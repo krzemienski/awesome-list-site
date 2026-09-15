@@ -1,0 +1,547 @@
+{
+  "route": "/submit",
+  "slug": "submit",
+  "kind": "html",
+  "note": "guest → client-side redirect to sign-in; both chains are recorded",
+  "byViewport": {
+    "375": {
+      "unitId": "9c7c59c0-ab70-4785-a846-ed05d97c4ab1",
+      "capturedAt": "2026-09-15T20:15:15.187Z",
+      "requestedUrl": "http://127.0.0.1:5000/submit",
+      "finalUrl": "http://127.0.0.1:5000/submit",
+      "documentStatus": 200,
+      "xRobotsTag": null,
+      "httpRedirects": [],
+      "clientNavigations": [
+        "http://127.0.0.1:5000/submit"
+      ],
+      "blockedRequests": [
+        {
+          "method": "POST",
+          "url": "https://gorgeous-jennet-4.clerk.accounts.dev/v1/dev_browser?__clerk_api_version=2026-05-12&_clerk_js_version=6.32.0"
+        }
+      ],
+      "allowedAuthInitializations": [],
+      "blockedWebSockets": [
+        "ws://127.0.0.1:5000/?token=%5BREDACTED%5D"
+      ],
+      "blockedWorkers": [
+        "Worker blob:http://127.0.0.1:5000/89216685-2d41-4292-b528-b772fa134f59"
+      ],
+      "blockedPopups": [],
+      "blockedServiceWorkers": [],
+      "consentBanner": {
+        "present": true,
+        "dismissedVia": "[data-testid=\"consent-decline\"]"
+      },
+      "attempts": 1,
+      "viewport": {
+        "width": 375,
+        "height": 812
+      },
+      "title": "Submit a Resource — Awesome Video",
+      "lang": "en",
+      "h1": [
+        "Add to the index"
+      ],
+      "canonical": "https://awesome.video/submit",
+      "robotsMeta": "index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1",
+      "description": "Suggest a new video development tool, library, article, or course for inclusion in Awesome Video.",
+      "jsonLdBlocks": 2,
+      "jsonLdTypes": [
+        "BreadcrumbList",
+        "ListItem",
+        "WebPage",
+        "WebSite"
+      ],
+      "linkCount": 29,
+      "navLabels": [
+        "Home",
+        "AWESOME VIDEO",
+        "Community & Events",
+        "Encoding & Codecs",
+        "General Tools",
+        "Infrastructure & Delivery",
+        "Intro & Learning",
+        "Media Tools",
+        "All categories →",
+        "Journeys",
+        "About",
+        "Submit a resource",
+        "Admin",
+        "Terms",
+        "Privacy",
+        "Code of Conduct",
+        "Cookie settings",
+        "krzemienski/awesome-video ↗",
+        "Report an issue ↗",
+        "Contributing ↗",
+        "awesome-list guidelines ↗",
+        "Docs ↗",
+        "Sitemap"
+      ],
+      "visibleTestIds": [
+        "alert-login-required",
+        "brand-mark",
+        "breadcrumb-mobile-current",
+        "button-cancel",
+        "button-submit",
+        "footer-about",
+        "footer-categories",
+        "footer-code-of-conduct",
+        "footer-cookie-settings",
+        "footer-copyright",
+        "footer-github",
+        "footer-home",
+        "footer-journeys",
+        "footer-privacy",
+        "footer-submit",
+        "footer-terms",
+        "header-brand",
+        "input-description",
+        "input-tags",
+        "input-title",
+        "input-url",
+        "link-breadcrumb-home",
+        "link-login",
+        "mobile-drawer-trigger",
+        "page-breadcrumb",
+        "select-category",
+        "site-footer"
+      ],
+      "documentHeight": 2778,
+      "screenshot": {
+        "width": 375,
+        "height": 2778,
+        "bytes": 119065,
+        "truncated": false,
+        "documentHeight": 2778,
+        "sha256": "bee0bed62304ff0dc4d23cc17f658df657e1d65e880bda179c25505aeb4a4b21"
+      }
+    },
+    "768": {
+      "unitId": "41c6383c-16b9-4ec6-81c8-d4354dd427ac",
+      "capturedAt": "2026-09-15T20:15:18.469Z",
+      "requestedUrl": "http://127.0.0.1:5000/submit",
+      "finalUrl": "http://127.0.0.1:5000/submit",
+      "documentStatus": 200,
+      "xRobotsTag": null,
+      "httpRedirects": [],
+      "clientNavigations": [
+        "http://127.0.0.1:5000/submit"
+      ],
+      "blockedRequests": [
+        {
+          "method": "POST",
+          "url": "https://gorgeous-jennet-4.clerk.accounts.dev/v1/dev_browser?__clerk_api_version=2026-05-12&_clerk_js_version=6.32.0"
+        }
+      ],
+      "allowedAuthInitializations": [],
+      "blockedWebSockets": [
+        "ws://127.0.0.1:5000/?token=%5BREDACTED%5D"
+      ],
+      "blockedWorkers": [
+        "Worker blob:http://127.0.0.1:5000/0093a863-3d65-4e8f-9ab4-67fcb84509e0"
+      ],
+      "blockedPopups": [],
+      "blockedServiceWorkers": [],
+      "consentBanner": {
+        "present": true,
+        "dismissedVia": "[data-testid=\"consent-decline\"]"
+      },
+      "attempts": 1,
+      "viewport": {
+        "width": 768,
+        "height": 1024
+      },
+      "title": "Submit a Resource — Awesome Video",
+      "lang": "en",
+      "h1": [
+        "Add to the index"
+      ],
+      "canonical": "https://awesome.video/submit",
+      "robotsMeta": "index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1",
+      "description": "Suggest a new video development tool, library, article, or course for inclusion in Awesome Video.",
+      "jsonLdBlocks": 2,
+      "jsonLdTypes": [
+        "BreadcrumbList",
+        "ListItem",
+        "WebPage",
+        "WebSite"
+      ],
+      "linkCount": 29,
+      "navLabels": [
+        "Home",
+        "AWESOME VIDEO",
+        "Community & Events",
+        "Encoding & Codecs",
+        "General Tools",
+        "Infrastructure & Delivery",
+        "Intro & Learning",
+        "Media Tools",
+        "All categories →",
+        "Journeys",
+        "About",
+        "Submit a resource",
+        "Admin",
+        "Terms",
+        "Privacy",
+        "Code of Conduct",
+        "Cookie settings",
+        "krzemienski/awesome-video ↗",
+        "Report an issue ↗",
+        "Contributing ↗",
+        "awesome-list guidelines ↗",
+        "Docs ↗",
+        "Sitemap"
+      ],
+      "visibleTestIds": [
+        "alert-login-required",
+        "brand-mark",
+        "breadcrumb-mobile-current",
+        "button-cancel",
+        "button-submit",
+        "footer-about",
+        "footer-categories",
+        "footer-code-of-conduct",
+        "footer-cookie-settings",
+        "footer-copyright",
+        "footer-github",
+        "footer-home",
+        "footer-journeys",
+        "footer-privacy",
+        "footer-submit",
+        "footer-terms",
+        "header-brand",
+        "input-description",
+        "input-tags",
+        "input-title",
+        "input-url",
+        "link-breadcrumb-home",
+        "link-login",
+        "mobile-drawer-trigger",
+        "page-breadcrumb",
+        "select-category",
+        "site-footer"
+      ],
+      "documentHeight": 2183,
+      "screenshot": {
+        "width": 768,
+        "height": 2183,
+        "bytes": 120384,
+        "truncated": false,
+        "documentHeight": 2183,
+        "sha256": "13227cbb72d28dc959d5e57c99775102fe6719a83b8d0fb81e1952bdd41256f7"
+      }
+    },
+    "1024": {
+      "unitId": "fc7b1ae5-3b5b-4edf-9e2a-8e2befb8dd09",
+      "capturedAt": "2026-09-15T20:15:21.086Z",
+      "requestedUrl": "http://127.0.0.1:5000/submit",
+      "finalUrl": "http://127.0.0.1:5000/submit",
+      "documentStatus": 200,
+      "xRobotsTag": null,
+      "httpRedirects": [],
+      "clientNavigations": [
+        "http://127.0.0.1:5000/submit"
+      ],
+      "blockedRequests": [
+        {
+          "method": "POST",
+          "url": "https://gorgeous-jennet-4.clerk.accounts.dev/v1/dev_browser?__clerk_api_version=2026-05-12&_clerk_js_version=6.32.0"
+        }
+      ],
+      "allowedAuthInitializations": [],
+      "blockedWebSockets": [
+        "ws://127.0.0.1:5000/?token=%5BREDACTED%5D"
+      ],
+      "blockedWorkers": [
+        "Worker blob:http://127.0.0.1:5000/d6e4eb98-3527-4a2a-a1b1-b3cd0a92e0ed"
+      ],
+      "blockedPopups": [],
+      "blockedServiceWorkers": [],
+      "consentBanner": {
+        "present": true,
+        "dismissedVia": "[data-testid=\"consent-decline\"]"
+      },
+      "attempts": 1,
+      "viewport": {
+        "width": 1024,
+        "height": 768
+      },
+      "title": "Submit a Resource — Awesome Video",
+      "lang": "en",
+      "h1": [
+        "Add to the index"
+      ],
+      "canonical": "https://awesome.video/submit",
+      "robotsMeta": "index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1",
+      "description": "Suggest a new video development tool, library, article, or course for inclusion in Awesome Video.",
+      "jsonLdBlocks": 2,
+      "jsonLdTypes": [
+        "BreadcrumbList",
+        "ListItem",
+        "WebPage",
+        "WebSite"
+      ],
+      "linkCount": 47,
+      "navLabels": [
+        "Home",
+        "AWESOME VIDEO",
+        "Community & Events",
+        "Encoding & Codecs",
+        "General Tools",
+        "Infrastructure & Delivery",
+        "Intro & Learning",
+        "Media Tools",
+        "All categories →",
+        "Journeys",
+        "About",
+        "Submit a resource",
+        "Admin",
+        "Terms",
+        "Privacy",
+        "Code of Conduct",
+        "Cookie settings",
+        "krzemienski/awesome-video ↗",
+        "Report an issue ↗",
+        "Contributing ↗",
+        "awesome-list guidelines ↗",
+        "Docs ↗",
+        "Sitemap"
+      ],
+      "visibleTestIds": [
+        "alert-login-required",
+        "brand-mark",
+        "breadcrumb-mobile-current",
+        "button-cancel",
+        "button-submit",
+        "footer-about",
+        "footer-categories",
+        "footer-code-of-conduct",
+        "footer-cookie-settings",
+        "footer-copyright",
+        "footer-github",
+        "footer-home",
+        "footer-journeys",
+        "footer-privacy",
+        "footer-submit",
+        "footer-terms",
+        "header-brand",
+        "input-description",
+        "input-tags",
+        "input-title",
+        "input-url",
+        "link-breadcrumb-home",
+        "link-login",
+        "mobile-drawer-trigger",
+        "page-breadcrumb",
+        "select-category",
+        "site-footer"
+      ],
+      "documentHeight": 1652,
+      "screenshot": {
+        "width": 1024,
+        "height": 1652,
+        "bytes": 122175,
+        "truncated": false,
+        "documentHeight": 1652,
+        "sha256": "6f25fa1cfd56f70192e85ab9a9c4a4e3c8aa8aaa79817bc4a0ae63ec3c47c717"
+      }
+    },
+    "1440": {
+      "unitId": "af52e4a0-4f9f-4392-a820-36a447bfe061",
+      "capturedAt": "2026-09-15T20:15:23.835Z",
+      "requestedUrl": "http://127.0.0.1:5000/submit",
+      "finalUrl": "http://127.0.0.1:5000/submit",
+      "documentStatus": 200,
+      "xRobotsTag": null,
+      "httpRedirects": [],
+      "clientNavigations": [
+        "http://127.0.0.1:5000/submit"
+      ],
+      "blockedRequests": [
+        {
+          "method": "POST",
+          "url": "https://gorgeous-jennet-4.clerk.accounts.dev/v1/dev_browser?__clerk_api_version=2026-05-12&_clerk_js_version=6.32.0"
+        }
+      ],
+      "allowedAuthInitializations": [],
+      "blockedWebSockets": [
+        "ws://127.0.0.1:5000/?token=%5BREDACTED%5D"
+      ],
+      "blockedWorkers": [
+        "Worker blob:http://127.0.0.1:5000/99633712-a7cd-46a6-9b64-0e0c6d11ddd6"
+      ],
+      "blockedPopups": [],
+      "blockedServiceWorkers": [],
+      "consentBanner": {
+        "present": true,
+        "dismissedVia": "[data-testid=\"consent-decline\"]"
+      },
+      "attempts": 1,
+      "viewport": {
+        "width": 1440,
+        "height": 900
+      },
+      "title": "Submit a Resource — Awesome Video",
+      "lang": "en",
+      "h1": [
+        "Add to the index"
+      ],
+      "canonical": "https://awesome.video/submit",
+      "robotsMeta": "index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1",
+      "description": "Suggest a new video development tool, library, article, or course for inclusion in Awesome Video.",
+      "jsonLdBlocks": 2,
+      "jsonLdTypes": [
+        "BreadcrumbList",
+        "ListItem",
+        "WebPage",
+        "WebSite"
+      ],
+      "linkCount": 46,
+      "navLabels": [
+        "Browse",
+        "Submit",
+        "About",
+        "Docs ↗",
+        "Home",
+        "AWESOME VIDEO",
+        "Community & Events",
+        "Encoding & Codecs",
+        "General Tools",
+        "Infrastructure & Delivery",
+        "Intro & Learning",
+        "Media Tools",
+        "All categories →",
+        "Journeys",
+        "Submit a resource",
+        "Admin",
+        "Terms",
+        "Privacy",
+        "Code of Conduct",
+        "Cookie settings",
+        "krzemienski/awesome-video ↗",
+        "Report an issue ↗",
+        "Contributing ↗",
+        "awesome-list guidelines ↗",
+        "Sitemap"
+      ],
+      "visibleTestIds": [
+        "alert-login-required",
+        "brand-mark",
+        "breadcrumb-mobile-current",
+        "button-cancel",
+        "button-submit",
+        "footer-about",
+        "footer-categories",
+        "footer-code-of-conduct",
+        "footer-cookie-settings",
+        "footer-copyright",
+        "footer-github",
+        "footer-home",
+        "footer-journeys",
+        "footer-privacy",
+        "footer-submit",
+        "footer-terms",
+        "header-brand",
+        "input-description",
+        "input-tags",
+        "input-title",
+        "input-url",
+        "link-breadcrumb-home",
+        "link-login",
+        "page-breadcrumb",
+        "select-category",
+        "site-footer"
+      ],
+      "documentHeight": 1652,
+      "screenshot": {
+        "width": 1440,
+        "height": 1652,
+        "bytes": 131967,
+        "truncated": false,
+        "documentHeight": 1652,
+        "sha256": "4388d07f7327ad031bb5132660f99e64a2b0f453c19fe8c77f49aa326e4f0ed0"
+      }
+    }
+  },
+  "primaryViewport": 1440,
+  "title": "Submit a Resource — Awesome Video",
+  "lang": "en",
+  "h1": [
+    "Add to the index"
+  ],
+  "canonical": "https://awesome.video/submit",
+  "robotsMeta": "index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1",
+  "description": "Suggest a new video development tool, library, article, or course for inclusion in Awesome Video.",
+  "jsonLdTypes": [
+    "BreadcrumbList",
+    "ListItem",
+    "WebPage",
+    "WebSite"
+  ],
+  "linkCount": 46,
+  "navLabels": [
+    "Browse",
+    "Submit",
+    "About",
+    "Docs ↗",
+    "Home",
+    "AWESOME VIDEO",
+    "Community & Events",
+    "Encoding & Codecs",
+    "General Tools",
+    "Infrastructure & Delivery",
+    "Intro & Learning",
+    "Media Tools",
+    "All categories →",
+    "Journeys",
+    "Submit a resource",
+    "Admin",
+    "Terms",
+    "Privacy",
+    "Code of Conduct",
+    "Cookie settings",
+    "krzemienski/awesome-video ↗",
+    "Report an issue ↗",
+    "Contributing ↗",
+    "awesome-list guidelines ↗",
+    "Sitemap"
+  ],
+  "visibleTestIds": [
+    "alert-login-required",
+    "brand-mark",
+    "breadcrumb-mobile-current",
+    "button-cancel",
+    "button-submit",
+    "footer-about",
+    "footer-categories",
+    "footer-code-of-conduct",
+    "footer-cookie-settings",
+    "footer-copyright",
+    "footer-github",
+    "footer-home",
+    "footer-journeys",
+    "footer-privacy",
+    "footer-submit",
+    "footer-terms",
+    "header-brand",
+    "input-description",
+    "input-tags",
+    "input-title",
+    "input-url",
+    "link-breadcrumb-home",
+    "link-login",
+    "page-breadcrumb",
+    "select-category",
+    "site-footer"
+  ],
+  "finalUrl": "http://127.0.0.1:5000/submit",
+  "documentStatus": 200,
+  "xRobotsTag": null,
+  "clientNavigations": [
+    "http://127.0.0.1:5000/submit"
+  ],
+  "viewportDisagreements": []
+}

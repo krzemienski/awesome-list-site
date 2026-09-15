@@ -1,0 +1,50 @@
+{
+  "route": "/journeys",
+  "slug": "journeys",
+  "axeWidths": [
+    375,
+    1440
+  ],
+  "byViewport": {
+    "375": {
+      "unitId": "147f2779-5cee-41f2-813a-6b8488094a10",
+      "axeVersion": "4.13.0",
+      "analyzedUrl": "http://127.0.0.1:5000/journeys",
+      "byImpact": {
+        "critical": 0,
+        "serious": 0,
+        "moderate": 0,
+        "minor": 0
+      },
+      "nodesByImpact": {
+        "critical": 0,
+        "serious": 0,
+        "moderate": 0,
+        "minor": 0
+      },
+      "violations": [],
+      "incompleteRules": 1,
+      "passedRules": 38
+    },
+    "1440": {
+      "unitId": "8c9e3fa8-dae6-403f-91f0-d93c8edaadad",
+      "axeVersion": "4.13.0",
+      "analyzedUrl": "http://127.0.0.1:5000/journeys",
+      "byImpact": {
+        "critical": 0,
+        "serious": 0,
+        "moderate": 0,
+        "minor": 0
+      },
+      "nodesByImpact": {
+        "critical": 0,
+        "serious": 0,
+        "moderate": 0,
+        "minor": 0
+      },
+      "violations": [],
+      "incompleteRules": 1,
+      "passedRules": 39
+    }
+  }
+}

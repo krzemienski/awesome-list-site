@@ -1,0 +1,50 @@
+{
+  "route": "/resource/185020",
+  "slug": "resource-185020",
+  "axeWidths": [
+    375,
+    1440
+  ],
+  "byViewport": {
+    "375": {
+      "unitId": "ac4bce10-d91b-4a48-b4bb-33197f4a1a88",
+      "axeVersion": "4.13.0",
+      "analyzedUrl": "http://127.0.0.1:5000/resource/185020",
+      "byImpact": {
+        "critical": 0,
+        "serious": 0,
+        "moderate": 0,
+        "minor": 0
+      },
+      "nodesByImpact": {
+        "critical": 0,
+        "serious": 0,
+        "moderate": 0,
+        "minor": 0
+      },
+      "violations": [],
+      "incompleteRules": 1,
+      "passedRules": 40
+    },
+    "1440": {
+      "unitId": "ba7d09f0-08a0-48b3-818d-4571b9fa6683",
+      "axeVersion": "4.13.0",
+      "analyzedUrl": "http://127.0.0.1:5000/resource/185020",
+      "byImpact": {
+        "critical": 0,
+        "serious": 0,
+        "moderate": 0,
+        "minor": 0
+      },
+      "nodesByImpact": {
+        "critical": 0,
+        "serious": 0,
+        "moderate": 0,
+        "minor": 0
+      },
+      "violations": [],
+      "incompleteRules": 1,
+      "passedRules": 41
+    }
+  }
+}

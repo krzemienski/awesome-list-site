@@ -1,0 +1,40 @@
+  capture /design-system @768
+  capture /design-system @1024
+  capture /design-system @1440 +axe
+  status probe /terms
+  capture /terms @375 +axe
+  capture /terms @768
+  capture /terms @1024
+  capture /terms @1440 +axe
+  status probe /privacy
+  capture /privacy @375 +axe
+  capture /privacy @768
+  capture /privacy @1024
+  capture /privacy @1440 +axe
+  status probe /code-of-conduct
+  capture /code-of-conduct @375 +axe
+  capture /code-of-conduct @768
+  capture /code-of-conduct @1024
+  capture /code-of-conduct @1440 +axe
+  status probe /sign-in
+  capture /sign-in @375 +axe
+  capture /sign-in @768
+  capture /sign-in @1024
+  capture /sign-in @1440 +axe
+  status probe /this-route-does-not-exist
+  capture /this-route-does-not-exist @375 +axe
+  capture /this-route-does-not-exist @768
+  capture /this-route-does-not-exist @1024
+  capture /this-route-does-not-exist @1440 +axe
+  status probe /sitemap.xml
+  status probe /robots.txt
+Playwright lease released (production-baseline-compare)
+# Production baseline compare — 2026-09-12
+
+- baseline: `tests/parity/production-baseline/2026-09-12` (captured from https://awesome.video)
+- candidate: `http://127.0.0.1:5000` → `../../../tmp/full-regression-2026-09-15/baseline-compare/candidate`
+- compared at 2026-09-15T20:19:41.576Z · tool commit 2b44a2bc08692059cc4ab63c526a5871451fbe1f · chromium chromium-1223 · axe-core 4.13.0
+- routes: 26 · endpoints: 12 · strips: 96 (visual only, never a pixel gate)
+- tracked deltas: **43** (25 routes, 8 endpoints)
+
+Report: /tmp/full-regression-2026-09-15/baseline-compare/compare-report.md

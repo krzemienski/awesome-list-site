@@ -1,0 +1,38 @@
+{
+  "schemaVersion": 2,
+  "task": "567",
+  "screen": "app.admin.research",
+  "widths": [
+    {
+      "screen": "app.admin.research",
+      "width": 375,
+      "route": "/admin/research",
+      "identity": "Nick-admin",
+      "status": "PASS",
+      "identityVerified": {
+        "name": "Nick",
+        "role": "admin"
+      },
+      "ready": true,
+      "httpStatus": 200,
+      "axe": {
+        "violations": [],
+        "seriousCritical": [],
+        "passes": 44,
+        "incomplete": 1
+      }
+    },
+    {
+      "screen": "app.admin.research",
+      "width": 1440,
+      "route": "/admin/research",
+      "identity": "Nick-admin",
+      "status": "INCOMPLETE",
+      "error": {
+        "name": "ActionUnavailableError",
+        "message": "app admin tab control [data-testid=\"tab-research\"] is not rendered for this session (not an admin, or the tab does not exist)"
+      }
+    }
+  ],
+  "seriousCriticalZero": false
+}

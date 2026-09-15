@@ -1,0 +1,38 @@
+{
+  "schemaVersion": 2,
+  "task": "567",
+  "screen": "app.category",
+  "widths": [
+    {
+      "screen": "app.category",
+      "width": 375,
+      "route": "/category/community-events",
+      "identity": "public",
+      "status": "PASS",
+      "ready": true,
+      "httpStatus": 200,
+      "axe": {
+        "violations": [],
+        "seriousCritical": [],
+        "passes": 44,
+        "incomplete": 2
+      }
+    },
+    {
+      "screen": "app.category",
+      "width": 1440,
+      "route": "/category/community-events",
+      "identity": "public",
+      "status": "PASS",
+      "ready": true,
+      "httpStatus": 200,
+      "axe": {
+        "violations": [],
+        "seriousCritical": [],
+        "passes": 45,
+        "incomplete": 2
+      }
+    }
+  ],
+  "seriousCriticalZero": true
+}

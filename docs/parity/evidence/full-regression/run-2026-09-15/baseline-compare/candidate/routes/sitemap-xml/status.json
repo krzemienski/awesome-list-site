@@ -1,0 +1,15 @@
+{
+  "route": "/sitemap.xml",
+  "slug": "sitemap-xml",
+  "kind": "document",
+  "note": null,
+  "requestedUrl": "http://127.0.0.1:5000/sitemap.xml",
+  "finalUrl": "http://127.0.0.1:5000/sitemap.xml",
+  "status": 200,
+  "xRobotsTag": null,
+  "contentType": "application/xml; charset=utf-8",
+  "cacheControl": null,
+  "redirectChain": [],
+  "attempts": 1,
+  "probedAt": "2026-09-15T20:18:53.461Z"
+}

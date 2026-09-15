@@ -1,0 +1,1 @@
+Source snapshot: git archive 2b44a2bc08692059cc4ab63c526a5871451fbe1f. Existing scripts unchanged; existing installed dependencies and browser cache reused. App target remains port 5000. Isolated source root preserves peer evidence fixed publication paths. Initial broad extraction timed out before execution; selected source files then copied successfully.

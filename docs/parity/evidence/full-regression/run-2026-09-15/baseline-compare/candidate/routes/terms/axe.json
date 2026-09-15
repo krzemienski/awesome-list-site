@@ -1,0 +1,50 @@
+{
+  "route": "/terms",
+  "slug": "terms",
+  "axeWidths": [
+    375,
+    1440
+  ],
+  "byViewport": {
+    "375": {
+      "unitId": "6b1f4edf-b5a7-4915-9ce8-9d81f38acd4c",
+      "axeVersion": "4.13.0",
+      "analyzedUrl": "http://127.0.0.1:5000/terms",
+      "byImpact": {
+        "critical": 0,
+        "serious": 0,
+        "moderate": 0,
+        "minor": 0
+      },
+      "nodesByImpact": {
+        "critical": 0,
+        "serious": 0,
+        "moderate": 0,
+        "minor": 0
+      },
+      "violations": [],
+      "incompleteRules": 1,
+      "passedRules": 39
+    },
+    "1440": {
+      "unitId": "4e1aa3d5-d629-4efe-bae4-098086dca6c2",
+      "axeVersion": "4.13.0",
+      "analyzedUrl": "http://127.0.0.1:5000/terms",
+      "byImpact": {
+        "critical": 0,
+        "serious": 0,
+        "moderate": 0,
+        "minor": 0
+      },
+      "nodesByImpact": {
+        "critical": 0,
+        "serious": 0,
+        "moderate": 0,
+        "minor": 0
+      },
+      "violations": [],
+      "incompleteRules": 1,
+      "passedRules": 40
+    }
+  }
+}

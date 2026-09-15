@@ -1,0 +1,50 @@
+{
+  "route": "/subcategory/community-groups",
+  "slug": "subcategory-community-groups",
+  "axeWidths": [
+    375,
+    1440
+  ],
+  "byViewport": {
+    "375": {
+      "unitId": "87d588e5-b20b-40ba-a4da-306bf6b2fcf3",
+      "axeVersion": "4.13.0",
+      "analyzedUrl": "http://127.0.0.1:5000/subcategory/community-groups",
+      "byImpact": {
+        "critical": 0,
+        "serious": 0,
+        "moderate": 0,
+        "minor": 0
+      },
+      "nodesByImpact": {
+        "critical": 0,
+        "serious": 0,
+        "moderate": 0,
+        "minor": 0
+      },
+      "violations": [],
+      "incompleteRules": 2,
+      "passedRules": 44
+    },
+    "1440": {
+      "unitId": "edb3e398-9983-4734-a204-c7b5875068e2",
+      "axeVersion": "4.13.0",
+      "analyzedUrl": "http://127.0.0.1:5000/subcategory/community-groups",
+      "byImpact": {
+        "critical": 0,
+        "serious": 0,
+        "moderate": 0,
+        "minor": 0
+      },
+      "nodesByImpact": {
+        "critical": 0,
+        "serious": 0,
+        "moderate": 0,
+        "minor": 0
+      },
+      "violations": [],
+      "incompleteRules": 2,
+      "passedRules": 45
+    }
+  }
+}

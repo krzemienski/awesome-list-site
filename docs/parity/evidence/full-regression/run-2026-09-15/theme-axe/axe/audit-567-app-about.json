@@ -1,0 +1,38 @@
+{
+  "schemaVersion": 2,
+  "task": "567",
+  "screen": "app.about",
+  "widths": [
+    {
+      "screen": "app.about",
+      "width": 375,
+      "route": "/about",
+      "identity": "public",
+      "status": "PASS",
+      "ready": true,
+      "httpStatus": 200,
+      "axe": {
+        "violations": [],
+        "seriousCritical": [],
+        "passes": 40,
+        "incomplete": 2
+      }
+    },
+    {
+      "screen": "app.about",
+      "width": 1440,
+      "route": "/about",
+      "identity": "public",
+      "status": "PASS",
+      "ready": true,
+      "httpStatus": 200,
+      "axe": {
+        "violations": [],
+        "seriousCritical": [],
+        "passes": 40,
+        "incomplete": 2
+      }
+    }
+  ],
+  "seriousCriticalZero": true
+}

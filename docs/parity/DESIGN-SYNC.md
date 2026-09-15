@@ -194,3 +194,46 @@ source of truth.
 
 `--shell-sidebar-width` (280px) and `--shell-header-height` (60px): zero
 consumers, superseded by `--shell-sidebar-w` / `--shell-header-h`.
+
+## Full-regression production comparison — run-2026-09-15
+
+This register does **not** approve additional differences or supersede the
+documented design decisions above. The retained production snapshot is dated
+2026-09-12; candidate source is `2b44a2bc08692059cc4ab63c526a5871451fbe1f`,
+captured on the development app on 2026-09-15.
+
+**26 routes compared: 1 unchanged, 0 wholly approved intentional, 25 unresolved
+different.** Twelve API endpoints were compared; eight have tracked differences.
+There are 43 tracked deltas overall. These numbers describe retained coverage,
+not every inventoried public route. No canonical, robots, or JSON-LD difference
+notes were emitted by this comparison.
+
+| Route / group | Tracked differences | Adjudication |
+|---|---|---|
+| `/` | title, testids | Unresolved; confirm intentional naming and stable-selector contracts |
+| `/about`, `/submit`, `/sign-in` | H1, testids | Unresolved; design copy changes are not blanket approval of selector changes |
+| `/categories`, `/category/encoding-codecs`, `/category/community-events?page=2` | testids | Unresolved; compare stable interaction coverage |
+| `/subcategory/community-groups`, `/sub-subcategory/ffmpeg` | testids | Unresolved |
+| `/resource/185020`, `/resource/186190` | testids | Unresolved |
+| `/search?q=ffmpeg`, `/search?q=zzqxv-nothing` | testids | Unresolved |
+| `/advanced`, `/journeys`, `/journey/7`, `/tag/open-source` | testids | Unresolved |
+| `/settings/theme`, `/recommendations` | testids | Unresolved |
+| `/design-system` | testids, axe at 375/1440 | Unresolved; changed accessibility findings require individual review |
+| `/terms`, `/privacy`, `/code-of-conduct`, `/this-route-does-not-exist` | testids | Unresolved |
+| `/sitemap.xml` | counts, body | Unresolved; development and production catalog data differ |
+| `/robots.txt` | none | Unchanged |
+| Eight changed API endpoints | See per-endpoint comparison | Unresolved; data differences must be separated from contract changes |
+
+Evidence: [exact route delta list](evidence/full-regression/run-2026-09-15/BASELINE-DELTAS.md),
+[raw comparison](evidence/full-regression/run-2026-09-15/baseline-compare/compare-report.json),
+[summary and coverage limitation](evidence/full-regression/run-2026-09-15/baseline-summary.json).
+Own-origin normalization is already performed by the comparator; it does not
+justify any remaining tracked delta. Counts and sitemap differences are not
+automatically intentional merely because the candidate uses a development DB.
+
+Missing retained production coverage includes sign-up, bookmarks, contributions,
+notifications, onboarding, profile, settings, bare search and state variants.
+Parameterized entries represent the recorded route identities, not an exhaustive
+catalog crawl. Missing historical snapshots cannot be reconstructed from today's
+production site. Baseline/inventory ownership must resolve coverage and approve
+individual differences before delivery can claim full production parity.

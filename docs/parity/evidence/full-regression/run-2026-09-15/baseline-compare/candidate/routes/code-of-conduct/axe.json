@@ -1,0 +1,50 @@
+{
+  "route": "/code-of-conduct",
+  "slug": "code-of-conduct",
+  "axeWidths": [
+    375,
+    1440
+  ],
+  "byViewport": {
+    "375": {
+      "unitId": "96169552-48ba-46e7-a888-a56e92126178",
+      "axeVersion": "4.13.0",
+      "analyzedUrl": "http://127.0.0.1:5000/code-of-conduct",
+      "byImpact": {
+        "critical": 0,
+        "serious": 0,
+        "moderate": 0,
+        "minor": 0
+      },
+      "nodesByImpact": {
+        "critical": 0,
+        "serious": 0,
+        "moderate": 0,
+        "minor": 0
+      },
+      "violations": [],
+      "incompleteRules": 1,
+      "passedRules": 39
+    },
+    "1440": {
+      "unitId": "abb6d1d5-5406-42cf-a05f-2d4e62a80ffa",
+      "axeVersion": "4.13.0",
+      "analyzedUrl": "http://127.0.0.1:5000/code-of-conduct",
+      "byImpact": {
+        "critical": 0,
+        "serious": 0,
+        "moderate": 0,
+        "minor": 0
+      },
+      "nodesByImpact": {
+        "critical": 0,
+        "serious": 0,
+        "moderate": 0,
+        "minor": 0
+      },
+      "violations": [],
+      "incompleteRules": 1,
+      "passedRules": 40
+    }
+  }
+}

@@ -1,0 +1,24 @@
+{
+  "schemaVersion": 2,
+  "task": "567",
+  "screen": "app.error.empty",
+  "widths": [
+    {
+      "screen": "app.error.empty",
+      "width": 375,
+      "identity": "public",
+      "status": "SKIPPED",
+      "stateOnly": true,
+      "reason": "Empty states need an empty catalog slice; verified through empty-state tokens, not pixels."
+    },
+    {
+      "screen": "app.error.empty",
+      "width": 1440,
+      "identity": "public",
+      "status": "SKIPPED",
+      "stateOnly": true,
+      "reason": "Empty states need an empty catalog slice; verified through empty-state tokens, not pixels."
+    }
+  ],
+  "seriousCriticalZero": false
+}

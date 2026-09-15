@@ -1,0 +1,512 @@
+{
+  "route": "/terms",
+  "slug": "terms",
+  "kind": "html",
+  "note": null,
+  "byViewport": {
+    "375": {
+      "unitId": "6b1f4edf-b5a7-4915-9ce8-9d81f38acd4c",
+      "capturedAt": "2026-09-15T20:17:57.246Z",
+      "requestedUrl": "http://127.0.0.1:5000/terms",
+      "finalUrl": "http://127.0.0.1:5000/terms",
+      "documentStatus": 200,
+      "xRobotsTag": null,
+      "httpRedirects": [],
+      "clientNavigations": [
+        "http://127.0.0.1:5000/terms"
+      ],
+      "blockedRequests": [
+        {
+          "method": "POST",
+          "url": "https://gorgeous-jennet-4.clerk.accounts.dev/v1/dev_browser?__clerk_api_version=2026-05-12&_clerk_js_version=6.32.0"
+        }
+      ],
+      "allowedAuthInitializations": [],
+      "blockedWebSockets": [
+        "ws://127.0.0.1:5000/?token=%5BREDACTED%5D"
+      ],
+      "blockedWorkers": [
+        "Worker blob:http://127.0.0.1:5000/5ffb1b61-6c29-4f51-9cab-6c8ac6bc07e8"
+      ],
+      "blockedPopups": [],
+      "blockedServiceWorkers": [],
+      "consentBanner": {
+        "present": true,
+        "dismissedVia": "[data-testid=\"consent-decline\"]"
+      },
+      "attempts": 1,
+      "viewport": {
+        "width": 375,
+        "height": 812
+      },
+      "title": "Terms of Use — Awesome Video",
+      "lang": "en",
+      "h1": [
+        "Terms of Use"
+      ],
+      "canonical": "https://awesome.video/terms",
+      "robotsMeta": "index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1",
+      "description": "The terms that govern your use of Awesome Video — a free, community-curated directory of video development resources.",
+      "jsonLdBlocks": 2,
+      "jsonLdTypes": [
+        "BreadcrumbList",
+        "ListItem",
+        "WebPage",
+        "WebSite"
+      ],
+      "linkCount": 29,
+      "navLabels": [
+        "Home",
+        "AWESOME VIDEO",
+        "Community & Events",
+        "Encoding & Codecs",
+        "General Tools",
+        "Infrastructure & Delivery",
+        "Intro & Learning",
+        "Media Tools",
+        "All categories →",
+        "Journeys",
+        "About",
+        "Submit a resource",
+        "Admin",
+        "Terms",
+        "Privacy",
+        "Code of Conduct",
+        "Cookie settings",
+        "krzemienski/awesome-video ↗",
+        "Report an issue ↗",
+        "Contributing ↗",
+        "awesome-list guidelines ↗",
+        "Docs ↗",
+        "Sitemap"
+      ],
+      "visibleTestIds": [
+        "brand-mark",
+        "breadcrumb-mobile-current",
+        "footer-about",
+        "footer-categories",
+        "footer-code-of-conduct",
+        "footer-cookie-settings",
+        "footer-copyright",
+        "footer-github",
+        "footer-home",
+        "footer-journeys",
+        "footer-privacy",
+        "footer-submit",
+        "footer-terms",
+        "header-brand",
+        "heading-terms",
+        "link-breadcrumb-home",
+        "link-terms-contact",
+        "mobile-drawer-trigger",
+        "page-breadcrumb",
+        "site-footer"
+      ],
+      "documentHeight": 3770,
+      "screenshot": {
+        "width": 375,
+        "height": 3770,
+        "bytes": 216679,
+        "truncated": false,
+        "documentHeight": 3770,
+        "sha256": "f00111c1fc5301782f71cca3b21c8bf8a656778a94108981aa234a9b047c92d4"
+      }
+    },
+    "768": {
+      "unitId": "dd1500eb-4177-49b9-998a-60c201266563",
+      "capturedAt": "2026-09-15T20:18:00.380Z",
+      "requestedUrl": "http://127.0.0.1:5000/terms",
+      "finalUrl": "http://127.0.0.1:5000/terms",
+      "documentStatus": 200,
+      "xRobotsTag": null,
+      "httpRedirects": [],
+      "clientNavigations": [
+        "http://127.0.0.1:5000/terms"
+      ],
+      "blockedRequests": [
+        {
+          "method": "POST",
+          "url": "https://gorgeous-jennet-4.clerk.accounts.dev/v1/dev_browser?__clerk_api_version=2026-05-12&_clerk_js_version=6.32.0"
+        }
+      ],
+      "allowedAuthInitializations": [],
+      "blockedWebSockets": [
+        "ws://127.0.0.1:5000/?token=%5BREDACTED%5D"
+      ],
+      "blockedWorkers": [
+        "Worker blob:http://127.0.0.1:5000/6c35167a-c6a1-4151-8829-5195f3367567"
+      ],
+      "blockedPopups": [],
+      "blockedServiceWorkers": [],
+      "consentBanner": {
+        "present": true,
+        "dismissedVia": "[data-testid=\"consent-decline\"]"
+      },
+      "attempts": 1,
+      "viewport": {
+        "width": 768,
+        "height": 1024
+      },
+      "title": "Terms of Use — Awesome Video",
+      "lang": "en",
+      "h1": [
+        "Terms of Use"
+      ],
+      "canonical": "https://awesome.video/terms",
+      "robotsMeta": "index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1",
+      "description": "The terms that govern your use of Awesome Video — a free, community-curated directory of video development resources.",
+      "jsonLdBlocks": 2,
+      "jsonLdTypes": [
+        "BreadcrumbList",
+        "ListItem",
+        "WebPage",
+        "WebSite"
+      ],
+      "linkCount": 29,
+      "navLabels": [
+        "Home",
+        "AWESOME VIDEO",
+        "Community & Events",
+        "Encoding & Codecs",
+        "General Tools",
+        "Infrastructure & Delivery",
+        "Intro & Learning",
+        "Media Tools",
+        "All categories →",
+        "Journeys",
+        "About",
+        "Submit a resource",
+        "Admin",
+        "Terms",
+        "Privacy",
+        "Code of Conduct",
+        "Cookie settings",
+        "krzemienski/awesome-video ↗",
+        "Report an issue ↗",
+        "Contributing ↗",
+        "awesome-list guidelines ↗",
+        "Docs ↗",
+        "Sitemap"
+      ],
+      "visibleTestIds": [
+        "brand-mark",
+        "breadcrumb-mobile-current",
+        "footer-about",
+        "footer-categories",
+        "footer-code-of-conduct",
+        "footer-cookie-settings",
+        "footer-copyright",
+        "footer-github",
+        "footer-home",
+        "footer-journeys",
+        "footer-privacy",
+        "footer-submit",
+        "footer-terms",
+        "header-brand",
+        "heading-terms",
+        "link-breadcrumb-home",
+        "link-terms-contact",
+        "mobile-drawer-trigger",
+        "page-breadcrumb",
+        "site-footer"
+      ],
+      "documentHeight": 2680,
+      "screenshot": {
+        "width": 768,
+        "height": 2680,
+        "bytes": 216842,
+        "truncated": false,
+        "documentHeight": 2680,
+        "sha256": "47ff0413d8a9b3de2b4300d5cb95d2623ea175205e6270896507d13c5d143531"
+      }
+    },
+    "1024": {
+      "unitId": "126b81fd-43f3-4801-944a-03833ffe5925",
+      "capturedAt": "2026-09-15T20:18:03.063Z",
+      "requestedUrl": "http://127.0.0.1:5000/terms",
+      "finalUrl": "http://127.0.0.1:5000/terms",
+      "documentStatus": 200,
+      "xRobotsTag": null,
+      "httpRedirects": [],
+      "clientNavigations": [
+        "http://127.0.0.1:5000/terms"
+      ],
+      "blockedRequests": [
+        {
+          "method": "POST",
+          "url": "https://gorgeous-jennet-4.clerk.accounts.dev/v1/dev_browser?__clerk_api_version=2026-05-12&_clerk_js_version=6.32.0"
+        }
+      ],
+      "allowedAuthInitializations": [],
+      "blockedWebSockets": [
+        "ws://127.0.0.1:5000/?token=%5BREDACTED%5D"
+      ],
+      "blockedWorkers": [
+        "Worker blob:http://127.0.0.1:5000/d6133a6c-ec27-4cfc-b6aa-8c2c354a2612"
+      ],
+      "blockedPopups": [],
+      "blockedServiceWorkers": [],
+      "consentBanner": {
+        "present": true,
+        "dismissedVia": "[data-testid=\"consent-decline\"]"
+      },
+      "attempts": 1,
+      "viewport": {
+        "width": 1024,
+        "height": 768
+      },
+      "title": "Terms of Use — Awesome Video",
+      "lang": "en",
+      "h1": [
+        "Terms of Use"
+      ],
+      "canonical": "https://awesome.video/terms",
+      "robotsMeta": "index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1",
+      "description": "The terms that govern your use of Awesome Video — a free, community-curated directory of video development resources.",
+      "jsonLdBlocks": 2,
+      "jsonLdTypes": [
+        "BreadcrumbList",
+        "ListItem",
+        "WebPage",
+        "WebSite"
+      ],
+      "linkCount": 47,
+      "navLabels": [
+        "Home",
+        "AWESOME VIDEO",
+        "Community & Events",
+        "Encoding & Codecs",
+        "General Tools",
+        "Infrastructure & Delivery",
+        "Intro & Learning",
+        "Media Tools",
+        "All categories →",
+        "Journeys",
+        "About",
+        "Submit a resource",
+        "Admin",
+        "Terms",
+        "Privacy",
+        "Code of Conduct",
+        "Cookie settings",
+        "krzemienski/awesome-video ↗",
+        "Report an issue ↗",
+        "Contributing ↗",
+        "awesome-list guidelines ↗",
+        "Docs ↗",
+        "Sitemap"
+      ],
+      "visibleTestIds": [
+        "brand-mark",
+        "breadcrumb-mobile-current",
+        "footer-about",
+        "footer-categories",
+        "footer-code-of-conduct",
+        "footer-cookie-settings",
+        "footer-copyright",
+        "footer-github",
+        "footer-home",
+        "footer-journeys",
+        "footer-privacy",
+        "footer-submit",
+        "footer-terms",
+        "header-brand",
+        "heading-terms",
+        "link-breadcrumb-home",
+        "link-terms-contact",
+        "mobile-drawer-trigger",
+        "page-breadcrumb",
+        "site-footer"
+      ],
+      "documentHeight": 2128,
+      "screenshot": {
+        "width": 1024,
+        "height": 2128,
+        "bytes": 218264,
+        "truncated": false,
+        "documentHeight": 2128,
+        "sha256": "cc464a72257aa4c84c82752a35ad29fe19a5b3f8e4494d47fd3de9bf388aa0e6"
+      }
+    },
+    "1440": {
+      "unitId": "4e1aa3d5-d629-4efe-bae4-098086dca6c2",
+      "capturedAt": "2026-09-15T20:18:05.629Z",
+      "requestedUrl": "http://127.0.0.1:5000/terms",
+      "finalUrl": "http://127.0.0.1:5000/terms",
+      "documentStatus": 200,
+      "xRobotsTag": null,
+      "httpRedirects": [],
+      "clientNavigations": [
+        "http://127.0.0.1:5000/terms"
+      ],
+      "blockedRequests": [
+        {
+          "method": "POST",
+          "url": "https://gorgeous-jennet-4.clerk.accounts.dev/v1/dev_browser?__clerk_api_version=2026-05-12&_clerk_js_version=6.32.0"
+        }
+      ],
+      "allowedAuthInitializations": [],
+      "blockedWebSockets": [
+        "ws://127.0.0.1:5000/?token=%5BREDACTED%5D"
+      ],
+      "blockedWorkers": [
+        "Worker blob:http://127.0.0.1:5000/11a733fe-6c2a-4ff7-b658-1591083b570a"
+      ],
+      "blockedPopups": [],
+      "blockedServiceWorkers": [],
+      "consentBanner": {
+        "present": true,
+        "dismissedVia": "[data-testid=\"consent-decline\"]"
+      },
+      "attempts": 1,
+      "viewport": {
+        "width": 1440,
+        "height": 900
+      },
+      "title": "Terms of Use — Awesome Video",
+      "lang": "en",
+      "h1": [
+        "Terms of Use"
+      ],
+      "canonical": "https://awesome.video/terms",
+      "robotsMeta": "index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1",
+      "description": "The terms that govern your use of Awesome Video — a free, community-curated directory of video development resources.",
+      "jsonLdBlocks": 2,
+      "jsonLdTypes": [
+        "BreadcrumbList",
+        "ListItem",
+        "WebPage",
+        "WebSite"
+      ],
+      "linkCount": 46,
+      "navLabels": [
+        "Browse",
+        "Submit",
+        "About",
+        "Docs ↗",
+        "Home",
+        "AWESOME VIDEO",
+        "Community & Events",
+        "Encoding & Codecs",
+        "General Tools",
+        "Infrastructure & Delivery",
+        "Intro & Learning",
+        "Media Tools",
+        "All categories →",
+        "Journeys",
+        "Submit a resource",
+        "Admin",
+        "Terms",
+        "Privacy",
+        "Code of Conduct",
+        "Cookie settings",
+        "krzemienski/awesome-video ↗",
+        "Report an issue ↗",
+        "Contributing ↗",
+        "awesome-list guidelines ↗",
+        "Sitemap"
+      ],
+      "visibleTestIds": [
+        "brand-mark",
+        "breadcrumb-mobile-current",
+        "footer-about",
+        "footer-categories",
+        "footer-code-of-conduct",
+        "footer-cookie-settings",
+        "footer-copyright",
+        "footer-github",
+        "footer-home",
+        "footer-journeys",
+        "footer-privacy",
+        "footer-submit",
+        "footer-terms",
+        "header-brand",
+        "heading-terms",
+        "link-breadcrumb-home",
+        "link-terms-contact",
+        "page-breadcrumb",
+        "site-footer"
+      ],
+      "documentHeight": 2130,
+      "screenshot": {
+        "width": 1440,
+        "height": 2130,
+        "bytes": 230586,
+        "truncated": false,
+        "documentHeight": 2130,
+        "sha256": "28c5bcdb7b324f3d79156932c77999895031e848229314a51689e15a63a9a1f3"
+      }
+    }
+  },
+  "primaryViewport": 1440,
+  "title": "Terms of Use — Awesome Video",
+  "lang": "en",
+  "h1": [
+    "Terms of Use"
+  ],
+  "canonical": "https://awesome.video/terms",
+  "robotsMeta": "index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1",
+  "description": "The terms that govern your use of Awesome Video — a free, community-curated directory of video development resources.",
+  "jsonLdTypes": [
+    "BreadcrumbList",
+    "ListItem",
+    "WebPage",
+    "WebSite"
+  ],
+  "linkCount": 46,
+  "navLabels": [
+    "Browse",
+    "Submit",
+    "About",
+    "Docs ↗",
+    "Home",
+    "AWESOME VIDEO",
+    "Community & Events",
+    "Encoding & Codecs",
+    "General Tools",
+    "Infrastructure & Delivery",
+    "Intro & Learning",
+    "Media Tools",
+    "All categories →",
+    "Journeys",
+    "Submit a resource",
+    "Admin",
+    "Terms",
+    "Privacy",
+    "Code of Conduct",
+    "Cookie settings",
+    "krzemienski/awesome-video ↗",
+    "Report an issue ↗",
+    "Contributing ↗",
+    "awesome-list guidelines ↗",
+    "Sitemap"
+  ],
+  "visibleTestIds": [
+    "brand-mark",
+    "breadcrumb-mobile-current",
+    "footer-about",
+    "footer-categories",
+    "footer-code-of-conduct",
+    "footer-cookie-settings",
+    "footer-copyright",
+    "footer-github",
+    "footer-home",
+    "footer-journeys",
+    "footer-privacy",
+    "footer-submit",
+    "footer-terms",
+    "header-brand",
+    "heading-terms",
+    "link-breadcrumb-home",
+    "link-terms-contact",
+    "page-breadcrumb",
+    "site-footer"
+  ],
+  "finalUrl": "http://127.0.0.1:5000/terms",
+  "documentStatus": 200,
+  "xRobotsTag": null,
+  "clientNavigations": [
+    "http://127.0.0.1:5000/terms"
+  ],
+  "viewportDisagreements": []
+}

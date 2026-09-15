@@ -28,9 +28,10 @@ checkable statement.
   vitest-shared-db-file-parallelism.md) and the set is byte-stable.
 - e2e: check `git log` of a failing spec — if its last change predates the last
   green commit and the selector it wants exists in neither tree, it is stale,
-  not broken by you. All five projects run here since 2026-09-15 (Firefox and
-  WebKit installed in the workspace cache; WebKit runtime notes in
-  playwright-browser-version-pin.md). A full run is ~40 min at 3 workers —
+  not broken by you. Missing Firefox/WebKit executables are an infrastructure
+  blocker, not failed application assertions — report them and follow the
+  testing policy instead of installing browsers (see
+  playwright-browser-version-pin.md). The full five-project run is long;
   background it. Spec copy drifts silently behind shared-component re-skins
   (search placeholder, bookmarks empty-state copy): check `git log` of the
   component before calling the spec stale.

@@ -1,0 +1,11 @@
+{
+  "routesCompared": 26,
+  "identicalTracked": 1,
+  "whollyApprovedIntentional": 0,
+  "unresolvedDifferent": 25,
+  "trackedDeltas": 43,
+  "apiEndpoints": 12,
+  "apiEndpointsWithTrackedDeltas": 8,
+  "semanticSeoNotes": [],
+  "coverageLimit": "Retained production inventory has no matching baseline for sign-up, bookmarks, contributions, notifications, onboarding, profile, settings, bare search; parameterized routes use representative identities only. Missing snapshots cannot be reconstructed retrospectively."
+}

@@ -1,0 +1,72 @@
+{
+  "route": "/",
+  "slug": "home",
+  "axeWidths": [
+    375,
+    1440
+  ],
+  "byViewport": {
+    "375": {
+      "unitId": "b51022a5-3a67-48c8-852f-ef6bca10837f",
+      "axeVersion": "4.13.0",
+      "analyzedUrl": "http://127.0.0.1:5000/",
+      "byImpact": {
+        "critical": 0,
+        "serious": 0,
+        "moderate": 1,
+        "minor": 0
+      },
+      "nodesByImpact": {
+        "critical": 0,
+        "serious": 0,
+        "moderate": 1,
+        "minor": 0
+      },
+      "violations": [
+        {
+          "id": "heading-order",
+          "impact": "moderate",
+          "help": "Heading levels should only increase by one",
+          "helpUrl": "https://dequeuniversity.com/rules/axe/4.13/heading-order?application=playwright",
+          "nodes": 1,
+          "targets": [
+            "a[data-testid=\"link-category-community-events\"] > h3"
+          ]
+        }
+      ],
+      "incompleteRules": 2,
+      "passedRules": 36
+    },
+    "1440": {
+      "unitId": "2d9bf7c1-4274-4b3c-808a-257594d68475",
+      "axeVersion": "4.13.0",
+      "analyzedUrl": "http://127.0.0.1:5000/",
+      "byImpact": {
+        "critical": 0,
+        "serious": 0,
+        "moderate": 1,
+        "minor": 0
+      },
+      "nodesByImpact": {
+        "critical": 0,
+        "serious": 0,
+        "moderate": 1,
+        "minor": 0
+      },
+      "violations": [
+        {
+          "id": "heading-order",
+          "impact": "moderate",
+          "help": "Heading levels should only increase by one",
+          "helpUrl": "https://dequeuniversity.com/rules/axe/4.13/heading-order?application=playwright",
+          "nodes": 1,
+          "targets": [
+            "a[data-testid=\"link-category-community-events\"] > h3"
+          ]
+        }
+      ],
+      "incompleteRules": 2,
+      "passedRules": 38
+    }
+  }
+}

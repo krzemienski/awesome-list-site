@@ -1,0 +1,24 @@
+{
+  "schemaVersion": 2,
+  "task": "567",
+  "screen": "app.error.loading",
+  "widths": [
+    {
+      "screen": "app.error.loading",
+      "width": 375,
+      "identity": "public",
+      "status": "SKIPPED",
+      "stateOnly": true,
+      "reason": "Loading skeletons are transient; verified through skeleton tokens, not pixels."
+    },
+    {
+      "screen": "app.error.loading",
+      "width": 1440,
+      "identity": "public",
+      "status": "SKIPPED",
+      "stateOnly": true,
+      "reason": "Loading skeletons are transient; verified through skeleton tokens, not pixels."
+    }
+  ],
+  "seriousCriticalZero": false
+}

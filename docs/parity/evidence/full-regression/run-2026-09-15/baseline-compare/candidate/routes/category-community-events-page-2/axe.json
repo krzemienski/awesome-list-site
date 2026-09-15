@@ -1,0 +1,50 @@
+{
+  "route": "/category/community-events?page=2",
+  "slug": "category-community-events-page-2",
+  "axeWidths": [
+    375,
+    1440
+  ],
+  "byViewport": {
+    "375": {
+      "unitId": "94b68e56-ce97-477c-9bf0-e138efddf914",
+      "axeVersion": "4.13.0",
+      "analyzedUrl": "http://127.0.0.1:5000/category/community-events?page=2",
+      "byImpact": {
+        "critical": 0,
+        "serious": 0,
+        "moderate": 0,
+        "minor": 0
+      },
+      "nodesByImpact": {
+        "critical": 0,
+        "serious": 0,
+        "moderate": 0,
+        "minor": 0
+      },
+      "violations": [],
+      "incompleteRules": 2,
+      "passedRules": 44
+    },
+    "1440": {
+      "unitId": "2c41d67b-a4f3-4f1a-9289-5b90d729eb34",
+      "axeVersion": "4.13.0",
+      "analyzedUrl": "http://127.0.0.1:5000/category/community-events?page=2",
+      "byImpact": {
+        "critical": 0,
+        "serious": 0,
+        "moderate": 0,
+        "minor": 0
+      },
+      "nodesByImpact": {
+        "critical": 0,
+        "serious": 0,
+        "moderate": 0,
+        "minor": 0
+      },
+      "violations": [],
+      "incompleteRules": 2,
+      "passedRules": 45
+    }
+  }
+}

@@ -1,0 +1,16 @@
+{
+  "task": "567",
+  "status": "INCOMPLETE",
+  "inventoriedAppScreens": 60,
+  "routableAppScreens": 54,
+  "publicScreens": 32,
+  "adminScreens": 28,
+  "expectedRows": 108,
+  "inventoriedRows": 120,
+  "executedRows": 108,
+  "skippedRows": 12,
+  "stateOnlyRows": 12,
+  "passRows": 107,
+  "seriousCriticalRows": 0,
+  "incompleteRows": 1
+}

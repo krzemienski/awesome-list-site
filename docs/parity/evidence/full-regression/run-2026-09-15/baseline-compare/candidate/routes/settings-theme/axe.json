@@ -1,0 +1,50 @@
+{
+  "route": "/settings/theme",
+  "slug": "settings-theme",
+  "axeWidths": [
+    375,
+    1440
+  ],
+  "byViewport": {
+    "375": {
+      "unitId": "f848f9f9-1265-46cb-a6b2-eaaa9e8d39b1",
+      "axeVersion": "4.13.0",
+      "analyzedUrl": "http://127.0.0.1:5000/settings/theme",
+      "byImpact": {
+        "critical": 0,
+        "serious": 0,
+        "moderate": 0,
+        "minor": 0
+      },
+      "nodesByImpact": {
+        "critical": 0,
+        "serious": 0,
+        "moderate": 0,
+        "minor": 0
+      },
+      "violations": [],
+      "incompleteRules": 1,
+      "passedRules": 38
+    },
+    "1440": {
+      "unitId": "ff643421-c4ff-4dc7-bdc3-e8660abc1bc0",
+      "axeVersion": "4.13.0",
+      "analyzedUrl": "http://127.0.0.1:5000/settings/theme",
+      "byImpact": {
+        "critical": 0,
+        "serious": 0,
+        "moderate": 0,
+        "minor": 0
+      },
+      "nodesByImpact": {
+        "critical": 0,
+        "serious": 0,
+        "moderate": 0,
+        "minor": 0
+      },
+      "violations": [],
+      "incompleteRules": 1,
+      "passedRules": 39
+    }
+  }
+}

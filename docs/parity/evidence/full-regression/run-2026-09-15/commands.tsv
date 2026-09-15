@@ -1,0 +1,59 @@
+check	0	13	npm run check
+lint	1	101	npm run lint
+lint-css	0	3	npm run lint:css
+unit	0	11	npm run test:unit
+canonical-token-parity	0	13	npm run validate:canonical-token-parity
+dead-components	0	1	node scripts/validation/dead-components.mjs
+dead-exports	0	3	node scripts/validation/dead-exports.mjs
+root-script-drift	0	1	node scripts/validation/root-script-drift.mjs
+design-system-artifact	0	1	npm run validate:design-system-artifact
+stylelint-system-tokens	0	0	npm run validate:stylelint-system-tokens
+migration-drift	0	13	npx tsx scripts/check-migration-drift.ts
+openapi-drift	0	7	npm run validate:openapi
+response-contract-drift	0	21	npm run validate:response-contracts
+palette-drift	0	1	node scripts/validation/palette-drift.mjs
+standalone-palette-drift	0	0	node scripts/validation/standalone-palette-drift.mjs
+accent-drift	0	1	node scripts/validation/accent-drift.mjs
+theme-registry-types	0	6	npm run validate:theme-registry-types
+webfont-fetch	0	1	npm run validate:webfont-fetch
+bundle-budget	1	9	npm run bundle:budget
+parity-smoke	1	261	npm run test:parity -- --only app.home.index,app.home.curated,app.category,app.about,app.shell.palette --width 375
+audit-sidebar	1	58	npm run audit:sidebar
+task302-build	0	22	node scripts/validation/build-dist.mjs
+bundle-budget-current	1	8	npm run bundle:budget
+task302-boot-safety	0	9	npx tsx scripts/verify-boot-migration-safety.ts
+print-audit-wrapper-aborted	SIGTERM	20	Parent wrapper nested the gate lease; aborted before browser start, corrected wrapper ownership
+print-audit	0	69.3	node scripts/validation/print-audit.mjs
+responsive-audit	0	86.5	node scripts/validation/responsive-audit.mjs
+tablet-audit	0	66.8	node scripts/validation/tablet-audit.mjs
+url-params-audit	0	59.2	node scripts/validation/url-params-audit.mjs
+tag-route-audit	0	5.4	node scripts/validation/tag-route-audit.mjs
+collections-audit	0	18.6	node scripts/validation/collections-audit.mjs
+auth-return-audit	1	15.6	npm run validate:auth-return
+task302-resilience	0	124.4	sleep 90 && BASE_URL=http://127.0.0.1:5000 npm run validate:resilience
+prefs-revision-races	0	3.2	npx tsx scripts/validation/preferences-revision-races.ts
+seo-snapshot	0	180.6	node scripts/validation/seo-snapshot.mjs --gate --parity
+taxonomy-listing-parity	0	0.7	node scripts/validation/taxonomy-listing-parity.mjs
+taxonomy-no-corpus-fetch	0	18.4	node scripts/validation/taxonomy-no-corpus-fetch.mjs
+cache-headers	0	42.3	node scripts/validation/http-cache-headers.mjs --spawn --build
+pool-probe	0	3.6	PROBE_ROUNDS=3 PROBE_CONCURRENCY=20 npm run validate:pool
+search-typos	0	6.4	npm run validate:search-typos
+ds-showcase	0	17.1	node scripts/validation/design-system-showcase.mjs
+ds-button-sweep	1	71.5	node scripts/validation/ds-button-sweep.mjs
+sticky-preview-audit	0	5.1	node scripts/validation/sticky-preview-audit.mjs
+guest-recommendations	0	12.1	npm run validate:guest-recommendations
+product-profile-browser	0	22.5	npm run validate:product-profile-browser
+font-prepaint	0	5.8	npm run validate:font-prepaint
+admin-catalog-kind-mappings	0	0.1	node scripts/validation/admin-catalog-kind-mappings.mjs
+integration	0	148.6	npm run test:integration -- --no-file-parallelism --reporter=json --outputFile=/tmp/full-regression-2026-09-15/integration-results.json
+api-smoke	0	1.8	HTTP GET OpenAPI health categories home and admin AI deep health
+parity-full	1	4279	npm run test:parity
+parity-pixels-second	1	4265	npm run test:parity -- --only app.about,app.admin.approvals,app.admin.audit,app.admin.categories,app.admin.database,app.admin.edits,app.admin.enrichment,app.admin.export,app.admin.github,app.admin.linkhealth,app.admin.overview,app.admin.research,app.admin.researcher,app.admin.resources,app.admin.subcategories,app.admin.users,app.category,app.home.curated,app.home.index,app.resource.detail,app.shell.default,app.shell.mobile-drawer,app.shell.palette,app.subcategory,app.submit,app.subsubcategory,artifact.docs.a11y,artifact.docs.buttons,artifact.docs.cards,artifact.docs.checklist,artifact.docs.color,artifact.docs.data-density,artifact.docs.flows,artifact.docs.forms,artifact.docs.getting-started,artifact.docs.integration,artifact.docs.lists,artifact.docs.motion,artifact.docs.navigation,artifact.docs.overview,artifact.docs.pages,artifact.docs.principles,artifact.docs.spacing,artifact.docs.theming,artifact.docs.theming-app,artifact.docs.tokens,artifact.docs.typography,artifact.showcase
+auth-return-retry	0	59.5	BASE_URL=http://127.0.0.1:5000 npm run validate:auth-return
+baseline-compare	1	453.2	npm run baseline:compare -- --baseline tests/parity/production-baseline/2026-09-12 --against http://127.0.0.1:5000 --out /tmp/full-regression-2026-09-15/baseline-compare
+perf-mobile	0	49.4	npm run perf:mobile -- --json /tmp/full-regression-2026-09-15/perf-mobile.json
+audit-sidebar	1	60.0	npm run audit:sidebar
+e2e	1	569.0	npm run test:e2e -- --workers=3 --reporter=list,json
+theme-combo-sweep	0	59.3	npm run audit:parity-systems -- --phase theme (unchanged isolated source snapshot)
+axe-sweep	1	263.6	npm run audit:parity-systems -- --phase axe --resume (unchanged isolated source snapshot)
+bundle-budget-head	0	9	npm run bundle:budget (HEAD 9878061a, Journeys caps from upstream 677f2ea9)

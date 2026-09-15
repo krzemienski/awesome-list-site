@@ -1,0 +1,72 @@
+{
+  "route": "/advanced",
+  "slug": "advanced",
+  "axeWidths": [
+    375,
+    1440
+  ],
+  "byViewport": {
+    "375": {
+      "unitId": "eee6b3a4-98a5-43f8-80e7-9fb22665226b",
+      "axeVersion": "4.13.0",
+      "analyzedUrl": "http://127.0.0.1:5000/advanced",
+      "byImpact": {
+        "critical": 0,
+        "serious": 0,
+        "moderate": 1,
+        "minor": 0
+      },
+      "nodesByImpact": {
+        "critical": 0,
+        "serious": 0,
+        "moderate": 1,
+        "minor": 0
+      },
+      "violations": [
+        {
+          "id": "heading-order",
+          "impact": "moderate",
+          "help": "Heading levels should only increase by one",
+          "helpUrl": "https://dequeuniversity.com/rules/axe/4.13/heading-order?application=playwright",
+          "nodes": 1,
+          "targets": [
+            "#radix-\\:rb\\: > .pt-3.border-t.space-y-2 > h4"
+          ]
+        }
+      ],
+      "incompleteRules": 1,
+      "passedRules": 44
+    },
+    "1440": {
+      "unitId": "ba58fa61-e250-4e9f-a52b-0facb010ce02",
+      "axeVersion": "4.13.0",
+      "analyzedUrl": "http://127.0.0.1:5000/advanced",
+      "byImpact": {
+        "critical": 0,
+        "serious": 0,
+        "moderate": 1,
+        "minor": 0
+      },
+      "nodesByImpact": {
+        "critical": 0,
+        "serious": 0,
+        "moderate": 1,
+        "minor": 0
+      },
+      "violations": [
+        {
+          "id": "heading-order",
+          "impact": "moderate",
+          "help": "Heading levels should only increase by one",
+          "helpUrl": "https://dequeuniversity.com/rules/axe/4.13/heading-order?application=playwright",
+          "nodes": 1,
+          "targets": [
+            "#radix-\\:rh\\: > .pt-3.border-t.space-y-2 > h4"
+          ]
+        }
+      ],
+      "incompleteRules": 1,
+      "passedRules": 44
+    }
+  }
+}

@@ -1,0 +1,50 @@
+{
+  "route": "/category/encoding-codecs",
+  "slug": "category-encoding-codecs",
+  "axeWidths": [
+    375,
+    1440
+  ],
+  "byViewport": {
+    "375": {
+      "unitId": "84f60dcb-a55d-4d7a-a457-7d35d7698810",
+      "axeVersion": "4.13.0",
+      "analyzedUrl": "http://127.0.0.1:5000/category/encoding-codecs",
+      "byImpact": {
+        "critical": 0,
+        "serious": 0,
+        "moderate": 0,
+        "minor": 0
+      },
+      "nodesByImpact": {
+        "critical": 0,
+        "serious": 0,
+        "moderate": 0,
+        "minor": 0
+      },
+      "violations": [],
+      "incompleteRules": 2,
+      "passedRules": 44
+    },
+    "1440": {
+      "unitId": "390f01cd-cec9-4444-b638-c1f736bfeb38",
+      "axeVersion": "4.13.0",
+      "analyzedUrl": "http://127.0.0.1:5000/category/encoding-codecs",
+      "byImpact": {
+        "critical": 0,
+        "serious": 0,
+        "moderate": 0,
+        "minor": 0
+      },
+      "nodesByImpact": {
+        "critical": 0,
+        "serious": 0,
+        "moderate": 0,
+        "minor": 0
+      },
+      "violations": [],
+      "incompleteRules": 2,
+      "passedRules": 46
+    }
+  }
+}

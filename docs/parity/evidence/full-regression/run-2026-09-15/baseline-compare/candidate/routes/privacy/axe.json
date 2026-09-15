@@ -1,0 +1,50 @@
+{
+  "route": "/privacy",
+  "slug": "privacy",
+  "axeWidths": [
+    375,
+    1440
+  ],
+  "byViewport": {
+    "375": {
+      "unitId": "d6959b7b-4f7a-4f3b-8190-ee3c3f1723c0",
+      "axeVersion": "4.13.0",
+      "analyzedUrl": "http://127.0.0.1:5000/privacy",
+      "byImpact": {
+        "critical": 0,
+        "serious": 0,
+        "moderate": 0,
+        "minor": 0
+      },
+      "nodesByImpact": {
+        "critical": 0,
+        "serious": 0,
+        "moderate": 0,
+        "minor": 0
+      },
+      "violations": [],
+      "incompleteRules": 1,
+      "passedRules": 42
+    },
+    "1440": {
+      "unitId": "189ea203-3740-45ab-954f-c76dcc0c2534",
+      "axeVersion": "4.13.0",
+      "analyzedUrl": "http://127.0.0.1:5000/privacy",
+      "byImpact": {
+        "critical": 0,
+        "serious": 0,
+        "moderate": 0,
+        "minor": 0
+      },
+      "nodesByImpact": {
+        "critical": 0,
+        "serious": 0,
+        "moderate": 0,
+        "minor": 0
+      },
+      "violations": [],
+      "incompleteRules": 1,
+      "passedRules": 44
+    }
+  }
+}

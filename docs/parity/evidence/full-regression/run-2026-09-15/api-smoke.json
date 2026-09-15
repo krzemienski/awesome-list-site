@@ -1,0 +1,52 @@
+[
+  {
+    "route": "/api/openapi.json",
+    "status": 200
+  },
+  {
+    "route": "/api/health",
+    "status": 200
+  },
+  {
+    "route": "/api/categories",
+    "status": 200
+  },
+  {
+    "route": "/api/home",
+    "status": 200
+  },
+  {
+    "route": "/api/health/ai?deep=1",
+    "status": 200,
+    "body": {
+      "status": "healthy",
+      "connectionOk": true,
+      "available": true,
+      "requestCount": 0,
+      "cacheSize": 0,
+      "cacheHitRate": 0,
+      "config": {
+        "endpoint": "router",
+        "label": "router router.hack.ski (bearer token)",
+        "baseUrlHost": "router.hack.ski",
+        "baseUrl": "https://router.hack.ski",
+        "primaryModel": "cc/claude-opus-5",
+        "models": {
+          "haiku": "cc/claude-haiku-4-5-20251001",
+          "sonnet": "cc/claude-sonnet-5",
+          "opus": "cc/claude-opus-5",
+          "fable": "cc/claude-fable-5"
+        },
+        "flows": {
+          "urlAnalysis": "cc/claude-haiku-4-5-20251001",
+          "tagging": "cc/claude-haiku-4-5-20251001",
+          "recommendations": "cc/claude-haiku-4-5-20251001",
+          "journeySeeding": "cc/claude-sonnet-5",
+          "enrichment": "cc/claude-haiku-4-5-20251001",
+          "researchScout": "cc/claude-haiku-4-5-20251001",
+          "researchOrchestrator": "cc/claude-opus-5"
+        }
+      }
+    }
+  }
+]

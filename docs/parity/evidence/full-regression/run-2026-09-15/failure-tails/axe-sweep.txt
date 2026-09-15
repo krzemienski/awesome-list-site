@@ -1,0 +1,40 @@
+[audit-567] checkpoint axe (cell)
+[audit-567] axe app.contributions@1440 Nick-admin: PASS
+[audit-567] checkpoint axe (cell)
+[audit-567] axe app.journey-detail@375 Nick-admin: PASS
+[audit-567] checkpoint axe (cell)
+[audit-567] axe app.journey-detail@1440 Nick-admin: PASS
+[audit-567] checkpoint axe (cell)
+[audit-567] axe app.journeys@375 Nick-admin: PASS
+[audit-567] checkpoint axe (cell)
+[audit-567] axe app.journeys@1440 Nick-admin: PASS
+[audit-567] checkpoint axe (cell)
+[audit-567] axe app.notifications@375 Nick-admin: PASS
+[audit-567] checkpoint axe (cell)
+[audit-567] axe app.notifications@1440 Nick-admin: PASS
+[audit-567] checkpoint axe (cell)
+[audit-567] axe app.onboarding@375 Nick-admin: PASS
+[audit-567] checkpoint axe (cell)
+[audit-567] axe app.onboarding@1440 Nick-admin: PASS
+[audit-567] checkpoint axe (cell)
+[audit-567] axe app.profile@375 Nick-admin: PASS
+[audit-567] checkpoint axe (cell)
+[audit-567] axe app.profile@1440 Nick-admin: PASS
+[audit-567] checkpoint axe (cell)
+[audit-567] axe app.settings@375 Nick-admin: PASS
+[audit-567] checkpoint axe (cell)
+[audit-567] axe app.settings@1440 Nick-admin: PASS
+[audit-567] checkpoint axe (cell)
+[audit-567] axe app.settings.theme@375 Nick-admin: PASS
+[audit-567] checkpoint axe (cell)
+[audit-567] axe app.settings.theme@1440 Nick-admin: PASS
+[audit-567] checkpoint axe (cell)
+[audit-567] axe app.submit@375 Nick-admin: PASS
+[audit-567] checkpoint axe (cell)
+[audit-567] axe app.submit@1440 Nick-admin: PASS
+[audit-567] checkpoint axe (incomplete)
+Playwright lease released (task567-browser)
+[audit-567] published evidence under docs/parity/evidence/multi-system, docs/parity/evidence/axe, and docs/parity/worklog/audit-567-browser.md
+[audit-567] theme matrix 50/50
+[audit-567] smoke 0/0
+[audit-567] axe rows 108, serious/critical 0, incomplete 1

@@ -1,0 +1,15 @@
+{
+  "route": "/submit",
+  "slug": "submit",
+  "kind": "html",
+  "note": "guest → client-side redirect to sign-in; both chains are recorded",
+  "requestedUrl": "http://127.0.0.1:5000/submit",
+  "finalUrl": "http://127.0.0.1:5000/submit",
+  "status": 200,
+  "xRobotsTag": null,
+  "contentType": "text/html; charset=utf-8",
+  "cacheControl": "no-store",
+  "redirectChain": [],
+  "attempts": 1,
+  "probedAt": "2026-09-15T20:15:13.009Z"
+}

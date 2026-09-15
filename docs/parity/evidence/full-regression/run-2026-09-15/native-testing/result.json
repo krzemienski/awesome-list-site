@@ -1,0 +1,23 @@
+{
+  "assignmentId": "93d5cbfd-65ce-4612-a4c5-bb418e95cc9c",
+  "jobId": "regression-dialogs:11",
+  "kind": "testing",
+  "name": "regression-dialogs",
+  "screenshots": [
+    {
+      "description": "Supported Clerk handshake landed on the excluded Awesome.Video Design System artifact rather than the target app.",
+      "id": "dfnkw6"
+    },
+    {
+      "description": "Rewritten handshake on port 5000 produced a /v1/agents/tasks 404 and still showed Visitor state.",
+      "id": "tt0lip"
+    },
+    {
+      "description": "Direct port-5000 /bookmarks route shows guest empty state, Account · Visitor, and consent banner; required signed-in Collections UI is unavailable.",
+      "id": "6wpjrr"
+    }
+  ],
+  "status": "completed",
+  "text": "Unable to complete Task 570 because the supported Clerk test-session injection targets the Replit dev-domain artifact, while the requested app is http://127.0.0.1:5000. The initial programmatic sign-in landed on the explicitly excluded Awesome.Video Design System artifact. Rewriting that handshake URL to port 5000 redirected to `/v1/agents/tasks?...` and rendered a 404; direct `/bookmarks` remained `Account · Visitor`. I did not use Clerk UI, a custom browser stack, source writes, workflow restarts, or AI jobs.\n\nChecks:\n- Clerk sign-in: PARTIAL — disposable identity created via `signInClerkUser`; non-secret cleanup identity recorded as `__qa_test_570_dialogs_1789494399009_k3z93d+clerk_test@example.com`. The session could not be applied to port 5000.\n- `/bookmarks` route: PASS for route availability only — it rendered the guest empty state, not the required signed-in Collections UI (`Nothing saved on this device`, `Account · Visitor`).\n- New Collection dialog: NOT RUN — requires signed-in bookmarks page.\n- BookmarkNotesDialog: NOT RUN — per instruction, stopped at the auth/target blocker and did not create guest bookmark data.\n- `/profile`: NOT RUN — signed-in verification was not possible.\n- Cleanup: no local user/bookmark row was created because the target app never accepted the session. Clerk identity cleanup is NOT COMPLETE: no supported `deleteClerkUser` helper is exposed, and I did not use undocumented/custom deletion or sweep other QA users. Clerk-first cleanup therefore requires the environment's supported Clerk cleanup mechanism or correct target-host auth injection.\n\nEvidence screenshots:\n- `dfnkw6` — excluded design-system root after supported Clerk handshake; confirms wrong artifact.\n- `tt0lip` — port-5000 host-rewritten handshake dead-link 404 with Visitor state.\n- `6wpjrr` — direct `/bookmarks` guest state with `Nothing saved on this device`, `Account · Visitor`, and consent banner.\n\nRequested evidence staging directory `/tmp/full-regression-2026-09-15/native-testing` was not written because the task explicitly prohibited source/repo writes and the browser evidence facility exposes observation screenshot IDs rather than user-controlled filesystem paths. No screenshot can truthfully be provided for either required dialog because neither was reached.",
+  "verdict": "unable"
+}

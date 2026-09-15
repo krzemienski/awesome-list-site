@@ -1,0 +1,3647 @@
+{
+  "schemaVersion": 3,
+  "task": "567",
+  "runId": "mu34mvnz-62785",
+  "capturedAt": "2026-09-15T20:31:04.655Z",
+  "base": "http://127.0.0.1:5000",
+  "phase": "axe",
+  "phaseStates": {
+    "theme": "COMPLETE",
+    "runtime": "PENDING",
+    "smoke": "PENDING",
+    "axe": "INCOMPLETE",
+    "font-prepaint": "PENDING"
+  },
+  "configuration": {
+    "chromium": "/tmp/full-regression-theme-axe-source/.cache/ms-playwright/chromium-1223/chrome-linux64/chrome",
+    "widths": [
+      375,
+      768,
+      1024,
+      1440
+    ],
+    "axeWidths": [
+      375,
+      1440
+    ],
+    "systems": [
+      "editorial",
+      "terminal",
+      "geist",
+      "brutalist",
+      "swiss"
+    ],
+    "accents": [
+      "crimson",
+      "magenta",
+      "orange",
+      "amber",
+      "emerald",
+      "matrix",
+      "cyan",
+      "violet",
+      "lime",
+      "rose"
+    ],
+    "smokeRoutes": {
+      "home": "/",
+      "category-encoding-codecs": "/category/encoding-codecs",
+      "resource-185020": "/resource/185020"
+    },
+    "identity": "public visitor + one disposable Nick admin",
+    "resume": false
+  },
+  "themeMatrix": [
+    {
+      "system": "editorial",
+      "accent": "crimson",
+      "attrs": {
+        "system": "editorial",
+        "accent": "crimson"
+      },
+      "stored": {
+        "system": "editorial",
+        "accent": "crimson"
+      },
+      "persistence": true,
+      "fonts": {
+        "checkedInSmoke": false
+      }
+    },
+    {
+      "system": "editorial",
+      "accent": "magenta",
+      "attrs": {
+        "system": "editorial",
+        "accent": "magenta"
+      },
+      "stored": {
+        "system": "editorial",
+        "accent": "magenta"
+      },
+      "persistence": true,
+      "fonts": {
+        "checkedInSmoke": false
+      }
+    },
+    {
+      "system": "editorial",
+      "accent": "orange",
+      "attrs": {
+        "system": "editorial",
+        "accent": "orange"
+      },
+      "stored": {
+        "system": "editorial",
+        "accent": "orange"
+      },
+      "persistence": true,
+      "fonts": {
+        "checkedInSmoke": false
+      }
+    },
+    {
+      "system": "editorial",
+      "accent": "amber",
+      "attrs": {
+        "system": "editorial",
+        "accent": "amber"
+      },
+      "stored": {
+        "system": "editorial",
+        "accent": "amber"
+      },
+      "persistence": true,
+      "fonts": {
+        "checkedInSmoke": false
+      }
+    },
+    {
+      "system": "editorial",
+      "accent": "emerald",
+      "attrs": {
+        "system": "editorial",
+        "accent": "emerald"
+      },
+      "stored": {
+        "system": "editorial",
+        "accent": "emerald"
+      },
+      "persistence": true,
+      "fonts": {
+        "checkedInSmoke": false
+      }
+    },
+    {
+      "system": "editorial",
+      "accent": "matrix",
+      "attrs": {
+        "system": "editorial",
+        "accent": "matrix"
+      },
+      "stored": {
+        "system": "editorial",
+        "accent": "matrix"
+      },
+      "persistence": true,
+      "fonts": {
+        "checkedInSmoke": false
+      }
+    },
+    {
+      "system": "editorial",
+      "accent": "cyan",
+      "attrs": {
+        "system": "editorial",
+        "accent": "cyan"
+      },
+      "stored": {
+        "system": "editorial",
+        "accent": "cyan"
+      },
+      "persistence": true,
+      "fonts": {
+        "checkedInSmoke": false
+      }
+    },
+    {
+      "system": "editorial",
+      "accent": "violet",
+      "attrs": {
+        "system": "editorial",
+        "accent": "violet"
+      },
+      "stored": {
+        "system": "editorial",
+        "accent": "violet"
+      },
+      "persistence": true,
+      "fonts": {
+        "checkedInSmoke": false
+      }
+    },
+    {
+      "system": "editorial",
+      "accent": "lime",
+      "attrs": {
+        "system": "editorial",
+        "accent": "lime"
+      },
+      "stored": {
+        "system": "editorial",
+        "accent": "lime"
+      },
+      "persistence": true,
+      "fonts": {
+        "checkedInSmoke": false
+      }
+    },
+    {
+      "system": "editorial",
+      "accent": "rose",
+      "attrs": {
+        "system": "editorial",
+        "accent": "rose"
+      },
+      "stored": {
+        "system": "editorial",
+        "accent": "rose"
+      },
+      "persistence": true,
+      "fonts": {
+        "checkedInSmoke": false
+      }
+    },
+    {
+      "system": "terminal",
+      "accent": "crimson",
+      "attrs": {
+        "system": "terminal",
+        "accent": "crimson"
+      },
+      "stored": {
+        "system": "terminal",
+        "accent": "crimson"
+      },
+      "persistence": true,
+      "fonts": {
+        "checkedInSmoke": false
+      }
+    },
+    {
+      "system": "terminal",
+      "accent": "magenta",
+      "attrs": {
+        "system": "terminal",
+        "accent": "magenta"
+      },
+      "stored": {
+        "system": "terminal",
+        "accent": "magenta"
+      },
+      "persistence": true,
+      "fonts": {
+        "checkedInSmoke": false
+      }
+    },
+    {
+      "system": "terminal",
+      "accent": "orange",
+      "attrs": {
+        "system": "terminal",
+        "accent": "orange"
+      },
+      "stored": {
+        "system": "terminal",
+        "accent": "orange"
+      },
+      "persistence": true,
+      "fonts": {
+        "checkedInSmoke": false
+      }
+    },
+    {
+      "system": "terminal",
+      "accent": "amber",
+      "attrs": {
+        "system": "terminal",
+        "accent": "amber"
+      },
+      "stored": {
+        "system": "terminal",
+        "accent": "amber"
+      },
+      "persistence": true,
+      "fonts": {
+        "checkedInSmoke": false
+      }
+    },
+    {
+      "system": "terminal",
+      "accent": "emerald",
+      "attrs": {
+        "system": "terminal",
+        "accent": "emerald"
+      },
+      "stored": {
+        "system": "terminal",
+        "accent": "emerald"
+      },
+      "persistence": true,
+      "fonts": {
+        "checkedInSmoke": false
+      }
+    },
+    {
+      "system": "terminal",
+      "accent": "matrix",
+      "attrs": {
+        "system": "terminal",
+        "accent": "matrix"
+      },
+      "stored": {
+        "system": "terminal",
+        "accent": "matrix"
+      },
+      "persistence": true,
+      "fonts": {
+        "checkedInSmoke": false
+      }
+    },
+    {
+      "system": "terminal",
+      "accent": "cyan",
+      "attrs": {
+        "system": "terminal",
+        "accent": "cyan"
+      },
+      "stored": {
+        "system": "terminal",
+        "accent": "cyan"
+      },
+      "persistence": true,
+      "fonts": {
+        "checkedInSmoke": false
+      }
+    },
+    {
+      "system": "terminal",
+      "accent": "violet",
+      "attrs": {
+        "system": "terminal",
+        "accent": "violet"
+      },
+      "stored": {
+        "system": "terminal",
+        "accent": "violet"
+      },
+      "persistence": true,
+      "fonts": {
+        "checkedInSmoke": false
+      }
+    },
+    {
+      "system": "terminal",
+      "accent": "lime",
+      "attrs": {
+        "system": "terminal",
+        "accent": "lime"
+      },
+      "stored": {
+        "system": "terminal",
+        "accent": "lime"
+      },
+      "persistence": true,
+      "fonts": {
+        "checkedInSmoke": false
+      }
+    },
+    {
+      "system": "terminal",
+      "accent": "rose",
+      "attrs": {
+        "system": "terminal",
+        "accent": "rose"
+      },
+      "stored": {
+        "system": "terminal",
+        "accent": "rose"
+      },
+      "persistence": true,
+      "fonts": {
+        "checkedInSmoke": false
+      }
+    },
+    {
+      "system": "geist",
+      "accent": "crimson",
+      "attrs": {
+        "system": "geist",
+        "accent": "crimson"
+      },
+      "stored": {
+        "system": "geist",
+        "accent": "crimson"
+      },
+      "persistence": true,
+      "fonts": {
+        "checkedInSmoke": false
+      }
+    },
+    {
+      "system": "geist",
+      "accent": "magenta",
+      "attrs": {
+        "system": "geist",
+        "accent": "magenta"
+      },
+      "stored": {
+        "system": "geist",
+        "accent": "magenta"
+      },
+      "persistence": true,
+      "fonts": {
+        "checkedInSmoke": false
+      }
+    },
+    {
+      "system": "geist",
+      "accent": "orange",
+      "attrs": {
+        "system": "geist",
+        "accent": "orange"
+      },
+      "stored": {
+        "system": "geist",
+        "accent": "orange"
+      },
+      "persistence": true,
+      "fonts": {
+        "checkedInSmoke": false
+      }
+    },
+    {
+      "system": "geist",
+      "accent": "amber",
+      "attrs": {
+        "system": "geist",
+        "accent": "amber"
+      },
+      "stored": {
+        "system": "geist",
+        "accent": "amber"
+      },
+      "persistence": true,
+      "fonts": {
+        "checkedInSmoke": false
+      }
+    },
+    {
+      "system": "geist",
+      "accent": "emerald",
+      "attrs": {
+        "system": "geist",
+        "accent": "emerald"
+      },
+      "stored": {
+        "system": "geist",
+        "accent": "emerald"
+      },
+      "persistence": true,
+      "fonts": {
+        "checkedInSmoke": false
+      }
+    },
+    {
+      "system": "geist",
+      "accent": "matrix",
+      "attrs": {
+        "system": "geist",
+        "accent": "matrix"
+      },
+      "stored": {
+        "system": "geist",
+        "accent": "matrix"
+      },
+      "persistence": true,
+      "fonts": {
+        "checkedInSmoke": false
+      }
+    },
+    {
+      "system": "geist",
+      "accent": "cyan",
+      "attrs": {
+        "system": "geist",
+        "accent": "cyan"
+      },
+      "stored": {
+        "system": "geist",
+        "accent": "cyan"
+      },
+      "persistence": true,
+      "fonts": {
+        "checkedInSmoke": false
+      }
+    },
+    {
+      "system": "geist",
+      "accent": "violet",
+      "attrs": {
+        "system": "geist",
+        "accent": "violet"
+      },
+      "stored": {
+        "system": "geist",
+        "accent": "violet"
+      },
+      "persistence": true,
+      "fonts": {
+        "checkedInSmoke": false
+      }
+    },
+    {
+      "system": "geist",
+      "accent": "lime",
+      "attrs": {
+        "system": "geist",
+        "accent": "lime"
+      },
+      "stored": {
+        "system": "geist",
+        "accent": "lime"
+      },
+      "persistence": true,
+      "fonts": {
+        "checkedInSmoke": false
+      }
+    },
+    {
+      "system": "geist",
+      "accent": "rose",
+      "attrs": {
+        "system": "geist",
+        "accent": "rose"
+      },
+      "stored": {
+        "system": "geist",
+        "accent": "rose"
+      },
+      "persistence": true,
+      "fonts": {
+        "checkedInSmoke": false
+      }
+    },
+    {
+      "system": "brutalist",
+      "accent": "crimson",
+      "attrs": {
+        "system": "brutalist",
+        "accent": "crimson"
+      },
+      "stored": {
+        "system": "brutalist",
+        "accent": "crimson"
+      },
+      "persistence": true,
+      "fonts": {
+        "checkedInSmoke": false
+      }
+    },
+    {
+      "system": "brutalist",
+      "accent": "magenta",
+      "attrs": {
+        "system": "brutalist",
+        "accent": "magenta"
+      },
+      "stored": {
+        "system": "brutalist",
+        "accent": "magenta"
+      },
+      "persistence": true,
+      "fonts": {
+        "checkedInSmoke": false
+      }
+    },
+    {
+      "system": "brutalist",
+      "accent": "orange",
+      "attrs": {
+        "system": "brutalist",
+        "accent": "orange"
+      },
+      "stored": {
+        "system": "brutalist",
+        "accent": "orange"
+      },
+      "persistence": true,
+      "fonts": {
+        "checkedInSmoke": false
+      }
+    },
+    {
+      "system": "brutalist",
+      "accent": "amber",
+      "attrs": {
+        "system": "brutalist",
+        "accent": "amber"
+      },
+      "stored": {
+        "system": "brutalist",
+        "accent": "amber"
+      },
+      "persistence": true,
+      "fonts": {
+        "checkedInSmoke": false
+      }
+    },
+    {
+      "system": "brutalist",
+      "accent": "emerald",
+      "attrs": {
+        "system": "brutalist",
+        "accent": "emerald"
+      },
+      "stored": {
+        "system": "brutalist",
+        "accent": "emerald"
+      },
+      "persistence": true,
+      "fonts": {
+        "checkedInSmoke": false
+      }
+    },
+    {
+      "system": "brutalist",
+      "accent": "matrix",
+      "attrs": {
+        "system": "brutalist",
+        "accent": "matrix"
+      },
+      "stored": {
+        "system": "brutalist",
+        "accent": "matrix"
+      },
+      "persistence": true,
+      "fonts": {
+        "checkedInSmoke": false
+      }
+    },
+    {
+      "system": "brutalist",
+      "accent": "cyan",
+      "attrs": {
+        "system": "brutalist",
+        "accent": "cyan"
+      },
+      "stored": {
+        "system": "brutalist",
+        "accent": "cyan"
+      },
+      "persistence": true,
+      "fonts": {
+        "checkedInSmoke": false
+      }
+    },
+    {
+      "system": "brutalist",
+      "accent": "violet",
+      "attrs": {
+        "system": "brutalist",
+        "accent": "violet"
+      },
+      "stored": {
+        "system": "brutalist",
+        "accent": "violet"
+      },
+      "persistence": true,
+      "fonts": {
+        "checkedInSmoke": false
+      }
+    },
+    {
+      "system": "brutalist",
+      "accent": "lime",
+      "attrs": {
+        "system": "brutalist",
+        "accent": "lime"
+      },
+      "stored": {
+        "system": "brutalist",
+        "accent": "lime"
+      },
+      "persistence": true,
+      "fonts": {
+        "checkedInSmoke": false
+      }
+    },
+    {
+      "system": "brutalist",
+      "accent": "rose",
+      "attrs": {
+        "system": "brutalist",
+        "accent": "rose"
+      },
+      "stored": {
+        "system": "brutalist",
+        "accent": "rose"
+      },
+      "persistence": true,
+      "fonts": {
+        "checkedInSmoke": false
+      }
+    },
+    {
+      "system": "swiss",
+      "accent": "crimson",
+      "attrs": {
+        "system": "swiss",
+        "accent": "crimson"
+      },
+      "stored": {
+        "system": "swiss",
+        "accent": "crimson"
+      },
+      "persistence": true,
+      "fonts": {
+        "checkedInSmoke": false
+      }
+    },
+    {
+      "system": "swiss",
+      "accent": "magenta",
+      "attrs": {
+        "system": "swiss",
+        "accent": "magenta"
+      },
+      "stored": {
+        "system": "swiss",
+        "accent": "magenta"
+      },
+      "persistence": true,
+      "fonts": {
+        "checkedInSmoke": false
+      }
+    },
+    {
+      "system": "swiss",
+      "accent": "orange",
+      "attrs": {
+        "system": "swiss",
+        "accent": "orange"
+      },
+      "stored": {
+        "system": "swiss",
+        "accent": "orange"
+      },
+      "persistence": true,
+      "fonts": {
+        "checkedInSmoke": false
+      }
+    },
+    {
+      "system": "swiss",
+      "accent": "amber",
+      "attrs": {
+        "system": "swiss",
+        "accent": "amber"
+      },
+      "stored": {
+        "system": "swiss",
+        "accent": "amber"
+      },
+      "persistence": true,
+      "fonts": {
+        "checkedInSmoke": false
+      }
+    },
+    {
+      "system": "swiss",
+      "accent": "emerald",
+      "attrs": {
+        "system": "swiss",
+        "accent": "emerald"
+      },
+      "stored": {
+        "system": "swiss",
+        "accent": "emerald"
+      },
+      "persistence": true,
+      "fonts": {
+        "checkedInSmoke": false
+      }
+    },
+    {
+      "system": "swiss",
+      "accent": "matrix",
+      "attrs": {
+        "system": "swiss",
+        "accent": "matrix"
+      },
+      "stored": {
+        "system": "swiss",
+        "accent": "matrix"
+      },
+      "persistence": true,
+      "fonts": {
+        "checkedInSmoke": false
+      }
+    },
+    {
+      "system": "swiss",
+      "accent": "cyan",
+      "attrs": {
+        "system": "swiss",
+        "accent": "cyan"
+      },
+      "stored": {
+        "system": "swiss",
+        "accent": "cyan"
+      },
+      "persistence": true,
+      "fonts": {
+        "checkedInSmoke": false
+      }
+    },
+    {
+      "system": "swiss",
+      "accent": "violet",
+      "attrs": {
+        "system": "swiss",
+        "accent": "violet"
+      },
+      "stored": {
+        "system": "swiss",
+        "accent": "violet"
+      },
+      "persistence": true,
+      "fonts": {
+        "checkedInSmoke": false
+      }
+    },
+    {
+      "system": "swiss",
+      "accent": "lime",
+      "attrs": {
+        "system": "swiss",
+        "accent": "lime"
+      },
+      "stored": {
+        "system": "swiss",
+        "accent": "lime"
+      },
+      "persistence": true,
+      "fonts": {
+        "checkedInSmoke": false
+      }
+    },
+    {
+      "system": "swiss",
+      "accent": "rose",
+      "attrs": {
+        "system": "swiss",
+        "accent": "rose"
+      },
+      "stored": {
+        "system": "swiss",
+        "accent": "rose"
+      },
+      "persistence": true,
+      "fonts": {
+        "checkedInSmoke": false
+      }
+    }
+  ],
+  "stageAudits": [],
+  "interactions": [],
+  "smoke": {
+    "rows": []
+  },
+  "axe": {
+    "rows": [
+      {
+        "screen": "app.about",
+        "width": 375,
+        "route": "/about",
+        "identity": "public",
+        "status": "PASS",
+        "ready": true,
+        "httpStatus": 200,
+        "axe": {
+          "violations": [],
+          "seriousCritical": [],
+          "passes": 40,
+          "incomplete": 2
+        }
+      },
+      {
+        "screen": "app.about",
+        "width": 1440,
+        "route": "/about",
+        "identity": "public",
+        "status": "PASS",
+        "ready": true,
+        "httpStatus": 200,
+        "axe": {
+          "violations": [],
+          "seriousCritical": [],
+          "passes": 40,
+          "incomplete": 2
+        }
+      },
+      {
+        "screen": "app.advanced",
+        "width": 375,
+        "route": "/advanced",
+        "identity": "public",
+        "status": "PASS",
+        "ready": true,
+        "httpStatus": 200,
+        "axe": {
+          "violations": [
+            {
+              "id": "heading-order",
+              "impact": "moderate",
+              "help": "Heading levels should only increase by one",
+              "description": "Ensure the order of headings is semantically correct",
+              "nodes": 1,
+              "targets": [
+                [
+                  "#radix-\\:rb\\: > .pt-3.border-t.space-y-2 > h4"
+                ]
+              ],
+              "details": [
+                {
+                  "target": [
+                    "#radix-\\:rb\\: > .pt-3.border-t.space-y-2 > h4"
+                  ],
+                  "failureSummary": "Fix any of the following:\n  Heading order invalid"
+                }
+              ]
+            }
+          ],
+          "seriousCritical": [],
+          "passes": 44,
+          "incomplete": 1
+        }
+      },
+      {
+        "screen": "app.advanced",
+        "width": 1440,
+        "route": "/advanced",
+        "identity": "public",
+        "status": "PASS",
+        "ready": true,
+        "httpStatus": 200,
+        "axe": {
+          "violations": [
+            {
+              "id": "heading-order",
+              "impact": "moderate",
+              "help": "Heading levels should only increase by one",
+              "description": "Ensure the order of headings is semantically correct",
+              "nodes": 1,
+              "targets": [
+                [
+                  "#radix-\\:rh\\: > .pt-3.border-t.space-y-2 > h4"
+                ]
+              ],
+              "details": [
+                {
+                  "target": [
+                    "#radix-\\:rh\\: > .pt-3.border-t.space-y-2 > h4"
+                  ],
+                  "failureSummary": "Fix any of the following:\n  Heading order invalid"
+                }
+              ]
+            }
+          ],
+          "seriousCritical": [],
+          "passes": 44,
+          "incomplete": 1
+        }
+      },
+      {
+        "screen": "app.auth.sign-in",
+        "width": 375,
+        "route": "/sign-in",
+        "identity": "public",
+        "status": "PASS",
+        "ready": true,
+        "httpStatus": 200,
+        "axe": {
+          "violations": [],
+          "seriousCritical": [],
+          "passes": 45,
+          "incomplete": 1
+        }
+      },
+      {
+        "screen": "app.auth.sign-in",
+        "width": 1440,
+        "route": "/sign-in",
+        "identity": "public",
+        "status": "PASS",
+        "ready": true,
+        "httpStatus": 200,
+        "axe": {
+          "violations": [],
+          "seriousCritical": [],
+          "passes": 45,
+          "incomplete": 1
+        }
+      },
+      {
+        "screen": "app.auth.sign-up",
+        "width": 375,
+        "route": "/sign-up",
+        "identity": "public",
+        "status": "PASS",
+        "ready": true,
+        "httpStatus": 200,
+        "axe": {
+          "violations": [],
+          "seriousCritical": [],
+          "passes": 45,
+          "incomplete": 1
+        }
+      },
+      {
+        "screen": "app.auth.sign-up",
+        "width": 1440,
+        "route": "/sign-up",
+        "identity": "public",
+        "status": "PASS",
+        "ready": true,
+        "httpStatus": 200,
+        "axe": {
+          "violations": [],
+          "seriousCritical": [],
+          "passes": 45,
+          "incomplete": 1
+        }
+      },
+      {
+        "screen": "app.categories",
+        "width": 375,
+        "route": "/categories",
+        "identity": "public",
+        "status": "PASS",
+        "ready": true,
+        "httpStatus": 200,
+        "axe": {
+          "violations": [],
+          "seriousCritical": [],
+          "passes": 39,
+          "incomplete": 1
+        }
+      },
+      {
+        "screen": "app.categories",
+        "width": 1440,
+        "route": "/categories",
+        "identity": "public",
+        "status": "PASS",
+        "ready": true,
+        "httpStatus": 200,
+        "axe": {
+          "violations": [],
+          "seriousCritical": [],
+          "passes": 39,
+          "incomplete": 1
+        }
+      },
+      {
+        "screen": "app.category",
+        "width": 375,
+        "route": "/category/community-events",
+        "identity": "public",
+        "status": "PASS",
+        "ready": true,
+        "httpStatus": 200,
+        "axe": {
+          "violations": [],
+          "seriousCritical": [],
+          "passes": 44,
+          "incomplete": 2
+        }
+      },
+      {
+        "screen": "app.category",
+        "width": 1440,
+        "route": "/category/community-events",
+        "identity": "public",
+        "status": "PASS",
+        "ready": true,
+        "httpStatus": 200,
+        "axe": {
+          "violations": [],
+          "seriousCritical": [],
+          "passes": 45,
+          "incomplete": 2
+        }
+      },
+      {
+        "screen": "app.collection",
+        "width": 375,
+        "identity": "public",
+        "status": "SKIPPED",
+        "stateOnly": true,
+        "reason": "The reference has no collection page; verified through shared list-pattern tokens instead of pixels."
+      },
+      {
+        "screen": "app.collection",
+        "width": 1440,
+        "identity": "public",
+        "status": "SKIPPED",
+        "stateOnly": true,
+        "reason": "The reference has no collection page; verified through shared list-pattern tokens instead of pixels."
+      },
+      {
+        "screen": "app.error.empty",
+        "width": 375,
+        "identity": "public",
+        "status": "SKIPPED",
+        "stateOnly": true,
+        "reason": "Empty states need an empty catalog slice; verified through empty-state tokens, not pixels."
+      },
+      {
+        "screen": "app.error.empty",
+        "width": 1440,
+        "identity": "public",
+        "status": "SKIPPED",
+        "stateOnly": true,
+        "reason": "Empty states need an empty catalog slice; verified through empty-state tokens, not pixels."
+      },
+      {
+        "screen": "app.error.loading",
+        "width": 375,
+        "identity": "public",
+        "status": "SKIPPED",
+        "stateOnly": true,
+        "reason": "Loading skeletons are transient; verified through skeleton tokens, not pixels."
+      },
+      {
+        "screen": "app.error.loading",
+        "width": 1440,
+        "identity": "public",
+        "status": "SKIPPED",
+        "stateOnly": true,
+        "reason": "Loading skeletons are transient; verified through skeleton tokens, not pixels."
+      },
+      {
+        "screen": "app.error.route",
+        "width": 375,
+        "identity": "public",
+        "status": "SKIPPED",
+        "stateOnly": true,
+        "reason": "Error injection is prohibited; no naturally occurring real error state is supplied."
+      },
+      {
+        "screen": "app.error.route",
+        "width": 1440,
+        "identity": "public",
+        "status": "SKIPPED",
+        "stateOnly": true,
+        "reason": "Error injection is prohibited; no naturally occurring real error state is supplied."
+      },
+      {
+        "screen": "app.home.curated",
+        "width": 375,
+        "route": "/?layout=curated",
+        "identity": "public",
+        "status": "PASS",
+        "ready": true,
+        "httpStatus": 200,
+        "axe": {
+          "violations": [],
+          "seriousCritical": [],
+          "passes": 36,
+          "incomplete": 2
+        }
+      },
+      {
+        "screen": "app.home.curated",
+        "width": 1440,
+        "route": "/?layout=curated",
+        "identity": "public",
+        "status": "PASS",
+        "ready": true,
+        "httpStatus": 200,
+        "axe": {
+          "violations": [],
+          "seriousCritical": [],
+          "passes": 38,
+          "incomplete": 2
+        }
+      },
+      {
+        "screen": "app.home.index",
+        "width": 375,
+        "route": "/?layout=index",
+        "identity": "public",
+        "status": "PASS",
+        "ready": true,
+        "httpStatus": 200,
+        "axe": {
+          "violations": [
+            {
+              "id": "heading-order",
+              "impact": "moderate",
+              "help": "Heading levels should only increase by one",
+              "description": "Ensure the order of headings is semantically correct",
+              "nodes": 1,
+              "targets": [
+                [
+                  "a[data-testid=\"link-category-community-events\"] > h3"
+                ]
+              ],
+              "details": [
+                {
+                  "target": [
+                    "a[data-testid=\"link-category-community-events\"] > h3"
+                  ],
+                  "failureSummary": "Fix any of the following:\n  Heading order invalid"
+                }
+              ]
+            }
+          ],
+          "seriousCritical": [],
+          "passes": 36,
+          "incomplete": 2
+        }
+      },
+      {
+        "screen": "app.home.index",
+        "width": 1440,
+        "route": "/?layout=index",
+        "identity": "public",
+        "status": "PASS",
+        "ready": true,
+        "httpStatus": 200,
+        "axe": {
+          "violations": [
+            {
+              "id": "heading-order",
+              "impact": "moderate",
+              "help": "Heading levels should only increase by one",
+              "description": "Ensure the order of headings is semantically correct",
+              "nodes": 1,
+              "targets": [
+                [
+                  "a[data-testid=\"link-category-community-events\"] > h3"
+                ]
+              ],
+              "details": [
+                {
+                  "target": [
+                    "a[data-testid=\"link-category-community-events\"] > h3"
+                  ],
+                  "failureSummary": "Fix any of the following:\n  Heading order invalid"
+                }
+              ]
+            }
+          ],
+          "seriousCritical": [],
+          "passes": 38,
+          "incomplete": 2
+        }
+      },
+      {
+        "screen": "app.legal",
+        "width": 375,
+        "route": "/terms",
+        "identity": "public",
+        "status": "PASS",
+        "ready": true,
+        "httpStatus": 200,
+        "axe": {
+          "violations": [],
+          "seriousCritical": [],
+          "passes": 39,
+          "incomplete": 1
+        }
+      },
+      {
+        "screen": "app.legal",
+        "width": 1440,
+        "route": "/terms",
+        "identity": "public",
+        "status": "PASS",
+        "ready": true,
+        "httpStatus": 200,
+        "axe": {
+          "violations": [],
+          "seriousCritical": [],
+          "passes": 40,
+          "incomplete": 1
+        }
+      },
+      {
+        "screen": "app.not-found",
+        "width": 375,
+        "route": "/__parity-not-found__",
+        "identity": "public",
+        "status": "PASS",
+        "ready": true,
+        "httpStatus": 404,
+        "axe": {
+          "violations": [],
+          "seriousCritical": [],
+          "passes": 38,
+          "incomplete": 1
+        }
+      },
+      {
+        "screen": "app.not-found",
+        "width": 1440,
+        "route": "/__parity-not-found__",
+        "identity": "public",
+        "status": "PASS",
+        "ready": true,
+        "httpStatus": 404,
+        "axe": {
+          "violations": [],
+          "seriousCritical": [],
+          "passes": 39,
+          "incomplete": 1
+        }
+      },
+      {
+        "screen": "app.resource.detail",
+        "width": 375,
+        "route": "/resource/188015",
+        "identity": "public",
+        "status": "PASS",
+        "ready": true,
+        "httpStatus": 200,
+        "axe": {
+          "violations": [],
+          "seriousCritical": [],
+          "passes": 42,
+          "incomplete": 1
+        }
+      },
+      {
+        "screen": "app.resource.detail",
+        "width": 1440,
+        "route": "/resource/188015",
+        "identity": "public",
+        "status": "PASS",
+        "ready": true,
+        "httpStatus": 200,
+        "axe": {
+          "violations": [],
+          "seriousCritical": [],
+          "passes": 43,
+          "incomplete": 1
+        }
+      },
+      {
+        "screen": "app.search",
+        "width": 375,
+        "route": "/search",
+        "identity": "public",
+        "status": "PASS",
+        "ready": true,
+        "httpStatus": 200,
+        "axe": {
+          "violations": [
+            {
+              "id": "landmark-main-is-top-level",
+              "impact": "moderate",
+              "help": "Main landmark should not be contained in another landmark",
+              "description": "Ensure the main landmark is at top level",
+              "nodes": 1,
+              "targets": [
+                [
+                  ".outline-none"
+                ]
+              ],
+              "details": [
+                {
+                  "target": [
+                    ".outline-none"
+                  ],
+                  "failureSummary": "Fix any of the following:\n  The main landmark is contained in another landmark."
+                }
+              ]
+            },
+            {
+              "id": "landmark-no-duplicate-main",
+              "impact": "moderate",
+              "help": "Document should not have more than one main landmark",
+              "description": "Ensure the document has at most one main landmark",
+              "nodes": 1,
+              "targets": [
+                [
+                  "#main"
+                ]
+              ],
+              "details": [
+                {
+                  "target": [
+                    "#main"
+                  ],
+                  "failureSummary": "Fix any of the following:\n  Document has more than one main landmark"
+                }
+              ]
+            }
+          ],
+          "seriousCritical": [],
+          "passes": 41,
+          "incomplete": 1
+        }
+      },
+      {
+        "screen": "app.search",
+        "width": 1440,
+        "route": "/search",
+        "identity": "public",
+        "status": "PASS",
+        "ready": true,
+        "httpStatus": 200,
+        "axe": {
+          "violations": [
+            {
+              "id": "landmark-main-is-top-level",
+              "impact": "moderate",
+              "help": "Main landmark should not be contained in another landmark",
+              "description": "Ensure the main landmark is at top level",
+              "nodes": 1,
+              "targets": [
+                [
+                  "main[aria-label=\"Search results\"]"
+                ]
+              ],
+              "details": [
+                {
+                  "target": [
+                    "main[aria-label=\"Search results\"]"
+                  ],
+                  "failureSummary": "Fix any of the following:\n  The main landmark is contained in another landmark."
+                }
+              ]
+            },
+            {
+              "id": "landmark-no-duplicate-main",
+              "impact": "moderate",
+              "help": "Document should not have more than one main landmark",
+              "description": "Ensure the document has at most one main landmark",
+              "nodes": 1,
+              "targets": [
+                [
+                  "#main"
+                ]
+              ],
+              "details": [
+                {
+                  "target": [
+                    "#main"
+                  ],
+                  "failureSummary": "Fix any of the following:\n  Document has more than one main landmark"
+                }
+              ]
+            }
+          ],
+          "seriousCritical": [],
+          "passes": 44,
+          "incomplete": 1
+        }
+      },
+      {
+        "screen": "app.shell.default",
+        "width": 375,
+        "route": "/",
+        "identity": "public",
+        "status": "PASS",
+        "ready": true,
+        "httpStatus": 200,
+        "axe": {
+          "violations": [
+            {
+              "id": "heading-order",
+              "impact": "moderate",
+              "help": "Heading levels should only increase by one",
+              "description": "Ensure the order of headings is semantically correct",
+              "nodes": 1,
+              "targets": [
+                [
+                  "a[data-testid=\"link-category-community-events\"] > h3"
+                ]
+              ],
+              "details": [
+                {
+                  "target": [
+                    "a[data-testid=\"link-category-community-events\"] > h3"
+                  ],
+                  "failureSummary": "Fix any of the following:\n  Heading order invalid"
+                }
+              ]
+            }
+          ],
+          "seriousCritical": [],
+          "passes": 36,
+          "incomplete": 2
+        }
+      },
+      {
+        "screen": "app.shell.default",
+        "width": 1440,
+        "route": "/",
+        "identity": "public",
+        "status": "PASS",
+        "ready": true,
+        "httpStatus": 200,
+        "axe": {
+          "violations": [
+            {
+              "id": "heading-order",
+              "impact": "moderate",
+              "help": "Heading levels should only increase by one",
+              "description": "Ensure the order of headings is semantically correct",
+              "nodes": 1,
+              "targets": [
+                [
+                  "a[data-testid=\"link-category-community-events\"] > h3"
+                ]
+              ],
+              "details": [
+                {
+                  "target": [
+                    "a[data-testid=\"link-category-community-events\"] > h3"
+                  ],
+                  "failureSummary": "Fix any of the following:\n  Heading order invalid"
+                }
+              ]
+            }
+          ],
+          "seriousCritical": [],
+          "passes": 38,
+          "incomplete": 2
+        }
+      },
+      {
+        "screen": "app.shell.mobile-drawer",
+        "width": 375,
+        "route": "/",
+        "identity": "public",
+        "status": "PASS",
+        "ready": true,
+        "httpStatus": 200,
+        "axe": {
+          "violations": [],
+          "seriousCritical": [],
+          "passes": 36,
+          "incomplete": 3
+        }
+      },
+      {
+        "screen": "app.shell.mobile-drawer",
+        "width": 1440,
+        "route": "/",
+        "identity": "public",
+        "status": "PASS",
+        "ready": true,
+        "httpStatus": 200,
+        "axe": {
+          "violations": [
+            {
+              "id": "heading-order",
+              "impact": "moderate",
+              "help": "Heading levels should only increase by one",
+              "description": "Ensure the order of headings is semantically correct",
+              "nodes": 1,
+              "targets": [
+                [
+                  "a[data-testid=\"link-category-community-events\"] > h3"
+                ]
+              ],
+              "details": [
+                {
+                  "target": [
+                    "a[data-testid=\"link-category-community-events\"] > h3"
+                  ],
+                  "failureSummary": "Fix any of the following:\n  Heading order invalid"
+                }
+              ]
+            }
+          ],
+          "seriousCritical": [],
+          "passes": 38,
+          "incomplete": 2
+        }
+      },
+      {
+        "screen": "app.shell.palette",
+        "width": 375,
+        "route": "/",
+        "identity": "public",
+        "status": "PASS",
+        "ready": true,
+        "httpStatus": 200,
+        "axe": {
+          "violations": [],
+          "seriousCritical": [],
+          "passes": 39,
+          "incomplete": 2
+        }
+      },
+      {
+        "screen": "app.shell.palette",
+        "width": 1440,
+        "route": "/",
+        "identity": "public",
+        "status": "PASS",
+        "ready": true,
+        "httpStatus": 200,
+        "axe": {
+          "violations": [],
+          "seriousCritical": [],
+          "passes": 39,
+          "incomplete": 2
+        }
+      },
+      {
+        "screen": "app.subcategory",
+        "width": 375,
+        "route": "/subcategory/community-groups",
+        "identity": "public",
+        "status": "PASS",
+        "ready": true,
+        "httpStatus": 200,
+        "axe": {
+          "violations": [],
+          "seriousCritical": [],
+          "passes": 44,
+          "incomplete": 2
+        }
+      },
+      {
+        "screen": "app.subcategory",
+        "width": 1440,
+        "route": "/subcategory/community-groups",
+        "identity": "public",
+        "status": "PASS",
+        "ready": true,
+        "httpStatus": 200,
+        "axe": {
+          "violations": [],
+          "seriousCritical": [],
+          "passes": 45,
+          "incomplete": 2
+        }
+      },
+      {
+        "screen": "app.subsubcategory",
+        "width": 375,
+        "route": "/sub-subcategory/online-forums",
+        "identity": "public",
+        "status": "PASS",
+        "ready": true,
+        "httpStatus": 200,
+        "axe": {
+          "violations": [],
+          "seriousCritical": [],
+          "passes": 43,
+          "incomplete": 2
+        }
+      },
+      {
+        "screen": "app.subsubcategory",
+        "width": 1440,
+        "route": "/sub-subcategory/online-forums",
+        "identity": "public",
+        "status": "PASS",
+        "ready": true,
+        "httpStatus": 200,
+        "axe": {
+          "violations": [],
+          "seriousCritical": [],
+          "passes": 44,
+          "incomplete": 2
+        }
+      },
+      {
+        "screen": "app.system.code-of-conduct",
+        "width": 375,
+        "route": "/code-of-conduct",
+        "identity": "public",
+        "status": "PASS",
+        "ready": true,
+        "httpStatus": 200,
+        "axe": {
+          "violations": [],
+          "seriousCritical": [],
+          "passes": 39,
+          "incomplete": 1
+        }
+      },
+      {
+        "screen": "app.system.code-of-conduct",
+        "width": 1440,
+        "route": "/code-of-conduct",
+        "identity": "public",
+        "status": "PASS",
+        "ready": true,
+        "httpStatus": 200,
+        "axe": {
+          "violations": [],
+          "seriousCritical": [],
+          "passes": 40,
+          "incomplete": 1
+        }
+      },
+      {
+        "screen": "app.system.consent",
+        "width": 375,
+        "route": "/",
+        "identity": "public",
+        "status": "PASS",
+        "ready": true,
+        "httpStatus": 200,
+        "axe": {
+          "violations": [
+            {
+              "id": "heading-order",
+              "impact": "moderate",
+              "help": "Heading levels should only increase by one",
+              "description": "Ensure the order of headings is semantically correct",
+              "nodes": 1,
+              "targets": [
+                [
+                  "a[data-testid=\"link-category-community-events\"] > h3"
+                ]
+              ],
+              "details": [
+                {
+                  "target": [
+                    "a[data-testid=\"link-category-community-events\"] > h3"
+                  ],
+                  "failureSummary": "Fix any of the following:\n  Heading order invalid"
+                }
+              ]
+            }
+          ],
+          "seriousCritical": [],
+          "passes": 36,
+          "incomplete": 2
+        }
+      },
+      {
+        "screen": "app.system.consent",
+        "width": 1440,
+        "route": "/",
+        "identity": "public",
+        "status": "PASS",
+        "ready": true,
+        "httpStatus": 200,
+        "axe": {
+          "violations": [
+            {
+              "id": "heading-order",
+              "impact": "moderate",
+              "help": "Heading levels should only increase by one",
+              "description": "Ensure the order of headings is semantically correct",
+              "nodes": 1,
+              "targets": [
+                [
+                  "a[data-testid=\"link-category-community-events\"] > h3"
+                ]
+              ],
+              "details": [
+                {
+                  "target": [
+                    "a[data-testid=\"link-category-community-events\"] > h3"
+                  ],
+                  "failureSummary": "Fix any of the following:\n  Heading order invalid"
+                }
+              ]
+            }
+          ],
+          "seriousCritical": [],
+          "passes": 38,
+          "incomplete": 2
+        }
+      },
+      {
+        "screen": "app.system.design-system",
+        "width": 375,
+        "route": "/design-system",
+        "identity": "public",
+        "status": "PASS",
+        "ready": true,
+        "httpStatus": 200,
+        "axe": {
+          "violations": [],
+          "seriousCritical": [],
+          "passes": 38,
+          "incomplete": 1
+        }
+      },
+      {
+        "screen": "app.system.design-system",
+        "width": 1440,
+        "route": "/design-system",
+        "identity": "public",
+        "status": "PASS",
+        "ready": true,
+        "httpStatus": 200,
+        "axe": {
+          "violations": [],
+          "seriousCritical": [],
+          "passes": 39,
+          "incomplete": 1
+        }
+      },
+      {
+        "screen": "app.system.empty-search",
+        "width": 375,
+        "route": "/search?q=zzqxv-nothing",
+        "identity": "public",
+        "status": "PASS",
+        "ready": true,
+        "httpStatus": 200,
+        "axe": {
+          "violations": [
+            {
+              "id": "landmark-main-is-top-level",
+              "impact": "moderate",
+              "help": "Main landmark should not be contained in another landmark",
+              "description": "Ensure the main landmark is at top level",
+              "nodes": 1,
+              "targets": [
+                [
+                  ".outline-none"
+                ]
+              ],
+              "details": [
+                {
+                  "target": [
+                    ".outline-none"
+                  ],
+                  "failureSummary": "Fix any of the following:\n  The main landmark is contained in another landmark."
+                }
+              ]
+            },
+            {
+              "id": "landmark-no-duplicate-main",
+              "impact": "moderate",
+              "help": "Document should not have more than one main landmark",
+              "description": "Ensure the document has at most one main landmark",
+              "nodes": 1,
+              "targets": [
+                [
+                  "#main"
+                ]
+              ],
+              "details": [
+                {
+                  "target": [
+                    "#main"
+                  ],
+                  "failureSummary": "Fix any of the following:\n  Document has more than one main landmark"
+                }
+              ]
+            }
+          ],
+          "seriousCritical": [],
+          "passes": 41,
+          "incomplete": 1
+        }
+      },
+      {
+        "screen": "app.system.empty-search",
+        "width": 1440,
+        "route": "/search?q=zzqxv-nothing",
+        "identity": "public",
+        "status": "PASS",
+        "ready": true,
+        "httpStatus": 200,
+        "axe": {
+          "violations": [
+            {
+              "id": "landmark-main-is-top-level",
+              "impact": "moderate",
+              "help": "Main landmark should not be contained in another landmark",
+              "description": "Ensure the main landmark is at top level",
+              "nodes": 1,
+              "targets": [
+                [
+                  "main[aria-label=\"Search results\"]"
+                ]
+              ],
+              "details": [
+                {
+                  "target": [
+                    "main[aria-label=\"Search results\"]"
+                  ],
+                  "failureSummary": "Fix any of the following:\n  The main landmark is contained in another landmark."
+                }
+              ]
+            },
+            {
+              "id": "landmark-no-duplicate-main",
+              "impact": "moderate",
+              "help": "Document should not have more than one main landmark",
+              "description": "Ensure the document has at most one main landmark",
+              "nodes": 1,
+              "targets": [
+                [
+                  "#main"
+                ]
+              ],
+              "details": [
+                {
+                  "target": [
+                    "#main"
+                  ],
+                  "failureSummary": "Fix any of the following:\n  Document has more than one main landmark"
+                }
+              ]
+            }
+          ],
+          "seriousCritical": [],
+          "passes": 43,
+          "incomplete": 1
+        }
+      },
+      {
+        "screen": "app.system.error",
+        "width": 375,
+        "identity": "public",
+        "status": "SKIPPED",
+        "stateOnly": true,
+        "reason": "ErrorPage consumes the canonical error-state pattern. No artificial failure was injected to capture this conditional surface."
+      },
+      {
+        "screen": "app.system.error",
+        "width": 1440,
+        "identity": "public",
+        "status": "SKIPPED",
+        "stateOnly": true,
+        "reason": "ErrorPage consumes the canonical error-state pattern. No artificial failure was injected to capture this conditional surface."
+      },
+      {
+        "screen": "app.system.loading",
+        "width": 375,
+        "route": "/search?q=ffmpeg",
+        "identity": "public",
+        "status": "PASS",
+        "ready": true,
+        "httpStatus": 200,
+        "axe": {
+          "violations": [
+            {
+              "id": "landmark-main-is-top-level",
+              "impact": "moderate",
+              "help": "Main landmark should not be contained in another landmark",
+              "description": "Ensure the main landmark is at top level",
+              "nodes": 1,
+              "targets": [
+                [
+                  ".outline-none"
+                ]
+              ],
+              "details": [
+                {
+                  "target": [
+                    ".outline-none"
+                  ],
+                  "failureSummary": "Fix any of the following:\n  The main landmark is contained in another landmark."
+                }
+              ]
+            },
+            {
+              "id": "landmark-no-duplicate-main",
+              "impact": "moderate",
+              "help": "Document should not have more than one main landmark",
+              "description": "Ensure the document has at most one main landmark",
+              "nodes": 1,
+              "targets": [
+                [
+                  "#main"
+                ]
+              ],
+              "details": [
+                {
+                  "target": [
+                    "#main"
+                  ],
+                  "failureSummary": "Fix any of the following:\n  Document has more than one main landmark"
+                }
+              ]
+            }
+          ],
+          "seriousCritical": [],
+          "passes": 42,
+          "incomplete": 1
+        }
+      },
+      {
+        "screen": "app.system.loading",
+        "width": 1440,
+        "route": "/search?q=ffmpeg",
+        "identity": "public",
+        "status": "PASS",
+        "ready": true,
+        "httpStatus": 200,
+        "axe": {
+          "violations": [
+            {
+              "id": "landmark-main-is-top-level",
+              "impact": "moderate",
+              "help": "Main landmark should not be contained in another landmark",
+              "description": "Ensure the main landmark is at top level",
+              "nodes": 1,
+              "targets": [
+                [
+                  "main[aria-label=\"Search results\"]"
+                ]
+              ],
+              "details": [
+                {
+                  "target": [
+                    "main[aria-label=\"Search results\"]"
+                  ],
+                  "failureSummary": "Fix any of the following:\n  The main landmark is contained in another landmark."
+                }
+              ]
+            },
+            {
+              "id": "landmark-no-duplicate-main",
+              "impact": "moderate",
+              "help": "Document should not have more than one main landmark",
+              "description": "Ensure the document has at most one main landmark",
+              "nodes": 1,
+              "targets": [
+                [
+                  "#main"
+                ]
+              ],
+              "details": [
+                {
+                  "target": [
+                    "#main"
+                  ],
+                  "failureSummary": "Fix any of the following:\n  Document has more than one main landmark"
+                }
+              ]
+            }
+          ],
+          "seriousCritical": [],
+          "passes": 44,
+          "incomplete": 1
+        }
+      },
+      {
+        "screen": "app.system.not-found",
+        "width": 375,
+        "route": "/this-route-does-not-exist",
+        "identity": "public",
+        "status": "PASS",
+        "ready": true,
+        "httpStatus": 404,
+        "axe": {
+          "violations": [],
+          "seriousCritical": [],
+          "passes": 38,
+          "incomplete": 1
+        }
+      },
+      {
+        "screen": "app.system.not-found",
+        "width": 1440,
+        "route": "/this-route-does-not-exist",
+        "identity": "public",
+        "status": "PASS",
+        "ready": true,
+        "httpStatus": 404,
+        "axe": {
+          "violations": [],
+          "seriousCritical": [],
+          "passes": 39,
+          "incomplete": 1
+        }
+      },
+      {
+        "screen": "app.system.privacy",
+        "width": 375,
+        "route": "/privacy",
+        "identity": "public",
+        "status": "PASS",
+        "ready": true,
+        "httpStatus": 200,
+        "axe": {
+          "violations": [],
+          "seriousCritical": [],
+          "passes": 42,
+          "incomplete": 1
+        }
+      },
+      {
+        "screen": "app.system.privacy",
+        "width": 1440,
+        "route": "/privacy",
+        "identity": "public",
+        "status": "PASS",
+        "ready": true,
+        "httpStatus": 200,
+        "axe": {
+          "violations": [],
+          "seriousCritical": [],
+          "passes": 44,
+          "incomplete": 1
+        }
+      },
+      {
+        "screen": "app.system.terms",
+        "width": 375,
+        "route": "/terms",
+        "identity": "public",
+        "status": "PASS",
+        "ready": true,
+        "httpStatus": 200,
+        "axe": {
+          "violations": [],
+          "seriousCritical": [],
+          "passes": 39,
+          "incomplete": 1
+        }
+      },
+      {
+        "screen": "app.system.terms",
+        "width": 1440,
+        "route": "/terms",
+        "identity": "public",
+        "status": "PASS",
+        "ready": true,
+        "httpStatus": 200,
+        "axe": {
+          "violations": [],
+          "seriousCritical": [],
+          "passes": 40,
+          "incomplete": 1
+        }
+      },
+      {
+        "screen": "app.system.toast",
+        "width": 375,
+        "identity": "public",
+        "status": "SKIPPED",
+        "stateOnly": true,
+        "reason": "Real guest bookmark action demonstrates canonical Radix toast presentation with unchanged li[data-state] contract."
+      },
+      {
+        "screen": "app.system.toast",
+        "width": 1440,
+        "identity": "public",
+        "status": "SKIPPED",
+        "stateOnly": true,
+        "reason": "Real guest bookmark action demonstrates canonical Radix toast presentation with unchanged li[data-state] contract."
+      },
+      {
+        "screen": "app.tag",
+        "width": 375,
+        "route": "/tag/open-source",
+        "identity": "public",
+        "status": "PASS",
+        "ready": true,
+        "httpStatus": 200,
+        "axe": {
+          "violations": [],
+          "seriousCritical": [],
+          "passes": 39,
+          "incomplete": 1
+        }
+      },
+      {
+        "screen": "app.tag",
+        "width": 1440,
+        "route": "/tag/open-source",
+        "identity": "public",
+        "status": "PASS",
+        "ready": true,
+        "httpStatus": 200,
+        "axe": {
+          "violations": [],
+          "seriousCritical": [],
+          "passes": 39,
+          "incomplete": 1
+        }
+      },
+      {
+        "screen": "app.admin.approvals",
+        "width": 375,
+        "route": "/admin",
+        "identity": "Nick-admin",
+        "status": "PASS",
+        "identityVerified": {
+          "name": "Nick",
+          "role": "admin"
+        },
+        "ready": true,
+        "httpStatus": 200,
+        "axe": {
+          "violations": [],
+          "seriousCritical": [],
+          "passes": 40,
+          "incomplete": 1
+        }
+      },
+      {
+        "screen": "app.admin.approvals",
+        "width": 1440,
+        "route": "/admin",
+        "identity": "Nick-admin",
+        "status": "PASS",
+        "identityVerified": {
+          "name": "Nick",
+          "role": "admin"
+        },
+        "ready": true,
+        "httpStatus": 200,
+        "axe": {
+          "violations": [],
+          "seriousCritical": [],
+          "passes": 40,
+          "incomplete": 1
+        }
+      },
+      {
+        "screen": "app.admin.audit",
+        "width": 375,
+        "route": "/admin",
+        "identity": "Nick-admin",
+        "status": "PASS",
+        "identityVerified": {
+          "name": "Nick",
+          "role": "admin"
+        },
+        "ready": true,
+        "httpStatus": 200,
+        "axe": {
+          "violations": [],
+          "seriousCritical": [],
+          "passes": 48,
+          "incomplete": 1
+        }
+      },
+      {
+        "screen": "app.admin.audit",
+        "width": 1440,
+        "route": "/admin",
+        "identity": "Nick-admin",
+        "status": "PASS",
+        "identityVerified": {
+          "name": "Nick",
+          "role": "admin"
+        },
+        "ready": true,
+        "httpStatus": 200,
+        "axe": {
+          "violations": [],
+          "seriousCritical": [],
+          "passes": 48,
+          "incomplete": 1
+        }
+      },
+      {
+        "screen": "app.admin.categories",
+        "width": 375,
+        "route": "/admin",
+        "identity": "Nick-admin",
+        "status": "PASS",
+        "identityVerified": {
+          "name": "Nick",
+          "role": "admin"
+        },
+        "ready": true,
+        "httpStatus": 200,
+        "axe": {
+          "violations": [],
+          "seriousCritical": [],
+          "passes": 47,
+          "incomplete": 1
+        }
+      },
+      {
+        "screen": "app.admin.categories",
+        "width": 1440,
+        "route": "/admin",
+        "identity": "Nick-admin",
+        "status": "PASS",
+        "identityVerified": {
+          "name": "Nick",
+          "role": "admin"
+        },
+        "ready": true,
+        "httpStatus": 200,
+        "axe": {
+          "violations": [],
+          "seriousCritical": [],
+          "passes": 47,
+          "incomplete": 1
+        }
+      },
+      {
+        "screen": "app.admin.database",
+        "width": 375,
+        "route": "/admin",
+        "identity": "Nick-admin",
+        "status": "PASS",
+        "identityVerified": {
+          "name": "Nick",
+          "role": "admin"
+        },
+        "ready": true,
+        "httpStatus": 200,
+        "axe": {
+          "violations": [
+            {
+              "id": "empty-table-header",
+              "impact": "minor",
+              "help": "Table header text should not be empty",
+              "description": "Ensure table headers have discernible text",
+              "nodes": 1,
+              "targets": [
+                [
+                  "th:nth-child(5)"
+                ]
+              ],
+              "details": [
+                {
+                  "target": [
+                    "th:nth-child(5)"
+                  ],
+                  "failureSummary": "Fix any of the following:\n  Element does not have text that is visible to screen readers"
+                }
+              ]
+            },
+            {
+              "id": "heading-order",
+              "impact": "moderate",
+              "help": "Heading levels should only increase by one",
+              "description": "Ensure the order of headings is semantically correct",
+              "nodes": 1,
+              "targets": [
+                [
+                  "h5"
+                ]
+              ],
+              "details": [
+                {
+                  "target": [
+                    "h5"
+                  ],
+                  "failureSummary": "Fix any of the following:\n  Heading order invalid"
+                }
+              ]
+            }
+          ],
+          "seriousCritical": [],
+          "passes": 44,
+          "incomplete": 1
+        }
+      },
+      {
+        "screen": "app.admin.database",
+        "width": 1440,
+        "route": "/admin",
+        "identity": "Nick-admin",
+        "status": "PASS",
+        "identityVerified": {
+          "name": "Nick",
+          "role": "admin"
+        },
+        "ready": true,
+        "httpStatus": 200,
+        "axe": {
+          "violations": [
+            {
+              "id": "empty-table-header",
+              "impact": "minor",
+              "help": "Table header text should not be empty",
+              "description": "Ensure table headers have discernible text",
+              "nodes": 1,
+              "targets": [
+                [
+                  "th:nth-child(5)"
+                ]
+              ],
+              "details": [
+                {
+                  "target": [
+                    "th:nth-child(5)"
+                  ],
+                  "failureSummary": "Fix any of the following:\n  Element does not have text that is visible to screen readers"
+                }
+              ]
+            },
+            {
+              "id": "heading-order",
+              "impact": "moderate",
+              "help": "Heading levels should only increase by one",
+              "description": "Ensure the order of headings is semantically correct",
+              "nodes": 1,
+              "targets": [
+                [
+                  "h5"
+                ]
+              ],
+              "details": [
+                {
+                  "target": [
+                    "h5"
+                  ],
+                  "failureSummary": "Fix any of the following:\n  Heading order invalid"
+                }
+              ]
+            }
+          ],
+          "seriousCritical": [],
+          "passes": 44,
+          "incomplete": 1
+        }
+      },
+      {
+        "screen": "app.admin.digests",
+        "width": 375,
+        "route": "/admin",
+        "identity": "Nick-admin",
+        "status": "PASS",
+        "identityVerified": {
+          "name": "Nick",
+          "role": "admin"
+        },
+        "ready": true,
+        "httpStatus": 200,
+        "axe": {
+          "violations": [],
+          "seriousCritical": [],
+          "passes": 40,
+          "incomplete": 1
+        }
+      },
+      {
+        "screen": "app.admin.digests",
+        "width": 1440,
+        "route": "/admin",
+        "identity": "Nick-admin",
+        "status": "PASS",
+        "identityVerified": {
+          "name": "Nick",
+          "role": "admin"
+        },
+        "ready": true,
+        "httpStatus": 200,
+        "axe": {
+          "violations": [],
+          "seriousCritical": [],
+          "passes": 40,
+          "incomplete": 1
+        }
+      },
+      {
+        "screen": "app.admin.edits",
+        "width": 375,
+        "route": "/admin",
+        "identity": "Nick-admin",
+        "status": "PASS",
+        "identityVerified": {
+          "name": "Nick",
+          "role": "admin"
+        },
+        "ready": true,
+        "httpStatus": 200,
+        "axe": {
+          "violations": [],
+          "seriousCritical": [],
+          "passes": 40,
+          "incomplete": 1
+        }
+      },
+      {
+        "screen": "app.admin.edits",
+        "width": 1440,
+        "route": "/admin",
+        "identity": "Nick-admin",
+        "status": "PASS",
+        "identityVerified": {
+          "name": "Nick",
+          "role": "admin"
+        },
+        "ready": true,
+        "httpStatus": 200,
+        "axe": {
+          "violations": [],
+          "seriousCritical": [],
+          "passes": 40,
+          "incomplete": 1
+        }
+      },
+      {
+        "screen": "app.admin.enrichment",
+        "width": 375,
+        "route": "/admin",
+        "identity": "Nick-admin",
+        "status": "PASS",
+        "identityVerified": {
+          "name": "Nick",
+          "role": "admin"
+        },
+        "ready": true,
+        "httpStatus": 200,
+        "axe": {
+          "violations": [],
+          "seriousCritical": [],
+          "passes": 47,
+          "incomplete": 1
+        }
+      },
+      {
+        "screen": "app.admin.enrichment",
+        "width": 1440,
+        "route": "/admin",
+        "identity": "Nick-admin",
+        "status": "PASS",
+        "identityVerified": {
+          "name": "Nick",
+          "role": "admin"
+        },
+        "ready": true,
+        "httpStatus": 200,
+        "axe": {
+          "violations": [],
+          "seriousCritical": [],
+          "passes": 47,
+          "incomplete": 1
+        }
+      },
+      {
+        "screen": "app.admin.export",
+        "width": 375,
+        "route": "/admin",
+        "identity": "Nick-admin",
+        "status": "PASS",
+        "identityVerified": {
+          "name": "Nick",
+          "role": "admin"
+        },
+        "ready": true,
+        "httpStatus": 200,
+        "axe": {
+          "violations": [],
+          "seriousCritical": [],
+          "passes": 44,
+          "incomplete": 2
+        }
+      },
+      {
+        "screen": "app.admin.export",
+        "width": 1440,
+        "route": "/admin",
+        "identity": "Nick-admin",
+        "status": "PASS",
+        "identityVerified": {
+          "name": "Nick",
+          "role": "admin"
+        },
+        "ready": true,
+        "httpStatus": 200,
+        "axe": {
+          "violations": [],
+          "seriousCritical": [],
+          "passes": 44,
+          "incomplete": 2
+        }
+      },
+      {
+        "screen": "app.admin.github",
+        "width": 375,
+        "route": "/admin",
+        "identity": "Nick-admin",
+        "status": "PASS",
+        "identityVerified": {
+          "name": "Nick",
+          "role": "admin"
+        },
+        "ready": true,
+        "httpStatus": 200,
+        "axe": {
+          "violations": [
+            {
+              "id": "empty-table-header",
+              "impact": "minor",
+              "help": "Table header text should not be empty",
+              "description": "Ensure table headers have discernible text",
+              "nodes": 1,
+              "targets": [
+                [
+                  "th:nth-child(4)"
+                ]
+              ],
+              "details": [
+                {
+                  "target": [
+                    "th:nth-child(4)"
+                  ],
+                  "failureSummary": "Fix any of the following:\n  Element does not have text that is visible to screen readers"
+                }
+              ]
+            },
+            {
+              "id": "heading-order",
+              "impact": "moderate",
+              "help": "Heading levels should only increase by one",
+              "description": "Ensure the order of headings is semantically correct",
+              "nodes": 1,
+              "targets": [
+                [
+                  "h4"
+                ]
+              ],
+              "details": [
+                {
+                  "target": [
+                    "h4"
+                  ],
+                  "failureSummary": "Fix any of the following:\n  Heading order invalid"
+                }
+              ]
+            }
+          ],
+          "seriousCritical": [],
+          "passes": 47,
+          "incomplete": 1
+        }
+      },
+      {
+        "screen": "app.admin.github",
+        "width": 1440,
+        "route": "/admin",
+        "identity": "Nick-admin",
+        "status": "PASS",
+        "identityVerified": {
+          "name": "Nick",
+          "role": "admin"
+        },
+        "ready": true,
+        "httpStatus": 200,
+        "axe": {
+          "violations": [
+            {
+              "id": "empty-table-header",
+              "impact": "minor",
+              "help": "Table header text should not be empty",
+              "description": "Ensure table headers have discernible text",
+              "nodes": 1,
+              "targets": [
+                [
+                  "th:nth-child(4)"
+                ]
+              ],
+              "details": [
+                {
+                  "target": [
+                    "th:nth-child(4)"
+                  ],
+                  "failureSummary": "Fix any of the following:\n  Element does not have text that is visible to screen readers"
+                }
+              ]
+            },
+            {
+              "id": "heading-order",
+              "impact": "moderate",
+              "help": "Heading levels should only increase by one",
+              "description": "Ensure the order of headings is semantically correct",
+              "nodes": 1,
+              "targets": [
+                [
+                  "h4"
+                ]
+              ],
+              "details": [
+                {
+                  "target": [
+                    "h4"
+                  ],
+                  "failureSummary": "Fix any of the following:\n  Heading order invalid"
+                }
+              ]
+            }
+          ],
+          "seriousCritical": [],
+          "passes": 47,
+          "incomplete": 1
+        }
+      },
+      {
+        "screen": "app.admin.journeys",
+        "width": 375,
+        "route": "/admin",
+        "identity": "Nick-admin",
+        "status": "PASS",
+        "identityVerified": {
+          "name": "Nick",
+          "role": "admin"
+        },
+        "ready": true,
+        "httpStatus": 200,
+        "axe": {
+          "violations": [],
+          "seriousCritical": [],
+          "passes": 40,
+          "incomplete": 1
+        }
+      },
+      {
+        "screen": "app.admin.journeys",
+        "width": 1440,
+        "route": "/admin",
+        "identity": "Nick-admin",
+        "status": "PASS",
+        "identityVerified": {
+          "name": "Nick",
+          "role": "admin"
+        },
+        "ready": true,
+        "httpStatus": 200,
+        "axe": {
+          "violations": [],
+          "seriousCritical": [],
+          "passes": 40,
+          "incomplete": 1
+        }
+      },
+      {
+        "screen": "app.admin.linkhealth",
+        "width": 375,
+        "route": "/admin",
+        "identity": "Nick-admin",
+        "status": "PASS",
+        "identityVerified": {
+          "name": "Nick",
+          "role": "admin"
+        },
+        "ready": true,
+        "httpStatus": 200,
+        "axe": {
+          "violations": [],
+          "seriousCritical": [],
+          "passes": 40,
+          "incomplete": 2
+        }
+      },
+      {
+        "screen": "app.admin.linkhealth",
+        "width": 1440,
+        "route": "/admin",
+        "identity": "Nick-admin",
+        "status": "PASS",
+        "identityVerified": {
+          "name": "Nick",
+          "role": "admin"
+        },
+        "ready": true,
+        "httpStatus": 200,
+        "axe": {
+          "violations": [],
+          "seriousCritical": [],
+          "passes": 40,
+          "incomplete": 2
+        }
+      },
+      {
+        "screen": "app.admin.overview",
+        "width": 375,
+        "route": "/admin",
+        "identity": "Nick-admin",
+        "status": "PASS",
+        "identityVerified": {
+          "name": "Nick",
+          "role": "admin"
+        },
+        "ready": true,
+        "httpStatus": 200,
+        "axe": {
+          "violations": [],
+          "seriousCritical": [],
+          "passes": 41,
+          "incomplete": 2
+        }
+      },
+      {
+        "screen": "app.admin.overview",
+        "width": 1440,
+        "route": "/admin",
+        "identity": "Nick-admin",
+        "status": "PASS",
+        "identityVerified": {
+          "name": "Nick",
+          "role": "admin"
+        },
+        "ready": true,
+        "httpStatus": 200,
+        "axe": {
+          "violations": [],
+          "seriousCritical": [],
+          "passes": 41,
+          "incomplete": 2
+        }
+      },
+      {
+        "screen": "app.admin.research",
+        "width": 375,
+        "route": "/admin/research",
+        "identity": "Nick-admin",
+        "status": "PASS",
+        "identityVerified": {
+          "name": "Nick",
+          "role": "admin"
+        },
+        "ready": true,
+        "httpStatus": 200,
+        "axe": {
+          "violations": [],
+          "seriousCritical": [],
+          "passes": 44,
+          "incomplete": 1
+        }
+      },
+      {
+        "screen": "app.admin.research",
+        "width": 1440,
+        "route": "/admin/research",
+        "identity": "Nick-admin",
+        "status": "INCOMPLETE",
+        "error": {
+          "name": "ActionUnavailableError",
+          "message": "app admin tab control [data-testid=\"tab-research\"] is not rendered for this session (not an admin, or the tab does not exist)"
+        }
+      },
+      {
+        "screen": "app.admin.researcher",
+        "width": 375,
+        "route": "/admin",
+        "identity": "Nick-admin",
+        "status": "PASS",
+        "identityVerified": {
+          "name": "Nick",
+          "role": "admin"
+        },
+        "ready": true,
+        "httpStatus": 200,
+        "axe": {
+          "violations": [],
+          "seriousCritical": [],
+          "passes": 43,
+          "incomplete": 1
+        }
+      },
+      {
+        "screen": "app.admin.researcher",
+        "width": 1440,
+        "route": "/admin",
+        "identity": "Nick-admin",
+        "status": "PASS",
+        "identityVerified": {
+          "name": "Nick",
+          "role": "admin"
+        },
+        "ready": true,
+        "httpStatus": 200,
+        "axe": {
+          "violations": [],
+          "seriousCritical": [],
+          "passes": 43,
+          "incomplete": 1
+        }
+      },
+      {
+        "screen": "app.admin.resources",
+        "width": 375,
+        "route": "/admin",
+        "identity": "Nick-admin",
+        "status": "PASS",
+        "identityVerified": {
+          "name": "Nick",
+          "role": "admin"
+        },
+        "ready": true,
+        "httpStatus": 200,
+        "axe": {
+          "violations": [],
+          "seriousCritical": [],
+          "passes": 48,
+          "incomplete": 1
+        }
+      },
+      {
+        "screen": "app.admin.resources",
+        "width": 1440,
+        "route": "/admin",
+        "identity": "Nick-admin",
+        "status": "PASS",
+        "identityVerified": {
+          "name": "Nick",
+          "role": "admin"
+        },
+        "ready": true,
+        "httpStatus": 200,
+        "axe": {
+          "violations": [],
+          "seriousCritical": [],
+          "passes": 48,
+          "incomplete": 1
+        }
+      },
+      {
+        "screen": "app.admin.subcategories",
+        "width": 375,
+        "route": "/admin",
+        "identity": "Nick-admin",
+        "status": "PASS",
+        "identityVerified": {
+          "name": "Nick",
+          "role": "admin"
+        },
+        "ready": true,
+        "httpStatus": 200,
+        "axe": {
+          "violations": [],
+          "seriousCritical": [],
+          "passes": 47,
+          "incomplete": 1
+        }
+      },
+      {
+        "screen": "app.admin.subcategories",
+        "width": 1440,
+        "route": "/admin",
+        "identity": "Nick-admin",
+        "status": "PASS",
+        "identityVerified": {
+          "name": "Nick",
+          "role": "admin"
+        },
+        "ready": true,
+        "httpStatus": 200,
+        "axe": {
+          "violations": [],
+          "seriousCritical": [],
+          "passes": 47,
+          "incomplete": 1
+        }
+      },
+      {
+        "screen": "app.admin.subsubcategories",
+        "width": 375,
+        "route": "/admin",
+        "identity": "Nick-admin",
+        "status": "PASS",
+        "identityVerified": {
+          "name": "Nick",
+          "role": "admin"
+        },
+        "ready": true,
+        "httpStatus": 200,
+        "axe": {
+          "violations": [],
+          "seriousCritical": [],
+          "passes": 47,
+          "incomplete": 1
+        }
+      },
+      {
+        "screen": "app.admin.subsubcategories",
+        "width": 1440,
+        "route": "/admin",
+        "identity": "Nick-admin",
+        "status": "PASS",
+        "identityVerified": {
+          "name": "Nick",
+          "role": "admin"
+        },
+        "ready": true,
+        "httpStatus": 200,
+        "axe": {
+          "violations": [],
+          "seriousCritical": [],
+          "passes": 47,
+          "incomplete": 1
+        }
+      },
+      {
+        "screen": "app.admin.users",
+        "width": 375,
+        "route": "/admin",
+        "identity": "Nick-admin",
+        "status": "PASS",
+        "identityVerified": {
+          "name": "Nick",
+          "role": "admin"
+        },
+        "ready": true,
+        "httpStatus": 200,
+        "axe": {
+          "violations": [],
+          "seriousCritical": [],
+          "passes": 47,
+          "incomplete": 1
+        }
+      },
+      {
+        "screen": "app.admin.users",
+        "width": 1440,
+        "route": "/admin",
+        "identity": "Nick-admin",
+        "status": "PASS",
+        "identityVerified": {
+          "name": "Nick",
+          "role": "admin"
+        },
+        "ready": true,
+        "httpStatus": 200,
+        "axe": {
+          "violations": [],
+          "seriousCritical": [],
+          "passes": 47,
+          "incomplete": 1
+        }
+      },
+      {
+        "screen": "app.bookmarks",
+        "width": 375,
+        "route": "/bookmarks",
+        "identity": "Nick-admin",
+        "status": "PASS",
+        "identityVerified": {
+          "name": "Nick",
+          "role": "admin"
+        },
+        "ready": true,
+        "httpStatus": 200,
+        "axe": {
+          "violations": [
+            {
+              "id": "landmark-main-is-top-level",
+              "impact": "moderate",
+              "help": "Main landmark should not be contained in another landmark",
+              "description": "Ensure the main landmark is at top level",
+              "nodes": 1,
+              "targets": [
+                [
+                  ".space-y-5"
+                ]
+              ],
+              "details": [
+                {
+                  "target": [
+                    ".space-y-5"
+                  ],
+                  "failureSummary": "Fix any of the following:\n  The main landmark is contained in another landmark."
+                }
+              ]
+            },
+            {
+              "id": "landmark-no-duplicate-main",
+              "impact": "moderate",
+              "help": "Document should not have more than one main landmark",
+              "description": "Ensure the document has at most one main landmark",
+              "nodes": 1,
+              "targets": [
+                [
+                  "#main"
+                ]
+              ],
+              "details": [
+                {
+                  "target": [
+                    "#main"
+                  ],
+                  "failureSummary": "Fix any of the following:\n  Document has more than one main landmark"
+                }
+              ]
+            },
+            {
+              "id": "landmark-unique",
+              "impact": "moderate",
+              "help": "Landmarks should have a unique role or role/label/title (i.e. accessible name) combination",
+              "description": "Ensure landmarks are unique",
+              "nodes": 1,
+              "targets": [
+                [
+                  "#main"
+                ]
+              ],
+              "details": [
+                {
+                  "target": [
+                    "#main"
+                  ],
+                  "failureSummary": "Fix any of the following:\n  The landmark must have a unique aria-label, aria-labelledby, or title to make landmarks distinguishable"
+                }
+              ]
+            }
+          ],
+          "seriousCritical": [],
+          "passes": 38,
+          "incomplete": 1
+        }
+      },
+      {
+        "screen": "app.bookmarks",
+        "width": 1440,
+        "route": "/bookmarks",
+        "identity": "Nick-admin",
+        "status": "PASS",
+        "identityVerified": {
+          "name": "Nick",
+          "role": "admin"
+        },
+        "ready": true,
+        "httpStatus": 200,
+        "axe": {
+          "violations": [
+            {
+              "id": "landmark-main-is-top-level",
+              "impact": "moderate",
+              "help": "Main landmark should not be contained in another landmark",
+              "description": "Ensure the main landmark is at top level",
+              "nodes": 1,
+              "targets": [
+                [
+                  ".space-y-5"
+                ]
+              ],
+              "details": [
+                {
+                  "target": [
+                    ".space-y-5"
+                  ],
+                  "failureSummary": "Fix any of the following:\n  The main landmark is contained in another landmark."
+                }
+              ]
+            },
+            {
+              "id": "landmark-no-duplicate-main",
+              "impact": "moderate",
+              "help": "Document should not have more than one main landmark",
+              "description": "Ensure the document has at most one main landmark",
+              "nodes": 1,
+              "targets": [
+                [
+                  "#main"
+                ]
+              ],
+              "details": [
+                {
+                  "target": [
+                    "#main"
+                  ],
+                  "failureSummary": "Fix any of the following:\n  Document has more than one main landmark"
+                }
+              ]
+            },
+            {
+              "id": "landmark-unique",
+              "impact": "moderate",
+              "help": "Landmarks should have a unique role or role/label/title (i.e. accessible name) combination",
+              "description": "Ensure landmarks are unique",
+              "nodes": 1,
+              "targets": [
+                [
+                  "#main"
+                ]
+              ],
+              "details": [
+                {
+                  "target": [
+                    "#main"
+                  ],
+                  "failureSummary": "Fix any of the following:\n  The landmark must have a unique aria-label, aria-labelledby, or title to make landmarks distinguishable"
+                }
+              ]
+            }
+          ],
+          "seriousCritical": [],
+          "passes": 38,
+          "incomplete": 1
+        }
+      },
+      {
+        "screen": "app.contributions",
+        "width": 375,
+        "route": "/contributions",
+        "identity": "Nick-admin",
+        "status": "PASS",
+        "identityVerified": {
+          "name": "Nick",
+          "role": "admin"
+        },
+        "ready": true,
+        "httpStatus": 200,
+        "axe": {
+          "violations": [],
+          "seriousCritical": [],
+          "passes": 42,
+          "incomplete": 1
+        }
+      },
+      {
+        "screen": "app.contributions",
+        "width": 1440,
+        "route": "/contributions",
+        "identity": "Nick-admin",
+        "status": "PASS",
+        "identityVerified": {
+          "name": "Nick",
+          "role": "admin"
+        },
+        "ready": true,
+        "httpStatus": 200,
+        "axe": {
+          "violations": [],
+          "seriousCritical": [],
+          "passes": 42,
+          "incomplete": 1
+        }
+      },
+      {
+        "screen": "app.journey-detail",
+        "width": 375,
+        "route": "/journey/7",
+        "identity": "Nick-admin",
+        "status": "PASS",
+        "identityVerified": {
+          "name": "Nick",
+          "role": "admin"
+        },
+        "ready": true,
+        "httpStatus": 200,
+        "axe": {
+          "violations": [],
+          "seriousCritical": [],
+          "passes": 38,
+          "incomplete": 1
+        }
+      },
+      {
+        "screen": "app.journey-detail",
+        "width": 1440,
+        "route": "/journey/7",
+        "identity": "Nick-admin",
+        "status": "PASS",
+        "identityVerified": {
+          "name": "Nick",
+          "role": "admin"
+        },
+        "ready": true,
+        "httpStatus": 200,
+        "axe": {
+          "violations": [],
+          "seriousCritical": [],
+          "passes": 39,
+          "incomplete": 1
+        }
+      },
+      {
+        "screen": "app.journeys",
+        "width": 375,
+        "route": "/journeys",
+        "identity": "Nick-admin",
+        "status": "PASS",
+        "identityVerified": {
+          "name": "Nick",
+          "role": "admin"
+        },
+        "ready": true,
+        "httpStatus": 200,
+        "axe": {
+          "violations": [],
+          "seriousCritical": [],
+          "passes": 38,
+          "incomplete": 1
+        }
+      },
+      {
+        "screen": "app.journeys",
+        "width": 1440,
+        "route": "/journeys",
+        "identity": "Nick-admin",
+        "status": "PASS",
+        "identityVerified": {
+          "name": "Nick",
+          "role": "admin"
+        },
+        "ready": true,
+        "httpStatus": 200,
+        "axe": {
+          "violations": [],
+          "seriousCritical": [],
+          "passes": 39,
+          "incomplete": 1
+        }
+      },
+      {
+        "screen": "app.notifications",
+        "width": 375,
+        "route": "/notifications",
+        "identity": "Nick-admin",
+        "status": "PASS",
+        "identityVerified": {
+          "name": "Nick",
+          "role": "admin"
+        },
+        "ready": true,
+        "httpStatus": 200,
+        "axe": {
+          "violations": [],
+          "seriousCritical": [],
+          "passes": 38,
+          "incomplete": 1
+        }
+      },
+      {
+        "screen": "app.notifications",
+        "width": 1440,
+        "route": "/notifications",
+        "identity": "Nick-admin",
+        "status": "PASS",
+        "identityVerified": {
+          "name": "Nick",
+          "role": "admin"
+        },
+        "ready": true,
+        "httpStatus": 200,
+        "axe": {
+          "violations": [],
+          "seriousCritical": [],
+          "passes": 39,
+          "incomplete": 1
+        }
+      },
+      {
+        "screen": "app.onboarding",
+        "width": 375,
+        "route": "/onboarding",
+        "identity": "Nick-admin",
+        "status": "PASS",
+        "identityVerified": {
+          "name": "Nick",
+          "role": "admin"
+        },
+        "ready": true,
+        "httpStatus": 200,
+        "axe": {
+          "violations": [],
+          "seriousCritical": [],
+          "passes": 40,
+          "incomplete": 2
+        }
+      },
+      {
+        "screen": "app.onboarding",
+        "width": 1440,
+        "route": "/onboarding",
+        "identity": "Nick-admin",
+        "status": "PASS",
+        "identityVerified": {
+          "name": "Nick",
+          "role": "admin"
+        },
+        "ready": true,
+        "httpStatus": 200,
+        "axe": {
+          "violations": [],
+          "seriousCritical": [],
+          "passes": 40,
+          "incomplete": 2
+        }
+      },
+      {
+        "screen": "app.profile",
+        "width": 375,
+        "route": "/profile",
+        "identity": "Nick-admin",
+        "status": "PASS",
+        "identityVerified": {
+          "name": "Nick",
+          "role": "admin"
+        },
+        "ready": true,
+        "httpStatus": 200,
+        "axe": {
+          "violations": [],
+          "seriousCritical": [],
+          "passes": 42,
+          "incomplete": 1
+        }
+      },
+      {
+        "screen": "app.profile",
+        "width": 1440,
+        "route": "/profile",
+        "identity": "Nick-admin",
+        "status": "PASS",
+        "identityVerified": {
+          "name": "Nick",
+          "role": "admin"
+        },
+        "ready": true,
+        "httpStatus": 200,
+        "axe": {
+          "violations": [],
+          "seriousCritical": [],
+          "passes": 42,
+          "incomplete": 1
+        }
+      },
+      {
+        "screen": "app.settings",
+        "width": 375,
+        "route": "/settings",
+        "identity": "Nick-admin",
+        "status": "PASS",
+        "identityVerified": {
+          "name": "Nick",
+          "role": "admin"
+        },
+        "ready": true,
+        "httpStatus": 200,
+        "axe": {
+          "violations": [],
+          "seriousCritical": [],
+          "passes": 43,
+          "incomplete": 1
+        }
+      },
+      {
+        "screen": "app.settings",
+        "width": 1440,
+        "route": "/settings",
+        "identity": "Nick-admin",
+        "status": "PASS",
+        "identityVerified": {
+          "name": "Nick",
+          "role": "admin"
+        },
+        "ready": true,
+        "httpStatus": 200,
+        "axe": {
+          "violations": [],
+          "seriousCritical": [],
+          "passes": 43,
+          "incomplete": 1
+        }
+      },
+      {
+        "screen": "app.settings.theme",
+        "width": 375,
+        "route": "/settings/theme",
+        "identity": "Nick-admin",
+        "status": "PASS",
+        "identityVerified": {
+          "name": "Nick",
+          "role": "admin"
+        },
+        "ready": true,
+        "httpStatus": 200,
+        "axe": {
+          "violations": [],
+          "seriousCritical": [],
+          "passes": 38,
+          "incomplete": 1
+        }
+      },
+      {
+        "screen": "app.settings.theme",
+        "width": 1440,
+        "route": "/settings/theme",
+        "identity": "Nick-admin",
+        "status": "PASS",
+        "identityVerified": {
+          "name": "Nick",
+          "role": "admin"
+        },
+        "ready": true,
+        "httpStatus": 200,
+        "axe": {
+          "violations": [],
+          "seriousCritical": [],
+          "passes": 39,
+          "incomplete": 1
+        }
+      },
+      {
+        "screen": "app.submit",
+        "width": 375,
+        "route": "/submit",
+        "identity": "Nick-admin",
+        "status": "PASS",
+        "identityVerified": {
+          "name": "Nick",
+          "role": "admin"
+        },
+        "ready": true,
+        "httpStatus": 200,
+        "axe": {
+          "violations": [],
+          "seriousCritical": [],
+          "passes": 44,
+          "incomplete": 1
+        }
+      },
+      {
+        "screen": "app.submit",
+        "width": 1440,
+        "route": "/submit",
+        "identity": "Nick-admin",
+        "status": "PASS",
+        "identityVerified": {
+          "name": "Nick",
+          "role": "admin"
+        },
+        "ready": true,
+        "httpStatus": 200,
+        "axe": {
+          "violations": [],
+          "seriousCritical": [],
+          "passes": 44,
+          "incomplete": 1
+        }
+      }
+    ],
+    "files": [
+      "audit-567-app-about.json",
+      "audit-567-app-advanced.json",
+      "audit-567-app-auth-sign-in.json",
+      "audit-567-app-auth-sign-up.json",
+      "audit-567-app-categories.json",
+      "audit-567-app-category.json",
+      "audit-567-app-collection.json",
+      "audit-567-app-error-empty.json",
+      "audit-567-app-error-loading.json",
+      "audit-567-app-error-route.json",
+      "audit-567-app-home-curated.json",
+      "audit-567-app-home-index.json",
+      "audit-567-app-legal.json",
+      "audit-567-app-not-found.json",
+      "audit-567-app-resource-detail.json",
+      "audit-567-app-search.json",
+      "audit-567-app-shell-default.json",
+      "audit-567-app-shell-mobile-drawer.json",
+      "audit-567-app-shell-palette.json",
+      "audit-567-app-subcategory.json",
+      "audit-567-app-subsubcategory.json",
+      "audit-567-app-system-code-of-conduct.json",
+      "audit-567-app-system-consent.json",
+      "audit-567-app-system-design-system.json",
+      "audit-567-app-system-empty-search.json",
+      "audit-567-app-system-error.json",
+      "audit-567-app-system-loading.json",
+      "audit-567-app-system-not-found.json",
+      "audit-567-app-system-privacy.json",
+      "audit-567-app-system-terms.json",
+      "audit-567-app-system-toast.json",
+      "audit-567-app-tag.json",
+      "audit-567-app-admin-approvals.json",
+      "audit-567-app-admin-audit.json",
+      "audit-567-app-admin-categories.json",
+      "audit-567-app-admin-database.json",
+      "audit-567-app-admin-digests.json",
+      "audit-567-app-admin-edits.json",
+      "audit-567-app-admin-enrichment.json",
+      "audit-567-app-admin-export.json",
+      "audit-567-app-admin-github.json",
+      "audit-567-app-admin-journeys.json",
+      "audit-567-app-admin-linkhealth.json",
+      "audit-567-app-admin-overview.json",
+      "audit-567-app-admin-research.json",
+      "audit-567-app-admin-researcher.json",
+      "audit-567-app-admin-resources.json",
+      "audit-567-app-admin-subcategories.json",
+      "audit-567-app-admin-subsubcategories.json",
+      "audit-567-app-admin-users.json",
+      "audit-567-app-bookmarks.json",
+      "audit-567-app-contributions.json",
+      "audit-567-app-journey-detail.json",
+      "audit-567-app-journeys.json",
+      "audit-567-app-notifications.json",
+      "audit-567-app-onboarding.json",
+      "audit-567-app-profile.json",
+      "audit-567-app-settings.json",
+      "audit-567-app-settings-theme.json",
+      "audit-567-app-submit.json"
+    ],
+    "summary": {
+      "inventoriedAppScreens": 60,
+      "routableAppScreens": 54,
+      "publicScreens": 32,
+      "adminScreens": 28,
+      "expectedRows": 108,
+      "inventoriedRows": 120,
+      "executedRows": 108,
+      "skippedRows": 12,
+      "stateOnlyRows": 12,
+      "passRows": 107,
+      "seriousCriticalRows": 0,
+      "incompleteRows": 1
+    }
+  },
+  "skinCounts": {
+    "systemSelectorCount": 80,
+    "dataDsCount": 26
+  },
+  "staticGates": [
+    {
+      "label": "palette-drift",
+      "status": "NOT_RUN",
+      "pass": null,
+      "reason": "retained static-worker evidence; browser runner did not rerun it"
+    },
+    {
+      "label": "accent-drift",
+      "status": "NOT_RUN",
+      "pass": null,
+      "reason": "retained static-worker evidence; browser runner did not rerun it"
+    },
+    {
+      "label": "standalone-palette-drift",
+      "status": "NOT_RUN",
+      "pass": null,
+      "reason": "retained static-worker evidence; browser runner did not rerun it"
+    },
+    {
+      "label": "font-prepaint",
+      "status": "NOT_RUN",
+      "pass": null,
+      "reason": "run only by the explicit font-prepaint phase"
+    },
+    {
+      "label": "theme-registry-types",
+      "status": "NOT_RUN",
+      "pass": null,
+      "reason": "retained static-worker evidence; browser runner did not rerun it"
+    }
+  ],
+  "identity": {
+    "teardown": {
+      "attempted": true,
+      "completed": true,
+      "localDeleted": true,
+      "clerkDeleted": true,
+      "localQaUsersRemaining": 0,
+      "errorCount": 0
+    }
+  },
+  "runError": null,
+  "lastCheckpoint": {
+    "phase": "axe",
+    "detail": "incomplete",
+    "at": "2026-09-15T20:36:24.290Z"
+  },
+  "generatedAt": "2026-09-15T20:36:25.352Z"
+}

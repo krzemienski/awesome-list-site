@@ -1,0 +1,34 @@
+Lint baseline comparison (current minus known non-green baseline)
+=================================================================
+
+Status: known baseline not green; both lint runs exit 1.
+No source files were modified. Browser and database checks were not run.
+
+Reproduction:
+  1. git archive --format=tar 34385b2f | tar -xf - -C /tmp/lint-baseline-34385b2f
+  2. ln -s /home/runner/workspace/node_modules /tmp/lint-baseline-34385b2f/node_modules
+  3. (cd /tmp/lint-baseline-34385b2f && npm run lint) > /tmp/full-regression-2026-09-15/lint-baseline/baseline-lint.log 2>&1
+  4. Compare /tmp/full-regression-2026-09-15/lint.log with baseline-lint.log after path normalization.
+
+Runs:
+  baseline_commit	34385b2f
+  current_commit	2b44a2bc08692059cc4ab63c526a5871451fbe1f
+  current_command	npm run lint
+  current_exit	1
+  current_duration_s	101 (from /tmp/full-regression-2026-09-15/commands.tsv)
+  current_log	/tmp/full-regression-2026-09-15/lint.log
+  baseline_command	(cd /tmp/lint-baseline-34385b2f && npm run lint)
+  baseline_exit	1
+  baseline_duration_ms	143552
+  baseline_log	/tmp/full-regression-2026-09-15/lint-baseline/baseline-lint.log
+
+Totals (errors / warnings / total / files / rules):
+  baseline	5303 / 23 / 5326 / 372 / 46
+  current	5218 / 23 / 5241 / 485 / 46
+  delta	-85 / 0 / -85
+
+Per-file/rule rows	1186
+Changed per-file/rule rows	180
+See comparison-per-file-rule.tsv for the complete union and comparison-changed.tsv for only changed rows.
+Rule label parsing-error represents ESLint parser failures; unused-eslint-disable-directive represents ESLint warnings that have no printed rule suffix.
+

@@ -1,0 +1,15 @@
+{
+  "route": "/subcategory/community-groups",
+  "slug": "subcategory-community-groups",
+  "kind": "html",
+  "note": null,
+  "requestedUrl": "http://127.0.0.1:5000/subcategory/community-groups",
+  "finalUrl": "http://127.0.0.1:5000/subcategory/community-groups",
+  "status": 200,
+  "xRobotsTag": null,
+  "contentType": "text/html; charset=utf-8",
+  "cacheControl": "no-store",
+  "redirectChain": [],
+  "attempts": 1,
+  "probedAt": "2026-09-15T20:13:38.736Z"
+}

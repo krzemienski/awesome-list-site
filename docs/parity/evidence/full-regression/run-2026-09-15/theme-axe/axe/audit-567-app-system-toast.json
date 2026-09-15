@@ -1,0 +1,24 @@
+{
+  "schemaVersion": 2,
+  "task": "567",
+  "screen": "app.system.toast",
+  "widths": [
+    {
+      "screen": "app.system.toast",
+      "width": 375,
+      "identity": "public",
+      "status": "SKIPPED",
+      "stateOnly": true,
+      "reason": "Real guest bookmark action demonstrates canonical Radix toast presentation with unchanged li[data-state] contract."
+    },
+    {
+      "screen": "app.system.toast",
+      "width": 1440,
+      "identity": "public",
+      "status": "SKIPPED",
+      "stateOnly": true,
+      "reason": "Real guest bookmark action demonstrates canonical Radix toast presentation with unchanged li[data-state] contract."
+    }
+  ],
+  "seriousCriticalZero": false
+}

@@ -1,0 +1,24 @@
+{
+  "schemaVersion": 2,
+  "task": "567",
+  "screen": "app.system.error",
+  "widths": [
+    {
+      "screen": "app.system.error",
+      "width": 375,
+      "identity": "public",
+      "status": "SKIPPED",
+      "stateOnly": true,
+      "reason": "ErrorPage consumes the canonical error-state pattern. No artificial failure was injected to capture this conditional surface."
+    },
+    {
+      "screen": "app.system.error",
+      "width": 1440,
+      "identity": "public",
+      "status": "SKIPPED",
+      "stateOnly": true,
+      "reason": "ErrorPage consumes the canonical error-state pattern. No artificial failure was injected to capture this conditional surface."
+    }
+  ],
+  "seriousCriticalZero": false
+}

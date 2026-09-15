@@ -1,0 +1,40 @@
+  0:0  error  Parsing error: /home/runner/workspace/tests/parity/cli.mjs was not found by the project service. Consider either including it in the tsconfig.json or including it in allowDefaultProject
+
+/home/runner/workspace/tests/parity/identity.mjs
+  0:0  error  Parsing error: /home/runner/workspace/tests/parity/identity.mjs was not found by the project service. Consider either including it in the tsconfig.json or including it in allowDefaultProject
+
+/home/runner/workspace/tests/parity/inventory.mjs
+  0:0  error  Parsing error: /home/runner/workspace/tests/parity/inventory.mjs was not found by the project service. Consider either including it in the tsconfig.json or including it in allowDefaultProject
+
+/home/runner/workspace/tests/parity/readiness.mjs
+  0:0  error  Parsing error: /home/runner/workspace/tests/parity/readiness.mjs was not found by the project service. Consider either including it in the tsconfig.json or including it in allowDefaultProject
+
+/home/runner/workspace/tests/parity/reference-adapter.mjs
+  0:0  error  Parsing error: /home/runner/workspace/tests/parity/reference-adapter.mjs was not found by the project service. Consider either including it in the tsconfig.json or including it in allowDefaultProject
+
+/home/runner/workspace/tests/parity/reference-admin-catalog.mjs
+  0:0  error  Parsing error: /home/runner/workspace/tests/parity/reference-admin-catalog.mjs was not found by the project service. Consider either including it in the tsconfig.json or including it in allowDefaultProject
+
+/home/runner/workspace/tests/parity/reference-admin-operations.mjs
+  0:0  error  Parsing error: /home/runner/workspace/tests/parity/reference-admin-operations.mjs was not found by the project service. Consider either including it in the tsconfig.json or including it in allowDefaultProject
+
+/home/runner/workspace/tests/parity/reference-extensions.mjs
+  0:0  error  Parsing error: /home/runner/workspace/tests/parity/reference-extensions.mjs was not found by the project service. Consider either including it in the tsconfig.json or including it in allowDefaultProject
+
+/home/runner/workspace/tests/parity/reference-reconciliation.mjs
+  0:0  error  Parsing error: /home/runner/workspace/tests/parity/reference-reconciliation.mjs was not found by the project service. Consider either including it in the tsconfig.json or including it in allowDefaultProject
+
+/home/runner/workspace/tests/parity/report.mjs
+  0:0  error  Parsing error: /home/runner/workspace/tests/parity/report.mjs was not found by the project service. Consider either including it in the tsconfig.json or including it in allowDefaultProject
+
+/home/runner/workspace/tests/parity/runner.mjs
+  0:0  error  Parsing error: /home/runner/workspace/tests/parity/runner.mjs was not found by the project service. Consider either including it in the tsconfig.json or including it in allowDefaultProject
+
+/home/runner/workspace/tests/setup.ts
+  0:0  error  Parsing error: /home/runner/workspace/tests/setup.ts was not found by the project service. Consider either including it in the tsconfig.json or including it in allowDefaultProject
+
+/home/runner/workspace/vitest.config.ts
+  0:0  error  Parsing error: /home/runner/workspace/vitest.config.ts was not found by the project service. Consider either including it in the tsconfig.json or including it in allowDefaultProject
+
+✖ 5241 problems (5218 errors, 23 warnings)
+  331 errors and 2 warnings potentially fixable with the `--fix` option.

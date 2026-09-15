@@ -1,0 +1,50 @@
+{
+  "route": "/tag/open-source",
+  "slug": "tag-open-source",
+  "axeWidths": [
+    375,
+    1440
+  ],
+  "byViewport": {
+    "375": {
+      "unitId": "c0b5b03a-ae5f-4641-88b3-56d522cd3845",
+      "axeVersion": "4.13.0",
+      "analyzedUrl": "http://127.0.0.1:5000/tag/open-source",
+      "byImpact": {
+        "critical": 0,
+        "serious": 0,
+        "moderate": 0,
+        "minor": 0
+      },
+      "nodesByImpact": {
+        "critical": 0,
+        "serious": 0,
+        "moderate": 0,
+        "minor": 0
+      },
+      "violations": [],
+      "incompleteRules": 1,
+      "passedRules": 39
+    },
+    "1440": {
+      "unitId": "b96320fa-4a52-4817-9457-b02e219b7103",
+      "axeVersion": "4.13.0",
+      "analyzedUrl": "http://127.0.0.1:5000/tag/open-source",
+      "byImpact": {
+        "critical": 0,
+        "serious": 0,
+        "moderate": 0,
+        "minor": 0
+      },
+      "nodesByImpact": {
+        "critical": 0,
+        "serious": 0,
+        "moderate": 0,
+        "minor": 0
+      },
+      "violations": [],
+      "incompleteRules": 1,
+      "passedRules": 39
+    }
+  }
+}

@@ -1,0 +1,532 @@
+{
+  "route": "/privacy",
+  "slug": "privacy",
+  "kind": "html",
+  "note": null,
+  "byViewport": {
+    "375": {
+      "unitId": "d6959b7b-4f7a-4f3b-8190-ee3c3f1723c0",
+      "capturedAt": "2026-09-15T20:18:09.496Z",
+      "requestedUrl": "http://127.0.0.1:5000/privacy",
+      "finalUrl": "http://127.0.0.1:5000/privacy",
+      "documentStatus": 200,
+      "xRobotsTag": null,
+      "httpRedirects": [],
+      "clientNavigations": [
+        "http://127.0.0.1:5000/privacy"
+      ],
+      "blockedRequests": [
+        {
+          "method": "POST",
+          "url": "https://gorgeous-jennet-4.clerk.accounts.dev/v1/dev_browser?__clerk_api_version=2026-05-12&_clerk_js_version=6.32.0"
+        }
+      ],
+      "allowedAuthInitializations": [],
+      "blockedWebSockets": [
+        "ws://127.0.0.1:5000/?token=%5BREDACTED%5D"
+      ],
+      "blockedWorkers": [
+        "Worker blob:http://127.0.0.1:5000/5bb35131-4900-40b8-8e0d-241aac6a8d9d"
+      ],
+      "blockedPopups": [],
+      "blockedServiceWorkers": [],
+      "consentBanner": {
+        "present": true,
+        "dismissedVia": "[data-testid=\"consent-decline\"]"
+      },
+      "attempts": 1,
+      "viewport": {
+        "width": 375,
+        "height": 812
+      },
+      "title": "Privacy Policy — Awesome Video",
+      "lang": "en",
+      "h1": [
+        "Privacy Policy"
+      ],
+      "canonical": "https://awesome.video/privacy",
+      "robotsMeta": "index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1",
+      "description": "How Awesome Video handles your data: what we collect, how it's used, and the analytics choices you control.",
+      "jsonLdBlocks": 2,
+      "jsonLdTypes": [
+        "BreadcrumbList",
+        "ListItem",
+        "WebPage",
+        "WebSite"
+      ],
+      "linkCount": 31,
+      "navLabels": [
+        "Home",
+        "AWESOME VIDEO",
+        "Community & Events",
+        "Encoding & Codecs",
+        "General Tools",
+        "Infrastructure & Delivery",
+        "Intro & Learning",
+        "Media Tools",
+        "All categories →",
+        "Journeys",
+        "About",
+        "Submit a resource",
+        "Admin",
+        "Terms",
+        "Privacy",
+        "Code of Conduct",
+        "Cookie settings",
+        "krzemienski/awesome-video ↗",
+        "Report an issue ↗",
+        "Contributing ↗",
+        "awesome-list guidelines ↗",
+        "Docs ↗",
+        "Sitemap"
+      ],
+      "visibleTestIds": [
+        "brand-mark",
+        "breadcrumb-mobile-current",
+        "button-privacy-cookie-settings",
+        "footer-about",
+        "footer-categories",
+        "footer-code-of-conduct",
+        "footer-cookie-settings",
+        "footer-copyright",
+        "footer-github",
+        "footer-home",
+        "footer-journeys",
+        "footer-privacy",
+        "footer-submit",
+        "footer-terms",
+        "header-brand",
+        "heading-privacy",
+        "link-breadcrumb-home",
+        "link-privacy-contact",
+        "link-privacy-deletion",
+        "link-privacy-github-issues",
+        "mobile-drawer-trigger",
+        "page-breadcrumb",
+        "site-footer",
+        "table-cookies"
+      ],
+      "documentHeight": 5862,
+      "screenshot": {
+        "width": 375,
+        "height": 5862,
+        "bytes": 389009,
+        "truncated": false,
+        "documentHeight": 5862,
+        "sha256": "38660cfed2e29f803dfc3c15985f0d4f4cd08a886613bb03ab2a84bc79ce4e88"
+      }
+    },
+    "768": {
+      "unitId": "20933429-b9fc-42b5-9f04-53185a057d95",
+      "capturedAt": "2026-09-15T20:18:12.979Z",
+      "requestedUrl": "http://127.0.0.1:5000/privacy",
+      "finalUrl": "http://127.0.0.1:5000/privacy",
+      "documentStatus": 200,
+      "xRobotsTag": null,
+      "httpRedirects": [],
+      "clientNavigations": [
+        "http://127.0.0.1:5000/privacy"
+      ],
+      "blockedRequests": [
+        {
+          "method": "POST",
+          "url": "https://gorgeous-jennet-4.clerk.accounts.dev/v1/dev_browser?__clerk_api_version=2026-05-12&_clerk_js_version=6.32.0"
+        }
+      ],
+      "allowedAuthInitializations": [],
+      "blockedWebSockets": [
+        "ws://127.0.0.1:5000/?token=%5BREDACTED%5D"
+      ],
+      "blockedWorkers": [
+        "Worker blob:http://127.0.0.1:5000/227f922f-8497-43f4-8e5c-93e7f91115b5"
+      ],
+      "blockedPopups": [],
+      "blockedServiceWorkers": [],
+      "consentBanner": {
+        "present": true,
+        "dismissedVia": "[data-testid=\"consent-decline\"]"
+      },
+      "attempts": 1,
+      "viewport": {
+        "width": 768,
+        "height": 1024
+      },
+      "title": "Privacy Policy — Awesome Video",
+      "lang": "en",
+      "h1": [
+        "Privacy Policy"
+      ],
+      "canonical": "https://awesome.video/privacy",
+      "robotsMeta": "index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1",
+      "description": "How Awesome Video handles your data: what we collect, how it's used, and the analytics choices you control.",
+      "jsonLdBlocks": 2,
+      "jsonLdTypes": [
+        "BreadcrumbList",
+        "ListItem",
+        "WebPage",
+        "WebSite"
+      ],
+      "linkCount": 31,
+      "navLabels": [
+        "Home",
+        "AWESOME VIDEO",
+        "Community & Events",
+        "Encoding & Codecs",
+        "General Tools",
+        "Infrastructure & Delivery",
+        "Intro & Learning",
+        "Media Tools",
+        "All categories →",
+        "Journeys",
+        "About",
+        "Submit a resource",
+        "Admin",
+        "Terms",
+        "Privacy",
+        "Code of Conduct",
+        "Cookie settings",
+        "krzemienski/awesome-video ↗",
+        "Report an issue ↗",
+        "Contributing ↗",
+        "awesome-list guidelines ↗",
+        "Docs ↗",
+        "Sitemap"
+      ],
+      "visibleTestIds": [
+        "brand-mark",
+        "breadcrumb-mobile-current",
+        "button-privacy-cookie-settings",
+        "footer-about",
+        "footer-categories",
+        "footer-code-of-conduct",
+        "footer-cookie-settings",
+        "footer-copyright",
+        "footer-github",
+        "footer-home",
+        "footer-journeys",
+        "footer-privacy",
+        "footer-submit",
+        "footer-terms",
+        "header-brand",
+        "heading-privacy",
+        "link-breadcrumb-home",
+        "link-privacy-contact",
+        "link-privacy-deletion",
+        "link-privacy-github-issues",
+        "mobile-drawer-trigger",
+        "page-breadcrumb",
+        "site-footer",
+        "table-cookies"
+      ],
+      "documentHeight": 3494,
+      "screenshot": {
+        "width": 768,
+        "height": 3494,
+        "bytes": 389029,
+        "truncated": false,
+        "documentHeight": 3494,
+        "sha256": "e6b5012a02de763d20eb31428236e0a521cc8ccce2031ed7aa5c742231490966"
+      }
+    },
+    "1024": {
+      "unitId": "63719e9e-850e-43bf-b5b9-090f38d1367e",
+      "capturedAt": "2026-09-15T20:18:15.696Z",
+      "requestedUrl": "http://127.0.0.1:5000/privacy",
+      "finalUrl": "http://127.0.0.1:5000/privacy",
+      "documentStatus": 200,
+      "xRobotsTag": null,
+      "httpRedirects": [],
+      "clientNavigations": [
+        "http://127.0.0.1:5000/privacy"
+      ],
+      "blockedRequests": [
+        {
+          "method": "POST",
+          "url": "https://gorgeous-jennet-4.clerk.accounts.dev/v1/dev_browser?__clerk_api_version=2026-05-12&_clerk_js_version=6.32.0"
+        }
+      ],
+      "allowedAuthInitializations": [],
+      "blockedWebSockets": [
+        "ws://127.0.0.1:5000/?token=%5BREDACTED%5D"
+      ],
+      "blockedWorkers": [
+        "Worker blob:http://127.0.0.1:5000/11a3de74-7b8c-41e5-bda2-cd0aabb0205d"
+      ],
+      "blockedPopups": [],
+      "blockedServiceWorkers": [],
+      "consentBanner": {
+        "present": true,
+        "dismissedVia": "[data-testid=\"consent-decline\"]"
+      },
+      "attempts": 1,
+      "viewport": {
+        "width": 1024,
+        "height": 768
+      },
+      "title": "Privacy Policy — Awesome Video",
+      "lang": "en",
+      "h1": [
+        "Privacy Policy"
+      ],
+      "canonical": "https://awesome.video/privacy",
+      "robotsMeta": "index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1",
+      "description": "How Awesome Video handles your data: what we collect, how it's used, and the analytics choices you control.",
+      "jsonLdBlocks": 2,
+      "jsonLdTypes": [
+        "BreadcrumbList",
+        "ListItem",
+        "WebPage",
+        "WebSite"
+      ],
+      "linkCount": 49,
+      "navLabels": [
+        "Home",
+        "AWESOME VIDEO",
+        "Community & Events",
+        "Encoding & Codecs",
+        "General Tools",
+        "Infrastructure & Delivery",
+        "Intro & Learning",
+        "Media Tools",
+        "All categories →",
+        "Journeys",
+        "About",
+        "Submit a resource",
+        "Admin",
+        "Terms",
+        "Privacy",
+        "Code of Conduct",
+        "Cookie settings",
+        "krzemienski/awesome-video ↗",
+        "Report an issue ↗",
+        "Contributing ↗",
+        "awesome-list guidelines ↗",
+        "Docs ↗",
+        "Sitemap"
+      ],
+      "visibleTestIds": [
+        "brand-mark",
+        "breadcrumb-mobile-current",
+        "button-privacy-cookie-settings",
+        "footer-about",
+        "footer-categories",
+        "footer-code-of-conduct",
+        "footer-cookie-settings",
+        "footer-copyright",
+        "footer-github",
+        "footer-home",
+        "footer-journeys",
+        "footer-privacy",
+        "footer-submit",
+        "footer-terms",
+        "header-brand",
+        "heading-privacy",
+        "link-breadcrumb-home",
+        "link-privacy-contact",
+        "link-privacy-deletion",
+        "link-privacy-github-issues",
+        "mobile-drawer-trigger",
+        "page-breadcrumb",
+        "site-footer",
+        "table-cookies"
+      ],
+      "documentHeight": 2947,
+      "screenshot": {
+        "width": 1024,
+        "height": 2947,
+        "bytes": 391403,
+        "truncated": false,
+        "documentHeight": 2947,
+        "sha256": "adcc727a0c5cec871384fb158689ed1e0ab0618fdb166215d0006ef7ad8e9870"
+      }
+    },
+    "1440": {
+      "unitId": "189ea203-3740-45ab-954f-c76dcc0c2534",
+      "capturedAt": "2026-09-15T20:18:18.695Z",
+      "requestedUrl": "http://127.0.0.1:5000/privacy",
+      "finalUrl": "http://127.0.0.1:5000/privacy",
+      "documentStatus": 200,
+      "xRobotsTag": null,
+      "httpRedirects": [],
+      "clientNavigations": [
+        "http://127.0.0.1:5000/privacy"
+      ],
+      "blockedRequests": [
+        {
+          "method": "POST",
+          "url": "https://gorgeous-jennet-4.clerk.accounts.dev/v1/dev_browser?__clerk_api_version=2026-05-12&_clerk_js_version=6.32.0"
+        }
+      ],
+      "allowedAuthInitializations": [],
+      "blockedWebSockets": [
+        "ws://127.0.0.1:5000/?token=%5BREDACTED%5D"
+      ],
+      "blockedWorkers": [
+        "Worker blob:http://127.0.0.1:5000/f7891ec8-d013-4eaa-844e-1bafdca4107d"
+      ],
+      "blockedPopups": [],
+      "blockedServiceWorkers": [],
+      "consentBanner": {
+        "present": true,
+        "dismissedVia": "[data-testid=\"consent-decline\"]"
+      },
+      "attempts": 1,
+      "viewport": {
+        "width": 1440,
+        "height": 900
+      },
+      "title": "Privacy Policy — Awesome Video",
+      "lang": "en",
+      "h1": [
+        "Privacy Policy"
+      ],
+      "canonical": "https://awesome.video/privacy",
+      "robotsMeta": "index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1",
+      "description": "How Awesome Video handles your data: what we collect, how it's used, and the analytics choices you control.",
+      "jsonLdBlocks": 2,
+      "jsonLdTypes": [
+        "BreadcrumbList",
+        "ListItem",
+        "WebPage",
+        "WebSite"
+      ],
+      "linkCount": 48,
+      "navLabels": [
+        "Browse",
+        "Submit",
+        "About",
+        "Docs ↗",
+        "Home",
+        "AWESOME VIDEO",
+        "Community & Events",
+        "Encoding & Codecs",
+        "General Tools",
+        "Infrastructure & Delivery",
+        "Intro & Learning",
+        "Media Tools",
+        "All categories →",
+        "Journeys",
+        "Submit a resource",
+        "Admin",
+        "Terms",
+        "Privacy",
+        "Code of Conduct",
+        "Cookie settings",
+        "krzemienski/awesome-video ↗",
+        "Report an issue ↗",
+        "Contributing ↗",
+        "awesome-list guidelines ↗",
+        "Sitemap"
+      ],
+      "visibleTestIds": [
+        "brand-mark",
+        "breadcrumb-mobile-current",
+        "button-privacy-cookie-settings",
+        "footer-about",
+        "footer-categories",
+        "footer-code-of-conduct",
+        "footer-cookie-settings",
+        "footer-copyright",
+        "footer-github",
+        "footer-home",
+        "footer-journeys",
+        "footer-privacy",
+        "footer-submit",
+        "footer-terms",
+        "header-brand",
+        "heading-privacy",
+        "link-breadcrumb-home",
+        "link-privacy-contact",
+        "link-privacy-deletion",
+        "link-privacy-github-issues",
+        "page-breadcrumb",
+        "site-footer",
+        "table-cookies"
+      ],
+      "documentHeight": 2949,
+      "screenshot": {
+        "width": 1440,
+        "height": 2949,
+        "bytes": 405976,
+        "truncated": false,
+        "documentHeight": 2949,
+        "sha256": "47c6469cb1ec33cebacc3321db1ad4ece75676dafa902f42c2aef82c4d3e7798"
+      }
+    }
+  },
+  "primaryViewport": 1440,
+  "title": "Privacy Policy — Awesome Video",
+  "lang": "en",
+  "h1": [
+    "Privacy Policy"
+  ],
+  "canonical": "https://awesome.video/privacy",
+  "robotsMeta": "index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1",
+  "description": "How Awesome Video handles your data: what we collect, how it's used, and the analytics choices you control.",
+  "jsonLdTypes": [
+    "BreadcrumbList",
+    "ListItem",
+    "WebPage",
+    "WebSite"
+  ],
+  "linkCount": 48,
+  "navLabels": [
+    "Browse",
+    "Submit",
+    "About",
+    "Docs ↗",
+    "Home",
+    "AWESOME VIDEO",
+    "Community & Events",
+    "Encoding & Codecs",
+    "General Tools",
+    "Infrastructure & Delivery",
+    "Intro & Learning",
+    "Media Tools",
+    "All categories →",
+    "Journeys",
+    "Submit a resource",
+    "Admin",
+    "Terms",
+    "Privacy",
+    "Code of Conduct",
+    "Cookie settings",
+    "krzemienski/awesome-video ↗",
+    "Report an issue ↗",
+    "Contributing ↗",
+    "awesome-list guidelines ↗",
+    "Sitemap"
+  ],
+  "visibleTestIds": [
+    "brand-mark",
+    "breadcrumb-mobile-current",
+    "button-privacy-cookie-settings",
+    "footer-about",
+    "footer-categories",
+    "footer-code-of-conduct",
+    "footer-cookie-settings",
+    "footer-copyright",
+    "footer-github",
+    "footer-home",
+    "footer-journeys",
+    "footer-privacy",
+    "footer-submit",
+    "footer-terms",
+    "header-brand",
+    "heading-privacy",
+    "link-breadcrumb-home",
+    "link-privacy-contact",
+    "link-privacy-deletion",
+    "link-privacy-github-issues",
+    "page-breadcrumb",
+    "site-footer",
+    "table-cookies"
+  ],
+  "finalUrl": "http://127.0.0.1:5000/privacy",
+  "documentStatus": 200,
+  "xRobotsTag": null,
+  "clientNavigations": [
+    "http://127.0.0.1:5000/privacy"
+  ],
+  "viewportDisagreements": []
+}

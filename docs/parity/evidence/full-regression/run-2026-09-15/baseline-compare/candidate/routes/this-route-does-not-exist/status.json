@@ -1,0 +1,15 @@
+{
+  "route": "/this-route-does-not-exist",
+  "slug": "this-route-does-not-exist",
+  "kind": "html",
+  "note": "expected 404",
+  "requestedUrl": "http://127.0.0.1:5000/this-route-does-not-exist",
+  "finalUrl": "http://127.0.0.1:5000/this-route-does-not-exist",
+  "status": 404,
+  "xRobotsTag": null,
+  "contentType": "text/html; charset=utf-8",
+  "cacheControl": "no-store",
+  "redirectChain": [],
+  "attempts": 1,
+  "probedAt": "2026-09-15T20:18:42.559Z"
+}

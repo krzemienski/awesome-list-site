@@ -1,0 +1,40 @@
+    [Mobile Safari] › tests/e2e/search.spec.ts:67:5 › Search and Discovery Flow › Search Dialog › should open search dialog when clicking search button 
+    [Mobile Safari] › tests/e2e/search.spec.ts:78:5 › Search and Discovery Flow › Search Dialog › should open search dialog with keyboard shortcut 
+    [Mobile Safari] › tests/e2e/search.spec.ts:88:5 › Search and Discovery Flow › Search Dialog › should focus search input when dialog opens 
+    [Mobile Safari] › tests/e2e/search.spec.ts:102:5 › Search and Discovery Flow › Search Dialog › should show placeholder state before search 
+    [Mobile Safari] › tests/e2e/search.spec.ts:112:5 › Search and Discovery Flow › Search Dialog › should close dialog with the advertised Escape shortcut 
+    [Mobile Safari] › tests/e2e/search.spec.ts:128:5 › Search and Discovery Flow › Search Dialog › should close dialog when pressing Escape 
+    [Mobile Safari] › tests/e2e/search.spec.ts:147:5 › Search and Discovery Flow › Search Functionality › should show "no results" when search has no matches 
+    [Mobile Safari] › tests/e2e/search.spec.ts:164:5 › Search and Discovery Flow › Search Functionality › should display search results when typing valid query 
+    [Mobile Safari] › tests/e2e/search.spec.ts:188:5 › Search and Discovery Flow › Search Functionality › should require minimum 2 characters to search 
+    [Mobile Safari] › tests/e2e/search.spec.ts:210:5 › Search and Discovery Flow › Search Functionality › should display resource details in search results 
+    [Mobile Safari] › tests/e2e/search.spec.ts:237:5 › Search and Discovery Flow › Search Functionality › should clear search when dialog closes 
+    [Mobile Safari] › tests/e2e/search.spec.ts:259:5 › Search and Discovery Flow › Category Page Discovery › should display category resources 
+    [Mobile Safari] › tests/e2e/search.spec.ts:274:5 › Search and Discovery Flow › Category Page Discovery › should navigate back to home from category page 
+    [Mobile Safari] › tests/e2e/search.spec.ts:290:5 › Search and Discovery Flow › Category Page Discovery › should have search input on category page 
+    [Mobile Safari] › tests/e2e/search.spec.ts:306:5 › Search and Discovery Flow › Category Page Discovery › should have view mode toggle on category page 
+    [Mobile Safari] › tests/e2e/search.spec.ts:324:5 › Search and Discovery Flow › Responsive Design › should display search on mobile viewport 
+    [Mobile Safari] › tests/e2e/search.spec.ts:341:5 › Search and Discovery Flow › Responsive Design › should display category cards in single column on mobile 
+    [Mobile Safari] › tests/e2e/search.spec.ts:360:5 › Search and Discovery Flow › Accessibility › should have proper heading hierarchy on home page 
+    [Mobile Safari] › tests/e2e/search.spec.ts:369:5 › Search and Discovery Flow › Accessibility › should have accessible category links 
+    [Mobile Safari] › tests/e2e/search.spec.ts:380:5 › Search and Discovery Flow › Accessibility › should have accessible search dialog 
+    [Mobile Safari] › tests/e2e/search.spec.ts:397:5 › Search and Discovery Flow › Accessibility › should support keyboard navigation in search dialog 
+    [Mobile Safari] › tests/e2e/search.spec.ts:415:5 › Search and Discovery Flow › Loading States › should show loading skeleton on initial page load 
+    [Mobile Safari] › tests/e2e/search.spec.ts:432:5 › Search and Discovery Flow › Error Handling › should handle failed resource load gracefully 
+    [Mobile Safari] › tests/e2e/sidebar-ux.spec.ts:28:3 › nested taxonomy leaves are not clipped at 375 
+    [Mobile Safari] › tests/e2e/sidebar-ux.spec.ts:28:3 › nested taxonomy leaves are not clipped at 1024 
+    [Mobile Safari] › tests/e2e/sidebar-ux.spec.ts:97:5 › @desktop-1440 › BUG-007 every sidebar chevron is ≥24 wide × ≥44 tall at desktop-1440 
+    [Mobile Safari] › tests/e2e/sidebar-ux.spec.ts:143:5 › @desktop-1440 › BUG-043 no sidebar label is truncated at desktop-1440 
+    [Mobile Safari] › tests/e2e/sidebar-ux.spec.ts:97:5 › @tablet-1024 › BUG-007 every sidebar chevron is ≥24 wide × ≥44 tall at tablet-1024 
+    [Mobile Safari] › tests/e2e/sidebar-ux.spec.ts:143:5 › @tablet-1024 › BUG-043 no sidebar label is truncated at tablet-1024 
+    [Mobile Safari] › tests/e2e/sidebar-ux.spec.ts:97:5 › @tablet-768 › BUG-007 every sidebar chevron is ≥24 wide × ≥44 tall at tablet-768 
+    [Mobile Safari] › tests/e2e/sidebar-ux.spec.ts:143:5 › @tablet-768 › BUG-043 no sidebar label is truncated at tablet-768 
+    [Mobile Safari] › tests/e2e/sidebar-ux.spec.ts:97:5 › @mobile-375 › BUG-007 every sidebar chevron is ≥24 wide × ≥44 tall at mobile-375 
+    [Mobile Safari] › tests/e2e/sidebar-ux.spec.ts:143:5 › @mobile-375 › BUG-043 no sidebar label is truncated at mobile-375 
+  3 flaky
+    [chromium] › tests/e2e/admin-operations.spec.ts:204:3 › Task549 admin operations tabs › matches live link-health filter counts, including DNS failures 
+    [Mobile Chrome] › tests/e2e/admin-users-audit.spec.ts:202:3 › Task549 admin Users and Audit tabs › Users changes the role of a disposable second account and restores it 
+    [Mobile Chrome] › tests/e2e/admin-users-audit.spec.ts:260:3 › Task549 admin Users and Audit tabs › Audit filters a disposable resource, opens detail, and records kind and featured updates 
+  38 skipped
+  1 did not run
+  283 passed (9.4m)

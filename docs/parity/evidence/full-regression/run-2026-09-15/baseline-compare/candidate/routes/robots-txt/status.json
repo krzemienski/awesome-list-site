@@ -1,0 +1,15 @@
+{
+  "route": "/robots.txt",
+  "slug": "robots-txt",
+  "kind": "document",
+  "note": null,
+  "requestedUrl": "http://127.0.0.1:5000/robots.txt",
+  "finalUrl": "http://127.0.0.1:5000/robots.txt",
+  "status": 200,
+  "xRobotsTag": null,
+  "contentType": "text/plain",
+  "cacheControl": "no-cache",
+  "redirectChain": [],
+  "attempts": 1,
+  "probedAt": "2026-09-15T20:18:53.570Z"
+}

@@ -1,0 +1,225 @@
+{
+  "base": "http://127.0.0.1:5000",
+  "viewports": [
+    {
+      "width": 375,
+      "height": 812
+    },
+    {
+      "width": 768,
+      "height": 1024
+    },
+    {
+      "width": 1024,
+      "height": 768
+    },
+    {
+      "width": 1440,
+      "height": 900
+    }
+  ],
+  "axeWidths": [
+    375,
+    1440
+  ],
+  "routes": [
+    {
+      "path": "/",
+      "kind": "html",
+      "slug": "home"
+    },
+    {
+      "path": "/categories",
+      "kind": "html",
+      "slug": "categories"
+    },
+    {
+      "path": "/category/encoding-codecs",
+      "kind": "html",
+      "slug": "category-encoding-codecs"
+    },
+    {
+      "path": "/category/community-events?page=2",
+      "kind": "html",
+      "slug": "category-community-events-page-2"
+    },
+    {
+      "path": "/subcategory/community-groups",
+      "kind": "html",
+      "slug": "subcategory-community-groups"
+    },
+    {
+      "path": "/sub-subcategory/ffmpeg",
+      "kind": "html",
+      "slug": "sub-subcategory-ffmpeg"
+    },
+    {
+      "path": "/resource/185020",
+      "kind": "html",
+      "slug": "resource-185020"
+    },
+    {
+      "path": "/resource/186190",
+      "kind": "html",
+      "slug": "resource-186190"
+    },
+    {
+      "path": "/about",
+      "kind": "html",
+      "slug": "about"
+    },
+    {
+      "path": "/submit",
+      "kind": "html",
+      "note": "guest → client-side redirect to sign-in; both chains are recorded",
+      "slug": "submit"
+    },
+    {
+      "path": "/search?q=ffmpeg",
+      "kind": "html",
+      "slug": "search-q-ffmpeg"
+    },
+    {
+      "path": "/search?q=zzqxv-nothing",
+      "kind": "html",
+      "note": "empty search state",
+      "slug": "search-q-zzqxv-nothing"
+    },
+    {
+      "path": "/advanced",
+      "kind": "html",
+      "slug": "advanced"
+    },
+    {
+      "path": "/journeys",
+      "kind": "html",
+      "slug": "journeys"
+    },
+    {
+      "path": "/journey/7",
+      "kind": "html",
+      "slug": "journey-7"
+    },
+    {
+      "path": "/tag/open-source",
+      "kind": "html",
+      "slug": "tag-open-source"
+    },
+    {
+      "path": "/settings/theme",
+      "kind": "html",
+      "slug": "settings-theme"
+    },
+    {
+      "path": "/recommendations",
+      "kind": "html",
+      "slug": "recommendations"
+    },
+    {
+      "path": "/design-system",
+      "kind": "html",
+      "slug": "design-system"
+    },
+    {
+      "path": "/terms",
+      "kind": "html",
+      "slug": "terms"
+    },
+    {
+      "path": "/privacy",
+      "kind": "html",
+      "slug": "privacy"
+    },
+    {
+      "path": "/code-of-conduct",
+      "kind": "html",
+      "slug": "code-of-conduct"
+    },
+    {
+      "path": "/sign-in",
+      "kind": "html",
+      "slug": "sign-in"
+    },
+    {
+      "path": "/this-route-does-not-exist",
+      "kind": "html",
+      "note": "expected 404",
+      "slug": "this-route-does-not-exist"
+    },
+    {
+      "path": "/sitemap.xml",
+      "kind": "document",
+      "slug": "sitemap-xml"
+    },
+    {
+      "path": "/robots.txt",
+      "kind": "document",
+      "slug": "robots-txt"
+    }
+  ],
+  "api": [
+    {
+      "path": "/api/resources?limit=24",
+      "slug": "resources-limit-24"
+    },
+    {
+      "path": "/api/resources/185020",
+      "slug": "resources-185020"
+    },
+    {
+      "path": "/api/categories",
+      "slug": "categories"
+    },
+    {
+      "path": "/api/subcategories",
+      "slug": "subcategories"
+    },
+    {
+      "path": "/api/sub-subcategories",
+      "slug": "sub-subcategories"
+    },
+    {
+      "path": "/api/tags",
+      "slug": "tags"
+    },
+    {
+      "path": "/api/awesome-list/listing?level=category&slug=encoding-codecs",
+      "slug": "awesome-list-listing-level-category-slug-encoding-codecs"
+    },
+    {
+      "path": "/api/journeys",
+      "slug": "journeys"
+    },
+    {
+      "path": "/api/journeys/7",
+      "slug": "journeys-7"
+    },
+    {
+      "path": "/api/recommendations",
+      "slug": "recommendations"
+    },
+    {
+      "path": "/api/health",
+      "slug": "health"
+    },
+    {
+      "path": "/api/health/ready",
+      "slug": "health-ready"
+    }
+  ],
+  "lighthouse": [
+    {
+      "path": "/",
+      "slug": "home"
+    },
+    {
+      "path": "/category/encoding-codecs",
+      "slug": "category-encoding-codecs"
+    },
+    {
+      "path": "/resource/185020",
+      "slug": "resource-185020"
+    }
+  ],
+  "capturedForCompare": true
+}

@@ -1,0 +1,128 @@
+{
+  "schemaVersion": 2,
+  "task": "567",
+  "screen": "app.admin.github",
+  "widths": [
+    {
+      "screen": "app.admin.github",
+      "width": 375,
+      "route": "/admin",
+      "identity": "Nick-admin",
+      "status": "PASS",
+      "identityVerified": {
+        "name": "Nick",
+        "role": "admin"
+      },
+      "ready": true,
+      "httpStatus": 200,
+      "axe": {
+        "violations": [
+          {
+            "id": "empty-table-header",
+            "impact": "minor",
+            "help": "Table header text should not be empty",
+            "description": "Ensure table headers have discernible text",
+            "nodes": 1,
+            "targets": [
+              [
+                "th:nth-child(4)"
+              ]
+            ],
+            "details": [
+              {
+                "target": [
+                  "th:nth-child(4)"
+                ],
+                "failureSummary": "Fix any of the following:\n  Element does not have text that is visible to screen readers"
+              }
+            ]
+          },
+          {
+            "id": "heading-order",
+            "impact": "moderate",
+            "help": "Heading levels should only increase by one",
+            "description": "Ensure the order of headings is semantically correct",
+            "nodes": 1,
+            "targets": [
+              [
+                "h4"
+              ]
+            ],
+            "details": [
+              {
+                "target": [
+                  "h4"
+                ],
+                "failureSummary": "Fix any of the following:\n  Heading order invalid"
+              }
+            ]
+          }
+        ],
+        "seriousCritical": [],
+        "passes": 47,
+        "incomplete": 1
+      }
+    },
+    {
+      "screen": "app.admin.github",
+      "width": 1440,
+      "route": "/admin",
+      "identity": "Nick-admin",
+      "status": "PASS",
+      "identityVerified": {
+        "name": "Nick",
+        "role": "admin"
+      },
+      "ready": true,
+      "httpStatus": 200,
+      "axe": {
+        "violations": [
+          {
+            "id": "empty-table-header",
+            "impact": "minor",
+            "help": "Table header text should not be empty",
+            "description": "Ensure table headers have discernible text",
+            "nodes": 1,
+            "targets": [
+              [
+                "th:nth-child(4)"
+              ]
+            ],
+            "details": [
+              {
+                "target": [
+                  "th:nth-child(4)"
+                ],
+                "failureSummary": "Fix any of the following:\n  Element does not have text that is visible to screen readers"
+              }
+            ]
+          },
+          {
+            "id": "heading-order",
+            "impact": "moderate",
+            "help": "Heading levels should only increase by one",
+            "description": "Ensure the order of headings is semantically correct",
+            "nodes": 1,
+            "targets": [
+              [
+                "h4"
+              ]
+            ],
+            "details": [
+              {
+                "target": [
+                  "h4"
+                ],
+                "failureSummary": "Fix any of the following:\n  Heading order invalid"
+              }
+            ]
+          }
+        ],
+        "seriousCritical": [],
+        "passes": 47,
+        "incomplete": 1
+      }
+    }
+  ],
+  "seriousCriticalZero": true
+}

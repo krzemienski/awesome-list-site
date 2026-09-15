@@ -1,0 +1,15 @@
+{
+  "route": "/category/encoding-codecs",
+  "slug": "category-encoding-codecs",
+  "kind": "html",
+  "note": null,
+  "requestedUrl": "http://127.0.0.1:5000/category/encoding-codecs",
+  "finalUrl": "http://127.0.0.1:5000/category/encoding-codecs",
+  "status": 200,
+  "xRobotsTag": null,
+  "contentType": "text/html; charset=utf-8",
+  "cacheControl": "no-store",
+  "redirectChain": [],
+  "attempts": 1,
+  "probedAt": "2026-09-15T20:12:42.848Z"
+}

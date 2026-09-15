@@ -1,0 +1,15 @@
+{
+  "route": "/search?q=zzqxv-nothing",
+  "slug": "search-q-zzqxv-nothing",
+  "kind": "html",
+  "note": "empty search state",
+  "requestedUrl": "http://127.0.0.1:5000/search?q=zzqxv-nothing",
+  "finalUrl": "http://127.0.0.1:5000/search?q=zzqxv-nothing",
+  "status": 200,
+  "xRobotsTag": null,
+  "contentType": "text/html; charset=utf-8",
+  "cacheControl": "no-store",
+  "redirectChain": [],
+  "attempts": 1,
+  "probedAt": "2026-09-15T20:15:45.664Z"
+}

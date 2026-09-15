@@ -1,0 +1,38 @@
+{
+  "schemaVersion": 2,
+  "task": "567",
+  "screen": "app.legal",
+  "widths": [
+    {
+      "screen": "app.legal",
+      "width": 375,
+      "route": "/terms",
+      "identity": "public",
+      "status": "PASS",
+      "ready": true,
+      "httpStatus": 200,
+      "axe": {
+        "violations": [],
+        "seriousCritical": [],
+        "passes": 39,
+        "incomplete": 1
+      }
+    },
+    {
+      "screen": "app.legal",
+      "width": 1440,
+      "route": "/terms",
+      "identity": "public",
+      "status": "PASS",
+      "ready": true,
+      "httpStatus": 200,
+      "axe": {
+        "violations": [],
+        "seriousCritical": [],
+        "passes": 40,
+        "incomplete": 1
+      }
+    }
+  ],
+  "seriousCriticalZero": true
+}

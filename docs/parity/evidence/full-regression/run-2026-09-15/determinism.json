@@ -1,0 +1,1445 @@
+{
+  "firstRun": "2026-09-15T17-47-51-897Z-9407",
+  "secondRun": "2026-09-15T18-59-43-142Z-21936",
+  "compared": 188,
+  "overTolerance": [
+    {
+      "screen": "app.admin.audit",
+      "width": 1024,
+      "first": 14.747666133553766,
+      "second": 14.761003315483038,
+      "delta": 0.01333718192927158
+    },
+    {
+      "screen": "app.admin.categories",
+      "width": 375,
+      "first": 32.1067565038368,
+      "second": 32.133258469024895,
+      "delta": 0.02650196518809622
+    },
+    {
+      "screen": "app.admin.categories",
+      "width": 1024,
+      "first": 8.365006396994772,
+      "second": 8.417832643728223,
+      "delta": 0.05282624673345104
+    },
+    {
+      "screen": "app.admin.database",
+      "width": 375,
+      "first": 6.50312546732466,
+      "second": 6.488649618663079,
+      "delta": 0.014475848661581026
+    },
+    {
+      "screen": "app.admin.edits",
+      "width": 375,
+      "first": 3.378981937602627,
+      "second": 3.4055829228243026,
+      "delta": 0.026600985221675533
+    },
+    {
+      "screen": "app.admin.enrichment",
+      "width": 375,
+      "first": 11.276679137716016,
+      "second": 11.256725458756458,
+      "delta": 0.01995367895955802
+    },
+    {
+      "screen": "app.admin.linkhealth",
+      "width": 375,
+      "first": 35.42981501632209,
+      "second": 35.46129851287632,
+      "delta": 0.03148349655423033
+    },
+    {
+      "screen": "app.admin.linkhealth",
+      "width": 768,
+      "first": 42.47921820430734,
+      "second": 42.495967937524256,
+      "delta": 0.016749733216919083
+    },
+    {
+      "screen": "app.admin.overview",
+      "width": 375,
+      "first": 16.234263233190273,
+      "second": 16.223533619456365,
+      "delta": 0.010729613733907684
+    },
+    {
+      "screen": "app.admin.research",
+      "width": 375,
+      "first": 34.90549556035517,
+      "second": 34.94965202783777,
+      "delta": 0.04415646748260116
+    },
+    {
+      "screen": "app.admin.research",
+      "width": 768,
+      "first": 22.407948186353828,
+      "second": 22.42870145631068,
+      "delta": 0.02075326995685245
+    },
+    {
+      "screen": "app.admin.research",
+      "width": 1440,
+      "first": 28.801257992771756,
+      "second": 28.812494208136407,
+      "delta": 0.011236215364650803
+    },
+    {
+      "screen": "app.admin.researcher",
+      "width": 375,
+      "first": 39.87685683530678,
+      "second": 39.91517761033369,
+      "delta": 0.03832077502691078
+    },
+    {
+      "screen": "app.admin.subcategories",
+      "width": 1024,
+      "first": 29.061219432969082,
+      "second": 29.07314015858209,
+      "delta": 0.011920725613006056
+    },
+    {
+      "screen": "app.admin.users",
+      "width": 768,
+      "first": 5.801542502908668,
+      "second": 5.816881180919139,
+      "delta": 0.01533867801047073
+    },
+    {
+      "screen": "app.admin.users",
+      "width": 1024,
+      "first": 3.8168184293320424,
+      "second": 3.8292972531461764,
+      "delta": 0.01247882381413401
+    },
+    {
+      "screen": "app.shell.palette",
+      "width": 1440,
+      "first": 0.3948537095088819,
+      "second": 0.3596307906652734,
+      "delta": 0.03522291884360845
+    }
+  ],
+  "maxDelta": 0.05282624673345104,
+  "rows": [
+    {
+      "screen": "app.about",
+      "width": 375,
+      "first": 8.973098835769136,
+      "second": 8.973098835769136,
+      "delta": 0
+    },
+    {
+      "screen": "app.about",
+      "width": 768,
+      "first": 6.440109343936381,
+      "second": 6.440109343936381,
+      "delta": 0
+    },
+    {
+      "screen": "app.about",
+      "width": 1024,
+      "first": 6.5084572654596755,
+      "second": 6.5084572654596755,
+      "delta": 0
+    },
+    {
+      "screen": "app.about",
+      "width": 1440,
+      "first": 5.572108603667137,
+      "second": 5.572108603667137,
+      "delta": 0
+    },
+    {
+      "screen": "app.admin.approvals",
+      "width": 375,
+      "first": 3.6660098522167486,
+      "second": 3.6660098522167486,
+      "delta": 0
+    },
+    {
+      "screen": "app.admin.approvals",
+      "width": 768,
+      "first": 1.3615926106770835,
+      "second": 1.3615926106770835,
+      "delta": 0
+    },
+    {
+      "screen": "app.admin.approvals",
+      "width": 1024,
+      "first": 1.4584859212239585,
+      "second": 1.4584859212239585,
+      "delta": 0
+    },
+    {
+      "screen": "app.admin.approvals",
+      "width": 1440,
+      "first": 1.5846450617283951,
+      "second": 1.5846450617283951,
+      "delta": 0
+    },
+    {
+      "screen": "app.admin.audit",
+      "width": 375,
+      "first": 18.151247465397162,
+      "second": 18.143630432866082,
+      "delta": 0.007617032531079815
+    },
+    {
+      "screen": "app.admin.audit",
+      "width": 768,
+      "first": 14.936316220450014,
+      "second": 14.938652627456564,
+      "delta": 0.0023364070065508002
+    },
+    {
+      "screen": "app.admin.audit",
+      "width": 1024,
+      "first": 14.747666133553766,
+      "second": 14.761003315483038,
+      "delta": 0.01333718192927158
+    },
+    {
+      "screen": "app.admin.audit",
+      "width": 1440,
+      "first": 14.215485432240751,
+      "second": 14.208457127340107,
+      "delta": 0.007028304900643434
+    },
+    {
+      "screen": "app.admin.categories",
+      "width": 375,
+      "first": 32.1067565038368,
+      "second": 32.133258469024895,
+      "delta": 0.02650196518809622
+    },
+    {
+      "screen": "app.admin.categories",
+      "width": 768,
+      "first": 29.38625062940584,
+      "second": 29.37893378650554,
+      "delta": 0.007316842900298326
+    },
+    {
+      "screen": "app.admin.categories",
+      "width": 1024,
+      "first": 8.365006396994772,
+      "second": 8.417832643728223,
+      "delta": 0.05282624673345104
+    },
+    {
+      "screen": "app.admin.categories",
+      "width": 1440,
+      "first": 8.43622967479675,
+      "second": 8.43622967479675,
+      "delta": 0
+    },
+    {
+      "screen": "app.admin.database",
+      "width": 375,
+      "first": 6.50312546732466,
+      "second": 6.488649618663079,
+      "delta": 0.014475848661581026
+    },
+    {
+      "screen": "app.admin.database",
+      "width": 768,
+      "first": 6.875039900408581,
+      "second": 6.875039900408581,
+      "delta": 0
+    },
+    {
+      "screen": "app.admin.database",
+      "width": 1024,
+      "first": 11.201045517560074,
+      "second": 11.201045517560074,
+      "delta": 0
+    },
+    {
+      "screen": "app.admin.database",
+      "width": 1440,
+      "first": 13.917352766651833,
+      "second": 13.917352766651833,
+      "delta": 0
+    },
+    {
+      "screen": "app.admin.edits",
+      "width": 375,
+      "first": 3.378981937602627,
+      "second": 3.4055829228243026,
+      "delta": 0.026600985221675533
+    },
+    {
+      "screen": "app.admin.edits",
+      "width": 768,
+      "first": 1.264063517252604,
+      "second": 1.264063517252604,
+      "delta": 0
+    },
+    {
+      "screen": "app.admin.edits",
+      "width": 1024,
+      "first": 1.2280782063802085,
+      "second": 1.2280782063802085,
+      "delta": 0
+    },
+    {
+      "screen": "app.admin.edits",
+      "width": 1440,
+      "first": 1.5368827160493825,
+      "second": 1.5368827160493825,
+      "delta": 0
+    },
+    {
+      "screen": "app.admin.enrichment",
+      "width": 375,
+      "first": 11.276679137716016,
+      "second": 11.256725458756458,
+      "delta": 0.01995367895955802
+    },
+    {
+      "screen": "app.admin.enrichment",
+      "width": 768,
+      "first": 12.751397579549865,
+      "second": 12.751397579549865,
+      "delta": 0
+    },
+    {
+      "screen": "app.admin.enrichment",
+      "width": 1024,
+      "first": 5.131328632305195,
+      "second": 5.131328632305195,
+      "delta": 0
+    },
+    {
+      "screen": "app.admin.enrichment",
+      "width": 1440,
+      "first": 5.976370851370851,
+      "second": 5.976370851370851,
+      "delta": 0
+    },
+    {
+      "screen": "app.admin.export",
+      "width": 375,
+      "first": 9.208418194161574,
+      "second": 9.208418194161574,
+      "delta": 0
+    },
+    {
+      "screen": "app.admin.export",
+      "width": 768,
+      "first": 8.60613425925926,
+      "second": 8.60613425925926,
+      "delta": 0
+    },
+    {
+      "screen": "app.admin.export",
+      "width": 1024,
+      "first": 13.418523389959432,
+      "second": 13.418523389959432,
+      "delta": 0
+    },
+    {
+      "screen": "app.admin.export",
+      "width": 1440,
+      "first": 13.4599587323834,
+      "second": 13.4599587323834,
+      "delta": 0
+    },
+    {
+      "screen": "app.admin.github",
+      "width": 375,
+      "first": 21.874605738902993,
+      "second": 21.874605738902993,
+      "delta": 0
+    },
+    {
+      "screen": "app.admin.github",
+      "width": 768,
+      "first": 19.654864308214197,
+      "second": 19.654864308214197,
+      "delta": 0
+    },
+    {
+      "screen": "app.admin.github",
+      "width": 1024,
+      "first": 19.249073578850854,
+      "second": 19.249073578850854,
+      "delta": 0
+    },
+    {
+      "screen": "app.admin.github",
+      "width": 1440,
+      "first": 18.877224259712037,
+      "second": 18.877224259712037,
+      "delta": 0
+    },
+    {
+      "screen": "app.admin.linkhealth",
+      "width": 375,
+      "first": 35.42981501632209,
+      "second": 35.46129851287632,
+      "delta": 0.03148349655423033
+    },
+    {
+      "screen": "app.admin.linkhealth",
+      "width": 768,
+      "first": 42.47921820430734,
+      "second": 42.495967937524256,
+      "delta": 0.016749733216919083
+    },
+    {
+      "screen": "app.admin.linkhealth",
+      "width": 1024,
+      "first": 40.56611335832675,
+      "second": 40.56611335832675,
+      "delta": 0
+    },
+    {
+      "screen": "app.admin.linkhealth",
+      "width": 1440,
+      "first": 31.18400859422959,
+      "second": 31.18400859422959,
+      "delta": 0
+    },
+    {
+      "screen": "app.admin.overview",
+      "width": 375,
+      "first": 16.234263233190273,
+      "second": 16.223533619456365,
+      "delta": 0.010729613733907684
+    },
+    {
+      "screen": "app.admin.overview",
+      "width": 768,
+      "first": 9.00633430013205,
+      "second": 9.000733941709111,
+      "delta": 0.0056003584229387116
+    },
+    {
+      "screen": "app.admin.overview",
+      "width": 1024,
+      "first": 10.414103718547079,
+      "second": 10.408951400162337,
+      "delta": 0.0051523183847415055
+    },
+    {
+      "screen": "app.admin.overview",
+      "width": 1440,
+      "first": 7.485081751999045,
+      "second": 7.482247284878864,
+      "delta": 0.0028344671201816496
+    },
+    {
+      "screen": "app.admin.research",
+      "width": 375,
+      "first": 34.90549556035517,
+      "second": 34.94965202783777,
+      "delta": 0.04415646748260116
+    },
+    {
+      "screen": "app.admin.research",
+      "width": 768,
+      "first": 22.407948186353828,
+      "second": 22.42870145631068,
+      "delta": 0.02075326995685245
+    },
+    {
+      "screen": "app.admin.research",
+      "width": 1024,
+      "first": 40.14918030650542,
+      "second": 40.14918030650542,
+      "delta": 0
+    },
+    {
+      "screen": "app.admin.research",
+      "width": 1440,
+      "first": 28.801257992771756,
+      "second": 28.812494208136407,
+      "delta": 0.011236215364650803
+    },
+    {
+      "screen": "app.admin.researcher",
+      "width": 375,
+      "first": 39.87685683530678,
+      "second": 39.91517761033369,
+      "delta": 0.03832077502691078
+    },
+    {
+      "screen": "app.admin.researcher",
+      "width": 768,
+      "first": 37.27427203989704,
+      "second": 37.27427203989704,
+      "delta": 0
+    },
+    {
+      "screen": "app.admin.researcher",
+      "width": 1024,
+      "first": 33.39213932937633,
+      "second": 33.39213932937633,
+      "delta": 0
+    },
+    {
+      "screen": "app.admin.researcher",
+      "width": 1440,
+      "first": 28.97141255605381,
+      "second": 28.97141255605381,
+      "delta": 0
+    },
+    {
+      "screen": "app.admin.resources",
+      "width": 375,
+      "first": 98.64483969083423,
+      "second": 98.64549381828255,
+      "delta": 0.0006541274483140569
+    },
+    {
+      "screen": "app.admin.resources",
+      "width": 768,
+      "first": 98.91283999669564,
+      "second": 98.91211966471336,
+      "delta": 0.0007203319822792764
+    },
+    {
+      "screen": "app.admin.resources",
+      "width": 1024,
+      "first": 98.94012183696461,
+      "second": 98.94012183696461,
+      "delta": 0
+    },
+    {
+      "screen": "app.admin.resources",
+      "width": 1440,
+      "first": 98.86510796923722,
+      "second": 98.86510796923722,
+      "delta": 0
+    },
+    {
+      "screen": "app.admin.subcategories",
+      "width": 375,
+      "first": 41.563271016151596,
+      "second": 41.563271016151596,
+      "delta": 0
+    },
+    {
+      "screen": "app.admin.subcategories",
+      "width": 768,
+      "first": 34.64630168323543,
+      "second": 34.64630168323543,
+      "delta": 0
+    },
+    {
+      "screen": "app.admin.subcategories",
+      "width": 1024,
+      "first": 29.061219432969082,
+      "second": 29.07314015858209,
+      "delta": 0.011920725613006056
+    },
+    {
+      "screen": "app.admin.subcategories",
+      "width": 1440,
+      "first": 27.603143195050944,
+      "second": 27.603143195050944,
+      "delta": 0
+    },
+    {
+      "screen": "app.admin.users",
+      "width": 375,
+      "first": 7.579339542760373,
+      "second": 7.579339542760373,
+      "delta": 0
+    },
+    {
+      "screen": "app.admin.users",
+      "width": 768,
+      "first": 5.801542502908668,
+      "second": 5.816881180919139,
+      "delta": 0.01533867801047073
+    },
+    {
+      "screen": "app.admin.users",
+      "width": 1024,
+      "first": 3.8168184293320424,
+      "second": 3.8292972531461764,
+      "delta": 0.01247882381413401
+    },
+    {
+      "screen": "app.admin.users",
+      "width": 1440,
+      "first": 12.004880606647305,
+      "second": 12.005216736581694,
+      "delta": 0.000336129934389362
+    },
+    {
+      "screen": "app.category",
+      "width": 375,
+      "first": 58.07106150887481,
+      "second": 58.07106150887481,
+      "delta": 0
+    },
+    {
+      "screen": "app.category",
+      "width": 768,
+      "first": 58.72788158669782,
+      "second": 58.72788158669782,
+      "delta": 0
+    },
+    {
+      "screen": "app.category",
+      "width": 1024,
+      "first": 35.128126869136814,
+      "second": 35.128126869136814,
+      "delta": 0
+    },
+    {
+      "screen": "app.category",
+      "width": 1440,
+      "first": 45.14751793463821,
+      "second": 45.14751793463821,
+      "delta": 0
+    },
+    {
+      "screen": "app.home.curated",
+      "width": 375,
+      "first": 0.16643348689074675,
+      "second": 0.16643348689074675,
+      "delta": 0
+    },
+    {
+      "screen": "app.home.curated",
+      "width": 768,
+      "first": 0.1338616861890493,
+      "second": 0.1338616861890493,
+      "delta": 0
+    },
+    {
+      "screen": "app.home.curated",
+      "width": 1024,
+      "first": 0.21465159869882575,
+      "second": 0.21465159869882575,
+      "delta": 0
+    },
+    {
+      "screen": "app.home.curated",
+      "width": 1440,
+      "first": 0.21457706233913537,
+      "second": 0.21457706233913537,
+      "delta": 0
+    },
+    {
+      "screen": "app.home.index",
+      "width": 375,
+      "first": 0.17099369428136552,
+      "second": 0.17099369428136552,
+      "delta": 0
+    },
+    {
+      "screen": "app.home.index",
+      "width": 768,
+      "first": 0.11852841526871699,
+      "second": 0.11852841526871699,
+      "delta": 0
+    },
+    {
+      "screen": "app.home.index",
+      "width": 1024,
+      "first": 0.18562758264462811,
+      "second": 0.18562758264462811,
+      "delta": 0
+    },
+    {
+      "screen": "app.home.index",
+      "width": 1440,
+      "first": 0.2287748171368861,
+      "second": 0.2287748171368861,
+      "delta": 0
+    },
+    {
+      "screen": "app.resource.detail",
+      "width": 375,
+      "first": 55.568183681836814,
+      "second": 55.568183681836814,
+      "delta": 0
+    },
+    {
+      "screen": "app.resource.detail",
+      "width": 768,
+      "first": 58.78959019334684,
+      "second": 58.78959019334684,
+      "delta": 0
+    },
+    {
+      "screen": "app.resource.detail",
+      "width": 1024,
+      "first": 67.63373121131741,
+      "second": 67.63373121131741,
+      "delta": 0
+    },
+    {
+      "screen": "app.resource.detail",
+      "width": 1440,
+      "first": 65.61502387727734,
+      "second": 65.61502387727734,
+      "delta": 0
+    },
+    {
+      "screen": "app.shell.mobile-drawer",
+      "width": 375,
+      "first": 0.42713633398564904,
+      "second": 0.42713633398564904,
+      "delta": 0
+    },
+    {
+      "screen": "app.shell.mobile-drawer",
+      "width": 768,
+      "first": 0.320484816713265,
+      "second": 0.320484816713265,
+      "delta": 0
+    },
+    {
+      "screen": "app.shell.mobile-drawer",
+      "width": 1024,
+      "first": 0.24717367035457213,
+      "second": 0.24717367035457213,
+      "delta": 0
+    },
+    {
+      "screen": "app.shell.mobile-drawer",
+      "width": 1440,
+      "first": 0.2287748171368861,
+      "second": 0.2287748171368861,
+      "delta": 0
+    },
+    {
+      "screen": "app.shell.palette",
+      "width": 375,
+      "first": 0.4372689715155469,
+      "second": 0.4372689715155469,
+      "delta": 0
+    },
+    {
+      "screen": "app.shell.palette",
+      "width": 768,
+      "first": 0.3446030890804598,
+      "second": 0.3446030890804598,
+      "delta": 0
+    },
+    {
+      "screen": "app.shell.palette",
+      "width": 1024,
+      "first": 0.3432418021860837,
+      "second": 0.3432418021860837,
+      "delta": 0
+    },
+    {
+      "screen": "app.shell.palette",
+      "width": 1440,
+      "first": 0.3948537095088819,
+      "second": 0.3596307906652734,
+      "delta": 0.03522291884360845
+    },
+    {
+      "screen": "app.subcategory",
+      "width": 375,
+      "first": 20.199659035557723,
+      "second": 20.199659035557723,
+      "delta": 0
+    },
+    {
+      "screen": "app.subcategory",
+      "width": 768,
+      "first": 22.14205736611397,
+      "second": 22.14205736611397,
+      "delta": 0
+    },
+    {
+      "screen": "app.subcategory",
+      "width": 1024,
+      "first": 27.40854661190365,
+      "second": 27.40854661190365,
+      "delta": 0
+    },
+    {
+      "screen": "app.subcategory",
+      "width": 1440,
+      "first": 10.723039851874924,
+      "second": 10.723039851874924,
+      "delta": 0
+    },
+    {
+      "screen": "app.submit",
+      "width": 375,
+      "first": 13.157347268881422,
+      "second": 13.157347268881422,
+      "delta": 0
+    },
+    {
+      "screen": "app.submit",
+      "width": 768,
+      "first": 11.26870477426459,
+      "second": 11.26870477426459,
+      "delta": 0
+    },
+    {
+      "screen": "app.submit",
+      "width": 1024,
+      "first": 14.358236087059195,
+      "second": 14.358236087059195,
+      "delta": 0
+    },
+    {
+      "screen": "app.submit",
+      "width": 1440,
+      "first": 13.70058424293311,
+      "second": 13.70058424293311,
+      "delta": 0
+    },
+    {
+      "screen": "app.subsubcategory",
+      "width": 375,
+      "first": 83.43435622666017,
+      "second": 83.43435622666017,
+      "delta": 0
+    },
+    {
+      "screen": "app.subsubcategory",
+      "width": 768,
+      "first": 75.27947517629121,
+      "second": 75.27947517629121,
+      "delta": 0
+    },
+    {
+      "screen": "app.subsubcategory",
+      "width": 1024,
+      "first": 80.79274067602672,
+      "second": 80.79274067602672,
+      "delta": 0
+    },
+    {
+      "screen": "app.subsubcategory",
+      "width": 1440,
+      "first": 73.89239536309424,
+      "second": 73.89239536309424,
+      "delta": 0
+    },
+    {
+      "screen": "artifact.docs.a11y",
+      "width": 375,
+      "first": 0.23512456248713198,
+      "second": 0.23512456248713198,
+      "delta": 0
+    },
+    {
+      "screen": "artifact.docs.a11y",
+      "width": 768,
+      "first": 0.14204997770984587,
+      "second": 0.14204997770984587,
+      "delta": 0
+    },
+    {
+      "screen": "artifact.docs.a11y",
+      "width": 1024,
+      "first": 0.274966461489899,
+      "second": 0.274966461489899,
+      "delta": 0
+    },
+    {
+      "screen": "artifact.docs.a11y",
+      "width": 1440,
+      "first": 0.21322440778341795,
+      "second": 0.21322440778341795,
+      "delta": 0
+    },
+    {
+      "screen": "artifact.docs.buttons",
+      "width": 375,
+      "first": 2.986879265070973,
+      "second": 2.986879265070973,
+      "delta": 0
+    },
+    {
+      "screen": "artifact.docs.buttons",
+      "width": 768,
+      "first": 1.93131345177665,
+      "second": 1.93131345177665,
+      "delta": 0
+    },
+    {
+      "screen": "artifact.docs.buttons",
+      "width": 1024,
+      "first": 2.3541231110622065,
+      "second": 2.3541231110622065,
+      "delta": 0
+    },
+    {
+      "screen": "artifact.docs.buttons",
+      "width": 1440,
+      "first": 1.8379521775706984,
+      "second": 1.8379521775706984,
+      "delta": 0
+    },
+    {
+      "screen": "artifact.docs.cards",
+      "width": 375,
+      "first": 0.16246006706748417,
+      "second": 0.16246006706748417,
+      "delta": 0
+    },
+    {
+      "screen": "artifact.docs.cards",
+      "width": 768,
+      "first": 0.10507571868583161,
+      "second": 0.10507571868583161,
+      "delta": 0
+    },
+    {
+      "screen": "artifact.docs.cards",
+      "width": 1024,
+      "first": 0.1651882693700217,
+      "second": 0.1651882693700217,
+      "delta": 0
+    },
+    {
+      "screen": "artifact.docs.cards",
+      "width": 1440,
+      "first": 0.1647851420247633,
+      "second": 0.1647851420247633,
+      "delta": 0
+    },
+    {
+      "screen": "artifact.docs.checklist",
+      "width": 375,
+      "first": 0.20156720916214588,
+      "second": 0.20156720916214588,
+      "delta": 0
+    },
+    {
+      "screen": "artifact.docs.checklist",
+      "width": 768,
+      "first": 0.10943783512064344,
+      "second": 0.10943783512064344,
+      "delta": 0
+    },
+    {
+      "screen": "artifact.docs.checklist",
+      "width": 1024,
+      "first": 0.23532652243589744,
+      "second": 0.23532652243589744,
+      "delta": 0
+    },
+    {
+      "screen": "artifact.docs.checklist",
+      "width": 1440,
+      "first": 0.24718362211928863,
+      "second": 0.24718362211928863,
+      "delta": 0
+    },
+    {
+      "screen": "artifact.docs.color",
+      "width": 375,
+      "first": 0.43661567464037054,
+      "second": 0.43661567464037054,
+      "delta": 0
+    },
+    {
+      "screen": "artifact.docs.color",
+      "width": 768,
+      "first": 0.2861490294732212,
+      "second": 0.2861490294732212,
+      "delta": 0
+    },
+    {
+      "screen": "artifact.docs.color",
+      "width": 1024,
+      "first": 0.3748182220536166,
+      "second": 0.3748182220536166,
+      "delta": 0
+    },
+    {
+      "screen": "artifact.docs.color",
+      "width": 1440,
+      "first": 0.35664433277498603,
+      "second": 0.35664433277498603,
+      "delta": 0
+    },
+    {
+      "screen": "artifact.docs.data-density",
+      "width": 375,
+      "first": 0.24818785094435936,
+      "second": 0.24818785094435936,
+      "delta": 0
+    },
+    {
+      "screen": "artifact.docs.data-density",
+      "width": 768,
+      "first": 0.14486794431731503,
+      "second": 0.14486794431731503,
+      "delta": 0
+    },
+    {
+      "screen": "artifact.docs.data-density",
+      "width": 1024,
+      "first": 0.3683108438314509,
+      "second": 0.3683108438314509,
+      "delta": 0
+    },
+    {
+      "screen": "artifact.docs.data-density",
+      "width": 1440,
+      "first": 0.29192162004662003,
+      "second": 0.29192162004662003,
+      "delta": 0
+    },
+    {
+      "screen": "artifact.docs.flows",
+      "width": 375,
+      "first": 0.34450142746813145,
+      "second": 0.34450142746813145,
+      "delta": 0
+    },
+    {
+      "screen": "artifact.docs.flows",
+      "width": 768,
+      "first": 0.23885733538698498,
+      "second": 0.23885733538698498,
+      "delta": 0
+    },
+    {
+      "screen": "artifact.docs.flows",
+      "width": 1024,
+      "first": 0.40845258956386293,
+      "second": 0.40845258956386293,
+      "delta": 0
+    },
+    {
+      "screen": "artifact.docs.flows",
+      "width": 1440,
+      "first": 0.3748791462144876,
+      "second": 0.3748791462144876,
+      "delta": 0
+    },
+    {
+      "screen": "artifact.docs.forms",
+      "width": 375,
+      "first": 1.8353525939732835,
+      "second": 1.8353525939732835,
+      "delta": 0
+    },
+    {
+      "screen": "artifact.docs.forms",
+      "width": 768,
+      "first": 1.1873670577741182,
+      "second": 1.1873670577741182,
+      "delta": 0
+    },
+    {
+      "screen": "artifact.docs.forms",
+      "width": 1024,
+      "first": 1.5491380094614264,
+      "second": 1.5491380094614264,
+      "delta": 0
+    },
+    {
+      "screen": "artifact.docs.forms",
+      "width": 1440,
+      "first": 1.224483669548511,
+      "second": 1.224483669548511,
+      "delta": 0
+    },
+    {
+      "screen": "artifact.docs.getting-started",
+      "width": 375,
+      "first": 0.7386077378780772,
+      "second": 0.7386077378780772,
+      "delta": 0
+    },
+    {
+      "screen": "artifact.docs.getting-started",
+      "width": 768,
+      "first": 0.44293091168091164,
+      "second": 0.44293091168091164,
+      "delta": 0
+    },
+    {
+      "screen": "artifact.docs.getting-started",
+      "width": 1024,
+      "first": 0.7080710613665803,
+      "second": 0.7080710613665803,
+      "delta": 0
+    },
+    {
+      "screen": "artifact.docs.getting-started",
+      "width": 1440,
+      "first": 0.5722711459012829,
+      "second": 0.5722711459012829,
+      "delta": 0
+    },
+    {
+      "screen": "artifact.docs.integration",
+      "width": 375,
+      "first": 0.19134351743047395,
+      "second": 0.19134351743047395,
+      "delta": 0
+    },
+    {
+      "screen": "artifact.docs.integration",
+      "width": 768,
+      "first": 0.19134351743047395,
+      "second": 0.19134351743047395,
+      "delta": 0
+    },
+    {
+      "screen": "artifact.docs.integration",
+      "width": 1024,
+      "first": 0.4291978715017738,
+      "second": 0.4291978715017738,
+      "delta": 0
+    },
+    {
+      "screen": "artifact.docs.integration",
+      "width": 1440,
+      "first": 0.40292996283480714,
+      "second": 0.40292996283480714,
+      "delta": 0
+    },
+    {
+      "screen": "artifact.docs.lists",
+      "width": 375,
+      "first": 0.2980840619217003,
+      "second": 0.2980840619217003,
+      "delta": 0
+    },
+    {
+      "screen": "artifact.docs.lists",
+      "width": 768,
+      "first": 0.23224892941013953,
+      "second": 0.23224892941013953,
+      "delta": 0
+    },
+    {
+      "screen": "artifact.docs.lists",
+      "width": 1024,
+      "first": 0.43109068849782295,
+      "second": 0.43109068849782295,
+      "delta": 0
+    },
+    {
+      "screen": "artifact.docs.lists",
+      "width": 1440,
+      "first": 0.3521825396825397,
+      "second": 0.3521825396825397,
+      "delta": 0
+    },
+    {
+      "screen": "artifact.docs.motion",
+      "width": 375,
+      "first": 0.3086230492431105,
+      "second": 0.3086230492431105,
+      "delta": 0
+    },
+    {
+      "screen": "artifact.docs.motion",
+      "width": 768,
+      "first": 0.19430347315813118,
+      "second": 0.19430347315813118,
+      "delta": 0
+    },
+    {
+      "screen": "artifact.docs.motion",
+      "width": 1024,
+      "first": 0.24841152493606136,
+      "second": 0.24841152493606136,
+      "delta": 0
+    },
+    {
+      "screen": "artifact.docs.motion",
+      "width": 1440,
+      "first": 0.23191892680081658,
+      "second": 0.23191892680081658,
+      "delta": 0
+    },
+    {
+      "screen": "artifact.docs.navigation",
+      "width": 375,
+      "first": 0.326534998742299,
+      "second": 0.326534998742299,
+      "delta": 0
+    },
+    {
+      "screen": "artifact.docs.navigation",
+      "width": 768,
+      "first": 0.20958293346129236,
+      "second": 0.20958293346129236,
+      "delta": 0
+    },
+    {
+      "screen": "artifact.docs.navigation",
+      "width": 1024,
+      "first": 0.3596268598884067,
+      "second": 0.3596268598884067,
+      "delta": 0
+    },
+    {
+      "screen": "artifact.docs.navigation",
+      "width": 1440,
+      "first": 0.2948280761579994,
+      "second": 0.2948280761579994,
+      "delta": 0
+    },
+    {
+      "screen": "artifact.docs.overview",
+      "width": 375,
+      "first": 0.4499084249084249,
+      "second": 0.4499084249084249,
+      "delta": 0
+    },
+    {
+      "screen": "artifact.docs.overview",
+      "width": 768,
+      "first": 0.28636124344103836,
+      "second": 0.28636124344103836,
+      "delta": 0
+    },
+    {
+      "screen": "artifact.docs.overview",
+      "width": 1024,
+      "first": 0.715121133784773,
+      "second": 0.715121133784773,
+      "delta": 0
+    },
+    {
+      "screen": "artifact.docs.overview",
+      "width": 1440,
+      "first": 0.6536984798620905,
+      "second": 0.6536984798620905,
+      "delta": 0
+    },
+    {
+      "screen": "artifact.docs.pages",
+      "width": 375,
+      "first": 0.7171588785046729,
+      "second": 0.7171588785046729,
+      "delta": 0
+    },
+    {
+      "screen": "artifact.docs.pages",
+      "width": 768,
+      "first": 0.40888689028509656,
+      "second": 0.40888689028509656,
+      "delta": 0
+    },
+    {
+      "screen": "artifact.docs.pages",
+      "width": 1024,
+      "first": 0.7010101512738853,
+      "second": 0.7010101512738853,
+      "delta": 0
+    },
+    {
+      "screen": "artifact.docs.pages",
+      "width": 1440,
+      "first": 0.5482020414523922,
+      "second": 0.5482020414523922,
+      "delta": 0
+    },
+    {
+      "screen": "artifact.docs.principles",
+      "width": 375,
+      "first": 3.613253279964421,
+      "second": 3.613253279964421,
+      "delta": 0
+    },
+    {
+      "screen": "artifact.docs.principles",
+      "width": 768,
+      "first": 0.46000918742343816,
+      "second": 0.46000918742343816,
+      "delta": 0
+    },
+    {
+      "screen": "artifact.docs.principles",
+      "width": 1024,
+      "first": 0.7057539420366455,
+      "second": 0.7057539420366455,
+      "delta": 0
+    },
+    {
+      "screen": "artifact.docs.principles",
+      "width": 1440,
+      "first": 0.5614787581699346,
+      "second": 0.5614787581699346,
+      "delta": 0
+    },
+    {
+      "screen": "artifact.docs.spacing",
+      "width": 375,
+      "first": 0.36356687898089174,
+      "second": 0.36356687898089174,
+      "delta": 0
+    },
+    {
+      "screen": "artifact.docs.spacing",
+      "width": 768,
+      "first": 0.21808367566510173,
+      "second": 0.21808367566510173,
+      "delta": 0
+    },
+    {
+      "screen": "artifact.docs.spacing",
+      "width": 1024,
+      "first": 0.4266036184210526,
+      "second": 0.4266036184210526,
+      "delta": 0
+    },
+    {
+      "screen": "artifact.docs.spacing",
+      "width": 1440,
+      "first": 0.4184085075174184,
+      "second": 0.4184085075174184,
+      "delta": 0
+    },
+    {
+      "screen": "artifact.docs.theming",
+      "width": 375,
+      "first": 0.5442725688963719,
+      "second": 0.5442725688963719,
+      "delta": 0
+    },
+    {
+      "screen": "artifact.docs.theming",
+      "width": 768,
+      "first": 0.42504894226273965,
+      "second": 0.42504894226273965,
+      "delta": 0
+    },
+    {
+      "screen": "artifact.docs.theming",
+      "width": 1024,
+      "first": 0.7613711415461624,
+      "second": 0.7613711415461624,
+      "delta": 0
+    },
+    {
+      "screen": "artifact.docs.theming",
+      "width": 1440,
+      "first": 0.633896251303761,
+      "second": 0.633896251303761,
+      "delta": 0
+    },
+    {
+      "screen": "artifact.docs.theming-app",
+      "width": 375,
+      "first": 0.5513776337115073,
+      "second": 0.5513776337115073,
+      "delta": 0
+    },
+    {
+      "screen": "artifact.docs.theming-app",
+      "width": 768,
+      "first": 0.2909164295096322,
+      "second": 0.2909164295096322,
+      "delta": 0
+    },
+    {
+      "screen": "artifact.docs.theming-app",
+      "width": 1024,
+      "first": 0.5897595097843451,
+      "second": 0.5897595097843451,
+      "delta": 0
+    },
+    {
+      "screen": "artifact.docs.theming-app",
+      "width": 1440,
+      "first": 0.5216992938231876,
+      "second": 0.5216992938231876,
+      "delta": 0
+    },
+    {
+      "screen": "artifact.docs.tokens",
+      "width": 375,
+      "first": 0.20874868481249342,
+      "second": 0.20874868481249342,
+      "delta": 0
+    },
+    {
+      "screen": "artifact.docs.tokens",
+      "width": 768,
+      "first": 0.14939759646562906,
+      "second": 0.14939759646562906,
+      "delta": 0
+    },
+    {
+      "screen": "artifact.docs.tokens",
+      "width": 1024,
+      "first": 0.18000676081730768,
+      "second": 0.18000676081730768,
+      "delta": 0
+    },
+    {
+      "screen": "artifact.docs.tokens",
+      "width": 1440,
+      "first": 0.16978827361563517,
+      "second": 0.16978827361563517,
+      "delta": 0
+    },
+    {
+      "screen": "artifact.docs.typography",
+      "width": 375,
+      "first": 0.6543821666265737,
+      "second": 0.6543821666265737,
+      "delta": 0
+    },
+    {
+      "screen": "artifact.docs.typography",
+      "width": 768,
+      "first": 0.43117559523809523,
+      "second": 0.43117559523809523,
+      "delta": 0
+    },
+    {
+      "screen": "artifact.docs.typography",
+      "width": 1024,
+      "first": 0.584599743150685,
+      "second": 0.584599743150685,
+      "delta": 0
+    },
+    {
+      "screen": "artifact.docs.typography",
+      "width": 1440,
+      "first": 0.4512077867341025,
+      "second": 0.4512077867341025,
+      "delta": 0
+    },
+    {
+      "screen": "artifact.showcase",
+      "width": 375,
+      "first": 25.89069119527645,
+      "second": 25.89069119527645,
+      "delta": 0
+    },
+    {
+      "screen": "artifact.showcase",
+      "width": 768,
+      "first": 6.798761930268796,
+      "second": 6.798761930268796,
+      "delta": 0
+    },
+    {
+      "screen": "artifact.showcase",
+      "width": 1024,
+      "first": 5.918629545501317,
+      "second": 5.918629545501317,
+      "delta": 0
+    },
+    {
+      "screen": "artifact.showcase",
+      "width": 1440,
+      "first": 5.297115514610735,
+      "second": 5.297115514610735,
+      "delta": 0
+    }
+  ]
+}

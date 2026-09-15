@@ -1,0 +1,46 @@
+{
+  "schemaVersion": 2,
+  "task": "567",
+  "screen": "app.submit",
+  "widths": [
+    {
+      "screen": "app.submit",
+      "width": 375,
+      "route": "/submit",
+      "identity": "Nick-admin",
+      "status": "PASS",
+      "identityVerified": {
+        "name": "Nick",
+        "role": "admin"
+      },
+      "ready": true,
+      "httpStatus": 200,
+      "axe": {
+        "violations": [],
+        "seriousCritical": [],
+        "passes": 44,
+        "incomplete": 1
+      }
+    },
+    {
+      "screen": "app.submit",
+      "width": 1440,
+      "route": "/submit",
+      "identity": "Nick-admin",
+      "status": "PASS",
+      "identityVerified": {
+        "name": "Nick",
+        "role": "admin"
+      },
+      "ready": true,
+      "httpStatus": 200,
+      "axe": {
+        "violations": [],
+        "seriousCritical": [],
+        "passes": 44,
+        "incomplete": 1
+      }
+    }
+  ],
+  "seriousCriticalZero": true
+}

@@ -1,0 +1,72 @@
+{
+  "route": "/sign-in",
+  "slug": "sign-in",
+  "axeWidths": [
+    375,
+    1440
+  ],
+  "byViewport": {
+    "375": {
+      "unitId": "b3ad62a7-8ba3-49c1-b7b2-b862160d6d09",
+      "axeVersion": "4.13.0",
+      "analyzedUrl": "http://127.0.0.1:5000/sign-in",
+      "byImpact": {
+        "critical": 0,
+        "serious": 0,
+        "moderate": 1,
+        "minor": 0
+      },
+      "nodesByImpact": {
+        "critical": 0,
+        "serious": 0,
+        "moderate": 1,
+        "minor": 0
+      },
+      "violations": [
+        {
+          "id": "page-has-heading-one",
+          "impact": "moderate",
+          "help": "Page should contain a level-one heading",
+          "helpUrl": "https://dequeuniversity.com/rules/axe/4.13/page-has-heading-one?application=playwright",
+          "nodes": 1,
+          "targets": [
+            "html"
+          ]
+        }
+      ],
+      "incompleteRules": 1,
+      "passedRules": 37
+    },
+    "1440": {
+      "unitId": "75a1adf0-5b12-4c47-bce6-b9a0a7acbf50",
+      "axeVersion": "4.13.0",
+      "analyzedUrl": "http://127.0.0.1:5000/sign-in",
+      "byImpact": {
+        "critical": 0,
+        "serious": 0,
+        "moderate": 1,
+        "minor": 0
+      },
+      "nodesByImpact": {
+        "critical": 0,
+        "serious": 0,
+        "moderate": 1,
+        "minor": 0
+      },
+      "violations": [
+        {
+          "id": "page-has-heading-one",
+          "impact": "moderate",
+          "help": "Page should contain a level-one heading",
+          "helpUrl": "https://dequeuniversity.com/rules/axe/4.13/page-has-heading-one?application=playwright",
+          "nodes": 1,
+          "targets": [
+            "html"
+          ]
+        }
+      ],
+      "incompleteRules": 1,
+      "passedRules": 38
+    }
+  }
+}

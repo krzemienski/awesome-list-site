@@ -1,0 +1,38 @@
+{
+  "schemaVersion": 2,
+  "task": "567",
+  "screen": "app.system.design-system",
+  "widths": [
+    {
+      "screen": "app.system.design-system",
+      "width": 375,
+      "route": "/design-system",
+      "identity": "public",
+      "status": "PASS",
+      "ready": true,
+      "httpStatus": 200,
+      "axe": {
+        "violations": [],
+        "seriousCritical": [],
+        "passes": 38,
+        "incomplete": 1
+      }
+    },
+    {
+      "screen": "app.system.design-system",
+      "width": 1440,
+      "route": "/design-system",
+      "identity": "public",
+      "status": "PASS",
+      "ready": true,
+      "httpStatus": 200,
+      "axe": {
+        "violations": [],
+        "seriousCritical": [],
+        "passes": 39,
+        "incomplete": 1
+      }
+    }
+  ],
+  "seriousCriticalZero": true
+}

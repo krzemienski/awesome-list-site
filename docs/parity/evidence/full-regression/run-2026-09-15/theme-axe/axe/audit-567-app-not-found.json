@@ -1,0 +1,38 @@
+{
+  "schemaVersion": 2,
+  "task": "567",
+  "screen": "app.not-found",
+  "widths": [
+    {
+      "screen": "app.not-found",
+      "width": 375,
+      "route": "/__parity-not-found__",
+      "identity": "public",
+      "status": "PASS",
+      "ready": true,
+      "httpStatus": 404,
+      "axe": {
+        "violations": [],
+        "seriousCritical": [],
+        "passes": 38,
+        "incomplete": 1
+      }
+    },
+    {
+      "screen": "app.not-found",
+      "width": 1440,
+      "route": "/__parity-not-found__",
+      "identity": "public",
+      "status": "PASS",
+      "ready": true,
+      "httpStatus": 404,
+      "axe": {
+        "violations": [],
+        "seriousCritical": [],
+        "passes": 39,
+        "incomplete": 1
+      }
+    }
+  ],
+  "seriousCriticalZero": true
+}

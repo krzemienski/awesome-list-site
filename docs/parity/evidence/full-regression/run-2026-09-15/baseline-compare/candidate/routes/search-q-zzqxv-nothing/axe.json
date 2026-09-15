@@ -1,0 +1,92 @@
+{
+  "route": "/search?q=zzqxv-nothing",
+  "slug": "search-q-zzqxv-nothing",
+  "axeWidths": [
+    375,
+    1440
+  ],
+  "byViewport": {
+    "375": {
+      "unitId": "6b1ce64a-8fde-453c-b817-9787d9dee3c1",
+      "axeVersion": "4.13.0",
+      "analyzedUrl": "http://127.0.0.1:5000/search?q=zzqxv-nothing",
+      "byImpact": {
+        "critical": 0,
+        "serious": 0,
+        "moderate": 2,
+        "minor": 0
+      },
+      "nodesByImpact": {
+        "critical": 0,
+        "serious": 0,
+        "moderate": 2,
+        "minor": 0
+      },
+      "violations": [
+        {
+          "id": "landmark-main-is-top-level",
+          "impact": "moderate",
+          "help": "Main landmark should not be contained in another landmark",
+          "helpUrl": "https://dequeuniversity.com/rules/axe/4.13/landmark-main-is-top-level?application=playwright",
+          "nodes": 1,
+          "targets": [
+            ".outline-none"
+          ]
+        },
+        {
+          "id": "landmark-no-duplicate-main",
+          "impact": "moderate",
+          "help": "Document should not have more than one main landmark",
+          "helpUrl": "https://dequeuniversity.com/rules/axe/4.13/landmark-no-duplicate-main?application=playwright",
+          "nodes": 1,
+          "targets": [
+            "#main"
+          ]
+        }
+      ],
+      "incompleteRules": 1,
+      "passedRules": 41
+    },
+    "1440": {
+      "unitId": "784f7094-1c68-4bdb-8155-1881ab82cda8",
+      "axeVersion": "4.13.0",
+      "analyzedUrl": "http://127.0.0.1:5000/search?q=zzqxv-nothing",
+      "byImpact": {
+        "critical": 0,
+        "serious": 0,
+        "moderate": 2,
+        "minor": 0
+      },
+      "nodesByImpact": {
+        "critical": 0,
+        "serious": 0,
+        "moderate": 2,
+        "minor": 0
+      },
+      "violations": [
+        {
+          "id": "landmark-main-is-top-level",
+          "impact": "moderate",
+          "help": "Main landmark should not be contained in another landmark",
+          "helpUrl": "https://dequeuniversity.com/rules/axe/4.13/landmark-main-is-top-level?application=playwright",
+          "nodes": 1,
+          "targets": [
+            "main[aria-label=\"Search results\"]"
+          ]
+        },
+        {
+          "id": "landmark-no-duplicate-main",
+          "impact": "moderate",
+          "help": "Document should not have more than one main landmark",
+          "helpUrl": "https://dequeuniversity.com/rules/axe/4.13/landmark-no-duplicate-main?application=playwright",
+          "nodes": 1,
+          "targets": [
+            "#main"
+          ]
+        }
+      ],
+      "incompleteRules": 1,
+      "passedRules": 43
+    }
+  }
+}

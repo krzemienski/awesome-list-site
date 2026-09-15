@@ -1,0 +1,50 @@
+{
+  "route": "/recommendations",
+  "slug": "recommendations",
+  "axeWidths": [
+    375,
+    1440
+  ],
+  "byViewport": {
+    "375": {
+      "unitId": "22f1685c-2cd1-43e3-baf1-0362bd4f6537",
+      "axeVersion": "4.13.0",
+      "analyzedUrl": "http://127.0.0.1:5000/recommendations",
+      "byImpact": {
+        "critical": 0,
+        "serious": 0,
+        "moderate": 0,
+        "minor": 0
+      },
+      "nodesByImpact": {
+        "critical": 0,
+        "serious": 0,
+        "moderate": 0,
+        "minor": 0
+      },
+      "violations": [],
+      "incompleteRules": 1,
+      "passedRules": 38
+    },
+    "1440": {
+      "unitId": "f808241a-c8fa-48cc-b135-88f5c365b756",
+      "axeVersion": "4.13.0",
+      "analyzedUrl": "http://127.0.0.1:5000/recommendations",
+      "byImpact": {
+        "critical": 0,
+        "serious": 0,
+        "moderate": 0,
+        "minor": 0
+      },
+      "nodesByImpact": {
+        "critical": 0,
+        "serious": 0,
+        "moderate": 0,
+        "minor": 0
+      },
+      "violations": [],
+      "incompleteRules": 1,
+      "passedRules": 39
+    }
+  }
+}

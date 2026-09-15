@@ -1,0 +1,50 @@
+{
+  "route": "/about",
+  "slug": "about",
+  "axeWidths": [
+    375,
+    1440
+  ],
+  "byViewport": {
+    "375": {
+      "unitId": "5bca15c5-8ccd-4105-a1d2-8c99d4e6b58a",
+      "axeVersion": "4.13.0",
+      "analyzedUrl": "http://127.0.0.1:5000/about",
+      "byImpact": {
+        "critical": 0,
+        "serious": 0,
+        "moderate": 0,
+        "minor": 0
+      },
+      "nodesByImpact": {
+        "critical": 0,
+        "serious": 0,
+        "moderate": 0,
+        "minor": 0
+      },
+      "violations": [],
+      "incompleteRules": 2,
+      "passedRules": 40
+    },
+    "1440": {
+      "unitId": "bb9bc6e3-46a7-4339-b047-ef3079bbbbeb",
+      "axeVersion": "4.13.0",
+      "analyzedUrl": "http://127.0.0.1:5000/about",
+      "byImpact": {
+        "critical": 0,
+        "serious": 0,
+        "moderate": 0,
+        "minor": 0
+      },
+      "nodesByImpact": {
+        "critical": 0,
+        "serious": 0,
+        "moderate": 0,
+        "minor": 0
+      },
+      "violations": [],
+      "incompleteRules": 2,
+      "passedRules": 40
+    }
+  }
+}

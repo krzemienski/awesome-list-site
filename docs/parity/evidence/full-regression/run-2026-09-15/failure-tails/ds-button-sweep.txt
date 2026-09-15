@@ -1,0 +1,40 @@
+PASS admin-audit-inputs :: /admin#audit (admin) — 0 stray inputs (2 DS-hooked)
+PASS admin-audit-chips :: /admin#audit (admin) — 0 stray chips (50 DS-hooked)
+PASS admin-audit-cards :: /admin#audit (admin) — 0 stray cards (0 DS-hooked)
+PASS admin-audit-h1s :: /admin#audit (admin) — 0 stray h1s (1 DS-hooked)
+PASS admin-audit-eyebrows :: /admin#audit (admin) — 0 stray eyebrows (1 DS-hooked)
+PASS overlay-admin-add-resource-dialog-buttons :: /admin#resources (admin) — overlay open (12 button(s) inside), canary rogue detected, 0 stray buttons of 125 total
+PASS overlay-admin-add-resource-dialog-inputs :: /admin#resources (admin) — 0 stray inputs of 8 total
+PASS overlay-admin-add-resource-dialog-chips :: /admin#resources (admin) — 0 stray chips of 25 total
+PASS overlay-admin-add-resource-dialog-cards :: /admin#resources (admin) — 0 stray cards of 0 total
+PASS overlay-admin-add-resource-dialog-h1s :: /admin#resources (admin) — 0 stray h1s of 1 total
+PASS overlay-admin-add-resource-dialog-eyebrows :: /admin#resources (admin) — 0 stray eyebrows of 1 total
+PASS overlay-admin-edit-resource-dialog-buttons :: /admin#resources (admin) — overlay open (11 button(s) inside), canary rogue detected, 0 stray buttons of 124 total
+PASS overlay-admin-edit-resource-dialog-inputs :: /admin#resources (admin) — 0 stray inputs of 9 total
+PASS overlay-admin-edit-resource-dialog-chips :: /admin#resources (admin) — 0 stray chips of 25 total
+PASS overlay-admin-edit-resource-dialog-cards :: /admin#resources (admin) — 0 stray cards of 0 total
+PASS overlay-admin-edit-resource-dialog-h1s :: /admin#resources (admin) — 0 stray h1s of 1 total
+PASS overlay-admin-edit-resource-dialog-eyebrows :: /admin#resources (admin) — 0 stray eyebrows of 1 total
+PASS overlay-admin-pending-detail-dialog-buttons :: /admin#approvals (admin) — overlay open (2 button(s) inside), canary rogue detected, 0 stray buttons of 40 total
+PASS overlay-admin-pending-detail-dialog-inputs :: /admin#approvals (admin) — 0 stray inputs of 0 total
+PASS overlay-admin-pending-detail-dialog-chips :: /admin#approvals (admin) — 0 stray chips of 2 total
+PASS overlay-admin-pending-detail-dialog-cards :: /admin#approvals (admin) — 0 stray cards of 0 total
+PASS overlay-admin-pending-detail-dialog-h1s :: /admin#approvals (admin) — 0 stray h1s of 1 total
+PASS overlay-admin-pending-detail-dialog-eyebrows :: /admin#approvals (admin) — 0 stray eyebrows of 1 total
+PASS overlay-admin-category-delete-confirm-buttons :: /admin#categories (admin) — overlay open (2 button(s) inside), canary rogue detected, 0 stray buttons of 37 total
+PASS overlay-admin-category-delete-confirm-inputs :: /admin#categories (admin) — 0 stray inputs of 1 total
+PASS overlay-admin-category-delete-confirm-chips :: /admin#categories (admin) — 0 stray chips of 0 total
+PASS overlay-admin-category-delete-confirm-cards :: /admin#categories (admin) — 0 stray cards of 0 total
+PASS overlay-admin-category-delete-confirm-h1s :: /admin#categories (admin) — 0 stray h1s of 1 total
+PASS overlay-admin-category-delete-confirm-eyebrows :: /admin#categories (admin) — 0 stray eyebrows of 1 total
+PASS overlay-admin-journey-step-editor-buttons :: /admin#journeys (admin) — overlay open (5 button(s) inside), canary rogue detected, 0 stray buttons of 86 total
+PASS overlay-admin-journey-step-editor-inputs :: /admin#journeys (admin) — 0 stray inputs of 2 total
+PASS overlay-admin-journey-step-editor-chips :: /admin#journeys (admin) — 0 stray chips of 0 total
+PASS overlay-admin-journey-step-editor-cards :: /admin#journeys (admin) — 0 stray cards of 0 total
+PASS overlay-admin-journey-step-editor-h1s :: /admin#journeys (admin) — 0 stray h1s of 1 total
+PASS overlay-admin-journey-step-editor-eyebrows :: /admin#journeys (admin) — 0 stray eyebrows of 1 total
+PASS admin-teardown :: remaining __qa_test_ds_admin_* users=0, seeded resources=0, seeded categories=0 (reusable QA admin retained separately)
+Playwright lease released (ds-button-sweep)
+
+1/216 CHECKS FAILED
+Gate lease released (db-heavy: ds-button-sweep)

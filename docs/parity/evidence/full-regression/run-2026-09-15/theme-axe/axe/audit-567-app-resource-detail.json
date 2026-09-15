@@ -1,0 +1,38 @@
+{
+  "schemaVersion": 2,
+  "task": "567",
+  "screen": "app.resource.detail",
+  "widths": [
+    {
+      "screen": "app.resource.detail",
+      "width": 375,
+      "route": "/resource/188015",
+      "identity": "public",
+      "status": "PASS",
+      "ready": true,
+      "httpStatus": 200,
+      "axe": {
+        "violations": [],
+        "seriousCritical": [],
+        "passes": 42,
+        "incomplete": 1
+      }
+    },
+    {
+      "screen": "app.resource.detail",
+      "width": 1440,
+      "route": "/resource/188015",
+      "identity": "public",
+      "status": "PASS",
+      "ready": true,
+      "httpStatus": 200,
+      "axe": {
+        "violations": [],
+        "seriousCritical": [],
+        "passes": 43,
+        "incomplete": 1
+      }
+    }
+  ],
+  "seriousCriticalZero": true
+}

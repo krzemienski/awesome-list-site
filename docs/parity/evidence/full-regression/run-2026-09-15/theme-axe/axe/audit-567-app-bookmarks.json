@@ -1,0 +1,168 @@
+{
+  "schemaVersion": 2,
+  "task": "567",
+  "screen": "app.bookmarks",
+  "widths": [
+    {
+      "screen": "app.bookmarks",
+      "width": 375,
+      "route": "/bookmarks",
+      "identity": "Nick-admin",
+      "status": "PASS",
+      "identityVerified": {
+        "name": "Nick",
+        "role": "admin"
+      },
+      "ready": true,
+      "httpStatus": 200,
+      "axe": {
+        "violations": [
+          {
+            "id": "landmark-main-is-top-level",
+            "impact": "moderate",
+            "help": "Main landmark should not be contained in another landmark",
+            "description": "Ensure the main landmark is at top level",
+            "nodes": 1,
+            "targets": [
+              [
+                ".space-y-5"
+              ]
+            ],
+            "details": [
+              {
+                "target": [
+                  ".space-y-5"
+                ],
+                "failureSummary": "Fix any of the following:\n  The main landmark is contained in another landmark."
+              }
+            ]
+          },
+          {
+            "id": "landmark-no-duplicate-main",
+            "impact": "moderate",
+            "help": "Document should not have more than one main landmark",
+            "description": "Ensure the document has at most one main landmark",
+            "nodes": 1,
+            "targets": [
+              [
+                "#main"
+              ]
+            ],
+            "details": [
+              {
+                "target": [
+                  "#main"
+                ],
+                "failureSummary": "Fix any of the following:\n  Document has more than one main landmark"
+              }
+            ]
+          },
+          {
+            "id": "landmark-unique",
+            "impact": "moderate",
+            "help": "Landmarks should have a unique role or role/label/title (i.e. accessible name) combination",
+            "description": "Ensure landmarks are unique",
+            "nodes": 1,
+            "targets": [
+              [
+                "#main"
+              ]
+            ],
+            "details": [
+              {
+                "target": [
+                  "#main"
+                ],
+                "failureSummary": "Fix any of the following:\n  The landmark must have a unique aria-label, aria-labelledby, or title to make landmarks distinguishable"
+              }
+            ]
+          }
+        ],
+        "seriousCritical": [],
+        "passes": 38,
+        "incomplete": 1
+      }
+    },
+    {
+      "screen": "app.bookmarks",
+      "width": 1440,
+      "route": "/bookmarks",
+      "identity": "Nick-admin",
+      "status": "PASS",
+      "identityVerified": {
+        "name": "Nick",
+        "role": "admin"
+      },
+      "ready": true,
+      "httpStatus": 200,
+      "axe": {
+        "violations": [
+          {
+            "id": "landmark-main-is-top-level",
+            "impact": "moderate",
+            "help": "Main landmark should not be contained in another landmark",
+            "description": "Ensure the main landmark is at top level",
+            "nodes": 1,
+            "targets": [
+              [
+                ".space-y-5"
+              ]
+            ],
+            "details": [
+              {
+                "target": [
+                  ".space-y-5"
+                ],
+                "failureSummary": "Fix any of the following:\n  The main landmark is contained in another landmark."
+              }
+            ]
+          },
+          {
+            "id": "landmark-no-duplicate-main",
+            "impact": "moderate",
+            "help": "Document should not have more than one main landmark",
+            "description": "Ensure the document has at most one main landmark",
+            "nodes": 1,
+            "targets": [
+              [
+                "#main"
+              ]
+            ],
+            "details": [
+              {
+                "target": [
+                  "#main"
+                ],
+                "failureSummary": "Fix any of the following:\n  Document has more than one main landmark"
+              }
+            ]
+          },
+          {
+            "id": "landmark-unique",
+            "impact": "moderate",
+            "help": "Landmarks should have a unique role or role/label/title (i.e. accessible name) combination",
+            "description": "Ensure landmarks are unique",
+            "nodes": 1,
+            "targets": [
+              [
+                "#main"
+              ]
+            ],
+            "details": [
+              {
+                "target": [
+                  "#main"
+                ],
+                "failureSummary": "Fix any of the following:\n  The landmark must have a unique aria-label, aria-labelledby, or title to make landmarks distinguishable"
+              }
+            ]
+          }
+        ],
+        "seriousCritical": [],
+        "passes": 38,
+        "incomplete": 1
+      }
+    }
+  ],
+  "seriousCriticalZero": true
+}

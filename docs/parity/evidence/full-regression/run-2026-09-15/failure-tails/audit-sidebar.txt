@@ -1,0 +1,40 @@
+[110/142] PASS sub:Best Practices & Guidelines → /subcategory/best-practices-guidelines (body=5995 cards=34)
+   --- saved partial at 110, 5 fails, 33s elapsed ---
+[111/142] PASS sub:DRM & Content Protection Standards → /subcategory/drm-content-protection-standards (body=3964 cards=13)
+[112/142] PASS sub:Industry Forums & Standards Bodies → /subcategory/industry-forums-standards-bodies (body=5247 cards=25)
+[113/142] PASS sub:Specs & Standards → /subcategory/specs-standards (body=8981 cards=58)
+[114/142] PASS sub:Video Codec Specifications → /subcategory/video-codec-specifications (body=5924 cards=37)
+[115/142] PASS sub:Uncategorized → /category/standards-industry?filter=general (body=14798 cards=76)
+[116/142] PASS subsub:Online Forums → /sub-subcategory/online-forums (body=3718 cards=7)
+[117/142] PASS subsub:Podcasts & Webinars → /sub-subcategory/podcasts-webinars (body=3696 cards=7)
+[118/142] PASS subsub:AV1 → /sub-subcategory/av1 (body=4931 cards=19)
+[119/142] PASS subsub:HEVC → /sub-subcategory/hevc (body=7180 cards=34)
+[120/142] PASS subsub:VP9 → /sub-subcategory/vp9 (body=4190 cards=7)
+   --- saved partial at 120, 5 fails, 37s elapsed ---
+   --- ctx restart at 120 ---
+[121/142] PASS subsub:Origin Servers → /sub-subcategory/origin-servers (body=2396 cards=6)
+[122/142] PASS subsub:FFmpeg → /sub-subcategory/ffmpeg (body=6674 cards=76)
+[123/142] PASS subsub:CDN Integration → /sub-subcategory/cdn-integration (body=2837 cards=6)
+[124/142] PASS subsub:Cloud Platforms → /sub-subcategory/cloud-platforms (body=3606 cards=12)
+[125/142] PASS subsub:Storage Solutions → /sub-subcategory/storage-solutions (body=3279 cards=12)
+[126/142] PASS subsub:Podcasts → /sub-subcategory/podcasts (body=3038 cards=7)
+[127/142] PASS subsub:Quality & Testing → /sub-subcategory/quality-testing (body=8864 cards=76)
+[128/142] PASS subsub:Audio → /sub-subcategory/audio (body=4933 cards=25)
+[129/142] PASS subsub:Subtitles & Captions → /sub-subcategory/subtitles-captions (body=8410 cards=76)
+[130/142] PASS subsub:Roku → /sub-subcategory/roku (body=7716 cards=76)
+   --- saved partial at 130, 5 fails, 44s elapsed ---
+[131/142] PASS subsub:Android → /sub-subcategory/android (body=5959 cards=34)
+[132/142] PASS subsub:Web Players → /sub-subcategory/web-players (body=7924 cards=61)
+[133/142] PASS subsub:iOS/tvOS → /sub-subcategory/ios-tvos (body=8089 cards=76)
+[134/142] PASS subsub:Chromecast → /sub-subcategory/chromecast (body=3832 cards=7)
+[135/142] PASS subsub:Smart TVs → /sub-subcategory/smart-tvs (body=4205 cards=13)
+[136/142] PASS subsub:DASH → /sub-subcategory/dash (body=8432 cards=76)
+[137/142] PASS subsub:HLS → /sub-subcategory/hls (body=9164 cards=76)
+[138/142] PASS subsub:SRT → /sub-subcategory/srt (body=4524 cards=13)
+[139/142] PASS subsub:HDR Guidelines → /sub-subcategory/hdr-guidelines (body=4413 cards=7)
+[140/142] FAIL subsub:RIST → /sub-subcategory/rist (body=4082 cards=4)
+   --- saved partial at 140, 6 fails, 49s elapsed ---
+[141/142] FAIL subsub:MPEG & Forums → /sub-subcategory/mpeg-forums (body=4114 cards=4)
+[142/142] FAIL subsub:Official Specs → /sub-subcategory/official-specs (body=4118 cards=4)
+
+=== EXHAUSTIVE TOTALS: 134/142 pass (8 failures) in 51s ===

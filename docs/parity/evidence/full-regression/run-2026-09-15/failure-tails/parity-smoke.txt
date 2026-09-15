@@ -1,0 +1,19 @@
+
+> rest-express@1.0.0 test:parity
+> node tests/parity/runner.mjs --only app.home.index,app.home.curated,app.category,app.about,app.shell.palette --width 375
+
+Gate lease acquired (db-heavy: parity-baseline)
+[identity] creating disposable Clerk admin 2044760120
+[identity] 2044760120 signed in and promoted (display name "Nick")
+[parity] app.about @ 375
+  FAIL 8.9731% (271683px)
+[parity] app.category @ 375
+  FAIL 58.0711% (6907335px)
+[parity] app.home.curated @ 375
+  PASS 0.1664% (3658px)
+[parity] app.home.index @ 375
+  PASS 0.1710% (3932px)
+[parity] app.shell.palette @ 375
+  PASS 0.4373% (10055px)
+Gate lease released (db-heavy: parity-baseline)
+[parity] selected-rows-diagnostic: 3/5 pixel rows pass, 2 fail, 0 incomplete, 0 blocked → tests/parity/baseline/2026-09-15T17-18-52-249Z-567 (exit 1)

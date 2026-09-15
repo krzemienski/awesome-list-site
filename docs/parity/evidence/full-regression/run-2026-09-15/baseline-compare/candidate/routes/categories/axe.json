@@ -1,0 +1,50 @@
+{
+  "route": "/categories",
+  "slug": "categories",
+  "axeWidths": [
+    375,
+    1440
+  ],
+  "byViewport": {
+    "375": {
+      "unitId": "c2ab97fc-b815-4bbe-b5b7-3738befd16ef",
+      "axeVersion": "4.13.0",
+      "analyzedUrl": "http://127.0.0.1:5000/categories",
+      "byImpact": {
+        "critical": 0,
+        "serious": 0,
+        "moderate": 0,
+        "minor": 0
+      },
+      "nodesByImpact": {
+        "critical": 0,
+        "serious": 0,
+        "moderate": 0,
+        "minor": 0
+      },
+      "violations": [],
+      "incompleteRules": 1,
+      "passedRules": 39
+    },
+    "1440": {
+      "unitId": "43bf8b2d-f129-411d-89de-56a94eac344f",
+      "axeVersion": "4.13.0",
+      "analyzedUrl": "http://127.0.0.1:5000/categories",
+      "byImpact": {
+        "critical": 0,
+        "serious": 0,
+        "moderate": 0,
+        "minor": 0
+      },
+      "nodesByImpact": {
+        "critical": 0,
+        "serious": 0,
+        "moderate": 0,
+        "minor": 0
+      },
+      "violations": [],
+      "incompleteRules": 1,
+      "passedRules": 39
+    }
+  }
+}

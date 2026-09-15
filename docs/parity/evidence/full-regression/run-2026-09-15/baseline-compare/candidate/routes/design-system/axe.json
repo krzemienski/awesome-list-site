@@ -1,0 +1,50 @@
+{
+  "route": "/design-system",
+  "slug": "design-system",
+  "axeWidths": [
+    375,
+    1440
+  ],
+  "byViewport": {
+    "375": {
+      "unitId": "29851f36-15e6-4c7a-9937-b6095d66718a",
+      "axeVersion": "4.13.0",
+      "analyzedUrl": "http://127.0.0.1:5000/design-system",
+      "byImpact": {
+        "critical": 0,
+        "serious": 0,
+        "moderate": 0,
+        "minor": 0
+      },
+      "nodesByImpact": {
+        "critical": 0,
+        "serious": 0,
+        "moderate": 0,
+        "minor": 0
+      },
+      "violations": [],
+      "incompleteRules": 1,
+      "passedRules": 38
+    },
+    "1440": {
+      "unitId": "e506570e-c895-4eeb-843f-adeca68f3295",
+      "axeVersion": "4.13.0",
+      "analyzedUrl": "http://127.0.0.1:5000/design-system",
+      "byImpact": {
+        "critical": 0,
+        "serious": 0,
+        "moderate": 0,
+        "minor": 0
+      },
+      "nodesByImpact": {
+        "critical": 0,
+        "serious": 0,
+        "moderate": 0,
+        "minor": 0
+      },
+      "violations": [],
+      "incompleteRules": 1,
+      "passedRules": 39
+    }
+  }
+}

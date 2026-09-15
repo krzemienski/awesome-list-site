@@ -1,0 +1,50 @@
+{
+  "route": "/this-route-does-not-exist",
+  "slug": "this-route-does-not-exist",
+  "axeWidths": [
+    375,
+    1440
+  ],
+  "byViewport": {
+    "375": {
+      "unitId": "314292e9-b064-4391-8b82-0b1a19199f45",
+      "axeVersion": "4.13.0",
+      "analyzedUrl": "http://127.0.0.1:5000/this-route-does-not-exist",
+      "byImpact": {
+        "critical": 0,
+        "serious": 0,
+        "moderate": 0,
+        "minor": 0
+      },
+      "nodesByImpact": {
+        "critical": 0,
+        "serious": 0,
+        "moderate": 0,
+        "minor": 0
+      },
+      "violations": [],
+      "incompleteRules": 1,
+      "passedRules": 38
+    },
+    "1440": {
+      "unitId": "3aa37409-99b5-47af-b95a-8c297f60ee72",
+      "axeVersion": "4.13.0",
+      "analyzedUrl": "http://127.0.0.1:5000/this-route-does-not-exist",
+      "byImpact": {
+        "critical": 0,
+        "serious": 0,
+        "moderate": 0,
+        "minor": 0
+      },
+      "nodesByImpact": {
+        "critical": 0,
+        "serious": 0,
+        "moderate": 0,
+        "minor": 0
+      },
+      "violations": [],
+      "incompleteRules": 1,
+      "passedRules": 39
+    }
+  }
+}
