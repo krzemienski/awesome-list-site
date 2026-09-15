@@ -1,0 +1,52 @@
+WebKit 2311 runtime verification
+================================
+
+Scope
+-----
+- Runtime config code change: playwright.config.ts only (this is the requested
+  evidence file, not a runtime config change).
+- Replit/Nix condition: non-empty REPLIT_LD_LIBRARY_PATH.
+- Affected projects: webkit and Mobile Safari only.
+- On that condition they use the stock WebKit 2311 pw_run.sh, headless:false
+  (GTK), and a per-launch environment containing
+  PLAYWRIGHT_SKIP_VALIDATE_HOST_REQUIREMENTS=1. No custom ABI wrapper is used.
+- Off Replit, both projects retain their previous default headless and launch
+  options; no bypass is configured.
+
+Why the scoped setting is needed
+--------------------------------
+The provisioned Nix outputs expose the exact WebKit sonames checked here:
+ICU 74, libatomic.so.1, libharfbuzz-icu.so.0, libjpeg.so.8, and
+libGLESv2.so.2. Playwright's Linux host check consults ldconfig, which does
+not list Nix store outputs. The executablePath remains the installed stock
+launcher, while the skip flag is passed only in the two WebKit launch
+environments.
+
+DISPLAY and configured launch check
+-----------------------------------
+- DISPLAY=:0
+- /tmp/.X11-unix/X0: present
+- Direct configured-project check (not the full suite): imported
+  playwright.config.ts, launched using @playwright/test's WebKit with each
+  project's resolved launch options, rendered a real page, asserted title,
+  content, exact configured page viewport, and exact configured user agent,
+  then closed context and browser.
+- Desktop Safari (`webkit`): configured/page viewport 1280x720; UA exact;
+  content "Configured WebKit OK"; connected before close=true, after close=false.
+- iPhone 12 (`Mobile Safari`): configured/page viewport 390x664; UA exact;
+  content "Configured WebKit OK"; connected before close=true, after close=false.
+  (Headed WebKit reports a different window.inner size for mobile emulation,
+  but Playwright's configured page viewport is the asserted 390x664.)
+- TypeScript check: `npx --no-install tsc --noEmit --pretty false` passed.
+- No global PLAYWRIGHT_SKIP_VALIDATE_HOST_REQUIREMENTS value was set by the
+  config process.
+
+Workspace diff note
+-------------------
+The package-management provisioner appended WebKit Nix attributes to the
+existing `.replit` [nix].packages line. That diff is retained and was not
+manually edited here. It adds gtk4, vulkan-loader, graphene, icu74,
+gcc-unwrapped, libxml2, sqlite, libxslt, lcms2, libevent, libopus, flite,
+libwebp, libavif, harfbuzzFull, libepoxy, libjpeg8, libmanette, enchant,
+hyphen, libsecret, woff2, libglvnd, x264, and the gst_all_1 plugin/libav
+attributes. Existing chromium and all other browser settings are unchanged.

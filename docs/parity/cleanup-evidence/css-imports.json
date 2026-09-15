@@ -1,0 +1,250 @@
+[
+  {
+    "file": "client/src/components/admin/admin-canonical.css",
+    "imports": [
+      "client/src/pages/AdminDashboard.tsx:10: import \"@/components/admin/admin-canonical.css\";"
+    ]
+  },
+  {
+    "file": "client/src/components/admin/admin-ops-export-database.css",
+    "imports": [
+      "client/src/components/admin/DatabaseTab.tsx:28: import \"./admin-ops-export-database.css\";",
+      "client/src/components/admin/ExportTab.tsx:45: import \"./admin-ops-export-database.css\";"
+    ]
+  },
+  {
+    "file": "client/src/components/admin/admin-ops-primitives.css",
+    "imports": [
+      "client/src/components/admin/AdminOpsPrimitives.tsx:5: import \"./admin-ops-primitives.css\";"
+    ]
+  },
+  {
+    "file": "client/src/components/admin/queues-agent.css",
+    "imports": [
+      "client/src/components/admin/AgentCommsGraph.tsx:4: import \"./queues-agent.css\";",
+      "client/src/components/admin/AgentEventLog.tsx:7: import \"./queues-agent.css\";",
+      "client/src/components/admin/BatchEnrichmentPanel.tsx:49: import \"./queues-agent.css\";",
+      "client/src/components/admin/ResearcherTab.tsx:53: import \"./queues-agent.css\";"
+    ]
+  },
+  {
+    "file": "client/src/components/admin/queues-review.css",
+    "imports": [
+      "client/src/components/admin/PendingEdits.tsx:17: import \"./queues-review.css\";",
+      "client/src/components/admin/PendingResources.tsx:18: import \"./queues-review.css\";"
+    ]
+  },
+  {
+    "file": "client/src/index.css",
+    "imports": [
+      "client/src/main.tsx:3: import \"./index.css\";"
+    ]
+  },
+  {
+    "file": "client/src/styles/components/resource-card.css",
+    "imports": [
+      "client/src/components/resource/ResourceCard.tsx:13: import \"@/styles/components/resource-card.css\";",
+      "client/src/components/ui/skeletons.tsx:3: import \"@/styles/components/resource-card.css\";"
+    ]
+  },
+  {
+    "file": "client/src/styles/design-system.css",
+    "imports": [
+      "client/src/index.css:5: @import './styles/design-system.css';"
+    ]
+  },
+  {
+    "file": "client/src/styles/mobile-optimizations.css",
+    "imports": [
+      "client/src/index.css:6: @import './styles/mobile-optimizations.css';"
+    ]
+  },
+  {
+    "file": "client/src/styles/pages/about.css",
+    "imports": [
+      "client/src/pages/About.tsx:28: import \"@/styles/pages/about.css\";"
+    ]
+  },
+  {
+    "file": "client/src/styles/pages/account.css",
+    "imports": [
+      "client/src/pages/Bookmarks.tsx:68: import \"@/styles/pages/account.css\";",
+      "client/src/pages/BookmarksGate.tsx:4: import \"@/styles/pages/account.css\";",
+      "client/src/pages/ContinueLearning.tsx:38: import \"@/styles/pages/account.css\";",
+      "client/src/pages/Contributions.tsx:49: import \"@/styles/pages/account.css\";",
+      "client/src/pages/GuestBookmarks.tsx:18: import \"@/styles/pages/account.css\";",
+      "client/src/pages/Notifications.tsx:8: import \"@/styles/pages/account.css\";",
+      "client/src/pages/Onboarding.tsx:20: import \"@/styles/pages/account.css\";",
+      "client/src/pages/Profile.tsx:63: import \"@/styles/pages/account.css\";",
+      "client/src/pages/Settings.tsx:30: import \"@/styles/pages/account.css\";",
+      "client/src/pages/ThemeSettings.tsx:25: import \"@/styles/pages/account.css\";"
+    ]
+  },
+  {
+    "file": "client/src/styles/pages/admin-catalog-resources.css",
+    "imports": [
+      "client/src/components/admin/ResourceManager.tsx:54: import \"@/styles/pages/admin-catalog-resources.css\";"
+    ]
+  },
+  {
+    "file": "client/src/styles/pages/admin-catalog-taxonomy.css",
+    "imports": [
+      "client/src/components/admin/GenericCrudManager.tsx:24: import \"@/styles/pages/admin-catalog-taxonomy.css\";"
+    ]
+  },
+  {
+    "file": "client/src/styles/pages/admin-ops-github-links.css",
+    "imports": [
+      "client/src/components/admin/DigestQueueHealth.tsx:7: import \"@/styles/pages/admin-ops-github-links.css\";",
+      "client/src/components/admin/GitHubSyncPanel.tsx:24: import \"@/styles/pages/admin-ops-github-links.css\";",
+      "client/src/components/admin/LinkHealthDashboard.tsx:29: import \"@/styles/pages/admin-ops-github-links.css\";"
+    ]
+  },
+  {
+    "file": "client/src/styles/pages/admin-ops-users-audit.css",
+    "imports": [
+      "client/src/components/admin/AuditTab.tsx:19: import \"@/styles/pages/admin-ops-users-audit.css\";",
+      "client/src/components/admin/ContactSubmissions.tsx:10: import \"@/styles/pages/admin-ops-users-audit.css\";",
+      "client/src/components/admin/UsersTab.tsx:15: import \"@/styles/pages/admin-ops-users-audit.css\";"
+    ]
+  },
+  {
+    "file": "client/src/styles/pages/admin-overview.css",
+    "imports": [
+      "client/src/components/admin/AdminOverview.tsx:7: import \"@/styles/pages/admin-overview.css\";"
+    ]
+  },
+  {
+    "file": "client/src/styles/pages/admin-shell.css",
+    "imports": [
+      "client/src/pages/AdminDashboard.tsx:11: import \"@/styles/pages/admin-shell.css\";"
+    ]
+  },
+  {
+    "file": "client/src/styles/pages/discovery-journeys.css",
+    "imports": [
+      "client/src/pages/JourneyDetail.tsx:36: import \"@/styles/pages/discovery-journeys.css\";",
+      "client/src/pages/Journeys.tsx:20: import \"@/styles/pages/discovery-journeys.css\";"
+    ]
+  },
+  {
+    "file": "client/src/styles/pages/discovery-tools.css",
+    "imports": [
+      "client/src/pages/Advanced.tsx:32: import \"@/styles/pages/discovery-tools.css\";",
+      "client/src/pages/Recommendations.tsx:13: import \"@/styles/pages/discovery-tools.css\";"
+    ]
+  },
+  {
+    "file": "client/src/styles/pages/discovery.css",
+    "imports": [
+      "client/src/pages/Categories.tsx:2: import \"@/styles/pages/discovery.css\";",
+      "client/src/pages/PublicCollection.tsx:2: import \"@/styles/pages/discovery.css\";",
+      "client/src/pages/Search.tsx:2: import \"@/styles/pages/discovery.css\";",
+      "client/src/pages/TagLanding.tsx:2: import \"@/styles/pages/discovery.css\";"
+    ]
+  },
+  {
+    "file": "client/src/styles/pages/home.css",
+    "imports": [
+      "client/src/pages/Home.tsx:33: import \"@/styles/pages/home.css\";"
+    ]
+  },
+  {
+    "file": "client/src/styles/pages/resource.css",
+    "imports": [
+      "client/src/pages/ResourceDetail.tsx:56: import \"@/styles/pages/resource.css\";"
+    ]
+  },
+  {
+    "file": "client/src/styles/pages/submit.css",
+    "imports": [
+      "client/src/pages/SubmitResource.tsx:50: import \"@/styles/pages/submit.css\";"
+    ]
+  },
+  {
+    "file": "client/src/styles/pages/system-legal.css",
+    "imports": [
+      "client/src/pages/CodeOfConduct.tsx:4: import \"@/styles/pages/system-legal.css\";",
+      "client/src/pages/Privacy.tsx:6: import \"@/styles/pages/system-legal.css\";",
+      "client/src/pages/Terms.tsx:4: import \"@/styles/pages/system-legal.css\";"
+    ]
+  },
+  {
+    "file": "client/src/styles/pages/system-overlays.css",
+    "imports": [
+      "client/src/components/ui/consent-banner.tsx:15: import \"@/styles/pages/system-overlays.css\";",
+      "client/src/components/ui/skeleton.tsx:2: import \"@/styles/pages/system-overlays.css\";",
+      "client/src/components/ui/toast.tsx:7: import \"@/styles/pages/system-overlays.css\";"
+    ]
+  },
+  {
+    "file": "client/src/styles/pages/system.css",
+    "imports": [
+      "client/src/index.css:5: @import './styles/design-system.css';",
+      "client/src/pages/DesignSystemShowcase.tsx:16: import \"@/styles/pages/system.css\";",
+      "client/src/pages/ErrorPage.tsx:5: import \"@/styles/pages/system.css\";",
+      "client/src/pages/not-found.tsx:9: import \"@/styles/pages/system.css\";"
+    ]
+  },
+  {
+    "file": "client/src/styles/pages/taxonomy.css",
+    "imports": [
+      "client/src/components/admin/GenericCrudManager.tsx:24: import \"@/styles/pages/admin-catalog-taxonomy.css\";",
+      "client/src/pages/TaxonomyListing.tsx:27: import \"@/styles/pages/taxonomy.css\";"
+    ]
+  },
+  {
+    "file": "client/src/styles/scrolling-fix.css",
+    "imports": [
+      "client/src/index.css:8: @import './styles/scrolling-fix.css';"
+    ]
+  },
+  {
+    "file": "client/src/styles/shell/drawer.css",
+    "imports": [
+      "client/src/components/layout/new/AppSidebar.tsx:31: import \"@/styles/shell/drawer.css\";"
+    ]
+  },
+  {
+    "file": "client/src/styles/shell/footer.css",
+    "imports": [
+      "client/src/components/layout/new/AppFooter.tsx:7: import \"@/styles/shell/footer.css\";"
+    ]
+  },
+  {
+    "file": "client/src/styles/shell/header.css",
+    "imports": [
+      "client/src/components/layout/new/AppHeader.tsx:13: import \"@/styles/shell/header.css\";"
+    ]
+  },
+  {
+    "file": "client/src/styles/shell/layout.css",
+    "imports": [
+      "client/src/components/layout/new/MainLayout.tsx:10: import \"@/styles/shell/layout.css\";"
+    ]
+  },
+  {
+    "file": "client/src/styles/shell/palette.css",
+    "imports": [
+      "client/src/components/ui/search-dialog.tsx:13: import \"./../../styles/shell/palette.css\";"
+    ]
+  },
+  {
+    "file": "client/src/styles/shell/sidebar.css",
+    "imports": [
+      "client/src/components/layout/new/AppSidebar.tsx:30: import \"@/styles/shell/sidebar.css\";"
+    ]
+  },
+  {
+    "file": "client/src/styles/skeleton-animations.css",
+    "imports": [
+      "client/src/index.css:7: @import './styles/skeleton-animations.css';"
+    ]
+  },
+  {
+    "file": "shared/styles/product-profiles.css",
+    "imports": [
+      "client/src/styles/design-system.css:1: @import \"../../../shared/styles/product-profiles.css\";"
+    ]
+  }
+]

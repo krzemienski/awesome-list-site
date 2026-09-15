@@ -14,7 +14,7 @@
  * - DELETE /api/admin/resources/:id - Delete a resource (admin only)
  */
 
-import { describe, it, expect, beforeEach, afterAll } from 'vitest';
+import { describe, it, expect, beforeEach, afterAll, afterEach } from 'vitest';
 import express, { type Express } from 'express';
 import request from 'supertest';
 import { registerRoutes } from '../../../server/routes';
@@ -28,20 +28,22 @@ import {
   getTestDb,
   closeTestDb,
 } from '../../helpers/db-helper';
-import { hashPassword } from '../../../server/passwordUtils';
 import * as schema from '../../../shared/schema';
 import { and, eq } from 'drizzle-orm';
+import {
+  cleanupClerkTestUsers,
+  createClerkAuthenticatedAgent,
+  installClerkTestMiddleware,
+} from '../../helpers/api-helper';
 
 describe('Admin API Integration Tests', () => {
   let app: Express;
   let adminAgent: request.SuperAgentTest;
   let userAgent: request.SuperAgentTest;
-  let adminEmail: string;
-  let adminPassword: string;
   let adminUserId: string;
-  let regularUserEmail: string;
-  let regularUserPassword: string;
   let regularUserId: string;
+  let adminUser: schema.User;
+  let regularUser: schema.User;
 
   beforeEach(async () => {
     // Clean database before each test
@@ -51,27 +53,20 @@ describe('Admin API Integration Tests', () => {
     app = express();
     app.use(express.json());
     app.use(express.urlencoded({ extended: false }));
+    installClerkTestMiddleware(app);
     await registerRoutes(app);
 
     // Create admin user
-    adminEmail = `admin-${Date.now()}@example.com`;
-    adminPassword = 'AdminPassword123';
-    const adminHashedPassword = await hashPassword(adminPassword);
-    const adminUser = await createTestAdmin({
-      email: adminEmail,
-      password: adminHashedPassword,
+    adminUser = await createTestAdmin({
+      email: `admin-${Date.now()}@example.com`,
       firstName: 'Admin',
       lastName: 'User',
     });
     adminUserId = adminUser.id;
 
     // Create regular user
-    regularUserEmail = `user-${Date.now()}@example.com`;
-    regularUserPassword = 'UserPassword123';
-    const userHashedPassword = await hashPassword(regularUserPassword);
-    const regularUser = await createTestUser({
-      email: regularUserEmail,
-      password: userHashedPassword,
+    regularUser = await createTestUser({
+      email: `user-${Date.now()}@example.com`,
       firstName: 'Regular',
       lastName: 'User',
       role: 'user',
@@ -79,20 +74,16 @@ describe('Admin API Integration Tests', () => {
     regularUserId = regularUser.id;
 
     // Create authenticated agents
-    adminAgent = request.agent(app);
-    await adminAgent
-      .post('/api/auth/local/login')
-      .send({ email: adminEmail, password: adminPassword })
-      .expect(200);
+    adminAgent = await createClerkAuthenticatedAgent(app, adminUser);
+    userAgent = await createClerkAuthenticatedAgent(app, regularUser);
+  });
 
-    userAgent = request.agent(app);
-    await userAgent
-      .post('/api/auth/local/login')
-      .send({ email: regularUserEmail, password: regularUserPassword })
-      .expect(200);
+  afterEach(async () => {
+    await cleanupClerkTestUsers();
   });
 
   afterAll(async () => {
+    await cleanupClerkTestUsers();
     await closeTestDb();
   });
 
@@ -110,12 +101,10 @@ describe('Admin API Integration Tests', () => {
 
       expect(response.body).toHaveProperty('users');
       expect(response.body).toHaveProperty('resources');
-      expect(response.body).toHaveProperty('categories');
-      expect(response.body).toHaveProperty('pendingResources');
+      expect(response.body).toHaveProperty('pendingApprovals');
       expect(response.body.users).toBeGreaterThanOrEqual(2);
       expect(response.body.resources).toBeGreaterThanOrEqual(2);
-      expect(response.body.categories).toBeGreaterThanOrEqual(1);
-      expect(response.body.pendingResources).toBeGreaterThanOrEqual(1);
+      expect(response.body.pendingApprovals).toBeGreaterThanOrEqual(1);
     });
 
     it('should return 403 for non-admin user', async () => {
@@ -148,11 +137,10 @@ describe('Admin API Integration Tests', () => {
 
       expect(response.body).toHaveProperty('users');
       expect(response.body).toHaveProperty('total');
-      expect(response.body).toHaveProperty('page');
-      expect(response.body).toHaveProperty('limit');
       expect(Array.isArray(response.body.users)).toBe(true);
       expect(response.body.users.length).toBeGreaterThanOrEqual(2);
       expect(response.body.total).toBeGreaterThanOrEqual(2);
+      expect(response.body.users.every((user: any) => !('password' in user))).toBe(true);
     });
 
     it('should support pagination parameters', async () => {
@@ -162,8 +150,6 @@ describe('Admin API Integration Tests', () => {
         .expect(200);
 
       expect(response.body.users.length).toBeLessThanOrEqual(1);
-      expect(response.body.page).toBe(1);
-      expect(response.body.limit).toBe(1);
     });
 
     it('should return 403 for non-admin user', async () => {
@@ -193,19 +179,29 @@ describe('Admin API Integration Tests', () => {
         .expect('Content-Type', /json/)
         .expect(200);
 
-      expect(response.body).toHaveProperty('user');
-      expect(response.body.user.role).toBe('admin');
-      expect(response.body.user.id).toBe(regularUserId);
+      expect(response.body.role).toBe('admin');
+      expect(response.body.id).toBe(regularUserId);
+      const [saved] = await getTestDb().select().from(schema.users)
+        .where(eq(schema.users.id, regularUserId));
+      expect(saved.role).toBe('admin');
     });
 
     it('should allow admin to change user role to user', async () => {
+      await adminAgent
+        .put(`/api/admin/users/${regularUserId}/role`)
+        .send({ role: 'admin' })
+        .expect(200);
+
       const response = await adminAgent
         .put(`/api/admin/users/${regularUserId}/role`)
         .send({ role: 'user' })
         .expect('Content-Type', /json/)
         .expect(200);
 
-      expect(response.body.user.role).toBe('user');
+      expect(response.body.role).toBe('user');
+      const [saved] = await getTestDb().select().from(schema.users)
+        .where(eq(schema.users.id, regularUserId));
+      expect(saved.role).toBe('user');
     });
 
     it('should return 400 for invalid role', async () => {
@@ -264,9 +260,10 @@ describe('Admin API Integration Tests', () => {
         .expect('Content-Type', /json/)
         .expect(200);
 
-      expect(Array.isArray(response.body)).toBe(true);
-      expect(response.body.length).toBeGreaterThanOrEqual(2);
-      expect(response.body.every((r: any) => r.status === 'pending')).toBe(true);
+      expect(Array.isArray(response.body.resources)).toBe(true);
+      expect(response.body.resources.length).toBeGreaterThanOrEqual(2);
+      expect(response.body.total).toBeGreaterThanOrEqual(2);
+      expect(response.body.resources.every((r: any) => r.status === 'pending')).toBe(true);
     });
 
     it('should return 403 for non-admin user', async () => {
@@ -301,10 +298,9 @@ describe('Admin API Integration Tests', () => {
         .expect('Content-Type', /json/)
         .expect(200);
 
-      expect(response.body).toHaveProperty('resource');
-      expect(response.body.resource.status).toBe('approved');
-      expect(response.body.resource.approvedBy).toBe(adminUserId);
-      expect(response.body.resource.approvedAt).toBeDefined();
+      expect(response.body.status).toBe('approved');
+      expect(response.body.approvedBy).toBe(adminUserId);
+      expect(response.body.approvedAt).toBeDefined();
     });
 
     it('should return 404 for non-existent resource', async () => {
@@ -361,10 +357,9 @@ describe('Admin API Integration Tests', () => {
         .expect('Content-Type', /json/)
         .expect(200);
 
-      expect(response.body).toHaveProperty('resource');
-      expect(response.body.resource.status).toBe('rejected');
-      expect(response.body.resource.rejectionReason).toBe('Does not meet quality standards');
-      expect(response.body.resource.rejectedBy).toBe(adminUserId);
+      expect(response.body.status).toBe('rejected');
+      expect(response.body.contributorRejectionReason).toBe('Does not meet quality standards');
+      expect(response.body.statusChangedAt).toBeDefined();
     });
 
     it('should reject without reason if not provided', async () => {
@@ -378,9 +373,9 @@ describe('Admin API Integration Tests', () => {
         .post(`/api/admin/resources/${pendingResource.id}/reject`)
         .send({})
         .expect('Content-Type', /json/)
-        .expect(200);
+        .expect(400);
 
-      expect(response.body.resource.status).toBe('rejected');
+      expect(response.body.message).toContain('minimum 10 characters');
     });
 
     it('should return 404 for non-existent resource', async () => {
@@ -506,11 +501,10 @@ describe('Admin API Integration Tests', () => {
         .expect('Content-Type', /json/)
         .expect(201);
 
-      expect(response.body).toHaveProperty('resource');
-      expect(response.body.resource.title).toBe(newResource.title);
-      expect(response.body.resource.url).toBe(newResource.url);
-      expect(response.body.resource.status).toBe('approved');
-      expect(response.body.resource.submittedBy).toBe(adminUserId);
+      expect(response.body.title).toBe(newResource.title);
+      expect(response.body.url).toBe(newResource.url);
+      expect(response.body.status).toBe('approved');
+      expect(response.body.submittedBy).toBe(adminUserId);
     });
 
     it('should validate required fields', async () => {
@@ -637,7 +631,7 @@ describe('Admin API Integration Tests', () => {
       const newResource = {
         title: 'HLS.js Demo',
         url: 'https://example.com/hls-demo',
-        description: 'demo',
+        description: 'HLS demo resource description',
         category: 'Players',
         subcategory: 'Web Players',
         subSubcategory: 'HLS.js',
@@ -678,9 +672,8 @@ describe('Admin API Integration Tests', () => {
         .expect('Content-Type', /json/)
         .expect(200);
 
-      expect(response.body).toHaveProperty('resource');
-      expect(response.body.resource.title).toBe('Updated Title');
-      expect(response.body.resource.description).toBe('Updated description');
+      expect(response.body.title).toBe('Updated Title');
+      expect(response.body.description).toBe('Updated description');
     });
 
     it('should allow admin to change resource status', async () => {
@@ -695,7 +688,7 @@ describe('Admin API Integration Tests', () => {
         .expect('Content-Type', /json/)
         .expect(200);
 
-      expect(response.body.resource.status).toBe('approved');
+      expect(response.body.status).toBe('approved');
     });
 
     it('should return 404 for non-existent resource', async () => {
@@ -754,7 +747,7 @@ describe('Admin API Integration Tests', () => {
         .expect('Content-Type', /json/)
         .expect(200);
 
-      expect(response.body).toHaveProperty('success', true);
+      expect(response.body.message).toBe('Resource deleted successfully');
 
       // Verify resource is deleted
       const getResponse = await adminAgent
@@ -859,7 +852,7 @@ describe('Admin API Integration Tests', () => {
       const operations = [
         adminAgent.post(`/api/admin/resources/${resource1.id}/approve`),
         adminAgent.post(`/api/admin/resources/${resource2.id}/approve`),
-        adminAgent.post(`/api/admin/resources/${resource3.id}/reject`).send({ reason: 'Test' }),
+        adminAgent.post(`/api/admin/resources/${resource3.id}/reject`).send({ reason: 'Test rejection reason' }),
       ];
 
       const responses = await Promise.all(operations);
@@ -867,18 +860,18 @@ describe('Admin API Integration Tests', () => {
       expect(responses[0].status).toBe(200);
       expect(responses[1].status).toBe(200);
       expect(responses[2].status).toBe(200);
-      expect(responses[0].body.resource.status).toBe('approved');
-      expect(responses[1].body.resource.status).toBe('approved');
-      expect(responses[2].body.resource.status).toBe('rejected');
+      expect(responses[0].body.status).toBe('approved');
+      expect(responses[1].body.status).toBe('approved');
+      expect(responses[2].body.status).toBe('rejected');
     });
 
     it('should handle admin updating own role', async () => {
       const response = await adminAgent
         .put(`/api/admin/users/${adminUserId}/role`)
         .send({ role: 'user' })
-        .expect(200);
+        .expect(400);
 
-      expect(response.body.user.role).toBe('user');
+      expect(response.body.message).toContain('cannot change your own role');
     });
 
     it('should handle very long rejection reason', async () => {

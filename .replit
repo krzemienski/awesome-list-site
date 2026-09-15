@@ -4,7 +4,7 @@ hidden = [".config", ".git", "generated-icon.png", "node_modules", "dist"]
 
 [nix]
 channel = "stable-24_05"
-packages = ["jq", "chromium", "glib", "nss", "nspr", "atk", "cups", "libdrm", "libxkbcommon", "mesa", "alsa-lib", "xorg.libxcb", "xorg.libX11", "xorg.libXcomposite", "xorg.libXcursor", "xorg.libXdamage", "xorg.libXext", "xorg.libXfixes", "xorg.libXi", "xorg.libXrandr", "xorg.libXrender", "xorg.libXtst", "xorg.libXScrnSaver", "gtk3", "pango", "cairo", "gdk-pixbuf", "dbus", "expat"]
+packages = ["jq", "chromium", "glib", "nss", "nspr", "atk", "cups", "libdrm", "libxkbcommon", "mesa", "alsa-lib", "xorg.libxcb", "xorg.libX11", "xorg.libXcomposite", "xorg.libXcursor", "xorg.libXdamage", "xorg.libXext", "xorg.libXfixes", "xorg.libXi", "xorg.libXrandr", "xorg.libXrender", "xorg.libXtst", "xorg.libXScrnSaver", "gtk3", "pango", "cairo", "gdk-pixbuf", "dbus", "expat", "gtk4", "vulkan-loader", "graphene", "icu74", "gcc-unwrapped", "libxml2", "sqlite", "libxslt", "lcms2", "libevent", "libopus", "flite", "libwebp", "libavif", "harfbuzzFull", "libepoxy", "libjpeg8", "libmanette", "enchant", "hyphen", "libsecret", "woff2", "libglvnd", "x264", "gst_all_1.gstreamer", "gst_all_1.gst-plugins-base", "gst_all_1.gst-plugins-good", "gst_all_1.gst-plugins-bad", "gst_all_1.gst-plugins-ugly", "gst_all_1.gst-libav"]
 
 [deployment]
 deploymentTarget = "autoscale"
@@ -22,10 +22,6 @@ externalPort = 3001
 [[ports]]
 localPort = 20928
 externalPort = 3002
-
-[[ports]]
-localPort = 23636
-externalPort = 3000
 
 [workflows]
 runButton = "Project"
@@ -50,10 +46,6 @@ args = "print-audit"
 [[workflows.workflow.tasks]]
 task = "workflow.run"
 args = "responsive-audit"
-
-[[workflows.workflow.tasks]]
-task = "workflow.run"
-args = "artifacts/mockup-sandbox: Component Preview Server"
 
 [[workflows.workflow.tasks]]
 task = "workflow.run"
@@ -229,19 +221,6 @@ isValidation = true
 [[workflows.workflow.tasks]]
 task = "shell.exec"
 args = "node scripts/validation/responsive-audit.mjs"
-
-[[workflows.workflow]]
-name = "artifacts/mockup-sandbox: Component Preview Server"
-author = "agent"
-
-[[workflows.workflow.tasks]]
-task = "shell.exec"
-args = "cd artifacts/mockup-sandbox && npm ci --ignore-scripts && PORT=23636 BASE_PATH=/__mockup/ npm run dev"
-waitForPort = 23636
-
-[workflows.workflow.metadata]
-outputType = "console"
-isCanvasWorkflow = true
 
 [[workflows.workflow]]
 name = "tablet-audit"

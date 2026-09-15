@@ -502,10 +502,21 @@ try {
     // that transitional frame as an empty, vacuous document.
     await awaitRouteSettle(pg, route);
     let sweeps = await runAll(pg);
-    if (Object.values(sweeps).some(s => s.strays.length > 0)) {
+    // A sample is "vacuous" when the frame it scanned had no content to judge
+    // (no buttons / no DS-hooked buttons / no <h1>); the per-kind sanity rule
+    // below still fails such a sample, so this only decides whether to
+    // re-settle and re-collect, never whether to pass.
+    const vacuous = (s) =>
+      (s.buttons && (s.buttons.total === 0 || s.buttons.dsVariantCount === 0)) ||
+      (s.h1s && s.h1s.total === 0);
+    if (Object.values(sweeps).some(s => s.strays.length > 0) || vacuous(sweeps)) {
       // Confirm before failing: transient pre-hydration/loading chrome can
-      // linger when the whole validation suite saturates the machine. A real
-      // hand-rolled element is still there 3s later.
+      // linger when the whole validation suite saturates the machine — and
+      // the collections above run one after another, so a re-render that
+      // lands between two of them (Clerk's first-user observation briefly
+      // swapping Home for its skeleton) leaves a later kind scanning an empty
+      // frame. A real hand-rolled element, or a genuinely empty route, is
+      // still there 3s later after the route's own settle condition.
       await pg.waitForTimeout(3000);
       await awaitRouteSettle(pg, route);
       sweeps = await runAll(pg);

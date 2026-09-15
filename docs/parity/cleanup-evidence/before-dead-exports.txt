@@ -1,0 +1,2 @@
+PASS canaries :: export/import extraction + re-export & star following + namespace/dynamic whole-module uses + allowlist contract verified against synthetic modules
+PASS dead-exports :: 836 export(s) across 214 module(s) in client/src/ + shared/ checked, 786 imported elsewhere, 50 pinned exception(s)

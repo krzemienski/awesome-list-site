@@ -6,7 +6,7 @@
 #   2. migration-drift  — scripts/check-migration-drift.ts
 #   3. print-audit      — scripts/validation/print-audit.mjs      (headless Chromium)
 #   4. responsive-audit — scripts/validation/responsive-audit.mjs (headless Chromium)
-#   5. standalone-palette-drift — hardcoded design-value ratchet for exports/mockups
+#   5. standalone-palette-drift — hardcoded design-value ratchet for standalone artifacts
 #   6. npm run build    — the actual production build
 #   7. bundle-budget    — deterministic entry/major-route size + isolation gate
 #

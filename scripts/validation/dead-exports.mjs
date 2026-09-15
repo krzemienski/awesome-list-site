@@ -37,10 +37,10 @@
 //   tests/, plus the root config files. Tests and scripts genuinely import
 //   client and shared symbols (tests/unit/parse-tags-param.test.ts →
 //   client/src/lib/tags, scripts/*.ts → shared/schema), so leaving them out
-//   would fabricate dead symbols. artifacts/ is deliberately excluded: the
-//   mockup sandbox is a self-contained second app with its OWN `@/` alias
-//   pointing at its own src/, so resolving its imports against client/src
-//   would invent uses that don't exist.
+//   would fabricate dead symbols. artifacts/ is deliberately excluded:
+//   registered artifacts are self-contained second apps with their OWN
+//   module aliases pointing at their own src/, so resolving their imports
+//   against client/src would invent uses that don't exist.
 //
 // ---------------------------------------------------------------------------
 // What counts as a use (and the traps each one hides)

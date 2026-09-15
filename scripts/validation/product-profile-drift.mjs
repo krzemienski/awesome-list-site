@@ -3,6 +3,7 @@ import { spawnSync } from "node:child_process";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 import { launchBrowserWithLease } from "./playwright-launch-lease.mjs";
+import { acquireGateLease } from "./gate-lease.mjs";
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..", "..");
 const BASE = process.env.AUDIT_BASE_URL || "http://localhost:5000";
@@ -31,9 +32,6 @@ const exportTools = read("client/src/components/ui/export-tools.tsx");
 // source (docs/parity/source-sync.json) and is intentionally never edited.
 const artifactEntry = read("artifacts/awesome-video-design-system/index.html");
 const artifactCss = read("artifacts/awesome-video-design-system/src/index.css");
-const mockupEntry = read("artifacts/mockup-sandbox/index.html");
-const mockupCss = read("artifacts/mockup-sandbox/src/index.css");
-const mockupApp = read("artifacts/mockup-sandbox/src/App.tsx");
 
 const profiles = [
   "public-discovery",
@@ -143,19 +141,6 @@ const surfaces = [
       ".docs-nav > div:first-child > a",
       ".docs-nav .chip",
       ".ds-shell footer a",
-    ],
-  },
-  {
-    name: "mockup sandbox",
-    entry: mockupEntry,
-    profile: "standalone-exports",
-    adapter: mockupCss,
-    importPath: "../../../shared/styles/product-profiles.css",
-    consumers: [
-      [mockupCss, "--profile-panel-padding"],
-      [mockupCss, "--profile-content-gap"],
-      [mockupCss, "--profile-page-measure"],
-      [mockupApp, "profile-gallery-shell"],
     ],
   },
 ];
@@ -479,7 +464,10 @@ async function inspectCrossTabThemeSync(browser) {
         && root.getAttribute("data-accent") === expectedAccent;
     },
     { expectedSystem: system, expectedAccent: accent },
-    { timeout: 10_000 },
+    // Propagation budget, not the assertion: under the concurrent completion
+    // validation suite the receiving tab can take well over 10 s to observe
+    // the storage event; 30 s matches this file's other page-level waits.
+    { timeout: 30_000 },
   );
 
   try {
@@ -592,6 +580,14 @@ if (!AUDIT_KEY || AUDIT_KEY.length < 8) {
   throw new Error("ADMIN_PASSWORD (>=8 chars) is required to inspect the protected admin document");
 }
 const { chromium } = await import(path.join(ROOT, "node_modules/playwright/index.mjs"));
+// The browser scenarios load real app routes (/settings/theme, /design-system,
+// /admin) whose data requests fail during the deliberate DB-outage gate, and a
+// page that has fallen back to the app-level error surface no longer carries
+// the theme provider's storage listeners — the cross-tab sync then times out
+// with no source defect. Serialize against the outage/crawl gates via the
+// shared "db-heavy" lease, acquired BEFORE the browser lease to keep the
+// repository-wide lock order (same as auth-return-audit and ds-button-sweep).
+const releaseGateLease = await acquireGateLease("db-heavy", "product-profile-browser");
 const browser = await launchBrowserWithLease(
   chromium,
   {
@@ -687,6 +683,7 @@ try {
   await inspectCrossTabThemeSync(browser);
 } finally {
   await browser.close();
+  await releaseGateLease();
 }
 
 if (failures.length) {

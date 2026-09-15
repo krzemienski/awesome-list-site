@@ -1,0 +1,21 @@
+Command: npm run test:integration
+Configured execution: vitest run tests/integration --no-file-parallelism
+Exit: 1
+Duration: 59.37 seconds
+Test files: 6 failed, 4 passed (10 total)
+Tests: 162 failed, 83 passed, 1 skipped (246 total)
+
+Observed example:
+tests/integration/api/resources.test.ts:1136 posts /api/auth/local/login.
+Its assertion at line 1140 expects HTTP 200 but receives HTTP 404.
+server/clerkAuth.ts documents that the Clerk migration removed this endpoint.
+This example does not diagnose every failing test.
+
+Baseline scope check:
+git diff --name-status b190c8fe6e558874b118fffeaa2b62cd6a231c1e -- client server shared tests vitest.config.ts package.json package-lock.json
+Output: empty.
+This establishes unchanged source inputs, not a second baseline execution
+or a passing integration suite. No tests or thresholds were weakened.
+
+Full console output retained temporarily at /tmp/cleanup-integration.log.
+This summary intentionally excludes database/authentication log payloads.

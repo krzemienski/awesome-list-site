@@ -4397,7 +4397,8 @@ components:
       properties:
         id:
           type: string
-          pattern: ^\d+$
+          minLength: 1
+          maxLength: 512
       required:
         - id
       additionalProperties: {}
@@ -4451,7 +4452,8 @@ components:
       properties:
         id:
           type: string
-          pattern: ^\d+$
+          minLength: 1
+          maxLength: 512
       required:
         - id
       additionalProperties: {}
@@ -4505,7 +4507,8 @@ components:
       properties:
         id:
           type: string
-          pattern: ^\d+$
+          minLength: 1
+          maxLength: 512
       required:
         - id
       additionalProperties: {}
@@ -21406,7 +21409,8 @@ paths:
           required: true
           schema:
             type: string
-            pattern: ^\d+$
+            minLength: 1
+            maxLength: 512
         - name: page
           in: query
           required: false
@@ -21564,7 +21568,8 @@ paths:
           required: true
           schema:
             type: string
-            pattern: ^\d+$
+            minLength: 1
+            maxLength: 512
         - name: page
           in: query
           required: false
@@ -21722,7 +21727,8 @@ paths:
           required: true
           schema:
             type: string
-            pattern: ^\d+$
+            minLength: 1
+            maxLength: 512
         - name: page
           in: query
           required: false

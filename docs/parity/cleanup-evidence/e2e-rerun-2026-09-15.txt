@@ -1,0 +1,42 @@
+npm run test:e2e — full rerun on HEAD after Firefox r1522 install (2026-09-15, start 06:15:45 UTC, 31.2 min, exit 1)
+Command: BASE_URL=http://127.0.0.1:5000 npx playwright test --reporter=list,json (5 projects, 4 workers)
+Result: 598 passed, 97 failed, 5 did not run, 0 flaky. Raw JSON/list logs: .cache/task569/e2e-full.{json,log} (gitignored, workspace-local).
+
+Failures grouped by project | spec | first error line (from the JSON reporter):
+  7 webkit | admin-operations.spec.ts | TimeoutError: locator.waitFor: Timeout 30000ms exceeded.
+  7 Mobile Safari | admin-operations.spec.ts | TimeoutError: locator.waitFor: Timeout 30000ms exceeded.
+  7 webkit | admin-users-audit.spec.ts | TimeoutError: locator.waitFor: Timeout 30000ms exceeded.
+  7 Mobile Safari | admin-users-audit.spec.ts | TimeoutError: locator.waitFor: Timeout 30000ms exceeded.
+  6 chromium | search.spec.ts | Test timeout of 60000ms exceeded.
+  6 firefox | search.spec.ts | Test timeout of 60000ms exceeded.
+  6 webkit | search.spec.ts | Test timeout of 60000ms exceeded.
+  6 Mobile Chrome | search.spec.ts | Test timeout of 60000ms exceeded.
+  6 Mobile Safari | search.spec.ts | Test timeout of 60000ms exceeded.
+  3 firefox | admin-users-audit.spec.ts | Test timeout of 60000ms exceeded.
+  3 firefox | browse-categories.spec.ts | Error: browserContext.newPage: Target page, context or browser has been closed
+  2 firefox | browse-categories.spec.ts | Error: page.goto: Target page, context or browser has been closed
+  2 firefox | browse-categories.spec.ts | Test timeout of 60000ms exceeded while running "beforeEach" hook.
+  2 chromium | search.spec.ts | Error: expect(locator).toBeVisible() failed
+  2 firefox | search.spec.ts | Error: expect(locator).toBeVisible() failed
+  2 webkit | search.spec.ts | Error: expect(locator).toBeVisible() failed
+  2 Mobile Chrome | search.spec.ts | Error: expect(locator).toBeVisible() failed
+  2 Mobile Safari | search.spec.ts | Error: expect(locator).toBeVisible() failed
+  1 firefox | admin-operations.spec.ts | Test timeout of 60000ms exceeded.
+  1 firefox | admin-operations.spec.ts | Error: locator.waitFor: Target page, context or browser has been closed
+  1 Mobile Chrome | admin-operations.spec.ts | Test timeout of 60000ms exceeded.
+  1 firefox | admin-users-audit.spec.ts | Fixture "task549Admin" timeout of 60000ms exceeded during setup.
+  1 firefox | admin-users-audit.spec.ts | Error: browser.newContext: Error setting storage state:
+  1 Mobile Chrome | admin-users-audit.spec.ts | Test timeout of 60000ms exceeded.
+  1 Mobile Safari | browse-categories.spec.ts | Error: expect(locator).toHaveAttribute(expected) failed
+  1 firefox | browse-categories.spec.ts | TypeError: browserContext.newPage: Cannot read properties of undefined (reading '_page')
+  1 Mobile Safari | browse-categories.spec.ts | Error: expect(locator).toBeVisible() failed
+  1 webkit | browse-categories.spec.ts | Error: expect(locator).toBeVisible() failed
+  1 chromium | continue-learning.spec.ts | Error: POST /api/journeys/7/start failed: 401 {"message":"Unauthorized"}
+  1 firefox | continue-learning.spec.ts | Test timeout of 120000ms exceeded while setting up "task549UserPage".
+  1 webkit | continue-learning.spec.ts | TimeoutError: locator.waitFor: Timeout 30000ms exceeded.
+  1 Mobile Chrome | continue-learning.spec.ts | Error: POST /api/journeys/7/start failed: 401 {"message":"Unauthorized"}
+  1 Mobile Safari | continue-learning.spec.ts | TimeoutError: locator.waitFor: Timeout 30000ms exceeded.
+  1 firefox | favorites.spec.ts | Error: expect(received).toBeTruthy()
+  1 firefox | favorites.spec.ts | Test timeout of 60000ms exceeded while running "beforeEach" hook.
+  1 firefox | favorites.spec.ts | Error: expect(locator).toContainText(expected) failed
+  1 Mobile Safari | search.spec.ts | Error: expect(locator).not.toBeVisible() failed

@@ -12,7 +12,7 @@
  * - POST /api/resources/:id/edits - Suggest resource edit (authenticated)
  */
 
-import { describe, it, expect, beforeEach, afterAll } from 'vitest';
+import { describe, it, expect, beforeEach, afterAll, afterEach } from 'vitest';
 import express, { type Express } from 'express';
 import request from 'supertest';
 import { registerRoutes } from '../../../server/routes';
@@ -27,17 +27,19 @@ import {
   getTestDb,
   closeTestDb,
 } from '../../helpers/db-helper';
-import { hashPassword } from '../../../server/passwordUtils';
 import { resourceTags } from '../../../shared/schema';
+import {
+  cleanupClerkTestUsers,
+  createClerkAuthenticatedAgent,
+  installClerkTestMiddleware,
+} from '../../helpers/api-helper';
 
 describe('Resources API Integration Tests', () => {
   let app: Express;
-  let regularUserEmail: string;
-  let regularUserPassword: string;
   let regularUserId: string;
-  let adminUserEmail: string;
-  let adminUserPassword: string;
   let adminUserId: string;
+  let regularUser: Awaited<ReturnType<typeof createTestUser>>;
+  let adminUser: Awaited<ReturnType<typeof createTestAdmin>>;
 
   beforeEach(async () => {
     // Clean database before each test
@@ -47,16 +49,12 @@ describe('Resources API Integration Tests', () => {
     app = express();
     app.use(express.json());
     app.use(express.urlencoded({ extended: false }));
+    installClerkTestMiddleware(app);
     await registerRoutes(app);
 
     // Create regular user
-    regularUserEmail = `regular-${Date.now()}@example.com`;
-    regularUserPassword = 'RegularPassword123';
-    const regularHashedPassword = await hashPassword(regularUserPassword);
-
-    const regularUser = await createTestUser({
-      email: regularUserEmail,
-      password: regularHashedPassword,
+    regularUser = await createTestUser({
+      email: `regular-${Date.now()}@example.com`,
       firstName: 'Regular',
       lastName: 'User',
       role: 'user',
@@ -64,21 +62,29 @@ describe('Resources API Integration Tests', () => {
     regularUserId = regularUser.id;
 
     // Create admin user
-    adminUserEmail = `admin-${Date.now()}@example.com`;
-    adminUserPassword = 'AdminPassword123';
-    const adminHashedPassword = await hashPassword(adminUserPassword);
-
-    const adminUser = await createTestAdmin({
-      email: adminUserEmail,
-      password: adminHashedPassword,
+    adminUser = await createTestAdmin({
+      email: `admin-${Date.now()}@example.com`,
       firstName: 'Admin',
       lastName: 'User',
     });
     adminUserId = adminUser.id;
+
+    // Contributor submissions validate category labels against the catalog.
+    // Seed the labels used by the POST fixtures without weakening that check.
+    await Promise.all([
+      createTestCategory({ name: 'Test Category', slug: 'test-category' }),
+      createTestCategory({ name: 'Admin Category', slug: 'admin-category' }),
+      createTestCategory({ name: 'Test', slug: 'test' }),
+    ]);
   });
 
   afterAll(async () => {
+    await cleanupClerkTestUsers();
     await closeTestDb();
+  });
+
+  afterEach(async () => {
+    await cleanupClerkTestUsers();
   });
 
   describe('GET /api/resources', () => {
@@ -105,8 +111,8 @@ describe('Resources API Integration Tests', () => {
 
       expect(response.body).toHaveProperty('resources');
       expect(response.body).toHaveProperty('total');
-      expect(response.body).toHaveProperty('page');
       expect(response.body).toHaveProperty('limit');
+      expect(response.body.pagination.page).toBe(1);
       expect(Array.isArray(response.body.resources)).toBe(true);
       expect(response.body.resources.length).toBe(2);
       expect(response.body.total).toBe(2);
@@ -155,7 +161,7 @@ describe('Resources API Integration Tests', () => {
         .expect(200);
 
       expect(page1.body.resources.length).toBe(10);
-      expect(page1.body.page).toBe(1);
+      expect(page1.body.pagination.page).toBe(1);
       expect(page1.body.total).toBe(25);
 
       // Page 2
@@ -164,7 +170,7 @@ describe('Resources API Integration Tests', () => {
         .expect(200);
 
       expect(page2.body.resources.length).toBe(10);
-      expect(page2.body.page).toBe(2);
+      expect(page2.body.pagination.page).toBe(2);
 
       // Page 3
       const page3 = await request(app)
@@ -172,7 +178,7 @@ describe('Resources API Integration Tests', () => {
         .expect(200);
 
       expect(page3.body.resources.length).toBe(5);
-      expect(page3.body.page).toBe(3);
+      expect(page3.body.pagination.page).toBe(3);
     });
 
     it('should filter by category', async () => {
@@ -316,19 +322,21 @@ describe('Resources API Integration Tests', () => {
     it('should handle invalid page number', async () => {
       const response = await request(app)
         .get('/api/resources?page=0')
-        .expect(200);
+        .expect(400);
 
-      // Should default to page 1
-      expect(response.body.page).toBe(1);
+      expect(response.body.error).toBe('validation_failed');
+      expect(response.body.message).toBe('Invalid query parameters');
+      expect(response.body.fieldErrors).toHaveProperty('page');
     });
 
     it('should handle invalid limit', async () => {
       const response = await request(app)
         .get('/api/resources?limit=abc')
-        .expect(200);
+        .expect(400);
 
-      // Should default to 20
-      expect(response.body.limit).toBe(20);
+      expect(response.body.error).toBe('validation_failed');
+      expect(response.body.message).toBe('Invalid query parameters');
+      expect(response.body.fieldErrors).toHaveProperty('limit');
     });
   });
 
@@ -347,10 +355,7 @@ describe('Resources API Integration Tests', () => {
         .expect(200);
 
       expect(response.body).toHaveProperty('exists', true);
-      expect(response.body).toHaveProperty('resource');
-      expect(response.body.resource.id).toBe(existingResource.id);
-      expect(response.body.resource.title).toBe('Existing Resource');
-      expect(response.body.resource.status).toBe('approved');
+      expect(response.body).not.toHaveProperty('resource');
     });
 
     it('should return exists=false when URL does not exist', async () => {
@@ -385,7 +390,7 @@ describe('Resources API Integration Tests', () => {
         .expect(200);
 
       expect(response.body.exists).toBe(true);
-      expect(response.body.resource.status).toBe('pending');
+      expect(response.body).not.toHaveProperty('resource');
     });
 
     it('should find rejected resources', async () => {
@@ -400,7 +405,7 @@ describe('Resources API Integration Tests', () => {
         .expect(200);
 
       expect(response.body.exists).toBe(true);
-      expect(response.body.resource.status).toBe('rejected');
+      expect(response.body).not.toHaveProperty('resource');
     });
   });
 
@@ -435,7 +440,7 @@ describe('Resources API Integration Tests', () => {
       expect(response.body.message).toContain('Resource not found');
     });
 
-    it('should return pending resource', async () => {
+    it('should hide pending resource from public', async () => {
       const resource = await createTestResource({
         title: 'Pending Resource',
         url: 'https://example.com/pending',
@@ -444,30 +449,21 @@ describe('Resources API Integration Tests', () => {
 
       const response = await request(app)
         .get(`/api/resources/${resource.id}`)
-        .expect(200);
+        .expect(404);
 
-      expect(response.body.status).toBe('pending');
+      expect(response.body.message).toContain('Resource not found');
     });
 
     it('should handle invalid id format', async () => {
       const response = await request(app)
         .get('/api/resources/invalid')
-        .expect(500);
-
-      expect(response.body).toHaveProperty('message');
+        .expect(404);
     });
   });
 
   describe('POST /api/resources', () => {
     it('should create resource when authenticated', async () => {
-      const agent = request.agent(app);
-      await agent
-        .post('/api/auth/local/login')
-        .send({
-          email: regularUserEmail,
-          password: regularUserPassword,
-        })
-        .expect(200);
+      const agent = await createClerkAuthenticatedAgent(app, regularUser);
 
       const resourceData = {
         title: 'New Resource',
@@ -506,14 +502,7 @@ describe('Resources API Integration Tests', () => {
     });
 
     it('should validate required fields', async () => {
-      const agent = request.agent(app);
-      await agent
-        .post('/api/auth/local/login')
-        .send({
-          email: regularUserEmail,
-          password: regularUserPassword,
-        })
-        .expect(200);
+      const agent = await createClerkAuthenticatedAgent(app, regularUser);
 
       const response = await agent
         .post('/api/resources')
@@ -525,19 +514,12 @@ describe('Resources API Integration Tests', () => {
         .expect(400);
 
       expect(response.body).toHaveProperty('message');
-      expect(response.body.message).toContain('Invalid resource data');
+      expect(response.body.message).toContain('Validation failed');
       expect(response.body).toHaveProperty('errors');
     });
 
     it('should create resource with all optional fields', async () => {
-      const agent = request.agent(app);
-      await agent
-        .post('/api/auth/local/login')
-        .send({
-          email: regularUserEmail,
-          password: regularUserPassword,
-        })
-        .expect(200);
+      const agent = await createClerkAuthenticatedAgent(app, regularUser);
 
       const resourceData = {
         title: 'Complete Resource',
@@ -545,10 +527,9 @@ describe('Resources API Integration Tests', () => {
         description: 'A complete test resource',
         category: 'Test Category',
         subcategory: 'Test Subcategory',
-        platform: 'YouTube',
-        duration: 3600,
-        difficultyLevel: 'intermediate',
-        language: 'en',
+        resourceFormat: 'video',
+        provider: 'youtube',
+        skillLevel: 'intermediate',
       };
 
       const response = await agent
@@ -557,21 +538,13 @@ describe('Resources API Integration Tests', () => {
         .expect(201);
 
       expect(response.body.subcategory).toBe('Test Subcategory');
-      expect(response.body.platform).toBe('YouTube');
-      expect(response.body.duration).toBe(3600);
-      expect(response.body.difficultyLevel).toBe('intermediate');
-      expect(response.body.language).toBe('en');
+      expect(response.body.resourceFormat).toBe('video');
+      expect(response.body.provider).toBe('youtube');
+      expect(response.body.skillLevel).toBe('intermediate');
     });
 
     it('should reject invalid URL format', async () => {
-      const agent = request.agent(app);
-      await agent
-        .post('/api/auth/local/login')
-        .send({
-          email: regularUserEmail,
-          password: regularUserPassword,
-        })
-        .expect(200);
+      const agent = await createClerkAuthenticatedAgent(app, regularUser);
 
       const response = await agent
         .post('/api/resources')
@@ -583,18 +556,11 @@ describe('Resources API Integration Tests', () => {
         })
         .expect(400);
 
-      expect(response.body.message).toContain('Invalid resource data');
+      expect(response.body.message).toContain('Validation failed');
     });
 
     it('should create resource with admin user', async () => {
-      const agent = request.agent(app);
-      await agent
-        .post('/api/auth/local/login')
-        .send({
-          email: adminUserEmail,
-          password: adminUserPassword,
-        })
-        .expect(200);
+      const agent = await createClerkAuthenticatedAgent(app, adminUser);
 
       const response = await agent
         .post('/api/resources')
@@ -631,14 +597,7 @@ describe('Resources API Integration Tests', () => {
         status: 'approved',
       });
 
-      const agent = request.agent(app);
-      await agent
-        .post('/api/auth/local/login')
-        .send({
-          email: adminUserEmail,
-          password: adminUserPassword,
-        })
-        .expect(200);
+      const agent = await createClerkAuthenticatedAgent(app, adminUser);
 
       const response = await agent
         .get('/api/resources/pending')
@@ -659,14 +618,7 @@ describe('Resources API Integration Tests', () => {
     });
 
     it('should return 403 for non-admin users', async () => {
-      const agent = request.agent(app);
-      await agent
-        .post('/api/auth/local/login')
-        .send({
-          email: regularUserEmail,
-          password: regularUserPassword,
-        })
-        .expect(200);
+      const agent = await createClerkAuthenticatedAgent(app, regularUser);
 
       const response = await agent
         .get('/api/resources/pending')
@@ -686,14 +638,7 @@ describe('Resources API Integration Tests', () => {
         });
       }
 
-      const agent = request.agent(app);
-      await agent
-        .post('/api/auth/local/login')
-        .send({
-          email: adminUserEmail,
-          password: adminUserPassword,
-        })
-        .expect(200);
+      const agent = await createClerkAuthenticatedAgent(app, adminUser);
 
       const response = await agent
         .get('/api/resources/pending?page=1&limit=10')
@@ -710,14 +655,7 @@ describe('Resources API Integration Tests', () => {
         status: 'approved',
       });
 
-      const agent = request.agent(app);
-      await agent
-        .post('/api/auth/local/login')
-        .send({
-          email: adminUserEmail,
-          password: adminUserPassword,
-        })
-        .expect(200);
+      const agent = await createClerkAuthenticatedAgent(app, adminUser);
 
       const response = await agent
         .get('/api/resources/pending')
@@ -736,14 +674,7 @@ describe('Resources API Integration Tests', () => {
         status: 'pending',
       });
 
-      const agent = request.agent(app);
-      await agent
-        .post('/api/auth/local/login')
-        .send({
-          email: adminUserEmail,
-          password: adminUserPassword,
-        })
-        .expect(200);
+      const agent = await createClerkAuthenticatedAgent(app, adminUser);
 
       const response = await agent
         .put(`/api/resources/${resource.id}/approve`)
@@ -752,8 +683,8 @@ describe('Resources API Integration Tests', () => {
 
       expect(response.body).toHaveProperty('id', resource.id);
       expect(response.body).toHaveProperty('status', 'approved');
-      expect(response.body).toHaveProperty('reviewedBy', adminUserId);
-      expect(response.body).toHaveProperty('reviewedAt');
+      expect(response.body).toHaveProperty('approvedBy', adminUserId);
+      expect(response.body).toHaveProperty('approvedAt');
     });
 
     it('should return 401 when not authenticated', async () => {
@@ -777,14 +708,7 @@ describe('Resources API Integration Tests', () => {
         status: 'pending',
       });
 
-      const agent = request.agent(app);
-      await agent
-        .post('/api/auth/local/login')
-        .send({
-          email: regularUserEmail,
-          password: regularUserPassword,
-        })
-        .expect(200);
+      const agent = await createClerkAuthenticatedAgent(app, regularUser);
 
       const response = await agent
         .put(`/api/resources/${resource.id}/approve`)
@@ -801,20 +725,13 @@ describe('Resources API Integration Tests', () => {
         status: 'approved',
       });
 
-      const agent = request.agent(app);
-      await agent
-        .post('/api/auth/local/login')
-        .send({
-          email: adminUserEmail,
-          password: adminUserPassword,
-        })
-        .expect(200);
+      const agent = await createClerkAuthenticatedAgent(app, adminUser);
 
       const response = await agent
         .put(`/api/resources/${resource.id}/approve`)
-        .expect(200);
+        .expect(409);
 
-      expect(response.body.status).toBe('approved');
+      expect(response.body.message).toContain('not pending approval');
     });
 
     it('should approve rejected resource', async () => {
@@ -824,20 +741,13 @@ describe('Resources API Integration Tests', () => {
         status: 'rejected',
       });
 
-      const agent = request.agent(app);
-      await agent
-        .post('/api/auth/local/login')
-        .send({
-          email: adminUserEmail,
-          password: adminUserPassword,
-        })
-        .expect(200);
+      const agent = await createClerkAuthenticatedAgent(app, adminUser);
 
       const response = await agent
         .put(`/api/resources/${resource.id}/approve`)
-        .expect(200);
+        .expect(409);
 
-      expect(response.body.status).toBe('approved');
+      expect(response.body.message).toContain('not pending approval');
     });
   });
 
@@ -849,14 +759,7 @@ describe('Resources API Integration Tests', () => {
         status: 'pending',
       });
 
-      const agent = request.agent(app);
-      await agent
-        .post('/api/auth/local/login')
-        .send({
-          email: adminUserEmail,
-          password: adminUserPassword,
-        })
-        .expect(200);
+      const agent = await createClerkAuthenticatedAgent(app, adminUser);
 
       const response = await agent
         .put(`/api/resources/${resource.id}/reject`)
@@ -865,8 +768,7 @@ describe('Resources API Integration Tests', () => {
 
       expect(response.body).toHaveProperty('id', resource.id);
       expect(response.body).toHaveProperty('status', 'rejected');
-      expect(response.body).toHaveProperty('reviewedBy', adminUserId);
-      expect(response.body).toHaveProperty('reviewedAt');
+      expect(response.body).toHaveProperty('statusChangedAt');
     });
 
     it('should return 401 when not authenticated', async () => {
@@ -890,14 +792,7 @@ describe('Resources API Integration Tests', () => {
         status: 'pending',
       });
 
-      const agent = request.agent(app);
-      await agent
-        .post('/api/auth/local/login')
-        .send({
-          email: regularUserEmail,
-          password: regularUserPassword,
-        })
-        .expect(200);
+      const agent = await createClerkAuthenticatedAgent(app, regularUser);
 
       const response = await agent
         .put(`/api/resources/${resource.id}/reject`)
@@ -914,20 +809,13 @@ describe('Resources API Integration Tests', () => {
         status: 'approved',
       });
 
-      const agent = request.agent(app);
-      await agent
-        .post('/api/auth/local/login')
-        .send({
-          email: adminUserEmail,
-          password: adminUserPassword,
-        })
-        .expect(200);
+      const agent = await createClerkAuthenticatedAgent(app, adminUser);
 
       const response = await agent
         .put(`/api/resources/${resource.id}/reject`)
-        .expect(200);
+        .expect(409);
 
-      expect(response.body.status).toBe('rejected');
+      expect(response.body.message).toContain('not pending approval');
     });
   });
 
@@ -940,19 +828,15 @@ describe('Resources API Integration Tests', () => {
         status: 'approved',
       });
 
-      const agent = request.agent(app);
-      await agent
-        .post('/api/auth/local/login')
-        .send({
-          email: regularUserEmail,
-          password: regularUserPassword,
-        })
-        .expect(200);
+      const agent = await createClerkAuthenticatedAgent(app, regularUser);
 
       const response = await agent
         .post(`/api/resources/${resource.id}/edits`)
         .send({
-          proposedChanges: 'Updated title and description',
+          proposedChanges: {
+            title: 'Updated Resource',
+            description: 'Updated description',
+          },
           proposedData: {
             title: 'Updated Resource',
             description: 'Updated description',
@@ -964,7 +848,10 @@ describe('Resources API Integration Tests', () => {
       expect(response.body).toHaveProperty('id');
       expect(response.body).toHaveProperty('resourceId', resource.id);
       expect(response.body).toHaveProperty('submittedBy', regularUserId);
-      expect(response.body).toHaveProperty('proposedChanges', 'Updated title and description');
+      expect(response.body.proposedChanges).toEqual({
+        title: 'Updated Resource',
+        description: 'Updated description',
+      });
       expect(response.body).toHaveProperty('status', 'pending');
     });
 
@@ -978,7 +865,7 @@ describe('Resources API Integration Tests', () => {
       const response = await request(app)
         .post(`/api/resources/${resource.id}/edits`)
         .send({
-          proposedChanges: 'Some changes',
+          proposedChanges: { title: 'New Title' },
           proposedData: { title: 'New Title' },
         })
         .expect(401);
@@ -987,25 +874,18 @@ describe('Resources API Integration Tests', () => {
     });
 
     it('should return 400 for invalid resource id', async () => {
-      const agent = request.agent(app);
-      await agent
-        .post('/api/auth/local/login')
-        .send({
-          email: regularUserEmail,
-          password: regularUserPassword,
-        })
-        .expect(200);
+      const agent = await createClerkAuthenticatedAgent(app, regularUser);
 
       const response = await agent
         .post('/api/resources/invalid/edits')
         .send({
-          proposedChanges: 'Some changes',
+          proposedChanges: { title: 'New Title' },
           proposedData: { title: 'New Title' },
         })
         .expect(400);
 
       expect(response.body).toHaveProperty('message');
-      expect(response.body.message).toContain('Invalid resource ID');
+      expect(response.body.message).toContain('Invalid request parameters');
     });
 
     it('should allow admin to suggest edits', async () => {
@@ -1015,19 +895,12 @@ describe('Resources API Integration Tests', () => {
         status: 'approved',
       });
 
-      const agent = request.agent(app);
-      await agent
-        .post('/api/auth/local/login')
-        .send({
-          email: adminUserEmail,
-          password: adminUserPassword,
-        })
-        .expect(200);
+      const agent = await createClerkAuthenticatedAgent(app, adminUser);
 
       const response = await agent
         .post(`/api/resources/${resource.id}/edits`)
         .send({
-          proposedChanges: 'Admin suggested changes',
+          proposedChanges: { title: 'Admin Updated Title' },
           proposedData: { title: 'Admin Updated Title' },
         })
         .expect(201);
@@ -1042,19 +915,12 @@ describe('Resources API Integration Tests', () => {
         status: 'approved',
       });
 
-      const agent = request.agent(app);
-      await agent
-        .post('/api/auth/local/login')
-        .send({
-          email: regularUserEmail,
-          password: regularUserPassword,
-        })
-        .expect(200);
+      const agent = await createClerkAuthenticatedAgent(app, regularUser);
 
       const response = await agent
         .post(`/api/resources/${resource.id}/edits`)
         .send({
-          proposedChanges: 'AI-assisted changes',
+          proposedChanges: { title: 'AI Updated Title' },
           proposedData: { title: 'AI Updated Title' },
           claudeMetadata: {
             analysisId: 'claude-123',
@@ -1069,14 +935,7 @@ describe('Resources API Integration Tests', () => {
 
   describe('Resources API - Integration Flows', () => {
     it('should complete full resource lifecycle: create -> pending -> approve', async () => {
-      const regularAgent = request.agent(app);
-      await regularAgent
-        .post('/api/auth/local/login')
-        .send({
-          email: regularUserEmail,
-          password: regularUserPassword,
-        })
-        .expect(200);
+      const regularAgent = await createClerkAuthenticatedAgent(app, regularUser);
 
       // Step 1: User creates resource
       const createResponse = await regularAgent
@@ -1093,14 +952,7 @@ describe('Resources API Integration Tests', () => {
       const resourceId = createResponse.body.id;
 
       // Step 2: Resource appears in pending list for admin
-      const adminAgent = request.agent(app);
-      await adminAgent
-        .post('/api/auth/local/login')
-        .send({
-          email: adminUserEmail,
-          password: adminUserPassword,
-        })
-        .expect(200);
+      const adminAgent = await createClerkAuthenticatedAgent(app, adminUser);
 
       const pendingResponse = await adminAgent
         .get('/api/resources/pending')
@@ -1131,14 +983,7 @@ describe('Resources API Integration Tests', () => {
     });
 
     it('should prevent duplicate URLs', async () => {
-      const agent = request.agent(app);
-      await agent
-        .post('/api/auth/local/login')
-        .send({
-          email: regularUserEmail,
-          password: regularUserPassword,
-        })
-        .expect(200);
+      const agent = await createClerkAuthenticatedAgent(app, regularUser);
 
       const resourceData = {
         title: 'First Resource',
@@ -1164,32 +1009,25 @@ describe('Resources API Integration Tests', () => {
 
   describe('Resources API - Edge Cases', () => {
     it('should handle concurrent resource creation', async () => {
-      const agent = request.agent(app);
-      await agent
-        .post('/api/auth/local/login')
-        .send({
-          email: regularUserEmail,
-          password: regularUserPassword,
-        })
-        .expect(200);
+      const agent = await createClerkAuthenticatedAgent(app, regularUser);
 
       const requests = [
         agent.post('/api/resources').send({
           title: 'Concurrent 1',
           url: 'https://example.com/concurrent1',
-          description: 'Test',
+          description: 'Concurrent test resource',
           category: 'Test',
         }),
         agent.post('/api/resources').send({
           title: 'Concurrent 2',
           url: 'https://example.com/concurrent2',
-          description: 'Test',
+          description: 'Concurrent test resource',
           category: 'Test',
         }),
         agent.post('/api/resources').send({
           title: 'Concurrent 3',
           url: 'https://example.com/concurrent3',
-          description: 'Test',
+          description: 'Concurrent test resource',
           category: 'Test',
         }),
       ];
@@ -1202,14 +1040,7 @@ describe('Resources API Integration Tests', () => {
     });
 
     it('should handle very long resource title', async () => {
-      const agent = request.agent(app);
-      await agent
-        .post('/api/auth/local/login')
-        .send({
-          email: regularUserEmail,
-          password: regularUserPassword,
-        })
-        .expect(200);
+      const agent = await createClerkAuthenticatedAgent(app, regularUser);
 
       const longTitle = 'A'.repeat(500);
       const response = await agent
@@ -1226,14 +1057,7 @@ describe('Resources API Integration Tests', () => {
     });
 
     it('should handle unicode in resource data', async () => {
-      const agent = request.agent(app);
-      await agent
-        .post('/api/auth/local/login')
-        .send({
-          email: regularUserEmail,
-          password: regularUserPassword,
-        })
-        .expect(200);
+      const agent = await createClerkAuthenticatedAgent(app, regularUser);
 
       const response = await agent
         .post('/api/resources')

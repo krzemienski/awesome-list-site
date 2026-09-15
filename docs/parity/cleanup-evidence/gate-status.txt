@@ -1,0 +1,11 @@
+check=0
+lint=1
+lint:css=0
+test:unit=0
+validate:design-system-artifact=0
+dead-components=0
+dead-exports=0
+root-script-drift=0
+palette-drift=0
+build=0
+bundle=0

@@ -1,0 +1,90 @@
+Final cleanup validation — 2026-09-15 UTC (after Mockup Sandbox retirement)
+
+Retirement
+  listArtifacts → only artifacts/awesome-video-design-system (verified twice,
+    the second time after a workspace restart).
+  Workflow "artifacts/mockup-sandbox: Component Preview Server" removed; no
+    "mockup" token remains in .replit (parent reference and port 23636 gone).
+  82 tracked files removed (git rm -r artifacts/mockup-sandbox); evidence kept
+    in docs/parity/cleanup-evidence/mockup-sandbox-retired/.
+  Wiring updated: .gitignore, product-profile-drift.mjs, standalone palette
+    baseline (re-pinned, 0 legacy matches), trim-publish-image.mjs,
+    pre-publish-gate.sh comment, dead-exports.mjs wording, replit.md.
+  git status -- client server shared: empty (no runtime file touched).
+
+PASS npm run check
+PASS npm run lint:css
+PASS npm run test:unit — 15 files, 300 tests (unchanged since the earlier run;
+  no test or runtime file changed by the retirement).
+PASS npm run test:integration — 226/226 (earlier run on the same runtime tree).
+PASS npm run validate:openapi — 178 routes/contracts.
+PASS npm run build; npm run bundle:budget — initial raw 627.9 KiB / gzip
+  194.6 KiB / Brotli 163.6 KiB; the sandbox was never in the app bundle, so no
+  bundle reduction is claimed.
+PASS npm run validate:design-system-artifact
+PASS root-script-drift — 27 executable files, 0 stray.
+PASS dead-components — 214 in-scope files, 214 reachable.
+PASS dead-exports — 836 exports, 786 imported, 50 pre-existing exceptions.
+PASS palette-drift; standalone-palette-drift (2 roots, 0 legacy matches);
+  product-profile-drift (5 profiles).
+PASS git diff --check on task-written files (evidence reports re-trimmed; the
+  parity REPORT.md keeps its generated Markdown two-space line breaks); git
+  check-ignore anchoring (root screenshots/ ignored,
+  docs/screenshots/ not; ls-files -i -c = 0).
+PASS npm run test:parity (selected rows) — 16/16 PASS, run
+  tests/parity/baseline/2026-09-15T05-06-59-334Z-8206, disposable admin torn
+  down. Before/after table: parity-before-after.md.
+PASS production baseline compare, local candidate vs itself — 0 tracked
+  deltas for /, /about, /category/encoding-codecs (production-compare-self.md).
+INFO production baseline compare vs 2026-09-12 production — 16 tracked deltas,
+  all from merged page tasks and dev-catalog counts, none from this task
+  (production-compare-vs-2026-09-12.md).
+
+FAIL npm run lint — pre-existing. 4,893 findings in both the starting commit
+  and the retired tree over client/server/shared/scripts/tests; 0 new files,
+  0 per-file rule increases. Repository-wide total 5,347 errors / 23 warnings /
+  273 parsing errors. No rules disabled, no ignores, no baseline reset.
+FAIL npm run test:e2e (first run, superseded by the addendum below) — 700 tests: 488 passed, 207 failed, 5 did
+  not run. 139 = Firefox r1522 missing (environment; installed afterwards, no
+  pin change); 68 = stale search-dialog selectors, Clerk sign-in on
+  WebKit/Gecko, journey fixture 401 — all in specs unchanged since before the
+  starting commit. Details: e2e-and-lint-summary.md.
+
+Runtime
+  Start application restarted after the workspace restart; port 5000 serves.
+  Design-system artifact workflow restarted; port 20928 serves.
+  Raw /tmp logs for the lint diff, e2e and parity runs were lost in the
+  workspace restart; the parity run's results.json survives in the repository.
+
+Not done here (owned downstream)
+  Full-inventory parity rerun and post-publish production compare.
+
+Addendum — completion-review follow-up (2026-09-15, later UTC)
+PASS ds-button-sweep rerun — ALL 284 CHECKS PASSED (.cache/task569/
+  ds-button-sweep.log). The single earlier failure
+  (route-authed-home-h1s :: /?context=account, vacuous render total=0) did not
+  reproduce; it occurred directly after the workflow restart (cold-boot flake,
+  see .agents/memory/audit-cold-boot-flake.md). No gate was changed.
+DECISION shared ANTHROPIC_BASE_URL / ANTHROPIC_*_MODEL in .replit
+  [userenv.shared]: user chose to keep them as they are; risk recorded in
+  CLEANUP.md ("Shared Anthropic routing variables"). No env var changed.
+FAIL npm run test:e2e — authoritative full rerun on HEAD, Firefox r1522
+  present: 598 passed / 97 failed / 5 did not run (31.2 min). 0 launch errors;
+  the 97 are stale search selectors (41), Clerk fixture on WebKit/Gecko (37),
+  Firefox browse-categories crash cascade + WebKit assertions (11), journey
+  fixture 401 (5), Firefox favorites (3). Specs unchanged since the starting
+  commit. e2e-rerun-2026-09-15.txt; e2e-and-lint-summary.md.
+PASS ds-button-sweep and product-profile-browser after the confirm-step /
+  propagation-budget repairs (CLEANUP.md "Subsequent validation-tool
+  repairs"), each re-run with typecheck/build in parallel: 284/284 and PASS.
+PASS product-profile-browser now holds the db-heavy lease (it overlapped the
+  DB-outage gate inside the validation suite); verified started 5 s after
+  validate:resilience — both PASS (.cache/task569/ppb-vs-resilience.log).
+INFO completion-validation run 3: both repaired gates PASS; collections-audit
+  and auth-return-audit failed inside that run on Clerk UI sign-in ("did not
+  produce an authenticated session"; a client-trust verification that did not
+  complete). Both had passed in the two earlier runs and pass alone again
+  (collections 12/12; auth-return 26/1 once on the same client-trust step,
+  then 30/30). Clerk development-instance sign-in nondeterminism after the
+  full e2e suite and repeated validation runs; no file these gates exercise
+  was changed. Logs: .cache/task569/{collections-rerun,auth-return-rerun*}.log

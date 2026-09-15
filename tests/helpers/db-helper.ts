@@ -13,6 +13,7 @@ const { Pool } = pkg;
 import * as schema from '../../shared/schema';
 import { sql } from 'drizzle-orm';
 import { isTestDatabaseName } from './test-db-url';
+import { invalidatePublicCache } from '../../server/cache/publicCache';
 
 // Create a separate pool for tests
 let testPool: pkg.Pool | null = null;
@@ -94,6 +95,9 @@ export async function cleanupDatabase() {
     await db.delete(schema.rateLimitHits);
     await db.delete(schema.sessions);
     await db.delete(schema.users);
+    // Route-level catalog responses are process-cached, while these fixtures
+    // write directly through the test DB helper rather than repositories.
+    invalidatePublicCache('manual');
   } catch (error) {
     console.error('Error cleaning up database:', error);
     throw error;

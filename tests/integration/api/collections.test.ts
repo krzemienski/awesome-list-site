@@ -1,4 +1,4 @@
-import { afterAll, beforeAll, describe, expect, it } from "vitest";
+import { afterAll, afterEach, beforeAll, describe, expect, it } from "vitest";
 import express, { type Express } from "express";
 import request from "supertest";
 import { registerRoutes } from "../../../server/routes";
@@ -8,49 +8,49 @@ import {
   createTestResource,
   createTestUser,
 } from "../../helpers/db-helper";
-import { hashPassword } from "../../../server/passwordUtils";
+import {
+  cleanupClerkTestUsers,
+  createClerkAuthenticatedAgent,
+  installClerkTestMiddleware,
+} from "../../helpers/api-helper";
 
 describe("Collections and learning queue API", () => {
   let app: Express;
   let owner: ReturnType<typeof request.agent>;
   let other: ReturnType<typeof request.agent>;
+  let ownerUser: Awaited<ReturnType<typeof createTestUser>>;
+  let otherUser: Awaited<ReturnType<typeof createTestUser>>;
+
+  afterAll(async () => {
+    await cleanupClerkTestUsers();
+    await cleanupDatabase();
+    await closeTestDb();
+  });
 
   beforeAll(async () => {
     await cleanupDatabase();
     app = express();
     app.use(express.json());
     app.use(express.urlencoded({ extended: false }));
+    installClerkTestMiddleware(app);
     await registerRoutes(app);
 
-    const ownerPassword = "CollectionOwner123";
-    const otherPassword = "CollectionOther123";
-    const [ownerUser, otherUser] = await Promise.all([
+    [ownerUser, otherUser] = await Promise.all([
       createTestUser({
         email: "collection-owner@example.com",
-        password: await hashPassword(ownerPassword),
       }),
       createTestUser({
         email: "collection-other@example.com",
-        password: await hashPassword(otherPassword),
       }),
     ]);
     expect(ownerUser.id).not.toBe(otherUser.id);
 
-    owner = request.agent(app);
-    other = request.agent(app);
-    await owner
-      .post("/api/auth/local/login")
-      .send({ email: ownerUser.email, password: ownerPassword })
-      .expect(200);
-    await other
-      .post("/api/auth/local/login")
-      .send({ email: otherUser.email, password: otherPassword })
-      .expect(200);
+    owner = await createClerkAuthenticatedAgent(app, ownerUser);
+    other = await createClerkAuthenticatedAgent(app, otherUser);
   });
 
-  afterAll(async () => {
-    await cleanupDatabase();
-    await closeTestDb();
+  afterEach(async () => {
+    await cleanupClerkTestUsers();
   });
 
   it("preserves bookmarks while enforcing ownership, partial bulk, and private sharing", async () => {

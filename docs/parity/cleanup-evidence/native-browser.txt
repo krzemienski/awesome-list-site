@@ -1,0 +1,26 @@
+Replit native browser testing: SUCCESS for the scoped read-only visitor journey.
+
+Desktop 1440: home -> Encoding & Codecs -> AMD Advanced Media Acceleration
+(AMA) SDK detail (/resource/184847) -> Back -> About -> Clerk sign-in form.
+Verified populated category/resources, matching detail title, working
+navigation and sign-in entry. No credentials submitted.
+
+Mobile 375: populated home -> drawer -> Encoding & Codecs -> account menu ->
+Clerk sign-in form. No horizontal overflow or clipped sign-in controls.
+Intermediate 768/1024: populated home and category, no horizontal overflow.
+No CSS 404s, runtime page errors or failed HTTP responses on verified routes.
+No signup, database writes, credential entry, or auth bypass.
+
+Native evidence IDs:
+Desktop home oq0ntk, category b7mu4q, detail th9483, About dh66jl,
+Clerk 950bro; mobile home 9axm21, drawer d96tnx, category spn6jl,
+Clerk 6b933r; 1024 category vts8w9.
+Main agent examined desktop/mobile Clerk screenshots: form labels and
+controls visible within viewport, no overlaps or horizontal clipping.
+
+Scope limitations:
+Not a signed-in journey, full E2E suite, pixelmatch comparison, or production
+baseline comparison. Some captures contain transitional skeletons; populated
+content was separately verified by the tester's browser assertions.
+The public development hostname served the design-system artifact rather than
+the main app; the tester used app port 5000 to verify the correct application.

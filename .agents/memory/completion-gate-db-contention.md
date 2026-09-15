@@ -32,3 +32,18 @@ crawls. Any gate that (a) waits for a real listing to render in a browser or
 time; the tell is the failure timestamp overlapping the resilience/pool-probe
 log window in `.local/state/workflow-logs/<runId>/`. Add the lease rather than
 rerunning and hoping.
+
+**Any browser gate that loads real app routes needs the lease too** — not just
+crawl/outage gates. During the outage the app swaps routes for the app-level
+error surface, which unmounts client-side listeners (theme-provider storage
+sync), so an unrelated-looking check (cross-tab theme propagation) times out
+at the same step run after run while passing alone. The tell: fails only
+inside the concurrent completion suite; the lease timeline shows the outage
+gate releasing `db-heavy` minutes after the failure. Acquire `db-heavy`
+BEFORE the Playwright lease (repository lock order).
+
+**Sequential DOM sweeps must re-settle on an EMPTY sample, not only on
+strays** — a re-render landing between two collections (Clerk first-user
+observation swapping Home for its skeleton) leaves a later kind scanning an
+empty frame ("vacuous render total=0"), which a strays-only confirm step never
+retries.

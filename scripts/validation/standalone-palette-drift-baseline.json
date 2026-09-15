@@ -1,58 +1,7 @@
 {
-  "palette-classes": {
-    "artifacts/mockup-sandbox/src/components/mockups/brand-kit/LogoSystem.tsx": {
-      "border-blue-500": 1
-    },
-    "artifacts/mockup-sandbox/src/components/ui/toast.tsx": {
-      "ring-offset-red-600": 1,
-      "ring-red-400": 1,
-      "text-red-300": 1,
-      "text-red-50": 1
-    }
-  },
-  "hex-colors": {
-    "artifacts/mockup-sandbox/public/favicon.svg": {
-      "#ff3c00": 1
-    },
-    "artifacts/mockup-sandbox/src/components/mockups/brand-kit/BrandInAction.tsx": {
-      "#ff3d52": 10
-    },
-    "artifacts/mockup-sandbox/src/components/mockups/brand-kit/Guidelines.tsx": {
-      "#000000": 1,
-      "#a8a4a0": 3,
-      "#f4f3ee": 2,
-      "#ff3d52": 4,
-      "#ffb4be": 3
-    },
-    "artifacts/mockup-sandbox/src/components/mockups/brand-kit/LogoSystem.tsx": {
-      "#1e1e1e": 1,
-      "#2d2d2d": 1,
-      "#34d08c": 2,
-      "#5eddf2": 8,
-      "#b84dff": 6,
-      "#f4f3ee": 1,
-      "#ff3d52": 37,
-      "#ff5c7a": 1,
-      "#fff": 2
-    },
-    "artifacts/mockup-sandbox/src/components/ui/chart.tsx": {
-      "#ccc": 3,
-      "#fff": 2
-    }
-  },
-  "rgb-colors": {
-    "artifacts/mockup-sandbox/src/components/mockups/brand-kit/LogoSystem.tsx": {
-      "rgba(0,0,0,0.5)": 1,
-      "rgba(255,61,82,0.3)": 1
-    }
-  },
-  "raw-radii": {
-    "artifacts/mockup-sandbox/src/components/mockups/brand-kit/LogoSystem.tsx": {
-      "rounded-[14px]": 1
-    },
-    "artifacts/mockup-sandbox/src/components/ui/chart.tsx": {
-      "rounded-[2px]": 2
-    }
-  },
+  "palette-classes": {},
+  "hex-colors": {},
+  "rgb-colors": {},
+  "raw-radii": {},
   "font-family": {}
 }

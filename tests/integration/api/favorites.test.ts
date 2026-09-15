@@ -10,7 +10,7 @@
  * - GET /api/bookmarks - Get user's bookmarks
  */
 
-import { describe, it, expect, beforeEach, afterAll } from 'vitest';
+import { describe, it, expect, beforeEach, afterAll, afterEach } from 'vitest';
 import express, { type Express } from 'express';
 import request from 'supertest';
 import { registerRoutes } from '../../../server/routes';
@@ -20,16 +20,18 @@ import {
   createTestResource,
   closeTestDb,
 } from '../../helpers/db-helper';
-import { hashPassword } from '../../../server/passwordUtils';
+import {
+  cleanupClerkTestUsers,
+  createClerkAuthenticatedAgent,
+  installClerkTestMiddleware,
+} from '../../helpers/api-helper';
 
 describe('Favorites and Bookmarks API Integration Tests', () => {
   let app: Express;
-  let user1Email: string;
-  let user1Password: string;
   let user1Id: string;
-  let user2Email: string;
-  let user2Password: string;
   let user2Id: string;
+  let user1: Awaited<ReturnType<typeof createTestUser>>;
+  let user2: Awaited<ReturnType<typeof createTestUser>>;
 
   beforeEach(async () => {
     // Clean database before each test
@@ -39,16 +41,12 @@ describe('Favorites and Bookmarks API Integration Tests', () => {
     app = express();
     app.use(express.json());
     app.use(express.urlencoded({ extended: false }));
+    installClerkTestMiddleware(app);
     await registerRoutes(app);
 
     // Create first user
-    user1Email = `user1-${Date.now()}@example.com`;
-    user1Password = 'User1Password123';
-    const user1HashedPassword = await hashPassword(user1Password);
-
-    const user1 = await createTestUser({
-      email: user1Email,
-      password: user1HashedPassword,
+    user1 = await createTestUser({
+      email: `user1-${Date.now()}@example.com`,
       firstName: 'User',
       lastName: 'One',
       role: 'user',
@@ -56,13 +54,8 @@ describe('Favorites and Bookmarks API Integration Tests', () => {
     user1Id = user1.id;
 
     // Create second user
-    user2Email = `user2-${Date.now()}@example.com`;
-    user2Password = 'User2Password123';
-    const user2HashedPassword = await hashPassword(user2Password);
-
-    const user2 = await createTestUser({
-      email: user2Email,
-      password: user2HashedPassword,
+    user2 = await createTestUser({
+      email: `user2-${Date.now()}@example.com`,
       firstName: 'User',
       lastName: 'Two',
       role: 'user',
@@ -71,7 +64,12 @@ describe('Favorites and Bookmarks API Integration Tests', () => {
   });
 
   afterAll(async () => {
+    await cleanupClerkTestUsers();
     await closeTestDb();
+  });
+
+  afterEach(async () => {
+    await cleanupClerkTestUsers();
   });
 
   // ============= FAVORITES TESTS =============
@@ -84,14 +82,7 @@ describe('Favorites and Bookmarks API Integration Tests', () => {
         status: 'approved',
       });
 
-      const agent = request.agent(app);
-      await agent
-        .post('/api/auth/local/login')
-        .send({
-          email: user1Email,
-          password: user1Password,
-        })
-        .expect(200);
+      const agent = await createClerkAuthenticatedAgent(app, user1);
 
       const response = await agent
         .post(`/api/favorites/${resource.id}`)
@@ -125,18 +116,11 @@ describe('Favorites and Bookmarks API Integration Tests', () => {
     });
 
     it('should handle invalid resource id', async () => {
-      const agent = request.agent(app);
-      await agent
-        .post('/api/auth/local/login')
-        .send({
-          email: user1Email,
-          password: user1Password,
-        })
-        .expect(200);
+      const agent = await createClerkAuthenticatedAgent(app, user1);
 
       const response = await agent
         .post('/api/favorites/invalid')
-        .expect(500);
+        .expect(400);
 
       expect(response.body).toHaveProperty('message');
     });
@@ -149,28 +133,14 @@ describe('Favorites and Bookmarks API Integration Tests', () => {
       });
 
       // User 1 favorites
-      const agent1 = request.agent(app);
-      await agent1
-        .post('/api/auth/local/login')
-        .send({
-          email: user1Email,
-          password: user1Password,
-        })
-        .expect(200);
+      const agent1 = await createClerkAuthenticatedAgent(app, user1);
 
       await agent1
         .post(`/api/favorites/${resource.id}`)
         .expect(200);
 
       // User 2 favorites
-      const agent2 = request.agent(app);
-      await agent2
-        .post('/api/auth/local/login')
-        .send({
-          email: user2Email,
-          password: user2Password,
-        })
-        .expect(200);
+      const agent2 = await createClerkAuthenticatedAgent(app, user2);
 
       await agent2
         .post(`/api/favorites/${resource.id}`)
@@ -191,14 +161,7 @@ describe('Favorites and Bookmarks API Integration Tests', () => {
         status: 'approved',
       });
 
-      const agent = request.agent(app);
-      await agent
-        .post('/api/auth/local/login')
-        .send({
-          email: user1Email,
-          password: user1Password,
-        })
-        .expect(200);
+      const agent = await createClerkAuthenticatedAgent(app, user1);
 
       // Add favorite first time
       await agent
@@ -222,14 +185,7 @@ describe('Favorites and Bookmarks API Integration Tests', () => {
         status: 'approved',
       });
 
-      const agent = request.agent(app);
-      await agent
-        .post('/api/auth/local/login')
-        .send({
-          email: user1Email,
-          password: user1Password,
-        })
-        .expect(200);
+      const agent = await createClerkAuthenticatedAgent(app, user1);
 
       // Add favorite first
       await agent
@@ -274,14 +230,7 @@ describe('Favorites and Bookmarks API Integration Tests', () => {
         status: 'approved',
       });
 
-      const agent = request.agent(app);
-      await agent
-        .post('/api/auth/local/login')
-        .send({
-          email: user1Email,
-          password: user1Password,
-        })
-        .expect(200);
+      const agent = await createClerkAuthenticatedAgent(app, user1);
 
       // Remove favorite that was never added
       const response = await agent
@@ -299,28 +248,14 @@ describe('Favorites and Bookmarks API Integration Tests', () => {
       });
 
       // User 1 adds favorite
-      const agent1 = request.agent(app);
-      await agent1
-        .post('/api/auth/local/login')
-        .send({
-          email: user1Email,
-          password: user1Password,
-        })
-        .expect(200);
+      const agent1 = await createClerkAuthenticatedAgent(app, user1);
 
       await agent1
         .post(`/api/favorites/${resource.id}`)
         .expect(200);
 
       // User 2 removes (should not affect user 1)
-      const agent2 = request.agent(app);
-      await agent2
-        .post('/api/auth/local/login')
-        .send({
-          email: user2Email,
-          password: user2Password,
-        })
-        .expect(200);
+      const agent2 = await createClerkAuthenticatedAgent(app, user2);
 
       await agent2
         .delete(`/api/favorites/${resource.id}`);
@@ -345,14 +280,7 @@ describe('Favorites and Bookmarks API Integration Tests', () => {
         status: 'approved',
       });
 
-      const agent = request.agent(app);
-      await agent
-        .post('/api/auth/local/login')
-        .send({
-          email: user1Email,
-          password: user1Password,
-        })
-        .expect(200);
+      const agent = await createClerkAuthenticatedAgent(app, user1);
 
       // Add favorites
       await agent.post(`/api/favorites/${resource1.id}`).expect(200);
@@ -379,14 +307,7 @@ describe('Favorites and Bookmarks API Integration Tests', () => {
     });
 
     it('should return empty array when user has no favorites', async () => {
-      const agent = request.agent(app);
-      await agent
-        .post('/api/auth/local/login')
-        .send({
-          email: user1Email,
-          password: user1Password,
-        })
-        .expect(200);
+      const agent = await createClerkAuthenticatedAgent(app, user1);
 
       const response = await agent
         .get('/api/favorites')
@@ -409,26 +330,12 @@ describe('Favorites and Bookmarks API Integration Tests', () => {
       });
 
       // User 1 favorites resource 1
-      const agent1 = request.agent(app);
-      await agent1
-        .post('/api/auth/local/login')
-        .send({
-          email: user1Email,
-          password: user1Password,
-        })
-        .expect(200);
+      const agent1 = await createClerkAuthenticatedAgent(app, user1);
 
       await agent1.post(`/api/favorites/${resource1.id}`).expect(200);
 
       // User 2 favorites resource 2
-      const agent2 = request.agent(app);
-      await agent2
-        .post('/api/auth/local/login')
-        .send({
-          email: user2Email,
-          password: user2Password,
-        })
-        .expect(200);
+      const agent2 = await createClerkAuthenticatedAgent(app, user2);
 
       await agent2.post(`/api/favorites/${resource2.id}`).expect(200);
 
@@ -454,14 +361,7 @@ describe('Favorites and Bookmarks API Integration Tests', () => {
         status: 'approved',
       });
 
-      const agent = request.agent(app);
-      await agent
-        .post('/api/auth/local/login')
-        .send({
-          email: user1Email,
-          password: user1Password,
-        })
-        .expect(200);
+      const agent = await createClerkAuthenticatedAgent(app, user1);
 
       const response = await agent
         .post(`/api/bookmarks/${resource.id}`)
@@ -487,14 +387,7 @@ describe('Favorites and Bookmarks API Integration Tests', () => {
         status: 'approved',
       });
 
-      const agent = request.agent(app);
-      await agent
-        .post('/api/auth/local/login')
-        .send({
-          email: user1Email,
-          password: user1Password,
-        })
-        .expect(200);
+      const agent = await createClerkAuthenticatedAgent(app, user1);
 
       const bookmarkNotes = 'Remember to watch this later for the Redux section';
 
@@ -519,14 +412,7 @@ describe('Favorites and Bookmarks API Integration Tests', () => {
         status: 'approved',
       });
 
-      const agent = request.agent(app);
-      await agent
-        .post('/api/auth/local/login')
-        .send({
-          email: user1Email,
-          password: user1Password,
-        })
-        .expect(200);
+      const agent = await createClerkAuthenticatedAgent(app, user1);
 
       await agent
         .post(`/api/bookmarks/${resource.id}`)
@@ -562,14 +448,7 @@ describe('Favorites and Bookmarks API Integration Tests', () => {
       });
 
       // User 1 bookmarks
-      const agent1 = request.agent(app);
-      await agent1
-        .post('/api/auth/local/login')
-        .send({
-          email: user1Email,
-          password: user1Password,
-        })
-        .expect(200);
+      const agent1 = await createClerkAuthenticatedAgent(app, user1);
 
       await agent1
         .post(`/api/bookmarks/${resource.id}`)
@@ -577,14 +456,7 @@ describe('Favorites and Bookmarks API Integration Tests', () => {
         .expect(200);
 
       // User 2 bookmarks
-      const agent2 = request.agent(app);
-      await agent2
-        .post('/api/auth/local/login')
-        .send({
-          email: user2Email,
-          password: user2Password,
-        })
-        .expect(200);
+      const agent2 = await createClerkAuthenticatedAgent(app, user2);
 
       await agent2
         .post(`/api/bookmarks/${resource.id}`)
@@ -609,14 +481,7 @@ describe('Favorites and Bookmarks API Integration Tests', () => {
         status: 'approved',
       });
 
-      const agent = request.agent(app);
-      await agent
-        .post('/api/auth/local/login')
-        .send({
-          email: user1Email,
-          password: user1Password,
-        })
-        .expect(200);
+      const agent = await createClerkAuthenticatedAgent(app, user1);
 
       // Add bookmark first time
       await agent
@@ -642,14 +507,7 @@ describe('Favorites and Bookmarks API Integration Tests', () => {
         status: 'approved',
       });
 
-      const agent = request.agent(app);
-      await agent
-        .post('/api/auth/local/login')
-        .send({
-          email: user1Email,
-          password: user1Password,
-        })
-        .expect(200);
+      const agent = await createClerkAuthenticatedAgent(app, user1);
 
       // Add bookmark first
       await agent
@@ -695,14 +553,7 @@ describe('Favorites and Bookmarks API Integration Tests', () => {
         status: 'approved',
       });
 
-      const agent = request.agent(app);
-      await agent
-        .post('/api/auth/local/login')
-        .send({
-          email: user1Email,
-          password: user1Password,
-        })
-        .expect(200);
+      const agent = await createClerkAuthenticatedAgent(app, user1);
 
       // Remove bookmark that was never added
       const response = await agent
@@ -720,14 +571,7 @@ describe('Favorites and Bookmarks API Integration Tests', () => {
       });
 
       // User 1 adds bookmark
-      const agent1 = request.agent(app);
-      await agent1
-        .post('/api/auth/local/login')
-        .send({
-          email: user1Email,
-          password: user1Password,
-        })
-        .expect(200);
+      const agent1 = await createClerkAuthenticatedAgent(app, user1);
 
       await agent1
         .post(`/api/bookmarks/${resource.id}`)
@@ -735,14 +579,7 @@ describe('Favorites and Bookmarks API Integration Tests', () => {
         .expect(200);
 
       // User 2 removes (should not affect user 1)
-      const agent2 = request.agent(app);
-      await agent2
-        .post('/api/auth/local/login')
-        .send({
-          email: user2Email,
-          password: user2Password,
-        })
-        .expect(200);
+      const agent2 = await createClerkAuthenticatedAgent(app, user2);
 
       await agent2
         .delete(`/api/bookmarks/${resource.id}`);
@@ -767,14 +604,7 @@ describe('Favorites and Bookmarks API Integration Tests', () => {
         status: 'approved',
       });
 
-      const agent = request.agent(app);
-      await agent
-        .post('/api/auth/local/login')
-        .send({
-          email: user1Email,
-          password: user1Password,
-        })
-        .expect(200);
+      const agent = await createClerkAuthenticatedAgent(app, user1);
 
       // Add bookmarks
       await agent
@@ -808,14 +638,7 @@ describe('Favorites and Bookmarks API Integration Tests', () => {
     });
 
     it('should return empty array when user has no bookmarks', async () => {
-      const agent = request.agent(app);
-      await agent
-        .post('/api/auth/local/login')
-        .send({
-          email: user1Email,
-          password: user1Password,
-        })
-        .expect(200);
+      const agent = await createClerkAuthenticatedAgent(app, user1);
 
       const response = await agent
         .get('/api/bookmarks')
@@ -838,14 +661,7 @@ describe('Favorites and Bookmarks API Integration Tests', () => {
       });
 
       // User 1 bookmarks resource 1
-      const agent1 = request.agent(app);
-      await agent1
-        .post('/api/auth/local/login')
-        .send({
-          email: user1Email,
-          password: user1Password,
-        })
-        .expect(200);
+      const agent1 = await createClerkAuthenticatedAgent(app, user1);
 
       await agent1
         .post(`/api/bookmarks/${resource1.id}`)
@@ -853,14 +669,7 @@ describe('Favorites and Bookmarks API Integration Tests', () => {
         .expect(200);
 
       // User 2 bookmarks resource 2
-      const agent2 = request.agent(app);
-      await agent2
-        .post('/api/auth/local/login')
-        .send({
-          email: user2Email,
-          password: user2Password,
-        })
-        .expect(200);
+      const agent2 = await createClerkAuthenticatedAgent(app, user2);
 
       await agent2
         .post(`/api/bookmarks/${resource2.id}`)
@@ -891,14 +700,7 @@ describe('Favorites and Bookmarks API Integration Tests', () => {
         status: 'approved',
       });
 
-      const agent = request.agent(app);
-      await agent
-        .post('/api/auth/local/login')
-        .send({
-          email: user1Email,
-          password: user1Password,
-        })
-        .expect(200);
+      const agent = await createClerkAuthenticatedAgent(app, user1);
 
       // Add favorite
       await agent
@@ -940,14 +742,7 @@ describe('Favorites and Bookmarks API Integration Tests', () => {
         }),
       ]);
 
-      const agent = request.agent(app);
-      await agent
-        .post('/api/auth/local/login')
-        .send({
-          email: user1Email,
-          password: user1Password,
-        })
-        .expect(200);
+      const agent = await createClerkAuthenticatedAgent(app, user1);
 
       // Favorite resources 1 and 2
       await agent.post(`/api/favorites/${resources[0].id}`).expect(200);
@@ -980,14 +775,7 @@ describe('Favorites and Bookmarks API Integration Tests', () => {
         status: 'approved',
       });
 
-      const agent = request.agent(app);
-      await agent
-        .post('/api/auth/local/login')
-        .send({
-          email: user1Email,
-          password: user1Password,
-        })
-        .expect(200);
+      const agent = await createClerkAuthenticatedAgent(app, user1);
 
       // Add both favorite and bookmark
       await agent.post(`/api/favorites/${resource.id}`).expect(200);
@@ -1010,14 +798,7 @@ describe('Favorites and Bookmarks API Integration Tests', () => {
 
   describe('Favorites and Bookmarks - Edge Cases', () => {
     it('should handle non-existent resource id gracefully', async () => {
-      const agent = request.agent(app);
-      await agent
-        .post('/api/auth/local/login')
-        .send({
-          email: user1Email,
-          password: user1Password,
-        })
-        .expect(200);
+      const agent = await createClerkAuthenticatedAgent(app, user1);
 
       const favResponse = await agent
         .post('/api/favorites/99999');
@@ -1037,14 +818,7 @@ describe('Favorites and Bookmarks API Integration Tests', () => {
         status: 'approved',
       });
 
-      const agent = request.agent(app);
-      await agent
-        .post('/api/auth/local/login')
-        .send({
-          email: user1Email,
-          password: user1Password,
-        })
-        .expect(200);
+      const agent = await createClerkAuthenticatedAgent(app, user1);
 
       const longNotes = 'A'.repeat(5000);
 
@@ -1063,14 +837,7 @@ describe('Favorites and Bookmarks API Integration Tests', () => {
         status: 'approved',
       });
 
-      const agent = request.agent(app);
-      await agent
-        .post('/api/auth/local/login')
-        .send({
-          email: user1Email,
-          password: user1Password,
-        })
-        .expect(200);
+      const agent = await createClerkAuthenticatedAgent(app, user1);
 
       const unicodeNotes = 'Important! 🚀 中文 العربية Remember for later 💻';
 
@@ -1104,14 +871,7 @@ describe('Favorites and Bookmarks API Integration Tests', () => {
         }),
       ]);
 
-      const agent = request.agent(app);
-      await agent
-        .post('/api/auth/local/login')
-        .send({
-          email: user1Email,
-          password: user1Password,
-        })
-        .expect(200);
+      const agent = await createClerkAuthenticatedAgent(app, user1);
 
       // Concurrent operations
       const operations = [

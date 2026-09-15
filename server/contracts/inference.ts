@@ -204,6 +204,10 @@ export function inferParamsSchema(
       // This legacy route intentionally delegates the reserved literal to the
       // later /api/bookmarks/bulk route via next("route").
       schema = z.union([boundedIntStringSchema, z.literal("bulk")]);
+    } else if (p.name === "id" && /^\/api\/admin\/users\/:id(?:\/|$)/.test(path)) {
+      // User bridge IDs are varchar (including Clerk-linked UUIDs), unlike
+      // the integer resource IDs. Keep validation without coercing identity.
+      schema = boundedSafeStringSchema;
     } else if (isIdParamName(p.name) || digitPattern) {
       schema = boundedIntStringSchema;
     } else if (p.pattern) {

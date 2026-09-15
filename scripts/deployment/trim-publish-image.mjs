@@ -7,7 +7,6 @@ import { fileURLToPath } from "node:url";
 const targets = [
   "tests/parity/baseline",
   ".cache/ms-playwright",
-  "artifacts/mockup-sandbox/node_modules",
 ];
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "../..");
 const mode = process.argv[2] ?? "--dry-run";

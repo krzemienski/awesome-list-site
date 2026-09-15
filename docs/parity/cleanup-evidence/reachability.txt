@@ -1,0 +1,16 @@
+b190c8fe6e558874b118fffeaa2b62cd6a231c1e
+CANDIDATE admin-dashboard-demo
+grep-exit=1 (1 means no hits)
+CANDIDATE category-navigation-demo
+grep-exit=1 (1 means no hits)
+CANDIDATE screenshot-demo
+grep-exit=1 (1 means no hits)
+7c5a117ddce55869a3fb81fd64e0345340550687cbbefcfd9a2bc450a6c689de  .github/PULL_REQUEST_TEMPLATE.md
+7c5a117ddce55869a3fb81fd64e0345340550687cbbefcfd9a2bc450a6c689de  .github/pull_request_template.md
+23696 scripts/admin-dashboard-demo.html
+10388 scripts/category-navigation-demo.html
+ 5550 scripts/screenshot-demo.html
+ 1481 .github/pull_request_template.md
+41115 total
+.gitignore:110:/screenshots/	screenshots/probe.png
+.gitignore:123:/artifacts/mockup-sandbox/dist/	artifacts/mockup-sandbox/dist/probe.js

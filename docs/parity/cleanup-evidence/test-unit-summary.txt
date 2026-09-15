@@ -1,0 +1,6 @@
+🧪 Test database is ready.
+
+ Test Files  15 passed (15)
+      Tests  300 passed (300)
+   Start at  23:57:54
+   Duration  8.28s (transform 2.66s, setup 8.43s, import 3.38s, tests 12.71s, environment 3ms)

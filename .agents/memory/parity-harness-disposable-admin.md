@@ -1,14 +1,11 @@
 ---
 name: Parity harness disposable Clerk admin
-description: Rules for an automated create → sign-in → promote → delete Clerk admin in a capture harness (numeric bridge id, admin reads via page fetch, frozen clock vs token refresh, fail-closed sweep, main-scoped identity checks).
+description: Rules for disposable Clerk admins in capture harnesses: page fetch, token refresh, cleanup verification and main-scoped identity checks.
 ---
 
-- **Bridge id / Clerk `external_id` must be a random integer** (2 000 000 000–
-  2 147 483 647): the admin user routes type `:id` as a bounded int4, so a
-  prefixed string id is JIT-provisioned on sign-in but can never be renamed,
-  promoted or deleted through the API (residue only SQL removes). Put the
-  `__qa_test_` prefix on the **email** and sweep by `email LIKE '__qa_test_%'`
-  (the admin users `q=` search and Clerk `?query=` both match it).
+- **Put the `__qa_test_` prefix on the email**, not just the bridge ID, so
+  disposable accounts remain discoverable in both identity systems.
+  Delete only identities owned by the current run when workers run concurrently.
 - **Admin reads use the signed-in page's `fetch(..., {credentials:"include"})`**,
   not `context.request` (shares the jar yet gets 401 on `/api/admin/*`).
 - **Frozen clock stops ClerkJS refreshing its ~60 s token.** Snapshot a fresh

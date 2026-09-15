@@ -1,5 +1,29 @@
 import { defineConfig, devices } from '@playwright/test';
+import { webkit } from 'playwright';
 import path from 'path';
+
+const hasReplitNixWebKitRuntime = Boolean(process.env.REPLIT_LD_LIBRARY_PATH?.trim());
+
+/*
+ * The WebKitGTK 2311 bundle resolves against the Nix-provisioned ICU 74,
+ * atomic, harfbuzz-icu, JPEG, and GLES sonames verified in this workspace.
+ * Playwright's host check only consults ldconfig, so keep its skip flag and
+ * the stock bundled executable scoped to the two WebKit projects. The
+ * executable is the stock launcher, not a custom ABI wrapper;
+ * headless:false selects bundled GTK.
+ */
+const replitWebKitLaunch = hasReplitNixWebKitRuntime
+  ? {
+      headless: false,
+      launchOptions: {
+        executablePath: webkit.executablePath(),
+        env: {
+          ...process.env,
+          PLAYWRIGHT_SKIP_VALIDATE_HOST_REQUIREMENTS: '1',
+        },
+      },
+    }
+  : {};
 
 /**
  * Playwright configuration for E2E tests
@@ -52,7 +76,7 @@ export default defineConfig({
     },
     {
       name: 'webkit',
-      use: { ...devices['Desktop Safari'] },
+      use: { ...devices['Desktop Safari'], ...replitWebKitLaunch },
     },
     // Mobile viewports
     {
@@ -61,7 +85,7 @@ export default defineConfig({
     },
     {
       name: 'Mobile Safari',
-      use: { ...devices['iPhone 12'] },
+      use: { ...devices['iPhone 12'], ...replitWebKitLaunch },
     },
   ],
 

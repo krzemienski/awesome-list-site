@@ -1,0 +1,34 @@
+Initial E2E prerequisite inspection (no browser suite run):
+
+The installed Playwright package resolves these executables:
+- chromium: .cache/ms-playwright/chromium-1228/chrome-linux64/chrome — absent
+- firefox: .cache/ms-playwright/firefox-1532/firefox/firefox — absent
+- webkit: .cache/ms-playwright/webkit-2311/pw_run.sh — absent
+
+Existing cache entries:
+chromium-1223, chromium_headless_shell-1223, ffmpeg-1011
+
+playwright.config.ts defines Chromium, Firefox, WebKit, Mobile Chrome and
+Mobile Safari projects without executablePath overrides.
+Therefore the configured E2E suite cannot launch its expected browsers in
+this checkout. This is a prerequisite failure, not an executed E2E result.
+The parity harness separately pins Chromium 1223; do not replace that pinned
+reference browser or claim its availability satisfies the E2E configuration.
+
+Artifact registry recheck:
+listArtifacts still returns artifacts/mockup-sandbox and
+artifacts/awesome-video-design-system. No documented deregistration callback
+was found in the available artifact skills. No registry mutation attempted.
+
+Subsequent prerequisite repair:
+Command: PLAYWRIGHT_SKIP_BROWSER_GC=1 node node_modules/playwright/cli.js install chromium firefox webkit
+Result: installed the package-matched browsers without garbage-collecting
+the pinned parity browser. No dependency manifest or test configuration changed.
+Sequential real launch/close checks:
+- Chromium: PASS
+- Firefox: PASS
+- WebKit: FAIL, host libraries missing (including GTK4, GStreamer and ICU 74).
+- .cache/ms-playwright/chromium-1223/chrome-linux64/chrome: still present.
+
+This repairs the missing executable blocker for Chromium and Firefox only.
+Browser launch is not an E2E suite pass. WebKit and Mobile Safari remain blocked.

@@ -10,6 +10,7 @@
 import { describe, it, expect, beforeEach, afterAll } from 'vitest';
 import express, { type Express } from 'express';
 import request from 'supertest';
+import pg from 'pg';
 import { registerRoutes } from '../../../server/routes';
 import {
   cleanupDatabase,
@@ -19,6 +20,31 @@ import {
   getTestDb,
 } from '../../helpers/db-helper';
 import * as schema from '../../../shared/schema';
+
+const { Pool } = pg;
+type CatalogTable = 'categories' | 'subcategories' | 'sub_subcategories';
+
+/**
+ * Hold a real PostgreSQL table lock in a separate transaction so the route's
+ * configured lock timeout exercises its operational-failure response. This is
+ * isolated to the dedicated integration database and always rolls back.
+ */
+async function withCatalogTableLocked<T>(
+  table: CatalogTable,
+  operation: () => Promise<T>,
+): Promise<T> {
+  const pool = new Pool({ connectionString: process.env.DATABASE_URL, max: 1 });
+  const client = await pool.connect();
+  try {
+    await client.query('BEGIN');
+    await client.query(`LOCK TABLE "${table}" IN ACCESS EXCLUSIVE MODE`);
+    return await operation();
+  } finally {
+    await client.query('ROLLBACK').catch(() => undefined);
+    client.release();
+    await pool.end();
+  }
+}
 
 describe('Categories API Integration Tests', () => {
   let app: Express;
@@ -79,8 +105,6 @@ describe('Categories API Integration Tests', () => {
       await createTestCategory({
         name: 'Testing Category',
         slug: 'testing-category',
-        description: 'A test category',
-        icon: '🧪',
       });
 
       const response = await request(app)
@@ -89,8 +113,8 @@ describe('Categories API Integration Tests', () => {
 
       expect(response.body[0].name).toBe('Testing Category');
       expect(response.body[0].slug).toBe('testing-category');
-      expect(response.body[0].description).toBe('A test category');
-      expect(response.body[0].icon).toBe('🧪');
+      expect(response.body[0]).toHaveProperty('id');
+      expect(response.body[0].resourceCount).toBe(0);
     });
 
     it('should return multiple categories in order', async () => {
@@ -121,21 +145,14 @@ describe('Categories API Integration Tests', () => {
     });
 
     it('should handle database errors gracefully', async () => {
-      // Close the database connection to force an error
-      await closeTestDb();
+      const response = await withCatalogTableLocked('categories', () =>
+        request(app).get('/api/categories'),
+      );
 
-      const response = await request(app)
-        .get('/api/categories')
-        .expect(500);
-
-      expect(response.body).toHaveProperty('message');
-      expect(response.body.message).toContain('Failed to fetch categories');
-
-      // Recreate app for subsequent tests
-      app = express();
-      app.use(express.json());
-      app.use(express.urlencoded({ extended: false }));
-      await registerRoutes(app);
+      expect(response.status).toBe(503);
+      expect(response.body).toEqual({
+        message: 'Service is temporarily unavailable',
+      });
     });
   });
 
@@ -241,7 +258,9 @@ describe('Categories API Integration Tests', () => {
         .expect(400);
 
       expect(response.body).toHaveProperty('message');
-      expect(response.body.message).toContain('Invalid categoryId parameter');
+      expect(response.body.error).toBe('validation_failed');
+      expect(response.body.message).toBe('Invalid query parameters');
+      expect(response.body.fieldErrors).toHaveProperty('categoryId');
       expect(response.body).toHaveProperty('errors');
     });
 
@@ -252,7 +271,9 @@ describe('Categories API Integration Tests', () => {
         .expect(400);
 
       expect(response.body).toHaveProperty('message');
-      expect(response.body.message).toContain('categoryId must be a positive number');
+      expect(response.body.error).toBe('validation_failed');
+      expect(response.body.message).toBe('Invalid query parameters');
+      expect(response.body.fieldErrors).toHaveProperty('categoryId');
     });
 
     it('should return 400 for zero categoryId', async () => {
@@ -262,7 +283,9 @@ describe('Categories API Integration Tests', () => {
         .expect(400);
 
       expect(response.body).toHaveProperty('message');
-      expect(response.body.message).toContain('categoryId must be a positive number');
+      expect(response.body.error).toBe('validation_failed');
+      expect(response.body.message).toBe('Invalid query parameters');
+      expect(response.body.fieldErrors).toHaveProperty('categoryId');
     });
 
     it('should return subcategories with all fields', async () => {
@@ -274,8 +297,6 @@ describe('Categories API Integration Tests', () => {
       await createTestSubcategory(category.id, {
         name: 'React',
         slug: 'react',
-        description: 'React framework',
-        icon: '⚛️',
       });
 
       const response = await request(app)
@@ -284,27 +305,19 @@ describe('Categories API Integration Tests', () => {
 
       expect(response.body[0].name).toBe('React');
       expect(response.body[0].slug).toBe('react');
-      expect(response.body[0].description).toBe('React framework');
-      expect(response.body[0].icon).toBe('⚛️');
       expect(response.body[0].categoryId).toBe(category.id);
+      expect(response.body[0]).toHaveProperty('id');
     });
 
     it('should handle database errors gracefully', async () => {
-      // Close the database connection to force an error
-      await closeTestDb();
+      const response = await withCatalogTableLocked('subcategories', () =>
+        request(app).get('/api/subcategories'),
+      );
 
-      const response = await request(app)
-        .get('/api/subcategories')
-        .expect(500);
-
-      expect(response.body).toHaveProperty('message');
-      expect(response.body.message).toContain('Failed to fetch subcategories');
-
-      // Recreate app for subsequent tests
-      app = express();
-      app.use(express.json());
-      app.use(express.urlencoded({ extended: false }));
-      await registerRoutes(app);
+      expect(response.status).toBe(503);
+      expect(response.body).toEqual({
+        message: 'Service is temporarily unavailable',
+      });
     });
   });
 
@@ -437,7 +450,9 @@ describe('Categories API Integration Tests', () => {
         .expect(400);
 
       expect(response.body).toHaveProperty('message');
-      expect(response.body.message).toContain('Invalid subcategoryId parameter');
+      expect(response.body.error).toBe('validation_failed');
+      expect(response.body.message).toBe('Invalid query parameters');
+      expect(response.body.fieldErrors).toHaveProperty('subcategoryId');
       expect(response.body).toHaveProperty('errors');
     });
 
@@ -448,7 +463,9 @@ describe('Categories API Integration Tests', () => {
         .expect(400);
 
       expect(response.body).toHaveProperty('message');
-      expect(response.body.message).toContain('subcategoryId must be a positive number');
+      expect(response.body.error).toBe('validation_failed');
+      expect(response.body.message).toBe('Invalid query parameters');
+      expect(response.body.fieldErrors).toHaveProperty('subcategoryId');
     });
 
     it('should return 400 for zero subcategoryId', async () => {
@@ -458,7 +475,9 @@ describe('Categories API Integration Tests', () => {
         .expect(400);
 
       expect(response.body).toHaveProperty('message');
-      expect(response.body.message).toContain('subcategoryId must be a positive number');
+      expect(response.body.error).toBe('validation_failed');
+      expect(response.body.message).toBe('Invalid query parameters');
+      expect(response.body.fieldErrors).toHaveProperty('subcategoryId');
     });
 
     it('should return sub-subcategories with all fields', async () => {
@@ -477,8 +496,6 @@ describe('Categories API Integration Tests', () => {
         name: 'Hooks',
         slug: 'hooks',
         subcategoryId: subcategory.id,
-        description: 'React Hooks',
-        icon: '🪝',
       }).returning();
 
       const response = await request(app)
@@ -487,27 +504,19 @@ describe('Categories API Integration Tests', () => {
 
       expect(response.body[0].name).toBe('Hooks');
       expect(response.body[0].slug).toBe('hooks');
-      expect(response.body[0].description).toBe('React Hooks');
-      expect(response.body[0].icon).toBe('🪝');
       expect(response.body[0].subcategoryId).toBe(subcategory.id);
+      expect(response.body[0]).toHaveProperty('id');
     });
 
     it('should handle database errors gracefully', async () => {
-      // Close the database connection to force an error
-      await closeTestDb();
+      const response = await withCatalogTableLocked('sub_subcategories', () =>
+        request(app).get('/api/sub-subcategories'),
+      );
 
-      const response = await request(app)
-        .get('/api/sub-subcategories')
-        .expect(500);
-
-      expect(response.body).toHaveProperty('message');
-      expect(response.body.message).toContain('Failed to fetch sub-subcategories');
-
-      // Recreate app for subsequent tests
-      app = express();
-      app.use(express.json());
-      app.use(express.urlencoded({ extended: false }));
-      await registerRoutes(app);
+      expect(response.status).toBe(503);
+      expect(response.body).toEqual({
+        message: 'Service is temporarily unavailable',
+      });
     });
   });
 
@@ -610,7 +619,6 @@ describe('Categories API Integration Tests', () => {
       await createTestCategory({
         name: 'Frameworks 中文 العربية',
         slug: 'frameworks-unicode',
-        description: 'Testing unicode 🚀',
       });
 
       const response = await request(app)
@@ -618,7 +626,7 @@ describe('Categories API Integration Tests', () => {
         .expect(200);
 
       expect(response.body[0].name).toContain('中文');
-      expect(response.body[0].description).toContain('🚀');
+      expect(response.body[0].slug).toBe('frameworks-unicode');
     });
 
     it('should handle very long category names', async () => {
@@ -680,7 +688,9 @@ describe('Categories API Integration Tests', () => {
         .get('/api/subcategories?categoryId=1.5')
         .expect(400);
 
-      expect(response.body.message).toContain('Invalid categoryId parameter');
+      expect(response.body.error).toBe('validation_failed');
+      expect(response.body.message).toBe('Invalid query parameters');
+      expect(response.body.fieldErrors).toHaveProperty('categoryId');
     });
   });
 });

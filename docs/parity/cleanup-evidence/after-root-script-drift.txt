@@ -1,0 +1,29 @@
+PASS canaries :: reference matching + comment stripping + candidate-import resolution + manifest conditions verified against synthetic samples
+PASS root-script-drift :: 27 root + active scripts/ executable file(s) checked, 0 stray
+       drizzle.config.ts — recognized-config: drizzle-kit — auto-discovered by drizzle-kit push/studio (npm run db:push)
+       eslint.config.js — recognized-config: eslint — flat config auto-discovered by `eslint .` (npm run lint)
+       playwright.config.ts — recognized-config: @playwright/test — auto-discovered by `playwright test` (npm run test:e2e)
+       postcss.config.js — recognized-config: postcss — auto-discovered by the PostCSS/Tailwind pipeline during vite build
+       stylelint.config.mjs — recognized-config: stylelint — auto-discovered by `stylelint` (npm run lint:css and editor diagnostics)
+       tailwind.config.ts — recognized-config: tailwindcss — Tailwind config (also named by components.json)
+       vite.config.ts — recognized-config: vite — auto-discovered by vite dev/build
+       vitest.config.ts — recognized-config: vitest — auto-discovered by `vitest run` (npm run test:unit / test:integration)
+       scripts/audit-sidebar-exhaustive-clicks.mjs — tooling: scripts/audit-sidebar.sh:71 → BASE_URL="$BASE_URL" node scripts/audit-sidebar-exhaustive-clicks.mjs
+       scripts/audit-sidebar.sh — npm-script: package.json scripts.audit:sidebar → bash scripts/audit-sidebar.sh
+       scripts/build-static.ts — tooling: .github/workflows/deploy.yml jobs.build.steps[3].run → npx tsx scripts/build-static.ts
+       scripts/check-awesome-bot.sh — npm-script: package.json scripts.check:awesome-bot → bash scripts/check-awesome-bot.sh
+       scripts/check-migration-drift.ts — workflow: .replit workflows.workflow[3].tasks[0].args → npx tsx scripts/check-migration-drift.ts
+       scripts/export-awesome-markdown.ts — tooling: scripts/check-awesome-bot.sh:45 → if ! (cd "$REPO_ROOT" && npx tsx scripts/export-awesome-markdown.ts "$MD_FILE"); then
+       scripts/export-openapi-yaml.ts — manual-runbook: retained on-demand OpenAPI artifact export used when refreshing checked-in API documentation
+       scripts/generate-design-system-artifact.mjs — npm-script: package.json scripts.generate:design-system-artifact → node scripts/generate-design-system-artifact.mjs
+       scripts/migrate.ts — manual-runbook: retained standalone migration runner for non-Replit/self-hosted recovery
+       scripts/post-merge.sh — workflow: .replit postMerge.path → scripts/post-merge.sh
+       scripts/pre-publish-gate.sh — workflow: .replit deployment.build → bash scripts/pre-publish-gate.sh --publish
+       scripts/prod-link-scan.ts — manual-runbook: retained resumable production URL sweep; read-only and intentionally run by hand
+       scripts/run-digest-dispatch.ts — npm-script: package.json scripts.digest:dispatch → tsx scripts/run-digest-dispatch.ts
+       scripts/test-feedback-loop.ts — manual-runbook: retained opt-in database-backed recommendation regression probe with QA-only teardown
+       scripts/verify-boot-migration-safety.ts — workflow: .replit workflows.workflow[14].tasks[0].args → npx tsx scripts/verify-boot-migration-safety.ts
+       scripts/verify-docker-deployment.sh — manual-runbook: retained self-hosted Docker deployment verification runbook
+       scripts/verify-non-replit-build.sh — manual-runbook: retained non-Replit production build verification runbook
+       scripts/vg2-ga4-validate.mjs — manual-runbook: retained real-browser GA4 validation runbook, invoked after analytics changes
+       scripts/vg2-teardown.ts — manual-runbook: retained cleanup runbook for the GA4 validation harness when automatic cleanup is incomplete
