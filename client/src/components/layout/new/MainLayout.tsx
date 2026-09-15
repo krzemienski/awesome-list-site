@@ -16,8 +16,12 @@ import { useHomeBoot } from "@/lib/home-boot";
 // and the shell renders exactly as before. Variants a/b/c add footer links,
 // b/e host the contact dialog.
 import AppFooter from "./AppFooter";
-import { contactVariant, useContactConfig } from "@/lib/contact";
-const ContactDialogHost = lazy(() => import("@/components/contact/contact-dialog").then((module) => ({ default: module.ContactDialogHost })));
+import { useContactConfig } from "@/lib/contact";
+// Guard the import itself so disabled builds do not emit the contact chunk.
+const ContactDialogHost =
+  import.meta.env.VITE_CONTACT_VARIANT === "b" || import.meta.env.VITE_CONTACT_VARIANT === "e"
+    ? lazy(() => import("@/components/contact/contact-dialog").then((module) => ({ default: module.ContactDialogHost })))
+    : null;
 
 /** R2-L01: floating "back to top" button, appears after scrolling ~600px. */
 function BackToTop() {
@@ -221,7 +225,7 @@ export default function MainLayout({ productProfile, nav, isLoading, navError, o
           />
         ) : null}
       </div>
-      {contactVariant === "b" || contactVariant === "e" ? (
+      {ContactDialogHost ? (
         <Suspense fallback={null}><ContactDialogHost /></Suspense>
       ) : null}
       {renderSearchDialog?.({

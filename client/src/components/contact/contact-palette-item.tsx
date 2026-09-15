@@ -5,6 +5,7 @@ import {
   openContactForm,
   useContactConfig,
 } from "@/lib/contact";
+import "@/styles/pages/contact.css";
 
 export function ContactPaletteItem({
   closePalette,
@@ -38,7 +39,7 @@ export function ContactPaletteItem({
           );
         }
       }}
-      className="search-palette-row"
+      className="contact-palette-item search-palette-row"
       data-testid="contact-palette-item"
     >
       <span className="search-palette-kind"><Mail aria-hidden="true" />page</span>

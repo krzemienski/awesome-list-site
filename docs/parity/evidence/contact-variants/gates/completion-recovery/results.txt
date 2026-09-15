@@ -1,0 +1,4 @@
+boot-safety exit=0
+preferences-races exit=0
+response-contracts exit=0
+product-profile exit=1

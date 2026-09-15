@@ -1,0 +1,158 @@
+{
+  "date": "2026-09-15T00:00:33.236Z",
+  "criterion": "Exact optional variant modules; no optional contact chunks/CSS in unset, empty or invalid; every enabled optional module lazy",
+  "results": [
+    {
+      "variant": "unset",
+      "expected": [],
+      "modules": [],
+      "contactCss": [],
+      "optionalModulesInInitialClosure": 0,
+      "manifestSha256": "e80d97b829d1d66819205faab8d4ede8618d94ca33bbfaf320bed4b79a49b7c0",
+      "passed": true
+    },
+    {
+      "variant": "empty",
+      "expected": [],
+      "modules": [],
+      "contactCss": [],
+      "optionalModulesInInitialClosure": 0,
+      "manifestSha256": "3e7d5ed6e44bcda8216d4b35b0853f2b41f39f393c68a57b23885d00ee101a5d",
+      "passed": true
+    },
+    {
+      "variant": "z",
+      "expected": [],
+      "modules": [],
+      "contactCss": [],
+      "optionalModulesInInitialClosure": 0,
+      "manifestSha256": "3f28eb1d802cf3459e3494662e8013d35ce226e27b4926c8214b4541f2356646",
+      "passed": true
+    },
+    {
+      "variant": "a",
+      "expected": [
+        "contact-footer"
+      ],
+      "modules": [
+        {
+          "file": "assets/contact-footer-_XIfJAna.js",
+          "module": "client/src/components/contact/contact-footer.tsx"
+        },
+        {
+          "file": "assets/contact-footer-_XIfJAna.js",
+          "module": "client/src/styles/pages/contact.css"
+        }
+      ],
+      "contactCss": [
+        "contact-footer-BFzqnZ77.css"
+      ],
+      "optionalModulesInInitialClosure": 0,
+      "manifestSha256": "fbe4b69b5632013bbf5ba318eb1053258d3b9d0d69efe57e49517cbd0c816fe5",
+      "passed": true
+    },
+    {
+      "variant": "b",
+      "expected": [
+        "contact-dialog",
+        "contact-footer",
+        "contact-palette-item"
+      ],
+      "modules": [
+        {
+          "file": "assets/contact-dialog-BGKtOJn0.js",
+          "module": "client/src/components/contact/contact-dialog.tsx"
+        },
+        {
+          "file": "assets/contact-CSSfPJT2.js",
+          "module": "client/src/styles/pages/contact.css"
+        },
+        {
+          "file": "assets/contact-footer-BtEapSxW.js",
+          "module": "client/src/components/contact/contact-footer.tsx"
+        },
+        {
+          "file": "assets/contact-palette-item-BJW5R-v5.js",
+          "module": "client/src/components/contact/contact-palette-item.tsx"
+        }
+      ],
+      "contactCss": [
+        "contact-BFzqnZ77.css"
+      ],
+      "optionalModulesInInitialClosure": 0,
+      "manifestSha256": "e2cbb4bac45d7efea3998f9e8fc2bc10090803300561c3325e34c1d1ef2da347",
+      "passed": true
+    },
+    {
+      "variant": "c",
+      "expected": [
+        "contact-footer"
+      ],
+      "modules": [
+        {
+          "file": "assets/contact-footer-lDc7B6AV.js",
+          "module": "client/src/components/contact/contact-footer.tsx"
+        },
+        {
+          "file": "assets/contact-footer-lDc7B6AV.js",
+          "module": "client/src/styles/pages/contact.css"
+        }
+      ],
+      "contactCss": [
+        "contact-footer-BFzqnZ77.css"
+      ],
+      "optionalModulesInInitialClosure": 0,
+      "manifestSha256": "78c2856a6bd732cbcbb44c6767a773b072de652e32e99f9cc28a93c0bad82380",
+      "passed": true
+    },
+    {
+      "variant": "d",
+      "expected": [
+        "contact-resource-action"
+      ],
+      "modules": [
+        {
+          "file": "assets/contact-resource-action-BMko6fy8.js",
+          "module": "client/src/components/contact/contact-resource-action.tsx"
+        },
+        {
+          "file": "assets/contact-resource-action-BMko6fy8.js",
+          "module": "client/src/styles/pages/contact.css"
+        }
+      ],
+      "contactCss": [
+        "contact-resource-action-BFzqnZ77.css"
+      ],
+      "optionalModulesInInitialClosure": 0,
+      "manifestSha256": "449b3d1f338501938144a78afe7e752e002469f002d9da1fc5b86774d2aa191e",
+      "passed": true
+    },
+    {
+      "variant": "e",
+      "expected": [
+        "contact-dialog",
+        "contact-palette-item"
+      ],
+      "modules": [
+        {
+          "file": "assets/contact-dialog-Y5KN7_Sc.js",
+          "module": "client/src/components/contact/contact-dialog.tsx"
+        },
+        {
+          "file": "assets/contact-CSSfPJT2.js",
+          "module": "client/src/styles/pages/contact.css"
+        },
+        {
+          "file": "assets/contact-palette-item-BY6d12D8.js",
+          "module": "client/src/components/contact/contact-palette-item.tsx"
+        }
+      ],
+      "contactCss": [
+        "contact-BFzqnZ77.css"
+      ],
+      "optionalModulesInInitialClosure": 0,
+      "manifestSha256": "296522673a94d0bbead7206cbe247cdc3528d65ecb5e7a11cda875da89bc99c4",
+      "passed": true
+    }
+  ]
+}

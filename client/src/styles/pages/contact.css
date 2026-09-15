@@ -1,0 +1,79 @@
+/* Contact-variant refinements. Components remain usable with every DS skin. */
+.contact-dialog {
+  border-color: var(--border-strong);
+  background: var(--bg-2);
+  box-shadow: var(--shadow-lg);
+}
+
+.contact-dialog__form {
+  color: var(--text);
+}
+
+.contact-dialog__form label {
+  color: var(--text-2);
+  font-family: var(--font-mono);
+  font-size: var(--mono-size-step);
+  letter-spacing: var(--eyebrow-tracking);
+  text-transform: uppercase;
+}
+
+.contact-dialog__form input,
+.contact-dialog__form textarea {
+  border-color: var(--border);
+  background: var(--surface);
+  color: var(--text);
+}
+
+.contact-dialog__form input:focus-visible,
+.contact-dialog__form textarea:focus-visible {
+  border-color: var(--accent);
+}
+
+.contact-dialog__success,
+.contact-dialog__unavailable {
+  border-radius: var(--radius-sm);
+  color: var(--text-2);
+}
+
+.contact-footer-link {
+  color: var(--text-2);
+  font-size: 0.75rem;
+}
+
+.contact-footer-link:hover {
+  color: var(--text);
+}
+
+.contact-footer-link--unavailable {
+  cursor: not-allowed;
+}
+
+.contact-footer-open {
+  color: var(--text-2);
+}
+
+.contact-resource-action {
+  border-color: var(--border);
+  background: var(--surface);
+  color: var(--text);
+}
+
+.contact-resource-action:hover {
+  border-color: var(--accent);
+  background: var(--surface-2);
+}
+
+.contact-palette-item[data-selected="true"] {
+  background: var(--surface-3);
+  color: var(--text);
+}
+
+@media (max-width: 520px) {
+  .contact-dialog {
+    padding: 1.25rem;
+  }
+
+  .contact-dialog__form textarea {
+    min-height: 7.5rem;
+  }
+}

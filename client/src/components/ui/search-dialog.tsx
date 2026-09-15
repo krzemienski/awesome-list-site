@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { lazy, Suspense, useEffect, useRef, useState } from "react";
 import * as DialogPrimitive from "@radix-ui/react-dialog";
 import { useQuery } from "@tanstack/react-query";
 import { Command, CommandGroup, CommandInput, CommandItem, CommandList } from "@/components/ui/command";
@@ -9,8 +9,12 @@ import { trackSearch, trackResourceClick } from "@/lib/analytics";
 import { useDebounce } from "@/hooks/useDebounce";
 import { normalizeSearchQuery } from "@shared/searchNormalize";
 import type { Category } from "@shared/schema";
-import { ContactPaletteItem } from "@/components/contact/contact-palette-item";
 import "./../../styles/shell/palette.css";
+
+const ContactPaletteItem =
+  import.meta.env.VITE_CONTACT_VARIANT === "b" || import.meta.env.VITE_CONTACT_VARIANT === "e"
+    ? lazy(() => import("@/components/contact/contact-palette-item").then((module) => ({ default: module.ContactPaletteItem })))
+    : null;
 
 interface SearchDialogProps {
   isOpen: boolean;
@@ -225,7 +229,9 @@ export default function SearchDialog({ isOpen, setIsOpen }: SearchDialogProps) {
           </CommandItem>
         );
       })}
-      <ContactPaletteItem closePalette={() => setIsOpen(false)} />
+      {ContactPaletteItem ? (
+        <Suspense fallback={null}><ContactPaletteItem closePalette={() => setIsOpen(false)} /></Suspense>
+      ) : null}
     </CommandGroup>
   );
 

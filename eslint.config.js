@@ -75,6 +75,27 @@ export default tseslint.config(
     },
   },
 
+  // The task 566 browser harness is a checked-in ESM JavaScript validator,
+  // rather than an application module included by tsconfig.json. Keep the
+  // normal JavaScript checks while opting this file out of TypeScript-only
+  // rules that require a typed program.
+  {
+    files: ["scripts/validation/contact-variants-566.mjs"],
+    ...tseslint.configs.disableTypeChecked,
+    languageOptions: {
+      ...tseslint.configs.disableTypeChecked.languageOptions,
+      globals: {
+        document: "readonly",
+        Event: "readonly",
+        fetch: "readonly",
+        getComputedStyle: "readonly",
+        HTMLInputElement: "readonly",
+        process: "readonly",
+        URL: "readonly",
+      },
+    },
+  },
+
   // Ignore patterns
   {
     ignores: [

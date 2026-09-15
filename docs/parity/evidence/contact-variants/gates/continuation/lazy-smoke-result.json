@@ -1,0 +1,18 @@
+{
+  "resourceId": 188015,
+  "default": {
+    "noContactSurfaces": true,
+    "paletteHasNoContactItem": true,
+    "coreSuggestEditFallbackRemains": true
+  },
+  "e": {
+    "lazyPaletteItemVisible": true,
+    "keyboardActivationOpenedDialog": true,
+    "focusRetainedInDialog": true
+  },
+  "d": {
+    "lazyResourceActionVisible": true,
+    "existingSuggestEditEntryOpened": true,
+    "signedOutGateMatchesCoreBehavior": true
+  }
+}

@@ -1,0 +1,1 @@
+{"variant":"z","baseUrl":"http://127.0.0.1:5059","marker":"__qa_test_contact_variant_566_z","checks":["DOM contact surface scan is zero and POST /api/contact is disabled with 404"]}

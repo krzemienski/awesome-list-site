@@ -7,6 +7,7 @@ import {
   useContactConfig,
   type ContactDestination,
 } from "@/lib/contact";
+import "@/styles/pages/contact.css";
 
 function DestinationLink({
   destination,
@@ -20,7 +21,7 @@ function DestinationLink({
   if (!destination?.available || !destination.href) {
     return (
       <span
-        className="inline-flex min-h-[44px] items-center text-[color:var(--text-3)]"
+        className="contact-footer-link contact-footer-link--unavailable inline-flex min-h-[44px] items-center text-[color:var(--text-3)]"
         title={destination?.unavailableReason ?? `${label} is not configured`}
       >
         {label} unavailable
@@ -34,7 +35,7 @@ function DestinationLink({
       href={destination.href}
       target={isEmail ? undefined : "_blank"}
       rel={isEmail ? undefined : "noopener noreferrer"}
-      className="inline-flex min-h-[44px] items-center gap-2 hover:text-[color:var(--text)] transition-colors"
+      className="contact-footer-link inline-flex min-h-[44px] items-center gap-2 hover:text-[color:var(--text)] transition-colors"
       data-testid={`contact-${label.toLowerCase().replace(/\s/g, "-")}`}
     >
       {icon}
@@ -86,7 +87,7 @@ export function ContactFooter() {
   return form?.available ? (
     <Button
       variant="ghost"
-      className="min-h-[44px] px-0 text-xs"
+      className="contact-footer-open min-h-[44px] px-0 text-xs"
       onClick={openContactForm}
       data-testid="contact-open-form"
     >
@@ -95,7 +96,7 @@ export function ContactFooter() {
     </Button>
   ) : (
     <span
-      className="inline-flex min-h-[44px] items-center text-[color:var(--text-3)]"
+      className="contact-footer-link contact-footer-link--unavailable inline-flex min-h-[44px] items-center text-[color:var(--text-3)]"
       title={form?.unavailableReason ?? "No persistence destination is configured"}
     >
       Contact form unavailable

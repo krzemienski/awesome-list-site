@@ -1,0 +1,2 @@
+harness ESLint exit=0
+harness syntax exit=0

@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useMutation } from "@tanstack/react-query";
@@ -23,20 +23,28 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
-import { apiRequest } from "@/lib/queryClient";
+import { ApiError, apiRequest } from "@/lib/queryClient";
 import {
   contactVariant,
   type ContactSubmission,
   type ContactSubmissionReceipt,
   useContactConfig,
 } from "@/lib/contact";
+import "@/styles/pages/contact.css";
+
+const singleLine = (max: number, field: string) =>
+  z.string().trim().min(1, `${field} is required`).max(max, `${field} must be ${max} characters or less`)
+    .refine((value) => !/\p{Cc}/u.test(value), `${field} must be a single line`);
 
 const schema = z.object({
-  name: z.string().trim().min(1, "Name is required").max(100, "Name must be 100 characters or less"),
-  replyTo: z.string().trim().email("Enter a valid email address").max(254, "Email address is too long"),
-  subject: z.string().trim().min(3, "Subject must be at least 3 characters").max(120, "Subject must be 120 characters or less"),
-  message: z.string().trim().min(10, "Message must be at least 10 characters").max(4000, "Message must be 4000 characters or less"),
-  website: z.string().max(0).optional(),
+  name: singleLine(100, "Name"),
+  replyTo: z.string().trim().email("Enter a valid email address").max(320, "Email address is too long"),
+  subject: singleLine(200, "Subject"),
+  message: z.string().trim().min(20, "Message must be at least 20 characters").max(4000, "Message must be 4000 characters or less")
+    .refine((value) => !value.includes("\u0000"), "Message contains an invalid character"),
+  // Deliberately accepts a value: the server treats it as a silent honeypot
+  // success and never persists it. Rejecting it client-side would reveal it.
+  website: z.string().max(2048).optional(),
 });
 
 type FormData = z.infer<typeof schema>;
@@ -44,6 +52,7 @@ type FormData = z.infer<typeof schema>;
 export function ContactDialogHost() {
   const [open, setOpen] = useState(false);
   const [receipt, setReceipt] = useState<ContactSubmissionReceipt | null>(null);
+  const openerRef = useRef<HTMLElement | null>(null);
   const config = useContactConfig(contactVariant === "b" || contactVariant === "e");
   const form = useForm<FormData>({
     resolver: zodResolver(schema),
@@ -52,6 +61,9 @@ export function ContactDialogHost() {
 
   useEffect(() => {
     const onOpen = () => {
+      openerRef.current = document.activeElement instanceof HTMLElement
+        ? document.activeElement
+        : null;
       setReceipt(null);
       setOpen(true);
     };
@@ -76,7 +88,17 @@ export function ContactDialogHost() {
   const formConfig = config.data?.contact.form;
   return (
     <Dialog open={open} onOpenChange={setOpen}>
-      <DialogContent className="sm:max-w-lg" data-testid="contact-dialog">
+      <DialogContent
+        className="contact-dialog sm:max-w-lg"
+        data-testid="contact-dialog"
+        onCloseAutoFocus={(event) => {
+          const opener = openerRef.current;
+          if (opener?.isConnected) {
+            event.preventDefault();
+            opener.focus();
+          }
+        }}
+      >
         <DialogHeader>
           <div className="eyebrow" aria-hidden>{"// Contact"}</div>
           <DialogTitle className="font-display text-2xl font-medium tracking-tight">
@@ -88,7 +110,7 @@ export function ContactDialogHost() {
         </DialogHeader>
 
         {receipt ? (
-          <div className="space-y-4" role="status" data-testid="contact-success">
+          <div className="contact-dialog__success space-y-4" role="status" data-testid="contact-success">
             <p className="text-sm">Your message was received and queued for maintainer review.</p>
             <Button className="w-full" onClick={() => setOpen(false)}>Close</Button>
           </div>
@@ -99,7 +121,7 @@ export function ContactDialogHost() {
           </div>
         ) : !formConfig?.available ? (
           <div
-            className="border border-[var(--border)] bg-[var(--surface-2)] p-4 text-sm"
+            className="contact-dialog__unavailable border border-[var(--border)] bg-[var(--surface-2)] p-4 text-sm"
             role="status"
             data-testid="contact-unavailable"
           >
@@ -110,7 +132,7 @@ export function ContactDialogHost() {
         ) : (
           <Form {...form}>
             <form
-              className="space-y-4"
+              className="contact-dialog__form space-y-4"
               onSubmit={(event) => { void form.handleSubmit((data) => mutation.mutate(data))(event); }}
               noValidate
             >
@@ -120,7 +142,7 @@ export function ContactDialogHost() {
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel>Name</FormLabel>
-                    <FormControl><Input autoComplete="name" {...field} /></FormControl>
+                    <FormControl><Input autoComplete="name" data-testid="contact-name" {...field} /></FormControl>
                     <FormMessage />
                   </FormItem>
                 )}
@@ -131,7 +153,7 @@ export function ContactDialogHost() {
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel>Email</FormLabel>
-                    <FormControl><Input type="email" autoComplete="email" {...field} /></FormControl>
+                    <FormControl><Input type="email" autoComplete="email" data-testid="contact-email" {...field} /></FormControl>
                     <FormMessage />
                   </FormItem>
                 )}
@@ -142,7 +164,7 @@ export function ContactDialogHost() {
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel>Subject</FormLabel>
-                    <FormControl><Input {...field} /></FormControl>
+                    <FormControl><Input data-testid="contact-subject" {...field} /></FormControl>
                     <FormMessage />
                   </FormItem>
                 )}
@@ -153,13 +175,14 @@ export function ContactDialogHost() {
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel>Message</FormLabel>
-                    <FormControl><Textarea rows={6} {...field} /></FormControl>
+                    <FormControl><Textarea rows={6} data-testid="contact-message" {...field} /></FormControl>
                     <FormMessage />
                   </FormItem>
                 )}
               />
               <input
                 className="hidden"
+                data-testid="contact-honeypot"
                 tabIndex={-1}
                 autoComplete="off"
                 aria-hidden="true"
@@ -167,9 +190,13 @@ export function ContactDialogHost() {
               />
               {mutation.isError ? (
                 <p className="text-sm text-destructive" role="alert" data-testid="contact-submit-error">
-                  {mutation.error instanceof Error
-                    ? mutation.error.message
-                    : "The message could not be submitted. Please try again."}
+                  {mutation.error instanceof ApiError && mutation.error.status === 429
+                    ? `Too many contact requests. Please try again${mutation.error.retryAfterSec
+                      ? ` in ${mutation.error.retryAfterSec} seconds`
+                      : " later"}.`
+                    : mutation.error instanceof Error
+                      ? mutation.error.message
+                      : "The message could not be submitted. Please try again."}
                 </p>
               ) : null}
               <p className="text-xs text-muted-foreground">

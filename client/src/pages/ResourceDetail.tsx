@@ -1,7 +1,7 @@
 import { useParams, Link, useLocation } from "wouter";
 import { hasInAppHistory } from "@/lib/nav-history";
 import { useQuery } from "@tanstack/react-query";
-import { useState, useEffect, useMemo, useRef, Fragment } from "react";
+import { lazy, Suspense, useState, useEffect, useMemo, useRef, Fragment, type ReactNode } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -10,7 +10,6 @@ import { Separator } from "@/components/ui/separator";
 import SEOHead from "@/components/layout/SEOHead";
 import { resourceSeoDescription } from "@shared/seo-templates";
 import { SuggestEditDialog } from "@/components/ui/suggest-edit-dialog";
-import { ContactResourceAction } from "@/components/contact/contact-resource-action";
 import {
   ArrowLeft,
   ExternalLink,
@@ -54,6 +53,16 @@ import {
 import { tagLandingPath } from "@shared/tagNormalize";
 import type { ResourceKind } from "@shared/resourceKinds";
 import "@/styles/pages/resource.css";
+
+const VariantResourceAction = import.meta.env.VITE_CONTACT_VARIANT === "d"
+  ? lazy(() => import("@/components/contact/contact-resource-action").then((module) => ({ default: module.ContactResourceAction })))
+  : null;
+
+function ContactResourceAction(props: { onSuggestEdit: () => void; fallback: ReactNode }) {
+  return VariantResourceAction ? (
+    <Suspense fallback={props.fallback}><VariantResourceAction {...props} /></Suspense>
+  ) : <>{props.fallback}</>;
+}
 
 export default function ResourceDetail() {
   const { id } = useParams<{ id: string }>();

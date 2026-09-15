@@ -6,9 +6,12 @@ import { contactVariant } from "@/lib/contact";
 import type { AwesomeListNav } from "@/lib/static-data";
 import "@/styles/shell/footer.css";
 
-const ContactFooter = lazy(() =>
-  import("@/components/contact/contact-footer").then((module) => ({ default: module.ContactFooter })),
-);
+const ContactFooter =
+  import.meta.env.VITE_CONTACT_VARIANT === "a" ||
+  import.meta.env.VITE_CONTACT_VARIANT === "b" ||
+  import.meta.env.VITE_CONTACT_VARIANT === "c"
+    ? lazy(() => import("@/components/contact/contact-footer").then((module) => ({ default: module.ContactFooter })))
+    : null;
 
 function Column({ title, children }: { title: string; children: ReactNode }) {
   return <div className="footer-column"><h2>{title}</h2><div className="app-footer-links">{children}</div></div>;
@@ -68,7 +71,7 @@ export default function AppFooter({ nav, site }: {
             <ExternalLink href="https://github.com/sindresorhus/awesome">awesome-list guidelines ↗</ExternalLink>
             <ExternalLink href={`${repo}/tree/${branch}/docs`}>Docs ↗</ExternalLink>
             <a href="/sitemap.xml">Sitemap</a>
-            {contactVariant === "a" || contactVariant === "b" || contactVariant === "c" ? (
+            {ContactFooter ? (
               <div className="app-footer-contact"><Suspense fallback={null}><ContactFooter /></Suspense></div>
             ) : null}
           </Column>

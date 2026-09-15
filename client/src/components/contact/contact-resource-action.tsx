@@ -2,6 +2,7 @@ import type { ReactNode } from "react";
 import { Edit } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { contactVariant } from "@/lib/contact";
+import "@/styles/pages/contact.css";
 
 interface ContactResourceActionProps {
   onSuggestEdit: () => void;
@@ -21,7 +22,7 @@ export function ContactResourceAction({
       size="sm"
       onClick={onSuggestEdit}
       data-testid="button-suggest-edit"
-      className="min-h-[44px] px-4"
+      className="contact-resource-action min-h-[44px] px-4"
       aria-label="Suggest an edit"
     >
       <Edit className="h-4 w-4 mr-2" />

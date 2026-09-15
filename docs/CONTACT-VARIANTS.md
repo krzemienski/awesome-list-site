@@ -4,11 +4,11 @@ Contact is build-time opt-in through `VITE_CONTACT_VARIANT`. Only `a`, `b`, `c`,
 
 | Value | Experience | Required public configuration | Screenshot |
 | --- | --- | --- | --- |
-| `a` | Footer email and repository issue links. Direct and familiar, but exposes the configured public address and splits requests across channels. | Valid public `mailto:` destination and repository issue URL. Missing destinations render unavailable with the server-provided reason. The current public profile has no email, so email is honestly unavailable rather than invented. | **UNVERIFIED** — capture after an actual configured run. |
-| `b` | Accessible modal with client validation and inline API errors. A single structured intake is easier to review, but stores personal data and depends on server rate limiting and retention controls. A successful response says only that persistence occurred; it does not claim email delivery. | Default-disabled POST `/api/contact`, database persistence, validation, honeypot, and rate limiting. | **UNVERIFIED** — capture and persisted-result verification pending. |
-| `c` | External GitHub Discussions link. This keeps community conversation on GitHub without unsupported iframe embedding, but requires a repository where Discussions is actually enabled. | Discussions was verified enabled for `https://github.com/krzemienski/awesome-video` through the GitHub API on 2026-09-10. | **UNVERIFIED** — screenshot pending. |
-| `d` | Per-resource Suggest Edit action. It reuses the authenticated edit-suggestion queue and review process, making it best for catalog corrections but not general messages. The original core action remains the fallback for every other flag value. | Existing resource edit endpoint, authentication, queue persistence, and admin review UI. | **UNVERIFIED** — capture and queued-edit verification pending. |
-| `e` | “Contact maintainers” command-palette item. It is fast for keyboard users but less discoverable; it opens the configured persisted form first, then a real configured external destination. | At least one available form, email, Discussions, or issue destination. | **UNVERIFIED** — capture and destination verification pending. |
+| `a` | Footer email and repository issue links. Direct and familiar, but exposes the configured public address and splits requests across channels. | Valid public `mailto:` destination and repository issue URL. Missing destinations render unavailable with the server-provided reason. The current public profile has no email, so email is honestly unavailable rather than invented. | **Verified 2026-09-14:** [1440](parity/evidence/contact-variants/variant-a-1440.png), [375](parity/evidence/contact-variants/variant-a-375.png). The configured Issues link opened its GitHub destination in a new tab; the email unavailable state was visible. |
+| `b` | Accessible modal with client validation and inline API errors. A single structured intake is easier to review, but stores personal data and depends on server rate limiting and retention controls. A successful response says only that persistence occurred; it does not claim email delivery. | Default-disabled POST `/api/contact`, database persistence, validation, honeypot, and rate limiting. | **Verified 2026-09-14:** [1440](parity/evidence/contact-variants/variant-b-1440.png), [375](parity/evidence/contact-variants/variant-b-375.png), and readable viewport companions ([1440](parity/evidence/contact-variants/variant-b-1440-viewport.png), [375](parity/evidence/contact-variants/variant-b-375-viewport.png)). Browser validation, Escape focus return, honeypot non-persistence, real sixth-request 429/`Retry-After`, input retention, receipt persistence, authenticated admin inbox listing, and exact cleanup passed. |
+| `c` | External GitHub Discussions link. This keeps community conversation on GitHub without unsupported iframe embedding, but requires a repository where Discussions is actually enabled. | Discussions was verified enabled for `https://github.com/krzemienski/awesome-video` through the GitHub API on 2026-09-10. | **Verified 2026-09-14:** [1440](parity/evidence/contact-variants/variant-c-1440.png), [375](parity/evidence/contact-variants/variant-c-375.png). The link opened the configured GitHub Discussions destination in a new tab. |
+| `d` | Per-resource Suggest Edit action. It reuses the authenticated edit-suggestion queue and review process, making it best for catalog corrections but not general messages. The original core action remains the fallback for every other flag value. | Existing resource edit endpoint, authentication, queue persistence, and admin review UI. | **Verified 2026-09-14:** [1440](parity/evidence/contact-variants/variant-d-1440.png), [375](parity/evidence/contact-variants/variant-d-375.png), readable companions ([1440](parity/evidence/contact-variants/variant-d-1440-viewport.png), [375](parity/evidence/contact-variants/variant-d-375-viewport.png)), and [admin Edits](parity/evidence/contact-variants/variant-d-admin-edits-1440.png). A real backend-session admin submitted and rejected a queued edit; an invalid-flag run rendered and opened the unchanged core fallback. Exact fixture cleanup passed. |
+| `e` | “Contact maintainers” command-palette item. It is fast for keyboard users but less discoverable; it opens the configured persisted form first, then a real configured external destination. | At least one available form, email, Discussions, or issue destination. | **Verified 2026-09-14:** [1440 palette](parity/evidence/contact-variants/variant-e-1440.png), [375 palette](parity/evidence/contact-variants/variant-e-375.png), readable palette companions ([1440](parity/evidence/contact-variants/variant-e-1440-palette-viewport.png), [375](parity/evidence/contact-variants/variant-e-375-viewport.png)), and form extras ([1440 full](parity/evidence/contact-variants/variant-e-1440-form.png), [1440 viewport](parity/evidence/contact-variants/variant-e-1440-form-viewport.png)). Arrow-key selection opened the configured form; a second isolated run opened the configured external fallback. |
 
 ## Public API contract
 
@@ -53,4 +53,30 @@ Contracts live in `docs/api/openapi.yaml` (`PublicConfigResponse`, `ContactSubmi
 
 ## Evidence status
 
-No contact screenshot or end-to-end persistence check was performed while these files were authored. All screenshot cells intentionally remain **UNVERIFIED** and must be replaced only after real configured browser validation.
+**Approved contact-prototype scope passed; full project acceptance remains incomplete.**
+The user approved following the archive's new-prototype requirements for this
+task: contact behaviour, accessibility, tokens, screenshots, and bundle checks.
+Repository-wide green gates and existing-page pixel parity remain required in
+task #570. The [archive assessment and scope approval](parity/evidence/contact-variants/gates/REFERENCE-ARCHIVE.md)
+explain why no independent contact pixel-reference match is claimed.
+The five configured browser flows and their cleanup are verified. The completed
+eight-configuration build matrix proves unset/empty/invalid builds emit no optional
+contact component or stylesheet; enabled components remain lazy. The shared-wiring
+fix and follow-up keyboard/resource smoke are documented in the
+[integration handoff](parity/evidence/contact-variants/gates/INTEGRATION-HANDOFF.md).
+The [gate results](parity/evidence/contact-variants/gates/RESULTS-SUMMARY.md)
+record the repaired harness lint registration, unchanged pre-existing lint findings
+in the four integration files, no current full integration/e2e green result, and no measured
+375/768/1024/1440 pixel comparison. These are not waived by the screenshots.
+
+The required desktop capture names are [variant-a.png](parity/evidence/contact-variants/variant-a.png),
+[variant-b.png](parity/evidence/contact-variants/variant-b.png),
+[variant-c.png](parity/evidence/contact-variants/variant-c.png),
+[variant-d.png](parity/evidence/contact-variants/variant-d.png), and
+[variant-e.png](parity/evidence/contact-variants/variant-e.png). These are byte-identical
+copies of the explicitly width-labelled 1440 captures above.
+
+The narrow live-browser evidence and fixture cleanup record is
+[contact-variants-566.md](parity/worklog/contact-variants-566.md). The captured
+canvases establish configured behaviour at 1440 and 375 CSS pixels; they are
+not a measured reference-image diff and do **not** claim pixel parity.

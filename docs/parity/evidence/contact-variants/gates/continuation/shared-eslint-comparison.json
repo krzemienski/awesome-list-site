@@ -1,0 +1,110 @@
+{
+  "schemaVersion": 1,
+  "method": "git show HEAD:file | eslint --stdin --stdin-filename file versus working file via eslint --stdin --stdin-filename file",
+  "files": [
+    {
+      "file": "client/src/components/layout/new/AppFooter.tsx",
+      "baseline": {
+        "exit": 0,
+        "errors": 0,
+        "warnings": 0,
+        "fatalErrors": 0,
+        "rules": {}
+      },
+      "working": {
+        "exit": 0,
+        "errors": 0,
+        "warnings": 0,
+        "fatalErrors": 0,
+        "rules": {}
+      },
+      "sameCounts": true
+    },
+    {
+      "file": "client/src/components/layout/new/MainLayout.tsx",
+      "baseline": {
+        "exit": 0,
+        "errors": 0,
+        "warnings": 0,
+        "fatalErrors": 0,
+        "rules": {}
+      },
+      "working": {
+        "exit": 0,
+        "errors": 0,
+        "warnings": 0,
+        "fatalErrors": 0,
+        "rules": {}
+      },
+      "sameCounts": true
+    },
+    {
+      "file": "client/src/components/ui/search-dialog.tsx",
+      "baseline": {
+        "exit": 1,
+        "errors": 4,
+        "warnings": 0,
+        "fatalErrors": 0,
+        "rules": {
+          "@typescript-eslint/no-misused-promises": 1,
+          "@typescript-eslint/no-unsafe-assignment": 1,
+          "@typescript-eslint/no-unsafe-return": 1,
+          "@typescript-eslint/prefer-nullish-coalescing": 1
+        }
+      },
+      "working": {
+        "exit": 1,
+        "errors": 4,
+        "warnings": 0,
+        "fatalErrors": 0,
+        "rules": {
+          "@typescript-eslint/no-misused-promises": 1,
+          "@typescript-eslint/no-unsafe-assignment": 1,
+          "@typescript-eslint/no-unsafe-return": 1,
+          "@typescript-eslint/prefer-nullish-coalescing": 1
+        }
+      },
+      "sameCounts": true
+    },
+    {
+      "file": "client/src/pages/ResourceDetail.tsx",
+      "baseline": {
+        "exit": 1,
+        "errors": 29,
+        "warnings": 2,
+        "fatalErrors": 0,
+        "rules": {
+          "@typescript-eslint/no-explicit-any": 2,
+          "@typescript-eslint/no-floating-promises": 6,
+          "@typescript-eslint/no-misused-promises": 2,
+          "@typescript-eslint/no-unnecessary-type-assertion": 3,
+          "@typescript-eslint/no-unsafe-assignment": 6,
+          "@typescript-eslint/no-unsafe-return": 3,
+          "@typescript-eslint/no-unused-vars": 1,
+          "@typescript-eslint/prefer-nullish-coalescing": 5,
+          "react-hooks/exhaustive-deps": 2,
+          "react/no-unescaped-entities": 1
+        }
+      },
+      "working": {
+        "exit": 1,
+        "errors": 29,
+        "warnings": 2,
+        "fatalErrors": 0,
+        "rules": {
+          "@typescript-eslint/no-explicit-any": 2,
+          "@typescript-eslint/no-floating-promises": 6,
+          "@typescript-eslint/no-misused-promises": 2,
+          "@typescript-eslint/no-unnecessary-type-assertion": 3,
+          "@typescript-eslint/no-unsafe-assignment": 6,
+          "@typescript-eslint/no-unsafe-return": 3,
+          "@typescript-eslint/no-unused-vars": 1,
+          "@typescript-eslint/prefer-nullish-coalescing": 5,
+          "react-hooks/exhaustive-deps": 2,
+          "react/no-unescaped-entities": 1
+        }
+      },
+      "sameCounts": true
+    }
+  ]
+}
