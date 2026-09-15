@@ -44,9 +44,10 @@
     },
     "journeys": {
       "manifestKey": "src/pages/Journeys.tsx",
-      "maxRawBytes": 37000,
-      "maxGzipBytes": 14000,
-      "maxBrotliBytes": 12500
+      "note": "Re-baselined 2026-09-15 (37000/14000/12500 -> 40000/15500/13800): the paint-before-hydrate change made Home lazy, which moved the shared Radix Select chunk (~23.6 KiB raw) out of the initial bundle (-35 KiB) and into the route closures that use it. Journeys was the only route without headroom for it; initial caps are unchanged and the visitor total (initial + journeys) fell.",
+      "maxRawBytes": 40000,
+      "maxGzipBytes": 15500,
+      "maxBrotliBytes": 13800
     },
     "recommendations": {
       "manifestKey": "src/pages/Recommendations.tsx",
