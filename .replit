@@ -615,5 +615,11 @@ timeoutMs = 90000
 
 [userenv.shared]
 VITE_SITE_URL = "https://awesome.video"
+ANTHROPIC_BASE_URL = "https://router.hack.ski"
+ANTHROPIC_DEFAULT_FABLE_MODEL = "cc/claude-fable-5"
+ANTHROPIC_DEFAULT_HAIKU_MODEL = "cc/claude-haiku-4-5-20251001"
+ANTHROPIC_DEFAULT_OPUS_MODEL = "cc/claude-opus-5"
+ANTHROPIC_DEFAULT_SONNET_MODEL = "cc/claude-sonnet-5"
+ANTHROPIC_MODEL = "cc/claude-opus-5"
 
 [userenv.development]
