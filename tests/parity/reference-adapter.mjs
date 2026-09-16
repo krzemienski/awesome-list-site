@@ -135,19 +135,27 @@ export async function buildCatalogAdapter(appBase, { frozenAt } = {}) {
   for (const [level, node] of [["category", taxonomyTokens.category], ["subcategory", taxonomyTokens.subcategory]]) {
     if (!node?.id) continue;
     const listing = await fetchJson(`${appBase}/api/awesome-list/listing?level=${level}&slug=${encodeURIComponent(node.id)}&page=1`);
-    const ids = (listing?.resources || []).map((item) => String(item.id));
     if (!Array.isArray(listing?.resources) || typeof listing?.pageSize !== "number") {
       throw new Error(`Listing page for ${level} ${JSON.stringify(node.id)} is malformed; refusing an invented taxonomy scope`);
     }
-    pageScopes.push({
-      level,
-      slug: node.id,
-      categorySlug: level === "category" ? node.id : taxonomyTokens.subcategoryCategory?.id,
-      subcategorySlug: level === "subcategory" ? node.id : null,
-      pageSize: listing.pageSize,
-      total: listing.total,
-      ids,
+    const ids = listing.resources.map((item) => String(item.id));
+    const categorySlug = level === "category" ? node.id : taxonomyTokens.subcategoryCategory?.id;
+    const subcategorySlug = level === "subcategory" ? node.id : null;
+    // The bound page must be a well-formed subset of the scope: unique rows
+    // that all belong to the measured category/subcategory.  Anything else
+    // would let the reference render rows the application never lists.
+    if (new Set(ids).size !== ids.length) {
+      throw new Error(`Listing page for ${level} ${JSON.stringify(node.id)} repeats a resource id; refusing a duplicated taxonomy scope`);
+    }
+    const byId = new Map(adapter.AV_RESOURCES.map((item) => [String(item.id), item]));
+    const outOfScope = ids.filter((id) => {
+      const row = byId.get(id);
+      return !row || row.cat !== categorySlug || (subcategorySlug && row.sub !== subcategorySlug);
     });
+    if (outOfScope.length) {
+      throw new Error(`Listing page for ${level} ${JSON.stringify(node.id)} contains ${outOfScope.length} row(s) outside the scope (${outOfScope.slice(0, 3).join(", ")}); refusing a mis-scoped taxonomy binding`);
+    }
+    pageScopes.push({ level, slug: node.id, categorySlug, subcategorySlug, pageSize: listing.pageSize, total: listing.total, ids });
   }
   adapter.AV_TAXONOMY_PAGE_SCOPES = pageScopes;
   const snapshotBytes = Buffer.from(JSON.stringify({ catalog, nav, home, pageScopes }));
@@ -348,14 +356,19 @@ export async function buildAdminAdapter(fetchJson, frozenAtMs) {
   // same five newest sync-history rows the application's panel renders
   // (GitHubSyncPanel.tsx: newest first, slice(0, 5)) instead of the data.js
   // fixture, so both sides describe the same real jobs.
-  const syncJobs = (Array.isArray(syncHistory) ? syncHistory : [])
+  if (!Array.isArray(syncHistory)) {
+    throw new Error("GET /api/github/sync-history did not return an array; refusing an invented GitHub job list");
+  }
+  const syncJobs = syncHistory
     .slice()
     .sort((a, b) => Date.parse(b.createdAt || "") - Date.parse(a.createdAt || ""))
     .slice(0, 5)
     .map((sync) => ({
       id: sync.id,
       type: sync.direction === "export" || sync.direction === "push" ? "Export" : "Import",
-      status: sync.status || "completed",
+      // The app renders no status chip when the row has none; mirror that
+      // instead of inventing a "completed" state.
+      status: sync.status ?? "",
     }));
   const navCategories = Array.isArray(nav?.categories) ? nav.categories : [];
   const users = Array.isArray(usersPage?.users) ? usersPage.users : [];
@@ -460,7 +473,7 @@ export async function buildAdminAdapter(fetchJson, frozenAtMs) {
     pendingApprovals,
     counts: { users: users.length, admins, contributors, pending: Number(stats.pendingApprovals ?? pendingResources.length), oldestPendingMs: oldestPending ?? null },
     endpoints: [...reads.keys()],
-    snapshotBytes: Buffer.from(JSON.stringify({ stats, usersPage, resourcesPage, pending, audit, contactResponse, operations, catalog })),
+    snapshotBytes: Buffer.from(JSON.stringify({ stats, usersPage, resourcesPage, pending, audit, contactResponse, operations, catalog, nav, syncHistory })),
   };
 }
 

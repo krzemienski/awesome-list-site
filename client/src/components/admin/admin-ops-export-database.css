@@ -11,6 +11,10 @@
 
 .admin-ops-export {
   display: grid;
+}
+
+.admin-ops-export,
+.admin-ops-database {
   position: relative;
 }
 
@@ -95,9 +99,18 @@
 }
 
 .admin-ops-export-card__action {
-  height: 2rem;
-  margin-top: auto;
-  min-height: 2rem;
+  /* Canonical `.btn.primary`: 1px accent border + 9px 16px padding around a
+     13px label at UA button line-height (36px tall). */
+  border: var(--border-w, 1px) solid var(--accent);
+  font-size: 0.8125rem;
+  font-weight: 600;
+  height: auto;
+  line-height: normal;
+  /* Canonical cards flow the button right after the description (no bottom
+     pinning), so one-line cards sit higher than two-line neighbours. */
+  margin-top: 0;
+  min-height: 0;
+  padding: 0.5625rem 1rem;
   width: 100%;
 }
 
@@ -524,10 +537,15 @@
   list-style: none;
 }
 
+/* The disclosures must not occupy a flex/grid track: a zero-height in-flow
+   child still pulled the parent gap (20px) into the canonical rhythm, and a
+   closed <details> keeps a hidden content slot even under display:contents.
+   Taken out of flow they neither reserve a track nor shift the cards; the
+   summaries are positioned against the tab surface below. */
 .admin-ops-export > .admin-ops-more,
 .admin-ops-database > .admin-ops-more {
-  height: 0;
-  position: relative;
+  inset: 0 0 auto;
+  position: absolute;
   z-index: 2;
 }
 
@@ -560,6 +578,13 @@
 
 .admin-ops-more[open] > summary {
   margin-bottom: 12px;
+}
+
+/* Opened, the disclosure rejoins the flow so its panel reads in sequence
+   instead of stacking over the cards. */
+.admin-ops-export > .admin-ops-more[open],
+.admin-ops-database > .admin-ops-more[open] {
+  position: relative;
 }
 
 @media (max-width: 48rem) {

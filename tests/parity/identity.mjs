@@ -2,7 +2,8 @@
  * Disposable Clerk admin identity for parity captures.
  *
  * Every app row is captured as a real, freshly created Clerk user named
- * "Nick" (matching the design demonstrator) who is promoted to admin through
+ * "Nick Krzemienski" (the design demonstrator: the frozen header chip shows
+ * the first name, the frozen admin eyebrow the full name) who is promoted to admin through
  * the existing admin audit-key path and deleted again at the end of the run.
  *
  * Credentials never touch the repository:
@@ -24,6 +25,9 @@
 import crypto from "node:crypto";
 
 export const QA_PREFIX = "__qa_test_parity_";
+export const DEMONSTRATOR_FIRST_NAME = "Nick";
+export const DEMONSTRATOR_LAST_NAME = "Krzemienski";
+export const DEMONSTRATOR_DISPLAY_NAME = `${DEMONSTRATOR_FIRST_NAME} ${DEMONSTRATOR_LAST_NAME}`;
 export const CLERK_TEST_EMAIL_DOMAIN = "+clerk_test@example.com";
 export const CLERK_TEST_OTP = "424242";
 export const QA_BRIDGE_ID_FLOOR = 2_000_000_000;
@@ -215,8 +219,8 @@ export async function createDisposableAdmin({
     external_id: bridgeId,
     email_address: [email],
     password,
-    first_name: "Nick",
-    last_name: "Parity",
+    first_name: DEMONSTRATOR_FIRST_NAME,
+    last_name: DEMONSTRATOR_LAST_NAME,
     skip_password_checks: true,
   });
   const record = { bridgeId, email, clerkUserId: clerkUser.id, localUserId: null, promoted: false };
@@ -272,15 +276,15 @@ export async function createDisposableAdmin({
       throw new Error(`JIT-provisioned user id ${localUserId} does not equal the bridge id ${bridgeId}; the Clerk session template no longer maps external_id`);
     }
     record.localUserId = localUserId;
-    await auditRequest(appBase, auditKey, "PATCH", `/api/admin/users/${encodeURIComponent(localUserId)}/name`, { firstName: "Nick", lastName: null });
+    await auditRequest(appBase, auditKey, "PATCH", `/api/admin/users/${encodeURIComponent(localUserId)}/name`, { firstName: DEMONSTRATOR_FIRST_NAME, lastName: DEMONSTRATOR_LAST_NAME });
     await auditRequest(appBase, auditKey, "PUT", `/api/admin/users/${encodeURIComponent(localUserId)}/role`, { role: "admin" });
     record.promoted = true;
     const promoted = await pollAuthUser(page, (state) => state?.isAuthenticated === true && (state.user?.role || state.role) === "admin", 30_000);
     record.displayName = promoted.user?.name
       || [promoted.user?.firstName, promoted.user?.lastName].filter(Boolean).join(" ")
       || "";
-    if (!/^nick$/i.test(record.displayName.trim())) {
-      throw new Error(`Disposable admin display name is "${record.displayName}", expected "Nick" (the design demonstrator identity)`);
+    if (record.displayName.trim() !== DEMONSTRATOR_DISPLAY_NAME) {
+      throw new Error(`Disposable admin display name is "${record.displayName}", expected "${DEMONSTRATOR_DISPLAY_NAME}" (the design demonstrator identity)`);
     }
     log(`[identity] ${bridgeId} signed in and promoted (display name "${record.displayName}")`);
     const storageState = async () => {

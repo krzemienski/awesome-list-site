@@ -33,6 +33,9 @@
 }
 
 .app-shell-main > .page-content-wrap[data-admin="true"] {
+  /* The canonical admin canvas is a left-anchored 1400px measure (no
+     auto centering); centering it doubles the desktop gutter. */
+  margin-inline: 0;
   max-width: var(--content-max-admin);
 }
 
