@@ -217,13 +217,19 @@ export default function PageBreadcrumb({ categories }: { categories: AwesomeList
     [categories, location, pageHeading, pageTitle],
   );
   if (crumbs.length === 0) return null;
+  // The frozen design has no shell-level breadcrumb row: every page that
+  // shows crumbs (pages.jsx SubcategoryPage) or a back link / eyebrow
+  // (CategoryPage, ResourcePage, SubmitPage, AboutPage, admin) renders it
+  // inside its own `.page-content`. This shell breadcrumb therefore stays in
+  // the DOM for assistive technology and the selector contracts (same
+  // testids, same links) but is visually hidden on every route.
   // ResourceDetail uses this exact string id in its public-detail query key.
   // Restrict the lazy disclosure to routable public resource ids: it has no
   // role on generic /resource 404s or any other breadcrumb shape.
   const resourceId = /^\/resource\/(\d+)$/.exec(location)?.[1];
 
   return (
-    <Breadcrumb className="mb-5 min-w-0" data-testid="page-breadcrumb">
+    <Breadcrumb className="sr-only" data-testid="page-breadcrumb">
       <BreadcrumbList className="min-w-0 flex-nowrap overflow-hidden">
         <BreadcrumbItem>
           <BreadcrumbLink href="/" title="Home" data-testid="link-breadcrumb-home">Home</BreadcrumbLink>

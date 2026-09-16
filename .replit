@@ -602,3 +602,6 @@ ANTHROPIC_DEFAULT_SONNET_MODEL = "cc/claude-sonnet-5"
 ANTHROPIC_MODEL = "cc/claude-opus-5"
 
 [userenv.development]
+
+[userenv.production]
+REPLIT_PUBLISH_IMAGE_TRIM = "1"
