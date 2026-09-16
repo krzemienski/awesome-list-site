@@ -359,11 +359,6 @@
     padding: 1.125rem 1.375rem;
   }
 
-  .admin-taxonomy-header-actions {
-    width: 100%;
-    justify-content: flex-start;
-  }
-
   .admin-taxonomy-search {
     flex: 1 1 12rem;
     width: auto;

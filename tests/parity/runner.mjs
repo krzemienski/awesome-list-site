@@ -142,6 +142,8 @@ const writeReports = async (results, runDir) => {
 const regenerateReport = async (resultsPath) => {
   const absolute = path.resolve(resultsPath);
   const results = JSON.parse(await fsp.readFile(absolute, "utf8"));
+  // Older results recorded `full: false` for an explicit all-width list; derive it.
+  results.selection.full = coversInventory(await loadInventory(), results.selection.only, results.selection.widths);
   const { shared } = await writeReports(results, path.dirname(absolute));
   await fsp.chmod(path.join(path.dirname(absolute), "REPORT.md"), 0o444);
   log(`[parity] regenerated REPORT.md from ${rel(repoRoot, absolute)}${shared ? " (shared docs/parity and tests/parity reports too)" : " (selected run: run directory only)"}`);
@@ -169,7 +171,20 @@ const planRows = (inventory, cli) => {
     for (const width of widths) plan.push({ screen, width });
   }
   if (!plan.length) throw new CliError("The selection matches no screen/width rows");
-  return { plan, byId, full: !cli.only && !cli.widths };
+  return { plan, byId, full: coversInventory(inventory, cli.only, cli.widths) };
+};
+
+/**
+ * A run is "full" when it restricts nothing that the inventory would have
+ * planned: no `--only`, and either no `--width` or a `--width` list naming every
+ * width any screen declares. Spelling out all four widths is the same run as
+ * the default and must publish the shared reports too.
+ */
+const coversInventory = (inventory, only, widths) => {
+  if (only) return false;
+  if (!widths) return true;
+  const declared = new Set(inventory.screens.flatMap((screen) => widthsFor(screen, inventory)));
+  return [...declared].every((width) => widths.includes(width));
 };
 
 // ---------------------------------------------------------------------------

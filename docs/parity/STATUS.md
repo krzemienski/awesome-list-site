@@ -1,44 +1,27 @@
 # Parity status
 
-Regression execution finished: `run-2026-09-15` — acceptance **BLOCKED**, not regression complete.
+Latest baseline run: `2026-09-16T05-55-50-268Z-6075` (2026-09-16T05:55:50.268Z) — gate **NOT PASSED**.
 
-Latest full inventory run: `2026-09-15T17-47-51-897Z-9407`; second pixel pass:
-`2026-09-15T18-59-43-142Z-21936`. Both gates **NOT PASSED**.
-
-Pixel cells: **16 pass, 172 fail, 188 measured**. Four alias cells are excluded,
-not counted as measured pixels. Outside that denominator: **40 blocked,
-96 unverified token-only, 4 evidence-only, 4 aliases**; zero incomplete captures.
-Eligibility: {"pixel":48,"token-only":24,"artifact-docs":1,"blocked":10}.
-Determinism fails: 17/188 measured cells differ by more than 0.01 percentage points.
-
-Other blockers: Journeys bundle budget (failed the caps in force at `2b44a2bc`;
-passes only under the upstream `677f2ea9` cap re-baseline, which needs an owner
-decision), legacy lint, sidebar audit, DS button
-authentication setup, incomplete axe research@1440, missing Firefox/WebKit
-executables, built-in Clerk target-host mismatch, and production baseline coverage
-and adjudication. Theme combinations passed 50/50. See the consolidated
-[report](REPORT.md) and [handoffs](worklog/full-regression-2026-09-15.md).
+Pixel rows: 56 pass, 128 fail, 0 incomplete, 0 blocked of 188. Eligibility: {"pixel":47,"token-only":25,"artifact-docs":1,"blocked":10}.
 
 ## Largest measured gaps
 
 | Screen | Width | Diff % | Reason |
 |---|---:|---:|---|
-| app.admin.resources | 1024 | 98.9401% | 98.940% differing pixels exceeds the 0.5% ceiling |
-| app.admin.resources | 768 | 98.9128% | 98.913% differing pixels exceeds the 0.5% ceiling |
-| app.admin.resources | 1440 | 98.8651% | 98.865% differing pixels exceeds the 0.5% ceiling |
-| app.admin.resources | 375 | 98.6448% | 98.645% differing pixels exceeds the 0.5% ceiling |
-| app.subsubcategory | 375 | 83.4344% | 83.434% differing pixels exceeds the 0.5% ceiling |
-| app.subsubcategory | 1024 | 80.7927% | 80.793% differing pixels exceeds the 0.5% ceiling |
-| app.subsubcategory | 768 | 75.2795% | 75.279% differing pixels exceeds the 0.5% ceiling |
-| app.subsubcategory | 1440 | 73.8924% | 73.892% differing pixels exceeds the 0.5% ceiling |
-| app.resource.detail | 1024 | 67.6337% | 67.634% differing pixels exceeds the 0.5% ceiling |
-| app.resource.detail | 1440 | 65.6150% | 65.615% differing pixels exceeds the 0.5% ceiling |
+| artifact.showcase | 375 | 25.8907% | 25.891% differing pixels exceeds the 0.5% ceiling; @font-face parity gap: 14 face(s) declared on one side only; font defect — app: Canonical display italic face Fraunces is not registered/loaded; synthetic italic is a visual defect when used |
+| app.subcategory | 375 | 9.9468% | 9.947% differing pixels exceeds the 0.5% ceiling |
+| app.category | 375 | 9.8077% | 9.808% differing pixels exceeds the 0.5% ceiling |
+| app.admin.overview | 375 | 9.7859% | 9.786% differing pixels exceeds the 0.5% ceiling |
+| app.subcategory | 1440 | 7.2404% | 7.240% differing pixels exceeds the 0.5% ceiling |
+| app.subcategory | 768 | 6.9956% | 6.996% differing pixels exceeds the 0.5% ceiling |
+| artifact.showcase | 768 | 6.7988% | 6.799% differing pixels exceeds the 0.5% ceiling; @font-face parity gap: 14 face(s) declared on one side only; font defect — app: Canonical display italic face Fraunces is not registered/loaded; synthetic italic is a visual defect when used |
+| app.admin.categories | 768 | 6.7774% | 6.777% differing pixels exceeds the 0.5% ceiling |
+| app.admin.users | 768 | 6.6376% | 6.638% differing pixels exceeds the 0.5% ceiling |
+| app.subcategory | 1024 | 6.6004% | 6.600% differing pixels exceeds the 0.5% ceiling |
 
 ## Blocked rows
 
-- 40 cells across the ten blocked inventory screens. Exact reasons remain in
-  the runner-generated row table in REPORT.md. Token-only cells remain unverified;
-  successful global token gates do not prove every state.
+- none
 
 ## Incomplete rows
 

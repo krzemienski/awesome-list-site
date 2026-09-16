@@ -1,33 +1,42 @@
 # Production release record
 
-## Decision — HOLD (2026-09-16)
+## Decision — HOLD (2026-09-16, updated after the full-inventory rerun)
 
-Candidate inspected: `60a43136711546fa047660716abb05dadf7db4fc`.
-The checkout was clean at inspection. **Not ready to publish; not published
-and verified.** No publishing action was offered or initiated, no deployment
-configuration was changed, and no production data was written.
+Candidate: the working tree that becomes the next commit on `main` after
+`fc92abb9` (the pushed image-trim fix) — see `git log` for the exact SHA.
+**Not ready to publish; not published and verified.** No publishing action
+was offered or initiated, no deployment configuration was changed, and no
+production data was written.
 
-The release contract requires independent verification to pass first.
-[Independent verification](VERIFICATION.md) still records acceptance BLOCKED.
-The [status](STATUS.md), [report](REPORT.md), and
-[regression handoff](worklog/full-regression-2026-09-15.md) agree:
+The release contract requires the parity gate and independent verification to
+pass first. The full-inventory run `tests/parity/baseline/2026-09-16T05-55-50-268Z-6075`
+(all four widths, admin identity) is the current measurement
+([STATUS.md](STATUS.md), [REPORT.md](REPORT.md), per-area reasons in
+[IMPLEMENTATION.md](IMPLEMENTATION.md)):
 
-- 188 measured pixel cells: 16 pass, 172 fail; 40 blocked cells and 96
-  unverified token-only cells remain outside that denominator.
-- 17 measured cells have repeat determinism differences above 0.01 percentage
-  points. Capture issues must be adjudicated separately from product defects;
-  neither constitutes a pass.
-- Candidate comparison against the retained production baseline has 25
-  unresolved routes of 26, 43 route deltas, and changes in 8 of 12 API endpoints.
+- 188 measured pixel cells: **56 pass, 128 fail**, 0 incomplete; 40 blocked
+  cells and the token-only rows stay outside that denominator. The previous
+  full run was 16 pass / 172 fail.
+- Passing at every width: approvals, audit, edits, export, research,
+  resources, home (index and curated), shell drawer, shell palette.
+- Failing at every width: about, category, subcategory, submit, users, every
+  `artifact.docs.*` and `artifact.showcase` cell (the artifact cells carry an
+  `@font-face` parity gap — 14 faces on one side — proposed as task 534).
+- Selected reruns after the run (`…06-59-13-579Z-19499`, `…07-03-25-409Z-20621`,
+  `…07-08-57-394Z-332`) cleared the 768 forced-stacking failures on
+  enrichment and database and brought categories/subcategories 768 from
+  6.8%/5.6% to 0.60%/0.62%; they do not change the shared report.
 - The Journeys budget passes only under an upstream cap increase that the
   independent review identifies as requiring an owner decision. This task
   does not approve or further relax that increase.
-- Browser/auth, incomplete axe, sidebar/taxonomy, lint, and reference coverage
-  blockers remain detailed in the linked review. Later selected attempts did
-  not produce a superseding passing acceptance run.
+- [Independent verification](VERIFICATION.md) still records acceptance
+  BLOCKED; browser/auth, incomplete axe and reference-coverage blockers remain
+  detailed there.
 
-These are retained findings, not new browser measurements of this candidate.
-Do not infer release acceptance from the static checks that previously passed.
+Static gates on this candidate (validation run `4bA5jAeYRT-L0MgQ3nTdc`):
+typecheck, dead-exports, palette-drift, canonical-token-parity,
+dead-components, accent-drift all PASS. Do not infer release acceptance from
+them.
 
 ## Pre-publish checklist
 

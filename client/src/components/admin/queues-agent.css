@@ -436,19 +436,6 @@
     gap: var(--space-4, 1rem);
   }
 
-  .queues-agent .queues-agent__table-heading {
-    align-items: flex-start;
-    padding: 16px;
-  }
-
-  .queues-agent .queues-agent__table-heading > :last-child {
-    width: 100%;
-  }
-
-  .queues-agent .queues-agent__table-heading > :last-child > * {
-    flex: 1 1 auto;
-  }
-
   .queues-agent .queues-agent__table-body td,
   .queues-agent .queues-agent__table-body th {
     padding: .65rem .75rem;

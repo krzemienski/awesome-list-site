@@ -153,17 +153,9 @@
 }
 
 @media (max-width: 48rem) {
-  /* The frozen TableShell keeps its 18px 22px header inset at every width. */
-  .admin-ops-table-shell__header {
-    align-items: flex-start;
-    padding: 18px 22px;
-  }
-
-  .admin-ops-table-shell__actions {
-    justify-content: flex-start;
-    width: 100%;
-  }
-
+  /* The frozen TableShell keeps its 18px 22px header inset, centred row and
+     natural flex-wrap at every width: the actions never get their own row
+     unless the title genuinely runs out of room. */
   .admin-ops-stat-strip {
     grid-template-columns: 1fr;
   }
