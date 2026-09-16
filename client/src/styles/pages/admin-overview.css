@@ -286,12 +286,14 @@
   text-align: end;
 }
 
-.admin-overview-canonical .admin-canonical-health-row > .dot.muted {
-  background: var(--text-3, var(--text-2));
+/* Own hook on the canonical dot: the frozen sheet defines no muted tone and
+   the row must not shrink the 8px dot. */
+.admin-overview-canonical .admin-canonical-health-dot {
+  flex: 0 0 auto;
 }
 
-.admin-overview-canonical .admin-canonical-health-row > .dot {
-  flex: 0 0 auto;
+.admin-overview-canonical .admin-canonical-health-dot.muted {
+  background: var(--text-3, var(--text-2));
 }
 
 .admin-overview-canonical .admin-canonical-category-row {

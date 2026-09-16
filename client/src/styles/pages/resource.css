@@ -87,7 +87,6 @@
 
 /* Preserve the richer app contracts without letting secondary metadata,
    previews, and recommendations lengthen the default ResourcePage. */
-.resource-detail:not(:has(.resource-detail-more[open])) .resource-detail-content > div:first-child:not(.resource-detail-sections),
 .resource-detail:not(:has(.resource-detail-more[open])) .resource-detail-sections > div:not(:has([data-testid="link-url"])):not([data-seo-section="resource-tags"]),
 .resource-detail:not(:has(.resource-detail-more[open])) .resource-detail-related {
   display: none;

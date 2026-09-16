@@ -622,11 +622,11 @@ export default function ResearcherTab({ initialTab = "launch" }: ResearcherTabPr
                   <tr key={job.id}>
                     <td><span className={`chip ${job.status === "completed" ? "ok" : job.status === "failed" ? "bad" : job.status === "pending" ? "warn" : ""}`}>{job.status}</span></td>
                     <td className="prompt">{job.prompt || "Auto-generated research brief"}</td>
-                    <td className="mono">{job.totalDiscoveries || 0}</td>
-                    <td className="mono">{job.approvedDiscoveries || 0}/{job.rejectedDiscoveries || 0}</td>
-                    <td className="mono accent">{formatCost(job.estimatedCostUsd)}</td>
-                    <td className="mono">{job.turnsUsed || 0}/{job.maxTurns || 0}</td>
-                    <td className="mono muted">{job.createdAt ? formatAdminDate(job.createdAt) : "—"}</td>
+                    <td className="mono queues-agent__cell-mono">{job.totalDiscoveries || 0}</td>
+                    <td className="mono queues-agent__cell-mono">{job.approvedDiscoveries || 0}/{job.rejectedDiscoveries || 0}</td>
+                    <td className="mono accent queues-agent__cell-mono">{formatCost(job.estimatedCostUsd)}</td>
+                    <td className="mono queues-agent__cell-mono">{job.turnsUsed || 0}/{job.maxTurns || 0}</td>
+                    <td className="mono muted queues-agent__cell-mono queues-agent__cell-muted">{job.createdAt ? formatAdminDate(job.createdAt) : "—"}</td>
                   </tr>
                 ))}
               </tbody>

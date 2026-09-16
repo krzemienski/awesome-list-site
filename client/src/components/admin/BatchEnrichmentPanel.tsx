@@ -426,7 +426,7 @@ export default function BatchEnrichmentPanel() {
               <tbody>
                 {jobs.slice(0, 6).map((job) => (
                   <tr key={job.id}>
-                    <td className="mono">#{job.id}</td>
+                    <td className="mono queues-agent__cell-mono">#{job.id}</td>
                     <td>
                       {(() => {
                         const status = effectiveStatus(job);
@@ -434,8 +434,8 @@ export default function BatchEnrichmentPanel() {
                         return <span className={`chip ${tone}`}>{status}</span>;
                       })()}
                     </td>
-                    <td className="mono muted">{job.startedAt ? new Date(job.startedAt).toLocaleString("en-US") : "—"}</td>
-                    <td className="mono muted">{job.completedAt ? new Date(job.completedAt).toLocaleString("en-US") : "—"}</td>
+                    <td className="mono muted queues-agent__cell-mono queues-agent__cell-muted">{job.startedAt ? new Date(job.startedAt).toLocaleString("en-US") : "—"}</td>
+                    <td className="mono muted queues-agent__cell-mono queues-agent__cell-muted">{job.completedAt ? new Date(job.completedAt).toLocaleString("en-US") : "—"}</td>
                     <td className="actions">
                       <button
                         className="btn ghost"

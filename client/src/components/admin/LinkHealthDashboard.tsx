@@ -294,7 +294,7 @@ export default function LinkHealthDashboard() {
           ["Timeout", summaryCounts.timeout, "bad"],
         ].map(([label, value, tone]) => (
           <div key={label} className={`card ops-link-health__stat-card ops-link-health__stat-card--${tone}`}>
-            <div className="mono">{label}</div>
+            <div className="mono ops-link-health__stat-label">{label}</div>
             <div>{value}</div>
           </div>
         ))}

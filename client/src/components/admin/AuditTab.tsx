@@ -336,7 +336,7 @@ export default function AuditTab() {
                     aria-label={`View details for audit entry ${log.id}`}
                     data-testid={`row-audit-log-${log.id}`}
                   >
-                    <TableCell className="text-xs text-muted-foreground whitespace-nowrap">
+                    <TableCell className="text-xs text-muted-foreground">
                        <span>TX#{log.id}</span>
                       <Button
                         type="button"
@@ -357,9 +357,7 @@ export default function AuditTab() {
                       {actorLabel(log)}
                     </TableCell>
                     <TableCell className="text-sm">
-                      <span className="truncate" title={log.action.replace(/_/g, " ")}>
-                        {log.action.replace(/_/g, " ")}
-                      </span>
+                      {log.action.replace(/_/g, " ")}
                     </TableCell>
                     <TableCell className="text-sm">
                        {targetLabel(log)}
@@ -369,7 +367,7 @@ export default function AuditTab() {
                         {(ACTION_STATUS[log.action] ?? "recorded").replace(/_/g, " ")}
                       </StatusChip>
                     </TableCell>
-                    <TableCell className="text-xs text-muted-foreground whitespace-nowrap">
+                    <TableCell className="text-xs text-muted-foreground">
                        {formatRelativeAgo(log.createdAt)}
                     </TableCell>
                   </TableRow>
@@ -384,7 +382,9 @@ export default function AuditTab() {
             </TableBody>
           </Table>
         </div>
-        <p className="text-xs text-muted-foreground mt-2 sm:hidden">
+        {/* The right-edge fade above is the visible cue; the frozen card ends
+            at the table, so the sideways hint stays for assistive tech only. */}
+        <p className="sr-only">
           Swipe the table sideways to see all columns.
         </p>
         </>

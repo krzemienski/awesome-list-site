@@ -50,7 +50,7 @@ interface DatabaseTabProps {
 }
 
 /** "24 KB" / "12.4 MB" / "34 MB" / "1.2 GB" — the same rounding the parity reference applies. */
-export const formatStorageSize = (bytes: number): string => {
+const formatStorageSize = (bytes: number): string => {
   const kb = bytes / 1024;
   if (kb < 1024) return `${Math.max(1, Math.round(kb))} KB`;
   const mb = kb / 1024;

@@ -77,7 +77,7 @@
   min-height: 36px;
   height: 36px;
   padding: 9px 16px;
-  border: 1px solid var(--accent);
+  border: var(--hairline-w) solid var(--accent);
   font-size: 13px;
   line-height: normal;
 }

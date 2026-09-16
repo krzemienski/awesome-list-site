@@ -3,10 +3,10 @@ import type { ResearchJob } from "@shared/schema";
 import { ApiError } from "@/lib/queryClient";
 import { formatRelativeAgo } from "@/lib/utils";
 
-export const RESEARCH_WORKSPACE_LIMIT = 4;
+const RESEARCH_WORKSPACE_LIMIT = 4;
 
 /** Mirror of the frozen note card: title, candidate count, freshness. */
-export function toResearchNote(job: ResearchJob, now = Date.now()) {
+function toResearchNote(job: ResearchJob, now = Date.now()) {
   const active = job.status === "pending" || job.status === "processing";
   return {
     id: job.id,

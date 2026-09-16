@@ -240,7 +240,7 @@ export default function AdminDashboard() {
       <div className="admin-dashboard__masthead">
         <div>
         <div className="admin-dashboard__eyebrow-slot">
-        <div className="eyebrow">
+        <div className="eyebrow admin-dashboard__eyebrow">
           <span aria-hidden="true" className="live-dot" />
           <span>Admin console · {user?.name ?? "Administrator"}</span>
         </div>

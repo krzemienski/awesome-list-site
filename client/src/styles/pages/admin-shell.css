@@ -14,7 +14,7 @@
 /* Canonical: the inline-flex eyebrow itself carries the 12px margin inside
    its line box; putting it on the block slot instead shifted the masthead 2px. */
 .admin-dashboard__eyebrow-slot { margin-bottom: 0; }
-.admin-dashboard__eyebrow-slot > .eyebrow { margin-bottom: 12px; }
+.admin-dashboard__eyebrow { margin-bottom: 12px; }
 .admin-dashboard .admin-dashboard__masthead h1 {
   font-family: var(--font-body);
   font-size: clamp(28px, 4vw, 40px);

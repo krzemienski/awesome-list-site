@@ -444,6 +444,7 @@ export default function AdminOverview({ stats }: AdminOverviewProps) {
                 <StatStatusChip
                   status={state}
                   dot
+                  className="admin-canonical-health-dot"
                   label={`${label}: ${state}`}
                 />
                 <span>{label}</span>
