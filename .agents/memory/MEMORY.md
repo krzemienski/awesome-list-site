@@ -143,4 +143,4 @@
 - [Built-in tester batching](native-tester-batching.md) — ~45 s ceiling per execution: one family × ≤4 items per step, one navigation per step, running ledger; it may restart the wrong workflow.
 - [URL-sync effects vs history navigation](url-sync-effect-popstate.md) — a URL-mirroring effect must no-op once the document left its route, or popstate entries get overwritten and Back never leaves the page.
 - [Parity harness lessons](parity-harness-lessons.md) — frozen panels only flex-wrap; content (not pins) drives auto-table drift; token gate drops type selectors so `:not(.x)` fails.
-- [Route page remounts + capture re-scroll](route-remount-causes.md) — inline `component={() => …}` routes and `qc.clear()` on Clerk first-observation remount every page; reveal ResizeObservers must disconnect after first reveal or full-page captures re-scroll.
+- [Route remounts + capture re-scroll](route-remount-causes.md) — inline `component={() => …}` routes and first-observation `qc.clear()` remount pages; reveal observers must disconnect after one reveal.

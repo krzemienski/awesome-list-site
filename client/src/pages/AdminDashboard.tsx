@@ -150,7 +150,7 @@ export default function AdminDashboard() {
       scroller.scrollLeft = Math.max(0, Math.min(scroller.scrollLeft + delta, scroller.scrollWidth - scroller.clientWidth));
     };
     reveal();
-    observer.observe(scroller);
+    if (!revealed) observer.observe(scroller);
     let cancelled = false;
     document.fonts?.ready.then(() => { if (!cancelled) reveal(); });
     return () => {

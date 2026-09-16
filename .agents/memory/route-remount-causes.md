@@ -13,4 +13,4 @@ Rule: a "clear the query cache when Clerk first reports a restored user" hook mu
 
 Rule: a "reveal the active tab" effect that observes its scroller with a ResizeObserver must disconnect after the first successful reveal. A full-page capture resizes the viewport (1×1 → W×H twice per shot), which re-fires the observer and re-scrolls the strip with a *different* alignment than the reference's one-shot scrollIntoView.
 
-**How to prove:** patch `Element.prototype.scrollLeft`'s setter and `scrollIntoView` in an init script with `console.trace` — the stack names the effect; a probe that logs the value after click / after settle / after capture must show the same number three times.
+**How to apply:** any scroll-position side effect keyed off layout observation must be one-shot; a capture harness that resizes the viewport is a legitimate later resize.
