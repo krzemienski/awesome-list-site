@@ -29,14 +29,16 @@ button,
   -webkit-tap-highlight-color: transparent;
 }
 
-/* Prevent zoom on input focus on mobile */
+/* Prevent zoom on input focus on mobile. The frozen design's canonical
+   controls (.input/.select/.textarea) keep their 13px type at every width,
+   so only non-canonical controls take the iOS-zoom guard. */
 @media (max-width: 767px) {
-  input[type="text"],
-  input[type="search"],
-  input[type="email"],
-  input[type="password"],
-  textarea,
-  select {
+  input[type="text"]:not(.input),
+  input[type="search"]:not(.input),
+  input[type="email"]:not(.input),
+  input[type="password"]:not(.input),
+  textarea:not(.textarea),
+  select:not(.select) {
     font-size: 16px !important;
   }
 }

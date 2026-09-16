@@ -439,7 +439,7 @@ export default function GitHubSyncPanel() {
                   return (
                   <TableRow key={sync.id} data-testid={`sync-history-row-${sync.id}`}>
                        <TableCell className="font-mono text-xs">#{sync.id}</TableCell>
-                       <TableCell>
+                       <TableCell className="ops-github-panel__history-direction">
                          {sync.direction}
                       </TableCell>
                       <TableCell>

@@ -153,9 +153,10 @@
 }
 
 @media (max-width: 48rem) {
+  /* The frozen TableShell keeps its 18px 22px header inset at every width. */
   .admin-ops-table-shell__header {
     align-items: flex-start;
-    padding: 1rem;
+    padding: 18px 22px;
   }
 
   .admin-ops-table-shell__actions {

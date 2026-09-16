@@ -103,7 +103,7 @@
 }
 
 .queues-agent__canonical-table .table {
-  min-width: 650px;
+  min-width: 0;
   width: 100%;
 }
 
@@ -458,4 +458,14 @@
   .queues-agent .queues-agent__active-shell > .p-\[var\(--profile-panel-padding\)\] {
     padding: 16px;
   }
+}
+/* The shell actions render through the shared Button, whose size ladder
+   (h-9/h-10) is not the frozen `.btn`: 9px 16px inset, 13px text, natural
+   line box. Scoped to the two canonical panels only. */
+.queues-agent .admin-ops-table-shell__actions .btn {
+  height: auto;
+  min-height: 0;
+  padding: 9px 16px;
+  font-size: 13px;
+  line-height: normal;
 }
