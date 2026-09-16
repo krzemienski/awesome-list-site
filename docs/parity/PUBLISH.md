@@ -1,35 +1,39 @@
 # Production release record
 
-## Decision — HOLD (2026-09-16, updated after the full-inventory rerun)
+## Decision — HOLD (2026-09-16, updated after the third full-inventory run)
 
 Candidate: the working tree that becomes the next commit on `main` after
-`fc92abb9` (the pushed image-trim fix) — see `git log` for the exact SHA.
-**Not ready to publish; not published and verified.** No publishing action
-was offered or initiated, no deployment configuration was changed, and no
-production data was written.
+`0d75b087` (route-remount and users-table fixes) — see `git log` for the
+exact SHA. **Not ready to publish; not published and verified.** No
+publishing action was offered or initiated, no deployment configuration was
+changed, and no production data was written.
 
 The release contract requires the parity gate and independent verification to
-pass first. The full-inventory run `tests/parity/baseline/2026-09-16T05-55-50-268Z-6075`
+pass first. The full-inventory run `tests/parity/baseline/2026-09-16T20-05-21-890Z-49182`
 (all four widths, admin identity) is the current measurement
 ([STATUS.md](STATUS.md), [REPORT.md](REPORT.md), per-area reasons in
 [IMPLEMENTATION.md](IMPLEMENTATION.md)):
 
-- 184 executed pixel cells: **56 pass, 128 fail**, 0 incomplete; 40 blocked
+- 184 executed pixel cells: **83 pass, 101 fail**, 0 incomplete; 40 blocked
   cells, 4 aliases and the token-only rows stay outside that denominator. The
-  previous full run was 16 pass / 172 fail.
+  previous full run was 56 pass / 128 fail, the one before 16 / 172.
+- App cells: **79 of 92 pass.** The 13 failing app cells are
+  `app.admin.overview` 375 (reference overflows to 400px), `app.admin.linkhealth`
+  375 (product empty state kept by contract), `app.admin.users` 375 (swipe
+  hint kept by contract), `app.admin.researcher` 375/768/1024 (live jobs table
+  rows 56px vs fixture 66px — not yet isolated), `app.admin.categories` and
+  `app.admin.subcategories` 375/768/1024 (0.51–0.73%: icon glyphs plus the
+  fractional column pins), and `app.admin.github` 375 at 0.518%.
+- Newly passing at every width since the previous full run: about, category,
+  subcategory, resource detail, submit, enrichment, database, github
+  768/1024, linkhealth 768/1024/1440, users 768/1024/1440.
+- Every `artifact.docs.*` and `artifact.showcase` cell (88) still fails on the
+  `@font-face` parity gap (10 faces on one side for the docs pages, 14 for
+  the showcase) — proposed as task 534; they are outside the app's
+  stylesheets.
 - The run recorded `Inputs changed during run: YES — stale` (live adapter
-  hashes moved during capture; 8 leftover `__qa_test_parity_` rows in the dev
-  DB). It locates defects; it is not exact-candidate proof.
-- Passing at every width: approvals, audit, edits, export, research,
-  resources, home (index and curated), shell drawer, shell palette.
-- Failing at every width: about, category, subcategory, submit, users, every
-  `artifact.docs.*` and `artifact.showcase` cell (the artifact cells carry an
-  `@font-face` parity gap — 10 faces on one side for the docs pages, 14 for
-  the showcase — proposed as task 534).
-- Selected reruns after the run (`…06-59-13-579Z-19499`, `…07-03-25-409Z-20621`,
-  `…07-08-57-394Z-332`) cleared the 768 forced-stacking failures on
-  enrichment and database and brought categories/subcategories 768 from
-  6.8%/5.6% to 0.60%/0.62%; they do not change the shared report.
+  hashes moved during capture). It locates defects; it is not exact-candidate
+  proof.
 - The Journeys budget passes only under an upstream cap increase that the
   independent review identifies as requiring an owner decision. This task
   does not approve or further relax that increase.
@@ -37,10 +41,9 @@ pass first. The full-inventory run `tests/parity/baseline/2026-09-16T05-55-50-26
   BLOCKED; browser/auth, incomplete axe and reference-coverage blockers remain
   detailed there.
 
-Static gates on this candidate (validation run `4bA5jAeYRT-L0MgQ3nTdc`):
-typecheck, dead-exports, palette-drift, canonical-token-parity,
-dead-components, accent-drift all PASS. Do not infer release acceptance from
-them.
+Static gates on this candidate (validation run `h-gQ2h8ZYvxGVbHpJwrWj`,
+all PASS): typecheck, dead-exports, palette-drift, canonical-token-parity,
+dead-components, accent-drift. Do not infer release acceptance from them.
 
 ## Pre-publish checklist
 

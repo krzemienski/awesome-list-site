@@ -126,13 +126,19 @@ export default function AdminDashboard() {
   // /admin#github shows which tab is open instead of the strip's first tabs;
   // a trigger that is already fully visible stays put. The strip can still be
   // wrapping (its page stylesheet not yet applied) when the tab first renders,
-  // so re-run once the list resizes into its single row and when fonts settle.
+  // so wait for the list to resize into its single row and for fonts to
+  // settle — then stop observing: later viewport changes (a window resize, a
+  // full-page capture) must leave the user's own scroll position alone.
   useEffect(() => {
     const scroller = document.querySelector<HTMLElement>(".admin-dashboard__tabs");
     if (!scroller) return;
+    let revealed = false;
+    const observer = new ResizeObserver(() => reveal());
     const reveal = () => {
       const trigger = scroller.querySelector<HTMLElement>(`[data-testid="tab-${visibleTab}"]`);
-      if (!trigger || scroller.scrollWidth <= scroller.clientWidth) return;
+      if (revealed || !trigger || scroller.scrollWidth <= scroller.clientWidth) return;
+      revealed = true;
+      observer.disconnect();
       const triggerRect = trigger.getBoundingClientRect();
       const scrollerRect = scroller.getBoundingClientRect();
       // Nearest-edge alignment (what the browser's own scroll-into-view does),
@@ -144,7 +150,6 @@ export default function AdminDashboard() {
       scroller.scrollLeft = Math.max(0, Math.min(scroller.scrollLeft + delta, scroller.scrollWidth - scroller.clientWidth));
     };
     reveal();
-    const observer = new ResizeObserver(reveal);
     observer.observe(scroller);
     let cancelled = false;
     document.fonts?.ready.then(() => { if (!cancelled) reveal(); });
