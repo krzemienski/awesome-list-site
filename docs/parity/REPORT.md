@@ -1,6 +1,6 @@
 # Visual parity report
 
-## Consolidated regression — run-2026-09-15
+## Consolidated regression — run-2026-09-15 (historical evidence, current documentation)
 
 **Acceptance BLOCKED.** Command execution has finished, but this is not a
 regression-complete or release-ready claim. Runtime source was unchanged at
@@ -9,8 +9,9 @@ edited no frozen design files, and published nothing. Provenance note: the
 task branch was later rebased onto upstream main commit `677f2ea9`, which
 re-baselined the Journeys route bundle caps (see the Bundle budget row); the
 client and server source at HEAD `9878061a` is otherwise identical to
-`2b44a2bc`, so the retained results still describe HEAD, with that one
-qualification.
+`2b44a2bc`; the retained results remain labelled with their originating capture
+SHA and this report does not claim a fresh capture at documentation HEAD
+`a1e2a9fc598a34b4e662a27f5c8bdb6a869c8f3e`.
 
 Evidence: [command ledger, exits and durations](evidence/full-regression/run-2026-09-15/COMMANDS.md),
 [worklog and owner handoffs](worklog/full-regression-2026-09-15.md).
@@ -70,6 +71,16 @@ Denominator: 16 pass / 172 fail / **188** pixel rows executed. 0 row-incomplete,
 Full inventory run: every one of the 332 screen/width rows below has exactly one terminal status.
 
 ## Eligibility
+
+## Independent verification at the command-tested SHA
+
+[Independent verification](VERIFICATION.md) records a distinct pass at `a1e2a9fc598a34b4e662a27f5c8bdb6a869c8f3e`; it does not relabel this historical full-regression capture. Fresh non-browser gates passed: `npm run check`; 16 files / 315 `npm run test:unit` tests; 19 response-contract checks with 0 real mismatches; OpenAPI 178 routes / 178 named contracts / 150 paths; boot-migration safety; migration drift with 27 journaled migrations/sequences; dead exports (841 across 216 modules, 50 pinned); and root-script drift (28 executable files, 0 stray).
+
+The requested five-ID parity selection has no complete fresh result. It exited 2 without `BASE_URL`, then exited 2 with `net::ERR_CONNECTION_REFUSED`; one final allowed attempt reached the browser but wrapper-timed out (`-1`) at 300 seconds after four failing `app.about` cells and two failing `app.category` cells, while beginning `app.category@1024`. The partial sequence is **UNVERIFIED**, not a five-row pass or a complete selected-run failure classification. Its cleanup gap is resolved separately: the verifier's exact two-ID operation deleted one local and one Clerk record, then verified zero records remaining; no prefix-wide sweep was used. See [the verification record](VERIFICATION.md#fresh-selected-parity-attempts).
+
+## Link-integrity audit
+
+The final read-only [Task 571 link/PNG audit report](evidence/verification-571/parity571-missing-targets.txt), [JSON result](evidence/verification-571/parity571-links.json), and [runnable Node document](evidence/verification-571/parity571-audit.js.txt) cover 163 Markdown files, 1,674 links, and 1,298 PNG references (698 unique): zero missing local targets, zero missing PNGs, and zero existing-but-untracked PNGs. The six authorized historical leaf links now carry explicit UNVERIFIED notes. The unavailable completion log, `final-shell-build/` directory, and artifact workflow log remain unavailable; no replacement raw evidence is asserted. The SCREENS aggregate remains intentionally excluded from leaf-link repairs.
 
 | Class | Screens | Meaning |
 |---|---:|---|
@@ -456,6 +467,29 @@ Catalog snapshot `14820b6e59688cc0…` (9 categories, 1816 resources) bound to t
         ) : (
           <p className="home-empty-section">No featured resources have been selected yet.</p>
         )}` | /api/home featured[] empty state |
+
+## Phase commit audit
+
+The [complete worklog](WORKLOG.md) retains all 30 wave records. Git subjects
+are preserved rather than rewritten to manufacture compliance.
+
+| Phase | Commits | Conventional-prefix audit |
+|---|---|---|
+| Foundations/source | `d7004885`, `98f1b0cc`, `1611b848` | PASS: chore/fix |
+| Tokens/fonts | `7dfe06f7`, `ee798204` | PASS: chore |
+| Kind/contact APIs | `6f94cab0`, `5f52709e` | PASS: feat |
+| Harness | `6fc80a5f` | UNMET: descriptive subject |
+| Shell/navigation | `8fc3f6ec`, `8bf3494d`, `6cab708f` | UNMET: descriptive subjects |
+| Discovery/retention | `882d5d6b`, `43dc2ba4` | UNMET: descriptive subjects |
+| Artifact | `fdf1c6b7`, `59cd9037` | UNMET: descriptive subjects |
+| Integration/audit | `b190c8fe`, `d11775ec` | UNMET: descriptive subjects |
+| Contact/click-through | `10cb97df`, `2b44a2bc` | UNMET: descriptive subjects |
+| Full regression | `a1e2a9fc` | UNMET: descriptive subject |
+| Documentation consolidation | Delivery commit following `a1e2a9fc` | `docs(parity)`; exact SHA is recorded by Git rather than embedded self-referentially |
+
+Only documentation and evidence records change in this delivery. Historic
+measurements retain their tested SHAs; no subsequent docs commit is represented
+as a new browser-tested runtime revision.
 
 ## Capture contract
 

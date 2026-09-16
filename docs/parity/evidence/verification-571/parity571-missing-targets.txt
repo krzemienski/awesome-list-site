@@ -1,0 +1,12 @@
+Task 571 Markdown local-link/PNG audit
+Scope: 163 Markdown files; repository unchanged.
+Markdown links: 1674 total; 1663 local file links; 10 external URL(s) skipped; 1 app route URL(s) skipped; 0 fragment-only.
+Root-relative evidence links resolved beside their report: 0.
+PNG references: 1298 (698 unique files); missing: 0; existing but not git-tracked: 0.
+Ignored path-like mentions: 2482 (inline code 2072; prose 410; neither is a Markdown link).
+Gate: PASS; missing local targets 0; missing PNGs 0; unavailable/untracked PNGs 0.
+
+No missing local Markdown targets or untracked PNG evidence.
+
+PRECISE FIX PLAN (no files changed)
+Final result: no missing local Markdown targets, missing PNG targets, or existing-but-untracked PNG targets. Historical unavailable raw artifacts remain explicit in their leaf notes; the SCREENS aggregate remains intentionally excluded from leaf-link repairs.

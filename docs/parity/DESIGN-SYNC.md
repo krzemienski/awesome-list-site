@@ -1,5 +1,7 @@
 # Canonical design-source synchronization
 
+> **Consolidation boundary:** the canonical archive/load graph below remains authoritative. Historical full-regression evidence remains at `2b44a2bc08692059cc4ab63c526a5871451fbe1f`; [independent verification](VERIFICATION.md) records fresh non-browser gates and an incomplete timed-out five-ID selection at command-tested `a1e2a9fc598a34b4e662a27f5c8bdb6a869c8f3e`, not a replacement browser capture.
+
 ## Scope and provenance
 
 - Phase: **0 only**. This record synchronizes the canonical reference; it makes no product-parity claim.

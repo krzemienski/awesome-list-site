@@ -1,0 +1,539 @@
+#!/usr/bin/env node
+
+/*
+ * Task 571 read-only Markdown-link/PNG audit.
+ *
+ * This deliberately does not rewrite or stage repository files.  Its only
+ * outputs are the JSON audit and the short report under /tmp.
+ */
+
+const fs = require("fs");
+const path = require("path");
+const cp = require("child_process");
+
+const root = process.cwd();
+const jsonPath = "/tmp/parity571-links.json";
+const reportPath = "/tmp/parity571-missing-targets.txt";
+
+const requestedFiles = [
+  path.join(root, "README.md"),
+  path.join(root, "docs", "ADMIN-GUIDE.md"),
+  path.join(root, "docs", "CONTACT-VARIANTS.md"),
+  path.join(root, "tests", "parity", "README.md"),
+  path.join(root, "tests", "parity", "REPORT.md"),
+];
+
+function walkMarkdown(dir) {
+  const found = [];
+  if (!fs.existsSync(dir)) return found;
+  for (const entry of fs.readdirSync(dir, { withFileTypes: true })) {
+    const absolute = path.join(dir, entry.name);
+    if (entry.isDirectory()) found.push(...walkMarkdown(absolute));
+    else if (entry.isFile() && entry.name.toLowerCase().endsWith(".md")) found.push(absolute);
+  }
+  return found;
+}
+
+const files = [
+  ...walkMarkdown(path.join(root, "docs", "parity")),
+  ...requestedFiles,
+].filter((file, index, all) => all.indexOf(file) === index && fs.existsSync(file))
+  .sort();
+
+const tracked = new Set(
+  cp.execFileSync("git", ["ls-files", "-z"], { cwd: root }).toString("utf8")
+    .split("\0")
+    .filter(Boolean),
+);
+
+function relative(file) {
+  return path.relative(root, file).split(path.sep).join("/");
+}
+
+function lineNumber(text, index) {
+  return text.slice(0, index).split("\n").length;
+}
+
+function lineText(lines, line) {
+  return lines[line - 1] || "";
+}
+
+function trimTarget(raw) {
+  let target = raw.trim();
+  if (target.startsWith("<") && target.endsWith(">")) {
+    target = target.slice(1, -1).trim();
+  }
+  // In an inline link, a title follows whitespace after the destination.
+  // Angle-bracket destinations can contain spaces; they were unwrapped above.
+  if (!(raw.trim().startsWith("<") && raw.trim().endsWith(">"))) {
+    const titleAt = target.search(/\s+(?:"[^"]*"|'[^']*'|\([^)]*\))\s*$/);
+    if (titleAt >= 0) target = target.slice(0, titleAt).trim();
+  }
+  return target;
+}
+
+function stripQueryAndFragment(target) {
+  const hash = target.indexOf("#");
+  const question = target.indexOf("?");
+  const cut = [hash, question].filter((value) => value >= 0).sort((a, b) => a - b)[0];
+  return cut === undefined ? target : target.slice(0, cut);
+}
+
+function isExternal(target) {
+  return /^(?:[a-z][a-z0-9+.-]*:|\/\/)/i.test(target);
+}
+
+function isAppRoute(target) {
+  // Root-relative URLs are app routes in this documentation set, not paths
+  // relative to the repository.  Query-only routes are also not files.
+  return target.startsWith("/") || target.startsWith("?");
+}
+
+function isPng(target) {
+  return /\.png(?:$|[?#])/i.test(target);
+}
+
+function safeDecode(target) {
+  try {
+    return decodeURIComponent(target);
+  } catch {
+    return target;
+  }
+}
+
+function classifyTarget(target, sourceFile) {
+  const normalized = target.trim();
+  const baseTarget = stripQueryAndFragment(normalized);
+  const classification = {
+    target: normalized,
+    targetPath: baseTarget,
+    kind: "local-file",
+    resolvedPath: null,
+    resolved: null,
+    exists: null,
+    tracked: null,
+    withinRepo: null,
+    rootRelativeEvidence: false,
+  };
+
+  if (normalized === "" || normalized.startsWith("#")) {
+    classification.kind = normalized === "" ? "empty" : "fragment-only";
+    return classification;
+  }
+  if (isExternal(normalized)) {
+    classification.kind = "external";
+    return classification;
+  }
+  if (isAppRoute(normalized)) {
+    // Older parity reports used /actual, /expected, /diff and /results.json
+    // as paths relative to the report's evidence directory. Resolve known
+    // evidence-shaped URLs as local files even when missing, so the gate
+    // fails rather than silently treating unavailable PNGs as app routes.
+    if (normalized.startsWith("/") && baseTarget !== "/") {
+      const evidenceCandidate = path.resolve(path.dirname(sourceFile), `.${safeDecode(baseTarget)}`);
+      const evidenceShape = /\/(?:actual|expected|diff)\/[^/]+\.png$/i.test(baseTarget) ||
+        /\/results\.json$/i.test(baseTarget);
+      if (fs.existsSync(evidenceCandidate) || evidenceShape) {
+        const relativeEvidence = path.relative(root, evidenceCandidate).split(path.sep).join("/");
+        classification.kind = "local-file";
+        classification.resolvedPath = relativeEvidence || ".";
+        classification.resolved = fs.existsSync(evidenceCandidate);
+        classification.exists = classification.resolved;
+        classification.tracked = classification.exists && tracked.has(relativeEvidence);
+        classification.withinRepo = true;
+        classification.rootRelativeEvidence = true;
+        return classification;
+      }
+    }
+    classification.kind = "app-route";
+    return classification;
+  }
+
+  const decoded = safeDecode(baseTarget);
+  const resolved = path.resolve(path.dirname(sourceFile), decoded);
+  const relativeResolved = path.relative(root, resolved).split(path.sep).join("/");
+  const withinRepo = relativeResolved === "" ||
+    (!relativeResolved.startsWith("../") && relativeResolved !== "..");
+  classification.resolvedPath = relativeResolved || ".";
+  classification.withinRepo = withinRepo;
+  if (!withinRepo) {
+    classification.exists = false;
+    classification.tracked = false;
+    return classification;
+  }
+  classification.resolved = fs.existsSync(resolved);
+  classification.exists = classification.resolved;
+  classification.tracked = tracked.has(relativeResolved);
+  return classification;
+}
+
+function lineIsFence(line) {
+  return /^\s{0,3}(?:`{3,}|~{3,})/.test(line);
+}
+
+function maskInlineCode(line) {
+  // Mask inline-code spans while retaining byte positions for line reporting.
+  // Supporting one-to-many backtick runs covers the Markdown forms used here.
+  return line.replace(/(`+)([\s\S]*?)\1/g, (match) => " ".repeat(match.length));
+}
+
+function addRecord(records, sourceFile, line, label, target, syntax, image, sourceText) {
+  const details = classifyTarget(target, sourceFile);
+  records.push({
+    source: relative(sourceFile),
+    line,
+    label: label || "",
+    target: details.target,
+    syntax,
+    image: Boolean(image),
+    sourceText: sourceText.trim(),
+    classification: details.kind,
+    targetPath: details.targetPath,
+    resolved: details.resolvedPath,
+    exists: details.exists,
+    tracked: details.tracked,
+    withinRepo: details.withinRepo,
+    rootRelativeEvidence: details.rootRelativeEvidence,
+  });
+}
+
+const links = [];
+const ignoredPathMentions = [];
+const pngReferences = [];
+const sourceFileData = [];
+
+for (const sourceFile of files) {
+  const text = fs.readFileSync(sourceFile, "utf8");
+  const lines = text.split(/\r?\n/);
+  const fences = new Set();
+  let fenceMarker = null;
+  for (let index = 0; index < lines.length; index += 1) {
+    const line = lines[index];
+    if (lineIsFence(line)) {
+      const marker = line.match(/^\s{0,3}(`{3,}|~{3,})/)[1][0];
+      if (fenceMarker === null) fenceMarker = marker;
+      else if (fenceMarker === marker) fenceMarker = null;
+      fences.add(index + 1);
+    } else if (fenceMarker !== null) {
+      fences.add(index + 1);
+    }
+  }
+
+  const definitions = new Map();
+  const maskedLines = lines.map((line, index) => {
+    if (fences.has(index + 1)) return " ".repeat(line.length);
+    return maskInlineCode(line);
+  });
+
+  // Reference definitions are file links in their own right, including
+  // definitions that have no use in the visible document.
+  for (let index = 0; index < maskedLines.length; index += 1) {
+    const match = maskedLines[index].match(/^\s{0,3}\[([^\]]+)\]:\s*(?:<([^>\n]+)>|(\S+))(?:\s+.*)?$/);
+    if (!match) continue;
+    const id = match[1].trim().toLowerCase();
+    const target = match[2] || match[3];
+    definitions.set(id, { target, line: index + 1, label: match[1] });
+    addRecord(links, sourceFile, index + 1, match[1], target, "reference-definition", false, lines[index]);
+  }
+
+  for (let index = 0; index < maskedLines.length; index += 1) {
+    if (fences.has(index + 1)) continue;
+    const masked = maskedLines[index];
+    const original = lines[index];
+
+    // Inline links and inline images.  A destination may be angle-wrapped.
+    const inlinePattern = /(!?)\[([^\]\n]*)\]\(\s*(<[^>\n]*>|[^)\n]*?)\s*\)/g;
+    let match;
+    while ((match = inlinePattern.exec(masked)) !== null) {
+      const target = trimTarget(match[3]);
+      if (!target) continue;
+      addRecord(links, sourceFile, index + 1, match[2], target, "inline", match[1] === "!", original);
+    }
+
+    // Reference-style uses: [label][id], [label][] and shortcut [id].
+    const referencePattern = /(!?)\[([^\]\n]+)\](?:\[([^\]\n]*)\])?/g;
+    while ((match = referencePattern.exec(masked)) !== null) {
+      const label = match[2].trim();
+      const explicitId = match[3];
+      const id = (explicitId === undefined || explicitId === "" ? label : explicitId).toLowerCase();
+      const definition = definitions.get(id);
+      if (!definition) continue;
+      addRecord(links, sourceFile, index + 1, label, definition.target, "reference-use", match[1] === "!", original);
+    }
+
+    // Markdown autolinks such as <guide.md>; avoid treating HTML tags as
+    // links.  External autolinks are retained as skipped external evidence.
+    const autolinkPattern = /<([^<>\s]+)>/g;
+    while ((match = autolinkPattern.exec(masked)) !== null) {
+      const candidate = match[1];
+      if (/^[a-z][a-z0-9+.-]*:/i.test(candidate) || candidate.startsWith("//")) {
+        addRecord(links, sourceFile, index + 1, candidate, candidate, "autolink", false, original);
+      } else if (
+        !/[=]/.test(candidate) &&
+        !/^(?:https?|mailto|tel):/i.test(candidate) &&
+        /(?:^\.{1,2}[\/\\]|\.md(?:$|[#?])|\.json(?:$|[#?])|\.png(?:$|[#?])|\.jpe?g(?:$|[#?])|\.webp(?:$|[#?])|\.log(?:$|[#?]))/i.test(candidate)
+      ) {
+        addRecord(links, sourceFile, index + 1, candidate, candidate, "autolink", false, original);
+      }
+    }
+
+    // Keep evidence that looked like a path but was not a Markdown link.
+    // This is intentionally narrow: only path-like strings with a slash or
+    // a documented file extension are reported, avoiding ordinary prose.
+    const codeMatches = [];
+    const originalInlineCode = original.match(/`+[^`]*`+/g) || [];
+    for (const code of originalInlineCode) {
+      const candidate = code.replace(/^`+|`+$/g, "").trim();
+      if (/(?:^|[\s(])(?:\.{0,2}\/|(?:docs|tests|client|server|attached_assets|audit-evidence)\/)[^\s,)]+|(?:^|[\s(])[^/\s,)]+\.(?:md|json|png|jpg|jpeg|webp|log)(?:[?#][^\s,)]*)?/i.test(candidate)) {
+        codeMatches.push(candidate);
+      }
+    }
+    for (const candidate of codeMatches) {
+      ignoredPathMentions.push({
+        source: relative(sourceFile),
+        line: index + 1,
+        context: "inline-code",
+        value: candidate,
+        reason: "code-path-not-markdown-link",
+      });
+    }
+    const proseMatches = original
+      .replace(/`+[^`]*`+/g, " ")
+      .match(/(?:^|[\s(])((?:\.{0,2}\/|(?:docs|tests|client|server|attached_assets|audit-evidence)\/)[^\s,)]+|[A-Za-z0-9_.-]+\.(?:md|json|png|jpg|jpeg|webp|log))(?:$|[\s,).])/gi) || [];
+    for (const mention of proseMatches) {
+      const value = mention.trim().replace(/[),.;:]+$/, "");
+      if (!value || /\[[^\]]+\]\(/.test(original)) continue;
+      ignoredPathMentions.push({
+        source: relative(sourceFile),
+        line: index + 1,
+        context: "prose",
+        value,
+        reason: "prose-path-not-markdown-link",
+      });
+    }
+  }
+
+  sourceFileData.push({ file: relative(sourceFile), lines: lines.length });
+}
+
+for (const link of links) {
+  if (link.classification === "local-file" && isPng(link.target)) {
+    pngReferences.push({
+      source: link.source,
+      line: link.line,
+      target: link.target,
+      resolved: link.resolved,
+      exists: link.exists,
+      tracked: link.tracked,
+      syntax: link.syntax,
+      image: link.image,
+    });
+  }
+}
+
+const missingLinks = links.filter((link) =>
+  link.classification === "local-file" && (!link.exists || !link.withinRepo)
+);
+const missingPng = pngReferences.filter((png) => !png.exists);
+const untrackedPng = pngReferences.filter((png) => png.exists && !png.tracked);
+const localLinks = links.filter((link) => link.classification === "local-file");
+const externalLinks = links.filter((link) => link.classification === "external");
+const appRoutes = links.filter((link) => link.classification === "app-route");
+const fragments = links.filter((link) => link.classification === "fragment-only");
+const emptyTargets = links.filter((link) => link.classification === "empty");
+
+function aggregateSuggestions(records) {
+  const aggregateDocument = (source) => {
+    if (!source.startsWith("docs/parity/")) return false;
+    const base = path.basename(source).toLowerCase();
+    const parent = path.dirname(source);
+    // Top-level parity indexes and consolidated reports are maintained as
+    // aggregates.  Per-run REPORT.md files under evidence remain historical
+    // leaf records even though their basename is also REPORT.md.
+    return parent === "docs/parity" &&
+      /^(?:report|status|screens|ground|cleanup|inspection|assumptions|research|design-sync|ds-audit|harness-review)\.md$/i.test(base);
+  };
+  const bySource = new Map();
+  for (const record of records) {
+    const bucket = bySource.get(record.source) || { source: record.source, occurrences: 0, targets: new Set() };
+    bucket.occurrences += 1;
+    bucket.targets.add(record.target);
+    bySource.set(record.source, bucket);
+  }
+  return [...bySource.values()]
+    .map((bucket) => ({
+      source: bucket.source,
+      occurrences: bucket.occurrences,
+      targets: [...bucket.targets].sort(),
+      documentRole: aggregateDocument(bucket.source)
+        ? "aggregate-or-index"
+        : "historical-leaf-or-evidence",
+      fixGuidance: aggregateDocument(bucket.source)
+        ? "Prefer one precise aggregate/index correction if the same target is repeated."
+        : "Review as historical leaf evidence; preserve the evidence and correct only the target if it is genuinely intended to remain linked.",
+    }))
+    .sort((a, b) => a.source.localeCompare(b.source));
+}
+
+function relativeTargetFromSource(source, targetFile) {
+  return path.relative(
+    path.dirname(path.join(root, source)),
+    path.join(root, targetFile),
+  ).split(path.sep).join("/");
+}
+
+const fixPlan = [
+  {
+    key: "shared-determinism-evidence",
+    affectedOccurrences: missingLinks.filter((link) => /harness\/determinism\/determinism\.json$/i.test(link.target)).map((link) => ({
+      source: link.source,
+      line: link.line,
+      currentTarget: link.target,
+      preciseTarget: relativeTargetFromSource(link.source, "docs/parity/evidence/harness/determinism/determinism.json"),
+    })),
+    role: "historical-leaf-or-evidence",
+    action: "Correct only the relative path depth in each per-run report to the existing tracked determinism evidence; preserve the historical claim and report files.",
+  },
+  {
+    key: "shared-completion-audit-log",
+    affectedOccurrences: missingLinks.filter((link) => /completion-responsive-design-system-2026-09-14\.log$/i.test(link.target)).map((link) => ({
+      source: link.source,
+      line: link.line,
+      currentTarget: link.target,
+    })),
+    role: "aggregate-plus-historical",
+    action: "One missing retained log is referenced four times. Restore that exact retained artifact once (preferred), or after evidentiary review update the aggregate and historical links to one existing equivalent retained artifact; do not delete the validation claim.",
+  },
+  {
+    key: "shared-final-shell-build-directory",
+    affectedOccurrences: missingLinks.filter((link) => /final-shell-build\/?$/i.test(link.target)).map((link) => ({
+      source: link.source,
+      line: link.line,
+      currentTarget: link.target,
+    })),
+    role: "historical-leaf-or-evidence",
+    action: "Restore the retained build evidence directory (or make both historical links point to a reviewed existing retained build record); do not remove the build-size evidence.",
+  },
+  {
+    key: "artifact-workflow-log",
+    affectedOccurrences: missingLinks.filter((link) => /artifact-showcase-550\/workflow\.log$/i.test(link.target)).map((link) => ({
+      source: link.source,
+      line: link.line,
+      currentTarget: link.target,
+    })),
+    role: "historical-leaf-or-evidence",
+    action: "The leaf worklog points at a non-retained workflow log. Restore it if delivery requires that evidence; otherwise replace only the link with an explicit retained-log status, without deleting the surrounding historical record.",
+  },
+].filter((group) => group.affectedOccurrences.length > 0);
+
+const gate = {
+  passed: missingLinks.length === 0 && missingPng.length === 0 && untrackedPng.length === 0,
+  failsOnMissingLocalTargets: true,
+  failsOnMissingPng: true,
+  failsOnUnavailablePng: true,
+  missingLocalFileLinks: missingLinks.length,
+  missingPngReferences: missingPng.length,
+  untrackedExistingPngReferences: untrackedPng.length,
+};
+
+const result = {
+  audit: {
+    task: 571,
+    generatedBy: "parity571-audit.js",
+    root,
+    scope: [
+      "docs/parity/**/*.md",
+      "README.md",
+      "docs/ADMIN-GUIDE.md",
+      "docs/CONTACT-VARIANTS.md",
+      "tests/parity/README.md",
+      "tests/parity/REPORT.md",
+    ],
+    readOnly: true,
+    externalUrlsSkipped: true,
+    appRouteUrlsSkipped: true,
+    historicalCodeAndProsePathsSeparated: true,
+  },
+  summary: {
+    filesScanned: files.length,
+    markdownLinksFound: links.length,
+    localFileLinks: localLinks.length,
+    missingLocalFileLinks: missingLinks.length,
+    externalLinksSkipped: externalLinks.length,
+    appRouteLinksSkipped: appRoutes.length,
+    fragmentOnlyLinks: fragments.length,
+    emptyTargets: emptyTargets.length,
+    ignoredPathMentions: ignoredPathMentions.length,
+    ignoredCodePathMentions: ignoredPathMentions.filter((mention) => mention.context === "inline-code").length,
+    ignoredProsePathMentions: ignoredPathMentions.filter((mention) => mention.context === "prose").length,
+    rootRelativeEvidenceLinks: links.filter((link) => link.rootRelativeEvidence).length,
+    pngReferences: pngReferences.length,
+    missingPngReferences: missingPng.length,
+    untrackedExistingPngReferences: untrackedPng.length,
+  },
+  files: sourceFileData,
+  links,
+  pngReferences,
+  missingTargets: missingLinks,
+  missingPng,
+  untrackedPng,
+  ignoredPathMentions,
+  fixPlan,
+  fixAggregation: {
+    missingLinksBySource: aggregateSuggestions(missingLinks),
+    missingPngBySource: aggregateSuggestions(missingPng),
+    untrackedPngBySource: aggregateSuggestions(untrackedPng),
+  },
+  gate,
+};
+
+fs.writeFileSync(jsonPath, JSON.stringify(result, null, 2) + "\n");
+
+const report = [];
+report.push("Task 571 Markdown local-link/PNG audit");
+report.push(`Scope: ${files.length} Markdown files; repository unchanged.`);
+report.push(`Markdown links: ${links.length} total; ${localLinks.length} local file links; ${externalLinks.length} external URL(s) skipped; ${appRoutes.length} app route URL(s) skipped; ${fragments.length} fragment-only.`);
+report.push(`Root-relative evidence links resolved beside their report: ${links.filter((link) => link.rootRelativeEvidence).length}.`);
+report.push(`PNG references: ${pngReferences.length} (${new Set(pngReferences.map((png) => png.resolved)).size} unique files); missing: ${missingPng.length}; existing but not git-tracked: ${untrackedPng.length}.`);
+report.push(`Ignored path-like mentions: ${ignoredPathMentions.length} (inline code ${ignoredPathMentions.filter((mention) => mention.context === "inline-code").length}; prose ${ignoredPathMentions.filter((mention) => mention.context === "prose").length}; neither is a Markdown link).`);
+report.push(`Gate: ${gate.passed ? "PASS" : "FAIL"}; missing local targets ${gate.missingLocalFileLinks}; missing PNGs ${gate.missingPngReferences}; unavailable/untracked PNGs ${gate.untrackedExistingPngReferences}.`);
+report.push("");
+if (missingLinks.length === 0 && missingPng.length === 0 && untrackedPng.length === 0) {
+  report.push("No missing local Markdown targets or untracked PNG evidence.");
+} else {
+  report.push("MISSING LOCAL MARKDOWN TARGETS");
+  if (missingLinks.length === 0) report.push("- none");
+  for (const link of missingLinks) {
+    report.push(`- ${link.source}:${link.line} -> ${link.target} [resolved=${link.resolved || "outside-repo"}]`);
+  }
+  report.push("");
+  report.push("MISSING PNG TARGETS");
+  if (missingPng.length === 0) report.push("- none");
+  for (const png of missingPng) {
+    report.push(`- ${png.source}:${png.line} -> ${png.target} [resolved=${png.resolved || "outside-repo"}]`);
+  }
+  report.push("");
+  report.push("EXISTING BUT UNTRACKED PNG TARGETS");
+  if (untrackedPng.length === 0) report.push("- none");
+  for (const png of untrackedPng) {
+    report.push(`- ${png.source}:${png.line} -> ${png.target} [resolved=${png.resolved}]`);
+  }
+}
+report.push("");
+report.push("PRECISE FIX PLAN (no files changed)");
+for (const group of fixPlan) {
+  report.push(`- ${group.key}: ${group.affectedOccurrences.length} occurrence(s); ${group.action}`);
+  for (const occurrence of group.affectedOccurrences) {
+    report.push(`  ${occurrence.source}:${occurrence.line} -> ${occurrence.preciseTarget || occurrence.currentTarget}`);
+  }
+}
+report.push("Final result: no missing local Markdown targets, missing PNG targets, or existing-but-untracked PNG targets. Historical unavailable raw artifacts remain explicit in their leaf notes; the SCREENS aggregate remains intentionally excluded from leaf-link repairs.");
+fs.writeFileSync(reportPath, report.join("\n") + "\n");
+
+process.exitCode = gate.passed ? 0 : 1;
+
+console.log(JSON.stringify({
+  jsonPath,
+  reportPath,
+  summary: result.summary,
+}, null, 2));

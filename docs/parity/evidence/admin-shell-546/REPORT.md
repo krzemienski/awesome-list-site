@@ -22,10 +22,10 @@ Selected run (`--only app.admin.overview --width 375,768,1024,1440`): 4 rows exe
 
 | Screen | Width | Class | Status | Diff px | Diff % | Actual vs expected size | Evidence / reason |
 |---|---:|---|---|---:|---:|---|---|
-| app.admin.overview | 375 | pixel | FAIL | 157503 | 18.3484% | 375×2146 vs 400×1999 | [actual](/actual/app.admin.overview-375.png) · [expected](/expected/app.admin.overview-375.png) · [diff](/diff/app.admin.overview-375.png) — 18.348% differing pixels exceeds the 0.5% ceiling; backdrop-filter sets differ (app ["blur(14px)"] vs reference ["blur(14px)","blur(2px)"]) |
-| app.admin.overview | 768 | pixel | FAIL | 173294 | 12.2766% | 768×1838 vs 768×1698 | [actual](/actual/app.admin.overview-768.png) · [expected](/expected/app.admin.overview-768.png) · [diff](/diff/app.admin.overview-768.png) — 12.277% differing pixels exceeds the 0.5% ceiling; backdrop-filter sets differ (app ["blur(14px)"] vs reference ["blur(14px)","blur(2px)"]) |
-| app.admin.overview | 1024 | pixel | FAIL | 767340 | 40.5715% | 1024×1847 vs 1024×1157 | [actual](/actual/app.admin.overview-1024.png) · [expected](/expected/app.admin.overview-1024.png) · [diff](/diff/app.admin.overview-1024.png) — 40.571% differing pixels exceeds the 0.5% ceiling; backdrop-filter sets differ (app ["blur(14px)"] vs reference ["blur(14px)","blur(2px)"]) |
-| app.admin.overview | 1440 | pixel | FAIL | 547991 | 30.7639% | 1440×1237 vs 1440×900 | [actual](/actual/app.admin.overview-1440.png) · [expected](/expected/app.admin.overview-1440.png) · [diff](/diff/app.admin.overview-1440.png) — 30.764% differing pixels exceeds the 0.5% ceiling; backdrop-filter sets differ (app ["blur(14px)"] vs reference ["blur(14px)","blur(2px)"]) |
+| app.admin.overview | 375 | pixel | FAIL | 157503 | 18.3484% | 375×2146 vs 400×1999 | [actual](actual/app.admin.overview-375.png) · [expected](expected/app.admin.overview-375.png) · [diff](diff/app.admin.overview-375.png) — 18.348% differing pixels exceeds the 0.5% ceiling; backdrop-filter sets differ (app ["blur(14px)"] vs reference ["blur(14px)","blur(2px)"]) |
+| app.admin.overview | 768 | pixel | FAIL | 173294 | 12.2766% | 768×1838 vs 768×1698 | [actual](actual/app.admin.overview-768.png) · [expected](expected/app.admin.overview-768.png) · [diff](diff/app.admin.overview-768.png) — 12.277% differing pixels exceeds the 0.5% ceiling; backdrop-filter sets differ (app ["blur(14px)"] vs reference ["blur(14px)","blur(2px)"]) |
+| app.admin.overview | 1024 | pixel | FAIL | 767340 | 40.5715% | 1024×1847 vs 1024×1157 | [actual](actual/app.admin.overview-1024.png) · [expected](expected/app.admin.overview-1024.png) · [diff](diff/app.admin.overview-1024.png) — 40.571% differing pixels exceeds the 0.5% ceiling; backdrop-filter sets differ (app ["blur(14px)"] vs reference ["blur(14px)","blur(2px)"]) |
+| app.admin.overview | 1440 | pixel | FAIL | 547991 | 30.7639% | 1440×1237 vs 1440×900 | [actual](actual/app.admin.overview-1440.png) · [expected](expected/app.admin.overview-1440.png) · [diff](diff/app.admin.overview-1440.png) — 30.764% differing pixels exceeds the 0.5% ceiling; backdrop-filter sets differ (app ["blur(14px)"] vs reference ["blur(14px)","blur(2px)"]) |
 
 ## Font-face parity
 
@@ -52,6 +52,6 @@ Determinism proof (standalone `--determinism 3` run `2026-09-12T23-21-07-982Z-38
 
 Recoveries: no rate-limit waits; no deferrals; no document reloads or font-readiness reopens. Every event is listed in results.json under `configuration`.
 
-Machine-readable result: [results.json](/results.json); output hashes: OUTPUT-MANIFEST.json. The reference was served from an in-memory snapshot on an ephemeral loopback port; awesome-list-site-ds/ was not modified (raw and served hashes are both recorded).
+Machine-readable result: [results.json](results.json); output hashes: OUTPUT-MANIFEST.json. The reference was served from an in-memory snapshot on an ephemeral loopback port; awesome-list-site-ds/ was not modified (raw and served hashes are both recorded).
 
 Inputs changed during run: no. Live catalog/admin adapter hashes were re-read after the final row; 0 comparisons needed more than one raw frame before two consecutive frames were byte-identical; every attempt is retained.

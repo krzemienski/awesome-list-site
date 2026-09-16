@@ -4,6 +4,18 @@ All notable changes to the Awesome Video Resource Viewer project. Newest entries
 
 ---
 
+## September 15, 2026
+
+### Parity documentation and independent verification
+- Consolidated the screen inventory, source decisions, wave worklogs,
+  assumptions, and retained regression evidence in [the parity report](docs/parity/REPORT.md).
+- Documented immediate kind/featured editing, the contact inbox, default-off
+  contact variants, theme settings, and parity harness commands.
+- Preserved failed and unverified results rather than claiming visual closure:
+  the retained full run passes 16 of 188 measured pixel cells. Publishing was
+  not performed. See [independent verification](docs/parity/VERIFICATION.md)
+  for tested-source provenance, fresh safety gates, and remaining blockers.
+
 ## July 21, 2026
 
 ### Documentation audit — full docs/ + root docs refresh

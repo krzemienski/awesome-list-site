@@ -50,7 +50,7 @@ artifact served by its managed workflow on 20928. No production comparison or pu
 | Canonical anatomy comparison | BLOCKED: reference has no anatomy-only navigation/state to activate; no fake reference produced |
 | Artifact typecheck / build | PASS, final `pnpm --filter @workspace/awesome-video-design-system run typecheck` and `run build` |
 | Token projection / standalone palette / app palette / theme registry gates | PASS, final `npm run validate:design-system-artifact`, `node scripts/validation/standalone-palette-drift.mjs`, `node scripts/validation/palette-drift.mjs`, `npm run validate:theme-registry-types` |
-| Managed workflow restart | PASS; [workflow.log](../evidence/artifact-showcase-550/workflow.log), Vite ready on 20928 |
+| Managed workflow restart | **HISTORICAL / UNVERIFIED:** notes reported PASS and Vite ready on 20928, but the expected artifact path `../evidence/artifact-showcase-550/workflow.log` is unavailable in this checkout; no replacement log is asserted. |
 
 Editorial shadow strings differ only in whitespace after rgba commas; the raw
 `equal:false` observation is retained alongside `semanticEqual:true` rather than

@@ -1,5 +1,10 @@
 # Task 568 — visitor and admin click-through
 
+See the [consolidated report](REPORT.md), [independent verification](VERIFICATION.md),
+[design-system audit](DS-AUDIT.md), and [cleanup](CLEANUP.md) for final delivery
+context. This retained scoped functional pass does not supersede the later
+full regression's blocked visual and browser-engine gates.
+
 Acceptance record for the Phase 5 human-flow safety net. One consolidated
 result; the detailed per-step log with artifact IDs, censuses and teardown is
 [evidence/clickthrough/native-testing/clickthrough-2026-09-15.md](evidence/clickthrough/native-testing/clickthrough-2026-09-15.md).

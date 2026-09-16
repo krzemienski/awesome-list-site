@@ -157,6 +157,31 @@ This project requires several environment variables to run. See [ENVIRONMENT.md]
 - Platform-specific setup instructions
 - Security best practices
 
+### Theme and optional contact experiences
+
+Use `/settings/theme` to select a design system, accent, and optional font
+override. Editorial × Crimson is the pixel-comparison target; other systems
+have separate token and interaction evidence.
+
+`VITE_CONTACT_VARIANT` is a build-time opt-in: `a` footer links, `b` contact
+form, `c` GitHub Discussions, `d` resource edit suggestion, or `e` command
+palette. Unset or invalid values add no contact feature. Server intake is
+independently disabled by default. See [configuration and five screenshots](docs/CONTACT-VARIANTS.md).
+
+### Parity verification
+
+```bash
+npm run test:parity -- --list
+BASE_URL=http://127.0.0.1:5000 npm run test:parity
+```
+
+Start the application first. A full run requires the existing authorized
+disposable-admin setup and is not read-only; it creates and cleans up its own
+test identity. For prerequisites, selection flags, and retained evidence see
+[the harness guide](tests/parity/README.md). Current parity acceptance is
+**blocked**, not release-ready: [report](docs/parity/REPORT.md),
+[independent verification](docs/parity/VERIFICATION.md).
+
 ## Admin Access
 
 Authentication is handled by Clerk (there is no local password login). Sign in

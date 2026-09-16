@@ -359,10 +359,13 @@ capture that aborted notifications is excluded. Each capture records one minor
 axe `aria-allowed-role` violation affecting three nodes. No credential, cookie,
 or raw identity response was retained.
 
-The current post-ancestor-disclosure production build/bundle check passes:
-**623.3 KiB raw / 193.1 KiB gzip / 162.4 KiB Brotli**. Caps remain unchanged at
-650000 / 200000 / 168000 bytes. Its exact build and budget logs are retained in
-[`retained-controls/final-shell-build/`](../evidence/integration-shell/retained-controls/final-shell-build/).
+The current post-ancestor-disclosure production build/bundle check was reported
+as passing historically: **623.3 KiB raw / 193.1 KiB gzip / 162.4 KiB Brotli**.
+Caps remain unchanged at 650000 / 200000 / 168000 bytes.
+**UNVERIFIED — missing retained artifact:** the original path
+`../evidence/integration-shell/retained-controls/final-shell-build/` is
+unavailable in this checkout; no replacement logs are asserted. The historical
+note reports that its exact build and budget logs were retained.
 The earlier **622.5 / 192.8 / 162.4 KiB** figure is a prior-checkout historical
 record, not the current build size. Focused navigation proofs, screenshots, and
 other source provenance remain under
@@ -550,15 +553,17 @@ this documentation aggregation; no publishing occurred.
   HTML/source roots instead of workspace-default scanning of cache, retained
   logs, and skills. Current typecheck, production build, and bundle budget
   pass; initial gzip is **194.5 KiB** with unchanged caps.
-- **Completion-validation and audit recheck:** final responsive **58/0** and
-  Design System **284/0** checks pass in the
-  [retained log](../evidence/integration-shell/retained-controls/completion-responsive-design-system-2026-09-14.log).
-  The initial five source-gate failures are corrected: unused `use-theme`,
-  Drawer Escape focus restoration to the actual opener, forced-colors
-  cookie-button border, non-vacuous settled DS account Home `h1`, and Tailwind
-  `source(...)` parser support. Type, parser, and full canonical cheap checks
-  pass. The audit-only optional route settle and observed 687 ms actual focus
-  return replace the former 400 ms sleep without changing normal pixel
+- **Completion-validation and audit recheck:** historical notes reported final
+  responsive **58/0** and Design System **284/0** checks passing. **UNVERIFIED —
+  missing retained artifact:** the original path
+  `../evidence/integration-shell/retained-controls/completion-responsive-design-system-2026-09-14.log`
+  is unavailable in this checkout; no replacement log is asserted. The initial
+  five source-gate failures were reported corrected: unused `use-theme`, Drawer
+  Escape focus restoration to the actual opener, forced-colors cookie-button
+  border, non-vacuous settled DS account Home `h1`, and Tailwind `source(...)`
+  parser support. Type, parser, and full canonical cheap checks were reported
+  passing. The audit-only optional route settle and observed 687 ms actual focus
+  return replaced the former 400 ms sleep without changing normal pixel
   geometry; the current 16-row evidence remains valid without a rerun.
 - **Breadcrumb disclosure:** the real ancestor-link legacy ellipsis restoration
   and focused guest menu behavior pass in

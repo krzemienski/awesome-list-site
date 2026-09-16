@@ -1,5 +1,7 @@
 # Capability research and evidence limits
 
+> Final evidence boundary: [REPORT.md](REPORT.md) preserves the historical full regression; [VERIFICATION.md](VERIFICATION.md) records fresh static gates and a partial timed-out selected run. Neither is a replacement full-inventory visual capture.
+
 ## R1 — Maintained solutions
 
 Research is scoped to the baseline harness. Research for contact delivery, Discussions, and later database/UI implementation must be completed before those capabilities are implemented.

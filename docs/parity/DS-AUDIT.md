@@ -1,5 +1,10 @@
 # Design-system artifact integration status
 
+Delivery context: [consolidated report](REPORT.md),
+[independent verification](VERIFICATION.md), [click-through](CLICKTHROUGH.md),
+and [cleanup](CLEANUP.md). Measurements below retain their original source
+provenance; they are not fresh measurements of the documentation commit.
+
 The docs generator and inventory handoff are integrated. Existing hash routes
 continue to render the chapters; no duplicate router or font implementation was
 added. Static generator/inventory checks pass. This is **not full pixel closure**.

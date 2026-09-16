@@ -69,11 +69,40 @@ come from `GET /api/admin/stats`.
 3. Modify fields
 4. Save changes
 
+#### Kind override and Curated placement
+
+In **Resources**, edit a resource to change **Kind override** or **Curated
+placement**. Unlike the other edit fields, these two controls **save
+immediately**; closing the dialog does not undo a successful change.
+Failed updates show an inline error and restore the previous value.
+
+Kinds are `tools`, `libraries`, `standards`, `events`, `protocols`, and
+`other`. **Use inferred** clears the stored override and displays the resolved
+kind inferred from tags; it does not backfill classifications into the catalog.
+Curated placement persists `metadata.featured` while preserving other metadata.
+The create form also offers these fields, saved with the new resource.
+
+These are additive API features; see the [generated OpenAPI contract](api/openapi.yaml)
+and [independent compatibility checks](parity/VERIFICATION.md).
+
 ### Deleting Resources
 1. Find resource in list
 2. Click Delete icon
 3. Confirm deletion
 4. Note: Deletion is logged in audit trail
+
+## Contact submissions inbox
+
+Open **Admin → Audit** (`/admin#audit`) and find **Contact submissions**.
+The inbox displays newest-first submissions in pages of 20, with previous/next
+controls and a detail dialog. Email addresses are masked in the list; authorized
+administrators can inspect submission details. Loading, empty, unavailable, and
+failed-request states are distinct; a failed request offers Retry.
+
+Intake is independently default-off even if a contact UI variant is selected.
+Receipts mean database persistence, not email delivery. There is no inbox delete
+endpoint; configured retention handles expired submissions. See
+[contact configuration, retention, and screenshots](CONTACT-VARIANTS.md).
 
 ## Edit Suggestion Queue
 

@@ -1,5 +1,11 @@
 # Repository cleanup evidence
 
+Historical cleanup record; see [current regression](REPORT.md),
+[independent verification](VERIFICATION.md), [design-system audit](DS-AUDIT.md),
+and [click-through](CLICKTHROUGH.md). Later browser-engine failures and fresh
+verification cleanup qualifications are recorded separately, not retroactively
+attributed to this cleanup run.
+
 ## Status
 
 **Complete.** The Mockup Sandbox is retired (deregistered, workflow and port

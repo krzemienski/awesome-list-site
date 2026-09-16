@@ -1,5 +1,9 @@
 # Assumptions and unresolved decisions
 
+## Consolidation coverage
+
+All nine retained assumption records are included in this decision boundary: `foundation.md`, `harness.md`, `kind-api.md`, `tokens.md`, `shell-header.md`, `shell-sidebar.md`, `token-only-account.md`, `contact-api.md`, and `README.md` (the index). The first eight supply the decisions below; the README supplies their navigation only. “Verified” refers to its stated evidence mechanism, never to an unqualified whole-inventory pixel pass. [Independent verification](VERIFICATION.md) is the separate fresh-command record.
+
 ## High-impact constraints
 
 1. **The latest execution brief governs implementation.** The modular source in the uploaded ZIP is newer than both embedded standalone apps. Historical exports and screenshots remain provenance, not replacement expected images.

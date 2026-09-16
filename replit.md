@@ -22,6 +22,25 @@ A production-ready React application for browsing and discovering over 2,600 cur
 
 ## Recent Changes
 
+### Parity documentation and harness conventions
+
+- [Parity report](docs/parity/REPORT.md), [inventory](docs/parity/SCREENS.md),
+  and [independent verification](docs/parity/VERIFICATION.md) distinguish
+  historical capture SHAs from the current documentation commit. Acceptance
+  remains blocked; documentation consolidation is not permission to publish.
+- Run `npm run test:parity -- --list` for exact inventory IDs. With the app
+  running, use `BASE_URL=http://127.0.0.1:5000 npm run test:parity`;
+  `--only <comma-separated IDs>` selects diagnostics without replacing the
+  full-run report. See [prerequisites](tests/parity/README.md) and the
+  [built-in browser testing policy](#testing-policy--built-in-browser-testing-only-september-15-2026).
+- Page-specific CSS belongs in uniquely owned files under
+  `client/src/styles/pages/`. Leaf workers supply inventory fragments and
+  worklogs; the integrator owns aggregate reports and inventory wiring.
+- Canonical archive files are read-only. Record source reconciliations,
+  font/geometry decisions, and allowed differences in
+  [DESIGN-SYNC](docs/parity/DESIGN-SYNC.md), never modify the frozen reference
+  or loosen the 0.1 pixelmatch / 0.5% full-union-canvas gate.
+
 ### AI calls unified on the Anthropic router — September 15, 2026
 - `server/ai/anthropicConfig.ts` is the single source of truth for endpoint, credentials and model ids for EVERY Claude call (direct SDK + Claude Agent SDK). Precedence: router (`ANTHROPIC_BASE_URL` + `ANTHROPIC_AUTH_TOKEN`) → managed integration → direct key; a base URL with no credential fails closed. Tiers resolve via `ANTHROPIC_DEFAULT_{HAIKU,SONNET,OPUS,FABLE}_MODEL`; `ANTHROPIC_MODEL` drives the Researcher orchestrator. Per-flow tiers live in `FLOW_TIERS` — change tiers there, not at call sites.
 - Agent SDK runs use `buildAgentEnv` (strips all credential keys, re-adds only the resolved router creds; platform creds never reach a custom base URL; token-only admin override still targets the router). Scout subagents get the tier alias `haiku` (CLI allowlist rejects literal custom ids). Structured outputs use `messages.parse` + `zodOutputFormat`.

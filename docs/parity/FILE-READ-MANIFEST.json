@@ -1808,5 +1808,62 @@
       "approved"
     ],
     "sha256": "6b28219d0e154cc2d5440f265200a132ec5b055d928ced9e1287937452bcf397"
+  },
+  "consolidation": {
+    "documentationHead": "a1e2a9fc598a34b4e662a27f5c8bdb6a869c8f3e",
+    "historicalRegression": {
+      "runId": "2026-09-15T17-47-51-897Z-9407",
+      "originatingGitCommit": "2b44a2bc08692059cc4ab63c526a5871451fbe1f",
+      "evidence": "tests/parity/baseline/2026-09-15T17-47-51-897Z-9407/results.json"
+    },
+    "independentVerification": {
+      "path": "docs/parity/VERIFICATION.md",
+      "hashSemantics": "Snapshot at consolidation read time, before final link-audit annotations; not a claim that the final mutable report has this hash.",
+      "sha256": "30aa4a63a9da8cb000b988766fedaec71ed11287ccf88561eb18858d9ae2993e",
+      "commandTestedCommit": "a1e2a9fc598a34b4e662a27f5c8bdb6a869c8f3e",
+      "selectedParity": "No complete result: two exit-2 prerequisite failures, then one 300-second wrapper timeout with partial measurements; exact two-ID cleanup later verified zero local and Clerk records."
+    },
+    "chunkCoverageQualification": "Existing entries retain originating-ledger hashes and completeRead/readMode claims. Per-wave canonical-file line ranges were not consistently recorded and are not retroactively fabricated.",
+    "canonicalSourceReadProvenance": {
+      "currentHashVerificationMethod": "Full-byte SHA-256 over the frozen workspace copies; hashing is not semantic reading. null chunkCoverage means historical line chunks were not retained. Read assertions are limited to the source-sync sets below.",
+      "files": [
+        {"path":"awesome-list-site-ds/HANDOFF.md","sha256":"2bcbf1d8e7e19f0e14e4413689e2c7bdfd9b45e1adee6f5416dc4d429fd9228f","chunkCoverage":null},
+        {"path":"awesome-list-site-ds/docs/04-tokens.md","sha256":"9fa54765d1a5fe8bed234a8c7def608efe638cff2a11e608ae6b0fc8bd359d87","chunkCoverage":null},
+        {"path":"awesome-list-site-ds/docs/05-theming.md","sha256":"98359a32a71ce808059c38c510c6bc83c199bdaea0be7b1835e0b9b9500d6371","chunkCoverage":null},
+        {"path":"awesome-list-site-ds/docs/10-components.md","sha256":"083ffe1beac8b9529d53eb694588d3f51d9eae30bc49474895a8287bc17feeaf","chunkCoverage":null},
+        {"path":"awesome-list-site-ds/docs/11-patterns.md","sha256":"9e220b1ab08c10d709ff02dfe40efccd80cbdb5fc32ed7e3d963b9483d37f761","chunkCoverage":null},
+        {"path":"awesome-list-site-ds/SKILL-verify-design-system.md","sha256":"37f25dbce6d8e486086eb9f8d66029f335365a636261b4983a8aa84f2f325da6","chunkCoverage":null},
+        {"path":"awesome-list-site-ds/styles.css","sha256":"f65694df1965889a6a6a4bff6404d9b47164f097ebcd417513a34d430e6a1055","chunkCoverage":null},
+        {"path":"awesome-list-site-ds/design-systems.jsx","sha256":"30c37539db397941f209055af28a5284fbdd14a3322adb869701c70b0e05bc7c","chunkCoverage":null},
+        {"path":"awesome-list-site-ds/app.jsx","sha256":"9d71619b1c70720d36b15803b818040f4515ca165b09388f9e60376fa81ae1c6","chunkCoverage":null},
+        {"path":"awesome-list-site-ds/data.js","sha256":"5196b2a166673cc3c62a011028573d93e02b9f690b24db2e06b6372700b25a66","chunkCoverage":null},
+        {"path":"awesome-list-site-ds/home-layouts.jsx","sha256":"c91a2a679670684b4182b3c6015544265373e01cf2ee96efc778975a2257b4f2","chunkCoverage":null},
+        {"path":"awesome-list-site-ds/index.html","sha256":"7f561822fdbb5b67ebce62324d7f02ce0154eb90b2927f8d46510466cda5f8f7","chunkCoverage":null},
+        {"path":"awesome-list-site-ds/layout.jsx","sha256":"911f165b50f94d6b3930b2761545606105a9a4ba9727ed443a0681b039b3e76a","chunkCoverage":null},
+        {"path":"awesome-list-site-ds/pages.jsx","sha256":"ee95572bb30f38424920918c49c9b483898ec975adf4bc0a8c04664cf2fd4a58","chunkCoverage":null},
+        {"path":"awesome-list-site-ds/sidebar-variants.jsx","sha256":"86ae99e167f07d7679672b4224fdfc758424224603c3de5459b7cdc9aba39e95","chunkCoverage":null},
+        {"path":"awesome-list-site-ds/REPLIT-REMEDIATION-PROMPT.md","sha256":"a7dc59083cc71dc2d1a08f34729fdb0812792af8c027251e9be07dfec1832b8b","chunkCoverage":null},
+        {"path":"awesome-list-site-ds/audit-report.md","sha256":"ed3dc0dc16f918cb276f2470f4522900c2d7c4a05932a0e93d15aeb344ff1f70","chunkCoverage":null},
+        {"path":"awesome-list-site-ds/uploads/INDEX.md","sha256":"12870b61be9bec03ae8da92b17fcc7f32a05df45fd4f4e23fd07d89bd0f9daf2","chunkCoverage":null}
+      ],
+      "source": "docs/parity/source-sync.json",
+      "sourceSha256": "74b6dda38c942828dbb9987c710ce360f0e61d9b6ba204900ecb09a3d5a5a1c5",
+      "archive": "attached_assets/awesome_list_site_2_1789019068732.zip",
+      "archiveSha256": "19f0240c46caf790bfc384e21f123525699e1ff386fe892f8084bf73337302c9",
+      "requiredOrder": ["HANDOFF.md", "docs/04-tokens.md", "docs/05-theming.md", "docs/10-components.md", "docs/11-patterns.md", "SKILL-verify-design-system.md", "styles.css", "design-systems.jsx"],
+      "fullyReadChangedAuthored": ["app.jsx", "data.js", "design-systems.jsx", "home-layouts.jsx", "index.html", "layout.jsx", "pages.jsx", "sidebar-variants.jsx", "styles.css", "REPLIT-REMEDIATION-PROMPT.md", "audit-report.md", "uploads/INDEX.md"],
+      "chunkCoverage": "source-sync records ordered and full-read sets, but no per-file line chunks; the missing chunks remain an explicit provenance limitation."
+    },
+    "historicalPreApplyLinkAudit": {
+      "stagingPath": "/tmp/parity571-links.json",
+      "durable": false,
+      "markdownFiles": 158,
+      "localLinks": 1488,
+      "missingLocalTargets": 12,
+      "pngReferences": 1293,
+      "missingPngReferences": 0,
+      "untrackedExistingPngReferences": 0,
+      "qualification": "Historical staging snapshot only; final current link results are supplied separately by the link auditor."
+    }
   }
 }
