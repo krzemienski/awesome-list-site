@@ -1,0 +1,23 @@
+{
+  "REPORT.md": "f18a823c922b6685a96bd168b22bd0c6827a6126a9fbfda50d5ad843b1c93376",
+  "actual/app.admin.audit-1440.attempt-1.png": "b69dc63f76834241175c7d20ec5551340c0695796c7ac0ef38841ffe466d642e",
+  "actual/app.admin.audit-1440.attempt-2.png": "b69dc63f76834241175c7d20ec5551340c0695796c7ac0ef38841ffe466d642e",
+  "actual/app.admin.audit-1440.png": "b69dc63f76834241175c7d20ec5551340c0695796c7ac0ef38841ffe466d642e",
+  "actual/app.admin.audit-1440.repeat.png": "b69dc63f76834241175c7d20ec5551340c0695796c7ac0ef38841ffe466d642e",
+  "actual/app.admin.audit-375.attempt-1.png": "297e7f0d1037facf4e1bd17b325095e6e061406acbf53ce043406601284c368f",
+  "actual/app.admin.audit-375.attempt-2.png": "297e7f0d1037facf4e1bd17b325095e6e061406acbf53ce043406601284c368f",
+  "actual/app.admin.audit-375.png": "297e7f0d1037facf4e1bd17b325095e6e061406acbf53ce043406601284c368f",
+  "actual/app.admin.audit-375.repeat.png": "297e7f0d1037facf4e1bd17b325095e6e061406acbf53ce043406601284c368f",
+  "diff/app.admin.audit-1440.png": "dcf96a93336458102330a640f44d041657e1ba0fb95e79cd16683a09ccbd729c",
+  "diff/app.admin.audit-375.png": "b31e053c1031ef29eee1b4026df01d67b3bc2a81ba41f6e85aa917e6986d727f",
+  "expected/app.admin.audit-1440.attempt-1.png": "7ede06fcce9d5cfd1b1debeb2b8b5df891c5ad8f2811383fe94db5797867e701",
+  "expected/app.admin.audit-1440.attempt-2.png": "7ede06fcce9d5cfd1b1debeb2b8b5df891c5ad8f2811383fe94db5797867e701",
+  "expected/app.admin.audit-1440.png": "7ede06fcce9d5cfd1b1debeb2b8b5df891c5ad8f2811383fe94db5797867e701",
+  "expected/app.admin.audit-1440.repeat.png": "7ede06fcce9d5cfd1b1debeb2b8b5df891c5ad8f2811383fe94db5797867e701",
+  "expected/app.admin.audit-375.attempt-1.png": "0ea3ec80d739c91e5ba241dad86ac198c67bfb8b40b05d283bc33aa50f886052",
+  "expected/app.admin.audit-375.attempt-2.png": "0ea3ec80d739c91e5ba241dad86ac198c67bfb8b40b05d283bc33aa50f886052",
+  "expected/app.admin.audit-375.png": "0ea3ec80d739c91e5ba241dad86ac198c67bfb8b40b05d283bc33aa50f886052",
+  "expected/app.admin.audit-375.repeat.png": "0ea3ec80d739c91e5ba241dad86ac198c67bfb8b40b05d283bc33aa50f886052",
+  "font-gaps.md": "0a3f0b91e46e334208442ea824d5232bd9624fd1b9e0ab13ccadd9241119f6b9",
+  "results.json": "6ab5208b93ee85b1bec9d1d02de07435fd2711f440d7d21229a5dbce9900d239"
+}

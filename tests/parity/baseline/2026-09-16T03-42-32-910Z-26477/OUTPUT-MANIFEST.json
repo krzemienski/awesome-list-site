@@ -1,0 +1,23 @@
+{
+  "REPORT.md": "73872c5ff41aa32a4d5a8171304c1d60b6815884802a208bc97af174b3e4a5f2",
+  "actual/app.admin.categories-1440.attempt-1.png": "e76dac6c6567ca31863e058805662c45a2b588ab2d2a7cde04abe4fc728fb928",
+  "actual/app.admin.categories-1440.attempt-2.png": "e76dac6c6567ca31863e058805662c45a2b588ab2d2a7cde04abe4fc728fb928",
+  "actual/app.admin.categories-1440.png": "e76dac6c6567ca31863e058805662c45a2b588ab2d2a7cde04abe4fc728fb928",
+  "actual/app.admin.categories-1440.repeat.png": "e76dac6c6567ca31863e058805662c45a2b588ab2d2a7cde04abe4fc728fb928",
+  "actual/app.admin.subcategories-1440.attempt-1.png": "3e2fdae42c3801311e17decd7820c5ab3a9e34feeff0a8ab34581e96cdd0bda1",
+  "actual/app.admin.subcategories-1440.attempt-2.png": "3e2fdae42c3801311e17decd7820c5ab3a9e34feeff0a8ab34581e96cdd0bda1",
+  "actual/app.admin.subcategories-1440.png": "3e2fdae42c3801311e17decd7820c5ab3a9e34feeff0a8ab34581e96cdd0bda1",
+  "actual/app.admin.subcategories-1440.repeat.png": "3e2fdae42c3801311e17decd7820c5ab3a9e34feeff0a8ab34581e96cdd0bda1",
+  "diff/app.admin.categories-1440.png": "da421a723f87b9be3f2a3ae1526c6a0d7b83e7cea6e69f01f1afcf346044be65",
+  "diff/app.admin.subcategories-1440.png": "bb79f8a048136befe3875c37891fe52a0c3e1e6f0cd52f8a582b8c03c8e303ce",
+  "expected/app.admin.categories-1440.attempt-1.png": "4672ac5f29502f3246d097bb7471b5cdd16cb5374b65e6dee702ad89e23dba01",
+  "expected/app.admin.categories-1440.attempt-2.png": "4672ac5f29502f3246d097bb7471b5cdd16cb5374b65e6dee702ad89e23dba01",
+  "expected/app.admin.categories-1440.png": "4672ac5f29502f3246d097bb7471b5cdd16cb5374b65e6dee702ad89e23dba01",
+  "expected/app.admin.categories-1440.repeat.png": "4672ac5f29502f3246d097bb7471b5cdd16cb5374b65e6dee702ad89e23dba01",
+  "expected/app.admin.subcategories-1440.attempt-1.png": "c5e31d770dc480ee156d9e006a0d1ae4f805f05e2c2705d3785716587dfc2c7a",
+  "expected/app.admin.subcategories-1440.attempt-2.png": "c5e31d770dc480ee156d9e006a0d1ae4f805f05e2c2705d3785716587dfc2c7a",
+  "expected/app.admin.subcategories-1440.png": "c5e31d770dc480ee156d9e006a0d1ae4f805f05e2c2705d3785716587dfc2c7a",
+  "expected/app.admin.subcategories-1440.repeat.png": "c5e31d770dc480ee156d9e006a0d1ae4f805f05e2c2705d3785716587dfc2c7a",
+  "font-gaps.md": "1aaa5f6a04b9bd02709230a3140a6cadd1c31ddcdb1f8f1d735412e74be2bd55",
+  "results.json": "21f34be548b53e2b030ed7e30c1d7807cfac051f63b5a4a231fba54133a0152d"
+}

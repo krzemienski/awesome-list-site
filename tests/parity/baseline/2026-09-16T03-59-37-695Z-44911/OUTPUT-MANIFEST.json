@@ -1,0 +1,14 @@
+{
+  "REPORT.md": "2a295dd077df3439cf545f8500bbe14b68adecf0fa2e19ac50eedb6124ae6bf9",
+  "actual/app.admin.users-375.attempt-1.png": "2a6376844bddea359792a431d7ba28f2670df2d22315a75e5c2ea0ffd2d1dc56",
+  "actual/app.admin.users-375.attempt-2.png": "2a6376844bddea359792a431d7ba28f2670df2d22315a75e5c2ea0ffd2d1dc56",
+  "actual/app.admin.users-375.png": "2a6376844bddea359792a431d7ba28f2670df2d22315a75e5c2ea0ffd2d1dc56",
+  "actual/app.admin.users-375.repeat.png": "2a6376844bddea359792a431d7ba28f2670df2d22315a75e5c2ea0ffd2d1dc56",
+  "diff/app.admin.users-375.png": "a51faa1e933ef4f267877a0c4756e8d38210bc4603dd0d8fee8e986f027b53a1",
+  "expected/app.admin.users-375.attempt-1.png": "94deb10d687aa9d4e66391ac6e68dfb54ec241f38e4b294ca2e9dc43a129e8d1",
+  "expected/app.admin.users-375.attempt-2.png": "94deb10d687aa9d4e66391ac6e68dfb54ec241f38e4b294ca2e9dc43a129e8d1",
+  "expected/app.admin.users-375.png": "94deb10d687aa9d4e66391ac6e68dfb54ec241f38e4b294ca2e9dc43a129e8d1",
+  "expected/app.admin.users-375.repeat.png": "94deb10d687aa9d4e66391ac6e68dfb54ec241f38e4b294ca2e9dc43a129e8d1",
+  "font-gaps.md": "08d8da5bc0d0c0023d98364ccb8fc852bcdf67e11a989a565ceb8443bfc48785",
+  "results.json": "83ec145633817bf16440c6058a50e9a06c4e404dc4d9aa5329230d09565b43d1"
+}

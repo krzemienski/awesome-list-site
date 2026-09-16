@@ -1,0 +1,14 @@
+{
+  "REPORT.md": "f1cbb0816226d674a4c099e08431dea7edfd969fd2c88da78db93d1ba18bf3ea",
+  "actual/app.admin.categories-1440.attempt-1.png": "5f8cb8dcc4296f4ea83e45c936da3ed4cdae2074ea49523f0714b088cbfd1f28",
+  "actual/app.admin.categories-1440.attempt-2.png": "5f8cb8dcc4296f4ea83e45c936da3ed4cdae2074ea49523f0714b088cbfd1f28",
+  "actual/app.admin.categories-1440.png": "5f8cb8dcc4296f4ea83e45c936da3ed4cdae2074ea49523f0714b088cbfd1f28",
+  "actual/app.admin.categories-1440.repeat.png": "5f8cb8dcc4296f4ea83e45c936da3ed4cdae2074ea49523f0714b088cbfd1f28",
+  "diff/app.admin.categories-1440.png": "74a6fa986dd064f7db64818842d5619b1b952de5a6243f030b8df7dec02ad5f6",
+  "expected/app.admin.categories-1440.attempt-1.png": "4672ac5f29502f3246d097bb7471b5cdd16cb5374b65e6dee702ad89e23dba01",
+  "expected/app.admin.categories-1440.attempt-2.png": "4672ac5f29502f3246d097bb7471b5cdd16cb5374b65e6dee702ad89e23dba01",
+  "expected/app.admin.categories-1440.png": "4672ac5f29502f3246d097bb7471b5cdd16cb5374b65e6dee702ad89e23dba01",
+  "expected/app.admin.categories-1440.repeat.png": "4672ac5f29502f3246d097bb7471b5cdd16cb5374b65e6dee702ad89e23dba01",
+  "font-gaps.md": "739b86611dcf1cf2d5fe4a908f86ded46d558e8bb707b0e2b7f6c7779e08d8bf",
+  "results.json": "9b8f40d8751470cef78141422bfc0cd33b9c480d7a141910c522cb4a858948a9"
+}

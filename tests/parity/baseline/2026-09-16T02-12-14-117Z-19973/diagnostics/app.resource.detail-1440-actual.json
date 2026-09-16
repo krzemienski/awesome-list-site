@@ -1,0 +1,18 @@
+{
+  "screen": "app.resource.detail",
+  "width": 1440,
+  "side": "actual",
+  "error": "page.evaluate: Error: Images did not decode within 20s\n    at eval (eval at evaluate (:303:30), <anonymous>:19:58)\n    at ClockController._callFirstTimer (<anonymous>:285:20)\n    at ClockController._runTo (<anonymous>:120:33)\n    at <anonymous>:168:38",
+  "url": "http://127.0.0.1:5000/resource/188015",
+  "title": "srtdroid — Awesome Video",
+  "bodyTextHead": "Skip to main content\nav\nAWESOME.VIDEO\nSearch 1,816 resources…\n⌘K\nBrowse\nSubmit\nAbout\nDocs ↗\nAdmin\nN\nNick\nHome\nsrtdroid\nBack\nRESOURCE · DETAIL\nsrtdroid\n⟁\nPROTOCOLS & TRANSPORT\nDESCRIPTION\n\nNative Java/Kotlin SRT protocol implementation for Android mobile streaming applications\n\nMore\nCANONICAL URL\nhttps://github.com/ThibaultBee/srtdroid ↗\nTAGS\nAWESOME VIDEO\n\nA curated collection of awesome video resources, tools, and technologies for developers and content creators\n\n1,816 resources · 9 categories · 92 subcategories\nindexed live\nBROWSE\nCommunity & Events\nEncoding & Codecs\nGeneral Tools\nInfrastruc",
+  "console": [
+    {
+      "type": "warning",
+      "text": "Clerk: Clerk has been loaded with development keys. Development instances have strict usage limits and should not be used when deploying your application to production. Learn more: https://clerk.com/docs/deployments/overview"
+    }
+  ],
+  "pageErrors": [],
+  "failedRequests": [],
+  "apiFailures": []
+}

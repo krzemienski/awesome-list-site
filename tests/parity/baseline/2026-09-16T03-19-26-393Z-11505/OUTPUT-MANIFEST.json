@@ -1,0 +1,23 @@
+{
+  "REPORT.md": "29d62c962bc6518388c02329fac770af047e6b2a70d564a1558338113ba7d8d9",
+  "actual/app.admin.export-1440.attempt-1.png": "9211d62f377d411cae8978be434eba01667c300a0344a19cd773a7e78b47d910",
+  "actual/app.admin.export-1440.attempt-2.png": "9211d62f377d411cae8978be434eba01667c300a0344a19cd773a7e78b47d910",
+  "actual/app.admin.export-1440.png": "9211d62f377d411cae8978be434eba01667c300a0344a19cd773a7e78b47d910",
+  "actual/app.admin.export-1440.repeat.png": "9211d62f377d411cae8978be434eba01667c300a0344a19cd773a7e78b47d910",
+  "actual/app.admin.overview-1440.attempt-1.png": "c8e92a7d5212ae09c39b5cbcb14eca5d71717586078ebc51db6a3f5c71a91d90",
+  "actual/app.admin.overview-1440.attempt-2.png": "c8e92a7d5212ae09c39b5cbcb14eca5d71717586078ebc51db6a3f5c71a91d90",
+  "actual/app.admin.overview-1440.png": "c8e92a7d5212ae09c39b5cbcb14eca5d71717586078ebc51db6a3f5c71a91d90",
+  "actual/app.admin.overview-1440.repeat.png": "c8e92a7d5212ae09c39b5cbcb14eca5d71717586078ebc51db6a3f5c71a91d90",
+  "diff/app.admin.export-1440.png": "61b8752c822cac65945481d98d83c6ef5a282771e8e14967cb5dc9d4018d0e5f",
+  "diff/app.admin.overview-1440.png": "cf9e09364dfb40eda5cb7bdea24973c02cb161487d2e4d54628ea3ade1bada78",
+  "expected/app.admin.export-1440.attempt-1.png": "434538b5d07b37e256d8f5620f3b97596f80da63437a0229ab5a6a7fa363eee0",
+  "expected/app.admin.export-1440.attempt-2.png": "434538b5d07b37e256d8f5620f3b97596f80da63437a0229ab5a6a7fa363eee0",
+  "expected/app.admin.export-1440.png": "434538b5d07b37e256d8f5620f3b97596f80da63437a0229ab5a6a7fa363eee0",
+  "expected/app.admin.export-1440.repeat.png": "434538b5d07b37e256d8f5620f3b97596f80da63437a0229ab5a6a7fa363eee0",
+  "expected/app.admin.overview-1440.attempt-1.png": "2f593b456b80ebd376153df090397b12550d8095d686c04239906534c1105c7a",
+  "expected/app.admin.overview-1440.attempt-2.png": "2f593b456b80ebd376153df090397b12550d8095d686c04239906534c1105c7a",
+  "expected/app.admin.overview-1440.png": "2f593b456b80ebd376153df090397b12550d8095d686c04239906534c1105c7a",
+  "expected/app.admin.overview-1440.repeat.png": "2f593b456b80ebd376153df090397b12550d8095d686c04239906534c1105c7a",
+  "font-gaps.md": "51e4e8b69f7e13451f15374eef9b67a65c0518aae5afb7b0a6ae1746624b893b",
+  "results.json": "d63baf4c84c7bc8f026913ebb27326a9fe0c532661be8090d306a071d9eefc96"
+}

@@ -1,0 +1,14 @@
+{
+  "REPORT.md": "7f4b99bfc3461c0ad64a7d0baf2436a5e5abd5d6a09ae263e20fc233db5b394c",
+  "actual/app.admin.researcher-1440.attempt-1.png": "447d74c2e4d9ab8ccc5a4ecb9a9cd7519d9fd2dd5f3b29df43017351c9b64ce0",
+  "actual/app.admin.researcher-1440.attempt-2.png": "447d74c2e4d9ab8ccc5a4ecb9a9cd7519d9fd2dd5f3b29df43017351c9b64ce0",
+  "actual/app.admin.researcher-1440.png": "447d74c2e4d9ab8ccc5a4ecb9a9cd7519d9fd2dd5f3b29df43017351c9b64ce0",
+  "actual/app.admin.researcher-1440.repeat.png": "447d74c2e4d9ab8ccc5a4ecb9a9cd7519d9fd2dd5f3b29df43017351c9b64ce0",
+  "diff/app.admin.researcher-1440.png": "aeb703ffd5dfc93291a3c41c5a0c66d79ed6521fa0a466ba09d8a416cbdb1b0e",
+  "expected/app.admin.researcher-1440.attempt-1.png": "2fcf1ef1bf0dd345ddc5f0d6195bd6077c495bef9ceb29170f9455dcd03208fc",
+  "expected/app.admin.researcher-1440.attempt-2.png": "2fcf1ef1bf0dd345ddc5f0d6195bd6077c495bef9ceb29170f9455dcd03208fc",
+  "expected/app.admin.researcher-1440.png": "2fcf1ef1bf0dd345ddc5f0d6195bd6077c495bef9ceb29170f9455dcd03208fc",
+  "expected/app.admin.researcher-1440.repeat.png": "2fcf1ef1bf0dd345ddc5f0d6195bd6077c495bef9ceb29170f9455dcd03208fc",
+  "font-gaps.md": "92ff087f709ecd77bd67f880f877adc06aaf532e62542af90b62f6f4527f3dc2",
+  "results.json": "f74501e255fa2934809a8acb637a63cc2f3b01ddd705377bcb7cea2ab5786bb6"
+}

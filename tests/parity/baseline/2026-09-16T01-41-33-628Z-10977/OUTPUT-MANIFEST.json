@@ -1,0 +1,14 @@
+{
+  "REPORT.md": "d75b26528bf99edca2097fe3edbeb76b25b26ad67cf27e53d4cfc300dc8722d5",
+  "actual/app.subcategory-1440.attempt-1.png": "8622fa38b866a8b9ef7139109b310d4773fecee368734cdf7662062e6ee5e1a5",
+  "actual/app.subcategory-1440.attempt-2.png": "8622fa38b866a8b9ef7139109b310d4773fecee368734cdf7662062e6ee5e1a5",
+  "actual/app.subcategory-1440.png": "8622fa38b866a8b9ef7139109b310d4773fecee368734cdf7662062e6ee5e1a5",
+  "actual/app.subcategory-1440.repeat.png": "8622fa38b866a8b9ef7139109b310d4773fecee368734cdf7662062e6ee5e1a5",
+  "diff/app.subcategory-1440.png": "8775922331f7cfb474adb445d34aad6c0d04ce433290c67e4e83362c97c70d2c",
+  "expected/app.subcategory-1440.attempt-1.png": "cd426ef5d58f1f9a2f128edd69c9d5b3d4ce4f4781c040805d1355394ba5fc10",
+  "expected/app.subcategory-1440.attempt-2.png": "cd426ef5d58f1f9a2f128edd69c9d5b3d4ce4f4781c040805d1355394ba5fc10",
+  "expected/app.subcategory-1440.png": "cd426ef5d58f1f9a2f128edd69c9d5b3d4ce4f4781c040805d1355394ba5fc10",
+  "expected/app.subcategory-1440.repeat.png": "cd426ef5d58f1f9a2f128edd69c9d5b3d4ce4f4781c040805d1355394ba5fc10",
+  "font-gaps.md": "2ddaa4aacf44c0f88b493e3d1a0c24f90154213d4cdac618b0db06333dbae737",
+  "results.json": "513b148d0da0e1564163c9bc85848b01adac7be365dc99d8f2f2a19da00346fd"
+}

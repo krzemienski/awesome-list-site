@@ -1,0 +1,14 @@
+{
+  "REPORT.md": "a0915eeb16c54e308c32c65d933287401cee097fd2df7c8a8a3d891e5534c07d",
+  "actual/app.admin.github-1440.attempt-1.png": "763d1cdf38498e6f8189a9727fedab95424b43b41153c7a2aa9334ad3823d75b",
+  "actual/app.admin.github-1440.attempt-2.png": "763d1cdf38498e6f8189a9727fedab95424b43b41153c7a2aa9334ad3823d75b",
+  "actual/app.admin.github-1440.png": "763d1cdf38498e6f8189a9727fedab95424b43b41153c7a2aa9334ad3823d75b",
+  "actual/app.admin.github-1440.repeat.png": "763d1cdf38498e6f8189a9727fedab95424b43b41153c7a2aa9334ad3823d75b",
+  "diff/app.admin.github-1440.png": "5f28e826e6324f0f4f223457729dc1ad1a0ce41a982ad239a048cbfc90f0be2f",
+  "expected/app.admin.github-1440.attempt-1.png": "c4cd50d153e3ebe0e3945badd1cfb801127be41658236251630140142341d51a",
+  "expected/app.admin.github-1440.attempt-2.png": "c4cd50d153e3ebe0e3945badd1cfb801127be41658236251630140142341d51a",
+  "expected/app.admin.github-1440.png": "c4cd50d153e3ebe0e3945badd1cfb801127be41658236251630140142341d51a",
+  "expected/app.admin.github-1440.repeat.png": "c4cd50d153e3ebe0e3945badd1cfb801127be41658236251630140142341d51a",
+  "font-gaps.md": "a030f0721c3fc7cbbc61da29c34005f09f08cff239a11dc668baad88515f1ef9",
+  "results.json": "53bdae3258d50790a8b3943e4e4712c125fcf2205724897cfce31e5c3b008756"
+}

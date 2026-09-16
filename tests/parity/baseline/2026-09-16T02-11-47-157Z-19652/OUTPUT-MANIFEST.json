@@ -1,0 +1,14 @@
+{
+  "REPORT.md": "4a2d698ebaa7464253061f29676a212965561eba847689006c6eba96613d8e8a",
+  "actual/app.admin.enrichment-1440.attempt-1.png": "3adc504f83ec2fbc3103584925ca7e42d8bf211253a5d7b668ffb3b0af2ed404",
+  "actual/app.admin.enrichment-1440.attempt-2.png": "3adc504f83ec2fbc3103584925ca7e42d8bf211253a5d7b668ffb3b0af2ed404",
+  "actual/app.admin.enrichment-1440.png": "3adc504f83ec2fbc3103584925ca7e42d8bf211253a5d7b668ffb3b0af2ed404",
+  "actual/app.admin.enrichment-1440.repeat.png": "3adc504f83ec2fbc3103584925ca7e42d8bf211253a5d7b668ffb3b0af2ed404",
+  "diff/app.admin.enrichment-1440.png": "8892d65a907d6f8ffbe2ecaeeca6c80f4a43bd0050b00b3aac3c7614e430ce29",
+  "expected/app.admin.enrichment-1440.attempt-1.png": "f4d6538940fe82ba148ec007c59c8d5a30eef749d6ddf8d7e4d07558fb056aa8",
+  "expected/app.admin.enrichment-1440.attempt-2.png": "f4d6538940fe82ba148ec007c59c8d5a30eef749d6ddf8d7e4d07558fb056aa8",
+  "expected/app.admin.enrichment-1440.png": "f4d6538940fe82ba148ec007c59c8d5a30eef749d6ddf8d7e4d07558fb056aa8",
+  "expected/app.admin.enrichment-1440.repeat.png": "f4d6538940fe82ba148ec007c59c8d5a30eef749d6ddf8d7e4d07558fb056aa8",
+  "font-gaps.md": "d6bf82b087d919bba0e9a9f991e70c9dead56b49b9ceb2455934ad49a38b2994",
+  "results.json": "42ea40aa2832ef9012395a1b7a1f4ebf84510c820da9045f2ecf449961da0cae"
+}
