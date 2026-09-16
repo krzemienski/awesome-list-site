@@ -273,6 +273,7 @@ export default function PendingEdits() {
           <Button
             variant="ghost"
             size="sm"
+            className="queue-review-extra-action"
             onClick={() => {
               void queryClient.invalidateQueries({ queryKey: ['/api/admin/resource-edits'] });
             }}

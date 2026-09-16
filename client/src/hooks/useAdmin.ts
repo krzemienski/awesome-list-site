@@ -12,6 +12,23 @@ interface AdminStats {
   totalPending?: number;
   /** Rows with status='rejected' (Audit2 BUG-050: was misnamed totalDeleted). */
   totalRejected?: number;
+  /** Real pg_catalog storage metrics for the Database tab. */
+  database?: AdminDatabaseOverview;
+}
+
+export interface AdminDatabaseTableOverview {
+  name: string;
+  rows: number;
+  bytes: number;
+  lastWriteAt: string | null;
+}
+
+export interface AdminDatabaseOverview {
+  tables: number;
+  totalRows: number;
+  diskBytes: number;
+  migrations: { applied: number; journaled: number | null };
+  tableStats: AdminDatabaseTableOverview[];
 }
 
 export function useAdmin() {

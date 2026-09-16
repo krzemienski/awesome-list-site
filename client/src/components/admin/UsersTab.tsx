@@ -184,10 +184,10 @@ export default function UsersTab() {
               Export CSV
             </a>
           </Button>
-          <Button size="sm" data-testid="button-invite-user">
-            <Plus className="h-3 w-3 mr-2" />
+          <button type="button" className="btn primary" data-testid="button-invite-user">
+            <Plus className="h-3 w-3" />
             Invite
-          </Button>
+          </button>
         </>
       }
     >
@@ -249,7 +249,9 @@ export default function UsersTab() {
                           {`${user.firstName || ''} ${user.lastName || ''}`.trim()}
                         </span>
                       ) : (
-                        <span className="text-muted-foreground" data-testid={`text-name-${user.id}`}>—</span>
+                        <span className="text-muted-foreground" data-testid={`text-name-${user.id}`}>
+                          {user.email || user.id}
+                        </span>
                       )}
                     </div>
                   </TableCell>

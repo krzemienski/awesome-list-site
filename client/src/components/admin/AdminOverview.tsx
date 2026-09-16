@@ -4,6 +4,7 @@ import { apiRequest } from "@/lib/queryClient";
 import type { EnrichmentJob, LinkHealthJob } from "@shared/schema";
 import StatStatusChip from "@/components/admin/canonical/StatusChip";
 import TableShell from "@/components/admin/canonical/TableShell";
+import { formatRelativeAgo } from "@/lib/utils";
 import "@/styles/pages/admin-overview.css";
 
 interface OverviewStats {
@@ -29,8 +30,26 @@ interface AuditEntry {
   performedBy: string | null;
   performedByEmail: string | null;
   notes: string | null;
+  changes?: Record<string, unknown> | null;
   createdAt: string | null;
 }
+
+/**
+ * Same target identity the audit tab renders: the recorded title when the log
+ * carries one, otherwise the resource number, otherwise "System".
+ */
+const auditTarget = (entry: AuditEntry): string => {
+  const changes = entry.changes ?? null;
+  const nested = changes?.resource;
+  const title = (nested && typeof nested === "object" && typeof (nested as { title?: unknown }).title === "string"
+    ? (nested as { title: string }).title
+    : typeof changes?.title === "string"
+      ? changes.title
+      : "").trim();
+  if (title) return title;
+  const id = entry.originalResourceId ?? entry.resourceId;
+  return id ? `#${id}` : entry.notes ?? "System";
+};
 
 interface AuditResponse {
   logs: AuditEntry[];
@@ -132,20 +151,10 @@ const dateValue = (value: string | null | undefined) => {
   return Number.isFinite(date.getTime()) ? date : null;
 };
 
-const relativeAge = (value: string | null | undefined) => {
-  const date = dateValue(value);
-  if (!date) return "unknown time";
-  const elapsed = Math.max(0, Date.now() - date.getTime());
-  const minutes = Math.floor(elapsed / 60_000);
-  if (minutes < 1) return "just now";
-  if (minutes < 60) return `${minutes}m ago`;
-  const hours = Math.floor(minutes / 60);
-  if (hours < 24) return `${hours}h ago`;
-  return `${Math.floor(hours / 24)}d ago`;
-};
+/** One relative-age vocabulary across the admin surface (Database, Enrichment, Overview). */
+const relativeAge = (value: string | null | undefined) => formatRelativeAgo(value);
 
-const dateLabel = (value: string | null | undefined) =>
-  dateValue(value) ? relativeAge(value) : "—";
+const dateLabel = relativeAge;
 
 const latestByDate = <T extends { createdAt?: string | null }>(items: T[]) =>
   [...items].sort(
@@ -259,15 +268,15 @@ function renderHealthRows(
 
   let aiRow: HealthRow;
   if (ai.isPending) {
-    aiRow = { label: "AI provider", detail: "checking…", state: "unknown" };
+    aiRow = { label: "Researcher API", detail: "checking…", state: "unknown" };
   } else if (ai.isError || ai.data?.status !== "healthy") {
     aiRow = {
-      label: "AI provider",
+      label: "Researcher API",
       detail: ai.data?.status ? title(ai.data.status) : "unavailable",
       state: "bad",
     };
   } else {
-    aiRow = { label: "AI provider", detail: "healthy", state: "ok" };
+    aiRow = { label: "Researcher API", detail: "healthy", state: "ok" };
   }
 
   let enrichmentRow: HealthRow;
@@ -402,9 +411,7 @@ export default function AdminOverview({ stats }: AdminOverviewProps) {
                     {entry.action.replace(/[_-]/g, " ")}
                   </span>
                   <span className="admin-canonical-activity-target">
-                    {entry.originalResourceId ?? entry.resourceId
-                      ? `Resource #${entry.originalResourceId ?? entry.resourceId}`
-                      : entry.notes ?? "System"}
+                    {auditTarget(entry)}
                   </span>
                   <span className="admin-canonical-activity-time">
                     {dateLabel(entry.createdAt)}
@@ -430,7 +437,7 @@ export default function AdminOverview({ stats }: AdminOverviewProps) {
                 className="admin-canonical-health-row admin-health-card"
                 data-testid={`health-${label === "Link checker"
                   ? "linkhealth"
-                  : label === "AI provider"
+                  : label === "Researcher API"
                     ? "researcher"
                     : label.toLowerCase().replace(/\s+/g, "-")}`}
               >

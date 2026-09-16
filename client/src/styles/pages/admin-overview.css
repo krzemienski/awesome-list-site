@@ -30,9 +30,13 @@
   padding: var(--space-5, 1.25rem) var(--space-5, 1.25rem) 0;
 }
 
-.admin-overview-stats-canonical .admin-canonical-stat__label {
+/* Canonical Stat label: a 10px .mono block at body leading (16px line box). */
+.admin-overview-stats-canonical .admin-canonical-stat__label.eyebrow {
   color: var(--text-3, var(--text-2));
   font-size: 0.625rem;
+  font-weight: 400;
+  letter-spacing: 1.4px;
+  line-height: 1.6;
 }
 
 .admin-overview-stats-canonical .admin-canonical-stat__title-link {
@@ -69,7 +73,8 @@
   margin-block-start: var(--space-2, 0.5rem);
   color: var(--text-2);
   font-size: 0.75rem;
-  line-height: 1.4;
+  /* Canonical sub inherits body leading (19.2px line box at 12px). */
+  line-height: 1.6;
 }
 
 .admin-overview-stats-canonical .admin-canonical-stat__sub button {
@@ -116,7 +121,7 @@
 }
 
 .admin-overview-canonical .admin-canonical-table-shell__heading p {
-  margin-block-start: 0.35rem;
+  margin-block-start: 4px;
   color: var(--text-3, var(--text-2));
   font-size: 0.75rem;
 }
@@ -207,10 +212,6 @@
   font-size: 0.78125rem;
 }
 
-.admin-overview-canonical .admin-canonical-activity-row:last-child {
-  border-block-end: 0;
-}
-
 .admin-overview-canonical .admin-canonical-activity-id,
 .admin-overview-canonical .admin-canonical-activity-time {
   flex: 0 0 auto;
@@ -269,10 +270,6 @@
   text-align: start;
 }
 
-.admin-overview-canonical .admin-canonical-health-row:last-child {
-  border-block-end: 0;
-}
-
 .admin-overview-canonical .admin-canonical-health-row > span:nth-child(2) {
   flex: 1;
   min-width: 0;
@@ -295,8 +292,6 @@
 
 .admin-overview-canonical .admin-canonical-health-row > .dot {
   flex: 0 0 auto;
-  width: 6px;
-  height: 6px;
 }
 
 .admin-overview-canonical .admin-canonical-category-row {

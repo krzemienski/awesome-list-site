@@ -120,9 +120,14 @@ export function registerAdminContentRoutes(
   // GET /api/admin/stats - Dashboard statistics
   app.get('/api/admin/stats', isAuthenticated, isAdmin, async (req, res) => {
     try {
-      const stats = await adminRepo.getAdminStats();
+      const [stats, database] = await Promise.all([
+        adminRepo.getAdminStats(),
+        adminRepo.getDatabaseOverview(),
+      ]);
       // Map backend property names to frontend expectations
       res.json({
+        // Real storage metrics for the Database tab (pg_catalog, never placeholders).
+        database,
         users: stats.totalUsers,
         resources: stats.totalResources,
         journeys: stats.totalJourneys,

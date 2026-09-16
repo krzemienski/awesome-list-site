@@ -67,7 +67,10 @@
   padding: 1.25rem;
 }
 
+/* Block-level so the label sits at the card's top edge instead of on the
+   baseline of an anonymous 16px/25.6px line box (the `.eyebrow` inline-flex). */
 .admin-ops-stat__label {
+  display: flex;
   color: var(--text-3, var(--text-2));
   font-family: var(--font-mono);
   font-size: 0.625rem;

@@ -10,9 +10,24 @@
   animation: fadeIn 0.5s ease;
 }
 
+/* Canonical `.btn.ghost` geometry: 36px tall, 9px 16px padding, 13px label. */
 .taxonomy-back {
-  gap: 6px;
+  height: 36px;
+  min-height: 36px;
+  gap: 8px;
   margin-bottom: 20px;
+  padding: 9px 16px;
+  border: var(--border-w, 1px) solid var(--border);
+  border-radius: var(--radius-sm);
+  background: transparent;
+  font-size: 13px;
+  font-weight: 500;
+  line-height: normal;
+}
+
+.taxonomy-back:hover {
+  border-color: var(--text-3);
+  background: var(--surface);
 }
 
 .taxonomy-eyebrow {

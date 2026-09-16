@@ -15,15 +15,15 @@
 
 .queue-review-shell-heading h2 {
   color: var(--text);
-  font-size: 0.875rem;
-  font-weight: 650;
-  line-height: 1.25;
+  font-size: 14px;
+  font-weight: 600;
+  line-height: 1.6;
 }
 
 .queue-review-shell-heading p {
   color: var(--text-3, var(--text-2));
   font-size: 0.75rem;
-  line-height: 1.4;
+  line-height: 1.6;
   margin-block-start: 0.25rem;
 }
 
@@ -59,6 +59,26 @@
 
 .queue-review-actions button {
   min-height: 2rem;
+}
+
+.queue-review-actions .btn {
+  line-height: normal;
+  min-height: 0;
+}
+
+.queue-review-actions .btn:disabled {
+  cursor: default;
+  opacity: 1;
+}
+
+.queue-review-extra-action {
+  opacity: 0;
+  position: absolute;
+}
+
+.queue-review-extra-action:focus-visible {
+  opacity: 1;
+  position: static;
 }
 
 .queue-review-table-wrap {
@@ -109,6 +129,28 @@
   text-align: start;
   text-transform: uppercase;
   white-space: nowrap;
+  height: auto;
+}
+
+.queue-review-shell > .admin-table-wrap .table {
+  border-collapse: collapse;
+  font-family: var(--font-body);
+  font-size: 13px;
+  width: 100%;
+}
+
+.queue-review-shell > .admin-table-wrap .table th {
+  border-bottom: var(--hairline-w) solid var(--border);
+  color: var(--text-3);
+  font-family: var(--font-body);
+  font-size: 11px;
+  font-weight: 500;
+  height: auto;
+  letter-spacing: 0.5px;
+  line-height: 1.6;
+  padding: 12px 14px;
+  text-align: left;
+  text-transform: uppercase;
 }
 
 .queue-review-table-wrap .queue-review-table td {
@@ -253,17 +295,17 @@
 
 @media (max-width: 48rem) {
   .queue-review-shell-heading {
-    align-items: flex-start;
-    flex-direction: column;
+    align-items: center;
+    flex-direction: row;
   }
 
   .queue-review-actions {
-    justify-content: flex-start;
-    width: 100%;
+    justify-content: flex-end;
+    width: auto;
   }
 
   .queue-review-actions button {
-    flex: 1 1 auto;
+    flex: 0 0 auto;
   }
 
   .queue-review-empty {

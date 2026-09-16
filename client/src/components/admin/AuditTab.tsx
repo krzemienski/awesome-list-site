@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { ApiError } from "@/lib/queryClient";
+import { formatRelativeAgo } from "@/lib/utils";
 import { useQuery } from "@tanstack/react-query";
 import { TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Input } from "@/components/ui/input";
@@ -17,6 +18,7 @@ import {
 } from "@/components/admin/AdminOpsPrimitives";
 import ContactSubmissions from "@/components/admin/ContactSubmissions";
 import "@/styles/pages/admin-ops-users-audit.css";
+import "@/styles/pages/admin-ops-audit.css";
 
 interface AuditLogEntry {
   id: number;
@@ -150,24 +152,19 @@ export default function AuditTab() {
     });
   };
 
-  const formatRelativeDate = (date: string | null) => {
-    if (!date) return "—";
-    const elapsed = Date.now() - new Date(date).getTime();
-    if (!Number.isFinite(elapsed)) return "—";
-    const minutes = Math.max(0, Math.floor(elapsed / 60_000));
-    if (minutes < 60) return `${minutes}m ago`;
-    const hours = Math.floor(minutes / 60);
-    if (hours < 24) return `${hours}h ago`;
-    const days = Math.floor(hours / 24);
-    return `${days}d ago`;
-  };
-
+  // Same target identity the overview's recent-activity list renders: the
+  // recorded title (nested `changes.resource.title` for delete/approve rows,
+  // flat `changes.title` for edits), else the resource number, else "System".
   const targetLabel = (log: AuditLogEntry): string => {
-    const title = log.changes?.title;
-    if (typeof title === "string" && title.trim()) return title;
-    return log.originalResourceId || log.resourceId
-      ? `#${log.originalResourceId || log.resourceId}`
-      : "System";
+    const nested = log.changes?.resource;
+    const title = (nested && typeof nested === "object" && typeof nested.title === "string"
+      ? nested.title
+      : typeof log.changes?.title === "string"
+        ? log.changes.title
+        : "").trim();
+    if (title) return title;
+    const id = log.originalResourceId ?? log.resourceId;
+    return id ? `#${id}` : log.notes ?? "System";
   };
 
   const actorLabel = (log: AuditLogEntry): string => {
@@ -314,7 +311,7 @@ export default function AuditTab() {
           <Table className="admin-ops-table admin-ops-audit-table">
             <TableHeader>
               <TableRow>
-                <TableHead className="w-20">ID</TableHead>
+                <TableHead>ID</TableHead>
                 <TableHead>Actor</TableHead>
                 <TableHead>Action</TableHead>
                 <TableHead>Target</TableHead>
@@ -373,7 +370,7 @@ export default function AuditTab() {
                       </StatusChip>
                     </TableCell>
                     <TableCell className="text-xs text-muted-foreground whitespace-nowrap">
-                       {formatRelativeDate(log.createdAt)}
+                       {formatRelativeAgo(log.createdAt)}
                     </TableCell>
                   </TableRow>
                 ))

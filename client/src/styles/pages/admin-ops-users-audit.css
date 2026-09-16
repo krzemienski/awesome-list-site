@@ -129,21 +129,55 @@
 
 .admin-ops-users-table {
   min-width: 52rem;
+  table-layout: fixed;
+}
+
+.admin-ops-users-table th:nth-child(1) { width: 33.85%; }
+.admin-ops-users-table th:nth-child(2) { width: 40.10%; }
+.admin-ops-users-table th:nth-child(3) { width: 8.13%; }
+.admin-ops-users-table th:nth-child(4) { width: 11.01%; }
+.admin-ops-users-table th:nth-child(5) { width: 6.91%; }
+
+.admin-ops-users-shell .admin-ops-table-shell__title,
+.admin-ops-users-shell .admin-ops-table-shell__description {
+  line-height: 1.6;
 }
 
 .admin-ops-users-table thead button svg {
   display: none;
 }
 
-.admin-ops-users-table {
-  table-layout: fixed;
+.admin-ops-users-table thead button {
+  font-size: inherit;
+  height: auto !important;
+  min-height: 0 !important;
 }
 
-.admin-ops-users-table th:nth-child(1) { width: 34%; }
-.admin-ops-users-table th:nth-child(2) { width: 34%; }
-.admin-ops-users-table th:nth-child(3) { width: 15%; }
-.admin-ops-users-table th:nth-child(4) { width: 12%; }
-.admin-ops-users-table th:nth-child(5) { width: 5%; }
+.admin-ops-users-table thead th {
+  font-family: var(--font-body);
+  line-height: 1.6;
+  text-transform: uppercase;
+}
+
+.admin-ops-users-table thead button {
+  font-family: inherit;
+  line-height: inherit;
+  text-transform: uppercase;
+}
+
+.admin-ops-users-shell [data-testid="button-invite-user"] {
+  line-height: normal;
+}
+
+.admin-ops-users-shell [data-testid="button-user-tools"] {
+  opacity: 0;
+  position: absolute;
+}
+
+.admin-ops-users-shell [data-testid="button-user-tools"]:focus-visible {
+  opacity: 1;
+  position: static;
+}
 
 .admin-ops-users-shell .admin-users-extra-action {
   opacity: 0;
@@ -170,8 +204,30 @@
 }
 
 .admin-ops-users-shell .admin-ops-cell-actions button {
+  background: transparent;
+  border: var(--border-w) solid var(--border);
+  border-radius: var(--radius-sm);
+  font-family: var(--font-body);
+  font-size: 12px;
   height: 27px !important;
+  line-height: normal;
   min-height: 0 !important;
+  padding: 5px 10px;
+}
+
+.admin-ops-users-shell .admin-ops-cell-actions > div {
+  justify-content: flex-end;
+}
+
+.admin-ops-users-shell [data-ds="chip"].admin-chip {
+  font-size: 10.5px;
+  gap: 6px;
+  line-height: 16.8px;
+  padding: 4px 10px;
+}
+
+.admin-ops-users-table tbody tr:last-child td {
+  border-bottom: var(--hairline-w) solid var(--border);
 }
 
 .admin-ops-users-shell [data-testid^="button-toggle-email-"],
@@ -290,6 +346,23 @@
 }
 
 @media (max-width: 48rem) {
+  .admin-ops-users-shell .admin-ops-table-shell__header {
+    align-items: center;
+    flex-direction: row;
+  }
+
+  .admin-ops-users-shell .admin-ops-table-shell__actions {
+    width: auto;
+  }
+
+  .admin-ops-users-table {
+    table-layout: auto;
+  }
+
+  .admin-ops-users-table th:nth-child(n) {
+    width: auto;
+  }
+
   .admin-ops-audit-toolbar {
     padding-inline: 1rem;
   }

@@ -2468,7 +2468,7 @@ export default function GenericCrudManager<T extends BaseEntityWithCount>({
   };
 
   return (
-    <Card className={`admin-taxonomy-shell border-0${toolsOpen ? " admin-taxonomy-shell--tools-open" : ""}`} data-testid={testIdPrefix}>
+    <Card className={`admin-taxonomy-shell admin-taxonomy-shell--${testIdEntityPlural} border-0${toolsOpen ? " admin-taxonomy-shell--tools-open" : ""}`} data-testid={testIdPrefix}>
       <CardHeader className="admin-taxonomy-header">
         {/* R5-003 (run24): the header row must WRAP — at 768/375 the rigid
             no-wrap flex row pushed the search input + "Add" button past the

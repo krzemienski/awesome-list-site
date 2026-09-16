@@ -18,6 +18,10 @@
   position: relative;
 }
 
+.admin-ops-database {
+  gap: 18px;
+}
+
 .admin-ops-export__intro {
   display: flex;
   flex-direction: column;
@@ -338,10 +342,6 @@
   color: var(--text);
 }
 
-.admin-ops-table tbody tr:last-child td {
-  border-bottom: 0;
-}
-
 .admin-ops-table .admin-ops-table__mono {
   color: var(--text-3);
   font-family: var(--font-mono);
@@ -531,6 +531,14 @@
   margin-top: 12px;
 }
 
+/* Canonical `.btn` geometry (36px) for the console actions. */
+.admin-ops-database__console-actions > .btn {
+  height: 36px;
+  line-height: normal;
+  min-height: 0;
+  padding: 9px 16px;
+}
+
 .admin-ops-more > summary {
   cursor: pointer;
   display: inline-flex;
@@ -549,27 +557,114 @@
   z-index: 2;
 }
 
+.admin-ops-export > .admin-ops-more,
+.admin-ops-database > .admin-ops-more {
+  top: calc(100% + 16px);
+}
+
 .admin-ops-export > .admin-ops-more > summary,
 .admin-ops-database > .admin-ops-more > summary {
   position: absolute;
   top: 0;
+  /* 16px offset + 32px control = the 48px page tail the canonical panel
+     already ends with, so the disclosure never lengthens the document. */
+  height: 32px;
+  min-height: 0;
+  padding: 5px 12px;
+  font-size: 12px;
+  line-height: normal;
 }
 
 .admin-ops-export > .admin-ops-more:first-of-type > summary {
-  top: 360px;
+  top: 0;
 }
 
 .admin-ops-export > .admin-ops-more:nth-of-type(2) > summary {
   left: 150px;
-  top: 360px;
+  top: 0;
 }
 
 .admin-ops-database > .admin-ops-more > summary {
-  top: 232px;
+  top: 0;
 }
 
 .admin-ops-database .admin-ops-table-shell__content {
-  min-height: 16.5rem;
+  min-height: 0;
+}
+
+/* The frozen database panel uses the same intrinsic auto-fill grid at every
+   viewport rather than the shared dashboard strip's fixed breakpoints. */
+.admin-ops-database .admin-ops-stat-strip {
+  gap: 14px;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+}
+
+.admin-ops-database .admin-ops-stat {
+  padding: 20px;
+}
+
+.admin-ops-database .admin-ops-stat__label {
+  margin-bottom: 10px;
+}
+
+.admin-ops-database .admin-ops-stat__value {
+  font-family: inherit;
+  font-weight: 700;
+}
+
+.admin-ops-database .admin-ops-stat__description {
+  line-height: 1.6;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.admin-ops-database .admin-ops-table {
+  min-width: 0;
+}
+
+.admin-ops-database .admin-ops-table th {
+  font-size: 11px;
+  font-family: inherit;
+  letter-spacing: 0.5px;
+  line-height: 1.6; /* body leading */
+  padding: 12px 14px;
+  white-space: normal;
+}
+
+.admin-ops-database .admin-ops-table td {
+  line-height: 1.6; /* body leading */
+  padding: 14px;
+}
+
+.admin-ops-database .admin-ops-table .admin-ops-table__mono,
+.admin-ops-database .admin-ops-table .admin-ops-table__name {
+  font-size: 12px;
+}
+
+/* Frozen `.btn.ghost`: transparent, hairline border, content-sized. */
+.admin-ops-database .admin-ops-table__action {
+  background: transparent;
+  border-color: var(--border);
+  font-size: 12px;
+  height: 27px;
+  line-height: normal;
+  min-height: 0;
+  min-width: 0;
+  padding: 5px 10px;
+}
+
+.admin-ops-database .admin-ops-table-shell__title {
+  line-height: 1.6; /* body leading */
+}
+
+.admin-ops-database .admin-ops-table-shell__description {
+  line-height: 1.6; /* body leading */
+}
+
+.admin-ops-database__console .textarea {
+  font-size: 12.5px !important;
+  line-height: normal;
 }
 
 .admin-ops-more > summary::-webkit-details-marker {
@@ -588,12 +683,14 @@
 }
 
 @media (max-width: 48rem) {
-  .admin-ops-export__cards {
-    grid-template-columns: 1fr;
-  }
-
   .admin-ops-export-card {
     min-height: 0;
+  }
+
+  /* The frozen TableShell keeps its 18px/22px heading at every width. */
+  .admin-ops-database .admin-ops-table-shell__header {
+    align-items: center;
+    padding: 18px 22px;
   }
 
   .admin-ops-validation-counts {
@@ -619,4 +716,8 @@
 
 .admin-ops-export .admin-ops-export-card--unsupported {
   border-style: solid;
+}
+/* Last-write column: the canonical table paints it in the tertiary ink. */
+.admin-ops-database .admin-ops-table .admin-ops-table__muted {
+  color: var(--text-3);
 }

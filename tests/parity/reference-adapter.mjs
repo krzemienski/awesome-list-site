@@ -278,6 +278,192 @@ const relativeTime = (fromMs, toMs) => {
   return `${Math.round(hours / 24)}d ago`;
 };
 
+/** True only when /api/admin/stats.database carries every field the substitutions read. */
+const isDatabaseOverview = (value) =>
+  Boolean(value)
+  && [value.tables, value.totalRows, value.diskBytes, value.migrations?.applied].every(Number.isFinite)
+  && (value.migrations.journaled === null || Number.isFinite(value.migrations.journaled))
+  && Array.isArray(value.tableStats)
+  && value.tableStats.every((table) => typeof table.name === "string" && Number.isFinite(table.rows) && Number.isFinite(table.bytes));
+
+/** "24 KB" / "12.4 MB" / "34 MB" — mirrors formatStorageSize in DatabaseTab.tsx. */
+const formatStorageSize = (bytes) => {
+  const kb = bytes / 1024;
+  if (kb < 1024) return `${Math.max(1, Math.round(kb))} KB`;
+  const mb = kb / 1024;
+  if (mb < 1024) return `${mb < 10 ? mb.toFixed(1) : Math.round(mb)} MB`;
+  return `${(mb / 1024).toFixed(1)} GB`;
+};
+
+const FROZEN_ADMIN_DATABASE_STATS = `        <Stat label="Tables" value="12" />
+        <Stat label="Rows" value="3,847" />
+        <Stat label="Disk" value="34 MB" />
+        <Stat label="Migrations" value="47" sub="0 pending" accent />`;
+
+const FROZEN_ADMIN_DATABASE_TABLES = `            {[
+              ['resources', '1,953', '12.4 MB', '2m ago'],
+              ['categories', '9', '24 KB', '4d ago'],
+              ['subcategories', '102', '88 KB', '4d ago'],
+              ['users', '3', '8 KB', '1d ago'],
+              ['audit_log', '14,329', '8.7 MB', '12s ago'],
+              ['enrichment_jobs', '21', '156 KB', '3h ago'],
+            ].map((row, i) => (`;
+
+const FROZEN_ADMIN_EDITS_DECLARATION = `  const edits = [
+    { id: 1, target: 'ffmpeg-python', field: 'description', user: 'krzemienski', time: '2h ago' },
+    { id: 2, target: 'shaka-player', field: 'tags', user: 'mhanssen', time: '5h ago' },
+    { id: 3, target: 'WebRTC.org', field: 'url', user: 'admin', time: '1d ago' },
+  ];`;
+
+const FROZEN_ADMIN_ENRICHMENT_STATS = `        <Stat label="Last enriched" value="3h ago" sub="batch #21 · 47 entries" />
+        <Stat label="Queue" value="0" sub="idle" />
+        <Stat label="Avg cost" value="$0.34" sub="per batch" />`;
+
+const FROZEN_ADMIN_LINK_HEALTH_STATS = `  const stats = [
+    { k: '200 OK', v: '1,847', color: '#34d08c' },
+    { k: '301/302', v: '78', color: '#ffb84d' },
+    { k: '404', v: '21', color: '#ff5c7a' },
+    { k: 'Timeout', v: '7', color: '#ff5c7a' },
+  ];`;
+
+const FROZEN_ADMIN_LINK_HEALTH_ROWS = `            {[
+              { t: 'AviSynth', u: 'http://avisynth.org/', s: '404', when: '2h ago' },
+              { t: 'OpenVisualCloud/Smart-City', u: 'github.com/OpenVisualCloud/...', s: 'timeout', when: '2h ago' },
+              { t: 'M3U8Kit/M3U8Parser', u: 'github.com/M3U8Kit/...', s: '301', when: '2h ago' },
+            ].map((r, i) => (`;
+
+const FROZEN_ADMIN_HEALTH_ROWS = `            {[
+              { k: 'Database', v: 'healthy', ok: true },
+              { k: 'GitHub sync', v: 'last: 1h ago', ok: true },
+              { k: 'Link checker', v: 'running · 47%', ok: true, warn: true },
+              { k: 'Enrichment queue', v: '0 pending', ok: true },
+              { k: 'Researcher API', v: 'healthy', ok: true },
+            ].map((row, i) => (`;
+const FROZEN_ADMIN_RESEARCH_NOTES = `          {[
+            { k: 'AV1 hardware encoders 2026', n: 12, d: 'Active' },
+            { k: 'Emerging WebRTC SFUs', n: 7, d: '2 days ago' },
+            { k: 'Subtitle ML pipelines', n: 4, d: '1 week ago' },
+            { k: 'Low-latency CMAF survey', n: 9, d: 'Active' },
+          ].map((p, i) => (`;
+const FROZEN_ADMIN_HEALTH_DOT = "'dot ' + (row.warn ? 'warn' : row.ok ? 'ok' : 'bad')";
+const FROZEN_ADMIN_HEALTH_SUBTITLE = "<p style={{ fontSize: 12, color: 'var(--text-3)', marginBottom: 16 }}>All systems nominal</p>";
+
+/** Mirror of AdminOverview's title(): humanised status words. */
+const titleWord = (value) => String(value).replace(/[_-]/g, " ").replace(/\b\w/g, (letter) => letter.toUpperCase());
+
+const parseDateMs = (value) => {
+  if (!value) return null;
+  const ms = Date.parse(value);
+  return Number.isFinite(ms) ? ms : null;
+};
+
+const newestByCreatedAt = (items) =>
+  [...items].sort((left, right) => (parseDateMs(right.createdAt) ?? 0) - (parseDateMs(left.createdAt) ?? 0))[0];
+
+/** Mirror of AdminOverview's formatRelativeAgo use: "—" for a missing date. */
+const ageOrDash = (value, frozenAtMs) => {
+  const ms = parseDateMs(value);
+  return ms === null ? "—" : relativeTime(ms, frozenAtMs);
+};
+
+/**
+ * Mirror of AdminOverview.renderHealthRows for settled reads: a failed read
+ * is the application's isError branch ("unavailable"). StatusChip renders the
+ * "unknown" state as `dot muted`, which neither stylesheet colours.
+ */
+/**
+ * Mirror of ResearchWorkspace.toResearchNote: the latest researcher jobs
+ * become the workspace note cards (prompt, discovery count, "Active" while
+ * pending/processing, otherwise completed/started/created age).
+ */
+const buildResearchNotes = (jobs, frozenAtMs) =>
+  jobs.map((job) => ({
+    k: job.prompt,
+    n: job.totalDiscoveries ?? 0,
+    d: job.status === "pending" || job.status === "processing"
+      ? "Active"
+      : ageOrDash(job.completedAt ?? job.startedAt ?? job.createdAt, frozenAtMs),
+  }));
+
+const buildOverviewHealth = ({ operations, ai, githubQueue, githubHistory, linkStatus, linkHistory, enrichment }, frozenAtMs) => {
+  const rows = [];
+  if (!operations.ok) rows.push({ k: "Database", v: "unavailable", state: "bad" });
+  else {
+    const probe = operations.body?.readiness?.lastProbe;
+    const ready = operations.body?.status === "ready" && probe?.ready !== false;
+    rows.push({
+      k: "Database",
+      v: ready ? `ready${probe?.durationMs === undefined ? "" : ` · ${probe.durationMs}ms`}` : `degraded${probe?.reason ? ` · ${probe.reason}` : ""}`,
+      state: ready ? "ok" : "bad",
+    });
+  }
+  if (!githubQueue.ok || !githubHistory.ok) rows.push({ k: "GitHub sync", v: "unavailable", state: "bad" });
+  else {
+    const activeGithub = newestByCreatedAt((githubQueue.body?.items || []).filter((item) => item.status === "pending" || item.status === "processing"));
+    const latestGithub = newestByCreatedAt(Array.isArray(githubHistory.body) ? githubHistory.body : []);
+    if (activeGithub) rows.push({ k: "GitHub sync", v: `${titleWord(activeGithub.status)} · ${ageOrDash(activeGithub.createdAt, frozenAtMs)}`, state: "warn" });
+    else if (latestGithub?.status === "failed") rows.push({ k: "GitHub sync", v: `failed · ${ageOrDash(latestGithub.createdAt, frozenAtMs)}`, state: "bad" });
+    else if (latestGithub) rows.push({ k: "GitHub sync", v: `${titleWord(latestGithub.status ?? "completed")} · ${ageOrDash(latestGithub.createdAt, frozenAtMs)}`, state: "ok" });
+    else rows.push({ k: "GitHub sync", v: "no runs", state: "unknown" });
+  }
+  if (!linkStatus.ok || !linkHistory.ok || linkStatus.body?.success === false) rows.push({ k: "Link checker", v: "unavailable", state: "bad" });
+  else {
+    const currentLink = linkStatus.body?.job;
+    const lastCompletedLink = [...(linkHistory.body?.jobs || [])]
+      .filter((job) => job.status === "completed")
+      .sort((left, right) => (parseDateMs(right.completedAt ?? right.createdAt) ?? 0) - (parseDateMs(left.completedAt ?? left.createdAt) ?? 0))[0];
+    if (currentLink?.status === "pending" || currentLink?.status === "processing") rows.push({ k: "Link checker", v: `${titleWord(currentLink.status)} · ${ageOrDash(currentLink.createdAt, frozenAtMs)}`, state: "warn" });
+    else if (currentLink?.status === "failed" || currentLink?.status === "cancelled") rows.push({ k: "Link checker", v: `${titleWord(currentLink.status)} · ${ageOrDash(currentLink.createdAt, frozenAtMs)}`, state: "bad" });
+    else if (lastCompletedLink) {
+      const broken = lastCompletedLink.brokenLinks;
+      rows.push({ k: "Link checker", v: `last ${ageOrDash(lastCompletedLink.completedAt ?? lastCompletedLink.createdAt, frozenAtMs)}${broken ? ` · ${broken} broken` : ""}`, state: broken ? "warn" : "ok" });
+    } else rows.push({ k: "Link checker", v: "no completed runs", state: "unknown" });
+  }
+  const jobs = enrichment.ok ? enrichment.body?.jobs || [] : [];
+  const activeJobs = jobs.filter((job) => job.status === "pending" || job.status === "processing").length;
+  const failedJobs = jobs.filter((job) => job.status === "failed").length;
+  if (!enrichment.ok || enrichment.body?.success === false) rows.push({ k: "Enrichment queue", v: "unavailable", state: "bad" });
+  else if (failedJobs) rows.push({ k: "Enrichment queue", v: `${failedJobs} failed`, state: "bad" });
+  else if (activeJobs) rows.push({ k: "Enrichment queue", v: `${activeJobs} active`, state: "warn" });
+  else rows.push({ k: "Enrichment queue", v: "idle", state: "ok" });
+  if (!ai.ok || ai.body?.status !== "healthy") rows.push({ k: "Researcher API", v: ai.ok && ai.body?.status ? titleWord(ai.body.status) : "unavailable", state: "bad" });
+  else rows.push({ k: "Researcher API", v: "healthy", state: "ok" });
+  const subtitle = rows.some((row) => row.state === "bad")
+    ? "One or more systems need attention"
+    : rows.some((row) => row.state === "unknown")
+      ? "Checking current readiness"
+      : rows.some((row) => row.state === "warn")
+        ? "Some systems are still working"
+        : "All systems nominal";
+  return { rows: rows.map((row) => ({ k: row.k, v: row.v, cls: row.state === "unknown" ? "muted" : row.state })), subtitle };
+};
+
+/** Same locale-pinned admin timestamp as client formatAdminDateTime, rendered in the UTC capture context. */
+const formatAdminDateTime = (iso) => {
+  const date = new Date(iso);
+  if (Number.isNaN(date.getTime())) return "";
+  return date.toLocaleString("en-US", { month: "short", day: "numeric", year: "numeric", hour: "2-digit", minute: "2-digit", timeZone: "UTC" });
+};
+
+/** Mirror of BatchEnrichmentPanel's averageBatchCost: mean of recorded metadata.agent.estimatedCostUsd, "—" when none. */
+const averageBatchCost = (jobs) => {
+  const costs = jobs.map((job) => Number(job?.metadata?.agent?.estimatedCostUsd)).filter((cost) => Number.isFinite(cost) && cost >= 0);
+  if (costs.length === 0) return "—";
+  return `$${(costs.reduce((sum, cost) => sum + cost, 0) / costs.length).toFixed(2)}`;
+};
+
+/** Mirror of BatchEnrichmentPanel's effectiveStatus (a completed job with no successes and real failures reads as failed). */
+const effectiveEnrichmentStatus = (job) => {
+  if (job.status === "completed") {
+    const processed = job.processedResources || 0;
+    const total = job.totalResources || 0;
+    const successful = job.successfulResources || 0;
+    const failed = job.failedResources || 0;
+    if (successful === 0 && (failed > 0 || (processed === 0 && total > 0))) return "failed";
+  }
+  return job.status;
+};
+
 const isoWeek = (date) => {
   const utc = new Date(Date.UTC(date.getUTCFullYear(), date.getUTCMonth(), date.getUTCDate()));
   const day = utc.getUTCDay() || 7;
@@ -338,7 +524,7 @@ export async function buildAdminAdapter(fetchJson, frozenAtMs) {
     if (!result.ok) throw new Error(`${route} returned ${result.status} for the disposable admin`);
     return result.body;
   };
-  const [stats, usersPage, resourcesPage, pending, audit, contactResponse, operations, catalog, nav, syncHistory] = await Promise.all([
+  const [stats, usersPage, resourcesPage, pending, audit, contactResponse, operations, catalog, nav, syncHistory, resourceEdits, enrichmentJobsBody, linkHealthStatus, linkHealthBroken, researcherJobsBody, overviewReads] = await Promise.all([
     get("/api/admin/stats"),
     get(ADMIN_USERS_ROUTE),
     get(ADMIN_RESOURCES_ROUTE),
@@ -351,7 +537,81 @@ export async function buildAdminAdapter(fetchJson, frozenAtMs) {
     null,
     get("/api/awesome-list/nav"),
     get("/api/github/sync-history"),
+    get("/api/admin/resource-edits"),
+    get("/api/enrichment/jobs"),
+    get("/api/admin/link-health/status"),
+    get("/api/admin/link-health/broken-links"),
+    // Research workspace notes (ResearchWorkspace.tsx): the latest four jobs.
+    get("/api/researcher/jobs?limit=4"),
+    // Overview "System health" reads (AdminOverview.tsx); a non-2xx response
+    // is that panel's isError branch, so these are not fail-closed.
+    (async () => ({
+      operations: await fetchOnce("/api/admin/operations/health"),
+      ai: await fetchOnce("/api/health/ai"),
+      githubQueue: await fetchOnce("/api/github/sync-status"),
+      githubHistory: await fetchOnce("/api/github/sync-history"),
+      linkStatus: await fetchOnce("/api/admin/link-health/status"),
+      linkHistory: await fetchOnce("/api/admin/link-health/history"),
+      enrichment: await fetchOnce("/api/enrichment/jobs?limit=100"),
+    }))(),
   ]);
+  const overviewHealth = buildOverviewHealth(overviewReads, frozenAtMs);
+  if (!Array.isArray(researcherJobsBody?.jobs)) {
+    throw new Error("GET /api/researcher/jobs did not return { jobs: [] }; refusing invented research notes");
+  }
+  const researchNotes = buildResearchNotes(researcherJobsBody.jobs, frozenAtMs);
+  // Edits / Enrichment / Link Health: the frozen panels declare fixture rows
+  // locally. Bind the same live reads their application counterparts consume
+  // (PendingEdits.tsx, BatchEnrichmentPanel.tsx, LinkHealthDashboard.tsx); an
+  // empty live list is authoritative on both sides.
+  if (!Array.isArray(resourceEdits)) {
+    throw new Error("GET /api/admin/resource-edits did not return an array; refusing an invented edit history");
+  }
+  if (!Array.isArray(enrichmentJobsBody?.jobs)) {
+    throw new Error("GET /api/enrichment/jobs did not return { jobs: [] }; refusing an invented enrichment job list");
+  }
+  if (!Array.isArray(linkHealthBroken?.checks) || typeof linkHealthStatus !== "object" || linkHealthStatus === null || !("job" in linkHealthStatus)) {
+    throw new Error("Link-health reads did not return { job } and { checks: [] }; refusing invented link statistics");
+  }
+  const edits = resourceEdits.map((edit) => ({
+    id: edit.id,
+    target: edit.resource?.title || edit.resourceTitle || (edit.resourceId ? `#${edit.resourceId}` : "—"),
+    field: Array.isArray(edit.changedFields) ? edit.changedFields.join(", ") : edit.field || "edit",
+    user: edit.userEmail || edit.submittedByEmail || edit.userId || "—",
+    time: edit.createdAt ? relativeTime(Date.parse(edit.createdAt), frozenAtMs) : "",
+  }));
+  const enrichmentJobs = enrichmentJobsBody.jobs;
+  const lastCompletedEnrichment = enrichmentJobs.find((job) => job.status === "completed") || null;
+  const enrichment = {
+    lastEnriched: lastCompletedEnrichment?.completedAt ? relativeTime(Date.parse(lastCompletedEnrichment.completedAt), frozenAtMs) : "—",
+    lastEnrichedSub: lastCompletedEnrichment ? `batch #${lastCompletedEnrichment.id} · ${lastCompletedEnrichment.successfulResources || 0} entries` : "No completed batches",
+    queue: enrichmentJobs.filter((job) => job.status === "pending" || job.status === "processing").length,
+    queueSub: enrichmentJobs.some((job) => job.status === "pending" || job.status === "processing") ? "active" : "idle",
+    avgCost: averageBatchCost(enrichmentJobs),
+    jobs: enrichmentJobs.slice(0, 6).map((job) => ({
+      id: `#${job.id}`,
+      status: effectiveEnrichmentStatus(job),
+      started: job.startedAt ? new Date(job.startedAt).toLocaleString("en-US", { timeZone: "UTC" }) : "—",
+      completed: job.completedAt ? new Date(job.completedAt).toLocaleString("en-US", { timeZone: "UTC" }) : "—",
+    })),
+  };
+  const latestLinkJob = linkHealthStatus.job;
+  const linkChecks = linkHealthBroken.checks;
+  const countLinkStatus = (statuses) => linkChecks.filter((check) => statuses.includes(check.status)).length;
+  const linkHealth = {
+    healthy: Math.max(0, (latestLinkJob?.totalLinks || 0) - linkChecks.length),
+    redirect: countLinkStatus(["redirect"]),
+    broken: countLinkStatus(["broken", "dns_failure"]),
+    timeout: countLinkStatus(["timeout"]),
+    failures: linkChecks
+      .filter((check) => check.flaggedForReview || ["broken", "dns_failure", "timeout"].includes(check.status))
+      .map((check) => ({
+        t: check.resource?.title ?? `Resource #${check.resourceId}`,
+        u: check.url || "",
+        s: check.status || "",
+        when: check.lastCheckedAt ? formatAdminDateTime(check.lastCheckedAt) : "",
+      })),
+  };
   // The frozen GitHub panel lists AV_SYNC_JOBS (id / type / status). Bind the
   // same five newest sync-history rows the application's panel renders
   // (GitHubSyncPanel.tsx: newest first, slice(0, 5)) instead of the data.js
@@ -412,6 +672,7 @@ export async function buildAdminAdapter(fetchJson, frozenAtMs) {
     // the same default 25-row admin page the application renders, while
     // leaving AV_TOTAL as the true catalog total.
     AV_SYNC_JOBS: syncJobs,
+    AV_ENRICHMENT_JOBS: enrichment.jobs,
     AV_ADMIN_RESOURCES: adminResources.map((resource) => ({
       id: resource.id,
       title: resource.title || resource.name || "",
@@ -430,8 +691,15 @@ export async function buildAdminAdapter(fetchJson, frozenAtMs) {
     AV_RECENT_ACTIVITY: logs.map((log, index) => ({
       id: `TX#${log.id ?? index + 1}`,
       user: auditActorLabel(log),
-      action: log.action || "updated",
-      target: log.changes?.resource?.title || log.changes?.title || (log.resourceId ? `#${log.resourceId}` : "—"),
+      // AdminOverview.tsx: action words are humanised and the target is the
+      // recorded title, else the original/current resource number, else notes.
+      action: String(log.action || "updated").replace(/[_-]/g, " "),
+      target: (() => {
+        const title = String(log.changes?.resource?.title || log.changes?.title || "").trim();
+        if (title) return title;
+        const id = log.originalResourceId ?? log.resourceId;
+        return id ? `#${id}` : log.notes ?? "System";
+      })(),
       time: log.createdAt ? relativeTime(Date.parse(log.createdAt), frozenAtMs) : "",
       status: auditActionStatus(log.action),
     })),
@@ -472,8 +740,14 @@ export async function buildAdminAdapter(fetchJson, frozenAtMs) {
     stats,
     pendingApprovals,
     counts: { users: users.length, admins, contributors, pending: Number(stats.pendingApprovals ?? pendingResources.length), oldestPendingMs: oldestPending ?? null },
+    database: isDatabaseOverview(stats.database) ? stats.database : null,
+    edits,
+    enrichment,
+    linkHealth,
+    overviewHealth,
+    researchNotes,
     endpoints: [...reads.keys()],
-    snapshotBytes: Buffer.from(JSON.stringify({ stats, usersPage, resourcesPage, pending, audit, contactResponse, operations, catalog, nav, syncHistory })),
+    snapshotBytes: Buffer.from(JSON.stringify({ stats, usersPage, resourcesPage, pending, audit, contactResponse, operations, catalog, nav, syncHistory, resourceEdits, enrichmentJobsBody, linkHealthStatus, linkHealthBroken, researcherJobsBody, overviewReads })),
   };
 }
 
@@ -503,6 +777,61 @@ export function buildPlaceholderSubstitutions({ adapter, home, frozenAt, admin, 
     { file: "admin.jsx", from: 'sub="2 admins · 1 contributor"', to: admin ? `sub="${admin.counts.admins} admin${admin.counts.admins === 1 ? "" : "s"} · ${admin.counts.contributors} contributor${admin.counts.contributors === 1 ? "" : "s"}"` : null, source: "/api/admin/users roles (admin session only)", available: Boolean(admin) },
     { file: "admin.jsx", from: 'value="7" sub="oldest 14m ago"', to: admin ? `value="${admin.counts.pending}" sub="${admin.counts.oldestPendingMs ? `oldest ${relativeTime(admin.counts.oldestPendingMs, frozenAtMs)}` : "nothing waiting"}"` : null, source: "/api/admin/stats pendingApprovals + oldest /api/admin/pending-resources createdAt vs frozen clock (admin session only)", available: Boolean(admin) },
     { file: "admin.jsx", from: FROZEN_ADMIN_PENDING_DECLARATION, to: admin ? `  const pending = ${JSON.stringify(admin.pendingApprovals)};` : null, source: "/api/admin/pending-resources (same unfiltered queue consumed by the Approvals tab; an empty live queue is authoritative)", available: Boolean(admin) },
+    // Database panel: the frozen fixture numbers are replaced by the same
+    // pg_catalog metrics the application renders from /api/admin/stats.database.
+    {
+      file: "admin.jsx",
+      from: FROZEN_ADMIN_DATABASE_STATS,
+      to: admin?.database ? `        <Stat label="Tables" value="${admin.database.tables.toLocaleString("en-US")}" />
+        <Stat label="Rows" value="${admin.database.totalRows.toLocaleString("en-US")}" />
+        <Stat label="Disk" value="${formatStorageSize(admin.database.diskBytes)}" />
+        <Stat label="Migrations" value="${admin.database.migrations.applied.toLocaleString("en-US")}" sub="${admin.database.migrations.journaled === null ? "journal not shipped" : `${Math.max(0, admin.database.migrations.journaled - admin.database.migrations.applied)} pending`}" accent />` : null,
+      source: "/api/admin/stats database (pg_catalog table count, exact row total, pg_database_size, drizzle journal; admin session only)",
+      available: Boolean(admin?.database),
+    },
+    {
+      file: "admin.jsx",
+      from: FROZEN_ADMIN_DATABASE_TABLES,
+      to: admin?.database ? `            {${JSON.stringify(admin.database.tableStats.map((table) => [
+        table.name,
+        table.rows.toLocaleString("en-US"),
+        formatStorageSize(table.bytes),
+        table.lastWriteAt ? relativeTime(Date.parse(table.lastWriteAt), frozenAtMs) : "—",
+      ]))}.map((row, i) => (` : null,
+      source: "/api/admin/stats database.tableStats (count(*), pg_total_relation_size, newest updated_at/created_at vs frozen clock; admin session only)",
+      available: Boolean(admin?.database),
+    },
+    { file: "admin.jsx", from: FROZEN_ADMIN_EDITS_DECLARATION, to: admin ? `  const edits = ${JSON.stringify(admin.edits)};` : null, source: "/api/admin/resource-edits (same list the Edits tab renders; an empty live list is authoritative)", available: Boolean(admin) },
+    // Overview "System health": the frozen fixture rows become the same
+    // readiness the application derives from its seven health reads.
+    { file: "admin.jsx", from: FROZEN_ADMIN_HEALTH_ROWS, to: admin ? `            {${JSON.stringify(admin.overviewHealth.rows)}.map((row, i) => (` : null, source: "/api/admin/operations/health, /api/health/ai, /api/github/sync-status|sync-history, /api/admin/link-health/status|history, /api/enrichment/jobs?limit=100 (AdminOverview.renderHealthRows mirror; admin session only)", available: Boolean(admin) },
+    { file: "admin.jsx", from: FROZEN_ADMIN_HEALTH_DOT, to: "'dot ' + row.cls", source: "AdminOverview StatusChip dot tone (ok/warn/bad/muted)", available: Boolean(admin) },
+    // Research workspace: the frozen note fixtures become the latest live
+    // researcher jobs (ResearchWorkspace.tsx mirror); an empty list is authoritative.
+    { file: "admin.jsx", from: FROZEN_ADMIN_RESEARCH_NOTES, to: admin ? `          {${JSON.stringify(admin.researchNotes)}.map((p, i) => (` : null, source: "/api/researcher/jobs?limit=4 (ResearchWorkspace.toResearchNote mirror; admin session only)", available: Boolean(admin) },
+    { file: "admin.jsx", from: FROZEN_ADMIN_HEALTH_SUBTITLE, to: admin ? `<p style={{ fontSize: 12, color: 'var(--text-3)', marginBottom: 16 }}>${admin.overviewHealth.subtitle}</p>` : null, source: "AdminOverview healthSubtitle derived from the bound health rows", available: Boolean(admin) },
+    {
+      file: "admin.jsx",
+      from: FROZEN_ADMIN_ENRICHMENT_STATS,
+      to: admin ? `        <Stat label="Last enriched" value=${JSON.stringify(admin.enrichment.lastEnriched)} sub=${JSON.stringify(admin.enrichment.lastEnrichedSub)} />
+        <Stat label="Queue" value="${admin.enrichment.queue}" sub="${admin.enrichment.queueSub}" />
+        <Stat label="Avg cost" value=${JSON.stringify(admin.enrichment.avgCost)} sub="per batch" />` : null,
+      source: "/api/enrichment/jobs (last completed job vs frozen clock, pending+processing count, mean recorded metadata.agent.estimatedCostUsd)",
+      available: Boolean(admin),
+    },
+    {
+      file: "admin.jsx",
+      from: FROZEN_ADMIN_LINK_HEALTH_STATS,
+      to: admin ? `  const stats = ${JSON.stringify([
+        { k: "200 OK", v: admin.linkHealth.healthy.toLocaleString("en-US"), color: "#34d08c" },
+        { k: "301/302", v: admin.linkHealth.redirect.toLocaleString("en-US"), color: "#ffb84d" },
+        { k: "404", v: admin.linkHealth.broken.toLocaleString("en-US"), color: "#ff5c7a" },
+        { k: "Timeout", v: admin.linkHealth.timeout.toLocaleString("en-US"), color: "#ff5c7a" },
+      ])};` : null,
+      source: "/api/admin/link-health/status latest job totalLinks + /api/admin/link-health/broken-links status counts (LinkHealthDashboard summary arithmetic)",
+      available: Boolean(admin),
+    },
+    { file: "admin.jsx", from: FROZEN_ADMIN_LINK_HEALTH_ROWS, to: admin ? `            {${JSON.stringify(admin.linkHealth.failures)}.map((r, i) => (` : null, source: "/api/admin/link-health/broken-links flagged/broken/dns_failure/timeout checks (an empty live list is authoritative)", available: Boolean(admin) },
     ...(reconciliation?.sourceSubstitutions || []),
   ];
   return entries;

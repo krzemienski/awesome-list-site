@@ -23,6 +23,12 @@
 }
 
 .admin-catalog-resources__header-actions input {
+  background: var(--surface);
+  border-color: var(--border);
+  display: block;
+  font-size: 13px;
+  height: 36px;
+  line-height: normal;
   min-height: 0;
   padding: 7px 10px;
   width: 200px;
@@ -32,10 +38,29 @@
   min-height: 0;
 }
 
+.admin-catalog-resources__header > div:first-child {
+  margin-bottom: 0;
+}
+
+.admin-catalog-resources__header-actions [data-testid="button-add-resource"] {
+  line-height: normal;
+}
+
+.admin-catalog-resources__header-actions [data-testid="button-resource-tools"] {
+  opacity: 0;
+  position: absolute;
+}
+
+.admin-catalog-resources__header-actions [data-testid="button-resource-tools"]:focus-visible {
+  opacity: 1;
+  position: static;
+}
+
 .admin-catalog-resources__title {
   color: var(--text);
   font-size: 14px;
   font-weight: 600;
+  line-height: 1.6;
 }
 
 .admin-catalog-resources__title > svg {
@@ -45,6 +70,7 @@
 .admin-catalog-resources__subtitle {
   color: var(--text-3);
   font-size: 12px;
+  line-height: 1.6;
   margin-top: 4px;
 }
 
@@ -63,6 +89,7 @@
 
 .admin-catalog-resources__table-scroll {
   border: 0;
+  margin-bottom: 0 !important;
 }
 
 .admin-catalog-resources__table {
@@ -82,13 +109,17 @@
   text-align: left;
   text-transform: uppercase;
   white-space: nowrap;
+  height: auto;
+  line-height: 1.6;
 }
 
 .admin-catalog-resources__table td {
   border-bottom: var(--hairline-w) solid var(--border);
   color: var(--text-2);
-  padding: 11px 14px;
+  line-height: 1.6;
+  padding: 14px;
   vertical-align: middle;
+  height: 56px;
 }
 
 .admin-catalog-resources__table tbody tr:hover td {
@@ -127,6 +158,8 @@
 .admin-catalog-resources__table [data-ds="chip"] {
   font-family: var(--font-mono);
   font-size: 9.5px;
+  /* canonical .chip tracking; the Badge's 0.12em widens the auto-layout Tags column */
+  letter-spacing: 0.6px;
   padding: 2px 6px;
 }
 
@@ -137,9 +170,13 @@
 .admin-catalog-resources__row-actions > button,
 .admin-catalog-resources__row-actions > a,
 .admin-catalog-resources__row-actions a {
+  background: transparent;
+  border: var(--border-w) solid var(--border);
+  border-radius: var(--radius-sm);
   font-size: 12px;
   height: auto;
   min-height: 0;
+  line-height: normal;
   padding: 5px 10px;
 }
 
@@ -163,9 +200,13 @@
   position: static;
 }
 
+/* Hidden until the tools open (or keyboard focus reaches them). Anchored to
+   the top of their containing block so the out-of-flow boxes never extend the
+   document below the canonical panel. */
 .admin-catalog-resources__scroll-hint,
 .admin-catalog-resources__pagination-summary,
 .admin-catalog-resources__paginator {
+  inset: 0 auto auto 0;
   opacity: 0;
   position: absolute;
 }
@@ -245,13 +286,17 @@
 @media (max-width: 640px) {
   .admin-catalog-resources__header,
   .admin-catalog-resources__content {
-    padding-left: 14px;
-    padding-right: 14px;
+    padding-left: 0;
+    padding-right: 0;
+  }
+
+  .admin-catalog-resources__header {
+    padding: 18px 22px;
   }
 
   .admin-catalog-resources__table-scroll {
-    margin-left: -14px;
-    margin-right: -14px;
+    margin-left: 0;
+    margin-right: 0;
     border-left: 0;
     border-right: 0;
     border-radius: 0;

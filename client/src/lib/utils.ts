@@ -39,6 +39,23 @@ export function getCategorySlug(category: string): string {
   return slugify(category);
 }
 
+/**
+ * "12s ago" / "2m ago" / "3h ago" / "4d ago" — the relative-time buckets the
+ * admin operations panels share (and the parity reference applies).
+ */
+export function formatRelativeAgo(value: string | Date | null | undefined, now = Date.now()): string {
+  if (!value) return "—";
+  const at = value instanceof Date ? value.getTime() : Date.parse(value);
+  if (!Number.isFinite(at)) return "—";
+  const seconds = Math.max(0, Math.round((now - at) / 1000));
+  if (seconds < 60) return `${seconds}s ago`;
+  const minutes = Math.round(seconds / 60);
+  if (minutes < 60) return `${minutes}m ago`;
+  const hours = Math.round(minutes / 60);
+  if (hours < 48) return `${hours}h ago`;
+  return `${Math.round(hours / 24)}d ago`;
+}
+
 // Run15 BUG-030: one explicit date format for the whole admin surface —
 // locale-pinned so every admin table reads the same regardless of viewer locale.
 export function formatAdminDateTime(date: string | Date): string {

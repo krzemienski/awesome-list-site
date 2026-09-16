@@ -23,6 +23,8 @@ import {
 } from "lucide-react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { apiRequest } from "@/lib/queryClient";
+import { formatRelativeAgo } from "@/lib/utils";
+import type { AdminDatabaseOverview } from "@/hooks/useAdmin";
 import { useToast } from "@/hooks/use-toast";
 import { AdminOpsTable as Table, Stat, StatusChip, TableShell } from "@/components/admin/AdminOpsPrimitives";
 import "./admin-ops-export-database.css";
@@ -42,8 +44,20 @@ interface DatabaseTabProps {
     totalPending?: number;
     /** Rows with status='rejected' (Audit2 BUG-050: was misnamed totalDeleted). */
     totalRejected?: number;
+    /** Real pg_catalog storage metrics (absent until /api/admin/stats answers). */
+    database?: AdminDatabaseOverview;
   };
 }
+
+/** "24 KB" / "12.4 MB" / "34 MB" / "1.2 GB" — the same rounding the parity reference applies. */
+export const formatStorageSize = (bytes: number): string => {
+  const kb = bytes / 1024;
+  if (kb < 1024) return `${Math.max(1, Math.round(kb))} KB`;
+  const mb = kb / 1024;
+  if (mb < 1024) return `${mb < 10 ? mb.toFixed(1) : Math.round(mb)} MB`;
+  return `${(mb / 1024).toFixed(1)} GB`;
+};
+
 
 /**
  * @description Response type from the seed database API endpoint
@@ -114,38 +128,41 @@ export default function DatabaseTab({ stats }: DatabaseTabProps) {
     seedDatabaseMutation.mutate({ clearExisting: true });
   };
 
-  const tableRows = [
-    { name: "resources", rows: stats?.resources },
-    { name: "users", rows: stats?.users },
-    { name: "learning_journeys", rows: stats?.journeys },
-  ];
+  const database = stats?.database;
+  const tableRows = database?.tableStats ?? [];
+  const pendingMigrations = database && database.migrations.journaled !== null
+    ? Math.max(0, database.migrations.journaled - database.migrations.applied)
+    : null;
 
   return (
     <div className="admin-ops-database">
       <div className="admin-ops-stat-strip">
         <Stat
           label="Tables"
-          value="—"
-          description="Schema count is not exposed by the admin API"
+          value={database ? database.tables.toLocaleString() : "—"}
         />
         <Stat
           label="Rows"
           value={
             <span data-testid="stat-db-live-resources">
-              {(stats?.totalPublic ?? stats?.resources ?? 0).toLocaleString()}
+              {database ? database.totalRows.toLocaleString() : "—"}
             </span>
           }
-          description={stats ? "Public resources reported by admin stats" : "Waiting for admin stats"}
         />
         <Stat
           label="Disk"
-          value="—"
-          description="Storage size is not exposed by the admin API"
+          value={database ? formatStorageSize(database.diskBytes) : "—"}
         />
         <Stat
           label="Migrations"
-          value="—"
-          description="Migration status is not exposed by the admin API"
+          value={database ? database.migrations.applied.toLocaleString() : "—"}
+          description={
+            pendingMigrations === null
+              ? database
+                ? "journal not shipped"
+                : "Waiting for admin stats"
+              : `${pendingMigrations} pending`
+          }
           accent
         />
       </div>
@@ -266,11 +283,9 @@ export default function DatabaseTab({ stats }: DatabaseTabProps) {
             {tableRows.map((row) => (
               <tr key={row.name}>
                 <td className="admin-ops-table__name">{row.name}</td>
-                <td className="admin-ops-table__mono">
-                  {typeof row.rows === "number" ? row.rows.toLocaleString() : "—"}
-                </td>
-                <td className="admin-ops-table__mono">—</td>
-                <td className="admin-ops-table__mono">—</td>
+                <td className="admin-ops-table__mono">{row.rows.toLocaleString()}</td>
+                <td className="admin-ops-table__mono">{formatStorageSize(row.bytes)}</td>
+                <td className="admin-ops-table__mono admin-ops-table__muted">{formatRelativeAgo(row.lastWriteAt)}</td>
                 <td className="admin-ops-table__actions">
                   <Button
                     variant="outline"

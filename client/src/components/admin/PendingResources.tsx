@@ -426,11 +426,12 @@ export default function PendingResources() {
             <p>0 submissions awaiting review</p>
           </div>
           <div className="queue-review-actions">
-            <Button variant="outline" size="sm" disabled>Bulk reject</Button>
-            <Button size="sm" disabled>Approve all</Button>
+            <button type="button" className="btn ghost" disabled>Bulk reject</button>
+            <button type="button" className="btn primary" disabled>Approve all</button>
             <Button
               variant="ghost"
               size="sm"
+              className="queue-review-extra-action"
               disabled={recheckState === 'checking'}
               onClick={() => {
                 setRecheckState('checking');

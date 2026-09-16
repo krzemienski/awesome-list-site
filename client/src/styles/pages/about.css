@@ -95,6 +95,11 @@
   line-height: 1.7;
 }
 
+.about-lead-copy > span:first-child::after {
+  content: "";
+  display: block;
+}
+
 .about-strong {
   font-weight: 600;
 }
@@ -141,6 +146,13 @@
   padding: 24px 24px 0;
 }
 
+.about-card-header > [class*="text-muted-foreground"] {
+  margin: 5.6px 0 0;
+  color: var(--text-2);
+  font-size: 13px;
+  line-height: inherit;
+}
+
 .about-card-content {
   padding: 16px 24px 24px;
 }
@@ -161,7 +173,7 @@
   width: 20px;
   height: 20px;
   flex: 0 0 auto;
-  color: var(--text-2);
+  color: var(--accent);
   stroke-width: 1.5;
 }
 
@@ -206,9 +218,7 @@
 }
 
 .about-inline-icon {
-  width: 16px;
-  height: 16px;
-  flex: 0 0 auto;
+  display: none;
 }
 
 .about-external-icon {
@@ -264,8 +274,8 @@
 }
 
 .about-source-icon {
-  width: 20px;
-  height: 20px;
+  width: 16px;
+  height: 16px;
   flex: 0 0 auto;
   color: var(--accent);
 }
@@ -373,13 +383,21 @@
   width: 8px;
   height: 8px;
   flex: 0 0 auto;
-  margin-top: 7px;
+  margin-top: 7.2px;
   border: var(--border-w) solid var(--accent);
   border-radius: var(--radius-pill);
   background: transparent;
 }
 
 .about-tech-dot-filled {
+  background: var(--accent);
+}
+
+.about-tech-column .about-tech-item:nth-child(even) .about-tech-dot {
+  background: transparent;
+}
+
+.about-tech-column .about-tech-item:nth-child(odd) .about-tech-dot {
   background: var(--accent);
 }
 
@@ -448,10 +466,11 @@
 }
 
 .about-faq-content {
-  padding-top: 12px;
+  padding-top: 16px;
 }
 
 .about-faq-list {
+  padding-top: 12px;
   border-top: var(--hairline-w) solid var(--border);
 }
 
@@ -473,7 +492,7 @@
   font: inherit;
   font-size: 14px;
   font-weight: 600;
-  line-height: 1.45;
+  line-height: inherit;
   text-align: left;
 }
 
@@ -486,15 +505,16 @@
 }
 
 .about-faq-chevron {
-  width: 18px;
-  height: 18px;
+  width: 16px;
+  height: 16px;
   flex: 0 0 auto;
   color: var(--text-2);
+  transform: rotate(-90deg);
   transition: transform 160ms ease;
 }
 
 .about-faq-chevron-open {
-  transform: rotate(180deg);
+  transform: rotate(0deg);
   color: var(--accent);
 }
 

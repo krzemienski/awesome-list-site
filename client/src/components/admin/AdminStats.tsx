@@ -82,7 +82,7 @@ function oldestPendingAge(resources: PendingResource[] | undefined): string {
       minimum === null ? value : Math.min(minimum, value)
     ), null);
 
-  if (oldest === null) return "none waiting";
+  if (oldest === null) return "nothing waiting";
   const elapsed = Math.max(0, Date.now() - oldest);
   const minutes = Math.floor(elapsed / 60_000);
   if (minutes < 1) return "oldest just now";

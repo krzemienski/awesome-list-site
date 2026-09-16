@@ -620,12 +620,12 @@ export default function ResearcherTab({ initialTab = "launch" }: ResearcherTabPr
               <tbody>
                 {(jobs || []).slice(0, 2).map((job) => (
                   <tr key={job.id}>
-                    <td><StatusChip status={job.status} /></td>
+                    <td><span className={`chip ${job.status === "completed" ? "ok" : job.status === "failed" ? "bad" : job.status === "pending" ? "warn" : ""}`}>{job.status}</span></td>
                     <td className="prompt">{job.prompt || "Auto-generated research brief"}</td>
                     <td className="mono">{job.totalDiscoveries || 0}</td>
-                    <td className="mono">{job.approvedDiscoveries || 0}</td>
+                    <td className="mono">{job.approvedDiscoveries || 0}/{job.rejectedDiscoveries || 0}</td>
                     <td className="mono accent">{formatCost(job.estimatedCostUsd)}</td>
-                    <td className="mono">{job.turnsUsed || 0}</td>
+                    <td className="mono">{job.turnsUsed || 0}/{job.maxTurns || 0}</td>
                     <td className="mono muted">{job.createdAt ? formatAdminDate(job.createdAt) : "—"}</td>
                   </tr>
                 ))}

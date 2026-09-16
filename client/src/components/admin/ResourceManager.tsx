@@ -1014,10 +1014,10 @@ export default function ResourceManager() {
             >
               More
             </Button>
-            <Button onClick={openCreateDialog} data-testid="button-add-resource">
-              <Plus className="h-3 w-3 mr-2" />
+            <button type="button" className="btn primary" onClick={openCreateDialog} data-testid="button-add-resource">
+              <Plus className="h-3 w-3" />
               Add
-            </Button>
+            </button>
           </div>
         </CardHeader>
         <CardContent className="admin-catalog-resources__content space-y-4">

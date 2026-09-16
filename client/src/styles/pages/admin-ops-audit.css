@@ -1,0 +1,91 @@
+/* Audit-only parity adjustments.  Shared operations styling also serves the
+   users screen, so the frozen Audit TableShell geometry is pinned here. */
+.admin-ops-audit-shell .admin-ops-table-shell__header {
+  padding: 18px 22px;
+}
+
+.admin-ops-audit-shell .admin-ops-table-shell__title {
+  font-size: 14px;
+  line-height: 1.6; /* body leading */
+}
+
+.admin-ops-audit-shell .admin-ops-table-shell__description {
+  font-size: 12px;
+  line-height: 1.6; /* body leading */
+}
+
+.admin-ops-audit-shell [data-testid="button-audit-tools"] {
+  opacity: 0;
+  position: absolute;
+}
+
+.admin-ops-audit-shell [data-testid="button-audit-tools"]:focus-visible {
+  opacity: 1;
+  position: static;
+}
+
+/* The frozen `.table` wraps inside the card at every width instead of
+   scrolling sideways behind a minimum width. */
+.admin-ops-audit-shell .admin-ops-audit-table {
+  font-size: 13px;
+  line-height: 1.6; /* body leading */
+  min-width: 0;
+}
+
+.admin-ops-audit-shell .admin-ops-table-wrap {
+  margin-bottom: 0;
+}
+
+.admin-ops-audit-shell .admin-ops-audit-table thead th {
+  padding: 12px 14px;
+  font-family: Inter, system-ui, sans-serif;
+  font-size: 11px;
+  line-height: 1.6; /* body leading */
+}
+
+.admin-ops-audit-shell .admin-ops-audit-table tbody td {
+  padding: 14px;
+}
+
+.admin-ops-audit-shell .admin-ops-audit-table tbody td:first-child,
+.admin-ops-audit-shell .admin-ops-audit-table tbody td:nth-child(2),
+.admin-ops-audit-shell .admin-ops-audit-table tbody td:nth-child(3),
+.admin-ops-audit-shell .admin-ops-audit-table tbody td:last-child {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  line-height: 1.6; /* body leading */
+}
+
+/* Target cell: the frozen table paints it in the primary ink at table size. */
+.admin-ops-audit-shell .admin-ops-audit-table tbody td:nth-child(4) {
+  color: var(--text);
+  font-size: 13px;
+  line-height: 1.6; /* body leading */
+}
+
+.admin-ops-audit-shell .admin-ops-audit-table tbody td:first-child {
+  color: var(--text-3);
+  font-size: 11px;
+}
+
+.admin-ops-audit-shell .admin-ops-audit-detail-button {
+  opacity: 0;
+}
+
+.admin-ops-audit-shell .admin-ops-audit-detail-button:focus-visible {
+  opacity: 1;
+}
+
+@media (max-width: 48rem) {
+  .admin-ops-audit-shell .admin-ops-table-shell__header {
+    padding: 18px 22px;
+  }
+}
+/* Frozen `.chip` metrics for the status column. */
+.admin-ops-audit-shell .admin-ops-audit-table .admin-ops-status-chip {
+  font-size: 10.5px;
+  gap: 6px;
+  letter-spacing: 0.6px;
+  line-height: 1.6; /* body leading */
+  padding: 4px 10px;
+}

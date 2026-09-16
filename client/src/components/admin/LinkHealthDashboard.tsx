@@ -25,7 +25,7 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { apiRequest } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
 import type { LinkHealthJob, LinkHealthCheck } from "@shared/schema";
-import { AdminOpsTable as Table, Stat, StatusChip, TableShell } from "@/components/admin/AdminOpsPrimitives";
+import { AdminOpsTable as Table, StatusChip, TableShell } from "@/components/admin/AdminOpsPrimitives";
 import "@/styles/pages/admin-ops-github-links.css";
 import type { LinkHealthTrendPoint } from "@/components/admin/LinkHealthTrendChart";
 
@@ -285,39 +285,19 @@ export default function LinkHealthDashboard() {
   }));
 
   return (
-    <div className="space-y-6 ops-link-health">
+    <div className="ops-link-health">
       <div className="ops-link-health__stat-grid" aria-label="Link health status summary">
-        <Stat
-          label="200 OK"
-          value={summaryCounts.healthy}
-          className="ops-link-health__stat-card ops-link-health__stat-card--ok"
-        />
-        <Stat
-          label="301/302"
-          value={summaryCounts.redirect}
-          className="ops-link-health__stat-card ops-link-health__stat-card--warn"
-        />
-        <Stat
-          label="404"
-          value={summaryCounts.broken}
-          className="ops-link-health__stat-card ops-link-health__stat-card--bad"
-        />
-        <Stat
-          label="Timeout"
-          value={summaryCounts.timeout}
-          className="ops-link-health__stat-card ops-link-health__stat-card--bad"
-        />
-      </div>
-      <div className="ops-link-health__more-row">
-        <Button
-          variant="ghost"
-          size="sm"
-          onClick={() => setShowDetails((visible) => !visible)}
-          aria-expanded={showDetails}
-          data-testid="button-link-health-more"
-        >
-          {showDetails ? "Less" : "More"}
-        </Button>
+        {[
+          ["200 OK", summaryCounts.healthy, "ok"],
+          ["301/302", summaryCounts.redirect, "warn"],
+          ["404", summaryCounts.broken, "bad"],
+          ["Timeout", summaryCounts.timeout, "bad"],
+        ].map(([label, value, tone]) => (
+          <div key={label} className={`card ops-link-health__stat-card ops-link-health__stat-card--${tone}`}>
+            <div className="mono">{label}</div>
+            <div>{value}</div>
+          </div>
+        ))}
       </div>
 
       {/* Summary Card */}
@@ -492,34 +472,28 @@ export default function LinkHealthDashboard() {
       )}
 
       <TableShell
-        title={
-          <span className="flex items-center justify-between gap-3">
-            <span className="flex items-center gap-2">
-              <AlertTriangle className="h-5 w-5" />
-              Recent failures
-            </span>
-            <StatusChip status={recentFailures.length > 0 ? "warning" : "complete"}>
-              {recentFailures.length}
-            </StatusChip>
-          </span>
-        }
+        title="Recent failures"
         sub="404s and timeouts from last sweep"
         className="ops-link-health__flagged-card"
       >
           {recentFailures.length === 0 ? (
-            <Alert>
-              <Info className="h-4 w-4" />
-              <AlertDescription>
+            <div className="ops-link-health__flagged-table-wrap">
+              <table className="table">
+                <thead>
+                  <tr><th>Resource</th><th>URL</th><th>Status</th><th>Last checked</th><th /></tr>
+                </thead>
+              </table>
+              <p className="ops-link-health__empty" role="status">
                 {isJobInProgress
                   ? "Recent failures will appear when the current check completes."
                   : latestJob
                     ? "No recent failures or review flags were found."
                     : "No link check has been run yet."}
-              </AlertDescription>
-            </Alert>
+              </p>
+            </div>
           ) : (
             <div className="ops-link-health__flagged-table-wrap">
-              <Table>
+              <Table className="table">
                 <TableHeader>
                   <TableRow>
                     <TableHead>Resource</TableHead>
@@ -575,6 +549,20 @@ export default function LinkHealthDashboard() {
             </div>
           )}
       </TableShell>
+
+      <details className="admin-ops-more ops-link-health__more-row">
+        <summary
+          className="btn ghost"
+          onClick={(event) => {
+            event.preventDefault();
+            setShowDetails((visible) => !visible);
+          }}
+          aria-expanded={showDetails}
+          data-testid="button-link-health-more"
+        >
+          {showDetails ? "Less" : "More"}
+        </summary>
+      </details>
 
       {showDetails && <Card className="ops-link-health__problem-card">
         <CardHeader>
@@ -642,7 +630,7 @@ export default function LinkHealthDashboard() {
             // Radix ScrollArea viewport clipped horizontal overflow, making
             // right-hand columns unreachable at ≤768px.
             <div className="max-h-[400px] overflow-auto" data-testid="scroller-link-health-table">
-              <Table>
+              <Table className="table">
                 <TableHeader>
                   <TableRow>
                     <TableHead className="w-[100px]">Status</TableHead>

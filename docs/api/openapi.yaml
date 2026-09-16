@@ -4292,6 +4292,54 @@ components:
           type: number
         totalRejected:
           type: number
+        database:
+          type: object
+          properties:
+            tables:
+              type: number
+            totalRows:
+              type: number
+            diskBytes:
+              type: number
+            migrations:
+              type: object
+              properties:
+                applied:
+                  type: number
+                journaled:
+                  nullable: true
+                  type: number
+              required:
+                - applied
+                - journaled
+              additionalProperties: false
+            tableStats:
+              type: array
+              items:
+                type: object
+                properties:
+                  name:
+                    type: string
+                  rows:
+                    type: number
+                  bytes:
+                    type: number
+                  lastWriteAt:
+                    nullable: true
+                    type: string
+                required:
+                  - name
+                  - rows
+                  - bytes
+                  - lastWriteAt
+                additionalProperties: false
+          required:
+            - tables
+            - totalRows
+            - diskBytes
+            - migrations
+            - tableStats
+          additionalProperties: false
       required:
         - users
         - resources
@@ -4301,6 +4349,7 @@ components:
         - totalPublic
         - totalPending
         - totalRejected
+        - database
       additionalProperties: {}
     get_3a__2f_api_2f_admin_2f_users.Query:
       type: object

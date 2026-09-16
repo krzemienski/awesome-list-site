@@ -21,7 +21,7 @@ import {
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Separator } from "@/components/ui/separator";
-import { formatAdminDateTime } from "@/lib/utils";
+import { formatAdminDateTime, formatRelativeAgo } from "@/lib/utils";
 import { 
   Sparkles, 
   Play, 
@@ -46,7 +46,7 @@ import { apiRequest, ApiError } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
 import { AgentEventLog } from "@/components/admin/AgentEventLog";
 import { AgentCommsGraph } from "@/components/admin/AgentCommsGraph";
-import { Stat, StatusChip, TableShell } from "@/components/admin/AdminOpsPrimitives";
+import { StatusChip, TableShell } from "@/components/admin/AdminOpsPrimitives";
 import type { EnrichmentJob } from "@shared/schema";
 import "./queues-agent.css";
 
@@ -79,6 +79,23 @@ const BAD_BORDER_CLASS = 'border-[#ff5c7a]/20'; // DS-OK: status bad
 const OK_OUTLINE_CLASS = 'border-[#34d08c] text-[#34d08c]'; // DS-OK: status ok
 const WARN_OUTLINE_CLASS = 'border-[#ffb84d] text-[#ffb84d]'; // DS-OK: status warn
 const BAD_OUTLINE_CLASS = 'border-[#ff5c7a] text-[#ff5c7a]'; // DS-OK: status bad
+
+/**
+ * Mean of the per-job cost the enrichment agent records
+ * (metadata.agent.estimatedCostUsd) over the jobs that carry one; "—" until
+ * a job has reported a cost. Same arithmetic as the parity reference binding.
+ */
+function averageBatchCost(jobs: EnrichmentJob[]): string {
+  const costs = jobs
+    .map((job) => {
+      const metadata = job.metadata as { agent?: { estimatedCostUsd?: unknown } } | null | undefined;
+      return Number(metadata?.agent?.estimatedCostUsd);
+    })
+    .filter((cost) => Number.isFinite(cost) && cost >= 0);
+  if (costs.length === 0) return "—";
+  const mean = costs.reduce((sum, cost) => sum + cost, 0) / costs.length;
+  return `$${mean.toFixed(2)}`;
+}
 
 function mutationErrorMessage(error: unknown): string {
   if (error instanceof Error && error.message) return error.message;
@@ -365,23 +382,26 @@ export default function BatchEnrichmentPanel() {
     <div className="queues-agent queues-agent--enrichment">
       <div className="queues-agent__canonical">
         <div className="queues-agent__stat-strip">
-          <Stat
-            label="Last enriched"
-            value={jobs.find((job) => job.status === "completed")?.completedAt
-              ? new Date(jobs.find((job) => job.status === "completed")!.completedAt!).toLocaleDateString("en-US", { month: "short", day: "numeric" })
-              : "—"}
-            sub={jobs.length ? `${jobs.length} recorded jobs` : "No completed batches"}
-          />
-          <Stat
-            label="Queue"
-            value={jobs.filter((job) => job.status === "pending" || job.status === "processing").length}
-            sub={hasActiveJob ? "active" : "idle"}
-          />
-          <Stat
-            label="Completed"
-            value={jobs.filter((job) => job.status === "completed").length}
-            sub="all recorded batches"
-          />
+          {(() => {
+            const lastCompleted = jobs.find((job) => job.status === "completed");
+            return (
+              <div className="card queues-agent__stat">
+                <div className="mono">Last enriched</div>
+                <div>{formatRelativeAgo(lastCompleted?.completedAt ?? null)}</div>
+                <div>{lastCompleted ? `batch #${lastCompleted.id} · ${lastCompleted.successfulResources || 0} entries` : "No completed batches"}</div>
+              </div>
+            );
+          })()}
+          <div className="card queues-agent__stat">
+            <div className="mono">Queue</div>
+            <div>{jobs.filter((job) => job.status === "pending" || job.status === "processing").length}</div>
+            <div>{hasActiveJob ? "active" : "idle"}</div>
+          </div>
+          <div className="card queues-agent__stat">
+            <div className="mono">Avg cost</div>
+            <div>{averageBatchCost(jobs)}</div>
+            <div>per batch</div>
+          </div>
         </div>
         <TableShell
           title="Enrichment jobs"
@@ -407,18 +427,23 @@ export default function BatchEnrichmentPanel() {
                 {jobs.slice(0, 6).map((job) => (
                   <tr key={job.id}>
                     <td className="mono">#{job.id}</td>
-                    <td><StatusChip status={effectiveStatus(job)} /></td>
+                    <td>
+                      {(() => {
+                        const status = effectiveStatus(job);
+                        const tone = status === "completed" ? "ok" : status === "failed" ? "bad" : status === "pending" ? "warn" : status === "cancelled" ? "muted" : "";
+                        return <span className={`chip ${tone}`}>{status}</span>;
+                      })()}
+                    </td>
                     <td className="mono muted">{job.startedAt ? new Date(job.startedAt).toLocaleString("en-US") : "—"}</td>
                     <td className="mono muted">{job.completedAt ? new Date(job.completedAt).toLocaleString("en-US") : "—"}</td>
                     <td className="actions">
-                      <Button
+                      <button
                         className="btn ghost"
-                        variant="ghost"
                         onClick={() => handleViewDetails(job.id)}
                         data-testid={`button-view-job-${job.id}-canonical`}
                       >
                         Logs
-                      </Button>
+                      </button>
                     </td>
                   </tr>
                 ))}

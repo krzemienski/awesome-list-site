@@ -25,6 +25,7 @@ import SubcategoryManager from "@/components/admin/SubcategoryManager";
 import SubSubcategoryManager from "@/components/admin/SubSubcategoryManager";
 import ResearcherTab from "@/components/admin/ResearcherTab";
 import JourneyStepsManager from "@/components/admin/JourneyStepsManager";
+import { ResearchWorkspace } from "@/components/admin/ResearchWorkspace";
 import DigestQueueHealth from "@/components/admin/DigestQueueHealth";
 import ErrorBoundary from "@/components/ErrorBoundary";
 import NotFound from "@/pages/not-found";
@@ -381,31 +382,7 @@ export default function AdminDashboard() {
           {activeTab === "journeys"
             ? <div data-testid="content-journeys"><ErrorBoundary label="Journeys tab"><JourneyStepsManager /></ErrorBoundary></div>
             : (
-              <ErrorBoundary label="Research tab">
-                <section className="admin-research-panel" aria-labelledby="admin-research-heading" data-testid="research-review-panel">
-                  <div className="card admin-research-workspace">
-                    <h2 id="admin-research-heading">Research workspace</h2>
-                    <p>Drafts, notes, and research-in-progress. Promote to &quot;Approvals&quot; once ready.</p>
-                    <div className="admin-research-notes">
-                      {[
-                        ["AV1 hardware encoders 2026", "12 candidates", "Active"],
-                        ["Emerging WebRTC SFUs", "7 candidates", "2 days ago"],
-                        ["Subtitle ML pipelines", "4 candidates", "1 week ago"],
-                        ["Low-latency CMAF survey", "9 candidates", "Active"],
-                      ].map(([title, count, date], index) => (
-                        <article className="card hoverable admin-research-note" key={title}>
-                          <div className="admin-research-note__eyebrow">NOTE · 0{index + 1}</div>
-                          <h3>{title}</h3>
-                          <div className="admin-research-note__meta">
-                            <span>{count}</span>
-                            <span>{date}</span>
-                          </div>
-                        </article>
-                      ))}
-                    </div>
-                  </div>
-                </section>
-              </ErrorBoundary>
+              <ErrorBoundary label="Research tab"><ResearchWorkspace /></ErrorBoundary>
             )}
         </TabsContent>
       </Tabs>

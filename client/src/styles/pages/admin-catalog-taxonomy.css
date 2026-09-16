@@ -42,7 +42,7 @@
   color: var(--text);
   font-size: 0.875rem;
   font-weight: 600;
-  line-height: 1.35;
+  line-height: 1.6;
   letter-spacing: normal;
 }
 
@@ -54,12 +54,38 @@
   margin-top: 0.25rem;
   color: var(--text-3);
   font-size: 0.75rem;
-  line-height: 1.45;
+  line-height: 1.6;
 }
 
 .admin-taxonomy-header-actions {
   justify-content: flex-end;
   gap: 0.5rem;
+}
+
+.admin-taxonomy-header-actions > [data-testid^="button-more-"] {
+  opacity: 0;
+  position: absolute;
+}
+
+.admin-taxonomy-header-actions > [data-testid^="button-more-"]:focus-visible,
+.admin-taxonomy-shell--tools-open .admin-taxonomy-header-actions > [data-testid^="button-more-"] {
+  opacity: 1;
+  position: static;
+}
+
+.admin-taxonomy-header-actions > [data-testid^="button-create-"] {
+  min-height: 36px;
+  height: 36px;
+  padding: 9px 16px;
+  border: 1px solid var(--accent);
+  font-size: 13px;
+  line-height: normal;
+}
+
+.admin-taxonomy-header-actions > [data-testid^="button-create-"] svg {
+  width: 12px;
+  height: 12px;
+  margin-right: 0;
 }
 
 .admin-taxonomy-bulk-actions {
@@ -77,10 +103,20 @@
   width: 12.5rem;
 }
 
+/* Tools closed: the search field and pager are taken out of the flow AND out
+   of the accessibility tree/tab order (visibility), and collapsed to a zero
+   box so the pager cannot extend the document below the canonical panel. */
 .admin-taxonomy-shell:not(.admin-taxonomy-shell--tools-open) .admin-taxonomy-search,
 .admin-taxonomy-shell:not(.admin-taxonomy-shell--tools-open) .admin-taxonomy-pagination {
-  opacity: 0;
+  height: 0;
+  inset: 0 auto auto 0;
+  margin: 0;
+  overflow: hidden;
+  padding: 0;
+  pointer-events: none;
   position: absolute;
+  visibility: hidden;
+  width: 0;
 }
 
 .admin-taxonomy-search input {
@@ -112,6 +148,7 @@
   width: 100%;
   border-collapse: collapse;
   font-size: 0.8125rem;
+  line-height: 1.6;
 }
 
 .admin-taxonomy-table thead th {
@@ -119,18 +156,18 @@
   padding: 0.75rem 0.875rem;
   border-bottom: var(--hairline-w) solid var(--border);
   color: var(--text-3);
-  font-family: var(--font-mono);
+  font-family: Inter, system-ui, sans-serif;
   font-size: 0.6875rem;
   font-weight: 500;
   letter-spacing: 0.03125rem;
-  line-height: 1.35;
+  line-height: 1.6;
   text-align: left;
   text-transform: uppercase;
   vertical-align: middle;
 }
 
 .admin-taxonomy-table tbody td {
-  padding: 0.6875rem 0.875rem;
+  padding: 0.875rem;
   border-bottom: var(--hairline-w) solid var(--border);
   color: var(--text-2);
   vertical-align: middle;
@@ -160,13 +197,23 @@
   color: var(--text-3);
 }
 
+/* Canonical slug sizes per panel (admin.jsx: categories 12px, subcategories
+   11.5px); the auto table layout shares width by these max-content widths. */
+.admin-taxonomy-shell--categories .admin-taxonomy-table .admin-taxonomy-cell-slug {
+  font-size: 0.75rem;
+}
+
+.admin-taxonomy-shell--subcategories .admin-taxonomy-table .admin-taxonomy-cell-slug {
+  font-size: 0.71875rem;
+}
+
 .admin-taxonomy-table .admin-taxonomy-cell-name {
   color: var(--text);
   font-weight: 500;
 }
 
 .admin-taxonomy-table .admin-taxonomy-column-icon {
-  width: 5rem;
+  width: auto;
   color: var(--accent);
 }
 
@@ -176,8 +223,27 @@
   stroke-width: 1.75;
 }
 
+.admin-taxonomy-shell--categories tbody .admin-taxonomy-column-icon {
+  font-size: 18px;
+  line-height: 28.8px;
+}
+
+.admin-taxonomy-shell--categories .admin-taxonomy-category-icon {
+  width: 18px;
+  height: 18px;
+}
+
+.admin-taxonomy-shell--categories .admin-taxonomy-table tbody tr {
+  height: 57.796875px;
+}
+
 .admin-taxonomy-table .admin-taxonomy-column-parent {
   color: var(--text-2);
+}
+
+.admin-taxonomy-table .admin-taxonomy-column-count,
+.admin-taxonomy-table .admin-taxonomy-column-actions {
+  width: auto;
 }
 
 .admin-taxonomy-table .admin-taxonomy-cell-count {
@@ -188,7 +254,7 @@
   border-radius: var(--radius-xs);
   background: transparent;
   box-shadow: none;
-  color: var(--text);
+  color: inherit;
   font-family: var(--font-mono);
   font-size: 0.75rem;
   font-weight: 400;
@@ -290,7 +356,7 @@
 
 @media (max-width: 48rem) {
   .admin-taxonomy-header {
-    padding: 1rem;
+    padding: 1.125rem 1.375rem;
   }
 
   .admin-taxonomy-header-actions {
@@ -313,7 +379,15 @@
   }
 
   .admin-taxonomy-table {
-    min-width: 42rem;
+    min-width: 0;
+  }
+
+  .admin-taxonomy-shell--categories .admin-taxonomy-table {
+    min-width: 603.578125px;
+  }
+
+  .admin-taxonomy-shell--subcategories .admin-taxonomy-table {
+    min-width: 544.625px;
   }
 
   .admin-taxonomy-pagination {

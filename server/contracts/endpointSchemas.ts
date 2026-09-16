@@ -301,6 +301,21 @@ const adminStatsResponseSchema = z
     totalPublic: z.number(),
     totalPending: z.number(),
     totalRejected: z.number(),
+    database: z
+      .object({
+        tables: z.number(),
+        totalRows: z.number(),
+        diskBytes: z.number(),
+        migrations: z.object({ applied: z.number(), journaled: z.number().nullable() }),
+        tableStats: z.array(
+          z.object({
+            name: z.string(),
+            rows: z.number(),
+            bytes: z.number(),
+            lastWriteAt: z.string().nullable(),
+          }),
+        ),
+      }),
   })
   .passthrough();
 

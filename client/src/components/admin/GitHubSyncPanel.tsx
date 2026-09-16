@@ -177,7 +177,7 @@ export default function GitHubSyncPanel() {
   }, [syncQueue]);
 
   return (
-    <div className="space-y-6 ops-github-panel">
+    <div className="ops-github-panel">
       <Card className="ops-github-panel__repository-card">
         <CardContent className="ops-github-panel__repository-content">
           <div className="ops-github-panel__repository-heading">
@@ -208,14 +208,6 @@ export default function GitHubSyncPanel() {
                 >
                   {exportMutation.isPending && <RefreshCw className="h-4 w-4 mr-2 animate-spin" />}
                   {exportMutation.isPending ? "Exporting..." : "Sync now"}
-                </Button>
-                <Button
-                  variant="ghost"
-                  onClick={() => setShowDetails((visible) => !visible)}
-                  aria-expanded={showDetails}
-                  data-testid="button-github-more"
-                >
-                  {showDetails ? "Less" : "More"}
                 </Button>
               </div>
             </div>
@@ -433,7 +425,7 @@ export default function GitHubSyncPanel() {
           className="ops-github-panel__history-shell"
         >
             <div className="ops-github-panel__history-table-wrap">
-              <Table>
+              <Table className="table">
                 <TableHeader>
                   <TableRow>
                     <TableHead>ID</TableHead>
@@ -444,49 +436,31 @@ export default function GitHubSyncPanel() {
                 </TableHeader>
                 <TableBody>
                 {visibleHistory.map((sync) => {
-                  // ADM-04: Sync History rows must carry the same failure
-                  // legibility as Recent Sync Jobs — a failed/orphaned row
-                  // gets a red badge + icon instead of reading like a success.
-                  const syncFailed = sync.status === 'failed';
                   return (
                   <TableRow key={sync.id} data-testid={`sync-history-row-${sync.id}`}>
                        <TableCell className="font-mono text-xs">#{sync.id}</TableCell>
-                       <TableCell className="capitalize">
+                       <TableCell>
                          {sync.direction}
                       </TableCell>
                       <TableCell>
-                        {sync.status && (
-                          <StatusChip
-                            status={sync.status}
-                            data-testid={`badge-sync-history-status-${sync.id}`}
-                          >
-                            {syncFailed ? (
-                              <XCircle className="h-3 w-3 mr-1" />
-                            ) : (
-                              <CheckCircle2 className="h-3 w-3 mr-1" />
-                            )}
-                            {sync.status}
-                          </StatusChip>
-                        )}
-                        {sync.errorMessage && (
-                           <span className="mt-1 block max-w-[20rem] truncate text-xs text-destructive" title={sync.errorMessage}>
-                            {sync.errorMessage}
-                          </span>
-                        )}
+                         {sync.status && (
+                           <span
+                             className={`chip ${sync.status === "completed" ? "ok" : sync.status === "failed" ? "bad" : sync.status === "pending" ? "warn" : ""}`}
+                             title={sync.errorMessage}
+                             data-testid={`badge-sync-history-status-${sync.id}`}
+                           >
+                             {sync.status}
+                           </span>
+                         )}
                       </TableCell>
                       <TableCell className="text-right">
                         {sync.commitUrl ? (
-                          <Button variant="ghost" size="sm" className="h-7 text-xs" asChild>
-                            <a href={sync.commitUrl} target="_blank" rel="noopener noreferrer">
-                              <ExternalLink className="h-3 w-3 mr-1" />
-                              Logs
-                            </a>
-                          </Button>
+                           <a className="btn ghost ops-github-panel__logs" href={sync.commitUrl} target="_blank" rel="noopener noreferrer">Logs</a>
                          ) : sync.commitMessage ? (
-                           <Button variant="ghost" size="sm" className="h-7 text-xs" title={sync.commitMessage}>Logs</Button>
-                        ) : (
-                           <Button variant="ghost" size="sm" className="h-7 text-xs" disabled>Logs</Button>
-                        )}
+                            <button className="btn ghost ops-github-panel__logs" title={sync.commitMessage}>Logs</button>
+                         ) : (
+                            <button className="btn ghost ops-github-panel__logs">Logs</button>
+                         )}
                       </TableCell>
                   </TableRow>
                   );
@@ -496,6 +470,20 @@ export default function GitHubSyncPanel() {
             </div>
         </TableShell>
       )}
+
+      <details className="admin-ops-more">
+        <summary
+          className="btn ghost"
+          onClick={(event) => {
+            event.preventDefault();
+            setShowDetails((visible) => !visible);
+          }}
+          aria-expanded={showDetails}
+          data-testid="button-github-more"
+        >
+          {showDetails ? "Less" : "More"}
+        </summary>
+      </details>
 
       {/* Run16 BUG-039: confirm before firing import (rewrites local catalog)
           or export (pushes a real commit to the repository). */}
