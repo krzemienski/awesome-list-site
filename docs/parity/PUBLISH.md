@@ -14,14 +14,18 @@ pass first. The full-inventory run `tests/parity/baseline/2026-09-16T05-55-50-26
 ([STATUS.md](STATUS.md), [REPORT.md](REPORT.md), per-area reasons in
 [IMPLEMENTATION.md](IMPLEMENTATION.md)):
 
-- 188 measured pixel cells: **56 pass, 128 fail**, 0 incomplete; 40 blocked
-  cells and the token-only rows stay outside that denominator. The previous
-  full run was 16 pass / 172 fail.
+- 184 executed pixel cells: **56 pass, 128 fail**, 0 incomplete; 40 blocked
+  cells, 4 aliases and the token-only rows stay outside that denominator. The
+  previous full run was 16 pass / 172 fail.
+- The run recorded `Inputs changed during run: YES — stale` (live adapter
+  hashes moved during capture; 8 leftover `__qa_test_parity_` rows in the dev
+  DB). It locates defects; it is not exact-candidate proof.
 - Passing at every width: approvals, audit, edits, export, research,
   resources, home (index and curated), shell drawer, shell palette.
 - Failing at every width: about, category, subcategory, submit, users, every
   `artifact.docs.*` and `artifact.showcase` cell (the artifact cells carry an
-  `@font-face` parity gap — 14 faces on one side — proposed as task 534).
+  `@font-face` parity gap — 10 faces on one side for the docs pages, 14 for
+  the showcase — proposed as task 534).
 - Selected reruns after the run (`…06-59-13-579Z-19499`, `…07-03-25-409Z-20621`,
   `…07-08-57-394Z-332`) cleared the 768 forced-stacking failures on
   enrichment and database and brought categories/subcategories 768 from

@@ -142,3 +142,4 @@
 - [Tester false defects](tester-finding-retractions.md) — Radix/cmdk ArrowDown timing, outline 0px mid-transition, Clerk card "unreachable", dialog role=0: re-check recipes before logging a bug.
 - [Built-in tester batching](native-tester-batching.md) — ~45 s ceiling per execution: one family × ≤4 items per step, one navigation per step, running ledger; it may restart the wrong workflow.
 - [URL-sync effects vs history navigation](url-sync-effect-popstate.md) — a URL-mirroring effect must no-op once the document left its route, or popstate entries get overwritten and Back never leaves the page.
+- [Parity harness lessons](parity-harness-lessons.md) — frozen panels only flex-wrap; content (not pins) drives auto-table drift; token gate drops type selectors so `:not(.x)` fails.

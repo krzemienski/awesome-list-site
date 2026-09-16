@@ -15,10 +15,15 @@ explains *why* each cell is where it is and who owns it.
 
 The Status column is read against the full-inventory run
 `2026-09-16T05-55-50-268Z-6075` ([STATUS.md](STATUS.md), [REPORT.md](REPORT.md):
-56 pass / 128 fail of 188 measured pixel rows, 40 blocked, gate **NOT
-PASSED**) plus the selected reruns taken after it on 2026-09-16 (run directories
+56 pass / 128 fail of **184** executed pixel rows, 40 blocked, 4 aliases, gate
+**NOT PASSED**) plus the selected reruns taken after it on 2026-09-16 (run directories
 `…06-59-13-579Z-19499`, `…07-03-25-409Z-20621`, `…07-08-57-394Z-332`). Selected reruns never overwrite the
 shared report; where one supersedes a full-run cell it is cited explicitly.
+Every cited run recorded `Inputs changed during run: YES — stale` (live
+catalog/admin adapter hashes moved while the run captured, and 8
+`__qa_test_parity_` rows from earlier runs remain in the dev DB), so these
+numbers locate defects but are not exact-candidate proof; a stable rerun on
+the committed candidate is still owed before any cell is called final.
 
 ## A. Theme foundations and five design systems
 
@@ -87,9 +92,9 @@ bound through the reference adapter, never faked in production.
 | Export, Database | `AdminExport`, `AdminDatabase` | `ExportTab.tsx`, `DatabaseTab.tsx` | Database seeding disclosure residual (accepted) | w-export-db → integrator | full run: export PASS at all four widths; database 375/1024/1440 PASS, 768 0.53% FAIL (same forced-stacking rule) → re-measured PASS 0.356% after the fix | verified-complete |
 | Resources, Categories, Subcategories | `AdminResources`, `AdminCategories`, `AdminSubcategories` | `ResourceManager.tsx`, taxonomy tabs | categories/subcategories: per-row lucide icon glyphs vs the reference's `Icon5` set (icon residual); the same forced-stacking rule failed 768 at 6.78%/5.64% → removed, re-measured 0.60%/0.62% in `…07-03-25-409Z-20621` (still just over); 375 moved 0.68→0.94% / 0.73→0.85% as the header now wraps naturally; the fractional-px `min-width` pins on both tables (`admin-catalog-taxonomy.css`) are hacks by the contract and still to be replaced; 24/page pager residual | w-audit-tax (done) → integrator | full run: resources PASS at all four widths; categories/subcategories 1440 PASS, other widths FAIL (REPORT + selected rerun) | needs-repair (categories/subcategories ≤1024) |
 | Users | `AdminUsers` | `UsersTab.tsx` + `admin-ops-users-audit.css` | full run FAIL 4.29/6.64/6.40/0.53% at 375/768/1024/1440. Removing the pinned column shares and `min-width: 52rem` was tried and reverted: 768 stayed 6.6%, 1024 went to 13.3% and 1440 to 2.1%, so the real cause is content, not the pins — the email cell carries the PII toggle button and masks every address while the adapter-bound reference shows some unmasked, changing the auto-layout shares and the date wrap (rows 80 vs 86px) | w-people → integrator | REPORT row `app.admin.users`; rerun `…07-08-57-394Z-332` | needs-repair (all widths) |
-| GitHub | `AdminGitHub` | `GitHubSyncPanel.tsx` | 1440 0.549%: live sync copy ("38 sync jobs" vs fixture "47 commits ahead") + tab-strip scroll offset; 375 2.68%: repository heading 8px taller than the reference | integrator | full run: 768 PASS 0.39%, 1440 PASS 0.26%; 375 2.68%, 1024 1.70% FAIL | needs-repair (375/1024) |
+| GitHub | `AdminGitHub` | `GitHubSyncPanel.tsx` | 1440 passes at 0.26% with live sync copy ("38 sync jobs" vs fixture "47 commits ahead"); 375 2.68%: repository heading 8px taller than the reference; 1024 1.70% | integrator | full run: 768 PASS 0.39%, 1440 PASS 0.26%; 375 2.68%, 1024 1.70% FAIL | needs-repair (375/1024) |
 | Link Health | `AdminLinkHealth` | `LinkHealthDashboard.tsx` | app renders a truthful empty-state line and a "More" disclosure the fixture-driven reference lacks; the geometry now matches | integrator | full run: 768 PASS 0.39%; 375 6.09%, 1024 0.51%, 1440 0.65% FAIL | needs-repair (product empty state kept by contract) |
-| Audit | `AdminAudit` | `AuditTab.tsx` + `admin-ops-audit.css` | none | integrator | full run PASS at all four widths (375 0.0128%, 768 0.0531%, 1024 0.0803%, 1440 0.0582%) | verified-complete |
+| Audit | `AdminAudit` | `AuditTab.tsx` + `admin-ops-audit.css` | none | integrator | full run PASS at all four widths (375 0.0689%, 768 0.0530%, 1024 0.0817%, 1440 0.0581%) | verified-complete |
 | Research (notes workspace) | `AdminResearch` | `ResearchWorkspace.tsx` (live-bound) | none | integrator | full run PASS at all four widths | verified-complete |
 | Digests, Journeys admin | no frozen counterpart | documented patterns | — | integrator | REPORT rows | unverified |
 | Operations persist in dev DB with owned, restored records | — | adapter + admin API | none | integrator | [admin-catalog/verify-ui-resource.json](evidence/admin-catalog/verify-ui-resource.json): record 188015 edited through the UI (`kind: protocols`, `featured: true`) and found again on the listing page; [restore-ui-resource.json](evidence/admin-catalog/restore-ui-resource.json): both fields patched back (`200`) to their `before` values; disposable admin torn down with zero QA users remaining | verified-complete |
