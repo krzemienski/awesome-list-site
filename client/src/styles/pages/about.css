@@ -25,6 +25,7 @@
       (var(--content-max, 1240px) - var(--content-max-admin, 1400px)) / 2
     );
   }
+
 }
 
 .about-hero {
@@ -72,6 +73,7 @@
 
 .about-card {
   position: relative;
+  overflow: hidden;
   border: var(--border-w) solid var(--border);
   border-radius: var(--radius);
   background: var(--surface);
@@ -310,12 +312,29 @@
 }
 
 .about-feature-icon {
+  display: none;
+}
+
+.about-feature-card::before {
+  display: grid;
+  place-items: center;
   width: 24px;
   height: 24px;
   margin-bottom: 8px;
-  color: var(--text-2);
-  stroke-width: 1.5;
+  border: var(--hairline-w) solid var(--accent);
+  border-radius: var(--radius-sm);
+  color: var(--accent);
+  font-size: 10px;
 }
+
+.about-feature-card:nth-child(1)::before { content: "01"; }
+.about-feature-card:nth-child(2)::before { content: "02"; }
+.about-feature-card:nth-child(3)::before { content: "03"; }
+.about-feature-card:nth-child(4)::before { content: "04"; }
+.about-feature-card:nth-child(5)::before { content: "05"; }
+.about-feature-card:nth-child(6)::before { content: "06"; }
+.about-feature-card:nth-child(7)::before { content: "07"; }
+.about-feature-card:nth-child(8)::before { content: "08"; }
 
 .about-feature-label {
   margin-bottom: 4px;

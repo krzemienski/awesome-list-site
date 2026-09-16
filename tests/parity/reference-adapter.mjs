@@ -22,8 +22,6 @@
 import crypto from "node:crypto";
 import { indexCatalogPaths } from "./catalog-paths.mjs";
 import { buildReferenceReconciliation, projectOfficialBrandMark } from "./reference-reconciliation.mjs";
-import { collectOperationsBindings } from "./reference-admin-operations.mjs";
-import { collectCatalogBindings } from "./reference-admin-catalog.mjs";
 
 export const sha256 = (value) => crypto.createHash("sha256").update(value).digest("hex");
 
@@ -125,7 +123,34 @@ export async function buildCatalogAdapter(appBase, { frozenAt } = {}) {
   if (mappingFailures.length) {
     throw new Error(`Catalog-to-nav identity mapping is incomplete for ${mappingFailures.length} resources; refusing false alignment`);
   }
-  const snapshotBytes = Buffer.from(JSON.stringify({ catalog, nav, home }));
+  // The frozen catalogue pages were authored for a loaded subset and render
+  // every AV_RESOURCES row of their scope with no pagination.  The application
+  // keeps its 24-per-page listing (client, SSR, sitemap and JSON-LD share that
+  // page size).  Bind the same first page, in the same tree order, for the
+  // taxonomy screens the inventory measures — the same data-binding rule the
+  // admin Resources table uses (AV_ADMIN_RESOURCES).  Only the token scopes
+  // are bound; every other category keeps the complete corpus.
+  const taxonomyTokens = resolveCatalogTokens(adapter);
+  const pageScopes = [];
+  for (const [level, node] of [["category", taxonomyTokens.category], ["subcategory", taxonomyTokens.subcategory]]) {
+    if (!node?.id) continue;
+    const listing = await fetchJson(`${appBase}/api/awesome-list/listing?level=${level}&slug=${encodeURIComponent(node.id)}&page=1`);
+    const ids = (listing?.resources || []).map((item) => String(item.id));
+    if (!Array.isArray(listing?.resources) || typeof listing?.pageSize !== "number") {
+      throw new Error(`Listing page for ${level} ${JSON.stringify(node.id)} is malformed; refusing an invented taxonomy scope`);
+    }
+    pageScopes.push({
+      level,
+      slug: node.id,
+      categorySlug: level === "category" ? node.id : taxonomyTokens.subcategoryCategory?.id,
+      subcategorySlug: level === "subcategory" ? node.id : null,
+      pageSize: listing.pageSize,
+      total: listing.total,
+      ids,
+    });
+  }
+  adapter.AV_TAXONOMY_PAGE_SCOPES = pageScopes;
+  const snapshotBytes = Buffer.from(JSON.stringify({ catalog, nav, home, pageScopes }));
   const createdAts = corpusResources.map((item) => Date.parse(item.createdAt)).filter(Number.isFinite);
   const byId = new Map(adapter.AV_RESOURCES.map((item) => [String(item.id), item]));
   const featuredResources = (home.featured || []).map((item) => {
@@ -206,6 +231,35 @@ export function resolvePathTemplate(template, tokens) {
   });
 }
 
+const maskAuditEmail = (email) => {
+  const at = email.indexOf("@");
+  if (at <= 0) return email;
+  return `${email[0]}\u2022\u2022\u2022${email.slice(at)}`;
+};
+const auditActorLabel = (log) => {
+  if (log.performedByEmail) return maskAuditEmail(log.performedByEmail);
+  if (log.performedBy) return String(log.performedBy).slice(0, 12);
+  return "system";
+};
+// Same translation as AuditTab.tsx ACTION_STATUS; unknown actions are not
+// silently reported as successful.
+const AUDIT_ACTION_STATUS = Object.freeze({
+  create: "completed", created: "completed", update: "completed", updated: "completed",
+  approved: "approved", rejected: "rejected", deleted: "completed", synced: "completed",
+  imported: "completed", exported: "completed", import: "completed", export: "completed",
+  skip: "completed", ai_enriched: "completed", ai_enrichment_failed: "failed",
+  edit_suggested: "pending", edit_approved: "approved", edit_rejected: "rejected",
+  edit_superseded: "completed", edit_withdrawn: "completed", bulk_import: "completed",
+  status_changed: "completed", withdrawn: "completed",
+  category_created: "completed", category_updated: "completed", category_deleted: "completed",
+  subcategory_created: "completed", subcategory_updated: "completed", subcategory_deleted: "completed",
+  sub_subcategory_created: "completed", sub_subcategory_updated: "completed", sub_subcategory_deleted: "completed",
+  "users.exported": "completed", "catalog.exported": "completed", "catalog.exported_github": "pending",
+  "database.exported": "completed", maintenance_backfill_approved_at: "completed",
+  maintenance_canonicalize_tags: "completed",
+});
+const auditActionStatus = (action) => AUDIT_ACTION_STATUS[action] ?? "recorded";
+
 const relativeTime = (fromMs, toMs) => {
   const seconds = Math.max(0, Math.round((toMs - fromMs) / 1000));
   if (seconds < 60) return `${seconds}s ago`;
@@ -231,6 +285,7 @@ const formatJoined = (iso) => {
 };
 
 const ADMIN_USERS_ROUTE = "/api/admin/users?page=1&limit=20&sortBy=createdAt&sortDir=desc";
+const ADMIN_RESOURCES_ROUTE = "/api/admin/resources?page=1&limit=25&status=approved";
 const ADMIN_AUDIT_ROUTE = "/api/admin/audit-logs?limit=50&offset=0";
 const ADMIN_CONTACT_ROUTE = "/api/admin/contact-submissions?limit=20&offset=0";
 
@@ -275,16 +330,36 @@ export async function buildAdminAdapter(fetchJson, frozenAtMs) {
     if (!result.ok) throw new Error(`${route} returned ${result.status} for the disposable admin`);
     return result.body;
   };
-  const [stats, usersPage, pending, audit, contactResponse, operations, catalog] = await Promise.all([
+  const [stats, usersPage, resourcesPage, pending, audit, contactResponse, operations, catalog, nav, syncHistory] = await Promise.all([
     get("/api/admin/stats"),
     get(ADMIN_USERS_ROUTE),
+    get(ADMIN_RESOURCES_ROUTE),
     get("/api/admin/pending-resources"),
     get(ADMIN_AUDIT_ROUTE),
     fetchOnce(ADMIN_CONTACT_ROUTE),
-    collectOperationsBindings(fetchOnce),
-    collectCatalogBindings(fetchOnce),
+    // Admin expected-side projections are retired: the frozen admin.jsx panels
+    // are the reference for every admin tab (see reference-extensions.mjs).
+    null,
+    null,
+    get("/api/awesome-list/nav"),
+    get("/api/github/sync-history"),
   ]);
+  // The frozen GitHub panel lists AV_SYNC_JOBS (id / type / status). Bind the
+  // same five newest sync-history rows the application's panel renders
+  // (GitHubSyncPanel.tsx: newest first, slice(0, 5)) instead of the data.js
+  // fixture, so both sides describe the same real jobs.
+  const syncJobs = (Array.isArray(syncHistory) ? syncHistory : [])
+    .slice()
+    .sort((a, b) => Date.parse(b.createdAt || "") - Date.parse(a.createdAt || ""))
+    .slice(0, 5)
+    .map((sync) => ({
+      id: sync.id,
+      type: sync.direction === "export" || sync.direction === "push" ? "Export" : "Import",
+      status: sync.status || "completed",
+    }));
+  const navCategories = Array.isArray(nav?.categories) ? nav.categories : [];
   const users = Array.isArray(usersPage?.users) ? usersPage.users : [];
+  const adminResources = Array.isArray(resourcesPage?.resources) ? resourcesPage.resources : [];
   const logs = Array.isArray(audit?.logs) ? audit.logs : Array.isArray(audit) ? audit : [];
   const pendingResources = Array.isArray(pending?.resources) ? pending.resources : [];
   const pendingApprovals = pendingResources.map((resource) => toReferencePendingRow(resource, frozenAtMs));
@@ -319,13 +394,33 @@ export async function buildAdminAdapter(fetchJson, frozenAtMs) {
       role: user.role || "user",
       joined: formatJoined(user.createdAt),
     })),
+    // The frozen Resources table was authored for a loaded subset even though
+    // the public catalog global normally contains the complete corpus. Bind
+    // the same default 25-row admin page the application renders, while
+    // leaving AV_TOTAL as the true catalog total.
+    AV_SYNC_JOBS: syncJobs,
+    AV_ADMIN_RESOURCES: adminResources.map((resource) => ({
+      id: resource.id,
+      title: resource.title || resource.name || "",
+      cat: navCategories.find((category) =>
+        category.name === resource.category || category.slug === resource.category
+      )?.slug || null,
+      tags: Array.isArray(resource.metadata?.tags)
+        ? resource.metadata.tags.map((tag) => tag?.name || tag).filter(Boolean)
+        : [],
+      featured: resource.metadata?.featured === true,
+      url: resource.url || "",
+    })),
+    // Data identities mirror the application's audit table (AuditTab.tsx):
+    // the actor is the same PII-masked email, and the status chip follows the
+    // same action → status translation instead of a blanket "completed".
     AV_RECENT_ACTIVITY: logs.map((log, index) => ({
       id: `TX#${log.id ?? index + 1}`,
-      user: (log.performedByEmail || log.performedBy || "system").split("@")[0],
+      user: auditActorLabel(log),
       action: log.action || "updated",
       target: log.changes?.resource?.title || log.changes?.title || (log.resourceId ? `#${log.resourceId}` : "—"),
       time: log.createdAt ? relativeTime(Date.parse(log.createdAt), frozenAtMs) : "",
-      status: "completed",
+      status: auditActionStatus(log.action),
     })),
     // Admin.jsx's frozen approval renderer does not consume globals for its
     // local row declaration; buildPlaceholderSubstitutions projects this
@@ -365,7 +460,7 @@ export async function buildAdminAdapter(fetchJson, frozenAtMs) {
     pendingApprovals,
     counts: { users: users.length, admins, contributors, pending: Number(stats.pendingApprovals ?? pendingResources.length), oldestPendingMs: oldestPending ?? null },
     endpoints: [...reads.keys()],
-    snapshotBytes: Buffer.from(JSON.stringify({ stats, usersPage, pending, audit, contactResponse, operations, catalog })),
+    snapshotBytes: Buffer.from(JSON.stringify({ stats, usersPage, resourcesPage, pending, audit, contactResponse, operations, catalog })),
   };
 }
 
@@ -390,6 +485,8 @@ export function buildPlaceholderSubstitutions({ adapter, home, frozenAt, admin, 
     { file: "home-layouts.jsx", from: "['CONTRIBUTORS', 3, 'reviewing']", to: `['APPROVED THIS WEEK', ${addedThisWeek}, 'newly indexed']`, source: "/api/home approvedThisWeek (approvedAt with createdAt fallback)", available: true },
     { file: "design-systems.jsx", from: "'--text-3': 'rgba(244,243,238,0.4)'", to: "'--text-3': 'rgba(244,243,238,0.52)'", source: "approved expected-side Editorial AA contrast reconciliation (3.4:1 reference to 5.2:1 application)", available: true },
     { file: "admin.jsx", from: 'sub="across 9 categories"', to: `sub="across ${categoriesCount} categories"`, source: "nav category count", available: true },
+    { file: "admin.jsx", from: "const filtered = AV_RESOURCES.filter(r => r.title.toLowerCase().includes(search.toLowerCase()));", to: "const filtered = (window.AV_ADMIN_RESOURCES || AV_RESOURCES).filter(r => r.title.toLowerCase().includes(search.toLowerCase()));", source: "/api/admin/resources default 25-row page (admin session only)", available: Boolean(admin) },
+    { file: "admin.jsx", from: "title={`Resources (${AV_RESOURCES.length} of ${AV_TOTAL.toLocaleString()})`}", to: "title={`Resources (${(window.AV_ADMIN_RESOURCES || AV_RESOURCES).length} of ${AV_TOTAL.toLocaleString()})`}", source: "/api/admin/resources default page size (admin session only)", available: Boolean(admin) },
     { file: "admin.jsx", from: 'sub="2 admins · 1 contributor"', to: admin ? `sub="${admin.counts.admins} admin${admin.counts.admins === 1 ? "" : "s"} · ${admin.counts.contributors} contributor${admin.counts.contributors === 1 ? "" : "s"}"` : null, source: "/api/admin/users roles (admin session only)", available: Boolean(admin) },
     { file: "admin.jsx", from: 'value="7" sub="oldest 14m ago"', to: admin ? `value="${admin.counts.pending}" sub="${admin.counts.oldestPendingMs ? `oldest ${relativeTime(admin.counts.oldestPendingMs, frozenAtMs)}` : "nothing waiting"}"` : null, source: "/api/admin/stats pendingApprovals + oldest /api/admin/pending-resources createdAt vs frozen clock (admin session only)", available: Boolean(admin) },
     { file: "admin.jsx", from: FROZEN_ADMIN_PENDING_DECLARATION, to: admin ? `  const pending = ${JSON.stringify(admin.pendingApprovals)};` : null, source: "/api/admin/pending-resources (same unfiltered queue consumed by the Approvals tab; an empty live queue is authoritative)", available: Boolean(admin) },

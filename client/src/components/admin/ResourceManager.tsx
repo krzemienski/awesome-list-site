@@ -155,6 +155,7 @@ export default function ResourceManager() {
   const [limit, setLimit] = useState(25);
   const [sort, setSort] = useState<"newest" | "oldest" | "name-asc" | "name-desc">("newest");
   const [search, setSearch] = useState("");
+  const [catalogToolsOpen, setCatalogToolsOpen] = useState(false);
   // Audit2 BUG-003: debounce the search text into the query key. Every
   // keystroke used to swap the queryKey immediately; the fresh key had no
   // cached data, `isLoading` went true, and the whole component fell into the
@@ -173,7 +174,7 @@ export default function ResourceManager() {
   // /admin?tab=resources&status=rejected both land on the same filtered table.
   const [statusFilter, setStatusFilter] = useState<string>(() => {
     const s = new URLSearchParams(window.location.search).get("status");
-    return s && STATUS_OPTIONS.some(o => o.value === s) ? s : "";
+    return s && STATUS_OPTIONS.some(o => o.value === s) ? s : "approved";
   });
 
   // Task 275: mirror the effective page into ?page= (replaceState, no history
@@ -247,6 +248,10 @@ export default function ResourceManager() {
 
   const { data: subSubcategoriesData } = useQuery<SubSubcategory[]>({
     queryKey: ['/api/sub-subcategories']
+  });
+
+  const { data: publicCatalogNav } = useQuery<{ totalResources?: number }>({
+    queryKey: ['/api/awesome-list/nav']
   });
 
   const categoryNames = useMemo(() => {
@@ -908,7 +913,7 @@ export default function ResourceManager() {
     setSearch("");
     setDebouncedSearch("");
     setCategoryFilter("");
-    setStatusFilter("");
+    setStatusFilter("approved");
     setPage(1);
     setSelectedResourceIds([]);
   };
@@ -980,27 +985,38 @@ export default function ResourceManager() {
   }
 
   return (
-    <div className="admin-catalog-resources space-y-4">
+    <div className={`admin-catalog-resources space-y-4${catalogToolsOpen ? " admin-catalog-resources--tools-open" : ""}`}>
       <Card className="admin-catalog-resources__shell">
         <CardHeader className="admin-catalog-resources__header">
-          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-            <div>
-              <CardTitle className="admin-catalog-resources__title flex items-center gap-2">
-                <Database className="h-5 w-5" />
-                Resources ({(data?.total ?? 0).toLocaleString()} of {((grandTotalData?.total ?? data?.total) ?? 0).toLocaleString()})
-              </CardTitle>
-              <CardDescription className="admin-catalog-resources__subtitle">
-                Manage every entry in the index
-                {(search || categoryFilter || statusFilter) ? " · Filters applied" : ""}
-              </CardDescription>
-            </div>
-            <Button 
-              onClick={openCreateDialog}
-             
-              data-testid="button-add-resource"
+          <div>
+            <CardTitle className="admin-catalog-resources__title flex items-center gap-2">
+              <Database className="h-5 w-5" />
+              Resources ({data?.resources.length ?? 0} of {Number(publicCatalogNav?.totalResources ?? data?.total ?? 0).toLocaleString()})
+            </CardTitle>
+            <CardDescription className="admin-catalog-resources__subtitle">
+              Manage every entry in the index
+              {(search || categoryFilter || (statusFilter && statusFilter !== "approved")) ? " · Filters applied" : ""}
+            </CardDescription>
+          </div>
+          <div className="admin-catalog-resources__header-actions">
+            <Input
+              placeholder="Search…"
+              value={search}
+              onChange={(event) => { setSearch(event.target.value); setPage(1); }}
+              data-testid="input-search-resources-header"
+            />
+            <Button
+              type="button"
+              variant="ghost"
+              onClick={() => setCatalogToolsOpen((open) => !open)}
+              aria-expanded={catalogToolsOpen}
+              data-testid="button-resource-tools"
             >
-              <Plus className="h-4 w-4 mr-2" />
-              Add Resource
+              More
+            </Button>
+            <Button onClick={openCreateDialog} data-testid="button-add-resource">
+              <Plus className="h-3 w-3 mr-2" />
+              Add
             </Button>
           </div>
         </CardHeader>
@@ -1239,32 +1255,23 @@ export default function ResourceManager() {
               </Button>
             </div>
           )}
-          <div className="admin-catalog-resources__table-scroll h-[600px] overflow-auto">
+          <div className="admin-catalog-resources__table-scroll overflow-auto">
             <Table className="admin-catalog-resources__table">
               <TableHeader>
                 <TableRow>
-                  <TableHead className="w-12">
-                    <Checkbox
-                      checked={isAllSelected}
-                      onCheckedChange={toggleSelectAll}
-                      aria-label="Select all resources on this page"
-                      className={`h-8 w-8 ${isSomeSelected ? "data-[state=checked]:bg-primary/50" : ""}`}
-                    />
-                  </TableHead>
+                  <TableHead>ID</TableHead>
                   <TableHead>Title</TableHead>
                   <TableHead>Category</TableHead>
-                  <TableHead>Kind</TableHead>
-                  <TableHead>Status</TableHead>
+                  <TableHead>Tags</TableHead>
                   <TableHead>Featured</TableHead>
-                  <TableHead>Updated</TableHead>
-                  <TableHead className="text-right">Actions</TableHead>
+                  <TableHead aria-label="Actions" />
                 </TableRow>
               </TableHeader>
               <TableBody>
                 {/* Run16 BUG-080: explicit empty state instead of a blank table. */}
                 {!isLoading && (data?.resources.length || 0) === 0 && (
                   <TableRow>
-                    <TableCell colSpan={8} className="py-12 text-center text-sm text-[var(--text-2)]" data-testid="row-empty-state">
+                    <TableCell colSpan={6} className="py-12 text-center text-sm text-[var(--text-2)]" data-testid="row-empty-state">
                       {(search || categoryFilter || statusFilter)
                         ? <>No resources match the current search or filters.{' '}
                             <button type="button" className="text-primary underline" onClick={clearFilters} data-testid="button-empty-clear-filters">
@@ -1280,83 +1287,53 @@ export default function ResourceManager() {
                     data-testid={`row-resource-${resource.id}`}
                     data-state={selectedResourceIds.includes(resource.id) ? "selected" : undefined}
                   >
-                    <TableCell>
+                    <TableCell className="admin-catalog-resources__id-cell">
+                      <span>{resource.id}</span>
                       <Checkbox
                         checked={selectedResourceIds.includes(resource.id)}
                         onCheckedChange={() => toggleResourceSelection(resource.id)}
                         aria-label={`Select ${resource.title || `resource #${resource.id}`}`}
-                        className="h-8 w-8"
+                        className="admin-catalog-resources__row-select h-8 w-8"
                       />
                     </TableCell>
                     <TableCell>
-                      <div className="space-y-1">
-                        <div className="font-medium line-clamp-1 break-words max-w-[300px]" title={resource.title || ''}>
+                        <div className="admin-catalog-resources__resource-title" title={resource.title || ''}>
                           {resource.title || 'Untitled'}
                         </div>
-                        {/* Run16 BUG-036: only http(s) URLs get a live anchor —
-                            legacy rows with other schemes render as plain text. */}
-                        {/^https?:\/\//i.test(resource.url || '') ? (
-                          <a
-                            href={resource.url}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="text-xs text-primary hover:underline flex items-center gap-1 truncate max-w-[300px] min-h-[32px]"
-                          >
-                            {resource.url}
-                            <ExternalLink className="h-3 w-3 flex-shrink-0" />
-                          </a>
-                        ) : (
-                          <span className="text-xs text-[var(--text-2)] truncate max-w-[300px] block">
-                            {resource.url}
-                          </span>
-                        )}
+                    </TableCell>
+                    <TableCell>
+                      {resource.category || "Uncategorized"}
+                    </TableCell>
+                    <TableCell>
+                      <div className="admin-catalog-resources__tags">
+                        {(safeResourceMetadataTags(resource.metadata) || []).slice(0, 2).map((tag, index) => (
+                          <Badge key={index} variant="chip">
+                            {typeof tag === "object" && tag && "name" in tag ? String(tag.name) : String(tag)}
+                          </Badge>
+                        ))}
                       </div>
                     </TableCell>
                     <TableCell>
-                      <div className="text-sm text-[var(--text-2)]">
-                        {resource.category || "Uncategorized"}
-                      </div>
-                      {resource.subcategory && (
-                        <div className="text-xs text-[var(--text-2)]">{resource.subcategory}</div>
-                      )}
-                    </TableCell>
-                    <TableCell>
-                      <div className="admin-catalog-resources__kind-cell">
-                        <Badge variant="chip">
-                          {resource.kind ? resourceKindLabel(resource.kind) : resourceKindLabel(resource.resolvedKind)}
-                        </Badge>
-                        <span className="admin-catalog-resources__meta">
-                          {resource.kind ? "Stored" : `resolved: ${resource.resolvedKind} (inferred)`}
-                        </span>
-                      </div>
-                    </TableCell>
-                    <TableCell>
-                      {getStatusBadge(resource.status || 'approved')}
-                    </TableCell>
-                    <TableCell>
-                      {featuredValue(resource) ? <Badge variant="accent">Featured</Badge> : <span className="text-xs text-[var(--text-2)]">—</span>}
-                    </TableCell>
-                    <TableCell className="font-mono text-xs text-[var(--text-2)]">
-                      {formatResourceUpdatedAt(resource.updatedAt)}
+                      {featuredValue(resource) ? <Badge variant="accent">★</Badge> : <span className="admin-catalog-resources__muted">—</span>}
                     </TableCell>
                     <TableCell className="text-right">
-                      <div className="flex justify-end gap-2">
-                        {/* P1-08: enforce a ≥44px square touch target on mobile
-                            (WCAG 2.5.5) — size="sm" left them 40–42px wide. */}
+                      <div className="admin-catalog-resources__row-actions">
+                        <Button variant="ghost" size="sm" asChild>
+                          <a href={`/resource/${resource.id}`}>View</a>
+                        </Button>
                         <Button
-                          variant="outline"
+                          variant="ghost"
                           size="sm"
-                          className="min-h-11 min-w-11"
                           onClick={() => openEditDialog(resource)}
                           aria-label={`Edit ${resource.title || `resource #${resource.id}`}`}
                           data-testid={`button-edit-${resource.id}`}
                         >
-                          <Pencil className="h-4 w-4" />
+                          Edit
                         </Button>
                         <Button
-                          variant="destructive"
+                          variant="ghost"
                           size="sm"
-                          className="min-h-11 min-w-11"
+                          className="admin-catalog-resources__delete-action"
                           onClick={() => openDeleteDialog(resource)}
                           aria-label={`Delete ${resource.title || `resource #${resource.id}`}`}
                           data-testid={`button-delete-${resource.id}`}
@@ -1371,12 +1348,12 @@ export default function ResourceManager() {
             </Table>
           </div>
           {/* Run17 BUG-033: same sideways-scroll hint the Users table has. */}
-          <p className="text-xs text-muted-foreground mt-2 sm:hidden">
+          <p className="admin-catalog-resources__scroll-hint text-xs text-muted-foreground mt-2 sm:hidden">
             Swipe the table sideways to see category, status, and actions.
           </p>
 
           {/* Run16 BUG-035: page-size selector + first/last jump buttons. */}
-          <div className="flex flex-wrap items-center justify-between gap-3 pt-4 border-t border-[var(--border)]">
+          <div className="admin-catalog-resources__pagination-summary flex flex-wrap items-center justify-between gap-3 pt-4 border-t border-[var(--border)]">
             <div className="flex items-center gap-3">
               <div className="text-sm text-[var(--text-2)]">
                 {/* P1-01: thousands separators everywhere (matches the header
@@ -1416,7 +1393,7 @@ export default function ResourceManager() {
               return url.pathname + url.search + url.hash;
             }}
             onNavigate={(p) => setPage(p)}
-            className="pt-4"
+            className="admin-catalog-resources__paginator pt-4"
           />
         </CardContent>
       </Card>

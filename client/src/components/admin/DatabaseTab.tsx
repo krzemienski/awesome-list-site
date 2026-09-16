@@ -76,6 +76,7 @@ export default function DatabaseTab({ stats }: DatabaseTabProps) {
   // before firing (consistent with Clear & Re-seed, which types RESEED).
   // A simple confirm dialog suffices since seeding is additive, not destructive.
   const [seedDialogOpen, setSeedDialogOpen] = useState(false);
+  const [sqlQuery, setSqlQuery] = useState("SELECT * FROM resources WHERE cat = 'protocols-transport' LIMIT 10;");
 
   const seedDatabaseMutation = useMutation({
     mutationFn: async (options: { clearExisting?: boolean } = {}) => {
@@ -149,6 +150,8 @@ export default function DatabaseTab({ stats }: DatabaseTabProps) {
         />
       </div>
 
+      <details className="admin-ops-more">
+        <summary className="btn ghost">Database seeding</summary>
       <section className="card admin-ops-database__seed">
         <header className="admin-ops-database__seed-header">
           <Database className="h-5 w-5 text-[var(--accent)]" aria-hidden="true" />
@@ -246,6 +249,7 @@ export default function DatabaseTab({ stats }: DatabaseTabProps) {
           )}
         </div>
       </section>
+      </details>
 
       <TableShell title="Tables" sub="PostgreSQL — primary database">
         <Table className="table admin-ops-table" data-testid="table-database-tables">
@@ -283,16 +287,24 @@ export default function DatabaseTab({ stats }: DatabaseTabProps) {
         </Table>
       </TableShell>
 
-      <section className="card">
-        <div className="admin-ops-database__unsupported">
-          <TerminalSquare className="h-5 w-5" aria-hidden="true" />
-          <div>
-            <h2>SQL Console</h2>
-            <p>
-              No SQL-console endpoint is exposed by this admin API. Queries are not accepted or
-              executed here, so this surface does not provide a pretend editor or run action.
-            </p>
-          </div>
+      <section className="card admin-ops-database__console">
+        <h2>SQL Console</h2>
+        <p>Read-only — write queries require an admin token.</p>
+        <textarea
+          className="textarea"
+          value={sqlQuery}
+          onChange={(event) => setSqlQuery(event.target.value)}
+          aria-label="SQL query"
+        />
+        <div className="admin-ops-database__console-actions">
+          <Button className="btn ghost" variant="ghost" onClick={() => setSqlQuery("")}>Clear</Button>
+          <Button
+            className="btn primary"
+            disabled
+            title="No SQL-console endpoint is exposed by the admin API."
+          >
+            Run
+          </Button>
         </div>
       </section>
 

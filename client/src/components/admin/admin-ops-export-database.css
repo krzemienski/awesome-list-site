@@ -9,6 +9,11 @@
   gap: var(--space-5, 1.25rem);
 }
 
+.admin-ops-export {
+  display: grid;
+  position: relative;
+}
+
 .admin-ops-export__intro {
   display: flex;
   flex-direction: column;
@@ -50,6 +55,14 @@
   padding: 1.375rem;
 }
 
+.admin-ops-export-card__icon {
+  display: none;
+}
+
+.admin-ops-export-card--unsupported {
+  border-style: solid;
+}
+
 .admin-ops-export-card:hover {
   border-color: var(--accent);
 }
@@ -82,9 +95,14 @@
 }
 
 .admin-ops-export-card__action {
+  height: 2rem;
   margin-top: auto;
-  min-height: 2.5rem;
+  min-height: 2rem;
   width: 100%;
+}
+
+.admin-ops-export-card__action svg {
+  display: none;
 }
 
 .admin-ops-export-card--unsupported {
@@ -471,6 +489,79 @@
   margin-top: 0.35rem;
 }
 
+.admin-ops-database__console {
+  padding: 22px;
+}
+
+.admin-ops-database__console h2 {
+  color: var(--text);
+  font-size: 14px;
+  font-weight: 600;
+  margin-bottom: 4px;
+}
+
+.admin-ops-database__console p {
+  color: var(--text-3);
+  font-size: 12px;
+  margin-bottom: 14px;
+}
+
+.admin-ops-database__console .textarea {
+  font-size: 12.5px;
+  min-height: 110px;
+}
+
+.admin-ops-database__console-actions {
+  display: flex;
+  gap: 8px;
+  justify-content: flex-end;
+  margin-top: 12px;
+}
+
+.admin-ops-more > summary {
+  cursor: pointer;
+  display: inline-flex;
+  list-style: none;
+}
+
+.admin-ops-export > .admin-ops-more,
+.admin-ops-database > .admin-ops-more {
+  height: 0;
+  position: relative;
+  z-index: 2;
+}
+
+.admin-ops-export > .admin-ops-more > summary,
+.admin-ops-database > .admin-ops-more > summary {
+  position: absolute;
+  top: 0;
+}
+
+.admin-ops-export > .admin-ops-more:first-of-type > summary {
+  top: 360px;
+}
+
+.admin-ops-export > .admin-ops-more:nth-of-type(2) > summary {
+  left: 150px;
+  top: 360px;
+}
+
+.admin-ops-database > .admin-ops-more > summary {
+  top: 232px;
+}
+
+.admin-ops-database .admin-ops-table-shell__content {
+  min-height: 16.5rem;
+}
+
+.admin-ops-more > summary::-webkit-details-marker {
+  display: none;
+}
+
+.admin-ops-more[open] > summary {
+  margin-bottom: 12px;
+}
+
 @media (max-width: 48rem) {
   .admin-ops-export__cards {
     grid-template-columns: 1fr;
@@ -495,4 +586,12 @@
   .admin-ops-validation-counts {
     grid-template-columns: 1fr;
   }
+}
+
+.admin-ops-export .admin-ops-export-card__icon {
+  display: none;
+}
+
+.admin-ops-export .admin-ops-export-card--unsupported {
+  border-style: solid;
 }

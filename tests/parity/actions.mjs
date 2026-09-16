@@ -45,10 +45,25 @@ const referenceGo = async (page, kind, tokens) => {
     const category = (id) => must(window.AV_CATEGORIES.find((item) => item.id === id), `category ${JSON.stringify(id)}`);
     const subcategory = (categoryId, id) => must(window.AV_SUBCATEGORIES[categoryId]?.find((item) => item.id === id), `subcategory ${JSON.stringify(id)} of ${JSON.stringify(categoryId)}`);
     const leaf = (subcategoryId, id) => must(window.AV_SUBSUBCATEGORIES?.[subcategoryId]?.find((item) => item.id === id), `leaf ${JSON.stringify(id)} of ${JSON.stringify(subcategoryId)}`);
+    // Bind the application's first listing page (same 24 rows, same tree
+    // order) for the measured scope; see AV_TAXONOMY_PAGE_SCOPES in
+    // reference-adapter.mjs.  Rows outside the scope are untouched.
+    const bindPageScope = (level, slug) => {
+      const scope = (window.AV_TAXONOMY_PAGE_SCOPES || []).find((item) => item.level === level && item.slug === slug);
+      if (!scope) throw new Error(`reference action "${kind}": no bound listing page for ${level} ${JSON.stringify(slug)}`);
+      const inScope = (item) => item.cat === scope.categorySlug && (!scope.subcategorySlug || item.sub === scope.subcategorySlug);
+      const byId = new Map(window.AV_RESOURCES.map((item) => [String(item.id), item]));
+      const pageRows = scope.ids.map((id) => must(byId.get(id), `listing row ${JSON.stringify(id)}`));
+      window.AV_RESOURCES = [...pageRows, ...window.AV_RESOURCES.filter((item) => !inScope(item))];
+    };
     if (kind === "home") window.__avGo("home");
-    if (kind === "category") window.__avGo("category", { cat: category(ids.categorySlug) });
+    if (kind === "category") {
+      bindPageScope("category", ids.categorySlug);
+      window.__avGo("category", { cat: category(ids.categorySlug) });
+    }
     if (kind === "subcategory") {
       const cat = category(ids.subcategoryCategorySlug);
+      bindPageScope("subcategory", ids.subcategorySlug);
       window.__avGo("subcategory", { cat, sub: subcategory(cat.id, ids.subcategorySlug) });
     }
     if (kind === "subsubcategory") {

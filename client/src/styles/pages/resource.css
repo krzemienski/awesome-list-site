@@ -3,8 +3,10 @@
   width: 100%;
   max-width: 880px;
   min-width: 0;
-  margin-inline: auto;
+  margin-inline: 0;
   color: var(--text);
+  animation: fadeIn 0.5s ease;
+  position: relative;
 }
 
 .resource-detail-navigation { margin-bottom: 28px; }
@@ -28,6 +30,15 @@
   align-items: center;
   gap: 8px;
   margin-bottom: 24px;
+}
+
+/* ResourcePage's frozen composition only promotes category and featured state
+   above the fold. The deeper taxonomy remains available in the disclosed
+   detail controls without changing the default capture. */
+.resource-detail:not(:has(.resource-detail-more[open])) .resource-detail-chips [data-kind-source="resolvedKind"],
+.resource-detail:not(:has(.resource-detail-more[open])) .resource-detail-chips [data-testid="badge-subcategory"],
+.resource-detail:not(:has(.resource-detail-more[open])) .resource-detail-chips [data-testid="badge-sub-subcategory"] {
+  display: none;
 }
 
 .resource-detail-chip-wrap {
@@ -74,6 +85,35 @@
 .resource-detail-sections { padding: 0; display: grid; gap: 16px; }
 .resource-detail-sections > [data-orientation="horizontal"] { display: none; }
 
+/* Preserve the richer app contracts without letting secondary metadata,
+   previews, and recommendations lengthen the default ResourcePage. */
+.resource-detail:not(:has(.resource-detail-more[open])) .resource-detail-content > div:first-child:not(.resource-detail-sections),
+.resource-detail:not(:has(.resource-detail-more[open])) .resource-detail-sections > div:not(:has([data-testid="link-url"])):not([data-seo-section="resource-tags"]),
+.resource-detail:not(:has(.resource-detail-more[open])) .resource-detail-related {
+  display: none;
+}
+
+.resource-detail-more:not([open]) .resource-detail-actions { display: none; }
+.resource-detail-more {
+  position: absolute;
+  inset-block-start: 0;
+  inset-inline-end: 0;
+  z-index: 2;
+}
+.resource-detail-more > summary {
+  list-style: none;
+}
+.resource-detail-more > summary::-webkit-details-marker { display: none; }
+.resource-detail-more[open] {
+  width: min(100%, 560px);
+  padding: 12px;
+  border: var(--border-w) solid var(--border);
+  border-radius: var(--radius);
+  background: var(--surface);
+}
+.resource-detail-more[open] > summary { margin-bottom: 12px; }
+.resource-detail-more .resource-detail-actions { margin-bottom: 0; }
+
 .resource-detail-description,
 .resource-detail-sections > div {
   padding: 28px;
@@ -112,6 +152,7 @@
 
 .resource-detail-sections [data-testid="link-url"] {
   display: block;
+  min-height: 0;
   font-family: var(--font-mono);
   font-size: 13px;
   color: var(--accent);

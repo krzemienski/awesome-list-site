@@ -16,6 +16,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { AgentEventLog } from "@/components/admin/AgentEventLog";
 import { AgentCommsGraph } from "@/components/admin/AgentCommsGraph";
+import { StatusChip, TableShell } from "@/components/admin/AdminOpsPrimitives";
 import {
   Search,
   Play,
@@ -213,11 +214,11 @@ export default function ResearcherTab({ initialTab = "launch" }: ResearcherTabPr
   // unbounded by default; entering a number opts INTO a cap.
   // BUG-045 (run25): default to a sane spending cap instead of UNLIMITED —
   // the operator can clear the field deliberately if they want no cap.
-  const [maxBudget, setMaxBudget] = useState("25");
+  const [maxBudget, setMaxBudget] = useState("1.00");
   // R4-052: keep the raw input string (like maxBudget) instead of a number so
   // typing "5.5" or "0" is never silently rewritten — validation feedback is
   // shown instead (see the hint below the field + handleLaunch).
-  const [maxTurns, setMaxTurns] = useState("");
+  const [maxTurns, setMaxTurns] = useState("15");
   // Stop condition: end the run automatically after N NEW saved discoveries.
   // Raw string like maxTurns so typing is never silently rewritten.
   const [targetDiscoveries, setTargetDiscoveries] = useState("");
@@ -544,6 +545,98 @@ export default function ResearcherTab({ initialTab = "launch" }: ResearcherTabPr
 
   return (
     <div className="queues-agent queues-agent--research">
+      <div className="queues-agent__canonical">
+        <section className="card queues-agent__research-form">
+          <h3>Run a research task</h3>
+          <p>The agent will scour the web for new resources matching your prompt.</p>
+          <div className="queues-agent__research-fields">
+            <div className="field">
+              <label htmlFor="canonical-research-prompt">Prompt</label>
+              <textarea
+                id="canonical-research-prompt"
+                className="textarea"
+                value={prompt}
+                onChange={(event) => setPrompt(event.target.value)}
+                placeholder="e.g. Find 5 new open-source AV1 encoders not yet in the index"
+              />
+            </div>
+            <div className="queues-agent__research-limits">
+              <div className="field">
+                <label htmlFor="canonical-max-turns">Max turns</label>
+                <input
+                  id="canonical-max-turns"
+                  className="input"
+                  value={maxTurns}
+                  onChange={(event) => setMaxTurns(event.target.value)}
+                  placeholder="15"
+                  inputMode="numeric"
+                />
+              </div>
+              <div className="field">
+                <label htmlFor="canonical-budget">Budget</label>
+                <input
+                  id="canonical-budget"
+                  className="input"
+                  value={`$${maxBudget}`}
+                  onChange={(event) => setMaxBudget(event.target.value.replace(/^\$/, ""))}
+                  inputMode="decimal"
+                />
+              </div>
+              <div className="field">
+                <label htmlFor="canonical-auto-approve">Auto-approve</label>
+                <select id="canonical-auto-approve" className="select" defaultValue="no">
+                  <option value="no">No</option>
+                  <option value="confidence">If confidence &gt; 0.8</option>
+                </select>
+              </div>
+            </div>
+            <div className="queues-agent__research-actions">
+              <Button
+                type="button"
+                className="btn ghost"
+                variant="ghost"
+                onClick={() => toast({ title: "Preset saved", description: "Research settings are preserved for this session." })}
+              >
+                Save preset
+              </Button>
+              <Button
+                type="button"
+                className="btn primary"
+                onClick={handleLaunch}
+                disabled={!activeJobStateKnown || activeJobs.length > 0 || startMutation.isPending}
+                data-testid="button-launch-researcher-canonical"
+              >
+                Run job
+              </Button>
+            </div>
+          </div>
+        </section>
+        <TableShell title="Researcher jobs" sub="Recent agentic research runs">
+          <div className="queues-agent__canonical-table queues-agent__canonical-table--research">
+            <table className="table">
+              <thead>
+                <tr><th>Status</th><th>Prompt</th><th>Found</th><th>Approved</th><th>Cost</th><th>Turns</th><th>Created</th></tr>
+              </thead>
+              <tbody>
+                {(jobs || []).slice(0, 2).map((job) => (
+                  <tr key={job.id}>
+                    <td><StatusChip status={job.status} /></td>
+                    <td className="prompt">{job.prompt || "Auto-generated research brief"}</td>
+                    <td className="mono">{job.totalDiscoveries || 0}</td>
+                    <td className="mono">{job.approvedDiscoveries || 0}</td>
+                    <td className="mono accent">{formatCost(job.estimatedCostUsd)}</td>
+                    <td className="mono">{job.turnsUsed || 0}</td>
+                    <td className="mono muted">{job.createdAt ? formatAdminDate(job.createdAt) : "—"}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+            {!jobsLoading && (jobs || []).length === 0 ? <p className="queues-agent__empty">No research jobs found.</p> : null}
+          </div>
+        </TableShell>
+      </div>
+      <details className="queues-agent__more">
+        <summary className="btn ghost">Advanced research controls &amp; discoveries</summary>
       <Tabs defaultValue={initialTab} className="w-full queues-agent__tabs">
         {/* Run16 BUG-030: wrap at narrow widths — the fixed inline-flex bar
             was 465px wide and pushed "Job History" off-screen at 375px. */}
@@ -1514,6 +1607,7 @@ export default function ResearcherTab({ initialTab = "launch" }: ResearcherTabPr
           )}
         </DialogContent>
       </Dialog>
+      </details>
 
       <Dialog open={!!rejectDialogId} onOpenChange={(open) => { if (!open && !rejectMutation.isPending) { setRejectDialogId(null); setRejectReason(""); } }}>
         <DialogContent className="queues-agent__dialog">

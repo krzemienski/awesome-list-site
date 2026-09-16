@@ -184,6 +184,14 @@ export default function ExportTab({ validationStatus: propValidationStatus }: Ex
 
   const validationStatus = propValidationStatus ?? fetchedValidationStatus;
 
+  const unavailableExport = (format: string) => {
+    toast({
+      title: `${format} export unavailable`,
+      description: "No supported admin endpoint is currently available for this format.",
+      variant: "destructive",
+    });
+  };
+
   const handleExport = async () => {
     // ADM-06: bail synchronously if an export is already in flight.
     if (exportingRef.current) return;
@@ -311,6 +319,8 @@ export default function ExportTab({ validationStatus: propValidationStatus }: Ex
 
   return (
     <div className="admin-ops-export">
+      <details className="admin-ops-more">
+        <summary className="btn ghost">Validation controls</summary>
       <div className="admin-ops-export__intro">
         <h2>Export Awesome List</h2>
         <div className="admin-ops-export__intro-actions">
@@ -352,6 +362,7 @@ export default function ExportTab({ validationStatus: propValidationStatus }: Ex
           ) : null}
         </div>
       </div>
+      </details>
 
       <div className="admin-ops-export__cards">
         <article className="card admin-ops-export-card hoverable">
@@ -359,9 +370,7 @@ export default function ExportTab({ validationStatus: propValidationStatus }: Ex
             <FileJson className="h-5 w-5" />
           </div>
           <h3 className="admin-ops-export-card__title">JSON Snapshot</h3>
-          <p className="admin-ops-export-card__description">
-            Complete database backup as a single JSON file, including sanitized admin data.
-          </p>
+          <p className="admin-ops-export-card__description">Complete dataset as a single JSON file. ~12 MB.</p>
           <Button
             className="admin-ops-export-card__action"
             onClick={() => {
@@ -380,13 +389,8 @@ export default function ExportTab({ validationStatus: propValidationStatus }: Ex
             <TableProperties className="h-5 w-5" />
           </div>
           <h3 className="admin-ops-export-card__title">CSV (resources)</h3>
-          <p className="admin-ops-export-card__description">
-            Flat resource table for spreadsheet workflows.
-          </p>
-          <div className="eyebrow admin-ops-export-card__availability">
-            <StatusChip status="Unavailable" />
-            <span className="sr-only">No supported admin endpoint is available.</span>
-          </div>
+          <p className="admin-ops-export-card__description">Flat resource table for spreadsheet workflows.</p>
+          <Button className="admin-ops-export-card__action" onClick={() => unavailableExport("CSV")}>Download</Button>
         </article>
 
         <article className="card admin-ops-export-card hoverable">
@@ -394,9 +398,7 @@ export default function ExportTab({ validationStatus: propValidationStatus }: Ex
             <FileText className="h-5 w-5" />
           </div>
           <h3 className="admin-ops-export-card__title">README.md</h3>
-          <p className="admin-ops-export-card__description">
-            Awesome-list flavored Markdown generated from the live public catalog.
-          </p>
+          <p className="admin-ops-export-card__description">Awesome-list flavored Markdown for the GitHub repo.</p>
           <Button
             className="admin-ops-export-card__action"
             onClick={() => {
@@ -406,7 +408,7 @@ export default function ExportTab({ validationStatus: propValidationStatus }: Ex
             data-testid="button-export-markdown"
           >
             {isExporting ? <RefreshCw className="h-4 w-4 animate-spin" /> : <Download className="h-4 w-4" />}
-            {isExporting ? "Generating..." : "Export Markdown"}
+             {isExporting ? "Generating..." : "Generate"}
           </Button>
         </article>
 
@@ -418,7 +420,7 @@ export default function ExportTab({ validationStatus: propValidationStatus }: Ex
           },
           {
             title: "SQL dump",
-            description: "PostgreSQL-compatible schema and data.",
+             description: "PostgreSQL-compatible schema + data.",
             icon: <TerminalSquare className="h-5 w-5" />,
           },
           {
@@ -433,14 +435,18 @@ export default function ExportTab({ validationStatus: propValidationStatus }: Ex
             </div>
             <h3 className="admin-ops-export-card__title">{format.title}</h3>
             <p className="admin-ops-export-card__description">{format.description}</p>
-            <div className="eyebrow admin-ops-export-card__availability">
-              <StatusChip status="Unavailable" />
-              <span className="sr-only">No supported admin endpoint is available.</span>
-            </div>
+            <Button
+              className="admin-ops-export-card__action"
+              onClick={() => unavailableExport(format.title)}
+            >
+              {format.title === "API token" ? "Generate" : "Download"}
+            </Button>
           </article>
         ))}
       </div>
 
+      <details className="admin-ops-more">
+        <summary className="btn ghost">Export history &amp; validation results</summary>
       <TableShell
         title="Export history"
         sub={auditHistoryWindowLabel}
@@ -710,6 +716,8 @@ export default function ExportTab({ validationStatus: propValidationStatus }: Ex
       </div>
 
       {/* Run23 NB-040: explicit confirmation before starting validation/link-check jobs. */}
+      </details>
+
       <AlertDialog open={confirmAction !== null} onOpenChange={(open) => { if (!open) setConfirmAction(null); }}>
         <AlertDialogContent data-testid="dialog-confirm-export-job">
           <AlertDialogHeader>

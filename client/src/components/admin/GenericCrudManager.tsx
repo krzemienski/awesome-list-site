@@ -811,6 +811,8 @@ export interface GenericCrudManagerProps<T extends BaseEntityWithCount> {
   paginationEnabled?: boolean;
   /** Number of items per page (default: 10) */
   itemsPerPage?: number;
+  /** Follow the public navigation tree's authored taxonomy order. */
+  navigationOrder?: "subcategories";
   /** Available page size options (default: [10, 25, 50, 100]) */
   pageSizeOptions?: number[];
   /** Enable bulk operations (select multiple, delete, export) (default: false) */
@@ -1033,6 +1035,7 @@ export default function GenericCrudManager<T extends BaseEntityWithCount>({
   searchPlaceholder,
   paginationEnabled = true,
   itemsPerPage: defaultItemsPerPage = 10,
+  navigationOrder,
   pageSizeOptions = [10, 25, 50, 100],
   bulkOperationsEnabled = false,
   bulkDeleteUrl,
@@ -1050,6 +1053,7 @@ export default function GenericCrudManager<T extends BaseEntityWithCount>({
   const queryClient = useQueryClient();
 
   const [editDialogOpen, setEditDialogOpen] = useState(false);
+  const [toolsOpen, setToolsOpen] = useState(false);
   const [createDialogOpen, setCreateDialogOpen] = useState(false);
   // P1-02/03/07: dialog-level validation banner, mirroring ResourceManager's
   // `formError`. Client-side validation failures (required/name-slug/field
@@ -1606,17 +1610,29 @@ export default function GenericCrudManager<T extends BaseEntityWithCount>({
     : description;
 
   // Filter items based on search query
+  const orderedItems = useMemo(() => {
+    if (!items || navigationOrder !== "subcategories" || !navTree) return items;
+    const rank = new Map(
+      navTree.categories.flatMap((category) => category.subcategories || [])
+        .map((subcategory, index) => [subcategory.slug, index]),
+    );
+    return [...items].sort((left, right) =>
+      (rank.get(left.slug) ?? Number.MAX_SAFE_INTEGER) -
+      (rank.get(right.slug) ?? Number.MAX_SAFE_INTEGER),
+    );
+  }, [items, navigationOrder, navTree]);
+
   const filteredItems = useMemo(() => {
-    if (!items || !searchQuery.trim() || !searchEnabled) return items;
+    if (!orderedItems || !searchQuery.trim() || !searchEnabled) return orderedItems;
     const query = searchQuery.toLowerCase();
     const fieldsToSearch = searchableFields || ['name', 'slug'];
-    return items.filter(item =>
+    return orderedItems.filter(item =>
       fieldsToSearch.some(field => {
         const value = item[field];
         return value && String(value).toLowerCase().includes(query);
       })
     );
-  }, [items, searchQuery, searchEnabled, searchableFields]);
+  }, [orderedItems, searchQuery, searchEnabled, searchableFields]);
 
   // Pagination calculations
   const totalItems = filteredItems?.length || 0;
@@ -2452,7 +2468,7 @@ export default function GenericCrudManager<T extends BaseEntityWithCount>({
   };
 
   return (
-    <Card className="admin-taxonomy-shell border-0" data-testid={testIdPrefix}>
+    <Card className={`admin-taxonomy-shell border-0${toolsOpen ? " admin-taxonomy-shell--tools-open" : ""}`} data-testid={testIdPrefix}>
       <CardHeader className="admin-taxonomy-header">
         {/* R5-003 (run24): the header row must WRAP — at 768/375 the rigid
             no-wrap flex row pushed the search input + "Add" button past the
@@ -2469,6 +2485,16 @@ export default function GenericCrudManager<T extends BaseEntityWithCount>({
             </CardDescription>
           </div>
           <div className="admin-taxonomy-header-actions flex flex-wrap items-center gap-3 min-w-0 max-w-full">
+            <Button
+              type="button"
+              variant="ghost"
+              size="sm"
+              onClick={() => setToolsOpen((open) => !open)}
+              aria-expanded={toolsOpen}
+              data-testid={`button-more-${testIdEntityPlural}`}
+            >
+              More
+            </Button>
             {/* Bulk Actions Toolbar */}
             {bulkOperationsEnabled && selectedIds.size > 0 && (
               <div className="admin-taxonomy-bulk-actions flex items-center gap-2 px-3 py-1.5 bg-muted rounded-lg" data-testid="bulk-actions-toolbar">
@@ -2740,10 +2766,10 @@ export default function GenericCrudManager<T extends BaseEntityWithCount>({
                                 The title lives on a wrapping span because disabled
                                 buttons swallow hover events in some browsers. */}
                             <span
+                              className="admin-taxonomy-delete-action inline-block"
                               title={item.resourceCount > 0
                                 ? `Cannot delete: ${item.resourceCount} resource${item.resourceCount === 1 ? "" : "s"} still assigned. Move or delete them first.`
                                 : undefined}
-                              className="inline-block"
                             >
                               <Button
                                 variant="ghost"

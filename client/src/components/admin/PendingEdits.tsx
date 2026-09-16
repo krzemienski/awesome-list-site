@@ -267,25 +267,25 @@ export default function PendingEdits() {
       <section className="admin-panel queue-review-shell" aria-labelledby="pending-edits-heading">
         <div className="admin-panel__heading queue-review-shell-heading">
           <div>
-            <h2 id="pending-edits-heading">Pending Edits</h2>
-            <p>Edit suggestions awaiting review</p>
+            <h2 id="pending-edits-heading">Edit history</h2>
+            <p>Pending and recent edits to resources</p>
           </div>
-        </div>
-        <div className="queue-review-empty">
-          <CheckCircle2 className="queue-review-empty-icon" aria-hidden="true" />
-          <h3>All Caught Up!</h3>
-          <p>There are no pending edits to review at this time.</p>
-          {/* Run16 BUG-078: empty state gets an explicit refresh control. */}
           <Button
-            variant="outline"
+            variant="ghost"
+            size="sm"
             onClick={() => {
               void queryClient.invalidateQueries({ queryKey: ['/api/admin/resource-edits'] });
             }}
             data-testid="button-refresh-pending-edits"
           >
-            <RefreshCw className="h-4 w-4 mr-2" />
+            <RefreshCw className="h-3 w-3 mr-2" />
             Check again
           </Button>
+        </div>
+        <div className="admin-table-wrap">
+          <table className="table">
+            <thead><tr><th>Resource</th><th>Field</th><th>Editor</th><th>When</th><th /></tr></thead>
+          </table>
         </div>
       </section>
     );

@@ -19,7 +19,6 @@ interface OverviewStats {
 
 interface AdminOverviewProps {
   stats?: OverviewStats;
-  onNavigate: (tab: string) => void;
 }
 
 interface AuditEntry {
@@ -119,6 +118,13 @@ interface HealthRow {
 
 const title = (value: string) =>
   value.replace(/[_-]/g, " ").replace(/\b\w/g, (letter) => letter.toUpperCase());
+
+const auditActor = (entry: AuditEntry) => {
+  const actor = entry.performedByEmail ?? entry.performedBy ?? "system";
+  if (!actor.includes("@")) return actor;
+  const [local, domain] = actor.split("@");
+  return `${local.slice(0, 1)}•••@${domain}`;
+};
 
 const dateValue = (value: string | null | undefined) => {
   if (!value) return null;
@@ -296,7 +302,7 @@ function renderHealthRows(
  * (rendered by AdminStats) and these three source-backed panels: last-six
  * activity, operational health, and top-five category counts.
  */
-export default function AdminOverview({ stats, onNavigate }: AdminOverviewProps) {
+export default function AdminOverview({ stats }: AdminOverviewProps) {
   const audit = useQuery<AuditResponse>({
     queryKey: ["/api/admin/audit-logs", "overview-last-six"],
     queryFn: () => apiRequest("/api/admin/audit-logs?limit=6&offset=0"),
@@ -359,8 +365,6 @@ export default function AdminOverview({ stats, onNavigate }: AdminOverviewProps)
       : healthRows.some((row) => row.state === "warn")
         ? "Some systems are still working"
         : "All systems nominal";
-  const pendingCount = stats?.totalPending ?? stats?.pendingApprovals;
-  const rejectedCount = stats?.totalRejected;
   const topCategories = [...(categories.data ?? [])]
     .sort((left, right) => (
       (right.resourceCount ?? 0) - (left.resourceCount ?? 0)
@@ -374,7 +378,7 @@ export default function AdminOverview({ stats, onNavigate }: AdminOverviewProps)
       <div className="admin-canonical-overview-grid">
         <TableShell
           title="Recent activity"
-          subtitle="Last 6 audit records"
+          subtitle="Last 24 hours"
           className="admin-panel admin-activity"
           testId="admin-overview-activity"
         >
@@ -389,13 +393,13 @@ export default function AdminOverview({ stats, onNavigate }: AdminOverviewProps)
               {audit.data.logs.slice(0, 6).map((entry) => (
                 <div key={entry.id} className="admin-canonical-activity-row">
                   <span className="admin-canonical-activity-id">
-                    #{entry.id}
+                    TX#{entry.id}
                   </span>
                   <span className="admin-canonical-activity-actor">
-                    {entry.performedByEmail ?? entry.performedBy ?? "system"}
+                    {auditActor(entry)}
                   </span>
                   <span className="admin-canonical-activity-action">
-                    {title(entry.action)}
+                    {entry.action.replace(/[_-]/g, " ")}
                   </span>
                   <span className="admin-canonical-activity-target">
                     {entry.originalResourceId ?? entry.resourceId
@@ -411,38 +415,6 @@ export default function AdminOverview({ stats, onNavigate }: AdminOverviewProps)
           ) : (
             <p className="admin-canonical-empty">No audit activity recorded.</p>
           )}
-          {pendingCount || rejectedCount ? (
-            <div
-              className="admin-canonical-workflow-links"
-              aria-label="Resource workflow shortcuts"
-            >
-              <span>Workflow</span>
-              {pendingCount ? (
-                <button
-                  type="button"
-                  data-testid="link-stat-pending"
-                  onClick={() => onNavigate("approvals")}
-                >
-                  +{pendingCount.toLocaleString()} pending
-                </button>
-              ) : null}
-              {pendingCount && rejectedCount ? <span aria-hidden="true">·</span> : null}
-              {rejectedCount ? (
-                <button
-                  type="button"
-                  data-testid="link-stat-rejected"
-                  onClick={() => {
-                    const url = new URL(window.location.href);
-                    url.searchParams.set("status", "rejected");
-                    window.history.replaceState({}, "", url.pathname + url.search + url.hash);
-                    onNavigate("resources");
-                  }}
-                >
-                  {rejectedCount.toLocaleString()} rejected
-                </button>
-              ) : null}
-            </div>
-          ) : null}
         </TableShell>
 
         <TableShell
@@ -476,7 +448,7 @@ export default function AdminOverview({ stats, onNavigate }: AdminOverviewProps)
 
         <TableShell
           title="Top categories"
-          subtitle="By approved resource count"
+          subtitle="By resource count"
           className="admin-panel"
           testId="admin-overview-categories"
         >

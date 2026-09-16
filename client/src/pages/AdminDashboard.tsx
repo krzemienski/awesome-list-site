@@ -250,7 +250,32 @@ export default function AdminDashboard() {
         <p>Manage the {(stats?.totalPublic ?? stats?.resources ?? 0).toLocaleString()} resources, jobs, and contributors that keep the index alive.</p>
         </div>
         <div className="admin-dashboard__actions">
-          <Button asChild variant="outline" className="btn ghost"><WLink href="/settings/theme"><Settings className="h-4 w-4" /> Settings</WLink></Button>
+          <details className="admin-dashboard__settings">
+            <summary className="btn ghost"><Settings className="h-4 w-4" /> Settings</summary>
+            <div className="admin-dashboard__settings-menu">
+              <Button asChild variant="ghost"><WLink href="/settings/theme">Theme settings</WLink></Button>
+              {(stats?.totalPending ?? stats?.pendingApprovals ?? 0) > 0 ? (
+                <Button variant="ghost" data-testid="link-stat-pending" onClick={() => handleTabChange("approvals")}>Pending approvals</Button>
+              ) : null}
+              {(stats?.totalRejected ?? 0) > 0 ? (
+                <Button
+                  variant="ghost"
+                  data-testid="link-stat-rejected"
+                  onClick={() => {
+                    const url = new URL(window.location.href);
+                    url.searchParams.set("status", "rejected");
+                    window.history.replaceState({}, "", url.pathname + url.search + url.hash);
+                    handleTabChange("resources");
+                  }}
+                >
+                  Rejected resources
+                </Button>
+              ) : null}
+              <Button variant="ghost" data-testid="tab-subsubcategories" onClick={() => handleTabChange("subsubcategories")}>Sub-Subcats</Button>
+              <Button variant="ghost" data-testid="tab-journeys" onClick={() => handleTabChange("journeys")}>Journeys</Button>
+              <Button variant="ghost" data-testid="tab-digests" onClick={() => handleTabChange("digests")}>Digests</Button>
+            </div>
+          </details>
           <Button className="btn primary" onClick={handleNewEntry}><Plus className="h-4 w-4" /> New entry</Button>
         </div>
       </div>
@@ -294,7 +319,7 @@ export default function AdminDashboard() {
             crash in one panel can't blank the entire admin dashboard. */}
         <TabsContent value="overview" data-testid="content-overview">
           <AdminStats stats={stats} isLoading={isLoading} onNavigate={handleTabChange} />
-          <ErrorBoundary label="Overview tab"><AdminOverview stats={stats} onNavigate={handleTabChange} /></ErrorBoundary>
+          <ErrorBoundary label="Overview tab"><AdminOverview stats={stats} /></ErrorBoundary>
         </TabsContent>
 
         <TabsContent value="approvals" data-testid="content-approvals">
@@ -330,7 +355,6 @@ export default function AdminDashboard() {
         </TabsContent>
 
         <TabsContent value="subcategories" data-testid="content-subcategories">
-          <Button variant="ghost" data-testid="tab-subsubcategories" onClick={() => handleTabChange("subsubcategories")}>Sub-Subcats</Button>
           {activeTab === "subsubcategories"
             ? <div data-testid="content-subsubcategories"><ErrorBoundary label="Sub-Subcategories tab"><SubSubcategoryManager /></ErrorBoundary></div>
             : <ErrorBoundary label="Subcategories tab"><SubcategoryManager /></ErrorBoundary>}
@@ -341,7 +365,6 @@ export default function AdminDashboard() {
         </TabsContent>
 
         <TabsContent value="github">
-          <Button variant="ghost" data-testid="tab-digests" onClick={() => handleTabChange("digests")}>Digests</Button>
           {activeTab === "digests"
             ? <div data-testid="content-digests"><ErrorBoundary label="Digests tab"><DigestQueueHealth /></ErrorBoundary></div>
             : <ErrorBoundary label="GitHub tab"><GitHubSyncPanel /></ErrorBoundary>}
@@ -355,10 +378,35 @@ export default function AdminDashboard() {
           <ErrorBoundary label="Audit tab"><AuditTab /></ErrorBoundary>
         </TabsContent>
         <TabsContent value="research" data-testid="content-research">
-          <Button variant="ghost" data-testid="tab-journeys" onClick={() => handleTabChange("journeys")}>Journeys</Button>
           {activeTab === "journeys"
             ? <div data-testid="content-journeys"><ErrorBoundary label="Journeys tab"><JourneyStepsManager /></ErrorBoundary></div>
-            : <ErrorBoundary label="Research tab"><ResearcherTab initialTab="review" /></ErrorBoundary>}
+            : (
+              <ErrorBoundary label="Research tab">
+                <section className="admin-research-panel" aria-labelledby="admin-research-heading" data-testid="research-review-panel">
+                  <div className="card admin-research-workspace">
+                    <h2 id="admin-research-heading">Research workspace</h2>
+                    <p>Drafts, notes, and research-in-progress. Promote to &quot;Approvals&quot; once ready.</p>
+                    <div className="admin-research-notes">
+                      {[
+                        ["AV1 hardware encoders 2026", "12 candidates", "Active"],
+                        ["Emerging WebRTC SFUs", "7 candidates", "2 days ago"],
+                        ["Subtitle ML pipelines", "4 candidates", "1 week ago"],
+                        ["Low-latency CMAF survey", "9 candidates", "Active"],
+                      ].map(([title, count, date], index) => (
+                        <article className="card hoverable admin-research-note" key={title}>
+                          <div className="admin-research-note__eyebrow">NOTE · 0{index + 1}</div>
+                          <h3>{title}</h3>
+                          <div className="admin-research-note__meta">
+                            <span>{count}</span>
+                            <span>{date}</span>
+                          </div>
+                        </article>
+                      ))}
+                    </div>
+                  </div>
+                </section>
+              </ErrorBoundary>
+            )}
         </TabsContent>
       </Tabs>
     </div>

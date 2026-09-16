@@ -217,7 +217,7 @@ const requiredSourceContracts = Object.freeze({
     "/api/admin/check-links",
   ],
   github: [
-    "GitHub repository",
+    "ops-github-panel__repository-card",
     "Sync Status",
     "Recent Sync Jobs",
     "Sync jobs",

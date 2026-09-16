@@ -645,14 +645,10 @@
       "family": "taxonomy",
       "id": "app.subsubcategory",
       "kind": "app",
-      "eligibility": "pixel",
+      "eligibility": "token-only",
       "actualPath": "/sub-subcategory/{subSubcategorySlug}",
-      "referencePath": "/index.html",
-      "referenceAction": "subsubcategory",
-      "actualReadySelector": "[data-testid=taxonomy-results-region]",
-      "referenceReadySelector": "main",
-      "identityCheck": "subsubcategory",
-      "notes": "Both sides resolve the first sub-subcategory of the first subcategory that has one; the reference opens it via __avGo('subcategory', {cat, sub, subSub})."
+      "reason": "The frozen prototype has no third-level page: __avGo('subcategory', {cat, sub, subSub}) renders the PARENT subcategory's heading, count and resources. The application keeps the leaf's own heading and resources (a feature the prototype never designed), so this route has no pixel counterpart and is verified through the shared taxonomy tokens instead.",
+      "notes": "Integrator decision 2026-09-16: parent-page substitution on the app side was rejected (it removed the leaf's own resource list)."
     },
     {
       "family": "token-only-system",

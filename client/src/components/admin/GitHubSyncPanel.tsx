@@ -6,7 +6,7 @@ import { Label } from "@/components/ui/label";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Badge } from "@/components/ui/badge";
 import { TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { GitBranch, Download, Upload, RefreshCw, CheckCircle2, XCircle, Clock, ExternalLink, Activity } from "lucide-react";
+import { Folder, Download, Upload, RefreshCw, CheckCircle2, XCircle, Clock, ExternalLink, Activity } from "lucide-react";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { apiRequest } from "@/lib/queryClient";
@@ -63,6 +63,7 @@ export default function GitHubSyncPanel() {
   // Run16 BUG-039: import rewrites the local catalog and export pushes a real
   // commit — both need an explicit confirmation step before firing.
   const [confirmAction, setConfirmAction] = useState<"import" | "export" | null>(null);
+  const [showDetails, setShowDetails] = useState(false);
 
   // BUG-042 (run25): validate the repo reference BEFORE queueing a sync job —
   // "not a repo!!" used to be accepted and fail minutes later in the queue.
@@ -138,6 +139,7 @@ export default function GitHubSyncPanel() {
     [syncHistory],
   );
   const lastSync = orderedHistory[0];
+  const visibleHistory = showDetails ? orderedHistory : orderedHistory.slice(0, 5);
   const syncQueue = syncQueueData?.items || [];
   const pendingJobs = syncQueue.filter(item => item.status === 'pending' || item.status === 'processing').length;
   // Run16 BUG-015: a broken integration must be VISIBLE. Surface failed jobs
@@ -177,18 +179,48 @@ export default function GitHubSyncPanel() {
   return (
     <div className="space-y-6 ops-github-panel">
       <Card className="ops-github-panel__repository-card">
-        <CardHeader>
+        <CardContent className="ops-github-panel__repository-content">
           <div className="ops-github-panel__repository-heading">
             <div className="ops-github-panel__repository-mark" aria-hidden="true">
-              <GitBranch className="h-5 w-5" />
+              <Folder className="h-5 w-5" />
             </div>
-            <div>
-              <CardTitle className="text-base">GitHub repository</CardTitle>
+            <div className="ops-github-panel__repository-copy">
+              <CardTitle className="ops-github-panel__repository-name">{repoUrl}</CardTitle>
+              <p className="ops-github-panel__repository-meta">
+                main · {lastSync ? `last sync ${formatSyncDate(lastSync.createdAt)}` : "not synced yet"} · {syncQueueData?.total ?? 0} sync jobs
+              </p>
+            </div>
+            <div className="ops-github-panel__repository-actions">
+              <div className="flex flex-wrap gap-2">
+                <Button
+                  variant="outline"
+                  onClick={() => setConfirmAction("import")}
+                  disabled={importMutation.isPending || !normalizedRepo}
+                  data-testid="button-import-github"
+                >
+                  {importMutation.isPending && <RefreshCw className="h-4 w-4 mr-2 animate-spin" />}
+                  {importMutation.isPending ? "Importing..." : "Pull"}
+                </Button>
+                <Button
+                  onClick={() => setConfirmAction("export")}
+                  disabled={exportMutation.isPending || !normalizedRepo}
+                  data-testid="button-export-github"
+                >
+                  {exportMutation.isPending && <RefreshCw className="h-4 w-4 mr-2 animate-spin" />}
+                  {exportMutation.isPending ? "Exporting..." : "Sync now"}
+                </Button>
+                <Button
+                  variant="ghost"
+                  onClick={() => setShowDetails((visible) => !visible)}
+                  aria-expanded={showDetails}
+                  data-testid="button-github-more"
+                >
+                  {showDetails ? "Less" : "More"}
+                </Button>
+              </div>
             </div>
           </div>
-        </CardHeader>
-        <CardContent className="space-y-5">
-          <div className="space-y-2">
+          {showDetails && <div className="ops-github-panel__repository-editor">
             <Label htmlFor="repo-url">Target Repository</Label>
             <div className="flex gap-2">
               <Input
@@ -220,41 +252,11 @@ export default function GitHubSyncPanel() {
                 Format: owner/repository (e.g., krzemienski/awesome-video)
               </p>
             )}
-          </div>
-
-          <div className="ops-github-panel__repository-actions">
-            <div className="flex flex-wrap gap-2">
-              <Button
-                variant="outline"
-                onClick={() => setConfirmAction("import")}
-                disabled={importMutation.isPending || !normalizedRepo}
-                data-testid="button-import-github"
-              >
-                {importMutation.isPending ? (
-                  <RefreshCw className="h-4 w-4 mr-2 animate-spin" />
-                ) : (
-                  <Download className="h-4 w-4 mr-2" />
-                )}
-                {importMutation.isPending ? "Importing..." : "Pull"}
-              </Button>
-              <Button
-                onClick={() => setConfirmAction("export")}
-                disabled={exportMutation.isPending || !normalizedRepo}
-                data-testid="button-export-github"
-              >
-                {exportMutation.isPending ? (
-                  <RefreshCw className="h-4 w-4 mr-2 animate-spin" />
-                ) : (
-                  <Upload className="h-4 w-4 mr-2" />
-                )}
-                {exportMutation.isPending ? "Exporting..." : "Sync now"}
-              </Button>
-            </div>
-          </div>
+          </div>}
         </CardContent>
       </Card>
 
-      <Card className="ops-github-panel__status-card">
+      {showDetails && <Card className="ops-github-panel__status-card">
           <CardHeader>
             <CardTitle className="flex items-center justify-between gap-3">
               <span className="flex items-center gap-2">
@@ -422,12 +424,12 @@ export default function GitHubSyncPanel() {
               </div>
             )}
           </CardContent>
-        </Card>
+        </Card>}
 
       {syncHistory && syncHistory.length > 0 && (
         <TableShell
           title="Sync jobs"
-          sub={`All ${orderedHistory.length} import/export operation${orderedHistory.length === 1 ? "" : "s"}`}
+          sub={`Last ${Math.min(5, orderedHistory.length)} import/export operations`}
           className="ops-github-panel__history-shell"
         >
             <div className="ops-github-panel__history-table-wrap">
@@ -441,7 +443,7 @@ export default function GitHubSyncPanel() {
                   </TableRow>
                 </TableHeader>
                 <TableBody>
-                {orderedHistory.map((sync) => {
+                {visibleHistory.map((sync) => {
                   // ADM-04: Sync History rows must carry the same failure
                   // legibility as Recent Sync Jobs — a failed/orphaned row
                   // gets a red badge + icon instead of reading like a success.
@@ -449,13 +451,8 @@ export default function GitHubSyncPanel() {
                   return (
                   <TableRow key={sync.id} data-testid={`sync-history-row-${sync.id}`}>
                        <TableCell className="font-mono text-xs">#{sync.id}</TableCell>
-                      <TableCell>
-                        {sync.direction === 'export' ? (
-                          <Upload className="h-4 w-4 text-primary" />
-                        ) : (
-                          <Download className="h-4 w-4 text-primary" />
-                        )}
-                        <span className="ml-2 font-semibold capitalize">{sync.direction}</span>
+                       <TableCell className="capitalize">
+                         {sync.direction}
                       </TableCell>
                       <TableCell>
                         {sync.status && (
@@ -482,15 +479,13 @@ export default function GitHubSyncPanel() {
                           <Button variant="ghost" size="sm" className="h-7 text-xs" asChild>
                             <a href={sync.commitUrl} target="_blank" rel="noopener noreferrer">
                               <ExternalLink className="h-3 w-3 mr-1" />
-                              View
+                              Logs
                             </a>
                           </Button>
                          ) : sync.commitMessage ? (
-                           <span className="block max-w-[16rem] truncate text-xs text-muted-foreground" title={sync.commitMessage}>
-                             {sync.commitMessage}
-                           </span>
+                           <Button variant="ghost" size="sm" className="h-7 text-xs" title={sync.commitMessage}>Logs</Button>
                         ) : (
-                          <span className="text-xs text-muted-foreground">—</span>
+                           <Button variant="ghost" size="sm" className="h-7 text-xs" disabled>Logs</Button>
                         )}
                       </TableCell>
                   </TableRow>

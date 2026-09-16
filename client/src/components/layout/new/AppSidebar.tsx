@@ -12,7 +12,6 @@ import {
   Palette,
   Search,
   MoreHorizontal,
-  Github,
   PanelLeft,
 } from "lucide-react";
 import { cn, slugify, getCategorySlug } from "@/lib/utils";
@@ -308,7 +307,6 @@ function CategoryAccordion({
   onToggle,
   isActive,
   activePath,
-  activeSearch,
   navigate,
   matchQuery,
   openSubs,
@@ -319,7 +317,6 @@ function CategoryAccordion({
   onToggle: () => void;
   isActive: boolean;
   activePath: string;
-  activeSearch: string;
   navigate: (path: string) => void;
   matchQuery: string;
   openSubs: string[];
@@ -343,48 +340,26 @@ function CategoryAccordion({
     (sub) => (sub.subSubcategories?.length ?? 0) > 0,
   );
 
-  // Resources assigned to this category but to no subcategory. They are real
-  // and reachable on the category page, but without a "General" line the child
-  // badges never sum to the category badge. Surfacing them here makes the sidebar
-  // math reconcile: sum(subcategory badges) + General badge === category badge.
-  const directCount = cat.resources
-    ? cat.resources.length
-    : (cat.resourceCount ?? 0);
-  // audit2 BUG-030: the canonical content-filter key is ?filter=general now
-  // (?view= carries layout only); the legacy ?view=general alias still
-  // counts as active so old links highlight correctly.
-  const generalPath = `${catPath}?filter=general`;
-  const generalActive =
-    activePath === catPath &&
-    (new URLSearchParams(activeSearch).get("filter") === "general" ||
-      new URLSearchParams(activeSearch).get("view") === "general");
-
-  // Semantic split (post-architect-review):
-  //  - The row is a <Link> (real navigation semantics; right-click/cmd-click
-  //    opens in new tab; assistive tech announces it as "link").
-  //  - The chevron is a sibling <button> with aria-expanded/aria-controls
-  //    pointing at the accordion body. It is the SOLE owner of disclosure
-  //    semantics — `aria-expanded` is no longer on the row.
-  //  - No nested interactive controls: Link and Button are siblings inside
-  //    a non-interactive flex container that keeps the row visual.
-
   return (
     <div className="accordion-item">
-      <div
-        className={cn("accordion-header", isActive && "active", "flex items-center w-full")}
+      <button
+        type="button"
+        className={cn("accordion-header", isActive && "active")}
         data-testid={`accordion-cat-${catSlug}`}
         data-state={isOpen ? "open" : "closed"}
         title={cat.name}
+        onClick={subs.length > 0 ? onToggle : () => navigate(catPath)}
+        aria-label={
+          subs.length > 0
+            ? `${isOpen ? "Collapse" : "Expand"} ${cat.name}`
+            : `Open ${cat.name} category page`
+        }
+        aria-expanded={subs.length > 0 ? isOpen : undefined}
+        aria-controls={subs.length > 0 ? bodyId : undefined}
       >
-        {/* BUG-043 (audit2): the category label link measured 24px tall in the
-            mobile drawer (the 44px expander alone carried the row height) —
-            give the link itself a 44px floor in the drawer, 36px on md+. */}
-        <Link
-          href={catPath}
+        <span
+          className="av-sidebar-category-label"
           data-testid={`row-cat-${catSlug}`}
-          aria-label={`Open ${cat.name} category page${hasGrandchildren ? ", contains nested groups" : ""}`}
-          aria-current={isActive ? "page" : undefined}
-          className="flex items-center gap-[10px] min-w-0 flex-1 cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent)] rounded-sm min-h-[44px] md:min-h-[36px]"
         >
           <span
             className="av-sidebar-category-glyph flex items-center justify-center shrink-0"
@@ -392,12 +367,12 @@ function CategoryAccordion({
               // DS-OK: frozen awesome-list-site-ds/layout.jsx Sidebar and
               // MobileDrawer category glyphs use 22px, 5px radius, 12px ink,
               // and this inactive rgba(255,255,255,0.04) fill exactly.
-              width: 22,
-              height: 22,
-              borderRadius: 5,
+              width: 24,
+              height: 24,
+              borderRadius: "var(--radius-sm)",
               background: isActive
                 ? "color-mix(in srgb, var(--accent) 25%, transparent)"
-                : "rgba(255,255,255,0.04)", // DS-OK: frozen awesome-list-site-ds/layout.jsx Sidebar/MobileDrawer category glyph inactive fill.
+                : "var(--surface)",
               color: isActive ? "var(--accent)" : "var(--text-2)",
             }}
             aria-hidden="true"
@@ -415,8 +390,8 @@ function CategoryAccordion({
           >
             {cat.name}
           </span>
-        </Link>
-        <span className="flex items-center gap-1.5 shrink-0 pl-2">
+        </span>
+        <span className="av-sidebar-category-meta">
           {hasGrandchildren && (
             <span
               className="av-sidebar-l3-indicator"
@@ -436,31 +411,29 @@ function CategoryAccordion({
           >
             {formatCount(totalCount)}
           </span>
-          {/* P1 — removed redundant "→" page-link span; chevron is the single
-              disclosure control per ref 01 sidebar. */}
-          {(subs.length > 0 || directCount > 0) && (
-            <button
-              type="button"
-              onClick={onToggle}
-              title={isOpen ? `Collapse ${cat.name}` : `Expand ${cat.name}`}
-              aria-label={isOpen ? `Collapse ${cat.name}` : `Expand ${cat.name}`}
-              aria-expanded={isOpen}
-              aria-controls={bodyId}
-              data-testid={`toggle-cat-${catSlug}`}
-              className="inline-flex items-center justify-center w-10 min-w-10 min-h-[44px] -mx-2 rounded-sm text-[var(--text-3)] hover:bg-[var(--surface-2)] focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent)]"
-            >
-              <ChevronRight className={cn("size-3 shrink-0 chevron-rotate", isOpen && "rotate-90")} />
-            </button>
+          {subs.length > 0 && (
+            <span data-testid={`toggle-cat-${catSlug}`}>
+              <ChevronRight className={cn("size-[10px] shrink-0 chevron-rotate", isOpen && "rotate-90")} />
+            </span>
           )}
         </span>
-      </div>
+      </button>
 
-      {(subs.length > 0 || directCount > 0) && (
+      {subs.length > 0 && (
         <MeasuredAccordionBody id={bodyId} open={isOpen}>
           {() => (
             <div className="accordion-body-inner">
-              {/* P4 — removed "All in {cat.name} →" link; not present in ref 09/10.
-                  Users open the category page by clicking the category row itself. */}
+              <a
+                href={catPath}
+                onClick={(event) => {
+                  event.preventDefault();
+                  navigate(catPath);
+                }}
+                className="sub-item av-sidebar-all-category no-underline"
+                aria-current={activePath === catPath ? "page" : undefined}
+              >
+                <span>All in {cat.name} →</span>
+              </a>
               {subs
               .filter(
                 (sub) =>
@@ -471,9 +444,15 @@ function CategoryAccordion({
               .map((sub) => {
                 const subSlug = sub.slug || slugify(sub.name);
                 const subPath = `/subcategory/${subSlug}`;
-                const subActive = activePath === subPath;
                 const subCount = getTotalResourceCount(sub);
                 const subSubs = sub.subSubcategories || [];
+                const subActive =
+                  activePath === subPath ||
+                  subSubs.some(
+                    (ss) =>
+                      activePath ===
+                      `/sub-subcategory/${ss.slug || slugify(ss.name)}`,
+                  );
                 const subOpen = openSubs.includes(subKey(sub.name));
 
                 if (subSubs.length === 0) {
@@ -491,8 +470,29 @@ function CategoryAccordion({
                 }
 
                 return (
-                  <div key={sub.name}>
-                    <div className="flex items-stretch gap-[2px]">
+                  <div key={sub.name} className="av-sidebar-l2-group">
+                    <div className={cn("av-sidebar-l2-row", subActive && "active")}>
+                      <a
+                        href={subPath}
+                        onClick={(event) => {
+                          event.preventDefault();
+                          navigate(subPath);
+                        }}
+                        data-testid={`sub-${subSlug}`}
+                        aria-current={subActive ? "page" : undefined}
+                        data-active={subActive || undefined}
+                        title={sub.name}
+                        className="av-sidebar-l2-link no-underline"
+                      >
+                        <span>{sub.name}</span>
+                        <span
+                          className="font-mono tabular-nums"
+                          title={`${formatCount(subCount)} ${subCount === 1 ? "resource" : "resources"}`}
+                          aria-label={`${formatCount(subCount)} ${subCount === 1 ? "resource" : "resources"}`}
+                        >
+                          {formatCount(subCount)}
+                        </span>
+                      </a>
                       <button
                         type="button"
                         onClick={() => toggleSub(subKey(sub.name))}
@@ -501,47 +501,46 @@ function CategoryAccordion({
                         aria-controls={`${bodyId}-sub-${subSlug}`}
                         data-state={subOpen ? "open" : "closed"}
                         data-testid={`expand-sub-${subSlug}`}
-                        className="shrink-0 inline-flex items-center justify-center w-10 min-w-10 min-h-[44px] -mx-2 rounded-md hover:bg-[var(--surface)] text-[var(--text-3)] hover:text-[var(--text)]"
+                        className="av-sidebar-l2-toggle"
                       >
-                        <span className="av-sidebar-nested-count" aria-hidden="true">
-                          +{subSubs.length}
-                        </span>
-                        <ChevronRight className={cn("size-3 chevron-rotate", subOpen && "rotate-90")} />
+                        <span className="av-sidebar-nested-count" aria-hidden="true">+{subSubs.length}</span>
+                        <ChevronRight className={cn("size-[9px] chevron-rotate", subOpen && "rotate-90")} />
                       </button>
-                      <SubItem
-                        label={sub.name}
-                        count={subCount}
-                        href={subPath}
-                        active={subActive}
-                        onClick={() => navigate(subPath)}
-                        testId={`sub-${subSlug}`}
-                      />
                     </div>
                     <MeasuredAccordionBody id={`${bodyId}-sub-${subSlug}`} open={subOpen}>
                       {() => (
-                        <div
-                          style={{
-                            paddingLeft: 22,
-                            marginTop: 2,
-                            marginBottom: 4,
-                            borderLeft: "1px solid var(--border)",
-                            marginLeft: 10,
-                          }}
-                        >
-                          {subSubs.map((ss) => {
+                        <div className="av-sidebar-l3-tree">
+                          <a
+                            href={subPath}
+                            onClick={(event) => {
+                              event.preventDefault();
+                              navigate(subPath);
+                            }}
+                            className="av-sidebar-l3-all no-underline"
+                          >
+                            <span aria-hidden="true">•</span>
+                            <span>All in {sub.name}</span>
+                          </a>
+                          {subSubs.map((ss, index) => {
                             const ssSlug = ss.slug || slugify(ss.name);
                             const ssPath = `/sub-subcategory/${ssSlug}`;
                             return (
-                              <SubItem
+                              <a
                                 key={ss.name}
-                                label={ss.name}
-                                count={getTotalResourceCount(ss)}
                                 href={ssPath}
-                                active={activePath === ssPath}
-                                onClick={() => navigate(ssPath)}
-                                testId={`subsub-${ssSlug}`}
-                                size="xs"
-                              />
+                                onClick={(event) => {
+                                  event.preventDefault();
+                                  navigate(ssPath);
+                                }}
+                                data-testid={`subsub-${ssSlug}`}
+                                data-active={activePath === ssPath || undefined}
+                                aria-current={activePath === ssPath ? "page" : undefined}
+                                className="av-sidebar-l3-row no-underline"
+                              >
+                                <span aria-hidden="true">{index === subSubs.length - 1 ? "└" : "├"}</span>
+                                <span title={ss.name}>{ss.name}</span>
+                                <span className="font-mono tabular-nums">{formatCount(getTotalResourceCount(ss))}</span>
+                              </a>
                             );
                           })}
                         </div>
@@ -550,21 +549,6 @@ function CategoryAccordion({
                   </div>
                 );
               })}
-              {directCount > 0 &&
-                (!matchQuery ||
-                  cat.name.toLowerCase().includes(matchQuery.toLowerCase()) ||
-                  "uncategorized".includes(matchQuery.toLowerCase())) && (
-                  <SubItem
-                    label="Uncategorized"
-                    count={directCount}
-                    href={generalPath}
-                    active={generalActive}
-                    onClick={() => navigate(generalPath)}
-                    testId={`sub-uncategorized-${catSlug}`}
-                    italic
-                  />
-                )}
-
             </div>
           )}
         </MeasuredAccordionBody>
@@ -652,16 +636,23 @@ export default function AppSidebar({
             ? prev
             : [...prev, matchCatKey],
         );
-        if (parts[1] === "sub-subcategory") {
-          const matchSub = matchCat.subcategories?.find((sub) =>
-            sub.subSubcategories?.some((ss) => (ss.slug || slugify(ss.name)) === slug),
+        const matchSub =
+          parts[1] === "subcategory"
+            ? matchCat.subcategories?.find(
+                (sub) => (sub.slug || slugify(sub.name)) === slug,
+              )
+            : parts[1] === "sub-subcategory"
+              ? matchCat.subcategories?.find((sub) =>
+                  sub.subSubcategories?.some(
+                    (ss) => (ss.slug || slugify(ss.name)) === slug,
+                  ),
+                )
+              : undefined;
+        if (matchSub && (matchSub.subSubcategories?.length ?? 0) > 0) {
+          const key = `${matchCat.slug || getCategorySlug(matchCat.name)}::${matchSub.slug || slugify(matchSub.name)}`;
+          setOpenSubcategories((prev) =>
+            prev.includes(key) ? prev : [...prev, key],
           );
-          if (matchSub) {
-            const key = `${matchCat.slug || getCategorySlug(matchCat.name)}::${matchSub.slug || slugify(matchSub.name)}`;
-            setOpenSubcategories((prev) =>
-              prev.includes(key) ? prev : [...prev, key],
-            );
-          }
         }
       }
     }
@@ -806,7 +797,6 @@ export default function AppSidebar({
                 }
                 isActive={catActive}
                 activePath={activePath}
-                activeSearch={activeSearch}
                 navigate={navigate}
                 matchQuery=""
                 openSubs={openSubcategories}
@@ -1009,6 +999,16 @@ export default function AppSidebar({
           `· ${totalCats}`
         )}
       </div>
+      <button
+        type="button"
+        onClick={() => setOpen(false)}
+        data-testid="sidebar-compact-navigation"
+        aria-label="Collapse sidebar"
+        title="Collapse sidebar"
+        className="av-sidebar-collapse-toggle"
+      >
+        <ChevronRight aria-hidden="true" className="size-[10px]" />
+      </button>
     </div>
   );
 
@@ -1057,7 +1057,15 @@ export default function AppSidebar({
             aria-label="Source: krzemienski/awesome-video"
             title="Source: krzemienski/awesome-video"
           >
-            <Github aria-hidden="true" className="size-[13px]" />
+            <svg
+              width="13"
+              height="13"
+              viewBox="0 0 16 16"
+              fill="currentColor"
+              aria-hidden="true"
+            >
+              <path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.012 8.012 0 0 0 16 8c0-4.42-3.58-8-8-8z" />
+            </svg>
           </a>
         </div>
         {renderMoreNavigation(
@@ -1163,45 +1171,75 @@ export default function AppSidebar({
             className="av-sidebar-icon-rail flex flex-col items-center gap-1.5 py-3"
             aria-hidden={false}
           >
-            {[
-              ...navItems,
-              ...(user?.role === "admin"
-                ? [{ label: "Admin", icon: Shield, href: "/admin" }]
-                : []),
-              { label: "About", icon: Info, href: "/about" },
-            ].map((item) => {
-              const RailIcon = item.icon;
-              return (
-                <a
-                  key={item.href}
-                  href={item.href}
-                  onClick={(e) => {
-                    e.preventDefault();
-                    navigate(item.href);
-                  }}
-                  title={item.label}
-                  aria-label={item.label}
-                  data-testid={`rail-${slugify(item.label)}`}
-                  data-active={isActive(item.href) || undefined}
-                  className={cn(
-                    "rail-icon-btn no-underline touch-manipulation",
-                    isActive(item.href) && "active",
-                  )}
-                >
-                  <RailIcon aria-hidden="true" className="size-4" />
-                </a>
-              );
-            })}
             <button
               type="button"
               onClick={() => setOpen(true)}
               className="rail-icon-btn rail-expand-navigation touch-manipulation"
               data-testid="sidebar-expanded-navigation"
-              aria-label="Expand navigation"
-              title="Expand navigation"
+              aria-label="Expand sidebar"
+              title="Expand sidebar"
             >
-              <PanelLeft aria-hidden="true" className="size-4" />
+              <ChevronRight aria-hidden="true" className="size-[11px]" />
             </button>
+            <a
+              href="/"
+              onClick={(event) => {
+                event.preventDefault();
+                navigate("/");
+              }}
+              title="Home"
+              aria-label="Home"
+              data-testid="rail-home"
+              data-active={isActive("/") || undefined}
+              className="rail-icon-btn no-underline touch-manipulation"
+            >
+              <Home aria-hidden="true" className="size-[15px]" />
+            </a>
+            <div className="av-sidebar-rail-divider" aria-hidden="true" />
+            {filtered.map((cat) => {
+              const catSlug = cat.slug || getCategorySlug(cat.name);
+              const href = `/category/${catSlug}`;
+              const catActive =
+                isActive(href) ||
+                cat.subcategories?.some((sub) =>
+                  isActive(`/subcategory/${sub.slug || slugify(sub.name)}`) ||
+                  sub.subSubcategories?.some((ss) =>
+                    isActive(`/sub-subcategory/${ss.slug || slugify(ss.name)}`),
+                  ),
+                );
+              return (
+                <a
+                  key={catSlug}
+                  href={href}
+                  onClick={(e) => {
+                    e.preventDefault();
+                    navigate(href);
+                  }}
+                  title={`${cat.name} · ${formatCount(getTotalResourceCount(cat))}`}
+                  aria-label={cat.name}
+                  data-testid={`rail-${catSlug}`}
+                  data-active={catActive || undefined}
+                  className={cn(
+                    "rail-icon-btn no-underline touch-manipulation",
+                    catActive && "active",
+                  )}
+                >
+                  <span aria-hidden="true" className="text-base leading-none">
+                    {getCategoryGlyph(cat.name)}
+                  </span>
+                </a>
+              );
+            })}
+            <a
+              href="https://github.com/krzemienski/awesome-video"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="rail-icon-btn av-sidebar-rail-repo no-underline"
+              aria-label="Source: krzemienski/awesome-video"
+              title="Source: krzemienski/awesome-video"
+            >
+              <span aria-hidden="true" className="font-mono text-sm">↗</span>
+            </a>
           </div>
         )}
 
@@ -1213,7 +1251,7 @@ export default function AppSidebar({
             {categoriesHeading}
           </div>
           {categoryList}
-          {compactFooter(desktopMoreItems, "", false, true, !isDrawer)}
+          {compactFooter(desktopMoreItems, "", false, true)}
         </div>
 
       </SidebarContent>

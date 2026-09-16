@@ -127,6 +127,7 @@ export default function TaxonomyListing({ level }: Props) {
   const [general, setGeneral] = useState(
     params.get("filter") === "general" || params.get("view") === "general" || params.get("subcategory") === "__general__",
   );
+  const [toolsOpen, setToolsOpen] = useState(false);
   const normalizedSearch = normalizeSearchQuery(searchTerm);
   const debouncedSearch = normalizeSearchQuery(useDebounce(searchTerm, 300));
   const serverSearchActive = debouncedSearch.length > 0;
@@ -211,6 +212,7 @@ export default function TaxonomyListing({ level }: Props) {
   const name = listingData?.node.name;
   const parentCategory = listingData?.parents.category;
   const parentSubcategory = listingData?.parents.subcategory;
+  const displayName = name;
   const loading = listing.isLoading && !listingData;
   const resultsLoading = serverFilterActive && (taxonomySearch.isLoading || taxonomySearch.isPlaceholderData);
   const paginationReady = serverFilterActive
@@ -470,27 +472,27 @@ export default function TaxonomyListing({ level }: Props) {
       </nav>}
     <header className="taxonomy-header">
       {level === "category" && <div className="eyebrow taxonomy-eyebrow"><span aria-hidden="true">{categoryMarks[slug] ?? name.slice(0, 1)}</span>CATEGORY · {slug === "infrastructure-delivery" ? "INFRA" : name.split(/[ &]/)[0].toUpperCase()}</div>}
-      <h1 className="display-h taxonomy-title">{level === "category" ? name : <><span className="serif-italic taxonomy-title-accent">{name.split(" ")[0]}</span>{name.includes(" ") ? ` ${name.split(" ").slice(1).join(" ")}` : ""}</>}</h1>
+      <h1 className="display-h taxonomy-title">{level === "category" ? name : <><span className="serif-italic taxonomy-title-accent">{displayName!.split(" ")[0]}</span>{displayName!.includes(" ") ? ` ${displayName!.split(" ").slice(1).join(" ")}` : ""}</>}</h1>
     <section aria-labelledby="taxonomy-scope-heading" data-seo-section="taxonomy-intro">
       <h2 id="taxonomy-scope-heading" className="sr-only">About this collection</h2>
-      <p className="taxonomy-description">{listingData.scopeIntro}</p>
+      {level === "category" && <p className="taxonomy-description">{listingData.resources[0]?.description?.slice(0, 200) ?? listingData.scopeIntro}</p>}
     </section>
-    <div className="taxonomy-summary"><span className="chip" data-ds="chip">{listingData.totalAll} {resourceNoun(listingData.totalAll)}</span>{listingData.children.length > 0 && <span className="chip" data-ds="chip">{listingData.children.length} {level === "category" ? (listingData.children.length === 1 ? "subcategory" : "subcategories") : (listingData.children.length === 1 ? "group" : "groups")}</span>}{parentCategory && <span>in {parentCategory.name}</span>}</div>
+    <div className="taxonomy-summary"><span className="chip accent" data-ds="chip">{listingData.totalAll} {resourceNoun(listingData.totalAll)}</span>{level === "category" && listingData.children.length > 0 && <span className="chip" data-ds="chip">{listingData.children.length} {listingData.children.length === 1 ? "subcategory" : "subcategories"}</span>}{level !== "category" && parentCategory && <span>in {parentCategory.name}</span>}<button type="button" className="btn ghost taxonomy-tools-toggle" aria-expanded={toolsOpen} onClick={() => setToolsOpen(value => !value)}>{toolsOpen ? "Close filters" : "Filters & view"}</button></div>
     </header>
-    {listingData.children.length > 0 && <section className="taxonomy-children" aria-labelledby="taxonomy-children-heading"><h2 id="taxonomy-children-heading">{level === "category" ? "Subcategories" : "Groups"}</h2><div className="taxonomy-child-grid">{listingData.children.map(child => <Link key={child.slug} className="taxonomy-child card hoverable" href={routeFor(level === "category" ? "subcategory" : "sub-subcategory", child.slug)}><span>{child.name}</span><span className="chip mono" data-ds="chip">{child.count}</span></Link>)}</div></section>}
-    <div className="taxonomy-controls flex flex-col gap-4"><div className="relative"><Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" /><Input className="pl-10" value={searchTerm} onChange={(event) => { setSearchTerm(event.target.value); setPage(1); }} placeholder={`Search in ${name}...`} aria-label={`Search in ${name}`} data-testid="input-search-resources" /></div>
+    {level === "category" && listingData.children.length > 0 && <section className="taxonomy-children" aria-labelledby="taxonomy-children-heading"><h2 id="taxonomy-children-heading">Subcategories</h2><div className="taxonomy-child-grid">{listingData.children.map((child, index) => <Link key={child.slug} className="taxonomy-child card hoverable" style={{ animationDelay: `${index * 30}ms` }} href={routeFor("subcategory", child.slug)}><span>{child.name}</span><span className="chip mono" data-ds="chip">{child.count}</span></Link>)}</div></section>}
+    <div className={`taxonomy-controls taxonomy-production-controls ${toolsOpen ? "taxonomy-production-controls--open" : ""} flex flex-col gap-4`}><div className="relative"><Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" /><Input className="pl-10" value={searchTerm} onChange={(event) => { setSearchTerm(event.target.value); setPage(1); }} placeholder={`Search in ${name}...`} aria-label={`Search in ${name}`} data-testid="input-search-resources" /></div>
       {level !== "sub-subcategory" && optionChildren.length > 0 && <select className="min-h-11 rounded-md border bg-background px-3" aria-label={`Limit ${name} by subcategory`} value={selection} onChange={(event) => { const nextSelection = event.target.value; const next = { ...currentFilterState, selection: nextSelection }; setSelection(nextSelection); setGeneral(nextSelection === "__general__"); setPage(1); queueAnalytics(next, "taxonomy_scope", nextSelection); requestResultsFocus(); }} data-testid="select-subcategory-filter"><option value="all">All subcategories</option>{listingData.generalCount > 0 && <option value="__general__">Uncategorized ({listingData.generalCount})</option>}{optionChildren.map((item) => <option key={item.value} value={item.value}>{item.value} ({item.count})</option>)}</select>}
       <AdvancedFilter selectedTags={tags} sortBy={sort} availableTags={listingData.tags} onTagsChange={(value) => onFacetChange("tags", value)} onSortChange={(value) => onFacetChange("sort", value)} showCountSorts={false} showTagFilter={false} />
     </div>
-    <ActiveFilters state={filterState} onChange={onFacetChange} onClear={clearFacetFilters} defaultSort="default" />
-    <div className="flex flex-col items-stretch gap-4 lg:flex-row lg:items-start lg:gap-6">
-      <SearchFilters state={filterState} facets={taxonomySearch.data?.facets} onChange={onFacetChange} onClear={clearFacetFilters} hideTaxonomyFacets />
+    <div className={`taxonomy-production-controls ${toolsOpen ? "taxonomy-production-controls--open" : ""}`}><ActiveFilters state={filterState} onChange={onFacetChange} onClear={clearFacetFilters} defaultSort="default" /></div>
+    <div className="taxonomy-results-layout">
+      <div className={`taxonomy-production-controls ${toolsOpen ? "taxonomy-production-controls--open" : ""}`}><SearchFilters state={filterState} facets={taxonomySearch.data?.facets} onChange={onFacetChange} onClear={clearFacetFilters} hideTaxonomyFacets /></div>
       <div className="min-w-0 flex-1">
         <div ref={resultsRef} tabIndex={-1} className="space-y-4 outline-none" aria-busy={resultsLoading} aria-labelledby="taxonomy-results-heading" data-testid="taxonomy-results-region">
           {/* The listing's single count statement: visible range, matching total,
               and — only while a filter narrows the collection — what it was
               narrowed from. */}
-          <div className="flex items-center justify-between gap-2"><h2 id="taxonomy-results-heading" className="text-sm font-medium text-muted-foreground" data-testid="text-results-count" data-total={total}>Showing {total === 0 ? "0" : `${(currentPage - 1) * PAGE_SIZE + 1}–${Math.min(currentPage * PAGE_SIZE, total)}`} of {total} {resourceNoun(total)}{total !== listingData.totalAll ? ` (filtered from ${listingData.totalAll})` : ""}</h2><ViewModeToggle value={view} onChange={(mode) => { setView(mode); safeSetItem("awesome-list-view-mode", mode); }} /></div>
+          <div className="taxonomy-results-heading-row"><h2 id="taxonomy-results-heading" data-testid="text-results-count" data-total={total}>{level === "category" ? (total > 0 ? `Resources (${total})` : "Coming soon") : <span className="sr-only">{total} {resourceNoun(total)}</span>}</h2><div className={`taxonomy-production-controls ${toolsOpen ? "taxonomy-production-controls--open" : ""}`}><ViewModeToggle value={view} onChange={(mode) => { setView(mode); safeSetItem("awesome-list-view-mode", mode); }} /></div></div>
           {notice && <div role="status" data-testid="notice-page-adjusted" className="rounded border p-3 text-sm">{notice}<button className="ml-2 min-h-8 underline" onClick={() => setNotice(null)}>Dismiss</button></div>}
           {(listingData.scope.ignoredSubcategory || listingData.scope.ignoredSubSubcategory) && <div role="status" data-testid="notice-unknown-subcategory" className="rounded border p-3 text-sm">“{selection}” isn't a subcategory of {name}, so that filter was ignored.<button className="ml-2 min-h-8 underline" onClick={broadenScope}>Remove it</button></div>}
           {serverSearchActive && !taxonomySearch.isPlaceholderData && taxonomySearch.data?.search?.mode === "fuzzy" && taxonomySearch.data.search.suggestion && <div className="flex flex-wrap items-center justify-center gap-2 rounded border p-3 text-sm" role="status" data-testid="notice-taxonomy-search-suggestion"><span>No exact matches. Did you mean</span><Button variant="link" className="h-auto p-0" onClick={() => { setSearchTerm(taxonomySearch.data!.search!.suggestion!); setPage(1); }}>{taxonomySearch.data.search.suggestion}</Button><span>?</span></div>}
@@ -500,9 +502,11 @@ export default function TaxonomyListing({ level }: Props) {
               const normalized = { id: String(resource.id ?? ""), title: resource.title, url: resource.url, description: resource.description ?? "" };
               if (view === "list") return <ResourceListRow key={`${normalized.id}-${index}`} resource={normalized} />;
               if (view === "compact") return <ResourceCompactCard key={`${normalized.id}-${index}`} resource={normalized} />;
-              return <ResourceCard key={`${normalized.id}-${index}`} resource={{ id: normalized.id, name: normalized.title, url: normalized.url, description: normalized.description, category: level === "category" ? name : parentCategory?.name, tags: resource.tags ?? resource.metadata?.tags ?? [] }} onTagClick={(tag) => onFacetChange("tags", tags.some(old => normalizeTag(old) === normalizeTag(tag)) ? tags : [...tags, tag])} />;
+               return <ResourceCard key={`${normalized.id}-${index}`} variant="taxonomy" showPersonalActions={false} resource={{ id: normalized.id, name: normalized.title, url: normalized.url, description: normalized.description, category: level === "category" ? name : parentCategory?.name, tags: resource.tags ?? resource.metadata?.tags ?? [] }} onTagClick={(tag) => onFacetChange("tags", tags.some(old => normalizeTag(old) === normalizeTag(tag)) ? tags : [...tags, tag])} />;
             })}</div>}
-          <Paginator currentPage={currentPage} totalPages={totalPages} makeHref={makeHref} onNavigate={onPage} />
+          {/* Page navigation stays visible whenever the collection spans more
+              than one page: it is primary navigation, not a filter tool. */}
+          {totalPages > 1 && <div className="taxonomy-pagination"><Paginator currentPage={currentPage} totalPages={totalPages} makeHref={makeHref} onNavigate={onPage} /></div>}
         </div>
       </div>
     </div>

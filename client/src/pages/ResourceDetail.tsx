@@ -72,6 +72,7 @@ export default function ResourceDetail() {
   const [, setLocation] = useLocation();
   const [suggestEditOpen, setSuggestEditOpen] = useState(false);
   const [imageLoaded, setImageLoaded] = useState(false);
+  const [moreOpen, setMoreOpen] = useState(false);
 
   const { data: resource, isLoading, error } = useQuery<Resource & { resolvedKind?: ResourceKind; featured?: boolean }>({
     queryKey: ['/api/resources', id],
@@ -607,7 +608,7 @@ export default function ResourceDetail() {
           {resource.category && (
             <span className="resource-detail-chip-wrap">
               <Link href={`/category/${slugify(resource.category)}`} className="chip" data-testid="badge-category">
-                <FolderTree size={12} aria-hidden="true" />
+                <span aria-hidden="true">⟁</span>
                 <span className="resource-detail-chip-label">{resource.category}</span>
               </Link>
             </span>
@@ -666,7 +667,11 @@ export default function ResourceDetail() {
         </p>
       </section>
 
-      <div>
+      <details
+        className="resource-detail-more"
+        onToggle={(event) => setMoreOpen(event.currentTarget.open)}
+      >
+        <summary className="btn ghost">More</summary>
         <div className="resource-detail-actions">
           <Button asChild>
             <a href={resource.url} target="_blank" rel="noopener noreferrer"
@@ -734,7 +739,7 @@ export default function ResourceDetail() {
             )}
           />
         </div>
-      </div>
+      </details>
 
       {/* BUG-021 (run25): saved bookmark notes render here too (parity with
           the /bookmarks cards), with a pen-edit into the shared dialog. */}
@@ -783,7 +788,7 @@ export default function ResourceDetail() {
       <div className="resource-detail-body">
         <div>
           <Card className="resource-detail-content">
-            {hasOgImage && (
+            {moreOpen && hasOgImage && (
               <div className="relative w-full h-48 md:h-64 overflow-hidden bg-gradient-to-b from-primary/10 to-transparent">
                 {metadata.ogImageBlurhash && !imageLoaded && (
                   <div className="absolute inset-0">
@@ -920,10 +925,16 @@ export default function ResourceDetail() {
                   className="text-primary hover:underline break-all flex items-center gap-2 text-sm md:text-base min-h-[32px]"
                   data-testid="link-url"
                 >
-                  {resource.url}
-                  <ExternalLink className="h-4 w-4 flex-shrink-0" />
+                  {resource.url} ↗
                 </a>
               </div>
+
+              {(!tags || tags.length === 0) && (
+                <div data-seo-section="resource-tags">
+                  <h2>Tags</h2>
+                  <div />
+                </div>
+              )}
 
               {tags && tags.length > 0 && (
                 <>

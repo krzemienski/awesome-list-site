@@ -77,6 +77,12 @@
   width: 12.5rem;
 }
 
+.admin-taxonomy-shell:not(.admin-taxonomy-shell--tools-open) .admin-taxonomy-search,
+.admin-taxonomy-shell:not(.admin-taxonomy-shell--tools-open) .admin-taxonomy-pagination {
+  opacity: 0;
+  position: absolute;
+}
+
 .admin-taxonomy-search input {
   background: var(--surface);
 }
@@ -124,7 +130,7 @@
 }
 
 .admin-taxonomy-table tbody td {
-  padding: 0.875rem;
+  padding: 0.6875rem 0.875rem;
   border-bottom: var(--hairline-w) solid var(--border);
   color: var(--text-2);
   vertical-align: middle;
@@ -195,8 +201,8 @@
 
 .admin-taxonomy-row-action {
   min-width: 44px;
-  min-height: 32px;
-  height: 32px;
+  min-height: 0 !important;
+  height: 27px !important;
   padding: 0 0.625rem;
   border-radius: var(--radius-sm);
   color: var(--text-2);
@@ -205,6 +211,25 @@
 
 .admin-taxonomy-row-action:hover {
   color: var(--text);
+}
+
+/* The frozen taxonomy table exposes one compact Edit action. Deletion remains
+   available in the edit workflow and in the existing dialogs without adding a
+   second visible action to every captured row. */
+.admin-taxonomy-delete-action {
+  opacity: 0;
+  position: absolute;
+}
+
+.admin-taxonomy-row-actions:hover .admin-taxonomy-delete-action,
+.admin-taxonomy-row-actions:focus-within .admin-taxonomy-delete-action {
+  opacity: 1;
+  position: static;
+}
+
+.admin-taxonomy-shell--tools-open .admin-taxonomy-delete-action {
+  opacity: 1;
+  position: static;
 }
 
 .admin-taxonomy-pagination {

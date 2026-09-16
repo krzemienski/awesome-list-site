@@ -6,6 +6,10 @@
   color: var(--text);
 }
 
+.taxonomy-page {
+  animation: fadeIn 0.5s ease;
+}
+
 .taxonomy-back {
   gap: 6px;
   margin-bottom: 20px;
@@ -46,6 +50,7 @@
 }
 
 .taxonomy-summary {
+  position: relative;
   display: flex;
   flex-wrap: wrap;
   align-items: center;
@@ -71,8 +76,6 @@
 
 .taxonomy-breadcrumbs a {
   display: inline-flex;
-  min-width: 44px;
-  min-height: 44px;
   align-items: center;
   color: var(--text-2);
 }
@@ -82,8 +85,13 @@
 }
 
 .taxonomy-children,
-.taxonomy-controls {
+.taxonomy-page--category .taxonomy-results-layout {
   margin-top: 56px;
+}
+
+.taxonomy-page--subcategory .taxonomy-results-layout,
+.taxonomy-page--sub-subcategory .taxonomy-results-layout {
+  margin-top: 40px;
 }
 
 .taxonomy-children h2 {
@@ -121,8 +129,107 @@
   gap: 16px;
 }
 
-.taxonomy-controls ~ div {
-  margin-top: 24px;
+.taxonomy-production-controls {
+  display: none !important;
+}
+
+.taxonomy-production-controls--open {
+  display: block !important;
+}
+
+.taxonomy-controls.taxonomy-production-controls--open {
+  display: flex !important;
+}
+
+.taxonomy-tools-toggle {
+  position: absolute;
+  top: -6px;
+  right: 0;
+}
+
+.taxonomy-results-heading-row {
+  margin-bottom: 16px;
+}
+
+.taxonomy-results-heading-row h2 {
+  color: var(--text-2);
+  font-size: 16px;
+  font-weight: 600;
+}
+
+.taxonomy-page--subcategory .taxonomy-results-heading-row,
+.taxonomy-page--sub-subcategory .taxonomy-results-heading-row {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+}
+
+.taxonomy-page .resource-card--taxonomy {
+  display: block;
+  height: auto;
+  padding: 20px;
+  overflow: visible;
+}
+
+.taxonomy-page .resource-card--taxonomy .resource-card__top {
+  margin-bottom: 14px !important;
+}
+
+.taxonomy-page .resource-card--taxonomy .resource-card__title {
+  min-height: 0;
+  margin-bottom: 8px;
+}
+
+.taxonomy-page .resource-card--taxonomy .resource-card__title-link {
+  display: block;
+  min-height: 0;
+  overflow: visible;
+  -webkit-line-clamp: unset;
+}
+
+.taxonomy-page .resource-card--taxonomy .resource-card__description {
+  display: block;
+  min-height: 0;
+  margin-bottom: 14px;
+  overflow: visible;
+  -webkit-line-clamp: unset;
+}
+
+.taxonomy-page .resource-card--taxonomy .resource-card__content {
+  display: block;
+}
+
+.taxonomy-page .resource-card--taxonomy .resource-card__metadata {
+  gap: 6px;
+  margin: 0;
+}
+
+.taxonomy-page .resource-card--taxonomy .resource-card__meta-link,
+.taxonomy-page .resource-card--taxonomy .resource-card__category-badge,
+.taxonomy-page .resource-card--taxonomy .resource-card__actions,
+.taxonomy-page .resource-card--taxonomy .resource-card__more-tags {
+  display: none;
+}
+
+.taxonomy-page .resource-card--taxonomy:hover .resource-card__meta-link,
+.taxonomy-page .resource-card--taxonomy:focus-within .resource-card__meta-link,
+.taxonomy-page .resource-card--taxonomy:hover .resource-card__category-badge,
+.taxonomy-page .resource-card--taxonomy:focus-within .resource-card__category-badge,
+.taxonomy-page .resource-card--taxonomy:hover .resource-card__more-tags,
+.taxonomy-page .resource-card--taxonomy:focus-within .resource-card__more-tags {
+  display: inline-flex;
+}
+
+.taxonomy-page .resource-card--taxonomy:hover .resource-card__actions,
+.taxonomy-page .resource-card--taxonomy:focus-within .resource-card__actions {
+  display: flex;
+}
+
+.taxonomy-page .resource-card--taxonomy .resource-card__tag-link {
+  min-height: 0;
+  pointer-events: auto;
 }
 
 .taxonomy-loading-header {
@@ -140,4 +247,9 @@
 .taxonomy-breadcrumbs a:focus-visible {
   outline: 2px solid var(--accent);
   outline-offset: 4px;
+}
+/* Page navigation for collections longer than one page (the frozen catalogue
+   pages predate pagination; this row is intentionally visible). */
+.taxonomy-pagination {
+  margin-top: 24px;
 }

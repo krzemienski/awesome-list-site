@@ -24,6 +24,10 @@ export const subcategoryConfig: GenericCrudManagerProps<SubcategoryWithCount> = 
   testIdPrefix: "subcategory-manager",
   testIdEntity: "subcategory",
   testIdEntityPlural: "subcategories",
+  searchEnabled: false,
+  itemsPerPage: 24,
+  pageSizeOptions: [24],
+  navigationOrder: "subcategories",
   parents: [
     {
       fieldName: "categoryId",
@@ -60,7 +64,7 @@ export const subcategoryConfig: GenericCrudManagerProps<SubcategoryWithCount> = 
     },
     {
       key: "actions",
-      label: "Actions",
+      label: "",
       align: "right" as const,
       width: "w-32",
       className: "admin-taxonomy-column-actions"

@@ -46,6 +46,7 @@ import { apiRequest, ApiError } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
 import { AgentEventLog } from "@/components/admin/AgentEventLog";
 import { AgentCommsGraph } from "@/components/admin/AgentCommsGraph";
+import { Stat, StatusChip, TableShell } from "@/components/admin/AdminOpsPrimitives";
 import type { EnrichmentJob } from "@shared/schema";
 import "./queues-agent.css";
 
@@ -362,6 +363,73 @@ export default function BatchEnrichmentPanel() {
 
   return (
     <div className="queues-agent queues-agent--enrichment">
+      <div className="queues-agent__canonical">
+        <div className="queues-agent__stat-strip">
+          <Stat
+            label="Last enriched"
+            value={jobs.find((job) => job.status === "completed")?.completedAt
+              ? new Date(jobs.find((job) => job.status === "completed")!.completedAt!).toLocaleDateString("en-US", { month: "short", day: "numeric" })
+              : "—"}
+            sub={jobs.length ? `${jobs.length} recorded jobs` : "No completed batches"}
+          />
+          <Stat
+            label="Queue"
+            value={jobs.filter((job) => job.status === "pending" || job.status === "processing").length}
+            sub={hasActiveJob ? "active" : "idle"}
+          />
+          <Stat
+            label="Completed"
+            value={jobs.filter((job) => job.status === "completed").length}
+            sub="all recorded batches"
+          />
+        </div>
+        <TableShell
+          title="Enrichment jobs"
+          sub="LLM-driven metadata enhancement"
+          actions={
+            <Button
+              className="btn primary"
+              onClick={handleStartEnrichment}
+              disabled={!activeJobStateKnown || hasActiveJob || startMutation.isPending || batchSizeInvalid}
+              data-testid="button-start-enrichment-canonical"
+            >
+              <Sparkles className="h-3 w-3" aria-hidden="true" />
+              Run job
+            </Button>
+          }
+        >
+          <div className="queues-agent__canonical-table">
+            <table className="table">
+              <thead>
+                <tr><th>Job</th><th>Status</th><th>Started</th><th>Completed</th><th /></tr>
+              </thead>
+              <tbody>
+                {jobs.slice(0, 6).map((job) => (
+                  <tr key={job.id}>
+                    <td className="mono">#{job.id}</td>
+                    <td><StatusChip status={effectiveStatus(job)} /></td>
+                    <td className="mono muted">{job.startedAt ? new Date(job.startedAt).toLocaleString("en-US") : "—"}</td>
+                    <td className="mono muted">{job.completedAt ? new Date(job.completedAt).toLocaleString("en-US") : "—"}</td>
+                    <td className="actions">
+                      <Button
+                        className="btn ghost"
+                        variant="ghost"
+                        onClick={() => handleViewDetails(job.id)}
+                        data-testid={`button-view-job-${job.id}-canonical`}
+                      >
+                        Logs
+                      </Button>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+            {!isLoading && jobs.length === 0 ? <p className="queues-agent__empty">No enrichment jobs found.</p> : null}
+          </div>
+        </TableShell>
+      </div>
+      <details className="queues-agent__more">
+        <summary className="btn ghost">Job controls &amp; monitoring</summary>
       <Card className="queues-agent__control-shell">
         <CardHeader>
           <CardTitle className="queues-agent__section-title flex items-center gap-2">
@@ -1074,6 +1142,7 @@ export default function BatchEnrichmentPanel() {
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
+      </details>
     </div>
   );
 }

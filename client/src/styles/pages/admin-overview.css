@@ -62,7 +62,7 @@
 }
 
 .admin-overview-stats-canonical .admin-canonical-stat__value--accent {
-  color: var(--text);
+  color: var(--accent);
 }
 
 .admin-overview-stats-canonical .admin-canonical-stat__sub {
@@ -227,7 +227,7 @@
   flex: 0 1 auto;
   min-width: 0;
   overflow: hidden;
-  color: var(--text-2);
+  color: var(--accent);
   font-weight: 500;
   text-overflow: ellipsis;
   white-space: nowrap;
@@ -246,30 +246,6 @@
   color: var(--text);
   text-overflow: ellipsis;
   white-space: nowrap;
-}
-
-.admin-overview-canonical .admin-canonical-workflow-links {
-  display: flex;
-  align-items: center;
-  flex-wrap: wrap;
-  gap: 8px;
-  margin-block-start: 12px;
-  color: var(--text-3, var(--text-2));
-  font-family: var(--font-mono);
-  font-size: 0.625rem;
-  letter-spacing: 0.04em;
-  text-transform: uppercase;
-}
-
-.admin-overview-canonical .admin-canonical-workflow-links button {
-  min-height: 24px;
-  color: var(--text-2);
-  font-family: var(--font-body);
-  font-size: 0.75rem;
-  letter-spacing: normal;
-  text-transform: none;
-  text-decoration: underline;
-  text-underline-offset: 0.2em;
 }
 
 .admin-overview-canonical .admin-canonical-health-list,
@@ -315,6 +291,12 @@
 
 .admin-overview-canonical .admin-canonical-health-row > .dot.muted {
   background: var(--text-3, var(--text-2));
+}
+
+.admin-overview-canonical .admin-canonical-health-row > .dot {
+  flex: 0 0 auto;
+  width: 6px;
+  height: 6px;
 }
 
 .admin-overview-canonical .admin-canonical-category-row {

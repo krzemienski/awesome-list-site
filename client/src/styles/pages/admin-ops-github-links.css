@@ -13,6 +13,12 @@
   color: var(--text);
 }
 
+.ops-github-panel {
+  display: flex;
+  flex-direction: column;
+  gap: 1.125rem;
+}
+
 .ops-github-panel__repository-card,
 .ops-github-panel__status-card,
 .ops-link-health__summary-card,
@@ -28,7 +34,33 @@
 .ops-github-panel__repository-heading {
   display: flex;
   align-items: flex-start;
-  gap: 0.875rem;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+.ops-github-panel__repository-content {
+  padding: 1.375rem;
+}
+
+.ops-github-panel__repository-copy {
+  min-width: 12.5rem;
+  flex: 1;
+}
+
+.ops-github-panel__repository-name {
+  font-size: 0.875rem;
+  font-weight: 600;
+}
+
+.ops-github-panel__repository-meta {
+  margin-top: 0.25rem;
+  color: var(--text-3);
+  font-family: var(--font-mono);
+  font-size: 0.71875rem;
+}
+
+.ops-github-panel__repository-editor {
+  margin-top: 1rem;
 }
 
 .ops-github-panel__repository-mark {
@@ -49,6 +81,7 @@
   justify-content: space-between;
   gap: 1rem;
   flex-wrap: wrap;
+  margin-left: auto;
 }
 
 .ops-github-panel__empty-state {
@@ -92,6 +125,13 @@
   vertical-align: middle;
 }
 
+.ops-github-panel__history-table-wrap th,
+.ops-github-panel__history-table-wrap td,
+.ops-link-health__flagged-table-wrap th,
+.ops-link-health__flagged-table-wrap td {
+  padding: 0.625rem 0.875rem;
+}
+
 .ops-github-panel__history-table-wrap tbody tr:hover,
 .ops-link-health__flagged-table-wrap tbody tr:hover {
   background: var(--surface-2);
@@ -99,7 +139,7 @@
 
 .ops-link-health__stat-grid {
   display: grid;
-  grid-template-columns: repeat(4, minmax(0, 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(12.5rem, 1fr));
   gap: 0.875rem;
 }
 
@@ -158,6 +198,12 @@
 
 .ops-link-health__summary-meta span {
   white-space: nowrap;
+}
+
+.ops-link-health__more-row {
+  display: flex;
+  justify-content: flex-end;
+  margin-block: -0.5rem;
 }
 
 .ops-link-health__flagged-card {
@@ -235,7 +281,6 @@
     flex: 1;
   }
 
-  .ops-link-health__stat-grid,
   .ops-digest-health__stat-grid,
   .ops-digest-health__queue-grid {
     grid-template-columns: 1fr;

@@ -43,6 +43,9 @@ interface ResourceCardProps {
   /** Public read-only collections hide account/edit actions while preserving
    * the card's real detail and external links. */
   showPersonalActions?: boolean;
+  /** Compact, read-only presentation used by taxonomy pages to mirror the
+   * public catalogue card while retaining the card's real links. */
+  variant?: "default" | "taxonomy";
 }
 
 const RESOURCE_CATEGORY_MARKS: Record<string, string> = {
@@ -77,6 +80,7 @@ function ResourceCard({
   onClick,
   onTagClick,
   showPersonalActions = true,
+  variant = "default",
 }: ResourceCardProps) {
   const [, setLocation] = useLocation();
   const [suggestEditOpen, setSuggestEditOpen] = useState(false);
@@ -175,6 +179,7 @@ function ResourceCard({
       ref={cardRef}
       className={cn(
         "resource-card card hoverable glow group relative",
+        variant === "taxonomy" && "resource-card--taxonomy",
         className
       )}
       data-ds="card-hover"
@@ -435,6 +440,7 @@ export default memo(ResourceCard, (prevProps, nextProps) => {
     prevProps.onClick === nextProps.onClick &&
     prevProps.onTagClick === nextProps.onTagClick &&
     prevProps.showPersonalActions === nextProps.showPersonalActions &&
+    prevProps.variant === nextProps.variant &&
     prevProps.fullResource === nextProps.fullResource
   );
 });

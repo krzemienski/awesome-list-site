@@ -78,6 +78,7 @@ export default function LinkHealthDashboard() {
   const [isPolling, setIsPolling] = useState(false);
   // Run23 NB-040: explicit confirmation before starting a link-check job.
   const [confirmRun, setConfirmRun] = useState(false);
+  const [showDetails, setShowDetails] = useState(false);
 
   const { data: statusData, isLoading: isStatusLoading } = useQuery<LinkHealthStatusResponse>({
     queryKey: ['/api/admin/link-health/status'],
@@ -297,19 +298,30 @@ export default function LinkHealthDashboard() {
           className="ops-link-health__stat-card ops-link-health__stat-card--warn"
         />
         <Stat
-          label="404 / DNS"
+          label="404"
           value={summaryCounts.broken}
           className="ops-link-health__stat-card ops-link-health__stat-card--bad"
         />
         <Stat
           label="Timeout"
           value={summaryCounts.timeout}
-          className="ops-link-health__stat-card ops-link-health__stat-card--warn"
+          className="ops-link-health__stat-card ops-link-health__stat-card--bad"
         />
+      </div>
+      <div className="ops-link-health__more-row">
+        <Button
+          variant="ghost"
+          size="sm"
+          onClick={() => setShowDetails((visible) => !visible)}
+          aria-expanded={showDetails}
+          data-testid="button-link-health-more"
+        >
+          {showDetails ? "Less" : "More"}
+        </Button>
       </div>
 
       {/* Summary Card */}
-      <Card className="ops-link-health__summary-card">
+      {showDetails && <Card className="ops-link-health__summary-card">
         <CardHeader>
           <CardTitle role="heading" aria-level={2} className="flex items-center justify-between">
             <span className="flex items-center gap-2">
@@ -451,9 +463,9 @@ export default function LinkHealthDashboard() {
             </div>
           )}
         </CardContent>
-      </Card>
+      </Card>}
 
-      {trendData.length > 0 && (
+      {showDetails && trendData.length > 0 && (
         <Suspense
           fallback={
             <Card>
@@ -491,7 +503,7 @@ export default function LinkHealthDashboard() {
             </StatusChip>
           </span>
         }
-        sub="404s, DNS failures, timeouts, and links flagged for review."
+        sub="404s and timeouts from last sweep"
         className="ops-link-health__flagged-card"
       >
           {recentFailures.length === 0 ? (
@@ -514,6 +526,7 @@ export default function LinkHealthDashboard() {
                     <TableHead>URL</TableHead>
                     <TableHead>Status</TableHead>
                     <TableHead>Last checked</TableHead>
+                    <TableHead />
                   </TableRow>
                 </TableHeader>
                 <TableBody>
@@ -550,6 +563,11 @@ export default function LinkHealthDashboard() {
                       <TableCell className="whitespace-nowrap text-xs text-muted-foreground">
                         {formatAdminDateTime(check.lastCheckedAt)}
                       </TableCell>
+                      <TableCell className="text-right">
+                        <Button variant="ghost" size="sm" onClick={() => setConfirmRun(true)}>
+                          Recheck
+                        </Button>
+                      </TableCell>
                     </TableRow>
                   ))}
                 </TableBody>
@@ -558,7 +576,7 @@ export default function LinkHealthDashboard() {
           )}
       </TableShell>
 
-      <Card className="ops-link-health__problem-card">
+      {showDetails && <Card className="ops-link-health__problem-card">
         <CardHeader>
           <CardTitle className="flex items-center justify-between">
             <span className="flex items-center gap-2">
@@ -688,7 +706,7 @@ export default function LinkHealthDashboard() {
             </div>
           )}
         </CardContent>
-      </Card>
+      </Card>}
 
       {/* Run23 NB-040: explicit confirmation before starting a link-check job. */}
       <AlertDialog open={confirmRun} onOpenChange={(open) => { if (!open) setConfirmRun(false); }}>

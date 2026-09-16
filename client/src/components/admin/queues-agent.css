@@ -16,6 +16,118 @@
   min-width: 0;
 }
 
+.queues-agent__canonical {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+.queues-agent__more > summary {
+  cursor: pointer;
+  display: inline-flex;
+  list-style: none;
+}
+
+.queues-agent__more > summary::-webkit-details-marker {
+  display: none;
+}
+
+.queues-agent__more[open] > summary {
+  margin-bottom: 12px;
+}
+
+.queues-agent__stat-strip {
+  display: grid;
+  gap: 14px;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+}
+
+.queues-agent__canonical-table {
+  overflow-x: auto;
+}
+
+.queues-agent__canonical-table .table {
+  min-width: 650px;
+  width: 100%;
+}
+
+.queues-agent__canonical-table td.mono {
+  font-family: var(--font-mono);
+  font-size: 12px;
+}
+
+.queues-agent__canonical-table td.muted {
+  color: var(--text-3);
+  font-size: 11.5px;
+}
+
+.queues-agent__canonical-table td.accent {
+  color: var(--accent);
+}
+
+.queues-agent__canonical-table td.actions {
+  text-align: right;
+}
+
+.queues-agent__canonical-table td.actions .btn {
+  font-size: 12px;
+  min-height: 0;
+  padding: 5px 10px;
+}
+
+.queues-agent__empty {
+  color: var(--text-3);
+  font-size: 12px;
+  padding: 18px 22px;
+}
+
+.queues-agent__research-form {
+  padding: 24px;
+}
+
+.queues-agent__research-form h3 {
+  color: var(--text);
+  font-size: 14px;
+  font-weight: 600;
+  margin-bottom: 4px;
+}
+
+.queues-agent__research-form > p {
+  color: var(--text-3);
+  font-size: 12px;
+  margin-bottom: 16px;
+}
+
+.queues-agent__research-fields {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.queues-agent__research-limits {
+  display: grid;
+  gap: 12px;
+  grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+}
+
+.queues-agent__research-actions {
+  display: flex;
+  gap: 8px;
+  justify-content: flex-end;
+}
+
+.queues-agent__canonical-table--research .table {
+  min-width: 760px;
+}
+
+.queues-agent__canonical-table td.prompt {
+  color: var(--text);
+  max-width: 320px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
 .queues-agent .queues-agent__table-shell {
   background: var(--queues-surface);
   border: var(--hairline-w, 1px) solid var(--border);

@@ -422,8 +422,27 @@ export default function PendingResources() {
       <section className="admin-panel queue-review-shell" aria-labelledby="pending-resources-heading">
         <div className="admin-panel__heading queue-review-shell-heading">
           <div>
-            <h2 id="pending-resources-heading">Pending Approvals</h2>
-            <p>Resources awaiting admin review</p>
+            <h2 id="pending-resources-heading">Pending approvals</h2>
+            <p>0 submissions awaiting review</p>
+          </div>
+          <div className="queue-review-actions">
+            <Button variant="outline" size="sm" disabled>Bulk reject</Button>
+            <Button size="sm" disabled>Approve all</Button>
+            <Button
+              variant="ghost"
+              size="sm"
+              disabled={recheckState === 'checking'}
+              onClick={() => {
+                setRecheckState('checking');
+                void queryClient
+                  .invalidateQueries({ queryKey: ['/api/admin/pending-resources'] })
+                  .then(() => setRecheckState('checked'), () => setRecheckState('checked'));
+              }}
+              data-testid="button-refresh-pending-resources"
+            >
+              <RefreshCw className={`h-3 w-3 mr-2 ${recheckState === 'checking' ? 'animate-spin' : ''}`} />
+              {recheckState === 'checking' ? 'Checking…' : 'Check again'}
+            </Button>
           </div>
         </div>
         {bulkOutcome && (
@@ -432,31 +451,14 @@ export default function PendingResources() {
             <span>{bulkOutcome.succeeded} succeeded · {bulkOutcome.failed} failed · {bulkOutcome.requested} requested</span>
           </div>
         )}
-        <div className="queue-review-empty">
-          <CheckCircle2 className="queue-review-empty-icon" aria-hidden="true" />
-          <h3>All Caught Up!</h3>
-          <p>There are no pending resources to review at this time.</p>
-          {/* Run16 BUG-078: empty state gets an explicit refresh control.
-              Run17 BUG-027: it now shows a busy state while re-fetching and
-              announces the outcome via role="status". */}
-          <Button
-            variant="outline"
-            disabled={recheckState === 'checking'}
-            onClick={() => {
-              setRecheckState('checking');
-              void queryClient
-                .invalidateQueries({ queryKey: ['/api/admin/pending-resources'] })
-                .then(() => setRecheckState('checked'), () => setRecheckState('checked'));
-            }}
-            data-testid="button-refresh-pending-resources"
-          >
-            <RefreshCw className={`h-4 w-4 mr-2 ${recheckState === 'checking' ? 'animate-spin' : ''}`} />
-            {recheckState === 'checking' ? 'Checking…' : 'Check again'}
-          </Button>
-          <p role="status" aria-live="polite" className="queue-review-empty-status">
-            {recheckState === 'checked' ? 'Checked — still no pending resources.' : ''}
-          </p>
+        <div className="admin-table-wrap">
+          <table className="table">
+            <thead><tr><th>Title</th><th>Category</th><th>Submitted by</th><th>When</th><th /></tr></thead>
+          </table>
         </div>
+        <span className="sr-only" role="status" aria-live="polite">
+          {recheckState === 'checked' ? 'Checked — still no pending resources.' : ''}
+        </span>
       </section>
     );
   }

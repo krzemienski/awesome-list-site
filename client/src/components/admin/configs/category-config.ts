@@ -70,7 +70,7 @@ export const categoryConfig: GenericCrudManagerProps<CategoryWithCount> = {
     },
     {
       key: "actions",
-      label: "Actions",
+      label: "",
       align: "right" as const,
       width: "w-32",
       className: "admin-taxonomy-column-actions"

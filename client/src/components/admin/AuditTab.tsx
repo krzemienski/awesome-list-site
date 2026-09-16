@@ -95,6 +95,7 @@ export default function AuditTab() {
   const [appliedLimit, setAppliedLimit] = useState("50");
   // Run16 BUG-083: clicking a row opens a detail view with the full payload.
   const [selectedLog, setSelectedLog] = useState<AuditLogEntry | null>(null);
+  const [showTools, setShowTools] = useState(false);
 
   // Run17 BUG-010: real pagination — the tab used to silently cap at the row
   // limit with no way to reach older entries.
@@ -149,6 +150,26 @@ export default function AuditTab() {
     });
   };
 
+  const formatRelativeDate = (date: string | null) => {
+    if (!date) return "—";
+    const elapsed = Date.now() - new Date(date).getTime();
+    if (!Number.isFinite(elapsed)) return "—";
+    const minutes = Math.max(0, Math.floor(elapsed / 60_000));
+    if (minutes < 60) return `${minutes}m ago`;
+    const hours = Math.floor(minutes / 60);
+    if (hours < 24) return `${hours}h ago`;
+    const days = Math.floor(hours / 24);
+    return `${days}d ago`;
+  };
+
+  const targetLabel = (log: AuditLogEntry): string => {
+    const title = log.changes?.title;
+    if (typeof title === "string" && title.trim()) return title;
+    return log.originalResourceId || log.resourceId
+      ? `#${log.originalResourceId || log.resourceId}`
+      : "System";
+  };
+
   const actorLabel = (log: AuditLogEntry): string => {
     if (log.performedByEmail) return maskEmail(log.performedByEmail);
     if (log.performedBy) return log.performedBy.slice(0, 12);
@@ -166,7 +187,6 @@ export default function AuditTab() {
             {[...Array(5)].map((_, i) => <Skeleton key={i} className="h-12 w-full" />)}
           </div>
         </TableShell>
-        <ContactSubmissions />
       </div>
     );
   }
@@ -174,12 +194,26 @@ export default function AuditTab() {
   return (
     <div className="admin-ops-audit-stack">
     <TableShell
-      title="Audit Log"
-      description={`Append-only · ${data?.total ?? 0} events`}
+      title={
+        <span className="admin-ops-audit-title">
+          <span>Audit log</span>
+          <Button
+            type="button"
+            variant="ghost"
+            size="sm"
+            onClick={() => setShowTools((visible) => !visible)}
+            aria-expanded={showTools}
+            data-testid="button-audit-tools"
+          >
+            {showTools ? "Hide tools" : "Tools"}
+          </Button>
+        </span>
+      }
+      description="Append-only · last 100 events"
       className="admin-ops-audit-shell"
     >
       <div className="space-y-4">
-        <form onSubmit={handleSearch} className="admin-ops-audit-toolbar flex flex-col sm:flex-row gap-3">
+        {showTools && <form onSubmit={handleSearch} className="admin-ops-audit-toolbar flex flex-col sm:flex-row gap-3">
           <div className="flex-1 relative">
             <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-[var(--text-2)]" />
             <Input
@@ -240,7 +274,7 @@ export default function AuditTab() {
           >
             <RefreshCw className={`h-4 w-4 ${isFetching ? 'animate-spin' : ''}`} />
           </Button>
-        </form>
+        </form>}
 
         {/* Run23 NB-041: fetch failures render a distinct, retryable error
             state — never the "No audit log entries found" empty state. */}
@@ -306,7 +340,7 @@ export default function AuditTab() {
                     data-testid={`row-audit-log-${log.id}`}
                   >
                     <TableCell className="text-xs text-muted-foreground whitespace-nowrap">
-                      <span>{log.id}</span>
+                       <span>TX#{log.id}</span>
                       <Button
                         type="button"
                         variant="ghost"
@@ -331,9 +365,7 @@ export default function AuditTab() {
                       </span>
                     </TableCell>
                     <TableCell className="text-sm">
-                      {log.originalResourceId || log.resourceId
-                        ? `#${log.originalResourceId || log.resourceId}`
-                        : "System"}
+                       {targetLabel(log)}
                     </TableCell>
                     <TableCell>
                       <StatusChip status={ACTION_STATUS[log.action] ?? "recorded"} className="text-xs">
@@ -341,7 +373,7 @@ export default function AuditTab() {
                       </StatusChip>
                     </TableCell>
                     <TableCell className="text-xs text-muted-foreground whitespace-nowrap">
-                      {formatDate(log.createdAt)}
+                       {formatRelativeDate(log.createdAt)}
                     </TableCell>
                   </TableRow>
                 ))
@@ -362,7 +394,7 @@ export default function AuditTab() {
         )}
 
         {/* Run17 BUG-010: range readout + Previous/Next through the full log. */}
-        {data && data.total > 0 && (
+        {showTools && data && data.total > 0 && (
           <div className="flex flex-wrap items-center justify-between gap-3 pt-2">
             <p className="text-sm text-muted-foreground" data-testid="text-audit-range">
               {offset + 1}–{Math.min(offset + (data.logs?.length || 0), data.total)} of{" "}
@@ -441,7 +473,7 @@ export default function AuditTab() {
         </Dialog>
       </div>
     </TableShell>
-    <ContactSubmissions />
+    {showTools && <ContactSubmissions />}
     </div>
   );
 }

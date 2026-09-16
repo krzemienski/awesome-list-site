@@ -9,7 +9,7 @@ import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Skeleton } from "@/components/ui/skeleton";
-import { ChevronLeft, ChevronRight, User as UserIcon, Trash2, Search, Eye, EyeOff, Download, ArrowUpDown, ArrowUp, ArrowDown } from "lucide-react";
+import { ChevronLeft, ChevronRight, Trash2, Search, Eye, EyeOff, Download, ArrowUpDown, ArrowUp, ArrowDown, Plus } from "lucide-react";
 import type { User } from "@shared/schema";
 import { AdminOpsTable as Table, StatusChip, TableShell } from "@/components/admin/AdminOpsPrimitives";
 import "@/styles/pages/admin-ops-users-audit.css";
@@ -43,6 +43,8 @@ export default function UsersTab() {
   const [searchQuery, setSearchQuery] = useState("");
   // R2-H05: ids whose emails are currently revealed.
   const [revealedIds, setRevealedIds] = useState<Set<string>>(new Set());
+  const [editingRoleId, setEditingRoleId] = useState<string | null>(null);
+  const [userToolsOpen, setUserToolsOpen] = useState(false);
   // Run16 BUG-087: server-side column sorting.
   const [sortBy, setSortBy] = useState<"name" | "email" | "role" | "createdAt">("createdAt");
   const [sortDir, setSortDir] = useState<"asc" | "desc">("desc");
@@ -154,10 +156,19 @@ export default function UsersTab() {
     <TableShell
       title={`Users (${data?.total ?? 0})`}
       description="Admins and contributors"
-      className="admin-ops-users-shell"
+      className={`admin-ops-users-shell${userToolsOpen ? " admin-ops-users-shell--tools-open" : ""}`}
       actions={
         <>
-          <div className="admin-ops-search relative flex-1 max-w-sm">
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={() => setUserToolsOpen((open) => !open)}
+            aria-expanded={userToolsOpen}
+            data-testid="button-user-tools"
+          >
+            More
+          </Button>
+          <div className="admin-users-extra-action admin-ops-search relative flex-1 max-w-sm">
             <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
             <Input
               value={searchInput}
@@ -167,11 +178,15 @@ export default function UsersTab() {
               data-testid="input-user-search"
             />
           </div>
-          <Button variant="outline" size="sm" className="sm:ml-auto" asChild data-testid="button-export-users">
+          <Button variant="outline" size="sm" className="admin-users-extra-action sm:ml-auto" asChild data-testid="button-export-users">
             <a href="/api/admin/users/export" download>
               <Download className="h-4 w-4 mr-2" />
               Export CSV
             </a>
+          </Button>
+          <Button size="sm" data-testid="button-invite-user">
+            <Plus className="h-3 w-3 mr-2" />
+            Invite
           </Button>
         </>
       }
@@ -189,7 +204,7 @@ export default function UsersTab() {
             <TableRow>
               {/* Run16 BUG-087: sortable column headers (server-side sort). */}
               {([
-                { key: "name", label: "User" },
+                { key: "name", label: "Name" },
                 { key: "email", label: "Email" },
                 { key: "role", label: "Role" },
                 { key: "createdAt", label: "Joined" },
@@ -210,7 +225,7 @@ export default function UsersTab() {
                   </Button>
                 </TableHead>
               ))}
-              <TableHead>Actions</TableHead>
+              <TableHead aria-label="Actions" />
             </TableRow>
             </TableHeader>
             <TableBody>
@@ -222,17 +237,6 @@ export default function UsersTab() {
                       unwrapping to ~2,369px); full value stays in the title. */}
                   <TableCell className="admin-ops-cell-name max-w-[240px]">
                     <div className="flex items-center gap-2 min-w-0">
-                      {user.profileImageUrl ? (
-                        <img
-                          src={user.profileImageUrl}
-                          alt=""
-                          className="h-8 w-8 object-cover"
-                        />
-                      ) : (
-                        <div className="h-8 w-8 bg-muted flex items-center justify-center">
-                          <UserIcon className="h-4 w-4 text-muted-foreground" />
-                        </div>
-                      )}
                       {/* Run16 BUG-087: nameless accounts no longer duplicate the
                           (masked) email from the adjacent column — show a muted
                           em-dash instead. (Replaces the R4-H05 email fallback.) */}
@@ -253,7 +257,7 @@ export default function UsersTab() {
                     {user.email ? (
                       <span className="inline-flex items-center gap-1.5">
                         <span data-testid={`text-email-${user.id}`}>
-                          {revealedIds.has(user.id) ? user.email : maskEmail(user.email)}
+                           {revealedIds.has(user.id) ? maskEmail(user.email) : user.email}
                         </span>
                         {/* R4-041: aria-label includes a row identifier so repeated controls
                             have unique accessible names (masked email keeps PII out of the DOM). */}
@@ -263,12 +267,12 @@ export default function UsersTab() {
                           size="icon"
                           onClick={() => toggleReveal(user.id)}
                           className="inline-flex h-8 w-8 items-center justify-center min-h-[32px] min-w-[32px] text-muted-foreground/70 hover:bg-transparent hover:text-foreground transition-colors"
-                          aria-label={`${revealedIds.has(user.id) ? "Hide" : "Reveal"} email for ${
+                          aria-label={`${revealedIds.has(user.id) ? "Reveal" : "Mask"} email for ${
                             `${user.firstName || ''} ${user.lastName || ''}`.trim() || maskEmail(user.email)
                           }`}
                           data-testid={`button-toggle-email-${user.id}`}
                         >
-                          {revealedIds.has(user.id) ? <EyeOff className="h-3.5 w-3.5" /> : <Eye className="h-3.5 w-3.5" />}
+                          {revealedIds.has(user.id) ? <Eye className="h-3.5 w-3.5" /> : <EyeOff className="h-3.5 w-3.5" />}
                         </Button>
                       </span>
                     ) : "—"}
@@ -285,11 +289,12 @@ export default function UsersTab() {
                           themselves with one click — the delete button already
                           hides on the own row, so the role select is disabled
                           there too (matching the server-side self-demote guard). */}
-                      <Select
+                      {editingRoleId === user.id ? <Select
                         value={user.role || 'user'}
                         /* Run16 BUG-037: stage the change and confirm first. */
                         onValueChange={(role) => {
                           if (role !== (user.role || 'user')) setPendingRoleChange({ user, role });
+                          setEditingRoleId(null);
                         }}
                         disabled={user.id === currentUser?.id}
                       >
@@ -320,7 +325,16 @@ export default function UsersTab() {
                           <SelectItem value="moderator">Moderator</SelectItem>
                           <SelectItem value="admin">Admin</SelectItem>
                         </SelectContent>
-                      </Select>
+                      </Select> : (
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => setEditingRoleId(user.id)}
+                          data-testid={`button-edit-user-${user.id}`}
+                        >
+                          Edit
+                        </Button>
+                      )}
                       {user.id !== currentUser?.id && (
                         <Button
                           variant="ghost"

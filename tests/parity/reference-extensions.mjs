@@ -15,6 +15,18 @@ const sha256 = (value) => crypto.createHash("sha256").update(value).digest("hex"
  */
 
 const repoRoot = path.resolve(path.dirname(new URL(import.meta.url).pathname), "..", "..");
+
+/**
+ * Admin expected-side projections are retired (2026-09-16).  The frozen
+ * `admin.jsx` already contains every admin tab (approvals, audit, edits,
+ * enrichment, export, database, categories, github, ...), and the reference
+ * adapter binds live data into those frozen panels.  Replacing a frozen panel
+ * with an app-shaped projection rewrote the design to match the app, which
+ * the parity contract forbids; the frozen panel is the reference.  Only the
+ * About retained-content projection remains: it appends required live About
+ * content that the frozen AboutPage never contained, in frozen vocabulary.
+ */
+const ADMIN_PROJECTIONS_ENABLED = false;
 const sourcePaths = Object.freeze({
   aboutPage: path.join(repoRoot, "client", "src", "pages", "About.tsx"),
   aboutContent: path.join(repoRoot, "shared", "about-content.ts"),
@@ -131,13 +143,6 @@ const referenceExtensionStyle = `
 .parity-about-faq-panel{padding:0 2rem 1.125rem 0}
 .parity-about-faq-panel[hidden]{display:none}
 .parity-about-faq-panel p{margin:0;color:var(--text-2);font-size:.875rem;line-height:1.65}
-.parity-page-breadcrumb{display:flex;align-items:center;height:2.5rem;margin:0;color:var(--text-2);font-size:.875rem;line-height:1.25}
-.parity-page-breadcrumb__list{display:flex;align-items:center;gap:.625rem;min-width:0;margin:0;padding:0;list-style:none}
-.parity-page-breadcrumb__item{display:inline-flex;align-items:center;gap:.625rem;min-width:0}
-.parity-page-breadcrumb__link,.parity-page-breadcrumb__current{color:inherit;text-decoration:none;white-space:nowrap}
-.parity-page-breadcrumb__current{color:var(--text)}
-.parity-page-breadcrumb__separator{display:inline-flex;align-items:center;color:var(--text-2)}
-.parity-page-breadcrumb__separator svg{width:.875rem;height:.875rem}
 .parity-admin-stack{display:flex;flex-direction:column;gap:1rem}
 .parity-admin-panel{overflow:hidden;padding:0}
 .parity-admin-panel__header{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:.75rem;padding:1.125rem 1.375rem;border-bottom:var(--hairline-w) solid var(--border)}
@@ -271,14 +276,6 @@ export function buildExpectedReferenceExtensions() {
       'BreadcrumbSeparator',
     ].every((value) => sources.pageBreadcrumb.includes(value))],
     ["About canonical Card primitives", ["Card", "CardHeader", "CardContent"].every((name) => sources.aboutPage.includes(name))],
-    ["Admin approvals endpoint", sources.approvals.includes("'/api/admin/pending-resources'")],
-    ["Admin approvals empty state", sources.approvals.includes("All Caught Up!")],
-    ["Admin audit endpoint", sources.audit.includes("/api/admin/audit-logs?")],
-    ["Admin audit panel", sources.audit.includes('title="Audit Log"')],
-    ["Admin contact panel", sources.audit.includes("ContactSubmissions")],
-    ["Admin contact endpoint", sources.contact.includes("/api/admin/contact-submissions?")],
-    ["Admin dashboard canonical tab", sources.adminPage.includes("CANONICAL_TABS")],
-    ["Admin canonical TableShell", sources.canonical.includes('className={cn("card admin-canonical-table-shell"')],
   ];
   const missing = required.filter(([, present]) => !present).map(([label]) => label);
   if (missing.length) {
@@ -332,7 +329,8 @@ export function buildExpectedReferenceExtensions() {
       },
     },
     admin: {
-      retainedTabs: ["approvals", "audit"],
+      retainedTabs: ADMIN_PROJECTIONS_ENABLED ? ["approvals", "audit"] : [],
+      projectionsEnabled: ADMIN_PROJECTIONS_ENABLED,
       sourceProof: {
         adminPage: sourceProof.adminPage,
         approvals: sourceProof.approvals,
@@ -445,26 +443,6 @@ const svgIcon = (document, name, className = "") => {
     svg.append(child);
   });
   return svg;
-};
-
-const appendReferenceBreadcrumb = (document, root, label) => {
-  if (root.querySelector('[data-parity-reference-breadcrumb="true"]')) return;
-  const nav = node(document, "nav", "parity-page-breadcrumb");
-  nav.dataset.parityReferenceBreadcrumb = "true";
-  nav.setAttribute("aria-label", "breadcrumb");
-  const list = node(document, "ol", "parity-page-breadcrumb__list");
-  const home = node(document, "li", "parity-page-breadcrumb__item");
-  const homeLink = link(document, "Home", "/", "parity-page-breadcrumb__link");
-  homeLink.target = "_self";
-  homeLink.removeAttribute("rel");
-  const separator = node(document, "span", "parity-page-breadcrumb__separator");
-  separator.append(svgIcon(document, "chevron"));
-  home.append(homeLink, separator);
-  const current = node(document, "li", "parity-page-breadcrumb__item");
-  current.append(node(document, "span", "parity-page-breadcrumb__current", label));
-  list.append(home, current);
-  nav.append(list);
-  root.prepend(nav);
 };
 
 const compactText = (element) => element?.textContent?.replace(/\s+/g, " ").trim() || "";
@@ -916,19 +894,15 @@ const browserProjection = (extension) => {
   const activeTab = root.querySelector(".tabs .tab.active")?.textContent?.trim();
   const aboutResult = { status: "not-applicable", modified: [], source: extension.about.sourceProof };
   const adminResult = { status: "not-applicable", modified: [], source: extension.admin.sourceProof };
-  if (activeTab && aboutHeading?.textContent?.trim() === "Admin") {
-    ensureStyle();
-    appendReferenceBreadcrumb(document, root, "Admin");
-  }
+  const adminProjections = extension.admin?.projectionsEnabled === true;
   for (const [project, bindings] of [
     [projectOperations, window.AV_RETAINED_OPERATIONS],
     [projectCatalog, window.AV_RETAINED_CATALOG],
   ]) {
-    if (!bindings) continue;
+    if (!adminProjections || !bindings) continue;
     const result = project(document, root, bindings);
     if (result.status === "applied") {
       ensureStyle();
-      appendReferenceBreadcrumb(document, root, "Admin");
       adminResult.status = "applied";
       adminResult.modified.push(...result.modified);
       adminResult.source = { ...adminResult.source, ...bindings.sourceProof };
@@ -936,22 +910,19 @@ const browserProjection = (extension) => {
   }
   if (isAbout && !root.querySelector('[data-parity-reference-extension="about-retained"]')) {
     ensureStyle();
-    appendReferenceBreadcrumb(document, root, "About");
     const heroModified = appendAboutHeroProjection(document, root, extension.about.hero);
     appendAboutProjection(document, root, extension.about);
     aboutResult.status = "applied";
     aboutResult.modified = [...heroModified, "retained About cards", "maintainer source content", "open-source projects", "features", "technology", "accessibility", "credits", "FAQ questions"];
   }
-  if (activeTab === "Approvals" && !root.querySelector('[data-parity-reference-extension="admin-approvals"]')) {
+  if (adminProjections && activeTab === "Approvals" && !root.querySelector('[data-parity-reference-extension="admin-approvals"]')) {
     ensureStyle();
-    appendReferenceBreadcrumb(document, root, "Admin");
     appendApprovalsProjection(document, root);
     adminResult.status = "applied";
     adminResult.modified = ["source-backed approvals queue", "canonical empty/action state"];
   }
-  if (activeTab === "Audit" && !root.querySelector('[data-parity-reference-extension="admin-audit"]')) {
+  if (adminProjections && activeTab === "Audit" && !root.querySelector('[data-parity-reference-extension="admin-audit"]')) {
     ensureStyle();
-    appendReferenceBreadcrumb(document, root, "Admin");
     appendAuditProjection(document, root);
     adminResult.status = "applied";
     adminResult.modified = ["source-backed audit table", "audit filters and pagination", "contact submissions panel"];
@@ -966,7 +937,6 @@ const browserProjectionSource = [
   ["node", node],
   ["link", link],
   ["svgIcon", svgIcon],
-  ["appendReferenceBreadcrumb", appendReferenceBreadcrumb],
   ["compactText", compactText],
   ["replaceDirectText", replaceDirectText],
   ["appendAboutHeroProjection", appendAboutHeroProjection],

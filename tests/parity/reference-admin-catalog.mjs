@@ -43,7 +43,7 @@ const readSourceContract = () => {
       "updateUrl: (id: number) => `/api/admin/categories/${id}`",
       "deleteUrl: (id: number) => `/api/admin/categories/${id}`",
     ].every((needle) => sources.categoryConfig.includes(needle))],
-    ["category table headings", ["Icon", "Name", "Slug", "Resources", "Subcategories", "Actions"].every((needle) => sources.categoryConfig.includes(`label: "${needle}"`))],
+    ["category table headings", ["Icon", "Name", "Slug", "Resources", "Subcategories"].every((needle) => sources.categoryConfig.includes(`label: "${needle}"`)) && sources.categoryConfig.includes('key: "actions"')],
     ["generic taxonomy search control", [
       "searchEnabled",
       "Search ${entityNamePlural.toLowerCase()}...",

@@ -29,6 +29,7 @@ import "@/styles/pages/about.css";
 
 interface AboutCatalogData {
   resources?: unknown[];
+  categories?: unknown[];
 }
 
 export default function About() {
@@ -40,6 +41,10 @@ export default function About() {
     staleTime: 1000 * 60 * 60,
   });
   const aboutFaqs = getAboutFaqs(treeData?.resources?.length);
+  const catalogSummary =
+    treeData?.resources?.length && treeData?.categories?.length
+      ? `Awesome.video is a hand-curated index of ${treeData.resources.length.toLocaleString()} resources across ${treeData.categories.length} domains — encoding, transport, players, infrastructure, standards. Maintained as the canonical reference for people who actually ship video in production. `
+      : "";
   const [openFaqs, setOpenFaqs] = useState<Set<number>>(() => new Set());
 
   const toggleFaq = (faqIndex: number) => {
@@ -83,6 +88,7 @@ export default function About() {
         <Card className="about-card about-lead-card">
           <CardContent className="about-lead-content">
             <p className="about-lead-copy">
+              <span>{catalogSummary}</span>
               awesome.video is the web home of{" "}
               <span className="about-strong">awesome-video</span> — a
               community-curated list of the best streaming and video-development
@@ -331,14 +337,14 @@ export default function About() {
                   </div>
                 </div>
                 <div className="about-tech-item">
-                  <div className="about-tech-dot" aria-hidden="true" />
+                  <div className="about-tech-dot about-tech-dot-filled" aria-hidden="true" />
                   <div>
                     <div className="about-tech-name">Tailwind CSS</div>
                     <div className="about-tech-description">Utility-first styling</div>
                   </div>
                 </div>
                 <div className="about-tech-item">
-                  <div className="about-tech-dot about-tech-dot-filled" aria-hidden="true" />
+                  <div className="about-tech-dot" aria-hidden="true" />
                   <div>
                     <div className="about-tech-name">shadcn/ui</div>
                     <div className="about-tech-description">Component primitives</div>
@@ -347,7 +353,7 @@ export default function About() {
               </div>
               <div className="about-tech-column">
                 <div className="about-tech-item">
-                  <div className="about-tech-dot" aria-hidden="true" />
+                  <div className="about-tech-dot about-tech-dot-filled" aria-hidden="true" />
                   <div>
                     <div className="about-tech-name">Fuse.js</div>
                     <div className="about-tech-description">Fuzzy search engine</div>

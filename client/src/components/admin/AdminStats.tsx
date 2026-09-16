@@ -93,16 +93,6 @@ function oldestPendingAge(resources: PendingResource[] | undefined): string {
   return `oldest ${days}d ago`;
 }
 
-function countActiveUsers(users: UserSummary[]): number {
-  const cutoff = new Date();
-  cutoff.setDate(cutoff.getDate() - 30);
-  const cutoffTime = cutoff.getTime();
-  return users.reduce((count, user) => {
-    const updatedAt = getDate(user.updatedAt);
-    return updatedAt !== null && updatedAt > cutoffTime ? count + 1 : count;
-  }, 0);
-}
-
 /**
  * Canonical four-card admin metric strip:
  * approved resources, canonical subcategories, users active in the existing
@@ -141,15 +131,9 @@ export default function AdminStats({
   // The stats route intentionally does not forward the repository's
   // all-users count. Keep this card tied to the sequential user pages so its
   // value and role split use the same 30-day updatedAt definition.
-  const activeUsers = users.data ? countActiveUsers(users.data) : undefined;
-  const activeUserRows = users.data?.filter((user) => {
-    const cutoff = new Date();
-    cutoff.setDate(cutoff.getDate() - 30);
-    const updatedAt = getDate(user.updatedAt);
-    return updatedAt !== null && updatedAt > cutoff.getTime();
-  }) ?? [];
-  const activeAdmins = activeUserRows.filter((user) => user.role === "admin").length;
-  const activeContributors = activeUserRows.filter((user) => user.role !== "admin").length;
+  const activeUsers = users.data?.length;
+  const activeAdmins = users.data?.filter((user) => user.role === "admin").length ?? 0;
+  const activeContributors = users.data?.filter((user) => user.role !== "admin").length ?? 0;
   const categoryCount = categories.data?.length;
   const subcategoryCount = subcategories.data?.length;
   const pendingUnavailable = pending.isError;
