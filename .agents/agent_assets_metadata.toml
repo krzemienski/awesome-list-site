@@ -351,3 +351,17 @@ mtime_ms = 1788641642570
 storage_uri = "gcs://replit-rams-assets-picard/rams/assets/repl:71ccccc7-37f7-4f07-a880-5973ae4aa911/4248deaf-e447-4457-8745-16741a734847/0e3bb82d-6a8a-4e5a-a84d-ed1c22475887"
 storage_version_token = "1788641647108186"
 content_type = "image/jpeg"
+
+[[outputs]]
+id = "MYJtejJlGQvdFnsYLcawI"
+uri = "file://docs/parity/MAIN-SESSION-EXECUTION-PROMPT.md"
+type = "text"
+title = "Main-session execution prompt"
+description = "Comprehensive product-first instructions grounded in the original design archive, with mandatory Replit built-in browser verification and user-controlled publishing."
+logical_id = "f94b2fba-1b8f-4359-b4ab-ddebc519b89c"
+content_hash = "sha256:77d9db98f0bdf8fa389a90126236bfb9fd604cf5c676a63c36e6e8ec9a6895bf"
+size = 31482
+mtime_ms = 1789518849023
+storage_uri = "gcs://replit-rams-assets-picard/rams/assets/repl:71ccccc7-37f7-4f07-a880-5973ae4aa911/f94b2fba-1b8f-4359-b4ab-ddebc519b89c/bf1e3294-9e5b-4bb6-9562-1ddb31641acf"
+storage_version_token = "1789518858007285"
+content_type = "text/markdown"
