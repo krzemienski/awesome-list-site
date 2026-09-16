@@ -237,9 +237,9 @@ export default function UsersTab() {
                       unwrapping to ~2,369px); full value stays in the title. */}
                   <TableCell className="admin-ops-cell-name max-w-[240px]">
                     <div className="flex items-center gap-2 min-w-0">
-                      {/* Run16 BUG-087: nameless accounts no longer duplicate the
-                          (masked) email from the adjacent column — show a muted
-                          em-dash instead. (Replaces the R4-H05 email fallback.) */}
+                      {/* A nameless account is identified by its email (or id),
+                          set in the same ink and weight as a real name — the
+                          frozen AdminUsers name cell has one style for every row. */}
                       {user.firstName || user.lastName ? (
                         <span
                           className="font-medium truncate"
@@ -249,13 +249,13 @@ export default function UsersTab() {
                           {`${user.firstName || ''} ${user.lastName || ''}`.trim()}
                         </span>
                       ) : (
-                        <span className="text-muted-foreground" data-testid={`text-name-${user.id}`}>
+                        <span className="font-medium" data-testid={`text-name-${user.id}`}>
                           {user.email || user.id}
                         </span>
                       )}
                     </div>
                   </TableCell>
-                  <TableCell className="admin-ops-cell-email text-muted-foreground text-sm">
+                  <TableCell className="admin-ops-cell-email text-muted-foreground">
                     {user.email ? (
                       <span className="inline-flex items-center gap-1.5">
                         <span data-testid={`text-email-${user.id}`}>
@@ -282,7 +282,7 @@ export default function UsersTab() {
                   <TableCell className="admin-ops-cell-role">
                     <StatusChip status={user.role ?? "user"} />
                   </TableCell>
-                  <TableCell className="admin-ops-cell-joined text-muted-foreground text-sm">
+                  <TableCell className="admin-ops-cell-joined text-muted-foreground">
                     {formatDate(user.createdAt)}
                   </TableCell>
                   <TableCell className="admin-ops-cell-actions">

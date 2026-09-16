@@ -127,6 +127,10 @@
   color: var(--text);
 }
 
+/* The frozen Users table is an auto-layout `.table`, but its cell content
+   (bare text) differs from the app's controls, so letting the app's content
+   drive the columns measured worse at every width (1440: 2.0% vs 0.47%).
+   Pin the frozen column proportions measured at 1440 instead. */
 .admin-ops-users-table {
   min-width: 52rem;
   table-layout: fixed;
@@ -137,6 +141,24 @@
 .admin-ops-users-table th:nth-child(3) { width: 8.13%; }
 .admin-ops-users-table th:nth-child(4) { width: 11.01%; }
 .admin-ops-users-table th:nth-child(5) { width: 6.91%; }
+
+/* Tablet: the frozen auto layout gives the Email column more room once the
+   names wrap (column boxes measured at 1024: 280/417/84/90/70px of a 941px
+   table; the last column holds the 10px-padded Edit button). */
+@media (min-width: 769px) and (max-width: 1100px) {
+  .admin-ops-users-table th:nth-child(1) { width: 29.75%; }
+  .admin-ops-users-table th:nth-child(2) { width: 44.31%; }
+  .admin-ops-users-table th:nth-child(3) { width: 8.93%; }
+  .admin-ops-users-table th:nth-child(4) { width: 9.56%; }
+  .admin-ops-users-table th:nth-child(5) { width: 7.45%; }
+}
+
+/* Frozen `.table td` inherits the 1.6 body leading; wrapped Email/Joined cells
+   must not keep Tailwind's tighter text-sm line box or every wrapped row runs
+   4-5px short. */
+.admin-ops-users-table tbody td {
+  line-height: var(--body-leading);
+}
 
 .admin-ops-users-shell .admin-ops-table-shell__title,
 .admin-ops-users-shell .admin-ops-table-shell__description {
@@ -151,6 +173,11 @@
   font-size: inherit;
   height: auto !important;
   min-height: 0 !important;
+  /* The frozen header is bare text: no 44px control box centring the label
+     (it shifted NAME/ROLE 4-7px right and inflated the Role column). */
+  min-width: 0 !important;
+  justify-content: flex-start;
+  padding: 0;
 }
 
 .admin-ops-users-table thead th {
@@ -219,9 +246,12 @@
   justify-content: flex-end;
 }
 
-.admin-ops-users-shell [data-ds="chip"].admin-chip {
+/* Frozen `.chip` metrics for the role column (the ops primitive shrinks
+   the chip to 10px/0.5rem padding, which made ADMIN 5px narrower). */
+.admin-ops-users-shell .admin-ops-cell-role .admin-ops-status-chip {
   font-size: 10.5px;
   gap: 6px;
+  letter-spacing: 0.6px;
   line-height: 16.8px;
   padding: 4px 10px;
 }

@@ -29,9 +29,9 @@
   color: var(--accent);
   font-family: var(--font-mono);
   font-size: var(--mono-size-step);
-  font-weight: 600;
+  font-weight: 700;
   letter-spacing: var(--eyebrow-tracking);
-  line-height: 1;
+  line-height: var(--body-leading);
   text-transform: uppercase;
 }
 
@@ -68,13 +68,6 @@
   box-shadow: none;
 }
 
-@media (min-width: 600px) {
-  .submit-form-card {
-    box-sizing: border-box;
-    height: 493px;
-  }
-}
-
 .submit-form-card:hover {
   border-color: var(--border);
 }
@@ -105,6 +98,12 @@
   margin-top: 0 !important;
 }
 
+/* Tailwind v4's space-y-2 sets margin-block-end on every non-last child, which
+   doubled the frozen 8px label/control gap and padded every field by 8px. */
+.submit-field > * {
+  margin-block: 0 !important;
+}
+
 .submit-fields {
   display: contents;
   min-width: 0;
@@ -117,7 +116,8 @@
   color: var(--text-2);
   font-size: 12px;
   font-weight: 500;
-  line-height: 1.25;
+  /* The frozen label inherits the 1.6 body leading (19.2px line box). */
+  line-height: var(--body-leading);
 }
 
 .submit-control {
@@ -131,9 +131,16 @@
   color: var(--text);
   font-family: inherit;
   font-size: 13px;
-  line-height: 1.25;
+  line-height: normal;
   transition: border-color var(--motion-fast) ease,
     background-color var(--motion-fast) ease;
+}
+
+/* The frozen category control is a native `select.select`, whose intrinsic
+   box is 2px taller than the text inputs beside it. */
+.submit-control[role="combobox"] {
+  height: 40px;
+  min-height: 40px;
 }
 
 .submit-control:hover {
@@ -198,11 +205,19 @@
 }
 
 .submit-actions button {
+  /* The frozen actions are the 36px `.btn` row: 13px text at normal leading
+     plus 9px vertical padding, no 44px control floor. */
+  height: 36px;
+  min-height: 36px;
   padding: 9px 16px;
   border-radius: var(--radius-sm);
   font-size: 13px;
   font-weight: 500;
-  line-height: 1.25;
+  line-height: normal;
+}
+
+.submit-actions button[type="submit"] {
+  font-weight: 600;
 }
 
 .submit-cancel-button {
@@ -377,5 +392,14 @@
   .submit-success-content {
     align-items: flex-start;
     flex-direction: column;
+  }
+}
+
+/* mobile-optimizations.css lifts every textarea to 16px against iOS zoom and
+   restores 13px only for the canonical `.textarea`; the frozen description
+   control is 13px at phone widths too. */
+@media (max-width: 767px) {
+  .submit-description-control {
+    font-size: 13px !important;
   }
 }

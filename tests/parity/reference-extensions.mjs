@@ -37,7 +37,21 @@ const sourcePaths = Object.freeze({
   audit: path.join(repoRoot, "client", "src", "components", "admin", "AuditTab.tsx"),
   contact: path.join(repoRoot, "client", "src", "components", "admin", "ContactSubmissions.tsx"),
   canonical: path.join(repoRoot, "client", "src", "components", "admin", "canonical", "TableShell.tsx"),
+  paginator: path.join(repoRoot, "client", "src", "components", "ui", "paginator.tsx"),
 });
+
+/**
+ * Retained taxonomy pagination.  The frozen Category/Subcategory pages list
+ * a whole scope on one page; the release contract keeps 24-per-page listings
+ * with a numbered pager, so the reference adapter binds the first page only
+ * and this projection appends the pager the frozen page never drew, in
+ * frozen vocabulary (`.btn.ghost` / `.btn.primary`, the body 13px caption)
+ * with the approved 44px interactive target.  The page window mirrors the
+ * retained paginator contract (first/last, ±1 around the current page,
+ * jump input past the threshold) so the expected side never shows a control
+ * the application does not offer.
+ */
+const TAXONOMY_PAGER_JUMP_THRESHOLD = 7;
 
 const ABOUT_HEADINGS = Object.freeze([
   "About the maintainer",
@@ -93,6 +107,16 @@ const ABOUT_CREDITS = Object.freeze([
 ]);
 
 const referenceExtensionStyle = `
+.parity-taxonomy-pager{display:flex;flex-direction:column;align-items:center;gap:12px;margin-top:24px}
+.parity-taxonomy-pager__row{display:flex;flex-wrap:wrap;align-items:center;justify-content:center;gap:8px}
+.parity-taxonomy-pager .btn{box-sizing:border-box;min-height:44px;min-width:44px;padding:9px 16px;line-height:normal;text-decoration:none}
+.parity-taxonomy-pager .btn svg{width:16px;height:16px;flex:0 0 auto}
+.parity-taxonomy-pager .btn.parity-taxonomy-pager__page{padding-inline:12px;font-variant-numeric:tabular-nums}
+.parity-taxonomy-pager .btn[aria-disabled="true"]{opacity:.5;pointer-events:none}
+.parity-taxonomy-pager__gap{padding-inline:4px;color:var(--text-3);font-size:13px;user-select:none}
+.parity-taxonomy-pager__caption{display:flex;flex-wrap:wrap;align-items:center;justify-content:center;gap:8px;color:var(--text-2);font-size:13px;line-height:normal;font-variant-numeric:tabular-nums}
+.parity-taxonomy-pager__jump{display:flex;align-items:center;gap:6px}
+.parity-taxonomy-pager__jump input{box-sizing:border-box;width:64px;height:32px;padding:0 8px;border:var(--border-w) solid var(--border);border-radius:var(--radius-sm);background:var(--surface);color:var(--text);font:inherit;font-size:13px;text-align:center;font-variant-numeric:tabular-nums}
 .parity-about-retained{display:grid;gap:14px;margin-top:14px}
 .parity-about-card{overflow:hidden;padding:0}
 .parity-about-card__header{padding:1.5rem 1.5rem 0}
@@ -104,7 +128,8 @@ const referenceExtensionStyle = `
 .parity-about-copy{display:grid;gap:1rem}
 .parity-about-copy p{max-width:65ch;margin:0;color:var(--text-2);font-size:.875rem;line-height:1.65}
 .parity-about-copy a,.parity-about-source a{color:var(--accent);text-decoration:none}
-.parity-about-copy a svg{width:.875rem;height:.875rem;margin-left:.25rem;vertical-align:-.15rem}
+.parity-about-copy>a{display:flex;align-items:center;gap:8px;min-height:24px;font-size:14px;font-weight:500;line-height:1.6}
+.parity-about-copy a svg{width:.875rem;height:.875rem;flex:0 0 auto;vertical-align:-.15rem}
 .parity-about-copy a:hover,.parity-about-source a:hover{text-decoration:underline;text-underline-offset:3px}
 .parity-about-source-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:1rem}
 .parity-about-source{display:flex;flex-direction:column;gap:.75rem;padding:1.25rem;color:inherit;text-decoration:none}
@@ -276,6 +301,15 @@ export function buildExpectedReferenceExtensions() {
       'BreadcrumbSeparator',
     ].every((value) => sources.pageBreadcrumb.includes(value))],
     ["About canonical Card primitives", ["Card", "CardHeader", "CardContent"].every((name) => sources.aboutPage.includes(name))],
+    ["Retained paginator source contract", [
+      `const JUMP_INPUT_THRESHOLD = ${TAXONOMY_PAGER_JUMP_THRESHOLD};`,
+      "Page {currentPage} of {totalPages}",
+      "Previous",
+      "Next",
+      'aria-label="Pagination"',
+      "Go to page",
+      "/ {totalPages}",
+    ].every((value) => sources.paginator.includes(value))],
   ];
   const missing = required.filter(([, present]) => !present).map(([label]) => label);
   if (missing.length) {
@@ -290,7 +324,7 @@ export function buildExpectedReferenceExtensions() {
     { file: path.relative(repoRoot, sourcePaths[key]).split(path.sep).join("/"), sha256: sha256(source) },
   ]));
   return {
-    version: 2,
+    version: 3,
     style: referenceExtensionStyle + operationsStyle + catalogStyle,
     about: {
       headings: ABOUT_HEADINGS,
@@ -327,6 +361,10 @@ export function buildExpectedReferenceExtensions() {
         pageBreadcrumb: sourceProof.pageBreadcrumb,
         hero: sourceProof.aboutPage,
       },
+    },
+    taxonomy: {
+      pager: { jumpThreshold: TAXONOMY_PAGER_JUMP_THRESHOLD },
+      sourceProof: { paginator: sourceProof.paginator },
     },
     admin: {
       retainedTabs: ADMIN_PROJECTIONS_ENABLED ? ["approvals", "audit"] : [],
@@ -374,6 +412,7 @@ const svgIcon = (document, name, className = "") => {
   if (className) svg.setAttribute("class", className);
   const paths = {
     chevron: [["path", { d: "m9 18 6-6-6-6" }]],
+    chevronLeft: [["path", { d: "m15 18-6-6 6-6" }]],
     refresh: [
       ["path", { d: "M20 11a8.1 8.1 0 0 0-15.5-2M4 5v4h4" }],
       ["path", { d: "M4 13a8.1 8.1 0 0 0 15.5 2M20 19v-4h-4" }],
@@ -464,8 +503,13 @@ const appendAboutHeroProjection = (document, root, hero) => {
    * styles, and card geometry stay frozen and independent of the app.
    */
   const candidates = [...root.querySelectorAll("p,div,span,h3,h4")];
+  // Innermost match only: the frozen opening card wraps its paragraph, and
+  // both share one textContent, so a shortest-text sort alone would land on
+  // the card and leave the frozen paragraph beside the retained copy.
+  const leadPattern = /hand-curated|1,816|across 9/i;
   const lead = candidates
-    .filter((element) => /hand-curated|1,816|across 9/i.test(compactText(element)))
+    .filter((element) => leadPattern.test(compactText(element))
+      && ![...element.children].some((child) => leadPattern.test(compactText(child))))
     .sort((a, b) => compactText(a).length - compactText(b).length)[0];
   const legacyTitles = ["No link farms", "Open source", "Versioned", "Built for ops"];
   const targets = legacyTitles.map((legacyTitle) => {
@@ -478,7 +522,10 @@ const appendAboutHeroProjection = (document, root, hero) => {
   if (!lead || targets.some(({ title, copy }) => !(title instanceof HTMLElement) || !(copy instanceof HTMLElement))) {
     return [];
   }
-  replaceDirectText(lead, hero.leadCopy);
+  // The retained copy follows the frozen (adapter-bound) opening sentence in
+  // the same paragraph: the app renders the bound summary first, then the
+  // About source's own sentence.
+  replaceDirectText(lead, `${compactText(lead)} ${hero.leadCopy}`.replace(/\s+/g, " ").trim());
   targets.forEach(({ title, copy }, index) => {
     replaceDirectText(title, hero.callouts[index].title);
     replaceDirectText(copy, hero.callouts[index].copy);
@@ -635,6 +682,93 @@ const appendAboutProjection = (document, root, about) => {
   retained.append(faq.card);
 
   root.append(retained);
+};
+
+/* Windowed page list mirroring the retained paginator: first/last, ±1 around
+   the current page, a single hidden page rendered instead of an ellipsis. */
+const taxonomyPageWindow = (current, total, threshold) => {
+  if (total <= threshold) return Array.from({ length: total }, (_, index) => index + 1);
+  const pages = [...new Set([1, total, current - 1, current, current + 1])]
+    .filter((page) => page >= 1 && page <= total)
+    .sort((a, b) => a - b);
+  const out = [];
+  let previous = 0;
+  for (const page of pages) {
+    if (previous) {
+      if (page - previous === 2) out.push(previous + 1);
+      else if (page - previous > 2) out.push("ellipsis");
+    }
+    out.push(page);
+    previous = page;
+  }
+  return out;
+};
+
+const appendTaxonomyPagerProjection = (document, root, taxonomy) => {
+  const scopes = Array.isArray(window.AV_TAXONOMY_PAGE_SCOPES) ? window.AV_TAXONOMY_PAGE_SCOPES : [];
+  const heading = compactText(root.querySelector("h1")).toLowerCase();
+  if (!heading || scopes.length === 0) return [];
+  const scopeName = (scope) => {
+    if (scope.level === "category") return (window.AV_CATEGORIES || []).find((item) => item.id === scope.slug)?.name;
+    return ((window.AV_SUBCATEGORIES || {})[scope.categorySlug] || []).find((item) => item.id === scope.slug)?.name;
+  };
+  const scope = scopes.find((item) => String(scopeName(item) || "").toLowerCase() === heading);
+  if (!scope || !(scope.pageSize > 0)) return [];
+  const totalPages = Math.ceil(scope.total / scope.pageSize);
+  if (totalPages <= 1) return [];
+  // The bound listing is the first page of the scope: the frozen grid it
+  // filled is the last 320px auto-fill grid on the page.
+  const grid = [...root.querySelectorAll("section > div")]
+    .filter((element) => /320px/.test(element.style.gridTemplateColumns || ""))
+    .pop();
+  if (!(grid instanceof HTMLElement)) return [];
+  const currentPage = 1;
+  const threshold = taxonomy?.pager?.jumpThreshold ?? 7;
+  const nav = node(document, "nav", "parity-taxonomy-pager");
+  nav.setAttribute("aria-label", "Pagination");
+  nav.dataset.parityReferenceExtension = "taxonomy-pager";
+  const row = node(document, "div", "parity-taxonomy-pager__row");
+  const previous = node(document, "span", "btn ghost");
+  previous.setAttribute("aria-disabled", "true");
+  previous.append(svgIcon(document, "chevronLeft"), text(document, "Previous"));
+  row.append(previous);
+  taxonomyPageWindow(currentPage, totalPages, threshold).forEach((item) => {
+    if (item === "ellipsis") {
+      const gap = node(document, "span", "parity-taxonomy-pager__gap", "…");
+      gap.setAttribute("aria-hidden", "true");
+      row.append(gap);
+      return;
+    }
+    const current = item === currentPage;
+    const page = node(document, "a", `btn ${current ? "primary" : "ghost"} parity-taxonomy-pager__page`, String(item));
+    page.href = `#page-${item}`;
+    page.setAttribute("aria-label", current ? `Page ${item}, current page` : `Go to page ${item}`);
+    if (current) page.setAttribute("aria-current", "page");
+    row.append(page);
+  });
+  const next = node(document, "a", "btn ghost");
+  next.href = "#page-2";
+  next.rel = "next";
+  next.append(text(document, "Next"), svgIcon(document, "chevron"));
+  row.append(next);
+  nav.append(row);
+  const caption = node(document, "div", "parity-taxonomy-pager__caption");
+  caption.append(node(document, "span", "", `Page ${currentPage} of ${totalPages}`));
+  if (totalPages > threshold) {
+    const jump = node(document, "span", "parity-taxonomy-pager__jump");
+    const input = document.createElement("input");
+    input.type = "text";
+    input.inputMode = "numeric";
+    input.value = String(currentPage);
+    input.setAttribute("aria-label", `Page number, 1 to ${totalPages}`);
+    const suffix = node(document, "span", "", `/ ${totalPages}`);
+    suffix.setAttribute("aria-hidden", "true");
+    jump.append(input, suffix);
+    caption.append(jump);
+  }
+  nav.append(caption);
+  grid.after(nav);
+  return [`retained taxonomy pager (${scope.level}, ${totalPages} pages)`];
 };
 
 const appendButton = (document, label, variant = "ghost") => node(document, "button", `btn ${variant}`, label);
@@ -881,7 +1015,7 @@ const appendAuditProjection = (document, root) => {
  */
 const browserProjection = (extension) => {
   const root = document.querySelector("main .page-content");
-  if (!(root instanceof HTMLElement)) return { about: { status: "not-applicable" }, admin: { status: "not-applicable" } };
+  if (!(root instanceof HTMLElement)) return { about: { status: "not-applicable" }, admin: { status: "not-applicable" }, taxonomy: { status: "not-applicable" } };
   const ensureStyle = () => {
     if (document.querySelector("style[data-parity-reference-extensions]")) return;
     const style = document.createElement("style");
@@ -894,6 +1028,7 @@ const browserProjection = (extension) => {
   const activeTab = root.querySelector(".tabs .tab.active")?.textContent?.trim();
   const aboutResult = { status: "not-applicable", modified: [], source: extension.about.sourceProof };
   const adminResult = { status: "not-applicable", modified: [], source: extension.admin.sourceProof };
+  const taxonomyResult = { status: "not-applicable", modified: [], source: extension.taxonomy?.sourceProof };
   const adminProjections = extension.admin?.projectionsEnabled === true;
   for (const [project, bindings] of [
     [projectOperations, window.AV_RETAINED_OPERATIONS],
@@ -927,7 +1062,15 @@ const browserProjection = (extension) => {
     adminResult.status = "applied";
     adminResult.modified = ["source-backed audit table", "audit filters and pagination", "contact submissions panel"];
   }
-  return { about: aboutResult, admin: adminResult };
+  if (extension.taxonomy && !root.querySelector('[data-parity-reference-extension="taxonomy-pager"]')) {
+    const pagerModified = appendTaxonomyPagerProjection(document, root, extension.taxonomy);
+    if (pagerModified.length) {
+      ensureStyle();
+      taxonomyResult.status = "applied";
+      taxonomyResult.modified = pagerModified;
+    }
+  }
+  return { about: aboutResult, admin: adminResult, taxonomy: taxonomyResult };
 };
 
 const browserProjectionSource = [
@@ -943,6 +1086,8 @@ const browserProjectionSource = [
   ["aboutHeader", aboutHeader],
   ["aboutCard", aboutCard],
   ["appendAboutProjection", appendAboutProjection],
+  ["taxonomyPageWindow", taxonomyPageWindow],
+  ["appendTaxonomyPagerProjection", appendTaxonomyPagerProjection],
   ["appendButton", appendButton],
   ["formatDate", formatDate],
   ["auditStatus", auditStatus],
@@ -963,9 +1108,10 @@ export async function applyExpectedRetainedReferenceExtensions(page, extension) 
     return new Function("extension", `${source}\nreturn browserProjection(extension);`)(extension);
   }, { extension, source: browserProjectionSource });
   return {
-    status: result.about.status === "applied" || result.admin.status === "applied" ? "applied" : "not-applicable",
+    status: [result.about, result.admin, result.taxonomy].some((item) => item?.status === "applied") ? "applied" : "not-applicable",
     about: result.about,
     admin: result.admin,
+    taxonomy: result.taxonomy,
     version: extension.version,
   };
 }

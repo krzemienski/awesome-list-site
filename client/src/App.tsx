@@ -9,7 +9,7 @@ import {
   type ComponentType,
   type ReactNode,
 } from "react";
-import { Switch, Route, Redirect, useLocation } from "wouter";
+import { Switch, Route, Redirect, useLocation, useSearch } from "wouter";
 import { ClerkProvider, SignIn, SignUp, useClerk } from "@clerk/react";
 import { AccountThemePreferenceBridge } from "@/components/ui/theme-provider";
 import { publishableKeyFromHost } from "@clerk/react/internal";
@@ -442,14 +442,19 @@ function ClerkQueryClientCacheInvalidator() {
   useEffect(() => {
     const unsubscribe = addListener(({ user }) => {
       const userId = user?.id ?? null;
-      if (
-        // The first callback may already contain a restored/new Clerk user.
-        // Clear the anonymous SSR/query cache in that case too; otherwise its
-        // public values can survive the first authenticated observation.
-        (prevUserIdRef.current === undefined && userId !== null) ||
-        (prevUserIdRef.current !== undefined &&
-          prevUserIdRef.current !== userId)
-      ) {
+      if (prevUserIdRef.current === undefined) {
+        // The first callback may already contain a restored Clerk user. The
+        // anonymous SSR/query cache must not outlive that first authenticated
+        // observation, but it holds no other identity's data (the session
+        // cookie was already sent with every client fetch), so refetch it in
+        // place rather than clearing it: `clear()` here also dropped
+        // /api/auth/user and every guard flashed "Verifying access…", which
+        // remounted the whole signed-in page tree 50–400 ms after load and
+        // lost its scroll positions and any early input.
+        if (userId !== null) void qc.invalidateQueries();
+      } else if (prevUserIdRef.current !== userId) {
+        // A real identity switch (sign-in, sign-out, account change): nothing
+        // user-scoped may survive it.
         qc.clear();
       }
       prevUserIdRef.current = userId;
@@ -538,6 +543,13 @@ function Router({ homeComponent: Home }: { homeComponent: HomeRouteComponent }) 
     logoutError,
   } = useAuth();
   const [location] = useLocation();
+  // Legacy `/?q=` and `/resource?q=` searches redirect to /search. Read the
+  // query through the router (not window.location at mount) so the routes
+  // below can be plain children: an inline `component={() => …}` is a new
+  // component type on every Router render, which remounted the whole page
+  // (guards included) whenever auth/nav state changed.
+  const search = useSearch();
+  const legacyHomeQuery = new URLSearchParams(search).get("q")?.trim() || "";
   const productProfile = resolveProductProfile(location);
   useLayoutEffect(() => {
     applyProductProfile(productProfile);
@@ -666,35 +678,32 @@ function Router({ homeComponent: Home }: { homeComponent: HomeRouteComponent }) 
       <RouteErrorBoundary location={location}>
       <Suspense fallback={<RouteFallback />}>
       <Switch>
-        <Route path="/" component={() => {
-          const q = new URLSearchParams(
-            typeof window === "undefined" ? "" : window.location.search,
-          ).get("q");
-          if (q && q.trim()) return <Redirect to={`/search?q=${encodeURIComponent(q.trim())}`} replace />;
-          return <Home nav={nav} navLoading={navLoading} />;
-        }} />
+        <Route path="/">
+          {legacyHomeQuery ? (
+            <Redirect to={`/search?q=${encodeURIComponent(legacyHomeQuery)}`} replace />
+          ) : (
+            <Home nav={nav} navLoading={navLoading} />
+          )}
+        </Route>
         {/* REQUIRED — the /*? optional wildcard is the only wouter syntax that
             matches both the bare URL and Clerk's OAuth/verification sub-paths. */}
         <Route path="/sign-in/*?" component={SignInPage} />
         <Route path="/sign-up/*?" component={SignUpPage} />
         <Route path="/logout" component={Logout} />
         {/* Legacy auth URLs (pre-Clerk) — preserve validated ?next= returns. */}
-        <Route path="/login" component={() => <LegacyAuthRedirect to="/sign-in" />} />
-        <Route path="/register" component={() => <LegacyAuthRedirect to="/sign-up" />} />
-        <Route path="/forgot-password" component={() => <LegacyAuthRedirect to="/sign-in" />} />
-        <Route path="/reset-password" component={() => <LegacyAuthRedirect to="/sign-in" />} />
-        <Route path="/auth/login" component={() => <LegacyAuthRedirect to="/sign-in" />} />
-        <Route path="/auth/register" component={() => <LegacyAuthRedirect to="/sign-up" />} />
-        <Route path="/signup" component={() => <LegacyAuthRedirect to="/sign-up" />} />
+        <Route path="/login"><LegacyAuthRedirect to="/sign-in" /></Route>
+        <Route path="/register"><LegacyAuthRedirect to="/sign-up" /></Route>
+        <Route path="/forgot-password"><LegacyAuthRedirect to="/sign-in" /></Route>
+        <Route path="/reset-password"><LegacyAuthRedirect to="/sign-in" /></Route>
+        <Route path="/auth/login"><LegacyAuthRedirect to="/sign-in" /></Route>
+        <Route path="/auth/register"><LegacyAuthRedirect to="/sign-up" /></Route>
+        <Route path="/signup"><LegacyAuthRedirect to="/sign-up" /></Route>
         <Route path="/explore">
           <Redirect to="/search" replace />
         </Route>
-        <Route path="/resource" component={() => {
-          const q = new URLSearchParams(
-            typeof window === "undefined" ? "" : window.location.search,
-          ).get("q");
-          return <Redirect to={q && q.trim() ? `/search?q=${encodeURIComponent(q.trim())}` : "/search"} replace />;
-        }} />
+        <Route path="/resource">
+          <Redirect to={legacyHomeQuery ? `/search?q=${encodeURIComponent(legacyHomeQuery)}` : "/search"} replace />
+        </Route>
         <Route path="/category/:slug/:subSlug">
           {(params) => <Redirect to={`/subcategory/${params.subSlug}`} replace />}
         </Route>
@@ -703,14 +712,14 @@ function Router({ homeComponent: Home }: { homeComponent: HomeRouteComponent }) 
           <Redirect to="/categories" replace />
         </Route>
         <Route path="/tag/:slug" component={TagLanding} />
-        <Route path="/categories" component={() => (
+        <Route path="/categories">
           <Categories
             nav={nav}
             isLoading={navLoading}
             error={navError}
             onRetry={() => refetchNav()}
           />
-        )} />
+        </Route>
         <Route path="/category">
           <Redirect to="/" replace />
         </Route>
@@ -737,14 +746,14 @@ function Router({ homeComponent: Home }: { homeComponent: HomeRouteComponent }) 
         <Route path="/collection/:shareId">
           {(params) => <PublicCollection shareId={params.shareId} />}
         </Route>
-        <Route path="/profile" component={() => (<AuthGuard><Profile user={user} /></AuthGuard>)} />
-        <Route path="/contributions" component={() => (<AuthGuard><Contributions /></AuthGuard>)} />
+        <Route path="/profile"><AuthGuard><Profile user={user} /></AuthGuard></Route>
+        <Route path="/contributions"><AuthGuard><Contributions /></AuthGuard></Route>
         <Route path="/bookmarks" component={BookmarksGate} />
-        <Route path="/notifications" component={() => (
+        <Route path="/notifications">
           <AuthGuard>
             <Notifications />
           </AuthGuard>
-        )} />
+        </Route>
         {/* Run17 BUG-055: favorites and bookmarks are different collections —
             this used to land on /bookmarks. */}
         <Route path="/favorites">
@@ -753,30 +762,30 @@ function Router({ homeComponent: Home }: { homeComponent: HomeRouteComponent }) 
         <Route path="/account">
           <Redirect to="/profile" replace />
         </Route>
-        <Route path="/admin" component={() => (
+        <Route path="/admin">
           <AdminGuard>
             <Suspense fallback={<RouteFallback />}>
               <AdminDashboard />
             </Suspense>
           </AdminGuard>
-        )} />
+        </Route>
         {/* R3-02: admin section deep-links (/admin/users, /admin/resources, …)
             open the matching tab — AdminDashboard reads :section via useRoute. */}
-        <Route path="/admin/:section" component={() => (
+        <Route path="/admin/:section">
           <AdminGuard>
             <Suspense fallback={<RouteFallback />}>
               <AdminDashboard />
             </Suspense>
           </AdminGuard>
-        )} />
+        </Route>
         <Route path="/settings/theme" component={ThemeSettings} />
         <Route path="/design-system" component={DesignSystemShowcase} />
         <Route path="/settings" component={Settings} />
-        <Route path="/onboarding" component={() => (
+        <Route path="/onboarding">
           <AuthGuard>
             <Onboarding />
           </AuthGuard>
-        )} />
+        </Route>
         <Route>
           <NotFound />
         </Route>

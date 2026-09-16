@@ -24,6 +24,7 @@ import { Separator } from "@/components/ui/separator";
 import { formatAdminDateTime, formatRelativeAgo } from "@/lib/utils";
 import { 
   Sparkles, 
+  Zap,
   Play, 
   XCircle, 
   RefreshCw, 
@@ -413,7 +414,8 @@ export default function BatchEnrichmentPanel() {
               disabled={!activeJobStateKnown || hasActiveJob || startMutation.isPending || batchSizeInvalid}
               data-testid="button-start-enrichment-canonical"
             >
-              <Sparkles className="h-3 w-3" aria-hidden="true" />
+              {/* The frozen Run job action carries the bolt glyph. */}
+              <Zap className="h-3 w-3" aria-hidden="true" />
               Run job
             </Button>
           }

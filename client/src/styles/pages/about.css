@@ -40,7 +40,7 @@
   color: var(--accent);
   font-family: var(--font-mono);
   font-size: var(--mono-size-step);
-  font-weight: 600;
+  font-weight: 700;
   letter-spacing: var(--eyebrow-tracking);
   line-height: var(--body-leading);
   text-transform: uppercase;
@@ -95,13 +95,10 @@
   line-height: 1.7;
 }
 
-.about-lead-copy > span:first-child::after {
-  content: "";
-  display: block;
-}
-
+/* One continuous paragraph, as the frozen opening card sets it: the two
+   sentences share the paragraph and the project name keeps body weight. */
 .about-strong {
-  font-weight: 600;
+  font-weight: inherit;
 }
 
 .about-callout-grid {
@@ -526,7 +523,7 @@
   display: none;
 }
 
-@media (max-width: 900px) {
+@media (max-width: 896px) {
   .about-feature-grid {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
@@ -537,8 +534,10 @@
 }
 
 @media (max-width: 640px) {
+  /* The frozen retained card only narrows the inline padding at phone widths;
+     its 24px top padding stays. */
   .about-card-header {
-    padding: 20px 20px 0;
+    padding: 24px 20px 0;
   }
 
   .about-card-content {
@@ -558,7 +557,7 @@
 
 }
 
-@media (max-width: 420px) {
+@media (max-width: 416px) {
   .about-feature-grid,
   .about-accessibility-grid {
     grid-template-columns: 1fr;

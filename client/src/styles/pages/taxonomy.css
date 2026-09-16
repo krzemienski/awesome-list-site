@@ -25,6 +25,13 @@
   line-height: normal;
 }
 
+/* The frozen back button draws its arrow at 12px; the button's svg sizing
+   utility would otherwise grow it to 16px and the label row by 4px. */
+.taxonomy-back svg {
+  width: 12px;
+  height: 12px;
+}
+
 .taxonomy-back:hover {
   border-color: var(--text-3);
   background: var(--surface);
@@ -38,8 +45,11 @@
   font-size: 14px;
 }
 
+/* The frozen Category/Subcategory h1 carries no display class: it renders in
+   the body face with its own weight/tracking/leading (pages.jsx). */
 .taxonomy-page .taxonomy-title {
   margin: 0 0 16px;
+  font-family: var(--font-body);
   font-size: clamp(36px, 5vw, 56px);
   font-weight: 700;
   line-height: 1.05;
@@ -73,6 +83,13 @@
   margin-top: 18px;
   color: var(--text-2);
   font-size: 13px;
+}
+
+/* The frozen Subcategory page sets its chip row directly under the h1 (mb 12);
+   only the Category page adds the 18px gap after the description. */
+.taxonomy-page--subcategory .taxonomy-summary,
+.taxonomy-page--sub-subcategory .taxonomy-summary {
+  margin-top: 0;
 }
 
 .taxonomy-breadcrumbs {
@@ -138,10 +155,25 @@
   overflow-wrap: anywhere;
 }
 
+/* The frozen child count is a regular-weight mono chip; the surrounding link's
+   500 weight must not leak into it. */
+.taxonomy-child > .chip.mono {
+  font-weight: 400;
+}
+
+/* Frozen listing grid: minmax(320px, 1fr). At 375 the 320px track overhangs
+   the 40px content padding (x 40→360) exactly as the reference renders; only
+   below 360px, where a 320px track would leave the viewport, does it yield. */
 .taxonomy-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(min(320px, 100%), 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
   gap: 16px;
+}
+
+@media (max-width: 359px) {
+  .taxonomy-grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
 }
 
 .taxonomy-production-controls {
@@ -190,6 +222,12 @@
 
 .taxonomy-page .resource-card--taxonomy .resource-card__top {
   margin-bottom: 14px !important;
+}
+
+/* shadcn's space-y on the card header adds margin-block-end to the title row;
+   the frozen ResCard has none between the h3 (mb 8) and the copy. */
+.taxonomy-page .resource-card--taxonomy .resource-card__title-row {
+  margin-block-end: 0;
 }
 
 .taxonomy-page .resource-card--taxonomy .resource-card__title {
@@ -247,6 +285,19 @@
   pointer-events: auto;
 }
 
+/* Frozen ResCard tags are canonical `.chip.mono`: 10.5px mono, 0.6px tracking,
+   4px 10px padding, body leading, regular weight. */
+.taxonomy-page .resource-card--taxonomy .resource-card__tag {
+  gap: 6px;
+  padding: 4px 10px;
+  border-width: var(--hairline-w);
+  border-radius: var(--radius-pill);
+  font-size: 10.5px;
+  font-weight: 400;
+  line-height: 1.6;
+  letter-spacing: 0.6px;
+}
+
 .taxonomy-loading-header {
   min-height: 260px;
 }
@@ -264,7 +315,85 @@
   outline-offset: 4px;
 }
 /* Page navigation for collections longer than one page (the frozen catalogue
-   pages predate pagination; this row is intentionally visible). */
+   pages predate pagination; this row is intentionally visible). Its controls
+   take canonical `.btn.ghost` / `.btn.primary` geometry at the approved 44px
+   interactive target, and the caption is the 13px body row the frozen
+   Subcategory page uses for "in {category}". */
 .taxonomy-pagination {
   margin-top: 24px;
+}
+
+.taxonomy-pagination [data-testid="pagination-controls"] {
+  gap: 12px;
+  padding-top: 0;
+}
+
+.taxonomy-pagination [data-testid="pagination-controls"] > div:first-child {
+  gap: 8px;
+}
+
+.taxonomy-pagination [data-testid="pagination-controls"] > div:first-child > a,
+.taxonomy-pagination [data-testid="pagination-controls"] > div:first-child > span[aria-disabled] {
+  box-sizing: border-box;
+  height: auto;
+  min-height: 44px;
+  min-width: 44px;
+  gap: 8px;
+  padding: 9px 16px;
+  border: var(--border-w) solid var(--border);
+  border-radius: var(--radius-sm);
+  background: transparent;
+  color: var(--text);
+  font-size: 13px;
+  font-weight: 500;
+  line-height: normal;
+  box-shadow: none;
+}
+
+.taxonomy-pagination [data-testid="pagination-controls"] > div:first-child > a svg,
+.taxonomy-pagination [data-testid="pagination-controls"] > div:first-child > span[aria-disabled] svg {
+  width: 16px;
+  height: 16px;
+  flex: 0 0 auto;
+}
+
+.taxonomy-pagination [data-testid="pagination-controls"] > div:first-child > a[aria-label] {
+  padding-inline: 12px;
+}
+
+.taxonomy-pagination [data-testid="pagination-controls"] > div:first-child > a[aria-current="page"] {
+  border-color: var(--accent);
+  background: var(--accent);
+  color: #0a0a0a; /* DS-OK: on-accent ink, canonical .btn.primary */
+  font-weight: 600;
+}
+
+.taxonomy-pagination [data-testid="pagination-controls"] > div:first-child > span[aria-hidden] {
+  padding-inline: 4px;
+  color: var(--text-3);
+  font-size: 13px;
+}
+
+.taxonomy-pagination [data-testid="pagination-controls"] > div:last-of-type {
+  gap: 8px;
+  color: var(--text-2);
+  font-size: 13px;
+  line-height: normal;
+}
+
+.taxonomy-pagination [data-testid="pagination-controls"] > div:last-of-type > span:last-child {
+  gap: 6px;
+}
+
+.taxonomy-pagination [data-testid="input-page-jump"] {
+  box-sizing: border-box;
+  width: 64px;
+  height: 32px;
+  min-height: 0;
+  padding: 0 8px;
+  border: var(--border-w) solid var(--border);
+  border-radius: var(--radius-sm);
+  background: var(--surface);
+  color: var(--text);
+  font-size: 13px;
 }

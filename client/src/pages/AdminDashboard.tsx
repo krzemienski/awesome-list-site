@@ -121,6 +121,39 @@ export default function AdminDashboard() {
     };
   }, []);
 
+  // The single-row strip overflows below ~1100px. Reveal the active trigger
+  // in its own scroller (never the window) so a deep link such as
+  // /admin#github shows which tab is open instead of the strip's first tabs;
+  // a trigger that is already fully visible stays put. The strip can still be
+  // wrapping (its page stylesheet not yet applied) when the tab first renders,
+  // so re-run once the list resizes into its single row and when fonts settle.
+  useEffect(() => {
+    const scroller = document.querySelector<HTMLElement>(".admin-dashboard__tabs");
+    if (!scroller) return;
+    const reveal = () => {
+      const trigger = scroller.querySelector<HTMLElement>(`[data-testid="tab-${visibleTab}"]`);
+      if (!trigger || scroller.scrollWidth <= scroller.clientWidth) return;
+      const triggerRect = trigger.getBoundingClientRect();
+      const scrollerRect = scroller.getBoundingClientRect();
+      // Nearest-edge alignment (what the browser's own scroll-into-view does),
+      // with a 1px tolerance so a sub-pixel overhang never nudges the strip.
+      const overflowRight = triggerRect.right - scrollerRect.right;
+      const overflowLeft = scrollerRect.left - triggerRect.left;
+      if (overflowRight <= 1 && overflowLeft <= 1) return;
+      const delta = overflowRight > 1 ? overflowRight : -overflowLeft;
+      scroller.scrollLeft = Math.max(0, Math.min(scroller.scrollLeft + delta, scroller.scrollWidth - scroller.clientWidth));
+    };
+    reveal();
+    const observer = new ResizeObserver(reveal);
+    observer.observe(scroller);
+    let cancelled = false;
+    document.fonts?.ready.then(() => { if (!cancelled) reveal(); });
+    return () => {
+      cancelled = true;
+      observer.disconnect();
+    };
+  }, [visibleTab]);
+
   const handleNewEntry = () => {
     const url = new URL(window.location.href);
     url.searchParams.set("create", "1");

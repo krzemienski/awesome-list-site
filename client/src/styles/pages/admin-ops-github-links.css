@@ -34,6 +34,18 @@
   z-index: 2;
 }
 
+/* 16px offset + 32px control = the 48px page tail the canonical panel already
+   ends with, so the disclosure never lengthens the document (the 36px `.btn`
+   box pushed the GitHub page 9px past the frozen height). */
+.ops-github-panel > .admin-ops-more > summary,
+.ops-link-health > .admin-ops-more > summary {
+  height: 32px;
+  min-height: 0;
+  padding: 5px 12px;
+  font-size: 12px;
+  line-height: normal;
+}
+
 .ops-github-panel__repository-card,
 .ops-github-panel__status-card,
 .ops-link-health__summary-card,
@@ -69,6 +81,9 @@
 .ops-github-panel__repository-name {
   font-size: 0.875rem;
   font-weight: 600;
+  /* The frozen repository name is a plain h3 inheriting the 1.6 body leading;
+     CardTitle's leading-none shaved 8px off the row and pulled the table up. */
+  line-height: 1.6;
 }
 
 .ops-github-panel__repository-meta {
@@ -228,7 +243,6 @@
   letter-spacing: 1.4px;
   line-height: 16px;
   margin-bottom: 10px;
-  text-transform: uppercase;
 }
 
 .ops-link-health__stat-card > :last-child {
@@ -292,8 +306,7 @@
 }
 
 .ops-link-health__flagged-card {
-  /* DS-OK: canonical warning status border, independent of accent. */
-  border-color: color-mix(in srgb, #ffb84d 25%, var(--border));
+  border-color: var(--border);
 }
 
 .ops-link-health__flagged-card .ops-link-health__flagged-table-wrap {

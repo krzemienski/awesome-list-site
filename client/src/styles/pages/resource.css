@@ -11,6 +11,20 @@
 
 .resource-detail-navigation { margin-bottom: 28px; }
 
+/* The frozen back control is the 36px `.btn.ghost` with a 12px arrow — the
+   same geometry the taxonomy pages' back button already takes. */
+.resource-detail-navigation button {
+  height: 36px;
+  min-height: 36px;
+  gap: 8px;
+  line-height: normal;
+}
+
+.resource-detail-navigation button svg {
+  width: 12px;
+  height: 12px;
+}
+
 .resource-detail-heading h1 {
   margin-block: 18px;
   font-family: var(--font-body);
@@ -149,14 +163,20 @@
   font-size: 11px;
 }
 
+/* The frozen card sets the URL as an inline run inside a body-sized block, so
+   its line box is the body line (1rem × body leading), not the 13px mono line. */
 .resource-detail-sections [data-testid="link-url"] {
   display: block;
   min-height: 0;
   font-family: var(--font-mono);
   font-size: 13px;
+  line-height: calc(1rem * var(--body-leading));
   color: var(--accent);
   overflow-wrap: anywhere;
 }
+
+.resource-detail-sections [data-seo-section="resource-tags"] h2 { margin-bottom: 12px; }
+.resource-detail-sections [data-seo-section="resource-tags"] > div { display: flex; flex-wrap: wrap; gap: 8px; }
 
 .resource-detail-sections [data-testid="link-url"] svg { display: inline; margin-left: 8px; }
 .resource-detail-related { display: grid; gap: 24px; min-width: 0; }

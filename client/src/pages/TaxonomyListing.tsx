@@ -471,8 +471,8 @@ export default function TaxonomyListing({ level }: Props) {
         <span aria-current="page">{name}</span>
       </nav>}
     <header className="taxonomy-header">
-      {level === "category" && <div className="eyebrow taxonomy-eyebrow"><span aria-hidden="true">{categoryMarks[slug] ?? name.slice(0, 1)}</span>CATEGORY · {slug === "infrastructure-delivery" ? "INFRA" : name.split(/[ &]/)[0].toUpperCase()}</div>}
-      <h1 className="display-h taxonomy-title">{level === "category" ? name : <><span className="serif-italic taxonomy-title-accent">{displayName!.split(" ")[0]}</span>{displayName!.includes(" ") ? ` ${displayName!.split(" ").slice(1).join(" ")}` : ""}</>}</h1>
+      {level === "category" && <div className="eyebrow taxonomy-eyebrow"><span aria-hidden="true">{categoryMarks[slug] ?? name.slice(0, 1)}</span>CATEGORY · {name.toUpperCase()}</div>}
+      <h1 className="taxonomy-title">{level === "category" ? name : <><span className="serif-italic taxonomy-title-accent">{displayName!.split(" ")[0]}</span>{displayName!.includes(" ") ? ` ${displayName!.split(" ").slice(1).join(" ")}` : ""}</>}</h1>
     <section aria-labelledby="taxonomy-scope-heading" data-seo-section="taxonomy-intro">
       <h2 id="taxonomy-scope-heading" className="sr-only">About this collection</h2>
       {level === "category" && <p className="taxonomy-description">{listingData.resources[0]?.description?.slice(0, 200) ?? listingData.scopeIntro}</p>}
