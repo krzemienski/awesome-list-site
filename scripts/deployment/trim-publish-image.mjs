@@ -13,8 +13,25 @@ const mode = process.argv[2] ?? "--dry-run";
 if (!["--dry-run", "--apply"].includes(mode) || process.argv.length > 3) {
   throw new Error("Usage: node scripts/deployment/trim-publish-image.mjs [--dry-run|--apply]");
 }
-if (mode === "--apply" && process.env.REPLIT_DEPLOYMENT !== "1") {
-  throw new Error("Refusing cleanup outside publishing: REPLIT_DEPLOYMENT must be 1. Use --dry-run in the workspace.");
+// Publishing markers. REPLIT_DEPLOYMENT=1 is set by Replit only at runtime
+// (never during the build command), so the publish build relies on
+// REPLIT_PUBLISH_IMAGE_TRIM=1, an env var that exists only in Replit's
+// production environment and is never set in the workspace.
+const publishMarker =
+  process.env.REPLIT_DEPLOYMENT === "1" ||
+  process.env.REPLIT_PUBLISH_IMAGE_TRIM === "1";
+if (mode === "--apply" && !publishMarker) {
+  throw new Error(
+    "Refusing cleanup outside publishing: REPLIT_PUBLISH_IMAGE_TRIM (or REPLIT_DEPLOYMENT) must be 1. Use --dry-run in the workspace.",
+  );
+}
+// REPLIT_DEV_DOMAIN exists only in the interactive workspace, never in a
+// deployment or its build container. Its presence means this is the real
+// workspace and its evidence must be preserved regardless of any marker.
+if (mode === "--apply" && process.env.REPLIT_DEV_DOMAIN) {
+  throw new Error(
+    "Refusing cleanup: REPLIT_DEV_DOMAIN is set, so this is the interactive workspace, not a publish build.",
+  );
 }
 
 // Check every path before deleting anything. Never follow symlinked parents

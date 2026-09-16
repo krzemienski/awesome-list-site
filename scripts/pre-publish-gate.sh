@@ -116,12 +116,23 @@ run_step build npm run build
 run_step bundle-budget npm run bundle:budget
 
 # Remove only development-only bulk, after all checks have consumed their
-# inputs. The helper also requires Replit's deployment marker so running this
-# gate with --publish in the editor cannot delete workspace evidence.
-if [ "$PUBLISH_MODE" = 1 ] && [ "${REPLIT_DEPLOYMENT:-}" = "1" ]; then
-  run_step trim-publish-image node scripts/deployment/trim-publish-image.mjs --apply
+# inputs. Replit sets REPLIT_DEPLOYMENT=1 only at RUNTIME, never while the
+# build command runs (confirmed by the 2026-09-15 publish logs: the step was
+# skipped and the image exceeded 8 GiB). The publish marker is therefore the
+# production-only env var REPLIT_PUBLISH_IMAGE_TRIM=1, which exists only in
+# Replit's production environment and is never set in the workspace. The
+# helper additionally refuses to run wherever REPLIT_DEV_DOMAIN is present
+# (the interactive workspace), so this gate cannot delete workspace evidence.
+if [ "$PUBLISH_MODE" = 1 ]; then
+  if [ "${REPLIT_DEPLOYMENT:-}" = "1" ] || [ "${REPLIT_PUBLISH_IMAGE_TRIM:-}" = "1" ]; then
+    run_step trim-publish-image node scripts/deployment/trim-publish-image.mjs --apply
+  else
+    echo "[pre-publish] SKIP image cleanup — publish marker absent (REPLIT_PUBLISH_IMAGE_TRIM/REPLIT_DEPLOYMENT)."
+    echo "[pre-publish]   Replit-provided variable NAMES visible to this build (values withheld):"
+    env | cut -d= -f1 | grep -E '^REPL(IT)?_' | sort | sed 's/^/[pre-publish]     /'
+  fi
 else
-  echo "[pre-publish] SKIP image cleanup — not a Replit publishing container"
+  echo "[pre-publish] SKIP image cleanup — not a publish build"
 fi
 
 echo ""

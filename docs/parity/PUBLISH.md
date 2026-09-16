@@ -45,7 +45,7 @@ Do not infer release acceptance from the static checks that previously passed.
 | No secrets in client bundle | **UNVERIFIED**; must inspect the final release bundle |
 | Production-mode local build smoke: `/`, `/api/health`, `/sitemap.xml`, `/category/encoding-codecs` | **UNVERIFIED**, deferred |
 | Local production-mode Lighthouse | **UNVERIFIED**, deferred |
-| Publishing-only image trimming | Guard inspected: apply only with `--publish` and `REPLIT_DEPLOYMENT=1`; workspace evidence preserved. Actual image size remains **UNVERIFIED** until a user publish |
+| Publishing-only image trimming | **REPAIRED 2026-09-15.** Two user publish attempts (builds `f3055341…` 18:57Z and `ef717b35…` 22:02Z, deployment `b112b7e1…`) passed every gate step and then failed with `image size is over the limit of 8 GiB`; both logs show `SKIP image cleanup — not a Replit publishing container`. Cause: Replit sets `REPLIT_DEPLOYMENT=1` only at runtime, never during the build command, so the trim step could never fire. Fix: the marker is now the production-only env var `REPLIT_PUBLISH_IMAGE_TRIM=1` (set in Replit's production environment, absent from development), and the helper additionally refuses wherever `REPLIT_DEV_DOMAIN` exists (the interactive workspace). Verified on a disposable `/tmp` copy: refuses in the workspace with the marker set, refuses without the marker, removes only `tests/parity/baseline` (2.9 GiB) and `.cache/ms-playwright` (641 MiB) under build-container conditions; the real workspace tree was not touched. Workspace measured 7.1 GiB + 2.2 GiB `.git`; projected trimmed image ≈ 5.8 GiB. Actual image size remains **UNVERIFIED** until the next user publish |
 
 Fresh file-only command, exit code 0:
 
