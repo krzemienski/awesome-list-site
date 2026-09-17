@@ -485,7 +485,10 @@ export default function TaxonomyListing({ level }: Props) {
       <h1 className="taxonomy-title">{level === "category" ? name : <><span className="serif-italic taxonomy-title-accent">{displayName!.split(" ")[0]}</span>{displayName!.includes(" ") ? ` ${displayName!.split(" ").slice(1).join(" ")}` : ""}</>}</h1>
     <section aria-labelledby="taxonomy-scope-heading" data-seo-section="taxonomy-intro">
       <h2 id="taxonomy-scope-heading" className="sr-only">About this collection</h2>
-      <p className="taxonomy-description">{listingData.scopeIntro}</p>
+      {/* Every level carries the same collection introduction as the crawler
+          markup (text parity), but the frozen design paints it only on the
+          category page; below that it stays screen-reader-only. */}
+      <p className={level === "category" ? "taxonomy-description" : "sr-only"}>{listingData.scopeIntro}</p>
     </section>
     <div className="taxonomy-summary"><span className="chip accent" data-ds="chip">{listingData.totalAll} {resourceNoun(listingData.totalAll)}</span>{level === "category" && listingData.children.length > 0 && <span className="chip" data-ds="chip">{listingData.children.length} {listingData.children.length === 1 ? "subcategory" : "subcategories"}</span>}{level !== "category" && parentCategory && <span>in {parentCategory.name}</span>}<button type="button" className="btn ghost taxonomy-tools-toggle" aria-expanded={toolsOpen} onClick={() => setToolsOpen(value => !value)}>{toolsOpen ? "Close filters" : "Filters & view"}</button></div>
     </header>

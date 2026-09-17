@@ -1,0 +1,1 @@
+{"variant":"a","baseUrl":"http://127.0.0.1:5051","marker":"__qa_test_contact_20260917_a","checks":["footer shows the honest unavailable email state and opens the configured issue tracker"]}

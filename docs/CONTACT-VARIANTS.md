@@ -77,6 +77,11 @@ The required desktop capture names are [variant-a.png](parity/evidence/contact-v
 copies of the explicitly width-labelled 1440 captures above.
 
 The narrow live-browser evidence and fixture cleanup record is
-[contact-variants-566.md](parity/worklog/contact-variants-566.md). The captured
+[contact-variants-566.md](parity/worklog/contact-variants-566.md); its
+2026-09-17 section reruns every variant plus the unset state on the redesign
+candidate ([rerun-2026-09-17/](parity/evidence/contact-variants/rerun-2026-09-17/)). The captured
 canvases establish configured behaviour at 1440 and 375 CSS pixels; they are
-not a measured reference-image diff and do **not** claim pixel parity.
+not a measured reference-image diff and do **not** claim pixel parity. Variant
+D's proof is the harness assertion that the rendered control is the variant-D
+component and that clicking it reaches the suggest-edit handler (a negative run
+against the variant-off application fails there), not the capture alone.

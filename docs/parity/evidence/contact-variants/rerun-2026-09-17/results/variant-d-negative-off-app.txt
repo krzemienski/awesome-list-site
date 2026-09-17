@@ -1,0 +1,4 @@
+Negative probe, 2026-09-17: same harness pointed at the variant-off application (port 5000, VITE_CONTACT_VARIANT unset) with CONTACT_VARIANT_UNDER_TEST=d.
+Expected and observed: exit 1 at the activation assertion.
+
+AssertionError [ERR_ASSERTION]: button-suggest-edit is the core fallback, not the variant-D ContactResourceAction

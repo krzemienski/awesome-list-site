@@ -49,6 +49,38 @@ async function capture(page, suffix = "", fullPage = true) {
   });
 }
 
+// The redesigned resource page keeps its secondary actions (external link,
+// bookmark, share, Suggest Edit) behind a native <details> "More" disclosure
+// (an accepted residual recorded in docs/parity/IMPLEMENTATION.md § C). Open
+// it the way a user does before asserting the control is visible.
+async function revealSuggestEdit(page) {
+  const button = page.getByTestId("button-suggest-edit");
+  await button.waitFor({ state: "attached", timeout: 60_000 });
+  if (!(await button.isVisible())) {
+    await page.getByRole("group").locator("summary", { hasText: "More" }).first().click();
+  }
+  await button.waitFor({ state: "visible" });
+  // The core fallback control shares the test id and handler; only the
+  // variant-D component renders with this class and accessible name, so the
+  // check fails when D is not the active configuration.
+  const isVariantD = await button.evaluate(
+    (node) => node.classList.contains("contact-resource-action") && node.getAttribute("aria-label") === "Suggest an edit",
+  );
+  assert.equal(isVariantD, true, "button-suggest-edit is the core fallback, not the variant-D ContactResourceAction");
+  // Exercise the handler. Signed out (this harness's state) the product
+  // answers with the "Sign in to suggest edits" toast; signed in it opens the
+  // SuggestEditDialog. Either proves the control is wired, an inert button
+  // fails here.
+  await button.click();
+  const outcome = page
+    .getByRole("dialog")
+    .filter({ hasText: /suggest/i })
+    .or(page.locator("li[data-state]", { hasText: "Sign in to suggest edits" }))
+    .first();
+  await outcome.waitFor({ state: "visible", timeout: 15_000 });
+  await page.keyboard.press("Escape");
+}
+
 async function requireNoSeriousAxe(page, scope) {
   const scan = await new AxeBuilder({ page }).include(scope).analyze();
   const serious = scan.violations.filter((item) => item.impact === "serious" || item.impact === "critical");
@@ -271,17 +303,21 @@ try {
 
   if (variant === "d") {
     const desktopPage = await pageFor(desktop);
-    const resourceLink = desktopPage.locator('[data-testid^="card-resource-"] a').first();
+    // The redesigned Index home links resources from its recent rail
+    // (`link-home-recent-*`); the Curated layout uses `link-home-resource-*`
+    // cards and listing pages keep `card-resource-*`.
+    const resourceLinkSelector = '[data-testid^="link-home-recent-"], [data-testid^="link-home-resource-"], [data-testid^="card-resource-"] a';
+    const resourceLink = desktopPage.locator(resourceLinkSelector).first();
     await resourceLink.waitFor({ state: "visible", timeout: 60_000 });
     await resourceLink.click();
-    await desktopPage.getByTestId("button-suggest-edit").waitFor({ state: "visible" });
-    results.checks.push("resource-level Suggest Edit control renders");
+    await revealSuggestEdit(desktopPage);
+    results.checks.push("resource-level Suggest Edit control is the variant-D ContactResourceAction (class + accessible name), renders behind the resource page's More disclosure, and its click reaches the suggest-edit handler");
     await capture(desktopPage);
     const mobilePage = await pageFor(mobile);
-    const mobileResourceLink = mobilePage.locator('[data-testid^="card-resource-"] a').first();
+    const mobileResourceLink = mobilePage.locator(resourceLinkSelector).first();
     await mobileResourceLink.waitFor({ state: "visible", timeout: 60_000 });
     await mobileResourceLink.click();
-    await mobilePage.getByTestId("button-suggest-edit").waitFor({ state: "visible" });
+    await revealSuggestEdit(mobilePage);
     await capture(mobilePage, "-375");
   }
 

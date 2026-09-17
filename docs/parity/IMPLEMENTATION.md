@@ -46,7 +46,7 @@ decisions.
 
 | Requirement | Original source | Current implementation | Missing/broken behavior | Owner | Real-browser proof | Status |
 |---|---|---|---|---|---|---|
-| Five systems × ten accents selectable at `/settings/theme`, systems change typography/geometry/motion | `styles.css` system skin blocks; `app.jsx` theme page | `client/src/styles/design-system.css` skin blocks + registry (`client/src/lib/theme/*`) | none found | integrator | 50/50 combinations, 0 failures: [tokens/50-combo-results.json](evidence/tokens/50-combo-results.json); per-system captures [multi-system/](evidence/multi-system/) (`audit-567-summary.json` phases theme/runtime/smoke/axe/font-prepaint all COMPLETE) | verified-complete |
+| Five systems × ten accents selectable at `/settings/theme`, systems change typography/geometry/motion | `styles.css` system skin blocks; `app.jsx` theme page | `client/src/styles/design-system.css` skin blocks + registry (`client/src/lib/theme/*`) | none found | integrator | 50/50 combinations, 0 failures, re-proven 2026-09-17 with persistence across reload and a long category page: [tokens/50-combo-2026-09-17/](evidence/tokens/50-combo-2026-09-17/) (earlier [tokens/50-combo-results.json](evidence/tokens/50-combo-results.json)); per-system captures [multi-system/](evidence/multi-system/) (`audit-567-summary.json` phases theme/runtime/smoke/axe/font-prepaint all COMPLETE) | verified-complete |
 | Token registry enumerated from source, not prose counts | `styles.css` `:root` | `canonical-tokens.json` + `canonical-token-parity` gate (effective cascade resolver) | none | integrator | gate PASS in validation run `beVZ6foyuPqgD5DGI91O3` and after `4f5e8968`; mutation probes in [tokens/gate-mutations.md](evidence/tokens/gate-mutations.md) | verified-complete |
 | Theme applied before first paint, CSP + SSR intact, manual accent preserved across system switches, stale values/reload/denied storage | `app.jsx` theme boot | pre-boot inline theme script (nonce'd) + storage guards | none | integrator | filmstrips [tokens/filmstrip.md](evidence/tokens/filmstrip.md), `font-prepaint` gate PASS, theme-registry-types PASS | verified-complete |
 | Real font families/weights per system; ONE canonical Google Fonts request in the app shell | `index.html` css2 link | shell `<link>` byte-identical to the design's nine-family URL; `accent-drift` `canonical-font-request` check | none | integrator | [worklog/fonts.md](worklog/fonts.md) gates table: webfont-fetch 6/6 200, 190 `@font-face`; font-set before/after in [fonts/](evidence/fonts/) | verified-complete |
@@ -120,12 +120,30 @@ bound through the reference adapter, never faked in production.
 
 | Requirement | Original source | Current implementation | Missing/broken behavior | Owner | Real-browser proof | Status |
 |---|---|---|---|---|---|---|
-| `VITE_CONTACT_VARIANT=a..e`, unset = none; production off | — | build-time flag, `docs/CONTACT-VARIANTS.md` | none | integrator | [contact-variants/](evidence/contact-variants/) `variant-*-{375,1440}.png`; [footer/contact-disabled.json](evidence/footer/contact-disabled.json) vs `contact-enabled-a.json` | verified-complete |
+| `VITE_CONTACT_VARIANT=a..e`, unset = none; production off | — | build-time flag, `docs/CONTACT-VARIANTS.md` | none | integrator | [contact-variants/](evidence/contact-variants/) `variant-*-{375,1440}.png`; [footer/contact-disabled.json](evidence/footer/contact-disabled.json) vs `contact-enabled-a.json`; rerun on this candidate 2026-09-17 (a–e, e fallback, unset all PASS; harness selectors updated for the redesigned home rail and the resource page's More disclosure, no product change) in [contact-variants/rerun-2026-09-17/](evidence/contact-variants/rerun-2026-09-17/) | verified-complete |
 | b: accessible modal → real rate-limited `/api/contact`; truthful unavailable state | — | `ContactDialog.tsx`, contact retention scheduler | none | integrator | [worklog/contact-api.md](worklog/contact-api.md), [worklog/contact-retention.md](worklog/contact-retention.md); response-contract probes | verified-complete |
 | d: per-resource suggest-edit via existing queue; e: palette action | — | existing edit-suggestion queue; cmdk item | none | integrator | contact-variants captures + gates [contact-variants/gates/](evidence/contact-variants/gates/) | verified-complete |
 
 ## Cross-cutting decisions recorded this pass
 
+- Contract-over-reference residuals (full run
+  `2026-09-17T11-42-39-272Z-11572`, 133/51, see the
+  [third pass](worklog/redesign-resume-2026-09-17.md#third-pass-later-on-2026-09-17-full-pixel-run-and-the-50-combinations)):
+  where the execution contract names a behaviour the frozen prototype does not
+  paint, the behaviour wins and the pixel rows it costs are recorded here, not
+  waived. (1) The 240px tablet sidebar at exactly 768 (contract) versus the
+  reference's `max-width:768px` hide fails `app.home.index`,
+  `app.home.curated`, `app.shell.mobile-drawer`, `app.shell.palette`,
+  `app.category`, `app.subcategory` at 768. (2) The artifact fitting a 375
+  viewport (contract: no sideways overflow) versus reference docs/showcase
+  captures 389–920px wide fails the artifact docs chapters at 375,
+  `artifact.docs.integration` 768/1024 and raises `artifact.showcase` 375;
+  `artifact.docs.color` and `artifact.docs.lists` still overflow (405/495px)
+  and remain an open defect. (3) `app.category` 375/1024/1440 prints the
+  crawler-parity `scopeIntro` where the reference binds the nav teaser (one
+  line shorter) and keeps the inactive Home link readable instead of the
+  prototype's default-button white box. Below category level the intro is
+  screen-reader-only, which returned `app.subcategory` 375/1024/1440 to PASS.
 - Auto table layout: any width class, `white-space: nowrap`, `truncate` or
   `min-width` on one cell shifts every column's share; the frozen tables have
   none. Audit 768 went 26% → 0.05% by removing them.

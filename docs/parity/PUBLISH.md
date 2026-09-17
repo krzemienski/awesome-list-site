@@ -11,6 +11,19 @@ candidates, not to the application's entire deployment history.
 Full final-candidate certification remains incomplete; no new release-ready
 claim is made here.
 
+The current full-inventory measurement is
+`tests/parity/baseline/2026-09-17T11-42-39-272Z-11572` ([REPORT.md](REPORT.md),
+[STATUS.md](STATUS.md)): **133 pass / 51 fail** of 184 executed pixel rows,
+gate **NOT PASSED**. The 26 failures beyond the 25 recorded below are the
+contract-over-reference residuals listed in
+[IMPLEMENTATION.md](IMPLEMENTATION.md#cross-cutting-decisions-recorded-this-pass)
+(768 tablet sidebar, artifact narrow-screen fit, category intro copy) plus two
+live-data rows 0.01pt over the ceiling; `app.subcategory` 375/1024/1440 were
+repaired afterwards and pass in a selected rerun. All 50 theme combinations
+pass a persistence probe
+([evidence/tokens/50-combo-2026-09-17/](evidence/tokens/50-combo-2026-09-17/)).
+The section below describes the earlier 159/25 run and is kept as history.
+
 ## Decision — HOLD (2026-09-17, updated after the fourth full-inventory run)
 
 Candidate: the working tree that becomes the next commit on `main` after

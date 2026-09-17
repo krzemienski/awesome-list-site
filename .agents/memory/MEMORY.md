@@ -149,3 +149,4 @@
 - [Hidden-control hitbox](hidden-control-hitbox.md) — opacity:0+absolute-without-offsets sits over the last button and still takes clicks; flipping to static on hover slides Edit under the pointer; anchor out of flow + reveal on tr:hover.
 - [Built-in tester + Clerk](native-tester-clerk-workaround.md) — tester Clerk helper fails on the proxied dev host; mint `+clerk_test` users via backend API, resend creds every follow-up, Clerk-first teardown + residue sweep.
 - [LCP dated to the bundle by re-inserting prerender](lcp-reinserted-prerender.md) — moving prerender nodes after the bundle runs re-registers a larger web-font LCP candidate; do holds in the pre-boot inline script, keep them semantic until adopted.
+- [Contract-over-reference residuals](contract-over-reference-residuals.md) — behaviour the contract requires but the prototype lacks: log its failing pixel rows the same pass; sr-only keeps crawler text.

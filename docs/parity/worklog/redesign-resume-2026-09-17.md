@@ -119,6 +119,7 @@ to the frozen reference, 0 differing entries), which retires item 1 below.
 | System states | none | 1280 captures of not-found, empty search, populated search, privacy, terms in [`evidence/redesign-resume-2026-09-17/system-states/`](../evidence/redesign-resume-2026-09-17/system-states/) | Rendered-state proof only |
 | Three-route Lighthouse | `scripts/validation/normal-lighthouse.mjs` gained `--path` (same registered command, one route per invocation; rejects `//`, backslashes, query/fragment and any off-origin resolution) | [PUBLISH.md](../PUBLISH.md) Lighthouse rows; evidence under `evidence/lighthouse/three-routes-2026-09-17/` | Measured (see PUBLISH for the verdict) |
 | Category Lighthouse below 0.82 (0.78) | `client/index.html` pre-boot script builds the `#ssr-seo-hold` overlay before first paint and leaves it semantic/interactive; `client/src/main.tsx` adopts it (`data-preboot`, `data-pathname`), applies `aria-hidden`/`inert` + h1 demotion right before React mounts, and keeps the removal logic; `TaxonomyListing.tsx` fetches the faceted `/api/resources` only once the filter panel opens or a filter is active. Root cause from a PerformanceObserver probe: re-inserting the prerender after the bundle ran re-registered the lead paragraph as a larger (web-font) LCP candidate, dating LCP to the bundle | Rebuilt `dist/`, loopback prod-mode server: category 0.79 / 0.89 / 0.84 median **0.84**, resource 0.86 / 0.85 / 0.77 median **0.85**, home 0.88 / 0.83 / 0.83 median **0.83** — [PUBLISH.md](../PUBLISH.md) Lighthouse rows; [`evidence/lighthouse/three-routes-2026-09-17/after-preboot-hold/`](../evidence/lighthouse/three-routes-2026-09-17/after-preboot-hold/). Overlay lifecycle re-checked in a headless browser on category, subcategory, resource and admin routes (semantic before adoption, adopted, then removed once data settles; no duplicate h1 while held) and with the entry chunk blocked (page stays usable). Code-review round: high (inert fallback when the bundle never runs) and medium (cached facets error surviving Back) findings fixed | Fixed, all three routes meet 0.82 locally |
+| Contact variants a–e rerun | harness only: `contact-variants-566.mjs` follows the redesigned Index home (`link-home-recent-*`) and opens the resource page's More disclosure before asserting Suggest Edit | a, b, c, d, e (form + fallback), unset PASS on isolated dev servers; QA rows and the contact limiter hit deleted afterwards — [contact-variants-566.md § 2026-09-17](contact-variants-566.md), [`evidence/contact-variants/rerun-2026-09-17/`](../evidence/contact-variants/rerun-2026-09-17/) | Verified |
 | `palette-drift` regression after the header edit | the avatar's fixed `#0a0a0a` ink fell out of the 5-line `DS-OK` window; tagged with its own reason | `palette-drift` PASS | Fixed |
 
 Gates after these changes: `npm run check`, `canonical-token-parity`,
@@ -126,6 +127,47 @@ Gates after these changes: `npm run check`, `canonical-token-parity`,
 44px floor, thresholds or expected captures was changed.
 
 Still not certified by this pass: full pixel parity of the final candidate,
-all 50 theme combinations, contact variants a–e rerun, forced loading/error
+all 50 theme combinations, forced loading/error
 states, the full SEO crawl, and anything production-specific. No publish
 action was taken.
+
+## Third pass, later on 2026-09-17: full pixel run and the 50 combinations
+
+Full-inventory admin run `tests/parity/baseline/2026-09-17T11-42-39-272Z-11572`
+(all four widths; the runner regenerated [REPORT.md](../REPORT.md) and
+[STATUS.md](../STATUS.md)): **133 pass / 51 fail** of 184 executed pixel
+rows, 0 incomplete, 40 blocked, clean identity teardown. The previous full
+run was 159/25. The 26 cells that were passing then and fail now (six 768
+shell/taxonomy cells, `app.category` ×3, `app.subcategory` ×3, ten artifact
+docs chapters at 375, `artifact.docs.integration` 768/1024, two admin
+live-data cells) plus three already-failing artifact cells that worsened were
+traced with `git diff a09ad484..HEAD` to the first pass's contract-directed
+changes; none is a capture defect, and every one is listed below with what was
+decided. Thresholds, expected captures and the frozen reference are unchanged.
+
+| Rows | Measured | Cause | Decision |
+| --- | --- | --- | --- |
+| `app.home.index`, `app.home.curated`, `app.shell.mobile-drawer`, `app.shell.palette`, `app.category`, `app.subcategory` at **768** | 25.2–32.7%, app taller (240px sidebar present) | Contract line 199–200 requires the tablet sidebar at exactly 768; the frozen `@media (max-width:768px){.sidebar{display:none}}` hides it there. The first pass moved the cutoff to `<768` ([ui/sidebar.tsx](../../../client/src/components/ui/sidebar.tsx), [sidebar.css](../../../client/src/styles/shell/sidebar.css)) | Kept. Contract-over-reference residual: these six 768 cells cannot pass while the reference hides the sidebar at that width; recorded, not waived |
+| `app.subcategory` 375/1024/1440 | 5.6–6.8% | First pass rendered the shared `scopeIntro` at every level for crawler parity; the frozen `SubcategoryPage` has no introduction paragraph | **Fixed**: below category level the paragraph is `sr-only` (same DOM text as the crawler markup; `seo-snapshot --gate --parity` PASS). Rerun `2026-09-17T12-50-11-108Z-25251`: 375 0.12%, 1024 0.24%, 1440 0.28% PASS |
+| `app.category` 375/1024/1440 | 4.9–6.0%, one text line taller | The reference's `CategoryPage` prints `cat.desc`, which the adapter binds to the nav teaser (the first direct resource's description, one line shorter); the app prints the crawler-parity `scopeIntro` sentence. Re-binding `desc` to `scopeIntro` was tried and reverted: the same field feeds the home category cards, where the app shows the teaser | Kept as a residual. The diff is the extra intro line shifting everything below it plus the readable inactive Home link (next row); the paragraph and the cards themselves match |
+| Inactive Home link on category pages (part of the rows above) | ≈0.1% | The reference's white box is a `<button class="sub-item">` with the UA default `buttonface` background and unreadable text (prototype defect); the first pass removed the emulation | Kept readable |
+| New: `artifact.docs.cards`, `color`, `flows`, `getting-started`, `integration`, `lists`, `motion`, `navigation`, `theming`, `tokens` at **375** (10 cells) and `artifact.docs.integration` 768/1024. Worsened, already failing on the 44px floor: `artifact.docs.buttons` 375 (2.9→14.1%), `artifact.docs.forms` 375 (1.8→13.2%), `artifact.showcase` 375 (23.7→62.6%) | 11.7–66.5%, expected width 389–920px at a 375 viewport | The frozen docs/showcase pages overflow sideways on narrow screens; the first pass made the artifact fit the viewport (contract line 211, "no sideways overflow"), so its documents are now narrower than the reference captures | Kept. Contract-over-reference residual, same class as the 768 sidebar. **Open defect**: `artifact.docs.color` (405px) and `artifact.docs.lists` (495px) still overflow at 375, so the fit is incomplete for two chapters |
+| `app.admin.database` 375, `app.admin.researcher` 1440 | 0.506%, 0.511% (0.49% in the previous run) | Live job/health data on both sides; already the recorded cause for the neighbouring researcher rows | Same residual class, now over the ceiling by 0.01pt |
+
+Not rerun after the subcategory fix: the full inventory. The category and
+subcategory 768 cells stay failed by the sidebar decision regardless.
+
+**Theme persistence, all 50 combinations** (Playwright against the loopback
+dev server, real `/settings/theme` controls, `system-option-*` and
+`accent-option-*` test ids): every combination applies `data-system` /
+`data-accent`, stores `ds-system`/`ds-accent`, survives a reload, and holds on
+`/category/encoding-codecs`, where the probe asserts per row that the
+resource-count chip colour equals the selected `--accent` token and the body
+font equals the selected system's `--font-body` (10 distinct accent tokens, 5
+distinct body families). 50/50 PASS — [`evidence/tokens/50-combo-2026-09-17/`](../evidence/tokens/50-combo-2026-09-17/)
+(`results.json`, the `probe.mjs` that produced it — run from the repo root
+against a loopback `BASE_URL` — and the crimson long-page captures at 375/1440
+per system). Signed-out guest persistence only; it is not a pixel comparison.
+
+Gates after this pass: `npm run check`, `seo-snapshot --gate --parity`,
+`dead-exports`, `palette-drift` PASS. No publish action was taken.

@@ -125,3 +125,25 @@ matching Clerk user was then deleted through the backend API. A final
 prefix-scoped Clerk backend query returned zero such identities. The separate
 core-fallback run likewise removed exactly its one bridge user and one
 resource, with zero scoped residue.
+## Rerun on the redesign candidate, 2026-09-17
+
+Same harness (`scripts/validation/contact-variants-566.mjs`), same isolated
+per-variant development servers (a 5051, b 5052, c 5053, d 5071, e form-first
+5055, e fallback 5056, unset 5057), fresh Chromium contexts, captures staged
+under `/tmp/contact-variants-2026-09-17/` and copied afterwards to
+[`evidence/contact-variants/rerun-2026-09-17/`](../evidence/contact-variants/rerun-2026-09-17/)
+(per-variant JSON results under `results/`).
+
+| Variant | Result |
+| --- | --- |
+| `a` | Passed: "Email unavailable" state, configured Issues link (`_blank`, `noopener noreferrer`) opened `github.com/krzemienski/awesome-video/issues`. A first attempt timed out waiting for the GitHub tab (external network, 30 s); the immediate rerun passed. |
+| `b` | Passed: client validation, Escape → focus back on the footer trigger, receipt persisted, honeypot receipt-shaped 200, sixth POST 429 with `Retry-After: 3598` and inputs retained, axe 0 serious/critical at 1440 and 375, all fourteen contact tokens resolved in the default system (same values as 2026-09-14). |
+| `c` | Passed: verified Discussions link opened in a safe new tab. |
+| `d` | Passed after two harness-only updates for the redesigned pages: the Index home links resources from its recent rail (`link-home-recent-*`, no `card-resource-*` on the home any more) and the resource page keeps its secondary actions behind the native `<details>` "More" disclosure (accepted residual, IMPLEMENTATION § C), so the harness opens "More" before asserting the control is visible. No product code changed. Review found that the first rerun only located `button-suggest-edit`, which the core fallback also renders, so it could not fail with D off; the harness now asserts the variant-D component itself (`contact-resource-action` class and "Suggest an edit" name) and clicks it, accepting the signed-out "Sign in to suggest edits" toast or the SuggestEditDialog as proof the handler is wired. Rerun on the isolated D server: PASS (`results/variant-d.json`, captures replaced); the same command against the variant-off application fails at that assertion (`results/variant-d-negative-off-app.txt`). The authenticated queued-edit/admin-reject leg was not repeated this pass. |
+| `e` | Passed: Ctrl-K → ArrowDown to "Contact maintainers" → Enter opened the configured form; the fallback configuration opened the configured GitHub Issues destination. |
+| unset | Passed: zero `[data-testid^="contact-"]` surfaces, same-origin `POST /api/contact` → `404 { "message": "Not found" }`. |
+
+Cleanup: the four `contact_submissions` rows the `b` run persisted (unique
+marker `__qa_test_contact_20260917_b`) and the one `contact` row in
+`rate_limit_hits` were deleted afterwards; 0 QA rows remain. Every isolated
+server was stopped at the end of its command.

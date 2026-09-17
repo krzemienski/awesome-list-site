@@ -1,0 +1,3312 @@
+{
+  "summary": {
+    "startedAt": "2026-09-17T13:11:01.431Z",
+    "finishedAt": "2026-09-17T13:12:18.217Z",
+    "base": "http://127.0.0.1:5000",
+    "longPage": "/category/encoding-codecs",
+    "total": 50,
+    "passed": 50,
+    "failed": [],
+    "distinctAccentTokens": {
+      "crimson": [
+        "#ff3d52"
+      ],
+      "magenta": [
+        "#ec4899"
+      ],
+      "orange": [
+        "#ff7a3d"
+      ],
+      "amber": [
+        "#ffb84d"
+      ],
+      "emerald": [
+        "#34d08c"
+      ],
+      "matrix": [
+        "#00ff88"
+      ],
+      "cyan": [
+        "#5eddf2"
+      ],
+      "violet": [
+        "#9d4edd"
+      ],
+      "lime": [
+        "#aaff00"
+      ],
+      "rose": [
+        "#ff7a8a"
+      ]
+    },
+    "distinctSystemBodyFonts": {
+      "editorial": [
+        "Inter, system-ui, sans-serif"
+      ],
+      "terminal": [
+        "\"IBM Plex Mono\", ui-monospace, monospace"
+      ],
+      "geist": [
+        "Geist, Inter, system-ui, sans-serif"
+      ],
+      "brutalist": [
+        "\"Space Grotesk\", system-ui, sans-serif"
+      ],
+      "swiss": [
+        "Manrope, system-ui, sans-serif"
+      ]
+    }
+  },
+  "rows": [
+    {
+      "system": "editorial",
+      "accent": "crimson",
+      "beforeReloadSettled": true,
+      "beforeReload": {
+        "attrs": {
+          "system": "editorial",
+          "accent": "crimson"
+        },
+        "stored": {
+          "system": "editorial",
+          "accent": "crimson"
+        },
+        "tokens": {
+          "accent": "#ff3d52",
+          "bg": "#000000",
+          "text": "#f4f3ee",
+          "fontBody": "'Inter', system-ui, sans-serif"
+        }
+      },
+      "afterReloadSettled": true,
+      "afterReload": {
+        "attrs": {
+          "system": "editorial",
+          "accent": "crimson"
+        },
+        "stored": {
+          "system": "editorial",
+          "accent": "crimson"
+        },
+        "tokens": {
+          "accent": "#ff3d52",
+          "bg": "#000000",
+          "text": "#f4f3ee",
+          "fontBody": "'Inter', system-ui, sans-serif"
+        }
+      },
+      "longPageSettled": true,
+      "longPage": {
+        "attrs": {
+          "system": "editorial",
+          "accent": "crimson"
+        },
+        "stored": {
+          "system": "editorial",
+          "accent": "crimson"
+        },
+        "tokens": {
+          "accent": "#ff3d52",
+          "bg": "#000000",
+          "text": "#f4f3ee",
+          "fontBody": "'Inter', system-ui, sans-serif"
+        },
+        "h1": "Encoding & Codecs",
+        "docHeight": 5293,
+        "primaryBg": null,
+        "chipColor": "rgb(255, 61, 82)",
+        "linkFont": "Inter, system-ui, sans-serif",
+        "bodyFont": "Inter, system-ui, sans-serif",
+        "holdPresent": false
+      },
+      "chipMatchesAccent": true,
+      "bodyFontMatchesSystem": true,
+      "ok": true
+    },
+    {
+      "system": "editorial",
+      "accent": "magenta",
+      "beforeReloadSettled": true,
+      "beforeReload": {
+        "attrs": {
+          "system": "editorial",
+          "accent": "magenta"
+        },
+        "stored": {
+          "system": "editorial",
+          "accent": "magenta"
+        },
+        "tokens": {
+          "accent": "#ec4899",
+          "bg": "#000000",
+          "text": "#f4f3ee",
+          "fontBody": "'Inter', system-ui, sans-serif"
+        }
+      },
+      "afterReloadSettled": true,
+      "afterReload": {
+        "attrs": {
+          "system": "editorial",
+          "accent": "magenta"
+        },
+        "stored": {
+          "system": "editorial",
+          "accent": "magenta"
+        },
+        "tokens": {
+          "accent": "#ec4899",
+          "bg": "#000000",
+          "text": "#f4f3ee",
+          "fontBody": "'Inter', system-ui, sans-serif"
+        }
+      },
+      "longPageSettled": true,
+      "longPage": {
+        "attrs": {
+          "system": "editorial",
+          "accent": "magenta"
+        },
+        "stored": {
+          "system": "editorial",
+          "accent": "magenta"
+        },
+        "tokens": {
+          "accent": "#ec4899",
+          "bg": "#000000",
+          "text": "#f4f3ee",
+          "fontBody": "'Inter', system-ui, sans-serif"
+        },
+        "h1": "Encoding & Codecs",
+        "docHeight": 5293,
+        "primaryBg": null,
+        "chipColor": "rgb(236, 72, 153)",
+        "linkFont": "Inter, system-ui, sans-serif",
+        "bodyFont": "Inter, system-ui, sans-serif",
+        "holdPresent": false
+      },
+      "chipMatchesAccent": true,
+      "bodyFontMatchesSystem": true,
+      "ok": true
+    },
+    {
+      "system": "editorial",
+      "accent": "orange",
+      "beforeReloadSettled": true,
+      "beforeReload": {
+        "attrs": {
+          "system": "editorial",
+          "accent": "orange"
+        },
+        "stored": {
+          "system": "editorial",
+          "accent": "orange"
+        },
+        "tokens": {
+          "accent": "#ff7a3d",
+          "bg": "#000000",
+          "text": "#f4f3ee",
+          "fontBody": "'Inter', system-ui, sans-serif"
+        }
+      },
+      "afterReloadSettled": true,
+      "afterReload": {
+        "attrs": {
+          "system": "editorial",
+          "accent": "orange"
+        },
+        "stored": {
+          "system": "editorial",
+          "accent": "orange"
+        },
+        "tokens": {
+          "accent": "#ff7a3d",
+          "bg": "#000000",
+          "text": "#f4f3ee",
+          "fontBody": "'Inter', system-ui, sans-serif"
+        }
+      },
+      "longPageSettled": true,
+      "longPage": {
+        "attrs": {
+          "system": "editorial",
+          "accent": "orange"
+        },
+        "stored": {
+          "system": "editorial",
+          "accent": "orange"
+        },
+        "tokens": {
+          "accent": "#ff7a3d",
+          "bg": "#000000",
+          "text": "#f4f3ee",
+          "fontBody": "'Inter', system-ui, sans-serif"
+        },
+        "h1": "Encoding & Codecs",
+        "docHeight": 5293,
+        "primaryBg": null,
+        "chipColor": "rgb(255, 122, 61)",
+        "linkFont": "Inter, system-ui, sans-serif",
+        "bodyFont": "Inter, system-ui, sans-serif",
+        "holdPresent": false
+      },
+      "chipMatchesAccent": true,
+      "bodyFontMatchesSystem": true,
+      "ok": true
+    },
+    {
+      "system": "editorial",
+      "accent": "amber",
+      "beforeReloadSettled": true,
+      "beforeReload": {
+        "attrs": {
+          "system": "editorial",
+          "accent": "amber"
+        },
+        "stored": {
+          "system": "editorial",
+          "accent": "amber"
+        },
+        "tokens": {
+          "accent": "#ffb84d",
+          "bg": "#000000",
+          "text": "#f4f3ee",
+          "fontBody": "'Inter', system-ui, sans-serif"
+        }
+      },
+      "afterReloadSettled": true,
+      "afterReload": {
+        "attrs": {
+          "system": "editorial",
+          "accent": "amber"
+        },
+        "stored": {
+          "system": "editorial",
+          "accent": "amber"
+        },
+        "tokens": {
+          "accent": "#ffb84d",
+          "bg": "#000000",
+          "text": "#f4f3ee",
+          "fontBody": "'Inter', system-ui, sans-serif"
+        }
+      },
+      "longPageSettled": true,
+      "longPage": {
+        "attrs": {
+          "system": "editorial",
+          "accent": "amber"
+        },
+        "stored": {
+          "system": "editorial",
+          "accent": "amber"
+        },
+        "tokens": {
+          "accent": "#ffb84d",
+          "bg": "#000000",
+          "text": "#f4f3ee",
+          "fontBody": "'Inter', system-ui, sans-serif"
+        },
+        "h1": "Encoding & Codecs",
+        "docHeight": 5293,
+        "primaryBg": null,
+        "chipColor": "rgb(255, 184, 77)",
+        "linkFont": "Inter, system-ui, sans-serif",
+        "bodyFont": "Inter, system-ui, sans-serif",
+        "holdPresent": false
+      },
+      "chipMatchesAccent": true,
+      "bodyFontMatchesSystem": true,
+      "ok": true
+    },
+    {
+      "system": "editorial",
+      "accent": "emerald",
+      "beforeReloadSettled": true,
+      "beforeReload": {
+        "attrs": {
+          "system": "editorial",
+          "accent": "emerald"
+        },
+        "stored": {
+          "system": "editorial",
+          "accent": "emerald"
+        },
+        "tokens": {
+          "accent": "#34d08c",
+          "bg": "#000000",
+          "text": "#f4f3ee",
+          "fontBody": "'Inter', system-ui, sans-serif"
+        }
+      },
+      "afterReloadSettled": true,
+      "afterReload": {
+        "attrs": {
+          "system": "editorial",
+          "accent": "emerald"
+        },
+        "stored": {
+          "system": "editorial",
+          "accent": "emerald"
+        },
+        "tokens": {
+          "accent": "#34d08c",
+          "bg": "#000000",
+          "text": "#f4f3ee",
+          "fontBody": "'Inter', system-ui, sans-serif"
+        }
+      },
+      "longPageSettled": true,
+      "longPage": {
+        "attrs": {
+          "system": "editorial",
+          "accent": "emerald"
+        },
+        "stored": {
+          "system": "editorial",
+          "accent": "emerald"
+        },
+        "tokens": {
+          "accent": "#34d08c",
+          "bg": "#000000",
+          "text": "#f4f3ee",
+          "fontBody": "'Inter', system-ui, sans-serif"
+        },
+        "h1": "Encoding & Codecs",
+        "docHeight": 5293,
+        "primaryBg": null,
+        "chipColor": "rgb(52, 208, 140)",
+        "linkFont": "Inter, system-ui, sans-serif",
+        "bodyFont": "Inter, system-ui, sans-serif",
+        "holdPresent": false
+      },
+      "chipMatchesAccent": true,
+      "bodyFontMatchesSystem": true,
+      "ok": true
+    },
+    {
+      "system": "editorial",
+      "accent": "matrix",
+      "beforeReloadSettled": true,
+      "beforeReload": {
+        "attrs": {
+          "system": "editorial",
+          "accent": "matrix"
+        },
+        "stored": {
+          "system": "editorial",
+          "accent": "matrix"
+        },
+        "tokens": {
+          "accent": "#00ff88",
+          "bg": "#000000",
+          "text": "#f4f3ee",
+          "fontBody": "'Inter', system-ui, sans-serif"
+        }
+      },
+      "afterReloadSettled": true,
+      "afterReload": {
+        "attrs": {
+          "system": "editorial",
+          "accent": "matrix"
+        },
+        "stored": {
+          "system": "editorial",
+          "accent": "matrix"
+        },
+        "tokens": {
+          "accent": "#00ff88",
+          "bg": "#000000",
+          "text": "#f4f3ee",
+          "fontBody": "'Inter', system-ui, sans-serif"
+        }
+      },
+      "longPageSettled": true,
+      "longPage": {
+        "attrs": {
+          "system": "editorial",
+          "accent": "matrix"
+        },
+        "stored": {
+          "system": "editorial",
+          "accent": "matrix"
+        },
+        "tokens": {
+          "accent": "#00ff88",
+          "bg": "#000000",
+          "text": "#f4f3ee",
+          "fontBody": "'Inter', system-ui, sans-serif"
+        },
+        "h1": "Encoding & Codecs",
+        "docHeight": 5293,
+        "primaryBg": null,
+        "chipColor": "rgb(0, 255, 136)",
+        "linkFont": "Inter, system-ui, sans-serif",
+        "bodyFont": "Inter, system-ui, sans-serif",
+        "holdPresent": false
+      },
+      "chipMatchesAccent": true,
+      "bodyFontMatchesSystem": true,
+      "ok": true
+    },
+    {
+      "system": "editorial",
+      "accent": "cyan",
+      "beforeReloadSettled": true,
+      "beforeReload": {
+        "attrs": {
+          "system": "editorial",
+          "accent": "cyan"
+        },
+        "stored": {
+          "system": "editorial",
+          "accent": "cyan"
+        },
+        "tokens": {
+          "accent": "#5eddf2",
+          "bg": "#000000",
+          "text": "#f4f3ee",
+          "fontBody": "'Inter', system-ui, sans-serif"
+        }
+      },
+      "afterReloadSettled": true,
+      "afterReload": {
+        "attrs": {
+          "system": "editorial",
+          "accent": "cyan"
+        },
+        "stored": {
+          "system": "editorial",
+          "accent": "cyan"
+        },
+        "tokens": {
+          "accent": "#5eddf2",
+          "bg": "#000000",
+          "text": "#f4f3ee",
+          "fontBody": "'Inter', system-ui, sans-serif"
+        }
+      },
+      "longPageSettled": true,
+      "longPage": {
+        "attrs": {
+          "system": "editorial",
+          "accent": "cyan"
+        },
+        "stored": {
+          "system": "editorial",
+          "accent": "cyan"
+        },
+        "tokens": {
+          "accent": "#5eddf2",
+          "bg": "#000000",
+          "text": "#f4f3ee",
+          "fontBody": "'Inter', system-ui, sans-serif"
+        },
+        "h1": "Encoding & Codecs",
+        "docHeight": 5293,
+        "primaryBg": null,
+        "chipColor": "rgb(94, 221, 242)",
+        "linkFont": "Inter, system-ui, sans-serif",
+        "bodyFont": "Inter, system-ui, sans-serif",
+        "holdPresent": false
+      },
+      "chipMatchesAccent": true,
+      "bodyFontMatchesSystem": true,
+      "ok": true
+    },
+    {
+      "system": "editorial",
+      "accent": "violet",
+      "beforeReloadSettled": true,
+      "beforeReload": {
+        "attrs": {
+          "system": "editorial",
+          "accent": "violet"
+        },
+        "stored": {
+          "system": "editorial",
+          "accent": "violet"
+        },
+        "tokens": {
+          "accent": "#9d4edd",
+          "bg": "#000000",
+          "text": "#f4f3ee",
+          "fontBody": "'Inter', system-ui, sans-serif"
+        }
+      },
+      "afterReloadSettled": true,
+      "afterReload": {
+        "attrs": {
+          "system": "editorial",
+          "accent": "violet"
+        },
+        "stored": {
+          "system": "editorial",
+          "accent": "violet"
+        },
+        "tokens": {
+          "accent": "#9d4edd",
+          "bg": "#000000",
+          "text": "#f4f3ee",
+          "fontBody": "'Inter', system-ui, sans-serif"
+        }
+      },
+      "longPageSettled": true,
+      "longPage": {
+        "attrs": {
+          "system": "editorial",
+          "accent": "violet"
+        },
+        "stored": {
+          "system": "editorial",
+          "accent": "violet"
+        },
+        "tokens": {
+          "accent": "#9d4edd",
+          "bg": "#000000",
+          "text": "#f4f3ee",
+          "fontBody": "'Inter', system-ui, sans-serif"
+        },
+        "h1": "Encoding & Codecs",
+        "docHeight": 5293,
+        "primaryBg": null,
+        "chipColor": "rgb(157, 78, 221)",
+        "linkFont": "Inter, system-ui, sans-serif",
+        "bodyFont": "Inter, system-ui, sans-serif",
+        "holdPresent": false
+      },
+      "chipMatchesAccent": true,
+      "bodyFontMatchesSystem": true,
+      "ok": true
+    },
+    {
+      "system": "editorial",
+      "accent": "lime",
+      "beforeReloadSettled": true,
+      "beforeReload": {
+        "attrs": {
+          "system": "editorial",
+          "accent": "lime"
+        },
+        "stored": {
+          "system": "editorial",
+          "accent": "lime"
+        },
+        "tokens": {
+          "accent": "#aaff00",
+          "bg": "#000000",
+          "text": "#f4f3ee",
+          "fontBody": "'Inter', system-ui, sans-serif"
+        }
+      },
+      "afterReloadSettled": true,
+      "afterReload": {
+        "attrs": {
+          "system": "editorial",
+          "accent": "lime"
+        },
+        "stored": {
+          "system": "editorial",
+          "accent": "lime"
+        },
+        "tokens": {
+          "accent": "#aaff00",
+          "bg": "#000000",
+          "text": "#f4f3ee",
+          "fontBody": "'Inter', system-ui, sans-serif"
+        }
+      },
+      "longPageSettled": true,
+      "longPage": {
+        "attrs": {
+          "system": "editorial",
+          "accent": "lime"
+        },
+        "stored": {
+          "system": "editorial",
+          "accent": "lime"
+        },
+        "tokens": {
+          "accent": "#aaff00",
+          "bg": "#000000",
+          "text": "#f4f3ee",
+          "fontBody": "'Inter', system-ui, sans-serif"
+        },
+        "h1": "Encoding & Codecs",
+        "docHeight": 5293,
+        "primaryBg": null,
+        "chipColor": "rgb(170, 255, 0)",
+        "linkFont": "Inter, system-ui, sans-serif",
+        "bodyFont": "Inter, system-ui, sans-serif",
+        "holdPresent": false
+      },
+      "chipMatchesAccent": true,
+      "bodyFontMatchesSystem": true,
+      "ok": true
+    },
+    {
+      "system": "editorial",
+      "accent": "rose",
+      "beforeReloadSettled": true,
+      "beforeReload": {
+        "attrs": {
+          "system": "editorial",
+          "accent": "rose"
+        },
+        "stored": {
+          "system": "editorial",
+          "accent": "rose"
+        },
+        "tokens": {
+          "accent": "#ff7a8a",
+          "bg": "#000000",
+          "text": "#f4f3ee",
+          "fontBody": "'Inter', system-ui, sans-serif"
+        }
+      },
+      "afterReloadSettled": true,
+      "afterReload": {
+        "attrs": {
+          "system": "editorial",
+          "accent": "rose"
+        },
+        "stored": {
+          "system": "editorial",
+          "accent": "rose"
+        },
+        "tokens": {
+          "accent": "#ff7a8a",
+          "bg": "#000000",
+          "text": "#f4f3ee",
+          "fontBody": "'Inter', system-ui, sans-serif"
+        }
+      },
+      "longPageSettled": true,
+      "longPage": {
+        "attrs": {
+          "system": "editorial",
+          "accent": "rose"
+        },
+        "stored": {
+          "system": "editorial",
+          "accent": "rose"
+        },
+        "tokens": {
+          "accent": "#ff7a8a",
+          "bg": "#000000",
+          "text": "#f4f3ee",
+          "fontBody": "'Inter', system-ui, sans-serif"
+        },
+        "h1": "Encoding & Codecs",
+        "docHeight": 5293,
+        "primaryBg": null,
+        "chipColor": "rgb(255, 122, 138)",
+        "linkFont": "Inter, system-ui, sans-serif",
+        "bodyFont": "Inter, system-ui, sans-serif",
+        "holdPresent": false
+      },
+      "chipMatchesAccent": true,
+      "bodyFontMatchesSystem": true,
+      "ok": true
+    },
+    {
+      "system": "terminal",
+      "accent": "crimson",
+      "beforeReloadSettled": true,
+      "beforeReload": {
+        "attrs": {
+          "system": "terminal",
+          "accent": "crimson"
+        },
+        "stored": {
+          "system": "terminal",
+          "accent": "crimson"
+        },
+        "tokens": {
+          "accent": "#ff3d52",
+          "bg": "#000000",
+          "text": "#e8e8e0",
+          "fontBody": "'IBM Plex Mono', ui-monospace, monospace"
+        }
+      },
+      "afterReloadSettled": true,
+      "afterReload": {
+        "attrs": {
+          "system": "terminal",
+          "accent": "crimson"
+        },
+        "stored": {
+          "system": "terminal",
+          "accent": "crimson"
+        },
+        "tokens": {
+          "accent": "#ff3d52",
+          "bg": "#000000",
+          "text": "#e8e8e0",
+          "fontBody": "'IBM Plex Mono', ui-monospace, monospace"
+        }
+      },
+      "longPageSettled": true,
+      "longPage": {
+        "attrs": {
+          "system": "terminal",
+          "accent": "crimson"
+        },
+        "stored": {
+          "system": "terminal",
+          "accent": "crimson"
+        },
+        "tokens": {
+          "accent": "#ff3d52",
+          "bg": "#000000",
+          "text": "#e8e8e0",
+          "fontBody": "'IBM Plex Mono', ui-monospace, monospace"
+        },
+        "h1": "Encoding & Codecs",
+        "docHeight": 5811,
+        "primaryBg": null,
+        "chipColor": "rgb(255, 61, 82)",
+        "linkFont": "\"IBM Plex Mono\", ui-monospace, monospace",
+        "bodyFont": "\"IBM Plex Mono\", ui-monospace, monospace",
+        "holdPresent": false
+      },
+      "chipMatchesAccent": true,
+      "bodyFontMatchesSystem": true,
+      "ok": true
+    },
+    {
+      "system": "terminal",
+      "accent": "magenta",
+      "beforeReloadSettled": true,
+      "beforeReload": {
+        "attrs": {
+          "system": "terminal",
+          "accent": "magenta"
+        },
+        "stored": {
+          "system": "terminal",
+          "accent": "magenta"
+        },
+        "tokens": {
+          "accent": "#ec4899",
+          "bg": "#000000",
+          "text": "#e8e8e0",
+          "fontBody": "'IBM Plex Mono', ui-monospace, monospace"
+        }
+      },
+      "afterReloadSettled": true,
+      "afterReload": {
+        "attrs": {
+          "system": "terminal",
+          "accent": "magenta"
+        },
+        "stored": {
+          "system": "terminal",
+          "accent": "magenta"
+        },
+        "tokens": {
+          "accent": "#ec4899",
+          "bg": "#000000",
+          "text": "#e8e8e0",
+          "fontBody": "'IBM Plex Mono', ui-monospace, monospace"
+        }
+      },
+      "longPageSettled": true,
+      "longPage": {
+        "attrs": {
+          "system": "terminal",
+          "accent": "magenta"
+        },
+        "stored": {
+          "system": "terminal",
+          "accent": "magenta"
+        },
+        "tokens": {
+          "accent": "#ec4899",
+          "bg": "#000000",
+          "text": "#e8e8e0",
+          "fontBody": "'IBM Plex Mono', ui-monospace, monospace"
+        },
+        "h1": "Encoding & Codecs",
+        "docHeight": 5811,
+        "primaryBg": null,
+        "chipColor": "rgb(236, 72, 153)",
+        "linkFont": "\"IBM Plex Mono\", ui-monospace, monospace",
+        "bodyFont": "\"IBM Plex Mono\", ui-monospace, monospace",
+        "holdPresent": false
+      },
+      "chipMatchesAccent": true,
+      "bodyFontMatchesSystem": true,
+      "ok": true
+    },
+    {
+      "system": "terminal",
+      "accent": "orange",
+      "beforeReloadSettled": true,
+      "beforeReload": {
+        "attrs": {
+          "system": "terminal",
+          "accent": "orange"
+        },
+        "stored": {
+          "system": "terminal",
+          "accent": "orange"
+        },
+        "tokens": {
+          "accent": "#ff7a3d",
+          "bg": "#000000",
+          "text": "#e8e8e0",
+          "fontBody": "'IBM Plex Mono', ui-monospace, monospace"
+        }
+      },
+      "afterReloadSettled": true,
+      "afterReload": {
+        "attrs": {
+          "system": "terminal",
+          "accent": "orange"
+        },
+        "stored": {
+          "system": "terminal",
+          "accent": "orange"
+        },
+        "tokens": {
+          "accent": "#ff7a3d",
+          "bg": "#000000",
+          "text": "#e8e8e0",
+          "fontBody": "'IBM Plex Mono', ui-monospace, monospace"
+        }
+      },
+      "longPageSettled": true,
+      "longPage": {
+        "attrs": {
+          "system": "terminal",
+          "accent": "orange"
+        },
+        "stored": {
+          "system": "terminal",
+          "accent": "orange"
+        },
+        "tokens": {
+          "accent": "#ff7a3d",
+          "bg": "#000000",
+          "text": "#e8e8e0",
+          "fontBody": "'IBM Plex Mono', ui-monospace, monospace"
+        },
+        "h1": "Encoding & Codecs",
+        "docHeight": 5811,
+        "primaryBg": null,
+        "chipColor": "rgb(255, 122, 61)",
+        "linkFont": "\"IBM Plex Mono\", ui-monospace, monospace",
+        "bodyFont": "\"IBM Plex Mono\", ui-monospace, monospace",
+        "holdPresent": false
+      },
+      "chipMatchesAccent": true,
+      "bodyFontMatchesSystem": true,
+      "ok": true
+    },
+    {
+      "system": "terminal",
+      "accent": "amber",
+      "beforeReloadSettled": true,
+      "beforeReload": {
+        "attrs": {
+          "system": "terminal",
+          "accent": "amber"
+        },
+        "stored": {
+          "system": "terminal",
+          "accent": "amber"
+        },
+        "tokens": {
+          "accent": "#ffb84d",
+          "bg": "#000000",
+          "text": "#e8e8e0",
+          "fontBody": "'IBM Plex Mono', ui-monospace, monospace"
+        }
+      },
+      "afterReloadSettled": true,
+      "afterReload": {
+        "attrs": {
+          "system": "terminal",
+          "accent": "amber"
+        },
+        "stored": {
+          "system": "terminal",
+          "accent": "amber"
+        },
+        "tokens": {
+          "accent": "#ffb84d",
+          "bg": "#000000",
+          "text": "#e8e8e0",
+          "fontBody": "'IBM Plex Mono', ui-monospace, monospace"
+        }
+      },
+      "longPageSettled": true,
+      "longPage": {
+        "attrs": {
+          "system": "terminal",
+          "accent": "amber"
+        },
+        "stored": {
+          "system": "terminal",
+          "accent": "amber"
+        },
+        "tokens": {
+          "accent": "#ffb84d",
+          "bg": "#000000",
+          "text": "#e8e8e0",
+          "fontBody": "'IBM Plex Mono', ui-monospace, monospace"
+        },
+        "h1": "Encoding & Codecs",
+        "docHeight": 5811,
+        "primaryBg": null,
+        "chipColor": "rgb(255, 184, 77)",
+        "linkFont": "\"IBM Plex Mono\", ui-monospace, monospace",
+        "bodyFont": "\"IBM Plex Mono\", ui-monospace, monospace",
+        "holdPresent": false
+      },
+      "chipMatchesAccent": true,
+      "bodyFontMatchesSystem": true,
+      "ok": true
+    },
+    {
+      "system": "terminal",
+      "accent": "emerald",
+      "beforeReloadSettled": true,
+      "beforeReload": {
+        "attrs": {
+          "system": "terminal",
+          "accent": "emerald"
+        },
+        "stored": {
+          "system": "terminal",
+          "accent": "emerald"
+        },
+        "tokens": {
+          "accent": "#34d08c",
+          "bg": "#000000",
+          "text": "#e8e8e0",
+          "fontBody": "'IBM Plex Mono', ui-monospace, monospace"
+        }
+      },
+      "afterReloadSettled": true,
+      "afterReload": {
+        "attrs": {
+          "system": "terminal",
+          "accent": "emerald"
+        },
+        "stored": {
+          "system": "terminal",
+          "accent": "emerald"
+        },
+        "tokens": {
+          "accent": "#34d08c",
+          "bg": "#000000",
+          "text": "#e8e8e0",
+          "fontBody": "'IBM Plex Mono', ui-monospace, monospace"
+        }
+      },
+      "longPageSettled": true,
+      "longPage": {
+        "attrs": {
+          "system": "terminal",
+          "accent": "emerald"
+        },
+        "stored": {
+          "system": "terminal",
+          "accent": "emerald"
+        },
+        "tokens": {
+          "accent": "#34d08c",
+          "bg": "#000000",
+          "text": "#e8e8e0",
+          "fontBody": "'IBM Plex Mono', ui-monospace, monospace"
+        },
+        "h1": "Encoding & Codecs",
+        "docHeight": 5811,
+        "primaryBg": null,
+        "chipColor": "rgb(52, 208, 140)",
+        "linkFont": "\"IBM Plex Mono\", ui-monospace, monospace",
+        "bodyFont": "\"IBM Plex Mono\", ui-monospace, monospace",
+        "holdPresent": false
+      },
+      "chipMatchesAccent": true,
+      "bodyFontMatchesSystem": true,
+      "ok": true
+    },
+    {
+      "system": "terminal",
+      "accent": "matrix",
+      "beforeReloadSettled": true,
+      "beforeReload": {
+        "attrs": {
+          "system": "terminal",
+          "accent": "matrix"
+        },
+        "stored": {
+          "system": "terminal",
+          "accent": "matrix"
+        },
+        "tokens": {
+          "accent": "#00ff88",
+          "bg": "#000000",
+          "text": "#e8e8e0",
+          "fontBody": "'IBM Plex Mono', ui-monospace, monospace"
+        }
+      },
+      "afterReloadSettled": true,
+      "afterReload": {
+        "attrs": {
+          "system": "terminal",
+          "accent": "matrix"
+        },
+        "stored": {
+          "system": "terminal",
+          "accent": "matrix"
+        },
+        "tokens": {
+          "accent": "#00ff88",
+          "bg": "#000000",
+          "text": "#e8e8e0",
+          "fontBody": "'IBM Plex Mono', ui-monospace, monospace"
+        }
+      },
+      "longPageSettled": true,
+      "longPage": {
+        "attrs": {
+          "system": "terminal",
+          "accent": "matrix"
+        },
+        "stored": {
+          "system": "terminal",
+          "accent": "matrix"
+        },
+        "tokens": {
+          "accent": "#00ff88",
+          "bg": "#000000",
+          "text": "#e8e8e0",
+          "fontBody": "'IBM Plex Mono', ui-monospace, monospace"
+        },
+        "h1": "Encoding & Codecs",
+        "docHeight": 5811,
+        "primaryBg": null,
+        "chipColor": "rgb(0, 255, 136)",
+        "linkFont": "\"IBM Plex Mono\", ui-monospace, monospace",
+        "bodyFont": "\"IBM Plex Mono\", ui-monospace, monospace",
+        "holdPresent": false
+      },
+      "chipMatchesAccent": true,
+      "bodyFontMatchesSystem": true,
+      "ok": true
+    },
+    {
+      "system": "terminal",
+      "accent": "cyan",
+      "beforeReloadSettled": true,
+      "beforeReload": {
+        "attrs": {
+          "system": "terminal",
+          "accent": "cyan"
+        },
+        "stored": {
+          "system": "terminal",
+          "accent": "cyan"
+        },
+        "tokens": {
+          "accent": "#5eddf2",
+          "bg": "#000000",
+          "text": "#e8e8e0",
+          "fontBody": "'IBM Plex Mono', ui-monospace, monospace"
+        }
+      },
+      "afterReloadSettled": true,
+      "afterReload": {
+        "attrs": {
+          "system": "terminal",
+          "accent": "cyan"
+        },
+        "stored": {
+          "system": "terminal",
+          "accent": "cyan"
+        },
+        "tokens": {
+          "accent": "#5eddf2",
+          "bg": "#000000",
+          "text": "#e8e8e0",
+          "fontBody": "'IBM Plex Mono', ui-monospace, monospace"
+        }
+      },
+      "longPageSettled": true,
+      "longPage": {
+        "attrs": {
+          "system": "terminal",
+          "accent": "cyan"
+        },
+        "stored": {
+          "system": "terminal",
+          "accent": "cyan"
+        },
+        "tokens": {
+          "accent": "#5eddf2",
+          "bg": "#000000",
+          "text": "#e8e8e0",
+          "fontBody": "'IBM Plex Mono', ui-monospace, monospace"
+        },
+        "h1": "Encoding & Codecs",
+        "docHeight": 5811,
+        "primaryBg": null,
+        "chipColor": "rgb(94, 221, 242)",
+        "linkFont": "\"IBM Plex Mono\", ui-monospace, monospace",
+        "bodyFont": "\"IBM Plex Mono\", ui-monospace, monospace",
+        "holdPresent": false
+      },
+      "chipMatchesAccent": true,
+      "bodyFontMatchesSystem": true,
+      "ok": true
+    },
+    {
+      "system": "terminal",
+      "accent": "violet",
+      "beforeReloadSettled": true,
+      "beforeReload": {
+        "attrs": {
+          "system": "terminal",
+          "accent": "violet"
+        },
+        "stored": {
+          "system": "terminal",
+          "accent": "violet"
+        },
+        "tokens": {
+          "accent": "#9d4edd",
+          "bg": "#000000",
+          "text": "#e8e8e0",
+          "fontBody": "'IBM Plex Mono', ui-monospace, monospace"
+        }
+      },
+      "afterReloadSettled": true,
+      "afterReload": {
+        "attrs": {
+          "system": "terminal",
+          "accent": "violet"
+        },
+        "stored": {
+          "system": "terminal",
+          "accent": "violet"
+        },
+        "tokens": {
+          "accent": "#9d4edd",
+          "bg": "#000000",
+          "text": "#e8e8e0",
+          "fontBody": "'IBM Plex Mono', ui-monospace, monospace"
+        }
+      },
+      "longPageSettled": true,
+      "longPage": {
+        "attrs": {
+          "system": "terminal",
+          "accent": "violet"
+        },
+        "stored": {
+          "system": "terminal",
+          "accent": "violet"
+        },
+        "tokens": {
+          "accent": "#9d4edd",
+          "bg": "#000000",
+          "text": "#e8e8e0",
+          "fontBody": "'IBM Plex Mono', ui-monospace, monospace"
+        },
+        "h1": "Encoding & Codecs",
+        "docHeight": 5811,
+        "primaryBg": null,
+        "chipColor": "rgb(157, 78, 221)",
+        "linkFont": "\"IBM Plex Mono\", ui-monospace, monospace",
+        "bodyFont": "\"IBM Plex Mono\", ui-monospace, monospace",
+        "holdPresent": false
+      },
+      "chipMatchesAccent": true,
+      "bodyFontMatchesSystem": true,
+      "ok": true
+    },
+    {
+      "system": "terminal",
+      "accent": "lime",
+      "beforeReloadSettled": true,
+      "beforeReload": {
+        "attrs": {
+          "system": "terminal",
+          "accent": "lime"
+        },
+        "stored": {
+          "system": "terminal",
+          "accent": "lime"
+        },
+        "tokens": {
+          "accent": "#aaff00",
+          "bg": "#000000",
+          "text": "#e8e8e0",
+          "fontBody": "'IBM Plex Mono', ui-monospace, monospace"
+        }
+      },
+      "afterReloadSettled": true,
+      "afterReload": {
+        "attrs": {
+          "system": "terminal",
+          "accent": "lime"
+        },
+        "stored": {
+          "system": "terminal",
+          "accent": "lime"
+        },
+        "tokens": {
+          "accent": "#aaff00",
+          "bg": "#000000",
+          "text": "#e8e8e0",
+          "fontBody": "'IBM Plex Mono', ui-monospace, monospace"
+        }
+      },
+      "longPageSettled": true,
+      "longPage": {
+        "attrs": {
+          "system": "terminal",
+          "accent": "lime"
+        },
+        "stored": {
+          "system": "terminal",
+          "accent": "lime"
+        },
+        "tokens": {
+          "accent": "#aaff00",
+          "bg": "#000000",
+          "text": "#e8e8e0",
+          "fontBody": "'IBM Plex Mono', ui-monospace, monospace"
+        },
+        "h1": "Encoding & Codecs",
+        "docHeight": 5811,
+        "primaryBg": null,
+        "chipColor": "rgb(170, 255, 0)",
+        "linkFont": "\"IBM Plex Mono\", ui-monospace, monospace",
+        "bodyFont": "\"IBM Plex Mono\", ui-monospace, monospace",
+        "holdPresent": false
+      },
+      "chipMatchesAccent": true,
+      "bodyFontMatchesSystem": true,
+      "ok": true
+    },
+    {
+      "system": "terminal",
+      "accent": "rose",
+      "beforeReloadSettled": true,
+      "beforeReload": {
+        "attrs": {
+          "system": "terminal",
+          "accent": "rose"
+        },
+        "stored": {
+          "system": "terminal",
+          "accent": "rose"
+        },
+        "tokens": {
+          "accent": "#ff7a8a",
+          "bg": "#000000",
+          "text": "#e8e8e0",
+          "fontBody": "'IBM Plex Mono', ui-monospace, monospace"
+        }
+      },
+      "afterReloadSettled": true,
+      "afterReload": {
+        "attrs": {
+          "system": "terminal",
+          "accent": "rose"
+        },
+        "stored": {
+          "system": "terminal",
+          "accent": "rose"
+        },
+        "tokens": {
+          "accent": "#ff7a8a",
+          "bg": "#000000",
+          "text": "#e8e8e0",
+          "fontBody": "'IBM Plex Mono', ui-monospace, monospace"
+        }
+      },
+      "longPageSettled": true,
+      "longPage": {
+        "attrs": {
+          "system": "terminal",
+          "accent": "rose"
+        },
+        "stored": {
+          "system": "terminal",
+          "accent": "rose"
+        },
+        "tokens": {
+          "accent": "#ff7a8a",
+          "bg": "#000000",
+          "text": "#e8e8e0",
+          "fontBody": "'IBM Plex Mono', ui-monospace, monospace"
+        },
+        "h1": "Encoding & Codecs",
+        "docHeight": 5811,
+        "primaryBg": null,
+        "chipColor": "rgb(255, 122, 138)",
+        "linkFont": "\"IBM Plex Mono\", ui-monospace, monospace",
+        "bodyFont": "\"IBM Plex Mono\", ui-monospace, monospace",
+        "holdPresent": false
+      },
+      "chipMatchesAccent": true,
+      "bodyFontMatchesSystem": true,
+      "ok": true
+    },
+    {
+      "system": "geist",
+      "accent": "crimson",
+      "beforeReloadSettled": true,
+      "beforeReload": {
+        "attrs": {
+          "system": "geist",
+          "accent": "crimson"
+        },
+        "stored": {
+          "system": "geist",
+          "accent": "crimson"
+        },
+        "tokens": {
+          "accent": "#ff3d52",
+          "bg": "#000000",
+          "text": "#fafafa",
+          "fontBody": "'Geist', 'Inter', system-ui, sans-serif"
+        }
+      },
+      "afterReloadSettled": true,
+      "afterReload": {
+        "attrs": {
+          "system": "geist",
+          "accent": "crimson"
+        },
+        "stored": {
+          "system": "geist",
+          "accent": "crimson"
+        },
+        "tokens": {
+          "accent": "#ff3d52",
+          "bg": "#000000",
+          "text": "#fafafa",
+          "fontBody": "'Geist', 'Inter', system-ui, sans-serif"
+        }
+      },
+      "longPageSettled": true,
+      "longPage": {
+        "attrs": {
+          "system": "geist",
+          "accent": "crimson"
+        },
+        "stored": {
+          "system": "geist",
+          "accent": "crimson"
+        },
+        "tokens": {
+          "accent": "#ff3d52",
+          "bg": "#000000",
+          "text": "#fafafa",
+          "fontBody": "'Geist', 'Inter', system-ui, sans-serif"
+        },
+        "h1": "Encoding & Codecs",
+        "docHeight": 5139,
+        "primaryBg": null,
+        "chipColor": "rgb(255, 61, 82)",
+        "linkFont": "Geist, Inter, system-ui, sans-serif",
+        "bodyFont": "Geist, Inter, system-ui, sans-serif",
+        "holdPresent": false
+      },
+      "chipMatchesAccent": true,
+      "bodyFontMatchesSystem": true,
+      "ok": true
+    },
+    {
+      "system": "geist",
+      "accent": "magenta",
+      "beforeReloadSettled": true,
+      "beforeReload": {
+        "attrs": {
+          "system": "geist",
+          "accent": "magenta"
+        },
+        "stored": {
+          "system": "geist",
+          "accent": "magenta"
+        },
+        "tokens": {
+          "accent": "#ec4899",
+          "bg": "#000000",
+          "text": "#fafafa",
+          "fontBody": "'Geist', 'Inter', system-ui, sans-serif"
+        }
+      },
+      "afterReloadSettled": true,
+      "afterReload": {
+        "attrs": {
+          "system": "geist",
+          "accent": "magenta"
+        },
+        "stored": {
+          "system": "geist",
+          "accent": "magenta"
+        },
+        "tokens": {
+          "accent": "#ec4899",
+          "bg": "#000000",
+          "text": "#fafafa",
+          "fontBody": "'Geist', 'Inter', system-ui, sans-serif"
+        }
+      },
+      "longPageSettled": true,
+      "longPage": {
+        "attrs": {
+          "system": "geist",
+          "accent": "magenta"
+        },
+        "stored": {
+          "system": "geist",
+          "accent": "magenta"
+        },
+        "tokens": {
+          "accent": "#ec4899",
+          "bg": "#000000",
+          "text": "#fafafa",
+          "fontBody": "'Geist', 'Inter', system-ui, sans-serif"
+        },
+        "h1": "Encoding & Codecs",
+        "docHeight": 5139,
+        "primaryBg": null,
+        "chipColor": "rgb(236, 72, 153)",
+        "linkFont": "Geist, Inter, system-ui, sans-serif",
+        "bodyFont": "Geist, Inter, system-ui, sans-serif",
+        "holdPresent": false
+      },
+      "chipMatchesAccent": true,
+      "bodyFontMatchesSystem": true,
+      "ok": true
+    },
+    {
+      "system": "geist",
+      "accent": "orange",
+      "beforeReloadSettled": true,
+      "beforeReload": {
+        "attrs": {
+          "system": "geist",
+          "accent": "orange"
+        },
+        "stored": {
+          "system": "geist",
+          "accent": "orange"
+        },
+        "tokens": {
+          "accent": "#ff7a3d",
+          "bg": "#000000",
+          "text": "#fafafa",
+          "fontBody": "'Geist', 'Inter', system-ui, sans-serif"
+        }
+      },
+      "afterReloadSettled": true,
+      "afterReload": {
+        "attrs": {
+          "system": "geist",
+          "accent": "orange"
+        },
+        "stored": {
+          "system": "geist",
+          "accent": "orange"
+        },
+        "tokens": {
+          "accent": "#ff7a3d",
+          "bg": "#000000",
+          "text": "#fafafa",
+          "fontBody": "'Geist', 'Inter', system-ui, sans-serif"
+        }
+      },
+      "longPageSettled": true,
+      "longPage": {
+        "attrs": {
+          "system": "geist",
+          "accent": "orange"
+        },
+        "stored": {
+          "system": "geist",
+          "accent": "orange"
+        },
+        "tokens": {
+          "accent": "#ff7a3d",
+          "bg": "#000000",
+          "text": "#fafafa",
+          "fontBody": "'Geist', 'Inter', system-ui, sans-serif"
+        },
+        "h1": "Encoding & Codecs",
+        "docHeight": 5139,
+        "primaryBg": null,
+        "chipColor": "rgb(255, 122, 61)",
+        "linkFont": "Geist, Inter, system-ui, sans-serif",
+        "bodyFont": "Geist, Inter, system-ui, sans-serif",
+        "holdPresent": false
+      },
+      "chipMatchesAccent": true,
+      "bodyFontMatchesSystem": true,
+      "ok": true
+    },
+    {
+      "system": "geist",
+      "accent": "amber",
+      "beforeReloadSettled": true,
+      "beforeReload": {
+        "attrs": {
+          "system": "geist",
+          "accent": "amber"
+        },
+        "stored": {
+          "system": "geist",
+          "accent": "amber"
+        },
+        "tokens": {
+          "accent": "#ffb84d",
+          "bg": "#000000",
+          "text": "#fafafa",
+          "fontBody": "'Geist', 'Inter', system-ui, sans-serif"
+        }
+      },
+      "afterReloadSettled": true,
+      "afterReload": {
+        "attrs": {
+          "system": "geist",
+          "accent": "amber"
+        },
+        "stored": {
+          "system": "geist",
+          "accent": "amber"
+        },
+        "tokens": {
+          "accent": "#ffb84d",
+          "bg": "#000000",
+          "text": "#fafafa",
+          "fontBody": "'Geist', 'Inter', system-ui, sans-serif"
+        }
+      },
+      "longPageSettled": true,
+      "longPage": {
+        "attrs": {
+          "system": "geist",
+          "accent": "amber"
+        },
+        "stored": {
+          "system": "geist",
+          "accent": "amber"
+        },
+        "tokens": {
+          "accent": "#ffb84d",
+          "bg": "#000000",
+          "text": "#fafafa",
+          "fontBody": "'Geist', 'Inter', system-ui, sans-serif"
+        },
+        "h1": "Encoding & Codecs",
+        "docHeight": 5139,
+        "primaryBg": null,
+        "chipColor": "rgb(255, 184, 77)",
+        "linkFont": "Geist, Inter, system-ui, sans-serif",
+        "bodyFont": "Geist, Inter, system-ui, sans-serif",
+        "holdPresent": false
+      },
+      "chipMatchesAccent": true,
+      "bodyFontMatchesSystem": true,
+      "ok": true
+    },
+    {
+      "system": "geist",
+      "accent": "emerald",
+      "beforeReloadSettled": true,
+      "beforeReload": {
+        "attrs": {
+          "system": "geist",
+          "accent": "emerald"
+        },
+        "stored": {
+          "system": "geist",
+          "accent": "emerald"
+        },
+        "tokens": {
+          "accent": "#34d08c",
+          "bg": "#000000",
+          "text": "#fafafa",
+          "fontBody": "'Geist', 'Inter', system-ui, sans-serif"
+        }
+      },
+      "afterReloadSettled": true,
+      "afterReload": {
+        "attrs": {
+          "system": "geist",
+          "accent": "emerald"
+        },
+        "stored": {
+          "system": "geist",
+          "accent": "emerald"
+        },
+        "tokens": {
+          "accent": "#34d08c",
+          "bg": "#000000",
+          "text": "#fafafa",
+          "fontBody": "'Geist', 'Inter', system-ui, sans-serif"
+        }
+      },
+      "longPageSettled": true,
+      "longPage": {
+        "attrs": {
+          "system": "geist",
+          "accent": "emerald"
+        },
+        "stored": {
+          "system": "geist",
+          "accent": "emerald"
+        },
+        "tokens": {
+          "accent": "#34d08c",
+          "bg": "#000000",
+          "text": "#fafafa",
+          "fontBody": "'Geist', 'Inter', system-ui, sans-serif"
+        },
+        "h1": "Encoding & Codecs",
+        "docHeight": 5139,
+        "primaryBg": null,
+        "chipColor": "rgb(52, 208, 140)",
+        "linkFont": "Geist, Inter, system-ui, sans-serif",
+        "bodyFont": "Geist, Inter, system-ui, sans-serif",
+        "holdPresent": false
+      },
+      "chipMatchesAccent": true,
+      "bodyFontMatchesSystem": true,
+      "ok": true
+    },
+    {
+      "system": "geist",
+      "accent": "matrix",
+      "beforeReloadSettled": true,
+      "beforeReload": {
+        "attrs": {
+          "system": "geist",
+          "accent": "matrix"
+        },
+        "stored": {
+          "system": "geist",
+          "accent": "matrix"
+        },
+        "tokens": {
+          "accent": "#00ff88",
+          "bg": "#000000",
+          "text": "#fafafa",
+          "fontBody": "'Geist', 'Inter', system-ui, sans-serif"
+        }
+      },
+      "afterReloadSettled": true,
+      "afterReload": {
+        "attrs": {
+          "system": "geist",
+          "accent": "matrix"
+        },
+        "stored": {
+          "system": "geist",
+          "accent": "matrix"
+        },
+        "tokens": {
+          "accent": "#00ff88",
+          "bg": "#000000",
+          "text": "#fafafa",
+          "fontBody": "'Geist', 'Inter', system-ui, sans-serif"
+        }
+      },
+      "longPageSettled": true,
+      "longPage": {
+        "attrs": {
+          "system": "geist",
+          "accent": "matrix"
+        },
+        "stored": {
+          "system": "geist",
+          "accent": "matrix"
+        },
+        "tokens": {
+          "accent": "#00ff88",
+          "bg": "#000000",
+          "text": "#fafafa",
+          "fontBody": "'Geist', 'Inter', system-ui, sans-serif"
+        },
+        "h1": "Encoding & Codecs",
+        "docHeight": 5139,
+        "primaryBg": null,
+        "chipColor": "rgb(0, 255, 136)",
+        "linkFont": "Geist, Inter, system-ui, sans-serif",
+        "bodyFont": "Geist, Inter, system-ui, sans-serif",
+        "holdPresent": false
+      },
+      "chipMatchesAccent": true,
+      "bodyFontMatchesSystem": true,
+      "ok": true
+    },
+    {
+      "system": "geist",
+      "accent": "cyan",
+      "beforeReloadSettled": true,
+      "beforeReload": {
+        "attrs": {
+          "system": "geist",
+          "accent": "cyan"
+        },
+        "stored": {
+          "system": "geist",
+          "accent": "cyan"
+        },
+        "tokens": {
+          "accent": "#5eddf2",
+          "bg": "#000000",
+          "text": "#fafafa",
+          "fontBody": "'Geist', 'Inter', system-ui, sans-serif"
+        }
+      },
+      "afterReloadSettled": true,
+      "afterReload": {
+        "attrs": {
+          "system": "geist",
+          "accent": "cyan"
+        },
+        "stored": {
+          "system": "geist",
+          "accent": "cyan"
+        },
+        "tokens": {
+          "accent": "#5eddf2",
+          "bg": "#000000",
+          "text": "#fafafa",
+          "fontBody": "'Geist', 'Inter', system-ui, sans-serif"
+        }
+      },
+      "longPageSettled": true,
+      "longPage": {
+        "attrs": {
+          "system": "geist",
+          "accent": "cyan"
+        },
+        "stored": {
+          "system": "geist",
+          "accent": "cyan"
+        },
+        "tokens": {
+          "accent": "#5eddf2",
+          "bg": "#000000",
+          "text": "#fafafa",
+          "fontBody": "'Geist', 'Inter', system-ui, sans-serif"
+        },
+        "h1": "Encoding & Codecs",
+        "docHeight": 5139,
+        "primaryBg": null,
+        "chipColor": "rgb(94, 221, 242)",
+        "linkFont": "Geist, Inter, system-ui, sans-serif",
+        "bodyFont": "Geist, Inter, system-ui, sans-serif",
+        "holdPresent": false
+      },
+      "chipMatchesAccent": true,
+      "bodyFontMatchesSystem": true,
+      "ok": true
+    },
+    {
+      "system": "geist",
+      "accent": "violet",
+      "beforeReloadSettled": true,
+      "beforeReload": {
+        "attrs": {
+          "system": "geist",
+          "accent": "violet"
+        },
+        "stored": {
+          "system": "geist",
+          "accent": "violet"
+        },
+        "tokens": {
+          "accent": "#9d4edd",
+          "bg": "#000000",
+          "text": "#fafafa",
+          "fontBody": "'Geist', 'Inter', system-ui, sans-serif"
+        }
+      },
+      "afterReloadSettled": true,
+      "afterReload": {
+        "attrs": {
+          "system": "geist",
+          "accent": "violet"
+        },
+        "stored": {
+          "system": "geist",
+          "accent": "violet"
+        },
+        "tokens": {
+          "accent": "#9d4edd",
+          "bg": "#000000",
+          "text": "#fafafa",
+          "fontBody": "'Geist', 'Inter', system-ui, sans-serif"
+        }
+      },
+      "longPageSettled": true,
+      "longPage": {
+        "attrs": {
+          "system": "geist",
+          "accent": "violet"
+        },
+        "stored": {
+          "system": "geist",
+          "accent": "violet"
+        },
+        "tokens": {
+          "accent": "#9d4edd",
+          "bg": "#000000",
+          "text": "#fafafa",
+          "fontBody": "'Geist', 'Inter', system-ui, sans-serif"
+        },
+        "h1": "Encoding & Codecs",
+        "docHeight": 5139,
+        "primaryBg": null,
+        "chipColor": "rgb(157, 78, 221)",
+        "linkFont": "Geist, Inter, system-ui, sans-serif",
+        "bodyFont": "Geist, Inter, system-ui, sans-serif",
+        "holdPresent": false
+      },
+      "chipMatchesAccent": true,
+      "bodyFontMatchesSystem": true,
+      "ok": true
+    },
+    {
+      "system": "geist",
+      "accent": "lime",
+      "beforeReloadSettled": true,
+      "beforeReload": {
+        "attrs": {
+          "system": "geist",
+          "accent": "lime"
+        },
+        "stored": {
+          "system": "geist",
+          "accent": "lime"
+        },
+        "tokens": {
+          "accent": "#aaff00",
+          "bg": "#000000",
+          "text": "#fafafa",
+          "fontBody": "'Geist', 'Inter', system-ui, sans-serif"
+        }
+      },
+      "afterReloadSettled": true,
+      "afterReload": {
+        "attrs": {
+          "system": "geist",
+          "accent": "lime"
+        },
+        "stored": {
+          "system": "geist",
+          "accent": "lime"
+        },
+        "tokens": {
+          "accent": "#aaff00",
+          "bg": "#000000",
+          "text": "#fafafa",
+          "fontBody": "'Geist', 'Inter', system-ui, sans-serif"
+        }
+      },
+      "longPageSettled": true,
+      "longPage": {
+        "attrs": {
+          "system": "geist",
+          "accent": "lime"
+        },
+        "stored": {
+          "system": "geist",
+          "accent": "lime"
+        },
+        "tokens": {
+          "accent": "#aaff00",
+          "bg": "#000000",
+          "text": "#fafafa",
+          "fontBody": "'Geist', 'Inter', system-ui, sans-serif"
+        },
+        "h1": "Encoding & Codecs",
+        "docHeight": 5139,
+        "primaryBg": null,
+        "chipColor": "rgb(170, 255, 0)",
+        "linkFont": "Geist, Inter, system-ui, sans-serif",
+        "bodyFont": "Geist, Inter, system-ui, sans-serif",
+        "holdPresent": false
+      },
+      "chipMatchesAccent": true,
+      "bodyFontMatchesSystem": true,
+      "ok": true
+    },
+    {
+      "system": "geist",
+      "accent": "rose",
+      "beforeReloadSettled": true,
+      "beforeReload": {
+        "attrs": {
+          "system": "geist",
+          "accent": "rose"
+        },
+        "stored": {
+          "system": "geist",
+          "accent": "rose"
+        },
+        "tokens": {
+          "accent": "#ff7a8a",
+          "bg": "#000000",
+          "text": "#fafafa",
+          "fontBody": "'Geist', 'Inter', system-ui, sans-serif"
+        }
+      },
+      "afterReloadSettled": true,
+      "afterReload": {
+        "attrs": {
+          "system": "geist",
+          "accent": "rose"
+        },
+        "stored": {
+          "system": "geist",
+          "accent": "rose"
+        },
+        "tokens": {
+          "accent": "#ff7a8a",
+          "bg": "#000000",
+          "text": "#fafafa",
+          "fontBody": "'Geist', 'Inter', system-ui, sans-serif"
+        }
+      },
+      "longPageSettled": true,
+      "longPage": {
+        "attrs": {
+          "system": "geist",
+          "accent": "rose"
+        },
+        "stored": {
+          "system": "geist",
+          "accent": "rose"
+        },
+        "tokens": {
+          "accent": "#ff7a8a",
+          "bg": "#000000",
+          "text": "#fafafa",
+          "fontBody": "'Geist', 'Inter', system-ui, sans-serif"
+        },
+        "h1": "Encoding & Codecs",
+        "docHeight": 5139,
+        "primaryBg": null,
+        "chipColor": "rgb(255, 122, 138)",
+        "linkFont": "Geist, Inter, system-ui, sans-serif",
+        "bodyFont": "Geist, Inter, system-ui, sans-serif",
+        "holdPresent": false
+      },
+      "chipMatchesAccent": true,
+      "bodyFontMatchesSystem": true,
+      "ok": true
+    },
+    {
+      "system": "brutalist",
+      "accent": "crimson",
+      "beforeReloadSettled": true,
+      "beforeReload": {
+        "attrs": {
+          "system": "brutalist",
+          "accent": "crimson"
+        },
+        "stored": {
+          "system": "brutalist",
+          "accent": "crimson"
+        },
+        "tokens": {
+          "accent": "#ff3d52",
+          "bg": "#000000",
+          "text": "#f5f5f0",
+          "fontBody": "'Space Grotesk', system-ui, sans-serif"
+        }
+      },
+      "afterReloadSettled": true,
+      "afterReload": {
+        "attrs": {
+          "system": "brutalist",
+          "accent": "crimson"
+        },
+        "stored": {
+          "system": "brutalist",
+          "accent": "crimson"
+        },
+        "tokens": {
+          "accent": "#ff3d52",
+          "bg": "#000000",
+          "text": "#f5f5f0",
+          "fontBody": "'Space Grotesk', system-ui, sans-serif"
+        }
+      },
+      "longPageSettled": true,
+      "longPage": {
+        "attrs": {
+          "system": "brutalist",
+          "accent": "crimson"
+        },
+        "stored": {
+          "system": "brutalist",
+          "accent": "crimson"
+        },
+        "tokens": {
+          "accent": "#ff3d52",
+          "bg": "#000000",
+          "text": "#f5f5f0",
+          "fontBody": "'Space Grotesk', system-ui, sans-serif"
+        },
+        "h1": "Encoding & Codecs",
+        "docHeight": 5308,
+        "primaryBg": null,
+        "chipColor": "rgb(255, 61, 82)",
+        "linkFont": "\"Space Grotesk\", system-ui, sans-serif",
+        "bodyFont": "\"Space Grotesk\", system-ui, sans-serif",
+        "holdPresent": false
+      },
+      "chipMatchesAccent": true,
+      "bodyFontMatchesSystem": true,
+      "ok": true
+    },
+    {
+      "system": "brutalist",
+      "accent": "magenta",
+      "beforeReloadSettled": true,
+      "beforeReload": {
+        "attrs": {
+          "system": "brutalist",
+          "accent": "magenta"
+        },
+        "stored": {
+          "system": "brutalist",
+          "accent": "magenta"
+        },
+        "tokens": {
+          "accent": "#ec4899",
+          "bg": "#000000",
+          "text": "#f5f5f0",
+          "fontBody": "'Space Grotesk', system-ui, sans-serif"
+        }
+      },
+      "afterReloadSettled": true,
+      "afterReload": {
+        "attrs": {
+          "system": "brutalist",
+          "accent": "magenta"
+        },
+        "stored": {
+          "system": "brutalist",
+          "accent": "magenta"
+        },
+        "tokens": {
+          "accent": "#ec4899",
+          "bg": "#000000",
+          "text": "#f5f5f0",
+          "fontBody": "'Space Grotesk', system-ui, sans-serif"
+        }
+      },
+      "longPageSettled": true,
+      "longPage": {
+        "attrs": {
+          "system": "brutalist",
+          "accent": "magenta"
+        },
+        "stored": {
+          "system": "brutalist",
+          "accent": "magenta"
+        },
+        "tokens": {
+          "accent": "#ec4899",
+          "bg": "#000000",
+          "text": "#f5f5f0",
+          "fontBody": "'Space Grotesk', system-ui, sans-serif"
+        },
+        "h1": "Encoding & Codecs",
+        "docHeight": 5308,
+        "primaryBg": null,
+        "chipColor": "rgb(236, 72, 153)",
+        "linkFont": "\"Space Grotesk\", system-ui, sans-serif",
+        "bodyFont": "\"Space Grotesk\", system-ui, sans-serif",
+        "holdPresent": false
+      },
+      "chipMatchesAccent": true,
+      "bodyFontMatchesSystem": true,
+      "ok": true
+    },
+    {
+      "system": "brutalist",
+      "accent": "orange",
+      "beforeReloadSettled": true,
+      "beforeReload": {
+        "attrs": {
+          "system": "brutalist",
+          "accent": "orange"
+        },
+        "stored": {
+          "system": "brutalist",
+          "accent": "orange"
+        },
+        "tokens": {
+          "accent": "#ff7a3d",
+          "bg": "#000000",
+          "text": "#f5f5f0",
+          "fontBody": "'Space Grotesk', system-ui, sans-serif"
+        }
+      },
+      "afterReloadSettled": true,
+      "afterReload": {
+        "attrs": {
+          "system": "brutalist",
+          "accent": "orange"
+        },
+        "stored": {
+          "system": "brutalist",
+          "accent": "orange"
+        },
+        "tokens": {
+          "accent": "#ff7a3d",
+          "bg": "#000000",
+          "text": "#f5f5f0",
+          "fontBody": "'Space Grotesk', system-ui, sans-serif"
+        }
+      },
+      "longPageSettled": true,
+      "longPage": {
+        "attrs": {
+          "system": "brutalist",
+          "accent": "orange"
+        },
+        "stored": {
+          "system": "brutalist",
+          "accent": "orange"
+        },
+        "tokens": {
+          "accent": "#ff7a3d",
+          "bg": "#000000",
+          "text": "#f5f5f0",
+          "fontBody": "'Space Grotesk', system-ui, sans-serif"
+        },
+        "h1": "Encoding & Codecs",
+        "docHeight": 5308,
+        "primaryBg": null,
+        "chipColor": "rgb(255, 122, 61)",
+        "linkFont": "\"Space Grotesk\", system-ui, sans-serif",
+        "bodyFont": "\"Space Grotesk\", system-ui, sans-serif",
+        "holdPresent": false
+      },
+      "chipMatchesAccent": true,
+      "bodyFontMatchesSystem": true,
+      "ok": true
+    },
+    {
+      "system": "brutalist",
+      "accent": "amber",
+      "beforeReloadSettled": true,
+      "beforeReload": {
+        "attrs": {
+          "system": "brutalist",
+          "accent": "amber"
+        },
+        "stored": {
+          "system": "brutalist",
+          "accent": "amber"
+        },
+        "tokens": {
+          "accent": "#ffb84d",
+          "bg": "#000000",
+          "text": "#f5f5f0",
+          "fontBody": "'Space Grotesk', system-ui, sans-serif"
+        }
+      },
+      "afterReloadSettled": true,
+      "afterReload": {
+        "attrs": {
+          "system": "brutalist",
+          "accent": "amber"
+        },
+        "stored": {
+          "system": "brutalist",
+          "accent": "amber"
+        },
+        "tokens": {
+          "accent": "#ffb84d",
+          "bg": "#000000",
+          "text": "#f5f5f0",
+          "fontBody": "'Space Grotesk', system-ui, sans-serif"
+        }
+      },
+      "longPageSettled": true,
+      "longPage": {
+        "attrs": {
+          "system": "brutalist",
+          "accent": "amber"
+        },
+        "stored": {
+          "system": "brutalist",
+          "accent": "amber"
+        },
+        "tokens": {
+          "accent": "#ffb84d",
+          "bg": "#000000",
+          "text": "#f5f5f0",
+          "fontBody": "'Space Grotesk', system-ui, sans-serif"
+        },
+        "h1": "Encoding & Codecs",
+        "docHeight": 5308,
+        "primaryBg": null,
+        "chipColor": "rgb(255, 184, 77)",
+        "linkFont": "\"Space Grotesk\", system-ui, sans-serif",
+        "bodyFont": "\"Space Grotesk\", system-ui, sans-serif",
+        "holdPresent": false
+      },
+      "chipMatchesAccent": true,
+      "bodyFontMatchesSystem": true,
+      "ok": true
+    },
+    {
+      "system": "brutalist",
+      "accent": "emerald",
+      "beforeReloadSettled": true,
+      "beforeReload": {
+        "attrs": {
+          "system": "brutalist",
+          "accent": "emerald"
+        },
+        "stored": {
+          "system": "brutalist",
+          "accent": "emerald"
+        },
+        "tokens": {
+          "accent": "#34d08c",
+          "bg": "#000000",
+          "text": "#f5f5f0",
+          "fontBody": "'Space Grotesk', system-ui, sans-serif"
+        }
+      },
+      "afterReloadSettled": true,
+      "afterReload": {
+        "attrs": {
+          "system": "brutalist",
+          "accent": "emerald"
+        },
+        "stored": {
+          "system": "brutalist",
+          "accent": "emerald"
+        },
+        "tokens": {
+          "accent": "#34d08c",
+          "bg": "#000000",
+          "text": "#f5f5f0",
+          "fontBody": "'Space Grotesk', system-ui, sans-serif"
+        }
+      },
+      "longPageSettled": true,
+      "longPage": {
+        "attrs": {
+          "system": "brutalist",
+          "accent": "emerald"
+        },
+        "stored": {
+          "system": "brutalist",
+          "accent": "emerald"
+        },
+        "tokens": {
+          "accent": "#34d08c",
+          "bg": "#000000",
+          "text": "#f5f5f0",
+          "fontBody": "'Space Grotesk', system-ui, sans-serif"
+        },
+        "h1": "Encoding & Codecs",
+        "docHeight": 5308,
+        "primaryBg": null,
+        "chipColor": "rgb(52, 208, 140)",
+        "linkFont": "\"Space Grotesk\", system-ui, sans-serif",
+        "bodyFont": "\"Space Grotesk\", system-ui, sans-serif",
+        "holdPresent": false
+      },
+      "chipMatchesAccent": true,
+      "bodyFontMatchesSystem": true,
+      "ok": true
+    },
+    {
+      "system": "brutalist",
+      "accent": "matrix",
+      "beforeReloadSettled": true,
+      "beforeReload": {
+        "attrs": {
+          "system": "brutalist",
+          "accent": "matrix"
+        },
+        "stored": {
+          "system": "brutalist",
+          "accent": "matrix"
+        },
+        "tokens": {
+          "accent": "#00ff88",
+          "bg": "#000000",
+          "text": "#f5f5f0",
+          "fontBody": "'Space Grotesk', system-ui, sans-serif"
+        }
+      },
+      "afterReloadSettled": true,
+      "afterReload": {
+        "attrs": {
+          "system": "brutalist",
+          "accent": "matrix"
+        },
+        "stored": {
+          "system": "brutalist",
+          "accent": "matrix"
+        },
+        "tokens": {
+          "accent": "#00ff88",
+          "bg": "#000000",
+          "text": "#f5f5f0",
+          "fontBody": "'Space Grotesk', system-ui, sans-serif"
+        }
+      },
+      "longPageSettled": true,
+      "longPage": {
+        "attrs": {
+          "system": "brutalist",
+          "accent": "matrix"
+        },
+        "stored": {
+          "system": "brutalist",
+          "accent": "matrix"
+        },
+        "tokens": {
+          "accent": "#00ff88",
+          "bg": "#000000",
+          "text": "#f5f5f0",
+          "fontBody": "'Space Grotesk', system-ui, sans-serif"
+        },
+        "h1": "Encoding & Codecs",
+        "docHeight": 5308,
+        "primaryBg": null,
+        "chipColor": "rgb(0, 255, 136)",
+        "linkFont": "\"Space Grotesk\", system-ui, sans-serif",
+        "bodyFont": "\"Space Grotesk\", system-ui, sans-serif",
+        "holdPresent": false
+      },
+      "chipMatchesAccent": true,
+      "bodyFontMatchesSystem": true,
+      "ok": true
+    },
+    {
+      "system": "brutalist",
+      "accent": "cyan",
+      "beforeReloadSettled": true,
+      "beforeReload": {
+        "attrs": {
+          "system": "brutalist",
+          "accent": "cyan"
+        },
+        "stored": {
+          "system": "brutalist",
+          "accent": "cyan"
+        },
+        "tokens": {
+          "accent": "#5eddf2",
+          "bg": "#000000",
+          "text": "#f5f5f0",
+          "fontBody": "'Space Grotesk', system-ui, sans-serif"
+        }
+      },
+      "afterReloadSettled": true,
+      "afterReload": {
+        "attrs": {
+          "system": "brutalist",
+          "accent": "cyan"
+        },
+        "stored": {
+          "system": "brutalist",
+          "accent": "cyan"
+        },
+        "tokens": {
+          "accent": "#5eddf2",
+          "bg": "#000000",
+          "text": "#f5f5f0",
+          "fontBody": "'Space Grotesk', system-ui, sans-serif"
+        }
+      },
+      "longPageSettled": true,
+      "longPage": {
+        "attrs": {
+          "system": "brutalist",
+          "accent": "cyan"
+        },
+        "stored": {
+          "system": "brutalist",
+          "accent": "cyan"
+        },
+        "tokens": {
+          "accent": "#5eddf2",
+          "bg": "#000000",
+          "text": "#f5f5f0",
+          "fontBody": "'Space Grotesk', system-ui, sans-serif"
+        },
+        "h1": "Encoding & Codecs",
+        "docHeight": 5308,
+        "primaryBg": null,
+        "chipColor": "rgb(94, 221, 242)",
+        "linkFont": "\"Space Grotesk\", system-ui, sans-serif",
+        "bodyFont": "\"Space Grotesk\", system-ui, sans-serif",
+        "holdPresent": false
+      },
+      "chipMatchesAccent": true,
+      "bodyFontMatchesSystem": true,
+      "ok": true
+    },
+    {
+      "system": "brutalist",
+      "accent": "violet",
+      "beforeReloadSettled": true,
+      "beforeReload": {
+        "attrs": {
+          "system": "brutalist",
+          "accent": "violet"
+        },
+        "stored": {
+          "system": "brutalist",
+          "accent": "violet"
+        },
+        "tokens": {
+          "accent": "#9d4edd",
+          "bg": "#000000",
+          "text": "#f5f5f0",
+          "fontBody": "'Space Grotesk', system-ui, sans-serif"
+        }
+      },
+      "afterReloadSettled": true,
+      "afterReload": {
+        "attrs": {
+          "system": "brutalist",
+          "accent": "violet"
+        },
+        "stored": {
+          "system": "brutalist",
+          "accent": "violet"
+        },
+        "tokens": {
+          "accent": "#9d4edd",
+          "bg": "#000000",
+          "text": "#f5f5f0",
+          "fontBody": "'Space Grotesk', system-ui, sans-serif"
+        }
+      },
+      "longPageSettled": true,
+      "longPage": {
+        "attrs": {
+          "system": "brutalist",
+          "accent": "violet"
+        },
+        "stored": {
+          "system": "brutalist",
+          "accent": "violet"
+        },
+        "tokens": {
+          "accent": "#9d4edd",
+          "bg": "#000000",
+          "text": "#f5f5f0",
+          "fontBody": "'Space Grotesk', system-ui, sans-serif"
+        },
+        "h1": "Encoding & Codecs",
+        "docHeight": 5308,
+        "primaryBg": null,
+        "chipColor": "rgb(157, 78, 221)",
+        "linkFont": "\"Space Grotesk\", system-ui, sans-serif",
+        "bodyFont": "\"Space Grotesk\", system-ui, sans-serif",
+        "holdPresent": false
+      },
+      "chipMatchesAccent": true,
+      "bodyFontMatchesSystem": true,
+      "ok": true
+    },
+    {
+      "system": "brutalist",
+      "accent": "lime",
+      "beforeReloadSettled": true,
+      "beforeReload": {
+        "attrs": {
+          "system": "brutalist",
+          "accent": "lime"
+        },
+        "stored": {
+          "system": "brutalist",
+          "accent": "lime"
+        },
+        "tokens": {
+          "accent": "#aaff00",
+          "bg": "#000000",
+          "text": "#f5f5f0",
+          "fontBody": "'Space Grotesk', system-ui, sans-serif"
+        }
+      },
+      "afterReloadSettled": true,
+      "afterReload": {
+        "attrs": {
+          "system": "brutalist",
+          "accent": "lime"
+        },
+        "stored": {
+          "system": "brutalist",
+          "accent": "lime"
+        },
+        "tokens": {
+          "accent": "#aaff00",
+          "bg": "#000000",
+          "text": "#f5f5f0",
+          "fontBody": "'Space Grotesk', system-ui, sans-serif"
+        }
+      },
+      "longPageSettled": true,
+      "longPage": {
+        "attrs": {
+          "system": "brutalist",
+          "accent": "lime"
+        },
+        "stored": {
+          "system": "brutalist",
+          "accent": "lime"
+        },
+        "tokens": {
+          "accent": "#aaff00",
+          "bg": "#000000",
+          "text": "#f5f5f0",
+          "fontBody": "'Space Grotesk', system-ui, sans-serif"
+        },
+        "h1": "Encoding & Codecs",
+        "docHeight": 5308,
+        "primaryBg": null,
+        "chipColor": "rgb(170, 255, 0)",
+        "linkFont": "\"Space Grotesk\", system-ui, sans-serif",
+        "bodyFont": "\"Space Grotesk\", system-ui, sans-serif",
+        "holdPresent": false
+      },
+      "chipMatchesAccent": true,
+      "bodyFontMatchesSystem": true,
+      "ok": true
+    },
+    {
+      "system": "brutalist",
+      "accent": "rose",
+      "beforeReloadSettled": true,
+      "beforeReload": {
+        "attrs": {
+          "system": "brutalist",
+          "accent": "rose"
+        },
+        "stored": {
+          "system": "brutalist",
+          "accent": "rose"
+        },
+        "tokens": {
+          "accent": "#ff7a8a",
+          "bg": "#000000",
+          "text": "#f5f5f0",
+          "fontBody": "'Space Grotesk', system-ui, sans-serif"
+        }
+      },
+      "afterReloadSettled": true,
+      "afterReload": {
+        "attrs": {
+          "system": "brutalist",
+          "accent": "rose"
+        },
+        "stored": {
+          "system": "brutalist",
+          "accent": "rose"
+        },
+        "tokens": {
+          "accent": "#ff7a8a",
+          "bg": "#000000",
+          "text": "#f5f5f0",
+          "fontBody": "'Space Grotesk', system-ui, sans-serif"
+        }
+      },
+      "longPageSettled": true,
+      "longPage": {
+        "attrs": {
+          "system": "brutalist",
+          "accent": "rose"
+        },
+        "stored": {
+          "system": "brutalist",
+          "accent": "rose"
+        },
+        "tokens": {
+          "accent": "#ff7a8a",
+          "bg": "#000000",
+          "text": "#f5f5f0",
+          "fontBody": "'Space Grotesk', system-ui, sans-serif"
+        },
+        "h1": "Encoding & Codecs",
+        "docHeight": 5308,
+        "primaryBg": null,
+        "chipColor": "rgb(255, 122, 138)",
+        "linkFont": "\"Space Grotesk\", system-ui, sans-serif",
+        "bodyFont": "\"Space Grotesk\", system-ui, sans-serif",
+        "holdPresent": false
+      },
+      "chipMatchesAccent": true,
+      "bodyFontMatchesSystem": true,
+      "ok": true
+    },
+    {
+      "system": "swiss",
+      "accent": "crimson",
+      "beforeReloadSettled": true,
+      "beforeReload": {
+        "attrs": {
+          "system": "swiss",
+          "accent": "crimson"
+        },
+        "stored": {
+          "system": "swiss",
+          "accent": "crimson"
+        },
+        "tokens": {
+          "accent": "#ff3d52",
+          "bg": "#000000",
+          "text": "#fafaf8",
+          "fontBody": "'Manrope', system-ui, sans-serif"
+        }
+      },
+      "afterReloadSettled": true,
+      "afterReload": {
+        "attrs": {
+          "system": "swiss",
+          "accent": "crimson"
+        },
+        "stored": {
+          "system": "swiss",
+          "accent": "crimson"
+        },
+        "tokens": {
+          "accent": "#ff3d52",
+          "bg": "#000000",
+          "text": "#fafaf8",
+          "fontBody": "'Manrope', system-ui, sans-serif"
+        }
+      },
+      "longPageSettled": true,
+      "longPage": {
+        "attrs": {
+          "system": "swiss",
+          "accent": "crimson"
+        },
+        "stored": {
+          "system": "swiss",
+          "accent": "crimson"
+        },
+        "tokens": {
+          "accent": "#ff3d52",
+          "bg": "#000000",
+          "text": "#fafaf8",
+          "fontBody": "'Manrope', system-ui, sans-serif"
+        },
+        "h1": "Encoding & Codecs",
+        "docHeight": 5206,
+        "primaryBg": null,
+        "chipColor": "rgb(255, 61, 82)",
+        "linkFont": "Manrope, system-ui, sans-serif",
+        "bodyFont": "Manrope, system-ui, sans-serif",
+        "holdPresent": false
+      },
+      "chipMatchesAccent": true,
+      "bodyFontMatchesSystem": true,
+      "ok": true
+    },
+    {
+      "system": "swiss",
+      "accent": "magenta",
+      "beforeReloadSettled": true,
+      "beforeReload": {
+        "attrs": {
+          "system": "swiss",
+          "accent": "magenta"
+        },
+        "stored": {
+          "system": "swiss",
+          "accent": "magenta"
+        },
+        "tokens": {
+          "accent": "#ec4899",
+          "bg": "#000000",
+          "text": "#fafaf8",
+          "fontBody": "'Manrope', system-ui, sans-serif"
+        }
+      },
+      "afterReloadSettled": true,
+      "afterReload": {
+        "attrs": {
+          "system": "swiss",
+          "accent": "magenta"
+        },
+        "stored": {
+          "system": "swiss",
+          "accent": "magenta"
+        },
+        "tokens": {
+          "accent": "#ec4899",
+          "bg": "#000000",
+          "text": "#fafaf8",
+          "fontBody": "'Manrope', system-ui, sans-serif"
+        }
+      },
+      "longPageSettled": true,
+      "longPage": {
+        "attrs": {
+          "system": "swiss",
+          "accent": "magenta"
+        },
+        "stored": {
+          "system": "swiss",
+          "accent": "magenta"
+        },
+        "tokens": {
+          "accent": "#ec4899",
+          "bg": "#000000",
+          "text": "#fafaf8",
+          "fontBody": "'Manrope', system-ui, sans-serif"
+        },
+        "h1": "Encoding & Codecs",
+        "docHeight": 5206,
+        "primaryBg": null,
+        "chipColor": "rgb(236, 72, 153)",
+        "linkFont": "Manrope, system-ui, sans-serif",
+        "bodyFont": "Manrope, system-ui, sans-serif",
+        "holdPresent": false
+      },
+      "chipMatchesAccent": true,
+      "bodyFontMatchesSystem": true,
+      "ok": true
+    },
+    {
+      "system": "swiss",
+      "accent": "orange",
+      "beforeReloadSettled": true,
+      "beforeReload": {
+        "attrs": {
+          "system": "swiss",
+          "accent": "orange"
+        },
+        "stored": {
+          "system": "swiss",
+          "accent": "orange"
+        },
+        "tokens": {
+          "accent": "#ff7a3d",
+          "bg": "#000000",
+          "text": "#fafaf8",
+          "fontBody": "'Manrope', system-ui, sans-serif"
+        }
+      },
+      "afterReloadSettled": true,
+      "afterReload": {
+        "attrs": {
+          "system": "swiss",
+          "accent": "orange"
+        },
+        "stored": {
+          "system": "swiss",
+          "accent": "orange"
+        },
+        "tokens": {
+          "accent": "#ff7a3d",
+          "bg": "#000000",
+          "text": "#fafaf8",
+          "fontBody": "'Manrope', system-ui, sans-serif"
+        }
+      },
+      "longPageSettled": true,
+      "longPage": {
+        "attrs": {
+          "system": "swiss",
+          "accent": "orange"
+        },
+        "stored": {
+          "system": "swiss",
+          "accent": "orange"
+        },
+        "tokens": {
+          "accent": "#ff7a3d",
+          "bg": "#000000",
+          "text": "#fafaf8",
+          "fontBody": "'Manrope', system-ui, sans-serif"
+        },
+        "h1": "Encoding & Codecs",
+        "docHeight": 5206,
+        "primaryBg": null,
+        "chipColor": "rgb(255, 122, 61)",
+        "linkFont": "Manrope, system-ui, sans-serif",
+        "bodyFont": "Manrope, system-ui, sans-serif",
+        "holdPresent": false
+      },
+      "chipMatchesAccent": true,
+      "bodyFontMatchesSystem": true,
+      "ok": true
+    },
+    {
+      "system": "swiss",
+      "accent": "amber",
+      "beforeReloadSettled": true,
+      "beforeReload": {
+        "attrs": {
+          "system": "swiss",
+          "accent": "amber"
+        },
+        "stored": {
+          "system": "swiss",
+          "accent": "amber"
+        },
+        "tokens": {
+          "accent": "#ffb84d",
+          "bg": "#000000",
+          "text": "#fafaf8",
+          "fontBody": "'Manrope', system-ui, sans-serif"
+        }
+      },
+      "afterReloadSettled": true,
+      "afterReload": {
+        "attrs": {
+          "system": "swiss",
+          "accent": "amber"
+        },
+        "stored": {
+          "system": "swiss",
+          "accent": "amber"
+        },
+        "tokens": {
+          "accent": "#ffb84d",
+          "bg": "#000000",
+          "text": "#fafaf8",
+          "fontBody": "'Manrope', system-ui, sans-serif"
+        }
+      },
+      "longPageSettled": true,
+      "longPage": {
+        "attrs": {
+          "system": "swiss",
+          "accent": "amber"
+        },
+        "stored": {
+          "system": "swiss",
+          "accent": "amber"
+        },
+        "tokens": {
+          "accent": "#ffb84d",
+          "bg": "#000000",
+          "text": "#fafaf8",
+          "fontBody": "'Manrope', system-ui, sans-serif"
+        },
+        "h1": "Encoding & Codecs",
+        "docHeight": 5206,
+        "primaryBg": null,
+        "chipColor": "rgb(255, 184, 77)",
+        "linkFont": "Manrope, system-ui, sans-serif",
+        "bodyFont": "Manrope, system-ui, sans-serif",
+        "holdPresent": false
+      },
+      "chipMatchesAccent": true,
+      "bodyFontMatchesSystem": true,
+      "ok": true
+    },
+    {
+      "system": "swiss",
+      "accent": "emerald",
+      "beforeReloadSettled": true,
+      "beforeReload": {
+        "attrs": {
+          "system": "swiss",
+          "accent": "emerald"
+        },
+        "stored": {
+          "system": "swiss",
+          "accent": "emerald"
+        },
+        "tokens": {
+          "accent": "#34d08c",
+          "bg": "#000000",
+          "text": "#fafaf8",
+          "fontBody": "'Manrope', system-ui, sans-serif"
+        }
+      },
+      "afterReloadSettled": true,
+      "afterReload": {
+        "attrs": {
+          "system": "swiss",
+          "accent": "emerald"
+        },
+        "stored": {
+          "system": "swiss",
+          "accent": "emerald"
+        },
+        "tokens": {
+          "accent": "#34d08c",
+          "bg": "#000000",
+          "text": "#fafaf8",
+          "fontBody": "'Manrope', system-ui, sans-serif"
+        }
+      },
+      "longPageSettled": true,
+      "longPage": {
+        "attrs": {
+          "system": "swiss",
+          "accent": "emerald"
+        },
+        "stored": {
+          "system": "swiss",
+          "accent": "emerald"
+        },
+        "tokens": {
+          "accent": "#34d08c",
+          "bg": "#000000",
+          "text": "#fafaf8",
+          "fontBody": "'Manrope', system-ui, sans-serif"
+        },
+        "h1": "Encoding & Codecs",
+        "docHeight": 5206,
+        "primaryBg": null,
+        "chipColor": "rgb(52, 208, 140)",
+        "linkFont": "Manrope, system-ui, sans-serif",
+        "bodyFont": "Manrope, system-ui, sans-serif",
+        "holdPresent": false
+      },
+      "chipMatchesAccent": true,
+      "bodyFontMatchesSystem": true,
+      "ok": true
+    },
+    {
+      "system": "swiss",
+      "accent": "matrix",
+      "beforeReloadSettled": true,
+      "beforeReload": {
+        "attrs": {
+          "system": "swiss",
+          "accent": "matrix"
+        },
+        "stored": {
+          "system": "swiss",
+          "accent": "matrix"
+        },
+        "tokens": {
+          "accent": "#00ff88",
+          "bg": "#000000",
+          "text": "#fafaf8",
+          "fontBody": "'Manrope', system-ui, sans-serif"
+        }
+      },
+      "afterReloadSettled": true,
+      "afterReload": {
+        "attrs": {
+          "system": "swiss",
+          "accent": "matrix"
+        },
+        "stored": {
+          "system": "swiss",
+          "accent": "matrix"
+        },
+        "tokens": {
+          "accent": "#00ff88",
+          "bg": "#000000",
+          "text": "#fafaf8",
+          "fontBody": "'Manrope', system-ui, sans-serif"
+        }
+      },
+      "longPageSettled": true,
+      "longPage": {
+        "attrs": {
+          "system": "swiss",
+          "accent": "matrix"
+        },
+        "stored": {
+          "system": "swiss",
+          "accent": "matrix"
+        },
+        "tokens": {
+          "accent": "#00ff88",
+          "bg": "#000000",
+          "text": "#fafaf8",
+          "fontBody": "'Manrope', system-ui, sans-serif"
+        },
+        "h1": "Encoding & Codecs",
+        "docHeight": 5206,
+        "primaryBg": null,
+        "chipColor": "rgb(0, 255, 136)",
+        "linkFont": "Manrope, system-ui, sans-serif",
+        "bodyFont": "Manrope, system-ui, sans-serif",
+        "holdPresent": false
+      },
+      "chipMatchesAccent": true,
+      "bodyFontMatchesSystem": true,
+      "ok": true
+    },
+    {
+      "system": "swiss",
+      "accent": "cyan",
+      "beforeReloadSettled": true,
+      "beforeReload": {
+        "attrs": {
+          "system": "swiss",
+          "accent": "cyan"
+        },
+        "stored": {
+          "system": "swiss",
+          "accent": "cyan"
+        },
+        "tokens": {
+          "accent": "#5eddf2",
+          "bg": "#000000",
+          "text": "#fafaf8",
+          "fontBody": "'Manrope', system-ui, sans-serif"
+        }
+      },
+      "afterReloadSettled": true,
+      "afterReload": {
+        "attrs": {
+          "system": "swiss",
+          "accent": "cyan"
+        },
+        "stored": {
+          "system": "swiss",
+          "accent": "cyan"
+        },
+        "tokens": {
+          "accent": "#5eddf2",
+          "bg": "#000000",
+          "text": "#fafaf8",
+          "fontBody": "'Manrope', system-ui, sans-serif"
+        }
+      },
+      "longPageSettled": true,
+      "longPage": {
+        "attrs": {
+          "system": "swiss",
+          "accent": "cyan"
+        },
+        "stored": {
+          "system": "swiss",
+          "accent": "cyan"
+        },
+        "tokens": {
+          "accent": "#5eddf2",
+          "bg": "#000000",
+          "text": "#fafaf8",
+          "fontBody": "'Manrope', system-ui, sans-serif"
+        },
+        "h1": "Encoding & Codecs",
+        "docHeight": 5206,
+        "primaryBg": null,
+        "chipColor": "rgb(94, 221, 242)",
+        "linkFont": "Manrope, system-ui, sans-serif",
+        "bodyFont": "Manrope, system-ui, sans-serif",
+        "holdPresent": false
+      },
+      "chipMatchesAccent": true,
+      "bodyFontMatchesSystem": true,
+      "ok": true
+    },
+    {
+      "system": "swiss",
+      "accent": "violet",
+      "beforeReloadSettled": true,
+      "beforeReload": {
+        "attrs": {
+          "system": "swiss",
+          "accent": "violet"
+        },
+        "stored": {
+          "system": "swiss",
+          "accent": "violet"
+        },
+        "tokens": {
+          "accent": "#9d4edd",
+          "bg": "#000000",
+          "text": "#fafaf8",
+          "fontBody": "'Manrope', system-ui, sans-serif"
+        }
+      },
+      "afterReloadSettled": true,
+      "afterReload": {
+        "attrs": {
+          "system": "swiss",
+          "accent": "violet"
+        },
+        "stored": {
+          "system": "swiss",
+          "accent": "violet"
+        },
+        "tokens": {
+          "accent": "#9d4edd",
+          "bg": "#000000",
+          "text": "#fafaf8",
+          "fontBody": "'Manrope', system-ui, sans-serif"
+        }
+      },
+      "longPageSettled": true,
+      "longPage": {
+        "attrs": {
+          "system": "swiss",
+          "accent": "violet"
+        },
+        "stored": {
+          "system": "swiss",
+          "accent": "violet"
+        },
+        "tokens": {
+          "accent": "#9d4edd",
+          "bg": "#000000",
+          "text": "#fafaf8",
+          "fontBody": "'Manrope', system-ui, sans-serif"
+        },
+        "h1": "Encoding & Codecs",
+        "docHeight": 5206,
+        "primaryBg": null,
+        "chipColor": "rgb(157, 78, 221)",
+        "linkFont": "Manrope, system-ui, sans-serif",
+        "bodyFont": "Manrope, system-ui, sans-serif",
+        "holdPresent": false
+      },
+      "chipMatchesAccent": true,
+      "bodyFontMatchesSystem": true,
+      "ok": true
+    },
+    {
+      "system": "swiss",
+      "accent": "lime",
+      "beforeReloadSettled": true,
+      "beforeReload": {
+        "attrs": {
+          "system": "swiss",
+          "accent": "lime"
+        },
+        "stored": {
+          "system": "swiss",
+          "accent": "lime"
+        },
+        "tokens": {
+          "accent": "#aaff00",
+          "bg": "#000000",
+          "text": "#fafaf8",
+          "fontBody": "'Manrope', system-ui, sans-serif"
+        }
+      },
+      "afterReloadSettled": true,
+      "afterReload": {
+        "attrs": {
+          "system": "swiss",
+          "accent": "lime"
+        },
+        "stored": {
+          "system": "swiss",
+          "accent": "lime"
+        },
+        "tokens": {
+          "accent": "#aaff00",
+          "bg": "#000000",
+          "text": "#fafaf8",
+          "fontBody": "'Manrope', system-ui, sans-serif"
+        }
+      },
+      "longPageSettled": true,
+      "longPage": {
+        "attrs": {
+          "system": "swiss",
+          "accent": "lime"
+        },
+        "stored": {
+          "system": "swiss",
+          "accent": "lime"
+        },
+        "tokens": {
+          "accent": "#aaff00",
+          "bg": "#000000",
+          "text": "#fafaf8",
+          "fontBody": "'Manrope', system-ui, sans-serif"
+        },
+        "h1": "Encoding & Codecs",
+        "docHeight": 5206,
+        "primaryBg": null,
+        "chipColor": "rgb(170, 255, 0)",
+        "linkFont": "Manrope, system-ui, sans-serif",
+        "bodyFont": "Manrope, system-ui, sans-serif",
+        "holdPresent": false
+      },
+      "chipMatchesAccent": true,
+      "bodyFontMatchesSystem": true,
+      "ok": true
+    },
+    {
+      "system": "swiss",
+      "accent": "rose",
+      "beforeReloadSettled": true,
+      "beforeReload": {
+        "attrs": {
+          "system": "swiss",
+          "accent": "rose"
+        },
+        "stored": {
+          "system": "swiss",
+          "accent": "rose"
+        },
+        "tokens": {
+          "accent": "#ff7a8a",
+          "bg": "#000000",
+          "text": "#fafaf8",
+          "fontBody": "'Manrope', system-ui, sans-serif"
+        }
+      },
+      "afterReloadSettled": true,
+      "afterReload": {
+        "attrs": {
+          "system": "swiss",
+          "accent": "rose"
+        },
+        "stored": {
+          "system": "swiss",
+          "accent": "rose"
+        },
+        "tokens": {
+          "accent": "#ff7a8a",
+          "bg": "#000000",
+          "text": "#fafaf8",
+          "fontBody": "'Manrope', system-ui, sans-serif"
+        }
+      },
+      "longPageSettled": true,
+      "longPage": {
+        "attrs": {
+          "system": "swiss",
+          "accent": "rose"
+        },
+        "stored": {
+          "system": "swiss",
+          "accent": "rose"
+        },
+        "tokens": {
+          "accent": "#ff7a8a",
+          "bg": "#000000",
+          "text": "#fafaf8",
+          "fontBody": "'Manrope', system-ui, sans-serif"
+        },
+        "h1": "Encoding & Codecs",
+        "docHeight": 5206,
+        "primaryBg": null,
+        "chipColor": "rgb(255, 122, 138)",
+        "linkFont": "Manrope, system-ui, sans-serif",
+        "bodyFont": "Manrope, system-ui, sans-serif",
+        "holdPresent": false
+      },
+      "chipMatchesAccent": true,
+      "bodyFontMatchesSystem": true,
+      "ok": true
+    }
+  ]
+}
