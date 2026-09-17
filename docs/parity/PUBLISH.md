@@ -5,10 +5,15 @@
 Candidate: the working tree that becomes the next commit on `main` after
 `99100aa8` — see `git log` for the exact SHA. **Not published; publishing has
 not been initiated.** No deployment configuration was changed and no
-production data was written. The release checks below now pass on this
-candidate; what still holds the release is the parity gate itself
-(25 named residual cells, all accepted and documented) and the independent
-verification record, which has not been re-run against this candidate.
+production data was written. The *local* release checks below (static gates,
+pre-publish gate, prod-mode smoke, bundle secret scan, loopback Lighthouse)
+pass on this candidate. What still holds the release: the pixel gate is
+**NOT PASSED** (25 failing cells — each is *documented* with a cause and an
+owner decision in IMPLEMENTATION.md; "documented" is this task's assessment,
+not an owner sign-off), independent verification is BLOCKED against an
+earlier candidate and has not been repeated here, production configuration
+is UNVERIFIED, and the actual publish-image size is UNVERIFIED until a user
+publish.
 
 The full-inventory run `tests/parity/baseline/2026-09-17T00-31-04-404Z-444`
 (all four widths, admin identity) is the current measurement
@@ -30,7 +35,11 @@ The full-inventory run `tests/parity/baseline/2026-09-17T00-31-04-404Z-444`
   [font-gaps.md](evidence/harness/font-gaps.md)). The 12 remaining failures
   (`artifact.docs.buttons`, `artifact.docs.forms`, `artifact.showcase`) are
   the 44px accessible-control floor the artifact keeps by contract; see the
-  cross-cutting decisions in IMPLEMENTATION.md.
+  cross-cutting decisions in IMPLEMENTATION.md. The artifact's font `<link>`
+  now ships without a static `href` (the boot script sets the per-view URL
+  synchronously, `blocking="render"`), so a direct docs load can no longer
+  preload the showcase faces first; this change post-dates the run above and
+  is covered only by the responsive/pre-publish reruns, not by a new pixel run.
 - Identity teardown was clean (0 `__qa_test_parity_` rows remaining); no
   document reloads or font-readiness reopens. The run still recorded
   `Inputs changed during run: YES — stale` (live adapter hashes move during
@@ -63,7 +72,7 @@ task302-build. Do not infer release acceptance from them.
 | Production config: `VITE_CONTACT_VARIANT` unset; router credential available | **UNVERIFIED**; no secrets accessed (the built `dist/` served `/api/config` contact options as unavailable in the local prod-mode smoke) |
 | No secrets in client bundle | **PASS** on the gate's `dist/` (2026-09-17): every workspace secret value grepped against `dist/public` — 0 hits; pattern scan for `sk_live_/sk_test_`, `sk-ant-`, `ghp_`, credentialed `postgres://` URLs over `dist/public` and `dist/index.js` — 0 hits |
 | Production-mode local build smoke: `/`, `/api/health`, `/sitemap.xml`, `/category/encoding-codecs` | **PASS** 2026-09-17 (`NODE_ENV=production node dist/index.js` on :5055 against the dev DB): all four 200 — `/` 123 KiB with `<title>Awesome Video — 1816+ Curated Video & Streaming Resources</title>`, canonical `https://awesome.video/`, nonce'd CSP, `Cache-Control: no-store`; `/api/health` `{"status":"ok"}`; `/sitemap.xml` 2,325 `<url>` entries; `/category/encoding-codecs` `<h1>Encoding & Codecs` with the crawl title `Video Encoding & Codecs: AV1, HEVC, H.264 — Awesome Video`; `/robots.txt` 200; unknown route 404 |
-| Local production-mode Lighthouse | **PASS** 2026-09-17 (`npm run perf:lighthouse:normal -- --base http://127.0.0.1:5055`, three fresh-browser mobile runs against the same `dist/` on the loopback prod-mode server): performance 0.82 / 0.71 / 0.84, **median 0.82 (meets the 0.82 threshold)**; accessibility 0.98, SEO 1.00, best-practices 0.79 on every run — the best-practices deductions are loopback artifacts (plain `http://`, Clerk *development-instance* cookie issues) not present on the HTTPS production host. FCP/LCP 3.4–3.5 s, TBT 110–540 ms under Lighthouse's simulated throttling; loopback Lantern scores sit below same-code production scores, so compare like with like. Manifest retained at [evidence/lighthouse/local-prod-2026-09-17-manifest.json](evidence/lighthouse/local-prod-2026-09-17-manifest.json); per-run reports were in `/tmp/prepub/lighthouse/` |
+| Local production-mode Lighthouse | **PASS** 2026-09-17 (`npm run perf:lighthouse:normal -- --base http://127.0.0.1:5055`, three fresh-browser mobile runs against the same `dist/` on the loopback prod-mode server): performance 0.82 / 0.71 / 0.84, **median 0.82 (meets the 0.82 threshold)**; accessibility 0.98, SEO 1.00, best-practices 0.79 on every run — the deductions Lighthouse lists are `inspector-issues` (third-party cookie issues on the Clerk *development-instance* origin the dev keys point at) and `valid-source-maps`; whether they recur on the HTTPS production host is **not verified** (production Lighthouse is a post-publish check below). FCP/LCP 3.4–3.5 s, TBT 110–540 ms under Lighthouse's simulated throttling; loopback Lantern scores sit below same-code production scores, so compare like with like. Manifest plus the three per-run summaries (all four category scores, metrics, observed-request ledger with credentials redacted by the script) retained under [evidence/lighthouse/](evidence/lighthouse/); the full Lighthouse JSON reports (~264 KiB each) were left in `/tmp/prepub/lighthouse/` |
 | Publishing-only image trimming | **REPAIRED 2026-09-15.** Two user publish attempts (builds `f3055341…` 18:57Z and `ef717b35…` 22:02Z, deployment `b112b7e1…`) passed every gate step and then failed with `image size is over the limit of 8 GiB`; both logs show `SKIP image cleanup — not a Replit publishing container`. Cause: Replit sets `REPLIT_DEPLOYMENT=1` only at runtime, never during the build command, so the trim step could never fire. Fix: the marker is now the production-only env var `REPLIT_PUBLISH_IMAGE_TRIM=1` (set in Replit's production environment, absent from development), and the helper additionally refuses wherever `REPLIT_DEV_DOMAIN` exists (the interactive workspace). Verified on a disposable `/tmp` copy: refuses in the workspace with the marker set, refuses without the marker, removes only `tests/parity/baseline` (2.9 GiB) and `.cache/ms-playwright` (641 MiB) under build-container conditions; the real workspace tree was not touched. Workspace measured 7.1 GiB + 2.2 GiB `.git`; projected trimmed image ≈ 5.8 GiB. Actual image size remains **UNVERIFIED** until the next user publish |
 
 Fresh file-only command, exit code 0:

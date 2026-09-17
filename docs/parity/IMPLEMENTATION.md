@@ -147,10 +147,16 @@ bound through the reference adapter, never faked in production.
   (inputs cannot carry them, swatches/pills would overlap). The 12 artifact
   cells that fail (1.1–2.9% on docs, 5.3–23.6% on the showcase, all at the
   control rows) are therefore an accepted, reported residual, not a defect.
-- The artifact serves the frozen font request per view: the showcase link is
-  byte-identical to `design-system.html`, the docs view swaps in the
-  `docs.html` URL (different axis subsets change outlines). Widening one URL
-  to cover both is token drift, not a fix.
+- The artifact serves the frozen font request per view: the showcase URL is
+  byte-identical to `design-system.html`, the docs view uses the `docs.html`
+  URL (different axis subsets change outlines). Widening one URL to cover
+  both is token drift, not a fix. The `<link>` carries both URLs as data
+  attributes and no static `href`: a static href is fetched by the preload
+  scanner before any inline script runs, so a direct `#docs-…` load would
+  have downloaded the showcase faces first. The boot script sets `href`
+  synchronously in `<head>` with the same hash normalisation as
+  `App.tsx readView()` (decode, `#`/`#/`, first segment, lower-case) and
+  `blocking="render"` keeps first paint behind the sheet.
 - Table fixes stay on the one cell that needs them. A `white-space: nowrap`
   added to the shared `.queues-agent__cell-muted` for the researcher date
   column regressed enrichment 375 from 0.106% to 5.25% because the enrichment
@@ -158,7 +164,12 @@ bound through the reference adapter, never faked in production.
   `queues-agent__cell-created` class on that cell only.
 - The shell breadcrumb is `sr-only` (pages own their visible crumbs), so the
   `responsive-audit` phone breadcrumb checks assert accessibility-tree
-  presence, `aria-current="page"` and a label, plus zero horizontal overflow
-  at 320 — not a visible width. `.accordion-header { border: 0 }` out-specified
+  membership instead of a visible width: Playwright `getByRole` must resolve
+  the breadcrumb navigation and the `role="link"` / `aria-current="page"`
+  crumb by accessible name, the nav's ARIA snapshot must name it, and an
+  in-page walk of every ancestor must find no `display:none`,
+  `visibility:hidden`, `aria-hidden`, `hidden` or `inert` (a mutation probe
+  showed `getByRole` alone still counts a crumb under an `inert` ancestor —
+  hence both probes); 320 additionally requires zero horizontal overflow. `.accordion-header { border: 0 }` out-specified
   the global forced-colors button border; a forced-colors-only override in
   `sidebar.css` restores it with no pixel effect outside High Contrast.

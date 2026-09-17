@@ -12,24 +12,35 @@
     <!--
       One always-on Google Fonts request, copied byte-for-byte from the frozen
       design page this route ports: design-system.html for the showcase and
-      anatomy views (href), docs.html for the docs view (data-docs-href — it
-      declares no IBM Plex Sans). The boot script below picks the right one
-      before first paint so each view declares exactly the faces its source
-      page declares.
+      anatomy views (data-showcase-href), docs.html for the docs view
+      (data-docs-href — it declares no IBM Plex Sans). The link ships with no
+      href so the preload scanner cannot fetch the wrong page's faces; the boot
+      script below sets it synchronously while the parser is still in <head>,
+      and blocking="render" keeps first paint behind it exactly as a static
+      stylesheet link would. The view test mirrors App.tsx readView().
     -->
     <link
       rel="stylesheet"
       id="ds-webfonts"
+      blocking="render"
       data-docs-href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Fraunces:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500;1,600&family=JetBrains+Mono:wght@400;500;600;700&family=Geist:wght@400;500;600;700&family=Instrument+Serif:ital@0;1&family=Space+Grotesk:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600;700&family=Manrope:wght@400;500;600;700;800&display=swap"
-      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Fraunces:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500;1,600&family=JetBrains+Mono:wght@400;500;600;700&family=Geist:wght@400;500;600;700&family=Instrument+Serif:ital@0;1&family=Space+Grotesk:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600;700&family=IBM+Plex+Sans:wght@400;500;600;700&family=Manrope:wght@400;500;600;700;800&display=swap"
+      data-showcase-href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Fraunces:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500;1,600&family=JetBrains+Mono:wght@400;500;600;700&family=Geist:wght@400;500;600;700&family=Instrument+Serif:ital@0;1&family=Space+Grotesk:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600;700&family=IBM+Plex+Sans:wght@400;500;600;700&family=Manrope:wght@400;500;600;700;800&display=swap"
     />
     <script>
       (() => {
         const webfonts = document.getElementById("ds-webfonts");
-        const showcaseHref = webfonts.getAttribute("href");
+        const showcaseHref = webfonts.getAttribute("data-showcase-href");
         const docsHref = webfonts.getAttribute("data-docs-href");
+        // Same normalisation as App.tsx readView(): decode, drop "#" or "#/",
+        // keep the first segment, lower-case. A malformed escape falls back to
+        // the raw hash rather than throwing before first paint.
+        const isDocsView = () => {
+          let hash = location.hash;
+          try { hash = decodeURIComponent(hash); } catch {}
+          return hash.replace(/^#\/?/, "").split(/[?&/]/, 1)[0].toLowerCase().startsWith("docs-");
+        };
         const syncWebfonts = () => {
-          const wanted = /^#docs-/.test(location.hash) ? docsHref : showcaseHref;
+          const wanted = isDocsView() ? docsHref : showcaseHref;
           if (webfonts.getAttribute("href") !== wanted) webfonts.setAttribute("href", wanted);
         };
         syncWebfonts();

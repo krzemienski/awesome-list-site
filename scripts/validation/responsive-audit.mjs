@@ -288,28 +288,63 @@ await resPage.waitForTimeout(1000);
 // The shell breadcrumb is visually hidden (`sr-only`) by design: the frozen
 // prototype has no shell crumb row and each page owns its visible crumbs. The
 // contract here is accessibility, not geometry — the current crumb must stay in
-// the accessibility tree with a non-empty label at phone widths.
-const readMobileCrumb = () => {
-  const m = document.querySelector('[data-testid="breadcrumb-mobile-current"]');
-  const nav = m?.closest('nav');
-  const hidden = (el) => !el || getComputedStyle(el).display === 'none' || getComputedStyle(el).visibility === 'hidden' || el.getAttribute('aria-hidden') === 'true';
-  const text = m?.textContent?.trim() ?? '';
-  const doc = document.documentElement;
+// the accessibility tree with a non-empty accessible name at phone widths.
+// Two independent probes, both required:
+//   1. Playwright's role machinery (`getByRole`) resolves the breadcrumb
+//      navigation and the `aria-current="page"` crumb, and the nav's ARIA
+//      snapshot names the crumb — this applies the real accessibility-tree
+//      exclusion rules (display:none / visibility:hidden / aria-hidden / hidden
+//      / inert on ANY ancestor, empty accessible name).
+//   2. An in-page walk of every ancestor for the same exclusions plus `inert`,
+//      so a regression is reported with the offending ancestor named.
+const readMobileCrumb = async (page) => {
+  const nav = page.getByRole('navigation', { name: 'breadcrumb' }).first();
+  const navCount = await nav.count();
+  const snapshot = navCount ? await nav.ariaSnapshot() : '';
+  const m = page.getByTestId('breadcrumb-mobile-current');
+  const inPage = await m.evaluate((el) => {
+    const blockers = [];
+    for (let node = el; node && node !== document; node = node.parentElement) {
+      const cs = getComputedStyle(node);
+      if (cs.display === 'none') blockers.push(`display:none@${node.tagName}`);
+      if (cs.visibility === 'hidden') blockers.push(`visibility:hidden@${node.tagName}`);
+      if (node.getAttribute('aria-hidden') === 'true') blockers.push(`aria-hidden@${node.tagName}`);
+      if (node.hasAttribute('hidden')) blockers.push(`hidden@${node.tagName}`);
+      if (node.inert || node.hasAttribute('inert')) blockers.push(`inert@${node.tagName}`);
+    }
+    const doc = document.documentElement;
+    return {
+      ariaCurrent: el.getAttribute('aria-current'),
+      name: (el.getAttribute('aria-label') || el.textContent || '').trim().slice(0, 40),
+      blockers,
+      hOverflow: doc.scrollWidth - doc.clientWidth,
+    };
+  }).catch((e) => ({ ariaCurrent: null, name: '', blockers: [`missing:${String(e.message).slice(0, 40)}`], hOverflow: null }));
+  const roleName = inPage.name;
+  // The crumb must be reachable by role + name and appear in the nav's ARIA
+  // snapshot (accessibility-tree membership, not DOM membership).
+  // BreadcrumbPage renders role="link" aria-current="page"; getByRole applies
+  // the accessibility-tree exclusion rules (hidden ancestors, empty names).
+  const byRole = roleName ? await nav.getByRole('link', { name: roleName, exact: true, current: 'page' }).count() : 0;
+  const inSnapshot = Boolean(roleName) && snapshot.includes(roleName);
   return {
-    exists: !!m,
-    accessible: !!m && !hidden(m) && !hidden(nav),
-    ariaCurrent: m?.getAttribute('aria-current') ?? null,
-    text: text.slice(0, 40),
-    hOverflow: doc.scrollWidth - doc.clientWidth,
+    navCount,
+    byRole,
+    inSnapshot,
+    ariaCurrent: inPage.ariaCurrent,
+    name: roleName,
+    blockers: inPage.blockers,
+    hOverflow: inPage.hOverflow,
   };
 };
-let r = await resPage.evaluate(readMobileCrumb);
-log('breadcrumb-mobile@375', r.exists && r.accessible && r.ariaCurrent === 'page' && r.text.length > 0, JSON.stringify(r));
+const crumbOk = (r) => r.navCount > 0 && r.byRole > 0 && r.inSnapshot && r.ariaCurrent === 'page' && r.name.length > 0 && r.blockers.length === 0;
+let r = await readMobileCrumb(resPage);
+log('breadcrumb-mobile@375', crumbOk(r), JSON.stringify(r));
 await resPage.screenshot({ path: `${OUT}/breadcrumb-375.png` });
 await resPage.setViewportSize({ width: 320, height: 700 });
 await resPage.waitForTimeout(400);
-r = await resPage.evaluate(readMobileCrumb);
-log('breadcrumb-mobile@320', r.exists && r.accessible && r.ariaCurrent === 'page' && r.text.length > 0 && r.hOverflow <= 0, JSON.stringify(r));
+r = await readMobileCrumb(resPage);
+log('breadcrumb-mobile@320', crumbOk(r) && r.hOverflow <= 0, JSON.stringify(r));
 
 // Title attrs on desktop crumbs + no role="menu" misuse.
 await resPage.setViewportSize({ width: 1440, height: 900 });
