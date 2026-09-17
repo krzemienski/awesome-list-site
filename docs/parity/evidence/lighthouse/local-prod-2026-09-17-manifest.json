@@ -1,0 +1,90 @@
+{
+  "schemaVersion": 1,
+  "kind": "normal-lighthouse-control",
+  "createdAt": "2026-09-17T02:00:36.057Z",
+  "command": "node scripts/validation/normal-lighthouse.mjs --base http://127.0.0.1:5055 --out /tmp/prepub/lighthouse",
+  "base": "http://127.0.0.1:5055/",
+  "outputDirectory": "../../../tmp/prepub/lighthouse",
+  "runCount": 3,
+  "performanceThreshold": 0.82,
+  "lighthouse": {
+    "version": "12.8.2",
+    "options": {
+      "output": "json",
+      "logLevel": "error",
+      "onlyCategories": [
+        "performance",
+        "accessibility",
+        "best-practices",
+        "seo"
+      ]
+    },
+    "config": "Lighthouse default mobile configuration (undefined config argument)"
+  },
+  "browser": {
+    "freshBrowserPerRun": true,
+    "executable": ".cache/ms-playwright/chromium-1223/chrome-linux64/chrome",
+    "chromiumSandbox": true,
+    "args": [
+      "--disable-dev-shm-usage",
+      "--remote-debugging-port=<ephemeral-loopback-port>"
+    ],
+    "requestInterception": false,
+    "strictGuardsImported": false
+  },
+  "requestSafety": {
+    "observedAllContextRequests": true,
+    "invalidatesSameOriginUnsafeMethods": true,
+    "safeMethods": [
+      "GET",
+      "HEAD",
+      "OPTIONS"
+    ]
+  },
+  "source": {
+    "gitHead": "99100aa85cb88d7ba1bc95f79dc2de64e39b451f",
+    "gitStatusSha256": "bfa0a0922d2b80a53a44e2f648249365a1582bca62b6bc868a9ee5a156c01f45",
+    "dirtyPatchSha256": "f6ddb8f126ce224daed53aa6cbe9f73c4010cb40d469db461bcb4b1137bd5695",
+    "trackedFileCount": 12644,
+    "trackedTreeSha256": "ac11f290d2b0291ee8a25a5db2ca22fc3ac3774d89de4957461b7a6e6abca9d7",
+    "untrackedFileCount": 1056,
+    "untrackedTreeSha256": "c64327bcddf379c73e4984f83a852e93014b7118c651328da8e7b6b8b92ad70a"
+  },
+  "build": {
+    "directory": "dist",
+    "fileCount": 355,
+    "treeSha256": "32430acf5de0b0ef51b5ecbdee47d3a7f53d608389859590af3bcb1dc5f090c4"
+  },
+  "binding": {
+    "sourceTrackedTreeSha256": "ac11f290d2b0291ee8a25a5db2ca22fc3ac3774d89de4957461b7a6e6abca9d7",
+    "sourceDirtyPatchSha256": "f6ddb8f126ce224daed53aa6cbe9f73c4010cb40d469db461bcb4b1137bd5695",
+    "sourceUntrackedTreeSha256": "c64327bcddf379c73e4984f83a852e93014b7118c651328da8e7b6b8b92ad70a",
+    "buildTreeSha256": "32430acf5de0b0ef51b5ecbdee47d3a7f53d608389859590af3bcb1dc5f090c4"
+  },
+  "runs": [
+    {
+      "run": 1,
+      "valid": true,
+      "performanceScore": 0.82,
+      "runFile": "run-1/run.json",
+      "reportFile": "run-1/lighthouse/home.json"
+    },
+    {
+      "run": 2,
+      "valid": true,
+      "performanceScore": 0.71,
+      "runFile": "run-2/run.json",
+      "reportFile": "run-2/lighthouse/home.json"
+    },
+    {
+      "run": 3,
+      "valid": true,
+      "performanceScore": 0.84,
+      "runFile": "run-3/run.json",
+      "reportFile": "run-3/lighthouse/home.json"
+    }
+  ],
+  "finishedAt": "2026-09-17T02:01:42.816Z",
+  "summaryFile": "scores.json",
+  "thresholdPassed": true
+}

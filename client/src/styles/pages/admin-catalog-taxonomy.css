@@ -377,14 +377,6 @@
     min-width: 0;
   }
 
-  .admin-taxonomy-shell--categories .admin-taxonomy-table {
-    min-width: 603.578125px;
-  }
-
-  .admin-taxonomy-shell--subcategories .admin-taxonomy-table {
-    min-width: 544.625px;
-  }
-
   .admin-taxonomy-pagination {
     margin-inline: 1rem;
   }

@@ -9,12 +9,31 @@
     <link rel="icon" href="data:," />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <!--
+      One always-on Google Fonts request, copied byte-for-byte from the frozen
+      design page this route ports: design-system.html for the showcase and
+      anatomy views (href), docs.html for the docs view (data-docs-href — it
+      declares no IBM Plex Sans). The boot script below picks the right one
+      before first paint so each view declares exactly the faces its source
+      page declares.
+    -->
     <link
       rel="stylesheet"
-      href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,500;1,9..144,600&family=Geist:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&family=Instrument+Serif:ital@0;1&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&family=Manrope:wght@400;500;600;700&family=Space+Grotesk:wght@400;500;600;700&display=swap"
+      id="ds-webfonts"
+      data-docs-href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Fraunces:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500;1,600&family=JetBrains+Mono:wght@400;500;600;700&family=Geist:wght@400;500;600;700&family=Instrument+Serif:ital@0;1&family=Space+Grotesk:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600;700&family=Manrope:wght@400;500;600;700;800&display=swap"
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Fraunces:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500;1,600&family=JetBrains+Mono:wght@400;500;600;700&family=Geist:wght@400;500;600;700&family=Instrument+Serif:ital@0;1&family=Space+Grotesk:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600;700&family=IBM+Plex+Sans:wght@400;500;600;700&family=Manrope:wght@400;500;600;700;800&display=swap"
     />
     <script>
       (() => {
+        const webfonts = document.getElementById("ds-webfonts");
+        const showcaseHref = webfonts.getAttribute("href");
+        const docsHref = webfonts.getAttribute("data-docs-href");
+        const syncWebfonts = () => {
+          const wanted = /^#docs-/.test(location.hash) ? docsHref : showcaseHref;
+          if (webfonts.getAttribute("href") !== wanted) webfonts.setAttribute("href", wanted);
+        };
+        syncWebfonts();
+        addEventListener("hashchange", syncWebfonts);
         const registry = __AWESOME_VIDEO_DS_BOOT__;
         try {
           const system = localStorage.getItem("ds-system");

@@ -626,7 +626,7 @@ export default function ResearcherTab({ initialTab = "launch" }: ResearcherTabPr
                     <td className="mono queues-agent__cell-mono">{job.approvedDiscoveries || 0}/{job.rejectedDiscoveries || 0}</td>
                     <td className="mono accent queues-agent__cell-mono">{formatCost(job.estimatedCostUsd)}</td>
                     <td className="mono queues-agent__cell-mono">{job.turnsUsed || 0}/{job.maxTurns || 0}</td>
-                    <td className="mono muted queues-agent__cell-mono queues-agent__cell-muted">{job.createdAt ? formatAdminDate(job.createdAt) : "—"}</td>
+                    <td className="mono muted queues-agent__cell-mono queues-agent__cell-muted queues-agent__cell-created">{job.createdAt ? formatAdminDate(job.createdAt) : "—"}</td>
                   </tr>
                 ))}
               </tbody>

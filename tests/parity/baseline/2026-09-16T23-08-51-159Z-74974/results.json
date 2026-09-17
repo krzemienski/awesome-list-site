@@ -1,0 +1,1082 @@
+{
+  "schemaVersion": 2,
+  "runId": "2026-09-16T23-08-51-159Z-74974",
+  "executedAt": "2026-09-16T23:08:51.159Z",
+  "finishedAt": "2026-09-16T23:09:20.051Z",
+  "claim": "selected-rows-diagnostic",
+  "gatePassed": false,
+  "exitCode": 1,
+  "selection": {
+    "full": false,
+    "only": [
+      "artifact.showcase"
+    ],
+    "widths": [
+      375
+    ],
+    "description": "--only artifact.showcase --width 375"
+  },
+  "identity": {
+    "mode": "admin",
+    "reason": null,
+    "bridgeId": "2108311938",
+    "displayName": "Nick Krzemienski",
+    "clerkUserId": "user_3JQjLj04Rkh9lqO9QuleVlke63s",
+    "teardown": {
+      "keepUser": false,
+      "bridgeId": "2108311938",
+      "email": "__qa_test_parity_mu4ppmwu074706+clerk_test@example.com",
+      "localDeleted": true,
+      "clerkDeleted": true,
+      "errors": [],
+      "verification": {
+        "localQaUsersRemaining": [
+          {
+            "id": "2100461846",
+            "email": "__qa_test_parity_mu4imasd29e3ae+clerk_test@example.com"
+          },
+          {
+            "id": "2117019619",
+            "email": "__qa_test_parity_mu4gy5px52ad5a+clerk_test@example.com"
+          }
+        ]
+      }
+    },
+    "teardownError": null,
+    "prefix": "__qa_test_parity_"
+  },
+  "configuration": {
+    "frozenAt": "2026-09-16T23:08:00.000Z",
+    "browserVersion": "148.0.7778.96",
+    "pixelmatchThreshold": 0.1,
+    "maximumDiffPercent": 0.5,
+    "viewportHeights": {
+      "375": 812,
+      "768": 1024,
+      "1024": 768,
+      "1440": 900
+    },
+    "captureNormalisations": [
+      "animations disabled",
+      "transitions disabled",
+      "caret hidden",
+      "backdrop-filter disabled on both sides (blur values compared via computed style)",
+      "Chromium partial raster disabled (--disable-partial-raster): full-page capture re-rasters tiles per frame and reused tile content flipped single anti-aliased pixels between consecutive frames"
+    ],
+    "chromiumArgs": [
+      "--disable-partial-raster"
+    ],
+    "captureState": {
+      "theme": {
+        "system": "editorial",
+        "accent": "crimson"
+      },
+      "app": {
+        "localStorage": {
+          "ds-system": "editorial",
+          "ds-accent": "crimson",
+          "analytics-consent": "denied"
+        }
+      },
+      "reference": {
+        "localStorage": {
+          "av-ds-system": "editorial",
+          "av-ds-accent": "crimson"
+        }
+      }
+    },
+    "throttleWaits": [],
+    "throttleDeferrals": [],
+    "documentReloads": [],
+    "fontFamilies": [
+      "Inter",
+      "Fraunces",
+      "JetBrains Mono",
+      "Geist",
+      "Instrument Serif",
+      "Space Grotesk",
+      "IBM Plex Mono",
+      "IBM Plex Sans",
+      "Manrope"
+    ],
+    "rowTimeoutMs": 150000,
+    "targets": {
+      "app": "http://127.0.0.1:5000",
+      "artifact": "http://127.0.0.1:20928",
+      "reference": "in-memory snapshot of awesome-list-site-ds on an ephemeral loopback port"
+    }
+  },
+  "inventory": {
+    "screens": 83,
+    "eligibility": {
+      "pixel": 47,
+      "token-only": 25,
+      "artifact-docs": 1,
+      "blocked": 10
+    },
+    "generatedHash": "179582c59891b50ca87af90568f5aea3f797c01f9c95bc9daa02138f66d5bf06"
+  },
+  "provenance": {
+    "gitCommit": "99100aa85cb88d7ba1bc95f79dc2de64e39b451f",
+    "gitDirtyPaths": [
+      "M artifacts/awesome-video-design-system/index.html",
+      " M artifacts/awesome-video-design-system/src/canonical/ArtifactDocs.css",
+      " M artifacts/awesome-video-design-system/src/canonical/CanonicalShowcase.tsx",
+      " M artifacts/awesome-video-design-system/src/canonical/ShowcaseParity.module.css",
+      " M artifacts/awesome-video-design-system/src/index.css",
+      " M client/src/components/admin/queues-agent.css",
+      " M client/src/styles/pages/admin-catalog-taxonomy.css"
+    ],
+    "snapshot": {
+      "sha256": "00130b0e8656c85c97f8a15240af6d792afa473a62648c32dc9be8155b2fe494",
+      "categories": 9,
+      "totalResources": 1816,
+      "reconciledPaths": [
+        {
+          "resourceId": 188006,
+          "raw": [
+            "Players & Clients",
+            "Web Players",
+            "Web Players"
+          ],
+          "publicTree": [
+            "Players & Clients",
+            "Web Players",
+            null
+          ]
+        }
+      ]
+    },
+    "referenceAdapter": {
+      "adminGlobals": [
+        "AV_RETAINED_OPERATIONS",
+        "AV_RETAINED_CATALOG",
+        "AV_TOTAL_USERS",
+        "AV_USERS",
+        "AV_SYNC_JOBS",
+        "AV_ENRICHMENT_JOBS",
+        "AV_ADMIN_RESOURCES",
+        "AV_RECENT_ACTIVITY",
+        "AV_PENDING_APPROVALS",
+        "AV_PENDING_RESOURCES",
+        "AV_AUDIT_LOGS",
+        "AV_AUDIT_TOTAL",
+        "AV_CONTACT_SUBMISSIONS"
+      ],
+      "adminCounts": {
+        "users": 10,
+        "admins": 5,
+        "contributors": 5,
+        "pending": 0,
+        "oldestPendingMs": null
+      },
+      "placeholders": {
+        "applied": [
+          {
+            "file": "home-layouts.jsx",
+            "from": "const recent = AV_RESOURCES.slice(0, 5);",
+            "to": "const recent = [{\"id\":188015,\"title\":\"srtdroid\",\"cat\":\"protocols-transport\",\"sub\":\"transport-protocols\",\"subsub\":\"srt\",\"desc\":\"Native Java/Kotlin SRT protocol implementation for Android mobile streaming applications\",\"tags\":[],\"featured\":false,\"url\":\"https://github.com/ThibaultBee/srtdroid\"},{\"id\":188014,\"title\":\"SRT CookBook - Projects and Applications\",\"cat\":\"protocols-transport\",\"sub\":\"transport-protocols\",\"subsub\":\"srt\",\"desc\":\"Comprehensive curated directory of SRT-enabled projects and applications including VLC, FFmpeg, GStreamer, Wireshark, OBS Studio, and integration guides\",\"tags\":[],\"featured\":false,\"url\":\"https://srtlab.github.io/srt-cookbook/apps/\"},{\"id\":188013,\"title\":\"HydraSRT\",\"cat\":\"protocols-transport\",\"sub\":\"transport-protocols\",\"subsub\":\"srt\",\"desc\":\"Open-source SRT gateway and relay tool with multi-protocol conversion capabilities (SRT to RTMP/HLS), alternative to commercial Haivision SRT Gateway\",\"tags\":[],\"featured\":false,\"url\":\"https://github.com/abc3/hydra-srt\"},{\"id\":188012,\"title\":\"CTA-WAVE Device Playback Task Force\",\"cat\":\"general-tools\",\"sub\":\"drm-testing-validation-tools\",\"subsub\":null,\"desc\":\"CTA-WAVE working group repository discussing commercial DRM test coverage for PlayReady, Widevine, and FairPlay across different security levels\",\"tags\":[],\"featured\":false,\"url\":\"https://github.com/cta-wave/device-playback-task-force\"},{\"id\":188011,\"title\":\"DRMreview\",\"cat\":\"general-tools\",\"sub\":\"drm-testing-validation-tools\",\"subsub\":null,\"desc\":\"Android application for checking DRM and HDCP security levels on mobile devices\",\"tags\":[],\"featured\":false,\"url\":\"https://github.com/espio999/DRMreview\"}];",
+            "occurrences": 1,
+            "source": "/api/home recent resources in approved/indexed order"
+          },
+          {
+            "file": "home-layouts.jsx",
+            "from": "const recent = AV_RESOURCES.slice(6, 12);",
+            "to": "const recent = [{\"id\":188015,\"title\":\"srtdroid\",\"cat\":\"protocols-transport\",\"sub\":\"transport-protocols\",\"subsub\":\"srt\",\"desc\":\"Native Java/Kotlin SRT protocol implementation for Android mobile streaming applications\",\"tags\":[],\"featured\":false,\"url\":\"https://github.com/ThibaultBee/srtdroid\"},{\"id\":188014,\"title\":\"SRT CookBook - Projects and Applications\",\"cat\":\"protocols-transport\",\"sub\":\"transport-protocols\",\"subsub\":\"srt\",\"desc\":\"Comprehensive curated directory of SRT-enabled projects and applications including VLC, FFmpeg, GStreamer, Wireshark, OBS Studio, and integration guides\",\"tags\":[],\"featured\":false,\"url\":\"https://srtlab.github.io/srt-cookbook/apps/\"},{\"id\":188013,\"title\":\"HydraSRT\",\"cat\":\"protocols-transport\",\"sub\":\"transport-protocols\",\"subsub\":\"srt\",\"desc\":\"Open-source SRT gateway and relay tool with multi-protocol conversion capabilities (SRT to RTMP/HLS), alternative to commercial Haivision SRT Gateway\",\"tags\":[],\"featured\":false,\"url\":\"https://github.com/abc3/hydra-srt\"},{\"id\":188012,\"title\":\"CTA-WAVE Device Playback Task Force\",\"cat\":\"general-tools\",\"sub\":\"drm-testing-validation-tools\",\"subsub\":null,\"desc\":\"CTA-WAVE working group repository discussing commercial DRM test coverage for PlayReady, Widevine, and FairPlay across different security levels\",\"tags\":[],\"featured\":false,\"url\":\"https://github.com/cta-wave/device-playback-task-force\"},{\"id\":188011,\"title\":\"DRMreview\",\"cat\":\"general-tools\",\"sub\":\"drm-testing-validation-tools\",\"subsub\":null,\"desc\":\"Android application for checking DRM and HDCP security levels on mobile devices\",\"tags\":[],\"featured\":false,\"url\":\"https://github.com/espio999/DRMreview\"}];",
+            "occurrences": 1,
+            "source": "/api/home recent resources in approved/indexed order"
+          },
+          {
+            "file": "home-layouts.jsx",
+            "from": "'+12 this week'",
+            "to": "'+0 this week'",
+            "occurrences": 2,
+            "source": "/api/home approvedThisWeek (approvedAt with createdAt fallback)"
+          },
+          {
+            "file": "home-layouts.jsx",
+            "from": "CURATED · WEEK 37 ·",
+            "to": "CURATED · WEEK 38 ·",
+            "occurrences": 1,
+            "source": "ISO week of the frozen clock"
+          },
+          {
+            "file": "home-layouts.jsx",
+            "from": "['CONTRIBUTORS', 3, 'reviewing']",
+            "to": "['APPROVED THIS WEEK', 0, 'newly indexed']",
+            "occurrences": 1,
+            "source": "/api/home approvedThisWeek (approvedAt with createdAt fallback)"
+          },
+          {
+            "file": "design-systems.jsx",
+            "from": "'--text-3': 'rgba(244,243,238,0.4)'",
+            "to": "'--text-3': 'rgba(244,243,238,0.52)'",
+            "occurrences": 1,
+            "source": "approved expected-side Editorial AA contrast reconciliation (3.4:1 reference to 5.2:1 application)"
+          },
+          {
+            "file": "admin.jsx",
+            "from": "sub=\"across 9 categories\"",
+            "to": "sub=\"across 9 categories\"",
+            "occurrences": 1,
+            "source": "nav category count"
+          },
+          {
+            "file": "admin.jsx",
+            "from": "const filtered = AV_RESOURCES.filter(r => r.title.toLowerCase().includes(search.toLowerCase()));",
+            "to": "const filtered = (window.AV_ADMIN_RESOURCES || AV_RESOURCES).filter(r => r.title.toLowerCase().includes(search.toLowerCase()));",
+            "occurrences": 1,
+            "source": "/api/admin/resources default 25-row page (admin session only)"
+          },
+          {
+            "file": "admin.jsx",
+            "from": "title={`Resources (${AV_RESOURCES.length} of ${AV_TOTAL.toLocaleString()})`}",
+            "to": "title={`Resources (${(window.AV_ADMIN_RESOURCES || AV_RESOURCES).length} of ${AV_TOTAL.toLocaleString()})`}",
+            "occurrences": 1,
+            "source": "/api/admin/resources default page size (admin session only)"
+          },
+          {
+            "file": "admin.jsx",
+            "from": "sub=\"2 admins · 1 contributor\"",
+            "to": "sub=\"5 admins · 5 contributors\"",
+            "occurrences": 1,
+            "source": "/api/admin/users roles (admin session only)"
+          },
+          {
+            "file": "admin.jsx",
+            "from": "value=\"7\" sub=\"oldest 14m ago\"",
+            "to": "value=\"0\" sub=\"nothing waiting\"",
+            "occurrences": 1,
+            "source": "/api/admin/stats pendingApprovals + oldest /api/admin/pending-resources createdAt vs frozen clock (admin session only)"
+          },
+          {
+            "file": "admin.jsx",
+            "from": "  const pending = [\n    { id: 1, title: 'WebCodecs API Reference', cat: 'Standards', user: 'guest', time: '14m ago' },\n    { id: 2, title: 'av1-encoder-bench', cat: 'Encoding', user: 'guest', time: '1h ago' },\n    { id: 3, title: 'OBS Lua Plugin Helper', cat: 'Media Tools', user: 'mhanssen', time: '3h ago' },\n    { id: 4, title: 'low-latency-cmaf-spec.pdf', cat: 'Standards', user: 'guest', time: '5h ago' },\n    { id: 5, title: 'react-native-track-player', cat: 'Players', user: 'guest', time: '1d ago' },\n  ];",
+            "to": "  const pending = [];",
+            "occurrences": 1,
+            "source": "/api/admin/pending-resources (same unfiltered queue consumed by the Approvals tab; an empty live queue is authoritative)"
+          },
+          {
+            "file": "admin.jsx",
+            "from": "        <Stat label=\"Tables\" value=\"12\" />\n        <Stat label=\"Rows\" value=\"3,847\" />\n        <Stat label=\"Disk\" value=\"34 MB\" />\n        <Stat label=\"Migrations\" value=\"47\" sub=\"0 pending\" accent />",
+            "to": "        <Stat label=\"Tables\" value=\"39\" />\n        <Stat label=\"Rows\" value=\"10,576\" />\n        <Stat label=\"Disk\" value=\"29 MB\" />\n        <Stat label=\"Migrations\" value=\"27\" sub=\"0 pending\" accent />",
+            "occurrences": 1,
+            "source": "/api/admin/stats database (pg_catalog table count, exact row total, pg_database_size, drizzle journal; admin session only)"
+          },
+          {
+            "file": "admin.jsx",
+            "from": "            {[\n              ['resources', '1,953', '12.4 MB', '2m ago'],\n              ['categories', '9', '24 KB', '4d ago'],\n              ['subcategories', '102', '88 KB', '4d ago'],\n              ['users', '3', '8 KB', '1d ago'],\n              ['audit_log', '14,329', '8.7 MB', '12s ago'],\n              ['enrichment_jobs', '21', '156 KB', '3h ago'],\n            ].map((row, i) => (",
+            "to": "            {[[\"resources\",\"1,993\",\"14 MB\",\"41h ago\"],[\"categories\",\"9\",\"96 KB\",\"29d ago\"],[\"subcategories\",\"92\",\"56 KB\",\"29d ago\"],[\"users\",\"10\",\"80 KB\",\"0s ago\"],[\"resource_audit_log\",\"6,223\",\"2.7 MB\",\"6h ago\"],[\"enrichment_jobs\",\"26\",\"168 KB\",\"41h ago\"]].map((row, i) => (",
+            "occurrences": 1,
+            "source": "/api/admin/stats database.tableStats (count(*), pg_total_relation_size, newest updated_at/created_at vs frozen clock; admin session only)"
+          },
+          {
+            "file": "admin.jsx",
+            "from": "  const edits = [\n    { id: 1, target: 'ffmpeg-python', field: 'description', user: 'krzemienski', time: '2h ago' },\n    { id: 2, target: 'shaka-player', field: 'tags', user: 'mhanssen', time: '5h ago' },\n    { id: 3, target: 'WebRTC.org', field: 'url', user: 'admin', time: '1d ago' },\n  ];",
+            "to": "  const edits = [];",
+            "occurrences": 1,
+            "source": "/api/admin/resource-edits (same list the Edits tab renders; an empty live list is authoritative)"
+          },
+          {
+            "file": "admin.jsx",
+            "from": "            {[\n              { k: 'Database', v: 'healthy', ok: true },\n              { k: 'GitHub sync', v: 'last: 1h ago', ok: true },\n              { k: 'Link checker', v: 'running · 47%', ok: true, warn: true },\n              { k: 'Enrichment queue', v: '0 pending', ok: true },\n              { k: 'Researcher API', v: 'healthy', ok: true },\n            ].map((row, i) => (",
+            "to": "            {[{\"k\":\"Database\",\"v\":\"ready · 3ms\",\"cls\":\"ok\"},{\"k\":\"GitHub sync\",\"v\":\"failed · 120d ago\",\"cls\":\"bad\"},{\"k\":\"Link checker\",\"v\":\"no completed runs\",\"cls\":\"muted\"},{\"k\":\"Enrichment queue\",\"v\":\"5 failed\",\"cls\":\"bad\"},{\"k\":\"Researcher API\",\"v\":\"healthy\",\"cls\":\"ok\"}].map((row, i) => (",
+            "occurrences": 1,
+            "source": "/api/admin/operations/health, /api/health/ai, /api/github/sync-status|sync-history, /api/admin/link-health/status|history, /api/enrichment/jobs?limit=100 (AdminOverview.renderHealthRows mirror; admin session only)"
+          },
+          {
+            "file": "admin.jsx",
+            "from": "'dot ' + (row.warn ? 'warn' : row.ok ? 'ok' : 'bad')",
+            "to": "'dot ' + row.cls",
+            "occurrences": 1,
+            "source": "AdminOverview StatusChip dot tone (ok/warn/bad/muted)"
+          },
+          {
+            "file": "admin.jsx",
+            "from": "          {[\n            { k: 'AV1 hardware encoders 2026', n: 12, d: 'Active' },\n            { k: 'Emerging WebRTC SFUs', n: 7, d: '2 days ago' },\n            { k: 'Subtitle ML pipelines', n: 4, d: '1 week ago' },\n            { k: 'Low-latency CMAF survey', n: 9, d: 'Active' },\n          ].map((p, i) => (",
+            "to": "          {[{\"k\":\"Find 3 open-source AV1 encoder tools on GitHub that are not already in the catalog. Use exactly one scout subagent, then finish.\",\"n\":3,\"d\":\"41h ago\"},{\"k\":\"AUTO-GENERATED RESEARCH BRIEF (2026-07-30) — campaign angle: Community finds.\\n\\nBias this run toward community venues: Show HN threads, lobste.rs, r/videoengineering discussions. Chase the concrete tools/projects being discussed (their official sites/repos), not the discussion threads themselves.\\n\\nTARGET GAPS THIS RUN (most under-served first — rotate through several):\\n- Encoding & Codecs › Comparative Analysis of Codecs (1 existing)\\n- Encoding & Codecs › Software Codecs (1 existing)\\n- General Tools › Research Projects & Academic Resources (1 existing)\\n- General Tools › Widevine FairPlay PlayReady Integrations (1 existing)\\n- Infrastructure & Delivery › Multi-CDN Management (1 existing)\\n- Media Tools › Color Grading & Correction Tools (1 existing)\\n- Media Tools › Color Science & Histogram Analysis (1 existing)\\n- Media Tools › Conversion & Format Tools (1 existing)\\n\\nRECENT RUNS ALREADY SEARCHED these queries — do NOT repeat them or near-variants; find NEW ground:\\n- \\\"Kodi addon inputstream set-top box DVB PVR github awesome-video\\\"\\n- \\\"libmpv embedded Linux IoT kiosk video player github\\\"\\n- \\\"WPE WebKit embedded set-top box video github WPEWebKit\\\"\\n- \\\"OvenMediaEngine low latency streaming server github WebRTC LLHLS\\\"\\n- \\\"open source LL-HLS low latency HLS server github\\\"\\n- \\\"Puffer Stanford video streaming research github Fugu ABR\\\"\\n- \\\"BOLA MPC robustMPC ABR algorithm implementation github\\\"\\n- \\\"GStreamer embedded video player kiosk IoT github\\\"\\n- \\\"RDK Reference Design Kit set-top box open source github rdkcentral\\\"\\n- \\\"omxplayer github embedded video player raspberry pi\\\"\\n- \\\"Natron open source compositor Nuke alternative github\\\"\\n- \\\"Real-ESRGAN video upscaling github open source\\\"\\n- \\\"VapourSynth video filtering frame server github\\\"\\n- \\\"RIFE video frame interpolation github open source\\\"\\n- \\\"Politecnico Torino multimedia video streaming research lab dataset dash\\\"\\n- \\\"LIVE video quality database University of Texas Austin subjective\\\"\\n- \\\"Waterloo video streaming QoE database dataset university\\\"\\n- \\\"GPAC MP4Box remux container tool site:github.com\\\"\\n- \\\"open source video converter Rust Go 2024 2025 github ffmpeg wrapper\\\"\\n- \\\"ffmpeg.wasm video codec wasm port openjpeg JPEG2000 github libaom software encoder\\\"\\n\\nDOMAINS PAST RUNS ALREADY MINED heavily (skip unless a specific find is exceptional): github.com (37), arxiv.org (7)\\n\\nVENUE TYPES THAT PRODUCED APPROVED FINDS before (proven hunting grounds worth revisiting with NEW queries): github.com\\n\\nGoal: save NEW, high-quality resources (confidence ≥ 70) that fill the target gaps, biased toward the campaign angle.\",\"n\":0,\"d\":\"49d ago\"},{\"k\":\"AUTO-GENERATED RESEARCH BRIEF (2026-07-30) — campaign angle: Curated-list mining.\\n\\nBias this run toward mining other curated lists: awesome-* repos, roundups, \\\"top N tools\\\" posts. The list itself is rarely savable — extract the INDIVIDUAL tools/projects it names and verify each one's official site or repo.\\n\\nTARGET GAPS THIS RUN (most under-served first — rotate through several):\\n- Encoding & Codecs › Comparative Analysis of Codecs (1 existing)\\n- Encoding & Codecs › Software Codecs (1 existing)\\n- General Tools › Research Projects & Academic Resources (1 existing)\\n- General Tools › Widevine FairPlay PlayReady Integrations (1 existing)\\n- Infrastructure & Delivery › Multi-CDN Management (1 existing)\\n- Media Tools › Color Grading & Correction Tools (1 existing)\\n- Media Tools › Color Science & Histogram Analysis (1 existing)\\n- Media Tools › Conversion & Format Tools (1 existing)\\n\\nRECENT RUNS ALREADY SEARCHED these queries — do NOT repeat them or near-variants; find NEW ground:\\n- \\\"SVTA Streaming Video Technology Alliance research project working group\\\"\\n- \\\"site:arxiv.org neural video codec 2025 open source implementation\\\"\\n- \\\"DaVinci Resolve scripting API python github color grading automation\\\"\\n- \\\"HDR color volume analysis tool engineering blog open source\\\"\\n- \\\"ACM MMSys video streaming dataset research project github\\\"\\n- \\\"ITEC Alpen-Adria video streaming research DASH dataset project page\\\"\\n- \\\"waveform vectorscope video analysis open source tool github\\\"\\n- \\\"OpenColorIO site:github.com config ACES pipeline tool\\\"\\n- \\\"VVenC Fraunhofer HHI VVC encoder blog open source\\\"\\n- \\\"rav1e Rust AV1 encoder Xiph blog architecture\\\"\\n- \\\"Twitch engineering blog CDN video delivery architecture\\\"\\n- \\\"multi-CDN switching algorithm video streaming engineering blog\\\"\\n- \\\"license server architecture Widevine PlayReady FairPlay engineering blog\\\"\\n- \\\"site:bitmovin.com blog multi-DRM Widevine FairPlay PlayReady integration architecture\\\"\\n- \\\"AV1 vs VVC vs HEVC BD-rate comparison arxiv 2024 2025\\\"\\n- \\\"SVT-AV1 architecture engineering blog encoder design\\\"\\n- \\\"subtitle OCR extraction open source github OR arxiv\\\"\\n- \\\"\\\"ASS subtitle editor\\\" OR \\\"SSA editor\\\" OR \\\"aegisub\\\" alternative open source 2024 2025\\\"\\n- \\\"\\\"subtitle timing\\\" \\\"synchronization\\\" OR \\\"alignment\\\" open source command-line github\\\"\\n- \\\"site:github.com subtitle editor SRT VTT stars:>50 language:Rust OR language:TypeScript OR language:Go\\\"\\n\\nDOMAINS PAST RUNS ALREADY MINED heavily (skip unless a specific find is exceptional): github.com (16)\\n\\nVENUE TYPES THAT PRODUCED APPROVED FINDS before (proven hunting grounds worth revisiting with NEW queries): github.com\\n\\nGoal: save NEW, high-quality resources (confidence ≥ 70) that fill the target gaps, biased toward the campaign angle.\",\"n\":45,\"d\":\"49d ago\"},{\"k\":\"AUTO-GENERATED RESEARCH BRIEF (2026-07-30) — campaign angle: Vendor & engineering blogs.\\n\\nBias this run toward deep technical blog posts and niche vendor documentation (engineering blogs of streaming platforms, codec vendors, CDN providers) — NOT marketing pages. Search \\\"<gap topic> engineering blog\\\" and \\\"site:<vendor domain> <topic>\\\".\\n\\nTARGET GAPS THIS RUN (most under-served first — rotate through several):\\n- Encoding & Codecs › Comparative Analysis of Codecs (1 existing)\\n- Encoding & Codecs › Software Codecs (1 existing)\\n- General Tools › Research Projects & Academic Resources (1 existing)\\n- General Tools › Widevine FairPlay PlayReady Integrations (1 existing)\\n- Infrastructure & Delivery › Multi-CDN Management (1 existing)\\n- Media Tools › Color Grading & Correction Tools (1 existing)\\n- Media Tools › Color Science & Histogram Analysis (1 existing)\\n- Media Tools › Conversion & Format Tools (1 existing)\\n\\nRECENT RUNS ALREADY SEARCHED these queries — do NOT repeat them or near-variants; find NEW ground:\\n- \\\"subtitle OCR extraction open source github OR arxiv\\\"\\n- \\\"\\\"ASS subtitle editor\\\" OR \\\"SSA editor\\\" OR \\\"aegisub\\\" alternative open source 2024 2025\\\"\\n- \\\"\\\"subtitle timing\\\" \\\"synchronization\\\" OR \\\"alignment\\\" open source command-line github\\\"\\n- \\\"site:github.com subtitle editor SRT VTT stars:>50 language:Rust OR language:TypeScript OR language:Go\\\"\\n- \\\"site:github.com DRM debug player test shaka dash-mpd widevine compliance\\\"\\n- \\\"license server testing DRM compliance framework multi-DRM streaming\\\"\\n- \\\"EME testing tools open source encrypted media extensions JavaScript\\\"\\n- \\\"site:github.com DRM testing validator Widevine PlayReady FairPlay\\\"\\n- \\\"SRT testing monitoring tools FFmpeg OBS GStreamer integration guide\\\"\\n- \\\"\\\"SRT\\\" streaming protocol Demuxed conference talk OR paper arxiv\\\"\\n- \\\"SRT relay gateway RTMP HLS converter tools\\\"\\n- \\\"SRT protocol implementation open source github -haivision\\\"\\n- \\\"DRM test suite content protection conformance tools GitHub\\\"\\n- \\\"EME Encrypted Media Extensions testing framework open source\\\"\\n- \\\"site:github.com DRM validator Widevine PlayReady FairPlay testing\\\"\\n- \\\"site:github.com dash.js DRM test encrypted\\\"\\n- \\\"W3C EME test suite specification video\\\"\\n- \\\"\\\"test vectors\\\" DRM video streaming open source\\\"\\n- \\\"site:github.com Shaka Player EME testing DRM\\\"\\n- \\\"site:github.com \\\"DRM test\\\" video streaming\\\"\\n\\nDOMAINS PAST RUNS ALREADY MINED heavily (skip unless a specific find is exceptional): github.com (16)\\n\\nVENUE TYPES THAT PRODUCED APPROVED FINDS before (proven hunting grounds worth revisiting with NEW queries): github.com\\n\\nGoal: save NEW, high-quality resources (confidence ≥ 70) that fill the target gaps, biased toward the campaign angle.\",\"n\":0,\"d\":\"49d ago\"}].map((p, i) => (",
+            "occurrences": 1,
+            "source": "/api/researcher/jobs?limit=4 (ResearchWorkspace.toResearchNote mirror; admin session only)"
+          },
+          {
+            "file": "admin.jsx",
+            "from": "<p style={{ fontSize: 12, color: 'var(--text-3)', marginBottom: 16 }}>All systems nominal</p>",
+            "to": "<p style={{ fontSize: 12, color: 'var(--text-3)', marginBottom: 16 }}>One or more systems need attention</p>",
+            "occurrences": 1,
+            "source": "AdminOverview healthSubtitle derived from the bound health rows"
+          },
+          {
+            "file": "admin.jsx",
+            "from": "        <Stat label=\"Last enriched\" value=\"3h ago\" sub=\"batch #21 · 47 entries\" />\n        <Stat label=\"Queue\" value=\"0\" sub=\"idle\" />\n        <Stat label=\"Avg cost\" value=\"$0.34\" sub=\"per batch\" />",
+            "to": "        <Stat label=\"Last enriched\" value=\"73d ago\" sub=\"batch #38 · 3 entries\" />\n        <Stat label=\"Queue\" value=\"0\" sub=\"idle\" />\n        <Stat label=\"Avg cost\" value=\"$0.05\" sub=\"per batch\" />",
+            "occurrences": 1,
+            "source": "/api/enrichment/jobs (last completed job vs frozen clock, pending+processing count, mean recorded metadata.agent.estimatedCostUsd)"
+          },
+          {
+            "file": "admin.jsx",
+            "from": "  const stats = [\n    { k: '200 OK', v: '1,847', color: '#34d08c' },\n    { k: '301/302', v: '78', color: '#ffb84d' },\n    { k: '404', v: '21', color: '#ff5c7a' },\n    { k: 'Timeout', v: '7', color: '#ff5c7a' },\n  ];",
+            "to": "  const stats = [{\"k\":\"200 OK\",\"v\":\"0\",\"color\":\"#34d08c\"},{\"k\":\"301/302\",\"v\":\"0\",\"color\":\"#ffb84d\"},{\"k\":\"404\",\"v\":\"0\",\"color\":\"#ff5c7a\"},{\"k\":\"Timeout\",\"v\":\"0\",\"color\":\"#ff5c7a\"}];",
+            "occurrences": 1,
+            "source": "/api/admin/link-health/status latest job totalLinks + /api/admin/link-health/broken-links status counts (LinkHealthDashboard summary arithmetic)"
+          },
+          {
+            "file": "admin.jsx",
+            "from": "            {[\n              { t: 'AviSynth', u: 'http://avisynth.org/', s: '404', when: '2h ago' },\n              { t: 'OpenVisualCloud/Smart-City', u: 'github.com/OpenVisualCloud/...', s: 'timeout', when: '2h ago' },\n              { t: 'M3U8Kit/M3U8Parser', u: 'github.com/M3U8Kit/...', s: '301', when: '2h ago' },\n            ].map((r, i) => (",
+            "to": "            {[].map((r, i) => (",
+            "occurrences": 1,
+            "source": "/api/admin/link-health/broken-links flagged/broken/dns_failure/timeout checks (an empty live list is authoritative)"
+          },
+          {
+            "file": "home-layouts.jsx",
+            "from": "<button className=\"btn primary\" onClick={() => go('submit')} style={{ width: '100%' }}>",
+            "to": "<button className=\"btn primary\" onClick={() => go('submit')} style={{ width: '100%', minHeight: 44 }}>",
+            "occurrences": 1,
+            "source": "User-approved Home Submit 44px minimum target reconciliation (2026-09-13)"
+          },
+          {
+            "file": "home-layouts.jsx",
+            "from": "<button className=\"btn ghost\" onClick={() => go('category', { cat: AV_CATEGORIES[1] })}>Browse all →</button>",
+            "to": "<button className=\"btn ghost\" style={{ minHeight: 44 }} onClick={() => go('category', { cat: AV_CATEGORIES[1] })}>Browse all →</button>",
+            "occurrences": 1,
+            "source": "User-approved Home Browse 44px minimum target reconciliation (2026-09-13)"
+          },
+          {
+            "file": "home-layouts.jsx",
+            "from": "const kindCount = k => AV_RESOURCES.filter(k.match).length;",
+            "to": "const kindCount = k => Number(window.AV_KIND_COUNTS?.[k.id] ?? AV_RESOURCES.filter(k.match).length);",
+            "occurrences": 1,
+            "source": "/api/resources/kinds/counts"
+          },
+          {
+            "file": "home-layouts.jsx",
+            "from": "const featured = AV_RESOURCES.filter(r => r.featured).slice(0, 6);",
+            "to": "const featured = (window.AV_HOME_FEATURED || AV_RESOURCES.filter(r => r.featured)).slice(0, 6);",
+            "occurrences": 1,
+            "source": "/api/home featured resource identities"
+          },
+          {
+            "file": "home-layouts.jsx",
+            "from": "['FEATURED', AV_RESOURCES.filter(r => r.featured).length, 'hand-picked']",
+            "to": "['FEATURED', Number(window.AV_HOME_FEATURED_COUNT ?? AV_RESOURCES.filter(r => r.featured).length), 'hand-picked']",
+            "occurrences": 1,
+            "source": "/api/home featuredCount"
+          },
+          {
+            "file": "home-layouts.jsx",
+            "from": "['FEATURED', featured.length, 'this week']",
+            "to": "['FEATURED', Number(window.AV_HOME_FEATURED_COUNT ?? featured.length), 'hand-picked']",
+            "occurrences": 1,
+            "source": "/api/home featuredCount and live curated stat label"
+          },
+          {
+            "file": "home-layouts.jsx",
+            "from": "<div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))', gap: 16 }}>\n          {featured.map((r, i) => <ResCard key={r.id} r={r} go={go} delay={i * 40} />)}\n        </div>",
+            "to": "{featured.length > 0 ? (\n          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))', gap: 16 }}>\n            {featured.map((r, i) => <ResCard key={r.id} r={r} go={go} delay={i * 40} />)}\n          </div>\n        ) : (\n          <p className=\"home-empty-section\">No featured resources have been selected yet.</p>\n        )}",
+            "occurrences": 1,
+            "source": "/api/home featured[] empty state"
+          }
+        ],
+        "unadapted": [],
+        "rule": "Substitutions are applied to the served in-memory bytes only; files under awesome-list-site-ds/ are never modified. Unavailable literals are left as designed and listed under unadapted."
+      },
+      "reconciliation": {
+        "version": 1,
+        "source": [
+          "/api/config",
+          "/api/awesome-list/nav",
+          "/api/home",
+          "/api/resources/kinds/counts"
+        ],
+        "site": {
+          "name": "Awesome Video",
+          "tagline": "A curated collection of awesome video resources, tools, and technologies for developers and content creators",
+          "repoUrl": "https://github.com/krzemienski/awesome-video",
+          "repoBranch": "master",
+          "copyrightYear": 2026
+        },
+        "kindCounts": {
+          "tools": 23,
+          "libraries": 61,
+          "standards": 47,
+          "events": 18,
+          "protocols": 11,
+          "other": 1656,
+          "total": 1816
+        },
+        "home": {
+          "total": 1816,
+          "approvedThisWeek": 0,
+          "featuredCount": 0,
+          "recentCount": 5,
+          "featuredCountReturned": 0
+        },
+        "sourceSubstitutions": [
+          {
+            "file": "home-layouts.jsx",
+            "from": "<button className=\"btn primary\" onClick={() => go('submit')} style={{ width: '100%' }}>",
+            "to": "<button className=\"btn primary\" onClick={() => go('submit')} style={{ width: '100%', minHeight: 44 }}>",
+            "source": "User-approved Home Submit 44px minimum target reconciliation (2026-09-13)",
+            "available": true
+          },
+          {
+            "file": "home-layouts.jsx",
+            "from": "<button className=\"btn ghost\" onClick={() => go('category', { cat: AV_CATEGORIES[1] })}>Browse all →</button>",
+            "to": "<button className=\"btn ghost\" style={{ minHeight: 44 }} onClick={() => go('category', { cat: AV_CATEGORIES[1] })}>Browse all →</button>",
+            "source": "User-approved Home Browse 44px minimum target reconciliation (2026-09-13)",
+            "available": true
+          },
+          {
+            "file": "home-layouts.jsx",
+            "from": "const kindCount = k => AV_RESOURCES.filter(k.match).length;",
+            "to": "const kindCount = k => Number(window.AV_KIND_COUNTS?.[k.id] ?? AV_RESOURCES.filter(k.match).length);",
+            "source": "/api/resources/kinds/counts",
+            "available": true
+          },
+          {
+            "file": "home-layouts.jsx",
+            "from": "const featured = AV_RESOURCES.filter(r => r.featured).slice(0, 6);",
+            "to": "const featured = (window.AV_HOME_FEATURED || AV_RESOURCES.filter(r => r.featured)).slice(0, 6);",
+            "source": "/api/home featured resource identities",
+            "available": true
+          },
+          {
+            "file": "home-layouts.jsx",
+            "from": "['FEATURED', AV_RESOURCES.filter(r => r.featured).length, 'hand-picked']",
+            "to": "['FEATURED', Number(window.AV_HOME_FEATURED_COUNT ?? AV_RESOURCES.filter(r => r.featured).length), 'hand-picked']",
+            "source": "/api/home featuredCount",
+            "available": true
+          },
+          {
+            "file": "home-layouts.jsx",
+            "from": "['FEATURED', featured.length, 'this week']",
+            "to": "['FEATURED', Number(window.AV_HOME_FEATURED_COUNT ?? featured.length), 'hand-picked']",
+            "source": "/api/home featuredCount and live curated stat label",
+            "available": true
+          },
+          {
+            "file": "home-layouts.jsx",
+            "from": "<div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))', gap: 16 }}>\n          {featured.map((r, i) => <ResCard key={r.id} r={r} go={go} delay={i * 40} />)}\n        </div>",
+            "to": "{featured.length > 0 ? (\n          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))', gap: 16 }}>\n            {featured.map((r, i) => <ResCard key={r.id} r={r} go={go} delay={i * 40} />)}\n          </div>\n        ) : (\n          <p className=\"home-empty-section\">No featured resources have been selected yet.</p>\n        )}",
+            "source": "/api/home featured[] empty state",
+            "available": true
+          }
+        ],
+        "officialBrandMark": {
+          "source": "client/src/components/BrandMark.tsx + client/src/lib/brand-mark.ts (esbuild TS projection)",
+          "sha256": "71ff42019de52cbc4808f28463203e6efd0ef9e9787123fec4b3c3d438cf4b73",
+          "sourceSha256": "02dfb5b928a00f24e21279ff7e08f36d1ab59e283ca3f31666eea4531fa6e101"
+        },
+        "palette": {
+          "pages": [
+            {
+              "label": "Browse categories",
+              "detail": "Explore the full catalog",
+              "href": "/categories",
+              "icon": "Grid2X2",
+              "kind": "page"
+            },
+            {
+              "label": "Advanced discovery",
+              "detail": "Filter resources in detail",
+              "href": "/advanced",
+              "icon": "Search",
+              "kind": "page"
+            },
+            {
+              "label": "Submit a resource",
+              "detail": "Suggest something useful",
+              "href": "/submit",
+              "icon": "Plus",
+              "kind": "page"
+            },
+            {
+              "label": "About",
+              "detail": "Learn about this collection",
+              "href": "/about",
+              "icon": "Info",
+              "kind": "page"
+            }
+          ],
+          "recentSearches": [],
+          "recentSearchesSource": "parity capture fixture: no recent-searches localStorage entry is seeded",
+          "scope": {
+            "root": ".modal-backdrop > .modal:has(> div:first-child > input[placeholder=\"Find resources, categories, or tags…\"])",
+            "pages": "[data-parity-palette=\"approved\"] .parity-palette-pages",
+            "rows": "[data-parity-palette=\"approved\"] [data-parity-palette-control=\"row\"]",
+            "focus": "[data-parity-palette=\"approved\"] [data-parity-palette-control=\"input\"]:focus,[data-parity-palette=\"approved\"] [data-parity-palette-control=\"row\"]:focus-visible,[data-parity-palette=\"approved\"] [data-parity-palette-control=\"page\"]:focus-visible,[data-parity-palette=\"approved\"] [data-parity-palette-control=\"history\"]:focus-visible,[data-parity-palette=\"approved\"] [data-parity-palette-control=\"clear\"]:focus-visible",
+            "history": "[data-parity-palette=\"approved\"] .parity-palette-recent"
+          },
+          "sourceProof": {
+            "file": "client/src/components/ui/search-dialog.tsx",
+            "sha256": "df35f79ad83f1c28ef3f535ff81e584fdbcedb93e87d1da86c32c054f93bfa0a",
+            "declarations": [
+              {
+                "label": "Browse categories",
+                "detail": "Explore the full catalog",
+                "href": "/categories",
+                "icon": "Grid2X2"
+              },
+              {
+                "label": "Advanced discovery",
+                "detail": "Filter resources in detail",
+                "href": "/advanced",
+                "icon": "Search"
+              },
+              {
+                "label": "Submit a resource",
+                "detail": "Suggest something useful",
+                "href": "/submit",
+                "icon": "Plus"
+              },
+              {
+                "label": "About",
+                "detail": "Learn about this collection",
+                "href": "/about",
+                "icon": "Info"
+              }
+            ],
+            "iconProjection": {
+              "renderer": "react-dom/server renderToStaticMarkup",
+              "package": "lucide-react",
+              "components": [
+                "Grid2X2",
+                "Search",
+                "Plus",
+                "Info"
+              ],
+              "svgSha256": {
+                "Grid2X2": "79f952f181c863e6fd88b693a2ceffcafe032c368b117d4c0f7520b65732f3b1",
+                "Search": "eae4708bc8f9ef4651c585619c320831fd8636cee30f6027979c15e574ca2e69",
+                "Plus": "b208fd73aa48c54364eb6eaaa9c389de4de22759717542cb0a08172afad33980",
+                "Info": "13bda2d16f007046d221c75a7e05a00a284de461b4f61a5361a89b361195ffca"
+              }
+            },
+            "focusSource": {
+              "file": "client/src/styles/design-system.css",
+              "sha256": "2f755e504b007028db5fa6824a0ca37e07fe714d6107781f45d6427a9e62afa3",
+              "declaration": "input, select, textarea, summary, [contenteditable=\"true\"], [tabindex] + outline: 2px solid var(--accent) !important;"
+            },
+            "styleSource": {
+              "file": "client/src/styles/shell/palette.css",
+              "sha256": "d7590a599ce7e4d438f13523f9b9c7470ef95f2f16a7afddfa479980dfad2837",
+              "badge": ".search-palette-kind { + color: var(--text-3);",
+              "detail": ".search-palette-copy small { + font-family: var(--font-mono); + font-size: 11px;"
+            }
+          }
+        },
+        "drawer": {
+          "moreLinks": [
+            {
+              "label": "Learning Journeys",
+              "href": "/journeys"
+            },
+            {
+              "label": "Advanced",
+              "href": "/advanced"
+            },
+            {
+              "label": "Theme",
+              "href": "/settings/theme"
+            },
+            {
+              "label": "Home dashboard",
+              "href": "/?context=account"
+            }
+          ],
+          "scope": {
+            "root": ".mobile-drawer.open",
+            "more": "[data-parity-drawer=\"approved\"] .parity-drawer-more-navigation",
+            "links": "[data-parity-drawer=\"approved\"] .parity-drawer-more-menu a",
+            "search": "[data-parity-drawer=\"approved\"] > div:nth-child(2) input.search-input",
+            "targets": [
+              "[data-parity-drawer=\"approved\"] > nav .sub-item",
+              "[data-parity-drawer=\"approved\"] .accordion-header",
+              "[data-parity-drawer=\"approved\"] > div:last-child a",
+              "[data-parity-drawer=\"approved\"] .parity-drawer-more-navigation > summary"
+            ]
+          },
+          "source": "client/src/components/layout/new/AppSidebar.tsx drawerMoreItems (navItems.slice(2) + accountDashboardItem; role-independent)",
+          "sourceProof": {
+            "file": "client/src/components/layout/new/AppSidebar.tsx",
+            "sha256": "50dec9a4678cdcbb68de7c35f96e0138d20a263ccb3127721e20c6be76b42dee",
+            "declarations": [
+              {
+                "label": "Learning Journeys",
+                "href": "/journeys"
+              },
+              {
+                "label": "Advanced",
+                "href": "/advanced"
+              },
+              {
+                "label": "Theme",
+                "href": "/settings/theme"
+              },
+              {
+                "label": "Home dashboard",
+                "href": "/?context=account"
+              }
+            ],
+            "contract": "const drawerMoreItems = [...navItems.slice(2), accountDashboardItem];",
+            "layoutSource": {
+              "file": "client/src/styles/shell/sidebar.css",
+              "sha256": "be5251e04b7223f950f3eb1737d56c44ee11ffac5c7de4e53406e97fb9244f8a",
+              "header": ".av-sidebar-drawer .av-sidebar-drawer-header > a + margin-block: -4px;",
+              "search": ".av-sidebar-drawer .av-sidebar-drawer-search-control input + height: 44px; + min-height: 44px;"
+            },
+            "iconProjection": {
+              "renderer": "react-dom/server renderToStaticMarkup",
+              "package": "lucide-react",
+              "component": "MoreHorizontal",
+              "svgSha256": "a8a8e1f0cfa7227533826f4fcbdf1d4485b3df0b62d38ff945d24ef7a0826873"
+            }
+          }
+        },
+        "approved44px": {
+          "selector": ".site-footer .footer-link",
+          "minHeightPx": 44,
+          "display": "inline-flex",
+          "alignItems": "center"
+        },
+        "approved44pxControls": {
+          "minHeightPx": 44,
+          "drawer": [
+            "[data-parity-drawer=\"approved\"] > nav .sub-item",
+            "[data-parity-drawer=\"approved\"] .accordion-header",
+            "[data-parity-drawer=\"approved\"] > div:last-child a",
+            "[data-parity-drawer=\"approved\"] .parity-drawer-more-navigation > summary"
+          ],
+          "drawerSearch": "[data-parity-drawer=\"approved\"] > div:nth-child(2) input.search-input",
+          "paletteFocus": "[data-parity-palette=\"approved\"] [data-parity-palette-control=\"input\"]:focus,[data-parity-palette=\"approved\"] [data-parity-palette-control=\"row\"]:focus-visible,[data-parity-palette=\"approved\"] [data-parity-palette-control=\"page\"]:focus-visible,[data-parity-palette=\"approved\"] [data-parity-palette-control=\"history\"]:focus-visible,[data-parity-palette=\"approved\"] [data-parity-palette-control=\"clear\"]:focus-visible"
+        }
+      },
+      "rawHashes": {
+        ".thumbnail": "e9124eedc686b6e534b830fb103b9ab4092606db67e52fa46969bc8d5bc0337a",
+        "Awesome.Video - Standalone.html": "f40a5525c72adda5af874f1d475084f8a5ba9714a74a9e95403dc6b056662af5",
+        "HANDOFF.md": "2bcbf1d8e7e19f0e14e4413689e2c7bdfd9b45e1adee6f5416dc4d429fd9228f",
+        "REPLIT-REMEDIATION-PROMPT.md": "a7dc59083cc71dc2d1a08f34729fdb0812792af8c027251e9be07dfec1832b8b",
+        "SKILL-verify-design-system.md": "37f25dbce6d8e486086eb9f8d66029f335365a636261b4983a8aa84f2f325da6",
+        "_check/01-flow2.png": "2b6d59a5e7b9c227e46fdb3e82a2fecdf09aeb1d0818e62bf2be7aaf020d95e0",
+        "_check/02-flow2.png": "2b6d59a5e7b9c227e46fdb3e82a2fecdf09aeb1d0818e62bf2be7aaf020d95e0",
+        "_check/03-flow2.png": "2b6d59a5e7b9c227e46fdb3e82a2fecdf09aeb1d0818e62bf2be7aaf020d95e0",
+        "_check/app-hero.png": "39c555adb98a3314c4e8e3d6db19f8a305a1d05911970b18beed2254a645aca5",
+        "_check/app-top.png": "ff61ca5519b51952519ede2abeb1472e83056a36d50010a36ef6d814feb917cf",
+        "_check/docs-overview.png": "87d751cdc133c43fd47ec2cbc30a0eccba14179aa35ed74bca8a7010fdf14e26",
+        "_check/flow-editorial.png": "37481b61470650c167a03a57a10054e96dcffc6075f600b2ec8ec99c7f5749f6",
+        "_check/flow.png": "2b6d59a5e7b9c227e46fdb3e82a2fecdf09aeb1d0818e62bf2be7aaf020d95e0",
+        "_check/show-top.png": "a9d231c71cf0a3ae8fdb8e3200ca4d12e2de3f3eb009f1f4faefe828758d2dac",
+        "admin.jsx": "c32b6a11b58d54b6704955fd556e2014e9c0617d1720bfbbd9dab10c19d82360",
+        "app.jsx": "9d71619b1c70720d36b15803b818040f4515ca165b09388f9e60376fa81ae1c6",
+        "audit-report.md": "ed3dc0dc16f918cb276f2470f4522900c2d7c4a05932a0e93d15aeb344ff1f70",
+        "data.js": "5196b2a166673cc3c62a011028573d93e02b9f690b24db2e06b6372700b25a66",
+        "design-system-anatomy.jsx": "9cadf8f0a44a535f416e56e3e24d2e005556a0ea270e97dcdab28ebff505810a",
+        "design-system-showcase.jsx": "24c91a564df8e7a50425ab0db86ef61f9d029a809c37571da3c5c6efb1adbe11",
+        "design-system.html": "59a851a95949c36b2877b4bd57f554e84d9be9d662d3f23a895216a26d5f4dc7",
+        "design-systems.jsx": "30c37539db397941f209055af28a5284fbdd14a3322adb869701c70b0e05bc7c",
+        "docs/01-overview.md": "7434b385729ad6e1a8592161ae6bb8b0a0898bc8c58fad6152c4fc4ccee2582a",
+        "docs/02-principles.md": "d25feef86fb7ca5d184eaeabd6f5cb32ffc553e7b693329109bf00b6378d7b13",
+        "docs/03-getting-started.md": "99dbdf4ccf793d551985b5eb10bdafb99c8393848bb65af3c07bbe937b2f33b3",
+        "docs/04-tokens.md": "9fa54765d1a5fe8bed234a8c7def608efe638cff2a11e608ae6b0fc8bd359d87",
+        "docs/05-theming.md": "98359a32a71ce808059c38c510c6bc83c199bdaea0be7b1835e0b9b9500d6371",
+        "docs/06-typography.md": "50636d27ae58414d3c5e36ab4013b82dfa92ce6d1c0ed0dfaa68887694cc562d",
+        "docs/07-color.md": "e6320c732732573000f3d8ff76d892c4c13fcbe74983aef69955d0071c1e2dd4",
+        "docs/08-spacing-layout.md": "637b852813c4565d534d4b844d8a3729c1f61372f883e6a989d44f72311edada",
+        "docs/09-motion.md": "8f8a4a3f86c154455764580cd43c2da613f150c273ceb5190b9b6e02d5cbac4c",
+        "docs/10-components.md": "083ffe1beac8b9529d53eb694588d3f51d9eae30bc49474895a8287bc17feeaf",
+        "docs/11-patterns.md": "9e220b1ab08c10d709ff02dfe40efccd80cbdb5fc32ed7e3d963b9483d37f761",
+        "docs/12-integration-html.md": "e9979c4781fda6b85a0539ec03b1c8d405d92e7ce717c1e05509385e7e0476a9",
+        "docs/13-integration-react.md": "4eaff2bbbc7aaf04809d81d5d8babbb02e020496e6f5aaeaebfb2cb8af7cf3b2",
+        "docs/14-integration-nextjs.md": "48a26566d786bc566fb808b016a61652ee542c0ded22ad81a2810d2f888697c7",
+        "docs/15-integration-vue.md": "be4ef659fc307401eb86a9c59434bdd201059120dba4bb11f87d2812608b2f5d",
+        "docs/16-migration.md": "7d5076e486008b51fae6d6a4ad48bcb5289a4b2b87036d561ef3f9cf454cb98a",
+        "docs/17-accessibility.md": "f1b0bdaf0b78fb8bcbea5348ea9dadd757cdbffb218de868009d36ebf3659e9e",
+        "docs/18-launch-checklist.md": "4fefbb090fca7699abbc7f59a274f751bb27c20d3f0510bc7408c8a41f91c707",
+        "docs/README.md": "995c700e5cd839a01627b7a4442f8ae3a98164b9c7fce52cca1e5eddd07ea7ca",
+        "docs-content-1.jsx": "b7b969b4aeb1b6e560b7fb1589626dd8def9145c3709bc31a127454ea5015982",
+        "docs-content-2.jsx": "fbf202ebdba472a6663c43e8a38cc86346ab2d0c9655fe012a66b579f6508f81",
+        "docs.html": "e3072e8e0f4722c0201b444ab270ccb32dacdf571329ac5b4cb4c4b954de45ec",
+        "docs.jsx": "d430fc4a9f5d2f3f95c789eab20ea36ae96eb307d495f07052a720f912f6eee2",
+        "home-layouts.jsx": "c91a2a679670684b4182b3c6015544265373e01cf2ee96efc778975a2257b4f2",
+        "index.html": "7f561822fdbb5b67ebce62324d7f02ce0154eb90b2927f8d46510466cda5f8f7",
+        "index.standalone.html": "7b62e47bf3ab24c6c1268be3a9ce078627d3074519af542bec07d1c40c7ffa47",
+        "layout.jsx": "911f165b50f94d6b3930b2761545606105a9a4ba9727ed443a0681b039b3e76a",
+        "pages-core.jsx": "fd370da82ed465d568a549816e607a4c59e3e764e7342ca176d1b4f65766aad9",
+        "pages-extra.jsx": "d9abd2edaf5df810b5cb2246059c4f4cba461c085771c00a465f107b64413e3a",
+        "pages.jsx": "ee95572bb30f38424920918c49c9b483898ec975adf4bc0a8c04664cf2fd4a58",
+        "sidebar-variants.jsx": "86ae99e167f07d7679672b4224fdfc758424224603c3de5459b7cdc9aba39e95",
+        "styles.css": "f65694df1965889a6a6a4bff6404d9b47164f097ebcd417513a34d430e6a1055",
+        "tweaks-panel.jsx": "ea982af775f053999f1f8841b7078ae20b37bdb3c20432fe293e3b4572c0c454",
+        "uploads/01_home.png": "43c6cb5b4f4ea68a25fff11c4d176709e95248ec80ea7ba47901c49f9d5015c4",
+        "uploads/02_about.png": "9d66e7e3b86841f708e19e74b4933207023a3aea864c18b264717206537dad9a",
+        "uploads/03_advanced.png": "8f004d07f1a2200365992f0ef9ea177df8c756da836332714c2934d3ecb76d38",
+        "uploads/04_learning_journeys.png": "bf0ad1aa3e384c5369a3afe7f57b48f07fa2362aef4b13b6401356404bb41921",
+        "uploads/05_journey_detail.png": "c8d13312128776fb51d8389b2d7bf43e863bb8d43095ed997e9ddec4e69eff10",
+        "uploads/06_login.png": "291baba8571c24f703b41acb3a1bde2731e02fb60ae3cdb94786980de4bbe506",
+        "uploads/07_submit_resource_authgate.png": "616819c0cf65707ed64c82a337deb5d15016bffdebb39ad7a110eca27cdc8cde",
+        "uploads/08_theme_settings.png": "9205753c5fd56106849fb5dc8ccae635084b5aa957641e3313e1fe36263c851e",
+        "uploads/09_category_community-events.png": "4a8b89350c6b0dc18f41ce85edf9d9babcac989419403c5c253e4991bfa81101",
+        "uploads/10_category_encoding-codecs.png": "b966ae38b27df934a18456c50e47c589d4a570d805b11a3580a8ecf6ac51df99",
+        "uploads/11_category_general-tools.png": "755c0115ce7d0726cdba5610f23988ecd368ba2da8c2c6ebb5ccb5b2b8e2d09b",
+        "uploads/12_category_infrastructure-delivery.png": "c72a990a404a3f819e35bf27908c47442e4970c2192cba774ed54b311f1caf1e",
+        "uploads/13_category_intro-learning.png": "6c945f36f389d1c6ea32583b7df1f1bd2551d735748636455833cf86404bf197",
+        "uploads/14_category_media-tools.png": "deadba69a700015bf508cc2dcc7305da44fe45e4a6a83e3448c90e79730667ae",
+        "uploads/15_category_players-clients.png": "91cbe5aba894bd35592598398657ee730162389c2591a423b123d481a0793e40",
+        "uploads/16_category_protocols-transport.png": "4d9cbb4d2d2081169b8af5f78514a0d1ed720e459a6705bed87399509eb765a1",
+        "uploads/17_category_standards-industry.png": "36e0cab03d177077dc6182d0f4ca89a7019a66759ee7e2151731a8b11a099d95",
+        "uploads/18_subcategory_ai-ml-tools.png": "4c91239b46395596cfc00ea91a7636493f55a903dcb075abcc67870ac97a53de",
+        "uploads/19_sub-subcategory_hls.png": "48fd44966fe7d3aa7cfe41be6c0500e957c32963122902c05e36a5a043c68b33",
+        "uploads/20_sub-subcategory_dash.png": "e8c7bb9b685c7ba2a0c31f5cb171a3521590a375743ee9746da29c93f4907241",
+        "uploads/21_resource_detail.png": "27e44c258f0ae9d2f14a865b6e51e893325b6bace8f0832e90b4e442586326ee",
+        "uploads/22_404_not_found.png": "ee9bbafa356eff6653a1a464a4e8f7adb8249d16cdcfff29a100b97ed344c835",
+        "uploads/IMG_3167.jpeg": "74fa937a2d4647d2d863e4afd08aa03c55eab946ece06923c05195785952d405",
+        "uploads/IMG_3169.jpeg": "b897452732a0cd8b639f8420796a9f4b1a713eed218706910dfb84fb090b0d01",
+        "uploads/IMG_3171.jpeg": "02d1130b7e87353010d2678440ecd7ace07c66a34d0631ca02dd60958cc83d9d",
+        "uploads/IMG_3173.jpeg": "791462af1ca505f23381d7b871b5ae4d122a579b83c176550c99b06a0c3a10bc",
+        "uploads/IMG_3175.jpeg": "ac8a23f8ac8133af86fb7ec21f0b9bd59bc8ae997e9bda43c1efb610845ca1f8",
+        "uploads/IMG_3177.jpeg": "28af1816a1987fdc40cb5f7af104e69749597bae7f1420d3259e8b44e953f997",
+        "uploads/IMG_3179.jpeg": "41fe819a15b4bbfe7cfbe2e085b1093b0cbbed8c042a1e8d45db2ab8e1490ac3",
+        "uploads/IMG_3181.jpeg": "a69d28c39b3dd58706a1d10a0238ebacf0ec3f03e14afe8a0c2885734e2a4120",
+        "uploads/IMG_3183.jpeg": "07abd8ffe6b91b03c923c87b521b00aee37637e0b9225ef2b4195799d087b2a0",
+        "uploads/IMG_3185.jpeg": "b645696f282e4fdb862a060c39434bc6c759a5a103afd9c5c66fd07faef540f1",
+        "uploads/IMG_3187.jpeg": "d5118ccbd8ffbb34eba1881b9ed669e83ca6884600eac41c983516ddbaeda912",
+        "uploads/IMG_3189.jpeg": "fea2d4ec82c95166c399214f3ac58300efc4d31d6ad1e6521928c3a6f48b4150",
+        "uploads/IMG_3191.jpeg": "13b7659661965d61ace34112cc07fba2704ae012ae38c9b8c3f3786af478d3af",
+        "uploads/IMG_3193.jpeg": "ce82d6451490b633016caba103131e1ff3ae14494bde60977414264461bc4fa0",
+        "uploads/IMG_3195.jpeg": "23d29bc41b152ef40c4b57d8724656c859704cc26c3f79cccc2ae33dd6e4b630",
+        "uploads/IMG_3197.jpeg": "7f3ae99ef3fdfa508816671fc6d4a50ae3b040ddc8bef1cebf6639e476e11730",
+        "uploads/IMG_3199.jpeg": "56896b8236a364fb0cfa25568d36b4360d3d9a2b60b58b14f48219942c862e2a",
+        "uploads/IMG_3201.jpeg": "b35514757788928eb7068c10fda0d2880ba1ca979397587344ab8cbd853bc65f",
+        "uploads/IMG_3203.jpeg": "39c1098f988a3b196646d62834a813e6b529a3191208cd992416a0a9d26eccf6",
+        "uploads/IMG_3205.jpeg": "3bbe6722397685b9e9c01f1f0cc3394badf259066cfac61da04b4c428adee0b7",
+        "uploads/IMG_3207.jpeg": "4f379c8b36c17eb5e25c2cb4911c81310ebc6d726d5a371e9def03c35041c1d6",
+        "uploads/IMG_3209.jpeg": "9ae400e5fe80693c174bce00ae496973a8f68caddc51d71a7daba85bf610ea4e",
+        "uploads/INDEX.md": "12870b61be9bec03ae8da92b17fcc7f32a05df45fd4f4e23fd07d89bd0f9daf2",
+        "uploads/Screenshot 2026-05-22 at 15.26.17.png": "8e3633aded14b8e21dc3c0e06de81b2844d137ddec7fa429ceb59922ce4a2639",
+        "views-1.jsx": "0d772bc0ae8133a5e400a111f79ea04db0944b403eb75584747cdd49c151a40e",
+        "views-2.jsx": "a91dccea691004186155e46677e680e987a7f01651bff895eb5a5c86871ad9e0"
+      },
+      "servedHashes": {
+        ".thumbnail": "e9124eedc686b6e534b830fb103b9ab4092606db67e52fa46969bc8d5bc0337a",
+        "Awesome.Video - Standalone.html": "f40a5525c72adda5af874f1d475084f8a5ba9714a74a9e95403dc6b056662af5",
+        "HANDOFF.md": "2bcbf1d8e7e19f0e14e4413689e2c7bdfd9b45e1adee6f5416dc4d429fd9228f",
+        "REPLIT-REMEDIATION-PROMPT.md": "a7dc59083cc71dc2d1a08f34729fdb0812792af8c027251e9be07dfec1832b8b",
+        "SKILL-verify-design-system.md": "37f25dbce6d8e486086eb9f8d66029f335365a636261b4983a8aa84f2f325da6",
+        "_check/01-flow2.png": "2b6d59a5e7b9c227e46fdb3e82a2fecdf09aeb1d0818e62bf2be7aaf020d95e0",
+        "_check/02-flow2.png": "2b6d59a5e7b9c227e46fdb3e82a2fecdf09aeb1d0818e62bf2be7aaf020d95e0",
+        "_check/03-flow2.png": "2b6d59a5e7b9c227e46fdb3e82a2fecdf09aeb1d0818e62bf2be7aaf020d95e0",
+        "_check/app-hero.png": "39c555adb98a3314c4e8e3d6db19f8a305a1d05911970b18beed2254a645aca5",
+        "_check/app-top.png": "ff61ca5519b51952519ede2abeb1472e83056a36d50010a36ef6d814feb917cf",
+        "_check/docs-overview.png": "87d751cdc133c43fd47ec2cbc30a0eccba14179aa35ed74bca8a7010fdf14e26",
+        "_check/flow-editorial.png": "37481b61470650c167a03a57a10054e96dcffc6075f600b2ec8ec99c7f5749f6",
+        "_check/flow.png": "2b6d59a5e7b9c227e46fdb3e82a2fecdf09aeb1d0818e62bf2be7aaf020d95e0",
+        "_check/show-top.png": "a9d231c71cf0a3ae8fdb8e3200ca4d12e2de3f3eb009f1f4faefe828758d2dac",
+        "admin.jsx": "1aae0c665e312032016db7aa264999c4aa6a8e44cabad56d8af10ec7f42b17cd",
+        "app.jsx": "9d71619b1c70720d36b15803b818040f4515ca165b09388f9e60376fa81ae1c6",
+        "audit-report.md": "ed3dc0dc16f918cb276f2470f4522900c2d7c4a05932a0e93d15aeb344ff1f70",
+        "data.js": "3e581fa4884ec11e940a20ef70b56993c5b5bfacd709805afc9366d06871eb63",
+        "design-system-anatomy.jsx": "9cadf8f0a44a535f416e56e3e24d2e005556a0ea270e97dcdab28ebff505810a",
+        "design-system-showcase.jsx": "24c91a564df8e7a50425ab0db86ef61f9d029a809c37571da3c5c6efb1adbe11",
+        "design-system.html": "59a851a95949c36b2877b4bd57f554e84d9be9d662d3f23a895216a26d5f4dc7",
+        "design-systems.jsx": "091a5b3b207f1e9431d6da2bcbb0afcc612f0deb5b4983efe987b6ae86799d8e",
+        "docs/01-overview.md": "7434b385729ad6e1a8592161ae6bb8b0a0898bc8c58fad6152c4fc4ccee2582a",
+        "docs/02-principles.md": "d25feef86fb7ca5d184eaeabd6f5cb32ffc553e7b693329109bf00b6378d7b13",
+        "docs/03-getting-started.md": "99dbdf4ccf793d551985b5eb10bdafb99c8393848bb65af3c07bbe937b2f33b3",
+        "docs/04-tokens.md": "9fa54765d1a5fe8bed234a8c7def608efe638cff2a11e608ae6b0fc8bd359d87",
+        "docs/05-theming.md": "98359a32a71ce808059c38c510c6bc83c199bdaea0be7b1835e0b9b9500d6371",
+        "docs/06-typography.md": "50636d27ae58414d3c5e36ab4013b82dfa92ce6d1c0ed0dfaa68887694cc562d",
+        "docs/07-color.md": "e6320c732732573000f3d8ff76d892c4c13fcbe74983aef69955d0071c1e2dd4",
+        "docs/08-spacing-layout.md": "637b852813c4565d534d4b844d8a3729c1f61372f883e6a989d44f72311edada",
+        "docs/09-motion.md": "8f8a4a3f86c154455764580cd43c2da613f150c273ceb5190b9b6e02d5cbac4c",
+        "docs/10-components.md": "083ffe1beac8b9529d53eb694588d3f51d9eae30bc49474895a8287bc17feeaf",
+        "docs/11-patterns.md": "9e220b1ab08c10d709ff02dfe40efccd80cbdb5fc32ed7e3d963b9483d37f761",
+        "docs/12-integration-html.md": "e9979c4781fda6b85a0539ec03b1c8d405d92e7ce717c1e05509385e7e0476a9",
+        "docs/13-integration-react.md": "4eaff2bbbc7aaf04809d81d5d8babbb02e020496e6f5aaeaebfb2cb8af7cf3b2",
+        "docs/14-integration-nextjs.md": "48a26566d786bc566fb808b016a61652ee542c0ded22ad81a2810d2f888697c7",
+        "docs/15-integration-vue.md": "be4ef659fc307401eb86a9c59434bdd201059120dba4bb11f87d2812608b2f5d",
+        "docs/16-migration.md": "7d5076e486008b51fae6d6a4ad48bcb5289a4b2b87036d561ef3f9cf454cb98a",
+        "docs/17-accessibility.md": "f1b0bdaf0b78fb8bcbea5348ea9dadd757cdbffb218de868009d36ebf3659e9e",
+        "docs/18-launch-checklist.md": "4fefbb090fca7699abbc7f59a274f751bb27c20d3f0510bc7408c8a41f91c707",
+        "docs/README.md": "995c700e5cd839a01627b7a4442f8ae3a98164b9c7fce52cca1e5eddd07ea7ca",
+        "docs-content-1.jsx": "b7b969b4aeb1b6e560b7fb1589626dd8def9145c3709bc31a127454ea5015982",
+        "docs-content-2.jsx": "fbf202ebdba472a6663c43e8a38cc86346ab2d0c9655fe012a66b579f6508f81",
+        "docs.html": "e3072e8e0f4722c0201b444ab270ccb32dacdf571329ac5b4cb4c4b954de45ec",
+        "docs.jsx": "d430fc4a9f5d2f3f95c789eab20ea36ae96eb307d495f07052a720f912f6eee2",
+        "home-layouts.jsx": "a82e60c8c7ba4155c8d1808dc6fd070fdae57fca53bfb0fbf7c06af163f968d2",
+        "index.html": "7f561822fdbb5b67ebce62324d7f02ce0154eb90b2927f8d46510466cda5f8f7",
+        "index.standalone.html": "7b62e47bf3ab24c6c1268be3a9ce078627d3074519af542bec07d1c40c7ffa47",
+        "layout.jsx": "911f165b50f94d6b3930b2761545606105a9a4ba9727ed443a0681b039b3e76a",
+        "pages-core.jsx": "fd370da82ed465d568a549816e607a4c59e3e764e7342ca176d1b4f65766aad9",
+        "pages-extra.jsx": "d9abd2edaf5df810b5cb2246059c4f4cba461c085771c00a465f107b64413e3a",
+        "pages.jsx": "ee95572bb30f38424920918c49c9b483898ec975adf4bc0a8c04664cf2fd4a58",
+        "sidebar-variants.jsx": "86ae99e167f07d7679672b4224fdfc758424224603c3de5459b7cdc9aba39e95",
+        "styles.css": "f65694df1965889a6a6a4bff6404d9b47164f097ebcd417513a34d430e6a1055",
+        "tweaks-panel.jsx": "ea982af775f053999f1f8841b7078ae20b37bdb3c20432fe293e3b4572c0c454",
+        "uploads/01_home.png": "43c6cb5b4f4ea68a25fff11c4d176709e95248ec80ea7ba47901c49f9d5015c4",
+        "uploads/02_about.png": "9d66e7e3b86841f708e19e74b4933207023a3aea864c18b264717206537dad9a",
+        "uploads/03_advanced.png": "8f004d07f1a2200365992f0ef9ea177df8c756da836332714c2934d3ecb76d38",
+        "uploads/04_learning_journeys.png": "bf0ad1aa3e384c5369a3afe7f57b48f07fa2362aef4b13b6401356404bb41921",
+        "uploads/05_journey_detail.png": "c8d13312128776fb51d8389b2d7bf43e863bb8d43095ed997e9ddec4e69eff10",
+        "uploads/06_login.png": "291baba8571c24f703b41acb3a1bde2731e02fb60ae3cdb94786980de4bbe506",
+        "uploads/07_submit_resource_authgate.png": "616819c0cf65707ed64c82a337deb5d15016bffdebb39ad7a110eca27cdc8cde",
+        "uploads/08_theme_settings.png": "9205753c5fd56106849fb5dc8ccae635084b5aa957641e3313e1fe36263c851e",
+        "uploads/09_category_community-events.png": "4a8b89350c6b0dc18f41ce85edf9d9babcac989419403c5c253e4991bfa81101",
+        "uploads/10_category_encoding-codecs.png": "b966ae38b27df934a18456c50e47c589d4a570d805b11a3580a8ecf6ac51df99",
+        "uploads/11_category_general-tools.png": "755c0115ce7d0726cdba5610f23988ecd368ba2da8c2c6ebb5ccb5b2b8e2d09b",
+        "uploads/12_category_infrastructure-delivery.png": "c72a990a404a3f819e35bf27908c47442e4970c2192cba774ed54b311f1caf1e",
+        "uploads/13_category_intro-learning.png": "6c945f36f389d1c6ea32583b7df1f1bd2551d735748636455833cf86404bf197",
+        "uploads/14_category_media-tools.png": "deadba69a700015bf508cc2dcc7305da44fe45e4a6a83e3448c90e79730667ae",
+        "uploads/15_category_players-clients.png": "91cbe5aba894bd35592598398657ee730162389c2591a423b123d481a0793e40",
+        "uploads/16_category_protocols-transport.png": "4d9cbb4d2d2081169b8af5f78514a0d1ed720e459a6705bed87399509eb765a1",
+        "uploads/17_category_standards-industry.png": "36e0cab03d177077dc6182d0f4ca89a7019a66759ee7e2151731a8b11a099d95",
+        "uploads/18_subcategory_ai-ml-tools.png": "4c91239b46395596cfc00ea91a7636493f55a903dcb075abcc67870ac97a53de",
+        "uploads/19_sub-subcategory_hls.png": "48fd44966fe7d3aa7cfe41be6c0500e957c32963122902c05e36a5a043c68b33",
+        "uploads/20_sub-subcategory_dash.png": "e8c7bb9b685c7ba2a0c31f5cb171a3521590a375743ee9746da29c93f4907241",
+        "uploads/21_resource_detail.png": "27e44c258f0ae9d2f14a865b6e51e893325b6bace8f0832e90b4e442586326ee",
+        "uploads/22_404_not_found.png": "ee9bbafa356eff6653a1a464a4e8f7adb8249d16cdcfff29a100b97ed344c835",
+        "uploads/IMG_3167.jpeg": "74fa937a2d4647d2d863e4afd08aa03c55eab946ece06923c05195785952d405",
+        "uploads/IMG_3169.jpeg": "b897452732a0cd8b639f8420796a9f4b1a713eed218706910dfb84fb090b0d01",
+        "uploads/IMG_3171.jpeg": "02d1130b7e87353010d2678440ecd7ace07c66a34d0631ca02dd60958cc83d9d",
+        "uploads/IMG_3173.jpeg": "791462af1ca505f23381d7b871b5ae4d122a579b83c176550c99b06a0c3a10bc",
+        "uploads/IMG_3175.jpeg": "ac8a23f8ac8133af86fb7ec21f0b9bd59bc8ae997e9bda43c1efb610845ca1f8",
+        "uploads/IMG_3177.jpeg": "28af1816a1987fdc40cb5f7af104e69749597bae7f1420d3259e8b44e953f997",
+        "uploads/IMG_3179.jpeg": "41fe819a15b4bbfe7cfbe2e085b1093b0cbbed8c042a1e8d45db2ab8e1490ac3",
+        "uploads/IMG_3181.jpeg": "a69d28c39b3dd58706a1d10a0238ebacf0ec3f03e14afe8a0c2885734e2a4120",
+        "uploads/IMG_3183.jpeg": "07abd8ffe6b91b03c923c87b521b00aee37637e0b9225ef2b4195799d087b2a0",
+        "uploads/IMG_3185.jpeg": "b645696f282e4fdb862a060c39434bc6c759a5a103afd9c5c66fd07faef540f1",
+        "uploads/IMG_3187.jpeg": "d5118ccbd8ffbb34eba1881b9ed669e83ca6884600eac41c983516ddbaeda912",
+        "uploads/IMG_3189.jpeg": "fea2d4ec82c95166c399214f3ac58300efc4d31d6ad1e6521928c3a6f48b4150",
+        "uploads/IMG_3191.jpeg": "13b7659661965d61ace34112cc07fba2704ae012ae38c9b8c3f3786af478d3af",
+        "uploads/IMG_3193.jpeg": "ce82d6451490b633016caba103131e1ff3ae14494bde60977414264461bc4fa0",
+        "uploads/IMG_3195.jpeg": "23d29bc41b152ef40c4b57d8724656c859704cc26c3f79cccc2ae33dd6e4b630",
+        "uploads/IMG_3197.jpeg": "7f3ae99ef3fdfa508816671fc6d4a50ae3b040ddc8bef1cebf6639e476e11730",
+        "uploads/IMG_3199.jpeg": "56896b8236a364fb0cfa25568d36b4360d3d9a2b60b58b14f48219942c862e2a",
+        "uploads/IMG_3201.jpeg": "b35514757788928eb7068c10fda0d2880ba1ca979397587344ab8cbd853bc65f",
+        "uploads/IMG_3203.jpeg": "39c1098f988a3b196646d62834a813e6b529a3191208cd992416a0a9d26eccf6",
+        "uploads/IMG_3205.jpeg": "3bbe6722397685b9e9c01f1f0cc3394badf259066cfac61da04b4c428adee0b7",
+        "uploads/IMG_3207.jpeg": "4f379c8b36c17eb5e25c2cb4911c81310ebc6d726d5a371e9def03c35041c1d6",
+        "uploads/IMG_3209.jpeg": "9ae400e5fe80693c174bce00ae496973a8f68caddc51d71a7daba85bf610ea4e",
+        "uploads/INDEX.md": "12870b61be9bec03ae8da92b17fcc7f32a05df45fd4f4e23fd07d89bd0f9daf2",
+        "uploads/Screenshot 2026-05-22 at 15.26.17.png": "8e3633aded14b8e21dc3c0e06de81b2844d137ddec7fa429ceb59922ce4a2639",
+        "views-1.jsx": "0d772bc0ae8133a5e400a111f79ea04db0944b403eb75584747cdd49c151a40e",
+        "views-2.jsx": "a91dccea691004186155e46677e680e987a7f01651bff895eb5a5c86871ad9e0"
+      },
+      "live": {
+        "catalogStart": "00130b0e8656c85c97f8a15240af6d792afa473a62648c32dc9be8155b2fe494",
+        "catalogEnd": "00130b0e8656c85c97f8a15240af6d792afa473a62648c32dc9be8155b2fe494",
+        "adminStart": "00043d3fbc260c9105693372ce7d7fd8d1a3c94903f3a20850deb83aac4c9713",
+        "adminEnd": "0be4bbadacd2ed91fcedb7046df87fecbc5a17b0396b5e67f8c41059968868c0",
+        "error": null
+      }
+    },
+    "workspace": {
+      "startFingerprints": "d804332a780a0255863b1acc7ff4e8a5e99ee3976be6af8e58203ab7e4bdcad2",
+      "endFingerprints": "d408e0426650f97abd2b20e0a6074142522f4b8e8d79a2cb347c082ad050fb2c",
+      "inputsChangedDuringRun": true
+    }
+  },
+  "summary": {
+    "denominator": 1,
+    "pass": 0,
+    "fail": 1,
+    "incomplete": 0,
+    "incompleteEvidence": false,
+    "fontGapOnlyFails": 0,
+    "blocked": 0,
+    "evidence": 0,
+    "unverified": 0,
+    "aliases": 0
+  },
+  "rows": [
+    {
+      "screen": "artifact.showcase",
+      "width": 375,
+      "family": "artifact",
+      "kind": "artifact",
+      "eligibility": "pixel",
+      "denominator": true,
+      "urls": {
+        "actual": "http://127.0.0.1:20928/",
+        "expected": "http://127.0.0.1:34641/design-system.html"
+      },
+      "session": null,
+      "comparison": {
+        "differingPixels": 3039030,
+        "overlapDifferingPixels": 3039030,
+        "unmatchedDimensionPixels": 0,
+        "canvasPixels": 15147522,
+        "diffPercent": 20.062885533356546,
+        "actualDimensions": {
+          "width": 741,
+          "height": 20442
+        },
+        "expectedDimensions": {
+          "width": 741,
+          "height": 20442
+        },
+        "canvas": {
+          "width": 741,
+          "height": 20442
+        },
+        "dimensionsMatch": true,
+        "withinCeiling": false
+      },
+      "identity": {
+        "checked": false
+      },
+      "fontParity": {
+        "ok": true,
+        "sharedFaces": 39,
+        "gaps": [],
+        "familiesMissingOnActual": [],
+        "familiesMissingOnExpected": []
+      },
+      "backdropFilters": {
+        "actual": [
+          "blur(14px)"
+        ],
+        "expected": [
+          "blur(14px)"
+        ],
+        "match": true,
+        "declaredActual": [
+          {
+            "value": "blur(14px)",
+            "count": 1,
+            "paintEligibleCount": 1,
+            "elements": [
+              "div.ds-switcher"
+            ]
+          }
+        ],
+        "declaredExpected": [
+          {
+            "value": "blur(14px)",
+            "count": 1,
+            "paintEligibleCount": 1,
+            "elements": [
+              "div"
+            ]
+          }
+        ]
+      },
+      "apiFailures": [],
+      "referenceApiFailures": [],
+      "actualCaptureStability": {
+        "stableAttempts": [
+          1,
+          2
+        ],
+        "attemptHashes": [
+          "ae65374cf84303e01fcd3a46daacb917dd5bc27802fb2fc82a7eddae8304afdd",
+          "ae65374cf84303e01fcd3a46daacb917dd5bc27802fb2fc82a7eddae8304afdd"
+        ],
+        "discardedFrames": [],
+        "apiTraffic": {
+          "completedAtCaptureStart": 0,
+          "completedAtCaptureEnd": 0,
+          "failures": 0
+        },
+        "reopenedAfterReload": 0
+      },
+      "expectedCaptureStability": {
+        "stableAttempts": [
+          1,
+          2
+        ],
+        "attemptHashes": [
+          "438bd0d543415ddefe994242ae0e639e39271a2e08beae5a3593b47ff5b5fe4d",
+          "438bd0d543415ddefe994242ae0e639e39271a2e08beae5a3593b47ff5b5fe4d"
+        ],
+        "discardedFrames": [],
+        "apiTraffic": {
+          "completedAtCaptureStart": 0,
+          "completedAtCaptureEnd": 0,
+          "failures": 0
+        },
+        "reopenedAfterReload": 0
+      },
+      "captureHashes": {
+        "actual": "ae65374cf84303e01fcd3a46daacb917dd5bc27802fb2fc82a7eddae8304afdd",
+        "expected": "438bd0d543415ddefe994242ae0e639e39271a2e08beae5a3593b47ff5b5fe4d"
+      },
+      "referenceReconciliation": [
+        {
+          "version": 1,
+          "source": [
+            "/api/config",
+            "/api/awesome-list/nav",
+            "/api/home",
+            "/api/resources/kinds/counts"
+          ],
+          "status": "not-applicable",
+          "adjustments": [],
+          "expectedFooterCount": 0,
+          "actualFooterCount": 0,
+          "retainedControls": {
+            "palette": {
+              "status": "not-applicable",
+              "modified": [],
+              "scope": {
+                "root": ".modal-backdrop > .modal:has(> div:first-child > input[placeholder=\"Find resources, categories, or tags…\"])",
+                "pages": 0,
+                "history": 0,
+                "rows": 0,
+                "focus": 0
+              },
+              "source": []
+            },
+            "drawer": {
+              "status": "not-applicable",
+              "modified": [],
+              "scope": {
+                "root": ".mobile-drawer.open",
+                "more": 0,
+                "links": 0,
+                "search": 0,
+                "targets": 0
+              },
+              "source": []
+            }
+          },
+          "retainedExtensions": {
+            "status": "not-applicable",
+            "about": {
+              "status": "not-applicable"
+            },
+            "admin": {
+              "status": "not-applicable"
+            },
+            "taxonomy": {
+              "status": "not-applicable"
+            },
+            "version": 3
+          },
+          "reason": "both sides have no footer on this route"
+        }
+      ],
+      "fontsSettled": {
+        "actual": {
+          "complete": true,
+          "forcedParityFaces": 39,
+          "failedFaces": [],
+          "nativeDefects": []
+        },
+        "expected": {
+          "complete": true,
+          "forcedParityFaces": 39,
+          "failedFaces": [],
+          "nativeDefects": []
+        }
+      },
+      "links": {
+        "actual": "actual/artifact.showcase-375.png",
+        "expected": "expected/artifact.showcase-375.png",
+        "diff": "diff/artifact.showcase-375.png"
+      },
+      "status": "FAIL",
+      "fontGap": false,
+      "fontDefects": [],
+      "reason": "20.063% differing pixels exceeds the 0.5% ceiling"
+    }
+  ]
+}

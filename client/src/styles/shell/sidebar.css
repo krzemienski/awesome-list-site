@@ -215,6 +215,17 @@
   width: 100%;
 }
 
+/* The `border: 0` above out-specifies the global forced-colors `button` rule
+   (index.css R5-056), so Windows High Contrast lost the button affordance on
+   every category header. Forced-colors ignores author colors; this is a no-op
+   outside HC, so no pixel changes at any width. */
+@media (forced-colors: active) {
+  .av-sidebar-shell .accordion-header,
+  .av-sidebar-drawer .accordion-header {
+    border: var(--border-w, 1px) solid ButtonText;
+  }
+}
+
 .av-sidebar-shell .accordion-header:hover,
 .av-sidebar-drawer .accordion-header:hover {
   background: var(--surface);

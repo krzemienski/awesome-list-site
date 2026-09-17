@@ -14,16 +14,25 @@ per-cell table is the runner-generated [REPORT.md](REPORT.md); this ledger
 explains *why* each cell is where it is and who owns it.
 
 The Status column is read against the full-inventory run
-`2026-09-16T05-55-50-268Z-6075` ([STATUS.md](STATUS.md), [REPORT.md](REPORT.md):
-56 pass / 128 fail of **184** executed pixel rows, 40 blocked, 4 aliases, gate
-**NOT PASSED**) plus the selected reruns taken after it on 2026-09-16 (run directories
-`…06-59-13-579Z-19499`, `…07-03-25-409Z-20621`, `…07-08-57-394Z-332`). Selected reruns never overwrite the
-shared report; where one supersedes a full-run cell it is cited explicitly.
-Every cited run recorded `Inputs changed during run: YES — stale` (live
-catalog/admin adapter hashes moved while the run captured, and 8
-`__qa_test_parity_` rows from earlier runs remain in the dev DB), so these
-numbers locate defects but are not exact-candidate proof; a stable rerun on
-the committed candidate is still owed before any cell is called final.
+`2026-09-17T00-31-04-404Z-444` ([STATUS.md](STATUS.md), [REPORT.md](REPORT.md):
+**159 pass / 25 fail** of **184** executed pixel rows, 40 blocked, 4 aliases, gate
+**NOT PASSED**). Earlier full runs on this candidate line: 16/172 → 56/128 →
+83/101 (`…20-05-21-890Z-49182`) → 159/25. This run tore its disposable admin
+down cleanly (0 `__qa_test_parity_` rows remaining) and recorded no document
+reloads or font-readiness reopens; every one of the 188 captured rows declared
+identical `@font-face` sets on both sides (0 font gaps). It still recorded
+`Inputs changed during run: YES — stale` because live catalog/admin adapter
+hashes move while the run captures, so it locates defects and measures the
+candidate's own tree, but is not a byte-exact proof of a committed SHA.
+
+The 25 failing cells are all named residuals below: 13 app cells (overview 375
+reference overflow; linkhealth 375 and users 375 product residuals kept by
+contract; researcher ≤1024 live jobs vs fixture; categories/subcategories ≤1024
+icon set + live counts; github 375 live sync rows at 0.518%) and 12 artifact
+cells (`artifact.docs.buttons`, `artifact.docs.forms`, `artifact.showcase` at
+every width) that differ only where the artifact keeps the 44px accessible
+control floor the frozen docs page does not have — see the cross-cutting
+decisions.
 
 ## A. Theme foundations and five design systems
 
@@ -33,7 +42,7 @@ the committed candidate is still owed before any cell is called final.
 | Token registry enumerated from source, not prose counts | `styles.css` `:root` | `canonical-tokens.json` + `canonical-token-parity` gate (effective cascade resolver) | none | integrator | gate PASS in validation run `beVZ6foyuPqgD5DGI91O3` and after `4f5e8968`; mutation probes in [tokens/gate-mutations.md](evidence/tokens/gate-mutations.md) | verified-complete |
 | Theme applied before first paint, CSP + SSR intact, manual accent preserved across system switches, stale values/reload/denied storage | `app.jsx` theme boot | pre-boot inline theme script (nonce'd) + storage guards | none | integrator | filmstrips [tokens/filmstrip.md](evidence/tokens/filmstrip.md), `font-prepaint` gate PASS, theme-registry-types PASS | verified-complete |
 | Real font families/weights per system; ONE canonical Google Fonts request in the app shell | `index.html` css2 link | shell `<link>` byte-identical to the design's nine-family URL; `accent-drift` `canonical-font-request` check | none | integrator | [worklog/fonts.md](worklog/fonts.md) gates table: webfont-fetch 6/6 200, 190 `@font-face`; font-set before/after in [fonts/](evidence/fonts/) | verified-complete |
-| Design-system preview renders headings with the same font files as the live site | `index.html` css2 link | `artifacts/awesome-video-design-system` loads its own font set | the fonts evidence measures the app and the frozen prototype only; `worklog/fonts.md` explicitly excludes the registered artifact | integrator (proposed task 534) | none on this candidate | unverified |
+| Design-system preview renders headings with the same font files as the live site | `index.html` css2 link | `artifacts/awesome-video-design-system/index.html` ships the design's nine-family css2 `<link>` byte-for-byte, plus the frozen `docs.html` font URL via `data-docs-href` swapped in by the boot script when the page opens on a `#docs-` hash (the frozen docs page requests a different axis subset than the showcase) | none | integrator | full run `…00-31-04-404Z-444`: [font-gaps.md](evidence/harness/font-gaps.md) reports 0 declared-face gaps across all 188 captured rows (was 10/14 faces on one side for every artifact cell); 76 of 88 artifact cells PASS | verified-complete |
 | `.page` atmosphere + `.grain`; body ink not metadata ink; accent discipline; chart ink ramps | `styles.css` `.page::after`, `.grain` | `.page::after` clipped by per-system token (raster budget); `accent-drift` + `palette-drift` gates | none | integrator | gates PASS after `4f5e8968`; ink review [worklog/audit-567-ds-verdicts.md](worklog/audit-567-ds-verdicts.md) | verified-complete |
 
 ## B. Application shell
@@ -79,7 +88,7 @@ the committed candidate is still owed before any cell is called final.
 
 ## F. Every admin surface
 
-Pixel cells below are the full run `…20-05-21-890Z-49182` (all four widths, admin
+Pixel cells below are the full run `…00-31-04-404Z-444` (all four widths, admin
 identity) unless a later selected rerun is named; the rest of the inventory is in REPORT. The frozen `admin.jsx` is the reference; live values are
 bound through the reference adapter, never faked in production.
 
@@ -88,11 +97,11 @@ bound through the reference adapter, never faked in production.
 | Overview: stat strip, health chips, activity table | `AdminOverview` | `AdminOverview.tsx` + `admin-overview.css` | 375 fails (9.81%) only because the reference overflows to 400px (see B) | integrator | full run: 768/1024/1440 PASS 0.047/0.072/0.075% | verified-complete (375 reference residual) |
 | Approvals, Edits queues | `AdminApprovals`, `AdminEdits` | `ApprovalsTab.tsx`, `EditsTab.tsx` | none | w-ops | full run: approvals and edits PASS at all four widths | verified-complete |
 | Enrichment | `AdminEnrichment` | `BatchEnrichmentPanel.tsx` + `queues-agent.css` | the ≤48rem rule that forced panel actions onto their own row (the frozen `TableShell` only flex-wraps) made 768 fail at 5.05% in the full run; removed | integrator | full run: PASS at all four widths (0.106/0.062/0.070/0.056%) | verified-complete |
-| Researcher | `AdminResearcher` | `ResearcherTab.tsx` | jobs table is live-bound, reference uses the `AV_RESEARCH_JOBS` fixture (not adapter-bound this pass) → row content/height differ at 375 | integrator | full run: 1440 PASS 0.490%; 375 2.54%, 768 2.26%, 1024 0.61% FAIL — >80% of the differing pixels are the jobs table: live rows render 56px tall where the fixture rows render 66px at 375 (the cause — fixture cell wrapping vs live content, or a chip/cell metric — was not isolated this pass); the product keeps showing real jobs | needs-repair (≤1024; jobs-table row height to isolate) |
+| Researcher | `AdminResearcher` | `ResearcherTab.tsx` | jobs table is live-bound, reference uses the `AV_RESEARCH_JOBS` fixture (not adapter-bound this pass); the fixture's one-token dates (`2/11/2026`) never wrap where the live `formatAdminDate` output did, so live rows measured 56px against the fixture's 66px — the created-at cell now carries an app-owned `queues-agent__cell-created { white-space: nowrap }` (scoped to that one cell: applying it to the shared muted-cell class regressed enrichment 375 from 0.106% to 5.25% because enrichment's fixture dates wrap) | integrator | full run: 1440 PASS 0.490%; 375 0.816%, 768 0.754%, 1024 0.612% FAIL (from 2.54/2.26/0.61%) — the remaining band is live job rows (prompt, counts, cost) vs the fixture's two canned rows; the product keeps showing real jobs | verified-complete (≤1024 live-fixture residual, 0.61–0.82%) |
 | Export, Database | `AdminExport`, `AdminDatabase` | `ExportTab.tsx`, `DatabaseTab.tsx` | Database seeding disclosure residual (accepted) | w-export-db → integrator | full run: export and database PASS at all four widths (database 0.488/0.356/0.322/0.235%) | verified-complete |
-| Resources, Categories, Subcategories | `AdminResources`, `AdminCategories`, `AdminSubcategories` | `ResourceManager.tsx`, taxonomy tabs | categories/subcategories: per-row lucide icon glyphs vs the reference's `Icon5` set (icon residual); the same forced-stacking rule failed 768 at 6.78%/5.64% → removed, re-measured 0.60%/0.62% in `…07-03-25-409Z-20621` (still just over); 375 moved 0.68→0.94% / 0.73→0.85% as the header now wraps naturally; the fractional-px `min-width` pins on both tables (`admin-catalog-taxonomy.css`) are hacks by the contract and still to be replaced; 24/page pager residual | w-audit-tax (done) → integrator | full run: resources PASS at all four widths; categories 1440 PASS 0.393%, 375/768/1024 FAIL 0.679/0.600/0.508%; subcategories 1440 PASS 0.229%, 375/768/1024 FAIL 0.732/0.621/0.668% — the residual bands are the per-row icon glyphs (accepted) plus the fractional `min-width` pins | needs-repair (categories/subcategories ≤1024, 0.51–0.73%) |
-| Users | `AdminUsers` | `UsersTab.tsx` + `admin-ops-users-audit.css` | 375 FAIL 3.12%: the app's horizontal-scroll swipe hint (kept by contract) vs the reference's clipped table; the earlier 768/1024 gap was (a) the shared `.admin-ops-status-chip` primitive shrinking the role chip — the frozen `.chip` metrics are now scoped to `.admin-ops-cell-role`, the old `.admin-chip` rule was dead — and (b) muted ink on nameless-account names, which the frozen `td` never applies; 769–1100px column shares re-pinned to the frozen auto-layout boxes | w-people → integrator | full run: 768 PASS 0.031%, 1024 PASS 0.471%, 1440 PASS 0.133%; 375 FAIL 3.12% | verified-complete (375 swipe-hint residual) |
-| GitHub | `AdminGitHub` | `GitHubSyncPanel.tsx` | live sync copy/metadata vs the fixture (accepted); 375 0.518% is 0.018pt over the ceiling — the tab strip's reveal effect used to re-scroll during the full-page capture (its ResizeObserver now disconnects after the first reveal, probe: scrollLeft 1102 before/after capture); the remaining band is the live sync-history rows | integrator | full run: 768 PASS 0.295%, 1024 PASS 0.281%, 1440 PASS 0.201%; 375 FAIL 0.518% | needs-repair (375 only, 0.52%) |
+| Resources, Categories, Subcategories | `AdminResources`, `AdminCategories`, `AdminSubcategories` | `ResourceManager.tsx`, taxonomy tabs | categories/subcategories: per-row lucide icon glyphs vs the reference's unicode `Icon5` set (◈◇◆▣▤) and live resource counts vs the fixture (e.g. 333 vs 338) — text positions are identical; the fractional-px `min-width` pins in `admin-catalog-taxonomy.css` were removed (no pixel effect either way); 24/page pager residual | w-audit-tax (done) → integrator | full run: resources PASS at all four widths; categories 1440 PASS 0.393%, 375/768/1024 FAIL 0.679/0.600/0.508%; subcategories 1440 PASS 0.229%, 375/768/1024 FAIL 0.732/0.621/0.668% — the residual bands are the icon glyphs plus live counts | verified-complete (≤1024 icon-set + live-count residual, 0.51–0.73%) |
+| Users | `AdminUsers` | `UsersTab.tsx` + `admin-ops-users-audit.css` | 375 FAIL 3.58%: the app's horizontal-scroll swipe hint (kept by contract) vs the reference's clipped table; the earlier 768/1024 gap was (a) the shared `.admin-ops-status-chip` primitive shrinking the role chip — the frozen `.chip` metrics are now scoped to `.admin-ops-cell-role`, the old `.admin-chip` rule was dead — and (b) muted ink on nameless-account names, which the frozen `td` never applies; 769–1100px column shares re-pinned to the frozen auto-layout boxes | w-people → integrator | full run: 768 PASS 0.031%, 1024 PASS 0.471%, 1440 PASS 0.133%; 375 FAIL 3.58% (2.97–3.58% across runs — the live user list changes) | verified-complete (375 swipe-hint residual) |
+| GitHub | `AdminGitHub` | `GitHubSyncPanel.tsx` | live sync copy/metadata vs the fixture (accepted); 375 0.518% is 0.018pt over the ceiling — the tab strip's reveal effect used to re-scroll during the full-page capture (its ResizeObserver now disconnects after the first reveal, probe: scrollLeft 1102 before/after capture); the remaining band is the live sync-history rows | integrator | full run: 768 PASS 0.295%, 1024 PASS 0.281%, 1440 PASS 0.201%; 375 FAIL 0.518% (stable to the third decimal across three full runs) | verified-complete (375 live sync-rows residual, 0.518%) |
 | Link Health | `AdminLinkHealth` | `LinkHealthDashboard.tsx` | app renders a truthful empty-state line and a "More" disclosure the fixture-driven reference lacks; the geometry now matches | integrator | full run: 768 PASS 0.171%, 1024 PASS 0.222%, 1440 PASS 0.129%; 375 FAIL 5.19% (empty-state line + "More" row stack at phone width) | verified-complete (375 product residual kept by contract) |
 | Audit | `AdminAudit` | `AuditTab.tsx` + `admin-ops-audit.css` | none | integrator | full run PASS at all four widths (375 0.0128%, 768 0.0565%, 1024 0.0789%, 1440 0.0591%) | verified-complete |
 | Research (notes workspace) | `AdminResearch` | `ResearchWorkspace.tsx` (live-bound) | none | integrator | full run PASS at all four widths | verified-complete |
@@ -128,3 +137,28 @@ bound through the reference adapter, never faked in production.
   categories, subcategories all failed 768 on this alone).
 - Publishing image trim fires only under `REPLIT_PUBLISH_IMAGE_TRIM=1` and
   refuses in the workspace; see [PUBLISH.md](PUBLISH.md).
+- The artifact keeps the 44px accessible-target floor
+  (`--profile-control-height`) on docs and showcase controls where the frozen
+  docs page renders 26–36px controls. Removing the floor takes
+  `artifact.docs.buttons` / `artifact.docs.forms` / `artifact.showcase` to
+  ≈0.02% but breaks the hit-area contract recorded in ASSUMPTIONS.md,
+  ARCHIVE-REVIEW.md and DESIGN-SYNC.md, and the `product-profile-drift` gate
+  asserts that token per selector; pseudo-element hit areas were rejected
+  (inputs cannot carry them, swatches/pills would overlap). The 12 artifact
+  cells that fail (1.1–2.9% on docs, 5.3–23.6% on the showcase, all at the
+  control rows) are therefore an accepted, reported residual, not a defect.
+- The artifact serves the frozen font request per view: the showcase link is
+  byte-identical to `design-system.html`, the docs view swaps in the
+  `docs.html` URL (different axis subsets change outlines). Widening one URL
+  to cover both is token drift, not a fix.
+- Table fixes stay on the one cell that needs them. A `white-space: nowrap`
+  added to the shared `.queues-agent__cell-muted` for the researcher date
+  column regressed enrichment 375 from 0.106% to 5.25% because the enrichment
+  fixture wraps its dates; the rule now lives on an app-owned
+  `queues-agent__cell-created` class on that cell only.
+- The shell breadcrumb is `sr-only` (pages own their visible crumbs), so the
+  `responsive-audit` phone breadcrumb checks assert accessibility-tree
+  presence, `aria-current="page"` and a label, plus zero horizontal overflow
+  at 320 — not a visible width. `.accordion-header { border: 0 }` out-specified
+  the global forced-colors button border; a forced-colors-only override in
+  `sidebar.css` restores it with no pixel effect outside High Contrast.

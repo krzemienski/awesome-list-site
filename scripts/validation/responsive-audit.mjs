@@ -285,23 +285,31 @@ const resPage = await ctx.newPage();
 await resPage.setViewportSize({ width: 375, height: 812 });
 await gotoPage(resPage, resourceRoute);
 await resPage.waitForTimeout(1000);
-let r = await resPage.evaluate(() => {
+// The shell breadcrumb is visually hidden (`sr-only`) by design: the frozen
+// prototype has no shell crumb row and each page owns its visible crumbs. The
+// contract here is accessibility, not geometry — the current crumb must stay in
+// the accessibility tree with a non-empty label at phone widths.
+const readMobileCrumb = () => {
   const m = document.querySelector('[data-testid="breadcrumb-mobile-current"]');
-  const rect = m?.getBoundingClientRect();
-  const span = m?.querySelector('span');
-  return { exists: !!m, w: rect?.width, h: rect?.height, text: span?.textContent?.slice(0, 40) };
-});
-log('breadcrumb-mobile@375', r.exists && r.w > 10 && r.h > 10, JSON.stringify(r));
+  const nav = m?.closest('nav');
+  const hidden = (el) => !el || getComputedStyle(el).display === 'none' || getComputedStyle(el).visibility === 'hidden' || el.getAttribute('aria-hidden') === 'true';
+  const text = m?.textContent?.trim() ?? '';
+  const doc = document.documentElement;
+  return {
+    exists: !!m,
+    accessible: !!m && !hidden(m) && !hidden(nav),
+    ariaCurrent: m?.getAttribute('aria-current') ?? null,
+    text: text.slice(0, 40),
+    hOverflow: doc.scrollWidth - doc.clientWidth,
+  };
+};
+let r = await resPage.evaluate(readMobileCrumb);
+log('breadcrumb-mobile@375', r.exists && r.accessible && r.ariaCurrent === 'page' && r.text.length > 0, JSON.stringify(r));
 await resPage.screenshot({ path: `${OUT}/breadcrumb-375.png` });
 await resPage.setViewportSize({ width: 320, height: 700 });
 await resPage.waitForTimeout(400);
-r = await resPage.evaluate(() => {
-  const m = document.querySelector('[data-testid="breadcrumb-mobile-current"]');
-  const rect = m?.getBoundingClientRect();
-  const doc = document.documentElement;
-  return { w: rect?.width, h: rect?.height, hOverflow: doc.scrollWidth - doc.clientWidth };
-});
-log('breadcrumb-mobile@320', r.w > 10 && r.h > 10 && r.hOverflow <= 0, JSON.stringify(r));
+r = await resPage.evaluate(readMobileCrumb);
+log('breadcrumb-mobile@320', r.exists && r.accessible && r.ariaCurrent === 'page' && r.text.length > 0 && r.hOverflow <= 0, JSON.stringify(r));
 
 // Title attrs on desktop crumbs + no role="menu" misuse.
 await resPage.setViewportSize({ width: 1440, height: 900 });

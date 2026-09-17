@@ -115,6 +115,9 @@ function commandOutput(command, args) {
   return execFileSync(command, args, {
     cwd: ROOT,
     encoding: "utf8",
+    // The source snapshot includes `git diff --binary HEAD`; a working tree
+    // with re-captured parity PNGs exceeds Node's 1 MiB default (ENOBUFS).
+    maxBuffer: 512 * 1024 * 1024,
     stdio: ["ignore", "pipe", "ignore"],
   });
 }
