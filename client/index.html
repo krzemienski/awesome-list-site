@@ -358,7 +358,35 @@
       (function () {
         try {
           var root = document.getElementById('root');
-          if (!root || root.firstElementChild) return;
+          if (!root) return;
+          // Crawler-injected routes (#ssr-seo-content, never the hydrated Home
+          // tree): move the markup into the fixed #ssr-seo-hold overlay HERE,
+          // before the first paint, instead of in main.tsx after the bundle
+          // has executed. Re-inserting the nodes later re-registers the lead
+          // paragraph as a fresh Largest Contentful Paint candidate measured
+          // in the swapped web font (a few percent larger than the fallback
+          // paint), which dated the route's LCP to the bundle's execution
+          // instead of the document's first paint. The overlay stays
+          // semantic and interactive (real h1, links, no aria-hidden/inert)
+          // until main.tsx adopts it (data-preboot) right before React
+          // mounts underneath — so a bundle that never runs still leaves a
+          // usable page, exactly like the old in-#root fallback.
+          var ssr = root.querySelector('#ssr-seo-content');
+          if (ssr && root.getAttribute('data-home-ssr') !== 'true' && !document.getElementById('ssr-seo-hold')) {
+            var overlay = document.createElement('div');
+            overlay.id = 'ssr-seo-hold';
+            overlay.setAttribute('data-preboot', 'true');
+            // main.tsx judges readiness for THIS document's URL, not a later one.
+            overlay.setAttribute('data-pathname', location.pathname);
+            overlay.setAttribute(
+              'style',
+              'position:fixed;inset:0;z-index:2147483000;background:#000;overflow:auto;overscroll-behavior:contain'
+            );
+            while (root.firstChild) overlay.appendChild(root.firstChild);
+            document.body.appendChild(overlay);
+            return;
+          }
+          if (root.firstElementChild) return;
           root.innerHTML =
             '<div aria-hidden="true" style="min-height:100vh;background:#000;padding:40px 20px;max-width:960px;margin:0 auto">' +
             '<style>@keyframes bsk{0%{opacity:.35}50%{opacity:.7}100%{opacity:.35}}.bsk{background:#1a1a22;animation:bsk 1.4s ease-in-out infinite}</style>' +

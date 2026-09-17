@@ -190,6 +190,12 @@ export default function TaxonomyListing({ level }: Props) {
     if (sort !== "default") query.set("sort", sort);
     return `/api/resources?${query.toString()}`;
   }, [debouncedSearch, format, general, level, listingData, page, provider, selection, skillLevel, slug, sort, tags]);
+  // The unfiltered listing renders from /api/awesome-list/listing alone; the
+  // faceted /api/resources response only feeds the (closed-by-default)
+  // filter panel and the filtered result set. Fetch it once either is in
+  // play instead of on every listing load — it cost a request plus a full
+  // listing re-render on the mobile critical path.
+  const taxonomySearchEnabled = Boolean(taxonomySearchUrl) && (serverFilterActive || toolsOpen);
   const taxonomySearch = useQuery<{
     resources: any[];
     total: number;
@@ -198,7 +204,7 @@ export default function TaxonomyListing({ level }: Props) {
   }>({
     queryKey: [taxonomySearchUrl],
     queryFn: () => apiRequest(taxonomySearchUrl, { method: "GET" }),
-    enabled: Boolean(taxonomySearchUrl),
+    enabled: taxonomySearchEnabled,
     staleTime: 60_000,
     placeholderData: keepPreviousData,
   });
@@ -342,7 +348,11 @@ export default function TaxonomyListing({ level }: Props) {
   // error — matching the resource-detail 404 UX. Genuine 5xx/network errors
   // still surface the retry-able error state.
   if (isNotFoundError(listing.error)) return <NotFound />;
-  if (listing.error || taxonomySearch.error) return <ErrorPage error={listing.error ?? taxonomySearch.error} />;
+  // A facets error cached from an earlier panel opening must not replace a
+  // healthy listing once the query is idle again (e.g. Back to this page with
+  // the panel closed): only a live, enabled request can fail the page.
+  const taxonomySearchError = taxonomySearchEnabled ? taxonomySearch.error : null;
+  if (listing.error || taxonomySearchError) return <ErrorPage error={listing.error ?? taxonomySearchError} />;
   if (!listingData || !name) return <NotFound />;
 
   const optionChildren = listingData.children.flatMap((child: any) => [
@@ -486,7 +496,7 @@ export default function TaxonomyListing({ level }: Props) {
     </div>
     <div className={`taxonomy-production-controls ${toolsOpen ? "taxonomy-production-controls--open" : ""}`}><ActiveFilters state={filterState} onChange={onFacetChange} onClear={clearFacetFilters} defaultSort="default" /></div>
     <div className="taxonomy-results-layout">
-      <div className={`taxonomy-production-controls ${toolsOpen ? "taxonomy-production-controls--open" : ""}`}><SearchFilters state={filterState} facets={taxonomySearch.data?.facets} onChange={onFacetChange} onClear={clearFacetFilters} hideTaxonomyFacets /></div>
+      <div className={`taxonomy-production-controls ${toolsOpen ? "taxonomy-production-controls--open" : ""}`} aria-busy={toolsOpen && taxonomySearch.isLoading}><SearchFilters state={filterState} facets={taxonomySearch.data?.facets} onChange={onFacetChange} onClear={clearFacetFilters} hideTaxonomyFacets /></div>
       <div className="min-w-0 flex-1">
         <div ref={resultsRef} tabIndex={-1} className="space-y-4 outline-none" aria-busy={resultsLoading} aria-labelledby="taxonomy-results-heading" data-testid="taxonomy-results-region">
           {/* The listing's single count statement: visible range, matching total,

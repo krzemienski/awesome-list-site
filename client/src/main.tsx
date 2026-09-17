@@ -120,29 +120,42 @@ const initialRouteChunk = preloadInitialRouteChunk();
 // .agents/memory/spa-crawler-prerender.md).
 (function holdSsrContent() {
   if (homeSsr) return;
-  const ssr = rootElement.querySelector("#ssr-seo-content");
+  // The inline pre-boot script in index.html normally builds this overlay
+  // before the first paint (see its comment: a later re-insertion would date
+  // the route's LCP to the bundle instead of the document). Adopt it here and
+  // only wire the removal; build it ourselves when that script did not run.
+  const prebootHold = document.getElementById("ssr-seo-hold");
+  const ssr = prebootHold
+    ? prebootHold.querySelector("#ssr-seo-content")
+    : rootElement.querySelector("#ssr-seo-content");
   if (!ssr) return;
   try {
     // This is the URL whose crawler markup is being held.  Do not evaluate
     // readiness against a later SPA location: that would let an unrelated
     // route's query settle the old overlay while its links remain on screen.
-    const initialPathname = window.location.pathname;
-    const overlay = document.createElement("div");
-    overlay.id = "ssr-seo-hold";
-    overlay.setAttribute(
-      "style",
-      "position:fixed;inset:0;z-index:2147483000;background:#000;overflow:auto;overscroll-behavior:contain",
-    );
-    // React mounts the live tree underneath this visual hold.  The crawler
-    // markup is therefore visual-only while both trees coexist; exposing it
+    const initialPathname = prebootHold?.getAttribute("data-pathname") || window.location.pathname;
+    const overlay = prebootHold ?? document.createElement("div");
+    // Both paths start from an overlay that is neither aria-hidden nor inert;
+    // disposal restores that state.
+    const previousAriaHidden: string | null = null;
+    const previousInert = false;
+    if (!prebootHold) {
+      overlay.id = "ssr-seo-hold";
+      overlay.setAttribute(
+        "style",
+        "position:fixed;inset:0;z-index:2147483000;background:#000;overflow:auto;overscroll-behavior:contain",
+      );
+      // Move the scoped <style> siblings too, so the overlay keeps its styling.
+      const nodes = Array.from(rootElement.childNodes);
+      for (const n of nodes) overlay.appendChild(n);
+    }
+    // React mounts the live tree underneath this visual hold.  From here on
+    // the crawler markup is visual-only while both trees coexist; exposing it
     // would create duplicate landmarks, headings, and interactive controls.
-    const previousAriaHidden = overlay.getAttribute("aria-hidden");
-    const previousInert = overlay.inert;
+    // (The pre-boot overlay deliberately stays semantic until this point so a
+    // bundle that never runs still leaves a usable page.)
     overlay.setAttribute("aria-hidden", "true");
     overlay.inert = true;
-    // Move the scoped <style> siblings too, so the overlay keeps its styling.
-    const nodes = Array.from(rootElement.childNodes);
-    for (const n of nodes) overlay.appendChild(n);
     // JavaScript clients only see this visual hold; crawlers retain the raw
     // semantic h1. Demote before React mounts so the live DOM never has two h1s.
     const ssrH1 = overlay.querySelector("h1");
@@ -152,7 +165,7 @@ const initialRouteChunk = preloadInitialRouteChunk();
       while (ssrH1.firstChild) div.appendChild(ssrH1.firstChild);
       ssrH1.replaceWith(div);
     }
-    document.body.appendChild(overlay);
+    if (!prebootHold) document.body.appendChild(overlay);
 
     const remove = () => {
       if (!overlay.isConnected) return;

@@ -1,0 +1,738 @@
+{
+  "schemaVersion": 1,
+  "binding": {
+    "sourceTrackedTreeSha256": "bb0731b9f04695b404565380e272f2b3ea0e7810ffd3219ea64c1cd529eee45c",
+    "sourceDirtyPatchSha256": "4a4dccd82c271761ef6ecbbf9e0abc7aacd07760e2d5013f9ca9100f0027efbd",
+    "sourceUntrackedTreeSha256": "36ff56cbba8fc898e238fbabda752e905742239b8820c304ab1b416bbb0046ad",
+    "buildTreeSha256": "229ed324ee1edadb229520dd37648089f64a95abd9a3f1c7d1797b6b18523368"
+  },
+  "observedRequests": [
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:5055/category/encoding-codecs",
+      "resourceType": "document",
+      "isNavigationRequest": true
+    },
+    {
+      "method": "GET",
+      "url": "https://fonts.googleapis.com/css2?family=Inter%3Awght%40400%3B500%3B600%3B700%3B800&family=Fraunces%3Aital%2Cwght%400%2C400%3B0%2C500%3B0%2C600%3B0%2C700%3B1%2C400%3B1%2C500%3B1%2C600&family=JetBrains+Mono%3Awght%40400%3B500%3B600%3B700&family=Geist%3Awght%40400%3B500%3B600%3B700&family=Instrument+Serif%3Aital%400%3B1&family=Space+Grotesk%3Awght%40400%3B500%3B600%3B700&family=IBM+Plex+Mono%3Awght%40400%3B500%3B600%3B700&family=IBM+Plex+Sans%3Awght%40400%3B500%3B600%3B700&family=Manrope%3Awght%40400%3B500%3B600%3B700%3B800&display=swap",
+      "resourceType": "stylesheet",
+      "isNavigationRequest": false
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:5055/assets/index-CqSr8xaM.js",
+      "resourceType": "script",
+      "isNavigationRequest": false
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:5055/assets/index-CTjT7uj6.js",
+      "resourceType": "script",
+      "isNavigationRequest": false
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:5055/assets/index-CeftJlzp.js",
+      "resourceType": "script",
+      "isNavigationRequest": false
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:5055/assets/index-Civ1Em3e.css",
+      "resourceType": "stylesheet",
+      "isNavigationRequest": false
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:5055/api/awesome-list/nav",
+      "resourceType": "fetch",
+      "isNavigationRequest": false
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:5055/api/awesome-list/listing?level=category&slug=encoding-codecs&page=1",
+      "resourceType": "fetch",
+      "isNavigationRequest": false
+    },
+    {
+      "method": "GET",
+      "url": "https://fonts.gstatic.com/s/inter/v20/UcC73FwrK3iLTeHuS_nVMrMxCp50SjIa1ZL7W0Q5nw.woff2",
+      "resourceType": "font",
+      "isNavigationRequest": false
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:5055/favicon.svg",
+      "resourceType": "other",
+      "isNavigationRequest": false
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:5055/assets/Category-BEIMiVou.js",
+      "resourceType": "script",
+      "isNavigationRequest": false
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:5055/assets/TaxonomyListing-KXp8fjE4.js",
+      "resourceType": "script",
+      "isNavigationRequest": false
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:5055/assets/paginator-CjjV7dMv.js",
+      "resourceType": "script",
+      "isNavigationRequest": false
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:5055/assets/advanced-filter-CB3Zgi36.js",
+      "resourceType": "script",
+      "isNavigationRequest": false
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:5055/assets/badge-kAhSPGJM.js",
+      "resourceType": "script",
+      "isNavigationRequest": false
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:5055/assets/select-DHSEu86Q.js",
+      "resourceType": "script",
+      "isNavigationRequest": false
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:5055/assets/index-BdQq_4o_.js",
+      "resourceType": "script",
+      "isNavigationRequest": false
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:5055/assets/index-BzkqPxjz.js",
+      "resourceType": "script",
+      "isNavigationRequest": false
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:5055/assets/chevron-down-C1jdPwkv.js",
+      "resourceType": "script",
+      "isNavigationRequest": false
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:5055/assets/collapsible-CtBoAqgD.js",
+      "resourceType": "script",
+      "isNavigationRequest": false
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:5055/assets/tags-DDvD59JP.js",
+      "resourceType": "script",
+      "isNavigationRequest": false
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:5055/assets/sliders-horizontal-BBQ46EZo.js",
+      "resourceType": "script",
+      "isNavigationRequest": false
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:5055/assets/SearchFilters-DPYmc78i.js",
+      "resourceType": "script",
+      "isNavigationRequest": false
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:5055/assets/resourceFacets-core-DMw7vNpP.js",
+      "resourceType": "script",
+      "isNavigationRequest": false
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:5055/assets/ResourceCard-C1iDtuZR.js",
+      "resourceType": "script",
+      "isNavigationRequest": false
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:5055/assets/card-BykY4iDg.js",
+      "resourceType": "script",
+      "isNavigationRequest": false
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:5055/assets/BookmarkButton-sO9o-xfi.js",
+      "resourceType": "script",
+      "isNavigationRequest": false
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:5055/assets/BookmarkNotesDialog-D1FS8uKN.js",
+      "resourceType": "script",
+      "isNavigationRequest": false
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:5055/assets/dialog-COTz4aBZ.js",
+      "resourceType": "script",
+      "isNavigationRequest": false
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:5055/assets/textarea-UxUIPJNu.js",
+      "resourceType": "script",
+      "isNavigationRequest": false
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:5055/assets/label-2C0VEp8V.js",
+      "resourceType": "script",
+      "isNavigationRequest": false
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:5055/assets/checkbox-CIDqRvDF.js",
+      "resourceType": "script",
+      "isNavigationRequest": false
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:5055/assets/folder-Cjd1cDGP.js",
+      "resourceType": "script",
+      "isNavigationRequest": false
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:5055/assets/heart-CIUDE9db.js",
+      "resourceType": "script",
+      "isNavigationRequest": false
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:5055/assets/vendor-blurhash-DVeDoVY-.js",
+      "resourceType": "script",
+      "isNavigationRequest": false
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:5055/assets/external-link-fD7Gz4Tu.js",
+      "resourceType": "script",
+      "isNavigationRequest": false
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:5055/assets/square-pen-B2eP-NiV.js",
+      "resourceType": "script",
+      "isNavigationRequest": false
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:5055/assets/resource-card-CPhpLDX2.css",
+      "resourceType": "stylesheet",
+      "isNavigationRequest": false
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:5055/assets/layout-grid-uxIsjbSm.js",
+      "resourceType": "script",
+      "isNavigationRequest": false
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:5055/assets/not-found-D7_442zw.js",
+      "resourceType": "script",
+      "isNavigationRequest": false
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:5055/assets/circle-alert-BmYY8CpM.js",
+      "resourceType": "script",
+      "isNavigationRequest": false
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:5055/assets/arrow-right-B9XuorMK.js",
+      "resourceType": "script",
+      "isNavigationRequest": false
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:5055/assets/system-D-mANIo5.css",
+      "resourceType": "stylesheet",
+      "isNavigationRequest": false
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:5055/assets/skeletons-XcjULs4R.js",
+      "resourceType": "script",
+      "isNavigationRequest": false
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:5055/assets/ErrorPage-zJlnBmbg.js",
+      "resourceType": "script",
+      "isNavigationRequest": false
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:5055/assets/refresh-cw-tJo5IT5g.js",
+      "resourceType": "script",
+      "isNavigationRequest": false
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:5055/assets/useDebounce-Bkpf_b0r.js",
+      "resourceType": "script",
+      "isNavigationRequest": false
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:5055/assets/searchNormalize-SvtDRall.js",
+      "resourceType": "script",
+      "isNavigationRequest": false
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:5055/assets/arrow-left-CFCujL-i.js",
+      "resourceType": "script",
+      "isNavigationRequest": false
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:5055/assets/TaxonomyListing-DrCLlSko.css",
+      "resourceType": "stylesheet",
+      "isNavigationRequest": false
+    },
+    {
+      "method": "GET",
+      "url": "https://gorgeous-jennet-4.clerk.accounts.dev/npm/@clerk/clerk-js@6/dist/clerk.browser.js",
+      "resourceType": "script",
+      "isNavigationRequest": false
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:5055/api/auth/user",
+      "resourceType": "fetch",
+      "isNavigationRequest": false
+    },
+    {
+      "method": "GET",
+      "url": "https://fonts.gstatic.com/s/jetbrainsmono/v24/tDbv2o-flEEny0FZhsfKu5WU4zr3E_BX0PnT8RD8yKwBNntkaToggR7BYRbKPxDcwgknk-4.woff2",
+      "resourceType": "font",
+      "isNavigationRequest": false
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:5055/api/config",
+      "resourceType": "fetch",
+      "isNavigationRequest": false
+    },
+    {
+      "method": "GET",
+      "url": "https://gorgeous-jennet-4.clerk.accounts.dev/npm/@clerk/clerk-js@6.32.0/dist/clerk.browser.js",
+      "resourceType": "script",
+      "isNavigationRequest": false
+    },
+    {
+      "method": "GET",
+      "url": "https://gorgeous-jennet-4.clerk.accounts.dev/npm/@clerk/ui@1/dist/ui.browser.js",
+      "resourceType": "script",
+      "isNavigationRequest": false
+    },
+    {
+      "method": "GET",
+      "url": "https://gorgeous-jennet-4.clerk.accounts.dev/npm/@clerk/ui@1.33.0/dist/ui.browser.js",
+      "resourceType": "script",
+      "isNavigationRequest": false
+    },
+    {
+      "method": "GET",
+      "url": "blob:http://127.0.0.1:5055/cfb20ea5-4d0d-4756-989b-5329041e2659",
+      "resourceType": "script",
+      "isNavigationRequest": false
+    },
+    {
+      "method": "POST",
+      "url": "https://gorgeous-jennet-4.clerk.accounts.dev/v1/dev_browser?__clerk_api_version=2026-05-12&_clerk_js_version=6.32.0",
+      "resourceType": "fetch",
+      "isNavigationRequest": false
+    },
+    {
+      "method": "POST",
+      "url": "https://gorgeous-jennet-4.clerk.accounts.dev/v1/environment?__clerk_api_version=2026-05-12&_clerk_js_version=6.32.0&_method=PATCH&__clerk_db_jwt=%5BREDACTED%5D",
+      "resourceType": "fetch",
+      "isNavigationRequest": false
+    },
+    {
+      "method": "GET",
+      "url": "https://gorgeous-jennet-4.clerk.accounts.dev/v1/client?__clerk_api_version=2026-05-12&_clerk_js_version=6.32.0&__clerk_db_jwt=%5BREDACTED%5D",
+      "resourceType": "fetch",
+      "isNavigationRequest": false
+    },
+    {
+      "method": "GET",
+      "url": "blob:http://127.0.0.1:5055/516946ff-f4de-4aa1-891f-de85cfefc04f",
+      "resourceType": "script",
+      "isNavigationRequest": false
+    },
+    {
+      "method": "GET",
+      "url": "https://gorgeous-jennet-4.clerk.accounts.dev/npm/@clerk/ui@1.33.0/dist/framework_ui_4bef77_1.33.0.js",
+      "resourceType": "script",
+      "isNavigationRequest": false
+    },
+    {
+      "method": "GET",
+      "url": "https://gorgeous-jennet-4.clerk.accounts.dev/npm/@clerk/ui@1.33.0/dist/ui-common_ui_4bef77_1.33.0.js",
+      "resourceType": "script",
+      "isNavigationRequest": false
+    },
+    {
+      "method": "GET",
+      "url": "https://gorgeous-jennet-4.clerk.accounts.dev/npm/@clerk/ui@1.33.0/dist/vendors_ui_4bef77_1.33.0.js",
+      "resourceType": "script",
+      "isNavigationRequest": false
+    },
+    {
+      "method": "GET",
+      "url": "https://gorgeous-jennet-4.clerk.accounts.dev/npm/@clerk/ui@1.33.0/dist/subscriptionDetails_ui_4bef77_1.33.0.js",
+      "resourceType": "script",
+      "isNavigationRequest": false
+    },
+    {
+      "method": "GET",
+      "url": "chrome://terms/",
+      "resourceType": "document",
+      "isNavigationRequest": true
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:5055/category/encoding-codecs",
+      "resourceType": "document",
+      "isNavigationRequest": true
+    },
+    {
+      "method": "GET",
+      "url": "https://fonts.googleapis.com/css2?family=Inter%3Awght%40400%3B500%3B600%3B700%3B800&family=Fraunces%3Aital%2Cwght%400%2C400%3B0%2C500%3B0%2C600%3B0%2C700%3B1%2C400%3B1%2C500%3B1%2C600&family=JetBrains+Mono%3Awght%40400%3B500%3B600%3B700&family=Geist%3Awght%40400%3B500%3B600%3B700&family=Instrument+Serif%3Aital%400%3B1&family=Space+Grotesk%3Awght%40400%3B500%3B600%3B700&family=IBM+Plex+Mono%3Awght%40400%3B500%3B600%3B700&family=IBM+Plex+Sans%3Awght%40400%3B500%3B600%3B700&family=Manrope%3Awght%40400%3B500%3B600%3B700%3B800&display=swap",
+      "resourceType": "stylesheet",
+      "isNavigationRequest": false
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:5055/assets/index-CqSr8xaM.js",
+      "resourceType": "script",
+      "isNavigationRequest": false
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:5055/assets/index-CTjT7uj6.js",
+      "resourceType": "script",
+      "isNavigationRequest": false
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:5055/assets/index-CeftJlzp.js",
+      "resourceType": "script",
+      "isNavigationRequest": false
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:5055/assets/index-Civ1Em3e.css",
+      "resourceType": "stylesheet",
+      "isNavigationRequest": false
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:5055/api/awesome-list/nav",
+      "resourceType": "fetch",
+      "isNavigationRequest": false
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:5055/api/awesome-list/listing?level=category&slug=encoding-codecs&page=1",
+      "resourceType": "fetch",
+      "isNavigationRequest": false
+    },
+    {
+      "method": "GET",
+      "url": "https://fonts.gstatic.com/s/inter/v20/UcC73FwrK3iLTeHuS_nVMrMxCp50SjIa1ZL7W0Q5nw.woff2",
+      "resourceType": "font",
+      "isNavigationRequest": false
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:5055/favicon.svg",
+      "resourceType": "other",
+      "isNavigationRequest": false
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:5055/assets/Category-BEIMiVou.js",
+      "resourceType": "script",
+      "isNavigationRequest": false
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:5055/assets/TaxonomyListing-KXp8fjE4.js",
+      "resourceType": "script",
+      "isNavigationRequest": false
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:5055/assets/paginator-CjjV7dMv.js",
+      "resourceType": "script",
+      "isNavigationRequest": false
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:5055/assets/advanced-filter-CB3Zgi36.js",
+      "resourceType": "script",
+      "isNavigationRequest": false
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:5055/assets/badge-kAhSPGJM.js",
+      "resourceType": "script",
+      "isNavigationRequest": false
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:5055/assets/select-DHSEu86Q.js",
+      "resourceType": "script",
+      "isNavigationRequest": false
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:5055/assets/index-BdQq_4o_.js",
+      "resourceType": "script",
+      "isNavigationRequest": false
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:5055/assets/index-BzkqPxjz.js",
+      "resourceType": "script",
+      "isNavigationRequest": false
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:5055/assets/chevron-down-C1jdPwkv.js",
+      "resourceType": "script",
+      "isNavigationRequest": false
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:5055/assets/collapsible-CtBoAqgD.js",
+      "resourceType": "script",
+      "isNavigationRequest": false
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:5055/assets/tags-DDvD59JP.js",
+      "resourceType": "script",
+      "isNavigationRequest": false
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:5055/assets/sliders-horizontal-BBQ46EZo.js",
+      "resourceType": "script",
+      "isNavigationRequest": false
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:5055/assets/SearchFilters-DPYmc78i.js",
+      "resourceType": "script",
+      "isNavigationRequest": false
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:5055/assets/resourceFacets-core-DMw7vNpP.js",
+      "resourceType": "script",
+      "isNavigationRequest": false
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:5055/assets/ResourceCard-C1iDtuZR.js",
+      "resourceType": "script",
+      "isNavigationRequest": false
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:5055/assets/card-BykY4iDg.js",
+      "resourceType": "script",
+      "isNavigationRequest": false
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:5055/assets/BookmarkButton-sO9o-xfi.js",
+      "resourceType": "script",
+      "isNavigationRequest": false
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:5055/assets/BookmarkNotesDialog-D1FS8uKN.js",
+      "resourceType": "script",
+      "isNavigationRequest": false
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:5055/assets/dialog-COTz4aBZ.js",
+      "resourceType": "script",
+      "isNavigationRequest": false
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:5055/assets/textarea-UxUIPJNu.js",
+      "resourceType": "script",
+      "isNavigationRequest": false
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:5055/assets/label-2C0VEp8V.js",
+      "resourceType": "script",
+      "isNavigationRequest": false
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:5055/assets/checkbox-CIDqRvDF.js",
+      "resourceType": "script",
+      "isNavigationRequest": false
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:5055/assets/folder-Cjd1cDGP.js",
+      "resourceType": "script",
+      "isNavigationRequest": false
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:5055/assets/heart-CIUDE9db.js",
+      "resourceType": "script",
+      "isNavigationRequest": false
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:5055/assets/vendor-blurhash-DVeDoVY-.js",
+      "resourceType": "script",
+      "isNavigationRequest": false
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:5055/assets/external-link-fD7Gz4Tu.js",
+      "resourceType": "script",
+      "isNavigationRequest": false
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:5055/assets/square-pen-B2eP-NiV.js",
+      "resourceType": "script",
+      "isNavigationRequest": false
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:5055/assets/resource-card-CPhpLDX2.css",
+      "resourceType": "stylesheet",
+      "isNavigationRequest": false
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:5055/assets/layout-grid-uxIsjbSm.js",
+      "resourceType": "script",
+      "isNavigationRequest": false
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:5055/assets/not-found-D7_442zw.js",
+      "resourceType": "script",
+      "isNavigationRequest": false
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:5055/assets/circle-alert-BmYY8CpM.js",
+      "resourceType": "script",
+      "isNavigationRequest": false
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:5055/assets/arrow-right-B9XuorMK.js",
+      "resourceType": "script",
+      "isNavigationRequest": false
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:5055/assets/system-D-mANIo5.css",
+      "resourceType": "stylesheet",
+      "isNavigationRequest": false
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:5055/assets/skeletons-XcjULs4R.js",
+      "resourceType": "script",
+      "isNavigationRequest": false
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:5055/assets/ErrorPage-zJlnBmbg.js",
+      "resourceType": "script",
+      "isNavigationRequest": false
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:5055/assets/refresh-cw-tJo5IT5g.js",
+      "resourceType": "script",
+      "isNavigationRequest": false
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:5055/assets/useDebounce-Bkpf_b0r.js",
+      "resourceType": "script",
+      "isNavigationRequest": false
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:5055/assets/searchNormalize-SvtDRall.js",
+      "resourceType": "script",
+      "isNavigationRequest": false
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:5055/assets/arrow-left-CFCujL-i.js",
+      "resourceType": "script",
+      "isNavigationRequest": false
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:5055/assets/TaxonomyListing-DrCLlSko.css",
+      "resourceType": "stylesheet",
+      "isNavigationRequest": false
+    },
+    {
+      "method": "GET",
+      "url": "https://gorgeous-jennet-4.clerk.accounts.dev/npm/@clerk/clerk-js@6/dist/clerk.browser.js",
+      "resourceType": "script",
+      "isNavigationRequest": false
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:5055/api/auth/user",
+      "resourceType": "fetch",
+      "isNavigationRequest": false
+    },
+    {
+      "method": "GET",
+      "url": "https://fonts.gstatic.com/s/jetbrainsmono/v24/tDbv2o-flEEny0FZhsfKu5WU4zr3E_BX0PnT8RD8yKwBNntkaToggR7BYRbKPxDcwgknk-4.woff2",
+      "resourceType": "font",
+      "isNavigationRequest": false
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:5055/api/config",
+      "resourceType": "fetch",
+      "isNavigationRequest": false
+    }
+  ],
+  "unsafeSameOriginRequests": []
+}

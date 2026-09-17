@@ -148,3 +148,4 @@
 - [44px floor vs frozen controls](accessible-floor-vs-frozen-controls.md) — the 12 artifact parity fails are the a11y floor by contract, don't re-fix; scope table nowraps to ONE cell; sweep parity users after a killed run.
 - [Hidden-control hitbox](hidden-control-hitbox.md) — opacity:0+absolute-without-offsets sits over the last button and still takes clicks; flipping to static on hover slides Edit under the pointer; anchor out of flow + reveal on tr:hover.
 - [Built-in tester + Clerk](native-tester-clerk-workaround.md) — tester Clerk helper fails on the proxied dev host; mint `+clerk_test` users via backend API, resend creds every follow-up, Clerk-first teardown + residue sweep.
+- [LCP dated to the bundle by re-inserting prerender](lcp-reinserted-prerender.md) — moving prerender nodes after the bundle runs re-registers a larger web-font LCP candidate; do holds in the pre-boot inline script, keep them semantic until adopted.
