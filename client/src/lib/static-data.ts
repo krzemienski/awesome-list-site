@@ -157,12 +157,18 @@ export async function fetchListingPage(
   level: ListingLevel,
   slug: string,
   page: number,
-  options: { subcategory?: string; subSubcategory?: string; general?: boolean } = {},
+  options: {
+    subcategory?: string;
+    subSubcategory?: string;
+    general?: boolean;
+    kind?: ResourceKind | null;
+  } = {},
 ): Promise<AwesomeListListing> {
   const params = new URLSearchParams({ level, slug, page: String(page) });
   if (options.subcategory) params.set("subcategory", options.subcategory);
   if (options.subSubcategory) params.set("subSubcategory", options.subSubcategory);
   if (options.general) params.set("general", "1");
+  if (options.kind) params.set("kind", options.kind);
   const url = `/api/awesome-list/listing?${params.toString()}`;
   if (typeof window !== "undefined") {
     const early = (window as any).__awesomeListListingEarlyFetch;

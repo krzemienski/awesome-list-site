@@ -18,6 +18,20 @@ interface AppHeaderProps {
   onLogout?: () => void;
   logoutError?: string | null;
   categories?: AwesomeListNavNode[];
+  siteName?: string;
+}
+
+/**
+ * The configured title is the source of truth, but the current deployment's
+ * compact shell mark is deliberately branded AWESOME.VIDEO. Keep that exact
+ * paint while allowing alternate configured sites to identify themselves.
+ */
+function shellBrand(siteName?: string): string {
+  const trimmed = siteName?.trim();
+  if (!trimmed || /^awesome\s+video(?:\s+dashboard)?$/i.test(trimmed)) {
+    return "AWESOME.VIDEO";
+  }
+  return trimmed.toUpperCase();
 }
 
 // Same recursive sum as Home's navTotalCount; never fetch the full corpus.
@@ -33,7 +47,7 @@ function SearchIcon() {
   </svg>;
 }
 
-export default function AppHeader({ onSearchOpen, user, onLogout, logoutError, categories = [] }: AppHeaderProps) {
+export default function AppHeader({ onSearchOpen, user, onLogout, logoutError, categories = [], siteName }: AppHeaderProps) {
   const [location, navigate] = useLocation();
   const guestSavedCount = useGuestBookmarkIds().size;
   const { data: notificationState } = useQuery<{ unreadCount: number }>({
@@ -48,6 +62,8 @@ export default function AppHeader({ onSearchOpen, user, onLogout, logoutError, c
     .reduce((sum, node) => sum + totalCount(node), 0);
   const firstName = user?.name?.trim() ? user.name.trim().split(/\s+/)[0] : "Account";
   const role = user?.role === "admin" ? "Admin" : user ? "Member" : "Visitor";
+  const brand = shellBrand(siteName);
+  const accessibleBrand = siteName?.trim() || "Awesome Video";
   const signIn = () => {
     const here = window.location.pathname + window.location.search;
     const skipNext = here === "/" || here.startsWith("/sign-in") || here.startsWith("/sign-up");
@@ -69,9 +85,9 @@ export default function AppHeader({ onSearchOpen, user, onLogout, logoutError, c
         <SidebarTrigger className="mobile-menu-btn" data-testid="mobile-drawer-trigger" aria-label="Toggle sidebar" />
         <svg className="header-menu-icon" aria-hidden="true" width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"><path d="M2 4 H14 M2 8 H14 M2 12 H14" /></svg>
       </span>
-      <Link href="/" className="header-brand" aria-label="Awesome Video — home" data-testid="header-brand">
+      <Link href="/" className="header-brand" aria-label={`${accessibleBrand} — home`} data-testid="header-brand">
         <span className="header-logo" aria-hidden="true" data-testid="brand-mark">av</span>
-        <span className="header-wordmark hide-tablet">AWESOME.VIDEO</span>
+        <span className="header-wordmark hide-tablet">{brand}</span>
       </Link>
       <div className="header-spacer" />
       {/* One responsive control preserves the existing search selector and focus

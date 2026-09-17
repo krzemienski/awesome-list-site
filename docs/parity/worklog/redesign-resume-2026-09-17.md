@@ -151,7 +151,7 @@ decided. Thresholds, expected captures and the frozen reference are unchanged.
 | `app.subcategory` 375/1024/1440 | 5.6–6.8% | First pass rendered the shared `scopeIntro` at every level for crawler parity; the frozen `SubcategoryPage` has no introduction paragraph | **Fixed**: below category level the paragraph is `sr-only` (same DOM text as the crawler markup; `seo-snapshot --gate --parity` PASS). Rerun `2026-09-17T12-50-11-108Z-25251`: 375 0.12%, 1024 0.24%, 1440 0.28% PASS |
 | `app.category` 375/1024/1440 | 4.9–6.0%, one text line taller | The reference's `CategoryPage` prints `cat.desc`, which the adapter binds to the nav teaser (the first direct resource's description, one line shorter); the app prints the crawler-parity `scopeIntro` sentence. Re-binding `desc` to `scopeIntro` was tried and reverted: the same field feeds the home category cards, where the app shows the teaser | Kept as a residual. The diff is the extra intro line shifting everything below it plus the readable inactive Home link (next row); the paragraph and the cards themselves match |
 | Inactive Home link on category pages (part of the rows above) | ≈0.1% | The reference's white box is a `<button class="sub-item">` with the UA default `buttonface` background and unreadable text (prototype defect); the first pass removed the emulation | Kept readable |
-| New: `artifact.docs.cards`, `color`, `flows`, `getting-started`, `integration`, `lists`, `motion`, `navigation`, `theming`, `tokens` at **375** (10 cells) and `artifact.docs.integration` 768/1024. Worsened, already failing on the 44px floor: `artifact.docs.buttons` 375 (2.9→14.1%), `artifact.docs.forms` 375 (1.8→13.2%), `artifact.showcase` 375 (23.7→62.6%) | 11.7–66.5%, expected width 389–920px at a 375 viewport | The frozen docs/showcase pages overflow sideways on narrow screens; the first pass made the artifact fit the viewport (contract line 211, "no sideways overflow"), so its documents are now narrower than the reference captures | Kept. Contract-over-reference residual, same class as the 768 sidebar. **Open defect**: `artifact.docs.color` (405px) and `artifact.docs.lists` (495px) still overflow at 375, so the fit is incomplete for two chapters |
+| New: `artifact.docs.cards`, `color`, `flows`, `getting-started`, `integration`, `lists`, `motion`, `navigation`, `theming`, `tokens` at **375** (10 cells) and `artifact.docs.integration` 768/1024. Worsened, already failing on the 44px floor: `artifact.docs.buttons` 375 (2.9→14.1%), `artifact.docs.forms` 375 (1.8→13.2%), `artifact.showcase` 375 (23.7→62.6%) | 11.7–66.5%, expected width 389–920px at a 375 viewport | The frozen docs/showcase pages overflow sideways on narrow screens; the first pass made the artifact fit the viewport (contract line 211, "no sideways overflow"), so its documents are now narrower than the reference captures | Kept. Contract-over-reference residual, same class as the 768 sidebar. `artifact.docs.color` (405px) and `artifact.docs.lists` (495px) still overflowed at 375 after that pass; **fixed** below in the fourth pass |
 | `app.admin.database` 375, `app.admin.researcher` 1440 | 0.506%, 0.511% (0.49% in the previous run) | Live job/health data on both sides; already the recorded cause for the neighbouring researcher rows | Same residual class, now over the ceiling by 0.01pt |
 
 Not rerun after the subcategory fix: the full inventory. The category and
@@ -171,3 +171,27 @@ per system). Signed-out guest persistence only; it is not a pixel comparison.
 
 Gates after this pass: `npm run check`, `seo-snapshot --gate --parity`,
 `dead-exports`, `palette-drift` PASS. No publish action was taken.
+
+## Fourth pass, later on 2026-09-17: the two remaining artifact overflows
+
+`artifact.docs.color` (405px) and `artifact.docs.lists` (495px) were the last
+docs chapters wider than a 375 viewport. Both came from inline fixed grid
+columns in `DocsContent.tsx` (`160px 100px 1fr` ink ramp, `60px 1fr 140px 100px`
+anatomy row). Fix in the same shape as the showcase's existing narrow-screen
+rules: the anatomy row now carries the showcase's `.ds-list-row` class and the
+ink ramp a new `.ds-ink-row`, both reflowing under 480px in the artifact's
+`index.css` (`!important` only where the inline `grid-template-columns` has to
+be overridden). A loopback Playwright sweep of all thirteen docs chapters
+reports `scrollWidth` equal to the viewport at 375, 768, 1024 and 1440.
+Gates: artifact `tsc`, `product-profile-browser`, `standalone-palette-drift`,
+`palette-drift` PASS.
+
+Selected pixel rerun `tests/parity/baseline/2026-09-17T14-25-54-964Z-6689`
+(five artifact rows at 375, diagnostic only, whole-inventory report untouched):
+all five still FAIL, as the contract-over-reference decision predicts — the
+actual captures are now exactly 375 wide (color 375×3500 vs expected 458×3331,
+lists 375×2862 vs 542×2664, buttons 375 vs 409, forms 375 vs 406, showcase 375
+vs 741) and the percentages rose accordingly (color 19.3→25.6%, lists
+18.5→37.1%; buttons, forms, showcase unchanged). No threshold, expected capture
+or frozen source was touched. The open defect is closed; the rows stay in the
+residual list.

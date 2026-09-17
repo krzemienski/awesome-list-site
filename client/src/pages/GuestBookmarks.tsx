@@ -8,6 +8,7 @@ import { ResourceCardSkeleton } from "@/components/ui/skeletons";
 import { Button } from "@/components/ui/button";
 import { queryClient, ApiError } from "@/lib/queryClient";
 import type { Resource } from "@shared/schema";
+import type { ResourceKind } from "@shared/resourceKinds";
 import {
   GUEST_BOOKMARK_CAP,
   isGuestStorePersistent,
@@ -16,6 +17,13 @@ import {
 } from "@/lib/guestBookmarks";
 import { trackAuthPromptShown } from "@/lib/analytics";
 import "@/styles/pages/account.css";
+
+// The public resource detail endpoint adds read-time kind resolution to the
+// database row. Keep this response type additive: the server supplies the
+// value, so the client does not infer or fabricate a fallback kind.
+type GuestPublicResource = Resource & {
+  resolvedKind: ResourceKind;
+};
 
 // Task #329: the guest view of /bookmarks. Signed-out visitors with ≥1
 // on-device save see their list plus a "sign in to keep these everywhere"
@@ -235,7 +243,7 @@ export default function GuestBookmarks() {
           if (!result || result.isPending) {
             return <ResourceCardSkeleton key={entry.id} />;
           }
-          const resource = result.data as Resource | undefined;
+           const resource = result.data as GuestPublicResource | undefined;
           // 404 rows are pruned by the effect above; other failures surface
           // in the banner. Either way there's no card to render yet.
           if (!resource) return null;
@@ -252,6 +260,9 @@ export default function GuestBookmarks() {
                 tags: Array.isArray(resource.metadata?.tags)
                   ? (resource.metadata.tags as string[])
                   : [],
+                 kind: resource.kind,
+                 resolvedKind: resource.resolvedKind,
+                 metadata: resource.metadata ?? undefined,
                 isBookmarked: true,
               }}
               fullResource={resource}

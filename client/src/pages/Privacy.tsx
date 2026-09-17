@@ -3,10 +3,14 @@ import SEOHead from "@/components/layout/SEOHead";
 import { Card, CardContent } from "@/components/ui/card";
 import { Shield } from "lucide-react";
 import { openCookieSettings } from "@/components/ui/consent-banner";
+import { preferredContactDestination, useContactConfig } from "@/lib/contact";
 import "@/styles/pages/system-legal.css";
 
 // BUG-019 (run13): companion to Terms — see that file for the routing notes.
 export default function Privacy() {
+  const { data: contactConfig } = useContactConfig(true);
+  const contactDestination = preferredContactDestination(contactConfig);
+
   return (
     <div className="legal-page">
       <SEOHead
@@ -195,22 +199,39 @@ export default function Privacy() {
                 Profile → Security → Delete account &amp; data
               </Link>
               . The request is tied to your authenticated session and handled
-              privately by a maintainer — you never have to post your email or
-              any personal data in a public issue. If you can no longer sign
-              in, open a GitHub issue{" "}
-              <a
-                href="https://github.com/krzemienski/awesome-video/issues"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="legal-inline-link inline-flex items-center min-h-[24px] align-middle underline underline-offset-4 hover:text-[color:var(--text)]"
-                data-testid="link-privacy-github-issues"
-              >
-                on the repository
-              </a>{" "}
-              that mentions only your username — include no email or personal
-              data; the maintainer will verify ownership privately. Approved
-              resources you submitted remain in the directory but are detached
-              from your identity.
+              privately by a maintainer — you never have to post your email or{" "}
+              {contactDestination?.kind === "issues"
+                ? "any personal data in a public issue."
+                : "personal data publicly."}{" "}
+              If you can no longer sign in,{" "}
+              {contactDestination ? (
+                <>
+                  <a
+                    href={contactDestination.href}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="legal-inline-link inline-flex items-center min-h-[24px] align-middle underline underline-offset-4 hover:text-[color:var(--text)]"
+                    data-testid="link-privacy-github-issues"
+                  >
+                    {contactDestination.label}
+                  </a>{" "}
+                  {contactDestination.kind === "issues"
+                    ? "and mention only your username"
+                    : "and explain that you need account access"}
+                </>
+              ) : (
+                <span data-testid="text-privacy-contact-unavailable">
+                  no configured public contact destination is available
+                </span>
+              )}
+              .{" "}
+              {contactDestination?.kind === "issues"
+                ? "Do not include your email or other personal data; the maintainer will verify ownership privately."
+                : contactDestination
+                  ? "Do not include passwords, session details, or other sensitive information."
+                  : "Please do not post personal information while this deployment has no configured contact destination."}{" "}
+              Approved resources you submitted remain in the directory but are
+              detached from your identity.
             </p>
           </section>
 
@@ -226,17 +247,25 @@ export default function Privacy() {
             <h2 className="text-base font-semibold text-[color:var(--text)]">7. Contact</h2>
             <p>
               For privacy, legal, or abuse questions,{" "}
-              <a
-                href="https://github.com/krzemienski/awesome-video/issues"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="legal-inline-link inline-flex items-center min-h-[24px] align-middle underline underline-offset-4 hover:text-[color:var(--text)]"
-                data-testid="link-privacy-contact"
-              >
-                open an issue on the project's GitHub repository
-              </a>
-              . Issues are public, so do not include private or sensitive
-              personal information.
+              {contactDestination ? (
+                <a
+                  href={contactDestination.href}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="legal-inline-link inline-flex items-center min-h-[24px] align-middle underline underline-offset-4 hover:text-[color:var(--text)]"
+                  data-testid="link-privacy-contact"
+                >
+                  {contactDestination.label}
+                </a>
+              ) : (
+                <span data-testid="text-privacy-contact-unavailable">
+                  no configured public contact destination is available
+                </span>
+              )}
+              .{" "}
+              {contactDestination?.kind === "issues"
+                ? "Issues are public, so do not include private or sensitive personal information."
+                : "Please do not include private or sensitive personal information."}
             </p>
           </section>
         </CardContent>

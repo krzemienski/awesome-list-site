@@ -114,6 +114,11 @@ export default function PublicCollection({ shareId }: { shareId: string }) {
                 url: resource.url,
                 description: resource.description,
                 category: resource.category,
+                 // The public collection projection intentionally omits
+                 // metadata, but it still carries the stored and resolved kind
+                 // fields used by ResourceCard's public badges.
+                 kind: resource.kind,
+                 resolvedKind: resource.resolvedKind,
               }}
               showPersonalActions={false}
             />

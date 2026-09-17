@@ -44,6 +44,15 @@
   margin-bottom: 0.875rem !important;
 }
 
+.resource-card__top-actions {
+  display: flex;
+  min-width: 0;
+  align-items: flex-start;
+  justify-content: flex-end;
+  gap: 0.375rem;
+  flex-wrap: wrap;
+}
+
 .resource-card__mark {
   display: grid;
   width: 2.25rem;
@@ -61,6 +70,15 @@
   display: flex;
   align-items: center;
   gap: 0.25rem;
+}
+
+.resource-card__featured {
+  max-width: 100%;
+  padding: 0.25rem 0.625rem;
+  overflow: hidden;
+  font-size: 0.59375rem;
+  letter-spacing: 0.0375rem;
+  text-overflow: ellipsis;
 }
 
 .resource-card__personal-actions > button {
@@ -237,6 +255,7 @@
 }
 
 .resource-card__category-badge,
+.resource-card__kind-badge,
 .resource-card__tag {
   font-family: var(--font-mono);
   font-size: 0.625rem;

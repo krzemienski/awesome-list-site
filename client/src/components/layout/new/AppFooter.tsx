@@ -2,7 +2,6 @@ import { lazy, Suspense, type ReactNode } from "react";
 import { Link, useLocation } from "wouter";
 import { BrandMark } from "@/components/BrandMark";
 import { openCookieSettings } from "@/components/ui/consent-banner";
-import { contactVariant } from "@/lib/contact";
 import type { AwesomeListNav } from "@/lib/static-data";
 import "@/styles/shell/footer.css";
 
@@ -21,16 +20,25 @@ function ExternalLink({ href, children, testId }: { href: string; children: Reac
   return <a href={href} target="_blank" rel="noopener noreferrer" data-testid={testId}>{children}</a>;
 }
 
+/** Keep the current deployment's established visible footer brand while
+ * allowing another configured list to render its own identity. */
+function footerBrandName(siteName: string): string {
+  return /^awesome\s+video(?:\s+dashboard)?$/i.test(siteName.trim())
+    ? "Awesome Video"
+    : siteName.trim();
+}
+
 /** Layout supplies its already-loaded lightweight tree; the footer never fetches the corpus. */
 export default function AppFooter({ nav, site }: {
   nav?: AwesomeListNav;
-  site: { name: string; tagline: string; repoUrl: string; repoBranch: string };
+  site: { name: string; tagline: string; repoUrl: string; repoBranch: string; issuesUrl?: string };
 }) {
   const [location] = useLocation();
   if (location.startsWith("/admin")) return null;
 
   const repo = site.repoUrl.replace(/\/$/, "");
   const branch = encodeURIComponent(site.repoBranch);
+  const visibleBrandName = footerBrandName(site.name);
   const categories = nav?.categories ?? [];
   const subcategoryCount = categories.reduce((total, category) => total + (category.subcategories?.length ?? 0), 0);
   return (
@@ -40,7 +48,7 @@ export default function AppFooter({ nav, site }: {
           <div className="footer-brand">
             <Link href="/" className="footer-brand-link" data-testid="footer-home" aria-label={`${site.name} home`}>
               <BrandMark className="app-footer-mark" />
-              <span className="footer-wordmark">{site.name.toUpperCase()}</span>
+              <span className="footer-wordmark">{visibleBrandName.toUpperCase()}</span>
             </Link>
             <p className="footer-tagline">{site.tagline}</p>
             {nav && <div className="footer-stats">
@@ -66,7 +74,7 @@ export default function AppFooter({ nav, site }: {
           </Column>
           <Column title="SOURCE">
             <ExternalLink href={repo} testId="footer-github">{repo.replace(/^https?:\/\/(www\.)?github\.com\//, "")} ↗</ExternalLink>
-            {contactVariant !== "a" && <ExternalLink href={`${repo}/issues`}>Report an issue ↗</ExternalLink>}
+            {site.issuesUrl ? <ExternalLink href={site.issuesUrl}>Report an issue ↗</ExternalLink> : null}
             <ExternalLink href={`${repo}/blob/${branch}/CONTRIBUTING.md`}>Contributing ↗</ExternalLink>
             <ExternalLink href="https://github.com/sindresorhus/awesome">awesome-list guidelines ↗</ExternalLink>
             <ExternalLink href={`${repo}/tree/${branch}/docs`}>Docs ↗</ExternalLink>
@@ -77,7 +85,7 @@ export default function AppFooter({ nav, site }: {
           </Column>
         </nav>
         <div className="footer-bottom">
-          <span data-testid="footer-copyright">© {new Date().getFullYear()} {site.name} · content CC0, code MIT</span>
+          <span data-testid="footer-copyright">© {new Date().getFullYear()} {visibleBrandName} · content CC0, code MIT</span>
           <span>Built with React &amp; shadcn/ui</span>
         </div>
       </div>

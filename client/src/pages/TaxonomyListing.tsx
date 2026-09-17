@@ -33,6 +33,7 @@ import { useDebounce } from "@/hooks/useDebounce";
 import { normalizeSearchQuery } from "@shared/searchNormalize";
 import { fetchListingPage, type ListingLevel } from "@/lib/static-data";
 import type { ResourceSearchFacets } from "@shared/resourceFacets";
+import { RESOURCE_KIND_VALUES, type ResourceKind } from "@shared/resourceKinds";
 import { trackCategoryView, trackFilterUsage, trackSearch, trackSortChange, trackTagInteraction } from "@/lib/analytics";
 
 const PAGE_SIZE = 24;
@@ -61,6 +62,7 @@ interface TaxonomyFilterSnapshot {
   skillLevel: string;
   sort: string;
   selection: string;
+  kind: ResourceKind | null;
 }
 
 function taxonomyFilterSignature(next: TaxonomyFilterSnapshot) {
@@ -71,7 +73,14 @@ function taxonomyFilterSignature(next: TaxonomyFilterSnapshot) {
     next.format,
     next.skillLevel,
     next.sort,
+    next.kind,
   ]);
+}
+
+function parseKindParam(value: string | null): ResourceKind | null {
+  return value && (RESOURCE_KIND_VALUES as readonly string[]).includes(value)
+    ? value as ResourceKind
+    : null;
 }
 
 // fetchListingPage throws `Error("HTTP 404 ... from /api/awesome-list/listing…")`
@@ -113,6 +122,7 @@ export default function TaxonomyListing({ level }: Props) {
   const [provider, setProvider] = useState(params.get("provider") ?? "");
   const [format, setFormat] = useState(params.get("format") ?? "");
   const [skillLevel, setSkillLevel] = useState(params.get("skillLevel") ?? "");
+  const [kind, setKind] = useState<ResourceKind | null>(() => parseKindParam(params.get("kind")));
   const [sort, setSort] = useState(() =>
     normalizeSort(params.get("sortBy") || params.get("sort")),
   );
@@ -131,7 +141,7 @@ export default function TaxonomyListing({ level }: Props) {
   const normalizedSearch = normalizeSearchQuery(searchTerm);
   const debouncedSearch = normalizeSearchQuery(useDebounce(searchTerm, 300));
   const serverSearchActive = debouncedSearch.length > 0;
-  const serverFilterActive = Boolean(debouncedSearch || tags.length || provider || format || skillLevel || sort !== "default");
+  const serverFilterActive = Boolean(debouncedSearch || tags.length || provider || format || skillLevel || kind || sort !== "default");
   const pageOptions = useMemo(() => {
     if (level === "category") {
       const [subcategory, subSubcategory] = selection.split(" › ");
@@ -141,10 +151,15 @@ export default function TaxonomyListing({ level }: Props) {
         subcategory: selection !== "all" && selection !== "__general__" ? subcategory : undefined,
         subSubcategory: subSubcategory || undefined,
         general,
+        kind,
       };
     }
-    return { subcategory: level === "subcategory" && selection !== "all" ? selection : undefined, general };
-  }, [general, level, selection]);
+    return {
+      subcategory: level === "subcategory" && selection !== "all" ? selection : undefined,
+      general,
+      kind,
+    };
+  }, [general, kind, level, selection]);
 
   const listing = useQuery({
     queryKey: ["awesome-list-listing", level, slug, page, pageOptions],
@@ -188,8 +203,9 @@ export default function TaxonomyListing({ level }: Props) {
     if (format) query.set("format", format);
     if (skillLevel) query.set("skillLevel", skillLevel);
     if (sort !== "default") query.set("sort", sort);
+    if (kind) query.set("kind", kind);
     return `/api/resources?${query.toString()}`;
-  }, [debouncedSearch, format, general, level, listingData, page, provider, selection, skillLevel, slug, sort, tags]);
+  }, [debouncedSearch, format, general, kind, level, listingData, page, provider, selection, skillLevel, slug, sort, tags]);
   // The unfiltered listing renders from /api/awesome-list/listing alone; the
   // faceted /api/resources response only feeds the (closed-by-default)
   // filter panel and the filtered result set. Fetch it once either is in
@@ -235,7 +251,7 @@ export default function TaxonomyListing({ level }: Props) {
     kind: "filter" | "sort" | "tag";
     tagAction?: "apply" | "remove";
   } | null>(null);
-  const currentFilterState = { tags, provider, format, skillLevel, sort, selection };
+  const currentFilterState = { tags, provider, format, skillLevel, sort, selection, kind };
   const currentFilterSignature = taxonomyFilterSignature(currentFilterState);
   const requestResultsFocus = () => {
     pendingResultsFocusRef.current = true;
@@ -256,12 +272,12 @@ export default function TaxonomyListing({ level }: Props) {
 
   useEffect(() => {
     if (serverSearchActive && taxonomySearch.data && !taxonomySearch.isPlaceholderData) {
-      const intent = JSON.stringify([debouncedSearch, level, slug, general, selection, tags, provider, format, skillLevel, sort]);
+      const intent = JSON.stringify([debouncedSearch, level, slug, general, selection, tags, provider, format, skillLevel, sort, kind]);
       if (lastTrackedSearchIntentRef.current === intent) return;
       lastTrackedSearchIntentRef.current = intent;
       trackSearch(debouncedSearch, taxonomySearch.data.total, `taxonomy_${level}`);
     }
-  }, [debouncedSearch, format, general, level, provider, selection, serverSearchActive, skillLevel, slug, sort, tags, taxonomySearch.data, taxonomySearch.isPlaceholderData]);
+  }, [debouncedSearch, format, general, kind, level, provider, selection, serverSearchActive, skillLevel, slug, sort, tags, taxonomySearch.data, taxonomySearch.isPlaceholderData]);
 
   useEffect(() => {
     if (!pendingResultsFocusRef.current || loading || resultsLoading || listing.isPlaceholderData) return;
@@ -299,12 +315,13 @@ export default function TaxonomyListing({ level }: Props) {
     if (format) next.set("format", format);
     if (skillLevel) next.set("skillLevel", skillLevel);
     if (sort !== "default") next.set("sortBy", sort);
+    if (kind) next.set("kind", kind);
     if (page > 1) next.set("page", String(page));
     if (general) next.set("filter", "general");
     if (view !== "grid") next.set("view", view);
     const href = `${routeFor(level, slug)}${next.size ? `?${next}` : ""}`;
     const current = `${window.location.pathname}${window.location.search}`;
-    const snapshot = JSON.stringify([page, selection, tags, provider, format, skillLevel, sort, general, view]);
+    const snapshot = JSON.stringify([page, selection, tags, provider, format, skillLevel, sort, kind, general, view]);
     // Browser Back/Forward to another route fires this effect (location dep)
     // while this listing is still mounted. Writing our href then would
     // overwrite the entry the user just navigated to and trap them here
@@ -318,7 +335,7 @@ export default function TaxonomyListing({ level }: Props) {
     urlSyncInitialized.current = true;
     popNavigation.current = false;
     pushSnapshot.current = snapshot;
-  }, [format, general, level, location, page, provider, searchTerm, selection, skillLevel, slug, sort, tags, view]);
+  }, [format, general, kind, level, location, page, provider, searchTerm, selection, skillLevel, slug, sort, tags, view]);
   useEffect(() => {
     const onPopState = () => {
       popNavigation.current = true;
@@ -331,6 +348,7 @@ export default function TaxonomyListing({ level }: Props) {
       setProvider(next.get("provider") ?? "");
       setFormat(next.get("format") ?? "");
       setSkillLevel(next.get("skillLevel") ?? "");
+       setKind(parseKindParam(next.get("kind")));
       setSort(normalizeSort(next.get("sortBy") || next.get("sort")));
       const parsed = parsePageParamStrict(next.get("page"));
       setPage(parsed.page);
@@ -341,6 +359,37 @@ export default function TaxonomyListing({ level }: Props) {
     window.addEventListener("popstate", onPopState);
     return () => window.removeEventListener("popstate", onPopState);
   }, []);
+
+  // Wouter links can replace the taxonomy slug without emitting a native
+  // popstate event. Rehydrate the listing state from the new URL in that case
+  // as well; otherwise a search/filter/page from the previous sibling leaks
+  // into the newly selected category and the URL no longer describes the
+  // visible controls.
+  const hydratedRouteRef = useRef(`${routeFor(level, slug)}?${search}`);
+  useEffect(() => {
+    const routeKey = `${routeFor(level, slug)}?${search}`;
+    if (hydratedRouteRef.current === routeKey) return;
+    hydratedRouteRef.current = routeKey;
+    const next = new URLSearchParams(search);
+    const nextGeneral =
+      next.get("filter") === "general" ||
+      next.get("view") === "general" ||
+      next.get("subcategory") === "__general__";
+    setSearchTerm(next.get("search") ?? "");
+    setSelection(nextGeneral ? "__general__" : next.get("subcategory") ?? "all");
+    setGeneral(nextGeneral);
+    setTags(parseTagsParam(next));
+    setProvider(next.get("provider") ?? "");
+    setFormat(next.get("format") ?? "");
+    setSkillLevel(next.get("skillLevel") ?? "");
+    setKind(parseKindParam(next.get("kind")));
+    setSort(normalizeSort(next.get("sortBy") || next.get("sort")));
+    const parsed = parsePageParamStrict(next.get("page"));
+    setPage(parsed.page);
+    setNotice(pageNoticeFor(parsed));
+    const nextView = next.get("view");
+    setView(isLayoutViewMode(nextView) ? nextView : "grid");
+  }, [level, search, slug]);
 
   if (loading) return <div className={`taxonomy-page taxonomy-page--${level}`} aria-busy="true"><SEOHead title="Loading resources" description="Loading Awesome Video resources." /><div className="taxonomy-loading-header"><PageHeaderSkeleton /></div><div className="taxonomy-grid">{Array.from({ length: 9 }).map((_, i) => <ResourceCardSkeleton key={i} />)}</div></div>;
   // An unknown top-level slug 404s from the listing endpoint. Treat that as a
@@ -412,11 +461,12 @@ export default function TaxonomyListing({ level }: Props) {
     requestResultsFocus();
   };
   const clearFacetFilters = () => {
-    const next = { ...currentFilterState, tags: [], provider: "", format: "", skillLevel: "", sort: "default" };
+    const next = { ...currentFilterState, tags: [], provider: "", format: "", skillLevel: "", kind: null, sort: "default" };
     setTags([]);
     setProvider("");
     setFormat("");
     setSkillLevel("");
+    setKind(null);
     setSort("default");
     setPage(1);
     queueAnalytics(next, "all", "cleared");
@@ -459,6 +509,7 @@ export default function TaxonomyListing({ level }: Props) {
     provider,
     format,
     skillLevel,
+    kind,
     sort,
   };
   const broadenParams = new URLSearchParams();
@@ -470,6 +521,7 @@ export default function TaxonomyListing({ level }: Props) {
   if (sort !== "default") broadenParams.set(level === "category" ? "sort" : "sortBy", sort);
   const broadenBase = level === "category" ? "/search" : back;
   const broadenHref = `${broadenBase}${broadenParams.size ? `?${broadenParams}` : ""}`;
+  const kindLabel = kind ? kind.replace(/[-_]/g, " ").replace(/\b\w/g, (letter) => letter.toUpperCase()) : "";
 
   return <div className={`taxonomy-page taxonomy-page--${level}`}>
     <SEOHead title={pagedSeoTitleCore(seoCore, currentPage)} description={pagedSeoDescription(seoDescription, currentPage, totalPages)} category={name} resourceCount={listingData.totalAll} pageParam={currentPage} />
@@ -490,12 +542,23 @@ export default function TaxonomyListing({ level }: Props) {
           category page; below that it stays screen-reader-only. */}
       <p className={level === "category" ? "taxonomy-description" : "sr-only"}>{listingData.scopeIntro}</p>
     </section>
-    <div className="taxonomy-summary"><span className="chip accent" data-ds="chip">{listingData.totalAll} {resourceNoun(listingData.totalAll)}</span>{level === "category" && listingData.children.length > 0 && <span className="chip" data-ds="chip">{listingData.children.length} {listingData.children.length === 1 ? "subcategory" : "subcategories"}</span>}{level !== "category" && parentCategory && <span>in {parentCategory.name}</span>}<button type="button" className="btn ghost taxonomy-tools-toggle" aria-expanded={toolsOpen} onClick={() => setToolsOpen(value => !value)}>{toolsOpen ? "Close filters" : "Filters & view"}</button></div>
+     <div className="taxonomy-summary"><span className="chip accent" data-ds="chip">{listingData.totalAll} {resourceNoun(listingData.totalAll)}</span>{kind && <span className="chip" data-ds="chip">Kind: {kindLabel}</span>}{level === "category" && listingData.children.length > 0 && <span className="chip" data-ds="chip">{listingData.children.length} {listingData.children.length === 1 ? "subcategory" : "subcategories"}</span>}{level !== "category" && parentCategory && <span>in {parentCategory.name}</span>}<button type="button" className="btn ghost taxonomy-tools-toggle" aria-expanded={toolsOpen} onClick={() => setToolsOpen(value => !value)}>{toolsOpen ? "Close filters" : "Filters & view"}</button></div>
     </header>
     {level === "category" && listingData.children.length > 0 && <section className="taxonomy-children" aria-labelledby="taxonomy-children-heading"><h2 id="taxonomy-children-heading">Subcategories</h2><div className="taxonomy-child-grid">{listingData.children.map((child, index) => <Link key={child.slug} className="taxonomy-child card hoverable" style={{ animationDelay: `${index * 30}ms` }} href={routeFor("subcategory", child.slug)}><span>{child.name}</span><span className="chip mono" data-ds="chip">{child.count}</span></Link>)}</div></section>}
     <div className={`taxonomy-controls taxonomy-production-controls ${toolsOpen ? "taxonomy-production-controls--open" : ""} flex flex-col gap-4`}><div className="relative"><Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" /><Input className="pl-10" value={searchTerm} onChange={(event) => { setSearchTerm(event.target.value); setPage(1); }} placeholder={`Search in ${name}...`} aria-label={`Search in ${name}`} data-testid="input-search-resources" /></div>
-      {level !== "sub-subcategory" && optionChildren.length > 0 && <select className="min-h-11 rounded-md border bg-background px-3" aria-label={`Limit ${name} by subcategory`} value={selection} onChange={(event) => { const nextSelection = event.target.value; const next = { ...currentFilterState, selection: nextSelection }; setSelection(nextSelection); setGeneral(nextSelection === "__general__"); setPage(1); queueAnalytics(next, "taxonomy_scope", nextSelection); requestResultsFocus(); }} data-testid="select-subcategory-filter"><option value="all">All subcategories</option>{listingData.generalCount > 0 && <option value="__general__">Uncategorized ({listingData.generalCount})</option>}{optionChildren.map((item) => <option key={item.value} value={item.value}>{item.value} ({item.count})</option>)}</select>}
-      <AdvancedFilter selectedTags={tags} sortBy={sort} availableTags={listingData.tags} onTagsChange={(value) => onFacetChange("tags", value)} onSortChange={(value) => onFacetChange("sort", value)} showCountSorts={false} showTagFilter={false} />
+       {level !== "sub-subcategory" && optionChildren.length > 0 && <select className="min-h-11 rounded-md border bg-background px-3" aria-label={`Limit ${name} by subcategory`} value={selection} onChange={(event) => { const nextSelection = event.target.value; const next = { ...currentFilterState, selection: nextSelection }; setSelection(nextSelection); setGeneral(nextSelection === "__general__"); setPage(1); queueAnalytics(next, "taxonomy_scope", nextSelection); requestResultsFocus(); }} data-testid="select-subcategory-filter"><option value="all">All subcategories</option>{listingData.generalCount > 0 && <option value="__general__">Uncategorized ({listingData.generalCount})</option>}{optionChildren.map((item) => <option key={item.value} value={item.value}>{item.value} ({item.count})</option>)}</select>}
+       <select className="min-h-11 rounded-md border bg-background px-3" aria-label="Limit by resource kind" value={kind ?? ""} onChange={(event) => { const nextKind = parseKindParam(event.target.value); setKind(nextKind); setPage(1); requestResultsFocus(); }} data-testid="select-kind-filter"><option value="">All resource kinds</option>{RESOURCE_KIND_VALUES.map((value) => <option key={value} value={value}>{value.replace(/[-_]/g, " ").replace(/\b\w/g, (letter) => letter.toUpperCase())}</option>)}</select>
+       <AdvancedFilter selectedTags={tags} sortBy={sort} availableTags={listingData.tags} onTagsChange={(value) => onFacetChange("tags", value)} onSortChange={(value) => onFacetChange("sort", value)} showCountSorts={false} showTagFilter={false} />
+       <div className="taxonomy-view-toggle-row" aria-label="View mode">
+         <span className="taxonomy-view-toggle-label">View</span>
+         <ViewModeToggle
+           value={view}
+           onChange={(mode) => {
+             setView(mode);
+             safeSetItem("awesome-list-view-mode", mode);
+           }}
+         />
+       </div>
     </div>
     <div className={`taxonomy-production-controls ${toolsOpen ? "taxonomy-production-controls--open" : ""}`}><ActiveFilters state={filterState} onChange={onFacetChange} onClear={clearFacetFilters} defaultSort="default" /></div>
     <div className="taxonomy-results-layout">
@@ -505,17 +568,26 @@ export default function TaxonomyListing({ level }: Props) {
           {/* The listing's single count statement: visible range, matching total,
               and — only while a filter narrows the collection — what it was
               narrowed from. */}
-          <div className="taxonomy-results-heading-row"><h2 id="taxonomy-results-heading" data-testid="text-results-count" data-total={total}>{level === "category" ? (total > 0 ? `Resources (${total})` : "Coming soon") : <span className="sr-only">{total} {resourceNoun(total)}</span>}</h2><div className={`taxonomy-production-controls ${toolsOpen ? "taxonomy-production-controls--open" : ""}`}><ViewModeToggle value={view} onChange={(mode) => { setView(mode); safeSetItem("awesome-list-view-mode", mode); }} /></div></div>
+           <div className="taxonomy-results-heading-row"><h2 id="taxonomy-results-heading" data-testid="text-results-count" data-total={total}>{level === "category" ? (total > 0 ? `Resources (${total})` : "Coming soon") : <span className="sr-only">{total} {resourceNoun(total)}</span>}</h2></div>
           {notice && <div role="status" data-testid="notice-page-adjusted" className="rounded border p-3 text-sm">{notice}<button className="ml-2 min-h-8 underline" onClick={() => setNotice(null)}>Dismiss</button></div>}
           {(listingData.scope.ignoredSubcategory || listingData.scope.ignoredSubSubcategory) && <div role="status" data-testid="notice-unknown-subcategory" className="rounded border p-3 text-sm">“{selection}” isn't a subcategory of {name}, so that filter was ignored.<button className="ml-2 min-h-8 underline" onClick={broadenScope}>Remove it</button></div>}
           {serverSearchActive && !taxonomySearch.isPlaceholderData && taxonomySearch.data?.search?.mode === "fuzzy" && taxonomySearch.data.search.suggestion && <div className="flex flex-wrap items-center justify-center gap-2 rounded border p-3 text-sm" role="status" data-testid="notice-taxonomy-search-suggestion"><span>No exact matches. Did you mean</span><Button variant="link" className="h-auto p-0" onClick={() => { setSearchTerm(taxonomySearch.data!.search!.suggestion!); setPage(1); }}>{taxonomySearch.data.search.suggestion}</Button><span>?</span></div>}
           {resultsLoading ? <div className="taxonomy-grid" data-testid="taxonomy-results-loading">{Array.from({ length: 6 }).map((_, index) => <ResourceCardSkeleton key={index} />)}</div>
-          : resources.length === 0 ? <div className="flex flex-col items-center gap-3 py-12 text-center" data-testid="empty-resources"><h3 className="text-lg font-semibold">No resources match this combination</h3><p className="text-muted-foreground">Clear a filter, remove the search, or broaden where you're looking.</p><div className="flex flex-wrap justify-center gap-2">{(tags.length > 0 || provider || format || skillLevel || sort !== "default") && <Button variant="outline" onClick={clearFacetFilters} data-testid="button-clear-taxonomy-filters">Clear filters</Button>}{normalizedSearch && <Button variant="ghost" onClick={() => { setSearchTerm(""); setPage(1); requestResultsFocus(); }} data-testid="button-clear-taxonomy-search">Clear search</Button>}{(selection !== "all" || general) ? <Button variant="secondary" onClick={broadenScope} data-testid="button-broaden-taxonomy-scope">Show all in {name}</Button> : <Button asChild variant="secondary"><Link href={broadenHref} data-testid="link-broaden-taxonomy-scope">{level === "category" ? "Search all of Awesome Video" : "Search the broader category"}</Link></Button>}</div></div> :
+             : resources.length === 0 ? <div className="flex flex-col items-center gap-3 py-12 text-center" data-testid="empty-resources"><h3 className="text-lg font-semibold">No resources match this combination</h3><p className="text-muted-foreground">Clear a filter, remove the search, or broaden where you're looking.</p><div className="flex flex-wrap justify-center gap-2">{(tags.length > 0 || provider || format || skillLevel || kind || sort !== "default") && <Button variant="outline" onClick={clearFacetFilters} data-testid="button-clear-taxonomy-filters">Clear filters</Button>}{normalizedSearch && <Button variant="ghost" onClick={() => { setSearchTerm(""); setPage(1); requestResultsFocus(); }} data-testid="button-clear-taxonomy-search">Clear search</Button>}{(selection !== "all" || general) ? <Button variant="secondary" onClick={broadenScope} data-testid="button-broaden-taxonomy-scope">Show all in {name}</Button> : <Button asChild variant="secondary"><Link href={broadenHref} data-testid="link-broaden-taxonomy-scope">{level === "category" ? "Search all of Awesome Video" : "Search the broader category"}</Link></Button>}</div></div> :
             <div className={view === "grid" ? "taxonomy-grid" : view === "list" ? "flex flex-col gap-2" : "grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3"}>{resources.map((resource: any, index: number) => {
-              const normalized = { id: String(resource.id ?? ""), title: resource.title, url: resource.url, description: resource.description ?? "" };
+               const normalized = {
+                 ...resource,
+                 id: String(resource.id ?? ""),
+                 title: resource.title,
+                 url: resource.url,
+                 description: resource.description ?? "",
+                 name: resource.title,
+                 category: level === "category" ? name : parentCategory?.name,
+                 tags: resource.tags ?? resource.metadata?.tags ?? [],
+               };
               if (view === "list") return <ResourceListRow key={`${normalized.id}-${index}`} resource={normalized} />;
               if (view === "compact") return <ResourceCompactCard key={`${normalized.id}-${index}`} resource={normalized} />;
-               return <ResourceCard key={`${normalized.id}-${index}`} variant="taxonomy" showPersonalActions={false} resource={{ id: normalized.id, name: normalized.title, url: normalized.url, description: normalized.description, category: level === "category" ? name : parentCategory?.name, tags: resource.tags ?? resource.metadata?.tags ?? [] }} onTagClick={(tag) => onFacetChange("tags", tags.some(old => normalizeTag(old) === normalizeTag(tag)) ? tags : [...tags, tag])} />;
+                return <ResourceCard key={`${normalized.id}-${index}`} variant="taxonomy" showPersonalActions={false} resource={normalized} fullResource={resource} onTagClick={(tag) => onFacetChange("tags", tags.some(old => normalizeTag(old) === normalizeTag(tag)) ? tags : [...tags, tag])} />;
             })}</div>}
           {/* Page navigation stays visible whenever the collection spans more
               than one page: it is primary navigation, not a filter tool. */}

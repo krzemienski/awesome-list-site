@@ -1,6 +1,7 @@
 import SEOHead from "@/components/layout/SEOHead";
 import { Card, CardContent } from "@/components/ui/card";
 import { HeartHandshake } from "lucide-react";
+import { preferredContactDestination, useContactConfig } from "@/lib/contact";
 import "@/styles/pages/system-legal.css";
 
 // Companion to Terms and Privacy — see Terms.tsx for the routing notes. This is
@@ -8,6 +9,9 @@ import "@/styles/pages/system-legal.css";
 // the server og-middleware staticRoutes, and the sitemap). The SEOHead title
 // mirrors the server og-middleware title EXACTLY (two-pass SEO parity).
 export default function CodeOfConduct() {
+  const { data: contactConfig } = useContactConfig(true);
+  const contactDestination = preferredContactDestination(contactConfig);
+
   return (
     <div className="legal-page">
       <SEOHead
@@ -61,19 +65,27 @@ export default function CodeOfConduct() {
             <h2 className="text-base font-semibold text-[color:var(--text)]">4. Reporting and enforcement</h2>
             <p>
               If you experience or witness a violation,{" "}
-              <a
-                href="https://github.com/krzemienski/awesome-video/issues"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="legal-inline-link inline-flex items-center min-h-[24px] align-middle underline underline-offset-4 hover:text-[color:var(--text)]"
-                data-testid="link-code-of-conduct-report"
-              >
-                open an issue on the project's GitHub repository
-              </a>
-              . Issues are public, so do not include private or sensitive
-              personal information. We may edit or remove submissions and
-              suspend accounts that abuse the service, disrupt it, or breach
-              this code.
+              {contactDestination ? (
+                <a
+                  href={contactDestination.href}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="legal-inline-link inline-flex items-center min-h-[24px] align-middle underline underline-offset-4 hover:text-[color:var(--text)]"
+                  data-testid="link-code-of-conduct-report"
+                >
+                  {contactDestination.label}
+                </a>
+              ) : (
+                <span data-testid="text-code-of-conduct-contact-unavailable">
+                  no configured public contact destination is available
+                </span>
+              )}
+              .{" "}
+              {contactDestination?.kind === "issues"
+                ? "Issues are public, so do not include private or sensitive personal information."
+                : "Please do not include private or sensitive personal information."}{" "}
+              We may edit or remove submissions and suspend accounts that abuse
+              the service, disrupt it, or breach this code.
             </p>
           </section>
 

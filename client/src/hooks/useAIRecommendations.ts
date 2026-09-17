@@ -6,6 +6,7 @@ import type {
   RecommendationExplanation,
   RecommendationFeedbackValue,
 } from "@shared/recommendations";
+import type { ResourceKind } from "@shared/resourceKinds";
 
 export interface UserProfile {
   userId: string;
@@ -28,6 +29,10 @@ export interface Resource {
   category?: string;
   subcategory?: string;
   subSubcategory?: string;
+  /** Public resource resolver fields used by ResourceCard badges. */
+  kind?: ResourceKind | null;
+  resolvedKind?: ResourceKind;
+  metadata?: Record<string, unknown>;
 }
 
 export interface RecommendationResult {

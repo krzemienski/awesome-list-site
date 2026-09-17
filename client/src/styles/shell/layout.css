@@ -39,6 +39,18 @@
   max-width: var(--content-max-admin);
 }
 
+@media (min-width: 640px) {
+  .app-shell-main > .page-content-wrap[data-admin="true"] {
+    /*
+     * Consent is a sticky shell row at desktop widths. Admin omits the
+     * footer, so reserve that row's live height inside the admin canvas too;
+     * otherwise the last table/action row can settle underneath the banner
+     * at the bottom of a long tab.
+     */
+    padding-bottom: calc(var(--page-pad-y) + var(--app-bottom-inset, 0px));
+  }
+}
+
 /* Integration boundary: leaf styles remain independently owned. Wide page
    roots inherit the shell's measure; prose/form and admin inner measures are
    intentional canonical exceptions, not additional viewport gutters. */

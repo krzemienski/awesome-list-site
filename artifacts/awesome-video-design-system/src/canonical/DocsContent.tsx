@@ -38,7 +38,7 @@ const Grid2 = ({ children, gap = 14 }) => (
 );
 
 const Spec = ({ rows }) => (
-  <div style={{ margin: '14px 0 24px', border: 'var(--hairline-w) solid var(--border)', borderRadius: 'var(--radius-sm)', overflow: 'hidden' }}>
+  <div className="ds-spec" style={{ margin: '14px 0 24px', border: 'var(--hairline-w) solid var(--border)', borderRadius: 'var(--radius-sm)', overflow: 'hidden' }}>
     {rows.map((r, i) => (
       <div key={i} style={{
         display: 'grid', gridTemplateColumns: '200px 1fr',
@@ -329,7 +329,7 @@ function ColorDoc() {
           ['--text-3', 'Tertiary',  'Meta, captions, eyebrows'],
           ['--text-4', 'Quaternary','Disabled, dividers'],
         ].map(([v, n, u]) => (
-          <div key={v} style={{ display: 'grid', gridTemplateColumns: '160px 100px 1fr', gap: 16, padding: '8px 0', borderTop: 'var(--hairline-w) solid var(--hairline)', alignItems: 'center' }}>
+          <div key={v} className="ds-ink-row" style={{ display: 'grid', gridTemplateColumns: '160px 100px 1fr', gap: 16, padding: '8px 0', borderTop: 'var(--hairline-w) solid var(--hairline)', alignItems: 'center' }}>
             <code className="mono" style={{ fontSize: 11.5, color: 'var(--accent)' }}>{v}</code>
             <span style={{ color: `var(${v})`, fontSize: 14, fontWeight: 500 }}>{n}</span>
             <span style={{ color: 'var(--text-3)', fontSize: 12 }}>{u}</span>
@@ -338,7 +338,7 @@ function ColorDoc() {
       </Surface>
       <H2>The 10 accent palette</H2>
       <Surface>
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(5, 1fr)', gap: 10 }}>
+        <div className="ds-accent-palette" style={{ display: 'grid', gridTemplateColumns: 'repeat(5, 1fr)', gap: 10 }}>
           {ACCENTS.map(a => (
             <div key={a.id}>
               <div style={{ height: 64, background: a.primary, borderRadius: 'var(--radius-sm)' }} />
@@ -493,7 +493,7 @@ const Surfaceb = ({ children, padded = true, style }) => (
   }}>{children}</div>
 );
 const Specb = ({ rows }) => (
-  <div style={{ margin: '14px 0 24px', border: 'var(--hairline-w) solid var(--border)', borderRadius: 'var(--radius-sm)', overflow: 'hidden' }}>
+  <div className="ds-spec" style={{ margin: '14px 0 24px', border: 'var(--hairline-w) solid var(--border)', borderRadius: 'var(--radius-sm)', overflow: 'hidden' }}>
     {rows.map((r, i) => (
       <div key={i} style={{
         display: 'grid', gridTemplateColumns: '200px 1fr', gap: 16, padding: '12px 16px',
@@ -667,7 +667,7 @@ function ListsDoc() {
       <Leadb>The unit of an awesome-list site. Get this right and the site is built.</Leadb>
       <H2b>Anatomy of a row</H2b>
       <Surfaceb padded={false}>
-        <div style={{ display: 'grid', gridTemplateColumns: '60px 1fr 140px 100px', gap: 24, padding: '20px 22px', alignItems: 'baseline' }}>
+        <div className="ds-list-row" style={{ display: 'grid', gridTemplateColumns: '60px 1fr 140px 100px', gap: 24, padding: '20px 22px', alignItems: 'baseline' }}>
           <code className="mono" style={{ fontSize: 11, color: 'var(--text-3)', letterSpacing: '0.1em' }}>01</code>
           <div>
             <div style={{ display: 'flex', gap: 10, alignItems: 'baseline', marginBottom: 6, flexWrap: 'wrap' }}>

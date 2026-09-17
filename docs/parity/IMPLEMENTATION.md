@@ -2,6 +2,11 @@
 
 ## Latest local follow-through
 
+The [parallel product-repair pass](worklog/site-repair-2026-09-17.md) records
+the subsequent source repairs and built-in browser journeys, including all
+admin tabs, resource persistence, pointer deletion, and collection/note
+persistence. It does not claim a new full pixel certification.
+
 The [2026-09-17 parallel redesign report](worklog/redesign-resume-2026-09-17.md)
 records repairs and focused live proof on the working tree based on `a09ad484`.
 It supersedes the exact-768 defect and taxonomy-intro regression for those
@@ -137,9 +142,12 @@ bound through the reference adapter, never faked in production.
   `app.category`, `app.subcategory` at 768. (2) The artifact fitting a 375
   viewport (contract: no sideways overflow) versus reference docs/showcase
   captures 389–920px wide fails the artifact docs chapters at 375,
-  `artifact.docs.integration` 768/1024 and raises `artifact.showcase` 375;
-  `artifact.docs.color` and `artifact.docs.lists` still overflow (405/495px)
-  and remain an open defect. (3) `app.category` 375/1024/1440 prints the
+  `artifact.docs.integration` 768/1024 and raises `artifact.showcase` 375.
+  `artifact.docs.color` and `artifact.docs.lists` still overflowed (405/495px)
+  after that pass; the fix followed the showcase's existing pattern (the docs'
+  anatomy row reuses `.ds-list-row`, the ink ramp gets `.ds-ink-row`, both
+  reflowing under 480px in the artifact's `index.css`), and all thirteen docs
+  chapters now fit at 375/768/1024/1440. (3) `app.category` 375/1024/1440 prints the
   crawler-parity `scopeIntro` where the reference binds the nav teaser (one
   line shorter) and keeps the inactive Home link readable instead of the
   prototype's default-button white box. Below category level the intro is

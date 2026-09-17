@@ -200,6 +200,16 @@ function resourceMatchesFilters(
   return matchesTags && matchesKind;
 }
 
+function isFeaturedResource(resource: Resource): boolean {
+  const metadataFeatured = resource.metadata?.featured;
+  return metadataFeatured === true || metadataFeatured === "true";
+}
+
+function resourceRecencyValue(resource: Resource): number {
+  const timestamp = Date.parse(String(resource.createdAt ?? ""));
+  return Number.isFinite(timestamp) ? timestamp : 0;
+}
+
 function truncateAtWord(text: string, max: number): string {
   if (text.length <= max) return text;
   const cut = text.substring(0, max);
@@ -646,6 +656,29 @@ export default function Home({ nav, navLoading }: HomeProps) {
     return categories;
   }, [corpusFilterActive, navCategories, corpusBaseCategories, selectedTags, selectedKind, sortBy]);
 
+  const filteredCorpusResources = useMemo(() => {
+    if (!corpusFilterActive) return [] as Resource[];
+    return corpusBaseCategories
+      .flatMap((category) => getAllResources(category))
+      .filter((resource) => resourceMatchesFilters(resource, selectedTags, selectedKind));
+  }, [corpusBaseCategories, corpusFilterActive, selectedKind, selectedTags]);
+
+  // The home feed is intentionally a bounded API response by default. Once a
+  // kind/tag filter is active, derive both visible feeds from the authoritative
+  // live corpus so a matching resource outside the default five/six records
+  // is not silently omitted.
+  const filteredRecent = useMemo(() => {
+    if (!corpusFilterActive) return homeData?.recent ?? [];
+    return [...filteredCorpusResources]
+      .sort((a, b) => resourceRecencyValue(b) - resourceRecencyValue(a) || Number(b.id) - Number(a.id))
+      .slice(0, 5);
+  }, [corpusFilterActive, filteredCorpusResources, homeData?.recent]);
+
+  const filteredFeatured = useMemo(() => {
+    if (!corpusFilterActive) return homeData?.featured ?? [];
+    return filteredCorpusResources.filter(isFeaturedResource).slice(0, 6);
+  }, [corpusFilterActive, filteredCorpusResources, homeData?.featured]);
+
   const categoriesForPresentation = useMemo<HomeCategoryView[]>(
     () =>
       filteredCategories.map((category) => {
@@ -784,8 +817,8 @@ export default function Home({ nav, navLoading }: HomeProps) {
       <HomePresentation
         layout={layout === "curated" ? "curated" : "index"}
         categories={categoriesForPresentation}
-        recent={homeData?.recent ?? []}
-        featured={homeData?.featured ?? []}
+        recent={filteredRecent}
+        featured={filteredFeatured}
         stats={stats}
         kindCounts={kindCounts}
         kindCountsLoading={kindCountsLoading}
@@ -796,7 +829,8 @@ export default function Home({ nav, navLoading }: HomeProps) {
         onClearFilters={() => {
           setSelectedTags([]);
           setSelectedKindState(null);
-          writeFilterParams({ kind: null });
+          setSortBy("default");
+          writeFilterParams({ tags: null, kind: null, sort: null });
         }}
         filters={filters}
         emptyTagParamNotice={

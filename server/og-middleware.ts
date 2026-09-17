@@ -5,6 +5,11 @@ import { parsePageNumber, parseUrlPageStrict } from "@shared/page-param";
 import { normalizeSearchQuery } from "@shared/searchNormalize";
 import { MAINTAINER } from "@shared/about-content";
 import {
+  repositoryDisplayName,
+  resolveSiteIdentity,
+} from "@shared/site-identity";
+import { config } from "./config";
+import {
   homeSeoTitle,
   homeSeoDescription,
   categorySeoTitleCore,
@@ -893,9 +898,11 @@ function homeShellChrome(): string {
       // Run22 BUG-018: FAQ count claim comes from the live catalog total so
       // schema, prerendered body, and hydrated DOM stay truthful together.
       let aboutResourceCount: number | undefined;
+      let aboutCategoryCount: number | undefined;
       try {
         const data = await getTreeCached();
         aboutResourceCount = data?.resources?.length;
+        aboutCategoryCount = data?.categories?.length;
         categories = (data?.categories ?? []).slice(0, 12).map((c: any) => ({
           name: c.name,
           slug: c.slug,
@@ -904,7 +911,35 @@ function homeShellChrome(): string {
       } catch (error) {
         rethrowBoundedDependencyFailure(error);
       }
-      const aboutFaqs = getAboutFaqs(aboutResourceCount);
+      // Keep SSR FAQ JSON-LD on the same public-config boundary as the client
+      // About page. `config.source.url` is the raw GitHub URL; normalize it to
+      // the repository URL that /api/config exposes before deriving the source
+      // label, so both callers produce identical FAQ copy.
+      const sourceParts = (() => {
+        try {
+          const parsed = new URL(config.source.url);
+          return parsed.pathname.split("/").filter(Boolean);
+        } catch {
+          return [];
+        }
+      })();
+      const sourceRepoUrl =
+        sourceParts.length >= 2
+          ? `https://github.com/${sourceParts[0]}/${sourceParts[1]}`
+          : undefined;
+      const aboutSite = resolveSiteIdentity({
+        ...config.site,
+        name: config.site.title,
+        ...(sourceRepoUrl
+          ? { repoUrl: sourceRepoUrl, repoBranch: sourceParts[2] }
+          : {}),
+      });
+      const aboutFaqs = getAboutFaqs({
+        resourceCount: aboutResourceCount,
+        categoryCount: aboutCategoryCount,
+        site: aboutSite,
+        sourceName: repositoryDisplayName(aboutSite.repoUrl),
+      });
       if (path === "/about") {
         // GEO: FAQPage schema (+ breadcrumb) markedly improves citation rates
         // in AI answer engines. The Q&A text is shared verbatim with the

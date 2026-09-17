@@ -121,6 +121,9 @@ export default function Recommendations() {
                       url: rec.resource.url,
                       description: rec.resource.description,
                       category: rec.resource.category,
+                       kind: rec.resource.kind,
+                       resolvedKind: rec.resource.resolvedKind,
+                       metadata: rec.resource.metadata,
                     }}
                   />
                 ))}

@@ -4,7 +4,15 @@ import { CanonicalAnatomy, CanonicalShowcase } from "./canonical/CanonicalShowca
 
 type View = "showcase" | "anatomy" | "docs";
 function readView(): View {
-  const hash = decodeURIComponent(window.location.hash)
+  let rawHash = window.location.hash;
+  // The URL is user-controlled. A malformed percent escape must not prevent
+  // the artifact shell from mounting before the browser can render it.
+  try {
+    rawHash = decodeURIComponent(rawHash);
+  } catch {
+    // Keep the undecoded hash and fall back to the showcase route below.
+  }
+  const hash = rawHash
     .replace(/^#\/?/, "")
     .split(/[?&/]/, 1)[0]
     .toLowerCase();

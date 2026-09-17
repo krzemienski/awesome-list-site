@@ -1,5 +1,5 @@
 import { JourneyCardSkeleton } from "@/components/ui/skeletons";
-import { useState } from "react";
+import { lazy, Suspense, useState } from "react";
 import { useQuery, useMutation } from "@tanstack/react-query";
 import { useLocation, Link } from "wouter";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader } from "@/components/ui/card";
@@ -7,7 +7,6 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
 import { journeysHubDescription } from "@shared/seo-templates";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { BookOpen, Clock, Award, ArrowRight, Play, CheckCircle2, Trophy, Loader2 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useAuth } from "@/hooks/useAuth";
@@ -18,6 +17,35 @@ import { trackJourneyStart } from "@/lib/analytics";
 import SEOHead from "@/components/layout/SEOHead";
 import { writeFilterParams, usePopstateParams } from "@/lib/url-filter-state";
 import "@/styles/pages/discovery-journeys.css";
+
+// The Radix Select primitive is only needed after the journey route is
+// reached. Keep it out of the route's eager chunk; the native select preserves
+// the filter while this small UI chunk is loading.
+const Select = lazy(() =>
+  import("@/components/ui/select").then(({ Select: component }) => ({
+    default: component,
+  })),
+);
+const SelectContent = lazy(() =>
+  import("@/components/ui/select").then(({ SelectContent: component }) => ({
+    default: component,
+  })),
+);
+const SelectItem = lazy(() =>
+  import("@/components/ui/select").then(({ SelectItem: component }) => ({
+    default: component,
+  })),
+);
+const SelectTrigger = lazy(() =>
+  import("@/components/ui/select").then(({ SelectTrigger: component }) => ({
+    default: component,
+  })),
+);
+const SelectValue = lazy(() =>
+  import("@/components/ui/select").then(({ SelectValue: component }) => ({
+    default: component,
+  })),
+);
 
 interface Journey {
   id: number;
@@ -35,6 +63,20 @@ interface Journey {
   // Task #330: first incomplete logical step (server-computed with the same
   // grouped-step accounting as completedStepCount); null when complete/empty.
   nextStepNumber?: number | null;
+}
+
+// The API normally returns a count bounded by stepCount, but keep the
+// presentation truthful if stale or hand-authored journey data briefly
+// violates that invariant. Without the clamp a progress bar can overflow
+// its track (or expose an invalid aria-valuenow value) on the listing page.
+function journeyProgressPercent(journey: Journey): number {
+  if (!journey.stepCount || journey.stepCount <= 0) return 0;
+
+  const completed = Number.isFinite(journey.completedStepCount)
+    ? journey.completedStepCount ?? 0
+    : 0;
+  const rawPercent = (completed / journey.stepCount) * 100;
+  return Math.min(100, Math.max(0, Math.round(rawPercent)));
 }
 
 export default function Journeys() {
@@ -223,19 +265,38 @@ export default function Journeys() {
       <div className="journeys-toolbar">
         <div className="journeys-filter">
           <span className="journeys-filter__label">Filter by category:</span>
-          <Select value={selectedCategory} onValueChange={handleCategoryChange}>
-            <SelectTrigger className="journeys-filter__control" aria-label="Filter by category" data-testid="select-category-filter">
-              <SelectValue />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="all">All Categories</SelectItem>
-              {categories.map(category => (
-                <SelectItem key={category} value={category}>
-                  {category}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
+          <Suspense
+            fallback={(
+              <select
+                className="journeys-filter__control"
+                aria-label="Filter by category"
+                data-testid="select-category-filter"
+                value={selectedCategory}
+                onChange={(event) => handleCategoryChange(event.target.value)}
+              >
+                <option value="all">All Categories</option>
+                {categories.map((category) => (
+                  <option key={category} value={category}>
+                    {category}
+                  </option>
+                ))}
+              </select>
+            )}
+          >
+            <Select value={selectedCategory} onValueChange={handleCategoryChange}>
+              <SelectTrigger className="journeys-filter__control" aria-label="Filter by category" data-testid="select-category-filter">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">All Categories</SelectItem>
+                {categories.map(category => (
+                  <SelectItem key={category} value={category}>
+                    {category}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </Suspense>
         </div>
         <div className="journeys-toolbar__count">
           {filteredJourneys.length} {filteredJourneys.length === 1 ? 'journey' : 'journeys'} available
@@ -276,9 +337,7 @@ export default function Journeys() {
         <div className="journeys-grid">
           {filteredJourneys.map((journey) => {
             const enrolled = journey.isEnrolled || false;
-            const progressPercent = journey.stepCount && journey.stepCount > 0
-              ? Math.round(((journey.completedStepCount || 0) / journey.stepCount) * 100)
-              : 0;
+            const progressPercent = journeyProgressPercent(journey);
             const isStartingThis =
               startJourneyMutation.isPending &&
               startJourneyMutation.variables?.id === journey.id;

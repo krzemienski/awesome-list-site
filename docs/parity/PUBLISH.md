@@ -1,5 +1,9 @@
 # Production release record
 
+Latest product changes and real-browser outcomes are recorded in the
+[parallel repair report](worklog/site-repair-2026-09-17.md). No publishing
+action was taken, and historical pixel results below remain historical.
+
 ## Latest local redesign follow-through — 2026-09-17
 
 The working tree based on `a09ad484` includes further verified responsive,

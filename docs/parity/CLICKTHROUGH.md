@@ -200,6 +200,12 @@ Declared gaps.
    was not attempted here because rewriting `main` in a task environment
    while other parity workers rebase onto it would break their merges.
 
+## Subsequent product repair verification
+
+See [parallel repairs, 2026-09-17](worklog/site-repair-2026-09-17.md) for the
+new built-in tester's guest, all-admin-tab, resource lifecycle and
+bookmark/collection/note journeys, including the failures actually repaired.
+
 ## Retained evidence layout
 
 ```

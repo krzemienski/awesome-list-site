@@ -128,6 +128,24 @@
   font-size: 13.5px;
   font-weight: 600;
 }
+.admin-research-note__open {
+  display: block;
+  border: 0;
+  padding: 0;
+  color: inherit;
+  background: transparent;
+  cursor: pointer;
+}
+.admin-research-note__open:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 4px;
+}
+.admin-research-note__excerpt {
+  margin-bottom: 10px;
+  color: var(--text-3);
+  font-size: 12px;
+  line-height: 1.5;
+}
 .admin-research-note__meta {
   display: flex;
   justify-content: space-between;

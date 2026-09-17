@@ -23,6 +23,7 @@
 
 import type { Express, Request, Response } from "express";
 import { SITE_URL, resolveOgImageMeta } from "../og-middleware";
+import { config } from "../config";
 // BUG-012 (audit 2): the sitemap's paginated-URL counts must use the exact
 // flatten + page size the SSR renderer and client use (indexable == sitemap).
 import {
@@ -629,10 +630,30 @@ ${urls.join('\n')}
   // static Expires would invalidate the whole record. GitHub private
   // vulnerability reporting is DISABLED on both project repos (verified
   // 2026-08-03 via the REST API), so Contact points at the public issue
-  // tracker the site already advertises on /about.
+  // tracker configured for the deployment. RFC 9116 requires Contact, so an
+  // unconfigured or invalid destination must not produce a successful record.
   const serveSecurityTxt = (_req: Request, res: Response) => {
-    const siteUrl = (process.env.PUBLIC_SITE_URL || "https://awesome.video")
-      .replace(/\/$/, "");
+    const siteUrl = SITE_URL.replace(/\/$/, "");
+    // CONTACT_ISSUES_URL (or contact.issues_url in the YAML config) is the
+    // supported issue-tracker setting. Do not infer or invent a tracker for a
+    // deployment that has not configured one; return an unavailable response
+    // instead of serving a record without the required Contact field.
+    const issuesUrl = (() => {
+      const candidate = config.contact.issues_url.trim();
+      if (!candidate) return "";
+      try {
+        return new URL(candidate).protocol === "https:" ? candidate : "";
+      } catch {
+        return "";
+      }
+    })();
+    if (!issuesUrl) {
+      return res
+        .status(404)
+        .set("Cache-Control", "no-store")
+        .type("text/plain; charset=utf-8")
+        .send("security.txt unavailable: no validated security contact is configured\n");
+    }
     const expires = new Date(
       Date.now() + 180 * 24 * 60 * 60 * 1000,
     ).toISOString();
@@ -641,7 +662,7 @@ ${urls.join('\n')}
       .type("text/plain; charset=utf-8")
       .send(
         [
-          "Contact: https://github.com/krzemienski/awesome-video/issues",
+          `Contact: ${issuesUrl}`,
           `Expires: ${expires}`,
           "Preferred-Languages: en",
           `Canonical: ${siteUrl}/.well-known/security.txt`,

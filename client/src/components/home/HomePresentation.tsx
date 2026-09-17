@@ -292,11 +292,18 @@ function ResourceLink({
 function ResourceCard({
   resource,
   featured = false,
+  selectedKind,
 }: {
   resource: Resource;
   featured?: boolean;
+  selectedKind?: ResourceKind | null;
 }) {
   const tags = resourceTags(resource);
+  const tagHref = (tag: string) => {
+    const query = new URLSearchParams({ tags: tag });
+    if (selectedKind) query.set("kind", selectedKind);
+    return `/?${query.toString()}`;
+  };
   return (
     <article className="home-resource-card card hoverable glow" data-testid={`card-home-resource-${resource.id}`}>
       <div className="home-resource-card-top">
@@ -317,7 +324,7 @@ function ResourceCard({
       <p className="home-resource-description">{resource.description}</p>
       <div className="home-resource-tags" aria-label={`Tags for ${resource.title}`}>
         {tags.slice(0, 3).map((tag) => (
-          <Link key={tag} href={`/?tags=${encodeURIComponent(tag)}`} className="home-resource-tag chip mono">
+          <Link key={tag} href={tagHref(tag)} className="home-resource-tag chip mono">
             #{tag}
           </Link>
         ))}
@@ -352,14 +359,16 @@ function SectionHeader({
 function CategoryHeading({
   category,
   selectedTags,
+  selectedKind,
 }: {
   category: HomeCategoryView;
   selectedTags: string[];
+  selectedKind?: ResourceKind | null;
 }) {
-  const tagsQuery =
-    selectedTags.length > 0
-      ? `?tags=${encodeURIComponent(selectedTags.join(","))}`
-      : "";
+  const query = new URLSearchParams();
+  if (selectedTags.length > 0) query.set("tags", selectedTags.join(","));
+  if (selectedKind) query.set("kind", selectedKind);
+  const tagsQuery = query.toString() ? `?${query.toString()}` : "";
   return (
     <Link
       href={`/category/${category.slug}${tagsQuery}`}
@@ -378,9 +387,10 @@ function CategoryHeading({
   );
 }
 
-function CategoryIndex({ categories, selectedTags, onClearFilters }: {
+function CategoryIndex({ categories, selectedTags, selectedKind, onClearFilters }: {
   categories: HomeCategoryView[];
   selectedTags: string[];
+  selectedKind?: ResourceKind | null;
   onClearFilters: () => void;
 }) {
   if (categories.length === 0) {
@@ -398,7 +408,11 @@ function CategoryIndex({ categories, selectedTags, onClearFilters }: {
     <div className="home-category-grid" data-testid="list-categories">
       {categories.map((category) => (
         <section className="home-category-section" key={category.slug}>
-          <CategoryHeading category={category} selectedTags={selectedTags} />
+          <CategoryHeading
+            category={category}
+            selectedTags={selectedTags}
+            selectedKind={selectedKind}
+          />
           {category.teaserDescription ? (
             <span className="sr-only" data-testid={`text-category-teaser-${category.slug}`}>
               <span className="font-medium">
@@ -411,7 +425,12 @@ function CategoryIndex({ categories, selectedTags, onClearFilters }: {
             {category.subcategories.map((subcategory) => (
               <Link
                 key={subcategory.slug}
-                href={`/subcategory/${subcategory.slug}${selectedTags.length > 0 ? `?tags=${encodeURIComponent(selectedTags.join(","))}` : ""}`}
+                href={(() => {
+                  const query = new URLSearchParams();
+                  if (selectedTags.length > 0) query.set("tags", selectedTags.join(","));
+                  if (selectedKind) query.set("kind", selectedKind);
+                  return `/subcategory/${subcategory.slug}${query.toString() ? `?${query.toString()}` : ""}`;
+                })()}
                 className="home-subcategory-row"
                 data-testid={`link-subcategory-${subcategory.slug}`}
               >
@@ -475,8 +494,9 @@ function IndexLayout({
   recent,
   stats,
   selectedTags,
+  selectedKind,
   onClearFilters,
-}: Pick<HomePresentationProps, "categories" | "recent" | "stats" | "selectedTags" | "onClearFilters">) {
+}: Pick<HomePresentationProps, "categories" | "recent" | "stats" | "selectedTags" | "selectedKind" | "onClearFilters">) {
   return (
     <>
       <StatStrip stats={stats} layout="index" />
@@ -484,6 +504,7 @@ function IndexLayout({
         <CategoryIndex
           categories={categories}
           selectedTags={selectedTags}
+          selectedKind={selectedKind}
           onClearFilters={onClearFilters}
         />
         <RecentRail recent={recent} />
@@ -498,10 +519,12 @@ function CuratedLayout({
   featured,
   stats,
   selectedTags,
-}: Pick<HomePresentationProps, "categories" | "recent" | "featured" | "stats" | "selectedTags">) {
-  const tagSearch = selectedTags.length > 0
-    ? `?tags=${encodeURIComponent(selectedTags.join(","))}`
-    : "";
+  selectedKind,
+}: Pick<HomePresentationProps, "categories" | "recent" | "featured" | "stats" | "selectedTags" | "selectedKind">) {
+  const query = new URLSearchParams();
+  if (selectedTags.length > 0) query.set("tags", selectedTags.join(","));
+  if (selectedKind) query.set("kind", selectedKind);
+  const tagSearch = query.toString() ? `?${query.toString()}` : "";
   return (
     <>
       <StatStrip stats={stats} layout="curated" />
@@ -524,7 +547,12 @@ function CuratedLayout({
         {featured.length > 0 ? (
           <div className="home-resource-grid">
             {featured.slice(0, 6).map((resource) => (
-              <ResourceCard key={String(resource.id)} resource={resource} featured />
+              <ResourceCard
+                key={String(resource.id)}
+                resource={resource}
+                featured
+                selectedKind={selectedKind}
+              />
             ))}
           </div>
         ) : (
@@ -634,6 +662,7 @@ export default function HomePresentation({
           recent={recent}
           stats={stats}
           selectedTags={selectedTags}
+          selectedKind={selectedKind}
           onClearFilters={onClearFilters}
         />
       ) : (
@@ -643,6 +672,7 @@ export default function HomePresentation({
           featured={featured}
           stats={stats}
           selectedTags={selectedTags}
+          selectedKind={selectedKind}
         />
       )}
       {filters}

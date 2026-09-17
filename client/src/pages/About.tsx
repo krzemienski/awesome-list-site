@@ -24,7 +24,9 @@ import {
 import { useQuery } from "@tanstack/react-query";
 import { getAboutFaqs } from "@shared/faq";
 import { MAINTAINER } from "@shared/about-content";
+import { resolveSiteIdentity, siteHost } from "@shared/site-identity";
 import { fetchStaticAwesomeList } from "@/lib/static-data";
+import { preferredContactDestination, useContactConfig } from "@/lib/contact";
 import "@/styles/pages/about.css";
 
 interface AboutCatalogData {
@@ -40,10 +42,29 @@ export default function About() {
     queryFn: fetchStaticAwesomeList,
     staleTime: 1000 * 60 * 60,
   });
-  const aboutFaqs = getAboutFaqs(treeData?.resources?.length);
+  const { data: contactConfig } = useContactConfig(true);
+  const contactDestination = preferredContactDestination(contactConfig);
+  const siteIdentity = resolveSiteIdentity(
+    contactConfig?.site
+      ? {
+          name: contactConfig.site.title,
+          description: contactConfig.site.description,
+          url: contactConfig.site.url,
+          author: contactConfig.site.author,
+          repoUrl: contactConfig.site.repoUrl,
+          repoBranch: contactConfig.site.repoBranch,
+        }
+      : undefined,
+  );
+  const aboutFaqs = getAboutFaqs({
+    resourceCount: treeData?.resources?.length,
+    categoryCount: treeData?.categories?.length,
+    site: siteIdentity,
+  });
+  const siteHostName = siteHost(siteIdentity.url);
   const catalogSummary =
     treeData?.resources?.length && treeData?.categories?.length
-      ? `Awesome.video is a hand-curated index of ${treeData.resources.length.toLocaleString()} resources across ${treeData.categories.length} domains — encoding, transport, players, infrastructure, standards. Maintained as the canonical reference for people who actually ship video in production. `
+      ? `${siteHostName || siteIdentity.name} is a hand-curated index of ${treeData.resources.length.toLocaleString()} resources across ${treeData.categories.length} domains — encoding, transport, players, infrastructure, standards. Maintained as the canonical reference for people who actually ship video in production. `
       : "";
   const [openFaqs, setOpenFaqs] = useState<Set<number>>(() => new Set());
 
@@ -182,16 +203,22 @@ export default function About() {
               </p>
               <p className="about-body-copy">
                 Questions or corrections? The best way to reach us is to{" "}
-                <a
-                  href="https://github.com/krzemienski/awesome-video/issues"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="about-inline-link about-inline-link-text"
-                  data-testid="link-about-github-issues"
-                >
-                  open an issue on GitHub
-                  <ExternalLink className="about-external-icon" aria-hidden="true" />
-                </a>
+                {contactDestination ? (
+                  <a
+                    href={contactDestination.href}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="about-inline-link about-inline-link-text"
+                    data-testid="link-about-github-issues"
+                  >
+                    {contactDestination.label}
+                    <ExternalLink className="about-external-icon" aria-hidden="true" />
+                  </a>
+                ) : (
+                  <span data-testid="text-about-contact-unavailable">
+                    no configured public contact destination is available
+                  </span>
+                )}
                 .
               </p>
               <p className="about-body-copy">

@@ -998,6 +998,10 @@ export function registerAdminContentRoutes(
         status: validatedData.status || 'approved',
         submittedBy: userId,
         kind: validatedData.kind ?? null,
+         // The admin editor submits metadata.featured on create. Preserve the
+         // validated metadata payload just like the admin update path does;
+         // omitting it here silently discarded the featured toggle.
+         metadata: validatedData.metadata,
       });
       
       await auditRepo.logResourceAudit(

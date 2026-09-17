@@ -1,27 +1,20 @@
 ---
-name: Hover-revealed controls inside flex action groups
-description: Why "opacity:0; position:absolute" reveal patterns make the wrong button fire, and the anchoring pattern that survives the pixel-parity harness.
+name: Reliable table action hitboxes
+description: Why hidden table actions can pass screenshots and keyboard checks while failing real pointer clicks.
 ---
 
-Rule: a hover/focus-revealed control in a flex action group must (1) get
-explicit offsets that place it where no visible sibling sits, (2) stay
-`pointer-events: none` until revealed, and (3) stay out of flow when
-revealed. Reveal on `tr:hover` (or the nearest row-level ancestor), not on the
-group's own `:hover`.
+Rule: prefer permanently visible, normal-flow controls for consequential
+table actions. Do not preserve hover-only prototype paint at the expense of
+reliable pointer interaction.
 
-**Why:** `opacity: 0; position: absolute` with no offsets leaves the box at its
-static position — in a `justify-content: flex-end` group that is on top of the
-last visible sibling — and it still receives clicks. Flipping it to `static`
-on hover re-flows the group and slides the visible sibling under the pointer,
-so a plain click on Edit opened the Delete dialog (admin Resources and
-Categories tables, 2026-09). Revealing only on the group's own `:hover` also
-means a pointer moved straight onto the hidden control never reveals it
-(it is outside the group's box and inert), so Playwright "intercepts pointer
-events" and users see nothing.
+**Why:** invisible absolute controls can cover their neighbours; revealing
+them in flow can move a different action under the pointer. Even explicit
+offsets, row-hover reveal and stacking fixes remained unreliable after a
+dialog's Cancel restored focus. Keyboard activation and a resting screenshot
+both concealed the failure. Normal-flow actions resolved the repeated
+pointer-only failure without changing the underlying operation.
 
-**How to apply:** the resting frame the pixel harness captures must not
-change, so keep the change to hover/focus/tools-open states only; if the group
-spans the whole cell, add `width: fit-content; margin-inline-start: auto` so
-the control anchors beside the last button rather than at the far edge of the
-cell. Verify with a pointer-only click on the visible neighbour AND a direct
-pointer move onto the hidden control.
+**How to apply:** reserve enough cell width for every action and use stable
+touch targets. Verify normal pointer open → Cancel → move away → reopen,
+not just one click or keyboard Enter. Keep the resulting reference difference
+honest rather than concealing the usable control again.

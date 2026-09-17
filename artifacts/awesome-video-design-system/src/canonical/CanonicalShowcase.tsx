@@ -682,7 +682,7 @@ function FlowDiagramsSection({ accent }) {
           const s = SYSTEM_FLOW_STYLES[sysId];
           return (
             <div key={sysId}>
-              <div style={{
+              <div className="ds-flow-system-header" style={{
                 display: 'grid',
                 gridTemplateColumns: 'minmax(0, 1fr) 240px',
                 gap: 32, alignItems: 'flex-start',

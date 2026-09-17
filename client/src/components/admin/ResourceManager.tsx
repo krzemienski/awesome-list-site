@@ -534,17 +534,30 @@ export default function ResourceManager() {
         body: JSON.stringify(data)
       });
     },
-    onSuccess: () => {
+    onSuccess: (createdResource: AdminResource) => {
       queryClient.invalidateQueries({ queryKey: ['/api/admin/resources'] });
       queryClient.invalidateQueries({ queryKey: ['/api/resources'] });
       queryClient.invalidateQueries({ queryKey: ["awesome-list-data"] });
       queryClient.invalidateQueries({ queryKey: ["awesome-list-nav"] });
       queryClient.invalidateQueries({ queryKey: ["/api/admin/stats"] });
+      // The catalog opens on approved resources, while admin-created entries
+      // normally enter the pending workflow. Move the table to the response's
+      // actual status and clear stale filters so the new row is immediately
+      // visible instead of reporting an unexplained exact-search miss.
+      const createdStatus = STATUS_OPTIONS.find((option) => option.value === createdResource?.status)?.value
+        ?? editForm.status
+        ?? "pending";
+      setSearch("");
+      setDebouncedSearch("");
+      setCategoryFilter("");
+      setStatusFilter(createdStatus);
+      setPage(1);
+      setSelectedResourceIds([]);
       setCreateDialogOpen(false);
       resetEditForm();
       toast({
         title: "Resource Created",
-        description: "The new resource has been added successfully.",
+        description: `The new ${createdStatus} resource is now visible in the catalog.`,
       });
     },
     onError: (error: Error) => {
@@ -1010,9 +1023,10 @@ export default function ResourceManager() {
               variant="ghost"
               onClick={() => setCatalogToolsOpen((open) => !open)}
               aria-expanded={catalogToolsOpen}
+              aria-controls="resource-filters"
               data-testid="button-resource-tools"
             >
-              More
+              {catalogToolsOpen ? "Hide filters and tools" : "Show filters and tools"}
             </Button>
             <button type="button" className="btn primary" onClick={openCreateDialog} data-testid="button-add-resource">
               <Plus className="h-3 w-3" />
@@ -1021,7 +1035,13 @@ export default function ResourceManager() {
           </div>
         </CardHeader>
         <CardContent className="admin-catalog-resources__content space-y-4">
-          <form onSubmit={handleSearch} className="admin-catalog-resources__filters flex flex-col sm:flex-row gap-3">
+          <form
+            id="resource-filters"
+            role="region"
+            aria-label="Resource filters and tools"
+            onSubmit={handleSearch}
+            className="admin-catalog-resources__filters flex flex-col sm:flex-row gap-3"
+          >
             <div className="flex-1 relative">
               <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-[var(--text-2)]" />
               <Input
@@ -1316,7 +1336,7 @@ export default function ResourceManager() {
                     <TableCell>
                       {featuredValue(resource) ? <Badge variant="accent">★</Badge> : <span className="admin-catalog-resources__muted">—</span>}
                     </TableCell>
-                    <TableCell className="text-right">
+                    <TableCell className="admin-catalog-resources__actions-cell text-right">
                       <div className="admin-catalog-resources__row-actions">
                         <Button variant="ghost" size="sm" asChild>
                           <a href={`/resource/${resource.id}`}>View</a>

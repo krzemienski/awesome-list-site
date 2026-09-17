@@ -188,10 +188,37 @@
   display: flex !important;
 }
 
+.taxonomy-view-toggle-row {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 10px;
+  min-height: 44px;
+}
+
+.taxonomy-view-toggle-label {
+  color: var(--text-3);
+  font-family: var(--font-mono);
+  font-size: 11px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
 .taxonomy-tools-toggle {
   position: absolute;
   top: -6px;
   right: 0;
+}
+
+@media (max-width: 639px) {
+  .taxonomy-summary {
+    padding-right: 0;
+  }
+
+  .taxonomy-tools-toggle {
+    position: static;
+    margin-left: auto;
+  }
 }
 
 .taxonomy-results-heading-row {

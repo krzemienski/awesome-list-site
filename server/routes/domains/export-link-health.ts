@@ -61,6 +61,11 @@ import type { RequestHandler } from "express";
 import crypto from "crypto";
 import { sql } from "drizzle-orm";
 import type { Resource } from "@shared/schema";
+import {
+  RESOURCE_KIND_VALUES,
+  resourceKindSchema,
+  type ResourceKind,
+} from "@shared/resourceKinds";
 import { taxonomyScopeIntro } from "@shared/seo-content-templates";
 import { normalizeGithubRepoInput } from "@shared/validation";
 import { db } from "../../db";
@@ -88,6 +93,7 @@ import {
   type ListingLevel,
 } from "../../seo-content";
 import { normalizeTagFilter } from "@shared/tagNormalize";
+import { resolveResourceKind } from "../../lib/resourceKinds";
 import { isDatabaseUnavailableError } from "../../db/errors";
 import { ServiceUnavailableError } from "../../middleware/errors";
 import { runHeavyWork, startHeavyWork } from "../../ops/heavyWork";
@@ -1398,33 +1404,78 @@ export function registerAwesomeListDiscoveryRoutes(
             : findSubSubcategory(tree, slug);
       if (!match) return res.status(404).json({ message: "Taxonomy node not found" });
 
-      const allResources = flattenListingResources(match.node, level as ListingLevel);
+      // Keep taxonomy listings on the same read-time resolver as
+      // /api/resources?kind and /api/resources/kinds/counts. The tree is
+      // already a public projection, so resolving each row here is
+      // synchronous and does not introduce a second kind implementation.
+      const rawKind = req.query.kind;
+      let requestedKind: ResourceKind | undefined;
+      if (rawKind !== undefined) {
+        if (typeof rawKind !== "string") {
+          return res.status(400).json({
+            error: "invalid_kind",
+            message: `kind must be one of: ${RESOURCE_KIND_VALUES.join(", ")}`,
+            allowed: RESOURCE_KIND_VALUES,
+          });
+        }
+        const normalizedKind = rawKind.trim().toLowerCase();
+        if (!normalizedKind) {
+          requestedKind = undefined;
+        } else {
+          const parsedKind = resourceKindSchema.safeParse(normalizedKind);
+          if (!parsedKind.success) {
+            return res.status(400).json({
+              error: "invalid_kind",
+              message: `kind must be one of: ${RESOURCE_KIND_VALUES.join(", ")}`,
+              allowed: RESOURCE_KIND_VALUES,
+            });
+          }
+          requestedKind = parsedKind.data;
+        }
+      }
+      const kindMatches = (item: any): boolean =>
+        requestedKind === undefined ||
+        resolveResourceKind(item).kind === requestedKind;
+      const allResources = flattenListingResources(match.node, level as ListingLevel)
+        .filter(kindMatches);
       const requestedSubcategory =
         typeof req.query.subcategory === "string" ? req.query.subcategory : undefined;
       const requestedSubSubcategory =
         typeof req.query.subSubcategory === "string" ? req.query.subSubcategory : undefined;
       const requestedGeneral = req.query.general === "1";
       const directResources = new Set(
-        (match.node?.resources ?? []).map((item: any) => `${item?.id ?? ""}|${item?.url ?? ""}`),
+        (match.node?.resources ?? [])
+          .filter(kindMatches)
+          .map((item: any) => `${item?.id ?? ""}|${item?.url ?? ""}`),
       );
+      const countNodeResourcesForKind = (node: any): number => {
+        let total = (node?.resources ?? []).filter(kindMatches).length;
+        for (const sub of node?.subcategories ?? []) {
+          total += countNodeResourcesForKind(sub);
+        }
+        for (const subSub of node?.subSubcategories ?? []) {
+          total += countNodeResourcesForKind(subSub);
+        }
+        return total;
+      };
 
       const children =
         level === "category"
           ? (match.node.subcategories ?? []).map((sub: any) => ({
               name: sub.name,
               slug: sub.slug,
-              count: countNodeResources(sub),
+              count: countNodeResourcesForKind(sub),
               subSubcategories: (sub.subSubcategories ?? []).map((subSub: any) => ({
                 name: subSub.name,
                 slug: subSub.slug,
-                count: countNodeResources(subSub),
+                count: countNodeResourcesForKind(subSub),
               })),
             }))
           : level === "subcategory"
             ? (match.node.subSubcategories ?? []).map((subSub: any) => ({
                 name: subSub.name,
                 slug: subSub.slug,
-                count: countNodeResources(subSub),
+                count: countNodeResourcesForKind(subSub),
               }))
             : [];
       const validSubcategory =

@@ -146,7 +146,7 @@
 - [Route remounts + capture re-scroll](route-remount-causes.md) — inline `component={() => …}` routes and first-observation `qc.clear()` remount pages; reveal observers must disconnect after one reveal.
 - [A11y gates need two probes](a11y-gate-hidden-probes.md) — getByRole misses `inert` ancestors; sr-only controls need role/name + ARIA snapshot + ancestor walk; forced-colors borders die under any `border:0`.
 - [44px floor vs frozen controls](accessible-floor-vs-frozen-controls.md) — the 12 artifact parity fails are the a11y floor by contract, don't re-fix; scope table nowraps to ONE cell; sweep parity users after a killed run.
-- [Hidden-control hitbox](hidden-control-hitbox.md) — opacity:0+absolute-without-offsets sits over the last button and still takes clicks; flipping to static on hover slides Edit under the pointer; anchor out of flow + reveal on tr:hover.
+- [Table action hitboxes](hidden-control-hitbox.md) — prefer visible normal-flow actions; hover/stacking fixes can still fail pointer reopen after Cancel despite keyboard success.
 - [Built-in tester + Clerk](native-tester-clerk-workaround.md) — tester Clerk helper fails on the proxied dev host; mint `+clerk_test` users via backend API, resend creds every follow-up, Clerk-first teardown + residue sweep.
 - [LCP dated to the bundle by re-inserting prerender](lcp-reinserted-prerender.md) — moving prerender nodes after the bundle runs re-registers a larger web-font LCP candidate; do holds in the pre-boot inline script, keep them semantic until adopted.
 - [Contract-over-reference residuals](contract-over-reference-residuals.md) — behaviour the contract requires but the prototype lacks: log its failing pixel rows the same pass; sr-only keeps crawler text.

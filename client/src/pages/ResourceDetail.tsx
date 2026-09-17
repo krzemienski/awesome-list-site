@@ -58,6 +58,15 @@ const VariantResourceAction = import.meta.env.VITE_CONTACT_VARIANT === "d"
   ? lazy(() => import("@/components/contact/contact-resource-action").then((module) => ({ default: module.ContactResourceAction })))
   : null;
 
+const RESOURCE_KIND_LABELS: Record<ResourceKind, string> = {
+  tools: "Tools & SDKs",
+  libraries: "Libraries",
+  standards: "Standards",
+  events: "Events",
+  protocols: "Protocols",
+  other: "Other",
+};
+
 function ContactResourceAction(props: { onSuggestEdit: () => void; fallback: ReactNode }) {
   return VariantResourceAction ? (
     <Suspense fallback={props.fallback}><VariantResourceAction {...props} /></Suspense>
@@ -72,7 +81,6 @@ export default function ResourceDetail() {
   const [, setLocation] = useLocation();
   const [suggestEditOpen, setSuggestEditOpen] = useState(false);
   const [imageLoaded, setImageLoaded] = useState(false);
-  const [moreOpen, setMoreOpen] = useState(false);
 
   const { data: resource, isLoading, error } = useQuery<Resource & { resolvedKind?: ResourceKind; featured?: boolean }>({
     queryKey: ['/api/resources', id],
@@ -483,6 +491,12 @@ export default function ResourceDetail() {
 
   const metadata = resource?.metadata as Record<string, any> | undefined;
   const hasOgImage = metadata?.ogImage;
+  // Imported rows store this state in metadata; feed projections may also
+  // expose an additive top-level flag. Accept both public response shapes.
+  const isFeatured =
+    resource?.featured === true ||
+    metadata?.featured === true ||
+    metadata?.featured === "true";
   const scrapedTitle = metadata?.scrapedTitle || metadata?.ogTitle;
   const scrapedDescription = metadata?.scrapedDescription || metadata?.ogDescription;
   const urlScraped = metadata?.urlScraped;
@@ -613,17 +627,19 @@ export default function ResourceDetail() {
               </Link>
             </span>
           )}
-          {resource.featured && (
+          {isFeatured && (
             <span className="resource-detail-chip-wrap">
-              <span className="chip accent">
+              <span className="chip accent" data-testid="badge-featured">
                 <span className="resource-detail-chip-label">★ FEATURED</span>
               </span>
             </span>
           )}
           {resource.resolvedKind && (
             <span className="resource-detail-chip-wrap">
-              <span className="chip" data-kind-source="resolvedKind">
-                <span className="resource-detail-chip-label">{resource.resolvedKind}</span>
+              <span className="chip" data-kind-source="resolvedKind" data-testid="badge-kind">
+                <span className="resource-detail-chip-label">
+                  {RESOURCE_KIND_LABELS[resource.resolvedKind] ?? resource.resolvedKind}
+                </span>
               </span>
             </span>
           )}
@@ -667,12 +683,7 @@ export default function ResourceDetail() {
         </p>
       </section>
 
-      <details
-        className="resource-detail-more"
-        onToggle={(event) => setMoreOpen(event.currentTarget.open)}
-      >
-        <summary className="btn ghost">More</summary>
-        <div className="resource-detail-actions">
+      <div className="resource-detail-actions" data-testid="resource-actions">
           <Button asChild>
             <a href={resource.url} target="_blank" rel="noopener noreferrer"
               onClick={handleVisitResource} data-testid="button-visit">
@@ -738,8 +749,7 @@ export default function ResourceDetail() {
               </Button>
             )}
           />
-        </div>
-      </details>
+      </div>
 
       {/* BUG-021 (run25): saved bookmark notes render here too (parity with
           the /bookmarks cards), with a pen-edit into the shared dialog. */}
@@ -788,7 +798,7 @@ export default function ResourceDetail() {
       <div className="resource-detail-body">
         <div>
           <Card className="resource-detail-content">
-            {moreOpen && hasOgImage && (
+            {hasOgImage && (
               <div className="relative w-full h-48 md:h-64 overflow-hidden bg-gradient-to-b from-primary/10 to-transparent">
                 {metadata.ogImageBlurhash && !imageLoaded && (
                   <div className="absolute inset-0">

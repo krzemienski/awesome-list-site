@@ -9,6 +9,7 @@ import BookmarkButton from "./BookmarkButton";
 import { cn } from "@/lib/utils";
 import { Blurhash } from "react-blurhash";
 import type { Resource } from "@shared/schema";
+import type { ResourceKind } from "@shared/resourceKinds";
 import { tagLandingPath } from "@shared/tagNormalize";
 import "@/styles/components/resource-card.css";
 
@@ -33,8 +34,12 @@ interface ResourceCardProps {
     isBookmarked?: boolean;
     favoriteCount?: number;
     bookmarkNotes?: string;
+    featured?: boolean;
+    kind?: ResourceKind | null;
+    resolvedKind?: ResourceKind;
+    metadata?: Record<string, unknown>;
   };
-  fullResource?: Resource;
+  fullResource?: Resource & { resolvedKind?: ResourceKind; featured?: boolean };
   className?: string;
   onClick?: () => void;
   /** When provided, normal clicks still apply the hosting page's filter while
@@ -133,6 +138,26 @@ function ResourceCard({
     searchTsv: null,
   };
   const categoryMark = resourceCategoryMark(resource.category);
+  const resourceMetadata = fullResource?.metadata ?? resource.metadata;
+  const isFeatured =
+    resource.featured === true ||
+    fullResource?.featured === true ||
+    resourceMetadata?.featured === true ||
+    resourceMetadata?.featured === "true";
+  const resolvedKind =
+    resource.resolvedKind ??
+    fullResource?.resolvedKind ??
+    fullResource?.kind ??
+    resource.kind ??
+    null;
+  const kindLabels: Record<ResourceKind, string> = {
+    tools: "Tools & SDKs",
+    libraries: "Libraries",
+    standards: "Standards",
+    events: "Events",
+    protocols: "Protocols",
+    other: "Other",
+  };
 
   // Run3 audit R3-31: the card title is a REAL anchor (stretched-link pattern)
   // instead of a JS-only onClick <div>, so middle-click / cmd-click / "open in
@@ -193,23 +218,30 @@ function ResourceCard({
           </div>
           {/* R2-L09: shown to anonymous users too — the buttons themselves
               prompt sign-in on click instead of hiding the affordance. */}
-          {showPersonalActions && (
-            <div className="resource-card__personal-actions no-print relative z-10">
-              <FavoriteButton
-                resourceId={resource.id}
-                isFavorited={resource.isFavorited}
-                favoriteCount={resource.favoriteCount}
-                size="sm"
-                showCount={false}
-              />
-              <BookmarkButton
-                resourceId={resource.id}
-                isBookmarked={resource.isBookmarked}
-                notes={resource.bookmarkNotes}
-                size="sm"
-              />
-            </div>
-          )}
+          <div className="resource-card__top-actions">
+            {isFeatured && (
+              <span className="resource-card__featured chip accent" data-testid={`badge-featured-${resource.id}`}>
+                ★ FEATURED
+              </span>
+            )}
+            {showPersonalActions && (
+              <div className="resource-card__personal-actions no-print relative z-10">
+                <FavoriteButton
+                  resourceId={resource.id}
+                  isFavorited={resource.isFavorited}
+                  favoriteCount={resource.favoriteCount}
+                  size="sm"
+                  showCount={false}
+                />
+                <BookmarkButton
+                  resourceId={resource.id}
+                  isBookmarked={resource.isBookmarked}
+                  notes={resource.bookmarkNotes}
+                  size="sm"
+                />
+              </div>
+            )}
+          </div>
         </div>
         <div className="resource-card__title-row">
           {/* BUG-021/036 (run10): full title via native tooltip — the visual
@@ -316,6 +348,16 @@ function ResourceCard({
           {resource.category && (
             <Badge variant="chip" className="resource-card__category-badge">
               {resource.category}
+            </Badge>
+          )}
+          {resolvedKind && (
+            <Badge
+              variant="chip"
+              className="resource-card__kind-badge"
+              data-kind-source="resolvedKind"
+              data-testid={`badge-kind-${resource.id}`}
+            >
+              {kindLabels[resolvedKind]}
             </Badge>
           )}
           {/* BUG-018 (run14): tag pills are interactive — they filter the
@@ -432,6 +474,9 @@ export default memo(ResourceCard, (prevProps, nextProps) => {
     prevRes.isBookmarked === nextRes.isBookmarked &&
     prevRes.favoriteCount === nextRes.favoriteCount &&
     prevRes.bookmarkNotes === nextRes.bookmarkNotes &&
+    prevRes.featured === nextRes.featured &&
+    prevRes.kind === nextRes.kind &&
+    prevRes.resolvedKind === nextRes.resolvedKind &&
     prevRes.category === nextRes.category &&
     // Handle optional array comparison
     JSON.stringify(prevRes.tags || []) === JSON.stringify(nextRes.tags || []) &&

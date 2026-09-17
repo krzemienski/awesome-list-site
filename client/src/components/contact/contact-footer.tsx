@@ -19,12 +19,16 @@ function DestinationLink({
   icon: ReactNode;
 }) {
   if (!destination?.available || !destination.href) {
+    const reason = destination?.unavailableReason ?? `${label} is not configured`;
     return (
       <span
         className="contact-footer-link contact-footer-link--unavailable inline-flex min-h-[44px] items-center text-[color:var(--text-3)]"
-        title={destination?.unavailableReason ?? `${label} is not configured`}
+        title={reason}
+        aria-label={`${label} unavailable: ${reason}`}
+        data-testid={`contact-${label.toLowerCase().replace(/\s/g, "-")}-unavailable`}
       >
-        {label} unavailable
+        <span>{label} unavailable</span>
+        <span className="contact-footer-unavailable-reason"> — {reason}</span>
       </span>
     );
   }
@@ -98,8 +102,11 @@ export function ContactFooter() {
     <span
       className="contact-footer-link contact-footer-link--unavailable inline-flex min-h-[44px] items-center text-[color:var(--text-3)]"
       title={form?.unavailableReason ?? "No persistence destination is configured"}
+      aria-label={`Contact form unavailable: ${form?.unavailableReason ?? "No persistence destination is configured"}`}
+      data-testid="contact-open-form-unavailable"
     >
-      Contact form unavailable
+      <span>Contact form unavailable</span>
+      <span className="contact-footer-unavailable-reason"> — {form?.unavailableReason ?? "No persistence destination is configured"}</span>
     </span>
   );
 }

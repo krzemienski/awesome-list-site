@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -8,9 +8,11 @@ import { Badge } from "@/components/ui/badge";
 import { TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Folder, Download, Upload, RefreshCw, CheckCircle2, XCircle, Clock, ExternalLink, Activity } from "lucide-react";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { apiRequest } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
+import { useContactConfig } from "@/lib/contact";
 import {
   AdminOpsScrollArea as ScrollArea,
   AdminOpsTable as Table,
@@ -59,22 +61,56 @@ interface SyncQueueResponse {
 export default function GitHubSyncPanel() {
   const { toast } = useToast();
   const queryClient = useQueryClient();
-  const [repoUrl, setRepoUrl] = useState("krzemienski/awesome-video");
+  // The public config is the single source of truth for the deployment's
+  // repository. Keep the field empty until it arrives rather than falling
+  // back to a repository that could send an export to the wrong destination.
+  const { data: publicConfig, isLoading: configIsLoading, isError: configIsError } = useContactConfig(true);
+  const configuredRepo = useMemo(
+    () => normalizeGithubRepoInput(publicConfig?.site?.repoUrl),
+    [publicConfig?.site?.repoUrl],
+  );
+  const configuredBranch = publicConfig?.site?.repoBranch?.trim() || "branch unavailable";
+  const [repoUrl, setRepoUrl] = useState("");
+  const [repoUrlTouched, setRepoUrlTouched] = useState(false);
+  useEffect(() => {
+    if (!repoUrlTouched && configuredRepo) setRepoUrl(configuredRepo);
+  }, [configuredRepo, repoUrlTouched]);
   // Run16 BUG-039: import rewrites the local catalog and export pushes a real
   // commit — both need an explicit confirmation step before firing.
   const [confirmAction, setConfirmAction] = useState<"import" | "export" | null>(null);
   const [showDetails, setShowDetails] = useState(false);
+  const [selectedHistory, setSelectedHistory] = useState<SyncHistory | null>(null);
 
   // BUG-042 (run25): validate the repo reference BEFORE queueing a sync job —
   // "not a repo!!" used to be accepted and fail minutes later in the queue.
   const normalizedRepo = normalizeGithubRepoInput(repoUrl);
   const repoInvalid = repoUrl.trim().length > 0 && !normalizedRepo;
+  const repositoryExample = configuredRepo ?? "owner/repository";
 
-  const { data: syncHistory } = useQuery<SyncHistory[]>({
+  const resetRepository = () => {
+    if (configuredRepo) {
+      setRepoUrlTouched(false);
+      setRepoUrl(configuredRepo);
+    }
+  };
+
+  const {
+    data: syncHistory,
+    isLoading: syncHistoryIsLoading,
+    isError: syncHistoryIsError,
+    isFetching: syncHistoryIsFetching,
+    refetch: refetchSyncHistory,
+  } = useQuery<SyncHistory[]>({
     queryKey: ['/api/github/sync-history'],
   });
 
-  const { data: syncQueueData } = useQuery<SyncQueueResponse>({
+  const {
+    data: syncQueueData,
+    isLoading: syncQueueIsLoading,
+    isError: syncQueueIsError,
+    isFetching: syncQueueIsFetching,
+    refetch: refetchSyncQueue,
+  } = useQuery<SyncQueueResponse>({
     queryKey: ['/api/github/sync-status'],
   });
 
@@ -185,9 +221,11 @@ export default function GitHubSyncPanel() {
               <Folder className="h-5 w-5" />
             </div>
             <div className="ops-github-panel__repository-copy">
-              <CardTitle className="ops-github-panel__repository-name">{repoUrl}</CardTitle>
+              <CardTitle className="ops-github-panel__repository-name">
+                {repoUrl || (configIsLoading ? "Loading repository…" : "Repository not configured")}
+              </CardTitle>
               <p className="ops-github-panel__repository-meta">
-                main · {lastSync ? `last sync ${formatSyncDate(lastSync.createdAt)}` : "not synced yet"} · {syncQueueData?.total ?? 0} sync jobs
+                {configuredBranch} · {lastSync ? `last sync ${formatSyncDate(lastSync.createdAt)}` : "not synced yet"} · {syncQueueData?.total ?? 0} sync jobs
               </p>
             </div>
             <div className="ops-github-panel__repository-actions">
@@ -212,14 +250,25 @@ export default function GitHubSyncPanel() {
               </div>
             </div>
           </div>
+          {configIsError && !repoUrl && (
+            <Alert variant="destructive" data-testid="alert-github-config-error">
+              <XCircle className="h-4 w-4" />
+              <AlertDescription>
+                The configured repository is unavailable. Pull and export are disabled until the site repository is configured.
+              </AlertDescription>
+            </Alert>
+          )}
           {showDetails && <div className="ops-github-panel__repository-editor">
             <Label htmlFor="repo-url">Target Repository</Label>
             <div className="flex gap-2">
               <Input
                 id="repo-url"
-                placeholder="owner/repository"
+                placeholder={repositoryExample}
                 value={repoUrl}
-                onChange={(e) => setRepoUrl(e.target.value)}
+                onChange={(e) => {
+                  setRepoUrlTouched(true);
+                  setRepoUrl(e.target.value);
+                }}
                 className={`font-mono text-sm ${repoInvalid ? "border-destructive focus-visible:ring-destructive" : ""}`}
                 aria-invalid={repoInvalid}
                 aria-describedby={repoInvalid ? "repo-url-error" : undefined}
@@ -228,8 +277,9 @@ export default function GitHubSyncPanel() {
               <Button
                 variant="outline"
                 size="icon"
-                onClick={() => setRepoUrl("krzemienski/awesome-video")}
-                title="Reset to default"
+                onClick={resetRepository}
+                disabled={!configuredRepo}
+                title={configuredRepo ? "Reset to configured repository" : "No configured repository available"}
                 data-testid="button-reset-repo"
               >
                 <RefreshCw className="h-4 w-4" />
@@ -237,11 +287,11 @@ export default function GitHubSyncPanel() {
             </div>
             {repoInvalid ? (
               <p id="repo-url-error" className="text-xs text-destructive" role="alert" data-testid="text-repo-url-error">
-                Not a valid repository. Use owner/repository (e.g., krzemienski/awesome-video) or a github.com URL.
+                Not a valid repository. Use owner/repository (e.g., {repositoryExample}) or a github.com URL.
               </p>
             ) : (
               <p className="text-xs text-muted-foreground">
-                Format: owner/repository (e.g., krzemienski/awesome-video)
+                Format: owner/repository{configuredRepo ? ` (configured: ${configuredRepo})` : ""}
               </p>
             )}
           </div>}
@@ -276,8 +326,12 @@ export default function GitHubSyncPanel() {
               <div className="ops-github-panel__empty-state">
                 <Clock className="h-5 w-5" aria-hidden="true" />
                 <div>
-                  <p className="font-medium">No sync activity yet</p>
-                  <p className="text-sm text-muted-foreground">Start a pull or sync to see its progress here.</p>
+                  <p className="font-medium">
+                    {syncQueueIsLoading || syncHistoryIsLoading ? "Loading sync activity…" : "No sync activity yet"}
+                  </p>
+                  {!syncQueueIsLoading && !syncHistoryIsLoading && (
+                    <p className="text-sm text-muted-foreground">Start a pull or sync to see its progress here.</p>
+                  )}
                 </div>
               </div>
             )}
@@ -372,7 +426,24 @@ export default function GitHubSyncPanel() {
               );
             })()}
 
-            {syncQueue && syncQueue.length > 0 && (
+             {syncQueueIsError ? (
+               <Alert variant="destructive" data-testid="alert-sync-queue-error">
+                 <XCircle className="h-4 w-4" />
+                 <AlertDescription className="flex flex-wrap items-center gap-3">
+                   <span>Sync queue status is unavailable.</span>
+                   <Button
+                     type="button"
+                     variant="outline"
+                     size="sm"
+                     onClick={() => { void refetchSyncQueue(); }}
+                     disabled={syncQueueIsFetching}
+                     data-testid="button-retry-sync-queue"
+                   >
+                     {syncQueueIsFetching ? "Retrying…" : "Retry"}
+                   </Button>
+                 </AlertDescription>
+               </Alert>
+             ) : syncQueue && syncQueue.length > 0 && (
               <div className="space-y-2">
                 <h4 className="text-sm font-semibold">Recent Sync Jobs</h4>
                 <ScrollArea className="h-[200px] rounded border">
@@ -418,7 +489,27 @@ export default function GitHubSyncPanel() {
           </CardContent>
         </Card>}
 
-      {syncHistory && syncHistory.length > 0 && (
+       {syncHistoryIsError ? (
+         <TableShell
+           title="Sync jobs"
+           sub="The sync history could not be loaded."
+           className="ops-github-panel__history-shell"
+         >
+           <div className="flex flex-wrap items-center gap-3" role="alert">
+             <span className="text-sm text-muted-foreground">Try again to inspect previous import/export operations.</span>
+             <Button
+               type="button"
+               variant="outline"
+               size="sm"
+               onClick={() => { void refetchSyncHistory(); }}
+               disabled={syncHistoryIsFetching}
+               data-testid="button-retry-sync-history"
+             >
+               {syncHistoryIsFetching ? "Retrying…" : "Retry"}
+             </Button>
+           </div>
+         </TableShell>
+       ) : syncHistory && syncHistory.length > 0 ? (
         <TableShell
           title="Sync jobs"
           sub={`Last ${Math.min(5, orderedHistory.length)} import/export operations`}
@@ -454,13 +545,15 @@ export default function GitHubSyncPanel() {
                          )}
                       </TableCell>
                       <TableCell className="text-right">
-                        {sync.commitUrl ? (
-                           <a className="btn ghost ops-github-panel__logs" href={sync.commitUrl} target="_blank" rel="noopener noreferrer">Logs</a>
-                         ) : sync.commitMessage ? (
-                            <button className="btn ghost ops-github-panel__logs" title={sync.commitMessage}>Logs</button>
-                         ) : (
-                            <button className="btn ghost ops-github-panel__logs">Logs</button>
-                         )}
+                         <button
+                           type="button"
+                           className="btn ghost ops-github-panel__logs"
+                           onClick={() => setSelectedHistory(sync)}
+                           aria-label={`View details for sync job ${sync.id}`}
+                           data-testid={`button-sync-details-${sync.id}`}
+                         >
+                           Logs
+                         </button>
                       </TableCell>
                   </TableRow>
                   );
@@ -468,8 +561,16 @@ export default function GitHubSyncPanel() {
                 </TableBody>
               </Table>
             </div>
-        </TableShell>
-      )}
+         </TableShell>
+       ) : (
+         <TableShell
+           title="Sync jobs"
+           sub="No import/export operations have been recorded yet."
+           className="ops-github-panel__history-shell"
+         >
+           <p className="text-sm text-muted-foreground" role="status">Start a pull or sync to see job details here.</p>
+         </TableShell>
+       )}
 
       <details className="admin-ops-more">
         <summary
@@ -525,6 +626,68 @@ export default function GitHubSyncPanel() {
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
+
+      <Dialog open={selectedHistory !== null} onOpenChange={(open) => { if (!open) setSelectedHistory(null); }}>
+        <DialogContent className="max-w-lg">
+          <DialogHeader>
+            <DialogTitle>Sync job #{selectedHistory?.id}</DialogTitle>
+            <DialogDescription>
+              {selectedHistory
+                ? `${selectedHistory.direction === "export" ? "Export" : "Import"} · ${formatSyncDate(selectedHistory.createdAt)}`
+                : "Sync job details"}
+            </DialogDescription>
+          </DialogHeader>
+          {selectedHistory && (
+            <dl className="grid gap-3 text-sm">
+              <div className="flex items-center justify-between gap-4">
+                <dt className="text-muted-foreground">Status</dt>
+                <dd><StatusChip status={selectedHistory.status ?? "recorded"} /></dd>
+              </div>
+              <div className="flex items-center justify-between gap-4">
+                <dt className="text-muted-foreground">Resources added</dt>
+                <dd className="font-mono">+{selectedHistory.resourcesAdded}</dd>
+              </div>
+              <div className="flex items-center justify-between gap-4">
+                <dt className="text-muted-foreground">Resources updated</dt>
+                <dd className="font-mono">~{selectedHistory.resourcesUpdated}</dd>
+              </div>
+              <div className="flex items-center justify-between gap-4">
+                <dt className="text-muted-foreground">Resources removed</dt>
+                <dd className="font-mono">-{selectedHistory.resourcesRemoved}</dd>
+              </div>
+              <div className="flex items-center justify-between gap-4">
+                <dt className="text-muted-foreground">Total resources</dt>
+                <dd className="font-mono">{selectedHistory.totalResources}</dd>
+              </div>
+              {selectedHistory.commitMessage && (
+                <div>
+                  <dt className="mb-1 text-muted-foreground">Commit message</dt>
+                  <dd className="break-words rounded border p-2 font-mono text-xs">{selectedHistory.commitMessage}</dd>
+                </div>
+              )}
+              {selectedHistory.errorMessage && (
+                <div role="alert">
+                  <dt className="mb-1 text-destructive">Error</dt>
+                  <dd className="break-words rounded border border-destructive/40 bg-destructive/10 p-2 font-mono text-xs">
+                    {selectedHistory.errorMessage}
+                  </dd>
+                </div>
+              )}
+              {selectedHistory.commitUrl && (
+                <a
+                  href={selectedHistory.commitUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="btn ghost inline-flex w-fit items-center gap-2"
+                >
+                  <ExternalLink className="h-3 w-3" aria-hidden="true" />
+                  View commit on GitHub
+                </a>
+              )}
+            </dl>
+          )}
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

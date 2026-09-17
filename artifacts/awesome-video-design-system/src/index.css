@@ -78,6 +78,19 @@ button { color: inherit; }
     max-width: 100%;
     overflow-x: auto;
   }
+  /* Colour chapter ink ramp: token, tier name, usage. The usage note reflows
+     under the token pair instead of squeezing into a 35px column. */
+  .ds-ink-row {
+    grid-template-columns: minmax(0, 1fr) auto !important;
+    column-gap: 10px !important;
+  }
+  .ds-ink-row > :nth-child(1) {
+    min-width: 0;
+    overflow-wrap: anywhere;
+  }
+  .ds-ink-row > :nth-child(3) {
+    grid-column: 1 / -1;
+  }
   .ds-list-row {
     grid-template-columns: 36px minmax(0, 1fr) !important;
     column-gap: 12px !important;
@@ -232,4 +245,23 @@ button { color: inherit; }
 .ds-accent-grid {
   flex-wrap: wrap;
   max-width: 100%;
+}
+
+/* The flow grammar metadata sits beside each diagram on larger screens. On
+   narrow screens it becomes a normal block so the fixed-width diagram's
+   local scrollport is the only horizontal overflow on the page. */
+.ds-flow-system-header {
+  min-width: 0;
+}
+
+@media (max-width: 767px) {
+  .ds-flow-system-header {
+    grid-template-columns: minmax(0, 1fr) !important;
+    gap: 14px !important;
+  }
+  .ds-flow-system-header > :nth-child(2) {
+    border-left: 0 !important;
+    border-top: 1px solid var(--border);
+    padding: 12px 0 0 !important;
+  }
 }

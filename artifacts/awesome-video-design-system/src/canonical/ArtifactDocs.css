@@ -4,14 +4,28 @@
 .artifact-docs .docs-shell > .docs-main {
   min-width: 0;
 }
-.artifact-docs .docs-nav-item { min-height: 0; }
+.artifact-docs .docs-nav-item { min-height: var(--profile-control-height); }
 .artifact-docs .docs-nav > div:first-child > a {
-  display: block !important;
-  min-height: 0;
+  display: inline-flex !important;
+  align-items: center;
+  min-height: var(--profile-control-height);
 }
-.artifact-docs .docs-nav .chip { min-height: 0; }
+.artifact-docs .docs-nav .chip { min-height: var(--profile-control-height); }
 .artifact-docs .docs-main h2,
 .artifact-docs .docs-main h3 { scroll-margin-top: 28px; }
+
+/* Keep the fixed-width documentation examples readable on a phone. The
+   desktop two-column spec rows become stacked rows instead of creating a
+   page-level horizontal scrollport. */
+.artifact-docs .ds-spec > div {
+  min-width: 0;
+}
+
+/* The palette is intentionally five columns in the reference at desktop
+   widths, but two columns give long accent names room at phone widths. */
+.artifact-docs .ds-accent-palette {
+  min-width: 0;
+}
 
 /* The canonical docs breakpoint is 900px, not the app's drawer breakpoints. */
 @media (max-width: 900px) {
@@ -23,4 +37,14 @@
     border-bottom: var(--hairline-w) solid var(--border);
   }
   .artifact-docs .docs-main { padding: 40px 24px 80px; }
+}
+
+@media (max-width: 767px) {
+  .artifact-docs .ds-spec > div {
+    grid-template-columns: minmax(0, 1fr) !important;
+    gap: 4px !important;
+  }
+  .artifact-docs .ds-accent-palette {
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+  }
 }

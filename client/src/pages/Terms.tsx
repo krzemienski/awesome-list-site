@@ -1,12 +1,16 @@
 import SEOHead from "@/components/layout/SEOHead";
 import { Card, CardContent } from "@/components/ui/card";
 import { FileText } from "lucide-react";
+import { preferredContactDestination, useContactConfig } from "@/lib/contact";
 import "@/styles/pages/system-legal.css";
 
 // BUG-019 (run13): the footer promised legal pages that didn't exist. Terms
 // and Privacy are real routes now (also registered in App.tsx
 // KNOWN_ROUTE_PATTERNS, the server og-middleware, and the sitemap).
 export default function Terms() {
+  const { data: contactConfig } = useContactConfig(true);
+  const contactDestination = preferredContactDestination(contactConfig);
+
   return (
     <div className="legal-page">
       <SEOHead
@@ -98,17 +102,25 @@ export default function Terms() {
             <h2 className="text-base font-semibold text-[color:var(--text)]">8. Contact</h2>
             <p>
               For legal, abuse, or terms questions,{" "}
-              <a
-                href="https://github.com/krzemienski/awesome-video/issues"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="legal-inline-link inline-flex items-center min-h-[24px] align-middle underline underline-offset-4 hover:text-[color:var(--text)]"
-                data-testid="link-terms-contact"
-              >
-                open an issue on the project's GitHub repository
-              </a>
-              . Issues are public, so do not include private or sensitive
-              personal information.
+              {contactDestination ? (
+                <a
+                  href={contactDestination.href}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="legal-inline-link inline-flex items-center min-h-[24px] align-middle underline underline-offset-4 hover:text-[color:var(--text)]"
+                  data-testid="link-terms-contact"
+                >
+                  {contactDestination.label}
+                </a>
+              ) : (
+                <span data-testid="text-terms-contact-unavailable">
+                  no configured public contact destination is available
+                </span>
+              )}
+              .{" "}
+              {contactDestination?.kind === "issues"
+                ? "Issues are public, so do not include private or sensitive personal information."
+                : "Please do not include private or sensitive personal information."}
             </p>
           </section>
         </CardContent>

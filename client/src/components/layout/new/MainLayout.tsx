@@ -1,5 +1,5 @@
 import { lazy, Suspense, useEffect, useState, type CSSProperties } from "react";
-import { useLocation } from "wouter";
+import { useLocation, useSearch } from "wouter";
 import { ArrowUp } from "lucide-react";
 import type { AwesomeListNav } from "@/lib/static-data";
 import AppSidebar from "./AppSidebar";
@@ -87,10 +87,20 @@ interface MainLayoutProps {
 export default function MainLayout({ productProfile, nav, isLoading, navError, onRetryNav, children, user, onLogout, logoutError, renderSearchDialog }: MainLayoutProps) {
   const homeBoot = useHomeBoot();
   const [location] = useLocation();
+  // wouter's location hook tracks pathname only; query-only history changes
+  // still represent a new route for the global palette's lifecycle.
+  const search = useSearch();
   const isAdmin = /^\/admin(?:\/|$)/.test(location);
   const hasBrowseSidebar = location === "/" || /^\/(?:category|subcategory|sub-subcategory)\//.test(location);
   const [searchOpen, setSearchOpen] = useState(false);
   const { data: publicConfig } = useContactConfig(true);
+
+  // A global dialog must not survive browser Back/Forward. Closing through the
+  // controlled Radix root also clears SearchDialog's transient query/results
+  // and restores focus to the current route's search trigger.
+  useEffect(() => {
+    setSearchOpen(false);
+  }, [location, search]);
 
   // Keep the lightweight global trigger in the eager shell. The palette code
   // itself is loaded only after one of these controls opens it.
@@ -175,6 +185,7 @@ export default function MainLayout({ productProfile, nav, isLoading, navError, o
         <div className="grain" aria-hidden="true" />
         <AppHeader
           onSearchOpen={() => setSearchOpen(true)}
+          siteName={publicConfig?.site?.title}
           user={user}
           onLogout={onLogout}
           logoutError={logoutError}
@@ -185,6 +196,9 @@ export default function MainLayout({ productProfile, nav, isLoading, navError, o
           categories={nav?.categories ?? []}
           totalResources={nav?.totalResources ?? 0}
           isLoading={isLoading}
+          siteName={publicConfig?.site?.title}
+          repoUrl={publicConfig?.site?.repoUrl}
+          repoBranch={publicConfig?.site?.repoBranch}
           navError={navError}
           onRetryNav={onRetryNav}
           user={user}
@@ -217,10 +231,11 @@ export default function MainLayout({ productProfile, nav, isLoading, navError, o
           <AppFooter
             nav={nav}
             site={{
-              name: publicConfig.site.title.replace(/\s+Dashboard$/, ""),
+              name: publicConfig.site.title,
               tagline: publicConfig.site.description,
               repoUrl: publicConfig.site.repoUrl,
               repoBranch: publicConfig.site.repoBranch,
+              issuesUrl: publicConfig.contact.issues.href,
             }}
           />
         ) : null}

@@ -49,6 +49,10 @@ interface AppSidebarProps {
   categories: NavCategory[];
   totalResources: number;
   isLoading: boolean;
+  siteName?: string;
+  /** Source links follow the public site configuration, not a shell constant. */
+  repoUrl?: string;
+  repoBranch?: string;
   // R5-024 (run24): true when the nav tree fetch failed — the header subtitle
   // resolves to a neutral label instead of showing "Loading…" forever.
   navError?: boolean;
@@ -563,6 +567,9 @@ export default function AppSidebar({
   categories,
   totalResources,
   isLoading,
+  siteName,
+  repoUrl,
+  repoBranch = "main",
   navError,
   onRetryNav,
   user,
@@ -720,18 +727,22 @@ export default function AppSidebar({
   };
 
   const totalCats = filtered.length;
+  const brandName = siteName?.trim() || "Awesome Video";
+  const brandWordmark = /^awesome\s+video(?:\s+dashboard)?$/i.test(brandName)
+    ? "AWESOME.VIDEO"
+    : brandName.toUpperCase();
 
   const brandHeader = (
     <SidebarHeader className="av-sidebar-drawer-header border-b p-0">
       <Link
         href="/"
         onClick={() => setOpenMobile(false)}
-        aria-label="Awesome Video home"
+        aria-label={`${brandName} home`}
         className="flex min-h-7 items-center gap-[10px] px-0 py-0 no-underline"
       >
         <BrandMark className="size-7 shrink-0" />
         <span className="av-sidebar-drawer-wordmark">
-          AWESOME.VIDEO
+          {brandWordmark}
           <span className="sr-only" data-testid="sidebar-resource-count">
             {navError && totalResources === 0
               ? "Catalog unavailable"
@@ -1041,9 +1052,9 @@ export default function AppSidebar({
           {resourceStatus} · live
         </span>
         <div className="av-sidebar-compact-footer-links">
-          {includeDocs && (
+          {includeDocs && repoUrl && (
             <a
-              href="https://github.com/krzemienski/awesome-video/tree/main/docs"
+              href={`${repoUrl.replace(/\/$/, "")}/tree/${encodeURIComponent(repoBranch)}/docs`}
               target="_blank"
               rel="noopener noreferrer"
             >
@@ -1051,11 +1062,13 @@ export default function AppSidebar({
             </a>
           )}
           <a
-            href="https://github.com/krzemienski/awesome-video"
+            {...(repoUrl ? { href: repoUrl } : {})}
             target="_blank"
             rel="noopener noreferrer"
-            aria-label="Source: krzemienski/awesome-video"
-            title="Source: krzemienski/awesome-video"
+            aria-label={repoUrl ? `Source: ${repoUrl.replace(/^https?:\/\/(www\.)?github\.com\//, "").replace(/\/$/, "")}` : "Source repository unavailable"}
+            title={repoUrl ? `Source: ${repoUrl.replace(/^https?:\/\/(www\.)?github\.com\//, "").replace(/\/$/, "")}` : "Source repository unavailable"}
+            aria-disabled={!repoUrl || undefined}
+            tabIndex={repoUrl ? undefined : -1}
           >
             <svg
               width="13"
@@ -1231,12 +1244,14 @@ export default function AppSidebar({
               );
             })}
             <a
-              href="https://github.com/krzemienski/awesome-video"
+              {...(repoUrl ? { href: repoUrl } : {})}
               target="_blank"
               rel="noopener noreferrer"
               className="rail-icon-btn av-sidebar-rail-repo no-underline"
-              aria-label="Source: krzemienski/awesome-video"
-              title="Source: krzemienski/awesome-video"
+              aria-label={repoUrl ? `Source: ${repoUrl.replace(/^https?:\/\/(www\.)?github\.com\//, "").replace(/\/$/, "")}` : "Source repository unavailable"}
+              title={repoUrl ? `Source: ${repoUrl.replace(/^https?:\/\/(www\.)?github\.com\//, "").replace(/\/$/, "")}` : "Source repository unavailable"}
+              aria-disabled={!repoUrl || undefined}
+              tabIndex={repoUrl ? undefined : -1}
             >
               <span aria-hidden="true" className="font-mono text-sm">↗</span>
             </a>
