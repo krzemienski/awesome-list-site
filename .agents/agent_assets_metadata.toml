@@ -393,3 +393,17 @@ mtime_ms = 1789683948146
 storage_uri = "gcs://replit-rams-assets-picard/rams/assets/repl:71ccccc7-37f7-4f07-a880-5973ae4aa911/9a59a7b6-7b3a-4000-9d1a-9f46fdc4567f/2870bcad-065d-4679-b31e-13eb9526b106"
 storage_version_token = "1789683975568518"
 content_type = "text/markdown"
+
+[[outputs]]
+id = "dewVlZFtxyfH-d4aiOykA"
+uri = "file://docs/parity/REFERENCE-ADJUSTMENTS.md"
+type = "text"
+title = "Approved reference adjustments and measured results"
+description = "Independent review, preserved originals and thresholds, scoped browser measurements, remaining pixel failures, and the final sidebar verification boundary."
+logical_id = "4b70d1af-6b61-47f2-ab19-4ca6622fd5bb"
+content_hash = "sha256:c650845eeaadb57cfa13851e17c7f3845d686b71ff9c6c33d5ce6e3f465f7644"
+size = 7054
+mtime_ms = 1789685998382
+storage_uri = "gcs://replit-rams-assets-picard/rams/assets/repl:71ccccc7-37f7-4f07-a880-5973ae4aa911/4b70d1af-6b61-47f2-ab19-4ca6622fd5bb/e298f4db-fcdd-4950-bae6-1b21c6b7fda9"
+storage_version_token = "1789686055617363"
+content_type = "text/markdown"

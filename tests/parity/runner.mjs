@@ -46,6 +46,7 @@ import {
   buildAdapterScript,
 } from "./reference-adapter.mjs";
 import { applyExpectedReferenceReconciliation } from "./reference-reconciliation.mjs";
+import { applyComparisonReferenceAdjustments, collectReferenceAdjustmentGeometry } from "./comparison-reference-adjustments.mjs";
 import { QA_PREFIX, identityAvailability, createDisposableAdmin, sweepDisposableAdmins } from "./identity.mjs";
 import { renderReport, renderStatus } from "./report.mjs";
 
@@ -415,7 +416,8 @@ const main = async () => {
     });
     const rawSnapshot = await snapshotDirectory(referenceRoot);
     const adapted = adaptReferenceSnapshot(rawSnapshot, { adapterScript, substitutions });
-    referenceServer = await serveSnapshot(adapted.served);
+    const adjusted = applyComparisonReferenceAdjustments(rawSnapshot, adapted.served);
+    referenceServer = await serveSnapshot(adjusted.served);
     const referenceBase = `http://127.0.0.1:${referenceServer.address().port}`;
 
     // ---- workspace fingerprints ---------------------------------------------
@@ -488,6 +490,7 @@ const main = async () => {
         browserVersion,
         referenceAdapter: {
           snapshot: sha256(catalogBinding.snapshotBytes),
+          comparisonReferenceAdjustments: adjusted.provenance,
           reconciliation: {
             version: catalogBinding.reconciliation.version,
             source: catalogBinding.reconciliation.source,
@@ -775,7 +778,8 @@ const main = async () => {
             approved44pxControls: catalogBinding.reconciliation.approved44pxControls,
           },
           rawHashes: adapted.provenance.rawHashes,
-          servedHashes: adapted.provenance.servedHashes,
+          servedHashes: Object.fromEntries([...adjusted.served].map(([relative, bytes]) => [relative, sha256(bytes)])),
+          comparisonReferenceAdjustments: adjusted.provenance,
           live: {
             catalogStart: sha256(catalogBinding.snapshotBytes),
             catalogEnd: endCatalogBinding ? sha256(endCatalogBinding.snapshotBytes) : null,
@@ -1257,6 +1261,7 @@ const captureRow = async (ctx, screen, width) => {
       expectedCaptureStability: { stableAttempts: expectedCapture.stableAttempts, attemptHashes: expectedCapture.attemptHashes, discardedFrames: expectedCapture.discardedFrames, apiTraffic: expectedCapture.apiTraffic, reopenedAfterReload: reloads.expected },
       captureHashes: { actual: actualCapture.sha256, expected: expectedCapture.sha256 },
       referenceReconciliation,
+      referenceAdjustmentGeometry: await collectReferenceAdjustmentGeometry(sides.expected.page),
       fontsSettled: {
         actual: { complete: sides.actual.settled.fonts.complete, forcedParityFaces: sides.actual.settled.fonts.forcedParityFaces, failedFaces: sides.actual.settled.fonts.failedFaces, nativeDefects: sides.actual.settled.fonts.nativeDefects },
         expected: { complete: sides.expected.settled.fonts.complete, forcedParityFaces: sides.expected.settled.fonts.forcedParityFaces, failedFaces: sides.expected.settled.fonts.failedFaces, nativeDefects: sides.expected.settled.fonts.nativeDefects },

@@ -57,6 +57,15 @@ The separately referenced external design project remains unavailable.
 
 - First resolve the explicitly documented reference conflicts without changing
   frozen originals, accessibility/responsiveness requirements or pixel thresholds.
+  The user approved separately reviewed contract-compliant references on
+  2026-09-17; apply only the four adjustments documented in
+  [REFERENCE-ADJUSTMENTS.md](REFERENCE-ADJUSTMENTS.md). Approval does not
+  certify their implementation or waive any remaining comparisons.
+  The adjustment implementation and independent source review are now complete.
+  Scoped reference viewport/font/control measurements are recorded there,
+  alongside four remaining artifact pixel failures. The final exact sidebar
+  inline-minimum correction is source-verified but still needs a focused
+  category browser measurement; do not redo earlier repairs or call it a pass.
 - Retained full inventory: 133 pass / 51 fail of 184 compared rows, plus 40
   blocked, 100 unverified, 4 aliases and 4 evidence-only rows. Use REPORT and the
   corrected STATUS for exact rows; none are fresh proof of the repaired candidate.

@@ -5,6 +5,13 @@ it was not delivered as a substitute for implementation. The independent
 reviewers, repair workers, real browser journeys and checks below are scoped
 evidence, not certification of every original acceptance requirement.
 
+**Latest follow-through:** The user approved separately reviewed comparison
+references, and the four scoped adjustments are implemented. See
+[REFERENCE-ADJUSTMENTS.md](REFERENCE-ADJUSTMENTS.md) for independent review,
+fresh measured failures, verified viewport/font/control geometry, and the final
+sidebar inline-minimum correction that remains browser-unverified.
+This resolves the pending permission decision, not full visual acceptance.
+
 ## Authority and source coverage
 
 The execution contract remains
@@ -88,15 +95,22 @@ a passing result.
 
 ## Outstanding acceptance, without waivers
 
+**Decision update — 2026-09-17:** The user approved separately reviewed,
+contract-compliant comparison references for the four conflicts in item 1.
+See [REFERENCE-ADJUSTMENTS.md](REFERENCE-ADJUSTMENTS.md). This supersedes
+the pending-decision language below, not the outstanding verification or
+measured failures. Original assets and thresholds remain unchanged.
+
 1. **Reconcile contradictory reference criteria.** The contract requires a
    visible 240px sidebar at exactly 768, no sideways mobile overflow, accessible
    44px controls and the same live/artifact font files. Frozen references hide
    that sidebar, overflow some mobile docs, use 26–36px controls, and omit IBM
    Plex Sans from the docs request. A <=0.5% raw full-union-canvas comparison
    cannot honestly certify both those references and all those requirements.
-   Keep original files, thresholds and required behavior intact pending an
-   explicit decision on separately documented, independently reviewed
-   contract-compliant comparison references. This is not permission to edit
+   The user has now approved separately documented, independently reviewed
+   contract-compliant comparison references. Their implementation preserves
+   original files, thresholds and required behavior. Fresh measurements and
+   remaining gaps are in REFERENCE-ADJUSTMENTS; this is not permission to edit
    expected pixels until they match.
 2. **Finish the measured visual/state inventory.** Latest retained full run:
    **133 PASS + 51 FAIL = 184 compared rows**, plus **40 BLOCKED, 100 UNVERIFIED,
@@ -112,6 +126,9 @@ a passing result.
    (24 unicode-subset rules). The existing parity gate compares all declared
    faces, so it will flag those extras even though heading files match.
    Do not narrow the app request or weaken the comparison to hide this.
+   **Update:** The approved expected-side canonical request resolves this
+   declared-face conflict in the scoped fresh captures; all measured font
+   comparisons match. This does not certify every theme or first paint.
 4. **Finish the eleven-stage design-system audit and state coverage.** Source
    review rejected the claim that taxonomy h1 must gain `.display-h`: the
    original explicitly uses body typography there. The stray-heading gate

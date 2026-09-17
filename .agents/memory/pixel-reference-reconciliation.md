@@ -64,6 +64,31 @@ performance and production-comparison requirements.
 approved reconciliations and their provenance unless the user explicitly
 revokes them.
 
+The user approved separately reviewed contract-compliant references on
+2026-09-17 for the exact-768 visible 240px sidebar, natural mobile wrapping,
+44px accessible controls, and the canonical nine-family font request.
+
+**Why:** Frozen prototype behavior conflicts with explicit responsive,
+accessibility and font requirements. Approval resolves the authority conflict,
+not the remaining measured visual failures.
+
+**How to apply:** Keep original assets immutable and apply independently
+reviewed, documented expected-side transformations with provenance. Keep
+pixelmatch 0.1 and the 0.5% full-union-canvas ceiling. This does not approve
+hiding kind badges, copying application CSS, or waiving other acceptance.
+
+Reference-adjustment source review is not evidence of responsive or target-size
+compliance; measure the expected document's overflow and actual control bounds.
+
+**Why:** Reviewed CSS still left mobile reference overflow, unclassified native
+buttons and inline minimum-height overrides. Broad one-column rules also added
+unnecessary stacking while missing the actual fixed-track overflow.
+
+**How to apply:** Identify exact source-owned layouts and controls, including
+generated documentation modules; scope transformations to those anchors.
+Keep each refinement's measurements separate and label unmeasured final
+corrections explicitly instead of carrying forward a previous runtime pass.
+
 **Why:** Interpreting “only these controls” as a replacement for the entire
 approval history can silently remove independently approved brand, content,
 footer and accessibility requirements.

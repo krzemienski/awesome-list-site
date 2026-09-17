@@ -1,0 +1,248 @@
+{
+  "schemaVersion": 1,
+  "decision": {
+    "approvedAt": "2026-09-17",
+    "scope": [
+      "A 240px sidebar remains visible at exactly 768px; the drawer breakpoint is strictly below 768px.",
+      "Documentation and showcase content fit a mobile viewport by reducing columns and wrapping content.",
+      "Interactive controls have a 44px minimum target.",
+      "All reference entrypoints request the canonical nine font families used by the frozen shell and live application."
+    ],
+    "contract": "attached_assets/Pasted--Finish-the-original-Awesome-List-design-implementation_1789632319500.txt",
+    "review": "docs/parity/COMPLETION-REVIEW.md",
+    "prohibitions": [
+      "No frozen-reference writes",
+      "No app-derived or runtime-derived layout values",
+      "No image masking, cropping, scaling, or per-pixel offsets",
+      "No pixelmatch threshold or ceiling changes"
+    ]
+  },
+  "sourceFiles": {
+    "styles.css": "f65694df1965889a6a6a4bff6404d9b47164f097ebcd417513a34d430e6a1055",
+    "docs.html": "e3072e8e0f4722c0201b444ab270ccb32dacdf571329ac5b4cb4c4b954de45ec",
+    "design-system.html": "59a851a95949c36b2877b4bd57f554e84d9be9d662d3f23a895216a26d5f4dc7",
+    "index.html": "7f561822fdbb5b67ebce62324d7f02ce0154eb90b2927f8d46510466cda5f8f7",
+    "docs.jsx": "d430fc4a9f5d2f3f95c789eab20ea36ae96eb307d495f07052a720f912f6eee2",
+    "docs-content-1.jsx": "b7b969b4aeb1b6e560b7fb1589626dd8def9145c3709bc31a127454ea5015982",
+    "docs-content-2.jsx": "fbf202ebdba472a6663c43e8a38cc86346ab2d0c9655fe012a66b579f6508f81",
+    "design-system-showcase.jsx": "24c91a564df8e7a50425ab0db86ef61f9d029a809c37571da3c5c6efb1adbe11",
+    "sidebar-variants.jsx": "86ae99e167f07d7679672b4224fdfc758424224603c3de5459b7cdc9aba39e95"
+  },
+  "canonicalFontRequest": "https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Fraunces:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500;1,600&family=JetBrains+Mono:wght@400;500;600;700&family=Geist:wght@400;500;600;700&family=Instrument+Serif:ital@0;1&family=Space+Grotesk:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600;700&family=IBM+Plex+Sans:wght@400;500;600;700&family=Manrope:wght@400;500;600;700;800&display=swap",
+  "rules": [
+    {
+      "id": "CCR-768-SIDEBAR",
+      "file": "styles.css",
+      "operation": "replace",
+      "from": "@media (max-width: 768px)",
+      "to": "@media (max-width: 767px)",
+      "occurrences": 2,
+      "rationale": "The contract makes 768px a tablet width with a visible 240px sidebar and reserves the drawer/mobile composition for widths strictly below 768px.",
+      "sourceAnchors": [
+        "contract:199-202",
+        "contract:454-459",
+        "styles.css:446-466"
+      ]
+    },
+    {
+      "id": "CCR-768-MOBILE-VISIBILITY",
+      "file": "styles.css",
+      "operation": "replace",
+      "from": "@media (min-width: 769px)",
+      "to": "@media (min-width: 768px)",
+      "occurrences": 1,
+      "rationale": "The complementary show-mobile boundary must use the same strict-below-768 contract.",
+      "sourceAnchors": [
+        "contract:199-202",
+        "styles.css:456-466"
+      ]
+    },
+    {
+      "id": "CCR-PAGE-MARKERS-DOCS",
+      "file": "docs.html",
+      "operation": "replace",
+      "from": "<body>",
+      "to": "<body class=\"parity-contract-docs\">",
+      "occurrences": 1,
+      "rationale": "A static reference-only marker scopes the approved natural-wrap rules to documentation without inspecting runtime layout.",
+      "sourceAnchors": [
+        "contract:211-212",
+        "docs.html:123-130"
+      ]
+    },
+    {
+      "id": "CCR-PAGE-MARKERS-SHOWCASE",
+      "file": "design-system.html",
+      "operation": "replace",
+      "from": "<body>",
+      "to": "<body class=\"parity-contract-showcase\">",
+      "occurrences": 1,
+      "rationale": "A static reference-only marker scopes the approved natural-wrap rules to the showcase without inspecting runtime layout.",
+      "sourceAnchors": [
+        "contract:211-212",
+        "design-system.html:16-19"
+      ]
+    },
+    {
+      "id": "CCR-DOCS-SPEC-MARKER-PRIMARY",
+      "file": "docs-content-1.jsx",
+      "operation": "replace",
+      "from": "const Spec = ({ rows }) => (\n  <div style={{ margin: '14px 0 24px', border: 'var(--hairline-w) solid var(--border)', borderRadius: 'var(--radius-sm)', overflow: 'hidden' }}>",
+      "to": "const Spec = ({ rows }) => (\n  <div className=\"parity-contract-docs-spec\" style={{ margin: '14px 0 24px', border: 'var(--hairline-w) solid var(--border)', borderRadius: 'var(--radius-sm)', overflow: 'hidden' }}>",
+      "occurrences": 1,
+      "rationale": "The primary generated docs content contains fixed 200px/1fr specification rows. An exact source marker scopes their approved narrow reflow without relying on serialized inline-style selectors.",
+      "sourceAnchors": [
+        "contract:211-212",
+        "docs.html:136-139",
+        "docs-content-1.jsx:38-50"
+      ]
+    },
+    {
+      "id": "CCR-DOCS-PALETTE-MARKER",
+      "file": "docs-content-1.jsx",
+      "operation": "replace",
+      "from": "        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(5, 1fr)', gap: 10 }}>",
+      "to": "        <div className=\"parity-contract-docs-accent-palette\" style={{ display: 'grid', gridTemplateColumns: 'repeat(5, 1fr)', gap: 10 }}>",
+      "occurrences": 1,
+      "rationale": "The generated color chapter has one source-identified five-column accent palette; its marker permits a two-column narrow layout without selecting unrelated grids.",
+      "sourceAnchors": [
+        "contract:211-212",
+        "docs.html:136-139",
+        "docs-content-1.jsx:339-350"
+      ]
+    },
+    {
+      "id": "CCR-DOCS-SPEC-MARKER-SECONDARY",
+      "file": "docs-content-2.jsx",
+      "operation": "replace",
+      "from": "const Specb = ({ rows }) => (\n  <div style={{ margin: '14px 0 24px', border: 'var(--hairline-w) solid var(--border)', borderRadius: 'var(--radius-sm)', overflow: 'hidden' }}>",
+      "to": "const Specb = ({ rows }) => (\n  <div className=\"parity-contract-docs-spec\" style={{ margin: '14px 0 24px', border: 'var(--hairline-w) solid var(--border)', borderRadius: 'var(--radius-sm)', overflow: 'hidden' }}>",
+      "occurrences": 1,
+      "rationale": "The secondary generated docs content defines the same fixed-track specification-row pattern and receives the same exact static scope marker.",
+      "sourceAnchors": [
+        "contract:211-212",
+        "docs.html:136-139",
+        "docs-content-2.jsx:28-39"
+      ]
+    },
+    {
+      "id": "CCR-DOCS-PAGER-MARKER",
+      "file": "docs.jsx",
+      "operation": "replace",
+      "from": "        <div style={{\n          display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 14,\n          marginTop: 80, paddingTop: 32, borderTop: 'var(--hairline-w) solid var(--border)',\n        }}>",
+      "to": "        <div className=\"parity-contract-docs-pager\" style={{\n          display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 14,\n          marginTop: 80, paddingTop: 32, borderTop: 'var(--hairline-w) solid var(--border)',\n        }}>",
+      "occurrences": 1,
+      "rationale": "The source-defined previous/next control grid receives an exact marker so its two columns use shrinkable tracks and naturally wrap at narrow widths.",
+      "sourceAnchors": [
+        "contract:179-183",
+        "contract:211-212",
+        "docs.jsx:148-168"
+      ]
+    },
+    {
+      "id": "CCR-SHOWCASE-ACCENT-TARGETS",
+      "file": "design-system-showcase.jsx",
+      "operation": "replace",
+      "from": "      <div style={{ display: 'flex', gap: 4, alignItems: 'center', borderLeft: '1px solid var(--border)', paddingLeft: 12, marginLeft: 4 }}>\n        {ACCENTS.map(a => (\n          <button key={a.id} title={a.name} onClick={() => onAccent(a.id)}\n            style={{\n              width: 18, height: 18,\n              borderRadius: 'var(--radius-pill)',\n              border: accent === a.id ? '2px solid var(--text)' : '1px solid var(--border)',\n              background: a.primary, cursor: 'pointer', padding: 0,\n            }} />\n        ))}\n      </div>",
+      "to": "      <div className=\"parity-contract-accent-targets\" style={{ display: 'flex', gap: 4, alignItems: 'center', borderLeft: '1px solid var(--border)', paddingLeft: 12, marginLeft: 4 }}>\n        {ACCENTS.map(a => (\n          <button key={a.id} title={a.name} aria-label={`Use ${a.name} accent`} aria-pressed={accent === a.id}\n            className=\"parity-contract-accent-target\" onClick={() => onAccent(a.id)}>\n            <span aria-hidden=\"true\" style={{\n              width: 18, height: 18, display: 'block',\n              borderRadius: 'var(--radius-pill)',\n              border: accent === a.id ? '2px solid var(--text)' : '1px solid var(--border)',\n              background: a.primary,\n            }} />\n          </button>\n        ))}\n      </div>",
+      "occurrences": 1,
+      "rationale": "Each showcase accent is an interactive control. A 44px target wraps the unchanged 18px visual swatch, and the static source gains an accessible name and pressed state.",
+      "sourceAnchors": [
+        "contract:179-183",
+        "design-system-showcase.jsx:83-94"
+      ]
+    },
+    {
+      "id": "CCR-SHOWCASE-SWITCHER-SCOPE",
+      "file": "design-system-showcase.jsx",
+      "operation": "replace",
+      "from": "    <div style={{\n      position: 'sticky', top: 0, zIndex: 30,",
+      "to": "    <div className=\"parity-contract-switcher\" style={{\n      position: 'sticky', top: 0, zIndex: 30,",
+      "occurrences": 1,
+      "rationale": "A static reference marker identifies the showcase component-navigation links whose interactive targets require the approved 44px minimum without selecting inline prose links.",
+      "sourceAnchors": [
+        "contract:179-183",
+        "design-system-showcase.jsx:44-68"
+      ]
+    },
+    {
+      "id": "CCR-44PX-CONTROLS-AND-NATURAL-WRAP",
+      "file": "styles.css",
+      "operation": "append",
+      "anchor": ".ds-system-pill.active {\n  background: var(--accent);\n  border-color: var(--accent);\n  color: #000;\n}",
+      "occurrences": 1,
+      "content": "\n\n/* Contract-compliant comparison reference adjustments (approved 2026-09-17). */\n.btn,.input,.select,.search-input,.accordion-header,.sub-item,.tab,.header-search-trigger,.user-pill,.icon-rail .icon-btn,.ds-system-pill{box-sizing:border-box;min-height:44px}\n.btn.icon,.icon-rail .icon-btn{min-width:44px}\n.parity-contract-docs :is(button,input,select,textarea),.parity-contract-docs .docs-nav>div:first-child>a,.parity-contract-docs a.chip,.parity-contract-showcase :is(button,input,select,textarea),.parity-contract-showcase .parity-contract-switcher>a,.parity-contract-showcase .ds-shell footer a{box-sizing:border-box;min-height:44px}\n.parity-contract-docs .docs-nav>div:first-child>a,.parity-contract-docs a.chip,.parity-contract-showcase .parity-contract-switcher>a,.parity-contract-showcase .ds-shell footer a{display:inline-flex;align-items:center}\n.parity-contract-docs .docs-nav-item{white-space:normal}\n.parity-contract-showcase .parity-contract-accent-targets{flex-wrap:wrap;max-width:100%}\n.parity-contract-showcase .parity-contract-accent-target{display:inline-flex;width:44px;height:44px;flex:0 0 44px;align-items:center;justify-content:center;padding:0;border:0;border-radius:var(--radius-pill);background:transparent;cursor:pointer}\n@media (min-width:768px) and (max-width:1024px){.mobile-menu-btn{display:none!important}}\n@media (max-width:767px){\n  .parity-contract-docs .docs-main,.parity-contract-showcase .ds-shell{box-sizing:border-box;min-width:0;max-width:100%}\n  .parity-contract-docs .parity-contract-docs-spec>div{grid-template-columns:minmax(0,1fr)!important}\n  .parity-contract-docs .parity-contract-docs-accent-palette{grid-template-columns:repeat(2,minmax(0,1fr))!important}\n  .parity-contract-docs .parity-contract-docs-pager{grid-template-columns:repeat(2,minmax(0,1fr))!important}\n  .parity-contract-docs .parity-contract-docs-pager>*{min-width:0;white-space:normal;overflow-wrap:anywhere}\n  .parity-contract-docs .code-block{white-space:pre-wrap;overflow-wrap:anywhere}\n  .parity-contract-docs a.chip,.parity-contract-showcase .btn,.parity-contract-showcase .tab{white-space:normal;overflow-wrap:anywhere}\n}\n@media (max-width:480px){\n  .parity-contract-docs .table,.parity-contract-showcase .table{display:block;max-width:100%;overflow-x:auto}\n  .parity-contract-showcase .ds-token-row{grid-template-columns:minmax(0,1fr) auto;column-gap:10px}\n  .parity-contract-showcase .ds-token-row>:nth-child(2){min-width:0;overflow-wrap:anywhere;text-align:right}\n  .parity-contract-showcase .ds-token-row>:nth-child(3){grid-column:1/-1;text-align:left!important}\n  .parity-contract-showcase [style*=\"120px 100px 1fr 160px\"]{grid-template-columns:76px 48px minmax(0,1fr)!important;column-gap:10px!important}\n  .parity-contract-showcase [style*=\"120px 100px 1fr 160px\"]>:nth-child(3){min-width:0;overflow-wrap:anywhere}\n  .parity-contract-showcase [style*=\"120px 100px 1fr 160px\"]>:nth-child(4){grid-column:1/-1;margin-top:4px;text-align:left!important}\n  .parity-contract-showcase [style*=\"60px 1fr 140px 100px\"]{grid-template-columns:36px minmax(0,1fr)!important;column-gap:12px!important}\n  .parity-contract-showcase [style*=\"60px 1fr 140px 100px\"]>:nth-child(3),.parity-contract-showcase [style*=\"60px 1fr 140px 100px\"]>:nth-child(4){grid-column:2;text-align:left!important}\n}\n",
+      "rationale": "Every actual button, form control, and navigation/component link receives a scoped 44px target while decorative chip spans and inline prose links remain unchanged. Mobile rules now reflow only source layouts whose fixed tracks exceed the viewport; naturally responsive grids retain their original behavior. Original docs and showcase padding is preserved.",
+      "sourceAnchors": [
+        "contract:179-183",
+        "contract:211-212",
+        "contract:420-421",
+        "styles.css:190-218",
+        "styles.css:251-312",
+        "styles.css:698-753",
+        "docs.html:47-94",
+        "docs.jsx:86-112,153-166",
+        "design-system-showcase.jsx:44-94,168-176,451-497,568-571,738",
+        "design-system-showcase.jsx:247,626",
+        "styles.css:699-753"
+      ]
+    },
+    {
+      "id": "CCR-SIDEBAR-INLINE-MINIMUM",
+      "file": "sidebar-variants.jsx",
+      "operation": "replace",
+      "from": "padding: '8px 11px 8px 0', minHeight: 32,",
+      "to": "padding: '8px 11px 8px 0', minHeight: 44,",
+      "occurrences": 1,
+      "rationale": "The measured 32px inline minimum on the shared sidebar All-in control overrides stylesheet minima. Raise only that source-owned minimum to the approved 44px; do not add an unrelated specificity override.",
+      "sourceAnchors": [
+        "contract:420-421",
+        "sidebar-variants.jsx:96-106"
+      ]
+    },
+    {
+      "id": "CCR-SIDEBAR-AND-USER-TARGETS",
+      "file": "styles.css",
+      "operation": "append",
+      "anchor": ".ds-system-pill.active {\n  background: var(--accent);\n  border-color: var(--accent);\n  color: #000;\n}",
+      "occurrences": 1,
+      "content": "\n\n/* Sidebar variants contain native buttons without shared control classes. */\n.sidebar button{box-sizing:border-box;min-height:44px;min-width:44px}\n.user-pill{min-width:44px}\n",
+      "rationale": "Measured sidebar variant buttons remained 22–36px high because they do not use shared button classes. Apply the already approved 44px target requirement to native sidebar buttons; preserve every label, action, and visual-state distinction. The compact user target also needs the minimum width.",
+      "sourceAnchors": [
+        "contract:199-206",
+        "contract:420-421",
+        "sidebar-variants.jsx",
+        "styles.css:251-312"
+      ]
+    },
+    {
+      "id": "CCR-CANONICAL-NINE-FONTS-DOCS",
+      "file": "docs.html",
+      "operation": "replaceFontRequest",
+      "occurrences": 1,
+      "rationale": "The docs entrypoint omitted IBM Plex Sans. It must use the one canonical nine-family request already present in the frozen shell and showcase and used by the live/artifact shell.",
+      "sourceAnchors": [
+        "contract:179-183",
+        "review:109-114",
+        "index.html:8-10",
+        "design-system.html:8-10",
+        "docs.html:8-10"
+      ]
+    },
+    {
+      "id": "CCR-CANONICAL-NINE-FONTS-ASSERT",
+      "files": [
+        "index.html",
+        "docs.html",
+        "design-system.html"
+      ],
+      "operation": "assertFontRequest",
+      "occurrences": 1,
+      "rationale": "Fail closed unless every served reference entrypoint has exactly one identical canonical request.",
+      "sourceAnchors": [
+        "contract:179-183",
+        "review:91-100"
+      ]
+    }
+  ]
+}
