@@ -156,7 +156,7 @@
   padding: 0.75rem 0.875rem;
   border-bottom: var(--hairline-w) solid var(--border);
   color: var(--text-3);
-  font-family: Inter, system-ui, sans-serif;
+  font-family: var(--font-body);
   font-size: 0.6875rem;
   font-weight: 500;
   letter-spacing: 0.03125rem;

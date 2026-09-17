@@ -1,5 +1,10 @@
 # Task 568 — visitor and admin click-through
 
+> Additional current guest journeys are recorded in
+> [COMPLETION-REVIEW.md](COMPLETION-REVIEW.md): resource/category navigation,
+> kind filtering, cross-tab font updates and artifact font/navigation reload.
+> Authenticated/admin results below remain historical, not newly recertified.
+
 See the [consolidated report](REPORT.md), [independent verification](VERIFICATION.md),
 [design-system audit](DS-AUDIT.md), and [cleanup](CLEANUP.md) for final delivery
 context. This retained scoped functional pass does not supersede the later

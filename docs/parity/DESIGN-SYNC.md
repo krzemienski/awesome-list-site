@@ -1,5 +1,11 @@
 # Canonical design-source synchronization
 
+> Latest authority reconciliation: [COMPLETION-REVIEW.md](COMPLETION-REVIEW.md).
+> The available original archive matches the frozen tree byte-for-byte.
+> The artifact now uses the live canonical nine-family request in all views.
+> Original files and pixel thresholds remain untouched; responsive/accessibility
+> and declared-font conflicts remain explicitly unresolved.
+
 > **Consolidation boundary:** the canonical archive/load graph below remains authoritative. Historical full-regression evidence remains at `2b44a2bc08692059cc4ab63c526a5871451fbe1f`; [independent verification](VERIFICATION.md) records fresh non-browser gates and an incomplete timed-out five-ID selection at command-tested `a1e2a9fc598a34b4e662a27f5c8bdb6a869c8f3e`, not a replacement browser capture.
 
 ## Scope and provenance

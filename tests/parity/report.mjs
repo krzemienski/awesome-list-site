@@ -147,18 +147,25 @@ export function renderReport(results, { linkPrefix, stageRoot, determinismEviden
 
 export function renderStatus(results) {
   const rows = results.rows;
-  const pixelRows = rows.filter((row) => row.eligibility === "pixel");
+  // Eligibility describes the screen family; aliases can still be "pixel"
+  // eligible without being comparisons. Use the recorded denominator flag.
+  const pixelRows = rows.filter((row) => row.denominator);
   const passing = pixelRows.filter((row) => row.status === "PASS");
   const failing = pixelRows.filter((row) => row.status === "FAIL");
   const incomplete = pixelRows.filter((row) => row.status === "INCOMPLETE");
-  const blocked = pixelRows.filter((row) => row.status === "BLOCKED");
+  const blocked = rows.filter((row) => row.status === "BLOCKED");
+  const unverified = rows.filter((row) => row.status === "UNVERIFIED");
+  const aliases = rows.filter((row) => row.status === "ALIAS");
+  const evidence = rows.filter((row) => row.status === "EVIDENCE");
   const worst = [...failing].sort((a, b) => (b.comparison?.diffPercent ?? 0) - (a.comparison?.diffPercent ?? 0)).slice(0, 10);
   return [
     "# Parity status",
     "",
     `Latest baseline run: \`${results.runId}\` (${results.executedAt}) — gate **${results.gatePassed ? "PASS" : "NOT PASSED"}**.`,
     "",
-    `Pixel rows: ${passing.length} pass, ${failing.length} fail, ${incomplete.length} incomplete, ${blocked.length} blocked of ${pixelRows.length}. Eligibility: ${JSON.stringify(results.inventory.eligibility)}.`,
+    `Compared pixel rows: ${passing.length} pass, ${failing.length} fail, ${incomplete.length} incomplete of ${pixelRows.length}.`,
+    "",
+    `Additional coverage: ${blocked.length} blocked, ${unverified.length} unverified, ${aliases.length} aliases, ${evidence.length} evidence-only rows. These do not inflate the compared-pixel denominator. Eligibility: ${JSON.stringify(results.inventory.eligibility)}.`,
     "",
     "## Largest measured gaps",
     "",
@@ -169,6 +176,10 @@ export function renderStatus(results) {
     "## Blocked rows",
     "",
     ...(blocked.length ? blocked.map((row) => `- ${row.screen}@${row.width}: ${row.reason}`) : ["- none"]),
+    "",
+    "## Unverified rows",
+    "",
+    ...(unverified.length ? unverified.map((row) => `- ${row.screen}@${row.width}: ${row.reason}`) : ["- none"]),
     "",
     "## Incomplete rows",
     "",

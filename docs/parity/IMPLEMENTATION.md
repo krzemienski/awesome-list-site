@@ -1,5 +1,11 @@
 # Implementation ledger
 
+> **Current acceptance:** [COMPLETION-REVIEW.md](COMPLETION-REVIEW.md) is the
+> current independent reconciliation. Overall **NOT COMPLETE**. The matrices
+> below retain historical ratings; a functional pass does not certify failed
+> or unverified visual acceptance. Fresh scoped repairs/proof and remaining
+> conflicts are separated in that review.
+
 ## Latest local follow-through
 
 The [parallel product-repair pass](worklog/site-repair-2026-09-17.md) records
@@ -55,7 +61,7 @@ decisions.
 | Token registry enumerated from source, not prose counts | `styles.css` `:root` | `canonical-tokens.json` + `canonical-token-parity` gate (effective cascade resolver) | none | integrator | gate PASS in validation run `beVZ6foyuPqgD5DGI91O3` and after `4f5e8968`; mutation probes in [tokens/gate-mutations.md](evidence/tokens/gate-mutations.md) | verified-complete |
 | Theme applied before first paint, CSP + SSR intact, manual accent preserved across system switches, stale values/reload/denied storage | `app.jsx` theme boot | pre-boot inline theme script (nonce'd) + storage guards | none | integrator | filmstrips [tokens/filmstrip.md](evidence/tokens/filmstrip.md), `font-prepaint` gate PASS, theme-registry-types PASS | verified-complete |
 | Real font families/weights per system; ONE canonical Google Fonts request in the app shell | `index.html` css2 link | shell `<link>` byte-identical to the design's nine-family URL; `accent-drift` `canonical-font-request` check | none | integrator | [worklog/fonts.md](worklog/fonts.md) gates table: webfont-fetch 6/6 200, 190 `@font-face`; font-set before/after in [fonts/](evidence/fonts/) | verified-complete |
-| Design-system preview renders headings with the same font files as the live site | `index.html` css2 link | `artifacts/awesome-video-design-system/index.html` ships the design's nine-family css2 `<link>` byte-for-byte, plus the frozen `docs.html` font URL via `data-docs-href` swapped in by the boot script when the page opens on a `#docs-` hash (the frozen docs page requests a different axis subset than the showcase) | none | integrator | full run `…00-31-04-404Z-444`: [font-gaps.md](evidence/harness/font-gaps.md) reports 0 declared-face gaps across all 188 captured rows (was 10/14 faces on one side for every artifact cell); 76 of 88 artifact cells PASS | verified-complete |
+| Design-system preview renders headings with the same font files as the live site | `index.html` css2 link | Artifact now uses the single static canonical nine-family URL on showcase and docs; the narrower docs override was removed | Frozen docs still declare fewer faces than the live canonical request | integrator | Fresh native Showcase/Docs/Typography navigation, Editorial/Terminal loaded heading faces and reload persistence; [completion review](COMPLETION-REVIEW.md) and retained font comparison | functional verification passed; frozen-doc declaration parity unresolved |
 | `.page` atmosphere + `.grain`; body ink not metadata ink; accent discipline; chart ink ramps | `styles.css` `.page::after`, `.grain` | `.page::after` clipped by per-system token (raster budget); `accent-drift` + `palette-drift` gates | none | integrator | gates PASS after `4f5e8968`; ink review [worklog/audit-567-ds-verdicts.md](worklog/audit-567-ds-verdicts.md) | verified-complete |
 
 ## B. Application shell
@@ -179,18 +185,15 @@ bound through the reference adapter, never faked in production.
   ARCHIVE-REVIEW.md and DESIGN-SYNC.md, and the `product-profile-drift` gate
   asserts that token per selector; pseudo-element hit areas were rejected
   (inputs cannot carry them, swatches/pills would overlap). The 12 artifact
-  cells that fail (1.1–2.9% on docs, 5.3–23.6% on the showcase, all at the
-  control rows) are therefore an accepted, reported residual, not a defect.
-- The artifact serves the frozen font request per view: the showcase URL is
-  byte-identical to `design-system.html`, the docs view uses the `docs.html`
-  URL (different axis subsets change outlines). Widening one URL to cover
-  both is token drift, not a fix. The `<link>` carries both URLs as data
-  attributes and no static `href`: a static href is fetched by the preload
-  scanner before any inline script runs, so a direct `#docs-…` load would
-  have downloaded the showcase faces first. The boot script sets `href`
-  synchronously in `<head>` with the same hash normalisation as
-  `App.tsx readView()` (decode, `#`/`#/`, first segment, lower-case) and
-  `blocking="render"` keeps first paint behind the sheet.
+   cells that failed (1.1–2.9% on docs, 5.3–23.6% on the showcase, all at the
+   control rows) remain unresolved visual acceptance, not an approved waiver.
+- The earlier per-view font-request decision is superseded: the explicit
+   live/artifact file-parity requirement now uses one static canonical
+   nine-family URL in every artifact view. Fresh loaded-heading checks pass;
+   the frozen docs' omitted IBM Plex Sans declarations cause a distinct
+   declared-face comparison conflict. See COMPLETION-REVIEW.md. Do not restore
+   the narrower request merely to hide that conflict or claim first-paint
+   timing from a loaded-font check.
 - Table fixes stay on the one cell that needs them. A `white-space: nowrap`
   added to the shared `.queues-agent__cell-muted` for the researcher date
   column regressed enrichment 375 from 0.106% to 5.25% because the enrichment

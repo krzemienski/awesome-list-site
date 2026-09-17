@@ -35,7 +35,7 @@ import { useFavoriteToggle, useBookmarkToggle } from "@/hooks/useResourceToggle"
 import { trackSelectContent, trackShare, trackResourceFavorite, trackResourceClick } from "@/lib/analytics";
 import { useToast } from "@/hooks/use-toast";
 import { ToastAction } from "@/components/ui/toast";
-import { slugify, formatAdminDate } from "@/lib/utils";
+import { formatAdminDate } from "@/lib/utils";
 import { fetchAwesomeListNav } from "@/lib/static-data";
 import { Blurhash } from "react-blurhash";
 import type { Resource } from "@shared/schema";
@@ -105,10 +105,11 @@ export default function ResourceDetail() {
     enabled: isAuthenticated
   });
 
-  // BUG-039 (run13): subcategory/sub-subcategory badges become real links.
-  // Slugs are resolved from the cached taxonomy tree (shared with the
-  // sidebar) because DB slugs are NOT always slugify(name) — de-duplicated
-  // sub-subcategories carry "-sc<id>" suffixes.
+  // Category-path links resolve from the cached taxonomy tree (shared with
+  // the sidebar) because DB slugs are NOT always slugify(name) —
+  // de-duplicated sub-subcategories carry "-sc<id>" suffixes. If a name is
+  // absent from that authoritative tree, keep its chip as text rather than
+  // guessing a route.
   const { data: awesomeListTree } = useQuery<{
     categories?: {
       name: string;
@@ -129,10 +130,11 @@ export default function ResourceDetail() {
   });
 
   const taxonomySlugs = useMemo(() => {
-    const out: { subcategory?: string; subSubcategory?: string } = {};
+    const out: { category?: string; subcategory?: string; subSubcategory?: string } = {};
     if (!awesomeListTree?.categories || !resource) return out;
     for (const cat of awesomeListTree.categories) {
       if (cat.name !== resource.category) continue;
+      out.category = cat.slug;
       for (const sub of cat.subcategories || []) {
         if (sub.name !== resource.subcategory) continue;
         out.subcategory = sub.slug;
@@ -621,10 +623,19 @@ export default function ResourceDetail() {
         <div className="resource-detail-chips">
           {resource.category && (
             <span className="resource-detail-chip-wrap">
-              <Link href={`/category/${slugify(resource.category)}`} className="chip" data-testid="badge-category">
-                <span aria-hidden="true">⟁</span>
-                <span className="resource-detail-chip-label">{resource.category}</span>
-              </Link>
+              {taxonomySlugs.category
+                ? (
+                  <Link href={`/category/${taxonomySlugs.category}`} className="chip" data-testid="badge-category">
+                    <span aria-hidden="true">⟁</span>
+                    <span className="resource-detail-chip-label">{resource.category}</span>
+                  </Link>
+                )
+                : (
+                  <span className="chip" data-testid="badge-category">
+                    <span aria-hidden="true">⟁</span>
+                    <span className="resource-detail-chip-label">{resource.category}</span>
+                  </span>
+                )}
             </span>
           )}
           {isFeatured && (
@@ -1088,12 +1099,12 @@ export default function ResourceDetail() {
                     )}
                   </a>
                 ))}
-                {resource.category && (
+                {resource.category && taxonomySlugs.category && (
                   /* Run16 BUG-057: the inline wouter <Link> wrapping a Button
                      produced a 20px-tall anchor box (< 24px WCAG 2.5.8).
                      asChild makes the anchor itself the ≥44px button. */
                   <Button asChild variant="ghost" size="sm" className="w-full mt-2 min-h-[44px]">
-                    <Link href={`/category/${slugify(resource.category)}`} data-testid="link-view-all-category">
+                    <Link href={`/category/${taxonomySlugs.category}`} data-testid="link-view-all-category">
                       View all in {resource.category}
                       <ChevronRight className="h-4 w-4 ml-1" />
                     </Link>

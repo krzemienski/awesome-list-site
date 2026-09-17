@@ -1457,11 +1457,12 @@ try {
     };
     await gotoAdmin();
 
-    // Folded admin sections render their inner trigger only after the
-    // canonical parent tab mounts. Never click a folded trigger by itself:
-    // it is absent from the DOM on a fresh /admin load. The activation proof
-    // checks the parent remains selected and that the inner content is visible
-    // after the second click, so a hidden or vacuous panel cannot pass.
+    // Folded admin sections are selected from the masthead Settings menu after
+    // their canonical parent tab mounts. Their menu items live in a Radix
+    // portal and therefore do not exist until the menu opens. The activation
+    // proof checks the parent remains selected and that the folded content is
+    // visible after the menu selection, so a hidden or vacuous panel cannot
+    // pass.
     const ADMIN_FOLDED_TAB_PARENTS = {
       subsubcategories: 'subcategories',
       journeys: 'research',
@@ -1479,14 +1480,15 @@ try {
 
       if (parentSlug) {
         const innerTrigger = `[data-testid="tab-${slug}"]`;
-        await adminPage.waitForSelector(innerTrigger, { timeout: 15000 });
+        await adminPage.click('.admin-dashboard__actions button:has-text("Settings")');
+        await adminPage.waitForSelector(innerTrigger, { state: 'visible', timeout: 15000 });
         await adminPage.click(innerTrigger);
       }
 
       // Harness-verified activation: the canonical parent trigger must
       // actually be selected and the panel's own content selector must
-      // appear. For folded tabs, the inner trigger is also required to be
-      // visible after the parent mounted it.
+      // appear. Folded menu items close and unmount after selection, so their
+      // parent selection plus their unique content is the durable proof.
       await adminPage.waitForSelector(
         `[data-testid="tab-${triggerSlug}"][aria-selected="true"]`,
         { timeout: 15000 },
@@ -1494,16 +1496,14 @@ try {
       await adminPage.waitForSelector(expect, { timeout: 30000 });
       if (parentSlug) {
         await adminPage.waitForFunction(
-          ({ parent, inner, content }) => {
+          ({ parent, content }) => {
             const parentTrigger = document.querySelector(`[data-testid="tab-${parent}"]`);
-            const innerTrigger = document.querySelector(`[data-testid="tab-${inner}"]`);
             const innerContent = document.querySelector(content);
             const visible = (element) => Boolean(element && element.getClientRects().length > 0);
             return parentTrigger?.getAttribute('aria-selected') === 'true'
-              && visible(innerTrigger)
               && visible(innerContent);
           },
-          { parent: parentSlug, inner: slug, content: expect },
+          { parent: parentSlug, content: expect },
           { timeout: 15000 },
         );
       }

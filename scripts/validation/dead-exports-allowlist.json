@@ -117,31 +117,6 @@
       "reason": "vendored shadcn/ui primitive family — full upstream surface kept so the next `shadcn add` does not conflict"
     },
     {
-      "file": "client/src/components/ui/select.tsx",
-      "symbol": "SelectGroup",
-      "reason": "vendored shadcn/ui primitive family — full upstream surface kept so the next `shadcn add` does not conflict"
-    },
-    {
-      "file": "client/src/components/ui/select.tsx",
-      "symbol": "SelectLabel",
-      "reason": "vendored shadcn/ui primitive family — full upstream surface kept so the next `shadcn add` does not conflict"
-    },
-    {
-      "file": "client/src/components/ui/select.tsx",
-      "symbol": "SelectScrollDownButton",
-      "reason": "vendored shadcn/ui primitive family — full upstream surface kept so the next `shadcn add` does not conflict"
-    },
-    {
-      "file": "client/src/components/ui/select.tsx",
-      "symbol": "SelectScrollUpButton",
-      "reason": "vendored shadcn/ui primitive family — full upstream surface kept so the next `shadcn add` does not conflict"
-    },
-    {
-      "file": "client/src/components/ui/select.tsx",
-      "symbol": "SelectSeparator",
-      "reason": "vendored shadcn/ui primitive family — full upstream surface kept so the next `shadcn add` does not conflict"
-    },
-    {
       "file": "client/src/components/ui/sheet.tsx",
       "symbol": "SheetClose",
       "reason": "vendored shadcn/ui primitive family — full upstream surface kept so the next `shadcn add` does not conflict"

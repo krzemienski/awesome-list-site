@@ -365,3 +365,31 @@ mtime_ms = 1789518849023
 storage_uri = "gcs://replit-rams-assets-picard/rams/assets/repl:71ccccc7-37f7-4f07-a880-5973ae4aa911/f94b2fba-1b8f-4359-b4ab-ddebc519b89c/bf1e3294-9e5b-4bb6-9562-1ddb31641acf"
 storage_version_token = "1789518858007285"
 content_type = "text/markdown"
+
+[[outputs]]
+id = "scfMS7TUi7BGLHW6zxGis"
+uri = "file://docs/parity/COMPLETION-PROMPT.md"
+type = "text"
+title = "Original design completion prompt"
+description = "The consolidated prompt was invoked. It now records verified repairs, unresolved acceptance and safe continuation requirements."
+logical_id = "e3e3a803-da0b-4f2d-bf5d-324c691f174c"
+content_hash = "sha256:8b40dd38eccb17833e49ff1025f3a3f85066dd72cf0230e489b1d9eb2723daf3"
+size = 7934
+mtime_ms = 1789683950146
+storage_uri = "gcs://replit-rams-assets-picard/rams/assets/repl:71ccccc7-37f7-4f07-a880-5973ae4aa911/e3e3a803-da0b-4f2d-bf5d-324c691f174c/700da397-5778-41ef-b283-d982cfe639a3"
+storage_version_token = "1789683975029082"
+content_type = "text/markdown"
+
+[[outputs]]
+id = "iYrLyipDRYilTsCm9aqGG"
+uri = "file://docs/parity/COMPLETION-REVIEW.md"
+type = "text"
+title = "Completion review and remaining gaps"
+description = "Parallel review findings, fresh browser checks, failing checks, and unresolved reference conflicts. Overall status: not complete."
+logical_id = "9a59a7b6-7b3a-4000-9d1a-9f46fdc4567f"
+content_hash = "sha256:c86336bfacd9c45c6feda652de52329d8ccc4427bbe316373c2ef26157e3a2f7"
+size = 12892
+mtime_ms = 1789683948146
+storage_uri = "gcs://replit-rams-assets-picard/rams/assets/repl:71ccccc7-37f7-4f07-a880-5973ae4aa911/9a59a7b6-7b3a-4000-9d1a-9f46fdc4567f/2870bcad-065d-4679-b31e-13eb9526b106"
+storage_version_token = "1789683975568518"
+content_type = "text/markdown"

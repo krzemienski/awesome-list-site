@@ -1,5 +1,9 @@
 # Visual parity report
 
+> This is a retained historical capture, not a rerun after the latest repairs.
+> See [COMPLETION-REVIEW.md](COMPLETION-REVIEW.md) for fresh scoped evidence and
+> unresolved acceptance. Original baseline captures/results remain unchanged.
+
 Run: `2026-09-17T11-42-39-272Z-11572`  
 Claim: **pre-parity-baseline**  
 Gate: **NOT PASSED** (exit code 1)  

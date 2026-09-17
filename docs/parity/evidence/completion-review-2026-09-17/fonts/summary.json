@@ -1,0 +1,77 @@
+{
+  "schemaVersion": 1,
+  "scope": "awesome-video-design-system font request; non-browser HTTP inspection",
+  "http": {
+    "canonical": 200,
+    "frozenDocs": 200
+  },
+  "requests": {
+    "artifactMatchesLive": true,
+    "artifactMatchesFrozenShell": true,
+    "artifactMatchesFrozenDocs": false,
+    "artifactRequestSha256": "74ced6847337deec209aabd4e50692ea07d964982348baeaac7fd792a0e2ff92",
+    "liveRequestSha256": "74ced6847337deec209aabd4e50692ea07d964982348baeaac7fd792a0e2ff92",
+    "frozenShellRequestSha256": "74ced6847337deec209aabd4e50692ea07d964982348baeaac7fd792a0e2ff92",
+    "frozenDocsRequestSha256": "8c12e97048a84c270cc448da4cf3f807474e6d1e81f74d64589b793cd3ca86c0"
+  },
+  "served": {
+    "canonicalRawFontFaceRules": 190,
+    "frozenDocsRawFontFaceRules": 166,
+    "artifactVsLiveFileSet": {
+      "leftCount": 190,
+      "rightCount": 190,
+      "sharedCount": 190,
+      "leftOnly": [],
+      "rightOnly": [],
+      "leftSetSha256": "d8f76a782a985d4d4f4ad52922d86ed1949067e690c7ccf5ad527cfd47bacffa",
+      "rightSetSha256": "d8f76a782a985d4d4f4ad52922d86ed1949067e690c7ccf5ad527cfd47bacffa",
+      "exact": true
+    },
+    "artifactVsFrozenDocsDeclaredSet": {
+      "leftCount": 39,
+      "rightCount": 35,
+      "sharedCount": 35,
+      "leftOnly": [
+        "IBM Plex Sans|normal|400",
+        "IBM Plex Sans|normal|500",
+        "IBM Plex Sans|normal|600",
+        "IBM Plex Sans|normal|700"
+      ],
+      "rightOnly": [],
+      "leftSetSha256": "6fe95a21c97f059d505046a524063744abd0a4dfea873161c982bcc47ba5a3e2",
+      "rightSetSha256": "e2f8c939eefa589ca089a55f790a3062b4fb2692a3d976b0cd09129fcbc36aa6",
+      "exact": false
+    },
+    "artifactVsFrozenDocsFileSet": {
+      "leftCount": 190,
+      "rightCount": 166,
+      "sharedCount": 166,
+      "leftOnlyCount": 24,
+      "rightOnlyCount": 0,
+      "leftSetSha256": "d8f76a782a985d4d4f4ad52922d86ed1949067e690c7ccf5ad527cfd47bacffa",
+      "rightSetSha256": "4d93e3ca89b0fb9ca2f71718ad68bb856e6c7b86392d99ec923f5cc144fbea4d",
+      "exact": false
+    },
+    "displayHeadingFileSet": {
+      "leftCount": 95,
+      "rightCount": 95,
+      "sharedCount": 95,
+      "leftOnly": [],
+      "rightOnly": [],
+      "leftSetSha256": "759c32392b8495b6fd1925e95fd6caf4f46a912963f84f11cb341c5b311f2a4e",
+      "rightSetSha256": "759c32392b8495b6fd1925e95fd6caf4f46a912963f84f11cb341c5b311f2a4e",
+      "exact": true
+    }
+  },
+  "gateRisk": {
+    "incompatible": true,
+    "reason": "The parity harness compares actual artifact docs against frozen docs.html by declared family|style|weight and fails any gap. The canonical artifact now declares IBM Plex Sans 400/500/600/700 while frozen docs.html does not.",
+    "predictedGapKeys": [
+      "IBM Plex Sans|normal|400",
+      "IBM Plex Sans|normal|500",
+      "IBM Plex Sans|normal|600",
+      "IBM Plex Sans|normal|700"
+    ],
+    "affectedInventory": "all 21 artifact.docs.* rows at every selected width"
+  }
+}

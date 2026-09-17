@@ -1,5 +1,10 @@
 # Design-system artifact integration status
 
+> Current independent reconciliation: [COMPLETION-REVIEW.md](COMPLETION-REVIEW.md).
+> Canonical artifact fonts and focused token gates now have fresh proof; the
+> eleven-stage/full-state acceptance is still open. Earlier pass labels below
+> do not waive unresolved reference or visual failures.
+
 Delivery context: [consolidated report](REPORT.md),
 [independent verification](VERIFICATION.md), [click-through](CLICKTHROUGH.md),
 and [cleanup](CLEANUP.md). Measurements below retain their original source

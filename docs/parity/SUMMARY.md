@@ -1,5 +1,11 @@
 # Parity final summary (blocked)
 
+> **Superseded snapshot:** the counts below describe an older capture.
+> Latest retained full results are 133 pass / 51 fail of 184 compared rows,
+> plus 40 blocked and 100 unverified. These also predate the latest repairs.
+> [COMPLETION-REVIEW.md](COMPLETION-REVIEW.md) is the current reconciliation;
+> the original capture history below is preserved, not relabelled.
+
 - Documentation HEAD / final documented application SHA: `a1e2a9fc598a34b4e662a27f5c8bdb6a869c8f3e`; historical capture is not relabelled.
 - Full regression `2026-09-15T17-47-51-897Z-9407` originated at `2b44a2bc08692059cc4ab63c526a5871451fbe1f`: **16/188** pixel PASS; **172/188** FAIL.
 - Outside pixel denominator: 40 blocked, 96 token-only UNVERIFIED, 4 evidence-only, 4 aliases; 83 exact harness IDs.

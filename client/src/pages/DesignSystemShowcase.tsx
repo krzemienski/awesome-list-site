@@ -181,7 +181,7 @@ export default function DesignSystemShowcase() {
     const observer = new MutationObserver(sample);
     observer.observe(document.documentElement, {
       attributes: true,
-      attributeFilter: ["data-system", "data-accent", "data-font-override"],
+      attributeFilter: ["data-system", "data-accent", "data-font"],
     });
     return () => observer.disconnect();
   }, []);

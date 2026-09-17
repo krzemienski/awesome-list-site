@@ -1,5 +1,15 @@
 # Production release record
 
+> The current independent completion review is **NOT COMPLETE**:
+> [COMPLETION-REVIEW.md](COMPLETION-REVIEW.md). No publish occurred in this pass.
+> Scoped development browser/font checks do not certify local production mode
+> or post-publish behavior.
+
+Published logs observed during the final refresh contain repeated home-SSR
+renderer import failures (`Host must not be empty`) followed by SPA fallback.
+Root cause remains undiagnosed; this is not fixed by the scoped development
+checks. Investigate with deployment provenance before changing code/configuration.
+
 Latest product changes and real-browser outcomes are recorded in the
 [parallel repair report](worklog/site-repair-2026-09-17.md). No publishing
 action was taken, and historical pixel results below remain historical.

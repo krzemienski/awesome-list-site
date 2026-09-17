@@ -1,5 +1,9 @@
 # Final parity screen inventory
 
+> Current acceptance and scoped repairs: [COMPLETION-REVIEW.md](COMPLETION-REVIEW.md).
+> “Final” in this historical title does not mean all rows passed. Use the live
+> harness inventory and corrected STATUS for current row classifications.
+
 **Harness authority:** [tests/parity/inventory.json](../../tests/parity/inventory.json) at consolidation HEAD `a1e2a9fc598a34b4e662a27f5c8bdb6a869c8f3e`. This table has exactly **83 unique harness IDs** across 10 families; the declared eligibility is **pixel 48, token-only 24, blocked 10, artifact-docs 1**. It is a documentation view, not a second inventory.
 
 **Regression authority:** the full run is [`2026-09-15T17-47-51-897Z-9407`](../../tests/parity/baseline/2026-09-15T17-47-51-897Z-9407/results.json), captured from application commit `2b44a2bc08692059cc4ab63c526a5871451fbe1f`; its evidence remains labelled with that originating SHA. This documentation-only consolidation is at current HEAD `a1e2a9fc598a34b4e662a27f5c8bdb6a869c8f3e`; it does not relabel the historical capture or assert a new capture. The gate is **NOT PASSED**: 16 pass / 172 fail / 188 measured pixel cells; 40 blocked, 96 token-only UNVERIFIED, 4 evidence-only and 4 aliases are outside that denominator.

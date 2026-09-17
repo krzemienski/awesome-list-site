@@ -1,5 +1,9 @@
 # Contact variants
 
+Current independent review: [parity/COMPLETION-REVIEW.md](parity/COMPLETION-REVIEW.md).
+All five variants received source review in this pass, not a fresh complete
+configured-form/browser certification. Default-off behavior was preserved.
+
 Latest repair follow-through: unavailable destinations distinguish configuration
 fetch errors from absent configuration. Reopening the form clears a previous
 submission error without erasing its values or resetting an in-flight send.

@@ -1,5 +1,10 @@
 # Independent verification — task 571
 
+> This is historical verification. Current scoped native-browser and static
+> evidence, fresh lint failure, safe-test-database requirements and unresolved
+> reference conflicts are in [COMPLETION-REVIEW.md](COMPLETION-REVIEW.md).
+> Overall original-contract acceptance remains **NOT COMPLETE**.
+
 ## Scope and provenance
 
 This was an independent acceptance/evidence review plus the task-required
