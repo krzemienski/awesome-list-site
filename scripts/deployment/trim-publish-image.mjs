@@ -43,6 +43,23 @@ for (const target of targets) {
     }
   }
 }
+// Frozen parity baselines are stored with write permission removed
+// (directories 0555). unlink() needs write permission on the parent
+// directory, so rmSync alone fails with EACCES (2026-09-17 publish log).
+// Re-grant owner write on every directory beneath the target first. This
+// only ever runs in the publishing copy (see the marker check above); it
+// never follows symlinks.
+function makeDirectoriesWritable(dir) {
+  const stat = fs.lstatSync(dir);
+  if (!stat.isDirectory()) return;
+  if ((stat.mode & 0o700) !== 0o700) fs.chmodSync(dir, stat.mode | 0o700);
+  for (const entry of fs.readdirSync(dir, { withFileTypes: true })) {
+    if (entry.isDirectory() && !entry.isSymbolicLink()) {
+      makeDirectoriesWritable(path.join(dir, entry.name));
+    }
+  }
+}
+
 for (const target of targets) {
   const absolute = path.join(root, target);
   if (!fs.existsSync(absolute)) {
@@ -50,5 +67,8 @@ for (const target of targets) {
     continue;
   }
   console.log(`[publish-image] ${mode === "--apply" ? "Removing" : "Would remove"} ${target}`);
-  if (mode === "--apply") fs.rmSync(absolute, { recursive: true, force: true });
+  if (mode === "--apply") {
+    makeDirectoriesWritable(absolute);
+    fs.rmSync(absolute, { recursive: true, force: true });
+  }
 }

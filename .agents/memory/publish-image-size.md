@@ -9,4 +9,6 @@ description: Preserve development evidence while reducing the production image.
 
 **Publish build env facts (observed in build logs):** REPLIT_DEPLOYMENT=1 is runtime-only (absent during the build command); REPLIT_DEV_DOMAIN IS present in the publish build container (2026-09-17 build failed on a guard assuming it meant "workspace"). Production env vars (e.g. REPLIT_PUBLISH_IMAGE_TRIM=1) are visible to the build command. Never infer "this is the workspace" from REPL*/REPLIT_* variables — only the production-only marker is a reliable discriminator.
 
+**Frozen baselines:** parity baseline runs are committed with write bits removed (dirs 0555); rmSync on them EACCESes at unlink (needs parent-dir write). Any cleanup must re-grant owner write on directories first — this is why the 2nd 2026-09-17 publish failed.
+
 **How to apply:** Require publish mode and the platform deployment marker, use a narrow allowlist, reject symlinks, and verify deletion on a disposable copy. Never set the deployment marker in the real workspace just to test cleanup.
