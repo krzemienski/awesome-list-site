@@ -13,4 +13,6 @@ description: Preserve development evidence while reducing the production image.
 
 **The 8 GiB limit counts EVERY layer**, including the Nix layer. This project's `[nix] packages` carry Chromium (1.5 GiB closure alone) + GTK4/GStreamer for WebKit tests, so the repo copy must stay well under ~4 GiB. Trimming only baselines + browser cache was not enough (third 2026-09-17 publish still failed on size); the allowlist also drops `.git` (2.4 GiB packs, runtime only sees the baked BUILD_REVISION), docs/parity* evidence, test output dirs, and `attached_assets` (Vite input already in dist). If size fails again, the remaining lever is removing the browser Nix packages — that breaks workspace Playwright runs, so it is the user's call.
 
+**`.cache/replit` is the runtime environment:** it holds the module env (nodejs-20, env/latest.json PATH). Deleting all of `.cache` in the publish copy builds fine but the container dies at start with `exec: "npm": executable file not found` (4th 2026-09-17 publish). Only ever trim `.cache/ms-playwright`; the trimmer now hard-refuses `.cache`, `.config`, `.local`, node_modules, dist, migrations.
+
 **How to apply:** Require publish mode and the platform deployment marker, use a narrow allowlist, reject symlinks, and verify deletion on a disposable copy. Never set the deployment marker in the real workspace just to test cleanup.

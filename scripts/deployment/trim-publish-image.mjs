@@ -9,7 +9,10 @@ import { fileURLToPath } from "node:url";
 // point) and is never read by `node dist/index.js`:
 //   - .git: history/packs (~2.4 GiB); the runtime only sees the baked revision
 //   - parity baselines / docs/parity*: frozen capture evidence (~5.6 GiB)
-//   - .cache: Playwright browser binaries and tool caches
+//   - .cache/ms-playwright: Playwright browser binaries. NEVER widen this to
+//     all of .cache: .cache/replit/ holds the module environment (nodejs-20,
+//     env/latest.json with the runtime PATH); deleting it made the 4th
+//     2026-09-17 publish fail at startup with `exec: "npm": not found`.
 //   - audit-evidence, test-results, playwright-report: test run output
 //   - attached_assets: Vite build input already copied into dist/public
 // The 2026-09-17 publish with only the first two entries still exceeded the
@@ -17,7 +20,7 @@ import { fileURLToPath } from "node:url";
 // tests) plus the remaining repo bulk left no headroom.
 const targets = [
   "tests/parity/baseline",
-  ".cache",
+  ".cache/ms-playwright",
   ".git",
   "docs/parity",
   "docs/parity-taxonomy",
@@ -51,6 +54,14 @@ if (mode === "--apply" && !publishMarker) {
 // from the production environment). The marker above is the only reliable
 // discriminator — it is a production-only env var that the interactive
 // workspace never defines — so the workspace can only ever run --dry-run.
+
+// Platform-owned directories the runtime container depends on. Refuse any
+// target that is one of these or would remove one (see the .cache note above).
+const platformDirs = [".cache/replit", ".config", ".local", ".replit", "replit.nix", "node_modules", "dist", "migrations"];
+for (const target of targets) {
+  const hit = platformDirs.find((p) => p === target || p.startsWith(`${target}/`) || target.startsWith(`${p}/`));
+  if (hit) throw new Error(`Refusing to trim ${target}: it contains or lives inside runtime-required ${hit}`);
+}
 
 // Check every path before deleting anything. Never follow symlinked parents
 // into directories outside the build copy.
