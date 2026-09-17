@@ -150,3 +150,4 @@
 - [Built-in tester + Clerk](native-tester-clerk-workaround.md) — tester Clerk helper fails on the proxied dev host; mint `+clerk_test` users via backend API, resend creds every follow-up, Clerk-first teardown + residue sweep.
 - [LCP dated to the bundle by re-inserting prerender](lcp-reinserted-prerender.md) — moving prerender nodes after the bundle runs re-registers a larger web-font LCP candidate; do holds in the pre-boot inline script, keep them semantic until adopted.
 - [Contract-over-reference residuals](contract-over-reference-residuals.md) — behaviour the contract requires but the prototype lacks: log its failing pixel rows the same pass; sr-only keeps crawler text.
+- [Skip-link route preservation](skip-link-route-preservation.md) — focus can land correctly while fragment routing switches pages; verify the current route and chapter remain intact too.

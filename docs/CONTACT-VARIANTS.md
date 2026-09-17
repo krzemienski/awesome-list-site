@@ -1,5 +1,11 @@
 # Contact variants
 
+Latest repair follow-through: unavailable destinations distinguish configuration
+fetch errors from absent configuration. Reopening the form clears a previous
+submission error without erasing its values or resetting an in-flight send.
+These changes were source/type-checked; the configured browser evidence below
+retains its original dates. Contact remains default-off.
+
 Contact is build-time opt-in through `VITE_CONTACT_VARIANT`. Only `a`, `b`, `c`, `d`, and `e` are accepted; unset and every other value render no new contact feature. Server form enablement is independent and defaults off. The existing Suggest Edit feature remains available when contact variants are off.
 
 | Value | Experience | Required public configuration | Screenshot |

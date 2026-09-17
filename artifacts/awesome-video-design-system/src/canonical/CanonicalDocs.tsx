@@ -2,6 +2,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { DOC_PAGES } from "./DocsContent";
 import "./ArtifactDocs.css";
+import { SkipLink } from "./SkipLink";
 
 export const NAV_GROUPS = [
   { label: "Start", items: [{ id: "overview", title: "Overview" }, { id: "principles", title: "Principles" }, { id: "getting-started", title: "Getting started" }] },
@@ -12,9 +13,24 @@ export const NAV_GROUPS = [
 ];
 const ALL_IDS = NAV_GROUPS.flatMap(group => group.items.map(item => item.id));
 
+function normalizedHash() {
+  let rawHash = window.location.hash;
+  try {
+    rawHash = decodeURIComponent(rawHash);
+  } catch {
+    // Preserve malformed user-controlled hashes without breaking the docs shell.
+  }
+  return rawHash.replace(/^#\/?/, "").split(/[?&/]/, 1)[0].toLowerCase();
+}
+
 function routeId() {
-  const hash = window.location.hash.replace(/^#(?:docs-)?/, "").split("/")[0];
+  const hash = normalizedHash().replace(/^docs-/, "");
   return ALL_IDS.includes(hash) ? hash : "overview";
+}
+
+function isDocsLocation() {
+  const hash = normalizedHash();
+  return hash.startsWith("docs-");
 }
 
 function DocsNav({ active, onPick }) {
@@ -45,6 +61,9 @@ export function CanonicalDocs() {
     return () => window.removeEventListener("hashchange", update);
   }, []);
   useEffect(() => {
+    // A docs link can navigate to another hash-routed view. Do not let the
+    // outgoing docs instance canonicalize that destination back to its chapter.
+    if (!isDocsLocation()) return;
     const target = `#docs-${active}`;
     if (window.location.hash !== target && !window.location.hash.startsWith(`${target}/`)) {
       window.history.replaceState(null, "", target);
@@ -72,9 +91,9 @@ export function CanonicalDocs() {
   const lookup = id => flat.find(item => item.id === id);
   const pick = id => { window.location.hash = `docs-${id}`; setActive(id); };
 
-  return <div className="page artifact-docs"><div className="grain" aria-hidden="true" /><div className="docs-shell">
+  return <div className="page artifact-docs"><SkipLink targetId="docs-main" /><div className="grain" aria-hidden="true" /><div className="docs-shell">
     <DocsNav active={active} onPick={pick} />
-    <main className="docs-main">
+      <main id="docs-main" className="docs-main" tabIndex={-1}>
       <div className="docs-meta"><span>{meta?.group}</span><span style={{ color: "var(--text-3)" }}>/</span><span style={{ color: "var(--text-2)" }}>{meta?.title}</span></div>
       <Page />
       <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 14, marginTop: 80, paddingTop: 32, borderTop: "var(--hairline-w) solid var(--border)" }}>

@@ -76,3 +76,44 @@ screenshots containing other users' personal details into the repository.
 The historical full-inventory result remains historical and is not replaced
 with a fabricated green report. This record describes actual product repairs
 and the specifically exercised user journeys.
+
+## Continuation: contact and design-system interactions
+
+Three parallel owners reviewed contact behavior, implemented artifact
+interactions, and checked the remaining application scope without starting
+another broad audit. No additional main-app behavior gap was established by
+the read-only scope review; historical failures were not relabeled as new bugs.
+
+Implemented:
+- Contact footer distinguishes a failed configuration request from genuinely
+  unconfigured destinations.
+- Reopening a contact form clears a previous submission error while retaining
+  entered values. Pending submissions remain pending on reopen, and the
+  submit handler rejects a second send while one is in flight.
+- Artifact parser boot reads the same combined theme record as React,
+  validating system/accent together. Invalid records resolve both defaults;
+  obsolete split storage keys no longer override the runtime's decision.
+- Showcase tab specimens now have real panels, arrow/Home/End navigation,
+  roving focus, and selected state. Non-action list rows no longer suggest
+  that clicking will perform an operation.
+- Showcase, Anatomy and Docs have keyboard skip links that focus and scroll
+  the main landmark without changing the route fragment or current chapter.
+- Docs no longer overwrites an outgoing Anatomy/Showcase navigation before
+  unmounting. Chapter Back/Forward navigation is preserved.
+
+The same built-in tester verified tabs and Terminal/Magenta reload persistence
+at 375px (`aing3j`, `b8h5rh`, `dx4duq`). It exposed the outgoing Docs navigation
+bug, which was repaired rather than bypassed. The focused correction passed
+at 375px and 768px: Docs → Principles → Anatomy → Showcase, keyboard skip
+focus without chapter/route changes, and browser Back/Forward. Personally
+reviewed captures include `6yfp3j` (768px docs navigation) and `8a04cm` (768px
+Anatomy). Document-level overflow was zero in the verified narrow states.
+The main Screenshot tool also confirmed the artifact renders at 1280px.
+
+The TypeScript check passed. Earlier artifact build/type checks passed before
+the final navigation corrections; those corrections were exercised in the
+running artifact rather than starting another build/gate loop. No precise
+prepaint flash measurement is claimed. Contact changes are source/type-checked;
+configured submission evidence from the earlier contact pass remains historical
+and was not replayed. Default-off flags, production configuration, frozen
+reference sources, font-preview ownership and database data were unchanged.

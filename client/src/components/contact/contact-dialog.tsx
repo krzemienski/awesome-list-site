@@ -59,18 +59,6 @@ export function ContactDialogHost() {
     defaultValues: { name: "", replyTo: "", subject: "", message: "", website: "" },
   });
 
-  useEffect(() => {
-    const onOpen = () => {
-      openerRef.current = document.activeElement instanceof HTMLElement
-        ? document.activeElement
-        : null;
-      setReceipt(null);
-      setOpen(true);
-    };
-    window.addEventListener("awesome:open-contact-form", onOpen);
-    return () => window.removeEventListener("awesome:open-contact-form", onOpen);
-  }, []);
-
   const mutation = useMutation({
     mutationFn: (data: ContactSubmission) =>
       apiRequest("/api/contact", {
@@ -82,6 +70,23 @@ export function ContactDialogHost() {
       form.reset();
     },
   });
+  const { reset: resetMutation, isError: submissionFailed } = mutation;
+
+  useEffect(() => {
+    const onOpen = () => {
+      openerRef.current = document.activeElement instanceof HTMLElement
+        ? document.activeElement
+        : null;
+      // Keep entered values after a failed submission, but do not carry an
+      // old transport/rate-limit error into a newly opened dialog. Never
+      // reset a pending request: reopening must not enable a second send.
+      if (submissionFailed) resetMutation();
+      setReceipt(null);
+      setOpen(true);
+    };
+    window.addEventListener("awesome:open-contact-form", onOpen);
+    return () => window.removeEventListener("awesome:open-contact-form", onOpen);
+  }, [resetMutation, submissionFailed]);
 
   if (contactVariant !== "b" && contactVariant !== "e") return null;
 
@@ -133,7 +138,13 @@ export function ContactDialogHost() {
           <Form {...form}>
             <form
               className="contact-dialog__form space-y-4"
-              onSubmit={(event) => { void form.handleSubmit((data) => mutation.mutate(data))(event); }}
+              onSubmit={(event) => {
+                if (mutation.isPending) {
+                  event.preventDefault();
+                  return;
+                }
+                void form.handleSubmit((data) => mutation.mutate(data))(event);
+              }}
               noValidate
             >
               <FormField

@@ -1,8 +1,9 @@
 // @ts-nocheck
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { ACCENTS, DESIGN_SYSTEMS as RUNTIME_SYSTEMS } from "../../../../client/src/lib/design-system";
 import { Button, Card, Chip, Dot, Eyebrow, Kbd } from "./ShowcasePrimitives";
 import { useShowcaseTheme } from "./useShowcaseTheme";
+import { SkipLink } from "./SkipLink";
 import showcaseStyles from "./ShowcaseParity.module.css";
 import tokenProjection from "../../tokens.json";
 const DESIGN_SYSTEMS = Object.fromEntries(Object.entries(RUNTIME_SYSTEMS).map(([id, meta]) => [id, { ...meta, vars: tokenProjection.themes[id].tokens }]));
@@ -1166,6 +1167,28 @@ function Geometry({ system }) {
 /* ------------------------------------------------------------------ */
 
 function Components() {
+  const tabs = [
+    { label: 'Overview', content: 'A compact overview of the resource and its current health.' },
+    { label: 'Subcategories', content: 'Browse the related subcategories and their indexed resources.' },
+    { label: 'Activity', content: 'Review recent indexing and maintenance activity for this resource.' },
+    { label: 'Stats', content: 'Compare usage, stars, and freshness signals over time.' },
+  ];
+  const [activeTab, setActiveTab] = useState(0);
+  const tabRefs = useRef<(HTMLButtonElement | null)[]>([]);
+  const selectTab = (index: number, focus = false) => {
+    setActiveTab(index);
+    if (focus) tabRefs.current[index]?.focus();
+  };
+  const handleTabKeyDown = (event: React.KeyboardEvent<HTMLButtonElement>, index: number) => {
+    let next = index;
+    if (event.key === 'ArrowRight') next = (index + 1) % tabs.length;
+    if (event.key === 'ArrowLeft') next = (index - 1 + tabs.length) % tabs.length;
+    if (event.key === 'Home') next = 0;
+    if (event.key === 'End') next = tabs.length - 1;
+    if (next === index) return;
+    event.preventDefault();
+    selectTab(next, true);
+  };
   return (
     <section className="ds-section">
       <SectionHead
@@ -1295,10 +1318,39 @@ function Components() {
       <div style={{ marginBottom: 48 }}>
         <div className="mono" style={{ fontSize: 10, letterSpacing: '0.18em', color: 'var(--text-3)', marginBottom: 14 }}>TABS</div>
         <div className="tabs" role="tablist" aria-label="Component example tabs">
-          <button className="tab active" role="tab" aria-selected="true">Overview</button>
-          <button className="tab" role="tab" aria-selected="false">Subcategories <span className="mono" style={{ color: 'var(--text-3)' }}>· 14</span></button>
-          <button className="tab" role="tab" aria-selected="false">Activity</button>
-          <button className="tab" role="tab" aria-selected="false">Stats</button>
+          {tabs.map((tab, index) => (
+            <button
+              key={tab.label}
+              ref={element => { tabRefs.current[index] = element; }}
+              id={`showcase-tab-${index}`}
+              className={`tab${activeTab === index ? ' active' : ''}`}
+              role="tab"
+              aria-selected={activeTab === index}
+              aria-controls="showcase-tabpanel"
+              tabIndex={activeTab === index ? 0 : -1}
+              onClick={() => selectTab(index)}
+              onKeyDown={event => handleTabKeyDown(event, index)}
+            >
+              {tab.label}{tab.label === 'Subcategories' && <span className="mono" style={{ color: 'var(--text-3)' }}>· 14</span>}
+            </button>
+          ))}
+        </div>
+        <div
+          id="showcase-tabpanel"
+          role="tabpanel"
+          aria-labelledby={`showcase-tab-${activeTab}`}
+          tabIndex={0}
+          style={{
+            minHeight: 44,
+            padding: '14px 16px',
+            border: 'var(--hairline-w) solid var(--border)',
+            borderTop: 0,
+            color: 'var(--text-2)',
+            fontSize: 13,
+            lineHeight: 1.55,
+          }}
+        >
+          {tabs[activeTab].content}
         </div>
       </div>
 
@@ -1306,7 +1358,7 @@ function Components() {
       <div>
         <div className="mono" style={{ fontSize: 10, letterSpacing: '0.18em', color: 'var(--text-3)', marginBottom: 14 }}>LIVE SIGNALS</div>
         <div style={{ display: 'flex', gap: 24, flexWrap: 'wrap', alignItems: 'center' }}>
-          <span style={{ display: 'inline-flex', alignItems: 'center', gap: 8, fontSize: 12, color: 'var(--text-2)' }}>
+          <span aria-label="indexed live" style={{ display: 'inline-flex', alignItems: 'center', gap: 8, fontSize: 12, color: 'var(--text-2)' }}>
             <span className="live-dot" />
             <span className="mono" style={{ letterSpacing: '0.08em' }}>indexed · live</span>
           </span>
@@ -1357,11 +1409,8 @@ function ListUnit() {
             gap: 24, padding: '20px 8px',
             borderBottom: 'var(--hairline-w) solid var(--hairline)',
             alignItems: 'baseline',
-            cursor: 'pointer',
-            transition: 'background 160ms ease',
-          }}
-          onMouseEnter={(e) => e.currentTarget.style.background = 'var(--surface)'}
-          onMouseLeave={(e) => e.currentTarget.style.background = 'transparent'}>
+             transition: 'background 160ms ease',
+           }}>
             <code className="mono" style={{ fontSize: 11, color: 'var(--text-3)', letterSpacing: '0.1em' }}>{it.idx}</code>
             <div>
               <div style={{ display: 'flex', gap: 10, alignItems: 'baseline', marginBottom: 6, flexWrap: 'wrap' }}>
@@ -1479,6 +1528,7 @@ export function CanonicalShowcase() {
 
   return (
     <div className="page">
+      <SkipLink targetId="showcase-main" />
       <div className="grain" aria-hidden="true" />
       <SystemSwitcher
         system={system}
@@ -1486,7 +1536,7 @@ export function CanonicalShowcase() {
         onSystem={handleSystem}
         onAccent={setAccent}
       />
-      <main className="ds-shell">
+      <main id="showcase-main" className="ds-shell" tabIndex={-1}>
         <Hero system={system} />
         <SystemsOverview system={system} onSystem={handleSystem} />
         <FlowDiagramsSection accent={accent} />
@@ -1505,5 +1555,5 @@ export function CanonicalShowcase() {
 
 export function CanonicalAnatomy() {
   const { system, accent, setSystem: handleSystem, setAccent } = useShowcaseTheme();
-  return <div className="page"><div className="grain" aria-hidden="true" /><SystemSwitcher system={system} accent={accent} onSystem={handleSystem} onAccent={setAccent} /><main className="ds-shell"><FlowDiagramsSection accent={accent} /><Footer system={system} /></main></div>;
+  return <div className="page"><SkipLink targetId="anatomy-main" /><div className="grain" aria-hidden="true" /><SystemSwitcher system={system} accent={accent} onSystem={handleSystem} onAccent={setAccent} /><main id="anatomy-main" className="ds-shell" tabIndex={-1}><FlowDiagramsSection accent={accent} /><Footer system={system} /></main></div>;
 }

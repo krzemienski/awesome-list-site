@@ -47,8 +47,15 @@
         addEventListener("hashchange", syncWebfonts);
         const registry = __AWESOME_VIDEO_DS_BOOT__;
         try {
-          const system = localStorage.getItem("ds-system");
-          const accent = localStorage.getItem("ds-accent");
+          // Keep parser-blocking boot semantics identical to useShowcaseTheme:
+          // only a complete, valid combined record can override both defaults.
+          let saved = null;
+          try { saved = JSON.parse(localStorage.getItem("awesome-video-design-system:theme") || "null"); } catch {}
+          const valid = saved && typeof saved === "object" && !Array.isArray(saved)
+            && typeof saved.system === "string" && registry.systems.includes(saved.system)
+            && typeof saved.accent === "string" && registry.accents.includes(saved.accent);
+          const system = valid ? saved.system : registry.defaultSystem;
+          const accent = valid ? saved.accent : registry.defaultAccent;
           document.documentElement.dataset.system = registry.systems.includes(system)
             ? system
             : registry.defaultSystem;

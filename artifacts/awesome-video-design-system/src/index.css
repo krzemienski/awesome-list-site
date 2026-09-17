@@ -19,6 +19,9 @@ button { color: inherit; }
 .ds-flow-section {
   overflow-x: clip;
 }
+.ds-list-row:hover {
+  background: var(--surface);
+}
 .ds-flow-scroll {
   width: 100%;
   max-width: 100%;

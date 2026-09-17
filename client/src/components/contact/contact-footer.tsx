@@ -11,15 +11,17 @@ import "@/styles/pages/contact.css";
 
 function DestinationLink({
   destination,
+  unavailableReason,
   label,
   icon,
 }: {
   destination?: ContactDestination;
+  unavailableReason?: string;
   label: string;
   icon: ReactNode;
 }) {
   if (!destination?.available || !destination.href) {
-    const reason = destination?.unavailableReason ?? `${label} is not configured`;
+    const reason = destination?.unavailableReason ?? unavailableReason ?? `${label} is not configured`;
     return (
       <span
         className="contact-footer-link contact-footer-link--unavailable inline-flex min-h-[44px] items-center text-[color:var(--text-3)]"
@@ -66,11 +68,13 @@ export function ContactFooter() {
       <>
         <DestinationLink
           destination={config.data?.contact.email}
+          unavailableReason={config.isError ? "Contact configuration could not be loaded" : undefined}
           label="Email"
           icon={<Mail aria-hidden className="h-4 w-4" />}
         />
         <DestinationLink
           destination={config.data?.contact.issues}
+          unavailableReason={config.isError ? "Contact configuration could not be loaded" : undefined}
           label="Report an issue"
           icon={<MessageCircle aria-hidden className="h-4 w-4" />}
         />
@@ -81,6 +85,7 @@ export function ContactFooter() {
     return (
       <DestinationLink
         destination={config.data?.contact.discussions}
+        unavailableReason={config.isError ? "Contact configuration could not be loaded" : undefined}
         label="GitHub Discussions"
         icon={<MessagesSquare aria-hidden className="h-4 w-4" />}
       />
