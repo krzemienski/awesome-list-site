@@ -144,3 +144,5 @@
 - [URL-sync effects vs history navigation](url-sync-effect-popstate.md) — a URL-mirroring effect must no-op once the document left its route, or popstate entries get overwritten and Back never leaves the page.
 - [Parity harness lessons](parity-harness-lessons.md) — frozen panels only flex-wrap; content (not pins) drives auto-table drift; token gate drops type selectors so `:not(.x)` fails.
 - [Route remounts + capture re-scroll](route-remount-causes.md) — inline `component={() => …}` routes and first-observation `qc.clear()` remount pages; reveal observers must disconnect after one reveal.
+- [A11y gates need two probes](a11y-gate-hidden-probes.md) — getByRole misses `inert` ancestors; sr-only controls need role/name + ARIA snapshot + ancestor walk; forced-colors borders die under any `border:0`.
+- [44px floor vs frozen controls](accessible-floor-vs-frozen-controls.md) — the 12 artifact parity fails are the a11y floor by contract, don't re-fix; scope table nowraps to ONE cell; sweep parity users after a killed run.

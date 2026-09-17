@@ -66,3 +66,11 @@ An optional font loader may reuse a stylesheet URL that is already present in th
 **Why:** Inter's optional picker URL can be byte-for-byte identical to the always-on Inter URL. Returning early on that duplicate preserves network efficiency but otherwise makes the option look loaderless to a correctly isolated gate.
 
 **How to apply:** keep one request, but attach option ownership before returning from the duplicate-link path. Wait for the non-rendered link to be attached (not visible) before mutation checks, because optional loaders run after first paint.
+
+## Per-view font requests without a static href (design-system artifact, September 2026)
+
+The standalone artifact ports two frozen pages that make *different* css2 requests (the docs page declares no IBM Plex Sans and a different axis subset). One static `<link href>` can never be right for both, and a static href is fetched by the preload scanner before any inline script can swap it, so "swap the href in a boot script" still downloaded the wrong faces first on a direct `#docs-…` load.
+
+**Why:** the parity harness compares declared `@font-face` sets per view; a preloaded wrong sheet leaves extra faces declared on one side (font gaps) even after the swap.
+
+**How to apply:** ship the link with NO `href`, both URLs as `data-*` attributes, `blocking="render"`, and set `href` synchronously from an inline `<head>` script whose hash test mirrors the app's `readView()` normalisation exactly (decode, `#`/`#/`, first segment, lower-case). Verify with a request listener: exactly one css2 request per view, and the chosen URL equals the frozen page's byte-for-byte.
