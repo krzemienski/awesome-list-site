@@ -475,7 +475,7 @@ export default function TaxonomyListing({ level }: Props) {
       <h1 className="taxonomy-title">{level === "category" ? name : <><span className="serif-italic taxonomy-title-accent">{displayName!.split(" ")[0]}</span>{displayName!.includes(" ") ? ` ${displayName!.split(" ").slice(1).join(" ")}` : ""}</>}</h1>
     <section aria-labelledby="taxonomy-scope-heading" data-seo-section="taxonomy-intro">
       <h2 id="taxonomy-scope-heading" className="sr-only">About this collection</h2>
-      {level === "category" && <p className="taxonomy-description">{listingData.resources[0]?.description?.slice(0, 200) ?? listingData.scopeIntro}</p>}
+      <p className="taxonomy-description">{listingData.scopeIntro}</p>
     </section>
     <div className="taxonomy-summary"><span className="chip accent" data-ds="chip">{listingData.totalAll} {resourceNoun(listingData.totalAll)}</span>{level === "category" && listingData.children.length > 0 && <span className="chip" data-ds="chip">{listingData.children.length} {listingData.children.length === 1 ? "subcategory" : "subcategories"}</span>}{level !== "category" && parentCategory && <span>in {parentCategory.name}</span>}<button type="button" className="btn ghost taxonomy-tools-toggle" aria-expanded={toolsOpen} onClick={() => setToolsOpen(value => !value)}>{toolsOpen ? "Close filters" : "Filters & view"}</button></div>
     </header>

@@ -1,5 +1,16 @@
 # Production release record
 
+## Latest local redesign follow-through — 2026-09-17
+
+The working tree based on `a09ad484` includes further verified responsive,
+rendering, taxonomy and admin-menu fixes described in
+[the current report](worklog/redesign-resume-2026-09-17.md).
+This session did not publish or change production configuration. Earlier
+"not published" statements below belong to their recorded historical
+candidates, not to the application's entire deployment history.
+Full final-candidate certification remains incomplete; no new release-ready
+claim is made here.
+
 ## Decision — HOLD (2026-09-17, updated after the fourth full-inventory run)
 
 Candidate: the working tree that becomes the next commit on `main` after

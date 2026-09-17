@@ -1,4 +1,9 @@
 /* Docs-only layout from the frozen docs.html. Keep showcase controls untouched. */
+.artifact-docs .docs-shell,
+.artifact-docs .docs-shell > .docs-nav,
+.artifact-docs .docs-shell > .docs-main {
+  min-width: 0;
+}
 .artifact-docs .docs-nav-item { min-height: 0; }
 .artifact-docs .docs-nav > div:first-child > a {
   display: block !important;

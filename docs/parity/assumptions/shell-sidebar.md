@@ -16,14 +16,15 @@ the older shadcn/icon-rail behavior rather than relaxing those checks.
 | Viewport | Sidebar | Drawer | Rationale |
 | --- | --- | --- | --- |
 | `>=1025px` | visible, `280px`, sticky below `--header-height` | unavailable | Canonical `.sidebar { width: 280px; top: 60px; height: calc(100vh - 60px) }`. |
-| `769–1024px` | visible, `240px`, sticky below the header | available from the header trigger | Canonical `@media (max-width: 1024px) { .sidebar { width: 240px } }`; the canonical menu affordance is also available through tablet. |
-| `<=768px` | hidden | `86%` width, `340px` max, left slide | Canonical `@media (max-width: 768px) { .sidebar { display: none } }` and `.mobile-drawer`. |
+| `768–1024px` | visible, `240px`, sticky below the header | available from the header trigger | Canonical tablet handoff: the 240px sidebar remains mounted at exactly `768px`, while the drawer remains available. |
+| `<768px` | hidden | `86%` width, `340px` max, left slide | Strict phone boundary: the static sidebar is hidden below `768px` and `.mobile-drawer` takes over. |
 
 The default shell intentionally has no 56px icon rail. The rail tokens remain
 available for a separately exposed design variant, but the application
 sidebar uses the full category rows by default. This is why the tablet audit
-expects a visible 240px sidebar instead of the old `sidebar-collapsed` rail,
-and why the 768px audit expects a hidden sidebar plus a trigger.
+expects a visible 240px sidebar at both `768px` and `1024px` instead of the old
+`sidebar-collapsed` rail, while still requiring the drawer trigger at `768px`.
+At `767px` and below it expects only the drawer path.
 
 ## Row and accessibility contract
 

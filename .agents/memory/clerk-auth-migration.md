@@ -26,6 +26,17 @@ The app migrated from Replit OIDC + local email/password (Passport) to Replit-ma
 - The openapi-drift gate (`scripts/validation/openapi-drift.ts`) pins hardcoded route count+hash baselines for BOTH `replit` and `portable` envs; any intentional route surface change must update both (they are now identical — no more REPL_ID-conditional routes).
 
 ## Prod deploy requirement
+
+SSR key resolution must not depend on a browser hostname.
+
+**Why:** Clerk's development-key path can tolerate a missing hostname while
+the production-key path rejects it at module evaluation. A green dev-render
+check therefore failed to predict a deployed renderer-import failure.
+
+**How to apply:** Evaluate server-rendering changes against the production-key
+branch as well as the normal development configuration; keep this separate
+from claims that actual production authentication was exercised.
+
 Production needs the same env vars (CLERK_SECRET_KEY, CLERK_PUBLISHABLE_KEY, VITE_CLERK_PUBLISHABLE_KEY, VITE_CLERK_PROXY_URL for the proxy) and the prod-only proxy path verified after the next publish.
 
 ## Dev vs prod Clerk instances (verified Aug 2026 post-publish)

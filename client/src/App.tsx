@@ -345,14 +345,16 @@ const KNOWN_ROUTE_PATTERNS: RegExp[] = [
   /^\/design-system\/?$/,
 ];
 
-// Task #307 — Clerk auth wiring. REQUIRED canonical constants (copy-verbatim
-// per the platform auth integration): resolve the publishable key from the
-// window hostname so the same build serves multiple domains, and pass the
-// proxy URL unconditionally (empty in dev is intentional — no PROD gates).
-const clerkPubKey = publishableKeyFromHost(
-  typeof window === "undefined" ? "" : window.location.hostname,
-  import.meta.env.VITE_CLERK_PUBLISHABLE_KEY,
-);
+// Task #307 — Clerk auth wiring. Browser loads derive the publishable key from
+// the current hostname so one build can serve multiple domains. SSR has no
+// browser hostname, so it must use the explicitly configured key instead of
+// passing an empty host to Clerk's host resolver. A missing build-time key is
+// a configuration error for both paths; never substitute a fake key.
+const configuredClerkPubKey = import.meta.env.VITE_CLERK_PUBLISHABLE_KEY;
+const clerkPubKey =
+  typeof window === "undefined"
+    ? configuredClerkPubKey
+    : publishableKeyFromHost(window.location.hostname, configuredClerkPubKey);
 const clerkProxyUrl = import.meta.env.VITE_CLERK_PROXY_URL;
 const basePath = import.meta.env.BASE_URL.replace(/\/$/, "");
 
@@ -365,7 +367,9 @@ function stripBase(path: string): string {
 }
 
 if (!clerkPubKey) {
-  throw new Error("Missing VITE_CLERK_PUBLISHABLE_KEY in .env file");
+  throw new Error(
+    "Missing VITE_CLERK_PUBLISHABLE_KEY: configure the Clerk publishable key for SSR and browser auth",
+  );
 }
 
 const clerkLocalization = {

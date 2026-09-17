@@ -1,0 +1,21 @@
+Current public coverage matrix (live :5000, named agent-browser session public-resume)
+
+Route | Guest result | Interaction/state proof | Evidence
+/about | loaded Editorial page | FAQ first item opened; expanded=true region | about.txt, about-faq-open.txt
+/terms | loaded full Terms of Use | static content/heading sections present | terms.txt
+/privacy | loaded full Privacy Policy | analytics/cookie table present | privacy.txt
+/code-of-conduct | loaded full Code of Conduct | static sections present | code-of-conduct.txt
+/advanced | loaded catalog explorer | nonsense query -> No categories found; Clear all removes empty state | advanced-empty.txt, advanced-cleared.txt
+/recommendations | loaded populated recommendations | Start here + 12 real resource cards rendered | recommendations.txt
+/continue-learning | guest account gate | “Your progress lives with your account”; Sign in + Browse journeys as guest | continue-learning.txt/png
+/contributions | Clerk guest gate | redirect /sign-in?redirect_url=%2Fcontributions; sign-in UI + Authentication Required | contributions.url/txt/png
+/notifications | Clerk guest gate | redirect /sign-in?redirect_url=%2Fnotifications; sign-in UI + Authentication Required | notifications.url/txt/png
+/search | loaded no-query state | Ctrl/Cmd-K palette; type ffmpeg; ArrowDown+Enter navigated to live resource /resource/184882; Escape closed palette and restored focus to Open search; fill ffmpeg -> q URL; Back -> /search; Forward -> /search?q=ffmpeg; Clear search -> /search | search/palette-*.txt, palette-focus-escape.json, history-forward.txt, clear.txt
+
+Known remaining uncovered interactions/states (not claimed complete):
+- Authenticated variants for contributions/notifications/continue-learning/recommendations and signed-in resource/collection persistence.
+- Forced backend loading/error states for the above pages; only live loaded/empty/gated states were exercised.
+- Advanced sort/category exploration beyond query-empty/clear.
+- Valid public collection share ID (invalid /collections path observed as 404 in prior batch).
+- Contact variants and full footer/external destination click-through in this batch.
+- Full route-by-route responsive/keyboard/axe sweep; current evidence is representative mobile plus prior public shell/category/resource/journey captures.

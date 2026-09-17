@@ -102,10 +102,10 @@ const SidebarProvider = React.forwardRef<
     }, [])
 
     // useIsMobile intentionally preserves the historical <768 public hook
-    // contract. The canonical sidebar cutoff is <=768, so keep this separate
-    // for deciding whether the hidden static copy should be mounted.
+    // contract. The canonical sidebar cutoff is strictly below 768, so keep
+    // this separate for deciding whether the hidden static copy should mount.
     React.useEffect(() => {
-      const media = window.matchMedia("(max-width: 768px)")
+      const media = window.matchMedia("(max-width: 767px)")
       const update = () => setIsPhone(media.matches)
       update()
       media.addEventListener("change", update)

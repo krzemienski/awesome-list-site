@@ -7,6 +7,7 @@ import { Link as WLink, useRoute } from "wouter";
 import AdminStats from "@/components/admin/AdminStats";
 import AdminOverview from "@/components/admin/AdminOverview";
 import { Button } from "@/components/ui/button";
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import "@/components/admin/admin-canonical.css";
 import "@/styles/pages/admin-shell.css";
 import SEOHead from "@/components/layout/SEOHead";
@@ -91,6 +92,7 @@ export default function AdminDashboard() {
     if (sectionTab) return sectionTab;
     return tabFromWindow() ?? "overview";
   });
+  const [settingsOpen, setSettingsOpen] = useState(false);
   const visibleTab = ({ subsubcategories: "subcategories", journeys: "research", digests: "github" } as Record<string, string>)[activeTab] ?? activeTab;
 
   // Keep the tab in sync if the user navigates between /admin/:section links.
@@ -167,6 +169,7 @@ export default function AdminDashboard() {
   };
 
   const handleTabChange = (value: string) => {
+    setSettingsOpen(false);
     setActiveTab(value);
     // Tab clicks always normalize back to /admin#tab (tabs stay on /admin);
     // the /admin/:section path form is only an inbound deep-link alias.
@@ -276,7 +279,7 @@ export default function AdminDashboard() {
         noindex
       />
       <div className="admin-dashboard__masthead">
-        <div>
+        <div className="admin-dashboard__intro">
         <div className="admin-dashboard__eyebrow-slot">
         <div className="eyebrow admin-dashboard__eyebrow">
           <span aria-hidden="true" className="live-dot" />
@@ -289,18 +292,19 @@ export default function AdminDashboard() {
         <p>Manage the {(stats?.totalPublic ?? stats?.resources ?? 0).toLocaleString()} resources, jobs, and contributors that keep the index alive.</p>
         </div>
         <div className="admin-dashboard__actions">
-          <details className="admin-dashboard__settings">
-            <summary className="btn ghost"><Settings className="h-4 w-4" /> Settings</summary>
-            <div className="admin-dashboard__settings-menu">
-              <Button asChild variant="ghost"><WLink href="/settings/theme">Theme settings</WLink></Button>
+          <DropdownMenu open={settingsOpen} onOpenChange={setSettingsOpen}>
+            <DropdownMenuTrigger asChild>
+              <Button variant="ghost"><Settings className="h-4 w-4" /> Settings</Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent className="admin-dashboard__settings-menu" align="start" sideOffset={6} collisionPadding={12}>
+              <DropdownMenuItem asChild><WLink href="/settings/theme">Theme settings</WLink></DropdownMenuItem>
               {(stats?.totalPending ?? stats?.pendingApprovals ?? 0) > 0 ? (
-                <Button variant="ghost" data-testid="link-stat-pending" onClick={() => handleTabChange("approvals")}>Pending approvals</Button>
+                <DropdownMenuItem data-testid="link-stat-pending" onSelect={() => handleTabChange("approvals")}>Pending approvals</DropdownMenuItem>
               ) : null}
               {(stats?.totalRejected ?? 0) > 0 ? (
-                <Button
-                  variant="ghost"
+                <DropdownMenuItem
                   data-testid="link-stat-rejected"
-                  onClick={() => {
+                  onSelect={() => {
                     const url = new URL(window.location.href);
                     url.searchParams.set("status", "rejected");
                     window.history.replaceState({}, "", url.pathname + url.search + url.hash);
@@ -308,13 +312,13 @@ export default function AdminDashboard() {
                   }}
                 >
                   Rejected resources
-                </Button>
+                </DropdownMenuItem>
               ) : null}
-              <Button variant="ghost" data-testid="tab-subsubcategories" onClick={() => handleTabChange("subsubcategories")}>Sub-Subcats</Button>
-              <Button variant="ghost" data-testid="tab-journeys" onClick={() => handleTabChange("journeys")}>Journeys</Button>
-              <Button variant="ghost" data-testid="tab-digests" onClick={() => handleTabChange("digests")}>Digests</Button>
-            </div>
-          </details>
+              <DropdownMenuItem data-testid="tab-subsubcategories" onSelect={() => handleTabChange("subsubcategories")}>Sub-Subcats</DropdownMenuItem>
+              <DropdownMenuItem data-testid="tab-journeys" onSelect={() => handleTabChange("journeys")}>Journeys</DropdownMenuItem>
+              <DropdownMenuItem data-testid="tab-digests" onSelect={() => handleTabChange("digests")}>Digests</DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
           <Button className="btn primary" onClick={handleNewEntry}><Plus className="h-4 w-4" /> New entry</Button>
         </div>
       </div>

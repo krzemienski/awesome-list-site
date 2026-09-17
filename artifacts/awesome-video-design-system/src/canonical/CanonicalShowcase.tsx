@@ -508,10 +508,10 @@ function FlowLane({ sysId, label, x, y, w, h }) {
 }
 
 /* ─── DIAGRAM CANVAS ─── */
-function FlowCanvas({ sysId, accent, children, height = 360 }) {
+function FlowCanvas({ sysId, accent, children, height = 360, scrollable = false, ariaLabel }) {
   const s = SYSTEM_FLOW_STYLES[sysId];
-  return (
-    <div style={{
+  const canvas = (
+    <div className="ds-flow-canvas" style={{
       position: 'relative',
       background: s.bg,
       // DS-OK: canonical per-system anatomy renderer value from awesome-list-site-ds/design-system-anatomy.jsx; pixel-gated against that source
@@ -547,12 +547,20 @@ function FlowCanvas({ sysId, accent, children, height = 360 }) {
       <div style={{ position: 'absolute', inset: 0 }}>{children}</div>
     </div>
   );
+  if (!scrollable) return canvas;
+  return (
+    <div className="ds-flow-clip">
+      <div className="ds-flow-scroll" role="region" tabIndex={0} aria-label={ariaLabel}>
+        {canvas}
+      </div>
+    </div>
+  );
 }
 
 /* ─── A consistent flow content for all systems ─── */
 /* Pipeline: Source → Transcode → [Decision: HLS?] → Package(HLS) / Package(DASH) → CDN
    So we exercise: 5 nodes, 1 decision, 5 arrows w/ labels, swim lane label. */
-function StandardFlow({ sysId, accent }) {
+function StandardFlow({ sysId, accent, scrollable = false, ariaLabel }) {
   /* Layout coordinates within a 720x340 canvas */
   const W = 700, H = 340;
   const nodes = {
@@ -581,7 +589,13 @@ function StandardFlow({ sysId, accent }) {
   };
 
   return (
-    <FlowCanvas sysId={sysId} accent={accent} height={H}>
+    <FlowCanvas
+      sysId={sysId}
+      accent={accent}
+      height={H}
+      scrollable={scrollable}
+      ariaLabel={ariaLabel}
+    >
       <FlowLane sysId={sysId} label="DELIVERY PIPELINE · v1" x={8} y={6} w={W - 16} h={H - 12} />
 
       <FlowNode sysId={sysId} {...nodes.src} accent={accent} />
@@ -656,7 +670,7 @@ function FlowDiagramsSection({ accent }) {
   const order = ['editorial', 'terminal', 'geist', 'brutalist', 'swiss'];
 
   return (
-    <section className="ds-section" data-canonical-section="anatomy">
+    <section className="ds-section ds-flow-section" data-canonical-section="anatomy">
       <SectionHead
         eyebrow="── 02b / FLOW DIAGRAMS"
         title={<>Charts &amp; flows, <em style={{ fontStyle: 'italic', color: 'var(--accent)', fontFamily: 'var(--font-display)' }}>per system</em></>}
@@ -700,7 +714,12 @@ function FlowDiagramsSection({ accent }) {
                 </div>
               </div>
 
-              <StandardFlow sysId={sysId} accent={accentHex} />
+              <StandardFlow
+                sysId={sysId}
+                accent={accentHex}
+                scrollable
+                ariaLabel={`${sysId} delivery pipeline flow diagram`}
+              />
               <PrimitivePalette sysId={sysId} accent={accentHex} />
             </div>
           );
@@ -953,7 +972,7 @@ function Typography({ system }) {
       {/* Scale */}
       <div>
         {TYPE_SCALE.map(t => (
-          <div key={t.name} style={{
+          <div key={t.name} className="ds-type-scale-row" style={{
             display: 'grid', gridTemplateColumns: '120px 100px 1fr 160px', gap: 24,
             padding: '20px 0', borderTop: 'var(--hairline-w) solid var(--hairline)',
             alignItems: 'baseline',
@@ -1332,7 +1351,7 @@ function ListUnit() {
       />
       <div style={{ borderTop: 'var(--hairline-w) solid var(--border)' }}>
         {items.map(it => (
-          <div key={it.idx} style={{
+          <div key={it.idx} className="ds-list-row" style={{
             display: 'grid',
             gridTemplateColumns: '60px 1fr 140px 100px',
             gap: 24, padding: '20px 8px',

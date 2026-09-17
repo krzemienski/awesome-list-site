@@ -79,10 +79,6 @@
   min-height: 34px;
 }
 
-.av-sidebar-shell .av-sidebar-home-navigation > .sub-item:not([data-active]) {
-  background: color-mix(in srgb, var(--text) 98%, var(--bg));
-}
-
 .av-sidebar-shell .av-sidebar-categories-heading {
   align-items: center;
   display: flex;
@@ -731,18 +727,18 @@
   outline-offset: 2px;
 }
 
-/* The tablet sidebar remains visible at exactly 769–1024px and narrows to the
+/* The tablet sidebar remains visible at exactly 768–1024px and narrows to the
    canonical 240px token. */
-@media (min-width: 769px) and (max-width: 1024px) {
+@media (min-width: 768px) and (max-width: 1024px) {
   .av-sidebar-shell {
     flex-basis: var(--shell-sidebar-w-tablet, 240px);
     width: var(--shell-sidebar-w-tablet, 240px);
   }
 }
 
-/* Canonical rule: at <=768px the sidebar is hidden and the drawer takes over.
+/* Canonical rule: below 768px the sidebar is hidden and the drawer takes over.
    Do not use an icon rail as a phone fallback. */
-@media (max-width: 768px) {
+@media (max-width: 767px) {
   .av-sidebar-shell {
     display: none;
   }

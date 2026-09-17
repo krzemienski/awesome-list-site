@@ -5,6 +5,19 @@ description: How to reliably confirm interactive states render, and why getCompu
 
 # Verifying focus/hover/active CSS states (this repo's Vite + Tailwind v4 setup)
 
+## Overlay visibility needs more than bounds
+
+**Rule:** For dropdowns, pair viewport rectangles with item hit-testing and an
+inspected screenshot of the open state.
+
+**Why:** A menu can have every rectangle inside the viewport while a sticky
+header obscures its first item or an alpha surface lets underlying text show
+through. Numeric geometry checks accepted both failures during mobile review.
+
+**How to apply:** Check the first and last items against actual hit targets,
+inspect the opaque background and stacking, and prefer the existing shared
+collision-aware overlay rather than repeatedly adjusting a custom disclosure.
+
 **Rule:** Confirm focus/hover/active styling with a REAL interaction + screenshot
 (agent-browser `find testid "..." click|hover` then `screenshot`), not with
 `el.focus()` + `getComputedStyle`.

@@ -1,0 +1,43 @@
+SSR fix verification (read-only build probes)
+==============================================
+
+Source change
+-------------
+Only client/src/App.tsx changed. SSR now uses the explicit
+VITE_CLERK_PUBLISHABLE_KEY at module evaluation; browser loads continue to
+resolve from window.location.hostname through Clerk's publishableKeyFromHost.
+An absent key now throws a clear configuration error rather than Clerk's empty-
+host exception. No entry-server.tsx or server SSR change was needed because the
+explicit key is resolved before renderHome() and no request-dependent global is
+introduced.
+
+Production-shaped disposable build
+-----------------------------------
+Command used a fake non-secret value (pk_live_not-a-secret) and emitted only to
+/tmp/redesign-resume/rendering/fixed-live-key-build (not dist/):
+  VITE_CLERK_PUBLISHABLE_KEY=pk_live_not-a-secret npx vite build --ssr \
+    src/entry-server.tsx --outDir /tmp/redesign-resume/rendering/fixed-live-key-build
+Result: 241 modules transformed; build completed. Import result:
+  renderer import ok renderHome export present
+
+Real render integration
+-----------------------
+A temporary bundled copy of server/home-ssr-data.ts performed read-only SELECT
+loads from the development database, and the fixed disposable renderer then
+rendered the real anonymous Home payload:
+  nav categories: 9
+  home recent: 5; featured: 0
+  kind count keys: events,libraries,other,protocols,standards,tools,total
+  HTML length: 73096
+  dehydrated queries: ["awesome-list-nav"], ["/api/home"],
+    ["/api/resources/kinds/counts"]
+Only the existing React useLayoutEffect-on-server warning was emitted; render
+completed successfully. No database mutations occurred.
+
+Missing-key behavior
+--------------------
+A second disposable SSR build with VITE_CLERK_PUBLISHABLE_KEY explicitly empty
+failed clearly during renderer import with:
+  Missing VITE_CLERK_PUBLISHABLE_KEY: configure the Clerk publishable key for SSR and browser auth
+No fake fallback was used. Full app build was intentionally deferred to the
+lead's final batch.

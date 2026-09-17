@@ -1,5 +1,13 @@
 # Implementation ledger
 
+## Latest local follow-through
+
+The [2026-09-17 parallel redesign report](worklog/redesign-resume-2026-09-17.md)
+records repairs and focused live proof on the working tree based on `a09ad484`.
+It supersedes the exact-768 defect and taxonomy-intro regression for those
+verified scenarios, but does **not** replace the historical full pixel results
+below or certify unexecuted account/admin persistence flows.
+
 Requirement-by-requirement record of the design-parity build against the frozen
 prototype (`awesome-list-site-ds/`), organised by the execution contract's
 section 4 areas (A–G in [MAIN-SESSION-EXECUTION-PROMPT.md](MAIN-SESSION-EXECUTION-PROMPT.md)).

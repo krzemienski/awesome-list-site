@@ -3,8 +3,91 @@
 :root { color-scheme: dark; }
 * { box-sizing: border-box; margin: 0; padding: 0; }
 html, body { height: 100%; }
-body { overflow-x: hidden; }
+/* The shared app token stylesheet includes a legacy page-level x clip. The
+   artifact owns local responsive scrollports instead, so do not inherit that
+   global clipping contract here. */
+body { overflow-x: visible; }
 button { color: inherit; }
+
+/* Flow anatomy keeps its canonical 700px coordinate canvas, but the viewport
+   must remain usable on phones. The focused region is the local scrollport;
+   page-level overflow is never used to reach diagram content. */
+.ds-flow-clip {
+  max-width: 100%;
+  overflow: clip;
+}
+.ds-flow-section {
+  overflow-x: clip;
+}
+.ds-flow-scroll {
+  width: 100%;
+  max-width: 100%;
+  overflow-x: auto;
+  overflow-y: hidden;
+  overscroll-behavior-x: contain;
+  scrollbar-color: var(--border-strong) transparent;
+  scrollbar-width: thin;
+}
+.ds-flow-scroll:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 3px;
+}
+.ds-flow-scroll > .ds-flow-canvas {
+  min-width: 0;
+}
+@media (max-width: 767px) {
+  .ds-flow-scroll > .ds-flow-canvas {
+    min-width: 700px;
+  }
+}
+@media (max-width: 480px) {
+  /* The token rows are fluid content, not fixed diagrams: reflow their
+     metadata below the sample instead of making the page a second scrollport. */
+  .ds-type-scale-row {
+    grid-template-columns: 76px 48px minmax(0, 1fr) !important;
+    column-gap: 10px !important;
+  }
+  .ds-type-scale-row > :nth-child(3) {
+    min-width: 0;
+    overflow-wrap: anywhere;
+  }
+  .ds-type-scale-row > :nth-child(4) {
+    grid-column: 1 / -1;
+    margin-top: 4px;
+    text-align: left !important;
+  }
+  .ds-token-row {
+    grid-template-columns: minmax(0, 1fr) auto;
+    column-gap: 10px;
+  }
+  .ds-token-row > :nth-child(2) {
+    min-width: 0;
+    overflow-wrap: anywhere;
+    text-align: right;
+  }
+  .ds-token-row > :nth-child(3) {
+    grid-column: 1 / -1;
+    text-align: left !important;
+  }
+  .tabs {
+    min-width: 0;
+    max-width: 100%;
+  }
+  .table {
+    display: block;
+    max-width: 100%;
+    overflow-x: auto;
+  }
+  .ds-list-row {
+    grid-template-columns: 36px minmax(0, 1fr) !important;
+    column-gap: 12px !important;
+  }
+  .ds-list-row > :nth-child(3),
+  .ds-list-row > :nth-child(4) {
+    grid-column: 2;
+    text-align: left !important;
+  }
+}
 
 /* Exact canonical docs renderer chrome from awesome-list-site-ds/docs.html. */
 .docs-shell { display: grid; grid-template-columns: 260px 1fr; min-height: 100vh; }
