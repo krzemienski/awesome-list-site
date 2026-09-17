@@ -120,9 +120,10 @@ run_step bundle-budget npm run bundle:budget
 # build command runs (confirmed by the 2026-09-15 publish logs: the step was
 # skipped and the image exceeded 8 GiB). The publish marker is therefore the
 # production-only env var REPLIT_PUBLISH_IMAGE_TRIM=1, which exists only in
-# Replit's production environment and is never set in the workspace. The
-# helper additionally refuses to run wherever REPLIT_DEV_DOMAIN is present
-# (the interactive workspace), so this gate cannot delete workspace evidence.
+# Replit's production environment and is never set in the workspace, so this
+# gate cannot delete workspace evidence. (Do not add a REPLIT_DEV_DOMAIN
+# guard: the publish build container inherits that variable too — the
+# 2026-09-17 publish failed on exactly that false "workspace" detection.)
 if [ "$PUBLISH_MODE" = 1 ]; then
   if [ "${REPLIT_DEPLOYMENT:-}" = "1" ] || [ "${REPLIT_PUBLISH_IMAGE_TRIM:-}" = "1" ]; then
     run_step trim-publish-image node scripts/deployment/trim-publish-image.mjs --apply

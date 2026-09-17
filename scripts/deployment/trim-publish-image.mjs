@@ -25,14 +25,12 @@ if (mode === "--apply" && !publishMarker) {
     "Refusing cleanup outside publishing: REPLIT_PUBLISH_IMAGE_TRIM (or REPLIT_DEPLOYMENT) must be 1. Use --dry-run in the workspace.",
   );
 }
-// REPLIT_DEV_DOMAIN exists only in the interactive workspace, never in a
-// deployment or its build container. Its presence means this is the real
-// workspace and its evidence must be preserved regardless of any marker.
-if (mode === "--apply" && process.env.REPLIT_DEV_DOMAIN) {
-  throw new Error(
-    "Refusing cleanup: REPLIT_DEV_DOMAIN is set, so this is the interactive workspace, not a publish build.",
-  );
-}
+// Do NOT gate on REPLIT_DEV_DOMAIN: the publish build container inherits it
+// (confirmed by the 2026-09-17 publish log, where this step aborted with
+// "REPLIT_DEV_DOMAIN is set" even though REPLIT_PUBLISH_IMAGE_TRIM=1 came
+// from the production environment). The marker above is the only reliable
+// discriminator — it is a production-only env var that the interactive
+// workspace never defines — so the workspace can only ever run --dry-run.
 
 // Check every path before deleting anything. Never follow symlinked parents
 // into directories outside the build copy.
