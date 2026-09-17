@@ -3,10 +3,30 @@ import path from "node:path";
 import { fileURLToPath } from "node:url";
 
 // Only these development artifacts are expendable in the publishing copy.
-// Keep runtime dependencies, dist, migrations, source, and Git history intact.
+// Keep runtime dependencies (node_modules), dist, migrations, and source
+// intact. Everything listed here is consumed BEFORE this step runs (the gate
+// builds first, and `npm run build` bakes BUILD_REVISION from git at that
+// point) and is never read by `node dist/index.js`:
+//   - .git: history/packs (~2.4 GiB); the runtime only sees the baked revision
+//   - parity baselines / docs/parity*: frozen capture evidence (~5.6 GiB)
+//   - .cache: Playwright browser binaries and tool caches
+//   - audit-evidence, test-results, playwright-report: test run output
+//   - attached_assets: Vite build input already copied into dist/public
+// The 2026-09-17 publish with only the first two entries still exceeded the
+// 8 GiB image limit because the Nix layer (Chromium/GTK/GStreamer for browser
+// tests) plus the remaining repo bulk left no headroom.
 const targets = [
   "tests/parity/baseline",
-  ".cache/ms-playwright",
+  ".cache",
+  ".git",
+  "docs/parity",
+  "docs/parity-taxonomy",
+  "docs/parity-545",
+  "docs/parity-547",
+  "audit-evidence",
+  "test-results",
+  "playwright-report",
+  "attached_assets",
 ];
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "../..");
 const mode = process.argv[2] ?? "--dry-run";
