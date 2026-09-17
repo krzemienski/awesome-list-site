@@ -89,6 +89,53 @@ focus manager, so focus rests on `body` after SPA navigation; the toast close
 button is enabled only by `group-hover` (gated on `@media (hover: hover)`),
 so on touch devices a toast can be dismissed only by swipe or auto-dismiss.
 
+## 2026-09-17 member and admin flows (built-in browser tester)
+
+Run in Replit's built-in browser tester (no new Playwright/agent-browser stack)
+against the dev server on the working tree after `a09ad484`, with one
+disposable Clerk member (`__qa_test_member_*+clerk_test@example.com`, minted
+through the Clerk backend API because the tester's own Clerk sign-in helper
+cannot reach the app on the proxied dev host; signed in through the app's
+`/sign-in` with the test code). Its local role was promoted to `admin` by
+`UPDATE users` for the admin flows and reset to `user` afterwards; the tester
+never deleted a user. Every catalog record the run created is named
+`__qa_test_*` and was deleted through the product UI; the member identity was
+removed in the session's final teardown (Clerk user first, then the local row
+with its `resource_audit_log.performed_by` nulled and interactions cascaded),
+leaving 0 `__qa_test_` users locally and in Clerk and `approved = 1816`.
+
+| Flow | Result |
+|---|---|
+| A. Collections: create `__qa_test_col_*` (id 278) → rename → delete; bookmark a real resource, add/edit/remove a note, unbookmark; all persisted across reload; baseline restored | PASS |
+| B. Submission: invalid form → inline errors; valid `__qa_test_sub_*` → pending id 188450; Approvals shows exactly that pending record; cancel then approve → success toast, pending 0; `/resource/188450` public with title/description/category/canonical URL; found by search | PASS |
+| C. Kind/featured on 188450: set `Protocols` + featured → save → reload → persisted (`Stored override: Protocols`, ★ in the row, featured card + `FEATURED 1` on the curated home) → clear kind, keep featured → save → reload → persisted | PASS |
+| D. Categories: create `__qa_test_cat_*` (id 1387) → rename → delete → reload shows 9 domains again | PASS (see note on slugs) |
+| E. Settings menu → Journeys panel (5 journeys × 6 steps, Steps dialog open/close) and Digests panel (delivery health: transport Available, queue 0, no failure codes); Users tab shows the disposable member with role `admin` | PASS |
+| Cleanup: delete 188450 through Admin Resources (toast, row gone, 1,817 → baseline), role reset, sign out → `Account · Visitor` | PASS |
+
+**Defect 2, confirmed and fixed (2026-09-17, CSS only).** In the admin
+Resources table a plain click on a row's **Edit** opened **Delete Resource**.
+The hover-revealed delete control was `opacity: 0; position: absolute` with no
+offsets: as an out-of-flow flex child it rested at the container's end edge —
+over Edit — and still took pointer events; on hover it switched to `static`,
+which slid Edit left under the pointer so the click landed on the trash. The
+Categories/Subcategories tables shared the pattern. Both now anchor the control
+out of flow on the far side of View/Edit, keep it inert (`pointer-events:
+none`) until the row is hovered or the action group focused, and never re-flow
+the visible buttons when revealed. The new declarations apply only under
+hover, focus-within or tools-open, so the resting composition the pixel
+harness captures is unchanged by construction; the no-hover harness itself was
+not rerun after this edit. Pointer-only re-verification on both tables: Edit →
+Edit dialog; the revealed trash → Delete confirmation (resources) or the
+disabled "Cannot delete: N resources still assigned" state (a populated
+category). Keyboard: Tab reaches the trash and reveals it with a focus ring.
+
+Observations not treated as defects: the category form auto-slugs a name with
+underscores into a slug its own validator rejects (the inline error is
+truthful; a hyphenated slug was entered); after the role reset the still-open
+admin session showed 401/403 responses until sign-out (expected); the
+journey Steps dialog rendered placeholder cards while its step query loaded.
+
 ## Task-owner waiver (2026-09-15)
 
 The task owner directed that all interactive verification be driven with the

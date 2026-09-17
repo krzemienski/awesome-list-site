@@ -193,11 +193,32 @@
 }
 
 .admin-catalog-resources__id-cell:focus-within .admin-catalog-resources__row-select,
-.admin-catalog-resources__id-cell:hover .admin-catalog-resources__row-select,
-.admin-catalog-resources__row-actions:focus-within .admin-catalog-resources__delete-action,
-.admin-catalog-resources__row-actions:hover .admin-catalog-resources__delete-action {
+.admin-catalog-resources__id-cell:hover .admin-catalog-resources__row-select {
   opacity: 1;
   position: static;
+}
+
+/* The hidden delete control must never sit under, or slide into, the Edit
+   button's hitbox: at rest an out-of-flow flex child lands at the container's
+   end edge (over Edit), and switching it to static on hover shifted Edit left
+   under the pointer, so a click on Edit opened Delete Resource. It now lives
+   out of flow on the far side of View, ignores pointer events until revealed,
+   and stays out of flow when revealed so nothing moves under the cursor. */
+.admin-catalog-resources__row-actions {
+  position: relative;
+}
+
+.admin-catalog-resources__delete-action {
+  inset: 50% 100% auto auto;
+  margin-inline-end: 6px;
+  pointer-events: none;
+  transform: translateY(-50%);
+}
+
+tr:hover .admin-catalog-resources__delete-action,
+.admin-catalog-resources__row-actions:focus-within .admin-catalog-resources__delete-action {
+  opacity: 1;
+  pointer-events: auto;
 }
 
 /* Hidden until the tools open (or keyboard focus reaches them). Anchored to
@@ -219,10 +240,18 @@
   position: static;
 }
 
-.admin-catalog-resources--tools-open .admin-catalog-resources__row-select,
-.admin-catalog-resources--tools-open .admin-catalog-resources__delete-action {
+.admin-catalog-resources--tools-open .admin-catalog-resources__row-select {
   opacity: 1;
   position: static;
+}
+
+.admin-catalog-resources--tools-open .admin-catalog-resources__delete-action {
+  inset: auto;
+  margin-inline-end: 0;
+  opacity: 1;
+  pointer-events: auto;
+  position: static;
+  transform: none;
 }
 
 .admin-catalog-resources__kind-cell {

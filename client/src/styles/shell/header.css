@@ -34,22 +34,30 @@
    indicator without adding an inline-block width to the canonical nav. */
 .app-canonical-header .header-live-dot::after { content: ""; position: absolute; left: 0; top: 50%; margin-top: -2.5px; width: 5px; height: 5px; border-radius: 50%; background: var(--accent); box-shadow: 0 0 10px var(--accent); }
 .app-canonical-header button { line-height: normal; font-feature-settings: normal; font-variation-settings: normal; font-weight: 400; }
-.app-canonical-header .header-search-trigger { display: inline-flex; align-items: center; gap: 10px; height: 36px; padding: 0 10px 0 12px; border: var(--hairline-w) solid var(--border); border-radius: var(--radius-sm); background: var(--surface); color: var(--text-2); cursor: pointer; font-family: inherit; font-size: 13px; min-width: 240px; max-width: 360px; transition: all 160ms ease; flex-shrink: 1; }
+.app-canonical-header .header-search-trigger { position: relative; display: inline-flex; align-items: center; gap: 10px; height: 44px; padding: 0 10px 0 12px; border: var(--hairline-w) solid transparent; border-radius: var(--radius-sm); background: transparent; color: var(--text-2); cursor: pointer; font-family: inherit; font-size: 13px; min-width: 240px; max-width: 360px; transition: color 160ms ease; flex-shrink: 1; }
+.app-canonical-header .header-search-trigger::before { content: ""; position: absolute; z-index: 0; inset: 4px 0; border: var(--hairline-w) solid var(--border); border-radius: var(--radius-sm); background: var(--surface); transition: all 160ms ease; pointer-events: none; }
+.app-canonical-header .header-search-trigger > * { position: relative; z-index: 1; }
 .app-canonical-header .header-search-trigger > svg { width: 14px; height: 14px; color: var(--text-3); flex-shrink: 0; }
-.app-canonical-header .header-search-trigger:hover { border-color: var(--border-strong); background: var(--surface-2); color: var(--text); }
+.app-canonical-header .header-search-trigger:hover { color: var(--text); }
+.app-canonical-header .header-search-trigger:hover::before { border-color: var(--border-strong); background: var(--surface-2); }
 .app-canonical-header .header-search-label { flex: 1; text-align: left; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; font-weight: 500; }
 .app-canonical-header .header-search-label > span { color: var(--text-3); }
 /* DS-OK: canonical .kbd uses a fixed 4px radius, not the skin's control radius. */
 .app-canonical-header .header-kbd { font-family: var(--font-mono); font-size: 10.5px; color: var(--text-3); padding: 2px 6px; border: var(--hairline-w) solid var(--border); border-radius: 4px; background: var(--surface); }
-.app-canonical-header .user-pill { display: inline-flex; align-items: center; gap: 8px; height: 36px; padding: 0 12px 0 4px; border-radius: var(--radius-pill); background: color-mix(in srgb, var(--accent) 12%, transparent); border: var(--border-w) solid color-mix(in srgb, var(--accent) 35%, var(--border)); color: var(--text); cursor: pointer; font-family: inherit; transition: all 160ms ease; flex-shrink: 0; }
-.app-canonical-header .user-pill:hover { background: color-mix(in srgb, var(--accent) 20%, transparent); border-color: color-mix(in srgb, var(--accent) 55%, var(--border)); }
+.app-canonical-header .user-pill { position: relative; display: inline-flex; align-items: center; gap: 8px; height: 44px; padding: 0 12px 0 4px; border-radius: var(--radius-pill); background: transparent; border: var(--border-w) solid transparent; color: var(--text); cursor: pointer; font-family: inherit; transition: color 160ms ease; flex-shrink: 0; }
+.app-canonical-header .user-pill::before { content: ""; position: absolute; z-index: 0; inset: 4px 0; border-radius: var(--radius-pill); background: color-mix(in srgb, var(--accent) 12%, transparent); border: var(--border-w) solid color-mix(in srgb, var(--accent) 35%, var(--border)); transition: all 160ms ease; pointer-events: none; }
+.app-canonical-header .user-pill > * { position: relative; z-index: 1; }
+.app-canonical-header .user-pill:hover::before { background: color-mix(in srgb, var(--accent) 20%, transparent); border-color: color-mix(in srgb, var(--accent) 55%, var(--border)); }
+/* DS-OK: canonical UserPill mixes the avatar disc from a fixed #0a0a0a ink (80%) into the accent; it is not a skin token. */
 .app-canonical-header .header-avatar, .app-canonical-header .header-avatar > span { width: 22px; height: 22px; border-radius: var(--radius-pill); background: color-mix(in srgb, #0a0a0a 80%, var(--accent)); color: var(--accent); display: grid; place-items: center; font-family: var(--font-mono); font-size: 10px; font-weight: 700; }
 .app-canonical-header .header-account-name { font-size: 12px; font-weight: 600; max-width: 120px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-.app-canonical-header .mobile-menu-btn { display: none; align-items: center; justify-content: center; cursor: pointer; width: 36px; height: 36px; min-width: 36px; min-height: 36px; padding: 0; border: var(--border-w) solid var(--border); border-radius: var(--radius-sm); background: transparent; color: var(--text); box-shadow: none; }
+.app-canonical-header .mobile-menu-btn { position: relative; display: none; align-items: center; justify-content: center; cursor: pointer; width: 44px; height: 44px; min-width: 44px; min-height: 44px; margin: -4px; padding: 0; border: var(--border-w) solid transparent; border-radius: var(--radius-sm); background: transparent; color: var(--text); box-shadow: none; }
+.app-canonical-header .mobile-menu-btn::before { content: ""; position: absolute; inset: 4px; border: var(--border-w) solid var(--border); border-radius: var(--radius-sm); background: transparent; transition: all 160ms ease; pointer-events: none; }
 .app-canonical-header .header-menu-control { display: none; position: relative; width: 36px; height: 36px; flex-shrink: 0; }
 .app-canonical-header .mobile-menu-btn > svg { visibility: hidden; }
 .app-canonical-header .header-menu-icon { position: absolute; top: 10px; left: 10px; pointer-events: none; }
-.app-canonical-header .mobile-menu-btn:hover { background: var(--surface); border-color: var(--text-3); transform: translateY(-1px); }
+.app-canonical-header .mobile-menu-btn:hover { transform: translateY(-1px); }
+.app-canonical-header .mobile-menu-btn:hover::before { background: var(--surface); border-color: var(--text-3); }
 .app-canonical-header :is(button, a):focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; }
 .header-account-menu [role="menuitem"] { min-height: 44px; }
 @media (max-width: 1180px) { .app-canonical-header .header-search-trigger { min-width: 180px; } }
@@ -63,7 +71,9 @@
 @media (max-width: 768px) {
   .app-canonical-header { height: 56px; padding: 0 14px; }
   .app-canonical-header .hide-mobile { display: none !important; }
-  .app-canonical-header .header-search-trigger { min-width: 36px; width: 36px; height: 36px; padding: 0; justify-content: center; background: transparent; }
+  .app-canonical-header .header-search-trigger { min-width: 44px; width: 44px; height: 44px; margin-inline: -4px; padding: 0; justify-content: center; }
+  .app-canonical-header .header-search-trigger::before { inset: 4px; background: transparent; }
   .app-canonical-header .header-search-trigger > svg { width: 16px; height: 16px; color: var(--text); }
-  .app-canonical-header .user-pill { padding: 0 4px; gap: 0; }
+  .app-canonical-header .user-pill { min-width: 44px; width: 44px; margin-inline: -6px; padding: 0; gap: 0; justify-content: center; }
+  .app-canonical-header .user-pill::before { inset: 4px 6px; }
 }

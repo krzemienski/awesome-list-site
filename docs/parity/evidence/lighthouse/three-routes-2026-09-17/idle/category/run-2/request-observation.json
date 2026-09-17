@@ -1,0 +1,480 @@
+{
+  "schemaVersion": 1,
+  "binding": {
+    "sourceTrackedTreeSha256": "1585af281f03ceb49f75a052e03c869711a23c2290c0065e2c7827b88d550cfb",
+    "sourceDirtyPatchSha256": "eab5c5c2658cb5dd767e3d0f4715b1adf039d686991544144c59b24cb7184c43",
+    "sourceUntrackedTreeSha256": "71ffc5884e03a79ae5cffbe799154e6d6d410f5bd4665baa351324b3c2047b85",
+    "buildTreeSha256": "134d3db1c6cec5c5524250fc66fdd158b740e15381e5150f71f03d26ac15a794"
+  },
+  "observedRequests": [
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:5055/category/encoding-codecs",
+      "resourceType": "document",
+      "isNavigationRequest": true
+    },
+    {
+      "method": "GET",
+      "url": "https://fonts.googleapis.com/css2?family=Inter%3Awght%40400%3B500%3B600%3B700%3B800&family=Fraunces%3Aital%2Cwght%400%2C400%3B0%2C500%3B0%2C600%3B0%2C700%3B1%2C400%3B1%2C500%3B1%2C600&family=JetBrains+Mono%3Awght%40400%3B500%3B600%3B700&family=Geist%3Awght%40400%3B500%3B600%3B700&family=Instrument+Serif%3Aital%400%3B1&family=Space+Grotesk%3Awght%40400%3B500%3B600%3B700&family=IBM+Plex+Mono%3Awght%40400%3B500%3B600%3B700&family=IBM+Plex+Sans%3Awght%40400%3B500%3B600%3B700&family=Manrope%3Awght%40400%3B500%3B600%3B700%3B800&display=swap",
+      "resourceType": "stylesheet",
+      "isNavigationRequest": false
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:5055/assets/index-CCQLmy6r.js",
+      "resourceType": "script",
+      "isNavigationRequest": false
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:5055/assets/index-CTjT7uj6.js",
+      "resourceType": "script",
+      "isNavigationRequest": false
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:5055/assets/index-CeftJlzp.js",
+      "resourceType": "script",
+      "isNavigationRequest": false
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:5055/assets/index-DLXZePn7.css",
+      "resourceType": "stylesheet",
+      "isNavigationRequest": false
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:5055/api/awesome-list/nav",
+      "resourceType": "fetch",
+      "isNavigationRequest": false
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:5055/api/awesome-list/listing?level=category&slug=encoding-codecs&page=1",
+      "resourceType": "fetch",
+      "isNavigationRequest": false
+    },
+    {
+      "method": "GET",
+      "url": "https://fonts.gstatic.com/s/inter/v20/UcC73FwrK3iLTeHuS_nVMrMxCp50SjIa1ZL7W0Q5nw.woff2",
+      "resourceType": "font",
+      "isNavigationRequest": false
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:5055/favicon.svg",
+      "resourceType": "other",
+      "isNavigationRequest": false
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:5055/assets/Category-CVqMYyM3.js",
+      "resourceType": "script",
+      "isNavigationRequest": false
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:5055/assets/TaxonomyListing-BMeJdFts.js",
+      "resourceType": "script",
+      "isNavigationRequest": false
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:5055/assets/paginator-Ddippb2m.js",
+      "resourceType": "script",
+      "isNavigationRequest": false
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:5055/assets/advanced-filter-DLL3J_pv.js",
+      "resourceType": "script",
+      "isNavigationRequest": false
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:5055/assets/badge-DtC8r4a5.js",
+      "resourceType": "script",
+      "isNavigationRequest": false
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:5055/assets/select-upMGWEwT.js",
+      "resourceType": "script",
+      "isNavigationRequest": false
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:5055/assets/index-BdQq_4o_.js",
+      "resourceType": "script",
+      "isNavigationRequest": false
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:5055/assets/index-BzkqPxjz.js",
+      "resourceType": "script",
+      "isNavigationRequest": false
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:5055/assets/chevron-down-DQklzkWR.js",
+      "resourceType": "script",
+      "isNavigationRequest": false
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:5055/assets/collapsible-CUOsgyV2.js",
+      "resourceType": "script",
+      "isNavigationRequest": false
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:5055/assets/tags-GN967ipk.js",
+      "resourceType": "script",
+      "isNavigationRequest": false
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:5055/assets/sliders-horizontal-CSNCTGjp.js",
+      "resourceType": "script",
+      "isNavigationRequest": false
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:5055/assets/SearchFilters-C1-kpewo.js",
+      "resourceType": "script",
+      "isNavigationRequest": false
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:5055/assets/resourceFacets-core-DMw7vNpP.js",
+      "resourceType": "script",
+      "isNavigationRequest": false
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:5055/assets/ResourceCard-CqKzXa5z.js",
+      "resourceType": "script",
+      "isNavigationRequest": false
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:5055/assets/card-DGI8xhBN.js",
+      "resourceType": "script",
+      "isNavigationRequest": false
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:5055/assets/BookmarkButton-BdVkOwGJ.js",
+      "resourceType": "script",
+      "isNavigationRequest": false
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:5055/assets/BookmarkNotesDialog-B0bVRAgr.js",
+      "resourceType": "script",
+      "isNavigationRequest": false
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:5055/assets/dialog-Bc8ykL4V.js",
+      "resourceType": "script",
+      "isNavigationRequest": false
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:5055/assets/textarea-C4paTr3T.js",
+      "resourceType": "script",
+      "isNavigationRequest": false
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:5055/assets/label-BsosfJPA.js",
+      "resourceType": "script",
+      "isNavigationRequest": false
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:5055/assets/checkbox-BPD7A-Gs.js",
+      "resourceType": "script",
+      "isNavigationRequest": false
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:5055/assets/folder-iKIvev60.js",
+      "resourceType": "script",
+      "isNavigationRequest": false
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:5055/assets/heart-Cj8-WuVm.js",
+      "resourceType": "script",
+      "isNavigationRequest": false
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:5055/assets/vendor-blurhash-DVeDoVY-.js",
+      "resourceType": "script",
+      "isNavigationRequest": false
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:5055/assets/external-link-CwNda_4C.js",
+      "resourceType": "script",
+      "isNavigationRequest": false
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:5055/assets/square-pen-CgP5wawR.js",
+      "resourceType": "script",
+      "isNavigationRequest": false
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:5055/assets/resource-card-CPhpLDX2.css",
+      "resourceType": "stylesheet",
+      "isNavigationRequest": false
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:5055/assets/layout-grid-D0uFHS5H.js",
+      "resourceType": "script",
+      "isNavigationRequest": false
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:5055/assets/not-found-BXNWkUTO.js",
+      "resourceType": "script",
+      "isNavigationRequest": false
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:5055/assets/circle-alert-Bhc7T05S.js",
+      "resourceType": "script",
+      "isNavigationRequest": false
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:5055/assets/arrow-right-BNSacM7C.js",
+      "resourceType": "script",
+      "isNavigationRequest": false
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:5055/assets/system-D-mANIo5.css",
+      "resourceType": "stylesheet",
+      "isNavigationRequest": false
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:5055/assets/skeletons-CH-UCz4n.js",
+      "resourceType": "script",
+      "isNavigationRequest": false
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:5055/assets/ErrorPage-CANwVxtr.js",
+      "resourceType": "script",
+      "isNavigationRequest": false
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:5055/assets/refresh-cw-Cw-8KGM-.js",
+      "resourceType": "script",
+      "isNavigationRequest": false
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:5055/assets/useDebounce-Bkpf_b0r.js",
+      "resourceType": "script",
+      "isNavigationRequest": false
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:5055/assets/searchNormalize-SvtDRall.js",
+      "resourceType": "script",
+      "isNavigationRequest": false
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:5055/assets/arrow-left-BfWbU-K8.js",
+      "resourceType": "script",
+      "isNavigationRequest": false
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:5055/assets/TaxonomyListing-DrCLlSko.css",
+      "resourceType": "stylesheet",
+      "isNavigationRequest": false
+    },
+    {
+      "method": "GET",
+      "url": "https://gorgeous-jennet-4.clerk.accounts.dev/npm/@clerk/clerk-js@6/dist/clerk.browser.js",
+      "resourceType": "script",
+      "isNavigationRequest": false
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:5055/api/auth/user",
+      "resourceType": "fetch",
+      "isNavigationRequest": false
+    },
+    {
+      "method": "GET",
+      "url": "https://fonts.gstatic.com/s/jetbrainsmono/v24/tDbv2o-flEEny0FZhsfKu5WU4zr3E_BX0PnT8RD8yKwBNntkaToggR7BYRbKPxDcwgknk-4.woff2",
+      "resourceType": "font",
+      "isNavigationRequest": false
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:5055/api/config",
+      "resourceType": "fetch",
+      "isNavigationRequest": false
+    },
+    {
+      "method": "GET",
+      "url": "https://gorgeous-jennet-4.clerk.accounts.dev/npm/@clerk/clerk-js@6.32.0/dist/clerk.browser.js",
+      "resourceType": "script",
+      "isNavigationRequest": false
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:5055/api/resources?page=1&limit=24&facets=true&category=encoding-codecs",
+      "resourceType": "fetch",
+      "isNavigationRequest": false
+    },
+    {
+      "method": "GET",
+      "url": "https://gorgeous-jennet-4.clerk.accounts.dev/npm/@clerk/ui@1/dist/ui.browser.js",
+      "resourceType": "script",
+      "isNavigationRequest": false
+    },
+    {
+      "method": "GET",
+      "url": "https://gorgeous-jennet-4.clerk.accounts.dev/npm/@clerk/ui@1.33.0/dist/ui.browser.js",
+      "resourceType": "script",
+      "isNavigationRequest": false
+    },
+    {
+      "method": "GET",
+      "url": "blob:http://127.0.0.1:5055/e48b109e-ba7b-4732-b713-56d154f87160",
+      "resourceType": "script",
+      "isNavigationRequest": false
+    },
+    {
+      "method": "POST",
+      "url": "https://gorgeous-jennet-4.clerk.accounts.dev/v1/dev_browser?__clerk_api_version=2026-05-12&_clerk_js_version=6.32.0",
+      "resourceType": "fetch",
+      "isNavigationRequest": false
+    },
+    {
+      "method": "POST",
+      "url": "https://gorgeous-jennet-4.clerk.accounts.dev/v1/environment?__clerk_api_version=2026-05-12&_clerk_js_version=6.32.0&_method=PATCH&__clerk_db_jwt=%5BREDACTED%5D",
+      "resourceType": "fetch",
+      "isNavigationRequest": false
+    },
+    {
+      "method": "GET",
+      "url": "https://gorgeous-jennet-4.clerk.accounts.dev/v1/client?__clerk_api_version=2026-05-12&_clerk_js_version=6.32.0&__clerk_db_jwt=%5BREDACTED%5D",
+      "resourceType": "fetch",
+      "isNavigationRequest": false
+    },
+    {
+      "method": "GET",
+      "url": "blob:http://127.0.0.1:5055/ce3013d8-b7b4-4a16-99fa-f1172f2cf239",
+      "resourceType": "script",
+      "isNavigationRequest": false
+    },
+    {
+      "method": "GET",
+      "url": "https://gorgeous-jennet-4.clerk.accounts.dev/npm/@clerk/ui@1.33.0/dist/framework_ui_4bef77_1.33.0.js",
+      "resourceType": "script",
+      "isNavigationRequest": false
+    },
+    {
+      "method": "GET",
+      "url": "https://gorgeous-jennet-4.clerk.accounts.dev/npm/@clerk/ui@1.33.0/dist/ui-common_ui_4bef77_1.33.0.js",
+      "resourceType": "script",
+      "isNavigationRequest": false
+    },
+    {
+      "method": "GET",
+      "url": "https://gorgeous-jennet-4.clerk.accounts.dev/npm/@clerk/ui@1.33.0/dist/vendors_ui_4bef77_1.33.0.js",
+      "resourceType": "script",
+      "isNavigationRequest": false
+    },
+    {
+      "method": "GET",
+      "url": "https://gorgeous-jennet-4.clerk.accounts.dev/npm/@clerk/ui@1.33.0/dist/subscriptionDetails_ui_4bef77_1.33.0.js",
+      "resourceType": "script",
+      "isNavigationRequest": false
+    },
+    {
+      "method": "GET",
+      "url": "chrome://terms/",
+      "resourceType": "document",
+      "isNavigationRequest": true
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:5055/category/encoding-codecs",
+      "resourceType": "document",
+      "isNavigationRequest": true
+    },
+    {
+      "method": "GET",
+      "url": "https://fonts.googleapis.com/css2?family=Inter%3Awght%40400%3B500%3B600%3B700%3B800&family=Fraunces%3Aital%2Cwght%400%2C400%3B0%2C500%3B0%2C600%3B0%2C700%3B1%2C400%3B1%2C500%3B1%2C600&family=JetBrains+Mono%3Awght%40400%3B500%3B600%3B700&family=Geist%3Awght%40400%3B500%3B600%3B700&family=Instrument+Serif%3Aital%400%3B1&family=Space+Grotesk%3Awght%40400%3B500%3B600%3B700&family=IBM+Plex+Mono%3Awght%40400%3B500%3B600%3B700&family=IBM+Plex+Sans%3Awght%40400%3B500%3B600%3B700&family=Manrope%3Awght%40400%3B500%3B600%3B700%3B800&display=swap",
+      "resourceType": "stylesheet",
+      "isNavigationRequest": false
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:5055/assets/index-CCQLmy6r.js",
+      "resourceType": "script",
+      "isNavigationRequest": false
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:5055/assets/index-CTjT7uj6.js",
+      "resourceType": "script",
+      "isNavigationRequest": false
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:5055/assets/index-CeftJlzp.js",
+      "resourceType": "script",
+      "isNavigationRequest": false
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:5055/assets/index-DLXZePn7.css",
+      "resourceType": "stylesheet",
+      "isNavigationRequest": false
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:5055/api/awesome-list/nav",
+      "resourceType": "fetch",
+      "isNavigationRequest": false
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:5055/api/awesome-list/listing?level=category&slug=encoding-codecs&page=1",
+      "resourceType": "fetch",
+      "isNavigationRequest": false
+    },
+    {
+      "method": "GET",
+      "url": "https://fonts.gstatic.com/s/inter/v20/UcC73FwrK3iLTeHuS_nVMrMxCp50SjIa1ZL7W0Q5nw.woff2",
+      "resourceType": "font",
+      "isNavigationRequest": false
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:5055/favicon.svg",
+      "resourceType": "other",
+      "isNavigationRequest": false
+    }
+  ],
+  "unsafeSameOriginRequests": []
+}

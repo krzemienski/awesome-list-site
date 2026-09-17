@@ -1,0 +1,40 @@
+{
+  "schemaVersion": 1,
+  "kind": "normal-lighthouse-control-summary",
+  "base": "http://127.0.0.1:5055/",
+  "path": "/category/encoding-codecs",
+  "binding": {
+    "sourceTrackedTreeSha256": "003940dac6bdfd3ff2361a9b490c4e653c2c8ef85c95d2c2d68c018401fa7ee8",
+    "sourceDirtyPatchSha256": "af940c0f50585bfb89298a50d6f450f527a280ed48f5dd84b63ea337b7c334ed",
+    "sourceUntrackedTreeSha256": "101501b47f074e08e09b26670323fee833d796aa94272e5843256367cc89e659",
+    "buildTreeSha256": "134d3db1c6cec5c5524250fc66fdd158b740e15381e5150f71f03d26ac15a794"
+  },
+  "runCount": 3,
+  "runs": [
+    {
+      "run": 1,
+      "valid": true,
+      "performanceScore": 0.81,
+      "runFile": "run-1/run.json",
+      "reportFile": "run-1/lighthouse/category-encoding-codecs.json"
+    },
+    {
+      "run": 2,
+      "valid": true,
+      "performanceScore": 0.81,
+      "runFile": "run-2/run.json",
+      "reportFile": "run-2/lighthouse/category-encoding-codecs.json"
+    },
+    {
+      "run": 3,
+      "valid": true,
+      "performanceScore": 0.73,
+      "runFile": "run-3/run.json",
+      "reportFile": "run-3/lighthouse/category-encoding-codecs.json"
+    }
+  ],
+  "medianPerformanceScore": 0.81,
+  "performanceThreshold": 0.82,
+  "thresholdPassed": false,
+  "allRunsValid": true
+}

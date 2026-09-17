@@ -104,3 +104,27 @@ The main preview was personally inspected with Replit Screenshot.
 No original fixture, frozen expected design, accessibility floor, database
 schema, bundle budget, or acceptance threshold was changed to manufacture a
 pass.
+
+## Second pass, later on 2026-09-17
+
+Same base revision (`a09ad484` + this working tree). The re-supplied original
+archive was reconciled first ([DESIGN-SYNC.md](../DESIGN-SYNC.md): identical
+to the frozen reference, 0 differing entries), which retires item 1 below.
+
+| Item | Change | Proof | Status |
+| --- | --- | --- | --- |
+| Header strip 2.3–5.4% | `styles/shell/header.css`: 44px hit targets as transparent pseudo-elements around the frozen 36px paint; comparison redone state-matched (signed-in admin, like the expected strips) | [`shell-header/repair-2026-09-17/`](../evidence/shell-header/repair-2026-09-17/) 375 0.70%, 768 0.36%, 1024 0.55%, 1440 0.52% (768 within the 0.5% ceiling; the other three remain 0.02–0.20pt over — raster rounding per [header-repair-2026-09-17.md](header-repair-2026-09-17.md), not waived) | Repaired, three widths still over ceiling |
+| Admin Resources: click on Edit opened Delete Resource | `admin-catalog-resources.css`, `admin-catalog-taxonomy.css`: hover-revealed delete control anchored out of flow beside View/Edit, inert until row hover/focus, no re-flow on reveal; rules apply only under hover/focus/tools-open so resting pixels are unchanged by construction (no-hover harness not rerun) | Built-in tester, pointer-only, both tables; details in [CLICKTHROUGH.md](../CLICKTHROUGH.md) defect 2 | Fixed |
+| Member/admin persistence flows (item 3 below) | none needed | Built-in tester: collections/bookmarks/notes CRUD, submit → approve → public → kind/featured set/clear/reload → delete, category create/rename/delete, Journeys/Digests/Users panels; every `__qa_test_*` catalog record removed through the UI; the disposable member (Clerk first, then local row) and older `__qa_test_` Clerk residue removed in the final teardown, 0 remaining, `approved = 1816` | Verified |
+| System states | none | 1280 captures of not-found, empty search, populated search, privacy, terms in [`evidence/redesign-resume-2026-09-17/system-states/`](../evidence/redesign-resume-2026-09-17/system-states/) | Rendered-state proof only |
+| Three-route Lighthouse | `scripts/validation/normal-lighthouse.mjs` gained `--path` (same registered command, one route per invocation; rejects `//`, backslashes, query/fragment and any off-origin resolution) | [PUBLISH.md](../PUBLISH.md) Lighthouse rows; evidence under `evidence/lighthouse/three-routes-2026-09-17/` | Measured (see PUBLISH for the verdict) |
+| `palette-drift` regression after the header edit | the avatar's fixed `#0a0a0a` ink fell out of the 5-line `DS-OK` window; tagged with its own reason | `palette-drift` PASS | Fixed |
+
+Gates after these changes: `npm run check`, `canonical-token-parity`,
+`palette-drift`, `accent-drift` PASS. Nothing in the frozen reference, the
+44px floor, thresholds or expected captures was changed.
+
+Still not certified by this pass: full pixel parity of the final candidate,
+all 50 theme combinations, contact variants a–e rerun, forced loading/error
+states, the full SEO crawl, and anything production-specific. No publish
+action was taken.

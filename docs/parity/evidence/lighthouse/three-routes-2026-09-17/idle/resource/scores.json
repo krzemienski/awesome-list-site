@@ -1,0 +1,40 @@
+{
+  "schemaVersion": 1,
+  "kind": "normal-lighthouse-control-summary",
+  "base": "http://127.0.0.1:5055/",
+  "path": "/resource/185020",
+  "binding": {
+    "sourceTrackedTreeSha256": "063378aa5fdc2dfbf4c56ec314ec679ef65edca1a0a0ceaafef5d09e96644dc2",
+    "sourceDirtyPatchSha256": "d1874ef4085b0df0b74d481aef9100ee115ac85200ec16bacf3b370324aae6fe",
+    "sourceUntrackedTreeSha256": "c7c481ee2563a17960e54c7c57202fe8f7f4c5772aa94842a0f1c0e84591ae81",
+    "buildTreeSha256": "134d3db1c6cec5c5524250fc66fdd158b740e15381e5150f71f03d26ac15a794"
+  },
+  "runCount": 3,
+  "runs": [
+    {
+      "run": 1,
+      "valid": true,
+      "performanceScore": 0.84,
+      "runFile": "run-1/run.json",
+      "reportFile": "run-1/lighthouse/resource-185020.json"
+    },
+    {
+      "run": 2,
+      "valid": true,
+      "performanceScore": 0.92,
+      "runFile": "run-2/run.json",
+      "reportFile": "run-2/lighthouse/resource-185020.json"
+    },
+    {
+      "run": 3,
+      "valid": true,
+      "performanceScore": 0.81,
+      "runFile": "run-3/run.json",
+      "reportFile": "run-3/lighthouse/resource-185020.json"
+    }
+  ],
+  "medianPerformanceScore": 0.84,
+  "performanceThreshold": 0.82,
+  "thresholdPassed": true,
+  "allRunsValid": true
+}

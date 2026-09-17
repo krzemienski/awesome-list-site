@@ -1,0 +1,24 @@
+{
+  "widths": [
+    {
+      "width": 375,
+      "differentPixels": 179,
+      "percent": 0.8523809523809524
+    },
+    {
+      "width": 768,
+      "differentPixels": 186,
+      "percent": 0.4324776785714286
+    },
+    {
+      "width": 1024,
+      "differentPixels": 760,
+      "percent": 1.2369791666666665
+    },
+    {
+      "width": 1440,
+      "differentPixels": 2492,
+      "percent": 2.8842592592592595
+    }
+  ]
+}

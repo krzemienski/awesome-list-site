@@ -14,6 +14,33 @@
 
 The existing `awesome-list-site-ds/` tree was compared path-by-path with all 103 original entries before synchronization. Result: 77 byte-identical, 10 existing paths to overwrite, and 16 archive paths to add. Local-only files are retained.
 
+## Re-supplied archive — 2026-09-17 reconciliation
+
+- Supplied again as `attached_assets/awesome_list_site_2_1789631650105.zip`
+  alongside the execution contract
+  `attached_assets/Pasted--Finish-the-original-Awesome-List-design-implementation_1789632319500.txt`.
+- Listed with `unzip -l` (103 entries), then extracted into the fresh isolated
+  directory `/tmp/orig-src` — never over the app or the frozen reference.
+- SHA-256 `19f0240c46caf790bfc384e21f123525699e1ff386fe892f8084bf73337302c9`:
+  byte-identical to the archive synchronized above, so the frozen reference
+  already embodies this upload.
+- `diff -rq /tmp/orig-src awesome-list-site-ds`: **0 differing entries**; all
+  103 archive paths are byte-identical in `awesome-list-site-ds/` (the frozen
+  tree only adds local provenance files). Spot hashes: `styles.css`
+  `f65694df…`, `design-systems.jsx` `30c37539…`, `layout.jsx` `911f165b…`,
+  `app.jsx` `9d71619b…`, `home-layouts.jsx` `c91a2a67…`, `admin.jsx`
+  `c32b6a11…`, `HANDOFF.md` `2bcbf1d8…`, `REPLIT-REMEDIATION-PROMPT.md`
+  `a7dc5908…` — equal on both sides.
+- The two standalone exports (`index.standalone.html` `7b62e47b…`,
+  `Awesome.Video - Standalone.html` `f40a5525…`) are unchanged; the
+  authority ruling below (modular load graph is canonical, standalone payloads
+  are older provenance) stands and needed no re-decoding.
+- No frozen-reference byte changed. The required reads (HANDOFF → docs
+  04/05/10/11 → SKILL-verify → `styles.css`/`design-systems.jsx` → the rest)
+  are the same files recorded in `FILE-READ-MANIFEST.json`; this pass
+  re-read the shell/header/sidebar/theme sources from the frozen copy while
+  repairing the shell.
+
 ## Source authority and variants
 
 The authoritative target is the **modular** `index.html` load graph:

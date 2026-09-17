@@ -1,0 +1,92 @@
+{
+  "schemaVersion": 1,
+  "kind": "normal-lighthouse-control",
+  "createdAt": "2026-09-17T08:46:57.065Z",
+  "command": "node scripts/validation/normal-lighthouse.mjs --base http://127.0.0.1:5055 --path /category/encoding-codecs --out /tmp/lh4/category",
+  "base": "http://127.0.0.1:5055/",
+  "path": "/category/encoding-codecs",
+  "target": "http://127.0.0.1:5055/category/encoding-codecs",
+  "outputDirectory": "../../../tmp/lh4/category",
+  "runCount": 3,
+  "performanceThreshold": 0.82,
+  "lighthouse": {
+    "version": "12.8.2",
+    "options": {
+      "output": "json",
+      "logLevel": "error",
+      "onlyCategories": [
+        "performance",
+        "accessibility",
+        "best-practices",
+        "seo"
+      ]
+    },
+    "config": "Lighthouse default mobile configuration (undefined config argument)"
+  },
+  "browser": {
+    "freshBrowserPerRun": true,
+    "executable": ".cache/ms-playwright/chromium-1223/chrome-linux64/chrome",
+    "chromiumSandbox": true,
+    "args": [
+      "--disable-dev-shm-usage",
+      "--remote-debugging-port=<ephemeral-loopback-port>"
+    ],
+    "requestInterception": false,
+    "strictGuardsImported": false
+  },
+  "requestSafety": {
+    "observedAllContextRequests": true,
+    "invalidatesSameOriginUnsafeMethods": true,
+    "safeMethods": [
+      "GET",
+      "HEAD",
+      "OPTIONS"
+    ]
+  },
+  "source": {
+    "gitHead": "83022704716c73bd8c2e7ae278d96bb96e09a461",
+    "gitStatusSha256": "394218766a378425811ed8e5b0390edcbfad3c066e737ae7964b2f77814ab9fc",
+    "dirtyPatchSha256": "eab5c5c2658cb5dd767e3d0f4715b1adf039d686991544144c59b24cb7184c43",
+    "trackedFileCount": 13735,
+    "trackedTreeSha256": "1585af281f03ceb49f75a052e03c869711a23c2290c0065e2c7827b88d550cfb",
+    "untrackedFileCount": 27,
+    "untrackedTreeSha256": "71ffc5884e03a79ae5cffbe799154e6d6d410f5bd4665baa351324b3c2047b85"
+  },
+  "build": {
+    "directory": "dist",
+    "fileCount": 362,
+    "treeSha256": "134d3db1c6cec5c5524250fc66fdd158b740e15381e5150f71f03d26ac15a794"
+  },
+  "binding": {
+    "sourceTrackedTreeSha256": "1585af281f03ceb49f75a052e03c869711a23c2290c0065e2c7827b88d550cfb",
+    "sourceDirtyPatchSha256": "eab5c5c2658cb5dd767e3d0f4715b1adf039d686991544144c59b24cb7184c43",
+    "sourceUntrackedTreeSha256": "71ffc5884e03a79ae5cffbe799154e6d6d410f5bd4665baa351324b3c2047b85",
+    "buildTreeSha256": "134d3db1c6cec5c5524250fc66fdd158b740e15381e5150f71f03d26ac15a794"
+  },
+  "runs": [
+    {
+      "run": 1,
+      "valid": true,
+      "performanceScore": 0.8,
+      "runFile": "run-1/run.json",
+      "reportFile": "run-1/lighthouse/category-encoding-codecs.json"
+    },
+    {
+      "run": 2,
+      "valid": true,
+      "performanceScore": 0.75,
+      "runFile": "run-2/run.json",
+      "reportFile": "run-2/lighthouse/category-encoding-codecs.json"
+    },
+    {
+      "run": 3,
+      "valid": true,
+      "performanceScore": 0.78,
+      "runFile": "run-3/run.json",
+      "reportFile": "run-3/lighthouse/category-encoding-codecs.json"
+    }
+  ],
+  "finishedAt": "2026-09-17T08:47:59.682Z",
+  "summaryFile": "scores.json",
+  "thresholdPassed": false
+}

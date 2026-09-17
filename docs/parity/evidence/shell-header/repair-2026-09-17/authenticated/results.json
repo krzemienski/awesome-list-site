@@ -1,0 +1,36 @@
+{
+  "state": "authenticated-admin",
+  "pixelmatchThreshold": 0.1,
+  "widths": [
+    {
+      "width": 375,
+      "beforePercent": 5.366666666666667,
+      "differentPixels": 146,
+      "percent": 0.6952380952380952
+    },
+    {
+      "width": 768,
+      "beforePercent": 2.701822916666667,
+      "differentPixels": 153,
+      "percent": 0.35574776785714285
+    },
+    {
+      "width": 1024,
+      "beforePercent": 2.3291015625,
+      "differentPixels": 339,
+      "percent": 0.5517578125
+    },
+    {
+      "width": 1440,
+      "beforePercent": 2.6689814814814814,
+      "differentPixels": 446,
+      "percent": 0.5162037037037037
+    }
+  ],
+  "teardown": {
+    "localRoleRestored": "user",
+    "signedOut": true,
+    "localUserDeleted": false,
+    "clerkUserDeleted": false
+  }
+}

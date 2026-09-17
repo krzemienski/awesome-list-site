@@ -31,15 +31,19 @@ function usage() {
   console.log(`Normal, loopback-only Lighthouse control
 
 Usage:
-  node scripts/validation/normal-lighthouse.mjs --base http://127.0.0.1:5000 [--out <directory>] [--threshold 0.82]
+  node scripts/validation/normal-lighthouse.mjs --base http://127.0.0.1:5000 [--path /] [--out <directory>] [--threshold 0.82]
 
-Exactly ${RUN_COUNT} fresh-browser mobile Lighthouse runs are captured. The command
+Exactly ${RUN_COUNT} fresh-browser mobile Lighthouse runs are captured for ONE
+route: the bare origin by default, or the same-origin absolute path given by
+--path (for example --path /category/encoding-codecs). Audit each route with
+its own invocation and output directory; a home-only run is never evidence
+for another route. The command
 exits 1 for an invalid run, a Lighthouse runtime error, or a median performance
 score below the threshold.`);
 }
 
 function parseArgs(argv) {
-  const args = { base: DEFAULT_BASE, out: DEFAULT_OUT, threshold: PERFORMANCE_THRESHOLD };
+  const args = { base: DEFAULT_BASE, path: "/", out: DEFAULT_OUT, threshold: PERFORMANCE_THRESHOLD };
   for (let index = 0; index < argv.length; index += 1) {
     const arg = argv[index];
     const next = () => {
@@ -50,6 +54,9 @@ function parseArgs(argv) {
     switch (arg) {
       case "--base":
         args.base = next();
+        break;
+      case "--path":
+        args.path = next();
         break;
       case "--out":
         args.out = next();
@@ -105,6 +112,29 @@ function parseLoopbackOrigin(value) {
     throw new Error("--base must be a bare origin without path, query, or fragment");
   }
   return url.origin;
+}
+
+// The audited route must be a same-origin absolute path: no scheme, host,
+// userinfo, query or fragment, so the evidence names exactly one document.
+// A backslash is rejected explicitly: the WHATWG parser treats "/\\host" like
+// "//host", so "startsWith('//')" alone would let --path change the origin.
+function parseRoutePath(value, base) {
+  if (typeof value !== "string" || !/^\/(?![/\\])/.test(value)) {
+    throw new Error("--path must be an absolute same-origin path such as /category/encoding-codecs");
+  }
+  if (/[?#\s\\]/.test(value)) {
+    throw new Error("--path must not contain a query, fragment, whitespace or backslash");
+  }
+  const resolved = new URL(value, base);
+  if (resolved.origin !== new URL(base).origin) {
+    throw new Error(`--path resolved off-origin (${resolved.origin}); refusing`);
+  }
+  return value;
+}
+
+function routeSlug(routePath) {
+  const slug = routePath.replace(/^\/+|\/+$/g, "").replace(/[^a-zA-Z0-9]+/g, "-");
+  return slug || "home";
 }
 
 function sha256(value) {
@@ -353,7 +383,9 @@ function isSameOriginUnsafeRequest(request, base) {
   }
 }
 
-async function runOne({ run, base, outDir, binding, lighthouseVersion }) {
+async function runOne({ run, base, routePath, outDir, binding, lighthouseVersion }) {
+  const targetUrl = new URL(routePath, base).toString();
+  const reportFile = `lighthouse/${routeSlug(routePath)}.json`;
   const port = await freePort();
   const browser = await chromium.launch({
     headless: true,
@@ -397,7 +429,7 @@ async function runOne({ run, base, outDir, binding, lighthouseVersion }) {
     // baseline mobile preset/configuration. Do not add desktop emulation or
     // Chrome flags here.
     const result = await lighthouse(
-      base,
+      targetUrl,
       {
         output: "json",
         logLevel: "error",
@@ -425,6 +457,8 @@ async function runOne({ run, base, outDir, binding, lighthouseVersion }) {
       run,
       capturedAt: new Date().toISOString(),
       base: redactEvidenceUrl(base),
+      path: routePath,
+      target: redactEvidenceUrl(targetUrl),
       lighthouseVersion,
       binding,
       valid,
@@ -446,9 +480,9 @@ async function runOne({ run, base, outDir, binding, lighthouseVersion }) {
       finalDisplayedUrl: redactEvidenceUrl(rawLhr.finalDisplayedUrl),
       observedRequests,
       unsafeSameOriginRequests: unsafeRequests,
-      reportFile: "lighthouse/home.json",
+      reportFile,
     };
-    writeJson(path.join(outDir, `run-${run}`, "lighthouse/home.json"), lhr);
+    writeJson(path.join(outDir, `run-${run}`, reportFile), lhr);
     writeJson(path.join(outDir, `run-${run}`, "request-observation.json"), {
       schemaVersion: 1,
       binding,
@@ -466,6 +500,8 @@ async function runOne({ run, base, outDir, binding, lighthouseVersion }) {
       run,
       capturedAt: new Date().toISOString(),
       base: redactEvidenceUrl(base),
+      path: routePath,
+      target: redactEvidenceUrl(targetUrl),
       lighthouseVersion,
       binding,
       valid: false,
@@ -501,6 +537,7 @@ async function runOne({ run, base, outDir, binding, lighthouseVersion }) {
 async function main() {
   const args = parseArgs(process.argv.slice(2));
   const base = parseLoopbackOrigin(args.base);
+  const routePath = parseRoutePath(args.path, base);
   const outDir = ensureOwnEmptyOutput(args.out);
   const lighthouseVersion = await verifyLighthouseVersion();
   const source = sourceSnapshot();
@@ -517,6 +554,8 @@ async function main() {
     createdAt: new Date().toISOString(),
     command: ["node", path.relative(ROOT, process.argv[1]), ...process.argv.slice(2)].join(" "),
     base: redactEvidenceUrl(base),
+    path: routePath,
+    target: redactEvidenceUrl(new URL(routePath, base).toString()),
     outputDirectory: path.relative(ROOT, outDir),
     runCount: RUN_COUNT,
     performanceThreshold: args.threshold,
@@ -551,7 +590,7 @@ async function main() {
 
   for (let run = 1; run <= RUN_COUNT; run += 1) {
     console.log(`Normal Lighthouse run ${run}/${RUN_COUNT}`);
-    const result = await runOne({ run, base, outDir, binding, lighthouseVersion });
+    const result = await runOne({ run, base, routePath, outDir, binding, lighthouseVersion });
     manifest.runs.push({
       run,
       valid: result.valid,
@@ -574,6 +613,7 @@ async function main() {
     schemaVersion: 1,
     kind: "normal-lighthouse-control-summary",
     base: redactEvidenceUrl(base),
+    path: routePath,
     binding,
     runCount: RUN_COUNT,
     runs: manifest.runs,
@@ -589,7 +629,7 @@ async function main() {
   writeJson(path.join(outDir, "manifest.json"), manifest);
 
   console.log(
-    `Normal Lighthouse median ${medianPerformanceScore === null ? "unavailable" : medianPerformanceScore.toFixed(2)} ` +
+    `Normal Lighthouse ${routePath} median ${medianPerformanceScore === null ? "unavailable" : medianPerformanceScore.toFixed(2)} ` +
       `(${thresholdPassed ? "meets" : "does not meet"} ${args.threshold.toFixed(2)})`,
   );
   return thresholdPassed ? 0 : 1;
