@@ -612,7 +612,12 @@ export default function ResearcherTab({ initialTab = "launch" }: ResearcherTabPr
           </div>
         </section>
         <TableShell title="Researcher jobs" sub="Recent agentic research runs">
-          <div className="queues-agent__canonical-table queues-agent__canonical-table--research">
+          <div
+            className="queues-agent__canonical-table queues-agent__canonical-table--research focus-visible:outline focus-visible:outline-2 focus-visible:outline-ring"
+            tabIndex={0}
+            role="region"
+            aria-label="Researcher jobs table, scrollable"
+          >
             <table className="table">
               <thead>
                 <tr><th>Status</th><th>Prompt</th><th>Found</th><th>Approved</th><th>Cost</th><th>Turns</th><th>Created</th></tr>
@@ -620,7 +625,7 @@ export default function ResearcherTab({ initialTab = "launch" }: ResearcherTabPr
               <tbody>
                 {(jobs || []).slice(0, 2).map((job) => (
                   <tr key={job.id}>
-                    <td><span className={`chip ${job.status === "completed" ? "ok" : job.status === "failed" ? "bad" : job.status === "pending" ? "warn" : ""}`}>{job.status}</span></td>
+                    <td><StatusChip status={job.status} /></td>
                     <td className="prompt">{job.prompt || "Auto-generated research brief"}</td>
                     <td className="mono queues-agent__cell-mono">{job.totalDiscoveries || 0}</td>
                     <td className="mono queues-agent__cell-mono">{job.approvedDiscoveries || 0}/{job.rejectedDiscoveries || 0}</td>

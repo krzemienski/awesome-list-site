@@ -32,6 +32,8 @@ import { chromium } from "playwright";
 import { AxeBuilder } from "@axe-core/playwright";
 import { launchBrowserWithLease } from "./validation/playwright-launch-lease.mjs";
 import {
+  DEMONSTRATOR_DISPLAY_NAME,
+  DEMONSTRATOR_FIRST_NAME,
   createDisposableAdmin,
   declineAnalyticsConsentViaUi,
   identityAvailability,
@@ -814,18 +816,15 @@ async function axeForScreen(page, screen, width, tokens, identityMode) {
       throw new Error(`actual route ${route} returned HTTP ${httpStatus ?? "unknown"} (expected a successful route)`);
     }
     await waitForApp(page);
-    const foldedParents = { "admin-tab:digests": "github", "admin-tab:journeys": "research", "admin-tab:subsubcategories": "subcategories" };
-    const foldedParent = foldedParents[screen.actualAction];
-    if (foldedParent) {
-      await applyAction(page, `admin-tab:${foldedParent}`, "actual", { tokens });
-    }
+    // Folded sections (Sub-Subcats / Journeys / Digests) are opened from the
+    // header Settings menu by the shared admin-tab action, which also waits
+    // for the section's own panel; no per-runner parent-tab choreography.
+    const foldedChildren = ["admin-tab:digests", "admin-tab:journeys", "admin-tab:subsubcategories"];
     if (screen.actualAction) {
-      if (foldedParent) {
+      await applyAction(page, screen.actualAction, "actual", { tokens });
+      if (foldedChildren.includes(screen.actualAction)) {
         const child = screen.actualAction.slice("admin-tab:".length);
-        await page.getByTestId(`tab-${child}`).click();
         await page.getByTestId(`content-${child}`).waitFor({ state: "visible", timeout: 30_000 });
-      } else {
-        await applyAction(page, screen.actualAction, "actual", { tokens });
       }
     }
     if (screen.actualReadySelector) {
@@ -842,11 +841,16 @@ async function axeForScreen(page, screen, width, tokens, identityMode) {
       if (!session?.isAuthenticated || session.user?.role !== "admin") {
         throw new Error(`protected app row is not authenticated as admin (session=${JSON.stringify(session).slice(0, 240)})`);
       }
+      // /api/auth/user exposes one joined `name` ("Nick Krzemienski" since the
+      // identity helper started setting the demonstrator last name), never a
+      // separate firstName; accept either the display name or the bare first name.
       const name = session.user?.firstName || session.user?.name;
-      if (name !== "Nick") throw new Error("Protected row is not using the disposable Nick identity");
+      if (name !== DEMONSTRATOR_DISPLAY_NAME && name !== DEMONSTRATOR_FIRST_NAME) {
+        throw new Error(`Protected row is not using the disposable Nick identity (name=${JSON.stringify(name)})`);
+      }
       // Mobile intentionally collapses the header name to an avatar. Verify
       // identity at the authenticated API, not by demanding desktop chrome.
-      result.identityVerified = { name: "Nick", role: "admin" };
+      result.identityVerified = { name, role: "admin" };
     }
     await page.evaluate(() => document.fonts?.ready).catch(() => {});
     const axe = sanitiseAxe(await new AxeBuilder({ page }).analyze());

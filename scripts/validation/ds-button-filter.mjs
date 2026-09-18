@@ -145,7 +145,18 @@ export function collectStrayH1s() {
       h.classList.contains('font-sans') ||
       h.classList.contains('font-medium')) &&
     /* 2 · screen-reader-only page titles (invisible — nothing to switch) */
-    !h.classList.contains('sr-only')
+    !h.classList.contains('sr-only') &&
+    /* 3 · the frozen Category/Subcategory title ONLY: pages.jsx renders that h1
+           with inline weight/tracking/leading in the BODY face and no display
+           class. The exclusion is narrow (the title inside the taxonomy page)
+           AND positive: it must actually paint in the --font-body face, so no
+           other h1 can opt out by borrowing the class name */
+    !(h.matches('main .taxonomy-page > .taxonomy-header > h1.taxonomy-title') &&
+      ((el) => {
+        const face = (v) => String(v || '').split(',')[0].replace(/\x22|\x27/g, '').trim().toLowerCase();
+        return face(getComputedStyle(el).fontFamily) ===
+          face(getComputedStyle(document.documentElement).getPropertyValue('--font-body'));
+      })(h))
   );
   // STAGE6-H1-FILTER-END
   return {

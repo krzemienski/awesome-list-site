@@ -30,17 +30,17 @@
   /* ----- Editorial defaults (mirrors design-systems.jsx editorial.vars) ----- */
   --bg:            #000000;
   --bg-2:          #070706;
-  --surface:       rgba(244, 243, 238, 0.025);
-  --surface-2:     rgba(244, 243, 238, 0.05);
-  --surface-3:     rgba(244, 243, 238, 0.08);
-  --border:        rgba(244, 243, 238, 0.08);
-  --border-strong: rgba(244, 243, 238, 0.16);
-  --hairline:      rgba(244, 243, 238, 0.06);
+  --surface:       rgba(244,243,238,0.025);
+  --surface-2:     rgba(244,243,238,0.05);
+  --surface-3:     rgba(244,243,238,0.08);
+  --border:        rgba(244,243,238,0.08);
+  --border-strong: rgba(244,243,238,0.16);
+  --hairline:      rgba(244,243,238,0.06);
 
   --text:   #f4f3ee;
-  --text-2: rgba(244, 243, 238, 0.66);
-  --text-3: rgba(244, 243, 238, 0.52); /* WP-6 a11y: 0.4 gave ~3.4:1 on #000 (DS_SPEC §7 claims 4.6:1 AA); 0.52 delivers ~5.2:1 */
-  --text-4: rgba(244, 243, 238, 0.22);
+  --text-2: rgba(244,243,238,0.66);
+  --text-3: rgba(244,243,238,0.52); /* WP-6 a11y: 0.4 gave ~3.4:1 on #000 (DS_SPEC §7 claims 4.6:1 AA); 0.52 delivers ~5.2:1 */
+  --text-4: rgba(244,243,238,0.22);
 
   --accent:   #ff3d52;
   --accent-2: #b84dff;
@@ -70,9 +70,9 @@
   --border-w:    1px;
   --hairline-w:  1px;
 
-  --shadow-sm:     0 1px 2px rgba(0, 0, 0, 0.3);
-  --shadow:        0 6px 24px -8px rgba(0, 0, 0, 0.5);
-  --shadow-lg:     0 24px 60px -20px rgba(0, 0, 0, 0.7);
+  --shadow-sm:     0 1px 2px rgba(0,0,0,0.3);
+  --shadow:        0 6px 24px -8px rgba(0,0,0,0.5);
+  --shadow-lg:     0 24px 60px -20px rgba(0,0,0,0.7);
   --shadow-accent: 0 0 0 1px color-mix(in srgb, var(--accent) 25%, transparent),
                    0 12px 36px -12px color-mix(in srgb, var(--accent) 40%, transparent);
 

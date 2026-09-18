@@ -10,7 +10,7 @@
       "identity": "Nick-admin",
       "status": "PASS",
       "identityVerified": {
-        "name": "Nick",
+        "name": "Nick Krzemienski",
         "role": "admin"
       },
       "ready": true,
@@ -18,8 +18,8 @@
       "axe": {
         "violations": [],
         "seriousCritical": [],
-        "passes": 40,
-        "incomplete": 1
+        "passes": 43,
+        "incomplete": 2
       }
     },
     {
@@ -29,7 +29,7 @@
       "identity": "Nick-admin",
       "status": "PASS",
       "identityVerified": {
-        "name": "Nick",
+        "name": "Nick Krzemienski",
         "role": "admin"
       },
       "ready": true,
@@ -37,8 +37,8 @@
       "axe": {
         "violations": [],
         "seriousCritical": [],
-        "passes": 40,
-        "incomplete": 1
+        "passes": 43,
+        "incomplete": 2
       }
     }
   ],

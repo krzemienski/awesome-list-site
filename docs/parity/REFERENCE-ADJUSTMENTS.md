@@ -104,3 +104,34 @@ used the original full-page captures without cropping or masking.
 Full lint, authenticated/member/contact coverage, isolated-database testing,
 local production-mode checks and the observed published SSR issue remain open
 in the completion review. No publishing or production changes are authorized.
+## Update — 2026-09-17/18 verification pass (supersedes the boundary above)
+
+The inline-minimum correction **has now been browser-remeasured** and the
+determinism run has been performed. Full details, commands and exit codes are
+in [COMPLETION-REPORT-2026-09-17.md](COMPLETION-REPORT-2026-09-17.md).
+
+Both runs are `--only` selected-row runs, which the harness classifies as
+`selected-rows-diagnostic` (`Gate: NOT PASSED`); the rows below are per-row
+measurements, not a whole-inventory acceptance.
+
+| Surface | Width | Pixel difference | Font parity | Run |
+|---|---:|---:|---|---|
+| Forms | 375 | 0.0610% — PASS | Match | [41477](../../tests/parity/baseline/2026-09-18T00-45-21-423Z-41477/REPORT.md) |
+| Forms | 768 | 0.0332% — PASS | Match | 41477 |
+| Showcase | 375 | 0.0119% — PASS (tiled capture, 375×19349) | Match | 41477, re-confirmed [46597](../../tests/parity/baseline/2026-09-18T01-26-48-109Z-46597/REPORT.md) |
+| Showcase | 768 | 0.0019% — PASS | Match | 41477, 46597 |
+| Category | 375 | 5.9677% — FAIL | Match | 41477, 46597 (admin identity) |
+| Category | 768 | 6.9788% — FAIL | Match | 41477, 46597 (admin identity) |
+
+Determinism: 3/3 cells byte-identical across three captures
+(`/tmp/parity-run-10.log`, evidence under `docs/parity/evidence/harness/determinism`).
+Both runs used a disposable Clerk admin with net-zero teardown and recorded
+"Inputs changed during run: no".
+
+The earlier Showcase@375 20.7156% figure was a capture defect, not a design
+difference: Chromium's single-surface full-page capture degrades above
+~16384px on both sides of the comparison. The harness now tiles and stitches;
+thresholds, masks and expected images are unchanged. The Category rows remain
+failing for the contract-required reasons enumerated in the completion report
+(kind badge retained, production filter controls, tablet hamburger, frozen
+sidebar Home button face, header at exactly 768). No waiver is claimed.

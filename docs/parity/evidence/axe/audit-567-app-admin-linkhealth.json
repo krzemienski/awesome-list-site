@@ -10,16 +10,37 @@
       "identity": "Nick-admin",
       "status": "PASS",
       "identityVerified": {
-        "name": "Nick",
+        "name": "Nick Krzemienski",
         "role": "admin"
       },
       "ready": true,
       "httpStatus": 200,
       "axe": {
-        "violations": [],
+        "violations": [
+          {
+            "id": "empty-table-header",
+            "impact": "minor",
+            "help": "Table header text should not be empty",
+            "description": "Ensure table headers have discernible text",
+            "nodes": 1,
+            "targets": [
+              [
+                "th:nth-child(5)"
+              ]
+            ],
+            "details": [
+              {
+                "target": [
+                  "th:nth-child(5)"
+                ],
+                "failureSummary": "Fix any of the following:\n  Element does not have text that is visible to screen readers"
+              }
+            ]
+          }
+        ],
         "seriousCritical": [],
-        "passes": 40,
-        "incomplete": 2
+        "passes": 44,
+        "incomplete": 3
       }
     },
     {
@@ -29,16 +50,37 @@
       "identity": "Nick-admin",
       "status": "PASS",
       "identityVerified": {
-        "name": "Nick",
+        "name": "Nick Krzemienski",
         "role": "admin"
       },
       "ready": true,
       "httpStatus": 200,
       "axe": {
-        "violations": [],
+        "violations": [
+          {
+            "id": "empty-table-header",
+            "impact": "minor",
+            "help": "Table header text should not be empty",
+            "description": "Ensure table headers have discernible text",
+            "nodes": 1,
+            "targets": [
+              [
+                "th:nth-child(5)"
+              ]
+            ],
+            "details": [
+              {
+                "target": [
+                  "th:nth-child(5)"
+                ],
+                "failureSummary": "Fix any of the following:\n  Element does not have text that is visible to screen readers"
+              }
+            ]
+          }
+        ],
         "seriousCritical": [],
-        "passes": 40,
-        "incomplete": 2
+        "passes": 44,
+        "incomplete": 3
       }
     }
   ],

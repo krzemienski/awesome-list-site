@@ -70,32 +70,11 @@
   grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
 }
 
+/* The stat cards are the shared admin `Stat` primitive (AdminOpsPrimitives):
+   its `.eyebrow` label, display value and description own their typography, so
+   this block only keeps the frozen Stat's 20px card padding. */
 .queues-agent__stat {
   padding: 20px;
-}
-
-.queues-agent__stat > :first-child {
-  color: var(--text-3);
-  font-size: 10px;
-  letter-spacing: 1.4px;
-  line-height: 16px;
-  margin-bottom: 10px;
-  text-transform: uppercase;
-}
-
-.queues-agent__stat > :nth-child(2) {
-  color: var(--text);
-  font-size: 32px;
-  font-weight: 700;
-  letter-spacing: -1px;
-  line-height: 1;
-}
-
-.queues-agent__stat > :last-child {
-  color: var(--text-2);
-  font-size: 12px;
-  line-height: 1.6; /* body leading */
-  margin-top: 8px;
 }
 
 .queues-agent__canonical-table {

@@ -1,6 +1,6 @@
 # Task 567 browser DS/axe worklog
 
-Captured: 2026-09-15T06:35:17.133Z
+Captured: 2026-09-18T00:15:04.178Z
 Base: `http://127.0.0.1:5000`
 Browser: pinned Playwright Chromium (explicit executable path; browser lease held by `playwright-launch-lease`)
 
@@ -9,7 +9,7 @@ Browser: pinned Playwright Chromium (explicit executable path; browser lease hel
 - Theme choices were made through the shipped `/settings/theme` controls; no `data-system` or `data-accent` attributes were injected.
 - Theme persistence matrix: **50/50** rows recorded; an overall PASS requires exactly 50/50 in the finalized report. Status: **PASS**.
 - Public rows used a signed-out browser context. Admin rows used one disposable Nick admin created by `tests/parity/identity.mjs`; only that identity was deleted in teardown.
-- No global identity sweep was run. Teardown: {"attempted":true,"completed":true,"localDeleted":true,"clerkDeleted":true,"localQaUsersRemaining":2,"errorCount":0}.
+- No global identity sweep was run. Teardown: {"attempted":true,"completed":true,"localDeleted":true,"clerkDeleted":true,"localQaUsersRemaining":0,"errorCount":0}.
 
 ## Smoke screenshots
 

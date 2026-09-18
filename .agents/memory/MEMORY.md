@@ -152,3 +152,8 @@
 - [Contract-over-reference residuals](contract-over-reference-residuals.md) — behaviour the contract requires but the prototype lacks: log its failing pixel rows the same pass; sr-only keeps crawler text.
 - [Skip-link route preservation](skip-link-route-preservation.md) — focus can land correctly while fragment routing switches pages; verify the current route and chapter remain intact too.
 - [Declared vs rendered font parity](font-declaration-vs-render-parity.md) — identical heading files can fail whole-document face parity when the canonical request adds a body family.
+- [Chromium capture ceiling](chromium-capture-ceiling.md) — full-page captures >16384px silently degrade on BOTH sides; tile + stitch, size the canvas to max(client, scroll widths).
+- [Run fingerprints vs live telemetry](run-fingerprint-live-telemetry.md) — project telemetry endpoints down to the fields the reference paints; drop counters only, never the whole endpoint.
+- [Evidence runner identity drift](evidence-runner-identity-drift.md) — assert demonstrator identity via the shared helper's exported constants, not a hard-coded name shape.
+- [Gates vs folded UI](gate-drift-from-folded-ui.md) — reveal every collapsed aria-expanded disclosure (never popups/tabs) before sweeping; folds hide selectors and new strays.
+- [SSR Clerk empty host](ssr-clerk-empty-host.md) — "Host must not be empty" = Clerk host-derived key at SSR module eval; resolve the explicit key, diagnose with a /tmp --ssr build only.

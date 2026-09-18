@@ -1,4 +1,0 @@
-/* Keep inactive labels quiet without reducing contrast on the selected accent. */
-:global(.ds-system-pill.active) .systemTag {
-  opacity: 1 !important;
-}

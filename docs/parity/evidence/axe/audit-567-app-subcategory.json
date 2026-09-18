@@ -14,7 +14,7 @@
       "axe": {
         "violations": [],
         "seriousCritical": [],
-        "passes": 44,
+        "passes": 40,
         "incomplete": 2
       }
     },
@@ -29,7 +29,7 @@
       "axe": {
         "violations": [],
         "seriousCritical": [],
-        "passes": 46,
+        "passes": 42,
         "incomplete": 2
       }
     }

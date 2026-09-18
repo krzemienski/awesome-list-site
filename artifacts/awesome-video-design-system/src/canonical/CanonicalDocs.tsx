@@ -42,7 +42,7 @@ function DocsNav({ active, onPick }) {
       <div style={{ display: "flex", gap: 6, marginTop: 14, flexWrap: "wrap" }}>
         <a href="#showcase" className="chip muted" style={{ textDecoration: "none", cursor: "pointer" }}>showcase ↗</a>
         <a href="#anatomy" className="chip muted" style={{ textDecoration: "none", cursor: "pointer" }}>anatomy ↗</a>
-        <a href="#docs-integration" className="chip muted" style={{ textDecoration: "none", cursor: "pointer" }}>integration ↗</a>
+        <a href="docs/README.md" className="chip muted" style={{ textDecoration: "none", cursor: "pointer" }}>.md ↗</a>
       </div>
     </div>
     {NAV_GROUPS.map(group => <div key={group.label} className="docs-nav-group">

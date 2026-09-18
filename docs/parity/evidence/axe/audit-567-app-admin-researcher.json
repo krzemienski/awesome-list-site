@@ -10,15 +10,36 @@
       "identity": "Nick-admin",
       "status": "PASS",
       "identityVerified": {
-        "name": "Nick",
+        "name": "Nick Krzemienski",
         "role": "admin"
       },
       "ready": true,
       "httpStatus": 200,
       "axe": {
-        "violations": [],
+        "violations": [
+          {
+            "id": "heading-order",
+            "impact": "moderate",
+            "help": "Heading levels should only increase by one",
+            "description": "Ensure the order of headings is semantically correct",
+            "nodes": 1,
+            "targets": [
+              [
+                "h3"
+              ]
+            ],
+            "details": [
+              {
+                "target": [
+                  "h3"
+                ],
+                "failureSummary": "Fix any of the following:\n  Heading order invalid"
+              }
+            ]
+          }
+        ],
         "seriousCritical": [],
-        "passes": 43,
+        "passes": 50,
         "incomplete": 1
       }
     },
@@ -29,15 +50,36 @@
       "identity": "Nick-admin",
       "status": "PASS",
       "identityVerified": {
-        "name": "Nick",
+        "name": "Nick Krzemienski",
         "role": "admin"
       },
       "ready": true,
       "httpStatus": 200,
       "axe": {
-        "violations": [],
+        "violations": [
+          {
+            "id": "heading-order",
+            "impact": "moderate",
+            "help": "Heading levels should only increase by one",
+            "description": "Ensure the order of headings is semantically correct",
+            "nodes": 1,
+            "targets": [
+              [
+                "h3"
+              ]
+            ],
+            "details": [
+              {
+                "target": [
+                  "h3"
+                ],
+                "failureSummary": "Fix any of the following:\n  Heading order invalid"
+              }
+            ]
+          }
+        ],
         "seriousCritical": [],
-        "passes": 43,
+        "passes": 50,
         "incomplete": 1
       }
     }

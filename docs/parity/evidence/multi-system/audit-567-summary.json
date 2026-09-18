@@ -1,10 +1,10 @@
 {
   "schemaVersion": 3,
   "task": "567",
-  "runId": "mu2as1l9-2431",
-  "capturedAt": "2026-09-15T06:35:17.133Z",
+  "runId": "mu67in02-36056",
+  "capturedAt": "2026-09-18T00:15:04.178Z",
   "base": "http://127.0.0.1:5000",
-  "phase": "runtime",
+  "phase": "axe",
   "phaseStates": {
     "theme": "COMPLETE",
     "runtime": "COMPLETE",
@@ -892,11 +892,11 @@
         "stage8": {
           "inks": {
             "text": "#f4f3ee",
-            "text2": "rgba(244, 243, 238, 0.66)",
-            "text3": "rgba(244, 243, 238, 0.52)",
-            "text4": "rgba(244, 243, 238, 0.22)",
+            "text2": "rgba(244,243,238,0.66)",
+            "text3": "rgba(244,243,238,0.52)",
+            "text4": "rgba(244,243,238,0.22)",
             "bg": "#000000",
-            "surface": "rgba(244, 243, 238, 0.025)"
+            "surface": "rgba(244,243,238,0.025)"
           }
         },
         "stage9": {
@@ -929,11 +929,11 @@
       "stage8": {
         "inks": {
           "text": "#f4f3ee",
-          "text2": "rgba(244, 243, 238, 0.66)",
-          "text3": "rgba(244, 243, 238, 0.52)",
-          "text4": "rgba(244, 243, 238, 0.22)",
+          "text2": "rgba(244,243,238,0.66)",
+          "text3": "rgba(244,243,238,0.52)",
+          "text4": "rgba(244,243,238,0.22)",
           "bg": "#000000",
-          "surface": "rgba(244, 243, 238, 0.025)"
+          "surface": "rgba(244,243,238,0.025)"
         },
         "contrast": {
           "text": {
@@ -942,17 +942,17 @@
             "onSurface": 18.23
           },
           "text2": {
-            "value": "rgba(244, 243, 238, 0.66)",
+            "value": "rgba(244,243,238,0.66)",
             "onBg": 8.058,
             "onSurface": 7.967
           },
           "text3": {
-            "value": "rgba(244, 243, 238, 0.52)",
+            "value": "rgba(244,243,238,0.52)",
             "onBg": 5.193,
             "onSurface": 5.213
           },
           "text4": {
-            "value": "rgba(244, 243, 238, 0.22)",
+            "value": "rgba(244,243,238,0.22)",
             "onBg": 1.723,
             "onSurface": 1.785
           }
@@ -1411,7 +1411,7 @@
           "canonicalPrimitives": true
         },
         "stage7": {
-          "visibleAccentUsers": 41
+          "visibleAccentUsers": 43
         },
         "stage8": {
           "inks": {
@@ -1585,7 +1585,7 @@
   "smoke": {
     "rows": [
       {
-        "captureRunId": "mu2as1l9-2431",
+        "captureRunId": "mu67in02-36056",
         "system": "editorial",
         "accent": "crimson",
         "width": 375,
@@ -1627,12 +1627,12 @@
           "system": "editorial",
           "accent": "crimson"
         },
-        "resumed": false,
+        "resumed": true,
         "pass": true,
-        "screenshotSha256": "0bc9ca2b81e1247ea9f47ad8f65f7780fd23070f4c53421a296a616765262467"
+        "screenshotSha256": "c4246163b7e6a672d2530ef1cc25acf00349f78edd782ff4faf54e199a2ebe5a"
       },
       {
-        "captureRunId": "mu2as1l9-2431",
+        "captureRunId": "mu67in02-36056",
         "system": "editorial",
         "accent": "crimson",
         "width": 375,
@@ -1674,12 +1674,12 @@
           "system": "editorial",
           "accent": "crimson"
         },
-        "resumed": false,
+        "resumed": true,
         "pass": true,
-        "screenshotSha256": "55a30c357def2ddd33cb54c228b4abcddaf6c90186deaea0edb1cc655f61d0f6"
+        "screenshotSha256": "1e5e2941a338645e73132085a0800c732887a037605be06c6bf9feefdb6f0d4c"
       },
       {
-        "captureRunId": "mu2as1l9-2431",
+        "captureRunId": "mu67in02-36056",
         "system": "editorial",
         "accent": "crimson",
         "width": 375,
@@ -1721,12 +1721,12 @@
           "system": "editorial",
           "accent": "crimson"
         },
-        "resumed": false,
+        "resumed": true,
         "pass": true,
-        "screenshotSha256": "21efad370d52e90fb92c1ab3821f0b4c7b46fb0cfa7fb6509b7523b2130590ce"
+        "screenshotSha256": "39baf24aac2552a227cfa8169054d77cdc244e5ab1d20940c0771f906e5416b7"
       },
       {
-        "captureRunId": "mu2as1l9-2431",
+        "captureRunId": "mu67in02-36056",
         "system": "editorial",
         "accent": "crimson",
         "width": 375,
@@ -1768,12 +1768,12 @@
           "system": "editorial",
           "accent": "crimson"
         },
-        "resumed": false,
+        "resumed": true,
         "pass": true,
-        "screenshotSha256": "9599e27d3172d833bfe139c11f71a82ab2cd6baf516ddea98ed6247a797bb31a"
+        "screenshotSha256": "ab8e97f933697888c334e98ff4e506038d1bf9510e512f88ba02dda100bb04aa"
       },
       {
-        "captureRunId": "mu2as1l9-2431",
+        "captureRunId": "mu67in02-36056",
         "system": "editorial",
         "accent": "crimson",
         "width": 768,
@@ -1815,12 +1815,12 @@
           "system": "editorial",
           "accent": "crimson"
         },
-        "resumed": false,
+        "resumed": true,
         "pass": true,
-        "screenshotSha256": "cf587a9b42afeb011c617d27b11cd94fa05ab81132f2b8ae3c0a14b1726ec082"
+        "screenshotSha256": "00de3949a4004f3af8a99adea7eaf10c6fb476f9733178fea7bc41243f29ff45"
       },
       {
-        "captureRunId": "mu2as1l9-2431",
+        "captureRunId": "mu67in02-36056",
         "system": "editorial",
         "accent": "crimson",
         "width": 768,
@@ -1862,12 +1862,12 @@
           "system": "editorial",
           "accent": "crimson"
         },
-        "resumed": false,
+        "resumed": true,
         "pass": true,
-        "screenshotSha256": "52dc1ff4305afcc51c51086a73bb19b49aef44fafa0beb08d7661ddff5438b5e"
+        "screenshotSha256": "b1ac748e78b74e7e2d278c1272f12ac2de9bc02f646eaba68bf1318a82ff51c0"
       },
       {
-        "captureRunId": "mu2as1l9-2431",
+        "captureRunId": "mu67in02-36056",
         "system": "editorial",
         "accent": "crimson",
         "width": 768,
@@ -1909,12 +1909,12 @@
           "system": "editorial",
           "accent": "crimson"
         },
-        "resumed": false,
+        "resumed": true,
         "pass": true,
-        "screenshotSha256": "083cc1f3a247e166a109d714ee6dc444431b4f6778a05601e4edf090d58d1d6a"
+        "screenshotSha256": "d5fb3475a2dcda4b8ff22cdd539765a6292e2a1be0f87d2589a1d9ae5676548b"
       },
       {
-        "captureRunId": "mu2as1l9-2431",
+        "captureRunId": "mu67in02-36056",
         "system": "editorial",
         "accent": "crimson",
         "width": 768,
@@ -1956,12 +1956,12 @@
           "system": "editorial",
           "accent": "crimson"
         },
-        "resumed": false,
+        "resumed": true,
         "pass": true,
-        "screenshotSha256": "1c034d131fb4e66ab6687f0091225e93a1460f5ff8177d3158cce36e6b7e731f"
+        "screenshotSha256": "e49b0ff6d444d445f58c05873afe41cc810ec8a73aac1af5073dfa9069ec2abe"
       },
       {
-        "captureRunId": "mu2as1l9-2431",
+        "captureRunId": "mu67in02-36056",
         "system": "editorial",
         "accent": "crimson",
         "width": 1024,
@@ -2003,12 +2003,12 @@
           "system": "editorial",
           "accent": "crimson"
         },
-        "resumed": false,
+        "resumed": true,
         "pass": true,
-        "screenshotSha256": "396cf2a13daabe67440e55d47a2047933d73bb89539a5f9aeaad34d0b1fffc54"
+        "screenshotSha256": "9afb34f58d9acfbb85da8c33175102a2651c6376ab9a5d6d4aca63aff124d1de"
       },
       {
-        "captureRunId": "mu2as1l9-2431",
+        "captureRunId": "mu67in02-36056",
         "system": "editorial",
         "accent": "crimson",
         "width": 1024,
@@ -2050,12 +2050,12 @@
           "system": "editorial",
           "accent": "crimson"
         },
-        "resumed": false,
+        "resumed": true,
         "pass": true,
-        "screenshotSha256": "1f24c5ce1430ff4742a347b0929de03fc1ea128256d9c172a0b51b1bf3b909e9"
+        "screenshotSha256": "2079b11675bb5d8befdf7fad47027a68ddabf5148bbfa6671e3884b0e5e627dd"
       },
       {
-        "captureRunId": "mu2as1l9-2431",
+        "captureRunId": "mu67in02-36056",
         "system": "editorial",
         "accent": "crimson",
         "width": 1024,
@@ -2097,12 +2097,12 @@
           "system": "editorial",
           "accent": "crimson"
         },
-        "resumed": false,
+        "resumed": true,
         "pass": true,
-        "screenshotSha256": "815a21ea6c123ece311acbea76e21afccd1caa2a1c471d04f1419a6eb9175893"
+        "screenshotSha256": "d5bc535eec51664ebbd71b814771b26d82db92b59d2ac7b5061f8b7bc9fa75d4"
       },
       {
-        "captureRunId": "mu2as1l9-2431",
+        "captureRunId": "mu67in02-36056",
         "system": "editorial",
         "accent": "crimson",
         "width": 1024,
@@ -2144,12 +2144,12 @@
           "system": "editorial",
           "accent": "crimson"
         },
-        "resumed": false,
+        "resumed": true,
         "pass": true,
-        "screenshotSha256": "a6177a67dce1f452795c6c0d9caad8ac8d2b061067d024b914b5764a98b9e19d"
+        "screenshotSha256": "5965e701846ab52aa0c6e3529737d14e65cb6fd91addc7150e41b0a6c09054c8"
       },
       {
-        "captureRunId": "mu2as1l9-2431",
+        "captureRunId": "mu67in02-36056",
         "system": "editorial",
         "accent": "crimson",
         "width": 1440,
@@ -2191,12 +2191,12 @@
           "system": "editorial",
           "accent": "crimson"
         },
-        "resumed": false,
+        "resumed": true,
         "pass": true,
-        "screenshotSha256": "335fd71ffb0d84634983da3bb69bb801826f95827d1eaa0f0843e383b61d3b14"
+        "screenshotSha256": "7f91a15747845cb244909c7e813360fc0e1eda5c1f6b8f1710d17cf3b408fd23"
       },
       {
-        "captureRunId": "mu2as1l9-2431",
+        "captureRunId": "mu67in02-36056",
         "system": "editorial",
         "accent": "crimson",
         "width": 1440,
@@ -2238,12 +2238,12 @@
           "system": "editorial",
           "accent": "crimson"
         },
-        "resumed": false,
+        "resumed": true,
         "pass": true,
-        "screenshotSha256": "e943d2e8bde29a7bf9ef2ee960e4f3b3e682daf5287752dab088fdeb4c27998c"
+        "screenshotSha256": "72fa0dd90c88097e51f713d2bbf304b3e7c278f467f86e27957767974fa55622"
       },
       {
-        "captureRunId": "mu2as1l9-2431",
+        "captureRunId": "mu67in02-36056",
         "system": "editorial",
         "accent": "crimson",
         "width": 1440,
@@ -2285,12 +2285,12 @@
           "system": "editorial",
           "accent": "crimson"
         },
-        "resumed": false,
+        "resumed": true,
         "pass": true,
-        "screenshotSha256": "24f12733c24350bae8c73f6687a564fa49c46d31d98d885ce064826a34dbfb5a"
+        "screenshotSha256": "eaef97f9aec1ef50b7ccbd2faa80fd9c059623ee3354960339577e40e8bf7c64"
       },
       {
-        "captureRunId": "mu2as1l9-2431",
+        "captureRunId": "mu67in02-36056",
         "system": "editorial",
         "accent": "crimson",
         "width": 1440,
@@ -2332,12 +2332,12 @@
           "system": "editorial",
           "accent": "crimson"
         },
-        "resumed": false,
+        "resumed": true,
         "pass": true,
-        "screenshotSha256": "324ec4f4ac11cce3fb3ee3ff4255c45913d7fa35525b86568c41ff42517f6283"
+        "screenshotSha256": "cdf1dd9d739ee9c27f9a13529b83f762f3bd3a276b44d10910e003c3f596aefe"
       },
       {
-        "captureRunId": "mu2as1l9-2431",
+        "captureRunId": "mu67in02-36056",
         "system": "terminal",
         "accent": "matrix",
         "width": 375,
@@ -2379,12 +2379,12 @@
           "system": "terminal",
           "accent": "matrix"
         },
-        "resumed": false,
+        "resumed": true,
         "pass": true,
-        "screenshotSha256": "c0fa86dc210ed7aebf4c0a1ae99a4fb0200d5cb236b6d6856d060c7510ef7356"
+        "screenshotSha256": "fb69113f948331a06a32ec3a537a7d295937d07c1c08cba3d1b481f03a26e0c6"
       },
       {
-        "captureRunId": "mu2as1l9-2431",
+        "captureRunId": "mu67in02-36056",
         "system": "terminal",
         "accent": "matrix",
         "width": 375,
@@ -2426,12 +2426,12 @@
           "system": "terminal",
           "accent": "matrix"
         },
-        "resumed": false,
+        "resumed": true,
         "pass": true,
-        "screenshotSha256": "44fe4470463d13c47a7ed50c8092a885d0df8bd28b293b6286adb63fc3c18199"
+        "screenshotSha256": "2fa3f74792ea618706815a47fd79ea5b30d115b918979558dd19bd94574d9976"
       },
       {
-        "captureRunId": "mu2as1l9-2431",
+        "captureRunId": "mu67in02-36056",
         "system": "terminal",
         "accent": "matrix",
         "width": 375,
@@ -2473,12 +2473,12 @@
           "system": "terminal",
           "accent": "matrix"
         },
-        "resumed": false,
+        "resumed": true,
         "pass": true,
-        "screenshotSha256": "74c9d02b36f320b331070d463183004334782db259589b1ad472c4e8499cfacb"
+        "screenshotSha256": "8e2f72c989760d8aa2fc0a0c0f9c146ec1263f91840547cf7f84abcba1ded6e6"
       },
       {
-        "captureRunId": "mu2as1l9-2431",
+        "captureRunId": "mu67in02-36056",
         "system": "terminal",
         "accent": "matrix",
         "width": 375,
@@ -2520,12 +2520,12 @@
           "system": "terminal",
           "accent": "matrix"
         },
-        "resumed": false,
+        "resumed": true,
         "pass": true,
-        "screenshotSha256": "14e7910c2eed9aef79d19cbac9a691c5fb277c9901fe3e39fae7339178efb67f"
+        "screenshotSha256": "50588b86354bdf02b6ccd2615a412ed005e623918bed1b51f9306064e8101e9b"
       },
       {
-        "captureRunId": "mu2as1l9-2431",
+        "captureRunId": "mu67in02-36056",
         "system": "terminal",
         "accent": "matrix",
         "width": 768,
@@ -2567,12 +2567,12 @@
           "system": "terminal",
           "accent": "matrix"
         },
-        "resumed": false,
+        "resumed": true,
         "pass": true,
-        "screenshotSha256": "0ce4f440814a21f842059e5efe10efdbd0e4b0f7571f9059332ec8847805ed40"
+        "screenshotSha256": "897374d60a8e58396faf412e3781d1a58f18e7b121d754ffc120285fd6a7b023"
       },
       {
-        "captureRunId": "mu2as1l9-2431",
+        "captureRunId": "mu67in02-36056",
         "system": "terminal",
         "accent": "matrix",
         "width": 768,
@@ -2614,12 +2614,12 @@
           "system": "terminal",
           "accent": "matrix"
         },
-        "resumed": false,
+        "resumed": true,
         "pass": true,
-        "screenshotSha256": "3f5ebe7170bddc790e5fbf4c1f279b866fc376a7ca9ea06359d91e416e27d3ef"
+        "screenshotSha256": "5178f46cccfff1e5aabce7025b9a741c8213ca2023d967ab6819063728839b7d"
       },
       {
-        "captureRunId": "mu2as1l9-2431",
+        "captureRunId": "mu67in02-36056",
         "system": "terminal",
         "accent": "matrix",
         "width": 768,
@@ -2661,12 +2661,12 @@
           "system": "terminal",
           "accent": "matrix"
         },
-        "resumed": false,
+        "resumed": true,
         "pass": true,
-        "screenshotSha256": "b06d0bd43cacdbdf9689397a2e0458f76fb45605dec7ee85f1253cd5f619dbb9"
+        "screenshotSha256": "5c10544dae99215f2502f54f8c5179c10fdb99f63a12029af0339f092136bd27"
       },
       {
-        "captureRunId": "mu2as1l9-2431",
+        "captureRunId": "mu67in02-36056",
         "system": "terminal",
         "accent": "matrix",
         "width": 768,
@@ -2708,12 +2708,12 @@
           "system": "terminal",
           "accent": "matrix"
         },
-        "resumed": false,
+        "resumed": true,
         "pass": true,
-        "screenshotSha256": "6129c6b95651f4b7fc5b3a6eb3a2db60dd592969ad8c8f443c55e40a33ae962c"
+        "screenshotSha256": "470f088dd2c7973321dbc41fcbed213034aaadd7557d06db675e7812d855eab2"
       },
       {
-        "captureRunId": "mu2as1l9-2431",
+        "captureRunId": "mu67in02-36056",
         "system": "terminal",
         "accent": "matrix",
         "width": 1024,
@@ -2755,12 +2755,12 @@
           "system": "terminal",
           "accent": "matrix"
         },
-        "resumed": false,
+        "resumed": true,
         "pass": true,
-        "screenshotSha256": "78de9974b1b5e3b792affda5046cae13a7d662cb11f1b1eb1959651e1bf6642b"
+        "screenshotSha256": "680f88a10ed9a84eeafc1bb0a7b3794dcd228da900b2b177345a1cb0713614c6"
       },
       {
-        "captureRunId": "mu2as1l9-2431",
+        "captureRunId": "mu67in02-36056",
         "system": "terminal",
         "accent": "matrix",
         "width": 1024,
@@ -2802,12 +2802,12 @@
           "system": "terminal",
           "accent": "matrix"
         },
-        "resumed": false,
+        "resumed": true,
         "pass": true,
-        "screenshotSha256": "ab2363537f96a461ef1f3b23e7ded03143b3564f63ae7d27f3ee94e1aa3e1e3a"
+        "screenshotSha256": "05b3f450875a14929d8f5258c3445c1745148246f829af1c961c0b516dcc2999"
       },
       {
-        "captureRunId": "mu2as1l9-2431",
+        "captureRunId": "mu67in02-36056",
         "system": "terminal",
         "accent": "matrix",
         "width": 1024,
@@ -2849,12 +2849,12 @@
           "system": "terminal",
           "accent": "matrix"
         },
-        "resumed": false,
+        "resumed": true,
         "pass": true,
-        "screenshotSha256": "c9be4082ad8dd32bfcf2c3344c9addd7b73b741e8d647256e1191cb55fc956ac"
+        "screenshotSha256": "a02a4f39c5212b553acac7f031b01d36cca2ccc4b7a44b04a3fb8cf6633fb9f4"
       },
       {
-        "captureRunId": "mu2as1l9-2431",
+        "captureRunId": "mu67in02-36056",
         "system": "terminal",
         "accent": "matrix",
         "width": 1024,
@@ -2896,12 +2896,12 @@
           "system": "terminal",
           "accent": "matrix"
         },
-        "resumed": false,
+        "resumed": true,
         "pass": true,
-        "screenshotSha256": "c707c90be46075906353242d65d2024c8c1ed94d401a8c6c0614ea777510f9b4"
+        "screenshotSha256": "52a7731148a8edea256e1b800f059e1a560801c72006ef9fd75e11397da1796b"
       },
       {
-        "captureRunId": "mu2as1l9-2431",
+        "captureRunId": "mu67in02-36056",
         "system": "terminal",
         "accent": "matrix",
         "width": 1440,
@@ -2943,12 +2943,12 @@
           "system": "terminal",
           "accent": "matrix"
         },
-        "resumed": false,
+        "resumed": true,
         "pass": true,
-        "screenshotSha256": "ce8f971e7d5b4ad30426fb7701cea24544f40267353c5c37a3087afd02f428f0"
+        "screenshotSha256": "74134040d87b9a2225297085dd6f210f954f74e186e96d8fb1c0ab5827645d57"
       },
       {
-        "captureRunId": "mu2as1l9-2431",
+        "captureRunId": "mu67in02-36056",
         "system": "terminal",
         "accent": "matrix",
         "width": 1440,
@@ -2990,12 +2990,12 @@
           "system": "terminal",
           "accent": "matrix"
         },
-        "resumed": false,
+        "resumed": true,
         "pass": true,
-        "screenshotSha256": "9a0c132f677b2b16e6d7255c05154604f4ac9da55c5e58c428406d63e5bde8c6"
+        "screenshotSha256": "db3445bb8dc8a7a7c156a6e37ce46f4d8acae9788f9bce250c1e771f7af0ed65"
       },
       {
-        "captureRunId": "mu2as1l9-2431",
+        "captureRunId": "mu67in02-36056",
         "system": "terminal",
         "accent": "matrix",
         "width": 1440,
@@ -3037,12 +3037,12 @@
           "system": "terminal",
           "accent": "matrix"
         },
-        "resumed": false,
+        "resumed": true,
         "pass": true,
-        "screenshotSha256": "fcb37bfe36fa8cc00769796413a14b548e425ffb448ba4992b8d425660e75597"
+        "screenshotSha256": "840f035614bed555480870d4e30fff35b6df507ab5251341be091248a8cb08f0"
       },
       {
-        "captureRunId": "mu2as1l9-2431",
+        "captureRunId": "mu67in02-36056",
         "system": "terminal",
         "accent": "matrix",
         "width": 1440,
@@ -3084,12 +3084,12 @@
           "system": "terminal",
           "accent": "matrix"
         },
-        "resumed": false,
+        "resumed": true,
         "pass": true,
-        "screenshotSha256": "390261b27715c56890094cde4a378b47a3106378465ca67ea01d65d45f854c89"
+        "screenshotSha256": "3b25712c690ac5a33360322458086554cf02de60f2cb0323eaeaa68834bf3d7c"
       },
       {
-        "captureRunId": "mu2as1l9-2431",
+        "captureRunId": "mu67in02-36056",
         "system": "geist",
         "accent": "cyan",
         "width": 375,
@@ -3131,12 +3131,12 @@
           "system": "geist",
           "accent": "cyan"
         },
-        "resumed": false,
+        "resumed": true,
         "pass": true,
-        "screenshotSha256": "8b7fa0d10fafa8a77f84fe937e723e8a0e756a80300fefce143ee0cc56d0c113"
+        "screenshotSha256": "048a9779a0c894cfb76fcd483956bc0be6c13096faead69922548e06c534a192"
       },
       {
-        "captureRunId": "mu2as1l9-2431",
+        "captureRunId": "mu67in02-36056",
         "system": "geist",
         "accent": "cyan",
         "width": 375,
@@ -3178,12 +3178,12 @@
           "system": "geist",
           "accent": "cyan"
         },
-        "resumed": false,
+        "resumed": true,
         "pass": true,
-        "screenshotSha256": "c94a849868b84fe3ca93b7a886d28ebbf6b74261c194c6c2d81a4f93fa502bdc"
+        "screenshotSha256": "aa6f0622675e84bb0ad5215ca1e8ffa6fed8c0611543b945f9336c19f3a636d0"
       },
       {
-        "captureRunId": "mu2as1l9-2431",
+        "captureRunId": "mu67in02-36056",
         "system": "geist",
         "accent": "cyan",
         "width": 375,
@@ -3225,12 +3225,12 @@
           "system": "geist",
           "accent": "cyan"
         },
-        "resumed": false,
+        "resumed": true,
         "pass": true,
-        "screenshotSha256": "5f965e7d6dde81324fd341a38f20a9b8c764c1a2f8f265743376e22fa704f861"
+        "screenshotSha256": "67fd346e646978c637a762d27de49f0b94319ae3411037d4209ab6d8179eab62"
       },
       {
-        "captureRunId": "mu2as1l9-2431",
+        "captureRunId": "mu67in02-36056",
         "system": "geist",
         "accent": "cyan",
         "width": 375,
@@ -3272,12 +3272,12 @@
           "system": "geist",
           "accent": "cyan"
         },
-        "resumed": false,
+        "resumed": true,
         "pass": true,
-        "screenshotSha256": "e83db2bff6e91f2327094e980cc5eb2a77689e703f479f26035b026b5e631a44"
+        "screenshotSha256": "42dce2ee813fe82c95ffcded68551c135a279efa607bf3511b113183f1043be7"
       },
       {
-        "captureRunId": "mu2as1l9-2431",
+        "captureRunId": "mu67in02-36056",
         "system": "geist",
         "accent": "cyan",
         "width": 768,
@@ -3319,12 +3319,12 @@
           "system": "geist",
           "accent": "cyan"
         },
-        "resumed": false,
+        "resumed": true,
         "pass": true,
-        "screenshotSha256": "d10f81388f2d7071c0ea55966b6f3d52035e3b4f7fa3cca43ffc9966228a280a"
+        "screenshotSha256": "e5533581455e2e07f97997d01294eff5ac0a3bcb947c1db90f655a8ac11378ec"
       },
       {
-        "captureRunId": "mu2as1l9-2431",
+        "captureRunId": "mu67in02-36056",
         "system": "geist",
         "accent": "cyan",
         "width": 768,
@@ -3366,12 +3366,12 @@
           "system": "geist",
           "accent": "cyan"
         },
-        "resumed": false,
+        "resumed": true,
         "pass": true,
-        "screenshotSha256": "e42eb64f7820df989860e5ba57bebd0431725d854fcc0d492e97eae721556141"
+        "screenshotSha256": "083f49de153462b49aaf3fcab0ec79464a888a80020608a78820f477f49f70b2"
       },
       {
-        "captureRunId": "mu2as1l9-2431",
+        "captureRunId": "mu67in02-36056",
         "system": "geist",
         "accent": "cyan",
         "width": 768,
@@ -3413,12 +3413,12 @@
           "system": "geist",
           "accent": "cyan"
         },
-        "resumed": false,
+        "resumed": true,
         "pass": true,
-        "screenshotSha256": "99aa61bea5a94e0605f9850bb06c30658d0dd1db7db4b64574264c6cb5857ad2"
+        "screenshotSha256": "1ebab53d4da2e4c4a2cd0f7af11234851ba4bf4e56ee9b2834af9009a875270b"
       },
       {
-        "captureRunId": "mu2as1l9-2431",
+        "captureRunId": "mu67in02-36056",
         "system": "geist",
         "accent": "cyan",
         "width": 768,
@@ -3460,12 +3460,12 @@
           "system": "geist",
           "accent": "cyan"
         },
-        "resumed": false,
+        "resumed": true,
         "pass": true,
-        "screenshotSha256": "9beea1b0df4ab132b8e167f0e446d7bd3559138ad13bcf5b95692faf013c9a43"
+        "screenshotSha256": "d7f891df51516a0cde87fc18c425af935833240000ef33cc69513eef9c8acf34"
       },
       {
-        "captureRunId": "mu2as1l9-2431",
+        "captureRunId": "mu67in02-36056",
         "system": "geist",
         "accent": "cyan",
         "width": 1024,
@@ -3507,12 +3507,12 @@
           "system": "geist",
           "accent": "cyan"
         },
-        "resumed": false,
+        "resumed": true,
         "pass": true,
-        "screenshotSha256": "5d6f64c0a0d40ee084d2bb0d06dc104d26abcca0eaef4184247ef0ef79505833"
+        "screenshotSha256": "e377eeb3e60f606e1a705a473ccf943384e3474382ff5c2cf031158e8268886f"
       },
       {
-        "captureRunId": "mu2as1l9-2431",
+        "captureRunId": "mu67in02-36056",
         "system": "geist",
         "accent": "cyan",
         "width": 1024,
@@ -3554,12 +3554,12 @@
           "system": "geist",
           "accent": "cyan"
         },
-        "resumed": false,
+        "resumed": true,
         "pass": true,
-        "screenshotSha256": "86fff4b478c4c31a0b4abcbc850e3954155f2d1f651681fc43854bf4f21ec8c3"
+        "screenshotSha256": "c4d1c6a158f44db4f347e507bbd5b4ed8619c731782234cee8ee3280c18bde66"
       },
       {
-        "captureRunId": "mu2as1l9-2431",
+        "captureRunId": "mu67in02-36056",
         "system": "geist",
         "accent": "cyan",
         "width": 1024,
@@ -3601,12 +3601,12 @@
           "system": "geist",
           "accent": "cyan"
         },
-        "resumed": false,
+        "resumed": true,
         "pass": true,
-        "screenshotSha256": "2ce3d36addd59d70a8a8ca274d6eadfef2d439db6328f96dc50d1d37d19a9985"
+        "screenshotSha256": "cc9ae3c4a131de2e60311ee6e324e4c24b376d037b7a0a452b23334bde3f426f"
       },
       {
-        "captureRunId": "mu2as1l9-2431",
+        "captureRunId": "mu67in02-36056",
         "system": "geist",
         "accent": "cyan",
         "width": 1024,
@@ -3648,12 +3648,12 @@
           "system": "geist",
           "accent": "cyan"
         },
-        "resumed": false,
+        "resumed": true,
         "pass": true,
-        "screenshotSha256": "0397526e07d5513c0634d26f8d015f89910301b2b72b588e10f4d0f3a3d0033a"
+        "screenshotSha256": "e6ed97a82d5e2244e6752122eed816679c44921dae2cb4db51939108f89d7dd9"
       },
       {
-        "captureRunId": "mu2as1l9-2431",
+        "captureRunId": "mu67in02-36056",
         "system": "geist",
         "accent": "cyan",
         "width": 1440,
@@ -3695,12 +3695,12 @@
           "system": "geist",
           "accent": "cyan"
         },
-        "resumed": false,
+        "resumed": true,
         "pass": true,
-        "screenshotSha256": "d11133c94a6c808b44f898a5ab0bf730ee0ee226ba60c173cb17b98986da0024"
+        "screenshotSha256": "c7e626a6d3df009ae4856c7fc35714a441acc4c6a0c13297abe5551bd110c3c4"
       },
       {
-        "captureRunId": "mu2as1l9-2431",
+        "captureRunId": "mu67in02-36056",
         "system": "geist",
         "accent": "cyan",
         "width": 1440,
@@ -3742,12 +3742,12 @@
           "system": "geist",
           "accent": "cyan"
         },
-        "resumed": false,
+        "resumed": true,
         "pass": true,
-        "screenshotSha256": "663c6b1ab29e8b57294fd986b324d96d845cdb0c1bec4cc42ba602c112b086fb"
+        "screenshotSha256": "3644413da27bb3cda757a360a96b6368860dc49752036aa225227826b807f01b"
       },
       {
-        "captureRunId": "mu2as1l9-2431",
+        "captureRunId": "mu67in02-36056",
         "system": "geist",
         "accent": "cyan",
         "width": 1440,
@@ -3789,12 +3789,12 @@
           "system": "geist",
           "accent": "cyan"
         },
-        "resumed": false,
+        "resumed": true,
         "pass": true,
-        "screenshotSha256": "d6c2d708a28108b8ff2c2515d6acb978df2fec1315a578baa426b14e83f88e7e"
+        "screenshotSha256": "6499fa5fe55dbb8743d960aec0266028f8cd94366d7864ea84d370039ca9aa91"
       },
       {
-        "captureRunId": "mu2as1l9-2431",
+        "captureRunId": "mu67in02-36056",
         "system": "geist",
         "accent": "cyan",
         "width": 1440,
@@ -3836,12 +3836,12 @@
           "system": "geist",
           "accent": "cyan"
         },
-        "resumed": false,
+        "resumed": true,
         "pass": true,
-        "screenshotSha256": "292283eb13ef382a3a6dbbae556b77a97c687d994af60416cb98144ad7f04da3"
+        "screenshotSha256": "f779ad919ad6fbbe71b9c67d2dbbd9acf9d59f2bf9446bba1d76c43b0c87ade2"
       },
       {
-        "captureRunId": "mu2as1l9-2431",
+        "captureRunId": "mu67in02-36056",
         "system": "brutalist",
         "accent": "amber",
         "width": 375,
@@ -3883,12 +3883,12 @@
           "system": "brutalist",
           "accent": "amber"
         },
-        "resumed": false,
+        "resumed": true,
         "pass": true,
-        "screenshotSha256": "c238cf94ccaeaf60987d4a12bda6ad39037593646a44174fb5ee3d1648a96b4d"
+        "screenshotSha256": "c5e314e99994e50fac430ef02249a282e5a43174485a86eda047628b5a99f7c5"
       },
       {
-        "captureRunId": "mu2as1l9-2431",
+        "captureRunId": "mu67in02-36056",
         "system": "brutalist",
         "accent": "amber",
         "width": 375,
@@ -3930,12 +3930,12 @@
           "system": "brutalist",
           "accent": "amber"
         },
-        "resumed": false,
+        "resumed": true,
         "pass": true,
-        "screenshotSha256": "c8d65c2e2a7b039cd24bbe711bdf3bca2a7cd63749e6dd18881b7671d749d4d2"
+        "screenshotSha256": "b3a31d0e1f432721c5f2780572a0a250503b3ae7f82a958f56554ee9831207c0"
       },
       {
-        "captureRunId": "mu2as1l9-2431",
+        "captureRunId": "mu67in02-36056",
         "system": "brutalist",
         "accent": "amber",
         "width": 375,
@@ -3977,12 +3977,12 @@
           "system": "brutalist",
           "accent": "amber"
         },
-        "resumed": false,
+        "resumed": true,
         "pass": true,
-        "screenshotSha256": "d7f9d6cf20e3723d88d95c86a39735afa6e7657185e88b29a41456a7b14c2ae2"
+        "screenshotSha256": "2d5d803f78a3738e6c2da60ccae41062a4802e8766bcb796e913c3cd4091ec21"
       },
       {
-        "captureRunId": "mu2as1l9-2431",
+        "captureRunId": "mu67in02-36056",
         "system": "brutalist",
         "accent": "amber",
         "width": 375,
@@ -4024,12 +4024,12 @@
           "system": "brutalist",
           "accent": "amber"
         },
-        "resumed": false,
+        "resumed": true,
         "pass": true,
-        "screenshotSha256": "d56a420580da2080d5ebeeafa6f63d4a753331a7f727262577bc7c47c3660977"
+        "screenshotSha256": "236b4cf8be7f95958de45a4d46b750cd4e72e4bd399b839af98455314d516e8f"
       },
       {
-        "captureRunId": "mu2as1l9-2431",
+        "captureRunId": "mu67in02-36056",
         "system": "brutalist",
         "accent": "amber",
         "width": 768,
@@ -4071,12 +4071,12 @@
           "system": "brutalist",
           "accent": "amber"
         },
-        "resumed": false,
+        "resumed": true,
         "pass": true,
-        "screenshotSha256": "2cb1a1086829c9301b3226ef8ff39a3be365136b3d85c6568892cbbd7351a6fe"
+        "screenshotSha256": "295104c308867ac96c77f967f7da20b6b165a5678c5213cc0a2be4bfa8dae814"
       },
       {
-        "captureRunId": "mu2as1l9-2431",
+        "captureRunId": "mu67in02-36056",
         "system": "brutalist",
         "accent": "amber",
         "width": 768,
@@ -4118,12 +4118,12 @@
           "system": "brutalist",
           "accent": "amber"
         },
-        "resumed": false,
+        "resumed": true,
         "pass": true,
-        "screenshotSha256": "0e1cd24246312f8058d56b2f2bbbd7bcc4fc685989655e90c1e9b21882b0247e"
+        "screenshotSha256": "ebeac6a04c3a951af7f8767d6a75adae4f431f363779f367fa264694d9a07213"
       },
       {
-        "captureRunId": "mu2as1l9-2431",
+        "captureRunId": "mu67in02-36056",
         "system": "brutalist",
         "accent": "amber",
         "width": 768,
@@ -4165,12 +4165,12 @@
           "system": "brutalist",
           "accent": "amber"
         },
-        "resumed": false,
+        "resumed": true,
         "pass": true,
-        "screenshotSha256": "1f7084356c451400585e3a860275739173cbb28985d620dae455c906b44009a6"
+        "screenshotSha256": "af50a507d2e2bdf6e8cdfe684c1ad929ab525ef6d9e1faac653e4a07406008a5"
       },
       {
-        "captureRunId": "mu2as1l9-2431",
+        "captureRunId": "mu67in02-36056",
         "system": "brutalist",
         "accent": "amber",
         "width": 768,
@@ -4212,12 +4212,12 @@
           "system": "brutalist",
           "accent": "amber"
         },
-        "resumed": false,
+        "resumed": true,
         "pass": true,
-        "screenshotSha256": "9e855f09da041abbf348abb185b2d8698572c3b074f208678d20d2b6c7373ae9"
+        "screenshotSha256": "bd991a09b9b64a3365f4abf1e869a8c9cea2c23db0ccc3187e6281f3f2b81740"
       },
       {
-        "captureRunId": "mu2as1l9-2431",
+        "captureRunId": "mu67in02-36056",
         "system": "brutalist",
         "accent": "amber",
         "width": 1024,
@@ -4259,12 +4259,12 @@
           "system": "brutalist",
           "accent": "amber"
         },
-        "resumed": false,
+        "resumed": true,
         "pass": true,
-        "screenshotSha256": "eb5564f5263d7654495ac30c7ff6297cb22b1ecd07b301fd7dff7ad7e3cedee1"
+        "screenshotSha256": "f78326a17048254c4faff0ea6e3546695c31244a4380ca19df55b8ed74fb5351"
       },
       {
-        "captureRunId": "mu2as1l9-2431",
+        "captureRunId": "mu67in02-36056",
         "system": "brutalist",
         "accent": "amber",
         "width": 1024,
@@ -4306,12 +4306,12 @@
           "system": "brutalist",
           "accent": "amber"
         },
-        "resumed": false,
+        "resumed": true,
         "pass": true,
-        "screenshotSha256": "8940feb13523fbfb237381f0d8b39d6fcbbe5909e85e643688732f7bfd16e3c1"
+        "screenshotSha256": "ff9f4fa17c9f6b571b410b2f9d291391eee3ce7ff50c76b37da9af7c1681c515"
       },
       {
-        "captureRunId": "mu2as1l9-2431",
+        "captureRunId": "mu67in02-36056",
         "system": "brutalist",
         "accent": "amber",
         "width": 1024,
@@ -4353,12 +4353,12 @@
           "system": "brutalist",
           "accent": "amber"
         },
-        "resumed": false,
+        "resumed": true,
         "pass": true,
-        "screenshotSha256": "90d65c0728fa88f0143532f9a5e442c6689f487a03ca1a5840c97e5dd2c7a44f"
+        "screenshotSha256": "0b7d664055bc9d0dba242ca70d46c2ac49e9a393b74e0836755c7eef73fa46fc"
       },
       {
-        "captureRunId": "mu2as1l9-2431",
+        "captureRunId": "mu67in02-36056",
         "system": "brutalist",
         "accent": "amber",
         "width": 1024,
@@ -4400,12 +4400,12 @@
           "system": "brutalist",
           "accent": "amber"
         },
-        "resumed": false,
+        "resumed": true,
         "pass": true,
-        "screenshotSha256": "ab634b9091e6d142e6d88b743ee305bd53d6f69340f301ebef4e6335ed2189e3"
+        "screenshotSha256": "a08c6e3c445a50e4b1284faa44a68f67a7a94c03ebf66fcdb4487cf41983a1e5"
       },
       {
-        "captureRunId": "mu2as1l9-2431",
+        "captureRunId": "mu67in02-36056",
         "system": "brutalist",
         "accent": "amber",
         "width": 1440,
@@ -4447,12 +4447,12 @@
           "system": "brutalist",
           "accent": "amber"
         },
-        "resumed": false,
+        "resumed": true,
         "pass": true,
-        "screenshotSha256": "c9d4cb052bac15dbdde0af11a1b01d36ffba77cc36173cd59a9703930482dc96"
+        "screenshotSha256": "ffe57b4a4a328e4a90afcb213fb5f9876fb18ad4c9be547c6bdd152621380509"
       },
       {
-        "captureRunId": "mu2as1l9-2431",
+        "captureRunId": "mu67in02-36056",
         "system": "brutalist",
         "accent": "amber",
         "width": 1440,
@@ -4494,12 +4494,12 @@
           "system": "brutalist",
           "accent": "amber"
         },
-        "resumed": false,
+        "resumed": true,
         "pass": true,
-        "screenshotSha256": "3c69b4f61817e27795ea6c3dec024a4e811502fdbea4e9e27328fc57c3950b3a"
+        "screenshotSha256": "209a26005e816761b0b48ca74c22679da5eebb7d3e4c2bd620e5105c88067f49"
       },
       {
-        "captureRunId": "mu2as1l9-2431",
+        "captureRunId": "mu67in02-36056",
         "system": "brutalist",
         "accent": "amber",
         "width": 1440,
@@ -4541,12 +4541,12 @@
           "system": "brutalist",
           "accent": "amber"
         },
-        "resumed": false,
+        "resumed": true,
         "pass": true,
-        "screenshotSha256": "cdc439908cd7256e55a3a743a22896f152606f9673e00e33bd720fcfb471d5eb"
+        "screenshotSha256": "263b3934037fb9f928c707afe31e98e526266d2848bb55e1397a855b4c662546"
       },
       {
-        "captureRunId": "mu2as1l9-2431",
+        "captureRunId": "mu67in02-36056",
         "system": "brutalist",
         "accent": "amber",
         "width": 1440,
@@ -4588,12 +4588,12 @@
           "system": "brutalist",
           "accent": "amber"
         },
-        "resumed": false,
+        "resumed": true,
         "pass": true,
-        "screenshotSha256": "b7c8b1f9e2d41edc20c32763d784fd79f8f63f423566e776467f2d1d9c5f2c5d"
+        "screenshotSha256": "4bef86bdcbc736e5bf94a20ae27ae541cd52b94d74dedd7cd3b87af9165137bf"
       },
       {
-        "captureRunId": "mu2as1l9-2431",
+        "captureRunId": "mu67in02-36056",
         "system": "swiss",
         "accent": "orange",
         "width": 375,
@@ -4635,12 +4635,12 @@
           "system": "swiss",
           "accent": "orange"
         },
-        "resumed": false,
+        "resumed": true,
         "pass": true,
-        "screenshotSha256": "82e73e5150796e14aef2fc452a48dd7e9d5d89a2d81fcd815dc16bff0eba8235"
+        "screenshotSha256": "43b6748cd0754deb55e627e2236b1a214e118c9380b057c70afe7b123f7a1ade"
       },
       {
-        "captureRunId": "mu2as1l9-2431",
+        "captureRunId": "mu67in02-36056",
         "system": "swiss",
         "accent": "orange",
         "width": 375,
@@ -4682,12 +4682,12 @@
           "system": "swiss",
           "accent": "orange"
         },
-        "resumed": false,
+        "resumed": true,
         "pass": true,
-        "screenshotSha256": "7d29308fda55227821acc13c17c64a153988a00d2e4c09dbd9576d8d3a36be36"
+        "screenshotSha256": "fdcd58af361e6204565cc6080e97d06a84d176df615ddbecc1662b7012924c90"
       },
       {
-        "captureRunId": "mu2as1l9-2431",
+        "captureRunId": "mu67in02-36056",
         "system": "swiss",
         "accent": "orange",
         "width": 375,
@@ -4729,12 +4729,12 @@
           "system": "swiss",
           "accent": "orange"
         },
-        "resumed": false,
+        "resumed": true,
         "pass": true,
-        "screenshotSha256": "a7d500ce5bd48b3afa9e03f924ff34abe05f82fe2711b9aa7519efb7ebe35f6c"
+        "screenshotSha256": "d0acd119e06b6b84f90811e4c9f056064743fe5be68ddea462d3aadd9fa92082"
       },
       {
-        "captureRunId": "mu2as1l9-2431",
+        "captureRunId": "mu67in02-36056",
         "system": "swiss",
         "accent": "orange",
         "width": 375,
@@ -4776,12 +4776,12 @@
           "system": "swiss",
           "accent": "orange"
         },
-        "resumed": false,
+        "resumed": true,
         "pass": true,
-        "screenshotSha256": "a429d42de91d84f0577b92d6c2bc0218d66022d8b4add80d2662ac324dd52851"
+        "screenshotSha256": "703d74bd8bb9e3849479b548e1ee25570b345ffa30778723046a2baa3f12085c"
       },
       {
-        "captureRunId": "mu2as1l9-2431",
+        "captureRunId": "mu67in02-36056",
         "system": "swiss",
         "accent": "orange",
         "width": 768,
@@ -4823,12 +4823,12 @@
           "system": "swiss",
           "accent": "orange"
         },
-        "resumed": false,
+        "resumed": true,
         "pass": true,
-        "screenshotSha256": "e9af7dbf05fe10e78ba3c096b9ca47f60c090d9868e857a9c064587387d8181b"
+        "screenshotSha256": "034937998a97795241321b87d3a6c7f8c88213fe7b467745661f904d07d133d0"
       },
       {
-        "captureRunId": "mu2as1l9-2431",
+        "captureRunId": "mu67in02-36056",
         "system": "swiss",
         "accent": "orange",
         "width": 768,
@@ -4870,12 +4870,12 @@
           "system": "swiss",
           "accent": "orange"
         },
-        "resumed": false,
+        "resumed": true,
         "pass": true,
-        "screenshotSha256": "9f62f5d7af555b1d352ec9b4a915ff841ec3808cd6288967596f4a968a562a9f"
+        "screenshotSha256": "bd4ae188d068ecc84ed041138f9100b60277edf5f3a67d43f142d3c7cd751168"
       },
       {
-        "captureRunId": "mu2as1l9-2431",
+        "captureRunId": "mu67in02-36056",
         "system": "swiss",
         "accent": "orange",
         "width": 768,
@@ -4917,12 +4917,12 @@
           "system": "swiss",
           "accent": "orange"
         },
-        "resumed": false,
+        "resumed": true,
         "pass": true,
-        "screenshotSha256": "ca01734bcf2518a4f908d63cf421d452cfb0fcadc0a2b53ce28c0abeb5aaf772"
+        "screenshotSha256": "ffe53ffd3fb245e2d51a7cbcb1d2f6dc7da3b4455d5b62672ec796eb3a4e0586"
       },
       {
-        "captureRunId": "mu2as1l9-2431",
+        "captureRunId": "mu67in02-36056",
         "system": "swiss",
         "accent": "orange",
         "width": 768,
@@ -4964,12 +4964,12 @@
           "system": "swiss",
           "accent": "orange"
         },
-        "resumed": false,
+        "resumed": true,
         "pass": true,
-        "screenshotSha256": "f4b0377b2ed89b25f8b88fd2c8d8fd2235a965c059220bbae7b966e00e2ed778"
+        "screenshotSha256": "7ec4b474a84feea71f9cc48217ec7ba4f575513f8158a9760db21b47e4564596"
       },
       {
-        "captureRunId": "mu2as1l9-2431",
+        "captureRunId": "mu67in02-36056",
         "system": "swiss",
         "accent": "orange",
         "width": 1024,
@@ -5011,12 +5011,12 @@
           "system": "swiss",
           "accent": "orange"
         },
-        "resumed": false,
+        "resumed": true,
         "pass": true,
-        "screenshotSha256": "beba88df8f6e88d6220b757b7e2b4c3263707758b2fa392ac0951f7d45099094"
+        "screenshotSha256": "0dab7147e3262b3ca6d410ebc47916f81e6939caa8e8e72ee63da59edee48de5"
       },
       {
-        "captureRunId": "mu2as1l9-2431",
+        "captureRunId": "mu67in02-36056",
         "system": "swiss",
         "accent": "orange",
         "width": 1024,
@@ -5058,12 +5058,12 @@
           "system": "swiss",
           "accent": "orange"
         },
-        "resumed": false,
+        "resumed": true,
         "pass": true,
-        "screenshotSha256": "3103bc814e7fde53de83fb16c6461e1cdb19477e03404e58880d0afa7a391775"
+        "screenshotSha256": "5d8f3012e1f90f0d4e7909e527dbfbc006b67017e2c554ada38e3b464a3aff35"
       },
       {
-        "captureRunId": "mu2as1l9-2431",
+        "captureRunId": "mu67in02-36056",
         "system": "swiss",
         "accent": "orange",
         "width": 1024,
@@ -5105,12 +5105,12 @@
           "system": "swiss",
           "accent": "orange"
         },
-        "resumed": false,
+        "resumed": true,
         "pass": true,
-        "screenshotSha256": "4e6bfa425d27760a936cc0e6f59b9616c31968829f61fd3dc7f413f804d6dda5"
+        "screenshotSha256": "f53cc21baa2b4797459f05be1bedca1126cda47cb83dd5f3287f8d2bc4e5c282"
       },
       {
-        "captureRunId": "mu2as1l9-2431",
+        "captureRunId": "mu67in02-36056",
         "system": "swiss",
         "accent": "orange",
         "width": 1024,
@@ -5152,12 +5152,12 @@
           "system": "swiss",
           "accent": "orange"
         },
-        "resumed": false,
+        "resumed": true,
         "pass": true,
-        "screenshotSha256": "e83f60f36ba529f9f7d236d6fb2023decb3dc212958decd2d8de6786076e6a04"
+        "screenshotSha256": "d34dad67a5a712741f14d62302bb2cdee59c3627067cc597044e536f183f398a"
       },
       {
-        "captureRunId": "mu2as1l9-2431",
+        "captureRunId": "mu67in02-36056",
         "system": "swiss",
         "accent": "orange",
         "width": 1440,
@@ -5199,12 +5199,12 @@
           "system": "swiss",
           "accent": "orange"
         },
-        "resumed": false,
+        "resumed": true,
         "pass": true,
-        "screenshotSha256": "feecac200aa3731827b1155e65360d6ceba3bc0ce1d7e6730f13ee064f4aa455"
+        "screenshotSha256": "c7804eb4d1898b40495cb8fc388f91ee20705f8225306110dc79c1b3cf2b382f"
       },
       {
-        "captureRunId": "mu2as1l9-2431",
+        "captureRunId": "mu67in02-36056",
         "system": "swiss",
         "accent": "orange",
         "width": 1440,
@@ -5246,12 +5246,12 @@
           "system": "swiss",
           "accent": "orange"
         },
-        "resumed": false,
+        "resumed": true,
         "pass": true,
-        "screenshotSha256": "9f106390e73e20e1a62f54ab302aa240d2d2b5d9bbec2d425171a8e37c036dd7"
+        "screenshotSha256": "e5931ae91d6051755e6afab21594539060e3a03b93e864cccab7a527e586210d"
       },
       {
-        "captureRunId": "mu2as1l9-2431",
+        "captureRunId": "mu67in02-36056",
         "system": "swiss",
         "accent": "orange",
         "width": 1440,
@@ -5293,12 +5293,12 @@
           "system": "swiss",
           "accent": "orange"
         },
-        "resumed": false,
+        "resumed": true,
         "pass": true,
-        "screenshotSha256": "5f03001629d43461b36894458f54b4668e98c58a801150b10cdc0b80fdf1faeb"
+        "screenshotSha256": "d062666afe41f1c122e0731d04f68e170ef92e12720db31cc1bc611ea759efe5"
       },
       {
-        "captureRunId": "mu2as1l9-2431",
+        "captureRunId": "mu67in02-36056",
         "system": "swiss",
         "accent": "orange",
         "width": 1440,
@@ -5340,9 +5340,9 @@
           "system": "swiss",
           "accent": "orange"
         },
-        "resumed": false,
+        "resumed": true,
         "pass": true,
-        "screenshotSha256": "b1be6a23f3863848ab54b6e1e52023186dd6c37d842cdc905bf5eb0bdcc0d2d4"
+        "screenshotSha256": "376799f65861380fee82d4d2b2eaa7b3b4738ef4c81ee64bed95fd1009ccc70f"
       }
     ]
   },
@@ -5551,7 +5551,7 @@
         "axe": {
           "violations": [],
           "seriousCritical": [],
-          "passes": 44,
+          "passes": 40,
           "incomplete": 2
         }
       },
@@ -5566,7 +5566,7 @@
         "axe": {
           "violations": [],
           "seriousCritical": [],
-          "passes": 46,
+          "passes": 42,
           "incomplete": 2
         }
       },
@@ -5747,7 +5747,7 @@
         "axe": {
           "violations": [],
           "seriousCritical": [],
-          "passes": 39,
+          "passes": 38,
           "incomplete": 1
         }
       },
@@ -5762,7 +5762,7 @@
         "axe": {
           "violations": [],
           "seriousCritical": [],
-          "passes": 40,
+          "passes": 39,
           "incomplete": 1
         }
       },
@@ -5807,7 +5807,7 @@
         "axe": {
           "violations": [],
           "seriousCritical": [],
-          "passes": 40,
+          "passes": 42,
           "incomplete": 1
         }
       },
@@ -5822,7 +5822,7 @@
         "axe": {
           "violations": [],
           "seriousCritical": [],
-          "passes": 41,
+          "passes": 43,
           "incomplete": 1
         }
       },
@@ -6022,7 +6022,7 @@
           "violations": [],
           "seriousCritical": [],
           "passes": 36,
-          "incomplete": 3
+          "incomplete": 2
         }
       },
       {
@@ -6102,7 +6102,7 @@
         "axe": {
           "violations": [],
           "seriousCritical": [],
-          "passes": 44,
+          "passes": 40,
           "incomplete": 2
         }
       },
@@ -6117,7 +6117,7 @@
         "axe": {
           "violations": [],
           "seriousCritical": [],
-          "passes": 46,
+          "passes": 42,
           "incomplete": 2
         }
       },
@@ -6132,7 +6132,7 @@
         "axe": {
           "violations": [],
           "seriousCritical": [],
-          "passes": 43,
+          "passes": 40,
           "incomplete": 2
         }
       },
@@ -6146,611 +6146,594 @@
         "httpStatus": 200,
         "axe": {
           "violations": [],
+          "seriousCritical": [],
+          "passes": 42,
+          "incomplete": 2
+        }
+      },
+      {
+        "screen": "app.system.code-of-conduct",
+        "width": 375,
+        "route": "/code-of-conduct",
+        "identity": "public",
+        "status": "PASS",
+        "ready": true,
+        "httpStatus": 200,
+        "axe": {
+          "violations": [],
+          "seriousCritical": [],
+          "passes": 38,
+          "incomplete": 1
+        }
+      },
+      {
+        "screen": "app.system.code-of-conduct",
+        "width": 1440,
+        "route": "/code-of-conduct",
+        "identity": "public",
+        "status": "PASS",
+        "ready": true,
+        "httpStatus": 200,
+        "axe": {
+          "violations": [],
+          "seriousCritical": [],
+          "passes": 39,
+          "incomplete": 1
+        }
+      },
+      {
+        "screen": "app.system.consent",
+        "width": 375,
+        "route": "/",
+        "identity": "public",
+        "status": "PASS",
+        "ready": true,
+        "httpStatus": 200,
+        "axe": {
+          "violations": [
+            {
+              "id": "heading-order",
+              "impact": "moderate",
+              "help": "Heading levels should only increase by one",
+              "description": "Ensure the order of headings is semantically correct",
+              "nodes": 1,
+              "targets": [
+                [
+                  "a[data-testid=\"link-category-community-events\"] > h3"
+                ]
+              ],
+              "details": [
+                {
+                  "target": [
+                    "a[data-testid=\"link-category-community-events\"] > h3"
+                  ],
+                  "failureSummary": "Fix any of the following:\n  Heading order invalid"
+                }
+              ]
+            }
+          ],
+          "seriousCritical": [],
+          "passes": 36,
+          "incomplete": 2
+        }
+      },
+      {
+        "screen": "app.system.consent",
+        "width": 1440,
+        "route": "/",
+        "identity": "public",
+        "status": "PASS",
+        "ready": true,
+        "httpStatus": 200,
+        "axe": {
+          "violations": [
+            {
+              "id": "heading-order",
+              "impact": "moderate",
+              "help": "Heading levels should only increase by one",
+              "description": "Ensure the order of headings is semantically correct",
+              "nodes": 1,
+              "targets": [
+                [
+                  "a[data-testid=\"link-category-community-events\"] > h3"
+                ]
+              ],
+              "details": [
+                {
+                  "target": [
+                    "a[data-testid=\"link-category-community-events\"] > h3"
+                  ],
+                  "failureSummary": "Fix any of the following:\n  Heading order invalid"
+                }
+              ]
+            }
+          ],
+          "seriousCritical": [],
+          "passes": 39,
+          "incomplete": 2
+        }
+      },
+      {
+        "screen": "app.system.design-system",
+        "width": 375,
+        "route": "/design-system",
+        "identity": "public",
+        "status": "PASS",
+        "ready": true,
+        "httpStatus": 200,
+        "axe": {
+          "violations": [],
+          "seriousCritical": [],
+          "passes": 38,
+          "incomplete": 1
+        }
+      },
+      {
+        "screen": "app.system.design-system",
+        "width": 1440,
+        "route": "/design-system",
+        "identity": "public",
+        "status": "PASS",
+        "ready": true,
+        "httpStatus": 200,
+        "axe": {
+          "violations": [],
+          "seriousCritical": [],
+          "passes": 39,
+          "incomplete": 1
+        }
+      },
+      {
+        "screen": "app.system.empty-search",
+        "width": 375,
+        "route": "/search?q=zzqxv-nothing",
+        "identity": "public",
+        "status": "PASS",
+        "ready": true,
+        "httpStatus": 200,
+        "axe": {
+          "violations": [
+            {
+              "id": "landmark-main-is-top-level",
+              "impact": "moderate",
+              "help": "Main landmark should not be contained in another landmark",
+              "description": "Ensure the main landmark is at top level",
+              "nodes": 1,
+              "targets": [
+                [
+                  ".outline-none"
+                ]
+              ],
+              "details": [
+                {
+                  "target": [
+                    ".outline-none"
+                  ],
+                  "failureSummary": "Fix any of the following:\n  The main landmark is contained in another landmark."
+                }
+              ]
+            },
+            {
+              "id": "landmark-no-duplicate-main",
+              "impact": "moderate",
+              "help": "Document should not have more than one main landmark",
+              "description": "Ensure the document has at most one main landmark",
+              "nodes": 1,
+              "targets": [
+                [
+                  "#main"
+                ]
+              ],
+              "details": [
+                {
+                  "target": [
+                    "#main"
+                  ],
+                  "failureSummary": "Fix any of the following:\n  Document has more than one main landmark"
+                }
+              ]
+            }
+          ],
+          "seriousCritical": [],
+          "passes": 41,
+          "incomplete": 1
+        }
+      },
+      {
+        "screen": "app.system.empty-search",
+        "width": 1440,
+        "route": "/search?q=zzqxv-nothing",
+        "identity": "public",
+        "status": "PASS",
+        "ready": true,
+        "httpStatus": 200,
+        "axe": {
+          "violations": [
+            {
+              "id": "landmark-main-is-top-level",
+              "impact": "moderate",
+              "help": "Main landmark should not be contained in another landmark",
+              "description": "Ensure the main landmark is at top level",
+              "nodes": 1,
+              "targets": [
+                [
+                  "main[aria-label=\"Search results\"]"
+                ]
+              ],
+              "details": [
+                {
+                  "target": [
+                    "main[aria-label=\"Search results\"]"
+                  ],
+                  "failureSummary": "Fix any of the following:\n  The main landmark is contained in another landmark."
+                }
+              ]
+            },
+            {
+              "id": "landmark-no-duplicate-main",
+              "impact": "moderate",
+              "help": "Document should not have more than one main landmark",
+              "description": "Ensure the document has at most one main landmark",
+              "nodes": 1,
+              "targets": [
+                [
+                  "#main"
+                ]
+              ],
+              "details": [
+                {
+                  "target": [
+                    "#main"
+                  ],
+                  "failureSummary": "Fix any of the following:\n  Document has more than one main landmark"
+                }
+              ]
+            }
+          ],
+          "seriousCritical": [],
+          "passes": 43,
+          "incomplete": 1
+        }
+      },
+      {
+        "screen": "app.system.error",
+        "width": 375,
+        "identity": "public",
+        "status": "SKIPPED",
+        "stateOnly": true,
+        "reason": "ErrorPage consumes the canonical error-state pattern. No artificial failure was injected to capture this conditional surface."
+      },
+      {
+        "screen": "app.system.error",
+        "width": 1440,
+        "identity": "public",
+        "status": "SKIPPED",
+        "stateOnly": true,
+        "reason": "ErrorPage consumes the canonical error-state pattern. No artificial failure was injected to capture this conditional surface."
+      },
+      {
+        "screen": "app.system.loading",
+        "width": 375,
+        "route": "/search?q=ffmpeg",
+        "identity": "public",
+        "status": "PASS",
+        "ready": true,
+        "httpStatus": 200,
+        "axe": {
+          "violations": [
+            {
+              "id": "landmark-main-is-top-level",
+              "impact": "moderate",
+              "help": "Main landmark should not be contained in another landmark",
+              "description": "Ensure the main landmark is at top level",
+              "nodes": 1,
+              "targets": [
+                [
+                  ".outline-none"
+                ]
+              ],
+              "details": [
+                {
+                  "target": [
+                    ".outline-none"
+                  ],
+                  "failureSummary": "Fix any of the following:\n  The main landmark is contained in another landmark."
+                }
+              ]
+            },
+            {
+              "id": "landmark-no-duplicate-main",
+              "impact": "moderate",
+              "help": "Document should not have more than one main landmark",
+              "description": "Ensure the document has at most one main landmark",
+              "nodes": 1,
+              "targets": [
+                [
+                  "#main"
+                ]
+              ],
+              "details": [
+                {
+                  "target": [
+                    "#main"
+                  ],
+                  "failureSummary": "Fix any of the following:\n  Document has more than one main landmark"
+                }
+              ]
+            }
+          ],
+          "seriousCritical": [],
+          "passes": 42,
+          "incomplete": 1
+        }
+      },
+      {
+        "screen": "app.system.loading",
+        "width": 1440,
+        "route": "/search?q=ffmpeg",
+        "identity": "public",
+        "status": "PASS",
+        "ready": true,
+        "httpStatus": 200,
+        "axe": {
+          "violations": [
+            {
+              "id": "landmark-main-is-top-level",
+              "impact": "moderate",
+              "help": "Main landmark should not be contained in another landmark",
+              "description": "Ensure the main landmark is at top level",
+              "nodes": 1,
+              "targets": [
+                [
+                  "main[aria-label=\"Search results\"]"
+                ]
+              ],
+              "details": [
+                {
+                  "target": [
+                    "main[aria-label=\"Search results\"]"
+                  ],
+                  "failureSummary": "Fix any of the following:\n  The main landmark is contained in another landmark."
+                }
+              ]
+            },
+            {
+              "id": "landmark-no-duplicate-main",
+              "impact": "moderate",
+              "help": "Document should not have more than one main landmark",
+              "description": "Ensure the document has at most one main landmark",
+              "nodes": 1,
+              "targets": [
+                [
+                  "#main"
+                ]
+              ],
+              "details": [
+                {
+                  "target": [
+                    "#main"
+                  ],
+                  "failureSummary": "Fix any of the following:\n  Document has more than one main landmark"
+                }
+              ]
+            }
+          ],
+          "seriousCritical": [],
+          "passes": 44,
+          "incomplete": 1
+        }
+      },
+      {
+        "screen": "app.system.not-found",
+        "width": 375,
+        "route": "/this-route-does-not-exist",
+        "identity": "public",
+        "status": "PASS",
+        "ready": true,
+        "httpStatus": 404,
+        "axe": {
+          "violations": [],
+          "seriousCritical": [],
+          "passes": 38,
+          "incomplete": 1
+        }
+      },
+      {
+        "screen": "app.system.not-found",
+        "width": 1440,
+        "route": "/this-route-does-not-exist",
+        "identity": "public",
+        "status": "PASS",
+        "ready": true,
+        "httpStatus": 404,
+        "axe": {
+          "violations": [],
+          "seriousCritical": [],
+          "passes": 39,
+          "incomplete": 1
+        }
+      },
+      {
+        "screen": "app.system.privacy",
+        "width": 375,
+        "route": "/privacy",
+        "identity": "public",
+        "status": "PASS",
+        "ready": true,
+        "httpStatus": 200,
+        "axe": {
+          "violations": [],
+          "seriousCritical": [],
+          "passes": 42,
+          "incomplete": 1
+        }
+      },
+      {
+        "screen": "app.system.privacy",
+        "width": 1440,
+        "route": "/privacy",
+        "identity": "public",
+        "status": "PASS",
+        "ready": true,
+        "httpStatus": 200,
+        "axe": {
+          "violations": [],
+          "seriousCritical": [],
+          "passes": 44,
+          "incomplete": 1
+        }
+      },
+      {
+        "screen": "app.system.terms",
+        "width": 375,
+        "route": "/terms",
+        "identity": "public",
+        "status": "PASS",
+        "ready": true,
+        "httpStatus": 200,
+        "axe": {
+          "violations": [],
+          "seriousCritical": [],
+          "passes": 38,
+          "incomplete": 1
+        }
+      },
+      {
+        "screen": "app.system.terms",
+        "width": 1440,
+        "route": "/terms",
+        "identity": "public",
+        "status": "PASS",
+        "ready": true,
+        "httpStatus": 200,
+        "axe": {
+          "violations": [],
+          "seriousCritical": [],
+          "passes": 39,
+          "incomplete": 1
+        }
+      },
+      {
+        "screen": "app.system.toast",
+        "width": 375,
+        "identity": "public",
+        "status": "SKIPPED",
+        "stateOnly": true,
+        "reason": "Real guest bookmark action demonstrates canonical Radix toast presentation with unchanged li[data-state] contract."
+      },
+      {
+        "screen": "app.system.toast",
+        "width": 1440,
+        "identity": "public",
+        "status": "SKIPPED",
+        "stateOnly": true,
+        "reason": "Real guest bookmark action demonstrates canonical Radix toast presentation with unchanged li[data-state] contract."
+      },
+      {
+        "screen": "app.tag",
+        "width": 375,
+        "route": "/tag/open-source",
+        "identity": "public",
+        "status": "PASS",
+        "ready": true,
+        "httpStatus": 200,
+        "axe": {
+          "violations": [],
+          "seriousCritical": [],
+          "passes": 39,
+          "incomplete": 1
+        }
+      },
+      {
+        "screen": "app.tag",
+        "width": 1440,
+        "route": "/tag/open-source",
+        "identity": "public",
+        "status": "PASS",
+        "ready": true,
+        "httpStatus": 200,
+        "axe": {
+          "violations": [],
+          "seriousCritical": [],
+          "passes": 39,
+          "incomplete": 1
+        }
+      },
+      {
+        "screen": "app.admin.audit",
+        "width": 375,
+        "route": "/admin",
+        "identity": "Nick-admin",
+        "status": "PASS",
+        "identityVerified": {
+          "name": "Nick Krzemienski",
+          "role": "admin"
+        },
+        "ready": true,
+        "httpStatus": 200,
+        "axe": {
+          "violations": [],
+          "seriousCritical": [],
+          "passes": 44,
+          "incomplete": 1
+        }
+      },
+      {
+        "screen": "app.admin.audit",
+        "width": 1440,
+        "route": "/admin",
+        "identity": "Nick-admin",
+        "status": "PASS",
+        "identityVerified": {
+          "name": "Nick Krzemienski",
+          "role": "admin"
+        },
+        "ready": true,
+        "httpStatus": 200,
+        "axe": {
+          "violations": [],
+          "seriousCritical": [],
+          "passes": 44,
+          "incomplete": 1
+        }
+      },
+      {
+        "screen": "app.admin.categories",
+        "width": 375,
+        "route": "/admin",
+        "identity": "Nick-admin",
+        "status": "PASS",
+        "identityVerified": {
+          "name": "Nick Krzemienski",
+          "role": "admin"
+        },
+        "ready": true,
+        "httpStatus": 200,
+        "axe": {
+          "violations": [
+            {
+              "id": "empty-table-header",
+              "impact": "minor",
+              "help": "Table header text should not be empty",
+              "description": "Ensure table headers have discernible text",
+              "nodes": 1,
+              "targets": [
+                [
+                  "th:nth-child(6)"
+                ]
+              ],
+              "details": [
+                {
+                  "target": [
+                    "th:nth-child(6)"
+                  ],
+                  "failureSummary": "Fix any of the following:\n  Element does not have text that is visible to screen readers"
+                }
+              ]
+            }
+          ],
           "seriousCritical": [],
           "passes": 45,
-          "incomplete": 2
-        }
-      },
-      {
-        "screen": "app.system.code-of-conduct",
-        "width": 375,
-        "route": "/code-of-conduct",
-        "identity": "public",
-        "status": "PASS",
-        "ready": true,
-        "httpStatus": 200,
-        "axe": {
-          "violations": [],
-          "seriousCritical": [],
-          "passes": 39,
-          "incomplete": 1
-        }
-      },
-      {
-        "screen": "app.system.code-of-conduct",
-        "width": 1440,
-        "route": "/code-of-conduct",
-        "identity": "public",
-        "status": "PASS",
-        "ready": true,
-        "httpStatus": 200,
-        "axe": {
-          "violations": [],
-          "seriousCritical": [],
-          "passes": 40,
-          "incomplete": 1
-        }
-      },
-      {
-        "screen": "app.system.consent",
-        "width": 375,
-        "route": "/",
-        "identity": "public",
-        "status": "PASS",
-        "ready": true,
-        "httpStatus": 200,
-        "axe": {
-          "violations": [
-            {
-              "id": "heading-order",
-              "impact": "moderate",
-              "help": "Heading levels should only increase by one",
-              "description": "Ensure the order of headings is semantically correct",
-              "nodes": 1,
-              "targets": [
-                [
-                  "a[data-testid=\"link-category-community-events\"] > h3"
-                ]
-              ],
-              "details": [
-                {
-                  "target": [
-                    "a[data-testid=\"link-category-community-events\"] > h3"
-                  ],
-                  "failureSummary": "Fix any of the following:\n  Heading order invalid"
-                }
-              ]
-            }
-          ],
-          "seriousCritical": [],
-          "passes": 36,
-          "incomplete": 2
-        }
-      },
-      {
-        "screen": "app.system.consent",
-        "width": 1440,
-        "route": "/",
-        "identity": "public",
-        "status": "PASS",
-        "ready": true,
-        "httpStatus": 200,
-        "axe": {
-          "violations": [
-            {
-              "id": "heading-order",
-              "impact": "moderate",
-              "help": "Heading levels should only increase by one",
-              "description": "Ensure the order of headings is semantically correct",
-              "nodes": 1,
-              "targets": [
-                [
-                  "a[data-testid=\"link-category-community-events\"] > h3"
-                ]
-              ],
-              "details": [
-                {
-                  "target": [
-                    "a[data-testid=\"link-category-community-events\"] > h3"
-                  ],
-                  "failureSummary": "Fix any of the following:\n  Heading order invalid"
-                }
-              ]
-            }
-          ],
-          "seriousCritical": [],
-          "passes": 39,
-          "incomplete": 2
-        }
-      },
-      {
-        "screen": "app.system.design-system",
-        "width": 375,
-        "route": "/design-system",
-        "identity": "public",
-        "status": "PASS",
-        "ready": true,
-        "httpStatus": 200,
-        "axe": {
-          "violations": [],
-          "seriousCritical": [],
-          "passes": 38,
-          "incomplete": 1
-        }
-      },
-      {
-        "screen": "app.system.design-system",
-        "width": 1440,
-        "route": "/design-system",
-        "identity": "public",
-        "status": "PASS",
-        "ready": true,
-        "httpStatus": 200,
-        "axe": {
-          "violations": [],
-          "seriousCritical": [],
-          "passes": 39,
-          "incomplete": 1
-        }
-      },
-      {
-        "screen": "app.system.empty-search",
-        "width": 375,
-        "route": "/search?q=zzqxv-nothing",
-        "identity": "public",
-        "status": "PASS",
-        "ready": true,
-        "httpStatus": 200,
-        "axe": {
-          "violations": [
-            {
-              "id": "landmark-main-is-top-level",
-              "impact": "moderate",
-              "help": "Main landmark should not be contained in another landmark",
-              "description": "Ensure the main landmark is at top level",
-              "nodes": 1,
-              "targets": [
-                [
-                  ".outline-none"
-                ]
-              ],
-              "details": [
-                {
-                  "target": [
-                    ".outline-none"
-                  ],
-                  "failureSummary": "Fix any of the following:\n  The main landmark is contained in another landmark."
-                }
-              ]
-            },
-            {
-              "id": "landmark-no-duplicate-main",
-              "impact": "moderate",
-              "help": "Document should not have more than one main landmark",
-              "description": "Ensure the document has at most one main landmark",
-              "nodes": 1,
-              "targets": [
-                [
-                  "#main"
-                ]
-              ],
-              "details": [
-                {
-                  "target": [
-                    "#main"
-                  ],
-                  "failureSummary": "Fix any of the following:\n  Document has more than one main landmark"
-                }
-              ]
-            }
-          ],
-          "seriousCritical": [],
-          "passes": 41,
-          "incomplete": 1
-        }
-      },
-      {
-        "screen": "app.system.empty-search",
-        "width": 1440,
-        "route": "/search?q=zzqxv-nothing",
-        "identity": "public",
-        "status": "PASS",
-        "ready": true,
-        "httpStatus": 200,
-        "axe": {
-          "violations": [
-            {
-              "id": "landmark-main-is-top-level",
-              "impact": "moderate",
-              "help": "Main landmark should not be contained in another landmark",
-              "description": "Ensure the main landmark is at top level",
-              "nodes": 1,
-              "targets": [
-                [
-                  "main[aria-label=\"Search results\"]"
-                ]
-              ],
-              "details": [
-                {
-                  "target": [
-                    "main[aria-label=\"Search results\"]"
-                  ],
-                  "failureSummary": "Fix any of the following:\n  The main landmark is contained in another landmark."
-                }
-              ]
-            },
-            {
-              "id": "landmark-no-duplicate-main",
-              "impact": "moderate",
-              "help": "Document should not have more than one main landmark",
-              "description": "Ensure the document has at most one main landmark",
-              "nodes": 1,
-              "targets": [
-                [
-                  "#main"
-                ]
-              ],
-              "details": [
-                {
-                  "target": [
-                    "#main"
-                  ],
-                  "failureSummary": "Fix any of the following:\n  Document has more than one main landmark"
-                }
-              ]
-            }
-          ],
-          "seriousCritical": [],
-          "passes": 43,
-          "incomplete": 1
-        }
-      },
-      {
-        "screen": "app.system.error",
-        "width": 375,
-        "identity": "public",
-        "status": "SKIPPED",
-        "stateOnly": true,
-        "reason": "ErrorPage consumes the canonical error-state pattern. No artificial failure was injected to capture this conditional surface."
-      },
-      {
-        "screen": "app.system.error",
-        "width": 1440,
-        "identity": "public",
-        "status": "SKIPPED",
-        "stateOnly": true,
-        "reason": "ErrorPage consumes the canonical error-state pattern. No artificial failure was injected to capture this conditional surface."
-      },
-      {
-        "screen": "app.system.loading",
-        "width": 375,
-        "route": "/search?q=ffmpeg",
-        "identity": "public",
-        "status": "PASS",
-        "ready": true,
-        "httpStatus": 200,
-        "axe": {
-          "violations": [
-            {
-              "id": "landmark-main-is-top-level",
-              "impact": "moderate",
-              "help": "Main landmark should not be contained in another landmark",
-              "description": "Ensure the main landmark is at top level",
-              "nodes": 1,
-              "targets": [
-                [
-                  ".outline-none"
-                ]
-              ],
-              "details": [
-                {
-                  "target": [
-                    ".outline-none"
-                  ],
-                  "failureSummary": "Fix any of the following:\n  The main landmark is contained in another landmark."
-                }
-              ]
-            },
-            {
-              "id": "landmark-no-duplicate-main",
-              "impact": "moderate",
-              "help": "Document should not have more than one main landmark",
-              "description": "Ensure the document has at most one main landmark",
-              "nodes": 1,
-              "targets": [
-                [
-                  "#main"
-                ]
-              ],
-              "details": [
-                {
-                  "target": [
-                    "#main"
-                  ],
-                  "failureSummary": "Fix any of the following:\n  Document has more than one main landmark"
-                }
-              ]
-            }
-          ],
-          "seriousCritical": [],
-          "passes": 42,
-          "incomplete": 1
-        }
-      },
-      {
-        "screen": "app.system.loading",
-        "width": 1440,
-        "route": "/search?q=ffmpeg",
-        "identity": "public",
-        "status": "PASS",
-        "ready": true,
-        "httpStatus": 200,
-        "axe": {
-          "violations": [
-            {
-              "id": "landmark-main-is-top-level",
-              "impact": "moderate",
-              "help": "Main landmark should not be contained in another landmark",
-              "description": "Ensure the main landmark is at top level",
-              "nodes": 1,
-              "targets": [
-                [
-                  "main[aria-label=\"Search results\"]"
-                ]
-              ],
-              "details": [
-                {
-                  "target": [
-                    "main[aria-label=\"Search results\"]"
-                  ],
-                  "failureSummary": "Fix any of the following:\n  The main landmark is contained in another landmark."
-                }
-              ]
-            },
-            {
-              "id": "landmark-no-duplicate-main",
-              "impact": "moderate",
-              "help": "Document should not have more than one main landmark",
-              "description": "Ensure the document has at most one main landmark",
-              "nodes": 1,
-              "targets": [
-                [
-                  "#main"
-                ]
-              ],
-              "details": [
-                {
-                  "target": [
-                    "#main"
-                  ],
-                  "failureSummary": "Fix any of the following:\n  Document has more than one main landmark"
-                }
-              ]
-            }
-          ],
-          "seriousCritical": [],
-          "passes": 44,
-          "incomplete": 1
-        }
-      },
-      {
-        "screen": "app.system.not-found",
-        "width": 375,
-        "route": "/this-route-does-not-exist",
-        "identity": "public",
-        "status": "PASS",
-        "ready": true,
-        "httpStatus": 404,
-        "axe": {
-          "violations": [],
-          "seriousCritical": [],
-          "passes": 38,
-          "incomplete": 1
-        }
-      },
-      {
-        "screen": "app.system.not-found",
-        "width": 1440,
-        "route": "/this-route-does-not-exist",
-        "identity": "public",
-        "status": "PASS",
-        "ready": true,
-        "httpStatus": 404,
-        "axe": {
-          "violations": [],
-          "seriousCritical": [],
-          "passes": 39,
-          "incomplete": 1
-        }
-      },
-      {
-        "screen": "app.system.privacy",
-        "width": 375,
-        "route": "/privacy",
-        "identity": "public",
-        "status": "PASS",
-        "ready": true,
-        "httpStatus": 200,
-        "axe": {
-          "violations": [],
-          "seriousCritical": [],
-          "passes": 42,
-          "incomplete": 1
-        }
-      },
-      {
-        "screen": "app.system.privacy",
-        "width": 1440,
-        "route": "/privacy",
-        "identity": "public",
-        "status": "PASS",
-        "ready": true,
-        "httpStatus": 200,
-        "axe": {
-          "violations": [],
-          "seriousCritical": [],
-          "passes": 44,
-          "incomplete": 1
-        }
-      },
-      {
-        "screen": "app.system.terms",
-        "width": 375,
-        "route": "/terms",
-        "identity": "public",
-        "status": "PASS",
-        "ready": true,
-        "httpStatus": 200,
-        "axe": {
-          "violations": [],
-          "seriousCritical": [],
-          "passes": 39,
-          "incomplete": 1
-        }
-      },
-      {
-        "screen": "app.system.terms",
-        "width": 1440,
-        "route": "/terms",
-        "identity": "public",
-        "status": "PASS",
-        "ready": true,
-        "httpStatus": 200,
-        "axe": {
-          "violations": [],
-          "seriousCritical": [],
-          "passes": 40,
-          "incomplete": 1
-        }
-      },
-      {
-        "screen": "app.system.toast",
-        "width": 375,
-        "identity": "public",
-        "status": "SKIPPED",
-        "stateOnly": true,
-        "reason": "Real guest bookmark action demonstrates canonical Radix toast presentation with unchanged li[data-state] contract."
-      },
-      {
-        "screen": "app.system.toast",
-        "width": 1440,
-        "identity": "public",
-        "status": "SKIPPED",
-        "stateOnly": true,
-        "reason": "Real guest bookmark action demonstrates canonical Radix toast presentation with unchanged li[data-state] contract."
-      },
-      {
-        "screen": "app.tag",
-        "width": 375,
-        "route": "/tag/open-source",
-        "identity": "public",
-        "status": "PASS",
-        "ready": true,
-        "httpStatus": 200,
-        "axe": {
-          "violations": [],
-          "seriousCritical": [],
-          "passes": 39,
-          "incomplete": 1
-        }
-      },
-      {
-        "screen": "app.tag",
-        "width": 1440,
-        "route": "/tag/open-source",
-        "identity": "public",
-        "status": "PASS",
-        "ready": true,
-        "httpStatus": 200,
-        "axe": {
-          "violations": [],
-          "seriousCritical": [],
-          "passes": 39,
-          "incomplete": 1
-        }
-      },
-      {
-        "screen": "app.admin.approvals",
-        "width": 375,
-        "route": "/admin",
-        "identity": "Nick-admin",
-        "status": "PASS",
-        "identityVerified": {
-          "name": "Nick",
-          "role": "admin"
-        },
-        "ready": true,
-        "httpStatus": 200,
-        "axe": {
-          "violations": [],
-          "seriousCritical": [],
-          "passes": 40,
-          "incomplete": 1
-        }
-      },
-      {
-        "screen": "app.admin.approvals",
-        "width": 1440,
-        "route": "/admin",
-        "identity": "Nick-admin",
-        "status": "PASS",
-        "identityVerified": {
-          "name": "Nick",
-          "role": "admin"
-        },
-        "ready": true,
-        "httpStatus": 200,
-        "axe": {
-          "violations": [],
-          "seriousCritical": [],
-          "passes": 40,
-          "incomplete": 1
-        }
-      },
-      {
-        "screen": "app.admin.audit",
-        "width": 375,
-        "route": "/admin",
-        "identity": "Nick-admin",
-        "status": "PASS",
-        "identityVerified": {
-          "name": "Nick",
-          "role": "admin"
-        },
-        "ready": true,
-        "httpStatus": 200,
-        "axe": {
-          "violations": [],
-          "seriousCritical": [],
-          "passes": 48,
-          "incomplete": 1
-        }
-      },
-      {
-        "screen": "app.admin.audit",
-        "width": 1440,
-        "route": "/admin",
-        "identity": "Nick-admin",
-        "status": "PASS",
-        "identityVerified": {
-          "name": "Nick",
-          "role": "admin"
-        },
-        "ready": true,
-        "httpStatus": 200,
-        "axe": {
-          "violations": [],
-          "seriousCritical": [],
-          "passes": 48,
-          "incomplete": 1
-        }
-      },
-      {
-        "screen": "app.admin.categories",
-        "width": 375,
-        "route": "/admin",
-        "identity": "Nick-admin",
-        "status": "PASS",
-        "identityVerified": {
-          "name": "Nick",
-          "role": "admin"
-        },
-        "ready": true,
-        "httpStatus": 200,
-        "axe": {
-          "violations": [],
-          "seriousCritical": [],
-          "passes": 47,
           "incomplete": 1
         }
       },
@@ -6761,15 +6744,36 @@
         "identity": "Nick-admin",
         "status": "PASS",
         "identityVerified": {
-          "name": "Nick",
+          "name": "Nick Krzemienski",
           "role": "admin"
         },
         "ready": true,
         "httpStatus": 200,
         "axe": {
-          "violations": [],
+          "violations": [
+            {
+              "id": "empty-table-header",
+              "impact": "minor",
+              "help": "Table header text should not be empty",
+              "description": "Ensure table headers have discernible text",
+              "nodes": 1,
+              "targets": [
+                [
+                  "th:nth-child(6)"
+                ]
+              ],
+              "details": [
+                {
+                  "target": [
+                    "th:nth-child(6)"
+                  ],
+                  "failureSummary": "Fix any of the following:\n  Element does not have text that is visible to screen readers"
+                }
+              ]
+            }
+          ],
           "seriousCritical": [],
-          "passes": 47,
+          "passes": 45,
           "incomplete": 1
         }
       },
@@ -6780,7 +6784,7 @@
         "identity": "Nick-admin",
         "status": "PASS",
         "identityVerified": {
-          "name": "Nick",
+          "name": "Nick Krzemienski",
           "role": "admin"
         },
         "ready": true,
@@ -6806,30 +6810,10 @@
                   "failureSummary": "Fix any of the following:\n  Element does not have text that is visible to screen readers"
                 }
               ]
-            },
-            {
-              "id": "heading-order",
-              "impact": "moderate",
-              "help": "Heading levels should only increase by one",
-              "description": "Ensure the order of headings is semantically correct",
-              "nodes": 1,
-              "targets": [
-                [
-                  "h5"
-                ]
-              ],
-              "details": [
-                {
-                  "target": [
-                    "h5"
-                  ],
-                  "failureSummary": "Fix any of the following:\n  Heading order invalid"
-                }
-              ]
             }
           ],
           "seriousCritical": [],
-          "passes": 44,
+          "passes": 48,
           "incomplete": 1
         }
       },
@@ -6840,7 +6824,7 @@
         "identity": "Nick-admin",
         "status": "PASS",
         "identityVerified": {
-          "name": "Nick",
+          "name": "Nick Krzemienski",
           "role": "admin"
         },
         "ready": true,
@@ -6866,30 +6850,10 @@
                   "failureSummary": "Fix any of the following:\n  Element does not have text that is visible to screen readers"
                 }
               ]
-            },
-            {
-              "id": "heading-order",
-              "impact": "moderate",
-              "help": "Heading levels should only increase by one",
-              "description": "Ensure the order of headings is semantically correct",
-              "nodes": 1,
-              "targets": [
-                [
-                  "h5"
-                ]
-              ],
-              "details": [
-                {
-                  "target": [
-                    "h5"
-                  ],
-                  "failureSummary": "Fix any of the following:\n  Heading order invalid"
-                }
-              ]
             }
           ],
           "seriousCritical": [],
-          "passes": 44,
+          "passes": 48,
           "incomplete": 1
         }
       },
@@ -6900,7 +6864,7 @@
         "identity": "Nick-admin",
         "status": "PASS",
         "identityVerified": {
-          "name": "Nick",
+          "name": "Nick Krzemienski",
           "role": "admin"
         },
         "ready": true,
@@ -6919,7 +6883,7 @@
         "identity": "Nick-admin",
         "status": "PASS",
         "identityVerified": {
-          "name": "Nick",
+          "name": "Nick Krzemienski",
           "role": "admin"
         },
         "ready": true,
@@ -6953,98 +6917,43 @@
         }
       },
       {
-        "screen": "app.admin.edits",
-        "width": 375,
-        "route": "/admin",
-        "identity": "Nick-admin",
-        "status": "PASS",
-        "identityVerified": {
-          "name": "Nick",
-          "role": "admin"
-        },
-        "ready": true,
-        "httpStatus": 200,
-        "axe": {
-          "violations": [],
-          "seriousCritical": [],
-          "passes": 40,
-          "incomplete": 1
-        }
-      },
-      {
-        "screen": "app.admin.edits",
-        "width": 1440,
-        "route": "/admin",
-        "identity": "Nick-admin",
-        "status": "PASS",
-        "identityVerified": {
-          "name": "Nick",
-          "role": "admin"
-        },
-        "ready": true,
-        "httpStatus": 200,
-        "axe": {
-          "violations": [],
-          "seriousCritical": [],
-          "passes": 40,
-          "incomplete": 1
-        }
-      },
-      {
-        "screen": "app.admin.enrichment",
-        "width": 375,
-        "route": "/admin",
-        "identity": "Nick-admin",
-        "status": "PASS",
-        "identityVerified": {
-          "name": "Nick",
-          "role": "admin"
-        },
-        "ready": true,
-        "httpStatus": 200,
-        "axe": {
-          "violations": [],
-          "seriousCritical": [],
-          "passes": 47,
-          "incomplete": 1
-        }
-      },
-      {
-        "screen": "app.admin.enrichment",
-        "width": 1440,
-        "route": "/admin",
-        "identity": "Nick-admin",
-        "status": "PASS",
-        "identityVerified": {
-          "name": "Nick",
-          "role": "admin"
-        },
-        "ready": true,
-        "httpStatus": 200,
-        "axe": {
-          "violations": [],
-          "seriousCritical": [],
-          "passes": 47,
-          "incomplete": 1
-        }
-      },
-      {
         "screen": "app.admin.export",
         "width": 375,
         "route": "/admin",
         "identity": "Nick-admin",
         "status": "PASS",
         "identityVerified": {
-          "name": "Nick",
+          "name": "Nick Krzemienski",
           "role": "admin"
         },
         "ready": true,
         "httpStatus": 200,
         "axe": {
-          "violations": [],
+          "violations": [
+            {
+              "id": "heading-order",
+              "impact": "moderate",
+              "help": "Heading levels should only increase by one",
+              "description": "Ensure the order of headings is semantically correct",
+              "nodes": 1,
+              "targets": [
+                [
+                  ".hoverable:nth-child(1) > h3"
+                ]
+              ],
+              "details": [
+                {
+                  "target": [
+                    ".hoverable:nth-child(1) > h3"
+                  ],
+                  "failureSummary": "Fix any of the following:\n  Heading order invalid"
+                }
+              ]
+            }
+          ],
           "seriousCritical": [],
-          "passes": 40,
-          "incomplete": 2
+          "passes": 41,
+          "incomplete": 1
         }
       },
       {
@@ -7054,16 +6963,37 @@
         "identity": "Nick-admin",
         "status": "PASS",
         "identityVerified": {
-          "name": "Nick",
+          "name": "Nick Krzemienski",
           "role": "admin"
         },
         "ready": true,
         "httpStatus": 200,
         "axe": {
-          "violations": [],
+          "violations": [
+            {
+              "id": "heading-order",
+              "impact": "moderate",
+              "help": "Heading levels should only increase by one",
+              "description": "Ensure the order of headings is semantically correct",
+              "nodes": 1,
+              "targets": [
+                [
+                  ".hoverable:nth-child(1) > h3"
+                ]
+              ],
+              "details": [
+                {
+                  "target": [
+                    ".hoverable:nth-child(1) > h3"
+                  ],
+                  "failureSummary": "Fix any of the following:\n  Heading order invalid"
+                }
+              ]
+            }
+          ],
           "seriousCritical": [],
-          "passes": 40,
-          "incomplete": 2
+          "passes": 41,
+          "incomplete": 1
         }
       },
       {
@@ -7073,7 +7003,7 @@
         "identity": "Nick-admin",
         "status": "PASS",
         "identityVerified": {
-          "name": "Nick",
+          "name": "Nick Krzemienski",
           "role": "admin"
         },
         "ready": true,
@@ -7099,30 +7029,10 @@
                   "failureSummary": "Fix any of the following:\n  Element does not have text that is visible to screen readers"
                 }
               ]
-            },
-            {
-              "id": "heading-order",
-              "impact": "moderate",
-              "help": "Heading levels should only increase by one",
-              "description": "Ensure the order of headings is semantically correct",
-              "nodes": 1,
-              "targets": [
-                [
-                  "h4"
-                ]
-              ],
-              "details": [
-                {
-                  "target": [
-                    "h4"
-                  ],
-                  "failureSummary": "Fix any of the following:\n  Heading order invalid"
-                }
-              ]
             }
           ],
           "seriousCritical": [],
-          "passes": 47,
+          "passes": 45,
           "incomplete": 1
         }
       },
@@ -7133,7 +7043,7 @@
         "identity": "Nick-admin",
         "status": "PASS",
         "identityVerified": {
-          "name": "Nick",
+          "name": "Nick Krzemienski",
           "role": "admin"
         },
         "ready": true,
@@ -7159,88 +7069,89 @@
                   "failureSummary": "Fix any of the following:\n  Element does not have text that is visible to screen readers"
                 }
               ]
-            },
+            }
+          ],
+          "seriousCritical": [],
+          "passes": 45,
+          "incomplete": 1
+        }
+      },
+      {
+        "screen": "app.admin.journeys",
+        "width": 375,
+        "route": "/admin",
+        "identity": "Nick-admin",
+        "status": "PASS",
+        "identityVerified": {
+          "name": "Nick Krzemienski",
+          "role": "admin"
+        },
+        "ready": true,
+        "httpStatus": 200,
+        "axe": {
+          "violations": [],
+          "seriousCritical": [],
+          "passes": 40,
+          "incomplete": 1
+        }
+      },
+      {
+        "screen": "app.admin.journeys",
+        "width": 1440,
+        "route": "/admin",
+        "identity": "Nick-admin",
+        "status": "PASS",
+        "identityVerified": {
+          "name": "Nick Krzemienski",
+          "role": "admin"
+        },
+        "ready": true,
+        "httpStatus": 200,
+        "axe": {
+          "violations": [],
+          "seriousCritical": [],
+          "passes": 40,
+          "incomplete": 1
+        }
+      },
+      {
+        "screen": "app.admin.linkhealth",
+        "width": 375,
+        "route": "/admin",
+        "identity": "Nick-admin",
+        "status": "PASS",
+        "identityVerified": {
+          "name": "Nick Krzemienski",
+          "role": "admin"
+        },
+        "ready": true,
+        "httpStatus": 200,
+        "axe": {
+          "violations": [
             {
-              "id": "heading-order",
-              "impact": "moderate",
-              "help": "Heading levels should only increase by one",
-              "description": "Ensure the order of headings is semantically correct",
+              "id": "empty-table-header",
+              "impact": "minor",
+              "help": "Table header text should not be empty",
+              "description": "Ensure table headers have discernible text",
               "nodes": 1,
               "targets": [
                 [
-                  "h4"
+                  "th:nth-child(5)"
                 ]
               ],
               "details": [
                 {
                   "target": [
-                    "h4"
+                    "th:nth-child(5)"
                   ],
-                  "failureSummary": "Fix any of the following:\n  Heading order invalid"
+                  "failureSummary": "Fix any of the following:\n  Element does not have text that is visible to screen readers"
                 }
               ]
             }
           ],
           "seriousCritical": [],
-          "passes": 47,
-          "incomplete": 1
-        }
-      },
-      {
-        "screen": "app.admin.journeys",
-        "width": 375,
-        "route": "/admin",
-        "identity": "Nick-admin",
-        "status": "PASS",
-        "identityVerified": {
-          "name": "Nick",
-          "role": "admin"
-        },
-        "ready": true,
-        "httpStatus": 200,
-        "axe": {
-          "violations": [],
-          "seriousCritical": [],
-          "passes": 40,
-          "incomplete": 1
-        }
-      },
-      {
-        "screen": "app.admin.journeys",
-        "width": 1440,
-        "route": "/admin",
-        "identity": "Nick-admin",
-        "status": "PASS",
-        "identityVerified": {
-          "name": "Nick",
-          "role": "admin"
-        },
-        "ready": true,
-        "httpStatus": 200,
-        "axe": {
-          "violations": [],
-          "seriousCritical": [],
-          "passes": 40,
-          "incomplete": 1
-        }
-      },
-      {
-        "screen": "app.admin.linkhealth",
-        "width": 375,
-        "route": "/admin",
-        "identity": "Nick-admin",
-        "status": "PASS",
-        "identityVerified": {
-          "name": "Nick",
-          "role": "admin"
-        },
-        "ready": true,
-        "httpStatus": 200,
-        "axe": {
-          "violations": [],
-          "seriousCritical": [],
-          "passes": 40,
-          "incomplete": 2
+          "passes": 44,
+          "incomplete": 3
         }
       },
       {
@@ -7250,16 +7161,37 @@
         "identity": "Nick-admin",
         "status": "PASS",
         "identityVerified": {
-          "name": "Nick",
+          "name": "Nick Krzemienski",
           "role": "admin"
         },
         "ready": true,
         "httpStatus": 200,
         "axe": {
-          "violations": [],
+          "violations": [
+            {
+              "id": "empty-table-header",
+              "impact": "minor",
+              "help": "Table header text should not be empty",
+              "description": "Ensure table headers have discernible text",
+              "nodes": 1,
+              "targets": [
+                [
+                  "th:nth-child(5)"
+                ]
+              ],
+              "details": [
+                {
+                  "target": [
+                    "th:nth-child(5)"
+                  ],
+                  "failureSummary": "Fix any of the following:\n  Element does not have text that is visible to screen readers"
+                }
+              ]
+            }
+          ],
           "seriousCritical": [],
-          "passes": 40,
-          "incomplete": 2
+          "passes": 44,
+          "incomplete": 3
         }
       },
       {
@@ -7269,7 +7201,7 @@
         "identity": "Nick-admin",
         "status": "PASS",
         "identityVerified": {
-          "name": "Nick",
+          "name": "Nick Krzemienski",
           "role": "admin"
         },
         "ready": true,
@@ -7278,7 +7210,7 @@
           "violations": [],
           "seriousCritical": [],
           "passes": 41,
-          "incomplete": 2
+          "incomplete": 1
         }
       },
       {
@@ -7288,7 +7220,7 @@
         "identity": "Nick-admin",
         "status": "PASS",
         "identityVerified": {
-          "name": "Nick",
+          "name": "Nick Krzemienski",
           "role": "admin"
         },
         "ready": true,
@@ -7297,7 +7229,7 @@
           "violations": [],
           "seriousCritical": [],
           "passes": 41,
-          "incomplete": 2
+          "incomplete": 1
         }
       },
       {
@@ -7307,7 +7239,7 @@
         "identity": "Nick-admin",
         "status": "PASS",
         "identityVerified": {
-          "name": "Nick",
+          "name": "Nick Krzemienski",
           "role": "admin"
         },
         "ready": true,
@@ -7315,7 +7247,7 @@
         "axe": {
           "violations": [],
           "seriousCritical": [],
-          "passes": 44,
+          "passes": 40,
           "incomplete": 1
         }
       },
@@ -7326,129 +7258,175 @@
         "identity": "Nick-admin",
         "status": "PASS",
         "identityVerified": {
-          "name": "Nick",
+          "name": "Nick Krzemienski",
           "role": "admin"
         },
         "ready": true,
         "httpStatus": 200,
         "axe": {
           "violations": [],
+          "seriousCritical": [],
+          "passes": 40,
+          "incomplete": 1
+        }
+      },
+      {
+        "screen": "app.admin.resources",
+        "width": 375,
+        "route": "/admin",
+        "identity": "Nick-admin",
+        "status": "PASS",
+        "identityVerified": {
+          "name": "Nick Krzemienski",
+          "role": "admin"
+        },
+        "ready": true,
+        "httpStatus": 200,
+        "axe": {
+          "violations": [
+            {
+              "id": "empty-table-header",
+              "impact": "minor",
+              "help": "Table header text should not be empty",
+              "description": "Ensure table headers have discernible text",
+              "nodes": 1,
+              "targets": [
+                [
+                  "th[aria-label=\"Actions\"]"
+                ]
+              ],
+              "details": [
+                {
+                  "target": [
+                    "th[aria-label=\"Actions\"]"
+                  ],
+                  "failureSummary": "Fix any of the following:\n  Element does not have text that is visible to screen readers"
+                }
+              ]
+            }
+          ],
+          "seriousCritical": [],
+          "passes": 48,
+          "incomplete": 2
+        }
+      },
+      {
+        "screen": "app.admin.resources",
+        "width": 1440,
+        "route": "/admin",
+        "identity": "Nick-admin",
+        "status": "PASS",
+        "identityVerified": {
+          "name": "Nick Krzemienski",
+          "role": "admin"
+        },
+        "ready": true,
+        "httpStatus": 200,
+        "axe": {
+          "violations": [
+            {
+              "id": "empty-table-header",
+              "impact": "minor",
+              "help": "Table header text should not be empty",
+              "description": "Ensure table headers have discernible text",
+              "nodes": 1,
+              "targets": [
+                [
+                  "th[aria-label=\"Actions\"]"
+                ]
+              ],
+              "details": [
+                {
+                  "target": [
+                    "th[aria-label=\"Actions\"]"
+                  ],
+                  "failureSummary": "Fix any of the following:\n  Element does not have text that is visible to screen readers"
+                }
+              ]
+            }
+          ],
+          "seriousCritical": [],
+          "passes": 48,
+          "incomplete": 2
+        }
+      },
+      {
+        "screen": "app.admin.subcategories",
+        "width": 375,
+        "route": "/admin",
+        "identity": "Nick-admin",
+        "status": "PASS",
+        "identityVerified": {
+          "name": "Nick Krzemienski",
+          "role": "admin"
+        },
+        "ready": true,
+        "httpStatus": 200,
+        "axe": {
+          "violations": [
+            {
+              "id": "empty-table-header",
+              "impact": "minor",
+              "help": "Table header text should not be empty",
+              "description": "Ensure table headers have discernible text",
+              "nodes": 1,
+              "targets": [
+                [
+                  "th:nth-child(5)"
+                ]
+              ],
+              "details": [
+                {
+                  "target": [
+                    "th:nth-child(5)"
+                  ],
+                  "failureSummary": "Fix any of the following:\n  Element does not have text that is visible to screen readers"
+                }
+              ]
+            }
+          ],
           "seriousCritical": [],
           "passes": 44,
           "incomplete": 1
         }
       },
       {
-        "screen": "app.admin.researcher",
-        "width": 375,
-        "route": "/admin",
-        "identity": "Nick-admin",
-        "status": "PASS",
-        "identityVerified": {
-          "name": "Nick",
-          "role": "admin"
-        },
-        "ready": true,
-        "httpStatus": 200,
-        "axe": {
-          "violations": [],
-          "seriousCritical": [],
-          "passes": 43,
-          "incomplete": 1
-        }
-      },
-      {
-        "screen": "app.admin.researcher",
-        "width": 1440,
-        "route": "/admin",
-        "identity": "Nick-admin",
-        "status": "PASS",
-        "identityVerified": {
-          "name": "Nick",
-          "role": "admin"
-        },
-        "ready": true,
-        "httpStatus": 200,
-        "axe": {
-          "violations": [],
-          "seriousCritical": [],
-          "passes": 43,
-          "incomplete": 1
-        }
-      },
-      {
-        "screen": "app.admin.resources",
-        "width": 375,
-        "route": "/admin",
-        "identity": "Nick-admin",
-        "status": "PASS",
-        "identityVerified": {
-          "name": "Nick",
-          "role": "admin"
-        },
-        "ready": true,
-        "httpStatus": 200,
-        "axe": {
-          "violations": [],
-          "seriousCritical": [],
-          "passes": 48,
-          "incomplete": 1
-        }
-      },
-      {
-        "screen": "app.admin.resources",
-        "width": 1440,
-        "route": "/admin",
-        "identity": "Nick-admin",
-        "status": "PASS",
-        "identityVerified": {
-          "name": "Nick",
-          "role": "admin"
-        },
-        "ready": true,
-        "httpStatus": 200,
-        "axe": {
-          "violations": [],
-          "seriousCritical": [],
-          "passes": 48,
-          "incomplete": 1
-        }
-      },
-      {
-        "screen": "app.admin.subcategories",
-        "width": 375,
-        "route": "/admin",
-        "identity": "Nick-admin",
-        "status": "PASS",
-        "identityVerified": {
-          "name": "Nick",
-          "role": "admin"
-        },
-        "ready": true,
-        "httpStatus": 200,
-        "axe": {
-          "violations": [],
-          "seriousCritical": [],
-          "passes": 47,
-          "incomplete": 1
-        }
-      },
-      {
         "screen": "app.admin.subcategories",
         "width": 1440,
         "route": "/admin",
         "identity": "Nick-admin",
         "status": "PASS",
         "identityVerified": {
-          "name": "Nick",
+          "name": "Nick Krzemienski",
           "role": "admin"
         },
         "ready": true,
         "httpStatus": 200,
         "axe": {
-          "violations": [],
+          "violations": [
+            {
+              "id": "empty-table-header",
+              "impact": "minor",
+              "help": "Table header text should not be empty",
+              "description": "Ensure table headers have discernible text",
+              "nodes": 1,
+              "targets": [
+                [
+                  "th:nth-child(5)"
+                ]
+              ],
+              "details": [
+                {
+                  "target": [
+                    "th:nth-child(5)"
+                  ],
+                  "failureSummary": "Fix any of the following:\n  Element does not have text that is visible to screen readers"
+                }
+              ]
+            }
+          ],
           "seriousCritical": [],
-          "passes": 47,
+          "passes": 44,
           "incomplete": 1
         }
       },
@@ -7459,7 +7437,7 @@
         "identity": "Nick-admin",
         "status": "PASS",
         "identityVerified": {
-          "name": "Nick",
+          "name": "Nick Krzemienski",
           "role": "admin"
         },
         "ready": true,
@@ -7467,7 +7445,7 @@
         "axe": {
           "violations": [],
           "seriousCritical": [],
-          "passes": 47,
+          "passes": 45,
           "incomplete": 1
         }
       },
@@ -7478,7 +7456,7 @@
         "identity": "Nick-admin",
         "status": "PASS",
         "identityVerified": {
-          "name": "Nick",
+          "name": "Nick Krzemienski",
           "role": "admin"
         },
         "ready": true,
@@ -7486,7 +7464,7 @@
         "axe": {
           "violations": [],
           "seriousCritical": [],
-          "passes": 47,
+          "passes": 45,
           "incomplete": 1
         }
       },
@@ -7497,15 +7475,36 @@
         "identity": "Nick-admin",
         "status": "PASS",
         "identityVerified": {
-          "name": "Nick",
+          "name": "Nick Krzemienski",
           "role": "admin"
         },
         "ready": true,
         "httpStatus": 200,
         "axe": {
-          "violations": [],
+          "violations": [
+            {
+              "id": "empty-table-header",
+              "impact": "minor",
+              "help": "Table header text should not be empty",
+              "description": "Ensure table headers have discernible text",
+              "nodes": 1,
+              "targets": [
+                [
+                  "th[aria-label=\"Actions\"]"
+                ]
+              ],
+              "details": [
+                {
+                  "target": [
+                    "th[aria-label=\"Actions\"]"
+                  ],
+                  "failureSummary": "Fix any of the following:\n  Element does not have text that is visible to screen readers"
+                }
+              ]
+            }
+          ],
           "seriousCritical": [],
-          "passes": 47,
+          "passes": 48,
           "incomplete": 1
         }
       },
@@ -7516,15 +7515,36 @@
         "identity": "Nick-admin",
         "status": "PASS",
         "identityVerified": {
-          "name": "Nick",
+          "name": "Nick Krzemienski",
           "role": "admin"
         },
         "ready": true,
         "httpStatus": 200,
         "axe": {
-          "violations": [],
+          "violations": [
+            {
+              "id": "empty-table-header",
+              "impact": "minor",
+              "help": "Table header text should not be empty",
+              "description": "Ensure table headers have discernible text",
+              "nodes": 1,
+              "targets": [
+                [
+                  "th[aria-label=\"Actions\"]"
+                ]
+              ],
+              "details": [
+                {
+                  "target": [
+                    "th[aria-label=\"Actions\"]"
+                  ],
+                  "failureSummary": "Fix any of the following:\n  Element does not have text that is visible to screen readers"
+                }
+              ]
+            }
+          ],
           "seriousCritical": [],
-          "passes": 47,
+          "passes": 48,
           "incomplete": 1
         }
       },
@@ -7535,7 +7555,7 @@
         "identity": "Nick-admin",
         "status": "PASS",
         "identityVerified": {
-          "name": "Nick",
+          "name": "Nick Krzemienski",
           "role": "admin"
         },
         "ready": true,
@@ -7615,7 +7635,7 @@
         "identity": "Nick-admin",
         "status": "PASS",
         "identityVerified": {
-          "name": "Nick",
+          "name": "Nick Krzemienski",
           "role": "admin"
         },
         "ready": true,
@@ -7695,7 +7715,7 @@
         "identity": "Nick-admin",
         "status": "PASS",
         "identityVerified": {
-          "name": "Nick",
+          "name": "Nick Krzemienski",
           "role": "admin"
         },
         "ready": true,
@@ -7714,7 +7734,7 @@
         "identity": "Nick-admin",
         "status": "PASS",
         "identityVerified": {
-          "name": "Nick",
+          "name": "Nick Krzemienski",
           "role": "admin"
         },
         "ready": true,
@@ -7733,7 +7753,7 @@
         "identity": "Nick-admin",
         "status": "PASS",
         "identityVerified": {
-          "name": "Nick",
+          "name": "Nick Krzemienski",
           "role": "admin"
         },
         "ready": true,
@@ -7752,7 +7772,7 @@
         "identity": "Nick-admin",
         "status": "PASS",
         "identityVerified": {
-          "name": "Nick",
+          "name": "Nick Krzemienski",
           "role": "admin"
         },
         "ready": true,
@@ -7771,7 +7791,7 @@
         "identity": "Nick-admin",
         "status": "PASS",
         "identityVerified": {
-          "name": "Nick",
+          "name": "Nick Krzemienski",
           "role": "admin"
         },
         "ready": true,
@@ -7790,7 +7810,7 @@
         "identity": "Nick-admin",
         "status": "PASS",
         "identityVerified": {
-          "name": "Nick",
+          "name": "Nick Krzemienski",
           "role": "admin"
         },
         "ready": true,
@@ -7809,7 +7829,7 @@
         "identity": "Nick-admin",
         "status": "PASS",
         "identityVerified": {
-          "name": "Nick",
+          "name": "Nick Krzemienski",
           "role": "admin"
         },
         "ready": true,
@@ -7828,7 +7848,7 @@
         "identity": "Nick-admin",
         "status": "PASS",
         "identityVerified": {
-          "name": "Nick",
+          "name": "Nick Krzemienski",
           "role": "admin"
         },
         "ready": true,
@@ -7847,7 +7867,7 @@
         "identity": "Nick-admin",
         "status": "PASS",
         "identityVerified": {
-          "name": "Nick",
+          "name": "Nick Krzemienski",
           "role": "admin"
         },
         "ready": true,
@@ -7866,7 +7886,7 @@
         "identity": "Nick-admin",
         "status": "PASS",
         "identityVerified": {
-          "name": "Nick",
+          "name": "Nick Krzemienski",
           "role": "admin"
         },
         "ready": true,
@@ -7885,7 +7905,7 @@
         "identity": "Nick-admin",
         "status": "PASS",
         "identityVerified": {
-          "name": "Nick",
+          "name": "Nick Krzemienski",
           "role": "admin"
         },
         "ready": true,
@@ -7904,7 +7924,7 @@
         "identity": "Nick-admin",
         "status": "PASS",
         "identityVerified": {
-          "name": "Nick",
+          "name": "Nick Krzemienski",
           "role": "admin"
         },
         "ready": true,
@@ -7923,7 +7943,7 @@
         "identity": "Nick-admin",
         "status": "PASS",
         "identityVerified": {
-          "name": "Nick",
+          "name": "Nick Krzemienski",
           "role": "admin"
         },
         "ready": true,
@@ -7942,7 +7962,7 @@
         "identity": "Nick-admin",
         "status": "PASS",
         "identityVerified": {
-          "name": "Nick",
+          "name": "Nick Krzemienski",
           "role": "admin"
         },
         "ready": true,
@@ -7951,7 +7971,7 @@
           "violations": [],
           "seriousCritical": [],
           "passes": 43,
-          "incomplete": 2
+          "incomplete": 1
         }
       },
       {
@@ -7961,7 +7981,7 @@
         "identity": "Nick-admin",
         "status": "PASS",
         "identityVerified": {
-          "name": "Nick",
+          "name": "Nick Krzemienski",
           "role": "admin"
         },
         "ready": true,
@@ -7980,7 +8000,7 @@
         "identity": "Nick-admin",
         "status": "PASS",
         "identityVerified": {
-          "name": "Nick",
+          "name": "Nick Krzemienski",
           "role": "admin"
         },
         "ready": true,
@@ -7999,7 +8019,7 @@
         "identity": "Nick-admin",
         "status": "PASS",
         "identityVerified": {
-          "name": "Nick",
+          "name": "Nick Krzemienski",
           "role": "admin"
         },
         "ready": true,
@@ -8018,7 +8038,7 @@
         "identity": "Nick-admin",
         "status": "PASS",
         "identityVerified": {
-          "name": "Nick",
+          "name": "Nick Krzemienski",
           "role": "admin"
         },
         "ready": true,
@@ -8027,6 +8047,200 @@
           "violations": [],
           "seriousCritical": [],
           "passes": 44,
+          "incomplete": 1
+        }
+      },
+      {
+        "screen": "app.admin.approvals",
+        "width": 375,
+        "route": "/admin",
+        "identity": "Nick-admin",
+        "status": "PASS",
+        "identityVerified": {
+          "name": "Nick Krzemienski",
+          "role": "admin"
+        },
+        "ready": true,
+        "httpStatus": 200,
+        "axe": {
+          "violations": [],
+          "seriousCritical": [],
+          "passes": 43,
+          "incomplete": 2
+        }
+      },
+      {
+        "screen": "app.admin.approvals",
+        "width": 1440,
+        "route": "/admin",
+        "identity": "Nick-admin",
+        "status": "PASS",
+        "identityVerified": {
+          "name": "Nick Krzemienski",
+          "role": "admin"
+        },
+        "ready": true,
+        "httpStatus": 200,
+        "axe": {
+          "violations": [],
+          "seriousCritical": [],
+          "passes": 43,
+          "incomplete": 2
+        }
+      },
+      {
+        "screen": "app.admin.edits",
+        "width": 375,
+        "route": "/admin",
+        "identity": "Nick-admin",
+        "status": "PASS",
+        "identityVerified": {
+          "name": "Nick Krzemienski",
+          "role": "admin"
+        },
+        "ready": true,
+        "httpStatus": 200,
+        "axe": {
+          "violations": [],
+          "seriousCritical": [],
+          "passes": 43,
+          "incomplete": 2
+        }
+      },
+      {
+        "screen": "app.admin.edits",
+        "width": 1440,
+        "route": "/admin",
+        "identity": "Nick-admin",
+        "status": "PASS",
+        "identityVerified": {
+          "name": "Nick Krzemienski",
+          "role": "admin"
+        },
+        "ready": true,
+        "httpStatus": 200,
+        "axe": {
+          "violations": [],
+          "seriousCritical": [],
+          "passes": 43,
+          "incomplete": 2
+        }
+      },
+      {
+        "screen": "app.admin.enrichment",
+        "width": 375,
+        "route": "/admin",
+        "identity": "Nick-admin",
+        "status": "PASS",
+        "identityVerified": {
+          "name": "Nick Krzemienski",
+          "role": "admin"
+        },
+        "ready": true,
+        "httpStatus": 200,
+        "axe": {
+          "violations": [],
+          "seriousCritical": [],
+          "passes": 46,
+          "incomplete": 1
+        }
+      },
+      {
+        "screen": "app.admin.enrichment",
+        "width": 1440,
+        "route": "/admin",
+        "identity": "Nick-admin",
+        "status": "PASS",
+        "identityVerified": {
+          "name": "Nick Krzemienski",
+          "role": "admin"
+        },
+        "ready": true,
+        "httpStatus": 200,
+        "axe": {
+          "violations": [],
+          "seriousCritical": [],
+          "passes": 46,
+          "incomplete": 1
+        }
+      },
+      {
+        "screen": "app.admin.researcher",
+        "width": 375,
+        "route": "/admin",
+        "identity": "Nick-admin",
+        "status": "PASS",
+        "identityVerified": {
+          "name": "Nick Krzemienski",
+          "role": "admin"
+        },
+        "ready": true,
+        "httpStatus": 200,
+        "axe": {
+          "violations": [
+            {
+              "id": "heading-order",
+              "impact": "moderate",
+              "help": "Heading levels should only increase by one",
+              "description": "Ensure the order of headings is semantically correct",
+              "nodes": 1,
+              "targets": [
+                [
+                  "h3"
+                ]
+              ],
+              "details": [
+                {
+                  "target": [
+                    "h3"
+                  ],
+                  "failureSummary": "Fix any of the following:\n  Heading order invalid"
+                }
+              ]
+            }
+          ],
+          "seriousCritical": [],
+          "passes": 50,
+          "incomplete": 1
+        }
+      },
+      {
+        "screen": "app.admin.researcher",
+        "width": 1440,
+        "route": "/admin",
+        "identity": "Nick-admin",
+        "status": "PASS",
+        "identityVerified": {
+          "name": "Nick Krzemienski",
+          "role": "admin"
+        },
+        "ready": true,
+        "httpStatus": 200,
+        "axe": {
+          "violations": [
+            {
+              "id": "heading-order",
+              "impact": "moderate",
+              "help": "Heading levels should only increase by one",
+              "description": "Ensure the order of headings is semantically correct",
+              "nodes": 1,
+              "targets": [
+                [
+                  "h3"
+                ]
+              ],
+              "details": [
+                {
+                  "target": [
+                    "h3"
+                  ],
+                  "failureSummary": "Fix any of the following:\n  Heading order invalid"
+                }
+              ]
+            }
+          ],
+          "seriousCritical": [],
+          "passes": 50,
           "incomplete": 1
         }
       }
@@ -8136,7 +8350,7 @@
       "command": "/nix/store/1lagpgadaybvs1n2312gysg2phjk89y8-nodejs-20.20.0-wrapped/bin/npm run validate:font-prepaint",
       "exitCode": 0,
       "signal": null,
-      "durationMs": 36917,
+      "durationMs": 13164,
       "outputTail": "> rest-express@1.0.0 validate:font-prepaint\n> tsx scripts/validation/font-prepaint-audit.ts\n\nPlaywright lease acquired (font-prepaint-audit, slot 1/1)\nfont-prepaint system: PASS (data-font=system, stack=\"\")\nfont-prepaint inter: PASS (data-font=inter, stack=\"'Inter', system-ui, sans-serif\")\nfont-prepaint dm-sans: PASS (data-font=dm-sans, stack=\"'DM Sans', system-ui, sans-serif\")\nfont-prepaint source-sans: PASS (data-font=source-sans, stack=\"'Source Sans 3', 'Source Sans Pro', system-ui, sans-serif\")\nfont-prepaint ibm-plex: PASS (data-font=ibm-plex, stack=\"'IBM Plex Sans', system-ui, sans-serif\")\nfont-prepaint jetbrains: PASS (data-font=jetbrains, stack=\"'JetBrains Mono', ui-monospace, monospace\")\nfont-prepaint __unknown-font-audit__: PASS (data-font=system, stack=\"\")\nPlaywright lease released (font-prepaint-audit)\nFont pre-paint audit: PASS (6 saved font ids + unknown-id fallback)",
       "pass": true
     },
@@ -8153,15 +8367,15 @@
       "completed": true,
       "localDeleted": true,
       "clerkDeleted": true,
-      "localQaUsersRemaining": 2,
+      "localQaUsersRemaining": 0,
       "errorCount": 0
     }
   },
   "runError": null,
   "lastCheckpoint": {
-    "phase": "runtime",
+    "phase": "axe",
     "detail": "complete",
-    "at": "2026-09-15T06:58:03.693Z"
+    "at": "2026-09-18T01:24:16.054Z"
   },
-  "generatedAt": "2026-09-15T06:58:04.169Z"
+  "generatedAt": "2026-09-18T01:24:16.479Z"
 }

@@ -389,7 +389,9 @@ const ROUTES = [
   { name: 'category', path: `/category/${slug}` },
   // Taxonomy pages render SearchFilters.ActiveFilters (the
   // data-testid="active-filter-chips" strip) when a tag is active.
-  { name: 'category-tag-chips', path: `/category/${slug}?tags=${TAG}`, expect: '[data-testid="active-filter-chips"]' },
+  // Listing pages keep search/facets (and the active-filter chips) behind the
+  // "Filters & view" toggle; open it so the chips are visible and swept.
+  { name: 'category-tag-chips', path: `/category/${slug}?tags=${TAG}`, revealTools: true, expect: '[data-testid="active-filter-chips"]' },
   { name: 'journeys', path: '/journeys' },
   { name: 'advanced', path: '/advanced' },
   { name: 'search', path: '/search?q=video' },
@@ -473,6 +475,88 @@ try {
     if (route?.settle) await route.settle(pg);
   };
 
+  // Several canonical surfaces fold secondary tools behind disclosures the
+  // frozen design never had: native `<details>` blocks in admin panels, the
+  // taxonomy managers' "More" button and the listing pages' "Filters & view"
+  // toggle. Their controls stay in the DOM but are not visible until opened.
+  // Opening them before a sweep only ADDS elements to the scanned surface; the
+  // pass rule (0 stray, non-vacuous) is unchanged.
+  // Disclosures are any collapsed `aria-expanded="false"` button/summary
+  // (native `<details>`, React-state "More"/"Tools"/"Filters & view" toggles,
+  // Radix collapsibles). Popup triggers (menus, selects/comboboxes) and tab
+  // triggers are NOT disclosures and are left alone. Opening one can reveal
+  // another, so loop until nothing collapsed remains (bounded).
+  // Every swept surface (each public `main`, each active admin panel) is
+  // revealed before its sweep — not just routes that declare tools — and the
+  // reveal must CONVERGE: if eligible collapsed controls remain after the
+  // bound, the gate fails instead of silently sweeping a partial surface.
+  const FOLDED_TOGGLE = ':is(button, summary)[aria-expanded="false"]:not([aria-haspopup]):not([role="combobox"]):not([data-testid^="tab-"])';
+  const REVEAL_ROUNDS = 12;
+  const describeToggle = async (handle) => ({
+    testid: await handle.getAttribute('data-testid').catch(() => null),
+    ariaLabel: await handle.getAttribute('aria-label').catch(() => null),
+    text: (await handle.textContent().catch(() => '') || '').trim().slice(0, 60),
+  });
+  const revealFoldedTools = async (pg, scope, label) => {
+    let opened = 0;
+    for (let round = 0; round < REVEAL_ROUNDS; round += 1) {
+      await pg.evaluate((selector) => {
+        for (const details of document.querySelectorAll(`${selector} details:not([open])`)) details.open = true;
+      }, scope);
+      // Pin every element up front: once one flips, the
+      // `[aria-expanded="false"]` locator no longer resolves to it and the
+      // indices shift.
+      const handles = await pg.locator(`${scope} ${FOLDED_TOGGLE}`).elementHandles();
+      const visible = [];
+      for (const h of handles) if (await h.isVisible().catch(() => false)) visible.push(h);
+      if (visible.length === 0) return opened;
+      for (const toggle of visible) {
+        // A toggle revealed earlier in this round may have been re-rendered
+        // away (or already flipped by a parent); skip those, they're re-queried
+        // next round.
+        if (!(await toggle.isVisible().catch(() => false))) continue;
+        if ((await toggle.getAttribute('aria-expanded').catch(() => null)) !== 'false') continue;
+        // Some disclosures are keyboard-first (opacity 0 until :focus-visible,
+        // e.g. the users panel's "More"); a pointer click times out on them,
+        // so operate them the way a keyboard user does. Either way the toggle
+        // must actually flip — a control that does not is reported below.
+        try {
+          await toggle.click({ timeout: 5000 });
+        } catch {
+          await toggle.focus();
+          await toggle.press('Enter');
+        }
+        const flipped = await toggle.getAttribute('aria-expanded').then((v) => v === 'true').catch(() => true);
+        if (!flipped) {
+          throw new Error(`${label}: disclosure did not open after click and Enter: ${JSON.stringify(await describeToggle(toggle))}`);
+        }
+        opened += 1;
+      }
+      await pg.waitForTimeout(150); // let the disclosures render before re-querying
+    }
+    const leftover = [];
+    for (const h of await pg.locator(`${scope} ${FOLDED_TOGGLE}`).elementHandles()) {
+      if (await h.isVisible().catch(() => false)) leftover.push(await describeToggle(h));
+    }
+    if (leftover.length > 0) {
+      throw new Error(`${label}: ${leftover.length} collapsed disclosure(s) still visible after ${REVEAL_ROUNDS} reveal rounds: ${JSON.stringify(leftover.slice(0, 5))}`);
+    }
+    return opened;
+  };
+  // `expect` targets often live INSIDE a fold (audit "Tools", listing
+  // "Filters & view"), and the fold's toggle may itself mount after the panel
+  // activates. Reveal, check, repeat until the expected element is visible or
+  // the budget runs out — never assume one reveal pass saw every toggle.
+  const revealUntilVisible = async (pg, scope, expect, label, budgetMs = 30000) => {
+    const deadline = Date.now() + budgetMs;
+    for (;;) {
+      await revealFoldedTools(pg, scope, label);
+      if (await pg.locator(expect).first().isVisible().catch(() => false)) return;
+      if (Date.now() > deadline) throw new Error(`${label}: ${expect} not visible after ${budgetMs}ms of revealing disclosures`);
+      await pg.waitForTimeout(250);
+    }
+  };
+
   const gotoAndSettle = async (pg, route) => {
     await pg.goto(`${BASE}${route.path}`, { waitUntil: 'domcontentloaded', timeout: 60000 });
     await pg.waitForSelector('.page', { timeout: 30000 });
@@ -482,10 +566,16 @@ try {
     // submit) that hydration replaces; sweep only the hydrated app — the
     // manual DevTools stage-6 sweep never sees this shell either.
     await pg.waitForFunction(() => !document.querySelector('.ssr-chrome'), null, { timeout: 30000 });
-    if (route.expect) await pg.waitForSelector(route.expect, { timeout: 20000 });
+    if (route.revealTools) await pg.waitForSelector('main .taxonomy-tools-toggle', { timeout: 20000 });
+    if (route.expect) await revealUntilVisible(pg, 'main', route.expect, `route ${route.name}`, 20000);
     for (const sel of route.expectAll ?? []) await pg.waitForSelector(sel, { timeout: 20000 });
     await awaitRouteSettle(pg, route);
     await pg.waitForTimeout(600); // settle async chunks (cards, facets)
+    // Reveal AFTER the route's own content has settled, so late-arriving
+    // disclosures (resource-card "+N more" tag toggles, listing tools) are
+    // part of the converged surface rather than appearing after the sweep.
+    await revealFoldedTools(pg, 'main', `route ${route.name}`);
+    await pg.waitForTimeout(150);
   };
 
   const runAll = async (pg) => {
@@ -1433,7 +1523,7 @@ try {
       { slug: 'edits', expect: '[data-testid="button-refresh-pending-edits"]' },
       { slug: 'enrichment', expect: '[data-testid="button-start-enrichment"]' },
       { slug: 'researcher', expect: '[data-testid="button-generate-brief"]' },
-      { slug: 'export', expect: 'button:has-text("Export Markdown")' },
+      { slug: 'export', expect: '[data-testid="button-export-markdown"]' },
       { slug: 'database', expect: '[data-testid="button-seed-database"]' },
       { slug: 'resources', expect: '[data-testid="button-add-resource"]' },
       { slug: 'categories', expect: '[data-testid="content-categories"][data-state="active"] button[data-ds-variant]' },
@@ -1493,7 +1583,17 @@ try {
         `[data-testid="tab-${triggerSlug}"][aria-selected="true"]`,
         { timeout: 15000 },
       );
-      await adminPage.waitForSelector(expect, { timeout: 30000 });
+      // Canonical admin panels keep their secondary tools deliberately folded
+      // (native `<details class="admin-ops-more|queues-agent__more">` and the
+      // taxonomy managers' "More" disclosure). Reveal them so the panel's real
+      // content is visible AND swept — nothing is skipped or masked by this.
+      await adminPage.waitForSelector('[role="tabpanel"][data-state="active"]', { timeout: 15000 });
+      // Some `expect` targets live inside folded <details>, so reveal first;
+      // reveal again once the panel's own content has arrived so late
+      // disclosures are part of the converged surface too.
+      await revealUntilVisible(adminPage, '[role="tabpanel"][data-state="active"]', expect, `admin tab ${slug}`);
+      await adminPage.waitForTimeout(300); // panel content after the fold opened
+      await revealFoldedTools(adminPage, '[role="tabpanel"][data-state="active"]', `admin tab ${slug}`);
       if (parentSlug) {
         await adminPage.waitForFunction(
           ({ parent, content }) => {

@@ -622,14 +622,33 @@ const stray = [...document.querySelectorAll('h1')].filter(h =>
     h.classList.contains('font-sans') ||
     h.classList.contains('font-medium')) &&
   /* 2 · screen-reader-only page titles (invisible — nothing to switch) */
-  !h.classList.contains('sr-only')
+  !h.classList.contains('sr-only') &&
+  /* 3 · the frozen Category/Subcategory title ONLY: pages.jsx renders that h1
+         with inline weight/tracking/leading in the BODY face and no display
+         class. The exclusion is narrow (the title inside the taxonomy page)
+         AND positive: it must actually paint in the --font-body face, so no
+         other h1 can opt out by borrowing the class name */
+  !(h.matches('main .taxonomy-page > .taxonomy-header > h1.taxonomy-title') &&
+    ((el) => {
+      const face = (v) => String(v || '').split(',')[0].replace(/\x22|\x27/g, '').trim().toLowerCase();
+      return face(getComputedStyle(el).fontFamily) ===
+        face(getComputedStyle(document.documentElement).getPropertyValue('--font-body'));
+    })(h))
 );
 stray  // → [] expected; a hit is a page title that skips the display tokens
 ```
 
-`sr-only` is the one exclusion: SubmitResource, ResourceDetail's loading
+`sr-only` is one exclusion: SubmitResource, ResourceDetail's loading
 state, and AdminDashboard render invisible screen-reader titles where no
-display font can matter. Every *visible* `h1` must carry `.display-h` and
+display font can matter. `.taxonomy-title` is the other: the frozen
+Category/Subcategory pages (`awesome-list-site-ds/pages.jsx`) deliberately
+render that `h1` in the body face with inline weight/tracking/leading and no
+display class, and the source review rejected adding `.display-h` there
+(docs/parity/COMPLETION-REVIEW.md item 4). That exclusion is deliberately
+narrow — only the title inside the taxonomy page header — and
+it asserts the frozen contract positively (the computed face must be the
+`--font-body` family), so a stray `h1` elsewhere cannot escape the gate by
+adding the class. Every other *visible* `h1` must carry `.display-h` and
 must not pin `font-sans`/`font-medium` back over it — either breaks the
 per-system display-font switching. The gate additionally requires each swept
 route to render at least one `h1` (a zero-`h1` page is a vacuous sweep, and

@@ -10,16 +10,37 @@
       "identity": "Nick-admin",
       "status": "PASS",
       "identityVerified": {
-        "name": "Nick",
+        "name": "Nick Krzemienski",
         "role": "admin"
       },
       "ready": true,
       "httpStatus": 200,
       "axe": {
-        "violations": [],
+        "violations": [
+          {
+            "id": "heading-order",
+            "impact": "moderate",
+            "help": "Heading levels should only increase by one",
+            "description": "Ensure the order of headings is semantically correct",
+            "nodes": 1,
+            "targets": [
+              [
+                ".hoverable:nth-child(1) > h3"
+              ]
+            ],
+            "details": [
+              {
+                "target": [
+                  ".hoverable:nth-child(1) > h3"
+                ],
+                "failureSummary": "Fix any of the following:\n  Heading order invalid"
+              }
+            ]
+          }
+        ],
         "seriousCritical": [],
-        "passes": 40,
-        "incomplete": 2
+        "passes": 41,
+        "incomplete": 1
       }
     },
     {
@@ -29,16 +50,37 @@
       "identity": "Nick-admin",
       "status": "PASS",
       "identityVerified": {
-        "name": "Nick",
+        "name": "Nick Krzemienski",
         "role": "admin"
       },
       "ready": true,
       "httpStatus": 200,
       "axe": {
-        "violations": [],
+        "violations": [
+          {
+            "id": "heading-order",
+            "impact": "moderate",
+            "help": "Heading levels should only increase by one",
+            "description": "Ensure the order of headings is semantically correct",
+            "nodes": 1,
+            "targets": [
+              [
+                ".hoverable:nth-child(1) > h3"
+              ]
+            ],
+            "details": [
+              {
+                "target": [
+                  ".hoverable:nth-child(1) > h3"
+                ],
+                "failureSummary": "Fix any of the following:\n  Heading order invalid"
+              }
+            ]
+          }
+        ],
         "seriousCritical": [],
-        "passes": 40,
-        "incomplete": 2
+        "passes": 41,
+        "incomplete": 1
       }
     }
   ],

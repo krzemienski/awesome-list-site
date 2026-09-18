@@ -10,7 +10,7 @@
       "identity": "Nick-admin",
       "status": "PASS",
       "identityVerified": {
-        "name": "Nick",
+        "name": "Nick Krzemienski",
         "role": "admin"
       },
       "ready": true,
@@ -90,7 +90,7 @@
       "identity": "Nick-admin",
       "status": "PASS",
       "identityVerified": {
-        "name": "Nick",
+        "name": "Nick Krzemienski",
         "role": "admin"
       },
       "ready": true,

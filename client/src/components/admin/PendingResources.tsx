@@ -452,9 +452,16 @@ export default function PendingResources() {
             <span>{bulkOutcome.succeeded} succeeded · {bulkOutcome.failed} failed · {bulkOutcome.requested} requested</span>
           </div>
         )}
-        <div className="admin-table-wrap">
+        {/* axe scrollable-region-focusable: the header-only empty table still
+            scrolls sideways on narrow viewports, so the wrap must be reachable. */}
+        <div
+          className="admin-table-wrap focus-visible:outline focus-visible:outline-2 focus-visible:outline-ring"
+          tabIndex={0}
+          role="region"
+          aria-label="Pending approvals table, empty, scrollable"
+        >
           <table className="table">
-            <thead><tr><th>Title</th><th>Category</th><th>Submitted by</th><th>When</th><th /></tr></thead>
+            <thead><tr><th>Title</th><th>Category</th><th>Submitted by</th><th>When</th><th><span className="sr-only">Actions</span></th></tr></thead>
           </table>
         </div>
         <span className="sr-only" role="status" aria-live="polite">

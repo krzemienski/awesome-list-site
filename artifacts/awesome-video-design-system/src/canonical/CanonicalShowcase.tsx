@@ -4,7 +4,6 @@ import { ACCENTS, DESIGN_SYSTEMS as RUNTIME_SYSTEMS } from "../../../../client/s
 import { Button, Card, Chip, Dot, Eyebrow, Kbd } from "./ShowcasePrimitives";
 import { useShowcaseTheme } from "./useShowcaseTheme";
 import { SkipLink } from "./SkipLink";
-import showcaseStyles from "./ShowcaseParity.module.css";
 import tokenProjection from "../../tokens.json";
 const DESIGN_SYSTEMS = Object.fromEntries(Object.entries(RUNTIME_SYSTEMS).map(([id, meta]) => [id, { ...meta, vars: tokenProjection.themes[id].tokens }]));
 const TYPE_SCALE = [
@@ -803,7 +802,7 @@ function SystemSwitcher({ system, accent, onSystem, onAccent }) {
             aria-pressed={system === k} onClick={() => onSystem(k)}>
             <span style={{ fontWeight: 600 }}>{sys.name}</span>
             <span style={{ opacity: 0.65 }}>·</span>
-            <span className={showcaseStyles.systemTag} style={{ opacity: 0.7 }}>{sys.tag}</span>
+            <span style={{ opacity: 0.7 }}>{sys.tag}</span>
           </button>
         ))}
       </div>
@@ -1168,10 +1167,10 @@ function Geometry({ system }) {
 
 function Components() {
   const tabs = [
-    { label: 'Overview', content: 'A compact overview of the resource and its current health.' },
-    { label: 'Subcategories', content: 'Browse the related subcategories and their indexed resources.' },
-    { label: 'Activity', content: 'Review recent indexing and maintenance activity for this resource.' },
-    { label: 'Stats', content: 'Compare usage, stars, and freshness signals over time.' },
+    { label: 'Overview' },
+    { label: 'Subcategories' },
+    { label: 'Activity' },
+    { label: 'Stats' },
   ];
   const [activeTab, setActiveTab] = useState(0);
   const tabRefs = useRef<(HTMLButtonElement | null)[]>([]);
@@ -1326,7 +1325,6 @@ function Components() {
               className={`tab${activeTab === index ? ' active' : ''}`}
               role="tab"
               aria-selected={activeTab === index}
-              aria-controls="showcase-tabpanel"
               tabIndex={activeTab === index ? 0 : -1}
               onClick={() => selectTab(index)}
               onKeyDown={event => handleTabKeyDown(event, index)}
@@ -1334,23 +1332,6 @@ function Components() {
               {tab.label}{tab.label === 'Subcategories' && <span className="mono" style={{ color: 'var(--text-3)' }}>· 14</span>}
             </button>
           ))}
-        </div>
-        <div
-          id="showcase-tabpanel"
-          role="tabpanel"
-          aria-labelledby={`showcase-tab-${activeTab}`}
-          tabIndex={0}
-          style={{
-            minHeight: 44,
-            padding: '14px 16px',
-            border: 'var(--hairline-w) solid var(--border)',
-            borderTop: 0,
-            color: 'var(--text-2)',
-            fontSize: 13,
-            lineHeight: 1.55,
-          }}
-        >
-          {tabs[activeTab].content}
         </div>
       </div>
 

@@ -553,7 +553,7 @@ export default function TaxonomyListing({ level }: Props) {
        <select className="select min-h-11" aria-label="Limit by resource kind" value={kind ?? ""} onChange={(event) => { const nextKind = parseKindParam(event.target.value); setKind(nextKind); setPage(1); requestResultsFocus(); }} data-testid="select-kind-filter"><option value="">All resource kinds</option>{RESOURCE_KIND_VALUES.map((value) => <option key={value} value={value}>{value.replace(/[-_]/g, " ").replace(/\b\w/g, (letter) => letter.toUpperCase())}</option>)}</select>
        <AdvancedFilter selectedTags={tags} sortBy={sort} availableTags={listingData.tags} onTagsChange={(value) => onFacetChange("tags", value)} onSortChange={(value) => onFacetChange("sort", value)} showCountSorts={false} showTagFilter={false} />
        <div className="taxonomy-view-toggle-row" aria-label="View mode">
-         <span className="taxonomy-view-toggle-label">View</span>
+         <span className="eyebrow">View</span>
          <ViewModeToggle
            value={view}
            onChange={(mode) => {

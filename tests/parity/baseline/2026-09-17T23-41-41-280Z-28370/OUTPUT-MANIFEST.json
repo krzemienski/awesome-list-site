@@ -1,0 +1,23 @@
+{
+  "REPORT.md": "fbf6b8c905711296113f5d80fe5a0361770bda42ff92566016cdf6daab0b577d",
+  "actual/artifact.showcase-375.attempt-1.png": "03fdf23e223eb101571922132e0af6b7f92eed74e9f7009c917305b39c1dab22",
+  "actual/artifact.showcase-375.attempt-2.png": "03fdf23e223eb101571922132e0af6b7f92eed74e9f7009c917305b39c1dab22",
+  "actual/artifact.showcase-375.png": "03fdf23e223eb101571922132e0af6b7f92eed74e9f7009c917305b39c1dab22",
+  "actual/artifact.showcase-375.repeat.png": "03fdf23e223eb101571922132e0af6b7f92eed74e9f7009c917305b39c1dab22",
+  "actual/artifact.showcase-768.attempt-1.png": "42b41b2aa355649d5bbfc3d7f2bd06c986c2c8f3fb04754e8906f120c8b69908",
+  "actual/artifact.showcase-768.attempt-2.png": "42b41b2aa355649d5bbfc3d7f2bd06c986c2c8f3fb04754e8906f120c8b69908",
+  "actual/artifact.showcase-768.png": "42b41b2aa355649d5bbfc3d7f2bd06c986c2c8f3fb04754e8906f120c8b69908",
+  "actual/artifact.showcase-768.repeat.png": "42b41b2aa355649d5bbfc3d7f2bd06c986c2c8f3fb04754e8906f120c8b69908",
+  "diff/artifact.showcase-375.png": "fe92e444dcd737d7fc10e536d34deef88e4f0302e8f730cf275b9c4128d34943",
+  "diff/artifact.showcase-768.png": "833a3ea13ed80cf108f552bf82010454646b7f476af27a7f2fef3868788270a5",
+  "expected/artifact.showcase-375.attempt-1.png": "b9c4f9fda692b5ce74702d63298946f1bcf5c76aac794c3ce114e1b2b0f6529e",
+  "expected/artifact.showcase-375.attempt-2.png": "b9c4f9fda692b5ce74702d63298946f1bcf5c76aac794c3ce114e1b2b0f6529e",
+  "expected/artifact.showcase-375.png": "b9c4f9fda692b5ce74702d63298946f1bcf5c76aac794c3ce114e1b2b0f6529e",
+  "expected/artifact.showcase-375.repeat.png": "b9c4f9fda692b5ce74702d63298946f1bcf5c76aac794c3ce114e1b2b0f6529e",
+  "expected/artifact.showcase-768.attempt-1.png": "b141a85ee7de2d9d986ac6a4813ea36bafe59a4b7fddfe89d025117ec59d49fb",
+  "expected/artifact.showcase-768.attempt-2.png": "b141a85ee7de2d9d986ac6a4813ea36bafe59a4b7fddfe89d025117ec59d49fb",
+  "expected/artifact.showcase-768.png": "b141a85ee7de2d9d986ac6a4813ea36bafe59a4b7fddfe89d025117ec59d49fb",
+  "expected/artifact.showcase-768.repeat.png": "b141a85ee7de2d9d986ac6a4813ea36bafe59a4b7fddfe89d025117ec59d49fb",
+  "font-gaps.md": "38d49306460a664c7d6c5154e33a8e67ace0f51b494d6e49f4003cb3cf3690cb",
+  "results.json": "3e1a30149e23b328ca604d1eadf57fedcc3ec6326e01bc7783ced788e0d89e84"
+}

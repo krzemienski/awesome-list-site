@@ -42,6 +42,14 @@ button { color: inherit; }
   .ds-flow-scroll > .ds-flow-canvas {
     min-width: 700px;
   }
+  /* Approved comparison reference (CCR-44PX-CONTROLS-AND-NATURAL-WRAP): on
+     phones, buttons and tabs wrap their labels instead of scrolling sideways or
+     clipping, so every control stays fully visible without horizontal overflow. */
+  .btn,
+  .tab {
+    white-space: normal;
+    overflow-wrap: anywhere;
+  }
 }
 @media (max-width: 480px) {
   /* The token rows are fluid content, not fixed diagrams: reflow their
@@ -248,23 +256,4 @@ button { color: inherit; }
 .ds-accent-grid {
   flex-wrap: wrap;
   max-width: 100%;
-}
-
-/* The flow grammar metadata sits beside each diagram on larger screens. On
-   narrow screens it becomes a normal block so the fixed-width diagram's
-   local scrollport is the only horizontal overflow on the page. */
-.ds-flow-system-header {
-  min-width: 0;
-}
-
-@media (max-width: 767px) {
-  .ds-flow-system-header {
-    grid-template-columns: minmax(0, 1fr) !important;
-    gap: 14px !important;
-  }
-  .ds-flow-system-header > :nth-child(2) {
-    border-left: 0 !important;
-    border-top: 1px solid var(--border);
-    padding: 12px 0 0 !important;
-  }
 }
