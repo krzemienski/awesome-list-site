@@ -38,9 +38,12 @@ export function collectStrayButtons() {
       'button-dismiss-scrubbed-params'].includes(b.getAttribute('data-testid')) &&
     !b.matches('.about-faq-item > .about-faq-trigger[aria-expanded][aria-controls]') && // About FAQ disclosure rows
     /* 5 · Clerk-hosted auth widget (third-party DOM the app cannot mark).
-           Positive: excluded ONLY while the widget is actually themed from the
-           DS — its primary button must paint the live --accent. */
-    !(b.closest('.cl-rootBox') && ((root) => {
+           Positive AND per control: excluded ONLY while the widget is themed
+           from the DS (its primary button paints the live --accent) AND this
+           very control paints in a DS face (--font-body / --font-display /
+           --font-mono first family) — a Clerk control still in its vendor
+           font is swept like anything else. */
+    !(b.closest('.cl-rootBox') && ((root, el) => {
       const primary = root.querySelector('.cl-formButtonPrimary');
       if (!primary) return false;
       const probe = document.createElement('i');
@@ -48,8 +51,12 @@ export function collectStrayButtons() {
       root.appendChild(probe);
       const want = getComputedStyle(probe).backgroundColor;
       probe.remove();
-      return getComputedStyle(primary).backgroundColor === want;
-    })(b.closest('.cl-rootBox'))) &&
+      if (getComputedStyle(primary).backgroundColor !== want) return false;
+      const face = (v) => String(v || '').split(',')[0].replace(/\x22|\x27/g, '').trim().toLowerCase();
+      const rs = getComputedStyle(document.documentElement);
+      const ds = ['--font-body', '--font-display', '--font-mono'].map(t => face(rs.getPropertyValue(t)));
+      return ds.includes(face(getComputedStyle(el).fontFamily));
+    })(b.closest('.cl-rootBox'), b)) &&
     /* 4 · raw DS classes (standalone artifacts / showcase helpers) */
     ![...b.classList].some(c => /^(btn|tab|icon-btn)/.test(c))
   );
@@ -82,8 +89,8 @@ export function collectStrayInputs() {
     !el.closest('[data-sidebar], [cmdk-root], [data-radix-popper-content-wrapper]') &&
     /* 3 · known tokenized native controls (verified compliant — list in SKILL.md) */
     el.getAttribute('data-testid') !== 'select-subcategory-filter' && // TaxonomyListing scope filter
-    /* Clerk-hosted auth widget — same positive themed-root check as the button sweep */
-    !(el.closest('.cl-rootBox') && ((root) => {
+    /* Clerk-hosted auth widget — same positive themed-root + per-control DS-face check as the button sweep */
+    !(el.closest('.cl-rootBox') && ((root, ctl) => {
       const primary = root.querySelector('.cl-formButtonPrimary');
       if (!primary) return false;
       const probe = document.createElement('i');
@@ -91,8 +98,12 @@ export function collectStrayInputs() {
       root.appendChild(probe);
       const want = getComputedStyle(probe).backgroundColor;
       probe.remove();
-      return getComputedStyle(primary).backgroundColor === want;
-    })(el.closest('.cl-rootBox'))) &&
+      if (getComputedStyle(primary).backgroundColor !== want) return false;
+      const face = (v) => String(v || '').split(',')[0].replace(/\x22|\x27/g, '').trim().toLowerCase();
+      const rs = getComputedStyle(document.documentElement);
+      const ds = ['--font-body', '--font-display', '--font-mono'].map(t => face(rs.getPropertyValue(t)));
+      return ds.includes(face(getComputedStyle(ctl).fontFamily));
+    })(el.closest('.cl-rootBox'), el)) &&
     /* 4 · raw DS classes (standalone artifacts / showcase helpers) */
     ![...el.classList].some(c => /^(input|select|textarea)$/.test(c))
   );
@@ -243,12 +254,18 @@ export function collectStrayEyebrows() {
     /* 5 · the frozen ResourceDetail card labels ONLY: pages.jsx renders them as
            .mono 10px accent labels (not .eyebrow), and the app keeps that paint
            under semantic h2s. Narrow (those two cards) AND positive: each must
-           actually paint in the --font-mono face */
+           actually paint the frozen label — --font-mono face, 10px, --accent ink */
     !(el.matches('main .resource-detail-description > h2, main .resource-detail-sections h2') &&
       ((h2) => {
         const face = (v) => String(v || '').split(',')[0].replace(/\x22|\x27/g, '').trim().toLowerCase();
-        return face(getComputedStyle(h2).fontFamily) ===
-          face(getComputedStyle(document.documentElement).getPropertyValue('--font-mono'));
+        const cs = getComputedStyle(h2);
+        const probe = document.createElement('i');
+        probe.style.color = 'var(--accent)';
+        h2.appendChild(probe);
+        const accent = getComputedStyle(probe).color;
+        probe.remove();
+        return face(cs.fontFamily) === face(getComputedStyle(document.documentElement).getPropertyValue('--font-mono')) &&
+          cs.fontSize === '10px' && cs.color === accent;
       })(el))
   );
   // STAGE6-EYEBROW-FILTER-END

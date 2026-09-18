@@ -57,8 +57,8 @@ URL (dev or production build) rather than a single file.
 ### Runtime
 
 - **Playwright Chromium**, imported as `import { chromium } from
-  '@playwright/test'` (the bare `playwright` package is not resolvable here).
-  Headless is fine. Launch once, reuse one browser; one context per width.
+  '@playwright/test'` (the pinned browser revision comes from that package;
+  the bare `playwright` import also resolves). Headless is fine. Launch once, reuse one browser; one context per width.
 - The harness **must live inside the workspace** (module resolution), e.g.
   `.cache/ds-audit/<run-id>/harness.mjs`, and all output (screenshots,
   JSON, logs) goes under that same `.cache/ds-audit/<run-id>/` tree.
@@ -91,7 +91,7 @@ URL (dev or production build) rather than a single file.
 |---|---|
 | 1 | `page.evaluate`: `typeof window.applyDesignSystem`, `Object.keys(window.DESIGN_SYSTEMS).length === 5`, `window.ACCENTS.length === 10`, and the `[data-system=` rule presence check from the quick reference. |
 | 2 | `document.documentElement.dataset.system/accent` present and `--bg` resolves non-empty. |
-| 3 | Two proofs, both required: **(a) static** — fetch the served HTML and assert that an **inline, synchronous** `<script>` (no `src`, no `async`/`defer`, not `type="module"`) inside `<head>` sets `data-system`, and that it does not call `window.applyDesignSystem` (a module global). Module scripts are deferred by spec, so their position relative to the boot is irrelevant — dev servers inject several (`/@vite/client`, react-refresh) ahead of it; **(b) runtime** — `context.addInitScript` installs a `MutationObserver` on `document` (`{ attributes: true, subtree: true, attributeFilter: ['data-system'] }` — `<html>` may not exist yet when init scripts run) that records `performance.now()` when `data-system` is first set; after load compare it against `performance.getEntriesByType('paint')[0].startTime` (first-paint) — attribute time must be **≤** first paint. Then set `localStorage['ds-system']='terminal'` (via a second init script), reload, and confirm the observer saw `terminal` before first paint too (a saved choice must also be flash-free). Restore `editorial`. |
+| 3 | Two proofs, both required: **(a) static** — fetch the served HTML and assert that an **inline, synchronous** `<script>` (no `src`, no `async`/`defer`, not `type="module"`) inside `<head>` sets **both** `data-system` and `data-accent`, and that it does not call `window.applyDesignSystem` (a module global). Module scripts are deferred by spec, so their position relative to the boot is irrelevant — dev servers inject several (`/@vite/client`, react-refresh) ahead of it; **(b) runtime** — `context.addInitScript` installs a `MutationObserver` on `document` (`{ attributes: true, subtree: true, attributeFilter: ['data-system', 'data-accent'] }` — `<html>` may not exist yet when init scripts run) that records `performance.now()` the first time **each** of `data-system` and `data-accent` is set; after load compare the **later** of the two against `performance.getEntriesByType('paint')[0].startTime` (first-paint) — both attributes must be set **≤** first paint (a deferred accent is a visible wrong-colour first paint even when the system is on time). Then set `localStorage['ds-system']='terminal'` and `localStorage['ds-accent']='matrix'` (Terminal's default accent — use a real id from `window.ACCENTS`; the boot falls back to the default for unknown ids) via a second init script, reload, and confirm the observer saw `terminal`/`matrix` before first paint too (a saved choice must also be flash-free). Restore `editorial` + `crimson`. Report the pair as `system <ms> / accent <ms> ≤ first-paint <ms>`. |
 | 4 | `.page` and `.grain` exist; `getComputedStyle(document.querySelector('.page')).getPropertyValue('--bg-atmosphere')` is non-empty. |
 | 6 | Run all six filters (buttons, inputs, chips, cards, page titles, eyebrows) on every screen in the coverage matrix, at every width, **in every system** (stage 11 loop). Report each hit through the triage ladder with its `data-testid`/class and screen. |
 | 7 | Run the accent-user count per screen; additionally **hover a primary button and a `data-ds="card-hover"` card with a real `page.hover()`** and screenshot — `getComputedStyle` after programmatic focus/hover lies mid-transition. Prove the focus ring with a real `keyboard.press('Tab')` + screenshot. |
@@ -457,7 +457,7 @@ const stray = [...document.querySelectorAll('button')].filter(b =>
   !b.matches('[data-state], [data-radix-collection-item], [cmdk-item], [role="switch"], [role="checkbox"], [role="tab"], [role="combobox"]') &&
   !b.closest('[data-sidebar]') &&
   !(b.closest('[role="dialog"]') && b.querySelector('.sr-only')) && // Dialog/Sheet close ✕
-  /* 3 · known composite chrome (verified compliant — list below) */
+  /* 3 · known composite chrome (verified compliant — list in SKILL.md) */
   !b.closest('.accordion-item') &&                        // AppSidebar taxonomy rows
   b.getAttribute('aria-label') !== 'Open search' &&       // AppHeader search chip
   !b.hasAttribute('aria-pressed') &&                      // facet/tag filter toggle rows
@@ -469,9 +469,12 @@ const stray = [...document.querySelectorAll('button')].filter(b =>
     'button-dismiss-scrubbed-params'].includes(b.getAttribute('data-testid')) &&
   !b.matches('.about-faq-item > .about-faq-trigger[aria-expanded][aria-controls]') && // About FAQ disclosure rows
   /* 5 · Clerk-hosted auth widget (third-party DOM the app cannot mark).
-         Positive: excluded ONLY while the widget is actually themed from the
-         DS — its primary button must paint the live --accent. */
-  !(b.closest('.cl-rootBox') && ((root) => {
+         Positive AND per control: excluded ONLY while the widget is themed
+         from the DS (its primary button paints the live --accent) AND this
+         very control paints in a DS face (--font-body / --font-display /
+         --font-mono first family) — a Clerk control still in its vendor
+         font is swept like anything else. */
+  !(b.closest('.cl-rootBox') && ((root, el) => {
     const primary = root.querySelector('.cl-formButtonPrimary');
     if (!primary) return false;
     const probe = document.createElement('i');
@@ -479,8 +482,12 @@ const stray = [...document.querySelectorAll('button')].filter(b =>
     root.appendChild(probe);
     const want = getComputedStyle(probe).backgroundColor;
     probe.remove();
-    return getComputedStyle(primary).backgroundColor === want;
-  })(b.closest('.cl-rootBox'))) &&
+    if (getComputedStyle(primary).backgroundColor !== want) return false;
+    const face = (v) => String(v || '').split(',')[0].replace(/\x22|\x27/g, '').trim().toLowerCase();
+    const rs = getComputedStyle(document.documentElement);
+    const ds = ['--font-body', '--font-display', '--font-mono'].map(t => face(rs.getPropertyValue(t)));
+    return ds.includes(face(getComputedStyle(el).fontFamily));
+  })(b.closest('.cl-rootBox'), b)) &&
   /* 4 · raw DS classes (standalone artifacts / showcase helpers) */
   ![...b.classList].some(c => /^(btn|tab|icon-btn)/.test(c))
 );
@@ -602,10 +609,11 @@ known list below instead of re-flagging it every run.
   `h1.cl-headerTitle` are excluded **only while the widget is provably themed
   from the DS** — the appearance in `client/src/lib/clerk-appearance.ts`
   maps `colorPrimary` ← `--accent` and the header font ← `--font-display`, so
-  the filters check that `.cl-formButtonPrimary` paints the live `--accent`
-  and the header paints in the `--font-display` face. If either check fails
-  the widget is swept like everything else (and the appearance wiring is the
-  🟡 FIX).
+  the filters check that `.cl-formButtonPrimary` paints the live `--accent`,
+  that **each excluded button/input itself** paints in a DS face
+  (`--font-body` / `--font-display` / `--font-mono`), and that the header
+  paints in the `--font-display` face. A control failing its own check is
+  swept like everything else (and the appearance wiring is the 🟡 FIX).
 - **Frozen ResourceDetail typography** (`client/src/pages/ResourceDetail.tsx`,
   `/resource/:id`): the frozen `pages.jsx` detail page renders its `h1` in the
   body face (no display class) and its card labels ("DESCRIPTION",
@@ -614,7 +622,7 @@ known list below instead of re-flagging it every run.
   page-title and eyebrow sweeps exclude exactly `main .resource-detail-heading >
   h1[data-testid="text-resource-title"]` (must paint in `--font-body`) and
   `main .resource-detail-description > h2` / `main .resource-detail-sections
-  h2` (must paint in `--font-mono`) — same narrow-and-positive shape as the
+  h2` (must paint in `--font-mono` at 10px in `--accent` ink) — same narrow-and-positive shape as the
   taxonomy title. Raw `.chip` elements (the DS's own class, used by
   frozen-reference ports and the 404 status chip) are chips, not eyebrows, and
   the eyebrow sweep treats them like `data-ds="chip"`.
@@ -665,10 +673,10 @@ const stray = [...document.querySelectorAll('input, select, textarea')].filter(e
   !el.matches('[cmdk-input], [type="hidden"], [type="checkbox"], [type="radio"], [type="range"], [type="file"], select[aria-hidden="true"]') &&
   !el.classList.contains('sr-only') &&                    // peer-hidden toggle inputs (select[aria-hidden] = Radix Select's off-screen native bridge)
   !el.closest('[data-sidebar], [cmdk-root], [data-radix-popper-content-wrapper]') &&
-  /* 3 · known tokenized native controls (verified compliant — list below) */
+  /* 3 · known tokenized native controls (verified compliant — list in SKILL.md) */
   el.getAttribute('data-testid') !== 'select-subcategory-filter' && // TaxonomyListing scope filter
-  /* Clerk-hosted auth widget — same positive themed-root check as the button sweep */
-  !(el.closest('.cl-rootBox') && ((root) => {
+  /* Clerk-hosted auth widget — same positive themed-root + per-control DS-face check as the button sweep */
+  !(el.closest('.cl-rootBox') && ((root, ctl) => {
     const primary = root.querySelector('.cl-formButtonPrimary');
     if (!primary) return false;
     const probe = document.createElement('i');
@@ -676,8 +684,12 @@ const stray = [...document.querySelectorAll('input, select, textarea')].filter(e
     root.appendChild(probe);
     const want = getComputedStyle(probe).backgroundColor;
     probe.remove();
-    return getComputedStyle(primary).backgroundColor === want;
-  })(el.closest('.cl-rootBox'))) &&
+    if (getComputedStyle(primary).backgroundColor !== want) return false;
+    const face = (v) => String(v || '').split(',')[0].replace(/\x22|\x27/g, '').trim().toLowerCase();
+    const rs = getComputedStyle(document.documentElement);
+    const ds = ['--font-body', '--font-display', '--font-mono'].map(t => face(rs.getPropertyValue(t)));
+    return ds.includes(face(getComputedStyle(ctl).fontFamily));
+  })(el.closest('.cl-rootBox'), el)) &&
   /* 4 · raw DS classes (standalone artifacts / showcase helpers) */
   ![...el.classList].some(c => /^(input|select|textarea)$/.test(c))
 );
@@ -840,12 +852,18 @@ const stray = [...document.querySelectorAll('p, div, span, a, h2, h3, h4, h5, h6
   /* 5 · the frozen ResourceDetail card labels ONLY: pages.jsx renders them as
          .mono 10px accent labels (not .eyebrow), and the app keeps that paint
          under semantic h2s. Narrow (those two cards) AND positive: each must
-         actually paint in the --font-mono face */
+         actually paint the frozen label — --font-mono face, 10px, --accent ink */
   !(el.matches('main .resource-detail-description > h2, main .resource-detail-sections h2') &&
     ((h2) => {
       const face = (v) => String(v || '').split(',')[0].replace(/\x22|\x27/g, '').trim().toLowerCase();
-      return face(getComputedStyle(h2).fontFamily) ===
-        face(getComputedStyle(document.documentElement).getPropertyValue('--font-mono'));
+      const cs = getComputedStyle(h2);
+      const probe = document.createElement('i');
+      probe.style.color = 'var(--accent)';
+      h2.appendChild(probe);
+      const accent = getComputedStyle(probe).color;
+      probe.remove();
+      return face(cs.fontFamily) === face(getComputedStyle(document.documentElement).getPropertyValue('--font-mono')) &&
+        cs.fontSize === '10px' && cs.color === accent;
     })(el))
 );
 stray  // → [] expected; a hit is a hand-pinned mono-uppercase label that skipped .eyebrow
@@ -956,19 +974,23 @@ system's display/body faces and any font override load on demand via
 
 ```js
 await document.fonts.ready;
-const stack = getComputedStyle(document.documentElement)
-                .getPropertyValue('--font-display').trim();
-const family = stack.split(',')[0].replace(/['"]/g, '').trim();
-document.fonts.check(`16px "${family}"`);  // → true
+const rs = getComputedStyle(document.documentElement);
+const first = (t) => rs.getPropertyValue(t).trim().split(',')[0].replace(/['"]/g, '').trim();
+const proof = {};
+for (const [role, family] of [['display', first('--font-display')], ['body', first('--font-body')]]) {
+  const faces = await document.fonts.load(`16px "${family}"`).catch(() => []);
+  proof[role] = { family, ok: faces.length > 0 && faces.every(f => f.status === 'loaded') };
+}
+proof;  // → { display: { family, ok: true }, body: { family, ok: true } }
 ```
 
-If false, first rule out on-demand loading: Chrome only fetches a face once
-an element paints in it, so `check()` is `false` for any weight/style/subset
-the current screen does not use (Fraunces 400-normal on `/about`, say, where
-the title is body-face by design). The authoritative proof is
-`(await document.fonts.load('16px "<family>"'))` returning a **non-empty**
-array of `loaded` faces — that forces the fetch and only fails when the
-family genuinely cannot load. If *that* fails, the font failed to load. Check:
+Both `ok` must be true. `document.fonts.load()` is the proof, **not**
+`document.fonts.check()`: Chrome only fetches a face once an element paints
+in it, so `check()` is `false` for any weight/style/subset the current
+screen does not use (Fraunces 400-normal on `/about`, say, where the title
+is body-face by design) — a diagnostic at best. `load()` forces the fetch
+and returns an empty/rejected result only when the family genuinely cannot
+load. If it fails, check:
 - `FONT_URLS` in `client/src/lib/font-options.ts` has an entry for the
   active system, and the family name in the URL matches the token's family.
 - Network tab shows no 4xx on the font request.
@@ -1095,7 +1117,7 @@ real-browser audit **appends** one section *after* it:
 ## Evidence
 - Target: <URL> (<dev | production build>, commit <sha>)
 - Screenshots: <run dir> — <n> files (<screens> × <widths> × 5 systems)
-- Stage 3 proof: attr-set <ms> ≤ first-paint <ms> (fresh) · <ms> ≤ <ms> (saved terminal)
+- Stage 3 proof: system <ms> / accent <ms> ≤ first-paint <ms> (fresh) · system <ms> / accent <ms> ≤ <ms> (saved terminal/matrix)
 - Stage 9 proof: <system → display/body families → true/false, per system>
 - Stage 6 hits per screen/width/system: <table or "none">
 - Blocked / not executed: <stage — exact reason> (never simulated)
