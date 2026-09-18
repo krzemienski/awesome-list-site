@@ -36,6 +36,20 @@ export function collectStrayButtons() {
     !['footer-cookie-settings',                             // small tokenized text buttons
       'button-clear-recent-searches',
       'button-dismiss-scrubbed-params'].includes(b.getAttribute('data-testid')) &&
+    !b.matches('.about-faq-item > .about-faq-trigger[aria-expanded][aria-controls]') && // About FAQ disclosure rows
+    /* 5 · Clerk-hosted auth widget (third-party DOM the app cannot mark).
+           Positive: excluded ONLY while the widget is actually themed from the
+           DS — its primary button must paint the live --accent. */
+    !(b.closest('.cl-rootBox') && ((root) => {
+      const primary = root.querySelector('.cl-formButtonPrimary');
+      if (!primary) return false;
+      const probe = document.createElement('i');
+      probe.style.background = 'var(--accent)';
+      root.appendChild(probe);
+      const want = getComputedStyle(probe).backgroundColor;
+      probe.remove();
+      return getComputedStyle(primary).backgroundColor === want;
+    })(b.closest('.cl-rootBox'))) &&
     /* 4 · raw DS classes (standalone artifacts / showcase helpers) */
     ![...b.classList].some(c => /^(btn|tab|icon-btn)/.test(c))
   );
@@ -68,6 +82,17 @@ export function collectStrayInputs() {
     !el.closest('[data-sidebar], [cmdk-root], [data-radix-popper-content-wrapper]') &&
     /* 3 · known tokenized native controls (verified compliant — list in SKILL.md) */
     el.getAttribute('data-testid') !== 'select-subcategory-filter' && // TaxonomyListing scope filter
+    /* Clerk-hosted auth widget — same positive themed-root check as the button sweep */
+    !(el.closest('.cl-rootBox') && ((root) => {
+      const primary = root.querySelector('.cl-formButtonPrimary');
+      if (!primary) return false;
+      const probe = document.createElement('i');
+      probe.style.background = 'var(--accent)';
+      root.appendChild(probe);
+      const want = getComputedStyle(probe).backgroundColor;
+      probe.remove();
+      return getComputedStyle(primary).backgroundColor === want;
+    })(el.closest('.cl-rootBox'))) &&
     /* 4 · raw DS classes (standalone artifacts / showcase helpers) */
     ![...el.classList].some(c => /^(input|select|textarea)$/.test(c))
   );
@@ -151,11 +176,20 @@ export function collectStrayH1s() {
            class. The exclusion is narrow (the title inside the taxonomy page)
            AND positive: it must actually paint in the --font-body face, so no
            other h1 can opt out by borrowing the class name */
-    !(h.matches('main .taxonomy-page > .taxonomy-header > h1.taxonomy-title') &&
+    !(h.matches('main .taxonomy-page > .taxonomy-header > h1.taxonomy-title, main .resource-detail-heading > h1[data-testid="text-resource-title"]') &&
       ((el) => {
         const face = (v) => String(v || '').split(',')[0].replace(/\x22|\x27/g, '').trim().toLowerCase();
         return face(getComputedStyle(el).fontFamily) ===
           face(getComputedStyle(document.documentElement).getPropertyValue('--font-body'));
+      })(h)) &&
+    /* 4 · the Clerk-hosted auth widget's header (third-party DOM the app cannot
+           mark). Positive: it must actually paint in the live --font-display face,
+           which only happens when the DS-derived appearance is wired */
+    !(h.matches('.cl-rootBox h1.cl-headerTitle') &&
+      ((el) => {
+        const face = (v) => String(v || '').split(',')[0].replace(/\x22|\x27/g, '').trim().toLowerCase();
+        return face(getComputedStyle(el).fontFamily) ===
+          face(getComputedStyle(document.documentElement).getPropertyValue('--font-display'));
       })(h))
   );
   // STAGE6-H1-FILTER-END
@@ -194,8 +228,9 @@ export function collectStrayEyebrows() {
     eyebrowish(el) &&
     /* 1 · the DS eyebrow helper (self, or child bits like the ── dash) */
     !el.closest('.eyebrow') &&
-    /* 2 · chips/badges — mono+uppercase comes from the Badge primitive */
-    !el.closest('[data-ds="chip"]') &&
+    /* 2 · chips/badges — mono+uppercase comes from the Badge primitive (or the
+           raw DS .chip class on standalone artifacts / frozen-reference ports) */
+    !el.closest('[data-ds="chip"], .chip') &&
     !(el.classList.contains('rounded-full') && el.classList.contains('focus:ring-ring')) &&
     /* 3 · keyboard hints + code samples — mono by nature, not section labels
            (covers the <kbd> itself, wrappers around one, and sibling captions
@@ -204,7 +239,17 @@ export function collectStrayEyebrows() {
     !el.querySelector('kbd, .kbd') &&
     !(el.parentElement && el.parentElement.querySelector(':scope > kbd, :scope > .kbd')) &&
     /* 4 · shadcn/Radix + reference sidebar chrome */
-    !el.closest('[data-sidebar], [cmdk-root], [data-radix-popper-content-wrapper]')
+    !el.closest('[data-sidebar], [cmdk-root], [data-radix-popper-content-wrapper]') &&
+    /* 5 · the frozen ResourceDetail card labels ONLY: pages.jsx renders them as
+           .mono 10px accent labels (not .eyebrow), and the app keeps that paint
+           under semantic h2s. Narrow (those two cards) AND positive: each must
+           actually paint in the --font-mono face */
+    !(el.matches('main .resource-detail-description > h2, main .resource-detail-sections h2') &&
+      ((h2) => {
+        const face = (v) => String(v || '').split(',')[0].replace(/\x22|\x27/g, '').trim().toLowerCase();
+        return face(getComputedStyle(h2).fontFamily) ===
+          face(getComputedStyle(document.documentElement).getPropertyValue('--font-mono'));
+      })(el))
   );
   // STAGE6-EYEBROW-FILTER-END
   return {

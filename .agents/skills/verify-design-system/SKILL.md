@@ -47,6 +47,86 @@ Formal audits verify the shipped default (Editorial + Crimson) per
 
 ---
 
+## Browser execution protocol (real-browser audits)
+
+The DevTools snippets in each stage are the contract; a **formal audit runs
+them in a real browser against a running URL** — never by reading source and
+inferring what the DOM would be. Run this way whenever you are handed an app
+URL (dev or production build) rather than a single file.
+
+### Runtime
+
+- **Playwright Chromium**, imported as `import { chromium } from
+  '@playwright/test'` (the bare `playwright` package is not resolvable here).
+  Headless is fine. Launch once, reuse one browser; one context per width.
+- The harness **must live inside the workspace** (module resolution), e.g.
+  `.cache/ds-audit/<run-id>/harness.mjs`, and all output (screenshots,
+  JSON, logs) goes under that same `.cache/ds-audit/<run-id>/` tree.
+  **Never write into tracked directories while a dev-server audit is
+  running** — Vite's workspace watcher full-reloads every open page on any
+  repo write and your captures go stale mid-run.
+- Navigate with `page.goto(url, { waitUntil: 'networkidle' })`, then wait
+  for `document.fonts.ready` **and** for `.page` to exist before evaluating
+  anything. `/login` is a server redirect to `/sign-in` — follow it and
+  audit the landing URL.
+- Evaluate the stage snippets **in-page** with `page.evaluate`. Stage 6's
+  six filters have executable copies in
+  `scripts/validation/ds-button-filter.mjs`; either paste the fenced
+  snippets from this file or `import * as F` from that module and evaluate
+  `fn.toString()` — they are kept literal-identical by the `ds-button-sweep`
+  gate, so both are the same audit.
+- Stages 5 and 10 are **source** checks: run them with `rg` against the
+  checkout that the URL is serving (and `node
+  scripts/validation/palette-drift.mjs` for the stage-5 gate). They do not
+  change between dev and production, so run them once per audit and cite the
+  commit.
+
+### Per-stage browser mechanics
+
+| Stage | How to prove it in-browser |
+|---|---|
+| 1 | `page.evaluate`: `typeof window.applyDesignSystem`, `Object.keys(window.DESIGN_SYSTEMS).length === 5`, `window.ACCENTS.length === 10`, and the `[data-system=` rule presence check from the quick reference. |
+| 2 | `document.documentElement.dataset.system/accent` present and `--bg` resolves non-empty. |
+| 3 | Two proofs, both required: **(a) static** — fetch the served HTML and assert that an **inline, synchronous** `<script>` (no `src`, no `async`/`defer`, not `type="module"`) inside `<head>` sets `data-system`, and that it does not call `window.applyDesignSystem` (a module global). Module scripts are deferred by spec, so their position relative to the boot is irrelevant — dev servers inject several (`/@vite/client`, react-refresh) ahead of it; **(b) runtime** — `context.addInitScript` installs a `MutationObserver` on `document` (`{ attributes: true, subtree: true, attributeFilter: ['data-system'] }` — `<html>` may not exist yet when init scripts run) that records `performance.now()` when `data-system` is first set; after load compare it against `performance.getEntriesByType('paint')[0].startTime` (first-paint) — attribute time must be **≤** first paint. Then set `localStorage['ds-system']='terminal'` (via a second init script), reload, and confirm the observer saw `terminal` before first paint too (a saved choice must also be flash-free). Restore `editorial`. |
+| 4 | `.page` and `.grain` exist; `getComputedStyle(document.querySelector('.page')).getPropertyValue('--bg-atmosphere')` is non-empty. |
+| 6 | Run all six filters (buttons, inputs, chips, cards, page titles, eyebrows) on every screen in the coverage matrix, at every width, **in every system** (stage 11 loop). Report each hit through the triage ladder with its `data-testid`/class and screen. |
+| 7 | Run the accent-user count per screen; additionally **hover a primary button and a `data-ds="card-hover"` card with a real `page.hover()`** and screenshot — `getComputedStyle` after programmatic focus/hover lies mid-transition. Prove the focus ring with a real `keyboard.press('Tab')` + screenshot. |
+| 8 | Run the `--text-3` long-copy scan per screen. |
+| 9 | In **every** system of the stage-11 loop, after `document.fonts.ready`: `const faces = await document.fonts.load('16px "<family>"')` for the active system's **display and body** first families (from `--font-display` / `--font-body`); pass = `faces.length > 0 && faces.every(f => f.status === 'loaded')`. Use `fonts.load`, not `fonts.check`, as the proof: Chrome fetches a face only when some element paints in it, so `check()` is legitimately `false` for a weight/style/subset nothing on the screen uses (e.g. Fraunces 400-normal on `/about`, whose title is body-face by design) — `load()` forces the fetch and rejects/returns empty only when the family genuinely cannot load. Additionally record, per screen, the computed first family of the page's `.display-h` (or note "no display-face consumer on this screen"). |
+| 10 | Source `rg` counts (above) **plus** in-page: at least one matching `[data-system="<id>"]` rule reachable for the active system (`<style>` textContent first, then CSSOM). |
+| 11 | On every screen × width: `for id of [editorial, terminal, geist, brutalist, swiss]` → `applyDesignSystem(id, SYSTEM_DEFAULT_ACCENT[id])` → `await document.fonts.ready` → wait 800 ms → **screenshot** `<run>/<screen>/<width>/<system>.png` → re-run stages 2, 4, 6, 7, 8, 9, 10 in that system → compare the five captures (they must differ; identical pixels across systems = stage-5 failure) and inspect each against the stage-11 symptom table. Restore `editorial` + `crimson` before leaving the page. |
+
+### Coverage matrix (the minimum for a formal audit)
+
+Screens — audit **all** of these, not a sample:
+
+| Screen | Path |
+|---|---|
+| Home | `/` |
+| About | `/about` |
+| Learning journeys | `/journeys` |
+| A category page | `/category/<slug>` (pick a real slug from `/categories`) |
+| Resource detail | `/resource/<id>` (pick a real id from a category page) |
+| Login | `/login` → follows to `/sign-in` (Clerk widget) |
+| Theme settings | `/settings/theme` |
+| 404 | `/this-route-does-not-exist-404` (must return HTTP 404 **and** the DS 404 page) |
+
+Widths — every screen at **1440×900** (desktop) and **375×812** (mobile);
+add 768×1024 if a finding looks layout-dependent.
+
+Systems — every screen × width cycles **all five** systems via the stage-11
+loop with their `SYSTEM_DEFAULT_ACCENT`. That is 8 screens × 2 widths × 5
+systems = **80 screenshots minimum**; name them
+`<screen>/<width>/<system>.png` and list the directory in the evidence
+appendix.
+
+Run the whole matrix again against the **production build** (`npm run build
+&& PORT=<free port> npm run start`) when asked to certify a release; the
+dev server is not the shipped artifact (asset hashing, CSP nonces, split
+CSS, and prerender all differ).
+
+---
+
 ## Stage 1 · Are the system files even loaded?
 
 **Severity if missing: 🔴 BLOCK**
@@ -383,6 +463,20 @@ const stray = [...document.querySelectorAll('button')].filter(b =>
   !['footer-cookie-settings',                             // small tokenized text buttons
     'button-clear-recent-searches',
     'button-dismiss-scrubbed-params'].includes(b.getAttribute('data-testid')) &&
+  !b.matches('.about-faq-item > .about-faq-trigger[aria-expanded][aria-controls]') && // About FAQ disclosure rows
+  /* 5 · Clerk-hosted auth widget (third-party DOM the app cannot mark).
+         Positive: excluded ONLY while the widget is actually themed from the
+         DS — its primary button must paint the live --accent. */
+  !(b.closest('.cl-rootBox') && ((root) => {
+    const primary = root.querySelector('.cl-formButtonPrimary');
+    if (!primary) return false;
+    const probe = document.createElement('i');
+    probe.style.background = 'var(--accent)';
+    root.appendChild(probe);
+    const want = getComputedStyle(probe).backgroundColor;
+    probe.remove();
+    return getComputedStyle(primary).backgroundColor === want;
+  })(b.closest('.cl-rootBox'))) &&
   /* 4 · raw DS classes (standalone artifacts / showcase helpers) */
   ![...b.classList].some(c => /^(btn|tab|icon-btn)/.test(c))
 );
@@ -484,6 +578,42 @@ known list below instead of re-flagging it every run.
   - the scrubbed-params banner Dismiss
     (`data-testid="button-dismiss-scrubbed-params"`, `min-h-8` = 32px —
     meets the text-link floor).
+- **About FAQ disclosure rows** (`client/src/pages/About.tsx`,
+  `.about-faq-item > .about-faq-trigger[aria-expanded][aria-controls]`,
+  `data-testid="button-about-faq-N"`): full-width question + chevron
+  accordion triggers (`min-height: 56px`, `color: var(--text)`, accent hover,
+  hairline item borders, global focus ring). A `Button` can't express a
+  disclosure row; the exclusion is positive — it must carry the
+  `aria-expanded`/`aria-controls` disclosure contract.
+- **Theme-picker option cards** (`client/src/pages/ThemeSettings.tsx`,
+  `data-testid="system-option-*"`, `"accent-option-*"`, `"font-option-*"`):
+  `role="radio"` cards inside ARIA radiogroups, tokenized
+  (`rounded-[var(--radius)] bg-[var(--surface)]`, `var(--border)` /
+  `var(--accent)` borders, `focus-visible:ring-[var(--accent)]`). They are
+  clickable cards, so they carry `data-ds="card-hover"` (the Cards rule) and
+  the per-system hover skins apply — no filter exclusion is needed; the
+  in-card clause already recognizes them.
+- **Clerk-hosted auth widget** (`/sign-in`, `/sign-up`, `.cl-rootBox`): a
+  third-party embed whose DOM the app cannot mark. Its buttons, inputs and
+  `h1.cl-headerTitle` are excluded **only while the widget is provably themed
+  from the DS** — the appearance in `client/src/lib/clerk-appearance.ts`
+  maps `colorPrimary` ← `--accent` and the header font ← `--font-display`, so
+  the filters check that `.cl-formButtonPrimary` paints the live `--accent`
+  and the header paints in the `--font-display` face. If either check fails
+  the widget is swept like everything else (and the appearance wiring is the
+  🟡 FIX).
+- **Frozen ResourceDetail typography** (`client/src/pages/ResourceDetail.tsx`,
+  `/resource/:id`): the frozen `pages.jsx` detail page renders its `h1` in the
+  body face (no display class) and its card labels ("DESCRIPTION",
+  "CANONICAL URL", …) as `.mono` 10px accent labels, not `.eyebrow`. The app
+  keeps that paint (pixel-parity row `app.resource.detail`), so the
+  page-title and eyebrow sweeps exclude exactly `main .resource-detail-heading >
+  h1[data-testid="text-resource-title"]` (must paint in `--font-body`) and
+  `main .resource-detail-description > h2` / `main .resource-detail-sections
+  h2` (must paint in `--font-mono`) — same narrow-and-positive shape as the
+  taxonomy title. Raw `.chip` elements (the DS's own class, used by
+  frozen-reference ports and the 404 status chip) are chips, not eyebrows, and
+  the eyebrow sweep treats them like `data-ds="chip"`.
 
 ### Same idea for the rest
 
@@ -533,6 +663,17 @@ const stray = [...document.querySelectorAll('input, select, textarea')].filter(e
   !el.closest('[data-sidebar], [cmdk-root], [data-radix-popper-content-wrapper]') &&
   /* 3 · known tokenized native controls (verified compliant — list below) */
   el.getAttribute('data-testid') !== 'select-subcategory-filter' && // TaxonomyListing scope filter
+  /* Clerk-hosted auth widget — same positive themed-root check as the button sweep */
+  !(el.closest('.cl-rootBox') && ((root) => {
+    const primary = root.querySelector('.cl-formButtonPrimary');
+    if (!primary) return false;
+    const probe = document.createElement('i');
+    probe.style.background = 'var(--accent)';
+    root.appendChild(probe);
+    const want = getComputedStyle(probe).backgroundColor;
+    probe.remove();
+    return getComputedStyle(primary).backgroundColor === want;
+  })(el.closest('.cl-rootBox'))) &&
   /* 4 · raw DS classes (standalone artifacts / showcase helpers) */
   ![...el.classList].some(c => /^(input|select|textarea)$/.test(c))
 );
@@ -628,11 +769,20 @@ const stray = [...document.querySelectorAll('h1')].filter(h =>
          class. The exclusion is narrow (the title inside the taxonomy page)
          AND positive: it must actually paint in the --font-body face, so no
          other h1 can opt out by borrowing the class name */
-  !(h.matches('main .taxonomy-page > .taxonomy-header > h1.taxonomy-title') &&
+  !(h.matches('main .taxonomy-page > .taxonomy-header > h1.taxonomy-title, main .resource-detail-heading > h1[data-testid="text-resource-title"]') &&
     ((el) => {
       const face = (v) => String(v || '').split(',')[0].replace(/\x22|\x27/g, '').trim().toLowerCase();
       return face(getComputedStyle(el).fontFamily) ===
         face(getComputedStyle(document.documentElement).getPropertyValue('--font-body'));
+    })(h)) &&
+  /* 4 · the Clerk-hosted auth widget's header (third-party DOM the app cannot
+         mark). Positive: it must actually paint in the live --font-display face,
+         which only happens when the DS-derived appearance is wired */
+  !(h.matches('.cl-rootBox h1.cl-headerTitle') &&
+    ((el) => {
+      const face = (v) => String(v || '').split(',')[0].replace(/\x22|\x27/g, '').trim().toLowerCase();
+      return face(getComputedStyle(el).fontFamily) ===
+        face(getComputedStyle(document.documentElement).getPropertyValue('--font-display'));
     })(h))
 );
 stray  // → [] expected; a hit is a page title that skips the display tokens
@@ -671,8 +821,9 @@ const stray = [...document.querySelectorAll('p, div, span, a, h2, h3, h4, h5, h6
   eyebrowish(el) &&
   /* 1 · the DS eyebrow helper (self, or child bits like the ── dash) */
   !el.closest('.eyebrow') &&
-  /* 2 · chips/badges — mono+uppercase comes from the Badge primitive */
-  !el.closest('[data-ds="chip"]') &&
+  /* 2 · chips/badges — mono+uppercase comes from the Badge primitive (or the
+         raw DS .chip class on standalone artifacts / frozen-reference ports) */
+  !el.closest('[data-ds="chip"], .chip') &&
   !(el.classList.contains('rounded-full') && el.classList.contains('focus:ring-ring')) &&
   /* 3 · keyboard hints + code samples — mono by nature, not section labels
          (covers the <kbd> itself, wrappers around one, and sibling captions
@@ -681,7 +832,17 @@ const stray = [...document.querySelectorAll('p, div, span, a, h2, h3, h4, h5, h6
   !el.querySelector('kbd, .kbd') &&
   !(el.parentElement && el.parentElement.querySelector(':scope > kbd, :scope > .kbd')) &&
   /* 4 · shadcn/Radix + reference sidebar chrome */
-  !el.closest('[data-sidebar], [cmdk-root], [data-radix-popper-content-wrapper]')
+  !el.closest('[data-sidebar], [cmdk-root], [data-radix-popper-content-wrapper]') &&
+  /* 5 · the frozen ResourceDetail card labels ONLY: pages.jsx renders them as
+         .mono 10px accent labels (not .eyebrow), and the app keeps that paint
+         under semantic h2s. Narrow (those two cards) AND positive: each must
+         actually paint in the --font-mono face */
+  !(el.matches('main .resource-detail-description > h2, main .resource-detail-sections h2') &&
+    ((h2) => {
+      const face = (v) => String(v || '').split(',')[0].replace(/\x22|\x27/g, '').trim().toLowerCase();
+      return face(getComputedStyle(h2).fontFamily) ===
+        face(getComputedStyle(document.documentElement).getPropertyValue('--font-mono'));
+    })(el))
 );
 stray  // → [] expected; a hit is a hand-pinned mono-uppercase label that skipped .eyebrow
 ```
@@ -797,7 +958,13 @@ const family = stack.split(',')[0].replace(/['"]/g, '').trim();
 document.fonts.check(`16px "${family}"`);  // → true
 ```
 
-If false, the font failed to load. Check:
+If false, first rule out on-demand loading: Chrome only fetches a face once
+an element paints in it, so `check()` is `false` for any weight/style/subset
+the current screen does not use (Fraunces 400-normal on `/about`, say, where
+the title is body-face by design). The authoritative proof is
+`(await document.fonts.load('16px "<family>"'))` returning a **non-empty**
+array of `loaded` faces — that forces the fetch and only fails when the
+family genuinely cannot load. If *that* fails, the font failed to load. Check:
 - `FONT_URLS` in `client/src/lib/font-options.ts` has an entry for the
   active system, and the family name in the URL matches the token's family.
 - Network tab shows no 4xx on the font request.
@@ -914,6 +1081,26 @@ Files audited: <list>
 - **FAIL** → ≥1 BLOCK. Page is not DS-compliant; fix immediately.
 
 NITs never gate. They're polish.
+
+### Evidence appendix (real-browser audits)
+
+The verdict block above is the contract and its format does not change. A
+real-browser audit **appends** one section *after* it:
+
+```markdown
+## Evidence
+- Target: <URL> (<dev | production build>, commit <sha>)
+- Screenshots: <run dir> — <n> files (<screens> × <widths> × 5 systems)
+- Stage 3 proof: attr-set <ms> ≤ first-paint <ms> (fresh) · <ms> ≤ <ms> (saved terminal)
+- Stage 9 proof: <system → display/body families → true/false, per system>
+- Stage 6 hits per screen/width/system: <table or "none">
+- Blocked / not executed: <stage — exact reason> (never simulated)
+```
+
+Under **What's good**, list stages 3, 9 and 11 as **individual** lines with
+their proof values — they are the three stages that can only be verified in
+a running browser, and a reader must be able to see each one passed on its
+own.
 
 ---
 

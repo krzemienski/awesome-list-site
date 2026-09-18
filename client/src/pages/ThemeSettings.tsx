@@ -189,7 +189,7 @@ export default function ThemeSettings() {
             <span className="block truncate text-sm font-bold tracking-tight">
               The quick brown fox <em className="text-[var(--accent)]">jumps</em>
             </span>
-            <span className="block truncate text-[11px] uppercase tracking-wider text-[color:var(--text-3)]">
+            <span className="block truncate text-[11px] text-[color:var(--text-3)]">
               {activeSystem?.name ?? systemId} · {activeAccent?.name ?? accentId}
             </span>
           </span>
@@ -222,6 +222,7 @@ export default function ThemeSettings() {
                 onClick={() => handlePickSystem(id)}
                 onKeyDown={makeRadioKeyDown("system", systemIds, systemId, handlePickSystem)}
                 data-testid={`system-option-${id}`}
+                data-ds="card-hover"
                 className="text-left rounded-[var(--radius)] border bg-[var(--surface)] p-4 transition-colors hover:border-[var(--border-strong)] focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent)] cursor-pointer"
                 style={{
                   borderColor: isActive ? "var(--accent)" : "var(--border)",
@@ -265,6 +266,7 @@ export default function ThemeSettings() {
                 onClick={() => handlePickAccent(a.id)}
                 onKeyDown={makeRadioKeyDown("accent", accentIds, accentId, handlePickAccent)}
                 data-testid={`accent-option-${a.id}`}
+                data-ds="card-hover"
                 className="text-left rounded-[var(--radius)] border bg-[var(--surface)] p-3 transition-colors hover:border-[var(--border-strong)] focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent)] cursor-pointer"
                 style={{
                   borderColor: isActive ? a.primary : "var(--border)",
@@ -318,6 +320,7 @@ export default function ThemeSettings() {
                 onClick={() => handlePickFont(f.id)}
                 onKeyDown={makeRadioKeyDown("font", fontIds, fontId, handlePickFont)}
                 data-testid={`font-option-${f.id}`}
+                data-ds="card-hover"
                 className="text-left rounded-[var(--radius)] border bg-[var(--surface)] p-4 transition-colors hover:border-[var(--border-strong)] focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent)] cursor-pointer"
                 style={{
                   borderColor: isActive ? "var(--accent)" : "var(--border)",
