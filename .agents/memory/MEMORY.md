@@ -157,3 +157,5 @@
 - [Evidence runner identity drift](evidence-runner-identity-drift.md) — assert demonstrator identity via the shared helper's exported constants, not a hard-coded name shape.
 - [Gates vs folded UI](gate-drift-from-folded-ui.md) — reveal every collapsed aria-expanded disclosure (never popups/tabs) before sweeping; folds hide selectors and new strays.
 - [SSR Clerk empty host](ssr-clerk-empty-host.md) — "Host must not be empty" = Clerk host-derived key at SSR module eval; resolve the explicit key, diagnose with a /tmp --ssr build only.
+- [fonts.check vs load](fonts-check-vs-load.md) — fonts.check() is false for loaded families with unused weights/subsets; prove with fonts.load() non-empty; prod prerenders .page before DS globals exist.
+- [Consensus audit panels](consensus-audit-panels.md) — blind auditors get skill+URL+private .cache dir only; dev panel then prod panel; save verdicts verbatim; waitForJob caps at 600 s.

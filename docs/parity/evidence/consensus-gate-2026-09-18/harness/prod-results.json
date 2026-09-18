@@ -1,0 +1,2379 @@
+{
+  "base": "http://127.0.0.1:5055",
+  "stage3": {
+    "static": {
+      "inlineBootInHead": true,
+      "usesModuleGlobal": false,
+      "ok": true
+    },
+    "fresh": {
+      "system": {
+        "a": "data-system",
+        "v": "editorial",
+        "t": 87.70000000018626
+      },
+      "accent": {
+        "a": "data-accent",
+        "v": "crimson",
+        "t": 87.70000000018626
+      },
+      "firstPaint": 328,
+      "now": "editorial/crimson",
+      "ok": true
+    },
+    "savedTerminal": {
+      "system": {
+        "a": "data-system",
+        "v": "terminal",
+        "t": 50
+      },
+      "accent": {
+        "a": "data-accent",
+        "v": "matrix",
+        "t": 50
+      },
+      "firstPaint": 204,
+      "now": "terminal/matrix",
+      "ok": true
+    }
+  },
+  "screens": {
+    "home@1440": {
+      "status": 200,
+      "url": "http://127.0.0.1:5055/",
+      "systems": {
+        "editorial": {
+          "system": "editorial",
+          "accent": "crimson",
+          "applyFn": "function",
+          "nSystems": 5,
+          "nAccents": 10,
+          "bg": "#000",
+          "page": true,
+          "grain": true,
+          "atmosphere": true,
+          "fonts": {
+            "display": "Fraunces",
+            "displayOk": true,
+            "body": "Inter",
+            "bodyOk": true
+          },
+          "skin": true,
+          "strays": {
+            "collectStrayButtons": [],
+            "collectStrayCards": [],
+            "collectStrayChips": [],
+            "collectStrayEyebrows": [],
+            "collectStrayH1s": [],
+            "collectStrayInputs": []
+          },
+          "text3Offenders": 0,
+          "accentUsers": 0
+        },
+        "terminal": {
+          "system": "terminal",
+          "accent": "matrix",
+          "applyFn": "function",
+          "nSystems": 5,
+          "nAccents": 10,
+          "bg": "#000",
+          "page": true,
+          "grain": true,
+          "atmosphere": true,
+          "fonts": {
+            "display": "IBM Plex Mono",
+            "displayOk": true,
+            "body": "IBM Plex Mono",
+            "bodyOk": true
+          },
+          "skin": true,
+          "strays": {
+            "collectStrayButtons": [],
+            "collectStrayCards": [],
+            "collectStrayChips": [],
+            "collectStrayEyebrows": [],
+            "collectStrayH1s": [],
+            "collectStrayInputs": []
+          },
+          "text3Offenders": 0,
+          "accentUsers": 0
+        },
+        "geist": {
+          "system": "geist",
+          "accent": "cyan",
+          "applyFn": "function",
+          "nSystems": 5,
+          "nAccents": 10,
+          "bg": "#000",
+          "page": true,
+          "grain": true,
+          "atmosphere": true,
+          "fonts": {
+            "display": "Geist",
+            "displayOk": true,
+            "body": "Geist",
+            "bodyOk": true
+          },
+          "skin": true,
+          "strays": {
+            "collectStrayButtons": [],
+            "collectStrayCards": [],
+            "collectStrayChips": [],
+            "collectStrayEyebrows": [],
+            "collectStrayH1s": [],
+            "collectStrayInputs": []
+          },
+          "text3Offenders": 0,
+          "accentUsers": 0
+        },
+        "brutalist": {
+          "system": "brutalist",
+          "accent": "amber",
+          "applyFn": "function",
+          "nSystems": 5,
+          "nAccents": 10,
+          "bg": "#000",
+          "page": true,
+          "grain": true,
+          "atmosphere": true,
+          "fonts": {
+            "display": "Instrument Serif",
+            "displayOk": true,
+            "body": "Space Grotesk",
+            "bodyOk": true
+          },
+          "skin": true,
+          "strays": {
+            "collectStrayButtons": [],
+            "collectStrayCards": [],
+            "collectStrayChips": [],
+            "collectStrayEyebrows": [],
+            "collectStrayH1s": [],
+            "collectStrayInputs": []
+          },
+          "text3Offenders": 0,
+          "accentUsers": 0
+        },
+        "swiss": {
+          "system": "swiss",
+          "accent": "orange",
+          "applyFn": "function",
+          "nSystems": 5,
+          "nAccents": 10,
+          "bg": "#000",
+          "page": true,
+          "grain": true,
+          "atmosphere": true,
+          "fonts": {
+            "display": "Manrope",
+            "displayOk": true,
+            "body": "Manrope",
+            "bodyOk": true
+          },
+          "skin": true,
+          "strays": {
+            "collectStrayButtons": [],
+            "collectStrayCards": [],
+            "collectStrayChips": [],
+            "collectStrayEyebrows": [],
+            "collectStrayH1s": [],
+            "collectStrayInputs": []
+          },
+          "text3Offenders": 0,
+          "accentUsers": 0
+        }
+      }
+    },
+    "about@1440": {
+      "status": 200,
+      "url": "http://127.0.0.1:5055/about",
+      "systems": {
+        "editorial": {
+          "system": "editorial",
+          "accent": "crimson",
+          "applyFn": "function",
+          "nSystems": 5,
+          "nAccents": 10,
+          "bg": "#000",
+          "page": true,
+          "grain": true,
+          "atmosphere": true,
+          "fonts": {
+            "display": "Fraunces",
+            "displayOk": true,
+            "body": "Inter",
+            "bodyOk": true
+          },
+          "skin": true,
+          "strays": {
+            "collectStrayButtons": [],
+            "collectStrayCards": [],
+            "collectStrayChips": [],
+            "collectStrayEyebrows": [],
+            "collectStrayH1s": [],
+            "collectStrayInputs": []
+          },
+          "text3Offenders": 0,
+          "accentUsers": 0
+        },
+        "terminal": {
+          "system": "terminal",
+          "accent": "matrix",
+          "applyFn": "function",
+          "nSystems": 5,
+          "nAccents": 10,
+          "bg": "#000",
+          "page": true,
+          "grain": true,
+          "atmosphere": true,
+          "fonts": {
+            "display": "IBM Plex Mono",
+            "displayOk": true,
+            "body": "IBM Plex Mono",
+            "bodyOk": true
+          },
+          "skin": true,
+          "strays": {
+            "collectStrayButtons": [],
+            "collectStrayCards": [],
+            "collectStrayChips": [],
+            "collectStrayEyebrows": [],
+            "collectStrayH1s": [],
+            "collectStrayInputs": []
+          },
+          "text3Offenders": 0,
+          "accentUsers": 0
+        },
+        "geist": {
+          "system": "geist",
+          "accent": "cyan",
+          "applyFn": "function",
+          "nSystems": 5,
+          "nAccents": 10,
+          "bg": "#000",
+          "page": true,
+          "grain": true,
+          "atmosphere": true,
+          "fonts": {
+            "display": "Geist",
+            "displayOk": true,
+            "body": "Geist",
+            "bodyOk": true
+          },
+          "skin": true,
+          "strays": {
+            "collectStrayButtons": [],
+            "collectStrayCards": [],
+            "collectStrayChips": [],
+            "collectStrayEyebrows": [],
+            "collectStrayH1s": [],
+            "collectStrayInputs": []
+          },
+          "text3Offenders": 0,
+          "accentUsers": 0
+        },
+        "brutalist": {
+          "system": "brutalist",
+          "accent": "amber",
+          "applyFn": "function",
+          "nSystems": 5,
+          "nAccents": 10,
+          "bg": "#000",
+          "page": true,
+          "grain": true,
+          "atmosphere": true,
+          "fonts": {
+            "display": "Instrument Serif",
+            "displayOk": true,
+            "body": "Space Grotesk",
+            "bodyOk": true
+          },
+          "skin": true,
+          "strays": {
+            "collectStrayButtons": [],
+            "collectStrayCards": [],
+            "collectStrayChips": [],
+            "collectStrayEyebrows": [],
+            "collectStrayH1s": [],
+            "collectStrayInputs": []
+          },
+          "text3Offenders": 0,
+          "accentUsers": 0
+        },
+        "swiss": {
+          "system": "swiss",
+          "accent": "orange",
+          "applyFn": "function",
+          "nSystems": 5,
+          "nAccents": 10,
+          "bg": "#000",
+          "page": true,
+          "grain": true,
+          "atmosphere": true,
+          "fonts": {
+            "display": "Manrope",
+            "displayOk": true,
+            "body": "Manrope",
+            "bodyOk": true
+          },
+          "skin": true,
+          "strays": {
+            "collectStrayButtons": [],
+            "collectStrayCards": [],
+            "collectStrayChips": [],
+            "collectStrayEyebrows": [],
+            "collectStrayH1s": [],
+            "collectStrayInputs": []
+          },
+          "text3Offenders": 0,
+          "accentUsers": 0
+        }
+      }
+    },
+    "journeys@1440": {
+      "status": 200,
+      "url": "http://127.0.0.1:5055/journeys",
+      "systems": {
+        "editorial": {
+          "system": "editorial",
+          "accent": "crimson",
+          "applyFn": "function",
+          "nSystems": 5,
+          "nAccents": 10,
+          "bg": "#000",
+          "page": true,
+          "grain": true,
+          "atmosphere": true,
+          "fonts": {
+            "display": "Fraunces",
+            "displayOk": true,
+            "body": "Inter",
+            "bodyOk": true
+          },
+          "skin": true,
+          "strays": {
+            "collectStrayButtons": [],
+            "collectStrayCards": [],
+            "collectStrayChips": [],
+            "collectStrayEyebrows": [],
+            "collectStrayH1s": [],
+            "collectStrayInputs": []
+          },
+          "text3Offenders": 0,
+          "accentUsers": 0
+        },
+        "terminal": {
+          "system": "terminal",
+          "accent": "matrix",
+          "applyFn": "function",
+          "nSystems": 5,
+          "nAccents": 10,
+          "bg": "#000",
+          "page": true,
+          "grain": true,
+          "atmosphere": true,
+          "fonts": {
+            "display": "IBM Plex Mono",
+            "displayOk": true,
+            "body": "IBM Plex Mono",
+            "bodyOk": true
+          },
+          "skin": true,
+          "strays": {
+            "collectStrayButtons": [],
+            "collectStrayCards": [],
+            "collectStrayChips": [],
+            "collectStrayEyebrows": [],
+            "collectStrayH1s": [],
+            "collectStrayInputs": []
+          },
+          "text3Offenders": 0,
+          "accentUsers": 0
+        },
+        "geist": {
+          "system": "geist",
+          "accent": "cyan",
+          "applyFn": "function",
+          "nSystems": 5,
+          "nAccents": 10,
+          "bg": "#000",
+          "page": true,
+          "grain": true,
+          "atmosphere": true,
+          "fonts": {
+            "display": "Geist",
+            "displayOk": true,
+            "body": "Geist",
+            "bodyOk": true
+          },
+          "skin": true,
+          "strays": {
+            "collectStrayButtons": [],
+            "collectStrayCards": [],
+            "collectStrayChips": [],
+            "collectStrayEyebrows": [],
+            "collectStrayH1s": [],
+            "collectStrayInputs": []
+          },
+          "text3Offenders": 0,
+          "accentUsers": 0
+        },
+        "brutalist": {
+          "system": "brutalist",
+          "accent": "amber",
+          "applyFn": "function",
+          "nSystems": 5,
+          "nAccents": 10,
+          "bg": "#000",
+          "page": true,
+          "grain": true,
+          "atmosphere": true,
+          "fonts": {
+            "display": "Instrument Serif",
+            "displayOk": true,
+            "body": "Space Grotesk",
+            "bodyOk": true
+          },
+          "skin": true,
+          "strays": {
+            "collectStrayButtons": [],
+            "collectStrayCards": [],
+            "collectStrayChips": [],
+            "collectStrayEyebrows": [],
+            "collectStrayH1s": [],
+            "collectStrayInputs": []
+          },
+          "text3Offenders": 0,
+          "accentUsers": 0
+        },
+        "swiss": {
+          "system": "swiss",
+          "accent": "orange",
+          "applyFn": "function",
+          "nSystems": 5,
+          "nAccents": 10,
+          "bg": "#000",
+          "page": true,
+          "grain": true,
+          "atmosphere": true,
+          "fonts": {
+            "display": "Manrope",
+            "displayOk": true,
+            "body": "Manrope",
+            "bodyOk": true
+          },
+          "skin": true,
+          "strays": {
+            "collectStrayButtons": [],
+            "collectStrayCards": [],
+            "collectStrayChips": [],
+            "collectStrayEyebrows": [],
+            "collectStrayH1s": [],
+            "collectStrayInputs": []
+          },
+          "text3Offenders": 0,
+          "accentUsers": 0
+        }
+      }
+    },
+    "category@1440": {
+      "status": 200,
+      "url": "http://127.0.0.1:5055/category/community-events",
+      "systems": {
+        "editorial": {
+          "system": "editorial",
+          "accent": "crimson",
+          "applyFn": "function",
+          "nSystems": 5,
+          "nAccents": 10,
+          "bg": "#000",
+          "page": true,
+          "grain": true,
+          "atmosphere": true,
+          "fonts": {
+            "display": "Fraunces",
+            "displayOk": true,
+            "body": "Inter",
+            "bodyOk": true
+          },
+          "skin": true,
+          "strays": {
+            "collectStrayButtons": [],
+            "collectStrayCards": [],
+            "collectStrayChips": [],
+            "collectStrayEyebrows": [],
+            "collectStrayH1s": [],
+            "collectStrayInputs": []
+          },
+          "text3Offenders": 0,
+          "accentUsers": 0
+        },
+        "terminal": {
+          "system": "terminal",
+          "accent": "matrix",
+          "applyFn": "function",
+          "nSystems": 5,
+          "nAccents": 10,
+          "bg": "#000",
+          "page": true,
+          "grain": true,
+          "atmosphere": true,
+          "fonts": {
+            "display": "IBM Plex Mono",
+            "displayOk": true,
+            "body": "IBM Plex Mono",
+            "bodyOk": true
+          },
+          "skin": true,
+          "strays": {
+            "collectStrayButtons": [],
+            "collectStrayCards": [],
+            "collectStrayChips": [],
+            "collectStrayEyebrows": [],
+            "collectStrayH1s": [],
+            "collectStrayInputs": []
+          },
+          "text3Offenders": 0,
+          "accentUsers": 0
+        },
+        "geist": {
+          "system": "geist",
+          "accent": "cyan",
+          "applyFn": "function",
+          "nSystems": 5,
+          "nAccents": 10,
+          "bg": "#000",
+          "page": true,
+          "grain": true,
+          "atmosphere": true,
+          "fonts": {
+            "display": "Geist",
+            "displayOk": true,
+            "body": "Geist",
+            "bodyOk": true
+          },
+          "skin": true,
+          "strays": {
+            "collectStrayButtons": [],
+            "collectStrayCards": [],
+            "collectStrayChips": [],
+            "collectStrayEyebrows": [],
+            "collectStrayH1s": [],
+            "collectStrayInputs": []
+          },
+          "text3Offenders": 0,
+          "accentUsers": 0
+        },
+        "brutalist": {
+          "system": "brutalist",
+          "accent": "amber",
+          "applyFn": "function",
+          "nSystems": 5,
+          "nAccents": 10,
+          "bg": "#000",
+          "page": true,
+          "grain": true,
+          "atmosphere": true,
+          "fonts": {
+            "display": "Instrument Serif",
+            "displayOk": true,
+            "body": "Space Grotesk",
+            "bodyOk": true
+          },
+          "skin": true,
+          "strays": {
+            "collectStrayButtons": [],
+            "collectStrayCards": [],
+            "collectStrayChips": [],
+            "collectStrayEyebrows": [],
+            "collectStrayH1s": [],
+            "collectStrayInputs": []
+          },
+          "text3Offenders": 0,
+          "accentUsers": 0
+        },
+        "swiss": {
+          "system": "swiss",
+          "accent": "orange",
+          "applyFn": "function",
+          "nSystems": 5,
+          "nAccents": 10,
+          "bg": "#000",
+          "page": true,
+          "grain": true,
+          "atmosphere": true,
+          "fonts": {
+            "display": "Manrope",
+            "displayOk": true,
+            "body": "Manrope",
+            "bodyOk": true
+          },
+          "skin": true,
+          "strays": {
+            "collectStrayButtons": [],
+            "collectStrayCards": [],
+            "collectStrayChips": [],
+            "collectStrayEyebrows": [],
+            "collectStrayH1s": [],
+            "collectStrayInputs": []
+          },
+          "text3Offenders": 0,
+          "accentUsers": 0
+        }
+      }
+    },
+    "resource@1440": {
+      "status": 200,
+      "url": "http://127.0.0.1:5055/resource/188015",
+      "systems": {
+        "editorial": {
+          "system": "editorial",
+          "accent": "crimson",
+          "applyFn": "function",
+          "nSystems": 5,
+          "nAccents": 10,
+          "bg": "#000",
+          "page": true,
+          "grain": true,
+          "atmosphere": true,
+          "fonts": {
+            "display": "Fraunces",
+            "displayOk": true,
+            "body": "Inter",
+            "bodyOk": true
+          },
+          "skin": true,
+          "strays": {
+            "collectStrayButtons": [],
+            "collectStrayCards": [],
+            "collectStrayChips": [],
+            "collectStrayEyebrows": [],
+            "collectStrayH1s": [],
+            "collectStrayInputs": []
+          },
+          "text3Offenders": 0,
+          "accentUsers": 0
+        },
+        "terminal": {
+          "system": "terminal",
+          "accent": "matrix",
+          "applyFn": "function",
+          "nSystems": 5,
+          "nAccents": 10,
+          "bg": "#000",
+          "page": true,
+          "grain": true,
+          "atmosphere": true,
+          "fonts": {
+            "display": "IBM Plex Mono",
+            "displayOk": true,
+            "body": "IBM Plex Mono",
+            "bodyOk": true
+          },
+          "skin": true,
+          "strays": {
+            "collectStrayButtons": [],
+            "collectStrayCards": [],
+            "collectStrayChips": [],
+            "collectStrayEyebrows": [],
+            "collectStrayH1s": [],
+            "collectStrayInputs": []
+          },
+          "text3Offenders": 0,
+          "accentUsers": 0
+        },
+        "geist": {
+          "system": "geist",
+          "accent": "cyan",
+          "applyFn": "function",
+          "nSystems": 5,
+          "nAccents": 10,
+          "bg": "#000",
+          "page": true,
+          "grain": true,
+          "atmosphere": true,
+          "fonts": {
+            "display": "Geist",
+            "displayOk": true,
+            "body": "Geist",
+            "bodyOk": true
+          },
+          "skin": true,
+          "strays": {
+            "collectStrayButtons": [],
+            "collectStrayCards": [],
+            "collectStrayChips": [],
+            "collectStrayEyebrows": [],
+            "collectStrayH1s": [],
+            "collectStrayInputs": []
+          },
+          "text3Offenders": 0,
+          "accentUsers": 0
+        },
+        "brutalist": {
+          "system": "brutalist",
+          "accent": "amber",
+          "applyFn": "function",
+          "nSystems": 5,
+          "nAccents": 10,
+          "bg": "#000",
+          "page": true,
+          "grain": true,
+          "atmosphere": true,
+          "fonts": {
+            "display": "Instrument Serif",
+            "displayOk": true,
+            "body": "Space Grotesk",
+            "bodyOk": true
+          },
+          "skin": true,
+          "strays": {
+            "collectStrayButtons": [],
+            "collectStrayCards": [],
+            "collectStrayChips": [],
+            "collectStrayEyebrows": [],
+            "collectStrayH1s": [],
+            "collectStrayInputs": []
+          },
+          "text3Offenders": 0,
+          "accentUsers": 0
+        },
+        "swiss": {
+          "system": "swiss",
+          "accent": "orange",
+          "applyFn": "function",
+          "nSystems": 5,
+          "nAccents": 10,
+          "bg": "#000",
+          "page": true,
+          "grain": true,
+          "atmosphere": true,
+          "fonts": {
+            "display": "Manrope",
+            "displayOk": true,
+            "body": "Manrope",
+            "bodyOk": true
+          },
+          "skin": true,
+          "strays": {
+            "collectStrayButtons": [],
+            "collectStrayCards": [],
+            "collectStrayChips": [],
+            "collectStrayEyebrows": [],
+            "collectStrayH1s": [],
+            "collectStrayInputs": []
+          },
+          "text3Offenders": 0,
+          "accentUsers": 0
+        }
+      }
+    },
+    "login@1440": {
+      "status": 200,
+      "url": "http://127.0.0.1:5055/sign-in",
+      "systems": {
+        "editorial": {
+          "system": "editorial",
+          "accent": "crimson",
+          "applyFn": "function",
+          "nSystems": 5,
+          "nAccents": 10,
+          "bg": "#000",
+          "page": true,
+          "grain": true,
+          "atmosphere": true,
+          "fonts": {
+            "display": "Fraunces",
+            "displayOk": true,
+            "body": "Inter",
+            "bodyOk": true
+          },
+          "skin": true,
+          "strays": {
+            "collectStrayButtons": [],
+            "collectStrayCards": [],
+            "collectStrayChips": [],
+            "collectStrayEyebrows": [],
+            "collectStrayH1s": [],
+            "collectStrayInputs": []
+          },
+          "text3Offenders": 0,
+          "accentUsers": 0
+        },
+        "terminal": {
+          "system": "terminal",
+          "accent": "matrix",
+          "applyFn": "function",
+          "nSystems": 5,
+          "nAccents": 10,
+          "bg": "#000",
+          "page": true,
+          "grain": true,
+          "atmosphere": true,
+          "fonts": {
+            "display": "IBM Plex Mono",
+            "displayOk": true,
+            "body": "IBM Plex Mono",
+            "bodyOk": true
+          },
+          "skin": true,
+          "strays": {
+            "collectStrayButtons": [],
+            "collectStrayCards": [],
+            "collectStrayChips": [],
+            "collectStrayEyebrows": [],
+            "collectStrayH1s": [],
+            "collectStrayInputs": []
+          },
+          "text3Offenders": 0,
+          "accentUsers": 0
+        },
+        "geist": {
+          "system": "geist",
+          "accent": "cyan",
+          "applyFn": "function",
+          "nSystems": 5,
+          "nAccents": 10,
+          "bg": "#000",
+          "page": true,
+          "grain": true,
+          "atmosphere": true,
+          "fonts": {
+            "display": "Geist",
+            "displayOk": true,
+            "body": "Geist",
+            "bodyOk": true
+          },
+          "skin": true,
+          "strays": {
+            "collectStrayButtons": [],
+            "collectStrayCards": [],
+            "collectStrayChips": [],
+            "collectStrayEyebrows": [],
+            "collectStrayH1s": [],
+            "collectStrayInputs": []
+          },
+          "text3Offenders": 0,
+          "accentUsers": 0
+        },
+        "brutalist": {
+          "system": "brutalist",
+          "accent": "amber",
+          "applyFn": "function",
+          "nSystems": 5,
+          "nAccents": 10,
+          "bg": "#000",
+          "page": true,
+          "grain": true,
+          "atmosphere": true,
+          "fonts": {
+            "display": "Instrument Serif",
+            "displayOk": true,
+            "body": "Space Grotesk",
+            "bodyOk": true
+          },
+          "skin": true,
+          "strays": {
+            "collectStrayButtons": [],
+            "collectStrayCards": [],
+            "collectStrayChips": [],
+            "collectStrayEyebrows": [],
+            "collectStrayH1s": [],
+            "collectStrayInputs": []
+          },
+          "text3Offenders": 0,
+          "accentUsers": 0
+        },
+        "swiss": {
+          "system": "swiss",
+          "accent": "orange",
+          "applyFn": "function",
+          "nSystems": 5,
+          "nAccents": 10,
+          "bg": "#000",
+          "page": true,
+          "grain": true,
+          "atmosphere": true,
+          "fonts": {
+            "display": "Manrope",
+            "displayOk": true,
+            "body": "Manrope",
+            "bodyOk": true
+          },
+          "skin": true,
+          "strays": {
+            "collectStrayButtons": [],
+            "collectStrayCards": [],
+            "collectStrayChips": [],
+            "collectStrayEyebrows": [],
+            "collectStrayH1s": [],
+            "collectStrayInputs": []
+          },
+          "text3Offenders": 0,
+          "accentUsers": 0
+        }
+      }
+    },
+    "settings-theme@1440": {
+      "status": 200,
+      "url": "http://127.0.0.1:5055/settings/theme",
+      "systems": {
+        "editorial": {
+          "system": "editorial",
+          "accent": "crimson",
+          "applyFn": "function",
+          "nSystems": 5,
+          "nAccents": 10,
+          "bg": "#000",
+          "page": true,
+          "grain": true,
+          "atmosphere": true,
+          "fonts": {
+            "display": "Fraunces",
+            "displayOk": true,
+            "body": "Inter",
+            "bodyOk": true
+          },
+          "skin": true,
+          "strays": {
+            "collectStrayButtons": [],
+            "collectStrayCards": [],
+            "collectStrayChips": [],
+            "collectStrayEyebrows": [],
+            "collectStrayH1s": [],
+            "collectStrayInputs": []
+          },
+          "text3Offenders": 0,
+          "accentUsers": 0
+        },
+        "terminal": {
+          "system": "terminal",
+          "accent": "matrix",
+          "applyFn": "function",
+          "nSystems": 5,
+          "nAccents": 10,
+          "bg": "#000",
+          "page": true,
+          "grain": true,
+          "atmosphere": true,
+          "fonts": {
+            "display": "IBM Plex Mono",
+            "displayOk": true,
+            "body": "IBM Plex Mono",
+            "bodyOk": true
+          },
+          "skin": true,
+          "strays": {
+            "collectStrayButtons": [],
+            "collectStrayCards": [],
+            "collectStrayChips": [],
+            "collectStrayEyebrows": [],
+            "collectStrayH1s": [],
+            "collectStrayInputs": []
+          },
+          "text3Offenders": 0,
+          "accentUsers": 0
+        },
+        "geist": {
+          "system": "geist",
+          "accent": "cyan",
+          "applyFn": "function",
+          "nSystems": 5,
+          "nAccents": 10,
+          "bg": "#000",
+          "page": true,
+          "grain": true,
+          "atmosphere": true,
+          "fonts": {
+            "display": "Geist",
+            "displayOk": true,
+            "body": "Geist",
+            "bodyOk": true
+          },
+          "skin": true,
+          "strays": {
+            "collectStrayButtons": [],
+            "collectStrayCards": [],
+            "collectStrayChips": [],
+            "collectStrayEyebrows": [],
+            "collectStrayH1s": [],
+            "collectStrayInputs": []
+          },
+          "text3Offenders": 0,
+          "accentUsers": 0
+        },
+        "brutalist": {
+          "system": "brutalist",
+          "accent": "amber",
+          "applyFn": "function",
+          "nSystems": 5,
+          "nAccents": 10,
+          "bg": "#000",
+          "page": true,
+          "grain": true,
+          "atmosphere": true,
+          "fonts": {
+            "display": "Instrument Serif",
+            "displayOk": true,
+            "body": "Space Grotesk",
+            "bodyOk": true
+          },
+          "skin": true,
+          "strays": {
+            "collectStrayButtons": [],
+            "collectStrayCards": [],
+            "collectStrayChips": [],
+            "collectStrayEyebrows": [],
+            "collectStrayH1s": [],
+            "collectStrayInputs": []
+          },
+          "text3Offenders": 0,
+          "accentUsers": 0
+        },
+        "swiss": {
+          "system": "swiss",
+          "accent": "orange",
+          "applyFn": "function",
+          "nSystems": 5,
+          "nAccents": 10,
+          "bg": "#000",
+          "page": true,
+          "grain": true,
+          "atmosphere": true,
+          "fonts": {
+            "display": "Manrope",
+            "displayOk": true,
+            "body": "Manrope",
+            "bodyOk": true
+          },
+          "skin": true,
+          "strays": {
+            "collectStrayButtons": [],
+            "collectStrayCards": [],
+            "collectStrayChips": [],
+            "collectStrayEyebrows": [],
+            "collectStrayH1s": [],
+            "collectStrayInputs": []
+          },
+          "text3Offenders": 0,
+          "accentUsers": 0
+        }
+      }
+    },
+    "not-found@1440": {
+      "status": 404,
+      "url": "http://127.0.0.1:5055/this-route-does-not-exist-404",
+      "systems": {
+        "editorial": {
+          "system": "editorial",
+          "accent": "crimson",
+          "applyFn": "function",
+          "nSystems": 5,
+          "nAccents": 10,
+          "bg": "#000",
+          "page": true,
+          "grain": true,
+          "atmosphere": true,
+          "fonts": {
+            "display": "Fraunces",
+            "displayOk": true,
+            "body": "Inter",
+            "bodyOk": true
+          },
+          "skin": true,
+          "strays": {
+            "collectStrayButtons": [],
+            "collectStrayCards": [],
+            "collectStrayChips": [],
+            "collectStrayEyebrows": [],
+            "collectStrayH1s": [],
+            "collectStrayInputs": []
+          },
+          "text3Offenders": 0,
+          "accentUsers": 0
+        },
+        "terminal": {
+          "system": "terminal",
+          "accent": "matrix",
+          "applyFn": "function",
+          "nSystems": 5,
+          "nAccents": 10,
+          "bg": "#000",
+          "page": true,
+          "grain": true,
+          "atmosphere": true,
+          "fonts": {
+            "display": "IBM Plex Mono",
+            "displayOk": true,
+            "body": "IBM Plex Mono",
+            "bodyOk": true
+          },
+          "skin": true,
+          "strays": {
+            "collectStrayButtons": [],
+            "collectStrayCards": [],
+            "collectStrayChips": [],
+            "collectStrayEyebrows": [],
+            "collectStrayH1s": [],
+            "collectStrayInputs": []
+          },
+          "text3Offenders": 0,
+          "accentUsers": 0
+        },
+        "geist": {
+          "system": "geist",
+          "accent": "cyan",
+          "applyFn": "function",
+          "nSystems": 5,
+          "nAccents": 10,
+          "bg": "#000",
+          "page": true,
+          "grain": true,
+          "atmosphere": true,
+          "fonts": {
+            "display": "Geist",
+            "displayOk": true,
+            "body": "Geist",
+            "bodyOk": true
+          },
+          "skin": true,
+          "strays": {
+            "collectStrayButtons": [],
+            "collectStrayCards": [],
+            "collectStrayChips": [],
+            "collectStrayEyebrows": [],
+            "collectStrayH1s": [],
+            "collectStrayInputs": []
+          },
+          "text3Offenders": 0,
+          "accentUsers": 0
+        },
+        "brutalist": {
+          "system": "brutalist",
+          "accent": "amber",
+          "applyFn": "function",
+          "nSystems": 5,
+          "nAccents": 10,
+          "bg": "#000",
+          "page": true,
+          "grain": true,
+          "atmosphere": true,
+          "fonts": {
+            "display": "Instrument Serif",
+            "displayOk": true,
+            "body": "Space Grotesk",
+            "bodyOk": true
+          },
+          "skin": true,
+          "strays": {
+            "collectStrayButtons": [],
+            "collectStrayCards": [],
+            "collectStrayChips": [],
+            "collectStrayEyebrows": [],
+            "collectStrayH1s": [],
+            "collectStrayInputs": []
+          },
+          "text3Offenders": 0,
+          "accentUsers": 0
+        },
+        "swiss": {
+          "system": "swiss",
+          "accent": "orange",
+          "applyFn": "function",
+          "nSystems": 5,
+          "nAccents": 10,
+          "bg": "#000",
+          "page": true,
+          "grain": true,
+          "atmosphere": true,
+          "fonts": {
+            "display": "Manrope",
+            "displayOk": true,
+            "body": "Manrope",
+            "bodyOk": true
+          },
+          "skin": true,
+          "strays": {
+            "collectStrayButtons": [],
+            "collectStrayCards": [],
+            "collectStrayChips": [],
+            "collectStrayEyebrows": [],
+            "collectStrayH1s": [],
+            "collectStrayInputs": []
+          },
+          "text3Offenders": 0,
+          "accentUsers": 0
+        }
+      }
+    },
+    "home@375": {
+      "status": 200,
+      "url": "http://127.0.0.1:5055/",
+      "systems": {
+        "editorial": {
+          "system": "editorial",
+          "accent": "crimson",
+          "applyFn": "function",
+          "nSystems": 5,
+          "nAccents": 10,
+          "bg": "#000",
+          "page": true,
+          "grain": true,
+          "atmosphere": true,
+          "fonts": {
+            "display": "Fraunces",
+            "displayOk": true,
+            "body": "Inter",
+            "bodyOk": true
+          },
+          "skin": true,
+          "strays": {
+            "collectStrayButtons": [],
+            "collectStrayCards": [],
+            "collectStrayChips": [],
+            "collectStrayEyebrows": [],
+            "collectStrayH1s": [],
+            "collectStrayInputs": []
+          },
+          "text3Offenders": 0,
+          "accentUsers": 0
+        },
+        "terminal": {
+          "system": "terminal",
+          "accent": "matrix",
+          "applyFn": "function",
+          "nSystems": 5,
+          "nAccents": 10,
+          "bg": "#000",
+          "page": true,
+          "grain": true,
+          "atmosphere": true,
+          "fonts": {
+            "display": "IBM Plex Mono",
+            "displayOk": true,
+            "body": "IBM Plex Mono",
+            "bodyOk": true
+          },
+          "skin": true,
+          "strays": {
+            "collectStrayButtons": [],
+            "collectStrayCards": [],
+            "collectStrayChips": [],
+            "collectStrayEyebrows": [],
+            "collectStrayH1s": [],
+            "collectStrayInputs": []
+          },
+          "text3Offenders": 0,
+          "accentUsers": 0
+        },
+        "geist": {
+          "system": "geist",
+          "accent": "cyan",
+          "applyFn": "function",
+          "nSystems": 5,
+          "nAccents": 10,
+          "bg": "#000",
+          "page": true,
+          "grain": true,
+          "atmosphere": true,
+          "fonts": {
+            "display": "Geist",
+            "displayOk": true,
+            "body": "Geist",
+            "bodyOk": true
+          },
+          "skin": true,
+          "strays": {
+            "collectStrayButtons": [],
+            "collectStrayCards": [],
+            "collectStrayChips": [],
+            "collectStrayEyebrows": [],
+            "collectStrayH1s": [],
+            "collectStrayInputs": []
+          },
+          "text3Offenders": 0,
+          "accentUsers": 0
+        },
+        "brutalist": {
+          "system": "brutalist",
+          "accent": "amber",
+          "applyFn": "function",
+          "nSystems": 5,
+          "nAccents": 10,
+          "bg": "#000",
+          "page": true,
+          "grain": true,
+          "atmosphere": true,
+          "fonts": {
+            "display": "Instrument Serif",
+            "displayOk": true,
+            "body": "Space Grotesk",
+            "bodyOk": true
+          },
+          "skin": true,
+          "strays": {
+            "collectStrayButtons": [],
+            "collectStrayCards": [],
+            "collectStrayChips": [],
+            "collectStrayEyebrows": [],
+            "collectStrayH1s": [],
+            "collectStrayInputs": []
+          },
+          "text3Offenders": 0,
+          "accentUsers": 0
+        },
+        "swiss": {
+          "system": "swiss",
+          "accent": "orange",
+          "applyFn": "function",
+          "nSystems": 5,
+          "nAccents": 10,
+          "bg": "#000",
+          "page": true,
+          "grain": true,
+          "atmosphere": true,
+          "fonts": {
+            "display": "Manrope",
+            "displayOk": true,
+            "body": "Manrope",
+            "bodyOk": true
+          },
+          "skin": true,
+          "strays": {
+            "collectStrayButtons": [],
+            "collectStrayCards": [],
+            "collectStrayChips": [],
+            "collectStrayEyebrows": [],
+            "collectStrayH1s": [],
+            "collectStrayInputs": []
+          },
+          "text3Offenders": 0,
+          "accentUsers": 0
+        }
+      }
+    },
+    "about@375": {
+      "status": 200,
+      "url": "http://127.0.0.1:5055/about",
+      "systems": {
+        "editorial": {
+          "system": "editorial",
+          "accent": "crimson",
+          "applyFn": "function",
+          "nSystems": 5,
+          "nAccents": 10,
+          "bg": "#000",
+          "page": true,
+          "grain": true,
+          "atmosphere": true,
+          "fonts": {
+            "display": "Fraunces",
+            "displayOk": true,
+            "body": "Inter",
+            "bodyOk": true
+          },
+          "skin": true,
+          "strays": {
+            "collectStrayButtons": [],
+            "collectStrayCards": [],
+            "collectStrayChips": [],
+            "collectStrayEyebrows": [],
+            "collectStrayH1s": [],
+            "collectStrayInputs": []
+          },
+          "text3Offenders": 0,
+          "accentUsers": 0
+        },
+        "terminal": {
+          "system": "terminal",
+          "accent": "matrix",
+          "applyFn": "function",
+          "nSystems": 5,
+          "nAccents": 10,
+          "bg": "#000",
+          "page": true,
+          "grain": true,
+          "atmosphere": true,
+          "fonts": {
+            "display": "IBM Plex Mono",
+            "displayOk": true,
+            "body": "IBM Plex Mono",
+            "bodyOk": true
+          },
+          "skin": true,
+          "strays": {
+            "collectStrayButtons": [],
+            "collectStrayCards": [],
+            "collectStrayChips": [],
+            "collectStrayEyebrows": [],
+            "collectStrayH1s": [],
+            "collectStrayInputs": []
+          },
+          "text3Offenders": 0,
+          "accentUsers": 0
+        },
+        "geist": {
+          "system": "geist",
+          "accent": "cyan",
+          "applyFn": "function",
+          "nSystems": 5,
+          "nAccents": 10,
+          "bg": "#000",
+          "page": true,
+          "grain": true,
+          "atmosphere": true,
+          "fonts": {
+            "display": "Geist",
+            "displayOk": true,
+            "body": "Geist",
+            "bodyOk": true
+          },
+          "skin": true,
+          "strays": {
+            "collectStrayButtons": [],
+            "collectStrayCards": [],
+            "collectStrayChips": [],
+            "collectStrayEyebrows": [],
+            "collectStrayH1s": [],
+            "collectStrayInputs": []
+          },
+          "text3Offenders": 0,
+          "accentUsers": 0
+        },
+        "brutalist": {
+          "system": "brutalist",
+          "accent": "amber",
+          "applyFn": "function",
+          "nSystems": 5,
+          "nAccents": 10,
+          "bg": "#000",
+          "page": true,
+          "grain": true,
+          "atmosphere": true,
+          "fonts": {
+            "display": "Instrument Serif",
+            "displayOk": true,
+            "body": "Space Grotesk",
+            "bodyOk": true
+          },
+          "skin": true,
+          "strays": {
+            "collectStrayButtons": [],
+            "collectStrayCards": [],
+            "collectStrayChips": [],
+            "collectStrayEyebrows": [],
+            "collectStrayH1s": [],
+            "collectStrayInputs": []
+          },
+          "text3Offenders": 0,
+          "accentUsers": 0
+        },
+        "swiss": {
+          "system": "swiss",
+          "accent": "orange",
+          "applyFn": "function",
+          "nSystems": 5,
+          "nAccents": 10,
+          "bg": "#000",
+          "page": true,
+          "grain": true,
+          "atmosphere": true,
+          "fonts": {
+            "display": "Manrope",
+            "displayOk": true,
+            "body": "Manrope",
+            "bodyOk": true
+          },
+          "skin": true,
+          "strays": {
+            "collectStrayButtons": [],
+            "collectStrayCards": [],
+            "collectStrayChips": [],
+            "collectStrayEyebrows": [],
+            "collectStrayH1s": [],
+            "collectStrayInputs": []
+          },
+          "text3Offenders": 0,
+          "accentUsers": 0
+        }
+      }
+    },
+    "journeys@375": {
+      "status": 200,
+      "url": "http://127.0.0.1:5055/journeys",
+      "systems": {
+        "editorial": {
+          "system": "editorial",
+          "accent": "crimson",
+          "applyFn": "function",
+          "nSystems": 5,
+          "nAccents": 10,
+          "bg": "#000",
+          "page": true,
+          "grain": true,
+          "atmosphere": true,
+          "fonts": {
+            "display": "Fraunces",
+            "displayOk": true,
+            "body": "Inter",
+            "bodyOk": true
+          },
+          "skin": true,
+          "strays": {
+            "collectStrayButtons": [],
+            "collectStrayCards": [],
+            "collectStrayChips": [],
+            "collectStrayEyebrows": [],
+            "collectStrayH1s": [],
+            "collectStrayInputs": []
+          },
+          "text3Offenders": 0,
+          "accentUsers": 0
+        },
+        "terminal": {
+          "system": "terminal",
+          "accent": "matrix",
+          "applyFn": "function",
+          "nSystems": 5,
+          "nAccents": 10,
+          "bg": "#000",
+          "page": true,
+          "grain": true,
+          "atmosphere": true,
+          "fonts": {
+            "display": "IBM Plex Mono",
+            "displayOk": true,
+            "body": "IBM Plex Mono",
+            "bodyOk": true
+          },
+          "skin": true,
+          "strays": {
+            "collectStrayButtons": [],
+            "collectStrayCards": [],
+            "collectStrayChips": [],
+            "collectStrayEyebrows": [],
+            "collectStrayH1s": [],
+            "collectStrayInputs": []
+          },
+          "text3Offenders": 0,
+          "accentUsers": 0
+        },
+        "geist": {
+          "system": "geist",
+          "accent": "cyan",
+          "applyFn": "function",
+          "nSystems": 5,
+          "nAccents": 10,
+          "bg": "#000",
+          "page": true,
+          "grain": true,
+          "atmosphere": true,
+          "fonts": {
+            "display": "Geist",
+            "displayOk": true,
+            "body": "Geist",
+            "bodyOk": true
+          },
+          "skin": true,
+          "strays": {
+            "collectStrayButtons": [],
+            "collectStrayCards": [],
+            "collectStrayChips": [],
+            "collectStrayEyebrows": [],
+            "collectStrayH1s": [],
+            "collectStrayInputs": []
+          },
+          "text3Offenders": 0,
+          "accentUsers": 0
+        },
+        "brutalist": {
+          "system": "brutalist",
+          "accent": "amber",
+          "applyFn": "function",
+          "nSystems": 5,
+          "nAccents": 10,
+          "bg": "#000",
+          "page": true,
+          "grain": true,
+          "atmosphere": true,
+          "fonts": {
+            "display": "Instrument Serif",
+            "displayOk": true,
+            "body": "Space Grotesk",
+            "bodyOk": true
+          },
+          "skin": true,
+          "strays": {
+            "collectStrayButtons": [],
+            "collectStrayCards": [],
+            "collectStrayChips": [],
+            "collectStrayEyebrows": [],
+            "collectStrayH1s": [],
+            "collectStrayInputs": []
+          },
+          "text3Offenders": 0,
+          "accentUsers": 0
+        },
+        "swiss": {
+          "system": "swiss",
+          "accent": "orange",
+          "applyFn": "function",
+          "nSystems": 5,
+          "nAccents": 10,
+          "bg": "#000",
+          "page": true,
+          "grain": true,
+          "atmosphere": true,
+          "fonts": {
+            "display": "Manrope",
+            "displayOk": true,
+            "body": "Manrope",
+            "bodyOk": true
+          },
+          "skin": true,
+          "strays": {
+            "collectStrayButtons": [],
+            "collectStrayCards": [],
+            "collectStrayChips": [],
+            "collectStrayEyebrows": [],
+            "collectStrayH1s": [],
+            "collectStrayInputs": []
+          },
+          "text3Offenders": 0,
+          "accentUsers": 0
+        }
+      }
+    },
+    "category@375": {
+      "status": 200,
+      "url": "http://127.0.0.1:5055/category/community-events",
+      "systems": {
+        "editorial": {
+          "system": "editorial",
+          "accent": "crimson",
+          "applyFn": "function",
+          "nSystems": 5,
+          "nAccents": 10,
+          "bg": "#000",
+          "page": true,
+          "grain": true,
+          "atmosphere": true,
+          "fonts": {
+            "display": "Fraunces",
+            "displayOk": true,
+            "body": "Inter",
+            "bodyOk": true
+          },
+          "skin": true,
+          "strays": {
+            "collectStrayButtons": [],
+            "collectStrayCards": [],
+            "collectStrayChips": [],
+            "collectStrayEyebrows": [],
+            "collectStrayH1s": [],
+            "collectStrayInputs": []
+          },
+          "text3Offenders": 0,
+          "accentUsers": 0
+        },
+        "terminal": {
+          "system": "terminal",
+          "accent": "matrix",
+          "applyFn": "function",
+          "nSystems": 5,
+          "nAccents": 10,
+          "bg": "#000",
+          "page": true,
+          "grain": true,
+          "atmosphere": true,
+          "fonts": {
+            "display": "IBM Plex Mono",
+            "displayOk": true,
+            "body": "IBM Plex Mono",
+            "bodyOk": true
+          },
+          "skin": true,
+          "strays": {
+            "collectStrayButtons": [],
+            "collectStrayCards": [],
+            "collectStrayChips": [],
+            "collectStrayEyebrows": [],
+            "collectStrayH1s": [],
+            "collectStrayInputs": []
+          },
+          "text3Offenders": 0,
+          "accentUsers": 0
+        },
+        "geist": {
+          "system": "geist",
+          "accent": "cyan",
+          "applyFn": "function",
+          "nSystems": 5,
+          "nAccents": 10,
+          "bg": "#000",
+          "page": true,
+          "grain": true,
+          "atmosphere": true,
+          "fonts": {
+            "display": "Geist",
+            "displayOk": true,
+            "body": "Geist",
+            "bodyOk": true
+          },
+          "skin": true,
+          "strays": {
+            "collectStrayButtons": [],
+            "collectStrayCards": [],
+            "collectStrayChips": [],
+            "collectStrayEyebrows": [],
+            "collectStrayH1s": [],
+            "collectStrayInputs": []
+          },
+          "text3Offenders": 0,
+          "accentUsers": 0
+        },
+        "brutalist": {
+          "system": "brutalist",
+          "accent": "amber",
+          "applyFn": "function",
+          "nSystems": 5,
+          "nAccents": 10,
+          "bg": "#000",
+          "page": true,
+          "grain": true,
+          "atmosphere": true,
+          "fonts": {
+            "display": "Instrument Serif",
+            "displayOk": true,
+            "body": "Space Grotesk",
+            "bodyOk": true
+          },
+          "skin": true,
+          "strays": {
+            "collectStrayButtons": [],
+            "collectStrayCards": [],
+            "collectStrayChips": [],
+            "collectStrayEyebrows": [],
+            "collectStrayH1s": [],
+            "collectStrayInputs": []
+          },
+          "text3Offenders": 0,
+          "accentUsers": 0
+        },
+        "swiss": {
+          "system": "swiss",
+          "accent": "orange",
+          "applyFn": "function",
+          "nSystems": 5,
+          "nAccents": 10,
+          "bg": "#000",
+          "page": true,
+          "grain": true,
+          "atmosphere": true,
+          "fonts": {
+            "display": "Manrope",
+            "displayOk": true,
+            "body": "Manrope",
+            "bodyOk": true
+          },
+          "skin": true,
+          "strays": {
+            "collectStrayButtons": [],
+            "collectStrayCards": [],
+            "collectStrayChips": [],
+            "collectStrayEyebrows": [],
+            "collectStrayH1s": [],
+            "collectStrayInputs": []
+          },
+          "text3Offenders": 0,
+          "accentUsers": 0
+        }
+      }
+    },
+    "resource@375": {
+      "status": 200,
+      "url": "http://127.0.0.1:5055/resource/188015",
+      "systems": {
+        "editorial": {
+          "system": "editorial",
+          "accent": "crimson",
+          "applyFn": "function",
+          "nSystems": 5,
+          "nAccents": 10,
+          "bg": "#000",
+          "page": true,
+          "grain": true,
+          "atmosphere": true,
+          "fonts": {
+            "display": "Fraunces",
+            "displayOk": true,
+            "body": "Inter",
+            "bodyOk": true
+          },
+          "skin": true,
+          "strays": {
+            "collectStrayButtons": [],
+            "collectStrayCards": [],
+            "collectStrayChips": [],
+            "collectStrayEyebrows": [],
+            "collectStrayH1s": [],
+            "collectStrayInputs": []
+          },
+          "text3Offenders": 0,
+          "accentUsers": 0
+        },
+        "terminal": {
+          "system": "terminal",
+          "accent": "matrix",
+          "applyFn": "function",
+          "nSystems": 5,
+          "nAccents": 10,
+          "bg": "#000",
+          "page": true,
+          "grain": true,
+          "atmosphere": true,
+          "fonts": {
+            "display": "IBM Plex Mono",
+            "displayOk": true,
+            "body": "IBM Plex Mono",
+            "bodyOk": true
+          },
+          "skin": true,
+          "strays": {
+            "collectStrayButtons": [],
+            "collectStrayCards": [],
+            "collectStrayChips": [],
+            "collectStrayEyebrows": [],
+            "collectStrayH1s": [],
+            "collectStrayInputs": []
+          },
+          "text3Offenders": 0,
+          "accentUsers": 0
+        },
+        "geist": {
+          "system": "geist",
+          "accent": "cyan",
+          "applyFn": "function",
+          "nSystems": 5,
+          "nAccents": 10,
+          "bg": "#000",
+          "page": true,
+          "grain": true,
+          "atmosphere": true,
+          "fonts": {
+            "display": "Geist",
+            "displayOk": true,
+            "body": "Geist",
+            "bodyOk": true
+          },
+          "skin": true,
+          "strays": {
+            "collectStrayButtons": [],
+            "collectStrayCards": [],
+            "collectStrayChips": [],
+            "collectStrayEyebrows": [],
+            "collectStrayH1s": [],
+            "collectStrayInputs": []
+          },
+          "text3Offenders": 0,
+          "accentUsers": 0
+        },
+        "brutalist": {
+          "system": "brutalist",
+          "accent": "amber",
+          "applyFn": "function",
+          "nSystems": 5,
+          "nAccents": 10,
+          "bg": "#000",
+          "page": true,
+          "grain": true,
+          "atmosphere": true,
+          "fonts": {
+            "display": "Instrument Serif",
+            "displayOk": true,
+            "body": "Space Grotesk",
+            "bodyOk": true
+          },
+          "skin": true,
+          "strays": {
+            "collectStrayButtons": [],
+            "collectStrayCards": [],
+            "collectStrayChips": [],
+            "collectStrayEyebrows": [],
+            "collectStrayH1s": [],
+            "collectStrayInputs": []
+          },
+          "text3Offenders": 0,
+          "accentUsers": 0
+        },
+        "swiss": {
+          "system": "swiss",
+          "accent": "orange",
+          "applyFn": "function",
+          "nSystems": 5,
+          "nAccents": 10,
+          "bg": "#000",
+          "page": true,
+          "grain": true,
+          "atmosphere": true,
+          "fonts": {
+            "display": "Manrope",
+            "displayOk": true,
+            "body": "Manrope",
+            "bodyOk": true
+          },
+          "skin": true,
+          "strays": {
+            "collectStrayButtons": [],
+            "collectStrayCards": [],
+            "collectStrayChips": [],
+            "collectStrayEyebrows": [],
+            "collectStrayH1s": [],
+            "collectStrayInputs": []
+          },
+          "text3Offenders": 0,
+          "accentUsers": 0
+        }
+      }
+    },
+    "login@375": {
+      "status": 200,
+      "url": "http://127.0.0.1:5055/sign-in",
+      "systems": {
+        "editorial": {
+          "system": "editorial",
+          "accent": "crimson",
+          "applyFn": "function",
+          "nSystems": 5,
+          "nAccents": 10,
+          "bg": "#000",
+          "page": true,
+          "grain": true,
+          "atmosphere": true,
+          "fonts": {
+            "display": "Fraunces",
+            "displayOk": true,
+            "body": "Inter",
+            "bodyOk": true
+          },
+          "skin": true,
+          "strays": {
+            "collectStrayButtons": [],
+            "collectStrayCards": [],
+            "collectStrayChips": [],
+            "collectStrayEyebrows": [],
+            "collectStrayH1s": [],
+            "collectStrayInputs": []
+          },
+          "text3Offenders": 0,
+          "accentUsers": 0
+        },
+        "terminal": {
+          "system": "terminal",
+          "accent": "matrix",
+          "applyFn": "function",
+          "nSystems": 5,
+          "nAccents": 10,
+          "bg": "#000",
+          "page": true,
+          "grain": true,
+          "atmosphere": true,
+          "fonts": {
+            "display": "IBM Plex Mono",
+            "displayOk": true,
+            "body": "IBM Plex Mono",
+            "bodyOk": true
+          },
+          "skin": true,
+          "strays": {
+            "collectStrayButtons": [],
+            "collectStrayCards": [],
+            "collectStrayChips": [],
+            "collectStrayEyebrows": [],
+            "collectStrayH1s": [],
+            "collectStrayInputs": []
+          },
+          "text3Offenders": 0,
+          "accentUsers": 0
+        },
+        "geist": {
+          "system": "geist",
+          "accent": "cyan",
+          "applyFn": "function",
+          "nSystems": 5,
+          "nAccents": 10,
+          "bg": "#000",
+          "page": true,
+          "grain": true,
+          "atmosphere": true,
+          "fonts": {
+            "display": "Geist",
+            "displayOk": true,
+            "body": "Geist",
+            "bodyOk": true
+          },
+          "skin": true,
+          "strays": {
+            "collectStrayButtons": [],
+            "collectStrayCards": [],
+            "collectStrayChips": [],
+            "collectStrayEyebrows": [],
+            "collectStrayH1s": [],
+            "collectStrayInputs": []
+          },
+          "text3Offenders": 0,
+          "accentUsers": 0
+        },
+        "brutalist": {
+          "system": "brutalist",
+          "accent": "amber",
+          "applyFn": "function",
+          "nSystems": 5,
+          "nAccents": 10,
+          "bg": "#000",
+          "page": true,
+          "grain": true,
+          "atmosphere": true,
+          "fonts": {
+            "display": "Instrument Serif",
+            "displayOk": true,
+            "body": "Space Grotesk",
+            "bodyOk": true
+          },
+          "skin": true,
+          "strays": {
+            "collectStrayButtons": [],
+            "collectStrayCards": [],
+            "collectStrayChips": [],
+            "collectStrayEyebrows": [],
+            "collectStrayH1s": [],
+            "collectStrayInputs": []
+          },
+          "text3Offenders": 0,
+          "accentUsers": 0
+        },
+        "swiss": {
+          "system": "swiss",
+          "accent": "orange",
+          "applyFn": "function",
+          "nSystems": 5,
+          "nAccents": 10,
+          "bg": "#000",
+          "page": true,
+          "grain": true,
+          "atmosphere": true,
+          "fonts": {
+            "display": "Manrope",
+            "displayOk": true,
+            "body": "Manrope",
+            "bodyOk": true
+          },
+          "skin": true,
+          "strays": {
+            "collectStrayButtons": [],
+            "collectStrayCards": [],
+            "collectStrayChips": [],
+            "collectStrayEyebrows": [],
+            "collectStrayH1s": [],
+            "collectStrayInputs": []
+          },
+          "text3Offenders": 0,
+          "accentUsers": 0
+        }
+      }
+    },
+    "settings-theme@375": {
+      "status": 200,
+      "url": "http://127.0.0.1:5055/settings/theme",
+      "systems": {
+        "editorial": {
+          "system": "editorial",
+          "accent": "crimson",
+          "applyFn": "function",
+          "nSystems": 5,
+          "nAccents": 10,
+          "bg": "#000",
+          "page": true,
+          "grain": true,
+          "atmosphere": true,
+          "fonts": {
+            "display": "Fraunces",
+            "displayOk": true,
+            "body": "Inter",
+            "bodyOk": true
+          },
+          "skin": true,
+          "strays": {
+            "collectStrayButtons": [],
+            "collectStrayCards": [],
+            "collectStrayChips": [],
+            "collectStrayEyebrows": [],
+            "collectStrayH1s": [],
+            "collectStrayInputs": []
+          },
+          "text3Offenders": 0,
+          "accentUsers": 0
+        },
+        "terminal": {
+          "system": "terminal",
+          "accent": "matrix",
+          "applyFn": "function",
+          "nSystems": 5,
+          "nAccents": 10,
+          "bg": "#000",
+          "page": true,
+          "grain": true,
+          "atmosphere": true,
+          "fonts": {
+            "display": "IBM Plex Mono",
+            "displayOk": true,
+            "body": "IBM Plex Mono",
+            "bodyOk": true
+          },
+          "skin": true,
+          "strays": {
+            "collectStrayButtons": [],
+            "collectStrayCards": [],
+            "collectStrayChips": [],
+            "collectStrayEyebrows": [],
+            "collectStrayH1s": [],
+            "collectStrayInputs": []
+          },
+          "text3Offenders": 0,
+          "accentUsers": 0
+        },
+        "geist": {
+          "system": "geist",
+          "accent": "cyan",
+          "applyFn": "function",
+          "nSystems": 5,
+          "nAccents": 10,
+          "bg": "#000",
+          "page": true,
+          "grain": true,
+          "atmosphere": true,
+          "fonts": {
+            "display": "Geist",
+            "displayOk": true,
+            "body": "Geist",
+            "bodyOk": true
+          },
+          "skin": true,
+          "strays": {
+            "collectStrayButtons": [],
+            "collectStrayCards": [],
+            "collectStrayChips": [],
+            "collectStrayEyebrows": [],
+            "collectStrayH1s": [],
+            "collectStrayInputs": []
+          },
+          "text3Offenders": 0,
+          "accentUsers": 0
+        },
+        "brutalist": {
+          "system": "brutalist",
+          "accent": "amber",
+          "applyFn": "function",
+          "nSystems": 5,
+          "nAccents": 10,
+          "bg": "#000",
+          "page": true,
+          "grain": true,
+          "atmosphere": true,
+          "fonts": {
+            "display": "Instrument Serif",
+            "displayOk": true,
+            "body": "Space Grotesk",
+            "bodyOk": true
+          },
+          "skin": true,
+          "strays": {
+            "collectStrayButtons": [],
+            "collectStrayCards": [],
+            "collectStrayChips": [],
+            "collectStrayEyebrows": [],
+            "collectStrayH1s": [],
+            "collectStrayInputs": []
+          },
+          "text3Offenders": 0,
+          "accentUsers": 0
+        },
+        "swiss": {
+          "system": "swiss",
+          "accent": "orange",
+          "applyFn": "function",
+          "nSystems": 5,
+          "nAccents": 10,
+          "bg": "#000",
+          "page": true,
+          "grain": true,
+          "atmosphere": true,
+          "fonts": {
+            "display": "Manrope",
+            "displayOk": true,
+            "body": "Manrope",
+            "bodyOk": true
+          },
+          "skin": true,
+          "strays": {
+            "collectStrayButtons": [],
+            "collectStrayCards": [],
+            "collectStrayChips": [],
+            "collectStrayEyebrows": [],
+            "collectStrayH1s": [],
+            "collectStrayInputs": []
+          },
+          "text3Offenders": 0,
+          "accentUsers": 0
+        }
+      }
+    },
+    "not-found@375": {
+      "status": 404,
+      "url": "http://127.0.0.1:5055/this-route-does-not-exist-404",
+      "systems": {
+        "editorial": {
+          "system": "editorial",
+          "accent": "crimson",
+          "applyFn": "function",
+          "nSystems": 5,
+          "nAccents": 10,
+          "bg": "#000",
+          "page": true,
+          "grain": true,
+          "atmosphere": true,
+          "fonts": {
+            "display": "Fraunces",
+            "displayOk": true,
+            "body": "Inter",
+            "bodyOk": true
+          },
+          "skin": true,
+          "strays": {
+            "collectStrayButtons": [],
+            "collectStrayCards": [],
+            "collectStrayChips": [],
+            "collectStrayEyebrows": [],
+            "collectStrayH1s": [],
+            "collectStrayInputs": []
+          },
+          "text3Offenders": 0,
+          "accentUsers": 0
+        },
+        "terminal": {
+          "system": "terminal",
+          "accent": "matrix",
+          "applyFn": "function",
+          "nSystems": 5,
+          "nAccents": 10,
+          "bg": "#000",
+          "page": true,
+          "grain": true,
+          "atmosphere": true,
+          "fonts": {
+            "display": "IBM Plex Mono",
+            "displayOk": true,
+            "body": "IBM Plex Mono",
+            "bodyOk": true
+          },
+          "skin": true,
+          "strays": {
+            "collectStrayButtons": [],
+            "collectStrayCards": [],
+            "collectStrayChips": [],
+            "collectStrayEyebrows": [],
+            "collectStrayH1s": [],
+            "collectStrayInputs": []
+          },
+          "text3Offenders": 0,
+          "accentUsers": 0
+        },
+        "geist": {
+          "system": "geist",
+          "accent": "cyan",
+          "applyFn": "function",
+          "nSystems": 5,
+          "nAccents": 10,
+          "bg": "#000",
+          "page": true,
+          "grain": true,
+          "atmosphere": true,
+          "fonts": {
+            "display": "Geist",
+            "displayOk": true,
+            "body": "Geist",
+            "bodyOk": true
+          },
+          "skin": true,
+          "strays": {
+            "collectStrayButtons": [],
+            "collectStrayCards": [],
+            "collectStrayChips": [],
+            "collectStrayEyebrows": [],
+            "collectStrayH1s": [],
+            "collectStrayInputs": []
+          },
+          "text3Offenders": 0,
+          "accentUsers": 0
+        },
+        "brutalist": {
+          "system": "brutalist",
+          "accent": "amber",
+          "applyFn": "function",
+          "nSystems": 5,
+          "nAccents": 10,
+          "bg": "#000",
+          "page": true,
+          "grain": true,
+          "atmosphere": true,
+          "fonts": {
+            "display": "Instrument Serif",
+            "displayOk": true,
+            "body": "Space Grotesk",
+            "bodyOk": true
+          },
+          "skin": true,
+          "strays": {
+            "collectStrayButtons": [],
+            "collectStrayCards": [],
+            "collectStrayChips": [],
+            "collectStrayEyebrows": [],
+            "collectStrayH1s": [],
+            "collectStrayInputs": []
+          },
+          "text3Offenders": 0,
+          "accentUsers": 0
+        },
+        "swiss": {
+          "system": "swiss",
+          "accent": "orange",
+          "applyFn": "function",
+          "nSystems": 5,
+          "nAccents": 10,
+          "bg": "#000",
+          "page": true,
+          "grain": true,
+          "atmosphere": true,
+          "fonts": {
+            "display": "Manrope",
+            "displayOk": true,
+            "body": "Manrope",
+            "bodyOk": true
+          },
+          "skin": true,
+          "strays": {
+            "collectStrayButtons": [],
+            "collectStrayCards": [],
+            "collectStrayChips": [],
+            "collectStrayEyebrows": [],
+            "collectStrayH1s": [],
+            "collectStrayInputs": []
+          },
+          "text3Offenders": 0,
+          "accentUsers": 0
+        }
+      }
+    }
+  },
+  "findings": []
+}

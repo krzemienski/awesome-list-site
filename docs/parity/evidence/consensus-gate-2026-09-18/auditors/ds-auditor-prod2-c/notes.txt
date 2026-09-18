@@ -1,0 +1,13 @@
+Audit target: http://127.0.0.1:5055
+Commit: e834be72b736cf0ca3596dcd89f8a3954b99d3a3
+Coverage: 8 screens x 2 widths x 5 systems; 80 matrix captures.
+Discovered routes: /category/community-events and /resource/185563.
+Stage 3: one qualifying synchronous inline head boot; fresh editorial/crimson at 67.5/67.5 ms <= first paint 284 ms; saved terminal/matrix at 40/40 ms <= first paint 176 ms.
+Stage 5: palette-drift passed all detector canaries and found zero unexempted matches. Raw documented rg output includes DS-OK-exempt values and issue references; the canonical detector classified zero violations.
+Stage 6: all six executable filters returned zero hits for all 80 combinations.
+Stage 7: literal accent-user scan returned 0 in each combination. Real hover captures were made for a primary button and card; a real Tab focus capture was also made.
+Stage 8: zero long-copy text-3 offenders.
+Stage 9: all display/body document.fonts.load proofs loaded in all combinations.
+Stage 10: source counts are 80 system selectors and 26 data-ds lines; active rules were reachable in all combinations.
+Stage 11: no duplicate screenshot hashes within any screen/width system set. Representative image inspection showed distinct Editorial, Terminal, and Brutalist typography, borders, accent colors, and treatments; mobile Swiss sign-in and Geist 404 were complete and themed. Terminal category chips showed bracket styling. No symptom-table failure was visible.
+404 response status: 404 at both widths, with the DS 404 page.
