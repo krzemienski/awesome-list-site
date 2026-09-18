@@ -66,9 +66,13 @@ URL (dev or production build) rather than a single file.
   running** — Vite's workspace watcher full-reloads every open page on any
   repo write and your captures go stale mid-run.
 - Navigate with `page.goto(url, { waitUntil: 'networkidle' })`, then wait
-  for `document.fonts.ready` **and** for `.page` to exist before evaluating
-  anything. `/login` is a server redirect to `/sign-in` — follow it and
-  audit the landing URL.
+  for `document.fonts.ready`, for `.page` to exist, **and** for
+  `typeof window.applyDesignSystem === 'function'` (`page.waitForFunction`)
+  before evaluating anything. The production build prerenders `.page`
+  server-side and defers the module bundle until after first paint, so the
+  DOM is complete before the DS globals exist — a snippet that runs on
+  `.page` alone reads `undefined` for `SYSTEM_DEFAULT_ACCENT`. `/login` is a
+  server redirect to `/sign-in` — follow it and audit the landing URL.
 - Evaluate the stage snippets **in-page** with `page.evaluate`. Stage 6's
   six filters have executable copies in
   `scripts/validation/ds-button-filter.mjs`; either paste the fenced
