@@ -52,7 +52,7 @@ export default function NotFound({ suggestion }: NotFoundProps) {
         <CardHeader>
           <span className="chip bad system-state-code">Error · 404</span>
           <div className="system-state-heading flex items-center gap-2">
-            <AlertCircle className="h-6 w-6 text-[var(--accent)]" aria-hidden="true" />
+            <AlertCircle className="h-6 w-6 text-[color:var(--text-2)]" aria-hidden="true" />
             <h1 className="display-h system-state-title">Page Not Found</h1>
           </div>
         </CardHeader>

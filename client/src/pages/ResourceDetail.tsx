@@ -970,7 +970,7 @@ export default function ResourceDetail() {
                         <span className="resource-detail-chip-wrap" key={index}>
                           <Link href={tagLandingPath(tag)}>
                             <span
-                              className="chip accent"
+                              className="chip muted"
                               data-testid={`tag-link-${index}`}
                             >
                               <span className="resource-detail-chip-label">#{tag}</span>
@@ -1042,7 +1042,7 @@ export default function ResourceDetail() {
               {/* F018: a real heading (CardTitle renders a div) so the section
                   shows up in the document outline / screen-reader rotor. */}
               <h2 className="text-lg font-semibold leading-none tracking-tight flex items-center gap-2">
-                <FolderTree className="h-4 w-4 text-primary" />
+                <FolderTree className="h-4 w-4" />
                 Related Resources
               </h2>
               <CardDescription>

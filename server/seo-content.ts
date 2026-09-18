@@ -135,19 +135,22 @@ function snippet(s: unknown, max = 140): string {
   return t.length > max ? t.slice(0, max - 1).trimEnd() + "…" : t;
 }
 
-// Scoped, inline dark styling so the pre-JavaScript view is legible (the boot
-// script paints <html> black before any CSS loads). Lives inside #root, so it is
+// Scoped, inline styling so the pre-JavaScript view is legible and already in
+// the stored design system: every color and the font resolve through the
+// design-system tokens (the token stylesheet is a <link> in <head> ahead of
+// this markup in production, and the boot script has set data-system /
+// data-accent on <html> before it paints). Lives inside #root, so it is
 // removed together with the content the moment React renders.
 const STYLE = [
-  "#ssr-seo-content{background:#000;color:#e6e6ea;min-height:100vh;",
-  "font-family:'Inter',system-ui,-apple-system,'Segoe UI',Roboto,sans-serif;line-height:1.5}",
+  "#ssr-seo-content{background:var(--bg);color:var(--text);min-height:100vh;",
+  "font-family:var(--font-body);line-height:1.5}",
   "#ssr-seo-content .ssr-wrap{max-width:960px;margin:0 auto;padding:40px 20px}",
   // Run22 BUG-009: .ssr-h1 mirrors the h1 rule — main.tsx demotes the SSR <h1>
   // to <div class="ssr-h1"> when it moves this block into the hold overlay, so
   // the DOM never contains two H1s once React renders the page's real <h1>.
-  "#ssr-seo-content h1,#ssr-seo-content .ssr-h1{font-size:2rem;font-weight:800;letter-spacing:-.02em;margin:0 0 .5rem;color:#fff}",
-  "#ssr-seo-content h2{font-size:1.05rem;font-weight:700;margin:2rem 0 .75rem;color:#fff}",
-  "#ssr-seo-content h3{font-size:.98rem;font-weight:700;margin:1.25rem 0 .35rem;color:#fff}",
+  "#ssr-seo-content h1,#ssr-seo-content .ssr-h1{font-size:2rem;font-weight:800;letter-spacing:-.02em;margin:0 0 .5rem;color:var(--text)}",
+  "#ssr-seo-content h2{font-size:1.05rem;font-weight:700;margin:2rem 0 .75rem;color:var(--text)}",
+  "#ssr-seo-content h3{font-size:.98rem;font-weight:700;margin:1.25rem 0 .35rem;color:var(--text)}",
   // Lead copy (the description and the collection intro) shares one scale.
   // The intro is the same sentence the client page renders as its lead
   // paragraph (TaxonomyListing's .taxonomy-description, 16px / 1.6, ~332px
@@ -155,19 +158,19 @@ const STYLE = [
   // text block at least as large as the rendered page's, in the fallback font
   // and after the swap to Inter, so the page's largest contentful paint is the
   // pre-JavaScript view instead of a later client re-render of the same text.
-  "#ssr-seo-content p.ssr-lead,#ssr-seo-content section[data-seo-section] > p{font-size:1.1rem;line-height:1.6;color:#b6b6c0;margin:0;max-width:72ch}",
+  "#ssr-seo-content p.ssr-lead,#ssr-seo-content section[data-seo-section] > p{font-size:1.1rem;line-height:1.6;color:var(--text-2);margin:0;max-width:72ch}",
   "#ssr-seo-content p.ssr-lead{margin-bottom:1rem}",
-  "#ssr-seo-content a{color:#ff5c7a;text-decoration:none}",
+  "#ssr-seo-content a{color:var(--accent);text-decoration:none}",
   "#ssr-seo-content a:hover{text-decoration:underline}",
   "#ssr-seo-content ul.ssr-list{list-style:none;padding:0;margin:0;display:grid;gap:.45rem}",
   "#ssr-seo-content ul.ssr-list li{padding:.1rem 0}",
-  "#ssr-seo-content .ssr-meta{color:#76768a;font-size:.85em}",
-  "#ssr-seo-content .ssr-desc{color:#9a9aae;display:block;font-size:.9em;margin-top:.1rem}",
-  "#ssr-seo-content nav.ssr-crumbs{font-size:.85rem;color:#76768a;margin:0 0 1rem}",
-  "#ssr-seo-content nav.ssr-crumbs a{color:#9a9aae}",
-  "#ssr-seo-content .ssr-sep{color:#44444f;padding:0 .35rem}",
+  "#ssr-seo-content .ssr-meta{color:var(--text-3);font-size:.85em}",
+  "#ssr-seo-content .ssr-desc{color:var(--text-2);display:block;font-size:.9em;margin-top:.1rem}",
+  "#ssr-seo-content nav.ssr-crumbs{font-size:.85rem;color:var(--text-3);margin:0 0 1rem}",
+  "#ssr-seo-content nav.ssr-crumbs a{color:var(--text-2)}",
+  "#ssr-seo-content .ssr-sep{color:var(--border-strong);padding:0 .35rem}",
   "#ssr-seo-content dl{display:grid;grid-template-columns:9rem 1fr;gap:.45rem 1rem;margin:0}",
-  "#ssr-seo-content dt{color:#9a9aae;font-weight:600}",
+  "#ssr-seo-content dt{color:var(--text-2);font-weight:600}",
   "#ssr-seo-content dd{margin:0}",
 ].join("");
 

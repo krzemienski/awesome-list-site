@@ -203,7 +203,8 @@ const PAGE = {
     /* Inputs */
     const textTypes = new Set(["", "text", "search", "email", "url", "password", "number", "tel", "date", "datetime-local", "time", "month", "week"]);
     const inputs = [...document.querySelectorAll("input")].filter((i) => textTypes.has((i.getAttribute("type") || "").toLowerCase()));
-    const strayInputs = inputs.filter((i) => !i.classList.contains("input") && !i.classList.contains("search-input"));
+    /* The command palette field is class-less in the design's own CmdPalette (layout.jsx) and is skinned by the palette rule, so it is not a stray input. */
+    const strayInputs = inputs.filter((i) => !i.classList.contains("input") && !i.classList.contains("search-input") && !i.hasAttribute("cmdk-input"));
     const selects = [...document.querySelectorAll("select, [role='combobox']")];
     const straySelects = selects.filter((s) => !s.classList.contains("select") && !s.classList.contains("input") && !s.hasAttribute("cmdk-input"));
     const textareas = [...document.querySelectorAll("textarea")];

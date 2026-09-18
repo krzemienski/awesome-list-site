@@ -251,7 +251,7 @@ export function Paginator({
         id={`${ids.jump}-error`}
         role="status"
         aria-live="polite"
-        className={cn("text-xs text-[var(--accent)]", !jumpError && "sr-only")}
+        className={cn("text-xs text-destructive", !jumpError && "sr-only")}
         data-testid={ids.jumpError}
       >
         {jumpError ?? ""}

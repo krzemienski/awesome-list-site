@@ -39,13 +39,13 @@
   --color-border: var(--border);
   --color-input: var(--border);
   --color-ring: var(--accent);
-  /* Charts: one accent series, then the ink ramp and the global status
-     palette (docs/07-color.md) — never a second hue. */
+  /* Charts: one accent series, then the ink ramp (docs/07-color.md: chart
+     fills use the ink ramp) — never a second hue. */
   --color-chart-1: var(--accent);
   --color-chart-2: var(--text-2);
-  --color-chart-3: #34d08c; /* DS-OK: status OK */
-  --color-chart-4: #ffb84d; /* DS-OK: status WARN */
-  --color-chart-5: var(--text-3);
+  --color-chart-3: var(--text-3);
+  --color-chart-4: var(--text-4);
+  --color-chart-5: var(--border-strong);
   --color-sidebar: var(--bg);
   --color-sidebar-foreground: var(--text);
   --color-sidebar-primary: var(--accent);

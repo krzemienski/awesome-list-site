@@ -349,7 +349,11 @@ are evaluated open).
   search field is `.search-input`); every `<select>` and every
   `role="combobox"` trigger must carry `.select`; every `<textarea>` must
   carry `.textarea`. `hidden`, checkbox/radio/range/file/colour inputs are not
-  text controls and are not counted.
+  text controls and are not counted. The ⌘K command palette's field
+  (`[cmdk-input]`) is the one class-less text input: the design's own
+  `CmdPalette` (`layout.jsx`) renders it bare and skins it through the palette
+  rule, and the app does the same (`.search-palette [cmdk-input]`), so it is
+  recognised as the design's field, not a stray.
 - *Keyboard hints.* Every `<kbd>` must carry `.kbd` (the command palette's own
   `.search-palette kbd` rule is the design's palette skin).
 - *Cards / section labels.* The driver lists heuristic candidates (bordered
