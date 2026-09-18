@@ -132,7 +132,7 @@ export default function ThemeSettings() {
         </Link>
         <div className="flex items-center gap-3">
           {/* P5 — sparkle icon to match ref 08 */}
-          <Sparkles className="h-6 w-6 text-[var(--accent)]" />
+          <Sparkles className="h-6 w-6 text-[color:var(--text-2)]" />
           <h1 className="display-h text-2xl">
             Theme Settings
           </h1>
@@ -146,7 +146,7 @@ export default function ThemeSettings() {
         {/* Task #346: living showcase — full token catalog + component anatomy. */}
         <Link
           href="/design-system"
-          className="inline-flex items-center gap-1.5 text-sm text-[var(--accent)] hover:underline mt-2 min-h-[44px]"
+          className="inline-flex items-center gap-1.5 text-sm text-[color:var(--text-2)] underline underline-offset-4 hover:text-[var(--text)] mt-2 min-h-[44px]"
           data-testid="link-design-system-showcase"
         >
           Explore the full design-system showcase →
@@ -201,7 +201,7 @@ export default function ThemeSettings() {
           cards are buttons (hidden in print), which left orphan headings. */}
       <section aria-label="Design system picker" data-testid="system-picker" className="no-print">
         <div className="flex items-center gap-2 mb-4">
-          <Layers className="h-5 w-5 text-[var(--accent)]" />
+          <Layers className="h-5 w-5 text-[color:var(--text-2)]" />
           <h2 className="font-sans font-semibold text-xl tracking-tight">Design System</h2>
         </div>
         <div
@@ -222,7 +222,7 @@ export default function ThemeSettings() {
                 onClick={() => handlePickSystem(id)}
                 onKeyDown={makeRadioKeyDown("system", systemIds, systemId, handlePickSystem)}
                 data-testid={`system-option-${id}`}
-                className="text-left rounded-[var(--radius)] border bg-[var(--surface)] p-4 transition-colors hover:border-[var(--border-strong)] focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent)] cursor-pointer"
+                className="card hoverable text-left p-4"
                 style={{
                   borderColor: isActive ? "var(--accent)" : "var(--border)",
                 }}
@@ -244,7 +244,7 @@ export default function ThemeSettings() {
       {/* Accent Picker — 10 swatches */}
       <section aria-label="Accent picker" data-testid="accent-picker" className="no-print">
         <div className="flex items-center gap-2 mb-4">
-          <Palette className="h-5 w-5 text-[var(--accent)]" />
+          <Palette className="h-5 w-5 text-[color:var(--text-2)]" />
           <h2 className="font-sans font-semibold text-xl tracking-tight">Accent</h2>
         </div>
         <div
@@ -265,7 +265,7 @@ export default function ThemeSettings() {
                 onClick={() => handlePickAccent(a.id)}
                 onKeyDown={makeRadioKeyDown("accent", accentIds, accentId, handlePickAccent)}
                 data-testid={`accent-option-${a.id}`}
-                className="text-left rounded-[var(--radius)] border bg-[var(--surface)] p-3 transition-colors hover:border-[var(--border-strong)] focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent)] cursor-pointer"
+                className="card hoverable text-left p-3"
                 style={{
                   borderColor: isActive ? a.primary : "var(--border)",
                 }}
@@ -294,7 +294,7 @@ export default function ThemeSettings() {
       {/* I1 — Font override picker (hybrid: keeps 5×10 picker above, adds per-system font override) */}
       <section aria-label="Font override picker" data-testid="font-picker" className="no-print">
         <div className="flex items-center gap-2 mb-2">
-          <Type className="h-5 w-5 text-[var(--accent)]" />
+          <Type className="h-5 w-5 text-[color:var(--text-2)]" />
           <h2 className="font-sans font-semibold text-xl tracking-tight">Font</h2>
         </div>
         <p className="text-xs text-[color:var(--text-2)] mb-4">
@@ -318,7 +318,7 @@ export default function ThemeSettings() {
                 onClick={() => handlePickFont(f.id)}
                 onKeyDown={makeRadioKeyDown("font", fontIds, fontId, handlePickFont)}
                 data-testid={`font-option-${f.id}`}
-                className="text-left rounded-[var(--radius)] border bg-[var(--surface)] p-4 transition-colors hover:border-[var(--border-strong)] focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent)] cursor-pointer"
+                className="card hoverable text-left p-4"
                 style={{
                   borderColor: isActive ? "var(--accent)" : "var(--border)",
                 }}
@@ -345,7 +345,7 @@ export default function ThemeSettings() {
           empty headings and blank bordered boxes; hide the whole preview. */}
       <section aria-label="Live preview" data-testid="theme-preview" className="no-print">
         <div className="flex items-center gap-2 mb-4">
-          <Eye className="h-5 w-5 text-[var(--accent)]" />
+          <Eye className="h-5 w-5 text-[color:var(--text-2)]" />
           <h2 className="font-sans font-semibold text-xl tracking-tight">Live Preview</h2>
           <span className="ml-2 text-xs text-[color:var(--text-3)]">
             {activeSystem?.name ?? systemId} · {activeAccent?.name ?? accentId}
@@ -357,7 +357,7 @@ export default function ThemeSettings() {
             is now `inert` (no pointer, focus, or AT exposure; lowercase
             string attr so React 18 forwards it — same pattern as the sidebar
             accordion bodies) and explicitly captioned as display-only. */}
-        <p className="text-xs text-[color:var(--text-3)] -mt-2 mb-4" data-testid="preview-display-only-note">
+        <p className="text-xs text-[color:var(--text-2)] -mt-2 mb-4" data-testid="preview-display-only-note">
           Display-only specimens — the controls below are intentionally inactive.
         </p>
         <Card

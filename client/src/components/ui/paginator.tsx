@@ -221,6 +221,8 @@ export function Paginator({
             <label htmlFor={ids.jump} className="sr-only">
               Go to page
             </label>
+            {/* .input is width:100%; the wrapper fixes the 64px jump column. */}
+            <span className="inline-block w-16">
             <Input
               id={ids.jump}
               type="text"
@@ -234,12 +236,13 @@ export function Paginator({
                 if (e.key === "Enter") commitJump();
               }}
               onBlur={commitJump}
-              className="h-8 w-16 text-center tabular-nums"
+              className="text-center tabular-nums"
               aria-label={`Page number, 1 to ${totalPages}`}
               aria-invalid={jumpError ? true : undefined}
               aria-describedby={jumpError ? `${ids.jump}-error` : undefined}
               data-testid={ids.jump}
             />
+            </span>
             <span aria-hidden="true">/ {totalPages}</span>
           </span>
         )}

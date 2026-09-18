@@ -387,7 +387,7 @@ function ResourceCard({
               {resource.tags.length > 3 && (
                 <button
                   type="button"
-                  className="resource-card__more-tags relative z-10"
+                  className="chip muted resource-card__more-tags relative z-10"
                   onClick={(e) => {
                     e.stopPropagation();
                     setShowAllTags((v) => !v);

@@ -1,6 +1,6 @@
 import { useEffect } from "react";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardFooter, CardHeader } from "@/components/ui/card";
+import { CardContent, CardFooter, CardHeader } from "@/components/ui/card";
 import { AlertCircle, Home, List, ArrowRight } from "lucide-react";
 import { Link } from "wouter";
 import SEOHead from "@/components/layout/SEOHead";
@@ -48,7 +48,7 @@ export default function NotFound({ suggestion }: NotFoundProps) {
         image={`${SITE_BASE}/og-image.png?path=%2F`}
       />
 
-      <Card className="system-state-card">
+      <section className="system-state-card">
         <CardHeader>
           <span className="chip bad system-state-code">Error · 404</span>
           <div className="system-state-heading flex items-center gap-2">
@@ -94,7 +94,7 @@ export default function NotFound({ suggestion }: NotFoundProps) {
             </Link>
           </Button>
         </CardFooter>
-      </Card>
+      </section>
     </div>
   );
 }

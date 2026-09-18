@@ -86,7 +86,7 @@
 .resource-detail-actions > button:hover { background: var(--surface); }
 
 .resource-detail-body { display: grid; gap: 24px; min-width: 0; }
-.resource-detail-content { background: none; border: 0; box-shadow: none; }
+.resource-detail-content { min-width: 0; }
 .resource-detail-sections { padding: 0; display: grid; gap: 16px; }
 .resource-detail-sections > [data-orientation="horizontal"] { display: none; }
 

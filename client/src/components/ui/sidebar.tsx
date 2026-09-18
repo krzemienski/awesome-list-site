@@ -415,7 +415,7 @@ const Sidebar = React.forwardRef<
             >
               <button
                 type="button"
-                className="av-sidebar-drawer-close"
+                className="icon-btn av-sidebar-drawer-close"
               >
                 <X aria-hidden="true" />
                 <span className="sr-only">Close</span>

@@ -184,7 +184,7 @@
   width: 42px;
   height: 42px;
   flex: 0 0 auto;
-  color: var(--accent);
+  color: var(--text-2);
   stroke-width: 1.5;
 }
 
@@ -241,32 +241,28 @@
   overflow-wrap: anywhere;
 }
 
-.journeys-page .journey-difficulty,
-.journey-detail-page .journey-difficulty {
-  border-color: color-mix(in srgb, var(--accent) 35%, var(--border));
-  background: color-mix(in srgb, var(--accent) 8%, transparent);
-  color: var(--accent);
-}
-
+/* Difficulty is a status semantic, so it reads from the global status
+   palette (docs/07-color.md) rather than the reserved accent: beginner = OK,
+   intermediate = WARN, advanced = BAD — the same ramp as .chip.ok/.warn/.bad. */
 .journeys-page .journey-difficulty--beginner,
 .journey-detail-page .journey-difficulty--beginner {
-  border-color: color-mix(in srgb, var(--accent-2) 35%, var(--border));
-  background: color-mix(in srgb, var(--accent-2) 8%, transparent);
-  color: var(--accent-2);
+  color: #34d08c; /* DS-OK: status OK */
+  border-color: rgba(52, 208, 140, 0.3); /* DS-OK: status OK */
+  background: rgba(52, 208, 140, 0.08); /* DS-OK: status OK */
 }
 
 .journeys-page .journey-difficulty--intermediate,
 .journey-detail-page .journey-difficulty--intermediate {
-  border-color: color-mix(in srgb, var(--accent) 45%, var(--border));
-  background: color-mix(in srgb, var(--accent) 10%, transparent);
-  color: var(--accent);
+  color: #ffb84d; /* DS-OK: status WARN */
+  border-color: rgba(255, 184, 77, 0.3); /* DS-OK: status WARN */
+  background: rgba(255, 184, 77, 0.08); /* DS-OK: status WARN */
 }
 
 .journeys-page .journey-difficulty--advanced,
 .journey-detail-page .journey-difficulty--advanced {
-  border-color: color-mix(in srgb, var(--accent-2) 45%, var(--border));
-  background: color-mix(in srgb, var(--accent-2) 10%, transparent);
-  color: var(--accent-2);
+  color: #ff5c7a; /* DS-OK: status BAD */
+  border-color: rgba(255, 92, 122, 0.3); /* DS-OK: status BAD */
+  background: rgba(255, 92, 122, 0.08); /* DS-OK: status BAD */
 }
 
 .journey-card__progress {

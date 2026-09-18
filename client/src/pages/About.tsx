@@ -96,7 +96,7 @@ export default function About() {
           display heading, divider, lead card, and callout grid. The copy in
           these surfaces stays grounded in the site's existing shared content. */}
       <header className="about-hero">
-        <div className="about-eyebrow">
+        <div className="eyebrow about-eyebrow">
           <BookOpen className="about-eyebrow-icon" aria-hidden="true" />
           ABOUT THIS PROJECT
         </div>
@@ -518,7 +518,7 @@ export default function About() {
                     <button
                       type="button"
                       id={buttonId}
-                      className="about-faq-trigger"
+                      className="accordion-header about-faq-trigger"
                       aria-expanded={isOpen}
                       aria-controls={panelId}
                       data-testid={`button-about-faq-${faqIndex}`}

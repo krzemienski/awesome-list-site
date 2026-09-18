@@ -27,27 +27,29 @@
   --color-popover: var(--bg-2);
   --color-popover-foreground: var(--text);
   --color-primary: var(--accent);
-  --color-primary-foreground: #000000;
+  --color-primary-foreground: #000000; /* DS-OK: ink on accent */
   --color-secondary: var(--surface-2);
   --color-secondary-foreground: var(--text);
   --color-muted: var(--surface);
   --color-muted-foreground: var(--text-2);
   --color-accent: var(--surface-2);
   --color-accent-foreground: var(--text);
-  --color-destructive: #ff5c7a;
-  --color-destructive-foreground: #000000;
+  --color-destructive: #ff5c7a; /* DS-OK: status BAD */
+  --color-destructive-foreground: #000000; /* DS-OK: ink on status fill */
   --color-border: var(--border);
   --color-input: var(--border);
   --color-ring: var(--accent);
+  /* Charts: one accent series, then the ink ramp and the global status
+     palette (docs/07-color.md) — never a second hue. */
   --color-chart-1: var(--accent);
-  --color-chart-2: #34d08c;
-  --color-chart-3: #5eddf2;
-  --color-chart-4: #ffb84d;
-  --color-chart-5: #9d4edd;
+  --color-chart-2: var(--text-2);
+  --color-chart-3: #34d08c; /* DS-OK: status OK */
+  --color-chart-4: #ffb84d; /* DS-OK: status WARN */
+  --color-chart-5: var(--text-3);
   --color-sidebar: var(--bg);
   --color-sidebar-foreground: var(--text);
   --color-sidebar-primary: var(--accent);
-  --color-sidebar-primary-foreground: #000000;
+  --color-sidebar-primary-foreground: #000000; /* DS-OK: ink on accent */
   --color-sidebar-accent: var(--surface-2);
   --color-sidebar-accent-foreground: var(--text);
   --color-sidebar-border: var(--border);
@@ -230,14 +232,16 @@ vite-plugin-checker-error-overlay {
       filled cards no longer spill into near-blank orphan trailing pages (R4-070).
 */
 @media print {
+  /* DS-OK: print media is paper, not a themed surface — every literal in this
+     block is the white page / black ink contract, not a design token. */
   /* White page, full-opacity black readable text everywhere. */
   html,
   body,
   #root,
   main,
   [role="main"] {
-    background: #fff !important;
-    color: #000 !important;
+    background: #fff !important; /* DS-OK: print paper */
+    color: #000 !important; /* DS-OK: print ink */
   }
 
   /* Neutralise dark surfaces/shadows and kill sub-1 opacity so nothing prints
@@ -250,10 +254,10 @@ vite-plugin-checker-error-overlay {
     background-image: none !important;
     box-shadow: none !important;
     text-shadow: none !important;
-    color: #000 !important;
+    color: #000 !important; /* DS-OK: print ink */
     opacity: 1 !important;
     filter: none !important;
-    border-color: #bbb !important;
+    border-color: #bbb !important; /* DS-OK: print rule */
   }
 
   /* Hide ALL interactive chrome for a content-only printout (R4-039):
@@ -360,14 +364,14 @@ vite-plugin-checker-error-overlay {
   [role="main"],
   article,
   .prose {
-    color: #000 !important;
+    color: #000 !important; /* DS-OK: print ink */
   }
 
   /* Links stay readable as plain underlined text. The href expansion is dropped
      (R4-038): as inline pseudo-content it overlapped titles and was clipped at
      the card edge. */
   a {
-    color: #000 !important;
+    color: #000 !important; /* DS-OK: print ink */
     text-decoration: underline;
   }
   a[href]::after {

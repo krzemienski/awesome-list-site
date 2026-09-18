@@ -505,7 +505,7 @@ function CategoryAccordion({
                         aria-controls={`${bodyId}-sub-${subSlug}`}
                         data-state={subOpen ? "open" : "closed"}
                         data-testid={`expand-sub-${subSlug}`}
-                        className="av-sidebar-l2-toggle"
+                        className="icon-btn av-sidebar-l2-toggle"
                       >
                         <span className="av-sidebar-nested-count" aria-hidden="true">+{subSubs.length}</span>
                         <ChevronRight className={cn("size-[9px] chevron-rotate", subOpen && "rotate-90")} />
@@ -838,7 +838,7 @@ export default function AppSidebar({
             <button
               type="button"
               onClick={() => onRetryNav()}
-              className="underline underline-offset-2 font-medium min-h-[44px] md:min-h-[36px]"
+              className="btn-link font-medium min-h-[44px] md:min-h-[36px]"
               style={{ color: "var(--text-2)" }}
               data-testid="sidebar-nav-retry"
             >
@@ -1016,7 +1016,7 @@ export default function AppSidebar({
         data-testid="sidebar-compact-navigation"
         aria-label="Collapse sidebar"
         title="Collapse sidebar"
-        className="av-sidebar-collapse-toggle"
+        className="icon-btn av-sidebar-collapse-toggle"
       >
         <ChevronRight aria-hidden="true" className="size-[10px]" />
       </button>
@@ -1187,7 +1187,7 @@ export default function AppSidebar({
             <button
               type="button"
               onClick={() => setOpen(true)}
-              className="rail-icon-btn rail-expand-navigation touch-manipulation"
+              className="icon-btn rail-icon-btn rail-expand-navigation touch-manipulation"
               data-testid="sidebar-expanded-navigation"
               aria-label="Expand sidebar"
               title="Expand sidebar"
@@ -1204,7 +1204,7 @@ export default function AppSidebar({
               aria-label="Home"
               data-testid="rail-home"
               data-active={isActive("/") || undefined}
-              className="rail-icon-btn no-underline touch-manipulation"
+              className="icon-btn rail-icon-btn no-underline touch-manipulation"
             >
               <Home aria-hidden="true" className="size-[15px]" />
             </a>
@@ -1233,7 +1233,7 @@ export default function AppSidebar({
                   data-testid={`rail-${catSlug}`}
                   data-active={catActive || undefined}
                   className={cn(
-                    "rail-icon-btn no-underline touch-manipulation",
+                    "icon-btn rail-icon-btn no-underline touch-manipulation",
                     catActive && "active",
                   )}
                 >
@@ -1247,7 +1247,7 @@ export default function AppSidebar({
               {...(repoUrl ? { href: repoUrl } : {})}
               target="_blank"
               rel="noopener noreferrer"
-              className="rail-icon-btn av-sidebar-rail-repo no-underline"
+              className="icon-btn rail-icon-btn av-sidebar-rail-repo no-underline"
               aria-label={repoUrl ? `Source: ${repoUrl.replace(/^https?:\/\/(www\.)?github\.com\//, "").replace(/\/$/, "")}` : "Source repository unavailable"}
               title={repoUrl ? `Source: ${repoUrl.replace(/^https?:\/\/(www\.)?github\.com\//, "").replace(/\/$/, "")}` : "Source repository unavailable"}
               aria-disabled={!repoUrl || undefined}

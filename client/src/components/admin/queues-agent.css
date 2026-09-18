@@ -410,7 +410,7 @@
 }
 
 .queues-agent .queues-agent__event-log [role="log"] {
-  background: color-mix(in srgb, var(--background) 90%, #000);
+  background: color-mix(in srgb, var(--background) 90%, var(--bg));
   border: var(--hairline-w, 1px) solid var(--border);
   border-radius: var(--radius, .5rem);
   min-height: 7.5rem;
@@ -429,7 +429,7 @@
 }
 
 .queues-agent .queues-agent__graph [data-testid="agent-comms-graph"] {
-  background: color-mix(in srgb, var(--background) 90%, #000);
+  background: color-mix(in srgb, var(--background) 90%, var(--bg));
   border: var(--hairline-w, 1px) solid var(--border);
   border-radius: var(--radius, .5rem);
 }

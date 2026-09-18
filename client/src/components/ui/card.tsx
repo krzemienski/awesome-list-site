@@ -2,19 +2,26 @@ import * as React from "react"
 
 import { cn } from "@/lib/utils"
 
+/**
+ * Card emits the design system's `.card` class (docs/10-components.md).
+ * Interactive cards opt into `.hoverable` (and `.glow`) through props or by
+ * passing the classes; paint, radius, hover lift and per-system skins come
+ * from design-system.css.
+ */
 const Card = React.forwardRef<
   HTMLElement,
-  React.HTMLAttributes<HTMLElement>
->(({ className, ...props }, ref) => (
-  <article
-    ref={ref}
-    className={cn(
-      "rounded-lg border bg-card text-card-foreground shadow-[var(--shadow-sm)] transition-[transform,border-color,background-color,box-shadow] duration-[var(--motion-base)] ease-[var(--motion-ease)] hover:border-[var(--border-strong)]",
-      className
-    )}
-    {...props}
-  />
-))
+  React.HTMLAttributes<HTMLElement> & { hoverable?: boolean; glow?: boolean; "data-ds"?: string }
+>(({ className, hoverable, glow, "data-ds": dataDs, ...props }, ref) => {
+  const interactive = Boolean(hoverable) || dataDs === "card-hover"
+  return (
+    <article
+      ref={ref}
+      className={cn("card", interactive && "hoverable", glow && "glow", className)}
+      data-ds={dataDs}
+      {...props}
+    />
+  )
+})
 Card.displayName = "Card"
 
 const CardHeader = React.forwardRef<

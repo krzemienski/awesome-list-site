@@ -688,7 +688,7 @@ export default function ResourceDetail() {
       </div>
 
       <section className="resource-detail-description">
-        <h2>DESCRIPTION</h2>
+        <h2 className="eyebrow">DESCRIPTION</h2>
         <p data-testid="text-description">
           {resource.description || 'No description available for this resource.'}
         </p>
@@ -808,7 +808,7 @@ export default function ResourceDetail() {
 
       <div className="resource-detail-body">
         <div>
-          <Card className="resource-detail-content">
+          <div className="resource-detail-content">
             {hasOgImage && (
               <div className="relative w-full h-48 md:h-64 overflow-hidden bg-gradient-to-b from-primary/10 to-transparent">
                 {metadata.ogImageBlurhash && !imageLoaded && (
@@ -839,8 +839,8 @@ export default function ResourceDetail() {
             
             <CardContent className="resource-detail-sections">
               <div data-seo-section="resource-details">
-                <h2 className="text-lg font-semibold mb-3 flex items-center gap-2">
-                  <FolderTree className="h-4 w-4 text-primary" />
+                <h2 className="eyebrow mb-3">
+                  <FolderTree className="h-4 w-4" />
                   Resource details
                 </h2>
                 <dl className="grid gap-3 text-sm sm:grid-cols-[9rem_minmax(0,1fr)]">
@@ -934,8 +934,8 @@ export default function ResourceDetail() {
               <Separator />
 
               <div>
-                <h2 className="text-lg font-semibold mb-2 flex items-center gap-2">
-                  <Link2 className="h-4 w-4 text-primary" />
+                <h2 className="eyebrow mb-2">
+                  <Link2 className="h-4 w-4" />
                   Canonical URL
                 </h2>
                 <a 
@@ -952,7 +952,7 @@ export default function ResourceDetail() {
 
               {(!tags || tags.length === 0) && (
                 <div data-seo-section="resource-tags">
-                  <h2>Tags</h2>
+                  <h2 className="eyebrow">Tags</h2>
                   <div />
                 </div>
               )}
@@ -961,8 +961,8 @@ export default function ResourceDetail() {
                 <>
                   <Separator />
                   <div data-seo-section="resource-tags">
-                    <h2 className="text-lg font-semibold mb-3 flex items-center gap-2">
-                      <Tag className="h-4 w-4 text-primary" />
+                    <h2 className="eyebrow mb-3">
+                      <Tag className="h-4 w-4" />
                       Tags
                     </h2>
                     <div className="flex flex-wrap gap-2">
@@ -1024,7 +1024,7 @@ export default function ResourceDetail() {
                 </>
               )}
             </CardContent>
-          </Card>
+          </div>
         </div>
 
         <div className="resource-detail-related">

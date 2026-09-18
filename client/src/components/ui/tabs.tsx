@@ -3,6 +3,12 @@ import * as TabsPrimitive from "@radix-ui/react-tabs"
 
 import { cn } from "@/lib/utils"
 
+/**
+ * Tabs emit the design system's `.tabs` / `.tab` classes
+ * (docs/10-components.md): a hairline-bottomed strip with the active tab's
+ * accent underline. Radix marks the active trigger with
+ * `data-state="active"`, which design-system.css maps onto `.tab.active`.
+ */
 const Tabs = TabsPrimitive.Root
 
 const TabsList = React.forwardRef<
@@ -11,15 +17,7 @@ const TabsList = React.forwardRef<
 >(({ className, ...props }, ref) => (
   <TabsPrimitive.List
     ref={ref}
-    className={cn(
-      // R5-054 (run24): rounded-full on a wrapping, auto-height list renders a
-      // giant stadium blob whose curved ends cut into the first/last tab rows
-      // (admin 15 tabs ≤1024, profile 5 tabs @768). Below xl — where tab lists
-      // can wrap — use the token card radius; the single-row pill look is
-      // preserved from xl (1280px) up.
-      "inline-flex h-10 items-center justify-center rounded-lg xl:rounded-full border border-border bg-[var(--surface)] p-1 text-muted-foreground",
-      className
-    )}
+    className={cn("tabs", className)}
     {...props}
   />
 ))
@@ -31,10 +29,7 @@ const TabsTrigger = React.forwardRef<
 >(({ className, ...props }, ref) => (
   <TabsPrimitive.Trigger
     ref={ref}
-    className={cn(
-      "inline-flex items-center justify-center whitespace-nowrap rounded-full px-3 py-1.5 text-sm font-medium ring-offset-background transition-all duration-[var(--motion-fast)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 hover:text-foreground data-[state=active]:bg-[var(--surface-3)] data-[state=active]:text-[var(--accent)] data-[state=active]:shadow-[var(--shadow-sm)]",
-      className
-    )}
+    className={cn("tab min-h-[44px]", className)}
     {...props}
   />
 ))
@@ -46,10 +41,7 @@ const TabsContent = React.forwardRef<
 >(({ className, ...props }, ref) => (
   <TabsPrimitive.Content
     ref={ref}
-    className={cn(
-      "mt-2 ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2",
-      className
-    )}
+    className={cn("mt-2 focus-visible:outline-none", className)}
     {...props}
   />
 ))

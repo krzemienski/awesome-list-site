@@ -114,7 +114,7 @@
 
 .about-callout-index {
   margin-bottom: 6px;
-  color: var(--accent);
+  color: var(--text-3);
   font-size: 10px;
   line-height: var(--body-leading);
 }
@@ -170,12 +170,12 @@
   width: 20px;
   height: 20px;
   flex: 0 0 auto;
-  color: var(--accent);
+  color: var(--text-2);
   stroke-width: 1.5;
 }
 
 .about-icon-accent {
-  color: var(--accent);
+  color: var(--text-2);
 }
 
 .about-copy-stack {
@@ -197,15 +197,15 @@
   align-self: flex-start;
   gap: 8px;
   min-height: 24px;
-  color: var(--accent);
+  color: var(--text);
   font-size: 14px;
   font-weight: 500;
-  text-decoration: none;
+  text-decoration: underline;
+  text-underline-offset: 3px;
 }
 
 .about-inline-link:hover {
-  text-decoration: underline;
-  text-underline-offset: 3px;
+  color: var(--accent);
 }
 
 .about-inline-link-text {
@@ -274,7 +274,7 @@
   width: 16px;
   height: 16px;
   flex: 0 0 auto;
-  color: var(--accent);
+  color: var(--text-2);
 }
 
 .about-source-external {
@@ -381,13 +381,13 @@
   height: 8px;
   flex: 0 0 auto;
   margin-top: 7.2px;
-  border: var(--border-w) solid var(--accent);
+  border: var(--border-w) solid var(--text-3);
   border-radius: var(--radius-pill);
   background: transparent;
 }
 
 .about-tech-dot-filled {
-  background: var(--accent);
+  background: var(--text-3);
 }
 
 .about-tech-column .about-tech-item:nth-child(even) .about-tech-dot {
@@ -395,7 +395,7 @@
 }
 
 .about-tech-column .about-tech-item:nth-child(odd) .about-tech-dot {
-  background: var(--accent);
+  background: var(--text-3);
 }
 
 .about-tech-name {
@@ -425,7 +425,7 @@
   height: 6px;
   flex: 0 0 auto;
   border-radius: var(--radius-pill);
-  background: var(--accent);
+  background: var(--text-3);
 }
 
 .about-credits-grid {

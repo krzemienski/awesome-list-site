@@ -13,10 +13,7 @@
 .system-state-card {
   width: 100%;
   max-width: 520px;
-  border: 0;
   border-radius: var(--radius);
-  background: transparent;
-  box-shadow: none;
 }
 
 .system-state-heading {

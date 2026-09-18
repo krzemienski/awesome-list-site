@@ -248,7 +248,7 @@ export default function SearchDialog({ isOpen, setIsOpen }: SearchDialogProps) {
       <CommandGroup heading="Recent searches" className="search-palette-group">
         <button
           type="button"
-          className="search-palette-clear"
+          className="btn-link search-palette-clear"
           onClick={() => {
             try {
               localStorage.removeItem(RECENT_SEARCHES_KEY);
@@ -352,8 +352,8 @@ export default function SearchDialog({ isOpen, setIsOpen }: SearchDialogProps) {
               aria-label="Search resources, categories, and pages"
               placeholder="Find resources, categories, or pages…"
               trailing={
-                <DialogPrimitive.Close className="search-palette-close" aria-label="Close search">
-                  <kbd>esc</kbd>
+                <DialogPrimitive.Close className="icon-btn search-palette-close" aria-label="Close search">
+                  <kbd className="kbd">esc</kbd>
                   <span className="sr-only">Close search</span>
                 </DialogPrimitive.Close>
               }
@@ -383,7 +383,7 @@ export default function SearchDialog({ isOpen, setIsOpen }: SearchDialogProps) {
                 ) : resourceQuery.isError ? (
                   <div className="search-palette-status search-palette-status-error" data-testid="search-error" role="alert">
                     <span>Search failed. Please try again.</span>
-                    <button type="button" onClick={() => resourceQuery.refetch()}>Try again</button>
+                    <button type="button" className="btn ghost" onClick={() => resourceQuery.refetch()}>Try again</button>
                   </div>
                 ) : (
                   <>
@@ -474,9 +474,9 @@ export default function SearchDialog({ isOpen, setIsOpen }: SearchDialogProps) {
           </Command>
 
           <footer className="search-palette-footer">
-            <span><kbd>↑↓</kbd> navigate</span>
-            <span><kbd>↵</kbd> open</span>
-            <span><kbd>esc</kbd> close</span>
+            <span><kbd className="kbd">↑↓</kbd> navigate</span>
+            <span><kbd className="kbd">↵</kbd> open</span>
+            <span><kbd className="kbd">esc</kbd> close</span>
             <span className="search-palette-footer-spacer" aria-hidden="true" />
             {(showResults && results.length > 0) || (!showResults && defaultSuggestionCount > 0) ? (
               <span className="search-palette-result-count" data-testid="search-result-count" aria-live="polite">

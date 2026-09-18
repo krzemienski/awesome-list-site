@@ -4,19 +4,23 @@ import { cva, type VariantProps } from "class-variance-authority"
 
 import { cn } from "@/lib/utils"
 
+/**
+ * Toggle emits the design system's `.btn.ghost` API; its pressed state
+ * (`data-state="on"`) is a design-system button state rule in
+ * design-system.css (accent ink on an accent-tinted surface).
+ */
 const toggleVariants = cva(
-  "inline-flex items-center justify-center text-sm font-medium ring-offset-background transition-colors hover:bg-muted hover:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 data-[state=on]:bg-accent data-[state=on]:text-accent-foreground [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0 gap-2",
+  "btn ghost gap-2 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0",
   {
     variants: {
       variant: {
-        default: "bg-transparent",
-        outline:
-          "border border-input bg-transparent hover:bg-accent hover:text-accent-foreground",
+        default: "",
+        outline: "",
       },
       size: {
-        default: "h-10 px-3 min-w-10",
-        sm: "h-9 px-2.5 min-w-9",
-        lg: "h-11 px-5 min-w-11",
+        default: "min-h-[44px] min-w-[44px]",
+        sm: "min-h-[44px] min-w-[44px]",
+        lg: "min-h-[48px] min-w-[48px]",
       },
     },
     defaultVariants: {

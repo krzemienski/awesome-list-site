@@ -13,6 +13,7 @@ import { Switch } from "@/components/ui/switch";
 import { Checkbox } from "@/components/ui/checkbox";
 import SEOHead from "@/components/layout/SEOHead";
 import { PRODUCT_PROFILES } from "@/lib/design-system";
+import { cn } from "@/lib/utils";
 import "@/styles/pages/system.css";
 
 /**
@@ -235,11 +236,7 @@ export default function DesignSystemShowcase() {
                 onClick={() => setSystem(id)}
                 aria-pressed={isActive}
                 data-testid={`ds-system-${id}`}
-                className="inline-flex min-h-[44px] items-center gap-2 rounded-[var(--radius-pill)] border bg-[var(--surface)] px-4 text-sm transition-colors hover:border-[var(--border-strong)] focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent)] cursor-pointer"
-                style={{
-                  borderColor: isActive ? "var(--accent)" : "var(--border)",
-                  color: isActive ? "var(--accent)" : "var(--text-2)",
-                }}
+                className={cn("ds-system-pill min-h-[44px] px-4 text-sm", isActive && "active")}
               >
                 {isActive && <Check className="h-4 w-4" />}
                 <span className="font-medium">{sys.name}</span>
@@ -268,8 +265,8 @@ export default function DesignSystemShowcase() {
                 onClick={() => setAccent(a.id)}
                 aria-pressed={isActive}
                 data-testid={`ds-accent-${a.id}`}
-                className="text-left rounded-[var(--radius-sm)] border bg-[var(--surface)] p-2 transition-colors hover:border-[var(--border-strong)] focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent)] cursor-pointer"
-                style={{ borderColor: isActive ? a.primary : "var(--border)" }}
+                className="card hoverable text-left p-2"
+                style={{ borderColor: isActive ? a.primary : undefined }}
               >
                 <div className="flex h-7 w-full overflow-hidden rounded-[var(--radius-xs)] mb-1.5">
                   <div aria-hidden style={{ flex: 2, background: a.primary }} />

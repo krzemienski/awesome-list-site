@@ -166,7 +166,7 @@ export default function AdvancedFilter({
                       <button
                         type="button"
                         key={tag}
-                        className="flex w-full items-center space-x-2 rounded-sm p-2 text-left hover:bg-accent min-h-[44px]"
+                        className="sub-item flex w-full items-center space-x-2 p-2 text-left min-h-[44px]"
                         onClick={() => toggleTag(tag)}
                         aria-pressed={isSelected(tag)}
                         aria-label={`${isSelected(tag) ? "Remove" : "Apply"} ${tag} tag filter`}
@@ -227,7 +227,7 @@ export default function AdvancedFilter({
             <button
               type="button"
               key={tag}
-              className="inline-flex min-h-11 items-center gap-1 rounded-full bg-primary px-3 py-1 text-xs text-primary-foreground touch-manipulation hover:bg-destructive hover:text-destructive-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+              className="chip accent min-h-11 gap-1 px-3 touch-manipulation"
               onClick={() => toggleTag(tag)}
               aria-label={`Remove ${tag} filter`}
             >

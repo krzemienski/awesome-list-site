@@ -1,5 +1,5 @@
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardFooter, CardHeader } from "@/components/ui/card";
+import { CardContent, CardFooter, CardHeader } from "@/components/ui/card";
 import { AlertCircle, RefreshCw } from "lucide-react";
 import { Helmet } from "react-helmet";
 import "@/styles/pages/system.css";
@@ -24,7 +24,7 @@ export default function ErrorPage({ error }: ErrorPageProps) {
         <meta name="robots" content="noindex, nofollow" />
       </Helmet>
       
-      <Card className="system-state-card">
+      <section className="system-state-card">
         <CardHeader>
           <span className="chip bad system-state-code">Error</span>
           <div className="system-state-heading flex items-center gap-2">
@@ -58,7 +58,7 @@ export default function ErrorPage({ error }: ErrorPageProps) {
             </a>
           </Button>
         </CardFooter>
-      </Card>
+      </section>
     </div>
   );
 }

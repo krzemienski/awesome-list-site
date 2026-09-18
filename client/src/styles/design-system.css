@@ -973,79 +973,71 @@ button { font-family: inherit; }
 [data-system="swiss"] .accordion-header.active::before { width: 1px; box-shadow: none; }
 
 /* =====================================================================
-   SHADCN BRIDGE SKINS (T229) — the per-system structural extras above
-   target the raw DS classes (.chip/.btn/.card), which shadcn primitives
-   never emit (MR-DS-13). These rules re-express the same extras via
-   data hooks so rendered output matches the handoff reference:
-     data-ds="chip"        → Badge variant chip|accent (badge.tsx)
-     data-ds-variant="…"   → Button variant (button.tsx)
-     data-ds="card-hover"  → interactive cards (ResourceCard, TaxonomyCard)
-   Non-DS badge variants (status badges) and non-primary buttons keep
-   plain shadcn styling by design — see replit.md divergence #4.
+   PRIMITIVE STATE RULES (Replit additions)
+   The app's React primitives (client/src/components/ui/*) emit the design
+   system's own class API — .btn / .chip / .card / .input / .select /
+   .textarea / .tabs / .tab — so the component rules and per-system skins
+   above apply to every rendered control unchanged. The rules below only
+   express the states those primitives carry as attributes (Radix data-state,
+   aria-pressed, aria-invalid) in the same tokens, plus the `.btn-link`
+   text-button variant the shadcn API exposes.
    ===================================================================== */
 
-/* Badge base rounded-full hardcodes 9999px; track the pill token instead */
-[data-ds="chip"] { border-radius: var(--radius-pill); }
-
-/* ─── TERMINAL ─── */
-[data-system="terminal"] [data-ds="chip"] { text-transform: uppercase; }
-[data-system="terminal"] [data-ds="chip"]::before { content: '['; margin-right: 2px; opacity: 0.55; }
-[data-system="terminal"] [data-ds="chip"]::after  { content: ']'; margin-left: 2px;  opacity: 0.55; }
-[data-system="terminal"] [data-ds-variant="default"] {
-  background: transparent;
+/* Radix Tabs mark the active trigger with data-state; same paint as .tab.active */
+.tab[data-state="active"] {
   color: var(--accent);
-  border: 1px solid var(--accent);
-  text-shadow: 0 0 12px color-mix(in srgb, var(--accent) 60%, transparent);
+  border-bottom-color: var(--accent);
 }
-[data-system="terminal"] [data-ds-variant="default"]:hover {
-  background: color-mix(in srgb, var(--accent) 14%, transparent);
-  box-shadow: 0 0 0 1px var(--accent), inset 0 0 30px color-mix(in srgb, var(--accent) 14%, transparent);
+
+/* Pressed toggles (Radix Toggle/ToggleGroup, aria-pressed buttons): accent ink
+   on the accent-tinted surface, exactly like the icon-rail active button. */
+.btn[data-state="on"],
+.btn[aria-pressed="true"] {
+  color: var(--accent);
+  background: color-mix(in srgb, var(--accent) 12%, transparent);
+  border-color: color-mix(in srgb, var(--accent) 30%, var(--border));
 }
-[data-system="terminal"] [data-ds="card-hover"]:hover {
-  border-color: var(--accent);
-  box-shadow: 0 0 0 1px color-mix(in srgb, var(--accent) 35%, transparent);
+
+/* Text-only button (shadcn `link` variant): accent underline, no chrome. */
+.btn-link {
+  background: transparent;
+  border: 0;
+  padding: 0;
+  min-height: 0;
+  min-width: 0;
+  color: var(--accent);
+  font: inherit;
+  text-decoration: underline;
+  text-underline-offset: 4px;
+  cursor: pointer;
+}
+.btn.btn-link:hover,
+.btn-link:hover {
+  background: transparent;
+  border-color: transparent;
+  color: var(--text);
   transform: none;
-}
-
-/* ─── GEIST ─── */
-[data-system="geist"] [data-ds="chip"] { text-transform: none; letter-spacing: 0; font-family: var(--font-body); font-weight: 500; }
-[data-system="geist"] [data-ds-variant] { font-weight: 500; }
-[data-system="geist"] [data-ds="card-hover"]:hover {
-  box-shadow: 0 0 0 1px var(--border-strong), 0 12px 32px rgba(0,0,0,0.5);
-}
-
-/* ─── BRUTALIST ─── */
-[data-system="brutalist"] [data-ds="chip"] { border-width: 1.5px; border-color: var(--text-2); text-transform: uppercase; }
-[data-system="brutalist"] [data-ds-variant="default"],
-[data-system="brutalist"] [data-ds-variant="outline"] {
-  border: 2px solid var(--text);
-  font-weight: 600;
-  text-transform: uppercase;
-  letter-spacing: 0.04em;
-  font-size: 12px;
-}
-[data-system="brutalist"] [data-ds-variant="default"] { background: var(--accent); color: #000; }
-[data-system="brutalist"] [data-ds-variant="default"]:hover,
-[data-system="brutalist"] [data-ds-variant="outline"]:hover {
-  transform: translate(-2px, -2px);
-  box-shadow: 4px 4px 0 0 var(--text);
-}
-[data-system="brutalist"] [data-ds="card-hover"]:hover {
-  transform: translate(-2px, -2px);
-  box-shadow: 6px 6px 0 0 var(--text);
-  background: var(--surface-2);
-}
-
-/* ─── SWISS ─── */
-[data-system="swiss"] [data-ds="chip"] { font-family: var(--font-mono); font-weight: 500; }
-[data-system="swiss"] [data-ds-variant] { font-weight: 600; }
-[data-system="swiss"] [data-ds-variant="default"],
-[data-system="swiss"] [data-ds-variant="outline"] { border-width: 0.5px; }
-[data-system="swiss"] [data-ds="card-hover"]:hover {
-  border-color: var(--text-3);
   box-shadow: none;
-  transform: none;
-  background: var(--surface-2);
+}
+
+/* Invalid form controls (aria-invalid is set by the form primitives): the
+   global BAD status color, never the accent (docs/10 · Validation). */
+.input[aria-invalid="true"],
+.select[aria-invalid="true"],
+.textarea[aria-invalid="true"],
+.search-input[aria-invalid="true"] {
+  border-color: #ff5c7a; /* DS-OK: status BAD */
+}
+
+/* Mobile text fields render at 16px so iOS Safari does not zoom on focus
+   (WCAG 1.4.4 / docs/17 touch audit); the 13px design size holds from 768px. */
+@media (max-width: 767px) {
+  .input,
+  .select,
+  .textarea,
+  .search-input {
+    font-size: 16px;
+  }
 }
 
 /* ============== SHOWCASE-PAGE-ONLY ============== */

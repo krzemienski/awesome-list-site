@@ -69,7 +69,7 @@ export function collectStrayInputs() {
     /* 3 · known tokenized native controls (verified compliant — list in SKILL.md) */
     el.getAttribute('data-testid') !== 'select-subcategory-filter' && // TaxonomyListing scope filter
     /* 4 · raw DS classes (standalone artifacts / showcase helpers) */
-    ![...el.classList].some(c => /^(input|select|textarea)$/.test(c))
+    ![...el.classList].some(c => /^(input|search-input|select|textarea)$/.test(c))
   );
   // STAGE6-INPUT-FILTER-END
   return {

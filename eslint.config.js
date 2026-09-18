@@ -80,18 +80,27 @@ export default tseslint.config(
   // normal JavaScript checks while opting this file out of TypeScript-only
   // rules that require a typed program.
   {
-    files: ["scripts/validation/contact-variants-566.mjs"],
+    files: [
+      "scripts/validation/contact-variants-566.mjs",
+      "scripts/validation/verify-design-system.mjs",
+    ],
     ...tseslint.configs.disableTypeChecked,
     languageOptions: {
       ...tseslint.configs.disableTypeChecked.languageOptions,
       globals: {
+        applyDesignSystem: "readonly",
+        console: "readonly",
         document: "readonly",
         Event: "readonly",
         fetch: "readonly",
         getComputedStyle: "readonly",
         HTMLInputElement: "readonly",
+        localStorage: "readonly",
         process: "readonly",
+        requestAnimationFrame: "readonly",
+        setTimeout: "readonly",
         URL: "readonly",
+        window: "readonly",
       },
     },
   },
