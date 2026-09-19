@@ -1,3 +1,8 @@
+---
+name: verify-design-system
+description: The 11-stage Awesome.Video design-system compliance contract for this repo — rules, exemptions and triage ladders for tokens, hardcoded values, component hooks, accent/ink discipline, fonts, skins and the five-system switch test. Read the relevant stage when triaging a DS gate failure or auditing a page; run the gates via the awesome-ds-verify skill.
+---
+
 # SKILL · Verify Design-System Compliance
 
 > **Use this skill when:** a user asks "is this page using our design system
