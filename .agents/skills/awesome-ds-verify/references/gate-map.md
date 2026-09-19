@@ -72,9 +72,10 @@ token block. Catches "skins stripped in a refactor" (HANDOFF pitfall 3).
 not composed from `var(--…)`, Tailwind palette classes, raw radii/borders,
 `font-family` literals. Shrink-only baseline keyed by (detector, file, token).
 Output gives `file:line` and the matched token. Fix by routing through a token
-/ bridge utility; a genuinely unavoidable literal takes
-`/* DS-OK: written reason */` within 5 lines above. Palette classes have no
-escape hatch. Self-tests with canaries every run.
+/ bridge utility; a genuinely unavoidable literal (e.g. a frozen radius that
+differs per system) takes `/* DS-OK: written reason */` on the same line or
+within the 5 lines above. Palette classes have no escape hatch. Self-tests with
+canaries every run.
 
 **`standalone-palette-drift`** 🟡 — same scan over manifest-backed
 `artifacts/*`, plus: `awesome-list-site-ds/` still byte-identical to its upload
@@ -99,7 +100,9 @@ Chromium via the repo's Playwright:
 - stage 1 🔴 `window.applyDesignSystem`, 5 systems, 10 accents, `--bg` resolves
 - stage 2 🔴 valid `data-system` / `data-accent`
 - stage 3 🟡 attributes still set with **every external script aborted** —
-  proves the inline boot, not the bundle, decides the theme
+  proves the inline boot, not the bundle, decides the theme (a
+  "decided-before-the-bundle" proof, not a paint-timing one; pre-paint
+  ordering is `font-prepaint`'s job, the script's static shape `accent-drift`'s)
 - stage 4 🟡 `.page`, `.grain`
 - stage 9 🟡 for each `--font-*` token, the face a real visible element uses
   (its weight + style) is loaded. Tokens nothing paints in are noted, not failed
@@ -110,6 +113,15 @@ Chromium via the repo's Playwright:
 Evidence: `live-probe/<route>-<system>.png`, `<route>-switch-samples.json`
 (the computed values per system — diff these to find the frozen property),
 `live-probe.json`. Exit 1 = BLOCK, 2 = FIX only, 70 = could not run.
+
+Limits: it runs signed-out, so `/admin` (and anything behind Clerk) is out of
+its reach — those surfaces are covered by `ds-button-sweep` and `ink-accent`.
+A route answering HTTP 404 *with the SPA shell* (the not-found page, by
+design) is audited as rendered; non-HTML 4xx and 5xx are BLOCK. Every `NOTE …
+not sampled` line is a stage the probe could not verify on that route (no
+visible card / h1 / element painting in a token) — read them, don't skip them.
+Screenshots are viewport-sized on purpose: a fullPage capture rebuilds the
+FontFaceSet and would invalidate the stage-9 check taken just before it.
 
 **`font-prepaint`** 🟡 — instruments writes to `data-font` / `--font-body` /
 `--font-sans` and proves they land before first paint on every boot path,
@@ -124,7 +136,9 @@ and every declared face paints at every inventoried weight — measured by
 **`ds-button-sweep`** 🟡 *(needs `CLERK_SECRET_KEY`, `DATABASE_URL`)* — the six
 stage-6 filters on public routes, with overlays open (cmdk, tag popover, mobile
 filter sheet), signed-in routes and every admin tab, each with a detector
-canary. Also asserts filter-literal parity with the rulebook. A hit prints
+canary. Also asserts filter-literal parity with the rulebook — a comparison
+of the *set* of quoted selector literals/regexes per snippet, so reordered or
+inverted logic around the same literals passes it; read the snippet too. A hit prints
 testid / aria-label / class / text → walk the stage-6 triage ladder before
 calling it a violation.
 
@@ -140,7 +154,9 @@ on both sides, which the offline gate can't.
 
 ## Deep gates
 
-`--deep` only; tens of minutes; need Clerk + admin env.
+`--deep` only; tens of minutes; need Clerk + admin env. Both rewrite
+**tracked** evidence (`tests/parity/{actual,diff,expected,baseline}`,
+`docs/parity/evidence/**`) — leave those out of every commit.
 
 **`parity-systems`** 🔴 — `audit-567-browser.mjs --phase all`: drives
 `/settings/theme` through systems × accents, 4 surfaces × 4 widths, axe on

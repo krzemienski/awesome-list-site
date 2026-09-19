@@ -81,18 +81,22 @@ try {
   // With every external script aborted, only inline <script>s can run. If the
   // attributes are still there, the theme is decided before the bundle — i.e.
   // before first paint. If they vanish, the boot depends on deferred code.
-  {
+  // Checked on EVERY route: the boot picks its default system + accent from
+  // the route's product profile (admin / learning / public), so one route
+  // proving it says nothing about the others. This is a "decided before the
+  // bundle" proof, not a paint-timing one — accent-drift covers the static
+  // shape of the inline script.
+  for (const route of routes) {
     const context = await browser.newContext({ viewport: { width: 1440, height: 900 } });
     const page = await context.newPage();
     await page.route('**/*', (request) => (request.request().resourceType() === 'script' ? request.abort() : request.continue()));
-    const route = routes[0];
-    await page.goto(baseUrl + route, { waitUntil: 'domcontentloaded', timeout: 60_000 });
+    await page.goto(baseUrl + route, { waitUntil: 'domcontentloaded', timeout: 60_000 }).catch(() => null);
     const boot = await page.evaluate(() => ({
       system: document.documentElement.getAttribute('data-system'),
       accent: document.documentElement.getAttribute('data-accent'),
     }));
     record(SYSTEMS.includes(boot.system) && !!boot.accent, '3', 'FIX', route,
-      `pre-paint boot with all external scripts blocked → data-system=${JSON.stringify(boot.system)} data-accent=${JSON.stringify(boot.accent)}`,
+      `boot with all external scripts blocked → data-system=${JSON.stringify(boot.system)} data-accent=${JSON.stringify(boot.accent)}`,
       'the theme attributes must be written by the inline boot script in client/index.html, not by the bundle / a useEffect');
     await context.close();
   }
@@ -101,11 +105,18 @@ try {
     const context = await browser.newContext({ viewport: { width: 1440, height: 900 }, reducedMotion: 'reduce' });
     const page = await context.newPage();
     const response = await page.goto(baseUrl + route, { waitUntil: 'load', timeout: 60_000 });
-    if (!response || response.status() >= 400) {
-      record(false, '1', 'BLOCK', route, `route answered HTTP ${response?.status() ?? 'no response'}`, 'fix the route or pass a valid --routes list');
+    // The not-found page is a key screen of the audit and answers 404 BY DESIGN
+    // (soft-404 architecture: the SPA shell is served with a real 404 status so
+    // crawlers don't index it). An HTML 404 is therefore audited like any other
+    // route; only non-HTML 4xx and every 5xx mean "nothing to audit".
+    const status = response?.status() ?? 0;
+    const isHtml = /text\/html/i.test(response?.headers()['content-type'] || '');
+    if (!response || status >= 500 || (status >= 400 && !(status === 404 && isHtml))) {
+      record(false, '1', 'BLOCK', route, `route answered HTTP ${response ? status : 'no response'}`, 'fix the route or pass a valid --routes list');
       await context.close();
       continue;
     }
+    if (status === 404) console.log(`NOTE ${route} :: answers HTTP 404 with the SPA shell (soft-404 by design) — audited as rendered`);
     await page.waitForFunction(() => typeof window.applyDesignSystem === 'function', null, { timeout: 45_000 }).catch(() => {});
     await page.waitForSelector('.page', { timeout: 15_000 }).catch(() => {});
     await page.evaluate(() => document.fonts.ready);

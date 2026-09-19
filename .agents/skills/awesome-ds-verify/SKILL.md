@@ -45,19 +45,48 @@ node <skill>/scripts/verify-ds.mjs
 # The real verification — app must be running (npm run dev → :5000).
 node <skill>/scripts/verify-ds.mjs --mode full --routes /,/category/encoding-codecs,/settings/theme
 
-# Release-grade: adds the 5×10 theme sweep + axe + pixel parity (slow).
+# Release-grade, the only command that can print PASS: adds the 5×10 theme
+# sweep + axe + pixel parity (tens of minutes; needs Clerk + admin env).
 node <skill>/scripts/verify-ds.mjs --mode full --deep
 ```
 
 Pass `--routes` for the pages you actually changed — the live probe checks each
-one. Signed-in/admin gates need `CLERK_SECRET_KEY`, `ADMIN_PASSWORD` (≥ 8
+one (stages 1–4, 9 and 11 per route; its stage-3 proof is "attributes present
+with every external script blocked", not paint timing — `accent-drift` and
+`font-prepaint` cover the static and pre-paint side). For a release/consensus-grade run pass the audit's key screens:
+`/,/about,/journeys,/category/<slug>,/resource/<id>,/sign-in,/settings/theme,/this-route-does-not-exist`
+(the last one answers HTTP 404 by design and is audited as rendered). `/admin`
+and its sub-flows need a Clerk session, so `live-probe` cannot reach them —
+they are covered by the authenticated gates `ds-button-sweep` and `ink-accent`.
+Signed-in/admin gates need `CLERK_SECRET_KEY`, `ADMIN_PASSWORD` (≥ 8
 chars) and `DATABASE_URL` in the environment; without them those gates report
 UNVERIFIED with the missing names. Other flags: `--list`, `--only id,id`
 (scoped debugging run — can never produce PASS), `--base-url`, `--json`.
 
+**Dev is not the final word.** The dev server (`npm run dev`, Vite) and the
+production build (`npm run build && PORT=5055 npm run start` → `node dist/index.js`)
+boot the theme differently (prod defers the bundle and prerenders `.page`
+before the DS globals exist). Run `--mode full --deep` against BOTH before
+calling DS work done (a non-deep full run tops out at INCOMPLETE — useful while
+iterating, never the final word):
+
+```bash
+npm run build                      # separate call — check+build chained exceeds shell budgets
+PORT=5055 npm run start &          # wait until curl -s -o /dev/null -w '%{http_code}' :5055/ prints 200
+node <skill>/scripts/verify-ds.mjs --mode full --deep --base-url http://127.0.0.1:5055 --routes …
+```
+
+**Run discipline.** One browser run at a time: never start the runner while
+another audit, the parity runner or an auditor subagent has a browser open,
+and make no repo writes (docs, `touch`, dir deletes included) while it runs —
+Vite's watcher reloads every open page and the live gates flake. Re-run only
+after something changed (code or environment); a second identical run proves
+nothing. When working under the consensus gate, log every run and what changed
+in between in `.cache/ds-consensus/LEDGER.md`.
+
 | Exit | Verdict | Meaning |
 |---|---|---|
-| 0 | **PASS** | Every gate ran and passed. Only reachable with `--mode full`. |
+| 0 | **PASS** | Every gate ran and passed. Only reachable with `--mode full --deep` and the auth env present — anything the run did not execute (deep tier, missing env, `--only`) stays UNVERIFIED and caps the verdict at INCOMPLETE. |
 | 1 | **FAIL** | ≥ 1 🔴 BLOCK gate failed. Not DS-compliant. |
 | 2 | **FIX** | No BLOCK, ≥ 1 🟡 FIX gate failed. Address before shipping. |
 | 3 | **INCOMPLETE** | Nothing failed, but something didn't run. Not a pass. |
@@ -100,8 +129,10 @@ same command shows it.
 
 - **Three gates parse the in-repo SKILL.md.** `palette-drift` diffs its stage-5
   `rg` command, `standalone-palette-drift` parses the scope comment,
-  `ds-button-sweep` diffs the six stage-6 JS snippets literal-for-literal
-  against `ds-button-filter.mjs`. Editing those blocks without the script (or
+  `ds-button-sweep` compares the set of quoted selector literals and regexes
+  in the six stage-6 JS snippets against `ds-button-filter.mjs` (a set
+  comparison — reordered or inverted logic around the same literals is not
+  caught, so read the snippet when you change the filter). Editing those blocks without the script (or
   vice-versa) fails the gate. Change both in one commit.
 - **`awesome-list-site-ds/` is frozen.** It is the design authority, kept
   byte-identical to the upload. Never edit it to make a check pass — port the
@@ -122,6 +153,40 @@ same command shows it.
   Chromium, or an unreachable app shows up as UNVERIFIED with the fix
   (`npm ci`, `npm run test:e2e:browsers`, `npm run dev`). Fix the environment
   and re-run; don't report it as a DS failure and don't wave it through.
+- **Two rulebooks exist; know which one you were handed.** The in-repo
+  `.agents/skills/verify-design-system/SKILL.md` is the app's contract (stage 6
+  = `data-ds` / `data-ds-variant` hooks on shadcn + Radix + Clerk, per
+  `replit.md` MR-DS-13 divergences #1/#5). The *verbatim* upstream 11-stage
+  skill (kept frozen for consensus audits under `.cache/ds-consensus/`) tests
+  stage 6 by literal `.btn` / `.card` / `.chip` classes and will FAIL this app
+  by construction — Clerk's generated sign-in DOM cannot take literal classes
+  at all. Report that as an architectural residual with the divergence cited;
+  never add marker classes to game it, and never edit or paraphrase the frozen
+  skill. A literal-class migration is a product decision the user makes.
+- **Fonts: what "loaded" means.** `document.fonts.check()` answers for the
+  weight-400 normal face of the family (false while only 600/700 are loaded),
+  and a Playwright *fullPage* screenshot rebuilds Chromium's CSS-connected
+  FontFaceSet — a check that was true before a capture can be false after it.
+  The app warms system faces on `applyDesignSystem()` and on window resize for
+  exactly this reason. Probe the face a real element uses, `fonts.load()` it,
+  and check *before* you capture — `live-probe` and `ds-showcase` already do.
+  The always-on Google Fonts `<link>` must stay byte-identical to the design's
+  (`accent-drift` rule 11) — a token naming a family that link lacks is token
+  drift, never a reason to widen the URL.
+- **Stage-5 literals that must stay literal** (a frozen radius or border that
+  differs per system, so no single token fits) take `/* DS-OK: reason */` on
+  the same line or within the 5 lines above. `palette-drift` accepts both; a
+  bare `DS-OK` without a reason exempts nothing.
+- **Evidence never enters git.** The runner's own tree (`.cache/verify-ds/`)
+  is self-ignored, but the deep gates rewrite *tracked* files —
+  `tests/parity/{actual,diff}`, `docs/parity/evidence/**`, hundreds of PNGs.
+  Commit with explicit source paths (`git add client/… scripts/…`), never
+  `git add -A`, and check `git diff --cached --stat` shows no `.png` before
+  committing.
+- **Authenticated gates leave residue when killed.** They mint disposable
+  `__qa_test_` users (Clerk + local row). After a timeout or a killed run, sweep
+  them Clerk-first, then the local rows — deleting the local row first lets a
+  live session re-provision it within seconds.
 
 ## When not to use
 

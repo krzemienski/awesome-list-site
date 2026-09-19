@@ -163,3 +163,4 @@
 - [Background shell subshell death](bash-long-jobs.md) — `( … ) &` inside a background ShellExec dies with the call; run the loop in the foreground of the background task, poll a log file.
 - [fonts.check probes weight 400 + capture rebuild](fonts-check-capture-rebuild.md) — check() is false until the 400 face loads; Playwright fullPage captures rebuild the FontFaceSet (unloaded) — warm on apply AND on resize.
 - [Verbatim skill Stage 6 vs shadcn hooks](verbatim-skill-vs-shadcn-hooks.md) — frozen skill's class predicate always FAILs this app (data-ds hooks by design); report as architectural residual, never add marker classes.
+- [awesome-ds-verify skill copies](awesome-ds-verify-skill-copies.md) — repo copy authoritative, mirror .local after edits; PASS needs --deep + auth env, non-deep full caps at INCOMPLETE; 404 page audited as rendered.
