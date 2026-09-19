@@ -1051,9 +1051,30 @@ try {
        VALUES ($1, 'new_resource', $2, 'Seeded by the ds-button-sweep authed scenario.', $3, $4, $5, now() + interval '1 day')`,
       [userId, NOTIF_TITLE, `/resource/${resourceId}`, resourceId, `${PREFIX}${suffix}`],
     );
-    const bookmarked = await authedContext.request.fetch(`${BASE}/api/bookmarks/${resourceId}`, {
+    // Seed through the signed-in PAGE, not authedContext.request: Clerk's
+    // __session cookie is Secure, and Playwright's Node-side request jar
+    // withholds Secure cookies over http://127.0.0.1 (it exempts only
+    // `localhost`), so the same POST 401s whenever BASE is the loopback IP.
+    // Browser fetch() treats both loopback hosts as secure contexts.
+    const authedFetch = async (url, { method = 'GET', data } = {}) => {
+      const result = await authedPage.evaluate(async ({ url, method, data }) => {
+        const response = await fetch(url, {
+          method,
+          credentials: 'include',
+          headers: data === undefined ? {} : { 'Content-Type': 'application/json' },
+          body: data === undefined ? undefined : JSON.stringify(data),
+        });
+        return { status: response.status, ok: response.ok, text: await response.text() };
+      }, { url, method, data });
+      return {
+        ok: () => result.ok,
+        status: () => result.status,
+        text: async () => result.text,
+        json: async () => JSON.parse(result.text),
+      };
+    };
+    const bookmarked = await authedFetch(`${BASE}/api/bookmarks/${resourceId}`, {
       method: 'POST',
-      headers: { Origin: BASE, 'Content-Type': 'application/json' },
       data: { notes: `ds-sweep seed ${suffix}` },
     });
     if (!bookmarked.ok()) throw new Error(`seed bookmark failed: ${bookmarked.status()} ${(await bookmarked.text()).slice(0, 200)}`);
@@ -1062,17 +1083,15 @@ try {
     // collection chrome (sidebar rows + reorder arrows; management strip when
     // selected) actually renders. Rows cascade with the QA user in teardown.
     const COLLECTION_NAME = `QA sweep collection ${suffix}`;
-    const createdCollection = await authedContext.request.fetch(`${BASE}/api/collections`, {
+    const createdCollection = await authedFetch(`${BASE}/api/collections`, {
       method: 'POST',
-      headers: { Origin: BASE, 'Content-Type': 'application/json' },
       data: { name: COLLECTION_NAME },
     });
     if (!createdCollection.ok()) throw new Error(`seed collection failed: ${createdCollection.status()} ${(await createdCollection.text()).slice(0, 200)}`);
     const collectionId = (await createdCollection.json())?.id;
     if (!collectionId) throw new Error('seed collection returned no id');
-    const addedToCollection = await authedContext.request.fetch(`${BASE}/api/collections/${collectionId}/items/${resourceId}`, {
+    const addedToCollection = await authedFetch(`${BASE}/api/collections/${collectionId}/items/${resourceId}`, {
       method: 'POST',
-      headers: { Origin: BASE, 'Content-Type': 'application/json' },
     });
     if (!addedToCollection.ok()) throw new Error(`seed collection item failed: ${addedToCollection.status()} ${(await addedToCollection.text()).slice(0, 200)}`);
 
@@ -1081,9 +1100,8 @@ try {
     // /bookmarks?collection=<id> and get swept — they only exist while
     // publishedAt + publicUrl are set. The published state cascades with
     // the collection row (and the QA user) in teardown.
-    const publishedCollection = await authedContext.request.fetch(`${BASE}/api/collections/${collectionId}/publish`, {
+    const publishedCollection = await authedFetch(`${BASE}/api/collections/${collectionId}/publish`, {
       method: 'POST',
-      headers: { Origin: BASE, 'Content-Type': 'application/json' },
     });
     if (!publishedCollection.ok()) throw new Error(`seed collection publish failed: ${publishedCollection.status()} ${(await publishedCollection.text()).slice(0, 200)}`);
     // Task #372: the publish response carries shareId (+ publicUrl built from

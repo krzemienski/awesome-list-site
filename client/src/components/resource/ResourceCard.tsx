@@ -350,7 +350,7 @@ function ResourceCard({
               {resource.category}
             </Badge>
           )}
-          {resolvedKind && (
+          {resolvedKind && resolvedKind !== "other" && (
             <Badge
               variant="chip"
               className="resource-card__kind-badge"

@@ -27,15 +27,15 @@
   border-color: var(--border);
   display: block;
   font-size: 13px;
-  height: 36px;
+  height: auto;
   line-height: normal;
-  min-height: 0;
+  min-height: 44px;
   padding: 7px 10px;
   width: 200px;
 }
 
 .admin-catalog-resources__header-actions button {
-  min-height: 0;
+  min-height: 44px;
 }
 
 .admin-catalog-resources__header > div:first-child {
@@ -91,6 +91,8 @@
   border-collapse: collapse;
   font-size: 13px;
   min-width: 720px;
+  /* Preserve the frozen data-column geometry; the additional product delete
+     target occupies one separate 44px control extent. */
   width: 100%;
 }
 
@@ -299,5 +301,12 @@
     border-left: 0;
     border-right: 0;
     border-radius: 0;
+  }
+}
+
+@media (min-width: 48rem) {
+  .admin-catalog-resources__table {
+    min-width: 764px;
+    width: calc(100% + 44px);
   }
 }

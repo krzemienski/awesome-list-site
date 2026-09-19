@@ -159,3 +159,7 @@
 - [SSR Clerk empty host](ssr-clerk-empty-host.md) — "Host must not be empty" = Clerk host-derived key at SSR module eval; resolve the explicit key, diagnose with a /tmp --ssr build only.
 - [fonts.check vs load](fonts-check-vs-load.md) — fonts.check() is false for loaded families with unused weights/subsets; prove with fonts.load() non-empty; prod prerenders .page before DS globals exist.
 - [Consensus audit panels](consensus-audit-panels.md) — blind auditors get skill+URL+private .cache dir only; dev panel then prod panel; save verdicts verbatim; waitForJob caps at 600 s.
+- [Reference adjustments → app lockstep](reference-adjustment-lockstep.md) — approved comparison-reference rules change EXPECTED only; port to app CSS same pass, check frozen JSX classes before calling accent drift, offsets fail all bands.
+- [Background shell subshell death](bash-long-jobs.md) — `( … ) &` inside a background ShellExec dies with the call; run the loop in the foreground of the background task, poll a log file.
+- [fonts.check probes weight 400 + capture rebuild](fonts-check-capture-rebuild.md) — check() is false until the 400 face loads; Playwright fullPage captures rebuild the FontFaceSet (unloaded) — warm on apply AND on resize.
+- [Verbatim skill Stage 6 vs shadcn hooks](verbatim-skill-vs-shadcn-hooks.md) — frozen skill's class predicate always FAILs this app (data-ds hooks by design); report as architectural residual, never add marker classes.

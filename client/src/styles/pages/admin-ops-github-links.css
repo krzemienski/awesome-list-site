@@ -34,13 +34,10 @@
   z-index: 2;
 }
 
-/* 16px offset + 32px control = the 48px page tail the canonical panel already
-   ends with, so the disclosure never lengthens the document (the 36px `.btn`
-   box pushed the GitHub page 9px past the frozen height). */
+/* The disclosure follows the contract-wide 44px interactive target. */
 .ops-github-panel > .admin-ops-more > summary,
 .ops-link-health > .admin-ops-more > summary {
-  height: 32px;
-  min-height: 0;
+  min-height: 44px;
   padding: 5px 12px;
   font-size: 12px;
   line-height: normal;
@@ -124,7 +121,7 @@
 
 .ops-github-panel__repository-actions button {
   height: auto;
-  min-height: 0;
+  min-height: 44px;
   padding: 9px 16px;
   font-size: 13px;
   line-height: normal;
@@ -204,7 +201,7 @@
 .ops-github-panel__logs {
   font-size: 12px;
   line-height: normal;
-  min-height: 0;
+  min-height: 44px;
   padding: 5px 10px;
 }
 

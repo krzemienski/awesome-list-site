@@ -74,7 +74,7 @@ export default function AppFooter({ nav, site }: {
           </Column>
           <Column title="SOURCE">
             <ExternalLink href={repo} testId="footer-github">{repo.replace(/^https?:\/\/(www\.)?github\.com\//, "")} ↗</ExternalLink>
-            {site.issuesUrl ? <ExternalLink href={site.issuesUrl}>Report an issue ↗</ExternalLink> : null}
+            <ExternalLink href={site.issuesUrl || `${repo}/issues`}>Report an issue ↗</ExternalLink>
             <ExternalLink href={`${repo}/blob/${branch}/CONTRIBUTING.md`}>Contributing ↗</ExternalLink>
             <ExternalLink href="https://github.com/sindresorhus/awesome">awesome-list guidelines ↗</ExternalLink>
             <ExternalLink href={`${repo}/tree/${branch}/docs`}>Docs ↗</ExternalLink>

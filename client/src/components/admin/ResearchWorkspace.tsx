@@ -11,14 +11,10 @@ const RESEARCH_WORKSPACE_LIMIT = 4;
 function toResearchNote(job: ResearchJob, now = Date.now()) {
   const active = job.status === "pending" || job.status === "processing";
   const brief = job.prompt?.trim() || `Research job #${job.id}`;
-  const firstLine = brief.split(/\r?\n/).find((line) => line.trim())?.trim() || brief;
-  const title = firstLine.length > 76 ? `${firstLine.slice(0, 73).trimEnd()}…` : firstLine;
-  const excerptText = brief.replace(/\s+/g, " ").trim();
-  const excerpt = excerptText.length > 156 ? `${excerptText.slice(0, 153).trimEnd()}…` : excerptText;
+  const title = brief;
   return {
     id: job.id,
     title,
-    excerpt,
     brief,
     candidates: job.totalDiscoveries ?? 0,
     freshness: active ? "Active" : formatRelativeAgo(job.completedAt ?? job.startedAt ?? job.createdAt, now),
@@ -77,11 +73,10 @@ export function ResearchWorkspace() {
                   if (job) setSelectedJob(job);
                 }}
                 aria-haspopup="dialog"
-                aria-label={`Open research note: ${note.title}. ${note.excerpt}`}
+                aria-label={`Open research note: ${note.title}`}
                 data-testid={`button-research-note-${note.id}`}
               >
                 <h3>{note.title}</h3>
-                <p className="admin-research-note__excerpt">{note.excerpt}</p>
                   <div className="admin-research-note__meta">
                     <span>{note.candidates} candidates</span>
                     <span>{note.freshness}</span>

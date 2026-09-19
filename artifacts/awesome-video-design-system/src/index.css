@@ -89,25 +89,26 @@ button { color: inherit; }
     max-width: 100%;
     overflow-x: auto;
   }
-  /* Colour chapter ink ramp: token, tier name, usage. The usage note reflows
-     under the token pair instead of squeezing into a 35px column. */
-  .ds-ink-row {
+  /* Showcase-only inline token and list specimens mirror the adjusted frozen
+     showcase. Documentation chapters intentionally retain their canonical row
+     widths unless a docs-specific contract rule above reflows them. */
+  .ds-shell .ds-ink-row {
     grid-template-columns: minmax(0, 1fr) auto !important;
     column-gap: 10px !important;
   }
-  .ds-ink-row > :nth-child(1) {
+  .ds-shell .ds-ink-row > :nth-child(1) {
     min-width: 0;
     overflow-wrap: anywhere;
   }
-  .ds-ink-row > :nth-child(3) {
+  .ds-shell .ds-ink-row > :nth-child(3) {
     grid-column: 1 / -1;
   }
-  .ds-list-row {
+  .ds-shell .ds-list-row {
     grid-template-columns: 36px minmax(0, 1fr) !important;
     column-gap: 12px !important;
   }
-  .ds-list-row > :nth-child(3),
-  .ds-list-row > :nth-child(4) {
+  .ds-shell .ds-list-row > :nth-child(3),
+  .ds-shell .ds-list-row > :nth-child(4) {
     grid-column: 2;
     text-align: left !important;
   }
@@ -221,7 +222,12 @@ button { color: inherit; }
 .tab,
 .ds-system-pill,
 .input,
-.select {
+.select,
+.artifact-docs button,
+.artifact-docs input,
+.artifact-docs select,
+.artifact-docs textarea {
+  box-sizing: border-box;
   min-height: var(--profile-control-height);
 }
 
@@ -256,4 +262,8 @@ button { color: inherit; }
 .ds-accent-grid {
   flex-wrap: wrap;
   max-width: 100%;
+}
+
+.artifact-docs .textarea {
+  min-height: 96px;
 }

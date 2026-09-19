@@ -97,11 +97,11 @@
 
 .admin-ops-table .admin-ops-cell-actions button,
 .admin-ops-table .admin-ops-cell-actions [role="combobox"] {
-  min-height: 2rem;
+  min-height: 44px;
 }
 
 .admin-ops-table .admin-ops-cell-actions button {
-  min-width: 2rem;
+  min-width: 44px;
 }
 
 .admin-ops-audit-detail-button {
@@ -172,23 +172,27 @@
 .admin-ops-users-table thead button {
   font-size: inherit;
   height: auto !important;
-  min-height: 0 !important;
-  /* The frozen header is bare text: no 44px control box centring the label
-     (it shifted NAME/ROLE 4-7px right and inflated the Role column). */
-  min-width: 0 !important;
+  min-height: 44px !important;
+  min-width: 44px !important;
   justify-content: flex-start;
   padding: 0;
 }
 
 .admin-ops-users-table thead th {
   font-family: var(--font-body);
+  height: 44px;
   line-height: 1.6;
+  position: relative;
   text-transform: uppercase;
 }
 
 .admin-ops-users-table thead button {
   font-family: inherit;
   line-height: inherit;
+  position: absolute;
+  inset-inline-start: 0.875rem;
+  top: 50%;
+  transform: translateY(-50%);
   text-transform: uppercase;
 }
 
@@ -236,9 +240,9 @@
   border-radius: var(--radius-sm);
   font-family: var(--font-body);
   font-size: 12px;
-  height: 27px !important;
+  height: auto !important;
   line-height: normal;
-  min-height: 0 !important;
+  min-height: 44px !important;
   padding: 5px 10px;
 }
 

@@ -74,8 +74,8 @@
 }
 
 .admin-taxonomy-header-actions > [data-testid^="button-create-"] {
-  min-height: 36px;
-  height: 36px;
+  min-height: 44px;
+  height: auto;
   padding: 9px 16px;
   border: var(--hairline-w) solid var(--accent);
   font-size: 13px;
@@ -145,6 +145,11 @@
 
 /* TableShell geometry from the frozen admin reference. */
 .admin-taxonomy-table {
+  /*
+   * The product adds one contract-required 44px delete target beside the
+   * frozen table's Edit target. Give that target its own inline extent rather
+   * than making auto layout steal width from every canonical data column.
+   */
   width: 100%;
   border-collapse: collapse;
   font-size: 0.8125rem;
@@ -389,5 +394,11 @@
 
   .admin-users-table {
     min-width: 52rem;
+  }
+}
+
+@media (min-width: 48.001rem) {
+  .admin-taxonomy-table {
+    width: calc(100% + 44px);
   }
 }

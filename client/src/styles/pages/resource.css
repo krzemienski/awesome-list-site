@@ -11,11 +11,10 @@
 
 .resource-detail-navigation { margin-bottom: 28px; }
 
-/* The frozen back control is the 36px `.btn.ghost` with a 12px arrow — the
-   same geometry the taxonomy pages' back button already takes. */
+/* The back control keeps the canonical inset with the 44px target floor. */
 .resource-detail-navigation button {
-  height: 36px;
-  min-height: 36px;
+  height: auto;
+  min-height: 44px;
   gap: 8px;
   line-height: normal;
 }
@@ -74,6 +73,7 @@
   font-size: 13px;
   font-weight: 500;
   padding: 9px 16px;
+  min-height: 44px;
 }
 
 .resource-detail-actions > button[aria-pressed="true"] {

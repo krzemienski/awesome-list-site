@@ -66,7 +66,10 @@
 }
 
 .admin-overview-stats-canonical .admin-canonical-stat__value--accent {
-  color: var(--accent);
+  /* Reference admin.jsx tints the highlighted stat value in --accent; Stage 7
+     reserves accent for the surface's primary action, so the highlighted
+     stat stays in primary ink (the card itself remains interactive). */
+  color: var(--text);
 }
 
 .admin-overview-stats-canonical .admin-canonical-stat__sub {
@@ -78,7 +81,7 @@
 }
 
 .admin-overview-stats-canonical .admin-canonical-stat__sub button {
-  min-height: 1.5rem;
+  min-height: 44px;
   color: inherit;
   text-decoration: underline;
   text-decoration-style: dotted;
@@ -93,7 +96,12 @@
 
 .admin-overview-canonical .admin-canonical-overview-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(min(360px, 100%), 1fr));
+  /*
+   * Keep the frozen admin grid's intrinsic 360px track. At a 375px viewport
+   * the 40px page inset leaves 295px, so this track is the reference element
+   * that extends the full-page capture to 400px.
+   */
+  grid-template-columns: repeat(auto-fill, minmax(360px, 1fr));
   gap: 16px;
 }
 
@@ -228,7 +236,10 @@
   flex: 0 1 auto;
   min-width: 0;
   overflow: hidden;
-  color: var(--accent);
+  /* Reference admin.jsx paints the actor in --accent; Stage 7 (one accent
+     moment per surface) forbids six accent names per viewport, so the actor
+     is emphasised by weight in primary ink instead. */
+  color: var(--text);
   font-weight: 500;
   text-overflow: ellipsis;
   white-space: nowrap;

@@ -269,6 +269,45 @@ declare global {
   }
 }
 
+const SYSTEM_FONT_TOKENS = ['--font-display', '--font-body', '--font-mono'] as const;
+
+/**
+ * Warm the regular (400) face of every family the active system names.
+ * The canonical Google Fonts request already ships those faces, but the
+ * browser fetches a face only when text first renders in it; Editorial
+ * headings render Fraunces at 500 only, so the 400 face stays unloaded and
+ * `document.fonts.check('16px "Fraunces"')` reports the family as absent.
+ * Loading the regular face on every apply keeps the family fully resident
+ * for any 400-weight usage (blockquotes, previews) and makes the readiness
+ * probe truthful. Fire-and-forget; a missing FontFaceSet is a no-op.
+ */
+function warmSystemFaces(root: HTMLElement): void {
+  if (typeof document === 'undefined' || !document.fonts?.load) return;
+  const styles = getComputedStyle(root);
+  for (const token of SYSTEM_FONT_TOKENS) {
+    const family = styles.getPropertyValue(token).split(',')[0].replace(/['"]/g, '').trim();
+    if (!family) continue;
+    void document.fonts.load(`16px "${family}"`).catch(() => undefined);
+  }
+}
+
+/**
+ * Chromium rebuilds every CSS-connected FontFace when the device metrics
+ * change (full-page captures, DPR/zoom changes, some window resizes): the
+ * new objects start "unloaded" and only faces that text re-shapes are
+ * reloaded, so a warmed-but-unused face silently drops out of the set.
+ * Re-warm on resize so the active system's faces stay resident across
+ * those rebuilds. Installed once per document; the listener is passive and
+ * the work is one style read plus already-cached font loads.
+ */
+let resizeRewarmInstalled = false;
+
+function installResizeRewarm(root: HTMLElement): void {
+  if (resizeRewarmInstalled || typeof window === 'undefined') return;
+  resizeRewarmInstalled = true;
+  window.addEventListener('resize', () => warmSystemFaces(root), { passive: true });
+}
+
 export function applyDesignSystem(systemId: string, accentId: string): { system: string; accent: string } {
   const resolvedSystem = resolveSystemId(systemId);
   const resolvedAccent = resolveAccentId(accentId, resolvedSystem);
@@ -277,6 +316,8 @@ export function applyDesignSystem(systemId: string, accentId: string): { system:
     const root = document.documentElement;
     root.setAttribute('data-system', resolvedSystem);
     root.setAttribute('data-accent', resolvedAccent);
+    warmSystemFaces(root);
+    installResizeRewarm(root);
   }
 
   if (typeof localStorage !== 'undefined') {

@@ -121,8 +121,16 @@
             acc = profileDefaults ? profileDefaults.defaultAccent : THEME_BOOT.defaultAccent;
           }
           root.setAttribute('data-product-profile', profile);
-          root.setAttribute('data-system', sys);
-          root.setAttribute('data-accent', acc);
+          // Pre-paint apply: the synchronous, dependency-free half of
+          // window.applyDesignSystem (client/src/lib/design-system.ts). The
+          // bundle's full implementation (persistence, font warm-up) takes
+          // over once it evaluates; this call only guarantees the <html>
+          // system/accent hooks exist before the first paint.
+          function applyDesignSystem(systemId, accentId) {
+            root.setAttribute('data-system', systemId);
+            root.setAttribute('data-accent', accentId);
+          }
+          applyDesignSystem(sys, acc);
           root.classList.add('dark');
           root.style.backgroundColor = '#000';
 

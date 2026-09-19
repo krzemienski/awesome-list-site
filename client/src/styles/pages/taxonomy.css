@@ -10,10 +10,11 @@
   animation: fadeIn 0.5s ease;
 }
 
-/* Canonical `.btn.ghost` geometry: 36px tall, 9px 16px padding, 13px label. */
+/* Canonical `.btn.ghost` padding and type within the approved target floor. */
 .taxonomy-back {
-  height: 36px;
-  min-height: 36px;
+  box-sizing: border-box;
+  height: auto;
+  min-height: 44px;
   gap: 8px;
   margin-bottom: 20px;
   padding: 9px 16px;
@@ -200,14 +201,34 @@
   position: absolute;
   top: -6px;
   right: 0;
+  box-sizing: border-box;
+  min-height: 44px;
 }
 
+/* Below 640px the summary row has no room for the 44px toggle beside its
+   chips. The Category page's back-button row is 44px tall with an empty right
+   side, so the toggle shares that row instead of pushing content down. The
+   breadcrumb pages keep the toggle in flow after the summary. */
 @media (max-width: 639px) {
-  .taxonomy-summary {
+  .taxonomy-page--category {
+    position: relative;
+  }
+
+  .taxonomy-page--category .taxonomy-summary {
+    position: static;
+  }
+
+  .taxonomy-page--category .taxonomy-tools-toggle {
+    top: 0;
+  }
+
+  .taxonomy-page--subcategory .taxonomy-summary,
+  .taxonomy-page--sub-subcategory .taxonomy-summary {
     padding-right: 0;
   }
 
-  .taxonomy-tools-toggle {
+  .taxonomy-page--subcategory .taxonomy-tools-toggle,
+  .taxonomy-page--sub-subcategory .taxonomy-tools-toggle {
     position: static;
     margin-left: auto;
   }
@@ -407,8 +428,8 @@
 .taxonomy-pagination [data-testid="input-page-jump"] {
   box-sizing: border-box;
   width: 64px;
-  height: 32px;
-  min-height: 0;
+  height: auto;
+  min-height: 44px;
   padding: 0 8px;
   border: var(--border-w) solid var(--border);
   border-radius: var(--radius-sm);

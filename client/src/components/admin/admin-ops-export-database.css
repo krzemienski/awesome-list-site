@@ -103,8 +103,7 @@
 }
 
 .admin-ops-export-card__action {
-  /* Canonical `.btn.primary`: 1px accent border + 9px 16px padding around a
-     13px label at UA button line-height (36px tall). */
+  /* Preserve the canonical inset while honoring the 44px control floor. */
   border: var(--border-w, 1px) solid var(--accent);
   font-size: 0.8125rem;
   font-weight: 600;
@@ -113,7 +112,7 @@
   /* Canonical cards flow the button right after the description (no bottom
      pinning), so one-line cards sit higher than two-line neighbours. */
   margin-top: 0;
-  min-height: 0;
+  min-height: 44px;
   padding: 0.5625rem 1rem;
   width: 100%;
 }
@@ -373,7 +372,7 @@
 }
 
 .admin-ops-table__action {
-  min-height: 2rem;
+  min-height: 44px;
   min-width: 4.25rem;
   padding: 0 0.625rem;
 }
@@ -531,11 +530,11 @@
   margin-top: 12px;
 }
 
-/* Canonical `.btn` geometry (36px) for the console actions. */
+/* Canonical inset with the contract-wide 44px control floor. */
 .admin-ops-database__console-actions > .btn {
-  height: 36px;
+  height: auto;
   line-height: normal;
-  min-height: 0;
+  min-height: 44px;
   padding: 9px 16px;
 }
 
@@ -566,10 +565,7 @@
 .admin-ops-database > .admin-ops-more > summary {
   position: absolute;
   top: 0;
-  /* 16px offset + 32px control = the 48px page tail the canonical panel
-     already ends with, so the disclosure never lengthens the document. */
-  height: 32px;
-  min-height: 0;
+  min-height: 44px;
   padding: 5px 12px;
   font-size: 12px;
   line-height: normal;
@@ -647,10 +643,10 @@
   background: transparent;
   border-color: var(--border);
   font-size: 12px;
-  height: 27px;
+  height: auto;
   line-height: normal;
-  min-height: 0;
-  min-width: 0;
+  min-height: 44px;
+  min-width: 44px;
   padding: 5px 10px;
 }
 

@@ -76,7 +76,7 @@
 .av-sidebar-shell .av-sidebar-home-navigation > .sub-item {
   border: 0;
   margin-block: 1px;
-  min-height: 34px;
+  min-height: 44px;
 }
 
 .av-sidebar-shell .av-sidebar-categories-heading {
@@ -95,12 +95,15 @@
   color: var(--text-3);
   cursor: pointer;
   display: flex;
-  flex: 0 0 26px;
-  height: 26px;
+  box-sizing: border-box;
+  flex: 0 0 44px;
+  height: 44px;
   justify-content: center;
   padding: 0;
   transform: scaleX(-1);
-  width: 26px;
+  min-height: 44px;
+  min-width: 44px;
+  width: 44px;
 }
 
 .av-sidebar-shell [data-sidebar="footer"] {
@@ -140,13 +143,14 @@
   border-radius: var(--radius-sm);
   color: var(--text-2);
   display: flex;
-  flex: 0 0 36px;
-  height: 36px;
+  box-sizing: border-box;
+  flex: 0 0 44px;
+  height: 44px;
   justify-content: center;
-  min-height: 36px;
-  min-width: 36px;
+  min-height: 44px;
+  min-width: 44px;
   padding: 0;
-  width: 36px;
+  width: 44px;
 }
 
 .av-sidebar-shell.av-sidebar-rail-compact .rail-icon-btn:hover {
@@ -278,7 +282,7 @@
 .av-sidebar-l3-indicator {
   background: var(--surface);
   /* DS-OK: frozen V2's noninteractive L3 taxonomy marker uses a 3px chip radius. */
-  border-radius: 3px;
+  border-radius: 3px; /* DS-OK: frozen literal, reason above */
   color: var(--text-3);
   font-family: var(--font-mono);
   font-size: 9px;
@@ -288,8 +292,8 @@
 
 .av-sidebar-nested-count {
   /* DS-OK: frozen V2's nested-count marker is a 1px bordered, 3px-radius chip. */
-  border: 1px solid var(--border);
-  border-radius: 3px;
+  border: 1px solid var(--border); /* DS-OK: frozen literal, reason above */
+  border-radius: 3px; /* DS-OK: frozen literal, reason above */
   color: var(--text-3);
   font-family: var(--font-mono);
   font-size: 9px;
@@ -518,7 +522,7 @@
   border: var(--hairline-w) solid transparent;
   /* DS-OK: canonical .sub-item uses a fixed 6px navigation radius rather
      than the variable card/control radius. */
-  border-radius: 6px;
+  border-radius: 6px; /* DS-OK: frozen literal, reason above */
   box-sizing: border-box;
   color: var(--text-2);
   cursor: pointer;
@@ -527,6 +531,7 @@
   gap: 10px;
   justify-content: space-between;
   margin: 1px 0;
+  min-height: 44px;
   padding: 7px 11px;
   transition: all 140ms ease;
 }
@@ -557,7 +562,7 @@
   background: transparent;
   border-radius: 6px; /* DS-OK: frozen awesome-list-site-ds/sidebar-variants.jsx refined L2 row radius (borderRadius: 6). */
   display: flex;
-  min-height: 34px;
+  min-height: 44px;
   transition: background 140ms ease;
 }
 
@@ -614,6 +619,8 @@
   flex-shrink: 0;
   gap: 6px;
   line-height: normal;
+  min-height: 44px;
+  min-width: 44px;
   padding: 0 9px 0 6px;
 }
 
@@ -637,7 +644,7 @@
   gap: 8px;
   grid-template-columns: 14px minmax(0, 1fr) auto;
   line-height: normal;
-  min-height: 32px;
+  min-height: 44px;
   padding: 8px 11px 8px 0;
   text-align: left;
   width: 100%;
@@ -647,7 +654,7 @@
   font-size: 11.5px;
   font-style: italic;
   grid-template-columns: 14px minmax(0, 1fr);
-  min-height: 0;
+  min-height: 44px;
   margin-bottom: 2px;
   padding-block: 4px;
 }

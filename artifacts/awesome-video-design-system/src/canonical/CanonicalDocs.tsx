@@ -96,7 +96,7 @@ export function CanonicalDocs() {
       <main id="docs-main" className="docs-main" tabIndex={-1}>
       <div className="docs-meta"><span>{meta?.group}</span><span style={{ color: "var(--text-3)" }}>/</span><span style={{ color: "var(--text-2)" }}>{meta?.title}</span></div>
       <Page />
-      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 14, marginTop: 80, paddingTop: 32, borderTop: "var(--hairline-w) solid var(--border)" }}>
+      <div className="docs-pager" style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 14, marginTop: 80, paddingTop: 32, borderTop: "var(--hairline-w) solid var(--border)" }}>
         {previous ? <button className="card hoverable" onClick={() => pick(previous)} style={{ padding: 20, textAlign: "left", cursor: "pointer", fontFamily: "inherit", color: "inherit" }}><div className="mono" style={{ fontSize: 10, color: "var(--text-3)", letterSpacing: "0.18em", marginBottom: 8 }}>← PREVIOUS</div><div style={{ fontWeight: 600, fontSize: 15 }}>{lookup(previous)?.title}</div></button> : <div />}
         {next ? <button className="card hoverable" onClick={() => pick(next)} style={{ padding: 20, textAlign: "right", cursor: "pointer", fontFamily: "inherit", color: "inherit" }}><div className="mono" style={{ fontSize: 10, color: "var(--text-3)", letterSpacing: "0.18em", marginBottom: 8 }}>NEXT →</div><div style={{ fontWeight: 600, fontSize: 15 }}>{lookup(next)?.title}</div></button> : <div />}
       </div>
