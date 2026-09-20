@@ -119,6 +119,15 @@ try {
     if (status === 404) console.log(`NOTE ${route} :: answers HTTP 404 with the SPA shell (soft-404 by design) — audited as rendered`);
     await page.waitForFunction(() => typeof window.applyDesignSystem === 'function', null, { timeout: 45_000 }).catch(() => {});
     await page.waitForSelector('.page', { timeout: 15_000 }).catch(() => {});
+    // Data-driven routes (home, category, resource) paint skeletons first;
+    // sampling then finds no h1 / card / display-face user and silently
+    // under-covers stages 9 and 11. Wait for the content, then the fonts.
+    await page.waitForLoadState('networkidle', { timeout: 30_000 }).catch(() => {});
+    const settled = await page.waitForFunction(
+      () => !document.querySelector('[aria-busy="true"], .skeleton, .system-skeleton'),
+      null, { timeout: 30_000 },
+    ).then(() => true).catch(() => false);
+    if (!settled) console.log(`NOTE ${route} :: still shows loading skeletons after 30s — sampled as-is`);
     await page.evaluate(() => document.fonts.ready);
 
     // ------------------------------------------------------- stages 1, 2, 4

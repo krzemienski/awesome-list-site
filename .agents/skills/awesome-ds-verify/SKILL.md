@@ -60,8 +60,12 @@ and its sub-flows need a Clerk session, so `live-probe` cannot reach them —
 they are covered by the authenticated gates `ds-button-sweep` and `ink-accent`.
 Signed-in/admin gates need `CLERK_SECRET_KEY`, `ADMIN_PASSWORD` (≥ 8
 chars) and `DATABASE_URL` in the environment; without them those gates report
-UNVERIFIED with the missing names. Other flags: `--list`, `--only id,id`
-(scoped debugging run — can never produce PASS), `--base-url`, `--json`.
+UNVERIFIED with the missing names. `--deep`'s `pixel-parity` also captures the
+design-system artifact, so its Vite dev server must be up (workflow
+`artifacts/awesome-video-design-system: web`, default `http://127.0.0.1:20928`,
+override with `--artifact-base-url`); otherwise that gate is UNVERIFIED. Other
+flags: `--list`, `--only id,id` (scoped debugging run — can never produce
+PASS), `--base-url`, `--json`.
 
 **Dev is not the final word.** The dev server (`npm run dev`, Vite) and the
 production build (`npm run build && PORT=5055 npm run start` → `node dist/index.js`)

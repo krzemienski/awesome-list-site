@@ -19,16 +19,24 @@
 .admin-catalog-resources__header-actions {
   align-items: center;
   display: flex;
+  /* The frozen TableShell actions row holds two short buttons; ours adds a
+     search field and a long toggle, so let it wrap inside the card instead of
+     being clipped by the shell's overflow at phone widths. */
+  flex-wrap: wrap;
   gap: 8px;
+  max-width: 100%;
+  min-width: 0;
 }
 
 .admin-catalog-resources__header-actions input {
   background: var(--surface);
   border-color: var(--border);
   display: block;
+  flex: 1 1 200px;
   font-size: 13px;
   height: auto;
   line-height: normal;
+  max-width: 100%;
   min-height: 44px;
   padding: 7px 10px;
   width: 200px;

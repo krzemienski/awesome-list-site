@@ -629,8 +629,14 @@ async function interactionSweep(page, system, accent, report, onCell) {
     await page.keyboard.press("Control+K");
     // The palette chunk is lazy-loaded on first trigger (MainLayout keeps only
     // the keydown handler in the eager shell), so wait for the dialog rather
-    // than sampling visibility synchronously after the keypress.
-    const paletteDialog = page.locator('[role="dialog"]').first();
+    // than sampling visibility synchronously after the keypress. Match only an
+    // OPEN dialog: at 375 the sidebar sheet is itself a role="dialog" that stays
+    // mounted (data-state="closed") through its close animation, so a bare
+    // `[role="dialog"]` locator resolved to the closing sheet and then sampled
+    // the gap between its unmount and the palette's mount as "not opened".
+    // Scope to the palette's own content node (`.search-palette`) so a sidebar
+    // sheet that failed to close can never stand in for it.
+    const paletteDialog = page.locator('.search-palette[role="dialog"][data-state="open"]').first();
     await paletteDialog.waitFor({ state: "visible", timeout: 15_000 }).catch(() => {});
     const palette = await paletteDialog.isVisible().catch(() => false);
     await page.keyboard.press("Escape");

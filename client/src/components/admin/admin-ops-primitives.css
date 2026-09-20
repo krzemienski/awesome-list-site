@@ -79,13 +79,17 @@
   text-transform: uppercase;
 }
 
+/* The frozen admin `Stat` value (admin.jsx) sets no face of its own: it
+   inherits the body family at 32px / 700 / -1px. Pinning the display face here
+   made the enrichment stat strip render its values in the serif display face
+   while the reference paints the body face (database had to override it). */
 .admin-ops-stat__value {
   color: var(--text);
-  font-family: var(--font-display);
+  font-family: inherit;
   font-size: 2rem;
   font-variant-numeric: tabular-nums;
-  font-weight: 650;
-  letter-spacing: -0.025em;
+  font-weight: 700;
+  letter-spacing: -1px;
   line-height: 1;
 }
 

@@ -160,12 +160,17 @@ on both sides, which the offline gate can't.
 
 **`parity-systems`** 🔴 — `audit-567-browser.mjs --phase all`: drives
 `/settings/theme` through systems × accents, 4 surfaces × 4 widths, axe on
-every inventory row. Resumable (`--resume`), checkpointed in
-`.cache/audit-567-run`.
+every inventory row. Refuses to run over an existing checkpoint, so the
+runner gives every run its own dir (`AUDIT_567_OUT=<evidence>/parity-systems/run`);
+by hand, checkpoint in `.cache/audit-567-run` (`--resume` to continue).
 
 **`pixel-parity`** 🟡 — `tests/parity/runner.mjs`: Editorial × Crimson vs the
 design reference, pixelmatch threshold 0.1, ≤ 0.5 % differing pixels per
-screen × width. Report: `docs/parity/REPORT.md`.
+screen × width. Needs BOTH origins: the app (`BASE_URL`) and the design-system
+artifact's Vite server (`ARTIFACT_BASE_URL`, workflow
+`artifacts/awesome-video-design-system: web`, default :20928 — the runner's
+`--artifact-base-url`); UNVERIFIED when the artifact is down. Report:
+`docs/parity/REPORT.md`.
 
 ## Environment
 

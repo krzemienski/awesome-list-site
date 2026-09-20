@@ -603,11 +603,6 @@
   margin-bottom: 10px;
 }
 
-.admin-ops-database .admin-ops-stat__value {
-  font-family: inherit;
-  font-weight: 700;
-}
-
 .admin-ops-database .admin-ops-stat__description {
   line-height: 1.6;
   overflow: hidden;

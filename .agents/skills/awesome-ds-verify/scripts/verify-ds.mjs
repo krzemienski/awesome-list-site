@@ -17,6 +17,7 @@
  * Usage:
  *   node verify-ds.mjs [--repo <path>] [--mode offline|full] [--deep]
  *                      [--base-url http://127.0.0.1:5000] [--routes /,/about]
+ *                      [--artifact-base-url http://127.0.0.1:20928]
  *                      [--only id,id] [--out <dir>] [--list] [--json]
  *
  * Zero dependencies of its own. Node >= 18.
@@ -38,6 +39,9 @@ function parseArgs(argv) {
     repo: process.cwd(), mode: 'offline', deep: false, list: false, json: false,
     baseUrl: process.env.BASE_URL || process.env.AUDIT_BASE_URL || 'http://127.0.0.1:5000',
     routes: '/', only: null, out: null,
+    // pixel-parity also captures the design-system artifact (its Vite dev
+    // server, workflow "artifacts/awesome-video-design-system: web").
+    artifactBaseUrl: process.env.ARTIFACT_BASE_URL || 'http://127.0.0.1:20928',
   };
   for (let i = 0; i < argv.length; i += 1) {
     const arg = argv[i];
@@ -55,6 +59,7 @@ function parseArgs(argv) {
     else if (arg.startsWith('--repo')) opts.repo = take();
     else if (arg.startsWith('--mode')) opts.mode = take();
     else if (arg.startsWith('--base-url')) opts.baseUrl = take();
+    else if (arg.startsWith('--artifact-base-url')) opts.artifactBaseUrl = take();
     else if (arg.startsWith('--routes')) opts.routes = take();
     else if (arg.startsWith('--only')) opts.only = take().split(',').map((s) => s.trim()).filter(Boolean);
     else if (arg.startsWith('--out')) opts.out = take();
@@ -63,6 +68,7 @@ function parseArgs(argv) {
   if (!['offline', 'full'].includes(opts.mode)) die(`--mode must be offline or full (got ${opts.mode})`);
   opts.repo = path.resolve(opts.repo);
   opts.baseUrl = opts.baseUrl.replace(/\/+$/, '');
+  opts.artifactBaseUrl = opts.artifactBaseUrl.replace(/\/+$/, '');
   return opts;
 }
 
@@ -145,11 +151,18 @@ function gateCatalogue(opts) {
     { id: 'parity-systems', stages: ['11'], severity: 'BLOCK', needs: 'live-auth', tier: 'deep',
       requiresEnv: ['CLERK_SECRET_KEY', 'ADMIN_PASSWORD'],
       proves: 'Drives /settings/theme through all systems x accents, captures 4 surfaces x 4 widths, runs axe on every inventory row.',
-      cmd: ['node', 'scripts/audit-567-browser.mjs', '--phase', 'all'], env: live, timeoutMs: 90 * 60_000 },
+      // The gate refuses to run over an existing checkpoint (its default
+      // .cache/audit-567-run), so every run gets a fresh run-scoped output dir.
+      // It still publishes into the tracked docs/parity/evidence/** tree by design.
+      cmd: ['node', 'scripts/audit-567-browser.mjs', '--phase', 'all'], env: live, timeoutMs: 90 * 60_000,
+      evidenceEnv: { AUDIT_567_OUT: 'run' } },
     { id: 'pixel-parity', stages: ['11'], severity: 'FIX', needs: 'live-auth', tier: 'deep',
       requiresEnv: ['CLERK_SECRET_KEY', 'ADMIN_PASSWORD'],
       proves: 'Editorial x Crimson pixel parity vs the design reference at <= 0.5% per screen x width.',
-      cmd: ['node', 'tests/parity/runner.mjs'], env: live, timeoutMs: 120 * 60_000 },
+      // The harness also captures the design-system artifact, so it needs that
+      // origin too (checked for reachability before the gate starts).
+      cmd: ['node', 'tests/parity/runner.mjs'], env: { ...live, ARTIFACT_BASE_URL: opts.artifactBaseUrl },
+      requiresServer: 'artifact', timeoutMs: 120 * 60_000 },
   ];
 }
 
@@ -296,11 +309,13 @@ const head = git(opts.repo, 'rev-parse', 'HEAD');
 const dirtyFiles = git(opts.repo, 'status', '--porcelain').split('\n').filter(Boolean);
 if (opts.only?.some((id) => gates.find((gate) => gate.id === id).needs !== 'offline')) opts.mode = 'full';
 const server = opts.mode === 'full' ? await reachable(opts.baseUrl) : { ok: false, why: 'offline mode' };
+const artifactServer = opts.mode === 'full' && opts.deep ? await reachable(opts.artifactBaseUrl) : { ok: false, why: 'not needed' };
 
 const say = (line) => { if (!opts.json) console.log(line); };
 say(`verify-ds · run ${runId}`);
 say(`repo ${opts.repo} @ ${head.slice(0, 10) || 'no-git'}${dirtyFiles.length ? ` (+${dirtyFiles.length} uncommitted)` : ''} · mode ${opts.mode}${opts.deep ? '+deep' : ''}`);
 if (opts.mode === 'full') say(`app  ${opts.baseUrl} → ${server.ok ? 'reachable' : `NOT reachable (${server.why})`}`);
+if (opts.mode === 'full' && opts.deep) say(`ds-artifact  ${opts.artifactBaseUrl} → ${artifactServer.ok ? 'reachable' : `NOT reachable (${artifactServer.why})`}`);
 say('');
 
 const results = [];
@@ -311,6 +326,7 @@ for (const gate of gates) {
   else if (gate.tier === 'deep' && !opts.deep && !opts.only?.includes(gate.id)) skip = 'deep tier — re-run with --deep';
   else if (gate.needs !== 'offline' && opts.mode === 'offline') skip = `needs ${gate.needs} — re-run with --mode full`;
   else if ((gate.needs === 'live' || gate.needs === 'live-auth') && !server.ok && opts.mode === 'full') skip = `app not reachable at ${opts.baseUrl} (${server.why}) — start it with \`npm run dev\``;
+  else if (gate.requiresServer === 'artifact' && !artifactServer.ok) skip = `design-system artifact not reachable at ${opts.artifactBaseUrl} (${artifactServer.why}) — start the "artifacts/awesome-video-design-system: web" workflow or pass --artifact-base-url`;
   else if (gate.requiresEnv) {
     const missing = gate.requiresEnv.filter((name) => !process.env[name]);
     if (missing.length) skip = `missing env: ${missing.join(', ')}`;

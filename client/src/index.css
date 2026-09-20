@@ -41,9 +41,9 @@
   --color-ring: var(--accent);
   --color-chart-1: var(--accent);
   --color-chart-2: #34d08c;
-  --color-chart-3: #5eddf2;
+  --color-chart-3: #5eddf2; /* DS-OK: fixed chart-series hue — the DS cyan accent swatch (design-system.css :root[data-accent="cyan"]); series colors must not follow the active accent */
   --color-chart-4: #ffb84d;
-  --color-chart-5: #9d4edd;
+  --color-chart-5: #9d4edd; /* DS-OK: fixed chart-series hue — the DS violet accent swatch (design-system.css :root[data-accent="violet"]); series colors must not follow the active accent */
   --color-sidebar: var(--bg);
   --color-sidebar-foreground: var(--text);
   --color-sidebar-primary: var(--accent);
