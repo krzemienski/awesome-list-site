@@ -7,4 +7,6 @@ description: The frozen 11-stage skill's Stage 6 class-name predicate can never 
 
 **Why:** three consecutive production panels reached PASS on Stages 1–5 and 7–11 with only Stage 6 outstanding; the residual is architectural, not a defect.
 
+**Provenance trap (found 2026-09-28):** the frozen `.cache/ds-consensus/embedded-skill.md` is byte-for-byte the design zip's `awesome-list-site-ds/SKILL-verify-design-system.md` (plus two blank lines), NOT the in-repo `.agents/skills/verify-design-system/SKILL.md`. The 2026-09-18 "nine auditors, all 11 stages PASS" report ran the in-repo text (six hook-aware filters). Any later prompt that claims "Stage 6 already passed, keep it green" while pointing at the embedded file is comparing two different Stage 6 predicates — check `md5sum` of the embedded file against both candidates before running a panel, and surface the mismatch instead of chasing a Stage 6 fix that the in-repo ladder (ds-button-sweep) already says is not a violation.
+
 **How to apply:** when a mandate says "skill verbatim, unmodified", expect a FIX verdict, state the Stage 6 reasoning up front in the final report, and spend remediation on the other stages (Stage 3 literal inline `applyDesignSystem(...)` call in the head, Stage 5 tokens, Stage 9 font warm-up). The repo's own skill (`.agents/skills/verify-design-system`) recognises the hook contract.
