@@ -4,8 +4,6 @@
 .admin-dashboard__masthead h1 em { color:var(--accent); font-family:var(--font-serif,var(--font-display)); font-weight:inherit; }
 .admin-dashboard__masthead p { color:var(--text-2); margin-block-start:var(--space-2,.5rem); }
 .admin-dashboard__actions { display:flex; flex-wrap:wrap; gap:var(--space-2,.5rem); }
-.admin-dashboard__tabs { margin-block-end:var(--space-7,1.75rem); }
-.admin-dashboard__tabs [role=tab] { min-height:2.75rem; }
 .admin-stat-strip{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:var(--space-3,.75rem);margin-block-end:var(--space-6,1.5rem)}.admin-stat{border-color:var(--border);border-radius:var(--radius,var(--radius-md));box-shadow:none}.admin-stat:hover{border-color:var(--accent)}.admin-stat__value{color:var(--text);font-family:var(--font-display);font-size:2rem;font-variant-numeric:tabular-nums;font-weight:650;letter-spacing:-.025em}
 .admin-overview { display:flex; flex-direction:column; gap:var(--space-6,1.5rem); }
 .admin-section-heading,.admin-panel__heading { display:flex; align-items:center; justify-content:space-between; gap:var(--space-3,.75rem); flex-wrap:wrap; }

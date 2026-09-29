@@ -305,7 +305,11 @@ export default function SearchDialog({ isOpen, setIsOpen }: SearchDialogProps) {
         >
           <span className="search-palette-kind">item</span>
           <span className="search-palette-copy">
-            <span>{resource.title}</span>
+            <span data-testid={`palette-featured-${resource.id}`}>
+              <span className="search-palette-featured-mark" aria-hidden="true">★</span>
+              <span className="sr-only">Featured: </span>
+              {resource.title}
+            </span>
             {resource.description ? <small>{resource.description.slice(0, 60)}</small> : null}
           </span>
           <span className="search-palette-arrow" aria-hidden="true">→</span>

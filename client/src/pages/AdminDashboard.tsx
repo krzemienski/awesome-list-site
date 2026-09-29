@@ -333,10 +333,8 @@ export default function AdminDashboard() {
       <Tabs value={visibleTab} onValueChange={handleTabChange}>
         {/* Canonical single-row strip. Radix keeps off-screen triggers
             keyboard reachable; extra tools live in the related tab panels. */}
-        <div className="w-full pb-2 admin-tab-scroller">
-          {/* F017: keep every trigger a comfortable ≥40px touch target at the
-              usage site (the global ui/tabs default is h-9/36px). */}
-          <TabsList className="admin-dashboard__tabs flex flex-wrap h-auto w-full justify-start gap-1">
+        <div className="admin-tab-scroller">
+          <TabsList className="admin-dashboard__tabs">
             {CANONICAL_TABS.map(([id, label, Icon]) => (
               <TabsTrigger
                 key={id}

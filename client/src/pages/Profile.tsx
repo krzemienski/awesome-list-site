@@ -484,7 +484,7 @@ export default function Profile({ user }: ProfileProps) {
       <Tabs value={activeTab} onValueChange={setActiveTab}>
         {/* Run17 BUG-014: fixed 5-col grid garbled/clipped labels at ≤768px —
             wrap on small screens, grid only from lg up. */}
-        <TabsList className="w-full h-auto p-1 flex flex-wrap justify-start gap-1 lg:grid lg:grid-cols-5">
+        <TabsList className="w-full flex flex-wrap justify-start lg:grid lg:grid-cols-5">
           <TabsTrigger value="overview">Overview</TabsTrigger>
           <TabsTrigger value="favorites">Favorites</TabsTrigger>
           <TabsTrigger value="bookmarks">Bookmarks</TabsTrigger>

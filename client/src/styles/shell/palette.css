@@ -180,6 +180,14 @@
   color: var(--accent);
 }
 
+/* Featured resources carry the same ★ as ResourceCard's chip, but in neutral
+   ink: up to four of them sit in the palette and the accent budget is spent
+   on the selected row. */
+.search-palette-featured-mark {
+  margin-inline-end: 6px;
+  color: var(--text-2);
+}
+
 .search-palette-copy small {
   color: var(--text-3);
   font-family: var(--font-mono);

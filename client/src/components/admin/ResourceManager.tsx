@@ -11,7 +11,6 @@ import { Textarea } from "@/components/ui/textarea";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Switch } from "@/components/ui/switch";
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
@@ -1280,38 +1279,38 @@ export default function ResourceManager() {
             </div>
           )}
           <div className="admin-catalog-resources__table-scroll overflow-auto">
-            <Table className="admin-catalog-resources__table">
-              <TableHeader>
-                <TableRow>
-                  <TableHead>ID</TableHead>
-                  <TableHead>Title</TableHead>
-                  <TableHead>Category</TableHead>
-                  <TableHead>Tags</TableHead>
-                  <TableHead>Featured</TableHead>
-                  <TableHead aria-label="Actions" />
-                </TableRow>
-              </TableHeader>
-              <TableBody>
+            <table className="table admin-catalog-resources__table">
+              <thead>
+                <tr>
+                  <th>ID</th>
+                  <th>Title</th>
+                  <th>Category</th>
+                  <th>Tags</th>
+                  <th>Featured</th>
+                  <th aria-label="Actions" />
+                </tr>
+              </thead>
+              <tbody>
                 {/* Run16 BUG-080: explicit empty state instead of a blank table. */}
                 {!isLoading && (data?.resources.length || 0) === 0 && (
-                  <TableRow>
-                    <TableCell colSpan={6} className="py-12 text-center text-sm text-[var(--text-2)]" data-testid="row-empty-state">
+                  <tr>
+                    <td colSpan={6} className="py-12 text-center text-sm text-[var(--text-2)]" data-testid="row-empty-state">
                       {(search || categoryFilter || statusFilter)
                         ? <>No resources match the current search or filters.{' '}
                             <button type="button" className="text-primary underline" onClick={clearFilters} data-testid="button-empty-clear-filters">
                               Clear filters
                             </button></>
                         : "No resources yet."}
-                    </TableCell>
-                  </TableRow>
+                    </td>
+                  </tr>
                 )}
                 {data?.resources.map((resource) => (
-                  <TableRow
+                  <tr
                     key={resource.id}
                     data-testid={`row-resource-${resource.id}`}
                     data-state={selectedResourceIds.includes(resource.id) ? "selected" : undefined}
                   >
-                    <TableCell className="admin-catalog-resources__id-cell">
+                    <td className="admin-catalog-resources__id-cell">
                       <span>{resource.id}</span>
                       <Checkbox
                         checked={selectedResourceIds.includes(resource.id)}
@@ -1319,16 +1318,16 @@ export default function ResourceManager() {
                         aria-label={`Select ${resource.title || `resource #${resource.id}`}`}
                         className="admin-catalog-resources__row-select h-8 w-8"
                       />
-                    </TableCell>
-                    <TableCell>
+                    </td>
+                    <td>
                         <div className="admin-catalog-resources__resource-title" title={resource.title || ''}>
                           {resource.title || 'Untitled'}
                         </div>
-                    </TableCell>
-                    <TableCell>
+                    </td>
+                    <td>
                       {resource.category || "Uncategorized"}
-                    </TableCell>
-                    <TableCell>
+                    </td>
+                    <td>
                       <div className="admin-catalog-resources__tags">
                         {(safeResourceMetadataTags(resource.metadata) || []).slice(0, 2).map((tag, index) => {
                           const label = typeof tag === "object" && tag && "name" in tag ? String(tag.name) : String(tag);
@@ -1339,11 +1338,11 @@ export default function ResourceManager() {
                           );
                         })}
                       </div>
-                    </TableCell>
-                    <TableCell>
+                    </td>
+                    <td>
                       {featuredValue(resource) ? <Badge variant="accent">★</Badge> : <span className="admin-catalog-resources__muted">—</span>}
-                    </TableCell>
-                    <TableCell className="admin-catalog-resources__actions-cell text-right">
+                    </td>
+                    <td className="admin-catalog-resources__actions-cell text-right">
                       <div className="admin-catalog-resources__row-actions">
                         <Button variant="ghost" size="sm" asChild>
                           <a href={`/resource/${resource.id}`}>View</a>
@@ -1368,11 +1367,11 @@ export default function ResourceManager() {
                           <Trash2 className="h-4 w-4" />
                         </Button>
                       </div>
-                    </TableCell>
-                  </TableRow>
+                    </td>
+                  </tr>
                 ))}
-              </TableBody>
-            </Table>
+              </tbody>
+            </table>
           </div>
           {/* Run17 BUG-033: same sideways-scroll hint the Users table has. */}
           <p className="admin-catalog-resources__scroll-hint text-xs text-muted-foreground mt-2 sm:hidden">

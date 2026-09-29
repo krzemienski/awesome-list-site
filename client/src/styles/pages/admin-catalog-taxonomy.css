@@ -147,45 +147,20 @@
   padding: 1.375rem;
 }
 
-/* TableShell geometry from the frozen admin reference. */
-.admin-taxonomy-table {
+/* Header and row styling come from the canonical `.table`; the admin adds
+   the frozen 56px row height and scrolls inside the card on narrow screens. */
+.admin-taxonomy-table-scroll {
+  position: relative;
   width: 100%;
-  border-collapse: collapse;
-  font-size: 0.8125rem;
-  line-height: 1.6;
-}
-
-.admin-taxonomy-table thead th {
-  height: auto;
-  padding: 0.75rem 0.875rem;
-  border-bottom: var(--hairline-w) solid var(--border);
-  color: var(--text-3);
-  font-family: var(--font-body);
-  font-size: 0.6875rem;
-  font-weight: 500;
-  letter-spacing: 0.03125rem;
-  line-height: 1.6;
-  text-align: left;
-  text-transform: uppercase;
-  vertical-align: middle;
+  overflow-x: auto;
 }
 
 .admin-taxonomy-table tbody td {
   height: 56px;
-  padding: 0.875rem;
-  border-bottom: var(--hairline-w) solid var(--border);
-  color: var(--text-2);
-  vertical-align: middle;
 }
 
 .admin-taxonomy-table tbody tr {
-  border-bottom: 0;
   transition: background-color var(--motion-fast), color var(--motion-fast);
-}
-
-.admin-taxonomy-table tbody tr:hover > td {
-  background: var(--surface);
-  color: var(--text);
 }
 
 .admin-taxonomy-table .admin-taxonomy-column-id,

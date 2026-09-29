@@ -8,7 +8,6 @@ import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { Label } from "@/components/ui/label";
 import { Skeleton } from "@/components/ui/skeleton";
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
@@ -2681,122 +2680,124 @@ export default function GenericCrudManager<T extends BaseEntityWithCount>({
           </div>
         ) : (
           <>
-          <Table className="admin-taxonomy-table" data-testid={`table-${testIdEntityPlural}`}>
-            <TableHeader>
-              <TableRow>
-                {bulkOperationsEnabled && (
-                  <TableHead className="w-[50px]">
-                    <Checkbox
-                      checked={allSelectableOnPageSelected && selectableItems.length > 0}
-                      onCheckedChange={handleSelectAll}
-                      aria-label="Select all"
-                      data-testid="checkbox-select-all"
-                      disabled={selectableItems.length === 0}
-                      className={someSelectedOnPage && !allSelectableOnPageSelected ? "data-[state=checked]:bg-primary/50" : ""}
-                    />
-                  </TableHead>
-                )}
-                {getVisibleColumns.map((col) => (
-                  <TableHead
-                    key={col.key}
-                    className={`${col.className || ""} ${col.width ? col.width : col.align === "right" ? "text-right" : ""}`}
-                  >
-                    {col.label}
-                  </TableHead>
-                ))}
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {/* Run17 BUG-032: a filter with zero matches renders an explicit
-                  empty row instead of headers floating over nothing. */}
-              {(!paginatedItems || paginatedItems.length === 0) && (
-                <TableRow>
-                  <TableCell
-                    colSpan={getVisibleColumns.length + (bulkOperationsEnabled ? 1 : 0)}
-                    className="text-center py-8 text-muted-foreground"
-                    data-testid={`empty-${testIdEntityPlural}`}
-                  >
-                    No {entityNamePlural.toLowerCase()} match your search.
-                  </TableCell>
-                </TableRow>
-              )}
-              {paginatedItems?.map((item) => (
-                <TableRow key={item.id} data-testid={`row-${testIdEntity}-${item.id}`} className={`admin-taxonomy-row ${selectedIds.has(item.id) ? "bg-muted/50" : ""}`}>
+          <div className="admin-taxonomy-table-scroll">
+            <table className="table admin-taxonomy-table" data-testid={`table-${testIdEntityPlural}`}>
+              <thead>
+                <tr>
                   {bulkOperationsEnabled && (
-                    <TableCell className="w-[50px]">
+                    <th className="w-[50px]">
                       <Checkbox
-                        checked={selectedIds.has(item.id)}
-                        onCheckedChange={(checked) => handleSelectItem(item.id, checked as boolean)}
-                        aria-label={`Select ${item.name}`}
-                        data-testid={`checkbox-select-${item.id}`}
-                        disabled={item.resourceCount > 0}
-                        title={item.resourceCount > 0 ? `Cannot select: has ${item.resourceCount} resources` : undefined}
+                        checked={allSelectableOnPageSelected && selectableItems.length > 0}
+                        onCheckedChange={handleSelectAll}
+                        aria-label="Select all"
+                        data-testid="checkbox-select-all"
+                        disabled={selectableItems.length === 0}
+                        className={someSelectedOnPage && !allSelectableOnPageSelected ? "data-[state=checked]:bg-primary/50" : ""}
                       />
-                    </TableCell>
+                    </th>
                   )}
                   {getVisibleColumns.map((col) => (
-                    <TableCell
+                    <th
                       key={col.key}
-                      className={`${col.className || ""} ${col.align === "right" ? "text-right" : ""}`}
-                      data-testid={col.key === "name" ? `text-${testIdEntity}-name-${item.id}` : undefined}
+                      className={`${col.className || ""} ${col.width ? col.width : col.align === "right" ? "text-right" : ""}`}
                     >
-                      {col.render ? col.render(item, parentData, navTree) : (
-                        col.key === "id" ? (
-                          <span className="admin-taxonomy-cell-id font-mono text-sm">{item.id}</span>
-                        ) : col.key === "name" ? (
-                          <span className="admin-taxonomy-cell-name font-medium">{item.name}</span>
-                        ) : col.key === "slug" ? (
-                          <span className="admin-taxonomy-cell-slug font-mono text-sm text-muted-foreground">{item.slug}</span>
-                        ) : col.key === "resourceCount" ? (
-                          <Badge className="admin-taxonomy-cell-count" variant="secondary" data-testid={`badge-count-${item.id}`}>
-                            {item.resourceCount}
-                          </Badge>
-                        ) : col.key === "actions" ? (
-                          <div className="admin-taxonomy-row-actions flex items-center justify-end gap-2">
-                            <Button
-                              variant="ghost"
-                              size="sm"
-                              onClick={() => openEditDialog(item)}
-                              className="admin-taxonomy-row-action"
-                              aria-label={`Edit ${item.name}`}
-                              data-testid={`button-edit-${item.id}`}
-                            >
-                              <span>Edit</span>
-                            </Button>
-                            {/* Run16 BUG-081: disabled delete gets a visible reason.
-                                The title lives on a wrapping span because disabled
-                                buttons swallow hover events in some browsers. */}
-                            <span
-                              className="admin-taxonomy-delete-action inline-block"
-                              title={item.resourceCount > 0
-                                ? `Cannot delete: ${item.resourceCount} resource${item.resourceCount === 1 ? "" : "s"} still assigned. Move or delete them first.`
-                                : undefined}
-                            >
+                      {col.label}
+                    </th>
+                  ))}
+                </tr>
+              </thead>
+              <tbody>
+                {/* Run17 BUG-032: a filter with zero matches renders an explicit
+                    empty row instead of headers floating over nothing. */}
+                {(!paginatedItems || paginatedItems.length === 0) && (
+                  <tr>
+                    <td
+                      colSpan={getVisibleColumns.length + (bulkOperationsEnabled ? 1 : 0)}
+                      className="text-center py-8 text-muted-foreground"
+                      data-testid={`empty-${testIdEntityPlural}`}
+                    >
+                      No {entityNamePlural.toLowerCase()} match your search.
+                    </td>
+                  </tr>
+                )}
+                {paginatedItems?.map((item) => (
+                  <tr key={item.id} data-testid={`row-${testIdEntity}-${item.id}`} className={`admin-taxonomy-row ${selectedIds.has(item.id) ? "bg-muted/50" : ""}`}>
+                    {bulkOperationsEnabled && (
+                      <td className="w-[50px]">
+                        <Checkbox
+                          checked={selectedIds.has(item.id)}
+                          onCheckedChange={(checked) => handleSelectItem(item.id, checked as boolean)}
+                          aria-label={`Select ${item.name}`}
+                          data-testid={`checkbox-select-${item.id}`}
+                          disabled={item.resourceCount > 0}
+                          title={item.resourceCount > 0 ? `Cannot select: has ${item.resourceCount} resources` : undefined}
+                        />
+                      </td>
+                    )}
+                    {getVisibleColumns.map((col) => (
+                      <td
+                        key={col.key}
+                        className={`${col.className || ""} ${col.align === "right" ? "text-right" : ""}`}
+                        data-testid={col.key === "name" ? `text-${testIdEntity}-name-${item.id}` : undefined}
+                      >
+                        {col.render ? col.render(item, parentData, navTree) : (
+                          col.key === "id" ? (
+                            <span className="admin-taxonomy-cell-id font-mono text-sm">{item.id}</span>
+                          ) : col.key === "name" ? (
+                            <span className="admin-taxonomy-cell-name font-medium">{item.name}</span>
+                          ) : col.key === "slug" ? (
+                            <span className="admin-taxonomy-cell-slug font-mono text-sm text-muted-foreground">{item.slug}</span>
+                          ) : col.key === "resourceCount" ? (
+                            <Badge className="admin-taxonomy-cell-count" variant="secondary" data-testid={`badge-count-${item.id}`}>
+                              {item.resourceCount}
+                            </Badge>
+                          ) : col.key === "actions" ? (
+                            <div className="admin-taxonomy-row-actions flex items-center justify-end gap-2">
                               <Button
                                 variant="ghost"
                                 size="sm"
-                                onClick={() => openDeleteDialog(item)}
-                                disabled={item.resourceCount > 0}
+                                onClick={() => openEditDialog(item)}
                                 className="admin-taxonomy-row-action"
-                                aria-label={item.resourceCount > 0
-                                  ? `Delete unavailable: ${item.resourceCount} resources still assigned`
-                                  : "Delete"}
-                                data-testid={`button-delete-${item.id}`}
+                                aria-label={`Edit ${item.name}`}
+                                data-testid={`button-edit-${item.id}`}
                               >
-                                <Trash2 className="h-4 w-4" />
+                                <span>Edit</span>
                               </Button>
-                            </span>
-                          </div>
-                        ) : (
-                          item[col.key]
-                        )
-                      )}
-                    </TableCell>
-                  ))}
-                </TableRow>
-              ))}
-            </TableBody>
-          </Table>
+                              {/* Run16 BUG-081: disabled delete gets a visible reason.
+                                  The title lives on a wrapping span because disabled
+                                  buttons swallow hover events in some browsers. */}
+                              <span
+                                className="admin-taxonomy-delete-action inline-block"
+                                title={item.resourceCount > 0
+                                  ? `Cannot delete: ${item.resourceCount} resource${item.resourceCount === 1 ? "" : "s"} still assigned. Move or delete them first.`
+                                  : undefined}
+                              >
+                                <Button
+                                  variant="ghost"
+                                  size="sm"
+                                  onClick={() => openDeleteDialog(item)}
+                                  disabled={item.resourceCount > 0}
+                                  className="admin-taxonomy-row-action"
+                                  aria-label={item.resourceCount > 0
+                                    ? `Delete unavailable: ${item.resourceCount} resources still assigned`
+                                    : "Delete"}
+                                  data-testid={`button-delete-${item.id}`}
+                                >
+                                  <Trash2 className="h-4 w-4" />
+                                </Button>
+                              </span>
+                            </div>
+                          ) : (
+                            item[col.key]
+                          )
+                        )}
+                      </td>
+                    ))}
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
 
           {/* Pagination Controls — Task 275: shared numbered paginator (same
               component as the public listings) so any page is reachable in ≤2

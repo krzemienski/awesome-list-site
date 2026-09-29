@@ -107,45 +107,27 @@
   margin-bottom: 0 !important;
 }
 
+/* Row and header styling come from the canonical `.table`; these are the
+   admin-only additions: a scroll floor, the frozen 56px row, and no rule
+   under the last row where the card edge already draws one. */
 .admin-catalog-resources__table {
-  border-collapse: collapse;
-  font-size: 13px;
   min-width: 720px;
-  /* Preserve the frozen data-column geometry; the additional product delete
-     target occupies one separate 44px control extent. */
-  width: 100%;
 }
 
 .admin-catalog-resources__table th {
-  border-bottom: var(--hairline-w) solid var(--border);
-  color: var(--text-3);
-  font-size: 11px;
-  font-weight: 500;
-  letter-spacing: 0.5px;
-  padding: 12px 14px;
-  text-align: left;
-  text-transform: uppercase;
   white-space: nowrap;
-  height: auto;
-  line-height: 1.6;
 }
 
 .admin-catalog-resources__table td {
-  border-bottom: var(--hairline-w) solid var(--border);
-  color: var(--text-2);
-  line-height: 1.6;
-  padding: 14px;
-  vertical-align: middle;
   height: 56px;
-}
-
-.admin-catalog-resources__table tbody tr:hover td {
-  background: var(--surface);
-  color: var(--text);
 }
 
 .admin-catalog-resources__table tbody tr:last-child td {
   border-bottom: 0;
+}
+
+.admin-catalog-resources__table tbody tr[data-state="selected"] td {
+  background: var(--surface);
 }
 
 .admin-catalog-resources__id-cell {
