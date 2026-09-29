@@ -202,24 +202,27 @@ export default function About() {
                 personal details publicly.
               </p>
               <p className="about-body-copy">
-                Questions or corrections? The best way to reach us is to{" "}
+                Questions or corrections?{" "}
                 {contactDestination ? (
-                  <a
-                    href={contactDestination.href}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="about-inline-link about-inline-link-text"
-                    data-testid="link-about-github-issues"
-                  >
-                    {contactDestination.label}
-                    <ExternalLink className="about-external-icon" aria-hidden="true" />
-                  </a>
+                  <>
+                    The best way to reach us is to{" "}
+                    <a
+                      href={contactDestination.href}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="about-inline-link about-inline-link-text"
+                      data-testid="link-about-github-issues"
+                    >
+                      {contactDestination.label}
+                      <ExternalLink className="about-external-icon" aria-hidden="true" />
+                    </a>
+                    .
+                  </>
                 ) : (
                   <span data-testid="text-about-contact-unavailable">
-                    no configured public contact destination is available
+                    No public contact destination is configured yet.
                   </span>
                 )}
-                .
               </p>
               <p className="about-body-copy">
                 Review the{" "}
