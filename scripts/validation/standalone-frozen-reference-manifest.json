@@ -1,12 +1,14 @@
 {
-  "$comment": "Per-member sha256 of the canonical design archive, so the frozen-reference check is reproducible in checkouts that do not carry the gitignored upload. Only standalone-palette-drift.mjs --update-frozen-manifest may rewrite it, and only from the archive itself.",
+  "$comment": "Per-member sha256 of the canonical design archive (attached_assets/awesome_list_site_2_1789019068732.zip), so the frozen-reference check is reproducible in checkouts that do not carry the gitignored upload. Provenance: every digest was derived from the sha256 of the git blob awesome-list-site-ds/<member> at commit 32d2aba4, whose committed evidence (docs/parity/evidence/foundation/standalone-palette-mutation-probe.txt, section 0) records a clean-tree PASS of the frozen-reference check against the real archive (103 files). The entries were cross-checked against docs/parity/source-sync.json: all 26 changedOrAdded digests match and the member count equals archive.originalEntries (103). When the archive is present, standalone-palette-drift.mjs verifies every entry against it, and `standalone-palette-drift.mjs --update-frozen-manifest` regenerates the entries (and pinnedFrom) from the archive itself; never edit the digests by hand.",
   "archive": {
     "path": "attached_assets/awesome_list_site_2_1789019068732.zip",
     "sha256": "19f0240c46caf790bfc384e21f123525699e1ff386fe892f8084bf73337302c9"
   },
   "pinnedFrom": {
     "commit": "32d2aba4616f60af3cc185f3119f770b97111061",
-    "evidence": "docs/parity/evidence/foundation/standalone-palette-mutation-probe.txt (clean tree PASS against the archive, 103 files)"
+    "method": "sha256 of git blob awesome-list-site-ds/<member> at pinnedFrom.commit",
+    "evidence": "docs/parity/evidence/foundation/standalone-palette-mutation-probe.txt (clean tree PASS against the archive, 103 files)",
+    "crossCheckedAgainst": "docs/parity/source-sync.json (26 changedOrAdded digests, archive.originalEntries 103)"
   },
   "entries": {
     ".thumbnail": "e9124eedc686b6e534b830fb103b9ab4092606db67e52fa46969bc8d5bc0337a",

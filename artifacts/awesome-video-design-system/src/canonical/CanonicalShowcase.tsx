@@ -1,11 +1,9 @@
 // @ts-nocheck
 import { useEffect, useMemo, useRef, useState } from "react";
-import { ACCENTS, DESIGN_SYSTEMS as RUNTIME_SYSTEMS } from "../../../../client/src/lib/design-system";
+import { ACCENTS, DESIGN_SYSTEMS } from "../consumer";
 import { Button, Card, Chip, Dot, Eyebrow, Kbd } from "./ShowcasePrimitives";
 import { useShowcaseTheme } from "./useShowcaseTheme";
 import { SkipLink } from "./SkipLink";
-import tokenProjection from "../../tokens.json";
-const DESIGN_SYSTEMS = Object.fromEntries(Object.entries(RUNTIME_SYSTEMS).map(([id, meta]) => [id, { ...meta, vars: tokenProjection.themes[id].tokens }]));
 const TYPE_SCALE = [
   { name: 'display-xl', px: 72, label: 'Display XL', use: 'Hero, single-line' }, { name: 'display', px: 56, label: 'Display', use: 'Page hero' }, { name: 'h1', px: 40, label: 'H1', use: 'Section anchor' }, { name: 'h2', px: 28, label: 'H2', use: 'Subsection' }, { name: 'h3', px: 20, label: 'H3', use: 'Card heading' }, { name: 'h4', px: 16, label: 'H4', use: 'List item title' }, { name: 'body', px: 14, label: 'Body', use: 'Prose, default' }, { name: 'small', px: 13, label: 'Small', use: 'Meta, secondary' }, { name: 'caption', px: 11, label: 'Caption', use: 'Mono, eyebrow, kbd' }, ];
 const SPACE_SCALE = [{name:'0',px:0},{name:'1',px:4},{name:'2',px:8},{name:'3',px:12},{name:'4',px:16},{name:'5',px:20},{name:'6',px:24},{name:'8',px:32},{name:'10',px:40},{name:'12',px:48},{name:'16',px:64},{name:'20',px:80}];
@@ -860,8 +858,8 @@ function Hero({ system }) {
         border: 'var(--hairline-w) solid var(--border)',
       }}>
         {[
-          ['SYSTEMS', '5'],
-          ['ACCENTS', '10'],
+          ['SYSTEMS', String(Object.keys(DESIGN_SYSTEMS).length)],
+          ['ACCENTS', String(ACCENTS.length)],
           ['TYPE STEPS', String(TYPE_SCALE.length)],
           ['SPACE STEPS', String(SPACE_SCALE.length)],
           ['TOKENS / SYS', '~36'],

@@ -85,14 +85,22 @@ expect(app.includes("productProfile={productProfile}"), "MainLayout does not dec
 // visitor's saved one (or the runtime default) on every route. The pre-paint
 // boot must reach that same answer through the canonical applier and must not
 // grow a per-profile system path again.
-const bootFallbackSystem = boot.match(/\bsys\s*=\s*'([a-z]+)'/)?.[1];
-const runtimeDefaultSystem = runtime.match(/export const DEFAULT_SYSTEM\b[^=]*=\s*"([a-z]+)"/)?.[1];
+// The boot's storage keys and fallback system come from THEME_BOOT_DATA in
+// design-system.ts, injected by Vite, so there is no literal to compare here:
+// require the injected marker on both sides and that the data carries
+// DEFAULT_SYSTEM.
+const bootThemeVar = boot.match(/var\s+(\w+)\s*=\s*__AWESOME_VIDEO_THEME_BOOT__\s*;/)?.[1];
 expect(
   boot.includes("window.applyDesignSystem(sys, acc)") &&
     boot.includes("window.SYSTEM_DEFAULT_ACCENT[sys]") &&
-    Boolean(bootFallbackSystem) &&
-    bootFallbackSystem === runtimeDefaultSystem,
-  `Pre-paint boot and runtime disagree on system precedence (boot fallback ${bootFallbackSystem ?? "missing"}, runtime DEFAULT_SYSTEM ${runtimeDefaultSystem ?? "missing"}, or the boot bypasses applyDesignSystem / SYSTEM_DEFAULT_ACCENT)`,
+    Boolean(bootThemeVar) &&
+    boot.includes(`sys = ${bootThemeVar}.defaultSystem`) &&
+    boot.includes(`${bootThemeVar}.systemKey`) &&
+    boot.includes(`${bootThemeVar}.accentKey`) &&
+    /export const THEME_BOOT_DATA\b[\s\S]*?defaultSystem:\s*DEFAULT_SYSTEM\b/.test(runtime) &&
+    vite.includes("__AWESOME_VIDEO_THEME_BOOT__") &&
+    vite.includes("JSON.stringify(THEME_BOOT_DATA)"),
+  "Pre-paint boot and runtime disagree on system precedence: the boot must read its storage keys and fallback system from the Vite-injected THEME_BOOT_DATA (DEFAULT_SYSTEM) and apply through applyDesignSystem / SYSTEM_DEFAULT_ACCENT",
 );
 expect(
   !/\.profiles\s*\[/.test(boot),

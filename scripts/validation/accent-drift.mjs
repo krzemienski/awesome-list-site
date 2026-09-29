@@ -1,49 +1,48 @@
 #!/usr/bin/env node
 // Theme drift gate (tasks #377, #388, #399, #429, parity W1 fonts).
 //
-// The inline boot script in client/index.html paints the theme BEFORE React
-// loads. Vite replaces markers with boot data derived from the runtime sources,
-// so system/accent/font ids and fallbacks are generated instead of copied into
-// HTML. This gate verifies those generation contracts plus the remaining
-// stylesheet/font mirrors.
+// The design system is the verbatim pair served at /ds/*:
+// client/public/ds/design-system.css (tokens + component skins) and
+// client/public/ds/design-system.js (window.DESIGN_SYSTEMS / ACCENTS /
+// SYSTEM_DEFAULT_ACCENT and applyDesignSystem(), which writes each system's
+// vars and the accent pair INLINE on <html>). Neither file is ever edited.
+// client/index.html loads both synchronously and runs an inline boot that
+// calls the applier before React loads; Vite replaces markers with boot data
+// derived from the TS sources. This gate verifies every contract around that
+// pair plus the font mirrors.
 //
-// Sources compared (every one is a hand-maintained copy of ONE registry, and
-// every pair below has silently drifted-by-omission before):
-//   1 · design-system.ts   ACCENTS[]                 → id + primary + secondary
-//   2 · design-system.css  :root[data-accent="…"]    → --accent + --accent-2
-//   3 · design-system.css  :root                     → the pre-attribute
-//        default pair, which the CSS itself documents as Crimson's values
-//        (i.e. DEFAULT_ACCENT's) and which paints before any data-accent
-//        attribute exists
-//   4 · design-system.ts   THEME_FALLBACK_REGISTRY is the source for
-//        ACCENTS / DESIGN_SYSTEMS / SYSTEM_DEFAULT_ACCENT / DEFAULT_* and the
-//        generated THEME_BOOT_DATA consumed by client/index.html
-//   5 · client/index.html  the pre-paint script keeps exactly one Vite marker
-//        and reads ids/fallbacks only from the injected THEME_BOOT object
-//   6 · design-system.css  :root[data-system="…"] token blocks  ↔
-//        DESIGN_SYSTEMS — agreeing on an id is not the same as having a
-//        LOOK. The block IS the treatment, so a system the picker offers
-//        and the boot script accepts but the stylesheet never paints sticks
-//        on <html> and renders exactly like the default: a theme that "does
-//        nothing" rather than one that "won't stick". The custom properties
-//        the established peer blocks agree on are also a contract: a block
-//        that declares only a small subset is still a half-finished look.
-//   7 · design-system.css  component skin selectors containing
-//        [data-system="…"]  ↔  DESIGN_SYSTEMS — a skin for a retired system
-//        is dead CSS that can never match, and would otherwise survive after
-//        the system's token block is removed
+// Sources compared:
+//   1 · design-system.js   (evaluated, never regex-parsed, through
+//        readCanonicalRegistry() in scripts/generate-design-system-artifact.mjs)
+//        — the ONE copy of systems, accents and per-system default accents
+//   2 · design-system.ts   the typed wrapper: restates no table, its getters
+//        return the window globals, DEFAULT_SYSTEM/DEFAULT_ACCENT are the
+//        applier's own fallbacks, and the storage keys the choice persists under
+//   3 · design-system.css  :root → the pre-apply default pair, which must be
+//        DEFAULT_ACCENT's swatch, and the pre-apply tokens, compared with
+//        DEFAULT_SYSTEM's vars (see default-prepaint)
+//   4 · client/index.html  /ds/design-system.css + /ds/design-system.js load
+//        synchronously ahead of the inline boot, which reads only the
+//        canonical globals and takes its storage keys + fallback system from
+//        the wrapper (THEME_BOOT_DATA via the Vite marker, or literally)
+//   5 · app stylesheets    client/**/*.css (minus the canonical sheet, incl.
+//        client/src/styles/app-bridge.css), shared/styles/**/*.css and the
+//        index.html <style> — none may re-key or redeclare the accent the
+//        applier paints inline
+//   6 · DESIGN_SYSTEMS[id].vars — every offered system paints from a
+//        non-empty vars table that carries the tokens its peers agree on
+//   7 · [data-system="…"] selectors in the canonical sheet AND every app
+//        sheet ↔ DESIGN_SYSTEMS — a rule for a retired system is dead CSS
 //   8 · font-options.ts    FONT_OPTIONS (id + stack; its own header calls
 //        itself the source of truth)  ↔  FONT_BOOT_DATA generated from it +
 //        the id it falls back to, which must be the option
 //        applyFontOverride() falls back to at runtime (FONT_OPTIONS[0])
-//   9 · design-system.ts   SYSTEM_DEFAULT_ACCENT  ↔  DESIGN_SYSTEMS + ACCENTS.
-//        A third hand-maintained list keyed by system id: it is the accent a
-//        system is meant to arrive with. applyDesignSystem() and the theme
-//        provider both read it as `SYSTEM_DEFAULT_ACCENT[id] || DEFAULT_ACCENT`,
-//        so a system with no entry quietly keeps whatever accent happens to be
-//        active (or falls back to the global default) instead of its own look,
-//        and an entry naming an accent that is not in ACCENTS sets a
-//        data-accent no :root[data-accent="…"] block paints
+//   9 · design-system.js   SYSTEM_DEFAULT_ACCENT  ↔  DESIGN_SYSTEMS + ACCENTS:
+//        the accent a system is meant to arrive with. The boot and the
+//        wrapper's selectSystem() read it, so a system with no entry keeps
+//        whatever accent happens to be active instead of its own look, and an
+//        entry naming an accent that is not in ACCENTS makes the applier paint
+//        ACCENTS[0] while data-accent claims something else
 //  10 · font-options.ts    FONT_STYLESHEETS — the map that actually DOWNLOADS
 //        the picker's webfonts  ↔  FONT_OPTIONS. A stack is only half of a
 //        webfont: an option whose stack is right but whose stylesheet entry
@@ -62,9 +61,9 @@
 //        second owner of the font set. That one request carries every family
 //        all five systems name, so there is no per-system stylesheet map any
 //        more — switching systems is attribute-only
-//  12 · design-system.css  the --font-display / --font-body / --font-mono a
-//        system declares (:root[data-system="…"], falling back to :root for
-//        the default system)  ↔  the only loader that runs for that system:
+//  12 · design-system.js   the --font-display / --font-body / --font-mono a
+//        system's vars declare (falling back to the canonical :root)  ↔  the
+//        only loader that runs for that system:
 //        the always-on <link rel="stylesheet"> in the HTML shell. This is #9
 //        one level deeper and it is how the mono face went missing (#411):
 //        every system NAMED a mono family, the (then per-system) stylesheets
@@ -86,29 +85,41 @@
 //        proved exists
 //
 // Checks (each FAILs with the id and both sides' literal values):
-//   · id-parity      — an accent id present in only one of the accent sources
-//   · swatch-value   — primary ≠ --accent, or secondary ≠ --accent-2
-//   · root-default   — :root's --accent/--accent-2 ≠ DEFAULT_ACCENT's pair
-//   · boot-registry  — a derived runtime export or THEME_BOOT_DATA disagrees
-//     with THEME_FALLBACK_REGISTRY
-//   · boot-generation — client/index.html lost either Vite marker, regained a
-//     hand-copied list/fallback, or no longer consumes injected fields
+//   · boot-registry  — design-system.ts exports its own DESIGN_SYSTEMS /
+//     ACCENTS / SYSTEM_DEFAULT_ACCENT / THEME_FALLBACK_REGISTRY / scales, or
+//     hard-codes a canonical accent color; a getter (executed against a
+//     stand-in window) serves a copy instead of the global; DEFAULT_SYSTEM /
+//     DEFAULT_ACCENT differ from applyDesignSystem()'s own fallbacks; or the
+//     canonical registry is structurally incomplete (registryStructureIssues)
+//   · boot-generation — /ds/design-system.css is not linked exactly once
+//     unconditionally; /ds/design-system.js is missing, async/defer/module,
+//     or loads after the boot; the boot is outside <head>, never calls the
+//     applier, skips a canonical global, hard-codes a canonical id, tests
+//     membership through the prototype chain, or reads storage keys /
+//     falls back to a system other than the wrapper's (marker form: the
+//     marker, the Vite serialization and THEME_BOOT_DATA's values)
+//   · accent-paint   — the applier stops painting --accent/--accent-2 from
+//     primary/secondary, an accent value is not a CSS color, or an app
+//     stylesheet has a [data-accent] rule or declares --accent/--accent-2
+//     (replaces the retired id-parity/swatch-value pair: the
+//     :root[data-accent] blocks they compared no longer exist by design)
+//   · root-default   — the canonical :root --accent/--accent-2 ≠ DEFAULT_ACCENT's pair
 //   · system-fallback— DEFAULT_SYSTEM is not one of DESIGN_SYSTEMS
-//   · system-paint   — a DESIGN_SYSTEMS id with no :root[data-system="…"]
-//     token block, a block whose id the picker never offers (dead paint),
-//     or a block that declares no custom property at all (an empty block
-//     paints like the default just as surely as a missing one)
-//   · system-skin    — a component skin selector in design-system.css names a
-//     system DESIGN_SYSTEMS does not offer
-//   · base-root-exemption — the "painted by the bare :root" escape hatch
-//     below went stale: an entry carrying no written reason, an entry whose
-//     system has since grown its own token block, or one naming a system
-//     DESIGN_SYSTEMS no longer offers
-//   · system-token-contract — a system block is missing one or more custom
+//   · system-paint   — an offered system with no or empty vars, or vars for a
+//     system the picker never offers
+//   · default-prepaint — (replaces the retired base-root-exemption) a token
+//     DEFAULT_SYSTEM's vars declare that the canonical :root paints
+//     differently before the applier runs. Reported as a NOTE while
+//     boot-generation holds (the applier writes it inline in <head>, ahead
+//     of first paint, so the difference never reaches a screen); a FAILURE
+//     when the boot contract is broken
+//   · system-skin    — a [data-system="…"] rule in the canonical sheet or any
+//     app sheet names a system DESIGN_SYSTEMS does not offer
+//   · system-token-contract — a system's vars miss one or more custom
 //     properties its established peers agree on; every missing token is named
 //   · minimal-system-exemption — the reason-carrying escape hatch for an
 //     intentionally small token set has no reason, names an unoffered system,
-//     or stayed pinned after the block grew to satisfy the shared contract
+//     or stayed pinned after the vars grew to satisfy the shared contract
 //   · system-accent-parity — a DESIGN_SYSTEMS id with no SYSTEM_DEFAULT_ACCENT
 //     entry, or an entry keyed by a system that no longer exists
 //   · system-accent-value  — a SYSTEM_DEFAULT_ACCENT entry naming an accent id
@@ -162,14 +173,12 @@
 //   · font-csp — OPT-IN, only under --network: an @font-face src: url(...)
 //     points at a host the server's font-src policy does not allow
 //
-// For a design system the families are read from the CSS, never from the
+// For a design system the families are read from its vars, never from the
 // DESIGN_SYSTEMS `tag` beside each id: that tag is picker copy, not a family
 // list ("Modern · Geist Sans" for the Geist family, and Brutalist names one
 // of its two faces). The authoritative list is the --font-display /
-// --font-body / --font-mono a system declares in its :root[data-system="…"]
-// block, falling back token-by-token to :root exactly as the cascade does —
-// which is also why the default system (no attribute block of its own) is
-// checked against :root. A token's FIRST family is the face the design asks
+// --font-body / --font-mono in DESIGN_SYSTEMS[id].vars, falling back
+// token-by-token to the canonical :root exactly as the cascade does. A token's FIRST family is the face the design asks
 // for and must be downloaded; the rest of the chain is by definition what it
 // falls back to, so a generic keyword or an installed face there is fine. A
 // token whose first family IS a generic (ui-monospace, system-ui) asks for a
@@ -244,46 +253,42 @@ import {
   findMissingSystemTokens,
   formatMissingSystemTokensMessage,
   parseCssCustomProperties,
-  parseCssSystemBlocks,
   sharedSystemTokens,
   validateMinimalTokenSystems,
 } from './design-system-token-contract.mjs';
+import {
+  APP_BRIDGE_PATH,
+  CANONICAL_CSS_PATH,
+  CANONICAL_REGISTRY_PATH,
+  applierFallbacks,
+  applierPaintsAccentPair,
+  readCanonicalRegistry,
+  registryStructureIssues,
+} from '../generate-design-system-artifact.mjs';
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..', '..');
 const TS_REL = 'client/src/lib/design-system.ts';
-const CSS_REL = 'client/src/styles/design-system.css';
+// The verbatim design-system pair served at /ds/*: the canonical sheet and
+// the registry + applier. Never edited; everything here is checked against it.
+const CSS_REL = CANONICAL_CSS_PATH;
+const REGISTRY_REL = CANONICAL_REGISTRY_PATH;
+const BRIDGE_REL = APP_BRIDGE_PATH;
+const CANONICAL_CSS_HREF = '/ds/design-system.css';
+const CANONICAL_JS_HREF = '/ds/design-system.js';
 const HTML_REL = 'client/index.html';
 const FONTS_REL = 'client/src/lib/font-options.ts';
 const SERVER_REL = 'server/index.ts';
 const VITE_REL = 'vite.config.ts';
-
-// ---------------------------------------------------------------------------
-// Escape hatch: systems intentionally painted by the BASE :root block
-// ---------------------------------------------------------------------------
-// Every offered design system owes a :root[data-system="…"] token block —
-// that block IS the look. The one honest exception is a system whose tokens
-// the bare :root block already carries, which would gain nothing from a block
-// that restates them. Such a system must be named HERE, with a written
-// reason, so the exemption is a decision on the record rather than a silent
-// gap. The table is honest in every direction: an entry with no written
-// reason is not an exemption at all, and an entry whose system has since
-// grown its own block, or that names a system DESIGN_SYSTEMS no longer
-// offers, FAILs as a stale pin so it can never outlive its reason.
-const BASE_ROOT_PAINTED_SYSTEMS = new Map([
-  [
-    'editorial',
-    `Editorial is the baseline, not an override: the bare ":root" block in ${CSS_REL} carries the Editorial token values verbatim (its own header says so), and both DEFAULT_SYSTEM and the pre-paint fallback resolve to it — a ":root[data-system=editorial]" block could only restate what already paints. Editorial's per-system COMPONENT skins do exist in that file, written as [data-system="editorial"] descendant rules.`,
-  ],
-]);
+// App stylesheets: everything the SPA loads besides the canonical sheet.
+const APP_SHEET_DIRS = ['client', 'shared/styles'];
 
 // ---------------------------------------------------------------------------
 // Escape hatch: systems intentionally using a deliberately minimal token set
 // ---------------------------------------------------------------------------
 // A system may intentionally share most of the default look, but that choice
-// must be recorded in the shared MINIMAL_TOKEN_SYSTEMS table imported above,
-// with the same discipline as BASE_ROOT_PAINTED_SYSTEMS. The reasoned entry
-// excuses only the shared-token contract below; it never excuses a
-// missing/empty block, an unoffered id, or a stale pin.
+// must be recorded in the shared MINIMAL_TOKEN_SYSTEMS table imported above
+// with a written reason. The reasoned entry excuses only the shared-token
+// contract below; it never excuses empty vars, an unoffered id, or a stale pin.
 // ---------------------------------------------------------------------------
 // Color identity
 // ---------------------------------------------------------------------------
@@ -532,21 +537,6 @@ function cssVar(body, name) {
   return m ? m[1].trim() : null;
 }
 
-// :root[data-accent="id"] { … } blocks. Anchored so that only a bare
-// attribute rule counts — a descendant rule like
-// `:root[data-accent="matrix"] .card { … }` is a component skin, not the
-// accent registry, and is deliberately ignored.
-const ACCENT_BLOCK_RE = /^[ \t]*:root\[data-accent=["']([A-Za-z0-9_-]+)["']\]\s*\{([^}]*)\}/gm;
-
-function parseCssAccents(cssSrc) {
-  const src = stripComments(cssSrc);
-  const out = new Map();
-  for (const m of src.matchAll(ACCENT_BLOCK_RE)) {
-    out.set(m[1], { primary: cssVar(m[2], '--accent'), secondary: cssVar(m[2], '--accent-2') });
-  }
-  return out;
-}
-
 // The bare `:root { … }` block (no attribute selector) holds the pre-attribute
 // default pair. Body-matching stops at the first "}" — the accent tokens sit
 // in the flat declaration list, not inside a nested at-rule, so that is exact.
@@ -587,117 +577,6 @@ function parseCssRootFonts(cssSrc) {
   const m = /^[ \t]*:root\s*\{([^}]*)\}/m.exec(src);
   if (!m) return null;
   return parseCssFontTokens(m[1]);
-}
-
-// ACCENTS: Accent[] in design-system.ts. Fields are read by NAME out of each
-// object literal rather than positionally, so reordering id/name/primary/
-// secondary never breaks the parse (only losing a field does — and that
-// FAILs, it does not silently skip the entry).
-function parseTsAccents(tsSrc) {
-  const m = /export\s+const\s+ACCENTS\s*(?::\s*Accent\[\])?\s*=\s*\[([\s\S]*?)\n\]\s*(?:as\s+const\s*)?(?:satisfies\s+[^;]+)?;/.exec(tsSrc);
-  if (!m) return { accents: new Map(), malformed: [], found: false };
-  const body = stripComments(m[1]);
-  const accents = new Map();
-  const malformed = [];
-  for (const objMatch of body.matchAll(/\{[^{}]*\}/g)) {
-    const obj = objMatch[0];
-    const field = (name) => {
-      const f = new RegExp(`\\b${name}\\s*:\\s*['"\`]([^'"\`]*)['"\`]`).exec(obj);
-      return f ? f[1] : null;
-    };
-    const id = field('id');
-    const primary = field('primary');
-    const secondary = field('secondary');
-    if (!id || !primary || !secondary) {
-      malformed.push(obj.replace(/\s+/g, ' ').slice(0, 120));
-      continue;
-    }
-    accents.set(id, { primary, secondary });
-  }
-  return { accents, malformed, found: true };
-}
-
-// The pre-paint boot script in client/index.html: an id allowlist plus the
-// hard-coded fallback applied when localStorage holds an unknown accent.
-function parseBootAccents(htmlSrc) {
-  const list = /var\s+ACCENTS\s*=\s*\[([^\]]*)\]/.exec(htmlSrc);
-  const ids = list ? [...list[1].matchAll(/['"]([^'"]+)['"]/g)].map((m) => m[1]) : null;
-  const fb = /ACCENTS\.indexOf\(\s*acc\s*\)\s*===?\s*-1\s*\)\s*acc\s*=\s*['"]([^'"]+)['"]/.exec(htmlSrc);
-  return { ids, fallback: fb ? fb[1] : null };
-}
-
-function parseTsDefaultAccent(tsSrc) {
-  const m = /export\s+const\s+DEFAULT_ACCENT\s*(?::[^=]+)?=\s*['"]([^'"]+)['"]/.exec(tsSrc);
-  return m ? m[1] : null;
-}
-
-// DESIGN_SYSTEMS: Record<string, DesignSystem> in design-system.ts — only the
-// keys matter here; the labels/taglines are picker copy, not boot state.
-function parseTsDesignSystems(tsSrc) {
-  const m = /export\s+const\s+DESIGN_SYSTEMS\s*(?::[^=]*)?=\s*\{([\s\S]*?)\n\}\s*(?:as\s+const\s*)?(?:satisfies\s+[^;]+)?;/.exec(tsSrc);
-  if (!m) return { ids: [], malformed: [], found: false };
-  const { entries, malformed } = parseObjectEntries(m[1]);
-  return { ids: [...entries.keys()], malformed, found: true };
-}
-
-function parseTsDefaultSystem(tsSrc) {
-  const m = /export\s+const\s+DEFAULT_SYSTEM\s*(?::[^=]+)?=\s*['"]([^'"]+)['"]/.exec(tsSrc);
-  return m ? m[1] : null;
-}
-
-// :root[data-system="id"] { … } token blocks — the ~30 overrides that make a
-// system look like itself. Anchored exactly like the accent parser, so only a
-function parseCssSystems(cssSrc) {
-  return parseCssSystemBlocks(cssSrc);
-}
-
-// Component skins use descendant selectors rather than the bare
-// :root[data-system="…"] token-block form. Keep every live occurrence with its
-// source line so a retired system can be removed from the stylesheet directly.
-// A selector containing :root[data-system="…"] plus a descendant is a skin too;
-// only a rule whose entire selector is the bare token-block form is excluded.
-const SYSTEM_SKIN_SELECTOR_RE = /\[data-system\s*=\s*(["'])([A-Za-z0-9_-]+)\1\s*\]/g;
-
-function parseCssSystemSkins(cssSrc) {
-  const src = stripCommentsPreservingLines(cssSrc);
-  const skins = [];
-  for (const rule of src.matchAll(/([^{}]+)\{/g)) {
-    const selectorText = rule[1];
-    const selector = selectorText.trim();
-    if (!selector) continue;
-    const isBareTokenBlock = /^\s*:root\s*\[data-system\s*=\s*(["'])[A-Za-z0-9_-]+\1\s*\]\s*$/.test(selectorText);
-    for (const match of selectorText.matchAll(SYSTEM_SKIN_SELECTOR_RE)) {
-      if (isBareTokenBlock) continue;
-      const offset = rule.index + match.index;
-      skins.push({
-        id: match[2],
-        line: src.slice(0, offset).split('\n').length,
-        selector: selector.replace(/\s+/g, ' '),
-      });
-    }
-  }
-  return skins;
-}
-
-// The same blocks, read as the font tokens each system declares — one
-// selector definition, so the two readings can never disagree about which
-// rules count as a system's token block.
-function parseCssSystemFonts(cssSrc) {
-  const out = new Map();
-  for (const [id, body] of parseCssSystems(cssSrc)) out.set(id, parseCssFontTokens(body));
-  return out;
-}
-
-// SYSTEM_DEFAULT_ACCENT: Record<string, string> in design-system.ts — a flat
-// `systemId: 'accentId'` map, read with the shared object walker so quoted
-// keys, bare keys, and a reformat all parse the same. A non-string value (a
-// computed default, a nested object) is reported malformed rather than
-// skipped: it is exactly the shape whose accent id cannot be verified.
-function parseTsSystemDefaultAccents(tsSrc) {
-  const m = /export\s+const\s+SYSTEM_DEFAULT_ACCENT\s*(?::[^=]*)?=\s*\{([\s\S]*?)\n\};/.exec(tsSrc);
-  if (!m) return { accents: new Map(), malformed: [], found: false };
-  const { entries, malformed } = parseObjectStringEntries(m[1]);
-  return { accents: entries, malformed, found: true };
 }
 
 // FONT_OPTIONS: FontOption[] in font-options.ts. Order is kept because
@@ -760,158 +639,272 @@ function parseTsStringMap(src, name) {
   return { entries, malformed, found: true };
 }
 
-// The pre-paint boot script's system allowlist + the id an unknown saved
-// system is silently rewritten to.
-function parseBootSystems(htmlSrc) {
-  const list = /var\s+SYSTEMS\s*=\s*\[([^\]]*)\]/.exec(htmlSrc);
-  const ids = list ? [...list[1].matchAll(/['"]([^'"]+)['"]/g)].map((m) => m[1]) : null;
-  const fb = /SYSTEMS\.indexOf\(\s*sys\s*\)\s*===?\s*-1\s*\)\s*sys\s*=\s*['"]([^'"]+)['"]/.exec(htmlSrc);
-  return { ids, fallback: fb ? fb[1] : null };
-}
-
 const THEME_BOOT_MARKER = '__AWESOME_VIDEO_THEME_BOOT__';
 const FONT_BOOT_MARKER = '__AWESOME_VIDEO_FONT_BOOT__';
 
-function parseThemeRegistry(tsSrc) {
+// ---------------------------------------------------------------------------
+// Canonical registry readers
+// ---------------------------------------------------------------------------
+// The five systems, ten accents and SYSTEM_DEFAULT_ACCENT live ONLY in the
+// verbatim /ds/design-system.js. It is evaluated (never regex-parsed) through
+// readCanonicalRegistry() from the artifact generator, so the gate sees the
+// exact tables the browser gets.
+
+// Every custom property declared by the top-level bare `:root { … }` blocks
+// of a stylesheet, in cascade order (a later declaration wins). This is what
+// paints <html> before applyDesignSystem() writes its inline tokens.
+function parseCssRootTokens(cssSrc) {
+  const src = stripComments(cssSrc);
+  const blocks = [...src.matchAll(/^[ \t]*:root\s*\{([^}]*)\}/gm)];
+  if (!blocks.length) return null;
+  const out = new Map();
+  for (const [, body] of blocks) {
+    for (const m of body.matchAll(/(?:^|[\s;{])(--[\w-]+)\s*:\s*([^;}]+)/g)) out.set(m[1], m[2].trim());
+  }
+  return out;
+}
+
+// DESIGN_SYSTEMS[id].vars rendered as a declaration body, so the shared token
+// contract (written against CSS block bodies) judges the inline paint the
+// applier actually performs.
+function registrySystemBlocks(systems) {
+  const out = new Map();
+  for (const [id, system] of Object.entries(systems ?? {})) {
+    const vars = system?.vars && typeof system.vars === 'object' ? system.vars : {};
+    out.set(id, Object.entries(vars).map(([name, value]) => `${name}: ${value};`).join(' '));
+  }
+  return out;
+}
+
+// The --font-* tokens each system's vars declare. A token a system leaves out
+// is ABSENT (the canonical :root decides), never empty.
+function registrySystemFonts(systems) {
+  const out = new Map();
+  for (const [id, system] of Object.entries(systems ?? {})) {
+    const fonts = new Map();
+    for (const token of FONT_TOKENS) {
+      const value = system?.vars?.[token];
+      if (typeof value === 'string') fonts.set(token, value);
+    }
+    out.set(id, fonts);
+  }
+  return out;
+}
+
+// The storage keys design-system.ts persists the choice under. They are
+// module-private consts, so they are read from the source by name.
+function parseStorageKeys(tsSrc) {
+  const src = stripComments(tsSrc);
+  const key = (name) => new RegExp(`\\bconst\\s+${name}\\s*(?::[^=]+)?=\\s*(['"\`])([^'"\`]+)\\1`).exec(src)?.[2] ?? null;
+  return { system: key('SYSTEM_STORAGE_KEY'), accent: key('ACCENT_STORAGE_KEY') };
+}
+
+// Tables the wrapper must never restate: the canonical file owns them.
+const RESTATED_TABLE_RE = /\bexport\s+(?:const|let|var|function)\s+(DESIGN_SYSTEMS|ACCENTS|SYSTEM_DEFAULT_ACCENT|THEME_FALLBACK_REGISTRY|TYPE_SCALE|SPACE_SCALE)\b/g;
+
+// Run design-system.ts with a stand-in `window` carrying the canonical tables.
+// Its readers resolve `window` at CALL time, so the stand-in has to stay in
+// place while `fn` runs; it is always removed afterwards.
+function withCanonicalWindow(registry, fn) {
+  const had = Object.prototype.hasOwnProperty.call(globalThis, 'window');
+  const previous = globalThis.window;
+  globalThis.window = {
+    DESIGN_SYSTEMS: registry?.systems,
+    ACCENTS: registry?.accents,
+    SYSTEM_DEFAULT_ACCENT: registry?.systemDefaultAccents,
+    TYPE_SCALE: registry?.typeScale,
+    SPACE_SCALE: registry?.spaceScale,
+    applyDesignSystem: () => {},
+  };
+  try {
+    return fn(globalThis.window);
+  } finally {
+    if (had) globalThis.window = previous;
+    else delete globalThis.window;
+  }
+}
+
+// boot-registry: design-system.ts is a typed wrapper over the canonical
+// globals. It restates no table, its getters return the globals themselves,
+// its defaults are the applier's own fallbacks, and the registry it wraps is
+// structurally complete.
+function checkRuntimeWrapper(tsSrc, registry, registrySource) {
+  const issues = [];
+  const stripped = stripComments(tsSrc);
+  for (const m of stripped.matchAll(RESTATED_TABLE_RE)) {
+    issues.push(`${TS_REL} exports its own ${m[1]} — the table lives only in ${REGISTRY_REL}; read window.${m[1] === 'THEME_FALLBACK_REGISTRY' ? 'DESIGN_SYSTEMS/ACCENTS' : m[1]} through the getters instead`);
+  }
+  for (const accent of Array.isArray(registry?.accents) ? registry.accents : []) {
+    for (const field of ['primary', 'secondary']) {
+      const value = String(accent?.[field] ?? '');
+      if (/^#[0-9a-f]{3,8}$/i.test(value) && new RegExp(`${value}(?![0-9a-f])`, 'i').test(stripped)) {
+        issues.push(`${TS_REL} hard-codes accent "${accent.id}" ${field} ${value} — a second copy of ${REGISTRY_REL}'s ACCENTS that nothing keeps in sync`);
+      }
+    }
+  }
+  for (const issue of registryStructureIssues(registry ?? {})) issues.push(`${REGISTRY_REL}: ${issue}`);
+
   let exports_;
   try {
     exports_ = loadTsExports(TS_REL, tsSrc);
   } catch (err) {
-    return { found: false, issues: [`could not execute ${TS_REL}: ${err.message}`] };
+    return { found: false, issues: [...issues, `could not execute ${TS_REL}: ${err.message}`] };
   }
 
-  const registry = exports_.THEME_FALLBACK_REGISTRY;
-  if (!registry || typeof registry !== 'object') {
-    return { found: false, issues: [`${TS_REL} does not export THEME_FALLBACK_REGISTRY`] };
-  }
-
-  const issues = [];
-  const systems = new Map();
-  const accents = new Map();
-  const systemDefaultAccents = new Map();
-  const expectedAccentExports = [];
-
-  if (!Array.isArray(registry.systems)) {
-    issues.push('THEME_FALLBACK_REGISTRY.systems is not an array');
-  } else {
-    for (const system of registry.systems) {
-      if (
-        !system || typeof system !== 'object' ||
-        !['id', 'name', 'tag', 'desc', 'defaultAccent'].every((field) => typeof system[field] === 'string' && system[field])
-      ) {
-        issues.push(`malformed system entry: ${JSON.stringify(system)}`);
-        continue;
+  withCanonicalWindow(registry, (win) => {
+    for (const [getter, global] of [
+      ['getDesignSystems', 'DESIGN_SYSTEMS'],
+      ['getAccents', 'ACCENTS'],
+      ['getSystemDefaultAccents', 'SYSTEM_DEFAULT_ACCENT'],
+    ]) {
+      if (typeof exports_[getter] !== 'function') {
+        issues.push(`${TS_REL} no longer exports ${getter}() — the one typed reader of window.${global}`);
+      } else if (exports_[getter]() !== win[global]) {
+        issues.push(`${getter}() in ${TS_REL} does not return window.${global} itself — it serves a copy that can drift from ${REGISTRY_REL}`);
       }
-      if (systems.has(system.id)) issues.push(`duplicate system id "${system.id}"`);
-      systems.set(system.id, { name: system.name, tag: system.tag, desc: system.desc });
-      systemDefaultAccents.set(system.id, system.defaultAccent);
+    }
+  });
+
+  const defaultSystem = typeof exports_.DEFAULT_SYSTEM === 'string' ? exports_.DEFAULT_SYSTEM : null;
+  const defaultAccent = typeof exports_.DEFAULT_ACCENT === 'string' ? exports_.DEFAULT_ACCENT : null;
+  if (!defaultSystem) issues.push(`${TS_REL} does not export DEFAULT_SYSTEM as a string`);
+  if (!defaultAccent) issues.push(`${TS_REL} does not export DEFAULT_ACCENT as a string`);
+  const fallbacks = applierFallbacks(registrySource, registry ?? {});
+  if (!fallbacks.system || !fallbacks.accent) {
+    issues.push(`could not read applyDesignSystem()'s own fallbacks out of ${REGISTRY_REL} (system ${fallbacks.system ?? '?'}, accent ${fallbacks.accent ?? '?'})`);
+  } else {
+    if (defaultSystem && defaultSystem !== fallbacks.system) {
+      issues.push(`DEFAULT_SYSTEM in ${TS_REL} is "${defaultSystem}" but applyDesignSystem() falls back to "${fallbacks.system}" — an unknown stored id paints one system while the app believes the other is selected`);
+    }
+    if (defaultAccent && defaultAccent !== fallbacks.accent) {
+      issues.push(`DEFAULT_ACCENT in ${TS_REL} is "${defaultAccent}" but applyDesignSystem() falls back to ACCENTS[…] = "${fallbacks.accent}"`);
     }
   }
+  return { found: true, issues, defaultSystem, defaultAccent, storageKeys: parseStorageKeys(tsSrc), exports: exports_ };
+}
 
-  if (!Array.isArray(registry.accents)) {
-    issues.push('THEME_FALLBACK_REGISTRY.accents is not an array');
-  } else {
-    for (const accent of registry.accents) {
-      if (
-        !accent || typeof accent !== 'object' ||
-        !['id', 'name', 'primary', 'secondary'].every((field) => typeof accent[field] === 'string' && accent[field])
-      ) {
-        issues.push(`malformed accent entry: ${JSON.stringify(accent)}`);
-        continue;
-      }
-      if (accents.has(accent.id)) issues.push(`duplicate accent id "${accent.id}"`);
-      accents.set(accent.id, { primary: accent.primary, secondary: accent.secondary });
-      expectedAccentExports.push({
-        id: accent.id,
-        name: accent.name,
-        primary: accent.primary,
-        secondary: accent.secondary,
-      });
-    }
-  }
-
-  const defaultSystem = typeof registry.defaultSystem === 'string' ? registry.defaultSystem : null;
-  const defaultAccent = typeof registry.defaultAccent === 'string' ? registry.defaultAccent : null;
-  if (!defaultSystem) issues.push('THEME_FALLBACK_REGISTRY.defaultSystem is not a non-empty string');
-  if (!defaultAccent) issues.push('THEME_FALLBACK_REGISTRY.defaultAccent is not a non-empty string');
-
-  const expectedBootData = {
-    systems: [...systems.keys()],
-    accents: [...accents.keys()],
-    defaultSystem,
-    defaultAccent,
-    systemDefaultAccent: Object.fromEntries(systemDefaultAccents),
-  };
-  const actualBootData = exports_.THEME_BOOT_DATA;
-  if (JSON.stringify(actualBootData) !== JSON.stringify(expectedBootData)) {
-    issues.push(`THEME_BOOT_DATA is stale: expected ${JSON.stringify(expectedBootData)}, received ${JSON.stringify(actualBootData)}`);
-  }
-
-  const exportedSystems = exports_.DESIGN_SYSTEMS;
-  if (!exportedSystems || JSON.stringify(exportedSystems) !== JSON.stringify(Object.fromEntries(systems))) {
-    issues.push('DESIGN_SYSTEMS metadata is not derived from THEME_FALLBACK_REGISTRY.systems');
-  }
-  const exportedAccents = exports_.ACCENTS;
-  if (!Array.isArray(exportedAccents) || JSON.stringify(exportedAccents) !== JSON.stringify(expectedAccentExports)) {
-    issues.push('ACCENTS metadata is not derived from THEME_FALLBACK_REGISTRY.accents');
-  }
-  if (JSON.stringify(exports_.SYSTEM_DEFAULT_ACCENT) !== JSON.stringify(Object.fromEntries(systemDefaultAccents))) {
-    issues.push('SYSTEM_DEFAULT_ACCENT is not derived from THEME_FALLBACK_REGISTRY.systems');
-  }
-  if (exports_.DEFAULT_SYSTEM !== defaultSystem) {
-    issues.push(`DEFAULT_SYSTEM is "${exports_.DEFAULT_SYSTEM}" instead of registry defaultSystem "${defaultSystem}"`);
-  }
-  if (exports_.DEFAULT_ACCENT !== defaultAccent) {
-    issues.push(`DEFAULT_ACCENT is "${exports_.DEFAULT_ACCENT}" instead of registry defaultAccent "${defaultAccent}"`);
-  }
-
+// The inline pre-paint script: the <script> without src whose text calls
+// applyDesignSystem(). Everything the boot contract needs is read off the
+// parsed document, so attribute order/quoting cannot hide a change.
+function parseThemeBoot(htmlSrc) {
+  const $ = cheerio.load(String(htmlSrc));
+  const nodes = $('link, script').toArray();
+  const at = (el) => nodes.indexOf(el);
+  const sheetLinks = $('link').toArray().filter((el) => {
+    const rel = String($(el).attr('rel') ?? '').toLowerCase().split(/\s+/);
+    return rel.includes('stylesheet') && $(el).attr('href') === CANONICAL_CSS_HREF;
+  });
+  const registryScripts = $('script[src]').toArray().filter((el) => $(el).attr('src') === CANONICAL_JS_HREF);
+  const boot = $('script:not([src])').toArray().find((el) => /\bapplyDesignSystem\s*\(/.test(stripComments($(el).text())));
   return {
-    found: true,
-    issues,
-    systems,
-    accents,
-    systemDefaultAccents,
-    defaultSystem,
-    defaultAccent,
-    bootData: actualBootData,
+    sheetLinks: sheetLinks.map((el) => ({ index: at(el), media: $(el).attr('media') ?? null })),
+    registryScripts: registryScripts.map((el) => ({
+      index: at(el),
+      async: $(el).attr('async') !== undefined,
+      defer: $(el).attr('defer') !== undefined,
+      type: $(el).attr('type') ?? null,
+    })),
+    boot: boot ? { index: at(boot), inHead: $(boot).closest('head').length > 0, text: stripComments($(boot).text()) } : null,
   };
 }
 
-function checkThemeBootGeneration(htmlSrc, viteSrc) {
+// boot-generation: the canonical sheet and applier load synchronously ahead
+// of an inline boot that picks the stored system/accent through the canonical
+// globals and calls the applier before first paint. Its storage keys and
+// fallback system are the wrapper's — either injected by Vite from
+// THEME_BOOT_DATA (marker form) or written literally with the same values.
+function checkThemeBoot(htmlSrc, viteSrc, wrapper, registry) {
   const issues = [];
-  for (const marker of [THEME_BOOT_MARKER, FONT_BOOT_MARKER]) {
-    const markerCount = htmlSrc.split(marker).length - 1;
-    if (markerCount !== 1) {
-      issues.push(`${HTML_REL} must contain exactly one ${marker} marker; found ${markerCount}`);
+  const doc = parseThemeBoot(htmlSrc);
+  const markerCount = (marker) => htmlSrc.split(marker).length - 1;
+
+  if (doc.sheetLinks.length !== 1) {
+    issues.push(`${HTML_REL} must link ${CANONICAL_CSS_HREF} exactly once as a stylesheet; found ${doc.sheetLinks.length}`);
+  } else if (doc.sheetLinks[0].media && !/^\s*all\s*$/i.test(doc.sheetLinks[0].media)) {
+    issues.push(`${HTML_REL} links ${CANONICAL_CSS_HREF} under media="${doc.sheetLinks[0].media}" — the canonical tokens paint only while that query holds`);
+  }
+  if (doc.registryScripts.length !== 1) {
+    issues.push(`${HTML_REL} must load ${CANONICAL_JS_HREF} exactly once with <script src>; found ${doc.registryScripts.length}`);
+  } else {
+    const s = doc.registryScripts[0];
+    if (s.async || s.defer || (s.type && !/^(?:text|application)\/javascript$/i.test(s.type))) {
+      issues.push(`${HTML_REL} loads ${CANONICAL_JS_HREF} ${s.async ? 'async' : s.defer ? 'deferred' : `as type="${s.type}"`} — the boot needs its globals synchronously, before first paint`);
+    }
+  }
+  if (!doc.boot) {
+    issues.push(`${HTML_REL} has no inline <script> that calls applyDesignSystem() — nothing paints the stored system before React loads`);
+    return issues;
+  }
+  if (!doc.boot.inHead) issues.push(`the inline theme boot in ${HTML_REL} is outside <head> — the body can paint before it runs`);
+  if (doc.sheetLinks[0] && doc.sheetLinks[0].index > doc.boot.index) {
+    issues.push(`${HTML_REL} links ${CANONICAL_CSS_HREF} AFTER the inline theme boot`);
+  }
+  if (doc.registryScripts[0] && doc.registryScripts[0].index > doc.boot.index) {
+    issues.push(`${HTML_REL} loads ${CANONICAL_JS_HREF} AFTER the inline theme boot — window.DESIGN_SYSTEMS/applyDesignSystem do not exist yet when it runs`);
+  }
+
+  const boot = doc.boot.text;
+  for (const global of ['DESIGN_SYSTEMS', 'ACCENTS', 'SYSTEM_DEFAULT_ACCENT']) {
+    if (!new RegExp(`\\bwindow\\.${global}\\b`).test(boot)) {
+      issues.push(`the inline theme boot in ${HTML_REL} never reads window.${global} — it cannot validate the stored choice against the canonical table`);
     }
   }
   if (/\bvar\s+(?:SYSTEMS|ACCENTS)\s*=\s*\[|\bvar\s+FONT_STACKS\s*=\s*\{/.test(htmlSrc)) {
-    issues.push(`${HTML_REL} contains a hand-maintained theme/font allowlist instead of generated boot data`);
+    issues.push(`${HTML_REL} contains a hand-maintained theme/font allowlist instead of the canonical globals`);
   }
-  for (const field of ['systems', 'accents', 'defaultSystem', 'defaultAccent', 'systemDefaultAccent']) {
-    if (!new RegExp(`\\bTHEME_BOOT\\.${field}\\b`).test(htmlSrc)) {
-      issues.push(`${HTML_REL} does not consume generated THEME_BOOT.${field}`);
+  const markerForm = markerCount(THEME_BOOT_MARKER) > 0;
+  const allowedLiteral = new Set(markerForm ? [] : [wrapper.defaultSystem]);
+  const knownIds = new Set([
+    ...Object.keys(registry?.systems ?? {}),
+    ...(Array.isArray(registry?.accents) ? registry.accents.map((a) => a?.id) : []),
+  ]);
+  for (const m of boot.matchAll(/(['"])([A-Za-z0-9_-]+)\1/g)) {
+    if (knownIds.has(m[2]) && !allowedLiteral.has(m[2])) {
+      issues.push(`the inline theme boot in ${HTML_REL} hard-codes "${m[2]}" — a hand copy of a canonical id`);
     }
   }
-  for (const field of ['stacks', 'fallback']) {
-    if (!new RegExp(`\\bFONT_BOOT\\.${field}\\b`).test(htmlSrc)) {
-      issues.push(`${HTML_REL} does not consume generated FONT_BOOT.${field}`);
+  for (const why of unsafeMembershipTests(boot)) {
+    issues.push(`the inline theme boot in ${HTML_REL} validates the stored system with ${why}`);
+  }
+
+  const keys = wrapper.storageKeys ?? {};
+  if (!keys.system || !keys.accent) issues.push(`could not read SYSTEM_STORAGE_KEY/ACCENT_STORAGE_KEY out of ${TS_REL}`);
+  if (markerForm) {
+    if (markerCount(THEME_BOOT_MARKER) !== 1) issues.push(`${HTML_REL} must contain exactly one ${THEME_BOOT_MARKER} marker; found ${markerCount(THEME_BOOT_MARKER)}`);
+    for (const field of ['systemKey', 'accentKey', 'defaultSystem']) {
+      if (!new RegExp(`\\bTHEME_BOOT\\.${field}\\b`).test(boot)) issues.push(`the inline theme boot in ${HTML_REL} does not consume generated THEME_BOOT.${field}`);
+    }
+    if (!/\bimport\s*\{[^}]*\bTHEME_BOOT_DATA\b[^}]*\}\s*from\s*["']\.\/client\/src\/lib\/design-system["']/.test(viteSrc)) {
+      issues.push(`${VITE_REL} does not import THEME_BOOT_DATA from ${TS_REL}`);
+    }
+    if (!viteSrc.includes(`const marker = "${THEME_BOOT_MARKER}"`) || !viteSrc.includes('JSON.stringify(THEME_BOOT_DATA)')) {
+      issues.push(`${VITE_REL} does not serialize THEME_BOOT_DATA for the ${THEME_BOOT_MARKER} marker`);
+    }
+    if (!/\bplugins\s*:\s*\[[\s\S]*?\bthemeBootRegistry\(\)/.test(viteSrc)) {
+      issues.push(`${VITE_REL} does not register themeBootRegistry() in the Vite plugin pipeline`);
+    }
+    const data = wrapper.exports?.THEME_BOOT_DATA;
+    const expected = { systemKey: keys.system, accentKey: keys.accent, defaultSystem: wrapper.defaultSystem };
+    for (const [field, value] of Object.entries(expected)) {
+      if (data?.[field] !== value) issues.push(`THEME_BOOT_DATA.${field} in ${TS_REL} is ${JSON.stringify(data?.[field])} but the wrapper uses ${JSON.stringify(value)} — the boot and the app would read different state`);
+    }
+  } else {
+    const readKeys = new Set([...boot.matchAll(/localStorage\.getItem\(\s*(['"])([^'"]+)\1\s*\)/g)].map((m) => m[2]));
+    for (const [label, key] of [['SYSTEM_STORAGE_KEY', keys.system], ['ACCENT_STORAGE_KEY', keys.accent]]) {
+      if (key && !readKeys.has(key)) issues.push(`the inline theme boot in ${HTML_REL} never reads localStorage "${key}" (${label} in ${TS_REL}); it reads ${[...readKeys].map((k) => `"${k}"`).join(', ') || 'nothing'}`);
+    }
+    const fallback = /\bsys\s*=\s*(['"])([^'"]+)\1/.exec(boot)?.[2] ?? null;
+    if (fallback !== wrapper.defaultSystem) {
+      issues.push(`the inline theme boot in ${HTML_REL} falls back to ${fallback ? `"${fallback}"` : 'nothing'} but DEFAULT_SYSTEM in ${TS_REL} is "${wrapper.defaultSystem}"`);
     }
   }
-  if (!/\bimport\s*\{[^}]*\bTHEME_BOOT_DATA\b[^}]*\}\s*from\s*["']\.\/client\/src\/lib\/design-system["']/.test(viteSrc)) {
-    issues.push(`${VITE_REL} does not import THEME_BOOT_DATA from ${TS_REL}`);
-  }
+
+  if (markerCount(FONT_BOOT_MARKER) !== 1) issues.push(`${HTML_REL} must contain exactly one ${FONT_BOOT_MARKER} marker; found ${markerCount(FONT_BOOT_MARKER)}`);
   if (!/\bimport\s*\{[^}]*\bFONT_BOOT_DATA\b[^}]*\}\s*from\s*["']\.\/client\/src\/lib\/font-options["']/.test(viteSrc)) {
     issues.push(`${VITE_REL} does not import FONT_BOOT_DATA from ${FONTS_REL}`);
   }
-  if (!viteSrc.includes(`const marker = "${THEME_BOOT_MARKER}"`) || !viteSrc.includes('JSON.stringify(THEME_BOOT_DATA)')) {
-    issues.push(`${VITE_REL} does not serialize THEME_BOOT_DATA for the ${THEME_BOOT_MARKER} marker`);
-  }
   if (!viteSrc.includes(`const marker = "${FONT_BOOT_MARKER}"`) || !viteSrc.includes('JSON.stringify(FONT_BOOT_DATA)')) {
     issues.push(`${VITE_REL} does not serialize FONT_BOOT_DATA for the ${FONT_BOOT_MARKER} marker`);
-  }
-  if (!/\bplugins\s*:\s*\[[\s\S]*?\bthemeBootRegistry\(\)/.test(viteSrc)) {
-    issues.push(`${VITE_REL} does not register themeBootRegistry() in the Vite plugin pipeline`);
   }
   if (!/\bplugins\s*:\s*\[[\s\S]*?\bfontBootRegistry\(\)/.test(viteSrc)) {
     issues.push(`${VITE_REL} does not register fontBootRegistry() in the Vite plugin pipeline`);
@@ -919,6 +912,99 @@ function checkThemeBootGeneration(htmlSrc, viteSrc) {
   return issues;
 }
 
+// Every [data-system="…"] selector in a stylesheet, with its source line. The
+// canonical sheet has no token blocks any more (the applier writes system
+// tokens inline), so every occurrence counts — a component skin or a stray
+// attribute block alike must name a system the registry offers.
+const SYSTEM_SKIN_SELECTOR_RE = /\[data-system\s*=\s*(["'])([A-Za-z0-9_-]+)\1\s*\]/g;
+
+function parseCssSystemSkins(cssSrc) {
+  const src = stripCommentsPreservingLines(cssSrc);
+  const skins = [];
+  for (const rule of src.matchAll(/([^{};]+)\{/g)) {
+    const selectorText = rule[1];
+    const selector = selectorText.trim();
+    if (!selector) continue;
+    for (const match of selectorText.matchAll(SYSTEM_SKIN_SELECTOR_RE)) {
+      const offset = rule.index + match.index;
+      skins.push({
+        id: match[2],
+        line: src.slice(0, offset).split('\n').length,
+        selector: selector.replace(/\s+/g, ' '),
+      });
+    }
+  }
+  return skins;
+}
+
+// accent-paint (app side): applyDesignSystem() writes --accent/--accent-2
+// inline on <html>. An app stylesheet that keys a rule off [data-accent] or
+// declares either token repaints the accent somewhere the applier never
+// reaches — every descendant inherits the redeclared value.
+function parseCssAccentOverrides(cssSrc) {
+  const src = stripCommentsPreservingLines(cssSrc);
+  const out = [];
+  const lineAt = (offset) => src.slice(0, offset).split('\n').length;
+  for (const rule of src.matchAll(/([^{};]+)\{/g)) {
+    if (/\[data-accent\b/.test(rule[1])) out.push({ what: `a [data-accent] rule (${rule[1].trim().replace(/\s+/g, ' ')})`, line: lineAt(rule.index + rule[1].search(/\S/)) });
+  }
+  for (const m of src.matchAll(/(^|[\s;{])(--accent(?:-2)?)\s*:/g)) {
+    out.push({ what: `a ${m[2]} declaration`, line: lineAt(m.index + m[1].length) });
+  }
+  return out.sort((a, b) => a.line - b.line);
+}
+
+const CSS_COLOR_RE = /^(?:#(?:[0-9a-f]{3,4}|[0-9a-f]{6}|[0-9a-f]{8})|(?:rgba?|hsla?|hwb|lab|lch|oklab|oklch|color)\([^()]*\))$/i;
+
+function compareAccentPaint({ accents, registrySource, appSheets }) {
+  const failures = [];
+  if (!applierPaintsAccentPair(registrySource)) {
+    failures.push({
+      kind: 'accent-paint',
+      id: 'applyDesignSystem',
+      message: `applyDesignSystem() in ${REGISTRY_REL} no longer sets --accent/--accent-2 from the accent's primary/secondary — the picker's swatch and the painted accent come apart`,
+    });
+  }
+  for (const accent of accents ?? []) {
+    for (const field of ['primary', 'secondary']) {
+      const value = String(accent?.[field] ?? '').trim();
+      if (!CSS_COLOR_RE.test(value)) {
+        failures.push({
+          kind: 'accent-paint',
+          id: accent?.id ?? '?',
+          message: `accent "${accent?.id}" ${field} in ${REGISTRY_REL} is ${JSON.stringify(accent?.[field])}, which is not a CSS color the applier can paint`,
+        });
+      }
+    }
+  }
+  for (const { rel, src } of appSheets) {
+    for (const { what, line } of parseCssAccentOverrides(src)) {
+      failures.push({
+        kind: 'accent-paint',
+        id: rel,
+        message: `${rel}:${line} has ${what} — the accent is painted inline on <html> by applyDesignSystem() from ${REGISTRY_REL}; an app stylesheet that re-keys or redeclares it fights the picker`,
+      });
+    }
+  }
+  return failures;
+}
+
+// default-prepaint: the canonical :root is what <html> shows before the
+// applier runs. For every token DEFAULT_SYSTEM's vars declare, the bare :root
+// should agree — otherwise the pre-apply frame is a different look. Returns
+// the divergences; the caller decides whether they can ever reach a screen.
+function compareDefaultPrePaint(defaultSystemId, defaultVars, rootTokens) {
+  const out = [];
+  for (const [token, value] of Object.entries(defaultVars ?? {})) {
+    const root = rootTokens?.get(token);
+    if (root === undefined) {
+      out.push({ kind: 'default-prepaint', id: token, root: null, system: value, message: `${token}: ${defaultSystemId} vars ${value}, canonical :root declares nothing` });
+    } else if (normalizeColor(root) !== normalizeColor(value)) {
+      out.push({ kind: 'default-prepaint', id: token, root, system: value, message: `${token}: ${defaultSystemId} vars ${value}, canonical :root ${root}` });
+    }
+  }
+  return out;
+}
 // Every <link> carrying the `stylesheet` rel token in an HTML source. HTML
 // is parsed as HTML rather than matched as text: quoted `>` characters,
 // character references, unquoted attributes, attribute order/line breaks,
@@ -1045,6 +1131,8 @@ function parseBootFonts(htmlSrc) {
     found: new RegExp(`\\bvar\\s+FONT_BOOT\\s*=\\s*${FONT_BOOT_MARKER}\\b`).test(htmlSrc),
     consumesStacks: /\bFONT_BOOT\.stacks\b/.test(htmlSrc),
     consumesFallback: /\bFONT_BOOT\.fallback\b/.test(htmlSrc),
+    // `… && FONT_BOOT.stacks[fnt])` — an unknown or empty-stack id applies nothing.
+    skipsEmptyStack: /&&\s*FONT_BOOT\.stacks\[\s*[A-Za-z_$][\w$]*\s*\]\s*\)/.test(htmlSrc),
   };
 }
 
@@ -1147,52 +1235,6 @@ function compareStylesheetCsp(targets, styleDirectives) {
 // Comparator — shared by the canaries and the real run so the two can never
 // disagree about what counts as drift.
 // ---------------------------------------------------------------------------
-function compareAccents(ts, css) {
-  const failures = [];
-  for (const id of [...new Set([...ts.keys(), ...css.keys()])].sort()) {
-    const t = ts.get(id);
-    const c = css.get(id);
-    if (!c) {
-      failures.push({
-        kind: 'id-parity',
-        id,
-        message: `accent "${id}" is in ${TS_REL} (ACCENTS) but has no :root[data-accent="${id}"] block in ${CSS_REL} — the picker offers a swatch that paints nothing`,
-      });
-      continue;
-    }
-    if (!t) {
-      failures.push({
-        kind: 'id-parity',
-        id,
-        message: `accent "${id}" has a :root[data-accent="${id}"] block in ${CSS_REL} but is missing from ACCENTS in ${TS_REL} — the picker can never offer it`,
-      });
-      continue;
-    }
-    for (const [field, cssVarName] of [
-      ['primary', '--accent'],
-      ['secondary', '--accent-2'],
-    ]) {
-      const cssValue = c[field];
-      if (cssValue == null) {
-        failures.push({
-          kind: 'swatch-value',
-          id,
-          message: `accent "${id}" :root[data-accent="${id}"] block declares no ${cssVarName} in ${CSS_REL}`,
-        });
-        continue;
-      }
-      if (normalizeColor(t[field]) !== normalizeColor(cssValue)) {
-        failures.push({
-          kind: 'swatch-value',
-          id,
-          message: `accent "${id}" ${field} drifted — ${TS_REL} says ${t[field]}, ${CSS_REL} ${cssVarName} says ${cssValue}`,
-        });
-      }
-    }
-  }
-  return failures;
-}
-
 // Two id lists that must hold exactly the same ids. `describeOnlyInA` /
 // `describeOnlyInB` name the consequence of each direction, since "the app
 // offers a theme the boot script rejects" and "the boot script allows a theme
@@ -1208,67 +1250,30 @@ function compareIdSets(kind, a, b, describeOnlyInA, describeOnlyInB) {
   return failures;
 }
 
-// DESIGN_SYSTEMS vs the :root[data-system="…"] token blocks that paint them,
-// with the documented "the bare :root already paints this one" escape hatch.
-// Separate from compareIdSets() because this parity has an exemption table,
-// and because the table itself has to be held to account.
-function compareSystemPaint(systemIds, cssBlocks, baseRootPainted, minimalTokenSystems = MINIMAL_TOKEN_SYSTEMS) {
+// DESIGN_SYSTEMS vs the vars each system hands to applyDesignSystem(): a
+// system the picker offers must carry a non-empty vars table (an empty one
+// paints exactly like whatever was applied before), and every non-exempt
+// system must declare the tokens its established peers agree on. `blocks` is
+// registrySystemBlocks() output, so the shared contract helpers judge the
+// inline paint. (The retired BASE_ROOT_PAINTED_SYSTEMS escape hatch covered a
+// system with no CSS block; every system now paints from its own vars, and
+// the bare :root's agreement with the default system is compareDefaultPrePaint.)
+function compareSystemPaint(systemIds, blocks, minimalTokenSystems = MINIMAL_TOKEN_SYSTEMS) {
   const offered = new Set(systemIds);
   const failures = [];
 
-  // The escape hatch first: an entry only excuses a missing block while it is
-  // honest about WHY, and about still being needed.
-  for (const [id, reason] of baseRootPainted) {
-    const written = String(reason ?? '').trim();
-    if (!written) {
-      failures.push({
-        kind: 'base-root-exemption',
-        id,
-        message: `design system "${id}" is pinned in BASE_ROOT_PAINTED_SYSTEMS with no written reason — an exemption without a reason is silence with extra steps; write why the bare :root paints it or delete the entry`,
-      });
-    }
-    if (cssBlocks.has(id)) {
-      failures.push({
-        kind: 'base-root-exemption',
-        id,
-        message: `design system "${id}" is pinned in BASE_ROOT_PAINTED_SYSTEMS as painted by the bare ":root" but now HAS its own :root[data-system="${id}"] block in ${CSS_REL} — drop the stale entry (reason was: ${written || '(none)'})`,
-      });
-    } else if (!offered.has(id)) {
-      failures.push({
-        kind: 'base-root-exemption',
-        id,
-        message: `design system "${id}" is pinned in BASE_ROOT_PAINTED_SYSTEMS but DESIGN_SYSTEMS in ${TS_REL} no longer offers it — drop the stale entry (reason was: ${written || '(none)'})`,
-      });
-    }
-  }
-
-  const exempt = new Set(
-    [...baseRootPainted].filter(([, reason]) => String(reason ?? '').trim()).map(([id]) => id),
-  );
-
-  // Minimal-token exemptions are checked before they are allowed to influence
-  // the peer contract. A reason-less or stale entry is never an exemption.
-  const minimalValidation = validateMinimalTokenSystems(
-    [...offered],
-    cssBlocks,
-    minimalTokenSystems,
-  );
+  const minimalValidation = validateMinimalTokenSystems([...offered], blocks, minimalTokenSystems);
   failures.push(
-    ...minimalValidation.failures.map(({ id, message }) => ({
-      kind: 'minimal-system-exemption',
-      id,
-      message,
-    })),
+    ...minimalValidation.failures.map(({ id, message }) => ({ kind: 'minimal-system-exemption', id, message })),
   );
   const minimalTokenExempt = minimalValidation.exemptIds;
 
-  for (const id of [...new Set([...offered, ...cssBlocks.keys()])].sort()) {
-    if (!cssBlocks.has(id)) {
-      if (exempt.has(id)) continue; // documented above: the bare :root paints it
+  for (const id of [...new Set([...offered, ...blocks.keys()])].sort()) {
+    if (!blocks.has(id)) {
       failures.push({
         kind: 'system-paint',
         id,
-        message: `design system "${id}" is offered by DESIGN_SYSTEMS in ${TS_REL} but has no :root[data-system="${id}"] block in ${CSS_REL} — the picker offers it and the attribute sticks, but the page paints exactly like the default. Add the token block, or — if the bare ":root" already paints it — add a reason-carrying entry to BASE_ROOT_PAINTED_SYSTEMS in this gate`,
+        message: `design system "${id}" is offered but DESIGN_SYSTEMS in ${REGISTRY_REL} carries no vars for it — the picker offers it and data-system sticks, but applyDesignSystem() paints nothing new`,
       });
       continue;
     }
@@ -1276,50 +1281,36 @@ function compareSystemPaint(systemIds, cssBlocks, baseRootPainted, minimalTokenS
       failures.push({
         kind: 'system-paint',
         id,
-        message: `${CSS_REL} has a :root[data-system="${id}"] token block but DESIGN_SYSTEMS in ${TS_REL} does not offer "${id}" — dead paint no picker choice can ever reach`,
+        message: `vars exist for design system "${id}" but DESIGN_SYSTEMS in ${REGISTRY_REL} does not offer it — dead paint no picker choice can ever reach`,
       });
       continue;
     }
-    if (!declaresCustomProperty(cssBlocks.get(id))) {
+    if (!declaresCustomProperty(blocks.get(id))) {
       failures.push({
         kind: 'system-paint',
         id,
-        message: `design system "${id}" has a :root[data-system="${id}"] block in ${CSS_REL} that declares no custom property — an empty block paints exactly like the default`,
+        message: `design system "${id}" has an empty vars table in ${REGISTRY_REL} — switching to it leaves the previous system's inline tokens cleared and nothing in their place`,
       });
     }
   }
 
-  const { tokens: sharedTokens, missingBySystem } = findMissingSystemTokens(
-    [...offered],
-    cssBlocks,
-    new Set([...exempt, ...minimalTokenExempt]),
-  );
-
-  // Every non-exempt system must declare the contract its established peers
-  // agree on. Report the names, not only a count, so a failed gate tells the
-  // author exactly which part of the look is still inherited.
+  const { tokens: sharedTokens, missingBySystem } = findMissingSystemTokens([...offered], blocks, minimalTokenExempt);
   for (const id of offered) {
-    const body = cssBlocks.get(id);
-    if (body == null || !declaresCustomProperty(body) || exempt.has(id) || minimalTokenExempt.has(id)) continue;
+    const body = blocks.get(id);
+    if (body == null || !declaresCustomProperty(body) || minimalTokenExempt.has(id)) continue;
     const missing = missingBySystem.get(id);
     if (missing) {
       failures.push({
         kind: 'system-token-contract',
         id,
-        message: formatMissingSystemTokensMessage(id, missing.declaredCount, sharedTokens.size, missing.missing),
+        message: formatMissingSystemTokensMessage(id, missing.declaredCount, sharedTokens.size, missing.missing)
+          .replace(`its :root[data-system="${id}"] block`, `DESIGN_SYSTEMS.${id}.vars in ${REGISTRY_REL}`),
       });
     }
   }
 
-  // Once a minimal system grows to satisfy the peer contract, its exemption
-  // has done its job and must be removed rather than becoming permanent debt.
   failures.push(
-    ...findStaleMinimalTokenSystems(
-      minimalTokenExempt,
-      cssBlocks,
-      sharedTokens,
-      minimalTokenSystems,
-    ).map(({ id, message }) => ({
+    ...findStaleMinimalTokenSystems(minimalTokenExempt, blocks, sharedTokens, minimalTokenSystems).map(({ id, message }) => ({
       kind: 'minimal-system-exemption',
       id,
       message,
@@ -1329,17 +1320,16 @@ function compareSystemPaint(systemIds, cssBlocks, baseRootPainted, minimalTokenS
   return failures;
 }
 
-function compareSystemSkins(systemIds, skins) {
+function compareSystemSkins(systemIds, skins, rel) {
   const offered = new Set(systemIds);
   return skins
     .filter(({ id }) => !offered.has(id))
     .map(({ id, line, selector }) => ({
       kind: 'system-skin',
       id,
-      message: `${CSS_REL} has a component skin for unknown design system "${id}" on line ${line}: ${selector} — remove or rename the skin because DESIGN_SYSTEMS in ${TS_REL} does not offer "${id}"`,
+      message: `${rel} has a [data-system="${id}"] rule for unknown design system "${id}" on line ${line}: ${selector} — remove or rename it because DESIGN_SYSTEMS in ${REGISTRY_REL} does not offer "${id}"`,
     }));
 }
-
 // Every design system must name the accent it is meant to arrive with, and
 // that accent must exist. Both directions matter and mean different things: a
 // system with no entry silently keeps the previously active accent (or the
@@ -1356,7 +1346,7 @@ function compareSystemDefaultAccents(systemIds, defaults, accentIds) {
       failures.push({
         kind: 'system-accent-parity',
         id,
-        message: `design system "${id}" is in DESIGN_SYSTEMS in ${TS_REL} but has no SYSTEM_DEFAULT_ACCENT entry — switching to it keeps whatever accent is already active (or falls back to DEFAULT_ACCENT), so a first-time visitor never sees the accent the system was designed around`,
+        message: `design system "${id}" is in DESIGN_SYSTEMS in ${REGISTRY_REL} but has no SYSTEM_DEFAULT_ACCENT entry — switching to it keeps whatever accent is already active (or falls back to DEFAULT_ACCENT), so a first-time visitor never sees the accent the system was designed around`,
       });
       continue;
     }
@@ -1364,7 +1354,7 @@ function compareSystemDefaultAccents(systemIds, defaults, accentIds) {
       failures.push({
         kind: 'system-accent-parity',
         id,
-        message: `SYSTEM_DEFAULT_ACCENT in ${TS_REL} maps design system "${id}" to accent "${accentId}", but "${id}" is not in DESIGN_SYSTEMS — a default no system can ever pick up`,
+        message: `SYSTEM_DEFAULT_ACCENT in ${REGISTRY_REL} maps design system "${id}" to accent "${accentId}", but "${id}" is not in DESIGN_SYSTEMS — a default no system can ever pick up`,
       });
       continue;
     }
@@ -1372,7 +1362,7 @@ function compareSystemDefaultAccents(systemIds, defaults, accentIds) {
       failures.push({
         kind: 'system-accent-value',
         id,
-        message: `SYSTEM_DEFAULT_ACCENT in ${TS_REL} defaults design system "${id}" to accent "${accentId}", which is not one of the ACCENTS entries — it would be written to data-accent with no :root[data-accent="${accentId}"] block to paint it`,
+        message: `SYSTEM_DEFAULT_ACCENT in ${REGISTRY_REL} defaults design system "${id}" to accent "${accentId}", which is not one of the ACCENTS entries — applyDesignSystem() would silently paint ACCENTS[0] while data-accent claims "${accentId}"`,
       });
     }
   }
@@ -1390,7 +1380,7 @@ function compareDefaultSystemAccent(defaultSystemId, defaultAccentId, defaults) 
   return [{
     kind: 'system-default-accent',
     id: defaultSystemId,
-    message: `SYSTEM_DEFAULT_ACCENT[DEFAULT_SYSTEM] in ${TS_REL} maps "${defaultSystemId}" to "${mappedAccentId ?? '(missing)'}", but DEFAULT_ACCENT is "${defaultAccentId}" — the default system's intended accent never reaches a first-time visitor because readInitial() in theme-provider.tsx and the pre-paint fallback in ${HTML_REL} use DEFAULT_ACCENT`,
+    message: `SYSTEM_DEFAULT_ACCENT[DEFAULT_SYSTEM] in ${REGISTRY_REL} maps "${defaultSystemId}" to "${mappedAccentId ?? '(missing)'}", but DEFAULT_ACCENT in ${TS_REL} is "${defaultAccentId}" — the default system's intended accent never reaches a first-time visitor: the pre-paint boot in ${HTML_REL} picks SYSTEM_DEFAULT_ACCENT while the app's fallbacks use DEFAULT_ACCENT`,
   }];
 }
 
@@ -1636,7 +1626,7 @@ function effectiveSystemFonts(systemId, rootFonts, systemFonts) {
     const declaredHere = own?.has(token);
     out.set(token, {
       value: declaredHere ? own.get(token) : rootFonts.get(token),
-      source: declaredHere ? `:root[data-system="${systemId}"]` : ':root',
+      source: declaredHere ? `DESIGN_SYSTEMS.${systemId}.vars` : `:root in ${CSS_REL}`,
     });
   }
   return out;
@@ -1671,7 +1661,7 @@ function compareSystemFontCoverage({ systemIds, rootFonts, systemFonts, staticHr
         failures.push({
           kind: 'system-font-token',
           id,
-          message: `design system "${id}" resolves ${token} to nothing — neither its own block nor :root declares it in ${CSS_REL}, so every \`font-family: var(${token})\` rule computes to nothing at all`,
+          message: `design system "${id}" resolves ${token} to nothing — neither DESIGN_SYSTEMS.${id}.vars in ${REGISTRY_REL} nor the :root in ${CSS_REL} declares it, so every \`font-family: var(${token})\` rule computes to nothing at all`,
         });
         continue;
       }
@@ -1873,17 +1863,27 @@ function walkClientMarkupFiles() {
 // the gate can exercise the shipped functions themselves rather than a
 // re-implementation of them — a re-implementation would only ever prove the
 // gate agrees with itself.
+// A relative import of a sibling .ts module that exists on disk (font-options.ts
+// → ./design-system) is executed the same way; anything else is refused.
 function loadTsExports(rel, tsSrc) {
   const js = esbuild.transformSync(tsSrc, { loader: 'ts', format: 'cjs' }).code;
   const mod = { exports: {} };
   const require_ = (spec) => {
-    throw new Error(`${rel} imports "${spec}" — it must stay self-contained to be executable here`);
+    const sibling = /^\.\.?\//.test(spec) ? path.posix.join(path.posix.dirname(rel), `${spec}.ts`) : null;
+    if (sibling && fs.existsSync(path.join(ROOT, sibling))) return loadTsExports(sibling, read(sibling));
+    throw new Error(`${rel} imports "${spec}" — only sibling .ts modules can be executed here`);
   };
   new Function('module', 'exports', 'require', js)(mod, mod.exports, require_);
   return mod.exports;
 }
 
-function checkSystemIdResolution(tsSrc, { systemIds, defaultSystemId }) {
+// The wrapper's readers resolve window.DESIGN_SYSTEMS at call time, so the
+// resolver is executed with the canonical registry installed as `window`.
+function checkSystemIdResolution(tsSrc, { systemIds, defaultSystemId, registry = null }) {
+  return withCanonicalWindow(registry, () => checkSystemIdResolutionIn(tsSrc, { systemIds, defaultSystemId }));
+}
+
+function checkSystemIdResolutionIn(tsSrc, { systemIds, defaultSystemId }) {
   const out = [];
   const bad = (message) => out.push({ kind: 'system-id-resolution', id: 'ds-system', message });
 
@@ -1901,7 +1901,7 @@ function checkSystemIdResolution(tsSrc, { systemIds, defaultSystemId }) {
   }
 
   for (const id of systemIds) {
-    if (isSystemId(id) !== true) bad(`isSystemId("${id}") is false, but DESIGN_SYSTEMS in ${TS_REL} offers that system`);
+    if (isSystemId(id) !== true) bad(`isSystemId("${id}") is false, but DESIGN_SYSTEMS in ${REGISTRY_REL} offers that system`);
     if (resolveSystemId(id) !== id) bad(`resolveSystemId("${id}") returns "${resolveSystemId(id)}" — an offered system must resolve to itself`);
   }
 
@@ -2107,38 +2107,29 @@ function runCanaries() {
     'an unregistered provider link in another HTML entry point cannot pass coverage',
   );
 
-  // CSS accent-block parser.
+  // Canonical :root readers (default accent pair, full token map, fonts).
   const cssSample = [
-    ':root { --accent: #ff3d52; --accent-2: #b84dff; }',
-    ':root[data-accent="crimson"]  { --accent: #ff3d52; --accent-2: #b84dff; }',
-    ":root[data-accent='matrix'] {--accent:#00FF88;--accent-2:#39ff14;}",
-    ':root[data-accent="lime"] { --accent: #aaff00; }',
-    ':root[data-accent="matrix"] .card { --accent: #dead00; }',
-    '/* :root[data-accent="ghost"] { --accent: #111111; --accent-2: #222222; } */',
+    ':root { --accent: #ff3d52; --accent-2: #b84dff; --bg: #000; }',
+    ':root { --bg: #0a0a0a; }',
+    '@media (max-width: 767px) { :root { --bg: #111111; } }',
+    '/* :root { --ghost: 1; } */',
     '[data-system="terminal"] .btn { border-radius: 0; }',
   ].join('\n');
-  const parsedCss = parseCssAccents(cssSample);
-  eq([...parsedCss.keys()].sort(), ['crimson', 'lime', 'matrix'], 'css blocks parsed, descendant rule ignored');
-  eq(parsedCss.get('crimson'), { primary: '#ff3d52', secondary: '#b84dff' }, 'css pair with padding');
-  eq(parsedCss.get('matrix'), { primary: '#00FF88', secondary: '#39ff14' }, 'css pair minified + single quotes');
-  eq(parsedCss.get('lime'), { primary: '#aaff00', secondary: null }, 'missing --accent-2 reported as null, not skipped');
-  eq(parsedCss.has('ghost'), false, 'commented-out block is not live config');
   eq(parseCssRootDefault(cssSample), { primary: '#ff3d52', secondary: '#b84dff' }, ':root default pair');
   eq(cssVar('--accent-2: #b84dff;', '--accent'), null, '--accent-2 never satisfies --accent');
+  eq(
+    [...parseCssRootTokens(cssSample)],
+    [['--accent', '#ff3d52'], ['--accent-2', '#b84dff'], ['--bg', '#0a0a0a']],
+    'every top-level bare :root block merges last-wins; indented media-scoped and commented blocks do not count',
+  );
+  eq(parseCssRootTokens('[data-system="x"] .a { --bg: #000; }'), null, 'a sheet with no bare :root block is detectable');
 
-  // CSS font-token parsers (:root base + per-system blocks).
   const cssFontSample = [
     ':root {',
     "  --font-body: 'Inter', system-ui, sans-serif;",
     "  --font-display: 'Fraunces', Georgia, serif;",
     "  --font-mono: 'JetBrains Mono', ui-monospace, monospace;",
     '}',
-    ':root[data-system="swiss"] {',
-    "  --font-body: 'Manrope', system-ui, sans-serif;",
-    "  --font-mono: 'IBM Plex Mono', ui-monospace, monospace;",
-    '}',
-    ':root[data-system="swiss"] .chip { font-family: var(--font-mono); }',
-    '/* :root[data-system="ghost"] { --font-body: \'Ghost\', sans-serif; } */',
     '[data-system="swiss"] .eyebrow { font-family: var(--font-mono); }',
   ].join('\n');
   eq(
@@ -2150,86 +2141,46 @@ function runCanaries() {
     ],
     ':root font tokens parsed',
   );
-  const parsedSystemFonts = parseCssSystemFonts(cssFontSample);
-  eq([...parsedSystemFonts.keys()], ['swiss'], 'per-system blocks parsed; descendant rule and comment ignored');
+  eq(parseCssRootFonts('[data-system="swiss"] .a { --font-body: A; }'), null, 'absent bare :root block is detectable');
+
+  // Registry readers — DESIGN_SYSTEMS[id].vars as the paint the applier performs.
+  const registrySystemsSample = {
+    editorial: { vars: { '--bg': '#000', '--font-body': "'Inter', sans-serif" } },
+    swiss: { vars: { '--bg': '#000', '--font-body': "'Manrope', sans-serif", '--font-mono': "'IBM Plex Mono', monospace" } },
+    hollow: { vars: {} },
+  };
+  const sampleBlocks = registrySystemBlocks(registrySystemsSample);
+  eq([...sampleBlocks.keys()], ['editorial', 'swiss', 'hollow'], 'one block per registry system');
+  eq(declaresCustomProperty(sampleBlocks.get('swiss')), true, 'vars render as declarations the token contract can read');
+  eq(declaresCustomProperty(sampleBlocks.get('hollow')), false, 'empty vars declare nothing');
   eq(
-    [...parsedSystemFonts.get('swiss').keys()],
+    [...registrySystemFonts(registrySystemsSample).get('swiss').keys()],
     ['--font-body', '--font-mono'],
-    'a token the system does not override is absent, not empty — the cascade decides, not the parser',
+    'a font token the system does not declare is absent, not empty — the canonical :root decides',
   );
-  eq(parseCssRootFonts(':root[data-system="swiss"] { --font-body: A; }'), null, 'absent bare :root block is detectable');
-  eq(parseCssSystemFonts(':root { --font-body: A; }').size, 0, 'zero per-system blocks is detectable, not an empty pass');
+  eq(registrySystemFonts(registrySystemsSample).get('hollow').size, 0, 'a system with no font vars yields an empty map');
 
-  // TS ACCENTS parser.
-  const tsSample = [
-    'export const ACCENTS: Accent[] = [',
-    "  // DS-OK: mirrored DS accent constants — keep the two files in sync.",
-    "  { id: 'crimson', name: 'Crimson', primary: '#ff3d52', secondary: '#b84dff' },",
-    '  { secondary: "#39ff14", primary: "#00ff88", name: "Matrix", id: "matrix" },',
-    "  // { id: 'ghost', name: 'Ghost', primary: '#111111', secondary: '#222222' },",
-    "  { id: 'broken', name: 'Broken', primary: '#123456' },",
-    '];',
-    "export const DEFAULT_ACCENT = 'crimson';",
-  ].join('\n');
-  const parsedTs = parseTsAccents(tsSample);
-  eq(parsedTs.found, true, 'ACCENTS array located');
-  eq([...parsedTs.accents.keys()].sort(), ['crimson', 'matrix'], 'ts entries parsed, comment ignored');
-  eq(parsedTs.accents.get('matrix'), { primary: '#00ff88', secondary: '#39ff14' }, 'fields read by name, not position');
-  eq(parsedTs.malformed.length, 1, 'entry missing a field is reported, never silently dropped');
-  eq(parseTsDefaultAccent(tsSample), 'crimson', 'DEFAULT_ACCENT parsed');
-  eq(parseTsAccents('const OTHER = [];').found, false, 'renamed/absent array is detectable, not an empty pass');
+  // default-prepaint comparator — the bare :root vs the default system's vars.
+  eq(
+    compareDefaultPrePaint('editorial', { '--bg': '#000000', '--text': '#f4f3ee' }, new Map([['--bg', '#000'], ['--text', '#F4F3EE']])),
+    [],
+    'shorthand and case differences are the same pre-paint value',
+  );
+  eq(
+    compareDefaultPrePaint('editorial', { '--bg-2': '#070706', '--grain': '0.3' }, new Map([['--bg-2', '#0a0a0a']])).map((f) => [f.id, f.root]),
+    [['--bg-2', '#0a0a0a'], ['--grain', null]],
+    'a differing value and a token the :root never declares are both reported',
+  );
 
-  // Boot-script parser.
-  const htmlSample = [
-    "          var ACCENTS  = ['crimson', 'magenta', 'orange'];",
-    "          if (ACCENTS.indexOf(acc)  === -1) acc = 'crimson';",
-  ].join('\n');
-  eq(parseBootAccents(htmlSample), { ids: ['crimson', 'magenta', 'orange'], fallback: 'crimson' }, 'boot allowlist + fallback');
-  eq(parseBootAccents('<html></html>'), { ids: null, fallback: null }, 'absent boot script is detectable');
+  // Storage keys, read by name out of the wrapper source.
+  eq(
+    parseStorageKeys('const SYSTEM_STORAGE_KEY = "ds-system";\nexport const ACCENT_STORAGE_KEY: string = \'ds-accent\';'),
+    { system: 'ds-system', accent: 'ds-accent' },
+    'module-private and exported storage keys both parse',
+  );
+  eq(parseStorageKeys('const OTHER = "x";'), { system: null, accent: null }, 'renamed storage keys are detectable');
 
-  // TS DESIGN_SYSTEMS parser (nested records, read structurally).
-  const tsSystemSample = [
-    'export const DESIGN_SYSTEMS: Record<string, DesignSystem> = {',
-    "  editorial: { name: 'Editorial', tag: 'Magazine · Fraunces', desc: 'Warm ink, generous leading.' },",
-    '  terminal: {',
-    "    name: 'Terminal',",
-    "    tag: 'CRT · IBM Plex Mono',",
-    "    desc: 'Square edges, scanlines, blinking carets.',",
-    '  },',
-    "  // ghost: { name: 'Ghost', tag: 'Hidden', desc: 'Commented out.' },",
-    '};',
-    "export const DEFAULT_SYSTEM = 'editorial';",
-  ].join('\n');
-  const parsedSystems = parseTsDesignSystems(tsSystemSample);
-  eq(parsedSystems.found, true, 'DESIGN_SYSTEMS record located');
-  eq(parsedSystems.ids, ['editorial', 'terminal'], 'nested + multi-line records parsed, comment ignored');
-  eq(parsedSystems.malformed, [], 'well-formed record reports nothing malformed');
-  eq(parseTsDesignSystems('const OTHER = {\n};').found, false, 'renamed/absent record is detectable, not an empty pass');
-  eq(parseTsDefaultSystem(tsSystemSample), 'editorial', 'DEFAULT_SYSTEM parsed');
-
-  // CSS per-system token-block parser.
-  const cssSystemSample = [
-    ':root { --bg: #000000; --accent: #ff3d52; }',
-    ':root[data-system="terminal"] {',
-    '  --bg: #000000; --radius: 0px;',
-    '}',
-    ":root[data-system='swiss'] { --bg: #000000; --radius: 4px; }",
-    ':root[data-system="hollow"] {   }',
-    '[data-system="editorial"] .display-h em { color: var(--accent); }',
-    ':root[data-system="terminal"] .card { border-radius: 0; }',
-    '/* :root[data-system="ghost"] { --bg: #111111; } */',
-  ].join('\n');
-  const parsedCssSystems = parseCssSystems(cssSystemSample);
-  eq([...parsedCssSystems.keys()].sort(), ['hollow', 'swiss', 'terminal'], 'system token blocks parsed; component skins ignored');
-  eq(parsedCssSystems.has('editorial'), false, 'a bare [data-system="…"] descendant skin is not a token block');
-  eq(parsedCssSystems.has('ghost'), false, 'commented-out block is not live config');
-  eq(declaresCustomProperty(parsedCssSystems.get('terminal')), true, 'multi-line block declares tokens');
-  eq(declaresCustomProperty(parsedCssSystems.get('swiss')), true, 'minified single-quoted block declares tokens');
-  eq(declaresCustomProperty(parsedCssSystems.get('hollow')), false, 'an empty block declares nothing');
-  eq(declaresCustomProperty('color: var(--accent);'), false, 'a var() READ is not a token declaration');
-  eq(parseCssSystems(':root { --bg: #000000; }').size, 0, 'a stylesheet with no system blocks is detectable, not an empty pass');
-
-  // CSS component-skin parser: live descendant rules only, with source lines.
+  // [data-system] rule parser: every occurrence, with source lines.
   const cssSkinSample = [
     ':root[data-system="terminal"] { --bg: #000000; }',
     '[data-system="terminal"] .btn { border-radius: 0; }',
@@ -2241,44 +2192,29 @@ function runCanaries() {
   const parsedCssSkins = parseCssSystemSkins(cssSkinSample);
   eq(
     parsedCssSkins.map(({ id }) => id),
-    ['terminal', 'swiss', 'geist', 'ghost'],
-    'component skins parsed, bare token block and comment ignored',
+    ['terminal', 'terminal', 'swiss', 'geist', 'ghost'],
+    'every [data-system] rule parsed — a bare attribute block is no longer exempt — and comments ignored',
   );
+  eq(parsedCssSkins.map(({ line }) => line), [1, 2, 3, 4, 5], '[data-system] rule source lines are preserved for diagnostics');
+  const unknownSkinFailures = compareSystemSkins(['terminal', 'swiss', 'geist'], parsedCssSkins, 'sample.css');
+  eq(unknownSkinFailures.map(({ id }) => id), ['ghost'], 'unknown system rule is reported');
   eq(
-    parsedCssSkins.map(({ line }) => line),
-    [2, 3, 4, 5],
-    'component skin source lines are preserved for diagnostics',
-  );
-  const unknownSkinFailures = compareSystemSkins(['terminal', 'swiss', 'geist'], parsedCssSkins);
-  eq(unknownSkinFailures.map(({ id }) => id), ['ghost'], 'unknown component skin system is reported');
-  eq(
-    unknownSkinFailures[0].message.includes('"ghost"') && unknownSkinFailures[0].message.includes('line 5'),
+    unknownSkinFailures[0].message.includes('"ghost"') && unknownSkinFailures[0].message.includes('line 5') && unknownSkinFailures[0].message.includes('sample.css'),
     true,
-    'unknown component skin reports its id and source line',
+    'unknown system rule reports its file, id and source line',
   );
-  eq(parseCssSystemSkins(':root[data-system="terminal"] { --bg: #000000; }').length, 0, 'zero component skins is detectable, not an empty pass');
+  eq(parseCssSystemSkins(':root { --bg: #000000; }').length, 0, 'zero [data-system] rules is detectable, not an empty pass');
 
-  // TS SYSTEM_DEFAULT_ACCENT parser (a flat systemId → accentId map).
-  const tsSystemAccentSample = [
-    'export const SYSTEM_DEFAULT_ACCENT: Record<string, string> = {',
-    "  editorial: 'crimson',",
-    '  \'terminal\': "matrix",',
-    "  // ghost:     'violet',",
-    '  brutalist: PICKED_LATER,',
-    '};',
-  ].join('\n');
-  const parsedSystemAccents = parseTsSystemDefaultAccents(tsSystemAccentSample);
-  eq(parsedSystemAccents.found, true, 'SYSTEM_DEFAULT_ACCENT map located');
+  // App-sheet accent overrides.
   eq(
-    [...parsedSystemAccents.accents],
-    [['editorial', 'crimson'], ['terminal', 'matrix']],
-    'bare and quoted keys parsed, comment ignored',
-  );
-  eq(parsedSystemAccents.malformed.length, 1, 'non-string default is reported, never silently dropped');
-  eq(
-    parseTsSystemDefaultAccents('const OTHER = {\n};').found,
-    false,
-    'renamed/absent SYSTEM_DEFAULT_ACCENT map is detectable, not an empty pass',
+    parseCssAccentOverrides([
+      '.btn.primary { background: var(--accent); }',
+      ':root[data-accent="crimson"] { --accent: #000; }',
+      '.card { --accent-2: red; --accent-rgb: 1 2 3; }',
+      '/* :root { --accent: #fff; } */',
+    ].join('\n')).map(({ what, line }) => [what.split(' (')[0], line]),
+    [['a [data-accent] rule', 2], ['a --accent declaration', 2], ['a --accent-2 declaration', 3]],
+    'a [data-accent] rule and --accent/--accent-2 declarations are found; var() reads, --accent-rgb and comments are not',
   );
 
   // TS FONT_OPTIONS parser.
@@ -2329,24 +2265,21 @@ function runCanaries() {
   eq(parsedSheets.malformed.length, 1, 'a non-string value is reported, never silently dropped');
   eq(parseTsStringMap(tsSheetSample, 'GHOST_STYLESHEETS').found, false, 'renamed/absent stylesheet map is detectable, not an empty pass');
 
-  // Boot-script system + generated-font consumers.
+  // Generated-font consumer.
   const htmlThemeSample = [
-    "          var SYSTEMS = ['editorial', 'terminal', 'geist'];",
-    "          if (SYSTEMS.indexOf(sys) === -1) sys = 'editorial';",
     `          var FONT_BOOT = ${FONT_BOOT_MARKER};`,
     '          if (!Object.prototype.hasOwnProperty.call(FONT_BOOT.stacks, fnt)) fnt = FONT_BOOT.fallback;',
   ].join('\n');
-  eq(
-    parseBootSystems(htmlThemeSample),
-    { ids: ['editorial', 'terminal', 'geist'], fallback: 'editorial' },
-    'boot SYSTEMS allowlist + fallback',
-  );
-  eq(parseBootSystems('<html></html>'), { ids: null, fallback: null }, 'absent boot SYSTEMS list is detectable');
   const parsedBootFonts = parseBootFonts(htmlThemeSample);
-  eq(parsedBootFonts, { found: true, consumesStacks: true, consumesFallback: true }, 'boot FONT_BOOT marker and both generated fields located');
+  eq(parsedBootFonts, { found: true, consumesStacks: true, consumesFallback: true, skipsEmptyStack: false }, 'boot FONT_BOOT marker and both generated fields located');
+  eq(
+    parseBootFonts('if (fnt && Object.prototype.hasOwnProperty.call(FONT_BOOT.stacks, fnt) && FONT_BOOT.stacks[fnt]) {').skipsEmptyStack,
+    true,
+    'a boot that applies nothing for an empty stack is recognised',
+  );
   eq(
     parseBootFonts('<html></html>'),
-    { found: false, consumesStacks: false, consumesFallback: false },
+    { found: false, consumesStacks: false, consumesFallback: false, skipsEmptyStack: false },
     'absent generated FONT_BOOT consumer is detectable',
   );
 
@@ -2367,33 +2300,87 @@ function runCanaries() {
     'stale generated font fallback is caught with an explicit failure',
   );
 
-  // Generated theme boot contract.
-  const registryModule = (bootDefaultAccent = 'crimson') => [
-    'export const THEME_FALLBACK_REGISTRY = {',
-    "  defaultSystem: 'editorial',",
-    "  defaultAccent: 'crimson',",
-    "  systems: [{ id: 'editorial', name: 'Editorial', tag: 'Magazine', desc: 'Baseline', defaultAccent: 'crimson' }],",
-    "  accents: [{ id: 'crimson', name: 'Crimson', primary: '#ff3d52', secondary: '#b84dff' }],",
+  // Theme boot + wrapper contract (canonical globals, no copied tables).
+  const canonRegistry = {
+    systems: {
+      editorial: { name: 'Editorial', vars: { '--bg': '#000' } },
+      terminal: { name: 'Terminal', vars: { '--bg': '#000' } },
+    },
+    accents: [
+      { id: 'crimson', name: 'Crimson', primary: '#ff3d52', secondary: '#b84dff' },
+      { id: 'matrix', name: 'Matrix', primary: '#00ff88', secondary: '#39ff14' },
+    ],
+    systemDefaultAccents: { editorial: 'crimson', terminal: 'matrix' },
+  };
+  const canonSource = [
+    'window.applyDesignSystem = function(systemId, accentId) {',
+    '  const sys = window.DESIGN_SYSTEMS[systemId] || window.DESIGN_SYSTEMS.editorial;',
+    '  const a = window.ACCENTS.find(x => x.id === accentId) || window.ACCENTS[0];',
+    "  root.style.setProperty('--accent',   a.primary);",
+    "  root.style.setProperty('--accent-2', a.secondary);",
     '};',
-    "export const DESIGN_SYSTEMS = { editorial: { name: 'Editorial', tag: 'Magazine', desc: 'Baseline' } };",
-    "export const ACCENTS = [{ id: 'crimson', name: 'Crimson', primary: '#ff3d52', secondary: '#b84dff' }];",
-    "export const SYSTEM_DEFAULT_ACCENT = { editorial: 'crimson' };",
-    "export const DEFAULT_SYSTEM = 'editorial';",
-    "export const DEFAULT_ACCENT = 'crimson';",
-    `export const THEME_BOOT_DATA = { systems: ['editorial'], accents: ['crimson'], defaultSystem: 'editorial', defaultAccent: '${bootDefaultAccent}', systemDefaultAccent: { editorial: 'crimson' } };`,
   ].join('\n');
-  eq(parseThemeRegistry(registryModule()).issues, [], 'theme registry and every derived export agree');
+  const wrapperModule = (extra = '', defaults = { system: 'editorial', accent: 'crimson' }) => [
+    'const SYSTEM_STORAGE_KEY = "ds-system";',
+    'const ACCENT_STORAGE_KEY = "ds-accent";',
+    `export const DEFAULT_SYSTEM = "${defaults.system}";`,
+    `export const DEFAULT_ACCENT = "${defaults.accent}";`,
+    'export const THEME_BOOT_DATA = { systemKey: SYSTEM_STORAGE_KEY, accentKey: ACCENT_STORAGE_KEY, defaultSystem: DEFAULT_SYSTEM };',
+    'const hasWindow = () => typeof window !== "undefined";',
+    'export function getDesignSystems() { return (hasWindow() && window.DESIGN_SYSTEMS) || {}; }',
+    'export function getAccents() { return (hasWindow() && window.ACCENTS) || []; }',
+    'export function getSystemDefaultAccents() { return (hasWindow() && window.SYSTEM_DEFAULT_ACCENT) || {}; }',
+    extra,
+  ].join('\n');
+  const wrapperIssues = (src, registry = canonRegistry) => checkRuntimeWrapper(src, registry, canonSource).issues;
+  eq(wrapperIssues(wrapperModule()), [], 'a wrapper over the canonical globals passes');
   eq(
-    parseThemeRegistry(registryModule('matrix')).issues.some((issue) => issue.includes('THEME_BOOT_DATA is stale')),
+    wrapperIssues(wrapperModule("export const ACCENTS = [{ id: 'crimson' }];")).some((i) => i.includes('exports its own ACCENTS')),
     true,
-    'stale generated boot data is caught with an explicit failure',
+    'a restated ACCENTS table is caught',
   );
-  const generatedHtml = [
-    `var THEME_BOOT = ${THEME_BOOT_MARKER};`,
-    'THEME_BOOT.systems; THEME_BOOT.accents;',
-    'THEME_BOOT.defaultSystem; THEME_BOOT.defaultAccent; THEME_BOOT.systemDefaultAccent;',
-    `var FONT_BOOT = ${FONT_BOOT_MARKER};`,
-    'FONT_BOOT.stacks; FONT_BOOT.fallback;',
+  eq(
+    wrapperIssues(wrapperModule('export const THEME_FALLBACK_REGISTRY = {};')).some((i) => i.includes('THEME_FALLBACK_REGISTRY')),
+    true,
+    'a reintroduced THEME_FALLBACK_REGISTRY is caught',
+  );
+  eq(
+    wrapperIssues(wrapperModule("const PAINT = '#ff3d52';")).some((i) => i.includes('hard-codes accent "crimson"')),
+    true,
+    'a hard-coded canonical accent color is caught as a second copy',
+  );
+  eq(
+    wrapperIssues(wrapperModule().replace('return (hasWindow() && window.ACCENTS) || [];', 'return [{ id: "crimson" }];')).some((i) => i.includes('getAccents()')),
+    true,
+    'a getter that serves its own copy instead of the global is caught by execution',
+  );
+  eq(
+    wrapperIssues(wrapperModule('', { system: 'terminal', accent: 'crimson' })).some((i) => i.includes('falls back to "editorial"')),
+    true,
+    "a DEFAULT_SYSTEM that disagrees with the applier's own fallback is caught",
+  );
+  eq(
+    wrapperIssues(wrapperModule(), { ...canonRegistry, systemDefaultAccents: { editorial: 'crimson' } }).some((i) => i.includes('no entry for system "terminal"')),
+    true,
+    'an incomplete canonical registry is reported through registryStructureIssues',
+  );
+  eq(typeof globalThis.window, 'undefined', 'the stand-in window never outlives the wrapper check');
+
+  const bootWrapper = checkRuntimeWrapper(wrapperModule(), canonRegistry, canonSource);
+  const markerBoot = [
+    '<html><head>',
+    `<link rel="stylesheet" href="${CANONICAL_CSS_HREF}" />`,
+    `<script src="${CANONICAL_JS_HREF}"></script>`,
+    '<script>',
+    `  var THEME_BOOT = ${THEME_BOOT_MARKER};`,
+    '  var sys = localStorage.getItem(THEME_BOOT.systemKey), acc = localStorage.getItem(THEME_BOOT.accentKey);',
+    '  if (!Object.prototype.hasOwnProperty.call(window.DESIGN_SYSTEMS, sys)) sys = THEME_BOOT.defaultSystem;',
+    '  var known = window.ACCENTS.some(function (a) { return a.id === acc; });',
+    '  if (!known) acc = window.SYSTEM_DEFAULT_ACCENT[sys];',
+    '  window.applyDesignSystem(sys, acc);',
+    `  var FONT_BOOT = ${FONT_BOOT_MARKER}; FONT_BOOT.stacks; FONT_BOOT.fallback;`,
+    '</script>',
+    '</head><body></body></html>',
   ].join('\n');
   const generatedVite = [
     'import { THEME_BOOT_DATA } from "./client/src/lib/design-system";',
@@ -2408,43 +2395,87 @@ function runCanaries() {
     '}',
     'const config = { plugins: [themeBootRegistry(), fontBootRegistry()] };',
   ].join('\n');
-  eq(checkThemeBootGeneration(generatedHtml, generatedVite), [], 'Vite theme marker generation contract passes');
+  const bootIssues = (html, vite = generatedVite, wrapper = bootWrapper) => checkThemeBoot(html, vite, wrapper, canonRegistry);
+  eq(bootIssues(markerBoot), [], 'the Vite-marker boot over the canonical globals passes');
+  const literalBoot = markerBoot
+    .replace(`  var THEME_BOOT = ${THEME_BOOT_MARKER};\n`, '')
+    .replace('localStorage.getItem(THEME_BOOT.systemKey)', "localStorage.getItem('ds-system')")
+    .replace('localStorage.getItem(THEME_BOOT.accentKey)', "localStorage.getItem('ds-accent')")
+    .replace('sys = THEME_BOOT.defaultSystem', "sys = 'editorial'");
+  eq(bootIssues(literalBoot), [], 'the literal boot with the wrapper\'s keys and fallback passes');
   eq(
-    checkThemeBootGeneration(generatedHtml.replace(THEME_BOOT_MARKER, '{}'), generatedVite)
-      .some((issue) => issue.includes('exactly one')),
+    bootIssues(literalBoot.replace("getItem('ds-system')", "getItem('theme-system')")).some((i) => i.includes('never reads localStorage "ds-system"')),
     true,
-    'a missing generation marker fails clearly',
+    'a literal boot reading a renamed storage key is caught',
   );
   eq(
-    checkThemeBootGeneration(`${generatedHtml}\nvar ACCENTS = ['crimson'];`, generatedVite)
-      .some((issue) => issue.includes('hand-maintained')),
+    bootIssues(literalBoot.replace("sys = 'editorial'", "sys = 'terminal'")).some((i) => i.includes('hard-codes "terminal"')),
+    true,
+    'a literal boot falling back to another system is caught',
+  );
+  eq(
+    bootIssues(markerBoot, generatedVite, { ...bootWrapper, storageKeys: { system: 'theme-system', accent: 'ds-accent' } })
+      .some((i) => i.includes('THEME_BOOT_DATA.systemKey')),
+    true,
+    'THEME_BOOT_DATA that disagrees with the wrapper storage key is caught',
+  );
+  eq(
+    bootIssues(markerBoot.replace(`  var THEME_BOOT = ${THEME_BOOT_MARKER};`, `  var THEME_BOOT = ${THEME_BOOT_MARKER}; var X = ${THEME_BOOT_MARKER};`))
+      .some((i) => i.includes('exactly one')),
+    true,
+    'a doubled generation marker fails clearly',
+  );
+  const scriptTag = `<script src="${CANONICAL_JS_HREF}"></script>`;
+  eq(
+    bootIssues(markerBoot.replace(`${scriptTag}\n`, '').replace('</head>', `${scriptTag}\n</head>`)).some((i) => i.includes('AFTER the inline theme boot')),
+    true,
+    'the registry script moved after the boot is caught',
+  );
+  eq(
+    bootIssues(markerBoot.replace(scriptTag, `<script src="${CANONICAL_JS_HREF}" defer></script>`)).some((i) => i.includes('deferred')),
+    true,
+    'a deferred registry script is caught',
+  );
+  eq(
+    bootIssues(markerBoot.replace(`<link rel="stylesheet" href="${CANONICAL_CSS_HREF}" />`, '')).some((i) => i.includes('exactly once as a stylesheet')),
+    true,
+    'a dropped canonical stylesheet link is caught',
+  );
+  eq(
+    bootIssues(`${markerBoot}\n<script>var ACCENTS = ['crimson'];</script>`).some((i) => i.includes('hand-maintained')),
     true,
     'a reintroduced hand-maintained boot allowlist fails clearly',
   );
-
-  // Comparator — every drift shape the gate exists to catch.
-  const good = new Map([
-    ['crimson', { primary: '#ff3d52', secondary: '#b84dff' }],
-    ['matrix', { primary: '#00ff88', secondary: '#39ff14' }],
-  ]);
-  eq(compareAccents(good, new Map(good)), [], 'identical sources pass');
   eq(
-    compareAccents(good, new Map([...good, ['matrix', { primary: '#0f8', secondary: '#39ff14' }]])).length,
-    0,
-    'shorthand-vs-longhand hex is the same color',
+    bootIssues(markerBoot.replace('Object.prototype.hasOwnProperty.call(window.DESIGN_SYSTEMS, sys)', 'window.DESIGN_SYSTEMS[sys] ? 1 : 0'))
+      .some((i) => i.includes('validates the stored system')),
+    true,
+    'a prototype-chain membership test in the boot is caught',
   );
-  const primaryDrift = compareAccents(good, new Map([...good, ['matrix', { primary: '#00ff87', secondary: '#39ff14' }]]));
-  eq(primaryDrift.map((f) => [f.kind, f.id]), [['swatch-value', 'matrix']], 'primary drift caught');
-  const secondaryDrift = compareAccents(good, new Map([...good, ['crimson', { primary: '#ff3d52', secondary: '#b84dfe' }]]));
-  eq(secondaryDrift.map((f) => [f.kind, f.id]), [['swatch-value', 'crimson']], 'secondary drift caught');
-  const missingCss = compareAccents(good, new Map([['crimson', good.get('crimson')]]));
-  eq(missingCss.map((f) => [f.kind, f.id]), [['id-parity', 'matrix']], 'ts-only accent caught');
-  const missingTs = compareAccents(new Map([['crimson', good.get('crimson')]]), good);
-  eq(missingTs.map((f) => [f.kind, f.id]), [['id-parity', 'matrix']], 'css-only accent caught');
-  const noVar = compareAccents(good, new Map([...good, ['matrix', { primary: '#00ff88', secondary: null }]]));
-  eq(noVar.map((f) => [f.kind, f.id]), [['swatch-value', 'matrix']], 'css block missing --accent-2 caught');
-  const notation = compareAccents(good, new Map([...good, ['matrix', { primary: 'rgb(0,255,136)', secondary: '#39ff14' }]]));
-  eq(notation.map((f) => [f.kind, f.id]), [['swatch-value', 'matrix']], 'notation swap is drift');
+  eq(
+    bootIssues(markerBoot.replace('  window.applyDesignSystem(sys, acc);\n', '')).some((i) => i.includes('no inline <script> that calls applyDesignSystem')),
+    true,
+    'a boot that never calls the applier is caught',
+  );
+
+  // accent-paint comparator.
+  const paintArgs = { accents: canonRegistry.accents, registrySource: canonSource, appSheets: [{ rel: 'bridge.css', src: '.btn { color: var(--accent); }' }] };
+  eq(compareAccentPaint(paintArgs), [], 'the canonical applier + an app sheet that only READS the accent passes');
+  eq(
+    compareAccentPaint({ ...paintArgs, registrySource: canonSource.replace("root.style.setProperty('--accent-2', a.secondary);", '') }).map((f) => f.id),
+    ['applyDesignSystem'],
+    'an applier that stops painting --accent-2 is caught',
+  );
+  eq(
+    compareAccentPaint({ ...paintArgs, accents: [{ id: 'crimson', primary: 'crimson-ish', secondary: '#b84dff' }] }).map((f) => f.id),
+    ['crimson'],
+    'an accent value that is not a CSS color is caught',
+  );
+  eq(
+    compareAccentPaint({ ...paintArgs, appSheets: [{ rel: 'bridge.css', src: ':root[data-accent="crimson"] { --accent: #000; }' }] }).map((f) => f.kind),
+    ['accent-paint', 'accent-paint'],
+    'an app [data-accent] block redeclaring --accent is caught on both counts',
+  );
 
   // Comparator — id sets (systems).
   const onlyBoot = (id) => `only-boot ${id}`;
@@ -2465,104 +2496,62 @@ function runCanaries() {
     'app-only system caught, with the app-side consequence',
   );
 
-  // Comparator — per-system paint, and the escape hatch that excuses one.
+  // Comparator — per-system paint (DESIGN_SYSTEMS[id].vars) and the shared contract.
   const paintedIds = ['editorial', 'terminal', 'swiss'];
   const paintBlocks = new Map([
+    ['editorial', '--bg: #000000; --radius: 12px;'],
     ['terminal', '--bg: #000000; --radius: 0px;'],
     ['swiss', '--bg: #000000; --radius: 4px;'],
   ]);
-  const baseRootExempt = new Map([['editorial', 'the bare :root carries the Editorial tokens verbatim']]);
   const noMinimalTokenExempt = new Map();
-  eq(compareSystemPaint(paintedIds, paintBlocks, baseRootExempt, noMinimalTokenExempt), [], 'a documented base-:root system passes without its own block');
+  eq(compareSystemPaint(paintedIds, paintBlocks, noMinimalTokenExempt), [], 'every offered system with complete vars passes');
   eq(
-    compareSystemPaint(paintedIds, paintBlocks, new Map(), noMinimalTokenExempt).map((f) => [f.kind, f.id]),
-    [['system-paint', 'editorial']],
-    'an undocumented system with no token block is caught — silence is not an exemption',
-  );
-  eq(
-    compareSystemPaint([...paintedIds, 'ghost'], paintBlocks, baseRootExempt, noMinimalTokenExempt).map((f) => [f.kind, f.id]),
+    compareSystemPaint([...paintedIds, 'ghost'], paintBlocks, noMinimalTokenExempt).map((f) => [f.kind, f.id]),
     [['system-paint', 'ghost']],
-    'a system added to DESIGN_SYSTEMS without a token block is caught',
+    'an offered system with no vars is caught',
   );
   eq(
-    compareSystemPaint(paintedIds, new Map([...paintBlocks, ['ghost', '--bg: #111111;']]), baseRootExempt, noMinimalTokenExempt).map((f) => [f.kind, f.id]),
+    compareSystemPaint(paintedIds, new Map([...paintBlocks, ['ghost', '--bg: #111111;']]), noMinimalTokenExempt).map((f) => [f.kind, f.id]),
     [['system-paint', 'ghost']],
-    'a token block for a system the picker never offers is caught',
+    'vars for a system the picker never offers are caught',
   );
   eq(
-    compareSystemPaint(paintedIds, new Map([...paintBlocks, ['swiss', '  ']]), baseRootExempt, noMinimalTokenExempt).map((f) => [f.kind, f.id]),
+    compareSystemPaint(paintedIds, new Map([...paintBlocks, ['swiss', '  ']]), noMinimalTokenExempt).map((f) => [f.kind, f.id]),
     [['system-paint', 'swiss']],
-    'a block that declares nothing is caught, not counted as paint',
+    'empty vars are caught, not counted as paint',
   );
-  const halfFinishedPaint = compareSystemPaint(
-    [...paintedIds, 'ghost'],
-    new Map([...paintBlocks, ['ghost', '--bg: #111111;']]),
-    baseRootExempt,
-    noMinimalTokenExempt,
-  );
-  eq(
-    halfFinishedPaint.map((f) => [f.kind, f.id]),
-    [['system-token-contract', 'ghost']],
-    'a one-token system is caught by the shared contract',
-  );
-  eq(
-    /--radius/.test(halfFinishedPaint[0].message),
-    true,
-    'the shared-contract failure names the token the half-finished system forgot',
-  );
+  const halfFinishedPaint = compareSystemPaint([...paintedIds, 'ghost'], new Map([...paintBlocks, ['ghost', '--bg: #111111;']]), noMinimalTokenExempt);
+  eq(halfFinishedPaint.map((f) => [f.kind, f.id]), [['system-token-contract', 'ghost']], 'a one-token system is caught by the shared contract');
+  eq(/--radius/.test(halfFinishedPaint[0].message), true, 'the shared-contract failure names the token the half-finished system forgot');
+  eq(/DESIGN_SYSTEMS\.ghost\.vars/.test(halfFinishedPaint[0].message), true, 'the shared-contract failure points at the registry vars, not a CSS block');
   eq(
     compareSystemPaint(
       [...paintedIds, 'ghost'],
       new Map([...paintBlocks, ['ghost', '--bg: #111111;']]),
-      baseRootExempt,
       new Map([['ghost', 'Written reason: this is intentionally a minimal visual variant']]),
     ),
     [],
     'a deliberately minimal system passes only with a written reason',
   );
   eq(
-    compareSystemPaint(paintedIds, new Map([...paintBlocks, ['editorial', '--bg: #000000;']]), baseRootExempt, noMinimalTokenExempt).map((f) => [f.kind, f.id]),
-    [['base-root-exemption', 'editorial']],
-    'an exemption whose system grew its own block is a stale pin',
-  );
-  eq(
-    compareSystemPaint(['terminal', 'swiss'], paintBlocks, baseRootExempt, noMinimalTokenExempt).map((f) => [f.kind, f.id]),
-    [['base-root-exemption', 'editorial']],
-    'an exemption naming a system DESIGN_SYSTEMS dropped is a stale pin',
-  );
-  eq(
-    compareSystemPaint(paintedIds, paintBlocks, new Map([['editorial', '   ']]), noMinimalTokenExempt).map((f) => [f.kind, f.id]),
-    [
-      ['base-root-exemption', 'editorial'],
-      ['system-paint', 'editorial'],
-    ],
-    'a reason-less entry is reported AND excuses nothing',
-  );
-  const reasonlessMinimal = compareSystemPaint(
-    [...paintedIds, 'ghost'],
-    new Map([...paintBlocks, ['ghost', '--bg: #111111;']]),
-    baseRootExempt,
-    new Map([['ghost', '   ']]),
-  );
-  eq(
-    reasonlessMinimal.map((f) => [f.kind, f.id]),
-    [
-      ['minimal-system-exemption', 'ghost'],
-      ['system-token-contract', 'ghost'],
-    ],
+    compareSystemPaint([...paintedIds, 'ghost'], new Map([...paintBlocks, ['ghost', '--bg: #111111;']]), new Map([['ghost', '   ']])).map((f) => [f.kind, f.id]),
+    [['minimal-system-exemption', 'ghost'], ['system-token-contract', 'ghost']],
     'a reason-less minimal entry is reported AND excuses nothing',
   );
   eq(
     compareSystemPaint(
       [...paintedIds, 'ghost'],
       new Map([...paintBlocks, ['ghost', '--bg: #111111; --radius: 2px;']]),
-      baseRootExempt,
       new Map([['ghost', 'This used to be intentionally minimal']]),
     ).map((f) => [f.kind, f.id]),
     [['minimal-system-exemption', 'ghost']],
-    'a minimal-system exemption is stale once the block satisfies the shared contract',
+    'a minimal-system exemption is stale once the vars satisfy the shared contract',
   );
-
+  eq(
+    compareSystemPaint(paintedIds, paintBlocks, new Map([['retired', 'reason']])).map((f) => [f.kind, f.id]),
+    [['minimal-system-exemption', 'retired']],
+    'a minimal-system exemption naming an unoffered system is a stale pin',
+  );
   // Comparator — per-system default accents.
   const someSystems = ['editorial', 'terminal'];
   const someAccents = ['crimson', 'matrix'];
@@ -3149,43 +3138,56 @@ const fail = (kind, message) => failures.push({ kind, message });
 const csp = parseCspHostAllowlists(serverSrc);
 failures.push(...compareCspHostAllowlists(csp));
 
-const themeRegistry = parseThemeRegistry(tsSrc);
-const tsAccents = themeRegistry.accents ?? new Map();
-const tsSystems = {
-  ids: [...(themeRegistry.systems ?? new Map()).keys()],
-  malformed: [],
-  found: themeRegistry.found,
-};
-const defaultSystemId = themeRegistry.defaultSystem ?? null;
-const defaultAccentId = themeRegistry.defaultAccent ?? null;
-const tsSystemDefaultAccents = {
-  accents: themeRegistry.systemDefaultAccents ?? new Map(),
-  malformed: [],
-  found: themeRegistry.found,
-};
-const cssAccents = parseCssAccents(cssSrc);
+// ---------------------------------------------------------------------------
+// The canonical registry (/ds/design-system.js, evaluated) and the wrapper.
+// ---------------------------------------------------------------------------
+let registry = { systems: undefined, accents: undefined, systemDefaultAccents: undefined, source: '' };
+try {
+  registry = readCanonicalRegistry(ROOT);
+} catch (err) {
+  fail('parser-rot', `could not evaluate ${REGISTRY_REL}: ${err.message}`);
+}
+const registrySource = registry.source;
+const systemIds = Object.keys(registry.systems ?? {});
+const registryAccents = Array.isArray(registry.accents) ? registry.accents : [];
+const accentIds = registryAccents.map((accent) => accent?.id);
+const systemDefaultAccents = new Map(Object.entries(registry.systemDefaultAccents ?? {}));
 
-if (!themeRegistry.found) fail('parser-rot', `could not load THEME_FALLBACK_REGISTRY from ${TS_REL}`);
-for (const issue of themeRegistry.issues ?? []) fail('boot-registry', issue);
-for (const issue of checkThemeBootGeneration(htmlSrc, viteSrc)) fail('boot-generation', issue);
+if (!systemIds.length) fail('parser-rot', `parsed ZERO systems out of window.DESIGN_SYSTEMS in ${REGISTRY_REL}`);
+if (!registryAccents.length) fail('parser-rot', `parsed ZERO accents out of window.ACCENTS in ${REGISTRY_REL}`);
+if (!systemDefaultAccents.size) fail('parser-rot', `parsed ZERO entries out of window.SYSTEM_DEFAULT_ACCENT in ${REGISTRY_REL}`);
 
-// Parser-rot guards: an empty registry must break the gate LOUDLY rather
-// than reduce it to comparing two empty sets.
-if (!tsAccents.size) fail('parser-rot', `parsed ZERO accents out of THEME_FALLBACK_REGISTRY in ${TS_REL}`);
-if (!cssAccents.size) fail('parser-rot', `parsed ZERO :root[data-accent="…"] blocks out of ${CSS_REL}`);
+const wrapper = checkRuntimeWrapper(tsSrc, registry, registrySource);
+if (!wrapper.found) fail('parser-rot', `could not execute ${TS_REL}`);
+for (const issue of wrapper.issues) fail('boot-registry', issue);
+const defaultSystemId = wrapper.defaultSystem ?? null;
+const defaultAccentId = wrapper.defaultAccent ?? null;
 
-failures.push(...compareAccents(tsAccents, cssAccents));
+const bootIssues = wrapper.found ? checkThemeBoot(htmlSrc, viteSrc, wrapper, registry) : [];
+for (const issue of bootIssues) fail('boot-generation', issue);
 
-// :root's pre-attribute default pair must be DEFAULT_ACCENT's swatch.
+// ---------------------------------------------------------------------------
+// Accents: the applier paints the pair inline; nothing in the app competes.
+// ---------------------------------------------------------------------------
+const appSheetRels = APP_SHEET_DIRS.flatMap((dir) => (fs.existsSync(path.join(ROOT, dir)) ? walkFiles(dir, /\.css$/) : []))
+  .filter((rel) => rel !== CSS_REL);
+const appSheets = appSheetRels.map((rel) => ({ rel, src: read(rel) }));
+const inlineStyles = cheerio.load(htmlSrc)('style').toArray().map((el) => cheerio.load(el).text());
+if (inlineStyles.length) appSheets.push({ rel: `${HTML_REL} <style>`, src: inlineStyles.join('\n') });
+if (!appSheetRels.includes(BRIDGE_REL)) fail('parser-rot', `walked the app stylesheets without reaching ${BRIDGE_REL} — the app-sheet scan went vacuous`);
+
+failures.push(...compareAccentPaint({ accents: registryAccents, registrySource, appSheets }));
+
+// :root's pre-apply default pair must be DEFAULT_ACCENT's swatch.
 const rootDefault = parseCssRootDefault(cssSrc);
 if (!defaultAccentId) {
-  fail('parser-rot', `THEME_FALLBACK_REGISTRY.defaultAccent is unavailable in ${TS_REL}`);
+  fail('parser-rot', `DEFAULT_ACCENT is unavailable in ${TS_REL}`);
 } else if (!rootDefault) {
   fail('parser-rot', `could not locate the bare ":root { … }" token block in ${CSS_REL}`);
 } else {
-  const expected = tsAccents.get(defaultAccentId);
+  const expected = registryAccents.find((accent) => accent?.id === defaultAccentId);
   if (!expected) {
-    fail('root-default', `DEFAULT_ACCENT "${defaultAccentId}" in ${TS_REL} is not one of the ACCENTS entries`);
+    fail('root-default', `DEFAULT_ACCENT "${defaultAccentId}" in ${TS_REL} is not one of the ACCENTS in ${REGISTRY_REL}`);
   } else {
     for (const [field, cssVarName] of [
       ['primary', '--accent'],
@@ -3194,7 +3196,7 @@ if (!defaultAccentId) {
       if (normalizeColor(expected[field]) !== normalizeColor(rootDefault[field] ?? '')) {
         fail(
           'root-default',
-          `:root ${cssVarName} in ${CSS_REL} is ${rootDefault[field] ?? '(absent)'} but DEFAULT_ACCENT "${defaultAccentId}" ${field} is ${expected[field]} — the pre-attribute paint disagrees with the default swatch`,
+          `:root ${cssVarName} in ${CSS_REL} is ${rootDefault[field] ?? '(absent)'} but DEFAULT_ACCENT "${defaultAccentId}" ${field} is ${expected[field]} — the pre-apply paint disagrees with the default swatch`,
         );
       }
     }
@@ -3202,49 +3204,54 @@ if (!defaultAccentId) {
 }
 
 // ---------------------------------------------------------------------------
-// Design systems: registry ids/defaults vs the CSS blocks that paint them.
+// Design systems: every offered system paints from its own vars, and every
+// [data-system="…"] rule — canonical skin or app skin — names one of them.
 // ---------------------------------------------------------------------------
-const cssSystems = parseCssSystems(cssSrc);
+if (defaultSystemId && systemIds.length && !systemIds.includes(defaultSystemId)) {
+  fail('system-fallback', `DEFAULT_SYSTEM "${defaultSystemId}" in ${TS_REL} is not one of the DESIGN_SYSTEMS in ${REGISTRY_REL}`);
+}
+const systemBlocks = registrySystemBlocks(registry.systems);
+if (systemIds.length) failures.push(...compareSystemPaint(systemIds, systemBlocks));
+
 const cssSystemSkins = parseCssSystemSkins(cssSrc);
-
-if (!tsSystems.ids.length) fail('parser-rot', `parsed ZERO systems out of THEME_FALLBACK_REGISTRY in ${TS_REL}`);
-if (!defaultSystemId) {
-  fail('parser-rot', `THEME_FALLBACK_REGISTRY.defaultSystem is unavailable in ${TS_REL}`);
-} else if (tsSystems.ids.length && !tsSystems.ids.includes(defaultSystemId)) {
-  fail('system-fallback', `DEFAULT_SYSTEM "${defaultSystemId}" in ${TS_REL} is not one of the DESIGN_SYSTEMS entries`);
-}
-
-// …and the paint itself: an id both lists agree on still has no LOOK until
-// the stylesheet carries its token block (or the bare :root demonstrably
-// already paints it, which BASE_ROOT_PAINTED_SYSTEMS must say out loud).
-if (!cssSystems.size) {
-  fail('parser-rot', `parsed ZERO :root[data-system="…"] token blocks out of ${CSS_REL}`);
-} else if (tsSystems.ids.length) {
-  failures.push(...compareSystemPaint(tsSystems.ids, cssSystems, BASE_ROOT_PAINTED_SYSTEMS));
-}
 if (!cssSystemSkins.length) {
-  fail('parser-rot', `parsed ZERO component skin rules containing [data-system="…"] out of ${CSS_REL}`);
-} else if (tsSystems.ids.length) {
-  failures.push(...compareSystemSkins(tsSystems.ids, cssSystemSkins));
+  fail('parser-rot', `parsed ZERO [data-system="…"] component skin rules out of ${CSS_REL}`);
+} else if (systemIds.length) {
+  failures.push(...compareSystemSkins(systemIds, cssSystemSkins, CSS_REL));
+}
+const appSystemSkins = [];
+for (const { rel, src } of appSheets) {
+  const skins = parseCssSystemSkins(src);
+  appSystemSkins.push(...skins);
+  if (systemIds.length) failures.push(...compareSystemSkins(systemIds, skins, rel));
+}
+
+// default-prepaint: the bare :root is what shows before the applier writes
+// DEFAULT_SYSTEM's vars. The boot contract above makes the applier run
+// synchronously in <head>, ahead of first paint, so a divergence cannot reach
+// a screen while it holds: then it is reported as a NOTE (the canonical files
+// are never edited here). If the boot contract is broken, it is a FAILURE.
+const rootTokens = parseCssRootTokens(cssSrc);
+if (!rootTokens) fail('parser-rot', `could not locate a bare ":root { … }" block in ${CSS_REL}`);
+const prePaint = rootTokens && defaultSystemId && registry.systems?.[defaultSystemId]
+  ? compareDefaultPrePaint(defaultSystemId, registry.systems[defaultSystemId].vars, rootTokens)
+  : [];
+const prePaintGuarded = bootIssues.length === 0 && wrapper.found;
+if (!prePaintGuarded) {
+  for (const d of prePaint) {
+    fail('default-prepaint', `${d.message} — and the boot contract is broken, so this pre-apply value can reach the first paint`);
+  }
 }
 
 // ---------------------------------------------------------------------------
 // Per-system default accents: SYSTEM_DEFAULT_ACCENT must name every design
 // system exactly once, and every accent it names must be a real ACCENTS id.
 // ---------------------------------------------------------------------------
-if (!tsSystemDefaultAccents.found) {
-  fail('parser-rot', `could not derive SYSTEM_DEFAULT_ACCENT from THEME_FALLBACK_REGISTRY in ${TS_REL}`);
-} else if (!tsSystemDefaultAccents.accents.size) {
-  fail('parser-rot', `parsed ZERO entries out of SYSTEM_DEFAULT_ACCENT in ${TS_REL}`);
+if (systemIds.length && accentIds.length && systemDefaultAccents.size) {
+  failures.push(...compareSystemDefaultAccents(systemIds, systemDefaultAccents, accentIds));
 }
-for (const part of tsSystemDefaultAccents.malformed) {
-  fail('parser-rot', `SYSTEM_DEFAULT_ACCENT entry in ${TS_REL} is not a "systemId: 'accentId'" pair: ${part}`);
-}
-if (tsSystems.ids.length && tsAccents.size && tsSystemDefaultAccents.accents.size) {
-  failures.push(...compareSystemDefaultAccents(tsSystems.ids, tsSystemDefaultAccents.accents, [...tsAccents.keys()]));
-}
-if (defaultSystemId && defaultAccentId && tsSystemDefaultAccents.found) {
-  failures.push(...compareDefaultSystemAccent(defaultSystemId, defaultAccentId, tsSystemDefaultAccents.accents));
+if (defaultSystemId && defaultAccentId && systemDefaultAccents.size) {
+  failures.push(...compareDefaultSystemAccent(defaultSystemId, defaultAccentId, systemDefaultAccents));
 }
 
 // ---------------------------------------------------------------------------
@@ -3265,7 +3272,13 @@ if (!fontRegistry.found) fail('parser-rot', `${FONTS_REL} does not export FONT_B
 for (const issue of fontRegistry.issues) fail('font-boot-registry', issue);
 if (!bootFonts.found) fail('parser-rot', `could not locate "var FONT_BOOT = ${FONT_BOOT_MARKER}" in ${HTML_REL}`);
 if (!bootFonts.consumesStacks) fail('boot-generation', `${HTML_REL} does not consume generated FONT_BOOT.stacks`);
-if (!bootFonts.consumesFallback) fail('boot-generation', `${HTML_REL} does not consume generated FONT_BOOT.fallback`);
+// The boot may either apply FONT_BOOT.fallback for an unknown id, or apply
+// nothing — which is the same outcome only while the fallback option is the
+// empty-stack "System default" (no override at all).
+const fontFallbackStack = tsFonts.fonts.get(runtimeFontFallback);
+if (!bootFonts.consumesFallback && !(bootFonts.skipsEmptyStack && fontFallbackStack === '')) {
+  fail('boot-generation', `${HTML_REL} neither consumes generated FONT_BOOT.fallback nor skips an unknown/empty-stack override while FONT_OPTIONS[0] ("${runtimeFontFallback}") is the empty-stack default — the boot and applyFontOverride() disagree about an unknown stored font`);
+}
 
 // ---------------------------------------------------------------------------
 // Stylesheets: the maps that actually FETCH the faces the stacks above name.
@@ -3294,8 +3307,8 @@ if (!clientSourceRels.length) {
   fail('parser-rot', `walked ZERO .ts/.tsx files under ${CLIENT_SRC_REL} — the source scan went vacuous`);
 }
 failures.push(...checkSystemIdSources(clientSourceRels));
-if (tsSystems.ids.length && defaultSystemId) {
-  failures.push(...checkSystemIdResolution(tsSrc, { systemIds: tsSystems.ids, defaultSystemId }));
+if (systemIds.length && defaultSystemId) {
+  failures.push(...checkSystemIdResolution(tsSrc, { systemIds, defaultSystemId, registry }));
 }
 
 // ---------------------------------------------------------------------------
@@ -3319,7 +3332,7 @@ if (designHtmlSrc !== null) failures.push(...compareCanonicalFontRequest(staticP
 // request above — the only loader that runs for a system.
 // ---------------------------------------------------------------------------
 const cssRootFonts = parseCssRootFonts(cssSrc);
-const cssSystemFonts = parseCssSystemFonts(cssSrc);
+const cssSystemFonts = registrySystemFonts(registry.systems);
 const clientMarkupRels = walkClientMarkupFiles();
 const clientCssRels = clientMarkupRels.filter((rel) => rel.endsWith('.css'));
 const clientHtmlRels = clientMarkupRels.filter((rel) => rel.endsWith('.html'));
@@ -3363,15 +3376,15 @@ if (!cssRootFonts) {
   fail('parser-rot', `parsed ZERO of ${FONT_TOKENS.join('/')} out of the :root block in ${CSS_REL}`);
 }
 if (!cssSystemFonts.size) {
-  fail('parser-rot', `parsed ZERO :root[data-system="…"] token blocks out of ${CSS_REL}`);
+  fail('parser-rot', `read ZERO systems' font vars out of DESIGN_SYSTEMS in ${REGISTRY_REL}`);
 }
 if (!staticFontHrefs.length) {
   fail('parser-rot', `could not locate any always-on <link rel="stylesheet"> in ${HTML_REL} — the pre-paint font loader cannot be verified`);
 }
-if (cssRootFonts?.size && tsSystems.ids.length) {
+if (cssRootFonts?.size && systemIds.length) {
   failures.push(
     ...compareSystemFontCoverage({
-      systemIds: tsSystems.ids,
+      systemIds,
       rootFonts: cssRootFonts,
       systemFonts: cssSystemFonts,
       staticHrefs: staticFontHrefs,
@@ -3382,10 +3395,11 @@ if (cssRootFonts?.size && tsSystems.ids.length) {
 if (failures.length) {
   for (const f of failures) console.error(`FAIL ${f.kind} :: ${f.message}`);
   console.error(`\n${failures.length} theme-drift failure(s).`);
-  console.error(`       Theme ids/defaults come from THEME_FALLBACK_REGISTRY in ${TS_REL};`);
-  console.error(`       ${VITE_REL} must inject its derived THEME_BOOT_DATA into ${HTML_REL}.`);
-  console.error(`       ${VITE_REL} must also inject FONT_OPTIONS-derived FONT_BOOT_DATA from`);
-  console.error(`       ${FONTS_REL}; picker swatches still mirror the paint in ${CSS_REL}.`);
+  console.error(`       Systems, accents and SYSTEM_DEFAULT_ACCENT live only in ${REGISTRY_REL}`);
+  console.error(`       (verbatim, never edited); ${TS_REL} wraps those globals, and the`);
+  console.error(`       pre-paint boot in ${HTML_REL} reads them after loading /ds/* synchronously.`);
+  console.error(`       ${VITE_REL} injects THEME_BOOT_DATA / FONT_OPTIONS-derived FONT_BOOT_DATA;`);
+  console.error(`       app sheets (${BRIDGE_REL} and the rest) may not repaint the accent.`);
   console.error('       A stack is only half of a webfont: the always-on <link> in');
   console.error(`       ${HTML_REL} (the design source's canonical request, byte for byte)`);
   console.error(`       and FONT_STYLESHEETS in ${FONTS_REL} are what fetch the face, so a`);
@@ -3397,34 +3411,36 @@ if (failures.length) {
   process.exit(1);
 }
 
-console.log(`PASS boot-generation :: ${tsSystems.ids.length} system id(s), ${tsAccents.size} accent id(s), and both fallbacks are generated from THEME_FALLBACK_REGISTRY into the inline pre-paint script`);
-console.log(`PASS id-parity :: ${tsAccents.size} accent(s) present in THEME_FALLBACK_REGISTRY, derived ACCENTS, and :root[data-accent] blocks`);
-for (const [id, v] of tsAccents) console.log(`       ${id.padEnd(8)} ${v.primary} / ${v.secondary}`);
-console.log(`PASS root-default :: :root paints DEFAULT_ACCENT "${defaultAccentId}" (${rootDefault.primary} / ${rootDefault.secondary})`);
+console.log(`PASS boot-registry :: ${TS_REL} restates no table; its getters return the ${REGISTRY_REL} globals; DEFAULT_SYSTEM "${defaultSystemId}" / DEFAULT_ACCENT "${defaultAccentId}" are applyDesignSystem()'s own fallbacks`);
+console.log(`PASS boot-generation :: ${HTML_REL} loads ${CANONICAL_CSS_HREF} + ${CANONICAL_JS_HREF} synchronously ahead of the inline boot, which reads the canonical globals with storage keys "${wrapper.storageKeys.system}"/"${wrapper.storageKeys.accent}" and fallback "${defaultSystemId}" from ${TS_REL}`);
+console.log(`PASS accent-paint :: applyDesignSystem() paints --accent/--accent-2 from ${registryAccents.length} accent(s); ${appSheets.length} app stylesheet(s) declare no [data-accent] rule or accent token`);
+for (const accent of registryAccents) console.log(`       ${accent.id.padEnd(8)} ${accent.primary} / ${accent.secondary}`);
+console.log(`PASS root-default :: the canonical :root paints DEFAULT_ACCENT "${defaultAccentId}" (${rootDefault.primary} / ${rootDefault.secondary})`);
+console.log(`PASS system-paint :: ${systemIds.length} system(s) each paint from their own DESIGN_SYSTEMS vars — ${systemIds.join(', ')} (fallback "${defaultSystemId}")`);
+const sharedTokenPeers = systemIds.filter((id) => !MINIMAL_TOKEN_SYSTEMS.has(id));
+const sharedTokenContract = sharedSystemTokens(sharedTokenPeers, systemBlocks).tokens;
 console.log(
-  `PASS system-parity :: ${tsSystems.ids.length} system(s) present in THEME_FALLBACK_REGISTRY and derived DESIGN_SYSTEMS — ${tsSystems.ids.join(', ')} (fallback "${defaultSystemId}")`,
+  `PASS system-tokens :: ${sharedTokenContract.size} shared token(s) agreed by ${sharedTokenPeers.length} system(s); every non-exempt system declares them`,
 );
 console.log(
-  `PASS system-paint :: ${cssSystems.size} :root[data-system="…"] token block(s) — ${[...cssSystems.keys()].join(', ')}; painted by the bare :root instead: ${[...BASE_ROOT_PAINTED_SYSTEMS.keys()].join(', ') || '(none)'}`,
-);
-const sharedTokenPeers = tsSystems.ids.filter(
-  (id) => cssSystems.has(id) && !BASE_ROOT_PAINTED_SYSTEMS.has(id) && !MINIMAL_TOKEN_SYSTEMS.has(id),
-);
-const sharedTokenContract = sharedSystemTokens(sharedTokenPeers, cssSystems).tokens;
-console.log(
-  `PASS system-tokens :: ${sharedTokenContract.size} shared token(s) agreed by ${sharedTokenPeers.length} peer block(s); every non-exempt system declares them`,
+  `PASS system-skin :: ${cssSystemSkins.length} canonical and ${appSystemSkins.length} app [data-system] rule(s) name only offered systems — ${[...new Set([...cssSystemSkins, ...appSystemSkins].map(({ id }) => id))].join(', ')}`,
 );
 console.log(
-  `PASS system-skin :: ${cssSystemSkins.length} component skin rule(s) name only offered systems — ${[...new Set(cssSystemSkins.map(({ id }) => id))].join(', ')}`,
-);
-console.log(
-  `PASS system-accent :: every design system names a default accent that exists — ${[...tsSystemDefaultAccents.accents]
+  `PASS system-accent :: every design system names a default accent that exists — ${[...systemDefaultAccents]
     .map(([system, accent]) => `${system}→${accent}`)
     .join(', ')}`,
 );
 console.log(
   `PASS system-default-accent :: DEFAULT_SYSTEM "${defaultSystemId}" and DEFAULT_ACCENT "${defaultAccentId}" agree with SYSTEM_DEFAULT_ACCENT`,
 );
+if (prePaint.length) {
+  console.log(`NOTE default-prepaint :: ${prePaint.length} token(s) where the canonical :root in ${CSS_REL} differs from DESIGN_SYSTEMS.${defaultSystemId}.vars.`);
+  console.log('       Unreachable while boot-generation holds (the applier writes these inline in <head> before first paint);');
+  console.log('       it becomes a FAILURE the moment the boot contract breaks. Canonical files are never edited here.');
+  for (const d of prePaint) console.log(`       ${d.message}`);
+} else {
+  console.log(`PASS default-prepaint :: the canonical :root agrees with every token DESIGN_SYSTEMS.${defaultSystemId}.vars declares`);
+}
 console.log(`PASS font-boot-registry :: ${tsFonts.fonts.size} font option id(s), stacks, and fallback "${runtimeFontFallback}" are generated from FONT_OPTIONS into the inline pre-paint script`);
 for (const [id, stack] of tsFonts.fonts) console.log(`       ${id.padEnd(12)} ${stack === '' ? '(system default — no override)' : stack}`);
 const webfontOptions = [...tsFonts.fonts].filter(([, stack]) => stack !== '');
@@ -3453,13 +3469,13 @@ console.log(
   `PASS system-font-coverage :: every family named by ${FONT_TOKENS.join(' / ')} is carried by the always-on request, for every system`,
 );
 console.log(`       always-on (${HTML_REL}, pre-paint, every visitor) ${alwaysOnFamilies.join(' + ') || '(none)'}`);
-for (const id of [...tsSystems.ids].sort()) {
+for (const id of [...systemIds].sort()) {
   const asked = [...effectiveSystemFonts(id, cssRootFonts, cssSystemFonts)]
     .map(([token, { value }]) => `${token.replace('--font-', '')}=${stackFamilies(value ?? '')[0] ?? '?'}`)
     .join(' ');
   console.log(`       ${id.padEnd(10)} ${asked}`);
 }
-console.log('\nPASS accent-drift :: the generated pre-paint theme/font registries, picker swatches, painted tokens, and stylesheets all agree');
+console.log('\nPASS accent-drift :: the canonical /ds registry, its wrapper, the pre-paint boot, the app stylesheets and the font loaders all agree');
 
 // ---------------------------------------------------------------------------
 // Live webfont probe — opt-in, and never from the registered gate

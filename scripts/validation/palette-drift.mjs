@@ -165,14 +165,37 @@ function checkPaletteRegexParity() {
   );
 }
 
+// The design system's own literals live in the verbatim canonical pair under
+// client/public/ds/, outside the scanned tree, so they need no exclusion; the
+// app-only bridge sheet (client/src/styles/app-bridge.css) is token-only and is
+// scanned like any other file. Only the two remaining color sources of truth
+// are excluded from the color scans.
 const SCANS = STAGE5_SCANS.map((scan) => ({
   ...scan,
   excludes: scan.id === 'hex-colors' || scan.id === 'rgb-colors'
-    ? ['client/src/styles/design-system.css', 'client/src/index.css', 'client/src/lib/charts/palette.ts']
-    : scan.id === 'raw-radii' || scan.id === 'font-family'
-      ? ['client/src/styles/design-system.css']
-      : [],
+    ? ['client/src/index.css', 'client/src/lib/charts/palette.ts']
+    : [],
 }));
+
+// An exclusion is a hole in the scan: one that names a file that no longer
+// exists (or sits outside the scanned tree) excludes nothing today and would
+// silently exempt whatever file next lands at that path.
+function checkExcludes() {
+  const stale = [];
+  for (const scan of SCANS) {
+    for (const rel of scan.excludes) {
+      const full = path.join(ROOT, rel);
+      if (!full.startsWith(SRC + path.sep) || !fs.existsSync(full)) stale.push(`${scan.id}: ${rel}`);
+    }
+  }
+  if (stale.length) {
+    console.error('FAIL stale-exclude :: exclusion(s) name files that are not in the scanned tree:');
+    for (const entry of stale) console.error(`  ${entry}`);
+    console.error('  Drop the entry (or point it at the file that now holds the source of truth).');
+    process.exit(1);
+  }
+  console.log(`PASS excludes :: ${new Set(SCANS.flatMap((s) => s.excludes)).size} exclusion path(s), each an existing file under ${path.relative(ROOT, SRC)}`);
+}
 
 // ---------------------------------------------------------------------------
 // Detector canaries — fail loudly if any classifier stops classifying.
@@ -408,6 +431,7 @@ function classifyUpdate(prior, counts, init) {
 }
 
 checkPaletteRegexParity();
+checkExcludes();
 runCanaries();
 console.log('PASS canaries :: all stage-5 detectors + ratchet classifier verified against known-bad/known-good samples');
 
