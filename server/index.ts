@@ -648,6 +648,14 @@ app.use((req, res, next) => {
   server.listen(listenOptions, () => {
     log(`serving on port ${port} (${isProduction ? 'production' : 'development'} mode)`);
 
+    // A second deployment sharing the production database sets
+    // DISABLE_BACKGROUND_JOBS=1 so only the primary runs the schedulers and the
+    // startup watchdog, which fails every pending/processing enrichment job.
+    if (process.env.DISABLE_BACKGROUND_JOBS === '1') {
+      log('background jobs disabled (DISABLE_BACKGROUND_JOBS=1)');
+      return;
+    }
+
     // Run background initialization AFTER server is listening
     // This ensures fast startup for production deployments
     runBackgroundInitialization().catch((error) => {
