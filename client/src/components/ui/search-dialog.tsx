@@ -353,7 +353,7 @@ export default function SearchDialog({ isOpen, setIsOpen }: SearchDialogProps) {
               placeholder="Find resources, categories, or pages…"
               trailing={
                 <DialogPrimitive.Close className="search-palette-close" aria-label="Close search">
-                  <kbd>esc</kbd>
+                  <kbd className="kbd">esc</kbd>
                   <span className="sr-only">Close search</span>
                 </DialogPrimitive.Close>
               }
@@ -474,9 +474,9 @@ export default function SearchDialog({ isOpen, setIsOpen }: SearchDialogProps) {
           </Command>
 
           <footer className="search-palette-footer">
-            <span><kbd>↑↓</kbd> navigate</span>
-            <span><kbd>↵</kbd> open</span>
-            <span><kbd>esc</kbd> close</span>
+            <span><kbd className="kbd">↑↓</kbd> navigate</span>
+            <span><kbd className="kbd">↵</kbd> open</span>
+            <span><kbd className="kbd">esc</kbd> close</span>
             <span className="search-palette-footer-spacer" aria-hidden="true" />
             {(showResults && results.length > 0) || (!showResults && defaultSuggestionCount > 0) ? (
               <span className="search-palette-result-count" data-testid="search-result-count" aria-live="polite">

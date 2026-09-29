@@ -95,7 +95,7 @@ export default function AppHeader({ onSearchOpen, user, onLogout, logoutError, c
       <button type="button" onClick={onSearchOpen} className="header-search-trigger" aria-label="Open search">
         <SearchIcon />
         <span className="header-search-label">Search <span>{categories.length ? count.toLocaleString() : "…"} resources…</span></span>
-        <span className="header-kbd hide-mobile">⌘K</span>
+        <span className="kbd hide-mobile">⌘K</span>
       </button>
       <nav className="header-nav hide-tablet" aria-label="Primary">
         {navLink("/categories", "Browse")}

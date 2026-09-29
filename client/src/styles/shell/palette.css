@@ -286,15 +286,9 @@
   flex: 1;
 }
 
-.search-palette kbd {
-  padding: 2px 6px;
-  border: var(--hairline-w) solid var(--border);
-  /* DS-OK: frozen .kbd utility fixes keycap radius at 4px across systems. */
-  border-radius: 4px; /* DS-OK: frozen literal, reason above */
-  background: var(--surface);
+/* Keycaps are the design system's `.kbd`; only the ink follows the row. */
+.search-palette .kbd {
   color: inherit;
-  font-family: var(--font-mono);
-  font-size: 10.5px;
 }
 
 .search-palette-close {
