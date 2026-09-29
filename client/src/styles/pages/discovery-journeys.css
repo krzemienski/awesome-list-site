@@ -179,7 +179,25 @@
   min-width: 0;
 }
 
-.journeys-page .journey-card__icon,
+/* CatCard icon tile: a 40px surface-2 square carrying the glyph. */
+.journeys-page .journey-card__icon-tile {
+  display: grid;
+  place-items: center;
+  width: 40px;
+  height: 40px;
+  flex: 0 0 auto;
+  border: var(--border-w) solid var(--border);
+  border-radius: var(--radius-sm);
+  background: var(--surface-2);
+  color: var(--text-2);
+}
+
+.journeys-page .journey-card__icon {
+  width: 18px;
+  height: 18px;
+  stroke-width: 1.5;
+}
+
 .journey-detail-page .journey-detail-card__icon {
   width: 42px;
   height: 42px;
@@ -189,13 +207,13 @@
 }
 
 .journeys-page .journey-card__title {
-  margin: 2px 0 8px;
+  margin: 8px 0 8px;
   color: var(--text);
   font-family: var(--font-display);
-  font-size: 20px;
-  font-weight: var(--display-weight);
-  letter-spacing: var(--display-tracking);
-  line-height: 1.15;
+  font-size: 17px;
+  font-weight: 600;
+  letter-spacing: -0.3px;
+  line-height: 1.25;
 }
 
 .journey-card__title-link {
@@ -216,6 +234,7 @@
 .journeys-page .journey-card__description {
   min-height: 3.2em;
   color: var(--text-2);
+  font-size: 13px;
   line-height: 1.55;
 }
 

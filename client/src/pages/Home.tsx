@@ -243,6 +243,15 @@ function HomeSkeleton({
           ))}
         </div>
       </div>
+      {layout === "index" ? (
+        <div className="home-skeleton-line home-skeleton-index-title" />
+      ) : (
+        <div className="home-hero">
+          <div className="home-skeleton-line home-skeleton-hero-title" />
+          <div className="home-skeleton-line home-skeleton-hero-lede" />
+          <div className="home-skeleton-line home-skeleton-hero-actions" />
+        </div>
+      )}
       <div className="home-stat-strip home-stat-strip-skeleton">
         {Array.from({ length: 4 }).map((_, index) => (
           <div className="home-stat-cell" key={index}>
@@ -258,7 +267,7 @@ function HomeSkeleton({
             {categorySkeletons.map((category, index) => (
               <div className="home-category-section" key={category?.slug ?? index}>
                 <div className="home-skeleton-line home-skeleton-category" />
-                {(category?.subcategories ?? Array.from({ length: 3 }, () => undefined)).map(
+                {(category?.subcategories ?? Array.from({ length: 3 }, () => undefined)).slice(0, 6).map(
                   (_, row) => (
                     <div className="home-skeleton-line home-skeleton-row" key={row} />
                   ),
@@ -287,18 +296,18 @@ function HomeSkeleton({
             ))}
           </div>
           <div className="home-skeleton-line home-skeleton-section-heading" />
-          <div className="home-skeleton-recent-table">
-            {Array.from({ length: 5 }).map((_, index) => (
-              <div className="home-skeleton-line home-skeleton-recent" key={index} />
-            ))}
-          </div>
-          <div className="home-skeleton-line home-skeleton-section-heading" />
           <div className="home-curated-category-grid">
             {categorySkeletons.map((category, index) => (
               <div className="home-skeleton-resource-card" key={category?.slug ?? index}>
                 <div className="home-skeleton-line home-skeleton-card-title" />
                 <div className="home-skeleton-line home-skeleton-card-copy short" />
               </div>
+            ))}
+          </div>
+          <div className="home-skeleton-line home-skeleton-section-heading" />
+          <div className="home-skeleton-recent-table">
+            {Array.from({ length: 5 }).map((_, index) => (
+              <div className="home-skeleton-line home-skeleton-recent" key={index} />
             ))}
           </div>
         </div>

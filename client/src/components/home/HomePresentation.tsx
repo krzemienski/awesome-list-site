@@ -60,6 +60,9 @@ const KIND_LABELS: Record<string, string> = {
   protocols: "Protocols",
 };
 
+/* The index lists a category's first six subcategories, then links to the rest. */
+const INDEX_SUBCATEGORY_LIMIT = 6;
+
 const COUNT_WORDS = [
   "Zero",
   "One",
@@ -237,7 +240,7 @@ function PageMeta({
 }) {
   const eyebrow =
     layout === "index"
-      ? `INDEX · ${formatCount(stats.total)} ENTRIES · UPDATED TODAY`
+      ? `INDEX · ${formatCount(stats.total)} ENTRIES`
       : `CURATED · WEEK ${isoWeekNumber(new Date())} · ${formatCount(stats.total)} INDEXED`;
   return (
     <div className="home-meta-row">
@@ -347,7 +350,7 @@ function SectionHeader({
     <div className="home-section-header">
       <div>
         {eyebrow ? <div className="eyebrow home-section-eyebrow">{eyebrow}</div> : null}
-        <h2 className="display-h home-section-title">{title}</h2>
+        <h2 className="home-section-title">{title}</h2>
         {sub ? <p className="home-section-sub">{sub}</p> : null}
       </div>
       {aside}
@@ -403,50 +406,64 @@ function CategoryIndex({ categories, selectedTags, selectedKind, onClearFilters 
     );
   }
 
+  const filterQuery = (() => {
+    const query = new URLSearchParams();
+    if (selectedTags.length > 0) query.set("tags", selectedTags.join(","));
+    if (selectedKind) query.set("kind", selectedKind);
+    return query.toString() ? `?${query.toString()}` : "";
+  })();
+
   return (
     <div className="home-category-grid" data-testid="list-categories">
-      {categories.map((category) => (
-        <section className="home-category-section" key={category.slug}>
-          <CategoryHeading
-            category={category}
-            selectedTags={selectedTags}
-            selectedKind={selectedKind}
-          />
-          {category.teaserDescription ? (
-            <span className="sr-only" data-testid={`text-category-teaser-${category.slug}`}>
-              <span className="font-medium">
-                {category.teaserTitle ? `Featured: ${category.teaserTitle} — ` : ""}
+      {categories.map((category) => {
+        const hidden = category.subcategories.length - INDEX_SUBCATEGORY_LIMIT;
+        return (
+          <section className="home-category-section" key={category.slug}>
+            <CategoryHeading
+              category={category}
+              selectedTags={selectedTags}
+              selectedKind={selectedKind}
+            />
+            {category.teaserDescription ? (
+              <span className="sr-only" data-testid={`text-category-teaser-${category.slug}`}>
+                <span className="font-medium">
+                  {category.teaserTitle ? `Featured: ${category.teaserTitle} — ` : ""}
+                </span>
+                {category.teaserDescription}
               </span>
-              {category.teaserDescription}
-            </span>
-          ) : null}
-          <div className="home-subcategory-list">
-            {category.subcategories.map((subcategory) => (
-              <Link
-                key={subcategory.slug}
-                href={(() => {
-                  const query = new URLSearchParams();
-                  if (selectedTags.length > 0) query.set("tags", selectedTags.join(","));
-                  if (selectedKind) query.set("kind", selectedKind);
-                  return `/subcategory/${subcategory.slug}${query.toString() ? `?${query.toString()}` : ""}`;
-                })()}
-                className="home-subcategory-row"
-                data-testid={`link-subcategory-${subcategory.slug}`}
-              >
-                <span className="home-subcategory-name">{subcategory.name}</span>
-                {subcategory.nestedCount > 0 ? (
-                  <span className="home-nested-count mono" title={`${subcategory.nestedCount} nested groups`}>
-                    +{subcategory.nestedCount}
-                  </span>
-                ) : (
-                  <span aria-hidden="true" />
-                )}
-                <span className="home-subcategory-count mono">{formatCount(subcategory.count)}</span>
-              </Link>
-            ))}
-          </div>
-        </section>
-      ))}
+            ) : null}
+            <div className="home-subcategory-list">
+              {category.subcategories.slice(0, INDEX_SUBCATEGORY_LIMIT).map((subcategory) => (
+                <Link
+                  key={subcategory.slug}
+                  href={`/subcategory/${subcategory.slug}${filterQuery}`}
+                  className="home-subcategory-row"
+                  data-testid={`link-subcategory-${subcategory.slug}`}
+                >
+                  <span className="home-subcategory-name">{subcategory.name}</span>
+                  {subcategory.nestedCount > 0 ? (
+                    <span className="home-nested-count mono" title={`${subcategory.nestedCount} nested groups`}>
+                      +{subcategory.nestedCount}
+                    </span>
+                  ) : (
+                    <span aria-hidden="true" />
+                  )}
+                  <span className="home-subcategory-count mono">{formatCount(subcategory.count)}</span>
+                </Link>
+              ))}
+              {hidden > 0 ? (
+                <Link
+                  href={`/category/${category.slug}${filterQuery}`}
+                  className="home-subcategory-more"
+                  data-testid={`link-category-more-${category.slug}`}
+                >
+                  + {hidden} more →
+                </Link>
+              ) : null}
+            </div>
+          </section>
+        );
+      })}
     </div>
   );
 }
@@ -498,6 +515,10 @@ function IndexLayout({
 }: Pick<HomePresentationProps, "categories" | "recent" | "stats" | "selectedTags" | "selectedKind" | "onClearFilters">) {
   return (
     <>
+      <h1 className="home-index-title mono">
+        <span className="caret">~/awesome.video</span>
+        <span className="sr-only"> — Awesome Video Resources</span>
+      </h1>
       <StatStrip stats={stats} layout="index" />
       <div className="home-index-grid">
         <CategoryIndex
@@ -524,28 +545,49 @@ function CuratedLayout({
   if (selectedTags.length > 0) query.set("tags", selectedTags.join(","));
   if (selectedKind) query.set("kind", selectedKind);
   const tagSearch = query.toString() ? `?${query.toString()}` : "";
+  const shownFeatured = featured.slice(0, 6);
   return (
     <>
+      <div className="home-hero">
+        <h1 className="display-h home-hero-title">
+          Awesome <span className="serif-italic">video</span> resources
+        </h1>
+        <p className="home-hero-lede">
+          A curated index of <span className="mono home-hero-figure">{formatCount(stats.total)}</span>{" "}
+          resources across <span className="mono home-hero-figure">{formatCount(stats.categories)}</span>{" "}
+          categories — codecs, players, protocols, infrastructure, and the people building it all.
+        </p>
+        <div className="home-hero-actions">
+          <Button asChild>
+            <Link href="/submit" data-testid="link-hero-submit">
+              + Submit a resource
+            </Link>
+          </Button>
+          <Button asChild variant="outline">
+            <Link href={`/categories${tagSearch}`} data-testid="link-hero-browse">
+              Browse categories
+            </Link>
+          </Button>
+        </div>
+      </div>
       <StatStrip stats={stats} layout="curated" />
       <div className="home-curated-section home-curated-featured">
         <SectionHeader
-          eyebrow="── FEATURED"
+          eyebrow="── FEATURED RESOURCES"
           title={
             <>
               Hand-picked <span className="serif-italic home-accent-italic">highlights</span>
             </>
           }
-          aside={
-            <Button asChild variant="ghost">
-              <Link href={`/categories${tagSearch}`}>
-                Browse all →
-              </Link>
-            </Button>
+          sub={
+            shownFeatured.length > 0
+              ? `${formatCount(shownFeatured.length)} of ${formatCount(stats.total)} resources stand out this week.`
+              : undefined
           }
         />
-        {featured.length > 0 ? (
+        {shownFeatured.length > 0 ? (
           <div className="home-resource-grid">
-            {featured.slice(0, 6).map((resource) => (
+            {shownFeatured.map((resource) => (
               <ResourceCard
                 key={String(resource.id)}
                 resource={resource}
@@ -561,36 +603,9 @@ function CuratedLayout({
         )}
       </div>
 
-      <div className="home-curated-section home-curated-recent">
-        <SectionHeader eyebrow="── RECENTLY INDEXED" title="Fresh from the index" />
-        <div className="home-recent-table card">
-          {recent.slice(0, 5).map((resource, index) => {
-            const category = categoryShortName(resource);
-            return (
-              <ResourceLink
-                key={String(resource.id)}
-                resource={resource}
-                className="home-curated-recent-row"
-                dataTestId={`link-home-curated-recent-${resource.id}`}
-              >
-                <span className="home-recent-number mono">{String(index + 1).padStart(2, "0")}</span>
-                <span className="home-curated-recent-copy">
-                  <span className="home-curated-recent-title">
-                    <span className="home-curated-recent-title-text">{resource.title}</span>
-                    <span className="home-curated-category chip muted">{category}</span>
-                  </span>
-                  <span className="home-curated-recent-description">{resource.description}</span>
-                </span>
-                <HomeArrow className="home-recent-arrow" />
-              </ResourceLink>
-            );
-          })}
-        </div>
-      </div>
-
       <div className="home-curated-section home-curated-categories">
         <SectionHeader
-          eyebrow="── CATEGORIES"
+          eyebrow="── ALL CATEGORIES"
           title={
             <>
               {formatCountWord(stats.categories)} domains,{" "}
@@ -621,6 +636,40 @@ function CuratedLayout({
           ))}
         </div>
       </div>
+
+      <div className="home-curated-section home-curated-recent">
+        <SectionHeader
+          eyebrow="── RECENTLY UPDATED"
+          title={
+            <>
+              Fresh from <span className="serif-italic home-muted-italic">the index</span>
+            </>
+          }
+        />
+        <div className="home-recent-table card">
+          {recent.slice(0, 5).map((resource, index) => {
+            const category = categoryShortName(resource);
+            return (
+              <ResourceLink
+                key={String(resource.id)}
+                resource={resource}
+                className="home-curated-recent-row"
+                dataTestId={`link-home-curated-recent-${resource.id}`}
+              >
+                <span className="home-recent-number mono">{String(index + 1).padStart(2, "0")}</span>
+                <span className="home-curated-recent-copy">
+                  <span className="home-curated-recent-title">
+                    <span className="home-curated-recent-title-text">{resource.title}</span>
+                    <span className="home-curated-category chip muted">{category}</span>
+                  </span>
+                  <span className="home-curated-recent-description">{resource.description}</span>
+                </span>
+                <HomeArrow className="home-recent-arrow" />
+              </ResourceLink>
+            );
+          })}
+        </div>
+      </div>
     </>
   );
 }
@@ -644,7 +693,6 @@ export default function HomePresentation({
 }: HomePresentationProps) {
   return (
     <div className="home-page" data-testid={`home-layout-${layout}`}>
-      <h1 className="sr-only">Awesome Video Resources</h1>
       <PageMeta
         layout={layout}
         stats={stats}

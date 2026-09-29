@@ -36,3 +36,41 @@
 .theme-sticky-preview {
   background: linear-gradient(var(--surface), var(--surface)), var(--bg);
 }
+
+/* Page head follows the docs/11 template: eyebrow, display heading, lede. */
+.theme-page__eyebrow {
+  display: flex;
+  margin: 8px 0 14px;
+}
+
+.theme-page__title {
+  margin: 0 0 10px;
+  font-size: clamp(32px, 4.5vw, 44px);
+}
+
+.theme-page__lede {
+  max-width: 680px;
+  margin: 0;
+  color: var(--text-2);
+  font-size: 15px;
+  line-height: var(--body-leading);
+}
+
+.theme-page__status {
+  color: var(--text-3);
+}
+
+.theme-section__title {
+  margin: 0;
+  font-size: 24px;
+}
+
+/* Tag hint ("Magazine · Fraunces") reads as authored in the system table. */
+.theme-option__tag {
+  display: block;
+  margin-bottom: 8px;
+  color: var(--text-3);
+  font-family: var(--font-mono);
+  font-size: 11px;
+  letter-spacing: 0.02em;
+}

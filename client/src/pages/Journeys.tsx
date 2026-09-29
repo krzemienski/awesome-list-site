@@ -353,17 +353,18 @@ export default function Journeys() {
               >
                 <CardHeader className="journey-card__header">
                   <div className="journey-card__topline">
-                    <BookOpen
-                      className="journey-card__icon"
-                      aria-hidden
-                      data-testid={`icon-journey-${journey.id}`}
-                    />
+                    <span className="journey-card__icon-tile" aria-hidden>
+                      <BookOpen
+                        className="journey-card__icon"
+                        data-testid={`icon-journey-${journey.id}`}
+                      />
+                    </span>
                     <Badge 
                       variant="outline"
-                      className={cn("journey-difficulty text-xs capitalize", `journey-difficulty--${journey.difficulty}`)}
+                      className={cn("journey-difficulty", `journey-difficulty--${journey.difficulty}`)}
                       data-testid={`badge-difficulty-${journey.id}`}
                     >
-                      <Award className="h-3 w-3 mr-1" />
+                      <Award className="h-3 w-3" />
                       {journey.difficulty}
                     </Badge>
                   </div>
@@ -398,15 +399,15 @@ export default function Journeys() {
                   <div className="journey-card__details">
                     {/* Meta Information */}
                     <div className="journey-card__meta">
-                      <Badge variant="chip" className="text-xs">
-                        <Clock className="h-3 w-3 mr-1" />
+                      <Badge variant="chip">
+                        <Clock className="h-3 w-3" />
                         {journey.estimatedDuration}
                       </Badge>
-                      <Badge variant="chip" className="text-xs">
+                      <Badge variant="chip">
                         {journey.category}
                       </Badge>
                       {journey.stepCount && (
-                        <Badge variant="chip" className="text-xs">
+                        <Badge variant="chip">
                           {journey.stepCount} steps
                         </Badge>
                       )}

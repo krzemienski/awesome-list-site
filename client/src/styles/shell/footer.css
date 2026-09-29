@@ -1,63 +1,163 @@
-/* Footer-owned refinements over the merged canonical shell foundations. */
-.app-footer .site-footer-inner {
-  width: min(100%, var(--content-max));
-  padding: var(--footer-pad);
+/* Reference PageFooter (sidebar-variants.jsx): a horizontal site-identity
+   block at the bottom of the content column, beside the sticky sidebar. */
+.app-footer {
+  position: relative;
+  z-index: 2;
+  margin-top: 80px;
+  border-top: var(--hairline-w) solid var(--border);
+  padding: 48px 40px 42px;
+  font-family: var(--font-body);
+  color: var(--text);
 }
-.app-footer .footer-wordmark,
-.app-footer .footer-stats,
-.app-footer .footer-bottom { font-family: var(--font-mono); }
-.app-footer .app-footer-mark { width: 28px; height: 28px; flex-shrink: 0; }
-.app-footer .footer-brand-link { margin-bottom: 12px; color: var(--text); }
-.app-footer .footer-tagline { margin-top: 0; }
-.app-footer .footer-stats { margin: 0; }
-.app-footer .app-footer-links { display: flex; flex-direction: column; gap: 8px; }
-.app-footer .footer-column a,
-.app-footer .footer-column button {
+.app-footer-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1.6fr) repeat(3, minmax(0, 1fr));
+  gap: 48px;
+  max-width: var(--content-max);
+  margin: 0 auto;
+}
+.app-footer p { margin: 0; }
+
+.app-footer .app-footer-eyebrow { display: flex; font-size: 10px; margin-bottom: 12px; }
+.app-footer .app-footer-name {
+  display: block;
+  width: fit-content;
+  margin-bottom: 12px;
+  color: var(--text);
+  font-size: clamp(28px, 3.4vw, 40px);
+  line-height: 1.05;
+  text-decoration: none;
+}
+.app-footer-tagline { max-width: 380px; color: var(--text-2); font-size: 14px; line-height: 1.55; }
+.app-footer-shimmer { width: 160px; margin-top: 18px; }
+
+.app-footer .app-footer-heading {
+  margin: 0 0 14px;
+  color: var(--text-3);
+  font-family: var(--font-mono);
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.18em;
+  line-height: var(--body-leading);
+}
+.app-footer .app-footer-total { margin-bottom: 6px; font-size: 32px; line-height: 1; }
+.app-footer .app-footer-stats { margin-top: 8px; color: var(--text-3); font-family: var(--font-mono); font-size: 11px; line-height: 1.7; }
+.app-footer-live { display: inline-flex; align-items: center; gap: 6px; margin-top: 4px; }
+
+/* EXPLORE rows paint the reference 13px text at an 8px rhythm; each link's
+   44px target overhangs its neighbours by the difference. */
+.app-footer-explore { display: flex; flex-direction: column; }
+.app-footer-explore > a {
+  display: flex;
   align-items: center;
-  box-sizing: border-box;
+  gap: 8px;
+  min-height: 44px;
+  margin-block: -7.6px;
+  color: var(--text-2);
+  font-size: 13px;
+  text-decoration: none;
+  transition: color 140ms ease;
+}
+.app-footer-explore > a:first-child { margin-top: -11.6px; }
+.app-footer-explore > a:hover { color: var(--accent); }
+.app-footer-glyph { color: var(--text-3); }
+
+.app-footer-repo {
   display: inline-flex;
-  min-height: 44px;
-  min-width: 0;
-  white-space: normal;
-  font-weight: 500;
-  transition: color 160ms ease;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 12px;
+  padding: 10px 14px;
+  border: var(--hairline-w) solid var(--border-strong);
+  border-radius: var(--radius-sm);
+  background: var(--surface);
+  color: var(--text);
+  font-family: var(--font-mono);
+  font-size: 12px;
+  letter-spacing: 0.04em;
+  text-decoration: none;
+  transition: all 160ms ease;
 }
-.app-footer .footer-grid > div:first-child > div:first-child {
-  min-height: 44px;
+.app-footer-repo > svg { flex-shrink: 0; }
+.app-footer-repo-arrow { color: var(--text-3); }
+.app-footer-repo:hover { border-color: var(--accent); color: var(--accent); }
+.app-footer-note { color: var(--text-3); font-size: 11.5px; line-height: 1.6; }
+.app-footer-note a { color: inherit; text-decoration: underline; text-underline-offset: 2px; }
+.app-footer-note a:hover { color: var(--text); }
+.app-footer-mono { font-family: var(--font-mono); }
+.app-footer-contact { display: flex; flex-direction: column; gap: 8px; margin-top: 12px; font-size: 12px; color: var(--text-2); }
+
+/* Meta strip: one mono line. Policy links keep 44px targets; the strip's top
+   padding is trimmed so the text still sits 18px + half a line below the rule. */
+.app-footer-meta {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0 16px;
+  max-width: var(--content-max);
+  margin: 40px auto 0;
+  padding-top: 4px;
+  border-top: var(--hairline-w) solid var(--hairline);
+  color: var(--text-3);
+  font-family: var(--font-mono);
+  font-size: 10.5px;
+  letter-spacing: 0.06em;
 }
-/* Canonical `btn ghost` marker on a footer text control: keep the column's
+.app-footer-meta > span { display: inline-flex; align-items: center; min-height: 44px; }
+.app-footer-meta-links { display: flex; flex-wrap: wrap; align-items: center; gap: 0 14px; }
+.app-footer-meta-links > a,
+.app-footer-meta-links > button {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  color: var(--text-3);
+  text-decoration: none;
+  transition: color 140ms ease;
+}
+.app-footer-meta-links > a:hover { color: var(--text); }
+
+/* Canonical `btn ghost` marker on a meta-strip text control: keep the strip's
    link paint in every skin (no fill, border, lift, or brutalist caps). */
-.app-footer .footer-column .btn.footer-cookie-settings,
-.app-footer .footer-column .btn.footer-cookie-settings:hover {
-  background: transparent;
+.app-footer .app-footer-meta-links .btn.footer-cookie-settings,
+.app-footer .app-footer-meta-links .btn.footer-cookie-settings:hover {
+  min-height: 44px;
+  padding: 0;
   border: 0;
   border-radius: 0;
+  background: transparent;
   box-shadow: none;
-  font-size: 13px;
-  font-weight: 500;
-  justify-content: flex-start;
-  letter-spacing: normal;
-  padding: 0;
+  font-family: inherit;
+  font-size: inherit;
+  font-weight: inherit;
+  letter-spacing: inherit;
   text-transform: none;
   transform: none;
-  white-space: normal;
 }
-.app-footer .footer-column .btn.footer-cookie-settings { color: var(--text-2); }
-.app-footer .footer-column .btn.footer-cookie-settings:hover { color: var(--text); }
+.app-footer .app-footer-meta-links .btn.footer-cookie-settings { color: var(--text-3); }
+.app-footer .app-footer-meta-links .btn.footer-cookie-settings:hover { color: var(--text); }
+
 .app-footer a:focus-visible,
 .app-footer button:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; }
-.app-footer .app-footer-contact { display: flex; flex-direction: column; gap: 8px; }
-/* Footer links are normally deliberately borderless text controls. In Windows
-   High Contrast that makes the consent action indistinguishable from static
-   copy, so restore its button affordance without changing normal pixels. */
+
+/* Footer text controls are borderless; in Windows High Contrast restore the
+   consent action's button affordance without changing normal pixels. */
 @media (forced-colors: active) {
-  .app-footer .footer-column .btn.footer-cookie-settings,
-  .app-footer .footer-column .btn.footer-cookie-settings:hover {
+  .app-footer .app-footer-meta-links .btn.footer-cookie-settings,
+  .app-footer .app-footer-meta-links .btn.footer-cookie-settings:hover {
     border: var(--border-w) solid ButtonText;
   }
 }
-@media (max-width: 520px) {
-  .app-footer .site-footer-inner { padding: 36px 20px 24px; }
+@media (max-width: 1100px) {
+  .app-footer-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 40px 32px; }
+  .app-footer-identity { grid-column: 1 / -1; }
+}
+@media (max-width: 640px) {
+  .app-footer { padding: 36px 20px 24px; margin-top: 56px; }
+  .app-footer-grid > :last-child { grid-column: 1 / -1; }
+  .app-footer-repo { max-width: 100%; overflow-wrap: anywhere; }
+  .app-footer-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 32px 24px; }
+  .app-footer-meta { margin-top: 28px; }
 }
 /* Keep the existing global print policy: footer navigation is screen-only. */
 @media print { .app-footer { display: none !important; } }

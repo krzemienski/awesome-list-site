@@ -1,6 +1,6 @@
 import { useContext, useEffect, useRef, useState } from "react";
 import { Link } from "wouter";
-import { ArrowLeft, Check, Palette, Layers, Eye, Sparkles, Zap, Type } from "lucide-react";
+import { ArrowLeft, Check, Sparkles, Zap } from "lucide-react";
 import { ThemeProviderContext } from "@/components/ui/theme-provider";
 import { useToast } from "@/hooks/use-toast";
 import { Button } from "@/components/ui/button";
@@ -131,16 +131,12 @@ export default function ThemeSettings() {
           <ArrowLeft className="h-4 w-4" />
           Back
         </Link>
-        <div className="flex items-center gap-3">
-          {/* P5 — sparkle icon to match ref 08 */}
-          <Sparkles className="h-6 w-6 text-[color:var(--text-2)]" />
-          <h1 className="display-h text-2xl">
-            Theme Settings
-          </h1>
-        </div>
-        <p className="text-sm sm:text-base text-[color:var(--text-2)] mt-2">
+        {/* docs/11 page head: eyebrow, display heading, lede. */}
+        <div className="eyebrow theme-page__eyebrow">── Settings · Theme</div>
+        <h1 className="display-h theme-page__title">Theme Settings</h1>
+        <p className="theme-page__lede">
           Pick a design system, accent, and (optionally) override the font. Changes apply instantly and persist across reloads.{" "}
-          <span role="status" aria-live="polite" aria-atomic="true" className="text-[color:var(--text-3)]" data-testid="text-active-preset">
+          <span role="status" aria-live="polite" aria-atomic="true" className="theme-page__status" data-testid="text-active-preset">
             Active: {activeSystem?.name ?? systemId} · {activeAccent?.name ?? accentId}
           </span>
         </p>
@@ -195,8 +191,7 @@ export default function ThemeSettings() {
           cards are buttons (hidden in print), which left orphan headings. */}
       <section aria-label="Design system picker" data-testid="system-picker" className="no-print">
         <div className="flex items-center gap-2 mb-4">
-          <Layers className="h-5 w-5 text-[color:var(--text-2)]" />
-          <h2 className="font-sans font-semibold text-xl tracking-tight">Design System</h2>
+          <h2 className="display-h theme-section__title">Design System</h2>
         </div>
         <div
           role="radiogroup"
@@ -222,9 +217,8 @@ export default function ThemeSettings() {
                   <span className="font-semibold text-sm">{sys.name}</span>
                   {isActive && <Check className="theme-option__check" />}
                 </div>
-                <code className="block font-mono text-xs text-[color:var(--text-3)] tracking-wider uppercase mb-2">
-                  {sys.tag}
-                </code>
+                {/* The system's own tag hint, as the DS authors it. */}
+                <code className="theme-option__tag">{sys.tag}</code>
                 <p className="text-xs text-[color:var(--text-2)]">{sys.desc}</p>
               </button>
             );
@@ -235,8 +229,7 @@ export default function ThemeSettings() {
       {/* Accent Picker — 10 swatches */}
       <section aria-label="Accent picker" data-testid="accent-picker" className="no-print">
         <div className="flex items-center gap-2 mb-4">
-          <Palette className="h-5 w-5 text-[color:var(--text-2)]" />
-          <h2 className="font-sans font-semibold text-xl tracking-tight">Accent</h2>
+          <h2 className="display-h theme-section__title">Accent</h2>
         </div>
         <div
           role="radiogroup"
@@ -282,8 +275,7 @@ export default function ThemeSettings() {
       {/* I1 — Font override picker (hybrid: keeps 5×10 picker above, adds per-system font override) */}
       <section aria-label="Font override picker" data-testid="font-picker" className="no-print">
         <div className="flex items-center gap-2 mb-2">
-          <Type className="h-5 w-5 text-[color:var(--text-2)]" />
-          <h2 className="font-sans font-semibold text-xl tracking-tight">Font</h2>
+          <h2 className="display-h theme-section__title">Font</h2>
         </div>
         <p className="text-xs text-[color:var(--text-2)] mb-4">
           Override the system&rsquo;s default font. &ldquo;System default&rdquo; falls back to the active design system&rsquo;s bundled font.
@@ -330,8 +322,7 @@ export default function ThemeSettings() {
           empty headings and blank bordered boxes; hide the whole preview. */}
       <section aria-label="Live preview" data-testid="theme-preview" className="no-print">
         <div className="flex items-center gap-2 mb-4">
-          <Eye className="h-5 w-5 text-[color:var(--text-2)]" />
-          <h2 className="font-sans font-semibold text-xl tracking-tight">Live Preview</h2>
+          <h2 className="display-h theme-section__title">Live Preview</h2>
           <span className="ml-2 text-xs text-[color:var(--text-3)]">
             {activeSystem?.name ?? systemId} · {activeAccent?.name ?? accentId}
           </span>

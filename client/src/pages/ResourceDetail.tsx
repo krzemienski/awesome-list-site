@@ -970,7 +970,7 @@ export default function ResourceDetail() {
                         <span className="resource-detail-chip-wrap" key={index}>
                           <Link href={tagLandingPath(tag)}>
                             <span
-                              className="chip muted"
+                              className="chip mono"
                               data-testid={`tag-link-${index}`}
                             >
                               <span className="resource-detail-chip-label">#{tag}</span>
@@ -1062,7 +1062,7 @@ export default function ResourceDetail() {
                   <a
                     key={related.id}
                     href={`/resource/${related.id}`}
-                    className="block p-3 border border-border hover:bg-accent hover:text-accent-foreground focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none cursor-pointer transition-colors group min-h-[44px]"
+                    className="resource-detail-related-item block p-3 border border-border hover:bg-accent hover:text-accent-foreground focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none cursor-pointer transition-colors group min-h-[44px]"
                     onClick={(e) => handleRelatedResourceClick(e, related)}
                     data-testid={`related-resource-${related.id}`}
                   >
@@ -1090,7 +1090,7 @@ export default function ResourceDetail() {
                         <div className="text-xs text-muted-foreground">Why recommended:</div>
                         <div className="flex flex-wrap gap-1">
                           {related.reasons.slice(0, 2).map((reason, index) => (
-                            <span key={index} className="text-xs bg-muted text-muted-foreground px-2 py-0.5">
+                            <span key={index} className="resource-detail-related-reason text-xs bg-muted text-muted-foreground px-2 py-0.5">
                               {reason}
                             </span>
                           ))}

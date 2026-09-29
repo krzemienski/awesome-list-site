@@ -19,6 +19,58 @@
   box-shadow: none;
 }
 
+/* 404: the docs/11 empty-state column — kicker, display title, copy,
+   actions — with no card chrome. */
+.system-state-panel {
+  width: 100%;
+  max-width: 520px;
+  color: var(--text-3);
+}
+
+.system-state-kicker {
+  margin: 0 0 14px;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  letter-spacing: 0.2em;
+  line-height: var(--body-leading);
+  overflow-wrap: anywhere;
+}
+
+.system-state-panel .system-state-title {
+  margin: 0 0 8px;
+  color: var(--text);
+}
+
+.system-state-copy {
+  margin: 0 0 8px;
+  color: var(--text-2);
+  font-size: 15px;
+  line-height: var(--body-leading);
+}
+
+.system-state-note {
+  margin: 0;
+  color: var(--text-3);
+  font-size: 13px;
+  line-height: var(--body-leading);
+}
+
+.system-state-suggestion {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  color: var(--text);
+  font-weight: 500;
+  text-decoration: underline;
+  text-decoration-color: var(--text-3);
+  text-underline-offset: 4px;
+}
+
+.system-state-panel .system-state-actions {
+  display: flex;
+  margin-top: 18px;
+}
+
 .system-state-heading {
   justify-content: center;
   flex-wrap: wrap;

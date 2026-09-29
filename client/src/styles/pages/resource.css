@@ -111,6 +111,10 @@
   text-transform: uppercase;
 }
 
+/* The frozen card labels are plain mono, not the Editorial eyebrow's 700. */
+[data-system="editorial"] .resource-detail-description h2.eyebrow,
+[data-system="editorial"] .resource-detail-sections h2.eyebrow { font-weight: 400; }
+
 .resource-detail-sections h2 svg { display: none; }
 .resource-detail-description { margin-bottom: 16px; }
 .resource-detail-image-shade { background: linear-gradient(to top, var(--bg), transparent); }
@@ -144,4 +148,15 @@
 
 .resource-detail-sections [data-testid="link-url"] svg { display: inline; margin-left: 8px; }
 .resource-detail-related { display: grid; gap: 24px; min-width: 0; }
+.resource-detail-related > * { min-width: 0; }
+
+/* Wider faces (terminal's mono) push the one-line "View all in …" label past a
+   phone column; let it wrap inside its 44px-min button instead. */
+.resource-detail-related [data-testid="link-view-all-category"] {
+  height: auto;
+  white-space: normal;
+  text-align: center;
+}
 .resource-detail a:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; }
+.resource-detail-related-item { border-radius: var(--radius-sm); }
+.resource-detail-related-reason { border-radius: var(--radius-pill); }

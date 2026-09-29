@@ -286,28 +286,38 @@ function buildClerkAppearance(
       // clipping surface (it wraps the card and the sign-up footer strip), so
       // it is the corner a visitor actually sees; pin it to the card token and
       // let Clerk's slightly tighter inner step nest inside it as designed.
-      ...(radii.card || palette.background
+      ...(radii.card || palette.fieldSurface || palette.background
         ? {
             cardBox: {
               ...(radii.card ? { borderRadius: radii.card } : {}),
               // Clerk's card/footer are transparent in the auth treatment;
               // this outer clipping surface owns the single DS background.
-              ...(palette.background ? { backgroundColor: palette.background } : {}),
+              // A DS `.card` sits on --surface over the page, not on bare --bg,
+              // so the widget reads as one of the site's cards.
+              ...(palette.fieldSurface
+                ? { backgroundColor: palette.fieldSurface }
+                : palette.background
+                  ? { backgroundColor: palette.background }
+                  : {}),
             },
           }
         : {}),
-      ...(palette.ink || typography.body
-        ? {
-            headerTitle: {
-              ...(typography.display ? { fontFamily: typography.display } : {}),
-              ...(palette.ink ? { color: palette.ink } : {}),
-            },
-            headerSubtitle: {
-              ...(typography.body ? { fontFamily: typography.body } : {}),
-              ...(palette.mutedInk ? { color: palette.mutedInk } : {}),
-            },
-          }
-        : {}),
+      // Element styles are ordinary CSS in the page, so the display grammar
+      // (weight, tracking, leading) can ride on the DS custom properties and
+      // follow the active system without a JS round-trip.
+      headerTitle: {
+        ...(typography.display ? { fontFamily: typography.display } : {}),
+        ...(palette.ink ? { color: palette.ink } : {}),
+        fontSize: "24px",
+        fontWeight: "var(--display-weight)",
+        letterSpacing: "var(--display-tracking)",
+        lineHeight: "var(--display-leading)",
+      },
+      headerSubtitle: {
+        ...(typography.body ? { fontFamily: typography.body } : {}),
+        color: "var(--text-2)",
+        fontSize: "14px",
+      },
       ...(palette.background
         ? {
             card: { backgroundColor: "transparent" },

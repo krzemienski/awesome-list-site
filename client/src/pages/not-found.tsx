@@ -1,7 +1,6 @@
 import { useEffect } from "react";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardFooter, CardHeader } from "@/components/ui/card";
-import { AlertCircle, Home, List, ArrowRight } from "lucide-react";
+import { Home, List, ArrowRight } from "lucide-react";
 import { Link } from "wouter";
 import SEOHead from "@/components/layout/SEOHead";
 import { trackEvent } from "@/lib/analytics";
@@ -32,7 +31,7 @@ export default function NotFound({ suggestion }: NotFoundProps) {
   }, []);
 
   // min-h-full, not a 100vh calc: <main> already fills whatever the app shell
-  // leaves (see index.css), so filling main centers this card without claiming
+  // leaves (see index.css), so filling main centers the panel without claiming
   // a viewport height the shell may not have to give.
   return (
     <div className="system-state">
@@ -48,53 +47,50 @@ export default function NotFound({ suggestion }: NotFoundProps) {
         image={`${SITE_BASE}/og-image.png?path=%2F`}
       />
 
-      <Card className="system-state-card">
-        <CardHeader>
-          <span className="chip bad system-state-code">Error · 404</span>
-          <div className="system-state-heading flex items-center gap-2">
-            <AlertCircle className="h-6 w-6 text-[color:var(--status-bad)]" aria-hidden="true" />
-            <h1 className="display-h system-state-title">Page Not Found</h1>
-          </div>
-        </CardHeader>
-        <CardContent>
-          <p className="text-muted-foreground mb-4">
-            We couldn't find the page you're looking for. The page may have been moved or doesn't exist.
+      {/* docs/11-patterns.md empty state, opened with the README's 404
+          typewriter beat. One primary action: back home. */}
+      <div className="system-state-panel">
+        <p className="system-state-kicker caret" aria-hidden="true">
+          ~/awesome.video/404 → not_found
+        </p>
+        <h1 className="display-h system-state-title">Page Not Found</h1>
+        <p className="system-state-copy">
+          We couldn't find the page you're looking for. The page may have been
+          moved or doesn't exist.
+        </p>
+        {suggestion && (
+          <p className="system-state-copy">
+            <Link
+              href={suggestion.href}
+              className="system-state-suggestion"
+              data-testid="link-did-you-mean"
+            >
+              {suggestion.label}
+              <ArrowRight className="h-4 w-4" aria-hidden="true" />
+            </Link>
           </p>
-          {suggestion && (
-            <p className="mb-4">
-              <Link
-                href={suggestion.href}
-                className="inline-flex items-center gap-1 font-medium text-[color:var(--text)] underline decoration-[color:var(--text-3)] underline-offset-4"
-                data-testid="link-did-you-mean"
-              >
-                {suggestion.label}
-                <ArrowRight className="h-4 w-4" />
-              </Link>
-            </p>
-          )}
-          <p className="text-sm text-muted-foreground">
-            You can return to the home page to explore our curated collection of awesome resources.
-          </p>
-        </CardContent>
-        {/* Run16 BUG-045: at 375px the unwrappable row pushed "Browse all
-            categories" 9px off the left viewport edge. Stack the CTAs
-            full-width on narrow screens; row layout resumes at sm. The
-            categories CTA also now points at /categories, not home. */}
-        <CardFooter className="system-state-actions flex-col sm:flex-row">
-          <Button variant="outline" asChild className="w-full sm:w-auto">
+        )}
+        <p className="system-state-note">
+          You can return to the home page to explore our curated collection of
+          awesome resources.
+        </p>
+        {/* Run16 BUG-045: the CTAs stack full-width at 375px so neither is
+            pushed off-screen; the categories CTA points at /categories. */}
+        <div className="system-state-actions">
+          <Button variant="outline" asChild>
             <Link href="/categories" data-testid="link-browse-categories">
-              <List className="mr-2 h-4 w-4" />
+              <List className="h-4 w-4" aria-hidden="true" />
               Browse all categories
             </Link>
           </Button>
-          <Button asChild className="w-full sm:w-auto">
+          <Button asChild>
             <Link href="/" data-testid="link-go-home">
-              <Home className="mr-2 h-4 w-4" />
-              Go Home
+              <Home className="h-4 w-4" aria-hidden="true" />
+              Go home
             </Link>
           </Button>
-        </CardFooter>
-      </Card>
+        </div>
+      </div>
     </div>
   );
 }

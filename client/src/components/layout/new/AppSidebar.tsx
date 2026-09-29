@@ -15,7 +15,7 @@ import {
   PanelLeft,
 } from "lucide-react";
 import { cn, slugify, getCategorySlug } from "@/lib/utils";
-import { BrandMark } from "@/components/BrandMark";
+import { getCategoryGlyph } from "./category-glyphs";
 import {
   Sidebar,
   SidebarContent,
@@ -126,28 +126,6 @@ function categoryStorageKey(cat: NavCategory): string {
 }
 
 /*
- * The V2 navigation uses category glyphs as taxonomy markers. These are
- * decorative because each category link already has an explicit accessible
- * name, so keeping them local avoids changing the shared icon map used by
- * other product surfaces.
- */
-const CATEGORY_GLYPHS: Record<string, string> = {
-  "Community & Events": "◈",
-  "Encoding & Codecs": "◇",
-  "General Tools": "◆",
-  "Infrastructure & Delivery": "▣",
-  "Intro & Learning": "▤",
-  "Media Tools": "▥",
-  "Players & Clients": "▶",
-  "Protocols & Transport": "⟁",
-  "Standards & Industry": "◉",
-};
-
-function getCategoryGlyph(categoryName: string): string {
-  return CATEGORY_GLYPHS[categoryName] ?? "◈";
-}
-
-/*
  * The reference AVSidebarV2 keeps disclosure state in localStorage so a user
  * can move between taxonomy routes without losing their place in the tree.
  * Keep the storage adapter deliberately defensive: this component also renders
@@ -218,29 +196,17 @@ function SubItem({
       data-active={active || undefined}
       aria-current={active ? "page" : undefined}
       className={cn(
-        "sub-item touch-manipulation min-h-[44px] no-underline w-full",
+        "sub-item av-sidebar-leaf touch-manipulation min-h-[44px] no-underline w-full",
         size === "xs" && "text-[12px]",
         italic && "italic",
       )}
-      style={
-        active
-          ? {
-              color: "var(--accent)",
-              background: "color-mix(in srgb, var(--accent) 8%, transparent)",
-              borderColor:
-                "color-mix(in srgb, var(--accent) 25%, var(--border))",
-            }
-          : count === 0
-            ? { opacity: 0.45 }
-            : undefined
-      }
+      style={count === 0 ? { opacity: 0.45 } : undefined}
       title={count === 0 ? `${label} (no resources yet)` : label}
     >
-      <span className="flex-1 min-w-0 break-words" title={label}>{label}</span>
+      <span className="av-sidebar-leaf-label" title={label}>{label}</span>
       {typeof count === "number" && (
         <span
-          className="font-mono shrink-0 tabular-nums"
-          style={{ fontSize: 12, color: "var(--text-3)" }}
+          className="av-sidebar-leaf-count font-mono shrink-0 tabular-nums"
           // BUG-049 (run19): bare numbers were ambiguous next to the labeled
           // "N resources" header — give every count an explicit unit for
           // assistive tech and a hover title for sighted users.
@@ -489,6 +455,7 @@ function CategoryAccordion({
                         className="av-sidebar-l2-link no-underline"
                       >
                         <span>{sub.name}</span>
+                        <span className="av-sidebar-nested-count" aria-hidden="true">+{subSubs.length}</span>
                         <span
                           className="font-mono tabular-nums"
                           title={`${formatCount(subCount)} ${subCount === 1 ? "resource" : "resources"}`}
@@ -507,7 +474,6 @@ function CategoryAccordion({
                         data-testid={`expand-sub-${subSlug}`}
                         className="icon-btn av-sidebar-l2-toggle"
                       >
-                        <span className="av-sidebar-nested-count" aria-hidden="true">+{subSubs.length}</span>
                         <ChevronRight className={cn("size-[9px] chevron-rotate", subOpen && "rotate-90")} />
                       </button>
                     </div>
@@ -740,7 +706,7 @@ export default function AppSidebar({
         aria-label={`${brandName} home`}
         className="flex min-h-7 items-center gap-[10px] px-0 py-0 no-underline"
       >
-        <BrandMark className="size-7 shrink-0" />
+        <span className="av-sidebar-drawer-logo" aria-hidden="true">av</span>
         <span className="av-sidebar-drawer-wordmark">
           {brandWordmark}
           <span className="sr-only" data-testid="sidebar-resource-count">
@@ -984,7 +950,7 @@ export default function AppSidebar({
         className="sub-item touch-manipulation min-h-[44px] no-underline w-full"
       >
         <span className="flex min-w-0 items-center gap-[10px]">
-          <Home className="size-[14px] shrink-0" />
+          <Home className="size-[13px] shrink-0" />
           <span className="break-words">Home</span>
         </span>
       </a>

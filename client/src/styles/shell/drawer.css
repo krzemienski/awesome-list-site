@@ -209,43 +209,57 @@
   flex-shrink: 0;
 }
 
-/* The Radix close control is the visible canonical drawer close affordance.
-   Keep its 44px target even when a consuming utility set changes. */
+/* MobileDrawer closes with a `btn icon ghost` 36px bordered square at the
+   header row's 18px right inset. The 44px Radix target overhangs it by 4px;
+   the visible square is an inset ::before so skins keep one paint path. */
 .av-sidebar-drawer-close {
   align-items: center;
   background: transparent;
   border: 0;
-  color: var(--text-2);
+  color: var(--text);
   display: flex;
   justify-content: center;
   min-height: 44px;
   min-width: 44px;
   padding: 0;
   position: absolute;
-  right: 4px;
-  top: 4px;
+  right: 20px;
+  top: 10px;
   z-index: 1;
 }
 
-.av-sidebar-drawer-close:hover {
-  color: var(--text);
+.av-sidebar-drawer-close::before {
+  border: var(--border-w) solid var(--border);
+  border-radius: var(--radius-sm);
+  content: "";
+  inset: 4px;
+  pointer-events: none;
+  position: absolute;
+  transition: all 160ms ease;
 }
 
-/* Canonical `btn icon ghost` marker; the pixel reference paints this close as
-   a bare glyph, so keep .btn and per-system skin paint off it. */
+.av-sidebar-drawer-close > * {
+  position: relative;
+}
+
 .av-sidebar-drawer .btn.av-sidebar-drawer-close,
 .av-sidebar-drawer .btn.av-sidebar-drawer-close:hover {
   background: transparent;
   border: 0;
   box-shadow: none;
-  height: auto;
+  height: 44px;
   padding: 0;
   transform: none;
-  width: auto;
+  width: 44px;
 }
-.av-sidebar-drawer .btn.av-sidebar-drawer-close { color: var(--text-2); }
-.av-sidebar-drawer .btn.av-sidebar-drawer-close:hover { color: var(--text); }
+.av-sidebar-drawer .btn.av-sidebar-drawer-close { color: var(--text); }
+.av-sidebar-drawer .btn.av-sidebar-drawer-close:hover::before {
+  background: var(--surface);
+  border-color: var(--text-3);
+  transform: translateY(-1px);
+}
 
+/* Lucide's X spans 12 of 24 units: 20px draws the reference 10px cross. */
 .av-sidebar-drawer-close svg {
   height: 20px;
   width: 20px;
