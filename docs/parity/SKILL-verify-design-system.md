@@ -444,405 +444,171 @@ contract in `HANDOFF.md`. If this skill conflicts with those, those win
 and this file should be updated.
 
 ---
+---
 
-# Awesome-list-site extensions (browser-MCP execution)
+# Part II · Execution through the browser MCP (awesome-list-site)
 
-> Everything above this line is the upstream skill, verbatim, fetched from
-> the design-system project `49c7785a-b6d4-4c30-9d2d-9f0229ebc042`
-> (`SKILL-verify-design-system.md`). Everything below is an additive
-> extension for this repo. It never relaxes a stage, a severity, a
-> prescribed expression, or a verdict threshold above.
+> Everything above this line (Part I) is the skill exactly as fetched from the
+> claude_design MCP on 2026-09-29 (project 49c7785a-…, sha256
+> `37f25dbce6d8e486086eb9f8d66029f335365a636261b4983a8aa84f2f325da6`).
+> It is unchanged, byte for byte, and it is the gate.
+>
+> Part II changes **how** each stage is executed and **what it covers**. It
+> never changes a pass criterion, a severity, the verdict thresholds, or the
+> verdict-block format. If anything in Part II appears to conflict with a
+> criterion in Part I, Part I wins. A property that cannot be observed in the
+> browser stays in the audit and is reported as **NOT RUNNABLE** under its
+> stage, with its Part I severity. It is never silently passed.
 
-Authority for this run: only the three files fetched from that project —
-`SKILL-verify-design-system.md`, `design-systems.js`, `styles.css`. Local
-copies (`awesome-list-site-ds/`, `.agents/`, `.cache/`, anything in the
-repo) are never an authority for tokens, class names, accents or rules.
+## II-0 · Operating rules
 
-## A · Execution through browser MCP
+1. **Actor.** Drive the running app as an end user through the browser MCP
+   (`mcp__chrome-devtools__*`). Every stage's expression is evaluated in-page
+   with `evaluate_script`. Reading repository files is not a substitute for any
+   stage. Test runners, Playwright, puppeteer, pixelmatch and repo `validate:*`
+   scripts are not evidence.
+2. **Targets.** Production: `http://localhost:5002` (`npm run build && PORT=5002 npm run start`).
+   Development: `http://localhost:5001` (`PORT=5001 npm run dev`). Port 5000 on
+   this machine is taken by macOS AirPlay Receiver, so `localhost:5000` is not
+   the app. The run brief names which server is the target. Stage 5 always
+   runs its source scan against the dev server at the same commit (see II-5).
+3. **Isolation and first load.** Open your first page with
+   `new_page({ url, isolatedContext: "<your-validator-name>" })`. A fresh isolated
+   context has empty site storage. Confirm it before Stage 3:
+   `localStorage.length === 0` → if not 0, run `localStorage.clear(); sessionStorage.clear()`
+   and reload. Never share an isolated context with another validator. The
+   system choice persists in `localStorage` (`ds-system`, `ds-accent`); a shared
+   profile would corrupt parallel runs.
+4. **Settle before measuring.** After every navigation or system switch:
+   wait for load, then `await document.fonts.ready`, then ~800 ms
+   (Part I Stage 11 uses 800 ms), then measure or screenshot.
+5. **Screenshots.** Save every screenshot with `take_screenshot({ filePath })`
+   under `<evidence-root>/<validator-name>/` using
+   `NN-<screen>-<system>-<width>.png`, and view each one (take it without
+   `filePath` too, or open the saved file) before you record a judgement about it.
+   An unviewed screenshot is not evidence.
+6. **Citations.** Every finding and every PASS line cites the stage number,
+   the URL, the evaluated expression's result, and the screenshot path(s).
+7. **Don't auto-fix** (Part I). Report only.
 
-The validator drives the **running app** and nothing else.
+## II-1 · Coverage (mandatory)
 
-- **Allowed tools (chrome-devtools browser MCP only):** `new_page`,
-  `navigate_page` (including `initScript`), `emulate` / `resize_page`,
-  `evaluate_script`, `take_snapshot` + `click` (only to open the first
-  resource card), `list_network_requests` / `get_network_request`,
-  `take_screenshot` (always with `filePath` inside the validator's private
-  evidence dir), then `Read` on each PNG to actually look at it.
-- **Forbidden:** reading repo source files, `rg`/`grep` over `src/`,
-  `npm` / `node` / Playwright / Puppeteer scripts, curl-driven HTML scraping,
-  and editing anything. Every "inspect the source" or shell step in the
-  upstream skill is replaced by the browser equivalent in section B.
-- **Prescribed expressions are evaluated exactly as written.** The body is
-  pasted verbatim into `evaluate_script`; the only permitted wrapping is
-  `async () => { <verbatim body>; return <final expression or result
-  variable>; }` (the `return` is needed because `evaluate_script` takes a
-  function). Stage 2's three lines are returned as a 3-element array. Stage
-  8 returns `offenders` (length + a short `tag.class` descriptor per item).
-  Stage 11 needs `async` for its `await`. Record the **raw return value**
-  (or the raw thrown error) per stage, per cell — never a paraphrase.
-- Upstream Stage 1 rule stands: if Stage 1 fails in a cell, stop that
-  cell's audit and report it (🔴 BLOCK → FAIL). Other cells still run.
-- Wait for the app to settle before each evaluation (network idle plus a
-  short fixed wait); a hydrating React page can report stale attributes.
+| Dimension | Values |
+|-----------|--------|
+| Systems (Stage 11 and per-system checks) | `editorial`×`crimson`, `terminal`×`matrix`, `geist`×`cyan`, `brutalist`×`amber`, `swiss`×`orange`, i.e. each at `window.SYSTEM_DEFAULT_ACCENT[id]` |
+| Key screens | Home `/` · About `/about` · Learning journeys `/journeys` · Category `/category/intro-learning` · Resource detail `/resource/<id>` (id given in the run brief) · Login `/sign-in` · Theme settings `/settings/theme` · 404 `/this-route-does-not-exist` |
+| Widths | Part I specifies none. Use desktop **1440×900** and mobile **375×667** (the iPhone SE size in `docs/18-launch-checklist.md`), set with `resize_page`. |
 
-## B · Shell/script → browser-MCP mapping
+Stages 1–4, 9 and 10 are page-level. Run them on every key screen at 1440. Stages 5–8 run on every key screen. Stage 11 runs 5 systems × 8 screens × 2 widths, which is 80 screenshots.
 
-One row per shell command or "inspect the source" instruction in the
-upstream skill. The **preserved property** column is what the replacement
-must still prove.
+## II-2 · Stage-by-stage execution
 
-| # | Upstream step | Browser-MCP replacement | Preserved property |
-|---|---------------|-------------------------|--------------------|
-| B1 | *How to invoke* 1 — "find the `<head>` of the root layout file plus the main stylesheet" | `evaluate_script`: `fetch(location.href,{cache:'reload'}).then(r=>r.text())` → `DOMParser` → served `<head>`; main stylesheet = the loaded sheet(s) in `document.styleSheets` whose `:root` rule defines `--bg` | Audit targets the real served head and the real token stylesheet, not a file guess |
-| B2 | Stage 1 — "Check `<head>` for a `<link rel=stylesheet>` … containing `:root { --bg: … }`" and "a `<script>` loading the systems definitions" | From the served head (B1) list `link[rel~=stylesheet]` hrefs and `script[src]`; then walk `document.styleSheets` (recursively into `cssRules`) for a rule with `selectorText === ':root'` and non-empty `style.getPropertyValue('--bg')`. In a Vite build the CSS may arrive as a hashed `<link>` or an injected `<style>`; either counts if the `:root --bg` rule is live. The JS half is proven by the prescribed Stage 1 expressions | Token CSS and systems JS are actually loaded in the page |
-| B3 | Stage 3 — "Inspect the source" (sync `<script>` in `<head>`, not module / deferred / `useEffect`) | **(a) Served-head parse:** same fetch as B1; find an inline `<script>` with no `src`, no `type="module"`, no `defer`, no `async`, positioned **before** the first `link[rel~=stylesheet]` / `<style>` in `<head>`, whose text sets both `data-system` and `data-accent` (via `setAttribute`, `dataset`, or a call to `applyDesignSystem`). **(b) First-paint probe:** `navigate_page` with `initScript` = the probe in §B-3 below, run three times: cold load (new page), cache reload (`navigate_page` type `reload`, `ignoreCache:true`), and with `localStorage` `ds-system=terminal` / `ds-accent=matrix` pre-seeded by the initScript. Pass only if both attributes are present (mutation timestamp or already present at the earliest observation) **before** the first `first-paint` / `first-contentful-paint` entry, and in the third run equal `terminal` / `matrix`. HANDOFF §10.3 sets the attributes from an inline function rather than `window.applyDesignSystem`; that is compliant — the property is "set synchronously in `<head>` before first paint" | No flash of the default theme: system + accent applied synchronously before first paint, including a stored non-default choice |
-| B4 | Stage 5 — `rg --type css '#[0-9a-fA-F]{3,8}\b' src/ …` (hex) | §B-5 script: scan every same-origin sheet's **raw text** via `fetch(sheet.href).then(r=>r.text())` (raw text keeps comments so `/* DS-OK */` is honoured) plus inline `<style>` text, per declaration, with pattern `/#[0-9a-fA-F]{3,8}\b/` | Every hex outside the token source and skin block is found |
-| B5 | Stage 5 — `rg --type css 'border(-radius)?:\s*\d+px' …` | Same scan, pattern `/border(-radius)?:\s*\d+px/` | Hardcoded border / radius px found |
-| B6 | Stage 5 — `rg --type css "font-family:\s*['\"]" …` | Same scan, pattern `/font-family:\s*['"]/` | Literal font families found |
-| B7 | Stage 5 — `rg "style=\{?\{[^}]*#[0-9a-fA-F]{3,6}" src/` (inline style hex) | `document.querySelectorAll('[style]')` → `getAttribute('style')` tested against the hex, border-px and font-family patterns. React serialises `style={{color:'#fff'}}` to `rgb(255, 255, 255)`, so a literal `rgb(`/`rgba(`/`hsl(` colour **not inside `var()`** in a style attribute is also a hit. Exclude the custom properties `applyDesignSystem` writes onto `<html>` (they come from `design-systems.js`) | Inline hardcoded colours in rendered markup found |
-| B8 | Stage 5 — `rg "color:\s*['\"]#[0-9a-fA-F]{3,6}" src/` | Same style-attribute scan, pattern `/color:\s*(#[0-9a-fA-F]{3,6}\|rgba?\()/` | Inline hardcoded `color:` found |
-| B9 | Stage 5 — "Respect intentional escapes" (`/* DS-OK: intentional */`) | In the raw-text scan, skip a declaration if a `/* DS-OK` comment sits inside it, directly before it, or after it on the same line | Intentional escapes skipped, nothing else |
-| B10 | Stage 9 — "Check the `<link href=fonts.googleapis.com…>` includes that family" and "Network tab shows no 4xx on the font file" | `evaluate_script` over served head (B1) + live `link[href*="fonts.googleapis.com"]`: decode each `family=` param and check it contains the Stage 9 `family`; `list_network_requests` (`resourceTypes: ["font","stylesheet"]`) → any status ≥ 400 is recorded | Font requested and delivered |
-| B11 | Stage 10 — `rg '\[data-system="(editorial\|terminal\|geist\|brutalist\|swiss)"\]' styles.css \| wc -l` | §B-10 script: iterate `document.styleSheets`, recursing into every `cssRules` (incl. `@media`, `@supports`, `@layer`), count rules whose `selectorText` contains `[data-system="editorial\|terminal\|geist\|brutalist\|swiss"]`, per system. Expected **≥ 15 total and every one of the five systems ≥ 1**. Cross-origin sheets that throw are listed, not skipped silently | Per-system skin block present and complete |
-| B12 | Stage 11 — "visually inspect the page" / "take a screenshot if you have one available" | `take_screenshot` → `<screen>-<width>-<system>.png` in the private dir, then `Read` the PNG and apply the Stage 11 symptom table | Visual switch test actually looked at |
-
-### §B-3 · First-paint probe (`initScript`)
-
-```js
-(() => {
-  window.__dsBoot = { attrs: [], paints: [], seeded: null };
-  try {
-    if (location.search.includes('dsseed=1')) {
-      localStorage.setItem('ds-system', 'terminal');
-      localStorage.setItem('ds-accent', 'matrix');
-      window.__dsBoot.seeded = 'terminal/matrix';
-    }
-  } catch (e) { window.__dsBoot.seeded = 'error: ' + e.message; }
-  const snap = (why) => {
-    const h = document.documentElement;
-    window.__dsBoot.attrs.push({
-      why, t: performance.now(),
-      system: h && h.getAttribute('data-system'),
-      accent: h && h.getAttribute('data-accent'),
-    });
-  };
-  new MutationObserver((ms) => {
-    if (ms.some((m) => m.type === 'attributes' || m.addedNodes.length)) snap('mutation');
-  }).observe(document, { subtree: true, childList: true, attributes: true,
-                         attributeFilter: ['data-system', 'data-accent'] });
-  new PerformanceObserver((l) => {
-    for (const e of l.getEntries()) {
-      snap('at-' + e.name);
-      window.__dsBoot.paints.push({ name: e.name, t: e.startTime });
-    }
-  }).observe({ type: 'paint', buffered: true });
-})();
-```
-
-The localStorage run navigates to the same URL with `?dsseed=1` so the
-seed happens on the app's own origin before any app script runs. After
-load, read `window.__dsBoot` with `evaluate_script` and record it raw.
-Pass: the first `attrs` entry with both values non-null has `t` earlier
-than the `first-paint` entry's `t` (paint entries are timestamped
-retroactively, so compare timestamps, not array order).
-
-### §B-5 · Stage 5 stylesheet + inline scan (reference script)
-
-```js
-async () => {
-  const PATS = { hex: /#[0-9a-fA-F]{3,8}\b/, borderPx: /border(-radius)?:\s*\d+px/,
-                 fontFamily: /font-family:\s*['"]/ };
-  const STATUS = ['#34d08c', '#ffb84d', '#ff5c7a'];
-  const hits = [];
-  const sources = [];
-  for (const s of document.styleSheets) {
-    const node = s.ownerNode;
-    if (s.href && new URL(s.href).origin === location.origin) {
-      sources.push({ id: s.href, text: await fetch(s.href).then((r) => r.text()) });
-    } else if (!s.href && node && node.textContent) {
-      sources.push({ id: node.getAttribute('data-vite-dev-id') || 'inline <style>', text: node.textContent });
-    }
-  }
-  for (const { id, text } of sources) {
-    const isTokenFile = /:root\s*\{[^}]*--bg\s*:/.test(text);
-    const stack = []; let buf = ''; let pre = ''; let line = 1; let paren = 0; let q = null;
-    const flush = (endIdx) => {
-      const decl = buf.trim(); const sel = stack.join(' » ');
-      const tail = text.slice(endIdx, text.indexOf('\n', endIdx) + 1 || undefined);
-      buf = '';
-      if (!decl || !sel) return;
-      if (/DS-OK/.test(decl + pre + tail)) return;
-      if (sel.includes('[data-system=')) return;                       // skin rules
-      if (isTokenFile && /^:root\b/.test(stack[stack.length - 1]) && decl.startsWith('--')) return;
-      for (const [k, re] of Object.entries(PATS)) {
-        const m = decl.match(re); if (!m) continue;
-        const v = m[0].toLowerCase();
-        if (k === 'hex' && STATUS.includes(v)) continue;               // status colours
-        if (k === 'hex' && v === '#0a0a0a' && /\.btn\.primary/.test(sel) && /^color\s*:/.test(decl)) continue;
-        if (k === 'hex' && ['#000', '#fff'].includes(v) && /\bsvg\b/.test(sel)) continue;
-        hits.push({ file: id, line, selector: sel, decl, pattern: k });
-      }
-    };
-    for (let i = 0; i < text.length; i++) {
-      const c = text[i];
-      if (c === '\n') line++;
-      if (q) { buf += c; if (c === q && text[i - 1] !== '\\') q = null; continue; }
-      if (c === '/' && text[i + 1] === '*') {
-        const j = text.indexOf('*/', i + 2); const cm = text.slice(i, j < 0 ? text.length : j + 2);
-        pre += cm; line += (cm.match(/\n/g) || []).length; i += cm.length - 1; continue;
-      }
-      if (c === '"' || c === "'") { q = c; buf += c; continue; }
-      if (c === '(') paren++; if (c === ')') paren--;
-      if (c === '{' && !paren) { stack.push(buf.trim()); buf = ''; pre = ''; continue; }
-      if ((c === ';' || c === '}') && !paren) { flush(i + 1); pre = ''; if (c === '}') stack.pop(); continue; }
-      buf += c;
-    }
-  }
-  const inline = [];
-  for (const el of document.querySelectorAll('[style]')) {
-    if (el === document.documentElement) continue;
-    const st = el.getAttribute('style');
-    const lit = st.replace(/var\([^)]*\)/g, '');
-    const hit = PATS.hex.test(lit) || PATS.borderPx.test(lit) || PATS.fontFamily.test(lit) ||
-                /color:\s*(#[0-9a-fA-F]{3,6}|rgba?\(|hsla?\()/.test(lit) ||
-                /(^|;)\s*(background|border[-a-z]*|fill|stroke)\s*:[^;]*(#[0-9a-fA-F]{3,8}|rgba?\(|hsla?\()/.test(lit);
-    const inSvg = !!el.closest('svg') && /#(000|fff)\b/i.test(lit) && !/rgba?\(|hsla?\(/.test(lit);
-    if (hit && !inSvg) inline.push({ el: el.tagName.toLowerCase() + '.' + [...el.classList].join('.'), style: st.slice(0, 160) });
-  }
-  return { sources: sources.map((s) => s.id), cssHits: hits.length, hits: hits.slice(0, 200), inlineHits: inline.length, inline: inline.slice(0, 100) };
-}
-```
-
-Exclusions are exactly the fetched acceptable-values list: `#0a0a0a` as
-`.btn.primary` text colour; `#000`/`#fff` on SVG; status colours
-`#34d08c`/`#ffb84d`/`#ff5c7a`; `design-systems.js` (never scanned — it is
-JS, and its values reach the page only as custom properties on `<html>`);
-`[data-system="…"]` skin rules; plus the token file's own `:root` custom
-property declarations (the CSS mirror of `design-systems.js`). Each hit is
-one 🟡 FIX, reported with file, line and the upstream "Suggest fixes"
-replacement.
-
-### §B-10 · Stage 10 recursive skin count
-
+**Stage 1 (files loaded).** Evaluate Part I's three expressions verbatim. The
+`<link rel="stylesheet">` / `<script>` requirement is checked in-page:
 ```js
 () => {
-  const re = /\[data-system="(editorial|terminal|geist|brutalist|swiss)"\]/g;
-  const per = { editorial: 0, terminal: 0, geist: 0, brutalist: 0, swiss: 0 };
-  let total = 0; const unreadable = [];
-  const walk = (rules) => {
-    for (const r of rules) {
-      if (r.selectorText) {
-        const ids = new Set([...r.selectorText.matchAll(re)].map((m) => m[1]));
-        if (ids.size) { total++; ids.forEach((id) => per[id]++); }
-      }
-      if (r.cssRules) walk(r.cssRules);
-    }
-  };
-  for (const s of document.styleSheets) {
-    try { walk(s.cssRules); } catch (e) { unreadable.push(s.href); }
-  }
-  return { total, per, unreadable, pass: total >= 15 && Object.values(per).every((n) => n > 0) };
+  const sheets = [...document.styleSheets].filter(s => { try { return [...s.cssRules].some(r => r.selectorText === ':root' && r.style.getPropertyValue('--bg')); } catch { return false; } });
+  const scripts = [...document.querySelectorAll('head script[src]')].filter(s => /design-systems?\.js/.test(s.src));
+  return { tokenSheets: sheets.map(s => s.href), dsScripts: scripts.map(s => ({ src: s.src, async: s.async, defer: s.defer, type: s.type })) };
 }
 ```
+PASS needs ≥1 token sheet delivered by a `<link rel="stylesheet">` (non-null `href`) and ≥1 DS script. Record the DS stylesheet href. Stages 5 and 10 use it.
 
-`rg | wc -l` counted lines; this counts rules. A grouped selector list is
-one rule, so the ≥ 15 bar is the same or stricter — never looser.
+**Stage 2 (system applied).** Part I's three expressions, verbatim.
 
-## C · Stage 6 triage note
+**Stage 3 (synchronous boot / no FOUT).** Part I says "inspect the source". In-browser mapping, two parts, both required:
+- (a) *Source order as served.* `fetch(location.href, {cache:'no-store'}).then(r=>r.text())`, parse with `DOMParser`, and walk `<head>` in order. PASS needs a classic `<script src=…design-system(s).js>` (no `async`, `defer` or `type=module`) followed, still inside `<head>`, by a synchronous inline `<script>` that calls `applyDesignSystem(`.
+- (b) *First paint, observed.* Seed a non-default stored system and record the root's state in the first animation frame, which runs before the first paint:
+  ```js
+  // navigate_page({ type:'url', url, initScript: <this> })
+  try { localStorage.setItem('ds-system','brutalist'); localStorage.setItem('ds-accent','amber'); } catch (e) {}
+  window.__fp = [];
+  const snap = l => { const r = document.documentElement, c = getComputedStyle(r);
+    return { l, sys: r.getAttribute('data-system'), fd: c.getPropertyValue('--font-display').trim(), bw: c.getPropertyValue('--border-w').trim(), bg: c.getPropertyValue('--bg').trim() }; };
+  requestAnimationFrame(() => window.__fp.push(snap('first-frame')));
+  new MutationObserver(() => window.__fp.push(snap('mutation'))).observe(document.documentElement, { attributes: true, attributeFilter: ['data-system'] });
+  ```
+  After load, read `window.__fp`. PASS needs `first-frame` to show `brutalist` tokens (`--font-display` starting `'Instrument Serif'`, `--border-w` `2px`), with no later mutation to a different system. Then restore: `localStorage.clear()`.
+  Also run the cold case: clear storage, reload, and `first-frame` must show the default `editorial` tokens. In a production panel, Stage 3 is judged on the production server.
 
-Run the Stage 6 expression unchanged and record `stray.length` and a
-`tag.classList` descriptor for every stray. A stray is **compliant** only
-if its `classList` contains a component class that is actually defined in
-the fetched `styles.css`. Classes defined there that legitimately style a
-`<button>`:
+**Stage 4 (chrome).** Part I's two expressions, verbatim, on every key screen.
 
-`btn` (+ `primary`, `ghost`, `icon`, `danger`), `tab`, `icon-btn`,
-`accordion-header`, `sub-item`, `nav-link`, `header-search-trigger`,
-`user-pill`, `mobile-menu-btn`, `chip`, `card` (+ `hoverable`, `glow`),
-`ds-system-pill`.
-
-Anything else is 🟡 FIX per element. Apply the same rule to the other
-Stage 6 families, using only classes defined in the fetched `styles.css`:
-
-| Family | Compliant classes (fetched `styles.css`) |
-|--------|------------------------------------------|
-| Inputs (`input`, `select`, `textarea`) | `input`, `select`, `textarea`, `search-input` |
-| Clickable hover containers | `card` + `hoverable` (optionally `glow`) |
-| Status badges | `chip` + `ok` / `warn` / `bad` / `accent` / `muted`; `dot` + `ok` / `warn` / `bad` |
-| Section eyebrows (mono, uppercase labels) | `eyebrow` |
-| Keyboard hints | `kbd` |
-
-Hidden inputs (`type=hidden`), checkbox/radio/range controls with no text
-entry, and elements inside `.tabs` / `.mobile-drawer` (per the upstream
-expression) are recorded but not counted.
-
-## D · Stage 7 note
-
-Run the Stage 7 expression unchanged and record `accentUsers.length`. It
-compares a hex slice against computed `rgb()` strings, so it usually
-returns 0 even when accent is used — that raw value is still recorded, but
-it is not the evidence. The supporting measurement:
-
-```js
-() => {
-  const probe = document.createElement('span');
-  probe.style.color = getComputedStyle(document.documentElement).getPropertyValue('--accent').trim();
-  document.body.appendChild(probe);
-  const [ar, ag, ab] = getComputedStyle(probe).color.match(/[\d.]+/g).map(Number);
-  probe.remove();
-  const parse = (c) => {
-    let m = c.match(/^rgba?\(([^)]+)\)/);
-    if (m) { const p = m[1].split(/[\s,/]+/).filter(Boolean).map(Number); return [p[0], p[1], p[2], p[3] ?? 1]; }
-    m = c.match(/^color\(srgb ([^)]+)\)/);
-    if (m) { const p = m[1].split(/[\s/]+/).filter(Boolean).map(Number);
-             return [p[0] * 255, p[1] * 255, p[2] * 255, p[3] ?? 1].map((v, i) => (i < 3 ? Math.round(v) : v)); }
-    return null;
-  };
-  const PROPS = ['color', 'background-color', 'border-top-color', 'border-right-color',
-                 'border-bottom-color', 'border-left-color'];
-  const users = [];
-  for (const el of document.querySelectorAll('body *')) {
-    const r = el.getBoundingClientRect();
-    if (!r.width || !r.height) continue;
-    for (const pseudo of [null, '::before', '::after']) {
-      const s = getComputedStyle(el, pseudo);
-      if (pseudo && (s.content === 'none' || s.content === 'normal')) continue;
-      const props = PROPS.filter((p) => {
-        if (p.startsWith('border') && parseFloat(s.getPropertyValue(p.replace('color', 'width'))) === 0) return false;
-        const v = parse(s.getPropertyValue(p));
-        return v && v[0] === ar && v[1] === ag && v[2] === ab && v[3] >= 0.05;
-      });
-      if (props.length) users.push({
-        el: el.tagName.toLowerCase() + [...el.classList].map((c) => '.' + c).join('') + (pseudo || ''),
-        props, viewport: Math.floor((r.top + scrollY) / innerHeight),
+**Stage 5 (hardcoded values).** Part I's `rg … src/` mapped to the running dev server. Vite serves every source module's original text at `<url>?raw` as `export default "…"`. Evaluate in-page on the dev server, after visiting the screen so its modules are loaded:
+  ```js
+  async () => {
+    const mods = [...new Set(performance.getEntriesByType('resource').map(e => e.name.split('?')[0])
+      .filter(u => /\/src\/.+\.(css|tsx|ts|jsx)$/.test(u)))];
+    // `?raw` answers either `export default "<json string>"` (CSS) or the plain source text (TS/TSX).
+    const getRaw = async u => { const r = await fetch(u + '?raw'); if (!r.ok) throw new Error(r.status); const t = await r.text();
+      const m = t.match(/^export default ("(?:[^"\\]|\\.)*")/); return m ? JSON.parse(m[1]) : t; };
+    const skip = u => /design-systems?\.(css|js)$/.test(u) || u.includes('/public/ds/');
+    const CSS = [/#[0-9a-fA-F]{3,8}\b/, /border(-radius)?:\s*\d+px/, /font-family:\s*['"]/];
+    const TSX = [/style=\{?\{[^}]*#[0-9a-fA-F]{3,6}/, /color:\s*['"]#[0-9a-fA-F]{3,6}/, /(['"`\[]|\s)#[0-9a-fA-F]{3,8}\b/];
+    const seen = new Set(), queue = [...mods], hits = [], files = [];
+    while (queue.length) { const u = queue.shift(); if (seen.has(u) || skip(u)) continue; seen.add(u);
+      let src; try { src = await getRaw(u); } catch { files.push({ u, error: 'unreadable' }); continue; }
+      const isCss = u.endsWith('.css'); files.push({ u, lines: src.split('\n').length });
+      if (isCss) for (const m of src.matchAll(/@import\s+["']([^"']+\.css)["']/g)) queue.push(new URL(m[1], u).href.split('?')[0]);
+      let inSkin = 0; const lines = src.split('\n');
+      lines.forEach((line, i) => {
+        if (isCss && /\[data-system=/.test(line)) inSkin = 1;               // skin rule: exempt until its block closes
+        const exempt = inSkin || /DS-OK/.test(line) || /DS-OK/.test(lines[i - 1] || '');
+        for (const re of (isCss ? CSS : TSX)) if (re.test(line)) hits.push({ file: u.replace(location.origin, ''), line: i + 1, rule: String(re), text: line.trim().slice(0, 160), exempt: !!exempt });
+        if (inSkin && line.includes('}')) inSkin = 0;
       });
     }
+    return { files: files.length, unreadable: files.filter(f => f.error), hits };
   }
-  const perViewport = {};
-  users.forEach((u) => { perViewport[u.viewport] = (perViewport[u.viewport] || 0) + 1; });
-  return { accent: `rgb(${ar}, ${ag}, ${ab})`, total: users.length, perViewport, users: users.slice(0, 150) };
-}
-```
+  ```
+  The script applies Part I's regexes line by line to each file's text (review every hit; `exempt:true` marks skin-block / `DS-OK` lines, which you still confirm by reading the line). `design-system.css` / `design-systems.js` (and `public/ds/*`) are excluded exactly as the `--glob` flags do.
+  - CSS: `#[0-9a-fA-F]{3,8}\b` · `border(-radius)?:\s*\d+px` · `font-family:\s*['"]`
+  - TSX/JSX: `style=\{?\{[^}]*#[0-9a-fA-F]{3,6}` · `color:\s*['"]#[0-9a-fA-F]{3,6}`. Also report any `#hex` color literal elsewhere in component source (for example Tailwind arbitrary values `bg-[#…]`) as a Stage 5 finding, because Part I's rule is "every hex code … is a violation" and the `rg` lines are how to find them.
+  - Also scan the served entry HTML (`fetch('/')` text) for inline-style hex.
+  Apply Part I's "Acceptable hardcoded values" list and `/* DS-OK: intentional */` escapes exactly. For each finding report file (`/src/...` path), line number, and the suggested token from Part I's table.
+  In a production panel, run the same scan on the dev server at the same commit. Confirm the commit by comparing the served `/ds/design-system.css` bytes (sha-256 via `crypto.subtle`) and the page's build revision on both servers. The production bundle's CSS is minified and has lost its comments, so it cannot carry `DS-OK` escapes.
 
-Any viewport-worth with more than 8 accent users is 🟡 FIX. Every user is
-then checked against the fetched reserved list — primary buttons (one per
-surface), active nav indicator, eyebrows, `.live-dot`, `.caret`, active
-tab underline, `.card.glow:hover` halo, `::selection`. In the fetched
-`styles.css` those correspond to `.btn.primary`, `.accordion-header.active::before`
-/ `.sub-item.active` / `.icon-rail .icon-btn.active`, `.eyebrow`,
-`.live-dot`, `.caret::after`, `.tab.active`, `.card.glow:hover`. Anything
-else painting the accent is a violation (🟡 FIX), per upstream "Anything
-else using accent is a violation"; more than one `.btn.primary` in a
-surface is also a FIX.
+**Stage 6 (component classes).** Evaluate Part I's expression verbatim on every screen, then do the same for `input, select, textarea` (non-`hidden` types) against `.input/.select/.textarea`.
+Clarification (the rule is "use the design-system classes"): a `<button>` whose class list contains a component class defined by the canonical DS stylesheet counts as DS-classed. Those classes are `btn`, `tab`, `icon-btn`, `accordion-header`, `sub-item`, `header-search-trigger`, `user-pill`, `ds-system-pill`, and `select` (for `role=combobox` triggers). Enumerate them from the DS sheet recorded in Stage 1 rather than trusting this list. Report every remaining stray element (tag, classes, text, screen). Pass criterion unchanged: 🟡 FIX per offending element.
 
-## E · Stage 9
+**Stage 7 (accent discipline).** Part I's expression compares a hex slice against computed colors, which the browser always serializes as `rgb(…)`, so as written it can never match. The execution below makes the comparison actually work, while the criterion (≤8 per viewport-worth, and only the allowed uses) is unchanged:
+  ```js
+  () => { const probe = document.createElement('i'); probe.style.color = 'var(--accent)'; document.body.append(probe);
+    const acc = getComputedStyle(probe).color; probe.remove();
+    const users = [...document.querySelectorAll('body *')].filter(el => { const r = el.getBoundingClientRect(); if (!r.width || !r.height || r.bottom < 0 || r.top > innerHeight) return false;
+      const s = getComputedStyle(el); return [s.color, s.backgroundColor, s.borderTopColor, s.borderLeftColor, s.borderBottomColor, s.outlineColor].includes(acc); });
+    return { accent: acc, count: users.length, users: users.map(e => ({ tag: e.tagName, cls: e.className?.toString().slice(0, 80), text: e.textContent.trim().slice(0, 40) })) }; }
+  ```
+  Evaluate per viewport, scrolling by one viewport height until the page end. Ancestors that only inherit `color` from an accent user count once; report both. Classify each user against Part I's allowed list. `docs/02-principles.md` ("the brand moment") and `docs/07-color.md` ("Always" list: `.chip.accent`, active nav, sub-item active) are the sources Part I defers to, so the 28×28 `av` logo mark and `.chip.accent` are allowed uses. Anything else is a violation.
 
-Keep ``document.fonts.check(`16px "${family}"`)`` exactly as written for
-`--font-display` and record the raw boolean. As supporting evidence only,
-repeat the same three lines with `--font-display` replaced by
-`--font-body` and record that boolean too; it does not replace the
-prescribed result. Then run B10.
+**Stage 8 (ink tier).** Part I compares `getComputedStyle(p).color` with the raw token string, which never matches the computed `rgba(…)` form. Resolve the tokens through a probe element first (as in Stage 7) for `--text-3` and `--text-4`, then apply Part I's filter (`p, li`, `textContent.length > 60`) with both colors. Criterion unchanged.
 
-## F · Stage 11
+**Stage 9 (fonts).** Part I's expression verbatim, evaluated in-page. Before it runs, `await document.fonts.ready`, and `await document.fonts.load('16px "<family>"')` with a 3 s timeout, so the result reflects a load that has settled rather than one in flight. Run it once per system, after each switch in Stage 11, on at least Home and About. `true` is required. On `false`, list `network` requests to `fonts.gstatic.com` / `fonts.googleapis.com` (`list_network_requests`) and report any status ≥ 400.
 
-1. Run the prescribed loop verbatim in one `async` `evaluate_script`
-   (uses `window.SYSTEM_DEFAULT_ACCENT`) and record its raw result or the
-   raw thrown error (a `ReferenceError` here is itself evidence for
-   Stage 1).
-2. For screenshots, unroll the same loop body per system: evaluate
-   `applyDesignSystem(id, window.SYSTEM_DEFAULT_ACCENT[id])`, wait the
-   loop's own 800 ms, record `data-system`, `data-accent`, `--accent`, then
-   `take_screenshot` → `<screen>-<width>-<system>.png`.
-3. `Read` every PNG and apply the upstream symptom table. Any visible bug
-   from that table is 🔴 BLOCK.
+**Stage 10 (skin block).** `rg … styles.css | wc -l` becomes an in-page CSSOM count over the DS stylesheet recorded in Stage 1:
+  ```js
+  (href) => { const s = [...document.styleSheets].find(x => x.href === href); const re = /\[data-system="(editorial|terminal|geist|brutalist|swiss)"\]/g;
+    let n = 0; const walk = rules => { for (const r of rules) { if (r.cssRules) walk(r.cssRules); if (r.selectorText) n += (r.selectorText.match(re) || []).length; } }; walk(s.cssRules); return n; }
+  ```
+  The count must be ≥ 15. In a production panel, also report whether the served DS stylesheet's sha-256 equals `31fde358acc5bea61c68b17025326169fad4e60c62b898fbacf279a9bc9b2070` (the canonical fetched `styles.css`; the served `design-system.js` must equal `30c37539db397941f209055af28a5284fbdd14a3322adb869701c70b0e05bc7c`). A mismatch is a finding under Stage 10.
 
-## G · Coverage matrix (mandatory)
+**Stage 11 (switch test).** For every key screen × width, run Part I's loop with a screenshot per system, calling `applyDesignSystem(id, SYSTEM_DEFAULT_ACCENT[id])` in-page, settling per II-0 rule 4, then `take_screenshot({ filePath })` and viewing it. Walk Part I's symptom table for every screenshot. Also compare each Editorial screenshot against the fetched references in the run brief (`handoff/project/uploads/*.png`, `assets/reference/*.png`, and the prototype render if provided). Those references are captures of the pre-design-system production site, so use them for structure and content (which regions exist and in what arrangement), and use the fetched design (prototype, docs) for the visual language. Report structural mismatches as Stage 11 findings.
 
-**Screens** (slug used in filenames):
+## II-3 · Shell-command → browser-MCP mapping (record)
 
-| Slug | Route | Notes |
-|------|-------|-------|
-| `home` | `/` | |
-| `about` | `/about` | |
-| `journeys` | `/journeys` | learning journeys |
-| `category` | `/category/community-events` | |
-| `resource` | opened from `category` | `take_snapshot`, `click` the first resource card, record the resulting URL |
-| `login` | `/login` | record the final URL after settle (redirect target) |
-| `theme-settings` | `/settings/theme` | |
-| `404` | `/this-route-does-not-exist` | |
+| Stage | Part I prescribes | Executed through the browser MCP as |
+|---|---|---|
+| 1 | Inspect `<head>` for stylesheet + script | CSSOM: `document.styleSheets` with a `:root --bg` rule and non-null `href`; `head script[src*=design-system]` attributes |
+| 3 | "Inspect the source" | (a) `fetch(location.href)` + `DOMParser` head-order walk; (b) `navigate_page` `initScript` first-animation-frame probe with a seeded stored system, plus a cold-load probe |
+| 5 | `rg --type css '#…' src/ --glob …` (×3) and `rg "style=…" src/` (×2) | `performance.getEntriesByType('resource')` module list plus recursive `@import`, raw text via Vite `?raw` fetched in-page, the same regexes applied line by line, the same globs excluded; entry HTML via `fetch('/')` |
+| 9 | DevTools console `document.fonts.check` | `evaluate_script` (same expression) after `fonts.ready`; failures traced with `list_network_requests` |
+| 10 | `rg '\[data-system=…\]' styles.css \| wc -l` | CSSOM rule walk over the DS stylesheet counting selector matches; the served file's sha-256 via `crypto.subtle` |
+| 11 | DevTools loop + "take a screenshot if you have one available" | `evaluate_script` switch + `take_screenshot({ filePath })` per system × screen × width, each viewed |
+| All | DevTools console | `evaluate_script` on the live page |
 
-**Systems** — all five, each with its default accent quoted from the
-fetched `design-systems.js` `window.SYSTEM_DEFAULT_ACCENT`:
+## II-4 · Output
 
-| System | Default accent |
-|--------|----------------|
-| `editorial` | `crimson` |
-| `terminal` | `matrix` |
-| `geist` | `cyan` |
-| `brutalist` | `amber` |
-| `swiss` | `orange` |
-
-**Accents** — all ten from the fetched `window.ACCENTS`, applied on `home`
-in the default system (via `applyDesignSystem(<current system>, id)` when
-Stage 1 proves it exists, otherwise through the app's own theme control on
-`/settings/theme`; record which path). After each, `--accent` and
-`--accent-2` (computed on `<html>`, lower-cased) must equal:
-
-| id | `--accent` (primary) | `--accent-2` (secondary) |
-|----|----------------------|--------------------------|
-| `crimson` | `#ff3d52` | `#b84dff` |
-| `magenta` | `#ec4899` | `#f472b6` |
-| `orange` | `#ff7a3d` | `#ffb84d` |
-| `amber` | `#ffb84d` | `#ffd86b` |
-| `emerald` | `#34d08c` | `#5ee6b8` |
-| `matrix` | `#00ff88` | `#39ff14` |
-| `cyan` | `#5eddf2` | `#7dd3fc` |
-| `violet` | `#9d4edd` | `#c77dff` |
-| `lime` | `#aaff00` | `#00ff88` |
-| `rose` | `#ff7a8a` | `#ffb3c1` |
-
-A mismatch is 🔴 BLOCK under Stage 2 (tokens not applied as defined).
-
-**Widths** — set with `emulate` `viewport`: `375x812x1,mobile,touch`,
-`768x1024x1`, `1440x900x1`, `1920x1080x1` (1920×1080 is the reference-image
-viewport).
-
-**Cells:**
-
-- Stages 1–10: every screen × every width, in the default system
-  (whatever Stage 2 reports on cold load) — 8 × 4 = 32 cells. Stage 3's
-  three-run probe is per screen at 1440 (it is width-independent) and
-  repeated at 375 on `home`.
-- Stage 11: every screen × every system at 1440 and 375 — 8 × 5 × 2 = 80
-  screenshots, named `<screen>-<width>-<system>.png`
-  (e.g. `category-375-brutalist.png`).
-- Accents: 10 checks on `home` at 1440, each with a screenshot
-  `home-1440-<default-system>-<accent>.png`.
-
-The verdict is computed over the union of all cells; a BLOCK in any cell
-makes the overall verdict FAIL.
-
-## H · Reference access
-
-Validators cannot call DesignSync. The orchestrator supplies reference
-PNGs at
-`/Users/nick/Desktop/awesome-list-site/.cache/ds-fetch-20260929T0640Z/assets/`
-(`reference/` and `screenshots/`). Use only files that open as valid PNGs
-with `Read`; list any that do not. They are for visual comparison in
-Stage 11 only — never a source of tokens, classes or rules, and never a
-substitute for a fresh screenshot of the running app.
-
-## I · Output
-
-1. The upstream **verdict block**, exactly as templated above, with the
-   thresholds unchanged: PASS = zero BLOCK and zero FIX; FIX = zero BLOCK
-   and ≥ 1 FIX; FAIL = ≥ 1 BLOCK; NITs never gate.
-2. A per-stage findings table:
-
-   | Stage | Result (🔴/🟡/🟢/✅) | Cells affected | Raw return (short) | Evidence paths |
-   |-------|----------------------|----------------|--------------------|----------------|
-
-   Evidence paths are full absolute paths to the saved screenshots,
-   raw-return JSON files and network listings in the private dir.
-3. The complete screenshot list (full paths), grouped by screen, plus the
-   list of reference PNGs actually compared.
+Emit Part I's verdict block **exactly** (same headings, same order). Inside it:
+- Each finding line is `<stage> — <description> [url · width · system · evidence path] → <fix>`.
+- `## What's good` lists every stage that passed as its own line, `✅ Stage N — <what was observed> [evidence path(s)]`. Stages 3, 9 and 11 must each appear individually, with Stage 11 listing its screenshot directory and count.
+- A stage that could not be executed is listed under its Part I severity as `Stage N — NOT RUNNABLE: <exact reason>`. It counts toward the verdict at that severity.
+After the verdict block, add `## Evidence index`, listing every screenshot path and the raw JSON returned by each stage's evaluation.
