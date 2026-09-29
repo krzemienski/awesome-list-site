@@ -8,8 +8,16 @@
     {
       "class_name": "AwesomeVideoApp",
       // Built from the repo Dockerfile and pushed with `wrangler containers
-      // push`; the tag is the git revision the image was built from.
-      "image": "registry.cloudflare.com/24080dbbce9363d385fac0500c121b85/awesome-video-cf:a1c3e710",
+      // push`; the tag is the git revision the image was built from. Build
+      // with the development Clerk key and an empty VITE_CLERK_PROXY_URL:
+      // Clerk rejects proxied Frontend API calls for development instances,
+      // and a pk_live key would derive a nonexistent clerk.cf.awesome.video.
+      //   docker buildx build --platform linux/amd64 \
+      //     --build-arg VITE_CLERK_PUBLISHABLE_KEY=<pk_test_…> \
+      //     --build-arg VITE_CLERK_PROXY_URL= \
+      //     --build-arg BUILD_REVISION=$(git rev-parse HEAD) \
+      //     -t awesome-video-cf:<rev> --load .
+      "image": "registry.cloudflare.com/24080dbbce9363d385fac0500c121b85/awesome-video-cf:b611a661",
       "instance_type": "standard-1",
       "max_instances": 1
     }
