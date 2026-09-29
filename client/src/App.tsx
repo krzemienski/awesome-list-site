@@ -621,11 +621,14 @@ function Router({ homeComponent: Home }: { homeComponent: HomeRouteComponent }) 
 
   if (error) {
     return (
-      <RouteErrorBoundary location={location}>
-      <Suspense fallback={<RouteFallback />}>
-        <ErrorPage error={error} />
-      </Suspense>
-      </RouteErrorBoundary>
+      <div className="page">
+        <div className="grain" aria-hidden="true" />
+        <RouteErrorBoundary location={location}>
+        <Suspense fallback={<RouteFallback />}>
+          <ErrorPage error={error} />
+        </Suspense>
+        </RouteErrorBoundary>
+      </div>
     );
   }
 

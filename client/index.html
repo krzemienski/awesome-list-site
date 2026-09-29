@@ -95,72 +95,6 @@
       })();
     </script>
 
-    <script>
-      (function () {
-        try {
-          // Vite replaces this marker from THEME_FALLBACK_REGISTRY-derived
-          // data before serving/building the HTML. Keeping the script inline
-          // preserves the current no-flash behavior without a second network
-          // request or a hand-maintained list of theme ids.
-          var THEME_BOOT = __AWESOME_VIDEO_THEME_BOOT__;
-          var PRODUCT_PROFILE_BOOT = __AWESOME_VIDEO_PRODUCT_PROFILE_BOOT__;
-          var sys = null, acc = null;
-          try { sys = localStorage.getItem('ds-system'); } catch (_) {}
-          try { acc = localStorage.getItem('ds-accent'); } catch (_) {}
-          var root = document.documentElement;
-          var profile = new RegExp(PRODUCT_PROFILE_BOOT.routePatterns.admin).test(location.pathname)
-            ? 'admin-operations'
-            : new RegExp(PRODUCT_PROFILE_BOOT.routePatterns.learning).test(location.pathname)
-              ? 'learning-workspace'
-              : 'public-discovery';
-          var profileDefaults = PRODUCT_PROFILE_BOOT.profiles[profile];
-          if (THEME_BOOT.systems.indexOf(sys) === -1) {
-            sys = profileDefaults ? profileDefaults.defaultSystem : THEME_BOOT.defaultSystem;
-          }
-          // Missing/invalid accent: the resolved system's natural accent
-          // (terminal→matrix, geist→cyan, …), exactly as ThemeProvider and
-          // resolveAccentId() resolve it, so boot and provider never disagree.
-          if (THEME_BOOT.accents.indexOf(acc)  === -1) {
-            acc = THEME_BOOT.systemDefaultAccent[sys] || THEME_BOOT.defaultAccent;
-          }
-          root.setAttribute('data-product-profile', profile);
-          // Pre-paint apply: the synchronous, dependency-free half of
-          // window.applyDesignSystem (client/src/lib/design-system.ts). The
-          // bundle's full implementation (persistence, font warm-up) takes
-          // over once it evaluates; this call only guarantees the <html>
-          // system/accent hooks exist before the first paint.
-          function applyDesignSystem(systemId, accentId) {
-            root.setAttribute('data-system', systemId);
-            root.setAttribute('data-accent', accentId);
-          }
-          applyDesignSystem(sys, acc);
-          root.classList.add('dark');
-          root.style.backgroundColor = '#000';
-
-          // I1 — font override: read ds-font-override from localStorage and
-          // apply --font-sans pre-paint on EVERY route, so the override
-          // persists across hard reloads regardless of which page boots.
-          // Vite replaces this marker from FONT_OPTIONS-derived data before
-          // serving/building the HTML. Keeping it inline preserves the
-          // current no-flash behavior without a second network request or a
-          // hand-maintained list of font ids and stacks.
-          var FONT_BOOT = __AWESOME_VIDEO_FONT_BOOT__;
-          var fnt = null;
-          try { fnt = localStorage.getItem('ds-font-override'); } catch (_) {}
-          if (!Object.prototype.hasOwnProperty.call(FONT_BOOT.stacks, fnt)) fnt = FONT_BOOT.fallback;
-          root.setAttribute('data-font', fnt);
-          if (fnt && FONT_BOOT.stacks[fnt]) {
-            // Run22 BUG-015: body text uses --font-body (not --font-sans);
-            // set both, matching applyFontOverride in font-options.ts.
-            root.style.setProperty('--font-body', FONT_BOOT.stacks[fnt]);
-            root.style.setProperty('--font-sans', FONT_BOOT.stacks[fnt]);
-          }
-           // Font assets remain optional until after the first paint. The app
-           // applies a selected picker font and system display font on idle.
-        } catch (e) {}
-      })();
-    </script>
-
     <style>
       #home-layout-boot-skeleton { display: none; }
       html[data-home-ssr="true"][data-home-layout-pending="true"] #root[data-home-ssr="true"] { visibility: hidden; }
@@ -340,6 +274,59 @@
          FOUT control. -->
     <link rel="stylesheet"
            href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Fraunces:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500;1,600&family=JetBrains+Mono:wght@400;500;600;700&family=Geist:wght@400;500;600;700&family=Instrument+Serif:ital@0;1&family=Space+Grotesk:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600;700&family=IBM+Plex+Sans:wght@400;500;600;700&family=Manrope:wght@400;500;600;700;800&display=swap" />
+
+    <!-- The design system, verbatim from the design source (never edited here;
+         app CSS lives in the Vite bundle, which links after this sheet). -->
+    <link rel="stylesheet" href="/ds/design-system.css" />
+    <!-- Classic, parser-blocking script on purpose: it defines
+         window.DESIGN_SYSTEMS / ACCENTS / SYSTEM_DEFAULT_ACCENT /
+         applyDesignSystem before the boot below runs. -->
+    <script src="/ds/design-system.js"></script>
+    <script>
+      // Synchronous boot (HANDOFF §5 Phase 3): write the ~36 inline tokens and
+      // data-system / data-accent before first paint. Runs every route.
+      (function () {
+        var root = document.documentElement;
+        try {
+          var sys = null, acc = null;
+          try { sys = localStorage.getItem('ds-system'); } catch (_) {}
+          try { acc = localStorage.getItem('ds-accent'); } catch (_) {}
+          if (!Object.prototype.hasOwnProperty.call(window.DESIGN_SYSTEMS, sys)) sys = 'editorial';
+          var known = false;
+          for (var i = 0; i < window.ACCENTS.length; i++) if (window.ACCENTS[i].id === acc) known = true;
+          if (!known) acc = window.SYSTEM_DEFAULT_ACCENT[sys];
+          window.applyDesignSystem(sys, acc);
+        } catch (_) {}
+
+        try {
+          // Layout-density hook only (shared/styles/product-profiles.css). It
+          // no longer decides which system paints.
+          var PROFILE_ROUTES = __AWESOME_VIDEO_PRODUCT_PROFILE_BOOT__.routePatterns;
+          root.setAttribute(
+            'data-product-profile',
+            new RegExp(PROFILE_ROUTES.admin).test(location.pathname)
+              ? 'admin-operations'
+              : new RegExp(PROFILE_ROUTES.learning).test(location.pathname)
+                ? 'learning-workspace'
+                : 'public-discovery'
+          );
+          root.classList.add('dark');
+
+          // Font override (Theme Settings picker). Only when a real override
+          // is stored: a first visit is pure applier state. The applier
+          // clears --font-body on every switch, so the app re-applies the
+          // override after each one (font-options.ts, single code path).
+          var FONT_BOOT = __AWESOME_VIDEO_FONT_BOOT__;
+          var fnt = null;
+          try { fnt = localStorage.getItem('ds-font-override'); } catch (_) {}
+          if (fnt && Object.prototype.hasOwnProperty.call(FONT_BOOT.stacks, fnt) && FONT_BOOT.stacks[fnt]) {
+            root.setAttribute('data-font', fnt);
+            root.style.setProperty('--font-body', FONT_BOOT.stacks[fnt]);
+            root.style.setProperty('--font-sans', FONT_BOOT.stacks[fnt]);
+          }
+        } catch (_) {}
+      })();
+    </script>
   </head>
   <body>
     <!-- BUG-004 (run10): real fallback for JS-disabled browsers/crawlers.

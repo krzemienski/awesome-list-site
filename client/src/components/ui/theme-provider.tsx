@@ -1,24 +1,26 @@
 import { createContext, useContext, useEffect, useState, useCallback, useRef, ReactNode } from "react";
 import {
-  DESIGN_SYSTEMS,
-  ACCENTS,
-  SYSTEM_DEFAULT_ACCENT,
-  DEFAULT_SYSTEM,
   DEFAULT_ACCENT,
-  PRODUCT_PROFILES,
-  applyDesignSystem,
-  resolveProductProfile,
-  isSystemId,
+  DEFAULT_SYSTEM,
+  getAccents,
+  getDesignSystems,
+  getSystemDefaultAccent,
+  getSystemDefaultAccents,
   isAccentId,
-  resolveSystemId,
+  isSystemId,
+  readAppliedTheme,
   resolveAccentId,
-  type DesignSystemId,
+  resolveSystemId,
+  selectSystem,
+  setAccent as persistAccent,
   type AccentId,
+  type DesignSystemId,
 } from "@/lib/design-system";
 import { safeGetItem } from "@/lib/safeStorage";
 import {
   FONT_LS_KEY,
   applyFontOverride,
+  reapplyStoredFontOverride,
   resolveFontOverrideId,
 } from "@/lib/font-options";
 import { useLearningPreferences } from "@/hooks/use-learning-preferences";
@@ -28,9 +30,9 @@ interface ThemeProviderState {
   accentId: AccentId;
   setSystem: (id: string) => void;
   setAccent: (id: string) => void;
-  systems: typeof DESIGN_SYSTEMS;
-  accents: typeof ACCENTS;
-  systemDefaultAccent: typeof SYSTEM_DEFAULT_ACCENT;
+  systems: ReturnType<typeof getDesignSystems>;
+  accents: ReturnType<typeof getAccents>;
+  systemDefaultAccent: ReturnType<typeof getSystemDefaultAccents>;
 }
 
 const initialState: ThemeProviderState = {
@@ -38,59 +40,43 @@ const initialState: ThemeProviderState = {
   accentId: DEFAULT_ACCENT,
   setSystem: () => null,
   setAccent: () => null,
-  systems: DESIGN_SYSTEMS,
-  accents: ACCENTS,
-  systemDefaultAccent: SYSTEM_DEFAULT_ACCENT,
+  systems: getDesignSystems(),
+  accents: getAccents(),
+  systemDefaultAccent: getSystemDefaultAccents(),
 };
 
 export const ThemeProviderContext = createContext<ThemeProviderState>(initialState);
 
-function readInitial<T extends string>(
-  key: string,
-  fallback: T,
-  valid: (v: string) => v is T,
-): T {
-  if (typeof window === "undefined") return fallback;
-  const saved = safeGetItem(key);
-  return saved && valid(saved) ? saved : fallback;
+/**
+ * The boot script in client/index.html has already applied the visitor's
+ * system and accent to <html> before React runs, so the provider adopts that
+ * state and never re-applies a different one on mount. On the server there is
+ * no document; editorial + crimson is what the server renders.
+ */
+function readInitialTheme(): { system: DesignSystemId; accent: AccentId } {
+  if (typeof document === "undefined") return { system: DEFAULT_SYSTEM, accent: DEFAULT_ACCENT };
+  return readAppliedTheme();
 }
 
 export function ThemeProvider({ children }: { children: ReactNode }) {
-  const initialProfile =
-    PRODUCT_PROFILES[
-      resolveProductProfile(typeof window === "undefined" ? "/" : window.location.pathname)
-    ];
-  const [systemId, setSystemId] = useState<DesignSystemId>(() =>
-    readInitial("ds-system", initialProfile.defaultSystem ?? DEFAULT_SYSTEM, isSystemId)
-  );
-
-  // Same fallback as the pre-paint boot in client/index.html: a missing or
-  // invalid stored accent takes the resolved system's natural accent.
-  const [accentId, setAccentId] = useState<AccentId>(() =>
-    typeof window === "undefined"
-      ? SYSTEM_DEFAULT_ACCENT[systemId] ?? DEFAULT_ACCENT
-      : resolveAccentId(safeGetItem("ds-accent"), systemId)
-  );
-
-  useEffect(() => {
-    applyDesignSystem(systemId, accentId);
-  }, [systemId, accentId]);
+  const [theme, setTheme] = useState(readInitialTheme);
+  const { system: systemId, accent: accentId } = theme;
 
   // The public switch API (`window.applyDesignSystem`) writes the <html>
   // attributes directly, and `storage` events never fire in the document that
-  // wrote them, so the provider (and every selection UI reading it) would keep
-  // the previous system. Mirror the document's attributes back into state.
+  // wrote them, so mirror the document's attributes back into state. The
+  // applier also clears --font-body, so re-assert a stored font override after
+  // every apply — one code path for every way a switch can happen.
   useEffect(() => {
     const root = document.documentElement;
     const syncFromDocument = () => {
-      const domSystem = root.getAttribute("data-system");
-      const domAccent = root.getAttribute("data-accent");
-      if (!domSystem || !domAccent) return;
-      const nextSystem = resolveSystemId(domSystem);
-      const nextAccent = resolveAccentId(domAccent, nextSystem);
-      setSystemId((prev) => (prev === nextSystem ? prev : nextSystem));
-      setAccentId((prev) => (prev === nextAccent ? prev : nextAccent));
+      reapplyStoredFontOverride();
+      const next = readAppliedTheme();
+      setTheme((prev) =>
+        prev.system === next.system && prev.accent === next.accent ? prev : next,
+      );
     };
+    syncFromDocument();
     const observer = new MutationObserver(syncFromDocument);
     observer.observe(root, { attributes: true, attributeFilter: ["data-system", "data-accent"] });
     return () => observer.disconnect();
@@ -112,8 +98,7 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
         // then resolve both values from the writer's completed storage state.
         const nextSystem = resolveSystemId(safeGetItem("ds-system"));
         const nextAccent = resolveAccentId(safeGetItem("ds-accent"), nextSystem);
-        setSystemId(nextSystem);
-        setAccentId(nextAccent);
+        window.applyDesignSystem(nextSystem, nextAccent);
         syncTimer = null;
       }, 0);
     };
@@ -126,21 +111,13 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
   }, []);
 
   const setSystem = useCallback((id: string) => {
-    if (!isSystemId(id)) return;
-    setSystemId(id);
-    /* On system change, nudge the accent to the system's natural default
-       only if the user is still on the previous system's natural default.
-       Otherwise respect their explicit accent choice across systems. */
-    setAccentId((prev) => {
-      const prevDefault = SYSTEM_DEFAULT_ACCENT[systemId] || DEFAULT_ACCENT;
-      const newDefault  = SYSTEM_DEFAULT_ACCENT[id] || DEFAULT_ACCENT;
-      return prev === prevDefault ? newDefault : prev;
-    });
-  }, [systemId]);
+    // selectSystem persists ds-system/ds-accent, shifts the accent only when
+    // it was still the previous system's natural default, and applies.
+    selectSystem(id);
+  }, []);
 
   const setAccent = useCallback((id: string) => {
-    if (!isAccentId(id)) return;
-    setAccentId(id);
+    persistAccent(id);
   }, []);
 
   return (
@@ -150,9 +127,9 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
         accentId,
         setSystem,
         setAccent,
-        systems: DESIGN_SYSTEMS,
-        accents: ACCENTS,
-        systemDefaultAccent: SYSTEM_DEFAULT_ACCENT,
+        systems: getDesignSystems(),
+        accents: getAccents(),
+        systemDefaultAccent: getSystemDefaultAccents(),
       }}
     >
       {children}
@@ -217,11 +194,10 @@ export function AccountThemePreferenceBridge({ children }: { children: ReactNode
   const setSystem = useCallback((id: string) => {
     if (!isSystemId(id)) return;
     localSelectionMade.current = true;
-    const previousDefault =
-      SYSTEM_DEFAULT_ACCENT[selectedSystem.current] || DEFAULT_ACCENT;
+    const previousDefault = getSystemDefaultAccent(selectedSystem.current);
     const nextAccent =
       selectedAccent.current === previousDefault
-        ? SYSTEM_DEFAULT_ACCENT[id] || DEFAULT_ACCENT
+        ? getSystemDefaultAccent(id)
         : selectedAccent.current;
     selectedSystem.current = id;
     selectedAccent.current = nextAccent;

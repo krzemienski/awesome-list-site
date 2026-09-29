@@ -1,0 +1,276 @@
+@import "../../../shared/styles/product-profiles.css";
+
+/* =====================================================================
+   APP BRIDGE — everything the app needs that the canonical design system
+   (/ds/design-system.css + /ds/design-system.js, verbatim, never edited)
+   does not ship.
+
+   The canonical sheet owns tokens, .page/.grain, cards, buttons, chips, the
+   per-system skins and the responsive rules. This file only adds:
+     - app-only tokens (status hues, motion, shell geometry, on-accent ink)
+     - shadcn/Radix sidebar bridge, skip-link, focus ring, disabled state
+     - the site footer base, and the data-ds skin hooks the React primitives use
+   Values are var(--token) throughout; the few literals are token definitions.
+   ===================================================================== */
+
+:root {
+  /* Status semantics: global, theme-independent (design source
+     colors_and_type.css). The applier never writes these. */
+  --status-ok:   #34d08c; /* DS-OK: token definition */
+  --status-warn: #ffb84d; /* DS-OK: token definition */
+  --status-bad:  #ff5c7a; /* DS-OK: token definition */
+  --status-info: #5eddf2; /* DS-OK: token definition */
+
+  /* Ink drawn on top of an --accent fill: every system's --bg is pure black. */
+  --on-accent: var(--bg);
+
+  --radius-xs: 3px;
+
+  --motion-fast: 160ms;
+  --motion-base: 240ms;
+  --motion-slow: 400ms;
+  --motion-ease: cubic-bezier(0.2, 0.65, 0.3, 1);
+
+  /* Shell geometry (canonical awesome-list-site-ds measurements):
+     sidebar 280 (240 tablet), icon rail 56, header 60 (56 mobile), page
+     padding 48/40, content measure 1240 (1400 admin), footer 48 40 32. */
+  --shell-sidebar-w:        280px;
+  --shell-sidebar-w-tablet: 240px;
+  --shell-rail-w:           56px;
+  --shell-header-h:         60px;
+  --page-pad-y:             48px;
+  --page-pad-x:             40px;
+  --content-max:            1240px;
+  --content-max-admin:      1400px;
+  --footer-pad:             48px 40px 32px;
+  --shell-footer-measure:   var(--content-max);
+}
+
+@media (min-width: 768px) and (max-width: 1023px) { :root { --shell-sidebar-w: var(--shell-sidebar-w-tablet); } }
+@media (max-width: 767px) { :root { --shell-header-h: 56px; } }
+
+/* NB-019: the canonical `html, body { height: 100% }` caps the body box at the
+   viewport, so when Radix scroll-lock sets `overflow: hidden` on body (any
+   Select/popover open) the document scroll range collapses and scrollY clamps
+   to 0. min-height keeps short pages viewport-tall without the cap. */
+body { height: auto; min-height: 100%; }
+
+/* Global "reduce motion" toggle: extends the canonical .no-anim to every
+   descendant, not just the three helper classes it names. */
+.no-anim,
+.no-anim *,
+.no-anim *::before,
+.no-anim *::after {
+  animation: none !important;
+  transition: none !important;
+}
+
+/* ============== SIDEBAR / RAIL (shadcn + Radix bridge) ============== */
+.accordion-header { min-height: 44px; }
+.accordion-header .truncate {
+  overflow-wrap: anywhere;
+  white-space: normal;
+}
+.chevron-rotate { transition: transform 220ms var(--motion-ease); }
+
+[data-collapsible="icon"] [data-sidebar="sidebar"] {
+  background: var(--bg-2);
+}
+[data-state="expanded"] [data-sidebar="sidebar"] {
+  background: color-mix(in srgb, var(--bg) 88%, transparent);
+}
+
+[data-collapsible="icon"] .rail-icon-btn {
+  width: 36px;
+  height: 36px;
+  border-radius: var(--radius-sm);
+  background: transparent;
+  border: var(--border-w) solid transparent;
+  color: var(--text-2);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all var(--motion-fast) ease;
+}
+[data-collapsible="icon"] .rail-icon-btn:hover {
+  color: var(--text);
+  background: var(--surface);
+}
+[data-collapsible="icon"] .rail-icon-btn:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+[data-collapsible="icon"] .rail-icon-btn.active {
+  color: var(--accent);
+  background: color-mix(in srgb, var(--accent) 12%, transparent);
+  border-color: color-mix(in srgb, var(--accent) 30%, var(--border));
+}
+
+@media (forced-colors: active) {
+  [data-collapsible="icon"] .rail-icon-btn {
+    border-color: ButtonBorder;
+  }
+}
+
+/* ============== data-ds SKIN HOOKS (React primitives) ==============
+   button.tsx / chip-button.tsx / ResourceCard / taxonomy-card carry
+   data-ds="chip|card-hover" and data-ds-variant; these give them the same
+   per-system personality the canonical [data-system] skins give .btn/.chip. */
+[data-ds="chip"] { border-radius: var(--radius-pill); }
+
+[data-system="terminal"] [data-ds="chip"] { text-transform: uppercase; }
+[data-system="terminal"] [data-ds="chip"]::before { content: '['; margin-right: 2px; opacity: 0.55; }
+[data-system="terminal"] [data-ds="chip"]::after  { content: ']'; margin-left: 2px;  opacity: 0.55; }
+[data-system="terminal"] [data-ds-variant="default"] {
+  background: transparent;
+  color: var(--accent);
+  border: var(--border-w) solid var(--accent);
+  text-shadow: 0 0 12px color-mix(in srgb, var(--accent) 60%, transparent);
+}
+[data-system="terminal"] [data-ds-variant="default"]:hover {
+  background: color-mix(in srgb, var(--accent) 14%, transparent);
+  box-shadow: 0 0 0 1px var(--accent), inset 0 0 30px color-mix(in srgb, var(--accent) 14%, transparent);
+}
+[data-system="terminal"] [data-ds="card-hover"]:hover {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 1px color-mix(in srgb, var(--accent) 35%, transparent);
+  transform: none;
+}
+
+[data-system="geist"] [data-ds="chip"] { text-transform: none; letter-spacing: 0; font-family: var(--font-body); font-weight: 500; }
+[data-system="geist"] [data-ds-variant] { font-weight: 500; }
+[data-system="geist"] [data-ds="card-hover"]:hover {
+  box-shadow: 0 0 0 1px var(--border-strong), var(--shadow);
+}
+
+[data-system="brutalist"] [data-ds="chip"] { border-width: var(--border-w); border-color: var(--text-2); text-transform: uppercase; }
+[data-system="brutalist"] [data-ds-variant="default"],
+[data-system="brutalist"] [data-ds-variant="outline"] {
+  border: var(--border-w) solid var(--text);
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  font-size: 12px;
+}
+[data-system="brutalist"] [data-ds-variant="default"] { background: var(--accent); color: var(--on-accent); }
+[data-system="brutalist"] [data-ds-variant="default"]:hover,
+[data-system="brutalist"] [data-ds-variant="outline"]:hover {
+  transform: translate(-2px, -2px);
+  box-shadow: var(--shadow);
+}
+[data-system="brutalist"] [data-ds="card-hover"]:hover {
+  transform: translate(-2px, -2px);
+  box-shadow: 6px 6px 0 0 var(--text);
+  background: var(--surface-2);
+}
+
+[data-system="swiss"] [data-ds="chip"] { font-family: var(--font-mono); font-weight: 500; }
+[data-system="swiss"] [data-ds-variant] { font-weight: 600; }
+[data-system="swiss"] [data-ds-variant="default"],
+[data-system="swiss"] [data-ds-variant="outline"] { border-width: var(--hairline-w); }
+[data-system="swiss"] [data-ds="card-hover"]:hover {
+  border-color: var(--text-3);
+  box-shadow: none;
+  transform: none;
+  background: var(--surface-2);
+}
+
+/* ============== ACCESSIBILITY & STATE ============== */
+.skip-link {
+  position: absolute;
+  top: -100px;
+  left: 8px;
+  z-index: 9999;
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  padding: 8px 14px;
+  background: var(--accent);
+  color: var(--on-accent);
+  font-family: var(--font-body);
+  font-size: 13px;
+  font-weight: 600;
+  text-decoration: none;
+  border: 0;
+  border-radius: var(--radius-sm);
+}
+.skip-link:focus,
+.skip-link:focus-visible {
+  top: 8px;
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
+/* One keyboard focus ring for every interactive role, in the accent. */
+:where(
+    a, button, [role="button"], [role="link"], [role="tab"], [role="menuitem"],
+    [role="menuitemcheckbox"], [role="menuitemradio"], [role="option"],
+    [role="switch"], [role="checkbox"], [role="radio"], [role="combobox"],
+    input, select, textarea, summary, [contenteditable="true"], [tabindex]
+  ):focus-visible {
+  outline: 2px solid var(--accent) !important;
+  outline-offset: 2px;
+}
+
+[disabled],
+[aria-disabled="true"],
+.is-disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.lucide,
+svg.lucide,
+[class*="lucide-"] {
+  stroke-width: 1.5;
+}
+
+button:active:not([disabled]):not([aria-disabled="true"]),
+.btn:active:not([disabled]):not([aria-disabled="true"]),
+[role="button"]:active:not([disabled]):not([aria-disabled="true"]) {
+  transform: translateY(1px);
+}
+
+/* ============== SITE FOOTER (base; shell/footer.css refines it) ============== */
+.site-footer {
+  position: relative;
+  z-index: 2;
+  border-top: var(--hairline-w) solid var(--border);
+  background: var(--bg-2);
+}
+.site-footer-inner {
+  width: min(100%, var(--shell-footer-measure));
+  margin-inline: auto;
+  padding: var(--footer-pad);
+}
+.footer-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1.6fr) repeat(3, minmax(0, 1fr));
+  gap: 32px;
+}
+.footer-brand-link { display: inline-flex; align-items: center; gap: 10px; min-height: 44px; text-decoration: none; }
+.footer-wordmark { font-size: 11px; font-weight: 700; letter-spacing: 1.8px; }
+.footer-tagline { max-width: 360px; margin: 8px 0 14px; color: var(--text-2); font-size: 13.5px; line-height: 1.55; }
+.footer-stats { margin: 8px 0 0; color: var(--text-3); font-size: 11px; line-height: 1.7; }
+.footer-live { display: inline-flex; align-items: center; gap: 6px; color: var(--accent); }
+.footer-column { display: flex; min-width: 0; flex-direction: column; gap: 0; }
+.footer-column h2 { margin: 0 0 12px; color: var(--text-3); font-family: var(--font-mono); font-size: 9.5px; font-weight: 700; letter-spacing: 0.18em; }
+.footer-column a, .footer-column button {
+  display: inline-flex; align-items: center; min-height: 44px; padding: 0; border: 0; background: transparent;
+  color: var(--text-2); font: inherit; font-size: 13px; text-align: left; text-decoration: none; cursor: pointer; overflow-wrap: anywhere;
+}
+.footer-column a:hover, .footer-column button:hover { color: var(--text); }
+.footer-bottom {
+  display: flex; justify-content: space-between; gap: 16px; flex-wrap: wrap; margin-top: 40px; padding-top: 20px;
+  border-top: var(--hairline-w) solid var(--hairline); color: var(--text-3); font-size: 10.5px; letter-spacing: 0.04em;
+}
+@media (max-width: 900px) {
+  .footer-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .footer-brand { grid-column: 1 / -1; }
+}
+@media (max-width: 520px) {
+  .footer-grid { grid-template-columns: minmax(0, 1fr); }
+  .footer-brand { grid-column: auto; }
+  .site-footer-inner { padding: 36px 20px 24px; }
+}

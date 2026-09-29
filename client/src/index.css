@@ -1,13 +1,21 @@
 /*
-  Foundation order matters: DS tokens MUST load before Tailwind so the
-  @theme inline block below can alias shadcn color keys to DS tokens.
+  The design system (/ds/design-system.css, linked in index.html before this
+  bundle) is unlayered and opens with `* { margin: 0; padding: 0; }`. An
+  unlayered rule beats every layered rule, so Tailwind's utilities cannot sit
+  in @layer utilities or every p-* / m-* utility computes to 0. They load
+  unlayered and first: a class (0,1,0) beats the DS `*` reset (0,0,0) on
+  specificity, and the app's own unlayered CSS below still wins ties.
 */
-@import './styles/design-system.css';
+@layer theme, base, components;
+@import "tailwindcss/theme.css" layer(theme);
+@import "tailwindcss/preflight.css" layer(base);
+@import "tailwindcss/utilities.css" source(none);
+
+@import './styles/app-bridge.css';
 @import './styles/mobile-optimizations.css';
 @import './styles/skeleton-animations.css';
 @import './styles/scrolling-fix.css';
 
-@import "tailwindcss" source(none);
 @source "../index.html";
 @source ".";
 
@@ -19,15 +27,14 @@
 @theme inline {
   --color-background: var(--bg);
   --color-foreground: var(--text);
-  /* MR-DS-20 — DS-OK: shadcn↔DS token bridge. Status slots read the
-     design-system.css --status-* tokens; the #000000 literals below are the
-     on-accent ink color verbatim from design-system.css. */
+  /* shadcn↔DS token bridge. Status slots read the --status-* tokens and the
+     on-accent ink is --on-accent (both defined in app-bridge.css). */
   --color-card: var(--surface);
   --color-card-foreground: var(--text);
   --color-popover: var(--bg-2);
   --color-popover-foreground: var(--text);
   --color-primary: var(--accent);
-  --color-primary-foreground: #000000;
+  --color-primary-foreground: var(--on-accent);
   --color-secondary: var(--surface-2);
   --color-secondary-foreground: var(--text);
   --color-muted: var(--surface);
@@ -35,7 +42,7 @@
   --color-accent: var(--surface-2);
   --color-accent-foreground: var(--text);
   --color-destructive: var(--status-bad);
-  --color-destructive-foreground: #000000;
+  --color-destructive-foreground: var(--on-accent);
   --color-border: var(--border);
   --color-input: var(--border);
   --color-ring: var(--accent);
@@ -43,11 +50,11 @@
   --color-chart-2: var(--status-ok);
   --color-chart-3: var(--status-info); /* fixed chart-series hue: the global status-info token, never the active accent */
   --color-chart-4: var(--status-warn);
-  --color-chart-5: #9d4edd; /* DS-OK: fixed chart-series hue — the DS violet accent swatch (design-system.css :root[data-accent="violet"]); series colors must not follow the active accent */
+  --color-chart-5: #9d4edd; /* DS-OK: fixed chart-series hue — the DS violet accent swatch (ACCENTS.violet.primary in /ds/design-system.js); series colors must not follow the active accent */
   --color-sidebar: var(--bg);
   --color-sidebar-foreground: var(--text);
   --color-sidebar-primary: var(--accent);
-  --color-sidebar-primary-foreground: #000000;
+  --color-sidebar-primary-foreground: var(--on-accent);
   --color-sidebar-accent: var(--surface-2);
   --color-sidebar-accent-foreground: var(--text);
   --color-sidebar-border: var(--border);
@@ -144,7 +151,7 @@
   }
 }
 
-/* selection rule lives in design-system.css with proper color-mix alpha */
+/* selection rule lives in /ds/design-system.css with proper color-mix alpha */
 
 /*
   Dev-only: suppress Vite's runtime error overlay.

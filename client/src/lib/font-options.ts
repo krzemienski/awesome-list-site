@@ -5,6 +5,7 @@
  * into `client/index.html` by Vite. The boot script cannot import TS modules
  * because it runs before bundle resolution, so the generated object keeps the
  * no-flash behavior without introducing a second hand-maintained font list.
+ * The boot only touches fonts when an override is actually stored.
  *
  * A stack is only half of a webfont: something has to download the files.
  * The always-on <link rel="stylesheet"> in `client/index.html` is the ONE
@@ -95,17 +96,41 @@ export function loadFontOverride(id: string): void {
 export function applyFontOverride(id: string): void {
   const resolvedId = resolveFontOverrideId(id);
   const opt = FONT_OPTIONS.find((f) => f.id === resolvedId)!;
-  document.documentElement.setAttribute("data-font", opt.id);
+  const root = document.documentElement;
+  root.setAttribute("data-font", opt.id);
   // Run22 BUG-015: body text renders with `var(--font-body)` (index.css +
   // design-system.css), NOT `--font-sans` — setting only --font-sans was a
   // silent no-op. Override BOTH: --font-body drives the actual body/UI text,
   // --font-sans keeps Tailwind `font-sans` utilities in agreement.
   if (opt.id === "system" || !opt.stack) {
-    document.documentElement.style.removeProperty("--font-body");
-    document.documentElement.style.removeProperty("--font-sans");
+    // "System default" means the ACTIVE design system's own body face. The
+    // applier owns --font-body, so hand it back its value rather than
+    // removing the property (which would leave nothing behind).
+    const system = root.getAttribute("data-system") ?? "";
+    const owned = window.DESIGN_SYSTEMS?.[system as keyof typeof window.DESIGN_SYSTEMS]?.vars["--font-body"];
+    if (owned) root.style.setProperty("--font-body", owned);
+    root.style.removeProperty("--font-sans");
   } else {
-    document.documentElement.style.setProperty("--font-body", opt.stack);
-    document.documentElement.style.setProperty("--font-sans", opt.stack);
+    root.style.setProperty("--font-body", opt.stack);
+    root.style.setProperty("--font-sans", opt.stack);
     loadFontOverride(opt.id);
   }
+}
+
+/**
+ * Re-assert a stored picker override. window.applyDesignSystem clears every
+ * key it set (including --font-body) on each call, so anything that switches
+ * system or accent must be followed by this. It is a no-op when no override
+ * is stored — a first visit stays pure applier state.
+ */
+export function reapplyStoredFontOverride(): void {
+  let stored: string | null = null;
+  try {
+    stored = localStorage.getItem(FONT_LS_KEY);
+  } catch {
+    return;
+  }
+  const id = resolveFontOverrideId(stored);
+  if (id === "system") return;
+  applyFontOverride(id);
 }
