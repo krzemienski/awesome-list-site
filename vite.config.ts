@@ -162,6 +162,10 @@ export default defineConfig({
     },
   },
   root: path.resolve(import.meta.dirname, "client"),
+  // The repo-root .env (local runs) sits beside package.json, not in client/.
+  // Deployments supply the same VITE_* values as real environment variables,
+  // which Vite reads regardless; only VITE_-prefixed values reach the client.
+  envDir: path.resolve(import.meta.dirname),
   build: {
     outDir: path.resolve(import.meta.dirname, "dist/public"),
     emptyOutDir: true,

@@ -50,11 +50,11 @@
    the body face with its own weight/tracking/leading (pages.jsx). */
 .taxonomy-page .taxonomy-title {
   margin: 0 0 16px;
-  font-family: var(--font-body);
+  font-family: var(--font-display);
   font-size: clamp(36px, 5vw, 56px);
-  font-weight: 700;
-  line-height: 1.05;
-  letter-spacing: -1.5px;
+  font-weight: var(--display-weight);
+  line-height: var(--display-leading);
+  letter-spacing: var(--display-tracking);
   overflow-wrap: anywhere;
 }
 
@@ -62,10 +62,6 @@
 .taxonomy-page--sub-subcategory .taxonomy-title {
   margin-bottom: 12px;
   font-size: clamp(32px, 5vw, 52px);
-}
-
-.taxonomy-title-accent {
-  color: var(--accent);
 }
 
 .taxonomy-description {
@@ -457,9 +453,9 @@
 }
 
 .taxonomy-pagination [data-testid="pagination-controls"] > div:first-child > a[aria-current="page"] {
-  border-color: var(--accent);
-  background: var(--accent);
-  color: #0a0a0a; /* DS-OK: on-accent ink, canonical .btn.primary */
+  border-color: var(--border-strong);
+  background: var(--surface-2);
+  color: var(--text);
   font-weight: 600;
 }
 

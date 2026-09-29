@@ -55,15 +55,11 @@
 
 .about-title {
   margin: 0 0 18px;
-  font-family: var(--font-body);
+  font-family: var(--font-display);
   font-size: clamp(32px, 4.5vw, 48px);
-  font-weight: 700;
-  letter-spacing: -1.2px;
-  line-height: 1.1;
-}
-
-.about-title-accent {
-  color: var(--accent);
+  font-weight: var(--display-weight);
+  letter-spacing: var(--display-tracking);
+  line-height: var(--display-leading);
 }
 
 .about-shimmer-line {

@@ -26,11 +26,11 @@
 
 .resource-detail-heading h1 {
   margin-block: 18px;
-  font-family: var(--font-body);
+  font-family: var(--font-display);
   font-size: clamp(28px, 4vw, 44px);
-  font-weight: 700;
-  letter-spacing: -1.2px;
-  line-height: 1.1;
+  font-weight: var(--display-weight);
+  letter-spacing: var(--display-tracking);
+  line-height: var(--display-leading);
   overflow-wrap: anywhere;
 }
 

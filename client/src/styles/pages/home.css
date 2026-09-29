@@ -645,31 +645,10 @@
   transform: translateY(-1px);
 }
 
+/* Paint, radius and hover come from the design system's `.btn.primary`. */
 .home-contribute-card > a {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  gap: 0.5rem;
   width: 100%;
-  min-width: 44px;
   min-height: max(44px, var(--profile-control-height));
-  padding: 0.5625rem 1rem;
-  color: var(--bg);
-  font-size: 0.8125rem;
-  font-weight: 600;
-  line-height: normal;
-  white-space: nowrap;
-  background: var(--accent);
-  border: var(--border-w) solid var(--accent);
-  border-radius: var(--radius-sm);
-}
-
-.home-contribute-card > a:hover {
-  color: var(--bg);
-  background: var(--surface-2);
-  border-color: var(--accent);
-  box-shadow: var(--shadow-accent);
-  transform: translateY(-1px);
 }
 
 .home-curated-category-top {

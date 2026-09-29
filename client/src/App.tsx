@@ -350,9 +350,14 @@ const KNOWN_ROUTE_PATTERNS: RegExp[] = [
 // browser hostname, so it must use the explicitly configured key instead of
 // passing an empty host to Clerk's host resolver. A missing build-time key is
 // a configuration error for both paths; never substitute a fake key.
+// A loopback host has no Clerk custom domain to derive (a production build
+// served on localhost would otherwise ask for clerk.localhost), so local runs
+// of either build use the configured key.
 const configuredClerkPubKey = import.meta.env.VITE_CLERK_PUBLISHABLE_KEY;
+const isLoopbackHost = (host: string) =>
+  host === "localhost" || host === "127.0.0.1" || host === "[::1]" || host.endsWith(".localhost");
 const clerkPubKey =
-  typeof window === "undefined"
+  typeof window === "undefined" || isLoopbackHost(window.location.hostname)
     ? configuredClerkPubKey
     : publishableKeyFromHost(window.location.hostname, configuredClerkPubKey);
 const clerkProxyUrl = import.meta.env.VITE_CLERK_PROXY_URL;
