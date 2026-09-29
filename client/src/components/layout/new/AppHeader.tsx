@@ -82,7 +82,7 @@ export default function AppHeader({ onSearchOpen, user, onLogout, logoutError, c
   return <>
     <header className="app-canonical-header">
       <span className="header-menu-control">
-        <SidebarTrigger className="mobile-menu-btn" data-testid="mobile-drawer-trigger" aria-label="Toggle sidebar" />
+        <SidebarTrigger className="btn icon ghost mobile-menu-btn"data-testid="mobile-drawer-trigger" aria-label="Toggle sidebar" />
         <svg className="header-menu-icon" aria-hidden="true" width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"><path d="M2 4 H14 M2 8 H14 M2 12 H14" /></svg>
       </span>
       <Link href="/" className="header-brand" aria-label={`${accessibleBrand} — home`} data-testid="header-brand">

@@ -58,6 +58,12 @@
 .app-canonical-header .header-menu-icon { position: absolute; top: 10px; left: 10px; pointer-events: none; }
 .app-canonical-header .mobile-menu-btn:hover { transform: translateY(-1px); }
 .app-canonical-header .mobile-menu-btn:hover::before { background: var(--surface); border-color: var(--text-3); }
+/* Canonical `btn icon ghost` paints through the inset ::before so the visible
+   36px control sits inside the 44px target; keep .btn and skin paint off the
+   outer hit box. */
+.app-canonical-header .btn.mobile-menu-btn,
+.app-canonical-header .btn.mobile-menu-btn:hover { background: transparent; border-width: var(--border-w); border-color: transparent; box-shadow: none; }
+.app-canonical-header .btn.mobile-menu-btn:hover { transform: translateY(-1px); }
 .app-canonical-header :is(button, a):focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; }
 .header-account-menu [role="menuitem"] { min-height: 44px; }
 @media (max-width: 1180px) { .app-canonical-header .header-search-trigger { min-width: 180px; } }

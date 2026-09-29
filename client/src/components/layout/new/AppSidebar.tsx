@@ -838,8 +838,7 @@ export default function AppSidebar({
             <button
               type="button"
               onClick={() => onRetryNav()}
-              className="underline underline-offset-2 font-medium min-h-[44px] md:min-h-[36px]"
-              style={{ color: "var(--text-2)" }}
+              className="btn ghost min-h-[44px]"
               data-testid="sidebar-nav-retry"
             >
               Retry
@@ -1016,7 +1015,7 @@ export default function AppSidebar({
         data-testid="sidebar-compact-navigation"
         aria-label="Collapse sidebar"
         title="Collapse sidebar"
-        className="av-sidebar-collapse-toggle"
+        className="btn icon av-sidebar-collapse-toggle"
       >
         <ChevronRight aria-hidden="true" className="size-[10px]" />
       </button>
@@ -1187,7 +1186,7 @@ export default function AppSidebar({
             <button
               type="button"
               onClick={() => setOpen(true)}
-              className="rail-icon-btn rail-expand-navigation touch-manipulation"
+              className="icon-btn rail-icon-btn rail-expand-navigation touch-manipulation"
               data-testid="sidebar-expanded-navigation"
               aria-label="Expand sidebar"
               title="Expand sidebar"

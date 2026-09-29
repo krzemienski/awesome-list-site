@@ -231,6 +231,21 @@
   color: var(--text);
 }
 
+/* Canonical `btn icon ghost` marker; the pixel reference paints this close as
+   a bare glyph, so keep .btn and per-system skin paint off it. */
+.av-sidebar-drawer .btn.av-sidebar-drawer-close,
+.av-sidebar-drawer .btn.av-sidebar-drawer-close:hover {
+  background: transparent;
+  border: 0;
+  box-shadow: none;
+  height: auto;
+  padding: 0;
+  transform: none;
+  width: auto;
+}
+.av-sidebar-drawer .btn.av-sidebar-drawer-close { color: var(--text-2); }
+.av-sidebar-drawer .btn.av-sidebar-drawer-close:hover { color: var(--text); }
+
 .av-sidebar-drawer-close svg {
   height: 20px;
   width: 20px;
