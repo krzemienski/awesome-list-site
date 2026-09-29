@@ -141,7 +141,7 @@ body { height: auto; min-height: 100%; }
 [data-system="brutalist"] .cl-cardBox { border-color: var(--text); }
 [data-system="swiss"] .cl-formFieldInput.input,
 [data-system="swiss"] .cl-button.btn,
-[data-system="swiss"] .cl-cardBox { border-width: 0.5px; }
+[data-system="swiss"] .cl-cardBox { border-width: var(--hairline-w); }
 
 /* ============== ACCESSIBILITY & STATE ============== */
 .skip-link {

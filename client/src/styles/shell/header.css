@@ -43,7 +43,6 @@
 .app-canonical-header .header-search-trigger:hover::before { border-color: var(--border-strong); background: var(--surface-2); }
 .app-canonical-header .header-search-label { flex: 1; text-align: left; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; font-weight: 500; }
 .app-canonical-header .header-search-label > span { color: var(--text-3); }
-/* DS-OK: canonical .kbd uses a fixed 4px radius, not the skin's control radius. */
 .app-canonical-header .user-pill { position: relative; display: inline-flex; align-items: center; gap: 8px; height: 44px; padding: 0 12px 0 4px; border-radius: var(--radius-pill); background: transparent; border: var(--border-w) solid transparent; color: var(--text); cursor: pointer; font-family: inherit; transition: color 160ms ease; flex-shrink: 0; }
 .app-canonical-header .user-pill::before { content: ""; position: absolute; z-index: 0; inset: 4px 0; border-radius: var(--radius-pill); background: color-mix(in srgb, var(--accent) 12%, transparent); border: var(--border-w) solid color-mix(in srgb, var(--accent) 35%, var(--border)); transition: all 160ms ease; pointer-events: none; }
 .app-canonical-header .user-pill > * { position: relative; z-index: 1; }
@@ -68,7 +67,7 @@
 .header-account-menu [role="menuitem"] { min-height: 44px; }
 @media (max-width: 1180px) { .app-canonical-header .header-search-trigger { min-width: 180px; } }
 @media (max-width: 1024px) {
-  .app-canonical-header .hide-tablet { display: none !important; }
+  /* Overrides canonical `@media (min-width: 769px) .mobile-menu-btn { display: none !important }`. */
   .app-canonical-header .mobile-menu-btn { display: inline-flex !important; }
   .app-canonical-header .header-menu-control { display: inline-flex; }
   .app-canonical-header .header-search-trigger { min-width: 0; width: 180px; gap: 6px; padding: 0 10px; }
@@ -76,14 +75,15 @@
 }
 @media (min-width: 768px) and (max-width: 1024px) {
   /* The tablet sidebar stays visible, but the reference also retains its
-     header drawer trigger through 1024px. Re-show these spans because the
-     canonical .hide-mobile utility extends to 768px. */
+     header drawer trigger through 1024px. Re-show these spans at 768px, where
+     canonical `@media (max-width: 768px) .hide-mobile { display: none !important }` still applies. */
   .app-canonical-header .kbd.hide-mobile,
   .app-canonical-header .header-account-name.hide-mobile {
     display: inline !important;
   }
 }
-/* design-system.css hides .header-search-trigger at <=768px because the
+/* design-system.css hides .header-search-trigger at <=768px
+   (`.header-search-trigger { display: none !important }`) because the
    reference swaps in a separate `btn icon ghost show-mobile` search button.
    The app keeps one responsive control (see AppHeader), so it must stay
    displayed and take that icon-button paint below. */
