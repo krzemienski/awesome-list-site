@@ -505,7 +505,7 @@
   height: 2.25rem;
   place-items: center;
   flex: 0 0 auto;
-  color: var(--accent);
+  color: var(--text-2);
   font-size: 1rem;
   background: var(--surface-2);
   border: var(--hairline-w) solid var(--border);
@@ -514,12 +514,9 @@
 
 .home-featured-chip {
   padding: 0.25rem 0.625rem;
-  color: var(--accent);
   font-family: var(--font-mono);
   font-size: 0.59375rem;
   letter-spacing: 0.0375rem;
-  background: color-mix(in srgb, var(--accent) 10%, transparent);
-  border-color: color-mix(in srgb, var(--accent) 35%, var(--border));
   border-radius: var(--radius-pill);
 }
 
@@ -532,13 +529,16 @@
 }
 
 .home-resource-description {
-  display: block;
+  display: -webkit-box;
   min-height: 0;
   margin-bottom: 0.875rem;
   overflow: hidden;
   color: var(--text-2);
   font-size: 0.8125rem;
   line-height: 1.55;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 3;
+  line-clamp: 3;
 }
 
 .home-resource-tags {

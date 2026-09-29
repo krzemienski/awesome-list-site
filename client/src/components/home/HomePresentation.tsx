@@ -4,6 +4,7 @@ import type { Resource } from "@/types/awesome-list";
 import type { ResourceKind } from "@shared/resourceKinds";
 import { STRIP_KINDS, type ResourceKindCounts } from "@/lib/static-data";
 import { Badge } from "@/components/ui/badge";
+import { getCategoryGlyph } from "@/components/layout/new/category-glyphs";
 import { ChipButton } from "@/components/ui/chip-button";
 import { Button } from "@/components/ui/button";
 
@@ -310,7 +311,7 @@ function ResourceCard({
     <article className="home-resource-card card hoverable glow" data-testid={`card-home-resource-${resource.id}`}>
       <div className="home-resource-card-top">
         <div className="home-resource-mark" aria-hidden="true">
-          ◆
+          {getCategoryGlyph(resource.category)}
         </div>
         {featured ? <Badge className="home-featured-chip">★ FEATURED</Badge> : null}
       </div>
