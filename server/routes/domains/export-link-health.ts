@@ -41,7 +41,6 @@
  *   Block 2 (awesome-list + GitHub discovery):
  *     - GET  /api/awesome-list                    (resourceReadLimiter)
  *     - GET  /api/awesome-list/nav                (resourceReadLimiter)
- *     - POST /api/switch-list
  *     - GET  /api/github/awesome-lists
  *     - GET  /api/github/search                   (isAuthenticated, isAdmin)
  *
@@ -69,8 +68,6 @@ import {
 import { taxonomyScopeIntro } from "@shared/seo-content-templates";
 import { normalizeGithubRepoInput } from "@shared/validation";
 import { db } from "../../db";
-import { storage } from "../../storage";
-import { fetchAwesomeList } from "../../parser";
 import { fetchAwesomeLists, searchAwesomeLists } from "../../github-api";
 import { syncService } from "../../github/syncService";
 import { AwesomeListFormatter } from "../../github/formatter";
@@ -1576,27 +1573,6 @@ export function registerAwesomeListDiscoveryRoutes(
     } catch (error) {
       console.error("Error building awesome-list listing:", error);
       sendOperationalFailure(res, error, "Failed to build taxonomy listing");
-    }
-  });
-
-  // New endpoint to switch lists
-  app.post("/api/switch-list", async (req, res) => {
-    try {
-      const { rawUrl } = req.body;
-      
-      if (!rawUrl) {
-        return res.status(400).json({ message: 'Raw URL is required' });
-      }
-      
-      console.log(`Switching to list: ${rawUrl}`);
-      const data = await fetchAwesomeList(rawUrl);
-      storage.setAwesomeListData(data);
-      
-      console.log(`Successfully switched to list with ${data.resources.length} resources`);
-      res.json(data);
-    } catch (error) {
-      console.error('Error switching list:', error);
-      res.status(500).json({ message: 'Failed to switch list' });
     }
   });
 
