@@ -53,6 +53,11 @@ COPY --from=builder --chown=node:node /app/shared ./shared
 COPY --from=builder --chown=node:node /app/migrations ./migrations
 COPY --from=builder --chown=node:node /app/drizzle.config.ts ./drizzle.config.ts
 COPY --from=builder --chown=node:node /app/tsconfig.json ./tsconfig.json
+# Site title, source list and features; without it server/config.ts falls
+# back to the upstream "Awesome Go" defaults.
+COPY --from=builder --chown=node:node /app/awesome-list.config.yaml ./awesome-list.config.yaml
+# Admin export link gate allowlist (server/validation/exportLinkGate.ts).
+COPY --from=builder --chown=node:node /app/scripts/awesome-bot-allowlist.txt ./scripts/awesome-bot-allowlist.txt
 
 # The official Node Alpine image includes an unprivileged `node` user.
 USER node
