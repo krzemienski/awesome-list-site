@@ -35,19 +35,19 @@ const FEEDBACK_OPTIONS: {
   {
     value: "helpful",
     label: "Helpful",
-    activeClass: "border-[#34d08c]/50 bg-[#34d08c]/10 text-[#34d08c]", // DS-OK: status ok
+    activeClass: "border-[var(--status-ok)]/50 bg-[var(--status-ok)]/10 text-[var(--status-ok)]", // DS-OK: status ok
     icon: ThumbsUp,
   },
   {
     value: "not_for_me",
     label: "Not for me",
-    activeClass: "border-[#ffb84d]/50 bg-[#ffb84d]/10 text-[#ffb84d]", // DS-OK: status warn
+    activeClass: "border-[var(--status-warn)]/50 bg-[var(--status-warn)]/10 text-[var(--status-warn)]", // DS-OK: status warn
     icon: ThumbsDown,
   },
   {
     value: "already_known",
     label: "Already know this",
-    activeClass: "border-[#5eddf2]/50 bg-[#5eddf2]/10 text-[#5eddf2]", // DS-OK: cyan info (DS chart/info constant)
+    activeClass: "border-[var(--status-info)]/50 bg-[var(--status-info)]/10 text-[var(--status-info)]", // DS-OK: cyan info (DS chart/info constant)
     icon: BookCheck,
   },
   {

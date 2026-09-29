@@ -494,7 +494,7 @@ export default function PendingResources() {
             </Button>
             <Button
               size="sm"
-              className={"bg-[#34d08c] text-black hover:bg-[#34d08c]/90" /* DS-OK: status ok */}
+              className={"bg-[var(--status-ok)] text-black hover:bg-[var(--status-ok)]/90" /* DS-OK: status ok */}
               onClick={openBulkApproveDialog}
               disabled={pendingResources.length === 0 || bulkApproveMutation.isPending || bulkRejectMutation.isPending}
               data-testid="button-bulk-approve"
@@ -663,7 +663,7 @@ export default function PendingResources() {
                         <Button
                           variant="default"
                           size="sm"
-                          className={"bg-[#34d08c] text-black hover:bg-[#34d08c]/90" /* DS-OK: status ok */}
+                          className={"bg-[var(--status-ok)] text-black hover:bg-[var(--status-ok)]/90" /* DS-OK: status ok */}
                           onClick={() => handleApproveClick(resource)}
                           disabled={approveMutation.isPending}
                           aria-label={`Approve ${resource.title}`}
@@ -849,7 +849,7 @@ export default function PendingResources() {
             <AlertDialogAction
               onClick={handleApproveConfirm}
               disabled={approveMutation.isPending}
-              className={"bg-[#34d08c] text-black hover:bg-[#34d08c]/90" /* DS-OK: status ok */}
+              className={"bg-[var(--status-ok)] text-black hover:bg-[var(--status-ok)]/90" /* DS-OK: status ok */}
               data-testid="button-confirm-approve"
             >
               {approveMutation.isPending ? "Approving..." : "Approve"}
@@ -951,7 +951,7 @@ export default function PendingResources() {
                   bulkApproveIds.length === 0 ||
                   bulkApproveIds.length > MAX_BULK_RESOURCE_IDS
                 }
-               className={"bg-[#34d08c] text-black hover:bg-[#34d08c]/90" /* DS-OK: status ok */}
+               className={"bg-[var(--status-ok)] text-black hover:bg-[var(--status-ok)]/90" /* DS-OK: status ok */}
                data-testid="button-confirm-bulk-approve"
              >
                {bulkApproveMutation.isPending ? "Approving..." : `Approve ${bulkApproveIds.length}`}

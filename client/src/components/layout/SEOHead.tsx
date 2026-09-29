@@ -188,6 +188,7 @@ export default function SEOHead({
       {/* Additional SEO Meta Tags */}
       {/* DS-OK: MR-DS-04/05 — literal required (meta can't read CSS vars); matches DS --accent */}
       <meta name="theme-color" content="#ff3d52" />
+      {/* DS-OK: intentional — Windows tile metadata needs a literal color, not a CSS token. */}
       <meta name="msapplication-TileColor" content="#ff3d52" />
       <meta name="application-name" content={SITE_NAME} />
       <meta name="apple-mobile-web-app-title" content={SITE_NAME} />

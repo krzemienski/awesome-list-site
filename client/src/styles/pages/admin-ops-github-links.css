@@ -282,17 +282,17 @@
 
 /* DS-OK: semantic status constants are shared by all admin operations. */
 .ops-link-health__stat-card--ok > :last-child {
-  color: #34d08c;
+  color: var(--status-ok);
 }
 
 .ops-link-health__stat-card--warn > :last-child {
   /* DS-OK: canonical global warning status ink, independent of accent. */
-  color: #ffb84d;
+  color: var(--status-warn);
 }
 
 .ops-link-health__stat-card--bad > :last-child {
   /* DS-OK: canonical global failure status ink, independent of accent. */
-  color: #ff5c7a;
+  color: var(--status-bad);
 }
 
 .ops-link-health__summary-meta {
@@ -351,7 +351,7 @@
 
 .ops-digest-health__error-code {
   /* DS-OK: semantic BAD status color, not a theme accent. */
-  color: #ff5c7a;
+  color: var(--status-bad);
   font-family: var(--font-mono);
   font-size: 0.6875rem;
 }
@@ -362,7 +362,7 @@
 
 .ops-digest-health__stat-card--unavailable .admin-ops-stat__value {
   /* DS-OK: semantic BAD status color, not a theme accent. */
-  color: #ff5c7a;
+  color: var(--status-bad);
 }
 
 .ops-digest-health__queue-grid {

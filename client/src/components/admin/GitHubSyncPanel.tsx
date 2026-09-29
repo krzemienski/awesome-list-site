@@ -390,15 +390,15 @@ export default function GitHubSyncPanel() {
                   
                   <div className="grid grid-cols-4 gap-2 text-sm">
                     <div className="text-center">
-                      <div className={"text-[#34d08c] font-semibold" /* DS-OK: status ok */}>+{lastSync.resourcesAdded}</div>
+                      <div className={"text-[var(--status-ok)] font-semibold" /* DS-OK: status ok */}>+{lastSync.resourcesAdded}</div>
                       <div className="text-xs text-muted-foreground">Added</div>
                     </div>
                     <div className="text-center">
-                      <div className={"text-[#ffb84d] font-semibold" /* DS-OK: status warn */}>~{lastSync.resourcesUpdated}</div>
+                      <div className={"text-[var(--status-warn)] font-semibold" /* DS-OK: status warn */}>~{lastSync.resourcesUpdated}</div>
                       <div className="text-xs text-muted-foreground">Updated</div>
                     </div>
                     <div className="text-center">
-                      <div className={"text-[#ff5c7a] font-semibold" /* DS-OK: status bad */}>-{lastSync.resourcesRemoved}</div>
+                      <div className={"text-[var(--status-bad)] font-semibold" /* DS-OK: status bad */}>-{lastSync.resourcesRemoved}</div>
                       <div className="text-xs text-muted-foreground">Removed</div>
                     </div>
                     <div className="text-center">
@@ -455,10 +455,10 @@ export default function GitHubSyncPanel() {
                       >
                         <div className="flex items-center justify-between">
                           <div className="flex items-center gap-2">
-                            {item.status === 'completed' && <CheckCircle2 className={"h-4 w-4 text-[#34d08c]" /* DS-OK: status ok */} />}
-                            {item.status === 'failed' && <XCircle className={"h-4 w-4 text-[#ff5c7a]" /* DS-OK: status bad */} />}
+                            {item.status === 'completed' && <CheckCircle2 className={"h-4 w-4 text-[var(--status-ok)]" /* DS-OK: status ok */} />}
+                            {item.status === 'failed' && <XCircle className={"h-4 w-4 text-[var(--status-bad)]" /* DS-OK: status bad */} />}
                             {(item.status === 'pending' || item.status === 'processing') && (
-                              <RefreshCw className={"h-4 w-4 text-[#ffb84d] animate-spin" /* DS-OK: status warn */} />
+                              <RefreshCw className={"h-4 w-4 text-[var(--status-warn)] animate-spin" /* DS-OK: status warn */} />
                             )}
                             <span className="font-medium capitalize">{item.action}</span>
                             <span className="text-xs text-muted-foreground">

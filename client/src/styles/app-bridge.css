@@ -20,6 +20,7 @@
   --status-warn: #ffb84d; /* DS-OK: token definition */
   --status-bad:  #ff5c7a; /* DS-OK: token definition */
   --status-info: #5eddf2; /* DS-OK: token definition */
+  --status-info-2: #9d4edd; /* DS-OK: token definition (second info/series hue) */
 
   /* Ink drawn on top of an --accent fill: every system's --bg is pure black. */
   --on-accent: var(--bg);

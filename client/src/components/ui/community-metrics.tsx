@@ -213,17 +213,17 @@ export default function CommunityMetrics({ resources, categories, className, sub
   const getBadgeColor = (level: string) => {
     switch (level) {
       case "platinum": return "bg-foreground text-background";
-      case "gold": return "bg-[#ffb84d] text-black"; // DS-OK: status warn constant doubling as gold medal fill
+      case "gold": return "bg-[var(--status-warn)] text-black"; // DS-OK: status warn constant doubling as gold medal fill
       case "silver": return "bg-muted-foreground text-background";
-      case "bronze": return "bg-[#ffb84d]/70 text-black"; // DS-OK: status warn constant at reduced strength = bronze
+      case "bronze": return "bg-[var(--status-warn)]/70 text-black"; // DS-OK: status warn constant at reduced strength = bronze
       default: return "bg-muted text-foreground";
     }
   };
 
   const getEngagementColor = (score: number) => {
-    if (score >= 80) return "text-[#34d08c]"; // DS-OK: status ok
-    if (score >= 60) return "text-[#ffb84d]"; // DS-OK: status warn
-    return "text-[#ff5c7a]"; // DS-OK: status bad
+    if (score >= 80) return "text-[var(--status-ok)]"; // DS-OK: status ok
+    if (score >= 60) return "text-[var(--status-warn)]"; // DS-OK: status warn
+    return "text-[var(--status-bad)]"; // DS-OK: status bad
   };
 
   return (
@@ -261,7 +261,7 @@ export default function CommunityMetrics({ resources, categories, className, sub
                       <span className="text-sm text-muted-foreground">Total Resources</span>
                     </div>
                     <p className="text-2xl font-bold mt-1">{metrics.totalContributions}</p>
-                    <p className="text-xs text-[#34d08c] mt-1">{/* DS-OK: status ok */}
+                    <p className="text-xs text-[var(--status-ok)] mt-1">{/* DS-OK: status ok */}
                       +{metrics.weeklyGrowth} this week
                     </p>
                   </CardContent>
@@ -274,7 +274,7 @@ export default function CommunityMetrics({ resources, categories, className, sub
                       <span className="text-sm text-muted-foreground">Active Contributors</span>
                     </div>
                     <p className="text-2xl font-bold mt-1">{metrics.activeContributors}</p>
-                    <p className="text-xs text-[#5eddf2] mt-1">{/* DS-OK: cyan info (DS chart/info constant) */}
+                    <p className="text-xs text-[var(--status-info)] mt-1">{/* DS-OK: cyan info (DS chart/info constant) */}
                       Across {categories.length} categories
                     </p>
                   </CardContent>
@@ -289,7 +289,7 @@ export default function CommunityMetrics({ resources, categories, className, sub
                       <span className="text-sm text-muted-foreground">New This Week</span>
                     </div>
                     <p className="text-2xl font-bold mt-1">+{metrics.weeklyGrowth}</p>
-                    <p className="text-xs text-[#34d08c] mt-1">{/* DS-OK: status ok */}
+                    <p className="text-xs text-[var(--status-ok)] mt-1">{/* DS-OK: status ok */}
                       resources added
                     </p>
                   </CardContent>
@@ -466,21 +466,21 @@ export default function CommunityMetrics({ resources, categories, className, sub
                           
                           <div className="grid grid-cols-3 gap-4 text-sm">
                             <div className="flex items-center gap-2">
-                              <Eye className="h-4 w-4 text-[#5eddf2]" />{/* DS-OK: cyan info (DS chart/info constant) */}
+                              <Eye className="h-4 w-4 text-[var(--status-info)]" />{/* DS-OK: cyan info (DS chart/info constant) */}
                               <div>
                                 <div className="font-medium">{resource.trends.clicks}</div>
                                 <div className="text-xs text-muted-foreground">clicks</div>
                               </div>
                             </div>
                             <div className="flex items-center gap-2">
-                              <MessageSquare className="h-4 w-4 text-[#34d08c]" />{/* DS-OK: status ok */}
+                              <MessageSquare className="h-4 w-4 text-[var(--status-ok)]" />{/* DS-OK: status ok */}
                               <div>
                                 <div className="font-medium">{resource.trends.searches}</div>
                                 <div className="text-xs text-muted-foreground">searches</div>
                               </div>
                             </div>
                             <div className="flex items-center gap-2">
-                              <Heart className="h-4 w-4 text-[#ff5c7a]" />{/* DS-OK: status bad */}
+                              <Heart className="h-4 w-4 text-[var(--status-bad)]" />{/* DS-OK: status bad */}
                               <div>
                                 <div className="font-medium">{resource.trends.shares}</div>
                                 <div className="text-xs text-muted-foreground">shares</div>
@@ -534,7 +534,7 @@ export default function CommunityMetrics({ resources, categories, className, sub
                         <div>
                           <div className="flex justify-between text-xs mb-1">
                             <span className="text-muted-foreground">Growth Rate</span>
-                            <span className="text-[#34d08c]">+{category.growthRate}%</span>{/* DS-OK: status ok */}
+                            <span className="text-[var(--status-ok)]">+{category.growthRate}%</span>{/* DS-OK: status ok */}
                           </div>
                           <Progress value={category.growthRate} className="h-2" />
                           {/* NB-047: say where the number comes from instead of

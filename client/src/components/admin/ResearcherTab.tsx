@@ -54,40 +54,40 @@ import type { ResearchJob, ResearchDiscovery } from "@shared/schema";
 import "./queues-agent.css";
 import { useState, useEffect } from "react";
 
-const INFO_STATUS_BADGE = "bg-[#5eddf2]/20 text-[#5eddf2] border-[#5eddf2]/30"; // DS-OK: cyan info (DS chart/info constant)
-const OK_STATUS_BADGE = "bg-[#34d08c]/20 text-[#34d08c] border-[#34d08c]/30"; // DS-OK: status ok
-const WARN_OUTLINE = "border-[#ffb84d]/30 text-[#ffb84d]"; // DS-OK: status warn
-const OK_OUTLINE = "text-xs shrink-0 text-[#34d08c] border-[#34d08c]/30"; // DS-OK: status ok
-const WARN_TEXT = "text-[#ffb84d]"; // DS-OK: status warn
-const INFO_BORDER = "border-[#5eddf2]/20"; // DS-OK: cyan info (DS chart/info constant)
-const OK_SOLID_BUTTON = "bg-[#34d08c] text-black hover:bg-[#34d08c]/90"; // DS-OK: status ok
-const OK_TEXT = "text-[#34d08c]"; // DS-OK: status ok
-const BAD_TEXT = "text-[#ff5c7a]"; // DS-OK: status bad
+const INFO_STATUS_BADGE = "bg-[var(--status-info)]/20 text-[var(--status-info)] border-[var(--status-info)]/30"; // DS-OK: cyan info (DS chart/info constant)
+const OK_STATUS_BADGE = "bg-[var(--status-ok)]/20 text-[var(--status-ok)] border-[var(--status-ok)]/30"; // DS-OK: status ok
+const WARN_OUTLINE = "border-[var(--status-warn)]/30 text-[var(--status-warn)]"; // DS-OK: status warn
+const OK_OUTLINE = "text-xs shrink-0 text-[var(--status-ok)] border-[var(--status-ok)]/30"; // DS-OK: status ok
+const WARN_TEXT = "text-[var(--status-warn)]"; // DS-OK: status warn
+const INFO_BORDER = "border-[var(--status-info)]/20"; // DS-OK: cyan info (DS chart/info constant)
+const OK_SOLID_BUTTON = "bg-[var(--status-ok)] text-black hover:bg-[var(--status-ok)]/90"; // DS-OK: status ok
+const OK_TEXT = "text-[var(--status-ok)]"; // DS-OK: status ok
+const BAD_TEXT = "text-[var(--status-bad)]"; // DS-OK: status bad
 
 /**
  * Agent roles use the global DS status/info constants. Related role variants
  * retain hierarchy through opacity rather than separate palette shades.
  */
 const AGENT_ROLE_BADGE_STYLES: Record<string, string> = {
-  error: "border-[#ff5c7a]/50 text-[#ff5c7a]", // DS-OK: status bad
-  tool_error: "border-[#ff5c7a]/50 text-[#ff5c7a]", // DS-OK: status bad
-  system: "border-[#ffb84d]/50 text-[#ffb84d]", // DS-OK: status warn
-  tool_call: "border-[#5eddf2]/50 text-[#5eddf2]", // DS-OK: cyan info (DS chart/info constant)
-  tool_result: "border-[#34d08c]/50 text-[#34d08c]", // DS-OK: status ok
-  web_search: "border-[#9d4edd]/50 text-[#9d4edd]", // DS-OK: violet info (DS chart/info constant)
-  web_search_result: "border-[#9d4edd]/30 text-[#9d4edd]/80", // DS-OK: violet info (DS chart/info constant)
-  assistant: "border-[#5eddf2]/50 text-[#5eddf2]/80", // DS-OK: cyan info (DS chart/info constant)
+  error: "border-[var(--status-bad)]/50 text-[var(--status-bad)]", // DS-OK: status bad
+  tool_error: "border-[var(--status-bad)]/50 text-[var(--status-bad)]", // DS-OK: status bad
+  system: "border-[var(--status-warn)]/50 text-[var(--status-warn)]", // DS-OK: status warn
+  tool_call: "border-[var(--status-info)]/50 text-[var(--status-info)]", // DS-OK: cyan info (DS chart/info constant)
+  tool_result: "border-[var(--status-ok)]/50 text-[var(--status-ok)]", // DS-OK: status ok
+  web_search: "border-[var(--status-info-2)]/50 text-[var(--status-info-2)]", // DS-OK: violet info (DS chart/info constant)
+  web_search_result: "border-[var(--status-info-2)]/30 text-[var(--status-info-2)]/80", // DS-OK: violet info (DS chart/info constant)
+  assistant: "border-[var(--status-info)]/50 text-[var(--status-info)]/80", // DS-OK: cyan info (DS chart/info constant)
 };
 
 const AGENT_ROLE_TEXT_STYLES: Record<string, string> = {
-  error: "text-[#ff5c7a]", // DS-OK: status bad
-  tool_error: "text-[#ff5c7a]", // DS-OK: status bad
-  system: "text-[#ffb84d]", // DS-OK: status warn
-  tool_call: "text-[#5eddf2]", // DS-OK: cyan info (DS chart/info constant)
-  tool_result: "text-[#34d08c]", // DS-OK: status ok
-  web_search: "text-[#9d4edd]", // DS-OK: violet info (DS chart/info constant)
-  web_search_result: "text-[#9d4edd]/80", // DS-OK: violet info (DS chart/info constant)
-  assistant: "text-[#5eddf2]/80", // DS-OK: cyan info (DS chart/info constant)
+  error: "text-[var(--status-bad)]", // DS-OK: status bad
+  tool_error: "text-[var(--status-bad)]", // DS-OK: status bad
+  system: "text-[var(--status-warn)]", // DS-OK: status warn
+  tool_call: "text-[var(--status-info)]", // DS-OK: cyan info (DS chart/info constant)
+  tool_result: "text-[var(--status-ok)]", // DS-OK: status ok
+  web_search: "text-[var(--status-info-2)]", // DS-OK: violet info (DS chart/info constant)
+  web_search_result: "text-[var(--status-info-2)]/80", // DS-OK: violet info (DS chart/info constant)
+  assistant: "text-[var(--status-info)]/80", // DS-OK: cyan info (DS chart/info constant)
 };
 
 function getStatusBadge(status: string) {

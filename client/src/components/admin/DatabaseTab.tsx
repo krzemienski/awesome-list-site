@@ -236,7 +236,7 @@ export default function DatabaseTab({ stats }: DatabaseTabProps) {
           {seedDatabaseMutation.isSuccess && seedDatabaseMutation.data && (
             <Alert className="admin-ops-database__seed-result">
               {/* DS-OK: global semantic status color for a completed seed result. */}
-              <CheckCircle2 className="h-4 w-4 text-[#34d08c]" />
+              <CheckCircle2 className="h-4 w-4 text-[var(--status-ok)]" />
               <AlertTitle className="flex flex-wrap items-center gap-2">
                 Seeding Completed Successfully
                 <StatusChip status="Completed" />

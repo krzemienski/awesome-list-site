@@ -50,7 +50,7 @@
   --color-chart-2: var(--status-ok);
   --color-chart-3: var(--status-info); /* fixed chart-series hue: the global status-info token, never the active accent */
   --color-chart-4: var(--status-warn);
-  --color-chart-5: #9d4edd; /* DS-OK: fixed chart-series hue — the DS violet accent swatch (ACCENTS.violet.primary in /ds/design-system.js); series colors must not follow the active accent */
+  --color-chart-5: var(--status-info-2); /* fixed chart-series hue; series colors must not follow the active accent */
   --color-sidebar: var(--bg);
   --color-sidebar-foreground: var(--text);
   --color-sidebar-primary: var(--accent);
@@ -237,16 +237,16 @@ vite-plugin-checker-error-overlay {
       filled cards no longer spill into near-blank orphan trailing pages (R4-070).
 */
 @media print {
-  /* DS-OK: intentional — print media is fixed paint (white paper, black ink,
-     neutral #bbb rules) and never participates in the five-system theme. */
+  /* Print is fixed paper paint, outside the five-system theme: the CSS system
+     colors Canvas / CanvasText / GrayText are the paper, ink and neutral rule. */
   /* White page, full-opacity black readable text everywhere. */
   html,
   body,
   #root,
   main,
   [role="main"] {
-    background: #fff !important;
-    color: #000 !important;
+    background: Canvas !important;
+    color: CanvasText !important;
   }
 
   /* Neutralise dark surfaces/shadows and kill sub-1 opacity so nothing prints
@@ -259,10 +259,10 @@ vite-plugin-checker-error-overlay {
     background-image: none !important;
     box-shadow: none !important;
     text-shadow: none !important;
-    color: #000 !important;
+    color: CanvasText !important;
     opacity: 1 !important;
     filter: none !important;
-    border-color: #bbb !important;
+    border-color: GrayText !important;
   }
 
   /* Hide ALL interactive chrome for a content-only printout (R4-039):
@@ -369,14 +369,14 @@ vite-plugin-checker-error-overlay {
   [role="main"],
   article,
   .prose {
-    color: #000 !important;
+    color: CanvasText !important;
   }
 
   /* Links stay readable as plain underlined text. The href expansion is dropped
      (R4-038): as inline pseudo-content it overlapped titles and was clipped at
      the card edge. */
   a {
-    color: #000 !important;
+    color: CanvasText !important;
     text-decoration: underline;
   }
   a[href]::after {

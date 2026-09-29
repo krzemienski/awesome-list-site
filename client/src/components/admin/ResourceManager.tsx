@@ -139,9 +139,9 @@ const normalizeAdminResourcesResponse = (
  * Tailwind palette classes.
  */
 const STATUS_OPTIONS = [
-  { value: "approved", label: "Approved", color: "bg-[#34d08c] text-black" }, // DS-OK: status ok
-  { value: "pending", label: "Pending", color: "bg-[#ffb84d] text-black" }, // DS-OK: status warn
-  { value: "rejected", label: "Rejected", color: "bg-[#ff5c7a] text-black" } // DS-OK: status bad
+  { value: "approved", label: "Approved", color: "bg-[var(--status-ok)] text-black" }, // DS-OK: status ok
+  { value: "pending", label: "Pending", color: "bg-[var(--status-warn)] text-black" }, // DS-OK: status warn
+  { value: "rejected", label: "Rejected", color: "bg-[var(--status-bad)] text-black" } // DS-OK: status bad
 ];
 
 export default function ResourceManager() {
@@ -1118,7 +1118,7 @@ export default function ResourceManager() {
                   <Button
                     size="sm"
                     variant="outline"
-                    className={"bg-[#34d08c]/10 hover:bg-[#34d08c]/20 border-[#34d08c]/30 text-[#34d08c]" /* DS-OK: status ok */}
+                    className={"bg-[var(--status-ok)]/10 hover:bg-[var(--status-ok)]/20 border-[var(--status-ok)]/30 text-[var(--status-ok)]" /* DS-OK: status ok */}
                     onClick={handleBulkApprove}
                     disabled={bulkApproveMutation.isPending}
                     data-testid="button-bulk-approve"
@@ -1129,7 +1129,7 @@ export default function ResourceManager() {
                   <Button
                     size="sm"
                     variant="outline"
-                    className={"bg-[#ffb84d]/10 hover:bg-[#ffb84d]/20 border-[#ffb84d]/30 text-[#ffb84d]" /* DS-OK: status warn */}
+                    className={"bg-[var(--status-warn)]/10 hover:bg-[var(--status-warn)]/20 border-[var(--status-warn)]/30 text-[var(--status-warn)]" /* DS-OK: status warn */}
                     onClick={handleBulkReject}
                     disabled={bulkRejectMutation.isPending}
                     data-testid="button-bulk-reject"
@@ -1140,7 +1140,7 @@ export default function ResourceManager() {
                   <Button
                     size="sm"
                     variant="outline"
-                    className={"bg-[#ff5c7a]/10 hover:bg-[#ff5c7a]/20 border-[#ff5c7a]/30 text-[#ff5c7a]" /* DS-OK: status bad */}
+                    className={"bg-[var(--status-bad)]/10 hover:bg-[var(--status-bad)]/20 border-[var(--status-bad)]/30 text-[var(--status-bad)]" /* DS-OK: status bad */}
                     onClick={handleBulkDelete}
                     disabled={bulkDeleteMutation.isPending}
                     data-testid="button-bulk-delete"
@@ -1194,7 +1194,7 @@ export default function ResourceManager() {
                 <Button
                   onClick={confirmBulkReject}
                   disabled={rejectReason.trim().length < 10}
-                  className={"bg-[#ffb84d] text-black hover:bg-[#ffb84d]/90" /* DS-OK: status warn */}
+                  className={"bg-[var(--status-warn)] text-black hover:bg-[var(--status-warn)]/90" /* DS-OK: status warn */}
                 >
                   Confirm Rejection
                 </Button>
@@ -1217,7 +1217,7 @@ export default function ResourceManager() {
                 <AlertDialogCancel data-testid="button-bulk-approve-cancel">Cancel</AlertDialogCancel>
                 <AlertDialogAction
                   onClick={confirmBulkApprove}
-                  className={"bg-[#34d08c] text-black hover:bg-[#34d08c]/90" /* DS-OK: status ok */}
+                  className={"bg-[var(--status-ok)] text-black hover:bg-[var(--status-ok)]/90" /* DS-OK: status ok */}
                   data-testid="button-bulk-approve-confirm"
                 >
                   Approve {selectedResourceIds.length}
@@ -1958,7 +1958,7 @@ export default function ResourceManager() {
       <AlertDialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
         <AlertDialogContent className="bg-[var(--bg-2)] border-[var(--border)]">
           <AlertDialogHeader>
-            <AlertDialogTitle className={"text-[#ff5c7a]" /* DS-OK: status bad */}>Delete Resource</AlertDialogTitle>
+            <AlertDialogTitle className={"text-[var(--status-bad)]" /* DS-OK: status bad */}>Delete Resource</AlertDialogTitle>
             <AlertDialogDescription>
               Are you sure you want to delete <strong className="text-white">"{selectedResource?.title}"</strong>? 
               This action cannot be undone.
@@ -1968,7 +1968,7 @@ export default function ResourceManager() {
             <AlertDialogCancel>Cancel</AlertDialogCancel>
             <AlertDialogAction
               onClick={handleDelete}
-              className={"bg-[#ff5c7a] text-black hover:bg-[#ff5c7a]/90" /* DS-OK: status bad */}
+              className={"bg-[var(--status-bad)] text-black hover:bg-[var(--status-bad)]/90" /* DS-OK: status bad */}
               data-testid="button-confirm-delete"
             >
               {deleteMutation.isPending ? "Deleting..." : "Delete"}

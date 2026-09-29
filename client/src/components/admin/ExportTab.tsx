@@ -545,9 +545,9 @@ export default function ExportTab({ validationStatus: propValidationStatus }: Ex
               <div className="admin-ops-validation-summary">
                 {/* DS-OK: global semantic status colors for validation outcomes. */}
                 {validationStatus.awesomeLint.valid ? (
-                  <CheckCircle2 className="h-4 w-4 text-[#34d08c]" aria-hidden="true" />
+                  <CheckCircle2 className="h-4 w-4 text-[var(--status-ok)]" aria-hidden="true" />
                 ) : (
-                  <XCircle className="h-4 w-4 text-[#ff5c7a]" aria-hidden="true" />
+                  <XCircle className="h-4 w-4 text-[var(--status-bad)]" aria-hidden="true" />
                 )}
                 <span className="admin-ops-validation-meta">
                   {validationStatus.awesomeLint.stats.totalResources} resources,{" "}
@@ -661,7 +661,7 @@ export default function ExportTab({ validationStatus: propValidationStatus }: Ex
                 validationStatus.linkCheck.brokenResources.length > 0 && (
                   <div className="space-y-2">
                     {/* DS-OK: global semantic status color for broken-link headings. */}
-                    <h3 className="text-sm font-semibold text-[#ff5c7a]">
+                    <h3 className="text-sm font-semibold text-[var(--status-bad)]">
                       Broken links ({validationStatus.linkCheck.brokenResources.length})
                     </h3>
                     <ScrollArea className="admin-ops-validation-list admin-ops-validation-list--bad h-64">
@@ -670,14 +670,14 @@ export default function ExportTab({ validationStatus: propValidationStatus }: Ex
                           <div key={i} className="border-b border-[var(--border)] pb-3 last:border-0">
                             <div className="flex items-start gap-2">
                               {/* DS-OK: global semantic status color for broken-link icons. */}
-                              <XCircle className="mt-0.5 h-4 w-4 shrink-0 text-[#ff5c7a]" />
+                              <XCircle className="mt-0.5 h-4 w-4 shrink-0 text-[var(--status-bad)]" />
                               <div className="min-w-0 flex-1">
                                 <div className="text-sm font-semibold text-[var(--text)]">
                                   {link.resourceTitle ?? "Unknown Resource"}
                                 </div>
                                 <div className="break-all font-mono text-xs text-[var(--text-2)]">{link.url}</div>
                                 {/* DS-OK: global semantic status color for broken-link messages. */}
-                                <div className="mt-1 flex flex-wrap items-center gap-2 text-xs text-[#ff5c7a]">
+                                <div className="mt-1 flex flex-wrap items-center gap-2 text-xs text-[var(--status-bad)]">
                                   <StatusChip status={link.status >= 500 ? "Failed" : "Warning"} />
                                   <span>
                                     {link.status} {link.statusText}

@@ -880,7 +880,7 @@ export default function ExportTools({ awesomeList, selectedCategory, className, 
         {/* Export Summary */}
         <div className="p-4 bg-muted">
           <div className="flex items-center gap-2 mb-2">
-            <CheckCircle className="h-4 w-4 text-[#34d08c]" />{/* DS-OK: status ok */}
+            <CheckCircle className="h-4 w-4 text-[var(--status-ok)]" />{/* DS-OK: status ok */}
             <span className="text-sm font-medium">Export Summary</span>
           </div>
           <div className="text-sm text-muted-foreground space-y-1">

@@ -128,9 +128,9 @@
 
 /* DS-OK: global semantic status constants, not theme decoration. */
 .admin-ops-status-chip--ok {
-  background: color-mix(in srgb, #34d08c 8%, transparent);
-  border-color: color-mix(in srgb, #34d08c 30%, transparent);
-  color: #34d08c;
+  background: color-mix(in srgb, var(--status-ok) 8%, transparent);
+  border-color: color-mix(in srgb, var(--status-ok) 30%, transparent);
+  color: var(--status-ok);
 }
 
 .admin-ops-status-chip--accent {
@@ -141,16 +141,16 @@
 
 .admin-ops-status-chip--warn {
   /* DS-OK: global semantic WARN status color. */
-  background: color-mix(in srgb, #ffb84d 8%, transparent);
-  border-color: color-mix(in srgb, #ffb84d 30%, transparent);
-  color: #ffb84d;
+  background: color-mix(in srgb, var(--status-warn) 8%, transparent);
+  border-color: color-mix(in srgb, var(--status-warn) 30%, transparent);
+  color: var(--status-warn);
 }
 
 .admin-ops-status-chip--bad {
   /* DS-OK: global semantic BAD status color. */
-  background: color-mix(in srgb, #ff5c7a 8%, transparent);
-  border-color: color-mix(in srgb, #ff5c7a 30%, transparent);
-  color: #ff5c7a;
+  background: color-mix(in srgb, var(--status-bad) 8%, transparent);
+  border-color: color-mix(in srgb, var(--status-bad) 30%, transparent);
+  color: var(--status-bad);
 }
 
 .admin-ops-status-chip--muted {

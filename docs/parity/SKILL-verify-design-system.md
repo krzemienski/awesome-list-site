@@ -533,37 +533,45 @@ PASS needs ≥1 token sheet delivered by a `<link rel="stylesheet">` (non-null `
 
 **Stage 4 (chrome).** Part I's two expressions, verbatim, on every key screen.
 
-**Stage 5 (hardcoded values).** Part I's `rg … src/` mapped to the running dev server. Vite serves every source module's original text at `<url>?raw` as `export default "…"`. Evaluate in-page on the dev server, after visiting the screen so its modules are loaded:
+**Stage 5 (hardcoded values).** Part I's `rg … src/` becomes a scan of the running dev server's source modules. Vite serves every source module's original text at `<url>?raw`. Part I scans `src/`, so the scope is the modules under `/src/` that the screen loads, plus the `@import`s they pull in that also resolve under `/src/`. Bare package imports (such as `tailwindcss/...`) and imports resolving outside `src/` are outside Part I's `rg … src/` scope; list them as out of scope. Visit the screen, then evaluate:
   ```js
   async () => {
     const mods = [...new Set(performance.getEntriesByType('resource').map(e => e.name.split('?')[0])
       .filter(u => /\/src\/.+\.(css|tsx|ts|jsx)$/.test(u)))];
-    // `?raw` answers either `export default "<json string>"` (CSS) or the plain source text (TS/TSX).
+    // `?raw` answers either `export default <JS string literal>` or the plain source text.
+    const unquote = lit => lit.slice(1, -1).replace(/\\(u[0-9a-fA-F]{4}|x[0-9a-fA-F]{2}|[\s\S])/g, (m, e) =>
+      /^[ux]/.test(e) ? String.fromCharCode(parseInt(e.slice(1), 16)) : ({ n: '\n', t: '\t', r: '\r', b: '\b', f: '\f', v: '\v', '0': '\0' }[e] ?? e));
     const getRaw = async u => { const r = await fetch(u + '?raw'); if (!r.ok) throw new Error(r.status); const t = await r.text();
-      const m = t.match(/^export default ("(?:[^"\\]|\\.)*")/); return m ? JSON.parse(m[1]) : t; };
+      if (/^\s*<!doctype html/i.test(t)) throw new Error('not a source module');
+      const m = t.match(/^export default ([\s\S]*?);?\s*$/); if (m && /^["']/.test(m[1])) return unquote(m[1].trim()); return t; };
     const skip = u => /design-systems?\.(css|js)$/.test(u) || u.includes('/public/ds/');
-    const CSS = [/#[0-9a-fA-F]{3,8}\b/, /border(-radius)?:\s*\d+px/, /font-family:\s*['"]/];
-    const TSX = [/style=\{?\{[^}]*#[0-9a-fA-F]{3,6}/, /color:\s*['"]#[0-9a-fA-F]{3,6}/, /(['"`\[]|\s)#[0-9a-fA-F]{3,8}\b/];
-    const seen = new Set(), queue = [...mods], hits = [], files = [];
+    const inScope = u => new URL(u).pathname.startsWith('/src/');
+    const CSS = [/#[0-9a-fA-F]{3,8}\b/, /border(-radius)?:\s*\d+px/, /font-family:\s*['"]/];                 // Part I, CSS
+    const TSX = [/style=\{?\{[^}]*#[0-9a-fA-F]{3,6}/, /color:\s*['"]#[0-9a-fA-F]{3,6}/,                     // Part I, JSX
+                 /['"`]#(?:[0-9a-fA-F]{3,4}|[0-9a-fA-F]{6}|[0-9a-fA-F]{8})['"`]|\[#[0-9a-fA-F]{3,8}\]/];    // any hex color literal / Tailwind arbitrary value
+    const isComment = l => /^\s*(\/\/|\/?\*)/.test(l);
+    const seen = new Set(), queue = [...mods], hits = [], files = [], outOfScope = [];
     while (queue.length) { const u = queue.shift(); if (seen.has(u) || skip(u)) continue; seen.add(u);
-      let src; try { src = await getRaw(u); } catch { files.push({ u, error: 'unreadable' }); continue; }
+      if (!inScope(u)) { outOfScope.push(u); continue; }
+      let src; try { src = await getRaw(u); } catch (e) { files.push({ u, error: String(e) }); continue; }
       const isCss = u.endsWith('.css'); files.push({ u, lines: src.split('\n').length });
-      if (isCss) for (const m of src.matchAll(/@import\s+["']([^"']+\.css)["']/g)) queue.push(new URL(m[1], u).href.split('?')[0]);
+      if (isCss) for (const m of src.matchAll(/@import\s+["']([^"']+\.css)["']/g)) {
+        if (!/^[./]/.test(m[1])) { outOfScope.push(m[1] + ' (package import)'); continue; }
+        queue.push(new URL(m[1], u).href.split('?')[0]); }
       let inSkin = 0; const lines = src.split('\n');
       lines.forEach((line, i) => {
         if (isCss && /\[data-system=/.test(line)) inSkin = 1;               // skin rule: exempt until its block closes
         const exempt = inSkin || /DS-OK/.test(line) || /DS-OK/.test(lines[i - 1] || '');
+        if (!isCss && isComment(line)) return;                              // a comment is not a value
         for (const re of (isCss ? CSS : TSX)) if (re.test(line)) hits.push({ file: u.replace(location.origin, ''), line: i + 1, rule: String(re), text: line.trim().slice(0, 160), exempt: !!exempt });
         if (inSkin && line.includes('}')) inSkin = 0;
       });
     }
-    return { files: files.length, unreadable: files.filter(f => f.error), hits };
+    return { files: files.length, unreadable: files.filter(f => f.error), outOfScope, hits };
   }
   ```
-  The script applies Part I's regexes line by line to each file's text (review every hit; `exempt:true` marks skin-block / `DS-OK` lines, which you still confirm by reading the line). `design-system.css` / `design-systems.js` (and `public/ds/*`) are excluded exactly as the `--glob` flags do.
-  - CSS: `#[0-9a-fA-F]{3,8}\b` · `border(-radius)?:\s*\d+px` · `font-family:\s*['"]`
-  - TSX/JSX: `style=\{?\{[^}]*#[0-9a-fA-F]{3,6}` · `color:\s*['"]#[0-9a-fA-F]{3,6}`. Also report any `#hex` color literal elsewhere in component source (for example Tailwind arbitrary values `bg-[#…]`) as a Stage 5 finding, because Part I's rule is "every hex code … is a violation" and the `rg` lines are how to find them.
-  - Also scan the served entry HTML (`fetch('/')` text) for inline-style hex.
+  CSS comments are scanned, because a CSS comment line rarely holds a color by accident. Review every hit. `exempt:true` marks skin-block or `DS-OK` lines; confirm each by reading the line. `unreadable` must be empty. If it isn't, report which modules could not be scanned under Stage 5 as NOT RUNNABLE for those files.
+  Part I's "inline styles in … HTML" line: also fetch the served entry document (`fetch('/')` text) and apply `style="[^"]*#[0-9a-fA-F]{3,8}` and `color:\s*#[0-9a-fA-F]{3,8}` to it.
   Apply Part I's "Acceptable hardcoded values" list and `/* DS-OK: intentional */` escapes exactly. For each finding report file (`/src/...` path), line number, and the suggested token from Part I's table.
   In a production panel, run the same scan on the dev server at the same commit. Confirm the commit by comparing the served `/ds/design-system.css` bytes (sha-256 via `crypto.subtle`) and the page's build revision on both servers. The production bundle's CSS is minified and has lost its comments, so it cannot carry `DS-OK` escapes.
 

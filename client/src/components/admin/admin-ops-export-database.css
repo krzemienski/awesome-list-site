@@ -208,17 +208,17 @@
 
 .admin-ops-validation-count--ok strong {
   /* DS-OK: global semantic OK status color. */
-  color: #34d08c;
+  color: var(--status-ok);
 }
 
 .admin-ops-validation-count--warn strong {
   /* DS-OK: global semantic WARN status color. */
-  color: #ffb84d;
+  color: var(--status-warn);
 }
 
 .admin-ops-validation-count--bad strong {
   /* DS-OK: global semantic BAD status color. */
-  color: #ff5c7a;
+  color: var(--status-bad);
 }
 
 .admin-ops-validation-count span {
@@ -247,12 +247,12 @@
 
 .admin-ops-validation-expander--bad {
   /* DS-OK: global semantic BAD status color. */
-  color: #ff5c7a;
+  color: var(--status-bad);
 }
 
 .admin-ops-validation-expander--warn {
   /* DS-OK: global semantic WARN status color. */
-  color: #ffb84d;
+  color: var(--status-warn);
 }
 
 .admin-ops-validation-list {
@@ -263,12 +263,12 @@
 
 .admin-ops-validation-list--bad {
   /* DS-OK: global semantic BAD status color. */
-  border: var(--hairline-w) solid color-mix(in srgb, #ff5c7a 20%, transparent);
+  border: var(--hairline-w) solid color-mix(in srgb, var(--status-bad) 20%, transparent);
 }
 
 .admin-ops-validation-list--warn {
   /* DS-OK: global semantic WARN status color. */
-  border: var(--hairline-w) solid color-mix(in srgb, #ffb84d 20%, transparent);
+  border: var(--hairline-w) solid color-mix(in srgb, var(--status-warn) 20%, transparent);
 }
 
 .admin-ops-validation-group {
@@ -288,12 +288,12 @@
 
 .admin-ops-validation-group__heading--bad {
   /* DS-OK: global semantic BAD status color. */
-  color: #ff5c7a;
+  color: var(--status-bad);
 }
 
 .admin-ops-validation-group__heading--warn {
   /* DS-OK: global semantic WARN status color. */
-  color: #ffb84d;
+  color: var(--status-warn);
 }
 
 .admin-ops-validation-group__items {
@@ -363,7 +363,7 @@
 
 .admin-ops-table__error {
   /* DS-OK: global semantic BAD status color. */
-  color: #ff5c7a;
+  color: var(--status-bad);
 }
 
 .admin-ops-table__actions {
@@ -435,14 +435,14 @@
 
 .admin-ops-database__seed-result {
   /* DS-OK: global semantic OK status color. */
-  border: var(--hairline-w) solid color-mix(in srgb, #34d08c 20%, transparent);
-  background: color-mix(in srgb, #34d08c 5%, transparent);
+  border: var(--hairline-w) solid color-mix(in srgb, var(--status-ok) 20%, transparent);
+  background: color-mix(in srgb, var(--status-ok) 5%, transparent);
   padding: 1rem;
 }
 
 .admin-ops-database__seed-result h3 {
   /* DS-OK: global semantic OK status color. */
-  color: #34d08c;
+  color: var(--status-ok);
   font-size: 0.8125rem;
   font-weight: 600;
 }
@@ -472,7 +472,7 @@
 
 .admin-ops-database__seed-result dd.admin-ops-database__seed-errors {
   /* DS-OK: global semantic WARN status color. */
-  color: #ffb84d;
+  color: var(--status-warn);
 }
 
 .admin-ops-database__unsupported {

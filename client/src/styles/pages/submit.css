@@ -155,8 +155,8 @@
 }
 
 .submit-control[aria-invalid="true"] {
-  border-color: #ff5c7a; /* DS-OK: status bad */
-  box-shadow: 0 0 0 1px #ff5c7a; /* DS-OK: status bad */
+  border-color: var(--status-bad); /* DS-OK: status bad */
+  box-shadow: 0 0 0 1px var(--status-bad); /* DS-OK: status bad */
 }
 
 .submit-control::placeholder {
@@ -180,7 +180,7 @@
 
 .submit-error {
   margin: 0;
-  color: #ff5c7a; /* DS-OK: status bad */
+  color: var(--status-bad); /* DS-OK: status bad */
   font-size: 12px;
   font-weight: 500;
   line-height: 1.4;
@@ -314,23 +314,23 @@
 }
 
 .submit-login-alert {
-  border-color: color-mix(in srgb, #ffb84d 50%, var(--border)); /* DS-OK: status warn */
-  background: color-mix(in srgb, #ffb84d 10%, transparent); /* DS-OK: status warn */
+  border-color: color-mix(in srgb, var(--status-warn) 50%, var(--border)); /* DS-OK: status warn */
+  background: color-mix(in srgb, var(--status-warn) 10%, transparent); /* DS-OK: status warn */
 }
 
 .submit-login-alert .submit-alert-icon,
 .submit-login-alert h5 {
-  color: #ffb84d; /* DS-OK: status warn */
+  color: var(--status-warn); /* DS-OK: status warn */
 }
 
 .submit-inline-alert {
-  border-color: color-mix(in srgb, #ffb84d 50%, var(--border)); /* DS-OK: status warn */
-  background: color-mix(in srgb, #ffb84d 10%, transparent); /* DS-OK: status warn */
+  border-color: color-mix(in srgb, var(--status-warn) 50%, var(--border)); /* DS-OK: status warn */
+  background: color-mix(in srgb, var(--status-warn) 10%, transparent); /* DS-OK: status warn */
 }
 
 .submit-inline-alert .submit-alert-icon,
 .submit-inline-alert h5 {
-  color: #ffb84d; /* DS-OK: status warn */
+  color: var(--status-warn); /* DS-OK: status warn */
 }
 
 .submit-inline-alert > div > span {
@@ -342,13 +342,13 @@
 
 .submit-success-card {
   margin-bottom: 24px;
-  border-color: color-mix(in srgb, #34d08c 20%, var(--border)); /* DS-OK: status ok */
-  background: color-mix(in srgb, #34d08c 5%, transparent); /* DS-OK: status ok */
+  border-color: color-mix(in srgb, var(--status-ok) 20%, var(--border)); /* DS-OK: status ok */
+  background: color-mix(in srgb, var(--status-ok) 5%, transparent); /* DS-OK: status ok */
   box-shadow: none;
 }
 
 .submit-success-card:hover {
-  border-color: color-mix(in srgb, #34d08c 20%, var(--border)); /* DS-OK: status ok */
+  border-color: color-mix(in srgb, var(--status-ok) 20%, var(--border)); /* DS-OK: status ok */
 }
 
 .submit-success-header {
@@ -365,12 +365,12 @@
   width: 24px;
   height: 24px;
   flex: 0 0 auto;
-  color: #34d08c; /* DS-OK: status ok */
+  color: var(--status-ok); /* DS-OK: status ok */
 }
 
 .submit-success-heading h2,
 .submit-success-heading [class*="text-2xl"] {
-  color: #34d08c; /* DS-OK: status ok */
+  color: var(--status-ok); /* DS-OK: status ok */
 }
 
 .submit-success-content {
@@ -379,7 +379,7 @@
   justify-content: space-between;
   gap: 12px;
   padding: 16px 22px 20px;
-  border-top: var(--border-w) solid color-mix(in srgb, #34d08c 20%, var(--border)); /* DS-OK: status ok */
+  border-top: var(--border-w) solid color-mix(in srgb, var(--status-ok) 20%, var(--border)); /* DS-OK: status ok */
 }
 
 .submit-success-content p {

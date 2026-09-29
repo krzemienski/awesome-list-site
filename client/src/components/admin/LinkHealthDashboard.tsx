@@ -54,21 +54,21 @@ interface BrokenLinksResponse {
 
 /**
  * Link-health colors use the global DS status constants:
- * DS-OK: #34d08c ok / #ffb84d warn / #ff5c7a bad / #5eddf2 info / #9d4edd info-2.
+ * DS-OK: var(--status-ok) ok / var(--status-warn) warn / var(--status-bad) bad / var(--status-info) info / var(--status-info-2) info-2.
  */
-const JOB_PROCESSING_CLASS = 'bg-[#5eddf2] text-black hover:bg-[#5eddf2]/90 animate-pulse'; // DS-OK: cyan info (DS chart/info constant)
-const JOB_COMPLETED_CLASS = 'bg-[#34d08c] text-black hover:bg-[#34d08c]/90'; // DS-OK: status ok
-const JOB_FAILED_CLASS = 'bg-[#ff5c7a] text-black hover:bg-[#ff5c7a]/90'; // DS-OK: status bad
-const OK_TEXT_CLASS = 'text-[#34d08c]'; // DS-OK: status ok
-const WARN_TEXT_CLASS = 'text-[#ffb84d]'; // DS-OK: status warn
-const BAD_TEXT_CLASS = 'text-[#ff5c7a]'; // DS-OK: status bad
-const INFO_TEXT_CLASS = 'text-[#5eddf2]'; // DS-OK: cyan info (DS chart/info constant)
-const INFO2_TEXT_CLASS = 'text-[#9d4edd]'; // DS-OK: violet info (DS chart/info constant)
-const INFO_PANEL_CLASS = 'border-[#5eddf2]/20 bg-[#5eddf2]/5'; // DS-OK: cyan info (DS chart/info constant)
-const OK_OUTLINE_CLASS = 'border-[#34d08c] text-[#34d08c]'; // DS-OK: status ok
-const WARN_OUTLINE_CLASS = 'border-[#ffb84d] text-[#ffb84d]'; // DS-OK: status warn
-const BAD_OUTLINE_CLASS = 'border-[#ff5c7a] text-[#ff5c7a]'; // DS-OK: status bad
-const INFO2_OUTLINE_CLASS = 'border-[#9d4edd] text-[#9d4edd]'; // DS-OK: violet info (DS chart/info constant)
+const JOB_PROCESSING_CLASS = 'bg-[var(--status-info)] text-black hover:bg-[var(--status-info)]/90 animate-pulse'; // DS-OK: cyan info (DS chart/info constant)
+const JOB_COMPLETED_CLASS = 'bg-[var(--status-ok)] text-black hover:bg-[var(--status-ok)]/90'; // DS-OK: status ok
+const JOB_FAILED_CLASS = 'bg-[var(--status-bad)] text-black hover:bg-[var(--status-bad)]/90'; // DS-OK: status bad
+const OK_TEXT_CLASS = 'text-[var(--status-ok)]'; // DS-OK: status ok
+const WARN_TEXT_CLASS = 'text-[var(--status-warn)]'; // DS-OK: status warn
+const BAD_TEXT_CLASS = 'text-[var(--status-bad)]'; // DS-OK: status bad
+const INFO_TEXT_CLASS = 'text-[var(--status-info)]'; // DS-OK: cyan info (DS chart/info constant)
+const INFO2_TEXT_CLASS = 'text-[var(--status-info-2)]'; // DS-OK: violet info (DS chart/info constant)
+const INFO_PANEL_CLASS = 'border-[var(--status-info)]/20 bg-[var(--status-info)]/5'; // DS-OK: cyan info (DS chart/info constant)
+const OK_OUTLINE_CLASS = 'border-[var(--status-ok)] text-[var(--status-ok)]'; // DS-OK: status ok
+const WARN_OUTLINE_CLASS = 'border-[var(--status-warn)] text-[var(--status-warn)]'; // DS-OK: status warn
+const BAD_OUTLINE_CLASS = 'border-[var(--status-bad)] text-[var(--status-bad)]'; // DS-OK: status bad
+const INFO2_OUTLINE_CLASS = 'border-[var(--status-info-2)] text-[var(--status-info-2)]'; // DS-OK: violet info (DS chart/info constant)
 
 export default function LinkHealthDashboard() {
   const { toast } = useToast();

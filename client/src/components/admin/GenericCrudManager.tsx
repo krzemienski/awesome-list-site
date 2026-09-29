@@ -3349,7 +3349,7 @@ export default function GenericCrudManager<T extends BaseEntityWithCount>({
             <AlertDialogDescription>
               Are you sure you want to delete "{selectedItem?.name}"?
               {selectedItem && selectedItem.resourceCount > 0 && (
-                <span className={"block mt-2 text-[#ff5c7a] font-semibold" /* DS-OK: status bad */}>
+                <span className={"block mt-2 text-[var(--status-bad)] font-semibold" /* DS-OK: status bad */}>
                   This {entityName.toLowerCase()} has {selectedItem.resourceCount} resources and cannot be deleted.
                 </span>
               )}
@@ -3381,7 +3381,7 @@ export default function GenericCrudManager<T extends BaseEntityWithCount>({
                 <>
                   Are you sure you want to delete {deletableSelectedItems.length} {deletableSelectedItems.length === 1 ? entityName.toLowerCase() : entityNamePlural.toLowerCase()}?
                   {selectedWithResources.length > 0 && (
-                    <span className={"block mt-2 text-[#ffb84d]" /* DS-OK: status warn */}>
+                    <span className={"block mt-2 text-[var(--status-warn)]" /* DS-OK: status warn */}>
                       Note: {selectedWithResources.length} selected {selectedWithResources.length === 1 ? 'item has' : 'items have'} resources and will be skipped.
                     </span>
                   )}
@@ -3398,7 +3398,7 @@ export default function GenericCrudManager<T extends BaseEntityWithCount>({
                   </ul>
                 </>
               ) : (
-                <span className={"text-[#ffb84d]" /* DS-OK: status warn */}>
+                <span className={"text-[var(--status-warn)]" /* DS-OK: status warn */}>
                   None of the selected items can be deleted because they all have associated resources.
                 </span>
               )}
@@ -3481,14 +3481,14 @@ export default function GenericCrudManager<T extends BaseEntityWithCount>({
                               View changes
                             </summary>
                             <div className="mt-2 grid grid-cols-2 gap-2 text-xs">
-                              <div className={"bg-[#ff5c7a]/10 rounded p-2" /* DS-OK: status bad */}>
-                                <span className={"font-medium text-[#ff5c7a]" /* DS-OK: status bad */}>Before:</span>
+                              <div className={"bg-[var(--status-bad)]/10 rounded p-2" /* DS-OK: status bad */}>
+                                <span className={"font-medium text-[var(--status-bad)]" /* DS-OK: status bad */}>Before:</span>
                                 <pre className="mt-1 whitespace-pre-wrap break-all text-muted-foreground max-h-32 overflow-y-auto">
                                   {JSON.stringify(entry.previousData, null, 2)}
                                 </pre>
                               </div>
-                              <div className={"bg-[#34d08c]/10 rounded p-2" /* DS-OK: status ok */}>
-                                <span className={"font-medium text-[#34d08c]" /* DS-OK: status ok */}>After:</span>
+                              <div className={"bg-[var(--status-ok)]/10 rounded p-2" /* DS-OK: status ok */}>
+                                <span className={"font-medium text-[var(--status-ok)]" /* DS-OK: status ok */}>After:</span>
                                 <pre className="mt-1 whitespace-pre-wrap break-all text-muted-foreground max-h-32 overflow-y-auto">
                                   {JSON.stringify(entry.newData, null, 2)}
                                 </pre>
@@ -3501,7 +3501,7 @@ export default function GenericCrudManager<T extends BaseEntityWithCount>({
                             <summary className="text-xs text-muted-foreground cursor-pointer hover:text-foreground">
                               View created data
                             </summary>
-                            <div className={"mt-2 bg-[#34d08c]/10 rounded p-2 text-xs" /* DS-OK: status ok */}>
+                            <div className={"mt-2 bg-[var(--status-ok)]/10 rounded p-2 text-xs" /* DS-OK: status ok */}>
                               <pre className="whitespace-pre-wrap break-all text-muted-foreground max-h-32 overflow-y-auto">
                                 {JSON.stringify(entry.newData, null, 2)}
                               </pre>
@@ -3513,7 +3513,7 @@ export default function GenericCrudManager<T extends BaseEntityWithCount>({
                             <summary className="text-xs text-muted-foreground cursor-pointer hover:text-foreground">
                               View deleted data
                             </summary>
-                            <div className={"mt-2 bg-[#ff5c7a]/10 rounded p-2 text-xs" /* DS-OK: status bad */}>
+                            <div className={"mt-2 bg-[var(--status-bad)]/10 rounded p-2 text-xs" /* DS-OK: status bad */}>
                               <pre className="whitespace-pre-wrap break-all text-muted-foreground max-h-32 overflow-y-auto">
                                 {JSON.stringify(entry.previousData, null, 2)}
                               </pre>
