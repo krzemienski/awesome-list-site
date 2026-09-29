@@ -145,6 +145,10 @@ repomix-output.xml
 # OUTPUT-MANIFEST.json record their hashes; only the accepted captures are committed.
 tests/parity/baseline/**/*.attempt-*.png
 tests/parity/baseline/**/*.repeat.png
+# New baseline run directories written by tests/parity/runner.mjs stay local
+# (root-anchored; files already tracked from earlier commits remain tracked).
+# Untracked runs reached 1.7 GB / 7,400 PNGs and made every checkpoint commit fail.
+/tests/parity/baseline/*/
 tests/parity/actual/*.attempt-*.png
 tests/parity/actual/*.repeat.png
 tests/parity/expected/*.attempt-*.png

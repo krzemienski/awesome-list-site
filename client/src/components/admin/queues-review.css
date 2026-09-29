@@ -58,12 +58,12 @@
 }
 
 .queue-review-actions button {
-  min-height: 2rem;
+  min-height: 44px;
 }
 
 .queue-review-actions .btn {
   line-height: normal;
-  min-height: 0;
+  min-height: 44px;
 }
 
 .queue-review-actions .btn:disabled {
@@ -136,6 +136,7 @@
   border-collapse: collapse;
   font-family: var(--font-body);
   font-size: 13px;
+  min-inline-size: 0;
   width: 100%;
 }
 

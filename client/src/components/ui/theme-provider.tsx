@@ -72,6 +72,26 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
     applyDesignSystem(systemId, accentId);
   }, [systemId, accentId]);
 
+  // The public switch API (`window.applyDesignSystem`) writes the <html>
+  // attributes directly, and `storage` events never fire in the document that
+  // wrote them, so the provider (and every selection UI reading it) would keep
+  // the previous system. Mirror the document's attributes back into state.
+  useEffect(() => {
+    const root = document.documentElement;
+    const syncFromDocument = () => {
+      const domSystem = root.getAttribute("data-system");
+      const domAccent = root.getAttribute("data-accent");
+      if (!domSystem || !domAccent) return;
+      const nextSystem = resolveSystemId(domSystem);
+      const nextAccent = resolveAccentId(domAccent, nextSystem);
+      setSystemId((prev) => (prev === nextSystem ? prev : nextSystem));
+      setAccentId((prev) => (prev === nextAccent ? prev : nextAccent));
+    };
+    const observer = new MutationObserver(syncFromDocument);
+    observer.observe(root, { attributes: true, attributeFilter: ["data-system", "data-accent"] });
+    return () => observer.disconnect();
+  }, []);
+
   useEffect(() => {
     let syncTimer: number | null = null;
 

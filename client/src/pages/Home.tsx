@@ -18,6 +18,7 @@ import {
 import SEOHead from "@/components/layout/SEOHead";
 import { useToast } from "@/hooks/use-toast";
 import { homeSeoTitle, homeSeoDescription } from "@shared/seo-templates";
+import { taxonomyScopeIntro } from "@shared/seo-content-templates";
 import { useAuth } from "@/hooks/useAuth";
 import { normalizeTag, parseTagsParam } from "@/lib/tags";
 import { writeFilterParams, usePopstateParams } from "@/lib/url-filter-state";
@@ -692,7 +693,12 @@ export default function Home({ nav, navLoading }: HomeProps) {
           slug: category.slug,
           count: category.count,
           icon: categoryIcon(category.name, category.slug),
-          description: category.teaser?.description,
+          description: taxonomyScopeIntro({
+            name: category.name,
+            level: "category",
+            totalResources: category.count,
+            childNames: category.subcategories.map((subcategory) => subcategory.name),
+          }),
           teaserTitle: category.teaser?.title,
           teaserDescription: category.teaser
             ? truncateAtWord(category.teaser.description, 110)

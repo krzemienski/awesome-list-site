@@ -436,7 +436,7 @@ const main = async () => {
           totalResources: catalog.adapter.AV_TOTAL,
         } : null,
         admin: adminBinding ? {
-          sha256: sha256(adminBinding.snapshotBytes),
+          sha256: sha256(adminBinding.fingerprintBytes),
           counts: adminBinding.counts,
         } : null,
         error: liveError,
@@ -513,6 +513,9 @@ const main = async () => {
             catalogEnd: endCatalogBinding ? sha256(endCatalogBinding.snapshotBytes) : null,
             adminStart: admin ? sha256(admin.snapshotBytes) : null,
             adminEnd: endAdmin ? sha256(endAdmin.snapshotBytes) : null,
+            // The governing comparison: the same reads minus the readiness probe's own timing.
+            adminFingerprintStart: admin ? sha256(admin.fingerprintBytes) : null,
+            adminFingerprintEnd: endAdmin ? sha256(endAdmin.fingerprintBytes) : null,
             error: liveAdapterError,
           },
         },
@@ -520,6 +523,7 @@ const main = async () => {
           startFingerprints: sha256(Buffer.from(JSON.stringify(startFingerprints))),
           endFingerprints: sha256(Buffer.from(JSON.stringify(endFingerprints))),
           inputsChangedDuringRun,
+          changedInputs: inputsChangedDuringRun ? changedFingerprintPaths(startFingerprints, endFingerprints) : [],
         },
         rows: determinism,
         identityTeardown: teardownOutcome,
@@ -785,10 +789,13 @@ const main = async () => {
             catalogEnd: endCatalogBinding ? sha256(endCatalogBinding.snapshotBytes) : null,
             adminStart: admin ? sha256(admin.snapshotBytes) : null,
             adminEnd: endAdmin ? sha256(endAdmin.snapshotBytes) : null,
+            // The governing comparison: the same reads minus the readiness probe's own timing.
+            adminFingerprintStart: admin ? sha256(admin.fingerprintBytes) : null,
+            adminFingerprintEnd: endAdmin ? sha256(endAdmin.fingerprintBytes) : null,
             error: liveAdapterError,
           },
         },
-        workspace: { startFingerprints: sha256(Buffer.from(JSON.stringify(startFingerprints))), endFingerprints: sha256(Buffer.from(JSON.stringify(endFingerprints))), inputsChangedDuringRun },
+        workspace: { startFingerprints: sha256(Buffer.from(JSON.stringify(startFingerprints))), endFingerprints: sha256(Buffer.from(JSON.stringify(endFingerprints))), inputsChangedDuringRun, changedInputs: inputsChangedDuringRun ? changedFingerprintPaths(startFingerprints, endFingerprints) : [] },
       },
       summary: { denominator: measured.length, pass, fail, incomplete, incompleteEvidence, fontGapOnlyFails: measured.filter((row) => row.status === "FAIL" && row.fontGap && row.comparison?.withinCeiling && row.backdropFilters?.match && row.identity?.ok !== false).length, blocked, evidence: rows.filter((row) => row.status === "EVIDENCE").length, unverified: rows.filter((row) => row.status === "UNVERIFIED").length, aliases: rows.filter((row) => row.status === "ALIAS").length },
       rows,
@@ -1260,6 +1267,7 @@ const captureRow = async (ctx, screen, width) => {
       actualCaptureStability: { stableAttempts: actualCapture.stableAttempts, attemptHashes: actualCapture.attemptHashes, discardedFrames: actualCapture.discardedFrames, apiTraffic: actualCapture.apiTraffic, reopenedAfterReload: reloads.actual },
       expectedCaptureStability: { stableAttempts: expectedCapture.stableAttempts, attemptHashes: expectedCapture.attemptHashes, discardedFrames: expectedCapture.discardedFrames, apiTraffic: expectedCapture.apiTraffic, reopenedAfterReload: reloads.expected },
       captureHashes: { actual: actualCapture.sha256, expected: expectedCapture.sha256 },
+      captureMethod: { actual: actualCapture.postprocessing, expected: expectedCapture.postprocessing },
       referenceReconciliation,
       referenceAdjustmentGeometry: await collectReferenceAdjustmentGeometry(sides.expected.page),
       fontsSettled: {
@@ -1424,6 +1432,19 @@ const serveSnapshot = async (served) => {
     server.listen(0, "127.0.0.1", resolve);
   });
   return server;
+};
+
+// Names every fingerprint leaf that differs between the start and end of a run
+// (e.g. "app/src/x.css", "liveAdapters.admin.sha256") so an "inputs changed"
+// verdict is diagnosable from the evidence instead of a bare boolean.
+const changedFingerprintPaths = (start, end, prefix = "") => {
+  if (start === end) return [];
+  const plain = (value) => value && typeof value === "object" && !Array.isArray(value);
+  if (!plain(start) || !plain(end)) return JSON.stringify(start) === JSON.stringify(end) ? [] : [prefix || "(root)"];
+  const keys = new Set([...Object.keys(start), ...Object.keys(end)]);
+  const out = [];
+  for (const key of keys) out.push(...changedFingerprintPaths(start[key], end[key], prefix ? `${prefix}.${key}` : key));
+  return out;
 };
 
 const walkHashes = async (directory, { include } = {}, prefix = "") => {

@@ -943,7 +943,7 @@ export default function ResourceDetail() {
                   target="_blank"
                   rel="noopener noreferrer"
                   onClick={handleVisitResource}
-                  className="text-primary hover:underline break-all flex items-center gap-2 text-sm md:text-base min-h-[32px]"
+                  className="text-foreground underline underline-offset-4 hover:opacity-80 break-all flex items-center gap-2 text-sm md:text-base min-h-[32px]"
                   data-testid="link-url"
                 >
                   {resource.url} ↗

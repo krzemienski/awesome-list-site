@@ -152,3 +152,18 @@
 - [Contract-over-reference residuals](contract-over-reference-residuals.md) — behaviour the contract requires but the prototype lacks: log its failing pixel rows the same pass; sr-only keeps crawler text.
 - [Skip-link route preservation](skip-link-route-preservation.md) — focus can land correctly while fragment routing switches pages; verify the current route and chapter remain intact too.
 - [Declared vs rendered font parity](font-declaration-vs-render-parity.md) — identical heading files can fail whole-document face parity when the canonical request adds a body family.
+- [Chromium capture ceiling](chromium-capture-ceiling.md) — full-page captures >16384px silently degrade on BOTH sides; tile + stitch, size the canvas to max(client, scroll widths).
+- [Run fingerprints vs live telemetry](run-fingerprint-live-telemetry.md) — project telemetry endpoints down to the fields the reference paints; drop counters only, never the whole endpoint.
+- [Evidence runner identity drift](evidence-runner-identity-drift.md) — assert demonstrator identity via the shared helper's exported constants, not a hard-coded name shape.
+- [Gates vs folded UI](gate-drift-from-folded-ui.md) — reveal every collapsed aria-expanded disclosure (never popups/tabs) before sweeping; folds hide selectors and new strays.
+- [SSR Clerk empty host](ssr-clerk-empty-host.md) — "Host must not be empty" = Clerk host-derived key at SSR module eval; resolve the explicit key, diagnose with a /tmp --ssr build only.
+- [fonts.check vs load](fonts-check-vs-load.md) — fonts.check() is false for loaded families with unused weights/subsets; prove with fonts.load() non-empty; prod prerenders .page before DS globals exist.
+- [Consensus audit panels](consensus-audit-panels.md) — blind auditors get skill+URL+private .cache dir only; dev panel then prod panel; save verdicts verbatim; waitForJob caps at 600 s.
+- [Reference adjustments → app lockstep](reference-adjustment-lockstep.md) — approved comparison-reference rules change EXPECTED only; port to app CSS same pass, check frozen JSX classes before calling accent drift, offsets fail all bands.
+- [Background shell subshell death](bash-long-jobs.md) — `( … ) &` inside a background ShellExec dies with the call; run the loop in the foreground of the background task, poll a log file.
+- [fonts.check probes weight 400 + capture rebuild](fonts-check-capture-rebuild.md) — check() is false until the 400 face loads; Playwright fullPage captures rebuild the FontFaceSet (unloaded) — warm on apply AND on resize.
+- [Verbatim skill Stage 6 vs shadcn hooks](verbatim-skill-vs-shadcn-hooks.md) — frozen skill's class predicate always FAILs this app (data-ds hooks by design); embedded file = design-zip skill, not the in-repo one — md5 both before a panel.
+- [awesome-ds-verify skill copies](awesome-ds-verify-skill-copies.md) — repo copy authoritative, mirror .local after edits; PASS needs --deep + auth env, non-deep full caps at INCOMPLETE; 404 page audited as rendered.
+- [Workspace recycles kill long runs](workspace-recycle-long-runs.md) — container restarts ~hourly (not OOM); logs in .cache/runlogs, sleep ≤270 + uptime check, cut panels are VOID and rerun under a new name.
+- [FontFaceSet rebuild + cold switch](fontfaceset-rebuild-on-stylesheet-insert.md) — late sheets drop warmed unused faces (rAF re-warm starves: use timer ladder + `loadingdone`); a same-tick check after a system switch races the first fetch → idle-prewarm every family in the canonical font link.
+- [Dialog-open locator race](dialog-open-locator-race.md) — a closing Radix sheet is still role=dialog; interaction sweeps must wait for `[role="dialog"][data-state="open"]` of the target, or a harness race reads as an app bug.

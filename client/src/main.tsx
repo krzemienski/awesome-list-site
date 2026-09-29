@@ -143,7 +143,7 @@ const initialRouteChunk = preloadInitialRouteChunk();
       overlay.id = "ssr-seo-hold";
       overlay.setAttribute(
         "style",
-        "position:fixed;inset:0;z-index:2147483000;background:#000;overflow:auto;overscroll-behavior:contain",
+        "position:fixed;inset:0;z-index:2147483000;background:var(--bg);overflow:auto;overscroll-behavior:contain",
       );
       // Move the scoped <style> siblings too, so the overlay keeps its styling.
       const nodes = Array.from(rootElement.childNodes);

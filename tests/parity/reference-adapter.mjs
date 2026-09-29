@@ -64,6 +64,24 @@ export async function buildCatalogAdapter(appBase, { frozenAt } = {}) {
     throw new Error("Approved public catalog snapshot is empty; refusing a blank or placeholder baseline");
   }
   const { byResourceId, reconciledPaths } = indexCatalogPaths(catalog, categories);
+  // The category page paints `cat.desc` as the collection introduction. The
+  // nav teaser is a single resource's teaser, not the category's own text, so
+  // binding it produced a data-identity mismatch (wrong prose on the expected
+  // side). Read the same public, credential-less listing introduction the
+  // application renders so both sides describe the same collection.
+  const categoryIntros = new Map(
+    await Promise.all(
+      categories.map(async (item) => {
+        const listing = await fetchJson(
+          `${appBase}/api/awesome-list/listing?level=category&slug=${encodeURIComponent(item.slug)}`,
+        );
+        if (typeof listing?.scopeIntro !== "string" || !listing.scopeIntro.trim()) {
+          throw new Error(`Category ${item.slug} has no public collection introduction; refusing a blank description`);
+        }
+        return [item.slug, listing.scopeIntro];
+      }),
+    ),
+  );
   const recentIds = new Set((home?.recent || []).map((item) => String(item.id)));
   const recentById = new Map((home?.recent || []).map((item) => [String(item.id), item]));
   const orderedResources = [
@@ -84,7 +102,7 @@ export async function buildCatalogAdapter(appBase, { frozenAt } = {}) {
       short: item.name,
       icon: null,
       count: recursiveCount(item),
-      desc: item.teaser?.description || "",
+      desc: categoryIntros.get(item.slug),
     })),
     AV_SUBCATEGORIES: Object.fromEntries(
       categories.map((item) => [
@@ -735,6 +753,7 @@ export async function buildAdminAdapter(fetchJson, frozenAtMs) {
       }
       : { available: false, status: Number(contactResponse?.status || 0), total: 0, submissions: [] },
   };
+  const snapshot = { stats, usersPage, resourcesPage, pending, audit, contactResponse, operations, catalog, nav, syncHistory, resourceEdits, enrichmentJobsBody, linkHealthStatus, linkHealthBroken, researcherJobsBody, overviewReads };
   return {
     globals,
     stats,
@@ -747,8 +766,38 @@ export async function buildAdminAdapter(fetchJson, frozenAtMs) {
     overviewHealth,
     researchNotes,
     endpoints: [...reads.keys()],
-    snapshotBytes: Buffer.from(JSON.stringify({ stats, usersPage, resourcesPage, pending, audit, contactResponse, operations, catalog, nav, syncHistory, resourceEdits, enrichmentJobsBody, linkHealthStatus, linkHealthBroken, researcherJobsBody, overviewReads })),
+    snapshotBytes: Buffer.from(JSON.stringify(snapshot)),
+    // Run-input fingerprint: the same reads minus `/api/admin/operations/health`.
+    // That endpoint is process telemetry — it re-probes the database on every
+    // call (`lastProbe.checkedAt`/`durationMs`) and its `telemetry.endpoints`
+    // request counters/averages advance with every request the run itself
+    // makes — so it differs between the start and end of every run by
+    // construction. Hashing it made every admin-identity run report "inputs
+    // changed during run" (and determinism mode exit 2) with no real input
+    // change. The painted snapshot keeps the read; only the fingerprint omits it.
+    fingerprintBytes: Buffer.from(JSON.stringify(stripLiveOperationsTelemetry(snapshot))),
   };
+}
+
+export function stripLiveOperationsTelemetry(snapshot) {
+  const { operations, ...overviewReads } = snapshot.overviewReads || {};
+  // Keep exactly the semantic readiness state the overview paints (see
+  // buildOverviewHealth: ok / status / lastProbe.ready+reason) so a
+  // ready→degraded transition mid-run still flips `inputsChangedDuringRun`.
+  // Only the per-request telemetry (probe timing, pool counters, request
+  // averages) is left out, because it differs on every call by construction.
+  const probe = operations?.body?.readiness?.lastProbe;
+  const semanticOperations = operations
+    ? {
+        ok: operations.ok,
+        status: operations.body?.status ?? null,
+        lastProbe: probe
+          ? { ready: probe.ready ?? null, reason: probe.reason ?? null, errorClass: probe.errorClass ?? null }
+          : null,
+        telemetry: "[per-request process telemetry excluded from the run-input fingerprint]",
+      }
+    : operations;
+  return { ...snapshot, overviewReads: { ...overviewReads, operations: semanticOperations } };
 }
 
 /**

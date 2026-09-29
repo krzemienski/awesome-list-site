@@ -32,6 +32,8 @@ import { chromium } from "playwright";
 import { AxeBuilder } from "@axe-core/playwright";
 import { launchBrowserWithLease } from "./validation/playwright-launch-lease.mjs";
 import {
+  DEMONSTRATOR_DISPLAY_NAME,
+  DEMONSTRATOR_FIRST_NAME,
   createDisposableAdmin,
   declineAnalyticsConsentViaUi,
   identityAvailability,
@@ -627,8 +629,14 @@ async function interactionSweep(page, system, accent, report, onCell) {
     await page.keyboard.press("Control+K");
     // The palette chunk is lazy-loaded on first trigger (MainLayout keeps only
     // the keydown handler in the eager shell), so wait for the dialog rather
-    // than sampling visibility synchronously after the keypress.
-    const paletteDialog = page.locator('[role="dialog"]').first();
+    // than sampling visibility synchronously after the keypress. Match only an
+    // OPEN dialog: at 375 the sidebar sheet is itself a role="dialog" that stays
+    // mounted (data-state="closed") through its close animation, so a bare
+    // `[role="dialog"]` locator resolved to the closing sheet and then sampled
+    // the gap between its unmount and the palette's mount as "not opened".
+    // Scope to the palette's own content node (`.search-palette`) so a sidebar
+    // sheet that failed to close can never stand in for it.
+    const paletteDialog = page.locator('.search-palette[role="dialog"][data-state="open"]').first();
     await paletteDialog.waitFor({ state: "visible", timeout: 15_000 }).catch(() => {});
     const palette = await paletteDialog.isVisible().catch(() => false);
     await page.keyboard.press("Escape");
@@ -814,18 +822,15 @@ async function axeForScreen(page, screen, width, tokens, identityMode) {
       throw new Error(`actual route ${route} returned HTTP ${httpStatus ?? "unknown"} (expected a successful route)`);
     }
     await waitForApp(page);
-    const foldedParents = { "admin-tab:digests": "github", "admin-tab:journeys": "research", "admin-tab:subsubcategories": "subcategories" };
-    const foldedParent = foldedParents[screen.actualAction];
-    if (foldedParent) {
-      await applyAction(page, `admin-tab:${foldedParent}`, "actual", { tokens });
-    }
+    // Folded sections (Sub-Subcats / Journeys / Digests) are opened from the
+    // header Settings menu by the shared admin-tab action, which also waits
+    // for the section's own panel; no per-runner parent-tab choreography.
+    const foldedChildren = ["admin-tab:digests", "admin-tab:journeys", "admin-tab:subsubcategories"];
     if (screen.actualAction) {
-      if (foldedParent) {
+      await applyAction(page, screen.actualAction, "actual", { tokens });
+      if (foldedChildren.includes(screen.actualAction)) {
         const child = screen.actualAction.slice("admin-tab:".length);
-        await page.getByTestId(`tab-${child}`).click();
         await page.getByTestId(`content-${child}`).waitFor({ state: "visible", timeout: 30_000 });
-      } else {
-        await applyAction(page, screen.actualAction, "actual", { tokens });
       }
     }
     if (screen.actualReadySelector) {
@@ -842,11 +847,16 @@ async function axeForScreen(page, screen, width, tokens, identityMode) {
       if (!session?.isAuthenticated || session.user?.role !== "admin") {
         throw new Error(`protected app row is not authenticated as admin (session=${JSON.stringify(session).slice(0, 240)})`);
       }
+      // /api/auth/user exposes one joined `name` ("Nick Krzemienski" since the
+      // identity helper started setting the demonstrator last name), never a
+      // separate firstName; accept either the display name or the bare first name.
       const name = session.user?.firstName || session.user?.name;
-      if (name !== "Nick") throw new Error("Protected row is not using the disposable Nick identity");
+      if (name !== DEMONSTRATOR_DISPLAY_NAME && name !== DEMONSTRATOR_FIRST_NAME) {
+        throw new Error(`Protected row is not using the disposable Nick identity (name=${JSON.stringify(name)})`);
+      }
       // Mobile intentionally collapses the header name to an avatar. Verify
       // identity at the authenticated API, not by demanding desktop chrome.
-      result.identityVerified = { name: "Nick", role: "admin" };
+      result.identityVerified = { name, role: "admin" };
     }
     await page.evaluate(() => document.fonts?.ready).catch(() => {});
     const axe = sanitiseAxe(await new AxeBuilder({ page }).analyze());

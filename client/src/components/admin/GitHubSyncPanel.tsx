@@ -535,13 +535,11 @@ export default function GitHubSyncPanel() {
                       </TableCell>
                       <TableCell>
                          {sync.status && (
-                           <span
-                             className={`chip ${sync.status === "completed" ? "ok" : sync.status === "failed" ? "bad" : sync.status === "pending" ? "warn" : ""}`}
+                           <StatusChip
+                             status={sync.status}
                              title={sync.errorMessage}
                              data-testid={`badge-sync-history-status-${sync.id}`}
-                           >
-                             {sync.status}
-                           </span>
+                           />
                          )}
                       </TableCell>
                       <TableCell className="text-right">

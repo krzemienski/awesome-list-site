@@ -19,23 +19,31 @@
 .admin-catalog-resources__header-actions {
   align-items: center;
   display: flex;
+  /* The frozen TableShell actions row holds two short buttons; ours adds a
+     search field and a long toggle, so let it wrap inside the card instead of
+     being clipped by the shell's overflow at phone widths. */
+  flex-wrap: wrap;
   gap: 8px;
+  max-width: 100%;
+  min-width: 0;
 }
 
 .admin-catalog-resources__header-actions input {
   background: var(--surface);
   border-color: var(--border);
   display: block;
+  flex: 1 1 200px;
   font-size: 13px;
-  height: 36px;
+  height: auto;
   line-height: normal;
-  min-height: 0;
+  max-width: 100%;
+  min-height: 44px;
   padding: 7px 10px;
   width: 200px;
 }
 
 .admin-catalog-resources__header-actions button {
-  min-height: 0;
+  min-height: 44px;
 }
 
 .admin-catalog-resources__header > div:first-child {
@@ -49,6 +57,10 @@
 .admin-catalog-resources__header-actions [data-testid="button-resource-tools"] {
   opacity: 1;
   position: static;
+}
+
+.admin-catalog-resources__tools-icon {
+  display: none;
 }
 
 .admin-catalog-resources__title {
@@ -91,6 +103,8 @@
   border-collapse: collapse;
   font-size: 13px;
   min-width: 720px;
+  /* Preserve the frozen data-column geometry; the additional product delete
+     target occupies one separate 44px control extent. */
   width: 100%;
 }
 
@@ -182,8 +196,11 @@
   color: var(--text-3);
 }
 
+/* At smaller widths the action column stays intrinsic (View + Edit + 44px
+   delete). Above 1024 it absorbs a continuous share of the auto-layout
+   surplus instead of shifting every data column at a breakpoint. */
 .admin-catalog-resources__actions-cell {
-  min-width: 184px;
+  width: calc(1px + clamp(0px, (100vw - 1024px) * 0.45620192, 189.78px));
 }
 
 /* Product-only bulk selection remains keyboard/hover reachable without
@@ -283,6 +300,42 @@
 }
 
 @media (max-width: 640px) {
+  /* Keep search, the touch-operable filters toggle and Add on one row. */
+  .admin-catalog-resources__header-actions {
+    flex-wrap: nowrap;
+    width: 100%;
+  }
+
+  .admin-catalog-resources__header-actions input {
+    flex: 1 1 0;
+    min-width: 0;
+  }
+
+  .admin-catalog-resources__header-actions [data-testid="button-resource-tools"] {
+    align-items: center;
+    display: inline-flex;
+    flex: 0 0 44px;
+    height: 44px;
+    justify-content: center;
+    padding: 0;
+    width: 44px;
+  }
+
+  .admin-catalog-resources__header-actions [data-testid="button-resource-tools"]:focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: 2px;
+  }
+
+  .admin-catalog-resources__tools-icon {
+    display: block;
+    height: 18px;
+    width: 18px;
+  }
+
+  .admin-catalog-resources__tools-label {
+    display: none;
+  }
+
   .admin-catalog-resources__header,
   .admin-catalog-resources__content {
     padding-left: 0;
@@ -299,5 +352,28 @@
     border-left: 0;
     border-right: 0;
     border-radius: 0;
+  }
+}
+
+@media (min-width: 48rem) {
+  /* The frozen TableShell header is one row (title · search + Add). Our
+     extra tools toggle made the actions group 24px too wide for the 768px
+     inset, so the whole group wrapped 55px under the title; let the group
+     share the row and give the search field the shrink instead. */
+  .admin-catalog-resources__header-actions {
+    flex: 1 1 0;
+    flex-wrap: nowrap;
+    justify-content: flex-end;
+  }
+
+  .admin-catalog-resources__header-actions input {
+    flex: 0 1 200px;
+    min-width: 0;
+  }
+
+  .admin-catalog-resources__table {
+    min-width: 764px;
+    /* +44px delete target +6px row-action gap beyond the frozen width. */
+    width: calc(100% + 50px);
   }
 }

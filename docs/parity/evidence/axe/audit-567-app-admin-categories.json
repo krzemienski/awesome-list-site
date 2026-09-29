@@ -10,15 +10,36 @@
       "identity": "Nick-admin",
       "status": "PASS",
       "identityVerified": {
-        "name": "Nick",
+        "name": "Nick Krzemienski",
         "role": "admin"
       },
       "ready": true,
       "httpStatus": 200,
       "axe": {
-        "violations": [],
+        "violations": [
+          {
+            "id": "empty-table-header",
+            "impact": "minor",
+            "help": "Table header text should not be empty",
+            "description": "Ensure table headers have discernible text",
+            "nodes": 1,
+            "targets": [
+              [
+                "th:nth-child(6)"
+              ]
+            ],
+            "details": [
+              {
+                "target": [
+                  "th:nth-child(6)"
+                ],
+                "failureSummary": "Fix any of the following:\n  Element does not have text that is visible to screen readers"
+              }
+            ]
+          }
+        ],
         "seriousCritical": [],
-        "passes": 47,
+        "passes": 45,
         "incomplete": 1
       }
     },
@@ -29,15 +50,36 @@
       "identity": "Nick-admin",
       "status": "PASS",
       "identityVerified": {
-        "name": "Nick",
+        "name": "Nick Krzemienski",
         "role": "admin"
       },
       "ready": true,
       "httpStatus": 200,
       "axe": {
-        "violations": [],
+        "violations": [
+          {
+            "id": "empty-table-header",
+            "impact": "minor",
+            "help": "Table header text should not be empty",
+            "description": "Ensure table headers have discernible text",
+            "nodes": 1,
+            "targets": [
+              [
+                "th:nth-child(6)"
+              ]
+            ],
+            "details": [
+              {
+                "target": [
+                  "th:nth-child(6)"
+                ],
+                "failureSummary": "Fix any of the following:\n  Element does not have text that is visible to screen readers"
+              }
+            ]
+          }
+        ],
         "seriousCritical": [],
-        "passes": 47,
+        "passes": 45,
         "incomplete": 1
       }
     }

@@ -269,6 +269,133 @@ declare global {
   }
 }
 
+const SYSTEM_FONT_TOKENS = ['--font-display', '--font-body', '--font-mono'] as const;
+
+/**
+ * Warm the regular (400) face of every family the active system names.
+ * The canonical Google Fonts request already ships those faces, but the
+ * browser fetches a face only when text first renders in it; Editorial
+ * headings render Fraunces at 500 only, so the 400 face stays unloaded and
+ * `document.fonts.check('16px "Fraunces"')` reports the family as absent.
+ * Loading the regular face on every apply keeps the family fully resident
+ * for any 400-weight usage (blockquotes, previews) and makes the readiness
+ * probe truthful. Fire-and-forget; a missing FontFaceSet is a no-op.
+ */
+function warmSystemFaces(root: HTMLElement): void {
+  if (typeof document === 'undefined' || !document.fonts?.load) return;
+  const styles = getComputedStyle(root);
+  for (const token of SYSTEM_FONT_TOKENS) {
+    const family = styles.getPropertyValue(token).split(',')[0].replace(/['"]/g, '').trim();
+    if (!family) continue;
+    void document.fonts.load(`16px "${family}"`).catch(() => undefined);
+  }
+}
+
+/**
+ * Chromium rebuilds every CSS-connected FontFace when the device metrics
+ * change (full-page captures, DPR/zoom changes, some window resizes): the
+ * new objects start "unloaded" and only faces that text re-shapes are
+ * reloaded, so a warmed-but-unused face silently drops out of the set.
+ * Re-warm on resize so the active system's faces stay resident across
+ * those rebuilds. Installed once per document; the listener is passive and
+ * the work is one style read plus already-cached font loads.
+ */
+let resizeRewarmInstalled = false;
+
+function installResizeRewarm(root: HTMLElement): void {
+  if (resizeRewarmInstalled || typeof window === 'undefined') return;
+  resizeRewarmInstalled = true;
+  window.addEventListener('resize', () => warmSystemFaces(root), { passive: true });
+  installStylesheetRewarm(root);
+}
+
+/**
+ * The same rebuild happens whenever a stylesheet joins the document after
+ * boot: Chromium recreates the CSS-connected FontFaces and the warmed face is
+ * "unloaded" again on any page whose text never shapes it. Clerk mounts its
+ * own `<style>` about a second after first paint, so `/sign-in` lost the
+ * Editorial 400 face the boot warm-up had just loaded. Two signals cover it:
+ *
+ * 1. A `<style>` / `<link rel="stylesheet">` insertion — the rebuild lands at
+ *    the next style recalc, not at insertion time (CSS-in-JS inserts an empty
+ *    `<style>` first and fills it via CSSOM), and that recalc can be delayed
+ *    in a throttled or background document, so re-warm on a short timer
+ *    ladder instead of trusting one animation frame.
+ * 2. `FontFaceSet` `loadingdone` — after a rebuild the faces that visible text
+ *    does use are reloaded and the set reports done; that is the rebuild's own
+ *    signal, independent of timing. Our loads only fire it when they actually
+ *    load something, so the listener settles once every face is resident.
+ *
+ * Every re-warm is a handful of cached `fonts.load()` calls; idempotent.
+ */
+const STYLESHEET_REWARM_LADDER_MS = [0, 50, 100, 200, 400, 800, 1600] as const;
+
+function installStylesheetRewarm(root: HTMLElement): void {
+  if (typeof MutationObserver === 'undefined' || typeof document === 'undefined') return;
+  const rewarm = () => warmSystemFaces(root);
+  document.fonts?.addEventListener?.('loadingdone', rewarm);
+  let pending = 0;
+  const isStylesheetNode = (node: Node): boolean => {
+    if (node.nodeType !== Node.ELEMENT_NODE) return false;
+    const el = node as Element;
+    return el.tagName === 'STYLE' || (el.tagName === 'LINK' && (el.getAttribute('rel') ?? '').includes('stylesheet'));
+  };
+  const observer = new MutationObserver((records) => {
+    if (pending > 0) return;
+    if (!records.some((record) => Array.from(record.addedNodes).some(isStylesheetNode))) return;
+    pending = STYLESHEET_REWARM_LADDER_MS.length;
+    for (const delay of STYLESHEET_REWARM_LADDER_MS) {
+      setTimeout(() => {
+        pending -= 1;
+        rewarm();
+      }, delay);
+    }
+  });
+  observer.observe(document.documentElement, { childList: true, subtree: true });
+}
+
+/**
+ * Switching systems names families the current page has never shaped, so
+ * their faces are still on the network when the switch lands: the first
+ * frames render the fallback stack and `document.fonts.check` reports the
+ * new family absent until the fetch completes. Warm the regular face of
+ * every family in the shell's canonical Google Fonts request once the page
+ * is idle after load — the CSS for all of them is already resident, this
+ * only pulls the latin regular files (a few small woff2s) ahead of a switch,
+ * and it never competes with first paint. The `<link>` is the single source
+ * of truth for which families exist, so nothing here can drift from it.
+ */
+let idleFacePrewarmInstalled = false;
+
+function familiesInCanonicalRequest(): string[] {
+  const link = document.querySelector<HTMLLinkElement>('link[href*="fonts.googleapis.com/css2"]');
+  if (!link) return [];
+  try {
+    return new URL(link.href).searchParams
+      .getAll('family')
+      .map((entry) => entry.split(':')[0].replace(/\+/g, ' ').trim())
+      .filter(Boolean);
+  } catch {
+    return [];
+  }
+}
+
+function installIdleFacePrewarm(): void {
+  if (idleFacePrewarmInstalled || typeof window === 'undefined' || !document.fonts?.load) return;
+  idleFacePrewarmInstalled = true;
+  const warmAll = () => {
+    for (const family of familiesInCanonicalRequest()) {
+      void document.fonts.load(`16px "${family}"`).catch(() => undefined);
+    }
+  };
+  const whenIdle = () => {
+    if (typeof window.requestIdleCallback === 'function') window.requestIdleCallback(warmAll, { timeout: 4000 });
+    else setTimeout(warmAll, 2000);
+  };
+  if (document.readyState === 'complete') whenIdle();
+  else window.addEventListener('load', whenIdle, { once: true });
+}
+
 export function applyDesignSystem(systemId: string, accentId: string): { system: string; accent: string } {
   const resolvedSystem = resolveSystemId(systemId);
   const resolvedAccent = resolveAccentId(accentId, resolvedSystem);
@@ -277,6 +404,9 @@ export function applyDesignSystem(systemId: string, accentId: string): { system:
     const root = document.documentElement;
     root.setAttribute('data-system', resolvedSystem);
     root.setAttribute('data-accent', resolvedAccent);
+    warmSystemFaces(root);
+    installResizeRewarm(root);
+    installIdleFacePrewarm();
   }
 
   if (typeof localStorage !== 'undefined') {

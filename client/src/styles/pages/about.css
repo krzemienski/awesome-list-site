@@ -274,7 +274,7 @@
   width: 16px;
   height: 16px;
   flex: 0 0 auto;
-  color: var(--accent);
+  color: var(--text-2);
 }
 
 .about-source-external {

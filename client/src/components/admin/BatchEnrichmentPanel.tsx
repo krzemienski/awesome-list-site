@@ -47,7 +47,7 @@ import { apiRequest, ApiError } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
 import { AgentEventLog } from "@/components/admin/AgentEventLog";
 import { AgentCommsGraph } from "@/components/admin/AgentCommsGraph";
-import { StatusChip, TableShell } from "@/components/admin/AdminOpsPrimitives";
+import { Stat, StatusChip, TableShell } from "@/components/admin/AdminOpsPrimitives";
 import type { EnrichmentJob } from "@shared/schema";
 import "./queues-agent.css";
 
@@ -386,23 +386,21 @@ export default function BatchEnrichmentPanel() {
           {(() => {
             const lastCompleted = jobs.find((job) => job.status === "completed");
             return (
-              <div className="card queues-agent__stat">
-                <div className="mono">Last enriched</div>
-                <div>{formatRelativeAgo(lastCompleted?.completedAt ?? null)}</div>
-                <div>{lastCompleted ? `batch #${lastCompleted.id} · ${lastCompleted.successfulResources || 0} entries` : "No completed batches"}</div>
-              </div>
+              <Stat
+                className="queues-agent__stat"
+                label="Last enriched"
+                value={formatRelativeAgo(lastCompleted?.completedAt ?? null)}
+                sub={lastCompleted ? `batch #${lastCompleted.id} · ${lastCompleted.successfulResources || 0} entries` : "No completed batches"}
+              />
             );
           })()}
-          <div className="card queues-agent__stat">
-            <div className="mono">Queue</div>
-            <div>{jobs.filter((job) => job.status === "pending" || job.status === "processing").length}</div>
-            <div>{hasActiveJob ? "active" : "idle"}</div>
-          </div>
-          <div className="card queues-agent__stat">
-            <div className="mono">Avg cost</div>
-            <div>{averageBatchCost(jobs)}</div>
-            <div>per batch</div>
-          </div>
+          <Stat
+            className="queues-agent__stat"
+            label="Queue"
+            value={jobs.filter((job) => job.status === "pending" || job.status === "processing").length}
+            sub={hasActiveJob ? "active" : "idle"}
+          />
+          <Stat className="queues-agent__stat" label="Avg cost" value={averageBatchCost(jobs)} sub="per batch" />
         </div>
         <TableShell
           title="Enrichment jobs"
@@ -420,21 +418,22 @@ export default function BatchEnrichmentPanel() {
             </Button>
           }
         >
-          <div className="queues-agent__canonical-table">
+          <div
+            className="queues-agent__canonical-table focus-visible:outline focus-visible:outline-2 focus-visible:outline-ring"
+            tabIndex={0}
+            role="region"
+            aria-label="Enrichment jobs table, scrollable"
+          >
             <table className="table">
               <thead>
-                <tr><th>Job</th><th>Status</th><th>Started</th><th>Completed</th><th /></tr>
+                <tr><th>Job</th><th>Status</th><th>Started</th><th>Completed</th><th><span className="sr-only">Actions</span></th></tr>
               </thead>
               <tbody>
                 {jobs.slice(0, 6).map((job) => (
                   <tr key={job.id}>
                     <td className="mono queues-agent__cell-mono">#{job.id}</td>
                     <td>
-                      {(() => {
-                        const status = effectiveStatus(job);
-                        const tone = status === "completed" ? "ok" : status === "failed" ? "bad" : status === "pending" ? "warn" : status === "cancelled" ? "muted" : "";
-                        return <span className={`chip ${tone}`}>{status}</span>;
-                      })()}
+                      <StatusChip status={effectiveStatus(job)} />
                     </td>
                     <td className="mono muted queues-agent__cell-mono queues-agent__cell-muted">{job.startedAt ? new Date(job.startedAt).toLocaleString("en-US") : "—"}</td>
                     <td className="mono muted queues-agent__cell-mono queues-agent__cell-muted">{job.completedAt ? new Date(job.completedAt).toLocaleString("en-US") : "—"}</td>

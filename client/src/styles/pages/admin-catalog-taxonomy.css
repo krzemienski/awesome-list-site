@@ -74,8 +74,8 @@
 }
 
 .admin-taxonomy-header-actions > [data-testid^="button-create-"] {
-  min-height: 36px;
-  height: 36px;
+  min-height: 44px;
+  height: auto;
   padding: 9px 16px;
   border: var(--hairline-w) solid var(--accent);
   font-size: 13px;
@@ -145,6 +145,11 @@
 
 /* TableShell geometry from the frozen admin reference. */
 .admin-taxonomy-table {
+  /*
+   * The product adds one contract-required 44px delete target beside the
+   * frozen table's Edit target. Give that target its own inline extent rather
+   * than making auto layout steal width from every canonical data column.
+   */
   width: 100%;
   border-collapse: collapse;
   font-size: 0.8125rem;
@@ -197,14 +202,31 @@
   color: var(--text-3);
 }
 
-/* Canonical slug sizes per panel (admin.jsx: categories 12px, subcategories
-   11.5px); the auto table layout shares width by these max-content widths. */
-.admin-taxonomy-shell--categories .admin-taxonomy-table .admin-taxonomy-cell-slug {
+/* The frozen admin.jsx puts `mono` on the CELL (slug, resource count,
+   subcategory count): 12px mono with the 1.6 body leading, so the glyphs sit
+   on the cell's own 19.2px line box. Styling only an inner span left a 13px
+   Inter strut under a 12px inline, dropping every mono glyph ~1px. Canonical
+   slug sizes per panel: categories 12px, subcategories 11.5px. */
+.admin-taxonomy-table tbody .admin-taxonomy-column-slug,
+.admin-taxonomy-table tbody .admin-taxonomy-column-count,
+.admin-taxonomy-table tbody .admin-taxonomy-column-subcategories {
+  font-family: var(--font-mono);
   font-size: 0.75rem;
+  line-height: 1.6;
 }
 
-.admin-taxonomy-shell--subcategories .admin-taxonomy-table .admin-taxonomy-cell-slug {
+.admin-taxonomy-table tbody .admin-taxonomy-column-slug {
+  color: var(--text-3);
+}
+
+.admin-taxonomy-shell--subcategories .admin-taxonomy-table tbody .admin-taxonomy-column-slug {
   font-size: 0.71875rem;
+}
+
+.admin-taxonomy-table .admin-taxonomy-cell-slug {
+  color: inherit;
+  font-size: inherit;
+  line-height: inherit;
 }
 
 .admin-taxonomy-table .admin-taxonomy-cell-name {
@@ -246,12 +268,25 @@
   width: auto;
 }
 
+/* The reference's auto-layout action column absorbs a share of surplus as
+   the viewport grows. Below that range a 1px hint lets intrinsic content
+   (Edit + the 44px delete target) determine the minimum. Continuous ramps
+   preserve the reference's 1024/1440 distribution without a 90rem jump. */
 .admin-taxonomy-table .admin-taxonomy-column-actions {
-  min-width: 122px;
+  width: 1px;
+}
+
+.admin-taxonomy-shell--categories .admin-taxonomy-table .admin-taxonomy-column-actions {
+  width: calc(1px + clamp(0px, (100vw - 768px) * 0.554375, 141.92px) + clamp(0px, (100vw - 1024px) * 0.07966346, 100vw));
+}
+
+.admin-taxonomy-shell--subcategories .admin-taxonomy-table .admin-taxonomy-column-actions {
+  width: calc(1px + clamp(0px, (100vw - 1024px) * 0.34766827, 144.63px));
 }
 
 .admin-taxonomy-table .admin-taxonomy-cell-count {
-  display: inline-flex;
+  /* Plain inline text in the mono cell (frozen: a bare number, no badge). */
+  display: inline;
   min-width: 0;
   padding: 0;
   border: 0;
@@ -259,10 +294,10 @@
   background: transparent;
   box-shadow: none;
   color: inherit;
-  font-family: var(--font-mono);
-  font-size: 0.75rem;
+  font-family: inherit;
+  font-size: inherit;
   font-weight: 400;
-  line-height: 1.35;
+  line-height: inherit;
 }
 
 .admin-taxonomy-row-actions {
@@ -270,16 +305,19 @@
 }
 
 .admin-taxonomy-row-action {
+  /* Frozen `btn ghost` (styles.css:216): hairline border, full ink. */
   min-width: 44px;
   min-height: 44px !important;
   height: 44px !important;
   padding: 0 0.625rem;
+  border: var(--border-w) solid var(--border);
   border-radius: var(--radius-sm);
-  color: var(--text-2);
+  color: var(--text);
   font-size: 0.75rem;
 }
 
 .admin-taxonomy-row-action:hover {
+  background: var(--surface);
   color: var(--text);
 }
 
@@ -389,5 +427,13 @@
 
   .admin-users-table {
     min-width: 52rem;
+  }
+}
+
+@media (min-width: 48rem) {
+  .admin-taxonomy-table {
+    /* +44px delete target +6px row-action gap beyond the frozen width; at
+       768 the frozen table is min-content-bound, so it needs the extent too. */
+    width: calc(100% + 50px);
   }
 }

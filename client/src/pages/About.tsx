@@ -96,7 +96,7 @@ export default function About() {
           display heading, divider, lead card, and callout grid. The copy in
           these surfaces stays grounded in the site's existing shared content. */}
       <header className="about-hero">
-        <div className="about-eyebrow">
+        <div className="eyebrow about-eyebrow">
           <BookOpen className="about-eyebrow-icon" aria-hidden="true" />
           ABOUT THIS PROJECT
         </div>
@@ -198,7 +198,7 @@ export default function About() {
                 >
                   Profile → Security → Delete account &amp; data
                 </Link>{" "}
-                — it&apos;s private and authenticated, so you never have to post
+                — it’s private and authenticated, so you never have to post
                 personal details publicly.
               </p>
               <p className="about-body-copy">
@@ -236,7 +236,7 @@ export default function About() {
                 >
                   Privacy Policy
                 </Link>{" "}
-                for the site&apos;s legal and data practices.
+                for the site’s legal and data practices.
               </p>
             </div>
           </CardContent>

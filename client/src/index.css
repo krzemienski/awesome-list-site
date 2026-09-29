@@ -41,9 +41,9 @@
   --color-ring: var(--accent);
   --color-chart-1: var(--accent);
   --color-chart-2: #34d08c;
-  --color-chart-3: #5eddf2;
+  --color-chart-3: #5eddf2; /* DS-OK: fixed chart-series hue — the DS cyan accent swatch (design-system.css :root[data-accent="cyan"]); series colors must not follow the active accent */
   --color-chart-4: #ffb84d;
-  --color-chart-5: #9d4edd;
+  --color-chart-5: #9d4edd; /* DS-OK: fixed chart-series hue — the DS violet accent swatch (design-system.css :root[data-accent="violet"]); series colors must not follow the active accent */
   --color-sidebar: var(--bg);
   --color-sidebar-foreground: var(--text);
   --color-sidebar-primary: var(--accent);
@@ -230,6 +230,8 @@ vite-plugin-checker-error-overlay {
       filled cards no longer spill into near-blank orphan trailing pages (R4-070).
 */
 @media print {
+  /* DS-OK: intentional — print media is fixed paint (white paper, black ink,
+     neutral #bbb rules) and never participates in the five-system theme. */
   /* White page, full-opacity black readable text everywhere. */
   html,
   body,

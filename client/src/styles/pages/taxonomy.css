@@ -10,10 +10,11 @@
   animation: fadeIn 0.5s ease;
 }
 
-/* Canonical `.btn.ghost` geometry: 36px tall, 9px 16px padding, 13px label. */
+/* Canonical `.btn.ghost` padding and type within the approved target floor. */
 .taxonomy-back {
-  height: 36px;
-  min-height: 36px;
+  box-sizing: border-box;
+  height: auto;
+  min-height: 44px;
   gap: 8px;
   margin-bottom: 20px;
   padding: 9px 16px;
@@ -196,26 +197,38 @@
   min-height: 44px;
 }
 
-.taxonomy-view-toggle-label {
-  color: var(--text-3);
-  font-family: var(--font-mono);
-  font-size: 11px;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-}
-
 .taxonomy-tools-toggle {
   position: absolute;
   top: -6px;
   right: 0;
+  box-sizing: border-box;
+  min-height: 44px;
 }
 
+/* Below 640px the summary row has no room for the 44px toggle beside its
+   chips. The Category page's back-button row is 44px tall with an empty right
+   side, so the toggle shares that row instead of pushing content down. The
+   breadcrumb pages keep the toggle in flow after the summary. */
 @media (max-width: 639px) {
-  .taxonomy-summary {
+  .taxonomy-page--category {
+    position: relative;
+  }
+
+  .taxonomy-page--category .taxonomy-summary {
+    position: static;
+  }
+
+  .taxonomy-page--category .taxonomy-tools-toggle {
+    top: 0;
+  }
+
+  .taxonomy-page--subcategory .taxonomy-summary,
+  .taxonomy-page--sub-subcategory .taxonomy-summary {
     padding-right: 0;
   }
 
-  .taxonomy-tools-toggle {
+  .taxonomy-page--subcategory .taxonomy-tools-toggle,
+  .taxonomy-page--sub-subcategory .taxonomy-tools-toggle {
     position: static;
     margin-left: auto;
   }
@@ -286,17 +299,35 @@
   margin: 0;
 }
 
+/* The frozen ResCard's chip row is featured + up to three `#tag` chips only.
+   The category and kind badges join the hover/focus reveal (the kind badge
+   pushed a fourth chip onto the row, wrapping it 32px taller than the
+   reference at ≤768px); both stay on the resource detail page. */
 .taxonomy-page .resource-card--taxonomy .resource-card__meta-link,
-.taxonomy-page .resource-card--taxonomy .resource-card__category-badge,
 .taxonomy-page .resource-card--taxonomy .resource-card__actions,
 .taxonomy-page .resource-card--taxonomy .resource-card__more-tags {
   display: none;
 }
 
+/* The category and kind badges are plain metadata text, not controls: at rest
+   they are visually hidden (out of flow, so the chip row keeps the frozen
+   geometry) but stay in the accessibility tree for screen-reader and touch
+   users who never trigger the hover reveal. */
+.taxonomy-page .resource-card--taxonomy:not(:hover):not(:focus-within) .resource-card__category-badge,
+.taxonomy-page .resource-card--taxonomy:not(:hover):not(:focus-within) .resource-card__kind-badge {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+  border-width: 0;
+}
+
 .taxonomy-page .resource-card--taxonomy:hover .resource-card__meta-link,
 .taxonomy-page .resource-card--taxonomy:focus-within .resource-card__meta-link,
-.taxonomy-page .resource-card--taxonomy:hover .resource-card__category-badge,
-.taxonomy-page .resource-card--taxonomy:focus-within .resource-card__category-badge,
 .taxonomy-page .resource-card--taxonomy:hover .resource-card__more-tags,
 .taxonomy-page .resource-card--taxonomy:focus-within .resource-card__more-tags {
   display: inline-flex;
@@ -415,8 +446,8 @@
 .taxonomy-pagination [data-testid="input-page-jump"] {
   box-sizing: border-box;
   width: 64px;
-  height: 32px;
-  min-height: 0;
+  height: auto;
+  min-height: 44px;
   padding: 0 8px;
   border: var(--border-w) solid var(--border);
   border-radius: var(--radius-sm);

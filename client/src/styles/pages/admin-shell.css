@@ -10,6 +10,7 @@
   padding: 0;
   width: 100%;
 }
+
 .admin-dashboard .admin-dashboard__masthead { margin-bottom: 24px; gap: 16px; }
 .admin-dashboard__intro { min-width: 0; max-width: 100%; }
 /* Canonical: the inline-flex eyebrow itself carries the 12px margin inside
@@ -31,9 +32,9 @@
 }
 .admin-dashboard .admin-dashboard__masthead p { font-size: 14px; margin-top: 8px; }
 .admin-dashboard .admin-dashboard__actions { width: auto; gap: 8px; }
-/* Canonical `.btn`: 1px border + 9px 16px padding around a 13px label at UA
-   button line-height (36px tall); the settings <details> wraps its summary. */
-.admin-dashboard .admin-dashboard__actions > * { flex: initial; min-height: 0; height: auto; padding: 9px 16px; font-size: 13px; line-height: normal; border-width: var(--border-w, 1px); }
+/* Canonical `.btn`: retain its intrinsic padding/leading while honoring the
+   approved 44px interactive-control floor. */
+.admin-dashboard .admin-dashboard__actions > * { flex: initial; min-height: 44px; height: auto; padding: 9px 16px; font-size: 13px; line-height: normal; border-width: var(--border-w, 1px); }
 .admin-dashboard .admin-dashboard__actions svg { width: 12px; height: 12px; }
 .admin-dashboard .admin-tab-scroller { padding: 0; margin: 0 0 28px; }
 .admin-dashboard .admin-dashboard__tabs {
@@ -53,7 +54,7 @@
 }
 .admin-dashboard .admin-dashboard__tabs [role="tab"] {
   flex-shrink: 0;
-  min-height: 40px;
+  min-height: 44px;
   padding: 12px 16px;
   gap: 6px;
   border-radius: 0;
@@ -63,8 +64,8 @@
   background: transparent;
   font-size: 13px;
   font-weight: 500;
-  /* Canonical .tab is a UA button: line-height normal (42px tab), not the
-     inherited body leading Tailwind's preflight gives buttons. */
+  /* Canonical .tab keeps UA button leading inside the 44px target, rather than
+     inheriting the body leading from Tailwind's preflight. */
   line-height: normal;
   box-shadow: none;
 }

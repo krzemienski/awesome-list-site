@@ -283,6 +283,13 @@ What each skin changes:
 Intentional divergences (per `replit.md` MR-DS-13 #5): non-DS badge variants (admin
 status badges) and secondary/ghost/destructive buttons keep plain shadcn styling; the
 BrandMark tile stays rounded in 0-radius systems (brand kit, not a radius bug).
+Accent-discipline divergences from the frozen reference (rule 1 wins over the
+prototype, audit stage 7 `audit-567-ink-accent`): the category-header count chip
+(`pages.jsx` renders `chip accent`; the app renders a neutral `chip`), the admin
+overview "Pending approvals" stat value (`admin.jsx` tints it `--accent`; the app
+keeps primary ink) and the admin activity-feed actor names (`admin.jsx` paints them
+`--accent`; the app uses `--text` at weight 500). All three are counted as pixel
+deltas in the parity ledgers, never re-tinted.
 
 ## 8. Rules
 

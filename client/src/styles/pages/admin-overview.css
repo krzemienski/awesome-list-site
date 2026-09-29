@@ -66,7 +66,10 @@
 }
 
 .admin-overview-stats-canonical .admin-canonical-stat__value--accent {
-  color: var(--accent);
+  /* Reference admin.jsx tints the highlighted stat value in --accent; Stage 7
+     reserves accent for the surface's primary action, so the highlighted
+     stat stays in primary ink (the card itself remains interactive). */
+  color: var(--text);
 }
 
 .admin-overview-stats-canonical .admin-canonical-stat__sub {
@@ -78,7 +81,7 @@
 }
 
 .admin-overview-stats-canonical .admin-canonical-stat__sub button {
-  min-height: 1.5rem;
+  min-height: 44px;
   color: inherit;
   text-decoration: underline;
   text-decoration-style: dotted;
@@ -93,6 +96,14 @@
 
 .admin-overview-canonical .admin-canonical-overview-grid {
   display: grid;
+  /*
+   * The frozen admin grid's intrinsic 360px track. At a 375px viewport the
+   * 40px page inset leaves 295px: the reference lets that track overflow the
+   * viewport (its capture grows to 400px, `noPageOverflow: false` in the
+   * runner's reference geometry), while the app shell clips the page at the
+   * viewport, which cut the card's right border and its last column. Cap the
+   * track at the container so the card fits; every width ≥ 440px is unchanged.
+   */
   grid-template-columns: repeat(auto-fill, minmax(min(360px, 100%), 1fr));
   gap: 16px;
 }
@@ -228,16 +239,29 @@
   flex: 0 1 auto;
   min-width: 0;
   overflow: hidden;
-  color: var(--accent);
+  /* Reference admin.jsx paints the actor in --accent; Stage 7 (one accent
+     moment per surface) forbids six accent names per viewport, so the actor
+     is emphasised by weight in primary ink instead. */
+  color: var(--text);
   font-weight: 500;
   text-overflow: ellipsis;
   white-space: nowrap;
 }
 
 .admin-overview-canonical .admin-canonical-activity-action {
+  /* Reference admin.jsx: action and time are plain flex items that shrink and
+     WRAP at spaces ("recommendation feedback / restored", "44m / ago"); only
+     the target truncates. `nowrap` here let long live actions overflow the
+     row, turning the list into a keyboard-unreachable scroll region (axe
+     scrollable-region-focusable at 375). `anywhere` only lowers the floor for
+     an unbreakable word, so normal wrapping still matches the reference. */
   flex: 0 1 auto;
   color: var(--text-2);
-  white-space: nowrap;
+  overflow-wrap: anywhere;
+}
+
+.admin-overview-canonical .admin-canonical-activity-time {
+  flex: 0 1 auto;
 }
 
 .admin-overview-canonical .admin-canonical-activity-target {

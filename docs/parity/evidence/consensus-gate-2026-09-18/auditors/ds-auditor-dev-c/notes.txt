@@ -1,0 +1,16 @@
+Target: http://127.0.0.1:5000 (development server)
+Commit: 63d0d5852462f47cf45f0368a28767c37653b68b
+
+Representative visual inspection:
+- home/desktop/editorial.png, terminal.png, and brutalist.png visibly differ in accent, typography, borders, density, and system-specific chrome.
+- home/mobile/swiss.png remains structured at 375px with the mobile header, single-column catalog, consent banner, and footer visible.
+- category/desktop/brutalist.png shows the expected rigid outlined card grid and slab-like system treatment without an obvious broken card.
+- theme-settings/desktop/geist.png shows distinct option cards, cyan Geist treatment, token swatches, and the live component preview.
+- 404/mobile/terminal.png is a themed DS 404 screen and the browser response was HTTP 404.
+- login/desktop/editorial.png shows the Clerk widget painted with the Editorial/Crimson system and the /login request landed on /sign-in.
+- resource/mobile/geist.png and journeys/desktop/swiss.png remain readable and structurally intact.
+- Real hover screenshots show primary-button and card states; real Tab screenshots show focus-visible states.
+- No Stage-11 symptom-table issue was observed in this representative sample.
+
+Execution note:
+- Theme Settings' first visible preview primary button could not receive a real hover because its containing live-preview section intercepted pointer events. Real primary-button hover was successfully captured on the other seven screens at both widths, and real card hover succeeded on Theme Settings and Category at both widths. This did not block the Stage 7 contract proof.
