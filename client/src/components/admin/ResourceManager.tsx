@@ -1022,11 +1022,15 @@ export default function ResourceManager() {
               type="button"
               variant="ghost"
               onClick={() => setCatalogToolsOpen((open) => !open)}
+              aria-label={catalogToolsOpen ? "Hide filters and tools" : "Show filters and tools"}
               aria-expanded={catalogToolsOpen}
               aria-controls="resource-filters"
               data-testid="button-resource-tools"
             >
-              {catalogToolsOpen ? "Hide filters and tools" : "Show filters and tools"}
+              <Filter className="admin-catalog-resources__tools-icon" aria-hidden="true" />
+              <span className="admin-catalog-resources__tools-label">
+                {catalogToolsOpen ? "Hide filters and tools" : "Show filters and tools"}
+              </span>
             </Button>
             <button type="button" className="btn primary" onClick={openCreateDialog} data-testid="button-add-resource">
               <Plus className="h-3 w-3" />

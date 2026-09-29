@@ -1,8 +1,8 @@
 # Parity status
 
-Latest baseline run: `2026-09-18T14-24-45-340Z-18689` (2026-09-18T14:24:45.340Z) — gate **NOT PASSED**.
+Latest baseline run: `2026-09-29T00-54-08-490Z-26988` (2026-09-29T00:54:08.490Z) — gate **NOT PASSED**.
 
-Compared pixel rows: 135 pass, 47 fail, 0 incomplete of 182.
+Compared pixel rows: 157 pass, 25 fail, 0 incomplete of 182.
 
 Additional coverage: 40 blocked, 100 unverified, 4 aliases, 4 evidence-only rows. These do not inflate the compared-pixel denominator. Eligibility: {"pixel":47,"token-only":25,"artifact-docs":1,"blocked":10}.
 
@@ -12,14 +12,14 @@ Additional coverage: 40 blocked, 100 unverified, 4 aliases, 4 evidence-only rows
 |---|---:|---:|---|
 | app.resource.detail | 1024 | 67.7687% | 67.769% differing pixels exceeds the 0.5% ceiling |
 | app.resource.detail | 1440 | 65.9244% | 65.924% differing pixels exceeds the 0.5% ceiling |
-| app.resource.detail | 768 | 58.9310% | 58.931% differing pixels exceeds the 0.5% ceiling |
-| app.resource.detail | 375 | 56.0453% | 56.045% differing pixels exceeds the 0.5% ceiling |
-| app.admin.users | 375 | 8.3391% | 8.339% differing pixels exceeds the 0.5% ceiling |
+| app.resource.detail | 768 | 58.9168% | 58.917% differing pixels exceeds the 0.5% ceiling |
+| app.resource.detail | 375 | 56.0540% | 56.054% differing pixels exceeds the 0.5% ceiling |
+| app.admin.overview | 375 | 10.1197% | 10.120% differing pixels exceeds the 0.5% ceiling |
+| app.admin.users | 375 | 9.2293% | 9.229% differing pixels exceeds the 0.5% ceiling |
+| app.admin.resources | 375 | 7.6528% | 7.653% differing pixels exceeds the 0.5% ceiling |
 | app.about | 1024 | 6.9274% | 6.927% differing pixels exceeds the 0.5% ceiling |
-| app.admin.overview | 375 | 6.6584% | 6.658% differing pixels exceeds the 0.5% ceiling |
-| app.subcategory | 375 | 6.6574% | 6.657% differing pixels exceeds the 0.5% ceiling |
+| app.subcategory | 375 | 6.3564% | 6.356% differing pixels exceeds the 0.5% ceiling |
 | app.admin.linkhealth | 375 | 6.3491% | 6.349% differing pixels exceeds the 0.5% ceiling |
-| app.about | 1440 | 6.2653% | 6.265% differing pixels exceeds the 0.5% ceiling |
 
 ## Blocked rows
 

@@ -1,6 +1,6 @@
 # Task 567 browser DS/axe worklog
 
-Captured: 2026-09-18T00:15:04.178Z
+Captured: 2026-09-29T03:02:23.429Z
 Base: `http://127.0.0.1:5000`
 Browser: pinned Playwright Chromium (explicit executable path; browser lease held by `playwright-launch-lease`)
 

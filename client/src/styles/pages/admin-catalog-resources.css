@@ -59,6 +59,10 @@
   position: static;
 }
 
+.admin-catalog-resources__tools-icon {
+  display: none;
+}
+
 .admin-catalog-resources__title {
   color: var(--text);
   font-size: 14px;
@@ -192,22 +196,11 @@
   color: var(--text-3);
 }
 
-/* The frozen action column is min-content-bound (View + Edit) up to 1024px;
-   a `width: 1px` column stays at its min-content (View + Edit + the 44px
-   delete target + 6px gap) instead of drawing a share of the auto-layout
-   surplus, so the data columns keep the frozen widths. An inflated pin
-   (184px) or an auto column shifted every data column 2–10px. */
+/* At smaller widths the action column stays intrinsic (View + Edit + 44px
+   delete). Above 1024 it absorbs a continuous share of the auto-layout
+   surplus instead of shifting every data column at a breakpoint. */
 .admin-catalog-resources__actions-cell {
-  width: 1px;
-}
-
-@media (min-width: 90rem) {
-  /* At 1440 the frozen action column absorbs 12.67px of surplus (140.78px);
-     pin that share plus the delete extent (44 + 6) so the data columns land
-     on the reference's 74.27 / 545.44 / 194.63 / 225.13 / 97.77. */
-  .admin-catalog-resources__actions-cell {
-    width: 190.78px;
-  }
+  width: calc(1px + clamp(0px, (100vw - 1024px) * 0.45620192, 189.78px));
 }
 
 /* Product-only bulk selection remains keyboard/hover reachable without
@@ -307,6 +300,42 @@
 }
 
 @media (max-width: 640px) {
+  /* Keep search, the touch-operable filters toggle and Add on one row. */
+  .admin-catalog-resources__header-actions {
+    flex-wrap: nowrap;
+    width: 100%;
+  }
+
+  .admin-catalog-resources__header-actions input {
+    flex: 1 1 0;
+    min-width: 0;
+  }
+
+  .admin-catalog-resources__header-actions [data-testid="button-resource-tools"] {
+    align-items: center;
+    display: inline-flex;
+    flex: 0 0 44px;
+    height: 44px;
+    justify-content: center;
+    padding: 0;
+    width: 44px;
+  }
+
+  .admin-catalog-resources__header-actions [data-testid="button-resource-tools"]:focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: 2px;
+  }
+
+  .admin-catalog-resources__tools-icon {
+    display: block;
+    height: 18px;
+    width: 18px;
+  }
+
+  .admin-catalog-resources__tools-label {
+    display: none;
+  }
+
   .admin-catalog-resources__header,
   .admin-catalog-resources__content {
     padding-left: 0;

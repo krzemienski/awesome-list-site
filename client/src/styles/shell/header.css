@@ -69,17 +69,9 @@
   .app-canonical-header .header-search-label { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip-path: inset(50%); }
 }
 @media (min-width: 768px) and (max-width: 1024px) {
-  .app-canonical-header .mobile-menu-btn,
-  .app-canonical-header .header-menu-control {
-    display: none !important;
-  }
-  /* The shell's tablet range starts at 768 (drawer hidden, 60px header, 180px
-     search), and the approved comparison reference moves the design's mobile
-     cut to 767 for the same reason (CCR-768-SIDEBAR / CCR-768-MOBILE-VISIBILITY
-     in tests/parity/comparison-reference-adjustments.json). The canonical
-     `.hide-mobile` utility must stay under `max-width: 768px` verbatim
-     (canonical-token-parity), so the header re-shows its two tablet-visible
-     spans here instead of moving the utility. */
+  /* The tablet sidebar stays visible, but the reference also retains its
+     header drawer trigger through 1024px. Re-show these spans because the
+     canonical .hide-mobile utility extends to 768px. */
   .app-canonical-header .header-kbd.hide-mobile,
   .app-canonical-header .header-account-name.hide-mobile {
     display: inline !important;

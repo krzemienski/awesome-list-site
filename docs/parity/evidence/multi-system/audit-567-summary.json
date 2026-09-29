@@ -1,10 +1,10 @@
 {
   "schemaVersion": 3,
   "task": "567",
-  "runId": "mu67in02-36056",
-  "capturedAt": "2026-09-18T00:15:04.178Z",
+  "runId": "mum3c6o5-80294",
+  "capturedAt": "2026-09-29T03:02:23.429Z",
   "base": "http://127.0.0.1:5000",
-  "phase": "axe",
+  "phase": "font-prepaint",
   "phaseStates": {
     "theme": "COMPLETE",
     "runtime": "COMPLETE",
@@ -1411,7 +1411,7 @@
           "canonicalPrimitives": true
         },
         "stage7": {
-          "visibleAccentUsers": 43
+          "visibleAccentUsers": 41
         },
         "stage8": {
           "inks": {
@@ -1585,7 +1585,7 @@
   "smoke": {
     "rows": [
       {
-        "captureRunId": "mu67in02-36056",
+        "captureRunId": "mum3c6o5-80294",
         "system": "editorial",
         "accent": "crimson",
         "width": 375,
@@ -1627,12 +1627,12 @@
           "system": "editorial",
           "accent": "crimson"
         },
-        "resumed": true,
+        "resumed": false,
         "pass": true,
-        "screenshotSha256": "c4246163b7e6a672d2530ef1cc25acf00349f78edd782ff4faf54e199a2ebe5a"
+        "screenshotSha256": "1bcf31d0f912243b9fd446a4987af065d7782bf2d7bf969f33a36a273d6b0fd2"
       },
       {
-        "captureRunId": "mu67in02-36056",
+        "captureRunId": "mum3c6o5-80294",
         "system": "editorial",
         "accent": "crimson",
         "width": 375,
@@ -1674,12 +1674,12 @@
           "system": "editorial",
           "accent": "crimson"
         },
-        "resumed": true,
+        "resumed": false,
         "pass": true,
-        "screenshotSha256": "1e5e2941a338645e73132085a0800c732887a037605be06c6bf9feefdb6f0d4c"
+        "screenshotSha256": "9b348df92adfe5aeaa279cddb8abf3156e0052403897c5d79b77ee4ad77e2110"
       },
       {
-        "captureRunId": "mu67in02-36056",
+        "captureRunId": "mum3c6o5-80294",
         "system": "editorial",
         "accent": "crimson",
         "width": 375,
@@ -1721,12 +1721,12 @@
           "system": "editorial",
           "accent": "crimson"
         },
-        "resumed": true,
+        "resumed": false,
         "pass": true,
-        "screenshotSha256": "39baf24aac2552a227cfa8169054d77cdc244e5ab1d20940c0771f906e5416b7"
+        "screenshotSha256": "4276b93834f95faa16d3526fcb790f4d6c532ea2c88ee9300fbbe021e177d78e"
       },
       {
-        "captureRunId": "mu67in02-36056",
+        "captureRunId": "mum3c6o5-80294",
         "system": "editorial",
         "accent": "crimson",
         "width": 375,
@@ -1768,12 +1768,12 @@
           "system": "editorial",
           "accent": "crimson"
         },
-        "resumed": true,
+        "resumed": false,
         "pass": true,
-        "screenshotSha256": "ab8e97f933697888c334e98ff4e506038d1bf9510e512f88ba02dda100bb04aa"
+        "screenshotSha256": "05dbe4caef66b12a79d171c97143d92f4dd24fad04cb9350bfe35a2e1188db68"
       },
       {
-        "captureRunId": "mu67in02-36056",
+        "captureRunId": "mum3c6o5-80294",
         "system": "editorial",
         "accent": "crimson",
         "width": 768,
@@ -1815,12 +1815,12 @@
           "system": "editorial",
           "accent": "crimson"
         },
-        "resumed": true,
+        "resumed": false,
         "pass": true,
-        "screenshotSha256": "00de3949a4004f3af8a99adea7eaf10c6fb476f9733178fea7bc41243f29ff45"
+        "screenshotSha256": "c3e35b80eef37857debc3d6cb70d22084a7533911245b61e4689f9de80b0cedc"
       },
       {
-        "captureRunId": "mu67in02-36056",
+        "captureRunId": "mum3c6o5-80294",
         "system": "editorial",
         "accent": "crimson",
         "width": 768,
@@ -1862,12 +1862,12 @@
           "system": "editorial",
           "accent": "crimson"
         },
-        "resumed": true,
+        "resumed": false,
         "pass": true,
-        "screenshotSha256": "b1ac748e78b74e7e2d278c1272f12ac2de9bc02f646eaba68bf1318a82ff51c0"
+        "screenshotSha256": "dd38c141f400c414d9252d9bf42b3698a633163da263bdb2c80d3df79aa49468"
       },
       {
-        "captureRunId": "mu67in02-36056",
+        "captureRunId": "mum3c6o5-80294",
         "system": "editorial",
         "accent": "crimson",
         "width": 768,
@@ -1909,12 +1909,12 @@
           "system": "editorial",
           "accent": "crimson"
         },
-        "resumed": true,
+        "resumed": false,
         "pass": true,
-        "screenshotSha256": "d5fb3475a2dcda4b8ff22cdd539765a6292e2a1be0f87d2589a1d9ae5676548b"
+        "screenshotSha256": "aa708866c3b5b6af4a3dff256f9759bc7dda433dbdf90d27e9aa8ac8aaeefe7f"
       },
       {
-        "captureRunId": "mu67in02-36056",
+        "captureRunId": "mum3c6o5-80294",
         "system": "editorial",
         "accent": "crimson",
         "width": 768,
@@ -1956,12 +1956,12 @@
           "system": "editorial",
           "accent": "crimson"
         },
-        "resumed": true,
+        "resumed": false,
         "pass": true,
-        "screenshotSha256": "e49b0ff6d444d445f58c05873afe41cc810ec8a73aac1af5073dfa9069ec2abe"
+        "screenshotSha256": "a9302361258dbcbecb5e9063c5b67eaefa3c36ca140dca65ef16b948458d57c0"
       },
       {
-        "captureRunId": "mu67in02-36056",
+        "captureRunId": "mum3c6o5-80294",
         "system": "editorial",
         "accent": "crimson",
         "width": 1024,
@@ -2003,12 +2003,12 @@
           "system": "editorial",
           "accent": "crimson"
         },
-        "resumed": true,
+        "resumed": false,
         "pass": true,
-        "screenshotSha256": "9afb34f58d9acfbb85da8c33175102a2651c6376ab9a5d6d4aca63aff124d1de"
+        "screenshotSha256": "4a25d1f4637557a4e6396631bd5c024e53a3d78af865c0670f5d6d9d15572db3"
       },
       {
-        "captureRunId": "mu67in02-36056",
+        "captureRunId": "mum3c6o5-80294",
         "system": "editorial",
         "accent": "crimson",
         "width": 1024,
@@ -2050,12 +2050,12 @@
           "system": "editorial",
           "accent": "crimson"
         },
-        "resumed": true,
+        "resumed": false,
         "pass": true,
-        "screenshotSha256": "2079b11675bb5d8befdf7fad47027a68ddabf5148bbfa6671e3884b0e5e627dd"
+        "screenshotSha256": "4b7a575ac77e7967f8254f8a8d7a1add5b2faac1b7d18f014cd6a895c5b6d181"
       },
       {
-        "captureRunId": "mu67in02-36056",
+        "captureRunId": "mum3c6o5-80294",
         "system": "editorial",
         "accent": "crimson",
         "width": 1024,
@@ -2097,12 +2097,12 @@
           "system": "editorial",
           "accent": "crimson"
         },
-        "resumed": true,
+        "resumed": false,
         "pass": true,
-        "screenshotSha256": "d5bc535eec51664ebbd71b814771b26d82db92b59d2ac7b5061f8b7bc9fa75d4"
+        "screenshotSha256": "956ed677b3881271da20e391aeb56e655301c4b05462d0dd262a70f39ea7d220"
       },
       {
-        "captureRunId": "mu67in02-36056",
+        "captureRunId": "mum3c6o5-80294",
         "system": "editorial",
         "accent": "crimson",
         "width": 1024,
@@ -2144,12 +2144,12 @@
           "system": "editorial",
           "accent": "crimson"
         },
-        "resumed": true,
+        "resumed": false,
         "pass": true,
-        "screenshotSha256": "5965e701846ab52aa0c6e3529737d14e65cb6fd91addc7150e41b0a6c09054c8"
+        "screenshotSha256": "e4c1da0c052435288bfa73b01549cb8c0540790cb2a241dd247e2abf712d7829"
       },
       {
-        "captureRunId": "mu67in02-36056",
+        "captureRunId": "mum3c6o5-80294",
         "system": "editorial",
         "accent": "crimson",
         "width": 1440,
@@ -2191,12 +2191,12 @@
           "system": "editorial",
           "accent": "crimson"
         },
-        "resumed": true,
+        "resumed": false,
         "pass": true,
-        "screenshotSha256": "7f91a15747845cb244909c7e813360fc0e1eda5c1f6b8f1710d17cf3b408fd23"
+        "screenshotSha256": "52f05bacc75eaf03fe9a31fefc1618f5cdf0b41afd033e8032e6ae45d7e0f26b"
       },
       {
-        "captureRunId": "mu67in02-36056",
+        "captureRunId": "mum3c6o5-80294",
         "system": "editorial",
         "accent": "crimson",
         "width": 1440,
@@ -2238,12 +2238,12 @@
           "system": "editorial",
           "accent": "crimson"
         },
-        "resumed": true,
+        "resumed": false,
         "pass": true,
-        "screenshotSha256": "72fa0dd90c88097e51f713d2bbf304b3e7c278f467f86e27957767974fa55622"
+        "screenshotSha256": "0ea8bde2262b8b7c3fe3d7b91f510772ef922a99ea2c8a2ef136506a189afa6d"
       },
       {
-        "captureRunId": "mu67in02-36056",
+        "captureRunId": "mum3c6o5-80294",
         "system": "editorial",
         "accent": "crimson",
         "width": 1440,
@@ -2285,12 +2285,12 @@
           "system": "editorial",
           "accent": "crimson"
         },
-        "resumed": true,
+        "resumed": false,
         "pass": true,
-        "screenshotSha256": "eaef97f9aec1ef50b7ccbd2faa80fd9c059623ee3354960339577e40e8bf7c64"
+        "screenshotSha256": "b79978a6d45c0223ec229b4edee89f084b61294ca7d3e59998adbe856970241f"
       },
       {
-        "captureRunId": "mu67in02-36056",
+        "captureRunId": "mum3c6o5-80294",
         "system": "editorial",
         "accent": "crimson",
         "width": 1440,
@@ -2332,12 +2332,12 @@
           "system": "editorial",
           "accent": "crimson"
         },
-        "resumed": true,
+        "resumed": false,
         "pass": true,
-        "screenshotSha256": "cdf1dd9d739ee9c27f9a13529b83f762f3bd3a276b44d10910e003c3f596aefe"
+        "screenshotSha256": "e763d6ea13a9498a2e5d70d0e44cc92e62836772aea3a328a1edcc74d8992786"
       },
       {
-        "captureRunId": "mu67in02-36056",
+        "captureRunId": "mum3c6o5-80294",
         "system": "terminal",
         "accent": "matrix",
         "width": 375,
@@ -2379,12 +2379,12 @@
           "system": "terminal",
           "accent": "matrix"
         },
-        "resumed": true,
+        "resumed": false,
         "pass": true,
-        "screenshotSha256": "fb69113f948331a06a32ec3a537a7d295937d07c1c08cba3d1b481f03a26e0c6"
+        "screenshotSha256": "dd647bfa4ffa5060f315ef1452f6a485d40e216fe2061d2b16aa7a1c96de7245"
       },
       {
-        "captureRunId": "mu67in02-36056",
+        "captureRunId": "mum3c6o5-80294",
         "system": "terminal",
         "accent": "matrix",
         "width": 375,
@@ -2426,12 +2426,12 @@
           "system": "terminal",
           "accent": "matrix"
         },
-        "resumed": true,
+        "resumed": false,
         "pass": true,
-        "screenshotSha256": "2fa3f74792ea618706815a47fd79ea5b30d115b918979558dd19bd94574d9976"
+        "screenshotSha256": "4691fd2119da2f4974fea064521a9e9f0aeba38f73b3a168bfb80b4ad17f5d7e"
       },
       {
-        "captureRunId": "mu67in02-36056",
+        "captureRunId": "mum3c6o5-80294",
         "system": "terminal",
         "accent": "matrix",
         "width": 375,
@@ -2473,12 +2473,12 @@
           "system": "terminal",
           "accent": "matrix"
         },
-        "resumed": true,
+        "resumed": false,
         "pass": true,
-        "screenshotSha256": "8e2f72c989760d8aa2fc0a0c0f9c146ec1263f91840547cf7f84abcba1ded6e6"
+        "screenshotSha256": "1c6965dac37094099e01e0b4c106e13f1f74dafc0c4107003c688ff443889c25"
       },
       {
-        "captureRunId": "mu67in02-36056",
+        "captureRunId": "mum3c6o5-80294",
         "system": "terminal",
         "accent": "matrix",
         "width": 375,
@@ -2520,12 +2520,12 @@
           "system": "terminal",
           "accent": "matrix"
         },
-        "resumed": true,
+        "resumed": false,
         "pass": true,
-        "screenshotSha256": "50588b86354bdf02b6ccd2615a412ed005e623918bed1b51f9306064e8101e9b"
+        "screenshotSha256": "d34f7f7cbb33e4c73ea8c866c8b25404868add65401df1160b7e48f35b1534e9"
       },
       {
-        "captureRunId": "mu67in02-36056",
+        "captureRunId": "mum3c6o5-80294",
         "system": "terminal",
         "accent": "matrix",
         "width": 768,
@@ -2567,12 +2567,12 @@
           "system": "terminal",
           "accent": "matrix"
         },
-        "resumed": true,
+        "resumed": false,
         "pass": true,
-        "screenshotSha256": "897374d60a8e58396faf412e3781d1a58f18e7b121d754ffc120285fd6a7b023"
+        "screenshotSha256": "dc05647dd29e1bc8e199384f7b9d6d464093f4e4e92b54624b6ca4c058280eba"
       },
       {
-        "captureRunId": "mu67in02-36056",
+        "captureRunId": "mum3c6o5-80294",
         "system": "terminal",
         "accent": "matrix",
         "width": 768,
@@ -2614,12 +2614,12 @@
           "system": "terminal",
           "accent": "matrix"
         },
-        "resumed": true,
+        "resumed": false,
         "pass": true,
-        "screenshotSha256": "5178f46cccfff1e5aabce7025b9a741c8213ca2023d967ab6819063728839b7d"
+        "screenshotSha256": "c65fb45b7d025c2fcf14d288c5eeafebb681b60433db38ece0083854b9dc2617"
       },
       {
-        "captureRunId": "mu67in02-36056",
+        "captureRunId": "mum3c6o5-80294",
         "system": "terminal",
         "accent": "matrix",
         "width": 768,
@@ -2661,12 +2661,12 @@
           "system": "terminal",
           "accent": "matrix"
         },
-        "resumed": true,
+        "resumed": false,
         "pass": true,
-        "screenshotSha256": "5c10544dae99215f2502f54f8c5179c10fdb99f63a12029af0339f092136bd27"
+        "screenshotSha256": "ddbc31cad08e71d444106f852d7a4b6348268165c449231daf84e3eef3a3809c"
       },
       {
-        "captureRunId": "mu67in02-36056",
+        "captureRunId": "mum3c6o5-80294",
         "system": "terminal",
         "accent": "matrix",
         "width": 768,
@@ -2708,12 +2708,12 @@
           "system": "terminal",
           "accent": "matrix"
         },
-        "resumed": true,
+        "resumed": false,
         "pass": true,
-        "screenshotSha256": "470f088dd2c7973321dbc41fcbed213034aaadd7557d06db675e7812d855eab2"
+        "screenshotSha256": "aaa81a68dabb2e4346cc7d34559de8766fa54de2578ad5a3ad161b81b74b0984"
       },
       {
-        "captureRunId": "mu67in02-36056",
+        "captureRunId": "mum3c6o5-80294",
         "system": "terminal",
         "accent": "matrix",
         "width": 1024,
@@ -2755,12 +2755,12 @@
           "system": "terminal",
           "accent": "matrix"
         },
-        "resumed": true,
+        "resumed": false,
         "pass": true,
-        "screenshotSha256": "680f88a10ed9a84eeafc1bb0a7b3794dcd228da900b2b177345a1cb0713614c6"
+        "screenshotSha256": "5088c06b3f4f46605e9584b64a5f8aa12fe679b1396b4ca39f846317e54b9d0a"
       },
       {
-        "captureRunId": "mu67in02-36056",
+        "captureRunId": "mum3c6o5-80294",
         "system": "terminal",
         "accent": "matrix",
         "width": 1024,
@@ -2802,12 +2802,12 @@
           "system": "terminal",
           "accent": "matrix"
         },
-        "resumed": true,
+        "resumed": false,
         "pass": true,
-        "screenshotSha256": "05b3f450875a14929d8f5258c3445c1745148246f829af1c961c0b516dcc2999"
+        "screenshotSha256": "b99a8b1ab5f8de0ee2dfb6ec6c8e433b83c86e1dccc601ab4271946a93a0e0d7"
       },
       {
-        "captureRunId": "mu67in02-36056",
+        "captureRunId": "mum3c6o5-80294",
         "system": "terminal",
         "accent": "matrix",
         "width": 1024,
@@ -2849,12 +2849,12 @@
           "system": "terminal",
           "accent": "matrix"
         },
-        "resumed": true,
+        "resumed": false,
         "pass": true,
-        "screenshotSha256": "a02a4f39c5212b553acac7f031b01d36cca2ccc4b7a44b04a3fb8cf6633fb9f4"
+        "screenshotSha256": "4db39741776f462a10ce48ae5a622be6c67c2fb875be5f068f8e17d461c42c0d"
       },
       {
-        "captureRunId": "mu67in02-36056",
+        "captureRunId": "mum3c6o5-80294",
         "system": "terminal",
         "accent": "matrix",
         "width": 1024,
@@ -2896,12 +2896,12 @@
           "system": "terminal",
           "accent": "matrix"
         },
-        "resumed": true,
+        "resumed": false,
         "pass": true,
-        "screenshotSha256": "52a7731148a8edea256e1b800f059e1a560801c72006ef9fd75e11397da1796b"
+        "screenshotSha256": "66b413eb5c142f6bfc66ba3206821123747b8279f1d6d38ca5e74167fb6ebbe5"
       },
       {
-        "captureRunId": "mu67in02-36056",
+        "captureRunId": "mum3c6o5-80294",
         "system": "terminal",
         "accent": "matrix",
         "width": 1440,
@@ -2943,12 +2943,12 @@
           "system": "terminal",
           "accent": "matrix"
         },
-        "resumed": true,
+        "resumed": false,
         "pass": true,
-        "screenshotSha256": "74134040d87b9a2225297085dd6f210f954f74e186e96d8fb1c0ab5827645d57"
+        "screenshotSha256": "a9dfd42f8d64497c6b587bbc00f870217c6442ecf7a6ba77b89738425ad7fe07"
       },
       {
-        "captureRunId": "mu67in02-36056",
+        "captureRunId": "mum3c6o5-80294",
         "system": "terminal",
         "accent": "matrix",
         "width": 1440,
@@ -2990,12 +2990,12 @@
           "system": "terminal",
           "accent": "matrix"
         },
-        "resumed": true,
+        "resumed": false,
         "pass": true,
-        "screenshotSha256": "db3445bb8dc8a7a7c156a6e37ce46f4d8acae9788f9bce250c1e771f7af0ed65"
+        "screenshotSha256": "0c82953ed6ead3f62826cf057837df9f4351b8de9cb9c8286704782cb0886733"
       },
       {
-        "captureRunId": "mu67in02-36056",
+        "captureRunId": "mum3c6o5-80294",
         "system": "terminal",
         "accent": "matrix",
         "width": 1440,
@@ -3037,12 +3037,12 @@
           "system": "terminal",
           "accent": "matrix"
         },
-        "resumed": true,
+        "resumed": false,
         "pass": true,
-        "screenshotSha256": "840f035614bed555480870d4e30fff35b6df507ab5251341be091248a8cb08f0"
+        "screenshotSha256": "ad808c68a5fc71ea59d1413d4b0964bce2fa9b123cef357c7eefcfd95bfd0ffd"
       },
       {
-        "captureRunId": "mu67in02-36056",
+        "captureRunId": "mum3c6o5-80294",
         "system": "terminal",
         "accent": "matrix",
         "width": 1440,
@@ -3084,12 +3084,12 @@
           "system": "terminal",
           "accent": "matrix"
         },
-        "resumed": true,
+        "resumed": false,
         "pass": true,
-        "screenshotSha256": "3b25712c690ac5a33360322458086554cf02de60f2cb0323eaeaa68834bf3d7c"
+        "screenshotSha256": "00b90bcf11da1bc1b81c1376684ef5e7fa6acafebde69cf7fd692b779287b74c"
       },
       {
-        "captureRunId": "mu67in02-36056",
+        "captureRunId": "mum3c6o5-80294",
         "system": "geist",
         "accent": "cyan",
         "width": 375,
@@ -3131,12 +3131,12 @@
           "system": "geist",
           "accent": "cyan"
         },
-        "resumed": true,
+        "resumed": false,
         "pass": true,
-        "screenshotSha256": "048a9779a0c894cfb76fcd483956bc0be6c13096faead69922548e06c534a192"
+        "screenshotSha256": "3f0f3ef5ef4be7be8e93f41eb4458d84ba3ffe3b9fe03398929ef072d45bcd63"
       },
       {
-        "captureRunId": "mu67in02-36056",
+        "captureRunId": "mum3c6o5-80294",
         "system": "geist",
         "accent": "cyan",
         "width": 375,
@@ -3178,12 +3178,12 @@
           "system": "geist",
           "accent": "cyan"
         },
-        "resumed": true,
+        "resumed": false,
         "pass": true,
-        "screenshotSha256": "aa6f0622675e84bb0ad5215ca1e8ffa6fed8c0611543b945f9336c19f3a636d0"
+        "screenshotSha256": "f81a93044db8b00391e609bcda98d55368b3a1e4b53191bf8be1b4c9ad96d8e8"
       },
       {
-        "captureRunId": "mu67in02-36056",
+        "captureRunId": "mum3c6o5-80294",
         "system": "geist",
         "accent": "cyan",
         "width": 375,
@@ -3225,12 +3225,12 @@
           "system": "geist",
           "accent": "cyan"
         },
-        "resumed": true,
+        "resumed": false,
         "pass": true,
-        "screenshotSha256": "67fd346e646978c637a762d27de49f0b94319ae3411037d4209ab6d8179eab62"
+        "screenshotSha256": "2a20abfcd389fa980e4068c10c26656e496767bb732675f6f4ab6fc56847f77b"
       },
       {
-        "captureRunId": "mu67in02-36056",
+        "captureRunId": "mum3c6o5-80294",
         "system": "geist",
         "accent": "cyan",
         "width": 375,
@@ -3272,12 +3272,12 @@
           "system": "geist",
           "accent": "cyan"
         },
-        "resumed": true,
+        "resumed": false,
         "pass": true,
-        "screenshotSha256": "42dce2ee813fe82c95ffcded68551c135a279efa607bf3511b113183f1043be7"
+        "screenshotSha256": "9df8ee994ace0784809acdbcbc8bb9cc80fc12bd3e3188a7a8cff349fafc58f1"
       },
       {
-        "captureRunId": "mu67in02-36056",
+        "captureRunId": "mum3c6o5-80294",
         "system": "geist",
         "accent": "cyan",
         "width": 768,
@@ -3319,12 +3319,12 @@
           "system": "geist",
           "accent": "cyan"
         },
-        "resumed": true,
+        "resumed": false,
         "pass": true,
-        "screenshotSha256": "e5533581455e2e07f97997d01294eff5ac0a3bcb947c1db90f655a8ac11378ec"
+        "screenshotSha256": "7613173b5656b52a7773b7c5e7c7f4533046556af5bbb790c265bce7ced77136"
       },
       {
-        "captureRunId": "mu67in02-36056",
+        "captureRunId": "mum3c6o5-80294",
         "system": "geist",
         "accent": "cyan",
         "width": 768,
@@ -3366,12 +3366,12 @@
           "system": "geist",
           "accent": "cyan"
         },
-        "resumed": true,
+        "resumed": false,
         "pass": true,
-        "screenshotSha256": "083f49de153462b49aaf3fcab0ec79464a888a80020608a78820f477f49f70b2"
+        "screenshotSha256": "2ce100384230578dfdff3d9d57d339a365edd914316171daa20c0e787bf2b278"
       },
       {
-        "captureRunId": "mu67in02-36056",
+        "captureRunId": "mum3c6o5-80294",
         "system": "geist",
         "accent": "cyan",
         "width": 768,
@@ -3413,12 +3413,12 @@
           "system": "geist",
           "accent": "cyan"
         },
-        "resumed": true,
+        "resumed": false,
         "pass": true,
-        "screenshotSha256": "1ebab53d4da2e4c4a2cd0f7af11234851ba4bf4e56ee9b2834af9009a875270b"
+        "screenshotSha256": "8611fda1d680ea58a328e4ae2dc85b39b00a8ac1f9058aa185fa91183bdd922d"
       },
       {
-        "captureRunId": "mu67in02-36056",
+        "captureRunId": "mum3c6o5-80294",
         "system": "geist",
         "accent": "cyan",
         "width": 768,
@@ -3460,12 +3460,12 @@
           "system": "geist",
           "accent": "cyan"
         },
-        "resumed": true,
+        "resumed": false,
         "pass": true,
-        "screenshotSha256": "d7f891df51516a0cde87fc18c425af935833240000ef33cc69513eef9c8acf34"
+        "screenshotSha256": "631d061633d5fb47f10f64dc4ff073d689991fb9138234a558f3de841a114378"
       },
       {
-        "captureRunId": "mu67in02-36056",
+        "captureRunId": "mum3c6o5-80294",
         "system": "geist",
         "accent": "cyan",
         "width": 1024,
@@ -3507,12 +3507,12 @@
           "system": "geist",
           "accent": "cyan"
         },
-        "resumed": true,
+        "resumed": false,
         "pass": true,
-        "screenshotSha256": "e377eeb3e60f606e1a705a473ccf943384e3474382ff5c2cf031158e8268886f"
+        "screenshotSha256": "19b6b07c2f8d1fce4aa6f4c5b3b6a645bd957bb862bf5caedc7716deaeaaabe5"
       },
       {
-        "captureRunId": "mu67in02-36056",
+        "captureRunId": "mum3c6o5-80294",
         "system": "geist",
         "accent": "cyan",
         "width": 1024,
@@ -3554,12 +3554,12 @@
           "system": "geist",
           "accent": "cyan"
         },
-        "resumed": true,
+        "resumed": false,
         "pass": true,
-        "screenshotSha256": "c4d1c6a158f44db4f347e507bbd5b4ed8619c731782234cee8ee3280c18bde66"
+        "screenshotSha256": "3cd51561f473d8f721c9a7e3c2bb9e28b2dfdc2530280110badb8135d26e36cf"
       },
       {
-        "captureRunId": "mu67in02-36056",
+        "captureRunId": "mum3c6o5-80294",
         "system": "geist",
         "accent": "cyan",
         "width": 1024,
@@ -3601,12 +3601,12 @@
           "system": "geist",
           "accent": "cyan"
         },
-        "resumed": true,
+        "resumed": false,
         "pass": true,
-        "screenshotSha256": "cc9ae3c4a131de2e60311ee6e324e4c24b376d037b7a0a452b23334bde3f426f"
+        "screenshotSha256": "c905d70a24839953b3590a991f79725ab87958e8862b97523d67523c377d9e91"
       },
       {
-        "captureRunId": "mu67in02-36056",
+        "captureRunId": "mum3c6o5-80294",
         "system": "geist",
         "accent": "cyan",
         "width": 1024,
@@ -3648,12 +3648,12 @@
           "system": "geist",
           "accent": "cyan"
         },
-        "resumed": true,
+        "resumed": false,
         "pass": true,
-        "screenshotSha256": "e6ed97a82d5e2244e6752122eed816679c44921dae2cb4db51939108f89d7dd9"
+        "screenshotSha256": "0d9672023e3ab21dbcf6817c801d0419e831e28767cd7f2bae9bc6cef3ec086f"
       },
       {
-        "captureRunId": "mu67in02-36056",
+        "captureRunId": "mum3c6o5-80294",
         "system": "geist",
         "accent": "cyan",
         "width": 1440,
@@ -3695,12 +3695,12 @@
           "system": "geist",
           "accent": "cyan"
         },
-        "resumed": true,
+        "resumed": false,
         "pass": true,
-        "screenshotSha256": "c7e626a6d3df009ae4856c7fc35714a441acc4c6a0c13297abe5551bd110c3c4"
+        "screenshotSha256": "faaff8715c00d00131246bd8f14778a0b3048f64163d9f3647d4e74e6043b77a"
       },
       {
-        "captureRunId": "mu67in02-36056",
+        "captureRunId": "mum3c6o5-80294",
         "system": "geist",
         "accent": "cyan",
         "width": 1440,
@@ -3742,12 +3742,12 @@
           "system": "geist",
           "accent": "cyan"
         },
-        "resumed": true,
+        "resumed": false,
         "pass": true,
-        "screenshotSha256": "3644413da27bb3cda757a360a96b6368860dc49752036aa225227826b807f01b"
+        "screenshotSha256": "10705db37e9d87af9697257fd40d458d8f3149d294241f34e02f8bd5f04c482e"
       },
       {
-        "captureRunId": "mu67in02-36056",
+        "captureRunId": "mum3c6o5-80294",
         "system": "geist",
         "accent": "cyan",
         "width": 1440,
@@ -3789,12 +3789,12 @@
           "system": "geist",
           "accent": "cyan"
         },
-        "resumed": true,
+        "resumed": false,
         "pass": true,
-        "screenshotSha256": "6499fa5fe55dbb8743d960aec0266028f8cd94366d7864ea84d370039ca9aa91"
+        "screenshotSha256": "e77874e678ffb8b9f73f37faa1ca9fb06eefea556e43737ce4fedfe196b7eda0"
       },
       {
-        "captureRunId": "mu67in02-36056",
+        "captureRunId": "mum3c6o5-80294",
         "system": "geist",
         "accent": "cyan",
         "width": 1440,
@@ -3836,12 +3836,12 @@
           "system": "geist",
           "accent": "cyan"
         },
-        "resumed": true,
+        "resumed": false,
         "pass": true,
-        "screenshotSha256": "f779ad919ad6fbbe71b9c67d2dbbd9acf9d59f2bf9446bba1d76c43b0c87ade2"
+        "screenshotSha256": "d5bbde2a319545eb3973d99b26af3fd85ea3a192ce8a958b7d66ff85fb75744a"
       },
       {
-        "captureRunId": "mu67in02-36056",
+        "captureRunId": "mum3c6o5-80294",
         "system": "brutalist",
         "accent": "amber",
         "width": 375,
@@ -3883,12 +3883,12 @@
           "system": "brutalist",
           "accent": "amber"
         },
-        "resumed": true,
+        "resumed": false,
         "pass": true,
-        "screenshotSha256": "c5e314e99994e50fac430ef02249a282e5a43174485a86eda047628b5a99f7c5"
+        "screenshotSha256": "f6018439fe93cc0a9db45e164fc41683c0619667a89809e9b580cca067d3602d"
       },
       {
-        "captureRunId": "mu67in02-36056",
+        "captureRunId": "mum3c6o5-80294",
         "system": "brutalist",
         "accent": "amber",
         "width": 375,
@@ -3930,12 +3930,12 @@
           "system": "brutalist",
           "accent": "amber"
         },
-        "resumed": true,
+        "resumed": false,
         "pass": true,
-        "screenshotSha256": "b3a31d0e1f432721c5f2780572a0a250503b3ae7f82a958f56554ee9831207c0"
+        "screenshotSha256": "f05f89e60731cd6d66e9730ce5af145230e2c58ea8eeb65cdab813243e4cdac9"
       },
       {
-        "captureRunId": "mu67in02-36056",
+        "captureRunId": "mum3c6o5-80294",
         "system": "brutalist",
         "accent": "amber",
         "width": 375,
@@ -3977,12 +3977,12 @@
           "system": "brutalist",
           "accent": "amber"
         },
-        "resumed": true,
+        "resumed": false,
         "pass": true,
-        "screenshotSha256": "2d5d803f78a3738e6c2da60ccae41062a4802e8766bcb796e913c3cd4091ec21"
+        "screenshotSha256": "0036daa6081913a4c557511bba363f3754cd2168434cd301767464e1c1b83b6c"
       },
       {
-        "captureRunId": "mu67in02-36056",
+        "captureRunId": "mum3c6o5-80294",
         "system": "brutalist",
         "accent": "amber",
         "width": 375,
@@ -4024,12 +4024,12 @@
           "system": "brutalist",
           "accent": "amber"
         },
-        "resumed": true,
+        "resumed": false,
         "pass": true,
-        "screenshotSha256": "236b4cf8be7f95958de45a4d46b750cd4e72e4bd399b839af98455314d516e8f"
+        "screenshotSha256": "7be7325294c689b453717fd6d804c46812580b5039316668482a5f97017b98ee"
       },
       {
-        "captureRunId": "mu67in02-36056",
+        "captureRunId": "mum3c6o5-80294",
         "system": "brutalist",
         "accent": "amber",
         "width": 768,
@@ -4071,12 +4071,12 @@
           "system": "brutalist",
           "accent": "amber"
         },
-        "resumed": true,
+        "resumed": false,
         "pass": true,
-        "screenshotSha256": "295104c308867ac96c77f967f7da20b6b165a5678c5213cc0a2be4bfa8dae814"
+        "screenshotSha256": "f023d60a29bae38b8c36a4722b65ff5b715b1d64128e86d529e7c34b4e44fddc"
       },
       {
-        "captureRunId": "mu67in02-36056",
+        "captureRunId": "mum3c6o5-80294",
         "system": "brutalist",
         "accent": "amber",
         "width": 768,
@@ -4118,12 +4118,12 @@
           "system": "brutalist",
           "accent": "amber"
         },
-        "resumed": true,
+        "resumed": false,
         "pass": true,
-        "screenshotSha256": "ebeac6a04c3a951af7f8767d6a75adae4f431f363779f367fa264694d9a07213"
+        "screenshotSha256": "99934a89ed18306892dbfac18f160c1a04c52052c1f477181cb57ba884893eff"
       },
       {
-        "captureRunId": "mu67in02-36056",
+        "captureRunId": "mum3c6o5-80294",
         "system": "brutalist",
         "accent": "amber",
         "width": 768,
@@ -4165,12 +4165,12 @@
           "system": "brutalist",
           "accent": "amber"
         },
-        "resumed": true,
+        "resumed": false,
         "pass": true,
-        "screenshotSha256": "af50a507d2e2bdf6e8cdfe684c1ad929ab525ef6d9e1faac653e4a07406008a5"
+        "screenshotSha256": "b617b987330d4299eabe1e3aa4b294e6d9c384325668070e00b48aa0a7800a8c"
       },
       {
-        "captureRunId": "mu67in02-36056",
+        "captureRunId": "mum3c6o5-80294",
         "system": "brutalist",
         "accent": "amber",
         "width": 768,
@@ -4212,12 +4212,12 @@
           "system": "brutalist",
           "accent": "amber"
         },
-        "resumed": true,
+        "resumed": false,
         "pass": true,
-        "screenshotSha256": "bd991a09b9b64a3365f4abf1e869a8c9cea2c23db0ccc3187e6281f3f2b81740"
+        "screenshotSha256": "cf6957569530f7854ef058a1cee0e5e1f733943b173ba79cb29daebf3e912e28"
       },
       {
-        "captureRunId": "mu67in02-36056",
+        "captureRunId": "mum3c6o5-80294",
         "system": "brutalist",
         "accent": "amber",
         "width": 1024,
@@ -4259,12 +4259,12 @@
           "system": "brutalist",
           "accent": "amber"
         },
-        "resumed": true,
+        "resumed": false,
         "pass": true,
-        "screenshotSha256": "f78326a17048254c4faff0ea6e3546695c31244a4380ca19df55b8ed74fb5351"
+        "screenshotSha256": "8a99cbea4c0463d3e484428c799ac7f46345dc43b41ff5d33acc110ce46b0d60"
       },
       {
-        "captureRunId": "mu67in02-36056",
+        "captureRunId": "mum3c6o5-80294",
         "system": "brutalist",
         "accent": "amber",
         "width": 1024,
@@ -4306,12 +4306,12 @@
           "system": "brutalist",
           "accent": "amber"
         },
-        "resumed": true,
+        "resumed": false,
         "pass": true,
-        "screenshotSha256": "ff9f4fa17c9f6b571b410b2f9d291391eee3ce7ff50c76b37da9af7c1681c515"
+        "screenshotSha256": "fdb191f3a54f8072b9b60c0be18824988dd7d5bcfa7ff3d1089ba9003f1fcc4a"
       },
       {
-        "captureRunId": "mu67in02-36056",
+        "captureRunId": "mum3c6o5-80294",
         "system": "brutalist",
         "accent": "amber",
         "width": 1024,
@@ -4353,12 +4353,12 @@
           "system": "brutalist",
           "accent": "amber"
         },
-        "resumed": true,
+        "resumed": false,
         "pass": true,
-        "screenshotSha256": "0b7d664055bc9d0dba242ca70d46c2ac49e9a393b74e0836755c7eef73fa46fc"
+        "screenshotSha256": "8c2d9372f2576511cdc66174dfec2102c29e19c31b047eca020a692b66398f01"
       },
       {
-        "captureRunId": "mu67in02-36056",
+        "captureRunId": "mum3c6o5-80294",
         "system": "brutalist",
         "accent": "amber",
         "width": 1024,
@@ -4400,12 +4400,12 @@
           "system": "brutalist",
           "accent": "amber"
         },
-        "resumed": true,
+        "resumed": false,
         "pass": true,
-        "screenshotSha256": "a08c6e3c445a50e4b1284faa44a68f67a7a94c03ebf66fcdb4487cf41983a1e5"
+        "screenshotSha256": "bcb57647ab19a0f834edfd4835eded34632a5f698e3969f110fef15fb18df351"
       },
       {
-        "captureRunId": "mu67in02-36056",
+        "captureRunId": "mum3c6o5-80294",
         "system": "brutalist",
         "accent": "amber",
         "width": 1440,
@@ -4447,12 +4447,12 @@
           "system": "brutalist",
           "accent": "amber"
         },
-        "resumed": true,
+        "resumed": false,
         "pass": true,
-        "screenshotSha256": "ffe57b4a4a328e4a90afcb213fb5f9876fb18ad4c9be547c6bdd152621380509"
+        "screenshotSha256": "ef1c6f38ff484767c14abad323550bc0caa0d034c739833f67bb48b1599be741"
       },
       {
-        "captureRunId": "mu67in02-36056",
+        "captureRunId": "mum3c6o5-80294",
         "system": "brutalist",
         "accent": "amber",
         "width": 1440,
@@ -4494,12 +4494,12 @@
           "system": "brutalist",
           "accent": "amber"
         },
-        "resumed": true,
+        "resumed": false,
         "pass": true,
-        "screenshotSha256": "209a26005e816761b0b48ca74c22679da5eebb7d3e4c2bd620e5105c88067f49"
+        "screenshotSha256": "b054353ae75b4b161f6536ec1be7a5cbc735097108df5a5c538bf1a603ea77bd"
       },
       {
-        "captureRunId": "mu67in02-36056",
+        "captureRunId": "mum3c6o5-80294",
         "system": "brutalist",
         "accent": "amber",
         "width": 1440,
@@ -4541,12 +4541,12 @@
           "system": "brutalist",
           "accent": "amber"
         },
-        "resumed": true,
+        "resumed": false,
         "pass": true,
-        "screenshotSha256": "263b3934037fb9f928c707afe31e98e526266d2848bb55e1397a855b4c662546"
+        "screenshotSha256": "3e6fd2fb8418e07e5f570b09eb2849155a0c7c7b775d0b223038f96481702bbb"
       },
       {
-        "captureRunId": "mu67in02-36056",
+        "captureRunId": "mum3c6o5-80294",
         "system": "brutalist",
         "accent": "amber",
         "width": 1440,
@@ -4588,12 +4588,12 @@
           "system": "brutalist",
           "accent": "amber"
         },
-        "resumed": true,
+        "resumed": false,
         "pass": true,
-        "screenshotSha256": "4bef86bdcbc736e5bf94a20ae27ae541cd52b94d74dedd7cd3b87af9165137bf"
+        "screenshotSha256": "2715583f4b9c4ac4080f3738d53656329601586d53094ce1c0069c5564f37c73"
       },
       {
-        "captureRunId": "mu67in02-36056",
+        "captureRunId": "mum3c6o5-80294",
         "system": "swiss",
         "accent": "orange",
         "width": 375,
@@ -4635,12 +4635,12 @@
           "system": "swiss",
           "accent": "orange"
         },
-        "resumed": true,
+        "resumed": false,
         "pass": true,
-        "screenshotSha256": "43b6748cd0754deb55e627e2236b1a214e118c9380b057c70afe7b123f7a1ade"
+        "screenshotSha256": "0e7d23de1b5003c81b2b329bd34b37acbc0b10aad861a9e3530f5bbc0c3bb190"
       },
       {
-        "captureRunId": "mu67in02-36056",
+        "captureRunId": "mum3c6o5-80294",
         "system": "swiss",
         "accent": "orange",
         "width": 375,
@@ -4682,12 +4682,12 @@
           "system": "swiss",
           "accent": "orange"
         },
-        "resumed": true,
+        "resumed": false,
         "pass": true,
-        "screenshotSha256": "fdcd58af361e6204565cc6080e97d06a84d176df615ddbecc1662b7012924c90"
+        "screenshotSha256": "13099c1d3156df4ee589de7ff7438d66383c5695f26f4671107fa540ffff0afd"
       },
       {
-        "captureRunId": "mu67in02-36056",
+        "captureRunId": "mum3c6o5-80294",
         "system": "swiss",
         "accent": "orange",
         "width": 375,
@@ -4729,12 +4729,12 @@
           "system": "swiss",
           "accent": "orange"
         },
-        "resumed": true,
+        "resumed": false,
         "pass": true,
-        "screenshotSha256": "d0acd119e06b6b84f90811e4c9f056064743fe5be68ddea462d3aadd9fa92082"
+        "screenshotSha256": "bf9d52dec7eccfa3e61b5ce9ff82ba1b23592156e9c83680118b8aee7f32df9c"
       },
       {
-        "captureRunId": "mu67in02-36056",
+        "captureRunId": "mum3c6o5-80294",
         "system": "swiss",
         "accent": "orange",
         "width": 375,
@@ -4776,12 +4776,12 @@
           "system": "swiss",
           "accent": "orange"
         },
-        "resumed": true,
+        "resumed": false,
         "pass": true,
-        "screenshotSha256": "703d74bd8bb9e3849479b548e1ee25570b345ffa30778723046a2baa3f12085c"
+        "screenshotSha256": "dd62af3ec088401666007ab5c641aa8edf7fc235c6f27cebcc74eb773280c07b"
       },
       {
-        "captureRunId": "mu67in02-36056",
+        "captureRunId": "mum3c6o5-80294",
         "system": "swiss",
         "accent": "orange",
         "width": 768,
@@ -4823,12 +4823,12 @@
           "system": "swiss",
           "accent": "orange"
         },
-        "resumed": true,
+        "resumed": false,
         "pass": true,
-        "screenshotSha256": "034937998a97795241321b87d3a6c7f8c88213fe7b467745661f904d07d133d0"
+        "screenshotSha256": "d7095e70f56e09de129e53995b34a2919c7cd9123bdde9a0d0f3d72dcfb4d7d4"
       },
       {
-        "captureRunId": "mu67in02-36056",
+        "captureRunId": "mum3c6o5-80294",
         "system": "swiss",
         "accent": "orange",
         "width": 768,
@@ -4870,12 +4870,12 @@
           "system": "swiss",
           "accent": "orange"
         },
-        "resumed": true,
+        "resumed": false,
         "pass": true,
-        "screenshotSha256": "bd4ae188d068ecc84ed041138f9100b60277edf5f3a67d43f142d3c7cd751168"
+        "screenshotSha256": "c5ee2ad67bea6ba41d341777e4debe899733d501c0b0223519d8d59e8d028d78"
       },
       {
-        "captureRunId": "mu67in02-36056",
+        "captureRunId": "mum3c6o5-80294",
         "system": "swiss",
         "accent": "orange",
         "width": 768,
@@ -4917,12 +4917,12 @@
           "system": "swiss",
           "accent": "orange"
         },
-        "resumed": true,
+        "resumed": false,
         "pass": true,
-        "screenshotSha256": "ffe53ffd3fb245e2d51a7cbcb1d2f6dc7da3b4455d5b62672ec796eb3a4e0586"
+        "screenshotSha256": "c9534ae1bfdf16f6316f42bb6cf0a6e6fdb8e62da5cfcbe631118eb5709e2ff5"
       },
       {
-        "captureRunId": "mu67in02-36056",
+        "captureRunId": "mum3c6o5-80294",
         "system": "swiss",
         "accent": "orange",
         "width": 768,
@@ -4964,12 +4964,12 @@
           "system": "swiss",
           "accent": "orange"
         },
-        "resumed": true,
+        "resumed": false,
         "pass": true,
-        "screenshotSha256": "7ec4b474a84feea71f9cc48217ec7ba4f575513f8158a9760db21b47e4564596"
+        "screenshotSha256": "987561f5423906134ac716846e9d344a6553df139f14d03545e176ce8dc1153d"
       },
       {
-        "captureRunId": "mu67in02-36056",
+        "captureRunId": "mum3c6o5-80294",
         "system": "swiss",
         "accent": "orange",
         "width": 1024,
@@ -5011,12 +5011,12 @@
           "system": "swiss",
           "accent": "orange"
         },
-        "resumed": true,
+        "resumed": false,
         "pass": true,
-        "screenshotSha256": "0dab7147e3262b3ca6d410ebc47916f81e6939caa8e8e72ee63da59edee48de5"
+        "screenshotSha256": "8a0bf72aeef9016c79771fb71e9da7bd054ed237d89e50e92a9748cbe3a2c087"
       },
       {
-        "captureRunId": "mu67in02-36056",
+        "captureRunId": "mum3c6o5-80294",
         "system": "swiss",
         "accent": "orange",
         "width": 1024,
@@ -5058,12 +5058,12 @@
           "system": "swiss",
           "accent": "orange"
         },
-        "resumed": true,
+        "resumed": false,
         "pass": true,
-        "screenshotSha256": "5d8f3012e1f90f0d4e7909e527dbfbc006b67017e2c554ada38e3b464a3aff35"
+        "screenshotSha256": "59db6b1c14efb097d948619e2b7a68a02314ffc7852573a96454737c32c52b6e"
       },
       {
-        "captureRunId": "mu67in02-36056",
+        "captureRunId": "mum3c6o5-80294",
         "system": "swiss",
         "accent": "orange",
         "width": 1024,
@@ -5105,12 +5105,12 @@
           "system": "swiss",
           "accent": "orange"
         },
-        "resumed": true,
+        "resumed": false,
         "pass": true,
-        "screenshotSha256": "f53cc21baa2b4797459f05be1bedca1126cda47cb83dd5f3287f8d2bc4e5c282"
+        "screenshotSha256": "455630af039d62b0ac0d025231aee238b467730fb7f5de83c3efcda55f642d37"
       },
       {
-        "captureRunId": "mu67in02-36056",
+        "captureRunId": "mum3c6o5-80294",
         "system": "swiss",
         "accent": "orange",
         "width": 1024,
@@ -5152,12 +5152,12 @@
           "system": "swiss",
           "accent": "orange"
         },
-        "resumed": true,
+        "resumed": false,
         "pass": true,
-        "screenshotSha256": "d34dad67a5a712741f14d62302bb2cdee59c3627067cc597044e536f183f398a"
+        "screenshotSha256": "039db588bbbbc2393c9dfb4f1e7a2d6e351cdfb27fdac68260d615062d03cc62"
       },
       {
-        "captureRunId": "mu67in02-36056",
+        "captureRunId": "mum3c6o5-80294",
         "system": "swiss",
         "accent": "orange",
         "width": 1440,
@@ -5199,12 +5199,12 @@
           "system": "swiss",
           "accent": "orange"
         },
-        "resumed": true,
+        "resumed": false,
         "pass": true,
-        "screenshotSha256": "c7804eb4d1898b40495cb8fc388f91ee20705f8225306110dc79c1b3cf2b382f"
+        "screenshotSha256": "f179cc6e8152a7ae37f77480e6443adb1130a7b1543104c65766642d15aec31b"
       },
       {
-        "captureRunId": "mu67in02-36056",
+        "captureRunId": "mum3c6o5-80294",
         "system": "swiss",
         "accent": "orange",
         "width": 1440,
@@ -5246,12 +5246,12 @@
           "system": "swiss",
           "accent": "orange"
         },
-        "resumed": true,
+        "resumed": false,
         "pass": true,
-        "screenshotSha256": "e5931ae91d6051755e6afab21594539060e3a03b93e864cccab7a527e586210d"
+        "screenshotSha256": "36de12da894cc290a1e4c57e66cecb727bf2c3ae9476dd03b510afcf1bab0c50"
       },
       {
-        "captureRunId": "mu67in02-36056",
+        "captureRunId": "mum3c6o5-80294",
         "system": "swiss",
         "accent": "orange",
         "width": 1440,
@@ -5293,12 +5293,12 @@
           "system": "swiss",
           "accent": "orange"
         },
-        "resumed": true,
+        "resumed": false,
         "pass": true,
-        "screenshotSha256": "d062666afe41f1c122e0731d04f68e170ef92e12720db31cc1bc611ea759efe5"
+        "screenshotSha256": "867137a48365e48b7eb88614a658394c89f9e4019ba9581ef6b1e0093ee8d7e2"
       },
       {
-        "captureRunId": "mu67in02-36056",
+        "captureRunId": "mum3c6o5-80294",
         "system": "swiss",
         "accent": "orange",
         "width": 1440,
@@ -5340,9 +5340,9 @@
           "system": "swiss",
           "accent": "orange"
         },
-        "resumed": true,
+        "resumed": false,
         "pass": true,
-        "screenshotSha256": "376799f65861380fee82d4d2b2eaa7b3b4738ef4c81ee64bed95fd1009ccc70f"
+        "screenshotSha256": "1e4dea6eb7e41f117cd336cd4fcd2b6069d872838bce3ce0ea34ce6bc83d02c2"
       }
     ]
   },
@@ -6660,6 +6660,44 @@
         }
       },
       {
+        "screen": "app.admin.approvals",
+        "width": 375,
+        "route": "/admin",
+        "identity": "Nick-admin",
+        "status": "PASS",
+        "identityVerified": {
+          "name": "Nick Krzemienski",
+          "role": "admin"
+        },
+        "ready": true,
+        "httpStatus": 200,
+        "axe": {
+          "violations": [],
+          "seriousCritical": [],
+          "passes": 43,
+          "incomplete": 2
+        }
+      },
+      {
+        "screen": "app.admin.approvals",
+        "width": 1440,
+        "route": "/admin",
+        "identity": "Nick-admin",
+        "status": "PASS",
+        "identityVerified": {
+          "name": "Nick Krzemienski",
+          "role": "admin"
+        },
+        "ready": true,
+        "httpStatus": 200,
+        "axe": {
+          "violations": [],
+          "seriousCritical": [],
+          "passes": 43,
+          "incomplete": 2
+        }
+      },
+      {
         "screen": "app.admin.audit",
         "width": 375,
         "route": "/admin",
@@ -6917,6 +6955,82 @@
         }
       },
       {
+        "screen": "app.admin.edits",
+        "width": 375,
+        "route": "/admin",
+        "identity": "Nick-admin",
+        "status": "PASS",
+        "identityVerified": {
+          "name": "Nick Krzemienski",
+          "role": "admin"
+        },
+        "ready": true,
+        "httpStatus": 200,
+        "axe": {
+          "violations": [],
+          "seriousCritical": [],
+          "passes": 43,
+          "incomplete": 2
+        }
+      },
+      {
+        "screen": "app.admin.edits",
+        "width": 1440,
+        "route": "/admin",
+        "identity": "Nick-admin",
+        "status": "PASS",
+        "identityVerified": {
+          "name": "Nick Krzemienski",
+          "role": "admin"
+        },
+        "ready": true,
+        "httpStatus": 200,
+        "axe": {
+          "violations": [],
+          "seriousCritical": [],
+          "passes": 43,
+          "incomplete": 2
+        }
+      },
+      {
+        "screen": "app.admin.enrichment",
+        "width": 375,
+        "route": "/admin",
+        "identity": "Nick-admin",
+        "status": "PASS",
+        "identityVerified": {
+          "name": "Nick Krzemienski",
+          "role": "admin"
+        },
+        "ready": true,
+        "httpStatus": 200,
+        "axe": {
+          "violations": [],
+          "seriousCritical": [],
+          "passes": 46,
+          "incomplete": 1
+        }
+      },
+      {
+        "screen": "app.admin.enrichment",
+        "width": 1440,
+        "route": "/admin",
+        "identity": "Nick-admin",
+        "status": "PASS",
+        "identityVerified": {
+          "name": "Nick Krzemienski",
+          "role": "admin"
+        },
+        "ready": true,
+        "httpStatus": 200,
+        "axe": {
+          "violations": [],
+          "seriousCritical": [],
+          "passes": 46,
+          "incomplete": 1
+        }
+      },
+      {
         "screen": "app.admin.export",
         "width": 375,
         "route": "/admin",
@@ -7267,6 +7381,86 @@
           "violations": [],
           "seriousCritical": [],
           "passes": 40,
+          "incomplete": 1
+        }
+      },
+      {
+        "screen": "app.admin.researcher",
+        "width": 375,
+        "route": "/admin",
+        "identity": "Nick-admin",
+        "status": "PASS",
+        "identityVerified": {
+          "name": "Nick Krzemienski",
+          "role": "admin"
+        },
+        "ready": true,
+        "httpStatus": 200,
+        "axe": {
+          "violations": [
+            {
+              "id": "heading-order",
+              "impact": "moderate",
+              "help": "Heading levels should only increase by one",
+              "description": "Ensure the order of headings is semantically correct",
+              "nodes": 1,
+              "targets": [
+                [
+                  "h3"
+                ]
+              ],
+              "details": [
+                {
+                  "target": [
+                    "h3"
+                  ],
+                  "failureSummary": "Fix any of the following:\n  Heading order invalid"
+                }
+              ]
+            }
+          ],
+          "seriousCritical": [],
+          "passes": 50,
+          "incomplete": 1
+        }
+      },
+      {
+        "screen": "app.admin.researcher",
+        "width": 1440,
+        "route": "/admin",
+        "identity": "Nick-admin",
+        "status": "PASS",
+        "identityVerified": {
+          "name": "Nick Krzemienski",
+          "role": "admin"
+        },
+        "ready": true,
+        "httpStatus": 200,
+        "axe": {
+          "violations": [
+            {
+              "id": "heading-order",
+              "impact": "moderate",
+              "help": "Heading levels should only increase by one",
+              "description": "Ensure the order of headings is semantically correct",
+              "nodes": 1,
+              "targets": [
+                [
+                  "h3"
+                ]
+              ],
+              "details": [
+                {
+                  "target": [
+                    "h3"
+                  ],
+                  "failureSummary": "Fix any of the following:\n  Heading order invalid"
+                }
+              ]
+            }
+          ],
+          "seriousCritical": [],
+          "passes": 50,
           "incomplete": 1
         }
       },
@@ -8047,200 +8241,6 @@
           "violations": [],
           "seriousCritical": [],
           "passes": 44,
-          "incomplete": 1
-        }
-      },
-      {
-        "screen": "app.admin.approvals",
-        "width": 375,
-        "route": "/admin",
-        "identity": "Nick-admin",
-        "status": "PASS",
-        "identityVerified": {
-          "name": "Nick Krzemienski",
-          "role": "admin"
-        },
-        "ready": true,
-        "httpStatus": 200,
-        "axe": {
-          "violations": [],
-          "seriousCritical": [],
-          "passes": 43,
-          "incomplete": 2
-        }
-      },
-      {
-        "screen": "app.admin.approvals",
-        "width": 1440,
-        "route": "/admin",
-        "identity": "Nick-admin",
-        "status": "PASS",
-        "identityVerified": {
-          "name": "Nick Krzemienski",
-          "role": "admin"
-        },
-        "ready": true,
-        "httpStatus": 200,
-        "axe": {
-          "violations": [],
-          "seriousCritical": [],
-          "passes": 43,
-          "incomplete": 2
-        }
-      },
-      {
-        "screen": "app.admin.edits",
-        "width": 375,
-        "route": "/admin",
-        "identity": "Nick-admin",
-        "status": "PASS",
-        "identityVerified": {
-          "name": "Nick Krzemienski",
-          "role": "admin"
-        },
-        "ready": true,
-        "httpStatus": 200,
-        "axe": {
-          "violations": [],
-          "seriousCritical": [],
-          "passes": 43,
-          "incomplete": 2
-        }
-      },
-      {
-        "screen": "app.admin.edits",
-        "width": 1440,
-        "route": "/admin",
-        "identity": "Nick-admin",
-        "status": "PASS",
-        "identityVerified": {
-          "name": "Nick Krzemienski",
-          "role": "admin"
-        },
-        "ready": true,
-        "httpStatus": 200,
-        "axe": {
-          "violations": [],
-          "seriousCritical": [],
-          "passes": 43,
-          "incomplete": 2
-        }
-      },
-      {
-        "screen": "app.admin.enrichment",
-        "width": 375,
-        "route": "/admin",
-        "identity": "Nick-admin",
-        "status": "PASS",
-        "identityVerified": {
-          "name": "Nick Krzemienski",
-          "role": "admin"
-        },
-        "ready": true,
-        "httpStatus": 200,
-        "axe": {
-          "violations": [],
-          "seriousCritical": [],
-          "passes": 46,
-          "incomplete": 1
-        }
-      },
-      {
-        "screen": "app.admin.enrichment",
-        "width": 1440,
-        "route": "/admin",
-        "identity": "Nick-admin",
-        "status": "PASS",
-        "identityVerified": {
-          "name": "Nick Krzemienski",
-          "role": "admin"
-        },
-        "ready": true,
-        "httpStatus": 200,
-        "axe": {
-          "violations": [],
-          "seriousCritical": [],
-          "passes": 46,
-          "incomplete": 1
-        }
-      },
-      {
-        "screen": "app.admin.researcher",
-        "width": 375,
-        "route": "/admin",
-        "identity": "Nick-admin",
-        "status": "PASS",
-        "identityVerified": {
-          "name": "Nick Krzemienski",
-          "role": "admin"
-        },
-        "ready": true,
-        "httpStatus": 200,
-        "axe": {
-          "violations": [
-            {
-              "id": "heading-order",
-              "impact": "moderate",
-              "help": "Heading levels should only increase by one",
-              "description": "Ensure the order of headings is semantically correct",
-              "nodes": 1,
-              "targets": [
-                [
-                  "h3"
-                ]
-              ],
-              "details": [
-                {
-                  "target": [
-                    "h3"
-                  ],
-                  "failureSummary": "Fix any of the following:\n  Heading order invalid"
-                }
-              ]
-            }
-          ],
-          "seriousCritical": [],
-          "passes": 50,
-          "incomplete": 1
-        }
-      },
-      {
-        "screen": "app.admin.researcher",
-        "width": 1440,
-        "route": "/admin",
-        "identity": "Nick-admin",
-        "status": "PASS",
-        "identityVerified": {
-          "name": "Nick Krzemienski",
-          "role": "admin"
-        },
-        "ready": true,
-        "httpStatus": 200,
-        "axe": {
-          "violations": [
-            {
-              "id": "heading-order",
-              "impact": "moderate",
-              "help": "Heading levels should only increase by one",
-              "description": "Ensure the order of headings is semantically correct",
-              "nodes": 1,
-              "targets": [
-                [
-                  "h3"
-                ]
-              ],
-              "details": [
-                {
-                  "target": [
-                    "h3"
-                  ],
-                  "failureSummary": "Fix any of the following:\n  Heading order invalid"
-                }
-              ]
-            }
-          ],
-          "seriousCritical": [],
-          "passes": 50,
           "incomplete": 1
         }
       }
@@ -8350,7 +8350,7 @@
       "command": "/nix/store/1lagpgadaybvs1n2312gysg2phjk89y8-nodejs-20.20.0-wrapped/bin/npm run validate:font-prepaint",
       "exitCode": 0,
       "signal": null,
-      "durationMs": 13164,
+      "durationMs": 6848,
       "outputTail": "> rest-express@1.0.0 validate:font-prepaint\n> tsx scripts/validation/font-prepaint-audit.ts\n\nPlaywright lease acquired (font-prepaint-audit, slot 1/1)\nfont-prepaint system: PASS (data-font=system, stack=\"\")\nfont-prepaint inter: PASS (data-font=inter, stack=\"'Inter', system-ui, sans-serif\")\nfont-prepaint dm-sans: PASS (data-font=dm-sans, stack=\"'DM Sans', system-ui, sans-serif\")\nfont-prepaint source-sans: PASS (data-font=source-sans, stack=\"'Source Sans 3', 'Source Sans Pro', system-ui, sans-serif\")\nfont-prepaint ibm-plex: PASS (data-font=ibm-plex, stack=\"'IBM Plex Sans', system-ui, sans-serif\")\nfont-prepaint jetbrains: PASS (data-font=jetbrains, stack=\"'JetBrains Mono', ui-monospace, monospace\")\nfont-prepaint __unknown-font-audit__: PASS (data-font=system, stack=\"\")\nPlaywright lease released (font-prepaint-audit)\nFont pre-paint audit: PASS (6 saved font ids + unknown-id fallback)",
       "pass": true
     },
@@ -8373,9 +8373,9 @@
   },
   "runError": null,
   "lastCheckpoint": {
-    "phase": "axe",
+    "phase": "font-prepaint",
     "detail": "complete",
-    "at": "2026-09-18T01:24:16.054Z"
+    "at": "2026-09-29T03:11:59.461Z"
   },
-  "generatedAt": "2026-09-18T01:24:16.479Z"
+  "generatedAt": "2026-09-29T03:11:59.469Z"
 }

@@ -268,30 +268,20 @@
   width: auto;
 }
 
-/* The frozen action column holds one Edit control; ours adds the 44px delete
-   target and a 6px gap. A `width: 1px` column stays at its min-content instead
-   of drawing a share of the auto-layout surplus (an inflated min-width shifted
-   every data column 3–27px); where the frozen column itself absorbs surplus
-   (categories at 1024/1440, subcategories at 1440) pin that share + 50px so
-   the data columns land on the reference widths. */
+/* The reference's auto-layout action column absorbs a share of surplus as
+   the viewport grows. Below that range a 1px hint lets intrinsic content
+   (Edit + the 44px delete target) determine the minimum. Continuous ramps
+   preserve the reference's 1024/1440 distribution without a 90rem jump. */
 .admin-taxonomy-table .admin-taxonomy-column-actions {
   width: 1px;
 }
 
-@media (min-width: 64rem) {
-  .admin-taxonomy-shell--categories .admin-taxonomy-table .admin-taxonomy-column-actions {
-    width: 142.92px;
-  }
+.admin-taxonomy-shell--categories .admin-taxonomy-table .admin-taxonomy-column-actions {
+  width: calc(1px + clamp(0px, (100vw - 768px) * 0.554375, 141.92px) + clamp(0px, (100vw - 1024px) * 0.07966346, 100vw));
 }
 
-@media (min-width: 90rem) {
-  .admin-taxonomy-shell--categories .admin-taxonomy-table .admin-taxonomy-column-actions {
-    width: 176.06px;
-  }
-
-  .admin-taxonomy-shell--subcategories .admin-taxonomy-table .admin-taxonomy-column-actions {
-    width: 145.63px;
-  }
+.admin-taxonomy-shell--subcategories .admin-taxonomy-table .admin-taxonomy-column-actions {
+  width: calc(1px + clamp(0px, (100vw - 1024px) * 0.34766827, 144.63px));
 }
 
 .admin-taxonomy-table .admin-taxonomy-cell-count {
