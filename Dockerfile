@@ -1,7 +1,10 @@
 # Multi-stage Dockerfile for awesome-list-site production deployment
 
 # Stage 1: Build stage
-FROM node:20-alpine AS builder
+# The build output is platform-independent JS, so this stage runs on the
+# builder's native platform. Cross-building it under emulation crashes
+# esbuild (a Go binary) on Apple Silicon.
+FROM --platform=$BUILDPLATFORM node:20-alpine AS builder
 
 # Set working directory
 WORKDIR /app
