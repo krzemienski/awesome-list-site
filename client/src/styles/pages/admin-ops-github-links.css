@@ -80,6 +80,7 @@
 .ops-github-panel__repository-name {
   font-size: 0.875rem;
   font-weight: 600;
+  letter-spacing: normal;
   /* The frozen repository name is a plain h3 inheriting the 1.6 body leading;
      CardTitle's leading-none shaved 8px off the row and pulled the table up. */
   line-height: 1.6;
@@ -153,6 +154,15 @@
   color: var(--text-3);
   font-size: 12px;
   padding: 18px 22px;
+}
+
+/* The empty history message takes the slot of the frozen table's header row
+   (12px block padding, 11px/1.6 → 43px) with the card's own inline inset. */
+.ops-github-panel__history-empty {
+  color: var(--text-3);
+  font-size: 12px;
+  line-height: 19px;
+  padding: 12px 22px;
 }
 
 /* The frozen history rows label direction as "Import"/"Export". */

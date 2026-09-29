@@ -563,10 +563,10 @@ export default function GitHubSyncPanel() {
        ) : (
          <TableShell
            title="Sync jobs"
-           sub="No import/export operations have been recorded yet."
+           sub="No import/export operations yet."
            className="ops-github-panel__history-shell"
          >
-           <p className="text-sm text-muted-foreground" role="status">Start a pull or sync to see job details here.</p>
+           <p className="ops-github-panel__history-empty" role="status">Start a pull or sync to see job details here.</p>
          </TableShell>
        )}
 

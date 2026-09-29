@@ -67,6 +67,7 @@
   color: var(--text);
   font-size: 14px;
   font-weight: 600;
+  letter-spacing: normal;
   line-height: 1.6;
 }
 
