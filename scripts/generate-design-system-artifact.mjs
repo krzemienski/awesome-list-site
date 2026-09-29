@@ -1,6 +1,7 @@
 import fs from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
+import vm from "node:vm";
 import {
   checkArtifactDocs,
   generateArtifactDocs,
@@ -12,7 +13,15 @@ const projectRoot = path.resolve(
   path.dirname(fileURLToPath(import.meta.url)),
   "..",
 );
-const cssPath = "client/src/styles/design-system.css";
+// The canonical design system is the verbatim /ds pair served to the SPA:
+// foundations are its top-level :root, and the per-system and per-accent
+// token sets are the registry tables design-system.js hands to
+// applyDesignSystem(). App-only foundation tokens (status, motion, shell
+// geometry) live in the bridge stylesheet the Vite bundle links after the
+// canonical sheet. The runtime wrapper owns only the app default.
+const cssPath = "client/public/ds/design-system.css";
+const bridgePath = "client/src/styles/app-bridge.css";
+const registryPath = "client/public/ds/design-system.js";
 const runtimePath = "client/src/lib/design-system.ts";
 const profilePath = "shared/styles/product-profiles.css";
 const outputPath = "artifacts/awesome-video-design-system/tokens.json";
@@ -37,6 +46,8 @@ if (docsOnly) {
 }
 
 const css = fs.readFileSync(fromRoot(cssPath), "utf8");
+const bridgeCss = fs.readFileSync(fromRoot(bridgePath), "utf8");
+const registrySource = fs.readFileSync(fromRoot(registryPath), "utf8");
 const runtime = fs.readFileSync(fromRoot(runtimePath), "utf8");
 const profilesCss = fs.readFileSync(fromRoot(profilePath), "utf8");
 
@@ -227,41 +238,56 @@ function customProperties(block) {
   }
 }
 
-const systemsSegment = runtime.slice(
-  runtime.indexOf("systems: ["),
-  runtime.indexOf("accents: ["),
-);
-const systems = [...systemsSegment.matchAll(
-  /id:\s*'([^']+)'[\s\S]*?name:\s*'([^']+)'[\s\S]*?tag:\s*'([^']+)'[\s\S]*?desc:\s*'([^']+)'[\s\S]*?defaultAccent:\s*'([^']+)'/g,
-)].map((match) => ({
-  id: match[1],
-  name: match[2],
-  tag: match[3],
-  description: match[4],
-  defaultAccent: match[5],
+// design-system.js only assigns window.* tables and defines the applier at
+// load; evaluating it in an isolated context reads the exact values the
+// browser gets, with no hand-maintained copy to drift.
+const registryWindow = {};
+vm.runInNewContext(registrySource, { window: registryWindow }, { filename: registryPath });
+const {
+  DESIGN_SYSTEMS: registrySystems,
+  ACCENTS: registryAccents,
+  SYSTEM_DEFAULT_ACCENT: registryDefaultAccents,
+} = registryWindow;
+
+const systems = Object.entries(registrySystems ?? {}).map(([id, system]) => ({
+  id,
+  name: system.name,
+  tag: system.tag,
+  description: system.desc,
+  defaultAccent: registryDefaultAccents?.[id],
+  tokens: { ...system.vars },
+}));
+const accents = (registryAccents ?? []).map((accent) => ({
+  id: accent.id,
+  name: accent.name,
+  primary: accent.primary,
+  secondary: accent.secondary,
 }));
 
-const accentsSegment = runtime.slice(
-  runtime.indexOf("accents: ["),
-  runtime.indexOf("});", runtime.indexOf("accents: [")),
-);
-const accents = [...accentsSegment.matchAll(
-  /\{\s*id:\s*'([^']+)',\s*name:\s*'([^']+)',\s*primary:\s*'([^']+)',\s*secondary:\s*'([^']+)'\s*\}/g,
-)].map((match) => ({
-  id: match[1],
-  name: match[2],
-  primary: match[3],
-  secondary: match[4],
-}));
-
-const defaultsMatch = runtime.match(
-  /defaultSystem:\s*'([^']+)'[\s\S]*?defaultAccent:\s*'([^']+)'/,
-);
-if (!defaultsMatch || systems.length !== 5 || accents.length !== 10) {
-  throw new Error("Could not parse the complete runtime theme registry");
+const defaultSystem = runtime.match(/export const DEFAULT_SYSTEM\b[^=]*=\s*"([^"]+)"/)?.[1];
+const defaultAccent = runtime.match(/export const DEFAULT_ACCENT\b[^=]*=\s*"([^"]+)"/)?.[1];
+const accentIds = new Set(accents.map((accent) => accent.id));
+if (
+  systems.length !== 5 ||
+  accents.length !== 10 ||
+  !systems.some((system) => system.id === defaultSystem) ||
+  !accentIds.has(defaultAccent) ||
+  systems.some((system) => !accentIds.has(system.defaultAccent) || !Object.keys(system.tokens).length)
+) {
+  throw new Error("Could not parse the complete canonical theme registry");
+}
+// applyDesignSystem() paints an accent as exactly these two properties; if the
+// canonical applier ever changes that contract the projection must change too.
+if (
+  !registrySource.includes("root.style.setProperty('--accent',   a.primary);") ||
+  !registrySource.includes("root.style.setProperty('--accent-2', a.secondary);")
+) {
+  throw new Error(`${registryPath}: applyDesignSystem no longer sets --accent/--accent-2 from primary/secondary`);
 }
 
-const rootTokens = customProperties(blockAfter(css, ":root"));
+// Canonical sheet first, bridge second: the same top-level :root cascade the
+// browser applies to <html>, last declaration wins.
+const rootTokens = customProperties(blockAfter(`${css}\n${bridgeCss}`, ":root"));
 const themes = Object.fromEntries(
   systems.map((system) => [
     system.id,
@@ -270,10 +296,7 @@ const themes = Object.fromEntries(
       tag: system.tag,
       description: system.description,
       defaultAccent: system.defaultAccent,
-      tokens:
-        system.id === defaultsMatch[1]
-          ? rootTokens
-          : customProperties(blockAfter(css, `:root[data-system="${system.id}"]`)),
+      tokens: system.tokens,
     },
   ]),
 );
@@ -285,7 +308,7 @@ const accentTokens = Object.fromEntries(
       name: accent.name,
       primary: accent.primary,
       secondary: accent.secondary,
-      tokens: customProperties(blockAfter(css, `:root[data-accent="${accent.id}"]`)),
+      tokens: { "--accent": accent.primary, "--accent-2": accent.secondary },
     },
   ]),
 );
@@ -310,12 +333,12 @@ const document = {
     "Generated Replit projection of the canonical Awesome.Video runtime design system.",
   _meta: {
     generated: true,
-    edit: [cssPath, runtimePath, profilePath],
+    edit: [cssPath, registryPath, bridgePath, runtimePath, profilePath],
     contract: "artifacts/awesome-video-design-system/DESIGN.md",
   },
   defaults: {
-    system: defaultsMatch[1],
-    accent: defaultsMatch[2],
+    system: defaultSystem,
+    accent: defaultAccent,
     colorScheme: "dark",
   },
   foundations: rootTokens,

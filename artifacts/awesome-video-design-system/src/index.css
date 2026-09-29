@@ -1,4 +1,5 @@
-@import "../../../client/src/styles/design-system.css";
+@import "../../../client/public/ds/design-system.css";
+@import "../../../client/src/styles/app-bridge.css";
 
 :root { color-scheme: dark; }
 * { box-sizing: border-box; margin: 0; padding: 0; }
