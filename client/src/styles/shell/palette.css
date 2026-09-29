@@ -294,11 +294,6 @@
   flex: 1;
 }
 
-/* Keycaps are the design system's `.kbd`; only the ink follows the row. */
-.search-palette .kbd {
-  color: inherit;
-}
-
 .search-palette-close {
   display: inline-flex;
   flex-shrink: 0;
