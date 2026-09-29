@@ -192,8 +192,22 @@
   color: var(--text-3);
 }
 
+/* The frozen action column is min-content-bound (View + Edit) up to 1024px;
+   a `width: 1px` column stays at its min-content (View + Edit + the 44px
+   delete target + 6px gap) instead of drawing a share of the auto-layout
+   surplus, so the data columns keep the frozen widths. An inflated pin
+   (184px) or an auto column shifted every data column 2–10px. */
 .admin-catalog-resources__actions-cell {
-  min-width: 184px;
+  width: 1px;
+}
+
+@media (min-width: 90rem) {
+  /* At 1440 the frozen action column absorbs 12.67px of surplus (140.78px);
+     pin that share plus the delete extent (44 + 6) so the data columns land
+     on the reference's 74.27 / 545.44 / 194.63 / 225.13 / 97.77. */
+  .admin-catalog-resources__actions-cell {
+    width: 190.78px;
+  }
 }
 
 /* Product-only bulk selection remains keyboard/hover reachable without
@@ -313,8 +327,24 @@
 }
 
 @media (min-width: 48rem) {
+  /* The frozen TableShell header is one row (title · search + Add). Our
+     extra tools toggle made the actions group 24px too wide for the 768px
+     inset, so the whole group wrapped 55px under the title; let the group
+     share the row and give the search field the shrink instead. */
+  .admin-catalog-resources__header-actions {
+    flex: 1 1 0;
+    flex-wrap: nowrap;
+    justify-content: flex-end;
+  }
+
+  .admin-catalog-resources__header-actions input {
+    flex: 0 1 200px;
+    min-width: 0;
+  }
+
   .admin-catalog-resources__table {
     min-width: 764px;
-    width: calc(100% + 44px);
+    /* +44px delete target +6px row-action gap beyond the frozen width. */
+    width: calc(100% + 50px);
   }
 }

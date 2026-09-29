@@ -172,7 +172,18 @@
   min-height: 44px;
 }
 
-.queues-agent__research-form .input {
+/* Approved comparison-reference floor: `.input,.select{min-height:44px}`
+   (CCR a11y adjustments); the canonical 10px padding around 13px text is
+   only 38–40px, which ran the whole form 4px short of the reference. */
+.queues-agent__research-form .input,
+.queues-agent__research-form .select {
+  line-height: normal;
+  min-height: 44px;
+}
+
+/* UA leading like the frozen textarea (Tailwind's preflight inherits the 1.6
+   body leading, which sat the placeholder line 1px low). */
+.queues-agent__research-form .textarea {
   line-height: normal;
 }
 

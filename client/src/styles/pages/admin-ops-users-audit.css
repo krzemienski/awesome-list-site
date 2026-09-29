@@ -143,14 +143,16 @@
 .admin-ops-users-table th:nth-child(5) { width: 6.91%; }
 
 /* Tablet: the frozen auto layout gives the Email column more room once the
-   names wrap (column boxes measured at 1024: 280/417/84/90/70px of a 941px
-   table; the last column holds the 10px-padded Edit button). */
+   names wrap (column boxes measured at 1024 on the comparison reference:
+   279.84/416.81/84.5/89.06/71.78px of a 942px table; the last column holds
+   the 44px Edit target). Four decimals keep every column edge within a
+   quarter pixel of the reference. */
 @media (min-width: 769px) and (max-width: 1100px) {
-  .admin-ops-users-table th:nth-child(1) { width: 29.75%; }
-  .admin-ops-users-table th:nth-child(2) { width: 44.31%; }
-  .admin-ops-users-table th:nth-child(3) { width: 8.93%; }
-  .admin-ops-users-table th:nth-child(4) { width: 9.56%; }
-  .admin-ops-users-table th:nth-child(5) { width: 7.45%; }
+  .admin-ops-users-table th:nth-child(1) { width: 29.7074%; }
+  .admin-ops-users-table th:nth-child(2) { width: 44.2476%; }
+  .admin-ops-users-table th:nth-child(3) { width: 8.9703%; }
+  .admin-ops-users-table th:nth-child(4) { width: 9.4546%; }
+  .admin-ops-users-table th:nth-child(5) { width: 7.6201%; }
 }
 
 /* Frozen `.table td` inherits the 1.6 body leading; wrapped Email/Joined cells
@@ -178,9 +180,15 @@
   padding: 0;
 }
 
+/* The frozen `.table th` is 12px padding around one 11px/1.6 line plus half
+   of the collapsed hairline (42.09px measured on both sides). The 44px sort
+   target below is positioned out of flow and centred, so it keeps its full
+   box while overhanging the row rule by ~1px each side — the same treatment
+   as the audit detail button — instead of forcing every header row 2px
+   taller than the reference and shifting the whole table. */
 .admin-ops-users-table thead th {
   font-family: var(--font-body);
-  height: 44px;
+  height: calc(0.6875rem * 1.6 + 1.5rem + var(--hairline-w) / 2);
   line-height: 1.6;
   position: relative;
   text-transform: uppercase;
@@ -196,8 +204,11 @@
   text-transform: uppercase;
 }
 
+/* Canonical `.btn` metrics plus the approved 44px control floor (the frozen
+   TableShell action is 44px tall under the same contract). */
 .admin-ops-users-shell [data-testid="button-invite-user"] {
   line-height: normal;
+  min-height: 44px;
 }
 
 .admin-ops-users-shell [data-testid="button-user-tools"] {
@@ -248,16 +259,6 @@
 
 .admin-ops-users-shell .admin-ops-cell-actions > div {
   justify-content: flex-end;
-}
-
-/* Frozen `.chip` metrics for the role column (the ops primitive shrinks
-   the chip to 10px/0.5rem padding, which made ADMIN 5px narrower). */
-.admin-ops-users-shell .admin-ops-cell-role .admin-ops-status-chip {
-  font-size: 10.5px;
-  gap: 6px;
-  letter-spacing: 0.6px;
-  line-height: 16.8px;
-  padding: 4px 10px;
 }
 
 .admin-ops-users-table tbody tr:last-child td {
@@ -395,6 +396,17 @@
 
   .admin-ops-users-table th:nth-child(n) {
     width: auto;
+  }
+
+  /* Auto layout sizes each column from its content, and the sort control is
+     positioned out of flow (so its 44px target cannot inflate the header row),
+     which removes the header label from the column's intrinsic width. The
+     frozen `.table` keeps "JOINED" in flow: its column measures 72px, while
+     the app's collapsed to 57px and wrapped every "Jul 6, 2026" onto three
+     lines (rows 87px instead of 73px). Restore the frozen label-driven
+     minimum for that column; the other four already match. */
+  .admin-ops-users-table th:nth-child(4) {
+    min-width: 4.5rem;
   }
 
   .admin-ops-audit-toolbar {

@@ -52,7 +52,7 @@ export default function AppFooter({ nav, site }: {
             </Link>
             <p className="footer-tagline">{site.tagline}</p>
             {nav && <div className="footer-stats">
-              {nav.totalResources.toLocaleString()} resources · {categories.length} categories · {subcategoryCount} subcategories
+              {nav.totalResources.toLocaleString()} resources · {categories.length} categories · {subcategoryCount} subcategories<br />
               <span className="footer-live"><span className="live-dot" aria-hidden="true" />indexed live</span>
             </div>}
           </div>

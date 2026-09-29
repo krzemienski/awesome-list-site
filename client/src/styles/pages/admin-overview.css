@@ -97,11 +97,14 @@
 .admin-overview-canonical .admin-canonical-overview-grid {
   display: grid;
   /*
-   * Keep the frozen admin grid's intrinsic 360px track. At a 375px viewport
-   * the 40px page inset leaves 295px, so this track is the reference element
-   * that extends the full-page capture to 400px.
+   * The frozen admin grid's intrinsic 360px track. At a 375px viewport the
+   * 40px page inset leaves 295px: the reference lets that track overflow the
+   * viewport (its capture grows to 400px, `noPageOverflow: false` in the
+   * runner's reference geometry), while the app shell clips the page at the
+   * viewport, which cut the card's right border and its last column. Cap the
+   * track at the container so the card fits; every width ≥ 440px is unchanged.
    */
-  grid-template-columns: repeat(auto-fill, minmax(360px, 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(min(360px, 100%), 1fr));
   gap: 16px;
 }
 

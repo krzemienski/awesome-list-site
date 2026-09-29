@@ -74,6 +74,9 @@
   color: var(--text-3, var(--text-2));
   font-family: var(--font-mono);
   font-size: 0.625rem;
+  /* The frozen Stat label is a plain `.mono` line (regular weight), not the
+     600-weight `.eyebrow` this element also carries for its system hooks. */
+  font-weight: 400;
   letter-spacing: 0.0875rem;
   margin-bottom: 0.625rem;
   text-transform: uppercase;
@@ -100,21 +103,25 @@
 .admin-ops-stat__description {
   color: var(--text-2);
   font-size: 0.75rem;
-  line-height: 1.45;
+  /* Frozen Stat sub-line inherits the 1.6 body leading (19.2px, not 17.4px). */
+  line-height: var(--body-leading, 1.6);
   margin-top: 0.5rem;
 }
 
+/* Frozen `.chip` metrics (10.5px mono, 4px 10px, body leading → 27px tall).
+   The earlier 10px/0.5rem/line-height-1 shrink made every status chip 23px
+   tall, which shortened each table row 3–4px against the reference. */
 .admin-ops-status-chip {
   align-items: center;
   border: var(--hairline-w) solid var(--border);
   border-radius: var(--radius-pill);
   display: inline-flex;
   font-family: var(--font-mono);
-  font-size: 0.625rem;
-  gap: 0.3rem;
-  letter-spacing: 0.06em;
-  line-height: 1;
-  padding: 0.35rem 0.5rem;
+  font-size: 10.5px;
+  gap: 6px;
+  letter-spacing: 0.6px;
+  line-height: 1.6;
+  padding: 4px 10px;
   text-transform: uppercase;
   white-space: nowrap;
 }

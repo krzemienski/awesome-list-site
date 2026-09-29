@@ -81,11 +81,3 @@
     padding: 18px 22px;
   }
 }
-/* Frozen `.chip` metrics for the status column. */
-.admin-ops-audit-shell .admin-ops-audit-table .admin-ops-status-chip {
-  font-size: 10.5px;
-  gap: 6px;
-  letter-spacing: 0.6px;
-  line-height: 1.6; /* body leading */
-  padding: 4px 10px;
-}
