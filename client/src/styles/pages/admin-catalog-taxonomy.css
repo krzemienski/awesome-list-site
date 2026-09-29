@@ -62,14 +62,18 @@
   gap: 0.5rem;
 }
 
+/* Hidden tools toggle: still reachable by keyboard, but it must not take
+   pointer input while invisible — out of flow it overlaps the Add button. */
 .admin-taxonomy-header-actions > [data-testid^="button-more-"] {
   opacity: 0;
+  pointer-events: none;
   position: absolute;
 }
 
 .admin-taxonomy-header-actions > [data-testid^="button-more-"]:focus-visible,
 .admin-taxonomy-shell--tools-open .admin-taxonomy-header-actions > [data-testid^="button-more-"] {
   opacity: 1;
+  pointer-events: auto;
   position: static;
 }
 
@@ -145,11 +149,6 @@
 
 /* TableShell geometry from the frozen admin reference. */
 .admin-taxonomy-table {
-  /*
-   * The product adds one contract-required 44px delete target beside the
-   * frozen table's Edit target. Give that target its own inline extent rather
-   * than making auto layout steal width from every canonical data column.
-   */
   width: 100%;
   border-collapse: collapse;
   font-size: 0.8125rem;
@@ -172,6 +171,7 @@
 }
 
 .admin-taxonomy-table tbody td {
+  height: 56px;
   padding: 0.875rem;
   border-bottom: var(--hairline-w) solid var(--border);
   color: var(--text-2);
@@ -234,15 +234,24 @@
   font-weight: 500;
 }
 
+/* The frozen table paints each category glyph in the accent. Nine glyphs
+   plus the shell's reserved moments break the per-viewport accent budget, so
+   the icons carry the secondary ink instead; the header stays a plain th. */
 .admin-taxonomy-table .admin-taxonomy-column-icon {
   width: auto;
-  color: var(--accent);
 }
 
+.admin-taxonomy-table tbody .admin-taxonomy-column-icon,
 .admin-taxonomy-category-icon {
-  display: block;
-  color: var(--accent);
+  color: var(--text-2);
+}
+
+/* Inline so the glyph sits on the cell's 18px/28.8px line box, like the
+   frozen text glyph does; that line box sets the frozen category row height. */
+.admin-taxonomy-category-icon {
+  display: inline-block;
   stroke-width: 1.75;
+  vertical-align: middle;
 }
 
 .admin-taxonomy-shell--categories tbody .admin-taxonomy-column-icon {
@@ -255,10 +264,6 @@
   height: 18px;
 }
 
-.admin-taxonomy-shell--categories .admin-taxonomy-table tbody tr {
-  height: 57.796875px;
-}
-
 .admin-taxonomy-table .admin-taxonomy-column-parent {
   color: var(--text-2);
 }
@@ -268,20 +273,16 @@
   width: auto;
 }
 
-/* The reference's auto-layout action column absorbs a share of surplus as
-   the viewport grows. Below that range a 1px hint lets intrinsic content
-   (Edit + the 44px delete target) determine the minimum. Continuous ramps
-   preserve the reference's 1024/1440 distribution without a 90rem jump. */
+/* The action column shrinks to its controls (Edit + the 44px delete target)
+   so both stay inside the card. Only this cell trims its block padding: the
+   44px targets then fit the frozen row height instead of stretching it. */
 .admin-taxonomy-table .admin-taxonomy-column-actions {
-  width: 1px;
+  white-space: nowrap;
+  width: 1%;
 }
 
-.admin-taxonomy-shell--categories .admin-taxonomy-table .admin-taxonomy-column-actions {
-  width: calc(1px + clamp(0px, (100vw - 768px) * 0.554375, 141.92px) + clamp(0px, (100vw - 1024px) * 0.07966346, 100vw));
-}
-
-.admin-taxonomy-shell--subcategories .admin-taxonomy-table .admin-taxonomy-column-actions {
-  width: calc(1px + clamp(0px, (100vw - 1024px) * 0.34766827, 144.63px));
+.admin-taxonomy-table tbody td.admin-taxonomy-column-actions {
+  padding-block: 5px;
 }
 
 .admin-taxonomy-table .admin-taxonomy-cell-count {
@@ -409,8 +410,10 @@
     margin-inline: 1rem;
   }
 
+  /* Scroll inside the card rather than stacking names and slugs 3-4 lines
+     deep; the page itself never scrolls sideways. */
   .admin-taxonomy-table {
-    min-width: 0;
+    min-width: 42rem;
   }
 
   .admin-taxonomy-pagination {
@@ -427,13 +430,5 @@
 
   .admin-users-table {
     min-width: 52rem;
-  }
-}
-
-@media (min-width: 48rem) {
-  .admin-taxonomy-table {
-    /* +44px delete target +6px row-action gap beyond the frozen width; at
-       768 the frozen table is min-content-bound, so it needs the extent too. */
-    width: calc(100% + 50px);
   }
 }

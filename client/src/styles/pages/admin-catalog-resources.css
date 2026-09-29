@@ -95,6 +95,13 @@
   margin: 14px 22px;
 }
 
+/* The category trigger leads with a filter icon; keep its value next to the
+   icon like the other selects instead of floating mid-trigger. */
+.admin-catalog-resources__filters [data-testid="select-category-filter"] > span {
+  flex: 1 1 auto;
+  text-align: start;
+}
+
 .admin-catalog-resources__table-scroll {
   border: 0;
   margin-bottom: 0 !important;
@@ -146,6 +153,7 @@
   font-family: var(--font-mono);
   font-size: 11px;
   position: relative;
+  white-space: nowrap;
 }
 
 .admin-catalog-resources__resource-title {
@@ -164,12 +172,25 @@
   gap: 4px;
 }
 
-.admin-catalog-resources__tags .chip,
+/* Imported tags can be whole phrases; cap each chip so one long tag cannot
+   take the width the title column needs. The full tag stays in the title. */
+.admin-catalog-resources__tags .chip {
+  display: inline-block;
+  max-width: 132px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
 .admin-catalog-resources__table .chip {
   font-family: var(--font-mono);
   font-size: 9.5px;
   /* canonical .chip tracking; the Badge's 0.12em widens the auto-layout Tags column */
   letter-spacing: 0.6px;
+}
+
+/* Tag chips are the compact variant; the featured ★ keeps canonical padding. */
+.admin-catalog-resources__tags .chip {
   padding: 2px 6px;
 }
 
@@ -197,35 +218,53 @@
   color: var(--text-3);
 }
 
-/* At smaller widths the action column stays intrinsic (View + Edit + 44px
-   delete). Above 1024 it absorbs a continuous share of the auto-layout
-   surplus instead of shifting every data column at a breakpoint. */
-.admin-catalog-resources__actions-cell {
-  width: calc(1px + clamp(0px, (100vw - 1024px) * 0.45620192, 189.78px));
+/* The action column shrinks to its controls (View · Edit · 44px delete) so
+   every one of them stays inside the card. The 44px touch targets would push
+   the row to 73px at the frozen 14px padding; trimming only this cell's block
+   padding keeps the row at the frozen 56px. */
+.admin-catalog-resources__table td.admin-catalog-resources__actions-cell {
+  padding-block: 5px;
+  white-space: nowrap;
+  width: 1%;
 }
 
 /* Product-only bulk selection remains keyboard/hover reachable without
-   changing the frozen table's resting composition. Delete is deliberately a
-   normal-flow action: it must have a deterministic pointer hitbox. */
+   changing the frozen table's resting composition: at rest the checkbox sits
+   invisibly over the ID and hover/focus swaps the two in place, so revealing
+   it never reflows the row. The box stays neutral (the shadcn default border
+   is the accent, which would put an accent mark on every row). */
 .admin-catalog-resources__row-select {
+  border-color: var(--border-strong);
+  border-radius: var(--radius-sm);
+  inset-block-start: 50%;
+  inset-inline-start: 14px;
   opacity: 0;
   position: absolute;
+  transform: translateY(-50%);
 }
 
 .admin-catalog-resources__id-cell:focus-within .admin-catalog-resources__row-select,
 .admin-catalog-resources__id-cell:hover .admin-catalog-resources__row-select {
   opacity: 1;
-  position: static;
+}
+
+.admin-catalog-resources__id-cell:focus-within > span,
+.admin-catalog-resources__id-cell:hover > span {
+  visibility: hidden;
 }
 
 /* Hidden until the tools open (or keyboard focus reaches them). Anchored to
    the top of their containing block so the out-of-flow boxes never extend the
    document below the canonical panel. */
+/* ...and while invisible they take no pointer input: out of flow they sit
+   over the card header, where a tap on Add or search would otherwise land on
+   a hidden page link. Keyboard focus still reaches them. */
 .admin-catalog-resources__scroll-hint,
 .admin-catalog-resources__pagination-summary,
 .admin-catalog-resources__paginator {
   inset: 0 auto auto 0;
   opacity: 0;
+  pointer-events: none;
   position: absolute;
 }
 
@@ -234,12 +273,42 @@
 .admin-catalog-resources--tools-open .admin-catalog-resources__pagination-summary,
 .admin-catalog-resources--tools-open .admin-catalog-resources__paginator {
   opacity: 1;
+  pointer-events: auto;
   position: static;
 }
 
+/* With the tools open, selection is a first-class column: ID and checkbox
+   sit side by side. */
+.admin-catalog-resources--tools-open .admin-catalog-resources__id-cell > span {
+  visibility: visible;
+}
+
+.admin-catalog-resources--tools-open .admin-catalog-resources__id-cell > span {
+  vertical-align: middle;
+}
+
 .admin-catalog-resources--tools-open .admin-catalog-resources__row-select {
+  margin-inline-start: 8px;
   opacity: 1;
   position: static;
+  transform: none;
+  vertical-align: middle;
+}
+
+/* The footer shares the TableShell header's 22px inset instead of running
+   into the card edge. */
+.admin-catalog-resources--tools-open .admin-catalog-resources__pagination-summary {
+  padding-inline: 22px;
+}
+
+.admin-catalog-resources--tools-open .admin-catalog-resources__paginator {
+  padding-bottom: 22px;
+  padding-inline: 22px;
+}
+
+.admin-catalog-resources__pagination-summary [data-testid="select-page-size"] {
+  width: auto;
+  min-width: 124px;
 }
 
 .admin-catalog-resources__kind-cell {
@@ -374,7 +443,5 @@
 
   .admin-catalog-resources__table {
     min-width: 764px;
-    /* +44px delete target +6px row-action gap beyond the frozen width. */
-    width: calc(100% + 50px);
   }
 }

@@ -2637,6 +2637,7 @@ export default function GenericCrudManager<T extends BaseEntityWithCount>({
               </Button>
             )}
             <Button
+              variant="outline"
               onClick={openCreateDialog}
               data-testid={`button-create-${testIdEntity}`}
             >

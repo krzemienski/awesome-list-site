@@ -106,7 +106,7 @@
   border: var(--border-w) solid var(--border);
   border-radius: var(--radius-sm);
   background: var(--surface-2);
-  color: var(--accent);
+  color: var(--text-2);
 }
 
 /* Frozen repository card: the action group is a plain 8px flex row that
@@ -142,7 +142,7 @@
 
 .ops-github-panel__empty-state > svg {
   flex: 0 0 auto;
-  color: var(--accent);
+  color: var(--text-3);
 }
 
 .ops-github-panel__history-table-wrap,
@@ -173,6 +173,7 @@
 .ops-github-panel__history-table-wrap table,
 .ops-link-health__flagged-table-wrap table {
   min-inline-size: 0;
+  font-size: 13px;
 }
 
 .ops-github-panel__history-table-wrap th,
@@ -204,9 +205,11 @@
   padding: 12px 14px;
 }
 
+/* The 44px Logs/Recheck controls set the row height, so cells drop their
+   vertical inset to land on the canonical 56px row. */
 .ops-github-panel__history-table-wrap td,
 .ops-link-health__flagged-table-wrap td {
-  padding: 14px;
+  padding: 6px 14px;
   line-height: 1.6;
 }
 
@@ -322,6 +325,23 @@
   margin-inline: -0.25rem;
 }
 
+.ops-link-health__flagged-card .ops-link-health__resource-cell {
+  color: var(--text);
+  font-weight: 500;
+}
+
+.ops-link-health__failure-chip {
+  font-size: 10px;
+  white-space: nowrap;
+}
+
+.ops-link-health__checked-cell {
+  color: var(--text-3);
+  font-family: var(--font-mono);
+  font-size: 12px;
+  white-space: nowrap;
+}
+
 .ops-digest-health__header {
   border-bottom: var(--hairline-w) solid var(--border);
 }
@@ -357,7 +377,7 @@
 }
 
 .ops-digest-health__stat-card--available .admin-ops-stat__value {
-  color: var(--accent);
+  color: var(--text);
 }
 
 .ops-digest-health__stat-card--unavailable .admin-ops-stat__value {

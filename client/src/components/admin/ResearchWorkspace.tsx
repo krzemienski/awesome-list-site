@@ -4,6 +4,7 @@ import type { ResearchJob } from "@shared/schema";
 import { ApiError } from "@/lib/queryClient";
 import { formatRelativeAgo } from "@/lib/utils";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import "./queues-agent.css";
 
 const RESEARCH_WORKSPACE_LIMIT = 4;
 
@@ -76,11 +77,11 @@ export function ResearchWorkspace() {
                 aria-label={`Open research note: ${note.title}`}
                 data-testid={`button-research-note-${note.id}`}
               >
-                <h3>{note.title}</h3>
-                  <div className="admin-research-note__meta">
-                    <span>{note.candidates} candidates</span>
-                    <span>{note.freshness}</span>
-                  </div>
+                <h3 title={note.title}>{note.title}</h3>
+                <div className="admin-research-note__meta">
+                  <span>{note.candidates} candidates</span>
+                  <span>{note.freshness}</span>
+                </div>
               </button>
             </article>
             );

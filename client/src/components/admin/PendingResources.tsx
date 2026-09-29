@@ -1,19 +1,18 @@
 import { type MouseEvent, useEffect, useMemo, useRef, useState } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { apiRequest } from "@/lib/queryClient";
-import { formatAdminDate } from "@/lib/utils";
+import { formatAdminDate, formatRelativeAgo } from "@/lib/utils";
 import { useToast } from "@/hooks/use-toast";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
-import { CheckCircle2, XCircle, Eye, ExternalLink, Calendar, User, FolderTree, RefreshCw, AlertCircle } from "lucide-react";
+import { ExternalLink, Calendar, User, FolderTree, RefreshCw, AlertCircle } from "lucide-react";
 import type { Resource } from "@shared/schema";
 import "./queues-review.css";
 
@@ -53,14 +52,6 @@ interface BulkResourceOutcome {
 // Keep queue bulk requests within the shared API body-array ceiling.
 const MAX_BULK_RESOURCE_IDS = 10_000;
 const MIN_REJECTION_REASON_LENGTH = 10;
-
-function StatusChip({ status }: { status: "pending" | "approved" | "rejected" }) {
-  return (
-    <Badge variant="chip" className={`admin-chip queue-review-status queue-review-status--${status}`}>
-      {status}
-    </Badge>
-  );
-}
 
 export default function PendingResources() {
   const { toast } = useToast();
@@ -125,11 +116,9 @@ export default function PendingResources() {
   // BUG-011 (run22): keep the hint in sync with real horizontal overflow.
   // Deps include the loading/count flags because the scroll container only
   // mounts once data has arrived (early returns above it).
-  // R5-058 (run25): the shadcn <Table> renders its own inner `overflow-auto`
-  // wrapper — THAT is the element that actually scrolls horizontally, not the
-  // outer max-h viewport. Track ITS scrollLeft so the gradient cue hides once
-  // the user reaches the rightmost columns (no more content off-screen), and
-  // re-shows when they scroll back.
+  // R5-058 (run25): track the table viewport's scrollLeft so the gradient cue
+  // hides once the user reaches the rightmost columns, and re-shows when they
+  // scroll back.
   useEffect(() => {
     const el = scrollRef.current;
     if (!el) return;
@@ -398,7 +387,7 @@ export default function PendingResources() {
       <section className="admin-panel queue-review-shell" aria-labelledby="pending-resources-heading">
         <div className="admin-panel__heading queue-review-shell-heading">
           <div>
-            <h2 id="pending-resources-heading">Pending Approvals</h2>
+            <h2 id="pending-resources-heading">Pending approvals</h2>
             <p>Resources awaiting admin review</p>
           </div>
         </div>
@@ -476,16 +465,12 @@ export default function PendingResources() {
       <section className="admin-panel queue-review-shell" aria-labelledby="pending-resources-heading">
         <div className="admin-panel__heading queue-review-shell-heading">
           <div>
-            <h2 id="pending-resources-heading" className="queue-review-title">
-              Pending Approvals
-              <Badge variant="accent" className="queue-review-count">{totalPending}</Badge>
-            </h2>
+            <h2 id="pending-resources-heading">Pending approvals</h2>
             <p>{totalPending} submissions awaiting review</p>
           </div>
           <div className="queue-review-actions" role="toolbar" aria-label="Pending approval actions">
             <Button
-              variant="destructive"
-              size="sm"
+              variant="ghost"
               onClick={openBulkRejectDialog}
               disabled={selectedPendingResourceIds.length === 0 || bulkRejectMutation.isPending || bulkApproveMutation.isPending}
               data-testid="button-bulk-reject"
@@ -493,8 +478,6 @@ export default function PendingResources() {
               Bulk reject{selectedPendingResourceIds.length > 0 ? ` (${selectedPendingResourceIds.length})` : ""}
             </Button>
             <Button
-              size="sm"
-              className={"bg-[var(--status-ok)] text-black hover:bg-[var(--status-ok)]/90" /* DS-OK: status ok */}
               onClick={openBulkApproveDialog}
               disabled={pendingResources.length === 0 || bulkApproveMutation.isPending || bulkRejectMutation.isPending}
               data-testid="button-bulk-approve"
@@ -536,159 +519,141 @@ export default function PendingResources() {
               onKeyDown={(e) => {
                 const el = scrollRef.current;
                 if (!el) return;
-                // R5-058: horizontal overflow lives on the shadcn <Table>'s own
-                // inner overflow-auto wrapper — scroll THAT, not the outer
-                // max-h viewport (which only ever overflows vertically).
                 const scroller = (el.querySelector('table')?.parentElement ?? el) as HTMLElement;
                 if (e.key === 'ArrowRight') { scroller.scrollBy({ left: 80 }); e.preventDefault(); }
                 else if (e.key === 'ArrowLeft') { scroller.scrollBy({ left: -80 }); e.preventDefault(); }
               }}
             >
-            {/* BUG-011 (run22): balanced columns via table-fixed — with auto
-                layout, max-w on cells doesn't cap column width, so the table
-                grew to ~1312px and pushed Approve/Reject off-screen even at
-                1440. Fixed layout makes the table fit its container at desktop
-                (no scroll) while min-w-[960px] keeps the ≤768px scroll+hint
-                behavior (px column widths act as minimums in fixed layout).
-                Tighter py-2 keeps tablet rows compact. */}
-            <Table className="queue-review-table queue-review-table--resources min-w-[960px] table-fixed [&_td]:py-2">
-              <TableHeader>
-                <TableRow>
-                  <TableHead className="queue-review-select-cell">
+            {/* BUG-011 (run22): fixed layout with <col> widths keeps the
+                table inside its container at desktop (no scroll) while the
+                60rem min-width keeps the ≤768px scroll + hint behavior. */}
+            <table className="table queue-review-table queue-review-table--resources">
+              <colgroup>
+                <col className="queue-review-col-select" />
+                <col />
+                <col className="queue-review-col-category" />
+                <col className="queue-review-col-submitter" />
+                <col className="queue-review-col-when" />
+                <col className="queue-review-col-actions" />
+              </colgroup>
+              <thead>
+                <tr>
+                  <th className="queue-review-select-cell">
                     <Checkbox
                       checked={allResourcesSelected ? true : selectedPendingResourceIds.length > 0 ? "indeterminate" : false}
                       onCheckedChange={(checked) => toggleAllResources(checked === true)}
                       aria-label="Select all pending resources"
                       data-testid="checkbox-select-all-pending-resources"
                     />
-                  </TableHead>
-                  <TableHead className="w-[170px]">Title</TableHead>
-                  <TableHead className="w-[115px]">Category</TableHead>
-                  <TableHead className="w-[220px]">Description</TableHead>
-                  <TableHead className="w-[150px]">Submitted</TableHead>
-                  <TableHead className="w-[90px]">Status</TableHead>
-                  <TableHead className="w-[320px] text-right">Actions</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {pendingResources.map((resource) => (
-                  <TableRow key={resource.id} data-testid={`row-pending-resource-${resource.id}`}>
-                    <TableCell className="queue-review-select-cell">
+                  </th>
+                  <th>Title</th>
+                  <th>Category</th>
+                  <th>Submitted by</th>
+                  <th>When</th>
+                  <th><span className="sr-only">Actions</span></th>
+                </tr>
+              </thead>
+              <tbody>
+                {pendingResources.map((resource) => {
+                  const submitter = resource.submittedByEmail ?? resource.submittedBy;
+                  const tags = getSubmissionTags(resource);
+                  return (
+                  <tr key={resource.id} data-testid={`row-pending-resource-${resource.id}`}>
+                    <td className="queue-review-select-cell">
                       <Checkbox
                         checked={selectedResourceIds.has(resource.id)}
                         onCheckedChange={(checked) => toggleResourceSelection(resource.id, checked === true)}
                         aria-label={`Select ${resource.title}`}
                         data-testid={`checkbox-pending-resource-${resource.id}`}
                       />
-                    </TableCell>
-                    <TableCell className="font-medium">
-                      <div className="flex items-center gap-2 min-w-0">
-                        <span className="line-clamp-1 break-words min-w-0" title={resource.title}>{resource.title}</span>
+                    </td>
+                    <td>
+                      <div className="queue-review-item-title">
+                        <span title={resource.title}>{resource.title}</span>
                         <a
                           href={resource.url}
                           target="_blank"
                           rel="noopener noreferrer"
-                          className="inline-flex items-center justify-center min-h-[32px] min-w-[32px] shrink-0 text-muted-foreground hover:text-primary"
+                          className="queue-review-item-link"
                           aria-label={`Open ${resource.title || resource.url} in a new tab`}
                           data-testid={`link-resource-url-${resource.id}`}
                         >
                           <ExternalLink className="h-3 w-3" />
                         </a>
                       </div>
-                    </TableCell>
-                    <TableCell>
-                      <div className="flex flex-col gap-1 min-w-0">
-                        {/* BUG-011 (run22): badge/subcategory truncate on one
-                            line (full value in tooltip) so the category cell
-                            never drives row height past the tablet budget. */}
-                        <Badge variant="outline" className="w-fit max-w-full" title={resource.category}>
-                          <span className="truncate">{resource.category}</span>
-                        </Badge>
-                        {resource.subcategory && (
-                          <span className="text-xs text-muted-foreground truncate" title={resource.subcategory}>
-                            {resource.subcategory}
-                          </span>
-                        )}
-                      </div>
-                    </TableCell>
-                    <TableCell>
-                      {/* BUG-011 (run22): clamp instead of hard-truncating at 80
-                          chars — up to 3 full lines, full text on hover. */}
-                      <p className="text-sm text-muted-foreground line-clamp-3" title={resource.description}>
-                        {resource.description}
-                      </p>
-                      {/* BUG-034 (run14): reviewers must see submitted tags —
-                          approvals were previously blind to tag content. */}
-                      {getSubmissionTags(resource).length > 0 && (
-                        <div className="flex flex-wrap gap-1 mt-1" data-testid={`tags-pending-${resource.id}`}>
-                          {getSubmissionTags(resource).map((tag) => (
-                            <Badge key={tag} variant="secondary" className="text-[10px] px-1.5 py-0">
-                              {tag}
-                            </Badge>
+                      {/* Reviewers still need the description and submitted
+                          tags (BUG-034); they sit under the title so the
+                          columns match the canonical approvals table. */}
+                      {resource.description && (
+                        <p className="queue-review-item-desc" title={resource.description}>
+                          {resource.description}
+                        </p>
+                      )}
+                      {tags.length > 0 && (
+                        <div className="queue-review-item-tags" data-testid={`tags-pending-${resource.id}`}>
+                          {tags.map((tag) => (
+                            <Badge key={tag} variant="secondary">{tag}</Badge>
                           ))}
                         </div>
                       )}
-                    </TableCell>
-                    <TableCell>
-                      <div className="flex flex-col gap-1 text-sm">
-                        <span className="flex items-center gap-1">
-                          <Calendar className="h-3 w-3" />
-                          {formatDate(resource.createdAt)}
+                    </td>
+                    <td>
+                      <span className="queue-review-truncate" title={resource.category}>{resource.category}</span>
+                      {resource.subcategory && (
+                        <span className="queue-review-truncate queue-review-sub" title={resource.subcategory}>
+                          {resource.subcategory}
                         </span>
-                        {(resource.submittedByEmail ?? resource.submittedBy) && (
-                          <span className="flex items-center gap-1 text-muted-foreground min-w-0">
-                            <User className="h-3 w-3 shrink-0" />
-                            <span className="truncate" title={resource.submittedByEmail ?? resource.submittedBy ?? undefined}>
-                              {resource.submittedByEmail ?? resource.submittedBy}
-                            </span>
-                          </span>
-                        )}
-                      </div>
-                    </TableCell>
-                    <TableCell>
-                      <StatusChip status="pending" />
-                    </TableCell>
-                    <TableCell className="queue-review-action-cell text-right">
-                      <div className="flex items-center justify-end gap-2">
+                      )}
+                    </td>
+                    <td className="mono queue-review-mono">
+                      <span className="queue-review-truncate" title={submitter ?? undefined}>{submitter ?? "—"}</span>
+                    </td>
+                    <td className="mono queue-review-mono queue-review-when">
+                      <time
+                        dateTime={resource.createdAt ? new Date(resource.createdAt).toISOString() : undefined}
+                        title={formatDate(resource.createdAt)}
+                      >
+                        {formatRelativeAgo(resource.createdAt)}
+                      </time>
+                    </td>
+                    <td className="queue-review-action-cell">
+                      <div className="queue-review-row-actions">
                         <Button
                           variant="ghost"
                           size="sm"
                           onClick={() => handleViewDetails(resource)}
-                          aria-label={`View details for ${resource.title}`}
+                          aria-label={`Review details for ${resource.title}`}
                           data-testid={`button-view-details-${resource.id}`}
                         >
-                          <Eye className="h-4 w-4 mr-1" />
-                          View
+                          Review
                         </Button>
                         <Button
-                          variant="default"
+                          variant="outline"
                           size="sm"
-                          className={"bg-[var(--status-ok)] text-black hover:bg-[var(--status-ok)]/90" /* DS-OK: status ok */}
                           onClick={() => handleApproveClick(resource)}
                           disabled={approveMutation.isPending}
                           aria-label={`Approve ${resource.title}`}
                           data-testid={`button-approve-${resource.id}`}
                         >
-                          <CheckCircle2 className="h-4 w-4 mr-1" />
                           Approve
                         </Button>
                         <Button
-                          variant="destructive"
+                          variant="ghost"
                           size="sm"
                           onClick={() => handleRejectClick(resource)}
                           disabled={rejectMutation.isPending}
                           aria-label={`Reject ${resource.title}`}
                           data-testid={`button-reject-${resource.id}`}
                         >
-                          <XCircle className="h-4 w-4 mr-1" />
                           Reject
                         </Button>
                       </div>
-                    </TableCell>
-                  </TableRow>
-                ))}
-              </TableBody>
-            </Table>
+                    </td>
+                  </tr>
+                  );
+                })}
+              </tbody>
+            </table>
             </div>
           </div>
           {/* R4-011 (run21) + BUG-011 (run22): discoverability hint for the

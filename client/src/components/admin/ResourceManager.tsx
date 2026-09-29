@@ -1032,7 +1032,7 @@ export default function ResourceManager() {
                 {catalogToolsOpen ? "Hide filters and tools" : "Show filters and tools"}
               </span>
             </Button>
-            <button type="button" className="btn primary" onClick={openCreateDialog} data-testid="button-add-resource">
+            <button type="button" className="btn" onClick={openCreateDialog} data-testid="button-add-resource">
               <Plus className="h-3 w-3" />
               Add
             </button>
@@ -1330,11 +1330,14 @@ export default function ResourceManager() {
                     </TableCell>
                     <TableCell>
                       <div className="admin-catalog-resources__tags">
-                        {(safeResourceMetadataTags(resource.metadata) || []).slice(0, 2).map((tag, index) => (
-                          <Badge key={index} variant="chip">
-                            {typeof tag === "object" && tag && "name" in tag ? String(tag.name) : String(tag)}
-                          </Badge>
-                        ))}
+                        {(safeResourceMetadataTags(resource.metadata) || []).slice(0, 2).map((tag, index) => {
+                          const label = typeof tag === "object" && tag && "name" in tag ? String(tag.name) : String(tag);
+                          return (
+                            <Badge key={index} variant="chip" title={label}>
+                              {label}
+                            </Badge>
+                          );
+                        })}
                       </div>
                     </TableCell>
                     <TableCell>
@@ -1515,7 +1518,7 @@ export default function ResourceManager() {
                 </p>
               )}
             </div>
-            <div className="grid grid-cols-2 gap-4">
+            <div className="grid gap-4 sm:grid-cols-2">
               <div className="grid gap-2">
                 <Label htmlFor="edit-category">Category</Label>
                 <Select 
@@ -1549,7 +1552,7 @@ export default function ResourceManager() {
                 </Select>
               </div>
             </div>
-            <div className="grid grid-cols-2 gap-4">
+            <div className="grid gap-4 sm:grid-cols-2">
               <div className="grid gap-2">
                 <Label htmlFor="edit-subcategory">Subcategory</Label>
                 <Select 
@@ -1793,7 +1796,7 @@ export default function ResourceManager() {
                 </p>
               )}
             </div>
-            <div className="grid grid-cols-2 gap-4">
+            <div className="grid gap-4 sm:grid-cols-2">
               <div className="grid gap-2">
                 <Label htmlFor="create-category">Category</Label>
                 <Select 
@@ -1827,7 +1830,7 @@ export default function ResourceManager() {
                 </Select>
               </div>
             </div>
-            <div className="grid grid-cols-2 gap-4">
+            <div className="grid gap-4 sm:grid-cols-2">
               <div className="grid gap-2">
                 <Label htmlFor="create-subcategory">Subcategory</Label>
                 <Select 

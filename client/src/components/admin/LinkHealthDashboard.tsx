@@ -275,6 +275,11 @@ export default function LinkHealthDashboard() {
     }
   };
 
+  // Recent failures use the canonical DS chip tones directly: hard failures
+  // read as `bad`, reachable-but-questionable links as `warn`.
+  const getFailureChipTone = (status: string) =>
+    status === 'broken' || status === 'dns_failure' ? 'bad' : 'warn';
+
   // Prepare trend chart data from last 10 jobs
   const trendData: LinkHealthTrendPoint[] = jobs.slice(0, 10).reverse().map((job) => ({
     date: formatAdminDate(job.createdAt),
@@ -295,7 +300,7 @@ export default function LinkHealthDashboard() {
         ].map(([label, value, tone]) => (
           <div key={label} className={`card ops-link-health__stat-card ops-link-health__stat-card--${tone}`}>
             <div className="mono ops-link-health__stat-label">{label}</div>
-            <div>{value}</div>
+            <div>{typeof value === "number" ? value.toLocaleString() : value}</div>
           </div>
         ))}
       </div>
@@ -506,7 +511,7 @@ export default function LinkHealthDashboard() {
                 <TableBody>
                   {recentFailures.map((check) => (
                     <TableRow key={`flagged-${check.id}`}>
-                      <TableCell className="font-medium">
+                      <TableCell className="ops-link-health__resource-cell">
                         {check.resource?.title ?? `Resource #${check.resourceId}`}
                         {check.resource?.category && (
                           <span className="mt-1 block text-xs text-muted-foreground">{check.resource.category}</span>
@@ -529,12 +534,11 @@ export default function LinkHealthDashboard() {
                         )}
                       </TableCell>
                       <TableCell>
-                        <StatusChip status={check.status} className={getHealthStatusBadge(check.status)}>
-                          {getHealthStatusIcon(check.status)}
-                          <span className="ml-1">{check.status}</span>
-                        </StatusChip>
+                        <span className={`chip ${getFailureChipTone(check.status)} ops-link-health__failure-chip`}>
+                          {check.status.replace(/_/g, " ")}
+                        </span>
                       </TableCell>
-                      <TableCell className="whitespace-nowrap text-xs text-muted-foreground">
+                      <TableCell className="ops-link-health__checked-cell">
                         {formatAdminDateTime(check.lastCheckedAt)}
                       </TableCell>
                       <TableCell className="text-right">

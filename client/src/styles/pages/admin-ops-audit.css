@@ -68,6 +68,11 @@
   font-size: 11px;
 }
 
+/* When column: tertiary ink, as in the canonical audit table. */
+.admin-ops-audit-shell .admin-ops-audit-table tbody td:last-child {
+  color: var(--text-3);
+}
+
 .admin-ops-audit-shell .admin-ops-audit-detail-button {
   opacity: 0;
 }

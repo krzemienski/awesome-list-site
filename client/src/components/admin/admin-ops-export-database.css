@@ -71,10 +71,6 @@
   border-style: solid;
 }
 
-.admin-ops-export-card:hover {
-  border-color: var(--accent);
-}
-
 .admin-ops-export-card__icon {
   align-items: center;
   background: var(--surface-2);
@@ -104,7 +100,6 @@
 
 .admin-ops-export-card__action {
   /* Preserve the canonical inset while honoring the 44px control floor. */
-  border: var(--border-w, 1px) solid var(--accent);
   font-size: 0.8125rem;
   font-weight: 600;
   height: auto;
@@ -349,7 +344,7 @@
 }
 
 .admin-ops-table .admin-ops-table__name {
-  color: var(--accent);
+  color: var(--text);
   font-family: var(--font-mono);
   font-size: 0.75rem;
 }
@@ -484,7 +479,7 @@
 }
 
 .admin-ops-database__unsupported svg {
-  color: var(--accent);
+  color: var(--text-3);
   margin-top: 0.1rem;
 }
 
@@ -602,7 +597,12 @@
   padding: 20px;
 }
 
+/* Canonical Stat label: a tertiary mono caption, not an accent eyebrow. */
 .admin-ops-database .admin-ops-stat__label {
+  color: var(--text-3);
+  font-size: 10px;
+  font-weight: 400;
+  letter-spacing: 1.4px;
   margin-bottom: 10px;
 }
 
@@ -626,14 +626,17 @@
   white-space: normal;
 }
 
+/* The 44px Inspect control sets the row height, so the cell drops its
+   vertical inset to land on the canonical 56px row. */
 .admin-ops-database .admin-ops-table td {
   line-height: 1.6; /* body leading */
-  padding: 14px;
+  padding: 6px 14px;
 }
 
 .admin-ops-database .admin-ops-table .admin-ops-table__mono,
 .admin-ops-database .admin-ops-table .admin-ops-table__name {
   font-size: 12px;
+  white-space: nowrap;
 }
 
 /* Frozen `.btn.ghost`: transparent, hairline border, content-sized. */
@@ -679,6 +682,14 @@
 @media (max-width: 48rem) {
   .admin-ops-export-card {
     min-height: 0;
+  }
+
+  /* Beside the first summary there is less room than the label needs at
+     phone width, so it wraps inside the card column instead of overhanging. */
+  .admin-ops-export > .admin-ops-more:nth-of-type(2) > summary {
+    max-width: calc(100% - 150px);
+    text-align: left;
+    white-space: normal;
   }
 
   /* The frozen TableShell keeps its 18px/22px heading at every width. */

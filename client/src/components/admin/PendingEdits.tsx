@@ -1,18 +1,17 @@
 import { type MouseEvent, useEffect, useRef, useState } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { apiRequest } from "@/lib/queryClient";
-import { formatAdminDateTime } from "@/lib/utils";
+import { formatAdminDateTime, formatRelativeAgo } from "@/lib/utils";
 import { useToast } from "@/hooks/use-toast";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
-import { CheckCircle2, XCircle, Eye, ExternalLink, AlertTriangle, Sparkles, RefreshCw, AlertCircle } from "lucide-react";
+import { ExternalLink, AlertTriangle, Sparkles, RefreshCw, AlertCircle } from "lucide-react";
 import type { Resource, ResourceEdit } from "@shared/schema";
 import "./queues-review.css";
 
@@ -21,14 +20,6 @@ interface ResourceEditWithResource extends ResourceEdit {
 }
 
 const MIN_REJECTION_REASON_LENGTH = 10;
-
-function StatusChip({ status }: { status: "pending" | "approved" | "rejected" }) {
-  return (
-    <Badge variant="chip" className={`admin-chip queue-review-status queue-review-status--${status}`}>
-      {status}
-    </Badge>
-  );
-}
 
 // BUG-012 (run25): invisible characters must be VISIBLE in review. A
 // zero-width-only value used to render as a blank "+ " line, so a reviewer
@@ -89,10 +80,8 @@ export default function PendingEdits() {
   // at narrow widths with no affordance that more columns existed.
   const scrollRef = useRef<HTMLDivElement>(null);
   const [showSwipeHint, setShowSwipeHint] = useState(false);
-  // R5-058 (run25): the shadcn <Table> renders its own inner `overflow-auto`
-  // wrapper — THAT is the element that actually scrolls horizontally. Track
-  // ITS scrollLeft so the gradient cue hides at max scroll and re-shows when
-  // the user scrolls back.
+  // R5-058 (run25): track the table viewport's scrollLeft so the gradient
+  // cue hides at max scroll and re-shows when the user scrolls back.
   useEffect(() => {
     const el = scrollRef.current;
     if (!el) return;
@@ -243,8 +232,8 @@ export default function PendingEdits() {
       <section className="admin-panel queue-review-shell" aria-labelledby="pending-edits-heading">
         <div className="admin-panel__heading queue-review-shell-heading">
           <div>
-            <h2 id="pending-edits-heading">Pending Edits</h2>
-            <p>Edit suggestions awaiting review</p>
+            <h2 id="pending-edits-heading">Edit history</h2>
+            <p>Pending and recent edits to resources</p>
           </div>
         </div>
         <div className="queue-review-loading-table" aria-label="Loading pending edits">
@@ -304,11 +293,8 @@ export default function PendingEdits() {
       <section className="admin-panel queue-review-shell" aria-labelledby="pending-edits-heading">
         <div className="admin-panel__heading queue-review-shell-heading">
           <div>
-            <h2 id="pending-edits-heading" className="queue-review-title">
-              Pending Edits
-              <Badge variant="accent" className="queue-review-count">{edits.length}</Badge>
-            </h2>
-            <p>{edits.length} edit suggestions awaiting review</p>
+            <h2 id="pending-edits-heading">Edit history</h2>
+            <p>{edits.length} pending edits awaiting review</p>
           </div>
         </div>
         {/* R4-012 (run21): shared narrow-admin-table strategy — a native
@@ -334,115 +320,114 @@ export default function PendingEdits() {
             onKeyDown={(e) => {
               const el = scrollRef.current;
               if (!el) return;
-              // R5-058: scroll the shadcn <Table>'s own inner overflow-auto
-              // wrapper — the outer viewport only overflows vertically.
               const scroller = (el.querySelector('table')?.parentElement ?? el) as HTMLElement;
               if (e.key === 'ArrowRight') { scroller.scrollBy({ left: 80 }); e.preventDefault(); }
               else if (e.key === 'ArrowLeft') { scroller.scrollBy({ left: -80 }); e.preventDefault(); }
             }}
           >
-            <Table className="queue-review-table queue-review-table--edits min-w-[720px]">
-              <TableHeader>
-                <TableRow>
-                  <TableHead>Resource</TableHead>
-                  <TableHead>Changes</TableHead>
-                  <TableHead>AI Analysis</TableHead>
-                  <TableHead>Submitted</TableHead>
-                  <TableHead>Status</TableHead>
-                  <TableHead className="text-right">Actions</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {edits.map((edit) => (
-                  <TableRow key={edit.id} data-testid={`row-pending-edit-${edit.id}`}>
-                    <TableCell className="font-medium">
-                      <div className="flex items-center gap-2">
+            <table className="table queue-review-table queue-review-table--edits">
+              <colgroup>
+                <col />
+                <col className="queue-review-col-field" />
+                <col className="queue-review-col-submitter" />
+                <col className="queue-review-col-when" />
+                <col className="queue-review-col-actions" />
+              </colgroup>
+              <thead>
+                <tr>
+                  <th>Resource</th>
+                  <th>Field</th>
+                  <th>Editor</th>
+                  <th>When</th>
+                  <th><span className="sr-only">Actions</span></th>
+                </tr>
+              </thead>
+              <tbody>
+                {edits.map((edit) => {
+                  const fields = Object.keys(edit.proposedChanges);
+                  const title = edit.resource?.title || 'Unknown Resource';
+                  return (
+                  <tr key={edit.id} data-testid={`row-pending-edit-${edit.id}`}>
+                    <td>
+                      <div className="queue-review-item-title">
                         {hasConflict(edit) && (
-                          <AlertTriangle className={"h-4 w-4 text-[var(--status-warn)]" /* DS-OK: status warn */} />
+                          <AlertTriangle
+                            className="queue-review-conflict"
+                            aria-label="Resource changed since this edit was proposed"
+                          />
                         )}
-                        <div>
-                          <p>{edit.resource?.title || 'Unknown Resource'}</p>
-                          {edit.resource?.url && (
-                            <a
-                              href={edit.resource.url}
-                              target="_blank"
-                              rel="noopener noreferrer"
-                              className="text-xs text-muted-foreground hover:text-primary flex items-center gap-1"
-                              data-testid={`link-edit-resource-${edit.id}`}
-                            >
-                              <ExternalLink className="h-3 w-3" />
-                              View Resource
-                            </a>
-                          )}
-                        </div>
+                        <span title={title}>{title}</span>
+                        {edit.resource?.url && (
+                          <a
+                            href={edit.resource.url}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="queue-review-item-link"
+                            aria-label={`Open ${title} in a new tab`}
+                            data-testid={`link-edit-resource-${edit.id}`}
+                          >
+                            <ExternalLink className="h-3 w-3" />
+                          </a>
+                        )}
                       </div>
-                    </TableCell>
-                    <TableCell>
-                      <Badge variant="outline">
-                        {Object.keys(edit.proposedChanges).length} field(s)
-                      </Badge>
-                    </TableCell>
-                    <TableCell>
-                      {edit.claudeMetadata ? (
-                        <div className="flex items-center gap-1">
-                          <Sparkles className={"h-4 w-4 text-[var(--status-info-2)]" /* DS-OK: violet info (DS chart/info constant) */} />
-                          <span className="text-xs">
-                            {Math.round((edit.claudeMetadata.confidence || 0) * 100)}%
-                          </span>
-                        </div>
-                      ) : (
-                        <span className="text-xs text-muted-foreground">No AI</span>
+                      {edit.claudeMetadata && (
+                        <span className="queue-review-sub queue-review-ai">
+                          <Sparkles className="h-3 w-3" aria-hidden="true" />
+                          AI {Math.round((edit.claudeMetadata.confidence || 0) * 100)}%
+                        </span>
                       )}
-                    </TableCell>
-                    <TableCell className="text-sm text-muted-foreground">
-                      {formatDate(edit.createdAt)}
-                    </TableCell>
-                    <TableCell>
-                      <StatusChip status="pending" />
-                    </TableCell>
-                    <TableCell className="queue-review-action-cell text-right">
-                      <div className="flex items-center justify-end gap-2">
+                    </td>
+                    <td className="mono queue-review-mono">
+                      <span className="queue-review-truncate" title={fields.join(', ')}>
+                        {fields.length > 0 ? fields.join(', ') : '—'}
+                      </span>
+                    </td>
+                    <td className="mono queue-review-mono">
+                      <span className="queue-review-truncate" title={edit.submittedBy}>{edit.submittedBy}</span>
+                    </td>
+                    <td className="mono queue-review-mono queue-review-when">
+                      <time dateTime={new Date(edit.createdAt).toISOString()} title={formatDate(edit.createdAt)}>
+                        {formatRelativeAgo(edit.createdAt)}
+                      </time>
+                    </td>
+                    <td className="queue-review-action-cell">
+                      <div className="queue-review-row-actions">
                         <Button
                           variant="ghost"
                           size="sm"
                           onClick={() => handleViewDetails(edit)}
-                          aria-label={`View edit details for ${edit.resource?.title || 'resource'}`}
+                          aria-label={`View diff for ${title}`}
                           data-testid={`button-view-edit-${edit.id}`}
                         >
-                          <Eye className="h-4 w-4" />
+                          Diff
                         </Button>
-                        {/* Run19 BUG-014: affirmative green, matching the
-                            Approvals tab — the theme's primary is red-toned,
-                            so variant="default" read as destructive. */}
                         <Button
-                          variant="default"
+                          variant="outline"
                           size="sm"
-                          className={"bg-[var(--status-ok)] hover:bg-[var(--status-ok)]/90 text-black" /* DS-OK: status ok */}
                           onClick={() => handleApproveClick(edit)}
                           disabled={approveMutation.isPending}
-                          aria-label={`Approve edit for ${edit.resource?.title || 'resource'}`}
+                          aria-label={`Approve edit for ${title}`}
                           data-testid={`button-approve-edit-${edit.id}`}
                         >
-                          <CheckCircle2 className="h-4 w-4 mr-1" />
                           Approve
                         </Button>
                         <Button
-                          variant="destructive"
+                          variant="ghost"
                           size="sm"
                           onClick={() => handleRejectClick(edit)}
                           disabled={rejectMutation.isPending}
-                          aria-label={`Reject edit for ${edit.resource?.title || 'resource'}`}
+                          aria-label={`Reject edit for ${title}`}
                           data-testid={`button-reject-edit-${edit.id}`}
                         >
-                          <XCircle className="h-4 w-4 mr-1" />
                           Reject
                         </Button>
                       </div>
-                    </TableCell>
-                  </TableRow>
-                ))}
-              </TableBody>
-            </Table>
+                    </td>
+                  </tr>
+                  );
+                })}
+              </tbody>
+            </table>
           </div>
           {showSwipeHint && (
             <p className="mt-2 text-xs text-muted-foreground" data-testid="text-swipe-hint-edits">

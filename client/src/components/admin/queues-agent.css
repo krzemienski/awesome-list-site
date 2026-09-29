@@ -451,3 +451,13 @@
   font-size: 13px;
   line-height: normal;
 }
+
+/* Research notes carry the whole agent brief as their title; the card shows
+   the canonical one-glance heading and the note dialog keeps the full text. */
+.admin-research-note .admin-research-note__open h3 {
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  display: -webkit-box;
+  line-height: 1.4;
+  overflow: hidden;
+}

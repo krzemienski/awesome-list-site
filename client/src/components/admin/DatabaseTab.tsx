@@ -163,7 +163,6 @@ export default function DatabaseTab({ stats }: DatabaseTabProps) {
                 : "Waiting for admin stats"
               : `${pendingMigrations} pending`
           }
-          accent
         />
       </div>
 
@@ -171,7 +170,7 @@ export default function DatabaseTab({ stats }: DatabaseTabProps) {
         <summary className="btn ghost">Database seeding</summary>
       <section className="card admin-ops-database__seed">
         <header className="admin-ops-database__seed-header">
-          <Database className="h-5 w-5 text-[var(--accent)]" aria-hidden="true" />
+          <Database className="h-5 w-5 text-[var(--text-2)]" aria-hidden="true" />
           <div>
             <h2>Database Management</h2>
             <p>Seed the database with video resources from the awesome-video JSON source</p>

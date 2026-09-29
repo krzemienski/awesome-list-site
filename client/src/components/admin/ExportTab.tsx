@@ -324,7 +324,11 @@ export default function ExportTab({ validationStatus: propValidationStatus }: Ex
       <div className="admin-ops-export__intro">
         <h2>Export Awesome List</h2>
         <div className="admin-ops-export__intro-actions">
-          <Button onClick={() => setConfirmAction("validate")} disabled={validateMutation.isPending}>
+          <Button
+            onClick={() => setConfirmAction("validate")}
+            disabled={validateMutation.isPending}
+            variant="outline"
+          >
             {validateMutation.isPending ? (
               <>
                 <RefreshCw className="h-4 w-4 animate-spin" />
@@ -390,7 +394,13 @@ export default function ExportTab({ validationStatus: propValidationStatus }: Ex
           </div>
           <h3 className="admin-ops-export-card__title">CSV (resources)</h3>
           <p className="admin-ops-export-card__description">Flat resource table for spreadsheet workflows.</p>
-          <Button className="admin-ops-export-card__action" onClick={() => unavailableExport("CSV")}>Download</Button>
+          <Button
+            className="admin-ops-export-card__action"
+            onClick={() => unavailableExport("CSV")}
+            variant="outline"
+          >
+            Download
+          </Button>
         </article>
 
         <article className="card admin-ops-export-card hoverable">
@@ -405,10 +415,11 @@ export default function ExportTab({ validationStatus: propValidationStatus }: Ex
               void handleExport();
             }}
             disabled={isExporting}
+            variant="outline"
             data-testid="button-export-markdown"
           >
             {isExporting ? <RefreshCw className="h-4 w-4 animate-spin" /> : <Download className="h-4 w-4" />}
-             {isExporting ? "Generating..." : "Generate"}
+            {isExporting ? "Generating..." : "Generate"}
           </Button>
         </article>
 
@@ -420,7 +431,7 @@ export default function ExportTab({ validationStatus: propValidationStatus }: Ex
           },
           {
             title: "SQL dump",
-             description: "PostgreSQL-compatible schema + data.",
+            description: "PostgreSQL-compatible schema + data.",
             icon: <TerminalSquare className="h-5 w-5" />,
           },
           {
@@ -438,6 +449,7 @@ export default function ExportTab({ validationStatus: propValidationStatus }: Ex
             <Button
               className="admin-ops-export-card__action"
               onClick={() => unavailableExport(format.title)}
+              variant="outline"
             >
               {format.title === "API token" ? "Generate" : "Download"}
             </Button>

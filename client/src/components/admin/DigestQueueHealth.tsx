@@ -27,7 +27,7 @@ export default function DigestQueueHealth() {
     <Card className="ops-digest-health" data-testid="card-digest-queue-health">
       <CardHeader className="ops-digest-health__header">
         <CardTitle className="flex items-center gap-2">
-          <Activity className="h-5 w-5 text-[var(--accent)]" />
+          <Activity className="h-5 w-5 text-[var(--text-2)]" />
           Digest delivery health
         </CardTitle>
         <p className="text-sm text-[color:var(--text-2)]">
@@ -58,7 +58,7 @@ export default function DigestQueueHealth() {
               <Stat
                 label={
                   <span className="ops-digest-health__stat-label-with-icon">
-                    <Radio className={`h-5 w-5 ${query.data.transport.available ? "text-[var(--accent)]" : "text-destructive"}`} />
+                    <Radio className={`h-5 w-5 ${query.data.transport.available ? "text-[var(--text-2)]" : "text-destructive"}`} />
                     Transport
                   </span>
                 }
@@ -75,7 +75,7 @@ export default function DigestQueueHealth() {
               <Stat
                 label={
                   <span className="ops-digest-health__stat-label-with-icon">
-                    <Clock3 className="h-5 w-5 text-[var(--accent)]" />
+                    <Clock3 className="h-5 w-5 text-[var(--text-2)]" />
                     Queue total
                   </span>
                 }
@@ -85,7 +85,7 @@ export default function DigestQueueHealth() {
               <Stat
                 label={
                   <span className="ops-digest-health__stat-label-with-icon">
-                    <CheckCircle2 className="h-5 w-5 text-[var(--accent)]" />
+                    <CheckCircle2 className="h-5 w-5 text-[var(--text-2)]" />
                     Oldest queued
                   </span>
                 }
@@ -117,7 +117,7 @@ export default function DigestQueueHealth() {
 
             <section>
               <h3 className="mb-3 flex items-center gap-2 text-sm font-semibold">
-                <AlertTriangle className="h-4 w-4 text-[var(--accent)]" />
+                <AlertTriangle className="h-4 w-4 text-[var(--text-2)]" />
                 Recent failure codes
               </h3>
               {query.data.recentFailureCodes.length ? (

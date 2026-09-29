@@ -221,7 +221,7 @@ export default function UsersTab() {
                     type="button"
                     variant="ghost"
                     onClick={() => toggleSort(col.key)}
-                    className="inline-flex h-auto items-center gap-1 p-0 min-h-[32px] font-medium hover:bg-transparent hover:text-foreground transition-colors"
+                    className="admin-ops-sort-button"
                     aria-label={`Sort by ${col.label}`}
                     data-testid={`button-sort-${col.key}`}
                   >
@@ -382,11 +382,11 @@ export default function UsersTab() {
         </p>
 
         {totalPages > 1 && (
-          <div className="flex items-center justify-between mt-4">
-            <span className="text-sm text-muted-foreground">
+          <div className="admin-ops-users-pagination">
+            <span className="admin-ops-users-pagination__label">
               Page {page} of {totalPages}
             </span>
-            <div className="flex gap-2">
+            <div className="admin-ops-users-pagination__controls">
               {/* BUG-057 (run25): icon-only pager buttons need accessible names. */}
               <Button
                 variant="outline"

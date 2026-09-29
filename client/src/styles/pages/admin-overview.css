@@ -231,8 +231,10 @@
   font-size: 0.625rem;
 }
 
+/* Reference column is 38px for "TX#1"; live ids ("TX#25627") are wider, so
+   38px is a floor rather than a fixed width that lets the id run into the actor. */
 .admin-overview-canonical .admin-canonical-activity-id {
-  inline-size: 38px;
+  min-inline-size: 38px;
 }
 
 .admin-overview-canonical .admin-canonical-activity-actor {
@@ -249,24 +251,29 @@
 }
 
 .admin-overview-canonical .admin-canonical-activity-action {
-  /* Reference admin.jsx: action and time are plain flex items that shrink and
-     WRAP at spaces ("recommendation feedback / restored", "44m / ago"); only
-     the target truncates. `nowrap` here let long live actions overflow the
-     row, turning the list into a keyboard-unreachable scroll region (axe
-     scrollable-region-focusable at 375). `anywhere` only lowers the floor for
-     an unbreakable word, so normal wrapping still matches the reference. */
-  flex: 0 1 auto;
+  /* Reference admin.jsx: action and time are plain flex items; only the target
+     truncates. Live rows carry long masked emails, which under the reference's
+     equal shrink squeezed the target to nothing and broke short actions
+     mid-word ("updat/ed") at 375. The action keeps its natural width up to 40%
+     of the row, wrapping at spaces beyond that ("recommendation feedback /
+     restored"); `anywhere` only applies to a single word wider than that cap,
+     so the row never overflows into a keyboard-unreachable scroll region. */
+  flex: 0 0 auto;
+  max-inline-size: 40%;
   color: var(--text-2);
   overflow-wrap: anywhere;
 }
 
 .admin-overview-canonical .admin-canonical-activity-time {
-  flex: 0 1 auto;
+  flex: 0 0 auto;
+  white-space: nowrap;
 }
 
+/* The actor (min-width 0, ellipsis) gives way first; the target keeps a
+   readable floor instead of collapsing to zero width. */
 .admin-overview-canonical .admin-canonical-activity-target {
-  min-width: 0;
-  flex: 1;
+  min-width: 2rem;
+  flex: 1 1 0;
   overflow: hidden;
   color: var(--text);
   text-overflow: ellipsis;
@@ -348,7 +355,9 @@
   height: 4px;
   overflow: hidden;
   border-radius: var(--radius-pill);
-  background: var(--border);
+  /* Editorial's --surface-3 equals its --border (the reference track); Brutalist's
+     near-opaque --border would swallow the ink bar, --surface-3 does not. */
+  background: var(--surface-3, var(--border));
 }
 
 .admin-overview-canonical .admin-canonical-category-bar {
@@ -356,7 +365,10 @@
   height: 100%;
   min-width: 0.25rem;
   border-radius: var(--radius-pill);
-  background: var(--accent);
+  /* Reference admin.jsx fills these in --accent; five accent bars push the
+     first viewport past Stage 7's eight accent users, and a data bar is not a
+     reserved accent moment, so they read in primary ink. */
+  background: var(--text);
 }
 
 @media (max-width: 48rem) {

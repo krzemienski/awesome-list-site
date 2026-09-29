@@ -131,6 +131,9 @@ export default function AdminDashboard() {
   // so wait for the list to resize into its single row and for fonts to
   // settle — then stop observing: later viewport changes (a window resize, a
   // full-page capture) must leave the user's own scroll position alone.
+  // The strip only mounts once auth and stats have loaded, so a cold deep link
+  // re-runs this when the loading gates open, not just when the tab changes.
+  const tabStripMounted = !authLoading && !isLoading && !error;
   useEffect(() => {
     const scroller = document.querySelector<HTMLElement>(".admin-dashboard__tabs");
     if (!scroller) return;
@@ -159,7 +162,7 @@ export default function AdminDashboard() {
       cancelled = true;
       observer.disconnect();
     };
-  }, [visibleTab]);
+  }, [visibleTab, tabStripMounted]);
 
   const handleNewEntry = () => {
     const url = new URL(window.location.href);

@@ -2,7 +2,7 @@
  * Queue review surfaces intentionally own their parity skin here instead of
  * adding queue-specific rules to the shared admin stylesheet. The structure
  * follows the canonical TableShell: bordered panel, 18/22px heading row,
- * horizontally scrollable table, and mono status chips.
+ * horizontally scrollable DS `.table`.
  */
 .queue-review-shell {
   overflow: hidden;
@@ -25,28 +25,6 @@
   font-size: 0.75rem;
   line-height: 1.6;
   margin-block-start: 0.25rem;
-}
-
-.queue-review-title {
-  align-items: center;
-  display: flex;
-  gap: 0.5rem;
-}
-
-.queue-review-count {
-  align-items: center;
-  background: color-mix(in srgb, var(--accent) 9%, transparent);
-  border: var(--hairline-w) solid color-mix(in srgb, var(--accent) 35%, var(--border));
-  border-radius: var(--radius-pill);
-  color: var(--accent);
-  display: inline-flex;
-  font-family: var(--font-mono);
-  font-size: 0.6875rem;
-  font-weight: 500;
-  min-height: 1.25rem;
-  min-width: 1.75rem;
-  justify-content: center;
-  padding-inline: 0.4rem;
 }
 
 .queue-review-actions {
@@ -84,7 +62,7 @@
 .queue-review-table-wrap {
   max-height: 37.5rem;
   overflow: auto;
-  scrollbar-color: color-mix(in srgb, var(--accent) 45%, transparent) transparent;
+  scrollbar-color: var(--border-strong) transparent;
   scrollbar-width: thin;
 }
 
@@ -95,44 +73,16 @@
 }
 
 .queue-review-table-wrap::-webkit-scrollbar-thumb {
-  background: color-mix(in srgb, var(--accent) 40%, transparent);
+  background: var(--border-strong);
   border-radius: var(--radius-pill);
 }
 
-.queue-review-table-wrap > .relative {
-  min-width: 100%;
-}
-
-.queue-review-table-wrap .queue-review-table {
-  border-collapse: collapse;
-  font-size: 0.8125rem;
-  min-width: 52rem;
-  width: 100%;
-}
-
-.queue-review-table-wrap .queue-review-table--resources {
-  min-width: 60rem;
-}
-
-.queue-review-table-wrap .queue-review-table--edits {
-  min-width: 52rem;
-}
-
-.queue-review-table-wrap .queue-review-table th {
-  border-block-end: var(--hairline-w) solid var(--border);
-  color: var(--text-3, var(--text-2));
-  font-family: var(--font-mono);
-  font-size: 0.6875rem;
-  font-weight: 500;
-  letter-spacing: 0.04em;
-  padding: 0.75rem 0.875rem;
-  text-align: start;
-  text-transform: uppercase;
-  white-space: nowrap;
-  height: auto;
-}
-
-.queue-review-shell > .admin-table-wrap .table {
+/*
+ * The shared `.admin-table-wrap` compacts every admin table (mono headers,
+ * mono first/last cells, 12px body). Queue tables restore the DS `.table`
+ * metrics the canonical TableShell uses.
+ */
+.queue-review-shell .admin-table-wrap .table {
   border-collapse: collapse;
   font-family: var(--font-body);
   font-size: 13px;
@@ -140,7 +90,7 @@
   width: 100%;
 }
 
-.queue-review-shell > .admin-table-wrap .table th {
+.queue-review-shell .admin-table-wrap .table th {
   border-bottom: var(--hairline-w) solid var(--border);
   color: var(--text-3);
   font-family: var(--font-body);
@@ -152,61 +102,166 @@
   padding: 12px 14px;
   text-align: left;
   text-transform: uppercase;
+  white-space: nowrap;
 }
 
-.queue-review-table-wrap .queue-review-table td {
-  border-block-end: var(--hairline-w) solid var(--border);
+.queue-review-shell .admin-table-wrap .table td {
+  border-bottom: var(--hairline-w) solid var(--border);
   color: var(--text-2);
-  padding: 0.875rem;
+  font-family: var(--font-body);
+  font-size: 13px;
+  padding: 14px;
   vertical-align: middle;
 }
 
-.queue-review-table-wrap .queue-review-table tbody tr:hover td {
-  background: var(--surface);
-  color: var(--text);
+.queue-review-shell .admin-table-wrap .table td.queue-review-mono {
+  font-family: var(--font-mono);
+  font-size: 12px;
 }
 
-.queue-review-table-wrap .queue-review-table td:first-of-type {
-  color: var(--text-2);
+.queue-review-shell .admin-table-wrap .table td.queue-review-when {
+  color: var(--text-3);
 }
 
-.queue-review-select-cell {
-  padding-inline-end: 0.25rem !important;
-  text-align: center !important;
-  width: 3rem;
+.queue-review-table {
+  table-layout: fixed;
+}
+
+.queue-review-shell .admin-table-wrap .queue-review-table--resources {
+  min-inline-size: 60rem;
+}
+
+.queue-review-shell .admin-table-wrap .queue-review-table--edits {
+  min-inline-size: 52rem;
+}
+
+.queue-review-col-select { inline-size: 3rem; }
+.queue-review-col-category { inline-size: 10rem; }
+.queue-review-col-field { inline-size: 10rem; }
+.queue-review-col-submitter { inline-size: 11rem; }
+.queue-review-col-when { inline-size: 6.5rem; }
+.queue-review-col-actions { inline-size: 16.5rem; }
+
+.queue-review-shell .admin-table-wrap .table .queue-review-select-cell {
+  padding-inline-end: 0.25rem;
+  text-align: center;
 }
 
 .queue-review-select-cell [role="checkbox"] {
   margin-inline: auto;
+  position: relative;
 }
 
-.queue-review-table .queue-review-action-cell {
-  min-width: 19rem;
+/* 44px hit area around the 16px box without changing its drawn size. */
+.queue-review-select-cell [role="checkbox"]::after {
+  content: "";
+  inset: -14px;
+  position: absolute;
+}
+
+/* Accent is reserved for the selection itself; an idle box is neutral ink. */
+.queue-review-select-cell [role="checkbox"][data-state="unchecked"] {
+  border-color: var(--border-strong);
+}
+
+.queue-review-item-title {
+  align-items: center;
+  color: var(--text);
+  display: flex;
+  font-weight: 500;
+  gap: 0.375rem;
+  min-inline-size: 0;
+}
+
+.queue-review-item-title > span {
+  min-inline-size: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
   white-space: nowrap;
 }
 
-.queue-review-status {
-  background: transparent;
-  font-size: 0.625rem;
-  min-height: 1.5rem;
+/* 44px hit area without growing the row: the negative margins cancel the
+   padding that makes the target. */
+.queue-review-item-link {
+  align-items: center;
+  color: var(--text-3);
+  display: inline-flex;
+  flex-shrink: 0;
+  justify-content: center;
+  margin: -0.75rem -0.75rem -0.75rem -0.5rem;
+  min-block-size: 2.75rem;
+  min-inline-size: 2.75rem;
 }
 
-.queue-review-status--pending {
-  background: color-mix(in srgb, var(--color-chart-4) 8%, transparent);
-  border-color: color-mix(in srgb, var(--color-chart-4) 30%, var(--border));
-  color: var(--color-chart-4);
+.queue-review-item-link:hover {
+  color: var(--text);
 }
 
-.queue-review-status--approved {
-  background: color-mix(in srgb, var(--color-chart-2) 8%, transparent);
-  border-color: color-mix(in srgb, var(--color-chart-2) 30%, var(--border));
-  color: var(--color-chart-2);
+.queue-review-conflict {
+  block-size: 1rem;
+  color: var(--status-warn);
+  flex-shrink: 0;
+  inline-size: 1rem;
 }
 
-.queue-review-status--rejected {
-  background: color-mix(in srgb, var(--color-destructive) 8%, transparent);
-  border-color: color-mix(in srgb, var(--color-destructive) 30%, var(--border));
-  color: var(--color-destructive);
+.queue-review-item-desc {
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  color: var(--text-2);
+  display: -webkit-box;
+  font-size: 12px;
+  line-height: 1.5;
+  margin-block-start: 0.25rem;
+  overflow: hidden;
+}
+
+.queue-review-item-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.25rem;
+  margin-block-start: 0.375rem;
+}
+
+.queue-review-item-tags .chip {
+  font-size: 9.5px;
+  padding: 1px 7px;
+}
+
+.queue-review-truncate {
+  display: block;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.queue-review-sub {
+  color: var(--text-3);
+  font-size: 12px;
+  margin-block-start: 0.125rem;
+}
+
+.queue-review-ai {
+  align-items: center;
+  display: inline-flex;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  gap: 0.25rem;
+}
+
+.queue-review-shell .admin-table-wrap .table .queue-review-action-cell {
+  text-align: right;
+  white-space: nowrap;
+}
+
+.queue-review-row-actions {
+  display: inline-flex;
+  gap: 0.375rem;
+  justify-content: flex-end;
+}
+
+.queue-review-row-actions .btn {
+  font-size: 12px;
+  padding-inline: 10px;
 }
 
 .queue-review-result {
@@ -250,20 +305,6 @@
   text-align: center;
 }
 
-.queue-review-empty-icon {
-  color: var(--text-3, var(--text-2));
-  height: 1.5rem;
-  margin-block-end: 0;
-  opacity: 0.6;
-  width: 1.5rem;
-}
-
-.queue-review-empty h3 {
-  color: var(--text);
-  font-size: 1rem;
-  font-weight: 650;
-}
-
 .queue-review-empty p {
   color: var(--text-2);
   font-size: 0.8125rem;
@@ -272,11 +313,6 @@
 
 .queue-review-empty button {
   margin-block-start: 0.75rem;
-}
-
-.queue-review-empty-status {
-  font-size: 0.75rem !important;
-  min-height: 0;
 }
 
 .queue-review-loading-table {
