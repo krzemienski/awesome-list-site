@@ -22,8 +22,8 @@ export function slugify(text: string): string {
     .normalize("NFKD")
     .replace(/[\u0300-\u036f]/g, "")
     .replace(/[ßæœøđðþłħŧĸı]/g, (ch) => SLUG_CHAR_MAP[ch] ?? "")
-    .replace(/\s+/g, "-")
-    .replace(/[^\w-]+/g, "")
+    .replace(/[\s_]+/g, "-")
+    .replace(/[^a-z0-9-]+/g, "")
     .replace(/--+/g, "-")
     .replace(/^-+/, "")
     .replace(/-+$/, "");
