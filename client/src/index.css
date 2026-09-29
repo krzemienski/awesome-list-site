@@ -19,9 +19,9 @@
 @theme inline {
   --color-background: var(--bg);
   --color-foreground: var(--text);
-  /* MR-DS-20 — DS-OK: shadcn↔DS token bridge. Hex literals below
-     (#ff5c7a / #34d08c / #ffb84d / #000000) mirror DS status colors and
-     the on-accent ink color verbatim from design-system.css. */
+  /* MR-DS-20 — DS-OK: shadcn↔DS token bridge. Status slots read the
+     design-system.css --status-* tokens; the #000000 literals below are the
+     on-accent ink color verbatim from design-system.css. */
   --color-card: var(--surface);
   --color-card-foreground: var(--text);
   --color-popover: var(--bg-2);
@@ -34,15 +34,15 @@
   --color-muted-foreground: var(--text-2);
   --color-accent: var(--surface-2);
   --color-accent-foreground: var(--text);
-  --color-destructive: #ff5c7a;
+  --color-destructive: var(--status-bad);
   --color-destructive-foreground: #000000;
   --color-border: var(--border);
   --color-input: var(--border);
   --color-ring: var(--accent);
   --color-chart-1: var(--accent);
-  --color-chart-2: #34d08c;
-  --color-chart-3: #5eddf2; /* DS-OK: fixed chart-series hue — the DS cyan accent swatch (design-system.css :root[data-accent="cyan"]); series colors must not follow the active accent */
-  --color-chart-4: #ffb84d;
+  --color-chart-2: var(--status-ok);
+  --color-chart-3: var(--status-info); /* fixed chart-series hue: the global status-info token, never the active accent */
+  --color-chart-4: var(--status-warn);
   --color-chart-5: #9d4edd; /* DS-OK: fixed chart-series hue — the DS violet accent swatch (design-system.css :root[data-accent="violet"]); series colors must not follow the active accent */
   --color-sidebar: var(--bg);
   --color-sidebar-foreground: var(--text);

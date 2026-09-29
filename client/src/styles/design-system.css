@@ -45,6 +45,14 @@
   --accent:   #ff3d52;
   --accent-2: #b84dff;
 
+  /* Status semantics — global, theme-independent (live DS colors_and_type.css
+     :root). The one source for .chip.ok/.warn/.bad, .dot.* and the shadcn
+     destructive/chart bridge in index.css. */
+  --status-ok:   #34d08c;
+  --status-warn: #ffb84d;
+  --status-bad:  #ff5c7a;
+  --status-info: #5eddf2;
+
   /* Naming a family here does not download it. Every FIRST family in these
      three stacks must also be fetched by the one always-on <link> in
      client/index.html — the design source's canonical nine-family request,
@@ -142,7 +150,9 @@
    .page (min-height: 100vh) exactly as in the design; body carries only the
    canonical `background: var(--bg)` — the earlier fixed-attachment copy of
    --bg-atmosphere here was drift from styles.css (body has no atmosphere
-   there) and a second full-viewport gradient raster on every page. */
+   there) and a second full-viewport gradient raster on every page.
+   Registered deviation: canonical-token-parity `rule:body:height`
+   (docs/parity/assumptions/tokens.md §12). */
 html { height: 100%; }
 body { min-height: 100%; }
 body {
@@ -388,9 +398,11 @@ button { font-family: inherit; }
   border-color: color-mix(in srgb, var(--accent) 35%, var(--border));
   background: color-mix(in srgb, var(--accent) 8%, transparent);
 }
-.chip.ok { color: #34d08c; border-color: rgba(52,208,140,0.3); background: rgba(52,208,140,0.08); }
-.chip.warn { color: #ffb84d; border-color: rgba(255,184,77,0.3); background: rgba(255,184,77,0.08); }
-.chip.bad { color: #ff5c7a; border-color: rgba(255,92,122,0.3); background: rgba(255,92,122,0.08); }
+/* Same paint as the design's rgba(…,0.3)/(…,0.08) literals: color-mix with
+   transparent keeps the status hue and scales only its alpha. */
+.chip.ok { color: var(--status-ok); border-color: color-mix(in srgb, var(--status-ok) 30%, transparent); background: color-mix(in srgb, var(--status-ok) 8%, transparent); }
+.chip.warn { color: var(--status-warn); border-color: color-mix(in srgb, var(--status-warn) 30%, transparent); background: color-mix(in srgb, var(--status-warn) 8%, transparent); }
+.chip.bad { color: var(--status-bad); border-color: color-mix(in srgb, var(--status-bad) 30%, transparent); background: color-mix(in srgb, var(--status-bad) 8%, transparent); }
 .chip.muted { color: var(--text-3); }
 
 /* ============== SIDEBAR ============== */
@@ -646,9 +658,9 @@ button { font-family: inherit; }
 
 /* ============== STATUS DOTS ============== */
 .dot { width: 8px; height: 8px; border-radius: 50%; display: inline-block; }
-.dot.ok { background: #34d08c; box-shadow: 0 0 8px #34d08c; }
-.dot.warn { background: #ffb84d; }
-.dot.bad { background: #ff5c7a; }
+.dot.ok { background: var(--status-ok); box-shadow: 0 0 8px var(--status-ok); }
+.dot.warn { background: var(--status-warn); }
+.dot.bad { background: var(--status-bad); }
 
 /* ============== RESPONSIVE ============== */
 @media (max-width: 1024px) { .sidebar { width: 240px; } }

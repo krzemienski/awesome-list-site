@@ -213,6 +213,9 @@ export const THEME_BOOT_DATA = {
   accents: ACCENTS.map(({ id }) => id),
   defaultSystem: DEFAULT_SYSTEM,
   defaultAccent: DEFAULT_ACCENT,
+  // A missing/invalid stored accent falls back to the resolved system's
+  // natural accent (HANDOFF §5: `ds-accent || SYSTEM_DEFAULT_ACCENT[sys]`).
+  systemDefaultAccent: SYSTEM_DEFAULT_ACCENT,
 } as const;
 
 export const PRODUCT_PROFILE_BOOT_DATA = {

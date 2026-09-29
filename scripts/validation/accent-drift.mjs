@@ -840,6 +840,7 @@ function parseThemeRegistry(tsSrc) {
     accents: [...accents.keys()],
     defaultSystem,
     defaultAccent,
+    systemDefaultAccent: Object.fromEntries(systemDefaultAccents),
   };
   const actualBootData = exports_.THEME_BOOT_DATA;
   if (JSON.stringify(actualBootData) !== JSON.stringify(expectedBootData)) {
@@ -887,7 +888,7 @@ function checkThemeBootGeneration(htmlSrc, viteSrc) {
   if (/\bvar\s+(?:SYSTEMS|ACCENTS)\s*=\s*\[|\bvar\s+FONT_STACKS\s*=\s*\{/.test(htmlSrc)) {
     issues.push(`${HTML_REL} contains a hand-maintained theme/font allowlist instead of generated boot data`);
   }
-  for (const field of ['systems', 'accents', 'defaultSystem', 'defaultAccent']) {
+  for (const field of ['systems', 'accents', 'defaultSystem', 'defaultAccent', 'systemDefaultAccent']) {
     if (!new RegExp(`\\bTHEME_BOOT\\.${field}\\b`).test(htmlSrc)) {
       issues.push(`${HTML_REL} does not consume generated THEME_BOOT.${field}`);
     }
@@ -2379,7 +2380,7 @@ function runCanaries() {
     "export const SYSTEM_DEFAULT_ACCENT = { editorial: 'crimson' };",
     "export const DEFAULT_SYSTEM = 'editorial';",
     "export const DEFAULT_ACCENT = 'crimson';",
-    `export const THEME_BOOT_DATA = { systems: ['editorial'], accents: ['crimson'], defaultSystem: 'editorial', defaultAccent: '${bootDefaultAccent}' };`,
+    `export const THEME_BOOT_DATA = { systems: ['editorial'], accents: ['crimson'], defaultSystem: 'editorial', defaultAccent: '${bootDefaultAccent}', systemDefaultAccent: { editorial: 'crimson' } };`,
   ].join('\n');
   eq(parseThemeRegistry(registryModule()).issues, [], 'theme registry and every derived export agree');
   eq(
@@ -2390,7 +2391,7 @@ function runCanaries() {
   const generatedHtml = [
     `var THEME_BOOT = ${THEME_BOOT_MARKER};`,
     'THEME_BOOT.systems; THEME_BOOT.accents;',
-    'THEME_BOOT.defaultSystem; THEME_BOOT.defaultAccent;',
+    'THEME_BOOT.defaultSystem; THEME_BOOT.defaultAccent; THEME_BOOT.systemDefaultAccent;',
     `var FONT_BOOT = ${FONT_BOOT_MARKER};`,
     'FONT_BOOT.stacks; FONT_BOOT.fallback;',
   ].join('\n');

@@ -117,8 +117,11 @@
           if (THEME_BOOT.systems.indexOf(sys) === -1) {
             sys = profileDefaults ? profileDefaults.defaultSystem : THEME_BOOT.defaultSystem;
           }
+          // Missing/invalid accent: the resolved system's natural accent
+          // (terminal→matrix, geist→cyan, …), exactly as ThemeProvider and
+          // resolveAccentId() resolve it, so boot and provider never disagree.
           if (THEME_BOOT.accents.indexOf(acc)  === -1) {
-            acc = profileDefaults ? profileDefaults.defaultAccent : THEME_BOOT.defaultAccent;
+            acc = THEME_BOOT.systemDefaultAccent[sys] || THEME_BOOT.defaultAccent;
           }
           root.setAttribute('data-product-profile', profile);
           // Pre-paint apply: the synchronous, dependency-free half of

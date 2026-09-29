@@ -636,7 +636,8 @@ try {
         name: "saved-invalid-accent",
         saved: { system: "terminal", accent: "retired-accent" },
         expectedSystem: "terminal",
-        expectedAccent: family.defaultAccent,
+        // The resolved system's natural accent, not the profile's (TK-21).
+        expectedAccent: "matrix",
       },
     ];
 

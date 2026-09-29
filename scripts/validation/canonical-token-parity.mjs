@@ -241,6 +241,11 @@ export const UTILITY_RULES = [
   '@media (min-width: 1025px)||.show-tablet',
 ];
 
+// Rule 8b — the document box. The design sizes `html, body { height: 100% }`;
+// only `height` is compared (the rest of `body` is covered by rule 11's
+// cascade model through the utilities that inherit from it).
+export const BASE_BOX_RULES = ['html', 'body'];
+
 // Shell geometry tokens the runtime must declare in its top-level :root
 // cascade, with the canonical source each value is read from (see
 // parseCanonicalGeometry).
@@ -345,7 +350,26 @@ function pageAtmosphereHolds({ canonical, app, appRules }) {
   );
 }
 
+const BODY_HEIGHT_REASON =
+  'NB-019 (run20) scroll-lock jump: with the design\'s `body { height: 100% }` the body box ' +
+  'stays viewport-sized while content overflows it, so when Radix scroll-lock sets ' +
+  '`overflow: hidden` on body (any Select/popover open) the document scroll range collapses, ' +
+  'window.scrollY clamps to 0 and the page jumps to the top. The runtime keeps ' +
+  '`html { height: 100% }` and gives body `min-height: 100%` instead, which still fills the ' +
+  'viewport on short pages without capping it. See docs/parity/assumptions/tokens.md §12. ' +
+  'Expires when the design stops capping body height or the runtime drops the min-height floor.';
+
+function bodyHeightHolds({ canonical, app, appRules }) {
+  if (!appRules || canonical !== '100%' || app !== 'auto') return false;
+  const decl = (selector, prop) => {
+    const value = appRules.get(selector)?.get(prop);
+    return value == null ? null : normaliseValue(value);
+  };
+  return decl('body', 'min-height') === '100%' && decl('html', 'height') === '100%';
+}
+
 export const DOCUMENTED_DEVIATIONS = new Map([
+  ['rule:body:height', { reason: BODY_HEIGHT_REASON, holds: bodyHeightHolds }],
   ['rule:.page:background', { reason: PAGE_ATMOSPHERE_REASON, holds: pageAtmosphereHolds }],
   ['rule:.page:background-color', { reason: PAGE_ATMOSPHERE_REASON, holds: pageAtmosphereHolds }],
   ...['editorial', 'terminal', 'geist', 'brutalist', 'swiss'].map((id) => [
@@ -1439,6 +1463,26 @@ function resolveVar(value, map) {
   return map.get(m[1]) ?? value;
 }
 
+/**
+ * A runtime utility value with every runtime-ONLY token (declared in the
+ * runtime's top-level :root, absent from the design's) replaced by its literal,
+ * and `color-mix(in srgb, #rrggbb P%, transparent)` — which keeps the hue and
+ * scales only alpha — rewritten as the equivalent `rgba()`. Design tokens are
+ * never substituted, so a runtime literal standing in for `var(--text)` still
+ * fails. Used so a status hue can have one source (`--status-*`) while the
+ * rule stays provably equal to the design's literals.
+ */
+function resolveRuntimeOnlyValue(value, appRoot, canonicalRoot) {
+  if (!appRoot) return value;
+  let v = value.replace(/var\((--[A-Za-z0-9_-]+)\)/g, (ref, token) =>
+    canonicalRoot?.has(token) || !appRoot.has(token) ? ref : normaliseValue(appRoot.get(token)));
+  v = v.replace(/color-mix\(in srgb,#([0-9a-f]{6}) ?(\d+(?:\.\d+)?)%,transparent\)/g, (_, hex, pct) => {
+    const n = parseInt(hex, 16);
+    return `rgba(${n >> 16},${(n >> 8) & 255},${n & 255},${Number(pct) / 100})`;
+  });
+  return normaliseValue(v);
+}
+
 // ---------------------------------------------------------------------------
 // Selectors — what rule 11 needs from a selector: its specificity, the
 // conditions (state / structural pseudo-classes) under which it applies, and a
@@ -2122,6 +2166,11 @@ export function compareModels(canonical, app, deviations = DOCUMENTED_DEVIATIONS
         const appRaw = appDecls.get(prop);
         const appNorm = appRaw == null ? null : normaliseValue(appRaw);
         if (appNorm === canon) { rows.push({ prop, canonical: canon, app: appNorm, status: 'match' }); continue; }
+        const resolved = appNorm == null ? null : resolveRuntimeOnlyValue(appNorm, app.root, canonical.root);
+        if (resolved !== appNorm && resolved === canon) {
+          rows.push({ prop, canonical: canon, app: appNorm, resolved, status: 'match' });
+          continue;
+        }
         const devKey = `rule:${selector}:${prop}`;
         const deviation = deviations.get(devKey);
         if (deviation && appNorm != null) {
@@ -2135,7 +2184,7 @@ export function compareModels(canonical, app, deviations = DOCUMENTED_DEVIATIONS
         rows.push({ prop, canonical: canon, app: appNorm, status: appNorm == null ? 'missing' : 'mismatch' });
         failures.push(appNorm == null
           ? `utility ${key}: declaration ${prop}: ${canon} is missing from the runtime rule`
-          : `utility ${key}: ${prop} differs — design ${canon} vs runtime ${appNorm}`);
+          : `utility ${key}: ${prop} differs — design ${canon} vs runtime ${appNorm}${resolved !== appNorm ? ` (resolves to ${resolved})` : ''}`);
       }
       for (const [prop, appRaw] of appDecls) {
         if (!canonDecls.has(prop)) {
@@ -2188,6 +2237,33 @@ export function compareModels(canonical, app, deviations = DOCUMENTED_DEVIATIONS
         declarations: rows,
         shadows: { canonical: [...shadows.canonical].sort(), app: [...shadows.app].sort(), contexts: shadows.contexts },
       });
+    }
+  }
+
+  // Rule 8b — the document box height (an absent runtime height is `auto`).
+  if (canonical.rules && app.rules) {
+    for (const selector of BASE_BOX_RULES) {
+      const canonRaw = canonical.rules.get(selector)?.get('height');
+      if (canonRaw == null) {
+        failures.push(`base box ${selector}: the design no longer sets height — update BASE_BOX_RULES`);
+        continue;
+      }
+      const canon = normaliseValue(canonRaw);
+      const appRaw = app.rules.get(selector)?.get('height');
+      const appNorm = appRaw == null ? 'auto' : normaliseValue(appRaw);
+      if (appNorm === canon) continue;
+      const devKey = `rule:${selector}:height`;
+      const deviation = deviations.get(devKey);
+      if (deviation) {
+        usedDeviations.add(devKey);
+        const reason = String(deviation.reason ?? '').trim();
+        if (!reason) failures.push(`deviation ${devKey} has no written reason — write why or delete the entry`);
+        else if (typeof deviation.holds !== 'function') failures.push(`deviation ${devKey} has no holds() check — a reason must be re-provable from data`);
+        else if (!deviation.holds({ canonical: canon, app: appNorm, canonicalRules: canonical.rules, appRules: app.rules })) failures.push(`deviation ${devKey} no longer holds (canonical ${canon} vs runtime ${appNorm}) — align the value or rewrite the entry`);
+        else { honoured.push({ system: `rule:${selector}`, token: 'height', canonical: canon, app: appNorm, reason }); continue; }
+        continue;
+      }
+      failures.push(`base box ${selector}: height differs — design ${canon} vs runtime ${appNorm}`);
     }
   }
 
@@ -2582,6 +2658,11 @@ export const CANARIES = [
   { id: 'utility-missing', note: '.hide-tablet rule removed', expect: /^utility @media \(max-width: 1024px\)\|\|\.hide-tablet: rule is missing/, mutate: { appCss: (s) => swap(s, /\.hide-tablet\s*\{[^}]*\}/, '', '.hide-tablet') } },
   { id: 'kbd-deviation-stale', note: '.kbd font-size 12px -> canonical 10.5px (entry becomes stale)', expect: /^deviation rule:\.kbd:font-size is stale/, mutate: { appCss: (s) => swap(s, /(\n\.kbd\s*\{[\s\S]*?font-size:\s*)12px/, '$110.5px', '.kbd font-size') } },
   { id: 'kbd-deviation-no-longer-holds', note: '.kbd font-size 12px -> 11px (below the floor the reason cites)', expect: /^deviation rule:\.kbd:font-size no longer holds/, mutate: { appCss: (s) => swap(s, /(\n\.kbd\s*\{[\s\S]*?font-size:\s*)12px/, '$111px', '.kbd font-size') } },
+  { id: 'body-height-deviation-stale', note: 'runtime body takes the design height 100% (entry becomes stale)', expect: /^deviation rule:body:height is stale/, mutate: { appCss: (s) => `${s}\nbody { height: 100%; }\n` } },
+  { id: 'body-height-deviation-no-longer-holds', note: 'body min-height 100% -> 100vh (the floor the reason cites is gone)', expect: /^deviation rule:body:height no longer holds/, mutate: { appCss: (s) => swap(s, /(\nbody\s*\{\s*min-height:\s*)100%/, '$1100vh', 'body min-height') } },
+  { id: 'html-height-drift', note: 'html height 100% -> 100vh', expect: /^base box html: height differs — design 100% vs runtime 100vh/, mutate: { appCss: (s) => swap(s, /(\nhtml\s*\{\s*height:\s*)100%/, '$1100vh', 'html height') } },
+  { id: 'status-token-drift', note: '--status-ok #34d08c -> #34d08d: .chip.ok/.dot.ok resolve off the design literal', expect: /^utility \.chip\.ok: color differs — design #34d08c vs runtime var\(--status-ok\) \(resolves to #34d08d\)/, also: [/^utility \.dot\.ok: background differs/], mutate: { appCss: (s) => swap(s, /(--status-ok:\s*)#34d08c/, '$1#34d08d', '--status-ok') } },
+  { id: 'status-mix-drift', note: '.chip.bad border color-mix 30% -> 35%', expect: /^utility \.chip\.bad: border-color differs — design rgba\(255,92,122,0\.3\) vs runtime color-mix/, mutate: { appCss: (s) => swap(s, /(\.chip\.bad\s*\{[^}]*border-color:\s*color-mix\(in srgb, var\(--status-bad\) )30%/, '$135%', '.chip.bad border-color') } },
   { id: 'canonical-moves', note: 'canonical jsx editorial --bg-2 changed (runtime now behind)', expect: /^editorial: --bg-2 differs/, mutate: { canonicalJsx: (s) => swap(s, /('--bg-2':\s*')#070706'/, "$1#070707'", 'editorial --bg-2') } },
   { id: 'canonical-shape', note: 'the design itself declares a token outside :root', expect: /^canonical shape changed: styles\.css \.sidebar declares --bg/, mutate: { canonicalCss: (s) => `${s}\n.sidebar { --bg: red; }\n` } },
 ];

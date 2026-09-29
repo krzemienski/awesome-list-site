@@ -64,8 +64,12 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
     readInitial("ds-system", initialProfile.defaultSystem ?? DEFAULT_SYSTEM, isSystemId)
   );
 
+  // Same fallback as the pre-paint boot in client/index.html: a missing or
+  // invalid stored accent takes the resolved system's natural accent.
   const [accentId, setAccentId] = useState<AccentId>(() =>
-    readInitial("ds-accent", initialProfile.defaultAccent ?? DEFAULT_ACCENT, isAccentId)
+    typeof window === "undefined"
+      ? SYSTEM_DEFAULT_ACCENT[systemId] ?? DEFAULT_ACCENT
+      : resolveAccentId(safeGetItem("ds-accent"), systemId)
   );
 
   useEffect(() => {

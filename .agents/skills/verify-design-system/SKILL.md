@@ -195,16 +195,26 @@ missing, the boot script was removed or errored.
 `data-system` / `data-accent` must be on `<html>` **before first paint**.
 
 ✅ **Good** — the app's pattern (inline synchronous `<script>` in
-`client/index.html`): reads localStorage keys `ds-system` / `ds-accent`
-(plus `ds-font-override`), validates against **inline** system/accent ID
-lists, falls back to Editorial + Crimson, and sets the attributes before any
-module loads. The inline ID lists and font map are hand-synced with
-`client/src/lib/design-system.ts` / `font-options.ts`. All three halves of
-that sync — accents, systems, and fonts — are now enforced automatically by
-the `accent-drift` gate (see "Acceptable hardcoded values" below), so drift
-is a failing check rather than something to eyeball here. An id or stack
-that exists in only one side is what makes a saved theme choice "not
-stick" after a reload.
+`<head>` of `client/index.html`): reads localStorage keys `ds-system` /
+`ds-accent` (plus `ds-font-override`) and validates them against **generated**
+boot data. Vite replaces `__AWESOME_VIDEO_THEME_BOOT__`,
+`__AWESOME_VIDEO_PRODUCT_PROFILE_BOOT__` and `__AWESOME_VIDEO_FONT_BOOT__`
+with JSON serialized from `THEME_BOOT_DATA` / `PRODUCT_PROFILE_BOOT_DATA`
+(`client/src/lib/design-system.ts`) and `FONT_BOOT_DATA` (`font-options.ts`),
+so the script stays inline with no network request and no hand-maintained
+list. A missing/invalid system falls back to the route's product-profile
+default (Editorial on public routes). A missing/invalid accent falls back to
+the resolved system's natural accent, `THEME_BOOT.systemDefaultAccent[sys]`
+(terminal→matrix, geist→cyan, brutalist→amber, swiss→orange,
+editorial→crimson), per HANDOFF `ds-accent || SYSTEM_DEFAULT_ACCENT[sys]`.
+The script then sets `data-product-profile` / `data-system` / `data-accent`
+before any module loads. `ThemeProvider` resolves the same values
+(`resolveAccentId`), so boot and provider never disagree. The `accent-drift`
+gate fails when the generated data drifts from the registries or the script
+stops consuming a field, and `product-profile-drift` asserts the pre-paint
+and runtime attributes per route. An id that resolves differently in boot
+and provider is what makes a saved theme choice "not stick" after a reload,
+or flash on hydrate.
 
 ❌ **Bad** — applying the system from a deferred/module script or inside a
 React `useEffect` (runs after first paint → theme flash), or an inline boot
@@ -348,15 +358,18 @@ These pass — each is tagged `/* DS-OK: reason */` at its definition site
 or within the 5 lines above the value):
 
 - The global status constants `#34d08c` (ok) / `#ffb84d` (warn) / `#ff5c7a`
-  (bad) — semantics, not theme.
+  (bad) — semantics, not theme. In CSS they are tokens (`--status-ok`,
+  `--status-warn`, `--status-bad`, `--status-info` in the design-system.css
+  `:root`); suggest `var(--status-*)` over a new literal.
 - The on-accent inks `#000000` / `#0a0a0a` (text sitting on accent fills).
 - `CHART_PALETTE` entries in `client/src/lib/charts/palette.ts` (recharts
   can't read CSS vars from prop strings).
 - The bridge block in `client/src/index.css`.
 - `[data-system="…"]` skin blocks inside
   `client/src/styles/design-system.css` — intentional per-system overrides.
-- The hand-synced font map in the `client/index.html` boot script — and its
-  sibling `SYSTEMS` id list. **Enforced, not trusted:** the same
+- The font/theme boot data in the `client/index.html` pre-paint script
+  (Vite-injected from `FONT_BOOT_DATA` / `THEME_BOOT_DATA`, never
+  hand-edited). **Enforced, not trusted:** the same
   `accent-drift` gate parses `FONT_OPTIONS` out of
   `client/src/lib/font-options.ts` (its own header calls itself the source of
   truth) and `DESIGN_SYSTEMS`/`DEFAULT_SYSTEM` out of `design-system.ts`, and
@@ -938,6 +951,7 @@ buttons, decorative borders — flag it. Accent is reserved for:
 - Eyebrows.
 - `.live-dot`, `.caret`, live indicators.
 - Active tab underline.
+- `.card.glow:hover` halo (the canonical `--shadow-accent` glow).
 - Focus rings, `::selection`.
 - Key data points in charts; sparing `<em>` emphasis in display copy.
 
