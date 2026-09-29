@@ -329,7 +329,7 @@ const HomeRoute: HomeRouteComponent = (props) => <LazyHomeRoute {...props} />;
 // (sidebar/header) that made 404s look like real content pages.
 const KNOWN_ROUTE_PATTERNS: RegExp[] = [
   /^\/$/,
-  /^\/(login|logout|register|signup|explore|forgot-password|reset-password|categories|category|tag|recommendations|search|about|advanced|submit|journeys|journey|continue-learning|profile|contributions|bookmarks|favorites|account|admin|settings|notifications|onboarding|resource|terms|privacy|code-of-conduct)\/?$/,
+  /^\/(login|logout|register|signup|explore|forgot-password|reset-password|categories|category|subcategory|sub-subcategory|tag|recommendations|search|about|advanced|submit|journeys|journey|continue-learning|profile|contributions|bookmarks|favorites|account|admin|settings|notifications|onboarding|resource|terms|privacy|code-of-conduct)\/?$/,
   // Task #307: Clerk-hosted auth pages, including OAuth/verification sub-paths.
   /^\/(sign-in|sign-up)(\/.*)?$/,
   /^\/auth\/(login|register)\/?$/,
@@ -733,8 +733,16 @@ function Router({ homeComponent: Home }: { homeComponent: HomeRouteComponent }) 
             onRetry={() => refetchNav()}
           />
         </Route>
+        {/* R5-051: one bare-prefix policy with the server — taxonomy
+            prefixes without a slug land on the category index. */}
         <Route path="/category">
-          <Redirect to="/" replace />
+          <Redirect to="/categories" replace />
+        </Route>
+        <Route path="/subcategory">
+          <Redirect to="/categories" replace />
+        </Route>
+        <Route path="/sub-subcategory">
+          <Redirect to="/categories" replace />
         </Route>
         <Route path="/subcategory/:slug" component={Subcategory} />
         <Route path="/recommendations" component={Recommendations} />
