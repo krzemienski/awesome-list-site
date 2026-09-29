@@ -248,7 +248,7 @@ export default function ConsentBanner() {
         </p>
         <div className="system-consent-banner__actions flex shrink-0 items-center gap-2">
           <Button
-            variant="outline"
+            variant="ghost"
             size="sm"
             className="system-consent-banner__action min-h-[44px]"
             onClick={() => decide("denied")}
@@ -256,7 +256,9 @@ export default function ConsentBanner() {
           >
             Decline
           </Button>
+          {/* Not a primary: the banner overlays pages that own their one primary action. */}
           <Button
+            variant="outline"
             size="sm"
             className="system-consent-banner__action min-h-[44px]"
             onClick={() => decide("granted")}

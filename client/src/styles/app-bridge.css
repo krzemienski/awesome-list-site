@@ -123,6 +123,26 @@ body { height: auto; min-height: 100%; }
 .cl-formFieldInput.input,
 .cl-formButtonPrimary.btn { min-height: 44px; }
 
+/* Clerk zeroes its control and card borders (`[data-variant] { border-width: 0 }`,
+   0,2,0) and draws a 1px shadow ring instead, which ignores --border-w. These
+   (0,3,0) rules restore the design system's own edge on the sign-in widget:
+   token border width, no ring, no gloss. */
+:root .cl-formFieldInput.input,
+:root .cl-button.btn,
+:root .cl-cardBox {
+  border-width: var(--border-w);
+  border-style: solid;
+}
+:root .cl-formFieldInput.input { border-color: var(--border); box-shadow: none; }
+:root .cl-formFieldInput.input:focus { border-color: color-mix(in srgb, var(--accent) 50%, var(--border-strong)); }
+:root .cl-button.btn:not(:hover) { box-shadow: none; }
+:root .cl-formButtonPrimary.btn::after { display: none; }
+:root .cl-cardBox { border-color: var(--border); box-shadow: none; }
+[data-system="brutalist"] .cl-cardBox { border-color: var(--text); }
+[data-system="swiss"] .cl-formFieldInput.input,
+[data-system="swiss"] .cl-button.btn,
+[data-system="swiss"] .cl-cardBox { border-width: 0.5px; }
+
 /* ============== ACCESSIBILITY & STATE ============== */
 .skip-link {
   position: absolute;

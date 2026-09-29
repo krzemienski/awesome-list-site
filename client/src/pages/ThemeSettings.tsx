@@ -171,13 +171,6 @@ export default function ThemeSettings() {
         data-testid="theme-sticky-preview"
       >
         <div className="flex items-center gap-3">
-          <span
-            aria-hidden
-            className="flex h-8 w-8 shrink-0 overflow-hidden rounded-[var(--radius-sm)] border border-[color:var(--border)]"
-          >
-            <span className="block h-full w-2/3 bg-[var(--accent)]" />
-            <span className="block h-full w-1/3 bg-[var(--accent-2)]" />
-          </span>
           {/* Both lines are `font-sans` on purpose. It resolves to
               `--font-body`, the one family BOTH pickers move: a design system
               sets --font-body/--font-display/--font-mono, but the font
@@ -188,7 +181,7 @@ export default function ThemeSettings() {
               solve. Do not "restore" a display face here. */}
           <span className="min-w-0 flex-1 font-sans">
             <span className="block truncate text-sm font-bold tracking-tight">
-              The quick brown fox <em className="text-[var(--accent)]">jumps</em>
+              The quick brown fox <em>jumps</em>
             </span>
             <span className="block truncate text-[11px] text-[color:var(--text-3)]">
               {activeSystem?.name ?? systemId} · {activeAccent?.name ?? accentId}
@@ -365,7 +358,7 @@ export default function ThemeSettings() {
             {/* Run15 BUG-027: type specimen, not a page heading — the page's
                 only h1 is "Theme Settings" at the top. */}
             <p className="font-display text-3xl font-bold tracking-tight">
-              The quick brown fox <em className="text-[var(--accent)]">jumps</em> over
+              The quick brown fox <em className="serif-italic">jumps</em> over
             </p>
             <h3 className="font-sans text-lg font-semibold">Section heading</h3>
             <p className="text-sm text-[color:var(--text-2)] max-w-2xl">
@@ -434,13 +427,11 @@ export default function ThemeSettings() {
             <code className="block font-mono text-xs text-[color:var(--text-3)] tracking-wider uppercase">
               Active Tokens
             </code>
-            <div className="grid grid-cols-2 sm:grid-cols-5 gap-2 text-xs">
+            <div className="grid grid-cols-3 gap-2 text-xs">
               {[
                 { label: "bg", varName: "--bg" },
                 { label: "surface", varName: "--surface" },
                 { label: "border", varName: "--border" },
-                { label: "accent", varName: "--accent" },
-                { label: "accent-2", varName: "--accent-2" },
               ].map((t) => (
                 <div
                   key={t.varName}
