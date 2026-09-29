@@ -32,8 +32,28 @@ export class AwesomeVideoApp extends Container<Env> {
   }
 }
 
+// The container reaches the internet from inside Cloudflare's network. If the
+// edge's cf-* / cdn-loop headers ride along to another Cloudflare-proxied host
+// (the app's Clerk Frontend API proxy forwards request headers verbatim), that
+// host rejects the request with Error 1000 "DNS points to prohibited IP". Drop
+// them here and hand the app the standard forwarding headers instead.
+function forContainer(request: Request): Request {
+  const url = new URL(request.url);
+  const headers = new Headers();
+  for (const [key, value] of request.headers) {
+    const name = key.toLowerCase();
+    if (name.startsWith("cf-") || name === "cdn-loop") continue;
+    headers.append(key, value);
+  }
+  const clientIp = request.headers.get("cf-connecting-ip");
+  if (clientIp) headers.set("x-forwarded-for", clientIp);
+  headers.set("x-forwarded-proto", url.protocol.replace(":", ""));
+  headers.set("x-forwarded-host", url.host);
+  return new Request(request, { headers });
+}
+
 export default {
   fetch(request: Request, env: Env): Promise<Response> {
-    return getContainer(env.APP).fetch(request);
+    return getContainer(env.APP).fetch(forContainer(request));
   },
 };
