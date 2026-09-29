@@ -41,7 +41,7 @@
  *   Block 2 (awesome-list + GitHub discovery):
  *     - GET  /api/awesome-list                    (resourceReadLimiter)
  *     - GET  /api/awesome-list/nav                (resourceReadLimiter)
- *     - GET  /api/github/awesome-lists
+ *     - GET  /api/github/awesome-lists            (isAuthenticated, isAdmin)
  *     - GET  /api/github/search                   (isAuthenticated, isAdmin)
  *
  * Middleware, statuses, headers and per-route comments are copied byte-for-byte
@@ -1577,11 +1577,14 @@ export function registerAwesomeListDiscoveryRoutes(
   });
 
   // GitHub awesome lists discovery routes
-  app.get("/api/github/awesome-lists", async (req, res) => {
+  // Admin-only for the same reason as /api/github/search below. GitHub search
+  // serves at most 1000 results, so pages past that are clamped rather than
+  // surfacing its 422 as a 500.
+  app.get("/api/github/awesome-lists", isAuthenticated, isAdmin, async (req, res) => {
     try {
-      const page = parseInt(req.query.page as string) || 1;
-      const perPage = parseInt(req.query.per_page as string) || 30;
-      
+      const perPage = Math.min(Math.max(parseInt(req.query.per_page as string) || 30, 1), 100);
+      const page = Math.min(Math.max(parseInt(req.query.page as string) || 1, 1), Math.floor(1000 / perPage));
+
       const result = await fetchAwesomeLists(page, perPage);
       res.json(result);
     } catch (error) {
