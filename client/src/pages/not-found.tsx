@@ -52,7 +52,7 @@ export default function NotFound({ suggestion }: NotFoundProps) {
         <CardHeader>
           <span className="chip bad system-state-code">Error · 404</span>
           <div className="system-state-heading flex items-center gap-2">
-            <AlertCircle className="h-6 w-6 text-[var(--accent)]" aria-hidden="true" />
+            <AlertCircle className="h-6 w-6 text-[color:var(--status-bad)]" aria-hidden="true" />
             <h1 className="display-h system-state-title">Page Not Found</h1>
           </div>
         </CardHeader>
@@ -64,7 +64,7 @@ export default function NotFound({ suggestion }: NotFoundProps) {
             <p className="mb-4">
               <Link
                 href={suggestion.href}
-                className="inline-flex items-center gap-1 font-medium text-[var(--accent)] underline underline-offset-4"
+                className="inline-flex items-center gap-1 font-medium text-[color:var(--text)] underline decoration-[color:var(--text-3)] underline-offset-4"
                 data-testid="link-did-you-mean"
               >
                 {suggestion.label}

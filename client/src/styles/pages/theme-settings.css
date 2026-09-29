@@ -1,0 +1,38 @@
+/* Theme Settings option cards are DS `.btn` radios laid out as cards. Only
+   geometry is adapted here; surface, border and hover come from `.btn`. */
+
+.btn.theme-option {
+  display: block;
+  width: 100%;
+  height: auto;
+  padding: 1rem;
+  border-color: var(--border);
+  border-radius: var(--radius);
+  font-size: inherit;
+  font-weight: inherit;
+  letter-spacing: normal;
+  text-align: left;
+  text-transform: none;
+  white-space: normal;
+}
+
+.btn.theme-option--compact {
+  padding: 0.75rem;
+}
+
+/* Selected state reads in ink: accent is reserved (docs/07-color). */
+.btn.theme-option[aria-checked="true"] {
+  border-color: var(--text);
+}
+
+.theme-option__check {
+  width: 1rem;
+  height: 1rem;
+  color: var(--text);
+}
+
+/* Sticky below the header: an opaque --bg base under the --surface tint so
+   scrolled content never shows through. */
+.theme-sticky-preview {
+  background: linear-gradient(var(--surface), var(--surface)), var(--bg);
+}

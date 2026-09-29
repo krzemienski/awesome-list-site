@@ -164,7 +164,7 @@ export default function About() {
         <Card className="about-card">
           <CardHeader className="about-card-header">
             <h2 className="about-section-title">
-              <Users className="about-section-icon about-icon-accent" aria-hidden="true" />
+              <Users className="about-section-icon about-icon-ink" aria-hidden="true" />
               About the maintainer
             </h2>
             <CardDescription>{MAINTAINER.role}</CardDescription>
@@ -249,7 +249,7 @@ export default function About() {
         <Card className="about-card">
           <CardHeader className="about-card-header">
             <h2 className="about-section-title">
-              <Github className="about-section-icon about-icon-accent" aria-hidden="true" />
+              <Github className="about-section-icon about-icon-ink" aria-hidden="true" />
               Open source at its core
             </h2>
             <CardDescription>
@@ -334,7 +334,7 @@ export default function About() {
               ].map((feature, idx) => (
                 <div key={feature.label} className="about-feature-card about-card">
                   <feature.icon
-                    className={`about-feature-icon ${idx < 4 ? "about-icon-accent" : ""}`}
+                    className={`about-feature-icon ${idx < 4 ? "about-icon-ink" : ""}`}
                     aria-hidden="true"
                   />
                   <div className="about-feature-label">{feature.label}</div>
@@ -462,7 +462,7 @@ export default function About() {
                   rel="noopener noreferrer"
                   className="about-credit-link about-card"
                 >
-                  <Users className="about-credit-icon about-icon-accent" aria-hidden="true" />
+                  <Users className="about-credit-icon about-icon-ink" aria-hidden="true" />
                   <div>
                     <div className="about-credit-name">Nick Krzemienski</div>
                     <div className="about-credit-description">Maintainer</div>
@@ -474,7 +474,7 @@ export default function About() {
                   rel="noopener noreferrer"
                   className="about-credit-link about-card"
                 >
-                  <Component className="about-credit-icon about-icon-accent" aria-hidden="true" />
+                  <Component className="about-credit-icon about-icon-ink" aria-hidden="true" />
                   <div>
                     <div className="about-credit-name">shadcn/ui</div>
                     <div className="about-credit-description">Components</div>
@@ -486,7 +486,7 @@ export default function About() {
                   rel="noopener noreferrer"
                   className="about-credit-link about-card"
                 >
-                  <Wind className="about-credit-icon about-icon-accent" aria-hidden="true" />
+                  <Wind className="about-credit-icon about-icon-ink" aria-hidden="true" />
                   <div>
                     <div className="about-credit-name">Tailwind CSS</div>
                     <div className="about-credit-description">Styling</div>
@@ -503,7 +503,7 @@ export default function About() {
         <Card className="about-card about-faq-card">
           <CardHeader className="about-card-header">
             <h2 className="about-section-title">
-              <HelpCircle className="about-section-icon about-icon-accent" aria-hidden="true" />
+              <HelpCircle className="about-section-icon about-icon-ink" aria-hidden="true" />
               Frequently asked questions
             </h2>
             <CardDescription>
@@ -521,7 +521,7 @@ export default function About() {
                     <button
                       type="button"
                       id={buttonId}
-                      className="about-faq-trigger"
+                      className="btn ghost about-faq-trigger"
                       aria-expanded={isOpen}
                       aria-controls={panelId}
                       data-testid={`button-about-faq-${faqIndex}`}

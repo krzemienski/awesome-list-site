@@ -688,7 +688,7 @@ export default function ResourceDetail() {
       </div>
 
       <section className="resource-detail-description">
-        <h2>DESCRIPTION</h2>
+        <h2 className="eyebrow">DESCRIPTION</h2>
         <p data-testid="text-description">
           {resource.description || 'No description available for this resource.'}
         </p>
@@ -839,8 +839,8 @@ export default function ResourceDetail() {
             
             <CardContent className="resource-detail-sections">
               <div data-seo-section="resource-details">
-                <h2 className="text-lg font-semibold mb-3 flex items-center gap-2">
-                  <FolderTree className="h-4 w-4 text-primary" />
+                <h2 className="eyebrow text-lg font-semibold mb-3 flex items-center gap-2">
+                  <FolderTree className="h-4 w-4 text-[color:var(--text-3)]" />
                   Resource details
                 </h2>
                 <dl className="grid gap-3 text-sm sm:grid-cols-[9rem_minmax(0,1fr)]">
@@ -934,8 +934,8 @@ export default function ResourceDetail() {
               <Separator />
 
               <div>
-                <h2 className="text-lg font-semibold mb-2 flex items-center gap-2">
-                  <Link2 className="h-4 w-4 text-primary" />
+                <h2 className="eyebrow text-lg font-semibold mb-2 flex items-center gap-2">
+                  <Link2 className="h-4 w-4 text-[color:var(--text-3)]" />
                   Canonical URL
                 </h2>
                 <a 
@@ -952,7 +952,7 @@ export default function ResourceDetail() {
 
               {(!tags || tags.length === 0) && (
                 <div data-seo-section="resource-tags">
-                  <h2>Tags</h2>
+                  <h2 className="eyebrow">Tags</h2>
                   <div />
                 </div>
               )}
@@ -961,8 +961,8 @@ export default function ResourceDetail() {
                 <>
                   <Separator />
                   <div data-seo-section="resource-tags">
-                    <h2 className="text-lg font-semibold mb-3 flex items-center gap-2">
-                      <Tag className="h-4 w-4 text-primary" />
+                    <h2 className="eyebrow text-lg font-semibold mb-3 flex items-center gap-2">
+                      <Tag className="h-4 w-4 text-[color:var(--text-3)]" />
                       Tags
                     </h2>
                     <div className="flex flex-wrap gap-2">
@@ -970,7 +970,7 @@ export default function ResourceDetail() {
                         <span className="resource-detail-chip-wrap" key={index}>
                           <Link href={tagLandingPath(tag)}>
                             <span
-                              className="chip accent"
+                              className="chip muted"
                               data-testid={`tag-link-${index}`}
                             >
                               <span className="resource-detail-chip-label">#{tag}</span>
@@ -1042,7 +1042,7 @@ export default function ResourceDetail() {
               {/* F018: a real heading (CardTitle renders a div) so the section
                   shows up in the document outline / screen-reader rotor. */}
               <h2 className="text-lg font-semibold leading-none tracking-tight flex items-center gap-2">
-                <FolderTree className="h-4 w-4 text-primary" />
+                <FolderTree className="h-4 w-4 text-[color:var(--text-3)]" />
                 Related Resources
               </h2>
               <CardDescription>

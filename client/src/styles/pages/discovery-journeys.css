@@ -379,7 +379,7 @@
 .journeys-page .journeys-state__icon {
   width: 44px;
   height: 44px;
-  color: var(--accent);
+  color: var(--text-3);
   stroke-width: 1.5;
 }
 

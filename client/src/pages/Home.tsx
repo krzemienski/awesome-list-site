@@ -845,7 +845,7 @@ export default function Home({ nav, navLoading }: HomeProps) {
               <span>The tag filter in the link you followed was empty, so it was ignored.</span>
               <button
                 type="button"
-                className="underline underline-offset-2"
+                className="btn ghost"
                 onClick={() => setEmptyTagParamNotice(false)}
                 data-testid="button-dismiss-empty-tag-param"
               >

@@ -268,7 +268,7 @@ export default function Journeys() {
           <Suspense
             fallback={(
               <select
-                className="journeys-filter__control"
+                className="select journeys-filter__control"
                 aria-label="Filter by category"
                 data-testid="select-category-filter"
                 value={selectedCategory}

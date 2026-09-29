@@ -134,7 +134,8 @@
   font-family: var(--font-mono);
   font-size: 13px;
   line-height: calc(1rem * var(--body-leading));
-  color: var(--accent);
+  color: var(--text);
+  text-decoration-color: var(--text-3);
   overflow-wrap: anywhere;
 }
 
