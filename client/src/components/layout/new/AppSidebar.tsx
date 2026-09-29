@@ -505,7 +505,7 @@ function CategoryAccordion({
                         aria-controls={`${bodyId}-sub-${subSlug}`}
                         data-state={subOpen ? "open" : "closed"}
                         data-testid={`expand-sub-${subSlug}`}
-                        className="av-sidebar-l2-toggle"
+                        className="icon-btn av-sidebar-l2-toggle"
                       >
                         <span className="av-sidebar-nested-count" aria-hidden="true">+{subSubs.length}</span>
                         <ChevronRight className={cn("size-[9px] chevron-rotate", subOpen && "rotate-90")} />

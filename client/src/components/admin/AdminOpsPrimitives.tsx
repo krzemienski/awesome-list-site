@@ -150,7 +150,6 @@ export function StatusChip({ status, className, children, ...props }: StatusChip
 
   return (
     <span
-      data-ds="chip"
       {...props}
       className={cn(
         "chip",

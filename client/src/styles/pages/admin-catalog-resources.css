@@ -164,8 +164,8 @@
   gap: 4px;
 }
 
-.admin-catalog-resources__tags [data-ds="chip"],
-.admin-catalog-resources__table [data-ds="chip"] {
+.admin-catalog-resources__tags .chip,
+.admin-catalog-resources__table .chip {
   font-family: var(--font-mono);
   font-size: 9.5px;
   /* canonical .chip tracking; the Badge's 0.12em widens the auto-layout Tags column */

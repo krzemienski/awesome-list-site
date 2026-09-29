@@ -225,7 +225,7 @@ export default function Settings() {
         {links.map(({ href, icon: Icon, title, description, testid }) => (
           <Link key={testid} href={href} data-testid={testid}>
             <Card
-              data-ds="card-hover"
+              hoverable
               className="h-full p-4 flex items-start gap-3 hover:border-[var(--accent)] transition-colors cursor-pointer"
             >
               <Icon className="h-5 w-5 text-[var(--accent)] mt-0.5 shrink-0" />

@@ -413,8 +413,7 @@ export default function Bookmarks() {
           <button
             key={key}
             type="button"
-            data-ds="card-hover"
-            className="account-list-item min-h-[72px] px-4 py-3 text-left"
+            className="card hoverable account-list-item min-h-[72px] px-4 py-3 text-left"
             onClick={() => {
               if (key === "active" || key === "archived") {
                 chooseArchive(key);

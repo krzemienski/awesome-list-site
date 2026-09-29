@@ -207,7 +207,6 @@ function ResourceCard({
         variant === "taxonomy" && "resource-card--taxonomy",
         className
       )}
-      data-ds="card-hover"
       onClick={onClick ? handleCardClick : undefined}
       data-testid={`card-resource-${resource.id}`}
     >

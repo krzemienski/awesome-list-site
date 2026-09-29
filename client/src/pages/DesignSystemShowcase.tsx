@@ -483,10 +483,9 @@ export default function DesignSystemShowcase() {
           </div>
 
           <div className="space-y-2">
-            <code className="block font-mono text-xs text-[color:var(--text-3)] tracking-wider uppercase">Interactive card · data-ds=&quot;card-hover&quot;</code>
+            <code className="block font-mono text-xs text-[color:var(--text-3)] tracking-wider uppercase">Interactive card · .card.hoverable</code>
             <div
-              data-ds="card-hover"
-              className="card rounded-[var(--radius)] border border-[color:var(--border)] bg-[var(--surface)] p-4 max-w-sm"
+              className="card hoverable p-4 max-w-sm"
             >
               <div className="eyebrow mb-2">── resource</div>
               <p className="font-medium text-sm">Card title resolves --text</p>

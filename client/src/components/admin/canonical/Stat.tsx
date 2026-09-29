@@ -50,11 +50,10 @@ export default function Stat({
     <div
       className={cn(
         "card admin-canonical-stat",
-        clickable && "admin-canonical-stat--interactive",
+        clickable && "hoverable admin-canonical-stat--interactive",
         clickable && "focus-ring",
         className,
       )}
-      data-ds={clickable ? "card-hover" : undefined}
       data-testid={testId}
       role={containerInteractive ? "button" : undefined}
       tabIndex={containerInteractive ? 0 : undefined}

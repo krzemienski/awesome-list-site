@@ -9,7 +9,7 @@
    per-system skins and the responsive rules. This file only adds:
      - app-only tokens (status hues, motion, shell geometry, on-accent ink)
      - shadcn/Radix sidebar bridge, skip-link, focus ring, disabled state
-     - the site footer base, and the data-ds skin hooks the React primitives use
+     - the site footer base and a link-style .btn for shadcn's link variant
    Values are var(--token) throughout; the few literals are token definitions.
    ===================================================================== */
 
@@ -113,68 +113,14 @@ body { height: auto; min-height: 100%; }
   }
 }
 
-/* ============== data-ds SKIN HOOKS (React primitives) ==============
-   button.tsx / chip-button.tsx / ResourceCard / taxonomy-card carry
-   data-ds="chip|card-hover" and data-ds-variant; these give them the same
-   per-system personality the canonical [data-system] skins give .btn/.chip. */
-[data-ds="chip"] { border-radius: var(--radius-pill); }
+/* shadcn's `link` Button variant: the design system has no link-style .btn,
+   so it keeps the .btn geometry and reads as an inline accent link. */
+.btn.link { background: transparent; border-color: transparent; color: var(--accent); }
+.btn.link:hover { background: transparent; text-decoration: underline; transform: none; box-shadow: none; }
 
-[data-system="terminal"] [data-ds="chip"] { text-transform: uppercase; }
-[data-system="terminal"] [data-ds="chip"]::before { content: '['; margin-right: 2px; opacity: 0.55; }
-[data-system="terminal"] [data-ds="chip"]::after  { content: ']'; margin-left: 2px;  opacity: 0.55; }
-[data-system="terminal"] [data-ds-variant="default"] {
-  background: transparent;
-  color: var(--accent);
-  border: var(--border-w) solid var(--accent);
-  text-shadow: 0 0 12px color-mix(in srgb, var(--accent) 60%, transparent);
-}
-[data-system="terminal"] [data-ds-variant="default"]:hover {
-  background: color-mix(in srgb, var(--accent) 14%, transparent);
-  box-shadow: 0 0 0 1px var(--accent), inset 0 0 30px color-mix(in srgb, var(--accent) 14%, transparent);
-}
-[data-system="terminal"] [data-ds="card-hover"]:hover {
-  border-color: var(--accent);
-  box-shadow: 0 0 0 1px color-mix(in srgb, var(--accent) 35%, transparent);
-  transform: none;
-}
-
-[data-system="geist"] [data-ds="chip"] { text-transform: none; letter-spacing: 0; font-family: var(--font-body); font-weight: 500; }
-[data-system="geist"] [data-ds-variant] { font-weight: 500; }
-[data-system="geist"] [data-ds="card-hover"]:hover {
-  box-shadow: 0 0 0 1px var(--border-strong), var(--shadow);
-}
-
-[data-system="brutalist"] [data-ds="chip"] { border-width: var(--border-w); border-color: var(--text-2); text-transform: uppercase; }
-[data-system="brutalist"] [data-ds-variant="default"],
-[data-system="brutalist"] [data-ds-variant="outline"] {
-  border: var(--border-w) solid var(--text);
-  font-weight: 600;
-  text-transform: uppercase;
-  letter-spacing: 0.04em;
-  font-size: 12px;
-}
-[data-system="brutalist"] [data-ds-variant="default"] { background: var(--accent); color: var(--on-accent); }
-[data-system="brutalist"] [data-ds-variant="default"]:hover,
-[data-system="brutalist"] [data-ds-variant="outline"]:hover {
-  transform: translate(-2px, -2px);
-  box-shadow: var(--shadow);
-}
-[data-system="brutalist"] [data-ds="card-hover"]:hover {
-  transform: translate(-2px, -2px);
-  box-shadow: 6px 6px 0 0 var(--text);
-  background: var(--surface-2);
-}
-
-[data-system="swiss"] [data-ds="chip"] { font-family: var(--font-mono); font-weight: 500; }
-[data-system="swiss"] [data-ds-variant] { font-weight: 600; }
-[data-system="swiss"] [data-ds-variant="default"],
-[data-system="swiss"] [data-ds-variant="outline"] { border-width: var(--hairline-w); }
-[data-system="swiss"] [data-ds="card-hover"]:hover {
-  border-color: var(--text-3);
-  box-shadow: none;
-  transform: none;
-  background: var(--surface-2);
-}
+/* Clerk's sign-in field: `.input` paints it, this keeps the 44px touch target. */
+.cl-formFieldInput.input,
+.cl-formButtonPrimary.btn { min-height: 44px; }
 
 /* ============== ACCESSIBILITY & STATE ============== */
 .skip-link {

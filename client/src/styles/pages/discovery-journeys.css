@@ -235,8 +235,8 @@
   gap: 8px;
 }
 
-.journeys-page .journey-card [data-ds="chip"],
-.journey-detail-page [data-ds="chip"] {
+.journeys-page .journey-card .chip,
+.journey-detail-page .chip {
   max-width: 100%;
   overflow-wrap: anywhere;
 }

@@ -233,10 +233,10 @@ function buildClerkAppearance(
 
   return {
     theme: dark,
-    // Keep Clerk's injected stylesheet in its own cascade layer. The app's
-    // unlayered DS rules remain authoritative without requiring selectors that
-    // reach into Clerk's generated class names.
-    cssLayerName: "clerk",
+    // Clerk's stylesheet stays unlayered. The design system is unlayered and
+    // opens with `* { margin: 0; padding: 0 }`; an unlayered rule beats every
+    // layered one, so a layered Clerk sheet lost all of its own spacing and
+    // fills to that reset. Unlayered, Clerk's class selectors outrank `*`.
     options: {
       logoPlacement: "inside" as const,
       logoLinkUrl: basePath || "/",
@@ -276,6 +276,10 @@ function buildClerkAppearance(
       ...(radii.control ? { borderRadius: radii.control } : {}),
     },
     elements: {
+      // Every Clerk button carries the base `cl-button` key, so this class hook
+      // puts the design system's `.btn` on the whole widget; the per-element
+      // styles below keep painting from tokens.
+      button: "btn",
       // Task #404: Clerk rounds the card at TWICE the base above (its own
       // ladder step), which overshoots the DS card token — 16px against the
       // 12px every other card on the page sits at. `cardBox` is the outer,
@@ -355,15 +359,11 @@ function buildClerkAppearance(
       // minimum the rest of the app holds to. Raise the interactive surfaces
       // (submit, inputs, OTP cells, and the footer sign-up/sign-in switch)
       // without altering the branded look.
-      formButtonPrimary: {
-        ...(palette.accent ? { backgroundColor: palette.accent } : {}),
-        minHeight: "44px",
-      },
-      formFieldInput: {
-        ...(palette.fieldSurface ? { backgroundColor: palette.fieldSurface } : {}),
-        ...(palette.ink ? { color: palette.ink } : {}),
-        minHeight: "44px",
-      },
+      // `.btn.primary` paints the accent fill like every other primary action.
+      formButtonPrimary: "primary",
+      // The design system's `.input` paints the field; the 44px touch minimum
+      // rides on `.cl-formFieldInput.input` in app-bridge.css.
+      formFieldInput: "input",
       otpCodeFieldInput: {
         ...(palette.fieldSurface ? { backgroundColor: palette.fieldSurface } : {}),
         ...(palette.ink ? { color: palette.ink } : {}),
@@ -380,6 +380,8 @@ function buildClerkAppearance(
       formFieldAction: {
         ...(palette.accent ? { color: palette.accent } : {}),
       },
+      // The 44px link stretches its row; center the prompt text against it.
+      footerAction: { alignItems: "center" },
       footerActionLink: {
         ...(palette.accent ? { color: palette.accent } : {}),
         display: "inline-flex",

@@ -223,7 +223,6 @@ export default function ThemeSettings() {
                 onClick={() => handlePickSystem(id)}
                 onKeyDown={makeRadioKeyDown("system", systemIds, systemId, handlePickSystem)}
                 data-testid={`system-option-${id}`}
-                data-ds="card-hover"
                 className="btn theme-option focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent)]"
               >
                 <div className="flex items-center justify-between mb-1">
@@ -264,7 +263,6 @@ export default function ThemeSettings() {
                 onClick={() => handlePickAccent(a.id)}
                 onKeyDown={makeRadioKeyDown("accent", accentIds, accentId, handlePickAccent)}
                 data-testid={`accent-option-${a.id}`}
-                data-ds="card-hover"
                 className="btn theme-option theme-option--compact focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent)]"
               >
                 <div className="flex items-center justify-between mb-2">
@@ -315,7 +313,6 @@ export default function ThemeSettings() {
                 onClick={() => handlePickFont(f.id)}
                 onKeyDown={makeRadioKeyDown("font", fontIds, fontId, handlePickFont)}
                 data-testid={`font-option-${f.id}`}
-                data-ds="card-hover"
                 className="btn theme-option focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent)]"
               >
                 <div className="flex items-center justify-between mb-1">
@@ -411,7 +408,7 @@ export default function ThemeSettings() {
               <Badge variant="secondary">Secondary</Badge>
               <Badge variant="outline">Outline</Badge>
               <Badge variant="destructive">Destructive</Badge>
-              <Badge className="bg-[var(--accent)] text-[var(--bg)] hover:bg-[var(--accent)]">
+              <Badge variant="accent">
                 Accent
               </Badge>
             </div>

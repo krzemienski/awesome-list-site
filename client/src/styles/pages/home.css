@@ -43,37 +43,6 @@
   flex-wrap: wrap;
 }
 
-/*
- * The shared `.chip` atom can be emitted after this page stylesheet. Keep the
- * Home selector more specific so the canonical 6px × 12px chip geometry is
- * not replaced by the atom's 4px × 10px defaults.
- */
-button.home-kind-chip {
-  padding: 0.375rem 0.75rem;
-  font-size: 0.65625rem;
-  /*
-   * The reference atom is a span and therefore retains the document's 1.6
-   * leading. This is a button in the application, whose UA `normal` leading
-   * otherwise makes every wrapped chip row four pixels too short.
-   */
-  line-height: var(--body-leading);
-  text-decoration: none;
-  white-space: nowrap;
-  transition: border-color 160ms ease, color 160ms ease, background 160ms ease;
-}
-
-.home-kind-chip:hover,
-.home-kind-chip:focus-visible {
-  color: var(--text);
-  border-color: var(--border-strong);
-  background: var(--surface-2);
-}
-
-.home-kind-chip[aria-pressed="true"] {
-  color: var(--accent);
-  border-color: color-mix(in srgb, var(--accent) 45%, var(--border));
-  background: color-mix(in srgb, var(--accent) 10%, transparent);
-}
 
 .home-kind-count {
   margin-left: 0.375rem;
