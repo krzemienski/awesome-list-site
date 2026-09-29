@@ -33,35 +33,48 @@ export interface Accent {
   secondary: string;
 }
 
-export interface TypeScaleEntry {
+interface TypeScaleEntry {
   name: string;
   px: number;
   label: string;
   use: string;
 }
 
-export interface SpaceScaleEntry {
+interface SpaceScaleEntry {
   name: string;
   px: number;
 }
 
+// Optional: /ds/design-system.js may fail to load, and none of it exists on
+// the server. Read them through the getters below, never directly.
 declare global {
   interface Window {
-    DESIGN_SYSTEMS: Record<SystemId, DesignSystem>;
-    ACCENTS: Accent[];
-    SYSTEM_DEFAULT_ACCENT: Record<SystemId, AccentId>;
-    TYPE_SCALE: TypeScaleEntry[];
-    SPACE_SCALE: SpaceScaleEntry[];
-    applyDesignSystem: (systemId: SystemId, accentId: AccentId) => void;
+    DESIGN_SYSTEMS?: Record<SystemId, DesignSystem>;
+    ACCENTS?: Accent[];
+    SYSTEM_DEFAULT_ACCENT?: Record<SystemId, AccentId>;
+    TYPE_SCALE?: TypeScaleEntry[];
+    SPACE_SCALE?: SpaceScaleEntry[];
+    applyDesignSystem?: (systemId: SystemId, accentId: AccentId) => void;
   }
 }
 
-export const SYSTEM_STORAGE_KEY = "ds-system";
-export const ACCENT_STORAGE_KEY = "ds-accent";
+const SYSTEM_STORAGE_KEY = "ds-system";
+const ACCENT_STORAGE_KEY = "ds-accent";
 
 /** The applier's own fallbacks (docs/05: editorial, then ACCENTS[0] = crimson). */
 export const DEFAULT_SYSTEM: SystemId = "editorial";
 export const DEFAULT_ACCENT: AccentId = "crimson";
+
+/**
+ * Data injected by Vite into client/index.html (__AWESOME_VIDEO_THEME_BOOT__)
+ * so the pre-paint boot reads the same storage keys and fallback system as
+ * this module instead of restating them.
+ */
+export const THEME_BOOT_DATA = {
+  systemKey: SYSTEM_STORAGE_KEY,
+  accentKey: ACCENT_STORAGE_KEY,
+  defaultSystem: DEFAULT_SYSTEM,
+} as const;
 
 const hasWindow = () => typeof window !== "undefined";
 
@@ -70,15 +83,15 @@ const NO_ACCENTS: Accent[] = [];
 const NO_DEFAULTS = Object.freeze({}) as Record<SystemId, AccentId>;
 
 export function getDesignSystems(): Record<SystemId, DesignSystem> {
-  return (hasWindow() && window.DESIGN_SYSTEMS) || NO_SYSTEMS;
+  return (hasWindow() ? window.DESIGN_SYSTEMS : undefined) ?? NO_SYSTEMS;
 }
 
 export function getAccents(): Accent[] {
-  return (hasWindow() && window.ACCENTS) || NO_ACCENTS;
+  return (hasWindow() ? window.ACCENTS : undefined) ?? NO_ACCENTS;
 }
 
 export function getSystemDefaultAccents(): Record<SystemId, AccentId> {
-  return (hasWindow() && window.SYSTEM_DEFAULT_ACCENT) || NO_DEFAULTS;
+  return (hasWindow() ? window.SYSTEM_DEFAULT_ACCENT : undefined) ?? NO_DEFAULTS;
 }
 
 /** Own-property test: a stored `ds-system` is arbitrary text ('toString', '__proto__'…). */

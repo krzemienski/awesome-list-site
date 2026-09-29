@@ -2,6 +2,7 @@ import { createContext, useContext, useEffect, useState, useCallback, useRef, Re
 import {
   DEFAULT_ACCENT,
   DEFAULT_SYSTEM,
+  THEME_BOOT_DATA,
   getAccents,
   getDesignSystems,
   getSystemDefaultAccent,
@@ -90,15 +91,15 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
       if (event.key === FONT_LS_KEY || event.key === null) {
         applyFontOverride(resolveFontOverrideId(safeGetItem(FONT_LS_KEY)));
       }
-      if (event.key !== null && event.key !== "ds-system" && event.key !== "ds-accent") return;
+      if (event.key !== null && event.key !== THEME_BOOT_DATA.systemKey && event.key !== THEME_BOOT_DATA.accentKey) return;
 
       if (syncTimer !== null) window.clearTimeout(syncTimer);
       syncTimer = window.setTimeout(() => {
         // Coalesce the two native events from a paired system/accent change,
         // then resolve both values from the writer's completed storage state.
-        const nextSystem = resolveSystemId(safeGetItem("ds-system"));
-        const nextAccent = resolveAccentId(safeGetItem("ds-accent"), nextSystem);
-        window.applyDesignSystem(nextSystem, nextAccent);
+        const nextSystem = resolveSystemId(safeGetItem(THEME_BOOT_DATA.systemKey));
+        const nextAccent = resolveAccentId(safeGetItem(THEME_BOOT_DATA.accentKey), nextSystem);
+        window.applyDesignSystem?.(nextSystem, nextAccent);
         syncTimer = null;
       }, 0);
     };

@@ -28,6 +28,8 @@
  * every family the URL asks for. It hits the network, so it is deliberately
  * not part of the validation suite; nothing runs it for you.
  */
+import { getDesignSystems, isSystemId } from "./design-system";
+
 export type FontOption = { id: string; name: string; stack: string };
 
 export const FONT_OPTIONS: FontOption[] = [
@@ -106,8 +108,8 @@ export function applyFontOverride(id: string): void {
     // "System default" means the ACTIVE design system's own body face. The
     // applier owns --font-body, so hand it back its value rather than
     // removing the property (which would leave nothing behind).
-    const system = root.getAttribute("data-system") ?? "";
-    const owned = window.DESIGN_SYSTEMS?.[system as keyof typeof window.DESIGN_SYSTEMS]?.vars["--font-body"];
+    const system = root.getAttribute("data-system");
+    const owned = isSystemId(system) ? getDesignSystems()[system].vars["--font-body"] : undefined;
     if (owned) root.style.setProperty("--font-body", owned);
     root.style.removeProperty("--font-sans");
   } else {

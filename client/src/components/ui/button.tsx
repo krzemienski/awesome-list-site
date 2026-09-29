@@ -8,7 +8,7 @@ import { cn } from "@/lib/utils"
 // system's `.btn` classes so every per-system skin applies; the utilities here
 // only size the control to the 44px touch target.
 const buttonVariants = cva(
-  "btn focus-visible:outline-none disabled:pointer-events-none [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0",
+  "btn disabled:pointer-events-none [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0",
   {
     variants: {
       variant: {

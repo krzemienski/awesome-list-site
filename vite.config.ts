@@ -1,7 +1,7 @@
 import { defineConfig, type Plugin } from "vite";
 import react from "@vitejs/plugin-react";
 import path from "path";
-import { PRODUCT_PROFILE_BOOT_DATA } from "./client/src/lib/design-system";
+import { PRODUCT_PROFILE_BOOT_DATA, THEME_BOOT_DATA } from "./client/src/lib/design-system";
 import { FONT_BOOT_DATA, FONT_OPTIONS } from "./client/src/lib/font-options";
 
 const workspaceRoot = path.resolve(import.meta.dirname);
@@ -94,6 +94,21 @@ function paintBeforeHydrate(): Plugin {
   };
 }
 
+function themeBootRegistry(): Plugin {
+  const marker = "__AWESOME_VIDEO_THEME_BOOT__";
+  const bootData = JSON.stringify(THEME_BOOT_DATA);
+
+  return {
+    name: "theme-boot-registry",
+    transformIndexHtml(html) {
+      if (!html.includes(marker)) {
+        throw new Error(`theme-boot-registry marker ${marker} is missing from client/index.html`);
+      }
+      return html.replaceAll(marker, bootData);
+    },
+  };
+}
+
 function productProfileBootRegistry(): Plugin {
   const marker = "__AWESOME_VIDEO_PRODUCT_PROFILE_BOOT__";
   const bootData = JSON.stringify(PRODUCT_PROFILE_BOOT_DATA);
@@ -134,6 +149,7 @@ function fontBootRegistry(): Plugin {
 export default defineConfig({
   plugins: [
     react(),
+    themeBootRegistry(),
     productProfileBootRegistry(),
     fontBootRegistry(),
     bundleModuleManifest(),

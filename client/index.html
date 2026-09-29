@@ -288,10 +288,12 @@
       (function () {
         var root = document.documentElement;
         try {
+          // Storage keys + fallback system from design-system.ts (Vite injects them).
+          var THEME_BOOT = __AWESOME_VIDEO_THEME_BOOT__;
           var sys = null, acc = null;
-          try { sys = localStorage.getItem('ds-system'); } catch (_) {}
-          try { acc = localStorage.getItem('ds-accent'); } catch (_) {}
-          if (!Object.prototype.hasOwnProperty.call(window.DESIGN_SYSTEMS, sys)) sys = 'editorial';
+          try { sys = localStorage.getItem(THEME_BOOT.systemKey); } catch (_) {}
+          try { acc = localStorage.getItem(THEME_BOOT.accentKey); } catch (_) {}
+          if (!Object.prototype.hasOwnProperty.call(window.DESIGN_SYSTEMS, sys)) sys = THEME_BOOT.defaultSystem;
           var known = false;
           for (var i = 0; i < window.ACCENTS.length; i++) if (window.ACCENTS[i].id === acc) known = true;
           if (!known) acc = window.SYSTEM_DEFAULT_ACCENT[sys];
