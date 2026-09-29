@@ -153,3 +153,6 @@ tests/parity/actual/*.attempt-*.png
 tests/parity/actual/*.repeat.png
 tests/parity/expected/*.attempt-*.png
 tests/parity/expected/*.repeat.png
+
+# Local agent scratch (screenshots, harness runs, worktrees)
+.cache/

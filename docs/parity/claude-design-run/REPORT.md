@@ -30,9 +30,15 @@ Branch `ds-mcp-rebuild-20260929`, cut from `ds-mcp-pixel-parity` @ `a552d76a` (i
 |---|---|---|
 | `ds-fetcher` | Fetch 148 listed paths through the MCP; no reading or rewriting | 148/148 calls OK, 15 PNGs truncated (listed above). Stopped once complete. |
 | `ds-foundation` | HANDOFF phases 1–4: verbatim `/ds/*` files, fonts, synchronous head boot, `.page`/`.grain`, remove legacy CSS into `app-bridge.css` | Produced the phase 1–4 working tree. Lead check found a regression: the design system's unlayered `* { padding: 0 }` reset zeroed every Tailwind padding utility. The user then asked for the team to be stopped and the work finished inline, so the agent was stopped before it filed a final report. The lead fixed the regression, verified and committed (`90c50398`). |
-| `validator-1/2/3` | The consensus panel: each received only the improved skill, the production URL and the browser MCP | See section 7. |
+| `validator-1/2/3`, `r2-*`, `r3-*` | Validator rounds 1–3: each validator received only the improved skill, the production URL and the browser MCP | Round 1 FAIL (fixed in `fdd98f5a`), round 2 4× FAIL (fixed in `503af066`), round 3 2× PASS + 1× FAIL on the header keycap radius (fixed in `7b159550`). |
+| `r4-validator-1/2/3` | Validator round 4 against `7b159550` | Stopped mid-run when the user narrowed the scope to Editorial × Crimson fidelity; their verdicts would have described a superseded build. |
+| `ed-shell` | Header, sidebar, mobile drawer, page footer (`layout/new/**`, `styles/shell/**`) | Shell rebuilt to the prototype's measurements at 1440 and 375; other four systems checked. No shared-file requests. |
+| `ed-home` | Home, both presentations (`components/home/**`, `Home.tsx`, `home.css`) | Index and curated presentations matched to the prototype. It restarted the dev server after a mid-edit syntax error stopped it (about 6 minutes down). |
+| `ed-catres` | Category, subcategory, resource detail (`TaxonomyListing`, `ResourceDetail`, `resource.css`, `taxonomy.css`) | Count chip, tags, card labels and related rows matched; terminal 375 overflow in Related fixed. |
+| `ed-pages` | About, Journeys, 404, sign-in (Clerk appearance), theme settings | Journeys cards, 404 empty state, Clerk card and theme page head matched. Its About title change to the body face was reverted by the lead (see section 8). |
+| `r5-validator-1/2/3` | Validator round 5 against `958264f` | See section 7. |
 
-After the user asked to stop the team, phases 5 and 6 and all fixes were done inline by the lead, with a browser-MCP check after each change.
+After the user asked to stop the first team, phases 5 and 6 and the round 1–3 fixes were done inline by the lead, with a browser-MCP check after each change. When the user then narrowed the goal to Editorial × Crimson fidelity and asked for agents to finish it, the four `ed-*` agents ran in parallel on non-overlapping file scopes against the fetched prototype served at `127.0.0.1:5066`; the lead reviewed each report, checked the screens in the browser and committed the result.
 
 ## 4. What changed, and why
 
@@ -43,6 +49,10 @@ After the user asked to stop the team, phases 5 and 6 and all fixes were done in
 | `0a361b23` | `Button` → `.btn` (+`primary`/`ghost`/`danger`), `Badge` → `.chip` (+status), `Card` → `.card` (+`hoverable`), `Input`/`Textarea`/`SelectTrigger` → `.input`/`.textarea`/`.select`; `ChipButton` → `.btn`; Clerk → `.btn`/`.btn.primary`/`.input` via appearance classes, and its sheet is no longer layered; the `data-ds` skin duplicate was deleted | HANDOFF Phase 5, one class at a time with a browser check after each. Pitfalls 2–3: the canonical skins now reach the primitives directly. The layered Clerk sheet had been losing all its spacing to the unlayered design-system reset. |
 | `922f70ff` | 241 status-hue literals → `--status-*` tokens; chart and agent-graph palettes read tokens through SVG `fill`/`stroke`; print paint uses `Canvas`/`CanvasText`/`GrayText`; the entry-HTML skeleton and `<noscript>` paint from tokens | HANDOFF Phase 6 regex sweep and lookup table. The repo-wide scan now has 0 non-exempt hits. |
 | `e8fe9b5b` | Accent kept to the reserved moments: journey CTAs are non-primary, journey icons and difficulty chips are ink, the header avatar, footer "indexed live" and Clerk "Sign up" link read ink, the home eyebrow's duplicate live-dot was removed, and BrandMark paints `currentColor` | Stage 7 accent discipline, docs/02 principle 03, docs/09 (one live-dot per view) |
+| `fdd98f5a` | Home primary CTA keeps canonical `.btn.primary` paint; current page in the paginator is neutral; `/sign-in` mounts on a local production build (loopback hosts use the configured Clerk key, Vite reads `VITE_*` from the repo root); the pre-JS SEO block paints from tokens; page titles use the display family and tokens | Round-1 validator findings |
+| `503af066` | Clerk inputs, buttons and card use the system's border width and colour; one primary per view (journeys, consent banner); theme page drops accent swatches outside the reserved moments | Round-2 validator findings |
+| `7b159550` | Header and search-palette keycaps use the design system's `.kbd` | Round-3 validator finding (keycap radius) |
+| `958264f6` | Editorial × Crimson fidelity pass by the four `ed-*` agents: shell (sidebar rows, four-column footer, drawer, mobile search control), home (index `~/awesome.video` title and caret, curated hero and section order), category/resource (accent count chip, mono tags, card labels, related rows) and pages (journey cards, 404 empty state, Clerk card, theme page head) | User's scope change: Editorial × Crimson is the one pairing that must match the prototype |
 
 ## 5. How the skill was improved (and what was preserved)
 
@@ -77,7 +87,7 @@ After the user asked to stop the team, phases 5 and 6 and all fixes were done in
 
 ## 6. Lead browser checks (browser MCP)
 
-Screenshots are under `.cache/run-20260929/`:
+Screenshots are under `evidence/`:
 - Baseline before changes: `baseline/01-home-legacy-editorial-1440.png`, `baseline/21-resource-legacy-1920.png`.
 - Lead checks, dev and prod: `lead-check/01-home-editorial-1440.png` and `02-home-brutalist-1440.png` (foundation; exposed the padding regression), `03-prod-about-brutalist-1440.png` (production, :5002), `04-theme-buttons-editorial.png`, `05-signin-editorial-1440.png`, `06-theme-buttons-terminal.png`, `07-home-brutalist-375.png`, `08-journeys-swiss-1440.jpeg`.
 
@@ -90,6 +100,10 @@ Observed in-page:
 - **Stage 7:** ≤8 per viewport on every key screen.
 - **Theme picker:** it switches systems and persists the choice across a reload.
 
+Editorial × Crimson pass (`958264f6`):
+- Agents' side-by-side captures (app left, prototype right) are under `evidence/editorial/<agent>/`, for example `ed-home/20-sbs-index-1440_app-left_proto-right.jpg`, `ed-home/21-sbs-curated-1440_app-left_proto-right.jpg`, `ed-shell/sbs-drawer-375.png`, `ed-catres/proto-category-1440.png` with `app-category-1440-after.png`.
+- Lead checks: `lead-check/ed-home-1440-lead.jpeg` (dev, cold context resolves to editorial × crimson), `lead-check/ed-404-1440.jpeg`, `lead-check/ed-category-375.jpeg` (scrollWidth 375, mobile search control displayed) and `lead-check/prod958-signin-1440.jpeg` (production, `/api/version` = `958264f6…`).
+
 ## 7. Consensus panel
 
 (Filled in from the validators' verbatim responses; see `validator-1.md`, `validator-2.md`, `validator-3.md`.)
@@ -101,4 +115,9 @@ Observed in-page:
   - The separate showcase workspace `artifacts/awesome-video-design-system` imports `ACCENTS` / `DESIGN_SYSTEMS` from `client/src/lib/design-system.ts` in `src/consumer.ts`, `src/canonical/CanonicalShowcase.tsx` and `src/canonical/DocsContent.tsx`. Those exports are gone now that the fetched `design-system.js` globals are the single source. That workspace's own `build`/`typecheck` will fail until it reads the globals (or a generated `themes` module) instead. The app's `npm run build` is unaffected.
   - Repo scripts written against the legacy file still reference `client/src/styles/design-system.css` or `THEME_BOOT_DATA` / `THEME_FALLBACK_REGISTRY`: `scripts/validation/{canonical-token-parity,accent-drift,palette-drift,product-profile-drift}.mjs`, `scripts/generate-design-system-artifact.mjs`, `scripts/audit-567-browser.mjs` and `scripts/brand/build-brand-assets.mjs`. They need retargeting at `client/public/ds/*`.
   - The one CI-wired validator, `validate:standalone-palette-drift`, already fails on a missing `attached_assets/*.zip`, which predates this run.
+- **Editorial × Crimson differences from the prototype that were kept on purpose:**
+  - Page titles (category, subcategory, resource, About) use the display serif through `--font-display`/`--display-*`. The prototype's page code sets them in the body face at 700, but docs/06 and the UI kit put h1 in the display face, and the round-1 validators raised the body-face titles as a finding. `ed-pages` switched About back to the body face; the lead reverted that for the same reason.
+  - Features the app has and the prototype does not are kept and styled from the design system: kind chips, stats strip and recently-indexed rail on home; "Filters & view", pagination and Related on category/resource pages; the sidebar's "…" menu, which is the only link to Journeys, Advanced and Theme.
+  - Accent stays off elements outside the reserved moments even where the prototype paints them (index category icons, resource-card icon marks, resource tags, About callout numbers, header avatar letter). The home featured grid's "Featured" chip is also neutral: the prototype tints it accent, but six featured cards would put six extra accent users in one viewport, over the budget of 8.
+  - Touch targets stay at 44px where the prototype draws 36px (back button, drawer search), and the curated home shows its empty state because no resource is marked featured in the live data.
 - Pixel-exact matching of the legacy captures (`uploads/*.png`) was not a goal. The fetched README describes them as grounding for the look and feel, and the page arrangement follows the design system's own templates and prototype.
