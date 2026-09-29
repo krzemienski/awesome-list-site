@@ -242,7 +242,6 @@ function PageMeta({
   return (
     <div className="home-meta-row">
       <div className="home-eyebrow eyebrow">
-        <span className="home-live-dot" aria-hidden="true" />
         {eyebrow}
       </div>
       <KindStrip

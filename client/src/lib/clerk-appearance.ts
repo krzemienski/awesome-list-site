@@ -383,7 +383,7 @@ function buildClerkAppearance(
       // The 44px link stretches its row; center the prompt text against it.
       footerAction: { alignItems: "center" },
       footerActionLink: {
-        ...(palette.accent ? { color: palette.accent } : {}),
+        ...(palette.ink ? { color: palette.ink } : {}),
         display: "inline-flex",
         alignItems: "center",
         minHeight: "44px",

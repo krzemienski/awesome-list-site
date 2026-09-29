@@ -451,7 +451,7 @@ export default function Journeys() {
                       "journey-card__cta group h-auto min-h-10 whitespace-normal",
                       enrolled && "journey-card__cta--enrolled"
                     )}
-                    variant={enrolled ? "outline" : "default"}
+                    variant="outline"
                     // Task #330: one-click start/continue — signed-in users
                     // enroll right here (or jump to their next incomplete
                     // step); anonymous users still get the read-only view.

@@ -184,7 +184,7 @@
   width: 42px;
   height: 42px;
   flex: 0 0 auto;
-  color: var(--accent);
+  color: var(--text-2);
   stroke-width: 1.5;
 }
 
@@ -241,34 +241,6 @@
   overflow-wrap: anywhere;
 }
 
-.journeys-page .journey-difficulty,
-.journey-detail-page .journey-difficulty {
-  border-color: color-mix(in srgb, var(--accent) 35%, var(--border));
-  background: color-mix(in srgb, var(--accent) 8%, transparent);
-  color: var(--accent);
-}
-
-.journeys-page .journey-difficulty--beginner,
-.journey-detail-page .journey-difficulty--beginner {
-  border-color: color-mix(in srgb, var(--accent-2) 35%, var(--border));
-  background: color-mix(in srgb, var(--accent-2) 8%, transparent);
-  color: var(--accent-2);
-}
-
-.journeys-page .journey-difficulty--intermediate,
-.journey-detail-page .journey-difficulty--intermediate {
-  border-color: color-mix(in srgb, var(--accent) 45%, var(--border));
-  background: color-mix(in srgb, var(--accent) 10%, transparent);
-  color: var(--accent);
-}
-
-.journeys-page .journey-difficulty--advanced,
-.journey-detail-page .journey-difficulty--advanced {
-  border-color: color-mix(in srgb, var(--accent-2) 45%, var(--border));
-  background: color-mix(in srgb, var(--accent-2) 10%, transparent);
-  color: var(--accent-2);
-}
-
 .journey-card__progress {
   display: grid;
   gap: 8px;
@@ -320,28 +292,6 @@
 .journeys-page .journey-card__cta {
   width: 100%;
   min-height: 44px;
-  border-color: var(--accent);
-  background: var(--accent);
-  color: var(--bg);
-  box-shadow: none;
-}
-
-.journeys-page .journey-card__cta:hover {
-  border-color: var(--accent);
-  background: var(--accent);
-  color: var(--bg);
-  box-shadow: var(--shadow-accent);
-}
-
-.journeys-page .journey-card__cta--enrolled {
-  border-color: color-mix(in srgb, var(--accent) 42%, var(--border));
-  background: color-mix(in srgb, var(--accent) 13%, transparent);
-  color: var(--accent);
-}
-
-.journeys-page .journey-card__cta--enrolled:hover {
-  background: color-mix(in srgb, var(--accent) 20%, transparent);
-  color: var(--accent);
 }
 
 .journeys-page .journeys-state,

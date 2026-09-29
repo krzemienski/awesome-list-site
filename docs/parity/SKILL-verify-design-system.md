@@ -578,15 +578,28 @@ PASS needs ≥1 token sheet delivered by a `<link rel="stylesheet">` (non-null `
 **Stage 6 (component classes).** Evaluate Part I's expression verbatim on every screen, then do the same for `input, select, textarea` (non-`hidden` types) against `.input/.select/.textarea`.
 Clarification (the rule is "use the design-system classes"): a `<button>` whose class list contains a component class defined by the canonical DS stylesheet counts as DS-classed. Those classes are `btn`, `tab`, `icon-btn`, `accordion-header`, `sub-item`, `header-search-trigger`, `user-pill`, `ds-system-pill`, and `select` (for `role=combobox` triggers). Enumerate them from the DS sheet recorded in Stage 1 rather than trusting this list. Stage 6 audits *interactive* elements (Part I). A control that a user cannot perceive or operate is not one: an element whose computed `visibility` is `hidden` or `display` is `none`, that has `aria-hidden="true"` and is not focusable, such as the invisible implicit-submit button some third-party form widgets inject. List every such element you exclude, with its outerHTML, so the exclusion itself is auditable. A control that is visible, focusable, or exposed to assistive technology is always counted. Report every remaining stray element (tag, classes, text, screen). Pass criterion unchanged: 🟡 FIX per offending element.
 
-**Stage 7 (accent discipline).** Part I's expression compares a hex slice against computed colors, which the browser always serializes as `rgb(…)`, so as written it can never match. The execution below makes the comparison actually work, while the criterion (≤8 per viewport-worth, and only the allowed uses) is unchanged:
+**Stage 7 (accent discipline).** Part I's expression compares a hex slice against computed colors, which the browser always serializes as `rgb(…)`, so as written it can never match. The execution below makes the comparison actually work. The criterion is unchanged: ≤8 per viewport-worth, and only the allowed uses.
   ```js
   () => { const probe = document.createElement('i'); probe.style.color = 'var(--accent)'; document.body.append(probe);
     const acc = getComputedStyle(probe).color; probe.remove();
-    const users = [...document.querySelectorAll('body *')].filter(el => { const r = el.getBoundingClientRect(); if (!r.width || !r.height || r.bottom < 0 || r.top > innerHeight) return false;
-      const s = getComputedStyle(el); return [s.color, s.backgroundColor, s.borderTopColor, s.borderLeftColor, s.borderBottomColor, s.outlineColor].includes(acc); });
+    const inView = el => { const r = el.getBoundingClientRect(); const s = getComputedStyle(el);
+      return r.width && r.height && r.bottom > 0 && r.top < innerHeight && s.visibility !== 'hidden' && s.display !== 'none'; };
+    const users = [...document.querySelectorAll('body *')].filter(el => {
+      if (!inView(el)) return false; const s = getComputedStyle(el);
+      // A border or outline is an accent use only when it is actually drawn: `border-color` and
+      // `outline-color` default to currentColor, so an undrawn edge would otherwise echo the text color.
+      const drawn = side => parseFloat(s[`border${side}Width`]) > 0 && s[`border${side}Style`] !== 'none' && s[`border${side}Color`] === acc;
+      const edge = ['Top', 'Right', 'Bottom', 'Left'].some(drawn) || (s.outlineStyle !== 'none' && parseFloat(s.outlineWidth) > 0 && s.outlineColor === acc);
+      // `color` (and currentColor-driven SVG fill/stroke) counts where it is set, not where an
+      // accent parent's color is inherited (Part II: an inheriting descendant counts once, with its ancestor).
+      const parent = el.parentElement ? getComputedStyle(el.parentElement).color : null;
+      const inherits = s.color === acc && parent === acc;
+      const ownColor = s.color === acc && !inherits;
+      const paint = !inherits && s.color !== acc && (s.fill === acc || s.stroke === acc);
+      return s.backgroundColor === acc || edge || ownColor || paint; });
     return { accent: acc, count: users.length, users: users.map(e => ({ tag: e.tagName, cls: e.className?.toString().slice(0, 80), text: e.textContent.trim().slice(0, 40) })) }; }
   ```
-  Evaluate per viewport, scrolling by one viewport height until the page end. Ancestors that only inherit `color` from an accent user count once; report both. Classify each user against Part I's allowed list. `docs/02-principles.md` ("the brand moment") and `docs/07-color.md` ("Always" list: `.chip.accent`, active nav, sub-item active) are the sources Part I defers to, so the 28×28 `av` logo mark and `.chip.accent` are allowed uses. Anything else is a violation.
+  Evaluate it at each scroll position one viewport height apart, down to the end of the page. `fill`/`stroke` count when an SVG is painted in accent on its own; an SVG that only inherits `currentColor` from an accent parent does not count again, and neither does a border or outline that is not drawn. Classify each user against Part I's allowed list. `docs/02-principles.md` ("the brand moment") and `docs/07-color.md` ("Always" list: `.chip.accent`, active nav, sub-item active) are the sources Part I defers to, so the 28×28 `av` logo mark and `.chip.accent` are allowed uses, as is Editorial's `.serif-italic` (the canonical Editorial skin colors it with the accent). Anything else is a violation.
 
 **Stage 8 (ink tier).** Part I compares `getComputedStyle(p).color` with the raw token string, which never matches the computed `rgba(…)` form. Resolve the tokens through a probe element first (as in Stage 7) for `--text-3` and `--text-4`, then apply Part I's filter (`p, li`, `textContent.length > 60`) with both colors. Criterion unchanged.
 
