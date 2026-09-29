@@ -3,16 +3,22 @@
 /**
  * Canonical token parity gate.
  *
- * The frozen design source is the authority for every CSS custom property the
- * runtime paints from:
- *   - awesome-list-site-ds/styles.css        — the bare `:root` pre-apply defaults
- *   - awesome-list-site-ds/design-systems.jsx — `DESIGN_SYSTEMS[id].vars` (per-system
- *     overrides applied inline by applyDesignSystem()), `ACCENTS` and
- *     `SYSTEM_DEFAULT_ACCENT`
- * The runtime carries the same tokens as static CSS in
- * client/src/styles/design-system.css: bare `:root` blocks (editorial defaults),
- * one `:root[data-system="…"]` block per non-default system and one
- * `:root[data-accent="…"]` block per accent.
+ * The canonical design system is the authority for every CSS custom property
+ * the runtime paints from, and the app serves it verbatim:
+ *   - client/public/ds/design-system.css — the bare `:root` pre-apply defaults,
+ *     the utilities and the per-system component skins
+ *   - client/public/ds/design-system.js  — `DESIGN_SYSTEMS[id].vars` (written
+ *     inline on <html> by applyDesignSystem()), `ACCENTS` (the accent pair,
+ *     also inline) and `SYSTEM_DEFAULT_ACCENT`
+ * Both are pinned (CANONICAL_PINS) to the sha256 of the design-system fetch
+ * they were copied from, and design-system.js is evaluated (node:vm, through
+ * scripts/generate-design-system-artifact.mjs), never re-parsed.
+ * client/index.html links the sheet and loads the script before its pre-paint
+ * boot; everything the app adds lives in sheets around it — app-only tokens
+ * and rules in client/src/styles/app-bridge.css, the Tailwind entry
+ * client/src/index.css and its @import graph, every other client/src CSS file
+ * and index.html's own <style>. So the gate models the SAME canonical pair on
+ * both sides and proves that nothing the app adds changes what it paints.
  *
  * What is compared is the EFFECTIVE value per system — the value the browser
  * resolves on <html data-system="…" data-accent="…"> — not the raw blocks.
@@ -43,12 +49,18 @@
  * accent blocks steals --accent, and `@layer early { :where(.hide-tablet) {
  * display: block !important } }` beats a later layer's `.hide-tablet.hide-
  * tablet { display: none !important }` however specific. The two sides
- * structure their blocks differently (the design's per-system objects restate
- * every token; the runtime lets a system inherit from :root), so the
- * comparison is always the resolved value, never a raw block.
+ * may differ in structure (a system's vars restate every token; an app sheet
+ * may add a :root block), so the comparison is always the resolved value,
+ * never a raw block.
  *
  * Rules (each failure names the system, the token and both values):
- *   1. Every system the design ships must resolve in the runtime.
+ *   0. Verbatim pair: client/public/ds/design-system.{css,js} carry the pinned
+ *      digests, the newest .cache/ds-fetch-* directory on disk (if any) still
+ *      matches them, `--served URL` optionally proves a running server serves
+ *      the same bytes, and inside the model the served pair must equal the
+ *      canonical inputs byte for byte. Rule 3 additionally compares the
+ *      pre-apply `:root` cascade (what paints before, or without, the applier).
+ *   1. Every system the design ships must be offered by the served registry.
  *   2. Every token the design resolves for a system must exist in the runtime's
  *      cascade for that system (a design-only token the runtime lacks is a gap
  *      the canonical components would paint through as `initial`).
@@ -58,9 +70,14 @@
  *      50 system × accent combinations must resolve --accent/--accent-2 to the
  *      design's pair (a system block, an !important, or a sibling sheet that
  *      steals the accent for one combination is reported by combination).
- *   5. The runtime registry (client/src/lib/design-system.ts) must boot
- *      editorial/crimson, map every system to the design's default accent and
- *      carry the same accent pairs the CSS blocks do.
+ *   5. Registry and boot: the served SYSTEM_DEFAULT_ACCENT maps every system to
+ *      the design's default accent; client/src/lib/design-system.ts boots the
+ *      applier's own fallbacks (DEFAULT_SYSTEM = its fallback system,
+ *      DEFAULT_ACCENT = ACCENTS[0] = SYSTEM_DEFAULT_ACCENT[DEFAULT_SYSTEM]),
+ *      restates none of the tables and reads the window globals; the index.html
+ *      pre-paint boot reads the same storage keys and falls back to the same
+ *      system — as string literals or as fields of THEME_BOOT_DATA injected by
+ *      vite.config.ts into the __AWESOME_VIDEO_THEME_BOOT__ marker.
  *   6. A mismatch may only survive as an entry in DOCUMENTED_DEVIATIONS, which
  *      needs a written reason AND a machine check that proves the reason still
  *      holds. A stale entry (values now equal, or the check no longer true)
@@ -69,7 +86,7 @@
  *      reported, never failed — the DESIGN-SYNC record lists them.
  *   7. Shell geometry: the runtime must resolve every shell geometry token
  *      (--shell-…, --page-pad-…, --content-max…, --footer-pad) to the value the
- *      design hard-codes (styles.css .sidebar/.icon-rail/.header, app.jsx page
+ *      design hard-codes (design-system.css .sidebar/.icon-rail/.header, app.jsx page
  *      padding + content measures, layout.jsx footer padding) under EVERY
  *      system — geometry is system-independent in the design, so a system
  *      block that re-declares one is drift. Values are parsed from the design
@@ -86,16 +103,18 @@
  *      height inside the mobile query (RESPONSIVE_GEOMETRY), and NO other
  *      scoped (@media/@supports/@layer/@container) declaration may touch a
  *      tracked token — the design has no responsive token values beyond these.
- *  10. Single source of truth: a tracked token (every design token, every
- *      geometry token, --accent/--accent-2) may be declared ONLY by the three
- *      canonical html-level forms above, inside client/src/styles/design-system.css.
- *      Any other selector (`html`, `*`, `body`, `.page`, a compound
- *      `:root[data-system][data-accent]`, …), any scoped block outside rule 9,
- *      and any sibling stylesheet of the app (everything index.css imports,
- *      everything design-system.css imports, client/index.html <style>) that
- *      declares one FAILS — custom properties inherit, so a descendant
- *      re-declaration repaints every element below it even though <html> still
- *      resolves the canonical value.
+ *  10. Single source of truth: a design token (the canonical :root tokens,
+ *      every system's vars, --accent/--accent-2) may be set ONLY by the
+ *      canonical sheet's :root and applyDesignSystem()'s inline writes — no app
+ *      sheet (app-bridge.css, everything index.css imports, client/index.html
+ *      <style>) may declare one under any selector, :root included, even when
+ *      the inline write would still win on <html>. Shell geometry tokens are
+ *      app-owned and may be declared only in the top-level :root of
+ *      app-bridge.css plus rule 9's responsive re-assignments. Any other
+ *      selector (`html`, `*`, `body`, `.page`, a compound
+ *      `:root[data-system][data-accent]`, …) FAILS — custom properties
+ *      inherit, so a descendant re-declaration repaints every element below it
+ *      even though <html> still resolves the canonical value.
  *  11. Shadow rules: for every canonical utility, under every system, the
  *      property values the cascade resolves for that utility's element must
  *      agree between the design and the runtime wherever a NON-canonical rule
@@ -128,10 +147,12 @@
  *      escapes are decoded (`.\63 hip` is `.chip`). A surviving difference
  *      uses the key `shadow:<winning rule key>:<property>` in
  *      DOCUMENTED_DEVIATIONS under the same reason + holds() contract.
- *  12. The main sheet must load: an `@import` chain from index.css (or
- *      client/index.html) must reach client/src/styles/design-system.css, and
- *      reach it unconditionally — an import under a media list or
- *      `supports()` paints the tokens only while the condition holds.
+ *  12. The canonical pair must load: client/index.html links
+ *      /ds/design-system.css exactly once with no media query (a conditioned
+ *      link paints the tokens only while it matches), and loads
+ *      /ds/design-system.js with a plain synchronous <script src> placed before
+ *      the inline boot that calls applyDesignSystem(). An @import of the sheet
+ *      anywhere in the index.css graph is a second load (rule 13).
  *  13. Every `@import` must be well-placed and single: index.css is a
  *      Tailwind root, and the Tailwind compiler inlines every import of the
  *      graph where it sits — after another rule, nested inside a block, or a
@@ -164,67 +185,103 @@
  *      statement order, anonymous layers, nested sublayers, layered vs
  *      unlayered !important, later-layer-wins for normal declarations, the
  *      vendor statement ordering layers an app sheet only uses, an
- *      `@import … layer()` of the main sheet), the document cases in
+ *      the main sheet loaded into a layer), the document cases in
  *      DOCUMENT_CANARIES (rewriting index.css through an in-memory overlay:
  *      `@layer early;` above a `layer(late)` import with and without a
  *      pinning statement, imports misplaced after a rule and inside
  *      `@media`, a doubled import, media- and print-conditioned imports, the
- *      main sheet imported late, conditionally or not at all, a layer first
- *      declared only under a desktop query)
- *      plus the value/registry/accent/deviation/geometry/utility cases) and
+ *      canonical sheet @imported again, a layer first declared only under a
+ *      desktop query), the index.html cases (link removed or media-
+ *      conditioned, registry script deferred or moved below the boot, boot
+ *      storage key or fallback renamed, marker no longer injected), the
+ *      served-pair cases (one byte, a registry value, an accent) plus the
+ *      registry/accent/deviation/geometry/utility cases) and
  *      asserts the gate FAILS each one on the expected rule (or PASSES where
  *      the browser would paint the canonical value). A canary that escapes
- *      means the parser has regressed, and the gate fails on that alone. The
+ *      means the parser has regressed, and the gate fails on that alone.
+ *      Canaries are judged on the failures a mutation ADDS to the live
+ *      inputs' own (the gate reports those itself), so a live finding can
+ *      neither mask nor fake a canary; mutations target app-bridge.css (the
+ *      `bridge` key), where app rules actually live. The
  *      layer and document canaries are additionally rendered in real Chromium
  *      by canonical-token-parity-browser-check.mjs (evidence:
  *      docs/parity/evidence/tokens/layer-order-browser.json) so each
  *      expectation is the browser's, not the gate's own opinion.
  *
- * Tailwind: index.css imports "tailwindcss" (node_modules/tailwindcss/
- * index.css), whose first line is `@layer theme, base, components,
- * utilities;`. The walk follows that bare import, so the statement sits at
- * its true document position — AFTER design-system.css's own `@layer base`
- * block — which is why the modelled order is `base < theme < components <
- * utilities < unlayered`, the order Chromium builds for the served bundle
- * (the compiler additionally prepends a `properties` layer holding only
- * universal `--tw-*` @property fallbacks; it has no source rule, so it is
- * not modelled — it cannot affect a class-anchored or html-level
- * comparison). The `@theme` block itself is a compiler directive: its
- * variables come out inside `@layer theme` at normal importance and can never
- * beat the unlayered design-system.css declaration of the same property, and
- * its names are namespaced (--color-*, --font-*, --radius-*). Rule 10 still
- * scans index.css's html-level rules like any other sibling, and rules 3/11
- * rank layered rules exactly where the layer order puts them.
+ * Document order: index.html <style> above the canonical <link> [0], the
+ * canonical sheet [1], <style> below it [2], then index.css and its @import
+ * graph [3, …] (Vite injects the bundle's CSS after the head), component
+ * sheets outside the graph last. Tailwind: index.css opens with `@layer theme,
+ * base, components;` and imports tailwindcss/theme.css into theme,
+ * preflight.css into base and utilities.css unlayered (the canonical sheet is
+ * unlayered and resets `*` padding, so layered utilities would lose), which
+ * is why the modelled order is `theme < base < components < unlayered`. The
+ * `@theme` block is a compiler directive: its variables come out inside
+ * `@layer theme` at normal importance and are namespaced (--color-*,
+ * --font-*, --radius-*). Rule 10 still scans index.css's html-level rules
+ * like any other sibling, and rules 3/11 rank layered rules exactly where the
+ * layer order puts them.
  *
  * Usage:
  *   node scripts/validation/canonical-token-parity.mjs            # gate (exit 1 on drift)
  *   node scripts/validation/canonical-token-parity.mjs --json DIR # also write
  *        DIR/canonical-tokens.json, DIR/app-tokens.json and DIR/token-diff.json
- *   node scripts/validation/canonical-token-parity.mjs --app-css PATH --app-registry PATH \
- *        --canonical-css PATH --canonical-jsx PATH --canonical-app PATH --canonical-layout PATH
- *        (mutation probing: point the parser at copies without touching the tree)
+ *   node scripts/validation/canonical-token-parity.mjs --served http://localhost:5001
+ *        also fetch /ds/design-system.{css,js} from a running server and compare to the pins
+ *   node scripts/validation/canonical-token-parity.mjs --app-css PATH --app-js PATH --app-bridge PATH \
+ *        --index-html PATH --app-registry PATH --vite-config PATH --canonical-css PATH --canonical-js PATH \
+ *        --canonical-app PATH --canonical-layout PATH
+ *        (mutation probing: point the parser at copies without touching the tree; the pins
+ *        are checked against the --app-* and --canonical-* copies too)
  *   node scripts/validation/canonical-token-parity.mjs --canaries-only   # self-test only
  */
 
+import crypto from 'node:crypto';
 import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { JSDOM } from 'jsdom';
+import { applierFallbacks, applierPaintsAccentPair, evaluateCanonicalRegistry } from '../generate-design-system-artifact.mjs';
 
 const ROOT = fileURLToPath(new URL('../..', import.meta.url));
 
 const DEFAULT_PATHS = {
-  appCss: 'client/src/styles/design-system.css',
+  // What the SPA serves: the verbatim canonical pair, linked/loaded by
+  // client/index.html before the app bundle.
+  appCss: 'client/public/ds/design-system.css',
+  appJs: 'client/public/ds/design-system.js',
+  // App-only rules and tokens (status, motion, shell geometry), imported by index.css.
+  appBridge: 'client/src/styles/app-bridge.css',
   appEntryCss: 'client/src/index.css',
   appRegistry: 'client/src/lib/design-system.ts',
   appIndexHtml: 'client/index.html',
+  viteConfig: 'vite.config.ts',
   appCssRoots: ['client/src'],
   viteRoot: 'client',
-  canonicalCss: 'awesome-list-site-ds/styles.css',
-  canonicalJsx: 'awesome-list-site-ds/design-systems.jsx',
+  vitePublic: 'client/public',
+  // The design authority. By default the same files the app serves: the pins
+  // below prove they are the fetched canonical bytes, so the model's job is to
+  // prove nothing the app adds around them changes what they paint.
+  canonicalCss: 'client/public/ds/design-system.css',
+  canonicalJs: 'client/public/ds/design-system.js',
+  // Shell geometry is hard-coded in the frozen prototype's JSX, not in the
+  // canonical pair (the latest fetch's handoff/project/layout.jsx no longer
+  // carries the site footer, so the frozen copy stays the geometry source).
   canonicalApp: 'awesome-list-site-ds/app.jsx',
   canonicalLayout: 'awesome-list-site-ds/layout.jsx',
 };
+
+// Rule 0 — the served pair is the canonical fetch, byte for byte. The digests
+// were taken from the design-system fetch named here (its styles.css and
+// design-system.js); re-pin only when a new fetch is adopted verbatim.
+export const CANONICAL_FETCH = { dir: '.cache', prefix: 'ds-fetch-', pinned: 'ds-fetch-20260929T0714Z' };
+export const CANONICAL_PINS = [
+  { file: DEFAULT_PATHS.appCss, href: '/ds/design-system.css', fetched: 'styles.css', sha256: '31fde358acc5bea61c68b17025326169fad4e60c62b898fbacf279a9bc9b2070' },
+  { file: DEFAULT_PATHS.appJs, href: '/ds/design-system.js', fetched: 'design-system.js', sha256: '30c37539db397941f209055af28a5284fbdd14a3322adb869701c70b0e05bc7c' },
+];
+const CSS_HREF = CANONICAL_PINS[0].href;
+const JS_HREF = CANONICAL_PINS[1].href;
+const THEME_BOOT_MARKER = '__AWESOME_VIDEO_THEME_BOOT__';
 
 // Canonical utility rules the design JSX relies on. `media||selector` keys
 // name rules nested in a media query; the runtime must carry the rule under
@@ -282,82 +339,26 @@ export const RESPONSIVE_GEOMETRY = [
 // can be re-proved from data rather than trusted. An entry whose values are
 // equal, or whose check returns false, is stale and fails the gate.
 // ---------------------------------------------------------------------------
-const TEXT3_REASON =
-  'WCAG 1.4.3: the design documents --text-3 as "4.6:1, passes AA for normal text" ' +
-  '(awesome-list-site-ds/docs/07-color.md), but its literal alpha resolves to ~3.4:1 ' +
-  'on the black --bg; the runtime keeps the alpha that actually delivers the documented ' +
-  'AA contract. See docs/parity/assumptions/tokens.md §1. This entry expires the moment the ' +
-  'design value itself passes 4.5:1 or the runtime value stops passing it.';
-
-function text3Holds({ canonical, app, canonicalMap, appMap }) {
-  const canonicalRatio = contrastRatio(canonical, canonicalMap.get('--bg'));
-  const appRatio = contrastRatio(app, appMap.get('--bg'));
-  if (canonicalRatio == null || appRatio == null) return false;
-  return canonicalRatio < 4.5 && appRatio >= 4.5;
-}
-
-const KBD_REASON =
-  'Legibility floor: the design sets .kbd at 10.5px; the runtime renders .kbd inside the ' +
-  '/settings/theme preview card, where tablet-audit (theme-preview-text) fails any text under ' +
-  '12px, and BUG-041 (audit 2) set the same 12px floor for mobile microtext. See ' +
-  'docs/parity/assumptions/tokens.md §2. Expires when the design raises .kbd to 12px or the ' +
-  'runtime drops below the floor.';
-
-function kbdHolds({ canonical, app }) {
-  const px = (v) => (/^(\d+(?:\.\d+)?)px$/.exec(v) ? Number(RegExp.$1) : null);
-  const c = px(canonical);
-  const a = px(app);
-  return c != null && a != null && c < 12 && a >= 12;
-}
-
 const NO_ANIM_REASON =
   'Reduced motion: the runtime\'s motion toggle puts .no-anim on the root and freezes EVERY ' +
   'animation/transition (!important), so a user who turned motion off also loses card hover ' +
-  'transitions; the design\'s .no-anim only stops caret, shimmer and live-dot (styles.css). ' +
+  'transitions; the design\'s .no-anim only stops caret, shimmer and live-dot (/ds/design-system.css; ' +
+  'the app\'s blanket rule lives in client/src/styles/app-bridge.css). ' +
   'Kept on the WCAG 2.3.3 side. See docs/parity/assumptions/tokens.md §8. Expires when the ' +
   'design freezes transitions under .no-anim too or the runtime narrows its rule.';
 
 const noAnimHolds = ({ canonical, app }) => app === 'none !important' && canonical !== app;
 
-const PAGE_ATMOSPHERE_REASON =
-  'Raster budget: the design paints `background: var(--bg-atmosphere), var(--bg)` on .page; ' +
-  'the runtime paints the same two layers on .page::before (var(--bg)) and .page::after ' +
-  '(var(--bg-atmosphere), background-repeat: var(--bg-atmosphere-repeat), clip-path: var(--bg-atmosphere-clip)) at z-index -1 — the same box, ' +
-  'positioning area and paint position — so the atmosphere raster can be bounded to the bands ' +
-  'where the gradient is not exactly transparent (Home at 412px is ~6000px tall; the unbounded ' +
-  'gradient cost ~3s of software raster per load). .page itself must be transparent for the ' +
-  'pseudo layers to show. See docs/parity/assumptions/tokens.md §11. Expires when the design ' +
-  'moves its atmosphere off .page or the runtime stops carrying both layers on the pseudos.';
-
-function pageAtmosphereHolds({ canonical, app, appRules }) {
-  if (!appRules || !(app === 'none' || app === 'transparent')) return false;
-  if (!/var\(--bg-atmosphere\)/.test(canonical) && canonical !== 'var(--bg)') return false;
-  const before = appRules.get('.page::before');
-  const after = appRules.get('.page::after');
-  const both = appRules.get('.page::before, .page::after');
-  const decl = (rule, prop) => (rule && rule.has(prop) ? normaliseValue(rule.get(prop)) : null);
-  const layer = (prop) => decl(before, prop) ?? decl(both, prop);
-  const layerAfter = (prop) => decl(after, prop) ?? decl(both, prop);
-  return (
-    layer('background') === 'var(--bg)' &&
-    layerAfter('background') === 'var(--bg-atmosphere)' &&
-    layerAfter('background-size') === 'var(--bg-atmosphere-size,auto)' &&
-    layerAfter('background-repeat') === 'var(--bg-atmosphere-repeat,no-repeat)' &&
-    layerAfter('clip-path') === 'var(--bg-atmosphere-clip,none)' &&
-    layer('position') === 'absolute' && layerAfter('position') === 'absolute' &&
-    layer('inset') === '0' && layerAfter('inset') === '0' &&
-    layer('z-index') === '-1' && layerAfter('z-index') === '-1'
-  );
-}
-
 const BODY_HEIGHT_REASON =
-  'NB-019 (run20) scroll-lock jump: with the design\'s `body { height: 100% }` the body box ' +
+  'NB-019 (run20) scroll-lock jump: with the design\'s `html, body { height: 100% }` the body box ' +
   'stays viewport-sized while content overflows it, so when Radix scroll-lock sets ' +
   '`overflow: hidden` on body (any Select/popover open) the document scroll range collapses, ' +
   'window.scrollY clamps to 0 and the page jumps to the top. The runtime keeps ' +
-  '`html { height: 100% }` and gives body `min-height: 100%` instead, which still fills the ' +
-  'viewport on short pages without capping it. See docs/parity/assumptions/tokens.md §12. ' +
-  'Expires when the design stops capping body height or the runtime drops the min-height floor.';
+  '`html { height: 100% }`; client/src/styles/app-bridge.css gives body `height: auto`, and the ' +
+  'viewport floor that keeps short pages full-height is `body { min-height: 100vh }` from ' +
+  'client/src/styles/scrolling-fix.css (4e502ef1, imported after app-bridge.css in index.css, so ' +
+  'it supersedes the bridge\'s own `min-height: 100%`). See docs/parity/assumptions/tokens.md §12. ' +
+  'Expires when the design stops capping body height or the runtime drops the viewport floor.';
 
 function bodyHeightHolds({ canonical, app, appRules }) {
   if (!appRules || canonical !== '100%' || app !== 'auto') return false;
@@ -365,20 +366,73 @@ function bodyHeightHolds({ canonical, app, appRules }) {
     const value = appRules.get(selector)?.get(prop);
     return value == null ? null : normaliseValue(value);
   };
-  return decl('body', 'min-height') === '100%' && decl('html', 'height') === '100%';
+  return ['100vh', '100%'].includes(decl('body', 'min-height')) && decl('html', 'height') === '100%';
 }
 
+// Rule 11 shadows the app keeps on purpose. Each entry is keyed by the app
+// rule that wins and the property it re-declares; the variants it also wins
+// on (.chip.accent/.ok/.warn/.bad/.muted) share the key. holds() pins the
+// exact values so a change on either side expires the entry.
+const ADMIN_TAGS_CHIP = 'client/src/styles/pages/admin-catalog-resources.css .admin-catalog-resources__tags .chip';
+const ADMIN_TABLE_CHIP = 'client/src/styles/pages/admin-catalog-resources.css .admin-catalog-resources__table .chip';
+const JOURNEY_CARD_CHIP = 'client/src/styles/pages/discovery-journeys.css .journeys-page .journey-card .chip';
+const RESOURCE_SECTION_EYEBROW = 'client/src/styles/pages/resource.css [data-system="editorial"] .resource-detail-sections h2.eyebrow';
+
+const ADMIN_TAG_TRUNCATE_REASON =
+  'Layout safety: imported tags can be whole phrases, and the canonical .chip (inline-flex, ' +
+  'nowrap, no max-width) lets one long tag push the admin resources table\'s Title column out ' +
+  'of its cell. The tags cell caps each chip (max-width 132px) and truncates it with an ellipsis, ' +
+  'which needs inline-block + overflow: hidden + text-overflow: ellipsis; the full tag stays in ' +
+  'the row title. Expires when the design sizes chips inside table cells or the app drops the cap.';
+
+const JOURNEY_CHIP_WRAP_REASON =
+  'Layout safety: journey cards are narrow on mobile (375px) and a long topic chip would overflow ' +
+  'the card with the canonical nowrap .chip; max-width: 100% + overflow-wrap: anywhere keep it ' +
+  'inside the card. Expires when the design bounds chips to their container or the app drops the rule.';
+
+const ADMIN_TABLE_CHIP_MONO_REASON =
+  'The prototype\'s admin resources table draws its tag chips as `chip mono` at 9.5px ' +
+  '(.cache/ds-fetch-20260929T0714Z/handoff/project/admin.jsx:468, featured star chip at :472). ' +
+  'The runtime keeps that mono face and the canonical .chip tracking under every system; the ' +
+  'Geist skin (`[data-system="geist"] .chip`, 0,2,0) outranks the prototype\'s `.mono` (0,1,0), so ' +
+  'the design itself resolves body face / 0 tracking there. Expires when the table chips drop the ' +
+  'mono override or the Geist skin stops re-facing chips.';
+
+const RESOURCE_LABEL_WEIGHT_REASON =
+  'The prototype\'s resource-detail card labels are accent-coloured mono text at the default weight ' +
+  '(.cache/ds-fetch-20260929T0714Z/handoff/project/pages.jsx:153, :163, :176 — `<div className="mono">` ' +
+  'at 10px / 1.4 letter-spacing), not the Editorial eyebrow\'s 700. The runtime renders them as ' +
+  'h2.eyebrow for document outline and resets the weight to 400 under Editorial to match. ' +
+  'Expires when the design gives those labels the eyebrow weight or the app stops using .eyebrow there.';
+
+const ADMIN_COMPACT_CHIP_REASON =
+  'The prototype\'s admin resources table draws compact chips: tag chips at fontSize 9.5 with ' +
+  'padding 2px 6px, and the featured star chip at 9.5 with canonical padding ' +
+  '(.cache/ds-fetch-20260929T0714Z/handoff/project/admin.jsx:468, :472). The runtime reproduces ' +
+  'those sizes in admin-catalog-resources.css. Expires when the prototype drops the compact ' +
+  'table chips or the app returns them to canonical .chip metrics.';
+
+const pinned = (canonicalValue, appValue) => ({ canonical, app }) => canonical === canonicalValue && app === appValue;
+
+// Retired with the legacy runtime sheet (the app now serves the canonical
+// sheet verbatim, so these values can no longer differ): `<system>:--text-3`
+// (WCAG alpha), `rule:.kbd:font-size` (12px floor) and `rule:.page:background`
+// / `background-color` (atmosphere on .page pseudos). A stale entry fails this
+// gate, which is how they were found.
 export const DOCUMENTED_DEVIATIONS = new Map([
   ['rule:body:height', { reason: BODY_HEIGHT_REASON, holds: bodyHeightHolds }],
-  ['rule:.page:background', { reason: PAGE_ATMOSPHERE_REASON, holds: pageAtmosphereHolds }],
-  ['rule:.page:background-color', { reason: PAGE_ATMOSPHERE_REASON, holds: pageAtmosphereHolds }],
-  ...['editorial', 'terminal', 'geist', 'brutalist', 'swiss'].map((id) => [
-    `${id}:--text-3`,
-    { reason: TEXT3_REASON, holds: text3Holds },
-  ]),
-  ['rule:.kbd:font-size', { reason: KBD_REASON, holds: kbdHolds }],
   // Rule 11 (cascade shadows): `shadow:<winning rule key>:<property>`.
-  ['shadow:.no-anim *:transition', { reason: NO_ANIM_REASON, holds: noAnimHolds }],
+  ['shadow:client/src/styles/app-bridge.css .no-anim *:transition', { reason: NO_ANIM_REASON, holds: noAnimHolds }],
+  [`shadow:${ADMIN_TAGS_CHIP}:display`, { reason: ADMIN_TAG_TRUNCATE_REASON, holds: pinned('inline-flex', 'inline-block') }],
+  [`shadow:${ADMIN_TAGS_CHIP}:overflow`, { reason: ADMIN_TAG_TRUNCATE_REASON, holds: pinned(null, 'hidden') }],
+  [`shadow:${ADMIN_TAGS_CHIP}:text-overflow`, { reason: ADMIN_TAG_TRUNCATE_REASON, holds: pinned(null, 'ellipsis') }],
+  [`shadow:${JOURNEY_CARD_CHIP}:max-width`, { reason: JOURNEY_CHIP_WRAP_REASON, holds: pinned(null, '100%') }],
+  [`shadow:${JOURNEY_CARD_CHIP}:overflow-wrap`, { reason: JOURNEY_CHIP_WRAP_REASON, holds: pinned(null, 'anywhere') }],
+  [`shadow:${ADMIN_TABLE_CHIP}:font-family`, { reason: ADMIN_TABLE_CHIP_MONO_REASON, holds: pinned('var(--font-body)', 'var(--font-mono)') }],
+  [`shadow:${ADMIN_TABLE_CHIP}:letter-spacing`, { reason: ADMIN_TABLE_CHIP_MONO_REASON, holds: pinned('0', '0.6px') }],
+  [`shadow:${ADMIN_TAGS_CHIP}:padding`, { reason: ADMIN_COMPACT_CHIP_REASON, holds: pinned('4px 10px', '2px 6px') }],
+  [`shadow:${ADMIN_TABLE_CHIP}:font-size`, { reason: ADMIN_COMPACT_CHIP_REASON, holds: pinned('10.5px', '9.5px') }],
+  [`shadow:${RESOURCE_SECTION_EYEBROW}:font-weight`, { reason: RESOURCE_LABEL_WEIGHT_REASON, holds: pinned('700', '400') }],
 ]);
 
 // ---------------------------------------------------------------------------
@@ -386,23 +440,6 @@ export const DOCUMENTED_DEVIATIONS = new Map([
 // ---------------------------------------------------------------------------
 function stripCssComments(src) {
   return String(src).replace(/\/\*[\s\S]*?\*\//g, '');
-}
-
-/** Body of the first block whose selector line matches exactly (brace-balanced). */
-function blockBody(source, selector) {
-  const escaped = selector.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-  const match = new RegExp(`^[ \\t]*${escaped}\\s*\\{`, 'm').exec(source);
-  if (!match) return null;
-  const open = match.index + match[0].lastIndexOf('{');
-  let depth = 1;
-  for (let i = open + 1; i < source.length; i += 1) {
-    if (source[i] === '{') depth += 1;
-    if (source[i] === '}') {
-      depth -= 1;
-      if (depth === 0) return source.slice(open + 1, i);
-    }
-  }
-  throw new Error(`Unclosed block for selector ${selector}`);
 }
 
 const IMPORTANT_RE = /!\s*important\s*$/i;
@@ -1143,53 +1180,44 @@ export function resolveHtmlTokens(declarations, { systemId, accentId = null }) {
   return out;
 }
 
-/** Concatenated JS string literal expression → string ('a' + "b" + …). */
-function jsStringExpression(expr) {
-  const parts = [...expr.matchAll(/'((?:[^'\\]|\\.)*)'|"((?:[^"\\]|\\.)*)"/g)];
-  if (!parts.length) return null;
-  return parts
-    .map((p) => (p[1] ?? p[2]).replace(/\\(['"\\])/g, '$1'))
-    .join('');
+/**
+ * design-system.js → { systems: Map<id, Map<token,value>>, accents, defaultAccents,
+ * fallbacks, paintsAccentPair }. The file only assigns window.* tables and
+ * defines the applier, so it is evaluated (scripts/generate-design-system-
+ * artifact.mjs, node:vm) rather than parsed: the model sees exactly the values
+ * the browser gets.
+ */
+export function runtimeFromRegistry(source, label = DEFAULT_PATHS.canonicalJs) {
+  const src = String(source ?? '');
+  const registry = evaluateCanonicalRegistry(src, label);
+  const systems = new Map(
+    Object.entries(registry.systems ?? {}).map(([id, system]) => [id, new Map(Object.entries(system?.vars ?? {}))]),
+  );
+  const accents = new Map(
+    (registry.accents ?? []).map((accent) => [accent.id, { name: accent.name, primary: accent.primary, secondary: accent.secondary }]),
+  );
+  const defaultAccents = new Map(Object.entries(registry.systemDefaultAccents ?? {}));
+  return { systems, accents, defaultAccents, fallbacks: applierFallbacks(src, registry), paintsAccentPair: applierPaintsAccentPair(src) };
 }
 
-/** design-systems.jsx → { systems: Map<id, Map<token,value>>, accents, defaultAccents } */
-function parseCanonicalRuntime(jsx) {
-  const src = String(jsx).replace(/\/\*[\s\S]*?\*\//g, '');
-  const systems = new Map();
-  // A system entry is `id: {` whose object opens with `name:` — that excludes
-  // the nested `vars: {` object, which opens with a token declaration.
-  const systemRe = /^\s*([a-z][a-z0-9_-]*):\s*\{\s*\n\s*name:/gm;
-  const registryStart = src.indexOf('window.DESIGN_SYSTEMS');
-  const registryEnd = src.indexOf('window.ACCENTS');
-  const registry = src.slice(registryStart, registryEnd);
-  for (const match of registry.matchAll(systemRe)) {
-    const id = match[1];
-    const varsIndex = registry.indexOf('vars:', match.index);
-    if (varsIndex === -1) continue;
-    const body = blockBody(registry.slice(varsIndex), 'vars:');
-    if (body == null) continue;
-    const vars = new Map();
-    // Entries look like  '--bg': '#000000',  or a multi-line concatenation.
-    const entryRe = /'(--[A-Za-z0-9_-]+)'\s*:\s*((?:'(?:[^'\\]|\\.)*'|"(?:[^"\\]|\\.)*"|\s|\+)+?)\s*(?:,\s*(?=(?:'--|\n\s*}|$))|\n\s*})/g;
-    for (const entry of body.matchAll(entryRe)) {
-      const value = jsStringExpression(entry[2]);
-      if (value != null) vars.set(entry[1], value);
-    }
-    systems.set(id, vars);
+// applyDesignSystem() writes the system's vars, then the accent pair, as
+// inline styles on <html>: modelled as inline declarations after every sheet
+// so the same cascade comparator resolves both sides.
+const INLINE_ORDER = 2e6;
+function inlineDeclarations(runtime) {
+  const out = [];
+  const inline = (kind, id, prop, value, order, index) => ({
+    kind, id, prop, value, important: false, inline: true, layer: null, layerRank: null, specificity: HTML_SPECIFICITY.inline, order, index,
+  });
+  for (const [id, vars] of runtime.systems) {
+    let index = 0;
+    for (const [prop, value] of vars) out.push(inline('system', id, prop, value, INLINE_ORDER, index++));
   }
-  const accents = new Map();
-  const accentsBody = blockBody(src.slice(src.indexOf('window.ACCENTS')), 'window.ACCENTS =')
-    ?? src.slice(src.indexOf('window.ACCENTS'), src.indexOf('];', src.indexOf('window.ACCENTS')));
-  for (const m of accentsBody.matchAll(
-    /id:\s*'([^']+)'\s*,\s*name:\s*'([^']+)'\s*,\s*primary:\s*'([^']+)'\s*,\s*secondary:\s*'([^']+)'/g,
-  )) {
-    accents.set(m[1], { name: m[2], primary: m[3], secondary: m[4] });
+  for (const [id, accent] of runtime.accents) {
+    out.push(inline('accent', id, '--accent', accent.primary, INLINE_ORDER + 1, 0));
+    out.push(inline('accent', id, '--accent-2', accent.secondary, INLINE_ORDER + 1, 1));
   }
-  const defaultAccents = new Map();
-  const sdaStart = src.indexOf('window.SYSTEM_DEFAULT_ACCENT');
-  const sdaBody = src.slice(sdaStart, src.indexOf('};', sdaStart));
-  for (const m of sdaBody.matchAll(/^\s*([a-z][a-z0-9_-]*):\s*'([^']+)'/gm)) defaultAccents.set(m[1], m[2]);
-  return { systems, accents, defaultAccents };
+  return out;
 }
 
 function firstMatch(re, src, label) {
@@ -1208,7 +1236,7 @@ export function parseCanonicalGeometry({ css, appJsx, layoutJsx }) {
   const rules = parseRules(css);
   const rule = (key, prop, label) => {
     const v = rules.get(key)?.get(prop);
-    if (v == null) throw new Error(`canonical geometry: ${label} (${key} ${prop}) not found in styles.css`);
+    if (v == null) throw new Error(`canonical geometry: ${label} (${key} ${prop}) not found in ${DEFAULT_PATHS.canonicalCss}`);
     return v.trim();
   };
   const padding = firstMatch(/const padding = [\s\S]*?:\s*'([^']+)';/, String(appJsx), 'default page padding (app.jsx)')[1];
@@ -1254,69 +1282,19 @@ export function normaliseValue(value) {
 const normaliseContext = (context) => String(context ?? '').replace(/\s+/g, ' ').replace(/:\s+/g, ':').trim();
 
 // ---------------------------------------------------------------------------
-// WCAG contrast for `rgba(r,g,b,a)` / `#rrggbb` ink composited over a solid bg.
-// ---------------------------------------------------------------------------
-function parseColor(value) {
-  const v = normaliseValue(value);
-  let m = /^#([0-9a-f]{6})([0-9a-f]{2})?$/.exec(v);
-  if (m) {
-    const n = parseInt(m[1], 16);
-    return { r: n >> 16, g: (n >> 8) & 255, b: n & 255, a: m[2] ? parseInt(m[2], 16) / 255 : 1 };
-  }
-  m = /^rgba?\((\d+),(\d+),(\d+)(?:,([\d.]+))?\)$/.exec(v);
-  if (m) return { r: +m[1], g: +m[2], b: +m[3], a: m[4] == null ? 1 : +m[4] };
-  return null;
-}
-
-function luminance({ r, g, b }) {
-  const lin = (c) => {
-    const s = c / 255;
-    return s <= 0.03928 ? s / 12.92 : ((s + 0.055) / 1.055) ** 2.4;
-  };
-  return 0.2126 * lin(r) + 0.7152 * lin(g) + 0.0722 * lin(b);
-}
-
-export function contrastRatio(inkValue, bgValue) {
-  const ink = parseColor(inkValue);
-  const bg = parseColor(bgValue);
-  if (!ink || !bg) return null;
-  const composite = {
-    r: ink.r * ink.a + bg.r * (1 - ink.a),
-    g: ink.g * ink.a + bg.g * (1 - ink.a),
-    b: ink.b * ink.a + bg.b * (1 - ink.a),
-  };
-  const l1 = luminance(composite);
-  const l2 = luminance(bg);
-  const [hi, lo] = l1 > l2 ? [l1, l2] : [l2, l1];
-  return Math.round(((hi + 0.05) / (lo + 0.05)) * 100) / 100;
-}
-
-// ---------------------------------------------------------------------------
 // Model building
 // ---------------------------------------------------------------------------
-export function buildCanonicalModel({ css, jsx, appJsx = null, layoutJsx = null }) {
+export function buildCanonicalModel({ css, js, appJsx = null, layoutJsx = null }) {
+  const file = DEFAULT_PATHS.canonicalCss;
   const sheet = parseStylesheet(css);
-  const layers = classifyCustomProperties(sheet, 'styles.css', 0);
-  if (!layers.root.size) throw new Error('canonical styles.css: no bare :root block found');
+  const layers = classifyCustomProperties(sheet, file, 0);
+  if (!layers.root.size) throw new Error(`canonical ${file}: no bare :root block found`);
   const root = layers.root;
-  const runtime = parseCanonicalRuntime(jsx);
-  if (!runtime.systems.size) throw new Error('canonical design-systems.jsx: no DESIGN_SYSTEMS entries parsed');
-  if (!runtime.accents.size) throw new Error('canonical design-systems.jsx: no ACCENTS parsed');
-  // applyDesignSystem() writes the system's vars, then the accent pair, as
-  // inline styles on <html>: model them as inline declarations (order 1 and 2,
-  // after the stylesheet) so the same cascade comparator resolves both sides.
-  const declarations = [...layers.declarations];
-  for (const [id, vars] of runtime.systems) {
-    let index = 0;
-    for (const [prop, value] of vars) {
-      declarations.push({ kind: 'system', id, prop, value, important: false, inline: true, layer: null, layerRank: null, specificity: HTML_SPECIFICITY.inline, order: 1, index: index++ });
-    }
-  }
-  for (const [id, accent] of runtime.accents) {
-    declarations.push({ kind: 'accent', id, prop: '--accent', value: accent.primary, important: false, inline: true, layer: null, layerRank: null, specificity: HTML_SPECIFICITY.inline, order: 2, index: 0 });
-    declarations.push({ kind: 'accent', id, prop: '--accent-2', value: accent.secondary, important: false, inline: true, layer: null, layerRank: null, specificity: HTML_SPECIFICITY.inline, order: 2, index: 1 });
-  }
-  const sheets = [{ file: 'awesome-list-site-ds/styles.css', order: 0, sheet, baseLayer: null }];
+  const runtime = runtimeFromRegistry(js, DEFAULT_PATHS.canonicalJs);
+  if (!runtime.systems.size) throw new Error(`canonical ${DEFAULT_PATHS.canonicalJs}: no DESIGN_SYSTEMS entries`);
+  if (!runtime.accents.size) throw new Error(`canonical ${DEFAULT_PATHS.canonicalJs}: no ACCENTS`);
+  const declarations = [...layers.declarations, ...inlineDeclarations(runtime)];
+  const sheets = [{ file, order: 0, sheet, baseLayer: null }];
   const layerOrder = buildLayerOrder(sheets);
   for (const d of declarations) d.layerRank = layerOrder.rank(d.layer);
   const resolve = (systemId, accentId = null) => resolveHtmlTokens(declarations, { systemId, accentId });
@@ -1329,6 +1307,8 @@ export function buildCanonicalModel({ css, jsx, appJsx = null, layoutJsx = null 
   }
   const parsedGeometry = appJsx != null && layoutJsx != null ? parseCanonicalGeometry({ css, appJsx, layoutJsx }) : null;
   return {
+    cssSource: String(css),
+    jsSource: String(js),
     root,
     systems: runtime.systems,
     effective,
@@ -1336,6 +1316,8 @@ export function buildCanonicalModel({ css, jsx, appJsx = null, layoutJsx = null 
     declarations,
     accents: runtime.accents,
     defaultAccents: runtime.defaultAccents,
+    fallbacks: runtime.fallbacks,
+    paintsAccentPair: runtime.paintsAccentPair,
     rules: sheet.rules,
     sheet,
     sheets,
@@ -1346,29 +1328,114 @@ export function buildCanonicalModel({ css, jsx, appJsx = null, layoutJsx = null 
   };
 }
 
-/** client/src/lib/design-system.ts → { defaultSystem, defaultAccent, systems: Map<id, defaultAccent>, accents: Map<id,{primary,secondary}> } */
+/**
+ * client/src/lib/design-system.ts → { defaultSystem, defaultAccent, systemKey,
+ * accentKey, bootData, restated, readsGlobals }. The wrapper owns only the app
+ * defaults and the storage keys; the tables themselves must be read from the
+ * window globals /ds/design-system.js assigns, never restated.
+ */
 export function parseAppRegistry(ts) {
-  const src = String(ts ?? '');
-  const start = src.indexOf('THEME_FALLBACK_REGISTRY');
-  const body = start === -1 ? '' : src.slice(start);
-  const top = (key) => {
-    const m = new RegExp(`^  ${key}:\\s*'([^']+)'`, 'm').exec(body);
-    return m ? m[1] : null;
+  const src = String(ts ?? '').replace(/\/\*[\s\S]*?\*\//g, '').replace(/^\s*\/\/.*$/gm, '');
+  const constants = new Map();
+  for (const m of src.matchAll(/\b(?:export\s+)?const\s+([A-Z][A-Z0-9_]*)\b[^=\n]*=\s*(["'])([^"'\n]*)\2/g)) constants.set(m[1], m[3]);
+  const bootBody = /\bTHEME_BOOT_DATA\b[^=]*=\s*\{([^}]*)\}/.exec(src)?.[1] ?? null;
+  let bootData = null;
+  if (bootBody != null) {
+    bootData = {};
+    for (const m of bootBody.matchAll(/([A-Za-z_$][\w$]*)\s*:\s*([^,\n]+)/g)) {
+      const value = m[2].trim();
+      const literal = /^(["'])(.*)\1$/.exec(value);
+      bootData[m[1]] = literal ? literal[2] : constants.get(value) ?? null;
+    }
+  }
+  const restated = [...src.matchAll(/\bexport\s+(?:const|let|var|function)\s+(DESIGN_SYSTEMS|ACCENTS|SYSTEM_DEFAULT_ACCENT|THEME_FALLBACK_REGISTRY|TYPE_SCALE|SPACE_SCALE)\b/g)].map((m) => m[1]);
+  if (/\bprimary\s*:\s*["']#[0-9a-f]/i.test(src)) restated.push('an accent swatch literal (primary: "#…")');
+  const readsGlobals = new Set([...src.matchAll(/\bwindow\.(DESIGN_SYSTEMS|ACCENTS|SYSTEM_DEFAULT_ACCENT)\b/g)].map((m) => m[1]));
+  return {
+    defaultSystem: constants.get('DEFAULT_SYSTEM') ?? null,
+    defaultAccent: constants.get('DEFAULT_ACCENT') ?? null,
+    systemKey: constants.get('SYSTEM_STORAGE_KEY') ?? null,
+    accentKey: constants.get('ACCENT_STORAGE_KEY') ?? null,
+    bootData,
+    restated,
+    readsGlobals,
   };
-  const systems = new Map();
-  for (const m of body.matchAll(/id:\s*'([^']+)'[\s\S]*?defaultAccent:\s*'([^']+)'/g)) {
-    if (!systems.has(m[1]) && !/primary:/.test(m[0])) systems.set(m[1], m[2]);
-  }
-  const accents = new Map();
-  for (const m of body.matchAll(/id:\s*'([^']+)',\s*name:\s*'[^']+',\s*primary:\s*'([^']+)',\s*secondary:\s*'([^']+)'/g)) {
-    accents.set(m[1], { primary: m[2], secondary: m[3] });
-  }
-  return { defaultSystem: top('defaultSystem'), defaultAccent: top('defaultAccent'), systems, accents };
 }
 
-/** `<style>…</style>` bodies of an HTML document (including ones built inside JS strings). */
-export function inlineStyleBlocks(html) {
-  return [...String(html ?? '').matchAll(/<style[^>]*>([\s\S]*?)<\/style>/gi)].map((m) => m[1]);
+// HTML comments blanked to spaces so offsets stay valid and a commented-out
+// tag never counts.
+const blankComments = (html) => String(html ?? '').replace(/<!--[\s\S]*?-->/g, (m) => ' '.repeat(m.length));
+
+function tagAttributes(text) {
+  const attrs = new Map();
+  for (const m of text.matchAll(/([^\s=/>]+)(?:\s*=\s*(?:"([^"]*)"|'([^']*)'|([^\s>]+)))?/g)) {
+    attrs.set(m[1].toLowerCase(), m[2] ?? m[3] ?? m[4] ?? '');
+  }
+  return attrs;
+}
+
+/**
+ * How client/index.html loads the canonical pair (rule 12): the stylesheet
+ * <link>, the registry <script src>, and the inline boot script that calls
+ * applyDesignSystem(), each with its offset in the document.
+ */
+export function parseDsLoad(html, { cssHref = CSS_HREF, jsHref = JS_HREF } = {}) {
+  const src = blankComments(html);
+  const links = [];
+  for (const m of src.matchAll(/<link\b([^>]*)>/gi)) {
+    const attrs = tagAttributes(m[1]);
+    if ((attrs.get('rel') ?? '').toLowerCase().split(/\s+/).includes('stylesheet') && attrs.get('href') === cssHref) {
+      links.push({ index: m.index, media: attrs.get('media') ?? null, attrs });
+    }
+  }
+  const scripts = [];
+  let boot = null;
+  for (const m of src.matchAll(/<script\b([^>]*)>([\s\S]*?)<\/script>/gi)) {
+    const attrs = tagAttributes(m[1]);
+    if (attrs.get('src') === jsHref) {
+      scripts.push({ index: m.index, async: attrs.has('async'), defer: attrs.has('defer'), module: (attrs.get('type') ?? '').toLowerCase() === 'module' });
+    } else if (!attrs.has('src') && boot == null && /\bapplyDesignSystem\s*\(/.test(m[2])) {
+      boot = { index: m.index, body: m[2] };
+    }
+  }
+  return { css: links[0] ?? null, cssCount: links.length, js: scripts[0] ?? null, jsCount: scripts.length, boot };
+}
+
+/**
+ * The pre-paint boot's storage keys and fallback system. Each is a string
+ * literal or a field of the object Vite injects for the THEME_BOOT marker —
+ * which resolves only when vite.config.ts actually serializes THEME_BOOT_DATA
+ * (imported from design-system.ts) into that marker.
+ */
+export function parseThemeBoot(bootBody, { registry = null, viteConfig = '' } = {}) {
+  const body = String(bootBody ?? '');
+  const markerVar = new RegExp(`\\bvar\\s+([A-Za-z_$][\\w$]*)\\s*=\\s*${THEME_BOOT_MARKER}\\b`).exec(body)?.[1] ?? null;
+  const vite = String(viteConfig ?? '');
+  const injects = vite.includes(`"${THEME_BOOT_MARKER}"`) || vite.includes(`'${THEME_BOOT_MARKER}'`);
+  const serializes = /JSON\.stringify\(\s*THEME_BOOT_DATA\s*\)/.test(vite) && /\bimport\s*\{[^}]*\bTHEME_BOOT_DATA\b[^}]*\}\s*from\s*["']\.\/client\/src\/lib\/design-system["']/.test(vite);
+  const injected = markerVar && injects && serializes ? registry?.bootData ?? null : null;
+  const value = (expr) => {
+    if (expr == null) return { value: null, expr: null };
+    const text = expr.trim();
+    const literal = /^(["'])(.*)\1$/.exec(text);
+    if (literal) return { value: literal[2], expr: text };
+    const field = /^([A-Za-z_$][\w$]*)\.([A-Za-z_$][\w$]*)$/.exec(text);
+    if (field && field[1] === markerVar) return { value: injected?.[field[2]] ?? null, expr: text, marker: true };
+    return { value: null, expr: text };
+  };
+  return {
+    markerVar,
+    injected: Boolean(injected),
+    systemKey: value(/\bsys\s*=\s*localStorage\.getItem\(([^)]*)\)/.exec(body)?.[1]),
+    accentKey: value(/\bacc\s*=\s*localStorage\.getItem\(([^)]*)\)/.exec(body)?.[1]),
+    fallbackSystem: value(/hasOwnProperty\.call\(\s*window\.DESIGN_SYSTEMS\s*,\s*sys\s*\)\s*\)\s*sys\s*=\s*([^;]+);/.exec(body)?.[1]),
+    handCopied: /\bvar\s+(?:SYSTEMS|ACCENTS|DESIGN_SYSTEMS)\s*=\s*[[{]/.test(body),
+  };
+}
+
+/** `<style>…</style>` bodies of an HTML document (including ones built inside JS strings), with their offsets. */
+function inlineStyleBlocksAt(html) {
+  return [...blankComments(html).matchAll(/<style[^>]*>([\s\S]*?)<\/style>/gi)].map((m) => ({ index: m.index, css: m[1] }));
 }
 
 // A stylesheet whose position in the document is unknown (a canary-added
@@ -1379,8 +1446,11 @@ const LATE_SHEET = 1e6;
 
 /**
  * @param {object} input
- * @param {string} input.css        client/src/styles/design-system.css
+ * @param {string} input.css        the served main sheet (client/public/ds/design-system.css)
+ * @param {string} input.js         the served registry + applier (client/public/ds/design-system.js)
  * @param {string} [input.registry] client/src/lib/design-system.ts
+ * @param {string} [input.indexHtml] client/index.html (boot keys, rule 5)
+ * @param {string} [input.viteConfig] vite.config.ts (THEME_BOOT marker injection, rule 5)
  * @param {{file:string, css:string, order?:number|number[], layer?:string|null, context?:string}[]} [input.siblings]
  *        every other stylesheet that reaches the document, with its document
  *        position (see documentOrder), the cascade layer it was imported into
@@ -1394,20 +1464,19 @@ const LATE_SHEET = 1e6;
  *        document loads its sheets (rules 12–13): { main: { reached, context,
  *        importer }, misplaced: [{ file, spec, reason }], duplicates, unresolved, entry }
  */
-export function buildAppModel({ css, registry = null, siblings = [], mainOrder = 0, mainLayer = null, reach = null }) {
+export function buildAppModel({ css, js, registry = null, indexHtml = null, viteConfig = null, siblings = [], mainOrder = 0, mainLayer = null, reach = null }) {
   const sheet = parseStylesheet(css);
   const layers = classifyCustomProperties(sheet, DEFAULT_PATHS.appCss, mainOrder, mainLayer);
-  if (!layers.root.size) throw new Error('runtime design-system.css: no bare :root block found');
-  const accents = new Map();
-  for (const [id, props] of layers.accents) {
-    accents.set(id, { primary: props.get('--accent') ?? null, secondary: props.get('--accent-2') ?? null });
-  }
+  if (!layers.root.size) throw new Error(`served ${DEFAULT_PATHS.appCss}: no bare :root block found`);
+  const runtime = runtimeFromRegistry(js, DEFAULT_PATHS.appJs);
   const siblingDeclarations = [];
+  const scoped = layers.scoped.map((record) => ({ ...record, file: DEFAULT_PATHS.appCss }));
   const sheets = [{ file: DEFAULT_PATHS.appCss, order: mainOrder, sheet, baseLayer: mainLayer ?? null, context: '' }];
   // Every html-level declaration in the document takes part in the resolver —
   // a sibling's `:root { --bg: … !important }` changes what the browser paints
-  // (rule 3) as well as breaking the single source (rule 10).
-  const declarations = [...layers.declarations];
+  // (rule 3) as well as breaking the single source (rule 10) — and so do the
+  // inline writes applyDesignSystem() performs from the served registry.
+  const declarations = [...layers.declarations, ...inlineDeclarations(runtime)];
   for (const sibling of siblings) {
     // A sheet imported under a condition is parsed as if wrapped in it: its
     // top-level rules become scoped rules (rule 9/10 see the condition) and
@@ -1423,24 +1492,49 @@ export function buildAppModel({ css, registry = null, siblings = [], mainOrder =
     for (const record of [...siblingLayers.scoped, ...siblingLayers.elsewhere]) {
       for (const [prop, value] of record.props) siblingDeclarations.push({ file: sibling.file, context: record.context, selector: record.selector, prop, value });
     }
+    for (const record of siblingLayers.scoped) scoped.push({ ...record, file: sibling.file });
   }
   // The document's layer order is known only once every sheet is parsed:
   // stamp each html-level declaration with its linear rank before resolving.
   const layerOrder = buildLayerOrder(sheets);
   for (const d of declarations) d.layerRank = layerOrder.rank(d.layer);
   const resolve = (systemId, accentId = null) => resolveHtmlTokens(declarations, { systemId, accentId });
+  // Every unconditioned rule of every sheet merged in document order — what
+  // an element-level rule (html/body height, the pseudo layers a deviation
+  // cites) resolves to once the app's sheets cascade over the canonical one.
+  const mergedRules = new Map();
+  for (const entry of [...sheets].sort((x, y) => comparePath(asPath(x.order), asPath(y.order)))) {
+    for (const [key, decls] of entry.sheet.rules) {
+      if (key.includes('||')) continue;
+      if (!mergedRules.has(key)) mergedRules.set(key, new Map());
+      mergeDeclarations(mergedRules.get(key), decls);
+    }
+  }
+  const appRegistry = registry != null ? parseAppRegistry(registry) : null;
+  const load = indexHtml != null ? parseDsLoad(indexHtml) : null;
+  const boot = load ? parseThemeBoot(load.boot?.body ?? '', { registry: appRegistry, viteConfig }) : null;
+  const accents = runtime.accents;
   return {
+    cssSource: String(css),
+    jsSource: String(js),
     root: layers.root,
-    systems: layers.systems,
+    systems: runtime.systems,
+    systemBlocks: layers.systems,
+    defaultAccents: runtime.defaultAccents,
+    fallbacks: runtime.fallbacks,
+    paintsAccentPair: runtime.paintsAccentPair,
     declarations,
     resolve,
     accents,
     accentProps: layers.accents,
-    scoped: layers.scoped,
+    scoped,
     elsewhere: layers.elsewhere,
     siblingDeclarations,
-    registry: registry ? parseAppRegistry(registry) : null,
+    registry: appRegistry,
+    load,
+    boot,
     rules: sheet.rules,
+    mergedRules,
     sheet,
     sheets,
     layerOrder,
@@ -1997,11 +2091,41 @@ export function compareModels(canonical, app, deviations = DOCUMENTED_DEVIATIONS
   const perSystem = {};
   const usedDeviations = new Set();
 
+  // Rule 0 — the served pair is the canonical pair, byte for byte (the CLI
+  // additionally pins both to the fetched digests).
+  for (const [label, served, canon, servedFile, canonFile] of [
+    ['served sheet', app.cssSource, canonical.cssSource, DEFAULT_PATHS.appCss, DEFAULT_PATHS.canonicalCss],
+    ['served registry', app.jsSource, canonical.jsSource, DEFAULT_PATHS.appJs, DEFAULT_PATHS.canonicalJs],
+  ]) {
+    if (served == null || canon == null || served === canon) continue;
+    const a = served.split('\n');
+    const b = canon.split('\n');
+    let line = 0;
+    while (line < Math.max(a.length, b.length) && a[line] === b[line]) line += 1;
+    failures.push(`${label}: ${servedFile} is not byte-identical to the canonical ${canonFile} (first difference on line ${line + 1}) — the served design system must be the verbatim fetch; re-copy it, never edit it`);
+  }
+
+  // Pre-apply — the bare :root cascade that paints before applyDesignSystem()
+  // runs (and whenever the registry script fails): app sheets may add tokens
+  // but must not change a canonical one. Reported with the per-system rows
+  // below as `pre-apply: <token> differs …` / `… is absent …`.
+  {
+    const canonPre = canonical.resolve(null);
+    const appPre = app.resolve(null);
+    for (const [token, canonRaw] of canonPre) {
+      const canon = normaliseValue(canonRaw);
+      const raw = appPre.get(token);
+      if (raw == null) {
+        missing.push({ system: 'pre-apply', token, canonical: canon });
+      } else if (normaliseValue(raw) !== canon) {
+        mismatches.push({ system: 'pre-apply', token, canonical: canon, app: normaliseValue(raw) });
+      }
+    }
+  }
+
   for (const [systemId, canonMap] of canonical.effective) {
-    const hasBlock = app.systems.has(systemId);
-    const isDefault = systemId === 'editorial';
-    if (!hasBlock && !isDefault) {
-      failures.push(`system "${systemId}" ships in the design but has no :root[data-system="${systemId}"] block in the runtime`);
+    if (!app.systems.has(systemId)) {
+      failures.push(`system "${systemId}" ships in the design but is missing from the served DESIGN_SYSTEMS (${DEFAULT_PATHS.appJs})`);
       continue;
     }
     const appMap = appEffective(app, systemId);
@@ -2053,7 +2177,7 @@ export function compareModels(canonical, app, deviations = DOCUMENTED_DEVIATIONS
 
   for (const [systemId] of app.systems) {
     if (!canonical.effective.has(systemId)) {
-      failures.push(`runtime declares :root[data-system="${systemId}"] but the design ships no such system`);
+      failures.push(`the served DESIGN_SYSTEMS offers "${systemId}" but the design ships no such system`);
     }
   }
 
@@ -2082,12 +2206,18 @@ export function compareModels(canonical, app, deviations = DOCUMENTED_DEVIATIONS
     }
   }
 
-  // The tracked set: every design token, every geometry token, the accent pair.
-  const tracked = new Set(['--accent', '--accent-2', ...GEOMETRY_TOKENS]);
-  for (const map of canonical.effective.values()) for (const token of map.keys()) tracked.add(token);
+  // The tracked set: every design token (canonical :root and every system's
+  // vars), the accent pair, and the shell geometry tokens. Design tokens are
+  // owned by the canonical pair alone; geometry is app-owned and lives in
+  // exactly one place — the top-level :root of client/src/styles/app-bridge.css
+  // (plus the responsive re-assignments of rule 9).
+  const designTokens = new Set(['--accent', '--accent-2', ...canonical.root.keys()]);
+  for (const map of canonical.effective.values()) for (const token of map.keys()) designTokens.add(token);
+  const tracked = new Set([...designTokens, ...GEOMETRY_TOKENS]);
 
   // Rule 9 — responsive geometry contract; no other scoped tracked declaration.
   const responsive = [];
+  let responsiveContract = new Set();
   if (canonical.responsive) {
     const scopedRoots = new Map();
     for (const record of app.scoped) {
@@ -2097,12 +2227,13 @@ export function compareModels(canonical, app, deviations = DOCUMENTED_DEVIATIONS
       mergeDeclarations(scopedRoots.get(context), record.props);
     }
     const expected = new Set();
+    const appPreApply = app.resolve(null);
     for (const entry of canonical.responsive) {
       const context = normaliseContext(entry.context);
       expected.add(`${context}::${entry.token}`);
       const canon = normaliseValue(entry.value);
       const appRaw = scopedRoots.get(context)?.get(entry.token);
-      const resolved = appRaw == null ? null : resolveVar(appRaw, app.root);
+      const resolved = appRaw == null ? null : resolveVar(appRaw, appPreApply);
       const appNorm = resolved == null ? null : normaliseValue(resolved);
       const status = appNorm == null ? 'missing' : appNorm === canon ? 'match' : 'mismatch';
       responsive.push({ token: entry.token, context: entry.context, canonical: canon, app: appNorm, declared: appRaw ?? null, status });
@@ -2110,6 +2241,8 @@ export function compareModels(canonical, app, deviations = DOCUMENTED_DEVIATIONS
       if (status === 'mismatch') failures.push(`responsive geometry: ${entry.token} inside ${entry.context} resolves to ${appNorm} but the design uses ${canon} (${entry.note})`);
     }
     for (const record of app.scoped) {
+      // Sibling sheets' scoped declarations are reported by rule 10, with their file.
+      if (record.file && record.file !== DEFAULT_PATHS.appCss) continue;
       const context = normaliseContext(record.context);
       for (const [prop, value] of record.props) {
         if (!tracked.has(prop)) continue;
@@ -2117,31 +2250,40 @@ export function compareModels(canonical, app, deviations = DOCUMENTED_DEVIATIONS
         failures.push(`scoped token: ${record.context} { ${record.selector} { ${prop}: ${normaliseValue(value)} } } re-declares a tracked token outside the responsive geometry contract — the design has no responsive token values`);
       }
     }
+    responsiveContract = expected;
   }
 
-  // Rule 10 — tracked tokens live only in the three canonical html-level forms
-  // of design-system.css.
+  // Rule 10 — single source: design tokens live only in the canonical sheet's
+  // :root and the applier's inline writes; shell geometry only in the bridge.
   const elsewhere = [];
   for (const record of app.elsewhere) {
     for (const [prop, value] of record.props) {
       if (!tracked.has(prop)) continue;
       elsewhere.push({ selector: record.selector, prop, value: normaliseValue(value) });
-      failures.push(`single source: ${record.selector} { ${prop}: ${normaliseValue(value)} } declares a tracked token outside :root / :root[data-system] / :root[data-accent] — custom properties inherit, so this repaints every element below it`);
+      failures.push(`single source: ${record.selector} { ${prop}: ${normaliseValue(value)} } declares a tracked token outside :root in ${DEFAULT_PATHS.appCss} — custom properties inherit, so this repaints every element below it`);
     }
   }
   for (const record of app.siblingDeclarations) {
     if (!tracked.has(record.prop)) continue;
     const where = record.context ? `${record.context} { ${record.selector} }` : record.selector;
+    if (!designTokens.has(record.prop) && record.file === DEFAULT_PATHS.appBridge && record.selector === ':root'
+      && (!record.context || responsiveContract.has(`${normaliseContext(record.context)}::${record.prop}`))) continue;
     elsewhere.push({ file: record.file, selector: where, prop: record.prop, value: normaliseValue(record.value) });
-    failures.push(`single source: ${record.file} ${where} { ${record.prop}: ${normaliseValue(record.value)} } declares a tracked token outside client/src/styles/design-system.css`);
+    failures.push(designTokens.has(record.prop)
+      ? `single source: ${record.file} ${where} { ${record.prop}: ${normaliseValue(record.value)} } redefines a canonical design token — only ${DEFAULT_PATHS.appCss} (:root) and applyDesignSystem() may set it`
+      : `single source: ${record.file} ${where} { ${record.prop}: ${normaliseValue(record.value)} } declares shell geometry outside the top-level :root of ${DEFAULT_PATHS.appBridge}`);
   }
   if (canonical.layers) {
     for (const record of [...canonical.layers.scoped, ...canonical.layers.elsewhere]) {
       for (const [prop] of record.props) {
         if (!tracked.has(prop)) continue;
-        failures.push(`canonical shape changed: styles.css ${record.context ? `${record.context} ` : ''}${record.selector} declares ${prop} outside :root — extend the cascade model before trusting this gate`);
+        failures.push(`canonical shape changed: ${DEFAULT_PATHS.canonicalCss} ${record.context ? `${record.context} ` : ''}${record.selector} declares ${prop} outside :root — extend the cascade model before trusting this gate`);
       }
     }
+  }
+
+  if (canonical.layers && (canonical.layers.systems.size || canonical.layers.accents.size)) {
+    failures.push(`canonical shape changed: ${DEFAULT_PATHS.canonicalCss} now carries :root[data-system]/:root[data-accent] token blocks — the model assumes systems and accents are painted inline by applyDesignSystem(); extend it before trusting this gate`);
   }
 
   // Rule 8 — canonical utility rules carried verbatim.
@@ -2178,7 +2320,7 @@ export function compareModels(canonical, app, deviations = DOCUMENTED_DEVIATIONS
           const reason = String(deviation.reason ?? '').trim();
           if (!reason) failures.push(`deviation ${devKey} has no written reason — write why or delete the entry`);
           else if (typeof deviation.holds !== 'function') failures.push(`deviation ${devKey} has no holds() check — a reason must be re-provable from data`);
-          else if (!deviation.holds({ canonical: canon, app: appNorm, canonicalRules: canonical.rules, appRules: app.rules })) failures.push(`deviation ${devKey} no longer holds (canonical ${canon} vs runtime ${appNorm}) — align the value or rewrite the entry`);
+          else if (!deviation.holds({ canonical: canon, app: appNorm, canonicalRules: canonical.rules, appRules: app.mergedRules ?? app.rules })) failures.push(`deviation ${devKey} no longer holds (canonical ${canon} vs runtime ${appNorm}) — align the value or rewrite the entry`);
           else { honoured.push({ system: `rule:${selector}`, token: prop, canonical: canon, app: appNorm, reason }); rows.push({ prop, canonical: canon, app: appNorm, status: 'documented-deviation' }); continue; }
         }
         rows.push({ prop, canonical: canon, app: appNorm, status: appNorm == null ? 'missing' : 'mismatch' });
@@ -2249,7 +2391,8 @@ export function compareModels(canonical, app, deviations = DOCUMENTED_DEVIATIONS
         continue;
       }
       const canon = normaliseValue(canonRaw);
-      const appRaw = app.rules.get(selector)?.get('height');
+      // What the document resolves once every app sheet cascades over the canonical one.
+      const appRaw = (app.mergedRules ?? app.rules).get(selector)?.get('height');
       const appNorm = appRaw == null ? 'auto' : normaliseValue(appRaw);
       if (appNorm === canon) continue;
       const devKey = `rule:${selector}:height`;
@@ -2259,7 +2402,7 @@ export function compareModels(canonical, app, deviations = DOCUMENTED_DEVIATIONS
         const reason = String(deviation.reason ?? '').trim();
         if (!reason) failures.push(`deviation ${devKey} has no written reason — write why or delete the entry`);
         else if (typeof deviation.holds !== 'function') failures.push(`deviation ${devKey} has no holds() check — a reason must be re-provable from data`);
-        else if (!deviation.holds({ canonical: canon, app: appNorm, canonicalRules: canonical.rules, appRules: app.rules })) failures.push(`deviation ${devKey} no longer holds (canonical ${canon} vs runtime ${appNorm}) — align the value or rewrite the entry`);
+        else if (!deviation.holds({ canonical: canon, app: appNorm, canonicalRules: canonical.rules, appRules: app.mergedRules ?? app.rules })) failures.push(`deviation ${devKey} no longer holds (canonical ${canon} vs runtime ${appNorm}) — align the value or rewrite the entry`);
         else { honoured.push({ system: `rule:${selector}`, token: 'height', canonical: canon, app: appNorm, reason }); continue; }
         continue;
       }
@@ -2290,10 +2433,12 @@ export function compareModels(canonical, app, deviations = DOCUMENTED_DEVIATIONS
   // declaration that outranks the accent block is a drift the block-level
   // compare cannot see).
   const combos = [];
+  if (canonical.paintsAccentPair === false) failures.push(`canonical ${DEFAULT_PATHS.canonicalJs}: applyDesignSystem no longer sets --accent/--accent-2 from primary/secondary — extend the model before trusting this gate`);
+  if (app.paintsAccentPair === false) failures.push(`served ${DEFAULT_PATHS.appJs}: applyDesignSystem no longer sets --accent/--accent-2 from primary/secondary — no accent paints`);
   for (const [id, canonAccent] of canonical.accents) {
     const appAccent = app.accents.get(id);
     if (!appAccent) {
-      failures.push(`accent "${id}" ships in the design but has no :root[data-accent="${id}"] block in the runtime`);
+      failures.push(`accent "${id}" ships in the design but is missing from the served ACCENTS (${DEFAULT_PATHS.appJs})`);
       continue;
     }
     for (const [field, token] of [['primary', '--accent'], ['secondary', '--accent-2']]) {
@@ -2324,7 +2469,7 @@ export function compareModels(canonical, app, deviations = DOCUMENTED_DEVIATIONS
     }
   }
   for (const [id] of app.accents) {
-    if (!canonical.accents.has(id)) failures.push(`runtime declares :root[data-accent="${id}"] but the design ships no such accent`);
+    if (!canonical.accents.has(id)) failures.push(`the served ACCENTS offers "${id}" but the design ships no such accent`);
   }
   if (app.accentProps) {
     for (const [id, props] of app.accentProps) {
@@ -2336,31 +2481,54 @@ export function compareModels(canonical, app, deviations = DOCUMENTED_DEVIATIONS
     }
   }
 
+  // Rule 5 — the runtime wrapper and the pre-paint boot agree with the design
+  // defaults and with each other, and restate none of the tables.
+  for (const [systemId, accentId] of canonical.defaultAccents) {
+    const appDefault = app.defaultAccents?.get(systemId) ?? null;
+    if (appDefault !== accentId) {
+      failures.push(`registry: default accent for "${systemId}" is ${appDefault ?? 'missing'} in the runtime but ${accentId} in the design`);
+    }
+  }
   if (app.registry) {
     const reg = app.registry;
-    for (const [systemId, accentId] of canonical.defaultAccents) {
-      const appDefault = reg.systems.get(systemId) ?? null;
-      if (appDefault !== accentId) {
-        failures.push(`registry: default accent for "${systemId}" is ${appDefault ?? 'missing'} in the runtime but ${accentId} in the design`);
-      }
+    const ts = DEFAULT_PATHS.appRegistry;
+    const designSystem = canonical.fallbacks?.system ?? null;
+    const designAccent = designSystem ? canonical.defaultAccents.get(designSystem) ?? null : null;
+    if (reg.defaultSystem !== designSystem || reg.defaultAccent !== designAccent) {
+      failures.push(`registry: boot default is ${reg.defaultSystem}/${reg.defaultAccent} in ${ts}; the design boots ${designSystem}/${designAccent} (applyDesignSystem's fallback system and its SYSTEM_DEFAULT_ACCENT)`);
     }
-    if (reg.defaultSystem !== 'editorial' || reg.defaultAccent !== canonical.defaultAccents.get('editorial')) {
-      failures.push(`registry: boot default is ${reg.defaultSystem}/${reg.defaultAccent}; the design boots editorial/${canonical.defaultAccents.get('editorial')}`);
+    if (reg.defaultAccent !== (canonical.fallbacks?.accent ?? null)) {
+      failures.push(`registry: DEFAULT_ACCENT ${reg.defaultAccent} in ${ts} is not the accent applyDesignSystem falls back to (${canonical.fallbacks?.accent ?? 'none'})`);
     }
-    for (const [id, canonAccent] of canonical.accents) {
-      const appAccent = reg.accents.get(id);
-      if (!appAccent) {
-        failures.push(`registry: accent "${id}" ships in the design but is missing from THEME_FALLBACK_REGISTRY`);
-        continue;
-      }
-      for (const field of ['primary', 'secondary']) {
-        if (normaliseValue(appAccent[field]) !== normaliseValue(canonAccent[field])) {
-          failures.push(`registry: accent "${id}" ${field} is ${appAccent[field]} in the runtime but ${canonAccent[field]} in the design`);
+    for (const name of reg.restated) {
+      failures.push(`registry: ${ts} restates ${name} — the tables live only in ${DEFAULT_PATHS.appJs}; read the window globals through the getters`);
+    }
+    for (const global of ['DESIGN_SYSTEMS', 'ACCENTS', 'SYSTEM_DEFAULT_ACCENT']) {
+      if (!reg.readsGlobals.has(global)) failures.push(`registry: ${ts} never reads window.${global} — its getters must read the canonical globals`);
+    }
+    for (const [field, label] of [['systemKey', 'SYSTEM_STORAGE_KEY'], ['accentKey', 'ACCENT_STORAGE_KEY']]) {
+      if (!reg[field]) failures.push(`registry: could not read ${label} out of ${ts}`);
+    }
+    const boot = app.boot;
+    const html = DEFAULT_PATHS.appIndexHtml;
+    if (boot && app.load?.boot) {
+      for (const [field, label, expected] of [
+        ['systemKey', 'system storage key', reg.systemKey],
+        ['accentKey', 'accent storage key', reg.accentKey],
+        ['fallbackSystem', 'fallback system', reg.defaultSystem],
+      ]) {
+        const got = boot[field];
+        if (got.expr == null) {
+          failures.push(`boot: could not locate the ${label} in the ${html} pre-paint script — teach parseThemeBoot() the new shape rather than leaving it unchecked`);
+        } else if (got.value == null) {
+          failures.push(got.marker
+            ? `boot: ${html} reads its ${label} from ${got.expr}, but ${DEFAULT_PATHS.viteConfig} does not inject design-system.ts THEME_BOOT_DATA for ${THEME_BOOT_MARKER} (or THEME_BOOT_DATA lacks that field)`
+            : `boot: the ${label} in ${html} (${got.expr}) is neither a string literal nor injected THEME_BOOT data`);
+        } else if (got.value !== expected) {
+          failures.push(`boot: ${html} uses ${label} "${got.value}" but ${ts} uses "${expected}" — a saved choice is read from a different place than it is written`);
         }
       }
-    }
-    for (const [id] of reg.accents) {
-      if (!canonical.accents.has(id)) failures.push(`registry: accent "${id}" is offered by the runtime but the design ships no such accent`);
+      if (boot.handCopied) failures.push(`boot: ${html} hand-copies a system/accent table into the pre-paint script — read window.DESIGN_SYSTEMS/ACCENTS instead`);
     }
   }
 
@@ -2371,14 +2539,27 @@ export function compareModels(canonical, app, deviations = DOCUMENTED_DEVIATIONS
   // unconditionally; no @import may be misplaced or doubled; the layer order
   // must not depend on which conditional rules currently match.
   const reach = app.reach ?? null;
+  const load = app.load ?? null;
+  const html = DEFAULT_PATHS.appIndexHtml;
+  if (load) {
+    // Rule 12 — the canonical pair loads unconditionally and before the boot.
+    if (!load.css) {
+      failures.push(`document: ${html} has no <link rel="stylesheet" href="${CSS_HREF}"> — ${DEFAULT_PATHS.appCss} is never loaded and the runtime paints no design token at all`);
+    } else if (load.css.media && !/^\s*(all|screen)?\s*$/i.test(load.css.media)) {
+      failures.push(`document: the ${CSS_HREF} <link> in ${html} carries media="${load.css.media}" — its tokens apply only while that query matches; link it unconditionally`);
+    }
+    if (load.cssCount > 1) failures.push(`document: ${html} links ${CSS_HREF} ${load.cssCount} times — every rule of it would apply at two document positions`);
+    if (!load.js) {
+      failures.push(`document: ${html} has no <script src="${JS_HREF}"> — no system or accent is ever applied`);
+    } else {
+      const how = [load.js.async && 'async', load.js.defer && 'defer', load.js.module && 'type="module"'].filter(Boolean);
+      if (how.length) failures.push(`document: <script src="${JS_HREF}"> in ${html} is ${how.join(' + ')} — it must load synchronously so applyDesignSystem exists before the boot paints`);
+      if (!load.boot) failures.push(`document: no inline script in ${html} calls applyDesignSystem() — the saved system is never painted before hydration`);
+      else if (load.js.index > load.boot.index) failures.push(`document: <script src="${JS_HREF}"> comes after the pre-paint boot in ${html} — the boot calls an applier that does not exist yet`);
+    }
+  }
   if (reach) {
     const entry = reach.entry ?? DEFAULT_PATHS.appEntryCss;
-    if (!reach.main?.reached) {
-      const missing = (reach.unresolved ?? []).find((u) => u.resolved === DEFAULT_PATHS.appCss);
-      failures.push(`document: ${DEFAULT_PATHS.appCss} is never loaded — no @import chain from ${entry} (or ${DEFAULT_PATHS.appIndexHtml}) reaches it${missing ? ` (${missing.file} imports "${missing.spec}", which does not exist)` : ''} — the runtime paints no design token at all`);
-    } else if (reach.main?.context) {
-      failures.push(`document: ${DEFAULT_PATHS.appCss} is imported under "${reach.main.context}" (${reach.main.importer}) — its tokens apply only while that condition holds; import it unconditionally`);
-    }
     for (const m of reach.misplaced ?? []) {
       failures.push(`misplaced @import: "${m.spec}" in ${m.file} ${m.reason} — the Tailwind compiler inlines it where it sits (so it IS modelled there), but css-syntax, postcss-import and a browser given the raw sheet drop an @import that is not at the top of its sheet (only @charset, @layer statements and other @imports may precede it); move it up so every pipeline agrees`);
     }
@@ -2405,7 +2586,7 @@ export function compareModels(canonical, app, deviations = DOCUMENTED_DEVIATIONS
     elsewhere,
     cascade: {
       rootBlocks: app.sheet?.occurrences.get(':root') ?? null,
-      systemBlocks: Object.fromEntries([...app.systems.keys()].map((id) => [id, app.sheet?.occurrences.get(`:root[data-system="${id}"]`) ?? null])),
+      systemBlocks: Object.fromEntries([...(app.systemBlocks ?? new Map()).keys()].map((id) => [id, app.sheet?.occurrences.get(`:root[data-system="${id}"]`) ?? null])),
       scopedDeclarations: app.scoped.reduce((n, r) => n + r.props.size, 0),
       siblingDeclarations: app.siblingDeclarations.length,
       layers: app.layerOrder ? app.layerOrder.list() : [],
@@ -2498,7 +2679,6 @@ const prepend = (text) => (source) => `${text}\n${source}`;
 const append = (text) => (source) => `${source}\n${text}\n`;
 const bypassSheet = `${TABLET_MEDIA} { @layer early { ${bypass} } }`;
 const restoreSheet = `${TABLET_MEDIA} { ${restore} }`;
-const mainImport = "@import './styles/design-system.css';";
 export const DOCUMENT_CANARIES = {
   // The reviewer's round-5 bypass: `@layer early;` written ABOVE the imports
   // registers before the imported sheets' layers (browsers place an importer's
@@ -2521,15 +2701,10 @@ export const DOCUMENT_CANARIES = {
   'conditional-import-media-matches': { files: { [INDEX_CSS]: prepend("@import '../canary/bypass.css' (min-width: 800px);"), [CANARY_BYPASS]: bypassSheet }, browser: 'block' },
   // A print-only import is not a screen surface.
   'conditional-import-print-only': { files: { [INDEX_CSS]: prepend("@import '../canary/bypass.css' print;"), [CANARY_BYPASS]: bypassSheet }, browser: 'none' },
-  // The main sheet's import moved below index.css's first rule: still inlined
-  // (the browser paints .chip inline-flex), but misplaced — and now behind
-  // Tailwind's layer statement, so the order becomes theme < base.
-  'main-sheet-import-after-rule': { files: { [INDEX_CSS]: (source) => swap(source.replace(`${mainImport}\n`, ''), '\n@layer base {', `\n${mainImport}\n@layer base {`, 'index.css @layer base block') }, browser: 'inline-flex', element: '.chip', property: 'display' },
-  // The main sheet not imported at all: no token, no utility.
-  'main-sheet-import-removed': { files: { [INDEX_CSS]: (source) => swap(source, `${mainImport}\n`, '', 'index.css design-system import') }, browser: 'block', element: '.chip', property: 'display' },
-  // The main sheet imported under a media condition applies only while it
-  // matches (a 900px viewport fails min-width: 1200px).
-  'main-sheet-import-conditional': { files: { [INDEX_CSS]: (source) => swap(source, mainImport, "@import './styles/design-system.css' (min-width: 1200px);", 'index.css design-system import') }, browser: 'block', element: '.chip', property: 'display' },
+  // The canonical sheet is <link>ed by client/index.html; an @import of it
+  // from index.css loads it a second time, at the bundle's position (the
+  // browser paints .chip inline-flex from that copy even without the link).
+  'main-sheet-reimported': { files: { [INDEX_CSS]: prepend(`@import '${CSS_HREF}';`) }, browser: 'inline-flex', element: '.chip', property: 'display' },
   // Rule 14 alone: `late` is declared first only at ≥1200px; at 900px the
   // browser meets `early` first, so early < late and the bypass wins — while
   // the all-conditions-true shadow computation sees late < early and the
@@ -2560,37 +2735,31 @@ export function overlayFiles(files) {
 export const CANARIES = [
   { id: 'control', note: 'unmodified inputs', expect: 'PASS' },
   // --- cascade bypasses -----------------------------------------------------
-  { id: 'later-root-override', note: 'a second :root at the end of the file re-declares --bg', expect: /^editorial: --bg differs/, mutate: { appCss: (s) => `${s}\n:root { --bg: #123456; }\n` } },
-  { id: 'later-root-important', note: 'a later :root sets --radius !important', expect: /^editorial: --radius differs/, mutate: { appCss: (s) => `${s}\n:root { --radius: 10px !important; }\n` } },
-  { id: 'earlier-important-wins', note: 'an earlier !important --radius survives a later plain override (browser semantics)', expect: /^editorial: --radius differs — design 12px vs runtime 9px !important/, mutate: { appCss: (s) => `:root { --radius: 9px !important; }\n${s}\n:root { --radius: 12px; }\n` } },
-  { id: 'later-system-block', note: 'a second :root[data-system="geist"] block overrides --surface', expect: /^geist: --surface differs/, mutate: { appCss: (s) => `${s}\n:root[data-system="geist"] { --surface: rgba(255,255,255,0.05); }\n` } },
-  { id: 'important-root-vs-system', note: 'a :root !important --surface outranks a later, canonical-valued editorial system block (importance beats specificity)', expect: /^editorial: --surface differs — design .+ vs runtime #010203 !important/, mutate: { appCss: (s) => {
-    const value = must(s, /:root\s*\{[^}]*?--surface:\s*([^;]+);/, 'root --surface').exec(s)[1].trim();
-    return `:root { --surface: #010203 !important; }\n${s}\n:root[data-system="editorial"] { --surface: ${value}; }\n`;
-  } } },
-  { id: 'important-accent-combo', note: 'a system block sets --accent !important, outranking every accent block', expect: /^accent combo geist\/cyan: --accent resolves to #ff0000 !important in the runtime but the design paints/, mutate: { appCss: (s) => `${s}\n:root[data-system="geist"] { --accent: #ff0000 !important; }\n` } },
-  { id: 'late-system-accent', note: 'a system block after the accent blocks sets --accent (same specificity, later wins)', expect: /^accent combo geist\/cyan: --accent resolves to #ff0000 in the runtime but the design paints/, mutate: { appCss: (s) => `${s}\n:root[data-system="geist"] { --accent: #ff0000; }\n` } },
-  { id: 'system-geometry-drift', note: 'a system block re-declares --content-max (geometry is system-independent in the design)', expect: /^geometry: --content-max differs in geist — design 1240px vs runtime 1000px/, mutate: { appCss: (s) => `${s}\n:root[data-system="geist"] { --content-max: 1000px; }\n` } },
+  { id: 'later-root-override', note: 'the bridge re-declares --bg on :root — the applier\'s inline write still paints every system, but the pre-apply paint and the single source break', expect: /^single source: client\/src\/styles\/app-bridge\.css :root \{ --bg: #123456 \} redefines a canonical design token/, also: [/^pre-apply: --bg differs — design .+ vs runtime #123456/], reject: /^editorial: --bg differs/, mutate: { bridge: (s) => `${s}\n:root { --bg: #123456; }\n` } },
+  { id: 'later-root-important', note: 'a later :root sets --radius !important', expect: /^editorial: --radius differs/, mutate: { bridge: (s) => `${s}\n:root { --radius: 10px !important; }\n` } },
+  { id: 'earlier-important-wins', note: 'an earlier !important --radius survives a later plain override (browser semantics)', expect: /^editorial: --radius differs — design 12px vs runtime 9px !important/, mutate: { bridge: (s) => `:root { --radius: 9px !important; }\n${s}\n:root { --radius: 12px; }\n` } },
+  { id: 'later-system-block', note: 'a bridge :root[data-system="geist"] block re-declares --surface (the inline write still wins; the single source breaks)', expect: /^single source: client\/src\/styles\/app-bridge\.css :root\[data-system="geist"\] \{ --surface: .+ \} redefines a canonical design token/, reject: /^geist: --surface differs/, mutate: { bridge: (s) => `${s}\n:root[data-system="geist"] { --surface: rgba(255,255,255,0.05); }\n` } },
+  { id: 'important-root-vs-system', note: 'a bridge :root !important --surface outranks a later, canonical-valued editorial system block and the inline write (importance beats specificity and inline)', expect: /^editorial: --surface differs — design .+ vs runtime #010203 !important/, mutate: { bridge: (s) => `:root { --surface: #010203 !important; }\n${s}\n:root[data-system="editorial"] { --surface: rgba(244,243,238,0.025); }\n` } },
+  { id: 'important-accent-combo', note: 'a system block sets --accent !important, outranking every accent block', expect: /^accent combo geist\/cyan: --accent resolves to #ff0000 !important in the runtime but the design paints/, mutate: { bridge: (s) => `${s}\n:root[data-system="geist"] { --accent: #ff0000 !important; }\n` } },
+  { id: 'late-system-accent', note: 'a bridge system block sets --accent without !important — the applier\'s inline accent still wins, the single source does not', expect: /^single source: client\/src\/styles\/app-bridge\.css :root\[data-system="geist"\] \{ --accent: #ff0000 \} redefines a canonical design token/, reject: /^accent combo/, mutate: { bridge: (s) => `${s}\n:root[data-system="geist"] { --accent: #ff0000; }\n` } },
+  { id: 'system-geometry-drift', note: 'a system block re-declares --content-max (geometry is system-independent in the design)', expect: /^geometry: --content-max differs in geist — design 1240px vs runtime 1000px/, mutate: { bridge: (s) => `${s}\n:root[data-system="geist"] { --content-max: 1000px; }\n` } },
   { id: 'later-utility-override', note: 'a repeated .chip rule changes font-size', expect: /^utility \.chip: font-size differs/, mutate: { appCss: (s) => `${s}\n.chip { font-size: 12px; }\n` } },
-  { id: 'later-utility-under-media', note: '.chip re-declared under a media query', expect: /^shadow rule: @media \(max-width: 600px\)\|\|\.chip re-declares font-size for \.chip under @media \(max-width:600px\)/, mutate: { appCss: (s) => `${s}\n@media (max-width: 600px) { .chip { font-size: 12px; } }\n` } },
-  { id: 'descendant-override', note: '.page .chip re-declares font-size', expect: /^shadow rule: \.page \.chip re-declares font-size/, mutate: { appCss: (s) => `${s}\n.page .chip { font-size: 12px; }\n` } },
-  { id: 'page-atmosphere-pseudo-dropped', note: '.page::after stops carrying the atmosphere — the .page background deviation must stop holding', expect: /^deviation rule:\.page:background no longer holds/, mutate: { appCss: (s) => `${s}\n.page::after { background: none; }\n` } },
-  { id: 'page-atmosphere-clip-dropped', note: '.page::after loses its clip-path token — the deviation is only honoured for the documented pseudo contract', expect: /^deviation rule:\.page:background no longer holds/, mutate: { appCss: (s) => `${s}\n.page::after { clip-path: none; }\n` } },
-  { id: 'page-atmosphere-repeat-dropped', note: '.page::after loses its background-repeat token — a repeated atmosphere re-rasterises the whole gradient bitmap per tile', expect: /^deviation rule:\.page:background no longer holds/, mutate: { appCss: (s) => `${s}\n.page::after { background-repeat: repeat; }\n` } },
-  { id: 'page-atmosphere-plane-dropped', note: '.page::before stops painting var(--bg) — the transparent .page would expose whatever lies beneath', expect: /^deviation rule:\.page:background-color no longer holds/, mutate: { appCss: (s) => `${s}\n.page::before { background: transparent; }\n` } },
-  { id: 'state-override', note: '.chip:hover re-declares background', expect: /^shadow rule: \.chip:hover re-declares background for \.chip when :hover/, mutate: { appCss: (s) => `${s}\n.chip:hover { background: red; }\n` } },
+  { id: 'later-utility-under-media', note: '.chip re-declared under a media query in the bridge', expect: /^shadow rule: client\/src\/styles\/app-bridge\.css @media \(max-width: 600px\)\|\|\.chip re-declares text-transform for \.chip under @media \(max-width:600px\)/, mutate: { bridge: (s) => `${s}\n@media (max-width: 600px) { .chip { text-transform: lowercase; } }\n` } },
+  { id: 'descendant-override', note: '.page .chip re-declares text-transform in the bridge', expect: /^shadow rule: client\/src\/styles\/app-bridge\.css \.page \.chip re-declares text-transform/, mutate: { bridge: (s) => `${s}\n.page .chip { text-transform: lowercase; }\n` } },
+  { id: 'page-background-shadow', note: 'the bridge repaints .page (the retired .page atmosphere deviation must not come back silently)', expect: /^shadow rule: client\/src\/styles\/app-bridge\.css \.page re-declares background for \.page/, mutate: { bridge: (s) => `${s}\n.page { background: transparent; }\n` } },
+  { id: 'state-override', note: '.chip:hover re-declares background', expect: /^shadow rule: client\/src\/styles\/app-bridge\.css \.chip:hover re-declares background for \.chip when :hover/, mutate: { bridge: (s) => `${s}\n.chip:hover { background: red; }\n` } },
   // --- selector-equivalent shadows (decided by a selector engine, not by the selector text) ---
-  { id: 'escaped-class-shadow', note: '.\\63 hip is .chip spelled with a hex escape — the engine must decode it, not split on the terminator space', expect: /^shadow rule: \.\\63 hip re-declares font-size for \.chip — runtime resolves 99px/, mutate: { appCss: (s) => `${s}\n.\\63 hip { font-size: 99px; }\n` } },
-  { id: 'attribute-class-shadow', note: '[class~="chip"] re-declares font-size (same element, same specificity, later wins)', expect: /^shadow rule: \[class~="chip"\] re-declares font-size for \.chip — runtime resolves 99px, design resolves 10\.5px/, mutate: { appCss: (s) => `${s}\n[class~="chip"] { font-size: 99px; }\n` } },
-  { id: 'is-shadow', note: ':is(.chip) re-declares font-size', expect: /^shadow rule: :is\(\.chip\) re-declares font-size for \.chip/, mutate: { appCss: (s) => `${s}\n:is(.chip) { font-size: 99px; }\n` } },
-  { id: 'not-shadow', note: '.chip:not(.accent) re-declares font-size (higher specificity)', expect: /^shadow rule: \.chip:not\(\.accent\) re-declares font-size for \.chip/, mutate: { appCss: (s) => `${s}\n.chip:not(.accent) { font-size: 99px; }\n` } },
-  { id: 'tag-qualified-shadow', note: 'span.chip re-declares font-size (type selector adds specificity)', expect: /^shadow rule: span\.chip re-declares font-size for \.chip/, mutate: { appCss: (s) => `${s}\nspan.chip { font-size: 99px; }\n` } },
-  { id: 'where-no-op', note: ':where(.chip) re-declares font-size at zero specificity — the canonical rule still wins', expect: 'PASS', mutate: { appCss: (s) => `${s}\n:where(.chip) { font-size: 99px; }\n` } },
-  { id: 'where-important-shadow', note: ':where(.chip) !important outranks the canonical rule despite zero specificity', expect: /^shadow rule: :where\(\.chip\) re-declares font-size for \.chip — runtime resolves 99px !important/, mutate: { appCss: (s) => `${s}\n:where(.chip) { font-size: 99px !important; }\n` } },
-  { id: 'system-scoped-shadow', note: ':root[data-system="geist"] .chip re-declares font-size for one system only', expect: /^shadow rule: :root\[data-system="geist"\] \.chip re-declares font-size for \.chip — runtime resolves 99px, design resolves 10\.5px \[geist\]$/, mutate: { appCss: (s) => `${s}\n:root[data-system="geist"] .chip { font-size: 99px; }\n` } },
-  { id: 'sibling-shadow', note: 'another client stylesheet (position unknown → ranked last) re-declares .chip font-size', expect: /^shadow rule: client\/src\/styles\/canary\.css \.chip re-declares font-size for \.chip/, mutate: { siblings: (list) => [...list, { file: 'client/src/styles/canary.css', css: '.chip { font-size: 99px; }' }] } },
-  { id: 'admin-descendant-shadow', note: 'the admin sheet scopes a .chip override under .admin-dashboard', expect: /^shadow rule: client\/src\/components\/admin\/admin-canonical\.css \.admin-dashboard \.chip re-declares font-size for \.chip/, mutate: { siblings: (list) => [...list, { file: 'client/src/components/admin/admin-canonical.css', css: '.admin-dashboard .chip { font-size: 99px; }' }] } },
-  { id: 'layered-shadow-no-op', note: 'a sibling re-declares .chip inside @layer — unlayered canonical rules outrank it', expect: 'PASS', mutate: { siblings: (list) => [...list, { file: 'client/src/styles/canary.css', css: '@layer components { .chip { font-size: 99px; } }' }] } },
+  { id: 'escaped-class-shadow', note: '.\\63 hip is .chip spelled with a hex escape — the engine must decode it, not split on the terminator space', expect: /^shadow rule: client\/src\/styles\/app-bridge\.css \.\\63 hip re-declares text-transform for \.chip — runtime resolves lowercase/, mutate: { bridge: (s) => `${s}\n.\\63 hip { text-transform: lowercase; }\n` } },
+  { id: 'attribute-class-shadow', note: '[class~="chip"] re-declares text-transform (same element, same specificity, later wins)', expect: /^shadow rule: client\/src\/styles\/app-bridge\.css \[class~="chip"\] re-declares text-transform for \.chip — runtime resolves lowercase, design resolves uppercase/, mutate: { bridge: (s) => `${s}\n[class~="chip"] { text-transform: lowercase; }\n` } },
+  { id: 'is-shadow', note: ':is(.chip) re-declares text-transform', expect: /^shadow rule: client\/src\/styles\/app-bridge\.css :is\(\.chip\) re-declares text-transform for \.chip/, mutate: { bridge: (s) => `${s}\n:is(.chip) { text-transform: lowercase; }\n` } },
+  { id: 'not-shadow', note: '.chip:not(.accent) re-declares text-transform (higher specificity)', expect: /^shadow rule: client\/src\/styles\/app-bridge\.css \.chip:not\(\.accent\) re-declares text-transform for \.chip/, mutate: { bridge: (s) => `${s}\n.chip:not(.accent) { text-transform: lowercase; }\n` } },
+  { id: 'tag-qualified-shadow', note: 'span.chip re-declares text-transform (type selector adds specificity)', expect: /^shadow rule: client\/src\/styles\/app-bridge\.css span\.chip re-declares text-transform for \.chip/, mutate: { bridge: (s) => `${s}\nspan.chip { text-transform: lowercase; }\n` } },
+  { id: 'where-no-op', note: ':where(.chip) re-declares text-transform at zero specificity — the canonical rule still wins', expect: 'PASS', mutate: { bridge: (s) => `${s}\n:where(.chip) { text-transform: lowercase; }\n` } },
+  { id: 'where-important-shadow', note: ':where(.chip) !important outranks the canonical rule despite zero specificity', expect: /^shadow rule: client\/src\/styles\/app-bridge\.css :where\(\.chip\) re-declares text-transform for \.chip — runtime resolves lowercase !important/, mutate: { bridge: (s) => `${s}\n:where(.chip) { text-transform: lowercase !important; }\n` } },
+  { id: 'system-scoped-shadow', note: ':root[data-system="geist"] .chip re-declares text-transform for one system only', expect: /^shadow rule: client\/src\/styles\/app-bridge\.css :root\[data-system="geist"\] \.chip re-declares text-transform for \.chip — runtime resolves lowercase, design resolves none via \[data-system="geist"\] \.chip \[geist\]$/, mutate: { bridge: (s) => `${s}\n:root[data-system="geist"] .chip { text-transform: lowercase; }\n` } },
+  { id: 'sibling-shadow', note: 'another client stylesheet (position unknown → ranked last) re-declares .chip text-transform', expect: /^shadow rule: client\/src\/styles\/canary\.css \.chip re-declares text-transform for \.chip/, mutate: { siblings: (list) => [...list, { file: 'client/src/styles/canary.css', css: '.chip { text-transform: lowercase; }' }] } },
+  { id: 'admin-descendant-shadow', note: 'the admin sheet scopes a .chip override under .admin-dashboard', expect: /^shadow rule: client\/src\/components\/admin\/admin-canonical\.css \.admin-dashboard \.chip re-declares text-transform for \.chip/, mutate: { siblings: (list) => [...list, { file: 'client/src/components/admin/admin-canonical.css', css: '.admin-dashboard .chip { text-transform: lowercase; }' }] } },
+  { id: 'layered-shadow-no-op', note: 'a sibling re-declares .chip inside @layer — unlayered canonical rules outrank it', expect: 'PASS', mutate: { siblings: (list) => [...list, { file: 'client/src/styles/canary.css', css: '@layer components { .chip { text-transform: lowercase; } }' }] } },
   layerCanary('two-layer-important-earlier-wins', /^shadow rule: client\/src\/styles\/canary\.css @media \(max-width: 1024px\) @layer early\|\|:where\(\.hide-tablet\) re-declares display for \.hide-tablet under @media \(max-width:1024px\) — runtime resolves block !important, design resolves none !important$/, 'reviewer bypass: earlier layer :where() !important beats a later layer\'s higher-specificity !important restore and the unlayered canonical rule'),
   layerCanary('two-layer-important-canonical-earlier', 'PASS', 'two layers, canonical restore in the earlier layer — the browser paints the design value'),
   layerCanary('layer-statement-sets-order-pass', 'PASS', '`@layer late, early;` declares late first, so its restore outranks the early-block bypass'),
@@ -2609,70 +2778,98 @@ export const CANARIES = [
   documentCanary('duplicate-import', /^duplicate @import: client\/canary\/bypass\.css is imported again by client\/src\/index\.css \("\.\.\/canary\/bypass\.css"\) after client\/src\/index\.css already loaded it/, 'a sheet imported twice is inlined twice — reported, first copy modelled', { also: [/^shadow rule: client\/canary\/bypass\.css @media \(max-width: 1024px\) @layer early\|\|:where\(\.hide-tablet\)/] }),
   documentCanary('conditional-import-media-matches', /^shadow rule: client\/canary\/bypass\.css @media \(min-width: 800px\) @media \(max-width: 1024px\) @layer early\|\|:where\(\.hide-tablet\) re-declares display for \.hide-tablet under @media \(min-width:800px\) @media \(max-width:1024px\) — runtime resolves block !important/, 'an @import with a media list is a media-scoped sheet — modelled under that condition'),
   documentCanary('conditional-import-print-only', 'PASS', 'an @import … print is print-only and not a screen parity surface'),
-  documentCanary('main-sheet-import-after-rule', /^misplaced @import: "\.\/styles\/design-system\.css" in client\/src\/index\.css it follows another rule/, 'the main sheet\'s import moved below index.css\'s first rule still loads (inlined) but is misplaced — rule 13', { reject: /^document: / }),
-  documentCanary('main-sheet-import-removed', /^document: client\/src\/styles\/design-system\.css is never loaded — no @import chain from client\/src\/index\.css \(or client\/index\.html\) reaches it — the runtime paints no design token at all$/, 'without its import the main sheet never loads — rule 12'),
-  documentCanary('main-sheet-import-conditional', /^document: client\/src\/styles\/design-system\.css is imported under "@media \(min-width: 1200px\)" \(client\/src\/index\.css\)/, 'the main sheet imported under a media list applies only while it matches'),
+  documentCanary('main-sheet-reimported', /^duplicate @import: client\/public\/ds\/design-system\.css is imported again by client\/src\/index\.css \("\/ds\/design-system\.css"\) after client\/index\.html already loaded it/, 'index.css @imports the canonical sheet index.html already links — rule 13 names the second load'),
   documentCanary('layer-order-conditional-first-declaration', /^layer order: cascade layers "late" and "early" are ordered by a condition — ahead of "early" \(client\/canary\/bypass-late\.css inside @media \(max-width:1024px\)\) "late" is declared only conditionally \(client\/canary\/late-desktop\.css inside @media \(min-width:1200px\)\) and it is declared again after it \(client\/canary\/bypass-late\.css inside @media \(max-width:1024px\)\)/, 'late is first declared only at ≥1200px, so at 900px early registers first and its bypass wins — the shadow computation (all conditions true) sees the restore win, only rule 14 catches it', { reject: /^shadow rule:/ }),
-  { id: 'import-layer-main-sheet', note: 'index.css imports design-system.css with layer(theme): an EARLIER unlayered index.html :root now beats it (unlayered outranks any layer) — rule 3 must see the browser value', expect: /^editorial: --bg differs — design .+ vs runtime #000001$/, mutate: { mainLayer: () => 'theme', siblings: (list) => [...list, { file: 'client/index.html', css: ':root { --bg: #000001; }', order: -1 }] } },
-  { id: 'import-layer-sibling-loses', note: 'a LATER sibling imported with layer(x) re-declares .chip — the unlayered canonical rule still wins', expect: 'PASS', mutate: { siblings: (list) => [...list, { file: 'client/src/styles/canary.css', css: '.chip { font-size: 99px; }', layer: 'x' }] } },
-  { id: 'print-shadow-ignored', note: 'a print-only .chip override is not a screen parity surface', expect: 'PASS', mutate: { appCss: (s) => `${s}\n@media print { .chip { font-size: 99px; } }\n` } },
-  { id: 'not-print-shadow-resolves', note: '@media not print DOES apply on screen — only a print-only query list is excluded', expect: /^shadow rule: @media not print\|\|\.chip re-declares font-size for \.chip under @media not print — runtime resolves 99px/, mutate: { appCss: (s) => `${s}\n@media not print { .chip { font-size: 99px; } }\n` } },
-  { id: 'screen-print-list-shadow-resolves', note: '@media screen, print matches screens too', expect: /^shadow rule: @media screen, print\|\|\.chip re-declares font-size for \.chip under @media screen, print — runtime resolves 99px/, mutate: { appCss: (s) => `${s}\n@media screen, print { .chip { font-size: 99px; } }\n` } },
-  { id: 'nested-descendant-shadow', note: 'CSS Nesting: .page { .chip {} } is .page .chip and outranks the utility', expect: /^shadow rule: \.page \.chip re-declares font-size for \.chip — runtime resolves 99px/, mutate: { appCss: (s) => `${s}\n.page { .chip { font-size: 99px; } }\n` } },
-  { id: 'nested-ampersand-media-shadow', note: 'CSS Nesting: .chip { @media (…) { … } } is a media-scoped .chip rule', expect: /^shadow rule: @media \(min-width: 0px\)\|\|\.chip re-declares font-size for \.chip under @media \(min-width:0px\) — runtime resolves 99px/, mutate: { appCss: (s) => `${s}\n.chip { @media (min-width: 0px) { font-size: 99px; } }\n` } },
-  { id: 'nested-root-media-geometry', note: 'CSS Nesting: :root { @media (tablet) { --shell-sidebar-w } } is the responsive geometry contract', expect: /^responsive geometry: --shell-sidebar-w inside @media \(min-width: 768px\) and \(max-width: 1023px\) resolves to 200px/, mutate: { appCss: (s) => `${s}\n:root { @media (min-width: 768px) and (max-width: 1023px) { --shell-sidebar-w: 200px; } }\n` } },
-  { id: 'nested-ampersand-root-token', note: 'CSS Nesting: :root { & { --bg } } is a later :root declaration', expect: /^editorial: --bg differs — design #000000 vs runtime #010204/, mutate: { appCss: (s) => `${s}\n:root { & { --bg: #010204; } }\n` } },
-  { id: 'universal-important-shadow', note: '* { font-size !important } outranks every utility rule', expect: /^shadow rule: \* re-declares font-size for \.chip — runtime resolves 99px !important/, mutate: { appCss: (s) => `${s}\n* { font-size: 99px !important; }\n` } },
-  { id: 'no-anim-deviation-stale', note: 'the runtime narrows .no-anim * to the design\'s scope (entry becomes stale)', expect: /^deviation shadow:\.no-anim \*:transition is stale/, mutate: { appCss: (s) => swap(s, /\.no-anim,\s*\n\.no-anim \*,\s*\n\.no-anim \*::before,\s*\n\.no-anim \*::after \{/, '.no-anim .live-dot {', '.no-anim blanket rule') } },
-  { id: 'no-anim-deviation-no-longer-holds', note: '.no-anim * still wins but no longer freezes (the reason cites a blanket freeze)', expect: /^deviation shadow:\.no-anim \*:transition no longer holds/, mutate: { appCss: (s) => swap(s, /(\.no-anim \*::after \{[^}]*transition:\s*)none !important/, '$1all 1s !important', '.no-anim transition !important') } },
-  { id: 'extra-tablet-override', note: 'a later tablet media block sets --shell-sidebar-w to 200px', expect: /^responsive geometry: --shell-sidebar-w inside @media \(min-width: 768px\) and \(max-width: 1023px\) resolves to 200px/, mutate: { appCss: (s) => `${s}\n@media (min-width: 768px) and (max-width: 1023px) { :root { --shell-sidebar-w: 200px; } }\n` } },
-  { id: 'removed-tablet-override', note: 'the tablet --shell-sidebar-w re-assignment is deleted', expect: /^responsive geometry: --shell-sidebar-w is not re-assigned inside/, mutate: { appCss: (s) => swap(s, /@media \(min-width: 768px\) and \(max-width: 1023px\)\s*\{\s*:root\s*\{\s*--shell-sidebar-w:[^}]*\}\s*\}/, '', 'tablet sidebar override') } },
-  { id: 'changed-media-query', note: 'the tablet query upper bound moves to 1100px', expect: /^responsive geometry: --shell-sidebar-w is not re-assigned inside/, mutate: { appCss: (s) => swap(s, /\(max-width: 1023px\)\s*\{\s*:root\s*\{\s*--shell-sidebar-w/, '(max-width: 1100px) { :root { --shell-sidebar-w', 'tablet query') } },
-  { id: 'changed-media-value', note: 'the mobile --shell-header-h drops to 60px', expect: /^responsive geometry: --shell-header-h inside @media \(max-width: 767px\) resolves to 60px/, mutate: { appCss: (s) => swap(s, /(--shell-header-h:\s*)56px(\s*;\s*\}\s*\})/, '$160px$2', 'mobile header override') } },
-  { id: 'tablet-alias-drift', note: '--shell-sidebar-w-tablet (the var the tablet override resolves through) changes', expect: /^geometry: --shell-sidebar-w-tablet differs/, mutate: { appCss: (s) => swap(s, /(--shell-sidebar-w-tablet:\s*)240px/, '$1220px', 'tablet alias') } },
-  { id: 'scoped-root-token', note: 'a media-scoped :root re-declares --bg', expect: /^scoped token: @media \(max-width: 600px\) \{ :root \{ --bg/, mutate: { appCss: (s) => `${s}\n@media (max-width: 600px) { :root { --bg: #111111; } }\n` } },
-  { id: 'supports-scoped-token', note: 'an @supports-scoped :root re-declares --surface', expect: /^scoped token: @supports/, mutate: { appCss: (s) => `${s}\n@supports (color: color-mix(in srgb, red, blue)) { :root { --surface: red; } }\n` } },
-  { id: 'html-selector-token', note: 'html { --text } re-declares a tracked token', expect: /^single source: html \{ --text/, mutate: { appCss: (s) => `${s}\nhtml { --text: #ffffff; }\n` } },
-  { id: 'universal-token', note: '* { --bg } re-declares a tracked token on every element', expect: /^single source: \* \{ --bg/, mutate: { appCss: (s) => `${s}\n* { --bg: #111111; }\n` } },
-  { id: 'component-token', note: '.page { --radius } re-declares a tracked token for a subtree', expect: /^single source: \.page \{ --radius/, mutate: { appCss: (s) => `${s}\n.page { --radius: 4px; }\n` } },
-  { id: 'compound-layer', note: ':root[data-system][data-accent] compound declares --bg', expect: /^single source: :root\[data-system="geist"\]\[data-accent="cyan"\] \{ --bg/, mutate: { appCss: (s) => `${s}\n:root[data-system="geist"][data-accent="cyan"] { --bg: #000001; }\n` } },
-  { id: 'accent-block-token', note: 'an accent block re-declares --surface', expect: /^accent "cyan": :root\[data-accent="cyan"\] re-declares --surface/, mutate: { appCss: (s) => `${s}\n:root[data-accent="cyan"] { --surface: red; }\n` } },
+  { id: 'import-layer-main-sheet', note: 'were the canonical sheet loaded into a cascade layer (layer(theme)) instead of linked unlayered, an EARLIER unlayered index.html :root would beat it — rule 3 must see the browser value', expect: /^pre-apply: --bg differs — design .+ vs runtime #000001$/, mutate: { mainLayer: () => 'theme', siblings: (list) => [...list, { file: 'client/index.html', css: ':root { --bg: #000001; }', order: -1 }] } },
+  { id: 'import-layer-sibling-loses', note: 'a LATER sibling imported with layer(x) re-declares .chip — the unlayered canonical rule still wins', expect: 'PASS', mutate: { siblings: (list) => [...list, { file: 'client/src/styles/canary.css', css: '.chip { text-transform: lowercase; }', layer: 'x' }] } },
+  { id: 'print-shadow-ignored', note: 'a print-only .chip override is not a screen parity surface', expect: 'PASS', mutate: { bridge: (s) => `${s}\n@media print { .chip { text-transform: lowercase; } }\n` } },
+  { id: 'not-print-shadow-resolves', note: '@media not print DOES apply on screen — only a print-only query list is excluded', expect: /^shadow rule: client\/src\/styles\/app-bridge\.css @media not print\|\|\.chip re-declares text-transform for \.chip under @media not print — runtime resolves lowercase/, mutate: { bridge: (s) => `${s}\n@media not print { .chip { text-transform: lowercase; } }\n` } },
+  { id: 'screen-print-list-shadow-resolves', note: '@media screen, print matches screens too', expect: /^shadow rule: client\/src\/styles\/app-bridge\.css @media screen, print\|\|\.chip re-declares text-transform for \.chip under @media screen, print — runtime resolves lowercase/, mutate: { bridge: (s) => `${s}\n@media screen, print { .chip { text-transform: lowercase; } }\n` } },
+  { id: 'nested-descendant-shadow', note: 'CSS Nesting: .page { .chip {} } is .page .chip and outranks the utility', expect: /^shadow rule: client\/src\/styles\/app-bridge\.css \.page \.chip re-declares text-transform for \.chip — runtime resolves lowercase/, mutate: { bridge: (s) => `${s}\n.page { .chip { text-transform: lowercase; } }\n` } },
+  { id: 'nested-ampersand-media-shadow', note: 'CSS Nesting: .chip { @media (…) { … } } is a media-scoped .chip rule', expect: /^shadow rule: client\/src\/styles\/app-bridge\.css @media \(min-width: 0px\)\|\|\.chip re-declares text-transform for \.chip under @media \(min-width:0px\) — runtime resolves lowercase/, mutate: { bridge: (s) => `${s}\n.chip { @media (min-width: 0px) { text-transform: lowercase; } }\n` } },
+  { id: 'nested-root-media-geometry', note: 'CSS Nesting: :root { @media (tablet) { --shell-sidebar-w } } is the responsive geometry contract', expect: /^responsive geometry: --shell-sidebar-w inside @media \(min-width: 768px\) and \(max-width: 1023px\) resolves to 200px/, mutate: { bridge: (s) => `${s}\n:root { @media (min-width: 768px) and (max-width: 1023px) { --shell-sidebar-w: 200px; } }\n` } },
+  { id: 'nested-ampersand-root-token', note: 'CSS Nesting: :root { & { --bg } } is a later :root declaration', expect: /^single source: client\/src\/styles\/app-bridge\.css :root \{ --bg: #010204 \} redefines a canonical design token/, also: [/^pre-apply: --bg differs — design .+ vs runtime #010204/], mutate: { bridge: (s) => `${s}\n:root { & { --bg: #010204; } }\n` } },
+  { id: 'universal-important-shadow', note: '* { text-transform !important } outranks every utility rule', expect: /^shadow rule: client\/src\/styles\/app-bridge\.css \* re-declares text-transform for \.chip — runtime resolves lowercase !important/, mutate: { bridge: (s) => `${s}\n* { text-transform: lowercase !important; }\n` } },
+  { id: 'no-anim-deviation-stale', note: 'the bridge narrows .no-anim * to the design\'s scope (entry becomes stale)', expect: /^deviation shadow:client\/src\/styles\/app-bridge\.css \.no-anim \*:transition is stale/, mutate: { bridge: (s) => swap(s, /\.no-anim,\s*\n\.no-anim \*,\s*\n\.no-anim \*::before,\s*\n\.no-anim \*::after \{/, '.no-anim .live-dot {', '.no-anim blanket rule') } },
+  { id: 'no-anim-deviation-no-longer-holds', note: '.no-anim * still wins but no longer freezes (the reason cites a blanket freeze)', expect: /^deviation shadow:client\/src\/styles\/app-bridge\.css \.no-anim \*:transition no longer holds/, mutate: { bridge: (s) => swap(s, /(\.no-anim \*::after \{[^}]*transition:\s*)none !important/, '$1all 1s !important', '.no-anim transition !important') } },
+  { id: 'extra-tablet-override', note: 'a later tablet media block sets --shell-sidebar-w to 200px', expect: /^responsive geometry: --shell-sidebar-w inside @media \(min-width: 768px\) and \(max-width: 1023px\) resolves to 200px/, mutate: { bridge: (s) => `${s}\n@media (min-width: 768px) and (max-width: 1023px) { :root { --shell-sidebar-w: 200px; } }\n` } },
+  { id: 'removed-tablet-override', note: 'the tablet --shell-sidebar-w re-assignment is deleted', expect: /^responsive geometry: --shell-sidebar-w is not re-assigned inside/, mutate: { bridge: (s) => swap(s, /@media \(min-width: 768px\) and \(max-width: 1023px\)\s*\{\s*:root\s*\{\s*--shell-sidebar-w:[^}]*\}\s*\}/, '', 'tablet sidebar override') } },
+  { id: 'changed-media-query', note: 'the tablet query upper bound moves to 1100px', expect: /^responsive geometry: --shell-sidebar-w is not re-assigned inside/, mutate: { bridge: (s) => swap(s, /\(max-width: 1023px\)\s*\{\s*:root\s*\{\s*--shell-sidebar-w/, '(max-width: 1100px) { :root { --shell-sidebar-w', 'tablet query') } },
+  { id: 'changed-media-value', note: 'the mobile --shell-header-h drops to 60px', expect: /^responsive geometry: --shell-header-h inside @media \(max-width: 767px\) resolves to 60px/, mutate: { bridge: (s) => swap(s, /(--shell-header-h:\s*)56px(\s*;\s*\}\s*\})/, '$160px$2', 'mobile header override') } },
+  { id: 'tablet-alias-drift', note: '--shell-sidebar-w-tablet (the var the tablet override resolves through) changes', expect: /^geometry: --shell-sidebar-w-tablet differs/, mutate: { bridge: (s) => swap(s, /(--shell-sidebar-w-tablet:\s*)240px/, '$1220px', 'tablet alias') } },
+  { id: 'scoped-root-token', note: 'a media-scoped :root in the bridge re-declares --bg', expect: /^single source: client\/src\/styles\/app-bridge\.css @media \(max-width: 600px\) \{ :root \} \{ --bg: #111111 \} redefines/, mutate: { bridge: (s) => `${s}\n@media (max-width: 600px) { :root { --bg: #111111; } }\n` } },
+  { id: 'supports-scoped-token', note: 'an @supports-scoped :root in the bridge re-declares --surface', expect: /^single source: client\/src\/styles\/app-bridge\.css @supports .+ \{ :root \} \{ --surface: red \} redefines/, mutate: { bridge: (s) => `${s}\n@supports (color: color-mix(in srgb, red, blue)) { :root { --surface: red; } }\n` } },
+  { id: 'html-selector-token', note: 'html { --text } re-declares a tracked token', expect: /^single source: client\/src\/styles\/app-bridge\.css html \{ --text/, mutate: { bridge: (s) => `${s}\nhtml { --text: #ffffff; }\n` } },
+  { id: 'universal-token', note: '* { --bg } re-declares a tracked token on every element', expect: /^single source: client\/src\/styles\/app-bridge\.css \* \{ --bg/, mutate: { bridge: (s) => `${s}\n* { --bg: #111111; }\n` } },
+  { id: 'component-token', note: '.page { --radius } re-declares a tracked token for a subtree', expect: /^single source: client\/src\/styles\/app-bridge\.css \.page \{ --radius/, mutate: { bridge: (s) => `${s}\n.page { --radius: 4px; }\n` } },
+  { id: 'compound-layer', note: ':root[data-system][data-accent] compound declares --bg', expect: /^single source: client\/src\/styles\/app-bridge\.css :root\[data-system="geist"\]\[data-accent="cyan"\] \{ --bg/, mutate: { bridge: (s) => `${s}\n:root[data-system="geist"][data-accent="cyan"] { --bg: #000001; }\n` } },
+  { id: 'accent-block-token', note: 'a bridge accent block re-declares --surface', expect: /^single source: client\/src\/styles\/app-bridge\.css :root\[data-accent="cyan"\] \{ --surface: red \} redefines/, mutate: { bridge: (s) => `${s}\n:root[data-accent="cyan"] { --surface: red; }\n` } },
   { id: 'sibling-root-token', note: 'another client stylesheet declares --bg on :root', expect: /^single source: client\/src\/styles\/canary\.css :root \{ --bg/, mutate: { siblings: (list) => [...list, { file: 'client/src/styles/canary.css', css: ':root { --bg: #111111; }' }] } },
   { id: 'sibling-important-root-resolves', note: 'a sibling :root !important --bg also changes what every system RESOLVES (rule 3, not only rule 10)', expect: /^editorial: --bg differs — design .+ vs runtime #000001 !important/, mutate: { siblings: (list) => [...list, { file: 'client/src/styles/canary.css', css: ':root { --bg: #000001 !important; }' }] } },
-  { id: 'index-html-early-root-loses', note: 'client/index.html <style> :root --bg (first in document order) loses to design-system.css — rule 10 still flags it, rule 3 must not', expect: /^single source: client\/index\.html :root \{ --bg/, reject: /^editorial: --bg differs/, mutate: { siblings: (list) => [...list, { file: 'client/index.html', css: ':root { --bg: #000001; }', order: -1 }] } },
+  { id: 'index-html-early-root-loses', note: 'client/index.html <style> :root --bg (first in document order) loses to design-system.css — rule 10 still flags it, rule 3 must not', expect: /^single source: client\/index\.html :root \{ --bg/, reject: /^editorial: --bg differs/, reject: /^(pre-apply|editorial): --bg differs/, mutate: { siblings: (list) => [...list, { file: 'client/index.html', css: ':root { --bg: #000001; }', order: -1 }] } },
   { id: 'sibling-scoped-token', note: 'another client stylesheet re-declares --text under print', expect: /^single source: client\/src\/index\.css @media print \{ :root \} \{ --text/, mutate: { siblings: (list) => [...list, { file: 'client/src/index.css', css: '@media print { :root { --text: #000; } }' }] } },
   // --- the original value / structure cases ----------------------------------
-  { id: 'value-drift', note: 'geist --surface alpha changes', expect: /^geist: --surface differs/, mutate: { appCss: (s) => swap(s, /(:root\[data-system="geist"\]\s*\{[\s\S]*?--surface:\s*rgba\(255,\s*255,\s*255,\s*)0\.04/, '$10.05', 'geist --surface') } },
-  { id: 'root-value-drift', note: 'root --radius 12px -> 10px (cascades to editorial)', expect: /^editorial: --radius differs — design 12px vs runtime 10px/, mutate: { appCss: (s) => swap(s, /(\n\s*--radius:\s*)12px/, '$110px', 'root --radius') } },
-  { id: 'missing-token', note: 'root --hairline removed', expect: /^editorial: design token --hairline .* is absent from the runtime cascade/, mutate: { appCss: (s) => swap(s, /\n\s*--hairline:[^;]*;/, '\n', 'root --hairline') } },
-  { id: 'bogus-accent', note: 'extra :root[data-accent="mint"] block', expect: /^runtime declares :root\[data-accent="mint"\] but the design ships no such accent/, mutate: { appCss: (s) => `${s}\n:root[data-accent="mint"] { --accent: #00ffaa; --accent-2: #00ddaa; }\n` } },
-  { id: 'accent-pair-drift', note: 'crimson --accent-2 changed', expect: /^accent:crimson: --accent-2 differs/, mutate: { appCss: (s) => swap(s, /(:root\[data-accent="crimson"\]\s*\{[^}]*--accent-2:\s*)#b84dff/, '$1#b84dfe', 'crimson --accent-2') } },
-  { id: 'stale-deviation', note: 'editorial --text-3 set back to the canonical alpha (entry becomes stale)', expect: /^deviation editorial:--text-3 is stale/, mutate: { appCss: (s) => swap(s, /(\n\s*--text-3:\s*rgba\(244,\s*243,\s*238,\s*)0\.52/, '$10.4', 'root --text-3') } },
-  { id: 'deviation-no-longer-holds', note: 'editorial --text-3 alpha 0.45 (fails 4.5:1)', expect: /^deviation editorial:--text-3 no longer holds/, mutate: { appCss: (s) => swap(s, /(\n\s*--text-3:\s*rgba\(244,\s*243,\s*238,\s*)0\.52/, '$10.45', 'root --text-3') } },
-  { id: 'registry-default-accent', note: 'registry geist defaultAccent cyan -> matrix', expect: /^registry: default accent for "geist" is matrix/, mutate: { appRegistry: (s) => swap(s, /(id:\s*'geist'[\s\S]*?defaultAccent:\s*')cyan'/, "$1matrix'", 'registry geist defaultAccent') } },
-  { id: 'registry-boot-default', note: 'registry defaultSystem editorial -> swiss', expect: /^registry: boot default is swiss\/crimson/, mutate: { appRegistry: (s) => swap(s, /(\n {2}defaultSystem:\s*')editorial'/, "$1swiss'", 'registry defaultSystem') } },
-  { id: 'geometry-drift', note: '--content-max 1240px -> 1280px', expect: /^geometry: --content-max differs in editorial — design 1240px vs runtime 1280px/, mutate: { appCss: (s) => swap(s, /(--content-max:\s*)1240px/, '$11280px', '--content-max') } },
-  { id: 'geometry-missing', note: '--footer-pad removed', expect: /^geometry: --footer-pad .* is not declared in the runtime's :root/, mutate: { appCss: (s) => swap(s, /\n\s*--footer-pad:[^;]*;/, '\n', '--footer-pad') } },
-  { id: 'grain-asset-drift', note: '.grain background-image swapped to a different data URI', expect: /^utility \.grain: background-image differs/, mutate: { appCss: (s) => swap(s, /(\.grain\s*\{[\s\S]*?background-image:\s*url\(["']?)data:image\/svg\+xml;base64,/, '$1data:image/svg+xml;utf8,', '.grain asset') } },
+  { id: 'value-drift', note: 'the served registry\'s geist --surface alpha changes', expect: /^geist: --surface differs — design rgba\(255,255,255,0\.04\) vs runtime rgba\(255,255,255,0\.05\)/, also: [/^served registry: /], mutate: { appJs: (s) => swap(s, /('--surface':\s*'rgba\(255,255,255,)0\.04\)'/, "$10.05)'", 'geist --surface') } },
+  { id: 'root-value-drift', note: 'served :root --radius 12px -> 10px (the pre-apply paint; every system restates it inline)', expect: /^pre-apply: --radius differs — design 12px vs runtime 10px/, also: [/^served sheet: /], mutate: { appCss: (s) => swap(s, /(\n\s*--radius:\s*)12px/, '$110px', 'root --radius') } },
+  { id: 'missing-token', note: 'served :root --hairline removed', expect: /^pre-apply: design token --hairline .* is absent from the runtime cascade/, mutate: { appCss: (s) => swap(s, /\n\s*--hairline:[^;]*;/, '\n', 'root --hairline') } },
+  { id: 'bogus-accent', note: 'the served ACCENTS gains an accent the design lacks', expect: /^the served ACCENTS offers "mint" but the design ships no such accent/, mutate: { appJs: (s) => swap(s, /(window\.ACCENTS = \[\n)/, "$1  { id: 'mint', name: 'Mint', primary: '#00ffaa', secondary: '#00ddaa' },\n", 'ACCENTS') } },
+  { id: 'accent-pair-drift', note: 'the served crimson --accent-2 changes', expect: /^accent:crimson: --accent-2 differs/, mutate: { appJs: (s) => swap(s, /(id: 'crimson',[^\n]*secondary: ')#b84dff'/, "$1#b84dfe'", 'crimson secondary') } },
+  { id: 'registry-default-accent', note: 'served SYSTEM_DEFAULT_ACCENT geist cyan -> matrix', expect: /^registry: default accent for "geist" is matrix/, mutate: { appJs: (s) => swap(s, /(\n\s*geist:\s*')cyan'/, "$1matrix'", 'SYSTEM_DEFAULT_ACCENT geist') } },
+  { id: 'registry-boot-default', note: 'design-system.ts DEFAULT_SYSTEM editorial -> swiss', expect: /^registry: boot default is swiss\/crimson/, mutate: { appRegistry: (s) => swap(s, /(export const DEFAULT_SYSTEM\b[^=]*=\s*")editorial"/, '$1swiss"', 'DEFAULT_SYSTEM') } },
+  { id: 'geometry-drift', note: '--content-max 1240px -> 1280px', expect: /^geometry: --content-max differs in editorial — design 1240px vs runtime 1280px/, mutate: { bridge: (s) => swap(s, /(--content-max:\s*)1240px/, '$11280px', '--content-max') } },
+  { id: 'geometry-missing', note: '--footer-pad removed', expect: /^geometry: --footer-pad .* is not declared in the runtime's :root/, mutate: { bridge: (s) => swap(s, /\n\s*--footer-pad:[^;]*;/, '\n', '--footer-pad') } },
+  { id: 'grain-asset-drift', note: '.grain background-image swapped to a different data URI', expect: /^utility \.grain: background-image differs/, mutate: { appCss: (s) => swap(s, /(\.grain\s*\{[\s\S]*?background-image:\s*url\(["']?data:image\/svg\+xml;)utf8,/, '$1charset=utf-8,', '.grain asset') } },
   { id: 'utility-drift', note: '.chip font-size 10.5px -> 12px in place', expect: /^utility \.chip: font-size differs — design 10\.5px vs runtime 12px/, mutate: { appCss: (s) => swap(s, /(\n\.chip\s*\{[\s\S]*?font-size:\s*)10\.5px/, '$112px', '.chip font-size') } },
   { id: 'utility-missing', note: '.hide-tablet rule removed', expect: /^utility @media \(max-width: 1024px\)\|\|\.hide-tablet: rule is missing/, mutate: { appCss: (s) => swap(s, /\.hide-tablet\s*\{[^}]*\}/, '', '.hide-tablet') } },
-  { id: 'kbd-deviation-stale', note: '.kbd font-size 12px -> canonical 10.5px (entry becomes stale)', expect: /^deviation rule:\.kbd:font-size is stale/, mutate: { appCss: (s) => swap(s, /(\n\.kbd\s*\{[\s\S]*?font-size:\s*)12px/, '$110.5px', '.kbd font-size') } },
-  { id: 'kbd-deviation-no-longer-holds', note: '.kbd font-size 12px -> 11px (below the floor the reason cites)', expect: /^deviation rule:\.kbd:font-size no longer holds/, mutate: { appCss: (s) => swap(s, /(\n\.kbd\s*\{[\s\S]*?font-size:\s*)12px/, '$111px', '.kbd font-size') } },
-  { id: 'body-height-deviation-stale', note: 'runtime body takes the design height 100% (entry becomes stale)', expect: /^deviation rule:body:height is stale/, mutate: { appCss: (s) => `${s}\nbody { height: 100%; }\n` } },
-  { id: 'body-height-deviation-no-longer-holds', note: 'body min-height 100% -> 100vh (the floor the reason cites is gone)', expect: /^deviation rule:body:height no longer holds/, mutate: { appCss: (s) => swap(s, /(\nbody\s*\{\s*min-height:\s*)100%/, '$1100vh', 'body min-height') } },
-  { id: 'html-height-drift', note: 'html height 100% -> 100vh', expect: /^base box html: height differs — design 100% vs runtime 100vh/, mutate: { appCss: (s) => swap(s, /(\nhtml\s*\{\s*height:\s*)100%/, '$1100vh', 'html height') } },
-  { id: 'status-token-drift', note: '--status-ok #34d08c -> #34d08d: .chip.ok/.dot.ok resolve off the design literal', expect: /^utility \.chip\.ok: color differs — design #34d08c vs runtime var\(--status-ok\) \(resolves to #34d08d\)/, also: [/^utility \.dot\.ok: background differs/], mutate: { appCss: (s) => swap(s, /(--status-ok:\s*)#34d08c/, '$1#34d08d', '--status-ok') } },
-  { id: 'status-mix-drift', note: '.chip.bad border color-mix 30% -> 35%', expect: /^utility \.chip\.bad: border-color differs — design rgba\(255,92,122,0\.3\) vs runtime color-mix/, mutate: { appCss: (s) => swap(s, /(\.chip\.bad\s*\{[^}]*border-color:\s*color-mix\(in srgb, var\(--status-bad\) )30%/, '$135%', '.chip.bad border-color') } },
-  { id: 'canonical-moves', note: 'canonical jsx editorial --bg-2 changed (runtime now behind)', expect: /^editorial: --bg-2 differs/, mutate: { canonicalJsx: (s) => swap(s, /('--bg-2':\s*')#070706'/, "$1#070707'", 'editorial --bg-2') } },
-  { id: 'canonical-shape', note: 'the design itself declares a token outside :root', expect: /^canonical shape changed: styles\.css \.sidebar declares --bg/, mutate: { canonicalCss: (s) => `${s}\n.sidebar { --bg: red; }\n` } },
+  { id: 'body-height-deviation-stale', note: 'runtime body takes the design height 100% (entry becomes stale)', expect: /^deviation rule:body:height is stale/, mutate: { bridge: (s) => `${s}\nbody { height: 100%; }\n` } },
+  { id: 'body-height-deviation-no-longer-holds', note: 'bridge body height auto -> 50% (the uncapped body the reason cites is gone)', expect: /^deviation rule:body:height no longer holds \(canonical 100% vs runtime 50%\)/, mutate: { bridge: (s) => swap(s, /(\nbody\s*\{\s*height:\s*)auto/, '$150%', 'body height') } },
+  { id: 'html-height-drift', note: 'the bridge sets html height 100vh', expect: /^base box html: height differs — design 100% vs runtime 100vh/, mutate: { bridge: (s) => `${s}\nhtml { height: 100vh; }\n` } },
+  { id: 'canonical-moves', note: 'canonical editorial --bg-2 changed (runtime now behind)', expect: /^editorial: --bg-2 differs/, mutate: { canonicalJs: (s) => swap(s, /('--bg-2':\s*')#070706'/, "$1#070707'", 'editorial --bg-2') } },
+  { id: 'canonical-shape', note: 'the design itself declares a token outside :root', expect: /^canonical shape changed: client\/public\/ds\/design-system\.css \.sidebar declares --bg/, mutate: { canonicalCss: (s) => `${s}\n.sidebar { --bg: red; }\n` } },
+  // --- rule 0 / 5 / 12: the served pair, the wrapper, the boot, the <head> ---
+  { id: 'served-byte-drift', note: 'one byte of the served sheet changes (a comment) — nothing paints differently, but it is no longer the verbatim fetch', expect: /^served sheet: client\/public\/ds\/design-system\.css is not byte-identical to the canonical/, mutate: { appCss: (s) => swap(s, 'Per-system component skins', 'Per-system component skinz', 'served sheet comment') } },
+  { id: 'bridge-geometry-elsewhere', note: 'another client stylesheet declares shell geometry', expect: /^single source: client\/src\/styles\/canary\.css :root \{ --content-max: 1240px \} declares shell geometry outside the top-level :root of client\/src\/styles\/app-bridge\.css/, mutate: { siblings: (list) => [...list, { file: 'client/src/styles/canary.css', css: ':root { --content-max: 1240px; }' }] } },
+  { id: 'registry-restates-table', note: 'design-system.ts exports its own ACCENTS again', expect: /^registry: client\/src\/lib\/design-system\.ts restates ACCENTS/, mutate: { appRegistry: (s) => `${s}\nexport const ACCENTS = [];\n` } },
+  { id: 'registry-stops-reading-globals', note: 'design-system.ts reads a renamed global instead of window.ACCENTS', expect: /^registry: client\/src\/lib\/design-system\.ts never reads window\.ACCENTS/, mutate: { appRegistry: (s) => swap(s, /window\.ACCENTS\b/g, 'window.ACCENT_LIST', 'window.ACCENTS reads') } },
+  { id: 'boot-storage-key-renamed', note: 'the pre-paint boot reads the saved system from another key', expect: /^boot: client\/index\.html uses system storage key "ds-sys" but client\/src\/lib\/design-system\.ts uses "ds-system"/, mutate: { files: { 'client/index.html': (s) => swap(s, /(\bsys\s*=\s*localStorage\.getItem\()[^)]*\)/, "$1'ds-sys')", 'boot system key') } } },
+  { id: 'boot-fallback-renamed', note: 'the pre-paint boot falls back to another system', expect: /^boot: client\/index\.html uses fallback system "swiss" but client\/src\/lib\/design-system\.ts uses "editorial"/, mutate: { files: { 'client/index.html': (s) => swap(s, /(hasOwnProperty\.call\(\s*window\.DESIGN_SYSTEMS\s*,\s*sys\s*\)\s*\)\s*sys\s*=\s*)[^;]+;/, "$1'swiss';", 'boot fallback') } } },
+  { id: 'boot-marker-not-injected', note: 'vite.config.ts stops serializing THEME_BOOT_DATA into the boot marker', expect: /^boot: client\/index\.html reads its system storage key from .+ but vite\.config\.ts does not inject/, mutate: { viteConfig: (s) => swap(s, /JSON\.stringify\(THEME_BOOT_DATA\)/, 'JSON.stringify({})', 'vite THEME_BOOT_DATA serialization') } },
+  { id: 'main-link-removed', note: 'index.html stops linking the canonical sheet — rule 12', expect: /^document: client\/index\.html has no <link rel="stylesheet" href="\/ds\/design-system\.css">/, mutate: { files: { 'client/index.html': (s) => swap(s, /<link\b[^>]*href="\/ds\/design-system\.css"[^>]*>/, '', 'canonical <link>') } } },
+  { id: 'main-link-media', note: 'the canonical <link> gains a media query', expect: /^document: the \/ds\/design-system\.css <link> in client\/index\.html carries media="\(min-width: 1200px\)"/, mutate: { files: { 'client/index.html': (s) => swap(s, /(<link\b[^>]*href="\/ds\/design-system\.css")/, '$1 media="(min-width: 1200px)"', 'canonical <link>') } } },
+  { id: 'ds-script-deferred', note: 'the registry script is deferred — the boot would call an applier that does not exist yet', expect: /^document: <script src="\/ds\/design-system\.js"> in client\/index\.html is defer/, mutate: { files: { 'client/index.html': (s) => swap(s, /<script src="\/ds\/design-system\.js">/, '<script defer src="/ds/design-system.js">', 'registry <script>') } } },
+  { id: 'ds-script-after-boot', note: 'the registry script moves below the pre-paint boot', expect: /^document: <script src="\/ds\/design-system\.js"> comes after the pre-paint boot/, mutate: { files: { 'client/index.html': (s) => { const tag = '<script src="/ds/design-system.js"></script>'; return swap(s, tag, '', 'registry <script>').replace('</head>', `${tag}\n</head>`); } } } },
 ];
 
 /**
  * Run every canary against in-memory mutations of the given inputs.
  * @returns {{ ok: boolean, rows: {id, note, expect, verdict, matched, ok, firstFailure}[] }}
  */
+function appModelInputs(inputs) {
+  return {
+    css: inputs.appCss, js: inputs.appJs, registry: inputs.appRegistry, indexHtml: inputs.indexHtml, viteConfig: inputs.viteConfig,
+    siblings: inputs.siblings, mainOrder: inputs.mainOrder ?? 1, mainLayer: inputs.mainLayer ?? null, reach: inputs.reach ?? null,
+  };
+}
+
+// `bridge` rewrites client/src/styles/app-bridge.css where the document
+// places it (the sibling the walk collected), so a canary exercises the file
+// app-only rules actually live in.
+function mutateBridge(siblings, fn) {
+  const index = siblings.findIndex((s) => s.file === DEFAULT_PATHS.appBridge);
+  if (index === -1) throw new Error(`canary anchor missing: ${DEFAULT_PATHS.appBridge} is not in the document`);
+  return siblings.map((s, i) => (i === index ? { ...s, css: fn(s.css) } : s));
+}
+
 export function runCanaries(inputs, deviations = DOCUMENTED_DEVIATIONS) {
   const rows = [];
+  // Canaries prove what a mutation ADDS: failures the live inputs already
+  // carry (reported by the gate itself) are subtracted, so a live finding
+  // neither masks nor fakes a canary's verdict.
+  let baseline = new Set();
+  try {
+    const canonical = buildCanonicalModel({ css: inputs.canonicalCss, js: inputs.canonicalJs, appJsx: inputs.canonicalApp, layoutJsx: inputs.canonicalLayout });
+    baseline = new Set(compareModels(canonical, buildAppModel(appModelInputs(inputs)), deviations).failures);
+  } catch { /* the control canary reports the error */ }
   for (const canary of CANARIES) {
     const mutated = { ...inputs, siblings: [...(inputs.siblings ?? [])] };
     let result;
@@ -2684,10 +2881,15 @@ export function runCanaries(inputs, deviations = DOCUMENTED_DEVIATIONS) {
       // mutations apply on top.
       const { files, ...rest } = canary.mutate ?? {};
       if (files) Object.assign(mutated, documentInputs({ files: overlayFiles(files), appCss: mutated.appCss }));
-      for (const [key, fn] of Object.entries(rest)) mutated[key] = fn(mutated[key]);
-      const canonical = buildCanonicalModel({ css: mutated.canonicalCss, jsx: mutated.canonicalJsx, appJsx: mutated.canonicalApp, layoutJsx: mutated.canonicalLayout });
-      const app = buildAppModel({ css: mutated.appCss, registry: mutated.appRegistry, siblings: mutated.siblings, mainOrder: mutated.mainOrder ?? 0, mainLayer: mutated.mainLayer ?? null, reach: mutated.reach ?? null });
+      for (const [key, fn] of Object.entries(rest)) {
+        if (key === 'bridge') mutated.siblings = mutateBridge(mutated.siblings, fn);
+        else mutated[key] = fn(mutated[key]);
+      }
+      const canonical = buildCanonicalModel({ css: mutated.canonicalCss, js: mutated.canonicalJs, appJsx: mutated.canonicalApp, layoutJsx: mutated.canonicalLayout });
+      const app = buildAppModel(appModelInputs(mutated));
       result = compareModels(canonical, app, deviations);
+      const added = result.failures.filter((f) => !baseline.has(f));
+      result = { ...result, failures: added, ok: added.length === 0 };
     } catch (err) {
       error = err;
     }
@@ -2706,6 +2908,7 @@ export function runCanaries(inputs, deviations = DOCUMENTED_DEVIATIONS) {
       verdict,
       matched,
       ok,
+      failures: error ? [] : result.failures,
       firstFailure: error ? error.message : rejected ? `unexpected: ${rejected}` : missingAlso ? `missing: ${missingAlso}` : (result.failures.find((f) => !expectPass && canary.expect.test(f)) ?? result.failures[0] ?? ''),
     });
   }
@@ -2770,7 +2973,12 @@ export function virtualFiles(files = {}) {
 export function resolveImport(fromFile, spec) {
   const clean = spec.replace(/[?#].*$/, '');
   if (!clean || /^(https?:|data:|\/\/)/.test(clean)) return null;
-  if (clean.startsWith('/')) return path.join(ROOT, DEFAULT_PATHS.viteRoot, clean);
+  if (clean.startsWith('/')) {
+    // Vite serves a root-relative URL from its root, then from publicDir.
+    const fromRoot = path.join(ROOT, DEFAULT_PATHS.viteRoot, clean);
+    const fromPublic = path.join(ROOT, DEFAULT_PATHS.vitePublic, clean);
+    return !fs.existsSync(fromRoot) && fs.existsSync(fromPublic) ? fromPublic : fromRoot;
+  }
   if (/^\./.test(clean) || clean.startsWith('~')) return path.resolve(path.dirname(fromFile), clean.replace(/^~/, ''));
   for (let dir = path.dirname(fromFile); ; dir = path.dirname(dir)) {
     const candidate = path.join(dir, 'node_modules', clean);
@@ -2825,7 +3033,7 @@ export function resolveImport(fromFile, spec) {
  *   importers: Map<string, {file: string, spec: string}|null>, misplaced: object[], unresolved: object[],
  *   duplicates: object[], entry: string, vfs: object }} keyed by absolute path
  */
-export function documentOrder({ entryCss = DEFAULT_PATHS.appEntryCss, indexHtmlPath = DEFAULT_PATHS.appIndexHtml, files = null, vfs = virtualFiles(files ?? {}) } = {}) {
+export function documentOrder({ entryCss = DEFAULT_PATHS.appEntryCss, indexHtmlPath = DEFAULT_PATHS.appIndexHtml, appCssPath = DEFAULT_PATHS.appCss, files = null, vfs = virtualFiles(files ?? {}) } = {}) {
   const order = new Map();
   const layers = new Map();
   const contexts = new Map();
@@ -2865,12 +3073,26 @@ export function documentOrder({ entryCss = DEFAULT_PATHS.appEntryCss, indexHtmlP
     }
     visiting.delete(file);
   };
+  // The canonical sheet is <link>ed by index.html ahead of the app bundle:
+  // index.html <style> above the link [0], the main sheet [1], <style> below
+  // it [2], then the entry sheet's graph [3, …] (Vite injects the bundle's CSS
+  // after the head). An @import of the main sheet anywhere in the graph is a
+  // second load and reported as a duplicate.
+  const main = path.resolve(ROOT, appCssPath);
+  const html = vfs.isFile(indexHtml) ? vfs.read(indexHtml) : '';
+  const load = parseDsLoad(html);
+  if (load.css && vfs.isFile(main) && resolveImport(indexHtml, CSS_HREF) === main) {
+    order.set(main, [1]);
+    layers.set(main, null);
+    contexts.set(main, load.css.media && !/^\s*(all|screen)?\s*$/i.test(load.css.media) ? `@media ${load.css.media}` : '');
+    importers.set(main, { file: rel(indexHtml), spec: CSS_HREF });
+  }
   const entry = path.resolve(ROOT, entryCss);
   if (vfs.isFile(entry)) {
     importers.set(entry, null);
-    visit(entry, [1], null, '');
+    visit(entry, [3], null, '');
   }
-  return { order, layers, contexts, importers, misplaced, unresolved, duplicates, entry: rel(entry), vfs };
+  return { order, layers, contexts, importers, misplaced, unresolved, duplicates, entry: rel(entry), load, html, vfs };
 }
 
 /**
@@ -2894,8 +3116,15 @@ export function collectSiblingStylesheets({ appCssPath = DEFAULT_PATHS.appCss, r
     file: path.relative(ROOT, file), css: vfs.read(file), order: order.get(file) ?? LATE_SHEET, layer: layers.get(file) ?? null, context: contexts.get(file) ?? '',
   }));
   if (vfs.isFile(indexHtml)) {
-    const blocks = inlineStyleBlocks(vfs.read(indexHtml));
-    if (blocks.length) siblings.push({ file: path.relative(ROOT, indexHtml), css: blocks.join('\n'), order: order.get(indexHtml) ?? 0, layer: null, context: '' });
+    const html = vfs.read(indexHtml);
+    const linkAt = parseDsLoad(html).css?.index ?? Infinity;
+    const blocks = inlineStyleBlocksAt(html);
+    for (const [css, position] of [
+      [blocks.filter((b) => b.index < linkAt).map((b) => b.css), [0]],
+      [blocks.filter((b) => b.index > linkAt).map((b) => b.css), [2]],
+    ]) {
+      if (css.length) siblings.push({ file: path.relative(ROOT, indexHtml), css: css.join('\n'), order: position, layer: null, context: '' });
+    }
   }
   return siblings;
 }
@@ -2913,11 +3142,12 @@ export function documentInputs({ files = {}, appCss = null, appCssPath = DEFAULT
   for (const [key, value] of files instanceof Map ? files : Object.entries(files)) overlay.set(path.resolve(ROOT, key), value);
   const main = path.resolve(ROOT, appCssPath);
   if (appCss != null && !overlay.has(main)) overlay.set(main, appCss);
-  const document = documentOrder({ vfs: virtualFiles(overlay) });
+  const document = documentOrder({ appCssPath, vfs: virtualFiles(overlay) });
   return {
     siblings: collectSiblingStylesheets({ appCssPath, roots, document }),
-    mainOrder: document.order.get(main) ?? 0,
+    mainOrder: document.order.get(main) ?? 1,
     mainLayer: document.layers.get(main) ?? null,
+    indexHtml: document.html,
     reach: {
       entry: document.entry,
       main: { reached: document.order.has(main), context: document.contexts.get(main) ?? '', importer: document.importers.get(main)?.file ?? null },
@@ -2933,24 +3163,84 @@ const isMain = process.argv[1] && path.resolve(process.argv[1]) === fileURLToPat
 if (isMain) {
   const paths = {
     appCss: argValue('--app-css') ?? DEFAULT_PATHS.appCss,
+    appJs: argValue('--app-js') ?? DEFAULT_PATHS.appJs,
+    appBridge: argValue('--app-bridge') ?? DEFAULT_PATHS.appBridge,
+    indexHtml: argValue('--index-html') ?? DEFAULT_PATHS.appIndexHtml,
     appRegistry: argValue('--app-registry') ?? DEFAULT_PATHS.appRegistry,
+    viteConfig: argValue('--vite-config') ?? DEFAULT_PATHS.viteConfig,
     canonicalCss: argValue('--canonical-css') ?? DEFAULT_PATHS.canonicalCss,
-    canonicalJsx: argValue('--canonical-jsx') ?? DEFAULT_PATHS.canonicalJsx,
+    canonicalJs: argValue('--canonical-js') ?? DEFAULT_PATHS.canonicalJs,
     canonicalApp: argValue('--canonical-app') ?? DEFAULT_PATHS.canonicalApp,
     canonicalLayout: argValue('--canonical-layout') ?? DEFAULT_PATHS.canonicalLayout,
   };
-  const read = (p) => fs.readFileSync(path.isAbsolute(p) ? p : path.join(ROOT, p), 'utf8');
+  const abs = (p) => (path.isAbsolute(p) ? p : path.join(ROOT, p));
+  const read = (p) => fs.readFileSync(abs(p), 'utf8');
   const inputs = {
     appCss: read(paths.appCss),
+    appJs: read(paths.appJs),
     appRegistry: read(paths.appRegistry),
+    viteConfig: read(paths.viteConfig),
     canonicalCss: read(paths.canonicalCss),
-    canonicalJsx: read(paths.canonicalJsx),
+    canonicalJs: read(paths.canonicalJs),
     canonicalApp: read(paths.canonicalApp),
     canonicalLayout: read(paths.canonicalLayout),
   };
-  // The document walk reads the main sheet from the same source the model
-  // does (a --app-css probe copy stands in for the file on disk).
-  Object.assign(inputs, documentInputs({ appCss: inputs.appCss }));
+  // The document walk reads the main sheet, the bridge and index.html from
+  // the same sources the model does (a --app-css / --app-bridge / --index-html
+  // probe copy stands in for the file on disk through the overlay).
+  const overlay = {};
+  if (paths.appBridge !== DEFAULT_PATHS.appBridge) overlay[DEFAULT_PATHS.appBridge] = read(paths.appBridge);
+  if (paths.indexHtml !== DEFAULT_PATHS.appIndexHtml) overlay[DEFAULT_PATHS.appIndexHtml] = read(paths.indexHtml);
+  Object.assign(inputs, documentInputs({ files: overlay, appCss: inputs.appCss }));
+
+  // Rule 0 — pins: every file the gate treats as the canonical pair (the
+  // served copies and the canonical inputs) must carry the fetched digests,
+  // and the newest design-system fetch on disk, if any, must still match them.
+  const sha256 = (text) => crypto.createHash('sha256').update(text).digest('hex');
+  const pinFailures = [];
+  const pinned = [
+    [paths.appCss, inputs.appCss, CANONICAL_PINS[0]],
+    [paths.appJs, inputs.appJs, CANONICAL_PINS[1]],
+    [paths.canonicalCss, inputs.canonicalCss, CANONICAL_PINS[0]],
+    [paths.canonicalJs, inputs.canonicalJs, CANONICAL_PINS[1]],
+  ];
+  const seenPinned = new Set();
+  for (const [file, text, pin] of pinned) {
+    if (seenPinned.has(abs(file))) continue;
+    seenPinned.add(abs(file));
+    const digest = sha256(text);
+    if (digest !== pin.sha256) pinFailures.push(`pin: ${file} sha256 ${digest.slice(0, 12)}… is not the canonical ${pin.fetched} from ${CANONICAL_FETCH.pinned} (${pin.sha256.slice(0, 12)}…) — the served design system must be the verbatim fetch; re-copy it, never edit it`);
+  }
+  const fetchRoot = path.join(ROOT, CANONICAL_FETCH.dir);
+  const fetches = fs.existsSync(fetchRoot) ? fs.readdirSync(fetchRoot).filter((d) => d.startsWith(CANONICAL_FETCH.prefix)).sort() : [];
+  const latestFetch = fetches.at(-1) ?? null;
+  if (latestFetch) {
+    for (const pin of CANONICAL_PINS) {
+      const fetched = path.join(fetchRoot, latestFetch, pin.fetched);
+      if (!fs.existsSync(fetched)) {
+        pinFailures.push(`pin: the latest fetch ${CANONICAL_FETCH.dir}/${latestFetch} has no ${pin.fetched} — cannot cross-check ${pin.file}`);
+        continue;
+      }
+      const digest = sha256(fs.readFileSync(fetched));
+      if (digest !== pin.sha256) pinFailures.push(`pin: ${CANONICAL_FETCH.dir}/${latestFetch}/${pin.fetched} (${digest.slice(0, 12)}…) differs from the pinned ${CANONICAL_FETCH.pinned} ${pin.fetched} — a newer design fetch exists: adopt it verbatim into ${pin.file} and re-pin, or remove the stale fetch`);
+    }
+  }
+  const servedBase = argValue('--served');
+  let servedNote = null;
+  if (servedBase) {
+    for (const pin of CANONICAL_PINS) {
+      const url = new URL(pin.href, servedBase).href;
+      try {
+        const res = await fetch(url, { signal: AbortSignal.timeout(10000) });
+        if (!res.ok) { pinFailures.push(`served: ${url} answered HTTP ${res.status}`); continue; }
+        const digest = sha256(Buffer.from(await res.arrayBuffer()));
+        if (digest !== pin.sha256) pinFailures.push(`served: ${url} sha256 ${digest.slice(0, 12)}… is not the pinned canonical ${pin.fetched} (${pin.sha256.slice(0, 12)}…)`);
+      } catch (err) {
+        servedNote = `served: ${servedBase} unreachable (${err.cause?.code ?? err.name}) — served-bytes check skipped`;
+        break;
+      }
+    }
+  }
 
   // The canaries self-test the parser against the LIVE inputs. When a caller
   // points the gate at mutated copies (--app-css …) the control canary would
@@ -2969,9 +3259,10 @@ if (isMain) {
   }
   if (canariesOnly) process.exit(canaryFailures.length ? 1 : 0);
 
-  const canonical = buildCanonicalModel({ css: inputs.canonicalCss, jsx: inputs.canonicalJsx, appJsx: inputs.canonicalApp, layoutJsx: inputs.canonicalLayout });
-  const app = buildAppModel({ css: inputs.appCss, registry: inputs.appRegistry, siblings: inputs.siblings, mainOrder: inputs.mainOrder, mainLayer: inputs.mainLayer, reach: inputs.reach });
+  const canonical = buildCanonicalModel({ css: inputs.canonicalCss, js: inputs.canonicalJs, appJsx: inputs.canonicalApp, layoutJsx: inputs.canonicalLayout });
+  const app = buildAppModel(appModelInputs(inputs));
   const result = compareModels(canonical, app);
+  result.failures.unshift(...pinFailures);
   if (canaryFailures.length) result.failures.unshift(`canaries: ${canaryFailures.map((r) => r.id).join(', ')} escaped — see above`);
   result.ok = result.failures.length === 0;
 
@@ -2979,7 +3270,7 @@ if (isMain) {
   if (jsonDir) {
     fs.mkdirSync(jsonDir, { recursive: true });
     fs.writeFileSync(path.join(jsonDir, 'canonical-tokens.json'), `${JSON.stringify({
-      source: [paths.canonicalCss, paths.canonicalJsx, paths.canonicalApp, paths.canonicalLayout],
+      source: [paths.canonicalCss, paths.canonicalJs, paths.canonicalApp, paths.canonicalLayout],
       root: serialise(canonical.root),
       geometry: serialise(canonical.geometry),
       responsive: canonical.responsive.map(({ token, context, value, note }) => ({ token, context, value, note })),
@@ -2990,7 +3281,7 @@ if (isMain) {
       defaultAccents: serialise(canonical.defaultAccents),
     }, null, 2)}\n`);
     fs.writeFileSync(path.join(jsonDir, 'app-tokens.json'), `${JSON.stringify({
-      source: [paths.appCss, paths.appRegistry, ...inputs.siblings.map((s) => s.file)],
+      source: [paths.appCss, paths.appJs, paths.appRegistry, paths.indexHtml, ...inputs.siblings.map((s) => s.file)],
       cascade: result.cascade,
       root: serialise(app.root),
       systems: serialise(app.systems),
@@ -3004,9 +3295,11 @@ if (isMain) {
       registry: app.registry && {
         defaultSystem: app.registry.defaultSystem,
         defaultAccent: app.registry.defaultAccent,
-        systemDefaultAccents: serialise(app.registry.systems),
-        accents: serialise(app.registry.accents),
+        storageKeys: { system: app.registry.systemKey, accent: app.registry.accentKey },
+        systemDefaultAccents: serialise(app.defaultAccents),
+        accents: serialise(app.accents),
       },
+      boot: app.boot && Object.fromEntries(['systemKey', 'accentKey', 'fallbackSystem'].map((k) => [k, app.boot[k]])),
     }, null, 2)}\n`);
     fs.writeFileSync(path.join(jsonDir, 'token-diff.json'), `${JSON.stringify({ ...result, canaries: canaries.rows }, null, 2)}\n`);
   }
@@ -3014,8 +3307,11 @@ if (isMain) {
   const systemCount = canonical.effective.size;
   const compared = Object.values(result.perSystem).reduce((n, rows) => n + rows.filter((r) => r.canonical != null && r.app != null).length, 0);
   console.log(`canonical-token-parity: ${systemCount} systems, ${canonical.accents.size} accents, ${compared} shared token values compared`);
+  console.log(`  canonical pair: ${CANONICAL_PINS.map((p) => `${p.file} sha256 ${p.sha256.slice(0, 12)}…`).join(', ')} (pinned from ${CANONICAL_FETCH.pinned}${latestFetch ? `; latest fetch on disk ${latestFetch}` : '; no fetch on disk to cross-check'})`);
+  if (servedBase) console.log(`  ${servedNote ?? `served: ${CANONICAL_PINS.map((p) => new URL(p.href, servedBase).href).join(' and ')} carry the pinned bytes`}`);
+  if (app.boot) console.log(`  boot: keys ${app.boot.systemKey.value}/${app.boot.accentKey.value}, fallback ${app.boot.fallbackSystem.value}${app.boot.markerVar ? ` (injected via ${THEME_BOOT_MARKER})` : ' (literal)'}; registry defaults ${app.registry?.defaultSystem}/${app.registry?.defaultAccent}`);
   const trackedInSiblings = result.elsewhere.filter((e) => e.file).length;
-  console.log(`  cascade: ${result.cascade.rootBlocks} top-level :root block(s) merged, system blocks ${Object.entries(result.cascade.systemBlocks).map(([id, n]) => `${id}×${n}`).join(' ')}, ${result.cascade.scopedDeclarations} scoped custom-property declaration(s), ${inputs.siblings.length} sibling stylesheet(s) scanned (${result.cascade.siblingDeclarations} custom-property declaration(s), ${trackedInSiblings} tracked)`);
+  console.log(`  cascade: ${result.cascade.rootBlocks} top-level :root block(s) merged, system blocks ${Object.entries(result.cascade.systemBlocks).map(([id, n]) => `${id}×${n}`).join(' ') || 'none (systems paint inline)'}, ${result.cascade.scopedDeclarations} scoped custom-property declaration(s), ${inputs.siblings.length} sibling stylesheet(s) scanned (${result.cascade.siblingDeclarations} custom-property declaration(s), ${trackedInSiblings} tracked)`);
   console.log(`  cascade layers (first appearance across ${app.sheets.length} sheets, browser order): ${result.cascade.layers.length ? `${result.cascade.layers.join(' < ')} < unlayered` : 'none — every rule is unlayered'}`);
   console.log(`  mismatches: ${result.mismatches.length}  missing-in-runtime: ${result.missing.length}  documented deviations honoured: ${result.honoured.length}  runtime-only tokens: ${result.appOnly.length}`);
   if (result.appOnly.length) console.log(`  runtime-only: ${result.appOnly.map((t) => t.token).join(', ')}`);
