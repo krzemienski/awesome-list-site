@@ -470,8 +470,8 @@ and this file should be updated.
 2. **Targets.** Production: `http://localhost:5002` (`npm run build && PORT=5002 npm run start`).
    Development: `http://localhost:5001` (`PORT=5001 npm run dev`). Port 5000 on
    this machine is taken by macOS AirPlay Receiver, so `localhost:5000` is not
-   the app. The run brief names which server is the target. Stage 5 always
-   runs its source scan against the dev server at the same commit (see II-5).
+   the app. The URL you were given is the target. Stage 5 always runs its
+   source scan against the dev server at the same commit (see Stage 5 below).
 3. **Isolation and first load.** Open your first page with
    `new_page({ url, isolatedContext: "<your-validator-name>" })`. A fresh isolated
    context has empty site storage. Confirm it before Stage 3:
@@ -483,20 +483,24 @@ and this file should be updated.
    wait for load, then `await document.fonts.ready`, then ~800 ms
    (Part I Stage 11 uses 800 ms), then measure or screenshot.
 5. **Screenshots.** Save every screenshot with `take_screenshot({ filePath })`
-   under `<evidence-root>/<validator-name>/` using
+   under `/Users/nick/Desktop/awesome-list-site/docs/parity/claude-design-run/evidence/<validator-name>/` using
    `NN-<screen>-<system>-<width>.png`, and view each one (take it without
    `filePath` too, or open the saved file) before you record a judgement about it.
    An unviewed screenshot is not evidence.
-6. **Citations.** Every finding and every PASS line cites the stage number,
+6. **References.** The design source fetched from the claude_design MCP for this
+   run is on disk at `/Users/nick/Desktop/awesome-list-site/.cache/ds-fetch-20260929T0714Z/`
+   (see its `MANIFEST.md`). Open reference images with `navigate_page` on a
+   `file://` URL: `handoff/project/uploads/*.png` and `assets/reference/*.png`.
+7. **Citations.** Every finding and every PASS line cites the stage number,
    the URL, the evaluated expression's result, and the screenshot path(s).
-7. **Don't auto-fix** (Part I). Report only.
+8. **Don't auto-fix** (Part I). Report only.
 
 ## II-1 · Coverage (mandatory)
 
 | Dimension | Values |
 |-----------|--------|
 | Systems (Stage 11 and per-system checks) | `editorial`×`crimson`, `terminal`×`matrix`, `geist`×`cyan`, `brutalist`×`amber`, `swiss`×`orange`, i.e. each at `window.SYSTEM_DEFAULT_ACCENT[id]` |
-| Key screens | Home `/` · About `/about` · Learning journeys `/journeys` · Category `/category/intro-learning` · Resource detail `/resource/<id>` (id given in the run brief) · Login `/sign-in` · Theme settings `/settings/theme` · 404 `/this-route-does-not-exist` |
+| Key screens | Home `/` · About `/about` · Learning journeys `/journeys` · Category `/category/intro-learning` · Resource detail `/resource/184739` · Login `/sign-in` · Theme settings `/settings/theme` · 404 `/this-route-does-not-exist` |
 | Widths | Part I specifies none. Use desktop **1440×900** and mobile **375×667** (the iPhone SE size in `docs/18-launch-checklist.md`), set with `resize_page`. |
 
 Stages 1–4, 9 and 10 are page-level. Run them on every key screen at 1440. Stages 5–8 run on every key screen. Stage 11 runs 5 systems × 8 screens × 2 widths, which is 80 screenshots.
@@ -573,7 +577,7 @@ PASS needs ≥1 token sheet delivered by a `<link rel="stylesheet">` (non-null `
   CSS comments are scanned, because a CSS comment line rarely holds a color by accident. Review every hit. `exempt:true` marks skin-block or `DS-OK` lines; confirm each by reading the line. `unreadable` must be empty. If it isn't, report which modules could not be scanned under Stage 5 as NOT RUNNABLE for those files.
   Part I's "inline styles in … HTML" line: also fetch the served entry document (`fetch('/')` text) and apply `style="[^"]*#[0-9a-fA-F]{3,8}` and `color:\s*#[0-9a-fA-F]{3,8}` to it.
   Apply Part I's "Acceptable hardcoded values" list and `/* DS-OK: intentional */` escapes exactly. For each finding report file (`/src/...` path), line number, and the suggested token from Part I's table.
-  In a production panel, run the same scan on the dev server at the same commit. Confirm the commit by comparing the served `/ds/design-system.css` bytes (sha-256 via `crypto.subtle`) and the page's build revision on both servers. The production bundle's CSS is minified and has lost its comments, so it cannot carry `DS-OK` escapes.
+  In a production panel, run the same scan on the dev server at the same commit. Confirm the commit: `fetch('/api/version')` must return the same `revision` on both servers, and the served `/ds/design-system.css` must hash the same (sha-256 via `crypto.subtle`). If the revisions differ, the Stage 5 result is NOT RUNNABLE for the production target. The production bundle's CSS is minified and has lost its comments, so it cannot carry `DS-OK` escapes.
 
 **Stage 6 (component classes).** Evaluate Part I's expression verbatim on every screen, then do the same for `input, select, textarea` (non-`hidden` types) against `.input/.select/.textarea`.
 Clarification (the rule is "use the design-system classes"): a `<button>` whose class list contains a component class defined by the canonical DS stylesheet counts as DS-classed. Those classes are `btn`, `tab`, `icon-btn`, `accordion-header`, `sub-item`, `header-search-trigger`, `user-pill`, `ds-system-pill`, and `select` (for `role=combobox` triggers). Enumerate them from the DS sheet recorded in Stage 1 rather than trusting this list. Stage 6 audits *interactive* elements (Part I). A control that a user cannot perceive or operate is not one: an element whose computed `visibility` is `hidden` or `display` is `none`, that has `aria-hidden="true"` and is not focusable, such as the invisible implicit-submit button some third-party form widgets inject. List every such element you exclude, with its outerHTML, so the exclusion itself is auditable. A control that is visible, focusable, or exposed to assistive technology is always counted. Report every remaining stray element (tag, classes, text, screen). Pass criterion unchanged: 🟡 FIX per offending element.
@@ -612,7 +616,7 @@ Clarification (the rule is "use the design-system classes"): a `<button>` whose 
   ```
   The count must be ≥ 15. In a production panel, also report whether the served DS stylesheet's sha-256 equals `31fde358acc5bea61c68b17025326169fad4e60c62b898fbacf279a9bc9b2070` (the canonical fetched `styles.css`; the served `design-system.js` must equal `30c37539db397941f209055af28a5284fbdd14a3322adb869701c70b0e05bc7c`). A mismatch is a finding under Stage 10.
 
-**Stage 11 (switch test).** For every key screen × width, run Part I's loop with a screenshot per system, calling `applyDesignSystem(id, SYSTEM_DEFAULT_ACCENT[id])` in-page, settling per II-0 rule 4, then `take_screenshot({ filePath })` and viewing it. Walk Part I's symptom table for every screenshot. Also compare each Editorial screenshot against the fetched references in the run brief (`handoff/project/uploads/*.png`, `assets/reference/*.png`, and the prototype render if provided). Those references are captures of the pre-design-system production site, so use them for structure and content (which regions exist and in what arrangement), and use the fetched design (prototype, docs) for the visual language. Report structural mismatches as Stage 11 findings.
+**Stage 11 (switch test).** For every key screen × width, run Part I's loop with a screenshot per system, calling `applyDesignSystem(id, SYSTEM_DEFAULT_ACCENT[id])` in-page, settling per II-0 rule 4, then `take_screenshot({ filePath })` and viewing it. Walk Part I's symptom table for every screenshot. Also compare each Editorial × Crimson screenshot with the fetched references (`handoff/project/uploads/*.png`, `assets/reference/*.png`). The fetched README defines what they are for: captures of the real product kept "to ground the look-and-feel (red square 'av' logo, dark surfaces, crimson primary CTA, sidebar of categories with counts)". Each of those grounding elements must be visible on the matching screen. One that is missing is a visible bug under Stage 11 (Part I severity). The arrangement of page regions is governed by the design system's own page templates (`docs/11-patterns.md`) and the prototype, not by the legacy captures. Record arrangement differences from the captures as observations with both image paths, not as findings. A reference PNG that the MCP returned truncated cannot be compared; name it as unavailable.
 
 ## II-3 · Shell-command → browser-MCP mapping (record)
 
