@@ -463,8 +463,10 @@ function ClerkQueryClientCacheInvalidator() {
         if (userId !== null) void qc.invalidateQueries();
       } else if (prevUserIdRef.current !== userId) {
         // A real identity switch (sign-in, sign-out, account change): nothing
-        // user-scoped may survive it.
-        qc.clear();
+        // user-scoped may survive it. resetQueries, not clear(): clear() drops
+        // the cache but leaves mounted observers holding their old result, so
+        // the header kept showing "Visitor" after sign-in until a reload.
+        void qc.resetQueries();
       }
       prevUserIdRef.current = userId;
     });
@@ -545,7 +547,6 @@ function Router({ homeComponent: Home }: { homeComponent: HomeRouteComponent }) 
   useCrossTabSync();
   const {
     user,
-    isLoading: authLoading,
     error: authError,
     refetchAuth,
     logout,
