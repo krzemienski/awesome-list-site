@@ -556,9 +556,12 @@
   z-index: 2;
 }
 
+/* 4px + the 44px summary = the page's 48px bottom inset, so the summary sits
+   inside it. At +16px it overhung the inset and every one of these tabs
+   scrolled 12px past the frozen page height. */
 .admin-ops-export > .admin-ops-more,
 .admin-ops-database > .admin-ops-more {
-  top: calc(100% + 16px);
+  top: calc(100% + 4px);
 }
 
 .admin-ops-export > .admin-ops-more > summary,

@@ -222,16 +222,53 @@
     top: 0;
   }
 
+  /* Breadcrumb pages have no spare row, and the frozen reference has no
+     control here. Pinned beside the chips, the toggle forced the parent label
+     onto a second line, so it collapses to a 44px icon button (its label stays
+     as the accessible name) in the breadcrumb band's reserved right column. */
+  .taxonomy-page--subcategory,
+  .taxonomy-page--sub-subcategory {
+    position: relative;
+  }
+
+  .taxonomy-page--subcategory .taxonomy-breadcrumbs,
+  .taxonomy-page--sub-subcategory .taxonomy-breadcrumbs {
+    padding-right: 52px;
+  }
+
   .taxonomy-page--subcategory .taxonomy-summary,
   .taxonomy-page--sub-subcategory .taxonomy-summary {
-    padding-right: 0;
+    position: static;
   }
 
   .taxonomy-page--subcategory .taxonomy-tools-toggle,
   .taxonomy-page--sub-subcategory .taxonomy-tools-toggle {
-    position: static;
-    margin-left: auto;
+    top: 0;
+    justify-content: center;
+    width: 44px;
+    padding: 0;
   }
+
+  .taxonomy-page--subcategory .taxonomy-tools-toggle__icon,
+  .taxonomy-page--sub-subcategory .taxonomy-tools-toggle__icon {
+    display: block;
+  }
+
+  .taxonomy-page--subcategory .taxonomy-tools-toggle__label,
+  .taxonomy-page--sub-subcategory .taxonomy-tools-toggle__label {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip-path: inset(50%);
+    white-space: nowrap;
+  }
+}
+
+.taxonomy-tools-toggle__icon {
+  display: none;
+  width: 16px;
+  height: 16px;
 }
 
 .taxonomy-results-heading-row {

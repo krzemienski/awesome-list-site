@@ -29,7 +29,9 @@
 
 .ops-github-panel > .admin-ops-more,
 .ops-link-health > .admin-ops-more {
-  inset: calc(100% + 16px) auto auto 0;
+  /* Same 4px offset as the export/database disclosures: the 44px summary then
+     fits the page's 48px bottom inset instead of extending the page by 12px. */
+  inset: calc(100% + 4px) auto auto 0;
   position: absolute;
   z-index: 2;
 }
