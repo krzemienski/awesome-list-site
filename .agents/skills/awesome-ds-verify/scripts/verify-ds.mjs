@@ -97,7 +97,7 @@ function gateCatalogue(opts) {
       proves: 'Runtime tokens, accents and canonical utility rules resolve to the frozen design source (awesome-list-site-ds) for all 5 systems x 10 accents, or carry a documented deviation.',
       cmd: ['node', 'scripts/validation/canonical-token-parity.mjs'] },
     { id: 'theme-registry-types', stages: ['1'], severity: 'BLOCK', needs: 'offline', tier: 'core',
-      proves: 'THEME_FALLBACK_REGISTRY rejects unknown/duplicate system and accent ids at compile time.',
+      proves: 'design-system.ts compiles standalone and rejects an unknown DEFAULT_SYSTEM or DEFAULT_ACCENT; registry uniqueness lives in the canonical JS and is checked by accent-drift.',
       cmd: ['node', 'scripts/validation/theme-registry-type-safety.mjs'] },
     { id: 'accent-drift', stages: ['1', '2', '3', '9', '10'], severity: 'BLOCK', needs: 'offline', tier: 'core',
       proves: 'Registry, pre-paint boot markers, :root[data-system]/[data-accent] blocks, skin selectors, font options and the always-on font <link> all agree.',
@@ -106,7 +106,7 @@ function gateCatalogue(opts) {
       proves: 'Every :root[data-system] block declares the token set its peers agree on.',
       cmd: ['node', 'scripts/validation/stylelint-design-system-token-contract.mjs'] },
     { id: 'skin-blocks', stages: ['10'], severity: 'BLOCK', needs: 'offline', tier: 'core', builtin: 'skinBlocks',
-      proves: 'Both skin layers survive in design-system.css: [data-system] selectors (>= 60) and data-ds bridge hooks (>= 15), with every system represented.' },
+      proves: 'The canonical client/public/ds/design-system.css keeps its [data-system] skin selectors (>= 55) with every system represented, and design-system.js defines every system.' },
     { id: 'palette-drift', stages: ['5'], severity: 'FIX', needs: 'offline', tier: 'core',
       proves: 'No new hardcoded hex / rgb() / Tailwind palette class / raw radius / font-family in client/src beyond the shrink-only baseline; SKILL.md stage-5 regex parity.',
       cmd: ['node', 'scripts/validation/palette-drift.mjs'] },
@@ -171,22 +171,21 @@ function gateCatalogue(opts) {
 // raw counts the skill asks for, so it lives here — reading the real file).
 // ---------------------------------------------------------------------------
 function skinBlocks(repo) {
-  const file = path.join(repo, 'client/src/styles/design-system.css');
+  const file = path.join(repo, 'client/public/ds/design-system.css');
+  const jsFile = path.join(repo, 'client/public/ds/design-system.js');
   const lines = [];
-  if (!fs.existsSync(file)) return { pass: false, log: `missing ${file}` };
+  for (const f of [file, jsFile]) if (!fs.existsSync(f)) return { pass: false, log: `missing ${f}` };
   const css = fs.readFileSync(file, 'utf8').replace(/\/\*[\s\S]*?\*\//g, '');
+  const js = fs.readFileSync(jsFile, 'utf8');
   const systemSelectors = css.match(/\[data-system="(?:editorial|terminal|geist|brutalist|swiss)"\]/g) || [];
-  const bridgeHooks = css.match(/data-ds(?:-variant)?\b/g) || [];
   let pass = true;
   const check = (ok, message) => { lines.push(`${ok ? 'PASS' : 'FAIL'} ${message}`); if (!ok) pass = false; };
-  check(systemSelectors.length >= 60, `[data-system] selector count ${systemSelectors.length} (floor 60)`);
-  check(bridgeHooks.length >= 15, `data-ds bridge hook count ${bridgeHooks.length} (floor 15)`);
+  check(systemSelectors.length >= 55, `[data-system] selector count ${systemSelectors.length} (floor 55)`);
   for (const id of SYSTEMS) {
     const skins = (css.match(new RegExp(`\\[data-system="${id}"\\]\\s+[^{,]+`, 'g')) || []).length;
     check(skins > 0, `${id}: ${skins} component skin selector(s)`);
-    if (id !== 'editorial') {
-      check(new RegExp(`:root\\[data-system="${id}"\\]\\s*\\{`).test(css), `${id}: :root[data-system] token block present`);
-    }
+    // Per-system tokens are not CSS blocks: applyDesignSystem() writes them inline from DESIGN_SYSTEMS.
+    check(new RegExp(`^\\s*${id}\\s*:\\s*\\{`, 'm').test(js), `${id}: DESIGN_SYSTEMS entry present in design-system.js`);
   }
   return { pass, log: lines.join('\n') };
 }
@@ -288,7 +287,7 @@ if (opts.list) {
   process.exit(0);
 }
 
-const SENTINELS = ['scripts/validation/palette-drift.mjs', 'client/src/styles/design-system.css', 'awesome-list-site-ds/styles.css'];
+const SENTINELS = ['scripts/validation/palette-drift.mjs', 'client/public/ds/design-system.css', 'awesome-list-site-ds/styles.css'];
 const missingSentinels = SENTINELS.filter((file) => !fs.existsSync(path.join(opts.repo, file)));
 if (missingSentinels.length) {
   die(`${opts.repo} does not look like awesome-list-site (missing ${missingSentinels.join(', ')}). Pass --repo <path>.`);

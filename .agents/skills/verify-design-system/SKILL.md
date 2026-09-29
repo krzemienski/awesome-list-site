@@ -19,13 +19,14 @@ description: The 11-stage Awesome.Video design-system compliance contract for th
 **Know your target before you start.** There are two kinds of surface, with
 different mechanics but one contract:
 
-1. **The shipped app** (`client/`) — consumes the DS through **shadcn
-   primitives + the Tailwind bridge** (`client/src/index.css`), with
-   per-system skins keyed on data hooks (`data-ds-variant`, `data-ds="chip"`,
-   `data-ds="card-hover"`). There is **no** `design-systems.js` script tag and
-   almost no raw `.btn`/`.input` usage — that is correct, not a violation.
-2. **Standalone HTML artifacts** (exports, mockups, one-pagers) — load
-   `design-system.css` via `<link>` (or inline tokens) and may use the raw DS
+1. **The shipped app** (`client/`) — loads the canonical
+   `client/public/ds/design-system.{css,js}` from `client/index.html` and
+   consumes it through **shadcn primitives that render the DS classes**
+   (`Button` → `.btn`, `Badge` → `.chip`, `Card` → `.card`) plus the Tailwind
+   bridge (`client/src/index.css` + `client/src/styles/app-bridge.css`), so the
+   canonical `[data-system="…"] .btn/.chip/.card` skins apply unchanged.
+2. **Standalone HTML artifacts** (exports, mockups, one-pagers) — load the
+   canonical `design-system.css` via `<link>` (or inline tokens) and may use the raw DS
    classes (`.btn`, `.chip`, `.card`) directly, per `docs/AGENTS.md` §5.
 
 The consumption contract is `docs/AGENTS.md`; the token catalog is
@@ -38,7 +39,8 @@ prototype.
 
 1. Confirm you can see the target files. For the app, that's
    `client/index.html`, `client/src/index.css`,
-   `client/src/styles/design-system.css`, and the page's components. For a
+   `client/public/ds/design-system.{css,js}`, `client/src/styles/app-bridge.css`,
+   and the page's components. For a
    standalone artifact, its HTML plus any CSS it references.
 2. Run the **11 audit stages** below, in order. Don't skip ahead.
 3. For each finding, tag with severity: 🔴 **BLOCK**, 🟡 **FIX**, 🟢 **NIT**.
@@ -142,15 +144,20 @@ CSS, and prerender all differ).
 
 **In the app**, the load path is:
 
-- [ ] **CSS:** `client/src/styles/design-system.css` is imported at the **top**
-  of `client/src/index.css` (foundation order — it must precede the Tailwind
-  layers or the bridge resolves against nothing). Vite bundles it; in dev it
-  arrives as an injected `<style>` tag, so do **not** expect a
-  `<link rel="stylesheet">` in the served HTML.
-- [ ] **JS:** `client/src/lib/design-system.ts` mirrors the definitions onto
+- [ ] **CSS:** `client/index.html` `<head>` has
+  `<link rel="stylesheet" href="/ds/design-system.css">` (the verbatim
+  canonical `client/public/ds/design-system.css`, served as-is, not bundled)
+  **ahead of** the Vite bundle. `client/src/index.css` does not import it; it
+  loads the Tailwind layers and then `@import`s `./styles/app-bridge.css`,
+  which maps the DS tokens onto the shadcn/Tailwind names.
+- [ ] **JS:** a classic, parser-blocking
+  `<script src="/ds/design-system.js">` follows the `<link>` and defines
   `window.DESIGN_SYSTEMS`, `window.ACCENTS`, `window.SYSTEM_DEFAULT_ACCENT`,
-  and `window.applyDesignSystem` at module load — there is no
-  `design-systems.js` script tag, and its absence is not a finding.
+  and `window.applyDesignSystem`; the inline boot after it calls
+  `applyDesignSystem(sys, acc)` with the storage keys and default system that
+  Vite injects from `THEME_BOOT_DATA` (`client/src/lib/design-system.ts`) at
+  `__AWESOME_VIDEO_THEME_BOOT__`. `design-system.ts` only reads those
+  globals; it does not define them.
 
 **In a standalone artifact**, expect a `<link>` to a stylesheet containing the
 `:root { --bg: …; }` token block (or the tokens inlined), per
@@ -204,7 +211,7 @@ with JSON serialized from `THEME_BOOT_DATA` / `PRODUCT_PROFILE_BOOT_DATA`
 so the script stays inline with no network request and no hand-maintained
 list. A missing/invalid system falls back to the route's product-profile
 default (Editorial on public routes). A missing/invalid accent falls back to
-the resolved system's natural accent, `THEME_BOOT.systemDefaultAccent[sys]`
+the resolved system's natural accent, `window.SYSTEM_DEFAULT_ACCENT[sys]`
 (terminal→matrix, geist→cyan, brutalist→amber, swiss→orange,
 editorial→crimson), per HANDOFF `ds-accent || SYSTEM_DEFAULT_ACCENT[sys]`.
 The script then sets `data-product-profile` / `data-system` / `data-accent`
@@ -260,7 +267,6 @@ resolve through a DS token — via bridged Tailwind utilities (`bg-card`,
 ```bash
 # Hex colors in app code (excluding the DS sources of truth)
 rg '#[0-9a-fA-F]{3,8}\b' client/src \
-  --glob '!client/src/styles/design-system.css' \
   --glob '!client/src/index.css' \
   --glob '!client/src/lib/charts/palette.ts'
 
@@ -268,18 +274,14 @@ rg '#[0-9a-fA-F]{3,8}\b' client/src \
 rg -n '\b(bg|text|border(?:-[xytrblse])?|ring|fill|stroke|from|via|to|divide|outline|decoration|shadow|accent|caret|placeholder|ring-offset|inset-ring|inset-shadow)-(slate|gray|zinc|neutral|stone|red|orange|amber|yellow|lime|green|emerald|teal|cyan|sky|blue|indigo|violet|purple|fuchsia|pink|rose)-[0-9]{2,3}\b' client/src
 
 # Raw radii / borders that bypass the ladders
-rg 'border(-radius)?:\s*\d+px|rounded-\[\d+px\]' client/src \
-  --glob '!client/src/styles/design-system.css'
+rg 'border(-radius)?:\s*\d+px|rounded-\[\d+px\]' client/src
 
 # Raw font-family strings
-rg "font-family:\s*['\"]" client/src \
-  --glob '!client/src/styles/design-system.css' \
-  --glob '!client/index.html'
+rg "font-family:\s*['\"]" client/src
 
 # rgb()/rgba() literals (inline style values included) — off-system colors
 # hiding from the hex scan. rgba(var(--…))-composed values are on-system.
 rg -i '\brgba?\(' client/src \
-  --glob '!client/src/styles/design-system.css' \
   --glob '!client/src/index.css' \
   --glob '!client/src/lib/charts/palette.ts' \
   | rg -v 'var\(\s*--'
@@ -359,20 +361,23 @@ or within the 5 lines above the value):
 
 - The global status constants `#34d08c` (ok) / `#ffb84d` (warn) / `#ff5c7a`
   (bad) — semantics, not theme. In CSS they are tokens (`--status-ok`,
-  `--status-warn`, `--status-bad`, `--status-info` in the design-system.css
-  `:root`); suggest `var(--status-*)` over a new literal.
+  `--status-warn`, `--status-bad`, `--status-info` in the
+  `client/src/styles/app-bridge.css` `:root`); suggest `var(--status-*)` over a new literal.
 - The on-accent inks `#000000` / `#0a0a0a` (text sitting on accent fills).
 - `CHART_PALETTE` entries in `client/src/lib/charts/palette.ts` (recharts
   can't read CSS vars from prop strings).
 - The bridge block in `client/src/index.css`.
 - `[data-system="…"]` skin blocks inside
-  `client/src/styles/design-system.css` — intentional per-system overrides.
+  `client/public/ds/design-system.css` — intentional per-system overrides
+  (canonical, never edited).
 - The font/theme boot data in the `client/index.html` pre-paint script
   (Vite-injected from `FONT_BOOT_DATA` / `THEME_BOOT_DATA`, never
   hand-edited). **Enforced, not trusted:** the same
   `accent-drift` gate parses `FONT_OPTIONS` out of
   `client/src/lib/font-options.ts` (its own header calls itself the source of
-  truth) and `DESIGN_SYSTEMS`/`DEFAULT_SYSTEM` out of `design-system.ts`, and
+  truth), `DESIGN_SYSTEMS` out of the canonical
+  `client/public/ds/design-system.js` and `DEFAULT_SYSTEM` out of
+  `design-system.ts`, and
   fails when a font id or a system id exists in only one side, when a boot
   `FONT_STACKS` stack disagrees with the matching `FONT_OPTIONS` stack, when
   the boot fallback system id ≠ `DEFAULT_SYSTEM`, or when the boot fallback
@@ -390,8 +395,9 @@ or within the 5 lines above the value):
   — no per-system stylesheets exist) and requires HTTP 200 **plus** an
   `@font-face` for every family the URL asks for. It is not part of the
   validation suite (network), so nothing runs it for you.
-- The per-system default accent map `SYSTEM_DEFAULT_ACCENT` in
-  `client/src/lib/design-system.ts` — the accent each system is meant to
+- The per-system default accent map `window.SYSTEM_DEFAULT_ACCENT` in
+  `client/public/ds/design-system.js` (read via
+  `getSystemDefaultAccents()` in `client/src/lib/design-system.ts`) — the accent each system is meant to
   arrive with, read as `SYSTEM_DEFAULT_ACCENT[id] || DEFAULT_ACCENT`.
   **Enforced, not trusted:** the same `accent-drift` gate fails when a
   `DESIGN_SYSTEMS` id has no entry (the system then keeps whatever accent is
@@ -399,22 +405,23 @@ or within the 5 lines above the value):
   when an entry is keyed by a system that no longer exists, or when an entry
   names an accent id that is not in `ACCENTS`. Adding a system means adding
   its default accent row too.
-- The ten accent swatches in the `ACCENTS` array of
-  `client/src/lib/design-system.ts` — only the ACTIVE accent's
+- The ten accent swatches in `window.ACCENTS` (canonical
+  `client/public/ds/design-system.js`, read via `getAccents()` in
+  `client/src/lib/design-system.ts`) — only the ACTIVE accent's
   `--accent`/`--accent-2` are readable at runtime, so the `/settings/theme`
-  picker has to inline all ten. **Enforced, not trusted:** the
-  `accent-drift` validation gate (`scripts/validation/accent-drift.mjs`)
-  parses the `:root[data-accent="…"]` blocks out of
-  `client/src/styles/design-system.css`, the `ACCENTS` array out of
-  `design-system.ts`, and the pre-paint id allowlist out of
-  `client/index.html`, and fails when an accent id exists in only some of
-  them, when a `primary`/`secondary` disagrees with `--accent`/`--accent-2`,
-  when `:root`'s default pair stops matching `DEFAULT_ACCENT`, or when the
-  boot fallback id drifts. Hex identity is normalized (`#0f8` ≡ `#00ff88`);
-  a notation swap (hex ↔ `rgb()`) fails on purpose. Either parser finding
-  zero accents is itself a failure, so renaming the array or the selector
-  can never make the gate pass vacuously. Adding an accent means editing
-  all three files.
+  picker reads all ten from that array. There are no
+  `:root[data-accent="…"]` CSS blocks: `applyDesignSystem()` writes the
+  accent as inline custom properties on `<html>`. **Enforced, not trusted:**
+  the `accent-drift` validation gate (`scripts/validation/accent-drift.mjs`)
+  reads the registry and `applyDesignSystem()` out of the canonical
+  `client/public/ds/design-system.{js,css}` and fails when
+  `design-system.ts` restates a table instead of returning the globals, when
+  `client/index.html` stops loading the canonical files ahead of the inline
+  boot, when the canonical `:root` default pair stops matching
+  `DEFAULT_ACCENT`, or when an app stylesheet declares a `[data-accent]`
+  rule or its own `--accent`/`--accent-2`. Parsing zero accents is itself a
+  failure, so the gate can never pass vacuously. Accents come from the
+  canonical design system; adding one here means re-adopting its files.
 - `#000`/`#fff` in SVG elements that need fixed paint.
 - A radius, border width or font stack that genuinely has no ladder step —
   e.g. a `::-webkit-scrollbar-thumb` corner or a forced-colors
@@ -1025,14 +1032,12 @@ falls back to Georgia and the whole magazine vibe collapses.
 
 **Severity: 🔴 BLOCK**
 
-Skins live in `client/src/styles/design-system.css` in **two parallel
-forms**, and both must survive:
-
-1. **Raw DS-class skins** (`[data-system="…"] .chip/.btn/.card…`) — for
-   static surfaces and showcase helpers.
-2. **Shadcn bridge skins** (`[data-system="…"] [data-ds-variant=…]`,
-   `[data-ds="chip"]`, `[data-ds="card-hover"]`) — the same extras for the
-   app's primitives.
+Skins live at the bottom of the canonical `client/public/ds/design-system.css`
+as raw DS-class rules (`[data-system="…"] .btn/.chip/.card/.input/.eyebrow…`).
+There is no second, shadcn-specific skin layer: the app's primitives render
+the DS classes (`Button` → `.btn`, `Badge` → `.chip`, `Card` → `.card`), so
+the same rules skin them. `client/src/styles/app-bridge.css` adds only a few
+`[data-system="…"]` rules for Clerk's widgets (`.cl-*`).
 
 Without them: Terminal chips lose their `[brackets]`, Brutalist cards lose
 the `4px 4px 0 0` offset slab, Swiss falls back from hairlines to 1px
@@ -1042,14 +1047,16 @@ Verify by counting:
 
 ```bash
 rg '\[data-system="(editorial|terminal|geist|brutalist|swiss)"\]' \
-  client/src/styles/design-system.css | wc -l   # expected ≥ 60 (~80 today)
+  client/public/ds/design-system.css | wc -l   # expected 55 (the canonical file)
 
-rg 'data-ds' client/src/styles/design-system.css | wc -l   # expected ≥ 15 (~25 today)
+rg 'data-ds' client/public/ds/design-system.css | wc -l   # expected 0 — no data-hook skins exist
 ```
 
-If either count is 0 or collapses, a skin layer was stripped during a
-refactor. If only the second is low, shadcn primitives silently lose their
-per-system extras even though raw-class skins look intact.
+The canonical file is verbatim and must never be edited, so a first count
+other than 55 means it drifted from the fetched source (compare its sha-256
+with `docs/parity/SKILL-verify-design-system.md` Stage 10). If skins look
+missing in the app while the count is intact, a primitive stopped rendering
+its DS class (`.btn`/`.chip`/`.card`).
 
 ---
 

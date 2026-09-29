@@ -49,8 +49,11 @@ token and both values. Fix the runtime, or — only if the difference is
 deliberate — add a reasoned entry to `DOCUMENTED_DEVIATIONS` *and*
 `docs/parity/assumptions/tokens.md`. Never edit the design source.
 
-**`theme-registry-types`** 🔴 — compile-time proof that
-`THEME_FALLBACK_REGISTRY` rejects unknown or duplicate ids. Needs `tsc`.
+**`theme-registry-types`** 🔴 — compiles `client/src/lib/design-system.ts`
+standalone, then re-compiles it with an unknown `DEFAULT_SYSTEM` and an unknown
+`DEFAULT_ACCENT` and expects both to be rejected. Needs `tsc`. The registry
+tables live in the canonical `client/public/ds/design-system.js`; their
+uniqueness and default-accent rows are checked by `accent-drift`.
 
 **`accent-drift`** 🔴 — the registry-mirror gate. Eleven comparisons between
 `design-system.ts`, `design-system.css`, `font-options.ts` and
