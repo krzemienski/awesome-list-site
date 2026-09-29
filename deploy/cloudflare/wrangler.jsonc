@@ -1,0 +1,21 @@
+{
+  "name": "awesome-video-cf",
+  "main": "src/index.ts",
+  "compatibility_date": "2026-09-01",
+  "observability": { "enabled": true },
+  "routes": [{ "pattern": "cf.awesome.video", "custom_domain": true }],
+  "containers": [
+    {
+      "class_name": "AwesomeVideoApp",
+      // Built from the repo Dockerfile and pushed with `wrangler containers
+      // push`; the tag is the git revision the image was built from.
+      "image": "registry.cloudflare.com/24080dbbce9363d385fac0500c121b85/awesome-video-cf:9ff56820",
+      "instance_type": "standard-1",
+      "max_instances": 1
+    }
+  ],
+  "durable_objects": {
+    "bindings": [{ "class_name": "AwesomeVideoApp", "name": "APP" }]
+  },
+  "migrations": [{ "new_sqlite_classes": ["AwesomeVideoApp"], "tag": "v1" }]
+}
