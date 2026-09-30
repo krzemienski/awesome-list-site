@@ -410,7 +410,7 @@ export default function AdminOverview({ stats }: AdminOverviewProps) {
                   <span className="admin-canonical-activity-action">
                     {entry.action.replace(/[_-]/g, " ")}
                   </span>
-                  <span className="admin-canonical-activity-target">
+                  <span className="admin-canonical-activity-target" title={auditTarget(entry)}>
                     {auditTarget(entry)}
                   </span>
                   <span className="admin-canonical-activity-time">
