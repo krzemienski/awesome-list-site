@@ -300,6 +300,7 @@ export default function TaxonomyListing({ level }: Props) {
     pendingAnalyticsRef.current = null;
   }, [currentFilterSignature, level, taxonomySearch.data, taxonomySearch.isPlaceholderData]);
 
+  const hydratedRouteRef = useRef(`${routeFor(level, slug)}?${search}`);
   const urlSyncInitialized = useRef(false);
   const popNavigation = useRef(false);
   const pushSnapshot = useRef("");
@@ -334,6 +335,9 @@ export default function TaxonomyListing({ level }: Props) {
     if (current !== href) {
       const shouldPush = urlSyncInitialized.current && !popNavigation.current && pushSnapshot.current !== snapshot;
       window.history[shouldPush ? "pushState" : "replaceState"]({}, "", href);
+      // Our own write already matches state; rehydrating from it would clear
+      // the page-clamp notice set just before this rewrite.
+      hydratedRouteRef.current = `${routeFor(level, slug)}?${next}`;
     }
     urlSyncInitialized.current = true;
     popNavigation.current = false;
@@ -368,7 +372,6 @@ export default function TaxonomyListing({ level }: Props) {
   // as well; otherwise a search/filter/page from the previous sibling leaks
   // into the newly selected category and the URL no longer describes the
   // visible controls.
-  const hydratedRouteRef = useRef(`${routeFor(level, slug)}?${search}`);
   useEffect(() => {
     const routeKey = `${routeFor(level, slug)}?${search}`;
     if (hydratedRouteRef.current === routeKey) return;
