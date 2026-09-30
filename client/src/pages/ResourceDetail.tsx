@@ -484,10 +484,20 @@ export default function ResourceDetail() {
 
   // Run16 BUG-020: the Visit Resource CTAs are real anchors now (Button
   // asChild), so navigation is native and can never silently no-op;
-  // middle-click/cmd-click also work. The click handler only fires the toast.
+  // middle-click/cmd-click also work. The click handler records the visit
+  // and fires the toast.
   const handleVisitResource = () => {
     if (resource) {
       trackResourceClick(resource.title, resource.url, resource.category ?? "uncategorized");
+      // The analytics event above never reaches the user's interaction
+      // history; record the visit there like the page view.
+      if (user?.id) {
+        trackInteraction.mutate({
+          resourceId: resource.id.toString(),
+          interactionType: "click",
+          metadata: { source: "visit" },
+        });
+      }
     }
     toast({
       title: "Opening resource",
