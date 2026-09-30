@@ -1,5 +1,6 @@
 import { useQuery } from "@tanstack/react-query";
 import { apiRequest } from "@/lib/queryClient";
+import { formatRelativeAgo } from "@/lib/utils";
 import Stat from "@/components/admin/canonical/Stat";
 
 interface AdminStatsProps {
@@ -84,14 +85,7 @@ function oldestPendingAge(resources: PendingResource[] | undefined): string {
     ), null);
 
   if (oldest === null) return "nothing waiting";
-  const elapsed = Math.max(0, Date.now() - oldest);
-  const minutes = Math.floor(elapsed / 60_000);
-  if (minutes < 1) return "oldest just now";
-  if (minutes < 60) return `oldest ${minutes}m ago`;
-  const hours = Math.floor(minutes / 60);
-  if (hours < 24) return `oldest ${hours}h ago`;
-  const days = Math.floor(hours / 24);
-  return `oldest ${days}d ago`;
+  return `oldest ${formatRelativeAgo(new Date(oldest))}`;
 }
 
 /**

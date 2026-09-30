@@ -55,6 +55,24 @@ function tabFromWindow(): string | null {
   return fromQuery;
 }
 
+// Nearest-edge reveal of a tab trigger inside the strip's own scroller (never
+// the window), inset by the strip's scroll-padding so the trigger never lands
+// under the overlaid scroll-arrow buttons. 1px tolerance so a sub-pixel
+// overhang never nudges the strip.
+function revealTabTrigger(scroller: HTMLElement, trigger: HTMLElement) {
+  if (scroller.scrollWidth <= scroller.clientWidth) return;
+  const style = getComputedStyle(scroller);
+  const insetStart = parseFloat(style.scrollPaddingInlineStart) || 0;
+  const insetEnd = parseFloat(style.scrollPaddingInlineEnd) || 0;
+  const triggerRect = trigger.getBoundingClientRect();
+  const scrollerRect = scroller.getBoundingClientRect();
+  const overflowRight = triggerRect.right - (scrollerRect.right - insetEnd);
+  const overflowLeft = scrollerRect.left + insetStart - triggerRect.left;
+  if (overflowRight <= 1 && overflowLeft <= 1) return;
+  const delta = overflowRight > 1 ? overflowRight : -overflowLeft;
+  scroller.scrollLeft = Math.max(0, Math.min(scroller.scrollLeft + delta, scroller.scrollWidth - scroller.clientWidth));
+}
+
 export default function AdminDashboard() {
   const { stats, isLoading, error } = useAdmin();
   const { isAuthenticated, user, isLoading: authLoading } = useAuth();
@@ -108,41 +126,35 @@ export default function AdminDashboard() {
   // The single-row strip overflows below ~1100px. Reveal the active trigger
   // in its own scroller (never the window) so a deep link such as
   // /admin#github shows which tab is open instead of the strip's first tabs;
-  // a trigger that is already fully visible stays put. The strip can still be
-  // wrapping (its page stylesheet not yet applied) when the tab first renders,
-  // so wait for the list to resize into its single row and for fonts to
-  // settle — then stop observing: later viewport changes (a window resize, a
-  // full-page capture) must leave the user's own scroll position alone.
+  // a trigger that is already fully visible stays put. The strip keeps
+  // settling after it first renders (its page stylesheet, fonts, the page
+  // scrollbar appearing once the panel's data loads and narrowing the strip),
+  // so re-reveal on every strip resize until the user scrolls the strip
+  // themselves — from then on their own scroll position is left alone.
   // The strip only mounts once auth and stats have loaded, so a cold deep link
   // re-runs this when the loading gates open, not just when the tab changes.
   const tabStripMounted = !authLoading && !isLoading && !error;
   useEffect(() => {
     const scroller = document.querySelector<HTMLElement>(".admin-dashboard__tabs");
-    if (!scroller) return;
-    let revealed = false;
-    const observer = new ResizeObserver(() => reveal());
+    const host = scroller?.parentElement;
+    if (!scroller || !host) return;
+    let released = false;
     const reveal = () => {
       const trigger = scroller.querySelector<HTMLElement>(`[data-testid="tab-${visibleTab}"]`);
-      if (revealed || !trigger || scroller.scrollWidth <= scroller.clientWidth) return;
-      revealed = true;
-      observer.disconnect();
-      const triggerRect = trigger.getBoundingClientRect();
-      const scrollerRect = scroller.getBoundingClientRect();
-      // Nearest-edge alignment (what the browser's own scroll-into-view does),
-      // with a 1px tolerance so a sub-pixel overhang never nudges the strip.
-      const overflowRight = triggerRect.right - scrollerRect.right;
-      const overflowLeft = scrollerRect.left - triggerRect.left;
-      if (overflowRight <= 1 && overflowLeft <= 1) return;
-      const delta = overflowRight > 1 ? overflowRight : -overflowLeft;
-      scroller.scrollLeft = Math.max(0, Math.min(scroller.scrollLeft + delta, scroller.scrollWidth - scroller.clientWidth));
+      if (!released && trigger) revealTabTrigger(scroller, trigger);
     };
-    reveal();
-    if (!revealed) observer.observe(scroller);
-    let cancelled = false;
-    document.fonts?.ready.then(() => { if (!cancelled) reveal(); });
-    return () => {
-      cancelled = true;
+    const observer = new ResizeObserver(reveal);
+    const release = () => {
+      released = true;
       observer.disconnect();
+    };
+    const userScrollEvents = ["pointerdown", "wheel", "touchstart"] as const;
+    userScrollEvents.forEach((type) => host.addEventListener(type, release, { passive: true }));
+    observer.observe(scroller);
+    document.fonts?.ready.then(reveal);
+    return () => {
+      release();
+      userScrollEvents.forEach((type) => host.removeEventListener(type, release));
     };
   }, [visibleTab, tabStripMounted]);
 
@@ -363,6 +375,10 @@ export default function AdminDashboard() {
                   // Radix suppresses same-value changes. A folded subsection
                   // still needs to return to its already-selected parent.
                   if (visibleTab === id && activeTab !== id) handleTabChange(id);
+                }}
+                onFocus={(event) => {
+                  const scroller = event.currentTarget.closest<HTMLElement>(".admin-dashboard__tabs");
+                  if (scroller) revealTabTrigger(scroller, event.currentTarget);
                 }}
                 onKeyDown={(event) => {
                   if (visibleTab === id && activeTab !== id &&

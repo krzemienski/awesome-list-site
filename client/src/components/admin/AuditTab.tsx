@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { ApiError } from "@/lib/queryClient";
 import { formatRelativeAgo } from "@/lib/utils";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, keepPreviousData } from "@tanstack/react-query";
 import { TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -105,7 +105,7 @@ export default function AuditTab() {
 
   // Run23 NB-041: surface fetch failures as a distinct error state instead of
   // letting them render as the "No audit log entries found" empty state.
-  const { data, isLoading, isError, refetch, isFetching } = useQuery<AuditLogsResponse>({
+  const { data, isLoading, isError, refetch, isFetching, isPlaceholderData } = useQuery<AuditLogsResponse>({
     queryKey: ['/api/admin/audit-logs', appliedFilter, appliedLimit, offset],
     queryFn: async () => {
       const params = new URLSearchParams({ limit: appliedLimit, offset: String(offset) });
@@ -117,6 +117,9 @@ export default function AuditTab() {
     // R5-037: refresh admin data when the operator returns to the tab.
     staleTime: 30_000,
     refetchOnWindowFocus: true,
+    // F1080: keep the current page (and the focused pager button) mounted
+    // while the next page loads instead of swapping in the skeleton.
+    placeholderData: keepPreviousData,
   });
 
   // ADM-08: validate the Resource ID filter client-side against the SAME rule
@@ -400,8 +403,11 @@ export default function AuditTab() {
                 type="button"
                 variant="outline"
                 size="sm"
-                disabled={offset === 0 || isFetching}
-                onClick={() => setOffset(Math.max(0, offset - parseInt(appliedLimit, 10)))}
+                disabled={offset === 0}
+                aria-busy={isPlaceholderData}
+                onClick={() => {
+                  if (!isPlaceholderData) setOffset(Math.max(0, offset - parseInt(appliedLimit, 10)));
+                }}
                 data-testid="button-audit-prev"
               >
                 Previous
@@ -410,8 +416,11 @@ export default function AuditTab() {
                 type="button"
                 variant="outline"
                 size="sm"
-                disabled={offset + parseInt(appliedLimit, 10) >= data.total || isFetching}
-                onClick={() => setOffset(offset + parseInt(appliedLimit, 10))}
+                disabled={offset + parseInt(appliedLimit, 10) >= data.total}
+                aria-busy={isPlaceholderData}
+                onClick={() => {
+                  if (!isPlaceholderData) setOffset(offset + parseInt(appliedLimit, 10));
+                }}
                 data-testid="button-audit-next"
               >
                 Next
