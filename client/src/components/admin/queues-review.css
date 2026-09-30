@@ -44,19 +44,17 @@
   min-height: 44px;
 }
 
-.queue-review-actions .btn:disabled {
-  cursor: default;
-  opacity: 1;
+.queue-review-actions .btn:disabled,
+.queue-review-actions button:disabled {
+  cursor: not-allowed;
+  opacity: 0.45;
 }
 
-.queue-review-extra-action {
-  opacity: 0;
-  position: absolute;
-}
-
-.queue-review-extra-action:focus-visible {
-  opacity: 1;
-  position: static;
+.queue-review-empty-row {
+  color: var(--text-2);
+  font-size: 0.8125rem;
+  padding: 18px 22px;
+  text-align: center;
 }
 
 .queue-review-table-wrap {

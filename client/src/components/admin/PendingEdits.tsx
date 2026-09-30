@@ -262,7 +262,6 @@ export default function PendingEdits() {
           <Button
             variant="ghost"
             size="sm"
-            className="queue-review-extra-action"
             onClick={() => {
               void queryClient.invalidateQueries({ queryKey: ['/api/admin/resource-edits'] });
             }}
@@ -282,6 +281,7 @@ export default function PendingEdits() {
         >
           <table className="table">
             <thead><tr><th>Resource</th><th>Field</th><th>Editor</th><th>When</th><th><span className="sr-only">Actions</span></th></tr></thead>
+            <tbody><tr><td colSpan={5} className="queue-review-empty-row">No pending edits.</td></tr></tbody>
           </table>
         </div>
       </section>

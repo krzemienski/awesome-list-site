@@ -420,7 +420,6 @@ export default function PendingResources() {
             <Button
               variant="ghost"
               size="sm"
-              className="queue-review-extra-action"
               disabled={recheckState === 'checking'}
               onClick={() => {
                 setRecheckState('checking');
@@ -451,6 +450,7 @@ export default function PendingResources() {
         >
           <table className="table">
             <thead><tr><th>Title</th><th>Category</th><th>Submitted by</th><th>When</th><th><span className="sr-only">Actions</span></th></tr></thead>
+            <tbody><tr><td colSpan={5} className="queue-review-empty-row">No pending submissions.</td></tr></tbody>
           </table>
         </div>
         <span className="sr-only" role="status" aria-live="polite">
@@ -473,6 +473,7 @@ export default function PendingResources() {
               variant="ghost"
               onClick={openBulkRejectDialog}
               disabled={selectedPendingResourceIds.length === 0 || bulkRejectMutation.isPending || bulkApproveMutation.isPending}
+              title={selectedPendingResourceIds.length === 0 ? "Select rows to bulk reject" : undefined}
               data-testid="button-bulk-reject"
             >
               Bulk reject{selectedPendingResourceIds.length > 0 ? ` (${selectedPendingResourceIds.length})` : ""}
