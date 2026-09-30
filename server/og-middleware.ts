@@ -2286,24 +2286,23 @@ export function ogInjectionMiddleware() {
       const safeNext = next && /^\/(?![/\\])/.test(next) ? next : null;
       return safeNext ? `${to}?redirect_url=${encodeURIComponent(safeNext)}` : to;
     };
-    if (urlPath === "/login" || urlPath === "/forgot-password" || urlPath === "/reset-password") {
-      return res.redirect(301, legacyAuthTarget("/sign-in"));
+    // BUG-009 / R3-08: /auth/* and /signup were never routes either; every
+    // alias shares the same ?next= carry-over (mirrors client LegacyAuthRedirect).
+    const legacyAuthAliases: Record<string, "/sign-in" | "/sign-up"> = {
+      "/login": "/sign-in",
+      "/forgot-password": "/sign-in",
+      "/reset-password": "/sign-in",
+      "/auth/login": "/sign-in",
+      "/register": "/sign-up",
+      "/auth/register": "/sign-up",
+      "/signup": "/sign-up",
+    };
+    const legacyAuthTo = legacyAuthAliases[urlPath];
+    if (legacyAuthTo) {
+      return res.redirect(301, legacyAuthTarget(legacyAuthTo));
     }
-    if (urlPath === "/register") {
-      return res.redirect(301, legacyAuthTarget("/sign-up"));
-    }
-    // BUG-009: /auth/* aliases were never routes — 301 to the canonical pages.
-    if (urlPath === "/auth/register") {
-      return res.redirect(301, "/sign-up");
-    }
-    if (urlPath === "/auth/login") {
-      return res.redirect(301, "/sign-in");
-    }
-    // Run3 audit R3-08/R3-09: more circulating URL shapes that were never
+    // Run3 audit R3-09: more circulating URL shapes that were never
     // routes — 301 them to their canonical pages instead of soft-404ing.
-    if (urlPath === "/signup") {
-      return res.redirect(301, "/sign-up");
-    }
     if (urlPath === "/explore") {
       return res.redirect(301, "/search");
     }

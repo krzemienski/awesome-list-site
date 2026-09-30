@@ -683,7 +683,7 @@ export default function ExportTools({ awesomeList, selectedCategory, className, 
           doc.save(`${baseName}.pdf`);
           toast({
             title: "Export Successful",
-            description: `${resources.length} resources exported as PDF`,
+            description: `${resources.length.toLocaleString()} resources exported as PDF`,
             variant: "default",
           });
           return;
@@ -703,7 +703,7 @@ export default function ExportTools({ awesomeList, selectedCategory, className, 
 
       toast({
         title: "Export Successful",
-        description: `${resources.length} resources exported as ${exportOptions.format.toUpperCase()}`,
+        description: `${resources.length.toLocaleString()} resources exported as ${exportOptions.format.toUpperCase()}`,
         variant: "default",
       });
 
@@ -885,7 +885,7 @@ export default function ExportTools({ awesomeList, selectedCategory, className, 
           </div>
           <div className="text-sm text-muted-foreground space-y-1">
             <div>Format: <Badge variant="outline">{exportOptions.format.toUpperCase()}</Badge></div>
-            <div>Resources: <span className="font-medium">{resourceCount}</span></div>
+            <div>Resources: <span className="font-medium">{resourceCount.toLocaleString()}</span></div>
             <div>Categories: <span className="font-medium">
               {exportOptions.selectedCategories.length === awesomeList.categories.length && awesomeList.categories.length > 0
                 ? `All (${awesomeList.categories.length})`
@@ -909,7 +909,7 @@ export default function ExportTools({ awesomeList, selectedCategory, className, 
           ) : (
             <>
               <Download className="h-4 w-4 mr-2" />
-              Export {resourceCount} Resources
+              Export {resourceCount.toLocaleString()} Resources
             </>
           )}
         </Button>
