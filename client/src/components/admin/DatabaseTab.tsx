@@ -90,7 +90,6 @@ export default function DatabaseTab({ stats }: DatabaseTabProps) {
   // before firing (consistent with Clear & Re-seed, which types RESEED).
   // A simple confirm dialog suffices since seeding is additive, not destructive.
   const [seedDialogOpen, setSeedDialogOpen] = useState(false);
-  const [sqlQuery, setSqlQuery] = useState("SELECT * FROM resources WHERE cat = 'protocols-transport' LIMIT 10;");
 
   const seedDatabaseMutation = useMutation({
     mutationFn: async (options: { clearExisting?: boolean } = {}) => {
@@ -275,7 +274,6 @@ export default function DatabaseTab({ stats }: DatabaseTabProps) {
               <th>Rows</th>
               <th>Size</th>
               <th>Last write</th>
-              <th />
             </tr>
           </thead>
           <tbody>
@@ -285,42 +283,11 @@ export default function DatabaseTab({ stats }: DatabaseTabProps) {
                 <td className="admin-ops-table__mono">{row.rows.toLocaleString()}</td>
                 <td className="admin-ops-table__mono">{formatStorageSize(row.bytes)}</td>
                 <td className="admin-ops-table__mono admin-ops-table__muted">{formatRelativeAgo(row.lastWriteAt)}</td>
-                <td className="admin-ops-table__actions">
-                  <Button
-                    variant="outline"
-                    disabled
-                    className="admin-ops-table__action"
-                    title="Table inspection is not available from the admin API."
-                  >
-                    Inspect
-                  </Button>
-                </td>
               </tr>
             ))}
           </tbody>
         </Table>
       </TableShell>
-
-      <section className="card admin-ops-database__console">
-        <h2>SQL Console</h2>
-        <p>Read-only — write queries require an admin token.</p>
-        <textarea
-          className="textarea"
-          value={sqlQuery}
-          onChange={(event) => setSqlQuery(event.target.value)}
-          aria-label="SQL query"
-        />
-        <div className="admin-ops-database__console-actions">
-          <Button className="btn ghost" variant="ghost" onClick={() => setSqlQuery("")}>Clear</Button>
-          <Button
-            className="btn primary"
-            disabled
-            title="No SQL-console endpoint is exposed by the admin API."
-          >
-            Run
-          </Button>
-        </div>
-      </section>
 
       <AlertDialog open={seedDialogOpen} onOpenChange={setSeedDialogOpen}>
         <AlertDialogContent data-testid="dialog-seed-database">

@@ -361,17 +361,6 @@
   color: var(--status-bad);
 }
 
-.admin-ops-table__actions {
-  text-align: right !important;
-  white-space: nowrap;
-}
-
-.admin-ops-table__action {
-  min-height: 44px;
-  min-width: 4.25rem;
-  padding: 0 0.625rem;
-}
-
 .admin-ops-database__seed {
   overflow: hidden;
   padding: 0;
@@ -496,43 +485,6 @@
   margin-top: 0.35rem;
 }
 
-.admin-ops-database__console {
-  padding: 22px;
-}
-
-.admin-ops-database__console h2 {
-  color: var(--text);
-  font-size: 14px;
-  font-weight: 600;
-  margin-bottom: 4px;
-}
-
-.admin-ops-database__console p {
-  color: var(--text-3);
-  font-size: 12px;
-  margin-bottom: 14px;
-}
-
-.admin-ops-database__console .textarea {
-  font-size: 12.5px;
-  min-height: 110px;
-}
-
-.admin-ops-database__console-actions {
-  display: flex;
-  gap: 8px;
-  justify-content: flex-end;
-  margin-top: 12px;
-}
-
-/* Canonical inset with the contract-wide 44px control floor. */
-.admin-ops-database__console-actions > .btn {
-  height: auto;
-  line-height: normal;
-  min-height: 44px;
-  padding: 9px 16px;
-}
-
 .admin-ops-more > summary {
   cursor: pointer;
   display: inline-flex;
@@ -596,11 +548,9 @@
   white-space: normal;
 }
 
-/* The 44px Inspect control sets the row height, so the cell drops its
-   vertical inset to land on the canonical 56px row. */
 .admin-ops-database .admin-ops-table td {
   line-height: 1.6; /* body leading */
-  padding: 6px 14px;
+  padding: 12px 14px;
 }
 
 .admin-ops-database .admin-ops-table .admin-ops-table__mono,
@@ -609,29 +559,12 @@
   white-space: nowrap;
 }
 
-/* Frozen `.btn.ghost`: transparent, hairline border, content-sized. */
-.admin-ops-database .admin-ops-table__action {
-  background: transparent;
-  border-color: var(--border);
-  font-size: 12px;
-  height: auto;
-  line-height: normal;
-  min-height: 44px;
-  min-width: 44px;
-  padding: 5px 10px;
-}
-
 .admin-ops-database .admin-ops-table-shell__title {
   line-height: 1.6; /* body leading */
 }
 
 .admin-ops-database .admin-ops-table-shell__description {
   line-height: 1.6; /* body leading */
-}
-
-.admin-ops-database__console .textarea {
-  font-size: 12.5px !important;
-  line-height: normal;
 }
 
 .admin-ops-more > summary::-webkit-details-marker {
