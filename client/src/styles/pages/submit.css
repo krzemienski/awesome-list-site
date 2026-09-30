@@ -272,6 +272,9 @@
   height: 16px;
 }
 
+/* The auth alerts sit above .submit-form, outside its flex gap. */
+.submit-auth-alert { margin-bottom: 18px; }
+
 .submit-auth-alert [data-slot="alert-title"],
 .submit-auth-alert h5,
 .submit-inline-alert h5 {
