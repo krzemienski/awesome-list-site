@@ -98,21 +98,27 @@ export default function DigestQueueHealth() {
 
             <section>
               <h3 className="mb-3 text-sm font-semibold">Queue by channel and status</h3>
-              <div className="ops-digest-health__queue-grid">
-                {Object.entries(query.data.queue).map(([channel, statuses]) => (
-                  <div key={channel} className="ops-digest-health__queue-card">
-                    <p className="eyebrow">{title(channel)}</p>
-                    <dl className="mt-3 grid grid-cols-2 gap-2">
-                      {Object.entries(statuses).map(([status, count]) => (
-                        <div key={status} className="flex items-center justify-between text-sm">
-                          <dt className="text-[color:var(--text-2)]">{title(status)}</dt>
-                          <dd className="font-mono">{count}</dd>
-                        </div>
-                      ))}
-                    </dl>
-                  </div>
-                ))}
-              </div>
+              {Object.keys(query.data.queue).length === 0 ? (
+                <p className="text-sm text-[color:var(--text-2)]">
+                  No queued digests.
+                </p>
+              ) : (
+                <div className="ops-digest-health__queue-grid">
+                  {Object.entries(query.data.queue).map(([channel, statuses]) => (
+                    <div key={channel} className="ops-digest-health__queue-card">
+                      <p className="eyebrow">{title(channel)}</p>
+                      <dl className="mt-3 grid grid-cols-2 gap-2">
+                        {Object.entries(statuses).map(([status, count]) => (
+                          <div key={status} className="flex items-center justify-between text-sm">
+                            <dt className="text-[color:var(--text-2)]">{title(status)}</dt>
+                            <dd className="font-mono">{count}</dd>
+                          </div>
+                        ))}
+                      </dl>
+                    </div>
+                  ))}
+                </div>
+              )}
             </section>
 
             <section>
