@@ -1109,8 +1109,8 @@ export default function AppSidebar({
             type="search"
             className="search-input"
             name="q"
-            placeholder="Search..."
-            aria-label="Search navigation"
+            placeholder="Search resources..."
+            aria-label="Search resources"
           />
         </div>
       </form>
