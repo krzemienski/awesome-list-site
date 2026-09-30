@@ -45,6 +45,7 @@ import {
   LogOut,
   Mail,
   Calendar,
+  ArrowRight,
   ExternalLink,
   Star,
   FileText,
@@ -808,7 +809,7 @@ export default function Profile({ user }: ProfileProps) {
                 <Button asChild data-testid="link-open-contributions">
                   <Link href="/contributions">
                     Open contribution dashboard
-                    <ExternalLink className="ml-2 h-4 w-4" />
+                    <ArrowRight className="ml-2 h-4 w-4" />
                   </Link>
                 </Button>
               </div>
