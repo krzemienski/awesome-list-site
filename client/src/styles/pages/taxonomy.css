@@ -183,6 +183,7 @@
 
 .taxonomy-controls.taxonomy-production-controls--open {
   display: flex !important;
+  margin-top: 16px;
 }
 
 .taxonomy-view-toggle-row {
