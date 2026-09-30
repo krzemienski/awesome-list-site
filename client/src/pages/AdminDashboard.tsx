@@ -73,7 +73,9 @@ export default function AdminDashboard() {
     return tabFromWindow() ?? "overview";
   });
   const [settingsOpen, setSettingsOpen] = useState(false);
-  const visibleTab = ({ subsubcategories: "subcategories", journeys: "research", digests: "github" } as Record<string, string>)[activeTab] ?? activeTab;
+  // Settings-menu sections that extend a strip tab highlight it; Digests has
+  // no parent tab, so it renders its own panel with no strip tab selected.
+  const visibleTab = ({ subsubcategories: "subcategories", journeys: "research" } as Record<string, string>)[activeTab] ?? activeTab;
 
   // Keep the tab in sync if the user navigates between /admin/:section links.
   useEffect(() => {
@@ -437,9 +439,11 @@ export default function AdminDashboard() {
         </TabsContent>
 
         <TabsContent value="github">
-          {activeTab === "digests"
-            ? <div data-testid="content-digests"><ErrorBoundary label="Digests tab"><DigestQueueHealth /></ErrorBoundary></div>
-            : <ErrorBoundary label="GitHub tab"><GitHubSyncPanel /></ErrorBoundary>}
+          <ErrorBoundary label="GitHub tab"><GitHubSyncPanel /></ErrorBoundary>
+        </TabsContent>
+
+        <TabsContent value="digests" data-testid="content-digests">
+          <ErrorBoundary label="Digests tab"><DigestQueueHealth /></ErrorBoundary>
         </TabsContent>
 
         <TabsContent value="linkhealth">
