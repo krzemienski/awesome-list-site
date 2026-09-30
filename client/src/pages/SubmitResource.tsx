@@ -915,7 +915,11 @@ export default function SubmitResource() {
                       </AlertDialogCancel>
                       <AlertDialogAction
                         data-testid="button-discard-confirm"
-                        onClick={() => setLocation('/')}
+                        onClick={() => {
+                          if (draftSaveTimer.current) clearTimeout(draftSaveTimer.current);
+                          safeRemoveItem(DRAFT_KEY);
+                          setLocation('/');
+                        }}
                       >
                         Discard
                       </AlertDialogAction>
