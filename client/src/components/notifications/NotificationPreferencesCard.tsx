@@ -65,7 +65,7 @@ export default function NotificationPreferencesCard() {
         includeWatchNext: data.includeWatchNext,
         includeJourneyStep: data.includeJourneyStep,
         cadence: data.cadence,
-        timezone: data.timezone,
+        timezone: data.timezone ?? localTimezone(),
         pausedUntil: data.pausedUntil,
       });
     }
