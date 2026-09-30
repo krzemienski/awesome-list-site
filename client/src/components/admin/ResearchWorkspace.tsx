@@ -7,12 +7,26 @@ import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } f
 import "./queues-agent.css";
 
 const RESEARCH_WORKSPACE_LIMIT = 4;
+const NOTE_TITLE_MAX = 80;
+
+/**
+ * A heading-sized name for a research brief. Scheduled briefs are several
+ * thousand characters; they name their focus as "campaign angle: …", which is
+ * the useful title. Other briefs use their first sentence, clipped.
+ */
+function researchNoteTitle(brief: string): string {
+  const angle = brief.match(/campaign angle:\s*([^.\n]+)/i)?.[1]?.trim();
+  const lead = angle || brief.split(/(?<=[.!?])\s|\n/)[0].trim();
+  if (lead.length <= NOTE_TITLE_MAX) return lead;
+  const clipped = lead.slice(0, NOTE_TITLE_MAX);
+  return `${clipped.slice(0, clipped.lastIndexOf(" ") > 40 ? clipped.lastIndexOf(" ") : NOTE_TITLE_MAX).trimEnd()}…`;
+}
 
 /** Mirror of the frozen note card: title, candidate count, freshness. */
 function toResearchNote(job: ResearchJob, now = Date.now()) {
   const active = job.status === "pending" || job.status === "processing";
   const brief = job.prompt?.trim() || `Research job #${job.id}`;
-  const title = brief;
+  const title = researchNoteTitle(brief);
   return {
     id: job.id,
     title,
