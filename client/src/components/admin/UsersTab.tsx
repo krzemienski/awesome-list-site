@@ -4,12 +4,12 @@ import { apiRequest, ApiError } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/hooks/useAuth";
 import { TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Select, SelectContent, SelectItem, SelectTrigger } from "@/components/ui/select";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Skeleton } from "@/components/ui/skeleton";
-import { ChevronLeft, ChevronRight, Trash2, Search, Eye, EyeOff, Download, ArrowUpDown, ArrowUp, ArrowDown, Plus } from "lucide-react";
+import { ChevronLeft, ChevronRight, Trash2, Search, Eye, EyeOff, Download, ArrowUpDown, ArrowUp, ArrowDown, Plus, X } from "lucide-react";
 import type { User } from "@shared/schema";
 import { AdminOpsTable as Table, StatusChip, TableShell } from "@/components/admin/AdminOpsPrimitives";
 import "@/styles/pages/admin-ops-users-audit.css";
@@ -166,7 +166,7 @@ export default function UsersTab() {
             aria-expanded={userToolsOpen}
             data-testid="button-user-tools"
           >
-            More
+            {userToolsOpen ? "Hide row actions" : "Row actions"}
           </Button>
           <div className="admin-users-extra-action admin-ops-search relative flex-1 max-w-sm">
             <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
@@ -174,9 +174,22 @@ export default function UsersTab() {
               value={searchInput}
               onChange={(e) => setSearchInput(e.target.value)}
               placeholder="Search by email or name…"
-              className="pl-8"
+              className="pl-8 pr-8"
               data-testid="input-user-search"
             />
+            {searchInput && (
+              <Button
+                type="button"
+                variant="ghost"
+                size="icon"
+                onClick={() => setSearchInput("")}
+                className="absolute right-1 top-1/2 h-8 w-8 min-h-8 min-w-8 -translate-y-1/2 text-muted-foreground hover:text-foreground"
+                aria-label="Clear user search"
+                data-testid="button-clear-user-search"
+              >
+                <X className="h-4 w-4" />
+              </Button>
+            )}
           </div>
           <Button variant="outline" size="sm" className="admin-users-extra-action sm:ml-auto" asChild data-testid="button-export-users">
             <a href="/api/admin/users/export" download>
@@ -216,7 +229,10 @@ export default function UsersTab() {
                 { key: "role", label: "Role" },
                 { key: "createdAt", label: "Joined" },
               ] as const).map(col => (
-                <TableHead key={col.key}>
+                <TableHead
+                  key={col.key}
+                  aria-sort={sortBy === col.key ? (sortDir === "asc" ? "ascending" : "descending") : undefined}
+                >
                   <Button
                     type="button"
                     variant="ghost"
@@ -295,39 +311,36 @@ export default function UsersTab() {
                   <TableCell className="admin-ops-cell-actions">
                     <div className="flex items-center gap-2">
                       {/* Run16 BUG-014: an admin must not be able to demote
-                          themselves with one click — the delete button already
-                          hides on the own row, so the role select is disabled
-                          there too (matching the server-side self-demote guard). */}
-                      {editingRoleId === user.id ? <Select
+                          themselves — like Delete, Edit is absent on the own
+                          row (matching the server-side self-demote guard). The
+                          role menu opens on Edit; closing it without a pick
+                          cancels the edit. */}
+                      {user.id === currentUser?.id ? null : editingRoleId === user.id ? <Select
                         value={user.role || 'user'}
+                        defaultOpen
+                        onOpenChange={(open) => { if (!open) setEditingRoleId(null); }}
                         /* Run16 BUG-037: stage the change and confirm first. */
                         onValueChange={(role) => {
                           if (role !== (user.role || 'user')) setPendingRoleChange({ user, role });
                           setEditingRoleId(null);
                         }}
-                        disabled={user.id === currentUser?.id}
                       >
                         <SelectTrigger
-                          className="w-32 h-8 text-xs"
+                          className="h-8 w-auto shrink-0 gap-1 text-xs"
                           aria-label={
                             /* R4-041: include a row identifier so the 20 role
                                selects don't share one accessible name (masked
                                email keeps PII out of the DOM, matching the
                                Reveal/Delete buttons). */
-                            user.id === currentUser?.id
-                              ? "You cannot change your own role"
-                              : `Change role for ${
-                                  `${user.firstName || ''} ${user.lastName || ''}`.trim() ||
-                                  (user.email ? maskEmail(user.email) : user.id)
-                                }`
-                          }
-                          title={
-                            user.id === currentUser?.id
-                              ? "You cannot change your own role"
-                              : undefined
+                            `Change role for ${
+                              `${user.firstName || ''} ${user.lastName || ''}`.trim() ||
+                              (user.email ? maskEmail(user.email) : user.id)
+                            }`
                           }
                         >
-                          <SelectValue />
+                          {/* The actions column is too narrow for the role
+                              name; the open menu checks the current role. */}
+                          Role
                         </SelectTrigger>
                         <SelectContent>
                           <SelectItem value="user">User</SelectItem>
@@ -344,7 +357,7 @@ export default function UsersTab() {
                           Edit
                         </Button>
                       )}
-                      {user.id !== currentUser?.id && (
+                      {user.id !== currentUser?.id && editingRoleId !== user.id && (
                         <Button
                           variant="ghost"
                           size="sm"

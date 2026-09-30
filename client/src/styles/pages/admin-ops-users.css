@@ -85,31 +85,6 @@
   min-height: 44px;
 }
 
-.admin-ops-users-shell [data-testid="button-user-tools"] {
-  opacity: 0;
-  position: absolute;
-}
-
-.admin-ops-users-shell [data-testid="button-user-tools"]:focus-visible {
-  opacity: 1;
-  position: static;
-}
-
-.admin-ops-users-shell .admin-users-extra-action {
-  opacity: 0;
-  position: absolute;
-}
-
-.admin-ops-users-shell .admin-users-extra-action:focus-within {
-  opacity: 1;
-  position: static;
-}
-
-.admin-ops-users-shell--tools-open .admin-users-extra-action {
-  opacity: 1;
-  position: static;
-}
-
 .admin-ops-users-shell .admin-ops-cell-name > div {
   gap: 0;
 }
@@ -139,22 +114,17 @@
   border-bottom: var(--hairline-w) solid var(--border);
 }
 
+/* Row reveal/delete controls keep their place in the row and only toggle
+   visibility: swapping them into the flow on hover shifted Edit sideways
+   under the pointer, so a click aimed at Edit landed on Delete. */
 .admin-ops-users-shell [data-testid^="button-toggle-email-"],
 .admin-ops-users-shell [data-testid^="button-delete-user-"] {
-  opacity: 0;
-  position: absolute;
+  visibility: hidden;
 }
 
 .admin-ops-users-shell .admin-ops-cell-email:hover [data-testid^="button-toggle-email-"],
-.admin-ops-users-shell .admin-ops-cell-email:focus-within [data-testid^="button-toggle-email-"],
 .admin-ops-users-shell .admin-ops-cell-actions:hover [data-testid^="button-delete-user-"],
-.admin-ops-users-shell .admin-ops-cell-actions:focus-within [data-testid^="button-delete-user-"] {
-  opacity: 1;
-  position: static;
-}
-
 .admin-ops-users-shell--tools-open [data-testid^="button-toggle-email-"],
 .admin-ops-users-shell--tools-open [data-testid^="button-delete-user-"] {
-  opacity: 1;
-  position: static;
+  visibility: visible;
 }

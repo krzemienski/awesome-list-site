@@ -102,31 +102,6 @@
 }
 
 @media (max-width: 48rem) {
-  .admin-ops-users-shell .admin-ops-table-shell__header {
-    align-items: center;
-    flex-direction: row;
-  }
-
-  .admin-ops-users-shell .admin-ops-table-shell__actions {
-    width: auto;
-  }
-
-  /* At rest the only visible action is the disabled invite, as in the frozen
-     TableShell: keep it beside the title and let the description wrap rather
-     than dropping the button onto a row of its own. Opened tools (or a
-     focused hidden control) still wrap. */
-  .admin-ops-users-shell:not(.admin-ops-users-shell--tools-open):not(:has(.admin-ops-table-shell__actions :focus-visible)) .admin-ops-table-shell__header {
-    flex-wrap: nowrap;
-  }
-
-  .admin-ops-users-shell .admin-ops-table-shell__header > div:first-child {
-    min-width: 0;
-  }
-
-  .admin-ops-users-shell .admin-ops-table-shell__actions {
-    flex-shrink: 0;
-  }
-
   .admin-ops-users-table {
     table-layout: auto;
   }
