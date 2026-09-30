@@ -190,9 +190,9 @@ export default function CommunityMetrics({ resources, categories, className, sub
                       <GitBranch className="h-4 w-4 text-muted-foreground" />
                       <span className="text-sm text-muted-foreground">Total Resources</span>
                     </div>
-                    <p className="text-2xl font-bold mt-1">{metrics.totalContributions}</p>
+                    <p className="text-2xl font-bold mt-1">{metrics.totalContributions.toLocaleString()}</p>
                     <p className="text-xs text-[var(--status-ok)] mt-1">{/* DS-OK: status ok */}
-                      +{metrics.weeklyGrowth} this week
+                      +{metrics.weeklyGrowth.toLocaleString()} this week
                     </p>
                   </CardContent>
                 </Card>
@@ -218,7 +218,7 @@ export default function CommunityMetrics({ resources, categories, className, sub
                           count, not a percentage — label it honestly. */}
                       <span className="text-sm text-muted-foreground">New This Week</span>
                     </div>
-                    <p className="text-2xl font-bold mt-1">+{metrics.weeklyGrowth}</p>
+                    <p className="text-2xl font-bold mt-1">+{metrics.weeklyGrowth.toLocaleString()}</p>
                     <p className="text-xs text-[var(--status-ok)] mt-1">{/* DS-OK: status ok */}
                       resources added
                     </p>
@@ -385,7 +385,7 @@ export default function CommunityMetrics({ resources, categories, className, sub
                         <div>
                           <h3 className="font-medium">{category.name}</h3>
                           <p className="text-sm text-muted-foreground">
-                            {category.resourceCount} {category.resourceCount === 1 ? "resource" : "resources"}
+                            {category.resourceCount.toLocaleString()} {category.resourceCount === 1 ? "resource" : "resources"}
                           </p>
                         </div>
                         <div className="text-right">
