@@ -616,8 +616,8 @@ export default function ResourceDetail() {
 
       <div className="resource-detail-navigation">
         {/* BUG-011 (run13): "Back" now behaves like a real back button —
-            history.back() when there is history, home as the fallback for
-            direct/deep-linked visits. */}
+            history.back() when there is history; direct/deep-linked visits
+            go up to the resource's category (home if it has none). */}
         <Button
           variant="ghost"
           size="sm"
@@ -631,7 +631,7 @@ export default function ResourceDetail() {
             if (hasInAppHistory() && window.history.length > 1) {
               window.history.back();
             } else {
-              setLocation("/");
+              setLocation(taxonomySlugs.category ? `/category/${taxonomySlugs.category}` : "/");
             }
           }}
         >
