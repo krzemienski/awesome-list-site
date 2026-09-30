@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { useQuery, useMutation } from "@tanstack/react-query";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -25,10 +25,12 @@ import {
   AlertDialogFooter,
   AlertDialogHeader,
   AlertDialogTitle,
+  AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { apiRequest, queryClient } from "@/lib/queryClient";
+import { getInitials } from "@/lib/utils";
 import { hasVisibleChars } from "@shared/validation";
 import { useToast } from "@/hooks/use-toast";
 import {
@@ -137,6 +139,8 @@ export default function Profile({ user }: ProfileProps) {
   // Run17 BUG-011: inline validation message (empty save is rejected, not
   // silently fallen back to the email local-part).
   const [nameError, setNameError] = useState<string | null>(null);
+  // The dialog has no DialogTrigger, so Radix can't return focus on close.
+  const editNameButtonRef = useRef<HTMLButtonElement>(null);
 
   const openNameDialog = () => {
     // Best-effort prefill from the combined display name.
@@ -277,11 +281,6 @@ export default function Profile({ user }: ProfileProps) {
     enabled: !!user
   });
 
-  const getInitials = (name?: string) => {
-    if (!name) return "U";
-    return name.split(" ").map(n => n[0]).join("").toUpperCase().slice(0, 2);
-  };
-
   const stats = [
     {
       label: "Favorites",
@@ -344,7 +343,7 @@ export default function Profile({ user }: ProfileProps) {
           <AvatarFallback
             className="account-avatar-fallback text-xl font-display font-medium tracking-tight"
           >
-            {getInitials(user.name)}
+            {getInitials(user.name, user.email)}
           </AvatarFallback>
         </Avatar>
 
@@ -362,6 +361,7 @@ export default function Profile({ user }: ProfileProps) {
               className="h-8 w-8 shrink-0"
               aria-label="Edit display name"
               data-testid="button-edit-name"
+              ref={editNameButtonRef}
               onClick={openNameDialog}
             >
               <Pencil className="h-4 w-4" />
@@ -410,24 +410,39 @@ export default function Profile({ user }: ProfileProps) {
             <LogOut className="h-4 w-4 mr-2" />
             Sign out
           </Button>
-          <Button
-            variant="destructive"
-            size="sm"
-            disabled={isLoggingOut}
-            onClick={() => {
-              if (
-                window.confirm(
-                  "Sign out this account on every device? You will need to sign in again.",
-                )
-              ) {
-                logoutAll();
-              }
-            }}
-            data-testid="button-logout-all"
-          >
-            <LogOut className="h-4 w-4 mr-2" />
-            Sign out all devices
-          </Button>
+          <AlertDialog>
+            <AlertDialogTrigger asChild>
+              <Button
+                variant="destructive"
+                size="sm"
+                disabled={isLoggingOut}
+                data-testid="button-logout-all"
+              >
+                <LogOut className="h-4 w-4 mr-2" />
+                Sign out all devices
+              </Button>
+            </AlertDialogTrigger>
+            <AlertDialogContent data-testid="dialog-logout-all-confirm">
+              <AlertDialogHeader>
+                <AlertDialogTitle>Sign out on every device?</AlertDialogTitle>
+                <AlertDialogDescription>
+                  This ends every session for this account, including this one.
+                  You will need to sign in again.
+                </AlertDialogDescription>
+              </AlertDialogHeader>
+              <AlertDialogFooter>
+                <AlertDialogCancel data-testid="button-logout-all-cancel">
+                  Cancel
+                </AlertDialogCancel>
+                <AlertDialogAction
+                  onClick={() => logoutAll()}
+                  data-testid="button-logout-all-confirm"
+                >
+                  Sign out all devices
+                </AlertDialogAction>
+              </AlertDialogFooter>
+            </AlertDialogContent>
+          </AlertDialog>
         </div>
         {logoutError ? (
           <Alert
@@ -895,7 +910,13 @@ export default function Profile({ user }: ProfileProps) {
 
       {/* Run15 BUG-049: display-name edit dialog */}
       <Dialog open={nameDialogOpen} onOpenChange={setNameDialogOpen}>
-        <DialogContent className="sm:max-w-md">
+        <DialogContent
+          className="sm:max-w-md"
+          onCloseAutoFocus={(event) => {
+            event.preventDefault();
+            editNameButtonRef.current?.focus();
+          }}
+        >
           <DialogHeader>
             <DialogTitle>Edit display name</DialogTitle>
             <DialogDescription>
@@ -911,6 +932,8 @@ export default function Profile({ user }: ProfileProps) {
                 value={editFirstName}
                 maxLength={50}
                 onChange={(e) => setEditFirstName(e.target.value)}
+                aria-invalid={!!nameError}
+                aria-describedby={nameError ? "edit-name-error" : undefined}
                 data-testid="input-first-name"
               />
             </div>
@@ -921,11 +944,14 @@ export default function Profile({ user }: ProfileProps) {
                 value={editLastName}
                 maxLength={50}
                 onChange={(e) => setEditLastName(e.target.value)}
+                aria-invalid={!!nameError}
+                aria-describedby={nameError ? "edit-name-error" : undefined}
                 data-testid="input-last-name"
               />
             </div>
             {nameError && (
               <p
+                id="edit-name-error"
                 className="text-sm text-destructive"
                 role="alert"
                 data-testid="text-name-error"

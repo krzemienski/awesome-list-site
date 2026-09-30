@@ -11,6 +11,7 @@ import { useAuth } from "@/hooks/useAuth";
 import { useGuestBookmarkIds } from "@/lib/guestBookmarks";
 import { cn } from "@/lib/utils";
 import type { BookmarkCollection } from "@/types/bookmarks";
+import type { BookmarkQueueStatus } from "@shared/bookmarkCollections";
 
 interface BookmarkButtonProps {
   resourceId: string;
@@ -57,12 +58,18 @@ function BookmarkButton({
     id: number | string;
     notes?: string | null;
     collectionIds?: number[];
+    queueStatus?: BookmarkQueueStatus;
+    archivedAt?: string | null;
+    personalTags?: string[];
   }>>({
     queryKey: ["/api/bookmarks"],
     enabled: isAuthenticated,
     staleTime: 60_000,
   });
   const serverEntry = bookmarksList?.find((b) => String(b.id) === String(resourceId));
+  // Snapshot of the saved row taken when a removal starts, so Undo can put
+  // back its collections and queue state, not just the bookmark itself.
+  const removedEntryRef = useRef<typeof serverEntry>(undefined);
   const serverBookmarked = bookmarksList !== undefined ? !!serverEntry : initialBookmarked;
   const serverNotes = bookmarksList !== undefined ? (serverEntry?.notes ?? "") : initialNotes;
   // Task #329: signed-out surfaces derive saved state from the on-device
@@ -90,6 +97,7 @@ function BookmarkButton({
     resourceId,
     isActive: isBookmarked,
     onOptimistic: (next) => {
+      if (!next) removedEntryRef.current = serverEntry;
       setIsBookmarked(next);
     },
     onSuccess: (data, vars, showToast) => {
@@ -108,6 +116,8 @@ function BookmarkButton({
         // Run17 BUG-013: removal is one click — give the toast a working Undo
         // so a misclick isn't permanent (notes are restored too).
         const restoredNotes = notes;
+        const removedEntry = removedEntryRef.current;
+        queryClient.invalidateQueries({ queryKey: ["/api/collections?includeArchived=true"] });
         showToast({
           description: "Bookmark removed",
           duration: 6000,
@@ -121,10 +131,44 @@ function BookmarkButton({
                     body: JSON.stringify(restoredNotes ? { notes: restoredNotes } : {}),
                     credentials: "include",
                   });
+                  let partial = false;
+                  if (removedEntry) {
+                    const state: Record<string, unknown> = {};
+                    if (removedEntry.queueStatus && removedEntry.queueStatus !== "saved") {
+                      state.queueStatus = removedEntry.queueStatus;
+                    }
+                    if (removedEntry.archivedAt) state.archived = true;
+                    if (removedEntry.personalTags?.length) {
+                      state.personalTags = removedEntry.personalTags;
+                    }
+                    const results = await Promise.allSettled([
+                      ...(Object.keys(state).length
+                        ? [apiRequest(`/api/bookmarks/${resourceId}/state`, {
+                            method: "PATCH",
+                            body: JSON.stringify(state),
+                          })]
+                        : []),
+                      ...(removedEntry.collectionIds ?? []).map((collectionId) =>
+                        apiRequest(`/api/collections/${collectionId}/items/${resourceId}`, {
+                          method: "POST",
+                        }),
+                      ),
+                    ]);
+                    partial = results.some((result) => result.status === "rejected");
+                  }
                   setIsBookmarked(true);
                   queryClient.invalidateQueries({ queryKey: ["/api/bookmarks"] });
+                  queryClient.invalidateQueries({ queryKey: ["/api/collections?includeArchived=true"] });
                   queryClient.invalidateQueries({ queryKey: [`/api/resources/${resourceId}`] });
-                  showToast({ description: "Bookmark restored", duration: 2000 });
+                  showToast(
+                    partial
+                      ? {
+                          title: "Bookmark restored",
+                          description: "Some collections or queue settings couldn't be restored.",
+                          variant: "destructive",
+                        }
+                      : { description: "Bookmark restored", duration: 2000 },
+                  );
                 } catch {
                   toast({
                     title: "Error",

@@ -6,6 +6,7 @@ import { SidebarTrigger } from "@/components/ui/sidebar";
 import type { useAuth } from "@/hooks/useAuth";
 import type { AwesomeListNavNode } from "@/lib/static-data";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { getInitials } from "@/lib/utils";
 import {
   DropdownMenu, DropdownMenuContent, DropdownMenuItem,
   DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger,
@@ -109,7 +110,7 @@ export default function AppHeader({ onSearchOpen, user, onLogout, logoutError, c
           <button type="button" className="user-pill" aria-label={`Account · ${role}`}>
             {user ? <Avatar className="header-avatar">
               <AvatarImage src={user.avatar} alt="" />
-              <AvatarFallback>{firstName[0].toUpperCase()}</AvatarFallback>
+              <AvatarFallback>{getInitials(user.name, user.email)}</AvatarFallback>
             </Avatar> : <span className="header-avatar"><LogIn size={12} aria-hidden="true" /></span>}
             <span className="header-account-name hide-mobile">{user ? firstName : "Sign in"}</span>
           </button>
