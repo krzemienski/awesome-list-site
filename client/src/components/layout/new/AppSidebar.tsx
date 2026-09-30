@@ -502,7 +502,7 @@ function CategoryAccordion({
                       <button
                         type="button"
                         onClick={() => toggleSub(subKey(sub.name))}
-                        aria-label={`${subOpen ? "Collapse" : "Expand"} ${subSubs.length} nested groups in ${sub.name}`}
+                        aria-label={`${subOpen ? "Collapse" : "Expand"} ${subSubs.length} nested ${subSubs.length === 1 ? "group" : "groups"} in ${sub.name}`}
                         aria-expanded={subOpen}
                         aria-controls={`${bodyId}-sub-${subSlug}`}
                         data-state={subOpen ? "open" : "closed"}
