@@ -29,6 +29,7 @@ import SEOHead from "@/components/layout/SEOHead";
 import { signInSeoDescription, signUpSeoDescription } from "@shared/seo-templates";
 import AuthConversionTracker from "@/components/auth/AuthConversionTracker";
 import GuestBookmarkMerge from "@/components/auth/GuestBookmarkMerge";
+import StaleSessionGate from "@/components/auth/StaleSessionGate";
 import ConsentBanner from "@/components/ui/consent-banner";
 import ScrubbedParamsNotice from "@/components/ui/scrubbed-params-notice";
 import { Button } from "@/components/ui/button";
@@ -412,11 +413,13 @@ function SignInPage() {
     >
       {/* Title mirrors the og-middleware /sign-in template (two-pass parity). */}
       <SEOHead title="Sign In" description={signInSeoDescription} noindex />
-      <SignIn
-        routing="path"
-        path={`${basePath}/sign-in`}
-        signUpUrl={`${basePath}/sign-up`}
-      />
+      <StaleSessionGate>
+        <SignIn
+          routing="path"
+          path={`${basePath}/sign-in`}
+          signUpUrl={`${basePath}/sign-up`}
+        />
+      </StaleSessionGate>
     </div>
   );
 }
@@ -432,11 +435,13 @@ function SignUpPage() {
     >
       {/* Title mirrors the og-middleware /sign-up template (two-pass parity). */}
       <SEOHead title="Create an Account" description={signUpSeoDescription} noindex />
-      <SignUp
-        routing="path"
-        path={`${basePath}/sign-up`}
-        signInUrl={`${basePath}/sign-in`}
-      />
+      <StaleSessionGate>
+        <SignUp
+          routing="path"
+          path={`${basePath}/sign-up`}
+          signInUrl={`${basePath}/sign-in`}
+        />
+      </StaleSessionGate>
     </div>
   );
 }
