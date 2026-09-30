@@ -143,6 +143,18 @@
     flex-basis: var(--shell-sidebar-w-tablet, 240px);
     width: var(--shell-sidebar-w-tablet, 240px);
   }
+
+  /* F210: at 240px an ellipsis cut category names to ~10 characters
+     ("Community &…"). Drop the L3 marker as the drawer does and let the name
+     wrap so every category stays readable. */
+  .av-sidebar-shell .av-sidebar-l3-indicator {
+    display: none;
+  }
+
+  .av-sidebar-shell .av-sidebar-category-label > span:nth-child(2) {
+    white-space: normal;
+    overflow-wrap: break-word;
+  }
 }
 
 /* Canonical rule: below 768px the sidebar is hidden and the drawer takes over.
