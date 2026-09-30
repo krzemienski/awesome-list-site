@@ -24,7 +24,7 @@ export default function LinkHealthTrendChart({ data }: LinkHealthTrendChartProps
           Link Health Trends
         </CardTitle>
         <CardDescription>
-          Health status trends across the last {data.length} {data.length === 1 ? "check" : "checks"}
+          Health status trends across the last {data.length} completed {data.length === 1 ? "check" : "checks"}
         </CardDescription>
       </CardHeader>
       <CardContent>

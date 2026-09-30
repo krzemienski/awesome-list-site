@@ -191,20 +191,18 @@ export default function AuditTab() {
   return (
     <div className="admin-ops-audit-stack">
     <TableShell
-      title={
-        <span className="admin-ops-audit-title">
-          <span>Audit log</span>
-          <Button
-            type="button"
-            variant="ghost"
-            size="sm"
-            onClick={() => setShowTools((visible) => !visible)}
-            aria-expanded={showTools}
-            data-testid="button-audit-tools"
-          >
-            {showTools ? "Hide tools" : "Tools"}
-          </Button>
-        </span>
+      title="Audit log"
+      actions={
+        <Button
+          type="button"
+          variant="ghost"
+          size="sm"
+          onClick={() => setShowTools((visible) => !visible)}
+          aria-expanded={showTools}
+          data-testid="button-audit-tools"
+        >
+          {showTools ? "Hide tools" : "Tools"}
+        </Button>
       }
       description={`Append-only · ${appliedLimit} events per page`}
       className="admin-ops-audit-shell"
@@ -391,7 +389,7 @@ export default function AuditTab() {
         )}
 
         {/* Run17 BUG-010: range readout + Previous/Next through the full log. */}
-        {showTools && data && data.total > 0 && (
+        {data && data.total > 0 && (
           <div className="admin-ops-pagination flex flex-wrap items-center justify-between gap-3 pt-2">
             <p className="text-sm text-muted-foreground" data-testid="text-audit-range">
               {offset + 1}–{Math.min(offset + (data.logs?.length || 0), data.total)} of{" "}
