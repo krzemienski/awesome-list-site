@@ -66,6 +66,7 @@
   display: inline-flex;
   align-items: center;
   gap: 8px;
+  max-width: 100%;
   margin-bottom: 12px;
   padding: 10px 14px;
   border: var(--hairline-w) solid var(--border-strong);
@@ -155,7 +156,7 @@
 @media (max-width: 640px) {
   .app-footer { padding: 36px 20px 24px; margin-top: 56px; }
   .app-footer-grid > :last-child { grid-column: 1 / -1; }
-  .app-footer-repo { max-width: 100%; overflow-wrap: anywhere; }
+  .app-footer-repo { overflow-wrap: anywhere; }
   .app-footer-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 32px 24px; }
   .app-footer-meta { margin-top: 28px; }
 }
