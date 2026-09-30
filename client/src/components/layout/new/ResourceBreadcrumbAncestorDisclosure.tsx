@@ -109,6 +109,9 @@ export default function ResourceBreadcrumbAncestorDisclosure({
               // to provide a 24px pointer target without adding layout
               // height; focused geometry verification measures the result.
               className="relative !size-5 !min-h-5 !min-w-5 !p-0 before:absolute before:-inset-0.5 before:content-['']"
+              // Lives inside the visually hidden shell breadcrumb: reachable
+              // by assistive technology, never an invisible Tab stop.
+              tabIndex={-1}
               data-testid="button-breadcrumb-ellipsis"
               aria-label={`Show ${countLabel}`}
               title={`Show ${countLabel}`}
