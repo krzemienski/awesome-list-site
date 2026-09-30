@@ -69,6 +69,7 @@ import { ensureSubSubcategoryExists } from "../../repositories/ensureSubSubcateg
 import { isDatabaseUnavailableError } from "../../db/errors";
 import { claudeService } from "../../ai/claudeService";
 import { send429 } from "../../middleware/rateLimit";
+import { ConflictError } from "../../middleware/errors";
 import type {
   UserRepository,
   ResourceRepository,
@@ -1224,10 +1225,14 @@ export function registerAdminContentRoutes(
       // /api/categories resourceCount exactly. getCategoryResourceCount
       // (all-statuses) is intentionally left unchanged — it backs the
       // taxonomy delete guard, which must see pending/rejected rows too.
-      const approvedCounts = await categoryRepo.getResourceCountsByCategory();
+      const [approvedCounts, subcategoryCounts] = await Promise.all([
+        categoryRepo.getResourceCountsByCategory(),
+        categoryRepo.getSubcategoryCountsByCategory(),
+      ]);
       const categoriesWithCounts = categories.map((cat) => ({
         ...cat,
         resourceCount: approvedCounts[cat.name] ?? 0,
+        subcategoryCount: subcategoryCounts[cat.id] ?? 0,
       }));
 
       res.json(categoriesWithCounts);
@@ -1348,6 +1353,9 @@ export function registerAdminContentRoutes(
       
       res.json({ message: 'Category deleted successfully' });
     } catch (error) {
+      if (error instanceof ConflictError) {
+        return res.status(409).json({ message: error.message });
+      }
       console.error('Error deleting category:', error);
       res.status(500).json({ message: 'Failed to delete category' });
     }
@@ -1361,11 +1369,12 @@ export function registerAdminContentRoutes(
       const categoryId = req.query.categoryId ? parseInt(req.query.categoryId as string) : undefined;
       
       const subcategories = await categoryRepo.listSubcategories(categoryId);
-      
+      const subSubcategoryCounts = await categoryRepo.getSubSubcategoryCountsBySubcategory();
+
       const subcategoriesWithCounts = await Promise.all(
         subcategories.map(async (sub) => {
           const count = await categoryRepo.getSubcategoryResourceCount(sub.name);
-          return { ...sub, resourceCount: count };
+          return { ...sub, resourceCount: count, subSubcategoryCount: subSubcategoryCounts[sub.id] ?? 0 };
         })
       );
       
@@ -1536,6 +1545,9 @@ export function registerAdminContentRoutes(
       
       res.json({ message: 'Subcategory deleted successfully' });
     } catch (error) {
+      if (error instanceof ConflictError) {
+        return res.status(409).json({ message: error.message });
+      }
       console.error('Error deleting subcategory:', error);
       res.status(500).json({ message: 'Failed to delete subcategory' });
     }
@@ -1704,6 +1716,9 @@ export function registerAdminContentRoutes(
       
       res.json({ message: 'Sub-subcategory deleted successfully' });
     } catch (error) {
+      if (error instanceof ConflictError) {
+        return res.status(409).json({ message: error.message });
+      }
       console.error('Error deleting sub-subcategory:', error);
       res.status(500).json({ message: 'Failed to delete sub-subcategory' });
     }

@@ -1,12 +1,13 @@
 import { Layers, Badge } from "lucide-react";
 import { GenericCrudManagerProps, BaseEntityWithCount } from "../GenericCrudManager";
 
-interface SubcategoryWithCount extends BaseEntityWithCount {
+export interface SubcategoryWithCount extends BaseEntityWithCount {
   id: number;
   name: string;
   slug: string;
   categoryId: number;
   resourceCount: number;
+  subSubcategoryCount: number;
 }
 
 export const subcategoryConfig: GenericCrudManagerProps<SubcategoryWithCount> = {
@@ -19,6 +20,7 @@ export const subcategoryConfig: GenericCrudManagerProps<SubcategoryWithCount> = 
   createUrl: "/api/admin/subcategories",
   updateUrl: (id: number) => `/api/admin/subcategories/${id}`,
   deleteUrl: (id: number) => `/api/admin/subcategories/${id}`,
+  childCount: { key: "subSubcategoryCount", singular: "sub-subcategory", plural: "sub-subcategories" },
   queryKey: "/api/admin/subcategories",
   publicQueryKey: "/api/subcategories",
   testIdPrefix: "subcategory-manager",
