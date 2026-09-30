@@ -13,6 +13,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { ExternalLink, AlertTriangle, Sparkles, RefreshCw, AlertCircle } from "lucide-react";
 import type { Resource, ResourceEdit } from "@shared/schema";
+import { Link } from "wouter";
 import "./queues-review.css";
 
 interface ResourceEditWithResource extends ResourceEdit {
@@ -356,7 +357,11 @@ export default function PendingEdits() {
                             aria-label="Resource changed since this edit was proposed"
                           />
                         )}
-                        <span title={title}>{title}</span>
+                        <span title={title}>
+                          <Link href={`/resource/${edit.resourceId}`} data-testid={`link-edit-resource-detail-${edit.id}`}>
+                            {title}
+                          </Link>
+                        </span>
                         {edit.resource?.url && (
                           <a
                             href={edit.resource.url}
