@@ -29,6 +29,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { apiRequest, queryClient } from "@/lib/queryClient";
+import { getInitials } from "@/lib/utils";
 import { hasVisibleChars } from "@shared/validation";
 import { useToast } from "@/hooks/use-toast";
 import {
@@ -277,11 +278,6 @@ export default function Profile({ user }: ProfileProps) {
     enabled: !!user
   });
 
-  const getInitials = (name?: string) => {
-    if (!name) return "U";
-    return name.split(" ").map(n => n[0]).join("").toUpperCase().slice(0, 2);
-  };
-
   const stats = [
     {
       label: "Favorites",
@@ -344,7 +340,7 @@ export default function Profile({ user }: ProfileProps) {
           <AvatarFallback
             className="account-avatar-fallback text-xl font-display font-medium tracking-tight"
           >
-            {getInitials(user.name)}
+            {getInitials(user.name, user.email)}
           </AvatarFallback>
         </Avatar>
 
