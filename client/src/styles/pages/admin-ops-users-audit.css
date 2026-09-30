@@ -16,14 +16,6 @@
   padding: 0.75rem 0.875rem;
 }
 
-.admin-ops-audit-title {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 1rem;
-  width: 100%;
-}
-
 /* Actor ink stays neutral: accent is reserved for the page's single
    primary moment, and a column of accent handles blew the budget. */
 .admin-ops-audit-table tbody td:nth-child(2) {
