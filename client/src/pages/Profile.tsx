@@ -31,6 +31,11 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { apiRequest, queryClient } from "@/lib/queryClient";
 import { getInitials } from "@/lib/utils";
+import { usePopstateParams, writeFilterParams } from "@/lib/url-filter-state";
+import {
+  queryUnavailableReason,
+  type QueryUnavailableReason,
+} from "@/lib/query-availability";
 import { hasVisibleChars } from "@shared/validation";
 import { useToast } from "@/hooks/use-toast";
 import {
@@ -120,15 +125,54 @@ interface UserJourney {
   };
 }
 
+const PROFILE_TABS = ["overview", "favorites", "bookmarks", "submissions", "security"];
+
+// Stands in for a list or summary that couldn't be fetched, so the page never
+// claims "No favorites yet" or zero counts it hasn't actually loaded.
+function UnavailableNotice({
+  reason,
+  subject,
+  onRetry,
+}: {
+  reason: QueryUnavailableReason;
+  subject: string;
+  onRetry: () => void;
+}) {
+  return (
+    <Alert variant={reason === "error" ? "destructive" : "default"} data-testid={`profile-${reason}`}>
+      <AlertTitle>
+        {reason === "offline" ? "You’re offline" : `Couldn’t load your ${subject}`}
+      </AlertTitle>
+      <AlertDescription className="mt-2 space-y-2">
+        {reason === "offline" && (
+          <p>Your {subject} will load when your connection is back.</p>
+        )}
+        <Button variant="outline" size="sm" onClick={onRetry}>
+          Try again
+        </Button>
+      </AlertDescription>
+    </Alert>
+  );
+}
+
+function readProfileTab(params: URLSearchParams): string {
+  const tab = params.get("tab");
+  return tab && PROFILE_TABS.includes(tab) ? tab : "overview";
+}
+
 export default function Profile({ user }: ProfileProps) {
   // Run17 BUG-055: /favorites redirects here with ?tab=favorites — honor a
   // valid ?tab= on first render so the link lands on the right collection.
-  const [activeTab, setActiveTab] = useState(() => {
-    const t = new URLSearchParams(window.location.search).get("tab");
-    return t && ["overview", "favorites", "bookmarks", "submissions", "security"].includes(t)
-      ? t
-      : "overview";
-  });
+  const [activeTab, setActiveTab] = useState(() =>
+    readProfileTab(new URLSearchParams(window.location.search)),
+  );
+  // Tab clicks write ?tab= (push) so reload/share restore the tab and Back
+  // steps through tab changes, matching the shared URL-state convention.
+  const handleTabChange = (next: string) => {
+    setActiveTab(next);
+    writeFilterParams({ tab: next === "overview" ? null : next });
+  };
+  usePopstateParams((params) => setActiveTab(readProfileTab(params)));
   const { logout, logoutAll, logoutError, isLoggingOut } = useAuth();
   const [, setLocation] = useLocation();
   const { toast } = useToast();
@@ -247,31 +291,26 @@ export default function Profile({ user }: ProfileProps) {
   });
 
   // Fetch favorites
-  const { data: favorites, isLoading: favoritesLoading } = useQuery<Favorite[]>({
+  const favoritesQuery = useQuery<Favorite[]>({
     queryKey: ['/api/favorites'],
     enabled: !!user
   });
 
   // Fetch bookmarks
-  const { data: bookmarks, isLoading: bookmarksLoading } = useQuery<BookmarkItem[]>({
+  const bookmarksQuery = useQuery<BookmarkItem[]>({
     queryKey: ['/api/bookmarks'],
     enabled: !!user
   });
 
   // Fetch learning progress
-  const { data: progress, isLoading: progressLoading } = useQuery<LearningProgress>({
+  const progressQuery = useQuery<LearningProgress>({
     queryKey: ['/api/user/progress'],
     enabled: !!user
   });
 
   // Compact contribution summary. The full filtered timeline lives at
   // /contributions so profile no longer maintains two divergent lists.
-  const {
-    data: contributions,
-    isLoading: contributionsLoading,
-    isError: contributionsError,
-    refetch: refetchContributions,
-  } = useQuery<ContributorSummaryResponse>({
+  const contributionsQuery = useQuery<ContributorSummaryResponse>({
     queryKey: ['/api/user/contributions?limit=1'],
     enabled: !!user
   });
@@ -282,22 +321,31 @@ export default function Profile({ user }: ProfileProps) {
     enabled: !!user
   });
 
+  const { data: favorites, isLoading: favoritesLoading } = favoritesQuery;
+  const { data: bookmarks, isLoading: bookmarksLoading } = bookmarksQuery;
+  const { data: contributions, isLoading: contributionsLoading } = contributionsQuery;
+  const { data: progress, isLoading: progressLoading } = progressQuery;
+  const progressUnavailable = queryUnavailableReason(progressQuery);
+  const favoritesUnavailable = queryUnavailableReason(favoritesQuery);
+  const bookmarksUnavailable = queryUnavailableReason(bookmarksQuery);
+  const contributionsUnavailable = queryUnavailableReason(contributionsQuery);
+
   const stats = [
     {
       label: "Favorites",
-      value: favorites?.length || 0,
+      value: favorites ? favorites.length : "—",
       icon: Heart,
       color: "text-primary"
     },
     {
       label: "Bookmarks",
-      value: bookmarks?.length || 0,
+      value: bookmarks ? bookmarks.length : "—",
       icon: Bookmark,
       color: "text-primary"
     },
     {
       label: "Learning Streak",
-      value: `${progress?.streakDays || 0}d`,
+      value: progress ? `${progress.streakDays || 0}d` : "—",
       icon: Trophy,
       color: "account-stat--secondary",
       // BUG-052 (run14): streak counts consecutive days signed in, not
@@ -308,7 +356,7 @@ export default function Profile({ user }: ProfileProps) {
       // Run15 BUG-017: the server counts completed learning journeys here,
       // not viewed resources — label it honestly.
       label: "Journeys Completed",
-      value: progress?.completedResources || 0,
+      value: progress ? progress.completedResources || 0 : "—",
       icon: Target,
       color: "account-stat--accent",
       hint: "Learning journeys finished",
@@ -464,7 +512,7 @@ export default function Profile({ user }: ProfileProps) {
           // NB-041 (run18): a "0d" streak reads as broken for new users — show
           // onboarding copy instead of the empty number.
           const isEmptyStreak =
-            stat.label === "Learning Streak" && !(progress?.streakDays);
+            stat.label === "Learning Streak" && !!progress && !progress.streakDays;
           return (
             <Card key={stat.label}>
               <CardContent className="p-4 flex items-center gap-3">
@@ -497,7 +545,7 @@ export default function Profile({ user }: ProfileProps) {
       </div>
 
       {/* Tabs */}
-      <Tabs value={activeTab} onValueChange={setActiveTab}>
+      <Tabs value={activeTab} onValueChange={handleTabChange}>
         {/* Run17 BUG-014: fixed 5-col grid garbled/clipped labels at ≤768px —
             wrap on small screens, grid only from lg up. */}
         <TabsList className="w-full flex flex-wrap justify-start lg:grid lg:grid-cols-5">
@@ -527,6 +575,12 @@ export default function Profile({ user }: ProfileProps) {
                   <Skeleton className="h-4 w-3/4" />
                   <Skeleton className="h-4 w-1/2" />
                 </div>
+              ) : progressUnavailable ? (
+                <UnavailableNotice
+                  reason={progressUnavailable}
+                  subject="learning progress"
+                  onRetry={() => void progressQuery.refetch()}
+                />
               ) : (
                 <div className="space-y-4">
                   {/* Progress Bar — Run15 BUG-017: the server metric counts
@@ -612,6 +666,12 @@ export default function Profile({ user }: ProfileProps) {
                       <Skeleton key={i} className="h-20 w-full" />
                     ))}
                   </div>
+                ) : favoritesUnavailable ? (
+                  <UnavailableNotice
+                    reason={favoritesUnavailable}
+                    subject="favorites"
+                    onRetry={() => void favoritesQuery.refetch()}
+                  />
                 ) : favorites && favorites.length > 0 ? (
                   <div className="space-y-3">
                     {favorites.map((favorite) => (
@@ -652,8 +712,13 @@ export default function Profile({ user }: ProfileProps) {
                               size="sm"
                               asChild
                             >
-                              <a href={favorite.url} target="_blank" rel="noopener noreferrer">
-                                <ExternalLink className="h-4 w-4" />
+                              <a
+                                href={favorite.url}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                aria-label={`Open ${favorite.title} in a new tab`}
+                              >
+                                <ExternalLink className="h-4 w-4" aria-hidden="true" />
                               </a>
                             </Button>
                           </div>
@@ -693,6 +758,12 @@ export default function Profile({ user }: ProfileProps) {
                       <Skeleton key={i} className="h-20 w-full" />
                     ))}
                   </div>
+                ) : bookmarksUnavailable ? (
+                  <UnavailableNotice
+                    reason={bookmarksUnavailable}
+                    subject="bookmarks"
+                    onRetry={() => void bookmarksQuery.refetch()}
+                  />
                 ) : bookmarks && bookmarks.length > 0 ? (
                   <div className="space-y-3">
                     {bookmarks.map((bookmark) => (
@@ -738,8 +809,13 @@ export default function Profile({ user }: ProfileProps) {
                               size="sm"
                               asChild
                             >
-                              <a href={bookmark.url} target="_blank" rel="noopener noreferrer">
-                                <ExternalLink className="h-4 w-4" />
+                              <a
+                                href={bookmark.url}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                aria-label={`Open ${bookmark.title} in a new tab`}
+                              >
+                                <ExternalLink className="h-4 w-4" aria-hidden="true" />
                               </a>
                             </Button>
                           </div>
@@ -778,15 +854,12 @@ export default function Profile({ user }: ProfileProps) {
                     <Skeleton key={index} className="h-24 w-full" />
                   ))}
                 </div>
-              ) : contributionsError ? (
-                <Alert variant="destructive">
-                  <AlertTitle>Couldn't load your contribution summary</AlertTitle>
-                  <AlertDescription className="mt-2">
-                    <Button variant="outline" size="sm" onClick={() => refetchContributions()}>
-                      Try again
-                    </Button>
-                  </AlertDescription>
-                </Alert>
+              ) : contributionsUnavailable ? (
+                <UnavailableNotice
+                  reason={contributionsUnavailable}
+                  subject="contribution summary"
+                  onRetry={() => void contributionsQuery.refetch()}
+                />
               ) : (
                 <div className="grid gap-3 sm:grid-cols-3">
                   {[

@@ -237,11 +237,15 @@ export default function Onboarding() {
   };
 
   const handleSkip = async () => {
+    // Revisiting a finished onboarding edits saved preferences; leaving early
+    // keeps it completed, so the step being left must still be valid.
+    const alreadyCompleted = preferences?.onboardingStatus === "completed";
+    if (alreadyCompleted && !validateStep(step)) return;
     setRequestError(null);
     try {
       await savePreferencesAsync({
         ...values,
-        onboardingStatus: "dismissed",
+        onboardingStatus: alreadyCompleted ? "completed" : "dismissed",
         onboardingStep: step,
       });
       safeRemoveItem(DRAFT_STORAGE_KEY);
