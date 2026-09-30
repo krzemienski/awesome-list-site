@@ -4,17 +4,17 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { 
-  Users, 
-  Star, 
-  TrendingUp, 
-  Award, 
-  GitBranch, 
+import {
+  Users,
+  Star,
+  TrendingUp,
+  GitBranch,
   Calendar,
   ExternalLink,
   Heart,
   Eye,
-  MessageSquare
+  MessageSquare,
+  FolderTree
 } from "lucide-react";
 import { Resource, Category } from "@/types/awesome-list";
 
@@ -27,14 +27,6 @@ interface CommunityMetricsProps {
   // other caller working unchanged.
   subTab?: string;
   onSubTabChange?: (value: string) => void;
-}
-
-interface ContributorMetric {
-  name: string;
-  contributions: number;
-  categories: string[];
-  badge: string;
-  level: "bronze" | "silver" | "gold" | "platinum";
 }
 
 interface PopularityMetric {
@@ -58,7 +50,6 @@ interface CategoryMetric {
   // size ratio (share of the catalog), not real engagement. See the categories
   // tab for the honest label.
   catalogShare: number;
-  completeness: number;
 }
 
 export default function CommunityMetrics({ resources, categories, className, subTab, onSubTabChange }: CommunityMetricsProps) {
@@ -78,48 +69,6 @@ export default function CommunityMetrics({ resources, categories, className, sub
 
   // Calculate metrics based on actual resource properties from database
   const metrics = useMemo(() => {
-    // Count actual resource types by analyzing real properties.
-    // BUG-027 (run13): `githubSynced` is an internal sync-pipeline field and is
-    // no longer present in public payloads, so the old "GitHub Synced" bucket
-    // (which keyed off it) was removed rather than always rendering 0.
-    const pendingResources = resources.filter(r => r.status === 'pending');
-    const aiEnrichedResources = resources.filter(r => r.metadata?.aiEnriched === true);
-
-    // Approved resources that are NOT AI enriched (avoid double-counting)
-    const approvedOnlyResources = resources.filter(r =>
-      r.status === 'approved' &&
-      r.metadata?.aiEnriched !== true
-    );
-
-    // Group categories by actual resource distribution
-    const aiEnrichedCategories = Array.from(new Set(aiEnrichedResources.map(r => r.category)));
-    const approvedCategories = Array.from(new Set(approvedOnlyResources.map(r => r.category)));
-    const pendingCategories = Array.from(new Set(pendingResources.map(r => r.category)));
-
-    const contributors: ContributorMetric[] = [
-      {
-        name: "Approved Resources",
-        contributions: approvedOnlyResources.length,
-        categories: approvedCategories.length > 0 ? approvedCategories : [] as string[],
-        badge: "Verified",
-        level: "platinum" as const
-      },
-      {
-        name: "AI Enriched",
-        contributions: aiEnrichedResources.length,
-        categories: aiEnrichedCategories.length > 0 ? aiEnrichedCategories : [] as string[],
-        badge: "AI Enhanced",
-        level: "silver" as const
-      },
-      {
-        name: "Pending Review",
-        contributions: pendingResources.length,
-        categories: pendingCategories.length > 0 ? pendingCategories : [] as string[],
-        badge: "In Review",
-        level: "bronze" as const
-      }
-    ].filter(c => c.contributions > 0);
-
     // Calculate popularity based on actual localStorage tracking data
     const popularResources: PopularityMetric[] = resources
       .slice(0, 10)
@@ -184,7 +133,6 @@ export default function CommunityMetrics({ resources, categories, className, sub
         resourceCount,
         growthRate: Math.min(100, growthRate),
         catalogShare: Math.min(100, catalogShare),
-        completeness: Math.min(100, (resourceCount / 50) * 100)
       };
     }).sort((a, b) => b.catalogShare - a.catalogShare);
 
@@ -196,29 +144,12 @@ export default function CommunityMetrics({ resources, categories, className, sub
     }).length;
 
     return {
-      contributors,
       popularResources,
       categoryMetrics,
       totalContributions: resources.length,
-      activeContributors: contributors.filter(c => c.contributions > 0).length,
       weeklyGrowth: recentlyAddedCount
     };
   }, [resources, categories, trackingData]);
-
-  // Contributor tier medals — decorative rank fills, not status. Raw palette
-  // gradients are forbidden (verify-design-system SKILL.md stage 5), so the
-  // metallic tiers ride bridge tokens (platinum brightest, silver mid) and
-  // gold/bronze reuse the DS warn constant at two strengths. Each fill
-  // carries its own ink, so callers must not pin text color.
-  const getBadgeColor = (level: string) => {
-    switch (level) {
-      case "platinum": return "bg-foreground text-background";
-      case "gold": return "bg-[var(--status-warn)] text-black"; // DS-OK: status warn constant doubling as gold medal fill
-      case "silver": return "bg-muted-foreground text-background";
-      case "bronze": return "bg-[var(--status-warn)]/70 text-black"; // DS-OK: status warn constant at reduced strength = bronze
-      default: return "bg-muted text-foreground";
-    }
-  };
 
   const getEngagementColor = (score: number) => {
     if (score >= 80) return "text-[var(--status-ok)]"; // DS-OK: status ok
@@ -232,10 +163,10 @@ export default function CommunityMetrics({ resources, categories, className, sub
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <Users className="h-5 w-5" />
-            Community Metrics & Contributions
+            Community Metrics
           </CardTitle>
           <CardDescription>
-            Track community engagement, popular resources, and contribution patterns
+            Catalog size and growth, per-category share, and resources popular in this browser
           </CardDescription>
         </CardHeader>
         <CardContent>
@@ -245,9 +176,8 @@ export default function CommunityMetrics({ resources, categories, className, sub
             onValueChange={onSubTabChange}
             className="space-y-4"
           >
-            <TabsList className="grid w-full grid-cols-4">
+            <TabsList className="grid w-full grid-cols-3">
               <TabsTrigger value="overview">Overview</TabsTrigger>
-              <TabsTrigger value="contributors">Contributors</TabsTrigger>
               <TabsTrigger value="popular">Popular</TabsTrigger>
               <TabsTrigger value="categories">Categories</TabsTrigger>
             </TabsList>
@@ -270,12 +200,12 @@ export default function CommunityMetrics({ resources, categories, className, sub
                 <Card>
                   <CardContent className="p-4">
                     <div className="flex items-center gap-2">
-                      <Users className="h-4 w-4 text-muted-foreground" />
-                      <span className="text-sm text-muted-foreground">Active Contributors</span>
+                      <FolderTree className="h-4 w-4 text-muted-foreground" />
+                      <span className="text-sm text-muted-foreground">Categories</span>
                     </div>
-                    <p className="text-2xl font-bold mt-1">{metrics.activeContributors}</p>
+                    <p className="text-2xl font-bold mt-1">{categories.length}</p>
                     <p className="text-xs text-[var(--status-info)] mt-1">{/* DS-OK: cyan info (DS chart/info constant) */}
-                      Across {categories.length} categories
+                      top-level sections
                     </p>
                   </CardContent>
                 </Card>
@@ -371,65 +301,6 @@ export default function CommunityMetrics({ resources, categories, className, sub
                   )}
                 </CardContent>
               </Card>
-            </TabsContent>
-
-            <TabsContent value="contributors" className="space-y-4">
-              <div className="space-y-4">
-                {metrics.contributors.map((contributor, index) => (
-                  <Card key={contributor.name}>
-                    <CardContent className="p-4">
-                      <div className="flex items-start justify-between">
-                        <div className="flex-1">
-                          <div className="flex items-center gap-3 mb-2">
-                            <div className="flex items-center gap-2">
-                              <Award className="h-4 w-4 text-muted-foreground" />
-                              <span className="font-medium">{contributor.name}</span>
-                            </div>
-                            <Badge 
-                              className={`text-xs ${getBadgeColor(contributor.level)}`}
-                            >
-                              {contributor.badge}
-                            </Badge>
-                          </div>
-                          
-                          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 text-sm">
-                            <div>
-                              <span className="text-muted-foreground">Contributions:</span>
-                              <div className="font-medium">{contributor.contributions} resources</div>
-                            </div>
-                            <div>
-                              <span className="text-muted-foreground">Categories:</span>
-                              <div className="font-medium">{contributor.categories.length} active</div>
-                            </div>
-                            <div>
-                              <span className="text-muted-foreground">Level:</span>
-                              <div className="font-medium capitalize">{contributor.level}</div>
-                            </div>
-                          </div>
-                          
-                          <div className="mt-3">
-                            <div className="text-xs text-muted-foreground mb-1">
-                              Active categories:
-                            </div>
-                            <div className="flex flex-wrap gap-1">
-                              {contributor.categories.slice(0, 4).map(category => (
-                                <Badge key={category} variant="outline" className="text-xs">
-                                  {category}
-                                </Badge>
-                              ))}
-                              {contributor.categories.length > 4 && (
-                                <Badge variant="outline" className="text-xs">
-                                  +{contributor.categories.length - 4} more
-                                </Badge>
-                              )}
-                            </div>
-                          </div>
-                        </div>
-                      </div>
-                    </CardContent>
-                  </Card>
-                ))}
-              </div>
             </TabsContent>
 
             <TabsContent value="popular" className="space-y-4">
@@ -542,14 +413,6 @@ export default function CommunityMetrics({ resources, categories, className, sub
                           <p className="text-[10px] text-muted-foreground mt-0.5">
                             Share of this category's resources added in the last 30 days
                           </p>
-                        </div>
-                        
-                        <div>
-                          <div className="flex justify-between text-xs mb-1">
-                            <span className="text-muted-foreground">Completeness</span>
-                            <span>{Math.round(category.completeness)}%</span>
-                          </div>
-                          <Progress value={category.completeness} className="h-2" />
                         </div>
                       </div>
                     </CardContent>
