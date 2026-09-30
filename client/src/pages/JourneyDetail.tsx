@@ -1,6 +1,6 @@
 import { useEffect, useRef } from "react";
 import { useQuery, useMutation } from "@tanstack/react-query";
-import { useParams, useLocation, Link } from "wouter";
+import { useParams, useLocation, useSearch, Link } from "wouter";
 import { Card, CardContent, CardDescription, CardHeader } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -77,8 +77,16 @@ interface UserProgress {
 
 export default function JourneyDetail() {
   const { id } = useParams<{ id: string }>();
-  const [, setLocation] = useLocation();
+  // Journey ids are positive integers; anything else is a not-found URL, not a
+  // transient failure worth retrying (the API rejects it with 400).
+  const isValidId = /^[1-9]\d*$/.test(id ?? "");
+  const [location, setLocation] = useLocation();
+  const search = useSearch();
   const { isAuthenticated } = useAuth();
+  const returnPath = search ? `${location}?${search}` : location;
+  const loginHref = /^\/(?![/\\])/.test(returnPath)
+    ? `/sign-in?redirect_url=${encodeURIComponent(returnPath)}`
+    : "/sign-in";
   const { toast } = useToast();
 
   // Fetch journey details (includes progress if authenticated)
@@ -95,6 +103,7 @@ export default function JourneyDetail() {
       if (!response.ok) throw new ApiError(response.status, await response.text());
       return response.json();
     },
+    enabled: isValidId,
   });
 
   // Task #330: logical step count (distinct stepNumbers) for funnel events —
@@ -351,7 +360,7 @@ export default function JourneyDetail() {
     );
   }
 
-  if (journeyError && !(journeyFetchError instanceof ApiError && journeyFetchError.status === 404)) {
+  if (journeyError && !(journeyFetchError instanceof ApiError && (journeyFetchError.status === 404 || journeyFetchError.status === 400))) {
     return (
       <div className="journey-detail-page journey-detail-page--state" role="alert">
         <SEOHead
@@ -547,26 +556,18 @@ export default function JourneyDetail() {
             <Alert className="journey-enroll-note mt-6">
               <AlertCircle className="h-4 w-4" />
               <AlertDescription>
-                {/* R5-027 (run24): print-keep-text — in print this button's
-                    text stays inline so the sentence prints grammatically. */}
-                Please <button 
-                  className="print-keep-text underline font-medium min-h-[44px] px-2 inline-flex items-center"
-                  onClick={() => {
-                    // P1-08: mirror /submit's auth hand-off — route to the
-                    // canonical /sign-in with a redirect_url back to this
-                    // journey (same /^\/(?![/\\])/ safe-path guard the legacy
-                    // /login redirect uses) instead of a bare /login hop that
-                    // dropped the return path after sign-in.
-                    const current = window.location.pathname + window.location.search;
-                    const safe = /^\/(?![/\\])/.test(current)
-                      ? `/sign-in?redirect_url=${encodeURIComponent(current)}`
-                      : '/sign-in';
-                    setLocation(safe);
-                  }}
+                {/* P1-08: canonical /sign-in with a redirect_url back to this
+                    journey. A real link (not a button) so it opens in a new
+                    tab; inline padding widens the target without stretching
+                    the line box. */}
+                Please{" "}
+                <Link
+                  href={loginHref}
+                  className="underline font-medium py-0.5"
                   data-testid="button-login-journey"
                 >
                   log in
-                </button> to start this journey and track your progress.
+                </Link> to start this journey and track your progress.
               </AlertDescription>
             </Alert>
           ) : !isEnrolled && (
