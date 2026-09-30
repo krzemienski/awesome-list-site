@@ -1,8 +1,13 @@
 /* Theme Settings option cards are DS `.btn` radios laid out as cards. Only
-   geometry is adapted here; surface, border and hover come from `.btn`. */
+   geometry is adapted here; surface, border and hover come from `.btn`.
+   A top-aligned column: a block <button> centres its content vertically, so
+   a card with shorter copy sat lower than its stretched row-mates. */
 
 .btn.theme-option {
-  display: block;
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  justify-content: flex-start;
   width: 100%;
   height: auto;
   padding: 1rem;
