@@ -4,6 +4,7 @@ import { getAboutFaqs } from "@shared/faq";
 import { parsePageNumber, parseUrlPageStrict } from "@shared/page-param";
 import { normalizeSearchQuery } from "@shared/searchNormalize";
 import { MAINTAINER } from "@shared/about-content";
+import { normalizeAdminTab } from "@shared/admin-tabs";
 import {
   repositoryDisplayName,
   resolveSiteIdentity,
@@ -848,12 +849,10 @@ function homeShellChrome(): string {
   };
   // Run3 audit R3-02: /admin/:section deep-links (e.g. /admin/users) are real
   // client routes that open the matching admin tab — serve them the /admin
-  // meta (noindex) instead of a soft-404. The section list mirrors
-  // AdminDashboard's tab ids; unknown sections still fall through to 404.
-  const adminSectionMatch = path.match(
-    /^\/admin\/(approvals|edits|enrichment|research|researcher|export|database|resources|categories|subcategories|subsubcategories|journeys|users|github|linkhealth|audit)$/,
-  );
-  const staticKey = adminSectionMatch ? "/admin" : path;
+  // meta (noindex) instead of a soft-404. The section ids and aliases are the
+  // ones AdminDashboard accepts; unknown sections still fall through to 404.
+  const adminSection = path.match(/^\/admin\/([^/]+)$/)?.[1];
+  const staticKey = adminSection && normalizeAdminTab(adminSection) ? "/admin" : path;
   if (staticRoutes[staticKey]) {
     const m = defaultMeta(path);
     Object.assign(m, staticRoutes[staticKey]);

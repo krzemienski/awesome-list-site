@@ -30,14 +30,11 @@ import { ResearchWorkspace } from "@/components/admin/ResearchWorkspace";
 import DigestQueueHealth from "@/components/admin/DigestQueueHealth";
 import ErrorBoundary from "@/components/ErrorBoundary";
 import NotFound from "@/pages/not-found";
-// Run3 audit R3-02: valid tab ids — used to validate /admin/:section
-// deep-links (unknown sections fall back to the default tab).
 import { ApiError } from "@/lib/queryClient";
-const ADMIN_TAB_IDS = [
-  "overview", "approvals", "edits", "enrichment", "researcher", "export", "database",
-  "resources", "categories", "subcategories", "subsubcategories", "journeys",
-   "users", "github", "linkhealth", "digests", "audit", "research",
-] as const;
+// Run3 audit R3-02 / Run16 BUG-034/074/085: valid tab ids and aliases live in
+// one shared module so the SSR middleware accepts exactly the same
+// /admin/:section deep-links (unknown sections fall back to the default tab).
+import { normalizeAdminTab as normalizeTab } from "@shared/admin-tabs";
 const CANONICAL_TABS = [
   ["overview", "Overview", LayoutGrid], ["approvals", "Approvals", Shield],
   ["edits", "Edits", List], ["enrichment", "Enrichment", Sparkles],
@@ -48,23 +45,6 @@ const CANONICAL_TABS = [
   ["linkhealth", "Link Health", Activity], ["audit", "Audit", List],
   ["research", "Research", Sparkles],
 ] as const;
-
-// Run16 BUG-085: human-guessable slug aliases → canonical tab ids.
-const ADMIN_TAB_ALIASES: Record<string, string> = {
-  "link-health": "linkhealth",
-  "sub-subcategories": "subsubcategories",
-  "sub-subcats": "subsubcategories",
-  "github-sync": "github",
-};
-
-// Run16 BUG-034/074/085: normalize any inbound tab slug (hash, ?tab= query
-// param, or /admin/:section) to a valid tab id, or null if unknown.
-function normalizeTab(raw: string | null | undefined): string | null {
-  if (!raw) return null;
-  const slug = raw.replace(/^#/, "").toLowerCase();
-  const mapped = ADMIN_TAB_ALIASES[slug] ?? slug;
-  return (ADMIN_TAB_IDS as readonly string[]).includes(mapped) ? mapped : null;
-}
 
 function tabFromWindow(): string | null {
   if (typeof window === "undefined") return null;
