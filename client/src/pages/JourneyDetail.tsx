@@ -386,10 +386,11 @@ export default function JourneyDetail() {
         {/* BUG-031 (run22): not-found state gets its own head (noindex — matches
             the server's soft-404 contract) instead of inheriting a stale one. */}
         <SEOHead title="Journey Not Found" description="This learning journey may have been removed or archived." noindex />
+        <h1 className="display-h journeys-state__title">Journey not found.</h1>
         <Alert variant="destructive" className="journeys-alert">
           <AlertCircle className="h-4 w-4" />
           <AlertDescription>
-            Journey not found. It may have been removed or archived.
+            It may have been removed or archived.
           </AlertDescription>
         </Alert>
         <Button 

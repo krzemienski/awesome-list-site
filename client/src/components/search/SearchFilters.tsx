@@ -76,16 +76,12 @@ function FacetGroup({ title, testid, collapsible, defaultOpen, forceOpen, bodyCl
 
 function FacetList({ title, items, value, onSelect, testid, collapseInert = false, collapsible = false, defaultOpen = true }: { title: string; items: { value: string; count: number; label: string }[]; value: string; onSelect: (v: string) => void; testid: string; collapseInert?: boolean; collapsible?: boolean; defaultOpen?: boolean }) {
   if (!items.length) return null;
-  // P-07: when the ONLY option a facet offers is "Not yet classified" (i.e. the
-  // whole catalog is unclassified for this dimension), the filter can't narrow
-  // anything — collapse the group so the taxonomy-page sidebar isn't cluttered
-  // with an inert, single-option filler row. Only applied on taxonomy listings
-  // (collapseInert): the /search page keeps every facet clickable so the
-  // ?provider=unknown deep-link workflow (pinned by url-params-audit) still
-  // works. A deep-linked ?provider=unknown selection still renders here (so its
-  // active state / removal chip stays reachable); the API + chips are untouched.
-  const onlyUnclassified = items.every((item) => item.value === "unknown");
-  if (collapseInert && onlyUnclassified && value !== "unknown") return null;
+  // P-07 / cf-audit F307: provider, format and skill level are NOT NULL, so a
+  // facet with a single option matches every result and can't narrow anything
+  // (today that option is "Not yet classified" for the whole catalog) — hide
+  // the inert group. An active selection (e.g. a deep-linked ?provider=unknown)
+  // still renders so its pressed state and removal stay reachable.
+  if (collapseInert && items.length === 1 && !value) return null;
   return <FacetGroup title={title} testid={testid} collapsible={collapsible} defaultOpen={defaultOpen} forceOpen={Boolean(value)} bodyClassName={cn(items.length > 6 && "max-h-64 overflow-y-auto overscroll-contain pr-1")}>
     {items.map(item => <button type="button" key={item.value} onClick={() => onSelect(value === item.value ? "" : item.value)} className="btn ghost search-facet-option" aria-pressed={value === item.value} aria-label={`${value === item.value ? "Remove" : "Apply"} ${item.label} ${title.toLowerCase()} filter, ${item.count} results`} data-testid={`facet-${testid}-${item.value}`}>
       <span className="flex min-w-0 items-center gap-2">{value === item.value ? <Check className="h-3.5 w-3.5 shrink-0" /> : <span className="w-3.5" />}<span className="truncate">{item.label}</span></span><span className="shrink-0 font-mono text-xs text-muted-foreground">{item.count}</span>
@@ -120,9 +116,9 @@ export default function SearchFilters({ state, facets, onChange, onClear, hideTa
     {!hideTaxonomyFacets && <FacetList title="Category" items={options(facets?.categories, state.category)} value={state.category} onSelect={v => applyChange("category", v)} testid="category" />}
     {!hideTaxonomyFacets && <FacetList title="Subcategory" items={options(facets?.subcategories, state.subcategory)} value={state.subcategory} onSelect={v => applyChange("subcategory", v)} testid="subcategory" collapsible={collapsible} defaultOpen={false} />}
     {!hideTaxonomyFacets && <FacetList title="Sub-subcategory" items={options(facets?.subSubcategories, state.subSubcategory)} value={state.subSubcategory} onSelect={v => applyChange("subSubcategory", v)} testid="sub-subcategory" collapsible={collapsible} defaultOpen={false} />}
-    <FacetList title="Provider" items={options(facets?.providers, state.provider, RESOURCE_PROVIDER_LABELS)} value={state.provider} onSelect={v => applyChange("provider", v)} testid="provider" collapseInert={hideTaxonomyFacets} />
-    <FacetList title="Format" items={options(facets?.formats, state.format, RESOURCE_FORMAT_LABELS)} value={state.format} onSelect={v => applyChange("format", v)} testid="format" collapseInert={hideTaxonomyFacets} />
-    <FacetList title="Skill level" items={options(facets?.skillLevels, state.skillLevel, RESOURCE_SKILL_LEVEL_LABELS)} value={state.skillLevel} onSelect={v => applyChange("skillLevel", v)} testid="skill-level" collapseInert={hideTaxonomyFacets} />
+    <FacetList title="Provider" items={options(facets?.providers, state.provider, RESOURCE_PROVIDER_LABELS)} value={state.provider} onSelect={v => applyChange("provider", v)} testid="provider" collapseInert />
+    <FacetList title="Format" items={options(facets?.formats, state.format, RESOURCE_FORMAT_LABELS)} value={state.format} onSelect={v => applyChange("format", v)} testid="format" collapseInert />
+    <FacetList title="Skill level" items={options(facets?.skillLevels, state.skillLevel, RESOURCE_SKILL_LEVEL_LABELS)} value={state.skillLevel} onSelect={v => applyChange("skillLevel", v)} testid="skill-level" collapseInert />
     <FacetGroup title="Tags" collapsible={collapsible} defaultOpen={false} forceOpen={state.tags.length > 0} bodyClassName="space-y-2">
       <div className="relative"><Search className="absolute left-2.5 top-3.5 h-4 w-4 text-muted-foreground" /><Input value={tagSearch} onChange={e => setTagSearch(e.target.value)} placeholder="Find a tag" className="h-11 pl-8" aria-label="Search tags" data-testid="input-search-tags" /></div>
       <div className="max-h-56 overflow-y-auto pr-1">{tags.slice(0, TAG_LIMIT).map(item => {

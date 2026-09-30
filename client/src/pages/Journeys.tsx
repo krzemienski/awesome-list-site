@@ -335,7 +335,7 @@ export default function Journeys() {
         // BUG-012 (run22): 3 columns only from xl — at lg (1024–1279) the
         // docked sidebar left ~220px cards and the CTA labels ellipsized.
         <div className="journeys-grid">
-          {filteredJourneys.map((journey, index) => {
+          {filteredJourneys.map((journey) => {
             const enrolled = journey.isEnrolled || false;
             const progressPercent = journeyProgressPercent(journey);
             const isStartingThis =
@@ -452,7 +452,7 @@ export default function Journeys() {
                       "journey-card__cta group h-auto min-h-10 whitespace-normal",
                       enrolled && "journey-card__cta--enrolled"
                     )}
-                    variant={index === 0 ? "default" : "outline"}
+                    variant="outline"
                     // Task #330: one-click start/continue — signed-in users
                     // enroll right here (or jump to their next incomplete
                     // step); anonymous users still get the read-only view.

@@ -557,7 +557,9 @@ export default function ResourceDetail() {
         />
         <Card className="w-full max-w-lg" data-testid="resource-not-found">
           <CardHeader>
-            <CardTitle>Resource Not Found</CardTitle>
+            <h1 className="text-2xl font-semibold leading-none tracking-tight">
+              Resource Not Found
+            </h1>
             <CardDescription>
               We couldn't find the resource requested as{" "}
               <span className="font-medium text-foreground break-all">
@@ -645,7 +647,10 @@ export default function ResourceDetail() {
               </span>
             </span>
           )}
-          {resource.resolvedKind && (
+          {/* "other" with no stored kind is the resolver's nothing-matched
+              default, not a classification — the details panel already says
+              "Not yet classified", so don't contradict it with a chip. */}
+          {resource.resolvedKind && !(resource.resolvedKind === "other" && !resource.kind) && (
             <span className="resource-detail-chip-wrap">
               <span className="chip" data-kind-source="resolvedKind" data-testid="badge-kind">
                 <span className="resource-detail-chip-label">

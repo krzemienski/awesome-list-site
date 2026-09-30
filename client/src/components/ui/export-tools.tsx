@@ -766,14 +766,14 @@ export default function ExportTools({ awesomeList, selectedCategory, className, 
       <CardContent className="space-y-6">
         {/* Format Selection */}
         <div className="space-y-3">
-          <label className="text-sm font-medium">Export Format</label>
+          <label htmlFor="export-format" className="text-sm font-medium">Export Format</label>
           <Select
             value={exportOptions.format}
             onValueChange={(value: ExportFormat) => 
               setExportOptions(prev => ({ ...prev, format: value }))
             }
           >
-            <SelectTrigger>
+            <SelectTrigger id="export-format">
               <SelectValue />
             </SelectTrigger>
             <SelectContent>
