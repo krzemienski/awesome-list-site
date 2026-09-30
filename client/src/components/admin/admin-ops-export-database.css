@@ -539,47 +539,17 @@
   list-style: none;
 }
 
-/* The disclosures must not occupy a flex/grid track: a zero-height in-flow
-   child still pulled the parent gap (20px) into the canonical rhythm, and a
-   closed <details> keeps a hidden content slot even under display:contents.
-   Taken out of flow they neither reserve a track nor shift the cards; the
-   summaries are positioned against the tab surface below. */
-.admin-ops-export > .admin-ops-more,
-.admin-ops-database > .admin-ops-more {
-  inset: 0 0 auto;
-  position: absolute;
-  z-index: 2;
-}
-
-/* 4px + the 44px summary = the page's 48px bottom inset, so the summary sits
-   inside it. At +16px it overhung the inset and every one of these tabs
-   scrolled 12px past the frozen page height. */
-.admin-ops-export > .admin-ops-more,
-.admin-ops-database > .admin-ops-more {
-  top: calc(100% + 4px);
-}
-
+/* Disclosures stay in flow so each panel expands directly under its own
+   summary instead of detaching from it or stacking over the cards. */
 .admin-ops-export > .admin-ops-more > summary,
 .admin-ops-database > .admin-ops-more > summary {
-  position: absolute;
-  top: 0;
   min-height: 44px;
+  max-width: 100%;
   padding: 5px 12px;
   font-size: 12px;
   line-height: normal;
-}
-
-.admin-ops-export > .admin-ops-more:first-of-type > summary {
-  top: 0;
-}
-
-.admin-ops-export > .admin-ops-more:nth-of-type(2) > summary {
-  left: 150px;
-  top: 0;
-}
-
-.admin-ops-database > .admin-ops-more > summary {
-  top: 0;
+  text-align: left;
+  white-space: normal;
 }
 
 .admin-ops-database .admin-ops-table-shell__content {
@@ -672,24 +642,9 @@
   margin-bottom: 12px;
 }
 
-/* Opened, the disclosure rejoins the flow so its panel reads in sequence
-   instead of stacking over the cards. */
-.admin-ops-export > .admin-ops-more[open],
-.admin-ops-database > .admin-ops-more[open] {
-  position: relative;
-}
-
 @media (max-width: 48rem) {
   .admin-ops-export-card {
     min-height: 0;
-  }
-
-  /* Beside the first summary there is less room than the label needs at
-     phone width, so it wraps inside the card column instead of overhanging. */
-  .admin-ops-export > .admin-ops-more:nth-of-type(2) > summary {
-    max-width: calc(100% - 150px);
-    text-align: left;
-    white-space: normal;
   }
 
   /* The frozen TableShell keeps its 18px/22px heading at every width. */
