@@ -45,6 +45,15 @@ export default function UsersTab() {
   // R2-H05: ids whose emails are currently revealed.
   const [revealedIds, setRevealedIds] = useState<Set<string>>(new Set());
   const [editingRoleId, setEditingRoleId] = useState<string | null>(null);
+  // The role menu replaces the row's Edit button, so the menu's own focus
+  // return targets an unmounted trigger; hand focus back to Edit instead
+  // (after the confirm dialog, when a change was staged).
+  const editButtonRefs = useRef(new Map<string, HTMLButtonElement>());
+  const refocusEditIdRef = useRef<string | null>(null);
+  const closeRoleEditor = (userId: string) => {
+    refocusEditIdRef.current = userId;
+    setEditingRoleId(null);
+  };
   const [userToolsOpen, setUserToolsOpen] = useState(false);
   // Run16 BUG-087: server-side column sorting.
   const [sortBy, setSortBy] = useState<"name" | "email" | "role" | "createdAt">("createdAt");
@@ -69,6 +78,12 @@ export default function UsersTab() {
     }, 300);
     return () => clearTimeout(t);
   }, [searchInput]);
+
+  useEffect(() => {
+    if (editingRoleId !== null || pendingRoleChange || !refocusEditIdRef.current) return;
+    editButtonRefs.current.get(refocusEditIdRef.current)?.focus();
+    refocusEditIdRef.current = null;
+  }, [editingRoleId, pendingRoleChange]);
 
   const { data, isLoading } = useQuery<UsersResponse>({
     queryKey: ['/api/admin/users', page, limit, searchQuery, sortBy, sortDir],
@@ -327,11 +342,11 @@ export default function UsersTab() {
                       {user.id === currentUser?.id ? null : editingRoleId === user.id ? <Select
                         value={user.role || 'user'}
                         defaultOpen
-                        onOpenChange={(open) => { if (!open) setEditingRoleId(null); }}
+                        onOpenChange={(open) => { if (!open) closeRoleEditor(user.id); }}
                         /* Run16 BUG-037: stage the change and confirm first. */
                         onValueChange={(role) => {
                           if (role !== (user.role || 'user')) setPendingRoleChange({ user, role });
-                          setEditingRoleId(null);
+                          closeRoleEditor(user.id);
                         }}
                       >
                         <SelectTrigger
@@ -358,6 +373,10 @@ export default function UsersTab() {
                         </SelectContent>
                       </Select> : (
                         <Button
+                          ref={(el) => {
+                            if (el) editButtonRefs.current.set(user.id, el);
+                            else editButtonRefs.current.delete(user.id);
+                          }}
                           variant="ghost"
                           size="sm"
                           onClick={() => setEditingRoleId(user.id)}
