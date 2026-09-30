@@ -286,8 +286,12 @@ export default function Bookmarks() {
   };
 
   const reorderCollection = (index: number, direction: -1 | 1) => {
+    // The arrows stay enabled while a save is in flight (disabling the focused
+    // one drops keyboard focus to <body>), so repeat presses are ignored here.
+    if (actionMutation.isPending) return;
     const destination = index + direction;
     if (destination < 0 || destination >= collections.length) return;
+    const movedId = collections[index].id;
     const ordered = collections.map((collection) => collection.id);
     [ordered[index], ordered[destination]] = [ordered[destination], ordered[index]];
     actionMutation.mutate({
@@ -295,6 +299,17 @@ export default function Bookmarks() {
       method: "PUT",
       body: { orderedIds: ordered },
       success: "Collection order updated",
+      // Re-rendering in the new order can detach the pressed arrow (or disable
+      // it at the list edge), so put focus back on the moved collection.
+      after: () =>
+        requestAnimationFrame(() => {
+          const controls = document.querySelectorAll<HTMLButtonElement>(
+            `[data-reorder-collection="${movedId}"] button`,
+          );
+          const [up, down] = Array.from(controls);
+          const preferred = direction < 0 ? up : down;
+          (preferred && !preferred.disabled ? preferred : direction < 0 ? down : up)?.focus();
+        }),
     });
   };
 
@@ -468,13 +483,13 @@ export default function Bookmarks() {
                     <span className="shrink-0">{collection.itemCount}</span>
                   </span>
                 </button>
-                {collections.length > 1 && <div className="flex" aria-label={`Reorder ${collection.name}`}>
+                {collections.length > 1 && <div className="flex" aria-label={`Reorder ${collection.name}`} data-reorder-collection={collection.id}>
                   <Button
                     type="button"
                     variant="ghost"
                     size="icon"
                     aria-label={`Move ${collection.name} up`}
-                    disabled={index === 0 || actionMutation.isPending}
+                    disabled={index === 0}
                     onClick={() => reorderCollection(index, -1)}
                   >
                     <ArrowUp className="h-4 w-4" aria-hidden="true" />
@@ -484,7 +499,7 @@ export default function Bookmarks() {
                     variant="ghost"
                     size="icon"
                     aria-label={`Move ${collection.name} down`}
-                    disabled={index === collections.length - 1 || actionMutation.isPending}
+                    disabled={index === collections.length - 1}
                     onClick={() => reorderCollection(index, 1)}
                   >
                     <ArrowDown className="h-4 w-4" aria-hidden="true" />
