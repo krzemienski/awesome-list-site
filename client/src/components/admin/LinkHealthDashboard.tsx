@@ -293,10 +293,11 @@ export default function LinkHealthDashboard() {
     <div className="ops-link-health">
       <div className="ops-link-health__stat-grid" aria-label="Link health status summary">
         {[
-          ["200 OK", summaryCounts.healthy, "ok"],
-          ["301/302", summaryCounts.redirect, "warn"],
-          ["404", summaryCounts.broken, "bad"],
+          ["Healthy", summaryCounts.healthy, "ok"],
+          ["Redirect", summaryCounts.redirect, "warn"],
+          ["Broken", summaryCounts.broken, "bad"],
           ["Timeout", summaryCounts.timeout, "bad"],
+          ["Suspect", summaryCounts.suspect, "warn"],
         ].map(([label, value, tone]) => (
           <div key={label} className={`card ops-link-health__stat-card ops-link-health__stat-card--${tone}`}>
             <div className="mono ops-link-health__stat-label">{label}</div>
@@ -478,14 +479,27 @@ export default function LinkHealthDashboard() {
 
       <TableShell
         title="Recent failures"
-        sub="404s and timeouts from last sweep"
+        sub="Broken, DNS and timeout failures plus links flagged for review from the last sweep"
         className="ops-link-health__flagged-card"
+        actions={
+          /* The server only checks the whole catalog, so there is no per-row
+             recheck — one action states what it actually runs. */
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={() => setConfirmRun(true)}
+            disabled={isJobInProgress}
+            data-testid="button-link-health-run-full"
+          >
+            Run full check
+          </Button>
+        }
       >
           {recentFailures.length === 0 ? (
             <div className="ops-link-health__flagged-table-wrap">
               <table className="table">
                 <thead>
-                  <tr><th>Resource</th><th>URL</th><th>Status</th><th>Last checked</th><th /></tr>
+                  <tr><th>Resource</th><th>URL</th><th>Status</th><th>Last checked</th></tr>
                 </thead>
               </table>
               <p className="ops-link-health__empty" role="status">
@@ -505,14 +519,19 @@ export default function LinkHealthDashboard() {
                     <TableHead>URL</TableHead>
                     <TableHead>Status</TableHead>
                     <TableHead>Last checked</TableHead>
-                    <TableHead />
                   </TableRow>
                 </TableHeader>
                 <TableBody>
                   {recentFailures.map((check) => (
                     <TableRow key={`flagged-${check.id}`}>
                       <TableCell className="ops-link-health__resource-cell">
-                        {check.resource?.title ?? `Resource #${check.resourceId}`}
+                        {check.resource ? (
+                          <a href={`/resource/${check.resource.id}`} className="hover:underline">
+                            {check.resource.title}
+                          </a>
+                        ) : (
+                          `Resource #${check.resourceId}`
+                        )}
                         {check.resource?.category && (
                           <span className="mt-1 block text-xs text-muted-foreground">{check.resource.category}</span>
                         )}
@@ -541,11 +560,6 @@ export default function LinkHealthDashboard() {
                       <TableCell className="ops-link-health__checked-cell">
                         {formatAdminDateTime(check.lastCheckedAt)}
                       </TableCell>
-                      <TableCell className="text-right">
-                        <Button variant="ghost" size="sm" onClick={() => setConfirmRun(true)}>
-                          Recheck
-                        </Button>
-                      </TableCell>
                     </TableRow>
                   ))}
                 </TableBody>
@@ -554,19 +568,17 @@ export default function LinkHealthDashboard() {
           )}
       </TableShell>
 
-      <details className="admin-ops-more ops-link-health__more-row">
-        <summary
+      <div className="admin-ops-more ops-link-health__more-row">
+        <button
+          type="button"
           className="btn ghost"
-          onClick={(event) => {
-            event.preventDefault();
-            setShowDetails((visible) => !visible);
-          }}
+          onClick={() => setShowDetails((visible) => !visible)}
           aria-expanded={showDetails}
           data-testid="button-link-health-more"
         >
           {showDetails ? "Less" : "More"}
-        </summary>
-      </details>
+        </button>
+      </div>
 
       {showDetails && <Card className="ops-link-health__problem-card">
         <CardHeader>

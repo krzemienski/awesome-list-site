@@ -37,8 +37,8 @@
 }
 
 /* The disclosure follows the contract-wide 44px interactive target. */
-.ops-github-panel > .admin-ops-more > summary,
-.ops-link-health > .admin-ops-more > summary {
+.ops-github-panel > .admin-ops-more > button,
+.ops-link-health > .admin-ops-more > button {
   min-height: 44px;
   padding: 5px 12px;
   font-size: 12px;
