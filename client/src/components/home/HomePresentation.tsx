@@ -494,7 +494,8 @@ function RecentRail({ recent }: { recent: Resource[] }) {
               <span className="home-recent-copy">
                 <span className="home-recent-title">{resource.title}</span>
                 <span className="home-recent-meta">
-                  {categoryShortName(resource)} · {resourceTags(resource)[0]}
+                  {categoryShortName(resource)}
+                  {resourceTags(resource)[0] ? ` · ${resourceTags(resource)[0]}` : null}
                 </span>
               </span>
             </ResourceLink>
