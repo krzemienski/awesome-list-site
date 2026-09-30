@@ -186,6 +186,12 @@ export default function Journeys() {
   const categories = Array.from(
     new Set(journeys.map((j) => j.category).filter((c): c is string => !!c && c.trim() !== "")),
   ).sort();
+  // A shared ?category= link can name a category that has no journeys. Keep it
+  // selectable, or the Select has no matching item and renders blank.
+  const categoryOptions =
+    selectedCategory !== "all" && !categories.includes(selectedCategory)
+      ? [...categories, selectedCategory]
+      : categories;
 
   // Filter journeys by category
   const filteredJourneys = selectedCategory === "all" 
@@ -275,7 +281,7 @@ export default function Journeys() {
                 onChange={(event) => handleCategoryChange(event.target.value)}
               >
                 <option value="all">All Categories</option>
-                {categories.map((category) => (
+                {categoryOptions.map((category) => (
                   <option key={category} value={category}>
                     {category}
                   </option>
@@ -289,7 +295,7 @@ export default function Journeys() {
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value="all">All Categories</SelectItem>
-                {categories.map(category => (
+                {categoryOptions.map(category => (
                   <SelectItem key={category} value={category}>
                     {category}
                   </SelectItem>

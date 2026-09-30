@@ -563,7 +563,7 @@ app.use((req, res, next) => {
   // their real handlers, not intercepted) but BEFORE vite/static so the HTML
   // response is rewritten with route-specific tags for crawlers that don't
   // execute JavaScript (Twitter, Facebook, Slack, iMessage, LinkedIn, etc.).
-  const { ogInjectionMiddleware } = await import("./og-middleware");
+  const { ogInjectionMiddleware, isEntityRoutePath } = await import("./og-middleware");
   app.use(ogInjectionMiddleware());
 
   // importantly only setup vite in development and after
@@ -606,13 +606,15 @@ app.use((req, res, next) => {
     // index.html (soft-404 that masks dead assets and "confirms" sensitive
     // filenames). If the last path segment contains a dot and no real file
     // exists under the static root, answer 404 before serveStatic's fallback.
-    // Extension-less SPA routes are untouched. Dev is exempt on purpose: the
+    // Extension-less SPA routes are untouched, and so are id/slug routes whose
+    // segment merely contains a dot (/journey/1.5): og-middleware marks those
+    // 404 and the SPA renders its not-found page. Dev is exempt on purpose: the
     // Vite dev pipeline serves dotted module paths (/src/App.tsx, /@vite/…).
     const staticRoot = path.resolve(import.meta.dirname, "public");
     app.use((req, res, next) => {
       if (req.method !== "GET" && req.method !== "HEAD") return next();
       const lastSegment = req.path.split("/").pop() ?? "";
-      if (!lastSegment.includes(".")) return next();
+      if (!lastSegment.includes(".") || isEntityRoutePath(req.path)) return next();
       try {
         const decoded = decodeURIComponent(req.path);
         const candidate = path.resolve(staticRoot, "." + decoded);
