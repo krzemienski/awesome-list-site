@@ -228,6 +228,41 @@ function SubItem({
   );
 }
 
+/**
+ * F204: a native <details> popover never closes on Escape or an outside
+ * click, so the "…" menu stayed open over the sidebar rows. Close it on
+ * both, returning focus to the summary after Escape.
+ */
+function DismissibleDetails({ className, children }: { className: string; children: ReactNode }) {
+  const ref = useRef<HTMLDetailsElement>(null);
+  const [open, setOpen] = useState(false);
+
+  useEffect(() => {
+    if (!open) return;
+    const close = (event: PointerEvent) => {
+      if (ref.current && !ref.current.contains(event.target as Node)) ref.current.open = false;
+    };
+    document.addEventListener("pointerdown", close);
+    return () => document.removeEventListener("pointerdown", close);
+  }, [open]);
+
+  return (
+    <details
+      ref={ref}
+      className={className}
+      onToggle={(e) => setOpen(e.currentTarget.open)}
+      onKeyDown={(e) => {
+        if (e.key !== "Escape" || !ref.current?.open) return;
+        e.stopPropagation();
+        ref.current.open = false;
+        ref.current.querySelector("summary")?.focus();
+      }}
+    >
+      {children}
+    </details>
+  );
+}
+
 /* -------- top-level accordion category -------- */
 
 function MeasuredAccordionBody({
@@ -875,7 +910,7 @@ export default function AppSidebar({
     compact = false,
     showNavigationModeToggle = false,
   ) => (
-    <details className={`av-sidebar-more-navigation ${className}`}>
+    <DismissibleDetails className={`av-sidebar-more-navigation ${className}`}>
       <summary
         className="flex min-h-[44px] cursor-pointer items-center px-3 text-xs font-medium text-[var(--text-2)]"
         aria-label={compact ? "More navigation" : undefined}
@@ -933,7 +968,7 @@ export default function AppSidebar({
           );
         })}
       </SidebarMenu>
-    </details>
+    </DismissibleDetails>
   );
 
   const homeNavigation = (
