@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { useQuery, useMutation } from "@tanstack/react-query";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -139,6 +139,8 @@ export default function Profile({ user }: ProfileProps) {
   // Run17 BUG-011: inline validation message (empty save is rejected, not
   // silently fallen back to the email local-part).
   const [nameError, setNameError] = useState<string | null>(null);
+  // The dialog has no DialogTrigger, so Radix can't return focus on close.
+  const editNameButtonRef = useRef<HTMLButtonElement>(null);
 
   const openNameDialog = () => {
     // Best-effort prefill from the combined display name.
@@ -359,6 +361,7 @@ export default function Profile({ user }: ProfileProps) {
               className="h-8 w-8 shrink-0"
               aria-label="Edit display name"
               data-testid="button-edit-name"
+              ref={editNameButtonRef}
               onClick={openNameDialog}
             >
               <Pencil className="h-4 w-4" />
@@ -907,7 +910,13 @@ export default function Profile({ user }: ProfileProps) {
 
       {/* Run15 BUG-049: display-name edit dialog */}
       <Dialog open={nameDialogOpen} onOpenChange={setNameDialogOpen}>
-        <DialogContent className="sm:max-w-md">
+        <DialogContent
+          className="sm:max-w-md"
+          onCloseAutoFocus={(event) => {
+            event.preventDefault();
+            editNameButtonRef.current?.focus();
+          }}
+        >
           <DialogHeader>
             <DialogTitle>Edit display name</DialogTitle>
             <DialogDescription>
@@ -923,6 +932,8 @@ export default function Profile({ user }: ProfileProps) {
                 value={editFirstName}
                 maxLength={50}
                 onChange={(e) => setEditFirstName(e.target.value)}
+                aria-invalid={!!nameError}
+                aria-describedby={nameError ? "edit-name-error" : undefined}
                 data-testid="input-first-name"
               />
             </div>
@@ -933,11 +944,14 @@ export default function Profile({ user }: ProfileProps) {
                 value={editLastName}
                 maxLength={50}
                 onChange={(e) => setEditLastName(e.target.value)}
+                aria-invalid={!!nameError}
+                aria-describedby={nameError ? "edit-name-error" : undefined}
                 data-testid="input-last-name"
               />
             </div>
             {nameError && (
               <p
+                id="edit-name-error"
                 className="text-sm text-destructive"
                 role="alert"
                 data-testid="text-name-error"
