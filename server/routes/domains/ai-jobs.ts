@@ -160,12 +160,12 @@ export function registerAiJobsRoutes(
       const job = await enrichmentRepo.getEnrichmentJob(jobId);
       
       if (!job) {
-        return res.json({
+        return res.status(404).json({
           success: false,
           message: 'Job not found'
         });
       }
-      
+
       res.json({
         success: true,
         job: stripJobAuthSecret(job)

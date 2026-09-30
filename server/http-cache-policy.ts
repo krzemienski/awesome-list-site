@@ -12,7 +12,9 @@
  * |   subcategories, sub-subcats)  |                                          |     |
  * | Public REST API (/api/public/*)| public, max-age=60                       | Read-only, anonymous, DB-fresh data for external consumers; 60s shared caching bounds staleness to the same contract as catalog reads. Express's default weak ETag still provides 304 revalidation. |
  * | Non-200 public API results     | no-store                                 | A 404 can flip to 200 the moment a resource is approved — never pin negative results in shared caches. |
- * | Auth/admin/user responses      | no-store / private, no-store (per route) | Session-specific; unchanged by this contract. |
+ * | Auth/admin/user responses      | private, no-store (default for any /api  | Session-specific. Handlers may set a stricter no-store or, where the |
+ * |                                |   request with a session; per-route      |   body is session-independent (/api/home), a public catalog policy.  |
+ * |                                |   headers override it)                   |     |
  *
  * Platform note (diagnosed Aug 19, 2026): on the very first response of a
  * browsing session, Replit's Google-Frontend edge injects a `GAESA` session
@@ -45,3 +47,10 @@ export const PUBLIC_API_CACHE_CONTROL = "public, max-age=60";
 
 /** Non-200 outcomes on public endpoints (negative results must not stick). */
 export const PUBLIC_API_ERROR_CACHE_CONTROL = "no-store";
+
+/**
+ * Default for every /api response to a request that carries a session, so
+ * user PII (e.g. the admin users CSV export) never lands in a shared or disk
+ * cache when a handler forgets to set its own policy.
+ */
+export const SESSION_CACHE_CONTROL = "private, no-store";

@@ -31,7 +31,7 @@ import {
   hasValidAuditKey,
   hasValidAuthReturnAuditKey,
 } from "./clerkAuth";
-import { HASHED_ASSET_CACHE_CONTROL } from "./http-cache-policy";
+import { HASHED_ASSET_CACHE_CONTROL, SESSION_CACHE_CONTROL } from "./http-cache-policy";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -466,6 +466,12 @@ app.use((req, res, next) => {
   if (!needsClerkAuth(req)) return next();
   if (isProtectedPage(req) && hasValidAuthReturnAuditKey(req)) return next();
   return clerkUserContext(req, res, next);
+});
+// Session responses default to private, no-store; a handler that sets its own
+// Cache-Control later overrides this. See server/http-cache-policy.ts.
+app.use("/api", (req, res, next) => {
+  if (req.dbUser) res.set("Cache-Control", SESSION_CACHE_CONTROL);
+  next();
 });
 
 app.use((req, res, next) => {

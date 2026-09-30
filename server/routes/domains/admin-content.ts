@@ -77,6 +77,9 @@ import type {
   AdminRepository,
 } from "../../repositories";
 
+// Every value resources.status can hold (shared/schema.ts resources.status).
+const ADMIN_RESOURCE_STATUSES = ['approved', 'pending', 'rejected', 'withdrawn', 'archived'];
+
 /**
  * Explicit dependency context for the admin-content routes. Everything the
  * handlers need — repositories, auth/limiter middleware, and the shared
@@ -901,6 +904,15 @@ export function registerAdminContentRoutes(
       const search = req.query.search as string;
       const category = req.query.category as string;
       const status = req.query.status as string;
+      // Same invalid_status contract as the public /api/resources; an unknown
+      // value used to come back as an empty 200 that looked like "no rows".
+      if (status !== undefined && status !== '' && !ADMIN_RESOURCE_STATUSES.includes(status)) {
+        return res.status(400).json({
+          error: 'invalid_status',
+          message: `status must be one of: ${ADMIN_RESOURCE_STATUSES.join(', ')}`,
+          allowed: ADMIN_RESOURCE_STATUSES,
+        });
+      }
       // Run16 BUG-035: pass the whitelisted sort through to the repo
       // (unknown values fall back to newest-first inside listResources).
       const sort = req.query.sort as "name-asc" | "name-desc" | "newest" | "oldest" | undefined;

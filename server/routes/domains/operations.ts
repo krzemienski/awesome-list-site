@@ -262,10 +262,12 @@ ${rows.join('\n')}
       if (!route || !layer.regexp) continue;
       if (!layer.regexp.test(fullPath) && !layer.regexp.test(fullPath + '/')) continue;
       sawMatch = true;
-      const hasAuthGuard = (route.stack ?? []).some((h: any) => {
-        const n = h?.handle?.name || h?.name || '';
-        return n === 'isAuthenticated' || n === 'isAdmin';
-      });
+      // Compare the guards by identity: routes.ts imports requireAuth under
+      // the alias isAuthenticated, and an alias doesn't rename the function,
+      // so name matching missed every user-only route.
+      const hasAuthGuard = (route.stack ?? []).some(
+        (h: any) => h?.handle === isAuthenticated || h?.handle === isAdmin,
+      );
       if (!hasAuthGuard) allMatchesRequireAuth = false;
       for (const m of Object.keys(route.methods || {})) {
         if (m === '_all') continue;
@@ -273,8 +275,9 @@ ${rows.join('\n')}
       }
     }
     if (allowed.size > 0 && !allowed.has(req.method)) {
-      const isAuthed =
-        typeof (req as any).isAuthenticated === 'function' && (req as any).isAuthenticated();
+      // clerkUserContext resolves req.dbUser per request; there is no
+      // Passport-style req.isAuthenticated() under Clerk.
+      const isAuthed = Boolean((req as any).dbUser);
       if (sawMatch && allMatchesRequireAuth && !isAuthed) {
         // Uniform envelope with the real handlers' anonymous answer.
         return res.status(401).json({ message: 'Unauthorized' });
