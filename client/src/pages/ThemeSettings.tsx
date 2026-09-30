@@ -2,7 +2,6 @@ import { useContext, useEffect, useRef, useState } from "react";
 import { Link } from "wouter";
 import { ArrowLeft, Check, Sparkles, Zap } from "lucide-react";
 import { ThemeProviderContext } from "@/components/ui/theme-provider";
-import { useToast } from "@/hooks/use-toast";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Card } from "@/components/ui/card";
@@ -28,7 +27,6 @@ import "@/styles/pages/theme-settings.css";
 export default function ThemeSettings() {
   const { systemId, accentId, setSystem, setAccent, systems, accents } =
     useContext(ThemeProviderContext);
-  const { toast } = useToast();
 
   const activeSystem = systems[systemId];
   const activeAccent = accents.find((a) => a.id === accentId);
@@ -56,21 +54,18 @@ export default function ThemeSettings() {
     setFontId(id);
     const name = FONT_OPTIONS.find((f) => f.id === id)?.name ?? id;
     trackThemeChange(name, 'font');
-    toast({ title: "Font applied", description: `${name} is now active.` });
   };
 
   const handlePickSystem = (id: string) => {
     setSystem(id);
     const label = isSystemId(id) ? systems[id].name : id;
     trackThemeChange(label, 'system');
-    toast({ title: "Design system applied", description: `${label} is now active.` });
   };
 
   const handlePickAccent = (id: string) => {
     setAccent(id);
     const label = accents.find((a) => a.id === id)?.name ?? id;
     trackThemeChange(label, 'color');
-    toast({ title: "Accent applied", description: `${label} is now the active accent.` });
   };
 
   // NB-057 (run18): the three theme pickers are ARIA radiogroups built from
