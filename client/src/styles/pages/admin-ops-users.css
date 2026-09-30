@@ -74,7 +74,10 @@
   position: absolute;
   inset-inline-start: 0.875rem;
   top: 50%;
-  transform: translateY(-50%);
+  /* The individual `translate` property survives the shared sort-button
+     hover rule's `transform: none`, so the label stays centred under the
+     pointer instead of dropping onto the header rule. */
+  translate: 0 -50%;
   text-transform: uppercase;
 }
 
