@@ -132,6 +132,13 @@
   padding: 18px 22px;
 }
 
+.queues-agent__table-more {
+  border-block-start: var(--hairline-w) solid var(--border);
+  display: flex;
+  justify-content: center;
+  padding: 10px 22px;
+}
+
 .queues-agent__research-form {
   padding: 24px;
 }

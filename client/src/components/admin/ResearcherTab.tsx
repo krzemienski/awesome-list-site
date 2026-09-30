@@ -63,6 +63,7 @@ const INFO_BORDER = "border-[var(--status-info)]/20"; // DS-OK: cyan info (DS ch
 const OK_SOLID_BUTTON = "bg-[var(--status-ok)] text-black hover:bg-[var(--status-ok)]/90"; // DS-OK: status ok
 const OK_TEXT = "text-[var(--status-ok)]"; // DS-OK: status ok
 const BAD_TEXT = "text-[var(--status-bad)]"; // DS-OK: status bad
+const CANONICAL_JOB_ROWS = 5;
 
 /**
  * Agent roles use the global DS status/info constants. Related role variants
@@ -267,6 +268,8 @@ export default function ResearcherTab({ initialTab = "launch" }: ResearcherTabPr
   });
   const jobs = jobsData?.jobs;
   const jobsTotal = jobsData?.total ?? 0;
+  const [showAllJobs, setShowAllJobs] = useState(false);
+  const visibleJobs = showAllJobs ? (jobs ?? []) : (jobs ?? []).slice(0, CANONICAL_JOB_ROWS);
   // A failed or still-loading job list cannot establish whether a research
   // job is active. Keep paid launches disabled until that state is known.
   const activeJobStateKnown =
@@ -596,7 +599,12 @@ export default function ResearcherTab({ initialTab = "launch" }: ResearcherTabPr
             </div>
           </div>
         </section>
-        <TableShell title="Researcher jobs" sub="Recent agentic research runs">
+        <TableShell
+          title="Researcher jobs"
+          sub={jobs && jobsTotal > visibleJobs.length
+            ? `Latest ${visibleJobs.length} of ${jobsTotal} research runs`
+            : "Recent agentic research runs"}
+        >
           <div
             className="queues-agent__canonical-table queues-agent__canonical-table--research focus-visible:outline focus-visible:outline-2 focus-visible:outline-ring"
             tabIndex={0}
@@ -605,17 +613,17 @@ export default function ResearcherTab({ initialTab = "launch" }: ResearcherTabPr
           >
             <table className="table">
               <thead>
-                <tr><th>Status</th><th>Prompt</th><th>Found</th><th>Approved</th><th>Cost</th><th>Turns</th><th>Created</th></tr>
+                <tr><th>Status</th><th>Prompt</th><th>Found</th><th>Approved / Rejected</th><th>Cost</th><th>Turns</th><th>Created</th></tr>
               </thead>
               <tbody>
-                {(jobs || []).slice(0, 2).map((job) => (
+                {visibleJobs.map((job) => (
                   <tr key={job.id}>
                     <td><StatusChip status={job.status} /></td>
                     <td className="prompt">{job.prompt || "Auto-generated research brief"}</td>
                     <td className="mono queues-agent__cell-mono">{job.totalDiscoveries || 0}</td>
                     <td className="mono queues-agent__cell-mono">{job.approvedDiscoveries || 0}/{job.rejectedDiscoveries || 0}</td>
                     <td className="mono accent queues-agent__cell-mono">{formatCost(job.estimatedCostUsd)}</td>
-                    <td className="mono queues-agent__cell-mono">{job.turnsUsed || 0}/{job.maxTurns || 0}</td>
+                    <td className="mono queues-agent__cell-mono">{job.turnsUsed || 0}/{job.maxTurns ?? "∞"}</td>
                     <td className="mono muted queues-agent__cell-mono queues-agent__cell-muted queues-agent__cell-created">{job.createdAt ? formatAdminDate(job.createdAt) : "—"}</td>
                   </tr>
                 ))}
@@ -623,6 +631,22 @@ export default function ResearcherTab({ initialTab = "launch" }: ResearcherTabPr
             </table>
             {!jobsLoading && (jobs || []).length === 0 ? <p className="queues-agent__empty">No research jobs found.</p> : null}
           </div>
+          {jobs && (jobs.length > visibleJobs.length || jobsTotal > jobs.length) ? (
+            <div className="queues-agent__table-more">
+              <Button
+                type="button"
+                className="btn ghost"
+                variant="ghost"
+                onClick={() => {
+                  if (showAllJobs) setJobsLimit((l) => Math.min(l + 20, 200));
+                  setShowAllJobs(true);
+                }}
+                data-testid="button-show-more-research-jobs"
+              >
+                {showAllJobs ? `Load more (${jobs.length} of ${jobsTotal})` : "Show more"}
+              </Button>
+            </div>
+          ) : null}
         </TableShell>
       </div>
       <details className="queues-agent__more">

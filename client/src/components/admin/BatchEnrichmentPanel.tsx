@@ -51,6 +51,8 @@ import { Stat, StatusChip, TableShell } from "@/components/admin/AdminOpsPrimiti
 import type { EnrichmentJob } from "@shared/schema";
 import "./queues-agent.css";
 
+const CANONICAL_JOB_ROWS = 6;
+
 interface JobsResponse {
   success: boolean;
   jobs: EnrichmentJob[];
@@ -122,6 +124,7 @@ export default function BatchEnrichmentPanel() {
   const [jobToCancel, setJobToCancel] = useState<number | null>(null);
   // Run23 NB-040: explicit confirmation before starting a paid enrichment job.
   const [confirmStart, setConfirmStart] = useState(false);
+  const [showAllJobs, setShowAllJobs] = useState(false);
 
   const [isPolling, setIsPolling] = useState(false);
 
@@ -225,6 +228,7 @@ export default function BatchEnrichmentPanel() {
   });
 
   const jobs = jobsData?.jobs || [];
+  const visibleJobs = showAllJobs ? jobs : jobs.slice(0, CANONICAL_JOB_ROWS);
   // A missing or failed list response cannot establish whether another job is
   // active. Keep paid launches disabled until the active-job state is known.
   const activeJobStateKnown =
@@ -429,7 +433,7 @@ export default function BatchEnrichmentPanel() {
                 <tr><th>Job</th><th>Status</th><th>Started</th><th>Completed</th><th><span className="sr-only">Actions</span></th></tr>
               </thead>
               <tbody>
-                {jobs.slice(0, 6).map((job) => (
+                {visibleJobs.map((job) => (
                   <tr key={job.id}>
                     <td className="mono queues-agent__cell-mono">#{job.id}</td>
                     <td>
@@ -452,6 +456,20 @@ export default function BatchEnrichmentPanel() {
             </table>
             {!isLoading && jobs.length === 0 ? <p className="queues-agent__empty">No enrichment jobs found.</p> : null}
           </div>
+          {jobs.length > CANONICAL_JOB_ROWS ? (
+            <div className="queues-agent__table-more">
+              <Button
+                type="button"
+                className="btn ghost"
+                variant="ghost"
+                onClick={() => setShowAllJobs((open) => !open)}
+                aria-expanded={showAllJobs}
+                data-testid="button-show-all-enrichment-jobs"
+              >
+                {showAllJobs ? "Show fewer" : `Show all ${jobs.length} jobs`}
+              </Button>
+            </div>
+          ) : null}
         </TableShell>
       </div>
       <details className="queues-agent__more">
