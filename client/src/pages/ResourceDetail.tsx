@@ -41,6 +41,7 @@ import { Blurhash } from "react-blurhash";
 import type { Resource } from "@shared/schema";
 import type { BookmarkCollection } from "@/types/bookmarks";
 import { useGuestBookmarkIds } from "@/lib/guestBookmarks";
+import { restoreRemovedBookmark, type RemovedBookmark } from "@/lib/bookmarkRestore";
 import { resourceFactsSummary } from "@shared/seo-content-templates";
 import {
   RESOURCE_FORMAT_LABELS,
@@ -99,7 +100,7 @@ export default function ResourceDetail() {
 
   // BUG-021 (run25): /api/bookmarks items carry the user's saved notes.
   const { data: bookmarks } = useQuery<
-    (Resource & { notes?: string | null; collectionIds?: number[] })[]
+    (Resource & RemovedBookmark)[]
   >({
     queryKey: ['/api/bookmarks'],
     enabled: isAuthenticated
@@ -181,6 +182,7 @@ export default function ResourceDetail() {
   const originalCollectionIdsRef = useRef<number[]>([]);
   const desiredCollectionIdsRef = useRef<number[]>([]);
   const saveModeRef = useRef<"add" | "edit">("add");
+  const removedBookmarkRef = useRef<RemovedBookmark | undefined>(undefined);
   const { data: collections = [], isLoading: collectionsLoading } =
     useQuery<BookmarkCollection[]>({
       queryKey: ["/api/collections?includeArchived=true"],
@@ -228,6 +230,9 @@ export default function ResourceDetail() {
     resourceId: id || '',
     isActive: isBookmarked,
     onOptimistic: (next) => {
+      // Snapshot before the flip drops the row from the cache, so Undo can
+      // put back its collections and queue state, not just the bookmark.
+      if (!next) removedBookmarkRef.current = bookmarkedEntry;
       // Guests: saved state re-derives from the guest store — don't seed the
       // disabled authed list cache with guest flips.
       if (isAuthenticated) flipCachedList('/api/bookmarks', next);
@@ -236,6 +241,7 @@ export default function ResourceDetail() {
       if (vars.remove) {
         // Run17 BUG-013: removal is instant — offer a one-click Undo instead
         // of a confirm dialog.
+        const removed = removedBookmarkRef.current;
         showToast({
           title: "Removed from bookmarks",
           description: "Resource removed from your bookmarks",
@@ -243,8 +249,24 @@ export default function ResourceDetail() {
             <ToastAction
               altText="Undo bookmark removal"
               onClick={async () => {
-                await apiRequest(`/api/bookmarks/${id}`, { method: 'POST' });
-                queryClient.invalidateQueries({ queryKey: ['/api/bookmarks'] });
+                try {
+                  const { partial } = await restoreRemovedBookmark(id || '', removed);
+                  showToast(
+                    partial
+                      ? {
+                          title: "Bookmark restored",
+                          description: "Some collections or queue settings couldn't be restored.",
+                          variant: "destructive",
+                        }
+                      : { description: "Bookmark restored", duration: 2000 },
+                  );
+                } catch {
+                  toast({
+                    title: "Error",
+                    description: "Couldn't restore the bookmark. Please try again.",
+                    variant: "destructive",
+                  });
+                }
               }}
               data-testid="button-undo-bookmark-removal"
             >

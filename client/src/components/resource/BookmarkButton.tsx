@@ -9,6 +9,7 @@ import { ToastAction } from "@/components/ui/toast";
 import { useBookmarkToggle } from "@/hooks/useResourceToggle";
 import { useAuth } from "@/hooks/useAuth";
 import { useGuestBookmarkIds } from "@/lib/guestBookmarks";
+import { restoreRemovedBookmark } from "@/lib/bookmarkRestore";
 import { cn } from "@/lib/utils";
 import type { BookmarkCollection } from "@/types/bookmarks";
 import type { BookmarkQueueStatus } from "@shared/bookmarkCollections";
@@ -126,40 +127,11 @@ function BookmarkButton({
               altText="Undo bookmark removal"
               onClick={async () => {
                 try {
-                  await apiRequest(`/api/bookmarks/${resourceId}`, {
-                    method: "POST",
-                    body: JSON.stringify(restoredNotes ? { notes: restoredNotes } : {}),
-                    credentials: "include",
+                  const { partial } = await restoreRemovedBookmark(resourceId, {
+                    ...removedEntry,
+                    notes: restoredNotes,
                   });
-                  let partial = false;
-                  if (removedEntry) {
-                    const state: Record<string, unknown> = {};
-                    if (removedEntry.queueStatus && removedEntry.queueStatus !== "saved") {
-                      state.queueStatus = removedEntry.queueStatus;
-                    }
-                    if (removedEntry.archivedAt) state.archived = true;
-                    if (removedEntry.personalTags?.length) {
-                      state.personalTags = removedEntry.personalTags;
-                    }
-                    const results = await Promise.allSettled([
-                      ...(Object.keys(state).length
-                        ? [apiRequest(`/api/bookmarks/${resourceId}/state`, {
-                            method: "PATCH",
-                            body: JSON.stringify(state),
-                          })]
-                        : []),
-                      ...(removedEntry.collectionIds ?? []).map((collectionId) =>
-                        apiRequest(`/api/collections/${collectionId}/items/${resourceId}`, {
-                          method: "POST",
-                        }),
-                      ),
-                    ]);
-                    partial = results.some((result) => result.status === "rejected");
-                  }
                   setIsBookmarked(true);
-                  queryClient.invalidateQueries({ queryKey: ["/api/bookmarks"] });
-                  queryClient.invalidateQueries({ queryKey: ["/api/collections?includeArchived=true"] });
-                  queryClient.invalidateQueries({ queryKey: [`/api/resources/${resourceId}`] });
                   showToast(
                     partial
                       ? {

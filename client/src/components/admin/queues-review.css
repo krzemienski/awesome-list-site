@@ -5,7 +5,11 @@
  * horizontally scrollable DS `.table`.
  */
 .queue-review-shell {
-  overflow: hidden;
+  /* clip, not hidden: a hidden box is still a scroll container, so focusing
+     an off-screen row action at mobile widths scrolled the whole panel
+     sideways and pushed the heading and row titles out of view. Only the
+     table wrap below should scroll. */
+  overflow: clip;
 }
 
 .queue-review-shell-heading {

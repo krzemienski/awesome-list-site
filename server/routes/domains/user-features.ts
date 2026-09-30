@@ -58,6 +58,7 @@ import {
   personalTagsSchema,
 } from "@shared/bookmarkCollections";
 import { PG_INT_MAX } from "../../validation/inputs";
+import { stripInternalResourceFields } from "../../lib/publicResource";
 
 /**
  * Everything the user-features handlers need from the composition root.
@@ -132,7 +133,7 @@ export function registerUserFeatureRoutes(
     try {
       const userId = req.dbUser.id;
       const favorites = await userFeatureRepo.getUserFavorites(userId);
-      res.json(favorites);
+      res.json(favorites.map(stripInternalResourceFields));
     } catch (error) {
       console.error('Error fetching favorites:', error);
       res.status(500).json({ message: 'Failed to fetch favorites' });
@@ -178,7 +179,7 @@ export function registerUserFeatureRoutes(
     try {
       const userId = req.dbUser.id;
       const bookmarks = await userFeatureRepo.getUserBookmarks(userId);
-      res.json(bookmarks);
+      res.json(bookmarks.map(stripInternalResourceFields));
     } catch (error) {
       console.error('Error fetching bookmarks:', error);
       res.status(500).json({ message: 'Failed to fetch bookmarks' });

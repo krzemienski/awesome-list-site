@@ -385,6 +385,7 @@ function ContributionCard({
                 className="account-action-danger"
                 onClick={() => onWithdraw(item)}
                 disabled={withdrawing}
+                aria-label={`Withdraw ${item.title}`}
                 data-testid={`button-withdraw-${item.kind}-${item.id}`}
               >
                 <Undo2 className="mr-2 h-4 w-4" aria-hidden="true" />

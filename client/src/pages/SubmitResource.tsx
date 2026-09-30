@@ -675,10 +675,15 @@ export default function SubmitResource() {
                               {/* Run16 BUG-061: the server hard-blocks duplicate
                                   URLs with a 409 — the old copy promised "you
                                   can still submit", which was never true. */}
-                              This URL is already in the catalog.
+                              {/* check-url only answers "exists" for a row of any
+                                  status (pending/rejected stay private), so the
+                                  copy can't claim the URL is listed. */}
+                              This URL has already been submitted, so it can&apos;t be submitted again.
                               <br />
                               <span>
-                                It can&apos;t be submitted again — if something about the existing entry is wrong, use &quot;Suggest Edit&quot; on the resource page instead.
+                                If it&apos;s listed and something about it is wrong, use &quot;Suggest Edit&quot; on its resource page.
+                                If you submitted it yourself, its status is in{" "}
+                                <Link href="/contributions" className="underline">your contributions</Link>.
                               </span>
                             </AlertDescription>
                           </Alert>

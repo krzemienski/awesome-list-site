@@ -830,7 +830,9 @@ export default function Bookmarks() {
                         ))}
                       </SelectContent>
                     </Select>
-                    <div className="flex min-w-0 flex-1 flex-wrap gap-1">
+                    {/* No min-w-0: the chips' own width must push Note/Archive onto the next
+                        toolbar line instead of letting a long tag overlap them. */}
+                    <div className="flex max-w-full flex-1 flex-wrap gap-1">
                       {resource.personalTags.map((tag) => (
                         <Badge key={tag} variant="secondary">#{tag}</Badge>
                       ))}
