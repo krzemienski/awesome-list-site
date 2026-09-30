@@ -84,3 +84,10 @@ logs/
 *.tar.gz
 *.zip
 *.rar
+
+# Cloudflare Worker wrapper (deployed separately)
+deploy/
+
+# Local caches and test fixtures are not part of the image
+.cache/
+tests/

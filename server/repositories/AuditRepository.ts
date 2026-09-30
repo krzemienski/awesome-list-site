@@ -36,7 +36,7 @@ import {
   type InsertResourceEdit,
 } from "@shared/schema";
 import { db } from "../db";
-import { decodeHtmlEntities } from "../github/importHygiene";
+import { decodeHtmlEntities, splitTaxonomyPathFields } from "../github/importHygiene";
 import {
   resourceFormatSchema,
   resourceProviderSchema,
@@ -665,7 +665,7 @@ export class AuditRepository {
 
       await tx
         .update(resources)
-        .set({ ...updates, updatedAt: now })
+        .set({ ...splitTaxonomyPathFields(updates), updatedAt: now })
         .where(eq(resources.id, edit.resourceId));
       await tx
         .update(resourceEdits)

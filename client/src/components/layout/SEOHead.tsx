@@ -4,6 +4,7 @@ import {
   clampSeoTitle,
   clampSeoDescription,
   ogImagePath,
+  siteTagline,
 } from "@shared/seo-templates";
 
 interface SEOHeadProps {
@@ -49,8 +50,6 @@ interface SEOHeadProps {
 let firstRealHeadCommitted = false;
 
 const SITE_NAME = "Awesome Video";
-const SITE_TAGLINE =
-  "The curated index of 2,300+ video development resources — players, encoders, codecs, streaming, AI, tools, and community.";
 
 // Canonical base must match the server SITE_URL (server/og-middleware.ts) so the
 // client-hydrated canonical / og:url / og:image never drift to a non-apex host
@@ -135,8 +134,8 @@ export default function SEOHead({
     category
       ? `Discover ${resourceCount || 'curated'} ${category.toLowerCase()} resources on ${SITE_NAME}. Find the best tools, libraries, and frameworks for video development.`
       : awesomeList
-      ? `${awesomeList.description || SITE_TAGLINE} Explore ${awesomeList.resources?.length || '2300+'} carefully curated resources across ${awesomeList.categories?.length || '80+'} categories.`
-      : SITE_TAGLINE
+      ? `${awesomeList.description || siteTagline} Explore ${awesomeList.resources?.length || 'hundreds of'} carefully curated resources across ${awesomeList.categories?.length || 'its'} categories.`
+      : siteTagline
   ));
 
   // Social sharing image — the SAME path-based PNG URL the server emits
@@ -188,6 +187,7 @@ export default function SEOHead({
       {/* Additional SEO Meta Tags */}
       {/* DS-OK: MR-DS-04/05 — literal required (meta can't read CSS vars); matches DS --accent */}
       <meta name="theme-color" content="#ff3d52" />
+      {/* DS-OK: intentional — Windows tile metadata needs a literal color, not a CSS token. */}
       <meta name="msapplication-TileColor" content="#ff3d52" />
       <meta name="application-name" content={SITE_NAME} />
       <meta name="apple-mobile-web-app-title" content={SITE_NAME} />

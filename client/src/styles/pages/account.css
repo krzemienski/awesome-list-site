@@ -8,10 +8,6 @@
   border-radius: var(--radius);
 }
 
-.account-theme [role="radio"][aria-checked="true"] {
-  box-shadow: var(--shadow-accent);
-}
-
 /*
  * Account surfaces.
  *

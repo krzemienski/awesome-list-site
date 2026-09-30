@@ -95,66 +95,11 @@
       })();
     </script>
 
-    <script>
-      (function () {
-        try {
-          // Vite replaces this marker from THEME_FALLBACK_REGISTRY-derived
-          // data before serving/building the HTML. Keeping the script inline
-          // preserves the current no-flash behavior without a second network
-          // request or a hand-maintained list of theme ids.
-          var THEME_BOOT = __AWESOME_VIDEO_THEME_BOOT__;
-          var PRODUCT_PROFILE_BOOT = __AWESOME_VIDEO_PRODUCT_PROFILE_BOOT__;
-          var sys = null, acc = null;
-          try { sys = localStorage.getItem('ds-system'); } catch (_) {}
-          try { acc = localStorage.getItem('ds-accent'); } catch (_) {}
-          var root = document.documentElement;
-          var profile = new RegExp(PRODUCT_PROFILE_BOOT.routePatterns.admin).test(location.pathname)
-            ? 'admin-operations'
-            : new RegExp(PRODUCT_PROFILE_BOOT.routePatterns.learning).test(location.pathname)
-              ? 'learning-workspace'
-              : 'public-discovery';
-          var profileDefaults = PRODUCT_PROFILE_BOOT.profiles[profile];
-          if (THEME_BOOT.systems.indexOf(sys) === -1) {
-            sys = profileDefaults ? profileDefaults.defaultSystem : THEME_BOOT.defaultSystem;
-          }
-          if (THEME_BOOT.accents.indexOf(acc)  === -1) {
-            acc = profileDefaults ? profileDefaults.defaultAccent : THEME_BOOT.defaultAccent;
-          }
-          root.setAttribute('data-product-profile', profile);
-          root.setAttribute('data-system', sys);
-          root.setAttribute('data-accent', acc);
-          root.classList.add('dark');
-          root.style.backgroundColor = '#000';
-
-          // I1 — font override: read ds-font-override from localStorage and
-          // apply --font-sans pre-paint on EVERY route, so the override
-          // persists across hard reloads regardless of which page boots.
-          // Vite replaces this marker from FONT_OPTIONS-derived data before
-          // serving/building the HTML. Keeping it inline preserves the
-          // current no-flash behavior without a second network request or a
-          // hand-maintained list of font ids and stacks.
-          var FONT_BOOT = __AWESOME_VIDEO_FONT_BOOT__;
-          var fnt = null;
-          try { fnt = localStorage.getItem('ds-font-override'); } catch (_) {}
-          if (!Object.prototype.hasOwnProperty.call(FONT_BOOT.stacks, fnt)) fnt = FONT_BOOT.fallback;
-          root.setAttribute('data-font', fnt);
-          if (fnt && FONT_BOOT.stacks[fnt]) {
-            // Run22 BUG-015: body text uses --font-body (not --font-sans);
-            // set both, matching applyFontOverride in font-options.ts.
-            root.style.setProperty('--font-body', FONT_BOOT.stacks[fnt]);
-            root.style.setProperty('--font-sans', FONT_BOOT.stacks[fnt]);
-          }
-           // Font assets remain optional until after the first paint. The app
-           // applies a selected picker font and system display font on idle.
-        } catch (e) {}
-      })();
-    </script>
-
     <style>
       #home-layout-boot-skeleton { display: none; }
       html[data-home-ssr="true"][data-home-layout-pending="true"] #root[data-home-ssr="true"] { visibility: hidden; }
       html[data-home-ssr="true"][data-home-layout-pending="true"] #home-layout-boot-skeleton {
-        display: block; min-height: 100vh; background: #000; padding: 40px 20px;
+        display: block; min-height: 100vh; background: var(--bg); padding: 40px 20px;
       }
       html[data-consent-known="true"] #root[data-home-ssr="true"] .system-consent-banner {
         display: none !important;
@@ -329,23 +274,78 @@
          FOUT control. -->
     <link rel="stylesheet"
            href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Fraunces:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500;1,600&family=JetBrains+Mono:wght@400;500;600;700&family=Geist:wght@400;500;600;700&family=Instrument+Serif:ital@0;1&family=Space+Grotesk:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600;700&family=IBM+Plex+Sans:wght@400;500;600;700&family=Manrope:wght@400;500;600;700;800&display=swap" />
+
+    <!-- The design system, verbatim from the design source (never edited here;
+         app CSS lives in the Vite bundle, which links after this sheet). -->
+    <link rel="stylesheet" href="/ds/design-system.css" />
+    <!-- Classic, parser-blocking script on purpose: it defines
+         window.DESIGN_SYSTEMS / ACCENTS / SYSTEM_DEFAULT_ACCENT /
+         applyDesignSystem before the boot below runs. -->
+    <script src="/ds/design-system.js"></script>
+    <script>
+      // Synchronous boot (HANDOFF §5 Phase 3): write the ~36 inline tokens and
+      // data-system / data-accent before first paint. Runs every route.
+      (function () {
+        var root = document.documentElement;
+        try {
+          // Storage keys + fallback system from design-system.ts (Vite injects them).
+          var THEME_BOOT = __AWESOME_VIDEO_THEME_BOOT__;
+          var sys = null, acc = null;
+          try { sys = localStorage.getItem(THEME_BOOT.systemKey); } catch (_) {}
+          try { acc = localStorage.getItem(THEME_BOOT.accentKey); } catch (_) {}
+          if (!Object.prototype.hasOwnProperty.call(window.DESIGN_SYSTEMS, sys)) sys = THEME_BOOT.defaultSystem;
+          var known = false;
+          for (var i = 0; i < window.ACCENTS.length; i++) if (window.ACCENTS[i].id === acc) known = true;
+          if (!known) acc = window.SYSTEM_DEFAULT_ACCENT[sys];
+          window.applyDesignSystem(sys, acc);
+        } catch (_) {}
+
+        try {
+          // Layout-density hook only (shared/styles/product-profiles.css). It
+          // no longer decides which system paints.
+          var PROFILE_ROUTES = __AWESOME_VIDEO_PRODUCT_PROFILE_BOOT__.routePatterns;
+          root.setAttribute(
+            'data-product-profile',
+            new RegExp(PROFILE_ROUTES.admin).test(location.pathname)
+              ? 'admin-operations'
+              : new RegExp(PROFILE_ROUTES.learning).test(location.pathname)
+                ? 'learning-workspace'
+                : 'public-discovery'
+          );
+          root.classList.add('dark');
+
+          // Font override (Theme Settings picker). Only when a real override
+          // is stored: a first visit is pure applier state. The applier
+          // clears --font-body on every switch, so the app re-applies the
+          // override after each one (font-options.ts, single code path).
+          var FONT_BOOT = __AWESOME_VIDEO_FONT_BOOT__;
+          var fnt = null;
+          try { fnt = localStorage.getItem('ds-font-override'); } catch (_) {}
+          if (fnt && Object.prototype.hasOwnProperty.call(FONT_BOOT.stacks, fnt) && FONT_BOOT.stacks[fnt]) {
+            root.setAttribute('data-font', fnt);
+            root.style.setProperty('--font-body', FONT_BOOT.stacks[fnt]);
+            root.style.setProperty('--font-sans', FONT_BOOT.stacks[fnt]);
+          }
+        } catch (_) {}
+      })();
+    </script>
   </head>
   <body>
     <!-- BUG-004 (run10): real fallback for JS-disabled browsers/crawlers.
          (A prior "noscript" match in this file was only a comment.) -->
     <noscript>
-      <div style="max-width:640px;margin:80px auto;padding:24px;font-family:'JetBrains Mono',monospace;color:#e6e6e6;background:#000;border:1px solid #333;">
+      <div style="max-width:640px;margin:80px auto;padding:24px;font-family:var(--font-mono);color:var(--text);background:var(--bg);border:var(--border-w) solid var(--border-strong);">
         <p style="font-size:20px;font-weight:700;margin:0 0 12px;">Awesome Video</p>
-        <p style="margin:0 0 8px;">This app requires JavaScript to browse the 2,000+ curated video development resources.</p>
+        <p style="margin:0 0 8px;">This app requires JavaScript to browse thousands of curated video development resources.</p>
         <p style="margin:0;">Please enable JavaScript, or view the source list at
-          <a href="https://github.com/krzemienski/awesome-video" style="color:#5eddf2;">github.com/krzemienski/awesome-video</a>.</p>
+          <a href="https://github.com/krzemienski/awesome-video" style="color:var(--accent);">github.com/krzemienski/awesome-video</a>.</p>
       </div>
     </noscript>
     <div id="home-layout-boot-skeleton" aria-hidden="true">
       <div style="max-width:960px;margin:0 auto">
-        <div style="height:2rem;width:55%;background:#1a1a22;margin-bottom:1rem"></div>
-        <div style="height:1rem;width:80%;background:#1a1a22;margin-bottom:2rem"></div>
-        <div style="height:12rem;background:#1a1a22;margin-bottom:1rem"></div>
+        <div style="height:2rem;width:55%;background:var(--surface-2);margin-bottom:1rem"></div>
+        <div style="height:1rem;width:80%;background:var(--surface-2);margin-bottom:2rem"></div>
+        <div style="height:12rem;background:var(--surface-2);margin-bottom:1rem"></div>
       </div>
     </div>
     <div id="root"><!--app-html--></div>
@@ -380,7 +380,7 @@
             overlay.setAttribute('data-pathname', location.pathname);
             overlay.setAttribute(
               'style',
-              'position:fixed;inset:0;z-index:2147483000;background:#000;overflow:auto;overscroll-behavior:contain'
+              'position:fixed;inset:0;z-index:2147483000;background:var(--bg);overflow:auto;overscroll-behavior:contain'
             );
             while (root.firstChild) overlay.appendChild(root.firstChild);
             document.body.appendChild(overlay);
@@ -388,8 +388,8 @@
           }
           if (root.firstElementChild) return;
           root.innerHTML =
-            '<div aria-hidden="true" style="min-height:100vh;background:#000;padding:40px 20px;max-width:960px;margin:0 auto">' +
-            '<style>@keyframes bsk{0%{opacity:.35}50%{opacity:.7}100%{opacity:.35}}.bsk{background:#1a1a22;animation:bsk 1.4s ease-in-out infinite}</style>' +
+            '<div aria-hidden="true" style="min-height:100vh;background:var(--bg);padding:40px 20px;max-width:960px;margin:0 auto">' +
+            '<style>@keyframes bsk{0%{opacity:.35}50%{opacity:.7}100%{opacity:.35}}.bsk{background:var(--surface-2);animation:bsk 1.4s ease-in-out infinite}</style>' +
             '<div class="bsk" style="height:2rem;width:60%;max-width:420px;margin-bottom:1rem"></div>' +
             '<div class="bsk" style="height:1rem;width:80%;max-width:640px;margin-bottom:2rem"></div>' +
             '<div class="bsk" style="height:8rem;width:100%;margin-bottom:1rem"></div>' +

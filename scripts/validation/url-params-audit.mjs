@@ -462,25 +462,32 @@ let initialFacets = null;
     await page.waitForFunction(() => new URLSearchParams(location.search).has('category'));
     const categoryValue = await page.evaluate(() => new URLSearchParams(location.search).get('category'));
     const categoryFirstHref = await page.locator('[data-testid^="link-resource-title-"]').first().getAttribute('href');
-    const providerButton = page.getByTestId('facet-provider-unknown').first();
-    await providerButton.click();
-    await page.waitForFunction(() => new URLSearchParams(location.search).get('provider') === 'unknown');
+    // Provider/Format/Skill groups hide when they can't narrow results, so the
+    // second filter is a subcategory within the chosen category.
+    const subcategoryGroup = page.getByTestId('subcategory');
+    if (!(await subcategoryGroup.getAttribute('open').catch(() => null) !== null)) {
+      await subcategoryGroup.locator('summary').click();
+    }
+    const subcategoryButton = page.getByTestId(/^facet-subcategory-/).first();
+    await subcategoryButton.click();
+    await page.waitForFunction(() => new URLSearchParams(location.search).has('subcategory'));
+    const subcategoryValue = await page.evaluate(() => new URLSearchParams(location.search).get('subcategory'));
     const forwardHref = await page.locator('[data-testid^="link-resource-title-"]').first().getAttribute('href');
     await page.goBack();
     await page.waitForFunction(expected =>
       new URLSearchParams(location.search).get('category') === expected &&
-      !new URLSearchParams(location.search).has('provider'), categoryValue);
+      !new URLSearchParams(location.search).has('subcategory'), categoryValue);
     const backChips = await text(page, '[data-testid="active-filter-chips"]');
     const backHref = await page.locator('[data-testid^="link-resource-title-"]').first().getAttribute('href');
     await page.goForward();
-    await page.waitForFunction(() => new URLSearchParams(location.search).get('provider') === 'unknown');
+    await page.waitForFunction(expected => new URLSearchParams(location.search).get('subcategory') === expected, subcategoryValue);
     const restoredChips = await text(page, '[data-testid="active-filter-chips"]');
     const restoredHref = await page.locator('[data-testid^="link-resource-title-"]').first().getAttribute('href');
     log('facets:back-forward-restores',
-      !!categoryValue && /Category:/i.test(backChips || '') && !/Provider:/i.test(backChips || '') &&
-        /Provider: Not yet classified/i.test(restoredChips || '') &&
+      !!categoryValue && /Category:/i.test(backChips || '') && !/Subcategory:/i.test(backChips || '') &&
+        /Subcategory:/i.test(restoredChips || '') &&
         backHref === categoryFirstHref && restoredHref === forwardHref,
-      `category="${categoryValue}", backRowsMatch=${backHref === categoryFirstHref}, forwardRowsMatch=${restoredHref === forwardHref}`);
+      `category="${categoryValue}", subcategory="${subcategoryValue}", backRowsMatch=${backHref === categoryFirstHref}, forwardRowsMatch=${restoredHref === forwardHref}`);
   }
   await page.screenshot({ path: `${OUT}/back-forward.png`, fullPage: true }).catch(() => {});
   await page.close();

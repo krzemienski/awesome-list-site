@@ -96,7 +96,7 @@ export default function About() {
           display heading, divider, lead card, and callout grid. The copy in
           these surfaces stays grounded in the site's existing shared content. */}
       <header className="about-hero">
-        <div className="about-eyebrow">
+        <div className="eyebrow about-eyebrow">
           <BookOpen className="about-eyebrow-icon" aria-hidden="true" />
           ABOUT THIS PROJECT
         </div>
@@ -164,7 +164,7 @@ export default function About() {
         <Card className="about-card">
           <CardHeader className="about-card-header">
             <h2 className="about-section-title">
-              <Users className="about-section-icon about-icon-accent" aria-hidden="true" />
+              <Users className="about-section-icon about-icon-ink" aria-hidden="true" />
               About the maintainer
             </h2>
             <CardDescription>{MAINTAINER.role}</CardDescription>
@@ -198,28 +198,31 @@ export default function About() {
                 >
                   Profile → Security → Delete account &amp; data
                 </Link>{" "}
-                — it&apos;s private and authenticated, so you never have to post
+                — it’s private and authenticated, so you never have to post
                 personal details publicly.
               </p>
               <p className="about-body-copy">
-                Questions or corrections? The best way to reach us is to{" "}
+                Questions or corrections?{" "}
                 {contactDestination ? (
-                  <a
-                    href={contactDestination.href}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="about-inline-link about-inline-link-text"
-                    data-testid="link-about-github-issues"
-                  >
-                    {contactDestination.label}
-                    <ExternalLink className="about-external-icon" aria-hidden="true" />
-                  </a>
+                  <>
+                    The best way to reach us is to{" "}
+                    <a
+                      href={contactDestination.href}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="about-inline-link about-inline-link-text"
+                      data-testid="link-about-github-issues"
+                    >
+                      {contactDestination.label}
+                      <ExternalLink className="about-external-icon" aria-hidden="true" />
+                    </a>
+                    .
+                  </>
                 ) : (
                   <span data-testid="text-about-contact-unavailable">
-                    no configured public contact destination is available
+                    No public contact destination is configured yet.
                   </span>
                 )}
-                .
               </p>
               <p className="about-body-copy">
                 Review the{" "}
@@ -236,7 +239,7 @@ export default function About() {
                 >
                   Privacy Policy
                 </Link>{" "}
-                for the site&apos;s legal and data practices.
+                for the site’s legal and data practices.
               </p>
             </div>
           </CardContent>
@@ -246,7 +249,7 @@ export default function About() {
         <Card className="about-card">
           <CardHeader className="about-card-header">
             <h2 className="about-section-title">
-              <Github className="about-section-icon about-icon-accent" aria-hidden="true" />
+              <Github className="about-section-icon about-icon-ink" aria-hidden="true" />
               Open source at its core
             </h2>
             <CardDescription>
@@ -331,7 +334,7 @@ export default function About() {
               ].map((feature, idx) => (
                 <div key={feature.label} className="about-feature-card about-card">
                   <feature.icon
-                    className={`about-feature-icon ${idx < 4 ? "about-icon-accent" : ""}`}
+                    className={`about-feature-icon ${idx < 4 ? "about-icon-ink" : ""}`}
                     aria-hidden="true"
                   />
                   <div className="about-feature-label">{feature.label}</div>
@@ -459,7 +462,7 @@ export default function About() {
                   rel="noopener noreferrer"
                   className="about-credit-link about-card"
                 >
-                  <Users className="about-credit-icon about-icon-accent" aria-hidden="true" />
+                  <Users className="about-credit-icon about-icon-ink" aria-hidden="true" />
                   <div>
                     <div className="about-credit-name">Nick Krzemienski</div>
                     <div className="about-credit-description">Maintainer</div>
@@ -471,7 +474,7 @@ export default function About() {
                   rel="noopener noreferrer"
                   className="about-credit-link about-card"
                 >
-                  <Component className="about-credit-icon about-icon-accent" aria-hidden="true" />
+                  <Component className="about-credit-icon about-icon-ink" aria-hidden="true" />
                   <div>
                     <div className="about-credit-name">shadcn/ui</div>
                     <div className="about-credit-description">Components</div>
@@ -483,7 +486,7 @@ export default function About() {
                   rel="noopener noreferrer"
                   className="about-credit-link about-card"
                 >
-                  <Wind className="about-credit-icon about-icon-accent" aria-hidden="true" />
+                  <Wind className="about-credit-icon about-icon-ink" aria-hidden="true" />
                   <div>
                     <div className="about-credit-name">Tailwind CSS</div>
                     <div className="about-credit-description">Styling</div>
@@ -500,7 +503,7 @@ export default function About() {
         <Card className="about-card about-faq-card">
           <CardHeader className="about-card-header">
             <h2 className="about-section-title">
-              <HelpCircle className="about-section-icon about-icon-accent" aria-hidden="true" />
+              <HelpCircle className="about-section-icon about-icon-ink" aria-hidden="true" />
               Frequently asked questions
             </h2>
             <CardDescription>
@@ -518,7 +521,7 @@ export default function About() {
                     <button
                       type="button"
                       id={buttonId}
-                      className="about-faq-trigger"
+                      className="btn ghost about-faq-trigger"
                       aria-expanded={isOpen}
                       aria-controls={panelId}
                       data-testid={`button-about-faq-${faqIndex}`}

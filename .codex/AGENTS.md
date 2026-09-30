@@ -1,11 +1,10 @@
 # ECC for Codex CLI
 
-This supplements the root `AGENTS.md` with a repo-local ECC baseline.
+This is the repo-local ECC baseline for Codex CLI.
 
 ## Repo Skill
 
 - Repo-generated Codex skill: `.agents/skills/awesome-list-site/SKILL.md`
-- Claude-facing companion skill: `.claude/skills/awesome-list-site/SKILL.md`
 - Keep user-specific credentials and private MCPs in `~/.codex/config.toml`, not in this repo.
 
 ## MCP Baseline
@@ -18,11 +17,3 @@ The generated baseline enables GitHub, Context7, Exa, Memory, Playwright, and Se
 - Explorer: read-only evidence gathering
 - Reviewer: correctness, security, and regression review
 - Docs researcher: API and release-note verification
-
-## Workflow Files
-
-- `.claude/commands/feature-development.md`
-- `.claude/commands/refactoring.md`
-- `.claude/commands/add-ai-powered-feature.md`
-
-Use these workflow files as reusable task scaffolds when the detected repository workflows recur.

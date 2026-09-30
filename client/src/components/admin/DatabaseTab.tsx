@@ -90,7 +90,6 @@ export default function DatabaseTab({ stats }: DatabaseTabProps) {
   // before firing (consistent with Clear & Re-seed, which types RESEED).
   // A simple confirm dialog suffices since seeding is additive, not destructive.
   const [seedDialogOpen, setSeedDialogOpen] = useState(false);
-  const [sqlQuery, setSqlQuery] = useState("SELECT * FROM resources WHERE cat = 'protocols-transport' LIMIT 10;");
 
   const seedDatabaseMutation = useMutation({
     mutationFn: async (options: { clearExisting?: boolean } = {}) => {
@@ -163,7 +162,6 @@ export default function DatabaseTab({ stats }: DatabaseTabProps) {
                 : "Waiting for admin stats"
               : `${pendingMigrations} pending`
           }
-          accent
         />
       </div>
 
@@ -171,7 +169,7 @@ export default function DatabaseTab({ stats }: DatabaseTabProps) {
         <summary className="btn ghost">Database seeding</summary>
       <section className="card admin-ops-database__seed">
         <header className="admin-ops-database__seed-header">
-          <Database className="h-5 w-5 text-[var(--accent)]" aria-hidden="true" />
+          <Database className="h-5 w-5 text-[var(--text-2)]" aria-hidden="true" />
           <div>
             <h2>Database Management</h2>
             <p>Seed the database with video resources from the awesome-video JSON source</p>
@@ -236,7 +234,7 @@ export default function DatabaseTab({ stats }: DatabaseTabProps) {
           {seedDatabaseMutation.isSuccess && seedDatabaseMutation.data && (
             <Alert className="admin-ops-database__seed-result">
               {/* DS-OK: global semantic status color for a completed seed result. */}
-              <CheckCircle2 className="h-4 w-4 text-[#34d08c]" />
+              <CheckCircle2 className="h-4 w-4 text-[var(--status-ok)]" />
               <AlertTitle className="flex flex-wrap items-center gap-2">
                 Seeding Completed Successfully
                 <StatusChip status="Completed" />
@@ -275,8 +273,9 @@ export default function DatabaseTab({ stats }: DatabaseTabProps) {
               <th>Name</th>
               <th>Rows</th>
               <th>Size</th>
-              <th>Last write</th>
-              <th />
+              {/* max(updated_at|created_at) over the rows that still exist:
+                  deletes leave no timestamp, so this is not a last-write time. */}
+              <th title="Latest created or updated timestamp among the table's current rows. Deletes are not tracked.">Newest row</th>
             </tr>
           </thead>
           <tbody>
@@ -286,42 +285,11 @@ export default function DatabaseTab({ stats }: DatabaseTabProps) {
                 <td className="admin-ops-table__mono">{row.rows.toLocaleString()}</td>
                 <td className="admin-ops-table__mono">{formatStorageSize(row.bytes)}</td>
                 <td className="admin-ops-table__mono admin-ops-table__muted">{formatRelativeAgo(row.lastWriteAt)}</td>
-                <td className="admin-ops-table__actions">
-                  <Button
-                    variant="outline"
-                    disabled
-                    className="admin-ops-table__action"
-                    title="Table inspection is not available from the admin API."
-                  >
-                    Inspect
-                  </Button>
-                </td>
               </tr>
             ))}
           </tbody>
         </Table>
       </TableShell>
-
-      <section className="card admin-ops-database__console">
-        <h2>SQL Console</h2>
-        <p>Read-only — write queries require an admin token.</p>
-        <textarea
-          className="textarea"
-          value={sqlQuery}
-          onChange={(event) => setSqlQuery(event.target.value)}
-          aria-label="SQL query"
-        />
-        <div className="admin-ops-database__console-actions">
-          <Button className="btn ghost" variant="ghost" onClick={() => setSqlQuery("")}>Clear</Button>
-          <Button
-            className="btn primary"
-            disabled
-            title="No SQL-console endpoint is exposed by the admin API."
-          >
-            Run
-          </Button>
-        </div>
-      </section>
 
       <AlertDialog open={seedDialogOpen} onOpenChange={setSeedDialogOpen}>
         <AlertDialogContent data-testid="dialog-seed-database">

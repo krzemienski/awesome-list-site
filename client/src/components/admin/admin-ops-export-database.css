@@ -71,10 +71,6 @@
   border-style: solid;
 }
 
-.admin-ops-export-card:hover {
-  border-color: var(--accent);
-}
-
 .admin-ops-export-card__icon {
   align-items: center;
   background: var(--surface-2);
@@ -103,9 +99,7 @@
 }
 
 .admin-ops-export-card__action {
-  /* Canonical `.btn.primary`: 1px accent border + 9px 16px padding around a
-     13px label at UA button line-height (36px tall). */
-  border: var(--border-w, 1px) solid var(--accent);
+  /* Preserve the canonical inset while honoring the 44px control floor. */
   font-size: 0.8125rem;
   font-weight: 600;
   height: auto;
@@ -113,7 +107,7 @@
   /* Canonical cards flow the button right after the description (no bottom
      pinning), so one-line cards sit higher than two-line neighbours. */
   margin-top: 0;
-  min-height: 0;
+  min-height: 44px;
   padding: 0.5625rem 1rem;
   width: 100%;
 }
@@ -209,17 +203,17 @@
 
 .admin-ops-validation-count--ok strong {
   /* DS-OK: global semantic OK status color. */
-  color: #34d08c;
+  color: var(--status-ok);
 }
 
 .admin-ops-validation-count--warn strong {
   /* DS-OK: global semantic WARN status color. */
-  color: #ffb84d;
+  color: var(--status-warn);
 }
 
 .admin-ops-validation-count--bad strong {
   /* DS-OK: global semantic BAD status color. */
-  color: #ff5c7a;
+  color: var(--status-bad);
 }
 
 .admin-ops-validation-count span {
@@ -248,12 +242,12 @@
 
 .admin-ops-validation-expander--bad {
   /* DS-OK: global semantic BAD status color. */
-  color: #ff5c7a;
+  color: var(--status-bad);
 }
 
 .admin-ops-validation-expander--warn {
   /* DS-OK: global semantic WARN status color. */
-  color: #ffb84d;
+  color: var(--status-warn);
 }
 
 .admin-ops-validation-list {
@@ -264,12 +258,12 @@
 
 .admin-ops-validation-list--bad {
   /* DS-OK: global semantic BAD status color. */
-  border: var(--hairline-w) solid color-mix(in srgb, #ff5c7a 20%, transparent);
+  border: var(--hairline-w) solid color-mix(in srgb, var(--status-bad) 20%, transparent);
 }
 
 .admin-ops-validation-list--warn {
   /* DS-OK: global semantic WARN status color. */
-  border: var(--hairline-w) solid color-mix(in srgb, #ffb84d 20%, transparent);
+  border: var(--hairline-w) solid color-mix(in srgb, var(--status-warn) 20%, transparent);
 }
 
 .admin-ops-validation-group {
@@ -289,12 +283,12 @@
 
 .admin-ops-validation-group__heading--bad {
   /* DS-OK: global semantic BAD status color. */
-  color: #ff5c7a;
+  color: var(--status-bad);
 }
 
 .admin-ops-validation-group__heading--warn {
   /* DS-OK: global semantic WARN status color. */
-  color: #ffb84d;
+  color: var(--status-warn);
 }
 
 .admin-ops-validation-group__items {
@@ -350,7 +344,7 @@
 }
 
 .admin-ops-table .admin-ops-table__name {
-  color: var(--accent);
+  color: var(--text);
   font-family: var(--font-mono);
   font-size: 0.75rem;
 }
@@ -364,18 +358,7 @@
 
 .admin-ops-table__error {
   /* DS-OK: global semantic BAD status color. */
-  color: #ff5c7a;
-}
-
-.admin-ops-table__actions {
-  text-align: right !important;
-  white-space: nowrap;
-}
-
-.admin-ops-table__action {
-  min-height: 2rem;
-  min-width: 4.25rem;
-  padding: 0 0.625rem;
+  color: var(--status-bad);
 }
 
 .admin-ops-database__seed {
@@ -436,14 +419,14 @@
 
 .admin-ops-database__seed-result {
   /* DS-OK: global semantic OK status color. */
-  border: var(--hairline-w) solid color-mix(in srgb, #34d08c 20%, transparent);
-  background: color-mix(in srgb, #34d08c 5%, transparent);
+  border: var(--hairline-w) solid color-mix(in srgb, var(--status-ok) 20%, transparent);
+  background: color-mix(in srgb, var(--status-ok) 5%, transparent);
   padding: 1rem;
 }
 
 .admin-ops-database__seed-result h3 {
   /* DS-OK: global semantic OK status color. */
-  color: #34d08c;
+  color: var(--status-ok);
   font-size: 0.8125rem;
   font-weight: 600;
 }
@@ -473,7 +456,7 @@
 
 .admin-ops-database__seed-result dd.admin-ops-database__seed-errors {
   /* DS-OK: global semantic WARN status color. */
-  color: #ffb84d;
+  color: var(--status-warn);
 }
 
 .admin-ops-database__unsupported {
@@ -485,7 +468,7 @@
 }
 
 .admin-ops-database__unsupported svg {
-  color: var(--accent);
+  color: var(--text-3);
   margin-top: 0.1rem;
 }
 
@@ -502,90 +485,23 @@
   margin-top: 0.35rem;
 }
 
-.admin-ops-database__console {
-  padding: 22px;
-}
-
-.admin-ops-database__console h2 {
-  color: var(--text);
-  font-size: 14px;
-  font-weight: 600;
-  margin-bottom: 4px;
-}
-
-.admin-ops-database__console p {
-  color: var(--text-3);
-  font-size: 12px;
-  margin-bottom: 14px;
-}
-
-.admin-ops-database__console .textarea {
-  font-size: 12.5px;
-  min-height: 110px;
-}
-
-.admin-ops-database__console-actions {
-  display: flex;
-  gap: 8px;
-  justify-content: flex-end;
-  margin-top: 12px;
-}
-
-/* Canonical `.btn` geometry (36px) for the console actions. */
-.admin-ops-database__console-actions > .btn {
-  height: 36px;
-  line-height: normal;
-  min-height: 0;
-  padding: 9px 16px;
-}
-
 .admin-ops-more > summary {
   cursor: pointer;
   display: inline-flex;
   list-style: none;
 }
 
-/* The disclosures must not occupy a flex/grid track: a zero-height in-flow
-   child still pulled the parent gap (20px) into the canonical rhythm, and a
-   closed <details> keeps a hidden content slot even under display:contents.
-   Taken out of flow they neither reserve a track nor shift the cards; the
-   summaries are positioned against the tab surface below. */
-.admin-ops-export > .admin-ops-more,
-.admin-ops-database > .admin-ops-more {
-  inset: 0 0 auto;
-  position: absolute;
-  z-index: 2;
-}
-
-.admin-ops-export > .admin-ops-more,
-.admin-ops-database > .admin-ops-more {
-  top: calc(100% + 16px);
-}
-
+/* Disclosures stay in flow so each panel expands directly under its own
+   summary instead of detaching from it or stacking over the cards. */
 .admin-ops-export > .admin-ops-more > summary,
 .admin-ops-database > .admin-ops-more > summary {
-  position: absolute;
-  top: 0;
-  /* 16px offset + 32px control = the 48px page tail the canonical panel
-     already ends with, so the disclosure never lengthens the document. */
-  height: 32px;
-  min-height: 0;
+  min-height: 44px;
+  max-width: 100%;
   padding: 5px 12px;
   font-size: 12px;
   line-height: normal;
-}
-
-.admin-ops-export > .admin-ops-more:first-of-type > summary {
-  top: 0;
-}
-
-.admin-ops-export > .admin-ops-more:nth-of-type(2) > summary {
-  left: 150px;
-  top: 0;
-}
-
-.admin-ops-database > .admin-ops-more > summary {
-  top: 0;
+  text-align: left;
+  white-space: normal;
 }
 
 .admin-ops-database .admin-ops-table-shell__content {
@@ -603,13 +519,13 @@
   padding: 20px;
 }
 
+/* Canonical Stat label: a tertiary mono caption, not an accent eyebrow. */
 .admin-ops-database .admin-ops-stat__label {
+  color: var(--text-3);
+  font-size: 10px;
+  font-weight: 400;
+  letter-spacing: 1.4px;
   margin-bottom: 10px;
-}
-
-.admin-ops-database .admin-ops-stat__value {
-  font-family: inherit;
-  font-weight: 700;
 }
 
 .admin-ops-database .admin-ops-stat__description {
@@ -634,24 +550,13 @@
 
 .admin-ops-database .admin-ops-table td {
   line-height: 1.6; /* body leading */
-  padding: 14px;
+  padding: 12px 14px;
 }
 
 .admin-ops-database .admin-ops-table .admin-ops-table__mono,
 .admin-ops-database .admin-ops-table .admin-ops-table__name {
   font-size: 12px;
-}
-
-/* Frozen `.btn.ghost`: transparent, hairline border, content-sized. */
-.admin-ops-database .admin-ops-table__action {
-  background: transparent;
-  border-color: var(--border);
-  font-size: 12px;
-  height: 27px;
-  line-height: normal;
-  min-height: 0;
-  min-width: 0;
-  padding: 5px 10px;
+  white-space: nowrap;
 }
 
 .admin-ops-database .admin-ops-table-shell__title {
@@ -662,24 +567,12 @@
   line-height: 1.6; /* body leading */
 }
 
-.admin-ops-database__console .textarea {
-  font-size: 12.5px !important;
-  line-height: normal;
-}
-
 .admin-ops-more > summary::-webkit-details-marker {
   display: none;
 }
 
 .admin-ops-more[open] > summary {
   margin-bottom: 12px;
-}
-
-/* Opened, the disclosure rejoins the flow so its panel reads in sequence
-   instead of stacking over the cards. */
-.admin-ops-export > .admin-ops-more[open],
-.admin-ops-database > .admin-ops-more[open] {
-  position: relative;
 }
 
 @media (max-width: 48rem) {

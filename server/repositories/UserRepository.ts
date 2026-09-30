@@ -180,11 +180,13 @@ export class UserRepository {
       case "email":
         orderExpr = textCol(users.email);
         break;
-      case "name":
-        orderExpr = dirDesc
-          ? sql`lower(coalesce(${users.firstName}, '') || ' ' || coalesce(${users.lastName}, '')) DESC NULLS LAST`
-          : sql`lower(coalesce(${users.firstName}, '') || ' ' || coalesce(${users.lastName}, '')) ASC NULLS LAST`;
+      case "name": {
+        // Sort on the value the Users table shows in the Name column: the
+        // full name, or the email (then id) for accounts without one.
+        const displayName = sql`lower(coalesce(nullif(trim(coalesce(${users.firstName}, '') || ' ' || coalesce(${users.lastName}, '')), ''), ${users.email}, ${users.id}))`;
+        orderExpr = dirDesc ? sql`${displayName} DESC` : sql`${displayName} ASC`;
         break;
+      }
       case "role":
         orderExpr = textCol(users.role);
         break;

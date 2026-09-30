@@ -11,7 +11,6 @@ import { Textarea } from "@/components/ui/textarea";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Switch } from "@/components/ui/switch";
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
@@ -139,12 +138,12 @@ const normalizeAdminResourcesResponse = (
  * Tailwind palette classes.
  */
 const STATUS_OPTIONS = [
-  { value: "approved", label: "Approved", color: "bg-[#34d08c] text-black" }, // DS-OK: status ok
-  { value: "pending", label: "Pending", color: "bg-[#ffb84d] text-black" }, // DS-OK: status warn
-  { value: "rejected", label: "Rejected", color: "bg-[#ff5c7a] text-black" } // DS-OK: status bad
+  { value: "approved", label: "Approved", color: "bg-[var(--status-ok)] text-black" }, // DS-OK: status ok
+  { value: "pending", label: "Pending", color: "bg-[var(--status-warn)] text-black" }, // DS-OK: status warn
+  { value: "rejected", label: "Rejected", color: "bg-[var(--status-bad)] text-black" } // DS-OK: status bad
 ];
 
-export default function ResourceManager() {
+export default function ResourceManager({ createRequest = 0 }: { createRequest?: number }) {
   const { toast } = useToast();
   const queryClient = useQueryClient();
   
@@ -248,10 +247,6 @@ export default function ResourceManager() {
 
   const { data: subSubcategoriesData } = useQuery<SubSubcategory[]>({
     queryKey: ['/api/sub-subcategories']
-  });
-
-  const { data: publicCatalogNav } = useQuery<{ totalResources?: number }>({
-    queryKey: ['/api/awesome-list/nav']
   });
 
   const categoryNames = useMemo(() => {
@@ -557,7 +552,9 @@ export default function ResourceManager() {
       resetEditForm();
       toast({
         title: "Resource Created",
-        description: `The new ${createdStatus} resource is now visible in the catalog.`,
+        description: createdStatus === "approved"
+          ? "The new resource is approved and now visible in the public catalog."
+          : `The new resource was saved as ${createdStatus} and is not public yet.`,
       });
     },
     onError: (error: Error) => {
@@ -746,7 +743,8 @@ export default function ResourceManager() {
   };
 
   // Canonical masthead deep-link: open the existing create workflow, then strip
-  // the one-shot flag so refresh and Back do not reopen the modal.
+  // the one-shot flag so refresh and Back do not reopen the modal. Re-runs on
+  // each createRequest so New entry also works while this tab is already open.
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
     if (params.get("create") !== "1") return;
@@ -755,7 +753,7 @@ export default function ResourceManager() {
     url.searchParams.delete("create");
     window.history.replaceState({}, "", url.pathname + url.search + url.hash);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [createRequest]);
 
   // NEW-013: /admin/resources?resourceId=N (ResourceDetail's "Edit in Admin"
   // deep-link) opens that resource's edit dialog directly instead of dumping
@@ -927,6 +925,7 @@ export default function ResourceManager() {
     setDebouncedSearch("");
     setCategoryFilter("");
     setStatusFilter("approved");
+    setSort("newest");
     setPage(1);
     setSelectedResourceIds([]);
   };
@@ -1004,7 +1003,7 @@ export default function ResourceManager() {
           <div>
             <CardTitle className="admin-catalog-resources__title flex items-center gap-2">
               <Database className="h-5 w-5" />
-              Resources ({data?.resources.length ?? 0} of {Number(publicCatalogNav?.totalResources ?? data?.total ?? 0).toLocaleString()})
+              Resources ({data?.resources.length ?? 0} of {(data?.total ?? 0).toLocaleString()})
             </CardTitle>
             <CardDescription className="admin-catalog-resources__subtitle">
               Manage every entry in the index
@@ -1022,13 +1021,17 @@ export default function ResourceManager() {
               type="button"
               variant="ghost"
               onClick={() => setCatalogToolsOpen((open) => !open)}
+              aria-label={catalogToolsOpen ? "Hide filters and tools" : "Show filters and tools"}
               aria-expanded={catalogToolsOpen}
               aria-controls="resource-filters"
               data-testid="button-resource-tools"
             >
-              {catalogToolsOpen ? "Hide filters and tools" : "Show filters and tools"}
+              <Filter className="admin-catalog-resources__tools-icon" aria-hidden="true" />
+              <span className="admin-catalog-resources__tools-label">
+                {catalogToolsOpen ? "Hide filters and tools" : "Show filters and tools"}
+              </span>
             </Button>
-            <button type="button" className="btn primary" onClick={openCreateDialog} data-testid="button-add-resource">
+            <button type="button" className="btn" onClick={openCreateDialog} data-testid="button-add-resource">
               <Plus className="h-3 w-3" />
               Add
             </button>
@@ -1114,7 +1117,7 @@ export default function ResourceManager() {
                   <Button
                     size="sm"
                     variant="outline"
-                    className={"bg-[#34d08c]/10 hover:bg-[#34d08c]/20 border-[#34d08c]/30 text-[#34d08c]" /* DS-OK: status ok */}
+                    className={"bg-[var(--status-ok)]/10 hover:bg-[var(--status-ok)]/20 border-[var(--status-ok)]/30 text-[var(--status-ok)]" /* DS-OK: status ok */}
                     onClick={handleBulkApprove}
                     disabled={bulkApproveMutation.isPending}
                     data-testid="button-bulk-approve"
@@ -1125,7 +1128,7 @@ export default function ResourceManager() {
                   <Button
                     size="sm"
                     variant="outline"
-                    className={"bg-[#ffb84d]/10 hover:bg-[#ffb84d]/20 border-[#ffb84d]/30 text-[#ffb84d]" /* DS-OK: status warn */}
+                    className={"bg-[var(--status-warn)]/10 hover:bg-[var(--status-warn)]/20 border-[var(--status-warn)]/30 text-[var(--status-warn)]" /* DS-OK: status warn */}
                     onClick={handleBulkReject}
                     disabled={bulkRejectMutation.isPending}
                     data-testid="button-bulk-reject"
@@ -1136,7 +1139,7 @@ export default function ResourceManager() {
                   <Button
                     size="sm"
                     variant="outline"
-                    className={"bg-[#ff5c7a]/10 hover:bg-[#ff5c7a]/20 border-[#ff5c7a]/30 text-[#ff5c7a]" /* DS-OK: status bad */}
+                    className={"bg-[var(--status-bad)]/10 hover:bg-[var(--status-bad)]/20 border-[var(--status-bad)]/30 text-[var(--status-bad)]" /* DS-OK: status bad */}
                     onClick={handleBulkDelete}
                     disabled={bulkDeleteMutation.isPending}
                     data-testid="button-bulk-delete"
@@ -1190,7 +1193,7 @@ export default function ResourceManager() {
                 <Button
                   onClick={confirmBulkReject}
                   disabled={rejectReason.trim().length < 10}
-                  className={"bg-[#ffb84d] text-black hover:bg-[#ffb84d]/90" /* DS-OK: status warn */}
+                  className={"bg-[var(--status-warn)] text-black hover:bg-[var(--status-warn)]/90" /* DS-OK: status warn */}
                 >
                   Confirm Rejection
                 </Button>
@@ -1213,7 +1216,7 @@ export default function ResourceManager() {
                 <AlertDialogCancel data-testid="button-bulk-approve-cancel">Cancel</AlertDialogCancel>
                 <AlertDialogAction
                   onClick={confirmBulkApprove}
-                  className={"bg-[#34d08c] text-black hover:bg-[#34d08c]/90" /* DS-OK: status ok */}
+                  className={"bg-[var(--status-ok)] text-black hover:bg-[var(--status-ok)]/90" /* DS-OK: status ok */}
                   data-testid="button-bulk-approve-confirm"
                 >
                   Approve {selectedResourceIds.length}
@@ -1276,38 +1279,38 @@ export default function ResourceManager() {
             </div>
           )}
           <div className="admin-catalog-resources__table-scroll overflow-auto">
-            <Table className="admin-catalog-resources__table">
-              <TableHeader>
-                <TableRow>
-                  <TableHead>ID</TableHead>
-                  <TableHead>Title</TableHead>
-                  <TableHead>Category</TableHead>
-                  <TableHead>Tags</TableHead>
-                  <TableHead>Featured</TableHead>
-                  <TableHead aria-label="Actions" />
-                </TableRow>
-              </TableHeader>
-              <TableBody>
+            <table className="table admin-catalog-resources__table">
+              <thead>
+                <tr>
+                  <th>ID</th>
+                  <th>Title</th>
+                  <th>Category</th>
+                  <th>Tags</th>
+                  <th>Featured</th>
+                  <th aria-label="Actions" />
+                </tr>
+              </thead>
+              <tbody>
                 {/* Run16 BUG-080: explicit empty state instead of a blank table. */}
                 {!isLoading && (data?.resources.length || 0) === 0 && (
-                  <TableRow>
-                    <TableCell colSpan={6} className="py-12 text-center text-sm text-[var(--text-2)]" data-testid="row-empty-state">
+                  <tr>
+                    <td colSpan={6} className="py-12 text-center text-sm text-[var(--text-2)]" data-testid="row-empty-state">
                       {(search || categoryFilter || statusFilter)
                         ? <>No resources match the current search or filters.{' '}
                             <button type="button" className="text-primary underline" onClick={clearFilters} data-testid="button-empty-clear-filters">
                               Clear filters
                             </button></>
                         : "No resources yet."}
-                    </TableCell>
-                  </TableRow>
+                    </td>
+                  </tr>
                 )}
                 {data?.resources.map((resource) => (
-                  <TableRow
+                  <tr
                     key={resource.id}
                     data-testid={`row-resource-${resource.id}`}
                     data-state={selectedResourceIds.includes(resource.id) ? "selected" : undefined}
                   >
-                    <TableCell className="admin-catalog-resources__id-cell">
+                    <td className="admin-catalog-resources__id-cell">
                       <span>{resource.id}</span>
                       <Checkbox
                         checked={selectedResourceIds.includes(resource.id)}
@@ -1315,28 +1318,31 @@ export default function ResourceManager() {
                         aria-label={`Select ${resource.title || `resource #${resource.id}`}`}
                         className="admin-catalog-resources__row-select h-8 w-8"
                       />
-                    </TableCell>
-                    <TableCell>
+                    </td>
+                    <td>
                         <div className="admin-catalog-resources__resource-title" title={resource.title || ''}>
                           {resource.title || 'Untitled'}
                         </div>
-                    </TableCell>
-                    <TableCell>
+                    </td>
+                    <td>
                       {resource.category || "Uncategorized"}
-                    </TableCell>
-                    <TableCell>
+                    </td>
+                    <td>
                       <div className="admin-catalog-resources__tags">
-                        {(safeResourceMetadataTags(resource.metadata) || []).slice(0, 2).map((tag, index) => (
-                          <Badge key={index} variant="chip">
-                            {typeof tag === "object" && tag && "name" in tag ? String(tag.name) : String(tag)}
-                          </Badge>
-                        ))}
+                        {(safeResourceMetadataTags(resource.metadata) || []).slice(0, 2).map((tag, index) => {
+                          const label = typeof tag === "object" && tag && "name" in tag ? String(tag.name) : String(tag);
+                          return (
+                            <Badge key={index} variant="chip" title={label}>
+                              {label}
+                            </Badge>
+                          );
+                        })}
                       </div>
-                    </TableCell>
-                    <TableCell>
+                    </td>
+                    <td>
                       {featuredValue(resource) ? <Badge variant="accent">★</Badge> : <span className="admin-catalog-resources__muted">—</span>}
-                    </TableCell>
-                    <TableCell className="admin-catalog-resources__actions-cell text-right">
+                    </td>
+                    <td className="admin-catalog-resources__actions-cell text-right">
                       <div className="admin-catalog-resources__row-actions">
                         <Button variant="ghost" size="sm" asChild>
                           <a href={`/resource/${resource.id}`}>View</a>
@@ -1361,11 +1367,11 @@ export default function ResourceManager() {
                           <Trash2 className="h-4 w-4" />
                         </Button>
                       </div>
-                    </TableCell>
-                  </TableRow>
+                    </td>
+                  </tr>
                 ))}
-              </TableBody>
-            </Table>
+              </tbody>
+            </table>
           </div>
           {/* Run17 BUG-033: same sideways-scroll hint the Users table has. */}
           <p className="admin-catalog-resources__scroll-hint text-xs text-muted-foreground mt-2 sm:hidden">
@@ -1426,13 +1432,14 @@ export default function ResourceManager() {
         }}
       >
         {/* NB-005 (run18): cap height to the small-viewport unit (svh accounts
-            for mobile URL bars) and scroll internally so every field + the
-            Save/Cancel footer stay reachable at 812×375 landscape. */}
+            for mobile URL bars). F893: only the field list scrolls; header and
+            Save/Cancel footer stay pinned so the footer is never half-clipped
+            (a click on its hidden half hit the overlay and closed unsaved). */}
         {/* P1-06: restore focus to the row's edit button on close. Radix's
             default drops focus to <body> because this one Dialog is shared
             across rows rather than nested under a per-row trigger. */}
         <DialogContent
-          className="max-w-2xl max-h-[90svh] overflow-y-auto bg-[var(--bg-2)] border-[var(--border)]"
+          className="flex max-w-2xl max-h-[90svh] flex-col overflow-hidden bg-[var(--bg-2)] border-[var(--border)]"
           onCloseAutoFocus={(e) => {
             const trigger = editTriggerRef.current;
             if (trigger && document.contains(trigger)) {
@@ -1451,7 +1458,7 @@ export default function ResourceManager() {
               Make changes to the resource below. Click save when done.
             </DialogDescription>
           </DialogHeader>
-          <div className="grid gap-4 py-4">
+          <div className="-mx-1 grid min-h-0 flex-1 gap-4 overflow-y-auto px-1 py-4">
             {/* BUG-049: dialog-level banner for server-side rejections. */}
             {formError && (
               <div
@@ -1511,7 +1518,7 @@ export default function ResourceManager() {
                 </p>
               )}
             </div>
-            <div className="grid grid-cols-2 gap-4">
+            <div className="grid gap-4 sm:grid-cols-2">
               <div className="grid gap-2">
                 <Label htmlFor="edit-category">Category</Label>
                 <Select 
@@ -1545,7 +1552,7 @@ export default function ResourceManager() {
                 </Select>
               </div>
             </div>
-            <div className="grid grid-cols-2 gap-4">
+            <div className="grid gap-4 sm:grid-cols-2">
               <div className="grid gap-2">
                 <Label htmlFor="edit-subcategory">Subcategory</Label>
                 <Select 
@@ -1714,9 +1721,8 @@ export default function ResourceManager() {
       </Dialog>
 
       <Dialog open={createDialogOpen} onOpenChange={setCreateDialogOpen}>
-        {/* NB-005 (run18): same svh height cap as the edit dialog so the Create
-            form's footer stays reachable on short landscape viewports. */}
-        <DialogContent className="max-w-2xl max-h-[90svh] overflow-y-auto bg-[var(--bg-2)] border-[var(--border)]">
+        {/* NB-005 (run18) + F893: same svh cap and pinned footer as the edit dialog. */}
+        <DialogContent className="flex max-w-2xl max-h-[90svh] flex-col overflow-hidden bg-[var(--bg-2)] border-[var(--border)]">
           <DialogHeader>
             <DialogTitle className="flex items-center gap-2">
               <Plus className="h-5 w-5" />
@@ -1726,7 +1732,7 @@ export default function ResourceManager() {
               Create a new resource entry. Required fields are marked with *.
             </DialogDescription>
           </DialogHeader>
-          <div className="grid gap-4 py-4">
+          <div className="-mx-1 grid min-h-0 flex-1 gap-4 overflow-y-auto px-1 py-4">
             {/* BUG-049: dialog-level banner for server-side rejections. */}
             {formError && (
               <div
@@ -1789,7 +1795,7 @@ export default function ResourceManager() {
                 </p>
               )}
             </div>
-            <div className="grid grid-cols-2 gap-4">
+            <div className="grid gap-4 sm:grid-cols-2">
               <div className="grid gap-2">
                 <Label htmlFor="create-category">Category</Label>
                 <Select 
@@ -1823,7 +1829,7 @@ export default function ResourceManager() {
                 </Select>
               </div>
             </div>
-            <div className="grid grid-cols-2 gap-4">
+            <div className="grid gap-4 sm:grid-cols-2">
               <div className="grid gap-2">
                 <Label htmlFor="create-subcategory">Subcategory</Label>
                 <Select 
@@ -1954,7 +1960,7 @@ export default function ResourceManager() {
       <AlertDialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
         <AlertDialogContent className="bg-[var(--bg-2)] border-[var(--border)]">
           <AlertDialogHeader>
-            <AlertDialogTitle className={"text-[#ff5c7a]" /* DS-OK: status bad */}>Delete Resource</AlertDialogTitle>
+            <AlertDialogTitle className={"text-[var(--status-bad)]" /* DS-OK: status bad */}>Delete Resource</AlertDialogTitle>
             <AlertDialogDescription>
               Are you sure you want to delete <strong className="text-white">"{selectedResource?.title}"</strong>? 
               This action cannot be undone.
@@ -1964,7 +1970,7 @@ export default function ResourceManager() {
             <AlertDialogCancel>Cancel</AlertDialogCancel>
             <AlertDialogAction
               onClick={handleDelete}
-              className={"bg-[#ff5c7a] text-black hover:bg-[#ff5c7a]/90" /* DS-OK: status bad */}
+              className={"bg-[var(--status-bad)] text-black hover:bg-[var(--status-bad)]/90" /* DS-OK: status bad */}
               data-testid="button-confirm-delete"
             >
               {deleteMutation.isPending ? "Deleting..." : "Delete"}

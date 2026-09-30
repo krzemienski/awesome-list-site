@@ -145,7 +145,7 @@ export default function Recommendations() {
             <CardContent className="discovery-tools-panel-content">
               {/* BUG-049 (run26): asChild — no <a>-wrapping-<button> nesting. */}
               <Button asChild className="w-full sm:w-auto" data-testid="button-login-to-get-started">
-                <Link href="/sign-in">
+                <Link href="/sign-in?redirect_url=%2Frecommendations">
                   <LogIn className="mr-2 h-4 w-4" />
                   Sign in
                 </Link>

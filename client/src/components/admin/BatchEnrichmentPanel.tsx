@@ -47,9 +47,11 @@ import { apiRequest, ApiError } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
 import { AgentEventLog } from "@/components/admin/AgentEventLog";
 import { AgentCommsGraph } from "@/components/admin/AgentCommsGraph";
-import { StatusChip, TableShell } from "@/components/admin/AdminOpsPrimitives";
+import { Stat, StatusChip, TableShell } from "@/components/admin/AdminOpsPrimitives";
 import type { EnrichmentJob } from "@shared/schema";
 import "./queues-agent.css";
+
+const CANONICAL_JOB_ROWS = 6;
 
 interface JobsResponse {
   success: boolean;
@@ -63,23 +65,23 @@ interface JobStatusResponse {
 
 /**
  * Enrichment colors use the global DS status constants:
- * DS-OK: #34d08c ok / #ffb84d warn / #ff5c7a bad / #5eddf2 info.
+ * DS-OK: var(--status-ok) ok / var(--status-warn) warn / var(--status-bad) bad / var(--status-info) info.
  */
-const JOB_PROCESSING_CLASS = 'bg-[#5eddf2] text-black hover:bg-[#5eddf2]/90 animate-pulse'; // DS-OK: cyan info (DS chart/info constant)
-const JOB_COMPLETED_CLASS = 'bg-[#34d08c] text-black hover:bg-[#34d08c]/90'; // DS-OK: status ok
-const JOB_FAILED_CLASS = 'bg-[#ff5c7a] text-black hover:bg-[#ff5c7a]/90'; // DS-OK: status bad
-const INFO_PANEL_CLASS = 'border-[#5eddf2]/20'; // DS-OK: cyan info (DS chart/info constant)
-const WARN_PANEL_CLASS = 'border-[#ffb84d]/20 bg-[#ffb84d]/5'; // DS-OK: status warn
-const OK_TEXT_CLASS = 'text-[#34d08c]'; // DS-OK: status ok
-const WARN_TEXT_CLASS = 'text-[#ffb84d]'; // DS-OK: status warn
-const BAD_TEXT_CLASS = 'text-[#ff5c7a]'; // DS-OK: status bad
-const INFO_TEXT_CLASS = 'text-[#5eddf2]'; // DS-OK: cyan info (DS chart/info constant)
-const OK_BORDER_CLASS = 'border-[#34d08c]/20'; // DS-OK: status ok
-const WARN_BORDER_CLASS = 'border-[#ffb84d]/20'; // DS-OK: status warn
-const BAD_BORDER_CLASS = 'border-[#ff5c7a]/20'; // DS-OK: status bad
-const OK_OUTLINE_CLASS = 'border-[#34d08c] text-[#34d08c]'; // DS-OK: status ok
-const WARN_OUTLINE_CLASS = 'border-[#ffb84d] text-[#ffb84d]'; // DS-OK: status warn
-const BAD_OUTLINE_CLASS = 'border-[#ff5c7a] text-[#ff5c7a]'; // DS-OK: status bad
+const JOB_PROCESSING_CLASS = 'bg-[var(--status-info)] text-black hover:bg-[var(--status-info)]/90 animate-pulse'; // DS-OK: cyan info (DS chart/info constant)
+const JOB_COMPLETED_CLASS = 'bg-[var(--status-ok)] text-black hover:bg-[var(--status-ok)]/90'; // DS-OK: status ok
+const JOB_FAILED_CLASS = 'bg-[var(--status-bad)] text-black hover:bg-[var(--status-bad)]/90'; // DS-OK: status bad
+const INFO_PANEL_CLASS = 'border-[var(--status-info)]/20'; // DS-OK: cyan info (DS chart/info constant)
+const WARN_PANEL_CLASS = 'border-[var(--status-warn)]/20 bg-[var(--status-warn)]/5'; // DS-OK: status warn
+const OK_TEXT_CLASS = 'text-[var(--status-ok)]'; // DS-OK: status ok
+const WARN_TEXT_CLASS = 'text-[var(--status-warn)]'; // DS-OK: status warn
+const BAD_TEXT_CLASS = 'text-[var(--status-bad)]'; // DS-OK: status bad
+const INFO_TEXT_CLASS = 'text-[var(--status-info)]'; // DS-OK: cyan info (DS chart/info constant)
+const OK_BORDER_CLASS = 'border-[var(--status-ok)]/20'; // DS-OK: status ok
+const WARN_BORDER_CLASS = 'border-[var(--status-warn)]/20'; // DS-OK: status warn
+const BAD_BORDER_CLASS = 'border-[var(--status-bad)]/20'; // DS-OK: status bad
+const OK_OUTLINE_CLASS = 'border-[var(--status-ok)] text-[var(--status-ok)]'; // DS-OK: status ok
+const WARN_OUTLINE_CLASS = 'border-[var(--status-warn)] text-[var(--status-warn)]'; // DS-OK: status warn
+const BAD_OUTLINE_CLASS = 'border-[var(--status-bad)] text-[var(--status-bad)]'; // DS-OK: status bad
 
 /**
  * Mean of the per-job cost the enrichment agent records
@@ -122,6 +124,7 @@ export default function BatchEnrichmentPanel() {
   const [jobToCancel, setJobToCancel] = useState<number | null>(null);
   // Run23 NB-040: explicit confirmation before starting a paid enrichment job.
   const [confirmStart, setConfirmStart] = useState(false);
+  const [showAllJobs, setShowAllJobs] = useState(false);
 
   const [isPolling, setIsPolling] = useState(false);
 
@@ -225,6 +228,7 @@ export default function BatchEnrichmentPanel() {
   });
 
   const jobs = jobsData?.jobs || [];
+  const visibleJobs = showAllJobs ? jobs : jobs.slice(0, CANONICAL_JOB_ROWS);
   // A missing or failed list response cannot establish whether another job is
   // active. Keep paid launches disabled until the active-job state is known.
   const activeJobStateKnown =
@@ -386,23 +390,21 @@ export default function BatchEnrichmentPanel() {
           {(() => {
             const lastCompleted = jobs.find((job) => job.status === "completed");
             return (
-              <div className="card queues-agent__stat">
-                <div className="mono">Last enriched</div>
-                <div>{formatRelativeAgo(lastCompleted?.completedAt ?? null)}</div>
-                <div>{lastCompleted ? `batch #${lastCompleted.id} · ${lastCompleted.successfulResources || 0} entries` : "No completed batches"}</div>
-              </div>
+              <Stat
+                className="queues-agent__stat"
+                label="Last enriched"
+                value={formatRelativeAgo(lastCompleted?.completedAt ?? null)}
+                sub={lastCompleted ? `batch #${lastCompleted.id} · ${lastCompleted.successfulResources || 0} entries` : "No completed batches"}
+              />
             );
           })()}
-          <div className="card queues-agent__stat">
-            <div className="mono">Queue</div>
-            <div>{jobs.filter((job) => job.status === "pending" || job.status === "processing").length}</div>
-            <div>{hasActiveJob ? "active" : "idle"}</div>
-          </div>
-          <div className="card queues-agent__stat">
-            <div className="mono">Avg cost</div>
-            <div>{averageBatchCost(jobs)}</div>
-            <div>per batch</div>
-          </div>
+          <Stat
+            className="queues-agent__stat"
+            label="Queue"
+            value={jobs.filter((job) => job.status === "pending" || job.status === "processing").length}
+            sub={hasActiveJob ? "active" : "idle"}
+          />
+          <Stat className="queues-agent__stat" label="Avg cost" value={averageBatchCost(jobs)} sub="per batch" />
         </div>
         <TableShell
           title="Enrichment jobs"
@@ -420,21 +422,22 @@ export default function BatchEnrichmentPanel() {
             </Button>
           }
         >
-          <div className="queues-agent__canonical-table">
+          <div
+            className="queues-agent__canonical-table focus-visible:outline focus-visible:outline-2 focus-visible:outline-ring"
+            tabIndex={0}
+            role="region"
+            aria-label="Enrichment jobs table, scrollable"
+          >
             <table className="table">
               <thead>
-                <tr><th>Job</th><th>Status</th><th>Started</th><th>Completed</th><th /></tr>
+                <tr><th>Job</th><th>Status</th><th>Started</th><th>Completed</th><th><span className="sr-only">Actions</span></th></tr>
               </thead>
               <tbody>
-                {jobs.slice(0, 6).map((job) => (
+                {visibleJobs.map((job) => (
                   <tr key={job.id}>
                     <td className="mono queues-agent__cell-mono">#{job.id}</td>
                     <td>
-                      {(() => {
-                        const status = effectiveStatus(job);
-                        const tone = status === "completed" ? "ok" : status === "failed" ? "bad" : status === "pending" ? "warn" : status === "cancelled" ? "muted" : "";
-                        return <span className={`chip ${tone}`}>{status}</span>;
-                      })()}
+                      <StatusChip status={effectiveStatus(job)} />
                     </td>
                     <td className="mono muted queues-agent__cell-mono queues-agent__cell-muted">{job.startedAt ? new Date(job.startedAt).toLocaleString("en-US") : "—"}</td>
                     <td className="mono muted queues-agent__cell-mono queues-agent__cell-muted">{job.completedAt ? new Date(job.completedAt).toLocaleString("en-US") : "—"}</td>
@@ -453,6 +456,20 @@ export default function BatchEnrichmentPanel() {
             </table>
             {!isLoading && jobs.length === 0 ? <p className="queues-agent__empty">No enrichment jobs found.</p> : null}
           </div>
+          {jobs.length > CANONICAL_JOB_ROWS ? (
+            <div className="queues-agent__table-more">
+              <Button
+                type="button"
+                className="btn ghost"
+                variant="ghost"
+                onClick={() => setShowAllJobs((open) => !open)}
+                aria-expanded={showAllJobs}
+                data-testid="button-show-all-enrichment-jobs"
+              >
+                {showAllJobs ? "Show fewer" : `Show all ${jobs.length} jobs`}
+              </Button>
+            </div>
+          ) : null}
         </TableShell>
       </div>
       <details className="queues-agent__more">
@@ -543,7 +560,7 @@ export default function BatchEnrichmentPanel() {
               type="button"
               variant="ghost"
               onClick={() => setShowAdvanced(v => !v)}
-              className="flex h-auto w-full items-center justify-between px-3 py-2 text-sm font-medium hover:bg-muted/50"
+              className="flex h-auto w-full items-center justify-between whitespace-normal px-3 py-2 text-left text-sm font-medium hover:bg-muted/50"
               disabled={hasActiveJob}
               data-testid="button-toggle-advanced-enrichment"
             >

@@ -100,12 +100,34 @@ const setReferenceTweak = async (page, buttonLabel, expectedEyebrow) => {
 
 const activateAppAdminTab = async (page, slug) => {
   const tab = page.locator(`[data-testid="tab-${slug}"]`).first();
+  let viaSettingsMenu = false;
   try {
     await tab.waitFor({ state: "visible", timeout: 20_000 });
   } catch {
-    throw new ActionUnavailableError(`app admin tab control [data-testid="tab-${slug}"] is not rendered for this session (not an admin, or the tab does not exist)`);
+    // Sub-Subcats / Journeys / Digests live inside the header "Settings"
+    // dropdown, not the tab strip; the menu is unmounted until opened.
+    const settings = page.locator(".admin-dashboard__actions button", { hasText: /^\s*Settings\s*$/ }).first();
+    const settingsVisible = await settings.isVisible().catch(() => false);
+    if (!settingsVisible) {
+      throw new ActionUnavailableError(`app admin tab control [data-testid="tab-${slug}"] is not rendered for this session (not an admin, or the tab does not exist)`);
+    }
+    await settings.click();
+    try {
+      await tab.waitFor({ state: "visible", timeout: 10_000 });
+    } catch {
+      await page.keyboard.press("Escape").catch(() => {});
+      throw new ActionUnavailableError(`app admin tab control [data-testid="tab-${slug}"] is neither a tab-strip trigger nor a Settings menu item`);
+    }
+    viaSettingsMenu = true;
   }
   await tab.click();
+  if (viaSettingsMenu) {
+    // Folded sections highlight their parent trigger; the section's own panel
+    // is the proof of activation, plus an active parent tabpanel.
+    await page.locator(`[data-testid="content-${slug}"]`).first().waitFor({ state: "visible", timeout: 20_000 });
+    await page.waitForFunction(() => Boolean(document.querySelector('[role="tabpanel"][data-state="active"]')), null, { timeout: 20_000 });
+    return;
+  }
   await page.waitForFunction((slug) => {
     const control = document.querySelector(`[data-testid="tab-${slug}"]`);
     if (!control) return false;

@@ -39,3 +39,9 @@ time: `VAR="$(grep -E '^VAR=' .env | head -1 | cut -d= -f2- | tr -d '"')"`.
 Also: a temporary second server for an env-gated check (`FLAG=true PORT=5055
 npx tsx server/index.ts`) must be started with the tool's `run_in_background`,
 not `nohup … &` — the latter is gone before the first curl.
+
+## Background ShellExec subshells
+`( cmd; cmd ) &` inside a `run_in_background` ShellExec dies when the outer shell exits.
+Run the loop directly in the background task and write progress to a log you poll.
+Also: Playwright `context.request` withholds Secure cookies over http://127.0.0.1 —
+use in-page `fetch` for authed probes against the loopback dev server.

@@ -23,7 +23,8 @@
 /* DS-OK: canonical Logo has a fixed 6px tile radius across skins.
    The reference requests 800 but its font download tops out at 700; request
    the actual available face rather than requiring an unshipped weight. */
-.app-canonical-header .header-logo { width: 28px; height: 28px; border-radius: 6px; background: var(--accent); color: #000; display: flex; align-items: center; justify-content: center; font: 700 13px var(--font-mono); box-shadow: 0 0 16px color-mix(in srgb, var(--accent) 35%, transparent); flex-shrink: 0; }
+/* MobileDrawer reuses the same <Logo /> tile. */
+.app-canonical-header .header-logo, .av-sidebar-drawer .av-sidebar-drawer-logo { width: 28px; height: 28px; border-radius: 6px; background: var(--accent); color: #000; display: flex; align-items: center; justify-content: center; font: 700 13px var(--font-mono); box-shadow: 0 0 16px color-mix(in srgb, var(--accent) 35%, transparent); flex-shrink: 0; } /* DS-OK: frozen canonical header literal radius (fixed across systems) */
 .app-canonical-header .header-wordmark { font-family: var(--font-mono); font-size: 11px; font-weight: 700; letter-spacing: 1.8px; white-space: nowrap; }
 .app-canonical-header .header-spacer { flex: 1; }
 .app-canonical-header .header-nav { display: flex; gap: 18px; align-items: center; }
@@ -42,14 +43,12 @@
 .app-canonical-header .header-search-trigger:hover::before { border-color: var(--border-strong); background: var(--surface-2); }
 .app-canonical-header .header-search-label { flex: 1; text-align: left; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; font-weight: 500; }
 .app-canonical-header .header-search-label > span { color: var(--text-3); }
-/* DS-OK: canonical .kbd uses a fixed 4px radius, not the skin's control radius. */
-.app-canonical-header .header-kbd { font-family: var(--font-mono); font-size: 10.5px; color: var(--text-3); padding: 2px 6px; border: var(--hairline-w) solid var(--border); border-radius: 4px; background: var(--surface); }
 .app-canonical-header .user-pill { position: relative; display: inline-flex; align-items: center; gap: 8px; height: 44px; padding: 0 12px 0 4px; border-radius: var(--radius-pill); background: transparent; border: var(--border-w) solid transparent; color: var(--text); cursor: pointer; font-family: inherit; transition: color 160ms ease; flex-shrink: 0; }
 .app-canonical-header .user-pill::before { content: ""; position: absolute; z-index: 0; inset: 4px 0; border-radius: var(--radius-pill); background: color-mix(in srgb, var(--accent) 12%, transparent); border: var(--border-w) solid color-mix(in srgb, var(--accent) 35%, var(--border)); transition: all 160ms ease; pointer-events: none; }
 .app-canonical-header .user-pill > * { position: relative; z-index: 1; }
 .app-canonical-header .user-pill:hover::before { background: color-mix(in srgb, var(--accent) 20%, transparent); border-color: color-mix(in srgb, var(--accent) 55%, var(--border)); }
 /* DS-OK: canonical UserPill mixes the avatar disc from a fixed #0a0a0a ink (80%) into the accent; it is not a skin token. */
-.app-canonical-header .header-avatar, .app-canonical-header .header-avatar > span { width: 22px; height: 22px; border-radius: var(--radius-pill); background: color-mix(in srgb, #0a0a0a 80%, var(--accent)); color: var(--accent); display: grid; place-items: center; font-family: var(--font-mono); font-size: 10px; font-weight: 700; }
+.app-canonical-header .header-avatar, .app-canonical-header .header-avatar > span { width: 22px; height: 22px; border-radius: var(--radius-pill); background: color-mix(in srgb, #0a0a0a 80%, var(--accent)); color: var(--text); display: grid; place-items: center; font-family: var(--font-mono); font-size: 10px; font-weight: 700; }
 .app-canonical-header .header-account-name { font-size: 12px; font-weight: 600; max-width: 120px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .app-canonical-header .mobile-menu-btn { position: relative; display: none; align-items: center; justify-content: center; cursor: pointer; width: 44px; height: 44px; min-width: 44px; min-height: 44px; margin: -4px; padding: 0; border: var(--border-w) solid transparent; border-radius: var(--radius-sm); background: transparent; color: var(--text); box-shadow: none; }
 .app-canonical-header .mobile-menu-btn::before { content: ""; position: absolute; inset: 4px; border: var(--border-w) solid var(--border); border-radius: var(--radius-sm); background: transparent; transition: all 160ms ease; pointer-events: none; }
@@ -58,19 +57,45 @@
 .app-canonical-header .header-menu-icon { position: absolute; top: 10px; left: 10px; pointer-events: none; }
 .app-canonical-header .mobile-menu-btn:hover { transform: translateY(-1px); }
 .app-canonical-header .mobile-menu-btn:hover::before { background: var(--surface); border-color: var(--text-3); }
+/* Canonical `btn icon ghost` paints through the inset ::before so the visible
+   36px control sits inside the 44px target; keep .btn and skin paint off the
+   outer hit box. */
+.app-canonical-header .btn.mobile-menu-btn,
+.app-canonical-header .btn.mobile-menu-btn:hover { background: transparent; border-width: var(--border-w); border-color: transparent; box-shadow: none; }
+.app-canonical-header .btn.mobile-menu-btn:hover { transform: translateY(-1px); }
 .app-canonical-header :is(button, a):focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; }
 .header-account-menu [role="menuitem"] { min-height: 44px; }
 @media (max-width: 1180px) { .app-canonical-header .header-search-trigger { min-width: 180px; } }
 @media (max-width: 1024px) {
-  .app-canonical-header .hide-tablet { display: none !important; }
+  /* Overrides canonical `@media (min-width: 769px) .mobile-menu-btn { display: none !important }`. */
   .app-canonical-header .mobile-menu-btn { display: inline-flex !important; }
   .app-canonical-header .header-menu-control { display: inline-flex; }
   .app-canonical-header .header-search-trigger { min-width: 0; width: 180px; gap: 6px; padding: 0 10px; }
   .app-canonical-header .header-search-label { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip-path: inset(50%); }
 }
+@media (min-width: 768px) and (max-width: 1024px) {
+  /* The tablet sidebar stays visible, but the reference also retains its
+     header drawer trigger through 1024px. Re-show these spans at 768px, where
+     canonical `@media (max-width: 768px) .hide-mobile { display: none !important }` still applies. */
+  .app-canonical-header .kbd.hide-mobile,
+  .app-canonical-header .header-account-name.hide-mobile {
+    display: inline !important;
+  }
+  /* F210: a bare ⌘K chip read as an empty field — keep the short "Search"
+     word visible; only the resource-count tail stays hidden. */
+  .app-canonical-header .header-search-trigger .header-search-label { display: block; position: static; width: auto; height: auto; margin: 0; clip-path: none; }
+  .app-canonical-header .header-search-label > span { display: none; }
+}
+/* design-system.css hides .header-search-trigger at <=768px
+   (`.header-search-trigger { display: none !important }`) because the
+   reference swaps in a separate `btn icon ghost show-mobile` search button.
+   The app keeps one responsive control (see AppHeader), so it must stay
+   displayed and take that icon-button paint below. */
 @media (max-width: 768px) {
+  .app-canonical-header .header-search-trigger { display: inline-flex !important; }
+}
+@media (max-width: 767px) {
   .app-canonical-header { height: 56px; padding: 0 14px; }
-  .app-canonical-header .hide-mobile { display: none !important; }
   .app-canonical-header .header-search-trigger { min-width: 44px; width: 44px; height: 44px; margin-inline: -4px; padding: 0; justify-content: center; }
   .app-canonical-header .header-search-trigger::before { inset: 4px; background: transparent; }
   .app-canonical-header .header-search-trigger > svg { width: 16px; height: 16px; color: var(--text); }

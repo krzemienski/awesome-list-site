@@ -58,6 +58,7 @@ import {
   personalTagsSchema,
 } from "@shared/bookmarkCollections";
 import { PG_INT_MAX } from "../../validation/inputs";
+import { stripInternalResourceFields } from "../../lib/publicResource";
 
 /**
  * Everything the user-features handlers need from the composition root.
@@ -132,7 +133,7 @@ export function registerUserFeatureRoutes(
     try {
       const userId = req.dbUser.id;
       const favorites = await userFeatureRepo.getUserFavorites(userId);
-      res.json(favorites);
+      res.json(favorites.map(stripInternalResourceFields));
     } catch (error) {
       console.error('Error fetching favorites:', error);
       res.status(500).json({ message: 'Failed to fetch favorites' });
@@ -178,7 +179,7 @@ export function registerUserFeatureRoutes(
     try {
       const userId = req.dbUser.id;
       const bookmarks = await userFeatureRepo.getUserBookmarks(userId);
-      res.json(bookmarks);
+      res.json(bookmarks.map(stripInternalResourceFields));
     } catch (error) {
       console.error('Error fetching bookmarks:', error);
       res.status(500).json({ message: 'Failed to fetch bookmarks' });
@@ -927,10 +928,15 @@ export function registerUserFeatureRoutes(
         }
       }
 
+      // Dismissing is only meaningful before onboarding is finished; a stale
+      // tab or "save and browse later" on a revisit must not erase completion.
       const onboardingStatus: OnboardingStatus =
-        parsed.data.onboardingStatus ??
-        current?.onboardingStatus ??
-        'not_started';
+        parsed.data.onboardingStatus === 'dismissed' &&
+        current?.onboardingStatus === 'completed'
+          ? 'completed'
+          : parsed.data.onboardingStatus ??
+            current?.onboardingStatus ??
+            'not_started';
       const onboardingStep =
         parsed.data.onboardingStep ?? current?.onboardingStep ?? 1;
 
@@ -1060,19 +1066,21 @@ export function registerUserFeatureRoutes(
       const userId = req.dbUser.id;
       const { type, status, sort, q, page, limit } = parsed.data;
       const dashboard = await auditRepo.getContributorDashboardData(userId);
-      const statusCounts = {
-        pending: 0,
-        approved: 0,
-        rejected: 0,
-        withdrawn: 0,
-        superseded: 0,
+      const countByStatus = (items: typeof dashboard.items) => {
+        const counts = {
+          pending: 0,
+          approved: 0,
+          rejected: 0,
+          withdrawn: 0,
+          superseded: 0,
+        };
+        for (const item of items) counts[item.status]++;
+        return counts;
       };
-      for (const item of dashboard.items) statusCounts[item.status]++;
 
       const normalizedQuery = q.toLocaleLowerCase();
-      const filtered = dashboard.items.filter((item) => {
+      const inScope = dashboard.items.filter((item) => {
         if (type !== 'all' && item.kind !== type) return false;
-        if (status !== 'all' && item.status !== status) return false;
         if (!normalizedQuery) return true;
         const searchable = [
           item.title,
@@ -1089,6 +1097,10 @@ export function registerUserFeatureRoutes(
           .toLocaleLowerCase();
         return searchable.includes(normalizedQuery);
       });
+      const filtered =
+        status === 'all'
+          ? inScope
+          : inScope.filter((item) => item.status === status);
 
       filtered.sort((a, b) => {
         const byTime = a.changedAt.getTime() - b.changedAt.getTime();
@@ -1112,11 +1124,15 @@ export function registerUserFeatureRoutes(
           total,
           totalPages,
         },
+        // summary is the whole timeline (metrics, empty state); statusCounts
+        // honours the type and search filters so the status options offered
+        // for the current scope never promise results that aren't there.
         summary: {
           total: dashboard.items.length,
-          ...statusCounts,
+          ...countByStatus(dashboard.items),
           ...dashboard.impact,
         },
+        statusCounts: countByStatus(inScope),
         definitions: {
           acceptedContributions:
             'Resource submissions and edit suggestions that moderators approved.',

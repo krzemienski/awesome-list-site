@@ -12,6 +12,8 @@
  * - `githubSynced` / `lastSyncedAt` — sync-pipeline state
  * - `updatedAt` / `approvedAt` — moderation/sync bookkeeping (Audit2 BUG-013;
  *   `createdAt` stays: it powers the public "Added on …" line on detail pages)
+ * - `contributorRejectionReason` / `statusChangedAt` — moderation bookkeeping;
+ *   contributors read their own reasons through /api/user/contributions
  * - metadata AI-pipeline internals: `source`, `confidence`, `discoveryId`,
  *   `researchJobId`, `enrichmentError`, `enrichment_error`
  * - metadata import/sync bookkeeping observed live on /api/awesome-list
@@ -70,7 +72,11 @@ const INTERNAL_METADATA_KEYS = [
 
 export function stripInternalResourceFields<T extends Record<string, any>>(r: T): T & PublicResourceFields {
   if (!r || typeof r !== "object") return r;
-  const { searchTsv, submittedBy, approvedBy, githubSynced, lastSyncedAt, updatedAt, approvedAt, ...rest } = r as any;
+  const {
+    searchTsv, submittedBy, approvedBy, githubSynced, lastSyncedAt, updatedAt, approvedAt,
+    contributorRejectionReason, statusChangedAt,
+    ...rest
+  } = r as any;
   if (rest.metadata && typeof rest.metadata === "object" && !Array.isArray(rest.metadata)) {
     const meta = { ...rest.metadata };
     let changed = false;

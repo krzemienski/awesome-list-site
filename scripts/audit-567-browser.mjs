@@ -32,6 +32,8 @@ import { chromium } from "playwright";
 import { AxeBuilder } from "@axe-core/playwright";
 import { launchBrowserWithLease } from "./validation/playwright-launch-lease.mjs";
 import {
+  DEMONSTRATOR_DISPLAY_NAME,
+  DEMONSTRATOR_FIRST_NAME,
   createDisposableAdmin,
   declineAnalyticsConsentViaUi,
   identityAvailability,
@@ -43,6 +45,11 @@ import {
   resolvePathTemplate,
 } from "../tests/parity/reference-adapter.mjs";
 import { applyAction } from "../tests/parity/actions.mjs";
+import {
+  CANONICAL_CSS_PATH,
+  readCanonicalRegistry,
+  registryStructureIssues,
+} from "./generate-design-system-artifact.mjs";
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const BASE = (process.env.BASE_URL || "http://127.0.0.1:5000").replace(/\/+$/, "");
@@ -62,25 +69,28 @@ const VIEWPORTS = {
   1024: { width: 1024, height: 768 },
   1440: { width: 1440, height: 900 },
 };
-const SYSTEMS = ["editorial", "terminal", "geist", "brutalist", "swiss"];
-const ACCENTS = ["crimson", "magenta", "orange", "amber", "emerald", "matrix", "cyan", "violet", "lime", "rose"];
-const SMOKE_SYSTEM_DEFAULTS = {
-  editorial: "crimson",
-  terminal: "matrix",
-  geist: "cyan",
-  brutalist: "amber",
-  swiss: "orange",
-};
+// Systems, accents and each system's natural accent come from the canonical
+// registry the browser loads (client/public/ds/design-system.js), so the
+// matrix grows or shrinks with the design instead of with a copy of it.
+const CANONICAL_REGISTRY = readCanonicalRegistry(ROOT);
+const REGISTRY_ISSUES = registryStructureIssues(CANONICAL_REGISTRY);
+if (REGISTRY_ISSUES.length) {
+  throw new Error(`canonical design-system registry is incomplete: ${REGISTRY_ISSUES.join("; ")}`);
+}
+const SYSTEMS = Object.keys(CANONICAL_REGISTRY.systems);
+const ACCENTS = CANONICAL_REGISTRY.accents.map((accent) => accent.id);
+const SMOKE_SYSTEM_DEFAULTS = { ...CANONICAL_REGISTRY.systemDefaultAccents };
 const SMOKE_ROUTES = {
   home: "/",
   "category-encoding-codecs": "/category/encoding-codecs",
   "resource-185020": "/resource/185020",
 };
 const SERIOUS_CRITICAL = new Set(["serious", "critical"]);
-const EXPECTED_SYSTEMS = 5;
-const EXPECTED_THEME_COMBINATIONS = 50;
-const EXPECTED_SMOKE_CAPTURES = 80;
-const STAGE10_CSS = path.join(ROOT, "client", "src", "styles", "design-system.css");
+const SMOKE_SCREENS = [...Object.keys(SMOKE_ROUTES), "admin-overview"];
+const EXPECTED_SYSTEMS = SYSTEMS.length;
+const EXPECTED_THEME_COMBINATIONS = SYSTEMS.length * ACCENTS.length;
+const EXPECTED_SMOKE_CAPTURES = SYSTEMS.length * Object.keys(VIEWPORTS).length * SMOKE_SCREENS.length;
+const STAGE10_CSS = path.join(ROOT, CANONICAL_CSS_PATH);
 const PHASES = new Set(["theme", "runtime", "smoke", "axe", "font-prepaint", "all"]);
 const REPORT_SCHEMA_VERSION = 3;
 
@@ -122,7 +132,7 @@ function parseCli() {
   const unknownSystems = systems?.filter((system) => !SYSTEMS.includes(system)) || [];
   if (unknownSystems.length) throw new Error(`unknown --system value(s): ${unknownSystems.join(", ")}`);
   const screens = readList(["--screen", "--screens"]);
-  const knownScreens = [...Object.keys(SMOKE_ROUTES), "admin-overview"];
+  const knownScreens = SMOKE_SCREENS;
   if (phase === "smoke") {
     const unknownScreens = screens?.filter((screen) => !knownScreens.includes(screen)) || [];
     if (unknownScreens.length) throw new Error(`unknown --screen value(s): ${unknownScreens.join(", ")}`);
@@ -627,8 +637,14 @@ async function interactionSweep(page, system, accent, report, onCell) {
     await page.keyboard.press("Control+K");
     // The palette chunk is lazy-loaded on first trigger (MainLayout keeps only
     // the keydown handler in the eager shell), so wait for the dialog rather
-    // than sampling visibility synchronously after the keypress.
-    const paletteDialog = page.locator('[role="dialog"]').first();
+    // than sampling visibility synchronously after the keypress. Match only an
+    // OPEN dialog: at 375 the sidebar sheet is itself a role="dialog" that stays
+    // mounted (data-state="closed") through its close animation, so a bare
+    // `[role="dialog"]` locator resolved to the closing sheet and then sampled
+    // the gap between its unmount and the palette's mount as "not opened".
+    // Scope to the palette's own content node (`.search-palette`) so a sidebar
+    // sheet that failed to close can never stand in for it.
+    const paletteDialog = page.locator('.search-palette[role="dialog"][data-state="open"]').first();
     await paletteDialog.waitFor({ state: "visible", timeout: 15_000 }).catch(() => {});
     const palette = await paletteDialog.isVisible().catch(() => false);
     await page.keyboard.press("Escape");
@@ -814,18 +830,15 @@ async function axeForScreen(page, screen, width, tokens, identityMode) {
       throw new Error(`actual route ${route} returned HTTP ${httpStatus ?? "unknown"} (expected a successful route)`);
     }
     await waitForApp(page);
-    const foldedParents = { "admin-tab:digests": "github", "admin-tab:journeys": "research", "admin-tab:subsubcategories": "subcategories" };
-    const foldedParent = foldedParents[screen.actualAction];
-    if (foldedParent) {
-      await applyAction(page, `admin-tab:${foldedParent}`, "actual", { tokens });
-    }
+    // Folded sections (Sub-Subcats / Journeys / Digests) are opened from the
+    // header Settings menu by the shared admin-tab action, which also waits
+    // for the section's own panel; no per-runner parent-tab choreography.
+    const foldedChildren = ["admin-tab:digests", "admin-tab:journeys", "admin-tab:subsubcategories"];
     if (screen.actualAction) {
-      if (foldedParent) {
+      await applyAction(page, screen.actualAction, "actual", { tokens });
+      if (foldedChildren.includes(screen.actualAction)) {
         const child = screen.actualAction.slice("admin-tab:".length);
-        await page.getByTestId(`tab-${child}`).click();
         await page.getByTestId(`content-${child}`).waitFor({ state: "visible", timeout: 30_000 });
-      } else {
-        await applyAction(page, screen.actualAction, "actual", { tokens });
       }
     }
     if (screen.actualReadySelector) {
@@ -842,11 +855,16 @@ async function axeForScreen(page, screen, width, tokens, identityMode) {
       if (!session?.isAuthenticated || session.user?.role !== "admin") {
         throw new Error(`protected app row is not authenticated as admin (session=${JSON.stringify(session).slice(0, 240)})`);
       }
+      // /api/auth/user exposes one joined `name` ("Nick Krzemienski" since the
+      // identity helper started setting the demonstrator last name), never a
+      // separate firstName; accept either the display name or the bare first name.
       const name = session.user?.firstName || session.user?.name;
-      if (name !== "Nick") throw new Error("Protected row is not using the disposable Nick identity");
+      if (name !== DEMONSTRATOR_DISPLAY_NAME && name !== DEMONSTRATOR_FIRST_NAME) {
+        throw new Error(`Protected row is not using the disposable Nick identity (name=${JSON.stringify(name)})`);
+      }
       // Mobile intentionally collapses the header name to an avatar. Verify
       // identity at the authenticated API, not by demanding desktop chrome.
-      result.identityVerified = { name: "Nick", role: "admin" };
+      result.identityVerified = { name, role: "admin" };
     }
     await page.evaluate(() => document.fonts?.ready).catch(() => {});
     const axe = sanitiseAxe(await new AxeBuilder({ page }).analyze());
@@ -988,7 +1006,10 @@ function runStaticCommand(label, command, args) {
 function stage10SkinCounts() {
   const css = fs.readFileSync(STAGE10_CSS, "utf8");
   return {
-    systemSelectorCount: (css.match(/\[data-system="(?:editorial|terminal|geist|brutalist|swiss)"\]/g) || []).length,
+    systemSelectorCount: SYSTEMS.reduce(
+      (count, system) => count + css.split(`[data-system="${system}"]`).length - 1,
+      0,
+    ),
     dataDsCount: (css.match(/data-ds/g) || []).length,
   };
 }
@@ -1080,7 +1101,7 @@ ${interactionLines || "- No interaction rows were captured."}
 - Stage 7 (accent discipline): visible accent-user counts retained per system; no count was silently waived.
 - Stage 8 (ink values): contrast values retained below and in \`multi-system/audit-567-summary.json\`.
 - Stage 9 (fonts): ${stageComplete && report.stageAudits.every((audit) => audit.runtime.stage9.families.display.check && audit.runtime.stage9.families.body.check && audit.runtime.stage9.families.mono.check) ? "PASS" : "INCOMPLETE"}.
-- Stage 10 (skin blocks): ${report.skinCounts.systemSelectorCount} system selectors and ${report.skinCounts.dataDsCount} data-ds references in \`client/src/styles/design-system.css\`.
+- Stage 10 (skin blocks): ${report.skinCounts.systemSelectorCount} system selectors and ${report.skinCounts.dataDsCount} data-ds references in \`${CANONICAL_CSS_PATH}\`.
 - Stage 11 (live switch): ${themeComplete ? "PASS" : "INCOMPLETE"}; an overall PASS requires exactly 50 combinations with reload persistence.
 
 ### Reported contrast ratios (ink on \`--bg\`)

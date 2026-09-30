@@ -9,6 +9,7 @@
 //   node scripts/validation/standalone-palette-drift.mjs
 //   node scripts/validation/standalone-palette-drift.mjs --update-baseline
 //   node scripts/validation/standalone-palette-drift.mjs --update-baseline --init
+//   node scripts/validation/standalone-palette-drift.mjs --update-frozen-manifest   (needs the archive)
 
 import { createHash } from 'crypto';
 import fs from 'fs';
@@ -490,7 +491,16 @@ function totalOf(counts) {
 // deflated members; the archive is far below zip64 sizes) and compared with
 // the working tree, so an edited, missing or extra file fails the gate and
 // the directory has to be either restored or treated as a scanned surface.
+//
+// The archive is a gitignored upload that exists only in the workspace it was
+// attached to. Its per-member digests are therefore also pinned in a committed
+// manifest: with the archive present the manifest must equal it member for
+// member; without it the working tree is verified against the manifest, which
+// must still agree with the sync record's pinned digest, member count and
+// every per-file digest the record carries.
 const SYNC_RECORD_PATH = path.join(ROOT, 'docs/parity/source-sync.json');
+const FROZEN_MANIFEST_PATH = path.join(ROOT, 'scripts/validation/standalone-frozen-reference-manifest.json');
+const UPDATE_FROZEN_MANIFEST = process.argv.includes('--update-frozen-manifest');
 
 function sha256(buffer) {
   return createHash('sha256').update(buffer).digest('hex');
@@ -578,29 +588,96 @@ function listFilesRecursively(dir, base = dir) {
   return { files, irregular };
 }
 
-function checkFrozenReferenceRoots() {
-  const syncRecord = JSON.parse(fs.readFileSync(SYNC_RECORD_PATH, 'utf8'));
-  const archivePath = path.join(ROOT, syncRecord.archive.path);
-  const zipBuffer = fs.readFileSync(archivePath);
-  const zipDigest = sha256(zipBuffer);
-  if (!/^[0-9a-f]{64}$/.test(syncRecord.archive?.sha256 ?? '')) {
-    console.error(`FAIL frozen-reference :: ${path.relative(ROOT, SYNC_RECORD_PATH)} lacks a pinned archive.sha256`);
-    process.exit(1);
-  }
-  if (zipDigest !== syncRecord.archive.sha256) {
-    console.error(`FAIL frozen-reference :: ${syncRecord.archive.path} sha256 ${zipDigest} does not match ${path.relative(ROOT, SYNC_RECORD_PATH)} (${syncRecord.archive.sha256})`);
-    process.exit(1);
-  }
-  const archiveEntries = readZipEntries(zipBuffer);
+function frozenFail(message) {
+  console.error(`FAIL frozen-reference :: ${message}`);
+  process.exit(1);
+}
+
+/** Member digests to verify against: from the archive when present, else from the pinned manifest. */
+function loadFrozenReferenceEntries(syncRecord) {
+  const recordName = path.relative(ROOT, SYNC_RECORD_PATH);
+  const manifestName = path.relative(ROOT, FROZEN_MANIFEST_PATH);
+  if (!/^[0-9a-f]{64}$/.test(syncRecord.archive?.sha256 ?? '')) frozenFail(`${recordName} lacks a pinned archive.sha256`);
   const expectedEntries = syncRecord.archive.originalEntries;
   if (!Number.isInteger(expectedEntries) || expectedEntries <= 0) {
-    console.error(`FAIL frozen-reference :: ${path.relative(ROOT, SYNC_RECORD_PATH)} lacks a positive archive.originalEntries count`);
+    frozenFail(`${recordName} lacks a positive archive.originalEntries count`);
+  }
+
+  const archivePath = path.join(ROOT, syncRecord.archive.path);
+  let archiveEntries = null;
+  if (fs.existsSync(archivePath)) {
+    const zipBuffer = fs.readFileSync(archivePath);
+    const zipDigest = sha256(zipBuffer);
+    if (zipDigest !== syncRecord.archive.sha256) {
+      frozenFail(`${syncRecord.archive.path} sha256 ${zipDigest} does not match ${recordName} (${syncRecord.archive.sha256})`);
+    }
+    archiveEntries = readZipEntries(zipBuffer);
+    if (archiveEntries.size !== expectedEntries) {
+      frozenFail(`${syncRecord.archive.path} holds ${archiveEntries.size} file entries, ${recordName} records ${expectedEntries}`);
+    }
+  }
+
+  if (UPDATE_FROZEN_MANIFEST) {
+    if (!archiveEntries) {
+      frozenFail(`--update-frozen-manifest needs the archive itself; ${syncRecord.archive.path} is not in this checkout`);
+    }
+    const manifest = fs.existsSync(FROZEN_MANIFEST_PATH) ? JSON.parse(fs.readFileSync(FROZEN_MANIFEST_PATH, 'utf8')) : {};
+    const next = {
+      ...manifest,
+      archive: { path: syncRecord.archive.path, sha256: syncRecord.archive.sha256 },
+      pinnedFrom: { archive: syncRecord.archive.path },
+      entries: Object.fromEntries([...archiveEntries].sort(([a], [b]) => (a < b ? -1 : a > b ? 1 : 0))),
+    };
+    fs.writeFileSync(FROZEN_MANIFEST_PATH, `${JSON.stringify(next, null, 2)}\n`);
+    console.log(`Updated ${manifestName} from ${syncRecord.archive.path} (${archiveEntries.size} members)`);
+  }
+
+  if (!fs.existsSync(FROZEN_MANIFEST_PATH)) frozenFail(`${manifestName} is missing`);
+  const manifest = JSON.parse(fs.readFileSync(FROZEN_MANIFEST_PATH, 'utf8'));
+  const manifestEntries = new Map(Object.entries(manifest.entries ?? {}));
+  const problems = [];
+  if (manifest.archive?.path !== syncRecord.archive.path || manifest.archive?.sha256 !== syncRecord.archive.sha256) {
+    problems.push(`${manifestName} pins ${manifest.archive?.path} @ ${manifest.archive?.sha256}, ${recordName} records ${syncRecord.archive.path} @ ${syncRecord.archive.sha256}`);
+  }
+  if (manifestEntries.size !== expectedEntries) {
+    problems.push(`${manifestName} lists ${manifestEntries.size} members, ${recordName} records ${expectedEntries}`);
+  }
+  for (const [name, digest] of manifestEntries) {
+    if (!/^[0-9a-f]{64}$/.test(digest)) problems.push(`${manifestName}: ${name} has no sha256 digest`);
+  }
+  for (const pinned of syncRecord.changedOrAdded ?? []) {
+    if (manifestEntries.get(pinned.path) !== pinned.sha256) {
+      problems.push(`${manifestName}: ${pinned.path} is ${manifestEntries.get(pinned.path) ?? 'absent'}, ${recordName} pins ${pinned.sha256}`);
+    }
+  }
+  if (archiveEntries) {
+    for (const [name, digest] of archiveEntries) {
+      if (manifestEntries.get(name) !== digest) problems.push(`${manifestName}: ${name} does not match the archive member`);
+    }
+    for (const name of manifestEntries.keys()) {
+      if (!archiveEntries.has(name)) problems.push(`${manifestName}: ${name} is not an archive member`);
+    }
+  }
+  if (problems.length) {
+    for (const problem of problems) console.error(`FAIL frozen-reference :: ${problem}`);
+    console.error(
+      archiveEntries
+        ? `\nThe pinned manifest drifted from ${syncRecord.archive.path}; rerun with --update-frozen-manifest.`
+        : `\nThe pinned manifest does not agree with ${recordName}; restore it or regenerate it from the archive.`,
+    );
     process.exit(1);
   }
-  if (archiveEntries.size !== expectedEntries) {
-    console.error(`FAIL frozen-reference :: ${syncRecord.archive.path} holds ${archiveEntries.size} file entries, ${path.relative(ROOT, SYNC_RECORD_PATH)} records ${expectedEntries}`);
-    process.exit(1);
-  }
+  return archiveEntries
+    ? { entries: archiveEntries, source: syncRecord.archive.path }
+    : {
+        entries: manifestEntries,
+        source: `${manifestName} (archive ${syncRecord.archive.path} not in this checkout; manifest agrees with ${recordName})`,
+      };
+}
+
+function checkFrozenReferenceRoots() {
+  const syncRecord = JSON.parse(fs.readFileSync(SYNC_RECORD_PATH, 'utf8'));
+  const { entries: archiveEntries, source } = loadFrozenReferenceEntries(syncRecord);
 
   const problems = [];
   for (const frozen of STANDALONE_SCOPE.frozenReferenceRoots) {
@@ -623,14 +700,14 @@ function checkFrozenReferenceRoots() {
 
   for (const problem of problems) console.error(`FAIL frozen-reference :: ${problem}`);
   if (problems.length) {
-    console.error(`\n${problems.length} frozen reference file(s) drifted from ${syncRecord.archive.path}.`);
+    console.error(`\n${problems.length} frozen reference file(s) drifted from ${source}.`);
     console.error('A frozen reference root is excluded from the Stage 5 scan only while it is byte-identical to its archive:');
     console.error('restore the files, or move the change into the registered artifact that ports this source.');
     process.exit(1);
   }
   console.log(
     `PASS frozen-reference :: ${STANDALONE_SCOPE.frozenReferenceRoots.map((frozen) => frozen.path).join(', ')} ` +
-      `byte-identical to ${syncRecord.archive.path} (${archiveEntries.size} files)`,
+      `byte-identical to ${source} (${archiveEntries.size} files)`,
   );
 }
 

@@ -164,7 +164,10 @@ export async function getNotificationPreferences(
     .from(notificationPreferences)
     .where(eq(notificationPreferences.userId, userId))
     .limit(1);
-  return preferenceResponse(preferences ?? defaultPreferences(userId));
+  if (preferences) return preferenceResponse(preferences);
+  // Nothing saved yet: leave the time zone unset so the client can offer the
+  // browser's zone instead of a server-side UTC placeholder.
+  return { ...preferenceResponse(defaultPreferences(userId)), timezone: null };
 }
 
 export async function updateNotificationPreferences(

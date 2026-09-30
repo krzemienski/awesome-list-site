@@ -1,21 +1,8 @@
-import { useState, useMemo, useEffect } from "react";
-import { safeGetItem } from "@/lib/safeStorage";
+import { useState, useMemo } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { 
-  Users, 
-  Star, 
-  TrendingUp, 
-  Award, 
-  GitBranch, 
-  Calendar,
-  ExternalLink,
-  Heart,
-  Eye,
-  MessageSquare
-} from "lucide-react";
+import { Users, TrendingUp, GitBranch, FolderTree } from "lucide-react";
 import { Resource, Category } from "@/types/awesome-list";
 
 interface CommunityMetricsProps {
@@ -29,27 +16,6 @@ interface CommunityMetricsProps {
   onSubTabChange?: (value: string) => void;
 }
 
-interface ContributorMetric {
-  name: string;
-  contributions: number;
-  categories: string[];
-  badge: string;
-  level: "bronze" | "silver" | "gold" | "platinum";
-}
-
-interface PopularityMetric {
-  resourceId: string;
-  title: string;
-  category: string;
-  url: string;
-  score: number;
-  trends: {
-    clicks: number;
-    searches: number;
-    shares: number;
-  };
-}
-
 interface CategoryMetric {
   name: string;
   resourceCount: number;
@@ -58,94 +24,13 @@ interface CategoryMetric {
   // size ratio (share of the catalog), not real engagement. See the categories
   // tab for the honest label.
   catalogShare: number;
-  completeness: number;
 }
 
 export default function CommunityMetrics({ resources, categories, className, subTab, onSubTabChange }: CommunityMetricsProps) {
   const [selectedPeriod, setSelectedPeriod] = useState("7d");
 
-  // Load tracking data from localStorage for real engagement metrics
-  const [trackingData, setTrackingData] = useState<{views: Record<string, number>, clicks: Record<string, number>}>({views: {}, clicks: {}});
-  
-  useEffect(() => {
-    const views = safeGetItem('resource-views');
-    const clicks = safeGetItem('resource-clicks');
-    setTrackingData({
-      views: views ? JSON.parse(views) : {},
-      clicks: clicks ? JSON.parse(clicks) : {}
-    });
-  }, []);
-
   // Calculate metrics based on actual resource properties from database
   const metrics = useMemo(() => {
-    // Count actual resource types by analyzing real properties.
-    // BUG-027 (run13): `githubSynced` is an internal sync-pipeline field and is
-    // no longer present in public payloads, so the old "GitHub Synced" bucket
-    // (which keyed off it) was removed rather than always rendering 0.
-    const pendingResources = resources.filter(r => r.status === 'pending');
-    const aiEnrichedResources = resources.filter(r => r.metadata?.aiEnriched === true);
-
-    // Approved resources that are NOT AI enriched (avoid double-counting)
-    const approvedOnlyResources = resources.filter(r =>
-      r.status === 'approved' &&
-      r.metadata?.aiEnriched !== true
-    );
-
-    // Group categories by actual resource distribution
-    const aiEnrichedCategories = Array.from(new Set(aiEnrichedResources.map(r => r.category)));
-    const approvedCategories = Array.from(new Set(approvedOnlyResources.map(r => r.category)));
-    const pendingCategories = Array.from(new Set(pendingResources.map(r => r.category)));
-
-    const contributors: ContributorMetric[] = [
-      {
-        name: "Approved Resources",
-        contributions: approvedOnlyResources.length,
-        categories: approvedCategories.length > 0 ? approvedCategories : [] as string[],
-        badge: "Verified",
-        level: "platinum" as const
-      },
-      {
-        name: "AI Enriched",
-        contributions: aiEnrichedResources.length,
-        categories: aiEnrichedCategories.length > 0 ? aiEnrichedCategories : [] as string[],
-        badge: "AI Enhanced",
-        level: "silver" as const
-      },
-      {
-        name: "Pending Review",
-        contributions: pendingResources.length,
-        categories: pendingCategories.length > 0 ? pendingCategories : [] as string[],
-        badge: "In Review",
-        level: "bronze" as const
-      }
-    ].filter(c => c.contributions > 0);
-
-    // Calculate popularity based on actual localStorage tracking data
-    const popularResources: PopularityMetric[] = resources
-      .slice(0, 10)
-      .map((resource) => {
-        // Get real tracking data from localStorage
-        const resourceViews = trackingData.views[resource.url] || trackingData.views[resource.id?.toString() || ''] || 0;
-        const resourceClicks = trackingData.clicks[resource.url] || trackingData.clicks[resource.id?.toString() || ''] || 0;
-        
-        // Calculate score based on actual engagement (views + clicks)
-        const engagementScore = Math.min(100, (resourceViews * 2) + (resourceClicks * 5));
-        
-        return {
-          resourceId: resource.id,
-          title: resource.title,
-          category: resource.category,
-          url: resource.url,
-          score: engagementScore,
-          trends: {
-            clicks: resourceClicks,
-            searches: 0, // No search tracking available
-            shares: 0    // No share tracking available
-          }
-        };
-      })
-      .sort((a, b) => b.score - a.score);
-
     // Run16 BUG-025: `category.resources` is the DIRECT-only slice of the
     // tree — most resources live under subcategories/sub-subcategories, so
     // the tab showed 923 total vs the 2303 every other surface reports.
@@ -184,9 +69,8 @@ export default function CommunityMetrics({ resources, categories, className, sub
         resourceCount,
         growthRate: Math.min(100, growthRate),
         catalogShare: Math.min(100, catalogShare),
-        completeness: Math.min(100, (resourceCount / 50) * 100)
       };
-    }).sort((a, b) => b.catalogShare - a.catalogShare);
+    }).sort((a, b) => b.resourceCount - a.resourceCount || a.name.localeCompare(b.name));
 
     // Calculate actual weekly growth from recent resources
     const oneWeekAgo = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000);
@@ -196,35 +80,11 @@ export default function CommunityMetrics({ resources, categories, className, sub
     }).length;
 
     return {
-      contributors,
-      popularResources,
       categoryMetrics,
       totalContributions: resources.length,
-      activeContributors: contributors.filter(c => c.contributions > 0).length,
       weeklyGrowth: recentlyAddedCount
     };
-  }, [resources, categories, trackingData]);
-
-  // Contributor tier medals — decorative rank fills, not status. Raw palette
-  // gradients are forbidden (verify-design-system SKILL.md stage 5), so the
-  // metallic tiers ride bridge tokens (platinum brightest, silver mid) and
-  // gold/bronze reuse the DS warn constant at two strengths. Each fill
-  // carries its own ink, so callers must not pin text color.
-  const getBadgeColor = (level: string) => {
-    switch (level) {
-      case "platinum": return "bg-foreground text-background";
-      case "gold": return "bg-[#ffb84d] text-black"; // DS-OK: status warn constant doubling as gold medal fill
-      case "silver": return "bg-muted-foreground text-background";
-      case "bronze": return "bg-[#ffb84d]/70 text-black"; // DS-OK: status warn constant at reduced strength = bronze
-      default: return "bg-muted text-foreground";
-    }
-  };
-
-  const getEngagementColor = (score: number) => {
-    if (score >= 80) return "text-[#34d08c]"; // DS-OK: status ok
-    if (score >= 60) return "text-[#ffb84d]"; // DS-OK: status warn
-    return "text-[#ff5c7a]"; // DS-OK: status bad
-  };
+  }, [resources, categories]);
 
   return (
     <div className={className}>
@@ -232,10 +92,10 @@ export default function CommunityMetrics({ resources, categories, className, sub
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <Users className="h-5 w-5" />
-            Community Metrics & Contributions
+            Community Metrics
           </CardTitle>
           <CardDescription>
-            Track community engagement, popular resources, and contribution patterns
+            Catalog size, weekly growth, and each category's share of the catalog
           </CardDescription>
         </CardHeader>
         <CardContent>
@@ -245,10 +105,8 @@ export default function CommunityMetrics({ resources, categories, className, sub
             onValueChange={onSubTabChange}
             className="space-y-4"
           >
-            <TabsList className="grid w-full grid-cols-4">
+            <TabsList className="grid w-full grid-cols-2">
               <TabsTrigger value="overview">Overview</TabsTrigger>
-              <TabsTrigger value="contributors">Contributors</TabsTrigger>
-              <TabsTrigger value="popular">Popular</TabsTrigger>
               <TabsTrigger value="categories">Categories</TabsTrigger>
             </TabsList>
 
@@ -260,9 +118,9 @@ export default function CommunityMetrics({ resources, categories, className, sub
                       <GitBranch className="h-4 w-4 text-muted-foreground" />
                       <span className="text-sm text-muted-foreground">Total Resources</span>
                     </div>
-                    <p className="text-2xl font-bold mt-1">{metrics.totalContributions}</p>
-                    <p className="text-xs text-[#34d08c] mt-1">{/* DS-OK: status ok */}
-                      +{metrics.weeklyGrowth} this week
+                    <p className="text-2xl font-bold mt-1">{metrics.totalContributions.toLocaleString()}</p>
+                    <p className="text-xs text-[var(--status-ok)] mt-1">{/* DS-OK: status ok */}
+                      +{metrics.weeklyGrowth.toLocaleString()} this week
                     </p>
                   </CardContent>
                 </Card>
@@ -270,12 +128,12 @@ export default function CommunityMetrics({ resources, categories, className, sub
                 <Card>
                   <CardContent className="p-4">
                     <div className="flex items-center gap-2">
-                      <Users className="h-4 w-4 text-muted-foreground" />
-                      <span className="text-sm text-muted-foreground">Active Contributors</span>
+                      <FolderTree className="h-4 w-4 text-muted-foreground" />
+                      <span className="text-sm text-muted-foreground">Categories</span>
                     </div>
-                    <p className="text-2xl font-bold mt-1">{metrics.activeContributors}</p>
-                    <p className="text-xs text-[#5eddf2] mt-1">{/* DS-OK: cyan info (DS chart/info constant) */}
-                      Across {categories.length} categories
+                    <p className="text-2xl font-bold mt-1">{categories.length}</p>
+                    <p className="text-xs text-[var(--status-info)] mt-1">{/* DS-OK: cyan info (DS chart/info constant) */}
+                      top-level sections
                     </p>
                   </CardContent>
                 </Card>
@@ -288,221 +146,13 @@ export default function CommunityMetrics({ resources, categories, className, sub
                           count, not a percentage — label it honestly. */}
                       <span className="text-sm text-muted-foreground">New This Week</span>
                     </div>
-                    <p className="text-2xl font-bold mt-1">+{metrics.weeklyGrowth}</p>
-                    <p className="text-xs text-[#34d08c] mt-1">{/* DS-OK: status ok */}
+                    <p className="text-2xl font-bold mt-1">+{metrics.weeklyGrowth.toLocaleString()}</p>
+                    <p className="text-xs text-[var(--status-ok)] mt-1">{/* DS-OK: status ok */}
                       resources added
                     </p>
                   </CardContent>
                 </Card>
               </div>
-
-              <Card>
-                <CardHeader>
-                  <CardTitle className="text-lg">Recent Activity</CardTitle>
-                  {/* run9 BUG-016: engagement is tracked locally per browser —
-                      say so instead of presenting 0/0/0% as broken site data.
-                      BUG-045 (run19): the action is called "Favorite" on
-                      resource pages — use the same word here, not "likes". */}
-                  <CardDescription>
-                    Views and favorites are tracked in this browser only — counts build as you explore resources.
-                  </CardDescription>
-                </CardHeader>
-                <CardContent>
-                  {/* BUG-041 (run19): never rank a 0%-engagement row "#1" — only
-                      resources with real local activity get a rank; with none,
-                      show an honest empty state instead of a fake leaderboard. */}
-                  {metrics.popularResources.filter((r) => r.score > 0).length === 0 ? (
-                    <p className="text-sm text-muted-foreground py-4" data-testid="text-no-engagement">
-                      No local activity yet — the leaderboard fills in as you view and open resources in this browser.
-                    </p>
-                  ) : (
-                  <div className="space-y-3">
-                    {metrics.popularResources.filter((r) => r.score > 0).slice(0, 5).map((resource, index) => (
-                      <div key={resource.resourceId} className="flex items-center justify-between p-3 border">
-                        <div className="flex items-center gap-3">
-                          <div className="flex items-center gap-2">
-                            <span className="text-sm font-medium">#{index + 1}</span>
-                            <Badge variant="outline" className="text-xs">
-                              {resource.category}
-                            </Badge>
-                          </div>
-                          <div>
-                            <a
-                              href={resource.url}
-                              target="_blank"
-                              rel="noopener noreferrer"
-                              className="font-medium hover:text-primary transition-colors"
-                            >
-                              {resource.title}
-                            </a>
-                            <div className="flex items-center gap-4 mt-1">
-                              {resource.trends.clicks > 0 || resource.trends.shares > 0 ? (
-                                <>
-                                  <span className="text-xs text-muted-foreground flex items-center gap-1">
-                                    <Eye className="h-3 w-3" />
-                                    {resource.trends.clicks}
-                                  </span>
-                                  <span className="text-xs text-muted-foreground flex items-center gap-1">
-                                    <Heart className="h-3 w-3" />
-                                    {resource.trends.shares}
-                                  </span>
-                                </>
-                              ) : (
-                                <span className="text-xs text-muted-foreground">
-                                  No local activity yet
-                                </span>
-                              )}
-                            </div>
-                          </div>
-                        </div>
-                        <div className="text-right">
-                          {/* Run15 BUG-039: show a real 0% instead of a
-                              dangling dash when there's no engagement yet. */}
-                          <div className="text-sm font-medium">
-                            {resource.score}%
-                          </div>
-                          <div className="text-xs text-muted-foreground">
-                            engagement
-                          </div>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                  )}
-                </CardContent>
-              </Card>
-            </TabsContent>
-
-            <TabsContent value="contributors" className="space-y-4">
-              <div className="space-y-4">
-                {metrics.contributors.map((contributor, index) => (
-                  <Card key={contributor.name}>
-                    <CardContent className="p-4">
-                      <div className="flex items-start justify-between">
-                        <div className="flex-1">
-                          <div className="flex items-center gap-3 mb-2">
-                            <div className="flex items-center gap-2">
-                              <Award className="h-4 w-4 text-muted-foreground" />
-                              <span className="font-medium">{contributor.name}</span>
-                            </div>
-                            <Badge 
-                              className={`text-xs ${getBadgeColor(contributor.level)}`}
-                            >
-                              {contributor.badge}
-                            </Badge>
-                          </div>
-                          
-                          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 text-sm">
-                            <div>
-                              <span className="text-muted-foreground">Contributions:</span>
-                              <div className="font-medium">{contributor.contributions} resources</div>
-                            </div>
-                            <div>
-                              <span className="text-muted-foreground">Categories:</span>
-                              <div className="font-medium">{contributor.categories.length} active</div>
-                            </div>
-                            <div>
-                              <span className="text-muted-foreground">Level:</span>
-                              <div className="font-medium capitalize">{contributor.level}</div>
-                            </div>
-                          </div>
-                          
-                          <div className="mt-3">
-                            <div className="text-xs text-muted-foreground mb-1">
-                              Active categories:
-                            </div>
-                            <div className="flex flex-wrap gap-1">
-                              {contributor.categories.slice(0, 4).map(category => (
-                                <Badge key={category} variant="outline" className="text-xs">
-                                  {category}
-                                </Badge>
-                              ))}
-                              {contributor.categories.length > 4 && (
-                                <Badge variant="outline" className="text-xs">
-                                  +{contributor.categories.length - 4} more
-                                </Badge>
-                              )}
-                            </div>
-                          </div>
-                        </div>
-                      </div>
-                    </CardContent>
-                  </Card>
-                ))}
-              </div>
-            </TabsContent>
-
-            <TabsContent value="popular" className="space-y-4">
-              {metrics.popularResources.filter((r) => r.score > 0).length === 0 ? (
-                <p className="text-sm text-muted-foreground py-8 text-center" data-testid="text-popular-empty">
-                  No popularity data yet — rankings appear as you view and open resources in this browser.
-                </p>
-              ) : (
-              <div className="space-y-3">
-                {metrics.popularResources.filter((r) => r.score > 0).map((resource, index) => (
-                  <Card key={resource.resourceId}>
-                    <CardContent className="p-4">
-                      <div className="flex items-start justify-between">
-                        <div className="flex-1">
-                          <div className="flex items-center gap-3 mb-2">
-                            <span className="text-lg font-bold text-muted-foreground">
-                              #{index + 1}
-                            </span>
-                            <div>
-                              <a
-                                href={resource.url}
-                                target="_blank"
-                                rel="noopener noreferrer"
-                                className="font-medium hover:text-primary transition-colors flex items-center gap-1"
-                              >
-                                {resource.title}
-                                <ExternalLink className="h-3 w-3" />
-                              </a>
-                              <Badge variant="outline" className="text-xs mt-1">
-                                {resource.category}
-                              </Badge>
-                            </div>
-                          </div>
-                          
-                          <div className="grid grid-cols-3 gap-4 text-sm">
-                            <div className="flex items-center gap-2">
-                              <Eye className="h-4 w-4 text-[#5eddf2]" />{/* DS-OK: cyan info (DS chart/info constant) */}
-                              <div>
-                                <div className="font-medium">{resource.trends.clicks}</div>
-                                <div className="text-xs text-muted-foreground">clicks</div>
-                              </div>
-                            </div>
-                            <div className="flex items-center gap-2">
-                              <MessageSquare className="h-4 w-4 text-[#34d08c]" />{/* DS-OK: status ok */}
-                              <div>
-                                <div className="font-medium">{resource.trends.searches}</div>
-                                <div className="text-xs text-muted-foreground">searches</div>
-                              </div>
-                            </div>
-                            <div className="flex items-center gap-2">
-                              <Heart className="h-4 w-4 text-[#ff5c7a]" />{/* DS-OK: status bad */}
-                              <div>
-                                <div className="font-medium">{resource.trends.shares}</div>
-                                <div className="text-xs text-muted-foreground">shares</div>
-                              </div>
-                            </div>
-                          </div>
-                        </div>
-                        
-                        <div className="text-right">
-                          <div className={`text-xl font-bold ${getEngagementColor(resource.score)}`}>
-                            {resource.score}%
-                          </div>
-                          <div className="text-xs text-muted-foreground">
-                            popularity score
-                          </div>
-                        </div>
-                      </div>
-                    </CardContent>
-                  </Card>
-                ))}
-              </div>
-              )}
             </TabsContent>
 
             <TabsContent value="categories" className="space-y-4">
@@ -514,7 +164,7 @@ export default function CommunityMetrics({ resources, categories, className, sub
                         <div>
                           <h3 className="font-medium">{category.name}</h3>
                           <p className="text-sm text-muted-foreground">
-                            {category.resourceCount} {category.resourceCount === 1 ? "resource" : "resources"}
+                            {category.resourceCount.toLocaleString()} {category.resourceCount === 1 ? "resource" : "resources"}
                           </p>
                         </div>
                         <div className="text-right">
@@ -534,7 +184,7 @@ export default function CommunityMetrics({ resources, categories, className, sub
                         <div>
                           <div className="flex justify-between text-xs mb-1">
                             <span className="text-muted-foreground">Growth Rate</span>
-                            <span className="text-[#34d08c]">+{category.growthRate}%</span>{/* DS-OK: status ok */}
+                            <span className="text-[var(--status-ok)]">+{category.growthRate}%</span>{/* DS-OK: status ok */}
                           </div>
                           <Progress value={category.growthRate} className="h-2" />
                           {/* NB-047: say where the number comes from instead of
@@ -542,14 +192,6 @@ export default function CommunityMetrics({ resources, categories, className, sub
                           <p className="text-[10px] text-muted-foreground mt-0.5">
                             Share of this category's resources added in the last 30 days
                           </p>
-                        </div>
-                        
-                        <div>
-                          <div className="flex justify-between text-xs mb-1">
-                            <span className="text-muted-foreground">Completeness</span>
-                            <span>{Math.round(category.completeness)}%</span>
-                          </div>
-                          <Progress value={category.completeness} className="h-2" />
                         </div>
                       </div>
                     </CardContent>

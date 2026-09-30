@@ -219,15 +219,18 @@ const extractMaintainer = (source) => {
 };
 
 const extractFaqContent = (source) => {
-  const questionMatches = [...source.matchAll(/question:\s*"([^"]+)"/g)];
+  // Questions are plain strings or `${site.name}` template literals; the site
+  // name is supplied by the live config in buildReferenceReconciliation.
+  const questionMatches = [...source.matchAll(/question:\s*(?:"([^"]+)"|`([^`]+)`)/g)];
   if (questionMatches.length === 0) throw new Error("FAQ source contract is empty; refusing an invented expected projection");
   return questionMatches.map((match, index) => {
     const end = questionMatches[index + 1]?.index ?? source.length;
     const segment = source.slice(match.index, end);
     const answerMatch = segment.match(/answer:\s*(?:"([\s\S]*?)"|`([\s\S]*?)`)/);
-    if (!answerMatch) throw new Error(`FAQ answer source contract is missing for "${match[1]}"`);
+    const question = (match[1] ?? match[2]).replaceAll("${site.name}", "{{siteName}}");
+    if (!answerMatch) throw new Error(`FAQ answer source contract is missing for "${question}"`);
     return {
-      question: match[1],
+      question,
       // The first answer is a source-owned template whose count is supplied by
       // the live catalog in buildReferenceReconciliation.
       answer: (answerMatch[1] ?? answerMatch[2]).replace("${countClaim}", "{{resourceCount}}"),
@@ -353,6 +356,7 @@ export function buildExpectedReferenceExtensions() {
       faqQuestions: faqContent.map(({ question }) => question),
       faqAnswers: faqContent.map(({ answer }) => answer),
       resourceCount: null,
+      siteName: null,
       hero: aboutHero,
       sourceProof: {
         aboutPage: sourceProof.aboutPage,
@@ -660,7 +664,7 @@ const appendAboutProjection = (document, root, about) => {
     trigger.setAttribute("aria-controls", `parity-about-faq-panel-${index}`);
     const chevron = node(document, "span", "parity-about-faq-chevron");
     chevron.append(svgIcon(document, "chevron"));
-    trigger.append(text(document, question), chevron);
+    trigger.append(text(document, question.replaceAll("{{siteName}}", about.siteName)), chevron);
     const panel = node(document, "div", "parity-about-faq-panel");
     panel.id = `parity-about-faq-panel-${index}`;
     panel.hidden = true;

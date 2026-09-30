@@ -1,0 +1,269 @@
+/* Shell sidebar, part 3: refined L2/L3 taxonomy rows and desktop tree
+   geometry. Loaded by sidebar.css after sidebar-categories.css. */
+
+/* Refined taxonomy rows from sidebar-variants.jsx. L2 navigation and its
+   disclosure remain separate siblings: opening a branch never navigates. */
+.av-sidebar-all-category {
+  color: var(--text-3) !important;
+  font-style: italic;
+}
+
+.av-sidebar-l2-row {
+  align-items: stretch;
+  background: transparent;
+  border-radius: 6px; /* DS-OK: frozen awesome-list-site-ds/sidebar-variants.jsx refined L2 row radius (borderRadius: 6). */
+  display: flex;
+  min-height: 44px;
+  transition: background 140ms ease;
+}
+
+.av-sidebar-l2-row:hover {
+  background: var(--surface);
+}
+
+.av-sidebar-l2-row.active {
+  background: color-mix(in srgb, var(--accent) 10%, transparent);
+}
+
+.av-sidebar-l2-link {
+  align-items: center;
+  color: var(--text-2);
+  display: flex;
+  flex: 1 1 auto;
+  font-size: 12.5px;
+  gap: 8px;
+  line-height: normal;
+  min-width: 0;
+  padding: 8px 4px 8px 11px;
+}
+
+.av-sidebar-l2-row.active .av-sidebar-l2-link {
+  color: var(--accent);
+}
+
+.av-sidebar-l2-link > span:first-child {
+  flex: 1 1 auto;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.av-sidebar-l2-link > span:last-child {
+  color: var(--text-3);
+  font-size: 10px;
+}
+
+.av-sidebar-l2-row.active .av-sidebar-l2-link > span:last-child {
+  color: var(--accent);
+}
+
+.av-sidebar-l2-toggle {
+  align-items: center;
+  background: transparent;
+  border: 0;
+  border-left: var(--hairline-w, 1px) solid var(--border);
+  border-radius: 0 6px 6px 0;
+  color: var(--text-2);
+  cursor: pointer;
+  display: flex;
+  flex-shrink: 0;
+  gap: 6px;
+  line-height: normal;
+  min-height: 44px;
+  min-width: 44px;
+  padding: 0 9px 0 6px;
+}
+
+.av-sidebar-l2-group > .accordion-body {
+  background: transparent;
+  transition-duration: 240ms;
+}
+
+.av-sidebar-l3-tree {
+  border-left: var(--hairline-w, 1px) solid var(--border);
+  margin-left: 6px;
+  padding: 4px 0 4px 8px;
+}
+
+.av-sidebar-l3-all,
+.av-sidebar-l3-row {
+  align-items: center;
+  color: var(--text-3);
+  display: grid;
+  font-size: 12px;
+  gap: 8px;
+  grid-template-columns: 14px minmax(0, 1fr) auto;
+  line-height: normal;
+  min-height: 44px;
+  padding: 8px 11px 8px 0;
+  text-align: left;
+  width: 100%;
+}
+
+.av-sidebar-l3-all {
+  font-size: 11.5px;
+  font-style: italic;
+  grid-template-columns: 14px minmax(0, 1fr);
+  min-height: 44px;
+  margin-bottom: 2px;
+  padding-block: 4px;
+}
+
+.av-sidebar-l3-all > span:first-child,
+.av-sidebar-l3-row > span:first-child {
+  color: var(--text-4);
+  font-family: var(--font-mono);
+  font-size: 11px;
+  line-height: 1;
+  text-align: center;
+}
+
+.av-sidebar-l3-row > span:nth-child(2) {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.av-sidebar-l3-row > span:last-child {
+  color: var(--text-4);
+  font-size: 9.5px;
+}
+
+.av-sidebar-l3-row:hover,
+.av-sidebar-l3-row[data-active="true"] {
+  color: var(--text);
+}
+
+/* Leaf taxonomy rows share the V2 L2Row type in both sidebars: one line,
+   ellipsised, with a 10px mono count that takes the accent when active. */
+.av-sidebar-leaf-label {
+  flex: 1 1 auto;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.av-sidebar-leaf-count {
+  color: var(--text-3);
+  font-size: 10px;
+}
+
+.av-sidebar-leaf[data-active="true"] .av-sidebar-leaf-count {
+  color: var(--accent);
+}
+
+/*
+ * V2 desktop tree geometry. SidebarFull paints its rows at their reference
+ * heights (All row 36px, L2 rows 27px, L3 rows 25px / 22px). Each row keeps a
+ * 44px target that overhangs its neighbours by the difference (negative
+ * block margins), and row paint moves to an inset ::before so hover and
+ * active fills stay at the reference size.
+ */
+.av-sidebar-shell .av-sidebar-all-category,
+.av-sidebar-shell .av-sidebar-leaf,
+.av-sidebar-shell .av-sidebar-l2-row {
+  background: transparent;
+  position: relative;
+}
+
+.av-sidebar-shell .av-sidebar-all-category::before,
+.av-sidebar-shell .av-sidebar-leaf::before,
+.av-sidebar-shell .av-sidebar-l2-row::before {
+  border: var(--hairline-w) solid transparent;
+  border-radius: inherit;
+  content: "";
+  pointer-events: none;
+  position: absolute;
+  transition: background 140ms ease, border-color 140ms ease;
+}
+
+.av-sidebar-shell .av-sidebar-all-category > span,
+.av-sidebar-shell .av-sidebar-leaf > span,
+.av-sidebar-shell .av-sidebar-l2-row > * {
+  position: relative;
+}
+
+/* Flex columns so adjacent overhangs add instead of collapsing. */
+.av-sidebar-shell .accordion-body-inner,
+.av-sidebar-shell .av-sidebar-l3-tree {
+  display: flex;
+  flex-direction: column;
+}
+
+/* "All in …" keeps the canonical .sub-item paint (36px incl. hairline). */
+.av-sidebar-shell .av-sidebar-all-category {
+  margin-block: -3px;
+}
+.av-sidebar-shell .av-sidebar-all-category::before { inset: 3px 0; }
+.av-sidebar-shell .av-sidebar-all-category:hover {
+  background: transparent;
+  border-color: transparent;
+}
+.av-sidebar-shell .av-sidebar-all-category:hover::before {
+  background: var(--surface);
+  border-color: var(--border);
+}
+
+/* L2 rows (leaf links, and the link + disclosure pair for nested groups). */
+.av-sidebar-shell .av-sidebar-leaf {
+  border: 0;
+  gap: 8px;
+  line-height: normal;
+  margin-block: -8.5px;
+  padding: 6px 11px;
+}
+.av-sidebar-shell .av-sidebar-leaf::before { border: 0; inset: 8.5px 0; }
+.av-sidebar-shell .av-sidebar-leaf:hover,
+.av-sidebar-shell .av-sidebar-leaf[data-active="true"] {
+  background: transparent;
+  transform: none;
+}
+.av-sidebar-shell .av-sidebar-leaf:hover { color: var(--text-2); }
+.av-sidebar-shell .av-sidebar-leaf:hover::before,
+.av-sidebar-shell .av-sidebar-l2-row:hover::before {
+  background: var(--surface);
+}
+.av-sidebar-shell .av-sidebar-leaf[data-active="true"]::before,
+.av-sidebar-shell .av-sidebar-l2-row.active::before {
+  background: color-mix(in srgb, var(--accent) 10%, transparent);
+}
+
+.av-sidebar-shell .av-sidebar-l2-row {
+  margin-block: -8.5px;
+}
+.av-sidebar-shell .av-sidebar-l2-row::before { border: 0; inset: 8.5px 0; }
+.av-sidebar-shell .av-sidebar-l2-row:hover,
+.av-sidebar-shell .av-sidebar-l2-row.active {
+  background: transparent;
+}
+.av-sidebar-shell .av-sidebar-l2-link {
+  padding: 0 0 0 11px;
+}
+.av-sidebar-l2-row.active .av-sidebar-nested-count {
+  border-color: color-mix(in srgb, var(--accent) 30%, var(--border));
+  color: var(--accent);
+}
+
+/* The disclosure's chevron sits 8px after the count, as in V2's single
+   button; the 44px target reaches back over the count's trailing edge. */
+.av-sidebar-shell .av-sidebar-l2-toggle {
+  border-left: 0;
+  border-radius: 0;
+  color: var(--text-3);
+  justify-content: flex-end;
+  margin-left: -16px;
+  padding: 0 11px 0 0;
+  width: 44px;
+}
+
+.av-sidebar-shell .av-sidebar-l3-row {
+  margin-block: -9.5px;
+  padding: 5px 11px 5px 0;
+}
+
+.av-sidebar-shell .av-sidebar-l3-all {
+  margin-block: -11px -9px;
+  padding: 4px 11px 4px 0;
+}

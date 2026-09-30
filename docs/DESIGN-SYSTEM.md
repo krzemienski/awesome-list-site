@@ -14,7 +14,8 @@ is never edited independently.
 | `artifacts/awesome-video-design-system/DESIGN.md` | Replit artifact identity, contribution contract, and workspace consumption guidance |
 | `artifacts/awesome-video-design-system/tokens.json` | Generated machine-readable projection; never hand-edit |
 | `shared/styles/product-profiles.css` | Cross-product profile density roles and reduced-motion contract |
-| `client/src/styles/design-system.css` | Personality/accent tokens, DS component classes, per-system skins, shadcn bridge skins |
+| `client/public/ds/design-system.css` · `design-system.js` | Canonical fetched design system, verbatim and never edited: tokens, DS component classes, per-system skins; `DESIGN_SYSTEMS` / `ACCENTS` / `SYSTEM_DEFAULT_ACCENT` / `applyDesignSystem()` |
+| `client/src/styles/app-bridge.css` | App-only tokens (status, motion, shell, on-accent ink) and the shadcn/Radix/Clerk bridge onto the DS tokens |
 | `client/src/index.css` | Tailwind v4 `@theme inline` shadcn↔DS token bridge |
 | `client/src/lib/design-system.ts` | System/accent metadata, product profiles, runtime appliers, defaults |
 | `client/index.html` | FOUC-free pre-paint boot script (`ds-system` / `ds-accent` / `ds-font-override`) |
@@ -283,6 +284,13 @@ What each skin changes:
 Intentional divergences (per `replit.md` MR-DS-13 #5): non-DS badge variants (admin
 status badges) and secondary/ghost/destructive buttons keep plain shadcn styling; the
 BrandMark tile stays rounded in 0-radius systems (brand kit, not a radius bug).
+Accent-discipline divergences from the frozen reference (rule 1 wins over the
+prototype, audit stage 7 `audit-567-ink-accent`): the category-header count chip
+(`pages.jsx` renders `chip accent`; the app renders a neutral `chip`), the admin
+overview "Pending approvals" stat value (`admin.jsx` tints it `--accent`; the app
+keeps primary ink) and the admin activity-feed actor names (`admin.jsx` paints them
+`--accent`; the app uses `--text` at weight 500). All three are counted as pixel
+deltas in the parity ledgers, never re-tinted.
 
 ## 8. Rules
 

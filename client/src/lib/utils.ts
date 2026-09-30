@@ -5,6 +5,16 @@ export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
 }
 
+// Avatar fallback initials: first + last word of the display name ("Ada
+// Lovelace" -> "AL"), the email's first letter when there is no name.
+export function getInitials(name?: string | null, email?: string | null): string {
+  const words = (name ?? "").trim().split(/\s+/).filter(Boolean);
+  if (words.length === 0) return (email?.trim()[0] ?? "U").toUpperCase();
+  const first = Array.from(words[0])[0];
+  const last = words.length > 1 ? Array.from(words[words.length - 1])[0] : "";
+  return (first + last).toUpperCase();
+}
+
 // BUG-055 (run25): transliterate instead of deleting — "Vídeo Töols" must
 // become "video-tools", not "vdeo-tls". NFKD splits accented letters into
 // base + combining marks (stripped), and a small map covers letters that
@@ -22,8 +32,8 @@ export function slugify(text: string): string {
     .normalize("NFKD")
     .replace(/[\u0300-\u036f]/g, "")
     .replace(/[ßæœøđðþłħŧĸı]/g, (ch) => SLUG_CHAR_MAP[ch] ?? "")
-    .replace(/\s+/g, "-")
-    .replace(/[^\w-]+/g, "")
+    .replace(/[\s_]+/g, "-")
+    .replace(/[^a-z0-9-]+/g, "")
     .replace(/--+/g, "-")
     .replace(/^-+/, "")
     .replace(/-+$/, "");

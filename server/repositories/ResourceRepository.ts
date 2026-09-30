@@ -773,11 +773,17 @@ export class ResourceRepository {
 
   /**
    * Create a new resource
-   * Automatically logs the creation to audit log
+   * Logs exactly one 'created' audit row attributed to resource.submittedBy.
+   * Callers that know more about the creation pass the row's changes/notes
+   * here rather than logging a second 'created' row themselves.
    * @param resource - Resource data to create
+   * @param audit - Changes and notes recorded on the 'created' audit row
    * @returns The created resource
    */
-  async createResource(resource: InsertResource): Promise<Resource> {
+  async createResource(
+    resource: InsertResource,
+    audit: { changes?: Record<string, unknown>; notes?: string } = {},
+  ): Promise<Resource> {
     // Task #248: universal write boundary — decode HTML entities in
     // title/description/hierarchy fields (never the URL) so "&amp;" text can
     // never be persisted, whatever the caller (routes, GitHub sync, AI).
@@ -811,7 +817,13 @@ export class ResourceRepository {
     invalidatePublicCache('resource-mutation');
 
     // Log the creation
-    await this.logResourceAudit(newResource.id, 'created', resource.submittedBy ?? undefined);
+    await this.logResourceAudit(
+      newResource.id,
+      'created',
+      resource.submittedBy ?? undefined,
+      audit.changes,
+      audit.notes,
+    );
 
     return newResource;
   }
@@ -877,12 +889,19 @@ export class ResourceRepository {
 
   /**
    * Update an existing resource
-   * Automatically logs the update to audit log
+   * Logs exactly one 'updated' audit row attributed to audit.performedBy
+   * (no actor = system). Pass audit=false only when the caller records its
+   * own audit row for this write.
    * @param id - Resource ID to update
    * @param resource - Partial resource data to update
+   * @param audit - Acting user and notes for the audit row, or false
    * @returns The updated resource
    */
-  async updateResource(id: number, resource: Partial<InsertResource>): Promise<Resource> {
+  async updateResource(
+    id: number,
+    resource: Partial<InsertResource>,
+    audit: { performedBy?: string; notes?: string } | false = {},
+  ): Promise<Resource> {
     // Task #248: same universal decode boundary as createResource.
     resource = this.normalizeResourceFacets(decodeResourceTextFields({ ...resource }), false);
     const [updatedResource] = await db
@@ -893,8 +912,9 @@ export class ResourceRepository {
 
     if (updatedResource) invalidatePublicCache('resource-mutation');
 
-    // Log the update
-    await this.logResourceAudit(id, 'updated', resource.submittedBy ?? undefined, resource);
+    if (audit) {
+      await this.logResourceAudit(id, 'updated', audit.performedBy, resource, audit.notes);
+    }
 
     return updatedResource;
   }

@@ -1,4 +1,4 @@
-import { keepPreviousData, useQuery } from "@tanstack/react-query";
+import { useQuery } from "@tanstack/react-query";
 import "@/styles/pages/discovery.css";
 import { ArrowLeft } from "lucide-react";
 import { Link, Redirect, useLocation, useParams, useSearch } from "wouter";
@@ -43,6 +43,11 @@ function resourceNoun(count: number): string {
   return count === 1 ? "resource" : "resources";
 }
 
+function listingTag(queryKeyUrl: unknown): string | null {
+  if (typeof queryKeyUrl !== "string") return null;
+  return new URLSearchParams(queryKeyUrl.split("?")[1] ?? "").get("tags");
+}
+
 function resourceTags(resource: any): string[] {
   const tags = resource?.tags ?? resource?.metadata?.tags;
   return Array.isArray(tags) ? tags.filter((tag): tag is string => typeof tag === "string") : [];
@@ -70,7 +75,10 @@ export default function TagLanding() {
     },
     enabled: Boolean(slug),
     staleTime: 60_000,
-    placeholderData: keepPreviousData,
+    // Hold the current page only while paging within this tag; another tag's
+    // cards and total must never render under the new tag's heading.
+    placeholderData: (previous, previousQuery) =>
+      previousQuery && listingTag(previousQuery.queryKey[0]) === slug ? previous : undefined,
   });
 
   const canonicalPath = tagLandingPath(slug);
@@ -79,7 +87,9 @@ export default function TagLanding() {
   }
 
   if (!slug) return <NotFound />;
-  if (listing.isLoading && !listing.data) {
+  // isPending, not isLoading: offline the fetch is paused (isLoading false),
+  // which fell through to the no-data 404 below.
+  if (listing.isPending) {
     return (
       <div className="discovery-page space-y-6" aria-busy="true">
         <PageHeaderSkeleton />
@@ -90,7 +100,21 @@ export default function TagLanding() {
     );
   }
   if (listing.error) {
-    return <div className="discovery-page discovery-state" role="alert"><h1 className="display-h">Error Loading Tag</h1><p>Please try again.</p><Button variant="outline" onClick={() => void listing.refetch()}>Retry</Button></div>;
+    return (
+      <div className="discovery-page discovery-state" role="alert">
+        <h1 className="display-h">Error Loading Tag</h1>
+        <p>Please try again.</p>
+        <div className="flex flex-wrap justify-center gap-2">
+          <Button variant="outline" className="min-h-10" onClick={() => void listing.refetch()}>Retry</Button>
+          <Button asChild variant="outline" className="min-h-10">
+            <Link href="/categories" data-testid="link-tag-error-categories">Browse categories</Link>
+          </Button>
+          <Button asChild className="min-h-10">
+            <Link href="/" data-testid="link-tag-error-home"><ArrowLeft className="h-4 w-4" />Back to Home</Link>
+          </Button>
+        </div>
+      </div>
+    );
   }
 
   const data = listing.data;

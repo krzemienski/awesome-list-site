@@ -10,7 +10,7 @@
       "identity": "Nick-admin",
       "status": "PASS",
       "identityVerified": {
-        "name": "Nick",
+        "name": "Nick Krzemienski",
         "role": "admin"
       },
       "ready": true,
@@ -36,30 +36,10 @@
                 "failureSummary": "Fix any of the following:\n  Element does not have text that is visible to screen readers"
               }
             ]
-          },
-          {
-            "id": "heading-order",
-            "impact": "moderate",
-            "help": "Heading levels should only increase by one",
-            "description": "Ensure the order of headings is semantically correct",
-            "nodes": 1,
-            "targets": [
-              [
-                "h4"
-              ]
-            ],
-            "details": [
-              {
-                "target": [
-                  "h4"
-                ],
-                "failureSummary": "Fix any of the following:\n  Heading order invalid"
-              }
-            ]
           }
         ],
         "seriousCritical": [],
-        "passes": 47,
+        "passes": 45,
         "incomplete": 1
       }
     },
@@ -70,7 +50,7 @@
       "identity": "Nick-admin",
       "status": "PASS",
       "identityVerified": {
-        "name": "Nick",
+        "name": "Nick Krzemienski",
         "role": "admin"
       },
       "ready": true,
@@ -96,30 +76,10 @@
                 "failureSummary": "Fix any of the following:\n  Element does not have text that is visible to screen readers"
               }
             ]
-          },
-          {
-            "id": "heading-order",
-            "impact": "moderate",
-            "help": "Heading levels should only increase by one",
-            "description": "Ensure the order of headings is semantically correct",
-            "nodes": 1,
-            "targets": [
-              [
-                "h4"
-              ]
-            ],
-            "details": [
-              {
-                "target": [
-                  "h4"
-                ],
-                "failureSummary": "Fix any of the following:\n  Heading order invalid"
-              }
-            ]
           }
         ],
         "seriousCritical": [],
-        "passes": 47,
+        "passes": 45,
         "incomplete": 1
       }
     }

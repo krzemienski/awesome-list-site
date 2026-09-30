@@ -1,4 +1,5 @@
-import { useState, memo } from "react";
+import { useState, useEffect, memo } from "react";
+import { useQuery } from "@tanstack/react-query";
 import { Button } from "@/components/ui/button";
 import { Heart } from "lucide-react";
 import { useFavoriteToggle } from "@/hooks/useResourceToggle";
@@ -28,6 +29,22 @@ function FavoriteButton({
   const [isFavorited, setIsFavorited] = useState(initialFavorited);
   const [favoriteCount, setFavoriteCount] = useState(initialCount);
   const { isAuthenticated } = useAuth();
+
+  // Most surfaces (bookmarks, search, list/compact modes) pass bare resources
+  // without isFavorited, so derive the state from the shared /api/favorites
+  // query the toggle hook invalidates; the prop only seeds it until the list
+  // loads (same approach as BookmarkButton).
+  const { data: favoritesList } = useQuery<Array<{ id: number | string }>>({
+    queryKey: ["/api/favorites"],
+    enabled: isAuthenticated,
+    staleTime: 60_000,
+  });
+  const serverFavorited = favoritesList !== undefined
+    ? favoritesList.some((f) => String(f.id) === String(resourceId))
+    : initialFavorited;
+  useEffect(() => {
+    setIsFavorited(isAuthenticated ? serverFavorited : false);
+  }, [isAuthenticated, serverFavorited]);
 
   // Favorites are account-only while bookmarks work for guests, so the two
   // otherwise-identical icon buttons must say which is which. Owned here (not

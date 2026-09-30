@@ -1,19 +1,19 @@
 import { type MouseEvent, useEffect, useRef, useState } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { apiRequest } from "@/lib/queryClient";
-import { formatAdminDateTime } from "@/lib/utils";
+import { formatAdminDateTime, formatRelativeAgo } from "@/lib/utils";
 import { useToast } from "@/hooks/use-toast";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
-import { CheckCircle2, XCircle, Eye, ExternalLink, AlertTriangle, Sparkles, RefreshCw, AlertCircle } from "lucide-react";
+import { ExternalLink, AlertTriangle, Sparkles, RefreshCw, AlertCircle } from "lucide-react";
 import type { Resource, ResourceEdit } from "@shared/schema";
+import { Link } from "wouter";
 import "./queues-review.css";
 
 interface ResourceEditWithResource extends ResourceEdit {
@@ -21,14 +21,6 @@ interface ResourceEditWithResource extends ResourceEdit {
 }
 
 const MIN_REJECTION_REASON_LENGTH = 10;
-
-function StatusChip({ status }: { status: "pending" | "approved" | "rejected" }) {
-  return (
-    <Badge variant="chip" className={`admin-chip queue-review-status queue-review-status--${status}`}>
-      {status}
-    </Badge>
-  );
-}
 
 // BUG-012 (run25): invisible characters must be VISIBLE in review. A
 // zero-width-only value used to render as a blank "+ " line, so a reviewer
@@ -57,7 +49,7 @@ function DiffValue({ value }: { value: string | number | null }) {
     <>
       <span className="break-all">{text}</span>
       {count > 0 && (
-        <span className={"ml-1 inline-block align-middle rounded bg-[#ffb84d]/15 px-1 text-[10px] font-medium uppercase tracking-wide text-[#ffb84d]" /* DS-OK: status warn */}>
+        <span className={"ml-1 inline-block align-middle rounded bg-[var(--status-warn)]/15 px-1 text-[10px] font-medium uppercase tracking-wide text-[var(--status-warn)]" /* DS-OK: status warn */}>
           {visibleRest === "" ? "invisible characters only" : `${count} invisible char${count === 1 ? "" : "s"}`}
         </span>
       )}
@@ -89,10 +81,8 @@ export default function PendingEdits() {
   // at narrow widths with no affordance that more columns existed.
   const scrollRef = useRef<HTMLDivElement>(null);
   const [showSwipeHint, setShowSwipeHint] = useState(false);
-  // R5-058 (run25): the shadcn <Table> renders its own inner `overflow-auto`
-  // wrapper — THAT is the element that actually scrolls horizontally. Track
-  // ITS scrollLeft so the gradient cue hides at max scroll and re-shows when
-  // the user scrolls back.
+  // R5-058 (run25): track the table viewport's scrollLeft so the gradient
+  // cue hides at max scroll and re-shows when the user scrolls back.
   useEffect(() => {
     const el = scrollRef.current;
     if (!el) return;
@@ -208,14 +198,14 @@ export default function PendingEdits() {
 
   const renderDiff = (changes: Record<string, { old: string | number | null; new: string | number | null }>) => {
     return Object.entries(changes).map(([field, { old: oldValue, new: newValue }]) => (
-      <div key={field} className={"border-l-4 border-[#ffb84d] pl-3 py-2 mb-2" /* DS-OK: status warn */}>
+      <div key={field} className={"border-l-4 border-[var(--status-warn)] pl-3 py-2 mb-2" /* DS-OK: status warn */}>
         <p className="text-sm font-semibold capitalize">{field}</p>
         <div className="mt-1 space-y-1">
-          <p className={"text-sm text-[#ff5c7a]" /* DS-OK: status bad */}>
+          <p className={"text-sm text-[var(--status-bad)]" /* DS-OK: status bad */}>
             <span className="font-mono">- </span>
             <DiffValue value={oldValue} />
           </p>
-          <p className={"text-sm text-[#34d08c]" /* DS-OK: status ok */}>
+          <p className={"text-sm text-[var(--status-ok)]" /* DS-OK: status ok */}>
             <span className="font-mono">+ </span>
             <DiffValue value={newValue} />
           </p>
@@ -243,8 +233,8 @@ export default function PendingEdits() {
       <section className="admin-panel queue-review-shell" aria-labelledby="pending-edits-heading">
         <div className="admin-panel__heading queue-review-shell-heading">
           <div>
-            <h2 id="pending-edits-heading">Pending Edits</h2>
-            <p>Edit suggestions awaiting review</p>
+            <h2 id="pending-edits-heading">Edit history</h2>
+            <p>Pending and recent edits to resources</p>
           </div>
         </div>
         <div className="queue-review-loading-table" aria-label="Loading pending edits">
@@ -273,7 +263,6 @@ export default function PendingEdits() {
           <Button
             variant="ghost"
             size="sm"
-            className="queue-review-extra-action"
             onClick={() => {
               void queryClient.invalidateQueries({ queryKey: ['/api/admin/resource-edits'] });
             }}
@@ -283,9 +272,17 @@ export default function PendingEdits() {
             Check again
           </Button>
         </div>
-        <div className="admin-table-wrap">
+        {/* axe scrollable-region-focusable: the header-only empty table still
+            scrolls sideways on narrow viewports, so the wrap must be reachable. */}
+        <div
+          className="admin-table-wrap focus-visible:outline focus-visible:outline-2 focus-visible:outline-ring"
+          tabIndex={0}
+          role="region"
+          aria-label="Pending edits table, empty, scrollable"
+        >
           <table className="table">
-            <thead><tr><th>Resource</th><th>Field</th><th>Editor</th><th>When</th><th /></tr></thead>
+            <thead><tr><th>Resource</th><th>Field</th><th>Editor</th><th>When</th><th><span className="sr-only">Actions</span></th></tr></thead>
+            <tbody><tr><td colSpan={5} className="queue-review-empty-row">No pending edits.</td></tr></tbody>
           </table>
         </div>
       </section>
@@ -297,11 +294,8 @@ export default function PendingEdits() {
       <section className="admin-panel queue-review-shell" aria-labelledby="pending-edits-heading">
         <div className="admin-panel__heading queue-review-shell-heading">
           <div>
-            <h2 id="pending-edits-heading" className="queue-review-title">
-              Pending Edits
-              <Badge variant="accent" className="queue-review-count">{edits.length}</Badge>
-            </h2>
-            <p>{edits.length} edit suggestions awaiting review</p>
+            <h2 id="pending-edits-heading">Edit history</h2>
+            <p>{edits.length} pending edits awaiting review</p>
           </div>
         </div>
         {/* R4-012 (run21): shared narrow-admin-table strategy — a native
@@ -327,115 +321,118 @@ export default function PendingEdits() {
             onKeyDown={(e) => {
               const el = scrollRef.current;
               if (!el) return;
-              // R5-058: scroll the shadcn <Table>'s own inner overflow-auto
-              // wrapper — the outer viewport only overflows vertically.
               const scroller = (el.querySelector('table')?.parentElement ?? el) as HTMLElement;
               if (e.key === 'ArrowRight') { scroller.scrollBy({ left: 80 }); e.preventDefault(); }
               else if (e.key === 'ArrowLeft') { scroller.scrollBy({ left: -80 }); e.preventDefault(); }
             }}
           >
-            <Table className="queue-review-table queue-review-table--edits min-w-[720px]">
-              <TableHeader>
-                <TableRow>
-                  <TableHead>Resource</TableHead>
-                  <TableHead>Changes</TableHead>
-                  <TableHead>AI Analysis</TableHead>
-                  <TableHead>Submitted</TableHead>
-                  <TableHead>Status</TableHead>
-                  <TableHead className="text-right">Actions</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {edits.map((edit) => (
-                  <TableRow key={edit.id} data-testid={`row-pending-edit-${edit.id}`}>
-                    <TableCell className="font-medium">
-                      <div className="flex items-center gap-2">
+            <table className="table queue-review-table queue-review-table--edits">
+              <colgroup>
+                <col />
+                <col className="queue-review-col-field" />
+                <col className="queue-review-col-submitter" />
+                <col className="queue-review-col-when" />
+                <col className="queue-review-col-actions" />
+              </colgroup>
+              <thead>
+                <tr>
+                  <th>Resource</th>
+                  <th>Field</th>
+                  <th>Editor</th>
+                  <th>When</th>
+                  <th><span className="sr-only">Actions</span></th>
+                </tr>
+              </thead>
+              <tbody>
+                {edits.map((edit) => {
+                  const fields = Object.keys(edit.proposedChanges);
+                  const title = edit.resource?.title || 'Unknown Resource';
+                  return (
+                  <tr key={edit.id} data-testid={`row-pending-edit-${edit.id}`}>
+                    <td>
+                      <div className="queue-review-item-title">
                         {hasConflict(edit) && (
-                          <AlertTriangle className={"h-4 w-4 text-[#ffb84d]" /* DS-OK: status warn */} />
+                          <AlertTriangle
+                            className="queue-review-conflict"
+                            aria-label="Resource changed since this edit was proposed"
+                          />
                         )}
-                        <div>
-                          <p>{edit.resource?.title || 'Unknown Resource'}</p>
-                          {edit.resource?.url && (
-                            <a
-                              href={edit.resource.url}
-                              target="_blank"
-                              rel="noopener noreferrer"
-                              className="text-xs text-muted-foreground hover:text-primary flex items-center gap-1"
-                              data-testid={`link-edit-resource-${edit.id}`}
-                            >
-                              <ExternalLink className="h-3 w-3" />
-                              View Resource
-                            </a>
-                          )}
-                        </div>
+                        <span title={title}>
+                          <Link href={`/resource/${edit.resourceId}`} data-testid={`link-edit-resource-detail-${edit.id}`}>
+                            {title}
+                          </Link>
+                        </span>
+                        {edit.resource?.url && (
+                          <a
+                            href={edit.resource.url}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="queue-review-item-link"
+                            aria-label={`Open ${title} in a new tab`}
+                            data-testid={`link-edit-resource-${edit.id}`}
+                          >
+                            <ExternalLink className="h-3 w-3" />
+                          </a>
+                        )}
                       </div>
-                    </TableCell>
-                    <TableCell>
-                      <Badge variant="outline">
-                        {Object.keys(edit.proposedChanges).length} field(s)
-                      </Badge>
-                    </TableCell>
-                    <TableCell>
-                      {edit.claudeMetadata ? (
-                        <div className="flex items-center gap-1">
-                          <Sparkles className={"h-4 w-4 text-[#9d4edd]" /* DS-OK: violet info (DS chart/info constant) */} />
-                          <span className="text-xs">
-                            {Math.round((edit.claudeMetadata.confidence || 0) * 100)}%
-                          </span>
-                        </div>
-                      ) : (
-                        <span className="text-xs text-muted-foreground">No AI</span>
+                      {edit.claudeMetadata && (
+                        <span className="queue-review-sub queue-review-ai">
+                          <Sparkles className="h-3 w-3" aria-hidden="true" />
+                          AI {Math.round((edit.claudeMetadata.confidence || 0) * 100)}%
+                        </span>
                       )}
-                    </TableCell>
-                    <TableCell className="text-sm text-muted-foreground">
-                      {formatDate(edit.createdAt)}
-                    </TableCell>
-                    <TableCell>
-                      <StatusChip status="pending" />
-                    </TableCell>
-                    <TableCell className="queue-review-action-cell text-right">
-                      <div className="flex items-center justify-end gap-2">
+                    </td>
+                    <td className="mono queue-review-mono">
+                      <span className="queue-review-truncate" title={fields.join(', ')}>
+                        {fields.length > 0 ? fields.join(', ') : '—'}
+                      </span>
+                    </td>
+                    <td className="mono queue-review-mono">
+                      <span className="queue-review-truncate" title={edit.submittedBy}>{edit.submittedBy}</span>
+                    </td>
+                    <td className="mono queue-review-mono queue-review-when">
+                      <time dateTime={new Date(edit.createdAt).toISOString()} title={formatDate(edit.createdAt)}>
+                        {formatRelativeAgo(edit.createdAt)}
+                      </time>
+                    </td>
+                    <td className="queue-review-action-cell">
+                      <div className="queue-review-row-actions">
                         <Button
                           variant="ghost"
                           size="sm"
                           onClick={() => handleViewDetails(edit)}
-                          aria-label={`View edit details for ${edit.resource?.title || 'resource'}`}
+                          aria-label={`View diff for ${title}`}
                           data-testid={`button-view-edit-${edit.id}`}
                         >
-                          <Eye className="h-4 w-4" />
+                          Diff
                         </Button>
-                        {/* Run19 BUG-014: affirmative green, matching the
-                            Approvals tab — the theme's primary is red-toned,
-                            so variant="default" read as destructive. */}
                         <Button
-                          variant="default"
+                          variant="outline"
                           size="sm"
-                          className={"bg-[#34d08c] hover:bg-[#34d08c]/90 text-black" /* DS-OK: status ok */}
                           onClick={() => handleApproveClick(edit)}
                           disabled={approveMutation.isPending}
-                          aria-label={`Approve edit for ${edit.resource?.title || 'resource'}`}
+                          aria-label={`Approve edit for ${title}`}
                           data-testid={`button-approve-edit-${edit.id}`}
                         >
-                          <CheckCircle2 className="h-4 w-4 mr-1" />
                           Approve
                         </Button>
                         <Button
-                          variant="destructive"
+                          variant="ghost"
                           size="sm"
                           onClick={() => handleRejectClick(edit)}
                           disabled={rejectMutation.isPending}
-                          aria-label={`Reject edit for ${edit.resource?.title || 'resource'}`}
+                          aria-label={`Reject edit for ${title}`}
                           data-testid={`button-reject-edit-${edit.id}`}
                         >
-                          <XCircle className="h-4 w-4 mr-1" />
                           Reject
                         </Button>
                       </div>
-                    </TableCell>
-                  </TableRow>
-                ))}
-              </TableBody>
-            </Table>
+                    </td>
+                  </tr>
+                  );
+                })}
+              </tbody>
+            </table>
           </div>
           {showSwipeHint && (
             <p className="mt-2 text-xs text-muted-foreground" data-testid="text-swipe-hint-edits">
@@ -457,11 +454,11 @@ export default function PendingEdits() {
           {selectedEdit && (
             <div className="space-y-4">
               {hasConflict(selectedEdit) && (
-                <div className={"bg-[#ffb84d]/10 border border-[#ffb84d]/30 rounded-lg p-4" /* DS-OK: status warn */}>
+                <div className={"bg-[var(--status-warn)]/10 border border-[var(--status-warn)]/30 rounded-lg p-4" /* DS-OK: status warn */}>
                   <div className="flex items-start gap-2">
-                    <AlertTriangle className={"h-5 w-5 text-[#ffb84d] mt-0.5" /* DS-OK: status warn */} />
+                    <AlertTriangle className={"h-5 w-5 text-[var(--status-warn)] mt-0.5" /* DS-OK: status warn */} />
                     <div>
-                      <h4 className={"font-semibold text-[#ffb84d]" /* DS-OK: status warn */}>
+                      <h4 className={"font-semibold text-[var(--status-warn)]" /* DS-OK: status warn */}>
                         Conflict Detected
                       </h4>
                       <p className="text-sm text-foreground mt-1">
@@ -492,10 +489,10 @@ export default function PendingEdits() {
               {selectedEdit.claudeMetadata && (
                 <div>
                   <h3 className="font-semibold mb-2 flex items-center gap-2">
-                    <Sparkles className={"h-4 w-4 text-[#9d4edd]" /* DS-OK: violet info (DS chart/info constant) */} />
+                    <Sparkles className={"h-4 w-4 text-[var(--status-info-2)]" /* DS-OK: violet info (DS chart/info constant) */} />
                     AI Analysis
                   </h3>
-                  <div className={"bg-[#9d4edd]/10 rounded-lg p-3 space-y-2" /* DS-OK: violet info (DS chart/info constant) */}>
+                  <div className={"bg-[var(--status-info-2)]/10 rounded-lg p-3 space-y-2" /* DS-OK: violet info (DS chart/info constant) */}>
                     <div className="flex items-center justify-between">
                       <span className="text-sm font-medium">Confidence</span>
                       <Badge variant="secondary">
@@ -546,7 +543,7 @@ export default function PendingEdits() {
             <AlertDialogDescription>
               {editToApprove && hasConflict(editToApprove) ? (
                 <div className="space-y-2">
-                  <div className={"flex items-start gap-2 text-[#ffb84d]" /* DS-OK: status warn */}>
+                  <div className={"flex items-start gap-2 text-[var(--status-warn)]" /* DS-OK: status warn */}>
                     <AlertTriangle className="h-4 w-4 mt-0.5" />
                     <span>
                       Warning: The resource has been modified since this edit was created.
@@ -578,7 +575,7 @@ export default function PendingEdits() {
             <AlertDialogAction
               onClick={handleApproveConfirm}
               disabled={approveMutation.isPending}
-              className={"bg-[#34d08c] text-black hover:bg-[#34d08c]/90" /* DS-OK: status ok */}
+              className={"bg-[var(--status-ok)] text-black hover:bg-[var(--status-ok)]/90" /* DS-OK: status ok */}
               data-testid="button-confirm-approve-edit"
             >
               {approveMutation.isPending ? "Approving..." : "Approve & Merge"}

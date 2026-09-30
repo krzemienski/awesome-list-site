@@ -32,14 +32,17 @@ const APP_SIDEBAR = resolve(
   process.cwd(),
   'client/src/components/layout/new/AppSidebar.tsx',
 );
-const DESIGN_SYSTEM_CSS = resolve(
-  process.cwd(),
-  'client/src/styles/shell/sidebar.css',
-);
+// sidebar.css is an @import entry; the rules live in its partials.
+const SIDEBAR_CSS = [
+  'sidebar.css',
+  'sidebar-shell.css',
+  'sidebar-categories.css',
+  'sidebar-tree.css',
+].map((file) => resolve(process.cwd(), 'client/src/styles/shell', file));
 
 describe('Phase 8 — Sidebar UX static guards (BUG-007 + BUG-043)', () => {
   const tsx = readFileSync(APP_SIDEBAR, 'utf-8');
-  const css = readFileSync(DESIGN_SYSTEM_CSS, 'utf-8');
+  const css = SIDEBAR_CSS.map((file) => readFileSync(file, 'utf-8')).join('\n');
 
   describe('BUG-007 — chevron hit area (≥24 wide × ≥44 tall)', () => {
     it('AppSidebar top-level chevron declares a 40×44px minimum hit area', () => {

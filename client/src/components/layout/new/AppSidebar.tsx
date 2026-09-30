@@ -15,7 +15,7 @@ import {
   PanelLeft,
 } from "lucide-react";
 import { cn, slugify, getCategorySlug } from "@/lib/utils";
-import { BrandMark } from "@/components/BrandMark";
+import { getCategoryGlyph } from "./category-glyphs";
 import {
   Sidebar,
   SidebarContent,
@@ -126,28 +126,6 @@ function categoryStorageKey(cat: NavCategory): string {
 }
 
 /*
- * The V2 navigation uses category glyphs as taxonomy markers. These are
- * decorative because each category link already has an explicit accessible
- * name, so keeping them local avoids changing the shared icon map used by
- * other product surfaces.
- */
-const CATEGORY_GLYPHS: Record<string, string> = {
-  "Community & Events": "◈",
-  "Encoding & Codecs": "◇",
-  "General Tools": "◆",
-  "Infrastructure & Delivery": "▣",
-  "Intro & Learning": "▤",
-  "Media Tools": "▥",
-  "Players & Clients": "▶",
-  "Protocols & Transport": "⟁",
-  "Standards & Industry": "◉",
-};
-
-function getCategoryGlyph(categoryName: string): string {
-  return CATEGORY_GLYPHS[categoryName] ?? "◈";
-}
-
-/*
  * The reference AVSidebarV2 keeps disclosure state in localStorage so a user
  * can move between taxonomy routes without losing their place in the tree.
  * Keep the storage adapter deliberately defensive: this component also renders
@@ -218,29 +196,17 @@ function SubItem({
       data-active={active || undefined}
       aria-current={active ? "page" : undefined}
       className={cn(
-        "sub-item touch-manipulation min-h-[44px] no-underline w-full",
+        "sub-item av-sidebar-leaf touch-manipulation min-h-[44px] no-underline w-full",
         size === "xs" && "text-[12px]",
         italic && "italic",
       )}
-      style={
-        active
-          ? {
-              color: "var(--accent)",
-              background: "color-mix(in srgb, var(--accent) 8%, transparent)",
-              borderColor:
-                "color-mix(in srgb, var(--accent) 25%, var(--border))",
-            }
-          : count === 0
-            ? { opacity: 0.45 }
-            : undefined
-      }
+      style={count === 0 ? { opacity: 0.45 } : undefined}
       title={count === 0 ? `${label} (no resources yet)` : label}
     >
-      <span className="flex-1 min-w-0 break-words" title={label}>{label}</span>
+      <span className="av-sidebar-leaf-label" title={label}>{label}</span>
       {typeof count === "number" && (
         <span
-          className="font-mono shrink-0 tabular-nums"
-          style={{ fontSize: 12, color: "var(--text-3)" }}
+          className="av-sidebar-leaf-count font-mono shrink-0 tabular-nums"
           // BUG-049 (run19): bare numbers were ambiguous next to the labeled
           // "N resources" header — give every count an explicit unit for
           // assistive tech and a hover title for sighted users.
@@ -259,6 +225,41 @@ function SubItem({
         </span>
       )}
     </a>
+  );
+}
+
+/**
+ * F204: a native <details> popover never closes on Escape or an outside
+ * click, so the "…" menu stayed open over the sidebar rows. Close it on
+ * both, returning focus to the summary after Escape.
+ */
+function DismissibleDetails({ className, children }: { className: string; children: ReactNode }) {
+  const ref = useRef<HTMLDetailsElement>(null);
+  const [open, setOpen] = useState(false);
+
+  useEffect(() => {
+    if (!open) return;
+    const close = (event: PointerEvent) => {
+      if (ref.current && !ref.current.contains(event.target as Node)) ref.current.open = false;
+    };
+    document.addEventListener("pointerdown", close);
+    return () => document.removeEventListener("pointerdown", close);
+  }, [open]);
+
+  return (
+    <details
+      ref={ref}
+      className={className}
+      onToggle={(e) => setOpen(e.currentTarget.open)}
+      onKeyDown={(e) => {
+        if (e.key !== "Escape" || !ref.current?.open) return;
+        e.stopPropagation();
+        ref.current.open = false;
+        ref.current.querySelector("summary")?.focus();
+      }}
+    >
+      {children}
+    </details>
   );
 }
 
@@ -489,6 +490,7 @@ function CategoryAccordion({
                         className="av-sidebar-l2-link no-underline"
                       >
                         <span>{sub.name}</span>
+                        <span className="av-sidebar-nested-count" aria-hidden="true">+{subSubs.length}</span>
                         <span
                           className="font-mono tabular-nums"
                           title={`${formatCount(subCount)} ${subCount === 1 ? "resource" : "resources"}`}
@@ -500,14 +502,13 @@ function CategoryAccordion({
                       <button
                         type="button"
                         onClick={() => toggleSub(subKey(sub.name))}
-                        aria-label={`${subOpen ? "Collapse" : "Expand"} ${subSubs.length} nested groups in ${sub.name}`}
+                        aria-label={`${subOpen ? "Collapse" : "Expand"} ${subSubs.length} nested ${subSubs.length === 1 ? "group" : "groups"} in ${sub.name}`}
                         aria-expanded={subOpen}
                         aria-controls={`${bodyId}-sub-${subSlug}`}
                         data-state={subOpen ? "open" : "closed"}
                         data-testid={`expand-sub-${subSlug}`}
-                        className="av-sidebar-l2-toggle"
+                        className="icon-btn av-sidebar-l2-toggle"
                       >
-                        <span className="av-sidebar-nested-count" aria-hidden="true">+{subSubs.length}</span>
                         <ChevronRight className={cn("size-[9px] chevron-rotate", subOpen && "rotate-90")} />
                       </button>
                     </div>
@@ -740,7 +741,7 @@ export default function AppSidebar({
         aria-label={`${brandName} home`}
         className="flex min-h-7 items-center gap-[10px] px-0 py-0 no-underline"
       >
-        <BrandMark className="size-7 shrink-0" />
+        <span className="av-sidebar-drawer-logo" aria-hidden="true">av</span>
         <span className="av-sidebar-drawer-wordmark">
           {brandWordmark}
           <span className="sr-only" data-testid="sidebar-resource-count">
@@ -838,8 +839,7 @@ export default function AppSidebar({
             <button
               type="button"
               onClick={() => onRetryNav()}
-              className="underline underline-offset-2 font-medium min-h-[44px] md:min-h-[36px]"
-              style={{ color: "var(--text-2)" }}
+              className="btn ghost min-h-[44px]"
               data-testid="sidebar-nav-retry"
             >
               Retry
@@ -873,7 +873,7 @@ export default function AppSidebar({
       label: "About",
       icon: BookOpen,
       href: "/about",
-      testId: "footer-about",
+      testId: "nav-about",
     },
   ];
   const drawerMoreItems = [...navItems.slice(2), accountDashboardItem];
@@ -886,7 +886,7 @@ export default function AppSidebar({
     ...(user?.role === "admin"
       ? [{ label: "Admin", icon: Shield, href: "/admin", testId: "nav-admin" }]
       : []),
-    { label: "About", icon: Info, href: "/about", testId: "footer-about" },
+    { label: "About", icon: Info, href: "/about", testId: "nav-about" },
   ];
 
   const resourceStatus = (
@@ -910,7 +910,7 @@ export default function AppSidebar({
     compact = false,
     showNavigationModeToggle = false,
   ) => (
-    <details className={`av-sidebar-more-navigation ${className}`}>
+    <DismissibleDetails className={`av-sidebar-more-navigation ${className}`}>
       <summary
         className="flex min-h-[44px] cursor-pointer items-center px-3 text-xs font-medium text-[var(--text-2)]"
         aria-label={compact ? "More navigation" : undefined}
@@ -968,7 +968,7 @@ export default function AppSidebar({
           );
         })}
       </SidebarMenu>
-    </details>
+    </DismissibleDetails>
   );
 
   const homeNavigation = (
@@ -985,7 +985,7 @@ export default function AppSidebar({
         className="sub-item touch-manipulation min-h-[44px] no-underline w-full"
       >
         <span className="flex min-w-0 items-center gap-[10px]">
-          <Home className="size-[14px] shrink-0" />
+          <Home className="size-[13px] shrink-0" />
           <span className="break-words">Home</span>
         </span>
       </a>
@@ -1016,7 +1016,7 @@ export default function AppSidebar({
         data-testid="sidebar-compact-navigation"
         aria-label="Collapse sidebar"
         title="Collapse sidebar"
-        className="av-sidebar-collapse-toggle"
+        className="btn icon av-sidebar-collapse-toggle"
       >
         <ChevronRight aria-hidden="true" className="size-[10px]" />
       </button>
@@ -1099,8 +1099,10 @@ export default function AppSidebar({
         onSubmit={(e) => {
           e.preventDefault();
           const form = e.currentTarget;
-          const query = new FormData(form).get("q")?.toString() ?? "";
-          navigate(`/search?q=${encodeURIComponent(query.trim())}`);
+          const query = new FormData(form).get("q")?.toString().trim() ?? "";
+          // Matches the header palette: Enter on a blank query is a no-op.
+          if (!query) return;
+          navigate(`/search?q=${encodeURIComponent(query)}`);
         }}
       >
         <div className="av-sidebar-drawer-search-control">
@@ -1109,8 +1111,8 @@ export default function AppSidebar({
             type="search"
             className="search-input"
             name="q"
-            placeholder="Search..."
-            aria-label="Search navigation"
+            placeholder="Search resources..."
+            aria-label="Search resources"
           />
         </div>
       </form>
@@ -1187,7 +1189,7 @@ export default function AppSidebar({
             <button
               type="button"
               onClick={() => setOpen(true)}
-              className="rail-icon-btn rail-expand-navigation touch-manipulation"
+              className="icon-btn rail-icon-btn rail-expand-navigation touch-manipulation"
               data-testid="sidebar-expanded-navigation"
               aria-label="Expand sidebar"
               title="Expand sidebar"

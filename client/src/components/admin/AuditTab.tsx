@@ -1,7 +1,7 @@
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { ApiError } from "@/lib/queryClient";
 import { formatRelativeAgo } from "@/lib/utils";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, keepPreviousData } from "@tanstack/react-query";
 import { TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -102,10 +102,14 @@ export default function AuditTab() {
   // Run17 BUG-010: real pagination — the tab used to silently cap at the row
   // limit with no way to reach older entries.
   const [offset, setOffset] = useState(0);
+  // Reaching the first/last page disables the pager button that was just
+  // pressed; hand focus to its sibling so keyboard users don't drop to <body>.
+  const prevButtonRef = useRef<HTMLButtonElement>(null);
+  const nextButtonRef = useRef<HTMLButtonElement>(null);
 
   // Run23 NB-041: surface fetch failures as a distinct error state instead of
   // letting them render as the "No audit log entries found" empty state.
-  const { data, isLoading, isError, refetch, isFetching } = useQuery<AuditLogsResponse>({
+  const { data, isLoading, isError, refetch, isFetching, isPlaceholderData } = useQuery<AuditLogsResponse>({
     queryKey: ['/api/admin/audit-logs', appliedFilter, appliedLimit, offset],
     queryFn: async () => {
       const params = new URLSearchParams({ limit: appliedLimit, offset: String(offset) });
@@ -117,6 +121,9 @@ export default function AuditTab() {
     // R5-037: refresh admin data when the operator returns to the tab.
     staleTime: 30_000,
     refetchOnWindowFocus: true,
+    // F1080: keep the current page (and the focused pager button) mounted
+    // while the next page loads instead of swapping in the skeleton.
+    placeholderData: keepPreviousData,
   });
 
   // ADM-08: validate the Resource ID filter client-side against the SAME rule
@@ -191,22 +198,20 @@ export default function AuditTab() {
   return (
     <div className="admin-ops-audit-stack">
     <TableShell
-      title={
-        <span className="admin-ops-audit-title">
-          <span>Audit log</span>
-          <Button
-            type="button"
-            variant="ghost"
-            size="sm"
-            onClick={() => setShowTools((visible) => !visible)}
-            aria-expanded={showTools}
-            data-testid="button-audit-tools"
-          >
-            {showTools ? "Hide tools" : "Tools"}
-          </Button>
-        </span>
+      title="Audit log"
+      actions={
+        <Button
+          type="button"
+          variant="ghost"
+          size="sm"
+          onClick={() => setShowTools((visible) => !visible)}
+          aria-expanded={showTools}
+          data-testid="button-audit-tools"
+        >
+          {showTools ? "Hide tools" : "Tools"}
+        </Button>
       }
-      description="Append-only · last 100 events"
+      description={`Append-only · ${appliedLimit} events per page`}
       className="admin-ops-audit-shell"
     >
       <div className="space-y-4">
@@ -391,29 +396,43 @@ export default function AuditTab() {
         )}
 
         {/* Run17 BUG-010: range readout + Previous/Next through the full log. */}
-        {showTools && data && data.total > 0 && (
-          <div className="flex flex-wrap items-center justify-between gap-3 pt-2">
+        {data && data.total > 0 && (
+          <div className="admin-ops-pagination flex flex-wrap items-center justify-between gap-3 pt-2">
             <p className="text-sm text-muted-foreground" data-testid="text-audit-range">
               {offset + 1}–{Math.min(offset + (data.logs?.length || 0), data.total)} of{" "}
               {data.total.toLocaleString()} entries
             </p>
             <div className="flex gap-2">
               <Button
+                ref={prevButtonRef}
                 type="button"
                 variant="outline"
                 size="sm"
-                disabled={offset === 0 || isFetching}
-                onClick={() => setOffset(Math.max(0, offset - parseInt(appliedLimit, 10)))}
+                disabled={offset === 0}
+                aria-busy={isPlaceholderData}
+                onClick={() => {
+                  if (isPlaceholderData) return;
+                  const nextOffset = Math.max(0, offset - parseInt(appliedLimit, 10));
+                  if (nextOffset === 0) nextButtonRef.current?.focus();
+                  setOffset(nextOffset);
+                }}
                 data-testid="button-audit-prev"
               >
                 Previous
               </Button>
               <Button
+                ref={nextButtonRef}
                 type="button"
                 variant="outline"
                 size="sm"
-                disabled={offset + parseInt(appliedLimit, 10) >= data.total || isFetching}
-                onClick={() => setOffset(offset + parseInt(appliedLimit, 10))}
+                disabled={offset + parseInt(appliedLimit, 10) >= data.total}
+                aria-busy={isPlaceholderData}
+                onClick={() => {
+                  if (isPlaceholderData) return;
+                  const nextOffset = offset + parseInt(appliedLimit, 10);
+                  if (nextOffset + parseInt(appliedLimit, 10) >= data.total) prevButtonRef.current?.focus();
+                  setOffset(nextOffset);
+                }}
                 data-testid="button-audit-next"
               >
                 Next

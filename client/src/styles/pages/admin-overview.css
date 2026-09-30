@@ -66,7 +66,10 @@
 }
 
 .admin-overview-stats-canonical .admin-canonical-stat__value--accent {
-  color: var(--accent);
+  /* Reference admin.jsx tints the highlighted stat value in --accent; Stage 7
+     reserves accent for the surface's primary action, so the highlighted
+     stat stays in primary ink (the card itself remains interactive). */
+  color: var(--text);
 }
 
 .admin-overview-stats-canonical .admin-canonical-stat__sub {
@@ -78,7 +81,7 @@
 }
 
 .admin-overview-stats-canonical .admin-canonical-stat__sub button {
-  min-height: 1.5rem;
+  min-height: 44px;
   color: inherit;
   text-decoration: underline;
   text-decoration-style: dotted;
@@ -93,6 +96,14 @@
 
 .admin-overview-canonical .admin-canonical-overview-grid {
   display: grid;
+  /*
+   * The frozen admin grid's intrinsic 360px track. At a 375px viewport the
+   * 40px page inset leaves 295px: the reference lets that track overflow the
+   * viewport (its capture grows to 400px, `noPageOverflow: false` in the
+   * runner's reference geometry), while the app shell clips the page at the
+   * viewport, which cut the card's right border and its last column. Cap the
+   * track at the container so the card fits; every width ≥ 440px is unchanged.
+   */
   grid-template-columns: repeat(auto-fill, minmax(min(360px, 100%), 1fr));
   gap: 16px;
 }
@@ -220,29 +231,50 @@
   font-size: 0.625rem;
 }
 
+/* Reference column is 38px for "TX#1"; live ids ("TX#25627") are wider, so
+   38px is a floor rather than a fixed width that lets the id run into the actor. */
 .admin-overview-canonical .admin-canonical-activity-id {
-  inline-size: 38px;
+  min-inline-size: 38px;
 }
 
 .admin-overview-canonical .admin-canonical-activity-actor {
   flex: 0 1 auto;
   min-width: 0;
   overflow: hidden;
-  color: var(--accent);
+  /* Reference admin.jsx paints the actor in --accent; Stage 7 (one accent
+     moment per surface) forbids six accent names per viewport, so the actor
+     is emphasised by weight in primary ink instead. */
+  color: var(--text);
   font-weight: 500;
   text-overflow: ellipsis;
   white-space: nowrap;
 }
 
 .admin-overview-canonical .admin-canonical-activity-action {
-  flex: 0 1 auto;
+  /* Reference admin.jsx: action and time are plain flex items; only the target
+     truncates. Live rows carry long masked emails, which under the reference's
+     equal shrink squeezed the target to nothing and broke short actions
+     mid-word ("updat/ed") at 375. The action keeps its natural width up to 40%
+     of the row, wrapping at spaces beyond that ("recommendation feedback /
+     restored"); `anywhere` only applies to a single word wider than that cap,
+     so the row never overflows into a keyboard-unreachable scroll region. */
+  flex: 0 0 auto;
+  max-inline-size: 40%;
   color: var(--text-2);
+  overflow-wrap: anywhere;
+}
+
+.admin-overview-canonical .admin-canonical-activity-time {
+  flex: 0 0 auto;
   white-space: nowrap;
 }
 
+/* The actor (min-width 0, ellipsis) gives way first; the target keeps a
+   floor wide enough for a full resource id ("#190173") instead of collapsing
+   to "#1…". Longer targets ellipsize and carry the full value in title. */
 .admin-overview-canonical .admin-canonical-activity-target {
-  min-width: 0;
-  flex: 1;
+  min-width: 8ch;
+  flex: 1 1 0;
   overflow: hidden;
   color: var(--text);
   text-overflow: ellipsis;
@@ -324,7 +356,9 @@
   height: 4px;
   overflow: hidden;
   border-radius: var(--radius-pill);
-  background: var(--border);
+  /* Editorial's --surface-3 equals its --border (the reference track); Brutalist's
+     near-opaque --border would swallow the ink bar, --surface-3 does not. */
+  background: var(--surface-3, var(--border));
 }
 
 .admin-overview-canonical .admin-canonical-category-bar {
@@ -332,11 +366,35 @@
   height: 100%;
   min-width: 0.25rem;
   border-radius: var(--radius-pill);
-  background: var(--accent);
+  /* Reference admin.jsx fills these in --accent; five accent bars push the
+     first viewport past Stage 7's eight accent users, and a data bar is not a
+     reserved accent moment, so they read in primary ink. */
+  background: var(--text);
 }
 
 @media (max-width: 48rem) {
   .admin-overview-canonical .admin-canonical-table-shell__heading {
     flex-wrap: wrap;
   }
+
+  /* Five single-line columns ellipsize every cell to fragments at phone
+     width; stack who/when over what/which instead. */
+  .admin-overview-canonical .admin-canonical-activity-row {
+    display: grid;
+    grid-template-areas:
+      "id actor time"
+      "action action action"
+      "target target target";
+    grid-template-columns: auto minmax(0, 1fr) auto;
+    row-gap: 2px;
+  }
+
+  .admin-overview-canonical .admin-canonical-activity-id { grid-area: id; }
+  .admin-overview-canonical .admin-canonical-activity-actor { grid-area: actor; }
+  .admin-overview-canonical .admin-canonical-activity-time { grid-area: time; }
+  .admin-overview-canonical .admin-canonical-activity-action {
+    grid-area: action;
+    max-inline-size: none;
+  }
+  .admin-overview-canonical .admin-canonical-activity-target { grid-area: target; }
 }

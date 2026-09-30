@@ -4,21 +4,32 @@ import type { ResearchJob } from "@shared/schema";
 import { ApiError } from "@/lib/queryClient";
 import { formatRelativeAgo } from "@/lib/utils";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import "./queues-agent.css";
 
 const RESEARCH_WORKSPACE_LIMIT = 4;
+const NOTE_TITLE_MAX = 80;
+
+/**
+ * A heading-sized name for a research brief. Scheduled briefs are several
+ * thousand characters; they name their focus as "campaign angle: …", which is
+ * the useful title. Other briefs use their first sentence, clipped.
+ */
+function researchNoteTitle(brief: string): string {
+  const angle = brief.match(/campaign angle:\s*([^.\n]+)/i)?.[1]?.trim();
+  const lead = angle || brief.split(/(?<=[.!?])\s|\n/)[0].trim();
+  if (lead.length <= NOTE_TITLE_MAX) return lead;
+  const clipped = lead.slice(0, NOTE_TITLE_MAX);
+  return `${clipped.slice(0, clipped.lastIndexOf(" ") > 40 ? clipped.lastIndexOf(" ") : NOTE_TITLE_MAX).trimEnd()}…`;
+}
 
 /** Mirror of the frozen note card: title, candidate count, freshness. */
 function toResearchNote(job: ResearchJob, now = Date.now()) {
   const active = job.status === "pending" || job.status === "processing";
   const brief = job.prompt?.trim() || `Research job #${job.id}`;
-  const firstLine = brief.split(/\r?\n/).find((line) => line.trim())?.trim() || brief;
-  const title = firstLine.length > 76 ? `${firstLine.slice(0, 73).trimEnd()}…` : firstLine;
-  const excerptText = brief.replace(/\s+/g, " ").trim();
-  const excerpt = excerptText.length > 156 ? `${excerptText.slice(0, 153).trimEnd()}…` : excerptText;
+  const title = researchNoteTitle(brief);
   return {
     id: job.id,
     title,
-    excerpt,
     brief,
     candidates: job.totalDiscoveries ?? 0,
     freshness: active ? "Active" : formatRelativeAgo(job.completedAt ?? job.startedAt ?? job.createdAt, now),
@@ -77,15 +88,14 @@ export function ResearchWorkspace() {
                   if (job) setSelectedJob(job);
                 }}
                 aria-haspopup="dialog"
-                aria-label={`Open research note: ${note.title}. ${note.excerpt}`}
+                aria-label={`Open research note: ${note.title}`}
                 data-testid={`button-research-note-${note.id}`}
               >
-                <h3>{note.title}</h3>
-                <p className="admin-research-note__excerpt">{note.excerpt}</p>
-                  <div className="admin-research-note__meta">
-                    <span>{note.candidates} candidates</span>
-                    <span>{note.freshness}</span>
-                  </div>
+                <h3 title={note.title}>{note.title}</h3>
+                <div className="admin-research-note__meta">
+                  <span>{note.candidates} candidates</span>
+                  <span>{note.freshness}</span>
+                </div>
               </button>
             </article>
             );

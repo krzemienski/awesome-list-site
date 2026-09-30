@@ -207,7 +207,6 @@ function ResourceCard({
         variant === "taxonomy" && "resource-card--taxonomy",
         className
       )}
-      data-ds="card-hover"
       onClick={onClick ? handleCardClick : undefined}
       data-testid={`card-resource-${resource.id}`}
     >
@@ -350,7 +349,7 @@ function ResourceCard({
               {resource.category}
             </Badge>
           )}
-          {resolvedKind && (
+          {resolvedKind && resolvedKind !== "other" && (
             <Badge
               variant="chip"
               className="resource-card__kind-badge"
@@ -387,7 +386,7 @@ function ResourceCard({
               {resource.tags.length > 3 && (
                 <button
                   type="button"
-                  className="resource-card__more-tags relative z-10"
+                  className="btn ghost resource-card__more-tags relative z-10"
                   onClick={(e) => {
                     e.stopPropagation();
                     setShowAllTags((v) => !v);

@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Shield, Activity, Sparkles, Zap, List, ArrowRight, Database, Folder, Users, LayoutGrid, Plus, Settings } from "lucide-react";
+import { Shield, Activity, Sparkles, Zap, List, ArrowRight, Database, Folder, Users, LayoutGrid, Plus, Settings, ChevronLeft, ChevronRight } from "lucide-react";
 import { useAdmin } from "@/hooks/useAdmin";
 import { useAuth } from "@/hooks/useAuth";
 import { Link as WLink, useRoute } from "wouter";
@@ -30,14 +30,11 @@ import { ResearchWorkspace } from "@/components/admin/ResearchWorkspace";
 import DigestQueueHealth from "@/components/admin/DigestQueueHealth";
 import ErrorBoundary from "@/components/ErrorBoundary";
 import NotFound from "@/pages/not-found";
-// Run3 audit R3-02: valid tab ids — used to validate /admin/:section
-// deep-links (unknown sections fall back to the default tab).
 import { ApiError } from "@/lib/queryClient";
-const ADMIN_TAB_IDS = [
-  "overview", "approvals", "edits", "enrichment", "researcher", "export", "database",
-  "resources", "categories", "subcategories", "subsubcategories", "journeys",
-   "users", "github", "linkhealth", "digests", "audit", "research",
-] as const;
+// Run3 audit R3-02 / Run16 BUG-034/074/085: valid tab ids and aliases live in
+// one shared module so the SSR middleware accepts exactly the same
+// /admin/:section deep-links (unknown sections fall back to the default tab).
+import { normalizeAdminTab as normalizeTab } from "@shared/admin-tabs";
 const CANONICAL_TABS = [
   ["overview", "Overview", LayoutGrid], ["approvals", "Approvals", Shield],
   ["edits", "Edits", List], ["enrichment", "Enrichment", Sparkles],
@@ -49,23 +46,6 @@ const CANONICAL_TABS = [
   ["research", "Research", Sparkles],
 ] as const;
 
-// Run16 BUG-085: human-guessable slug aliases → canonical tab ids.
-const ADMIN_TAB_ALIASES: Record<string, string> = {
-  "link-health": "linkhealth",
-  "sub-subcategories": "subsubcategories",
-  "sub-subcats": "subsubcategories",
-  "github-sync": "github",
-};
-
-// Run16 BUG-034/074/085: normalize any inbound tab slug (hash, ?tab= query
-// param, or /admin/:section) to a valid tab id, or null if unknown.
-function normalizeTab(raw: string | null | undefined): string | null {
-  if (!raw) return null;
-  const slug = raw.replace(/^#/, "").toLowerCase();
-  const mapped = ADMIN_TAB_ALIASES[slug] ?? slug;
-  return (ADMIN_TAB_IDS as readonly string[]).includes(mapped) ? mapped : null;
-}
-
 function tabFromWindow(): string | null {
   if (typeof window === "undefined") return null;
   const fromHash = normalizeTab(window.location.hash);
@@ -73,6 +53,24 @@ function tabFromWindow(): string | null {
   // BUG-074: /admin?tab=export style deep links.
   const fromQuery = normalizeTab(new URLSearchParams(window.location.search).get("tab"));
   return fromQuery;
+}
+
+// Nearest-edge reveal of a tab trigger inside the strip's own scroller (never
+// the window), inset by the strip's scroll-padding so the trigger never lands
+// under the overlaid scroll-arrow buttons. 1px tolerance so a sub-pixel
+// overhang never nudges the strip.
+function revealTabTrigger(scroller: HTMLElement, trigger: HTMLElement) {
+  if (scroller.scrollWidth <= scroller.clientWidth) return;
+  const style = getComputedStyle(scroller);
+  const insetStart = parseFloat(style.scrollPaddingInlineStart) || 0;
+  const insetEnd = parseFloat(style.scrollPaddingInlineEnd) || 0;
+  const triggerRect = trigger.getBoundingClientRect();
+  const scrollerRect = scroller.getBoundingClientRect();
+  const overflowRight = triggerRect.right - (scrollerRect.right - insetEnd);
+  const overflowLeft = scrollerRect.left + insetStart - triggerRect.left;
+  if (overflowRight <= 1 && overflowLeft <= 1) return;
+  const delta = overflowRight > 1 ? overflowRight : -overflowLeft;
+  scroller.scrollLeft = Math.max(0, Math.min(scroller.scrollLeft + delta, scroller.scrollWidth - scroller.clientWidth));
 }
 
 export default function AdminDashboard() {
@@ -93,7 +91,10 @@ export default function AdminDashboard() {
     return tabFromWindow() ?? "overview";
   });
   const [settingsOpen, setSettingsOpen] = useState(false);
-  const visibleTab = ({ subsubcategories: "subcategories", journeys: "research", digests: "github" } as Record<string, string>)[activeTab] ?? activeTab;
+  // Settings-menu sections that extend a strip tab highlight it; Journeys and
+  // Digests have no parent tab, so each renders its own panel with no strip
+  // tab selected.
+  const visibleTab = ({ subsubcategories: "subcategories" } as Record<string, string>)[activeTab] ?? activeTab;
 
   // Keep the tab in sync if the user navigates between /admin/:section links.
   useEffect(() => {
@@ -126,45 +127,72 @@ export default function AdminDashboard() {
   // The single-row strip overflows below ~1100px. Reveal the active trigger
   // in its own scroller (never the window) so a deep link such as
   // /admin#github shows which tab is open instead of the strip's first tabs;
-  // a trigger that is already fully visible stays put. The strip can still be
-  // wrapping (its page stylesheet not yet applied) when the tab first renders,
-  // so wait for the list to resize into its single row and for fonts to
-  // settle — then stop observing: later viewport changes (a window resize, a
-  // full-page capture) must leave the user's own scroll position alone.
+  // a trigger that is already fully visible stays put. The strip keeps
+  // settling after it first renders (its page stylesheet, fonts, the page
+  // scrollbar appearing once the panel's data loads and narrowing the strip),
+  // so re-reveal on every strip resize until the user scrolls the strip
+  // themselves — from then on their own scroll position is left alone.
+  // The strip only mounts once auth and stats have loaded, so a cold deep link
+  // re-runs this when the loading gates open, not just when the tab changes.
+  const tabStripMounted = !authLoading && !isLoading && !error;
+  useEffect(() => {
+    const scroller = document.querySelector<HTMLElement>(".admin-dashboard__tabs");
+    const host = scroller?.parentElement;
+    if (!scroller || !host) return;
+    let released = false;
+    const reveal = () => {
+      const trigger = scroller.querySelector<HTMLElement>(`[data-testid="tab-${visibleTab}"]`);
+      if (!released && trigger) revealTabTrigger(scroller, trigger);
+    };
+    const observer = new ResizeObserver(reveal);
+    const release = () => {
+      released = true;
+      observer.disconnect();
+    };
+    const userScrollEvents = ["pointerdown", "wheel", "touchstart"] as const;
+    userScrollEvents.forEach((type) => host.addEventListener(type, release, { passive: true }));
+    observer.observe(scroller);
+    document.fonts?.ready.then(reveal);
+    return () => {
+      release();
+      userScrollEvents.forEach((type) => host.removeEventListener(type, release));
+    };
+  }, [visibleTab, tabStripMounted]);
+
+  // The strip overflows at every width below its natural ~1600px and hides
+  // its scrollbar, so show an edge fade + chevron wherever tabs are hidden.
+  const [tabOverflow, setTabOverflow] = useState({ start: false, end: false });
   useEffect(() => {
     const scroller = document.querySelector<HTMLElement>(".admin-dashboard__tabs");
     if (!scroller) return;
-    let revealed = false;
-    const observer = new ResizeObserver(() => reveal());
-    const reveal = () => {
-      const trigger = scroller.querySelector<HTMLElement>(`[data-testid="tab-${visibleTab}"]`);
-      if (revealed || !trigger || scroller.scrollWidth <= scroller.clientWidth) return;
-      revealed = true;
-      observer.disconnect();
-      const triggerRect = trigger.getBoundingClientRect();
-      const scrollerRect = scroller.getBoundingClientRect();
-      // Nearest-edge alignment (what the browser's own scroll-into-view does),
-      // with a 1px tolerance so a sub-pixel overhang never nudges the strip.
-      const overflowRight = triggerRect.right - scrollerRect.right;
-      const overflowLeft = scrollerRect.left - triggerRect.left;
-      if (overflowRight <= 1 && overflowLeft <= 1) return;
-      const delta = overflowRight > 1 ? overflowRight : -overflowLeft;
-      scroller.scrollLeft = Math.max(0, Math.min(scroller.scrollLeft + delta, scroller.scrollWidth - scroller.clientWidth));
+    const update = () => {
+      const max = scroller.scrollWidth - scroller.clientWidth;
+      const start = scroller.scrollLeft > 1;
+      const end = scroller.scrollLeft < max - 1;
+      setTabOverflow((prev) => (prev.start === start && prev.end === end ? prev : { start, end }));
     };
-    reveal();
-    if (!revealed) observer.observe(scroller);
-    let cancelled = false;
-    document.fonts?.ready.then(() => { if (!cancelled) reveal(); });
+    update();
+    scroller.addEventListener("scroll", update, { passive: true });
+    const observer = new ResizeObserver(update);
+    observer.observe(scroller);
     return () => {
-      cancelled = true;
+      scroller.removeEventListener("scroll", update);
       observer.disconnect();
     };
-  }, [visibleTab]);
+  }, [tabStripMounted]);
+  const scrollTabs = (direction: 1 | -1) => {
+    const scroller = document.querySelector<HTMLElement>(".admin-dashboard__tabs");
+    scroller?.scrollBy({ left: direction * scroller.clientWidth * 0.6, behavior: "smooth" });
+  };
 
+  // Bumped on every New entry click so an already-mounted ResourceManager
+  // re-reads the ?create=1 flag (its mount-time read only covers tab switches).
+  const [createRequest, setCreateRequest] = useState(0);
   const handleNewEntry = () => {
     const url = new URL(window.location.href);
     url.searchParams.set("create", "1");
     window.history.replaceState({}, "", url.pathname + url.search + url.hash);
+    setCreateRequest((n) => n + 1);
     handleTabChange("resources");
   };
 
@@ -330,10 +358,19 @@ export default function AdminDashboard() {
       <Tabs value={visibleTab} onValueChange={handleTabChange}>
         {/* Canonical single-row strip. Radix keeps off-screen triggers
             keyboard reachable; extra tools live in the related tab panels. */}
-        <div className="w-full pb-2 admin-tab-scroller">
-          {/* F017: keep every trigger a comfortable ≥40px touch target at the
-              usage site (the global ui/tabs default is h-9/36px). */}
-          <TabsList className="admin-dashboard__tabs flex flex-wrap h-auto w-full justify-start gap-1">
+        <div className="admin-tab-scroller">
+          {tabOverflow.start && (
+            <button
+              type="button"
+              className="admin-tab-scroller__edge admin-tab-scroller__edge--start"
+              aria-label="Scroll tabs left"
+              tabIndex={-1}
+              onClick={() => scrollTabs(-1)}
+            >
+              <ChevronLeft aria-hidden="true" size={16} />
+            </button>
+          )}
+          <TabsList className="admin-dashboard__tabs">
             {CANONICAL_TABS.map(([id, label, Icon]) => (
               <TabsTrigger
                 key={id}
@@ -343,6 +380,10 @@ export default function AdminDashboard() {
                   // Radix suppresses same-value changes. A folded subsection
                   // still needs to return to its already-selected parent.
                   if (visibleTab === id && activeTab !== id) handleTabChange(id);
+                }}
+                onFocus={(event) => {
+                  const scroller = event.currentTarget.closest<HTMLElement>(".admin-dashboard__tabs");
+                  if (scroller) revealTabTrigger(scroller, event.currentTarget);
                 }}
                 onKeyDown={(event) => {
                   if (visibleTab === id && activeTab !== id &&
@@ -356,6 +397,17 @@ export default function AdminDashboard() {
               </TabsTrigger>
             ))}
           </TabsList>
+          {tabOverflow.end && (
+            <button
+              type="button"
+              className="admin-tab-scroller__edge admin-tab-scroller__edge--end"
+              aria-label="Scroll tabs right"
+              tabIndex={-1}
+              onClick={() => scrollTabs(1)}
+            >
+              <ChevronRight aria-hidden="true" size={16} />
+            </button>
+          )}
         </div>
 
         {/* R2-L13: each tab body sits in its own ErrorBoundary so a render
@@ -390,7 +442,7 @@ export default function AdminDashboard() {
         </TabsContent>
 
         <TabsContent value="resources">
-          <ErrorBoundary label="Resources tab"><ResourceManager /></ErrorBoundary>
+          <ErrorBoundary label="Resources tab"><ResourceManager createRequest={createRequest} /></ErrorBoundary>
         </TabsContent>
 
         <TabsContent value="categories" data-testid="content-categories">
@@ -408,9 +460,11 @@ export default function AdminDashboard() {
         </TabsContent>
 
         <TabsContent value="github">
-          {activeTab === "digests"
-            ? <div data-testid="content-digests"><ErrorBoundary label="Digests tab"><DigestQueueHealth /></ErrorBoundary></div>
-            : <ErrorBoundary label="GitHub tab"><GitHubSyncPanel /></ErrorBoundary>}
+          <ErrorBoundary label="GitHub tab"><GitHubSyncPanel /></ErrorBoundary>
+        </TabsContent>
+
+        <TabsContent value="digests" data-testid="content-digests">
+          <ErrorBoundary label="Digests tab"><DigestQueueHealth /></ErrorBoundary>
         </TabsContent>
 
         <TabsContent value="linkhealth">
@@ -420,12 +474,12 @@ export default function AdminDashboard() {
         <TabsContent value="audit">
           <ErrorBoundary label="Audit tab"><AuditTab /></ErrorBoundary>
         </TabsContent>
+        <TabsContent value="journeys" data-testid="content-journeys">
+          <ErrorBoundary label="Journeys tab"><JourneyStepsManager /></ErrorBoundary>
+        </TabsContent>
+
         <TabsContent value="research" data-testid="content-research">
-          {activeTab === "journeys"
-            ? <div data-testid="content-journeys"><ErrorBoundary label="Journeys tab"><JourneyStepsManager /></ErrorBoundary></div>
-            : (
-              <ErrorBoundary label="Research tab"><ResearchWorkspace /></ErrorBoundary>
-            )}
+          <ErrorBoundary label="Research tab"><ResearchWorkspace /></ErrorBoundary>
         </TabsContent>
       </Tabs>
     </div>

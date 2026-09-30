@@ -29,14 +29,48 @@ const DialogOverlay = React.forwardRef<
 ))
 DialogOverlay.displayName = DialogPrimitive.Overlay.displayName
 
+type AutoFocusHandler = (event: Event) => void
+
+/**
+ * Radix returns focus only to a <DialogTrigger>. Controlled dialogs opened
+ * from a plain button have no trigger, so focus fell to <body> on close
+ * (WCAG 2.4.3). Remember what held focus when the dialog opened and restore
+ * it, unless the consumer handled close focus itself.
+ */
+function useReturnFocus(
+  onOpenAutoFocus?: AutoFocusHandler,
+  onCloseAutoFocus?: AutoFocusHandler,
+) {
+  const returnTo = React.useRef<HTMLElement | null>(null)
+  return {
+    onOpenAutoFocus: (event: Event) => {
+      const active = document.activeElement
+      returnTo.current =
+        active instanceof HTMLElement && active !== document.body ? active : null
+      onOpenAutoFocus?.(event)
+    },
+    onCloseAutoFocus: (event: Event) => {
+      onCloseAutoFocus?.(event)
+      const target = returnTo.current
+      returnTo.current = null
+      if (event.defaultPrevented || !target?.isConnected) return
+      event.preventDefault()
+      target.focus({ preventScroll: true })
+    },
+  }
+}
+
 const DialogContent = React.forwardRef<
   React.ElementRef<typeof DialogPrimitive.Content>,
   React.ComponentPropsWithoutRef<typeof DialogPrimitive.Content>
->(({ className, children, ...props }, ref) => (
+>(({ className, children, onOpenAutoFocus, onCloseAutoFocus, ...props }, ref) => {
+  const returnFocus = useReturnFocus(onOpenAutoFocus, onCloseAutoFocus)
+  return (
   <DialogPortal>
     <DialogOverlay />
     <DialogPrimitive.Content
       ref={ref}
+      {...returnFocus}
       className={cn(
         // R4-017/NB-018: `[&>*]:min-w-0` lets every direct grid child shrink
         // below its intrinsic content width so a single unbroken string cannot
@@ -48,13 +82,17 @@ const DialogContent = React.forwardRef<
       {...props}
     >
       {children}
-      <DialogPrimitive.Close className="absolute right-4 top-4 opacity-70 ring-offset-background transition-opacity hover:opacity-100 focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:pointer-events-none data-[state=open]:bg-accent data-[state=open]:text-muted-foreground">
+      {/* 44x44 hit area centred on the same point the bare 16px icon sat at
+          (right/top 24px), so the X does not move; the ring is inset because
+          the content's overflow-y-auto would clip an outset ring at 2px. */}
+      <DialogPrimitive.Close className="absolute right-0.5 top-0.5 flex h-11 w-11 items-center justify-center rounded-sm opacity-70 transition-opacity hover:opacity-100 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-ring disabled:pointer-events-none data-[state=open]:bg-accent data-[state=open]:text-muted-foreground">
         <X className="h-4 w-4" />
         <span className="sr-only">Close</span>
       </DialogPrimitive.Close>
     </DialogPrimitive.Content>
   </DialogPortal>
-))
+  )
+})
 DialogContent.displayName = DialogPrimitive.Content.displayName
 
 const DialogHeader = ({
@@ -113,6 +151,7 @@ const DialogDescription = React.forwardRef<
 DialogDescription.displayName = DialogPrimitive.Description.displayName
 
 export {
+  useReturnFocus,
   Dialog,
   DialogPortal,
   DialogOverlay,

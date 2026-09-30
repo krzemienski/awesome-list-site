@@ -15,6 +15,14 @@
  *   absent query (explicit empty-state prompt / no search filter).
  */
 
+/**
+ * Longest `search` value the API accepts: every query param is capped at
+ * MAX_PARAM_LENGTH (server/contracts/inference.ts) and longer ones get a 400.
+ * Callers check the normalized query against this before fetching so an
+ * over-long paste gets a clear message instead of a request that can't pass.
+ */
+export const SEARCH_QUERY_MAX_LENGTH = 512;
+
 // C0 control chars + DEL — treated as whitespace, never passed to Postgres.
 const CONTROL_CHARS = /[\u0000-\u001f\u007f]/g;
 

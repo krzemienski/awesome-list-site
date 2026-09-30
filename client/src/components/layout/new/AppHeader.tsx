@@ -6,6 +6,7 @@ import { SidebarTrigger } from "@/components/ui/sidebar";
 import type { useAuth } from "@/hooks/useAuth";
 import type { AwesomeListNavNode } from "@/lib/static-data";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { getInitials } from "@/lib/utils";
 import {
   DropdownMenu, DropdownMenuContent, DropdownMenuItem,
   DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger,
@@ -33,6 +34,9 @@ function shellBrand(siteName?: string): string {
   }
   return trimmed.toUpperCase();
 }
+
+// Catalog pages reached from Browse (bare /tag redirects to /categories).
+const BROWSE_ROUTE_PREFIXES = ["/category/", "/subcategory/", "/sub-subcategory/", "/tag/"];
 
 // Same recursive sum as Home's navTotalCount; never fetch the full corpus.
 function totalCount(node: AwesomeListNavNode): number {
@@ -69,11 +73,14 @@ export default function AppHeader({ onSearchOpen, user, onLogout, logoutError, c
     const skipNext = here === "/" || here.startsWith("/sign-in") || here.startsWith("/sign-up");
     navigate(skipNext ? "/sign-in" : `/sign-in?redirect_url=${encodeURIComponent(here)}`);
   };
+  const isCurrent = (href: string) =>
+    location === href ||
+    (href === "/categories" && (location === "/" || BROWSE_ROUTE_PREFIXES.some(prefix => location.startsWith(prefix))));
   const navLink = (href: string, label: string) => (
     <Link
       href={href}
-      className={`nav-link${location === href || (href === "/categories" && location === "/") ? " active" : ""}`}
-      aria-current={location === href || (href === "/categories" && location === "/") ? "page" : undefined}
+      className={`nav-link${isCurrent(href) ? " active" : ""}`}
+      aria-current={isCurrent(href) ? "page" : undefined}
     >
       {label}
     </Link>
@@ -82,7 +89,7 @@ export default function AppHeader({ onSearchOpen, user, onLogout, logoutError, c
   return <>
     <header className="app-canonical-header">
       <span className="header-menu-control">
-        <SidebarTrigger className="mobile-menu-btn" data-testid="mobile-drawer-trigger" aria-label="Toggle sidebar" />
+        <SidebarTrigger className="btn icon ghost mobile-menu-btn" data-testid="mobile-drawer-trigger" aria-label="Toggle sidebar" />
         <svg className="header-menu-icon" aria-hidden="true" width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"><path d="M2 4 H14 M2 8 H14 M2 12 H14" /></svg>
       </span>
       <Link href="/" className="header-brand" aria-label={`${accessibleBrand} — home`} data-testid="header-brand">
@@ -95,7 +102,7 @@ export default function AppHeader({ onSearchOpen, user, onLogout, logoutError, c
       <button type="button" onClick={onSearchOpen} className="header-search-trigger" aria-label="Open search">
         <SearchIcon />
         <span className="header-search-label">Search <span>{categories.length ? count.toLocaleString() : "…"} resources…</span></span>
-        <span className="header-kbd hide-mobile">⌘K</span>
+        <span className="kbd hide-mobile">⌘K</span>
       </button>
       <nav className="header-nav hide-tablet" aria-label="Primary">
         {navLink("/categories", "Browse")}
@@ -109,7 +116,7 @@ export default function AppHeader({ onSearchOpen, user, onLogout, logoutError, c
           <button type="button" className="user-pill" aria-label={`Account · ${role}`}>
             {user ? <Avatar className="header-avatar">
               <AvatarImage src={user.avatar} alt="" />
-              <AvatarFallback>{firstName[0].toUpperCase()}</AvatarFallback>
+              <AvatarFallback>{getInitials(user.name, user.email)}</AvatarFallback>
             </Avatar> : <span className="header-avatar"><LogIn size={12} aria-hidden="true" /></span>}
             <span className="header-account-name hide-mobile">{user ? firstName : "Sign in"}</span>
           </button>

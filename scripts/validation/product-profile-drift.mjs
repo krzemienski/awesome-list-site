@@ -21,7 +21,11 @@ const app = read("client/src/App.tsx");
 const boot = read("client/index.html");
 const vite = read("vite.config.ts");
 const profileCss = read("shared/styles/product-profiles.css");
-const clientCss = read("client/src/styles/design-system.css");
+// The SPA's design system is the canonical /ds/design-system.{css,js} pair,
+// linked verbatim from client/index.html and never edited. App-only rules —
+// including the shared profile foundation import — live in app-bridge.css,
+// which the app stylesheet (client/src/index.css) pulls in.
+const bridgeCss = read("client/src/styles/app-bridge.css");
 const mainLayout = read("client/src/components/layout/new/MainLayout.tsx");
 const main = read("client/src/main.tsx");
 const button = read("client/src/components/ui/button.tsx");
@@ -32,6 +36,8 @@ const exportTools = read("client/src/components/ui/export-tools.tsx");
 // source (docs/parity/source-sync.json) and is intentionally never edited.
 const artifactEntry = read("artifacts/awesome-video-design-system/index.html");
 const artifactCss = read("artifacts/awesome-video-design-system/src/index.css");
+
+const PROFILE_FOUNDATION = "shared/styles/product-profiles.css";
 
 const profiles = [
   "public-discovery",
@@ -75,14 +81,38 @@ expect(
 );
 expect(app.includes("resolveProductProfile(location)"), "SPA routes do not resolve a product profile");
 expect(app.includes("productProfile={productProfile}"), "MainLayout does not declare its product profile");
+// Profiles are layout-density hooks only: the system that paints is the
+// visitor's saved one (or the runtime default) on every route. The pre-paint
+// boot must reach that same answer through the canonical applier and must not
+// grow a per-profile system path again.
+// The boot's storage keys and fallback system come from THEME_BOOT_DATA in
+// design-system.ts, injected by Vite, so there is no literal to compare here:
+// require the injected marker on both sides and that the data carries
+// DEFAULT_SYSTEM.
+const bootThemeVar = boot.match(/var\s+(\w+)\s*=\s*__AWESOME_VIDEO_THEME_BOOT__\s*;/)?.[1];
 expect(
-  boot.includes("PRODUCT_PROFILE_BOOT.profiles[profile]"),
-  "Pre-paint boot does not select profile defaults",
+  boot.includes("window.applyDesignSystem(sys, acc)") &&
+    boot.includes("window.SYSTEM_DEFAULT_ACCENT[sys]") &&
+    Boolean(bootThemeVar) &&
+    boot.includes(`sys = ${bootThemeVar}.defaultSystem`) &&
+    boot.includes(`${bootThemeVar}.systemKey`) &&
+    boot.includes(`${bootThemeVar}.accentKey`) &&
+    /export const THEME_BOOT_DATA\b[\s\S]*?defaultSystem:\s*DEFAULT_SYSTEM\b/.test(runtime) &&
+    vite.includes("__AWESOME_VIDEO_THEME_BOOT__") &&
+    vite.includes("JSON.stringify(THEME_BOOT_DATA)"),
+  "Pre-paint boot and runtime disagree on system precedence: the boot must read its storage keys and fallback system from the Vite-injected THEME_BOOT_DATA (DEFAULT_SYSTEM) and apply through applyDesignSystem / SYSTEM_DEFAULT_ACCENT",
 );
 expect(
+  !/\.profiles\s*\[/.test(boot),
+  "Pre-paint boot selects a system from product-profile defaults; profiles are density hooks only",
+);
+const bootRouteVar = boot.match(/(\w+)\s*=\s*__AWESOME_VIDEO_PRODUCT_PROFILE_BOOT__\.routePatterns\b/)?.[1];
+expect(
   runtime.includes("PRODUCT_PROFILE_ROUTE_PATTERNS") &&
-    boot.includes("PRODUCT_PROFILE_BOOT.routePatterns.admin") &&
-    boot.includes("PRODUCT_PROFILE_BOOT.routePatterns.learning"),
+    runtime.includes("routePatterns: PRODUCT_PROFILE_ROUTE_PATTERNS") &&
+    Boolean(bootRouteVar) &&
+    boot.includes(`${bootRouteVar}.admin`) &&
+    boot.includes(`${bootRouteVar}.learning`),
   "Runtime and pre-paint route classification do not share one generated source",
 );
 expect(
@@ -90,6 +120,15 @@ expect(
     !main.includes("loadDesignSystemFont") &&
     main.includes("loadFontOverride(fontOverrideAtBoot)"),
   "Boot font work must be limited to the saved picker override — the canonical <link> in client/index.html carries every system's families, and the pre-paint boot owns saved-system/profile precedence",
+);
+expect(
+  boot.includes('<link rel="stylesheet" href="/ds/design-system.css"') &&
+    boot.includes('<script src="/ds/design-system.js"></script>'),
+  "client/index.html does not load the canonical /ds/design-system.css + /ds/design-system.js the profile layer sits on",
+);
+expect(
+  main.includes('import "./index.css"'),
+  "client/src/main.tsx does not import the app stylesheet that carries the profile foundation",
 );
 expect(
   vite.includes("PRODUCT_PROFILE_BOOT_DATA") &&
@@ -102,8 +141,8 @@ const surfaces = [
     name: "SPA",
     entry: boot,
     profile: "public-discovery",
-    adapter: clientCss,
-    importPath: "../../../shared/styles/product-profiles.css",
+    adapter: bridgeCss,
+    stylesheet: "client/src/index.css",
     consumers: [
       [mainLayout, "--profile-page-measure"],
       [button, "--profile-control-height"],
@@ -114,11 +153,11 @@ const surfaces = [
     name: "standalone design-system artifact",
     entry: artifactEntry,
     profile: "standalone-exports",
-    // The artifact reaches the shared foundation through the app stylesheet
-    // (design-system.css imports product-profiles.css; the SPA surface above
-    // asserts that hop), so both hops of the chain are covered.
+    // The artifact must reach the shared foundation through its own @import
+    // chain; every hop is resolved on disk, so an import of a deleted
+    // stylesheet fails here instead of passing on a substring match.
     adapter: artifactCss,
-    importPath: "../../../client/src/styles/design-system.css",
+    stylesheet: "artifacts/awesome-video-design-system/src/index.css",
     consumers: [
       // The docs measure (920px) is canonical docs.html chrome, so the
       // artifact deliberately does not consume --profile-page-measure; see
@@ -150,9 +189,13 @@ for (const surface of surfaces) {
     surface.entry.includes(`data-product-profile="${surface.profile}"`),
     `${surface.name} does not declare ${surface.profile}`,
   );
+  const chain = resolveImportChain(surface.stylesheet, PROFILE_FOUNDATION);
+  for (const broken of chain.missing) {
+    expect(false, `${surface.name}: ${broken}`);
+  }
   expect(
-    surface.adapter.includes(`@import "${surface.importPath}"`),
-    `${surface.name} does not import the shared profile foundation`,
+    chain.reached,
+    `${surface.name} does not import the shared profile foundation (${PROFILE_FOUNDATION}) from ${surface.stylesheet}`,
   );
   for (const [source, role] of surface.consumers) {
     expect(source.includes(role), `${surface.name} does not consume ${role}`);
@@ -170,6 +213,36 @@ for (const surface of surfaces) {
       `${surface.name} restates the control-height floor as a literal (${literalFloor?.length ?? 0}×) instead of consuming the token`,
     );
   }
+}
+
+/**
+ * Follow relative @import hops from `entry` and report whether `target` is
+ * reached. Every hop must exist on disk; a missing one is returned in
+ * `missing` (a Vite build would fail on it). Root-absolute and remote imports
+ * are served assets, not source hops, and are skipped.
+ */
+function resolveImportChain(entry, target) {
+  const goal = path.join(ROOT, target);
+  const seen = new Set();
+  const missing = [];
+  const walk = (file) => {
+    if (file === goal) return true;
+    if (seen.has(file)) return false;
+    seen.add(file);
+    const css = fs.readFileSync(file, "utf8").replace(/\/\*[\s\S]*?\*\//g, "");
+    let reached = false;
+    for (const [, spec] of css.matchAll(/@import\s+(?:url\(\s*)?["']([^"']+)["']/g)) {
+      if (!spec.startsWith("./") && !spec.startsWith("../")) continue;
+      const next = path.resolve(path.dirname(file), spec);
+      if (!fs.existsSync(next)) {
+        missing.push(`${path.relative(ROOT, file)} imports "${spec}", which does not exist`);
+        continue;
+      }
+      if (walk(next)) reached = true;
+    }
+    return reached;
+  };
+  return { reached: walk(path.join(ROOT, entry)), missing };
 }
 
 /**
@@ -636,7 +709,8 @@ try {
         name: "saved-invalid-accent",
         saved: { system: "terminal", accent: "retired-accent" },
         expectedSystem: "terminal",
-        expectedAccent: family.defaultAccent,
+        // The resolved system's natural accent, not the profile's (TK-21).
+        expectedAccent: "matrix",
       },
     ];
 

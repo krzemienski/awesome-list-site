@@ -176,8 +176,8 @@ export function Paginator({
               className={cn(
                 linkBase,
                 item === currentPage
-                  ? "border-[var(--accent)] bg-[var(--accent)] text-[var(--accent-contrast,white)] font-medium"
-                  : "border-[var(--border)] bg-transparent text-foreground hover:border-[var(--accent)] hover:text-[var(--accent)]",
+                  ? "border-[var(--border-strong)] bg-[var(--surface-2)] text-[var(--text)] font-medium"
+                  : "border-[var(--border)] bg-transparent text-foreground hover:border-[var(--border-strong)] hover:bg-[var(--surface)]",
               )}
               data-testid={pageLinkTestId(item)}
             >
@@ -248,7 +248,7 @@ export function Paginator({
         id={`${ids.jump}-error`}
         role="status"
         aria-live="polite"
-        className={cn("text-xs text-[var(--accent)]", !jumpError && "sr-only")}
+        className={cn("text-xs text-[var(--status-bad)]", !jumpError && "sr-only")}
         data-testid={ids.jumpError}
       >
         {jumpError ?? ""}

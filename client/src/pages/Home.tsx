@@ -18,6 +18,7 @@ import {
 import SEOHead from "@/components/layout/SEOHead";
 import { useToast } from "@/hooks/use-toast";
 import { homeSeoTitle, homeSeoDescription } from "@shared/seo-templates";
+import { taxonomyScopeIntro } from "@shared/seo-content-templates";
 import { useAuth } from "@/hooks/useAuth";
 import { normalizeTag, parseTagsParam } from "@/lib/tags";
 import { writeFilterParams, usePopstateParams } from "@/lib/url-filter-state";
@@ -242,6 +243,15 @@ function HomeSkeleton({
           ))}
         </div>
       </div>
+      {layout === "index" ? (
+        <div className="home-skeleton-line home-skeleton-index-title" />
+      ) : (
+        <div className="home-hero">
+          <div className="home-skeleton-line home-skeleton-hero-title" />
+          <div className="home-skeleton-line home-skeleton-hero-lede" />
+          <div className="home-skeleton-line home-skeleton-hero-actions" />
+        </div>
+      )}
       <div className="home-stat-strip home-stat-strip-skeleton">
         {Array.from({ length: 4 }).map((_, index) => (
           <div className="home-stat-cell" key={index}>
@@ -257,7 +267,7 @@ function HomeSkeleton({
             {categorySkeletons.map((category, index) => (
               <div className="home-category-section" key={category?.slug ?? index}>
                 <div className="home-skeleton-line home-skeleton-category" />
-                {(category?.subcategories ?? Array.from({ length: 3 }, () => undefined)).map(
+                {(category?.subcategories ?? Array.from({ length: 3 }, () => undefined)).slice(0, 6).map(
                   (_, row) => (
                     <div className="home-skeleton-line home-skeleton-row" key={row} />
                   ),
@@ -286,18 +296,18 @@ function HomeSkeleton({
             ))}
           </div>
           <div className="home-skeleton-line home-skeleton-section-heading" />
-          <div className="home-skeleton-recent-table">
-            {Array.from({ length: 5 }).map((_, index) => (
-              <div className="home-skeleton-line home-skeleton-recent" key={index} />
-            ))}
-          </div>
-          <div className="home-skeleton-line home-skeleton-section-heading" />
           <div className="home-curated-category-grid">
             {categorySkeletons.map((category, index) => (
               <div className="home-skeleton-resource-card" key={category?.slug ?? index}>
                 <div className="home-skeleton-line home-skeleton-card-title" />
                 <div className="home-skeleton-line home-skeleton-card-copy short" />
               </div>
+            ))}
+          </div>
+          <div className="home-skeleton-line home-skeleton-section-heading" />
+          <div className="home-skeleton-recent-table">
+            {Array.from({ length: 5 }).map((_, index) => (
+              <div className="home-skeleton-line home-skeleton-recent" key={index} />
             ))}
           </div>
         </div>
@@ -692,7 +702,12 @@ export default function Home({ nav, navLoading }: HomeProps) {
           slug: category.slug,
           count: category.count,
           icon: categoryIcon(category.name, category.slug),
-          description: category.teaser?.description,
+          description: taxonomyScopeIntro({
+            name: category.name,
+            level: "category",
+            totalResources: category.count,
+            childNames: category.subcategories.map((subcategory) => subcategory.name),
+          }),
           teaserTitle: category.teaser?.title,
           teaserDescription: category.teaser
             ? truncateAtWord(category.teaser.description, 110)
@@ -724,7 +739,7 @@ export default function Home({ nav, navLoading }: HomeProps) {
                 : (subcategory.subSubcategories?.length ?? 0) +
                   (subcategory.subcategories?.length ?? 0),
             };
-          }),
+          }).filter((subcategory) => !corpusFilterActive || subcategory.count > 0),
         };
       }),
     [
@@ -746,8 +761,9 @@ export default function Home({ nav, navLoading }: HomeProps) {
       nestedGroups: countNestedGroups(rawCategories),
       featured: homeData?.featuredCount ?? homeData?.featured?.length ?? 0,
       approvedThisWeek: homeData?.approvedThisWeek ?? 0,
+      matching: corpusFilterActive ? filteredCorpusResources.length : undefined,
     };
-  }, [homeData, nav?.categories, nav?.totalResources, navCategories.length]);
+  }, [homeData, nav?.categories, nav?.totalResources, navCategories.length, corpusFilterActive, filteredCorpusResources.length]);
 
   const filters = showFilters ? (
     <Suspense fallback={<FilterControlsFallback />}>
@@ -839,8 +855,12 @@ export default function Home({ nav, navLoading }: HomeProps) {
               <span>The tag filter in the link you followed was empty, so it was ignored.</span>
               <button
                 type="button"
-                className="underline underline-offset-2"
-                onClick={() => setEmptyTagParamNotice(false)}
+                className="btn ghost"
+                onClick={() => {
+                  setEmptyTagParamNotice(false);
+                  // Replace, not push: Back must not resurrect the notice.
+                  writeFilterParams({ tags: null, tag: null }, "replace");
+                }}
                 data-testid="button-dismiss-empty-tag-param"
               >
                 Dismiss

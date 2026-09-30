@@ -746,6 +746,7 @@ export default function JourneyStepsManager() {
               <Button
                 size="sm"
                 onClick={() => setActiveJourney(j)}
+                aria-label={`Steps for ${j.title}`}
                 data-testid={`edit-steps-${j.id}`}
               >
                 <ListOrdered className="h-4 w-4 mr-1" />

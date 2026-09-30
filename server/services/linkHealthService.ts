@@ -1,10 +1,14 @@
 import type { LinkHealthJob, LinkHealthCheck, LinkHealthJobRow, LinkHealthCheckRow } from "@shared/schema";
-import { linkHealthJobs, linkHealthChecks } from "@shared/schema";
+import { linkHealthJobs, linkHealthChecks, resources as resourcesTable } from "@shared/schema";
 import { db } from "../db";
 import { desc, eq, ne, and, inArray, lt } from "drizzle-orm";
 import { storage } from "../storage";
 import { checkResourceLinks, browserVerifyLink, type LinkCheckResult } from "../validation/linkChecker";
 import { runHeavyWork } from "../ops/heavyWork";
+
+export type BrokenLinkCheck = LinkHealthCheck & {
+  resource?: { id: number; title: string; category: string };
+};
 
 function mapResultToStatus(result: LinkCheckResult): LinkHealthCheck['status'] {
   // 200-at-face-value but takeover/intent-flip/parked heuristics fired:
@@ -92,7 +96,7 @@ export const linkHealthService = {
     return rows.map(jobRowToApi);
   },
 
-  async getBrokenLinks(filter?: string): Promise<LinkHealthCheck[]> {
+  async getBrokenLinks(filter?: string): Promise<BrokenLinkCheck[]> {
     // Problem links belong to the latest completed scan (checks of older
     // jobs are pruned on completion, but scope by jobId anyway for safety).
     const [latestCompleted] = await db
@@ -110,11 +114,22 @@ export const linkHealthService = {
     if (filter && filter !== 'all') {
       conditions.push(eq(linkHealthChecks.status, filter));
     }
+    // Carry the resource title/category so the admin list names the failing
+    // resource instead of a bare id. Inner join: a check outlives a deleted
+    // resource until the next scan prunes it, and a resource that no longer
+    // exists is not a problem link to act on or count.
     const rows = await db
-      .select()
+      .select({
+        check: linkHealthChecks,
+        resource: { id: resourcesTable.id, title: resourcesTable.title, category: resourcesTable.category },
+      })
       .from(linkHealthChecks)
+      .innerJoin(resourcesTable, eq(resourcesTable.id, linkHealthChecks.resourceId))
       .where(and(...conditions));
-    return rows.map(checkRowToApi);
+    return rows.map(({ check, resource }) => ({
+      ...checkRowToApi(check),
+      resource,
+    }));
   },
 
   async startCheck(): Promise<LinkHealthJob> {

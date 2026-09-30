@@ -1,15 +1,15 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useQuery, useMutation, useQueryClient, keepPreviousData } from "@tanstack/react-query";
 import { apiRequest, ApiError } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/hooks/useAuth";
 import { TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Select, SelectContent, SelectItem, SelectTrigger } from "@/components/ui/select";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Skeleton } from "@/components/ui/skeleton";
-import { ChevronLeft, ChevronRight, Trash2, Search, Eye, EyeOff, Download, ArrowUpDown, ArrowUp, ArrowDown, Plus } from "lucide-react";
+import { ChevronLeft, ChevronRight, Trash2, Search, Eye, EyeOff, Download, ArrowUpDown, ArrowUp, ArrowDown, Plus, X } from "lucide-react";
 import type { User } from "@shared/schema";
 import { AdminOpsTable as Table, StatusChip, TableShell } from "@/components/admin/AdminOpsPrimitives";
 import "@/styles/pages/admin-ops-users-audit.css";
@@ -40,10 +40,20 @@ export default function UsersTab() {
   const [pendingRoleChange, setPendingRoleChange] = useState<{ user: User; role: string } | null>(null);
   // R2-M17: server-side user search (email / first / last name).
   const [searchInput, setSearchInput] = useState("");
+  const searchInputRef = useRef<HTMLInputElement>(null);
   const [searchQuery, setSearchQuery] = useState("");
   // R2-H05: ids whose emails are currently revealed.
   const [revealedIds, setRevealedIds] = useState<Set<string>>(new Set());
   const [editingRoleId, setEditingRoleId] = useState<string | null>(null);
+  // The role menu replaces the row's Edit button, so the menu's own focus
+  // return targets an unmounted trigger; hand focus back to Edit instead
+  // (after the confirm dialog, when a change was staged).
+  const editButtonRefs = useRef(new Map<string, HTMLButtonElement>());
+  const refocusEditIdRef = useRef<string | null>(null);
+  const closeRoleEditor = (userId: string) => {
+    refocusEditIdRef.current = userId;
+    setEditingRoleId(null);
+  };
   const [userToolsOpen, setUserToolsOpen] = useState(false);
   // Run16 BUG-087: server-side column sorting.
   const [sortBy, setSortBy] = useState<"name" | "email" | "role" | "createdAt">("createdAt");
@@ -68,6 +78,24 @@ export default function UsersTab() {
     }, 300);
     return () => clearTimeout(t);
   }, [searchInput]);
+
+  useEffect(() => {
+    if (editingRoleId !== null || pendingRoleChange || !refocusEditIdRef.current) return;
+    editButtonRefs.current.get(refocusEditIdRef.current)?.focus();
+    refocusEditIdRef.current = null;
+  }, [editingRoleId, pendingRoleChange]);
+
+  // The pressed pager button disables itself at either end, which dropped
+  // focus to <body>; hand focus to its sibling once the new page renders.
+  const prevPageRef = useRef<HTMLButtonElement>(null);
+  const nextPageRef = useRef<HTMLButtonElement>(null);
+  const pagerRefocusRef = useRef<"prev" | "next" | null>(null);
+  useEffect(() => {
+    const target = pagerRefocusRef.current;
+    pagerRefocusRef.current = null;
+    if (target === "prev") prevPageRef.current?.focus();
+    if (target === "next") nextPageRef.current?.focus();
+  }, [page]);
 
   const { data, isLoading } = useQuery<UsersResponse>({
     queryKey: ['/api/admin/users', page, limit, searchQuery, sortBy, sortDir],
@@ -166,17 +194,34 @@ export default function UsersTab() {
             aria-expanded={userToolsOpen}
             data-testid="button-user-tools"
           >
-            More
+            {userToolsOpen ? "Hide row actions" : "Row actions"}
           </Button>
           <div className="admin-users-extra-action admin-ops-search relative flex-1 max-w-sm">
             <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
             <Input
+              ref={searchInputRef}
               value={searchInput}
               onChange={(e) => setSearchInput(e.target.value)}
               placeholder="Search by email or name…"
-              className="pl-8"
+              className="pl-8 pr-8"
               data-testid="input-user-search"
             />
+            {searchInput && (
+              <Button
+                type="button"
+                variant="ghost"
+                size="icon"
+                onClick={() => {
+                  setSearchInput("");
+                  searchInputRef.current?.focus();
+                }}
+                className="absolute right-1 top-1/2 h-8 w-8 min-h-8 min-w-8 -translate-y-1/2 text-muted-foreground hover:text-foreground"
+                aria-label="Clear user search"
+                data-testid="button-clear-user-search"
+              >
+                <X className="h-4 w-4" />
+              </Button>
+            )}
           </div>
           <Button variant="outline" size="sm" className="admin-users-extra-action sm:ml-auto" asChild data-testid="button-export-users">
             <a href="/api/admin/users/export" download>
@@ -216,12 +261,15 @@ export default function UsersTab() {
                 { key: "role", label: "Role" },
                 { key: "createdAt", label: "Joined" },
               ] as const).map(col => (
-                <TableHead key={col.key}>
+                <TableHead
+                  key={col.key}
+                  aria-sort={sortBy === col.key ? (sortDir === "asc" ? "ascending" : "descending") : undefined}
+                >
                   <Button
                     type="button"
                     variant="ghost"
                     onClick={() => toggleSort(col.key)}
-                    className="inline-flex h-auto items-center gap-1 p-0 min-h-[32px] font-medium hover:bg-transparent hover:text-foreground transition-colors"
+                    className="admin-ops-sort-button"
                     aria-label={`Sort by ${col.label}`}
                     data-testid={`button-sort-${col.key}`}
                   >
@@ -244,9 +292,10 @@ export default function UsersTab() {
                       unwrapping to ~2,369px); full value stays in the title. */}
                   <TableCell className="admin-ops-cell-name max-w-[240px]">
                     <div className="flex items-center gap-2 min-w-0">
-                      {/* A nameless account is identified by its email (or id),
-                          set in the same ink and weight as a real name — the
-                          frozen AdminUsers name cell has one style for every row. */}
+                      {/* A nameless account is identified by its masked email (or
+                          id), set in the same ink and weight as a real name — the
+                          frozen AdminUsers name cell has one style for every row.
+                          The reveal toggle governs the Email column only. */}
                       {user.firstName || user.lastName ? (
                         <span
                           className="font-medium truncate"
@@ -256,17 +305,25 @@ export default function UsersTab() {
                           {`${user.firstName || ''} ${user.lastName || ''}`.trim()}
                         </span>
                       ) : (
-                        <span className="font-medium" data-testid={`text-name-${user.id}`}>
-                          {user.email || user.id}
+                        <span
+                          className="font-medium truncate"
+                          title={user.email ? maskEmail(user.email) : user.id}
+                          data-testid={`text-name-${user.id}`}
+                        >
+                          {user.email ? maskEmail(user.email) : user.id}
                         </span>
                       )}
                     </div>
                   </TableCell>
-                  <TableCell className="admin-ops-cell-email text-muted-foreground">
+                  <TableCell className="admin-ops-cell-email max-w-[280px] text-muted-foreground">
                     {user.email ? (
-                      <span className="inline-flex items-center gap-1.5">
-                        <span data-testid={`text-email-${user.id}`}>
-                           {revealedIds.has(user.id) ? maskEmail(user.email) : user.email}
+                      <span className="flex min-w-0 items-center gap-1.5">
+                        <span
+                          className="min-w-0 truncate"
+                          title={revealedIds.has(user.id) ? user.email : maskEmail(user.email)}
+                          data-testid={`text-email-${user.id}`}
+                        >
+                          {revealedIds.has(user.id) ? user.email : maskEmail(user.email)}
                         </span>
                         {/* R4-041: aria-label includes a row identifier so repeated controls
                             have unique accessible names (masked email keeps PII out of the DOM). */}
@@ -275,13 +332,13 @@ export default function UsersTab() {
                           variant="ghost"
                           size="icon"
                           onClick={() => toggleReveal(user.id)}
-                          className="inline-flex h-8 w-8 items-center justify-center min-h-[32px] min-w-[32px] text-muted-foreground/70 hover:bg-transparent hover:text-foreground transition-colors"
-                          aria-label={`${revealedIds.has(user.id) ? "Reveal" : "Mask"} email for ${
+                          className="inline-flex h-8 w-8 shrink-0 items-center justify-center min-h-[32px] min-w-[32px] text-muted-foreground/70 hover:bg-transparent hover:text-foreground transition-colors"
+                          aria-label={`${revealedIds.has(user.id) ? "Mask" : "Reveal"} email for ${
                             `${user.firstName || ''} ${user.lastName || ''}`.trim() || maskEmail(user.email)
                           }`}
                           data-testid={`button-toggle-email-${user.id}`}
                         >
-                          {revealedIds.has(user.id) ? <Eye className="h-3.5 w-3.5" /> : <EyeOff className="h-3.5 w-3.5" />}
+                          {revealedIds.has(user.id) ? <EyeOff className="h-3.5 w-3.5" /> : <Eye className="h-3.5 w-3.5" />}
                         </Button>
                       </span>
                     ) : "—"}
@@ -295,47 +352,57 @@ export default function UsersTab() {
                   <TableCell className="admin-ops-cell-actions">
                     <div className="flex items-center gap-2">
                       {/* Run16 BUG-014: an admin must not be able to demote
-                          themselves with one click — the delete button already
-                          hides on the own row, so the role select is disabled
-                          there too (matching the server-side self-demote guard). */}
-                      {editingRoleId === user.id ? <Select
+                          themselves — like Delete, Edit is absent on the own
+                          row (matching the server-side self-demote guard). The
+                          role menu opens on Edit; closing it without a pick
+                          cancels the edit. */}
+                      {user.id === currentUser?.id ? null : editingRoleId === user.id ? <Select
                         value={user.role || 'user'}
+                        defaultOpen
+                        onOpenChange={(open) => { if (!open) closeRoleEditor(user.id); }}
                         /* Run16 BUG-037: stage the change and confirm first. */
                         onValueChange={(role) => {
+                          closeRoleEditor(user.id);
                           if (role !== (user.role || 'user')) setPendingRoleChange({ user, role });
-                          setEditingRoleId(null);
                         }}
-                        disabled={user.id === currentUser?.id}
                       >
                         <SelectTrigger
-                          className="w-32 h-8 text-xs"
+                          className="h-8 w-auto shrink-0 gap-1 text-xs"
                           aria-label={
                             /* R4-041: include a row identifier so the 20 role
                                selects don't share one accessible name (masked
                                email keeps PII out of the DOM, matching the
                                Reveal/Delete buttons). */
-                            user.id === currentUser?.id
-                              ? "You cannot change your own role"
-                              : `Change role for ${
-                                  `${user.firstName || ''} ${user.lastName || ''}`.trim() ||
-                                  (user.email ? maskEmail(user.email) : user.id)
-                                }`
-                          }
-                          title={
-                            user.id === currentUser?.id
-                              ? "You cannot change your own role"
-                              : undefined
+                            `Change role for ${
+                              `${user.firstName || ''} ${user.lastName || ''}`.trim() ||
+                              (user.email ? maskEmail(user.email) : user.id)
+                            }`
                           }
                         >
-                          <SelectValue />
+                          {/* The actions column is too narrow for the role
+                              name; the open menu checks the current role. */}
+                          Role
                         </SelectTrigger>
-                        <SelectContent>
+                        <SelectContent
+                          onKeyDown={(e) => {
+                            // Radix commits the pick on Enter keydown but keeps the
+                            // key's default action, so its follow-up activation
+                            // clicked whatever had focus next: the re-mounted Edit
+                            // (re-opening this menu behind the confirm) or the
+                            // confirm's Cancel. Runs after the item has selected.
+                            if (e.key === "Enter") e.preventDefault();
+                          }}
+                        >
                           <SelectItem value="user">User</SelectItem>
                           <SelectItem value="moderator">Moderator</SelectItem>
                           <SelectItem value="admin">Admin</SelectItem>
                         </SelectContent>
                       </Select> : (
                         <Button
+                          ref={(el) => {
+                            if (el) editButtonRefs.current.set(user.id, el);
+                            else editButtonRefs.current.delete(user.id);
+                          }}
                           variant="ghost"
                           size="sm"
                           onClick={() => setEditingRoleId(user.id)}
@@ -344,7 +411,7 @@ export default function UsersTab() {
                           Edit
                         </Button>
                       )}
-                      {user.id !== currentUser?.id && (
+                      {user.id !== currentUser?.id && editingRoleId !== user.id && (
                         <Button
                           variant="ghost"
                           size="sm"
@@ -382,16 +449,20 @@ export default function UsersTab() {
         </p>
 
         {totalPages > 1 && (
-          <div className="flex items-center justify-between mt-4">
-            <span className="text-sm text-muted-foreground">
+          <div className="admin-ops-users-pagination">
+            <span className="admin-ops-users-pagination__label">
               Page {page} of {totalPages}
             </span>
-            <div className="flex gap-2">
+            <div className="admin-ops-users-pagination__controls">
               {/* BUG-057 (run25): icon-only pager buttons need accessible names. */}
               <Button
+                ref={prevPageRef}
                 variant="outline"
                 size="sm"
-                onClick={() => setPage(p => Math.max(1, p - 1))}
+                onClick={() => {
+                  if (page - 1 <= 1) pagerRefocusRef.current = "next";
+                  setPage(Math.max(1, page - 1));
+                }}
                 disabled={page <= 1}
                 aria-label="Previous page"
                 data-testid="button-users-prev-page"
@@ -399,9 +470,13 @@ export default function UsersTab() {
                 <ChevronLeft className="h-4 w-4" aria-hidden="true" />
               </Button>
               <Button
+                ref={nextPageRef}
                 variant="outline"
                 size="sm"
-                onClick={() => setPage(p => Math.min(totalPages, p + 1))}
+                onClick={() => {
+                  if (page + 1 >= totalPages) pagerRefocusRef.current = "prev";
+                  setPage(Math.min(totalPages, page + 1));
+                }}
                 disabled={page >= totalPages}
                 aria-label="Next page"
                 data-testid="button-users-next-page"
@@ -414,7 +489,10 @@ export default function UsersTab() {
 
         {/* Run16 BUG-037: explicit confirmation before applying a role change. */}
         <AlertDialog open={!!pendingRoleChange} onOpenChange={(open) => { if (!open) setPendingRoleChange(null); }}>
-          <AlertDialogContent>
+          {/* The refocus effect has already put focus on the row's Edit; the
+              dialog's own return target (the unmounted role menu) would drop it
+              to <body>. */}
+          <AlertDialogContent onCloseAutoFocus={(e) => e.preventDefault()}>
             <AlertDialogHeader>
               <AlertDialogTitle>Change user role?</AlertDialogTitle>
               <AlertDialogDescription>

@@ -29,18 +29,17 @@
 
 .ops-github-panel > .admin-ops-more,
 .ops-link-health > .admin-ops-more {
-  inset: calc(100% + 16px) auto auto 0;
+  /* Same 4px offset as the export/database disclosures: the 44px summary then
+     fits the page's 48px bottom inset instead of extending the page by 12px. */
+  inset: calc(100% + 4px) auto auto 0;
   position: absolute;
   z-index: 2;
 }
 
-/* 16px offset + 32px control = the 48px page tail the canonical panel already
-   ends with, so the disclosure never lengthens the document (the 36px `.btn`
-   box pushed the GitHub page 9px past the frozen height). */
-.ops-github-panel > .admin-ops-more > summary,
-.ops-link-health > .admin-ops-more > summary {
-  height: 32px;
-  min-height: 0;
+/* The disclosure follows the contract-wide 44px interactive target. */
+.ops-github-panel > .admin-ops-more > button,
+.ops-link-health > .admin-ops-more > button {
+  min-height: 44px;
   padding: 5px 12px;
   font-size: 12px;
   line-height: normal;
@@ -81,6 +80,7 @@
 .ops-github-panel__repository-name {
   font-size: 0.875rem;
   font-weight: 600;
+  letter-spacing: normal;
   /* The frozen repository name is a plain h3 inheriting the 1.6 body leading;
      CardTitle's leading-none shaved 8px off the row and pulled the table up. */
   line-height: 1.6;
@@ -106,7 +106,7 @@
   border: var(--border-w) solid var(--border);
   border-radius: var(--radius-sm);
   background: var(--surface-2);
-  color: var(--accent);
+  color: var(--text-2);
 }
 
 /* Frozen repository card: the action group is a plain 8px flex row that
@@ -124,7 +124,7 @@
 
 .ops-github-panel__repository-actions button {
   height: auto;
-  min-height: 0;
+  min-height: 44px;
   padding: 9px 16px;
   font-size: 13px;
   line-height: normal;
@@ -142,7 +142,7 @@
 
 .ops-github-panel__empty-state > svg {
   flex: 0 0 auto;
-  color: var(--accent);
+  color: var(--text-3);
 }
 
 .ops-github-panel__history-table-wrap,
@@ -156,6 +156,15 @@
   padding: 18px 22px;
 }
 
+/* The empty history message takes the slot of the frozen table's header row
+   (12px block padding, 11px/1.6 → 43px) with the card's own inline inset. */
+.ops-github-panel__history-empty {
+  color: var(--text-3);
+  font-size: 12px;
+  line-height: 19px;
+  padding: 12px 22px;
+}
+
 /* The frozen history rows label direction as "Import"/"Export". */
 .ops-github-panel__history-direction { text-transform: capitalize; }
 
@@ -164,6 +173,7 @@
 .ops-github-panel__history-table-wrap table,
 .ops-link-health__flagged-table-wrap table {
   min-inline-size: 0;
+  font-size: 13px;
 }
 
 .ops-github-panel__history-table-wrap th,
@@ -195,16 +205,18 @@
   padding: 12px 14px;
 }
 
+/* The 44px Logs/Recheck controls set the row height, so cells drop their
+   vertical inset to land on the canonical 56px row. */
 .ops-github-panel__history-table-wrap td,
 .ops-link-health__flagged-table-wrap td {
-  padding: 14px;
+  padding: 6px 14px;
   line-height: 1.6;
 }
 
 .ops-github-panel__logs {
   font-size: 12px;
   line-height: normal;
-  min-height: 0;
+  min-height: 44px;
   padding: 5px 10px;
 }
 
@@ -273,17 +285,17 @@
 
 /* DS-OK: semantic status constants are shared by all admin operations. */
 .ops-link-health__stat-card--ok > :last-child {
-  color: #34d08c;
+  color: var(--status-ok);
 }
 
 .ops-link-health__stat-card--warn > :last-child {
   /* DS-OK: canonical global warning status ink, independent of accent. */
-  color: #ffb84d;
+  color: var(--status-warn);
 }
 
 .ops-link-health__stat-card--bad > :last-child {
   /* DS-OK: canonical global failure status ink, independent of accent. */
-  color: #ff5c7a;
+  color: var(--status-bad);
 }
 
 .ops-link-health__summary-meta {
@@ -311,6 +323,23 @@
 
 .ops-link-health__flagged-card .ops-link-health__flagged-table-wrap {
   margin-inline: -0.25rem;
+}
+
+.ops-link-health__flagged-card .ops-link-health__resource-cell {
+  color: var(--text);
+  font-weight: 500;
+}
+
+.ops-link-health__failure-chip {
+  font-size: 10px;
+  white-space: nowrap;
+}
+
+.ops-link-health__checked-cell {
+  color: var(--text-3);
+  font-family: var(--font-mono);
+  font-size: 12px;
+  white-space: nowrap;
 }
 
 .ops-digest-health__header {
@@ -342,18 +371,18 @@
 
 .ops-digest-health__error-code {
   /* DS-OK: semantic BAD status color, not a theme accent. */
-  color: #ff5c7a;
+  color: var(--status-bad);
   font-family: var(--font-mono);
   font-size: 0.6875rem;
 }
 
 .ops-digest-health__stat-card--available .admin-ops-stat__value {
-  color: var(--accent);
+  color: var(--text);
 }
 
 .ops-digest-health__stat-card--unavailable .admin-ops-stat__value {
   /* DS-OK: semantic BAD status color, not a theme accent. */
-  color: #ff5c7a;
+  color: var(--status-bad);
 }
 
 .ops-digest-health__queue-grid {

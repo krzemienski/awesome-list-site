@@ -41,8 +41,7 @@
  *   Block 2 (awesome-list + GitHub discovery):
  *     - GET  /api/awesome-list                    (resourceReadLimiter)
  *     - GET  /api/awesome-list/nav                (resourceReadLimiter)
- *     - POST /api/switch-list
- *     - GET  /api/github/awesome-lists
+ *     - GET  /api/github/awesome-lists            (isAuthenticated, isAdmin)
  *     - GET  /api/github/search                   (isAuthenticated, isAdmin)
  *
  * Middleware, statuses, headers and per-route comments are copied byte-for-byte
@@ -69,8 +68,6 @@ import {
 import { taxonomyScopeIntro } from "@shared/seo-content-templates";
 import { normalizeGithubRepoInput } from "@shared/validation";
 import { db } from "../../db";
-import { storage } from "../../storage";
-import { fetchAwesomeList } from "../../parser";
 import { fetchAwesomeLists, searchAwesomeLists } from "../../github-api";
 import { syncService } from "../../github/syncService";
 import { AwesomeListFormatter } from "../../github/formatter";
@@ -210,8 +207,11 @@ export function registerExportLinkHealthRoutes(
       }
       
       // Add to queue for processing
+      // The branch is recorded once the sync has resolved it; the column's
+      // 'main' default would otherwise mislabel repos on another branch.
       const queueItem = await githubSyncRepo.addToGithubSyncQueue({
         repositoryUrl,
+        branch: null,
         action: 'import',
         status: 'pending',
         resourceIds: [],
@@ -236,6 +236,7 @@ export function registerExportLinkHealthRoutes(
               skipped: result.skipped,
               errors: result.errors.length,
             },
+            result.branch,
           );
         } catch (error) {
           console.error('GitHub import failed:', error);
@@ -285,6 +286,7 @@ export function registerExportLinkHealthRoutes(
       // Add to queue for processing
       const queueItem = await githubSyncRepo.addToGithubSyncQueue({
         repositoryUrl,
+        branch: null,
         action: 'export',
         status: 'pending',
         resourceIds: [],
@@ -309,7 +311,7 @@ export function registerExportLinkHealthRoutes(
           const result = await syncService.exportToGitHub(repositoryUrl, options);
           if (result.errors.length > 0) {
             console.error('GitHub export failed:', result.errors);
-            await githubSyncRepo.updateGithubSyncStatus(queueItem.id, 'failed', result.errors.join('; '));
+            await githubSyncRepo.updateGithubSyncStatus(queueItem.id, 'failed', result.errors.join('; '), undefined, result.branch);
             return;
           }
           console.log('GitHub export completed:', result);
@@ -317,7 +319,7 @@ export function registerExportLinkHealthRoutes(
             exported: result.exported,
             commitSha: result.commitSha,
             commitUrl: result.commitUrl
-          });
+          }, result.branch);
         } catch (error) {
           console.error('GitHub export failed:', error);
           await githubSyncRepo.updateGithubSyncStatus(
@@ -433,7 +435,10 @@ export function registerExportLinkHealthRoutes(
             // rows honestly instead of rendering every row as a success.
             status: q.status,
             commitSha: md.commitSha ?? null,
-            commitMessage: md.commitMessage ?? (q.status === 'failed' ? (q.errorMessage || 'Sync failed') : null),
+            // A failure reason is not a commit message; the panel labels
+            // errorMessage as "Error".
+            commitMessage: md.commitMessage ?? null,
+            errorMessage: q.status === 'failed' ? (q.errorMessage || 'Sync failed') : null,
             commitUrl: null,
             resourcesAdded: added,
             resourcesUpdated: updated,
@@ -447,6 +452,11 @@ export function registerExportLinkHealthRoutes(
       // Run23 NB-038: canonical history rows carry a full resource `snapshot`
       // jsonb (2.7MB total on prod). The list view only needs summary fields;
       // snapshots remain in the DB for on-demand use.
+      // Failed imports record their reason only in the snapshot.
+      const snapshotError = (snapshot: unknown): string | null => {
+        const error = (snapshot as { error?: unknown } | null)?.error;
+        return typeof error === 'string' ? error : null;
+      };
       const historySummaries = history.map(h => {
         // ADM-03/04: canonical history rows have no status column — the
         // outcome is recorded in metadata.outcome ('completed' | 'partial' |
@@ -461,6 +471,7 @@ export function registerExportLinkHealthRoutes(
           status,
           commitSha: h.commitSha,
           commitMessage: h.commitMessage,
+          errorMessage: status === 'failed' ? snapshotError(h.snapshot) : null,
           commitUrl: h.commitUrl,
           resourcesAdded: h.resourcesAdded,
           resourcesUpdated: h.resourcesUpdated,
@@ -1579,33 +1590,15 @@ export function registerAwesomeListDiscoveryRoutes(
     }
   });
 
-  // New endpoint to switch lists
-  app.post("/api/switch-list", async (req, res) => {
-    try {
-      const { rawUrl } = req.body;
-      
-      if (!rawUrl) {
-        return res.status(400).json({ message: 'Raw URL is required' });
-      }
-      
-      console.log(`Switching to list: ${rawUrl}`);
-      const data = await fetchAwesomeList(rawUrl);
-      storage.setAwesomeListData(data);
-      
-      console.log(`Successfully switched to list with ${data.resources.length} resources`);
-      res.json(data);
-    } catch (error) {
-      console.error('Error switching list:', error);
-      res.status(500).json({ message: 'Failed to switch list' });
-    }
-  });
-
   // GitHub awesome lists discovery routes
-  app.get("/api/github/awesome-lists", async (req, res) => {
+  // Admin-only for the same reason as /api/github/search below. GitHub search
+  // serves at most 1000 results, so pages past that are clamped rather than
+  // surfacing its 422 as a 500.
+  app.get("/api/github/awesome-lists", isAuthenticated, isAdmin, async (req, res) => {
     try {
-      const page = parseInt(req.query.page as string) || 1;
-      const perPage = parseInt(req.query.per_page as string) || 30;
-      
+      const perPage = Math.min(Math.max(parseInt(req.query.per_page as string) || 30, 1), 100);
+      const page = Math.min(Math.max(parseInt(req.query.page as string) || 1, 1), Math.floor(1000 / perPage));
+
       const result = await fetchAwesomeLists(page, perPage);
       res.json(result);
     } catch (error) {

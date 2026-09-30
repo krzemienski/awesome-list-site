@@ -62,20 +62,9 @@
   gap: 0.5rem;
 }
 
-.admin-taxonomy-header-actions > [data-testid^="button-more-"] {
-  opacity: 0;
-  position: absolute;
-}
-
-.admin-taxonomy-header-actions > [data-testid^="button-more-"]:focus-visible,
-.admin-taxonomy-shell--tools-open .admin-taxonomy-header-actions > [data-testid^="button-more-"] {
-  opacity: 1;
-  position: static;
-}
-
 .admin-taxonomy-header-actions > [data-testid^="button-create-"] {
-  min-height: 36px;
-  height: 36px;
+  min-height: 44px;
+  height: auto;
   padding: 9px 16px;
   border: var(--hairline-w) solid var(--accent);
   font-size: 13px;
@@ -103,11 +92,10 @@
   width: 12.5rem;
 }
 
-/* Tools closed: the search field and pager are taken out of the flow AND out
-   of the accessibility tree/tab order (visibility), and collapsed to a zero
-   box so the pager cannot extend the document below the canonical panel. */
-.admin-taxonomy-shell:not(.admin-taxonomy-shell--tools-open) .admin-taxonomy-search,
-.admin-taxonomy-shell:not(.admin-taxonomy-shell--tools-open) .admin-taxonomy-pagination {
+/* Tools closed: the search field leaves the flow and the accessibility
+   tree unless it still holds a query, so an active filter is never invisible.
+   The pager is not a tool — it always shows when there is more than a page. */
+.admin-taxonomy-shell:not(.admin-taxonomy-shell--tools-open) .admin-taxonomy-search:not(:has(input:not(:placeholder-shown))) {
   height: 0;
   inset: 0 auto auto 0;
   margin: 0;
@@ -143,44 +131,20 @@
   padding: 1.375rem;
 }
 
-/* TableShell geometry from the frozen admin reference. */
-.admin-taxonomy-table {
+/* Header and row styling come from the canonical `.table`; the admin adds
+   the frozen 56px row height and scrolls inside the card on narrow screens. */
+.admin-taxonomy-table-scroll {
+  position: relative;
   width: 100%;
-  border-collapse: collapse;
-  font-size: 0.8125rem;
-  line-height: 1.6;
-}
-
-.admin-taxonomy-table thead th {
-  height: auto;
-  padding: 0.75rem 0.875rem;
-  border-bottom: var(--hairline-w) solid var(--border);
-  color: var(--text-3);
-  font-family: var(--font-body);
-  font-size: 0.6875rem;
-  font-weight: 500;
-  letter-spacing: 0.03125rem;
-  line-height: 1.6;
-  text-align: left;
-  text-transform: uppercase;
-  vertical-align: middle;
+  overflow-x: auto;
 }
 
 .admin-taxonomy-table tbody td {
-  padding: 0.875rem;
-  border-bottom: var(--hairline-w) solid var(--border);
-  color: var(--text-2);
-  vertical-align: middle;
+  height: 56px;
 }
 
 .admin-taxonomy-table tbody tr {
-  border-bottom: 0;
   transition: background-color var(--motion-fast), color var(--motion-fast);
-}
-
-.admin-taxonomy-table tbody tr:hover > td {
-  background: var(--surface);
-  color: var(--text);
 }
 
 .admin-taxonomy-table .admin-taxonomy-column-id,
@@ -197,14 +161,31 @@
   color: var(--text-3);
 }
 
-/* Canonical slug sizes per panel (admin.jsx: categories 12px, subcategories
-   11.5px); the auto table layout shares width by these max-content widths. */
-.admin-taxonomy-shell--categories .admin-taxonomy-table .admin-taxonomy-cell-slug {
+/* The frozen admin.jsx puts `mono` on the CELL (slug, resource count,
+   subcategory count): 12px mono with the 1.6 body leading, so the glyphs sit
+   on the cell's own 19.2px line box. Styling only an inner span left a 13px
+   Inter strut under a 12px inline, dropping every mono glyph ~1px. Canonical
+   slug sizes per panel: categories 12px, subcategories 11.5px. */
+.admin-taxonomy-table tbody .admin-taxonomy-column-slug,
+.admin-taxonomy-table tbody .admin-taxonomy-column-count,
+.admin-taxonomy-table tbody .admin-taxonomy-column-subcategories {
+  font-family: var(--font-mono);
   font-size: 0.75rem;
+  line-height: 1.6;
 }
 
-.admin-taxonomy-shell--subcategories .admin-taxonomy-table .admin-taxonomy-cell-slug {
+.admin-taxonomy-table tbody .admin-taxonomy-column-slug {
+  color: var(--text-3);
+}
+
+.admin-taxonomy-shell--subcategories .admin-taxonomy-table tbody .admin-taxonomy-column-slug {
   font-size: 0.71875rem;
+}
+
+.admin-taxonomy-table .admin-taxonomy-cell-slug {
+  color: inherit;
+  font-size: inherit;
+  line-height: inherit;
 }
 
 .admin-taxonomy-table .admin-taxonomy-cell-name {
@@ -212,15 +193,24 @@
   font-weight: 500;
 }
 
+/* The frozen table paints each category glyph in the accent. Nine glyphs
+   plus the shell's reserved moments break the per-viewport accent budget, so
+   the icons carry the secondary ink instead; the header stays a plain th. */
 .admin-taxonomy-table .admin-taxonomy-column-icon {
   width: auto;
-  color: var(--accent);
 }
 
+.admin-taxonomy-table tbody .admin-taxonomy-column-icon,
 .admin-taxonomy-category-icon {
-  display: block;
-  color: var(--accent);
+  color: var(--text-2);
+}
+
+/* Inline so the glyph sits on the cell's 18px/28.8px line box, like the
+   frozen text glyph does; that line box sets the frozen category row height. */
+.admin-taxonomy-category-icon {
+  display: inline-block;
   stroke-width: 1.75;
+  vertical-align: middle;
 }
 
 .admin-taxonomy-shell--categories tbody .admin-taxonomy-column-icon {
@@ -233,10 +223,6 @@
   height: 18px;
 }
 
-.admin-taxonomy-shell--categories .admin-taxonomy-table tbody tr {
-  height: 57.796875px;
-}
-
 .admin-taxonomy-table .admin-taxonomy-column-parent {
   color: var(--text-2);
 }
@@ -246,12 +232,21 @@
   width: auto;
 }
 
+/* The action column shrinks to its controls (Edit + the 44px delete target)
+   so both stay inside the card. Only this cell trims its block padding: the
+   44px targets then fit the frozen row height instead of stretching it. */
 .admin-taxonomy-table .admin-taxonomy-column-actions {
-  min-width: 122px;
+  white-space: nowrap;
+  width: 1%;
+}
+
+.admin-taxonomy-table tbody td.admin-taxonomy-column-actions {
+  padding-block: 5px;
 }
 
 .admin-taxonomy-table .admin-taxonomy-cell-count {
-  display: inline-flex;
+  /* Plain inline text in the mono cell (frozen: a bare number, no badge). */
+  display: inline;
   min-width: 0;
   padding: 0;
   border: 0;
@@ -259,10 +254,10 @@
   background: transparent;
   box-shadow: none;
   color: inherit;
-  font-family: var(--font-mono);
-  font-size: 0.75rem;
+  font-family: inherit;
+  font-size: inherit;
   font-weight: 400;
-  line-height: 1.35;
+  line-height: inherit;
 }
 
 .admin-taxonomy-row-actions {
@@ -270,16 +265,19 @@
 }
 
 .admin-taxonomy-row-action {
+  /* Frozen `btn ghost` (styles.css:216): hairline border, full ink. */
   min-width: 44px;
   min-height: 44px !important;
   height: 44px !important;
   padding: 0 0.625rem;
+  border: var(--border-w) solid var(--border);
   border-radius: var(--radius-sm);
-  color: var(--text-2);
+  color: var(--text);
   font-size: 0.75rem;
 }
 
 .admin-taxonomy-row-action:hover {
+  background: var(--surface);
   color: var(--text);
 }
 
@@ -371,8 +369,10 @@
     margin-inline: 1rem;
   }
 
+  /* Scroll inside the card rather than stacking names and slugs 3-4 lines
+     deep; the page itself never scrolls sideways. */
   .admin-taxonomy-table {
-    min-width: 0;
+    min-width: 42rem;
   }
 
   .admin-taxonomy-pagination {

@@ -1,5 +1,6 @@
 import { useQuery } from "@tanstack/react-query";
 import { apiRequest } from "@/lib/queryClient";
+import { formatRelativeAgo } from "@/lib/utils";
 import Stat from "@/components/admin/canonical/Stat";
 
 interface AdminStatsProps {
@@ -46,6 +47,7 @@ interface CategorySummary {
 }
 
 const PAGE_SIZE = 100;
+const ACTIVE_WINDOW_MS = 30 * 24 * 60 * 60 * 1000;
 const getDate = (value: string | null | undefined) => {
   if (!value) return null;
   const timestamp = new Date(value).getTime();
@@ -83,14 +85,7 @@ function oldestPendingAge(resources: PendingResource[] | undefined): string {
     ), null);
 
   if (oldest === null) return "nothing waiting";
-  const elapsed = Math.max(0, Date.now() - oldest);
-  const minutes = Math.floor(elapsed / 60_000);
-  if (minutes < 1) return "oldest just now";
-  if (minutes < 60) return `oldest ${minutes}m ago`;
-  const hours = Math.floor(minutes / 60);
-  if (hours < 24) return `oldest ${hours}h ago`;
-  const days = Math.floor(hours / 24);
-  return `oldest ${days}d ago`;
+  return `oldest ${formatRelativeAgo(new Date(oldest))}`;
 }
 
 /**
@@ -131,9 +126,13 @@ export default function AdminStats({
   // The stats route intentionally does not forward the repository's
   // all-users count. Keep this card tied to the sequential user pages so its
   // value and role split use the same 30-day updatedAt definition.
-  const activeUsers = users.data?.length;
-  const activeAdmins = users.data?.filter((user) => user.role === "admin").length ?? 0;
-  const activeContributors = users.data?.filter((user) => user.role !== "admin").length ?? 0;
+  const activeSince = Date.now() - ACTIVE_WINDOW_MS;
+  const activeUserList = users.data?.filter(
+    (user) => (getDate(user.updatedAt) ?? 0) > activeSince,
+  );
+  const activeUsers = activeUserList?.length;
+  const activeAdmins = activeUserList?.filter((user) => user.role === "admin").length ?? 0;
+  const activeContributors = activeUserList?.filter((user) => user.role !== "admin").length ?? 0;
   const categoryCount = categories.data?.length;
   const subcategoryCount = subcategories.data?.length;
   const pendingUnavailable = pending.isError;

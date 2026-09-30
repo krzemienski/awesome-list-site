@@ -15,7 +15,8 @@ import { AccountThemePreferenceBridge } from "@/components/ui/theme-provider";
 import { publishableKeyFromHost } from "@clerk/react/internal";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { noteLocationChange, useScrollRestoration } from "./lib/nav-history";
-import { useAuth } from "./hooks/useAuth";
+import { useAuth, clearSignedInClientState } from "./hooks/useAuth";
+import { findRouteSuggestion } from "./lib/not-found-suggestion";
 import { useAnalytics } from "./hooks/use-analytics";
 import { useCrossTabSync } from "./lib/crossTabSync";
 import { useClerkAppearance } from "./lib/clerk-appearance";
@@ -26,8 +27,10 @@ import {
 
 import MainLayout from "@/components/layout/new/MainLayout";
 import SEOHead from "@/components/layout/SEOHead";
+import { signInSeoDescription, signUpSeoDescription } from "@shared/seo-templates";
 import AuthConversionTracker from "@/components/auth/AuthConversionTracker";
 import GuestBookmarkMerge from "@/components/auth/GuestBookmarkMerge";
+import StaleSessionGate from "@/components/auth/StaleSessionGate";
 import ConsentBanner from "@/components/ui/consent-banner";
 import ScrubbedParamsNotice from "@/components/ui/scrubbed-params-notice";
 import { Button } from "@/components/ui/button";
@@ -329,7 +332,7 @@ const HomeRoute: HomeRouteComponent = (props) => <LazyHomeRoute {...props} />;
 // (sidebar/header) that made 404s look like real content pages.
 const KNOWN_ROUTE_PATTERNS: RegExp[] = [
   /^\/$/,
-  /^\/(login|logout|register|signup|explore|forgot-password|reset-password|categories|category|tag|recommendations|search|about|advanced|submit|journeys|journey|continue-learning|profile|contributions|bookmarks|favorites|account|admin|settings|notifications|onboarding|resource|terms|privacy|code-of-conduct)\/?$/,
+  /^\/(login|logout|register|signup|explore|forgot-password|reset-password|categories|category|subcategory|sub-subcategory|tag|recommendations|search|about|advanced|submit|journeys|journey|continue-learning|profile|contributions|bookmarks|favorites|account|admin|settings|notifications|onboarding|resource|terms|privacy|code-of-conduct)\/?$/,
   // Task #307: Clerk-hosted auth pages, including OAuth/verification sub-paths.
   /^\/(sign-in|sign-up)(\/.*)?$/,
   /^\/auth\/(login|register)\/?$/,
@@ -350,9 +353,14 @@ const KNOWN_ROUTE_PATTERNS: RegExp[] = [
 // browser hostname, so it must use the explicitly configured key instead of
 // passing an empty host to Clerk's host resolver. A missing build-time key is
 // a configuration error for both paths; never substitute a fake key.
+// A loopback host has no Clerk custom domain to derive (a production build
+// served on localhost would otherwise ask for clerk.localhost), so local runs
+// of either build use the configured key.
 const configuredClerkPubKey = import.meta.env.VITE_CLERK_PUBLISHABLE_KEY;
+const isLoopbackHost = (host: string) =>
+  host === "localhost" || host === "127.0.0.1" || host === "[::1]" || host.endsWith(".localhost");
 const clerkPubKey =
-  typeof window === "undefined"
+  typeof window === "undefined" || isLoopbackHost(window.location.hostname)
     ? configuredClerkPubKey
     : publishableKeyFromHost(window.location.hostname, configuredClerkPubKey);
 const clerkProxyUrl = import.meta.env.VITE_CLERK_PROXY_URL;
@@ -405,12 +413,14 @@ function SignInPage() {
       data-testid="page-sign-in"
     >
       {/* Title mirrors the og-middleware /sign-in template (two-pass parity). */}
-      <SEOHead title="Sign In" noindex />
-      <SignIn
-        routing="path"
-        path={`${basePath}/sign-in`}
-        signUpUrl={`${basePath}/sign-up`}
-      />
+      <SEOHead title="Sign In" description={signInSeoDescription} noindex />
+      <StaleSessionGate>
+        <SignIn
+          routing="path"
+          path={`${basePath}/sign-in`}
+          signUpUrl={`${basePath}/sign-up`}
+        />
+      </StaleSessionGate>
     </div>
   );
 }
@@ -425,12 +435,14 @@ function SignUpPage() {
       data-testid="page-sign-up"
     >
       {/* Title mirrors the og-middleware /sign-up template (two-pass parity). */}
-      <SEOHead title="Create an Account" noindex />
-      <SignUp
-        routing="path"
-        path={`${basePath}/sign-up`}
-        signInUrl={`${basePath}/sign-in`}
-      />
+      <SEOHead title="Create an Account" description={signUpSeoDescription} noindex />
+      <StaleSessionGate>
+        <SignUp
+          routing="path"
+          path={`${basePath}/sign-up`}
+          signInUrl={`${basePath}/sign-in`}
+        />
+      </StaleSessionGate>
     </div>
   );
 }
@@ -458,8 +470,10 @@ function ClerkQueryClientCacheInvalidator() {
         if (userId !== null) void qc.invalidateQueries();
       } else if (prevUserIdRef.current !== userId) {
         // A real identity switch (sign-in, sign-out, account change): nothing
-        // user-scoped may survive it.
-        qc.clear();
+        // user-scoped may survive it. resetQueries, not clear(): clear() drops
+        // the cache but leaves mounted observers holding their old result, so
+        // the header kept showing "Visitor" after sign-in until a reload.
+        void qc.resetQueries();
       }
       prevUserIdRef.current = userId;
     });
@@ -480,6 +494,7 @@ function Logout() {
     const doSignOut = async () => {
       try {
         await signOut();
+        clearSignedInClientState();
         const authCheck = await fetch("/api/auth/user", {
           credentials: "include",
           cache: "no-store",
@@ -540,7 +555,6 @@ function Router({ homeComponent: Home }: { homeComponent: HomeRouteComponent }) 
   useCrossTabSync();
   const {
     user,
-    isLoading: authLoading,
     error: authError,
     refetchAuth,
     logout,
@@ -621,11 +635,14 @@ function Router({ homeComponent: Home }: { homeComponent: HomeRouteComponent }) 
 
   if (error) {
     return (
-      <RouteErrorBoundary location={location}>
-      <Suspense fallback={<RouteFallback />}>
-        <ErrorPage error={error} />
-      </Suspense>
-      </RouteErrorBoundary>
+      <div className="page">
+        <div className="grain" aria-hidden="true" />
+        <RouteErrorBoundary location={location}>
+        <Suspense fallback={<RouteFallback />}>
+          <ErrorPage error={error} />
+        </Suspense>
+        </RouteErrorBoundary>
+      </div>
     );
   }
 
@@ -645,7 +662,7 @@ function Router({ homeComponent: Home }: { homeComponent: HomeRouteComponent }) 
       <MainLayout productProfile={productProfile} nav={nav} isLoading={navLoading} navError={navError} onRetryNav={() => refetchNav()} user={user ?? undefined} onLogout={logout} logoutError={logoutError} renderSearchDialog={renderSearchDialog}>
         <RouteErrorBoundary location={location}>
         <Suspense fallback={<RouteFallback />}>
-          <NotFound />
+          <NotFound suggestion={findRouteSuggestion(location, nav)} />
         </Suspense>
         </RouteErrorBoundary>
       </MainLayout>
@@ -703,7 +720,7 @@ function Router({ homeComponent: Home }: { homeComponent: HomeRouteComponent }) 
         <Route path="/auth/register"><LegacyAuthRedirect to="/sign-up" /></Route>
         <Route path="/signup"><LegacyAuthRedirect to="/sign-up" /></Route>
         <Route path="/explore">
-          <Redirect to="/search" replace />
+          <Redirect to={legacyHomeQuery ? `/search?q=${encodeURIComponent(legacyHomeQuery)}` : "/search"} replace />
         </Route>
         <Route path="/resource">
           <Redirect to={legacyHomeQuery ? `/search?q=${encodeURIComponent(legacyHomeQuery)}` : "/search"} replace />
@@ -724,8 +741,16 @@ function Router({ homeComponent: Home }: { homeComponent: HomeRouteComponent }) 
             onRetry={() => refetchNav()}
           />
         </Route>
+        {/* R5-051: one bare-prefix policy with the server — taxonomy
+            prefixes without a slug land on the category index. */}
         <Route path="/category">
-          <Redirect to="/" replace />
+          <Redirect to="/categories" replace />
+        </Route>
+        <Route path="/subcategory">
+          <Redirect to="/categories" replace />
+        </Route>
+        <Route path="/sub-subcategory">
+          <Redirect to="/categories" replace />
         </Route>
         <Route path="/subcategory/:slug" component={Subcategory} />
         <Route path="/recommendations" component={Recommendations} />
@@ -791,7 +816,7 @@ function Router({ homeComponent: Home }: { homeComponent: HomeRouteComponent }) 
           </AuthGuard>
         </Route>
         <Route>
-          <NotFound />
+          <NotFound suggestion={findRouteSuggestion(location, nav)} />
         </Route>
       </Switch>
       </Suspense>

@@ -402,6 +402,7 @@ export function buildReferenceReconciliation({
     about: {
       ...retainedReferenceExtensions.about,
       resourceCount: total.toLocaleString("en-US"),
+      siteName: title,
     },
   };
 

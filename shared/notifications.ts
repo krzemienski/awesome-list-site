@@ -61,7 +61,8 @@ export interface NotificationPreferencesResponse {
   includeWatchNext: boolean;
   includeJourneyStep: boolean;
   cadence: DigestCadence;
-  timezone: string;
+  /** null until the user has saved preferences at least once. */
+  timezone: string | null;
   pausedUntil: string | null;
   emailOptedInAt: string | null;
   emailUnsubscribedAt: string | null;

@@ -48,11 +48,11 @@ with a reason or the audit will flag it.
 
 - **shadcn primitives first** (`@/components/ui/*` — see
   [`docs/COMPONENT-LIBRARY.md`](COMPONENT-LIBRARY.md)). They are pre-bridged: `Button`
-  emits `data-ds-variant`, `Badge` variants `chip`/`accent` emit `data-ds="chip"`, so
+  emits `data-ds-variant` and renders `.btn`, every `Badge` variant renders `.chip`, so
   per-system skins (terminal brackets, brutalist slabs, swiss hairlines) apply for
   free. Do **not** hand-roll buttons, dialogs, dropdowns, or tabs.
-- **Interactive cards** add `data-ds="card-hover"` so hover behavior follows the
-  active system (lift / glow / slab / color-only).
+- **Interactive cards** pass `hoverable` to `Card` (renders `.card.hoverable`) so hover
+  behavior follows the active system (lift / glow / slab / color-only).
 - **Page-title `h1`s use `.display-h`** — never `font-sans` or `font-medium` on them
   (breaks per-system display faces/weights). `<em>` inside display copy is the
   approved accent-emphasis device.
@@ -115,8 +115,8 @@ Any new surface must remain correct under every `data-system`:
 
 - [ ] No unmarked hex/palette colors, raw radii/shadows, or font strings (grep for
       `#[0-9a-f]` and Tailwind palette classes in your diff).
-- [ ] shadcn primitives (or DS classes) used; interactive cards carry
-      `data-ds="card-hover"`; `h1` uses `.display-h`.
+- [ ] shadcn primitives (or DS classes) used; interactive cards use
+      `<Card hoverable>`; `h1` uses `.display-h`.
 - [ ] Accent moments ≤1 per surface; body copy in tier 1/2 ink.
 - [ ] 44px targets; `aria-label` on icon buttons; keyboard focus visible (don't
       suppress the global outline).

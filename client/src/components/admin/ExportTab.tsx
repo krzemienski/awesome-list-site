@@ -324,7 +324,11 @@ export default function ExportTab({ validationStatus: propValidationStatus }: Ex
       <div className="admin-ops-export__intro">
         <h2>Export Awesome List</h2>
         <div className="admin-ops-export__intro-actions">
-          <Button onClick={() => setConfirmAction("validate")} disabled={validateMutation.isPending}>
+          <Button
+            onClick={() => setConfirmAction("validate")}
+            disabled={validateMutation.isPending}
+            variant="outline"
+          >
             {validateMutation.isPending ? (
               <>
                 <RefreshCw className="h-4 w-4 animate-spin" />
@@ -370,7 +374,7 @@ export default function ExportTab({ validationStatus: propValidationStatus }: Ex
             <FileJson className="h-5 w-5" />
           </div>
           <h3 className="admin-ops-export-card__title">JSON Snapshot</h3>
-          <p className="admin-ops-export-card__description">Complete dataset as a single JSON file. ~12 MB.</p>
+          <p className="admin-ops-export-card__description">Complete dataset as a single JSON file.</p>
           <Button
             className="admin-ops-export-card__action"
             onClick={() => {
@@ -390,7 +394,13 @@ export default function ExportTab({ validationStatus: propValidationStatus }: Ex
           </div>
           <h3 className="admin-ops-export-card__title">CSV (resources)</h3>
           <p className="admin-ops-export-card__description">Flat resource table for spreadsheet workflows.</p>
-          <Button className="admin-ops-export-card__action" onClick={() => unavailableExport("CSV")}>Download</Button>
+          <Button
+            className="admin-ops-export-card__action"
+            onClick={() => unavailableExport("CSV")}
+            variant="outline"
+          >
+            Download
+          </Button>
         </article>
 
         <article className="card admin-ops-export-card hoverable">
@@ -405,10 +415,11 @@ export default function ExportTab({ validationStatus: propValidationStatus }: Ex
               void handleExport();
             }}
             disabled={isExporting}
+            variant="outline"
             data-testid="button-export-markdown"
           >
             {isExporting ? <RefreshCw className="h-4 w-4 animate-spin" /> : <Download className="h-4 w-4" />}
-             {isExporting ? "Generating..." : "Generate"}
+            {isExporting ? "Generating..." : "Generate"}
           </Button>
         </article>
 
@@ -420,7 +431,7 @@ export default function ExportTab({ validationStatus: propValidationStatus }: Ex
           },
           {
             title: "SQL dump",
-             description: "PostgreSQL-compatible schema + data.",
+            description: "PostgreSQL-compatible schema + data.",
             icon: <TerminalSquare className="h-5 w-5" />,
           },
           {
@@ -438,6 +449,7 @@ export default function ExportTab({ validationStatus: propValidationStatus }: Ex
             <Button
               className="admin-ops-export-card__action"
               onClick={() => unavailableExport(format.title)}
+              variant="outline"
             >
               {format.title === "API token" ? "Generate" : "Download"}
             </Button>
@@ -545,9 +557,9 @@ export default function ExportTab({ validationStatus: propValidationStatus }: Ex
               <div className="admin-ops-validation-summary">
                 {/* DS-OK: global semantic status colors for validation outcomes. */}
                 {validationStatus.awesomeLint.valid ? (
-                  <CheckCircle2 className="h-4 w-4 text-[#34d08c]" aria-hidden="true" />
+                  <CheckCircle2 className="h-4 w-4 text-[var(--status-ok)]" aria-hidden="true" />
                 ) : (
-                  <XCircle className="h-4 w-4 text-[#ff5c7a]" aria-hidden="true" />
+                  <XCircle className="h-4 w-4 text-[var(--status-bad)]" aria-hidden="true" />
                 )}
                 <span className="admin-ops-validation-meta">
                   {validationStatus.awesomeLint.stats.totalResources} resources,{" "}
@@ -661,7 +673,7 @@ export default function ExportTab({ validationStatus: propValidationStatus }: Ex
                 validationStatus.linkCheck.brokenResources.length > 0 && (
                   <div className="space-y-2">
                     {/* DS-OK: global semantic status color for broken-link headings. */}
-                    <h3 className="text-sm font-semibold text-[#ff5c7a]">
+                    <h3 className="text-sm font-semibold text-[var(--status-bad)]">
                       Broken links ({validationStatus.linkCheck.brokenResources.length})
                     </h3>
                     <ScrollArea className="admin-ops-validation-list admin-ops-validation-list--bad h-64">
@@ -670,14 +682,14 @@ export default function ExportTab({ validationStatus: propValidationStatus }: Ex
                           <div key={i} className="border-b border-[var(--border)] pb-3 last:border-0">
                             <div className="flex items-start gap-2">
                               {/* DS-OK: global semantic status color for broken-link icons. */}
-                              <XCircle className="mt-0.5 h-4 w-4 shrink-0 text-[#ff5c7a]" />
+                              <XCircle className="mt-0.5 h-4 w-4 shrink-0 text-[var(--status-bad)]" />
                               <div className="min-w-0 flex-1">
                                 <div className="text-sm font-semibold text-[var(--text)]">
                                   {link.resourceTitle ?? "Unknown Resource"}
                                 </div>
                                 <div className="break-all font-mono text-xs text-[var(--text-2)]">{link.url}</div>
                                 {/* DS-OK: global semantic status color for broken-link messages. */}
-                                <div className="mt-1 flex flex-wrap items-center gap-2 text-xs text-[#ff5c7a]">
+                                <div className="mt-1 flex flex-wrap items-center gap-2 text-xs text-[var(--status-bad)]">
                                   <StatusChip status={link.status >= 500 ? "Failed" : "Warning"} />
                                   <span>
                                     {link.status} {link.statusText}

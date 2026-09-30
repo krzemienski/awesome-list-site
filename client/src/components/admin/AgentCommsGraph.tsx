@@ -24,12 +24,12 @@ const TYPE_LAYER: Record<NodeType, number> = {
 // ok), mirrored verbatim from client/src/lib/charts/palette.ts and
 // docs/DESIGN-SYSTEM.md §5. Three distinct hues are required to tell the roles
 // apart under every accent, so they cannot track var(--accent).
-// DS-OK: mirrored DS status/info constants — semantics, not themeable paint.
+// Status/info tokens (app-bridge.css) — semantics, not themeable paint.
 const TYPE_STROKE: Record<NodeType, string> = {
-  orchestrator: "#5eddf2",
-  system: "#5eddf2",
-  subagent: "#9d4edd",
-  tool: "#34d08c",
+  orchestrator: "var(--status-info)",
+  system: "var(--status-info)",
+  subagent: "var(--status-info-2)",
+  tool: "var(--status-ok)",
 };
 
 const TYPE_LABEL: Record<NodeType, string> = {
@@ -39,9 +39,9 @@ const TYPE_LABEL: Record<NodeType, string> = {
   tool: "tool",
 };
 
-// DS-OK: edge colors follow the node role colors above (DS constants).
-const EDGE_DELEGATION = "#9d4edd";
-const EDGE_TOOL = "#34d08c";
+// Edge colors follow the node role colors above.
+const EDGE_DELEGATION = "var(--status-info-2)";
+const EDGE_TOOL = "var(--status-ok)";
 
 interface GNode {
   id: string;

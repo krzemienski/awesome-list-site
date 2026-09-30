@@ -135,6 +135,9 @@ const STATUS_VARIANTS: Record<string, string> = {
   moderator: "warn",
   user: "muted",
   accent: "accent",
+  ok: "ok",
+  warn: "warn",
+  bad: "bad",
   failed: "bad",
   error: "bad",
   rejected: "bad",
@@ -150,7 +153,6 @@ export function StatusChip({ status, className, children, ...props }: StatusChip
 
   return (
     <span
-      data-ds="chip"
       {...props}
       className={cn(
         "chip",

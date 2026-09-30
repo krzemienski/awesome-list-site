@@ -387,7 +387,7 @@ export default function AdminOverview({ stats }: AdminOverviewProps) {
       <div className="admin-canonical-overview-grid">
         <TableShell
           title="Recent activity"
-          subtitle="Last 24 hours"
+          subtitle="Latest 6 events"
           className="admin-panel admin-activity"
           testId="admin-overview-activity"
         >
@@ -410,7 +410,7 @@ export default function AdminOverview({ stats }: AdminOverviewProps) {
                   <span className="admin-canonical-activity-action">
                     {entry.action.replace(/[_-]/g, " ")}
                   </span>
-                  <span className="admin-canonical-activity-target">
+                  <span className="admin-canonical-activity-target" title={auditTarget(entry)}>
                     {auditTarget(entry)}
                   </span>
                   <span className="admin-canonical-activity-time">

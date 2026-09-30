@@ -8,6 +8,18 @@ import { mpIdentify, mpReset } from '@/lib/mixpanel';
 import { phIdentify, phReset } from '@/lib/posthog';
 import { useToast } from '@/hooks/use-toast';
 
+/**
+ * Per-device state that belongs to the person who just signed out: the
+ * private submit draft, analytics identities, and other tabs' auth view.
+ * Every sign-out path (account menu and the /logout route) runs this.
+ */
+export function clearSignedInClientState(): void {
+  safeRemoveItem('submit-resource-draft');
+  mpReset();
+  phReset();
+  notifyCrossTabSync();
+}
+
 interface User {
   id: string;
   email?: string;
@@ -103,10 +115,7 @@ export function useAuth() {
       // Clear auth cache only after the server confirms invalidation.
       queryClient.invalidateQueries({ queryKey: ['/api/auth/user'] });
       queryClient.setQueryData(['/api/auth/user'], { user: null, isAuthenticated: false });
-      safeRemoveItem('submit-resource-draft');
-      mpReset();
-      phReset();
-      notifyCrossTabSync();
+      clearSignedInClientState();
       window.location.href = '/';
   };
 

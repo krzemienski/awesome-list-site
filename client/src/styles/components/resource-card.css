@@ -59,7 +59,8 @@
   height: 2.25rem;
   flex: 0 0 auto;
   place-items: center;
-  color: var(--accent);
+  /* Decorative glyph: ink tier, not accent (Stage 7 — accent is reserved). */
+  color: var(--text-2);
   font-size: 1rem;
   background: var(--surface-2);
   border: var(--hairline-w) solid var(--border);
@@ -126,7 +127,7 @@
 
 .resource-card__print-url {
   margin-bottom: 0.5rem;
-  color: var(--text-3);
+  color: var(--text-2);
   font-family: var(--font-mono);
   font-size: 0.625rem;
   overflow-wrap: anywhere;
@@ -238,14 +239,16 @@
 }
 
 .resource-card__meta-badge {
-  color: var(--accent);
-  border-color: color-mix(in srgb, var(--accent) 30%, var(--border));
+  color: var(--text-2);
+  border-color: var(--border);
   font-size: 0.625rem;
 }
 
 .resource-card__meta-badge:hover,
 .resource-card__meta-badge:focus-visible {
-  background: color-mix(in srgb, var(--accent) 10%, transparent);
+  color: var(--text);
+  border-color: var(--border-strong);
+  background: var(--surface-2);
 }
 
 .resource-card__meta-icon {
@@ -266,11 +269,10 @@
   text-decoration: none;
 }
 
-.resource-card__more-tags {
-  display: inline-flex;
+/* DS .btn.ghost, compacted to sit inline with the tag chips. */
+.btn.resource-card__more-tags {
   min-height: 2rem;
-  align-items: center;
-  padding: 0 0.25rem;
+  padding: 0 0.5rem;
   color: var(--text-2);
   font-size: 0.6875rem;
   text-decoration: none;

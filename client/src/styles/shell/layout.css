@@ -20,6 +20,13 @@
   display: none;
 }
 
+.app-shell-column {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  min-width: 0;
+}
+
 .app-shell-main {
   flex: 1;
   min-width: 0;

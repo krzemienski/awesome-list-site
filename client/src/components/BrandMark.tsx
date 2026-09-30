@@ -18,12 +18,13 @@ export function BrandMark({ className }: { className?: string }) {
     <svg
       viewBox={BRAND_MARK_VIEWBOX}
       className={className}
+      style={{ color: "var(--accent)" }}
       aria-hidden="true"
       focusable="false"
       data-testid="brand-mark"
     >
       {/* The tile fill is fixed brand paint (see BRAND_MARK_TILE_FILL); the
-          border and glyphs track var(--accent). */}
+          border and glyphs paint currentColor, which the svg sets to the accent. */}
       <rect
         fill={BRAND_MARK_TILE_FILL}
         x={BRAND_MARK_TILE.x}
@@ -31,10 +32,10 @@ export function BrandMark({ className }: { className?: string }) {
         width={BRAND_MARK_TILE.width}
         height={BRAND_MARK_TILE.height}
         rx={BRAND_MARK_TILE.rx}
-        stroke="var(--accent)"
+        stroke="currentColor"
         strokeWidth={BRAND_MARK_TILE.strokeWidth}
       />
-      <g fill="var(--accent)">
+      <g fill="currentColor">
         {BRAND_MARK_GLYPHS.map((glyph) => (
           <path key={glyph.transform} transform={glyph.transform} d={glyph.d} />
         ))}

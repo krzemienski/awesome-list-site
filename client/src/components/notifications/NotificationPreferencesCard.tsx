@@ -44,6 +44,15 @@ function Toggle({ checked, onChange, label, description, icon: Icon }: { checked
   );
 }
 
+function isValidTimezone(timezone: string): boolean {
+  try {
+    new Intl.DateTimeFormat(undefined, { timeZone: timezone.trim() });
+    return timezone.trim().length > 0;
+  } catch {
+    return false;
+  }
+}
+
 export default function NotificationPreferencesCard() {
   const preferencesQuery = useQuery<NotificationPreferencesResponse>({
     queryKey: ["/api/notification-preferences"],
@@ -54,22 +63,29 @@ export default function NotificationPreferencesCard() {
   const [values, setValues] = useState<NotificationPreferencesUpdate>(defaults);
   const [saved, setSaved] = useState(false);
   const [requestError, setRequestError] = useState<string | null>(null);
+  const [timezoneError, setTimezoneError] = useState<string | null>(null);
+
+  // Unsaved edits survive a refetch and the quick actions below; only an
+  // explicit "Save choices" commits them.
+  const [dirty, setDirty] = useState(false);
+  const savedValues = useMemo<NotificationPreferencesUpdate | null>(() => {
+    const data = preferencesQuery.data;
+    if (!data) return null;
+    return {
+      emailDigestEnabled: data.emailDigestEnabled,
+      inAppEnabled: data.inAppEnabled,
+      includeNewResources: data.includeNewResources,
+      includeWatchNext: data.includeWatchNext,
+      includeJourneyStep: data.includeJourneyStep,
+      cadence: data.cadence,
+      timezone: data.timezone ?? localTimezone(),
+      pausedUntil: data.pausedUntil,
+    };
+  }, [preferencesQuery.data]);
 
   useEffect(() => {
-    const data = preferencesQuery.data;
-    if (data) {
-      setValues({
-        emailDigestEnabled: data.emailDigestEnabled,
-        inAppEnabled: data.inAppEnabled,
-        includeNewResources: data.includeNewResources,
-        includeWatchNext: data.includeWatchNext,
-        includeJourneyStep: data.includeJourneyStep,
-        cadence: data.cadence,
-        timezone: data.timezone,
-        pausedUntil: data.pausedUntil,
-      });
-    }
-  }, [preferencesQuery.data]);
+    if (savedValues && !dirty) setValues(savedValues);
+  }, [savedValues, dirty]);
 
   const saveMutation = useMutation({
     mutationFn: (body: NotificationPreferencesUpdate) =>
@@ -92,9 +108,18 @@ export default function NotificationPreferencesCard() {
   const paused = Boolean(values.pausedUntil && new Date(values.pausedUntil).getTime() > Date.now());
   const update = <K extends keyof NotificationPreferencesUpdate>(key: K, value: NotificationPreferencesUpdate[K]) => {
     setSaved(false);
+    setDirty(true);
+    if (key === "timezone") setTimezoneError(null);
     setValues((current) => ({ ...current, [key]: value }));
   };
-  const saveValues = (nextValues: NotificationPreferencesUpdate) => {
+  const saveValues = (nextValues: NotificationPreferencesUpdate, onSaved?: () => void) => {
+    if (!isValidTimezone(nextValues.timezone)) {
+      setSaved(false);
+      setRequestError(null);
+      setTimezoneError("Choose a valid IANA time zone.");
+      return;
+    }
+    setTimezoneError(null);
     const parsed = notificationPreferencesUpdateSchema.safeParse(nextValues);
     if (!parsed.success) {
       setSaved(false);
@@ -102,24 +127,19 @@ export default function NotificationPreferencesCard() {
       return;
     }
     setRequestError(null);
-    saveMutation.mutate(parsed.data);
+    saveMutation.mutate(parsed.data, { onSuccess: onSaved });
   };
-  const save = () => saveValues(values);
-  const pause = () => {
-    const next = { ...values, pausedUntil: new Date(Date.now() + 7 * 86400000).toISOString() };
-    setValues(next);
-    saveValues(next);
+  const save = () => saveValues(values, () => setDirty(false));
+  // Quick actions change only their own fields: they save on top of the last
+  // saved state, and mirror the change into the form without committing
+  // anything else the person has edited but not saved.
+  const saveQuickAction = (patch: Partial<NotificationPreferencesUpdate>) => {
+    setValues((current) => ({ ...current, ...patch }));
+    saveValues({ ...(savedValues ?? values), ...patch });
   };
-  const resume = () => {
-    const next = { ...values, pausedUntil: null };
-    setValues(next);
-    saveValues(next);
-  };
-  const unsubscribeAll = () => {
-    const next = { ...values, emailDigestEnabled: false, inAppEnabled: false };
-    setValues(next);
-    saveValues(next);
-  };
+  const pause = () => saveQuickAction({ pausedUntil: new Date(Date.now() + 7 * 86400000).toISOString() });
+  const resume = () => saveQuickAction({ pausedUntil: null });
+  const unsubscribeAll = () => saveQuickAction({ emailDigestEnabled: false, inAppEnabled: false });
 
   return (
     <Card data-testid="card-notification-preferences">
@@ -162,7 +182,7 @@ export default function NotificationPreferencesCard() {
             </section>
             <div className="grid gap-4 sm:grid-cols-2">
               <div><Label htmlFor="digest-cadence">Cadence</Label><select id="digest-cadence" value={values.cadence} onChange={(e) => update("cadence", e.target.value as NotificationPreferencesUpdate["cadence"])} className="mt-2 min-h-[44px] w-full rounded-md border border-input bg-[var(--surface)] px-3 text-sm">{DIGEST_CADENCES.map((cadence) => <option key={cadence} value={cadence}>{cadence[0].toUpperCase() + cadence.slice(1)}</option>)}</select></div>
-               <div><Label htmlFor="digest-timezone">Time zone</Label><input id="digest-timezone" value={values.timezone} onChange={(e) => update("timezone", e.target.value)} className="mt-2 min-h-[44px] w-full rounded-md border border-input bg-[var(--surface)] px-3 text-sm" /></div>
+               <div><Label htmlFor="digest-timezone">Time zone</Label><input id="digest-timezone" value={values.timezone} onChange={(e) => update("timezone", e.target.value)} aria-invalid={timezoneError ? true : undefined} aria-describedby={timezoneError ? "digest-timezone-error" : undefined} className={`mt-2 min-h-[44px] w-full rounded-md border bg-[var(--surface)] px-3 text-sm ${timezoneError ? "border-destructive" : "border-input"}`} />{timezoneError ? <p id="digest-timezone-error" className="mt-1 text-xs text-destructive" role="alert">{timezoneError}</p> : null}</div>
             </div>
             <div className="flex flex-wrap items-center gap-2 border-t border-[var(--border)] pt-4">
                {paused ? <Button variant="outline" className="min-h-[44px]" onClick={resume} disabled={saveMutation.isPending}><Play className="mr-2 h-4 w-4" />Resume now</Button> : <Button variant="outline" className="min-h-[44px]" onClick={pause} disabled={saveMutation.isPending}><Pause className="mr-2 h-4 w-4" />Pause for 7 days</Button>}
@@ -174,7 +194,7 @@ export default function NotificationPreferencesCard() {
             {saved ? <p className="flex items-center gap-2 text-sm text-[var(--accent)]" role="status"><Check className="h-4 w-4" />Your choices are saved.</p> : null}
             <Separator />
             <section aria-labelledby="digest-preview">
-              <div className="flex items-start justify-between gap-3"><div><h3 id="digest-preview" className="flex items-center gap-2 text-sm font-semibold"><Eye className="h-4 w-4 text-[var(--accent)]" />Preview</h3><p className="mt-1 text-xs text-[color:var(--text-2)]">This uses the same rules as delivery.</p></div>{previewQuery.data ? <span className="font-mono text-xs text-[color:var(--text-2)]">{previewQuery.data.itemCount} items</span> : null}</div>
+              <div className="flex items-start justify-between gap-3"><div><h3 id="digest-preview" className="flex items-center gap-2 text-sm font-semibold"><Eye className="h-4 w-4 text-[var(--accent)]" />Preview</h3><p className="mt-1 text-xs text-[color:var(--text-2)]">This uses the same rules as delivery.</p></div>{previewQuery.data ? <span className="font-mono text-xs text-[color:var(--text-2)]">{previewQuery.data.itemCount} {previewQuery.data.itemCount === 1 ? "item" : "items"}</span> : null}</div>
               {previewQuery.isLoading ? <div className="mt-3 space-y-2"><div className="skeleton h-12 w-full" /><div className="skeleton h-12 w-full" /></div> : previewQuery.isError ? <p className="mt-3 text-sm text-destructive" role="alert">Preview is unavailable right now. Your choices have not changed.</p> : previewItems.length === 0 ? <div className="mt-3 border border-dashed border-[var(--border-strong)] p-4 text-sm text-[color:var(--text-2)]"><Info className="mb-2 h-4 w-4 text-[var(--accent)]" /><p>No saved content matches these rules yet. When there is something to share, it will appear here.</p></div> : <div className="mt-3 space-y-2">{previewItems.map((item, index) => <a key={`${item.href}-${index}`} href={item.href} className="block border-l-2 border-[var(--accent)] bg-[var(--surface-2)] px-3 py-2 transition-colors hover:bg-[var(--surface-3)]"><span className="font-mono text-[10px] uppercase tracking-[0.12em] text-[var(--accent)]">{item.sectionTitle}</span><span className="mt-1 block text-sm font-semibold">{item.title}</span><span className="mt-0.5 block text-xs text-[color:var(--text-2)]">{item.description}</span></a>)}</div>}
             </section>
           </>

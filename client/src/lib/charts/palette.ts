@@ -2,18 +2,18 @@
 // Extracted from LinkHealthDashboard.tsx so DS
 // compliance sweeps see exactly one palette declaration. All values are
 // either DS accents (--accent / --accent-2) or DS status semantics
-// (#34d08c ok / #ff5c7a bad / #ffb84d warn / #5eddf2 info / #9d4edd info-2)
+// (var(--status-ok) ok / var(--status-bad) bad / var(--status-warn) warn / var(--status-info) info / var(--status-info-2) info-2)
 // mirrored verbatim from design-system.css.
-// DS-OK: chart palette literals mirror DS status colors verbatim.
+// Chart series read the design tokens directly (SVG fill/stroke accept var()).
 export const CHART_PALETTE: readonly string[] = [
-  '#ff3d52', // DS --accent (crimson)
-  '#b84dff', // DS --accent-2 (violet)
-  '#34d08c', // DS ok
-  '#ffb84d', // DS warn
-  '#5eddf2', // DS cyan info
-  '#ff5c7a', // DS bad
-  '#9d4edd', // DS violet info
-  '#f4f3ee', // DS --text
-  '#34d08c', // DS ok (repeat for 10-slot recharts expectation)
-  '#b84dff', // DS --accent-2 (repeat)
+  'var(--accent)',
+  'var(--accent-2)',
+  'var(--status-ok)',
+  'var(--status-warn)',
+  'var(--status-info)',
+  'var(--status-bad)',
+  'var(--status-info-2)',
+  'var(--text)',
+  'var(--status-ok)', // repeat for the 10-slot recharts expectation
+  'var(--accent-2)',
 ] as const;

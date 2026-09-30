@@ -564,6 +564,57 @@ export async function assertSettledDocument(page, { documentToken, side }, when)
   if (!state.mounted) throw new DocumentReloadedError(`React container left #root ${when}`, state);
 }
 
+/**
+ * Chromium cannot raster a single capture surface taller than 16384 device
+ * pixels: a fullPage screenshot of a longer document silently returns the
+ * declared height with everything below row 16383 filled with an undefined
+ * colour (white on one side, page fill on the other), which the comparison then
+ * reports as a ~15% "difference" that no source change can close. Documents
+ * within the limit are captured exactly as before; longer documents are
+ * captured as document-coordinate clips (each below the limit, never scrolling
+ * the viewport, so fixed/sticky chrome renders exactly as in a fullPage frame)
+ * and stitched back into one full-height image.
+ */
+export const CHROMIUM_MAX_CAPTURE_HEIGHT = 16384;
+const CAPTURE_TILE_HEIGHT = 8192;
+
+export async function fullPageScreenshot(page, file) {
+  // Same extent as Playwright's own fullPage frame (CSS content size): a page
+  // that overflows sideways keeps its overflow in the tiles too, so the two
+  // capture paths never disagree about the canvas and nothing is cropped away.
+  const { width, height } = await page.evaluate(() => ({
+    width: Math.max(
+      document.documentElement.clientWidth,
+      document.documentElement.scrollWidth,
+      document.body?.scrollWidth ?? 0,
+    ),
+    height: Math.max(document.documentElement.scrollHeight, document.body?.scrollHeight ?? 0),
+  }));
+  if (height <= CHROMIUM_MAX_CAPTURE_HEIGHT) {
+    await page.screenshot({ path: file, fullPage: true, animations: "disabled" });
+    return { tiled: false, height };
+  }
+  const tiles = [];
+  for (let y = 0; y < height; y += CAPTURE_TILE_HEIGHT) {
+    const tileHeight = Math.min(CAPTURE_TILE_HEIGHT, height - y);
+    const buffer = await page.screenshot({
+      fullPage: true,
+      animations: "disabled",
+      clip: { x: 0, y, width, height: tileHeight },
+    });
+    const meta = await sharp(buffer).metadata();
+    if (meta.width !== width || meta.height !== tileHeight) {
+      throw new Error(`Tiled capture returned ${meta.width}x${meta.height} for a ${width}x${tileHeight} clip at y=${y}`);
+    }
+    tiles.push({ input: buffer, top: y, left: 0 });
+  }
+  await sharp({ create: { width, height, channels: 4, background: { r: 0, g: 0, b: 0, alpha: 0 } } })
+    .composite(tiles)
+    .png()
+    .toFile(file);
+  return { tiled: true, height, tiles: tiles.length };
+}
+
 export async function stableFullPageCapture(page, file, { attempts = 8, documentToken = null, side = null } = {}) {
   const repeatFile = file.replace(/\.png$/, ".repeat.png");
   const frames = [];
@@ -578,11 +629,11 @@ export async function stableFullPageCapture(page, file, { attempts = 8, document
     // Idle again + nothing poisoned since the settle (the other side opened and
     // settled in between; a refetch or a late 429 in that gap must not be captured).
     const completedBefore = await assertApiQuiet(page, `before frame ${attempt}`);
-    await page.screenshot({ path: attemptFile, fullPage: true, animations: "disabled" });
+    const capture = await fullPageScreenshot(page, attemptFile);
     if (identity) await assertSettledDocument(page, identity, `while taking frame ${attempt}`);
     const overlap = apiTrafficDuringFrame(page, completedBefore);
     const hash = sha256(await fsp.readFile(attemptFile));
-    const frame = { attempt, file: attemptFile, hash };
+    const frame = { attempt, file: attemptFile, hash, tiled: capture.tiled, documentHeight: capture.height };
     frames.push(frame);
     if (overlap) {
       // The frame straddled API traffic: whatever it shows is timing-dependent.
@@ -611,6 +662,8 @@ export async function stableFullPageCapture(page, file, { attempts = 8, document
     discardedFrames,
     apiTraffic: completedAtStart === null ? null : { completedAtCaptureStart: completedAtStart, completedAtCaptureEnd: page.__parityNetwork.completed, failures: capturePoisoningFailures(page.__parityNetwork).length },
     identical: true,
-    postprocessing: "none",
+    postprocessing: stablePair[0].tiled
+      ? `stitched ${stablePair[0].documentHeight}px document from document-coordinate clips (Chromium single-surface capture limit is ${CHROMIUM_MAX_CAPTURE_HEIGHT}px)`
+      : "none",
   };
 }

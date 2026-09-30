@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useParams, Link, useLocation, useSearch } from "wouter";
 import { keepPreviousData, useQuery } from "@tanstack/react-query";
-import { ArrowLeft, Search } from "lucide-react";
+import { ArrowLeft, Search, SlidersHorizontal } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Paginator } from "@/components/ui/paginator";
@@ -23,6 +23,7 @@ import {
   subSubcategorySeoTitleCore,
 } from "@shared/seo-templates";
 import NotFound from "@/pages/not-found";
+import { findTaxonomySuggestion } from "@/lib/not-found-suggestion";
 import ErrorPage from "@/pages/ErrorPage";
 import "@/styles/pages/taxonomy.css";
 import { parsePageParamStrict, pageNoticeFor } from "@/lib/page-param";
@@ -32,7 +33,7 @@ import { apiRequest } from "@/lib/queryClient";
 import { useDebounce } from "@/hooks/useDebounce";
 import { useContactConfig } from "@/lib/contact";
 import { normalizeSearchQuery } from "@shared/searchNormalize";
-import { fetchListingPage, type ListingLevel } from "@/lib/static-data";
+import { fetchAwesomeListNav, fetchListingPage, type AwesomeListNav, type ListingLevel } from "@/lib/static-data";
 import type { ResourceSearchFacets } from "@shared/resourceFacets";
 import { RESOURCE_KIND_VALUES, type ResourceKind } from "@shared/resourceKinds";
 import { trackCategoryView, trackFilterUsage, trackSearch, trackSortChange, trackTagInteraction } from "@/lib/analytics";
@@ -136,10 +137,10 @@ export default function TaxonomyListing({ level }: Props) {
     return isLayoutViewMode(saved) ? saved : "grid";
   });
   const [notice, setNotice] = useState<string | null>(pageNoticeFor(initialPage));
-  const [selection, setSelection] = useState(params.get("subcategory") ?? "all");
-  const [general, setGeneral] = useState(
-    params.get("filter") === "general" || params.get("view") === "general" || params.get("subcategory") === "__general__",
-  );
+  const initialGeneral =
+    params.get("filter") === "general" || params.get("view") === "general" || params.get("subcategory") === "__general__";
+  const [selection, setSelection] = useState(initialGeneral ? "__general__" : params.get("subcategory") ?? "all");
+  const [general, setGeneral] = useState(initialGeneral);
   const [toolsOpen, setToolsOpen] = useState(false);
   const normalizedSearch = normalizeSearchQuery(searchTerm);
   const debouncedSearch = normalizeSearchQuery(useDebounce(searchTerm, 300));
@@ -158,12 +159,19 @@ export default function TaxonomyListing({ level }: Props) {
       };
     }
     return {
-      subcategory: level === "subcategory" && selection !== "all" ? selection : undefined,
+      subcategory: level === "subcategory" && selection !== "all" && selection !== "__general__" ? selection : undefined,
       general,
       kind,
     };
   }, [general, kind, level, selection]);
 
+  // Shared with the sidebar (same key), so the "Did you mean" lookup on an
+  // unknown slug costs no extra request.
+  const { data: nav } = useQuery<AwesomeListNav>({
+    queryKey: ["awesome-list-nav"],
+    queryFn: fetchAwesomeListNav,
+    staleTime: 1000 * 60 * 60,
+  });
   const listing = useQuery({
     queryKey: ["awesome-list-listing", level, slug, page, pageOptions],
     queryFn: () => fetchListingPage(level, slug, page, pageOptions),
@@ -300,6 +308,7 @@ export default function TaxonomyListing({ level }: Props) {
     pendingAnalyticsRef.current = null;
   }, [currentFilterSignature, level, taxonomySearch.data, taxonomySearch.isPlaceholderData]);
 
+  const hydratedRouteRef = useRef(`${routeFor(level, slug)}?${search}`);
   const urlSyncInitialized = useRef(false);
   const popNavigation = useRef(false);
   const pushSnapshot = useRef("");
@@ -334,6 +343,9 @@ export default function TaxonomyListing({ level }: Props) {
     if (current !== href) {
       const shouldPush = urlSyncInitialized.current && !popNavigation.current && pushSnapshot.current !== snapshot;
       window.history[shouldPush ? "pushState" : "replaceState"]({}, "", href);
+      // Our own write already matches state; rehydrating from it would clear
+      // the page-clamp notice set just before this rewrite.
+      hydratedRouteRef.current = `${routeFor(level, slug)}?${next}`;
     }
     urlSyncInitialized.current = true;
     popNavigation.current = false;
@@ -368,7 +380,6 @@ export default function TaxonomyListing({ level }: Props) {
   // as well; otherwise a search/filter/page from the previous sibling leaks
   // into the newly selected category and the URL no longer describes the
   // visible controls.
-  const hydratedRouteRef = useRef(`${routeFor(level, slug)}?${search}`);
   useEffect(() => {
     const routeKey = `${routeFor(level, slug)}?${search}`;
     if (hydratedRouteRef.current === routeKey) return;
@@ -394,12 +405,16 @@ export default function TaxonomyListing({ level }: Props) {
     setView(isLayoutViewMode(nextView) ? nextView : "grid");
   }, [level, search, slug]);
 
+  // Under a kind filter the listing counts that kind only; empty tiles would
+  // advertise subcategories the filter has already ruled out.
+  const childTiles = kind ? listingData?.children.filter((child) => child.count > 0) ?? [] : listingData?.children ?? [];
+
   if (loading) return <div className={`taxonomy-page taxonomy-page--${level}`} aria-busy="true"><SEOHead title="Loading resources" description="Loading catalog resources." /><div className="taxonomy-loading-header"><PageHeaderSkeleton /></div><div className="taxonomy-grid">{Array.from({ length: 9 }).map((_, i) => <ResourceCardSkeleton key={i} />)}</div></div>;
   // An unknown top-level slug 404s from the listing endpoint. Treat that as a
   // real not-found page (with navigation), not a transient "please try again"
   // error — matching the resource-detail 404 UX. Genuine 5xx/network errors
   // still surface the retry-able error state.
-  if (isNotFoundError(listing.error)) return <NotFound />;
+  if (isNotFoundError(listing.error)) return <NotFound suggestion={findTaxonomySuggestion(nav, level, slug)} />;
   // A facets error cached from an earlier panel opening must not replace a
   // healthy listing once the query is idle again (e.g. Back to this page with
   // the panel closed): only a live, enabled request can fail the page.
@@ -407,9 +422,11 @@ export default function TaxonomyListing({ level }: Props) {
   if (listing.error || taxonomySearchError) return <ErrorPage error={listing.error ?? taxonomySearchError} />;
   if (!listingData || !name) return <NotFound />;
 
-  const optionChildren = listingData.children.flatMap((child: any) => [
+  const optionChildren = childTiles.flatMap((child: any) => [
     { value: child.name, count: child.count },
-    ...((child.subSubcategories ?? []).map((subSub: any) => ({ value: `${child.name} › ${subSub.name}`, count: subSub.count }))),
+    ...((child.subSubcategories ?? [])
+      .filter((subSub: any) => !kind || subSub.count > 0)
+      .map((subSub: any) => ({ value: `${child.name} › ${subSub.name}`, count: subSub.count }))),
   ]);
   const backSlug = level === "subcategory" ? parentCategory?.slug : parentSubcategory?.slug;
   const back = level === "category" || !backSlug
@@ -545,15 +562,16 @@ export default function TaxonomyListing({ level }: Props) {
           category page; below that it stays screen-reader-only. */}
       <p className={level === "category" ? "taxonomy-description" : "sr-only"}>{listingData.scopeIntro}</p>
     </section>
-     <div className="taxonomy-summary"><span className="chip accent" data-ds="chip">{listingData.totalAll} {resourceNoun(listingData.totalAll)}</span>{kind && <span className="chip" data-ds="chip">Kind: {kindLabel}</span>}{level === "category" && listingData.children.length > 0 && <span className="chip" data-ds="chip">{listingData.children.length} {listingData.children.length === 1 ? "subcategory" : "subcategories"}</span>}{level !== "category" && parentCategory && <span>in {parentCategory.name}</span>}<button type="button" className="btn ghost taxonomy-tools-toggle" aria-expanded={toolsOpen} onClick={() => setToolsOpen(value => !value)}>{toolsOpen ? "Close filters" : "Filters & view"}</button></div>
+     <div className="taxonomy-summary"><span className="chip accent">{listingData.totalAll} {resourceNoun(listingData.totalAll)}</span>{kind && <span className="chip">Kind: {kindLabel}</span>}{level === "category" && childTiles.length > 0 && <span className="chip">{childTiles.length} {childTiles.length === 1 ? "subcategory" : "subcategories"}</span>}{level !== "category" && parentCategory && <span>in {parentCategory.name}</span>}<button type="button" className="btn ghost taxonomy-tools-toggle" aria-expanded={toolsOpen} aria-controls="taxonomy-tools-panel" onClick={() => setToolsOpen(value => !value)}><SlidersHorizontal className="taxonomy-tools-toggle__icon" aria-hidden="true" /><span className="taxonomy-tools-toggle__label">{toolsOpen ? "Close filters" : "Filters & view"}</span></button></div>
     </header>
-    {level === "category" && listingData.children.length > 0 && <section className="taxonomy-children" aria-labelledby="taxonomy-children-heading"><h2 id="taxonomy-children-heading">Subcategories</h2><div className="taxonomy-child-grid">{listingData.children.map((child, index) => <Link key={child.slug} className="taxonomy-child card hoverable" style={{ animationDelay: `${index * 30}ms` }} href={routeFor("subcategory", child.slug)}><span>{child.name}</span><span className="chip mono" data-ds="chip">{child.count}</span></Link>)}</div></section>}
-    <div className={`taxonomy-controls taxonomy-production-controls ${toolsOpen ? "taxonomy-production-controls--open" : ""} flex flex-col gap-4`}><div className="relative"><Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" /><Input className="pl-10" value={searchTerm} onChange={(event) => { setSearchTerm(event.target.value); setPage(1); }} placeholder={`Search in ${name}...`} aria-label={`Search in ${name}`} data-testid="input-search-resources" /></div>
+    {/* Directly under the header's toggle: after the subcategory tiles the
+        opened panel landed below the fold at 1440x900 and the click looked inert. */}
+    <div id="taxonomy-tools-panel" className={`taxonomy-controls taxonomy-production-controls ${toolsOpen ? "taxonomy-production-controls--open" : ""} flex flex-col gap-4`}><div className="relative"><Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" /><Input className="pl-10" value={searchTerm} onChange={(event) => { setSearchTerm(event.target.value); setPage(1); }} placeholder={`Search in ${name}...`} aria-label={`Search in ${name}`} data-testid="input-search-resources" /></div>
        {level !== "sub-subcategory" && optionChildren.length > 0 && <select className="select min-h-11" aria-label={`Limit ${name} by subcategory`} value={selection} onChange={(event) => { const nextSelection = event.target.value; const next = { ...currentFilterState, selection: nextSelection }; setSelection(nextSelection); setGeneral(nextSelection === "__general__"); setPage(1); queueAnalytics(next, "taxonomy_scope", nextSelection); requestResultsFocus(); }} data-testid="select-subcategory-filter"><option value="all">All subcategories</option>{listingData.generalCount > 0 && <option value="__general__">Uncategorized ({listingData.generalCount})</option>}{optionChildren.map((item) => <option key={item.value} value={item.value}>{item.value} ({item.count})</option>)}</select>}
        <select className="select min-h-11" aria-label="Limit by resource kind" value={kind ?? ""} onChange={(event) => { const nextKind = parseKindParam(event.target.value); setKind(nextKind); setPage(1); requestResultsFocus(); }} data-testid="select-kind-filter"><option value="">All resource kinds</option>{RESOURCE_KIND_VALUES.map((value) => <option key={value} value={value}>{value.replace(/[-_]/g, " ").replace(/\b\w/g, (letter) => letter.toUpperCase())}</option>)}</select>
        <AdvancedFilter selectedTags={tags} sortBy={sort} availableTags={listingData.tags} onTagsChange={(value) => onFacetChange("tags", value)} onSortChange={(value) => onFacetChange("sort", value)} showCountSorts={false} showTagFilter={false} />
        <div className="taxonomy-view-toggle-row" aria-label="View mode">
-         <span className="taxonomy-view-toggle-label">View</span>
+         <span className="eyebrow">View</span>
          <ViewModeToggle
            value={view}
            onChange={(mode) => {
@@ -563,6 +581,7 @@ export default function TaxonomyListing({ level }: Props) {
          />
        </div>
     </div>
+    {level === "category" && childTiles.length > 0 && <section className="taxonomy-children" aria-labelledby="taxonomy-children-heading"><h2 id="taxonomy-children-heading">Subcategories</h2><div className="taxonomy-child-grid">{childTiles.map((child, index) => <Link key={child.slug} className="taxonomy-child card hoverable" style={{ animationDelay: `${index * 30}ms` }} href={`${routeFor("subcategory", child.slug)}${kind ? `?kind=${kind}` : ""}`}><span>{child.name}</span><span className="chip mono">{child.count}</span></Link>)}</div></section>}
     <div className={`taxonomy-production-controls ${toolsOpen ? "taxonomy-production-controls--open" : ""}`}><ActiveFilters state={filterState} onChange={onFacetChange} onClear={clearFacetFilters} defaultSort="default" /></div>
     <div className="taxonomy-results-layout">
       <div className={`taxonomy-production-controls ${toolsOpen ? "taxonomy-production-controls--open" : ""}`} aria-busy={toolsOpen && taxonomySearch.isLoading}><SearchFilters state={filterState} facets={taxonomySearch.data?.facets} onChange={onFacetChange} onClear={clearFacetFilters} hideTaxonomyFacets /></div>
@@ -572,8 +591,8 @@ export default function TaxonomyListing({ level }: Props) {
               and — only while a filter narrows the collection — what it was
               narrowed from. */}
            <div className="taxonomy-results-heading-row"><h2 id="taxonomy-results-heading" data-testid="text-results-count" data-total={total}>{level === "category" ? (total > 0 ? `Resources (${total})` : "Coming soon") : <span className="sr-only">{total} {resourceNoun(total)}</span>}</h2></div>
-          {notice && <div role="status" data-testid="notice-page-adjusted" className="rounded border p-3 text-sm">{notice}<button className="ml-2 min-h-8 underline" onClick={() => setNotice(null)}>Dismiss</button></div>}
-          {(listingData.scope.ignoredSubcategory || listingData.scope.ignoredSubSubcategory) && <div role="status" data-testid="notice-unknown-subcategory" className="rounded border p-3 text-sm">“{selection}” isn't a subcategory of {name}, so that filter was ignored.<button className="ml-2 min-h-8 underline" onClick={broadenScope}>Remove it</button></div>}
+          {notice && <div role="status" data-testid="notice-page-adjusted" className="rounded border p-3 text-sm">{notice}<button type="button" className="btn ghost ml-2 min-h-8" onClick={() => setNotice(null)}>Dismiss</button></div>}
+          {(listingData.scope.ignoredSubcategory || listingData.scope.ignoredSubSubcategory) && <div role="status" data-testid="notice-unknown-subcategory" className="rounded border p-3 text-sm">“{selection}” isn't a subcategory of {name}, so that filter was ignored.<button type="button" className="btn ghost ml-2 min-h-8" onClick={broadenScope}>Remove it</button></div>}
           {serverSearchActive && !taxonomySearch.isPlaceholderData && taxonomySearch.data?.search?.mode === "fuzzy" && taxonomySearch.data.search.suggestion && <div className="flex flex-wrap items-center justify-center gap-2 rounded border p-3 text-sm" role="status" data-testid="notice-taxonomy-search-suggestion"><span>No exact matches. Did you mean</span><Button variant="link" className="h-auto p-0" onClick={() => { setSearchTerm(taxonomySearch.data!.search!.suggestion!); setPage(1); }}>{taxonomySearch.data.search.suggestion}</Button><span>?</span></div>}
           {resultsLoading ? <div className="taxonomy-grid" data-testid="taxonomy-results-loading">{Array.from({ length: 6 }).map((_, index) => <ResourceCardSkeleton key={index} />)}</div>
              : resources.length === 0 ? <div className="flex flex-col items-center gap-3 py-12 text-center" data-testid="empty-resources"><h3 className="text-lg font-semibold">No resources match this combination</h3><p className="text-muted-foreground">Clear a filter, remove the search, or broaden where you're looking.</p><div className="flex flex-wrap justify-center gap-2">{(tags.length > 0 || provider || format || skillLevel || kind || sort !== "default") && <Button variant="outline" onClick={clearFacetFilters} data-testid="button-clear-taxonomy-filters">Clear filters</Button>}{normalizedSearch && <Button variant="ghost" onClick={() => { setSearchTerm(""); setPage(1); requestResultsFocus(); }} data-testid="button-clear-taxonomy-search">Clear search</Button>}{(selection !== "all" || general) ? <Button variant="secondary" onClick={broadenScope} data-testid="button-broaden-taxonomy-scope">Show all in {name}</Button> : <Button asChild variant="secondary"><Link href={broadenHref} data-testid="link-broaden-taxonomy-scope">{level === "category" ? `Search all of ${siteName}` : "Search the broader category"}</Link></Button>}</div></div> :

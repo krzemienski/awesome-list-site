@@ -1,0 +1,133 @@
+/* Users tab: frozen column proportions, sort targets and row actions.
+   Loaded by admin-ops-users-audit.css after admin-ops-table.css. */
+
+/* The frozen Users table is an auto-layout `.table`, but its cell content
+   (bare text) differs from the app's controls, so letting the app's content
+   drive the columns measured worse at every width (1440: 2.0% vs 0.47%).
+   Pin the frozen column proportions measured at 1440 instead. */
+.admin-ops-users-table {
+  min-width: 52rem;
+  table-layout: fixed;
+}
+
+.admin-ops-users-table th:nth-child(1) { width: 33.85%; }
+.admin-ops-users-table th:nth-child(2) { width: 40.10%; }
+.admin-ops-users-table th:nth-child(3) { width: 8.13%; }
+.admin-ops-users-table th:nth-child(4) { width: 11.01%; }
+.admin-ops-users-table th:nth-child(5) { width: 6.91%; }
+
+/* Tablet: the frozen auto layout gives the Email column more room once the
+   names wrap (column boxes measured at 1024 on the comparison reference:
+   279.84/416.81/84.5/89.06/71.78px of a 942px table; the last column holds
+   the 44px Edit target). Four decimals keep every column edge within a
+   quarter pixel of the reference. */
+@media (min-width: 769px) and (max-width: 1100px) {
+  .admin-ops-users-table th:nth-child(1) { width: 29.7074%; }
+  .admin-ops-users-table th:nth-child(2) { width: 44.2476%; }
+  .admin-ops-users-table th:nth-child(3) { width: 8.9703%; }
+  .admin-ops-users-table th:nth-child(4) { width: 9.4546%; }
+  .admin-ops-users-table th:nth-child(5) { width: 7.6201%; }
+}
+
+/* Frozen `.table td` inherits the 1.6 body leading; wrapped Email/Joined cells
+   must not keep Tailwind's tighter text-sm line box or every wrapped row runs
+   4-5px short. */
+.admin-ops-users-table tbody td {
+  line-height: var(--body-leading);
+}
+
+.admin-ops-users-shell .admin-ops-table-shell__title,
+.admin-ops-users-shell .admin-ops-table-shell__description {
+  line-height: 1.6;
+}
+
+.admin-ops-users-table thead button svg {
+  display: none;
+}
+
+.admin-ops-users-table thead button {
+  font-size: inherit;
+  height: auto;
+  min-height: 44px;
+  min-width: 44px;
+  justify-content: flex-start;
+  padding: 0;
+}
+
+/* The frozen `.table th` is 12px padding around one 11px/1.6 line plus half
+   of the collapsed hairline (42.09px measured on both sides). The 44px sort
+   target below is positioned out of flow and centred, so it keeps its full
+   box while overhanging the row rule by ~1px each side — the same treatment
+   as the audit detail button — instead of forcing every header row 2px
+   taller than the reference and shifting the whole table. */
+.admin-ops-users-table thead th {
+  font-family: var(--font-body);
+  height: calc(0.6875rem * 1.6 + 1.5rem + var(--hairline-w) / 2);
+  line-height: 1.6;
+  position: relative;
+  text-transform: uppercase;
+}
+
+.admin-ops-users-table thead button {
+  font-family: inherit;
+  line-height: inherit;
+  position: absolute;
+  inset-inline-start: 0.875rem;
+  top: 50%;
+  /* The individual `translate` property survives the shared sort-button
+     hover rule's `transform: none`, so the label stays centred under the
+     pointer instead of dropping onto the header rule. */
+  translate: 0 -50%;
+  text-transform: uppercase;
+}
+
+/* Canonical `.btn` metrics plus the approved 44px control floor (the frozen
+   TableShell action is 44px tall under the same contract). */
+.admin-ops-users-shell [data-testid="button-invite-user"] {
+  line-height: normal;
+  min-height: 44px;
+}
+
+.admin-ops-users-shell .admin-ops-cell-name > div {
+  gap: 0;
+}
+
+.admin-ops-users-shell .admin-ops-cell-email,
+.admin-ops-users-shell .admin-ops-cell-joined {
+  font-size: 0.75rem;
+}
+
+.admin-ops-users-shell .admin-ops-cell-actions button {
+  background: transparent;
+  border: var(--border-w) solid var(--border);
+  border-radius: var(--radius-sm);
+  font-family: var(--font-body);
+  font-size: 12px;
+  height: auto;
+  line-height: normal;
+  min-height: 44px;
+  padding: 5px 10px;
+}
+
+.admin-ops-users-shell .admin-ops-cell-actions > div {
+  justify-content: flex-end;
+}
+
+.admin-ops-users-table tbody tr:last-child td {
+  border-bottom: var(--hairline-w) solid var(--border);
+}
+
+/* Row reveal/delete controls keep their place in the row and only toggle
+   visibility: swapping them into the flow on hover shifted Edit sideways
+   under the pointer, so a click aimed at Edit landed on Delete. */
+.admin-ops-users-shell [data-testid^="button-toggle-email-"],
+.admin-ops-users-shell [data-testid^="button-delete-user-"] {
+  visibility: hidden;
+}
+
+.admin-ops-users-shell .admin-ops-cell-email:hover [data-testid^="button-toggle-email-"],
+.admin-ops-users-shell .admin-ops-cell-actions:hover [data-testid^="button-delete-user-"],
+.admin-ops-users-shell--tools-open [data-testid^="button-toggle-email-"],
+.admin-ops-users-shell--tools-open [data-testid^="button-delete-user-"] {
+  visibility: visible;
+}

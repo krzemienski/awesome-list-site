@@ -1,284 +1,8 @@
-/*
- * Operations users / audit surfaces.
- *
- * The frozen admin reference uses one TableShell contract: a flat card,
- * compact title bar, scrollable table, mono metadata, and hairline row rules.
- * Keep this file scoped to the users, audit, and private contact inbox tabs so
- * the catalog taxonomy manager retains its own surface contract.
- */
-
-.admin-ops-audit-stack {
-  display: flex;
-  flex-direction: column;
-  gap: 1.125rem;
-}
-
-.admin-ops-loading {
-  padding: 1.375rem;
-}
-
-.admin-ops-audit-toolbar {
-  padding: 1rem 1.375rem;
-  border-bottom: var(--hairline-w) solid var(--border);
-}
-
-.admin-ops-search {
-  width: 12.5rem;
-}
-
-.admin-ops-search input {
-  background: var(--surface);
-}
-
-.admin-ops-table-wrap {
-  width: 100%;
-}
-
-.admin-ops-table {
-  width: 100%;
-  min-width: 42rem;
-  border-collapse: collapse;
-  font-size: 0.8125rem;
-}
-
-.admin-ops-table thead th {
-  height: auto;
-  padding: 0.75rem 0.875rem;
-  border-bottom: var(--hairline-w) solid var(--border);
-  color: var(--text-3);
-  font-family: var(--font-mono);
-  font-size: 0.6875rem;
-  font-weight: 500;
-  letter-spacing: 0.03125rem;
-  line-height: 1.35;
-  text-align: left;
-  text-transform: uppercase;
-  vertical-align: middle;
-}
-
-.admin-ops-table tbody td {
-  padding: 0.875rem;
-  border-bottom: var(--hairline-w) solid var(--border);
-  color: var(--text-2);
-  vertical-align: middle;
-}
-
-.admin-ops-table tbody tr {
-  border-bottom: 0;
-  transition: background-color var(--motion-fast), color var(--motion-fast);
-}
-
-.admin-ops-table tbody tr:hover > td {
-  background: var(--surface);
-  color: var(--text);
-}
-
-.admin-ops-table .admin-ops-cell-name {
-  color: var(--text);
-  font-weight: 500;
-}
-
-.admin-ops-table .admin-ops-cell-email,
-.admin-ops-table .admin-ops-cell-role,
-.admin-ops-table .admin-ops-cell-actions {
-  color: var(--text-2);
-}
-
-.admin-ops-table .admin-ops-cell-joined,
-.admin-ops-table .admin-ops-cell-email,
-.admin-ops-table .admin-ops-cell-actions {
-  font-family: var(--font-mono);
-  font-size: 0.6875rem;
-}
-
-.admin-ops-table .admin-ops-cell-actions {
-  white-space: nowrap;
-}
-
-.admin-ops-table .admin-ops-cell-actions button,
-.admin-ops-table .admin-ops-cell-actions [role="combobox"] {
-  min-height: 2rem;
-}
-
-.admin-ops-table .admin-ops-cell-actions button {
-  min-width: 2rem;
-}
-
-.admin-ops-audit-detail-button {
-  color: var(--text-3, var(--text-2));
-  vertical-align: middle;
-}
-
-.admin-ops-audit-detail-button:hover {
-  color: var(--text);
-}
-
-.admin-ops-table .admin-ops-clickable-row {
-  cursor: pointer;
-}
-
-.admin-ops-table .admin-ops-clickable-row:focus-visible {
-  outline: 2px solid var(--accent);
-  outline-offset: -2px;
-}
-
-.admin-ops-table .admin-ops-clickable-row:hover > td {
-  background: var(--surface);
-  color: var(--text);
-}
-
-/* The frozen Users table is an auto-layout `.table`, but its cell content
-   (bare text) differs from the app's controls, so letting the app's content
-   drive the columns measured worse at every width (1440: 2.0% vs 0.47%).
-   Pin the frozen column proportions measured at 1440 instead. */
-.admin-ops-users-table {
-  min-width: 52rem;
-  table-layout: fixed;
-}
-
-.admin-ops-users-table th:nth-child(1) { width: 33.85%; }
-.admin-ops-users-table th:nth-child(2) { width: 40.10%; }
-.admin-ops-users-table th:nth-child(3) { width: 8.13%; }
-.admin-ops-users-table th:nth-child(4) { width: 11.01%; }
-.admin-ops-users-table th:nth-child(5) { width: 6.91%; }
-
-/* Tablet: the frozen auto layout gives the Email column more room once the
-   names wrap (column boxes measured at 1024: 280/417/84/90/70px of a 941px
-   table; the last column holds the 10px-padded Edit button). */
-@media (min-width: 769px) and (max-width: 1100px) {
-  .admin-ops-users-table th:nth-child(1) { width: 29.75%; }
-  .admin-ops-users-table th:nth-child(2) { width: 44.31%; }
-  .admin-ops-users-table th:nth-child(3) { width: 8.93%; }
-  .admin-ops-users-table th:nth-child(4) { width: 9.56%; }
-  .admin-ops-users-table th:nth-child(5) { width: 7.45%; }
-}
-
-/* Frozen `.table td` inherits the 1.6 body leading; wrapped Email/Joined cells
-   must not keep Tailwind's tighter text-sm line box or every wrapped row runs
-   4-5px short. */
-.admin-ops-users-table tbody td {
-  line-height: var(--body-leading);
-}
-
-.admin-ops-users-shell .admin-ops-table-shell__title,
-.admin-ops-users-shell .admin-ops-table-shell__description {
-  line-height: 1.6;
-}
-
-.admin-ops-users-table thead button svg {
-  display: none;
-}
-
-.admin-ops-users-table thead button {
-  font-size: inherit;
-  height: auto !important;
-  min-height: 0 !important;
-  /* The frozen header is bare text: no 44px control box centring the label
-     (it shifted NAME/ROLE 4-7px right and inflated the Role column). */
-  min-width: 0 !important;
-  justify-content: flex-start;
-  padding: 0;
-}
-
-.admin-ops-users-table thead th {
-  font-family: var(--font-body);
-  line-height: 1.6;
-  text-transform: uppercase;
-}
-
-.admin-ops-users-table thead button {
-  font-family: inherit;
-  line-height: inherit;
-  text-transform: uppercase;
-}
-
-.admin-ops-users-shell [data-testid="button-invite-user"] {
-  line-height: normal;
-}
-
-.admin-ops-users-shell [data-testid="button-user-tools"] {
-  opacity: 0;
-  position: absolute;
-}
-
-.admin-ops-users-shell [data-testid="button-user-tools"]:focus-visible {
-  opacity: 1;
-  position: static;
-}
-
-.admin-ops-users-shell .admin-users-extra-action {
-  opacity: 0;
-  position: absolute;
-}
-
-.admin-ops-users-shell .admin-users-extra-action:focus-within {
-  opacity: 1;
-  position: static;
-}
-
-.admin-ops-users-shell--tools-open .admin-users-extra-action {
-  opacity: 1;
-  position: static;
-}
-
-.admin-ops-users-shell .admin-ops-cell-name > div {
-  gap: 0;
-}
-
-.admin-ops-users-shell .admin-ops-cell-email,
-.admin-ops-users-shell .admin-ops-cell-joined {
-  font-size: 0.75rem;
-}
-
-.admin-ops-users-shell .admin-ops-cell-actions button {
-  background: transparent;
-  border: var(--border-w) solid var(--border);
-  border-radius: var(--radius-sm);
-  font-family: var(--font-body);
-  font-size: 12px;
-  height: 27px !important;
-  line-height: normal;
-  min-height: 0 !important;
-  padding: 5px 10px;
-}
-
-.admin-ops-users-shell .admin-ops-cell-actions > div {
-  justify-content: flex-end;
-}
-
-/* Frozen `.chip` metrics for the role column (the ops primitive shrinks
-   the chip to 10px/0.5rem padding, which made ADMIN 5px narrower). */
-.admin-ops-users-shell .admin-ops-cell-role .admin-ops-status-chip {
-  font-size: 10.5px;
-  gap: 6px;
-  letter-spacing: 0.6px;
-  line-height: 16.8px;
-  padding: 4px 10px;
-}
-
-.admin-ops-users-table tbody tr:last-child td {
-  border-bottom: var(--hairline-w) solid var(--border);
-}
-
-.admin-ops-users-shell [data-testid^="button-toggle-email-"],
-.admin-ops-users-shell [data-testid^="button-delete-user-"] {
-  opacity: 0;
-  position: absolute;
-}
-
-.admin-ops-users-shell .admin-ops-cell-email:hover [data-testid^="button-toggle-email-"],
-.admin-ops-users-shell .admin-ops-cell-email:focus-within [data-testid^="button-toggle-email-"],
-.admin-ops-users-shell .admin-ops-cell-actions:hover [data-testid^="button-delete-user-"],
-.admin-ops-users-shell .admin-ops-cell-actions:focus-within [data-testid^="button-delete-user-"] {
-  opacity: 1;
-  position: static;
-}
-
-.admin-ops-users-shell--tools-open [data-testid^="button-toggle-email-"],
-.admin-ops-users-shell--tools-open [data-testid^="button-delete-user-"] {
-  opacity: 1;
-  position: static;
-}
+/* Operations users / audit / contact inbox surfaces. The imports keep the
+   original cascade order: shared TableShell table, Users tab, then the audit
+   and contact tables and the responsive block below, which overrides both. */
+@import "./admin-ops-table.css";
+@import "./admin-ops-users.css";
 
 .admin-ops-audit-table {
   min-width: 60rem;
@@ -292,16 +16,10 @@
   padding: 0.75rem 0.875rem;
 }
 
-.admin-ops-audit-title {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 1rem;
-  width: 100%;
-}
-
+/* Actor ink stays neutral: accent is reserved for the page's single
+   primary moment, and a column of accent handles blew the budget. */
 .admin-ops-audit-table tbody td:nth-child(2) {
-  color: var(--accent);
+  color: var(--text);
   font-family: var(--font-mono);
   font-size: 0.75rem;
 }
@@ -376,21 +94,23 @@
 }
 
 @media (max-width: 48rem) {
-  .admin-ops-users-shell .admin-ops-table-shell__header {
-    align-items: center;
-    flex-direction: row;
-  }
-
-  .admin-ops-users-shell .admin-ops-table-shell__actions {
-    width: auto;
-  }
-
   .admin-ops-users-table {
     table-layout: auto;
   }
 
   .admin-ops-users-table th:nth-child(n) {
     width: auto;
+  }
+
+  /* Auto layout sizes each column from its content, and the sort control is
+     positioned out of flow (so its 44px target cannot inflate the header row),
+     which removes the header label from the column's intrinsic width. The
+     frozen `.table` keeps "JOINED" in flow: its column measures 72px, while
+     the app's collapsed to 57px and wrapped every "Jul 6, 2026" onto three
+     lines (rows 87px instead of 73px). Restore the frozen label-driven
+     minimum for that column; the other four already match. */
+  .admin-ops-users-table th:nth-child(4) {
+    min-width: 4.5rem;
   }
 
   .admin-ops-audit-toolbar {
