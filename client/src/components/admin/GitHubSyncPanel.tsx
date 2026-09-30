@@ -46,6 +46,7 @@ interface SyncHistory {
 interface SyncQueueItem {
   id: number;
   repositoryUrl: string;
+  branch?: string | null;
   action: string;
   status: string;
   errorMessage?: string;
@@ -461,6 +462,11 @@ export default function GitHubSyncPanel() {
                               <RefreshCw className={"h-4 w-4 text-[var(--status-warn)] animate-spin" /* DS-OK: status warn */} />
                             )}
                             <span className="font-medium capitalize">{item.action}</span>
+                            {item.branch && (
+                              <span className="font-mono text-xs text-muted-foreground" title="Branch recorded for this job">
+                                {item.branch}
+                              </span>
+                            )}
                             <span className="text-xs text-muted-foreground">
                               {formatSyncDate(item.processedAt || item.createdAt)}
                             </span>
@@ -512,7 +518,7 @@ export default function GitHubSyncPanel() {
        ) : syncHistory && syncHistory.length > 0 ? (
         <TableShell
           title="Sync jobs"
-          sub={`Last ${Math.min(5, orderedHistory.length)} import/export operations`}
+          sub={`${showDetails ? "All" : "Last"} ${visibleHistory.length} import/export operation${visibleHistory.length === 1 ? "" : "s"}`}
           className="ops-github-panel__history-shell"
         >
             <div className="ops-github-panel__history-table-wrap">
@@ -570,19 +576,17 @@ export default function GitHubSyncPanel() {
          </TableShell>
        )}
 
-      <details className="admin-ops-more">
-        <summary
+      <div className="admin-ops-more">
+        <button
+          type="button"
           className="btn ghost"
-          onClick={(event) => {
-            event.preventDefault();
-            setShowDetails((visible) => !visible);
-          }}
+          onClick={() => setShowDetails((visible) => !visible)}
           aria-expanded={showDetails}
           data-testid="button-github-more"
         >
           {showDetails ? "Less" : "More"}
-        </summary>
-      </details>
+        </button>
+      </div>
 
       {/* Run16 BUG-039: confirm before firing import (rewrites local catalog)
           or export (pushes a real commit to the repository). */}

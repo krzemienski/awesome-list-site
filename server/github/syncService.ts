@@ -76,6 +76,8 @@ interface ImportResult {
     totalCategories: number;
   };
   resources: Resource[];
+  /** Branch the README was read from; unset if the fetch never succeeded. */
+  branch?: string;
 }
 
 interface ExportResult {
@@ -84,6 +86,8 @@ interface ExportResult {
   commitUrl?: string;
   pullRequestUrl?: string;
   errors: string[];
+  /** Branch the export committed to; unset if it never got that far. */
+  branch?: string;
 }
 
 interface ConflictResolution {
@@ -236,7 +240,8 @@ export class GitHubSyncService {
     try {
       // Fetch README content
       console.log(`Fetching README from ${repoUrl}...`);
-      const readmeContent = await this.client.fetchFile(repoUrl, 'README.md');
+      const { content: readmeContent, branch: readmeBranch } = await this.client.fetchFile(repoUrl, 'README.md');
+      result.branch = readmeBranch;
       
       // STEP 1: Validate with awesome-lint BEFORE importing
       console.log('Validating awesome list with awesome-lint...');
@@ -439,6 +444,7 @@ export class GitHubSyncService {
       if (!options.dryRun) {
         await this.syncRepo.addToGithubSyncQueue({
           repositoryUrl: repoUrl,
+          branch: result.branch ?? null,
           action: 'import',
           status: 'completed',
           resourceIds: result.resources.map(r => r.id),
@@ -486,6 +492,7 @@ export class GitHubSyncService {
       if (!options.dryRun) {
         await this.syncRepo.addToGithubSyncQueue({
           repositoryUrl: repoUrl,
+          branch: result.branch ?? null,
           action: 'import',
           status: 'failed',
           resourceIds: [],
@@ -750,6 +757,7 @@ export class GitHubSyncService {
 
       // Detect the default branch (main, master, or repository default)
       const defaultBranch = await this.detectDefaultBranch(octokit, owner, repo);
+      result.branch = defaultBranch;
 
       // Get current commit SHA for the default branch
       const { data: refData } = await octokit.git.getRef({
@@ -983,13 +991,14 @@ export class GitHubSyncService {
           };
 
           if (result.errors.length === 0) {
-            await this.syncRepo.updateGithubSyncStatus(item.id, 'completed', undefined, metadata);
+            await this.syncRepo.updateGithubSyncStatus(item.id, 'completed', undefined, metadata, result.branch);
           } else {
             await this.syncRepo.updateGithubSyncStatus(
-              item.id, 
+              item.id,
               result.imported > 0 || result.updated > 0 ? 'completed' : 'failed',
               result.errors.slice(0, 3).join('; '),
-              metadata
+              metadata,
+              result.branch
             );
           }
         } else if (item.action === 'export') {
@@ -1004,13 +1013,14 @@ export class GitHubSyncService {
           };
 
           if (result.errors.length === 0) {
-            await this.syncRepo.updateGithubSyncStatus(item.id, 'completed', undefined, metadata);
+            await this.syncRepo.updateGithubSyncStatus(item.id, 'completed', undefined, metadata, result.branch);
           } else {
             await this.syncRepo.updateGithubSyncStatus(
               item.id,
               'failed',
               result.errors.join('; '),
-              metadata
+              metadata,
+              result.branch
             );
           }
         }

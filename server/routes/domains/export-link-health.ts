@@ -207,8 +207,11 @@ export function registerExportLinkHealthRoutes(
       }
       
       // Add to queue for processing
+      // The branch is recorded once the sync has resolved it; the column's
+      // 'main' default would otherwise mislabel repos on another branch.
       const queueItem = await githubSyncRepo.addToGithubSyncQueue({
         repositoryUrl,
+        branch: null,
         action: 'import',
         status: 'pending',
         resourceIds: [],
@@ -233,6 +236,7 @@ export function registerExportLinkHealthRoutes(
               skipped: result.skipped,
               errors: result.errors.length,
             },
+            result.branch,
           );
         } catch (error) {
           console.error('GitHub import failed:', error);
@@ -282,6 +286,7 @@ export function registerExportLinkHealthRoutes(
       // Add to queue for processing
       const queueItem = await githubSyncRepo.addToGithubSyncQueue({
         repositoryUrl,
+        branch: null,
         action: 'export',
         status: 'pending',
         resourceIds: [],
@@ -306,7 +311,7 @@ export function registerExportLinkHealthRoutes(
           const result = await syncService.exportToGitHub(repositoryUrl, options);
           if (result.errors.length > 0) {
             console.error('GitHub export failed:', result.errors);
-            await githubSyncRepo.updateGithubSyncStatus(queueItem.id, 'failed', result.errors.join('; '));
+            await githubSyncRepo.updateGithubSyncStatus(queueItem.id, 'failed', result.errors.join('; '), undefined, result.branch);
             return;
           }
           console.log('GitHub export completed:', result);
@@ -314,7 +319,7 @@ export function registerExportLinkHealthRoutes(
             exported: result.exported,
             commitSha: result.commitSha,
             commitUrl: result.commitUrl
-          });
+          }, result.branch);
         } catch (error) {
           console.error('GitHub export failed:', error);
           await githubSyncRepo.updateGithubSyncStatus(

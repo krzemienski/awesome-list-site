@@ -111,7 +111,7 @@ export class GitHubClient {
   /**
    * Fetch file content from repository
    */
-  async fetchFile(repoUrl: string, path: string, branch?: string): Promise<string> {
+  async fetchFile(repoUrl: string, path: string, branch?: string): Promise<{ content: string; branch: string }> {
     const { owner, repo } = this.parseRepoUrl(repoUrl);
     
     // Try main branch first, then master as fallback
@@ -128,7 +128,7 @@ export class GitHubClient {
         if (response.ok) {
           const content = await response.text();
           console.log(`✅ Successfully fetched ${path} from ${branchName} branch`);
-          return content;
+          return { content, branch: branchName };
         }
         
         if (response.status === 404 && !branch) {
