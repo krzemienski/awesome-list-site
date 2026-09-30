@@ -65,21 +65,27 @@ export default function NotificationPreferencesCard() {
   const [requestError, setRequestError] = useState<string | null>(null);
   const [timezoneError, setTimezoneError] = useState<string | null>(null);
 
-  useEffect(() => {
+  // Unsaved edits survive a refetch and the quick actions below; only an
+  // explicit "Save choices" commits them.
+  const [dirty, setDirty] = useState(false);
+  const savedValues = useMemo<NotificationPreferencesUpdate | null>(() => {
     const data = preferencesQuery.data;
-    if (data) {
-      setValues({
-        emailDigestEnabled: data.emailDigestEnabled,
-        inAppEnabled: data.inAppEnabled,
-        includeNewResources: data.includeNewResources,
-        includeWatchNext: data.includeWatchNext,
-        includeJourneyStep: data.includeJourneyStep,
-        cadence: data.cadence,
-        timezone: data.timezone ?? localTimezone(),
-        pausedUntil: data.pausedUntil,
-      });
-    }
+    if (!data) return null;
+    return {
+      emailDigestEnabled: data.emailDigestEnabled,
+      inAppEnabled: data.inAppEnabled,
+      includeNewResources: data.includeNewResources,
+      includeWatchNext: data.includeWatchNext,
+      includeJourneyStep: data.includeJourneyStep,
+      cadence: data.cadence,
+      timezone: data.timezone ?? localTimezone(),
+      pausedUntil: data.pausedUntil,
+    };
   }, [preferencesQuery.data]);
+
+  useEffect(() => {
+    if (savedValues && !dirty) setValues(savedValues);
+  }, [savedValues, dirty]);
 
   const saveMutation = useMutation({
     mutationFn: (body: NotificationPreferencesUpdate) =>
@@ -102,10 +108,11 @@ export default function NotificationPreferencesCard() {
   const paused = Boolean(values.pausedUntil && new Date(values.pausedUntil).getTime() > Date.now());
   const update = <K extends keyof NotificationPreferencesUpdate>(key: K, value: NotificationPreferencesUpdate[K]) => {
     setSaved(false);
+    setDirty(true);
     if (key === "timezone") setTimezoneError(null);
     setValues((current) => ({ ...current, [key]: value }));
   };
-  const saveValues = (nextValues: NotificationPreferencesUpdate) => {
+  const saveValues = (nextValues: NotificationPreferencesUpdate, onSaved?: () => void) => {
     if (!isValidTimezone(nextValues.timezone)) {
       setSaved(false);
       setRequestError(null);
@@ -120,24 +127,19 @@ export default function NotificationPreferencesCard() {
       return;
     }
     setRequestError(null);
-    saveMutation.mutate(parsed.data);
+    saveMutation.mutate(parsed.data, { onSuccess: onSaved });
   };
-  const save = () => saveValues(values);
-  const pause = () => {
-    const next = { ...values, pausedUntil: new Date(Date.now() + 7 * 86400000).toISOString() };
-    setValues(next);
-    saveValues(next);
+  const save = () => saveValues(values, () => setDirty(false));
+  // Quick actions change only their own fields: they save on top of the last
+  // saved state, and mirror the change into the form without committing
+  // anything else the person has edited but not saved.
+  const saveQuickAction = (patch: Partial<NotificationPreferencesUpdate>) => {
+    setValues((current) => ({ ...current, ...patch }));
+    saveValues({ ...(savedValues ?? values), ...patch });
   };
-  const resume = () => {
-    const next = { ...values, pausedUntil: null };
-    setValues(next);
-    saveValues(next);
-  };
-  const unsubscribeAll = () => {
-    const next = { ...values, emailDigestEnabled: false, inAppEnabled: false };
-    setValues(next);
-    saveValues(next);
-  };
+  const pause = () => saveQuickAction({ pausedUntil: new Date(Date.now() + 7 * 86400000).toISOString() });
+  const resume = () => saveQuickAction({ pausedUntil: null });
+  const unsubscribeAll = () => saveQuickAction({ emailDigestEnabled: false, inAppEnabled: false });
 
   return (
     <Card data-testid="card-notification-preferences">

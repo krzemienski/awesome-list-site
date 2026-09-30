@@ -2303,12 +2303,9 @@ export function ogInjectionMiddleware() {
     }
     // Run3 audit R3-09: more circulating URL shapes that were never
     // routes — 301 them to their canonical pages instead of soft-404ing.
-    if (urlPath === "/explore") {
-      return res.redirect(301, "/search");
-    }
-    if (/^\/resource\/?$/.test(urlPath)) {
-      // Bare /resource (often seen as /resource?q=term) — canonical is the
-      // search page; carry the query through. Exact-match so this never
+    if (urlPath === "/explore" || /^\/resource\/?$/.test(urlPath)) {
+      // /explore and bare /resource (often seen with ?q=term) — canonical is
+      // the search page; carry the query through. Exact-match so this never
       // hijacks the /resource/:id detail route.
       const qs = (req.originalUrl || req.url).split("?")[1] || "";
       const q = new URLSearchParams(qs).get("q");

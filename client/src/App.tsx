@@ -15,7 +15,8 @@ import { AccountThemePreferenceBridge } from "@/components/ui/theme-provider";
 import { publishableKeyFromHost } from "@clerk/react/internal";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { noteLocationChange, useScrollRestoration } from "./lib/nav-history";
-import { useAuth } from "./hooks/useAuth";
+import { useAuth, clearSignedInClientState } from "./hooks/useAuth";
+import { findRouteSuggestion } from "./lib/not-found-suggestion";
 import { useAnalytics } from "./hooks/use-analytics";
 import { useCrossTabSync } from "./lib/crossTabSync";
 import { useClerkAppearance } from "./lib/clerk-appearance";
@@ -493,6 +494,7 @@ function Logout() {
     const doSignOut = async () => {
       try {
         await signOut();
+        clearSignedInClientState();
         const authCheck = await fetch("/api/auth/user", {
           credentials: "include",
           cache: "no-store",
@@ -660,7 +662,7 @@ function Router({ homeComponent: Home }: { homeComponent: HomeRouteComponent }) 
       <MainLayout productProfile={productProfile} nav={nav} isLoading={navLoading} navError={navError} onRetryNav={() => refetchNav()} user={user ?? undefined} onLogout={logout} logoutError={logoutError} renderSearchDialog={renderSearchDialog}>
         <RouteErrorBoundary location={location}>
         <Suspense fallback={<RouteFallback />}>
-          <NotFound />
+          <NotFound suggestion={findRouteSuggestion(location, nav)} />
         </Suspense>
         </RouteErrorBoundary>
       </MainLayout>
@@ -718,7 +720,7 @@ function Router({ homeComponent: Home }: { homeComponent: HomeRouteComponent }) 
         <Route path="/auth/register"><LegacyAuthRedirect to="/sign-up" /></Route>
         <Route path="/signup"><LegacyAuthRedirect to="/sign-up" /></Route>
         <Route path="/explore">
-          <Redirect to="/search" replace />
+          <Redirect to={legacyHomeQuery ? `/search?q=${encodeURIComponent(legacyHomeQuery)}` : "/search"} replace />
         </Route>
         <Route path="/resource">
           <Redirect to={legacyHomeQuery ? `/search?q=${encodeURIComponent(legacyHomeQuery)}` : "/search"} replace />
@@ -814,7 +816,7 @@ function Router({ homeComponent: Home }: { homeComponent: HomeRouteComponent }) 
           </AuthGuard>
         </Route>
         <Route>
-          <NotFound />
+          <NotFound suggestion={findRouteSuggestion(location, nav)} />
         </Route>
       </Switch>
       </Suspense>

@@ -23,6 +23,7 @@ import {
   subSubcategorySeoTitleCore,
 } from "@shared/seo-templates";
 import NotFound from "@/pages/not-found";
+import { findTaxonomySuggestion } from "@/lib/not-found-suggestion";
 import ErrorPage from "@/pages/ErrorPage";
 import "@/styles/pages/taxonomy.css";
 import { parsePageParamStrict, pageNoticeFor } from "@/lib/page-param";
@@ -32,7 +33,7 @@ import { apiRequest } from "@/lib/queryClient";
 import { useDebounce } from "@/hooks/useDebounce";
 import { useContactConfig } from "@/lib/contact";
 import { normalizeSearchQuery } from "@shared/searchNormalize";
-import { fetchListingPage, type ListingLevel } from "@/lib/static-data";
+import { fetchAwesomeListNav, fetchListingPage, type AwesomeListNav, type ListingLevel } from "@/lib/static-data";
 import type { ResourceSearchFacets } from "@shared/resourceFacets";
 import { RESOURCE_KIND_VALUES, type ResourceKind } from "@shared/resourceKinds";
 import { trackCategoryView, trackFilterUsage, trackSearch, trackSortChange, trackTagInteraction } from "@/lib/analytics";
@@ -164,6 +165,13 @@ export default function TaxonomyListing({ level }: Props) {
     };
   }, [general, kind, level, selection]);
 
+  // Shared with the sidebar (same key), so the "Did you mean" lookup on an
+  // unknown slug costs no extra request.
+  const { data: nav } = useQuery<AwesomeListNav>({
+    queryKey: ["awesome-list-nav"],
+    queryFn: fetchAwesomeListNav,
+    staleTime: 1000 * 60 * 60,
+  });
   const listing = useQuery({
     queryKey: ["awesome-list-listing", level, slug, page, pageOptions],
     queryFn: () => fetchListingPage(level, slug, page, pageOptions),
@@ -406,7 +414,7 @@ export default function TaxonomyListing({ level }: Props) {
   // real not-found page (with navigation), not a transient "please try again"
   // error — matching the resource-detail 404 UX. Genuine 5xx/network errors
   // still surface the retry-able error state.
-  if (isNotFoundError(listing.error)) return <NotFound />;
+  if (isNotFoundError(listing.error)) return <NotFound suggestion={findTaxonomySuggestion(nav, level, slug)} />;
   // A facets error cached from an earlier panel opening must not replace a
   // healthy listing once the query is idle again (e.g. Back to this page with
   // the panel closed): only a live, enabled request can fail the page.
