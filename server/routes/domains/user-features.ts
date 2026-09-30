@@ -1066,19 +1066,21 @@ export function registerUserFeatureRoutes(
       const userId = req.dbUser.id;
       const { type, status, sort, q, page, limit } = parsed.data;
       const dashboard = await auditRepo.getContributorDashboardData(userId);
-      const statusCounts = {
-        pending: 0,
-        approved: 0,
-        rejected: 0,
-        withdrawn: 0,
-        superseded: 0,
+      const countByStatus = (items: typeof dashboard.items) => {
+        const counts = {
+          pending: 0,
+          approved: 0,
+          rejected: 0,
+          withdrawn: 0,
+          superseded: 0,
+        };
+        for (const item of items) counts[item.status]++;
+        return counts;
       };
-      for (const item of dashboard.items) statusCounts[item.status]++;
 
       const normalizedQuery = q.toLocaleLowerCase();
-      const filtered = dashboard.items.filter((item) => {
+      const inScope = dashboard.items.filter((item) => {
         if (type !== 'all' && item.kind !== type) return false;
-        if (status !== 'all' && item.status !== status) return false;
         if (!normalizedQuery) return true;
         const searchable = [
           item.title,
@@ -1095,6 +1097,10 @@ export function registerUserFeatureRoutes(
           .toLocaleLowerCase();
         return searchable.includes(normalizedQuery);
       });
+      const filtered =
+        status === 'all'
+          ? inScope
+          : inScope.filter((item) => item.status === status);
 
       filtered.sort((a, b) => {
         const byTime = a.changedAt.getTime() - b.changedAt.getTime();
@@ -1118,11 +1124,15 @@ export function registerUserFeatureRoutes(
           total,
           totalPages,
         },
+        // summary is the whole timeline (metrics, empty state); statusCounts
+        // honours the type and search filters so the status options offered
+        // for the current scope never promise results that aren't there.
         summary: {
           total: dashboard.items.length,
-          ...statusCounts,
+          ...countByStatus(dashboard.items),
           ...dashboard.impact,
         },
+        statusCounts: countByStatus(inScope),
         definitions: {
           acceptedContributions:
             'Resource submissions and edit suggestions that moderators approved.',

@@ -106,6 +106,8 @@ interface ContributionsResponse {
     publicResources: number;
     recordedViews: number;
   };
+  /** Per-status counts within the active type and search filters. */
+  statusCounts: Record<ContributionStatus, number>;
   definitions: {
     acceptedContributions: string;
     publicResources: string;
@@ -721,8 +723,8 @@ export default function Contributions() {
                   {Object.entries(statusConfig).map(([value, config]) => (
                     <SelectItem key={value} value={value}>
                       {config.label}
-                      {summary
-                        ? ` (${summary[value as ContributionStatus]})`
+                      {query.data
+                        ? ` (${query.data.statusCounts[value as ContributionStatus]})`
                         : ""}
                     </SelectItem>
                   ))}
