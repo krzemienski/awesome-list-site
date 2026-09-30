@@ -77,7 +77,7 @@ export default function AppFooter({ nav, site }: {
         <nav aria-label="Explore categories">
           <h2 className="app-footer-heading">EXPLORE</h2>
           <div className="app-footer-explore">
-            {categories.slice(0, 6).map((category) => category.slug ? (
+            {categories.map((category) => category.slug ? (
               <Link key={category.slug} href={`/category/${encodeURIComponent(category.slug)}`} aria-label={category.name}>
                 <span className="app-footer-glyph" aria-hidden="true">{getCategoryGlyph(category.name)}</span>
                 <span aria-hidden="true">{shortCategoryName(category.name)}</span>
