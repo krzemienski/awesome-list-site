@@ -63,12 +63,29 @@ const OK_TEXT_CLASS = 'text-[var(--status-ok)]'; // DS-OK: status ok
 const WARN_TEXT_CLASS = 'text-[var(--status-warn)]'; // DS-OK: status warn
 const BAD_TEXT_CLASS = 'text-[var(--status-bad)]'; // DS-OK: status bad
 const INFO_TEXT_CLASS = 'text-[var(--status-info)]'; // DS-OK: cyan info (DS chart/info constant)
-const INFO2_TEXT_CLASS = 'text-[var(--status-info-2)]'; // DS-OK: violet info (DS chart/info constant)
 const INFO_PANEL_CLASS = 'border-[var(--status-info)]/20 bg-[var(--status-info)]/5'; // DS-OK: cyan info (DS chart/info constant)
-const OK_OUTLINE_CLASS = 'border-[var(--status-ok)] text-[var(--status-ok)]'; // DS-OK: status ok
-const WARN_OUTLINE_CLASS = 'border-[var(--status-warn)] text-[var(--status-warn)]'; // DS-OK: status warn
-const BAD_OUTLINE_CLASS = 'border-[var(--status-bad)] text-[var(--status-bad)]'; // DS-OK: status bad
-const INFO2_OUTLINE_CLASS = 'border-[var(--status-info-2)] text-[var(--status-info-2)]'; // DS-OK: violet info (DS chart/info constant)
+
+type StatusTone = 'ok' | 'warn' | 'bad';
+
+// One status -> tone map for stat cards, summary counters, chips and badges:
+// hard failures are bad, reachable-but-questionable links are warn.
+const LINK_STATUS_TONE: Record<string, StatusTone> = {
+  healthy: 'ok',
+  redirect: 'warn',
+  timeout: 'warn',
+  suspect: 'warn',
+  broken: 'bad',
+  dns_failure: 'bad',
+};
+const TONE_TEXT_CLASS: Record<StatusTone, string> = { ok: OK_TEXT_CLASS, warn: WARN_TEXT_CLASS, bad: BAD_TEXT_CLASS };
+const statusTone = (status: string): StatusTone => LINK_STATUS_TONE[status] ?? 'warn';
+
+// Never round a partial result up to 100%: one decimal, floored.
+const formatHealthPercentage = (healthy: number, total: number) => {
+  if (total <= 0) return '0';
+  if (healthy >= total) return '100';
+  return (Math.floor((healthy / total) * 1000) / 10).toFixed(1);
+};
 
 export default function LinkHealthDashboard() {
   const { toast } = useToast();
@@ -212,10 +229,8 @@ export default function LinkHealthDashboard() {
     // eslint-disable-next-line react-hooks/exhaustive-deps -- latestJob object identity changes every poll; keying on status is intentional
   }, [isActiveJob, latestJob?.status]);
 
-  const calculateHealthPercentage = (job: LinkHealthJob | null | undefined) => {
-    if (!job?.totalLinks || job.totalLinks === 0) return 0;
-    return Math.round(((job.healthyLinks || 0) / job.totalLinks) * 100);
-  };
+  const calculateHealthPercentage = (job: LinkHealthJob | null | undefined) =>
+    formatHealthPercentage(job?.healthyLinks || 0, job?.totalLinks || 0);
 
   const calculateProgress = (job: LinkHealthJob | null | undefined) => {
     if (!job?.totalLinks || job.totalLinks === 0) return 0;
@@ -238,51 +253,32 @@ export default function LinkHealthDashboard() {
   };
 
   const getHealthStatusIcon = (status: string) => {
+    const className = `h-4 w-4 ${TONE_TEXT_CLASS[statusTone(status)]}`;
     switch (status) {
       case 'healthy':
-        return <CheckCircle2 className={`h-4 w-4 ${OK_TEXT_CLASS}`} />;
+        return <CheckCircle2 className={className} />;
       case 'redirect':
-        return <TrendingUp className={`h-4 w-4 ${WARN_TEXT_CLASS}`} />;
+        return <TrendingUp className={className} />;
       case 'broken':
-        return <XCircle className={`h-4 w-4 ${BAD_TEXT_CLASS}`} />;
+        return <XCircle className={className} />;
       case 'timeout':
-        return <Clock className={`h-4 w-4 ${WARN_TEXT_CLASS}`} />;
+        return <Clock className={className} />;
       case 'dns_failure':
-        return <AlertCircle className={`h-4 w-4 ${BAD_TEXT_CLASS}`} />;
+        return <AlertCircle className={className} />;
       case 'suspect':
-        return <AlertTriangle className={`h-4 w-4 ${INFO2_TEXT_CLASS}`} />;
+        return <AlertTriangle className={className} />;
       default:
         return <Info className="h-4 w-4" />;
     }
   };
 
-  const getHealthStatusBadge = (status: string) => {
-    switch (status) {
-      case 'healthy':
-        return OK_OUTLINE_CLASS;
-      case 'redirect':
-        return WARN_OUTLINE_CLASS;
-      case 'broken':
-        return BAD_OUTLINE_CLASS;
-      case 'timeout':
-        return WARN_OUTLINE_CLASS;
-      case 'dns_failure':
-        return BAD_OUTLINE_CLASS;
-      case 'suspect':
-        return INFO2_OUTLINE_CLASS;
-      default:
-        return '';
-    }
-  };
-
-  // Recent failures use the canonical DS chip tones directly: hard failures
-  // read as `bad`, reachable-but-questionable links as `warn`.
-  const getFailureChipTone = (status: string) =>
-    status === 'broken' || status === 'dns_failure' ? 'bad' : 'warn';
-
-  // Prepare trend chart data from last 10 jobs
-  const trendData: LinkHealthTrendPoint[] = jobs.slice(0, 10).reverse().map((job) => ({
-    date: formatAdminDate(job.createdAt),
+  // Failed/cancelled runs never finished counting, so plotting their partial
+  // healthy count would draw a false drop to ~0%. Trend completed runs only.
+  const trendJobs = jobs.filter((job) => job.status === 'completed').slice(0, 10).reverse();
+  const trendDates = trendJobs.map((job) => formatAdminDate(job.createdAt));
+  const trendNeedsTime = new Set(trendDates).size < trendDates.length;
+  const trendData: LinkHealthTrendPoint[] = trendJobs.map((job, i) => ({
+    date: trendNeedsTime ? formatAdminDateTime(job.createdAt) : trendDates[i],
     healthy: ((job.healthyLinks || 0) / (job.totalLinks || 1)) * 100,
     broken: ((job.brokenLinks || 0) / (job.totalLinks || 1)) * 100,
     redirect: ((job.redirectLinks || 0) / (job.totalLinks || 1)) * 100,
@@ -292,13 +288,13 @@ export default function LinkHealthDashboard() {
   return (
     <div className="ops-link-health">
       <div className="ops-link-health__stat-grid" aria-label="Link health status summary">
-        {[
-          ["Healthy", summaryCounts.healthy, "ok"],
-          ["Redirect", summaryCounts.redirect, "warn"],
-          ["Broken", summaryCounts.broken, "bad"],
-          ["Timeout", summaryCounts.timeout, "bad"],
-          ["Suspect", summaryCounts.suspect, "warn"],
-        ].map(([label, value, tone]) => (
+        {([
+          ["Healthy", summaryCounts.healthy, statusTone("healthy")],
+          ["Redirect", summaryCounts.redirect, statusTone("redirect")],
+          ["Broken", summaryCounts.broken, statusTone("broken")],
+          ["Timeout", summaryCounts.timeout, statusTone("timeout")],
+          ["Suspect", summaryCounts.suspect, statusTone("suspect")],
+        ] as const).map(([label, value, tone]) => (
           <div key={label} className={`card ops-link-health__stat-card ops-link-health__stat-card--${tone}`}>
             <div className="mono ops-link-health__stat-label">{label}</div>
             <div>{typeof value === "number" ? value.toLocaleString() : value}</div>
@@ -366,19 +362,19 @@ export default function LinkHealthDashboard() {
               )}
               <div className="ops-link-health__summary-meta" aria-label="Detailed link counts">
                 <span data-testid="counter-total-links">Total {summaryCounts.total}</span>
-                <span className={OK_TEXT_CLASS} data-testid="counter-healthy-links">
+                <span className={TONE_TEXT_CLASS[statusTone('healthy')]} data-testid="counter-healthy-links">
                   Healthy {summaryCounts.healthy}
                 </span>
-                <span className={BAD_TEXT_CLASS} data-testid="counter-broken-links">
+                <span className={TONE_TEXT_CLASS[statusTone('broken')]} data-testid="counter-broken-links">
                   Broken {summaryCounts.broken}
                 </span>
-                <span className={WARN_TEXT_CLASS} data-testid="counter-redirect-links">
+                <span className={TONE_TEXT_CLASS[statusTone('redirect')]} data-testid="counter-redirect-links">
                   Redirects {summaryCounts.redirect}
                 </span>
-                <span className={WARN_TEXT_CLASS} data-testid="counter-timeout-links">
+                <span className={TONE_TEXT_CLASS[statusTone('timeout')]} data-testid="counter-timeout-links">
                   Timeouts {summaryCounts.timeout}
                 </span>
-                <span className={INFO2_TEXT_CLASS} data-testid="counter-suspect-links">
+                <span className={TONE_TEXT_CLASS[statusTone('suspect')]} data-testid="counter-suspect-links">
                   Suspect {summaryCounts.suspect}
                 </span>
               </div>
@@ -391,7 +387,7 @@ export default function LinkHealthDashboard() {
                   {/* R4-044: derived from the same summaryCounts dataset. */}
                   <div className="text-3xl font-bold font-mono">
                     {summaryCounts.total > 0
-                      ? Math.round((summaryCounts.healthy / summaryCounts.total) * 100)
+                      ? formatHealthPercentage(summaryCounts.healthy, summaryCounts.total)
                       : calculateHealthPercentage(summaryJob)}%
                   </div>
                 </div>
@@ -461,7 +457,7 @@ export default function LinkHealthDashboard() {
                   Link Health Trends
                 </CardTitle>
                 <CardDescription>
-                  Health status trends across the last {trendData.length}{" "}
+                  Health status trends across the last {trendData.length} completed{" "}
                   {trendData.length === 1 ? "check" : "checks"}
                 </CardDescription>
               </CardHeader>
@@ -553,7 +549,7 @@ export default function LinkHealthDashboard() {
                         )}
                       </TableCell>
                       <TableCell>
-                        <span className={`chip ${getFailureChipTone(check.status)} ops-link-health__failure-chip`}>
+                        <span className={`chip ${statusTone(check.status)} ops-link-health__failure-chip`}>
                           {check.status.replace(/_/g, " ")}
                         </span>
                       </TableCell>
@@ -661,7 +657,7 @@ export default function LinkHealthDashboard() {
                   {brokenLinks.map((check) => (
                     <TableRow key={check.id}>
                       <TableCell>
-                        <StatusChip status={check.status} className={getHealthStatusBadge(check.status)}>
+                        <StatusChip status={statusTone(check.status)}>
                           {getHealthStatusIcon(check.status)}
                           <span className="ml-1">{check.status}</span>
                         </StatusChip>
