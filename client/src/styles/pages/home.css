@@ -71,6 +71,8 @@
 }
 
 
+.home-kind-chip[aria-pressed="true"] { border-color: var(--accent); }
+
 .home-kind-count {
   margin-left: 0.375rem;
   color: var(--text-3);
