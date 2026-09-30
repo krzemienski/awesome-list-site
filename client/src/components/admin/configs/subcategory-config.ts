@@ -24,7 +24,6 @@ export const subcategoryConfig: GenericCrudManagerProps<SubcategoryWithCount> = 
   testIdPrefix: "subcategory-manager",
   testIdEntity: "subcategory",
   testIdEntityPlural: "subcategories",
-  searchEnabled: false,
   itemsPerPage: 24,
   pageSizeOptions: [24],
   navigationOrder: "subcategories",
