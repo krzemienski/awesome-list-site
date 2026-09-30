@@ -239,7 +239,7 @@ export default function Advanced() {
                 <Card className="discovery-tools-stat-card">
                   <CardContent className="discovery-tools-stat-card-content">
                     <div className="discovery-tools-stat-value discovery-tools-stat-value--tertiary">
-                      {new Set(resources.flatMap((r) => r.metadata?.tags ?? r.tags ?? [])).size}
+                      {new Set(resources.flatMap((r) => r.metadata?.tags ?? r.tags ?? []).map((tag) => tag.toLowerCase())).size.toLocaleString()}
                     </div>
                     <div className="eyebrow discovery-tools-stat-label">Unique Tags</div>
                   </CardContent>
