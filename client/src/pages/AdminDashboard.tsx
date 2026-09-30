@@ -91,9 +91,10 @@ export default function AdminDashboard() {
     return tabFromWindow() ?? "overview";
   });
   const [settingsOpen, setSettingsOpen] = useState(false);
-  // Settings-menu sections that extend a strip tab highlight it; Digests has
-  // no parent tab, so it renders its own panel with no strip tab selected.
-  const visibleTab = ({ subsubcategories: "subcategories", journeys: "research" } as Record<string, string>)[activeTab] ?? activeTab;
+  // Settings-menu sections that extend a strip tab highlight it; Journeys and
+  // Digests have no parent tab, so each renders its own panel with no strip
+  // tab selected.
+  const visibleTab = ({ subsubcategories: "subcategories" } as Record<string, string>)[activeTab] ?? activeTab;
 
   // Keep the tab in sync if the user navigates between /admin/:section links.
   useEffect(() => {
@@ -473,12 +474,12 @@ export default function AdminDashboard() {
         <TabsContent value="audit">
           <ErrorBoundary label="Audit tab"><AuditTab /></ErrorBoundary>
         </TabsContent>
+        <TabsContent value="journeys" data-testid="content-journeys">
+          <ErrorBoundary label="Journeys tab"><JourneyStepsManager /></ErrorBoundary>
+        </TabsContent>
+
         <TabsContent value="research" data-testid="content-research">
-          {activeTab === "journeys"
-            ? <div data-testid="content-journeys"><ErrorBoundary label="Journeys tab"><JourneyStepsManager /></ErrorBoundary></div>
-            : (
-              <ErrorBoundary label="Research tab"><ResearchWorkspace /></ErrorBoundary>
-            )}
+          <ErrorBoundary label="Research tab"><ResearchWorkspace /></ErrorBoundary>
         </TabsContent>
       </Tabs>
     </div>

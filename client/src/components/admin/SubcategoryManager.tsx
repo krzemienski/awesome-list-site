@@ -1,13 +1,5 @@
-import GenericCrudManager, { BaseEntityWithCount, GenericCrudManagerProps } from "./GenericCrudManager";
-import { subcategoryConfig } from "./configs/subcategory-config";
-
-interface SubcategoryWithCount extends BaseEntityWithCount {
-  id: number;
-  name: string;
-  slug: string;
-  categoryId: number;
-  resourceCount: number;
-}
+import GenericCrudManager, { GenericCrudManagerProps } from "./GenericCrudManager";
+import { subcategoryConfig, type SubcategoryWithCount } from "./configs/subcategory-config";
 
 const TypedCrudManager = GenericCrudManager as React.ComponentType<GenericCrudManagerProps<SubcategoryWithCount>>;
 

@@ -189,9 +189,12 @@ export default function LinkHealthDashboard() {
 
   // R4-044: summary counters tally the SAME array the table renders, so the
   // numbers always reconcile with the visible rows (dns_failure folds into
-  // Broken, matching the table's badge semantics). Healthy is derived as
-  // total − problems from the same set. While a job is still running we fall
-  // back to the job record's live progress counts.
+  // Broken, matching the table's badge semantics). Healthy is the job's own
+  // recorded healthy results — deriving it as total − problems turned the
+  // checks the table excludes (resources deleted since the scan) into
+  // "healthy" ones — and Total is healthy + the problems shown, so the
+  // excluded checks leave the total too. While a job is still running we
+  // fall back to the job record's live progress counts.
   const countByStatus = (statuses: string[]) =>
     allProblemLinks.filter((c) => statuses.includes(c.status)).length;
   // R5-009 (run24): while a check runs, the in-progress job's counters are all
@@ -204,12 +207,12 @@ export default function LinkHealthDashboard() {
   const summaryJob = isJobInProgress || isTerminalWithoutResults ? lastCompletedJob : latestJob;
   const summaryCounts = !isJobInProgress && !isTerminalWithoutResults && brokenLinksData
     ? {
-        total: latestJob?.totalLinks || 0,
+        total: (latestJob?.healthyLinks || 0) + allProblemLinks.length,
         broken: countByStatus(['broken', 'dns_failure']),
         redirect: countByStatus(['redirect']),
         timeout: countByStatus(['timeout']),
         suspect: countByStatus(['suspect']),
-        healthy: Math.max(0, (latestJob?.totalLinks || 0) - allProblemLinks.length),
+        healthy: latestJob?.healthyLinks || 0,
       }
     : {
         total: summaryJob?.totalLinks || 0,
