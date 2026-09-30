@@ -432,7 +432,7 @@ export function registerAdminContentRoutes(
       // description so no live resource has a stub under 20 chars.
       const cleanDescription = ensureMinDescription(existing.description || '', existing.title, existing.url);
       if (cleanDescription !== (existing.description || '')) {
-        await resourceRepo.updateResource(resourceId, { description: cleanDescription });
+        await resourceRepo.updateResource(resourceId, { description: cleanDescription }, { performedBy: userId });
       }
       
       const updatedResource = await resourceRepo.approveResource(resourceId, userId);
@@ -616,15 +616,10 @@ export function registerAdminContentRoutes(
         updateData.subSubcategory = null;
       }
 
-      const updatedResource = await resourceRepo.updateResource(resourceId, updateData);
-      
-      await auditRepo.logResourceAudit(
-        resourceId,
-        'updated',
-        userId,
-        updateData,
-        'Resource updated by admin'
-      );
+      const updatedResource = await resourceRepo.updateResource(resourceId, updateData, {
+        performedBy: userId,
+        notes: 'Resource updated by admin',
+      });
       
       res.json(updatedResource);
     } catch (error: any) {

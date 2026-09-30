@@ -411,7 +411,8 @@ export class GitHubSyncService {
                   {
                     ...conflict.resource,
                     metadata: updatedMetadata
-                  } as Partial<InsertResource>
+                  } as Partial<InsertResource>,
+                  false
                 );
                 result.resources.push(updated);
                 

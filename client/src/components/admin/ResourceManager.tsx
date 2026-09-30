@@ -1428,13 +1428,14 @@ export default function ResourceManager() {
         }}
       >
         {/* NB-005 (run18): cap height to the small-viewport unit (svh accounts
-            for mobile URL bars) and scroll internally so every field + the
-            Save/Cancel footer stay reachable at 812×375 landscape. */}
+            for mobile URL bars). F893: only the field list scrolls; header and
+            Save/Cancel footer stay pinned so the footer is never half-clipped
+            (a click on its hidden half hit the overlay and closed unsaved). */}
         {/* P1-06: restore focus to the row's edit button on close. Radix's
             default drops focus to <body> because this one Dialog is shared
             across rows rather than nested under a per-row trigger. */}
         <DialogContent
-          className="max-w-2xl max-h-[90svh] overflow-y-auto bg-[var(--bg-2)] border-[var(--border)]"
+          className="flex max-w-2xl max-h-[90svh] flex-col overflow-hidden bg-[var(--bg-2)] border-[var(--border)]"
           onCloseAutoFocus={(e) => {
             const trigger = editTriggerRef.current;
             if (trigger && document.contains(trigger)) {
@@ -1453,7 +1454,7 @@ export default function ResourceManager() {
               Make changes to the resource below. Click save when done.
             </DialogDescription>
           </DialogHeader>
-          <div className="grid gap-4 py-4">
+          <div className="-mx-1 grid min-h-0 flex-1 gap-4 overflow-y-auto px-1 py-4">
             {/* BUG-049: dialog-level banner for server-side rejections. */}
             {formError && (
               <div
@@ -1716,9 +1717,8 @@ export default function ResourceManager() {
       </Dialog>
 
       <Dialog open={createDialogOpen} onOpenChange={setCreateDialogOpen}>
-        {/* NB-005 (run18): same svh height cap as the edit dialog so the Create
-            form's footer stays reachable on short landscape viewports. */}
-        <DialogContent className="max-w-2xl max-h-[90svh] overflow-y-auto bg-[var(--bg-2)] border-[var(--border)]">
+        {/* NB-005 (run18) + F893: same svh cap and pinned footer as the edit dialog. */}
+        <DialogContent className="flex max-w-2xl max-h-[90svh] flex-col overflow-hidden bg-[var(--bg-2)] border-[var(--border)]">
           <DialogHeader>
             <DialogTitle className="flex items-center gap-2">
               <Plus className="h-5 w-5" />
@@ -1728,7 +1728,7 @@ export default function ResourceManager() {
               Create a new resource entry. Required fields are marked with *.
             </DialogDescription>
           </DialogHeader>
-          <div className="grid gap-4 py-4">
+          <div className="-mx-1 grid min-h-0 flex-1 gap-4 overflow-y-auto px-1 py-4">
             {/* BUG-049: dialog-level banner for server-side rejections. */}
             {formError && (
               <div

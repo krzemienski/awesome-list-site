@@ -687,7 +687,7 @@ ${taxonomyHint}`;
     if (updates.title) updates.title = humanizeTitle(updates.title);
     if (updates.description) updates.description = sanitizeDescription(updates.description);
 
-    await this.resourceRepo.updateResource(item.resourceId, updates);
+    await this.resourceRepo.updateResource(item.resourceId, updates, false);
 
     await this.auditRepo.logResourceAudit(
       item.resourceId,

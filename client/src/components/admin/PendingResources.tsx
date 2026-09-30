@@ -139,13 +139,50 @@ export default function PendingResources() {
     };
   }, [isLoading, data?.total]);
 
+  // F890: approving/rejecting removes the row whose button opened the dialog,
+  // so the dialog's return-focus target disappears. Plan a surviving target
+  // (next row, else previous row, else the list heading) before it goes.
+  const focusAfterRemovalRef = useRef<{ removedId: number; targetId: number | null } | null>(null);
+
+  const planFocusAfterRemoval = (removedId: number) => {
+    const index = pendingResources.findIndex((resource) => resource.id === removedId);
+    const target = pendingResources[index + 1] ?? pendingResources[index - 1] ?? null;
+    focusAfterRemovalRef.current = { removedId, targetId: target?.id ?? null };
+  };
+
+  const focusRemovalTarget = () => {
+    const plan = focusAfterRemovalRef.current;
+    if (!plan) return;
+    const el = plan.targetId !== null
+      ? document.querySelector<HTMLElement>(`[data-testid="button-view-details-${plan.targetId}"]`)
+      : document.getElementById("pending-resources-heading");
+    el?.focus();
+  };
+
+  const restoreFocusAfterRemoval = (event: Event) => {
+    if (!focusAfterRemovalRef.current) return;
+    event.preventDefault();
+    focusRemovalTarget();
+  };
+
+  // The refetch that drops the row (or swaps in the empty view) can land after
+  // the dialog closed; re-apply the planned focus if it was lost to <body>.
+  useEffect(() => {
+    const plan = focusAfterRemovalRef.current;
+    if (!plan || pendingResourceIds.includes(plan.removedId)) return;
+    const active = document.activeElement;
+    if (!active || active === document.body || !active.isConnected) focusRemovalTarget();
+    focusAfterRemovalRef.current = null;
+  }, [pendingResourceIds]);
+
   const approveMutation = useMutation({
     mutationFn: async (resourceId: number): Promise<unknown> => {
       return await apiRequest(`/api/admin/resources/${resourceId}/approve`, {
         method: 'POST'
       });
     },
-    onSuccess: () => {
+    onSuccess: (_data, resourceId) => {
+      planFocusAfterRemoval(resourceId);
       void queryClient.invalidateQueries({ queryKey: ['/api/admin/pending-resources'] });
       void queryClient.invalidateQueries({ queryKey: ['/api/admin/stats'] });
       setApproveDialogOpen(false);
@@ -168,7 +205,8 @@ export default function PendingResources() {
         body: JSON.stringify({ reason })
       });
     },
-    onSuccess: () => {
+    onSuccess: (_data, { resourceId }) => {
+      planFocusAfterRemoval(resourceId);
       void queryClient.invalidateQueries({ queryKey: ['/api/admin/pending-resources'] });
       void queryClient.invalidateQueries({ queryKey: ['/api/admin/stats'] });
       setRejectDialogOpen(false);
@@ -411,7 +449,7 @@ export default function PendingResources() {
       <section className="admin-panel queue-review-shell" aria-labelledby="pending-resources-heading">
         <div className="admin-panel__heading queue-review-shell-heading">
           <div>
-            <h2 id="pending-resources-heading">Pending approvals</h2>
+            <h2 id="pending-resources-heading" tabIndex={-1}>Pending approvals</h2>
             <p>0 submissions awaiting review</p>
           </div>
           <div className="queue-review-actions">
@@ -465,7 +503,7 @@ export default function PendingResources() {
       <section className="admin-panel queue-review-shell" aria-labelledby="pending-resources-heading">
         <div className="admin-panel__heading queue-review-shell-heading">
           <div>
-            <h2 id="pending-resources-heading">Pending approvals</h2>
+            <h2 id="pending-resources-heading" tabIndex={-1}>Pending approvals</h2>
             <p>{totalPending} submissions awaiting review</p>
           </div>
           <div className="queue-review-actions" role="toolbar" aria-label="Pending approval actions">
@@ -788,7 +826,7 @@ export default function PendingResources() {
         setApproveDialogOpen(open);
         if (!open) setApproveError(null);
       }}>
-        <AlertDialogContent>
+        <AlertDialogContent onCloseAutoFocus={restoreFocusAfterRemoval}>
           <AlertDialogHeader>
             <AlertDialogTitle>Approve Resource?</AlertDialogTitle>
             <AlertDialogDescription>
@@ -829,7 +867,7 @@ export default function PendingResources() {
          setRejectDialogOpen(open);
          if (!open) setRejectError(null);
        }}>
-        <AlertDialogContent>
+        <AlertDialogContent onCloseAutoFocus={restoreFocusAfterRemoval}>
           <AlertDialogHeader>
             <AlertDialogTitle>Reject Resource?</AlertDialogTitle>
             <AlertDialogDescription>

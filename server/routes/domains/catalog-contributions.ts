@@ -895,7 +895,7 @@ export function registerCatalogContributionsRoutes(
       // stub description; sanitize (entities/emails) or backfill a fallback.
       const cleanDescription = ensureMinDescription(existing.description || '', existing.title, existing.url);
       if (cleanDescription !== (existing.description || '')) {
-        await resourceRepo.updateResource(id, { description: cleanDescription });
+        await resourceRepo.updateResource(id, { description: cleanDescription }, { performedBy: userId });
       }
       
       const resource = await resourceRepo.updateResourceStatus(id, 'approved', userId);
