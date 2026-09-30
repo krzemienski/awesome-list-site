@@ -3,6 +3,7 @@ import { Link } from "wouter";
 import { Button } from "@/components/ui/button";
 import { useAppBottomInset } from "@/hooks/use-app-bottom-inset";
 import {
+  ANALYTICS_VENDORS,
   getAnalyticsConsent,
   setAnalyticsConsent,
   initGA,
@@ -22,6 +23,11 @@ const OPEN_COOKIE_SETTINGS_EVENT = "open-cookie-settings";
 export function openCookieSettings() {
   window.dispatchEvent(new CustomEvent(OPEN_COOKIE_SETTINGS_EVENT));
 }
+
+/** False when this build has no analytics vendor keys, so there is nothing to consent to. */
+export const hasAnalyticsVendors = ANALYTICS_VENDORS.length > 0;
+
+const vendorList = new Intl.ListFormat("en", { type: "conjunction" }).format(ANALYTICS_VENDORS);
 
 // BUG-020 (run13): analytics consent banner. Google Analytics loads ONLY
 // after an explicit "Accept" (see the consent gate inside initGA); declining
@@ -143,7 +149,7 @@ export default function ConsentBanner() {
     return () => window.removeEventListener(OPEN_COOKIE_SETTINGS_EVENT, onOpen);
   }, []);
 
-  if (choiceMade) return null;
+  if (choiceMade || !hasAnalyticsVendors) return null;
 
   const decide = (value: "granted" | "denied") => {
     setAnalyticsConsent(value);
@@ -230,11 +236,13 @@ export default function ConsentBanner() {
           375px, where it sits in flow at the top and scrolls away. */}
       <div className="system-consent-banner__inner mx-auto w-full flex flex-col items-start gap-2 px-4 py-2 sm:flex-row sm:items-center sm:gap-3 sm:px-6 sm:py-3 md:px-12">
         <p className="system-consent-banner__copy flex-1 text-xs sm:text-sm">
-          We use analytics (Google Analytics, Mixpanel, PostHog and Amplitude) to understand how the
-          site is used — only if you allow it.{" "}
+          We use analytics ({vendorList}) to understand how the site is used — only if you allow
+          it.{" "}
           <span className="hidden sm:inline">
-            Decline and none of them load. Allow and, if you are signed in, your name and email are
-            attached to your analytics profile.{" "}
+            Decline and none of them load.
+            {ANALYTICS_VENDORS.includes("Mixpanel")
+              ? " Allow and, if you are signed in, your name and email are attached to your analytics profile."
+              : ""}{" "}
           </span>
           See our {/* Run17 BUG-048: inline-flex + min-h keeps the tap target ≥24px. */}
           <Link
