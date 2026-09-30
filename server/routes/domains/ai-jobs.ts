@@ -229,7 +229,7 @@ export function registerAiJobsRoutes(
   // hierarchy columns via `promoteEnrichmentSuggestions`, auto-creating any
   // implied `sub_subcategories` rows. Idempotent — safe to re-run; only
   // touches rows where a corresponding hierarchy column is still blank.
-  app.post('/api/admin/enrichment/backfill-suggestions', isAuthenticated, isAdmin, async (req: any, res) => {
+  app.post('/api/admin/enrichment/backfill-suggestions', isAuthenticated, isAdmin, async (req, res) => {
     try {
       const { promoteEnrichmentSuggestions } = await import('../../ai/promoteEnrichmentSuggestions');
 
