@@ -44,3 +44,22 @@
   border-radius: var(--radius-pill);
   font-size: 0.75rem;
 }
+
+/* Clipped facet lists: keep the scrollbar visible where the browser allows
+   (overlay scrollbars hide until scrolled) and name the hidden rows below. */
+.search-facet-scroll {
+  scrollbar-gutter: stable;
+}
+
+@supports not selector(::-webkit-scrollbar) {
+  .search-facet-scroll {
+    scrollbar-width: thin;
+    scrollbar-color: var(--border-strong) transparent;
+  }
+}
+
+.search-facet-scroll-hint {
+  padding: 0.25rem 0.5rem 0;
+  color: var(--text-3);
+  font-size: 0.75rem;
+}
