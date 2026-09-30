@@ -37,7 +37,7 @@ import { Badge } from "@/components/ui/badge";
 import { ToastAction } from "@/components/ui/toast";
 import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/hooks/useAuth";
-import { apiRequest, queryClient } from "@/lib/queryClient";
+import { ApiError, apiRequest, queryClient } from "@/lib/queryClient";
 import { humanizeApiError } from "@/lib/apiError";
 import { mpTrack } from "@/lib/mixpanel";
 import type { Resource } from "@shared/schema";
@@ -72,6 +72,37 @@ const makeSuggestEditSchema = (originalUrl: string) => z.object({
 });
 
 type SuggestEditFormData = z.infer<ReturnType<typeof makeSuggestEditSchema>>;
+
+function formatWait(seconds: number): string {
+  if (seconds < 60) return `${seconds} second${seconds === 1 ? "" : "s"}`;
+  if (seconds < 3600) {
+    const minutes = Math.ceil(seconds / 60);
+    return `${minutes} minute${minutes === 1 ? "" : "s"}`;
+  }
+  const hours = Math.ceil(seconds / 3600);
+  return `${hours} hour${hours === 1 ? "" : "s"}`;
+}
+
+// Only transport failures and 5xx are worth retrying as-is. A 4xx (domain not
+// allowlisted, page unreadable) or a rate limit carries the server's reason,
+// and repeating the same request can't change the answer.
+function analyzeFailureToast(error: unknown): { title: string; description: string } {
+  if (!(error instanceof ApiError)) {
+    return { title: "Analysis Failed", description: "Could not analyze URL with AI. Please try again." };
+  }
+  if (error.status === 429) {
+    return {
+      title: "AI analysis limit reached",
+      description: error.retryAfterSec
+        ? `Try again in ${formatWait(error.retryAfterSec)}.`
+        : error.message,
+    };
+  }
+  if (error.status >= 400 && error.status < 500) {
+    return { title: "Can't analyze this URL", description: error.message };
+  }
+  return { title: "Analysis Failed", description: "Could not analyze URL with AI. Please try again." };
+}
 
 interface Category {
   id: number;
@@ -279,11 +310,7 @@ export function SuggestEditDialog({ resource, open, onOpenChange }: SuggestEditD
         description: `Suggestions generated with ${Math.round(response.confidence * 100)}% confidence`,
       });
     } catch (error) {
-      toast({
-        title: "Analysis Failed",
-        description: "Could not analyze URL with AI. Please try again.",
-        variant: "destructive",
-      });
+      toast({ ...analyzeFailureToast(error), variant: "destructive" });
     } finally {
       setAnalyzingWithAI(false);
     }
