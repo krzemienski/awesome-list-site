@@ -62,21 +62,6 @@
   gap: 0.5rem;
 }
 
-/* Hidden tools toggle: still reachable by keyboard, but it must not take
-   pointer input while invisible — out of flow it overlaps the Add button. */
-.admin-taxonomy-header-actions > [data-testid^="button-more-"] {
-  opacity: 0;
-  pointer-events: none;
-  position: absolute;
-}
-
-.admin-taxonomy-header-actions > [data-testid^="button-more-"]:focus-visible,
-.admin-taxonomy-shell--tools-open .admin-taxonomy-header-actions > [data-testid^="button-more-"] {
-  opacity: 1;
-  pointer-events: auto;
-  position: static;
-}
-
 .admin-taxonomy-header-actions > [data-testid^="button-create-"] {
   min-height: 44px;
   height: auto;
@@ -107,11 +92,10 @@
   width: 12.5rem;
 }
 
-/* Tools closed: the search field and pager are taken out of the flow AND out
-   of the accessibility tree/tab order (visibility), and collapsed to a zero
-   box so the pager cannot extend the document below the canonical panel. */
-.admin-taxonomy-shell:not(.admin-taxonomy-shell--tools-open) .admin-taxonomy-search,
-.admin-taxonomy-shell:not(.admin-taxonomy-shell--tools-open) .admin-taxonomy-pagination {
+/* Tools closed: the search field leaves the flow and the accessibility
+   tree unless it still holds a query, so an active filter is never invisible.
+   The pager is not a tool — it always shows when there is more than a page. */
+.admin-taxonomy-shell:not(.admin-taxonomy-shell--tools-open) .admin-taxonomy-search:not(:has(input:not(:placeholder-shown))) {
   height: 0;
   inset: 0 auto auto 0;
   margin: 0;

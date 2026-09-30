@@ -2484,16 +2484,18 @@ export default function GenericCrudManager<T extends BaseEntityWithCount>({
             </CardDescription>
           </div>
           <div className="admin-taxonomy-header-actions flex flex-wrap items-center gap-3 min-w-0 max-w-full">
-            <Button
-              type="button"
-              variant="ghost"
-              size="sm"
-              onClick={() => setToolsOpen((open) => !open)}
-              aria-expanded={toolsOpen}
-              data-testid={`button-more-${testIdEntityPlural}`}
-            >
-              More
-            </Button>
+            {searchEnabled && (
+              <Button
+                type="button"
+                variant="ghost"
+                size="sm"
+                onClick={() => setToolsOpen((open) => !open)}
+                aria-expanded={toolsOpen}
+                data-testid={`button-more-${testIdEntityPlural}`}
+              >
+                {toolsOpen ? "Hide search" : "Search"}
+              </Button>
+            )}
             {/* Bulk Actions Toolbar */}
             {bulkOperationsEnabled && selectedIds.size > 0 && (
               <div className="admin-taxonomy-bulk-actions flex items-center gap-2 px-3 py-1.5 bg-muted rounded-lg" data-testid="bulk-actions-toolbar">
