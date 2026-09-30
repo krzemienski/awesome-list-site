@@ -10,6 +10,8 @@ import {
   BreadcrumbSeparator,
 } from "@/components/ui/breadcrumb";
 import { deslugify } from "@/lib/utils";
+import { tagDisplayNameBranded } from "@shared/seo-templates";
+import { normalizeTagPathSegment } from "@shared/tagNormalize";
 
 const ResourceBreadcrumbAncestorDisclosure = lazy(
   () => import("./ResourceBreadcrumbAncestorDisclosure"),
@@ -167,7 +169,12 @@ function resolveCrumbs(categories: AwesomeListNavNode[], pathname: string, title
     return [{ href: "/journeys", label: "Learning Journeys" }, { label: titleLabel(title) ?? "Journey" }];
   }
   if (root === "tag" && value) {
-    return [{ href: "/categories", label: "Browse" }, { label: `Tag: ${decodedSlug(value)}` }];
+    // Same name source as the TagLanding H1, so brand casing ("FFmpeg") matches.
+    const tag = normalizeTagPathSegment(value);
+    return [
+      { href: "/categories", label: "Browse" },
+      { label: `Tag: ${tag ? tagDisplayNameBranded(tag) : decodedSlug(value)}` },
+    ];
   }
   if (root === "collection" && value) return [{ label: "Shared collection" }];
   if (root === "sign-in") return [{ label: "Sign in" }];
