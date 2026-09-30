@@ -21,7 +21,7 @@ const SelectTrigger = React.forwardRef<
     className={cn(
       // Run16 BUG-063: red ring on aria-invalid (set by FormControl) so
       // invalid selects are highlighted like invalid inputs.
-      "select flex min-h-[44px] items-center justify-between gap-2 data-[placeholder]:text-[var(--text-3)] aria-[invalid=true]:border-destructive aria-[invalid=true]:ring-1 aria-[invalid=true]:ring-destructive disabled:cursor-not-allowed [&>span]:line-clamp-1",
+      "select flex min-h-[44px] items-center justify-between gap-2 text-left data-[placeholder]:text-[var(--text-3)] aria-[invalid=true]:border-destructive aria-[invalid=true]:ring-1 aria-[invalid=true]:ring-destructive disabled:cursor-not-allowed [&>span]:line-clamp-1",
       className
     )}
     {...props}
