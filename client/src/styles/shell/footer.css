@@ -83,10 +83,10 @@
   transition: all 160ms ease;
 }
 .app-footer-repo > svg { flex-shrink: 0; }
-/* The label is the one part that may give way: without min-width:0 and a
-   break opportunity it can't shrink below "krzemienski/awesome-", so the text
-   and arrow ran past the capped button at 1280-1440px. */
-.app-footer-repo > span:not(.app-footer-repo-arrow) { min-width: 0; overflow-wrap: anywhere; }
+/* The label is the one part that may give way: it wraps after the owner/
+   slash (a <wbr> in the markup) so the repo name stays whole inside the capped
+   button at 1280-1440px. */
+.app-footer-repo > span:not(.app-footer-repo-arrow) { min-width: 0; }
 .app-footer-repo-arrow { flex-shrink: 0; }
 .app-footer-repo-arrow { color: var(--text-3); }
 .app-footer-repo:hover { border-color: var(--accent); color: var(--accent); }
