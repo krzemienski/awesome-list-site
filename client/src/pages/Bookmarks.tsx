@@ -62,6 +62,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Link } from "wouter";
+import { queryUnavailableReason } from "@/lib/query-availability";
 import { apiRequest, queryClient } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
 import { writeFilterParams, usePopstateParams } from "@/lib/url-filter-state";
@@ -126,22 +127,19 @@ export default function Bookmarks() {
   const [noteText, setNoteText] = useState("");
   const { toast } = useToast();
 
-  const {
-    data: bookmarks = [],
-    isLoading: bookmarksLoading,
-    error: bookmarksError,
-  } = useQuery<BookmarkedResource[]>({
+  const bookmarksQuery = useQuery<BookmarkedResource[]>({
     queryKey: ["/api/bookmarks"],
     staleTime: 30_000,
   });
-  const {
-    data: collections = [],
-    isLoading: collectionsLoading,
-    error: collectionsError,
-  } = useQuery<BookmarkCollection[]>({
+  const collectionsQuery = useQuery<BookmarkCollection[]>({
     queryKey: ["/api/collections?includeArchived=true"],
     staleTime: 30_000,
   });
+  const { data: bookmarks = [] } = bookmarksQuery;
+  const { data: collections = [] } = collectionsQuery;
+  const libraryUnavailable =
+    queryUnavailableReason(bookmarksQuery) ??
+    queryUnavailableReason(collectionsQuery);
 
   const refreshLibrary = async () => {
     await Promise.all([
@@ -354,7 +352,7 @@ export default function Bookmarks() {
     }
   };
 
-  if (bookmarksLoading || collectionsLoading) {
+  if (bookmarksQuery.isLoading || collectionsQuery.isLoading) {
     return (
       <div className="account-page account-page--wide space-y-6" aria-busy="true" aria-live="polite">
         <SEOHead title="My Library - Loading" description="View your saved library" noindex />
@@ -368,7 +366,31 @@ export default function Bookmarks() {
     );
   }
 
-  if (bookmarksError || collectionsError) {
+  if (libraryUnavailable === "offline") {
+    return (
+      <div className="account-page account-page--wide space-y-6">
+        <SEOHead title="My Library - Offline" description="View your saved library" noindex />
+        <div className="text-center py-12" role="alert" data-testid="library-offline">
+          <BookmarkX className="h-16 w-16 mx-auto text-muted-foreground mb-4" />
+          <h1 className="display-h text-2xl mb-2">You’re offline</h1>
+          <p className="text-muted-foreground mb-5">
+            Your saves are still safe. Your library will load when your
+            connection is back.
+          </p>
+          <Button
+            onClick={() => {
+              void bookmarksQuery.refetch();
+              void collectionsQuery.refetch();
+            }}
+          >
+            Try again
+          </Button>
+        </div>
+      </div>
+    );
+  }
+
+  if (libraryUnavailable === "error") {
     return (
       <div className="account-page account-page--wide space-y-6">
         <SEOHead title="My Library - Error" description="View your saved library" noindex />
