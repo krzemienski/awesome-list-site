@@ -46,6 +46,7 @@ interface CategorySummary {
 }
 
 const PAGE_SIZE = 100;
+const ACTIVE_WINDOW_MS = 30 * 24 * 60 * 60 * 1000;
 const getDate = (value: string | null | undefined) => {
   if (!value) return null;
   const timestamp = new Date(value).getTime();
@@ -131,9 +132,13 @@ export default function AdminStats({
   // The stats route intentionally does not forward the repository's
   // all-users count. Keep this card tied to the sequential user pages so its
   // value and role split use the same 30-day updatedAt definition.
-  const activeUsers = users.data?.length;
-  const activeAdmins = users.data?.filter((user) => user.role === "admin").length ?? 0;
-  const activeContributors = users.data?.filter((user) => user.role !== "admin").length ?? 0;
+  const activeSince = Date.now() - ACTIVE_WINDOW_MS;
+  const activeUserList = users.data?.filter(
+    (user) => (getDate(user.updatedAt) ?? 0) > activeSince,
+  );
+  const activeUsers = activeUserList?.length;
+  const activeAdmins = activeUserList?.filter((user) => user.role === "admin").length ?? 0;
+  const activeContributors = activeUserList?.filter((user) => user.role !== "admin").length ?? 0;
   const categoryCount = categories.data?.length;
   const subcategoryCount = subcategories.data?.length;
   const pendingUnavailable = pending.isError;

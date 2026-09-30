@@ -375,4 +375,25 @@
   .admin-overview-canonical .admin-canonical-table-shell__heading {
     flex-wrap: wrap;
   }
+
+  /* Five single-line columns ellipsize every cell to fragments at phone
+     width; stack who/when over what/which instead. */
+  .admin-overview-canonical .admin-canonical-activity-row {
+    display: grid;
+    grid-template-areas:
+      "id actor time"
+      "action action action"
+      "target target target";
+    grid-template-columns: auto minmax(0, 1fr) auto;
+    row-gap: 2px;
+  }
+
+  .admin-overview-canonical .admin-canonical-activity-id { grid-area: id; }
+  .admin-overview-canonical .admin-canonical-activity-actor { grid-area: actor; }
+  .admin-overview-canonical .admin-canonical-activity-time { grid-area: time; }
+  .admin-overview-canonical .admin-canonical-activity-action {
+    grid-area: action;
+    max-inline-size: none;
+  }
+  .admin-overview-canonical .admin-canonical-activity-target { grid-area: target; }
 }

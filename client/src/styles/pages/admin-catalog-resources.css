@@ -235,28 +235,14 @@
   visibility: hidden;
 }
 
-/* Hidden until the tools open (or keyboard focus reaches them). Anchored to
-   the top of their containing block so the out-of-flow boxes never extend the
-   document below the canonical panel. */
-/* ...and while invisible they take no pointer input: out of flow they sit
-   over the card header, where a tap on Add or search would otherwise land on
-   a hidden page link. Keyboard focus still reaches them. */
-.admin-catalog-resources__scroll-hint,
-.admin-catalog-resources__pagination-summary,
-.admin-catalog-resources__paginator {
+/* Hidden until the tools open. Anchored to the top of its containing block so
+   the out-of-flow box never extends the document below the panel, and while
+   invisible it takes no pointer input. */
+.admin-catalog-resources__scroll-hint {
   inset: 0 auto auto 0;
   opacity: 0;
   pointer-events: none;
   position: absolute;
-}
-
-.admin-catalog-resources__pagination-summary:focus-within,
-.admin-catalog-resources__paginator:focus-within,
-.admin-catalog-resources--tools-open .admin-catalog-resources__pagination-summary,
-.admin-catalog-resources--tools-open .admin-catalog-resources__paginator {
-  opacity: 1;
-  pointer-events: auto;
-  position: static;
 }
 
 /* With the tools open, selection is a first-class column: ID and checkbox
@@ -279,11 +265,11 @@
 
 /* The footer shares the TableShell header's 22px inset instead of running
    into the card edge. */
-.admin-catalog-resources--tools-open .admin-catalog-resources__pagination-summary {
+.admin-catalog-resources__pagination-summary {
   padding-inline: 22px;
 }
 
-.admin-catalog-resources--tools-open .admin-catalog-resources__paginator {
+.admin-catalog-resources__paginator {
   padding-bottom: 22px;
   padding-inline: 22px;
 }

@@ -249,10 +249,6 @@ export default function ResourceManager() {
     queryKey: ['/api/sub-subcategories']
   });
 
-  const { data: publicCatalogNav } = useQuery<{ totalResources?: number }>({
-    queryKey: ['/api/awesome-list/nav']
-  });
-
   const categoryNames = useMemo(() => {
     return categoriesData?.map(c => c.name) || [];
   }, [categoriesData]);
@@ -1003,7 +999,7 @@ export default function ResourceManager() {
           <div>
             <CardTitle className="admin-catalog-resources__title flex items-center gap-2">
               <Database className="h-5 w-5" />
-              Resources ({data?.resources.length ?? 0} of {Number(publicCatalogNav?.totalResources ?? data?.total ?? 0).toLocaleString()})
+              Resources ({data?.resources.length ?? 0} of {(data?.total ?? 0).toLocaleString()})
             </CardTitle>
             <CardDescription className="admin-catalog-resources__subtitle">
               Manage every entry in the index

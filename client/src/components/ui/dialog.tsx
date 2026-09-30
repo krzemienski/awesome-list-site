@@ -29,14 +29,48 @@ const DialogOverlay = React.forwardRef<
 ))
 DialogOverlay.displayName = DialogPrimitive.Overlay.displayName
 
+type AutoFocusHandler = (event: Event) => void
+
+/**
+ * Radix returns focus only to a <DialogTrigger>. Controlled dialogs opened
+ * from a plain button have no trigger, so focus fell to <body> on close
+ * (WCAG 2.4.3). Remember what held focus when the dialog opened and restore
+ * it, unless the consumer handled close focus itself.
+ */
+function useReturnFocus(
+  onOpenAutoFocus?: AutoFocusHandler,
+  onCloseAutoFocus?: AutoFocusHandler,
+) {
+  const returnTo = React.useRef<HTMLElement | null>(null)
+  return {
+    onOpenAutoFocus: (event: Event) => {
+      const active = document.activeElement
+      returnTo.current =
+        active instanceof HTMLElement && active !== document.body ? active : null
+      onOpenAutoFocus?.(event)
+    },
+    onCloseAutoFocus: (event: Event) => {
+      onCloseAutoFocus?.(event)
+      const target = returnTo.current
+      returnTo.current = null
+      if (event.defaultPrevented || !target?.isConnected) return
+      event.preventDefault()
+      target.focus({ preventScroll: true })
+    },
+  }
+}
+
 const DialogContent = React.forwardRef<
   React.ElementRef<typeof DialogPrimitive.Content>,
   React.ComponentPropsWithoutRef<typeof DialogPrimitive.Content>
->(({ className, children, ...props }, ref) => (
+>(({ className, children, onOpenAutoFocus, onCloseAutoFocus, ...props }, ref) => {
+  const returnFocus = useReturnFocus(onOpenAutoFocus, onCloseAutoFocus)
+  return (
   <DialogPortal>
     <DialogOverlay />
     <DialogPrimitive.Content
       ref={ref}
+      {...returnFocus}
       className={cn(
         // R4-017/NB-018: `[&>*]:min-w-0` lets every direct grid child shrink
         // below its intrinsic content width so a single unbroken string cannot
@@ -54,7 +88,8 @@ const DialogContent = React.forwardRef<
       </DialogPrimitive.Close>
     </DialogPrimitive.Content>
   </DialogPortal>
-))
+  )
+})
 DialogContent.displayName = DialogPrimitive.Content.displayName
 
 const DialogHeader = ({
@@ -113,6 +148,7 @@ const DialogDescription = React.forwardRef<
 DialogDescription.displayName = DialogPrimitive.Description.displayName
 
 export {
+  useReturnFocus,
   Dialog,
   DialogPortal,
   DialogOverlay,

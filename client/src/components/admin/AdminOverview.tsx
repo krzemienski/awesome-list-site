@@ -387,7 +387,7 @@ export default function AdminOverview({ stats }: AdminOverviewProps) {
       <div className="admin-canonical-overview-grid">
         <TableShell
           title="Recent activity"
-          subtitle="Last 24 hours"
+          subtitle="Latest 6 events"
           className="admin-panel admin-activity"
           testId="admin-overview-activity"
         >
