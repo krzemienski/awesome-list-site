@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { ApiError } from "@/lib/queryClient";
 import { formatRelativeAgo } from "@/lib/utils";
 import { useQuery, keepPreviousData } from "@tanstack/react-query";
@@ -102,6 +102,10 @@ export default function AuditTab() {
   // Run17 BUG-010: real pagination — the tab used to silently cap at the row
   // limit with no way to reach older entries.
   const [offset, setOffset] = useState(0);
+  // Reaching the first/last page disables the pager button that was just
+  // pressed; hand focus to its sibling so keyboard users don't drop to <body>.
+  const prevButtonRef = useRef<HTMLButtonElement>(null);
+  const nextButtonRef = useRef<HTMLButtonElement>(null);
 
   // Run23 NB-041: surface fetch failures as a distinct error state instead of
   // letting them render as the "No audit log entries found" empty state.
@@ -400,26 +404,34 @@ export default function AuditTab() {
             </p>
             <div className="flex gap-2">
               <Button
+                ref={prevButtonRef}
                 type="button"
                 variant="outline"
                 size="sm"
                 disabled={offset === 0}
                 aria-busy={isPlaceholderData}
                 onClick={() => {
-                  if (!isPlaceholderData) setOffset(Math.max(0, offset - parseInt(appliedLimit, 10)));
+                  if (isPlaceholderData) return;
+                  const nextOffset = Math.max(0, offset - parseInt(appliedLimit, 10));
+                  if (nextOffset === 0) nextButtonRef.current?.focus();
+                  setOffset(nextOffset);
                 }}
                 data-testid="button-audit-prev"
               >
                 Previous
               </Button>
               <Button
+                ref={nextButtonRef}
                 type="button"
                 variant="outline"
                 size="sm"
                 disabled={offset + parseInt(appliedLimit, 10) >= data.total}
                 aria-busy={isPlaceholderData}
                 onClick={() => {
-                  if (!isPlaceholderData) setOffset(offset + parseInt(appliedLimit, 10));
+                  if (isPlaceholderData) return;
+                  const nextOffset = offset + parseInt(appliedLimit, 10);
+                  if (nextOffset + parseInt(appliedLimit, 10) >= data.total) prevButtonRef.current?.focus();
+                  setOffset(nextOffset);
                 }}
                 data-testid="button-audit-next"
               >
