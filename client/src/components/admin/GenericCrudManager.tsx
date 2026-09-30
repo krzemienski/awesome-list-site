@@ -1064,6 +1064,7 @@ export default function GenericCrudManager<T extends BaseEntityWithCount>({
   const [fileData, setFileData] = useState<Record<string, File | null>>({});
   const [filePreviews, setFilePreviews] = useState<Record<string, string>>({});
   const [searchQuery, setSearchQuery] = useState("");
+  const searchInputRef = useRef<HTMLInputElement>(null);
   const [currentPage, setCurrentPage] = useState(1);
   const [pageSize, setPageSize] = useState(defaultItemsPerPage);
   const [selectedIds, setSelectedIds] = useState<Set<number>>(new Set());
@@ -2576,6 +2577,7 @@ export default function GenericCrudManager<T extends BaseEntityWithCount>({
               <div className="admin-taxonomy-search relative w-64 max-w-full">
                 <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
                 <Input
+                  ref={searchInputRef}
                   placeholder={searchPlaceholder || `Search ${entityNamePlural.toLowerCase()}...`}
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
@@ -2587,7 +2589,13 @@ export default function GenericCrudManager<T extends BaseEntityWithCount>({
                     type="button"
                     variant="ghost"
                     size="icon"
-                    onClick={() => setSearchQuery("")}
+                    onClick={() => {
+                      // Keep the field open so focus can return to it; with
+                      // tools closed an empty field would leave the layout.
+                      setSearchQuery("");
+                      setToolsOpen(true);
+                      searchInputRef.current?.focus();
+                    }}
                     className="absolute right-1 top-1/2 h-8 w-8 min-h-8 min-w-8 -translate-y-1/2 text-muted-foreground hover:text-foreground"
                     aria-label="Clear search"
                     data-testid="button-clear-search"

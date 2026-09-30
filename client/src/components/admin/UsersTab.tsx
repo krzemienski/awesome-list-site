@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useQuery, useMutation, useQueryClient, keepPreviousData } from "@tanstack/react-query";
 import { apiRequest, ApiError } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
@@ -40,6 +40,7 @@ export default function UsersTab() {
   const [pendingRoleChange, setPendingRoleChange] = useState<{ user: User; role: string } | null>(null);
   // R2-M17: server-side user search (email / first / last name).
   const [searchInput, setSearchInput] = useState("");
+  const searchInputRef = useRef<HTMLInputElement>(null);
   const [searchQuery, setSearchQuery] = useState("");
   // R2-H05: ids whose emails are currently revealed.
   const [revealedIds, setRevealedIds] = useState<Set<string>>(new Set());
@@ -171,6 +172,7 @@ export default function UsersTab() {
           <div className="admin-users-extra-action admin-ops-search relative flex-1 max-w-sm">
             <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
             <Input
+              ref={searchInputRef}
               value={searchInput}
               onChange={(e) => setSearchInput(e.target.value)}
               placeholder="Search by email or name…"
@@ -182,7 +184,10 @@ export default function UsersTab() {
                 type="button"
                 variant="ghost"
                 size="icon"
-                onClick={() => setSearchInput("")}
+                onClick={() => {
+                  setSearchInput("");
+                  searchInputRef.current?.focus();
+                }}
                 className="absolute right-1 top-1/2 h-8 w-8 min-h-8 min-w-8 -translate-y-1/2 text-muted-foreground hover:text-foreground"
                 aria-label="Clear user search"
                 data-testid="button-clear-user-search"
