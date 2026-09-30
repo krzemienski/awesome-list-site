@@ -60,6 +60,9 @@
 }
 .app-footer-explore > a:first-child { margin-top: -11.6px; }
 .app-footer-explore > a:hover { color: var(--accent); }
+/* The overhanging targets would draw an offset ring across the neighbouring
+   labels; keep it inside the focused row instead. */
+.app-footer .app-footer-explore > a:focus-visible { position: relative; outline-offset: -2px; }
 .app-footer-glyph { color: var(--text-3); }
 
 .app-footer-repo {
