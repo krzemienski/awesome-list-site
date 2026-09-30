@@ -115,19 +115,20 @@ export const linkHealthService = {
       conditions.push(eq(linkHealthChecks.status, filter));
     }
     // Carry the resource title/category so the admin list names the failing
-    // resource instead of a bare id. Left join: a check outlives a deleted
-    // resource until the next scan prunes it.
+    // resource instead of a bare id. Inner join: a check outlives a deleted
+    // resource until the next scan prunes it, and a resource that no longer
+    // exists is not a problem link to act on or count.
     const rows = await db
       .select({
         check: linkHealthChecks,
         resource: { id: resourcesTable.id, title: resourcesTable.title, category: resourcesTable.category },
       })
       .from(linkHealthChecks)
-      .leftJoin(resourcesTable, eq(resourcesTable.id, linkHealthChecks.resourceId))
+      .innerJoin(resourcesTable, eq(resourcesTable.id, linkHealthChecks.resourceId))
       .where(and(...conditions));
     return rows.map(({ check, resource }) => ({
       ...checkRowToApi(check),
-      ...(resource ? { resource } : {}),
+      resource,
     }));
   },
 
