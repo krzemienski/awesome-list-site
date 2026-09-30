@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Shield, Activity, Sparkles, Zap, List, ArrowRight, Database, Folder, Users, LayoutGrid, Plus, Settings } from "lucide-react";
+import { Shield, Activity, Sparkles, Zap, List, ArrowRight, Database, Folder, Users, LayoutGrid, Plus, Settings, ChevronLeft, ChevronRight } from "lucide-react";
 import { useAdmin } from "@/hooks/useAdmin";
 import { useAuth } from "@/hooks/useAuth";
 import { Link as WLink, useRoute } from "wouter";
@@ -163,6 +163,32 @@ export default function AdminDashboard() {
       observer.disconnect();
     };
   }, [visibleTab, tabStripMounted]);
+
+  // The strip overflows at every width below its natural ~1600px and hides
+  // its scrollbar, so show an edge fade + chevron wherever tabs are hidden.
+  const [tabOverflow, setTabOverflow] = useState({ start: false, end: false });
+  useEffect(() => {
+    const scroller = document.querySelector<HTMLElement>(".admin-dashboard__tabs");
+    if (!scroller) return;
+    const update = () => {
+      const max = scroller.scrollWidth - scroller.clientWidth;
+      const start = scroller.scrollLeft > 1;
+      const end = scroller.scrollLeft < max - 1;
+      setTabOverflow((prev) => (prev.start === start && prev.end === end ? prev : { start, end }));
+    };
+    update();
+    scroller.addEventListener("scroll", update, { passive: true });
+    const observer = new ResizeObserver(update);
+    observer.observe(scroller);
+    return () => {
+      scroller.removeEventListener("scroll", update);
+      observer.disconnect();
+    };
+  }, [tabStripMounted]);
+  const scrollTabs = (direction: 1 | -1) => {
+    const scroller = document.querySelector<HTMLElement>(".admin-dashboard__tabs");
+    scroller?.scrollBy({ left: direction * scroller.clientWidth * 0.6, behavior: "smooth" });
+  };
 
   const handleNewEntry = () => {
     const url = new URL(window.location.href);
@@ -334,6 +360,17 @@ export default function AdminDashboard() {
         {/* Canonical single-row strip. Radix keeps off-screen triggers
             keyboard reachable; extra tools live in the related tab panels. */}
         <div className="admin-tab-scroller">
+          {tabOverflow.start && (
+            <button
+              type="button"
+              className="admin-tab-scroller__edge admin-tab-scroller__edge--start"
+              aria-label="Scroll tabs left"
+              tabIndex={-1}
+              onClick={() => scrollTabs(-1)}
+            >
+              <ChevronLeft aria-hidden="true" size={16} />
+            </button>
+          )}
           <TabsList className="admin-dashboard__tabs">
             {CANONICAL_TABS.map(([id, label, Icon]) => (
               <TabsTrigger
@@ -357,6 +394,17 @@ export default function AdminDashboard() {
               </TabsTrigger>
             ))}
           </TabsList>
+          {tabOverflow.end && (
+            <button
+              type="button"
+              className="admin-tab-scroller__edge admin-tab-scroller__edge--end"
+              aria-label="Scroll tabs right"
+              tabIndex={-1}
+              onClick={() => scrollTabs(1)}
+            >
+              <ChevronRight aria-hidden="true" size={16} />
+            </button>
+          )}
         </div>
 
         {/* R2-L13: each tab body sits in its own ErrorBoundary so a render
