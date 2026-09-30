@@ -83,7 +83,9 @@ export async function fetchAwesomeLists(page = 1, perPage = 30): Promise<{
     return {
       lists,
       totalCount: data.total_count,
-      hasMore: page * perPage < data.total_count,
+      // GitHub search serves at most 1000 results; the route clamps to the
+      // last whole page inside that window, so stop there too.
+      hasMore: page < Math.floor(Math.min(data.total_count, 1000) / perPage),
     };
   } catch (error) {
     console.error('Error fetching awesome lists:', error);
