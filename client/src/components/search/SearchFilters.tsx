@@ -84,7 +84,7 @@ function FacetList({ title, items, value, onSelect, testid, collapseInert = fals
   if (collapseInert && items.length === 1 && !value) return null;
   return <FacetGroup title={title} testid={testid} collapsible={collapsible} defaultOpen={defaultOpen} forceOpen={Boolean(value)} bodyClassName={cn(items.length > 6 && "max-h-64 overflow-y-auto overscroll-contain pr-1")}>
     {items.map(item => <button type="button" key={item.value} onClick={() => onSelect(value === item.value ? "" : item.value)} className="btn ghost search-facet-option" aria-pressed={value === item.value} aria-label={`${value === item.value ? "Remove" : "Apply"} ${item.label} ${title.toLowerCase()} filter, ${item.count} results`} data-testid={`facet-${testid}-${item.value}`}>
-      <span className="flex min-w-0 items-center gap-2">{value === item.value ? <Check className="h-3.5 w-3.5 shrink-0" /> : <span className="w-3.5" />}<span className="truncate">{item.label}</span></span><span className="shrink-0 font-mono text-xs text-muted-foreground">{item.count}</span>
+      <span className="flex min-w-0 items-center gap-2">{value === item.value ? <Check className="h-3.5 w-3.5 shrink-0" /> : <span className="w-3.5 shrink-0" aria-hidden="true" />}<span className="truncate">{item.label}</span></span><span className="shrink-0 font-mono text-xs text-muted-foreground">{item.count}</span>
     </button>)}
   </FacetGroup>;
 }

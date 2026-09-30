@@ -2,7 +2,7 @@ import { useState, useEffect, useRef } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useMutation, useQuery } from "@tanstack/react-query";
-import { useLocation } from "wouter";
+import { Link, useLocation } from "wouter";
 import { z } from "zod";
 import { Loader2, Plus, CheckCircle, AlertCircle, AlertTriangle, LogIn, RefreshCw } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -554,13 +554,10 @@ export default function SubmitResource() {
               <p>
                 Track review status and outcomes in your private contribution timeline.
               </p>
-              <Button
-                type="button"
-                variant="outline"
-                onClick={() => setLocation("/contributions")}
-                data-testid="link-submission-contributions"
-              >
-                View your contributions
+              <Button asChild variant="outline">
+                <Link href="/contributions" data-testid="link-submission-contributions">
+                  View your contributions
+                </Link>
               </Button>
             </CardContent>
           </Card>

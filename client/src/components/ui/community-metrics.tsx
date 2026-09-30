@@ -134,7 +134,7 @@ export default function CommunityMetrics({ resources, categories, className, sub
         growthRate: Math.min(100, growthRate),
         catalogShare: Math.min(100, catalogShare),
       };
-    }).sort((a, b) => b.catalogShare - a.catalogShare);
+    }).sort((a, b) => b.resourceCount - a.resourceCount || a.name.localeCompare(b.name));
 
     // Calculate actual weekly growth from recent resources
     const oneWeekAgo = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000);
