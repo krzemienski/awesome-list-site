@@ -25,6 +25,7 @@ import {
   AlertDialogFooter,
   AlertDialogHeader,
   AlertDialogTitle,
+  AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -406,24 +407,39 @@ export default function Profile({ user }: ProfileProps) {
             <LogOut className="h-4 w-4 mr-2" />
             Sign out
           </Button>
-          <Button
-            variant="destructive"
-            size="sm"
-            disabled={isLoggingOut}
-            onClick={() => {
-              if (
-                window.confirm(
-                  "Sign out this account on every device? You will need to sign in again.",
-                )
-              ) {
-                logoutAll();
-              }
-            }}
-            data-testid="button-logout-all"
-          >
-            <LogOut className="h-4 w-4 mr-2" />
-            Sign out all devices
-          </Button>
+          <AlertDialog>
+            <AlertDialogTrigger asChild>
+              <Button
+                variant="destructive"
+                size="sm"
+                disabled={isLoggingOut}
+                data-testid="button-logout-all"
+              >
+                <LogOut className="h-4 w-4 mr-2" />
+                Sign out all devices
+              </Button>
+            </AlertDialogTrigger>
+            <AlertDialogContent data-testid="dialog-logout-all-confirm">
+              <AlertDialogHeader>
+                <AlertDialogTitle>Sign out on every device?</AlertDialogTitle>
+                <AlertDialogDescription>
+                  This ends every session for this account, including this one.
+                  You will need to sign in again.
+                </AlertDialogDescription>
+              </AlertDialogHeader>
+              <AlertDialogFooter>
+                <AlertDialogCancel data-testid="button-logout-all-cancel">
+                  Cancel
+                </AlertDialogCancel>
+                <AlertDialogAction
+                  onClick={() => logoutAll()}
+                  data-testid="button-logout-all-confirm"
+                >
+                  Sign out all devices
+                </AlertDialogAction>
+              </AlertDialogFooter>
+            </AlertDialogContent>
+          </AlertDialog>
         </div>
         {logoutError ? (
           <Alert
