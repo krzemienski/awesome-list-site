@@ -14,16 +14,6 @@
   line-height: 1.6; /* body leading */
 }
 
-.admin-ops-audit-shell [data-testid="button-audit-tools"] {
-  opacity: 0;
-  position: absolute;
-}
-
-.admin-ops-audit-shell [data-testid="button-audit-tools"]:focus-visible {
-  opacity: 1;
-  position: static;
-}
-
 /* The frozen `.table` wraps inside the card at every width instead of
    scrolling sideways behind a minimum width. */
 .admin-ops-audit-shell .admin-ops-audit-table {

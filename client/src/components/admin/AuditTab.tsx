@@ -206,7 +206,7 @@ export default function AuditTab() {
           </Button>
         </span>
       }
-      description="Append-only · last 100 events"
+      description={`Append-only · ${appliedLimit} events per page`}
       className="admin-ops-audit-shell"
     >
       <div className="space-y-4">
@@ -392,7 +392,7 @@ export default function AuditTab() {
 
         {/* Run17 BUG-010: range readout + Previous/Next through the full log. */}
         {showTools && data && data.total > 0 && (
-          <div className="flex flex-wrap items-center justify-between gap-3 pt-2">
+          <div className="admin-ops-pagination flex flex-wrap items-center justify-between gap-3 pt-2">
             <p className="text-sm text-muted-foreground" data-testid="text-audit-range">
               {offset + 1}–{Math.min(offset + (data.logs?.length || 0), data.total)} of{" "}
               {data.total.toLocaleString()} entries
