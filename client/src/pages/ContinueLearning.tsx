@@ -201,7 +201,7 @@ export default function ContinueLearning() {
           </CardHeader>
           <CardContent className="flex flex-wrap justify-center gap-3 pb-10">
             <Button asChild>
-              <Link href="/sign-in">Sign in</Link>
+              <Link href="/sign-in?redirect_url=%2Fcontinue-learning">Sign in</Link>
             </Button>
             <Button variant="outline" asChild>
               <Link href="/journeys">Browse journeys as a guest</Link>
