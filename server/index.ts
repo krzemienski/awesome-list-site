@@ -426,9 +426,16 @@ const clerkSessionMiddleware = clerkMiddleware((req) => ({
 // would always bounce to /sign-in. Anonymous dev loads of THESE paths still
 // take Clerk's handshake redirect — acceptable: they'd be redirected to
 // /sign-in anyway, and audit scripts reach them with the audit-key bypass.
+// Every client route that renders only inside AuthGuard/AdminGuard (no
+// signed-out state of its own) belongs here, so anonymous loads get the same
+// 302 instead of an SSR 200 shell that only redirects after hydration.
+// /bookmarks and /submit are deliberately absent: both render for guests.
 export const PROTECTED_PAGE_PATTERNS = [
   /^\/admin(\/|$)/,
   /^\/profile(\/|$)/,
+  /^\/onboarding\/?$/,
+  /^\/contributions\/?$/,
+  /^\/notifications\/?$/,
 ];
 const needsClerkAuth = (req: express.Request) =>
   req.path.startsWith("/api") ||

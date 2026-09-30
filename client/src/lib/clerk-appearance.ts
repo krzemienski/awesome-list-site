@@ -50,7 +50,10 @@ const TOKENS = {
   danger: "--color-destructive",
   background: "--bg",
   ink: "--text",
-  mutedInk: "--text-3",
+  // Clerk paints readable secondary copy (the identity preview, footer prompt)
+  // with this role, so it takes the DS secondary ink that clears 4.5:1 on the
+  // card — --text-3 composites to ~3.3:1 there.
+  mutedInk: "--text-2",
   border: "--border-strong",
   fieldSurface: "--surface",
 } as const;
@@ -255,7 +258,7 @@ function buildClerkAppearance(
       // own (~15% lightness), which reads as a lighter patch stuck onto the
       // true-black card. The DS paints text fields as the surface token over
       // the page background with a hairline border — hand Clerk those instead.
-      // The placeholder is colorMutedForeground (already the --text-3 ink) and
+      // The placeholder is colorMutedForeground (the --text-2 ink above) and
       // keyboard focus is the global 2px accent outline in design-system.css,
       // so both stay on-system for free once the field itself is.
       ...(palette.fieldSurface ? { colorInput: palette.fieldSurface } : {}),
@@ -278,30 +281,33 @@ function buildClerkAppearance(
     elements: {
       // Every Clerk button carries the base `cl-button` key, so this class hook
       // puts the design system's `.btn` on the whole widget; the per-element
-      // styles below keep painting from tokens.
-      button: "btn",
+      // styles below keep painting from tokens. `auth-edge` restores the DS
+      // border over Clerk's shadow ring (app-bridge.css).
+      button: "btn auth-edge",
       // Task #404: Clerk rounds the card at TWICE the base above (its own
       // ladder step), which overshoots the DS card token — 16px against the
       // 12px every other card on the page sits at. `cardBox` is the outer,
       // clipping surface (it wraps the card and the sign-up footer strip), so
       // it is the corner a visitor actually sees; pin it to the card token and
       // let Clerk's slightly tighter inner step nest inside it as designed.
-      ...(radii.card || palette.fieldSurface || palette.background
-        ? {
-            cardBox: {
-              ...(radii.card ? { borderRadius: radii.card } : {}),
-              // Clerk's card/footer are transparent in the auth treatment;
-              // this outer clipping surface owns the single DS background.
-              // A DS `.card` sits on --surface over the page, not on bare --bg,
-              // so the widget reads as one of the site's cards.
-              ...(palette.fieldSurface
-                ? { backgroundColor: palette.fieldSurface }
-                : palette.background
-                  ? { backgroundColor: palette.background }
-                  : {}),
-            },
-          }
-        : {}),
+      cardBox: {
+        ...(radii.card ? { borderRadius: radii.card } : {}),
+        // Clerk's card/footer are transparent in the auth treatment;
+        // this outer clipping surface owns the single DS background.
+        // A DS `.card` sits on --surface over the page, not on bare --bg,
+        // so the widget reads as one of the site's cards.
+        ...(palette.fieldSurface
+          ? { backgroundColor: palette.fieldSurface }
+          : palette.background
+            ? { backgroundColor: palette.background }
+            : {}),
+        // The DS card edge in place of Clerk's shadow ring; the per-system
+        // width and colour tokens live in app-bridge.css.
+        borderWidth: "var(--auth-edge-w)",
+        borderStyle: "solid",
+        borderColor: "var(--auth-card-edge)",
+        boxShadow: "none",
+      },
       // Element styles are ordinary CSS in the page, so the display grammar
       // (weight, tracking, leading) can ride on the DS custom properties and
       // follow the active system without a JS round-trip.
@@ -373,7 +379,7 @@ function buildClerkAppearance(
       formButtonPrimary: "primary",
       // The design system's `.input` paints the field; the 44px touch minimum
       // rides on `.cl-formFieldInput.input` in app-bridge.css.
-      formFieldInput: "input",
+      formFieldInput: "input auth-edge",
       otpCodeFieldInput: {
         ...(palette.fieldSurface ? { backgroundColor: palette.fieldSurface } : {}),
         ...(palette.ink ? { color: palette.ink } : {}),

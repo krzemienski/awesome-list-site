@@ -72,7 +72,7 @@ export function getAboutFaqs(
   {
     question: "How do I suggest a new resource?",
     answer:
-      `Use the Submit page${host ? ` at ${host}/submit` : ""}. Sign in, provide the resource URL, title, and category, and a maintainer will review your suggestion before it is published to the directory.`,
+      `Use the Submit page (/submit). Sign in, provide the resource URL, title, and category, and a maintainer will review your suggestion before it is published to the directory.`,
   },
   {
     question: "What are the best video codecs for developers?",

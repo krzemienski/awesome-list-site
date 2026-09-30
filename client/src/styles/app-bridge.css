@@ -124,24 +124,23 @@ body { height: auto; min-height: 100%; }
 .cl-formButtonPrimary.btn { min-height: 44px; }
 
 /* Clerk zeroes its control and card borders (`[data-variant] { border-width: 0 }`,
-   0,2,0) and draws a 1px shadow ring instead, which ignores --border-w. These
-   (0,3,0) rules restore the design system's own edge on the sign-in widget:
-   token border width, no ring, no gloss. */
-:root .cl-formFieldInput.input,
-:root .cl-button.btn,
-:root .cl-cardBox {
-  border-width: var(--border-w);
+   0,2,0) and draws a 1px shadow ring instead, which ignores --border-w. The
+   `auth-edge` hook that clerk-appearance.ts adds to its buttons and fields
+   restores the design system's own edge at (0,3,0): token border width, no
+   ring, no gloss. Only our own class is selected here — selectors built on
+   Clerk's `.cl-*` DOM structure trip its "structural CSS" warning. The card
+   box reads the same per-system edge tokens from its appearance styles. */
+:root { --auth-edge-w: var(--border-w); --auth-card-edge: var(--border); }
+[data-system="swiss"] { --auth-edge-w: var(--hairline-w); }
+[data-system="brutalist"] { --auth-card-edge: var(--text); }
+.auth-edge.auth-edge.auth-edge {
+  border-width: var(--auth-edge-w);
   border-style: solid;
 }
-:root .cl-formFieldInput.input { border-color: var(--border); box-shadow: none; }
-:root .cl-formFieldInput.input:focus { border-color: color-mix(in srgb, var(--accent) 50%, var(--border-strong)); }
-:root .cl-button.btn:not(:hover) { box-shadow: none; }
-:root .cl-formButtonPrimary.btn::after { display: none; }
-:root .cl-cardBox { border-color: var(--border); box-shadow: none; }
-[data-system="brutalist"] .cl-cardBox { border-color: var(--text); }
-[data-system="swiss"] .cl-formFieldInput.input,
-[data-system="swiss"] .cl-button.btn,
-[data-system="swiss"] .cl-cardBox { border-width: var(--hairline-w); }
+.input.auth-edge.auth-edge { border-color: var(--border); box-shadow: none; }
+.input.auth-edge.auth-edge:focus { border-color: color-mix(in srgb, var(--accent) 50%, var(--border-strong)); }
+.btn.auth-edge.auth-edge:not(:hover) { box-shadow: none; }
+.btn.primary.auth-edge::after { display: none; }
 
 /* ============== ACCESSIBILITY & STATE ============== */
 .skip-link {
