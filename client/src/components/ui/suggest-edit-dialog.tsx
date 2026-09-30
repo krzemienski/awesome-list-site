@@ -183,6 +183,22 @@ export function SuggestEditDialog({ resource, open, onOpenChange }: SuggestEditD
     },
   });
 
+  // Each open starts from the resource's current values. Cancel used to leave
+  // edited (even invalid) fields and their errors behind for the next open.
+  // Declared before the taxonomy effects so their setValue calls land after it.
+  useEffect(() => {
+    if (!open) return;
+    form.reset({
+      title: resource.title || "",
+      url: resource.url || "",
+      description: resource.description || "",
+      category: "",
+      subcategory: "",
+      subSubcategory: "",
+    });
+    setClaudeSuggestions(null);
+  }, [open, resource.id]);
+
   useEffect(() => {
     if (open && categories.length > 0) {
       const matchedCategory = categories.find(
