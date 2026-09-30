@@ -99,7 +99,7 @@ export default function Notifications() {
               will appear in this quiet inbox.
             </p>
             <Link
-              href="/settings"
+              href="/settings#notification-settings"
               className="account-accent mt-5 inline-flex min-h-[44px] items-center text-sm font-semibold underline underline-offset-4"
             >
               Review notification choices
