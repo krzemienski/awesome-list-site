@@ -4,10 +4,10 @@ import { useQuery } from "@tanstack/react-query";
 import { Command, CommandGroup, CommandInput, CommandItem, CommandList } from "@/components/ui/command";
 import { Clock, Folder, Grid2X2, Info, Loader2, Plus, Search, X } from "lucide-react";
 import { useLocation } from "wouter";
-import { apiRequest } from "@/lib/queryClient";
+import { ApiError, apiRequest } from "@/lib/queryClient";
 import { trackSearch, trackResourceClick } from "@/lib/analytics";
 import { useDebounce } from "@/hooks/useDebounce";
-import { normalizeSearchQuery } from "@shared/searchNormalize";
+import { normalizeSearchQuery, SEARCH_QUERY_MAX_LENGTH } from "@shared/searchNormalize";
 import type { Category } from "@shared/schema";
 import "./../../styles/shell/palette.css";
 
@@ -91,6 +91,7 @@ export default function SearchDialog({ isOpen, setIsOpen }: SearchDialogProps) {
   const trimmed = normalizeSearchQuery(debouncedQuery);
   const queryTrimmed = normalizeSearchQuery(query);
   const showResults = queryTrimmed.length >= 2;
+  const queryTooLong = queryTrimmed.length > SEARCH_QUERY_MAX_LENGTH;
 
   // Keep this query and cache key in lockstep with /search. Selecting a
   // palette result still warms the first page that the destination will read.
@@ -100,7 +101,7 @@ export default function SearchDialog({ isOpen, setIsOpen }: SearchDialogProps) {
       apiRequest(`/api/resources?search=${encodeURIComponent(trimmed)}&page=1&limit=24`, {
         method: "GET",
       }),
-    enabled: isOpen && trimmed.length >= 2,
+    enabled: isOpen && trimmed.length >= 2 && trimmed.length <= SEARCH_QUERY_MAX_LENGTH,
     staleTime: 60 * 1000,
   });
 
@@ -366,7 +367,7 @@ export default function SearchDialog({ isOpen, setIsOpen }: SearchDialogProps) {
               onKeyDown={(event) => {
                 // Before a debounced result has an active cmdk row, commit to
                 // /search rather than making Enter a no-op.
-                if (event.key !== "Enter" || queryTrimmed.length < 2) return;
+                if (event.key !== "Enter" || queryTrimmed.length < 2 || queryTooLong) return;
                 const active = document.querySelector(
                   '[cmdk-item][data-selected="true"], [cmdk-item][aria-selected="true"]',
                 );
@@ -379,15 +380,30 @@ export default function SearchDialog({ isOpen, setIsOpen }: SearchDialogProps) {
 
             <CommandList className="search-palette-list">
               {showResults ? (
-                isPending ? (
+                queryTooLong ? (
+                  <div className="search-palette-status search-palette-status-error" data-testid="search-too-long" role="alert">
+                    <span>
+                      Search is limited to {SEARCH_QUERY_MAX_LENGTH} characters. This query has{" "}
+                      {queryTrimmed.length.toLocaleString()} — shorten it to search.
+                    </span>
+                  </div>
+                ) : isPending ? (
                   <div className="search-palette-status" data-testid="search-loading" role="status">
                     <Loader2 className="animate-spin" />
                     Searching…
                   </div>
                 ) : resourceQuery.isError ? (
                   <div className="search-palette-status search-palette-status-error" data-testid="search-error" role="alert">
-                    <span>Search failed. Please try again.</span>
-                    <button type="button" onClick={() => resourceQuery.refetch()}>Try again</button>
+                    {/* A 400 is the query itself being rejected: resending it
+                        can't succeed, so show the reason and no retry. */}
+                    {resourceQuery.error instanceof ApiError && resourceQuery.error.status === 400 ? (
+                      <span>{resourceQuery.error.message}</span>
+                    ) : (
+                      <>
+                        <span>Search failed. Please try again.</span>
+                        <button type="button" onClick={() => resourceQuery.refetch()}>Try again</button>
+                      </>
+                    )}
                   </div>
                 ) : (
                   <>
