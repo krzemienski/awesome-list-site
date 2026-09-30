@@ -428,7 +428,7 @@ function CategoryIndex({ categories, selectedTags, selectedKind, onClearFilters 
             {category.teaserDescription ? (
               <span className="sr-only" data-testid={`text-category-teaser-${category.slug}`}>
                 <span className="font-medium">
-                  {category.teaserTitle ? `Featured: ${category.teaserTitle} — ` : ""}
+                  {category.teaserTitle ? `Example: ${category.teaserTitle} — ` : ""}
                 </span>
                 {category.teaserDescription}
               </span>
