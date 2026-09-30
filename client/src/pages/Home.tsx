@@ -856,7 +856,11 @@ export default function Home({ nav, navLoading }: HomeProps) {
               <button
                 type="button"
                 className="btn ghost"
-                onClick={() => setEmptyTagParamNotice(false)}
+                onClick={() => {
+                  setEmptyTagParamNotice(false);
+                  // Replace, not push: Back must not resurrect the notice.
+                  writeFilterParams({ tags: null, tag: null }, "replace");
+                }}
                 data-testid="button-dismiss-empty-tag-param"
               >
                 Dismiss
