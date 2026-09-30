@@ -34,7 +34,7 @@ import "@/styles/pages/discovery-tools.css";
 const VALID_ADVANCED_TABS = ["explorer", "metrics", "export", "recommendations"];
 // audit2 BUG-036: inner sub-tabs of the Metrics panel, deep-linkable via
 // ?sub= (only meaningful alongside tab=metrics).
-const VALID_METRICS_SUBTABS = ["overview", "popular", "categories"];
+const VALID_METRICS_SUBTABS = ["overview", "categories"];
 
 export default function Advanced() {
   // BUG-038 (run14): ?tab= deep-links restore the selected tab, and switching

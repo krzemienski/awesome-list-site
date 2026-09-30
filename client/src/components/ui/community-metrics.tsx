@@ -1,21 +1,8 @@
-import { useState, useMemo, useEffect } from "react";
-import { safeGetItem } from "@/lib/safeStorage";
+import { useState, useMemo } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import {
-  Users,
-  Star,
-  TrendingUp,
-  GitBranch,
-  Calendar,
-  ExternalLink,
-  Heart,
-  Eye,
-  MessageSquare,
-  FolderTree
-} from "lucide-react";
+import { Users, TrendingUp, GitBranch, FolderTree } from "lucide-react";
 import { Resource, Category } from "@/types/awesome-list";
 
 interface CommunityMetricsProps {
@@ -27,19 +14,6 @@ interface CommunityMetricsProps {
   // other caller working unchanged.
   subTab?: string;
   onSubTabChange?: (value: string) => void;
-}
-
-interface PopularityMetric {
-  resourceId: string;
-  title: string;
-  category: string;
-  url: string;
-  score: number;
-  trends: {
-    clicks: number;
-    searches: number;
-    shares: number;
-  };
 }
 
 interface CategoryMetric {
@@ -55,46 +29,8 @@ interface CategoryMetric {
 export default function CommunityMetrics({ resources, categories, className, subTab, onSubTabChange }: CommunityMetricsProps) {
   const [selectedPeriod, setSelectedPeriod] = useState("7d");
 
-  // Load tracking data from localStorage for real engagement metrics
-  const [trackingData, setTrackingData] = useState<{views: Record<string, number>, clicks: Record<string, number>}>({views: {}, clicks: {}});
-  
-  useEffect(() => {
-    const views = safeGetItem('resource-views');
-    const clicks = safeGetItem('resource-clicks');
-    setTrackingData({
-      views: views ? JSON.parse(views) : {},
-      clicks: clicks ? JSON.parse(clicks) : {}
-    });
-  }, []);
-
   // Calculate metrics based on actual resource properties from database
   const metrics = useMemo(() => {
-    // Calculate popularity based on actual localStorage tracking data
-    const popularResources: PopularityMetric[] = resources
-      .slice(0, 10)
-      .map((resource) => {
-        // Get real tracking data from localStorage
-        const resourceViews = trackingData.views[resource.url] || trackingData.views[resource.id?.toString() || ''] || 0;
-        const resourceClicks = trackingData.clicks[resource.url] || trackingData.clicks[resource.id?.toString() || ''] || 0;
-        
-        // Calculate score based on actual engagement (views + clicks)
-        const engagementScore = Math.min(100, (resourceViews * 2) + (resourceClicks * 5));
-        
-        return {
-          resourceId: resource.id,
-          title: resource.title,
-          category: resource.category,
-          url: resource.url,
-          score: engagementScore,
-          trends: {
-            clicks: resourceClicks,
-            searches: 0, // No search tracking available
-            shares: 0    // No share tracking available
-          }
-        };
-      })
-      .sort((a, b) => b.score - a.score);
-
     // Run16 BUG-025: `category.resources` is the DIRECT-only slice of the
     // tree — most resources live under subcategories/sub-subcategories, so
     // the tab showed 923 total vs the 2303 every other surface reports.
@@ -144,18 +80,11 @@ export default function CommunityMetrics({ resources, categories, className, sub
     }).length;
 
     return {
-      popularResources,
       categoryMetrics,
       totalContributions: resources.length,
       weeklyGrowth: recentlyAddedCount
     };
-  }, [resources, categories, trackingData]);
-
-  const getEngagementColor = (score: number) => {
-    if (score >= 80) return "text-[var(--status-ok)]"; // DS-OK: status ok
-    if (score >= 60) return "text-[var(--status-warn)]"; // DS-OK: status warn
-    return "text-[var(--status-bad)]"; // DS-OK: status bad
-  };
+  }, [resources, categories]);
 
   return (
     <div className={className}>
@@ -166,7 +95,7 @@ export default function CommunityMetrics({ resources, categories, className, sub
             Community Metrics
           </CardTitle>
           <CardDescription>
-            Catalog size and growth, per-category share, and resources popular in this browser
+            Catalog size, weekly growth, and each category's share of the catalog
           </CardDescription>
         </CardHeader>
         <CardContent>
@@ -176,9 +105,8 @@ export default function CommunityMetrics({ resources, categories, className, sub
             onValueChange={onSubTabChange}
             className="space-y-4"
           >
-            <TabsList className="grid w-full grid-cols-3">
+            <TabsList className="grid w-full grid-cols-2">
               <TabsTrigger value="overview">Overview</TabsTrigger>
-              <TabsTrigger value="popular">Popular</TabsTrigger>
               <TabsTrigger value="categories">Categories</TabsTrigger>
             </TabsList>
 
@@ -225,155 +153,6 @@ export default function CommunityMetrics({ resources, categories, className, sub
                   </CardContent>
                 </Card>
               </div>
-
-              <Card>
-                <CardHeader>
-                  <CardTitle className="text-lg">Recent Activity</CardTitle>
-                  {/* run9 BUG-016: engagement is tracked locally per browser —
-                      say so instead of presenting 0/0/0% as broken site data.
-                      BUG-045 (run19): the action is called "Favorite" on
-                      resource pages — use the same word here, not "likes". */}
-                  <CardDescription>
-                    Views and favorites are tracked in this browser only — counts build as you explore resources.
-                  </CardDescription>
-                </CardHeader>
-                <CardContent>
-                  {/* BUG-041 (run19): never rank a 0%-engagement row "#1" — only
-                      resources with real local activity get a rank; with none,
-                      show an honest empty state instead of a fake leaderboard. */}
-                  {metrics.popularResources.filter((r) => r.score > 0).length === 0 ? (
-                    <p className="text-sm text-muted-foreground py-4" data-testid="text-no-engagement">
-                      No local activity yet — the leaderboard fills in as you view and open resources in this browser.
-                    </p>
-                  ) : (
-                  <div className="space-y-3">
-                    {metrics.popularResources.filter((r) => r.score > 0).slice(0, 5).map((resource, index) => (
-                      <div key={resource.resourceId} className="flex items-center justify-between p-3 border">
-                        <div className="flex items-center gap-3">
-                          <div className="flex items-center gap-2">
-                            <span className="text-sm font-medium">#{index + 1}</span>
-                            <Badge variant="outline" className="text-xs">
-                              {resource.category}
-                            </Badge>
-                          </div>
-                          <div>
-                            <a
-                              href={resource.url}
-                              target="_blank"
-                              rel="noopener noreferrer"
-                              className="font-medium hover:text-primary transition-colors"
-                            >
-                              {resource.title}
-                            </a>
-                            <div className="flex items-center gap-4 mt-1">
-                              {resource.trends.clicks > 0 || resource.trends.shares > 0 ? (
-                                <>
-                                  <span className="text-xs text-muted-foreground flex items-center gap-1">
-                                    <Eye className="h-3 w-3" />
-                                    {resource.trends.clicks}
-                                  </span>
-                                  <span className="text-xs text-muted-foreground flex items-center gap-1">
-                                    <Heart className="h-3 w-3" />
-                                    {resource.trends.shares}
-                                  </span>
-                                </>
-                              ) : (
-                                <span className="text-xs text-muted-foreground">
-                                  No local activity yet
-                                </span>
-                              )}
-                            </div>
-                          </div>
-                        </div>
-                        <div className="text-right">
-                          {/* Run15 BUG-039: show a real 0% instead of a
-                              dangling dash when there's no engagement yet. */}
-                          <div className="text-sm font-medium">
-                            {resource.score}%
-                          </div>
-                          <div className="text-xs text-muted-foreground">
-                            engagement
-                          </div>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                  )}
-                </CardContent>
-              </Card>
-            </TabsContent>
-
-            <TabsContent value="popular" className="space-y-4">
-              {metrics.popularResources.filter((r) => r.score > 0).length === 0 ? (
-                <p className="text-sm text-muted-foreground py-8 text-center" data-testid="text-popular-empty">
-                  No popularity data yet — rankings appear as you view and open resources in this browser.
-                </p>
-              ) : (
-              <div className="space-y-3">
-                {metrics.popularResources.filter((r) => r.score > 0).map((resource, index) => (
-                  <Card key={resource.resourceId}>
-                    <CardContent className="p-4">
-                      <div className="flex items-start justify-between">
-                        <div className="flex-1">
-                          <div className="flex items-center gap-3 mb-2">
-                            <span className="text-lg font-bold text-muted-foreground">
-                              #{index + 1}
-                            </span>
-                            <div>
-                              <a
-                                href={resource.url}
-                                target="_blank"
-                                rel="noopener noreferrer"
-                                className="font-medium hover:text-primary transition-colors flex items-center gap-1"
-                              >
-                                {resource.title}
-                                <ExternalLink className="h-3 w-3" />
-                              </a>
-                              <Badge variant="outline" className="text-xs mt-1">
-                                {resource.category}
-                              </Badge>
-                            </div>
-                          </div>
-                          
-                          <div className="grid grid-cols-3 gap-4 text-sm">
-                            <div className="flex items-center gap-2">
-                              <Eye className="h-4 w-4 text-[var(--status-info)]" />{/* DS-OK: cyan info (DS chart/info constant) */}
-                              <div>
-                                <div className="font-medium">{resource.trends.clicks}</div>
-                                <div className="text-xs text-muted-foreground">clicks</div>
-                              </div>
-                            </div>
-                            <div className="flex items-center gap-2">
-                              <MessageSquare className="h-4 w-4 text-[var(--status-ok)]" />{/* DS-OK: status ok */}
-                              <div>
-                                <div className="font-medium">{resource.trends.searches}</div>
-                                <div className="text-xs text-muted-foreground">searches</div>
-                              </div>
-                            </div>
-                            <div className="flex items-center gap-2">
-                              <Heart className="h-4 w-4 text-[var(--status-bad)]" />{/* DS-OK: status bad */}
-                              <div>
-                                <div className="font-medium">{resource.trends.shares}</div>
-                                <div className="text-xs text-muted-foreground">shares</div>
-                              </div>
-                            </div>
-                          </div>
-                        </div>
-                        
-                        <div className="text-right">
-                          <div className={`text-xl font-bold ${getEngagementColor(resource.score)}`}>
-                            {resource.score}%
-                          </div>
-                          <div className="text-xs text-muted-foreground">
-                            popularity score
-                          </div>
-                        </div>
-                      </div>
-                    </CardContent>
-                  </Card>
-                ))}
-              </div>
-              )}
             </TabsContent>
 
             <TabsContent value="categories" className="space-y-4">
