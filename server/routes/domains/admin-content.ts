@@ -220,7 +220,10 @@ export function registerAdminContentRoutes(
       const header = ['id', 'email', 'firstName', 'lastName', 'role', 'authProvider', 'createdAt'];
       const lines = [header.join(',')];
       for (const u of allUsers) {
-        const provider = u.password ? 'local' : 'replit';
+        // No provider column exists: Clerk-provisioned rows carry the Clerk
+        // `user_…` id, migrated rows keep their legacy id (password hash =
+        // pre-Clerk email/password account, none = Replit OIDC subject).
+        const provider = u.id.startsWith('user_') ? 'clerk' : u.password ? 'local' : 'replit';
         lines.push([
           csvCell(u.id),
           csvCell(u.email ?? ''),
