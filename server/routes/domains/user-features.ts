@@ -928,10 +928,15 @@ export function registerUserFeatureRoutes(
         }
       }
 
+      // Dismissing is only meaningful before onboarding is finished; a stale
+      // tab or "save and browse later" on a revisit must not erase completion.
       const onboardingStatus: OnboardingStatus =
-        parsed.data.onboardingStatus ??
-        current?.onboardingStatus ??
-        'not_started';
+        parsed.data.onboardingStatus === 'dismissed' &&
+        current?.onboardingStatus === 'completed'
+          ? 'completed'
+          : parsed.data.onboardingStatus ??
+            current?.onboardingStatus ??
+            'not_started';
       const onboardingStep =
         parsed.data.onboardingStep ?? current?.onboardingStep ?? 1;
 
