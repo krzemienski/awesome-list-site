@@ -930,6 +930,7 @@ function homeShellChrome(): string {
       const aboutSite = resolveSiteIdentity({
         ...config.site,
         name: config.site.title,
+        url: SITE_URL,
         ...(sourceRepoUrl
           ? { repoUrl: sourceRepoUrl, repoBranch: sourceParts[2] }
           : {}),
