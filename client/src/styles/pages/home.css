@@ -71,7 +71,14 @@
 }
 
 
-.home-kind-chip[aria-pressed="true"] { border-color: var(--accent); }
+/* Selected state can't rely on border hue alone: in brutalist the accent
+   border is darker than the white unselected borders. */
+.home-kind-chip[aria-pressed="true"] {
+  border-color: var(--accent);
+  outline: 2px solid var(--accent);
+  outline-offset: -1px;
+  color: var(--accent);
+}
 
 .home-kind-count {
   margin-left: 0.375rem;
