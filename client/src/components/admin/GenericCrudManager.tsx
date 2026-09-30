@@ -774,6 +774,8 @@ export interface GenericCrudManagerProps<T extends BaseEntityWithCount> {
   createUrl: string;
   updateUrl: (id: number) => string;
   deleteUrl: (id: number) => string;
+  /** Child rows counted on each item that block deletion (the server answers 409), e.g. a category's subcategories. */
+  childCount?: { key: string; singular: string; plural: string };
   queryKey: string;
   publicQueryKey?: string;
   testIdPrefix: string;
@@ -1005,6 +1007,7 @@ export default function GenericCrudManager<T extends BaseEntityWithCount>({
   createUrl,
   updateUrl,
   deleteUrl,
+  childCount,
   queryKey,
   publicQueryKey,
   testIdPrefix,
@@ -2440,6 +2443,15 @@ export default function GenericCrudManager<T extends BaseEntityWithCount>({
     setEditDialogOpen(true);
   };
 
+  const getDeleteBlocker = (item: T): { count: number; reason: string } | null => {
+    const describe = (count: number, singular: string, plural: string) =>
+      ({ count, reason: `${count} ${count === 1 ? singular : plural} still assigned` });
+    if (item.resourceCount > 0) return describe(item.resourceCount, "resource", "resources");
+    const children = childCount ? Number(item[childCount.key] ?? 0) : 0;
+    if (childCount && children > 0) return describe(children, childCount.singular, childCount.plural);
+    return null;
+  };
+
   const openDeleteDialog = (item: T) => {
     setSelectedItem(item);
     setDeleteDialogOpen(true);
@@ -2450,6 +2462,8 @@ export default function GenericCrudManager<T extends BaseEntityWithCount>({
   // "Vídeo Töols" must become "video-tools", not "vdeo-tols".
   const generateSlug = (name: string) => slugify(name);
 
+  // Only the create dialog auto-slugs. An existing slug is a public URL, so
+  // the edit dialog leaves it alone unless the admin edits the slug field.
   const handleNameChange = (name: string) => {
     setFormData({ ...formData, name, slug: generateSlug(name) });
   };
@@ -2465,6 +2479,9 @@ export default function GenericCrudManager<T extends BaseEntityWithCount>({
     }
 
     setFormData(newFormData);
+    // A "Parent … is required" banner is stale once a parent is picked; the
+    // next submit re-validates everything.
+    setFormError(null);
   };
 
   return (
@@ -2776,26 +2793,31 @@ export default function GenericCrudManager<T extends BaseEntityWithCount>({
                               {/* Run16 BUG-081: disabled delete gets a visible reason.
                                   The title lives on a wrapping span because disabled
                                   buttons swallow hover events in some browsers. */}
-                              <span
-                                className="admin-taxonomy-delete-action inline-block"
-                                title={item.resourceCount > 0
-                                  ? `Cannot delete: ${item.resourceCount} resource${item.resourceCount === 1 ? "" : "s"} still assigned. Move or delete them first.`
-                                  : undefined}
-                              >
-                                <Button
-                                  variant="ghost"
-                                  size="sm"
-                                  onClick={() => openDeleteDialog(item)}
-                                  disabled={item.resourceCount > 0}
-                                  className="admin-taxonomy-row-action"
-                                  aria-label={item.resourceCount > 0
-                                    ? `Delete unavailable: ${item.resourceCount} resources still assigned`
-                                    : "Delete"}
-                                  data-testid={`button-delete-${item.id}`}
-                                >
-                                  <Trash2 className="h-4 w-4" />
-                                </Button>
-                              </span>
+                              {(() => {
+                                const blocker = getDeleteBlocker(item);
+                                return (
+                                  <span
+                                    className="admin-taxonomy-delete-action inline-block"
+                                    title={blocker
+                                      ? `Cannot delete: ${blocker.reason}. Move or delete ${blocker.count === 1 ? "it" : "them"} first.`
+                                      : undefined}
+                                  >
+                                    <Button
+                                      variant="ghost"
+                                      size="sm"
+                                      onClick={() => openDeleteDialog(item)}
+                                      disabled={!!blocker}
+                                      className="admin-taxonomy-row-action"
+                                      aria-label={blocker
+                                        ? `Delete ${item.name} unavailable: ${blocker.reason}`
+                                        : `Delete ${item.name}`}
+                                      data-testid={`button-delete-${item.id}`}
+                                    >
+                                      <Trash2 className="h-4 w-4" />
+                                    </Button>
+                                  </span>
+                                );
+                              })()}
                             </div>
                           ) : (
                             item[col.key]
@@ -2811,8 +2833,10 @@ export default function GenericCrudManager<T extends BaseEntityWithCount>({
 
           {/* Pagination Controls — Task 275: shared numbered paginator (same
               component as the public listings) so any page is reachable in ≤2
-              interactions; rows-per-page selector kept alongside it. */}
-          {paginationEnabled && totalPages > 1 && (
+              interactions. The rows-per-page selector stays whenever rows
+              exist: hiding it once the chosen size fit every row stranded the
+              admin at that size. */}
+          {paginationEnabled && totalItems > 0 && (
             <div className="admin-taxonomy-pagination mt-4 pt-4 border-t" data-testid={`pagination-${testIdEntityPlural}`}>
               <div className="flex items-center gap-2">
                 <span className="text-sm text-muted-foreground">Rows per page:</span>
@@ -2832,7 +2856,7 @@ export default function GenericCrudManager<T extends BaseEntityWithCount>({
                   </SelectContent>
                 </Select>
               </div>
-              <Paginator
+              {totalPages > 1 && <Paginator
                 currentPage={currentPage}
                 totalPages={totalPages}
                 makeHref={(p) => {
@@ -2844,7 +2868,7 @@ export default function GenericCrudManager<T extends BaseEntityWithCount>({
                 onNavigate={goToPage}
                 className="pt-3"
                 testIds={{ container: `paginator-${testIdEntityPlural}` }}
-              />
+              />}
             </div>
           )}
           </>
@@ -3153,7 +3177,7 @@ export default function GenericCrudManager<T extends BaseEntityWithCount>({
                 id="edit-name"
                 placeholder={formFields.name.placeholder}
                 value={formData.name}
-                onChange={(e) => handleNameChange(e.target.value)}
+                onChange={(e) => setFormData({ ...formData, name: e.target.value })}
                 data-testid="input-edit-name"
               />
             </div>
@@ -3360,9 +3384,9 @@ export default function GenericCrudManager<T extends BaseEntityWithCount>({
             <AlertDialogTitle>Delete {entityName}</AlertDialogTitle>
             <AlertDialogDescription>
               Are you sure you want to delete "{selectedItem?.name}"?
-              {selectedItem && selectedItem.resourceCount > 0 && (
+              {selectedItem && getDeleteBlocker(selectedItem) && (
                 <span className={"block mt-2 text-[var(--status-bad)] font-semibold" /* DS-OK: status bad */}>
-                  This {entityName.toLowerCase()} has {selectedItem.resourceCount} resources and cannot be deleted.
+                  This {entityName.toLowerCase()} cannot be deleted: {getDeleteBlocker(selectedItem)!.reason}.
                 </span>
               )}
             </AlertDialogDescription>
@@ -3373,7 +3397,7 @@ export default function GenericCrudManager<T extends BaseEntityWithCount>({
             </AlertDialogCancel>
             <AlertDialogAction
               onClick={handleDelete}
-              disabled={deleteMutation.isPending || (selectedItem?.resourceCount ?? 0) > 0}
+              disabled={deleteMutation.isPending || (!!selectedItem && !!getDeleteBlocker(selectedItem))}
               className="bg-destructive hover:bg-destructive/90"
               data-testid="button-confirm-delete"
             >

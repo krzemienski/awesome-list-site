@@ -4,6 +4,7 @@ import { Link } from "wouter";
 import SEOHead from "@/components/layout/SEOHead";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { queryUnavailableReason } from "@/lib/query-availability";
 import { apiRequest, queryClient } from "@/lib/queryClient";
 import "@/styles/pages/account.css";
 
@@ -31,6 +32,7 @@ export default function Notifications() {
   });
 
   const mutationError = readMutation.error ?? allMutation.error;
+  const unavailable = queryUnavailableReason(query);
 
   return (
     <div className="account-page account-page--form space-y-8 px-4 py-8 sm:px-6">
@@ -73,12 +75,14 @@ export default function Notifications() {
             <div className="skeleton h-20 w-full" />
           </CardContent>
         </Card>
-      ) : query.isError ? (
+      ) : unavailable ? (
         <Card>
-          <CardContent className="p-8 text-center" role="alert">
+          <CardContent className="p-8 text-center" role="alert" data-testid={`notifications-${unavailable}`}>
             <RefreshCw className="account-accent-icon mx-auto h-8 w-8" />
             <p className="account-muted mt-3 text-sm">
-              We couldn’t load your notifications.
+              {unavailable === "offline"
+                ? "You’re offline. Your notifications will load when your connection is back."
+                : "We couldn’t load your notifications."}
             </p>
             <Button
               variant="outline"
@@ -99,7 +103,7 @@ export default function Notifications() {
               will appear in this quiet inbox.
             </p>
             <Link
-              href="/settings"
+              href="/settings#notification-settings"
               className="account-accent mt-5 inline-flex min-h-[44px] items-center text-sm font-semibold underline underline-offset-4"
             >
               Review notification choices

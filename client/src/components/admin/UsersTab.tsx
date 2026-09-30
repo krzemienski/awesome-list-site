@@ -85,6 +85,18 @@ export default function UsersTab() {
     refocusEditIdRef.current = null;
   }, [editingRoleId, pendingRoleChange]);
 
+  // The pressed pager button disables itself at either end, which dropped
+  // focus to <body>; hand focus to its sibling once the new page renders.
+  const prevPageRef = useRef<HTMLButtonElement>(null);
+  const nextPageRef = useRef<HTMLButtonElement>(null);
+  const pagerRefocusRef = useRef<"prev" | "next" | null>(null);
+  useEffect(() => {
+    const target = pagerRefocusRef.current;
+    pagerRefocusRef.current = null;
+    if (target === "prev") prevPageRef.current?.focus();
+    if (target === "next") nextPageRef.current?.focus();
+  }, [page]);
+
   const { data, isLoading } = useQuery<UsersResponse>({
     queryKey: ['/api/admin/users', page, limit, searchQuery, sortBy, sortDir],
     // R5-037: refresh admin data when the operator returns to the tab.
@@ -280,9 +292,10 @@ export default function UsersTab() {
                       unwrapping to ~2,369px); full value stays in the title. */}
                   <TableCell className="admin-ops-cell-name max-w-[240px]">
                     <div className="flex items-center gap-2 min-w-0">
-                      {/* A nameless account is identified by its email (or id),
-                          set in the same ink and weight as a real name — the
-                          frozen AdminUsers name cell has one style for every row. */}
+                      {/* A nameless account is identified by its masked email (or
+                          id), set in the same ink and weight as a real name — the
+                          frozen AdminUsers name cell has one style for every row.
+                          The reveal toggle governs the Email column only. */}
                       {user.firstName || user.lastName ? (
                         <span
                           className="font-medium truncate"
@@ -292,8 +305,12 @@ export default function UsersTab() {
                           {`${user.firstName || ''} ${user.lastName || ''}`.trim()}
                         </span>
                       ) : (
-                        <span className="font-medium truncate" title={user.email || user.id} data-testid={`text-name-${user.id}`}>
-                          {user.email || user.id}
+                        <span
+                          className="font-medium truncate"
+                          title={user.email ? maskEmail(user.email) : user.id}
+                          data-testid={`text-name-${user.id}`}
+                        >
+                          {user.email ? maskEmail(user.email) : user.id}
                         </span>
                       )}
                     </div>
@@ -346,12 +363,7 @@ export default function UsersTab() {
                         /* Run16 BUG-037: stage the change and confirm first. */
                         onValueChange={(role) => {
                           closeRoleEditor(user.id);
-                          // Radix Select commits on keydown; opening the dialog in
-                          // the same tick let the Enter keyup land on its
-                          // auto-focused Cancel and close it straight away.
-                          if (role !== (user.role || 'user')) {
-                            setTimeout(() => setPendingRoleChange({ user, role }), 0);
-                          }
+                          if (role !== (user.role || 'user')) setPendingRoleChange({ user, role });
                         }}
                       >
                         <SelectTrigger
@@ -371,7 +383,16 @@ export default function UsersTab() {
                               name; the open menu checks the current role. */}
                           Role
                         </SelectTrigger>
-                        <SelectContent>
+                        <SelectContent
+                          onKeyDown={(e) => {
+                            // Radix commits the pick on Enter keydown but keeps the
+                            // key's default action, so its follow-up activation
+                            // clicked whatever had focus next: the re-mounted Edit
+                            // (re-opening this menu behind the confirm) or the
+                            // confirm's Cancel. Runs after the item has selected.
+                            if (e.key === "Enter") e.preventDefault();
+                          }}
+                        >
                           <SelectItem value="user">User</SelectItem>
                           <SelectItem value="moderator">Moderator</SelectItem>
                           <SelectItem value="admin">Admin</SelectItem>
@@ -435,9 +456,13 @@ export default function UsersTab() {
             <div className="admin-ops-users-pagination__controls">
               {/* BUG-057 (run25): icon-only pager buttons need accessible names. */}
               <Button
+                ref={prevPageRef}
                 variant="outline"
                 size="sm"
-                onClick={() => setPage(p => Math.max(1, p - 1))}
+                onClick={() => {
+                  if (page - 1 <= 1) pagerRefocusRef.current = "next";
+                  setPage(Math.max(1, page - 1));
+                }}
                 disabled={page <= 1}
                 aria-label="Previous page"
                 data-testid="button-users-prev-page"
@@ -445,9 +470,13 @@ export default function UsersTab() {
                 <ChevronLeft className="h-4 w-4" aria-hidden="true" />
               </Button>
               <Button
+                ref={nextPageRef}
                 variant="outline"
                 size="sm"
-                onClick={() => setPage(p => Math.min(totalPages, p + 1))}
+                onClick={() => {
+                  if (page + 1 >= totalPages) pagerRefocusRef.current = "prev";
+                  setPage(Math.min(totalPages, page + 1));
+                }}
                 disabled={page >= totalPages}
                 aria-label="Next page"
                 data-testid="button-users-next-page"
@@ -460,7 +489,10 @@ export default function UsersTab() {
 
         {/* Run16 BUG-037: explicit confirmation before applying a role change. */}
         <AlertDialog open={!!pendingRoleChange} onOpenChange={(open) => { if (!open) setPendingRoleChange(null); }}>
-          <AlertDialogContent>
+          {/* The refocus effect has already put focus on the row's Edit; the
+              dialog's own return target (the unmounted role menu) would drop it
+              to <body>. */}
+          <AlertDialogContent onCloseAutoFocus={(e) => e.preventDefault()}>
             <AlertDialogHeader>
               <AlertDialogTitle>Change user role?</AlertDialogTitle>
               <AlertDialogDescription>

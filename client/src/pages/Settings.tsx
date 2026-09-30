@@ -27,6 +27,7 @@ import {
 } from "@/components/ui/alert-dialog";
 import NotificationPreferencesCard from "@/components/notifications/NotificationPreferencesCard";
 import HomeLayoutPreferenceControl from "@/components/home/HomeLayoutPreferenceControl";
+import { useScrollToHash } from "@/lib/nav-history";
 import "@/styles/pages/account.css";
 
 interface CategoryOption {
@@ -106,6 +107,12 @@ export default function Settings() {
     enabled: isAuthenticated,
     staleTime: 5 * 60 * 1000,
   });
+  // Sections above a deep-linked one change height as they load, so scroll to
+  // #learning-preferences / #notification-settings only once they have.
+  useScrollToHash(
+    !isLoading &&
+      (!isAuthenticated || (!preferencesLoading && !categoriesLoading)),
+  );
   const [values, setValues] = useState<LearningPreferencesValues>(
     DEFAULT_LEARNING_PREFERENCES,
   );
@@ -387,7 +394,7 @@ export default function Settings() {
       ) : null}
 
       {isAuthenticated ? (
-        <section aria-labelledby="notification-settings-title">
+        <section id="notification-settings" aria-labelledby="notification-settings-title">
           <NotificationPreferencesCard />
         </section>
       ) : null}

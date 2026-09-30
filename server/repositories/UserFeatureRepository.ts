@@ -136,13 +136,12 @@ export class UserFeatureRepository {
         // duplicate saves idempotent and closes the guest-merge race where
         // another tab creates a noted bookmark after the merge's pre-dedupe
         // read but before its POST reaches PostgreSQL. An explicit empty
-        // string still intentionally clears notes via the editor.
+        // string still intentionally clears notes via the editor. createdAt is
+        // the saved date (it drives "Newest saved"), so a note edit never
+        // touches it.
         set: notes === undefined
-          ? {
-              notes: sql`${userBookmarks.notes}`,
-              createdAt: sql`${userBookmarks.createdAt}`,
-            }
-          : { notes, createdAt: new Date() }
+          ? { notes: sql`${userBookmarks.notes}` }
+          : { notes }
       })
       .returning();
     return row;

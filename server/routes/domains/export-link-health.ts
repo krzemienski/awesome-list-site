@@ -435,7 +435,10 @@ export function registerExportLinkHealthRoutes(
             // rows honestly instead of rendering every row as a success.
             status: q.status,
             commitSha: md.commitSha ?? null,
-            commitMessage: md.commitMessage ?? (q.status === 'failed' ? (q.errorMessage || 'Sync failed') : null),
+            // A failure reason is not a commit message; the panel labels
+            // errorMessage as "Error".
+            commitMessage: md.commitMessage ?? null,
+            errorMessage: q.status === 'failed' ? (q.errorMessage || 'Sync failed') : null,
             commitUrl: null,
             resourcesAdded: added,
             resourcesUpdated: updated,
@@ -449,6 +452,11 @@ export function registerExportLinkHealthRoutes(
       // Run23 NB-038: canonical history rows carry a full resource `snapshot`
       // jsonb (2.7MB total on prod). The list view only needs summary fields;
       // snapshots remain in the DB for on-demand use.
+      // Failed imports record their reason only in the snapshot.
+      const snapshotError = (snapshot: unknown): string | null => {
+        const error = (snapshot as { error?: unknown } | null)?.error;
+        return typeof error === 'string' ? error : null;
+      };
       const historySummaries = history.map(h => {
         // ADM-03/04: canonical history rows have no status column — the
         // outcome is recorded in metadata.outcome ('completed' | 'partial' |
@@ -463,6 +471,7 @@ export function registerExportLinkHealthRoutes(
           status,
           commitSha: h.commitSha,
           commitMessage: h.commitMessage,
+          errorMessage: status === 'failed' ? snapshotError(h.snapshot) : null,
           commitUrl: h.commitUrl,
           resourcesAdded: h.resourcesAdded,
           resourcesUpdated: h.resourcesUpdated,

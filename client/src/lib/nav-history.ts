@@ -113,3 +113,30 @@ export function useScrollRestoration(location: string): void {
     };
   }, [location]);
 }
+
+// In-app links to a page section (/settings#notification-settings) arrive via
+// pushState, which never jumps to a fragment, and the route-change effect above
+// scrolls to the top anyway. Once the caller's content has loaded, bring the
+// fragment's element into view (waiting a few frames for it to render).
+export function useScrollToHash(ready: boolean): void {
+  useEffect(() => {
+    const id = decodeURIComponent(window.location.hash.slice(1));
+    if (!ready || !id) return;
+
+    let cancelled = false;
+    const deadline = Date.now() + 4000;
+    const tryScroll = () => {
+      if (cancelled) return;
+      const section = document.getElementById(id);
+      if (section) {
+        section.scrollIntoView({ block: "start" });
+      } else if (Date.now() < deadline) {
+        requestAnimationFrame(tryScroll);
+      }
+    };
+    requestAnimationFrame(tryScroll);
+    return () => {
+      cancelled = true;
+    };
+  }, [ready]);
+}

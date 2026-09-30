@@ -44,6 +44,7 @@ import {
 } from "@/components/ui/select";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useToast } from "@/hooks/use-toast";
+import { queryUnavailableReason } from "@/lib/query-availability";
 import { ApiError, apiRequest, queryClient } from "@/lib/queryClient";
 import { writeFilterParams } from "@/lib/url-filter-state";
 import "@/styles/pages/account.css";
@@ -106,6 +107,8 @@ interface ContributionsResponse {
     publicResources: number;
     recordedViews: number;
   };
+  /** Per-status counts within the active type and search filters. */
+  statusCounts: Record<ContributionStatus, number>;
   definitions: {
     acceptedContributions: string;
     publicResources: string;
@@ -542,6 +545,7 @@ export default function Contributions() {
     return `/contributions${queryString ? `?${queryString}` : ""}`;
   };
 
+  const unavailable = queryUnavailableReason(query);
   const summary = query.data?.summary;
   const definitions = query.data?.definitions;
   const hasFilters =
@@ -645,7 +649,7 @@ export default function Contributions() {
                         .toLowerCase()
                         .replace(/\s+/g, "-")}`}
                     >
-                      {metric.value ?? 0}
+                      {metric.value ?? "—"}
                     </p>
                   )}
                   <p className="mt-2 text-xs leading-5 text-muted-foreground">
@@ -721,8 +725,8 @@ export default function Contributions() {
                   {Object.entries(statusConfig).map(([value, config]) => (
                     <SelectItem key={value} value={value}>
                       {config.label}
-                      {summary
-                        ? ` (${summary[value as ContributionStatus]})`
+                      {query.data
+                        ? ` (${query.data.statusCounts[value as ContributionStatus]})`
                         : ""}
                     </SelectItem>
                   ))}
@@ -787,13 +791,23 @@ export default function Contributions() {
               </div>
             ))}
           </div>
-        ) : query.isError ? (
+        ) : unavailable ? (
           <Card>
-            <CardContent className="flex flex-col items-center gap-3 py-12 text-center">
+            <CardContent
+              className="flex flex-col items-center gap-3 py-12 text-center"
+              role="alert"
+              data-testid={`contributions-${unavailable}`}
+            >
               <RefreshCw className="account-accent-icon h-8 w-8" />
-              <h3 className="font-semibold">We couldn't load your contributions</h3>
+              <h3 className="font-semibold">
+                {unavailable === "offline"
+                  ? "You’re offline"
+                  : "We couldn't load your contributions"}
+              </h3>
               <p className="max-w-md text-sm text-muted-foreground">
-                Your data is unchanged. Check your connection and try again.
+                {unavailable === "offline"
+                  ? "Your contributions will load when your connection is back."
+                  : "Your data is unchanged. Check your connection and try again."}
               </p>
               <Button
                 variant="outline"
