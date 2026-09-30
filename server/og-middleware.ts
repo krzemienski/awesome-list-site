@@ -831,7 +831,7 @@ function homeShellChrome(): string {
     },
     "/search": {
       title: `Search — ${SITE_NAME}`,
-      description: `Search 2,000+ curated video development tools, libraries, players, codecs, and learning resources.`,
+      description: `Search thousands of curated video development tools, libraries, players, codecs, and learning resources.`,
       // Search results pages are standard noindex (thin/duplicate content).
       noindex: true,
     },
