@@ -184,10 +184,14 @@ export default function AdminDashboard() {
     scroller?.scrollBy({ left: direction * scroller.clientWidth * 0.6, behavior: "smooth" });
   };
 
+  // Bumped on every New entry click so an already-mounted ResourceManager
+  // re-reads the ?create=1 flag (its mount-time read only covers tab switches).
+  const [createRequest, setCreateRequest] = useState(0);
   const handleNewEntry = () => {
     const url = new URL(window.location.href);
     url.searchParams.set("create", "1");
     window.history.replaceState({}, "", url.pathname + url.search + url.hash);
+    setCreateRequest((n) => n + 1);
     handleTabChange("resources");
   };
 
@@ -437,7 +441,7 @@ export default function AdminDashboard() {
         </TabsContent>
 
         <TabsContent value="resources">
-          <ErrorBoundary label="Resources tab"><ResourceManager /></ErrorBoundary>
+          <ErrorBoundary label="Resources tab"><ResourceManager createRequest={createRequest} /></ErrorBoundary>
         </TabsContent>
 
         <TabsContent value="categories" data-testid="content-categories">

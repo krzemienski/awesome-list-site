@@ -143,7 +143,7 @@ const STATUS_OPTIONS = [
   { value: "rejected", label: "Rejected", color: "bg-[var(--status-bad)] text-black" } // DS-OK: status bad
 ];
 
-export default function ResourceManager() {
+export default function ResourceManager({ createRequest = 0 }: { createRequest?: number }) {
   const { toast } = useToast();
   const queryClient = useQueryClient();
   
@@ -552,7 +552,9 @@ export default function ResourceManager() {
       resetEditForm();
       toast({
         title: "Resource Created",
-        description: `The new ${createdStatus} resource is now visible in the catalog.`,
+        description: createdStatus === "approved"
+          ? "The new resource is approved and now visible in the public catalog."
+          : `The new resource was saved as ${createdStatus} and is not public yet.`,
       });
     },
     onError: (error: Error) => {
@@ -741,7 +743,8 @@ export default function ResourceManager() {
   };
 
   // Canonical masthead deep-link: open the existing create workflow, then strip
-  // the one-shot flag so refresh and Back do not reopen the modal.
+  // the one-shot flag so refresh and Back do not reopen the modal. Re-runs on
+  // each createRequest so New entry also works while this tab is already open.
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
     if (params.get("create") !== "1") return;
@@ -750,7 +753,7 @@ export default function ResourceManager() {
     url.searchParams.delete("create");
     window.history.replaceState({}, "", url.pathname + url.search + url.hash);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [createRequest]);
 
   // NEW-013: /admin/resources?resourceId=N (ResourceDetail's "Edit in Admin"
   // deep-link) opens that resource's edit dialog directly instead of dumping
@@ -922,6 +925,7 @@ export default function ResourceManager() {
     setDebouncedSearch("");
     setCategoryFilter("");
     setStatusFilter("approved");
+    setSort("newest");
     setPage(1);
     setSelectedResourceIds([]);
   };

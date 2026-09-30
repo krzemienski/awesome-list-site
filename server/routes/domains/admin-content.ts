@@ -1009,15 +1009,10 @@ export function registerAdminContentRoutes(
          // validated metadata payload just like the admin update path does;
          // omitting it here silently discarded the featured toggle.
          metadata: validatedData.metadata,
+      }, {
+        changes: { title: validatedData.title, url: validatedData.url },
+        notes: 'Resource created by admin',
       });
-      
-      await auditRepo.logResourceAudit(
-        newResource.id,
-        'created',
-        userId,
-        { title: validatedData.title, url: validatedData.url },
-        'Resource created by admin'
-      );
       
       res.status(201).json(newResource);
     } catch (error: any) {

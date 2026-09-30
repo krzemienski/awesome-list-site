@@ -838,7 +838,7 @@ export default function ResearcherTab({ initialTab = "launch" }: ResearcherTabPr
                     type="button"
                     variant="ghost"
                     onClick={() => setShowAdvanced(v => !v)}
-                    className="flex h-auto w-full items-center justify-between px-3 py-2 text-sm font-medium hover:bg-muted/50"
+                    className="flex h-auto w-full items-center justify-between whitespace-normal px-3 py-2 text-left text-sm font-medium hover:bg-muted/50"
                     data-testid="button-toggle-advanced-researcher"
                   >
                     <span className="flex items-center gap-2">

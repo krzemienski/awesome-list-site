@@ -374,7 +374,7 @@ export default function ExportTab({ validationStatus: propValidationStatus }: Ex
             <FileJson className="h-5 w-5" />
           </div>
           <h3 className="admin-ops-export-card__title">JSON Snapshot</h3>
-          <p className="admin-ops-export-card__description">Complete dataset as a single JSON file. ~12 MB.</p>
+          <p className="admin-ops-export-card__description">Complete dataset as a single JSON file.</p>
           <Button
             className="admin-ops-export-card__action"
             onClick={() => {

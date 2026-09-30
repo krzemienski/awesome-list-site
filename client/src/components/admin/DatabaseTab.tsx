@@ -273,7 +273,9 @@ export default function DatabaseTab({ stats }: DatabaseTabProps) {
               <th>Name</th>
               <th>Rows</th>
               <th>Size</th>
-              <th>Last write</th>
+              {/* max(updated_at|created_at) over the rows that still exist:
+                  deletes leave no timestamp, so this is not a last-write time. */}
+              <th title="Latest created or updated timestamp among the table's current rows. Deletes are not tracked.">Newest row</th>
             </tr>
           </thead>
           <tbody>

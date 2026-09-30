@@ -773,11 +773,17 @@ export class ResourceRepository {
 
   /**
    * Create a new resource
-   * Automatically logs the creation to audit log
+   * Logs exactly one 'created' audit row attributed to resource.submittedBy.
+   * Callers that know more about the creation pass the row's changes/notes
+   * here rather than logging a second 'created' row themselves.
    * @param resource - Resource data to create
+   * @param audit - Changes and notes recorded on the 'created' audit row
    * @returns The created resource
    */
-  async createResource(resource: InsertResource): Promise<Resource> {
+  async createResource(
+    resource: InsertResource,
+    audit: { changes?: Record<string, unknown>; notes?: string } = {},
+  ): Promise<Resource> {
     // Task #248: universal write boundary — decode HTML entities in
     // title/description/hierarchy fields (never the URL) so "&amp;" text can
     // never be persisted, whatever the caller (routes, GitHub sync, AI).
@@ -811,7 +817,13 @@ export class ResourceRepository {
     invalidatePublicCache('resource-mutation');
 
     // Log the creation
-    await this.logResourceAudit(newResource.id, 'created', resource.submittedBy ?? undefined);
+    await this.logResourceAudit(
+      newResource.id,
+      'created',
+      resource.submittedBy ?? undefined,
+      audit.changes,
+      audit.notes,
+    );
 
     return newResource;
   }

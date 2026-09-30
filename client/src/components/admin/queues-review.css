@@ -182,6 +182,15 @@
   white-space: nowrap;
 }
 
+.queue-review-item-title > span > a {
+  color: inherit;
+  text-underline-offset: 2px;
+}
+
+.queue-review-item-title > span > a:hover {
+  text-decoration: underline;
+}
+
 /* 44px hit area without growing the row: the negative margins cancel the
    padding that makes the target. */
 .queue-review-item-link {
