@@ -303,10 +303,10 @@ export default function UsersTab() {
                       <span className="flex min-w-0 items-center gap-1.5">
                         <span
                           className="min-w-0 truncate"
-                          title={revealedIds.has(user.id) ? maskEmail(user.email) : user.email}
+                          title={revealedIds.has(user.id) ? user.email : maskEmail(user.email)}
                           data-testid={`text-email-${user.id}`}
                         >
-                          {revealedIds.has(user.id) ? maskEmail(user.email) : user.email}
+                          {revealedIds.has(user.id) ? user.email : maskEmail(user.email)}
                         </span>
                         {/* R4-041: aria-label includes a row identifier so repeated controls
                             have unique accessible names (masked email keeps PII out of the DOM). */}
@@ -316,12 +316,12 @@ export default function UsersTab() {
                           size="icon"
                           onClick={() => toggleReveal(user.id)}
                           className="inline-flex h-8 w-8 shrink-0 items-center justify-center min-h-[32px] min-w-[32px] text-muted-foreground/70 hover:bg-transparent hover:text-foreground transition-colors"
-                          aria-label={`${revealedIds.has(user.id) ? "Reveal" : "Mask"} email for ${
+                          aria-label={`${revealedIds.has(user.id) ? "Mask" : "Reveal"} email for ${
                             `${user.firstName || ''} ${user.lastName || ''}`.trim() || maskEmail(user.email)
                           }`}
                           data-testid={`button-toggle-email-${user.id}`}
                         >
-                          {revealedIds.has(user.id) ? <Eye className="h-3.5 w-3.5" /> : <EyeOff className="h-3.5 w-3.5" />}
+                          {revealedIds.has(user.id) ? <EyeOff className="h-3.5 w-3.5" /> : <Eye className="h-3.5 w-3.5" />}
                         </Button>
                       </span>
                     ) : "—"}
@@ -345,8 +345,13 @@ export default function UsersTab() {
                         onOpenChange={(open) => { if (!open) closeRoleEditor(user.id); }}
                         /* Run16 BUG-037: stage the change and confirm first. */
                         onValueChange={(role) => {
-                          if (role !== (user.role || 'user')) setPendingRoleChange({ user, role });
                           closeRoleEditor(user.id);
+                          // Radix Select commits on keydown; opening the dialog in
+                          // the same tick let the Enter keyup land on its
+                          // auto-focused Cancel and close it straight away.
+                          if (role !== (user.role || 'user')) {
+                            setTimeout(() => setPendingRoleChange({ user, role }), 0);
+                          }
                         }}
                       >
                         <SelectTrigger
