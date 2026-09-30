@@ -137,10 +137,10 @@ export default function TaxonomyListing({ level }: Props) {
     return isLayoutViewMode(saved) ? saved : "grid";
   });
   const [notice, setNotice] = useState<string | null>(pageNoticeFor(initialPage));
-  const [selection, setSelection] = useState(params.get("subcategory") ?? "all");
-  const [general, setGeneral] = useState(
-    params.get("filter") === "general" || params.get("view") === "general" || params.get("subcategory") === "__general__",
-  );
+  const initialGeneral =
+    params.get("filter") === "general" || params.get("view") === "general" || params.get("subcategory") === "__general__";
+  const [selection, setSelection] = useState(initialGeneral ? "__general__" : params.get("subcategory") ?? "all");
+  const [general, setGeneral] = useState(initialGeneral);
   const [toolsOpen, setToolsOpen] = useState(false);
   const normalizedSearch = normalizeSearchQuery(searchTerm);
   const debouncedSearch = normalizeSearchQuery(useDebounce(searchTerm, 300));
@@ -159,7 +159,7 @@ export default function TaxonomyListing({ level }: Props) {
       };
     }
     return {
-      subcategory: level === "subcategory" && selection !== "all" ? selection : undefined,
+      subcategory: level === "subcategory" && selection !== "all" && selection !== "__general__" ? selection : undefined,
       general,
       kind,
     };
@@ -562,10 +562,11 @@ export default function TaxonomyListing({ level }: Props) {
           category page; below that it stays screen-reader-only. */}
       <p className={level === "category" ? "taxonomy-description" : "sr-only"}>{listingData.scopeIntro}</p>
     </section>
-     <div className="taxonomy-summary"><span className="chip accent">{listingData.totalAll} {resourceNoun(listingData.totalAll)}</span>{kind && <span className="chip">Kind: {kindLabel}</span>}{level === "category" && childTiles.length > 0 && <span className="chip">{childTiles.length} {childTiles.length === 1 ? "subcategory" : "subcategories"}</span>}{level !== "category" && parentCategory && <span>in {parentCategory.name}</span>}<button type="button" className="btn ghost taxonomy-tools-toggle" aria-expanded={toolsOpen} onClick={() => setToolsOpen(value => !value)}><SlidersHorizontal className="taxonomy-tools-toggle__icon" aria-hidden="true" /><span className="taxonomy-tools-toggle__label">{toolsOpen ? "Close filters" : "Filters & view"}</span></button></div>
+     <div className="taxonomy-summary"><span className="chip accent">{listingData.totalAll} {resourceNoun(listingData.totalAll)}</span>{kind && <span className="chip">Kind: {kindLabel}</span>}{level === "category" && childTiles.length > 0 && <span className="chip">{childTiles.length} {childTiles.length === 1 ? "subcategory" : "subcategories"}</span>}{level !== "category" && parentCategory && <span>in {parentCategory.name}</span>}<button type="button" className="btn ghost taxonomy-tools-toggle" aria-expanded={toolsOpen} aria-controls="taxonomy-tools-panel" onClick={() => setToolsOpen(value => !value)}><SlidersHorizontal className="taxonomy-tools-toggle__icon" aria-hidden="true" /><span className="taxonomy-tools-toggle__label">{toolsOpen ? "Close filters" : "Filters & view"}</span></button></div>
     </header>
-    {level === "category" && childTiles.length > 0 && <section className="taxonomy-children" aria-labelledby="taxonomy-children-heading"><h2 id="taxonomy-children-heading">Subcategories</h2><div className="taxonomy-child-grid">{childTiles.map((child, index) => <Link key={child.slug} className="taxonomy-child card hoverable" style={{ animationDelay: `${index * 30}ms` }} href={`${routeFor("subcategory", child.slug)}${kind ? `?kind=${kind}` : ""}`}><span>{child.name}</span><span className="chip mono">{child.count}</span></Link>)}</div></section>}
-    <div className={`taxonomy-controls taxonomy-production-controls ${toolsOpen ? "taxonomy-production-controls--open" : ""} flex flex-col gap-4`}><div className="relative"><Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" /><Input className="pl-10" value={searchTerm} onChange={(event) => { setSearchTerm(event.target.value); setPage(1); }} placeholder={`Search in ${name}...`} aria-label={`Search in ${name}`} data-testid="input-search-resources" /></div>
+    {/* Directly under the header's toggle: after the subcategory tiles the
+        opened panel landed below the fold at 1440x900 and the click looked inert. */}
+    <div id="taxonomy-tools-panel" className={`taxonomy-controls taxonomy-production-controls ${toolsOpen ? "taxonomy-production-controls--open" : ""} flex flex-col gap-4`}><div className="relative"><Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" /><Input className="pl-10" value={searchTerm} onChange={(event) => { setSearchTerm(event.target.value); setPage(1); }} placeholder={`Search in ${name}...`} aria-label={`Search in ${name}`} data-testid="input-search-resources" /></div>
        {level !== "sub-subcategory" && optionChildren.length > 0 && <select className="select min-h-11" aria-label={`Limit ${name} by subcategory`} value={selection} onChange={(event) => { const nextSelection = event.target.value; const next = { ...currentFilterState, selection: nextSelection }; setSelection(nextSelection); setGeneral(nextSelection === "__general__"); setPage(1); queueAnalytics(next, "taxonomy_scope", nextSelection); requestResultsFocus(); }} data-testid="select-subcategory-filter"><option value="all">All subcategories</option>{listingData.generalCount > 0 && <option value="__general__">Uncategorized ({listingData.generalCount})</option>}{optionChildren.map((item) => <option key={item.value} value={item.value}>{item.value} ({item.count})</option>)}</select>}
        <select className="select min-h-11" aria-label="Limit by resource kind" value={kind ?? ""} onChange={(event) => { const nextKind = parseKindParam(event.target.value); setKind(nextKind); setPage(1); requestResultsFocus(); }} data-testid="select-kind-filter"><option value="">All resource kinds</option>{RESOURCE_KIND_VALUES.map((value) => <option key={value} value={value}>{value.replace(/[-_]/g, " ").replace(/\b\w/g, (letter) => letter.toUpperCase())}</option>)}</select>
        <AdvancedFilter selectedTags={tags} sortBy={sort} availableTags={listingData.tags} onTagsChange={(value) => onFacetChange("tags", value)} onSortChange={(value) => onFacetChange("sort", value)} showCountSorts={false} showTagFilter={false} />
@@ -580,6 +581,7 @@ export default function TaxonomyListing({ level }: Props) {
          />
        </div>
     </div>
+    {level === "category" && childTiles.length > 0 && <section className="taxonomy-children" aria-labelledby="taxonomy-children-heading"><h2 id="taxonomy-children-heading">Subcategories</h2><div className="taxonomy-child-grid">{childTiles.map((child, index) => <Link key={child.slug} className="taxonomy-child card hoverable" style={{ animationDelay: `${index * 30}ms` }} href={`${routeFor("subcategory", child.slug)}${kind ? `?kind=${kind}` : ""}`}><span>{child.name}</span><span className="chip mono">{child.count}</span></Link>)}</div></section>}
     <div className={`taxonomy-production-controls ${toolsOpen ? "taxonomy-production-controls--open" : ""}`}><ActiveFilters state={filterState} onChange={onFacetChange} onClear={clearFacetFilters} defaultSort="default" /></div>
     <div className="taxonomy-results-layout">
       <div className={`taxonomy-production-controls ${toolsOpen ? "taxonomy-production-controls--open" : ""}`} aria-busy={toolsOpen && taxonomySearch.isLoading}><SearchFilters state={filterState} facets={taxonomySearch.data?.facets} onChange={onFacetChange} onClear={clearFacetFilters} hideTaxonomyFacets /></div>

@@ -35,6 +35,9 @@ function shellBrand(siteName?: string): string {
   return trimmed.toUpperCase();
 }
 
+// Catalog pages reached from Browse (bare /tag redirects to /categories).
+const BROWSE_ROUTE_PREFIXES = ["/category/", "/subcategory/", "/sub-subcategory/", "/tag/"];
+
 // Same recursive sum as Home's navTotalCount; never fetch the full corpus.
 function totalCount(node: AwesomeListNavNode): number {
   return node.resourceCount
@@ -70,11 +73,14 @@ export default function AppHeader({ onSearchOpen, user, onLogout, logoutError, c
     const skipNext = here === "/" || here.startsWith("/sign-in") || here.startsWith("/sign-up");
     navigate(skipNext ? "/sign-in" : `/sign-in?redirect_url=${encodeURIComponent(here)}`);
   };
+  const isCurrent = (href: string) =>
+    location === href ||
+    (href === "/categories" && (location === "/" || BROWSE_ROUTE_PREFIXES.some(prefix => location.startsWith(prefix))));
   const navLink = (href: string, label: string) => (
     <Link
       href={href}
-      className={`nav-link${location === href || (href === "/categories" && location === "/") ? " active" : ""}`}
-      aria-current={location === href || (href === "/categories" && location === "/") ? "page" : undefined}
+      className={`nav-link${isCurrent(href) ? " active" : ""}`}
+      aria-current={isCurrent(href) ? "page" : undefined}
     >
       {label}
     </Link>

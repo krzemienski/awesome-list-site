@@ -873,7 +873,7 @@ export default function AppSidebar({
       label: "About",
       icon: BookOpen,
       href: "/about",
-      testId: "footer-about",
+      testId: "nav-about",
     },
   ];
   const drawerMoreItems = [...navItems.slice(2), accountDashboardItem];
@@ -886,7 +886,7 @@ export default function AppSidebar({
     ...(user?.role === "admin"
       ? [{ label: "Admin", icon: Shield, href: "/admin", testId: "nav-admin" }]
       : []),
-    { label: "About", icon: Info, href: "/about", testId: "footer-about" },
+    { label: "About", icon: Info, href: "/about", testId: "nav-about" },
   ];
 
   const resourceStatus = (
@@ -1099,8 +1099,10 @@ export default function AppSidebar({
         onSubmit={(e) => {
           e.preventDefault();
           const form = e.currentTarget;
-          const query = new FormData(form).get("q")?.toString() ?? "";
-          navigate(`/search?q=${encodeURIComponent(query.trim())}`);
+          const query = new FormData(form).get("q")?.toString().trim() ?? "";
+          // Matches the header palette: Enter on a blank query is a no-op.
+          if (!query) return;
+          navigate(`/search?q=${encodeURIComponent(query)}`);
         }}
       >
         <div className="av-sidebar-drawer-search-control">
