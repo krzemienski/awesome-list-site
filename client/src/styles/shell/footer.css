@@ -83,6 +83,11 @@
   transition: all 160ms ease;
 }
 .app-footer-repo > svg { flex-shrink: 0; }
+/* The label is the one part that may give way: without min-width:0 and a
+   break opportunity it can't shrink below "krzemienski/awesome-", so the text
+   and arrow ran past the capped button at 1280-1440px. */
+.app-footer-repo > span:not(.app-footer-repo-arrow) { min-width: 0; overflow-wrap: anywhere; }
+.app-footer-repo-arrow { flex-shrink: 0; }
 .app-footer-repo-arrow { color: var(--text-3); }
 .app-footer-repo:hover { border-color: var(--accent); color: var(--accent); }
 .app-footer-note { color: var(--text-2); font-size: 11.5px; line-height: 1.6; }
@@ -159,7 +164,6 @@
 @media (max-width: 640px) {
   .app-footer { padding: 36px 20px 24px; margin-top: 56px; }
   .app-footer-grid > :last-child { grid-column: 1 / -1; }
-  .app-footer-repo { overflow-wrap: anywhere; }
   .app-footer-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 32px 24px; }
   .app-footer-meta { margin-top: 28px; }
 }
