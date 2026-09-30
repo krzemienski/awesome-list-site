@@ -272,17 +272,21 @@ export default function UsersTab() {
                           {`${user.firstName || ''} ${user.lastName || ''}`.trim()}
                         </span>
                       ) : (
-                        <span className="font-medium" data-testid={`text-name-${user.id}`}>
+                        <span className="font-medium truncate" title={user.email || user.id} data-testid={`text-name-${user.id}`}>
                           {user.email || user.id}
                         </span>
                       )}
                     </div>
                   </TableCell>
-                  <TableCell className="admin-ops-cell-email text-muted-foreground">
+                  <TableCell className="admin-ops-cell-email max-w-[280px] text-muted-foreground">
                     {user.email ? (
-                      <span className="inline-flex items-center gap-1.5">
-                        <span data-testid={`text-email-${user.id}`}>
-                           {revealedIds.has(user.id) ? maskEmail(user.email) : user.email}
+                      <span className="flex min-w-0 items-center gap-1.5">
+                        <span
+                          className="min-w-0 truncate"
+                          title={revealedIds.has(user.id) ? maskEmail(user.email) : user.email}
+                          data-testid={`text-email-${user.id}`}
+                        >
+                          {revealedIds.has(user.id) ? maskEmail(user.email) : user.email}
                         </span>
                         {/* R4-041: aria-label includes a row identifier so repeated controls
                             have unique accessible names (masked email keeps PII out of the DOM). */}
@@ -291,7 +295,7 @@ export default function UsersTab() {
                           variant="ghost"
                           size="icon"
                           onClick={() => toggleReveal(user.id)}
-                          className="inline-flex h-8 w-8 items-center justify-center min-h-[32px] min-w-[32px] text-muted-foreground/70 hover:bg-transparent hover:text-foreground transition-colors"
+                          className="inline-flex h-8 w-8 shrink-0 items-center justify-center min-h-[32px] min-w-[32px] text-muted-foreground/70 hover:bg-transparent hover:text-foreground transition-colors"
                           aria-label={`${revealedIds.has(user.id) ? "Reveal" : "Mask"} email for ${
                             `${user.firstName || ''} ${user.lastName || ''}`.trim() || maskEmail(user.email)
                           }`}
