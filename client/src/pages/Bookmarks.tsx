@@ -461,14 +461,14 @@ export default function Bookmarks() {
                   title={collection.name}
                 >
                   <span className="flex items-center justify-between gap-2">
-                    <span className="truncate">
+                    <span className="min-w-0 break-words line-clamp-2">
                       {collection.archivedAt ? "Archived · " : ""}
                       {collection.name}
                     </span>
-                    <span>{collection.itemCount}</span>
+                    <span className="shrink-0">{collection.itemCount}</span>
                   </span>
                 </button>
-                <div className="flex" aria-label={`Reorder ${collection.name}`}>
+                {collections.length > 1 && <div className="flex" aria-label={`Reorder ${collection.name}`}>
                   <Button
                     type="button"
                     variant="ghost"
@@ -489,7 +489,7 @@ export default function Bookmarks() {
                   >
                     <ArrowDown className="h-4 w-4" aria-hidden="true" />
                   </Button>
-                </div>
+                </div>}
               </div>
             ))}
           </div>
@@ -898,6 +898,23 @@ export default function Bookmarks() {
                   Bookmark resources as you browse. They will land here ready to organize.
                 </p>
                 <Button asChild><Link href="/">Explore resources</Link></Button>
+              </CardContent>
+            </Card>
+          ) : selectedCollection &&
+            selectedCollection.itemCount === 0 &&
+            statusFilter === "all" &&
+            archiveFilter === "active" ? (
+            <Card>
+              <CardContent className="flex flex-col items-center justify-center py-12 text-center">
+                <Folder className="h-10 w-10 text-primary mb-4" aria-hidden="true" />
+                <h2 className="text-xl font-semibold mb-2">This collection is empty</h2>
+                <p className="max-w-md text-muted-foreground mb-5">
+                  To add bookmarks, open All saved, select the bookmarks you want, then pick
+                  this collection under Move to collection and choose Move.
+                </p>
+                <Button variant="outline" onClick={() => chooseCollection("all")}>
+                  Go to All saved
+                </Button>
               </CardContent>
             </Card>
           ) : (
