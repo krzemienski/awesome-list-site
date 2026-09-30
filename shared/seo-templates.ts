@@ -392,6 +392,17 @@ export const advancedSeoTitle = `Advanced — ${SITE_NAME}`;
 export const advancedSeoDescription =
   `Power-user tools for ${SITE_NAME}: category explorer, analytics dashboard, link health, and bulk export.`;
 
+// Default description for pages that supply none. Count-free on purpose: the
+// live total belongs to the pages that render it (homeSeoDescription), and a
+// literal here goes stale as the catalog grows.
+export const siteTagline =
+  "The curated index of video development resources — players, encoders, codecs, streaming, AI, tools, and community.";
+
+export const signInSeoDescription =
+  `Sign in to ${SITE_NAME} to save bookmarks, submit resources, and personalize your learning journey.`;
+export const signUpSeoDescription =
+  `Create an ${SITE_NAME} account to save bookmarks, submit resources, and track your learning journeys.`;
+
 export const submitSeoTitle = `Submit a Resource — ${SITE_NAME}`;
 export const submitSeoDescription =
   `Suggest a new video development tool, library, article, or course for inclusion in ${SITE_NAME}.`;

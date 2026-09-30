@@ -33,6 +33,9 @@ import {
   tagDisplayNameBranded,
   tagSeoDescription,
   tagTitleCoreDeduped,
+  siteTagline,
+  signInSeoDescription,
+  signUpSeoDescription,
 } from "@shared/seo-templates";
 import {
   RESOURCE_FORMAT_LABELS,
@@ -75,8 +78,6 @@ import { loadHomeNav } from "./home-ssr-data";
 export const SITE_URL =
   process.env.PUBLIC_SITE_URL?.replace(/\/$/, "") || "https://awesome.video";
 export const SITE_NAME = "Awesome Video";
-export const SITE_TAGLINE =
-  "The curated index of 2,000+ video development resources — players, encoders, codecs, streaming, AI, tools, and community.";
 const collectionRepo = new CollectionRepository();
 
 export interface RouteMeta {
@@ -270,7 +271,7 @@ function ogImage(path: string) {
 function defaultMeta(url: string): RouteMeta {
   return {
     title: `${SITE_NAME} — Curated video development resources`,
-    description: SITE_TAGLINE,
+    description: siteTagline,
     url: abs(url),
     image: ogImage(url),
     imageAlt: `${SITE_NAME} — curated video development resources`,
@@ -734,7 +735,7 @@ function homeShellChrome(): string {
     // below) — only the new paths carry route metadata.
     "/sign-in": {
       title: `Sign In — ${SITE_NAME}`,
-      description: `Sign in to ${SITE_NAME} to save bookmarks, submit resources, and personalize your learning journey.`,
+      description: signInSeoDescription,
       // Utility auth page: thin, duplicate content with no search value. Mark
       // noindex so it does not compete in search (buildMetaTags then also drops
       // the canonical/og:url); the route still returns HTTP 200 (found: true).
@@ -742,7 +743,7 @@ function homeShellChrome(): string {
     },
     "/sign-up": {
       title: `Create an Account — ${SITE_NAME}`,
-      description: `Create an ${SITE_NAME} account to save bookmarks, submit resources, and track your learning journeys.`,
+      description: signUpSeoDescription,
       // Utility auth page — noindex for the same reason as /sign-in.
       noindex: true,
     },

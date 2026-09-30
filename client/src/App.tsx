@@ -26,6 +26,7 @@ import {
 
 import MainLayout from "@/components/layout/new/MainLayout";
 import SEOHead from "@/components/layout/SEOHead";
+import { signInSeoDescription, signUpSeoDescription } from "@shared/seo-templates";
 import AuthConversionTracker from "@/components/auth/AuthConversionTracker";
 import GuestBookmarkMerge from "@/components/auth/GuestBookmarkMerge";
 import ConsentBanner from "@/components/ui/consent-banner";
@@ -410,7 +411,7 @@ function SignInPage() {
       data-testid="page-sign-in"
     >
       {/* Title mirrors the og-middleware /sign-in template (two-pass parity). */}
-      <SEOHead title="Sign In" noindex />
+      <SEOHead title="Sign In" description={signInSeoDescription} noindex />
       <SignIn
         routing="path"
         path={`${basePath}/sign-in`}
@@ -430,7 +431,7 @@ function SignUpPage() {
       data-testid="page-sign-up"
     >
       {/* Title mirrors the og-middleware /sign-up template (two-pass parity). */}
-      <SEOHead title="Create an Account" noindex />
+      <SEOHead title="Create an Account" description={signUpSeoDescription} noindex />
       <SignUp
         routing="path"
         path={`${basePath}/sign-up`}
