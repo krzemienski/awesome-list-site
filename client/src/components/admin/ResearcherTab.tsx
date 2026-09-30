@@ -582,23 +582,8 @@ export default function ResearcherTab({ initialTab = "launch" }: ResearcherTabPr
                   inputMode="decimal"
                 />
               </div>
-              <div className="field">
-                <label htmlFor="canonical-auto-approve">Auto-approve</label>
-                <select id="canonical-auto-approve" className="select" defaultValue="no">
-                  <option value="no">No</option>
-                  <option value="confidence">If confidence &gt; 0.8</option>
-                </select>
-              </div>
             </div>
             <div className="queues-agent__research-actions">
-              <Button
-                type="button"
-                className="btn ghost"
-                variant="ghost"
-                onClick={() => toast({ title: "Preset saved", description: "Research settings are preserved for this session." })}
-              >
-                Save preset
-              </Button>
               <Button
                 type="button"
                 className="btn primary"
