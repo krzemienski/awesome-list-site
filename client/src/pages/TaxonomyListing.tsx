@@ -414,9 +414,11 @@ export default function TaxonomyListing({ level }: Props) {
   if (listing.error || taxonomySearchError) return <ErrorPage error={listing.error ?? taxonomySearchError} />;
   if (!listingData || !name) return <NotFound />;
 
-  const optionChildren = listingData.children.flatMap((child: any) => [
+  const optionChildren = childTiles.flatMap((child: any) => [
     { value: child.name, count: child.count },
-    ...((child.subSubcategories ?? []).map((subSub: any) => ({ value: `${child.name} › ${subSub.name}`, count: subSub.count }))),
+    ...((child.subSubcategories ?? [])
+      .filter((subSub: any) => !kind || subSub.count > 0)
+      .map((subSub: any) => ({ value: `${child.name} › ${subSub.name}`, count: subSub.count }))),
   ]);
   const backSlug = level === "subcategory" ? parentCategory?.slug : parentSubcategory?.slug;
   const back = level === "category" || !backSlug
@@ -552,7 +554,7 @@ export default function TaxonomyListing({ level }: Props) {
           category page; below that it stays screen-reader-only. */}
       <p className={level === "category" ? "taxonomy-description" : "sr-only"}>{listingData.scopeIntro}</p>
     </section>
-     <div className="taxonomy-summary"><span className="chip accent">{listingData.totalAll} {resourceNoun(listingData.totalAll)}</span>{kind && <span className="chip">Kind: {kindLabel}</span>}{level === "category" && listingData.children.length > 0 && <span className="chip">{listingData.children.length} {listingData.children.length === 1 ? "subcategory" : "subcategories"}</span>}{level !== "category" && parentCategory && <span>in {parentCategory.name}</span>}<button type="button" className="btn ghost taxonomy-tools-toggle" aria-expanded={toolsOpen} onClick={() => setToolsOpen(value => !value)}><SlidersHorizontal className="taxonomy-tools-toggle__icon" aria-hidden="true" /><span className="taxonomy-tools-toggle__label">{toolsOpen ? "Close filters" : "Filters & view"}</span></button></div>
+     <div className="taxonomy-summary"><span className="chip accent">{listingData.totalAll} {resourceNoun(listingData.totalAll)}</span>{kind && <span className="chip">Kind: {kindLabel}</span>}{level === "category" && childTiles.length > 0 && <span className="chip">{childTiles.length} {childTiles.length === 1 ? "subcategory" : "subcategories"}</span>}{level !== "category" && parentCategory && <span>in {parentCategory.name}</span>}<button type="button" className="btn ghost taxonomy-tools-toggle" aria-expanded={toolsOpen} onClick={() => setToolsOpen(value => !value)}><SlidersHorizontal className="taxonomy-tools-toggle__icon" aria-hidden="true" /><span className="taxonomy-tools-toggle__label">{toolsOpen ? "Close filters" : "Filters & view"}</span></button></div>
     </header>
     {level === "category" && childTiles.length > 0 && <section className="taxonomy-children" aria-labelledby="taxonomy-children-heading"><h2 id="taxonomy-children-heading">Subcategories</h2><div className="taxonomy-child-grid">{childTiles.map((child, index) => <Link key={child.slug} className="taxonomy-child card hoverable" style={{ animationDelay: `${index * 30}ms` }} href={`${routeFor("subcategory", child.slug)}${kind ? `?kind=${kind}` : ""}`}><span>{child.name}</span><span className="chip mono">{child.count}</span></Link>)}</div></section>}
     <div className={`taxonomy-controls taxonomy-production-controls ${toolsOpen ? "taxonomy-production-controls--open" : ""} flex flex-col gap-4`}><div className="relative"><Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" /><Input className="pl-10" value={searchTerm} onChange={(event) => { setSearchTerm(event.target.value); setPage(1); }} placeholder={`Search in ${name}...`} aria-label={`Search in ${name}`} data-testid="input-search-resources" /></div>
