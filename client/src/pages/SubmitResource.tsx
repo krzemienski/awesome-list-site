@@ -112,6 +112,16 @@ type SubmitResourceFormData = z.infer<typeof submitResourceSchema>;
 // refresh, tab close, or navigation no longer wipes everything the user typed.
 const DRAFT_KEY = "submit-resource-draft";
 
+const EMPTY_VALUES: SubmitResourceFormData = {
+  title: "",
+  url: "",
+  description: "",
+  category: "",
+  subcategory: "",
+  subSubcategory: "",
+  tags: "",
+};
+
 interface Category {
   id: number;
   name: string;
@@ -149,19 +159,19 @@ export default function SubmitResource() {
   const [duplicateResource, setDuplicateResource] = useState(false);
 
   // Fetch categories
-  const { data: categories = [] } = useQuery<Category[]>({
+  const { data: categories = [], isFetched: categoriesFetched } = useQuery<Category[]>({
     queryKey: ['/api/categories'],
     enabled: isAuthenticated,
   });
 
   // Fetch subcategories
-  const { data: subcategories = [] } = useQuery<Subcategory[]>({
+  const { data: subcategories = [], isFetched: subcategoriesFetched } = useQuery<Subcategory[]>({
     queryKey: ['/api/subcategories'],
     enabled: isAuthenticated,
   });
 
   // Fetch sub-subcategories
-  const { data: subSubcategories = [] } = useQuery<SubSubcategory[]>({
+  const { data: subSubcategories = [], isFetched: subSubcategoriesFetched } = useQuery<SubSubcategory[]>({
     queryKey: ['/api/sub-subcategories'],
     enabled: isAuthenticated,
   });
@@ -169,15 +179,7 @@ export default function SubmitResource() {
   const form = useForm<SubmitResourceFormData>({
     resolver: zodResolver(submitResourceSchema),
     mode: "onTouched",
-    defaultValues: {
-      title: "",
-      url: "",
-      description: "",
-      category: "",
-      subcategory: "",
-      subSubcategory: "",
-      tags: "",
-    },
+    defaultValues: EMPTY_VALUES,
   });
   // BUG-033 (run14): react-hook-form's formState is a Proxy — isDirty is only
   // tracked once it's read during render. Reading it for the first time inside
@@ -236,17 +238,6 @@ export default function SubmitResource() {
       return subcategoryId ? subSub.subcategoryId === subcategoryId : false;
     }
   );
-
-  // Reset subcategory when category changes
-  useEffect(() => {
-    form.setValue("subcategory", "");
-    form.setValue("subSubcategory", "");
-  }, [selectedCategory, form]);
-
-  // Reset sub-subcategory when subcategory changes
-  useEffect(() => {
-    form.setValue("subSubcategory", "");
-  }, [selectedSubcategory, form]);
 
   // Check for duplicate URLs
   useEffect(() => {
@@ -315,6 +306,10 @@ export default function SubmitResource() {
   // Restore a saved draft once auth has confirmed (R5-016) — before the
   // auto-save subscription is wired (draftRestoredRef gates saving until the
   // restore has run so we never clobber the stored draft with empty defaults).
+  // The taxonomy lists must be loaded first: a Radix Select handed a value it
+  // has no option for reports "" back, which wiped the restored category.
+  const taxonomyFetched =
+    categoriesFetched && subcategoriesFetched && subSubcategoriesFetched;
   useEffect(() => {
     if (authLoading) return;
     if (!isAuthenticated) {
@@ -322,14 +317,16 @@ export default function SubmitResource() {
       draftRestoredRef.current = true;
       return;
     }
-    if (draftRestoredRef.current) return;
+    if (draftRestoredRef.current || !taxonomyFetched) return;
     const saved = safeGetItem(DRAFT_KEY);
     if (saved) {
       const draft = parseDraft(saved);
       if (!draft) {
         safeRemoveItem(DRAFT_KEY);
       } else if (draftHasContent(draft.values)) {
-        form.reset({ ...form.getValues(), ...draft.values });
+        // keepDefaultValues: the draft must not become the form's defaults,
+        // or a later form.reset() would bring it back.
+        form.reset({ ...form.getValues(), ...draft.values }, { keepDefaultValues: true });
         draftSeenAtRef.current = draft.updatedAt;
         toast({
           title: "Draft restored",
@@ -340,7 +337,7 @@ export default function SubmitResource() {
     }
     draftRestoredRef.current = true;
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [authLoading, isAuthenticated]);
+  }, [authLoading, isAuthenticated, taxonomyFetched]);
 
   // Debounced auto-save of the in-progress form to localStorage.
   useEffect(() => {
@@ -388,7 +385,7 @@ export default function SubmitResource() {
       const draft = parseDraft(e.newValue);
       if (!draft || draft.updatedAt <= draftSeenAtRef.current) return;
       draftSeenAtRef.current = draft.updatedAt;
-      form.reset({ ...form.getValues(), ...draft.values });
+      form.reset({ ...form.getValues(), ...draft.values }, { keepDefaultValues: true });
     };
     window.addEventListener("storage", onStorage);
     return () => window.removeEventListener("storage", onStorage);
@@ -454,7 +451,10 @@ export default function SubmitResource() {
       });
 
       setShowSuccess(true);
-      form.reset();
+      if (draftSaveTimer.current) clearTimeout(draftSaveTimer.current);
+      form.reset(EMPTY_VALUES);
+      safeRemoveItem(DRAFT_KEY);
+      draftSeenAtRef.current = 0;
       toast({
         title: "Success!",
         description: "Your resource has been submitted for review. It will be visible once approved by an admin.",
@@ -701,7 +701,16 @@ export default function SubmitResource() {
                           <FormLabel className="submit-label">Category</FormLabel>
                           {/* R3-04: name gives the hidden native select a non-empty
                               name; the visible trigger is labeled via FormLabel. */}
-                          <Select name={field.name} onValueChange={field.onChange} value={field.value}>
+                          <Select
+                            name={field.name}
+                            value={field.value}
+                            onValueChange={(value) => {
+                              if (!value || value === field.value) return;
+                              field.onChange(value);
+                              form.setValue("subcategory", "");
+                              form.setValue("subSubcategory", "");
+                            }}
+                          >
                             <FormControl>
                               <SelectTrigger className="submit-control" data-testid="select-category">
                                 <SelectValue placeholder="Select…" />
@@ -757,7 +766,15 @@ export default function SubmitResource() {
                       render={({ field }) => (
                         <FormItem className="submit-field submit-taxonomy-field">
                           <FormLabel className="submit-label">Subcategory (Optional)</FormLabel>
-                          <Select name={field.name} onValueChange={field.onChange} value={field.value}>
+                          <Select
+                            name={field.name}
+                            value={field.value}
+                            onValueChange={(value) => {
+                              if (!value || value === field.value) return;
+                              field.onChange(value);
+                              form.setValue("subSubcategory", "");
+                            }}
+                          >
                             <FormControl>
                               <SelectTrigger className="submit-control" data-testid="select-subcategory">
                                 <SelectValue placeholder="Select a subcategory" />
@@ -787,7 +804,13 @@ export default function SubmitResource() {
                       render={({ field }) => (
                         <FormItem className="submit-field submit-taxonomy-field">
                           <FormLabel className="submit-label">Specific Topic (Optional)</FormLabel>
-                          <Select name={field.name} onValueChange={field.onChange} value={field.value}>
+                          <Select
+                            name={field.name}
+                            value={field.value}
+                            onValueChange={(value) => {
+                              if (value) field.onChange(value);
+                            }}
+                          >
                             <FormControl>
                               <SelectTrigger className="submit-control" data-testid="select-subsubcategory">
                                 <SelectValue placeholder="Select a specific topic" />
