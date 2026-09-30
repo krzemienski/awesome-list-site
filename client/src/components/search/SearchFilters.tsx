@@ -103,12 +103,13 @@ export default function SearchFilters({ state, facets, onChange, onClear, hideTa
   const activeCount = [state.category, state.subcategory, state.subSubcategory, state.provider, state.format, state.skillLevel].filter(Boolean).length + state.tags.length;
   // Task #379: selected tags sort first so a deep-linked selection is never cut
   // off by TAG_LIMIT and always stays removable from the panel.
+  const allTags = useMemo(() => options(facets?.tags, state.tags), [facets?.tags, state.tags]);
   const tags = useMemo(() => {
     const selected = new Set(state.tags.map(t => t.toLowerCase()));
-    return options(facets?.tags, state.tags)
+    return allTags
       .filter(x => x.label.toLowerCase().includes(tagSearch.toLowerCase()))
       .sort((a, b) => Number(selected.has(b.value.toLowerCase())) - Number(selected.has(a.value.toLowerCase())));
-  }, [facets?.tags, state.tags, tagSearch]);
+  }, [allTags, state.tags, tagSearch]);
   const content = (collapsible: boolean) => <div className="space-y-6">
     <div className="flex items-center justify-between"><div><p className="text-sm font-semibold">Narrow results</p><p className="text-xs text-muted-foreground">Counts update for this combination.</p></div>{activeCount > 0 && <Button variant="ghost" size="sm" onClick={clear} data-testid="button-clear-filters">Clear all</Button>}</div>
     {/* Category is the entry point into the taxonomy, so it stays open; the two
@@ -119,14 +120,15 @@ export default function SearchFilters({ state, facets, onChange, onClear, hideTa
     <FacetList title="Provider" items={options(facets?.providers, state.provider, RESOURCE_PROVIDER_LABELS)} value={state.provider} onSelect={v => applyChange("provider", v)} testid="provider" collapseInert />
     <FacetList title="Format" items={options(facets?.formats, state.format, RESOURCE_FORMAT_LABELS)} value={state.format} onSelect={v => applyChange("format", v)} testid="format" collapseInert />
     <FacetList title="Skill level" items={options(facets?.skillLevels, state.skillLevel, RESOURCE_SKILL_LEVEL_LABELS)} value={state.skillLevel} onSelect={v => applyChange("skillLevel", v)} testid="skill-level" collapseInert />
-    <FacetGroup title="Tags" collapsible={collapsible} defaultOpen={false} forceOpen={state.tags.length > 0} bodyClassName="space-y-2">
+    {allTags.length > 0 && <FacetGroup title="Tags" collapsible={collapsible} defaultOpen={false} forceOpen={state.tags.length > 0} bodyClassName="space-y-2">
       <div className="relative"><Search className="absolute left-2.5 top-3.5 h-4 w-4 text-muted-foreground" /><Input value={tagSearch} onChange={e => setTagSearch(e.target.value)} placeholder="Find a tag" className="h-11 pl-8" aria-label="Search tags" data-testid="input-search-tags" /></div>
       <div className="max-h-56 overflow-y-auto pr-1">{tags.slice(0, TAG_LIMIT).map(item => {
         const selected = state.tags.some(t => t.toLowerCase() === item.value.toLowerCase());
         return <button type="button" key={item.value} className="btn ghost search-facet-option" aria-pressed={selected} aria-label={`${selected ? "Remove" : "Apply"} ${item.label} tag filter`} onClick={() => applyChange("tags", selected ? state.tags.filter(t => t.toLowerCase() !== item.value.toLowerCase()) : [...state.tags, item.value])}><span className="flex min-w-0 items-center gap-2"><span aria-hidden="true" className="search-facet-check" data-selected={selected}>{selected && <Check className="h-3 w-3" />}</span><span className="truncate">{item.label}</span></span><span className="shrink-0 font-mono text-xs text-muted-foreground">{item.count}</span></button>;
       })}</div>
+      {tags.length === 0 && <p className="px-2 text-xs text-muted-foreground" role="status" data-testid="text-no-matching-tags">No tags match "{tagSearch.trim()}".</p>}
       {tags.length > TAG_LIMIT && <p className="px-2 text-xs text-muted-foreground">Showing {TAG_LIMIT} of {tags.length} tags. Refine your tag search to see more.</p>}
-    </FacetGroup>
+    </FacetGroup>}
   </div>;
   return <><aside className="hidden w-64 shrink-0 rounded-lg border border-[var(--border)] bg-[var(--surface)] p-4 lg:block">{content(true)}</aside>
     <div className="lg:hidden"><Sheet open={open} onOpenChange={setOpen}><SheetTrigger asChild><Button variant="outline" className="min-h-11 gap-2" data-testid="button-open-filters"><SlidersHorizontal className="h-4 w-4" /> Filters {activeCount > 0 && <span className="rounded-full bg-[var(--accent)] px-2 py-0.5 text-xs text-black">{activeCount}</span>}</Button></SheetTrigger><SheetContent side="left" className="w-[min(90vw,360px)] overflow-y-auto"><SheetHeader><SheetTitle>Filters</SheetTitle></SheetHeader><div className="mt-5">{content(false)}</div></SheetContent></Sheet></div></>;
