@@ -2057,6 +2057,15 @@ export async function resolveOgImageMeta(
   return { pageTitle, category, kicker };
 }
 
+/**
+ * SPA routes whose last segment is an id or slug, not a file name. A dot in it
+ * ("/journey/1.5", "/category/foo.bar") must not turn the page into a
+ * static-asset request: it still gets the resolver's 404 page with app chrome.
+ */
+export function isEntityRoutePath(urlPath: string): boolean {
+  return /^\/(?:resource|journey|category|subcategory|sub-subcategory|tag)\/[^\/]+$/.test(urlPath);
+}
+
 // Express middleware that intercepts HTML responses and rewrites <head> with
 // route-specific OG/Twitter/SEO tags. Mount BEFORE any HTML-serving middleware
 // (vite dev middlewares or static index.html fallback).
@@ -2098,7 +2107,7 @@ export function ogInjectionMiddleware() {
       urlPath.startsWith("/@") ||
       urlPath.startsWith("/src/") ||
       urlPath.startsWith("/node_modules") ||
-      (/\.[a-z0-9]+$/i.test(urlPath) && !urlPath.startsWith("/tag/"))
+      (/\.[a-z0-9]+$/i.test(urlPath) && !urlPath.startsWith("/tag/") && !isEntityRoutePath(urlPath))
     ) {
       return next();
     }
