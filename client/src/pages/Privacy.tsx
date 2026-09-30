@@ -2,7 +2,7 @@ import { Link } from "wouter";
 import SEOHead from "@/components/layout/SEOHead";
 import { Card, CardContent } from "@/components/ui/card";
 import { Shield } from "lucide-react";
-import { openCookieSettings } from "@/components/ui/consent-banner";
+import { hasAnalyticsVendors, openCookieSettings } from "@/components/ui/consent-banner";
 import { preferredContactDestination, useContactConfig } from "@/lib/contact";
 import "@/styles/pages/system-legal.css";
 
@@ -73,18 +73,20 @@ export default function Privacy() {
             </p>
             {/* R5-025 (run24): in-product consent-reset control — re-opens the
                 banner so a persisted Accept/Decline can be changed anytime. */}
-            <p>
-              Changed your mind?{" "}
-              <button
-                type="button"
-                onClick={openCookieSettings}
-                className="legal-inline-link inline-flex items-center min-h-[24px] underline underline-offset-4 hover:text-[color:var(--text)]"
-                data-testid="button-privacy-cookie-settings"
-              >
-                Open cookie settings
-              </button>{" "}
-              to make or change your analytics choice.
-            </p>
+            {hasAnalyticsVendors && (
+              <p>
+                Changed your mind?{" "}
+                <button
+                  type="button"
+                  onClick={openCookieSettings}
+                  className="legal-inline-link inline-flex items-center min-h-[24px] underline underline-offset-4 hover:text-[color:var(--text)]"
+                  data-testid="button-privacy-cookie-settings"
+                >
+                  Open cookie settings
+                </button>{" "}
+                to make or change your analytics choice.
+              </p>
+            )}
           </section>
 
           <section className="space-y-2">

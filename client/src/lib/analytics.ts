@@ -26,6 +26,15 @@ declare global {
 const getMeasurementId = (): string | undefined =>
   import.meta.env.VITE_GA_MEASUREMENT_ID as string | undefined;
 
+// F206: the consent banner must only name vendors this build can load — each
+// init no-ops without its key, so an unconfigured vendor is never contacted.
+export const ANALYTICS_VENDORS = [
+  { name: 'Google Analytics', configured: Boolean(import.meta.env.VITE_GA_MEASUREMENT_ID) },
+  { name: 'Mixpanel', configured: Boolean(import.meta.env.VITE_MIXPANEL_TOKEN) },
+  { name: 'PostHog', configured: Boolean(import.meta.env.VITE_POSTHOG_KEY) },
+  { name: 'Amplitude', configured: Boolean(import.meta.env.VITE_AMPLITUDE_API_KEY) },
+].filter((vendor) => vendor.configured).map((vendor) => vendor.name);
+
 // BUG-020 (run13): analytics is consent-gated. The choice lives in
 // localStorage; initGA() hard-returns until the visitor explicitly accepts,
 // so gtag.js is never even downloaded pre-consent. Every tracking helper

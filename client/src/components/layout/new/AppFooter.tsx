@@ -1,6 +1,6 @@
 import { lazy, Suspense } from "react";
 import { Link, useLocation } from "wouter";
-import { openCookieSettings } from "@/components/ui/consent-banner";
+import { hasAnalyticsVendors, openCookieSettings } from "@/components/ui/consent-banner";
 import type { AwesomeListNav } from "@/lib/static-data";
 import { getCategoryGlyph } from "./category-glyphs";
 import "@/styles/shell/footer.css";
@@ -77,7 +77,7 @@ export default function AppFooter({ nav, site }: {
         <nav aria-label="Explore categories">
           <h2 className="app-footer-heading">EXPLORE</h2>
           <div className="app-footer-explore">
-            {categories.slice(0, 6).map((category) => category.slug ? (
+            {categories.map((category) => category.slug ? (
               <Link key={category.slug} href={`/category/${encodeURIComponent(category.slug)}`} aria-label={category.name}>
                 <span className="app-footer-glyph" aria-hidden="true">{getCategoryGlyph(category.name)}</span>
                 <span aria-hidden="true">{shortCategoryName(category.name)}</span>
@@ -111,7 +111,9 @@ export default function AppFooter({ nav, site }: {
           <Link href="/terms" data-testid="footer-terms">Terms</Link>
           <Link href="/privacy" data-testid="footer-privacy">Privacy</Link>
           <Link href="/code-of-conduct" data-testid="footer-code-of-conduct" aria-label="Code of Conduct">Conduct</Link>
-          <button type="button" onClick={openCookieSettings} data-testid="footer-cookie-settings" className="btn ghost footer-cookie-settings">Cookie settings</button>
+          {hasAnalyticsVendors && (
+            <button type="button" onClick={openCookieSettings} data-testid="footer-cookie-settings" className="btn ghost footer-cookie-settings">Cookie settings</button>
+          )}
           <a href={site.issuesUrl || `${repo}/issues`} target="_blank" rel="noopener noreferrer">Issues ↗</a>
           <a href="/sitemap.xml">Sitemap</a>
         </nav>

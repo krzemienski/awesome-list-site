@@ -81,6 +81,10 @@
   .app-canonical-header .header-account-name.hide-mobile {
     display: inline !important;
   }
+  /* F210: a bare ⌘K chip read as an empty field — keep the short "Search"
+     word visible; only the resource-count tail stays hidden. */
+  .app-canonical-header .header-search-trigger .header-search-label { display: block; position: static; width: auto; height: auto; margin: 0; clip-path: none; }
+  .app-canonical-header .header-search-label > span { display: none; }
 }
 /* design-system.css hides .header-search-trigger at <=768px
    (`.header-search-trigger { display: none !important }`) because the

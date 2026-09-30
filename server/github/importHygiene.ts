@@ -91,6 +91,44 @@ export function decodeResourceTextFields<T extends Record<string, any>>(obj: T):
       (obj as Record<string, any>)[field] = decodeHtmlEntities(obj[field]);
     }
   }
+  return splitTaxonomyPathFields(obj);
+}
+
+/** Separator the taxonomy uses when it renders a hierarchy as one string. */
+export const TAXONOMY_PATH_SEPARATOR = " › ";
+
+const TAXONOMY_FIELDS = ["category", "subcategory", "subSubcategory"] as const;
+
+/**
+ * cf-ui-audit F201: the AI researcher/enrichment prompts show the taxonomy as
+ * "Category › Subcategory › Sub-subcategory" paths, and the model echoed a
+ * whole path back as the subcategory ("Codecs › VP9"). Stored that way the
+ * resource matched no subcategory or L3 page. Spread any "›"-joined value
+ * across the hierarchy columns instead (a repeated parent segment collapses,
+ * levels past the third are dropped). Fields absent from a partial update are
+ * only written when the split produces a value for them.
+ */
+export function splitTaxonomyPathFields<T extends Record<string, any>>(obj: T): T {
+  const joined = (v: unknown): v is string => typeof v === "string" && v.includes("›");
+  if (!TAXONOMY_FIELDS.some((f) => joined(obj[f]))) return obj;
+
+  const start = TAXONOMY_FIELDS.findIndex((f) => typeof obj[f] === "string" && obj[f].trim() !== "");
+  const fields = TAXONOMY_FIELDS.slice(start);
+  const levels: string[] = [];
+  for (const field of fields) {
+    const value = obj[field];
+    if (typeof value !== "string") continue;
+    for (const segment of value.split("›")) {
+      const name = segment.trim();
+      if (name && name.toLowerCase() !== levels[levels.length - 1]?.toLowerCase()) levels.push(name);
+    }
+  }
+
+  const out = obj as Record<string, any>;
+  fields.forEach((field, i) => {
+    if (levels[i] !== undefined) out[field] = levels[i];
+    else if (field in out) out[field] = null;
+  });
   return obj;
 }
 

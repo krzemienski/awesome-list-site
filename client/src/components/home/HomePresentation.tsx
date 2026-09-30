@@ -33,6 +33,8 @@ export interface HomeStats {
   nestedGroups: number;
   featured: number;
   approvedThisWeek: number;
+  /** Resources matching the active kind/tag filter; undefined when unfiltered. */
+  matching?: number;
 }
 
 export interface HomePresentationProps {
@@ -143,16 +145,20 @@ function isoWeekNumber(date: Date): number {
 }
 
 function StatStrip({ stats, layout }: { stats: HomeStats; layout: "index" | "curated" }) {
+  const resourcesSub =
+    stats.matching === undefined
+      ? `+${formatCount(stats.approvedThisWeek)} this week`
+      : `${formatCount(stats.matching)} match this filter`;
   const items =
     layout === "index"
       ? [
-          ["RESOURCES", formatCount(stats.total), `+${formatCount(stats.approvedThisWeek)} this week`],
+          ["RESOURCES", formatCount(stats.total), resourcesSub],
           ["CATEGORIES", formatCount(stats.categories), `${formatCount(stats.subcategories)} subcategories`],
           ["NESTED GROUPS", formatCount(stats.nestedGroups), "L3 depth"],
           ["FEATURED", formatCount(stats.featured), "hand-picked"],
         ]
       : [
-          ["RESOURCES", formatCount(stats.total), `+${formatCount(stats.approvedThisWeek)} this week`],
+          ["RESOURCES", formatCount(stats.total), resourcesSub],
           ["CATEGORIES", formatCount(stats.categories), `${formatCount(stats.subcategories)} subcategories`],
           ["FEATURED", formatCount(stats.featured), "hand-picked"],
           ["APPROVED THIS WEEK", formatCount(stats.approvedThisWeek), "newly indexed"],
@@ -241,7 +247,9 @@ function PageMeta({
 }) {
   const eyebrow =
     layout === "index"
-      ? `INDEX · ${formatCount(stats.total)} ENTRIES`
+      ? stats.matching === undefined
+        ? `INDEX · ${formatCount(stats.total)} ENTRIES`
+        : `INDEX · ${formatCount(stats.matching)} OF ${formatCount(stats.total)} ENTRIES`
       : `CURATED · WEEK ${isoWeekNumber(new Date())} · ${formatCount(stats.total)} INDEXED`;
   return (
     <div className="home-meta-row">
@@ -428,7 +436,7 @@ function CategoryIndex({ categories, selectedTags, selectedKind, onClearFilters 
             {category.teaserDescription ? (
               <span className="sr-only" data-testid={`text-category-teaser-${category.slug}`}>
                 <span className="font-medium">
-                  {category.teaserTitle ? `Featured: ${category.teaserTitle} — ` : ""}
+                  {category.teaserTitle ? `Example: ${category.teaserTitle} — ` : ""}
                 </span>
                 {category.teaserDescription}
               </span>

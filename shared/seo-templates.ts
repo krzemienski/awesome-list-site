@@ -336,8 +336,10 @@ export function subcategorySeoTitleCore(
   const intent = (categorySlug && CATEGORY_INTENT_NOUNS[categorySlug]) || "tools & guides";
   const parent = categoryName ? `${name} — ${categoryName} ${intent}` : `${name} ${intent}`;
   if (parent.length <= SEO_TITLE_MAX - BRAND_SUFFIX.length) return parent;
-  const concise = `${name} ${intent}`;
-  return concise.length <= SEO_TITLE_MAX - BRAND_SUFFIX.length ? concise : name;
+  // F211: the bare "<name> <intent>" fallback read as a broken phrase
+  // ("Community Groups communities & events"); fall back to the same
+  // "child – parent" form the sub-subcategory titles use.
+  return categoryName ? withParentContext(name, categoryName) : name;
 }
 
 export function subcategorySeoDescription(

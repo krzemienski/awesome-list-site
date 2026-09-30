@@ -739,7 +739,7 @@ export default function Home({ nav, navLoading }: HomeProps) {
                 : (subcategory.subSubcategories?.length ?? 0) +
                   (subcategory.subcategories?.length ?? 0),
             };
-          }),
+          }).filter((subcategory) => !corpusFilterActive || subcategory.count > 0),
         };
       }),
     [
@@ -761,8 +761,9 @@ export default function Home({ nav, navLoading }: HomeProps) {
       nestedGroups: countNestedGroups(rawCategories),
       featured: homeData?.featuredCount ?? homeData?.featured?.length ?? 0,
       approvedThisWeek: homeData?.approvedThisWeek ?? 0,
+      matching: corpusFilterActive ? filteredCorpusResources.length : undefined,
     };
-  }, [homeData, nav?.categories, nav?.totalResources, navCategories.length]);
+  }, [homeData, nav?.categories, nav?.totalResources, navCategories.length, corpusFilterActive, filteredCorpusResources.length]);
 
   const filters = showFilters ? (
     <Suspense fallback={<FilterControlsFallback />}>
