@@ -50,7 +50,10 @@ const TOKENS = {
   danger: "--color-destructive",
   background: "--bg",
   ink: "--text",
-  mutedInk: "--text-3",
+  // Clerk paints readable secondary copy (the identity preview, footer prompt)
+  // with this role, so it takes the DS secondary ink that clears 4.5:1 on the
+  // card — --text-3 composites to ~3.3:1 there.
+  mutedInk: "--text-2",
   border: "--border-strong",
   fieldSurface: "--surface",
 } as const;
@@ -255,7 +258,7 @@ function buildClerkAppearance(
       // own (~15% lightness), which reads as a lighter patch stuck onto the
       // true-black card. The DS paints text fields as the surface token over
       // the page background with a hairline border — hand Clerk those instead.
-      // The placeholder is colorMutedForeground (already the --text-3 ink) and
+      // The placeholder is colorMutedForeground (the --text-2 ink above) and
       // keyboard focus is the global 2px accent outline in design-system.css,
       // so both stay on-system for free once the field itself is.
       ...(palette.fieldSurface ? { colorInput: palette.fieldSurface } : {}),
