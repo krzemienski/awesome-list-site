@@ -2466,6 +2466,14 @@ export default function GenericCrudManager<T extends BaseEntityWithCount>({
   // the edit dialog leaves it alone unless the admin edits the slug field.
   const handleNameChange = (name: string) => {
     setFormData({ ...formData, name, slug: generateSlug(name) });
+    setFormError(null);
+  };
+
+  // Like a parent pick, editing a field the banner names makes it stale; the
+  // next submit re-validates everything.
+  const handleFieldEdit = (field: "name" | "slug", value: string) => {
+    setFormData({ ...formData, [field]: value });
+    setFormError(null);
   };
 
   const handleParentChange = (parentFieldName: string, value: string) => {
@@ -2940,7 +2948,7 @@ export default function GenericCrudManager<T extends BaseEntityWithCount>({
                 id="create-slug"
                 placeholder={formFields.slug.placeholder}
                 value={formData.slug}
-                onChange={(e) => setFormData({ ...formData, slug: e.target.value })}
+                onChange={(e) => handleFieldEdit("slug", e.target.value)}
                 data-testid="input-create-slug"
               />
               {formFields.slug.helpText && (
@@ -3177,7 +3185,7 @@ export default function GenericCrudManager<T extends BaseEntityWithCount>({
                 id="edit-name"
                 placeholder={formFields.name.placeholder}
                 value={formData.name}
-                onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                onChange={(e) => handleFieldEdit("name", e.target.value)}
                 data-testid="input-edit-name"
               />
             </div>
@@ -3187,7 +3195,7 @@ export default function GenericCrudManager<T extends BaseEntityWithCount>({
                 id="edit-slug"
                 placeholder={formFields.slug.placeholder}
                 value={formData.slug}
-                onChange={(e) => setFormData({ ...formData, slug: e.target.value })}
+                onChange={(e) => handleFieldEdit("slug", e.target.value)}
                 data-testid="input-edit-slug"
               />
             </div>

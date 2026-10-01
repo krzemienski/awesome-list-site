@@ -2,9 +2,10 @@ import { lazy, Suspense, useEffect, useRef, useState } from "react";
 import * as DialogPrimitive from "@radix-ui/react-dialog";
 import { useQuery } from "@tanstack/react-query";
 import { Command, CommandGroup, CommandInput, CommandItem, CommandList } from "@/components/ui/command";
-import { Clock, Folder, Grid2X2, Info, Loader2, Plus, Search, X } from "lucide-react";
+import { Clock, Folder, Grid2X2, Info, Loader2, Plus, Search, WifiOff, X } from "lucide-react";
 import { useLocation } from "wouter";
 import { ApiError, apiRequest } from "@/lib/queryClient";
+import { queryUnavailableReason } from "@/lib/query-availability";
 import { trackSearch, trackResourceClick } from "@/lib/analytics";
 import { useDebounce } from "@/hooks/useDebounce";
 import { normalizeSearchQuery, SEARCH_QUERY_MAX_LENGTH } from "@shared/searchNormalize";
@@ -134,6 +135,10 @@ export default function SearchDialog({ isOpen, setIsOpen }: SearchDialogProps) {
     : undefined;
   const isPending =
     showResults && results.length === 0 && (resourceQuery.isFetching || queryTrimmed !== trimmed);
+  // Offline, the resource search is paused rather than failed; it is not a
+  // "no results" answer, and it resumes by itself when the connection returns.
+  const resourcesOffline =
+    showResults && results.length === 0 && queryUnavailableReason(resourceQuery) === "offline";
   const categoryMatches = showResults
     ? (categoriesQuery.data ?? []).filter((category) =>
         category.name.toLocaleLowerCase().includes(queryTrimmed.toLocaleLowerCase()),
@@ -460,7 +465,13 @@ export default function SearchDialog({ isOpen, setIsOpen }: SearchDialogProps) {
                         ))}
                       </CommandGroup>
                     )}
-                    {!hasNonResourceMatches && results.length === 0 && (
+                    {resourcesOffline ? (
+                      <div className="search-palette-status" data-testid="search-offline" role="status">
+                        <WifiOff aria-hidden="true" />
+                        <strong>You’re offline</strong>
+                        <span>Resource results will load when your connection is back.</span>
+                      </div>
+                    ) : !hasNonResourceMatches && results.length === 0 && (
                       <div className="search-palette-status" data-testid="search-no-results">
                         <Search aria-hidden="true" />
                         <strong>No results for “{queryTrimmed}”</strong>

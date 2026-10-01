@@ -61,7 +61,7 @@ export default function NotificationPreferencesCard() {
     queryKey: ["/api/digests/preview"],
   });
   const [values, setValues] = useState<NotificationPreferencesUpdate>(defaults);
-  const [saved, setSaved] = useState(false);
+  const [savedMessage, setSavedMessage] = useState<string | null>(null);
   const [requestError, setRequestError] = useState<string | null>(null);
   const [timezoneError, setTimezoneError] = useState<string | null>(null);
 
@@ -94,11 +94,10 @@ export default function NotificationPreferencesCard() {
       queryClient.setQueryData(["/api/notification-preferences"], data);
       void queryClient.invalidateQueries({ queryKey: ["/api/notification-preferences"] });
       void queryClient.invalidateQueries({ queryKey: ["/api/digests/preview"] });
-      setSaved(true);
       setRequestError(null);
     },
     onError: (error) => {
-      setSaved(false);
+      setSavedMessage(null);
       setRequestError(error instanceof Error ? error.message : "We couldn’t save notification preferences.");
     },
   });
@@ -107,14 +106,14 @@ export default function NotificationPreferencesCard() {
     section.items.map((item) => ({ ...item, sectionTitle: section.title }))), [previewQuery.data]);
   const paused = Boolean(values.pausedUntil && new Date(values.pausedUntil).getTime() > Date.now());
   const update = <K extends keyof NotificationPreferencesUpdate>(key: K, value: NotificationPreferencesUpdate[K]) => {
-    setSaved(false);
+    setSavedMessage(null);
     setDirty(true);
     if (key === "timezone") setTimezoneError(null);
     setValues((current) => ({ ...current, [key]: value }));
   };
-  const saveValues = (nextValues: NotificationPreferencesUpdate, onSaved?: () => void) => {
+  const saveValues = (nextValues: NotificationPreferencesUpdate, message: string, onSaved?: () => void) => {
     if (!isValidTimezone(nextValues.timezone)) {
-      setSaved(false);
+      setSavedMessage(null);
       setRequestError(null);
       setTimezoneError("Choose a valid IANA time zone.");
       return;
@@ -122,24 +121,31 @@ export default function NotificationPreferencesCard() {
     setTimezoneError(null);
     const parsed = notificationPreferencesUpdateSchema.safeParse(nextValues);
     if (!parsed.success) {
-      setSaved(false);
+      setSavedMessage(null);
       setRequestError(parsed.error.issues[0]?.message ?? "Check your notification choices.");
       return;
     }
     setRequestError(null);
-    saveMutation.mutate(parsed.data, { onSuccess: onSaved });
+    saveMutation.mutate(parsed.data, {
+      onSuccess: () => {
+        setSavedMessage(message);
+        onSaved?.();
+      },
+    });
   };
-  const save = () => saveValues(values, () => setDirty(false));
+  const save = () => saveValues(values, "Your choices are saved.", () => setDirty(false));
   // Quick actions change only their own fields: they save on top of the last
   // saved state, and mirror the change into the form without committing
-  // anything else the person has edited but not saved.
-  const saveQuickAction = (patch: Partial<NotificationPreferencesUpdate>) => {
+  // anything else the person has edited but not saved. The confirmation says
+  // only what the action saved, so it never vouches for pending edits.
+  const saveQuickAction = (patch: Partial<NotificationPreferencesUpdate>, done: string) => {
     setValues((current) => ({ ...current, ...patch }));
-    saveValues({ ...(savedValues ?? values), ...patch });
+    const message = dirty ? `${done} Your other changes aren't saved yet — use Save choices.` : done;
+    saveValues({ ...(savedValues ?? values), ...patch }, message);
   };
-  const pause = () => saveQuickAction({ pausedUntil: new Date(Date.now() + 7 * 86400000).toISOString() });
-  const resume = () => saveQuickAction({ pausedUntil: null });
-  const unsubscribeAll = () => saveQuickAction({ emailDigestEnabled: false, inAppEnabled: false });
+  const pause = () => saveQuickAction({ pausedUntil: new Date(Date.now() + 7 * 86400000).toISOString() }, "Notifications paused.");
+  const resume = () => saveQuickAction({ pausedUntil: null }, "Notifications resumed.");
+  const unsubscribeAll = () => saveQuickAction({ emailDigestEnabled: false, inAppEnabled: false }, "Email and in-app updates are off.");
 
   return (
     <Card data-testid="card-notification-preferences">
@@ -191,7 +197,7 @@ export default function NotificationPreferencesCard() {
             </div>
             {paused ? <p className="flex items-center gap-2 text-xs text-[color:var(--text-2)]"><Clock3 className="h-4 w-4" />Paused until {new Date(values.pausedUntil!).toLocaleDateString()}.</p> : null}
             {requestError ? <p className="border border-destructive/40 bg-destructive/10 p-3 text-sm text-destructive" role="alert">{requestError}</p> : null}
-            {saved ? <p className="flex items-center gap-2 text-sm text-[var(--accent)]" role="status"><Check className="h-4 w-4" />Your choices are saved.</p> : null}
+            {savedMessage ? <p className="flex items-center gap-2 text-sm text-[var(--accent)]" role="status"><Check className="h-4 w-4 shrink-0" />{savedMessage}</p> : null}
             <Separator />
             <section aria-labelledby="digest-preview">
               <div className="flex items-start justify-between gap-3"><div><h3 id="digest-preview" className="flex items-center gap-2 text-sm font-semibold"><Eye className="h-4 w-4 text-[var(--accent)]" />Preview</h3><p className="mt-1 text-xs text-[color:var(--text-2)]">This uses the same rules as delivery.</p></div>{previewQuery.data ? <span className="font-mono text-xs text-[color:var(--text-2)]">{previewQuery.data.itemCount} {previewQuery.data.itemCount === 1 ? "item" : "items"}</span> : null}</div>

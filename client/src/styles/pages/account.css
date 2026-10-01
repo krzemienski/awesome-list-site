@@ -173,6 +173,8 @@
 }
 
 .account-page .account-bookmark-card {
+  display: flex;
+  flex-direction: column;
   overflow: hidden;
   border: var(--border-w) solid var(--border);
   border-radius: var(--radius);
@@ -183,7 +185,12 @@
   border-bottom: var(--hairline-w) solid var(--border);
 }
 
+/* .resource-card is height:100% of its parent, but here it shares the card
+   with the toolbar: fill only the space below it, or the footer (Open Link,
+   notes) is clipped by the card's overflow. */
 .account-page .account-resource-card {
+  flex: 1 1 auto;
+  height: auto;
   border: 0;
   border-radius: var(--radius);
   box-shadow: var(--shadow-sm);

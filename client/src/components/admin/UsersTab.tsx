@@ -406,6 +406,10 @@ export default function UsersTab() {
                           variant="ghost"
                           size="sm"
                           onClick={() => setEditingRoleId(user.id)}
+                          aria-label={`Edit role for ${
+                            `${user.firstName || ''} ${user.lastName || ''}`.trim() ||
+                            (user.email ? maskEmail(user.email) : user.id)
+                          }`}
                           data-testid={`button-edit-user-${user.id}`}
                         >
                           Edit
