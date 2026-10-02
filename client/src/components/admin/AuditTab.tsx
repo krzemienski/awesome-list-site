@@ -1,6 +1,6 @@
 import { useRef, useState } from "react";
 import { ApiError } from "@/lib/queryClient";
-import { formatRelativeAgo } from "@/lib/utils";
+import { formatRelativeAgo, maskEmail } from "@/lib/utils";
 import { useQuery, keepPreviousData } from "@tanstack/react-query";
 import { TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Input } from "@/components/ui/input";
@@ -35,12 +35,6 @@ interface AuditLogEntry {
 interface AuditLogsResponse {
   logs: AuditLogEntry[];
   total: number;
-}
-
-function maskEmail(email: string): string {
-  const at = email.indexOf("@");
-  if (at <= 0) return email;
-  return `${email[0]}•••${email.slice(at)}`;
 }
 
 /* A log entry is recorded after the operation it describes. Keep this

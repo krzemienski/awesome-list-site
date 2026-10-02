@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import { useQuery, useMutation, useQueryClient, keepPreviousData } from "@tanstack/react-query";
 import { apiRequest, ApiError } from "@/lib/queryClient";
+import { maskEmail } from "@/lib/utils";
 import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/hooks/useAuth";
 import { TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
@@ -13,17 +14,6 @@ import { ChevronLeft, ChevronRight, Trash2, Search, Eye, EyeOff, Download, Arrow
 import type { User } from "@shared/schema";
 import { AdminOpsTable as Table, StatusChip, TableShell } from "@/components/admin/AdminOpsPrimitives";
 import "@/styles/pages/admin-ops-users-audit.css";
-
-/**
- * R2-H05: mask emails by default so an over-the-shoulder look at the admin
- * panel doesn't leak the full user list. Per-row reveal toggle below.
- * "someone@example.com" -> "s•••@example.com"
- */
-function maskEmail(email: string): string {
-  const at = email.indexOf("@");
-  if (at <= 0) return email;
-  return `${email[0]}•••${email.slice(at)}`;
-}
 
 interface UsersResponse {
   users: User[];

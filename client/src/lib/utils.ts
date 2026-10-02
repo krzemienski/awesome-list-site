@@ -80,3 +80,13 @@ export function formatAdminDate(date: string | Date): string {
     month: 'short', day: 'numeric', year: 'numeric',
   });
 }
+
+/**
+ * R2-H05: admin tables mask emails by default so an over-the-shoulder look at
+ * the panel doesn't leak them. "someone@example.com" -> "s•••@example.com"
+ */
+export function maskEmail(email: string): string {
+  const at = email.indexOf("@");
+  if (at <= 0) return email;
+  return `${email[0]}•••${email.slice(at)}`;
+}
