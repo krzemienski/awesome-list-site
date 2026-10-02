@@ -250,7 +250,9 @@ export default function CategoryExplorer({ categories, resources, className }: C
               <Filter className="h-4 w-4 text-muted-foreground" />
               <span className="text-sm text-muted-foreground">Sort:</span>
               <Select value={sortBy} onValueChange={handleSortChange}>
-                <SelectTrigger className="w-32" aria-label="Sort categories">
+                {/* C5-V2-02: size to the selected label — a fixed w-32 clipped
+                    "Resource Count" to "Resource..." in every design system. */}
+                <SelectTrigger className="w-auto min-w-32" aria-label="Sort categories">
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
