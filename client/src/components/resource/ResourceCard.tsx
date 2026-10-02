@@ -231,12 +231,14 @@ function ResourceCard({
                   favoriteCount={resource.favoriteCount}
                   size="sm"
                   showCount={false}
+                  resourceTitle={resource.name}
                 />
                 <BookmarkButton
                   resourceId={resource.id}
                   isBookmarked={resource.isBookmarked}
                   notes={resource.bookmarkNotes}
                   size="sm"
+                  resourceTitle={resource.name}
                 />
               </div>
             )}
@@ -438,7 +440,7 @@ function ResourceCard({
               onClick={handleSuggestEdit}
               data-testid={`button-suggest-edit-${resource.id}`}
               title="Suggest an edit"
-              aria-label="Suggest an edit"
+              aria-label={`Suggest an edit: ${resource.name}`}
             >
               <Edit className="h-4 w-4" />
             </Button>

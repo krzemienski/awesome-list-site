@@ -80,8 +80,8 @@ export function ResourceListRow({ resource }: { resource: ViewModeResource }) {
             resources only (the toggles need a resource id). */}
         {resource.id !== "" && (
           <>
-            <FavoriteButton resourceId={resource.id} size="sm" showCount={false} />
-            <BookmarkButton resourceId={resource.id} size="sm" />
+            <FavoriteButton resourceId={resource.id} size="sm" showCount={false} resourceTitle={resource.title} />
+            <BookmarkButton resourceId={resource.id} size="sm" resourceTitle={resource.title} />
           </>
         )}
         <Button
@@ -141,8 +141,8 @@ export function ResourceCompactCard({ resource }: { resource: ViewModeResource }
           footer row (the title row is too tight at 2-up mobile widths). */}
       {resource.id !== "" && (
         <div className="relative z-10 flex items-center gap-0.5 mt-1 -mb-1 -ml-1">
-          <FavoriteButton resourceId={resource.id} size="sm" showCount={false} />
-          <BookmarkButton resourceId={resource.id} size="sm" />
+          <FavoriteButton resourceId={resource.id} size="sm" showCount={false} resourceTitle={resource.title} />
+          <BookmarkButton resourceId={resource.id} size="sm" resourceTitle={resource.title} />
         </div>
       )}
     </Card>

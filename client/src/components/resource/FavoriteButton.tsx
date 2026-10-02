@@ -13,6 +13,8 @@ interface FavoriteButtonProps {
   className?: string;
   size?: "sm" | "default" | "lg";
   showCount?: boolean;
+  /** Names the resource in the accessible label (see BookmarkButton). */
+  resourceTitle?: string;
 }
 
 // All toggle behavior (latest-wins rapid clicks, auth gate, error handling,
@@ -24,7 +26,8 @@ function FavoriteButton({
   favoriteCount: initialCount = 0,
   className,
   size = "default",
-  showCount = true
+  showCount = true,
+  resourceTitle,
 }: FavoriteButtonProps) {
   const [isFavorited, setIsFavorited] = useState(initialFavorited);
   const [favoriteCount, setFavoriteCount] = useState(initialCount);
@@ -100,7 +103,7 @@ function FavoriteButton({
       onClick={handleClick}
       aria-disabled={favorite.isPending}
       aria-busy={favorite.isPending}
-      aria-label={favoriteLabel}
+      aria-label={resourceTitle ? `${favoriteLabel}: ${resourceTitle}` : favoriteLabel}
       title={favoriteLabel}
       aria-pressed={isFavorited}
       data-testid="button-favorite"

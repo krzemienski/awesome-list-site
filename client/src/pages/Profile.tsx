@@ -706,6 +706,7 @@ export default function Profile({ user }: ProfileProps) {
                               isFavorited={true}
                               size="sm"
                               showCount={false}
+                              resourceTitle={favorite.title}
                             />
                             <Button
                               variant="ghost"
@@ -803,6 +804,7 @@ export default function Profile({ user }: ProfileProps) {
                               isBookmarked={true}
                               notes={bookmark.notes}
                               size="sm"
+                              resourceTitle={bookmark.title}
                             />
                             <Button
                               variant="ghost"

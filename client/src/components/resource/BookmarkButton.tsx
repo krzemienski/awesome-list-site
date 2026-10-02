@@ -21,6 +21,9 @@ interface BookmarkButtonProps {
   className?: string;
   size?: "sm" | "default" | "lg";
   showNotesDialog?: boolean;
+  /** Names the resource in the accessible label so a list of cards doesn't
+   *  announce several identical "Remove bookmark" buttons (C3-VX-01). */
+  resourceTitle?: string;
 }
 
 // All toggle behavior (latest-wins rapid clicks, auth gate, error handling,
@@ -32,7 +35,8 @@ function BookmarkButton({
   notes: initialNotes = "",
   className,
   size = "default",
-  showNotesDialog = true
+  showNotesDialog = true,
+  resourceTitle,
 }: BookmarkButtonProps) {
   const [isBookmarked, setIsBookmarked] = useState(initialBookmarked);
   const [notes, setNotes] = useState(initialNotes);
@@ -272,7 +276,7 @@ function BookmarkButton({
         onClick={handleClick}
         aria-disabled={bookmark.isPending}
         aria-busy={bookmark.isPending}
-        aria-label={bookmarkLabel}
+        aria-label={resourceTitle ? `${bookmarkLabel}: ${resourceTitle}` : bookmarkLabel}
         title={bookmarkLabel}
         aria-pressed={isBookmarked}
         data-testid="button-bookmark"
@@ -309,7 +313,7 @@ function BookmarkButton({
           size={size}
           className={cn("text-muted-foreground hover:text-foreground", className)}
           onClick={handleEditNotesClick}
-          aria-label="View or edit bookmark notes"
+          aria-label={resourceTitle ? `View or edit bookmark notes: ${resourceTitle}` : "View or edit bookmark notes"}
           data-testid="button-edit-bookmark-notes"
         >
           <NotebookPen className={size === "sm" ? "h-3.5 w-3.5" : "h-4 w-4"} />
