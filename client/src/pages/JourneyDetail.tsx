@@ -723,20 +723,30 @@ export default function JourneyDetail() {
                           </div>
                         )}
 
-                        {/* Complete Button */}
-                        {isEnrolled && !isStepCompleted && (
-                          <Button 
-                            variant="outline"
+                        {/* C6-V2-02: one button that switches between "Mark as
+                            Complete" and "Completed — Undo". Two conditional
+                            buttons unmounted the pressed one and dropped
+                            keyboard focus to <body>. */}
+                        {(isEnrolled || isStepCompleted) && (
+                          <Button
+                            variant={isStepCompleted ? "ghost" : "outline"}
                             className={cn(
-                              "journey-step-card__complete min-h-[44px]",
+                              isStepCompleted
+                                ? "journey-step-card__undo min-h-[44px] px-2"
+                                : "journey-step-card__complete min-h-[44px]",
                               completeStepMutation.isPending && "journey-step-card__complete--pending",
                             )}
-                            onClick={() => handleToggleStep(step.rowIds, true, step.stepNumber, index + 1)}
+                            onClick={() => handleToggleStep(step.rowIds, !isStepCompleted, step.stepNumber, index + 1)}
                             aria-disabled={completeStepMutation.isPending}
                             aria-busy={completeStepMutation.isPending}
-                            data-testid={`button-complete-step-${step.stepNumber}`}
+                            data-testid={`button-${isStepCompleted ? "uncomplete" : "complete"}-step-${step.stepNumber}`}
                           >
-                            {completeStepMutation.isPending ? (
+                            {isStepCompleted ? (
+                              <>
+                                <CheckCircle2 className="h-4 w-4 mr-2" />
+                                {completeStepMutation.isPending ? "Updating..." : "Completed — Undo"}
+                              </>
+                            ) : completeStepMutation.isPending ? (
                               <>Marking as Complete...</>
                             ) : (
                               <>
@@ -744,23 +754,6 @@ export default function JourneyDetail() {
                                 Mark as Complete
                               </>
                             )}
-                          </Button>
-                        )}
-
-                        {isStepCompleted && (
-                          <Button
-                            variant="ghost"
-                            className={cn(
-                              "journey-step-card__undo min-h-[44px] px-2",
-                              completeStepMutation.isPending && "journey-step-card__complete--pending",
-                            )}
-                            onClick={() => handleToggleStep(step.rowIds, false, step.stepNumber, index + 1)}
-                            aria-disabled={completeStepMutation.isPending}
-                            aria-busy={completeStepMutation.isPending}
-                            data-testid={`button-uncomplete-step-${step.stepNumber}`}
-                          >
-                            <CheckCircle2 className="h-4 w-4 mr-2" />
-                            {completeStepMutation.isPending ? "Updating..." : "Completed — Undo"}
                           </Button>
                         )}
                       </div>

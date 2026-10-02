@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Link } from "wouter";
 import { useQuery } from "@tanstack/react-query";
 import { ArrowLeft, Palette, User, ShieldCheck, Bookmark, Sparkles, ChevronRight, LogIn, RotateCcw, SlidersHorizontal } from "lucide-react";
@@ -124,6 +124,27 @@ export default function Settings() {
   >(null);
   const [showEmptyPreferencesEditor, setShowEmptyPreferencesEditor] =
     useState(false);
+  // C6-V3-01: Reset (confirmed) and "Choose preferences" both unmount the
+  // control that was pressed. Focus follows to whatever replaces it once it
+  // renders: the empty state's button, the form's first field, or back to
+  // Reset if the request failed.
+  const [pendingPreferencesFocus, setPendingPreferencesFocus] = useState<
+    "empty" | "form" | "reset" | null
+  >(null);
+  const preferencesContentRef = useRef<HTMLDivElement>(null);
+  const resetConfirmedRef = useRef(false);
+  useEffect(() => {
+    if (!pendingPreferencesFocus) return;
+    const selector = {
+      empty: '[data-testid="button-start-learning-preferences"]',
+      form: '[role="radio"][tabindex="0"], [role="radio"]',
+      reset: '[data-testid="button-reset-learning-preferences"]:not([disabled])',
+    }[pendingPreferencesFocus];
+    const target = preferencesContentRef.current?.querySelector<HTMLElement>(selector);
+    if (!target) return;
+    target.focus();
+    setPendingPreferencesFocus(null);
+  });
 
   useEffect(() => {
     setValues(
@@ -190,6 +211,7 @@ export default function Settings() {
       setValues(DEFAULT_LEARNING_PREFERENCES);
       setShowEmptyPreferencesEditor(false);
       setPreferenceErrors({});
+      setPendingPreferencesFocus("empty");
       toast({
         title: "Learning preferences reset",
         description:
@@ -201,6 +223,7 @@ export default function Settings() {
           ? error.message
           : "We couldn’t reset your learning preferences.",
       );
+      setPendingPreferencesFocus("reset");
     }
   };
   return (
@@ -287,7 +310,7 @@ export default function Settings() {
                 are not sent to analytics.
               </CardDescription>
             </CardHeader>
-            <CardContent>
+            <CardContent ref={preferencesContentRef}>
               {preferencesLoading || categoriesLoading ? (
                 <div className="space-y-3" aria-busy="true">
                   <div className="h-5 w-40 animate-pulse bg-muted" />
@@ -323,7 +346,10 @@ export default function Settings() {
                   </p>
                   <Button
                     className="mt-4"
-                    onClick={() => setShowEmptyPreferencesEditor(true)}
+                    onClick={() => {
+                      setShowEmptyPreferencesEditor(true);
+                      setPendingPreferencesFocus("form");
+                    }}
                     data-testid="button-start-learning-preferences"
                   >
                     Choose preferences
@@ -364,7 +390,14 @@ export default function Settings() {
                           Reset preferences
                         </Button>
                       </AlertDialogTrigger>
-                      <AlertDialogContent>
+                      <AlertDialogContent
+                        onCloseAutoFocus={(event) => {
+                          // The trigger is disabled, then gone, after a
+                          // confirmed reset; the effect above places focus.
+                          if (resetConfirmedRef.current) event.preventDefault();
+                          resetConfirmedRef.current = false;
+                        }}
+                      >
                         <AlertDialogHeader>
                           <AlertDialogTitle>
                             Reset learning preferences?
@@ -378,7 +411,10 @@ export default function Settings() {
                         <AlertDialogFooter>
                           <AlertDialogCancel>Cancel</AlertDialogCancel>
                           <AlertDialogAction
-                            onClick={() => void handleResetPreferences()}
+                            onClick={() => {
+                              resetConfirmedRef.current = true;
+                              void handleResetPreferences();
+                            }}
                             data-testid="button-confirm-reset-learning-preferences"
                           >
                             Reset preferences

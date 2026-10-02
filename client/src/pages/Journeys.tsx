@@ -1,5 +1,5 @@
 import { JourneyCardSkeleton } from "@/components/ui/skeletons";
-import { lazy, Suspense, useState } from "react";
+import { lazy, Suspense, useRef, useState } from "react";
 import { useQuery, useMutation } from "@tanstack/react-query";
 import { useLocation, Link } from "wouter";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader } from "@/components/ui/card";
@@ -89,6 +89,7 @@ export default function Journeys() {
     const fromUrl = new URLSearchParams(window.location.search).get("category");
     return fromUrl && fromUrl.trim() !== "" ? fromUrl : "all";
   });
+  const filterRef = useRef<HTMLDivElement>(null);
   const handleCategoryChange = (next: string) => {
     setSelectedCategory(next);
     // Run22 BUG-016: push (not replace) so Back steps through filter changes.
@@ -278,7 +279,7 @@ export default function Journeys() {
 
       {/* Filters */}
       <div className="journeys-toolbar">
-        <div className="journeys-filter">
+        <div className="journeys-filter" ref={filterRef}>
           <span className="journeys-filter__label">Filter by category:</span>
           <Suspense
             fallback={(
@@ -338,7 +339,12 @@ export default function Journeys() {
               <Button 
                 variant="outline" 
                 className="journeys-state__action"
-                onClick={() => handleCategoryChange("all")}
+                onClick={() => {
+                  handleCategoryChange("all");
+                  // C6-V2-01: this button unmounts with the empty state; hand
+                  // focus to the category filter it just reset.
+                  filterRef.current?.querySelector<HTMLElement>("button, select")?.focus();
+                }}
                 data-testid="button-clear-filter"
               >
                 Clear Filter
