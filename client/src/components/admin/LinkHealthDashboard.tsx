@@ -608,7 +608,9 @@ export default function LinkHealthDashboard() {
               value={statusFilter}
               onValueChange={(value) => setStatusFilter(value as 'all' | 'broken' | 'timeout' | 'redirect' | 'suspect')}
             >
-              <SelectTrigger className="w-[200px]" aria-label="Filter by link status">
+              {/* C5-V5B-02: size to the selected label (as C5-V2-02 did for the
+                  explorer sort) — a fixed 200px clipped "Suspect (takeover/parked)". */}
+              <SelectTrigger className="w-auto min-w-[200px]" aria-label="Filter by link status">
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>

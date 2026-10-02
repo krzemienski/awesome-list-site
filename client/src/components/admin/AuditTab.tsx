@@ -99,6 +99,7 @@ export default function AuditTab() {
   // Reaching the first/last page disables the pager button that was just
   // pressed; hand focus to its sibling so keyboard users don't drop to <body>.
   const prevButtonRef = useRef<HTMLButtonElement>(null);
+  const resourceIdInputRef = useRef<HTMLInputElement>(null);
   const nextButtonRef = useRef<HTMLButtonElement>(null);
 
   // Run23 NB-041: surface fetch failures as a distinct error state instead of
@@ -143,6 +144,8 @@ export default function AuditTab() {
     setResourceIdFilter("");
     setAppliedFilter("");
     setOffset(0);
+    // C5-V5B-03: Clear unmounts itself; hand focus to the now-empty filter.
+    resourceIdInputRef.current?.focus();
   };
 
   const formatDate = (date: string | null) => {
@@ -218,6 +221,7 @@ export default function AuditTab() {
             <div className="relative">
               <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-[var(--text-2)]" />
               <Input
+                ref={resourceIdInputRef}
                 placeholder="Filter by Resource ID..."
                 value={resourceIdFilter}
                 onChange={(e) => setResourceIdFilter(e.target.value)}

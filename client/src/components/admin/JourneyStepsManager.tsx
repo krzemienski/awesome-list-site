@@ -543,8 +543,19 @@ function StepsDialog({
                       </span>
                       {linkedRows.map((row) => (
                         <Badge key={row.id} variant="outline" className="gap-1">
-                          <ExternalLink className="h-3 w-3" />
-                          #{row.resourceId}
+                          {/* C5-V5B-01: the chip carried a link icon but was
+                              plain text; it now opens the linked resource. */}
+                          <a
+                            href={`/resource/${row.resourceId}`}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="inline-flex min-h-[32px] items-center gap-1 underline-offset-2 hover:underline"
+                            aria-label={`Open resource #${row.resourceId} in a new tab`}
+                            data-testid={`step-resource-link-${row.id}`}
+                          >
+                            <ExternalLink className="h-3 w-3" aria-hidden="true" />
+                            #{row.resourceId}
+                          </a>
                           {group.rows.length > 1 && (
                             <Button
                               type="button"
