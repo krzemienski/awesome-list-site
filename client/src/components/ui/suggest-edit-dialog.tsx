@@ -562,7 +562,18 @@ export function SuggestEditDialog({ resource, open, onOpenChange }: SuggestEditD
               render={({ field }) => (
                 <FormItem>
                   <FormLabel>Category</FormLabel>
-                  <Select onValueChange={field.onChange} value={field.value}>
+                  {/* C3-V2-01: a new parent invalidates the child picks, or the
+                      form would submit e.g. Encoding & Codecs › Roku. */}
+                  <Select
+                    onValueChange={(value) => {
+                      if (value !== field.value) {
+                        form.setValue("subcategory", "");
+                        form.setValue("subSubcategory", "");
+                      }
+                      field.onChange(value);
+                    }}
+                    value={field.value}
+                  >
                     <FormControl>
                       <SelectTrigger data-testid="select-edit-category">
                         <SelectValue placeholder="Select category" />
@@ -588,7 +599,13 @@ export function SuggestEditDialog({ resource, open, onOpenChange }: SuggestEditD
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel>Subcategory (Optional)</FormLabel>
-                    <Select onValueChange={field.onChange} value={field.value}>
+                    <Select
+                      onValueChange={(value) => {
+                        if (value !== field.value) form.setValue("subSubcategory", "");
+                        field.onChange(value);
+                      }}
+                      value={field.value}
+                    >
                       <FormControl>
                         <SelectTrigger data-testid="select-edit-subcategory">
                           <SelectValue placeholder="Select subcategory" />

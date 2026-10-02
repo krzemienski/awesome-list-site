@@ -397,10 +397,19 @@ export class ResourceRepository {
     // GIN index and preserves the established order-independent token policy.
     const searchTokens = tokenizeSearchQuery(search);
     const normalizedSearch = searchTokens.join(" ");
-    const ftsTerms = searchTokens
-      .map((token) => token.toLowerCase().replace(/[^\p{L}\p{N}_]+/gu, ""))
-      .filter(Boolean);
-    const tsQuery = ftsTerms.map((term) => `${term}:*`).join(" & ");
+    // C3-V2-03: Postgres indexes dotted names ("hls.js", "video.js") as one
+    // host-style lexeme, so the punctuation-stripped prefix alone ("hlsjs:*")
+    // missed most of them. A dotted token matches either form.
+    const tsQuery = searchTokens
+      .map((token) => {
+        const lower = token.toLowerCase();
+        const stripped = lower.replace(/[^\p{L}\p{N}_]+/gu, "");
+        if (!stripped) return "";
+        const dotted = lower.match(/[\p{L}\p{N}_]+(?:\.[\p{L}\p{N}_]+)+/u)?.[0];
+        return dotted ? `(${stripped}:* | ${dotted}:*)` : `${stripped}:*`;
+      })
+      .filter(Boolean)
+      .join(" & ");
     const strictSearchCondition = tsQuery
       ? sql`${resources.searchTsv} @@ to_tsquery('english', ${tsQuery})`
       : undefined;

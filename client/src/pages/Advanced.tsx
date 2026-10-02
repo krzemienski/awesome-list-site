@@ -7,7 +7,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import CategoryExplorer from "@/components/ui/category-explorer";
 import CommunityMetrics from "@/components/ui/community-metrics";
-import ExportTools from "@/components/ui/export-tools";
+import ExportTools, { type ExportFormat } from "@/components/ui/export-tools";
 import AIRecommendationsPanel from "@/components/ui/ai-recommendations-panel";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Button } from "@/components/ui/button";
@@ -77,8 +77,9 @@ export default function Advanced() {
     );
   });
 
-  // BUG-026 (run13): selected export format, driven by the showcase cards.
-  const [exportFormat, setExportFormat] = useState<"markdown" | "json" | "csv" | "pdf" | "html" | "yaml" | undefined>();
+  // BUG-026 (run13): selected export format, shared by the showcase cards and
+  // the Export Format select (C3-V2-02: one state, so they stay in sync).
+  const [exportFormat, setExportFormat] = useState<ExportFormat>("markdown");
 
   // R4-033 (run21): share ONE catalog cache entry app-wide. App.tsx fetches
   // under ["awesome-list-data"] via fetchStaticAwesomeList; using the raw
@@ -334,7 +335,8 @@ export default function Advanced() {
           {awesomeList ? (
             <ExportTools
               awesomeList={awesomeList}
-              formatOverride={exportFormat}
+              format={exportFormat}
+              onFormatChange={setExportFormat}
               className="discovery-tools-owned-panel discovery-tools-export-tools"
             />
           ) : null}
