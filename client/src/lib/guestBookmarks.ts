@@ -150,7 +150,18 @@ export function isGuestBookmarked(resourceId: string | number): boolean {
   return id !== null && getGuestBookmarkIdSet().has(id);
 }
 
-export function addGuestBookmark(resourceId: string | number): GuestAddResult {
+/** What removeGuestBookmark took out, so an Undo can put it back as it was. */
+export interface RemovedGuestBookmark {
+  entry: GuestBookmarkEntry;
+  index: number;
+}
+
+export function addGuestBookmark(
+  resourceId: string | number,
+  // C4-V4-04: Undo passes the removed entry back so the save keeps its
+  // original savedAt and slot instead of being re-dated as the newest.
+  restore?: RemovedGuestBookmark,
+): GuestAddResult {
   const current = getGuestBookmarks();
   const id = normalizeId(resourceId);
   if (id === null) return { ok: false, reason: "invalid", count: current.length };
@@ -160,23 +171,30 @@ export function addGuestBookmark(resourceId: string | number): GuestAddResult {
   if (current.length >= GUEST_BOOKMARK_CAP) {
     return { ok: false, reason: "cap", count: current.length };
   }
-  const next = [...current, { id, savedAt: new Date().toISOString() }];
+  const restored = restore?.entry.id === id ? restore : null;
+  const next = [...current];
+  next.splice(
+    restored ? Math.min(restored.index, next.length) : next.length,
+    0,
+    restored ? restored.entry : { id, savedAt: new Date().toISOString() },
+  );
   writeEntries(next);
   return { ok: true, count: next.length, alreadySaved: false };
 }
 
 export function removeGuestBookmark(resourceId: string | number): {
-  removed: boolean;
+  removed: RemovedGuestBookmark | null;
   count: number;
 } {
   const current = getGuestBookmarks();
   const id = normalizeId(resourceId);
-  if (id === null || !current.some((entry) => entry.id === id)) {
-    return { removed: false, count: current.length };
+  const index = id === null ? -1 : current.findIndex((entry) => entry.id === id);
+  if (index === -1) {
+    return { removed: null, count: current.length };
   }
   const next = current.filter((entry) => entry.id !== id);
   writeEntries(next);
-  return { removed: true, count: next.length };
+  return { removed: { entry: current[index], index }, count: next.length };
 }
 
 /** Bulk removal (single write + notification); returns the remaining count. */

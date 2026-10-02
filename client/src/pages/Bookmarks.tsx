@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import {
   Archive,
@@ -119,6 +119,7 @@ export default function Bookmarks() {
   const [collectionDialogOpen, setCollectionDialogOpen] = useState(false);
   const [editingCollection, setEditingCollection] = useState<BookmarkCollection | null>(null);
   const [collectionName, setCollectionName] = useState("");
+  const collectionNameRef = useRef<HTMLInputElement>(null);
   const [deleteCollection, setDeleteCollection] = useState<BookmarkCollection | null>(null);
   const [bulkStatus, setBulkStatus] = useState<BookmarkQueueStatus>("watch-next");
   const [bulkDestination, setBulkDestination] = useState("");
@@ -467,7 +468,7 @@ export default function Bookmarks() {
         ))}
       </section>
 
-      <div className="lg:grid lg:grid-cols-[15rem_minmax(0,1fr)] lg:gap-6">
+      <div className="lg:grid lg:grid-cols-[17rem_minmax(0,1fr)] lg:gap-6">
         <aside className="hidden lg:block" aria-label="Bookmark collections">
           <div className="account-collection-panel sticky top-24 space-y-2 p-3">
             <button
@@ -497,8 +498,11 @@ export default function Bookmarks() {
                   onClick={() => chooseCollection(String(collection.id))}
                   title={collection.name}
                 >
-                  <span className="flex items-center justify-between gap-2">
-                    <span className="min-w-0 break-words line-clamp-2">
+                  {/* C4-V4-02: no line clamp. Beside the reorder arrows the name
+                      column is narrow, and clamping cut names sharing a prefix
+                      to identical text; wrap the full name instead. */}
+                  <span className="flex items-center justify-between gap-2 py-2">
+                    <span className="min-w-0 break-words [overflow-wrap:anywhere]">
                       {collection.archivedAt ? "Archived · " : ""}
                       {collection.name}
                     </span>
@@ -532,7 +536,8 @@ export default function Bookmarks() {
           </div>
         </aside>
 
-        <main className="min-w-0 space-y-5">
+        {/* C4-V4-01: the app shell already renders the page's one <main>. */}
+        <div className="min-w-0 space-y-5">
           <div className="lg:hidden">
             <Label htmlFor="mobile-collection-filter" className="mb-2 block">
               Collection
@@ -558,8 +563,12 @@ export default function Bookmarks() {
               <div className="flex flex-wrap items-center justify-between gap-3">
                 <div className="min-w-0">
                   <div className="flex items-center gap-2">
-                    <Folder className="h-5 w-5 text-primary" aria-hidden="true" />
-                    <h2 className="truncate text-lg font-semibold">{selectedCollection.name}</h2>
+                    <Folder className="h-5 w-5 shrink-0 text-primary" aria-hidden="true" />
+                    {/* C4-V4-02: wrap, don't truncate; at phone width truncation
+                        cut prefix-sharing names to the same visible text. */}
+                    <h2 className="min-w-0 break-words text-lg font-semibold [overflow-wrap:anywhere]">
+                      {selectedCollection.name}
+                    </h2>
                     {selectedCollection.archivedAt && <Badge variant="secondary">Archived</Badge>}
                   </div>
                   <p className="mt-1 text-sm text-muted-foreground">
@@ -981,11 +990,20 @@ export default function Bookmarks() {
               </CardContent>
             </Card>
           )}
-        </main>
+        </div>
       </div>
 
       <Dialog open={collectionDialogOpen} onOpenChange={setCollectionDialogOpen}>
-        <DialogContent>
+        <DialogContent
+          // C4-V4-03: focus the name field here, not via autoFocus. autoFocus
+          // ran before Radix's open-focus event, so DialogContent recorded the
+          // input (gone after close) as the return target and focus fell to
+          // <body> instead of going back to New collection / Rename.
+          onOpenAutoFocus={(event) => {
+            event.preventDefault();
+            collectionNameRef.current?.focus();
+          }}
+        >
           <DialogHeader>
             <DialogTitle>{editingCollection ? "Rename collection" : "Create a collection"}</DialogTitle>
             <DialogDescription>
@@ -1002,11 +1020,11 @@ export default function Bookmarks() {
             <div>
               <Label htmlFor="collection-name" className="mb-2 block">Name</Label>
               <Input
+                ref={collectionNameRef}
                 id="collection-name"
                 value={collectionName}
                 onChange={(event) => setCollectionName(event.target.value)}
                 maxLength={80}
-                autoFocus
                 placeholder="e.g. Streaming fundamentals"
               />
             </div>
