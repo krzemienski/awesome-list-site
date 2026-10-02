@@ -184,6 +184,9 @@ export function registerAiJobsRoutes(
     try {
       const jobId = parseInt(req.params.id);
       if (Number.isNaN(jobId)) return res.status(400).json({ message: 'Invalid job ID' });
+      if (!(await enrichmentRepo.getEnrichmentJob(jobId))) {
+        return res.status(404).json({ message: 'Job not found' });
+      }
       const { getAgentEvents } = await import('../../ai/agentEvents');
       const afterSeq = req.query.afterSeq !== undefined ? parseInt(req.query.afterSeq as string) : undefined;
       const events = await getAgentEvents('enrichment', jobId, afterSeq);
@@ -476,6 +479,10 @@ export function registerAiJobsRoutes(
     try {
       const jobId = parseInt(req.params.id);
       if (Number.isNaN(jobId)) return res.status(400).json({ message: 'Invalid job ID' });
+      const { researchService } = await import('../../ai/researchService');
+      if (!(await researchService.getJob(jobId))) {
+        return res.status(404).json({ message: 'Job not found' });
+      }
       const { getAgentEvents } = await import('../../ai/agentEvents');
       const afterSeq = req.query.afterSeq !== undefined ? parseInt(req.query.afterSeq as string) : undefined;
       const events = await getAgentEvents('research', jobId, afterSeq);

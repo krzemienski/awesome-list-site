@@ -201,12 +201,33 @@ export function registerOperationsRoutes(
     const swaggerSpec = getSwaggerSpec();
     const esc = (s: string) =>
       String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+    // C3-API-01: no contract carries a summary, so a Summary column rendered
+    // blank on every row. Show what the spec does know: who may call the
+    // operation, plus its documented description where one exists.
+    const access = (op: any): string => {
+      if (op?.['x-requires-admin']) return 'Admin';
+      if (op?.security?.some((s: Record<string, unknown>) => 'BearerAuth' in s)) return 'API key';
+      if (op?.security?.length) return 'Signed in';
+      return 'Public';
+    };
+    const genericDescriptions = new Set([
+      'Successful response',
+      'Successful response with no body',
+    ]);
+    const describe = (op: any): string => {
+      if (op?.summary) return op.summary;
+      if (op?.description) return op.description;
+      const success = Object.entries(op?.responses ?? {}).find(([status]) => status.startsWith('2'));
+      const text = (success?.[1] as { description?: string } | undefined)?.description ?? '';
+      return genericDescriptions.has(text) ? '' : text;
+    };
     const rows: string[] = [];
     const paths = (swaggerSpec.paths ?? {}) as Record<string, Record<string, any>>;
     for (const [p, methods] of Object.entries(paths)) {
       for (const [method, op] of Object.entries(methods)) {
+        const description = describe(op);
         rows.push(
-          `<tr><td><code>${method.toUpperCase()}</code></td><td><code>${esc(p)}</code></td><td>${esc(op?.summary ?? '')}</td></tr>`
+          `<tr><td><code>${method.toUpperCase()}</code></td><td><code>${esc(p)}</code>${description ? `<br><small>${esc(description)}</small>` : ''}</td><td>${access(op)}</td></tr>`
         );
       }
     }
@@ -223,14 +244,14 @@ export function registerOperationsRoutes(
 <style>
 body{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;background:#0e0d0c;color:#e8e6e3;margin:2rem auto;max-width:60rem;padding:0 1rem;line-height:1.5}
 a{color:#ff3d52}table{border-collapse:collapse;width:100%;margin:1rem 0}
-td,th{border:1px solid #333;padding:.5rem;text-align:left}code{color:#5eddf2}
+td,th{border:1px solid #333;padding:.5rem;text-align:left}td:last-child{white-space:nowrap}code{color:#5eddf2}
 </style>
 </head>
 <body>
 <h1>${esc(swaggerSpec.info?.title ?? 'Public API')}</h1>
 <p>Version ${esc(swaggerSpec.info?.version ?? '')} — machine-readable spec: <a href="/api/openapi.json">/api/openapi.json</a> (OpenAPI 3.0)</p>
 <h2>Endpoints</h2>
-<table><thead><tr><th>Method</th><th>Path</th><th>Summary</th></tr></thead><tbody>
+<table><thead><tr><th>Method</th><th>Path</th><th>Access</th></tr></thead><tbody>
 ${rows.join('\n')}
 </tbody></table>
 <p>Each operation documents whether it requires the session cookie or an <code>Authorization: Bearer &lt;api-key&gt;</code> header. Validation errors use the field-level <code>{ "error": "validation_failed", "message": string, "fieldErrors": object, "errors": array }</code> envelope. Rate-limit state is exposed via <code>RateLimit-*</code> response headers.</p>

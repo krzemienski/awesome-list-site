@@ -71,15 +71,20 @@ export function registerAuthUserRoutes(
   });
 
   // GET /api/auth/me — deprecated REST-style alias (401 when unauthenticated).
-  app.get("/api/auth/me", (req, res) => {
-    res.setHeader("Deprecation", "true");
-    res.setHeader("Link", '</api/auth/user>; rel="successor-version"');
-    if (!req.dbUser) {
-      // BUG-051 (run14): canonical 401 body everywhere.
-      return res.status(401).json({ message: "Unauthorized" });
-    }
-    res.json(toClientUser(req.dbUser));
-  });
+  // The 401 comes from the isAuthenticated guard (canonical body, BUG-051) so
+  // the contract registry and /api/docs report this route as signed-in only.
+  app.get(
+    "/api/auth/me",
+    (_req, res, next) => {
+      res.setHeader("Deprecation", "true");
+      res.setHeader("Link", '</api/auth/user>; rel="successor-version"');
+      next();
+    },
+    isAuthenticated,
+    (req, res) => {
+      res.json(toClientUser(req.dbUser!));
+    },
+  );
 
   // POST /api/auth/logout-all — "sign out all devices": revoke every active
   // Clerk session for the caller. Uses the Clerk-native user id (NOT the
