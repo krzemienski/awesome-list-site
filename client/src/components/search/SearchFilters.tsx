@@ -11,6 +11,7 @@ import {
   type ResourceSearchSort, type ResourceSkillLevel, type ResourceSearchFacets,
 } from "@shared/resourceFacets-core";
 import { tagDisplayNameBranded } from "@shared/seo-templates";
+import { normalizeTag } from "@/lib/tags";
 
 type State = { category: string; subcategory: string; subSubcategory: string; tags: string[]; provider: string; format: string; skillLevel: string; sort: string };
 type Props = {
@@ -35,18 +36,25 @@ const FACET_VISIBLE_ROWS = 6;
 // Taxonomy facet values are the canonical names ("FFmpeg-Based Tools"); only
 // the placeholder value needs a label. Tags are slugs with their own display names.
 const label = (value: string) => value === "unknown" ? "Not yet classified" : value;
-const tagLabel = (value: string) => tagDisplayNameBranded(value);
+// C3-V1-02: an all-caps tag from the data ("AMD", via a card pill) keeps its
+// spelling; title-casing the slug would print "Amd".
+const tagLabel = (value: string) =>
+  /[A-Z]/.test(value) && value === value.toUpperCase() ? value.trim() : tagDisplayNameBranded(normalizeTag(value));
 const fieldLabel = (value: string) => value
   .replace(/([a-z])([A-Z])/g, "$1 $2")
   .replace(/[-_]/g, " ")
   .replace(/\b\w/g, c => c.toUpperCase());
-const options = (counts: Count[] | undefined, selected: string | string[], labels?: Record<string, string>, toLabel = label) => {
-  const values = new Map((counts ?? []).map(c => [c.value, c.count]));
+const identity = (value: string) => value;
+const options = (counts: Count[] | undefined, selected: string | string[], labels?: Record<string, string>, toLabel = label, keyOf = identity) => {
+  const values = new Map((counts ?? []).map(c => [keyOf(c.value), { value: c.value, count: c.count }]));
   const selectedValues = Array.isArray(selected) ? selected : selected ? [selected] : [];
+  // C3-V1-02: a selected value joins its facet row by identity (tags: the
+  // canonical slug, so "?tags=AMD" is the facet's "amd"), keeping the
+  // selected spelling, instead of adding a second zero-count row.
   for (const value of selectedValues) {
-    if (!values.has(value)) values.set(value, 0);
+    values.set(keyOf(value), { value, count: values.get(keyOf(value))?.count ?? 0 });
   }
-  return [...values].map(([value, count]) => ({ value, count, label: labels?.[value] ?? toLabel(value) }));
+  return [...values.values()].map(({ value, count }) => ({ value, count, label: labels?.[value] ?? toLabel(value) }));
 };
 
 /**
@@ -115,7 +123,7 @@ export default function SearchFilters({ state, facets, onChange, onClear, hideTa
   const activeCount = [state.category, state.subcategory, state.subSubcategory, state.provider, state.format, state.skillLevel].filter(Boolean).length + state.tags.length;
   // Task #379: selected tags sort first so a deep-linked selection is never cut
   // off by TAG_LIMIT and always stays removable from the panel.
-  const allTags = useMemo(() => options(facets?.tags, state.tags, undefined, tagLabel), [facets?.tags, state.tags]);
+  const allTags = useMemo(() => options(facets?.tags, state.tags, undefined, tagLabel, normalizeTag), [facets?.tags, state.tags]);
   const tags = useMemo(() => {
     const selected = new Set(state.tags.map(t => t.toLowerCase()));
     return allTags
