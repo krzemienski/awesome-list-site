@@ -101,6 +101,8 @@ function readCollection(params: URLSearchParams): string {
   return value && /^\d+$/.test(value) ? value : "all";
 }
 
+type FocusTarget = "all-saved" | "copy-link" | "publish-link";
+
 type ActionRequest = {
   url: string;
   method: "POST" | "PATCH" | "PUT" | "DELETE";
@@ -126,6 +128,10 @@ export default function Bookmarks() {
   const [bulkTag, setBulkTag] = useState("");
   const [noteTarget, setNoteTarget] = useState<BookmarkedResource | null>(null);
   const [noteText, setNoteText] = useState("");
+  // C5-V4-03: Publish link, Unpublish, Delete and Go to All saved unmount the
+  // button that ran them. Name the control that takes its place; the effect
+  // below focuses it once it has rendered instead of leaving focus on <body>.
+  const [focusAfterAction, setFocusAfterAction] = useState<FocusTarget | null>(null);
   const { toast } = useToast();
 
   const bookmarksQuery = useQuery<BookmarkedResource[]>({
@@ -173,6 +179,18 @@ export default function Bookmarks() {
         variant: "destructive",
       });
     },
+  });
+
+  useEffect(() => {
+    if (!focusAfterAction) return;
+    // The All saved entry is the sidebar button on lg and the Collection
+    // select below it; focus whichever one is displayed.
+    const target = Array.from(
+      document.querySelectorAll<HTMLElement>(`[data-focus-target="${focusAfterAction}"]`),
+    ).find((element) => element.getClientRects().length > 0);
+    if (!target) return;
+    target.focus();
+    setFocusAfterAction(null);
   });
 
   usePopstateParams((params) => {
@@ -474,6 +492,7 @@ export default function Bookmarks() {
             <button
               type="button"
               aria-pressed={collectionFilter === "all"}
+              data-focus-target="all-saved"
               className={`account-collection-button flex min-h-11 w-full items-center justify-between px-3 text-left text-sm ${
                 collectionFilter === "all" ? "account-collection-button--active" : ""
               }`}
@@ -543,7 +562,7 @@ export default function Bookmarks() {
               Collection
             </Label>
             <Select value={collectionFilter} onValueChange={chooseCollection}>
-              <SelectTrigger id="mobile-collection-filter">
+              <SelectTrigger id="mobile-collection-filter" data-focus-target="all-saved">
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>
@@ -613,11 +632,13 @@ export default function Bookmarks() {
                       variant="outline"
                       size="sm"
                       className="min-h-11"
+                      data-focus-target="publish-link"
                       onClick={() =>
                         actionMutation.mutate({
                           url: `/api/collections/${selectedCollection.id}/publish`,
                           method: "POST",
                           success: "Read-only sharing enabled",
+                          after: () => setFocusAfterAction("copy-link"),
                         })
                       }
                     >
@@ -631,6 +652,7 @@ export default function Bookmarks() {
                         variant="outline"
                         size="sm"
                         className="min-h-11"
+                        data-focus-target="copy-link"
                         onClick={() => copyShareLink(selectedCollection.publicUrl!)}
                       >
                         <Clipboard className="h-4 w-4 mr-2" aria-hidden="true" />
@@ -645,6 +667,7 @@ export default function Bookmarks() {
                             url: `/api/collections/${selectedCollection.id}/publish`,
                             method: "DELETE",
                             success: "Public access revoked",
+                            after: () => setFocusAfterAction("publish-link"),
                           })
                         }
                       >
@@ -964,7 +987,13 @@ export default function Bookmarks() {
                   To add bookmarks, open All saved, select the bookmarks you want, then pick
                   this collection under Move to collection and choose Move.
                 </p>
-                <Button variant="outline" onClick={() => chooseCollection("all")}>
+                <Button
+                  variant="outline"
+                  onClick={() => {
+                    chooseCollection("all");
+                    setFocusAfterAction("all-saved");
+                  }}
+                >
                   Go to All saved
                 </Button>
               </CardContent>
@@ -1061,6 +1090,7 @@ export default function Bookmarks() {
                   after: () => {
                     chooseCollection("all");
                     setDeleteCollection(null);
+                    setFocusAfterAction("all-saved");
                   },
                 });
               }}
