@@ -684,8 +684,11 @@ export default function Profile({ user }: ProfileProps) {
                         key={favorite.id}
                         className="account-list-item p-3"
                       >
-                        <div className="flex items-start justify-between gap-2">
-                          <div className="flex-1 min-w-0">
+                        {/* C5-V4-01: below sm the category/date row spans the
+                            full width under the actions; in the narrow title
+                            column the nowrap chip ran under Remove. */}
+                        <div className="grid grid-cols-[minmax(0,1fr)_auto] items-start gap-x-2">
+                          <div className="min-w-0">
                             {/* Run15 BUG-006: title links to the in-app resource page. */}
                             <h4 className="font-medium truncate">
                               <Link
@@ -696,16 +699,8 @@ export default function Profile({ user }: ProfileProps) {
                                 {favorite.title}
                               </Link>
                             </h4>
-                            <div className="flex flex-wrap items-center gap-x-2 gap-y-1 mt-1">
-                              <Badge variant="secondary" className="text-xs">
-                                {favorite.category}
-                              </Badge>
-                              <span className="text-xs text-muted-foreground">
-                                Added {formatDistanceToNow(new Date(favorite.favoritedAt), { addSuffix: true })}
-                              </span>
-                            </div>
                           </div>
-                          <div className="flex shrink-0 items-center gap-1">
+                          <div className="flex items-center gap-1 sm:row-span-2">
                             <FavoriteButton
                               resourceId={String(favorite.id)}
                               isFavorited={true}
@@ -727,6 +722,14 @@ export default function Profile({ user }: ProfileProps) {
                                 <ExternalLink className="h-4 w-4" aria-hidden="true" />
                               </a>
                             </Button>
+                          </div>
+                          <div className="col-span-2 mt-1 flex flex-wrap items-center gap-x-2 gap-y-1 sm:col-span-1">
+                            <Badge variant="secondary" className="max-w-full whitespace-normal text-xs">
+                              {favorite.category}
+                            </Badge>
+                            <span className="text-xs text-muted-foreground">
+                              Added {formatDistanceToNow(new Date(favorite.favoritedAt), { addSuffix: true })}
+                            </span>
                           </div>
                         </div>
                       </div>
@@ -782,8 +785,9 @@ export default function Profile({ user }: ProfileProps) {
                         key={bookmark.id}
                         className="account-list-item p-3"
                       >
-                        <div className="flex items-start justify-between gap-2">
-                          <div className="flex-1 min-w-0">
+                        {/* C5-V4-01: same layout as the Favorites rows above. */}
+                        <div className="grid grid-cols-[minmax(0,1fr)_auto] items-start gap-x-2">
+                          <div className="min-w-0">
                             {/* Run15 BUG-006: title links to the in-app resource page. */}
                             <h4 className="font-medium truncate">
                               <Link
@@ -799,16 +803,8 @@ export default function Profile({ user }: ProfileProps) {
                                 {bookmark.notes}
                               </p>
                             )}
-                            <div className="flex flex-wrap items-center gap-x-2 gap-y-1 mt-2">
-                              <Badge variant="secondary" className="text-xs">
-                                {bookmark.category}
-                              </Badge>
-                              <span className="text-xs text-muted-foreground">
-                                Added {formatDistanceToNow(new Date(bookmark.bookmarkedAt), { addSuffix: true })}
-                              </span>
-                            </div>
                           </div>
-                          <div className="flex shrink-0 items-center gap-1">
+                          <div className="flex items-center gap-1 sm:row-span-2">
                             <BookmarkButton
                               resourceId={String(bookmark.id)}
                               isBookmarked={true}
@@ -830,6 +826,14 @@ export default function Profile({ user }: ProfileProps) {
                                 <ExternalLink className="h-4 w-4" aria-hidden="true" />
                               </a>
                             </Button>
+                          </div>
+                          <div className="col-span-2 mt-2 flex flex-wrap items-center gap-x-2 gap-y-1 sm:col-span-1">
+                            <Badge variant="secondary" className="max-w-full whitespace-normal text-xs">
+                              {bookmark.category}
+                            </Badge>
+                            <span className="text-xs text-muted-foreground">
+                              Added {formatDistanceToNow(new Date(bookmark.bookmarkedAt), { addSuffix: true })}
+                            </span>
                           </div>
                         </div>
                       </div>
