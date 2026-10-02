@@ -1,4 +1,4 @@
-import { lazy, Suspense, useEffect, useRef, useState } from "react";
+import { lazy, Suspense, useEffect, useRef, useState, type KeyboardEvent } from "react";
 import * as DialogPrimitive from "@radix-ui/react-dialog";
 import { useQuery } from "@tanstack/react-query";
 import { Command, CommandGroup, CommandInput, CommandItem, CommandList } from "@/components/ui/command";
@@ -204,6 +204,14 @@ export default function SearchDialog({ isOpen, setIsOpen }: SearchDialogProps) {
     navigate(`/category/${category.slug}`);
   };
 
+  // C4-V2-01: cmdk's root keydown handler owns Enter for its whole subtree
+  // (preventDefault + select the highlighted row), which swallowed the native
+  // activation of plain buttons rendered inside <Command>. Keep Enter on
+  // those buttons away from cmdk so the focused button itself activates.
+  const keepNativeEnter = (event: KeyboardEvent) => {
+    if (event.key === "Enter") event.stopPropagation();
+  };
+
   const restoreOpenerFocus = (event: Event) => {
     const opener = openerRef.current && openerRef.current !== document.body
       ? openerRef.current
@@ -255,6 +263,7 @@ export default function SearchDialog({ isOpen, setIsOpen }: SearchDialogProps) {
         <button
           type="button"
           className="search-palette-clear"
+          onKeyDown={keepNativeEnter}
           onClick={() => {
             try {
               localStorage.removeItem(RECENT_SEARCHES_KEY);
@@ -262,6 +271,9 @@ export default function SearchDialog({ isOpen, setIsOpen }: SearchDialogProps) {
               // storage may be unavailable — clearing the UI is still useful
             }
             setRecentSearches([]);
+            // C4-V2-01: this button unmounts with the list; keep focus in the
+            // palette rather than dropping it to <body>.
+            inputRef.current?.focus();
           }}
           data-testid="button-clear-recent-searches"
         >
@@ -362,7 +374,7 @@ export default function SearchDialog({ isOpen, setIsOpen }: SearchDialogProps) {
               aria-label="Search resources, categories, and pages"
               placeholder="Find resources, categories, or pages…"
               trailing={
-                <DialogPrimitive.Close className="search-palette-close" aria-label="Close search">
+                <DialogPrimitive.Close className="search-palette-close" aria-label="Close search" onKeyDown={keepNativeEnter}>
                   <kbd className="kbd">esc</kbd>
                   <span className="sr-only">Close search</span>
                 </DialogPrimitive.Close>
@@ -406,7 +418,7 @@ export default function SearchDialog({ isOpen, setIsOpen }: SearchDialogProps) {
                     ) : (
                       <>
                         <span>Search failed. Please try again.</span>
-                        <button type="button" onClick={() => resourceQuery.refetch()}>Try again</button>
+                        <button type="button" onKeyDown={keepNativeEnter} onClick={() => resourceQuery.refetch()}>Try again</button>
                       </>
                     )}
                   </div>
