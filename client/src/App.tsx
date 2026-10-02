@@ -32,6 +32,7 @@ import { signInSeoDescription, signUpSeoDescription } from "@shared/seo-template
 import AuthConversionTracker from "@/components/auth/AuthConversionTracker";
 import GuestBookmarkMerge from "@/components/auth/GuestBookmarkMerge";
 import StaleSessionGate from "@/components/auth/StaleSessionGate";
+import { ClerkUiFallback } from "@/components/auth/AuthUnavailable";
 import ConsentBanner from "@/components/ui/consent-banner";
 import ScrubbedParamsNotice from "@/components/ui/scrubbed-params-notice";
 import { Button } from "@/components/ui/button";
@@ -416,10 +417,12 @@ function SignInPage() {
       {/* Title mirrors the og-middleware /sign-in template (two-pass parity). */}
       <SEOHead title="Sign In" description={signInSeoDescription} noindex />
       <StaleSessionGate>
+        {/* C5-V3-01: never a blank body while Clerk's UI can't load. */}
         <SignIn
           routing="path"
           path={`${basePath}/sign-in`}
           signUpUrl={`${basePath}/sign-up`}
+          fallback={<ClerkUiFallback flow="sign-in" />}
         />
       </StaleSessionGate>
     </div>
@@ -442,6 +445,7 @@ function SignUpPage() {
           routing="path"
           path={`${basePath}/sign-up`}
           signInUrl={`${basePath}/sign-in`}
+          fallback={<ClerkUiFallback flow="sign-up" />}
         />
       </StaleSessionGate>
     </div>
