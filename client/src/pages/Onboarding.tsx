@@ -87,14 +87,22 @@ export default function Onboarding() {
     let initialStep =
       stepFromUrl() ?? preferences?.onboardingStep ?? 1;
     const stored = safeGetItem(DRAFT_STORAGE_KEY);
-    if (stored && preferences?.onboardingStatus !== "completed") {
+    if (stored) {
       try {
         const draft = JSON.parse(stored) as {
           userId?: string;
           values?: LearningPreferencesValues;
           step?: number;
+          revision?: number | null;
         };
+        // C3-V4-03: a revisit of a completed onboarding keeps its unsaved
+        // choice across a reload too, but only while the saved preferences
+        // are the ones the draft was based on — a later edit elsewhere wins.
+        const draftIsCurrent =
+          preferences?.onboardingStatus !== "completed" ||
+          (preferences?.revision !== undefined && draft.revision === preferences.revision);
         if (
+          draftIsCurrent &&
           draft.userId === user.id &&
           draft.values &&
           Number.isInteger(draft.step) &&
@@ -158,7 +166,12 @@ export default function Onboarding() {
     if (!user?.id) return;
     safeSetItem(
       DRAFT_STORAGE_KEY,
-      JSON.stringify({ userId: user.id, values: nextValues, step: nextStep }),
+      JSON.stringify({
+        userId: user.id,
+        values: nextValues,
+        step: nextStep,
+        revision: preferences?.revision ?? null,
+      }),
     );
   };
 

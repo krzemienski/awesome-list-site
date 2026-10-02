@@ -429,7 +429,7 @@ function ResourceCard({
               <ExternalLink className="h-4 w-4 mr-2" />
               Open Link
               {/* Run25 F-003: SRs need to know this leaves the app in a new tab. */}
-              <span className="sr-only"> (opens in new tab)</span>
+              <span className="sr-only">{`: ${resource.name} (opens in new tab)`}</span>
             </a>
           </Button>
           {isValidDbResource && showPersonalActions && (

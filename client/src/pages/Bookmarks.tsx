@@ -878,6 +878,9 @@ export default function Bookmarks() {
                       variant="ghost"
                       size="sm"
                       className="min-h-11"
+                      // C3-V4-02: name the resource so repeated card toolbars
+                      // don't announce identical "Note" / "Archive" buttons.
+                      aria-label={`Note: ${resource.title}`}
                       onClick={() => {
                         setNoteTarget(resource);
                         setNoteText(resource.notes ?? "");
@@ -890,6 +893,7 @@ export default function Bookmarks() {
                       variant="ghost"
                       size="sm"
                       className="min-h-11"
+                      aria-label={`${resource.archivedAt ? "Restore" : "Archive"}: ${resource.title}`}
                       onClick={() =>
                         actionMutation.mutate({
                           url: `/api/bookmarks/${resource.id}/state`,
