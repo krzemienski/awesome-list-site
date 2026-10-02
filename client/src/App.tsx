@@ -10,7 +10,7 @@ import {
   type ReactNode,
 } from "react";
 import { Switch, Route, Redirect, useLocation, useSearch } from "wouter";
-import { ClerkProvider, SignIn, SignUp, useClerk } from "@clerk/react";
+import { ClerkProvider, SignIn, SignUp, useAuth as useClerkAuth, useClerk } from "@clerk/react";
 import { AccountThemePreferenceBridge } from "@/components/ui/theme-provider";
 import { publishableKeyFromHost } from "@clerk/react/internal";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
@@ -486,14 +486,21 @@ function ClerkQueryClientCacheInvalidator() {
 // SPA-side /logout. Both direct and client-side navigation render this route,
 // which signs out via Clerk and confirms invalidation before redirecting.
 function Logout() {
-  const { signOut } = useClerk();
+  const { isLoaded, signOut } = useClerkAuth();
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
+    // C3-V3-02: on a direct /logout load Clerk is still loading, and signOut()
+    // then only queues the call and resolves at once — the server check below
+    // saw a live session, and the queued signOut later routed to "/"
+    // client-side, leaving the cached signed-in user in the header.
+    if (!isLoaded) return;
     let cancelled = false;
     const doSignOut = async () => {
       try {
-        await signOut();
+        // The callback replaces Clerk's own navigation so the full reload
+        // below, not a client-side route change, ends the signed-in page.
+        await signOut(() => {});
         clearSignedInClientState();
         const authCheck = await fetch("/api/auth/user", {
           credentials: "include",
@@ -517,7 +524,7 @@ function Logout() {
     return () => {
       cancelled = true;
     };
-  }, [signOut]);
+  }, [isLoaded, signOut]);
   return (
     // min-h-full, not min-h-screen: this screen renders inside the app shell's
     // <main>, and a row that claims a viewport height of its own pushes the

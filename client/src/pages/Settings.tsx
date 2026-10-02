@@ -230,7 +230,15 @@ export default function Settings() {
 
       <div className="grid gap-3 sm:grid-cols-2">
         {links.map(({ href, icon: Icon, title, description, testid }) => (
-          <Link key={testid} href={href} data-testid={testid}>
+          // C3-V3-01: the <article> card hides its heading from the link's
+          // computed name, so label the link from the visible title/text.
+          <Link
+            key={testid}
+            href={href}
+            data-testid={testid}
+            aria-labelledby={`${testid}-title`}
+            aria-describedby={`${testid}-description`}
+          >
             <Card
               hoverable
               className="h-full p-4 flex items-start gap-3 hover:border-[var(--accent)] transition-colors cursor-pointer"
@@ -238,10 +246,10 @@ export default function Settings() {
               <Icon className="h-5 w-5 text-[var(--accent)] mt-0.5 shrink-0" />
               <div className="min-w-0 flex-1">
                 <div className="flex items-center justify-between gap-2">
-                  <h2 className="font-sans font-semibold text-base">{title}</h2>
+                  <h2 id={`${testid}-title`} className="font-sans font-semibold text-base">{title}</h2>
                   <ChevronRight className="h-4 w-4 text-[color:var(--text-3)] shrink-0" />
                 </div>
-                <p className="text-sm text-[color:var(--text-2)] mt-1">{description}</p>
+                <p id={`${testid}-description`} className="text-sm text-[color:var(--text-2)] mt-1">{description}</p>
               </div>
             </Card>
           </Link>

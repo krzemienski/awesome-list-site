@@ -99,7 +99,9 @@ export function useAuth() {
 
   /** Sign out via Clerk, then confirm the server no longer sees a session. */
   const clerkSignOutAndVerify = async () => {
-    await signOut();
+    // The no-op callback stops Clerk routing to its after-sign-out URL;
+    // finishLogout does the full reload once the server confirms (C3-V3-02).
+    await signOut(() => {});
     const authCheck = await fetch('/api/auth/user', {
       credentials: 'include',
       cache: 'no-store',
