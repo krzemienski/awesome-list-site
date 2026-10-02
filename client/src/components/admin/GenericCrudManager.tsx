@@ -55,6 +55,7 @@ export interface BaseEntityWithCount {
  * @property {string} queryKey - React Query key for fetching parent entities
  * @property {string} fetchUrl - API endpoint to fetch parent entities
  * @property {string} [filterBy] - Field name to filter by (enables cascading dropdowns, e.g., 'platformId')
+ * @property {string} [emptyHint] - Shown (with the select disabled) when the chosen filterBy parent has no options
  * @property {Function} [getNameFn] - Custom function to get the display name of a parent entity
  *
  * @example
@@ -83,6 +84,7 @@ export interface ParentConfig {
   queryKey: string;
   fetchUrl: string;
   filterBy?: string;
+  emptyHint?: string;
   getNameFn?: (id: number, parentData?: BaseEntityWithCount[]) => string;
 }
 
@@ -1063,6 +1065,12 @@ export default function GenericCrudManager<T extends BaseEntityWithCount>({
   // so the dialog stays open with the user's input intact for correction.
   const [formError, setFormError] = useState<string | null>(null);
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+  // C3-V5B-02: the deleted row's Delete button (the dialog's return-focus
+  // target) unmounts once the list refetches, dropping focus to <body>. After a
+  // successful delete, focus a neighbouring row's Edit button (or Add) instead.
+  const createButtonRef = useRef<HTMLButtonElement>(null);
+  const editButtonRefs = useRef(new Map<number, HTMLButtonElement>());
+  const deleteFocusTargetRef = useRef<HTMLElement | null>(null);
   const [selectedItem, setSelectedItem] = useState<T | null>(null);
   const [fileData, setFileData] = useState<Record<string, File | null>>({});
   const [filePreviews, setFilePreviews] = useState<Record<string, string>>({});
@@ -1897,6 +1905,11 @@ export default function GenericCrudManager<T extends BaseEntityWithCount>({
         title: "Success",
         description: `${entityName} deleted successfully`
       });
+      const rows = paginatedItems || [];
+      const index = rows.findIndex(item => item.id === id);
+      const neighbour = rows[index + 1] ?? rows[index - 1];
+      deleteFocusTargetRef.current =
+        (neighbour && editButtonRefs.current.get(neighbour.id)) || createButtonRef.current;
       setDeleteDialogOpen(false);
       setSelectedItem(null);
     },
@@ -2048,6 +2061,47 @@ export default function GenericCrudManager<T extends BaseEntityWithCount>({
 
     return (parentData[parentFieldName] || []).filter(item =>
       item[parent.filterBy!] === parseInt(filterValue as string)
+    );
+  };
+
+  // C3-V5B-01: a cascading select whose chosen parent has no children used to
+  // stay enabled and open an empty list; disable it and say why instead.
+  const renderParentSelect = (parent: ParentConfig, mode: 'create' | 'edit') => {
+    const options = getFilteredParentOptions(parent.fieldName);
+    const awaitingFilter = !!(parent.filterBy && !formData[parent.filterBy]);
+    const noOptions = !!parent.filterBy && !awaitingFilter && options.length === 0;
+    const id = `${mode}-${parent.fieldName}`;
+    const hintId = `${id}-empty-hint`;
+
+    return (
+      <div key={parent.fieldName} className="space-y-2">
+        <Label htmlFor={id}>{parent.label}</Label>
+        <Select
+          value={formData[parent.fieldName] as string}
+          onValueChange={(value) => handleParentChange(parent.fieldName, value)}
+          disabled={awaitingFilter || noOptions}
+        >
+          <SelectTrigger
+            id={id}
+            aria-describedby={noOptions ? hintId : undefined}
+            data-testid={`select-${mode}-${parent.fieldName.replace(/([A-Z])/g, '-$1').toLowerCase()}`}
+          >
+            <SelectValue placeholder={`Select ${parent.label.toLowerCase().replace(' *', '')}`} />
+          </SelectTrigger>
+          <SelectContent>
+            {options.map((option) => (
+              <SelectItem key={option.id} value={option.id.toString()}>
+                {option.name}
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
+        {noOptions && (
+          <p id={hintId} className="text-xs text-muted-foreground" data-testid={`hint-${id}-empty`}>
+            {parent.emptyHint ?? "No options are available for this selection yet."}
+          </p>
+        )}
+      </div>
     );
   };
 
@@ -2671,6 +2725,7 @@ export default function GenericCrudManager<T extends BaseEntityWithCount>({
               </Button>
             )}
             <Button
+              ref={createButtonRef}
               variant="outline"
               onClick={openCreateDialog}
               data-testid={`button-create-${testIdEntity}`}
@@ -2789,6 +2844,10 @@ export default function GenericCrudManager<T extends BaseEntityWithCount>({
                           ) : col.key === "actions" ? (
                             <div className="admin-taxonomy-row-actions flex items-center justify-end gap-2">
                               <Button
+                                ref={(el) => {
+                                  if (el) editButtonRefs.current.set(item.id, el);
+                                  else editButtonRefs.current.delete(item.id);
+                                }}
                                 variant="ghost"
                                 size="sm"
                                 onClick={() => openEditDialog(item)}
@@ -2903,35 +2962,7 @@ export default function GenericCrudManager<T extends BaseEntityWithCount>({
             </div>
           )}
           <div className="admin-taxonomy-form space-y-4 py-4">
-            {parents.map((parent, index) => {
-              const options = getFilteredParentOptions(parent.fieldName);
-              const isDisabled = !!(parent.filterBy && !formData[parent.filterBy]);
-
-              return (
-                <div key={parent.fieldName} className="space-y-2">
-                  <Label htmlFor={`create-${parent.fieldName}`}>{parent.label}</Label>
-                  <Select
-                    value={formData[parent.fieldName] as string}
-                    onValueChange={(value) => handleParentChange(parent.fieldName, value)}
-                    disabled={isDisabled}
-                  >
-                    <SelectTrigger
-                      id={`create-${parent.fieldName}`}
-                      data-testid={`select-create-${parent.fieldName.replace(/([A-Z])/g, '-$1').toLowerCase()}`}
-                    >
-                      <SelectValue placeholder={`Select ${parent.label.toLowerCase().replace(' *', '')}`} />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {options.map((option) => (
-                        <SelectItem key={option.id} value={option.id.toString()}>
-                          {option.name}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                </div>
-              );
-            })}
+            {parents.map((parent) => renderParentSelect(parent, 'create'))}
             <div className="space-y-2">
               <Label htmlFor="create-name">{formFields.name.label}</Label>
               <Input
@@ -3150,35 +3181,7 @@ export default function GenericCrudManager<T extends BaseEntityWithCount>({
             </div>
           )}
           <div className="admin-taxonomy-form space-y-4 py-4">
-            {parents.map((parent, index) => {
-              const options = getFilteredParentOptions(parent.fieldName);
-              const isDisabled = !!(parent.filterBy && !formData[parent.filterBy]);
-
-              return (
-                <div key={parent.fieldName} className="space-y-2">
-                  <Label htmlFor={`edit-${parent.fieldName}`}>{parent.label}</Label>
-                  <Select
-                    value={formData[parent.fieldName] as string}
-                    onValueChange={(value) => handleParentChange(parent.fieldName, value)}
-                    disabled={isDisabled}
-                  >
-                    <SelectTrigger
-                      id={`edit-${parent.fieldName}`}
-                      data-testid={`select-edit-${parent.fieldName.replace(/([A-Z])/g, '-$1').toLowerCase()}`}
-                    >
-                      <SelectValue placeholder={`Select ${parent.label.toLowerCase().replace(' *', '')}`} />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {options.map((option) => (
-                        <SelectItem key={option.id} value={option.id.toString()}>
-                          {option.name}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                </div>
-              );
-            })}
+            {parents.map((parent) => renderParentSelect(parent, 'edit'))}
             <div className="space-y-2">
               <Label htmlFor="edit-name">{formFields.name.label}</Label>
               <Input
@@ -3387,7 +3390,16 @@ export default function GenericCrudManager<T extends BaseEntityWithCount>({
 
       {/* Delete Dialog */}
       <AlertDialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
-        <AlertDialogContent data-testid={`dialog-delete-${testIdEntity}`}>
+        <AlertDialogContent
+          data-testid={`dialog-delete-${testIdEntity}`}
+          onCloseAutoFocus={(event) => {
+            const target = deleteFocusTargetRef.current;
+            deleteFocusTargetRef.current = null;
+            if (!target?.isConnected) return;
+            event.preventDefault();
+            target.focus();
+          }}
+        >
           <AlertDialogHeader>
             <AlertDialogTitle>Delete {entityName}</AlertDialogTitle>
             <AlertDialogDescription>
@@ -3404,7 +3416,11 @@ export default function GenericCrudManager<T extends BaseEntityWithCount>({
               Cancel
             </AlertDialogCancel>
             <AlertDialogAction
-              onClick={handleDelete}
+              onClick={(event) => {
+                // Stay open until the delete settles so onSuccess can pick the focus target.
+                event.preventDefault();
+                handleDelete();
+              }}
               disabled={deleteMutation.isPending || (!!selectedItem && !!getDeleteBlocker(selectedItem))}
               className="bg-destructive hover:bg-destructive/90"
               data-testid="button-confirm-delete"

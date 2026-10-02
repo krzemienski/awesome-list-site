@@ -202,8 +202,12 @@ export default function UsersTab() {
               ref={searchInputRef}
               value={searchInput}
               onChange={(e) => setSearchInput(e.target.value)}
-              placeholder="Search by email or name…"
-              className="pl-8 pr-8"
+              // C3-V5B-05: the field is a fixed 12.5rem in the card header, so
+              // keep the hint short and reserve the clear-button gutter only
+              // while the button is shown; the aria-label carries the full name.
+              placeholder="Email or name…"
+              aria-label="Search users by email or name"
+              className={searchInput ? "pl-8 pr-8" : "pl-8"}
               data-testid="input-user-search"
             />
             {searchInput && (

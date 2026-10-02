@@ -36,7 +36,8 @@ export const subSubcategoryConfig: GenericCrudManagerProps<SubSubcategoryWithCou
       label: "Parent Subcategory *",
       queryKey: "/api/admin/subcategories",
       fetchUrl: "/api/admin/subcategories",
-      filterBy: "categoryId"
+      filterBy: "categoryId",
+      emptyHint: "This category has no subcategories yet. Pick another category or add a subcategory first."
     }
   ],
   columns: [

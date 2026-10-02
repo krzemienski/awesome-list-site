@@ -216,20 +216,24 @@ export default function AuditTab() {
     >
       <div className="space-y-4">
         {showTools && <form onSubmit={handleSearch} className="admin-ops-audit-toolbar flex flex-col sm:flex-row gap-3">
-          <div className="flex-1 relative">
-            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-[var(--text-2)]" />
-            <Input
-              placeholder="Filter by Resource ID..."
-              value={resourceIdFilter}
-              onChange={(e) => setResourceIdFilter(e.target.value)}
-              className="pl-10"
-              type="number"
-              min={1}
-              max={PG_INT4_MAX}
-              aria-invalid={resourceIdInvalid}
-              aria-describedby={resourceIdInvalid ? "audit-resource-id-error" : undefined}
-              data-testid="input-audit-resource-id"
-            />
+          <div className="flex-1">
+            {/* C3-V5B-08: the icon centres against the input alone, not the
+                wrapper that also grows to hold the error line below. */}
+            <div className="relative">
+              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-[var(--text-2)]" />
+              <Input
+                placeholder="Filter by Resource ID..."
+                value={resourceIdFilter}
+                onChange={(e) => setResourceIdFilter(e.target.value)}
+                className="pl-10"
+                type="number"
+                min={1}
+                max={PG_INT4_MAX}
+                aria-invalid={resourceIdInvalid}
+                aria-describedby={resourceIdInvalid ? "audit-resource-id-error" : undefined}
+                data-testid="input-audit-resource-id"
+              />
+            </div>
             {/* ADM-08: honest inline validation instead of a misleading
                 server-error alert after a failed request. */}
             {resourceIdInvalid && (
@@ -266,13 +270,17 @@ export default function AuditTab() {
               Clear
             </Button>
           )}
+          {/* C3-V5B-09: aria-disabled (not disabled) so a keyboard user keeps
+              focus on the button while the refetch runs. */}
           <Button
             type="button"
             variant="outline"
             size="icon"
-            onClick={() => refetch()}
-            disabled={isFetching}
+            onClick={() => { if (!isFetching) void refetch(); }}
+            aria-disabled={isFetching}
+            aria-busy={isFetching}
             aria-label="Refresh"
+            data-testid="button-audit-refresh"
           >
             <RefreshCw className={`h-4 w-4 ${isFetching ? 'animate-spin' : ''}`} />
           </Button>
@@ -295,8 +303,9 @@ export default function AuditTab() {
               type="button"
               variant="outline"
               size="sm"
-              onClick={() => refetch()}
-              disabled={isFetching}
+              onClick={() => { if (!isFetching) void refetch(); }}
+              aria-disabled={isFetching}
+              aria-busy={isFetching}
               data-testid="button-audit-retry"
             >
               <RefreshCw className={`h-4 w-4 mr-2 ${isFetching ? 'animate-spin' : ''}`} />
