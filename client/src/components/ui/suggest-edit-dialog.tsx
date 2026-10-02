@@ -287,12 +287,15 @@ export function SuggestEditDialog({ resource, open, onOpenChange }: SuggestEditD
     }
   );
 
+  // C5-V2-01: analyze the URL in the field (the user's proposed URL), not the
+  // stored one; an invalid field shows its own validation instead of a request.
   const handleAnalyzeWithAI = async () => {
+    if (!(await form.trigger("url"))) return;
     setAnalyzingWithAI(true);
     try {
       const response = await apiRequest('/api/claude/analyze', {
         method: 'POST',
-        body: JSON.stringify({ url: resource.url }),
+        body: JSON.stringify({ url: form.getValues("url") }),
       });
       
       if (response.available === false) {
