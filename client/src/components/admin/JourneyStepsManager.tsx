@@ -734,7 +734,9 @@ export default function JourneyStepsManager() {
               <div className="min-w-0">
                 <div className="flex items-center gap-2 flex-wrap">
                   <span className="font-medium line-clamp-1 break-words min-w-0" title={j.title}>{j.title}</span>
-                  <Badge variant="outline">{j.category}</Badge>
+                  <Badge variant="outline" className="max-w-full min-w-0" title={j.category}>
+                    <span className="truncate">{j.category}</span>
+                  </Badge>
                   {j.status && j.status !== "published" && (
                     <Badge variant="secondary">{j.status}</Badge>
                   )}

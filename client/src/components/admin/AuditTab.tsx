@@ -215,10 +215,12 @@ export default function AuditTab() {
       className="admin-ops-audit-shell"
     >
       <div className="space-y-4">
-        {showTools && <form onSubmit={handleSearch} className="admin-ops-audit-toolbar flex flex-col sm:flex-row gap-3">
+        {showTools && <form onSubmit={handleSearch} className="admin-ops-audit-toolbar flex flex-col sm:flex-row sm:items-start gap-3">
           <div className="flex-1">
             {/* C3-V5B-08: the icon centres against the input alone, not the
-                wrapper that also grows to hold the error line below. */}
+                wrapper that also grows to hold the error line below; the
+                toolbar aligns to the top so its controls stay level with the
+                input too. */}
             <div className="relative">
               <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-[var(--text-2)]" />
               <Input
