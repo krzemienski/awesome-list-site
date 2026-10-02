@@ -123,7 +123,7 @@ function useResourceToggle(
   // auth prompt, naming exactly what will be kept after sign-in.
   const guestToggle = () => {
     if (isGuestBookmarked(opts.resourceId)) {
-      const { count } = removeGuestBookmark(opts.resourceId);
+      const { removed, count } = removeGuestBookmark(opts.resourceId);
       opts.onOptimistic(false);
       trackGuestBookmarkRemoved(opts.resourceId, count);
       showToast({
@@ -134,7 +134,7 @@ function useResourceToggle(
           {
             altText: "Undo removal",
             onClick: () => {
-              const restored = addGuestBookmark(opts.resourceId);
+              const restored = addGuestBookmark(opts.resourceId, removed ?? undefined);
               if (restored.ok) {
                 opts.onOptimistic(true);
                 trackGuestBookmarkAdded(opts.resourceId, restored.count);
