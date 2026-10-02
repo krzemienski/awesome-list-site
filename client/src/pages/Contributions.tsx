@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { Link, useSearch } from "wouter";
 import { formatDistanceToNow } from "date-fns";
@@ -407,6 +407,7 @@ export default function Contributions() {
   const { toast } = useToast();
   const [state, setState] = useState<FilterState>(() => readState(searchString));
   const [searchInput, setSearchInput] = useState(state.q);
+  const searchInputRef = useRef<HTMLInputElement>(null);
   const [pageNotice, setPageNotice] = useState<string | null>(null);
   const [withdrawTarget, setWithdrawTarget] =
     useState<ContributionItem | null>(null);
@@ -528,6 +529,10 @@ export default function Contributions() {
       "push",
     );
     setPageNotice(null);
+    // C5-V4-02: Clear filters lives in the empty state, which unmounts once
+    // results return; move focus to the (now empty) search field instead of
+    // letting it fall to <body>.
+    searchInputRef.current?.focus();
   };
 
   const gotoPage = (page: number) => {
@@ -681,6 +686,7 @@ export default function Contributions() {
                   aria-hidden="true"
                 />
                 <Input
+                  ref={searchInputRef}
                   value={searchInput}
                   onChange={(event) =>
                     setSearchInput(event.target.value.slice(0, 100))
