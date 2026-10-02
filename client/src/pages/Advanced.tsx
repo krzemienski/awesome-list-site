@@ -29,6 +29,7 @@ import {
 import { AwesomeList } from "@/types/awesome-list";
 import { fetchStaticAwesomeList } from "@/lib/static-data";
 import { writeFilterParams, usePopstateParams } from "@/lib/url-filter-state";
+import { queryUnavailableReason } from "@/lib/query-availability";
 import "@/styles/pages/discovery-tools.css";
 
 const VALID_ADVANCED_TABS = ["explorer", "metrics", "export", "recommendations"];
@@ -85,11 +86,15 @@ export default function Advanced() {
   // under ["awesome-list-data"] via fetchStaticAwesomeList; using the raw
   // '/api/awesome-list' key here created a second cache entry and a second
   // full 3.1MB download on this page.
-  const { data: awesomeList, isLoading, isError, refetch, isFetching } = useQuery<AwesomeList>({
+  const catalogQuery = useQuery<AwesomeList>({
     queryKey: ["awesome-list-data"],
     queryFn: fetchStaticAwesomeList,
     staleTime: 1000 * 60 * 60,
   });
+  const { data: awesomeList, isLoading, refetch, isFetching } = catalogQuery;
+  // C5-V2-03: a fetch started offline is paused, not failed — without this it
+  // fell through to the "Unable to load awesome list data" dead-end.
+  const catalogUnavailable = queryUnavailableReason(catalogQuery);
   const resources = awesomeList?.resources ?? [];
   const categories = awesomeList?.categories ?? [];
 
@@ -112,21 +117,27 @@ export default function Advanced() {
   // Run21 R4-032: a failed catalog fetch (429/500/network) gets an explicit
   // error state with a manual retry — the same treatment /search already has —
   // instead of the ambiguous "Unable to load" dead-end that offered no recovery.
-  if (isError && tab !== "recommendations") {
+  if (catalogUnavailable && tab !== "recommendations") {
+    const offline = catalogUnavailable === "offline";
     return (
       <div className="discovery-tools-page discovery-tools-page--advanced">
         <SEOHead title={advancedSeoTitle} description={advancedSeoDescription} />
         <div
           className="discovery-tools-state discovery-tools-state--error"
           role="alert"
-          data-testid="advanced-error"
+          data-testid={`advanced-${catalogUnavailable}`}
         >
-          <span className="chip bad discovery-tools-state-badge">Error · Catalog</span>
+          <span className="chip bad discovery-tools-state-badge">
+            {offline ? "Offline" : "Error · Catalog"}
+          </span>
           <AlertCircle className="discovery-tools-state-icon" aria-hidden="true" />
-          <h1 className="display-h discovery-tools-state-title">Couldn&apos;t load advanced features</h1>
+          <h1 className="display-h discovery-tools-state-title">
+            {offline ? "You’re offline." : "Couldn’t load advanced features"}
+          </h1>
           <p className="discovery-tools-state-copy">
-            We couldn&apos;t reach the catalog data. This is usually a temporary
-            network problem.
+            {offline
+              ? "Advanced features will load when your connection is back."
+              : "We couldn’t reach the catalog data. This is usually a temporary network problem."}
           </p>
           <Button
             variant="outline"
