@@ -17,7 +17,7 @@
       //     --build-arg VITE_CLERK_PROXY_URL= \
       //     --build-arg BUILD_REVISION=$(git rev-parse HEAD) \
       //     -t awesome-video-cf:<rev> --load .
-      "image": "registry.cloudflare.com/24080dbbce9363d385fac0500c121b85/awesome-video-cf:0a05cba2",
+      "image": "registry.cloudflare.com/24080dbbce9363d385fac0500c121b85/awesome-video-cf:5df3f2a0",
       "instance_type": "standard-1",
       "max_instances": 1
     }
