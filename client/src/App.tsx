@@ -19,6 +19,7 @@ import { useAuth, clearSignedInClientState } from "./hooks/useAuth";
 import { findRouteSuggestion } from "./lib/not-found-suggestion";
 import { useAnalytics } from "./hooks/use-analytics";
 import { useCrossTabSync } from "./lib/crossTabSync";
+import { setSessionTokenRefresher } from "./lib/queryClient";
 import { useClerkAppearance } from "./lib/clerk-appearance";
 import {
   applyProductProfile,
@@ -452,8 +453,16 @@ function SignUpPage() {
 // user-scoped data leaks across identities.
 function ClerkQueryClientCacheInvalidator() {
   const { addListener } = useClerk();
+  const { getToken } = useClerkAuth();
   const qc = useQueryClient();
   const prevUserIdRef = useRef<string | null | undefined>(undefined);
+
+  // Lets the query cache refresh a stale __session token before treating a
+  // protected 401 as an expired session (C3-V5A-07).
+  useEffect(() => {
+    setSessionTokenRefresher(() => getToken({ skipCache: true }));
+    return () => setSessionTokenRefresher(null);
+  }, [getToken]);
 
   useEffect(() => {
     const unsubscribe = addListener(({ user }) => {

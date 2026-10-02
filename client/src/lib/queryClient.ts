@@ -120,14 +120,51 @@ const PROTECTED_KEY_PREFIXES = [
   "/api/digests",
 ];
 let sessionExpiryHandledAt = 0;
+let sessionCheckInFlight = false;
 
-function handleUnauthorized(sourceKey: unknown) {
-  const key = Array.isArray(sourceKey) ? sourceKey[0] : sourceKey;
-  if (key === "/api/auth/user") return; // anonymous visitor, not an expiry
-  const auth = queryClient.getQueryData<{ isAuthenticated?: boolean }>([
-    "/api/auth/user",
-  ]);
-  if (!auth?.isAuthenticated) return; // already signed out — nothing stale
+// C3-V5A-07: a protected 401 is not proof the session ended. Clerk's
+// __session token lives about a minute and is refreshed in the background,
+// so after a network drop (or a sleeping tab) the first requests carry an
+// expired cookie and 401 although the Clerk session is fine. The app shell
+// registers a refresher; a 401 refreshes the token and re-asks the server
+// before anything is flipped to signed-out.
+type SessionTokenRefresher = () => Promise<string | null>;
+let refreshSessionToken: SessionTokenRefresher | null = null;
+export function setSessionTokenRefresher(refresher: SessionTokenRefresher | null) {
+  refreshSessionToken = refresher;
+}
+
+const SESSION_RECHECK_TIMEOUT_MS = 5_000;
+
+async function sessionStillValid(): Promise<boolean> {
+  if (!refreshSessionToken) return false;
+  try {
+    const token = await Promise.race([
+      refreshSessionToken(),
+      new Promise<null>((resolve) => setTimeout(() => resolve(null), SESSION_RECHECK_TIMEOUT_MS)),
+    ]);
+    if (!token) return false;
+    const res = await fetch("/api/auth/user", {
+      credentials: "include",
+      cache: "no-store",
+      signal: AbortSignal.timeout(SESSION_RECHECK_TIMEOUT_MS),
+    });
+    return res.ok && (await res.json())?.isAuthenticated === true;
+  } catch {
+    return false;
+  }
+}
+
+function isProtectedKey(key: unknown): boolean {
+  return (
+    typeof key === "string" &&
+    PROTECTED_KEY_PREFIXES.some(
+      (p) => key === p || key.startsWith(`${p}/`) || key.startsWith(`${p}?`),
+    )
+  );
+}
+
+function expireSession() {
   const now = Date.now();
   if (now - sessionExpiryHandledAt < 10_000) return;
   sessionExpiryHandledAt = now;
@@ -136,18 +173,33 @@ function handleUnauthorized(sourceKey: unknown) {
     isAuthenticated: false,
   });
   setTimeout(() => {
-    queryClient.removeQueries({
-      predicate: (q) => {
-        const k = q.queryKey[0];
-        return (
-          typeof k === "string" &&
-          PROTECTED_KEY_PREFIXES.some(
-            (p) => k === p || k.startsWith(`${p}/`) || k.startsWith(`${p}?`),
-          )
-        );
-      },
-    });
+    queryClient.removeQueries({ predicate: (q) => isProtectedKey(q.queryKey[0]) });
   }, 0);
+}
+
+function handleUnauthorized(sourceKey: unknown) {
+  const key = Array.isArray(sourceKey) ? sourceKey[0] : sourceKey;
+  if (key === "/api/auth/user") return; // anonymous visitor, not an expiry
+  const auth = queryClient.getQueryData<{ isAuthenticated?: boolean }>([
+    "/api/auth/user",
+  ]);
+  if (!auth?.isAuthenticated) return; // already signed out — nothing stale
+  if (sessionCheckInFlight) return; // one check covers a burst of 401s
+  sessionCheckInFlight = true;
+  void sessionStillValid()
+    .then((valid) => {
+      if (valid) {
+        // The token was only stale: re-run the protected reads that failed.
+        void queryClient.invalidateQueries({
+          predicate: (q) => isProtectedKey(q.queryKey[0]) && q.state.status === "error",
+        });
+      } else {
+        expireSession();
+      }
+    })
+    .finally(() => {
+      sessionCheckInFlight = false;
+    });
 }
 
 export const queryClient = new QueryClient({
