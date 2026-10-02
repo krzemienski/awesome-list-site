@@ -11,6 +11,9 @@
  *   drops ("ffmpeg  hls" ≡ "ffmpeg hls").
  * - Quote characters are stripped from token EDGES only ("ffmpeg" → ffmpeg,
  *   “ffmpeg hls” → ffmpeg hls) so in-word apostrophes (don't) keep matching.
+ * - A token with no letter or digit ("!!", "--", "()") drops: nothing in it
+ *   can match, and keeping it made "!!" an unfiltered 3,824-row "search"
+ *   (C4-API-01).
  * - A query that normalizes to "" is treated by callers exactly like an
  *   absent query (explicit empty-state prompt / no search filter).
  */
@@ -30,6 +33,8 @@ const CONTROL_CHARS = /[\u0000-\u001f\u007f]/g;
 const EDGE_QUOTES =
   /^["'\u2018\u2019\u201C\u201D\u00AB\u00BB\u2039\u203A`]+|["'\u2018\u2019\u201C\u201D\u00AB\u00BB\u2039\u203A`]+$/g;
 
+const SEARCHABLE_CHAR = /[\p{L}\p{N}]/u;
+
 /**
  * Split a raw query into clean match tokens. Downstream matchers apply AND
  * semantics: every token must appear somewhere in the searched fields, so
@@ -41,7 +46,7 @@ export function tokenizeSearchQuery(raw: string | null | undefined): string[] {
     .replace(CONTROL_CHARS, " ")
     .split(/\s+/)
     .map((t) => t.replace(EDGE_QUOTES, ""))
-    .filter((t) => t.length > 0);
+    .filter((t) => SEARCHABLE_CHAR.test(t));
 }
 
 /** Canonical display/fetch form of a query: tokens joined by single spaces. */
