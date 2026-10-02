@@ -91,3 +91,10 @@ deploy/
 # Local caches and test fixtures are not part of the image
 .cache/
 tests/
+
+# Agent sessions and local tool caches are not part of the app image
+.claude/
+.omc/
+.omp/
+.agents/
+.codex/
