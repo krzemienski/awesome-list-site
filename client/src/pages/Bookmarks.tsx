@@ -102,6 +102,7 @@ function readCollection(params: URLSearchParams): string {
 }
 
 type FocusTarget = "all-saved" | "copy-link" | "publish-link";
+const FOCUS_AFTER_ACTION_TTL_MS = 5_000;
 
 type ActionRequest = {
   url: string;
@@ -131,7 +132,8 @@ export default function Bookmarks() {
   // C5-V4-03: Publish link, Unpublish, Delete and Go to All saved unmount the
   // button that ran them. Name the control that takes its place; the effect
   // below focuses it once it has rendered instead of leaving focus on <body>.
-  const [focusAfterAction, setFocusAfterAction] = useState<FocusTarget | null>(null);
+  const [focusAfterAction, setFocusAfterActionState] = useState<{ target: FocusTarget; at: number } | null>(null);
+  const setFocusAfterAction = (target: FocusTarget) => setFocusAfterActionState({ target, at: Date.now() });
   const { toast } = useToast();
 
   const bookmarksQuery = useQuery<BookmarkedResource[]>({
@@ -183,14 +185,20 @@ export default function Bookmarks() {
 
   useEffect(() => {
     if (!focusAfterAction) return;
+    // A target that never renders (e.g. no public URL came back) must not
+    // grab focus later during unrelated work, so a request expires.
+    if (Date.now() - focusAfterAction.at > FOCUS_AFTER_ACTION_TTL_MS) {
+      setFocusAfterActionState(null);
+      return;
+    }
     // The All saved entry is the sidebar button on lg and the Collection
     // select below it; focus whichever one is displayed.
     const target = Array.from(
-      document.querySelectorAll<HTMLElement>(`[data-focus-target="${focusAfterAction}"]`),
+      document.querySelectorAll<HTMLElement>(`[data-focus-target="${focusAfterAction.target}"]`),
     ).find((element) => element.getClientRects().length > 0);
     if (!target) return;
     target.focus();
-    setFocusAfterAction(null);
+    setFocusAfterActionState(null);
   });
 
   usePopstateParams((params) => {
