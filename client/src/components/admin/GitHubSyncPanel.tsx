@@ -223,7 +223,9 @@ export default function GitHubSyncPanel() {
             </div>
             <div className="ops-github-panel__repository-copy">
               <CardTitle className="ops-github-panel__repository-name">
-                {repoUrl || (configIsLoading ? "Loading repository…" : "Repository not configured")}
+                {/* C4-V5B-01: the card describes the configured repository (its
+                    branch, last sync and job count below), not the draft target. */}
+                {configuredRepo || (configIsLoading ? "Loading repository…" : "Repository not configured")}
               </CardTitle>
               <p className="ops-github-panel__repository-meta">
                 {configuredBranch} · {lastSync ? `last sync ${formatSyncDate(lastSync.createdAt)}` : "not synced yet"} · {syncQueueData?.total ?? 0} sync jobs
