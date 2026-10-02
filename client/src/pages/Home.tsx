@@ -24,6 +24,7 @@ import { normalizeTag, parseTagsParam } from "@/lib/tags";
 import { writeFilterParams, usePopstateParams } from "@/lib/url-filter-state";
 import { processAwesomeListData } from "@/lib/parser";
 import { fetchStaticAwesomeList } from "@/lib/static-data";
+import { queryUnavailableReason } from "@/lib/query-availability";
 import { useLearningPreferences } from "@/hooks/use-learning-preferences";
 import { DEFAULT_LEARNING_PREFERENCES } from "@shared/onboarding-values";
 import { useHomeLayout } from "@/components/home/use-home-layout";
@@ -564,16 +565,13 @@ export default function Home({ nav, navLoading }: HomeProps) {
   const corpusFilterActive = selectedTags.length > 0 || selectedKind !== null;
   const showFilters =
     selectedTags.length > 0 || sortBy !== "default" || currentParams.get("filters") === "1";
-  const {
-    data: rawCorpus,
-    isLoading: corpusLoading,
-    error: corpusError,
-  } = useQuery<unknown>({
+  const corpusQuery = useQuery<unknown>({
     queryKey: ["awesome-list-data"],
     queryFn: fetchStaticAwesomeList,
     staleTime: 1000 * 60 * 60,
     enabled: corpusFilterActive,
   });
+  const { data: rawCorpus, isLoading: corpusLoading, refetch: refetchCorpus } = corpusQuery;
   const awesomeList = rawCorpus ? processAwesomeListData(rawCorpus) : undefined;
 
   const { data: tagsData } = useQuery<{
@@ -588,25 +586,26 @@ export default function Home({ nav, navLoading }: HomeProps) {
     enabled: showFilters,
   });
 
-  const {
-    data: homeData,
-    isLoading: homeLoading,
-    error: homeError,
-    refetch: refetchHome,
-  } = useQuery<HomeApiResponse>({
+  const homeQuery = useQuery<HomeApiResponse>({
     queryKey: ["/api/home"],
     staleTime: 1000 * 60,
   });
+  const { data: homeData, isLoading: homeLoading, refetch: refetchHome } = homeQuery;
 
-  const {
-    data: kindCounts,
-    isLoading: kindCountsLoading,
-    isError: kindCountsError,
-  } = useQuery<ResourceKindCounts>({
+  const kindCountsQuery = useQuery<ResourceKindCounts>({
     queryKey: ["/api/resources/kinds/counts"],
     queryFn: () => fetchKindCounts(),
     staleTime: 1000 * 60,
   });
+  const { data: kindCounts, isLoading: kindCountsLoading } = kindCountsQuery;
+
+  // C4-V1-03: a fetch started offline is paused, not failed (no loading, no
+  // error, no data), so Home rendered zero kind counts, an empty Recently
+  // indexed list and "No categories match" as fact. Treat paused-without-data
+  // like a failure; the paused fetches resume on their own when back online.
+  const homeUnavailable = queryUnavailableReason(homeQuery);
+  const kindCountsUnavailable = queryUnavailableReason(kindCountsQuery) !== null;
+  const corpusUnavailable = corpusFilterActive ? queryUnavailableReason(corpusQuery) : null;
 
   const navCategories = useMemo<DisplayCategory[]>(() => {
     if (!nav?.categories) return [];
@@ -803,20 +802,25 @@ export default function Home({ nav, navLoading }: HomeProps) {
     );
   }
 
-  if (!nav || homeError || (corpusFilterActive && !awesomeList && corpusError)) {
-    const message = homeError
-      ? "The home index is temporarily unavailable. Please try again."
-      : "We couldn't load the catalog. Please try again.";
+  const corpusMissing = !awesomeList && corpusUnavailable !== null;
+  if (!nav || homeUnavailable || corpusMissing) {
+    const offline = (homeUnavailable ?? corpusUnavailable) === "offline";
+    const message = offline
+      ? "You're offline. The catalog will load when your connection is back."
+      : homeUnavailable
+        ? "The home index is temporarily unavailable. Please try again."
+        : "We couldn't load the catalog. Please try again.";
     return (
       <>
         <SEOHead />
         <CatalogError
           onRetry={() => {
-            if (homeError) {
-              void refetchHome();
-            } else {
+            if (!nav) {
               window.location.reload();
+              return;
             }
+            if (homeUnavailable) void refetchHome();
+            if (corpusMissing) void refetchCorpus();
           }}
           message={message}
         />
@@ -838,7 +842,7 @@ export default function Home({ nav, navLoading }: HomeProps) {
         stats={stats}
         kindCounts={kindCounts}
         kindCountsLoading={kindCountsLoading}
-        kindCountsError={kindCountsError}
+        kindCountsError={kindCountsUnavailable}
         selectedKind={selectedKind}
         onKindChange={handleKindChange}
         selectedTags={selectedTags}

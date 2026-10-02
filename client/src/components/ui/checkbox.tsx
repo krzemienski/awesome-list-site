@@ -1,6 +1,6 @@
 import * as React from "react"
 import * as CheckboxPrimitive from "@radix-ui/react-checkbox"
-import { Check } from "lucide-react"
+import { Check, Minus } from "lucide-react"
 
 import { cn } from "@/lib/utils"
 
@@ -16,10 +16,13 @@ const Checkbox = React.forwardRef<
     )}
     {...props}
   >
+    {/* C4-V5A-02: Radix shows the Indicator for "indeterminate" too; a partial
+        selection draws a dash so it never reads as "all selected". */}
     <CheckboxPrimitive.Indicator
-      className={cn("flex items-center justify-center text-current")}
+      className={cn("group flex items-center justify-center text-current")}
     >
-      <Check className="h-4 w-4" />
+      <Check className="h-4 w-4 group-data-[state=indeterminate]:hidden" />
+      <Minus className="hidden h-4 w-4 group-data-[state=indeterminate]:block" />
     </CheckboxPrimitive.Indicator>
   </CheckboxPrimitive.Root>
 ))

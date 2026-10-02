@@ -334,21 +334,11 @@
 }
 
 /* The frozen ResCard's chip row is featured + up to three `#tag` chips only.
-   The category and kind badges join the hover/focus reveal (the kind badge
-   pushed a fourth chip onto the row, wrapping it 32px taller than the
-   reference at ≤768px); both stay on the resource detail page. */
-.taxonomy-page .resource-card--taxonomy .resource-card__meta-link,
-.taxonomy-page .resource-card--taxonomy .resource-card__actions,
-.taxonomy-page .resource-card--taxonomy .resource-card__more-tags {
-  display: none;
-}
-
-/* The category and kind badges are plain metadata text, not controls: at rest
-   they are visually hidden (out of flow, so the chip row keeps the frozen
-   geometry) but stay in the accessibility tree for screen-reader and touch
-   users who never trigger the hover reveal. */
-.taxonomy-page .resource-card--taxonomy:not(:hover):not(:focus-within) .resource-card__category-badge,
-.taxonomy-page .resource-card--taxonomy:not(:hover):not(:focus-within) .resource-card__kind-badge {
+   The category and kind badges are plain metadata text, not controls: they
+   stay visually hidden (out of flow, so the chip row keeps the frozen
+   geometry) but in the accessibility tree; both are on the detail page. */
+.taxonomy-page .resource-card--taxonomy .resource-card__category-badge,
+.taxonomy-page .resource-card--taxonomy .resource-card__kind-badge {
   position: absolute;
   width: 1px;
   height: 1px;
@@ -360,16 +350,79 @@
   border-width: 0;
 }
 
-.taxonomy-page .resource-card--taxonomy:hover .resource-card__meta-link,
-.taxonomy-page .resource-card--taxonomy:focus-within .resource-card__meta-link,
-.taxonomy-page .resource-card--taxonomy:hover .resource-card__more-tags,
-.taxonomy-page .resource-card--taxonomy:focus-within .resource-card__more-tags {
-  display: inline-flex;
+/* C4-V1-01: View Details, "+N more" and Open Link are production additions
+   revealed on hover/focus. Inserted into the chip row they pushed the tag
+   pills right/down and grew the card ~88px, so a click aimed at a pill landed
+   on View Details. They now float over the empty band right of the mark
+   (36px tall) and only toggle visibility, so nothing reflows. */
+.taxonomy-page .resource-card--taxonomy .resource-card__reveal {
+  position: absolute;
+  z-index: 10;
+  top: 20px;
+  right: 20px;
+  left: 68px;
+  display: flex;
+  height: 36px;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 6px;
+  visibility: hidden;
+  opacity: 0;
+  transition: opacity 160ms ease, visibility 160ms;
 }
 
-.taxonomy-page .resource-card--taxonomy:hover .resource-card__actions,
-.taxonomy-page .resource-card--taxonomy:focus-within .resource-card__actions {
-  display: flex;
+.taxonomy-page .resource-card--taxonomy:hover .resource-card__reveal,
+.taxonomy-page .resource-card--taxonomy:focus-within .resource-card__reveal {
+  visibility: visible;
+  opacity: 1;
+}
+
+/* The tray takes the featured chip's corner while it is shown. */
+.taxonomy-page .resource-card--taxonomy:hover .resource-card__featured,
+.taxonomy-page .resource-card--taxonomy:focus-within .resource-card__featured {
+  visibility: hidden;
+}
+
+/* Touch screens never hover, so the tray stays shown there; it sits in the
+   empty band, so showing it costs no layout. */
+@media (hover: none) {
+  .taxonomy-page .resource-card--taxonomy .resource-card__reveal {
+    visibility: visible;
+    opacity: 1;
+  }
+
+  .taxonomy-page .resource-card--taxonomy .resource-card__featured {
+    visibility: hidden;
+  }
+}
+
+.taxonomy-page .resource-card--taxonomy .resource-card__reveal > *,
+.taxonomy-page .resource-card--taxonomy .resource-card__reveal .resource-card__visit-button {
+  flex: none;
+  min-height: 32px;
+  margin: 0;
+  white-space: nowrap;
+}
+
+/* The band right of the mark is 232px on the narrowest (320px) card, so Open
+   Link is icon-only here; its label stays as the accessible name. */
+.taxonomy-page .resource-card--taxonomy .resource-card__reveal .resource-card__visit-button {
+  width: 32px;
+  height: 32px;
+  padding: 0;
+}
+
+.taxonomy-page .resource-card--taxonomy .resource-card__reveal .resource-card__visit-button svg {
+  margin: 0;
+}
+
+.taxonomy-page .resource-card--taxonomy .resource-card__reveal .resource-card__visit-label {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
 }
 
 .taxonomy-page .resource-card--taxonomy .resource-card__tag-link {

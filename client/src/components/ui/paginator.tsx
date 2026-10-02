@@ -117,7 +117,11 @@ export function Paginator({
     const clamped = Math.min(Math.max(n, 1), totalPages);
     setJumpError(null);
     if (clamped !== currentPage) onNavigate(clamped);
-    else setJumpValue(String(currentPage));
+    // C4-V5A-01: the box mirrors the shown page, not the last request. When
+    // the requested page never arrives (offline, then "Stay on page N"),
+    // currentPage never changes, so the typed number used to linger and a
+    // later blur re-committed it. The effect above shows the new page on load.
+    setJumpValue(String(currentPage));
   };
 
   const linkBase =
