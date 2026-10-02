@@ -211,10 +211,11 @@ function ResourceCard({
       className="resource-card__meta-link no-print relative z-10"
       data-testid={`link-view-details-${resource.id}`}
       aria-label={`View details for ${resource.name}`}
+      title="View details"
     >
       <Badge variant="outline" className="resource-card__meta-badge">
         <ChevronRight className="resource-card__meta-icon" />
-        View Details
+        <span className="resource-card__meta-label">View Details</span>
       </Badge>
     </Link>
   );
