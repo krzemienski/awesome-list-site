@@ -199,18 +199,9 @@ export default function SubmitResource() {
 
   const onInvalid = (errors: Record<string, unknown>) => {
     const firstBad = FIELD_ORDER.find((name) => name in errors);
-    if (firstBad) {
-      try {
-        form.setFocus(firstBad);
-      } catch {
-        // Some controls (Select) cannot be focused programmatically; fall back
-        // to focusing the rendered input/trigger by name.
-        const el = document.querySelector<HTMLElement>(
-          `[name="${firstBad}"], [data-testid="input-${firstBad}"], [data-testid="select-${firstBad}"]`
-        );
-        el?.focus();
-      }
-    }
+    // C4-V3-01: the Select triggers carry field.ref, so setFocus
+    // reaches them too; without it setFocus silently did nothing for Category.
+    if (firstBad) form.setFocus(firstBad);
     toast({
       title: "Please fix the highlighted fields",
       description: "Some required fields are missing or invalid.",
@@ -714,7 +705,7 @@ export default function SubmitResource() {
                             }}
                           >
                             <FormControl>
-                              <SelectTrigger className="submit-control" data-testid="select-category">
+                              <SelectTrigger ref={field.ref} className="submit-control" data-testid="select-category">
                                 <SelectValue placeholder="Select…" />
                               </SelectTrigger>
                             </FormControl>
@@ -778,7 +769,7 @@ export default function SubmitResource() {
                             }}
                           >
                             <FormControl>
-                              <SelectTrigger className="submit-control" data-testid="select-subcategory">
+                              <SelectTrigger ref={field.ref} className="submit-control" data-testid="select-subcategory">
                                 <SelectValue placeholder="Select a subcategory" />
                               </SelectTrigger>
                             </FormControl>
@@ -814,7 +805,7 @@ export default function SubmitResource() {
                             }}
                           >
                             <FormControl>
-                              <SelectTrigger className="submit-control" data-testid="select-subsubcategory">
+                              <SelectTrigger ref={field.ref} className="submit-control" data-testid="select-subsubcategory">
                                 <SelectValue placeholder="Select a specific topic" />
                               </SelectTrigger>
                             </FormControl>
