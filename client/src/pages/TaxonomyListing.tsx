@@ -422,12 +422,18 @@ export default function TaxonomyListing({ level }: Props) {
   if (listing.error || taxonomySearchError) return <ErrorPage error={listing.error ?? taxonomySearchError} />;
   if (!listingData || !name) return <NotFound />;
 
-  const optionChildren = childTiles.flatMap((child: any) => [
-    { value: child.name, count: child.count },
-    ...((child.subSubcategories ?? [])
-      .filter((subSub: any) => !kind || subSub.count > 0)
-      .map((subSub: any) => ({ value: `${child.name} › ${subSub.name}`, count: subSub.count }))),
-  ]);
+  // C3-V1-01: the active selection keeps its option even when the kind filter
+  // empties it ("Codecs (0)"); otherwise the select falls back to its first
+  // option and claims "All subcategories" while the URL still filters by it.
+  const selectedChild = selection.split(" › ")[0];
+  const optionChildren = (listingData.children ?? [])
+    .filter((child) => !kind || child.count > 0 || child.name === selectedChild)
+    .flatMap((child: any) => [
+      { value: child.name, count: child.count },
+      ...((child.subSubcategories ?? [])
+        .filter((subSub: any) => !kind || subSub.count > 0 || `${child.name} › ${subSub.name}` === selection)
+        .map((subSub: any) => ({ value: `${child.name} › ${subSub.name}`, count: subSub.count }))),
+    ]);
   const backSlug = level === "subcategory" ? parentCategory?.slug : parentSubcategory?.slug;
   const back = level === "category" || !backSlug
     ? "/"
@@ -541,6 +547,9 @@ export default function TaxonomyListing({ level }: Props) {
   if (sort !== "default") broadenParams.set(level === "category" ? "sort" : "sortBy", sort);
   const broadenBase = level === "category" ? "/search" : back;
   const broadenHref = `${broadenBase}${broadenParams.size ? `?${broadenParams}` : ""}`;
+  // C3-V1-03: an empty search/filter result is "Resources (0)"; "Coming soon"
+  // is only for a category with nothing in it.
+  const narrowed = serverFilterActive || selection !== "all" || general;
   const kindLabel = kind ? kind.replace(/[-_]/g, " ").replace(/\b\w/g, (letter) => letter.toUpperCase()) : "";
 
   return <div className={`taxonomy-page taxonomy-page--${level}`}>
@@ -590,7 +599,7 @@ export default function TaxonomyListing({ level }: Props) {
           {/* The listing's single count statement: visible range, matching total,
               and — only while a filter narrows the collection — what it was
               narrowed from. */}
-           <div className="taxonomy-results-heading-row"><h2 id="taxonomy-results-heading" data-testid="text-results-count" data-total={total}>{level === "category" ? (total > 0 ? `Resources (${total})` : "Coming soon") : <span className="sr-only">{total} {resourceNoun(total)}</span>}</h2></div>
+           <div className="taxonomy-results-heading-row"><h2 id="taxonomy-results-heading" data-testid="text-results-count" data-total={total}>{level === "category" ? (total > 0 || narrowed ? `Resources (${total})` : "Coming soon") : <span className="sr-only">{total} {resourceNoun(total)}</span>}</h2></div>
           {notice && <div role="status" data-testid="notice-page-adjusted" className="rounded border p-3 text-sm">{notice}<button type="button" className="btn ghost ml-2 min-h-8" onClick={() => setNotice(null)}>Dismiss</button></div>}
           {(listingData.scope.ignoredSubcategory || listingData.scope.ignoredSubSubcategory) && <div role="status" data-testid="notice-unknown-subcategory" className="rounded border p-3 text-sm">“{selection}” isn't a subcategory of {name}, so that filter was ignored.<button type="button" className="btn ghost ml-2 min-h-8" onClick={broadenScope}>Remove it</button></div>}
           {serverSearchActive && !taxonomySearch.isPlaceholderData && taxonomySearch.data?.search?.mode === "fuzzy" && taxonomySearch.data.search.suggestion && <div className="flex flex-wrap items-center justify-center gap-2 rounded border p-3 text-sm" role="status" data-testid="notice-taxonomy-search-suggestion"><span>No exact matches. Did you mean</span><Button variant="link" className="h-auto p-0" onClick={() => { setSearchTerm(taxonomySearch.data!.search!.suggestion!); setPage(1); }}>{taxonomySearch.data.search.suggestion}</Button><span>?</span></div>}

@@ -16,7 +16,7 @@ export const TAG_PLURAL_KEEP = new Set([
 export const TAG_LANDING_MIN_RESOURCES = 5;
 
 const TAG_DISPLAY_ACRONYMS = new Set([
-  "ai", "api", "av1", "cdn", "dash", "drm", "ffmpeg", "hls", "hdr", "hevc",
+  "ai", "amd", "api", "av1", "cdn", "dash", "drm", "ffmpeg", "hls", "hdr", "hevc",
   "html5", "ios", "mpeg", "obs", "ott", "rtmp", "sdk", "srt", "ssai",
   "vmaf", "vp9", "webrtc",
 ]);
