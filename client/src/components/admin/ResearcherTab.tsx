@@ -45,14 +45,14 @@ import {
 } from "lucide-react";
 import { formatAdminDate } from "@/lib/utils";
 import { fetchStaticAwesomeList } from "@/lib/static-data";
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { keepPreviousData, useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useAiDefaults } from "@/hooks/useAiDefaults";
 import { apiRequest, ApiError } from "@/lib/queryClient";
 import { sanitizeDisplay } from "@/lib/sanitize-display";
 import { useToast } from "@/hooks/use-toast";
 import type { ResearchJob, ResearchDiscovery } from "@shared/schema";
 import "./queues-agent.css";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 
 const INFO_STATUS_BADGE = "bg-[var(--status-info)]/20 text-[var(--status-info)] border-[var(--status-info)]/30"; // DS-OK: cyan info (DS chart/info constant)
 const OK_STATUS_BADGE = "bg-[var(--status-ok)]/20 text-[var(--status-ok)] border-[var(--status-ok)]/30"; // DS-OK: status ok
@@ -265,11 +265,24 @@ export default function ResearcherTab({ initialTab = "launch" }: ResearcherTabPr
     // R5-037: refresh admin data when the operator returns to the tab.
     staleTime: 30_000,
     refetchOnWindowFocus: true,
+    // C3-V5A-04: each "Load more" is a new key. Holding the current rows keeps
+    // the button mounted while the next window loads, so focus stays on it.
+    placeholderData: keepPreviousData,
   });
   const jobs = jobsData?.jobs;
   const jobsTotal = jobsData?.total ?? 0;
   const [showAllJobs, setShowAllJobs] = useState(false);
   const visibleJobs = showAllJobs ? (jobs ?? []) : (jobs ?? []).slice(0, CANONICAL_JOB_ROWS);
+  const hasMoreJobs = !!jobs && (jobs.length > visibleJobs.length || jobsTotal > jobs.length);
+  // When the last "Load more" removes the button, hand focus to the table
+  // region instead of letting it fall to <body>.
+  const jobsRegionRef = useRef<HTMLDivElement>(null);
+  const jobsMoreFocusPending = useRef(false);
+  useEffect(() => {
+    if (!jobsMoreFocusPending.current || jobsFetching) return;
+    jobsMoreFocusPending.current = false;
+    if (!hasMoreJobs) jobsRegionRef.current?.focus();
+  }, [hasMoreJobs, jobsFetching]);
   // A failed or still-loading job list cannot establish whether a research
   // job is active. Keep paid launches disabled until that state is known.
   const activeJobStateKnown =
@@ -606,6 +619,7 @@ export default function ResearcherTab({ initialTab = "launch" }: ResearcherTabPr
             : "Recent agentic research runs"}
         >
           <div
+            ref={jobsRegionRef}
             className="queues-agent__canonical-table queues-agent__canonical-table--research focus-visible:outline focus-visible:outline-2 focus-visible:outline-ring"
             tabIndex={0}
             role="region"
@@ -631,13 +645,14 @@ export default function ResearcherTab({ initialTab = "launch" }: ResearcherTabPr
             </table>
             {!jobsLoading && (jobs || []).length === 0 ? <p className="queues-agent__empty">No research jobs found.</p> : null}
           </div>
-          {jobs && (jobs.length > visibleJobs.length || jobsTotal > jobs.length) ? (
+          {jobs && hasMoreJobs ? (
             <div className="queues-agent__table-more">
               <Button
                 type="button"
                 className="btn ghost"
                 variant="ghost"
                 onClick={() => {
+                  jobsMoreFocusPending.current = true;
                   if (showAllJobs) setJobsLimit((l) => Math.min(l + 20, 200));
                   setShowAllJobs(true);
                 }}
@@ -915,7 +930,11 @@ export default function ResearcherTab({ initialTab = "launch" }: ResearcherTabPr
                 <Alert>
                   <Zap className="w-4 h-4" />
                   <AlertDescription>
-                    Uses Claude Sonnet 4 (~$3/M input, $15/M output tokens).{" "}
+                    {/* C3-V5A-05: name the model this launch will actually use
+                        (custom override, else the server's resolved default). */}
+                    {model.trim() || defaultOrchestratorModel
+                      ? <>Uses <span className="font-mono" data-testid="text-research-launch-model">{model.trim() || defaultOrchestratorModel}</span>{model.trim() ? "" : " (server default)"}.</>
+                      : "Uses the server's default research model."}{" "}
                     {costMin !== null && costMax !== null
                       ? `Your past jobs have cost $${costMin.toFixed(2)}–$${costMax.toFixed(2)} depending on scope and duration (see Job History below).`
                       : "Cost depends on scope and duration — check Job History after your first run."}{" "}

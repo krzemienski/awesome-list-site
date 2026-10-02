@@ -32,7 +32,8 @@ import { Paginator } from "@/components/ui/paginator";
 import { parsePageFromSearch } from "@/lib/page-param";
 // BUG-049: client-side validation mirrors the server's shared schemas so the
 // dialog flags bad input inline instead of only failing server-side.
-import { resourceTitleSchema, resourceDescriptionSchema, webUrlSchema, httpsUrlSchema } from "@shared/validation";
+import { resourceTitleSchema, optionalResourceDescriptionSchema, webUrlSchema, httpsUrlSchema } from "@shared/validation";
+import { extractFieldErrors } from "@/lib/apiError";
 import {
   RESOURCE_FORMAT_LABELS,
   RESOURCE_FORMAT_VALUES,
@@ -69,6 +70,8 @@ type AdminResourceWire = Omit<Resource, "kind" | "metadata"> & {
 type AdminResource = Omit<AdminResourceWire, "metadata"> & {
   metadata: ResourceMetadata | null;
   resolvedKind: ResourceKind;
+  /** What "Use inferred" resolves to, ignoring any stored override. */
+  inferredKind: ResourceKind;
 };
 type ResourcePatchResponse = AdminResourceWire;
 
@@ -88,12 +91,12 @@ const normalizeAdminResource = (resource: AdminResourceWire): AdminResource => {
   const metadata = safeResourceMetadata(resource.metadata);
   const parsedKind = resourceKindSchema.safeParse(resource.kind);
   const kind = parsedKind.success ? parsedKind.data : null;
-  const resolvedKind = resolveResourceKindFrom({
-    storedKind: kind,
+  const signals = {
     tags: safeResourceMetadataTags(metadata),
     taxonomy: [resource.category, resource.subcategory, resource.subSubcategory],
-  }).kind;
-  return { ...resource, kind, metadata, resolvedKind };
+  };
+  const inferredKind = resolveResourceKindFrom({ ...signals, storedKind: null }).kind;
+  return { ...resource, kind, metadata, resolvedKind: kind ?? inferredKind, inferredKind };
 };
 
 const featuredValue = (resource: AdminResource) => resource.metadata?.featured === true;
@@ -277,7 +280,7 @@ export default function ResourceManager({ createRequest = 0 }: { createRequest?:
     return `/api/admin/resources?${params.toString()}`;
   };
 
-  const { data, isLoading, isError, refetch } = useQuery<ResourcesResponse>({
+  const { data, isLoading, isError, isPaused, refetch } = useQuery<ResourcesResponse>({
     queryKey: ['/api/admin/resources', page, limit, debouncedSearch, categoryFilter, statusFilter, sort],
     queryFn: async () => {
       const params = new URLSearchParams();
@@ -304,6 +307,12 @@ export default function ResourceManager({ createRequest = 0 }: { createRequest?:
     refetchOnWindowFocus: true
   });
 
+  // C3-V5A-08: placeholderData keeps the previous page on screen while the
+  // next one loads (or, offline, while its fetch is paused). The footer and
+  // pager describe the rows actually shown, not the page that was requested.
+  const shownPage = data?.page ?? page;
+  const shownLimit = data?.limit ?? limit;
+
   // Task 275: clamp an out-of-range page (stale ?page= link, shrunk result
   // set) back to the last real page instead of showing an empty table.
   const totalPages = data?.totalPages || 1;
@@ -326,6 +335,24 @@ export default function ResourceManager({ createRequest = 0 }: { createRequest?:
     },
     staleTime: 60000
   });
+
+  // C3-V5A-02: a server 400 carries per-field messages; mark those fields
+  // inline and keep the banner for anything that has no field in the dialog.
+  const showServerFormError = (error: Error, fallback: string) => {
+    const serverFieldErrors = extractFieldErrors(error);
+    if (!serverFieldErrors) {
+      setFormError(error.message || fallback);
+      return;
+    }
+    const inline: { title?: string; url?: string; description?: string } = {};
+    const other: string[] = [];
+    for (const [field, message] of Object.entries(serverFieldErrors)) {
+      if (field === "title" || field === "url" || field === "description") inline[field] = message;
+      else other.push(`${field}: ${message}`);
+    }
+    setFieldErrors(inline);
+    setFormError(other.length > 0 ? other.join(" ") : "Please fix the highlighted fields.");
+  };
 
   const updateMutation = useMutation({
     mutationFn: async ({ id, data }: { id: number, data: Partial<AdminResource> }) => {
@@ -350,7 +377,7 @@ export default function ResourceManager({ createRequest = 0 }: { createRequest?:
     onError: (error: Error) => {
       // BUG-049: keep the dialog open and surface the server's message inline
       // so the operator can correct the field, not just see a vanishing toast.
-      setFormError(error.message || "Failed to update resource");
+      showServerFormError(error, "Failed to update resource");
     }
   });
 
@@ -437,11 +464,11 @@ export default function ResourceManager({ createRequest = 0 }: { createRequest?:
         kind,
         // The list stays responsive while the PATCH is in flight. Its
         // read-time inferred kind is reconciled from the server response below.
-        resolvedKind: kind ?? current?.resolvedKind ?? "other",
+        resolvedKind: kind ?? current?.inferredKind ?? "other",
       });
       setSelectedResource((resource) =>
         resource?.id === id
-          ? { ...resource, kind, resolvedKind: kind ?? resource.resolvedKind }
+          ? { ...resource, kind, resolvedKind: kind ?? resource.inferredKind }
           : resource,
       );
       return { snapshots, previousResource };
@@ -559,7 +586,7 @@ export default function ResourceManager({ createRequest = 0 }: { createRequest?:
     },
     onError: (error: Error) => {
       // BUG-049: surface server-side rejection inline in the open dialog.
-      setFormError(error.message || "Failed to create resource");
+      showServerFormError(error, "Failed to create resource");
     }
   });
 
@@ -776,7 +803,7 @@ export default function ResourceManager({ createRequest = 0 }: { createRequest?:
     };
     fetch(`/api/resources/${rid}`, { credentials: "include" })
       .then((r) => (r.ok ? r.json() : Promise.reject(new Error(`HTTP ${r.status}`))))
-      .then((resource: AdminResource) => openEditDialog(resource))
+      .then((resource: AdminResourceWire) => openEditDialog(normalizeAdminResource(resource)))
       .catch(() => {
         toast({
           title: "Resource not found",
@@ -809,11 +836,9 @@ export default function ResourceManager({ createRequest = 0 }: { createRequest?:
     if (!urlParsed.success) {
       errors.url = urlParsed.error.issues[0]?.message || "Invalid URL";
     }
-    if (editForm.description.trim()) {
-      const descParsed = resourceDescriptionSchema.safeParse(editForm.description.trim());
-      if (!descParsed.success) {
-        errors.description = descParsed.error.issues[0]?.message || "Invalid description";
-      }
+    const descParsed = optionalResourceDescriptionSchema.safeParse(editForm.description);
+    if (!descParsed.success) {
+      errors.description = descParsed.error.issues[0]?.message || "Invalid description";
     }
     setFieldErrors(errors);
     setFormError(null);
@@ -1278,6 +1303,43 @@ export default function ResourceManager({ createRequest = 0 }: { createRequest?:
               </Button>
             </div>
           )}
+          {/* C3-V5A-08: offline the fetch pauses instead of failing, so the
+              error banner never fires; say so instead of relabelling stale rows. */}
+          {isPaused && !isError && (
+            <div
+              role="status"
+              className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 rounded-md border border-[var(--border)] bg-[var(--surface)] px-4 py-3"
+              data-testid="banner-resources-offline"
+            >
+              <p className="text-sm text-[var(--text)]">
+                {!data
+                  ? "You're offline. Resources will load when your connection returns."
+                  : shownPage !== page
+                    ? `You're offline. Page ${page.toLocaleString()} will load when your connection returns — still showing page ${shownPage.toLocaleString()}.`
+                    : "You're offline — showing the last loaded results."}
+              </p>
+              <div className="flex flex-wrap gap-2">
+                {data && shownPage !== page && (
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => setPage(shownPage)}
+                    data-testid="button-resources-offline-stay"
+                  >
+                    Stay on page {shownPage.toLocaleString()}
+                  </Button>
+                )}
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => refetch()}
+                  data-testid="button-resources-offline-retry"
+                >
+                  Retry
+                </Button>
+              </div>
+            </div>
+          )}
           <div className="admin-catalog-resources__table-scroll overflow-auto">
             <table className="table admin-catalog-resources__table">
               <thead>
@@ -1386,7 +1448,7 @@ export default function ResourceManager({ createRequest = 0 }: { createRequest?:
                     and stats card). P1-05: count-aware noun — "1 resource". */}
                 {(data?.total || 0) === 0
                   ? "0 resources"
-                  : `Showing ${(((page - 1) * limit) + 1).toLocaleString()} - ${Math.min(page * limit, data?.total || 0).toLocaleString()} of ${(data?.total || 0).toLocaleString()} ${(data?.total || 0) === 1 ? 'resource' : 'resources'}`}
+                  : `Showing ${(((shownPage - 1) * shownLimit) + 1).toLocaleString()} - ${Math.min(shownPage * shownLimit, data?.total || 0).toLocaleString()} of ${(data?.total || 0).toLocaleString()} ${(data?.total || 0) === 1 ? 'resource' : 'resources'}`}
               </div>
               <Select value={String(limit)} onValueChange={(v) => { setLimit(parseInt(v, 10)); setPage(1); }}>
                 {/* Run17 BUG-034: shrink-0 — flexbox squeezed the trigger below w-28
@@ -1410,7 +1472,7 @@ export default function ResourceManager({ createRequest = 0 }: { createRequest?:
               public listings) — any of the 100+ pages is reachable in ≤2
               interactions via the number links or the jump input. */}
           <Paginator
-            currentPage={page}
+            currentPage={shownPage}
             totalPages={totalPages}
             makeHref={(p) => {
               const url = new URL(window.location.href);
@@ -1602,8 +1664,9 @@ export default function ResourceManager({ createRequest = 0 }: { createRequest?:
                     aria-describedby="edit-kind-hint"
                     data-testid="admin-resource-kind-select"
                   >
+                    {/* C3-V5A-06: the inferred kind, not the stored override. */}
                     <option value="">
-                      Use inferred — resolved: {selectedResource?.resolvedKind ?? "other"} (inferred)
+                      Use inferred — resolved: {selectedResource?.inferredKind ?? "other"} (inferred)
                     </option>
                     {RESOURCE_KIND_VALUES.map((kind) => (
                       <option key={kind} value={kind}>{resourceKindLabel(kind)}</option>
@@ -1613,7 +1676,7 @@ export default function ResourceManager({ createRequest = 0 }: { createRequest?:
                 <p id="edit-kind-hint" className="text-xs text-[var(--text-2)]" data-testid="text-kind-storage-state">
                   {editForm.kind
                     ? `Stored override: ${resourceKindLabel(editForm.kind)}`
-                    : `resolved: ${selectedResource?.resolvedKind ?? "other"} (inferred)`}
+                    : `resolved: ${selectedResource?.inferredKind ?? "other"} (inferred)`}
                 </p>
                 {selectedResource && resourceActionErrors[`kind:${selectedResource.id}`] && (
                   <p role="alert" className="admin-catalog-resources__action-error" data-testid="error-resource-kind">

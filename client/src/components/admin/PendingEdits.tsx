@@ -1,7 +1,7 @@
 import { type MouseEvent, useEffect, useRef, useState } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { apiRequest } from "@/lib/queryClient";
-import { formatAdminDateTime, formatRelativeAgo } from "@/lib/utils";
+import { formatAdminDateTime, formatRelativeAgo, maskEmail } from "@/lib/utils";
 import { useToast } from "@/hooks/use-toast";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -18,6 +18,8 @@ import "./queues-review.css";
 
 interface ResourceEditWithResource extends ResourceEdit {
   resource: Resource;
+  /** Joined submitter email (null when the user row is gone). */
+  submittedByEmail?: string | null;
 }
 
 const MIN_REJECTION_REASON_LENGTH = 10;
@@ -388,7 +390,15 @@ export default function PendingEdits() {
                       </span>
                     </td>
                     <td className="mono queue-review-mono">
-                      <span className="queue-review-truncate" title={edit.submittedBy}>{edit.submittedBy}</span>
+                      {/* C3-V5A-03: name the editor by (masked) email like the
+                          other admin queues; the raw user id is only a fallback. */}
+                      <span
+                        className="queue-review-truncate"
+                        title={edit.submittedByEmail ?? edit.submittedBy}
+                        data-testid={`text-edit-editor-${edit.id}`}
+                      >
+                        {edit.submittedByEmail ? maskEmail(edit.submittedByEmail) : edit.submittedBy}
+                      </span>
                     </td>
                     <td className="mono queue-review-mono queue-review-when">
                       <time dateTime={new Date(edit.createdAt).toISOString()} title={formatDate(edit.createdAt)}>
@@ -476,6 +486,7 @@ export default function PendingEdits() {
                   <p className="text-sm"><strong>Title:</strong> {selectedEdit.resource?.title}</p>
                   <p className="text-sm"><strong>URL:</strong> <a href={selectedEdit.resource?.url} target="_blank" rel="noopener noreferrer" className="text-primary hover:underline">{selectedEdit.resource?.url}</a></p>
                   <p className="text-sm"><strong>Category:</strong> {selectedEdit.resource?.category}</p>
+                  <p className="text-sm" data-testid="text-edit-detail-editor"><strong>Suggested by:</strong> {selectedEdit.submittedByEmail ?? selectedEdit.submittedBy}</p>
                 </div>
               </div>
 

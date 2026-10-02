@@ -141,6 +141,11 @@
 .admin-catalog-resources__resource-title {
   color: var(--text);
   font-weight: 500;
+  /* C3-V5A-01: an unbroken title (no spaces) must wrap inside the column
+     instead of widening the table and pushing the row actions off-screen.
+     `anywhere` also lowers the cell's min-content width, so auto layout
+     stops sizing the column to the whole string. */
+  overflow-wrap: anywhere;
 }
 
 .admin-catalog-resources__tags,

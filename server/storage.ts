@@ -262,7 +262,7 @@ export interface IStorage {
   getResourceEdit(id: number): Promise<ResourceEdit | undefined>;
   getResourceEditsByResource(resourceId: number): Promise<ResourceEdit[]>;
   getResourceEditsByUser(userId: string): Promise<ResourceEdit[]>;
-  getPendingResourceEdits(): Promise<ResourceEdit[]>;
+  getPendingResourceEdits(): Promise<(ResourceEdit & { submittedByEmail: string | null })[]>;
   approveResourceEdit(editId: number, adminId: string): Promise<void>;
   rejectResourceEdit(editId: number, adminId: string, reason: string): Promise<void>;
 
@@ -755,7 +755,7 @@ export class DatabaseStorage implements IStorage {
     return this.auditRepo.getResourceEditsByUser(userId);
   }
 
-  async getPendingResourceEdits(): Promise<ResourceEdit[]> {
+  async getPendingResourceEdits(): Promise<(ResourceEdit & { submittedByEmail: string | null })[]> {
     return this.auditRepo.getPendingResourceEdits();
   }
 
