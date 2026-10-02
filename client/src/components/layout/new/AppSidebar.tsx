@@ -251,6 +251,14 @@ function DismissibleDetails({ className, children }: { className: string; childr
       ref={ref}
       className={className}
       onToggle={(e) => setOpen(e.currentTarget.open)}
+      // C4-V1-02: choosing an item navigates client-side and the sidebar stays
+      // mounted, so the menu has to close itself or it covers the new page.
+      onClick={(e) => {
+        const target = e.target as Element;
+        if (ref.current && !target.closest("summary") && target.closest("a, button")) {
+          ref.current.open = false;
+        }
+      }}
       onKeyDown={(e) => {
         if (e.key !== "Escape" || !ref.current?.open) return;
         e.stopPropagation();
