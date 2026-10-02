@@ -199,6 +199,87 @@ function ResourceCard({
     </a>
   );
 
+  const isTaxonomy = variant === "taxonomy";
+
+  // BUG-012 (run14): "View Details" is a real link to the detail page (was a
+  // decorative Badge that swallowed clicks under the stretched-link overlay).
+  // R5-053 (run24): no-print — it is an anchor, not a button, so the blanket
+  // print button-hide missed it.
+  const viewDetailsLink = isValidDbResource && (
+    <Link
+      href={`/resource/${resource.id}`}
+      className="resource-card__meta-link no-print relative z-10"
+      data-testid={`link-view-details-${resource.id}`}
+      aria-label={`View details for ${resource.name}`}
+    >
+      <Badge variant="outline" className="resource-card__meta-badge">
+        <ChevronRight className="resource-card__meta-icon" />
+        View Details
+      </Badge>
+    </Link>
+  );
+
+  // Run15 BUG-022: "+N more" is a real control — clicking it reveals the
+  // remaining tags (and can collapse them again).
+  const hiddenTagCount = (resource.tags?.length ?? 0) - 3;
+  const moreTagsButton = hiddenTagCount > 0 && (
+    <button
+      type="button"
+      className="btn ghost resource-card__more-tags relative z-10"
+      onClick={(e) => {
+        e.stopPropagation();
+        setShowAllTags((v) => !v);
+      }}
+      aria-expanded={showAllTags}
+      aria-label={showAllTags ? "Show fewer tags" : `Show ${hiddenTagCount} more tags`}
+      data-testid={`button-more-tags-${resource.id}`}
+    >
+      {showAllTags ? "Show fewer" : `+${hiddenTagCount} more`}
+    </button>
+  );
+
+  // R5-053 (run24): no-print — the "Open Link" action is an anchor styled as a
+  // button; on paper it printed as a dead rectangle.
+  const visitActions = (
+    <div className="resource-card__actions no-print relative z-10">
+      {/* Run16 BUG-006/BUG-020: real anchor (not JS window.open) so the
+          action can never silently fail and middle-click/cmd-click work */}
+      <Button
+        asChild
+        variant="outline"
+        size="sm"
+        className="resource-card__visit-button"
+      >
+        <a
+          href={resource.url}
+          target="_blank"
+          rel="noopener noreferrer"
+          onClick={(e) => e.stopPropagation()}
+          data-testid={`button-visit-${resource.id}`}
+          title="Open Link"
+        >
+          <ExternalLink className="h-4 w-4 mr-2" />
+          <span className="resource-card__visit-label">Open Link</span>
+          {/* Run25 F-003: SRs need to know this leaves the app in a new tab. */}
+          <span className="sr-only">{`: ${resource.name} (opens in new tab)`}</span>
+        </a>
+      </Button>
+      {isValidDbResource && showPersonalActions && (
+        <Button
+          variant="ghost"
+          size="sm"
+          className="min-h-[44px] min-w-[44px]"
+          onClick={handleSuggestEdit}
+          data-testid={`button-suggest-edit-${resource.id}`}
+          title="Suggest an edit"
+          aria-label={`Suggest an edit: ${resource.name}`}
+        >
+          <Edit className="h-4 w-4" />
+        </Button>
+      )}
+    </div>
+  );
+
   return (
     <Card 
       ref={cardRef}
@@ -328,24 +409,7 @@ function ResourceCard({
         )}
         
         <div className="resource-card__metadata">
-          {/* BUG-012 (run14): "View Details" is a real link to the detail page
-              (was a decorative Badge that swallowed clicks under the
-              stretched-link overlay). */}
-          {/* R5-053 (run24): no-print — "View Details" is an anchor, not a
-              button, so the blanket print button-hide missed it. */}
-          {isValidDbResource && (
-            <Link
-              href={`/resource/${resource.id}`}
-              className="resource-card__meta-link no-print relative z-10"
-              data-testid={`link-view-details-${resource.id}`}
-              aria-label={`View details for ${resource.name}`}
-            >
-              <Badge variant="outline" className="resource-card__meta-badge">
-                <ChevronRight className="resource-card__meta-icon" />
-                View Details
-              </Badge>
-            </Link>
-          )}
+          {!isTaxonomy && viewDetailsLink}
           {resource.category && (
             <Badge variant="chip" className="resource-card__category-badge">
               {resource.category}
@@ -383,69 +447,23 @@ function ResourceCard({
                   </Badge>
                 </Link>
               ))}
-              {/* Run15 BUG-022: "+N more" is now a real control — clicking it
-                  reveals the remaining tags (and can collapse them again). */}
-              {resource.tags.length > 3 && (
-                <button
-                  type="button"
-                  className="btn ghost resource-card__more-tags relative z-10"
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    setShowAllTags((v) => !v);
-                  }}
-                  aria-expanded={showAllTags}
-                  aria-label={
-                    showAllTags
-                      ? "Show fewer tags"
-                      : `Show ${resource.tags.length - 3} more tags`
-                  }
-                  data-testid={`button-more-tags-${resource.id}`}
-                >
-                  {showAllTags ? "Show fewer" : `+${resource.tags.length - 3} more`}
-                </button>
-              )}
+              {!isTaxonomy && moreTagsButton}
             </>
           )}
         </div>
         
-        {/* R5-053 (run24): no-print — the "Open Link" action is an anchor
-            styled as a button; on paper it printed as a dead rectangle. */}
-        <div className="resource-card__actions no-print relative z-10">
-          {/* Run16 BUG-006/BUG-020: real anchor (not JS window.open) so the
-              action can never silently fail and middle-click/cmd-click work */}
-          <Button
-            asChild
-            variant="outline"
-            size="sm"
-              className="resource-card__visit-button"
-          >
-            <a
-              href={resource.url}
-              target="_blank"
-              rel="noopener noreferrer"
-              onClick={(e) => e.stopPropagation()}
-              data-testid={`button-visit-${resource.id}`}
-            >
-              <ExternalLink className="h-4 w-4 mr-2" />
-              Open Link
-              {/* Run25 F-003: SRs need to know this leaves the app in a new tab. */}
-              <span className="sr-only">{`: ${resource.name} (opens in new tab)`}</span>
-            </a>
-          </Button>
-          {isValidDbResource && showPersonalActions && (
-            <Button
-              variant="ghost"
-              size="sm"
-              className="min-h-[44px] min-w-[44px]"
-              onClick={handleSuggestEdit}
-              data-testid={`button-suggest-edit-${resource.id}`}
-              title="Suggest an edit"
-              aria-label={`Suggest an edit: ${resource.name}`}
-            >
-              <Edit className="h-4 w-4" />
-            </Button>
-          )}
-        </div>
+        {isTaxonomy ? (
+          /* C4-V1-01: the taxonomy card's hover/focus-only controls float in
+             the empty band beside the mark instead of joining the chip row, so
+             revealing them never moves a tag pill or resizes the card. */
+          <div className="resource-card__reveal">
+            {viewDetailsLink}
+            {moreTagsButton}
+            {visitActions}
+          </div>
+        ) : (
+          visitActions
+        )}
       </CardContent>
 
       {suggestEditOpen && showPersonalActions && (
