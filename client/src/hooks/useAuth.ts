@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useQuery, useMutation } from '@tanstack/react-query';
 import { useClerk } from '@clerk/react';
-import { queryClient, ApiError } from '@/lib/queryClient';
+import { queryClient, ApiError, renewSessionToken } from '@/lib/queryClient';
 import { notifyCrossTabSync } from '@/lib/crossTabSync';
 import { safeRemoveItem } from '@/lib/safeStorage';
 import { mpIdentify, mpReset } from '@/lib/mixpanel';
@@ -50,13 +50,23 @@ function logoutRequestSignal(): AbortSignal {
  * The hook's return surface is unchanged; only the sign-out path switched
  * from POST /api/auth/logout to Clerk's signOut().
  */
-async function fetchAuthUser(): Promise<AuthResponse> {
+async function requestAuthUser(): Promise<AuthResponse> {
   const res = await fetch('/api/auth/user', { credentials: 'include' });
   if (!res.ok) {
     const text = (await res.text()) || res.statusText;
     throw new ApiError(res.status, text);
   }
   return await res.json();
+}
+
+// C3-V5A-07 (cycle-4 reverify): the server answers an expired __session cookie with 200
+// {isAuthenticated:false}, not a 401. After a drop longer than staleTime this
+// refetch ran before Clerk refreshed the cookie and signed a live admin out.
+// When Clerk still holds a session, refresh the token and ask once more.
+async function fetchAuthUser(): Promise<AuthResponse> {
+  const auth = await requestAuthUser();
+  if (auth.isAuthenticated || !(await renewSessionToken())) return auth;
+  return requestAuthUser();
 }
 
 export function useAuth() {

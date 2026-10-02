@@ -136,14 +136,27 @@ export function setSessionTokenRefresher(refresher: SessionTokenRefresher | null
 
 const SESSION_RECHECK_TIMEOUT_MS = 5_000;
 
-async function sessionStillValid(): Promise<boolean> {
+/**
+ * Ask Clerk for a fresh __session token. True only when Clerk still holds an
+ * active session (getToken resolves null for a signed-out visitor), so callers
+ * can tell a stale cookie from a real sign-out.
+ */
+export async function renewSessionToken(): Promise<boolean> {
   if (!refreshSessionToken) return false;
   try {
     const token = await Promise.race([
       refreshSessionToken(),
       new Promise<null>((resolve) => setTimeout(() => resolve(null), SESSION_RECHECK_TIMEOUT_MS)),
     ]);
-    if (!token) return false;
+    return Boolean(token);
+  } catch {
+    return false;
+  }
+}
+
+async function sessionStillValid(): Promise<boolean> {
+  try {
+    if (!(await renewSessionToken())) return false;
     const res = await fetch("/api/auth/user", {
       credentials: "include",
       cache: "no-store",
