@@ -40,11 +40,17 @@ const SEARCHABLE_CHAR = /[\p{L}\p{N}]/u;
  * letters and digits only, because that is all the matcher indexes: "c++"
  * searched as the bare prefix "c:*" and matched 2,872 rows, and the
  * server-rendered /search had no minimum at all.
+ *
+ * C6-API-01: the minimum applies per word. Counting across the whole query let
+ * "C / C++" or "a b" through as bare one-letter prefixes (2,872 / 1,783 rows);
+ * at least one word must carry 2 letters/digits, so "x 264" still searches.
  */
 export const SEARCH_QUERY_MIN_CHARS = 2;
 
-export function isSearchableQuery(normalized: string): boolean {
-  return (normalized.match(/[\p{L}\p{N}]/gu)?.length ?? 0) >= SEARCH_QUERY_MIN_CHARS;
+export function isSearchableQuery(query: string): boolean {
+  return tokenizeSearchQuery(query).some(
+    (t) => (t.match(/[\p{L}\p{N}]/gu)?.length ?? 0) >= SEARCH_QUERY_MIN_CHARS,
+  );
 }
 
 /**
