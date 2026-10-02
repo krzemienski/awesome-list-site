@@ -41,15 +41,27 @@ interface LinkHealthHistoryResponse {
   jobs: LinkHealthJob[];
 }
 
+type CheckWithResource = LinkHealthCheck & {
+  resource?: {
+    id: number;
+    title: string;
+    category: string;
+  };
+};
+
 interface BrokenLinksResponse {
   success: boolean;
-  checks: (LinkHealthCheck & {
-    resource?: {
-      id: number;
-      title: string;
-      category: string;
-    };
-  })[];
+  checks: CheckWithResource[];
+}
+
+// C3-V5B-06: both problem-link tables name and link the resource the same way.
+function ResourceTitle({ check }: { check: CheckWithResource }) {
+  if (!check.resource) return <>{`Resource #${check.resourceId}`}</>;
+  return (
+    <a href={`/resource/${check.resource.id}`} className="hover:underline">
+      {check.resource.title}
+    </a>
+  );
 }
 
 /**
@@ -524,13 +536,7 @@ export default function LinkHealthDashboard() {
                   {recentFailures.map((check) => (
                     <TableRow key={`flagged-${check.id}`}>
                       <TableCell className="ops-link-health__resource-cell">
-                        {check.resource ? (
-                          <a href={`/resource/${check.resource.id}`} className="hover:underline">
-                            {check.resource.title}
-                          </a>
-                        ) : (
-                          `Resource #${check.resourceId}`
-                        )}
+                        <ResourceTitle check={check} />
                         {check.resource?.category && (
                           <span className="mt-1 block text-xs text-muted-foreground">{check.resource.category}</span>
                         )}
@@ -666,7 +672,7 @@ export default function LinkHealthDashboard() {
                         </StatusChip>
                       </TableCell>
                       <TableCell className="font-medium">
-                        {check.resource?.title ?? `Resource #${check.resourceId}`}
+                        <ResourceTitle check={check} />
                       </TableCell>
                       <TableCell className="text-sm text-muted-foreground">
                         {check.resource?.category ?? '-'}

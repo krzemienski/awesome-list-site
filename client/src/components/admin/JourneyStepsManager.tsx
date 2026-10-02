@@ -489,6 +489,9 @@ function StepsDialog({
           {groups.map((group, index) => {
             const primary = group.rows[0];
             const linkedRows = group.rows.filter((r) => r.resourceId !== null);
+            // C3-V5B-03: name the step in each control so the repeated icon
+            // buttons are distinguishable to screen-reader users.
+            const stepName = `step ${index + 1}: ${primary.title}`;
             return (
               <div
                 key={primary.id}
@@ -504,7 +507,7 @@ function StepsDialog({
                       className="h-8 w-8"
                       onClick={() => move(index, -1)}
                       disabled={index === 0 || reorderMutation.isPending}
-                      aria-label="Move step up"
+                      aria-label={`Move ${stepName} up`}
                       data-testid={`step-up-${primary.id}`}
                     >
                       <ArrowUp className="h-3 w-3" />
@@ -515,7 +518,7 @@ function StepsDialog({
                       className="h-8 w-8"
                       onClick={() => move(index, 1)}
                       disabled={index === groups.length - 1 || reorderMutation.isPending}
-                      aria-label="Move step down"
+                      aria-label={`Move ${stepName} down`}
                       data-testid={`step-down-${primary.id}`}
                     >
                       <ArrowDown className="h-3 w-3" />
@@ -566,7 +569,7 @@ function StepsDialog({
                     size="icon"
                     variant="ghost"
                     onClick={() => setEditingGroup(group)}
-                    aria-label="Edit step"
+                    aria-label={`Edit ${stepName}`}
                     data-testid={`step-edit-${primary.id}`}
                   >
                     <Pencil className="h-4 w-4" />
@@ -575,7 +578,7 @@ function StepsDialog({
                     size="icon"
                     variant="ghost"
                     onClick={() => setDeletingGroup(group)}
-                    aria-label="Delete step"
+                    aria-label={`Delete ${stepName}`}
                     data-testid={`step-delete-${primary.id}`}
                   >
                     <Trash2 className="h-4 w-4" />
@@ -731,7 +734,9 @@ export default function JourneyStepsManager() {
               <div className="min-w-0">
                 <div className="flex items-center gap-2 flex-wrap">
                   <span className="font-medium line-clamp-1 break-words min-w-0" title={j.title}>{j.title}</span>
-                  <Badge variant="outline">{j.category}</Badge>
+                  <Badge variant="outline" className="max-w-full min-w-0" title={j.category}>
+                    <span className="truncate">{j.category}</span>
+                  </Badge>
                   {j.status && j.status !== "published" && (
                     <Badge variant="secondary">{j.status}</Badge>
                   )}
@@ -743,8 +748,11 @@ export default function JourneyStepsManager() {
                   </p>
                 )}
               </div>
+              {/* C3-V5B-04: shrink-0 keeps the full "Steps" label at phone width;
+                  the min-w-0 text column truncates instead. */}
               <Button
                 size="sm"
+                className="shrink-0"
                 onClick={() => setActiveJourney(j)}
                 aria-label={`Steps for ${j.title}`}
                 data-testid={`edit-steps-${j.id}`}

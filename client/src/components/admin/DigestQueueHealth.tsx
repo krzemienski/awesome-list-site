@@ -4,6 +4,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { formatAdminDateTime } from "@/lib/utils";
 import { Stat } from "@/components/admin/AdminOpsPrimitives";
+import type { DigestJobStatus } from "@shared/notifications";
 import "@/styles/pages/admin-ops-github-links.css";
 
 interface Health {
@@ -15,11 +16,18 @@ interface Health {
 
 const title = (value: string) => value.replace(/_/g, " ").replace(/\b\w/g, (c) => c.toUpperCase());
 
+// C3-V5B-07: the health payload counts every digest job by status, including
+// finished ones (sent/failed/skipped). Only these are still in the queue.
+const IN_QUEUE_STATUSES: ReadonlySet<string> = new Set<DigestJobStatus>(["queued", "processing"]);
+
 export default function DigestQueueHealth() {
   const query = useQuery<Health>({ queryKey: ["/api/admin/digests/health"] });
   const total = query.data
     ? Object.values(query.data.queue).reduce(
-      (sum, statuses) => sum + Object.values(statuses).reduce((channelTotal, count) => channelTotal + count, 0),
+      (sum, statuses) => sum + Object.entries(statuses).reduce(
+        (channelTotal, [status, count]) => channelTotal + (IN_QUEUE_STATUSES.has(status) ? count : 0),
+        0,
+      ),
       0,
     )
     : 0;
@@ -97,10 +105,10 @@ export default function DigestQueueHealth() {
             </div>
 
             <section>
-              <h3 className="mb-3 text-sm font-semibold">Queue by channel and status</h3>
+              <h3 className="mb-3 text-sm font-semibold">Digest jobs by channel and status</h3>
               {Object.keys(query.data.queue).length === 0 ? (
                 <p className="text-sm text-[color:var(--text-2)]">
-                  No queued digests.
+                  No digest jobs recorded.
                 </p>
               ) : (
                 <div className="ops-digest-health__queue-grid">
