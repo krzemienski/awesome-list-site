@@ -6,7 +6,7 @@ import { useQuery } from "@tanstack/react-query";
 import { apiRequest, ApiError } from "@/lib/queryClient";
 import { writeFilterParams } from "@/lib/url-filter-state";
 import { parseTagsParam, normalizeTag } from "@/lib/tags";
-import { normalizeSearchQuery, SEARCH_QUERY_MAX_LENGTH } from "@shared/searchNormalize";
+import { isSearchableQuery, normalizeSearchQuery, SEARCH_QUERY_MAX_LENGTH } from "@shared/searchNormalize";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -188,14 +188,15 @@ export default function Search() {
   const queryTooLong = normalized.length > SEARCH_QUERY_MAX_LENGTH;
   const hasActiveFilters = facetState(state);
   const canBrowse = hasActiveFilters || state.sort !== "relevance";
-  const shouldShowResults = normalized.length >= 2 || canBrowse;
-  const queryUrl = useMemo(() => { const p = new URLSearchParams({ page: String(state.page), limit: String(PAGE_SIZE), facets: "true" }); if (normalized && (normalized.length >= 2 || canBrowse)) p.set("search", normalized); if (state.category) p.set("category", state.category); if (state.subcategory) p.set("subcategory", state.subcategory); if (state.subSubcategory) p.set("subSubcategory", state.subSubcategory); if (state.tags.length) p.set("tags", state.tags.join(",")); if (state.provider) p.set("provider", state.provider); if (state.format) p.set("format", state.format); if (state.skillLevel) p.set("skillLevel", state.skillLevel); if (state.sort !== "relevance") p.set("sort", state.sort); return `/api/resources?${p.toString()}`; }, [normalized, canBrowse, state]);
+  const queryReady = isSearchableQuery(normalized);
+  const shouldShowResults = queryReady || canBrowse;
+  const queryUrl = useMemo(() => { const p = new URLSearchParams({ page: String(state.page), limit: String(PAGE_SIZE), facets: "true" }); if (normalized && (queryReady || canBrowse)) p.set("search", normalized); if (state.category) p.set("category", state.category); if (state.subcategory) p.set("subcategory", state.subcategory); if (state.subSubcategory) p.set("subSubcategory", state.subSubcategory); if (state.tags.length) p.set("tags", state.tags.join(",")); if (state.provider) p.set("provider", state.provider); if (state.format) p.set("format", state.format); if (state.skillLevel) p.set("skillLevel", state.skillLevel); if (state.sort !== "relevance") p.set("sort", state.sort); return `/api/resources?${p.toString()}`; }, [normalized, queryReady, canBrowse, state]);
   // Fetch the unfiltered first page even while the prompt is visible. Its rows
   // stay hidden, but its facet metadata makes filter-only browsing possible.
   const query = useQuery<{ resources: DbResource[]; total: number; facets: ResourceSearchFacets; search?: { mode: "fts" | "fuzzy"; suggestion?: string } }>({ queryKey: [queryUrl], queryFn: () => apiRequest(queryUrl, { method: "GET" }), enabled: !queryTooLong, staleTime: 60_000 });
   const data = query.data; const results = data?.resources ?? []; const total = data?.total ?? 0; const totalPages = Math.max(1, Math.ceil(total / PAGE_SIZE)); const safePage = Math.min(state.page, totalPages);
   useEffect(() => {
-    if (normalized.length < 2 || !data) return;
+    if (!queryReady || !data) return;
     const intent = JSON.stringify([
       normalized,
       state.category,
@@ -240,7 +241,7 @@ export default function Search() {
     <ActiveFilters state={state} onChange={update} onClear={() => clearFilters()} />
     {pageNotice && <div className="flex items-center justify-between rounded-md border border-[var(--border)] bg-[var(--surface)] px-4 py-2 text-sm" role="status" data-testid="notice-page-adjusted"><span>{pageNotice}</span><button className="min-h-8 underline" onClick={() => setPageNotice(null)} data-testid="button-dismiss-page-notice">Dismiss</button></div>}
     <div className="flex flex-col items-stretch gap-4 lg:flex-row lg:items-start lg:gap-6"><SearchFilters state={state} facets={data?.facets ?? lastFacets.current} onChange={update} onClear={() => clearFilters()} /><section ref={resultsRef} tabIndex={-1} aria-label="Search results" className="min-w-0 flex-1 outline-none">
-      {!shouldShowResults ? <Card data-testid="text-search-prompt"><CardContent className="flex flex-col items-center gap-3 py-12 text-center"><SearchIcon className="h-8 w-8 text-muted-foreground" /><h2 className="text-sm font-semibold">{normalized.length === 1 ? "Keep typing to search" : "Enter a query or choose filters"}</h2><p className="text-xs text-muted-foreground">{normalized.length === 1 ? "Type at least 2 characters, or choose a filter to browse." : "Narrow the catalog by category, provider, format, skill level, or tag."}</p><Button asChild variant="outline"><Link href="/categories">Browse categories</Link></Button></CardContent></Card>
+      {!shouldShowResults ? <Card data-testid="text-search-prompt"><CardContent className="flex flex-col items-center gap-3 py-12 text-center"><SearchIcon className="h-8 w-8 text-muted-foreground" /><h2 className="text-sm font-semibold">{normalized ? "Keep typing to search" : "Enter a query or choose filters"}</h2><p className="text-xs text-muted-foreground">{normalized ? "Type at least 2 letters or digits, or choose a filter to browse." : "Narrow the catalog by category, provider, format, skill level, or tag."}</p><Button asChild variant="outline"><Link href="/categories">Browse categories</Link></Button></CardContent></Card>
        : queryTooLong ? <Card data-testid="search-query-too-long"><CardContent className="flex flex-col items-center gap-3 py-10 text-center"><AlertCircle className="h-8 w-8 text-[var(--accent)]" /><p className="text-sm text-muted-foreground" role="alert">Search is limited to {SEARCH_QUERY_MAX_LENGTH} characters. This query has {normalized.length.toLocaleString()} — shorten it to search.</p><Button variant="outline" onClick={clearSearch} data-testid="button-clear-long-query">Clear search</Button></CardContent></Card>
        : query.isLoading ? <div className="grid gap-4 [grid-template-columns:repeat(auto-fill,minmax(min(100%,300px),1fr))]" data-testid="search-results-loading" aria-busy="true">{Array.from({ length: 6 }).map((_, i) => <ResourceCardSkeleton key={i} />)}</div>
        : query.isError ? <Card data-testid="search-results-error"><CardContent className="flex flex-col items-center gap-3 py-10 text-center"><AlertCircle className="h-8 w-8 text-[var(--accent)]" /><p className="text-sm text-muted-foreground">{invalid ? query.error.message : "Search failed. Please try again."}</p><Button variant="outline" onClick={invalid ? clearInvalidRequest : () => query.refetch()} data-testid={invalid ? "button-clear-invalid-filters" : "button-retry-search"}>{invalid ? "Clear invalid filters" : "Try again"}</Button></CardContent></Card>

@@ -8,7 +8,7 @@ import { ApiError, apiRequest } from "@/lib/queryClient";
 import { queryUnavailableReason } from "@/lib/query-availability";
 import { trackSearch, trackResourceClick } from "@/lib/analytics";
 import { useDebounce } from "@/hooks/useDebounce";
-import { normalizeSearchQuery, SEARCH_QUERY_MAX_LENGTH } from "@shared/searchNormalize";
+import { isSearchableQuery, normalizeSearchQuery, SEARCH_QUERY_MAX_LENGTH } from "@shared/searchNormalize";
 import type { Category } from "@shared/schema";
 import "./../../styles/shell/palette.css";
 
@@ -60,7 +60,7 @@ function readRecentSearches(): string[] {
 
 function saveRecentSearch(query: string): string[] {
   const trimmed = query.trim();
-  if (trimmed.length < 2) return readRecentSearches();
+  if (!isSearchableQuery(normalizeSearchQuery(trimmed))) return readRecentSearches();
   const next = [trimmed, ...readRecentSearches().filter((s) => s.toLowerCase() !== trimmed.toLowerCase())].slice(
     0,
     RECENT_SEARCHES_MAX,
@@ -91,7 +91,7 @@ export default function SearchDialog({ isOpen, setIsOpen }: SearchDialogProps) {
   // and /search share one cache entry per canonical query.
   const trimmed = normalizeSearchQuery(debouncedQuery);
   const queryTrimmed = normalizeSearchQuery(query);
-  const showResults = queryTrimmed.length >= 2;
+  const showResults = isSearchableQuery(queryTrimmed);
   const queryTooLong = queryTrimmed.length > SEARCH_QUERY_MAX_LENGTH;
 
   // Keep this query and cache key in lockstep with /search. Selecting a
@@ -102,7 +102,7 @@ export default function SearchDialog({ isOpen, setIsOpen }: SearchDialogProps) {
       apiRequest(`/api/resources?search=${encodeURIComponent(trimmed)}&page=1&limit=24`, {
         method: "GET",
       }),
-    enabled: isOpen && trimmed.length >= 2 && trimmed.length <= SEARCH_QUERY_MAX_LENGTH,
+    enabled: isOpen && isSearchableQuery(trimmed) && trimmed.length <= SEARCH_QUERY_MAX_LENGTH,
     staleTime: 60 * 1000,
   });
 
@@ -124,8 +124,8 @@ export default function SearchDialog({ isOpen, setIsOpen }: SearchDialogProps) {
     staleTime: 60 * 1000,
   });
 
-  const allMatches = trimmed.length >= 2 ? resourceQuery.data?.resources ?? [] : [];
-  const totalMatches = trimmed.length >= 2 ? resourceQuery.data?.total ?? allMatches.length : 0;
+  const allMatches = isSearchableQuery(trimmed) ? resourceQuery.data?.resources ?? [] : [];
+  const totalMatches = isSearchableQuery(trimmed) ? resourceQuery.data?.total ?? allMatches.length : 0;
   const results = allMatches.slice(0, 15);
   const defaultCategories = (categoriesQuery.data ?? []).slice(0, 5);
   const featuredResources = (featuredQuery.data?.featured ?? []).slice(0, 4);
@@ -154,7 +154,7 @@ export default function SearchDialog({ isOpen, setIsOpen }: SearchDialogProps) {
   // Track the search once the debounced query settles and results arrive —
   // one `search` event per settled query, not one per keystroke.
   useEffect(() => {
-    if (!trimmed || trimmed.length < 2 || !resourceQuery.data) return;
+    if (!isSearchableQuery(trimmed) || !resourceQuery.data) return;
     trackSearch(trimmed, resourceQuery.data.total, "search_palette");
   }, [trimmed, resourceQuery.data]);
 
@@ -183,13 +183,13 @@ export default function SearchDialog({ isOpen, setIsOpen }: SearchDialogProps) {
 
   const openResource = (resource: DbSearchResource) => {
     trackResourceClick(resource.title, resource.url, resource.category || "");
-    if (queryTrimmed.length >= 2) setRecentSearches(saveRecentSearch(queryTrimmed));
+    if (isSearchableQuery(queryTrimmed)) setRecentSearches(saveRecentSearch(queryTrimmed));
     setIsOpen(false);
     navigate(`/resource/${resource.id}`);
   };
 
   const commitToSearchPage = (q: string) => {
-    if (q.length >= 2) setRecentSearches(saveRecentSearch(q));
+    if (isSearchableQuery(normalizeSearchQuery(q))) setRecentSearches(saveRecentSearch(q));
     setIsOpen(false);
     navigate(`/search?q=${encodeURIComponent(q)}`);
   };
@@ -384,7 +384,7 @@ export default function SearchDialog({ isOpen, setIsOpen }: SearchDialogProps) {
               onKeyDown={(event) => {
                 // Before a debounced result has an active cmdk row, commit to
                 // /search rather than making Enter a no-op.
-                if (event.key !== "Enter" || queryTrimmed.length < 2 || queryTooLong) return;
+                if (event.key !== "Enter" || !isSearchableQuery(queryTrimmed) || queryTooLong) return;
                 const active = document.querySelector(
                   '[cmdk-item][data-selected="true"], [cmdk-item][aria-selected="true"]',
                 );

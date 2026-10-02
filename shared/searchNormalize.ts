@@ -36,6 +36,18 @@ const EDGE_QUOTES =
 const SEARCHABLE_CHAR = /[\p{L}\p{N}]/u;
 
 /**
+ * C5-API-01/02: the one minimum every search surface applies. It counts
+ * letters and digits only, because that is all the matcher indexes: "c++"
+ * searched as the bare prefix "c:*" and matched 2,872 rows, and the
+ * server-rendered /search had no minimum at all.
+ */
+export const SEARCH_QUERY_MIN_CHARS = 2;
+
+export function isSearchableQuery(normalized: string): boolean {
+  return (normalized.match(/[\p{L}\p{N}]/gu)?.length ?? 0) >= SEARCH_QUERY_MIN_CHARS;
+}
+
+/**
  * Split a raw query into clean match tokens. Downstream matchers apply AND
  * semantics: every token must appear somewhere in the searched fields, so
  * "ffmpeg hls" and "hls ffmpeg" return the same set (audit2 BUG-011).

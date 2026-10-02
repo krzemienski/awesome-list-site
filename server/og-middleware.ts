@@ -2,7 +2,7 @@ import type { Request, Response, NextFunction } from "express";
 import { storage } from "./storage";
 import { getAboutFaqs } from "@shared/faq";
 import { parsePageNumber, parseUrlPageStrict } from "@shared/page-param";
-import { normalizeSearchQuery } from "@shared/searchNormalize";
+import { isSearchableQuery, normalizeSearchQuery } from "@shared/searchNormalize";
 import { MAINTAINER } from "@shared/about-content";
 import { normalizeAdminTab } from "@shared/admin-tabs";
 import {
@@ -1079,7 +1079,10 @@ function homeShellChrome(): string {
       // whitespace-/control-only queries render the explicit "enter a search
       // term" prompt instead of catalog rows, and the SSR heading always
       // shows the query that was actually matched.
-      const q = normalizeSearchQuery(parseQueryParam(url));
+      // C5-API-02: the same minimum as the API and the hydrated page, so a
+      // one-letter query never renders a result count the client then hides.
+      const normalizedQuery = normalizeSearchQuery(parseQueryParam(url));
+      const q = isSearchableQuery(normalizedQuery) ? normalizedQuery : "";
       let results: { id: number; title: string; description?: string }[] = [];
       let total = 0;
       let sPage = parsePage(url);

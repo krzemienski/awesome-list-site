@@ -65,7 +65,7 @@ import {
   resourceDescriptionSchema,
   tagSchema,
 } from "@shared/validation";
-import { normalizeSearchQuery } from "@shared/searchNormalize";
+import { isSearchableQuery, normalizeSearchQuery } from "@shared/searchNormalize";
 import {
   RESOURCE_FORMAT_VALUES,
   RESOURCE_PROVIDER_VALUES,
@@ -496,7 +496,7 @@ export function registerCatalogContributionsRoutes(
       const q = normalizeSearchQuery(
         firstQueryValue(req.query.q) || firstQueryValue(req.query.search) || ''
       );
-      if (q.length < 2) {
+      if (!isSearchableQuery(q)) {
         return res.json({ query: q, total: 0, results: [] });
       }
       const limit = Math.min(Math.max(parseInt(firstQueryValue(req.query.limit) as string) || 100, 1), 200);
