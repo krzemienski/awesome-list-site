@@ -292,18 +292,27 @@ export const resourceTitleSchema = z
   .refine((v) => !NO_HTML_RE.test(v), "Title must not contain HTML tags")
   .transform((v) => stripInvisible(v));
 
+const buildResourceDescriptionSchema = (allowBlank: boolean) =>
+  z
+    .string()
+    .max(DESCRIPTION_MAX, `Description must be at most ${DESCRIPTION_MAX} characters`)
+    .refine((v) => !MULTILINE_CONTROL_RE.test(v), `Description ${CONTROL_CHARS_MESSAGE}`)
+    .refine((v) => !BIDI_CONTROL_RE.test(v), `Description ${BIDI_CONTROL_MESSAGE}`)
+    .refine((v) => !NO_HTML_RE.test(v), "Description must not contain HTML tags")
+    .refine(
+      (v) => (allowBlank && !hasVisibleChars(v)) || visibleLength(v) >= DESCRIPTION_MIN,
+      `Description must be at least ${DESCRIPTION_MIN} characters`,
+    )
+    .transform((v) => stripInvisible(v).replace(/\s+/g, " "));
+
 /** Description: required on submit paths, 10–1000 visible chars, no markup. */
-export const resourceDescriptionSchema = z
-  .string()
-  .max(DESCRIPTION_MAX, `Description must be at most ${DESCRIPTION_MAX} characters`)
-  .refine((v) => !MULTILINE_CONTROL_RE.test(v), `Description ${CONTROL_CHARS_MESSAGE}`)
-  .refine((v) => !BIDI_CONTROL_RE.test(v), `Description ${BIDI_CONTROL_MESSAGE}`)
-  .refine((v) => !NO_HTML_RE.test(v), "Description must not contain HTML tags")
-  .refine(
-    (v) => visibleLength(v) >= DESCRIPTION_MIN,
-    `Description must be at least ${DESCRIPTION_MIN} characters`,
-  )
-  .transform((v) => stripInvisible(v).replace(/\s+/g, " "));
+export const resourceDescriptionSchema = buildResourceDescriptionSchema(false);
+
+/**
+ * Admin create/edit description: optional, so a blank value is accepted and
+ * stored as "" (C3-V5A-02). Anything typed gets the full submit rules.
+ */
+export const optionalResourceDescriptionSchema = buildResourceDescriptionSchema(true);
 
 export const tagSchema = z
   .string()

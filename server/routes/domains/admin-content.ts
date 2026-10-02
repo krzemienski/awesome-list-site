@@ -58,7 +58,7 @@ import { resourceKindSchema } from "@shared/resourceKinds";
 import {
   httpsUrlSchema,
   resourceTitleSchema,
-  resourceDescriptionSchema,
+  optionalResourceDescriptionSchema,
   DISPLAY_NAME_MAX,
   stripInvisible,
   parseIntInRange,
@@ -70,6 +70,7 @@ import { isDatabaseUnavailableError } from "../../db/errors";
 import { claudeService } from "../../ai/claudeService";
 import { send429 } from "../../middleware/rateLimit";
 import { ConflictError } from "../../middleware/errors";
+import { buildValidationEnvelope } from "../../contracts/envelope";
 import type {
   UserRepository,
   ResourceRepository,
@@ -561,16 +562,14 @@ export function registerAdminContentRoutes(
       // set the admin-owned stored kind.
       const updateSchema = adminResourceWriteSchema.partial().extend({
         title: resourceTitleSchema.optional(),
-        description: resourceDescriptionSchema.optional(),
+        description: optionalResourceDescriptionSchema.optional(),
         url: httpsUrlSchema.optional(),
       });
       const validationResult = updateSchema.safeParse(bodyForValidation);
       
       if (!validationResult.success) {
-        return res.status(400).json({ 
-          message: 'Validation failed', 
-          errors: validationResult.error.issues
-        });
+        // C3-V5A-02: per-field messages so the dialog can mark the field.
+        return res.status(400).json(buildValidationEnvelope(validationResult.error));
       }
       
       // Task #248: entity-escaped text must never be stored (shared decode
@@ -954,16 +953,13 @@ export function registerAdminContentRoutes(
       const createSchema = adminResourceWriteSchema.extend({
         title: resourceTitleSchema,
         url: httpsUrlSchema,
-        description: resourceDescriptionSchema.optional(),
+        description: optionalResourceDescriptionSchema.optional(),
       });
       
       const validationResult = createSchema.safeParse(req.body);
       
       if (!validationResult.success) {
-        return res.status(400).json({ 
-          message: 'Validation failed', 
-          errors: validationResult.error.issues
-        });
+        return res.status(400).json(buildValidationEnvelope(validationResult.error));
       }
       
       // Task #248: entity-escaped text must never be stored (shared decode
