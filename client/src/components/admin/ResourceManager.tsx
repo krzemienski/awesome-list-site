@@ -312,6 +312,9 @@ export default function ResourceManager({ createRequest = 0 }: { createRequest?:
   // pager describe the rows actually shown, not the page that was requested.
   const shownPage = data?.page ?? page;
   const shownLimit = data?.limit ?? limit;
+  // C4-V5A-01: "Stay on page N" unmounts itself; land focus on the rows it
+  // kept instead of dropping it to <body>.
+  const tableRegionRef = useRef<HTMLDivElement>(null);
 
   // Task 275: clamp an out-of-range page (stale ?page= link, shrunk result
   // set) back to the last real page instead of showing an empty table.
@@ -1323,7 +1326,10 @@ export default function ResourceManager({ createRequest = 0 }: { createRequest?:
                   <Button
                     variant="ghost"
                     size="sm"
-                    onClick={() => setPage(shownPage)}
+                    onClick={() => {
+                      setPage(shownPage);
+                      tableRegionRef.current?.focus();
+                    }}
                     data-testid="button-resources-offline-stay"
                   >
                     Stay on page {shownPage.toLocaleString()}
@@ -1340,7 +1346,11 @@ export default function ResourceManager({ createRequest = 0 }: { createRequest?:
               </div>
             </div>
           )}
-          <div className="admin-catalog-resources__table-scroll overflow-auto">
+          <div
+            ref={tableRegionRef}
+            tabIndex={-1}
+            className="admin-catalog-resources__table-scroll overflow-auto"
+          >
             <table className="table admin-catalog-resources__table">
               <thead>
                 <tr>
