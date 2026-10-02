@@ -142,12 +142,19 @@ export default function PendingResources() {
   // F890: approving/rejecting removes the row whose button opened the dialog,
   // so the dialog's return-focus target disappears. Plan a surviving target
   // (next row, else previous row, else the list heading) before it goes.
-  const focusAfterRemovalRef = useRef<{ removedId: number; targetId: number | null } | null>(null);
+  // C5-V5A-01: the bulk paths plan the same way — their opener is disabled
+  // once the selection clears, so Radix's return focus would land on <body>.
+  const focusAfterRemovalRef = useRef<{ removedIds: number[]; targetId: number | null } | null>(null);
 
-  const planFocusAfterRemoval = (removedId: number) => {
-    const index = pendingResources.findIndex((resource) => resource.id === removedId);
-    const target = pendingResources[index + 1] ?? pendingResources[index - 1] ?? null;
-    focusAfterRemovalRef.current = { removedId, targetId: target?.id ?? null };
+  const planFocusAfterRemoval = (removedIds: number[]) => {
+    const removed = new Set(removedIds);
+    const index = pendingResources.findIndex((resource) => removed.has(resource.id));
+    const survives = (resource: Resource) => !removed.has(resource.id);
+    const target =
+      pendingResources.slice(index + 1).find(survives) ??
+      pendingResources.slice(0, Math.max(index, 0)).reverse().find(survives) ??
+      null;
+    focusAfterRemovalRef.current = { removedIds, targetId: target?.id ?? null };
   };
 
   const focusRemovalTarget = () => {
@@ -169,7 +176,7 @@ export default function PendingResources() {
   // the dialog closed; re-apply the planned focus if it was lost to <body>.
   useEffect(() => {
     const plan = focusAfterRemovalRef.current;
-    if (!plan || pendingResourceIds.includes(plan.removedId)) return;
+    if (!plan || plan.removedIds.every((id) => pendingResourceIds.includes(id))) return;
     const active = document.activeElement;
     if (!active || active === document.body || !active.isConnected) focusRemovalTarget();
     focusAfterRemovalRef.current = null;
@@ -182,7 +189,7 @@ export default function PendingResources() {
       });
     },
     onSuccess: (_data, resourceId) => {
-      planFocusAfterRemoval(resourceId);
+      planFocusAfterRemoval([resourceId]);
       void queryClient.invalidateQueries({ queryKey: ['/api/admin/pending-resources'] });
       void queryClient.invalidateQueries({ queryKey: ['/api/admin/stats'] });
       setApproveDialogOpen(false);
@@ -206,7 +213,7 @@ export default function PendingResources() {
       });
     },
     onSuccess: (_data, { resourceId }) => {
-      planFocusAfterRemoval(resourceId);
+      planFocusAfterRemoval([resourceId]);
       void queryClient.invalidateQueries({ queryKey: ['/api/admin/pending-resources'] });
       void queryClient.invalidateQueries({ queryKey: ['/api/admin/stats'] });
       setRejectDialogOpen(false);
@@ -240,6 +247,7 @@ export default function PendingResources() {
         succeeded: response.succeeded,
         failed: response.failed
       };
+      planFocusAfterRemoval(ids);
       setBulkOutcome(outcome);
       setSelectedResourceIds(new Set());
       setBulkApproveDialogOpen(false);
@@ -278,6 +286,7 @@ export default function PendingResources() {
         succeeded: response.succeeded,
         failed: response.failed
       };
+      planFocusAfterRemoval(variables.ids);
       setBulkOutcome(outcome);
       setSelectedResourceIds(new Set());
       setBulkRejectDialogOpen(false);
@@ -930,7 +939,7 @@ export default function PendingResources() {
          setBulkApproveDialogOpen(open);
          if (!open) setBulkApproveError(null);
        }}>
-         <AlertDialogContent>
+         <AlertDialogContent onCloseAutoFocus={restoreFocusAfterRemoval}>
            <AlertDialogHeader>
              <AlertDialogTitle>Approve pending resources?</AlertDialogTitle>
              <AlertDialogDescription>
@@ -972,7 +981,7 @@ export default function PendingResources() {
            setBulkRejectionReason("");
          }
        }}>
-         <DialogContent>
+         <DialogContent onCloseAutoFocus={restoreFocusAfterRemoval}>
            <DialogHeader>
              <DialogTitle>Reject pending resources?</DialogTitle>
              <DialogDescription>
