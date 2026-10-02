@@ -24,6 +24,7 @@ import { useAuth } from "@/hooks/useAuth";
 import { useToast } from "@/hooks/use-toast";
 import { queryClient, apiRequest, ApiError } from "@/lib/queryClient";
 import { humanizeApiError } from "@/lib/apiError";
+import { queryUnavailableReason } from "@/lib/query-availability";
 import { mpTrack } from "@/lib/mixpanel";
 import {
   trackJourneyStart,
@@ -90,13 +91,7 @@ export default function JourneyDetail() {
   const { toast } = useToast();
 
   // Fetch journey details (includes progress if authenticated)
-  const {
-    data: journey,
-    isLoading: journeyLoading,
-    isError: journeyError,
-    error: journeyFetchError,
-    refetch: refetchJourney,
-  } = useQuery<Journey>({
+  const journeyQuery = useQuery<Journey>({
     queryKey: [`/api/journeys/${id}`],
     queryFn: async () => {
       const response = await fetch(`/api/journeys/${id}`);
@@ -105,6 +100,18 @@ export default function JourneyDetail() {
     },
     enabled: isValidId,
   });
+  const {
+    data: journey,
+    isLoading: journeyLoading,
+    error: journeyFetchError,
+    refetch: refetchJourney,
+  } = journeyQuery;
+  // C4-V2-02: a fetch started offline is paused (no data, no error); that is
+  // not "Journey not found". Only a real 404/400 answer is a missing journey.
+  const journeyMissing =
+    journeyFetchError instanceof ApiError &&
+    (journeyFetchError.status === 404 || journeyFetchError.status === 400);
+  const journeyUnavailable = journeyMissing ? null : queryUnavailableReason(journeyQuery);
 
   // Task #330: logical step count (distinct stepNumbers) for funnel events —
   // the same accounting the server uses for stepCount, never raw row count.
@@ -360,9 +367,10 @@ export default function JourneyDetail() {
     );
   }
 
-  if (journeyError && !(journeyFetchError instanceof ApiError && (journeyFetchError.status === 404 || journeyFetchError.status === 400))) {
+  if (journeyUnavailable) {
+    const offline = journeyUnavailable === "offline";
     return (
-      <div className="journey-detail-page journey-detail-page--state" role="alert">
+      <div className="journey-detail-page journey-detail-page--state" role="alert" data-testid={`journey-${journeyUnavailable}`}>
         <SEOHead
           title="Journey unavailable"
           description="This learning journey could not be loaded."
@@ -370,11 +378,15 @@ export default function JourneyDetail() {
         />
         <div className="journeys-state journeys-state--error">
           <Badge variant="destructive" className="journeys-state__error-label">
-            Error · unavailable
+            {offline ? "Offline" : "Error · unavailable"}
           </Badge>
-          <h1 className="display-h journeys-state__title">Couldn’t load this journey.</h1>
+          <h1 className="display-h journeys-state__title">
+            {offline ? "You’re offline." : "Couldn’t load this journey."}
+          </h1>
           <p className="journeys-state__copy">
-            Something went wrong while fetching the learning path. Please try again.
+            {offline
+              ? "This journey will load when your connection is back."
+              : "Something went wrong while fetching the learning path. Please try again."}
           </p>
           <Button
             variant="outline"

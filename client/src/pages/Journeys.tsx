@@ -13,6 +13,7 @@ import { useAuth } from "@/hooks/useAuth";
 import { useToast } from "@/hooks/use-toast";
 import { queryClient, apiRequest } from "@/lib/queryClient";
 import { humanizeApiError } from "@/lib/apiError";
+import { queryUnavailableReason } from "@/lib/query-availability";
 import { trackJourneyStart } from "@/lib/analytics";
 import SEOHead from "@/components/layout/SEOHead";
 import { writeFilterParams, usePopstateParams } from "@/lib/url-filter-state";
@@ -103,14 +104,17 @@ export default function Journeys() {
   const { toast } = useToast();
 
   // Fetch all published journeys (includes enrollment and progress data)
+  const journeysQuery = useQuery<Journey[]>({
+    queryKey: ['/api/journeys'],
+  });
   const {
     data: journeys = [],
     isLoading: journeysLoading,
-    isError: journeysError,
     refetch: refetchJourneys,
-  } = useQuery<Journey[]>({
-    queryKey: ['/api/journeys'],
-  });
+  } = journeysQuery;
+  // C4-V2-02: a fetch started offline is paused, not failed — without this it
+  // fell through to "No learning journeys are available at the moment".
+  const journeysUnavailable = queryUnavailableReason(journeysQuery);
 
   // Deep-link target for start/continue: the first incomplete logical step,
   // falling back to the journey top when there's nothing to jump to.
@@ -218,20 +222,25 @@ export default function Journeys() {
     );
   }
 
-  if (journeysError) {
+  if (journeysUnavailable) {
+    const offline = journeysUnavailable === "offline";
     return (
-      <div className="journeys-page journeys-page--state" role="alert">
+      <div className="journeys-page journeys-page--state" role="alert" data-testid={`journeys-${journeysUnavailable}`}>
         <SEOHead
           title="Learning Journeys"
           description={journeysHubDescription}
         />
         <div className="journeys-state journeys-state--error">
           <Badge variant="destructive" className="journeys-state__error-label">
-            Error · unavailable
+            {offline ? "Offline" : "Error · unavailable"}
           </Badge>
-          <h1 className="display-h journeys-state__title">Couldn’t load journeys.</h1>
+          <h1 className="display-h journeys-state__title">
+            {offline ? "You’re offline." : "Couldn’t load journeys."}
+          </h1>
           <p className="journeys-state__copy">
-            Something went wrong while fetching the learning paths. Please try again.
+            {offline
+              ? "Learning journeys will load when your connection is back."
+              : "Something went wrong while fetching the learning paths. Please try again."}
           </p>
           <Button
             variant="outline"
