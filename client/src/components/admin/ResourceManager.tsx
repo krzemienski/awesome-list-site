@@ -315,6 +315,16 @@ export default function ResourceManager({ createRequest = 0 }: { createRequest?:
   // C4-V5A-01: "Stay on page N" unmounts itself; land focus on the rows it
   // kept instead of dropping it to <body>.
   const tableRegionRef = useRef<HTMLDivElement>(null);
+  // C5-V5A-01: a confirmed bulk action clears the selection (unmounting the
+  // bar that opened its dialog) and a row delete removes its row, so the
+  // dialog's return-focus target is gone. Land on the table instead.
+  const focusTableOnCloseRef = useRef(false);
+  const restoreFocusToTable = (event: Event) => {
+    if (!focusTableOnCloseRef.current) return;
+    focusTableOnCloseRef.current = false;
+    event.preventDefault();
+    tableRegionRef.current?.focus();
+  };
 
   // Task 275: clamp an out-of-range page (stale ?page= link, shrunk result
   // set) back to the last real page instead of showing an empty table.
@@ -663,6 +673,7 @@ export default function ResourceManager({ createRequest = 0 }: { createRequest?:
       queryClient.invalidateQueries({ queryKey: ["awesome-list-nav"] });
       queryClient.invalidateQueries({ queryKey: ["/api/admin/stats"] });
       setSelectedResourceIds([]);
+      focusTableOnCloseRef.current = true;
       setRejectDialogOpen(false);
       toast({
         title: "Resources Rejected",
@@ -866,7 +877,11 @@ export default function ResourceManager({ createRequest = 0 }: { createRequest?:
     });
   };
 
+  // C5-V5A-02: the Kind select and Feature switch stay focusable while a PATCH
+  // runs (aria-disabled, not disabled — a disabled control drops focus out of
+  // the open dialog to <body>), so the handlers ignore input until it settles.
   const handleKindChange = (value: string) => {
+    if (editControlsPending) return;
     const kind = value === "" ? null : (value as ResourceKind);
     setEditForm((form) => ({ ...form, kind: kind ?? "" }));
     if (selectedResource) {
@@ -875,6 +890,7 @@ export default function ResourceManager({ createRequest = 0 }: { createRequest?:
   };
 
   const handleFeaturedChange = (featured: boolean) => {
+    if (editControlsPending) return;
     setEditForm((form) => ({ ...form, featured }));
     if (selectedResource) {
       featuredMutation.mutate({ id: selectedResource.id, featured });
@@ -899,6 +915,9 @@ export default function ResourceManager({ createRequest = 0 }: { createRequest?:
 
   const handleDelete = () => {
     if (!selectedResource) return;
+    // The confirm button closes the dialog at once; the row it opened from is
+    // about to go, so return focus to the table.
+    focusTableOnCloseRef.current = true;
     deleteMutation.mutate(selectedResource.id);
   };
 
@@ -908,6 +927,7 @@ export default function ResourceManager({ createRequest = 0 }: { createRequest?:
   };
 
   const confirmBulkApprove = () => {
+    focusTableOnCloseRef.current = true;
     setBulkApproveDialogOpen(false);
     bulkApproveMutation.mutate(selectedResourceIds);
   };
@@ -936,6 +956,7 @@ export default function ResourceManager({ createRequest = 0 }: { createRequest?:
   };
 
   const confirmBulkDelete = () => {
+    focusTableOnCloseRef.current = true;
     setBulkDeleteDialogOpen(false);
     bulkDeleteMutation.mutate(selectedResourceIds);
   };
@@ -1191,7 +1212,7 @@ export default function ResourceManager({ createRequest = 0 }: { createRequest?:
 
           {/* Bulk Reject Reason Dialog */}
           <Dialog open={rejectDialogOpen} onOpenChange={setRejectDialogOpen}>
-            <DialogContent>
+            <DialogContent onCloseAutoFocus={restoreFocusToTable}>
               <DialogHeader>
                 <DialogTitle>Reject Selected Resources</DialogTitle>
                 <DialogDescription>
@@ -1232,7 +1253,7 @@ export default function ResourceManager({ createRequest = 0 }: { createRequest?:
           {/* R4-054: Bulk Approve Confirmation — states the exact count so a
               batch publish can't fire on a single misclick. */}
           <AlertDialog open={bulkApproveDialogOpen} onOpenChange={setBulkApproveDialogOpen}>
-            <AlertDialogContent data-testid="dialog-bulk-approve">
+            <AlertDialogContent data-testid="dialog-bulk-approve" onCloseAutoFocus={restoreFocusToTable}>
               <AlertDialogHeader>
                 <AlertDialogTitle>Approve {selectedResourceIds.length} resource{selectedResourceIds.length === 1 ? '' : 's'}?</AlertDialogTitle>
                 <AlertDialogDescription>
@@ -1255,7 +1276,7 @@ export default function ResourceManager({ createRequest = 0 }: { createRequest?:
 
           {/* Bulk Delete Confirmation */}
           <AlertDialog open={bulkDeleteDialogOpen} onOpenChange={setBulkDeleteDialogOpen}>
-            <AlertDialogContent data-testid="dialog-bulk-delete">
+            <AlertDialogContent data-testid="dialog-bulk-delete" onCloseAutoFocus={restoreFocusToTable}>
               <AlertDialogHeader>
                 <AlertDialogTitle>Delete {selectedResourceIds.length} resource{selectedResourceIds.length === 1 ? '' : 's'}?</AlertDialogTitle>
                 <AlertDialogDescription>
@@ -1369,7 +1390,17 @@ export default function ResourceManager({ createRequest = 0 }: { createRequest?:
                     <td colSpan={6} className="py-12 text-center text-sm text-[var(--text-2)]" data-testid="row-empty-state">
                       {(search || categoryFilter || statusFilter)
                         ? <>No resources match the current search or filters.{' '}
-                            <button type="button" className="text-primary underline" onClick={clearFilters} data-testid="button-empty-clear-filters">
+                            {/* C5-V5A-02: this row unmounts once results return;
+                                hand focus to the table that shows them. */}
+                            <button
+                              type="button"
+                              className="text-primary underline"
+                              onClick={() => {
+                                clearFilters();
+                                tableRegionRef.current?.focus();
+                              }}
+                              data-testid="button-empty-clear-filters"
+                            >
                               Clear filters
                             </button></>
                         : "No resources yet."}
@@ -1670,7 +1701,8 @@ export default function ResourceManager({ createRequest = 0 }: { createRequest?:
                     className="select admin-catalog-resources__native-select"
                     value={editForm.kind}
                     onChange={(event) => handleKindChange(event.target.value)}
-                    disabled={editControlsPending}
+                    aria-disabled={editControlsPending}
+                    aria-busy={kindMutation.isPending}
                     aria-describedby="edit-kind-hint"
                     data-testid="admin-resource-kind-select"
                   >
@@ -1701,7 +1733,8 @@ export default function ResourceManager({ createRequest = 0 }: { createRequest?:
                     id="edit-featured"
                     checked={editForm.featured}
                     onCheckedChange={handleFeaturedChange}
-                    disabled={editControlsPending}
+                    aria-disabled={editControlsPending}
+                    aria-busy={featuredMutation.isPending}
                     aria-label="Feature this resource"
                     data-testid="admin-resource-featured-toggle"
                   />
@@ -2031,7 +2064,7 @@ export default function ResourceManager({ createRequest = 0 }: { createRequest?:
       </Dialog>
 
       <AlertDialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
-        <AlertDialogContent className="bg-[var(--bg-2)] border-[var(--border)]">
+        <AlertDialogContent className="bg-[var(--bg-2)] border-[var(--border)]" onCloseAutoFocus={restoreFocusToTable}>
           <AlertDialogHeader>
             <AlertDialogTitle className={"text-[var(--status-bad)]" /* DS-OK: status bad */}>Delete Resource</AlertDialogTitle>
             <AlertDialogDescription>

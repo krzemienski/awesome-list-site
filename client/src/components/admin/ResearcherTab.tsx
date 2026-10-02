@@ -696,8 +696,11 @@ export default function ResearcherTab({ initialTab = "launch" }: ResearcherTabPr
                       size="sm"
                       variant="outline"
                       className="h-7 text-xs"
-                      onClick={() => briefMutation.mutate()}
-                      disabled={briefMutation.isPending}
+                      // C5-V5A-02: aria-disabled (not disabled) keeps keyboard
+                      // focus on the button while the brief generates.
+                      onClick={() => { if (!briefMutation.isPending) briefMutation.mutate(); }}
+                      aria-disabled={briefMutation.isPending}
+                      aria-busy={briefMutation.isPending}
                       data-testid="button-generate-brief"
                     >
                       {briefMutation.isPending

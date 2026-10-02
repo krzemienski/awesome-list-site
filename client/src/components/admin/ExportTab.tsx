@@ -324,9 +324,13 @@ export default function ExportTab({ validationStatus: propValidationStatus }: Ex
       <div className="admin-ops-export__intro">
         <h2>Export Awesome List</h2>
         <div className="admin-ops-export__intro-actions">
+          {/* C5-V5A-02: these buttons (and the Download / Generate cards below)
+              use aria-disabled, not disabled, while working — a disabled button
+              drops keyboard focus to <body>. */}
           <Button
-            onClick={() => setConfirmAction("validate")}
-            disabled={validateMutation.isPending}
+            onClick={() => { if (!validateMutation.isPending) setConfirmAction("validate"); }}
+            aria-disabled={validateMutation.isPending}
+            aria-busy={validateMutation.isPending}
             variant="outline"
           >
             {validateMutation.isPending ? (
@@ -342,8 +346,9 @@ export default function ExportTab({ validationStatus: propValidationStatus }: Ex
             )}
           </Button>
           <Button
-            onClick={() => setConfirmAction("links")}
-            disabled={checkLinksMutation.isPending}
+            onClick={() => { if (!checkLinksMutation.isPending) setConfirmAction("links"); }}
+            aria-disabled={checkLinksMutation.isPending}
+            aria-busy={checkLinksMutation.isPending}
             variant="outline"
           >
             {checkLinksMutation.isPending ? (
@@ -378,9 +383,10 @@ export default function ExportTab({ validationStatus: propValidationStatus }: Ex
           <Button
             className="admin-ops-export-card__action"
             onClick={() => {
-              void handleJsonExport();
+              if (!isJsonExporting) void handleJsonExport();
             }}
-            disabled={isJsonExporting}
+            aria-disabled={isJsonExporting}
+            aria-busy={isJsonExporting}
             data-testid="button-export-json"
           >
             {isJsonExporting ? <RefreshCw className="h-4 w-4 animate-spin" /> : <Download className="h-4 w-4" />}
@@ -414,7 +420,8 @@ export default function ExportTab({ validationStatus: propValidationStatus }: Ex
             onClick={() => {
               void handleExport();
             }}
-            disabled={isExporting}
+            aria-disabled={isExporting}
+            aria-busy={isExporting}
             variant="outline"
             data-testid="button-export-markdown"
           >
