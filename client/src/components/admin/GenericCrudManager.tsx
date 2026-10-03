@@ -2945,6 +2945,16 @@ export default function GenericCrudManager<T extends BaseEntityWithCount>({
       {/* Create Dialog */}
       <Dialog open={createDialogOpen} onOpenChange={setCreateDialogOpen}>
         <DialogContent className="admin-taxonomy-dialog" data-testid={`dialog-create-${testIdEntity}`}>
+          {/* C7-V5B-01: a real form so Enter in a field submits, like the
+              Save button; display:contents keeps the dialog's grid layout. */}
+          <form
+            className="contents"
+            noValidate
+            onSubmit={(e) => {
+              e.preventDefault();
+              if (!createMutation.isPending) void handleCreate();
+            }}
+          >
           <DialogHeader>
             <DialogTitle>{createDialogTitle}</DialogTitle>
             <DialogDescription>
@@ -3144,13 +3154,14 @@ export default function GenericCrudManager<T extends BaseEntityWithCount>({
                 setValidationErrors({});
                 setFormError(null);
               }}
+              type="button"
               data-testid="button-cancel-create"
             >
               <X className="h-4 w-4 mr-2" />
               Cancel
             </Button>
             <Button
-              onClick={handleCreate}
+              type="submit"
               disabled={createMutation.isPending}
               data-testid="button-confirm-create"
             >
@@ -3158,12 +3169,23 @@ export default function GenericCrudManager<T extends BaseEntityWithCount>({
               {createMutation.isPending ? "Creating..." : "Create"}
             </Button>
           </DialogFooter>
+          </form>
         </DialogContent>
       </Dialog>
 
       {/* Edit Dialog */}
       <Dialog open={editDialogOpen} onOpenChange={setEditDialogOpen}>
         <DialogContent className="admin-taxonomy-dialog" data-testid={`dialog-edit-${testIdEntity}`}>
+          {/* C7-V5B-01: a real form so Enter in a field submits, like the
+              Save button; display:contents keeps the dialog's grid layout. */}
+          <form
+            className="contents"
+            noValidate
+            onSubmit={(e) => {
+              e.preventDefault();
+              if (!updateMutation.isPending) void handleUpdate();
+            }}
+          >
           <DialogHeader>
             <DialogTitle>{editDialogTitle}</DialogTitle>
             <DialogDescription>
@@ -3371,13 +3393,14 @@ export default function GenericCrudManager<T extends BaseEntityWithCount>({
                 setValidationErrors({});
                 setFormError(null);
               }}
+              type="button"
               data-testid="button-cancel-edit"
             >
               <X className="h-4 w-4 mr-2" />
               Cancel
             </Button>
             <Button
-              onClick={handleUpdate}
+              type="submit"
               disabled={updateMutation.isPending}
               data-testid="button-confirm-edit"
             >
@@ -3385,6 +3408,7 @@ export default function GenericCrudManager<T extends BaseEntityWithCount>({
               {updateMutation.isPending ? "Saving..." : "Save"}
             </Button>
           </DialogFooter>
+          </form>
         </DialogContent>
       </Dialog>
 
