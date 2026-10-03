@@ -489,7 +489,7 @@ export default function PendingEdits() {
             </table>
           </div>
           {showSwipeHint && (
-            <p className="mt-2 text-xs text-muted-foreground" data-testid="text-swipe-hint-edits">
+            <p className="admin-ops-scroll-hint mt-2 text-xs text-muted-foreground" data-testid="text-swipe-hint-edits">
               Swipe the table sideways to see all columns, including Approve/Reject.
             </p>
           )}

@@ -78,8 +78,10 @@ function matcherForm(token: string): string {
 export function isSearchableQuery(query: string): boolean {
   // C8-API-01: Postgres splits the matcher form at "_" ("the_c" -> the & c,
   // then drops the stop word), so judge each "_"-separated part on its own.
+  // C8-V5A-05: a hyphenated token is parsed into its parts too ("c-c" ->
+  // c & c), so each hyphen-separated piece is judged the same way.
   return tokenizeSearchQuery(query).some((t) =>
-    matcherForm(t).split("_").some((part) =>
+    t.toLowerCase().split("-").flatMap((piece) => matcherForm(piece).split("_")).some((part) =>
       (part.match(/[\p{L}\p{N}]/gu)?.length ?? 0) >= SEARCH_QUERY_MIN_CHARS
       && !POSTGRES_ENGLISH_STOP_WORDS.has(part),
     ),

@@ -31,6 +31,7 @@ import DigestQueueHealth from "@/components/admin/DigestQueueHealth";
 import ErrorBoundary from "@/components/ErrorBoundary";
 import NotFound from "@/pages/not-found";
 import { ApiError } from "@/lib/queryClient";
+import { focusElement } from "@/hooks/focus-handoff";
 // Run3 audit R3-02 / Run16 BUG-034/074/085: valid tab ids and aliases live in
 // one shared module so the SSR middleware accepts exactly the same
 // /admin/:section deep-links (unknown sections fall back to the default tab).
@@ -413,7 +414,17 @@ export default function AdminDashboard() {
         {/* R2-L13: each tab body sits in its own ErrorBoundary so a render
             crash in one panel can't blank the entire admin dashboard. */}
         <TabsContent value="overview" data-testid="content-overview">
-          <AdminStats stats={stats} isLoading={isLoading} onNavigate={handleTabChange} />
+          <AdminStats stats={stats} isLoading={isLoading} onNavigate={(tab) => {
+            // C8-V5A-02: the tile unmounts with the Overview panel, so hand
+            // keyboard focus to the newly selected tab trigger.
+            handleTabChange(tab);
+            window.setTimeout(() => {
+              const trigger = document.querySelector<HTMLElement>(`[data-testid="tab-${tab}"]`);
+              if (document.activeElement === document.body || !document.activeElement?.isConnected) {
+                focusElement(trigger);
+              }
+            }, 0);
+          }} />
           <ErrorBoundary label="Overview tab"><AdminOverview stats={stats} /></ErrorBoundary>
         </TabsContent>
 

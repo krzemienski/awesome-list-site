@@ -405,6 +405,17 @@ export class ResourceRepository {
         const lower = token.toLowerCase();
         const stripped = lower.replace(/[^\p{L}\p{N}_]+/gu, "");
         if (!stripped) return "";
+        // C8-V5A-05: Postgres indexes "low-latency" as the compound "low-lat"
+        // plus its parts, so the stripped "lowlatency:*" never matched. Hand
+        // the parser the hyphenated form itself and it builds the matching
+        // compound-and-parts query.
+        if (!lower.includes(".") && /[\p{L}\p{N}]-+[\p{L}\p{N}]/u.test(lower)) {
+          const hyphenated = lower
+            .replace(/[^\p{L}\p{N}_-]+/gu, "")
+            .replace(/-+/g, "-")
+            .replace(/^-|-$/g, "");
+          return `${hyphenated}:*`;
+        }
         const dotted = lower.match(/[\p{L}\p{N}_]+(?:\.[\p{L}\p{N}_]+)+/u)?.[0];
         return dotted ? `(${stripped}:* | ${dotted}:*)` : `${stripped}:*`;
       })
