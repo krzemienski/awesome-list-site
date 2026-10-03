@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useRef, useState } from "react";
-import { handoffFocusOnUnmount } from "@/hooks/focus-handoff";
+import { focusElement, focusPageHeading, handoffFocusOnUnmount, handoffFocusToSiblingControl } from "@/hooks/focus-handoff";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import {
   Archive,
@@ -349,7 +349,16 @@ export default function Bookmarks() {
         data.failed?.length
           ? `${data.succeeded.length} updated; ${data.failed.length} couldn't be changed`
           : message,
-      after: () => setSelected(new Set()),
+      after: () => {
+        // C6-V4-01: the bulk action row unmounts once the selection clears;
+        // move focus to "Select all shown", which survives, unless the user
+        // already moved it elsewhere.
+        const active = document.activeElement;
+        if (!active || active === document.body || active.closest('[aria-label="Bulk bookmark actions"]')) {
+          if (!focusElement(document.getElementById("bulk-select-all"))) focusPageHeading();
+        }
+        setSelected(new Set());
+      },
     });
   };
 
@@ -755,6 +764,7 @@ export default function Bookmarks() {
                           : new Set(),
                       )
                     }
+                    id="bulk-select-all"
                     aria-label="Select all visible bookmarks"
                     className="h-5 w-5"
                   />
@@ -936,14 +946,17 @@ export default function Bookmarks() {
                       size="sm"
                       className="min-h-11"
                       aria-label={`${resource.archivedAt ? "Restore" : "Archive"}: ${resource.title}`}
-                      onClick={() =>
+                      data-card-archive
+                      onClick={(event) => {
+                        // C6-V4-03: archiving can drop the card from this view.
+                        handoffFocusToSiblingControl(event.currentTarget, "[data-card-archive]");
                         actionMutation.mutate({
                           url: `/api/bookmarks/${resource.id}/state`,
                           method: "PATCH",
                           body: { archived: !resource.archivedAt },
                           success: resource.archivedAt ? "Bookmark restored" : "Bookmark archived",
-                        })
-                      }
+                        });
+                      }}
                     >
                       {resource.archivedAt ? (
                         <RotateCcw className="h-4 w-4 mr-2" aria-hidden="true" />

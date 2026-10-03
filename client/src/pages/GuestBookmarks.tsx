@@ -16,6 +16,7 @@ import {
   useGuestBookmarks,
 } from "@/lib/guestBookmarks";
 import { trackAuthPromptShown } from "@/lib/analytics";
+import { queryUnavailableReason } from "@/lib/query-availability";
 import { handoffFocusOnUnmount } from "@/hooks/focus-handoff";
 import "@/styles/pages/account.css";
 
@@ -86,6 +87,10 @@ export default function GuestBookmarks() {
         : undefined,
     )
     .filter((id): id is number => typeof id === "number");
+
+  // C6-V4-04: offline, the per-id queries are paused (not failed), so without
+  // this the cards stay skeletons forever. They resume on reconnect.
+  const offline = results.some((result) => queryUnavailableReason(result) === "offline");
 
   const retryFailed = () => {
     for (const id of failedIds) {
@@ -231,6 +236,32 @@ export default function GuestBookmarks() {
             data-testid="button-guest-retry-failed"
           >
             Retry
+          </Button>
+        </div>
+      )}
+
+      {offline && (
+        <div
+          role="status"
+          className="account-callout flex flex-wrap items-center justify-between gap-3 px-4 py-3 text-sm"
+          data-testid="banner-guest-offline"
+        >
+          <span>
+            You're offline. Your saves are still safe on this device; they'll load
+            when you're back online.
+          </span>
+          <Button
+            variant="outline"
+            size="sm"
+            className="min-h-10"
+            onClick={() => {
+              for (const entry of sortedEntries) {
+                queryClient.invalidateQueries({ queryKey: [`/api/resources/${entry.id}`] });
+              }
+            }}
+            data-testid="button-guest-offline-retry"
+          >
+            Try again
           </Button>
         </div>
       )}

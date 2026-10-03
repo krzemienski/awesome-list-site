@@ -1015,7 +1015,15 @@ export default function Profile({ user }: ProfileProps) {
               last name.
             </DialogDescription>
           </DialogHeader>
-          <div className="space-y-4">
+          {/* C6-V4-02: a form so Enter in a name field saves, with the same
+              validation as the Save button. */}
+          <form
+            className="space-y-4"
+            onSubmit={(event) => {
+              event.preventDefault();
+              handleSaveName();
+            }}
+          >
             <div className="space-y-2">
               <Label htmlFor="edit-first-name">First name</Label>
               <Input
@@ -1050,9 +1058,9 @@ export default function Profile({ user }: ProfileProps) {
                 {nameError}
               </p>
             )}
-          </div>
           <DialogFooter>
             <Button
+              type="button"
               variant="outline"
               onClick={() => setNameDialogOpen(false)}
               disabled={updateNameMutation.isPending}
@@ -1060,13 +1068,14 @@ export default function Profile({ user }: ProfileProps) {
               Cancel
             </Button>
             <Button
-              onClick={handleSaveName}
+              type="submit"
               disabled={updateNameMutation.isPending}
               data-testid="button-save-name"
             >
               {updateNameMutation.isPending ? "Saving..." : "Save"}
             </Button>
           </DialogFooter>
+          </form>
         </DialogContent>
       </Dialog>
 

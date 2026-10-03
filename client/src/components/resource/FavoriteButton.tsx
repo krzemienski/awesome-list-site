@@ -3,6 +3,7 @@ import { useQuery } from "@tanstack/react-query";
 import { Button } from "@/components/ui/button";
 import { Heart } from "lucide-react";
 import { useFavoriteToggle } from "@/hooks/useResourceToggle";
+import { handoffFocusToSiblingControl } from "@/hooks/focus-handoff";
 import { useAuth } from "@/hooks/useAuth";
 import { cn } from "@/lib/utils";
 
@@ -86,6 +87,8 @@ function FavoriteButton({
   const handleClick = (e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
+    // C6-VX-03: removing from a list card unmounts this button with the card.
+    if (isFavorited) handoffFocusToSiblingControl(e.currentTarget as HTMLElement, '[data-testid="button-favorite"]');
     favorite.toggle();
   };
 

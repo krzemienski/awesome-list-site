@@ -148,11 +148,19 @@ export function registerUserFeatureRoutes(
     try {
       const userId = req.dbUser.id;
       const resourceId = parseInt(req.params.resourceId);
-      const { notes } = req.body;
+      const { notes, restoreCreatedAt } = req.body;
+      // C6-VX-01: Undo re-saves with the removed bookmark's original saved
+      // date so it keeps its place in "Newest saved". Only a valid past date
+      // is honoured; anything else is ignored and the row is dated now.
+      let savedAt: Date | undefined;
+      if (typeof restoreCreatedAt === 'string') {
+        const parsed = new Date(restoreCreatedAt);
+        if (!Number.isNaN(parsed.getTime()) && parsed.getTime() <= Date.now()) savedAt = parsed;
+      }
       
       // BUG-021: echo the canonical saved state so surfaces holding local
       // bookmark state (e.g. BookmarkButton) can sync notes after an edit.
-      const saved = await userFeatureRepo.addBookmark(userId, resourceId, notes);
+      const saved = await userFeatureRepo.addBookmark(userId, resourceId, notes, savedAt);
       res.json({ message: 'Bookmark added successfully', isBookmarked: true, notes: saved.notes ?? '' });
     } catch (error) {
       console.error('Error adding bookmark:', error);

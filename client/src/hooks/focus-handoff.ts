@@ -61,3 +61,22 @@ export function handoffFocusOnUnmount(
   };
   observer.observe(document.body, { childList: true, subtree: true });
 }
+
+/**
+ * C6-VX-03: a card's own "remove" button disappears with its card. Call this
+ * on click (before the removal) with the button and a selector matching the
+ * same control on every card: if the button vanishes and focus is lost, it
+ * moves to the next card's equivalent control, else the previous one, else the
+ * page heading.
+ */
+export function handoffFocusToSiblingControl(trigger: HTMLElement, selector: string): void {
+  const peers = Array.from(
+    document.querySelectorAll<HTMLElement>(`#main ${selector}`),
+  ).filter((el) => el.offsetParent !== null);
+  const index = peers.indexOf(trigger);
+  if (index < 0) return;
+  handoffFocusOnUnmount(trigger, () => {
+    const live = (el: HTMLElement) => el.isConnected && el !== trigger;
+    return peers.slice(index + 1).find(live) ?? peers.slice(0, index).reverse().find(live);
+  });
+}
