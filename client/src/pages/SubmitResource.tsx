@@ -6,6 +6,7 @@ import { Link, useLocation } from "wouter";
 import { z } from "zod";
 import { Loader2, Plus, CheckCircle, AlertCircle, AlertTriangle, LogIn, RefreshCw } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { focusElement } from "@/hooks/focus-handoff";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import {
@@ -176,6 +177,7 @@ export default function SubmitResource() {
     enabled: isAuthenticated,
   });
 
+  const successCardRef = useRef<HTMLElement | null>(null);
   const form = useForm<SubmitResourceFormData>({
     resolver: zodResolver(submitResourceSchema),
     mode: "onTouched",
@@ -529,7 +531,14 @@ export default function SubmitResource() {
 
         {/* Success Message */}
         {showSuccess && (
-          <Card className="submit-success-card"> {/* DS-OK: status ok */}
+          <Card
+            className="submit-success-card"
+            role="status"
+            // C8-VX-01: hand focus to the confirmation once it renders, so the
+            // last edited (now empty) field isn't left ringed and a keyboard
+            // submit doesn't strand focus on <body>.
+            ref={(el) => { if (el && el !== successCardRef.current) { successCardRef.current = el; focusElement(el); } if (!el) successCardRef.current = null; }}
+          > {/* DS-OK: status ok */}
             <CardHeader className="submit-success-header">
               <div className="submit-success-heading">
                 <CheckCircle aria-hidden="true" />
