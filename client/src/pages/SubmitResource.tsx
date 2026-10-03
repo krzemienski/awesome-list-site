@@ -445,6 +445,11 @@ export default function SubmitResource() {
 
       setShowSuccess(true);
       if (draftSaveTimer.current) clearTimeout(draftSaveTimer.current);
+      // A mouse submit keeps focus in the last edited field; blur it while it
+      // still holds its value, or the success card taking focus after the
+      // reset blurs an empty field and "onTouched" flags it as required.
+      const active = document.activeElement;
+      if (active instanceof HTMLElement && active.closest("form")) active.blur();
       form.reset(EMPTY_VALUES);
       safeRemoveItem(DRAFT_KEY);
       draftSeenAtRef.current = 0;
