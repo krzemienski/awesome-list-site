@@ -505,6 +505,11 @@ export default function TaxonomyListing({ level }: Props) {
     queueAnalytics(next, "all", "cleared");
     requestResultsFocus();
   };
+  // C10-V1-01: the active-filter row's "Clear all" also removes the search chip.
+  const clearAllFilters = () => {
+    setSearchTerm("");
+    clearFacetFilters();
+  };
   const broadenScope = () => {
     const next = { ...currentFilterState, selection: "all" };
     setSelection("all");
@@ -599,7 +604,7 @@ export default function TaxonomyListing({ level }: Props) {
     </div>
     {level === "category" && childTiles.length > 0 && <section className="taxonomy-children" aria-labelledby="taxonomy-children-heading"><h2 id="taxonomy-children-heading">Subcategories</h2><div className="taxonomy-child-grid">{childTiles.map((child, index) => <Link key={child.slug} className="taxonomy-child card hoverable" style={{ animationDelay: `${index * 30}ms` }} href={`${routeFor("subcategory", child.slug)}${kind ? `?kind=${kind}` : ""}`}><span>{child.name}</span><span className="chip mono">{child.count}</span></Link>)}</div></section>}
     {/* C9-V1-02: active filters stay visible while the tools panel is closed. */}
-    <div className="taxonomy-active-filters">{!toolsOpen && normalizedSearch && <button type="button" className="btn ghost search-filter-chip" aria-label={`Remove search “${normalizedSearch}”`} onClick={() => { setSearchTerm(""); setPage(1); requestResultsFocus(); }}>Search: “{normalizedSearch}”<X className="h-3.5 w-3.5" aria-hidden="true" /></button>}<ActiveFilters state={filterState} onChange={onFacetChange} onClear={clearFacetFilters} defaultSort="default" /></div>
+    <div className="taxonomy-active-filters">{!toolsOpen && normalizedSearch && <button type="button" className="btn ghost search-filter-chip" aria-label={`Remove search “${normalizedSearch}”`} onClick={() => { setSearchTerm(""); setPage(1); requestResultsFocus(); }}>Search: “{normalizedSearch}”<X className="h-3.5 w-3.5" aria-hidden="true" /></button>}<ActiveFilters state={filterState} onChange={onFacetChange} onClear={clearAllFilters} defaultSort="default" /></div>
     <div className="taxonomy-results-layout">
       <div className={`taxonomy-production-controls ${toolsOpen ? "taxonomy-production-controls--open" : ""}`} aria-busy={toolsOpen && taxonomySearch.isLoading}><SearchFilters state={filterState} facets={taxonomySearch.data?.facets} onChange={onFacetChange} onClear={clearFacetFilters} hideTaxonomyFacets /></div>
       <div className="min-w-0 flex-1">
