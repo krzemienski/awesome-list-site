@@ -134,8 +134,11 @@ function SearchDialogFallback() {
 // chunk manifest); if that still fails, the visitor gets an in-app retry
 // card. Vite caches the rejected import promise, so recovery must be a full
 // reload — a soft re-render would replay the same rejection.
+// C8-V2-01: Vite rejects a route import with "Unable to preload CSS for …"
+// when the route's stylesheet can't load (offline, rotated hash) — the same
+// failure as a missing script chunk.
 const CHUNK_ERROR_RE =
-  /Failed to fetch dynamically imported module|Importing a module script failed|error loading dynamically imported module|ChunkLoadError|Loading chunk [\d]+ failed/i;
+  /Failed to fetch dynamically imported module|Importing a module script failed|error loading dynamically imported module|ChunkLoadError|Loading chunk [\d]+ failed|Unable to preload CSS/i;
 const CHUNK_RELOAD_FLAG = "route-chunk-reload-attempted";
 
 function isChunkLoadError(error: unknown): boolean {
@@ -204,6 +207,20 @@ class RouteErrorBoundary extends Component<RouteErrorBoundaryProps, RouteErrorBo
       }
     }
     console.error("Route render error:", error);
+  }
+
+  // C8-V2-01: like the app's other offline states, a route that failed to load
+  // offline retries by itself once the connection is back.
+  handleOnline = () => {
+    if (this.state.error && isChunkLoadError(this.state.error)) this.handleRetry();
+  };
+
+  componentDidMount() {
+    window.addEventListener("online", this.handleOnline);
+  }
+
+  componentWillUnmount() {
+    window.removeEventListener("online", this.handleOnline);
   }
 
   componentDidUpdate(prevProps: RouteErrorBoundaryProps) {
