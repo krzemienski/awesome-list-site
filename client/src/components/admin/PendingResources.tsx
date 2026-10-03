@@ -708,7 +708,7 @@ export default function PendingResources() {
               contained horizontal scroll — shown whenever the table actually
               overflows (always at ≤768px), not just below the sm breakpoint. */}
           {showSwipeHint && (
-            <p className="text-xs text-muted-foreground mt-2" data-testid="hint-swipe-pending-table">
+            <p className="admin-ops-scroll-hint text-xs text-muted-foreground mt-2" data-testid="hint-swipe-pending-table">
               Swipe the table sideways to see all columns, including Approve/Reject.
             </p>
           )}
@@ -941,9 +941,9 @@ export default function PendingResources() {
        }}>
          <AlertDialogContent onCloseAutoFocus={restoreFocusAfterRemoval}>
            <AlertDialogHeader>
-             <AlertDialogTitle>Approve pending resources?</AlertDialogTitle>
+             <AlertDialogTitle>{bulkApproveIds.length === 1 ? "Approve pending resource?" : "Approve pending resources?"}</AlertDialogTitle>
              <AlertDialogDescription>
-               This will approve {bulkApproveIds.length} pending {bulkApproveIds.length === 1 ? "resource" : "resources"} and add them to the public catalog.
+               This will approve {bulkApproveIds.length} pending {bulkApproveIds.length === 1 ? "resource" : "resources"} and add {bulkApproveIds.length === 1 ? "it" : "them"} to the public catalog.
              </AlertDialogDescription>
            </AlertDialogHeader>
            {bulkApproveError && (
@@ -983,7 +983,7 @@ export default function PendingResources() {
        }}>
          <DialogContent onCloseAutoFocus={restoreFocusAfterRemoval}>
            <DialogHeader>
-             <DialogTitle>Reject pending resources?</DialogTitle>
+             <DialogTitle>{bulkRejectIds.length === 1 ? "Reject pending resource?" : "Reject pending resources?"}</DialogTitle>
              <DialogDescription>
                Provide a reason for rejecting {bulkRejectIds.length} pending {bulkRejectIds.length === 1 ? "resource" : "resources"}. This message is shown to contributors.
              </DialogDescription>

@@ -268,6 +268,15 @@
   position: absolute;
 }
 
+/* C8-V5A-04: with the tools open the hint shows below the table at narrow
+   widths, inset like the card content. */
+.admin-catalog-resources--tools-open .admin-catalog-resources__scroll-hint {
+  opacity: 1;
+  padding-inline: 1.375rem;
+  pointer-events: auto;
+  position: static;
+}
+
 /* With the tools open, selection is a first-class column: ID and checkbox
    sit side by side. */
 .admin-catalog-resources--tools-open .admin-catalog-resources__id-cell > span {
