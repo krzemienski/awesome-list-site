@@ -424,9 +424,12 @@ export default function Settings() {
                         </AlertDialogFooter>
                       </AlertDialogContent>
                     </AlertDialog>
+                    {/* C9-V3-01: aria-disabled (not native disabled) so a
+                        keyboard save keeps focus on the button. */}
                     <Button
-                      onClick={() => void handleSavePreferences()}
-                      disabled={isSaving || isResetting}
+                      onClick={() => { if (!isSaving && !isResetting) void handleSavePreferences(); }}
+                      aria-disabled={isSaving || isResetting}
+                      aria-busy={isSaving}
                       data-testid="button-save-learning-preferences"
                     >
                       {isSaving ? "Saving…" : "Save learning preferences"}
