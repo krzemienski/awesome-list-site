@@ -82,6 +82,11 @@ export interface UserFeaturesContext {
   parseBoundedInt: (value: unknown) => number | null;
 }
 
+
+// C7-API-02: bookmark Undo may restore its original saved date (C6-VX-01).
+const RESTORE_DATE_PATTERN = /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(?:\.\d{1,3})?Z$/;
+const RESTORE_DATE_FLOOR = Date.UTC(2000, 0, 1);
+
 export function registerUserFeatureRoutes(
   app: Express,
   ctx: UserFeaturesContext,
@@ -152,10 +157,14 @@ export function registerUserFeatureRoutes(
       // C6-VX-01: Undo re-saves with the removed bookmark's original saved
       // date so it keeps its place in "Newest saved". Only a valid past date
       // is honoured; anything else is ignored and the row is dated now.
+      // C7-API-02: only the strict UTC ISO form the API itself returns, between
+      // 2000 and now; Date() alone accepted "1"/"Jan 1 2000", remapped years
+      // 0001-0099 and threw a 500 on year 0.
       let savedAt: Date | undefined;
-      if (typeof restoreCreatedAt === 'string') {
+      if (typeof restoreCreatedAt === 'string' && RESTORE_DATE_PATTERN.test(restoreCreatedAt)) {
         const parsed = new Date(restoreCreatedAt);
-        if (!Number.isNaN(parsed.getTime()) && parsed.getTime() <= Date.now()) savedAt = parsed;
+        const time = parsed.getTime();
+        if (time >= RESTORE_DATE_FLOOR && time <= Date.now()) savedAt = parsed;
       }
       
       // BUG-021: echo the canonical saved state so surfaces holding local

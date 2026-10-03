@@ -235,9 +235,11 @@ export function registerCatalogContributionsRoutes(
       // empty ("%00", "%20%20%20") behaves EXACTLY like an absent search param,
       // instead of NUL → full catalog while spaces → zero rows.
       const rawSearch = firstQueryValue(req.query.search) ?? firstQueryValue(req.query.q);
-      const search = typeof rawSearch === 'string'
-        ? normalizeSearchQuery(rawSearch) || undefined
-        : undefined;
+      // C7-API-01: a query below the shared minimum ("c c", "C and C++")
+      // behaves like an absent one too, as SSR /search and /api/search do,
+      // instead of reaching Postgres as a bare one-letter prefix.
+      const normalizedSearch = typeof rawSearch === 'string' ? normalizeSearchQuery(rawSearch) : '';
+      const search = isSearchableQuery(normalizedSearch) ? normalizedSearch : undefined;
 
       // Task #294: controlled public facet contract. Unknown is a valid,
       // explicit selection; unsupported controlled values are caller errors,

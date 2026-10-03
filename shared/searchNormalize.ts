@@ -47,10 +47,40 @@ const SEARCHABLE_CHAR = /[\p{L}\p{N}]/u;
  */
 export const SEARCH_QUERY_MIN_CHARS = 2;
 
+/**
+ * C7-API-01 (C6-API-01 residual): Postgres's `english` config drops these
+ * words from the tsquery (copied verbatim from its tsearch_data/english.stop),
+ * so "C and C++" or "the c" reached the matcher as the bare prefix "c:*". A
+ * stop word never counts as the word that makes a query searchable.
+ */
+const POSTGRES_ENGLISH_STOP_WORDS = new Set([
+  "i", "me", "my", "myself", "we", "our", "ours", "ourselves", "you",
+  "your", "yours", "yourself", "yourselves", "he", "him", "his", "himself",
+  "she", "her", "hers", "herself", "it", "its", "itself", "they", "them",
+  "their", "theirs", "themselves", "what", "which", "who", "whom", "this",
+  "that", "these", "those", "am", "is", "are", "was", "were", "be", "been",
+  "being", "have", "has", "had", "having", "do", "does", "did", "doing",
+  "a", "an", "the", "and", "but", "if", "or", "because", "as", "until",
+  "while", "of", "at", "by", "for", "with", "about", "against", "between",
+  "into", "through", "during", "before", "after", "above", "below", "to",
+  "from", "up", "down", "in", "out", "on", "off", "over", "under", "again",
+  "further", "then", "once", "here", "there", "when", "where", "why", "how",
+  "all", "any", "both", "each", "few", "more", "most", "other", "some",
+  "such", "no", "nor", "not", "only", "own", "same", "so", "than", "too",
+  "very", "s", "t", "can", "will", "just", "don", "should", "now",
+]);
+
+/** The token as the matcher indexes it: lower-case letters, digits, "_". */
+function matcherForm(token: string): string {
+  return token.toLowerCase().replace(/[^\p{L}\p{N}_]+/gu, "");
+}
+
 export function isSearchableQuery(query: string): boolean {
-  return tokenizeSearchQuery(query).some(
-    (t) => (t.match(/[\p{L}\p{N}]/gu)?.length ?? 0) >= SEARCH_QUERY_MIN_CHARS,
-  );
+  return tokenizeSearchQuery(query).some((t) => {
+    const form = matcherForm(t);
+    return (form.match(/[\p{L}\p{N}]/gu)?.length ?? 0) >= SEARCH_QUERY_MIN_CHARS
+      && !POSTGRES_ENGLISH_STOP_WORDS.has(form);
+  });
 }
 
 /**
