@@ -54,7 +54,7 @@ import "@/styles/pages/submit.css";
 // (mirrors the server-side guard — markup is never legitimate catalog content).
 // Run21 R4-015/048: rules now come from the SHARED validation module so the
 // two layers can't drift (visible-char titles, 2048-char URL cap).
-import { NO_HTML_RE as NO_HTML, MAX_URL_LENGTH, hasVisibleChars } from "@shared/validation";
+import { NO_HTML_RE as NO_HTML, MAX_URL_LENGTH, hasVisibleChars, isPlausiblePublicUrl, URL_HOSTNAME_MESSAGE, URL_WHITESPACE_MESSAGE } from "@shared/validation";
 
 // Form validation schema
 const submitResourceSchema = z.object({
@@ -77,7 +77,10 @@ const submitResourceSchema = z.object({
     .url("Please enter a valid URL")
     .refine((url) => url.startsWith("https://"), {
       message: "URL must use HTTPS protocol"
-    }),
+    })
+    // C9-V2-01: the same checks the server applies, so they show inline.
+    .refine((url) => !/\s/.test(url), URL_WHITESPACE_MESSAGE)
+    .refine((url) => /\s/.test(url) || isPlausiblePublicUrl(url), URL_HOSTNAME_MESSAGE),
   description: z.string()
     .trim()
     // Run22 BUG-021: an EMPTY description used to surface the misleading

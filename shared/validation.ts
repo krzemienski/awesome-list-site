@@ -128,6 +128,7 @@ export const HTTPS_URL_RE = /^https:\/\//i;
 export const WEB_URL_RE = /^https?:\/\//i;
 export const URL_HOSTNAME_MESSAGE =
   "URL must have a valid hostname (e.g. https://example.com)";
+export const URL_WHITESPACE_MESSAGE = "URL must not contain spaces";
 
 /**
  * A catalog URL must parse, carry no whitespace, and have a dotted hostname
@@ -253,13 +254,14 @@ const urlCoreChecks = (schema: z.ZodString) =>
     .min(1, "URL is required")
     .max(MAX_URL_LENGTH, `URL must be at most ${MAX_URL_LENGTH} characters`)
     .refine((v) => !/[\u0000-\u001F\u007F]/.test(v), "URL must not contain control characters")
-    .refine((v) => !v.includes("\\"), "URL must not contain backslashes");
+    .refine((v) => !v.includes("\\"), "URL must not contain backslashes")
+    .refine((v) => !/\s/.test(v), URL_WHITESPACE_MESSAGE);
 
 /** Strict https-only resource URL — new resources (submit + admin create). */
 export const httpsUrlSchema = urlCoreChecks(z.string())
   .url("Invalid URL format")
   .refine((v) => HTTPS_URL_RE.test(v), "Must be a valid HTTPS URL")
-  .refine(isPlausiblePublicUrl, URL_HOSTNAME_MESSAGE)
+  .refine((v) => /\s/.test(v) || isPlausiblePublicUrl(v), URL_HOSTNAME_MESSAGE)
   .refine((v) => !urlHasUserinfo(v), "URL must not contain embedded credentials")
   .refine((v) => !urlHasPortZero(v), "URL must not use port 0")
   .transform(normalizeCatalogUrl);
@@ -267,7 +269,7 @@ export const httpsUrlSchema = urlCoreChecks(z.string())
 /** Web URL for edits — legacy http:// may be kept, but caps/userinfo still apply. */
 export const webUrlSchema = urlCoreChecks(z.string())
   .refine((v) => WEB_URL_RE.test(v), "URL must start with http:// or https://")
-  .refine(isPlausiblePublicUrl, URL_HOSTNAME_MESSAGE)
+  .refine((v) => /\s/.test(v) || isPlausiblePublicUrl(v), URL_HOSTNAME_MESSAGE)
   .refine((v) => !urlHasUserinfo(v), "URL must not contain embedded credentials")
   .refine((v) => !urlHasPortZero(v), "URL must not use port 0")
   .transform(normalizeCatalogUrl);

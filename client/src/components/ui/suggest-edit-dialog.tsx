@@ -41,7 +41,7 @@ import { ApiError, apiRequest, queryClient } from "@/lib/queryClient";
 import { humanizeApiError } from "@/lib/apiError";
 import { mpTrack } from "@/lib/mixpanel";
 import type { Resource } from "@shared/schema";
-import { hasVisibleChars } from "@shared/validation";
+import { hasVisibleChars, isPlausiblePublicUrl, URL_HOSTNAME_MESSAGE, URL_WHITESPACE_MESSAGE } from "@shared/validation";
 
 // BUG-024 (run14): the HTTPS rule applies to NEW urls only. Legacy resources
 // whose canonical URL is still http:// (their https twin is broken — see the
@@ -58,7 +58,10 @@ const makeSuggestEditSchema = (originalUrl: string) => z.object({
     .url("Please enter a valid URL")
     .refine((url) => url === originalUrl || url.startsWith("https://"), {
       message: "New URLs must use HTTPS (keeping the current URL unchanged is fine)"
-    }),
+    })
+    // C9-V2-01: the same checks the server applies, so they show inline.
+    .refine((url) => url === originalUrl || !/\s/.test(url), URL_WHITESPACE_MESSAGE)
+    .refine((url) => url === originalUrl || /\s/.test(url) || isPlausiblePublicUrl(url), URL_HOSTNAME_MESSAGE),
   description: z.string()
     // Run22 BUG-021: an empty description should say it's required, not
     // surface the misleading minimum-length message.

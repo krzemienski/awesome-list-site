@@ -20,6 +20,7 @@ import {
   HTTPS_URL_RE,
   WEB_URL_RE,
   isPlausiblePublicUrl,
+  URL_WHITESPACE_MESSAGE,
   urlHasUserinfo,
   urlHasPortZero,
   URL_HOSTNAME_MESSAGE,
@@ -113,7 +114,8 @@ export const httpsUrlContractSchema = z
   .refine((v) => !/[\u0000-\u001F\u007F]/.test(v), "URL must not contain control characters")
   .refine((v) => !v.includes("\\"), "URL must not contain backslashes")
   .refine((v) => HTTPS_URL_RE.test(v), "Must be a valid HTTPS URL")
-  .refine(isPlausiblePublicUrl, URL_HOSTNAME_MESSAGE)
+  .refine((v) => !/\s/.test(v), URL_WHITESPACE_MESSAGE)
+  .refine((v) => /\s/.test(v) || isPlausiblePublicUrl(v), URL_HOSTNAME_MESSAGE)
   .refine((v) => !urlHasUserinfo(v), "URL must not contain embedded credentials")
   .refine((v) => !urlHasPortZero(v), "URL must not use port 0");
 
@@ -126,7 +128,8 @@ export const webUrlContractSchema = z
   .refine((v) => !/[\u0000-\u001F\u007F]/.test(v), "URL must not contain control characters")
   .refine((v) => !v.includes("\\"), "URL must not contain backslashes")
   .refine((v) => WEB_URL_RE.test(v), "URL must start with http:// or https://")
-  .refine(isPlausiblePublicUrl, URL_HOSTNAME_MESSAGE)
+  .refine((v) => !/\s/.test(v), URL_WHITESPACE_MESSAGE)
+  .refine((v) => /\s/.test(v) || isPlausiblePublicUrl(v), URL_HOSTNAME_MESSAGE)
   .refine((v) => !urlHasUserinfo(v), "URL must not contain embedded credentials")
   .refine((v) => !urlHasPortZero(v), "URL must not use port 0");
 
