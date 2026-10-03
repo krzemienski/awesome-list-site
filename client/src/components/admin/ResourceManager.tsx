@@ -1473,7 +1473,7 @@ export default function ResourceManager({ createRequest = 0 }: { createRequest?:
                     <td className="admin-catalog-resources__actions-cell text-right">
                       <div className="admin-catalog-resources__row-actions">
                         <Button variant="ghost" size="sm" asChild>
-                          <a href={`/resource/${resource.id}`}>View</a>
+                          <a href={`/resource/${resource.id}`} aria-label={`View ${resource.title || `resource #${resource.id}`}`}>View</a>
                         </Button>
                         <Button
                           variant="ghost"

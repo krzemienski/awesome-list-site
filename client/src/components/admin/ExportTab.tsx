@@ -475,8 +475,12 @@ export default function ExportTab({ validationStatus: propValidationStatus }: Ex
               type="button"
               variant="outline"
               size="sm"
-              disabled={!hasPreviousAuditHistoryPage || isExportHistoryLoading}
-              onClick={() => setAuditHistoryPage((page) => Math.max(0, page - 1))}
+              // C7-V5A-02: aria-disabled, never native disabled — while the next
+              // window loads its data is undefined, so a native disabled here
+              // dropped the pressed button's keyboard focus to <body>.
+              aria-disabled={!hasPreviousAuditHistoryPage || isExportHistoryLoading}
+              aria-busy={isExportHistoryLoading}
+              onClick={() => { if (hasPreviousAuditHistoryPage && !isExportHistoryLoading) setAuditHistoryPage((page) => Math.max(0, page - 1)); }}
               aria-label="Previous audit entries"
             >
               <ChevronLeft className="h-4 w-4" aria-hidden="true" />
@@ -486,8 +490,9 @@ export default function ExportTab({ validationStatus: propValidationStatus }: Ex
               type="button"
               variant="outline"
               size="sm"
-              disabled={!hasNextAuditHistoryPage || isExportHistoryLoading}
-              onClick={() => setAuditHistoryPage((page) => page + 1)}
+              aria-disabled={!hasNextAuditHistoryPage || isExportHistoryLoading}
+              aria-busy={isExportHistoryLoading}
+              onClick={() => { if (hasNextAuditHistoryPage && !isExportHistoryLoading) setAuditHistoryPage((page) => page + 1); }}
               aria-label="Next audit entries"
             >
               Next
@@ -579,7 +584,9 @@ export default function ExportTab({ validationStatus: propValidationStatus }: Ex
                   <div>
                     {/* Run16 BUG-073: expanders get a ≥44px touch target. */}
                     <button
+                      type="button"
                       onClick={() => setShowErrors(!showErrors)}
+                      aria-expanded={showErrors}
                       className="admin-ops-validation-expander admin-ops-validation-expander--bad"
                     >
                       {showErrors ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}
@@ -613,7 +620,9 @@ export default function ExportTab({ validationStatus: propValidationStatus }: Ex
                   <div>
                     {/* Run16 BUG-073: 140×20px expander → ≥44px touch target. */}
                     <button
+                      type="button"
                       onClick={() => setShowWarnings(!showWarnings)}
+                      aria-expanded={showWarnings}
                       className="admin-ops-validation-expander admin-ops-validation-expander--warn"
                     >
                       {showWarnings ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}

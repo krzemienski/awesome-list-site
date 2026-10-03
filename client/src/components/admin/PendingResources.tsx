@@ -513,7 +513,7 @@ export default function PendingResources() {
         <div className="admin-panel__heading queue-review-shell-heading">
           <div>
             <h2 id="pending-resources-heading" tabIndex={-1}>Pending approvals</h2>
-            <p>{totalPending} submissions awaiting review</p>
+            <p>{totalPending} {totalPending === 1 ? "submission" : "submissions"} awaiting review</p>
           </div>
           <div className="queue-review-actions" role="toolbar" aria-label="Pending approval actions">
             <Button

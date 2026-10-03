@@ -341,7 +341,7 @@ export default function PendingEdits() {
         <div className="admin-panel__heading queue-review-shell-heading">
           <div>
             <h2 id="pending-edits-heading">Edit history</h2>
-            <p>{edits.length} pending edits awaiting review</p>
+            <p>{edits.length} pending {edits.length === 1 ? "edit" : "edits"} awaiting review</p>
           </div>
         </div>
         {/* R4-012 (run21): shared narrow-admin-table strategy — a native
