@@ -850,8 +850,13 @@ export default function SubmitResource() {
                   />
                 </fieldset>
 
-                {/* Canonical actions stay in one right-aligned row. */}
-                <div className="submit-actions">
+                {/* Canonical actions stay in one right-aligned row.
+                    C7-V3-01: a mouse press here must not blur the field being
+                    edited — its onTouched error would render above this row and
+                    move the button out from under the pointer, so the click was
+                    lost. Submit validates everything and focuses the first bad
+                    field itself; keyboard focus is unaffected. */}
+                <div className="submit-actions" onMouseDown={(e) => e.preventDefault()}>
                   <Button
                     type="button"
                     variant="outline"
