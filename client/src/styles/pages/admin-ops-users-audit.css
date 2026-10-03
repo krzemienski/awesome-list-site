@@ -47,8 +47,9 @@
 .admin-ops-audit-detail-button {
   position: absolute;
   inset-inline-end: 0.25rem;
-  top: 50%;
-  transform: translateY(-50%);
+  /* C6-V5A-01: no transform centring; the global button:active transform would displace it. */
+  inset-block: 0;
+  margin-block: auto;
 }
 
 .admin-ops-contact-table {

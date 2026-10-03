@@ -127,7 +127,13 @@
 }
 
 .admin-catalog-resources__table tbody tr[data-state="selected"] td {
-  background: var(--surface);
+  /* C6-V5A-05: --surface alone is a ~2.4% tint; the accent wash and the rail
+     make a selected row readable at rest. */
+  background: color-mix(in srgb, var(--accent) 12%, var(--surface));
+}
+
+.admin-catalog-resources__table tbody tr[data-state="selected"] td:first-child {
+  box-shadow: inset 2px 0 0 var(--accent);
 }
 
 .admin-catalog-resources__id-cell {
@@ -223,11 +229,23 @@
 .admin-catalog-resources__row-select {
   border-color: var(--border-strong);
   border-radius: var(--radius-sm);
-  inset-block-start: 50%;
+  /* C6-V5A-01: centre with auto margins, not transform, so the global
+     button:active translateY(1px) can't move the box out from under the press. */
+  inset-block: 0;
   inset-inline-start: 14px;
+  margin-block: auto;
   opacity: 0;
   position: absolute;
-  transform: translateY(-50%);
+}
+
+/* C6-V5A-05: a checked box stays visible in place of the ID. */
+.admin-catalog-resources__row-select[data-state="checked"] {
+  opacity: 1;
+}
+
+.admin-catalog-resources:not(.admin-catalog-resources--tools-open)
+  .admin-catalog-resources__id-cell:has(.admin-catalog-resources__row-select[data-state="checked"]) > span {
+  visibility: hidden;
 }
 
 .admin-catalog-resources__id-cell:focus-within .admin-catalog-resources__row-select,
@@ -263,8 +281,8 @@
 .admin-catalog-resources--tools-open .admin-catalog-resources__row-select {
   margin-inline-start: 8px;
   opacity: 1;
+  margin-block: 0;
   position: static;
-  transform: none;
   vertical-align: middle;
 }
 

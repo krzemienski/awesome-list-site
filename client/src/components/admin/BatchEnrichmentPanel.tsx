@@ -113,7 +113,10 @@ export default function BatchEnrichmentPanel() {
   const defaultBaseUrl = aiDefaults.config?.baseUrl;
   
   const [filter, setFilter] = useState<'all' | 'unenriched'>('unenriched');
-  const [batchSize, setBatchSize] = useState(10);
+  // C6-V5A-02: the field's own text, so it can be emptied; the number is derived.
+  const [batchSizeText, setBatchSizeText] = useState("10");
+  const parsedBatchSize = parseInt(batchSizeText, 10);
+  const batchSize = Number.isNaN(parsedBatchSize) ? 0 : parsedBatchSize;
   const [showAdvanced, setShowAdvanced] = useState(false);
   const [model, setModel] = useState("");
   const [baseUrl, setBaseUrl] = useState("");
@@ -526,13 +529,12 @@ export default function BatchEnrichmentPanel() {
                 type="number"
                 min={1}
                 max={50}
-                value={batchSize}
+                value={batchSizeText}
                 onChange={(e) => {
                   // Run15 BUG-019: parseInt(...) || 10 coerced 0 to 10, silently
                   // bypassing the 1-50 guard and starting a real job. Keep the
-                  // raw value so handleStartEnrichment can reject it.
-                  const v = parseInt(e.target.value, 10);
-                  setBatchSize(Number.isNaN(v) ? 0 : v);
+                  // raw text; empty/NaN derives 0 so the 1-50 guard rejects it.
+                  setBatchSizeText(e.target.value);
                 }}
                 disabled={hasActiveJob}
                 aria-invalid={batchSizeInvalid}
