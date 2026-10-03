@@ -164,7 +164,11 @@ export function registerUserFeatureRoutes(
       if (typeof restoreCreatedAt === 'string' && RESTORE_DATE_PATTERN.test(restoreCreatedAt)) {
         const parsed = new Date(restoreCreatedAt);
         const time = parsed.getTime();
-        if (time >= RESTORE_DATE_FLOOR && time <= Date.now()) savedAt = parsed;
+        // C8-API-02: Date rolls impossible dates over (Feb 30 -> Mar 2); the
+        // round-trip must give back the same calendar date and time.
+        const sameMoment = !Number.isNaN(time)
+          && parsed.toISOString().slice(0, 19) === restoreCreatedAt.slice(0, 19);
+        if (sameMoment && time >= RESTORE_DATE_FLOOR && time <= Date.now()) savedAt = parsed;
       }
       
       // BUG-021: echo the canonical saved state so surfaces holding local
