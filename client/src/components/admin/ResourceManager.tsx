@@ -34,6 +34,7 @@ import { parsePageFromSearch } from "@/lib/page-param";
 // dialog flags bad input inline instead of only failing server-side.
 import { resourceTitleSchema, optionalResourceDescriptionSchema, webUrlSchema, httpsUrlSchema } from "@shared/validation";
 import { extractFieldErrors } from "@/lib/apiError";
+import { handoffFocusOnUnmount } from "@/hooks/focus-handoff";
 import {
   RESOURCE_FORMAT_LABELS,
   RESOURCE_FORMAT_VALUES,
@@ -950,6 +951,11 @@ export default function ResourceManager({ createRequest = 0 }: { createRequest?:
     bulkRejectMutation.mutate({ ids: selectedResourceIds, reason: rejectReason });
   };
 
+  const bulkDeleteTitles = selectedResourceIds.map((id) => {
+    const row = data?.resources.find((r) => r.id === id);
+    return row ? row.title || `Resource #${id}` : `Resource #${id}`;
+  });
+
   const handleBulkDelete = () => {
     if (selectedResourceIds.length === 0) return;
     setBulkDeleteDialogOpen(true);
@@ -1201,7 +1207,11 @@ export default function ResourceManager({ createRequest = 0 }: { createRequest?:
               <Button
                 size="sm"
                 variant="ghost"
-                onClick={() => setSelectedResourceIds([])}
+                onClick={(event) => {
+                  // C6-V5A-04: the bar unmounts with its focused button.
+                  handoffFocusOnUnmount(event.currentTarget, () => tableRegionRef.current);
+                  setSelectedResourceIds([]);
+                }}
                 className="text-[var(--text-2)] hover:text-[var(--text)]"
                 data-testid="button-clear-selection"
               >
@@ -1284,6 +1294,15 @@ export default function ResourceManager({ createRequest = 0 }: { createRequest?:
                   the catalog, including any bookmarks, favorites, and journey references
                   pointing at {selectedResourceIds.length === 1 ? 'it' : 'them'}. This cannot be undone.
                 </AlertDialogDescription>
+                {/* C6-V5A-05: name the rows the permanent delete will remove. */}
+                {bulkDeleteTitles.length > 0 && (
+                  <ul className="list-disc pl-5 text-sm text-[var(--text-2)]" data-testid="list-bulk-delete-titles">
+                    {bulkDeleteTitles.slice(0, 5).map((title, index) => (
+                      <li key={index} className="break-words">{title}</li>
+                    ))}
+                    {selectedResourceIds.length > 5 && <li>and {selectedResourceIds.length - 5} more</li>}
+                  </ul>
+                )}
               </AlertDialogHeader>
               <AlertDialogFooter>
                 <AlertDialogCancel data-testid="button-bulk-delete-cancel">Cancel</AlertDialogCancel>
@@ -1320,7 +1339,10 @@ export default function ResourceManager({ createRequest = 0 }: { createRequest?:
               <Button
                 variant="outline"
                 size="sm"
-                onClick={() => refetch()}
+                onClick={(event) => {
+                  handoffFocusOnUnmount(event.currentTarget, () => tableRegionRef.current);
+                  refetch();
+                }}
                 data-testid="button-resources-retry"
               >
                 Retry
@@ -1359,7 +1381,10 @@ export default function ResourceManager({ createRequest = 0 }: { createRequest?:
                 <Button
                   variant="outline"
                   size="sm"
-                  onClick={() => refetch()}
+                  onClick={(event) => {
+                    handoffFocusOnUnmount(event.currentTarget, () => tableRegionRef.current);
+                    refetch();
+                  }}
                   data-testid="button-resources-offline-retry"
                 >
                   Retry

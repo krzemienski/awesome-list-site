@@ -98,7 +98,7 @@ export function AgentEventLog({ jobType, jobId, isActive, height = "360px" }: Ag
         </div>
       ) : (
         <ScrollArea
-          className="border rounded p-2 bg-black/40"
+          className="border rounded p-2 bg-black/40 [&_[data-radix-scroll-area-viewport]>div]:!block" /* C6-V5A-03: Radix wraps the content in display:table, which grows past the box; block keeps rows at its width */
           style={{ height }}
           role="log"
           aria-live="polite"
@@ -137,7 +137,7 @@ export function AgentEventLog({ jobType, jobId, isActive, height = "360px" }: Ag
                       const isLong = clean.length > SUMMARY_MAX;
                       return (
                         <span
-                          className="whitespace-pre-wrap break-words flex-1 text-foreground/90"
+                          className="whitespace-pre-wrap [overflow-wrap:anywhere] min-w-0 flex-1 text-foreground/90"
                           title={isLong ? clean : undefined}
                         >
                           {isLong ? `${clean.slice(0, SUMMARY_MAX)}…` : clean}
