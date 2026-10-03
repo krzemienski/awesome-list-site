@@ -1035,6 +1035,8 @@ export default function Bookmarks() {
                     chooseCollection("all");
                     chooseStatus("all");
                     chooseArchive("active");
+                    // C7-V4-02: this empty state unmounts; same hand-off as Go to All saved.
+                    setFocusAfterAction("all-saved");
                   }}
                 >
                   Clear filters

@@ -254,7 +254,9 @@ export default function GuestBookmarks() {
             variant="outline"
             size="sm"
             className="min-h-10"
-            onClick={() => {
+            onClick={(e) => {
+              // C7-V4-01: the banner unmounts on reconnect; hand focus on like Retry does.
+              handoffFocusOnUnmount(e.currentTarget);
               for (const entry of sortedEntries) {
                 queryClient.invalidateQueries({ queryKey: [`/api/resources/${entry.id}`] });
               }
