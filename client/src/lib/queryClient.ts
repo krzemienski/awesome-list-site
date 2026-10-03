@@ -118,6 +118,9 @@ const PROTECTED_KEY_PREFIXES = [
   "/api/notifications",
   "/api/notification-preferences",
   "/api/digests",
+  // C6-V2-06: per-user hidden-choice states; a stale-token 401 after a reconnect
+  // must renew the session and re-run this read, not strand /recommendations.
+  "/api/recommendations/feedback",
 ];
 let sessionExpiryHandledAt = 0;
 let sessionCheckInFlight = false;

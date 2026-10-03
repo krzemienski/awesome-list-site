@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { Link } from "wouter";
-import { handoffFocusOnUnmount } from "@/hooks/focus-handoff";
+import { focusElement, focusPageHeading, handoffFocusOnUnmount } from "@/hooks/focus-handoff";
 import {
   AlertCircle,
   EyeOff,
@@ -48,14 +48,19 @@ export default function AIRecommendationsPanel({
   const { preferences, isLoading: preferencesLoading } =
     useLearningPreferences();
   const {
-    data: feedbackStates = [],
+    data: feedbackStatesData,
     isError: feedbackStatesError,
     isLoading: feedbackStatesLoading,
     refetch: refetchFeedbackStates,
   } = useRecommendationFeedbackStates(user?.id, isAuthenticated);
+  const feedbackStates = feedbackStatesData ?? [];
   const { recordFeedbackAsync, isLoading: isRestoring } =
     useRecommendationFeedback();
   const [locallyHidden, setLocallyHidden] = useState<Set<number>>(new Set());
+  // C6-V2-04: where keyboard focus goes once Hide / Restore unmounts the
+  // control that had it (resource ids in preference order).
+  const hideFocusRef = useRef<number[] | null>(null);
+  const restoreFocusRef = useRef<number[] | null>(null);
 
   const hasSavedPreferences =
     isAuthenticated && hasMeaningfulLearningPreferences(preferences);
@@ -150,8 +155,11 @@ export default function AIRecommendationsPanel({
       )
       .map((state) => state.resourceId),
   );
+  // C6-V2-06: cached cards are only held back until hidden choices are known
+  // at least once. A later failed re-check (e.g. around a reconnect) keeps the
+  // last known choices, so the saved cards stay on screen instead of vanishing.
   const canRenderRecommendations =
-    !isFromCache || (!feedbackStatesLoading && !feedbackStatesError);
+    !isFromCache || (feedbackStatesData !== undefined) || (!feedbackStatesLoading && !feedbackStatesError);
   const visibleRecommendations = canRenderRecommendations
     ? recommendations.filter(
         (recommendation) =>
@@ -163,10 +171,44 @@ export default function AIRecommendationsPanel({
     (state) => state.feedback === "hidden" && state.resource,
   );
 
+  useEffect(() => {
+    const candidates = hideFocusRef.current;
+    if (!candidates) return;
+    hideFocusRef.current = null;
+    for (const id of candidates) {
+      const summary = document.querySelector<HTMLElement>(
+        `[data-testid="recommendation-explanation-${id}"] > summary`,
+      );
+      if (focusElement(summary)) return;
+    }
+    focusElement(document.querySelector<HTMLElement>('[data-testid="recommendations-list"] h2'))
+      || focusPageHeading();
+  }, [visibleRecommendations.length]);
+
+  useEffect(() => {
+    const candidates = restoreFocusRef.current;
+    if (!candidates) return;
+    restoreFocusRef.current = null;
+    for (const id of candidates) {
+      if (focusElement(document.querySelector<HTMLElement>(`[data-testid="restore-hidden-${id}"]`))) return;
+    }
+    focusPageHeading();
+  }, [hiddenStates.length]);
+
   const handleFeedbackChange = (
     resourceId: number,
     feedback: RecommendationFeedbackValue | null,
   ) => {
+    if (
+      feedback === "hidden"
+      && document.activeElement?.closest(`[data-testid^="recommendation-feedback-"]`)
+    ) {
+      const index = visibleRecommendations.findIndex((r) => r.resource.id === resourceId);
+      hideFocusRef.current = [
+        visibleRecommendations[index + 1]?.resource.id,
+        visibleRecommendations[index - 1]?.resource.id,
+      ].filter((id): id is number => id !== undefined);
+    }
     setLocallyHidden((current) => {
       const next = new Set(current);
       if (feedback === "hidden") next.add(resourceId);
@@ -176,6 +218,15 @@ export default function AIRecommendationsPanel({
   };
 
   const restoreHidden = async (resourceId: number) => {
+    if (isRestoring) return; // aria-disabled: a restore is already saving
+    const index = hiddenStates.findIndex((state) => state.resourceId === resourceId);
+    const hadFocus = document.activeElement?.matches(`[data-testid="restore-hidden-${resourceId}"]`);
+    if (hadFocus) {
+      restoreFocusRef.current = [
+        hiddenStates[index + 1]?.resourceId,
+        hiddenStates[index - 1]?.resourceId,
+      ].filter((id): id is number => id !== undefined);
+    }
     try {
       await recordFeedbackAsync({ resourceId, feedback: null });
       setLocallyHidden((current) => {
@@ -188,6 +239,7 @@ export default function AIRecommendationsPanel({
         description: "It can appear the next time recommendations are refreshed.",
       });
     } catch {
+      restoreFocusRef.current = null;
       toast({
         title: "Couldn’t restore recommendation",
         description: "Please try again.",
@@ -199,8 +251,10 @@ export default function AIRecommendationsPanel({
   // Anonymous visitors have no account: their refresh must hit the anon-safe
   // GET path (POST /api/recommendations is auth-gated and 401s). Passing no
   // profile makes the hook use GET; a profile forces the authed POST.
-  const retry = () =>
+  const retry = () => {
+    if (isLoading) return; // aria-disabled: a refresh is already running
     refreshRecommendations(isAuthenticated ? effectiveProfile : undefined);
+  };
 
   // Same safe-return pattern the legacy /login redirect uses: only an internal
   // absolute path (not "//" or "/\") is carried back as redirect_url.
@@ -217,7 +271,8 @@ export default function AIRecommendationsPanel({
       type="button"
       variant="ghost"
       onClick={retry}
-      disabled={isLoading}
+      aria-disabled={isLoading}
+      aria-busy={isLoading}
       data-testid="button-generate-recommendations"
     >
       <RefreshCw className={`mr-2 h-4 w-4 ${isLoading ? "animate-spin" : ""}`} />
@@ -339,7 +394,9 @@ export default function AIRecommendationsPanel({
                 <Button
                   size="sm"
                   variant="outline"
-                  disabled={isRestoring}
+                  aria-disabled={isRestoring}
+                  aria-busy={isRestoring}
+                  aria-label={`Restore: ${state.resource?.title ?? "recommendation"}`}
                   onClick={() => void restoreHidden(state.resourceId)}
                   data-testid={`restore-hidden-${state.resourceId}`}
                 >
@@ -351,7 +408,7 @@ export default function AIRecommendationsPanel({
         </details>
       ) : null}
 
-      {feedbackStatesError ? (
+      {feedbackStatesError && !canRenderRecommendations ? (
         <Alert>
           <AlertCircle className="h-4 w-4" />
           <AlertTitle>Saved feedback is temporarily unavailable</AlertTitle>
@@ -381,7 +438,7 @@ export default function AIRecommendationsPanel({
         </Card>
       ) : null}
 
-      {(isStale || (isError && hasUsefulResults)) ? (
+      {(isStale || (isError && hasUsefulResults)) && visibleRecommendations.length > 0 ? (
         <Alert data-testid="stale-recommendations-state">
           <RefreshCw className="h-4 w-4" />
           <AlertTitle>Showing your last useful recommendations</AlertTitle>

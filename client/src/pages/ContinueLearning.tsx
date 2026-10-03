@@ -101,6 +101,7 @@ function ActiveJourneyCard({
             className="w-full"
             onClick={() => onResume(item)}
             disabled={pending}
+            aria-label={`${item.nextStep ? "Resume next step" : "Open journey"}: ${item.title}`}
             data-testid={`button-resume-journey-${item.journeyId}`}
           >
             <Play className="mr-2 h-4 w-4" />
