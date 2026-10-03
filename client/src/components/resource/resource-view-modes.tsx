@@ -26,7 +26,10 @@ function titleAnchor(resource: ViewModeResource, testId: string, clampClass = ""
   // BUG-003 (run22): clamped callers pass clampClass (replacing inline-block)
   // because an inline-block child inside a -webkit-box wrapper defeats
   // -webkit-line-clamp; the clamp's block-level box keeps the hit-box.
-  const className = `${clampClass || "inline-block"} py-1 -my-1 hover:text-primary transition-colors after:absolute after:inset-0 after:content-[''] focus-visible:outline-none focus-visible:after:ring-2 focus-visible:after:ring-[var(--accent)]`;
+  // C6-V1-02: no py/-my on clamped titles — overflow:hidden clips at the
+  // padding edge, so the 4px of padding showed the top of the hidden third
+  // line. Their hit-box comes from the card-wide after: overlay instead.
+  const className = `${clampClass || "inline-block py-1 -my-1"} hover:text-primary transition-colors after:absolute after:inset-0 after:content-[''] focus-visible:outline-none focus-visible:after:ring-2 focus-visible:after:ring-[var(--accent)]`;
   return isDb ? (
     <Link href={`/resource/${resource.id}`} className={className} data-testid={testId}>
       {resource.title}
