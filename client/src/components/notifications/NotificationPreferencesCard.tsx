@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { useLayoutEffect, useMemo, useState } from "react";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { Bell, Check, Clock3, Eye, Info, Mail, Pause, Play, ShieldCheck } from "lucide-react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -6,6 +6,8 @@ import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { Separator } from "@/components/ui/separator";
 import { apiRequest, queryClient } from "@/lib/queryClient";
+import { queryUnavailableReason } from "@/lib/query-availability";
+import { handoffFocusOnUnmount } from "@/hooks/focus-handoff";
 import type { DigestPreview, NotificationPreferencesResponse, NotificationPreferencesUpdate } from "@shared/notifications";
 import { DIGEST_CADENCES, notificationPreferencesUpdateSchema } from "@shared/notifications";
 
@@ -83,10 +85,14 @@ export default function NotificationPreferencesCard() {
     };
   }, [preferencesQuery.data]);
 
-  useEffect(() => {
+  // C6-V3-02: the form is only rendered once real saved values exist (below),
+  // and they are applied before paint, so the defaults above are never shown or
+  // edited and an edit can't pin defaults over what the server has saved.
+  useLayoutEffect(() => {
     if (savedValues && !dirty) setValues(savedValues);
   }, [savedValues, dirty]);
 
+  const unavailable = queryUnavailableReason(preferencesQuery);
   const saveMutation = useMutation({
     mutationFn: (body: NotificationPreferencesUpdate) =>
       apiRequest("/api/notification-preferences", { method: "PUT", body: JSON.stringify(body) }),
@@ -158,13 +164,13 @@ export default function NotificationPreferencesCard() {
         <CardDescription>Quiet, useful updates for your Awesome Video learning space. Every channel starts off until you explicitly opt in.</CardDescription>
       </CardHeader>
       <CardContent className="space-y-6">
-        {preferencesQuery.isLoading ? (
-          <div className="space-y-3" aria-busy="true"><div className="skeleton h-16 w-full" /><div className="skeleton h-16 w-full" /><div className="skeleton h-10 w-2/3" /></div>
-        ) : preferencesQuery.isError ? (
-          <div className="border border-destructive/40 bg-destructive/10 p-4 text-sm" role="alert">
-            <p>We couldn’t load your notification choices.</p>
-            <Button variant="outline" className="mt-3 min-h-[44px]" onClick={() => void preferencesQuery.refetch()}>Try again</Button>
+        {unavailable ? (
+          <div className="border border-destructive/40 bg-destructive/10 p-4 text-sm" role="alert" data-testid={`notification-preferences-${unavailable}`}>
+            <p>{unavailable === "offline" ? "You’re offline. Your notification choices will load when your connection is back." : "We couldn’t load your notification choices."}</p>
+            <Button variant="outline" className="mt-3 min-h-[44px]" onClick={(e) => { handoffFocusOnUnmount(e.currentTarget, () => document.getElementById("notification-settings-title")); void preferencesQuery.refetch(); }}>Try again</Button>
           </div>
+        ) : preferencesQuery.isLoading || !savedValues ? (
+          <div className="space-y-3" aria-busy="true"><div className="skeleton h-16 w-full" /><div className="skeleton h-16 w-full" /><div className="skeleton h-10 w-2/3" /></div>
         ) : (
           <>
             <div className="grid gap-3 sm:grid-cols-2">
