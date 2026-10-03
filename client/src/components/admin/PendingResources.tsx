@@ -998,7 +998,7 @@ export default function PendingResources() {
              <Label htmlFor="bulk-rejection-reason">Rejection Reason *</Label>
              <Textarea
                id="bulk-rejection-reason"
-               placeholder="Explain why these resources are being rejected..."
+               placeholder={bulkRejectIds.length === 1 ? "Explain why this resource is being rejected..." : "Explain why these resources are being rejected..."}
                value={bulkRejectionReason}
                onChange={(event) => setBulkRejectionReason(event.target.value)}
                className="min-h-[100px]"

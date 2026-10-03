@@ -1224,9 +1224,9 @@ export default function ResourceManager({ createRequest = 0 }: { createRequest?:
           <Dialog open={rejectDialogOpen} onOpenChange={setRejectDialogOpen}>
             <DialogContent onCloseAutoFocus={restoreFocusToTable}>
               <DialogHeader>
-                <DialogTitle>Reject Selected Resources</DialogTitle>
+                <DialogTitle>{selectedResourceIds.length === 1 ? "Reject Selected Resource" : "Reject Selected Resources"}</DialogTitle>
                 <DialogDescription>
-                  You are about to reject {selectedResourceIds.length} resource(s).
+                  You are about to reject {selectedResourceIds.length} {selectedResourceIds.length === 1 ? "resource" : "resources"}.
                   Please provide a reason (minimum 10 characters).
                 </DialogDescription>
               </DialogHeader>
@@ -1237,7 +1237,7 @@ export default function ResourceManager({ createRequest = 0 }: { createRequest?:
                     id="reject-reason"
                     value={rejectReason}
                     onChange={(e) => setRejectReason(e.target.value)}
-                    placeholder="Explain why these resources are being rejected..."
+                    placeholder={selectedResourceIds.length === 1 ? "Explain why this resource is being rejected..." : "Explain why these resources are being rejected..."}
                     rows={4}
                   />
                   <p className="text-sm text-muted-foreground mt-1">

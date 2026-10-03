@@ -370,6 +370,12 @@
 }
 
 @media (max-width: 640px) {
+  /* C8-V5A-04: the table scrolls sideways here, so give titles a readable
+     column instead of letting overflow-wrap break them a syllable per line. */
+  .admin-catalog-resources__resource-title {
+    min-width: 11rem;
+  }
+
   /* Keep search, the touch-operable filters toggle and Add on one row. */
   .admin-catalog-resources__header-actions {
     flex-wrap: nowrap;
