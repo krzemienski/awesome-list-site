@@ -129,7 +129,9 @@ export default function SearchDialog({ isOpen, setIsOpen }: SearchDialogProps) {
   const results = allMatches.slice(0, 15);
   const defaultCategories = (categoriesQuery.data ?? []).slice(0, 5);
   const featuredResources = (featuredQuery.data?.featured ?? []).slice(0, 4);
-  const defaultSuggestionCount = defaultCategories.length + featuredResources.length;
+  // C7-V2-05: count every row the empty palette lists (jump targets, pages, recent searches).
+  const defaultSuggestionCount =
+    defaultCategories.length + featuredResources.length + PAGES.length + recentSearches.length;
   const firstCategoryValue = defaultCategories[0]
     ? `category-${defaultCategories[0].name}`
     : undefined;

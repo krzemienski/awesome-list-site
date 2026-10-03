@@ -748,6 +748,8 @@ export default function JourneyDetail() {
                             onClick={() => handleToggleStep(step.rowIds, !isStepCompleted, step.stepNumber, index + 1)}
                             aria-disabled={completeStepMutation.isPending}
                             aria-busy={completeStepMutation.isPending}
+                            // C7-V2-03: six identical toggles; name the step (keeps the visible text first).
+                            aria-label={`${completeStepMutation.isPending ? (isStepCompleted ? "Updating..." : "Marking as Complete...") : isStepCompleted ? "Completed — Undo" : "Mark as Complete"}: ${step.title}`}
                             data-testid={`button-${isStepCompleted ? "uncomplete" : "complete"}-step-${step.stepNumber}`}
                           >
                             {isStepCompleted ? (

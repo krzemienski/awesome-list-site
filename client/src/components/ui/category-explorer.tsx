@@ -371,7 +371,6 @@ export default function CategoryExplorer({ categories, resources, className }: C
                       >
                         {category.name}
                       </Link>
-                      <ExternalLink className="h-4 w-4 text-muted-foreground shrink-0" />
                     </CardTitle>
                     <div className="flex flex-wrap items-center gap-x-4 gap-y-1 mt-2">
                       <span className="text-sm text-muted-foreground whitespace-nowrap">
@@ -440,6 +439,9 @@ export default function CategoryExplorer({ categories, resources, className }: C
                         className="inline-flex min-h-10 items-center text-foreground hover:text-primary transition-colors font-medium"
                       >
                         {resource.title}
+                        {/* C7-V2-04: the cue belongs on the links that really open a new tab. */}
+                        <ExternalLink aria-hidden="true" className="ml-1.5 h-3.5 w-3.5 shrink-0 text-muted-foreground" />
+                        <span className="sr-only"> (opens in new tab)</span>
                       </a>
                       <p className="text-xs text-muted-foreground line-clamp-1">
                         {resource.description}

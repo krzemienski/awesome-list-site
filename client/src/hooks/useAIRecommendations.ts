@@ -1,5 +1,5 @@
 import { useMutation } from "@tanstack/react-query";
-import { apiRequest } from "@/lib/queryClient";
+import { apiRequest, ApiError, renewSessionToken } from "@/lib/queryClient";
 import { useState, useEffect } from "react";
 import { safeGetItem, safeSetItem, safeRemoveItem } from "@/lib/safeStorage";
 import type {
@@ -137,13 +137,23 @@ export function useAIRecommendations(
       try {
         // Authenticated profile fields are ignored by the server except as the
         // signal to use POST; saved account preferences remain authoritative.
-        const raw: unknown = finalProfile
-          ? await apiRequest(url, {
-              method: 'POST',
-              body: JSON.stringify({}),
-              signal: controller.signal,
-            })
-          : await apiRequest(url, { method: 'GET', signal: controller.signal });
+        const send = () =>
+          finalProfile
+            ? apiRequest(url, {
+                method: 'POST',
+                body: JSON.stringify({}),
+                signal: controller.signal,
+              })
+            : apiRequest(url, { method: 'GET', signal: controller.signal });
+        // C6-V2-06: the first request after a reconnect can carry an expired
+        // Clerk token and 401. Renew the session and ask once more instead of
+        // leaving "latest refresh failed" until the user presses Try again.
+        const raw: unknown = await send().catch(async (error) => {
+          if (error instanceof ApiError && error.status === 401 && (await renewSessionToken())) {
+            return send();
+          }
+          throw error;
+        });
 
         return normalizeRecommendationsResponse(raw);
       } catch (error) {
