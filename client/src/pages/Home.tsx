@@ -7,7 +7,10 @@ import { Button } from "@/components/ui/button";
 import { Category, Resource, Subcategory } from "@/types/awesome-list";
 import {
   fetchKindCounts,
+  isRealCategory,
+  navTotalCount,
   STRIP_KINDS,
+  visibleNavCategories,
   type AwesomeListNav,
   type AwesomeListNavNode,
   type ResourceKindCounts,
@@ -97,23 +100,6 @@ interface DisplayCategory {
   count: number;
   teaser?: { title: string; description: string };
   subcategories: AwesomeListNavNode[];
-}
-
-const EXCLUDED_CATEGORY_NAMES = ["Contributing", "License", "External Links", "Anti-features"];
-
-function isRealCategory(name: string): boolean {
-  return (
-    name !== "Table of contents" &&
-    !name.startsWith("List of") &&
-    !EXCLUDED_CATEGORY_NAMES.includes(name)
-  );
-}
-
-function navTotalCount(node: AwesomeListNavNode): number {
-  let total = node.resourceCount ?? 0;
-  for (const sub of node.subcategories ?? []) total += navTotalCount(sub);
-  for (const nested of node.subSubcategories ?? []) total += navTotalCount(nested);
-  return total;
 }
 
 function countSubcategories(categories: AwesomeListNavNode[]): number {
@@ -753,7 +739,8 @@ export default function Home({ nav, navLoading }: HomeProps) {
 
   const stats = useMemo<HomeStats>(() => {
     const realCategories = navCategories.length;
-    const rawCategories = nav?.categories ?? [];
+    // C8-V1-01: count only the taxonomy the public site shows.
+    const rawCategories = visibleNavCategories(nav?.categories);
     return {
       total: homeData?.total ?? nav?.totalResources ?? 0,
       categories: realCategories,

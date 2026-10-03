@@ -25,7 +25,7 @@ import { useQuery } from "@tanstack/react-query";
 import { getAboutFaqs } from "@shared/faq";
 import { MAINTAINER } from "@shared/about-content";
 import { resolveSiteIdentity, siteHost } from "@shared/site-identity";
-import { fetchStaticAwesomeList } from "@/lib/static-data";
+import { fetchAwesomeListNav, fetchStaticAwesomeList, visibleNavCategories } from "@/lib/static-data";
 import { preferredContactDestination, useContactConfig } from "@/lib/contact";
 import "@/styles/pages/about.css";
 
@@ -42,6 +42,14 @@ export default function About() {
     queryFn: fetchStaticAwesomeList,
     staleTime: 1000 * 60 * 60,
   });
+  // C8-V1-01: "domains" counts the categories the public site lists, not
+  // empty admin-created ones (shared nav cache with App/Home).
+  const { data: navData } = useQuery({
+    queryKey: ["awesome-list-nav"],
+    queryFn: fetchAwesomeListNav,
+    staleTime: 1000 * 60 * 60,
+  });
+  const domainCount = navData ? visibleNavCategories(navData.categories).length : undefined;
   const { data: contactConfig } = useContactConfig(true);
   const contactDestination = preferredContactDestination(contactConfig);
   const siteIdentity = resolveSiteIdentity(
@@ -58,13 +66,13 @@ export default function About() {
   );
   const aboutFaqs = getAboutFaqs({
     resourceCount: treeData?.resources?.length,
-    categoryCount: treeData?.categories?.length,
+    categoryCount: domainCount,
     site: siteIdentity,
   });
   const siteHostName = siteHost(siteIdentity.url);
   const catalogSummary =
-    treeData?.resources?.length && treeData?.categories?.length
-      ? `${siteHostName || siteIdentity.name} is a hand-curated index of ${treeData.resources.length.toLocaleString()} resources across ${treeData.categories.length} domains — encoding, transport, players, infrastructure, standards. Maintained as the canonical reference for people who actually ship video in production. `
+    treeData?.resources?.length && domainCount
+      ? `${siteHostName || siteIdentity.name} is a hand-curated index of ${treeData.resources.length.toLocaleString()} resources across ${domainCount} domains — encoding, transport, players, infrastructure, standards. Maintained as the canonical reference for people who actually ship video in production. `
       : "";
   const [openFaqs, setOpenFaqs] = useState<Set<number>>(() => new Set());
 

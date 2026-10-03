@@ -310,6 +310,7 @@ export default function TaxonomyListing({ level }: Props) {
   }, [currentFilterSignature, level, taxonomySearch.data, taxonomySearch.isPlaceholderData]);
 
   const hydratedRouteRef = useRef(`${routeFor(level, slug)}?${search}`);
+  const lastWrittenRouteRef = useRef<string | null>(null);
   const urlSyncInitialized = useRef(false);
   const popNavigation = useRef(false);
   const pushSnapshot = useRef("");
@@ -347,6 +348,7 @@ export default function TaxonomyListing({ level }: Props) {
       // Our own write already matches state; rehydrating from it would clear
       // the page-clamp notice set just before this rewrite.
       hydratedRouteRef.current = `${routeFor(level, slug)}?${next}`;
+      lastWrittenRouteRef.current = hydratedRouteRef.current;
     }
     urlSyncInitialized.current = true;
     popNavigation.current = false;
@@ -385,6 +387,10 @@ export default function TaxonomyListing({ level }: Props) {
     const routeKey = `${routeFor(level, slug)}?${search}`;
     if (hydratedRouteRef.current === routeKey) return;
     hydratedRouteRef.current = routeKey;
+    // C8-V1-02: wouter reports our own canonicalising rewrite (?page=0 -> no
+    // param) back as a navigation; state already matches it, and rehydrating
+    // would wipe the invalid-page notice just set from the original URL.
+    if (lastWrittenRouteRef.current === routeKey) return;
     const next = new URLSearchParams(search);
     const nextGeneral =
       next.get("filter") === "general" ||
