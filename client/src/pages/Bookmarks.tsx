@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useRef, useState } from "react";
+import { handoffFocusOnUnmount } from "@/hooks/focus-handoff";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import {
   Archive,
@@ -405,7 +406,8 @@ export default function Bookmarks() {
             connection is back.
           </p>
           <Button
-            onClick={() => {
+            onClick={(e) => {
+              handoffFocusOnUnmount(e.currentTarget);
               void bookmarksQuery.refetch();
               void collectionsQuery.refetch();
             }}

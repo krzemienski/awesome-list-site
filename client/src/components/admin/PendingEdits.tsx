@@ -105,13 +105,56 @@ export default function PendingEdits() {
     };
   }, [isLoading, edits.length]);
 
+  // C6-SWEEP-13: approving/rejecting removes the row whose button opened the
+  // dialog, so the dialog's return-focus target disappears. Plan a surviving
+  // target (next row's Diff button, else previous, else the heading) first —
+  // same pattern as PendingResources.planFocusAfterRemoval.
+  const focusAfterRemovalRef = useRef<{ removedId: number; targetId: number | null } | null>(null);
+  const editIds = edits.map((edit) => edit.id).join(",");
+
+  const planFocusAfterRemoval = (removedId: number) => {
+    const index = edits.findIndex((edit) => edit.id === removedId);
+    const target =
+      edits.slice(index + 1).find((edit) => edit.id !== removedId) ??
+      edits.slice(0, Math.max(index, 0)).reverse().find((edit) => edit.id !== removedId) ??
+      null;
+    focusAfterRemovalRef.current = { removedId, targetId: target?.id ?? null };
+  };
+
+  const focusRemovalTarget = () => {
+    const plan = focusAfterRemovalRef.current;
+    if (!plan) return;
+    const el = plan.targetId !== null
+      ? document.querySelector<HTMLElement>(`[data-testid="button-view-edit-${plan.targetId}"]`)
+      : document.getElementById("pending-edits-heading");
+    if (el && plan.targetId === null) el.setAttribute("tabindex", "-1");
+    el?.focus();
+  };
+
+  const restoreFocusAfterRemoval = (event: Event) => {
+    if (!focusAfterRemovalRef.current) return;
+    event.preventDefault();
+    focusRemovalTarget();
+  };
+
+  // The refetch that drops the row can land after the dialog closed;
+  // re-apply the planned focus if it was lost to <body>.
+  useEffect(() => {
+    const plan = focusAfterRemovalRef.current;
+    if (!plan || editIds.split(",").includes(String(plan.removedId))) return;
+    const active = document.activeElement;
+    if (!active || active === document.body || !active.isConnected) focusRemovalTarget();
+    focusAfterRemovalRef.current = null;
+  }, [editIds]);
+
   const approveMutation = useMutation({
     mutationFn: async (editId: number) => {
       return await apiRequest(`/api/admin/resource-edits/${editId}/approve`, {
         method: 'POST'
       });
     },
-    onSuccess: () => {
+    onSuccess: (_data, editId) => {
+      planFocusAfterRemoval(editId);
       queryClient.invalidateQueries({ queryKey: ['/api/admin/resource-edits'] });
       queryClient.invalidateQueries({ queryKey: ['/api/admin/stats'] });
       queryClient.invalidateQueries({ queryKey: ['/api/resources'] });
@@ -136,7 +179,8 @@ export default function PendingEdits() {
         body: JSON.stringify({ reason })
       });
     },
-    onSuccess: () => {
+    onSuccess: (_data, { editId }) => {
+      planFocusAfterRemoval(editId);
       queryClient.invalidateQueries({ queryKey: ['/api/admin/resource-edits'] });
       queryClient.invalidateQueries({ queryKey: ['/api/admin/stats'] });
       setRejectDialogOpen(false);
@@ -548,7 +592,7 @@ export default function PendingEdits() {
         setApproveDialogOpen(open);
         if (!open) setApproveError(null);
       }}>
-        <AlertDialogContent>
+        <AlertDialogContent onCloseAutoFocus={restoreFocusAfterRemoval}>
           <AlertDialogHeader>
             <AlertDialogTitle>Approve Edit Suggestion?</AlertDialogTitle>
             <AlertDialogDescription>
@@ -600,7 +644,7 @@ export default function PendingEdits() {
         setRejectDialogOpen(open);
         if (!open) setRejectError(null);
       }}>
-        <DialogContent>
+        <DialogContent onCloseAutoFocus={restoreFocusAfterRemoval}>
           <DialogHeader>
             <DialogTitle>Reject Edit Suggestion</DialogTitle>
             <DialogDescription>

@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from "react";
+import { handoffFocusOnUnmount } from "@/hooks/focus-handoff";
 import { Link } from "wouter";
 import { useQuery } from "@tanstack/react-query";
 import { ArrowLeft, ArrowRight, Check, Sparkles } from "lucide-react";
@@ -321,7 +322,8 @@ export default function Onboarding() {
         </p>
         <Button
           className="mt-4"
-          onClick={() => {
+          onClick={(e) => {
+            handoffFocusOnUnmount(e.currentTarget);
             void refetchPreferences();
             void refetchCategories();
           }}

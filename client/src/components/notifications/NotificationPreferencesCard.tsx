@@ -133,12 +133,13 @@ export default function NotificationPreferencesCard() {
       },
     });
   };
-  const save = () => saveValues(values, "Your choices are saved.", () => setDirty(false));
+  const save = () => !saveMutation.isPending && saveValues(values, "Your choices are saved.", () => setDirty(false));
   // Quick actions change only their own fields: they save on top of the last
   // saved state, and mirror the change into the form without committing
   // anything else the person has edited but not saved. The confirmation says
   // only what the action saved, so it never vouches for pending edits.
   const saveQuickAction = (patch: Partial<NotificationPreferencesUpdate>, done: string) => {
+    if (saveMutation.isPending) return; // aria-disabled buttons stay clickable
     setValues((current) => ({ ...current, ...patch }));
     const message = dirty ? `${done} Your other changes aren't saved yet — use Save choices.` : done;
     saveValues({ ...(savedValues ?? values), ...patch }, message);
@@ -191,9 +192,10 @@ export default function NotificationPreferencesCard() {
                <div><Label htmlFor="digest-timezone">Time zone</Label><input id="digest-timezone" value={values.timezone} onChange={(e) => update("timezone", e.target.value)} aria-invalid={timezoneError ? true : undefined} aria-describedby={timezoneError ? "digest-timezone-error" : undefined} className={`mt-2 min-h-[44px] w-full rounded-md border bg-[var(--surface)] px-3 text-sm ${timezoneError ? "border-destructive" : "border-input"}`} />{timezoneError ? <p id="digest-timezone-error" className="mt-1 text-xs text-destructive" role="alert">{timezoneError}</p> : null}</div>
             </div>
             <div className="flex flex-wrap items-center gap-2 border-t border-[var(--border)] pt-4">
-               {paused ? <Button variant="outline" className="min-h-[44px]" onClick={resume} disabled={saveMutation.isPending}><Play className="mr-2 h-4 w-4" />Resume now</Button> : <Button variant="outline" className="min-h-[44px]" onClick={pause} disabled={saveMutation.isPending}><Pause className="mr-2 h-4 w-4" />Pause for 7 days</Button>}
-               <Button variant="ghost" className="min-h-[44px] text-[color:var(--text-2)]" onClick={unsubscribeAll} disabled={saveMutation.isPending || (!values.emailDigestEnabled && !values.inAppEnabled)}>Unsubscribe all</Button>
-              <Button className="ml-auto min-h-[44px]" onClick={save} disabled={saveMutation.isPending}>{saveMutation.isPending ? "Saving…" : "Save choices"}</Button>
+               {/* C6-SWEEP-11: one toggle button, so the pressed control is never unmounted. */}
+               <Button variant="outline" className="min-h-[44px]" onClick={paused ? resume : pause} aria-disabled={saveMutation.isPending} aria-busy={saveMutation.isPending}>{paused ? <><Play className="mr-2 h-4 w-4" />Resume now</> : <><Pause className="mr-2 h-4 w-4" />Pause for 7 days</>}</Button>
+               <Button variant="ghost" className="min-h-[44px] text-[color:var(--text-2)]" onClick={unsubscribeAll} aria-disabled={saveMutation.isPending || (!values.emailDigestEnabled && !values.inAppEnabled)} aria-busy={saveMutation.isPending}>Unsubscribe all</Button>
+              <Button className="ml-auto min-h-[44px]" onClick={save} aria-disabled={saveMutation.isPending} aria-busy={saveMutation.isPending}>{saveMutation.isPending ? "Saving…" : "Save choices"}</Button>
             </div>
             {paused ? <p className="flex items-center gap-2 text-xs text-[color:var(--text-2)]"><Clock3 className="h-4 w-4" />Paused until {new Date(values.pausedUntil!).toLocaleDateString()}.</p> : null}
             {requestError ? <p className="border border-destructive/40 bg-destructive/10 p-3 text-sm text-destructive" role="alert">{requestError}</p> : null}

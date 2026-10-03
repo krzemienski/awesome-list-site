@@ -1,4 +1,5 @@
 import { useQuery } from "@tanstack/react-query";
+import { handoffFocusOnUnmount } from "@/hooks/focus-handoff";
 import "@/styles/pages/discovery.css";
 import { ArrowLeft } from "lucide-react";
 import { Link, Redirect, useLocation, useParams, useSearch } from "wouter";
@@ -105,7 +106,7 @@ export default function TagLanding() {
         <h1 className="display-h">Error Loading Tag</h1>
         <p>Please try again.</p>
         <div className="flex flex-wrap justify-center gap-2">
-          <Button variant="outline" className="min-h-10" onClick={() => void listing.refetch()}>Retry</Button>
+          <Button variant="outline" className="min-h-10" onClick={(e) => { handoffFocusOnUnmount(e.currentTarget); void listing.refetch(); }}>Retry</Button>
           <Button asChild variant="outline" className="min-h-10">
             <Link href="/categories" data-testid="link-tag-error-categories">Browse categories</Link>
           </Button>

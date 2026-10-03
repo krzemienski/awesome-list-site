@@ -1,4 +1,5 @@
 import { lazy, Suspense, useEffect, useMemo, useState } from "react";
+import { focusPageHeading, handoffFocusOnUnmount } from "@/hooks/focus-handoff";
 import { Link, useSearch } from "wouter";
 import { useQuery } from "@tanstack/react-query";
 import { Card, CardContent } from "@/components/ui/card";
@@ -322,7 +323,7 @@ function CatalogError({ onRetry, message }: { onRetry: () => void; message: stri
     <div className="home-error" role="alert">
       <h1 className="display-h">We couldn&apos;t load the catalog</h1>
       <p>{message}</p>
-      <Button onClick={onRetry} data-testid="button-retry-catalog">
+      <Button onClick={(e) => { handoffFocusOnUnmount(e.currentTarget); onRetry(); }} data-testid="button-retry-catalog">
         Retry
       </Button>
     </div>
@@ -862,6 +863,8 @@ export default function Home({ nav, navLoading }: HomeProps) {
                 className="btn ghost"
                 onClick={() => {
                   setEmptyTagParamNotice(false);
+                  // C6-SWEEP-03: the notice unmounts with this button; focus the page h1.
+                  focusPageHeading();
                   // Replace, not push: Back must not resurrect the notice.
                   writeFilterParams({ tags: null, tag: null }, "replace");
                 }}

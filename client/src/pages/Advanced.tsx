@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { handoffFocusOnUnmount } from "@/hooks/focus-handoff";
 import { Link } from "wouter";
 import { useQuery } from "@tanstack/react-query";
 import SEOHead from "@/components/layout/SEOHead";
@@ -141,7 +142,7 @@ export default function Advanced() {
           </p>
           <Button
             variant="outline"
-            onClick={() => { if (!isFetching) void refetch(); }}
+            onClick={(e) => { if (isFetching) return; handoffFocusOnUnmount(e.currentTarget); void refetch(); }}
             aria-disabled={isFetching}
             data-testid="button-advanced-retry"
           >

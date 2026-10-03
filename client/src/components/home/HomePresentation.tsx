@@ -7,6 +7,7 @@ import { Badge } from "@/components/ui/badge";
 import { getCategoryGlyph } from "@/components/layout/new/category-glyphs";
 import { ChipButton } from "@/components/ui/chip-button";
 import { Button } from "@/components/ui/button";
+import { handoffFocusOnUnmount } from "@/hooks/focus-handoff";
 
 export interface HomeSubcategoryView {
   name: string;
@@ -408,7 +409,7 @@ function CategoryIndex({ categories, selectedTags, selectedKind, onClearFilters 
     return (
       <div className="home-empty-categories" data-testid="empty-categories">
         <p>No categories match the selected filters.</p>
-        <Button variant="outline" size="sm" onClick={onClearFilters} data-testid="button-clear-filters">
+        <Button variant="outline" size="sm" onClick={(e) => { /* C6-SWEEP-02: the card unmounts once categories return; focus the index heading */ handoffFocusOnUnmount(e.currentTarget, () => document.querySelector<HTMLElement>(".home-index-title")); onClearFilters(); }} data-testid="button-clear-filters">
           Clear filters
         </Button>
       </div>
