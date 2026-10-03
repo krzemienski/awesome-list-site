@@ -118,6 +118,7 @@ function RecommendationCard({
               </p>
               <RecommendationFeedback
                 resourceId={Number(resource.id)}
+                title={resource.name}
                 initialFeedback={resource.feedback}
                 onFeedbackChange={onFeedbackChange}
               />

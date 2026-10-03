@@ -17,6 +17,8 @@ import type { RecommendationFeedbackValue } from "@shared/recommendations";
 
 interface RecommendationFeedbackProps {
   resourceId: number;
+  /** C6-V2-05: names the resource in the group/button accessible names. */
+  title?: string;
   initialFeedback?: RecommendationFeedbackValue | null;
   className?: string;
   onFeedbackChange?: (feedback: RecommendationFeedbackValue | null) => void;
@@ -60,6 +62,7 @@ const FEEDBACK_OPTIONS: {
 
 function RecommendationFeedback({
   resourceId,
+  title,
   initialFeedback = null,
   className,
   onFeedbackChange,
@@ -118,6 +121,7 @@ function RecommendationFeedback({
   };
 
   const choose = (next: RecommendationFeedbackValue) => {
+    if (isLoading) return; // aria-disabled (not disabled) so focus stays put while saving
     if (!isAuthenticated) {
       toast({
         title: "Sign in to save feedback",
@@ -150,7 +154,7 @@ function RecommendationFeedback({
       <div
         className="flex flex-wrap gap-2"
         role="group"
-        aria-label="Recommendation feedback"
+        aria-label={title ? `Feedback for ${title}` : "Recommendation feedback"}
       >
         {FEEDBACK_OPTIONS.map((option) => {
           const Icon = option.icon;
@@ -170,7 +174,9 @@ function RecommendationFeedback({
                 event.stopPropagation();
                 choose(option.value);
               }}
-              disabled={isLoading}
+              aria-disabled={isLoading}
+              aria-busy={isLoading && selected}
+              aria-label={title ? `${option.label}: ${title}` : undefined}
               aria-pressed={selected}
               data-testid={`recommendation-feedback-${option.value}-${resourceId}`}
             >

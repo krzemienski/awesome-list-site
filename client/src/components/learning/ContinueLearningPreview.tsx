@@ -141,6 +141,7 @@ export default function ContinueLearningPreview() {
                   })
                 }
                 disabled={resumeJourney.isPending}
+                aria-label={`Resume: ${active.title}`}
                 data-testid={`button-preview-resume-${active.journeyId}`}
               >
                 <Play className="mr-2 h-4 w-4" />
