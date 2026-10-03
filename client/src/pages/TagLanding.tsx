@@ -1,3 +1,4 @@
+import { useEffect, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { handoffFocusOnUnmount } from "@/hooks/focus-handoff";
 import "@/styles/pages/discovery.css";
@@ -59,7 +60,13 @@ export default function TagLanding() {
   const { slug: rawSlug = "" } = useParams<{ slug: string }>();
   const slug = normalizeTagPathSegment(rawSlug);
   const parsedPage = parsePageParamStrict(new URLSearchParams(useSearch()).get("page"));
-  const page = parsedPage.page;
+  // C8-V1-04: a page past the end shows the last page plus a notice (as the
+  // taxonomy listings do) instead of a 404. `clamp` remembers the last page
+  // once the first fetch for the out-of-range page reveals the total.
+  const [clamp, setClamp] = useState<{ requested: string; slug: string; page: number } | null>(null);
+  const requestedKey = String(parsedPage.page);
+  const activeClamp = clamp && clamp.slug === slug && clamp.requested === requestedKey ? clamp : null;
+  const page = activeClamp ? activeClamp.page : parsedPage.page;
   const offset = (page - 1) * PAGE_SIZE;
   const url = `/api/resources?tags=${encodeURIComponent(slug)}&limit=${PAGE_SIZE}&offset=${offset}&facets=true`;
   const listing = useQuery<TagListingResponse>({
@@ -82,6 +89,14 @@ export default function TagLanding() {
       previousQuery && listingTag(previousQuery.queryKey[0]) === slug ? previous : undefined,
   });
 
+  const listedTotal = listing.data?.total;
+  useEffect(() => {
+    if (listedTotal && !activeClamp && !listing.isPlaceholderData) {
+      const lastPage = Math.max(1, Math.ceil(listedTotal / PAGE_SIZE));
+      if (parsedPage.page > lastPage) setClamp({ requested: requestedKey, slug, page: lastPage });
+    }
+  }, [activeClamp, listedTotal, listing.isPlaceholderData, parsedPage.page, requestedKey, slug]);
+
   const canonicalPath = tagLandingPath(slug);
   if (slug && window.location.pathname !== canonicalPath) {
     return <Redirect to={`${canonicalPath}${page > 1 ? `?page=${page}` : ""}`} replace />;
@@ -90,7 +105,7 @@ export default function TagLanding() {
   if (!slug) return <NotFound />;
   // isPending, not isLoading: offline the fetch is paused (isLoading false),
   // which fell through to the no-data 404 below.
-  if (listing.isPending) {
+  if (listing.isPending || (activeClamp && listing.isPlaceholderData)) {
     return (
       <div className="discovery-page space-y-6" aria-busy="true">
         <PageHeaderSkeleton />
@@ -121,7 +136,6 @@ export default function TagLanding() {
   const data = listing.data;
   if (!data || data.total === 0) return <NotFound />;
   const totalPages = Math.max(1, Math.ceil(data.total / PAGE_SIZE));
-  if (page > totalPages) return <NotFound />;
 
   const name = tagDisplayNameBranded(slug);
   const titleCore = tagTitleCoreDeduped(name);
@@ -174,9 +188,9 @@ export default function TagLanding() {
             at this size) keeps the measure readable on wide desktop screens. */}
         <p className="mt-1 max-w-prose text-sm leading-relaxed text-muted-foreground">{intro}</p>
       </section>
-      {pageNoticeFor(parsedPage) && (
+      {pageNoticeFor(parsedPage, totalPages) && (
         <div role="status" data-testid="notice-page-adjusted" className="rounded border p-3 text-sm">
-          {pageNoticeFor(parsedPage)}
+          {pageNoticeFor(parsedPage, totalPages)}
         </div>
       )}
       <p className="text-sm text-muted-foreground" data-testid="text-results-count" data-total={data.total}>

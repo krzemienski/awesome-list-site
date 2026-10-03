@@ -123,6 +123,15 @@
   margin-top: 40px;
 }
 
+/* C8-V1-05: below the lg breakpoint the Filters sheet trigger stacks directly
+   on the first card; the category level has a results heading in between. */
+@media (max-width: 1023px) {
+  .taxonomy-page--subcategory .taxonomy-results-layout > .taxonomy-production-controls--open,
+  .taxonomy-page--sub-subcategory .taxonomy-results-layout > .taxonomy-production-controls--open {
+    margin-bottom: 16px;
+  }
+}
+
 .taxonomy-children h2 {
   margin-bottom: 16px;
   color: var(--text-2);

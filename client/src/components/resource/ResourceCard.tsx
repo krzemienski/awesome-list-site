@@ -232,7 +232,7 @@ function ResourceCard({
         setShowAllTags((v) => !v);
       }}
       aria-expanded={showAllTags}
-      aria-label={showAllTags ? "Show fewer tags" : `Show ${hiddenTagCount} more tags`}
+      aria-label={showAllTags ? "Show fewer tags" : `Show ${hiddenTagCount} more ${hiddenTagCount === 1 ? "tag" : "tags"}`}
       data-testid={`button-more-tags-${resource.id}`}
     >
       {showAllTags ? "Show fewer" : `+${hiddenTagCount} more`}
