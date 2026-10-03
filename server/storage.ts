@@ -243,7 +243,7 @@ export interface IStorage {
   getUserFavorites(userId: string): Promise<Array<Resource & { favoritedAt: Date }>>;
 
   // User Bookmarks
-  addBookmark(userId: string, resourceId: number, notes?: string): Promise<UserBookmark>;
+  addBookmark(userId: string, resourceId: number, notes?: string, savedAt?: Date): Promise<UserBookmark>;
   removeBookmark(userId: string, resourceId: number): Promise<void>;
   getUserBookmarks(userId: string): Promise<Array<Resource & { notes?: string; bookmarkedAt: Date }>>;
 
@@ -642,8 +642,8 @@ export class DatabaseStorage implements IStorage {
     return this.userFeatureRepo.getUserFavorites(userId);
   }
 
-  async addBookmark(userId: string, resourceId: number, notes?: string): Promise<UserBookmark> {
-    return this.userFeatureRepo.addBookmark(userId, resourceId, notes);
+  async addBookmark(userId: string, resourceId: number, notes?: string, savedAt?: Date): Promise<UserBookmark> {
+    return this.userFeatureRepo.addBookmark(userId, resourceId, notes, savedAt);
   }
 
   async removeBookmark(userId: string, resourceId: number): Promise<void> {

@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useRef, useState } from "react";
+import { focusElement } from "@/hooks/focus-handoff";
 import { handoffFocusOnUnmount } from "@/hooks/focus-handoff";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { Link, useSearch } from "wouter";
@@ -256,7 +257,8 @@ function ContributionCard({
 
   return (
     <article
-      className="account-contribution-card relative"
+      className="account-contribution-card relative focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+      tabIndex={-1}
       data-testid={`contribution-${item.kind}-${item.id}`}
     >
       <div className="flex flex-col gap-4 p-4 sm:p-5">
@@ -463,6 +465,7 @@ export default function Contributions() {
     );
   }, [query.data?.pagination.page, state.page]);
 
+  const withdrawnRef = useRef<{ kind: string; id: number | string } | null>(null);
   const withdrawMutation = useMutation({
     mutationFn: (item: ContributionItem) =>
       apiRequest(
@@ -470,6 +473,9 @@ export default function Contributions() {
         { method: "POST" },
       ),
     onSuccess: (_, item) => {
+      // C6-VX-02: the row's Withdraw button disappears with the withdraw, so
+      // the dialog's close hands focus to the row (or the timeline heading).
+      withdrawnRef.current = { kind: item.kind, id: item.id };
       setWithdrawTarget(null);
       void queryClient.invalidateQueries({
         queryKey: ["/api/user/contributions"],
@@ -908,7 +914,21 @@ export default function Contributions() {
           if (!open && !withdrawMutation.isPending) setWithdrawTarget(null);
         }}
       >
-        <AlertDialogContent data-testid="dialog-withdraw-contribution">
+        <AlertDialogContent
+          data-testid="dialog-withdraw-contribution"
+          onCloseAutoFocus={(event) => {
+            // C6-VX-02: Radix would return focus to the vanished trigger.
+            const withdrawn = withdrawnRef.current;
+            if (!withdrawn) return;
+            event.preventDefault();
+            withdrawnRef.current = null;
+            focusElement(
+              document.querySelector<HTMLElement>(
+                `[data-testid="contribution-${withdrawn.kind}-${withdrawn.id}"]`,
+              ) ?? document.getElementById("timeline-heading"),
+            );
+          }}
+        >
           <AlertDialogHeader>
             <AlertDialogTitle>Withdraw this contribution?</AlertDialogTitle>
             <AlertDialogDescription>

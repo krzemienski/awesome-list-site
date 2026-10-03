@@ -8,6 +8,8 @@ export interface RemovedBookmark {
   queueStatus?: BookmarkQueueStatus;
   archivedAt?: string | null;
   personalTags?: string[];
+  /** Original saved date (/api/bookmarks `bookmarkedAt`). */
+  bookmarkedAt?: string | null;
 }
 
 /**
@@ -24,7 +26,11 @@ export async function restoreRemovedBookmark(
 ): Promise<{ partial: boolean }> {
   await apiRequest(`/api/bookmarks/${resourceId}`, {
     method: "POST",
-    body: JSON.stringify(removed?.notes ? { notes: removed.notes } : {}),
+    // C6-VX-01: send the original saved date so Undo doesn't re-date the save.
+    body: JSON.stringify({
+      ...(removed?.notes ? { notes: removed.notes } : {}),
+      ...(removed?.bookmarkedAt ? { restoreCreatedAt: removed.bookmarkedAt } : {}),
+    }),
     credentials: "include",
   });
 

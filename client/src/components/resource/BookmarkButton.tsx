@@ -9,6 +9,7 @@ import { ToastAction } from "@/components/ui/toast";
 import { useBookmarkToggle } from "@/hooks/useResourceToggle";
 import { useAuth } from "@/hooks/useAuth";
 import { useGuestBookmarkIds } from "@/lib/guestBookmarks";
+import { handoffFocusToSiblingControl } from "@/hooks/focus-handoff";
 import { restoreRemovedBookmark } from "@/lib/bookmarkRestore";
 import { cn } from "@/lib/utils";
 import type { BookmarkCollection } from "@/types/bookmarks";
@@ -66,6 +67,7 @@ function BookmarkButton({
     queueStatus?: BookmarkQueueStatus;
     archivedAt?: string | null;
     personalTags?: string[];
+    bookmarkedAt?: string | null;
   }>>({
     queryKey: ["/api/bookmarks"],
     enabled: isAuthenticated,
@@ -212,6 +214,8 @@ function BookmarkButton({
   const handleClick = (e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
+    // C6-VX-03: removing from a list card unmounts this button with the card.
+    if (isBookmarked) handoffFocusToSiblingControl(e.currentTarget as HTMLElement, '[data-testid="button-bookmark"]');
     // Activating with the notes dialog enabled opens the dialog instead of
     // firing the request immediately (rapid in-flight toggles skip the
     // dialog inside the hook; notes can be added afterwards).
