@@ -408,8 +408,13 @@ export default function AuditTab() {
         {data && data.total > 0 && (
           <div className="admin-ops-pagination flex flex-wrap items-center justify-between gap-3 pt-2">
             <p className="text-sm text-muted-foreground" data-testid="text-audit-range">
-              {offset + 1}–{Math.min(offset + (data.logs?.length || 0), data.total)} of{" "}
-              {data.total.toLocaleString()} entries
+              {/* C6-V5B-01: format every number alike and don't print "1–1". */}
+              {(() => {
+                const first = offset + 1;
+                const last = Math.min(offset + (data.logs?.length || 0), data.total);
+                const range = first === last ? first.toLocaleString() : `${first.toLocaleString()}–${last.toLocaleString()}`;
+                return `${range} of ${data.total.toLocaleString()} ${data.total === 1 ? "entry" : "entries"}`;
+              })()}
             </p>
             <div className="flex gap-2">
               <Button
