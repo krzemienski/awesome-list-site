@@ -1,4 +1,4 @@
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { ApiError } from "@/lib/queryClient";
 import { formatRelativeAgo, maskEmail } from "@/lib/utils";
 import { useQuery, keepPreviousData } from "@tanstack/react-query";
@@ -120,6 +120,16 @@ export default function AuditTab() {
     // while the next page loads instead of swapping in the skeleton.
     placeholderData: keepPreviousData,
   });
+
+  // C9-V5B-01: a taller next page can push the focused pager button below the
+  // fold; bring it back into view once the new page has rendered.
+  useEffect(() => {
+    if (isPlaceholderData) return;
+    const active = document.activeElement;
+    if (active === prevButtonRef.current || active === nextButtonRef.current) {
+      (active as HTMLElement).scrollIntoView({ block: "nearest" });
+    }
+  }, [offset, isPlaceholderData]);
 
   // ADM-08: validate the Resource ID filter client-side against the SAME rule
   // the server enforces (positive integer within int4). An out-of-range value
