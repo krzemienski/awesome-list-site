@@ -3,6 +3,8 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { apiRequest } from "@/lib/queryClient";
 import { formatAdminDate, formatRelativeAgo } from "@/lib/utils";
 import { useToast } from "@/hooks/use-toast";
+import { queryUnavailableReason } from "@/lib/query-availability";
+import { handoffFocusOnUnmount } from "@/hooks/focus-handoff";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -76,7 +78,7 @@ export default function PendingResources() {
   const [bulkRejectError, setBulkRejectError] = useState<string | null>(null);
   const [bulkOutcome, setBulkOutcome] = useState<BulkResourceOutcome | null>(null);
   // Run17 BUG-027: "Check again" busy/outcome state for the empty view.
-  const [recheckState, setRecheckState] = useState<'idle' | 'checking' | 'checked'>('idle');
+  const [recheckState, setRecheckState] = useState<'idle' | 'checking' | 'checked' | 'offline'>('idle');
 
   // BUG-011 (run22): the swipe hint must appear whenever the table actually
   // overflows its scrollport (which is always the case at ≤768px, where the
@@ -85,10 +87,13 @@ export default function PendingResources() {
   const scrollRef = useRef<HTMLDivElement>(null);
   const [showSwipeHint, setShowSwipeHint] = useState(false);
 
-  const { data, isLoading, isError, refetch, isFetching } = useQuery<PendingResourcesResponse>({
+  const pendingQuery = useQuery<PendingResourcesResponse>({
     queryKey: ['/api/admin/pending-resources'],
     refetchInterval: 10000
   });
+  const { data, isLoading, refetch, isFetching } = pendingQuery;
+  // C9-V5A-03: a fetch paused while offline is not an empty queue.
+  const unavailable = queryUnavailableReason(pendingQuery);
 
   const pendingResourceData = data?.resources;
   const pendingResources = useMemo(
@@ -415,13 +420,26 @@ export default function PendingResources() {
     return formatAdminDate(date);
   };
 
-  if (isError) {
+  if (unavailable) {
     return (
       <section className="admin-panel queue-review-shell" aria-label="Approvals">
         <div className="admin-panel__heading queue-review-shell-heading"><h2>Approvals</h2></div>
         <div className="queue-review-empty" role="alert" data-testid="pending-resources-load-error">
-          <p>Unable to load pending resources. The queue may still contain items awaiting review.</p>
-          <Button onClick={() => void refetch()} disabled={isFetching} data-testid="pending-resources-retry">
+          <p>
+            {unavailable === "offline"
+              ? "You're offline, so the approvals queue can't be loaded. It may still contain items awaiting review."
+              : "Unable to load pending resources. The queue may still contain items awaiting review."}
+          </p>
+          <Button
+            aria-disabled={isFetching}
+            aria-busy={isFetching}
+            onClick={(event) => {
+              if (isFetching) return;
+              handoffFocusOnUnmount(event.currentTarget, () => document.getElementById("pending-resources-heading"));
+              void refetch();
+            }}
+            data-testid="pending-resources-retry"
+          >
             {isFetching ? "Retrying…" : "Retry"}
           </Button>
         </div>
@@ -467,12 +485,19 @@ export default function PendingResources() {
             <Button
               variant="ghost"
               size="sm"
-              disabled={recheckState === 'checking'}
+              aria-disabled={recheckState === 'checking'}
+              aria-busy={recheckState === 'checking'}
               onClick={() => {
+                if (recheckState === 'checking') return;
+                if (!navigator.onLine) {
+                  setRecheckState('offline');
+                  return;
+                }
                 setRecheckState('checking');
+                const done = () => setRecheckState(navigator.onLine && queryClient.getQueryState(['/api/admin/pending-resources'])?.status !== 'error' ? 'checked' : 'offline');
                 void queryClient
                   .invalidateQueries({ queryKey: ['/api/admin/pending-resources'] })
-                  .then(() => setRecheckState('checked'), () => setRecheckState('checked'));
+                  .then(done, done);
               }}
               data-testid="button-refresh-pending-resources"
             >
@@ -501,7 +526,11 @@ export default function PendingResources() {
           </table>
         </div>
         <span className="sr-only" role="status" aria-live="polite">
-          {recheckState === 'checked' ? 'Checked — still no pending resources.' : ''}
+          {recheckState === 'checked'
+            ? 'Checked — still no pending resources.'
+            : recheckState === 'offline'
+              ? "You're offline — couldn't check for new submissions."
+              : ''}
         </span>
       </section>
     );

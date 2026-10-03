@@ -220,7 +220,7 @@ export default function ResourceManager({ createRequest = 0 }: { createRequest?:
   const [bulkApproveDialogOpen, setBulkApproveDialogOpen] = useState(false);
 
   // BUG-049: per-field inline errors + a dialog-level banner for server 400s.
-  const [fieldErrors, setFieldErrors] = useState<{ title?: string; url?: string; description?: string }>({});
+  const [fieldErrors, setFieldErrors] = useState<{ title?: string; url?: string; description?: string; category?: string }>({});
   const [formError, setFormError] = useState<string | null>(null);
   // Catalog controls use narrow PATCH endpoints. Keep failures next to the
   // control that initiated them so an error never closes/remounts the dialog.
@@ -287,7 +287,9 @@ export default function ResourceManager({ createRequest = 0 }: { createRequest?:
       const params = new URLSearchParams();
       params.set('page', page.toString());
       params.set('limit', limit.toString());
-      if (sort !== 'newest') params.set('sort', sort);
+      // C9-V5A-06: a search without an explicit sort is relevance-ordered server-side,
+      // so always send the chosen sort when searching.
+      if (sort !== 'newest' || debouncedSearch) params.set('sort', sort);
       if (debouncedSearch) params.set('search', debouncedSearch);
       if (categoryFilter) params.set('category', categoryFilter);
       if (statusFilter) params.set('status', statusFilter);
@@ -841,7 +843,7 @@ export default function ResourceManager({ createRequest = 0 }: { createRequest?:
   // http:// URLs (server PUT uses webUrlSchema); Create requires https
   // (server POST uses httpsUrlSchema).
   const validateEditForm = (mode: 'edit' | 'create'): boolean => {
-    const errors: { title?: string; url?: string; description?: string } = {};
+    const errors: { title?: string; url?: string; description?: string; category?: string } = {};
     const titleParsed = resourceTitleSchema.safeParse(editForm.title.trim());
     if (!titleParsed.success) {
       errors.title = titleParsed.error.issues[0]?.message || "Invalid title";
@@ -855,12 +857,16 @@ export default function ResourceManager({ createRequest = 0 }: { createRequest?:
     if (!descParsed.success) {
       errors.description = descParsed.error.issues[0]?.message || "Invalid description";
     }
+    // C9-V5A-02: Create requires a category; flag the field, not just a banner.
+    if (mode === 'create' && !editForm.category) {
+      errors.category = "Category is required";
+    }
     setFieldErrors(errors);
     setFormError(null);
     return Object.keys(errors).length === 0;
   };
 
-  const clearFieldError = (field: 'title' | 'url' | 'description') => {
+  const clearFieldError = (field: 'title' | 'url' | 'description' | 'category') => {
     setFieldErrors(prev => (prev[field] ? { ...prev, [field]: undefined } : prev));
   };
 
@@ -900,12 +906,8 @@ export default function ResourceManager({ createRequest = 0 }: { createRequest?:
 
   const handleCreate = () => {
     if (!validateEditForm('create')) return;
-    // Run16 BUG-031: require a category on create so new resources never
-    // land in the catalog as "Uncategorized".
-    if (!editForm.category) {
-      setFormError("Please select a category for the new resource");
-      return;
-    }
+    // Run16 BUG-031 / C9-V5A-02: validateEditForm('create') requires a
+    // category so new resources never land as "Uncategorized".
     const { featured, kind, ...fields } = editForm;
     createMutation.mutate({
       ...fields,
@@ -1503,7 +1505,7 @@ export default function ResourceManager({ createRequest = 0 }: { createRequest?:
           </div>
           {/* Run17 BUG-033: same sideways-scroll hint the Users table has. */}
           <p className="admin-catalog-resources__scroll-hint text-xs text-muted-foreground mt-2 sm:hidden">
-            Swipe the table sideways to see category, status, and actions.
+            Swipe the table sideways to see category, tags, featured, and actions.
           </p>
 
           {/* Run16 BUG-035: page-size selector + first/last jump buttons. */}
@@ -1928,12 +1930,18 @@ export default function ResourceManager({ createRequest = 0 }: { createRequest?:
             </div>
             <div className="grid gap-4 sm:grid-cols-2">
               <div className="grid gap-2">
-                <Label htmlFor="create-category">Category</Label>
+                <Label htmlFor="create-category">Category *</Label>
                 <Select 
                   value={editForm.category} 
-                  onValueChange={(v) => setEditForm(f => ({ ...f, category: v, subcategory: "", subSubcategory: "" }))}
+                  onValueChange={(v) => { clearFieldError('category'); setEditForm(f => ({ ...f, category: v, subcategory: "", subSubcategory: "" })); }}
                 >
-                  <SelectTrigger id="create-category" data-testid="select-create-category">
+                  <SelectTrigger
+                    id="create-category"
+                    aria-required="true"
+                    aria-invalid={!!fieldErrors.category}
+                    aria-describedby={fieldErrors.category ? "create-category-error" : undefined}
+                    data-testid="select-create-category"
+                  >
                     <SelectValue placeholder="Select category" />
                   </SelectTrigger>
                   <SelectContent>
@@ -1942,6 +1950,11 @@ export default function ResourceManager({ createRequest = 0 }: { createRequest?:
                     ))}
                   </SelectContent>
                 </Select>
+                {fieldErrors.category && (
+                  <p id="create-category-error" className="text-sm text-destructive" data-testid="error-create-category">
+                    {fieldErrors.category}
+                  </p>
+                )}
               </div>
               <div className="grid gap-2">
                 <Label htmlFor="create-status">Status</Label>

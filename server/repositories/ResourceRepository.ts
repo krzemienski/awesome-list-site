@@ -79,6 +79,8 @@ export interface ListResourceOptions {
   /** Limit results to resources attached directly to this taxonomy level. */
   generalScope?: "category" | "subcategory";
   includeFacets?: boolean;
+  /** C9-V5A-06: admin lists must show exact full-text matches only, never fuzzy near-misses. */
+  exactSearchOnly?: boolean;
   /** R3-H08: whitelisted sort order; unknown/absent falls back to newest-first. */
   sort?: "relevance" | "name-asc" | "name-desc" | "newest" | "oldest";
   /**
@@ -387,6 +389,7 @@ export class ResourceRepository {
       sort,
       kind,
       includeFacets = false,
+      exactSearchOnly = false,
     } = options;
     const offset = options.offset ?? ((page - 1) * limit);
 
@@ -642,6 +645,15 @@ export class ResourceRepository {
         return {
           resources: resourceList,
           total,
+          ...(facets ? { facets } : {}),
+          search: { mode: "fts" },
+        };
+      }
+
+      if (exactSearchOnly) {
+        return {
+          resources: [],
+          total: 0,
           ...(facets ? { facets } : {}),
           search: { mode: "fts" },
         };
