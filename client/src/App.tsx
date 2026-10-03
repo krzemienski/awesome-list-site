@@ -36,6 +36,7 @@ import { ClerkUiFallback } from "@/components/auth/AuthUnavailable";
 import ConsentBanner from "@/components/ui/consent-banner";
 import ScrubbedParamsNotice from "@/components/ui/scrubbed-params-notice";
 import { Button } from "@/components/ui/button";
+import { focusPageHeading } from "@/hooks/focus-handoff";
 
 // Guard and terminal error surfaces only render after routing has selected a
 // matching branch. Keep them out of the anonymous entry while the auth/theme
@@ -140,6 +141,29 @@ function SearchDialogFallback() {
 const CHUNK_ERROR_RE =
   /Failed to fetch dynamically imported module|Importing a module script failed|error loading dynamically imported module|ChunkLoadError|Loading chunk [\d]+ failed|Unable to preload CSS/i;
 const CHUNK_RELOAD_FLAG = "route-chunk-reload-attempted";
+// C10-V2-01: a keyboard user who was on the route error card when it reloads
+// the page lands on the recovered page's h1, not <body>.
+const ROUTE_RETRY_FOCUS_FLAG = "route-retry-focus-heading";
+
+function restoreRouteRetryFocus(): void {
+  let pending = false;
+  try {
+    pending = sessionStorage.getItem(ROUTE_RETRY_FOCUS_FLAG) === "1";
+    sessionStorage.removeItem(ROUTE_RETRY_FOCUS_FLAG);
+  } catch {
+    return;
+  }
+  if (!pending) return;
+  const startedAt = Date.now();
+  const tick = () => {
+    if (document.activeElement && document.activeElement !== document.body) return;
+    if (document.querySelector("#main h1") && focusPageHeading()) return;
+    if (Date.now() - startedAt < 10_000) window.setTimeout(tick, 200);
+  };
+  window.setTimeout(tick, 200);
+}
+
+if (typeof window !== "undefined") restoreRouteRetryFocus();
 
 function isChunkLoadError(error: unknown): boolean {
   return error instanceof Error && CHUNK_ERROR_RE.test(`${error.name}: ${error.message}`);
@@ -247,6 +271,9 @@ class RouteErrorBoundary extends Component<RouteErrorBoundaryProps, RouteErrorBo
         CHUNK_RELOAD_FLAG,
         `${Date.now()}|${window.location.href}`,
       );
+      if (document.activeElement?.closest("[data-testid='route-error-boundary']")) {
+        sessionStorage.setItem(ROUTE_RETRY_FOCUS_FLAG, "1");
+      }
     } catch {
       // ignore
     }
