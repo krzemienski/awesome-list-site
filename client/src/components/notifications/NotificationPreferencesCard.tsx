@@ -146,7 +146,10 @@ export default function NotificationPreferencesCard() {
   };
   const pause = () => saveQuickAction({ pausedUntil: new Date(Date.now() + 7 * 86400000).toISOString() }, "Notifications paused.");
   const resume = () => saveQuickAction({ pausedUntil: null }, "Notifications resumed.");
-  const unsubscribeAll = () => saveQuickAction({ emailDigestEnabled: false, inAppEnabled: false }, "Email and in-app updates are off.");
+  const unsubscribeAll = () => {
+    if (!values.emailDigestEnabled && !values.inAppEnabled) return; // aria-disabled: nothing to turn off
+    saveQuickAction({ emailDigestEnabled: false, inAppEnabled: false }, "Email and in-app updates are off.");
+  };
 
   return (
     <Card data-testid="card-notification-preferences">
