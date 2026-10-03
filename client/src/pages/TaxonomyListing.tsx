@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useParams, Link, useLocation, useSearch } from "wouter";
 import { keepPreviousData, useQuery } from "@tanstack/react-query";
-import { ArrowLeft, Search, SlidersHorizontal } from "lucide-react";
+import { ArrowLeft, Search, SlidersHorizontal, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Paginator } from "@/components/ui/paginator";
@@ -598,7 +598,8 @@ export default function TaxonomyListing({ level }: Props) {
        </div>
     </div>
     {level === "category" && childTiles.length > 0 && <section className="taxonomy-children" aria-labelledby="taxonomy-children-heading"><h2 id="taxonomy-children-heading">Subcategories</h2><div className="taxonomy-child-grid">{childTiles.map((child, index) => <Link key={child.slug} className="taxonomy-child card hoverable" style={{ animationDelay: `${index * 30}ms` }} href={`${routeFor("subcategory", child.slug)}${kind ? `?kind=${kind}` : ""}`}><span>{child.name}</span><span className="chip mono">{child.count}</span></Link>)}</div></section>}
-    <div className={`taxonomy-production-controls ${toolsOpen ? "taxonomy-production-controls--open" : ""}`}><ActiveFilters state={filterState} onChange={onFacetChange} onClear={clearFacetFilters} defaultSort="default" /></div>
+    {/* C9-V1-02: active filters stay visible while the tools panel is closed. */}
+    <div className="taxonomy-active-filters">{!toolsOpen && normalizedSearch && <button type="button" className="btn ghost search-filter-chip" aria-label={`Remove search “${normalizedSearch}”`} onClick={() => { setSearchTerm(""); setPage(1); requestResultsFocus(); }}>Search: “{normalizedSearch}”<X className="h-3.5 w-3.5" aria-hidden="true" /></button>}<ActiveFilters state={filterState} onChange={onFacetChange} onClear={clearFacetFilters} defaultSort="default" /></div>
     <div className="taxonomy-results-layout">
       <div className={`taxonomy-production-controls ${toolsOpen ? "taxonomy-production-controls--open" : ""}`} aria-busy={toolsOpen && taxonomySearch.isLoading}><SearchFilters state={filterState} facets={taxonomySearch.data?.facets} onChange={onFacetChange} onClear={clearFacetFilters} hideTaxonomyFacets /></div>
       <div className="min-w-0 flex-1">
@@ -606,7 +607,7 @@ export default function TaxonomyListing({ level }: Props) {
           {/* The listing's single count statement: visible range, matching total,
               and — only while a filter narrows the collection — what it was
               narrowed from. */}
-           <div className="taxonomy-results-heading-row"><h2 id="taxonomy-results-heading" data-testid="text-results-count" data-total={total}>{level === "category" ? (total > 0 || narrowed ? `Resources (${total})` : "Coming soon") : <span className="sr-only">{total} {resourceNoun(total)}</span>}</h2></div>
+           <div className={`taxonomy-results-heading-row${serverFilterActive ? " taxonomy-results-heading-row--narrowed" : ""}`}><h2 id="taxonomy-results-heading" data-testid="text-results-count" data-total={total}>{level === "category" ? (total > 0 || narrowed ? `Resources (${total})` : "Coming soon") : serverFilterActive ? `${total} of ${listingData.totalAll} ${resourceNoun(listingData.totalAll)} match` : <span className="sr-only">{total} {resourceNoun(total)}</span>}</h2></div>
           {notice && <div role="status" data-testid="notice-page-adjusted" className="rounded border p-3 text-sm">{notice}<button type="button" className="btn ghost ml-2 min-h-8" onClick={() => { setNotice(null); /* C6-SWEEP-07: notice unmounts; focus the results region */ resultsRef.current?.focus({ preventScroll: true }); }}>Dismiss</button></div>}
           {(listingData.scope.ignoredSubcategory || listingData.scope.ignoredSubSubcategory) && <div role="status" data-testid="notice-unknown-subcategory" className="rounded border p-3 text-sm">“{selection}” isn't a subcategory of {name}, so that filter was ignored.<button type="button" className="btn ghost ml-2 min-h-8" onClick={broadenScope}>Remove it</button></div>}
           {serverSearchActive && !taxonomySearch.isPlaceholderData && taxonomySearch.data?.search?.mode === "fuzzy" && taxonomySearch.data.search.suggestion && <div className="flex flex-wrap items-center justify-center gap-2 rounded border p-3 text-sm" role="status" data-testid="notice-taxonomy-search-suggestion"><span>No exact matches. Did you mean</span><Button variant="link" className="h-auto p-0" onClick={() => { setSearchTerm(taxonomySearch.data!.search!.suggestion!); setPage(1); /* C6-SWEEP-08: the notice unmounts with this button; the input is display:none while the tools panel is closed, so fall back to the results region */ const input = searchInputRef.current; if (input && input.offsetParent !== null) input.focus(); else resultsRef.current?.focus({ preventScroll: true }); }}>{taxonomySearch.data.search.suggestion}</Button><span>?</span></div>}

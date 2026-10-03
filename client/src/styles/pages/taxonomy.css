@@ -126,6 +126,7 @@
 /* C8-V1-05: below the lg breakpoint the Filters sheet trigger stacks directly
    on the first card; the category level has a results heading in between. */
 @media (max-width: 1023px) {
+  .taxonomy-page--category .taxonomy-results-layout > .taxonomy-production-controls--open,
   .taxonomy-page--subcategory .taxonomy-results-layout > .taxonomy-production-controls--open,
   .taxonomy-page--sub-subcategory .taxonomy-results-layout > .taxonomy-production-controls--open {
     margin-bottom: 16px;
@@ -184,6 +185,18 @@
 
 .taxonomy-production-controls {
   display: none !important;
+}
+
+.taxonomy-active-filters {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  margin-top: 16px;
+}
+
+.taxonomy-active-filters:empty {
+  display: none;
 }
 
 .taxonomy-production-controls--open {
@@ -287,8 +300,8 @@
   font-weight: 600;
 }
 
-.taxonomy-page--subcategory .taxonomy-results-heading-row,
-.taxonomy-page--sub-subcategory .taxonomy-results-heading-row {
+.taxonomy-page--subcategory .taxonomy-results-heading-row:not(.taxonomy-results-heading-row--narrowed),
+.taxonomy-page--sub-subcategory .taxonomy-results-heading-row:not(.taxonomy-results-heading-row--narrowed) {
   position: absolute;
   width: 1px;
   height: 1px;
