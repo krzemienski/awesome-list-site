@@ -857,6 +857,8 @@ export default function ResearcherTab({ initialTab = "launch" }: ResearcherTabPr
                     variant="ghost"
                     onClick={() => setShowAdvanced(v => !v)}
                     className="flex h-auto w-full items-center justify-between whitespace-normal px-3 py-2 text-left text-sm font-medium hover:bg-muted/50"
+                    aria-expanded={showAdvanced}
+                    aria-controls="advanced-researcher-region"
                     data-testid="button-toggle-advanced-researcher"
                   >
                     <span className="flex items-center gap-2">
@@ -866,7 +868,7 @@ export default function ResearcherTab({ initialTab = "launch" }: ResearcherTabPr
                     {showAdvanced ? <ChevronDown className="w-4 h-4" /> : <ChevronRight className="w-4 h-4" />}
                   </Button>
                   {showAdvanced && (
-                    <div className="space-y-3 border-t px-3 py-3">
+                    <div id="advanced-researcher-region" className="space-y-3 border-t px-3 py-3">
                       <div>
                         <Label htmlFor="research-model" className="flex items-center gap-1.5">
                           <Cpu className="w-3.5 h-3.5 text-muted-foreground" />Model

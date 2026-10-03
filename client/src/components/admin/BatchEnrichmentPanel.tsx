@@ -564,6 +564,8 @@ export default function BatchEnrichmentPanel() {
               onClick={() => setShowAdvanced(v => !v)}
               className="flex h-auto w-full items-center justify-between whitespace-normal px-3 py-2 text-left text-sm font-medium hover:bg-muted/50"
               disabled={hasActiveJob}
+              aria-expanded={showAdvanced}
+              aria-controls="advanced-enrichment-region"
               data-testid="button-toggle-advanced-enrichment"
             >
               <span className="flex items-center gap-2">
@@ -573,7 +575,7 @@ export default function BatchEnrichmentPanel() {
               {showAdvanced ? <ChevronDown className="w-4 h-4" /> : <ChevronRight className="w-4 h-4" />}
             </Button>
             {showAdvanced && (
-              <div className="space-y-3 border-t px-3 py-3">
+              <div id="advanced-enrichment-region" className="space-y-3 border-t px-3 py-3">
                 <div className="space-y-2">
                   <Label htmlFor="enrich-model" className="flex items-center gap-1.5">
                     <Cpu className="w-3.5 h-3.5 text-muted-foreground" />Model

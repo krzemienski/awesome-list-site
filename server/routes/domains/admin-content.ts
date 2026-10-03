@@ -926,7 +926,9 @@ export function registerAdminContentRoutes(
         search,
         category,
         status: status || undefined,
-        sort
+        sort,
+        // C9-V5A-06: no fuzzy near-misses in the admin list (bulk actions act on what is shown).
+        exactSearchOnly: true
       });
       
       res.json({

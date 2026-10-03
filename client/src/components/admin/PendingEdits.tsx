@@ -3,6 +3,8 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { apiRequest } from "@/lib/queryClient";
 import { formatAdminDateTime, formatRelativeAgo, maskEmail } from "@/lib/utils";
 import { useToast } from "@/hooks/use-toast";
+import { queryUnavailableReason } from "@/lib/query-availability";
+import { handoffFocusOnUnmount } from "@/hooks/focus-handoff";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -73,10 +75,14 @@ export default function PendingEdits() {
   const [approveError, setApproveError] = useState<string | null>(null);
   const [rejectError, setRejectError] = useState<string | null>(null);
 
-  const { data: edits = [], isLoading, isError, refetch, isFetching } = useQuery<ResourceEditWithResource[]>({
+  const editsQuery = useQuery<ResourceEditWithResource[]>({
     queryKey: ['/api/admin/resource-edits'],
     refetchInterval: 10000
   });
+  const { data: edits = [], isLoading, refetch, isFetching } = editsQuery;
+  // C9-V5A-03: a fetch paused while offline is not an empty queue.
+  const unavailable = queryUnavailableReason(editsQuery);
+  const [recheckState, setRecheckState] = useState<'idle' | 'checking' | 'checked' | 'offline'>('idle');
 
   // R5-013 (run24): same keyboard-operable scroller + right-edge gradient cue
   // as PendingResources (R5-058) — the edits table clipped its Actions column
@@ -260,13 +266,26 @@ export default function PendingEdits() {
     ));
   };
 
-  if (isError) {
+  if (unavailable) {
     return (
       <section className="admin-panel queue-review-shell" aria-label="Pending edits">
         <div className="admin-panel__heading queue-review-shell-heading"><h2>Pending edits</h2></div>
         <div className="queue-review-empty" role="alert" data-testid="pending-edits-load-error">
-          <p>Unable to load pending edits. The queue may still contain suggestions awaiting review.</p>
-          <Button onClick={() => void refetch()} disabled={isFetching} data-testid="pending-edits-retry">
+          <p>
+            {unavailable === "offline"
+              ? "You're offline, so pending edits can't be loaded. The queue may still contain suggestions awaiting review."
+              : "Unable to load pending edits. The queue may still contain suggestions awaiting review."}
+          </p>
+          <Button
+            aria-disabled={isFetching}
+            aria-busy={isFetching}
+            onClick={(event) => {
+              if (isFetching) return;
+              handoffFocusOnUnmount(event.currentTarget, () => document.getElementById("pending-edits-heading"));
+              void refetch();
+            }}
+            data-testid="pending-edits-retry"
+          >
             {isFetching ? "Retrying…" : "Retry"}
           </Button>
         </div>
@@ -309,13 +328,24 @@ export default function PendingEdits() {
           <Button
             variant="ghost"
             size="sm"
+            aria-disabled={recheckState === 'checking'}
+            aria-busy={recheckState === 'checking'}
             onClick={() => {
-              void queryClient.invalidateQueries({ queryKey: ['/api/admin/resource-edits'] });
+              if (recheckState === 'checking') return;
+              if (!navigator.onLine) {
+                setRecheckState('offline');
+                return;
+              }
+              setRecheckState('checking');
+              const done = () => setRecheckState(navigator.onLine && queryClient.getQueryState(['/api/admin/resource-edits'])?.status !== 'error' ? 'checked' : 'offline');
+              void queryClient
+                .invalidateQueries({ queryKey: ['/api/admin/resource-edits'] })
+                .then(done, done);
             }}
             data-testid="button-refresh-pending-edits"
           >
-            <RefreshCw className="h-3 w-3 mr-2" />
-            Check again
+            <RefreshCw className={`h-3 w-3 mr-2 ${recheckState === 'checking' ? 'animate-spin' : ''}`} />
+            {recheckState === 'checking' ? 'Checking…' : 'Check again'}
           </Button>
         </div>
         {/* axe scrollable-region-focusable: the header-only empty table still
@@ -331,6 +361,13 @@ export default function PendingEdits() {
             <tbody><tr><td colSpan={5} className="queue-review-empty-row">No pending edits.</td></tr></tbody>
           </table>
         </div>
+        <span className="sr-only" role="status" aria-live="polite">
+          {recheckState === 'checked'
+            ? 'Checked — still no pending edits.'
+            : recheckState === 'offline'
+              ? "You're offline — couldn't check for new edits."
+              : ''}
+        </span>
       </section>
     );
   }
