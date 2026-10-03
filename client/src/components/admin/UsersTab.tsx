@@ -133,6 +133,10 @@ export default function UsersTab() {
   // NEW-004: admin user deletion (QA/test account cleanup). The server blocks
   // self-deletion, detaches the user's catalog resources instead of deleting
   // them, and cascades personal data away.
+  // C6-SWEEP-13: a successful delete removes the row whose button opened the
+  // dialog; Radix would return focus to that vanished trigger, so hand it to
+  // the user search box instead. A failed delete keeps the row: default return.
+  const deletedUserRef = useRef(false);
   const deleteUserMutation = useMutation({
     mutationFn: async (userId: string) => {
       return await apiRequest(`/api/admin/users/${userId}`, { method: 'DELETE' });
@@ -140,6 +144,7 @@ export default function UsersTab() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['/api/admin/users'] });
       toast({ title: "User Deleted", description: "The user account has been removed." });
+      deletedUserRef.current = true;
       setUserToDelete(null);
     },
     onError: (error: Error) => {
@@ -524,7 +529,14 @@ export default function UsersTab() {
         </AlertDialog>
 
         <AlertDialog open={!!userToDelete} onOpenChange={(open) => { if (!open) setUserToDelete(null); }}>
-          <AlertDialogContent>
+          <AlertDialogContent
+            onCloseAutoFocus={(event) => {
+              if (!deletedUserRef.current) return;
+              deletedUserRef.current = false;
+              event.preventDefault();
+              searchInputRef.current?.focus();
+            }}
+          >
             <AlertDialogHeader>
               <AlertDialogTitle>Delete this user?</AlertDialogTitle>
               <AlertDialogDescription>

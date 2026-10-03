@@ -1,4 +1,5 @@
 import { useQuery } from "@tanstack/react-query";
+import { handoffFocusOnUnmount } from "@/hooks/focus-handoff";
 import { Link } from "wouter";
 import { apiRequest } from "@/lib/queryClient";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -96,7 +97,7 @@ export default function Recommendations() {
                   <p className="discovery-tools-state-copy">
                     We couldn&apos;t load recommendations right now.
                   </p>
-                  <Button variant="outline" onClick={() => void refetch()} data-testid="button-retry-recommendations">
+                  <Button variant="outline" onClick={(e) => { handoffFocusOnUnmount(e.currentTarget); void refetch(); }} data-testid="button-retry-recommendations">
                     Try again
                   </Button>
                 </CardContent>

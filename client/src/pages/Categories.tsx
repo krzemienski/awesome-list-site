@@ -1,4 +1,5 @@
 import { TaxonomyCardSkeleton } from "@/components/ui/skeletons";
+import { handoffFocusOnUnmount } from "@/hooks/focus-handoff";
 import "@/styles/pages/discovery.css";
 import { Button } from "@/components/ui/button";
 import { useMemo, useState } from "react";
@@ -205,7 +206,7 @@ export default function Categories({ nav, isLoading, error, onRetry }: Categorie
           </p>
           <Button
             type="button"
-            onClick={onRetry}
+            onClick={(e) => { handoffFocusOnUnmount(e.currentTarget); onRetry?.(); }}
             data-testid="button-categories-retry"
           >
             Retry

@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { Link } from "wouter";
+import { handoffFocusOnUnmount } from "@/hooks/focus-handoff";
 import {
   AlertCircle,
   EyeOff,
@@ -363,7 +364,7 @@ export default function AIRecommendationsPanel({
               type="button"
               size="sm"
               variant="outline"
-              onClick={() => void refetchFeedbackStates()}
+              onClick={(e) => { handoffFocusOnUnmount(e.currentTarget); void refetchFeedbackStates(); }}
             >
               Try again
             </Button>
@@ -393,7 +394,7 @@ export default function AIRecommendationsPanel({
                 ? ` Last updated ${new Date(lastUpdatedAt).toLocaleString()}.`
                 : ""}
             </p>
-            <Button type="button" size="sm" variant="outline" onClick={retry}>
+            <Button type="button" size="sm" variant="outline" onClick={(e) => { handoffFocusOnUnmount(e.currentTarget); retry(); }}>
               Try again
             </Button>
           </AlertDescription>
@@ -431,7 +432,7 @@ export default function AIRecommendationsPanel({
           <AlertTitle>Recommendations couldn’t be refreshed</AlertTitle>
           <AlertDescription className="space-y-3">
             <p>{error instanceof Error ? error.message : "An unexpected error occurred."}</p>
-            <Button type="button" size="sm" variant="outline" onClick={retry}>
+            <Button type="button" size="sm" variant="outline" onClick={(e) => { handoffFocusOnUnmount(e.currentTarget); retry(); }}>
               Try again
             </Button>
           </AlertDescription>
@@ -499,12 +500,12 @@ export default function AIRecommendationsPanel({
                 : "Try again to look for new catalog matches, or sign in to personalize these picks with your preferences and activity."}
             </p>
             {isAuthenticated ? (
-              <Button type="button" size="sm" variant="outline" onClick={retry}>
+              <Button type="button" size="sm" variant="outline" onClick={(e) => { handoffFocusOnUnmount(e.currentTarget); retry(); }}>
                 Try again
               </Button>
             ) : (
               <div className="flex flex-col gap-2 sm:flex-row">
-                <Button type="button" size="sm" variant="outline" onClick={retry}>
+                <Button type="button" size="sm" variant="outline" onClick={(e) => { handoffFocusOnUnmount(e.currentTarget); retry(); }}>
                   Try again
                 </Button>
                 <Button asChild size="sm" variant="outline">

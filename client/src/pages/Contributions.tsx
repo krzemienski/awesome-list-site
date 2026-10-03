@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useRef, useState } from "react";
+import { handoffFocusOnUnmount } from "@/hooks/focus-handoff";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { Link, useSearch } from "wouter";
 import { formatDistanceToNow } from "date-fns";
@@ -817,8 +818,9 @@ export default function Contributions() {
               </p>
               <Button
                 variant="outline"
-                onClick={() => query.refetch()}
-                disabled={query.isFetching}
+                onClick={(e) => { if (query.isFetching) return; handoffFocusOnUnmount(e.currentTarget); void query.refetch(); }}
+                aria-disabled={query.isFetching}
+                aria-busy={query.isFetching}
                 data-testid="button-retry-contributions"
               >
                 {query.isFetching ? (

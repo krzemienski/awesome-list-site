@@ -1,4 +1,5 @@
 import { formatDistanceToNow } from "date-fns";
+import { handoffFocusOnUnmount } from "@/hooks/focus-handoff";
 import {
   ArrowRight,
   BookOpen,
@@ -233,8 +234,9 @@ export default function ContinueLearning() {
             <Button
               variant="outline"
               size="sm"
-              onClick={() => refetch()}
-              disabled={isFetching}
+              onClick={(e) => { if (isFetching) return; handoffFocusOnUnmount(e.currentTarget); void refetch(); }}
+              aria-disabled={isFetching}
+              aria-busy={isFetching}
               data-testid="button-retry-continue-learning"
             >
               Retry

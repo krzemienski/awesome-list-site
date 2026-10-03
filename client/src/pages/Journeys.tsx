@@ -1,4 +1,5 @@
 import { JourneyCardSkeleton } from "@/components/ui/skeletons";
+import { handoffFocusOnUnmount } from "@/hooks/focus-handoff";
 import { lazy, Suspense, useRef, useState } from "react";
 import { useQuery, useMutation } from "@tanstack/react-query";
 import { useLocation, Link } from "wouter";
@@ -246,7 +247,7 @@ export default function Journeys() {
           <Button
             variant="outline"
             className="journeys-state__action"
-            onClick={() => void refetchJourneys()}
+            onClick={(e) => { handoffFocusOnUnmount(e.currentTarget); void refetchJourneys(); }}
             data-testid="button-retry-journeys"
           >
             Try again

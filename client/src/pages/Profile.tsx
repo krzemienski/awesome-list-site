@@ -1,4 +1,5 @@
 import { useRef, useState } from "react";
+import { handoffFocusOnUnmount } from "@/hooks/focus-handoff";
 import { useQuery, useMutation } from "@tanstack/react-query";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -147,7 +148,7 @@ function UnavailableNotice({
         {reason === "offline" && (
           <p>Your {subject} will load when your connection is back.</p>
         )}
-        <Button variant="outline" size="sm" onClick={onRetry}>
+        <Button variant="outline" size="sm" onClick={(e) => { handoffFocusOnUnmount(e.currentTarget); onRetry(); }}>
           Try again
         </Button>
       </AlertDescription>

@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from "react";
+import { handoffFocusOnUnmount } from "@/hooks/focus-handoff";
 import { Link } from "wouter";
 import { useQuery } from "@tanstack/react-query";
 import { ArrowLeft, Palette, User, ShieldCheck, Bookmark, Sparkles, ChevronRight, LogIn, RotateCcw, SlidersHorizontal } from "lucide-react";
@@ -324,7 +325,8 @@ export default function Settings() {
                   <Button
                     variant="outline"
                     className="mt-3"
-                    onClick={() => {
+                    onClick={(e) => {
+                      handoffFocusOnUnmount(e.currentTarget);
                       void refetchPreferences();
                       void refetchCategories();
                     }}

@@ -16,6 +16,7 @@ import {
   useGuestBookmarks,
 } from "@/lib/guestBookmarks";
 import { trackAuthPromptShown } from "@/lib/analytics";
+import { handoffFocusOnUnmount } from "@/hooks/focus-handoff";
 import "@/styles/pages/account.css";
 
 // The public resource detail endpoint adds read-time kind resolution to the
@@ -226,7 +227,7 @@ export default function GuestBookmarks() {
             variant="outline"
             size="sm"
             className="min-h-10"
-            onClick={retryFailed}
+            onClick={(e) => { handoffFocusOnUnmount(e.currentTarget); retryFailed(); }}
             data-testid="button-guest-retry-failed"
           >
             Retry

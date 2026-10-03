@@ -1,4 +1,5 @@
 import { useEffect, useRef } from "react";
+import { handoffFocusOnUnmount } from "@/hooks/focus-handoff";
 import { useQuery, useMutation } from "@tanstack/react-query";
 import { useParams, useLocation, useSearch, Link } from "wouter";
 import { Card, CardContent, CardDescription, CardHeader } from "@/components/ui/card";
@@ -391,7 +392,7 @@ export default function JourneyDetail() {
           <Button
             variant="outline"
             className="journeys-state__action"
-            onClick={() => void refetchJourney()}
+            onClick={(e) => { handoffFocusOnUnmount(e.currentTarget); void refetchJourney(); }}
             data-testid="button-retry-journey"
           >
             Try again
@@ -585,8 +586,16 @@ export default function JourneyDetail() {
           ) : !isEnrolled && (
             <Button
               className="journey-detail-card__start mt-6"
-              onClick={() => startJourneyMutation.mutate()}
-              disabled={startJourneyMutation.isPending}
+              onClick={(e) => {
+                if (startJourneyMutation.isPending) return;
+                // C6-SWEEP-01: Start Journey is replaced by the progress UI;
+                // focus the first step's "Mark as Complete" once it renders.
+                handoffFocusOnUnmount(e.currentTarget, () =>
+                  document.querySelector<HTMLElement>('[data-testid^="button-complete-step-"]'));
+                startJourneyMutation.mutate();
+              }}
+              aria-disabled={startJourneyMutation.isPending}
+              aria-busy={startJourneyMutation.isPending}
               data-testid="button-start-journey"
             >
               {startJourneyMutation.isPending ? (
