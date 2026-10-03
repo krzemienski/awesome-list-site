@@ -177,7 +177,9 @@ export default function ResourceManager({ createRequest = 0 }: { createRequest?:
   // /admin?tab=resources&status=rejected both land on the same filtered table.
   const [statusFilter, setStatusFilter] = useState<string>(() => {
     const s = new URLSearchParams(window.location.search).get("status");
-    return s && STATUS_OPTIONS.some(o => o.value === s) ? s : "approved";
+    // C10-V5A-03: "all" is an explicit choice (distinct from the default
+    // "approved"), so it survives reload/Back and reads as a real value.
+    return s && (s === "all" || STATUS_OPTIONS.some(o => o.value === s)) ? s : "approved";
   });
 
   // Task 275: mirror the effective page into ?page= (replaceState, no history
@@ -277,7 +279,7 @@ export default function ResourceManager({ createRequest = 0 }: { createRequest?:
     params.set('limit', limit.toString());
     if (search) params.set('search', search);
     if (categoryFilter) params.set('category', categoryFilter);
-    if (statusFilter) params.set('status', statusFilter);
+    if (statusFilter && statusFilter !== 'all') params.set('status', statusFilter);
     return `/api/admin/resources?${params.toString()}`;
   };
 
@@ -292,7 +294,7 @@ export default function ResourceManager({ createRequest = 0 }: { createRequest?:
       if (sort !== 'newest' || debouncedSearch) params.set('sort', sort);
       if (debouncedSearch) params.set('search', debouncedSearch);
       if (categoryFilter) params.set('category', categoryFilter);
-      if (statusFilter) params.set('status', statusFilter);
+      if (statusFilter && statusFilter !== 'all') params.set('status', statusFilter);
       const response = await fetch(`/api/admin/resources?${params.toString()}`, {
         credentials: 'include'
       });
@@ -1131,7 +1133,7 @@ export default function ResourceManager({ createRequest = 0 }: { createRequest?:
                 ))}
               </SelectContent>
             </Select>
-            <Select value={statusFilter} onValueChange={(v) => { setStatusFilter(v === "all" ? "" : v); setPage(1); setSelectedResourceIds([]); }}>
+            <Select value={statusFilter} onValueChange={(v) => { setStatusFilter(v); setPage(1); setSelectedResourceIds([]); }}>
               <SelectTrigger className="w-full sm:w-36" aria-label="Filter by status" data-testid="select-status-filter">
                 <SelectValue placeholder="All Status" />
               </SelectTrigger>
@@ -1928,8 +1930,10 @@ export default function ResourceManager({ createRequest = 0 }: { createRequest?:
                 </p>
               )}
             </div>
+            {/* C10-V5A-01: content-start keeps the Status column from stretching
+                when the Category error adds a row beside it. */}
             <div className="grid gap-4 sm:grid-cols-2">
-              <div className="grid gap-2">
+              <div className="grid content-start gap-2">
                 <Label htmlFor="create-category">Category *</Label>
                 <Select 
                   value={editForm.category} 
@@ -1956,7 +1960,7 @@ export default function ResourceManager({ createRequest = 0 }: { createRequest?:
                   </p>
                 )}
               </div>
-              <div className="grid gap-2">
+              <div className="grid content-start gap-2">
                 <Label htmlFor="create-status">Status</Label>
                 <Select 
                   value={editForm.status} 
