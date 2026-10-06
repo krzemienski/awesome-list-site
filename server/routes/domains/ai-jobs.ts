@@ -543,6 +543,9 @@ export function registerAiJobsRoutes(
       const discovery = await researchService.approveDiscovery(parseInt(req.params.id));
       res.json({ success: true, discovery });
     } catch (error: any) {
+      if (error?.name === 'DiscoveryNotFoundError') {
+        return res.status(404).json({ message: 'Discovery not found' });
+      }
       res.status(500).json({ message: 'Failed to approve discovery', error: error.message });
     }
   });
@@ -554,6 +557,9 @@ export function registerAiJobsRoutes(
       const discovery = await researchService.rejectDiscovery(parseInt(req.params.id), reason);
       res.json({ success: true, discovery });
     } catch (error: any) {
+      if (error?.name === 'DiscoveryNotFoundError') {
+        return res.status(404).json({ message: 'Discovery not found' });
+      }
       res.status(500).json({ message: 'Failed to reject discovery', error: error.message });
     }
   });

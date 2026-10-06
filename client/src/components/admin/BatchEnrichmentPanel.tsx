@@ -967,17 +967,24 @@ export default function BatchEnrichmentPanel() {
             </Alert>
           )}
           {selectedJobData?.job && (
-            <ScrollArea className="max-h-[60vh] pr-4">
+            // Radix wraps viewport content in an inline display:table div that
+            // grows to the widest descendant's max-content (a long log line or
+            // model id), pushing the second grid column off-screen on mobile.
+            // Forcing it to block makes everything wrap to the dialog width.
+            <ScrollArea className="max-h-[60vh] pr-4" viewportClassName="[&>div]:!block [&>div]:!w-full [&>div]:!min-w-0">
               <div className="space-y-6">
                 <div>
                   <h3 className="font-semibold mb-2 flex items-center gap-2">
                     <Info className="h-4 w-4" />
                     Configuration
                   </h3>
-                  <div className="grid grid-cols-2 gap-4 text-sm">
+                  {/* min-w-0 + break-all: a long model id must wrap inside its
+                      column, or grid min-content widens the ScrollArea's table
+                      wrapper and clips the second column off-screen on mobile. */}
+                  <div className="grid grid-cols-2 gap-4 text-sm [&>div]:min-w-0">
                     <div>
                       <div className="text-muted-foreground">Filter</div>
-                      <div className="font-mono">{selectedJobData.job.filter || 'all'}</div>
+                      <div className="font-mono break-all">{selectedJobData.job.filter || 'all'}</div>
                     </div>
                     <div>
                       <div className="text-muted-foreground">Batch Size</div>
@@ -985,7 +992,7 @@ export default function BatchEnrichmentPanel() {
                     </div>
                     <div>
                       <div className="text-muted-foreground">Model</div>
-                      <div className="font-mono">{selectedJobData.job.model || (defaultEnrichmentModel ? `${defaultEnrichmentModel} (default)` : 'default')}</div>
+                      <div className="font-mono break-all">{selectedJobData.job.model || (defaultEnrichmentModel ? `${defaultEnrichmentModel} (default)` : 'default')}</div>
                     </div>
                     <div>
                       <div className="text-muted-foreground">Base URL</div>

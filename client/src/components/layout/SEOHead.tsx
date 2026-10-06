@@ -1,3 +1,4 @@
+import { useEffect, useLayoutEffect, useState } from "react";
 import { Helmet } from "react-helmet";
 import { AwesomeList } from "@/types/awesome-list";
 import {
@@ -57,6 +58,21 @@ const SITE_NAME = "Awesome Video";
 // server, an env override (VITE_SITE_URL) wins; otherwise the official apex.
 const CANONICAL_BASE = (import.meta.env.VITE_SITE_URL || "https://awesome.video").replace(/\/+$/, "");
 
+// react-helmet registers an instance in UNSAFE_componentWillMount, which React
+// 18 also calls for renders it later discards (an interrupted transition or a
+// suspended pass). Such an instance never unmounts, so its tags keep winning
+// wherever a later page omits that tag — a noindex page (no canonical) then
+// shipped a canonical for a route visited earlier. Mounting <Helmet> only
+// after this component has committed keeps every registered instance real.
+// The layout effect re-renders before paint, so head timing is unchanged.
+const useIsomorphicLayoutEffect = typeof window === "undefined" ? useEffect : useLayoutEffect;
+
+function useCommitted(): boolean {
+  const [committed, setCommitted] = useState(false);
+  useIsomorphicLayoutEffect(() => setCommitted(true), []);
+  return committed;
+}
+
 export default function SEOHead({
   title,
   description,
@@ -71,6 +87,7 @@ export default function SEOHead({
   follow = false,
   ogUrl
 }: SEOHeadProps) {
+  const committed = useCommitted();
   // R5-022: identify transient loading fallbacks — the "Loading …" titles the
   // pages mount while their data fetch is in flight, and the prop-less
   // <SEOHead /> Home renders while the tree loads.
@@ -149,6 +166,8 @@ export default function SEOHead({
 
   // Extract repository info for additional metadata
   const repoInfo = awesomeList?.repoUrl ? extractRepoInfo(awesomeList.repoUrl) : null;
+
+  if (!committed) return null;
 
   return (
     <Helmet>

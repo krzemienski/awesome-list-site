@@ -270,7 +270,7 @@
 }
 
 /* The actor (min-width 0, ellipsis) gives way first; the target keeps a
-   floor wide enough for a full resource id ("#190173") instead of collapsing
+   floor wide enough for a full six-digit resource id instead of collapsing
    to "#1…". Longer targets ellipsize and carry the full value in title. */
 .admin-overview-canonical .admin-canonical-activity-target {
   min-width: 8ch;

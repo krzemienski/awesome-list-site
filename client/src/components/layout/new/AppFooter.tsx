@@ -91,7 +91,7 @@ export default function AppFooter({ nav, site }: {
           <h2 className="app-footer-heading">SOURCE</h2>
           <a className="app-footer-repo" href={repo} target="_blank" rel="noopener noreferrer" data-testid="footer-github">
             <GitHubMark />
-            <span>{repoLabel.split("/").map((part, i) => i === 0 ? part : <span key={i}>/<wbr />{part}</span>)}</span>
+            <span className="app-footer-repo-label">{repoLabel.split("/").map((part, i) => i === 0 ? part : <span key={i}>/<wbr />{part}</span>)}</span>
             <span className="app-footer-repo-arrow" aria-hidden="true">↗</span>
           </a>
           <p className="app-footer-note">

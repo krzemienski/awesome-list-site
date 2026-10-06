@@ -33,6 +33,7 @@ import {
   CollectionNotFoundError,
 } from "../../repositories";
 import { storage } from "../../storage";
+import { isForeignKeyViolation } from "../../errors/pgErrors";
 import { db } from "../../db";
 import {
   DEFAULT_HOME_LAYOUT,
@@ -114,6 +115,9 @@ export function registerUserFeatureRoutes(
       await userFeatureRepo.addFavorite(userId, resourceId);
       res.json({ message: 'Favorite added successfully' });
     } catch (error) {
+      if (isForeignKeyViolation(error)) {
+        return res.status(404).json({ message: 'Resource not found' });
+      }
       console.error('Error adding favorite:', error);
       res.status(500).json({ message: 'Failed to add favorite' });
     }
@@ -176,6 +180,9 @@ export function registerUserFeatureRoutes(
       const saved = await userFeatureRepo.addBookmark(userId, resourceId, notes, savedAt);
       res.json({ message: 'Bookmark added successfully', isBookmarked: true, notes: saved.notes ?? '' });
     } catch (error) {
+      if (isForeignKeyViolation(error)) {
+        return res.status(404).json({ message: 'Resource not found' });
+      }
       console.error('Error adding bookmark:', error);
       res.status(500).json({ message: 'Failed to add bookmark' });
     }
@@ -505,6 +512,7 @@ export function registerUserFeatureRoutes(
 
   // ---- API key management (session-authed) -------------------------------
   // POST /api/user/api-keys — create a key; the plaintext is returned ONCE.
+  const MAX_API_KEY_EXPIRY_DAYS = 3650;
   app.post('/api/user/api-keys', isAuthenticated, async (req: any, res) => {
     try {
       const userId = req.dbUser.id;
@@ -519,8 +527,10 @@ export function registerUserFeatureRoutes(
       let expiresAt: Date | null = null;
       if (expiresInDays !== undefined && expiresInDays !== null) {
         const days = Number(expiresInDays);
-        if (!Number.isFinite(days) || days <= 0) {
-          return res.status(400).json({ message: '"expiresInDays" must be a positive number' });
+        // Bounded so the computed date stays valid (1e308 overflowed to an
+        // Invalid Date and crashed the insert with a 500).
+        if (!Number.isFinite(days) || days <= 0 || days > MAX_API_KEY_EXPIRY_DAYS) {
+          return res.status(400).json({ message: `"expiresInDays" must be a positive number of at most ${MAX_API_KEY_EXPIRY_DAYS}` });
         }
         expiresAt = new Date(Date.now() + days * 24 * 60 * 60 * 1000);
       }

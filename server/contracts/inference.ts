@@ -208,6 +208,10 @@ export function inferParamsSchema(
       // User bridge IDs are varchar (including Clerk-linked UUIDs), unlike
       // the integer resource IDs. Keep validation without coercing identity.
       schema = boundedSafeStringSchema;
+    } else if (p.name === "id" && /^\/api\/user\/api-keys\/:id(?:\/|$)/.test(path)) {
+      // API key ids are gen_random_uuid() varchars; an integer schema made
+      // every revoke a 400 and left keys usable after "revoke".
+      schema = boundedSafeStringSchema;
     } else if (isIdParamName(p.name) || digitPattern) {
       schema = boundedIntStringSchema;
     } else if (p.pattern) {

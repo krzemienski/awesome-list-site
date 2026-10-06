@@ -91,6 +91,8 @@ export default function ExportTab({ validationStatus: propValidationStatus }: Ex
   const queryClient = useQueryClient();
   const [isExporting, setIsExporting] = useState(false);
   const [isJsonExporting, setIsJsonExporting] = useState(false);
+  const [isCsvExporting, setIsCsvExporting] = useState(false);
+  const [isOpmlExporting, setIsOpmlExporting] = useState(false);
   // ADM-06: synchronous in-flight guard (mirrors the public exporter in
   // components/ui/export-tools.tsx). `isExporting` is React state set
   // asynchronously, so a rapid double-click can land the second click before
@@ -260,6 +262,62 @@ export default function ExportTab({ validationStatus: propValidationStatus }: Ex
     }
   };
 
+  const handleCsvExport = async () => {
+    try {
+      setIsCsvExporting(true);
+      const response = await fetch("/api/admin/export-csv", {
+        credentials: "include",
+      });
+      if (!response.ok) throw new ApiError(response.status, "CSV export failed");
+
+      triggerBlobDownload(
+        await response.blob(),
+        exportFileName(response, "resources-export.csv"),
+      );
+      void queryClient.invalidateQueries({ queryKey: ["/api/admin/audit-logs"] });
+      toast({
+        title: "CSV Export Successful",
+        description: "The resource table has been downloaded.",
+      });
+    } catch {
+      toast({
+        title: "CSV Export Failed",
+        description: "Failed to export the resource table. Please try again.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsCsvExporting(false);
+    }
+  };
+
+  const handleOpmlExport = async () => {
+    try {
+      setIsOpmlExporting(true);
+      const response = await fetch("/api/admin/export-opml", {
+        credentials: "include",
+      });
+      if (!response.ok) throw new ApiError(response.status, "OPML export failed");
+
+      triggerBlobDownload(
+        await response.blob(),
+        exportFileName(response, "categories-export.opml"),
+      );
+      void queryClient.invalidateQueries({ queryKey: ["/api/admin/audit-logs"] });
+      toast({
+        title: "OPML Export Successful",
+        description: "The category tree has been downloaded.",
+      });
+    } catch {
+      toast({
+        title: "OPML Export Failed",
+        description: "Failed to export the category tree. Please try again.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsOpmlExporting(false);
+    }
+  };
+
   const validateMutation = useMutation({
     mutationFn: async () => {
       const response: unknown = await apiRequest("/api/admin/validate", {
@@ -394,7 +452,7 @@ export default function ExportTab({ validationStatus: propValidationStatus }: Ex
           </Button>
         </article>
 
-        <article className="card admin-ops-export-card admin-ops-export-card--unsupported">
+        <article className="card admin-ops-export-card hoverable">
           <div className="admin-ops-export-card__icon" aria-hidden="true">
             <TableProperties className="h-5 w-5" />
           </div>
@@ -402,10 +460,16 @@ export default function ExportTab({ validationStatus: propValidationStatus }: Ex
           <p className="admin-ops-export-card__description">Flat resource table for spreadsheet workflows.</p>
           <Button
             className="admin-ops-export-card__action"
-            onClick={() => unavailableExport("CSV")}
+            onClick={() => {
+              if (!isCsvExporting) void handleCsvExport();
+            }}
+            aria-disabled={isCsvExporting}
+            aria-busy={isCsvExporting}
             variant="outline"
+            data-testid="button-export-csv"
           >
-            Download
+            {isCsvExporting && <RefreshCw className="h-4 w-4 animate-spin" />}
+            {isCsvExporting ? "Downloading..." : "Download"}
           </Button>
         </article>
 
@@ -430,12 +494,28 @@ export default function ExportTab({ validationStatus: propValidationStatus }: Ex
           </Button>
         </article>
 
+        <article className="card admin-ops-export-card hoverable">
+          <div className="admin-ops-export-card__icon" aria-hidden="true">
+            <Database className="h-5 w-5" />
+          </div>
+          <h3 className="admin-ops-export-card__title">OPML (categories)</h3>
+          <p className="admin-ops-export-card__description">Hierarchical export for feed readers.</p>
+          <Button
+            className="admin-ops-export-card__action"
+            onClick={() => {
+              if (!isOpmlExporting) void handleOpmlExport();
+            }}
+            aria-disabled={isOpmlExporting}
+            aria-busy={isOpmlExporting}
+            variant="outline"
+            data-testid="button-export-opml"
+          >
+            {isOpmlExporting && <RefreshCw className="h-4 w-4 animate-spin" />}
+            {isOpmlExporting ? "Downloading..." : "Download"}
+          </Button>
+        </article>
+
         {[
-          {
-            title: "OPML (categories)",
-            description: "Hierarchical export for feed readers.",
-            icon: <Database className="h-5 w-5" />,
-          },
           {
             title: "SQL dump",
             description: "PostgreSQL-compatible schema + data.",

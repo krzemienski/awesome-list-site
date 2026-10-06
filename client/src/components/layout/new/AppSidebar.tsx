@@ -121,6 +121,25 @@ function formatCount(n: number): string {
   return String(n);
 }
 
+/* Bring an item into its nearest scrolling ancestor ("block: nearest").
+   Element.scrollIntoView() also moves Chromium's sequential focus navigation
+   starting point to the element, so the first Tab on a fresh page skipped the
+   skip link and header and landed in the sidebar. Scrolling the container
+   directly leaves keyboard order alone. */
+function revealInSidebarScrollport(el: HTMLElement) {
+  let scroller = el.parentElement;
+  while (scroller) {
+    const { overflowY } = getComputedStyle(scroller);
+    if ((overflowY === "auto" || overflowY === "scroll") && scroller.scrollHeight > scroller.clientHeight) break;
+    scroller = scroller.parentElement;
+  }
+  if (!scroller) return;
+  const box = scroller.getBoundingClientRect();
+  const item = el.getBoundingClientRect();
+  if (item.top < box.top) scroller.scrollTop -= box.top - item.top;
+  else if (item.bottom > box.bottom) scroller.scrollTop += Math.min(item.bottom - box.bottom, item.top - box.top);
+}
+
 function categoryStorageKey(cat: NavCategory): string {
   return cat.slug || getCategorySlug(cat.name);
 }
@@ -691,7 +710,7 @@ export default function AppSidebar({
         `${surface} [data-active]`,
       );
       const el = matches[matches.length - 1];
-      el?.scrollIntoView({ block: "nearest" });
+      if (el) revealInSidebarScrollport(el);
     }, 350);
     return () => clearTimeout(t);
   }, [categories, location, isPhone, openMobile]);

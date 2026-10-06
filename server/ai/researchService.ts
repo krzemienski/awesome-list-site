@@ -8,6 +8,14 @@ import { tool, createSdkMcpServer } from '@anthropic-ai/claude-agent-sdk';
 import { z } from 'zod';
 import { AgentEventEmitter } from './agentEvents';
 import { cleanGithubSlugTitle } from '../lib/titleClean';
+
+/** Thrown when an approve/reject targets a discovery id that does not exist. */
+export class DiscoveryNotFoundError extends Error {
+  constructor() {
+    super("Discovery not found");
+    this.name = "DiscoveryNotFoundError";
+  }
+}
 import { decodeHtmlEntities, decodeResourceTextFields } from '../github/importHygiene';
 import { runAgentQuery, type AgentDefinitionInput } from './runAgentQuery';
 import { defaultResearchModel, defaultScoutModel, resolveModel, validateBaseUrl, type AgentRunConfig } from './agentRuntime';
@@ -1348,7 +1356,7 @@ STOP TARGET: this run ends AUTOMATICALLY once ${targetDiscoveries} new discoveri
 
   async approveDiscovery(discoveryId: number, opts: { skipDuplicateCheck?: boolean } = {}): Promise<ResearchDiscovery> {
     const [discovery] = await db.select().from(researchDiscoveries).where(eq(researchDiscoveries.id, discoveryId));
-    if (!discovery) throw new Error("Discovery not found");
+    if (!discovery) throw new DiscoveryNotFoundError();
 
     // Normalized dedup guard (July 30, 2026): the per-job unique index only
     // stops exact same-job repeats — a single approve could still create a
@@ -1473,6 +1481,7 @@ STOP TARGET: this run ends AUTOMATICALLY once ${targetDiscoveries} new discoveri
       rejectionReason: reason || null,
     }).where(eq(researchDiscoveries.id, discoveryId)).returning();
 
+    if (!updated) throw new DiscoveryNotFoundError();
     if (updated.jobId) {
       await db.update(researchJobs)
         .set({ rejectedDiscoveries: sql`${researchJobs.rejectedDiscoveries} + 1` })

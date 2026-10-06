@@ -557,6 +557,110 @@ export function registerExportLinkHealthRoutes(
     }
   });
 
+  // GET /api/admin/export-csv - Flat resource table for spreadsheet workflows
+  // (the admin Export tab's "CSV (resources)" card). All statuses, one row per
+  // resource; cells are formula-neutralised like the users CSV export.
+  app.get('/api/admin/export-csv', isAuthenticated, isAdmin, async (req: any, res) => {
+    try {
+      const rows = await runHeavyWork('database-export', async () => {
+        const all = await resourceRepo.listResources({ limit: 100000 });
+        return all.resources as any[];
+      });
+      await auditRepo.logResourceAudit(
+        null,
+        'resources.exported',
+        req.dbUser?.id,
+        { rowCount: rows.length, format: 'csv' },
+        `Admin exported ${rows.length} resources (CSV)`
+      );
+      const csvCell = (value: unknown): string => {
+        let s = value === null || value === undefined ? '' : String(value);
+        if (/^[=+\-@]/.test(s)) s = `'${s}`;
+        if (/[",\n\r]/.test(s)) s = `"${s.replace(/"/g, '""')}"`;
+        return s;
+      };
+      const iso = (v: unknown) => (v instanceof Date ? v.toISOString() : v);
+      const header = ['id', 'title', 'url', 'description', 'category', 'subcategory', 'subSubcategory', 'status', 'tags', 'createdAt', 'updatedAt'];
+      const lines = [header.join(',')];
+      for (const r of rows) {
+        const tags = Array.isArray(r.metadata?.tags) ? r.metadata.tags.join('; ') : '';
+        lines.push([
+          r.id, r.title, r.url, r.description, r.category, r.subcategory, r.subSubcategory,
+          r.status, tags, iso(r.createdAt), iso(r.updatedAt),
+        ].map(csvCell).join(','));
+      }
+      res.set('Content-Type', 'text/csv; charset=utf-8');
+      res.set('Content-Disposition', `attachment; filename="resources-export-${new Date().toISOString().slice(0, 10)}.csv"`);
+      res.send(lines.join('\r\n') + '\r\n');
+    } catch (error) {
+      console.error('Error generating CSV export:', error);
+      sendOperationalFailure(res, error, 'Failed to generate CSV export');
+    }
+  });
+
+  // GET /api/admin/export-opml - Category tree (category → subcategory →
+  // sub-subcategory) with each approved resource as a link outline, for feed
+  // readers and outliners (the Export tab's "OPML (categories)" card).
+  app.get('/api/admin/export-opml', isAuthenticated, isAdmin, async (req: any, res) => {
+    try {
+      const { categories, subcategories, subSubcategories, rows } = await runHeavyWork('database-export', async () => ({
+        categories: await categoryRepo.listCategories(),
+        subcategories: await categoryRepo.listSubcategories(),
+        subSubcategories: await categoryRepo.listSubSubcategories(),
+        rows: ((await resourceRepo.listResources({ limit: 100000, status: 'approved' })).resources as any[])
+          .filter((r) => r.status === 'approved'),
+      }));
+      const xml = (v: unknown) => String(v ?? '')
+        .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;').replace(/[\u0000-\u0008\u000B\u000C\u000E-\u001F]/g, '');
+      const links = (pick: (r: any) => boolean, indent: string) => rows
+        .filter(pick)
+        .map((r) => `${indent}<outline type="link" text="${xml(r.title)}" url="${xml(r.url)}"/>`);
+      const out: string[] = [];
+      for (const cat of categories as any[]) {
+        out.push(`    <outline text="${xml(cat.name)}">`);
+        for (const sub of (subcategories as any[]).filter((s) => s.categoryId === cat.id)) {
+          out.push(`      <outline text="${xml(sub.name)}">`);
+          for (const ss of (subSubcategories as any[]).filter((x) => x.subcategoryId === sub.id)) {
+            out.push(`        <outline text="${xml(ss.name)}">`);
+            out.push(...links((r) => r.category === cat.name && r.subcategory === sub.name && r.subSubcategory === ss.name, '          '));
+            out.push('        </outline>');
+          }
+          out.push(...links((r) => r.category === cat.name && r.subcategory === sub.name && !r.subSubcategory, '        '));
+          out.push('      </outline>');
+        }
+        out.push(...links((r) => r.category === cat.name && !r.subcategory, '      '));
+        out.push('    </outline>');
+      }
+      const body = [
+        '<?xml version="1.0" encoding="UTF-8"?>',
+        '<opml version="2.0">',
+        '  <head>',
+        '    <title>Awesome Video — categories</title>',
+        `    <dateCreated>${new Date().toUTCString()}</dateCreated>`,
+        '  </head>',
+        '  <body>',
+        ...out,
+        '  </body>',
+        '</opml>',
+        '',
+      ].join('\n');
+      await auditRepo.logResourceAudit(
+        null,
+        'categories.exported',
+        req.dbUser?.id,
+        { categories: categories.length, resources: rows.length, format: 'opml' },
+        `Admin exported the category tree (OPML, ${rows.length} resources)`
+      );
+      res.set('Content-Type', 'text/x-opml; charset=utf-8');
+      res.set('Content-Disposition', `attachment; filename="awesome-video-categories-${new Date().toISOString().slice(0, 10)}.opml"`);
+      res.send(body);
+    } catch (error) {
+      console.error('Error generating OPML export:', error);
+      sendOperationalFailure(res, error, 'Failed to generate OPML export');
+    }
+  });
+
   // GET /api/admin/export-json - Export full database as JSON for backup
   app.get('/api/admin/export-json', isAuthenticated, isAdmin, async (req, res) => {
     try {

@@ -86,7 +86,7 @@
 /* The label is the one part that may give way: it wraps after the owner/
    slash (a <wbr> in the markup) so the repo name stays whole inside the capped
    button at 1280-1440px. */
-.app-footer-repo > span:not(.app-footer-repo-arrow) { min-width: 0; }
+.app-footer-repo-label { min-width: 0; }
 .app-footer-repo-arrow { flex-shrink: 0; }
 .app-footer-repo-arrow { color: var(--text-3); }
 .app-footer-repo:hover { border-color: var(--accent); color: var(--accent); }

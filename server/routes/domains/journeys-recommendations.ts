@@ -41,6 +41,7 @@ import {
   type RecommendationFeedbackValue,
 } from "@shared/recommendations";
 import { DEFAULT_LEARNING_PREFERENCES } from "@shared/onboarding";
+import { isForeignKeyViolation } from "../../errors/pgErrors";
 
 // ---------------------------------------------------------------------------
 // Journeys registrar
@@ -227,6 +228,9 @@ export function registerJourneyRoutes(
       const { progress, created } = await learningJourneyRepo.startUserJourney(userId, journeyId);
       res.json({ ...progress, created });
     } catch (error) {
+      if (isForeignKeyViolation(error)) {
+        return res.status(404).json({ message: 'Journey not found' });
+      }
       console.error('Error starting journey:', error);
       res.status(500).json({ message: 'Failed to start journey' });
     }
