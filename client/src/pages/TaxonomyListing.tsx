@@ -575,7 +575,7 @@ export default function TaxonomyListing({ level }: Props) {
       </nav>}
     <header className="taxonomy-header">
       {level === "category" && <div className="eyebrow taxonomy-eyebrow"><span aria-hidden="true">{categoryMarks[slug] ?? name.slice(0, 1)}</span>CATEGORY · {name.toUpperCase()}</div>}
-      <h1 className="taxonomy-title">{level === "category" ? name : <><span className="serif-italic taxonomy-title-accent">{displayName!.split(" ")[0]}</span>{displayName!.includes(" ") ? ` ${displayName!.split(" ").slice(1).join(" ")}` : ""}</>}</h1>
+      <h1 className="taxonomy-title display-h">{level === "category" ? name : <><span className="serif-italic taxonomy-title-accent">{displayName!.split(" ")[0]}</span>{displayName!.includes(" ") ? ` ${displayName!.split(" ").slice(1).join(" ")}` : ""}</>}</h1>
     <section aria-labelledby="taxonomy-scope-heading" data-seo-section="taxonomy-intro">
       <h2 id="taxonomy-scope-heading" className="sr-only">About this collection</h2>
       {/* Every level carries the same collection introduction as the crawler

@@ -493,6 +493,8 @@ const stray = [...document.querySelectorAll('button')].filter(b =>
     'button-clear-recent-searches',
     'button-dismiss-scrubbed-params'].includes(b.getAttribute('data-testid')) &&
   !b.matches('.about-faq-item > .about-faq-trigger[aria-expanded][aria-controls]') && // About FAQ disclosure rows
+  !b.matches('button.card.hoverable') &&                  // canonical card-as-button (account lists): skins key on .card.hoverable
+  !b.matches('.admin-tab-scroller > button.admin-tab-scroller__edge[aria-label]') && // admin tab-strip scroll arrows
   /* 5 · Clerk-hosted auth widget (third-party DOM the app cannot mark).
          Positive AND per control: excluded ONLY while the widget is themed
          from the DS (its primary button paints the live --accent) AND this
@@ -621,6 +623,13 @@ known list below instead of re-flagging it every run.
   hairline item borders, global focus ring). A `Button` can't express a
   disclosure row; the exclusion is positive — it must carry the
   `aria-expanded`/`aria-controls` disclosure contract.
+- **Canonical card buttons** (`button.card.hoverable`, e.g. the `/bookmarks`
+  `.account-list-item` collection rows): the canonical `.card.hoverable`
+  class is itself the hover hook — every `[data-system] .card.hoverable:hover`
+  skin in `client/public/ds/design-system.css` applies to it.
+- **Admin tab-strip scroll arrows** (`.admin-tab-scroller > button.admin-tab-scroller__edge[aria-label]`,
+  `client/src/pages/AdminDashboard.tsx`): icon-only edge affordances over a
+  `var(--bg)` fade; they must carry an accessible name.
 - **Theme-picker option cards** (`client/src/pages/ThemeSettings.tsx`,
   `data-testid="system-option-*"`, `"accent-option-*"`, `"font-option-*"`):
   `role="radio"` cards inside ARIA radiogroups, tokenized
@@ -824,10 +833,23 @@ const stray = [...document.querySelectorAll('h1')].filter(h =>
       const face = (v) => String(v || '').split(',')[0].replace(/\x22|\x27/g, '').trim().toLowerCase();
       return face(getComputedStyle(el).fontFamily) ===
         face(getComputedStyle(document.documentElement).getPropertyValue('--font-display'));
+    })(h)) &&
+  /* 5 · the terminal-style index title (frozen ~/awesome.video heading): a
+         .mono h1 by design. Positive: it must actually paint in the live
+         --font-mono face, so .mono alone cannot opt an h1 out */
+  !(h.matches('main h1.home-index-title.mono') &&
+    ((el) => {
+      const face = (v) => String(v || '').split(',')[0].replace(/\x22|\x27/g, '').trim().toLowerCase();
+      return face(getComputedStyle(el).fontFamily) ===
+        face(getComputedStyle(document.documentElement).getPropertyValue('--font-mono'));
     })(h))
 );
 stray  // → [] expected; a hit is a page title that skips the display tokens
 ```
+
+`h1.home-index-title.mono` is excluded only while it paints in the live
+`--font-mono` face: the home index title is a terminal-style `.mono` heading
+by design (`~/awesome.video`), so it does not switch display faces.
 
 `sr-only` is one exclusion: SubmitResource, ResourceDetail's loading
 state, and AdminDashboard render invisible screen-reader titles where no

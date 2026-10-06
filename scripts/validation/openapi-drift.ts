@@ -15,6 +15,7 @@ import express from "express";
 import SwaggerParser from "@apidevtools/swagger-parser";
 import { dump } from "js-yaml";
 import { registerRoutes } from "../../server/routes";
+import { mountVersionRoute } from "../../server/version-route";
 import { getSwaggerSpec } from "../../server/openapi";
 import {
   canonicalKey,
@@ -34,19 +35,20 @@ import {
 // surface (GET /api/resources/kinds/counts, PATCH /api/admin/resources/:id/kind,
 // PATCH /api/admin/resources/:id/featured) + the bounded Home feed
 // (GET /api/home) + owner password sign-in (POST /api/auth/admin-login,
-// POST /api/auth/admin-logout). When another task lands routes in
+// POST /api/auth/admin-logout) + GET /api/version (mounted by the gate the
+// same way server/index.ts mounts it). When another task lands routes in
 // parallel, recompute from this gate's own "got N/hash" line after merging
 // instead of adding counts by hand.
 const BASELINES = {
   replit: {
-    apiCount: 181,
-    apiHash: "ed6337fce81b014492c784637118893b73c7d1426f4b9bd8f0e5cb280d40dddc",
+    apiCount: 182,
+    apiHash: "23ff79dca343ce8a5f494b30bcb01e966540795285db7c4ad14eb3f8c56831da",
     nonApiCount: 7,
     nonApiHash: "d8f02ed21a7ee98464146ef8958d38a24113b0a47dbbe4132e2da54f00d61a89",
   },
   portable: {
-    apiCount: 181,
-    apiHash: "ed6337fce81b014492c784637118893b73c7d1426f4b9bd8f0e5cb280d40dddc",
+    apiCount: 182,
+    apiHash: "23ff79dca343ce8a5f494b30bcb01e966540795285db7c4ad14eb3f8c56831da",
     nonApiCount: 7,
     nonApiHash: "d8f02ed21a7ee98464146ef8958d38a24113b0a47dbbe4132e2da54f00d61a89",
   },
@@ -69,6 +71,9 @@ async function main() {
   // raw stack that reads like a gate bug rather than a server boot failure
   // (and looks nothing like a schema mismatch either). Mirrors the same
   // guard in response-contract-drift.ts.
+  // Mirror server/index.ts: GET /api/version is mounted before registerRoutes
+  // (ahead of Clerk) and declared by routes.ts, so the graph needs both.
+  mountVersionRoute(app);
   try {
     await registerRoutes(app);
   } catch (bootError) {

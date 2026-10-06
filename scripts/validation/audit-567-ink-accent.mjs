@@ -180,7 +180,7 @@ async function assertTheme(page, system, accent) {
         system: root.getAttribute("data-system"),
         accent: root.getAttribute("data-accent"),
       };
-      return {
+      const settled = {
         attrs,
         stored: { system: storedSystem, accent: storedAccent },
         pass: attrs.system === expectedSystem &&
@@ -188,11 +188,14 @@ async function assertTheme(page, system, accent) {
           storedSystem === expectedSystem &&
           storedAccent === expectedAccent,
       };
+      // Resolve only once settled: waitForFunction resolves on the first
+      // truthy return, and an object is always truthy.
+      return settled.pass ? settled : null;
     },
     { expectedSystem: system, expectedAccent: accent },
     { timeout: 30_000 },
-  );
-  const value = await state.jsonValue();
+  ).catch(() => null);
+  const value = state ? await state.jsonValue() : { pass: false };
   if (!value.pass) throw new Error(`theme state did not settle for ${system}/${accent}`);
   return value;
 }
@@ -425,6 +428,12 @@ async function measurePage(page, { system, accent, width, surface, route, identi
       }
       if (element.matches(".admin-canonical-category-track > .admin-canonical-category-bar")) {
         return { allowed: true, reason: "category distribution chart data", selector };
+      }
+      if (element.matches(".taxonomy-page .taxonomy-summary > .chip.accent:first-child")) {
+        return { allowed: true, reason: "category count chip retained by the approved reference contract (pages.jsx chip accent)", selector };
+      }
+      if (element.matches(".card.hoverable:hover") && matchedProperties.every((property) => property.startsWith("border") || property === "box-shadow")) {
+        return { allowed: true, reason: "per-system card hover skin under the pointer", selector };
       }
       if (primaryCandidate(element)) {
         const ordinal = primaryOrdinals.get(element) || 1;

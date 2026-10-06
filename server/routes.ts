@@ -222,9 +222,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // declared (task #319: catch field-level payload drift, not just broken JSON).
   registerCoreEndpointSchemas();
   installApiContractRegistration(app);
-  // server/index.ts mounts GET /api/version before this installer exists, so
-  // it is never auto-registered; declare it so /api/openapi.json and /api/docs
-  // list it (C3-API-01).
+  // GET /api/version is mounted from server/index.ts (server/version-route.ts)
+  // before this installer exists, so it is never auto-registered; declare it
+  // so /api/openapi.json and /api/docs list it (C3-API-01).
   declareContract(contracts, "get", "/api/version", [], false, false);
 
   // Authentication (Task #307): Clerk middleware + user context are mounted

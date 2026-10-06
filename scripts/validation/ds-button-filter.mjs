@@ -37,6 +37,8 @@ export function collectStrayButtons() {
       'button-clear-recent-searches',
       'button-dismiss-scrubbed-params'].includes(b.getAttribute('data-testid')) &&
     !b.matches('.about-faq-item > .about-faq-trigger[aria-expanded][aria-controls]') && // About FAQ disclosure rows
+    !b.matches('button.card.hoverable') &&                  // canonical card-as-button (account lists): skins key on .card.hoverable
+    !b.matches('.admin-tab-scroller > button.admin-tab-scroller__edge[aria-label]') && // admin tab-strip scroll arrows
     /* 5 · Clerk-hosted auth widget (third-party DOM the app cannot mark).
            Positive AND per control: excluded ONLY while the widget is themed
            from the DS (its primary button paints the live --accent) AND this
@@ -201,6 +203,15 @@ export function collectStrayH1s() {
         const face = (v) => String(v || '').split(',')[0].replace(/\x22|\x27/g, '').trim().toLowerCase();
         return face(getComputedStyle(el).fontFamily) ===
           face(getComputedStyle(document.documentElement).getPropertyValue('--font-display'));
+      })(h)) &&
+    /* 5 · the terminal-style index title (frozen ~/awesome.video heading): a
+           .mono h1 by design. Positive: it must actually paint in the live
+           --font-mono face, so .mono alone cannot opt an h1 out */
+    !(h.matches('main h1.home-index-title.mono') &&
+      ((el) => {
+        const face = (v) => String(v || '').split(',')[0].replace(/\x22|\x27/g, '').trim().toLowerCase();
+        return face(getComputedStyle(el).fontFamily) ===
+          face(getComputedStyle(document.documentElement).getPropertyValue('--font-mono'));
       })(h))
   );
   // STAGE6-H1-FILTER-END

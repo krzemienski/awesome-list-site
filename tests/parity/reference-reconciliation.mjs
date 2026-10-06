@@ -131,7 +131,7 @@ const paletteSourcePath = path.join(repoRoot, "client", "src", "components", "ui
 const paletteStyleSourcePath = path.join(repoRoot, "client", "src", "styles", "shell", "palette.css");
 const sidebarSourcePath = path.join(repoRoot, "client", "src", "components", "layout", "new", "AppSidebar.tsx");
 const drawerStyleSourcePath = path.join(repoRoot, "client", "src", "styles", "shell", "sidebar.css");
-const focusSourcePath = path.join(repoRoot, "client", "src", "styles", "design-system.css");
+const focusSourcePath = path.join(repoRoot, "client", "src", "styles", "app-bridge.css");
 const retainedReferenceExtensions = buildExpectedReferenceExtensions();
 
 /*
@@ -200,7 +200,7 @@ const assertCurrentControlDeclarations = () => {
         svgSha256: Object.fromEntries(APPROVED_PALETTE_PAGES.map(({ icon }) => [icon, sha256(APPROVED_PALETTE_ICON_SVG[icon])])),
       },
       focusSource: {
-        file: "client/src/styles/design-system.css",
+        file: "client/src/styles/app-bridge.css",
         sha256: sha256(focusSource),
         declaration: `${requiredFocusContract} + ${requiredFocusIndicator}`,
       },
@@ -724,7 +724,7 @@ export async function applyExpectedPaletteControls(page, reconciliation) {
     source: [
       "client/src/components/ui/search-dialog.tsx PAGES declaration",
       "client/src/styles/shell/palette.css focus-visible selectors",
-      "client/src/styles/design-system.css global :where(... input ...):focus-visible indicator",
+      "client/src/styles/app-bridge.css global :where(... input ...):focus-visible indicator",
       reconciliation?.palette?.recentSearchesSource || "parity capture fixture: no recent-searches localStorage entry is seeded",
     ],
     declarationProof: sourceProof,

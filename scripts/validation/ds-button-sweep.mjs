@@ -1094,6 +1094,13 @@ try {
       method: 'POST',
     });
     if (!addedToCollection.ok()) throw new Error(`seed collection item failed: ${addedToCollection.status()} ${(await addedToCollection.text()).slice(0, 200)}`);
+    // Reorder arrows only render when there is something to reorder (two or
+    // more collections), so seed an empty second collection alongside it.
+    const secondCollection = await authedFetch(`${BASE}/api/collections`, {
+      method: 'POST',
+      data: { name: `${COLLECTION_NAME} (2)` },
+    });
+    if (!secondCollection.ok()) throw new Error(`seed second collection failed: ${secondCollection.status()} ${(await secondCollection.text()).slice(0, 200)}`);
 
     // Task #367: publish the seeded collection so the share controls
     // ("Copy link" / "Unpublish" + the public-link line) render on
@@ -1130,7 +1137,7 @@ try {
             );
             return Boolean(
               presentation &&
-              presentation.querySelector('h1.sr-only') &&
+              presentation.querySelector('h1') &&
               presentation.querySelector('[data-testid="home-account-context"]') &&
               presentation.querySelector('[data-testid="card-onboarding-invitation"]') &&
               !document.querySelector('[data-testid="home-skeleton"]'),
@@ -1573,20 +1580,24 @@ try {
     // pass.
     const ADMIN_FOLDED_TAB_PARENTS = {
       subsubcategories: 'subcategories',
-      journeys: 'research',
-      digests: 'github',
     };
+    // Settings-menu sections with no strip tab: they render their own panel
+    // and leave every strip tab unselected (AdminDashboard visibleTab).
+    const ADMIN_MENU_ONLY_TABS = new Set(['journeys', 'digests']);
     const activateAdminTab = async (slug, expect) => {
+      const menuOnly = ADMIN_MENU_ONLY_TABS.has(slug);
       const parentSlug = ADMIN_FOLDED_TAB_PARENTS[slug];
       const triggerSlug = parentSlug ?? slug;
 
-      await adminPage.click(`[data-testid="tab-${triggerSlug}"]`);
-      await adminPage.waitForSelector(
-        `[data-testid="tab-${triggerSlug}"][aria-selected="true"]`,
-        { timeout: 15000 },
-      );
+      if (!menuOnly) {
+        await adminPage.click(`[data-testid="tab-${triggerSlug}"]`);
+        await adminPage.waitForSelector(
+          `[data-testid="tab-${triggerSlug}"][aria-selected="true"]`,
+          { timeout: 15000 },
+        );
+      }
 
-      if (parentSlug) {
+      if (parentSlug || menuOnly) {
         const innerTrigger = `[data-testid="tab-${slug}"]`;
         await adminPage.click('.admin-dashboard__actions button:has-text("Settings")');
         await adminPage.waitForSelector(innerTrigger, { state: 'visible', timeout: 15000 });
@@ -1594,11 +1605,14 @@ try {
       }
 
       // Harness-verified activation: the canonical parent trigger must
-      // actually be selected and the panel's own content selector must
-      // appear. Folded menu items close and unmount after selection, so their
-      // parent selection plus their unique content is the durable proof.
+      // actually be selected (or, for menu-only sections, the section's own
+      // panel must be the active one) and the panel's own content selector
+      // must appear. Folded menu items close and unmount after selection, so
+      // that selection plus their unique content is the durable proof.
       await adminPage.waitForSelector(
-        `[data-testid="tab-${triggerSlug}"][aria-selected="true"]`,
+        menuOnly
+          ? `[data-testid="content-${slug}"][role="tabpanel"][data-state="active"]`
+          : `[data-testid="tab-${triggerSlug}"][aria-selected="true"]`,
         { timeout: 15000 },
       );
       // Canonical admin panels keep their secondary tools deliberately folded

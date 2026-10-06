@@ -280,7 +280,7 @@ async function assertTheme(page, system, accent, { reload = false } = {}) {
         storedSystem = localStorage.getItem("ds-system");
         storedAccent = localStorage.getItem("ds-accent");
       } catch {}
-      return {
+      const settled = {
         attrs: {
           system: root.getAttribute("data-system"),
           accent: root.getAttribute("data-accent"),
@@ -291,11 +291,14 @@ async function assertTheme(page, system, accent, { reload = false } = {}) {
           storedSystem === expectedSystem &&
           storedAccent === expectedAccent,
       };
+      // Resolve only once settled: waitForFunction resolves on the first
+      // truthy return, and an object is always truthy.
+      return settled.pass ? settled : null;
     },
     { expectedSystem: system, expectedAccent: accent },
     { timeout: 30_000 },
-  );
-  const values = await state.jsonValue();
+  ).catch(() => null);
+  const values = state ? await state.jsonValue() : { pass: false };
   if (!values.pass) throw new Error(`theme state did not settle for ${system}/${accent}`);
   return values;
 }
