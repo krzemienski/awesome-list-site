@@ -444,6 +444,28 @@ const adminContactSubmissionsQuerySchema = z.object({
  * override map is simply overwritten with the same values).
  */
 export function registerCoreEndpointSchemas(): void {
+  // --- Text downloads: document the real media type, not JSON ---
+  setRouteResponseSchema("post", "/api/admin/export", {
+    name: "MarkdownExport",
+    description: "Awesome-list Markdown document",
+    contentType: "text/markdown",
+  });
+  setRouteResponseSchema("get", "/api/admin/export-csv", {
+    name: "ResourcesCsvExport",
+    description: "Approved resources as CSV",
+    contentType: "text/csv",
+  });
+  setRouteResponseSchema("get", "/api/admin/export-opml", {
+    name: "OpmlExport",
+    description: "Resource feeds as an OPML outline",
+    contentType: "text/x-opml",
+  });
+  setRouteResponseSchema("get", "/api/admin/users/export", {
+    name: "UsersCsvExport",
+    description: "Users as CSV (admin-only; includes email addresses)",
+    contentType: "text/csv",
+  });
+
   // --- Task #319 endpoints ---
 
   setRouteResponseSchema("get", "/api/auth/user", {

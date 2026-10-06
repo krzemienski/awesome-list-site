@@ -811,6 +811,7 @@ components:
                   - events
                   - protocols
                   - other
+                  - null
               resolvedKind:
                 type: string
                 enum:
@@ -852,6 +853,7 @@ components:
                   - events
                   - protocols
                   - other
+                  - null
               resolvedKind:
                 type: string
                 enum:
@@ -944,6 +946,7 @@ components:
                   - events
                   - protocols
                   - other
+                  - null
               resolvedKind:
                 type: string
                 enum:
@@ -1274,6 +1277,7 @@ components:
             - events
             - protocols
             - other
+            - null
         resolvedKind:
           type: string
           enum:
@@ -2765,6 +2769,7 @@ components:
                   - events
                   - protocols
                   - other
+                  - null
               resolvedKind:
                 type: string
                 enum:
@@ -4870,6 +4875,7 @@ components:
             - events
             - protocols
             - other
+            - null
       required:
         - kind
       additionalProperties: false
@@ -4894,6 +4900,7 @@ components:
             - events
             - protocols
             - other
+            - null
         metadata:
           anyOf:
             - type: object
@@ -4989,6 +4996,7 @@ components:
             - events
             - protocols
             - other
+            - null
         metadata:
           anyOf:
             - type: object
@@ -7957,6 +7965,7 @@ components:
                   - events
                   - protocols
                   - other
+                  - null
               resolvedKind:
                 type: string
                 enum:
@@ -8183,6 +8192,7 @@ components:
                   - events
                   - protocols
                   - other
+                  - null
               resolvedKind:
                 type: string
                 enum:
@@ -8271,6 +8281,7 @@ components:
                   - events
                   - protocols
                   - other
+                  - null
               resolvedKind:
                 type: string
                 enum:
@@ -21317,11 +21328,11 @@ paths:
       operationId: get:/api/admin/users/export
       responses:
         '200':
-          description: Successful response
+          description: Users as CSV (emails masked)
           content:
-            application/json:
+            text/csv:
               schema:
-                $ref: '#/components/schemas/JsonResponse'
+                type: string
         '400':
           description: Request validation failed
           content:
@@ -27585,11 +27596,11 @@ paths:
       operationId: post:/api/admin/export
       responses:
         '200':
-          description: Successful response
+          description: Awesome-list Markdown document
           content:
-            application/json:
+            text/markdown:
               schema:
-                $ref: '#/components/schemas/JsonResponse'
+                type: string
         '400':
           description: Request validation failed
           content:
@@ -27736,11 +27747,11 @@ paths:
       operationId: get:/api/admin/export-csv
       responses:
         '200':
-          description: Successful response
+          description: Approved resources as CSV
           content:
-            application/json:
+            text/csv:
               schema:
-                $ref: '#/components/schemas/JsonResponse'
+                type: string
         '400':
           description: Request validation failed
           content:
@@ -27880,11 +27891,11 @@ paths:
       operationId: get:/api/admin/export-opml
       responses:
         '200':
-          description: Successful response
+          description: Resource feeds as an OPML outline
           content:
-            application/json:
+            text/x-opml:
               schema:
-                $ref: '#/components/schemas/JsonResponse'
+                type: string
         '400':
           description: Request validation failed
           content:

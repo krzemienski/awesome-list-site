@@ -19,13 +19,30 @@ import { contracts, type ApiContract, type HttpMethod } from "./registry";
 
 /** Convert a zod schema to an OpenAPI-3.0 Schema Object (input side). */
 function toOpenApiSchema(schema: ZodTypeAny, io: "input" | "output" = "input"): Record<string, any> {
-  return z.toJSONSchema(schema, {
+  return allowNullInNullableEnums(z.toJSONSchema(schema, {
     target: "openapi-3.0",
     io,
     // Unrepresentable types (Date, transforms, etc.) become {} instead of
     // throwing, so a single exotic schema never breaks doc generation.
     unrepresentable: "any",
-  }) as Record<string, any>;
+  })) as Record<string, any>;
+}
+
+/**
+ * OpenAPI 3.0 `nullable: true` widens `type`, but an `enum` still restricts
+ * the allowed values, so `{ nullable: true, enum: ["a"] }` rejects null in
+ * standard validators. Zod's `.nullable()` on an enum means null is a real
+ * value (e.g. a resource's stored `kind`), so list it in the enum too.
+ */
+function allowNullInNullableEnums(value: unknown): unknown {
+  if (Array.isArray(value)) return value.map(allowNullInNullableEnums);
+  if (value === null || typeof value !== "object") return value;
+  const output: Record<string, unknown> = {};
+  for (const [key, child] of Object.entries(value)) output[key] = allowNullInNullableEnums(child);
+  if (output.nullable === true && Array.isArray(output.enum) && !output.enum.includes(null)) {
+    output.enum = [...output.enum, null];
+  }
+  return output;
 }
 
 /**
@@ -125,7 +142,10 @@ function buildResponses(contract: ApiContract): Record<string, any> {
   }
   for (const [status, named] of entries) {
     const response: Record<string, any> = { description: named.description };
-    if (named.schema) {
+    if (named.contentType) {
+      // Non-JSON downloads (Markdown, CSV, OPML): the body is raw text.
+      response.content = { [named.contentType]: { schema: { type: "string" } } };
+    } else if (named.schema) {
       response.content = {
         "application/json": {
           schema: { $ref: `#/components/schemas/${named.name}` },

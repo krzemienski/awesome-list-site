@@ -44,6 +44,12 @@ export interface NamedResponseSchema {
   description: string;
   /** Optional zod schema for the response body at this status. */
   schema?: ZodTypeAny;
+  /**
+   * Non-JSON media type for text downloads (e.g. "text/csv"). When set, the
+   * generated OpenAPI documents a raw string body of this type instead of a
+   * JSON schema.
+   */
+  contentType?: string;
 }
 
 export interface ApiContractInput {

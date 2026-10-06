@@ -152,6 +152,10 @@
      `anywhere` also lowers the cell's min-content width, so auto layout
      stops sizing the column to the whole string. */
   overflow-wrap: anywhere;
+  /* C8-V5A-04 / ADM-002: `anywhere` also lets auto layout starve the column
+     (a syllable per line at 768px), so the title keeps a readable floor at
+     every width and the table scrolls sideways instead. */
+  min-width: 11rem;
 }
 
 .admin-catalog-resources__tags,
@@ -370,12 +374,6 @@
 }
 
 @media (max-width: 640px) {
-  /* C8-V5A-04: the table scrolls sideways here, so give titles a readable
-     column instead of letting overflow-wrap break them a syllable per line. */
-  .admin-catalog-resources__resource-title {
-    min-width: 11rem;
-  }
-
   /* Keep search, the touch-operable filters toggle and Add on one row. */
   .admin-catalog-resources__header-actions {
     flex-wrap: nowrap;

@@ -357,7 +357,15 @@ export default function AdminDashboard() {
           (normalizeTab yields a valid id or the "approvals" default), so Radix's
           roving tabindex always makes exactly the active trigger tabbable
           (tabindex=0) and arrow keys move focus between tabs — never all -1. */}
-      <Tabs value={visibleTab} onValueChange={handleTabChange}>
+      {/* Journeys/Digests have no strip trigger. Radix's automatic activation
+          would select the first trigger the moment Tab enters the strip and
+          unmount the open panel, so those panels switch to manual activation
+          (Enter/Space/click still change tabs). */}
+      <Tabs
+        value={visibleTab}
+        onValueChange={handleTabChange}
+        activationMode={CANONICAL_TABS.some(([id]) => id === visibleTab) ? "automatic" : "manual"}
+      >
         {/* Canonical single-row strip. Radix keeps off-screen triggers
             keyboard reachable; extra tools live in the related tab panels. */}
         <div className="admin-tab-scroller">

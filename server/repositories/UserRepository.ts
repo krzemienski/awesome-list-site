@@ -228,9 +228,9 @@ export class UserRepository {
    * Update a user's role
    * @param userId - User ID to update
    * @param role - New role (e.g., 'admin', 'user')
-   * @returns Updated user object
+   * @returns Updated user object, or undefined when no user has that id
    */
-  async updateUserRole(userId: string, role: string): Promise<User> {
+  async updateUserRole(userId: string, role: string): Promise<User | undefined> {
     const [user] = await db
       .update(users)
       .set({ role, updatedAt: new Date() })

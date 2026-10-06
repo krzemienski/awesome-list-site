@@ -300,6 +300,9 @@ export function registerAdminContentRoutes(
       }
       
       const user = await userRepo.updateUserRole(userId, role);
+      if (!user) {
+        return res.status(404).json({ message: 'User not found' });
+      }
       // Run21 R4-019: this endpoint used to serialize the FULL user row —
       // including the bcrypt hash. Field-whitelist serializer only.
       res.json(sanitizeUser(user));

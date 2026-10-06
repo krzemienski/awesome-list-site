@@ -167,7 +167,7 @@ export interface IStorage {
   getUserByEmail(email: string): Promise<User | undefined>;
   listUsers(page: number, limit: number, q?: string, sortBy?: string, sortDir?: string): Promise<{ users: User[]; total: number }>;
   listAllUsers(): Promise<User[]>;
-  updateUserRole(userId: string, role: string): Promise<User>;
+  updateUserRole(userId: string, role: string): Promise<User | undefined>;
 
   // Resource CRUD operations
   listResources(options: ListResourceOptions): Promise<{ resources: Resource[]; total: number }>;
@@ -390,7 +390,7 @@ export class DatabaseStorage implements IStorage {
     return this.userRepo.listAllUsers();
   }
 
-  async updateUserRole(userId: string, role: string): Promise<User> {
+  async updateUserRole(userId: string, role: string): Promise<User | undefined> {
     return this.userRepo.updateUserRole(userId, role);
   }
 
