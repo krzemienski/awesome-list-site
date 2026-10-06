@@ -1,6 +1,7 @@
 import { useAuth } from "@/hooks/useAuth";
 import { Link as WLink } from "wouter";
 import { Shield } from "lucide-react";
+import SEOHead from "@/components/layout/SEOHead";
 
 interface AdminGuardProps {
   children: React.ReactNode;
@@ -13,6 +14,7 @@ export default function AdminGuard({ children }: AdminGuardProps) {
   if (isLoading) {
     return (
       <div className="min-h-full flex items-center justify-center bg-background">
+        <SEOHead title="Admin Dashboard" noindex />
         <div className="text-center">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto mb-4"></div>
           <p className="text-muted-foreground">Verifying access...</p>
@@ -31,6 +33,7 @@ export default function AdminGuard({ children }: AdminGuardProps) {
     const signedInNonAdmin = Boolean(user);
     return (
       <div className="container mx-auto px-4 py-8 max-w-2xl">
+        <SEOHead title="Admin Dashboard" noindex />
         <h1 className="display-h text-2xl sm:text-3xl text-[var(--text)] mb-4 flex items-center gap-2">
           <Shield className="h-6 w-6 text-[var(--accent)]" />
           Admin Dashboard

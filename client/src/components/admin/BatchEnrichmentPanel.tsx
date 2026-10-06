@@ -981,7 +981,7 @@ export default function BatchEnrichmentPanel() {
                   {/* min-w-0 + break-all: a long model id must wrap inside its
                       column, or grid min-content widens the ScrollArea's table
                       wrapper and clips the second column off-screen on mobile. */}
-                  <div className="grid grid-cols-2 gap-4 text-sm [&>div]:min-w-0">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-sm [&>div]:min-w-0">
                     <div>
                       <div className="text-muted-foreground">Filter</div>
                       <div className="font-mono break-all">{selectedJobData.job.filter || 'all'}</div>
@@ -992,11 +992,11 @@ export default function BatchEnrichmentPanel() {
                     </div>
                     <div>
                       <div className="text-muted-foreground">Model</div>
-                      <div className="font-mono break-all">{selectedJobData.job.model || (defaultEnrichmentModel ? `${defaultEnrichmentModel} (default)` : 'default')}</div>
+                      <div className="font-mono break-words">{selectedJobData.job.model || (defaultEnrichmentModel ? `${defaultEnrichmentModel} (default)` : 'default')}</div>
                     </div>
                     <div>
                       <div className="text-muted-foreground">Base URL</div>
-                      <div className="font-mono break-all">{selectedJobData.job.baseUrl || 'Platform default'}</div>
+                      <div className="font-mono break-words">{selectedJobData.job.baseUrl || 'Platform default'}</div>
                     </div>
                     <div>
                       <div className="text-muted-foreground">Auth Token</div>

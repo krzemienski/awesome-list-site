@@ -245,15 +245,16 @@ export function registerOperationsRoutes(
 body{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;background:#0e0d0c;color:#e8e6e3;margin:2rem auto;max-width:60rem;padding:0 1rem;line-height:1.5}
 a{color:#ff3d52}table{border-collapse:collapse;width:100%;margin:1rem 0}
 td,th{border:1px solid #333;padding:.5rem;text-align:left}td:last-child{white-space:nowrap}code{color:#5eddf2}
+.table-scroll{overflow-x:auto;max-width:100%}td:nth-child(2) code{overflow-wrap:anywhere}
 </style>
 </head>
 <body>
 <h1>${esc(swaggerSpec.info?.title ?? 'Public API')}</h1>
 <p>Version ${esc(swaggerSpec.info?.version ?? '')} — machine-readable spec: <a href="/api/openapi.json">/api/openapi.json</a> (OpenAPI 3.0)</p>
 <h2>Endpoints</h2>
-<table><thead><tr><th>Method</th><th>Path</th><th>Access</th></tr></thead><tbody>
+<div class="table-scroll"><table><thead><tr><th>Method</th><th>Path</th><th>Access</th></tr></thead><tbody>
 ${rows.join('\n')}
-</tbody></table>
+</tbody></table></div>
 <p>Each operation documents whether it requires the session cookie or an <code>Authorization: Bearer &lt;api-key&gt;</code> header. Validation errors use the field-level <code>{ "error": "validation_failed", "message": string, "fieldErrors": object, "errors": array }</code> envelope. Rate-limit state is exposed via <code>RateLimit-*</code> response headers.</p>
 </body>
 </html>`);

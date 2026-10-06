@@ -399,8 +399,10 @@ export default function Profile({ user }: ProfileProps) {
 
         {/* R4-040: min-w-0 lets this column shrink (so the long name truncates)
             instead of shoving the Settings/Logout buttons off-viewport in the
-            768–812px tablet band. */}
-        <div className="flex-1 min-w-0 text-center sm:text-left">
+            768–812px tablet band. On phones the parent is a centered column,
+            which sizes children to max-content; w-full bounds it to the
+            viewport so a long name truncates there too. */}
+        <div className="flex-1 min-w-0 w-full sm:w-auto text-center sm:text-left">
           <div className="eyebrow mb-2" aria-hidden>// Profile</div>
           <h1 className="display-h text-3xl sm:text-4xl mb-2 flex items-center gap-2 justify-center sm:justify-start min-w-0">
             {/* Run17 BUG-012: truncate — CSS defense for names at the 50-char cap */}

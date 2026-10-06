@@ -538,7 +538,11 @@ export class AuditRepository {
               SELECT 1
               FROM ${resources} current_resource
               WHERE current_resource.id = ${resourceEdits.resourceId}
-                AND current_resource.updated_at <= ${resourceEdits.originalResourceUpdatedAt}
+                -- The snapshot was written from a JS Date (millisecond
+                -- precision) while updated_at keeps microseconds, so compare
+                -- at the snapshot's precision like the JS supersede checks do.
+                AND date_trunc('milliseconds', current_resource.updated_at)
+                  <= ${resourceEdits.originalResourceUpdatedAt}
             )`,
           ),
         )

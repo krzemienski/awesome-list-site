@@ -495,7 +495,7 @@ function StepsDialog({
             return (
               <div
                 key={primary.id}
-                className="flex gap-3 items-start border rounded-md p-3"
+                className="flex flex-wrap sm:flex-nowrap gap-3 items-start border rounded-md p-3"
                 data-testid={`step-group-${primary.id}`}
               >
                 <div className="flex flex-col items-center gap-1 pt-1">
@@ -575,7 +575,7 @@ function StepsDialog({
                   )}
                 </div>
 
-                <div className="flex gap-1">
+                <div className="flex w-full justify-end sm:w-auto gap-1">
                   <Button
                     size="icon"
                     variant="ghost"

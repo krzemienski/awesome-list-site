@@ -158,7 +158,13 @@ export function useAIRecommendations(
         return normalizeRecommendationsResponse(raw);
       } catch (error) {
         if (error instanceof DOMException && error.name === 'AbortError') {
-          throw new Error('Recommendation refresh timed out. Your saved results are still available.');
+          // Only promise saved results when there are some on screen; a first
+          // load that times out has nothing to fall back on.
+          throw new Error(
+            localCache
+              ? 'Recommendation refresh timed out. Your saved results are still available.'
+              : 'Recommendations took too long to load. Please try again.',
+          );
         }
         throw error;
       } finally {
