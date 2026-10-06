@@ -17,6 +17,8 @@ import type { RecommendationFeedbackValue } from "@shared/recommendations";
 
 interface RecommendationFeedbackProps {
   resourceId: number;
+  /** C6-V2-05: names the resource in the group/button accessible names. */
+  title?: string;
   initialFeedback?: RecommendationFeedbackValue | null;
   className?: string;
   onFeedbackChange?: (feedback: RecommendationFeedbackValue | null) => void;
@@ -35,19 +37,19 @@ const FEEDBACK_OPTIONS: {
   {
     value: "helpful",
     label: "Helpful",
-    activeClass: "border-[#34d08c]/50 bg-[#34d08c]/10 text-[#34d08c]", // DS-OK: status ok
+    activeClass: "border-[var(--status-ok)]/50 bg-[var(--status-ok)]/10 text-[var(--status-ok)]", // DS-OK: status ok
     icon: ThumbsUp,
   },
   {
     value: "not_for_me",
     label: "Not for me",
-    activeClass: "border-[#ffb84d]/50 bg-[#ffb84d]/10 text-[#ffb84d]", // DS-OK: status warn
+    activeClass: "border-[var(--status-warn)]/50 bg-[var(--status-warn)]/10 text-[var(--status-warn)]", // DS-OK: status warn
     icon: ThumbsDown,
   },
   {
     value: "already_known",
     label: "Already know this",
-    activeClass: "border-[#5eddf2]/50 bg-[#5eddf2]/10 text-[#5eddf2]", // DS-OK: cyan info (DS chart/info constant)
+    activeClass: "border-[var(--status-info)]/50 bg-[var(--status-info)]/10 text-[var(--status-info)]", // DS-OK: cyan info (DS chart/info constant)
     icon: BookCheck,
   },
   {
@@ -60,6 +62,7 @@ const FEEDBACK_OPTIONS: {
 
 function RecommendationFeedback({
   resourceId,
+  title,
   initialFeedback = null,
   className,
   onFeedbackChange,
@@ -118,6 +121,7 @@ function RecommendationFeedback({
   };
 
   const choose = (next: RecommendationFeedbackValue) => {
+    if (isLoading) return; // aria-disabled (not disabled) so focus stays put while saving
     if (!isAuthenticated) {
       toast({
         title: "Sign in to save feedback",
@@ -150,7 +154,7 @@ function RecommendationFeedback({
       <div
         className="flex flex-wrap gap-2"
         role="group"
-        aria-label="Recommendation feedback"
+        aria-label={title ? `Feedback for ${title}` : "Recommendation feedback"}
       >
         {FEEDBACK_OPTIONS.map((option) => {
           const Icon = option.icon;
@@ -170,7 +174,9 @@ function RecommendationFeedback({
                 event.stopPropagation();
                 choose(option.value);
               }}
-              disabled={isLoading}
+              aria-disabled={isLoading}
+              aria-busy={isLoading && selected}
+              aria-label={title ? `${option.label}: ${title}` : undefined}
               aria-pressed={selected}
               data-testid={`recommendation-feedback-${option.value}-${resourceId}`}
             >

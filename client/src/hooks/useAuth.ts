@@ -1,12 +1,24 @@
 import { useEffect, useState } from 'react';
 import { useQuery, useMutation } from '@tanstack/react-query';
 import { useClerk } from '@clerk/react';
-import { queryClient, ApiError } from '@/lib/queryClient';
+import { queryClient, ApiError, renewSessionToken } from '@/lib/queryClient';
 import { notifyCrossTabSync } from '@/lib/crossTabSync';
 import { safeRemoveItem } from '@/lib/safeStorage';
 import { mpIdentify, mpReset } from '@/lib/mixpanel';
 import { phIdentify, phReset } from '@/lib/posthog';
 import { useToast } from '@/hooks/use-toast';
+
+/**
+ * Per-device state that belongs to the person who just signed out: the
+ * private submit draft, analytics identities, and other tabs' auth view.
+ * Every sign-out path (account menu and the /logout route) runs this.
+ */
+export function clearSignedInClientState(): void {
+  safeRemoveItem('submit-resource-draft');
+  mpReset();
+  phReset();
+  notifyCrossTabSync();
+}
 
 interface User {
   id: string;
@@ -38,13 +50,23 @@ function logoutRequestSignal(): AbortSignal {
  * The hook's return surface is unchanged; only the sign-out path switched
  * from POST /api/auth/logout to Clerk's signOut().
  */
-async function fetchAuthUser(): Promise<AuthResponse> {
+async function requestAuthUser(): Promise<AuthResponse> {
   const res = await fetch('/api/auth/user', { credentials: 'include' });
   if (!res.ok) {
     const text = (await res.text()) || res.statusText;
     throw new ApiError(res.status, text);
   }
   return await res.json();
+}
+
+// C3-V5A-07 (cycle-4 reverify): the server answers an expired __session cookie with 200
+// {isAuthenticated:false}, not a 401. After a drop longer than staleTime this
+// refetch ran before Clerk refreshed the cookie and signed a live admin out.
+// When Clerk still holds a session, refresh the token and ask once more.
+async function fetchAuthUser(): Promise<AuthResponse> {
+  const auth = await requestAuthUser();
+  if (auth.isAuthenticated || !(await renewSessionToken())) return auth;
+  return requestAuthUser();
 }
 
 export function useAuth() {
@@ -87,7 +109,9 @@ export function useAuth() {
 
   /** Sign out via Clerk, then confirm the server no longer sees a session. */
   const clerkSignOutAndVerify = async () => {
-    await signOut();
+    // The no-op callback stops Clerk routing to its after-sign-out URL;
+    // finishLogout does the full reload once the server confirms (C3-V3-02).
+    await signOut(() => {});
     const authCheck = await fetch('/api/auth/user', {
       credentials: 'include',
       cache: 'no-store',
@@ -103,10 +127,7 @@ export function useAuth() {
       // Clear auth cache only after the server confirms invalidation.
       queryClient.invalidateQueries({ queryKey: ['/api/auth/user'] });
       queryClient.setQueryData(['/api/auth/user'], { user: null, isAuthenticated: false });
-      safeRemoveItem('submit-resource-draft');
-      mpReset();
-      phReset();
-      notifyCrossTabSync();
+      clearSignedInClientState();
       window.location.href = '/';
   };
 

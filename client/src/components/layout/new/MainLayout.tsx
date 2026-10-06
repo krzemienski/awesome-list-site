@@ -23,12 +23,18 @@ const ContactDialogHost =
     ? lazy(() => import("@/components/contact/contact-dialog").then((module) => ({ default: module.ContactDialogHost })))
     : null;
 
-/** R2-L01: floating "back to top" button, appears after scrolling ~600px. */
+/** R2-L01: floating "back to top" button, appears after scrolling ~600px.
+ * It steps aside once the footer's meta strip is on screen: that strip spans
+ * the content column to its right edge, exactly where the button floats. */
 function BackToTop() {
   const [visible, setVisible] = useState(false);
 
   useEffect(() => {
-    const onScroll = () => setVisible(window.scrollY > 600);
+    const onScroll = () => {
+      const meta = document.querySelector(".app-footer-meta");
+      const metaOnScreen = meta ? meta.getBoundingClientRect().top < window.innerHeight : false;
+      setVisible(window.scrollY > 600 && !metaOnScreen);
+    };
     onScroll();
     window.addEventListener("scroll", onScroll, { passive: true });
     return () => window.removeEventListener("scroll", onScroll);
@@ -203,6 +209,10 @@ export default function MainLayout({ productProfile, nav, isLoading, navError, o
           onRetryNav={onRetryNav}
           user={user}
         />
+        {/* The reference PageFooter closes the content column beside the sticky
+            sidebar. Keep it a sibling of <main> so it stays the page's
+            top-level contentinfo landmark. */}
+        <div className="app-shell-column">
         {/*
           CC-14 (landmark half) — single <main id="main"> wrapping route content.
           Canonical page-content-wrap owns the token-backed measure and gutters.
@@ -226,7 +236,6 @@ export default function MainLayout({ productProfile, nav, isLoading, navError, o
           {children}
           </div>
         </main>
-        </div>
         {!isAdmin && publicConfig?.site ? (
           <AppFooter
             nav={nav}
@@ -239,6 +248,8 @@ export default function MainLayout({ productProfile, nav, isLoading, navError, o
             }}
           />
         ) : null}
+        </div>
+        </div>
       </div>
       {ContactDialogHost ? (
         <Suspense fallback={null}><ContactDialogHost /></Suspense>

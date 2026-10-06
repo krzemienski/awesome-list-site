@@ -63,14 +63,16 @@ export class GithubSyncRepository {
    * @param id - Queue item ID
    * @param status - New status ('pending', 'processing', 'completed', 'failed')
    * @param errorMessage - Optional error message if status is 'failed'
+   * @param branch - Branch the sync actually read from / wrote to, once known
    */
-  async updateGithubSyncStatus(id: number, status: string, errorMessage?: string, metadata?: Record<string, any>): Promise<void> {
+  async updateGithubSyncStatus(id: number, status: string, errorMessage?: string, metadata?: Record<string, any>, branch?: string): Promise<void> {
     await db
       .update(githubSyncQueue)
       .set({
         status,
         errorMessage,
         ...(metadata !== undefined ? { metadata } : {}),
+        ...(branch !== undefined ? { branch } : {}),
         processedAt: status === 'completed' || status === 'failed' ? new Date() : null
       })
       .where(eq(githubSyncQueue.id, id));

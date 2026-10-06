@@ -1,0 +1,14 @@
+{
+  "name": "awesome-video-cf",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "deploy": "wrangler deploy"
+  },
+  "dependencies": {
+    "@cloudflare/containers": "^0.3.0"
+  },
+  "devDependencies": {
+    "wrangler": "^4.40.0"
+  }
+}

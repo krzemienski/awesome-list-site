@@ -20,6 +20,13 @@
   display: none;
 }
 
+.app-shell-column {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  min-width: 0;
+}
+
 .app-shell-main {
   flex: 1;
   min-width: 0;
@@ -65,6 +72,17 @@
   .journeys-page, .journey-detail-page, .account-page.container
 ) {
   padding: 0;
+}
+
+/* About and Submit are laid out against the wider editorial measure. Widen
+   the shell box itself rather than pulling the page root left with a negative
+   margin: the box can only grow as far as <main> allows, so its gutter always
+   holds. At wide desktop widths the root lands where it always did. */
+.app-shell-main > .page-content-wrap:has(> :is(.about-page, .submit-page)) {
+  max-width: calc(
+    var(--shell-page-measure, var(--content-max))
+    + var(--content-max-admin) - var(--content-max)
+  );
 }
 
 /* Integration boundary: legacy direct route roots must inherit the shell's

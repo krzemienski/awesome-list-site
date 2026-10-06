@@ -65,7 +65,7 @@ import {
   resourceDescriptionSchema,
   tagSchema,
 } from "@shared/validation";
-import { normalizeSearchQuery } from "@shared/searchNormalize";
+import { isSearchableQuery, normalizeSearchQuery } from "@shared/searchNormalize";
 import {
   RESOURCE_FORMAT_VALUES,
   RESOURCE_PROVIDER_VALUES,
@@ -235,9 +235,11 @@ export function registerCatalogContributionsRoutes(
       // empty ("%00", "%20%20%20") behaves EXACTLY like an absent search param,
       // instead of NUL → full catalog while spaces → zero rows.
       const rawSearch = firstQueryValue(req.query.search) ?? firstQueryValue(req.query.q);
-      const search = typeof rawSearch === 'string'
-        ? normalizeSearchQuery(rawSearch) || undefined
-        : undefined;
+      // C7-API-01: a query below the shared minimum ("c c", "C and C++")
+      // behaves like an absent one too, as SSR /search and /api/search do,
+      // instead of reaching Postgres as a bare one-letter prefix.
+      const normalizedSearch = typeof rawSearch === 'string' ? normalizeSearchQuery(rawSearch) : '';
+      const search = isSearchableQuery(normalizedSearch) ? normalizedSearch : undefined;
 
       // Task #294: controlled public facet contract. Unknown is a valid,
       // explicit selection; unsupported controlled values are caller errors,
@@ -496,7 +498,7 @@ export function registerCatalogContributionsRoutes(
       const q = normalizeSearchQuery(
         firstQueryValue(req.query.q) || firstQueryValue(req.query.search) || ''
       );
-      if (q.length < 2) {
+      if (!isSearchableQuery(q)) {
         return res.json({ query: q, total: 0, results: [] });
       }
       const limit = Math.min(Math.max(parseInt(firstQueryValue(req.query.limit) as string) || 100, 1), 200);
@@ -895,7 +897,7 @@ export function registerCatalogContributionsRoutes(
       // stub description; sanitize (entities/emails) or backfill a fallback.
       const cleanDescription = ensureMinDescription(existing.description || '', existing.title, existing.url);
       if (cleanDescription !== (existing.description || '')) {
-        await resourceRepo.updateResource(id, { description: cleanDescription });
+        await resourceRepo.updateResource(id, { description: cleanDescription }, { performedBy: userId });
       }
       
       const resource = await resourceRepo.updateResourceStatus(id, 'approved', userId);

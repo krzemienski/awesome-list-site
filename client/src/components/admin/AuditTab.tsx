@@ -1,7 +1,7 @@
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { ApiError } from "@/lib/queryClient";
-import { formatRelativeAgo } from "@/lib/utils";
-import { useQuery } from "@tanstack/react-query";
+import { formatRelativeAgo, maskEmail } from "@/lib/utils";
+import { useQuery, keepPreviousData } from "@tanstack/react-query";
 import { TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -35,12 +35,6 @@ interface AuditLogEntry {
 interface AuditLogsResponse {
   logs: AuditLogEntry[];
   total: number;
-}
-
-function maskEmail(email: string): string {
-  const at = email.indexOf("@");
-  if (at <= 0) return email;
-  return `${email[0]}•••${email.slice(at)}`;
 }
 
 /* A log entry is recorded after the operation it describes. Keep this
@@ -102,10 +96,15 @@ export default function AuditTab() {
   // Run17 BUG-010: real pagination — the tab used to silently cap at the row
   // limit with no way to reach older entries.
   const [offset, setOffset] = useState(0);
+  // Reaching the first/last page disables the pager button that was just
+  // pressed; hand focus to its sibling so keyboard users don't drop to <body>.
+  const prevButtonRef = useRef<HTMLButtonElement>(null);
+  const resourceIdInputRef = useRef<HTMLInputElement>(null);
+  const nextButtonRef = useRef<HTMLButtonElement>(null);
 
   // Run23 NB-041: surface fetch failures as a distinct error state instead of
   // letting them render as the "No audit log entries found" empty state.
-  const { data, isLoading, isError, refetch, isFetching } = useQuery<AuditLogsResponse>({
+  const { data, isLoading, isError, refetch, isFetching, isPlaceholderData } = useQuery<AuditLogsResponse>({
     queryKey: ['/api/admin/audit-logs', appliedFilter, appliedLimit, offset],
     queryFn: async () => {
       const params = new URLSearchParams({ limit: appliedLimit, offset: String(offset) });
@@ -117,7 +116,20 @@ export default function AuditTab() {
     // R5-037: refresh admin data when the operator returns to the tab.
     staleTime: 30_000,
     refetchOnWindowFocus: true,
+    // F1080: keep the current page (and the focused pager button) mounted
+    // while the next page loads instead of swapping in the skeleton.
+    placeholderData: keepPreviousData,
   });
+
+  // C9-V5B-01: a taller next page can push the focused pager button below the
+  // fold; bring it back into view once the new page has rendered.
+  useEffect(() => {
+    if (isPlaceholderData) return;
+    const active = document.activeElement;
+    if (active === prevButtonRef.current || active === nextButtonRef.current) {
+      (active as HTMLElement).scrollIntoView({ block: "nearest" });
+    }
+  }, [offset, isPlaceholderData]);
 
   // ADM-08: validate the Resource ID filter client-side against the SAME rule
   // the server enforces (positive integer within int4). An out-of-range value
@@ -142,6 +154,8 @@ export default function AuditTab() {
     setResourceIdFilter("");
     setAppliedFilter("");
     setOffset(0);
+    // C5-V5B-03: Clear unmounts itself; hand focus to the now-empty filter.
+    resourceIdInputRef.current?.focus();
   };
 
   const formatDate = (date: string | null) => {
@@ -191,40 +205,45 @@ export default function AuditTab() {
   return (
     <div className="admin-ops-audit-stack">
     <TableShell
-      title={
-        <span className="admin-ops-audit-title">
-          <span>Audit log</span>
-          <Button
-            type="button"
-            variant="ghost"
-            size="sm"
-            onClick={() => setShowTools((visible) => !visible)}
-            aria-expanded={showTools}
-            data-testid="button-audit-tools"
-          >
-            {showTools ? "Hide tools" : "Tools"}
-          </Button>
-        </span>
+      title="Audit log"
+      actions={
+        <Button
+          type="button"
+          variant="ghost"
+          size="sm"
+          onClick={() => setShowTools((visible) => !visible)}
+          aria-expanded={showTools}
+          data-testid="button-audit-tools"
+        >
+          {showTools ? "Hide tools" : "Tools"}
+        </Button>
       }
-      description="Append-only · last 100 events"
+      description={`Append-only · ${appliedLimit} events per page`}
       className="admin-ops-audit-shell"
     >
       <div className="space-y-4">
-        {showTools && <form onSubmit={handleSearch} className="admin-ops-audit-toolbar flex flex-col sm:flex-row gap-3">
-          <div className="flex-1 relative">
-            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-[var(--text-2)]" />
-            <Input
-              placeholder="Filter by Resource ID..."
-              value={resourceIdFilter}
-              onChange={(e) => setResourceIdFilter(e.target.value)}
-              className="pl-10"
-              type="number"
-              min={1}
-              max={PG_INT4_MAX}
-              aria-invalid={resourceIdInvalid}
-              aria-describedby={resourceIdInvalid ? "audit-resource-id-error" : undefined}
-              data-testid="input-audit-resource-id"
-            />
+        {showTools && <form onSubmit={handleSearch} className="admin-ops-audit-toolbar flex flex-col sm:flex-row sm:items-start gap-3">
+          <div className="flex-1">
+            {/* C3-V5B-08: the icon centres against the input alone, not the
+                wrapper that also grows to hold the error line below; the
+                toolbar aligns to the top so its controls stay level with the
+                input too. */}
+            <div className="relative">
+              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-[var(--text-2)]" />
+              <Input
+                ref={resourceIdInputRef}
+                placeholder="Filter by Resource ID..."
+                value={resourceIdFilter}
+                onChange={(e) => setResourceIdFilter(e.target.value)}
+                className="pl-10"
+                type="number"
+                min={1}
+                max={PG_INT4_MAX}
+                aria-invalid={resourceIdInvalid}
+                aria-describedby={resourceIdInvalid ? "audit-resource-id-error" : undefined}
+                data-testid="input-audit-resource-id"
+              />
+            </div>
             {/* ADM-08: honest inline validation instead of a misleading
                 server-error alert after a failed request. */}
             {resourceIdInvalid && (
@@ -261,13 +280,17 @@ export default function AuditTab() {
               Clear
             </Button>
           )}
+          {/* C3-V5B-09: aria-disabled (not disabled) so a keyboard user keeps
+              focus on the button while the refetch runs. */}
           <Button
             type="button"
             variant="outline"
             size="icon"
-            onClick={() => refetch()}
-            disabled={isFetching}
+            onClick={() => { if (!isFetching) void refetch(); }}
+            aria-disabled={isFetching}
+            aria-busy={isFetching}
             aria-label="Refresh"
+            data-testid="button-audit-refresh"
           >
             <RefreshCw className={`h-4 w-4 ${isFetching ? 'animate-spin' : ''}`} />
           </Button>
@@ -290,8 +313,9 @@ export default function AuditTab() {
               type="button"
               variant="outline"
               size="sm"
-              onClick={() => refetch()}
-              disabled={isFetching}
+              onClick={() => { if (!isFetching) void refetch(); }}
+              aria-disabled={isFetching}
+              aria-busy={isFetching}
               data-testid="button-audit-retry"
             >
               <RefreshCw className={`h-4 w-4 mr-2 ${isFetching ? 'animate-spin' : ''}`} />
@@ -391,29 +415,48 @@ export default function AuditTab() {
         )}
 
         {/* Run17 BUG-010: range readout + Previous/Next through the full log. */}
-        {showTools && data && data.total > 0 && (
-          <div className="flex flex-wrap items-center justify-between gap-3 pt-2">
+        {data && data.total > 0 && (
+          <div className="admin-ops-pagination flex flex-wrap items-center justify-between gap-3 pt-2">
             <p className="text-sm text-muted-foreground" data-testid="text-audit-range">
-              {offset + 1}–{Math.min(offset + (data.logs?.length || 0), data.total)} of{" "}
-              {data.total.toLocaleString()} entries
+              {/* C6-V5B-01: format every number alike and don't print "1–1". */}
+              {(() => {
+                const first = offset + 1;
+                const last = Math.min(offset + (data.logs?.length || 0), data.total);
+                const range = first === last ? first.toLocaleString() : `${first.toLocaleString()}–${last.toLocaleString()}`;
+                return `${range} of ${data.total.toLocaleString()} ${data.total === 1 ? "entry" : "entries"}`;
+              })()}
             </p>
             <div className="flex gap-2">
               <Button
+                ref={prevButtonRef}
                 type="button"
                 variant="outline"
                 size="sm"
-                disabled={offset === 0 || isFetching}
-                onClick={() => setOffset(Math.max(0, offset - parseInt(appliedLimit, 10)))}
+                disabled={offset === 0}
+                aria-busy={isPlaceholderData}
+                onClick={() => {
+                  if (isPlaceholderData) return;
+                  const nextOffset = Math.max(0, offset - parseInt(appliedLimit, 10));
+                  if (nextOffset === 0) nextButtonRef.current?.focus();
+                  setOffset(nextOffset);
+                }}
                 data-testid="button-audit-prev"
               >
                 Previous
               </Button>
               <Button
+                ref={nextButtonRef}
                 type="button"
                 variant="outline"
                 size="sm"
-                disabled={offset + parseInt(appliedLimit, 10) >= data.total || isFetching}
-                onClick={() => setOffset(offset + parseInt(appliedLimit, 10))}
+                disabled={offset + parseInt(appliedLimit, 10) >= data.total}
+                aria-busy={isPlaceholderData}
+                onClick={() => {
+                  if (isPlaceholderData) return;
+                  const nextOffset = offset + parseInt(appliedLimit, 10);
+                  if (nextOffset + parseInt(appliedLimit, 10) >= data.total) prevButtonRef.current?.focus();
+                  setOffset(nextOffset);
+                }}
                 data-testid="button-audit-next"
               >
                 Next

@@ -7,6 +7,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Collapsible, CollapsibleTrigger, CollapsibleContent } from "@/components/ui/collapsible";
 import { SlidersHorizontal, X, ChevronDown, Search, Check } from "lucide-react";
 import { normalizeTag } from "@/lib/tags";
+import { handoffFocusOnUnmount } from "@/hooks/focus-handoff";
 
 interface AdvancedFilterProps {
   selectedTags: string[];
@@ -221,21 +222,38 @@ export default function AdvancedFilter({
       </Select>
 
       {showTagFilter && hasSelectedFilters && (
-        <div className="flex gap-1.5 flex-wrap items-center w-full sm:w-auto">
+        <div className="flex gap-1.5 flex-wrap items-center w-full sm:w-auto" data-active-tag-chips>
           <span className="text-xs text-muted-foreground">Active:</span>
-          {selectedTags.map((tag) => (
+          {selectedTags.map((tag, index) => (
             <button
               type="button"
               key={tag}
               className="inline-flex min-h-11 items-center gap-1 rounded-full bg-primary px-3 py-1 text-xs text-primary-foreground touch-manipulation hover:bg-destructive hover:text-destructive-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
-              onClick={() => toggleTag(tag)}
+              onClick={(e) => {
+                // C6-V1-01: this chip unmounts; focus the next remaining chip's Remove (else the previous), else the index heading.
+                handoffFocusOnUnmount(e.currentTarget, () => {
+                  const left = Array.from(document.querySelectorAll<HTMLElement>("[data-active-tag-chips] [data-tag-chip]"));
+                  return left[Math.min(index, left.length - 1)] ?? document.querySelector<HTMLElement>(".home-index-title");
+                });
+                toggleTag(tag);
+              }}
+              data-tag-chip
               aria-label={`Remove ${tag} filter`}
             >
               {tag}
               <X className="h-3 w-3" />
             </button>
           ))}
-          <Button variant="ghost" size="sm" onClick={clearAll} className="min-h-11 px-2 text-xs">
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={(e) => {
+              // C6-V1-01: Clear unmounts with the chip bar; focus the index heading.
+              handoffFocusOnUnmount(e.currentTarget, () => document.querySelector<HTMLElement>(".home-index-title"));
+              clearAll();
+            }}
+            className="min-h-11 px-2 text-xs"
+          >
             Clear
           </Button>
         </div>

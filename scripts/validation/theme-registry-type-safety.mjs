@@ -1,12 +1,16 @@
 #!/usr/bin/env node
 
 /**
- * Compile-time regression gate for the design-system registry.
+ * Compile-time regression gate for the typed design-system wrapper.
  *
- * The source file is copied to a disposable TypeScript project and compiled
- * once unchanged, then once for each intentionally invalid registry edit.
- * This proves the relationships are enforced by TypeScript rather than only
- * being valid in today's declarations, without touching the working tree.
+ * The registry tables (DESIGN_SYSTEMS, ACCENTS, SYSTEM_DEFAULT_ACCENT) are
+ * runtime data in the canonical client/public/ds/design-system.js; their
+ * uniqueness and default-accent rows are checked by accent-drift and
+ * generate-design-system-artifact --check. What stays typed here is the
+ * wrapper's own fallbacks, so this gate proves an unknown DEFAULT_SYSTEM or
+ * DEFAULT_ACCENT fails to compile. The source is copied to a disposable
+ * TypeScript project, compiled unchanged, then once per invalid edit, without
+ * touching the working tree.
  */
 
 import { mkdtemp, readFile, rm, writeFile } from 'node:fs/promises';
@@ -21,40 +25,11 @@ const TSC_PATH = join(ROOT, 'node_modules/typescript/bin/tsc');
 
 const mutations = [
   {
-    name: 'duplicate system id',
-    apply(source) {
-      return source.replace("id: 'terminal',", "id: 'editorial',");
-    },
-  },
-  {
-    name: 'duplicate accent id',
-    apply(source) {
-      return source.replace(
-        "{ id: 'magenta', name: 'Magenta'",
-        "{ id: 'crimson', name: 'Magenta'",
-      );
-    },
-  },
-  {
-    name: 'missing SYSTEM_DEFAULT_ACCENT row',
-    apply(source) {
-      const needle = "defaultAccent: 'matrix',";
-      return source.replace(needle, '');
-    },
-  },
-  {
-    name: 'unknown mapped accent',
-    apply(source) {
-      const needle = "defaultAccent: 'matrix',";
-      return source.replace(needle, "defaultAccent: 'not-an-accent',");
-    },
-  },
-  {
     name: 'invalid DEFAULT_SYSTEM',
     apply(source) {
       return source.replace(
-        "defaultSystem: 'editorial',",
-        "defaultSystem: 'not-a-system',",
+        'export const DEFAULT_SYSTEM: SystemId = "editorial";',
+        'export const DEFAULT_SYSTEM: SystemId = "not-a-system";',
       );
     },
   },
@@ -62,8 +37,8 @@ const mutations = [
     name: 'invalid DEFAULT_ACCENT',
     apply(source) {
       return source.replace(
-        "defaultAccent: 'crimson',\n  systems:",
-        "defaultAccent: 'not-an-accent',\n  systems:",
+        'export const DEFAULT_ACCENT: AccentId = "crimson";',
+        'export const DEFAULT_ACCENT: AccentId = "not-an-accent";',
       );
     },
   },
@@ -117,7 +92,7 @@ try {
   if (baseline.code !== 0) {
     throw new Error(`baseline registry does not compile:\n${baseline.output}`);
   }
-  console.log('PASS baseline :: current design-system registry compiles');
+  console.log('PASS baseline :: current design-system wrapper compiles');
 
   for (const mutation of mutations) {
     const mutated = mutation.apply(source);

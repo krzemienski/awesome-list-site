@@ -2,10 +2,11 @@ import { useState, useEffect, useRef } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useMutation, useQuery } from "@tanstack/react-query";
-import { useLocation } from "wouter";
+import { Link, useLocation } from "wouter";
 import { z } from "zod";
 import { Loader2, Plus, CheckCircle, AlertCircle, AlertTriangle, LogIn, RefreshCw } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { focusElement } from "@/hooks/focus-handoff";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import {
@@ -53,7 +54,7 @@ import "@/styles/pages/submit.css";
 // (mirrors the server-side guard — markup is never legitimate catalog content).
 // Run21 R4-015/048: rules now come from the SHARED validation module so the
 // two layers can't drift (visible-char titles, 2048-char URL cap).
-import { NO_HTML_RE as NO_HTML, MAX_URL_LENGTH, hasVisibleChars } from "@shared/validation";
+import { NO_HTML_RE as NO_HTML, MAX_URL_LENGTH, hasVisibleChars, isPlausiblePublicUrl, URL_HOSTNAME_MESSAGE, URL_WHITESPACE_MESSAGE } from "@shared/validation";
 
 // Form validation schema
 const submitResourceSchema = z.object({
@@ -76,7 +77,10 @@ const submitResourceSchema = z.object({
     .url("Please enter a valid URL")
     .refine((url) => url.startsWith("https://"), {
       message: "URL must use HTTPS protocol"
-    }),
+    })
+    // C9-V2-01: the same checks the server applies, so they show inline.
+    .refine((url) => !/\s/.test(url), URL_WHITESPACE_MESSAGE)
+    .refine((url) => /\s/.test(url) || isPlausiblePublicUrl(url), URL_HOSTNAME_MESSAGE),
   description: z.string()
     .trim()
     // Run22 BUG-021: an EMPTY description used to surface the misleading
@@ -111,6 +115,16 @@ type SubmitResourceFormData = z.infer<typeof submitResourceSchema>;
 // R4-055: localStorage key for the in-progress /submit draft so an accidental
 // refresh, tab close, or navigation no longer wipes everything the user typed.
 const DRAFT_KEY = "submit-resource-draft";
+
+const EMPTY_VALUES: SubmitResourceFormData = {
+  title: "",
+  url: "",
+  description: "",
+  category: "",
+  subcategory: "",
+  subSubcategory: "",
+  tags: "",
+};
 
 interface Category {
   id: number;
@@ -149,35 +163,28 @@ export default function SubmitResource() {
   const [duplicateResource, setDuplicateResource] = useState(false);
 
   // Fetch categories
-  const { data: categories = [] } = useQuery<Category[]>({
+  const { data: categories = [], isFetched: categoriesFetched } = useQuery<Category[]>({
     queryKey: ['/api/categories'],
     enabled: isAuthenticated,
   });
 
   // Fetch subcategories
-  const { data: subcategories = [] } = useQuery<Subcategory[]>({
+  const { data: subcategories = [], isFetched: subcategoriesFetched } = useQuery<Subcategory[]>({
     queryKey: ['/api/subcategories'],
     enabled: isAuthenticated,
   });
 
   // Fetch sub-subcategories
-  const { data: subSubcategories = [] } = useQuery<SubSubcategory[]>({
+  const { data: subSubcategories = [], isFetched: subSubcategoriesFetched } = useQuery<SubSubcategory[]>({
     queryKey: ['/api/sub-subcategories'],
     enabled: isAuthenticated,
   });
 
+  const successCardRef = useRef<HTMLElement | null>(null);
   const form = useForm<SubmitResourceFormData>({
     resolver: zodResolver(submitResourceSchema),
     mode: "onTouched",
-    defaultValues: {
-      title: "",
-      url: "",
-      description: "",
-      category: "",
-      subcategory: "",
-      subSubcategory: "",
-      tags: "",
-    },
+    defaultValues: EMPTY_VALUES,
   });
   // BUG-033 (run14): react-hook-form's formState is a Proxy — isDirty is only
   // tracked once it's read during render. Reading it for the first time inside
@@ -197,18 +204,9 @@ export default function SubmitResource() {
 
   const onInvalid = (errors: Record<string, unknown>) => {
     const firstBad = FIELD_ORDER.find((name) => name in errors);
-    if (firstBad) {
-      try {
-        form.setFocus(firstBad);
-      } catch {
-        // Some controls (Select) cannot be focused programmatically; fall back
-        // to focusing the rendered input/trigger by name.
-        const el = document.querySelector<HTMLElement>(
-          `[name="${firstBad}"], [data-testid="input-${firstBad}"], [data-testid="select-${firstBad}"]`
-        );
-        el?.focus();
-      }
-    }
+    // C4-V3-01: the Select triggers carry field.ref, so setFocus
+    // reaches them too; without it setFocus silently did nothing for Category.
+    if (firstBad) form.setFocus(firstBad);
     toast({
       title: "Please fix the highlighted fields",
       description: "Some required fields are missing or invalid.",
@@ -236,17 +234,6 @@ export default function SubmitResource() {
       return subcategoryId ? subSub.subcategoryId === subcategoryId : false;
     }
   );
-
-  // Reset subcategory when category changes
-  useEffect(() => {
-    form.setValue("subcategory", "");
-    form.setValue("subSubcategory", "");
-  }, [selectedCategory, form]);
-
-  // Reset sub-subcategory when subcategory changes
-  useEffect(() => {
-    form.setValue("subSubcategory", "");
-  }, [selectedSubcategory, form]);
 
   // Check for duplicate URLs
   useEffect(() => {
@@ -315,6 +302,10 @@ export default function SubmitResource() {
   // Restore a saved draft once auth has confirmed (R5-016) — before the
   // auto-save subscription is wired (draftRestoredRef gates saving until the
   // restore has run so we never clobber the stored draft with empty defaults).
+  // The taxonomy lists must be loaded first: a Radix Select handed a value it
+  // has no option for reports "" back, which wiped the restored category.
+  const taxonomyFetched =
+    categoriesFetched && subcategoriesFetched && subSubcategoriesFetched;
   useEffect(() => {
     if (authLoading) return;
     if (!isAuthenticated) {
@@ -322,14 +313,16 @@ export default function SubmitResource() {
       draftRestoredRef.current = true;
       return;
     }
-    if (draftRestoredRef.current) return;
+    if (draftRestoredRef.current || !taxonomyFetched) return;
     const saved = safeGetItem(DRAFT_KEY);
     if (saved) {
       const draft = parseDraft(saved);
       if (!draft) {
         safeRemoveItem(DRAFT_KEY);
       } else if (draftHasContent(draft.values)) {
-        form.reset({ ...form.getValues(), ...draft.values });
+        // keepDefaultValues: the draft must not become the form's defaults,
+        // or a later form.reset() would bring it back.
+        form.reset({ ...form.getValues(), ...draft.values }, { keepDefaultValues: true });
         draftSeenAtRef.current = draft.updatedAt;
         toast({
           title: "Draft restored",
@@ -340,7 +333,7 @@ export default function SubmitResource() {
     }
     draftRestoredRef.current = true;
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [authLoading, isAuthenticated]);
+  }, [authLoading, isAuthenticated, taxonomyFetched]);
 
   // Debounced auto-save of the in-progress form to localStorage.
   useEffect(() => {
@@ -388,7 +381,7 @@ export default function SubmitResource() {
       const draft = parseDraft(e.newValue);
       if (!draft || draft.updatedAt <= draftSeenAtRef.current) return;
       draftSeenAtRef.current = draft.updatedAt;
-      form.reset({ ...form.getValues(), ...draft.values });
+      form.reset({ ...form.getValues(), ...draft.values }, { keepDefaultValues: true });
     };
     window.addEventListener("storage", onStorage);
     return () => window.removeEventListener("storage", onStorage);
@@ -454,7 +447,15 @@ export default function SubmitResource() {
       });
 
       setShowSuccess(true);
-      form.reset();
+      if (draftSaveTimer.current) clearTimeout(draftSaveTimer.current);
+      // A mouse submit keeps focus in the last edited field; blur it while it
+      // still holds its value, or the success card taking focus after the
+      // reset blurs an empty field and "onTouched" flags it as required.
+      const active = document.activeElement;
+      if (active instanceof HTMLElement && active.closest("form")) active.blur();
+      form.reset(EMPTY_VALUES);
+      safeRemoveItem(DRAFT_KEY);
+      draftSeenAtRef.current = 0;
       toast({
         title: "Success!",
         description: "Your resource has been submitted for review. It will be visible once approved by an admin.",
@@ -538,7 +539,14 @@ export default function SubmitResource() {
 
         {/* Success Message */}
         {showSuccess && (
-          <Card className="submit-success-card"> {/* DS-OK: status ok */}
+          <Card
+            className="submit-success-card"
+            role="status"
+            // C8-VX-01: hand focus to the confirmation once it renders, so the
+            // last edited (now empty) field isn't left ringed and a keyboard
+            // submit doesn't strand focus on <body>.
+            ref={(el) => { if (el && el !== successCardRef.current) { successCardRef.current = el; focusElement(el); } if (!el) successCardRef.current = null; }}
+          > {/* DS-OK: status ok */}
             <CardHeader className="submit-success-header">
               <div className="submit-success-heading">
                 <CheckCircle aria-hidden="true" />
@@ -554,13 +562,10 @@ export default function SubmitResource() {
               <p>
                 Track review status and outcomes in your private contribution timeline.
               </p>
-              <Button
-                type="button"
-                variant="outline"
-                onClick={() => setLocation("/contributions")}
-                data-testid="link-submission-contributions"
-              >
-                View your contributions
+              <Button asChild variant="outline">
+                <Link href="/contributions" data-testid="link-submission-contributions">
+                  View your contributions
+                </Link>
               </Button>
             </CardContent>
           </Card>
@@ -678,10 +683,15 @@ export default function SubmitResource() {
                               {/* Run16 BUG-061: the server hard-blocks duplicate
                                   URLs with a 409 — the old copy promised "you
                                   can still submit", which was never true. */}
-                              This URL is already in the catalog.
+                              {/* check-url only answers "exists" for a row of any
+                                  status (pending/rejected stay private), so the
+                                  copy can't claim the URL is listed. */}
+                              This URL has already been submitted, so it can&apos;t be submitted again.
                               <br />
                               <span>
-                                It can&apos;t be submitted again — if something about the existing entry is wrong, use &quot;Suggest Edit&quot; on the resource page instead.
+                                If it&apos;s listed and something about it is wrong, use &quot;Suggest Edit&quot; on its resource page.
+                                If you submitted it yourself, its status is in{" "}
+                                <Link href="/contributions" className="underline">your contributions</Link>.
                               </span>
                             </AlertDescription>
                           </Alert>
@@ -701,9 +711,18 @@ export default function SubmitResource() {
                           <FormLabel className="submit-label">Category</FormLabel>
                           {/* R3-04: name gives the hidden native select a non-empty
                               name; the visible trigger is labeled via FormLabel. */}
-                          <Select name={field.name} onValueChange={field.onChange} value={field.value}>
+                          <Select
+                            name={field.name}
+                            value={field.value}
+                            onValueChange={(value) => {
+                              if (!value || value === field.value) return;
+                              field.onChange(value);
+                              form.setValue("subcategory", "");
+                              form.setValue("subSubcategory", "");
+                            }}
+                          >
                             <FormControl>
-                              <SelectTrigger className="submit-control" data-testid="select-category">
+                              <SelectTrigger ref={field.ref} className="submit-control" data-testid="select-category">
                                 <SelectValue placeholder="Select…" />
                               </SelectTrigger>
                             </FormControl>
@@ -757,9 +776,17 @@ export default function SubmitResource() {
                       render={({ field }) => (
                         <FormItem className="submit-field submit-taxonomy-field">
                           <FormLabel className="submit-label">Subcategory (Optional)</FormLabel>
-                          <Select name={field.name} onValueChange={field.onChange} value={field.value}>
+                          <Select
+                            name={field.name}
+                            value={field.value}
+                            onValueChange={(value) => {
+                              if (!value || value === field.value) return;
+                              field.onChange(value);
+                              form.setValue("subSubcategory", "");
+                            }}
+                          >
                             <FormControl>
-                              <SelectTrigger className="submit-control" data-testid="select-subcategory">
+                              <SelectTrigger ref={field.ref} className="submit-control" data-testid="select-subcategory">
                                 <SelectValue placeholder="Select a subcategory" />
                               </SelectTrigger>
                             </FormControl>
@@ -787,9 +814,15 @@ export default function SubmitResource() {
                       render={({ field }) => (
                         <FormItem className="submit-field submit-taxonomy-field">
                           <FormLabel className="submit-label">Specific Topic (Optional)</FormLabel>
-                          <Select name={field.name} onValueChange={field.onChange} value={field.value}>
+                          <Select
+                            name={field.name}
+                            value={field.value}
+                            onValueChange={(value) => {
+                              if (value) field.onChange(value);
+                            }}
+                          >
                             <FormControl>
-                              <SelectTrigger className="submit-control" data-testid="select-subsubcategory">
+                              <SelectTrigger ref={field.ref} className="submit-control" data-testid="select-subsubcategory">
                                 <SelectValue placeholder="Select a specific topic" />
                               </SelectTrigger>
                             </FormControl>
@@ -834,8 +867,13 @@ export default function SubmitResource() {
                   />
                 </fieldset>
 
-                {/* Canonical actions stay in one right-aligned row. */}
-                <div className="submit-actions">
+                {/* Canonical actions stay in one right-aligned row.
+                    C7-V3-01: a mouse press here must not blur the field being
+                    edited — its onTouched error would render above this row and
+                    move the button out from under the pointer, so the click was
+                    lost. Submit validates everything and focuses the first bad
+                    field itself; keyboard focus is unaffected. */}
+                <div className="submit-actions" onMouseDown={(e) => e.preventDefault()}>
                   <Button
                     type="button"
                     variant="outline"
@@ -892,7 +930,11 @@ export default function SubmitResource() {
                       </AlertDialogCancel>
                       <AlertDialogAction
                         data-testid="button-discard-confirm"
-                        onClick={() => setLocation('/')}
+                        onClick={() => {
+                          if (draftSaveTimer.current) clearTimeout(draftSaveTimer.current);
+                          safeRemoveItem(DRAFT_KEY);
+                          setLocation('/');
+                        }}
                       >
                         Discard
                       </AlertDialogAction>

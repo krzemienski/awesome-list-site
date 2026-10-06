@@ -41,6 +41,8 @@ import { parseBoundedInt } from "./validation/inputs";
 import { runHeavyWork } from "./ops/heavyWork";
 import { seedDatabase } from "./seed";
 import {
+  contracts,
+  declareContract,
   installApiContractRegistration,
   observeRoutes,
   registerCoreEndpointSchemas,
@@ -220,6 +222,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // declared (task #319: catch field-level payload drift, not just broken JSON).
   registerCoreEndpointSchemas();
   installApiContractRegistration(app);
+  // server/index.ts mounts GET /api/version before this installer exists, so
+  // it is never auto-registered; declare it so /api/openapi.json and /api/docs
+  // list it (C3-API-01).
+  declareContract(contracts, "get", "/api/version", [], false, false);
 
   // Authentication (Task #307): Clerk middleware + user context are mounted
   // globally in server/index.ts (clerkMiddleware + clerkUserContext). The

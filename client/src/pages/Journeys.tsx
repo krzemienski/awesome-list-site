@@ -1,5 +1,6 @@
 import { JourneyCardSkeleton } from "@/components/ui/skeletons";
-import { lazy, Suspense, useState } from "react";
+import { handoffFocusOnUnmount } from "@/hooks/focus-handoff";
+import { lazy, Suspense, useRef, useState } from "react";
 import { useQuery, useMutation } from "@tanstack/react-query";
 import { useLocation, Link } from "wouter";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader } from "@/components/ui/card";
@@ -13,6 +14,7 @@ import { useAuth } from "@/hooks/useAuth";
 import { useToast } from "@/hooks/use-toast";
 import { queryClient, apiRequest } from "@/lib/queryClient";
 import { humanizeApiError } from "@/lib/apiError";
+import { queryUnavailableReason } from "@/lib/query-availability";
 import { trackJourneyStart } from "@/lib/analytics";
 import SEOHead from "@/components/layout/SEOHead";
 import { writeFilterParams, usePopstateParams } from "@/lib/url-filter-state";
@@ -88,6 +90,7 @@ export default function Journeys() {
     const fromUrl = new URLSearchParams(window.location.search).get("category");
     return fromUrl && fromUrl.trim() !== "" ? fromUrl : "all";
   });
+  const filterRef = useRef<HTMLDivElement>(null);
   const handleCategoryChange = (next: string) => {
     setSelectedCategory(next);
     // Run22 BUG-016: push (not replace) so Back steps through filter changes.
@@ -103,14 +106,17 @@ export default function Journeys() {
   const { toast } = useToast();
 
   // Fetch all published journeys (includes enrollment and progress data)
+  const journeysQuery = useQuery<Journey[]>({
+    queryKey: ['/api/journeys'],
+  });
   const {
     data: journeys = [],
     isLoading: journeysLoading,
-    isError: journeysError,
     refetch: refetchJourneys,
-  } = useQuery<Journey[]>({
-    queryKey: ['/api/journeys'],
-  });
+  } = journeysQuery;
+  // C4-V2-02: a fetch started offline is paused, not failed — without this it
+  // fell through to "No learning journeys are available at the moment".
+  const journeysUnavailable = queryUnavailableReason(journeysQuery);
 
   // Deep-link target for start/continue: the first incomplete logical step,
   // falling back to the journey top when there's nothing to jump to.
@@ -186,6 +192,12 @@ export default function Journeys() {
   const categories = Array.from(
     new Set(journeys.map((j) => j.category).filter((c): c is string => !!c && c.trim() !== "")),
   ).sort();
+  // A shared ?category= link can name a category that has no journeys. Keep it
+  // selectable, or the Select has no matching item and renders blank.
+  const categoryOptions =
+    selectedCategory !== "all" && !categories.includes(selectedCategory)
+      ? [...categories, selectedCategory]
+      : categories;
 
   // Filter journeys by category
   const filteredJourneys = selectedCategory === "all" 
@@ -212,25 +224,30 @@ export default function Journeys() {
     );
   }
 
-  if (journeysError) {
+  if (journeysUnavailable) {
+    const offline = journeysUnavailable === "offline";
     return (
-      <div className="journeys-page journeys-page--state" role="alert">
+      <div className="journeys-page journeys-page--state" role="alert" data-testid={`journeys-${journeysUnavailable}`}>
         <SEOHead
           title="Learning Journeys"
           description={journeysHubDescription}
         />
         <div className="journeys-state journeys-state--error">
           <Badge variant="destructive" className="journeys-state__error-label">
-            Error · unavailable
+            {offline ? "Offline" : "Error · unavailable"}
           </Badge>
-          <h1 className="display-h journeys-state__title">Couldn’t load journeys.</h1>
+          <h1 className="display-h journeys-state__title">
+            {offline ? "You’re offline." : "Couldn’t load journeys."}
+          </h1>
           <p className="journeys-state__copy">
-            Something went wrong while fetching the learning paths. Please try again.
+            {offline
+              ? "Learning journeys will load when your connection is back."
+              : "Something went wrong while fetching the learning paths. Please try again."}
           </p>
           <Button
             variant="outline"
             className="journeys-state__action"
-            onClick={() => void refetchJourneys()}
+            onClick={(e) => { handoffFocusOnUnmount(e.currentTarget); void refetchJourneys(); }}
             data-testid="button-retry-journeys"
           >
             Try again
@@ -263,19 +280,19 @@ export default function Journeys() {
 
       {/* Filters */}
       <div className="journeys-toolbar">
-        <div className="journeys-filter">
+        <div className="journeys-filter" ref={filterRef}>
           <span className="journeys-filter__label">Filter by category:</span>
           <Suspense
             fallback={(
               <select
-                className="journeys-filter__control"
+                className="select journeys-filter__control"
                 aria-label="Filter by category"
                 data-testid="select-category-filter"
                 value={selectedCategory}
                 onChange={(event) => handleCategoryChange(event.target.value)}
               >
                 <option value="all">All Categories</option>
-                {categories.map((category) => (
+                {categoryOptions.map((category) => (
                   <option key={category} value={category}>
                     {category}
                   </option>
@@ -289,7 +306,7 @@ export default function Journeys() {
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value="all">All Categories</SelectItem>
-                {categories.map(category => (
+                {categoryOptions.map(category => (
                   <SelectItem key={category} value={category}>
                     {category}
                   </SelectItem>
@@ -323,7 +340,12 @@ export default function Journeys() {
               <Button 
                 variant="outline" 
                 className="journeys-state__action"
-                onClick={() => handleCategoryChange("all")}
+                onClick={() => {
+                  handleCategoryChange("all");
+                  // C6-V2-01: this button unmounts with the empty state; hand
+                  // focus to the category filter it just reset.
+                  filterRef.current?.querySelector<HTMLElement>("button, select")?.focus();
+                }}
                 data-testid="button-clear-filter"
               >
                 Clear Filter
@@ -353,17 +375,18 @@ export default function Journeys() {
               >
                 <CardHeader className="journey-card__header">
                   <div className="journey-card__topline">
-                    <BookOpen
-                      className="journey-card__icon"
-                      aria-hidden
-                      data-testid={`icon-journey-${journey.id}`}
-                    />
+                    <span className="journey-card__icon-tile" aria-hidden>
+                      <BookOpen
+                        className="journey-card__icon"
+                        data-testid={`icon-journey-${journey.id}`}
+                      />
+                    </span>
                     <Badge 
                       variant="outline"
-                      className={cn("journey-difficulty text-xs capitalize", `journey-difficulty--${journey.difficulty}`)}
+                      className={cn("journey-difficulty", `journey-difficulty--${journey.difficulty}`)}
                       data-testid={`badge-difficulty-${journey.id}`}
                     >
-                      <Award className="h-3 w-3 mr-1" />
+                      <Award className="h-3 w-3" />
                       {journey.difficulty}
                     </Badge>
                   </div>
@@ -398,15 +421,15 @@ export default function Journeys() {
                   <div className="journey-card__details">
                     {/* Meta Information */}
                     <div className="journey-card__meta">
-                      <Badge variant="chip" className="text-xs">
-                        <Clock className="h-3 w-3 mr-1" />
+                      <Badge variant="chip">
+                        <Clock className="h-3 w-3" />
                         {journey.estimatedDuration}
                       </Badge>
-                      <Badge variant="chip" className="text-xs">
+                      <Badge variant="chip">
                         {journey.category}
                       </Badge>
                       {journey.stepCount && (
-                        <Badge variant="chip" className="text-xs">
+                        <Badge variant="chip">
                           {journey.stepCount} steps
                         </Badge>
                       )}
@@ -451,7 +474,7 @@ export default function Journeys() {
                       "journey-card__cta group h-auto min-h-10 whitespace-normal",
                       enrolled && "journey-card__cta--enrolled"
                     )}
-                    variant={enrolled ? "outline" : "default"}
+                    variant="outline"
                     // Task #330: one-click start/continue — signed-in users
                     // enroll right here (or jump to their next incomplete
                     // step); anonymous users still get the read-only view.

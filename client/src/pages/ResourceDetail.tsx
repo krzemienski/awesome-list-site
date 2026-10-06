@@ -41,6 +41,7 @@ import { Blurhash } from "react-blurhash";
 import type { Resource } from "@shared/schema";
 import type { BookmarkCollection } from "@/types/bookmarks";
 import { useGuestBookmarkIds } from "@/lib/guestBookmarks";
+import { restoreRemovedBookmark, type RemovedBookmark } from "@/lib/bookmarkRestore";
 import { resourceFactsSummary } from "@shared/seo-content-templates";
 import {
   RESOURCE_FORMAT_LABELS,
@@ -99,7 +100,7 @@ export default function ResourceDetail() {
 
   // BUG-021 (run25): /api/bookmarks items carry the user's saved notes.
   const { data: bookmarks } = useQuery<
-    (Resource & { notes?: string | null; collectionIds?: number[] })[]
+    (Resource & RemovedBookmark)[]
   >({
     queryKey: ['/api/bookmarks'],
     enabled: isAuthenticated
@@ -181,6 +182,7 @@ export default function ResourceDetail() {
   const originalCollectionIdsRef = useRef<number[]>([]);
   const desiredCollectionIdsRef = useRef<number[]>([]);
   const saveModeRef = useRef<"add" | "edit">("add");
+  const removedBookmarkRef = useRef<RemovedBookmark | undefined>(undefined);
   const { data: collections = [], isLoading: collectionsLoading } =
     useQuery<BookmarkCollection[]>({
       queryKey: ["/api/collections?includeArchived=true"],
@@ -228,6 +230,9 @@ export default function ResourceDetail() {
     resourceId: id || '',
     isActive: isBookmarked,
     onOptimistic: (next) => {
+      // Snapshot before the flip drops the row from the cache, so Undo can
+      // put back its collections and queue state, not just the bookmark.
+      if (!next) removedBookmarkRef.current = bookmarkedEntry;
       // Guests: saved state re-derives from the guest store — don't seed the
       // disabled authed list cache with guest flips.
       if (isAuthenticated) flipCachedList('/api/bookmarks', next);
@@ -236,6 +241,7 @@ export default function ResourceDetail() {
       if (vars.remove) {
         // Run17 BUG-013: removal is instant — offer a one-click Undo instead
         // of a confirm dialog.
+        const removed = removedBookmarkRef.current;
         showToast({
           title: "Removed from bookmarks",
           description: "Resource removed from your bookmarks",
@@ -243,8 +249,24 @@ export default function ResourceDetail() {
             <ToastAction
               altText="Undo bookmark removal"
               onClick={async () => {
-                await apiRequest(`/api/bookmarks/${id}`, { method: 'POST' });
-                queryClient.invalidateQueries({ queryKey: ['/api/bookmarks'] });
+                try {
+                  const { partial } = await restoreRemovedBookmark(id || '', removed);
+                  showToast(
+                    partial
+                      ? {
+                          title: "Bookmark restored",
+                          description: "Some collections or queue settings couldn't be restored.",
+                          variant: "destructive",
+                        }
+                      : { description: "Bookmark restored", duration: 2000 },
+                  );
+                } catch {
+                  toast({
+                    title: "Error",
+                    description: "Couldn't restore the bookmark. Please try again.",
+                    variant: "destructive",
+                  });
+                }
               }}
               data-testid="button-undo-bookmark-removal"
             >
@@ -462,10 +484,20 @@ export default function ResourceDetail() {
 
   // Run16 BUG-020: the Visit Resource CTAs are real anchors now (Button
   // asChild), so navigation is native and can never silently no-op;
-  // middle-click/cmd-click also work. The click handler only fires the toast.
+  // middle-click/cmd-click also work. The click handler records the visit
+  // and fires the toast.
   const handleVisitResource = () => {
     if (resource) {
       trackResourceClick(resource.title, resource.url, resource.category ?? "uncategorized");
+      // The analytics event above never reaches the user's interaction
+      // history; record the visit there like the page view.
+      if (user?.id) {
+        trackInteraction.mutate({
+          resourceId: resource.id.toString(),
+          interactionType: "click",
+          metadata: { source: "visit" },
+        });
+      }
     }
     toast({
       title: "Opening resource",
@@ -557,7 +589,9 @@ export default function ResourceDetail() {
         />
         <Card className="w-full max-w-lg" data-testid="resource-not-found">
           <CardHeader>
-            <CardTitle>Resource Not Found</CardTitle>
+            <h1 className="text-2xl font-semibold leading-none tracking-tight">
+              Resource Not Found
+            </h1>
             <CardDescription>
               We couldn't find the resource requested as{" "}
               <span className="font-medium text-foreground break-all">
@@ -592,8 +626,8 @@ export default function ResourceDetail() {
 
       <div className="resource-detail-navigation">
         {/* BUG-011 (run13): "Back" now behaves like a real back button —
-            history.back() when there is history, home as the fallback for
-            direct/deep-linked visits. */}
+            history.back() when there is history; direct/deep-linked visits
+            go up to the resource's category (home if it has none). */}
         <Button
           variant="ghost"
           size="sm"
@@ -607,7 +641,7 @@ export default function ResourceDetail() {
             if (hasInAppHistory() && window.history.length > 1) {
               window.history.back();
             } else {
-              setLocation("/");
+              setLocation(taxonomySlugs.category ? `/category/${taxonomySlugs.category}` : "/");
             }
           }}
         >
@@ -645,7 +679,10 @@ export default function ResourceDetail() {
               </span>
             </span>
           )}
-          {resource.resolvedKind && (
+          {/* "other" with no stored kind is the resolver's nothing-matched
+              default, not a classification — the details panel already says
+              "Not yet classified", so don't contradict it with a chip. */}
+          {resource.resolvedKind && !(resource.resolvedKind === "other" && !resource.kind) && (
             <span className="resource-detail-chip-wrap">
               <span className="chip" data-kind-source="resolvedKind" data-testid="badge-kind">
                 <span className="resource-detail-chip-label">
@@ -688,7 +725,7 @@ export default function ResourceDetail() {
       </div>
 
       <section className="resource-detail-description">
-        <h2>DESCRIPTION</h2>
+        <h2 className="eyebrow">DESCRIPTION</h2>
         <p data-testid="text-description">
           {resource.description || 'No description available for this resource.'}
         </p>
@@ -839,8 +876,8 @@ export default function ResourceDetail() {
             
             <CardContent className="resource-detail-sections">
               <div data-seo-section="resource-details">
-                <h2 className="text-lg font-semibold mb-3 flex items-center gap-2">
-                  <FolderTree className="h-4 w-4 text-primary" />
+                <h2 className="eyebrow text-lg font-semibold mb-3 flex items-center gap-2">
+                  <FolderTree className="h-4 w-4 text-[color:var(--text-3)]" />
                   Resource details
                 </h2>
                 <dl className="grid gap-3 text-sm sm:grid-cols-[9rem_minmax(0,1fr)]">
@@ -934,8 +971,8 @@ export default function ResourceDetail() {
               <Separator />
 
               <div>
-                <h2 className="text-lg font-semibold mb-2 flex items-center gap-2">
-                  <Link2 className="h-4 w-4 text-primary" />
+                <h2 className="eyebrow text-lg font-semibold mb-2 flex items-center gap-2">
+                  <Link2 className="h-4 w-4 text-[color:var(--text-3)]" />
                   Canonical URL
                 </h2>
                 <a 
@@ -943,7 +980,7 @@ export default function ResourceDetail() {
                   target="_blank"
                   rel="noopener noreferrer"
                   onClick={handleVisitResource}
-                  className="text-primary hover:underline break-all flex items-center gap-2 text-sm md:text-base min-h-[32px]"
+                  className="text-foreground underline underline-offset-4 hover:opacity-80 break-all flex items-center gap-2 text-sm md:text-base min-h-[32px]"
                   data-testid="link-url"
                 >
                   {resource.url} ↗
@@ -952,7 +989,7 @@ export default function ResourceDetail() {
 
               {(!tags || tags.length === 0) && (
                 <div data-seo-section="resource-tags">
-                  <h2>Tags</h2>
+                  <h2 className="eyebrow">Tags</h2>
                   <div />
                 </div>
               )}
@@ -961,8 +998,8 @@ export default function ResourceDetail() {
                 <>
                   <Separator />
                   <div data-seo-section="resource-tags">
-                    <h2 className="text-lg font-semibold mb-3 flex items-center gap-2">
-                      <Tag className="h-4 w-4 text-primary" />
+                    <h2 className="eyebrow text-lg font-semibold mb-3 flex items-center gap-2">
+                      <Tag className="h-4 w-4 text-[color:var(--text-3)]" />
                       Tags
                     </h2>
                     <div className="flex flex-wrap gap-2">
@@ -970,7 +1007,7 @@ export default function ResourceDetail() {
                         <span className="resource-detail-chip-wrap" key={index}>
                           <Link href={tagLandingPath(tag)}>
                             <span
-                              className="chip accent"
+                              className="chip mono"
                               data-testid={`tag-link-${index}`}
                             >
                               <span className="resource-detail-chip-label">#{tag}</span>
@@ -1042,7 +1079,7 @@ export default function ResourceDetail() {
               {/* F018: a real heading (CardTitle renders a div) so the section
                   shows up in the document outline / screen-reader rotor. */}
               <h2 className="text-lg font-semibold leading-none tracking-tight flex items-center gap-2">
-                <FolderTree className="h-4 w-4 text-primary" />
+                <FolderTree className="h-4 w-4 text-[color:var(--text-3)]" />
                 Related Resources
               </h2>
               <CardDescription>
@@ -1062,7 +1099,7 @@ export default function ResourceDetail() {
                   <a
                     key={related.id}
                     href={`/resource/${related.id}`}
-                    className="block p-3 border border-border hover:bg-accent hover:text-accent-foreground focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none cursor-pointer transition-colors group min-h-[44px]"
+                    className="resource-detail-related-item block p-3 border border-border hover:bg-accent hover:text-accent-foreground focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none cursor-pointer transition-colors group min-h-[44px]"
                     onClick={(e) => handleRelatedResourceClick(e, related)}
                     data-testid={`related-resource-${related.id}`}
                   >
@@ -1090,7 +1127,7 @@ export default function ResourceDetail() {
                         <div className="text-xs text-muted-foreground">Why recommended:</div>
                         <div className="flex flex-wrap gap-1">
                           {related.reasons.slice(0, 2).map((reason, index) => (
-                            <span key={index} className="text-xs bg-muted text-muted-foreground px-2 py-0.5">
+                            <span key={index} className="resource-detail-related-reason text-xs bg-muted text-muted-foreground px-2 py-0.5">
                               {reason}
                             </span>
                           ))}

@@ -36,6 +36,9 @@ import {
 import { db } from "../db";
 import { eq, and, or, sql, asc } from "drizzle-orm";
 import { invalidatePublicCache } from "../cache/publicCache";
+import { ConflictError } from "../middleware/errors";
+
+const plural = (n: number, one: string, many: string) => `${n} ${n === 1 ? one : many}`;
 
 /**
  * Repository class for category hierarchy database operations
@@ -124,7 +127,7 @@ export class CategoryRepository {
   /**
    * Delete a category
    * @param id - Category ID to delete
-   * @throws Error if category has resources or subcategories
+   * @throws ConflictError if category has resources or subcategories
    */
   async deleteCategory(id: number): Promise<void> {
     // Check if category has any resources
@@ -135,13 +138,15 @@ export class CategoryRepository {
 
     const resourceCount = await this.getCategoryResourceCount(category.name);
     if (resourceCount > 0) {
-      throw new Error(`Cannot delete category "${category.name}" because it has ${resourceCount} resources`);
+      throw new ConflictError(`Cannot delete category "${category.name}" because it has ${plural(resourceCount, "resource", "resources")}.`);
     }
 
     // Check if category has any subcategories
     const subcategoryList = await this.listSubcategories(id);
     if (subcategoryList.length > 0) {
-      throw new Error(`Cannot delete category "${category.name}" because it has ${subcategoryList.length} subcategories`);
+      throw new ConflictError(
+        `Cannot delete category "${category.name}" because it still has ${plural(subcategoryList.length, "subcategory", "subcategories")}. Delete or move ${subcategoryList.length === 1 ? "it" : "them"} first.`,
+      );
     }
 
     await db.delete(categories).where(eq(categories.id, id));
@@ -178,6 +183,23 @@ export class CategoryRepository {
     const counts: Record<string, number> = {};
     for (const row of rows) {
       if (row.category) counts[row.category] = row.count;
+    }
+    return counts;
+  }
+
+  /**
+   * Get the number of subcategories under every category in one query.
+   * @returns Map of category ID -> subcategory count
+   */
+  async getSubcategoryCountsByCategory(): Promise<Record<number, number>> {
+    const rows = await db
+      .select({ categoryId: subcategories.categoryId, count: sql<number>`count(*)::int` })
+      .from(subcategories)
+      .groupBy(subcategories.categoryId);
+
+    const counts: Record<number, number> = {};
+    for (const row of rows) {
+      if (row.categoryId != null) counts[row.categoryId] = row.count;
     }
     return counts;
   }
@@ -341,13 +363,15 @@ export class CategoryRepository {
 
     const resourceCount = await this.getSubcategoryResourceCount(subcategory.name);
     if (resourceCount > 0) {
-      throw new Error(`Cannot delete subcategory "${subcategory.name}" because it has ${resourceCount} resources`);
+      throw new ConflictError(`Cannot delete subcategory "${subcategory.name}" because it has ${plural(resourceCount, "resource", "resources")}.`);
     }
 
     // Check if subcategory has any sub-subcategories
     const subSubcategoryList = await this.listSubSubcategories(id);
     if (subSubcategoryList.length > 0) {
-      throw new Error(`Cannot delete subcategory "${subcategory.name}" because it has ${subSubcategoryList.length} sub-subcategories`);
+      throw new ConflictError(
+        `Cannot delete subcategory "${subcategory.name}" because it still has ${plural(subSubcategoryList.length, "sub-subcategory", "sub-subcategories")}. Delete or move ${subSubcategoryList.length === 1 ? "it" : "them"} first.`,
+      );
     }
 
     await db.transaction(async (tx) => {
@@ -373,6 +397,23 @@ export class CategoryRepository {
       .from(resources)
       .where(eq(resources.subcategory, subcategoryName));
     return result?.count ?? 0;
+  }
+
+  /**
+   * Get the number of sub-subcategories under every subcategory in one query.
+   * @returns Map of subcategory ID -> sub-subcategory count
+   */
+  async getSubSubcategoryCountsBySubcategory(): Promise<Record<number, number>> {
+    const rows = await db
+      .select({ subcategoryId: subSubcategories.subcategoryId, count: sql<number>`count(*)::int` })
+      .from(subSubcategories)
+      .groupBy(subSubcategories.subcategoryId);
+
+    const counts: Record<number, number> = {};
+    for (const row of rows) {
+      if (row.subcategoryId != null) counts[row.subcategoryId] = row.count;
+    }
+    return counts;
   }
 
   // =========================================================================
@@ -536,7 +577,7 @@ export class CategoryRepository {
 
     const resourceCount = await this.getSubSubcategoryResourceCount(subSubcategory.name);
     if (resourceCount > 0) {
-      throw new Error(`Cannot delete sub-subcategory "${subSubcategory.name}" because it has ${resourceCount} resources`);
+      throw new ConflictError(`Cannot delete sub-subcategory "${subSubcategory.name}" because it has ${plural(resourceCount, "resource", "resources")}.`);
     }
 
     await db.transaction(async (tx) => {

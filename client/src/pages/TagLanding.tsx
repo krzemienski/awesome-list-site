@@ -1,4 +1,6 @@
-import { keepPreviousData, useQuery } from "@tanstack/react-query";
+import { useEffect, useState } from "react";
+import { useQuery } from "@tanstack/react-query";
+import { handoffFocusOnUnmount } from "@/hooks/focus-handoff";
 import "@/styles/pages/discovery.css";
 import { ArrowLeft } from "lucide-react";
 import { Link, Redirect, useLocation, useParams, useSearch } from "wouter";
@@ -43,6 +45,11 @@ function resourceNoun(count: number): string {
   return count === 1 ? "resource" : "resources";
 }
 
+function listingTag(queryKeyUrl: unknown): string | null {
+  if (typeof queryKeyUrl !== "string") return null;
+  return new URLSearchParams(queryKeyUrl.split("?")[1] ?? "").get("tags");
+}
+
 function resourceTags(resource: any): string[] {
   const tags = resource?.tags ?? resource?.metadata?.tags;
   return Array.isArray(tags) ? tags.filter((tag): tag is string => typeof tag === "string") : [];
@@ -53,7 +60,13 @@ export default function TagLanding() {
   const { slug: rawSlug = "" } = useParams<{ slug: string }>();
   const slug = normalizeTagPathSegment(rawSlug);
   const parsedPage = parsePageParamStrict(new URLSearchParams(useSearch()).get("page"));
-  const page = parsedPage.page;
+  // C8-V1-04: a page past the end shows the last page plus a notice (as the
+  // taxonomy listings do) instead of a 404. `clamp` remembers the last page
+  // once the first fetch for the out-of-range page reveals the total.
+  const [clamp, setClamp] = useState<{ requested: string; slug: string; page: number } | null>(null);
+  const requestedKey = String(parsedPage.page);
+  const activeClamp = clamp && clamp.slug === slug && clamp.requested === requestedKey ? clamp : null;
+  const page = activeClamp ? activeClamp.page : parsedPage.page;
   const offset = (page - 1) * PAGE_SIZE;
   const url = `/api/resources?tags=${encodeURIComponent(slug)}&limit=${PAGE_SIZE}&offset=${offset}&facets=true`;
   const listing = useQuery<TagListingResponse>({
@@ -70,8 +83,19 @@ export default function TagLanding() {
     },
     enabled: Boolean(slug),
     staleTime: 60_000,
-    placeholderData: keepPreviousData,
+    // Hold the current page only while paging within this tag; another tag's
+    // cards and total must never render under the new tag's heading.
+    placeholderData: (previous, previousQuery) =>
+      previousQuery && listingTag(previousQuery.queryKey[0]) === slug ? previous : undefined,
   });
+
+  const listedTotal = listing.data?.total;
+  useEffect(() => {
+    if (listedTotal && !activeClamp && !listing.isPlaceholderData) {
+      const lastPage = Math.max(1, Math.ceil(listedTotal / PAGE_SIZE));
+      if (parsedPage.page > lastPage) setClamp({ requested: requestedKey, slug, page: lastPage });
+    }
+  }, [activeClamp, listedTotal, listing.isPlaceholderData, parsedPage.page, requestedKey, slug]);
 
   const canonicalPath = tagLandingPath(slug);
   if (slug && window.location.pathname !== canonicalPath) {
@@ -79,7 +103,9 @@ export default function TagLanding() {
   }
 
   if (!slug) return <NotFound />;
-  if (listing.isLoading && !listing.data) {
+  // isPending, not isLoading: offline the fetch is paused (isLoading false),
+  // which fell through to the no-data 404 below.
+  if (listing.isPending || (activeClamp && listing.isPlaceholderData)) {
     return (
       <div className="discovery-page space-y-6" aria-busy="true">
         <PageHeaderSkeleton />
@@ -90,13 +116,26 @@ export default function TagLanding() {
     );
   }
   if (listing.error) {
-    return <div className="discovery-page discovery-state" role="alert"><h1 className="display-h">Error Loading Tag</h1><p>Please try again.</p><Button variant="outline" onClick={() => void listing.refetch()}>Retry</Button></div>;
+    return (
+      <div className="discovery-page discovery-state" role="alert">
+        <h1 className="display-h">Error Loading Tag</h1>
+        <p>Please try again.</p>
+        <div className="flex flex-wrap justify-center gap-2">
+          <Button variant="outline" className="min-h-10" onClick={(e) => { handoffFocusOnUnmount(e.currentTarget); void listing.refetch(); }}>Retry</Button>
+          <Button asChild variant="outline" className="min-h-10">
+            <Link href="/categories" data-testid="link-tag-error-categories">Browse categories</Link>
+          </Button>
+          <Button asChild className="min-h-10">
+            <Link href="/" data-testid="link-tag-error-home"><ArrowLeft className="h-4 w-4" />Back to Home</Link>
+          </Button>
+        </div>
+      </div>
+    );
   }
 
   const data = listing.data;
   if (!data || data.total === 0) return <NotFound />;
   const totalPages = Math.max(1, Math.ceil(data.total / PAGE_SIZE));
-  if (page > totalPages) return <NotFound />;
 
   const name = tagDisplayNameBranded(slug);
   const titleCore = tagTitleCoreDeduped(name);
@@ -149,9 +188,9 @@ export default function TagLanding() {
             at this size) keeps the measure readable on wide desktop screens. */}
         <p className="mt-1 max-w-prose text-sm leading-relaxed text-muted-foreground">{intro}</p>
       </section>
-      {pageNoticeFor(parsedPage) && (
+      {pageNoticeFor(parsedPage, totalPages) && (
         <div role="status" data-testid="notice-page-adjusted" className="rounded border p-3 text-sm">
-          {pageNoticeFor(parsedPage)}
+          {pageNoticeFor(parsedPage, totalPages)}
         </div>
       )}
       <p className="text-sm text-muted-foreground" data-testid="text-results-count" data-total={data.total}>

@@ -1,4 +1,5 @@
-import { useState } from "react";
+import { useRef, useState } from "react";
+import { handoffFocusOnUnmount } from "@/hooks/focus-handoff";
 import { useQuery, useMutation } from "@tanstack/react-query";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -25,10 +26,17 @@ import {
   AlertDialogFooter,
   AlertDialogHeader,
   AlertDialogTitle,
+  AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { apiRequest, queryClient } from "@/lib/queryClient";
+import { getInitials } from "@/lib/utils";
+import { usePopstateParams, writeFilterParams } from "@/lib/url-filter-state";
+import {
+  queryUnavailableReason,
+  type QueryUnavailableReason,
+} from "@/lib/query-availability";
 import { hasVisibleChars } from "@shared/validation";
 import { useToast } from "@/hooks/use-toast";
 import {
@@ -43,6 +51,7 @@ import {
   LogOut,
   Mail,
   Calendar,
+  ArrowRight,
   ExternalLink,
   Star,
   FileText,
@@ -117,15 +126,54 @@ interface UserJourney {
   };
 }
 
+const PROFILE_TABS = ["overview", "favorites", "bookmarks", "submissions", "security"];
+
+// Stands in for a list or summary that couldn't be fetched, so the page never
+// claims "No favorites yet" or zero counts it hasn't actually loaded.
+function UnavailableNotice({
+  reason,
+  subject,
+  onRetry,
+}: {
+  reason: QueryUnavailableReason;
+  subject: string;
+  onRetry: () => void;
+}) {
+  return (
+    <Alert variant={reason === "error" ? "destructive" : "default"} data-testid={`profile-${reason}`}>
+      <AlertTitle>
+        {reason === "offline" ? "You’re offline" : `Couldn’t load your ${subject}`}
+      </AlertTitle>
+      <AlertDescription className="mt-2 space-y-2">
+        {reason === "offline" && (
+          <p>Your {subject} will load when your connection is back.</p>
+        )}
+        <Button variant="outline" size="sm" onClick={(e) => { handoffFocusOnUnmount(e.currentTarget); onRetry(); }}>
+          Try again
+        </Button>
+      </AlertDescription>
+    </Alert>
+  );
+}
+
+function readProfileTab(params: URLSearchParams): string {
+  const tab = params.get("tab");
+  return tab && PROFILE_TABS.includes(tab) ? tab : "overview";
+}
+
 export default function Profile({ user }: ProfileProps) {
   // Run17 BUG-055: /favorites redirects here with ?tab=favorites — honor a
   // valid ?tab= on first render so the link lands on the right collection.
-  const [activeTab, setActiveTab] = useState(() => {
-    const t = new URLSearchParams(window.location.search).get("tab");
-    return t && ["overview", "favorites", "bookmarks", "submissions", "security"].includes(t)
-      ? t
-      : "overview";
-  });
+  const [activeTab, setActiveTab] = useState(() =>
+    readProfileTab(new URLSearchParams(window.location.search)),
+  );
+  // Tab clicks write ?tab= (push) so reload/share restore the tab and Back
+  // steps through tab changes, matching the shared URL-state convention.
+  const handleTabChange = (next: string) => {
+    setActiveTab(next);
+    writeFilterParams({ tab: next === "overview" ? null : next });
+  };
+  usePopstateParams((params) => setActiveTab(readProfileTab(params)));
   const { logout, logoutAll, logoutError, isLoggingOut } = useAuth();
   const [, setLocation] = useLocation();
   const { toast } = useToast();
@@ -137,6 +185,8 @@ export default function Profile({ user }: ProfileProps) {
   // Run17 BUG-011: inline validation message (empty save is rejected, not
   // silently fallen back to the email local-part).
   const [nameError, setNameError] = useState<string | null>(null);
+  // The dialog has no DialogTrigger, so Radix can't return focus on close.
+  const editNameButtonRef = useRef<HTMLButtonElement>(null);
 
   const openNameDialog = () => {
     // Best-effort prefill from the combined display name.
@@ -242,31 +292,26 @@ export default function Profile({ user }: ProfileProps) {
   });
 
   // Fetch favorites
-  const { data: favorites, isLoading: favoritesLoading } = useQuery<Favorite[]>({
+  const favoritesQuery = useQuery<Favorite[]>({
     queryKey: ['/api/favorites'],
     enabled: !!user
   });
 
   // Fetch bookmarks
-  const { data: bookmarks, isLoading: bookmarksLoading } = useQuery<BookmarkItem[]>({
+  const bookmarksQuery = useQuery<BookmarkItem[]>({
     queryKey: ['/api/bookmarks'],
     enabled: !!user
   });
 
   // Fetch learning progress
-  const { data: progress, isLoading: progressLoading } = useQuery<LearningProgress>({
+  const progressQuery = useQuery<LearningProgress>({
     queryKey: ['/api/user/progress'],
     enabled: !!user
   });
 
   // Compact contribution summary. The full filtered timeline lives at
   // /contributions so profile no longer maintains two divergent lists.
-  const {
-    data: contributions,
-    isLoading: contributionsLoading,
-    isError: contributionsError,
-    refetch: refetchContributions,
-  } = useQuery<ContributorSummaryResponse>({
+  const contributionsQuery = useQuery<ContributorSummaryResponse>({
     queryKey: ['/api/user/contributions?limit=1'],
     enabled: !!user
   });
@@ -277,27 +322,31 @@ export default function Profile({ user }: ProfileProps) {
     enabled: !!user
   });
 
-  const getInitials = (name?: string) => {
-    if (!name) return "U";
-    return name.split(" ").map(n => n[0]).join("").toUpperCase().slice(0, 2);
-  };
+  const { data: favorites, isLoading: favoritesLoading } = favoritesQuery;
+  const { data: bookmarks, isLoading: bookmarksLoading } = bookmarksQuery;
+  const { data: contributions, isLoading: contributionsLoading } = contributionsQuery;
+  const { data: progress, isLoading: progressLoading } = progressQuery;
+  const progressUnavailable = queryUnavailableReason(progressQuery);
+  const favoritesUnavailable = queryUnavailableReason(favoritesQuery);
+  const bookmarksUnavailable = queryUnavailableReason(bookmarksQuery);
+  const contributionsUnavailable = queryUnavailableReason(contributionsQuery);
 
   const stats = [
     {
       label: "Favorites",
-      value: favorites?.length || 0,
+      value: favorites ? favorites.length : "—",
       icon: Heart,
       color: "text-primary"
     },
     {
       label: "Bookmarks",
-      value: bookmarks?.length || 0,
+      value: bookmarks ? bookmarks.length : "—",
       icon: Bookmark,
       color: "text-primary"
     },
     {
       label: "Learning Streak",
-      value: `${progress?.streakDays || 0}d`,
+      value: progress ? `${progress.streakDays || 0}d` : "—",
       icon: Trophy,
       color: "account-stat--secondary",
       // BUG-052 (run14): streak counts consecutive days signed in, not
@@ -308,7 +357,7 @@ export default function Profile({ user }: ProfileProps) {
       // Run15 BUG-017: the server counts completed learning journeys here,
       // not viewed resources — label it honestly.
       label: "Journeys Completed",
-      value: progress?.completedResources || 0,
+      value: progress ? progress.completedResources || 0 : "—",
       icon: Target,
       color: "account-stat--accent",
       hint: "Learning journeys finished",
@@ -344,14 +393,16 @@ export default function Profile({ user }: ProfileProps) {
           <AvatarFallback
             className="account-avatar-fallback text-xl font-display font-medium tracking-tight"
           >
-            {getInitials(user.name)}
+            {getInitials(user.name, user.email)}
           </AvatarFallback>
         </Avatar>
 
         {/* R4-040: min-w-0 lets this column shrink (so the long name truncates)
             instead of shoving the Settings/Logout buttons off-viewport in the
-            768–812px tablet band. */}
-        <div className="flex-1 min-w-0 text-center sm:text-left">
+            768–812px tablet band. On phones the parent is a centered column,
+            which sizes children to max-content; w-full bounds it to the
+            viewport so a long name truncates there too. */}
+        <div className="flex-1 min-w-0 w-full sm:w-auto text-center sm:text-left">
           <div className="eyebrow mb-2" aria-hidden>// Profile</div>
           <h1 className="display-h text-3xl sm:text-4xl mb-2 flex items-center gap-2 justify-center sm:justify-start min-w-0">
             {/* Run17 BUG-012: truncate — CSS defense for names at the 50-char cap */}
@@ -362,6 +413,7 @@ export default function Profile({ user }: ProfileProps) {
               className="h-8 w-8 shrink-0"
               aria-label="Edit display name"
               data-testid="button-edit-name"
+              ref={editNameButtonRef}
               onClick={openNameDialog}
             >
               <Pencil className="h-4 w-4" />
@@ -410,24 +462,39 @@ export default function Profile({ user }: ProfileProps) {
             <LogOut className="h-4 w-4 mr-2" />
             Sign out
           </Button>
-          <Button
-            variant="destructive"
-            size="sm"
-            disabled={isLoggingOut}
-            onClick={() => {
-              if (
-                window.confirm(
-                  "Sign out this account on every device? You will need to sign in again.",
-                )
-              ) {
-                logoutAll();
-              }
-            }}
-            data-testid="button-logout-all"
-          >
-            <LogOut className="h-4 w-4 mr-2" />
-            Sign out all devices
-          </Button>
+          <AlertDialog>
+            <AlertDialogTrigger asChild>
+              <Button
+                variant="destructive"
+                size="sm"
+                disabled={isLoggingOut}
+                data-testid="button-logout-all"
+              >
+                <LogOut className="h-4 w-4 mr-2" />
+                Sign out all devices
+              </Button>
+            </AlertDialogTrigger>
+            <AlertDialogContent data-testid="dialog-logout-all-confirm">
+              <AlertDialogHeader>
+                <AlertDialogTitle>Sign out on every device?</AlertDialogTitle>
+                <AlertDialogDescription>
+                  This ends every session for this account, including this one.
+                  You will need to sign in again.
+                </AlertDialogDescription>
+              </AlertDialogHeader>
+              <AlertDialogFooter>
+                <AlertDialogCancel data-testid="button-logout-all-cancel">
+                  Cancel
+                </AlertDialogCancel>
+                <AlertDialogAction
+                  onClick={() => logoutAll()}
+                  data-testid="button-logout-all-confirm"
+                >
+                  Sign out all devices
+                </AlertDialogAction>
+              </AlertDialogFooter>
+            </AlertDialogContent>
+          </AlertDialog>
         </div>
         {logoutError ? (
           <Alert
@@ -448,7 +515,7 @@ export default function Profile({ user }: ProfileProps) {
           // NB-041 (run18): a "0d" streak reads as broken for new users — show
           // onboarding copy instead of the empty number.
           const isEmptyStreak =
-            stat.label === "Learning Streak" && !(progress?.streakDays);
+            stat.label === "Learning Streak" && !!progress && !progress.streakDays;
           return (
             <Card key={stat.label}>
               <CardContent className="p-4 flex items-center gap-3">
@@ -481,10 +548,10 @@ export default function Profile({ user }: ProfileProps) {
       </div>
 
       {/* Tabs */}
-      <Tabs value={activeTab} onValueChange={setActiveTab}>
+      <Tabs value={activeTab} onValueChange={handleTabChange}>
         {/* Run17 BUG-014: fixed 5-col grid garbled/clipped labels at ≤768px —
             wrap on small screens, grid only from lg up. */}
-        <TabsList className="w-full h-auto p-1 flex flex-wrap justify-start gap-1 lg:grid lg:grid-cols-5">
+        <TabsList className="w-full flex flex-wrap justify-start lg:grid lg:grid-cols-5">
           <TabsTrigger value="overview">Overview</TabsTrigger>
           <TabsTrigger value="favorites">Favorites</TabsTrigger>
           <TabsTrigger value="bookmarks">Bookmarks</TabsTrigger>
@@ -511,6 +578,12 @@ export default function Profile({ user }: ProfileProps) {
                   <Skeleton className="h-4 w-3/4" />
                   <Skeleton className="h-4 w-1/2" />
                 </div>
+              ) : progressUnavailable ? (
+                <UnavailableNotice
+                  reason={progressUnavailable}
+                  subject="learning progress"
+                  onRetry={() => void progressQuery.refetch()}
+                />
               ) : (
                 <div className="space-y-4">
                   {/* Progress Bar — Run15 BUG-017: the server metric counts
@@ -589,13 +662,24 @@ export default function Profile({ user }: ProfileProps) {
               </CardDescription>
             </CardHeader>
             <CardContent>
-              <ScrollArea className="h-[400px] pr-4">
+              <ScrollArea
+                className="h-[400px] pr-4"
+                // C3-V4-01: NB-018 — without this the table box sizes to the
+                // row's content and clips the trailing actions at 390px.
+                viewportClassName="[&>div]:!block [&>div]:!w-full [&>div]:!min-w-0"
+              >
                 {favoritesLoading ? (
                   <div className="space-y-3" aria-busy={true} aria-live="polite">
                     {Array(3).fill(0).map((_, i) => (
                       <Skeleton key={i} className="h-20 w-full" />
                     ))}
                   </div>
+                ) : favoritesUnavailable ? (
+                  <UnavailableNotice
+                    reason={favoritesUnavailable}
+                    subject="favorites"
+                    onRetry={() => void favoritesQuery.refetch()}
+                  />
                 ) : favorites && favorites.length > 0 ? (
                   <div className="space-y-3">
                     {favorites.map((favorite) => (
@@ -603,8 +687,11 @@ export default function Profile({ user }: ProfileProps) {
                         key={favorite.id}
                         className="account-list-item p-3"
                       >
-                        <div className="flex items-start justify-between">
-                          <div className="flex-1 min-w-0">
+                        {/* C5-V4-01: below sm the category/date row spans the
+                            full width under the actions; in the narrow title
+                            column the nowrap chip ran under Remove. */}
+                        <div className="grid grid-cols-[minmax(0,1fr)_auto] items-start gap-x-2">
+                          <div className="min-w-0">
                             {/* Run15 BUG-006: title links to the in-app resource page. */}
                             <h4 className="font-medium truncate">
                               <Link
@@ -615,31 +702,37 @@ export default function Profile({ user }: ProfileProps) {
                                 {favorite.title}
                               </Link>
                             </h4>
-                            <div className="flex items-center gap-2 mt-1">
-                              <Badge variant="secondary" className="text-xs">
-                                {favorite.category}
-                              </Badge>
-                              <span className="text-xs text-muted-foreground">
-                                Added {formatDistanceToNow(new Date(favorite.favoritedAt), { addSuffix: true })}
-                              </span>
-                            </div>
                           </div>
-                          <div className="flex items-center gap-1">
+                          <div className="flex items-center gap-1 sm:row-span-2">
                             <FavoriteButton
                               resourceId={String(favorite.id)}
                               isFavorited={true}
                               size="sm"
                               showCount={false}
+                              resourceTitle={favorite.title}
                             />
                             <Button
                               variant="ghost"
                               size="sm"
                               asChild
                             >
-                              <a href={favorite.url} target="_blank" rel="noopener noreferrer">
-                                <ExternalLink className="h-4 w-4" />
+                              <a
+                                href={favorite.url}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                aria-label={`Open ${favorite.title} in a new tab`}
+                              >
+                                <ExternalLink className="h-4 w-4" aria-hidden="true" />
                               </a>
                             </Button>
+                          </div>
+                          <div className="col-span-2 mt-1 flex flex-wrap items-center gap-x-2 gap-y-1 sm:col-span-1">
+                            <Badge variant="secondary" className="max-w-full whitespace-normal text-xs">
+                              {favorite.category}
+                            </Badge>
+                            <span className="text-xs text-muted-foreground">
+                              Added {formatDistanceToNow(new Date(favorite.favoritedAt), { addSuffix: true })}
+                            </span>
                           </div>
                         </div>
                       </div>
@@ -670,13 +763,24 @@ export default function Profile({ user }: ProfileProps) {
               </CardDescription>
             </CardHeader>
             <CardContent>
-              <ScrollArea className="h-[400px] pr-4">
+              <ScrollArea
+                className="h-[400px] pr-4"
+                // C3-V4-01: NB-018 — without this the table box sizes to the
+                // row's content and clips the trailing actions at 390px.
+                viewportClassName="[&>div]:!block [&>div]:!w-full [&>div]:!min-w-0"
+              >
                 {bookmarksLoading ? (
                   <div className="space-y-3" aria-busy={true} aria-live="polite">
                     {Array(3).fill(0).map((_, i) => (
                       <Skeleton key={i} className="h-20 w-full" />
                     ))}
                   </div>
+                ) : bookmarksUnavailable ? (
+                  <UnavailableNotice
+                    reason={bookmarksUnavailable}
+                    subject="bookmarks"
+                    onRetry={() => void bookmarksQuery.refetch()}
+                  />
                 ) : bookmarks && bookmarks.length > 0 ? (
                   <div className="space-y-3">
                     {bookmarks.map((bookmark) => (
@@ -684,8 +788,9 @@ export default function Profile({ user }: ProfileProps) {
                         key={bookmark.id}
                         className="account-list-item p-3"
                       >
-                        <div className="flex items-start justify-between">
-                          <div className="flex-1 min-w-0">
+                        {/* C5-V4-01: same layout as the Favorites rows above. */}
+                        <div className="grid grid-cols-[minmax(0,1fr)_auto] items-start gap-x-2">
+                          <div className="min-w-0">
                             {/* Run15 BUG-006: title links to the in-app resource page. */}
                             <h4 className="font-medium truncate">
                               <Link
@@ -701,31 +806,37 @@ export default function Profile({ user }: ProfileProps) {
                                 {bookmark.notes}
                               </p>
                             )}
-                            <div className="flex items-center gap-2 mt-2">
-                              <Badge variant="secondary" className="text-xs">
-                                {bookmark.category}
-                              </Badge>
-                              <span className="text-xs text-muted-foreground">
-                                Added {formatDistanceToNow(new Date(bookmark.bookmarkedAt), { addSuffix: true })}
-                              </span>
-                            </div>
                           </div>
-                          <div className="flex items-center gap-1">
+                          <div className="flex items-center gap-1 sm:row-span-2">
                             <BookmarkButton
                               resourceId={String(bookmark.id)}
                               isBookmarked={true}
                               notes={bookmark.notes}
                               size="sm"
+                              resourceTitle={bookmark.title}
                             />
                             <Button
                               variant="ghost"
                               size="sm"
                               asChild
                             >
-                              <a href={bookmark.url} target="_blank" rel="noopener noreferrer">
-                                <ExternalLink className="h-4 w-4" />
+                              <a
+                                href={bookmark.url}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                aria-label={`Open ${bookmark.title} in a new tab`}
+                              >
+                                <ExternalLink className="h-4 w-4" aria-hidden="true" />
                               </a>
                             </Button>
+                          </div>
+                          <div className="col-span-2 mt-2 flex flex-wrap items-center gap-x-2 gap-y-1 sm:col-span-1">
+                            <Badge variant="secondary" className="max-w-full whitespace-normal text-xs">
+                              {bookmark.category}
+                            </Badge>
+                            <span className="text-xs text-muted-foreground">
+                              Added {formatDistanceToNow(new Date(bookmark.bookmarkedAt), { addSuffix: true })}
+                            </span>
                           </div>
                         </div>
                       </div>
@@ -762,15 +873,12 @@ export default function Profile({ user }: ProfileProps) {
                     <Skeleton key={index} className="h-24 w-full" />
                   ))}
                 </div>
-              ) : contributionsError ? (
-                <Alert variant="destructive">
-                  <AlertTitle>Couldn't load your contribution summary</AlertTitle>
-                  <AlertDescription className="mt-2">
-                    <Button variant="outline" size="sm" onClick={() => refetchContributions()}>
-                      Try again
-                    </Button>
-                  </AlertDescription>
-                </Alert>
+              ) : contributionsUnavailable ? (
+                <UnavailableNotice
+                  reason={contributionsUnavailable}
+                  subject="contribution summary"
+                  onRetry={() => void contributionsQuery.refetch()}
+                />
               ) : (
                 <div className="grid gap-3 sm:grid-cols-3">
                   {[
@@ -793,7 +901,7 @@ export default function Profile({ user }: ProfileProps) {
                 <Button asChild data-testid="link-open-contributions">
                   <Link href="/contributions">
                     Open contribution dashboard
-                    <ExternalLink className="ml-2 h-4 w-4" />
+                    <ArrowRight className="ml-2 h-4 w-4" />
                   </Link>
                 </Button>
               </div>
@@ -895,7 +1003,13 @@ export default function Profile({ user }: ProfileProps) {
 
       {/* Run15 BUG-049: display-name edit dialog */}
       <Dialog open={nameDialogOpen} onOpenChange={setNameDialogOpen}>
-        <DialogContent className="sm:max-w-md">
+        <DialogContent
+          className="sm:max-w-md"
+          onCloseAutoFocus={(event) => {
+            event.preventDefault();
+            editNameButtonRef.current?.focus();
+          }}
+        >
           <DialogHeader>
             <DialogTitle>Edit display name</DialogTitle>
             <DialogDescription>
@@ -903,7 +1017,15 @@ export default function Profile({ user }: ProfileProps) {
               last name.
             </DialogDescription>
           </DialogHeader>
-          <div className="space-y-4">
+          {/* C6-V4-02: a form so Enter in a name field saves, with the same
+              validation as the Save button. */}
+          <form
+            className="space-y-4"
+            onSubmit={(event) => {
+              event.preventDefault();
+              handleSaveName();
+            }}
+          >
             <div className="space-y-2">
               <Label htmlFor="edit-first-name">First name</Label>
               <Input
@@ -911,6 +1033,8 @@ export default function Profile({ user }: ProfileProps) {
                 value={editFirstName}
                 maxLength={50}
                 onChange={(e) => setEditFirstName(e.target.value)}
+                aria-invalid={!!nameError}
+                aria-describedby={nameError ? "edit-name-error" : undefined}
                 data-testid="input-first-name"
               />
             </div>
@@ -921,11 +1045,14 @@ export default function Profile({ user }: ProfileProps) {
                 value={editLastName}
                 maxLength={50}
                 onChange={(e) => setEditLastName(e.target.value)}
+                aria-invalid={!!nameError}
+                aria-describedby={nameError ? "edit-name-error" : undefined}
                 data-testid="input-last-name"
               />
             </div>
             {nameError && (
               <p
+                id="edit-name-error"
                 className="text-sm text-destructive"
                 role="alert"
                 data-testid="text-name-error"
@@ -933,9 +1060,9 @@ export default function Profile({ user }: ProfileProps) {
                 {nameError}
               </p>
             )}
-          </div>
           <DialogFooter>
             <Button
+              type="button"
               variant="outline"
               onClick={() => setNameDialogOpen(false)}
               disabled={updateNameMutation.isPending}
@@ -943,13 +1070,14 @@ export default function Profile({ user }: ProfileProps) {
               Cancel
             </Button>
             <Button
-              onClick={handleSaveName}
+              type="submit"
               disabled={updateNameMutation.isPending}
               data-testid="button-save-name"
             >
               {updateNameMutation.isPending ? "Saving..." : "Save"}
             </Button>
           </DialogFooter>
+          </form>
         </DialogContent>
       </Dialog>
 

@@ -108,6 +108,44 @@ export interface AwesomeListNav {
   categories: AwesomeListNavNode[];
 }
 
+const EXCLUDED_CATEGORY_NAMES = ["Contributing", "License", "External Links", "Anti-features"];
+
+export function isRealCategory(name: string): boolean {
+  return (
+    name !== "Table of contents" &&
+    !name.startsWith("List of") &&
+    !EXCLUDED_CATEGORY_NAMES.includes(name)
+  );
+}
+
+export function navTotalCount(node: AwesomeListNavNode): number {
+  let total = node.resourceCount ?? 0;
+  for (const sub of node.subcategories ?? []) total += navTotalCount(sub);
+  for (const nested of node.subSubcategories ?? []) total += navTotalCount(nested);
+  return total;
+}
+
+// C8-V1-01: the taxonomy the public site shows (Home, About, /categories,
+// sidebar): real categories holding resources, with empty subcategories and
+// sub-subcategories pruned. Counts shown to visitors derive from this tree.
+export function visibleNavCategories(
+  categories: AwesomeListNavNode[] | undefined,
+): AwesomeListNavNode[] {
+  const nonEmpty = (node: AwesomeListNavNode) => navTotalCount(node) > 0;
+  return (categories ?? [])
+    .filter((cat) => isRealCategory(cat.name) && nonEmpty(cat))
+    .map((cat) => ({
+      ...cat,
+      subcategories: (cat.subcategories ?? [])
+        .map((sub) => ({
+          ...sub,
+          subSubcategories: (sub.subSubcategories ?? []).filter(nonEmpty),
+        }))
+        .filter(nonEmpty),
+      subSubcategories: (cat.subSubcategories ?? []).filter(nonEmpty),
+    }));
+}
+
 /**
  * Routes whose CONTENT needs the full corpus (resource listings / client-side
  * fuzzy browse). Everything else renders from the nav tree + page-scoped

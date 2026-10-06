@@ -33,10 +33,14 @@ function HomeLayoutPreferenceControl({
   const isDisabled = disabled || isLoading || isSaving;
 
   return (
+    // C8-VX-02: aria-disabled while saving, not native disabled — disabling
+    // the fieldset dropped the chosen radio's keyboard focus to <body>.
     <fieldset
       {...props}
       className={className}
-      disabled={isDisabled}
+      disabled={disabled || isLoading}
+      aria-disabled={isDisabled}
+      aria-busy={isSaving}
       data-testid="home-layout-preference-control"
     >
       <legend className="text-sm font-semibold">Home layout</legend>
@@ -48,7 +52,7 @@ function HomeLayoutPreferenceControl({
         value={layout}
         onValueChange={(value) => {
           const next = OPTIONS.find((option) => option.value === value)?.value;
-          if (next) setLayout(next);
+          if (next && !isSaving) setLayout(next);
         }}
         className="mt-3 gap-2 sm:grid-cols-2"
         data-testid="home-layout-options"

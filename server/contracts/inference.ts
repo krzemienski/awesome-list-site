@@ -208,6 +208,10 @@ export function inferParamsSchema(
       // User bridge IDs are varchar (including Clerk-linked UUIDs), unlike
       // the integer resource IDs. Keep validation without coercing identity.
       schema = boundedSafeStringSchema;
+    } else if (p.name === "id" && /^\/api\/user\/api-keys\/:id(?:\/|$)/.test(path)) {
+      // API key ids are gen_random_uuid() varchars; an integer schema made
+      // every revoke a 400 and left keys usable after "revoke".
+      schema = boundedSafeStringSchema;
     } else if (isIdParamName(p.name) || digitPattern) {
       schema = boundedIntStringSchema;
     } else if (p.pattern) {
@@ -268,16 +272,14 @@ const boundedCursorString = z
  * repeated keys, e.g. ?tag=a&tag=b, into arrays). Each element must be a
  * bounded, control-char-free string.
  */
-const genericQueryValue = z.union([
-  boundedSafeStringSchema,
-  z.string().max(0), // allow empty-string values (?q=)
-  z.array(
-    z
-      .string()
-      .max(MAX_PARAM_LENGTH, `must be at most ${MAX_PARAM_LENGTH} characters`)
-      .refine((s) => !/[\u0000-\u001F\u007F]/.test(s), "must not contain control characters"),
-  ),
-]);
+const boundedQueryString = z
+  .string()
+  .max(MAX_PARAM_LENGTH, `must be at most ${MAX_PARAM_LENGTH} characters`)
+  .refine((s) => !/[\u0000-\u001F\u007F]/.test(s), "must not contain control characters");
+// One string branch (empty allowed, e.g. ?q=): with two string branches a
+// too-long value failed both and zod reported only "Invalid input", hiding
+// the length message the envelope copies into fieldErrors.
+const genericQueryValue = z.union([boundedQueryString, z.array(boundedQueryString)]);
 
 /**
  * Generic query schema: pagination keys (page/limit/offset/cursor) are

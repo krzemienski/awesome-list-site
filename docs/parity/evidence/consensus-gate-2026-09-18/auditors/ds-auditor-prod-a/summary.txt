@@ -1,0 +1,77 @@
+{
+  "map": {
+    "editorial": {
+      "display": "Fraunces",
+      "body": "Inter",
+      "loaded": true
+    },
+    "terminal": {
+      "display": "IBM Plex Mono",
+      "body": "IBM Plex Mono",
+      "loaded": true
+    },
+    "geist": {
+      "display": "Geist",
+      "body": "Geist",
+      "loaded": true
+    },
+    "brutalist": {
+      "display": "Instrument Serif",
+      "body": "Space Grotesk",
+      "loaded": true
+    },
+    "swiss": {
+      "display": "Manrope",
+      "body": "Manrope",
+      "loaded": true
+    }
+  },
+  "filterHits": 0,
+  "text3": 0,
+  "maxAccent": 0,
+  "allChrome": true,
+  "allRules": true,
+  "allApplied": true,
+  "allFonts": true,
+  "allHashes": true,
+  "displayConsumers": {
+    "404": {
+      "editorial": "Fraunces",
+      "terminal": "IBM Plex Mono",
+      "geist": "Geist",
+      "brutalist": "Instrument Serif",
+      "swiss": "Manrope"
+    },
+    "home": {
+      "editorial": "Fraunces",
+      "terminal": "IBM Plex Mono",
+      "geist": "Geist",
+      "brutalist": "Instrument Serif",
+      "swiss": "Manrope"
+    },
+    "about": {
+      "editorial": "Inter",
+      "terminal": "IBM Plex Mono",
+      "geist": "Geist",
+      "brutalist": "Space Grotesk",
+      "swiss": "Manrope"
+    },
+    "journeys": {
+      "editorial": "Fraunces",
+      "terminal": "IBM Plex Mono",
+      "geist": "Geist",
+      "brutalist": "Instrument Serif",
+      "swiss": "Manrope"
+    },
+    "category": {},
+    "resource": {},
+    "login": {},
+    "theme-settings": {
+      "editorial": "Fraunces",
+      "terminal": "IBM Plex Mono",
+      "geist": "Geist",
+      "brutalist": "Instrument Serif",
+      "swiss": "Manrope"
+    }
+  }
+}

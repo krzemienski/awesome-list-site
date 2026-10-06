@@ -153,6 +153,30 @@ measured failures. Original assets and thresholds remain unchanged.
    required widths, 50 system/accent combinations, first paint, font overrides,
    severe accessibility checks, bundle/performance and supported existing
    gates. Do not represent prior green runs as current-candidate certification.
+**Verification update — 2026-09-17/18** (see
+[COMPLETION-REPORT-2026-09-17.md](COMPLETION-REPORT-2026-09-17.md); the items
+below are left as written for history):
+
+- Item 2/3: Forms and Showcase artifact rows PASS at 375/768 with matching
+  font parity (selected-row diagnostic runs, not a whole-inventory gate pass);
+  determinism 3/3 identical; Category rows still FAIL (5.9677%/6.9788%) for
+  contract-required reasons.
+- Item 4: the taxonomy-title source/gate conflict is resolved in the gate
+  (h1 exclusion mirrored in the skill and the filter), folded disclosures are
+  revealed before sweeping, and the sweep is green (284/284). Kind badges
+  remain visible.
+- Item 5: unit and integration suites ran on a dedicated, provisioned test
+  database (`heliumdb_test_parity_20260918T000947`): 311/315 and 225/226,
+  every failure pre-existing on the base commit. Full lint remains failed
+  (5310 problems, pre-existing).
+- Item 6: authenticated runs used a disposable Clerk admin with net-zero
+  teardown; admin sweep and overlay scenarios re-executed.
+- Item 7: local production-mode boot passed with 0 SSR host errors; theme
+  matrix 50/50, smoke 80/80, axe 108/108 with 0 serious/critical.
+- Item 8: `Host must not be empty` is diagnosed (Clerk host-derived key at SSR
+  module evaluation; fixed in source at `83022704`, published bundle predates
+  it). No publish occurred; production verification remains open.
+
 8. **Publishing remains separate and user-controlled.** No publish occurred.
    Post-publish checks, production configuration and production comparison
    cannot be marked complete from development-only results.

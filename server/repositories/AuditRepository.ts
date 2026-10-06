@@ -36,7 +36,7 @@ import {
   type InsertResourceEdit,
 } from "@shared/schema";
 import { db } from "../db";
-import { decodeHtmlEntities } from "../github/importHygiene";
+import { decodeHtmlEntities, splitTaxonomyPathFields } from "../github/importHygiene";
 import {
   resourceFormatSchema,
   resourceProviderSchema,
@@ -538,7 +538,11 @@ export class AuditRepository {
               SELECT 1
               FROM ${resources} current_resource
               WHERE current_resource.id = ${resourceEdits.resourceId}
-                AND current_resource.updated_at <= ${resourceEdits.originalResourceUpdatedAt}
+                -- The snapshot was written from a JS Date (millisecond
+                -- precision) while updated_at keeps microseconds, so compare
+                -- at the snapshot's precision like the JS supersede checks do.
+                AND date_trunc('milliseconds', current_resource.updated_at)
+                  <= ${resourceEdits.originalResourceUpdatedAt}
             )`,
           ),
         )
@@ -565,14 +569,21 @@ export class AuditRepository {
 
   /**
    * Get all pending resource edit suggestions
-   * @returns Array of pending resource edits, ordered by oldest first
+   * @returns Array of pending resource edits, ordered by oldest first, each
+   *   with the submitter's email so the queue can name the editor (C3-V5A-03)
    */
-  async getPendingResourceEdits(): Promise<ResourceEdit[]> {
-    return await db
-      .select()
+  async getPendingResourceEdits(): Promise<(ResourceEdit & { submittedByEmail: string | null })[]> {
+    const rows = await db
+      .select({ edit: resourceEdits, submittedByEmail: users.email })
       .from(resourceEdits)
+      .leftJoin(users, eq(resourceEdits.submittedBy, users.id))
       .where(eq(resourceEdits.status, 'pending'))
       .orderBy(asc(resourceEdits.createdAt));
+
+    return rows.map((row) => ({
+      ...row.edit,
+      submittedByEmail: row.submittedByEmail ?? null,
+    }));
   }
 
   /**
@@ -665,7 +676,7 @@ export class AuditRepository {
 
       await tx
         .update(resources)
-        .set({ ...updates, updatedAt: now })
+        .set({ ...splitTaxonomyPathFields(updates), updatedAt: now })
         .where(eq(resources.id, edit.resourceId));
       await tx
         .update(resourceEdits)

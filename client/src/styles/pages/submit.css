@@ -13,14 +13,6 @@
   animation: fadeIn 0.5s ease;
 }
 
-@media (min-width: 1280px) {
-  .submit-page {
-    margin-inline-start: calc(
-      (var(--content-max, 1240px) - var(--content-max-admin, 1400px)) / 2
-    );
-  }
-}
-
 .submit-eyebrow {
   display: inline-flex;
   align-items: center;
@@ -121,8 +113,9 @@
 }
 
 .submit-control {
+  box-sizing: border-box;
   width: 100%;
-  min-height: 0;
+  min-height: 44px;
   height: auto;
   padding: 10px 14px;
   border: var(--border-w) solid var(--border);
@@ -136,11 +129,10 @@
     background-color var(--motion-fast) ease;
 }
 
-/* The frozen category control is a native `select.select`, whose intrinsic
-   box is 2px taller than the text inputs beside it. */
+/* The category combobox follows the approved shared-control target floor. */
 .submit-control[role="combobox"] {
-  height: 40px;
-  min-height: 40px;
+  height: auto;
+  min-height: 44px;
 }
 
 .submit-control:hover {
@@ -155,8 +147,8 @@
 }
 
 .submit-control[aria-invalid="true"] {
-  border-color: #ff5c7a; /* DS-OK: status bad */
-  box-shadow: 0 0 0 1px #ff5c7a; /* DS-OK: status bad */
+  border-color: var(--status-bad); /* DS-OK: status bad */
+  box-shadow: 0 0 0 1px var(--status-bad); /* DS-OK: status bad */
 }
 
 .submit-control::placeholder {
@@ -180,7 +172,7 @@
 
 .submit-error {
   margin: 0;
-  color: #ff5c7a; /* DS-OK: status bad */
+  color: var(--status-bad); /* DS-OK: status bad */
   font-size: 12px;
   font-weight: 500;
   line-height: 1.4;
@@ -205,10 +197,10 @@
 }
 
 .submit-actions button {
-  /* The frozen actions are the 36px `.btn` row: 13px text at normal leading
-     plus 9px vertical padding, no 44px control floor. */
-  height: 36px;
-  min-height: 36px;
+  /* Preserve the canonical padding and leading within the approved target. */
+  box-sizing: border-box;
+  height: auto;
+  min-height: 44px;
   padding: 9px 16px;
   border-radius: var(--radius-sm);
   font-size: 13px;
@@ -272,6 +264,9 @@
   height: 16px;
 }
 
+/* The auth alerts sit above .submit-form, outside its flex gap. */
+.submit-auth-alert { margin-bottom: 18px; }
+
 .submit-auth-alert [data-slot="alert-title"],
 .submit-auth-alert h5,
 .submit-inline-alert h5 {
@@ -308,29 +303,29 @@
 
 .submit-alert-description button {
   align-self: flex-start;
-  min-height: 40px;
+  min-height: 44px;
   padding: 8px 12px;
   font-size: 12px;
 }
 
 .submit-login-alert {
-  border-color: color-mix(in srgb, #ffb84d 50%, var(--border)); /* DS-OK: status warn */
-  background: color-mix(in srgb, #ffb84d 10%, transparent); /* DS-OK: status warn */
+  border-color: color-mix(in srgb, var(--status-warn) 50%, var(--border)); /* DS-OK: status warn */
+  background: color-mix(in srgb, var(--status-warn) 10%, transparent); /* DS-OK: status warn */
 }
 
 .submit-login-alert .submit-alert-icon,
 .submit-login-alert h5 {
-  color: #ffb84d; /* DS-OK: status warn */
+  color: var(--status-warn); /* DS-OK: status warn */
 }
 
 .submit-inline-alert {
-  border-color: color-mix(in srgb, #ffb84d 50%, var(--border)); /* DS-OK: status warn */
-  background: color-mix(in srgb, #ffb84d 10%, transparent); /* DS-OK: status warn */
+  border-color: color-mix(in srgb, var(--status-warn) 50%, var(--border)); /* DS-OK: status warn */
+  background: color-mix(in srgb, var(--status-warn) 10%, transparent); /* DS-OK: status warn */
 }
 
 .submit-inline-alert .submit-alert-icon,
 .submit-inline-alert h5 {
-  color: #ffb84d; /* DS-OK: status warn */
+  color: var(--status-warn); /* DS-OK: status warn */
 }
 
 .submit-inline-alert > div > span {
@@ -342,13 +337,13 @@
 
 .submit-success-card {
   margin-bottom: 24px;
-  border-color: color-mix(in srgb, #34d08c 20%, var(--border)); /* DS-OK: status ok */
-  background: color-mix(in srgb, #34d08c 5%, transparent); /* DS-OK: status ok */
+  border-color: color-mix(in srgb, var(--status-ok) 20%, var(--border)); /* DS-OK: status ok */
+  background: color-mix(in srgb, var(--status-ok) 5%, transparent); /* DS-OK: status ok */
   box-shadow: none;
 }
 
 .submit-success-card:hover {
-  border-color: color-mix(in srgb, #34d08c 20%, var(--border)); /* DS-OK: status ok */
+  border-color: color-mix(in srgb, var(--status-ok) 20%, var(--border)); /* DS-OK: status ok */
 }
 
 .submit-success-header {
@@ -365,12 +360,12 @@
   width: 24px;
   height: 24px;
   flex: 0 0 auto;
-  color: #34d08c; /* DS-OK: status ok */
+  color: var(--status-ok); /* DS-OK: status ok */
 }
 
 .submit-success-heading h2,
 .submit-success-heading [class*="text-2xl"] {
-  color: #34d08c; /* DS-OK: status ok */
+  color: var(--status-ok); /* DS-OK: status ok */
 }
 
 .submit-success-content {
@@ -379,7 +374,7 @@
   justify-content: space-between;
   gap: 12px;
   padding: 16px 22px 20px;
-  border-top: var(--border-w) solid color-mix(in srgb, #34d08c 20%, var(--border)); /* DS-OK: status ok */
+  border-top: var(--border-w) solid color-mix(in srgb, var(--status-ok) 20%, var(--border)); /* DS-OK: status ok */
 }
 
 .submit-success-content p {
@@ -392,6 +387,11 @@
   .submit-success-content {
     align-items: flex-start;
     flex-direction: column;
+  }
+
+  /* C9-V3-02: two columns leave Tags too narrow for its placeholder. */
+  .submit-form-row {
+    grid-template-columns: minmax(0, 1fr);
   }
 }
 

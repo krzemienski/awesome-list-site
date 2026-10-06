@@ -1,3 +1,8 @@
+---
+name: verify-design-system
+description: The 11-stage Awesome.Video design-system compliance contract for this repo — rules, exemptions and triage ladders for tokens, hardcoded values, component hooks, accent/ink discipline, fonts, skins and the five-system switch test. Read the relevant stage when triaging a DS gate failure or auditing a page; run the gates via the awesome-ds-verify skill.
+---
+
 # SKILL · Verify Design-System Compliance
 
 > **Use this skill when:** a user asks "is this page using our design system
@@ -14,13 +19,14 @@
 **Know your target before you start.** There are two kinds of surface, with
 different mechanics but one contract:
 
-1. **The shipped app** (`client/`) — consumes the DS through **shadcn
-   primitives + the Tailwind bridge** (`client/src/index.css`), with
-   per-system skins keyed on data hooks (`data-ds-variant`, `data-ds="chip"`,
-   `data-ds="card-hover"`). There is **no** `design-systems.js` script tag and
-   almost no raw `.btn`/`.input` usage — that is correct, not a violation.
-2. **Standalone HTML artifacts** (exports, mockups, one-pagers) — load
-   `design-system.css` via `<link>` (or inline tokens) and may use the raw DS
+1. **The shipped app** (`client/`) — loads the canonical
+   `client/public/ds/design-system.{css,js}` from `client/index.html` and
+   consumes it through **shadcn primitives that render the DS classes**
+   (`Button` → `.btn`, `Badge` → `.chip`, `Card` → `.card`) plus the Tailwind
+   bridge (`client/src/index.css` + `client/src/styles/app-bridge.css`), so the
+   canonical `[data-system="…"] .btn/.chip/.card` skins apply unchanged.
+2. **Standalone HTML artifacts** (exports, mockups, one-pagers) — load the
+   canonical `design-system.css` via `<link>` (or inline tokens) and may use the raw DS
    classes (`.btn`, `.chip`, `.card`) directly, per `docs/AGENTS.md` §5.
 
 The consumption contract is `docs/AGENTS.md`; the token catalog is
@@ -33,7 +39,8 @@ prototype.
 
 1. Confirm you can see the target files. For the app, that's
    `client/index.html`, `client/src/index.css`,
-   `client/src/styles/design-system.css`, and the page's components. For a
+   `client/public/ds/design-system.{css,js}`, `client/src/styles/app-bridge.css`,
+   and the page's components. For a
    standalone artifact, its HTML plus any CSS it references.
 2. Run the **11 audit stages** below, in order. Don't skip ahead.
 3. For each finding, tag with severity: 🔴 **BLOCK**, 🟡 **FIX**, 🟢 **NIT**.
@@ -47,21 +54,110 @@ Formal audits verify the shipped default (Editorial + Crimson) per
 
 ---
 
+## Browser execution protocol (real-browser audits)
+
+The DevTools snippets in each stage are the contract; a **formal audit runs
+them in a real browser against a running URL** — never by reading source and
+inferring what the DOM would be. Run this way whenever you are handed an app
+URL (dev or production build) rather than a single file.
+
+### Runtime
+
+- **Playwright Chromium**, imported as `import { chromium } from
+  '@playwright/test'` (the pinned browser revision comes from that package;
+  the bare `playwright` import also resolves). Headless is fine. Launch once, reuse one browser; one context per width.
+- The harness **must live inside the workspace** (module resolution), e.g.
+  `.cache/ds-audit/<run-id>/harness.mjs`, and all output (screenshots,
+  JSON, logs) goes under that same `.cache/ds-audit/<run-id>/` tree.
+  **Never write into tracked directories while a dev-server audit is
+  running** — Vite's workspace watcher full-reloads every open page on any
+  repo write and your captures go stale mid-run.
+- Navigate with `page.goto(url, { waitUntil: 'networkidle' })`, then wait
+  for `document.fonts.ready`, for `.page` to exist, **and** for
+  `typeof window.applyDesignSystem === 'function'` (`page.waitForFunction`)
+  before evaluating anything. The production build prerenders `.page`
+  server-side and defers the module bundle until after first paint, so the
+  DOM is complete before the DS globals exist — a snippet that runs on
+  `.page` alone reads `undefined` for `SYSTEM_DEFAULT_ACCENT`. `/login` is a
+  server redirect to `/sign-in` — follow it and audit the landing URL.
+- Evaluate the stage snippets **in-page** with `page.evaluate`. Stage 6's
+  six filters have executable copies in
+  `scripts/validation/ds-button-filter.mjs`; either paste the fenced
+  snippets from this file or `import * as F` from that module and evaluate
+  `fn.toString()` — they are kept literal-identical by the `ds-button-sweep`
+  gate, so both are the same audit.
+- Stages 5 and 10 are **source** checks: run them with `rg` against the
+  checkout that the URL is serving (and `node
+  scripts/validation/palette-drift.mjs` for the stage-5 gate). They do not
+  change between dev and production, so run them once per audit and cite the
+  commit.
+
+### Per-stage browser mechanics
+
+| Stage | How to prove it in-browser |
+|---|---|
+| 1 | `page.evaluate`: `typeof window.applyDesignSystem`, `Object.keys(window.DESIGN_SYSTEMS).length === 5`, `window.ACCENTS.length === 10`, and the `[data-system=` rule presence check from the quick reference. |
+| 2 | `document.documentElement.dataset.system/accent` present and `--bg` resolves non-empty. |
+| 3 | Two proofs, both required: **(a) static** — fetch the served HTML and assert that an **inline, synchronous** `<script>` (no `src`, no `async`/`defer`, not `type="module"`) inside `<head>` sets **both** `data-system` and `data-accent`, and that it does not call `window.applyDesignSystem` (a module global). Module scripts are deferred by spec, so their position relative to the boot is irrelevant — dev servers inject several (`/@vite/client`, react-refresh) ahead of it; **(b) runtime** — `context.addInitScript` installs a `MutationObserver` on `document` (`{ attributes: true, subtree: true, attributeFilter: ['data-system', 'data-accent'] }` — `<html>` may not exist yet when init scripts run) that records `performance.now()` the first time **each** of `data-system` and `data-accent` is set; after load compare the **later** of the two against `performance.getEntriesByType('paint')[0].startTime` (first-paint) — both attributes must be set **≤** first paint (a deferred accent is a visible wrong-colour first paint even when the system is on time). Then set `localStorage['ds-system']='terminal'` and `localStorage['ds-accent']='matrix'` (Terminal's default accent — use a real id from `window.ACCENTS`; the boot falls back to the default for unknown ids) via a second init script, reload, and confirm the observer saw `terminal`/`matrix` before first paint too (a saved choice must also be flash-free). Restore `editorial` + `crimson`. Report the pair as `system <ms> / accent <ms> ≤ first-paint <ms>`. |
+| 4 | `.page` and `.grain` exist; `getComputedStyle(document.querySelector('.page')).getPropertyValue('--bg-atmosphere')` is non-empty. |
+| 6 | Run all six filters (buttons, inputs, chips, cards, page titles, eyebrows) on every screen in the coverage matrix, at every width, **in every system** (stage 11 loop). Report each hit through the triage ladder with its `data-testid`/class and screen. |
+| 7 | Run the accent-user count per screen; additionally **hover a primary button and a `data-ds="card-hover"` card with a real `page.hover()`** and screenshot — `getComputedStyle` after programmatic focus/hover lies mid-transition. Prove the focus ring with a real `keyboard.press('Tab')` + screenshot. |
+| 8 | Run the `--text-3` long-copy scan per screen. |
+| 9 | In **every** system of the stage-11 loop, after `document.fonts.ready`: `const faces = await document.fonts.load('16px "<family>"')` for the active system's **display and body** first families (from `--font-display` / `--font-body`); pass = `faces.length > 0 && faces.every(f => f.status === 'loaded')`. Use `fonts.load`, not `fonts.check`, as the proof: Chrome fetches a face only when some element paints in it, so `check()` is legitimately `false` for a weight/style/subset nothing on the screen uses (e.g. Fraunces 400-normal on `/about`, whose title is body-face by design) — `load()` forces the fetch and rejects/returns empty only when the family genuinely cannot load. Additionally record, per screen, the computed first family of the page's `.display-h` (or note "no display-face consumer on this screen"). |
+| 10 | Source `rg` counts (above) **plus** in-page: at least one matching `[data-system="<id>"]` rule reachable for the active system (`<style>` textContent first, then CSSOM). |
+| 11 | On every screen × width: `for id of [editorial, terminal, geist, brutalist, swiss]` → `applyDesignSystem(id, SYSTEM_DEFAULT_ACCENT[id])` → `await document.fonts.ready` → wait 800 ms → **screenshot** `<run>/<screen>/<width>/<system>.png` → re-run stages 2, 4, 6, 7, 8, 9, 10 in that system → compare the five captures (they must differ; identical pixels across systems = stage-5 failure) and inspect each against the stage-11 symptom table. Restore `editorial` + `crimson` before leaving the page. |
+
+### Coverage matrix (the minimum for a formal audit)
+
+Screens — audit **all** of these, not a sample:
+
+| Screen | Path |
+|---|---|
+| Home | `/` |
+| About | `/about` |
+| Learning journeys | `/journeys` |
+| A category page | `/category/<slug>` (pick a real slug from `/categories`) |
+| Resource detail | `/resource/<id>` (pick a real id from a category page) |
+| Login | `/login` → follows to `/sign-in` (Clerk widget) |
+| Theme settings | `/settings/theme` |
+| 404 | `/this-route-does-not-exist-404` (must return HTTP 404 **and** the DS 404 page) |
+
+Widths — every screen at **1440×900** (desktop) and **375×812** (mobile);
+add 768×1024 if a finding looks layout-dependent.
+
+Systems — every screen × width cycles **all five** systems via the stage-11
+loop with their `SYSTEM_DEFAULT_ACCENT`. That is 8 screens × 2 widths × 5
+systems = **80 screenshots minimum**; name them
+`<screen>/<width>/<system>.png` and list the directory in the evidence
+appendix.
+
+Run the whole matrix again against the **production build** (`npm run build
+&& PORT=<free port> npm run start`) when asked to certify a release; the
+dev server is not the shipped artifact (asset hashing, CSP nonces, split
+CSS, and prerender all differ).
+
+---
+
 ## Stage 1 · Are the system files even loaded?
 
 **Severity if missing: 🔴 BLOCK**
 
 **In the app**, the load path is:
 
-- [ ] **CSS:** `client/src/styles/design-system.css` is imported at the **top**
-  of `client/src/index.css` (foundation order — it must precede the Tailwind
-  layers or the bridge resolves against nothing). Vite bundles it; in dev it
-  arrives as an injected `<style>` tag, so do **not** expect a
-  `<link rel="stylesheet">` in the served HTML.
-- [ ] **JS:** `client/src/lib/design-system.ts` mirrors the definitions onto
+- [ ] **CSS:** `client/index.html` `<head>` has
+  `<link rel="stylesheet" href="/ds/design-system.css">` (the verbatim
+  canonical `client/public/ds/design-system.css`, served as-is, not bundled)
+  **ahead of** the Vite bundle. `client/src/index.css` does not import it; it
+  loads the Tailwind layers and then `@import`s `./styles/app-bridge.css`,
+  which maps the DS tokens onto the shadcn/Tailwind names.
+- [ ] **JS:** a classic, parser-blocking
+  `<script src="/ds/design-system.js">` follows the `<link>` and defines
   `window.DESIGN_SYSTEMS`, `window.ACCENTS`, `window.SYSTEM_DEFAULT_ACCENT`,
-  and `window.applyDesignSystem` at module load — there is no
-  `design-systems.js` script tag, and its absence is not a finding.
+  and `window.applyDesignSystem`; the inline boot after it calls
+  `applyDesignSystem(sys, acc)` with the storage keys and default system that
+  Vite injects from `THEME_BOOT_DATA` (`client/src/lib/design-system.ts`) at
+  `__AWESOME_VIDEO_THEME_BOOT__`. `design-system.ts` only reads those
+  globals; it does not define them.
 
 **In a standalone artifact**, expect a `<link>` to a stylesheet containing the
 `:root { --bg: …; }` token block (or the tokens inlined), per
@@ -106,16 +202,26 @@ missing, the boot script was removed or errored.
 `data-system` / `data-accent` must be on `<html>` **before first paint**.
 
 ✅ **Good** — the app's pattern (inline synchronous `<script>` in
-`client/index.html`): reads localStorage keys `ds-system` / `ds-accent`
-(plus `ds-font-override`), validates against **inline** system/accent ID
-lists, falls back to Editorial + Crimson, and sets the attributes before any
-module loads. The inline ID lists and font map are hand-synced with
-`client/src/lib/design-system.ts` / `font-options.ts`. All three halves of
-that sync — accents, systems, and fonts — are now enforced automatically by
-the `accent-drift` gate (see "Acceptable hardcoded values" below), so drift
-is a failing check rather than something to eyeball here. An id or stack
-that exists in only one side is what makes a saved theme choice "not
-stick" after a reload.
+`<head>` of `client/index.html`): reads localStorage keys `ds-system` /
+`ds-accent` (plus `ds-font-override`) and validates them against **generated**
+boot data. Vite replaces `__AWESOME_VIDEO_THEME_BOOT__`,
+`__AWESOME_VIDEO_PRODUCT_PROFILE_BOOT__` and `__AWESOME_VIDEO_FONT_BOOT__`
+with JSON serialized from `THEME_BOOT_DATA` / `PRODUCT_PROFILE_BOOT_DATA`
+(`client/src/lib/design-system.ts`) and `FONT_BOOT_DATA` (`font-options.ts`),
+so the script stays inline with no network request and no hand-maintained
+list. A missing/invalid system falls back to the route's product-profile
+default (Editorial on public routes). A missing/invalid accent falls back to
+the resolved system's natural accent, `window.SYSTEM_DEFAULT_ACCENT[sys]`
+(terminal→matrix, geist→cyan, brutalist→amber, swiss→orange,
+editorial→crimson), per HANDOFF `ds-accent || SYSTEM_DEFAULT_ACCENT[sys]`.
+The script then sets `data-product-profile` / `data-system` / `data-accent`
+before any module loads. `ThemeProvider` resolves the same values
+(`resolveAccentId`), so boot and provider never disagree. The `accent-drift`
+gate fails when the generated data drifts from the registries or the script
+stops consuming a field, and `product-profile-drift` asserts the pre-paint
+and runtime attributes per route. An id that resolves differently in boot
+and provider is what makes a saved theme choice "not stick" after a reload,
+or flash on hydrate.
 
 ❌ **Bad** — applying the system from a deferred/module script or inside a
 React `useEffect` (runs after first paint → theme flash), or an inline boot
@@ -161,7 +267,6 @@ resolve through a DS token — via bridged Tailwind utilities (`bg-card`,
 ```bash
 # Hex colors in app code (excluding the DS sources of truth)
 rg '#[0-9a-fA-F]{3,8}\b' client/src \
-  --glob '!client/src/styles/design-system.css' \
   --glob '!client/src/index.css' \
   --glob '!client/src/lib/charts/palette.ts'
 
@@ -169,18 +274,14 @@ rg '#[0-9a-fA-F]{3,8}\b' client/src \
 rg -n '\b(bg|text|border(?:-[xytrblse])?|ring|fill|stroke|from|via|to|divide|outline|decoration|shadow|accent|caret|placeholder|ring-offset|inset-ring|inset-shadow)-(slate|gray|zinc|neutral|stone|red|orange|amber|yellow|lime|green|emerald|teal|cyan|sky|blue|indigo|violet|purple|fuchsia|pink|rose)-[0-9]{2,3}\b' client/src
 
 # Raw radii / borders that bypass the ladders
-rg 'border(-radius)?:\s*\d+px|rounded-\[\d+px\]' client/src \
-  --glob '!client/src/styles/design-system.css'
+rg 'border(-radius)?:\s*\d+px|rounded-\[\d+px\]' client/src
 
 # Raw font-family strings
-rg "font-family:\s*['\"]" client/src \
-  --glob '!client/src/styles/design-system.css' \
-  --glob '!client/index.html'
+rg "font-family:\s*['\"]" client/src
 
 # rgb()/rgba() literals (inline style values included) — off-system colors
 # hiding from the hex scan. rgba(var(--…))-composed values are on-system.
 rg -i '\brgba?\(' client/src \
-  --glob '!client/src/styles/design-system.css' \
   --glob '!client/src/index.css' \
   --glob '!client/src/lib/charts/palette.ts' \
   | rg -v 'var\(\s*--'
@@ -259,18 +360,24 @@ These pass — each is tagged `/* DS-OK: reason */` at its definition site
 or within the 5 lines above the value):
 
 - The global status constants `#34d08c` (ok) / `#ffb84d` (warn) / `#ff5c7a`
-  (bad) — semantics, not theme.
+  (bad) — semantics, not theme. In CSS they are tokens (`--status-ok`,
+  `--status-warn`, `--status-bad`, `--status-info` in the
+  `client/src/styles/app-bridge.css` `:root`); suggest `var(--status-*)` over a new literal.
 - The on-accent inks `#000000` / `#0a0a0a` (text sitting on accent fills).
 - `CHART_PALETTE` entries in `client/src/lib/charts/palette.ts` (recharts
   can't read CSS vars from prop strings).
 - The bridge block in `client/src/index.css`.
 - `[data-system="…"]` skin blocks inside
-  `client/src/styles/design-system.css` — intentional per-system overrides.
-- The hand-synced font map in the `client/index.html` boot script — and its
-  sibling `SYSTEMS` id list. **Enforced, not trusted:** the same
+  `client/public/ds/design-system.css` — intentional per-system overrides
+  (canonical, never edited).
+- The font/theme boot data in the `client/index.html` pre-paint script
+  (Vite-injected from `FONT_BOOT_DATA` / `THEME_BOOT_DATA`, never
+  hand-edited). **Enforced, not trusted:** the same
   `accent-drift` gate parses `FONT_OPTIONS` out of
   `client/src/lib/font-options.ts` (its own header calls itself the source of
-  truth) and `DESIGN_SYSTEMS`/`DEFAULT_SYSTEM` out of `design-system.ts`, and
+  truth), `DESIGN_SYSTEMS` out of the canonical
+  `client/public/ds/design-system.js` and `DEFAULT_SYSTEM` out of
+  `design-system.ts`, and
   fails when a font id or a system id exists in only one side, when a boot
   `FONT_STACKS` stack disagrees with the matching `FONT_OPTIONS` stack, when
   the boot fallback system id ≠ `DEFAULT_SYSTEM`, or when the boot fallback
@@ -288,8 +395,9 @@ or within the 5 lines above the value):
   — no per-system stylesheets exist) and requires HTTP 200 **plus** an
   `@font-face` for every family the URL asks for. It is not part of the
   validation suite (network), so nothing runs it for you.
-- The per-system default accent map `SYSTEM_DEFAULT_ACCENT` in
-  `client/src/lib/design-system.ts` — the accent each system is meant to
+- The per-system default accent map `window.SYSTEM_DEFAULT_ACCENT` in
+  `client/public/ds/design-system.js` (read via
+  `getSystemDefaultAccents()` in `client/src/lib/design-system.ts`) — the accent each system is meant to
   arrive with, read as `SYSTEM_DEFAULT_ACCENT[id] || DEFAULT_ACCENT`.
   **Enforced, not trusted:** the same `accent-drift` gate fails when a
   `DESIGN_SYSTEMS` id has no entry (the system then keeps whatever accent is
@@ -297,22 +405,23 @@ or within the 5 lines above the value):
   when an entry is keyed by a system that no longer exists, or when an entry
   names an accent id that is not in `ACCENTS`. Adding a system means adding
   its default accent row too.
-- The ten accent swatches in the `ACCENTS` array of
-  `client/src/lib/design-system.ts` — only the ACTIVE accent's
+- The ten accent swatches in `window.ACCENTS` (canonical
+  `client/public/ds/design-system.js`, read via `getAccents()` in
+  `client/src/lib/design-system.ts`) — only the ACTIVE accent's
   `--accent`/`--accent-2` are readable at runtime, so the `/settings/theme`
-  picker has to inline all ten. **Enforced, not trusted:** the
-  `accent-drift` validation gate (`scripts/validation/accent-drift.mjs`)
-  parses the `:root[data-accent="…"]` blocks out of
-  `client/src/styles/design-system.css`, the `ACCENTS` array out of
-  `design-system.ts`, and the pre-paint id allowlist out of
-  `client/index.html`, and fails when an accent id exists in only some of
-  them, when a `primary`/`secondary` disagrees with `--accent`/`--accent-2`,
-  when `:root`'s default pair stops matching `DEFAULT_ACCENT`, or when the
-  boot fallback id drifts. Hex identity is normalized (`#0f8` ≡ `#00ff88`);
-  a notation swap (hex ↔ `rgb()`) fails on purpose. Either parser finding
-  zero accents is itself a failure, so renaming the array or the selector
-  can never make the gate pass vacuously. Adding an accent means editing
-  all three files.
+  picker reads all ten from that array. There are no
+  `:root[data-accent="…"]` CSS blocks: `applyDesignSystem()` writes the
+  accent as inline custom properties on `<html>`. **Enforced, not trusted:**
+  the `accent-drift` validation gate (`scripts/validation/accent-drift.mjs`)
+  reads the registry and `applyDesignSystem()` out of the canonical
+  `client/public/ds/design-system.{js,css}` and fails when
+  `design-system.ts` restates a table instead of returning the globals, when
+  `client/index.html` stops loading the canonical files ahead of the inline
+  boot, when the canonical `:root` default pair stops matching
+  `DEFAULT_ACCENT`, or when an app stylesheet declares a `[data-accent]`
+  rule or its own `--accent`/`--accent-2`. Parsing zero accents is itself a
+  failure, so the gate can never pass vacuously. Accents come from the
+  canonical design system; adding one here means re-adopting its files.
 - `#000`/`#fff` in SVG elements that need fixed paint.
 - A radius, border width or font stack that genuinely has no ladder step —
   e.g. a `::-webkit-scrollbar-thumb` corner or a forced-colors
@@ -373,7 +482,7 @@ const stray = [...document.querySelectorAll('button')].filter(b =>
   !b.matches('[data-state], [data-radix-collection-item], [cmdk-item], [role="switch"], [role="checkbox"], [role="tab"], [role="combobox"]') &&
   !b.closest('[data-sidebar]') &&
   !(b.closest('[role="dialog"]') && b.querySelector('.sr-only')) && // Dialog/Sheet close ✕
-  /* 3 · known composite chrome (verified compliant — list below) */
+  /* 3 · known composite chrome (verified compliant — list in SKILL.md) */
   !b.closest('.accordion-item') &&                        // AppSidebar taxonomy rows
   b.getAttribute('aria-label') !== 'Open search' &&       // AppHeader search chip
   !b.hasAttribute('aria-pressed') &&                      // facet/tag filter toggle rows
@@ -383,6 +492,27 @@ const stray = [...document.querySelectorAll('button')].filter(b =>
   !['footer-cookie-settings',                             // small tokenized text buttons
     'button-clear-recent-searches',
     'button-dismiss-scrubbed-params'].includes(b.getAttribute('data-testid')) &&
+  !b.matches('.about-faq-item > .about-faq-trigger[aria-expanded][aria-controls]') && // About FAQ disclosure rows
+  /* 5 · Clerk-hosted auth widget (third-party DOM the app cannot mark).
+         Positive AND per control: excluded ONLY while the widget is themed
+         from the DS (its primary button paints the live --accent) AND this
+         very control paints in a DS face (--font-body / --font-display /
+         --font-mono first family) — a Clerk control still in its vendor
+         font is swept like anything else. */
+  !(b.closest('.cl-rootBox') && ((root, el) => {
+    const primary = root.querySelector('.cl-formButtonPrimary');
+    if (!primary) return false;
+    const probe = document.createElement('i');
+    probe.style.background = 'var(--accent)';
+    root.appendChild(probe);
+    const want = getComputedStyle(probe).backgroundColor;
+    probe.remove();
+    if (getComputedStyle(primary).backgroundColor !== want) return false;
+    const face = (v) => String(v || '').split(',')[0].replace(/\x22|\x27/g, '').trim().toLowerCase();
+    const rs = getComputedStyle(document.documentElement);
+    const ds = ['--font-body', '--font-display', '--font-mono'].map(t => face(rs.getPropertyValue(t)));
+    return ds.includes(face(getComputedStyle(el).fontFamily));
+  })(b.closest('.cl-rootBox'), b)) &&
   /* 4 · raw DS classes (standalone artifacts / showcase helpers) */
   ![...b.classList].some(c => /^(btn|tab|icon-btn)/.test(c))
 );
@@ -484,6 +614,43 @@ known list below instead of re-flagging it every run.
   - the scrubbed-params banner Dismiss
     (`data-testid="button-dismiss-scrubbed-params"`, `min-h-8` = 32px —
     meets the text-link floor).
+- **About FAQ disclosure rows** (`client/src/pages/About.tsx`,
+  `.about-faq-item > .about-faq-trigger[aria-expanded][aria-controls]`,
+  `data-testid="button-about-faq-N"`): full-width question + chevron
+  accordion triggers (`min-height: 56px`, `color: var(--text)`, accent hover,
+  hairline item borders, global focus ring). A `Button` can't express a
+  disclosure row; the exclusion is positive — it must carry the
+  `aria-expanded`/`aria-controls` disclosure contract.
+- **Theme-picker option cards** (`client/src/pages/ThemeSettings.tsx`,
+  `data-testid="system-option-*"`, `"accent-option-*"`, `"font-option-*"`):
+  `role="radio"` cards inside ARIA radiogroups, tokenized
+  (`rounded-[var(--radius)] bg-[var(--surface)]`, `var(--border)` /
+  `var(--accent)` borders, `focus-visible:ring-[var(--accent)]`). They are
+  clickable cards, so they carry `data-ds="card-hover"` (the Cards rule) and
+  the per-system hover skins apply — no filter exclusion is needed; the
+  in-card clause already recognizes them.
+- **Clerk-hosted auth widget** (`/sign-in`, `/sign-up`, `.cl-rootBox`): a
+  third-party embed whose DOM the app cannot mark. Its buttons, inputs and
+  `h1.cl-headerTitle` are excluded **only while the widget is provably themed
+  from the DS** — the appearance in `client/src/lib/clerk-appearance.ts`
+  maps `colorPrimary` ← `--accent` and the header font ← `--font-display`, so
+  the filters check that `.cl-formButtonPrimary` paints the live `--accent`,
+  that **each excluded button/input itself** paints in a DS face
+  (`--font-body` / `--font-display` / `--font-mono`), and that the header
+  paints in the `--font-display` face. A control failing its own check is
+  swept like everything else (and the appearance wiring is the 🟡 FIX).
+- **Frozen ResourceDetail typography** (`client/src/pages/ResourceDetail.tsx`,
+  `/resource/:id`): the frozen `pages.jsx` detail page renders its `h1` in the
+  body face (no display class) and its card labels ("DESCRIPTION",
+  "CANONICAL URL", …) as `.mono` 10px accent labels, not `.eyebrow`. The app
+  keeps that paint (pixel-parity row `app.resource.detail`), so the
+  page-title and eyebrow sweeps exclude exactly `main .resource-detail-heading >
+  h1[data-testid="text-resource-title"]` (must paint in `--font-body`) and
+  `main .resource-detail-description > h2` / `main .resource-detail-sections
+  h2` (must paint in `--font-mono` at 10px in `--accent` ink) — same narrow-and-positive shape as the
+  taxonomy title. Raw `.chip` elements (the DS's own class, used by
+  frozen-reference ports and the 404 status chip) are chips, not eyebrows, and
+  the eyebrow sweep treats them like `data-ds="chip"`.
 
 ### Same idea for the rest
 
@@ -531,8 +698,23 @@ const stray = [...document.querySelectorAll('input, select, textarea')].filter(e
   !el.matches('[cmdk-input], [type="hidden"], [type="checkbox"], [type="radio"], [type="range"], [type="file"], select[aria-hidden="true"]') &&
   !el.classList.contains('sr-only') &&                    // peer-hidden toggle inputs (select[aria-hidden] = Radix Select's off-screen native bridge)
   !el.closest('[data-sidebar], [cmdk-root], [data-radix-popper-content-wrapper]') &&
-  /* 3 · known tokenized native controls (verified compliant — list below) */
+  /* 3 · known tokenized native controls (verified compliant — list in SKILL.md) */
   el.getAttribute('data-testid') !== 'select-subcategory-filter' && // TaxonomyListing scope filter
+  /* Clerk-hosted auth widget — same positive themed-root + per-control DS-face check as the button sweep */
+  !(el.closest('.cl-rootBox') && ((root, ctl) => {
+    const primary = root.querySelector('.cl-formButtonPrimary');
+    if (!primary) return false;
+    const probe = document.createElement('i');
+    probe.style.background = 'var(--accent)';
+    root.appendChild(probe);
+    const want = getComputedStyle(probe).backgroundColor;
+    probe.remove();
+    if (getComputedStyle(primary).backgroundColor !== want) return false;
+    const face = (v) => String(v || '').split(',')[0].replace(/\x22|\x27/g, '').trim().toLowerCase();
+    const rs = getComputedStyle(document.documentElement);
+    const ds = ['--font-body', '--font-display', '--font-mono'].map(t => face(rs.getPropertyValue(t)));
+    return ds.includes(face(getComputedStyle(ctl).fontFamily));
+  })(el.closest('.cl-rootBox'), el)) &&
   /* 4 · raw DS classes (standalone artifacts / showcase helpers) */
   ![...el.classList].some(c => /^(input|select|textarea)$/.test(c))
 );
@@ -622,14 +804,42 @@ const stray = [...document.querySelectorAll('h1')].filter(h =>
     h.classList.contains('font-sans') ||
     h.classList.contains('font-medium')) &&
   /* 2 · screen-reader-only page titles (invisible — nothing to switch) */
-  !h.classList.contains('sr-only')
+  !h.classList.contains('sr-only') &&
+  /* 3 · the frozen Category/Subcategory title ONLY: pages.jsx renders that h1
+         with inline weight/tracking/leading in the BODY face and no display
+         class. The exclusion is narrow (the title inside the taxonomy page)
+         AND positive: it must actually paint in the --font-body face, so no
+         other h1 can opt out by borrowing the class name */
+  !(h.matches('main .taxonomy-page > .taxonomy-header > h1.taxonomy-title, main .resource-detail-heading > h1[data-testid="text-resource-title"]') &&
+    ((el) => {
+      const face = (v) => String(v || '').split(',')[0].replace(/\x22|\x27/g, '').trim().toLowerCase();
+      return face(getComputedStyle(el).fontFamily) ===
+        face(getComputedStyle(document.documentElement).getPropertyValue('--font-body'));
+    })(h)) &&
+  /* 4 · the Clerk-hosted auth widget's header (third-party DOM the app cannot
+         mark). Positive: it must actually paint in the live --font-display face,
+         which only happens when the DS-derived appearance is wired */
+  !(h.matches('.cl-rootBox h1.cl-headerTitle') &&
+    ((el) => {
+      const face = (v) => String(v || '').split(',')[0].replace(/\x22|\x27/g, '').trim().toLowerCase();
+      return face(getComputedStyle(el).fontFamily) ===
+        face(getComputedStyle(document.documentElement).getPropertyValue('--font-display'));
+    })(h))
 );
 stray  // → [] expected; a hit is a page title that skips the display tokens
 ```
 
-`sr-only` is the one exclusion: SubmitResource, ResourceDetail's loading
+`sr-only` is one exclusion: SubmitResource, ResourceDetail's loading
 state, and AdminDashboard render invisible screen-reader titles where no
-display font can matter. Every *visible* `h1` must carry `.display-h` and
+display font can matter. `.taxonomy-title` is the other: the frozen
+Category/Subcategory pages (`awesome-list-site-ds/pages.jsx`) deliberately
+render that `h1` in the body face with inline weight/tracking/leading and no
+display class, and the source review rejected adding `.display-h` there
+(docs/parity/COMPLETION-REVIEW.md item 4). That exclusion is deliberately
+narrow — only the title inside the taxonomy page header — and
+it asserts the frozen contract positively (the computed face must be the
+`--font-body` family), so a stray `h1` elsewhere cannot escape the gate by
+adding the class. Every other *visible* `h1` must carry `.display-h` and
 must not pin `font-sans`/`font-medium` back over it — either breaks the
 per-system display-font switching. The gate additionally requires each swept
 route to render at least one `h1` (a zero-`h1` page is a vacuous sweep, and
@@ -652,8 +862,9 @@ const stray = [...document.querySelectorAll('p, div, span, a, h2, h3, h4, h5, h6
   eyebrowish(el) &&
   /* 1 · the DS eyebrow helper (self, or child bits like the ── dash) */
   !el.closest('.eyebrow') &&
-  /* 2 · chips/badges — mono+uppercase comes from the Badge primitive */
-  !el.closest('[data-ds="chip"]') &&
+  /* 2 · chips/badges — mono+uppercase comes from the Badge primitive (or the
+         raw DS .chip class on standalone artifacts / frozen-reference ports) */
+  !el.closest('[data-ds="chip"], .chip') &&
   !(el.classList.contains('rounded-full') && el.classList.contains('focus:ring-ring')) &&
   /* 3 · keyboard hints + code samples — mono by nature, not section labels
          (covers the <kbd> itself, wrappers around one, and sibling captions
@@ -662,7 +873,23 @@ const stray = [...document.querySelectorAll('p, div, span, a, h2, h3, h4, h5, h6
   !el.querySelector('kbd, .kbd') &&
   !(el.parentElement && el.parentElement.querySelector(':scope > kbd, :scope > .kbd')) &&
   /* 4 · shadcn/Radix + reference sidebar chrome */
-  !el.closest('[data-sidebar], [cmdk-root], [data-radix-popper-content-wrapper]')
+  !el.closest('[data-sidebar], [cmdk-root], [data-radix-popper-content-wrapper]') &&
+  /* 5 · the frozen ResourceDetail card labels ONLY: pages.jsx renders them as
+         .mono 10px accent labels (not .eyebrow), and the app keeps that paint
+         under semantic h2s. Narrow (those two cards) AND positive: each must
+         actually paint the frozen label — --font-mono face, 10px, --accent ink */
+  !(el.matches('main .resource-detail-description > h2, main .resource-detail-sections h2') &&
+    ((h2) => {
+      const face = (v) => String(v || '').split(',')[0].replace(/\x22|\x27/g, '').trim().toLowerCase();
+      const cs = getComputedStyle(h2);
+      const probe = document.createElement('i');
+      probe.style.color = 'var(--accent)';
+      h2.appendChild(probe);
+      const accent = getComputedStyle(probe).color;
+      probe.remove();
+      return face(cs.fontFamily) === face(getComputedStyle(document.documentElement).getPropertyValue('--font-mono')) &&
+        cs.fontSize === '10px' && cs.color === accent;
+    })(el))
 );
 stray  // → [] expected; a hit is a hand-pinned mono-uppercase label that skipped .eyebrow
 ```
@@ -731,6 +958,7 @@ buttons, decorative borders — flag it. Accent is reserved for:
 - Eyebrows.
 - `.live-dot`, `.caret`, live indicators.
 - Active tab underline.
+- `.card.glow:hover` halo (the canonical `--shadow-accent` glow).
 - Focus rings, `::selection`.
 - Key data points in charts; sparing `<em>` emphasis in display copy.
 
@@ -772,13 +1000,23 @@ system's display/body faces and any font override load on demand via
 
 ```js
 await document.fonts.ready;
-const stack = getComputedStyle(document.documentElement)
-                .getPropertyValue('--font-display').trim();
-const family = stack.split(',')[0].replace(/['"]/g, '').trim();
-document.fonts.check(`16px "${family}"`);  // → true
+const rs = getComputedStyle(document.documentElement);
+const first = (t) => rs.getPropertyValue(t).trim().split(',')[0].replace(/['"]/g, '').trim();
+const proof = {};
+for (const [role, family] of [['display', first('--font-display')], ['body', first('--font-body')]]) {
+  const faces = await document.fonts.load(`16px "${family}"`).catch(() => []);
+  proof[role] = { family, ok: faces.length > 0 && faces.every(f => f.status === 'loaded') };
+}
+proof;  // → { display: { family, ok: true }, body: { family, ok: true } }
 ```
 
-If false, the font failed to load. Check:
+Both `ok` must be true. `document.fonts.load()` is the proof, **not**
+`document.fonts.check()`: Chrome only fetches a face once an element paints
+in it, so `check()` is `false` for any weight/style/subset the current
+screen does not use (Fraunces 400-normal on `/about`, say, where the title
+is body-face by design) — a diagnostic at best. `load()` forces the fetch
+and returns an empty/rejected result only when the family genuinely cannot
+load. If it fails, check:
 - `FONT_URLS` in `client/src/lib/font-options.ts` has an entry for the
   active system, and the family name in the URL matches the token's family.
 - Network tab shows no 4xx on the font request.
@@ -794,14 +1032,12 @@ falls back to Georgia and the whole magazine vibe collapses.
 
 **Severity: 🔴 BLOCK**
 
-Skins live in `client/src/styles/design-system.css` in **two parallel
-forms**, and both must survive:
-
-1. **Raw DS-class skins** (`[data-system="…"] .chip/.btn/.card…`) — for
-   static surfaces and showcase helpers.
-2. **Shadcn bridge skins** (`[data-system="…"] [data-ds-variant=…]`,
-   `[data-ds="chip"]`, `[data-ds="card-hover"]`) — the same extras for the
-   app's primitives.
+Skins live at the bottom of the canonical `client/public/ds/design-system.css`
+as raw DS-class rules (`[data-system="…"] .btn/.chip/.card/.input/.eyebrow…`).
+There is no second, shadcn-specific skin layer: the app's primitives render
+the DS classes (`Button` → `.btn`, `Badge` → `.chip`, `Card` → `.card`), so
+the same rules skin them. `client/src/styles/app-bridge.css` adds only a few
+`[data-system="…"]` rules for Clerk's widgets (`.cl-*`).
 
 Without them: Terminal chips lose their `[brackets]`, Brutalist cards lose
 the `4px 4px 0 0` offset slab, Swiss falls back from hairlines to 1px
@@ -811,14 +1047,16 @@ Verify by counting:
 
 ```bash
 rg '\[data-system="(editorial|terminal|geist|brutalist|swiss)"\]' \
-  client/src/styles/design-system.css | wc -l   # expected ≥ 60 (~80 today)
+  client/public/ds/design-system.css | wc -l   # expected 55 (the canonical file)
 
-rg 'data-ds' client/src/styles/design-system.css | wc -l   # expected ≥ 15 (~25 today)
+rg 'data-ds' client/public/ds/design-system.css | wc -l   # expected 0 — no data-hook skins exist
 ```
 
-If either count is 0 or collapses, a skin layer was stripped during a
-refactor. If only the second is low, shadcn primitives silently lose their
-per-system extras even though raw-class skins look intact.
+The canonical file is verbatim and must never be edited, so a first count
+other than 55 means it drifted from the fetched source (compare its sha-256
+with `docs/parity/SKILL-verify-design-system.md` Stage 10). If skins look
+missing in the app while the count is intact, a primitive stopped rendering
+its DS class (`.btn`/`.chip`/`.card`).
 
 ---
 
@@ -895,6 +1133,26 @@ Files audited: <list>
 - **FAIL** → ≥1 BLOCK. Page is not DS-compliant; fix immediately.
 
 NITs never gate. They're polish.
+
+### Evidence appendix (real-browser audits)
+
+The verdict block above is the contract and its format does not change. A
+real-browser audit **appends** one section *after* it:
+
+```markdown
+## Evidence
+- Target: <URL> (<dev | production build>, commit <sha>)
+- Screenshots: <run dir> — <n> files (<screens> × <widths> × 5 systems)
+- Stage 3 proof: system <ms> / accent <ms> ≤ first-paint <ms> (fresh) · system <ms> / accent <ms> ≤ <ms> (saved terminal/matrix)
+- Stage 9 proof: <system → display/body families → true/false, per system>
+- Stage 6 hits per screen/width/system: <table or "none">
+- Blocked / not executed: <stage — exact reason> (never simulated)
+```
+
+Under **What's good**, list stages 3, 9 and 11 as **individual** lines with
+their proof values — they are the three stages that can only be verified in
+a running browser, and a reader must be able to see each one passed on its
+own.
 
 ---
 

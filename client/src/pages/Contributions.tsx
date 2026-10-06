@@ -1,4 +1,6 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
+import { focusElement } from "@/hooks/focus-handoff";
+import { handoffFocusOnUnmount } from "@/hooks/focus-handoff";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { Link, useSearch } from "wouter";
 import { formatDistanceToNow } from "date-fns";
@@ -44,6 +46,7 @@ import {
 } from "@/components/ui/select";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useToast } from "@/hooks/use-toast";
+import { queryUnavailableReason } from "@/lib/query-availability";
 import { ApiError, apiRequest, queryClient } from "@/lib/queryClient";
 import { writeFilterParams } from "@/lib/url-filter-state";
 import "@/styles/pages/account.css";
@@ -106,6 +109,8 @@ interface ContributionsResponse {
     publicResources: number;
     recordedViews: number;
   };
+  /** Per-status counts within the active type and search filters. */
+  statusCounts: Record<ContributionStatus, number>;
   definitions: {
     acceptedContributions: string;
     publicResources: string;
@@ -252,7 +257,8 @@ function ContributionCard({
 
   return (
     <article
-      className="account-contribution-card relative"
+      className="account-contribution-card relative focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+      tabIndex={-1}
       data-testid={`contribution-${item.kind}-${item.id}`}
     >
       <div className="flex flex-col gap-4 p-4 sm:p-5">
@@ -385,6 +391,7 @@ function ContributionCard({
                 className="account-action-danger"
                 onClick={() => onWithdraw(item)}
                 disabled={withdrawing}
+                aria-label={`Withdraw ${item.title}`}
                 data-testid={`button-withdraw-${item.kind}-${item.id}`}
               >
                 <Undo2 className="mr-2 h-4 w-4" aria-hidden="true" />
@@ -403,6 +410,7 @@ export default function Contributions() {
   const { toast } = useToast();
   const [state, setState] = useState<FilterState>(() => readState(searchString));
   const [searchInput, setSearchInput] = useState(state.q);
+  const searchInputRef = useRef<HTMLInputElement>(null);
   const [pageNotice, setPageNotice] = useState<string | null>(null);
   const [withdrawTarget, setWithdrawTarget] =
     useState<ContributionItem | null>(null);
@@ -457,6 +465,7 @@ export default function Contributions() {
     );
   }, [query.data?.pagination.page, state.page]);
 
+  const withdrawnRef = useRef<{ kind: string; id: number | string } | null>(null);
   const withdrawMutation = useMutation({
     mutationFn: (item: ContributionItem) =>
       apiRequest(
@@ -464,6 +473,9 @@ export default function Contributions() {
         { method: "POST" },
       ),
     onSuccess: (_, item) => {
+      // C6-VX-02: the row's Withdraw button disappears with the withdraw, so
+      // the dialog's close hands focus to the row (or the timeline heading).
+      withdrawnRef.current = { kind: item.kind, id: item.id };
       setWithdrawTarget(null);
       void queryClient.invalidateQueries({
         queryKey: ["/api/user/contributions"],
@@ -524,6 +536,10 @@ export default function Contributions() {
       "push",
     );
     setPageNotice(null);
+    // C5-V4-02: Clear filters lives in the empty state, which unmounts once
+    // results return; move focus to the (now empty) search field instead of
+    // letting it fall to <body>.
+    searchInputRef.current?.focus();
   };
 
   const gotoPage = (page: number) => {
@@ -541,6 +557,7 @@ export default function Contributions() {
     return `/contributions${queryString ? `?${queryString}` : ""}`;
   };
 
+  const unavailable = queryUnavailableReason(query);
   const summary = query.data?.summary;
   const definitions = query.data?.definitions;
   const hasFilters =
@@ -644,7 +661,7 @@ export default function Contributions() {
                         .toLowerCase()
                         .replace(/\s+/g, "-")}`}
                     >
-                      {metric.value ?? 0}
+                      {metric.value ?? "—"}
                     </p>
                   )}
                   <p className="mt-2 text-xs leading-5 text-muted-foreground">
@@ -676,6 +693,7 @@ export default function Contributions() {
                   aria-hidden="true"
                 />
                 <Input
+                  ref={searchInputRef}
                   value={searchInput}
                   onChange={(event) =>
                     setSearchInput(event.target.value.slice(0, 100))
@@ -720,8 +738,8 @@ export default function Contributions() {
                   {Object.entries(statusConfig).map(([value, config]) => (
                     <SelectItem key={value} value={value}>
                       {config.label}
-                      {summary
-                        ? ` (${summary[value as ContributionStatus]})`
+                      {query.data
+                        ? ` (${query.data.statusCounts[value as ContributionStatus]})`
                         : ""}
                     </SelectItem>
                   ))}
@@ -786,18 +804,29 @@ export default function Contributions() {
               </div>
             ))}
           </div>
-        ) : query.isError ? (
+        ) : unavailable ? (
           <Card>
-            <CardContent className="flex flex-col items-center gap-3 py-12 text-center">
+            <CardContent
+              className="flex flex-col items-center gap-3 py-12 text-center"
+              role="alert"
+              data-testid={`contributions-${unavailable}`}
+            >
               <RefreshCw className="account-accent-icon h-8 w-8" />
-              <h3 className="font-semibold">We couldn't load your contributions</h3>
+              <h3 className="font-semibold">
+                {unavailable === "offline"
+                  ? "You’re offline"
+                  : "We couldn't load your contributions"}
+              </h3>
               <p className="max-w-md text-sm text-muted-foreground">
-                Your data is unchanged. Check your connection and try again.
+                {unavailable === "offline"
+                  ? "Your contributions will load when your connection is back."
+                  : "Your data is unchanged. Check your connection and try again."}
               </p>
               <Button
                 variant="outline"
-                onClick={() => query.refetch()}
-                disabled={query.isFetching}
+                onClick={(e) => { if (query.isFetching) return; handoffFocusOnUnmount(e.currentTarget); void query.refetch(); }}
+                aria-disabled={query.isFetching}
+                aria-busy={query.isFetching}
                 data-testid="button-retry-contributions"
               >
                 {query.isFetching ? (
@@ -885,7 +914,21 @@ export default function Contributions() {
           if (!open && !withdrawMutation.isPending) setWithdrawTarget(null);
         }}
       >
-        <AlertDialogContent data-testid="dialog-withdraw-contribution">
+        <AlertDialogContent
+          data-testid="dialog-withdraw-contribution"
+          onCloseAutoFocus={(event) => {
+            // C6-VX-02: Radix would return focus to the vanished trigger.
+            const withdrawn = withdrawnRef.current;
+            if (!withdrawn) return;
+            event.preventDefault();
+            withdrawnRef.current = null;
+            focusElement(
+              document.querySelector<HTMLElement>(
+                `[data-testid="contribution-${withdrawn.kind}-${withdrawn.id}"]`,
+              ) ?? document.getElementById("timeline-heading"),
+            );
+          }}
+        >
           <AlertDialogHeader>
             <AlertDialogTitle>Withdraw this contribution?</AlertDialogTitle>
             <AlertDialogDescription>

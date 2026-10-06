@@ -118,9 +118,9 @@ const TOKEN_GROUPS: { group: string; note: string; tokens: { name: string; kind:
 /** DS status semantics — global across all systems (see docs/DESIGN-SYSTEM.md). */
 /* DS-OK: status color literals mirror design-system.css .chip.ok/.warn/.bad verbatim. */
 const STATUS_COLORS = [
-  { label: "ok", hex: "#34d08c", desc: "success / healthy" },
-  { label: "warn", hex: "#ffb84d", desc: "warning / attention" },
-  { label: "bad", hex: "#ff5c7a", desc: "error / destructive" },
+  { label: "ok", hex: "var(--status-ok)", desc: "success / healthy" },
+  { label: "warn", hex: "var(--status-warn)", desc: "warning / attention" },
+  { label: "bad", hex: "var(--status-bad)", desc: "error / destructive" },
 ] as const;
 
 /** What each system's skin layer changes structurally (tokens can't express these). */
@@ -483,10 +483,9 @@ export default function DesignSystemShowcase() {
           </div>
 
           <div className="space-y-2">
-            <code className="block font-mono text-xs text-[color:var(--text-3)] tracking-wider uppercase">Interactive card · data-ds=&quot;card-hover&quot;</code>
+            <code className="block font-mono text-xs text-[color:var(--text-3)] tracking-wider uppercase">Interactive card · .card.hoverable</code>
             <div
-              data-ds="card-hover"
-              className="card rounded-[var(--radius)] border border-[color:var(--border)] bg-[var(--surface)] p-4 max-w-sm"
+              className="card hoverable p-4 max-w-sm"
             >
               <div className="eyebrow mb-2">── resource</div>
               <p className="font-medium text-sm">Card title resolves --text</p>

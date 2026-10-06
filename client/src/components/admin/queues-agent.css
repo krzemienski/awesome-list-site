@@ -17,31 +17,28 @@
   position: relative;
 }
 
-.queues-agent > .queues-agent__more {
-  inset: 0 0 auto auto;
-  position: absolute;
-  z-index: 2;
-}
-
+/* The secondary controls stay in flow with a labelled, always-visible
+   summary: expanding them pushes nothing out of place and never stacks the
+   panel over the stat tiles, job tables or prompt. */
 .queues-agent > .queues-agent__more > summary {
-  font-size: 0;
-  height: 24px;
-  min-height: 0;
-  overflow: hidden;
-  padding: 0;
-  opacity: 0;
-  width: 24px;
+  font-size: 12px;
+  line-height: normal;
+  max-width: 100%;
+  min-height: 44px;
+  padding: 5px 12px;
+  text-align: left;
+  white-space: normal;
 }
 
-.queues-agent > .queues-agent__more > summary:hover,
 .queues-agent > .queues-agent__more > summary:focus-visible {
-  opacity: 1;
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
 }
 
-.queues-agent > .queues-agent__more > summary::after {
-  content: "•••";
-  font-size: 9px;
-  letter-spacing: 1px;
+/* In flow the panel is bound by the page width, so its grid cards must be
+   able to shrink below their inputs' intrinsic width on phones. */
+.queues-agent__more .grid > * {
+  min-width: 0;
 }
 
 .queues-agent__canonical {
@@ -70,32 +67,11 @@
   grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
 }
 
+/* The stat cards are the shared admin `Stat` primitive (AdminOpsPrimitives):
+   its `.eyebrow` label, display value and description own their typography, so
+   this block only keeps the frozen Stat's 20px card padding. */
 .queues-agent__stat {
   padding: 20px;
-}
-
-.queues-agent__stat > :first-child {
-  color: var(--text-3);
-  font-size: 10px;
-  letter-spacing: 1.4px;
-  line-height: 16px;
-  margin-bottom: 10px;
-  text-transform: uppercase;
-}
-
-.queues-agent__stat > :nth-child(2) {
-  color: var(--text);
-  font-size: 32px;
-  font-weight: 700;
-  letter-spacing: -1px;
-  line-height: 1;
-}
-
-.queues-agent__stat > :last-child {
-  color: var(--text-2);
-  font-size: 12px;
-  line-height: 1.6; /* body leading */
-  margin-top: 8px;
 }
 
 .queues-agent__canonical-table {
@@ -135,7 +111,7 @@
 .queues-agent__canonical-table td.actions .btn {
   font-size: 12px;
   line-height: normal;
-  min-height: 0;
+  min-height: 44px;
   padding: 5px 10px;
 }
 
@@ -151,6 +127,13 @@
   color: var(--text-3);
   font-size: 12px;
   padding: 18px 22px;
+}
+
+.queues-agent__table-more {
+  border-block-start: var(--hairline-w) solid var(--border);
+  display: flex;
+  justify-content: center;
+  padding: 10px 22px;
 }
 
 .queues-agent__research-form {
@@ -190,10 +173,21 @@
 
 .queues-agent__research-actions .btn {
   line-height: normal;
-  min-height: 0;
+  min-height: 44px;
 }
 
-.queues-agent__research-form .input {
+/* Approved comparison-reference floor: `.input,.select{min-height:44px}`
+   (CCR a11y adjustments); the canonical 10px padding around 13px text is
+   only 38–40px, which ran the whole form 4px short of the reference. */
+.queues-agent__research-form .input,
+.queues-agent__research-form .select {
+  line-height: normal;
+  min-height: 44px;
+}
+
+/* UA leading like the frozen textarea (Tailwind's preflight inherits the 1.6
+   body leading, which sat the placeholder line 1px low). */
+.queues-agent__research-form .textarea {
   line-height: normal;
 }
 
@@ -363,7 +357,7 @@
 }
 
 .queues-agent .queues-agent__tabs [role="tab"] {
-  min-height: 2.5rem;
+  min-height: 44px;
 }
 
 .queues-agent .queues-agent__dialog {
@@ -410,7 +404,7 @@
 }
 
 .queues-agent .queues-agent__event-log [role="log"] {
-  background: color-mix(in srgb, var(--background) 90%, #000);
+  background: color-mix(in srgb, var(--background) 90%, var(--bg));
   border: var(--hairline-w, 1px) solid var(--border);
   border-radius: var(--radius, .5rem);
   min-height: 7.5rem;
@@ -424,12 +418,12 @@
   align-items: center;
   display: inline-flex;
   justify-content: center;
-  min-height: 2rem;
-  min-width: 2rem;
+  min-height: 44px;
+  min-width: 44px;
 }
 
 .queues-agent .queues-agent__graph [data-testid="agent-comms-graph"] {
-  background: color-mix(in srgb, var(--background) 90%, #000);
+  background: color-mix(in srgb, var(--background) 90%, var(--bg));
   border: var(--hairline-w, 1px) solid var(--border);
   border-radius: var(--radius, .5rem);
 }
@@ -453,13 +447,21 @@
     padding: 16px;
   }
 }
-/* The shell actions render through the shared Button, whose size ladder
-   (h-9/h-10) is not the frozen `.btn`: 9px 16px inset, 13px text, natural
-   line box. Scoped to the two canonical panels only. */
+/* Match the adjusted reference's 44px control floor without changing inset. */
 .queues-agent .admin-ops-table-shell__actions .btn {
   height: auto;
-  min-height: 0;
+  min-height: 44px;
   padding: 9px 16px;
   font-size: 13px;
   line-height: normal;
+}
+
+/* Research notes carry the whole agent brief as their title; the card shows
+   the canonical one-glance heading and the note dialog keeps the full text. */
+.admin-research-note .admin-research-note__open h3 {
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  display: -webkit-box;
+  line-height: 1.4;
+  overflow: hidden;
 }

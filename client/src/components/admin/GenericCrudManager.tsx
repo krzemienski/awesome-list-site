@@ -8,7 +8,6 @@ import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { Label } from "@/components/ui/label";
 import { Skeleton } from "@/components/ui/skeleton";
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
@@ -56,6 +55,7 @@ export interface BaseEntityWithCount {
  * @property {string} queryKey - React Query key for fetching parent entities
  * @property {string} fetchUrl - API endpoint to fetch parent entities
  * @property {string} [filterBy] - Field name to filter by (enables cascading dropdowns, e.g., 'platformId')
+ * @property {string} [emptyHint] - Shown (with the select disabled) when the chosen filterBy parent has no options
  * @property {Function} [getNameFn] - Custom function to get the display name of a parent entity
  *
  * @example
@@ -84,6 +84,7 @@ export interface ParentConfig {
   queryKey: string;
   fetchUrl: string;
   filterBy?: string;
+  emptyHint?: string;
   getNameFn?: (id: number, parentData?: BaseEntityWithCount[]) => string;
 }
 
@@ -775,6 +776,8 @@ export interface GenericCrudManagerProps<T extends BaseEntityWithCount> {
   createUrl: string;
   updateUrl: (id: number) => string;
   deleteUrl: (id: number) => string;
+  /** Child rows counted on each item that block deletion (the server answers 409), e.g. a category's subcategories. */
+  childCount?: { key: string; singular: string; plural: string };
   queryKey: string;
   publicQueryKey?: string;
   testIdPrefix: string;
@@ -1006,6 +1009,7 @@ export default function GenericCrudManager<T extends BaseEntityWithCount>({
   createUrl,
   updateUrl,
   deleteUrl,
+  childCount,
   queryKey,
   publicQueryKey,
   testIdPrefix,
@@ -1061,10 +1065,17 @@ export default function GenericCrudManager<T extends BaseEntityWithCount>({
   // so the dialog stays open with the user's input intact for correction.
   const [formError, setFormError] = useState<string | null>(null);
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+  // C3-V5B-02: the deleted row's Delete button (the dialog's return-focus
+  // target) unmounts once the list refetches, dropping focus to <body>. After a
+  // successful delete, focus a neighbouring row's Edit button (or Add) instead.
+  const createButtonRef = useRef<HTMLButtonElement>(null);
+  const editButtonRefs = useRef(new Map<number, HTMLButtonElement>());
+  const deleteFocusTargetRef = useRef<HTMLElement | null>(null);
   const [selectedItem, setSelectedItem] = useState<T | null>(null);
   const [fileData, setFileData] = useState<Record<string, File | null>>({});
   const [filePreviews, setFilePreviews] = useState<Record<string, string>>({});
   const [searchQuery, setSearchQuery] = useState("");
+  const searchInputRef = useRef<HTMLInputElement>(null);
   const [currentPage, setCurrentPage] = useState(1);
   const [pageSize, setPageSize] = useState(defaultItemsPerPage);
   const [selectedIds, setSelectedIds] = useState<Set<number>>(new Set());
@@ -1894,6 +1905,11 @@ export default function GenericCrudManager<T extends BaseEntityWithCount>({
         title: "Success",
         description: `${entityName} deleted successfully`
       });
+      const rows = paginatedItems || [];
+      const index = rows.findIndex(item => item.id === id);
+      const neighbour = rows[index + 1] ?? rows[index - 1];
+      deleteFocusTargetRef.current =
+        (neighbour && editButtonRefs.current.get(neighbour.id)) || createButtonRef.current;
       setDeleteDialogOpen(false);
       setSelectedItem(null);
     },
@@ -2045,6 +2061,47 @@ export default function GenericCrudManager<T extends BaseEntityWithCount>({
 
     return (parentData[parentFieldName] || []).filter(item =>
       item[parent.filterBy!] === parseInt(filterValue as string)
+    );
+  };
+
+  // C3-V5B-01: a cascading select whose chosen parent has no children used to
+  // stay enabled and open an empty list; disable it and say why instead.
+  const renderParentSelect = (parent: ParentConfig, mode: 'create' | 'edit') => {
+    const options = getFilteredParentOptions(parent.fieldName);
+    const awaitingFilter = !!(parent.filterBy && !formData[parent.filterBy]);
+    const noOptions = !!parent.filterBy && !awaitingFilter && options.length === 0;
+    const id = `${mode}-${parent.fieldName}`;
+    const hintId = `${id}-empty-hint`;
+
+    return (
+      <div key={parent.fieldName} className="space-y-2">
+        <Label htmlFor={id}>{parent.label}</Label>
+        <Select
+          value={formData[parent.fieldName] as string}
+          onValueChange={(value) => handleParentChange(parent.fieldName, value)}
+          disabled={awaitingFilter || noOptions}
+        >
+          <SelectTrigger
+            id={id}
+            aria-describedby={noOptions ? hintId : undefined}
+            data-testid={`select-${mode}-${parent.fieldName.replace(/([A-Z])/g, '-$1').toLowerCase()}`}
+          >
+            <SelectValue placeholder={`Select ${parent.label.toLowerCase().replace(' *', '')}`} />
+          </SelectTrigger>
+          <SelectContent>
+            {options.map((option) => (
+              <SelectItem key={option.id} value={option.id.toString()}>
+                {option.name}
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
+        {noOptions && (
+          <p id={hintId} className="text-xs text-muted-foreground" data-testid={`hint-${id}-empty`}>
+            {parent.emptyHint ?? "No options are available for this selection yet."}
+          </p>
+        )}
+      </div>
     );
   };
 
@@ -2440,6 +2497,15 @@ export default function GenericCrudManager<T extends BaseEntityWithCount>({
     setEditDialogOpen(true);
   };
 
+  const getDeleteBlocker = (item: T): { count: number; reason: string } | null => {
+    const describe = (count: number, singular: string, plural: string) =>
+      ({ count, reason: `${count} ${count === 1 ? singular : plural} still assigned` });
+    if (item.resourceCount > 0) return describe(item.resourceCount, "resource", "resources");
+    const children = childCount ? Number(item[childCount.key] ?? 0) : 0;
+    if (childCount && children > 0) return describe(children, childCount.singular, childCount.plural);
+    return null;
+  };
+
   const openDeleteDialog = (item: T) => {
     setSelectedItem(item);
     setDeleteDialogOpen(true);
@@ -2450,8 +2516,18 @@ export default function GenericCrudManager<T extends BaseEntityWithCount>({
   // "Vídeo Töols" must become "video-tools", not "vdeo-tols".
   const generateSlug = (name: string) => slugify(name);
 
+  // Only the create dialog auto-slugs. An existing slug is a public URL, so
+  // the edit dialog leaves it alone unless the admin edits the slug field.
   const handleNameChange = (name: string) => {
     setFormData({ ...formData, name, slug: generateSlug(name) });
+    setFormError(null);
+  };
+
+  // Like a parent pick, editing a field the banner names makes it stale; the
+  // next submit re-validates everything.
+  const handleFieldEdit = (field: "name" | "slug", value: string) => {
+    setFormData({ ...formData, [field]: value });
+    setFormError(null);
   };
 
   const handleParentChange = (parentFieldName: string, value: string) => {
@@ -2465,6 +2541,9 @@ export default function GenericCrudManager<T extends BaseEntityWithCount>({
     }
 
     setFormData(newFormData);
+    // A "Parent … is required" banner is stale once a parent is picked; the
+    // next submit re-validates everything.
+    setFormError(null);
   };
 
   return (
@@ -2485,16 +2564,18 @@ export default function GenericCrudManager<T extends BaseEntityWithCount>({
             </CardDescription>
           </div>
           <div className="admin-taxonomy-header-actions flex flex-wrap items-center gap-3 min-w-0 max-w-full">
-            <Button
-              type="button"
-              variant="ghost"
-              size="sm"
-              onClick={() => setToolsOpen((open) => !open)}
-              aria-expanded={toolsOpen}
-              data-testid={`button-more-${testIdEntityPlural}`}
-            >
-              More
-            </Button>
+            {searchEnabled && (
+              <Button
+                type="button"
+                variant="ghost"
+                size="sm"
+                onClick={() => setToolsOpen((open) => !open)}
+                aria-expanded={toolsOpen}
+                data-testid={`button-more-${testIdEntityPlural}`}
+              >
+                {toolsOpen ? "Hide search" : "Search"}
+              </Button>
+            )}
             {/* Bulk Actions Toolbar */}
             {bulkOperationsEnabled && selectedIds.size > 0 && (
               <div className="admin-taxonomy-bulk-actions flex items-center gap-2 px-3 py-1.5 bg-muted rounded-lg" data-testid="bulk-actions-toolbar">
@@ -2575,6 +2656,7 @@ export default function GenericCrudManager<T extends BaseEntityWithCount>({
               <div className="admin-taxonomy-search relative w-64 max-w-full">
                 <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
                 <Input
+                  ref={searchInputRef}
                   placeholder={searchPlaceholder || `Search ${entityNamePlural.toLowerCase()}...`}
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
@@ -2586,7 +2668,13 @@ export default function GenericCrudManager<T extends BaseEntityWithCount>({
                     type="button"
                     variant="ghost"
                     size="icon"
-                    onClick={() => setSearchQuery("")}
+                    onClick={() => {
+                      // Keep the field open so focus can return to it; with
+                      // tools closed an empty field would leave the layout.
+                      setSearchQuery("");
+                      setToolsOpen(true);
+                      searchInputRef.current?.focus();
+                    }}
                     className="absolute right-1 top-1/2 h-8 w-8 min-h-8 min-w-8 -translate-y-1/2 text-muted-foreground hover:text-foreground"
                     aria-label="Clear search"
                     data-testid="button-clear-search"
@@ -2637,6 +2725,8 @@ export default function GenericCrudManager<T extends BaseEntityWithCount>({
               </Button>
             )}
             <Button
+              ref={createButtonRef}
+              variant="outline"
               onClick={openCreateDialog}
               data-testid={`button-create-${testIdEntity}`}
             >
@@ -2680,127 +2770,140 @@ export default function GenericCrudManager<T extends BaseEntityWithCount>({
           </div>
         ) : (
           <>
-          <Table className="admin-taxonomy-table" data-testid={`table-${testIdEntityPlural}`}>
-            <TableHeader>
-              <TableRow>
-                {bulkOperationsEnabled && (
-                  <TableHead className="w-[50px]">
-                    <Checkbox
-                      checked={allSelectableOnPageSelected && selectableItems.length > 0}
-                      onCheckedChange={handleSelectAll}
-                      aria-label="Select all"
-                      data-testid="checkbox-select-all"
-                      disabled={selectableItems.length === 0}
-                      className={someSelectedOnPage && !allSelectableOnPageSelected ? "data-[state=checked]:bg-primary/50" : ""}
-                    />
-                  </TableHead>
-                )}
-                {getVisibleColumns.map((col) => (
-                  <TableHead
-                    key={col.key}
-                    className={`${col.className || ""} ${col.width ? col.width : col.align === "right" ? "text-right" : ""}`}
-                  >
-                    {col.label}
-                  </TableHead>
-                ))}
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {/* Run17 BUG-032: a filter with zero matches renders an explicit
-                  empty row instead of headers floating over nothing. */}
-              {(!paginatedItems || paginatedItems.length === 0) && (
-                <TableRow>
-                  <TableCell
-                    colSpan={getVisibleColumns.length + (bulkOperationsEnabled ? 1 : 0)}
-                    className="text-center py-8 text-muted-foreground"
-                    data-testid={`empty-${testIdEntityPlural}`}
-                  >
-                    No {entityNamePlural.toLowerCase()} match your search.
-                  </TableCell>
-                </TableRow>
-              )}
-              {paginatedItems?.map((item) => (
-                <TableRow key={item.id} data-testid={`row-${testIdEntity}-${item.id}`} className={`admin-taxonomy-row ${selectedIds.has(item.id) ? "bg-muted/50" : ""}`}>
+          <div className="admin-taxonomy-table-scroll">
+            <table className="table admin-taxonomy-table" data-testid={`table-${testIdEntityPlural}`}>
+              <thead>
+                <tr>
                   {bulkOperationsEnabled && (
-                    <TableCell className="w-[50px]">
+                    <th className="w-[50px]">
                       <Checkbox
-                        checked={selectedIds.has(item.id)}
-                        onCheckedChange={(checked) => handleSelectItem(item.id, checked as boolean)}
-                        aria-label={`Select ${item.name}`}
-                        data-testid={`checkbox-select-${item.id}`}
-                        disabled={item.resourceCount > 0}
-                        title={item.resourceCount > 0 ? `Cannot select: has ${item.resourceCount} resources` : undefined}
+                        checked={allSelectableOnPageSelected && selectableItems.length > 0}
+                        onCheckedChange={handleSelectAll}
+                        aria-label="Select all"
+                        data-testid="checkbox-select-all"
+                        disabled={selectableItems.length === 0}
+                        className={someSelectedOnPage && !allSelectableOnPageSelected ? "data-[state=checked]:bg-primary/50" : ""}
                       />
-                    </TableCell>
+                    </th>
                   )}
                   {getVisibleColumns.map((col) => (
-                    <TableCell
+                    <th
                       key={col.key}
-                      className={`${col.className || ""} ${col.align === "right" ? "text-right" : ""}`}
-                      data-testid={col.key === "name" ? `text-${testIdEntity}-name-${item.id}` : undefined}
+                      className={`${col.className || ""} ${col.width ? col.width : col.align === "right" ? "text-right" : ""}`}
                     >
-                      {col.render ? col.render(item, parentData, navTree) : (
-                        col.key === "id" ? (
-                          <span className="admin-taxonomy-cell-id font-mono text-sm">{item.id}</span>
-                        ) : col.key === "name" ? (
-                          <span className="admin-taxonomy-cell-name font-medium">{item.name}</span>
-                        ) : col.key === "slug" ? (
-                          <span className="admin-taxonomy-cell-slug font-mono text-sm text-muted-foreground">{item.slug}</span>
-                        ) : col.key === "resourceCount" ? (
-                          <Badge className="admin-taxonomy-cell-count" variant="secondary" data-testid={`badge-count-${item.id}`}>
-                            {item.resourceCount}
-                          </Badge>
-                        ) : col.key === "actions" ? (
-                          <div className="admin-taxonomy-row-actions flex items-center justify-end gap-2">
-                            <Button
-                              variant="ghost"
-                              size="sm"
-                              onClick={() => openEditDialog(item)}
-                              className="admin-taxonomy-row-action"
-                              aria-label={`Edit ${item.name}`}
-                              data-testid={`button-edit-${item.id}`}
-                            >
-                              <span>Edit</span>
-                            </Button>
-                            {/* Run16 BUG-081: disabled delete gets a visible reason.
-                                The title lives on a wrapping span because disabled
-                                buttons swallow hover events in some browsers. */}
-                            <span
-                              className="admin-taxonomy-delete-action inline-block"
-                              title={item.resourceCount > 0
-                                ? `Cannot delete: ${item.resourceCount} resource${item.resourceCount === 1 ? "" : "s"} still assigned. Move or delete them first.`
-                                : undefined}
-                            >
+                      {col.label}
+                    </th>
+                  ))}
+                </tr>
+              </thead>
+              <tbody>
+                {/* Run17 BUG-032: a filter with zero matches renders an explicit
+                    empty row instead of headers floating over nothing. */}
+                {(!paginatedItems || paginatedItems.length === 0) && (
+                  <tr>
+                    <td
+                      colSpan={getVisibleColumns.length + (bulkOperationsEnabled ? 1 : 0)}
+                      className="text-center py-8 text-muted-foreground"
+                      data-testid={`empty-${testIdEntityPlural}`}
+                    >
+                      No {entityNamePlural.toLowerCase()} match your search.
+                    </td>
+                  </tr>
+                )}
+                {paginatedItems?.map((item) => (
+                  <tr key={item.id} data-testid={`row-${testIdEntity}-${item.id}`} className={`admin-taxonomy-row ${selectedIds.has(item.id) ? "bg-muted/50" : ""}`}>
+                    {bulkOperationsEnabled && (
+                      <td className="w-[50px]">
+                        <Checkbox
+                          checked={selectedIds.has(item.id)}
+                          onCheckedChange={(checked) => handleSelectItem(item.id, checked as boolean)}
+                          aria-label={`Select ${item.name}`}
+                          data-testid={`checkbox-select-${item.id}`}
+                          disabled={item.resourceCount > 0}
+                          title={item.resourceCount > 0 ? `Cannot select: has ${item.resourceCount} resources` : undefined}
+                        />
+                      </td>
+                    )}
+                    {getVisibleColumns.map((col) => (
+                      <td
+                        key={col.key}
+                        className={`${col.className || ""} ${col.align === "right" ? "text-right" : ""}`}
+                        data-testid={col.key === "name" ? `text-${testIdEntity}-name-${item.id}` : undefined}
+                      >
+                        {col.render ? col.render(item, parentData, navTree) : (
+                          col.key === "id" ? (
+                            <span className="admin-taxonomy-cell-id font-mono text-sm">{item.id}</span>
+                          ) : col.key === "name" ? (
+                            <span className="admin-taxonomy-cell-name font-medium">{item.name}</span>
+                          ) : col.key === "slug" ? (
+                            <span className="admin-taxonomy-cell-slug font-mono text-sm text-muted-foreground">{item.slug}</span>
+                          ) : col.key === "resourceCount" ? (
+                            <Badge className="admin-taxonomy-cell-count" variant="secondary" data-testid={`badge-count-${item.id}`}>
+                              {item.resourceCount}
+                            </Badge>
+                          ) : col.key === "actions" ? (
+                            <div className="admin-taxonomy-row-actions flex items-center justify-end gap-2">
                               <Button
+                                ref={(el) => {
+                                  if (el) editButtonRefs.current.set(item.id, el);
+                                  else editButtonRefs.current.delete(item.id);
+                                }}
                                 variant="ghost"
                                 size="sm"
-                                onClick={() => openDeleteDialog(item)}
-                                disabled={item.resourceCount > 0}
+                                onClick={() => openEditDialog(item)}
                                 className="admin-taxonomy-row-action"
-                                aria-label={item.resourceCount > 0
-                                  ? `Delete unavailable: ${item.resourceCount} resources still assigned`
-                                  : "Delete"}
-                                data-testid={`button-delete-${item.id}`}
+                                aria-label={`Edit ${item.name}`}
+                                data-testid={`button-edit-${item.id}`}
                               >
-                                <Trash2 className="h-4 w-4" />
+                                <span>Edit</span>
                               </Button>
-                            </span>
-                          </div>
-                        ) : (
-                          item[col.key]
-                        )
-                      )}
-                    </TableCell>
-                  ))}
-                </TableRow>
-              ))}
-            </TableBody>
-          </Table>
+                              {/* Run16 BUG-081: disabled delete gets a visible reason.
+                                  The title lives on a wrapping span because disabled
+                                  buttons swallow hover events in some browsers. */}
+                              {(() => {
+                                const blocker = getDeleteBlocker(item);
+                                return (
+                                  <span
+                                    className="admin-taxonomy-delete-action inline-block"
+                                    title={blocker
+                                      ? `Cannot delete: ${blocker.reason}. Move or delete ${blocker.count === 1 ? "it" : "them"} first.`
+                                      : undefined}
+                                  >
+                                    <Button
+                                      variant="ghost"
+                                      size="sm"
+                                      onClick={() => openDeleteDialog(item)}
+                                      disabled={!!blocker}
+                                      className="admin-taxonomy-row-action"
+                                      aria-label={blocker
+                                        ? `Delete ${item.name} unavailable: ${blocker.reason}`
+                                        : `Delete ${item.name}`}
+                                      data-testid={`button-delete-${item.id}`}
+                                    >
+                                      <Trash2 className="h-4 w-4" />
+                                    </Button>
+                                  </span>
+                                );
+                              })()}
+                            </div>
+                          ) : (
+                            item[col.key]
+                          )
+                        )}
+                      </td>
+                    ))}
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
 
           {/* Pagination Controls — Task 275: shared numbered paginator (same
               component as the public listings) so any page is reachable in ≤2
-              interactions; rows-per-page selector kept alongside it. */}
-          {paginationEnabled && totalPages > 1 && (
+              interactions. The rows-per-page selector stays whenever rows
+              exist: hiding it once the chosen size fit every row stranded the
+              admin at that size. */}
+          {paginationEnabled && totalItems > 0 && (
             <div className="admin-taxonomy-pagination mt-4 pt-4 border-t" data-testid={`pagination-${testIdEntityPlural}`}>
               <div className="flex items-center gap-2">
                 <span className="text-sm text-muted-foreground">Rows per page:</span>
@@ -2820,7 +2923,7 @@ export default function GenericCrudManager<T extends BaseEntityWithCount>({
                   </SelectContent>
                 </Select>
               </div>
-              <Paginator
+              {totalPages > 1 && <Paginator
                 currentPage={currentPage}
                 totalPages={totalPages}
                 makeHref={(p) => {
@@ -2832,7 +2935,7 @@ export default function GenericCrudManager<T extends BaseEntityWithCount>({
                 onNavigate={goToPage}
                 className="pt-3"
                 testIds={{ container: `paginator-${testIdEntityPlural}` }}
-              />
+              />}
             </div>
           )}
           </>
@@ -2842,6 +2945,16 @@ export default function GenericCrudManager<T extends BaseEntityWithCount>({
       {/* Create Dialog */}
       <Dialog open={createDialogOpen} onOpenChange={setCreateDialogOpen}>
         <DialogContent className="admin-taxonomy-dialog" data-testid={`dialog-create-${testIdEntity}`}>
+          {/* C7-V5B-01: a real form so Enter in a field submits, like the
+              Save button; display:contents keeps the dialog's grid layout. */}
+          <form
+            className="contents"
+            noValidate
+            onSubmit={(e) => {
+              e.preventDefault();
+              if (!createMutation.isPending) void handleCreate();
+            }}
+          >
           <DialogHeader>
             <DialogTitle>{createDialogTitle}</DialogTitle>
             <DialogDescription>
@@ -2859,35 +2972,7 @@ export default function GenericCrudManager<T extends BaseEntityWithCount>({
             </div>
           )}
           <div className="admin-taxonomy-form space-y-4 py-4">
-            {parents.map((parent, index) => {
-              const options = getFilteredParentOptions(parent.fieldName);
-              const isDisabled = !!(parent.filterBy && !formData[parent.filterBy]);
-
-              return (
-                <div key={parent.fieldName} className="space-y-2">
-                  <Label htmlFor={`create-${parent.fieldName}`}>{parent.label}</Label>
-                  <Select
-                    value={formData[parent.fieldName] as string}
-                    onValueChange={(value) => handleParentChange(parent.fieldName, value)}
-                    disabled={isDisabled}
-                  >
-                    <SelectTrigger
-                      id={`create-${parent.fieldName}`}
-                      data-testid={`select-create-${parent.fieldName.replace(/([A-Z])/g, '-$1').toLowerCase()}`}
-                    >
-                      <SelectValue placeholder={`Select ${parent.label.toLowerCase().replace(' *', '')}`} />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {options.map((option) => (
-                        <SelectItem key={option.id} value={option.id.toString()}>
-                          {option.name}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                </div>
-              );
-            })}
+            {parents.map((parent) => renderParentSelect(parent, 'create'))}
             <div className="space-y-2">
               <Label htmlFor="create-name">{formFields.name.label}</Label>
               <Input
@@ -2904,7 +2989,7 @@ export default function GenericCrudManager<T extends BaseEntityWithCount>({
                 id="create-slug"
                 placeholder={formFields.slug.placeholder}
                 value={formData.slug}
-                onChange={(e) => setFormData({ ...formData, slug: e.target.value })}
+                onChange={(e) => handleFieldEdit("slug", e.target.value)}
                 data-testid="input-create-slug"
               />
               {formFields.slug.helpText && (
@@ -3069,13 +3154,14 @@ export default function GenericCrudManager<T extends BaseEntityWithCount>({
                 setValidationErrors({});
                 setFormError(null);
               }}
+              type="button"
               data-testid="button-cancel-create"
             >
               <X className="h-4 w-4 mr-2" />
               Cancel
             </Button>
             <Button
-              onClick={handleCreate}
+              type="submit"
               disabled={createMutation.isPending}
               data-testid="button-confirm-create"
             >
@@ -3083,12 +3169,23 @@ export default function GenericCrudManager<T extends BaseEntityWithCount>({
               {createMutation.isPending ? "Creating..." : "Create"}
             </Button>
           </DialogFooter>
+          </form>
         </DialogContent>
       </Dialog>
 
       {/* Edit Dialog */}
       <Dialog open={editDialogOpen} onOpenChange={setEditDialogOpen}>
         <DialogContent className="admin-taxonomy-dialog" data-testid={`dialog-edit-${testIdEntity}`}>
+          {/* C7-V5B-01: a real form so Enter in a field submits, like the
+              Save button; display:contents keeps the dialog's grid layout. */}
+          <form
+            className="contents"
+            noValidate
+            onSubmit={(e) => {
+              e.preventDefault();
+              if (!updateMutation.isPending) void handleUpdate();
+            }}
+          >
           <DialogHeader>
             <DialogTitle>{editDialogTitle}</DialogTitle>
             <DialogDescription>
@@ -3106,42 +3203,14 @@ export default function GenericCrudManager<T extends BaseEntityWithCount>({
             </div>
           )}
           <div className="admin-taxonomy-form space-y-4 py-4">
-            {parents.map((parent, index) => {
-              const options = getFilteredParentOptions(parent.fieldName);
-              const isDisabled = !!(parent.filterBy && !formData[parent.filterBy]);
-
-              return (
-                <div key={parent.fieldName} className="space-y-2">
-                  <Label htmlFor={`edit-${parent.fieldName}`}>{parent.label}</Label>
-                  <Select
-                    value={formData[parent.fieldName] as string}
-                    onValueChange={(value) => handleParentChange(parent.fieldName, value)}
-                    disabled={isDisabled}
-                  >
-                    <SelectTrigger
-                      id={`edit-${parent.fieldName}`}
-                      data-testid={`select-edit-${parent.fieldName.replace(/([A-Z])/g, '-$1').toLowerCase()}`}
-                    >
-                      <SelectValue placeholder={`Select ${parent.label.toLowerCase().replace(' *', '')}`} />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {options.map((option) => (
-                        <SelectItem key={option.id} value={option.id.toString()}>
-                          {option.name}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                </div>
-              );
-            })}
+            {parents.map((parent) => renderParentSelect(parent, 'edit'))}
             <div className="space-y-2">
               <Label htmlFor="edit-name">{formFields.name.label}</Label>
               <Input
                 id="edit-name"
                 placeholder={formFields.name.placeholder}
                 value={formData.name}
-                onChange={(e) => handleNameChange(e.target.value)}
+                onChange={(e) => handleFieldEdit("name", e.target.value)}
                 data-testid="input-edit-name"
               />
             </div>
@@ -3151,7 +3220,7 @@ export default function GenericCrudManager<T extends BaseEntityWithCount>({
                 id="edit-slug"
                 placeholder={formFields.slug.placeholder}
                 value={formData.slug}
-                onChange={(e) => setFormData({ ...formData, slug: e.target.value })}
+                onChange={(e) => handleFieldEdit("slug", e.target.value)}
                 data-testid="input-edit-slug"
               />
             </div>
@@ -3324,13 +3393,14 @@ export default function GenericCrudManager<T extends BaseEntityWithCount>({
                 setValidationErrors({});
                 setFormError(null);
               }}
+              type="button"
               data-testid="button-cancel-edit"
             >
               <X className="h-4 w-4 mr-2" />
               Cancel
             </Button>
             <Button
-              onClick={handleUpdate}
+              type="submit"
               disabled={updateMutation.isPending}
               data-testid="button-confirm-edit"
             >
@@ -3338,19 +3408,29 @@ export default function GenericCrudManager<T extends BaseEntityWithCount>({
               {updateMutation.isPending ? "Saving..." : "Save"}
             </Button>
           </DialogFooter>
+          </form>
         </DialogContent>
       </Dialog>
 
       {/* Delete Dialog */}
       <AlertDialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
-        <AlertDialogContent data-testid={`dialog-delete-${testIdEntity}`}>
+        <AlertDialogContent
+          data-testid={`dialog-delete-${testIdEntity}`}
+          onCloseAutoFocus={(event) => {
+            const target = deleteFocusTargetRef.current;
+            deleteFocusTargetRef.current = null;
+            if (!target?.isConnected) return;
+            event.preventDefault();
+            target.focus();
+          }}
+        >
           <AlertDialogHeader>
             <AlertDialogTitle>Delete {entityName}</AlertDialogTitle>
             <AlertDialogDescription>
               Are you sure you want to delete "{selectedItem?.name}"?
-              {selectedItem && selectedItem.resourceCount > 0 && (
-                <span className={"block mt-2 text-[#ff5c7a] font-semibold" /* DS-OK: status bad */}>
-                  This {entityName.toLowerCase()} has {selectedItem.resourceCount} resources and cannot be deleted.
+              {selectedItem && getDeleteBlocker(selectedItem) && (
+                <span className={"block mt-2 text-[var(--status-bad)] font-semibold" /* DS-OK: status bad */}>
+                  This {entityName.toLowerCase()} cannot be deleted: {getDeleteBlocker(selectedItem)!.reason}.
                 </span>
               )}
             </AlertDialogDescription>
@@ -3360,8 +3440,12 @@ export default function GenericCrudManager<T extends BaseEntityWithCount>({
               Cancel
             </AlertDialogCancel>
             <AlertDialogAction
-              onClick={handleDelete}
-              disabled={deleteMutation.isPending || (selectedItem?.resourceCount ?? 0) > 0}
+              onClick={(event) => {
+                // Stay open until the delete settles so onSuccess can pick the focus target.
+                event.preventDefault();
+                handleDelete();
+              }}
+              disabled={deleteMutation.isPending || (!!selectedItem && !!getDeleteBlocker(selectedItem))}
               className="bg-destructive hover:bg-destructive/90"
               data-testid="button-confirm-delete"
             >
@@ -3381,7 +3465,7 @@ export default function GenericCrudManager<T extends BaseEntityWithCount>({
                 <>
                   Are you sure you want to delete {deletableSelectedItems.length} {deletableSelectedItems.length === 1 ? entityName.toLowerCase() : entityNamePlural.toLowerCase()}?
                   {selectedWithResources.length > 0 && (
-                    <span className={"block mt-2 text-[#ffb84d]" /* DS-OK: status warn */}>
+                    <span className={"block mt-2 text-[var(--status-warn)]" /* DS-OK: status warn */}>
                       Note: {selectedWithResources.length} selected {selectedWithResources.length === 1 ? 'item has' : 'items have'} resources and will be skipped.
                     </span>
                   )}
@@ -3398,7 +3482,7 @@ export default function GenericCrudManager<T extends BaseEntityWithCount>({
                   </ul>
                 </>
               ) : (
-                <span className={"text-[#ffb84d]" /* DS-OK: status warn */}>
+                <span className={"text-[var(--status-warn)]" /* DS-OK: status warn */}>
                   None of the selected items can be deleted because they all have associated resources.
                 </span>
               )}
@@ -3481,14 +3565,14 @@ export default function GenericCrudManager<T extends BaseEntityWithCount>({
                               View changes
                             </summary>
                             <div className="mt-2 grid grid-cols-2 gap-2 text-xs">
-                              <div className={"bg-[#ff5c7a]/10 rounded p-2" /* DS-OK: status bad */}>
-                                <span className={"font-medium text-[#ff5c7a]" /* DS-OK: status bad */}>Before:</span>
+                              <div className={"bg-[var(--status-bad)]/10 rounded p-2" /* DS-OK: status bad */}>
+                                <span className={"font-medium text-[var(--status-bad)]" /* DS-OK: status bad */}>Before:</span>
                                 <pre className="mt-1 whitespace-pre-wrap break-all text-muted-foreground max-h-32 overflow-y-auto">
                                   {JSON.stringify(entry.previousData, null, 2)}
                                 </pre>
                               </div>
-                              <div className={"bg-[#34d08c]/10 rounded p-2" /* DS-OK: status ok */}>
-                                <span className={"font-medium text-[#34d08c]" /* DS-OK: status ok */}>After:</span>
+                              <div className={"bg-[var(--status-ok)]/10 rounded p-2" /* DS-OK: status ok */}>
+                                <span className={"font-medium text-[var(--status-ok)]" /* DS-OK: status ok */}>After:</span>
                                 <pre className="mt-1 whitespace-pre-wrap break-all text-muted-foreground max-h-32 overflow-y-auto">
                                   {JSON.stringify(entry.newData, null, 2)}
                                 </pre>
@@ -3501,7 +3585,7 @@ export default function GenericCrudManager<T extends BaseEntityWithCount>({
                             <summary className="text-xs text-muted-foreground cursor-pointer hover:text-foreground">
                               View created data
                             </summary>
-                            <div className={"mt-2 bg-[#34d08c]/10 rounded p-2 text-xs" /* DS-OK: status ok */}>
+                            <div className={"mt-2 bg-[var(--status-ok)]/10 rounded p-2 text-xs" /* DS-OK: status ok */}>
                               <pre className="whitespace-pre-wrap break-all text-muted-foreground max-h-32 overflow-y-auto">
                                 {JSON.stringify(entry.newData, null, 2)}
                               </pre>
@@ -3513,7 +3597,7 @@ export default function GenericCrudManager<T extends BaseEntityWithCount>({
                             <summary className="text-xs text-muted-foreground cursor-pointer hover:text-foreground">
                               View deleted data
                             </summary>
-                            <div className={"mt-2 bg-[#ff5c7a]/10 rounded p-2 text-xs" /* DS-OK: status bad */}>
+                            <div className={"mt-2 bg-[var(--status-bad)]/10 rounded p-2 text-xs" /* DS-OK: status bad */}>
                               <pre className="whitespace-pre-wrap break-all text-muted-foreground max-h-32 overflow-y-auto">
                                 {JSON.stringify(entry.previousData, null, 2)}
                               </pre>

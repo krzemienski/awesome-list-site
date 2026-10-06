@@ -31,6 +31,7 @@ import {
 import { parseIntInRange } from "@shared/validation";
 import type { ContactRepository } from "../../repositories";
 import { config } from "../../config";
+import { SITE_URL } from "../../og-middleware";
 import { validateBody } from "../../validation/inputs";
 import { negotiated429Handler } from "../../middleware/rateLimit";
 import { PgRateLimitStore } from "../../middleware/pgRateLimitStore";
@@ -232,7 +233,10 @@ export function registerContactRoutes(app: Express, ctx: ContactRoutesContext): 
       site: {
         title: config.site.title,
         description: config.site.description,
-        url: config.site.url,
+        // The served deployment's canonical origin (the one canonical links,
+        // the sitemap and JSON-LD use) — not the static-export URL in
+        // awesome-list.config.yaml.
+        url: SITE_URL,
         author: config.site.author,
         ...sourceRepository,
       },

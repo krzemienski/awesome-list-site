@@ -58,7 +58,7 @@ import { resourceKindSchema } from "@shared/resourceKinds";
 import {
   httpsUrlSchema,
   resourceTitleSchema,
-  resourceDescriptionSchema,
+  optionalResourceDescriptionSchema,
   DISPLAY_NAME_MAX,
   stripInvisible,
   parseIntInRange,
@@ -69,6 +69,8 @@ import { ensureSubSubcategoryExists } from "../../repositories/ensureSubSubcateg
 import { isDatabaseUnavailableError } from "../../db/errors";
 import { claudeService } from "../../ai/claudeService";
 import { send429 } from "../../middleware/rateLimit";
+import { ConflictError } from "../../middleware/errors";
+import { buildValidationEnvelope } from "../../contracts/envelope";
 import type {
   UserRepository,
   ResourceRepository,
@@ -76,6 +78,9 @@ import type {
   AuditRepository,
   AdminRepository,
 } from "../../repositories";
+
+// Every value resources.status can hold (shared/schema.ts resources.status).
+const ADMIN_RESOURCE_STATUSES = ['approved', 'pending', 'rejected', 'withdrawn', 'archived'];
 
 /**
  * Explicit dependency context for the admin-content routes. Everything the
@@ -217,7 +222,10 @@ export function registerAdminContentRoutes(
       const header = ['id', 'email', 'firstName', 'lastName', 'role', 'authProvider', 'createdAt'];
       const lines = [header.join(',')];
       for (const u of allUsers) {
-        const provider = u.password ? 'local' : 'replit';
+        // No provider column exists: Clerk-provisioned rows carry the Clerk
+        // `user_…` id, migrated rows keep their legacy id (password hash =
+        // pre-Clerk email/password account, none = Replit OIDC subject).
+        const provider = u.id.startsWith('user_') ? 'clerk' : u.password ? 'local' : 'replit';
         lines.push([
           csvCell(u.id),
           csvCell(u.email ?? ''),
@@ -432,7 +440,7 @@ export function registerAdminContentRoutes(
       // description so no live resource has a stub under 20 chars.
       const cleanDescription = ensureMinDescription(existing.description || '', existing.title, existing.url);
       if (cleanDescription !== (existing.description || '')) {
-        await resourceRepo.updateResource(resourceId, { description: cleanDescription });
+        await resourceRepo.updateResource(resourceId, { description: cleanDescription }, { performedBy: userId });
       }
       
       const updatedResource = await resourceRepo.approveResource(resourceId, userId);
@@ -554,16 +562,14 @@ export function registerAdminContentRoutes(
       // set the admin-owned stored kind.
       const updateSchema = adminResourceWriteSchema.partial().extend({
         title: resourceTitleSchema.optional(),
-        description: resourceDescriptionSchema.optional(),
+        description: optionalResourceDescriptionSchema.optional(),
         url: httpsUrlSchema.optional(),
       });
       const validationResult = updateSchema.safeParse(bodyForValidation);
       
       if (!validationResult.success) {
-        return res.status(400).json({ 
-          message: 'Validation failed', 
-          errors: validationResult.error.issues
-        });
+        // C3-V5A-02: per-field messages so the dialog can mark the field.
+        return res.status(400).json(buildValidationEnvelope(validationResult.error));
       }
       
       // Task #248: entity-escaped text must never be stored (shared decode
@@ -616,15 +622,10 @@ export function registerAdminContentRoutes(
         updateData.subSubcategory = null;
       }
 
-      const updatedResource = await resourceRepo.updateResource(resourceId, updateData);
-      
-      await auditRepo.logResourceAudit(
-        resourceId,
-        'updated',
-        userId,
-        updateData,
-        'Resource updated by admin'
-      );
+      const updatedResource = await resourceRepo.updateResource(resourceId, updateData, {
+        performedBy: userId,
+        notes: 'Resource updated by admin',
+      });
       
       res.json(updatedResource);
     } catch (error: any) {
@@ -906,6 +907,15 @@ export function registerAdminContentRoutes(
       const search = req.query.search as string;
       const category = req.query.category as string;
       const status = req.query.status as string;
+      // Same invalid_status contract as the public /api/resources; an unknown
+      // value used to come back as an empty 200 that looked like "no rows".
+      if (status !== undefined && status !== '' && !ADMIN_RESOURCE_STATUSES.includes(status)) {
+        return res.status(400).json({
+          error: 'invalid_status',
+          message: `status must be one of: ${ADMIN_RESOURCE_STATUSES.join(', ')}`,
+          allowed: ADMIN_RESOURCE_STATUSES,
+        });
+      }
       // Run16 BUG-035: pass the whitelisted sort through to the repo
       // (unknown values fall back to newest-first inside listResources).
       const sort = req.query.sort as "name-asc" | "name-desc" | "newest" | "oldest" | undefined;
@@ -916,7 +926,9 @@ export function registerAdminContentRoutes(
         search,
         category,
         status: status || undefined,
-        sort
+        sort,
+        // C9-V5A-06: no fuzzy near-misses in the admin list (bulk actions act on what is shown).
+        exactSearchOnly: true
       });
       
       res.json({
@@ -943,16 +955,13 @@ export function registerAdminContentRoutes(
       const createSchema = adminResourceWriteSchema.extend({
         title: resourceTitleSchema,
         url: httpsUrlSchema,
-        description: resourceDescriptionSchema.optional(),
+        description: optionalResourceDescriptionSchema.optional(),
       });
       
       const validationResult = createSchema.safeParse(req.body);
       
       if (!validationResult.success) {
-        return res.status(400).json({ 
-          message: 'Validation failed', 
-          errors: validationResult.error.issues
-        });
+        return res.status(400).json(buildValidationEnvelope(validationResult.error));
       }
       
       // Task #248: entity-escaped text must never be stored (shared decode
@@ -1002,15 +1011,10 @@ export function registerAdminContentRoutes(
          // validated metadata payload just like the admin update path does;
          // omitting it here silently discarded the featured toggle.
          metadata: validatedData.metadata,
+      }, {
+        changes: { title: validatedData.title, url: validatedData.url },
+        notes: 'Resource created by admin',
       });
-      
-      await auditRepo.logResourceAudit(
-        newResource.id,
-        'created',
-        userId,
-        { title: validatedData.title, url: validatedData.url },
-        'Resource created by admin'
-      );
       
       res.status(201).json(newResource);
     } catch (error: any) {
@@ -1214,10 +1218,14 @@ export function registerAdminContentRoutes(
       // /api/categories resourceCount exactly. getCategoryResourceCount
       // (all-statuses) is intentionally left unchanged — it backs the
       // taxonomy delete guard, which must see pending/rejected rows too.
-      const approvedCounts = await categoryRepo.getResourceCountsByCategory();
+      const [approvedCounts, subcategoryCounts] = await Promise.all([
+        categoryRepo.getResourceCountsByCategory(),
+        categoryRepo.getSubcategoryCountsByCategory(),
+      ]);
       const categoriesWithCounts = categories.map((cat) => ({
         ...cat,
         resourceCount: approvedCounts[cat.name] ?? 0,
+        subcategoryCount: subcategoryCounts[cat.id] ?? 0,
       }));
 
       res.json(categoriesWithCounts);
@@ -1338,6 +1346,9 @@ export function registerAdminContentRoutes(
       
       res.json({ message: 'Category deleted successfully' });
     } catch (error) {
+      if (error instanceof ConflictError) {
+        return res.status(409).json({ message: error.message });
+      }
       console.error('Error deleting category:', error);
       res.status(500).json({ message: 'Failed to delete category' });
     }
@@ -1351,11 +1362,12 @@ export function registerAdminContentRoutes(
       const categoryId = req.query.categoryId ? parseInt(req.query.categoryId as string) : undefined;
       
       const subcategories = await categoryRepo.listSubcategories(categoryId);
-      
+      const subSubcategoryCounts = await categoryRepo.getSubSubcategoryCountsBySubcategory();
+
       const subcategoriesWithCounts = await Promise.all(
         subcategories.map(async (sub) => {
           const count = await categoryRepo.getSubcategoryResourceCount(sub.name);
-          return { ...sub, resourceCount: count };
+          return { ...sub, resourceCount: count, subSubcategoryCount: subSubcategoryCounts[sub.id] ?? 0 };
         })
       );
       
@@ -1526,6 +1538,9 @@ export function registerAdminContentRoutes(
       
       res.json({ message: 'Subcategory deleted successfully' });
     } catch (error) {
+      if (error instanceof ConflictError) {
+        return res.status(409).json({ message: error.message });
+      }
       console.error('Error deleting subcategory:', error);
       res.status(500).json({ message: 'Failed to delete subcategory' });
     }
@@ -1694,6 +1709,9 @@ export function registerAdminContentRoutes(
       
       res.json({ message: 'Sub-subcategory deleted successfully' });
     } catch (error) {
+      if (error instanceof ConflictError) {
+        return res.status(409).json({ message: error.message });
+      }
       console.error('Error deleting sub-subcategory:', error);
       res.status(500).json({ message: 'Failed to delete sub-subcategory' });
     }

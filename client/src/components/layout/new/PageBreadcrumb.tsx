@@ -10,6 +10,8 @@ import {
   BreadcrumbSeparator,
 } from "@/components/ui/breadcrumb";
 import { deslugify } from "@/lib/utils";
+import { tagDisplayNameBranded } from "@shared/seo-templates";
+import { normalizeTagPathSegment } from "@shared/tagNormalize";
 
 const ResourceBreadcrumbAncestorDisclosure = lazy(
   () => import("./ResourceBreadcrumbAncestorDisclosure"),
@@ -167,7 +169,12 @@ function resolveCrumbs(categories: AwesomeListNavNode[], pathname: string, title
     return [{ href: "/journeys", label: "Learning Journeys" }, { label: titleLabel(title) ?? "Journey" }];
   }
   if (root === "tag" && value) {
-    return [{ href: "/categories", label: "Browse" }, { label: `Tag: ${decodedSlug(value)}` }];
+    // Same name source as the TagLanding H1, so brand casing ("FFmpeg") matches.
+    const tag = normalizeTagPathSegment(value);
+    return [
+      { href: "/categories", label: "Browse" },
+      { label: `Tag: ${tag ? tagDisplayNameBranded(tag) : decodedSlug(value)}` },
+    ];
   }
   if (root === "collection" && value) return [{ label: "Shared collection" }];
   if (root === "sign-in") return [{ label: "Sign in" }];
@@ -222,7 +229,9 @@ export default function PageBreadcrumb({ categories }: { categories: AwesomeList
   // (CategoryPage, ResourcePage, SubmitPage, AboutPage, admin) renders it
   // inside its own `.page-content`. This shell breadcrumb therefore stays in
   // the DOM for assistive technology and the selector contracts (same
-  // testids, same links) but is visually hidden on every route.
+  // testids, same links) but is visually hidden on every route. Its links
+  // stay in the accessibility tree but out of the Tab order, so keyboard
+  // focus never lands on an invisible 1px target.
   // ResourceDetail uses this exact string id in its public-detail query key.
   // Restrict the lazy disclosure to routable public resource ids: it has no
   // role on generic /resource 404s or any other breadcrumb shape.
@@ -232,7 +241,7 @@ export default function PageBreadcrumb({ categories }: { categories: AwesomeList
     <Breadcrumb className="sr-only" data-testid="page-breadcrumb">
       <BreadcrumbList className="min-w-0 flex-nowrap overflow-hidden">
         <BreadcrumbItem>
-          <BreadcrumbLink href="/" title="Home" data-testid="link-breadcrumb-home">Home</BreadcrumbLink>
+          <BreadcrumbLink href="/" title="Home" tabIndex={-1} data-testid="link-breadcrumb-home">Home</BreadcrumbLink>
         </BreadcrumbItem>
         <BreadcrumbSeparator />
         {crumbs.map((crumb, index) => {
@@ -249,7 +258,7 @@ export default function PageBreadcrumb({ categories }: { categories: AwesomeList
             <BreadcrumbItem className={current ? "min-w-0" : undefined} key={`${crumb.href ?? "current"}-${crumb.label}`}>
               {current
                 ? <BreadcrumbPage className="block truncate" title={crumb.label} data-testid="breadcrumb-mobile-current">{crumb.label}</BreadcrumbPage>
-                : <BreadcrumbLink href={href ?? "/"} title={crumb.label} data-testid={`link-breadcrumb-hidden-${href?.split("/").pop() ?? "home"}`}>{crumb.label}</BreadcrumbLink>}
+                : <BreadcrumbLink href={href ?? "/"} title={crumb.label} tabIndex={-1} data-testid={`link-breadcrumb-hidden-${href?.split("/").pop() ?? "home"}`}>{crumb.label}</BreadcrumbLink>}
             </BreadcrumbItem>,
             !current && <BreadcrumbSeparator key={`${crumb.label}-separator`} />,
           ];

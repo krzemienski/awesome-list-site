@@ -1,680 +1,89 @@
-/*
- * Canonical shell sidebar
- *
- * Scope all rules to the primitive's .av-sidebar-shell or its navigation
- * landmark. This file owns shell geometry only; palette and motion values stay
- * in the parity token source (design-system.css).
- */
-
-.av-sidebar-shell {
-  align-self: flex-start;
-  box-sizing: border-box;
-  display: flex;
-  flex: 0 0 var(--shell-sidebar-w, 280px);
-  height: calc(100vh - var(--header-height, 60px));
-  /* Consent is an in-flow shell row: reserve it only while present. */
-  max-height: calc(100vh - var(--header-height, 60px) - var(--app-bottom-inset, 0px));
-  min-height: 0;
-  position: sticky;
-  top: var(--header-height, 60px);
-  width: var(--shell-sidebar-w, 280px);
-  z-index: 5;
-}
-
-.av-sidebar-shell > [data-sidebar="sidebar"] {
-  background: linear-gradient(
-    180deg,
-    color-mix(in srgb, var(--bg) 88%, transparent),
-    color-mix(in srgb, var(--bg) 88%, transparent)
-  );
-  border-right: var(--hairline-w, 1px) solid var(--border);
-  box-sizing: border-box;
-  min-height: 0;
-  overflow: hidden;
-  /* DS-OK: canonical styles.css sidebar scrollbar is fixed white at 8%,
-     not foreground ink (which varies across typography profiles). */
-  scrollbar-color: rgba(255, 255, 255, 0.08) transparent; /* DS-OK: frozen sidebar scrollbar uses fixed white at 8%, independent of theme ink. */
-  scrollbar-width: thin;
-}
-
-.av-sidebar-shell [data-sidebar="content"] {
-  gap: 0;
-  min-height: 0;
-  overflow: hidden;
-}
+/* Canonical shell sidebar entry. The imports keep the original cascade
+   order; the mobile drawer, focus and breakpoint rules below come last. */
+@import "./sidebar-shell.css";
+@import "./sidebar-categories.css";
+@import "./sidebar-tree.css";
 
 /*
- * V2 sidebar anatomy: fixed Home + category heading, one scrolling taxonomy
- * tree, then a fixed compact footer. Keeping the scrollport on this direct
- * child prevents a long expanded tree from pushing footer controls below the
- * viewport, while leaving every row free to grow for its complete label.
+ * MobileDrawer (layout.jsx) taxonomy: no L3 marker on category rows, and
+ * canonical 36px .sub-item rows (38px rhythm). Rows keep 44px targets that
+ * overhang by 3px; paint moves to an inset ::before as on desktop.
  */
-.av-sidebar-tree-scroll {
-  flex: 1 1 auto;
-  min-height: 0;
-  overflow-x: clip;
-  overflow-y: auto;
-}
-
-.av-sidebar-shell .av-sidebar-tree-scroll {
-  /* DS-OK: frozen canonical sidebar scrollbar uses fixed white at 8%, not theme ink. */
-  scrollbar-color: rgba(255, 255, 255, 0.08) transparent;
-  scrollbar-width: thin;
-}
-
-.av-sidebar-shell .av-sidebar-home-navigation {
-  padding: 14px 14px 8px;
-}
-
-.av-sidebar-expanded-navigation {
-  display: flex;
-  flex: 1 1 auto;
-  flex-direction: column;
-  min-height: 0;
-}
-
-.av-sidebar-shell .av-sidebar-home-navigation > .sub-item {
-  border: 0;
-  margin-block: 1px;
-  min-height: 34px;
-}
-
-.av-sidebar-shell .av-sidebar-categories-heading {
-  align-items: center;
-  display: flex;
-  gap: 8px;
-  justify-content: space-between;
-  padding: 6px 14px 10px;
-}
-
-.av-sidebar-collapse-toggle {
-  align-items: center;
-  background: var(--surface);
-  border: var(--hairline-w, 1px) solid var(--border);
-  border-radius: var(--radius-sm);
-  color: var(--text-3);
-  cursor: pointer;
-  display: flex;
-  flex: 0 0 26px;
-  height: 26px;
-  justify-content: center;
-  padding: 0;
-  transform: scaleX(-1);
-  width: 26px;
-}
-
-.av-sidebar-shell [data-sidebar="footer"] {
-  flex-shrink: 0;
-}
-
-/* The canonical default remains expanded. The persisted SidebarProvider
-   preference opts into this real, keyboard-reachable compact rail. */
-.av-sidebar-shell .av-sidebar-icon-rail {
+.av-sidebar-drawer .av-sidebar-l3-indicator {
   display: none;
 }
 
-.av-sidebar-shell.av-sidebar-rail-compact {
-  flex-basis: var(--shell-rail-w, 56px);
-  width: var(--shell-rail-w, 56px);
-}
-
-.av-sidebar-shell.av-sidebar-rail-compact [data-sidebar="content"] {
-  align-items: center;
-}
-
-.av-sidebar-shell.av-sidebar-rail-compact .av-sidebar-expanded-navigation {
-  display: none;
-}
-
-.av-sidebar-shell.av-sidebar-rail-compact .av-sidebar-icon-rail {
-  display: flex;
-  flex: 1 1 auto;
-  overflow-y: auto;
-  width: 100%;
-}
-
-.av-sidebar-shell.av-sidebar-rail-compact .rail-icon-btn {
-  align-items: center;
-  background: transparent;
-  border: var(--hairline-w, 1px) solid transparent;
-  border-radius: var(--radius-sm);
-  color: var(--text-2);
-  display: flex;
-  flex: 0 0 36px;
-  height: 36px;
-  justify-content: center;
-  min-height: 36px;
-  min-width: 36px;
-  padding: 0;
-  width: 36px;
-}
-
-.av-sidebar-shell.av-sidebar-rail-compact .rail-icon-btn:hover {
-  background: var(--surface);
-  color: var(--text);
-}
-
-.av-sidebar-shell.av-sidebar-rail-compact .rail-icon-btn[data-active="true"] {
-  background: color-mix(in srgb, var(--accent) 12%, transparent);
-  border-color: color-mix(in srgb, var(--accent) 35%, var(--border));
-  color: var(--accent);
-}
-
-.av-sidebar-shell.av-sidebar-rail-compact .rail-expand-navigation {
-  background: var(--surface);
-  border-color: var(--border);
-  margin-bottom: 10px;
-}
-
-.av-sidebar-rail-divider {
-  background: var(--hairline);
-  height: 1px;
-  margin: 6px 12px 4px;
-  width: 32px;
-}
-
-.av-sidebar-shell.av-sidebar-rail-compact .av-sidebar-rail-repo {
-  border-color: var(--border);
-  margin-top: auto;
-}
-
-/* AppSidebar shares one child tree between the visible tablet sidebar and the
-   optional drawer. The brand row belongs to the drawer only, as in the
-   canonical full-width-header handoff. */
-.av-sidebar-shell .av-sidebar-drawer-header {
-  display: none;
-}
-
-/* Canonical rows: hairline-separated category groups, a 44px disclosure
-   target, and a 2px accent bar for the active category. */
-.av-sidebar-shell .accordion-item,
-.av-sidebar-drawer .accordion-item {
-  border-bottom: var(--hairline-w, 1px) solid var(--border);
-  overflow: hidden;
-}
-
-.av-sidebar-shell .accordion-header,
-.av-sidebar-drawer .accordion-header {
-  align-items: center;
-  background: transparent;
-  border: 0;
-  box-sizing: border-box;
-  color: inherit;
-  display: flex;
-  gap: 10px;
-  justify-content: space-between;
-  min-height: 44px;
-  padding: 13px 18px;
-  position: relative;
-  text-align: left;
-  transition: background var(--motion-fast, 160ms) ease;
-  width: 100%;
-}
-
-/* The `border: 0` above out-specifies the global forced-colors `button` rule
-   (index.css R5-056), so Windows High Contrast lost the button affordance on
-   every category header. Forced-colors ignores author colors; this is a no-op
-   outside HC, so no pixel changes at any width. */
-@media (forced-colors: active) {
-  .av-sidebar-shell .accordion-header,
-  .av-sidebar-drawer .accordion-header {
-    border: var(--border-w, 1px) solid ButtonText;
-  }
-}
-
-.av-sidebar-shell .accordion-header:hover,
-.av-sidebar-drawer .accordion-header:hover {
-  background: var(--surface);
-}
-
-/* Refined desktop taxonomy uses the V2 24px marker; the frozen drawer keeps
-   the original 22px marker declared by layout.jsx. */
-.av-sidebar-category-label {
-  align-items: center;
-  display: flex;
-  flex: 1 1 auto;
-  gap: 10px;
-  min-width: 0;
-}
-
-.av-sidebar-category-meta {
-  align-items: center;
-  display: flex;
-  flex-shrink: 0;
-  gap: 6px;
-}
-
-.av-sidebar-shell .av-sidebar-category-label > span:first-child {
-  width: 24px !important;
-  height: 24px !important;
-  border-radius: var(--radius-sm) !important;
-}
-
-.av-sidebar-drawer .av-sidebar-category-label > span:first-child {
-  width: 22px !important;
-  height: 22px !important;
-  border-radius: 5px !important; /* DS-OK: frozen awesome-list-site-ds/layout.jsx MobileDrawer category glyph radius. */
-}
-
-.av-sidebar-drawer .accordion-header:not(.active) .av-sidebar-category-glyph {
-  background: rgba(255, 255, 255, 0.04) !important; /* DS-OK: frozen MobileDrawer inactive glyph fill. */
-}
-
-.av-sidebar-category-glyph {
-  font-size: 13px;
-  line-height: 1;
-}
-
-.av-sidebar-drawer .av-sidebar-category-glyph {
-  font-size: 12px;
-}
-
-/* The frozen mobile drawer leaves its category title at the drawer's inherited
-   foreground color; the desktop reference retains its dim inactive title. */
-.av-sidebar-drawer .av-sidebar-category-label > span:nth-child(2) {
-  color: var(--text) !important;
-}
-
-.av-sidebar-l3-indicator {
-  background: var(--surface);
-  /* DS-OK: frozen V2's noninteractive L3 taxonomy marker uses a 3px chip radius. */
-  border-radius: 3px;
-  color: var(--text-3);
-  font-family: var(--font-mono);
-  font-size: 9px;
-  letter-spacing: 0.12em;
-  padding: 1px 4px;
-}
-
-.av-sidebar-nested-count {
-  /* DS-OK: frozen V2's nested-count marker is a 1px bordered, 3px-radius chip. */
-  border: 1px solid var(--border);
-  border-radius: 3px;
-  color: var(--text-3);
-  font-family: var(--font-mono);
-  font-size: 9px;
-  letter-spacing: 0.06em;
-  line-height: 1;
-  padding: 1px 5px;
-}
-
-.av-sidebar-shell .accordion-header .font-mono,
-.av-sidebar-drawer .accordion-header .font-mono {
-  font-size: 10px !important;
-}
-
-.av-sidebar-shell .av-sidebar-category-label > span:nth-child(2),
-.av-sidebar-drawer .av-sidebar-category-label > span:nth-child(2),
-.av-sidebar-shell .sub-item > span:first-child,
-.av-sidebar-drawer .sub-item > span:first-child {
-  overflow-wrap: anywhere;
-}
-
-.av-sidebar-shell .av-sidebar-category-label > span:nth-child(2),
-.av-sidebar-drawer .av-sidebar-category-label > span:nth-child(2) {
-  flex: 1 1 auto;
-  overflow: hidden;
-  overflow-wrap: normal;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-
-/*
- * The frozen sidebar renders these taxonomy labels in native buttons, whose
- * computed feature/variation settings are normal. AppSidebar uses links to
- * preserve real navigation semantics; reset only their text spans, never the
- * adjacent mono count badges or unrelated product-navigation links.
- */
-.av-sidebar-shell .av-sidebar-home-navigation > .sub-item > span,
-.av-sidebar-shell .av-sidebar-category-label > span:nth-child(2),
-.av-sidebar-shell .accordion-body .sub-item > span:first-child {
-  font-feature-settings: normal;
-  font-variation-settings: normal;
-}
-
-/* Match the frozen drawer's body OpenType features explicitly: inheriting
-   here instead picks up the application's different base feature set.
-   Desktop native-button typography remains separate. */
-.av-sidebar-drawer .av-sidebar-category-label > span:nth-child(2) {
-  font-feature-settings: "ss01", "cv11", "tnum";
-  font-variation-settings: inherit;
-}
-
-.av-sidebar-shell .accordion-header,
-.av-sidebar-drawer .accordion-header,
-.av-sidebar-shell .sub-item,
-.av-sidebar-drawer .sub-item,
-.av-sidebar-compact-footer-copy {
-  line-height: var(--body-leading);
-}
-
-.av-sidebar-shell details,
-.av-sidebar-drawer details {
-  padding: 10px 18px;
-  color: var(--text-2);
-}
-
-.av-sidebar-shell summary,
-.av-sidebar-drawer summary {
-  min-height: 44px;
-  cursor: pointer;
-}
-
-/* V2's pinned site-identity footer is intentionally compact. More navigation
-   remains a native disclosure inside it so product routes and test IDs are
-   retained without displacing the taxonomy scrollport. */
-.av-sidebar-compact-footer {
-  background: var(--bg);
-  border-top: var(--hairline-w, 1px) solid var(--border);
+.av-sidebar-drawer .accordion-body-inner,
+.av-sidebar-drawer .av-sidebar-l3-tree {
   display: flex;
   flex-direction: column;
-  gap: 0;
-  margin-top: auto;
-  padding: 0;
 }
 
-.av-sidebar-compact-footer-status {
-  align-items: center;
-  display: flex;
-  gap: 8px;
-  min-height: 48px;
-  padding: 0 14px;
-}
-
-.av-sidebar-compact-footer-copy {
-  color: var(--text-3);
-  flex: 1 1 auto;
-  font-family: var(--font-mono);
-  font-size: 10px;
-  letter-spacing: 0.06em;
-  min-width: 0;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-
-.av-sidebar-compact-footer-links {
-  align-items: center;
-  display: flex;
-  flex-shrink: 0;
-  gap: 4px;
-}
-
-.av-sidebar-compact-footer-links a {
-  align-items: center;
-  color: var(--text-2);
-  display: inline-flex;
-  font-family: var(--font-mono);
-  font-size: 10px;
-  background: var(--surface);
-  border: var(--hairline-w, 1px) solid var(--border);
-  border-radius: var(--radius-sm);
-  height: 28px;
-  min-height: 28px;
-  min-width: 28px;
-  justify-content: center;
-  text-decoration: none;
-}
-
-.av-sidebar-compact-footer-links a:hover {
-  color: var(--accent);
-}
-
-.av-sidebar-compact-footer .av-sidebar-more-navigation {
-  flex: 0 0 28px;
-  margin-left: 0;
-  padding: 0;
+.av-sidebar-drawer .av-sidebar-all-category,
+.av-sidebar-drawer .av-sidebar-leaf,
+.av-sidebar-drawer .av-sidebar-l2-row {
+  background: transparent;
+  margin-block: -3px;
   position: relative;
 }
 
-.av-sidebar-compact-footer .av-sidebar-more-navigation > summary {
-  align-items: center;
-  display: flex;
-  background: var(--surface);
-  border: var(--hairline-w, 1px) solid var(--border);
-  border-radius: var(--radius-sm);
-  height: 28px;
-  justify-content: center;
-  list-style: none;
-  min-height: 28px;
-  padding: 0;
-  width: 28px;
-}
-
-.av-sidebar-compact-footer .av-sidebar-more-navigation > summary::-webkit-details-marker {
-  display: none;
-}
-
-.av-sidebar-compact-footer .av-sidebar-more-navigation > [data-sidebar="menu"] {
-  background: var(--bg-2);
-  border: var(--hairline-w, 1px) solid var(--border);
-  bottom: calc(100% + 6px);
-  box-shadow: var(--shadow);
-  min-width: 220px;
-  padding: 8px;
-  position: absolute;
-  right: -14px;
-  z-index: 6;
-}
-
-.av-sidebar-drawer .av-sidebar-compact-footer .av-sidebar-more-navigation > [data-sidebar="menu"] {
-  right: -18px;
-}
-
-/* SidebarMenuButton carries shadcn's generic single-line menu treatment.
-   Product links in this shell retain their complete labels instead. */
-.av-sidebar-compact-footer .av-sidebar-more-navigation [data-sidebar="menu-button"] {
-  height: auto;
-  overflow: visible;
-}
-
-.av-sidebar-compact-footer .av-sidebar-more-navigation [data-sidebar="menu-button"] > span:last-child {
-  overflow: visible;
-  text-overflow: clip;
-  white-space: normal;
-}
-
-.av-sidebar-shell .accordion-header.active,
-.av-sidebar-drawer .accordion-header.active {
-  background: var(--surface-2);
-}
-
-.av-sidebar-shell .accordion-header.active::before,
-.av-sidebar-drawer .accordion-header.active::before {
-  background: var(--accent);
-  box-shadow: 0 0 8px var(--accent);
-  content: "";
-  left: 0;
-  position: absolute;
-  top: 10px;
-  bottom: 10px;
-  width: 2px;
-}
-
-.av-sidebar-shell .accordion-body,
-.av-sidebar-drawer .accordion-body {
-  /* DS-OK: canonical accordion well is a fixed black compositing layer,
-     not a profile surface tint. */
-  background: rgba(0, 0, 0, 0.18);
-  overflow: hidden;
-  transition: max-height 320ms var(--motion-ease, cubic-bezier(0.2, 0.65, 0.3, 1));
-}
-
-.av-sidebar-shell .accordion-body-inner,
-.av-sidebar-drawer .accordion-body-inner {
-  padding: 4px 16px 10px 30px;
-}
-
-/* Preserve the accessible full-label fallback for legacy consumers. */
-.av-sidebar-shell .accordion-header .truncate,
-.av-sidebar-drawer .accordion-header .truncate {
-  overflow-wrap: anywhere;
-  white-space: normal;
-}
-
-.av-sidebar-shell .sub-item,
-.av-sidebar-drawer .sub-item {
-  align-items: center;
+.av-sidebar-drawer .av-sidebar-all-category::before,
+.av-sidebar-drawer .av-sidebar-leaf::before,
+.av-sidebar-drawer .av-sidebar-l2-row::before {
   border: var(--hairline-w) solid transparent;
-  /* DS-OK: canonical .sub-item uses a fixed 6px navigation radius rather
-     than the variable card/control radius. */
-  border-radius: 6px;
-  box-sizing: border-box;
-  color: var(--text-2);
-  cursor: pointer;
-  display: flex;
-  font-size: 12.5px;
-  gap: 10px;
-  justify-content: space-between;
-  margin: 1px 0;
-  padding: 7px 11px;
-  transition: all 140ms ease;
+  border-radius: inherit;
+  content: "";
+  inset: 3px 0;
+  pointer-events: none;
+  position: absolute;
+  transition: background 140ms ease, border-color 140ms ease;
 }
 
-.av-sidebar-shell .sub-item:hover,
-.av-sidebar-drawer .sub-item:hover {
+.av-sidebar-drawer .av-sidebar-l2-row::before { inset: 4px 0; }
+
+.av-sidebar-drawer .av-sidebar-all-category > span,
+.av-sidebar-drawer .av-sidebar-leaf > span,
+.av-sidebar-drawer .av-sidebar-l2-row > * {
+  position: relative;
+}
+
+.av-sidebar-drawer .av-sidebar-all-category:hover,
+.av-sidebar-drawer .av-sidebar-leaf:hover,
+.av-sidebar-drawer .av-sidebar-leaf[data-active="true"] {
+  background: transparent;
+  border-color: transparent;
+}
+
+.av-sidebar-drawer .av-sidebar-all-category:hover::before,
+.av-sidebar-drawer .av-sidebar-leaf:hover::before,
+.av-sidebar-drawer .av-sidebar-l2-row:hover::before {
   background: var(--surface);
   border-color: var(--border);
-  color: var(--text);
-  transform: translateX(2px);
 }
 
-.av-sidebar-shell .sub-item[data-active="true"],
-.av-sidebar-drawer .sub-item[data-active="true"] {
+.av-sidebar-drawer .av-sidebar-leaf[data-active="true"]::before,
+.av-sidebar-drawer .av-sidebar-l2-row.active::before {
   background: color-mix(in srgb, var(--accent) 8%, transparent);
-  color: var(--accent);
 }
 
-/* Refined taxonomy rows from sidebar-variants.jsx. L2 navigation and its
-   disclosure remain separate siblings: opening a branch never navigates. */
-.av-sidebar-all-category {
-  color: var(--text-3) !important;
-  font-style: italic;
-}
-
-.av-sidebar-l2-row {
-  align-items: stretch;
+.av-sidebar-drawer .av-sidebar-l2-row:hover,
+.av-sidebar-drawer .av-sidebar-l2-row.active {
   background: transparent;
-  border-radius: 6px; /* DS-OK: frozen awesome-list-site-ds/sidebar-variants.jsx refined L2 row radius (borderRadius: 6). */
-  display: flex;
-  min-height: 34px;
-  transition: background 140ms ease;
 }
 
-.av-sidebar-l2-row:hover {
-  background: var(--surface);
+/* Leaf .sub-item rows keep their 1px transparent hairline in the drawer. */
+.av-sidebar-drawer .av-sidebar-l2-link {
+  padding: 0 0 0 12px;
 }
 
-.av-sidebar-l2-row.active {
-  background: color-mix(in srgb, var(--accent) 10%, transparent);
-}
-
-.av-sidebar-l2-link {
-  align-items: center;
-  color: var(--text-2);
-  display: flex;
-  flex: 1 1 auto;
-  font-size: 12.5px;
-  gap: 8px;
-  line-height: normal;
-  min-width: 0;
-  padding: 8px 4px 8px 11px;
-}
-
-.av-sidebar-l2-row.active .av-sidebar-l2-link {
-  color: var(--accent);
-}
-
-.av-sidebar-l2-link > span:first-child {
-  flex: 1 1 auto;
-  min-width: 0;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-
-.av-sidebar-l2-link > span:last-child {
+.av-sidebar-drawer .av-sidebar-l2-toggle {
+  border-left: 0;
+  border-radius: 0;
   color: var(--text-3);
-  font-size: 10px;
-}
-
-.av-sidebar-l2-row.active .av-sidebar-l2-link > span:last-child {
-  color: var(--accent);
-}
-
-.av-sidebar-l2-toggle {
-  align-items: center;
-  background: transparent;
-  border: 0;
-  border-left: var(--hairline-w, 1px) solid var(--border);
-  border-radius: 0 6px 6px 0;
-  color: var(--text-2);
-  cursor: pointer;
-  display: flex;
-  flex-shrink: 0;
-  gap: 6px;
-  line-height: normal;
-  padding: 0 9px 0 6px;
-}
-
-.av-sidebar-l2-group > .accordion-body {
-  background: transparent;
-  transition-duration: 240ms;
-}
-
-.av-sidebar-l3-tree {
-  border-left: var(--hairline-w, 1px) solid var(--border);
-  margin-left: 6px;
-  padding: 4px 0 4px 8px;
-}
-
-.av-sidebar-l3-all,
-.av-sidebar-l3-row {
-  align-items: center;
-  color: var(--text-3);
-  display: grid;
-  font-size: 12px;
-  gap: 8px;
-  grid-template-columns: 14px minmax(0, 1fr) auto;
-  line-height: normal;
-  min-height: 32px;
-  padding: 8px 11px 8px 0;
-  text-align: left;
-  width: 100%;
-}
-
-.av-sidebar-l3-all {
-  font-size: 11.5px;
-  font-style: italic;
-  grid-template-columns: 14px minmax(0, 1fr);
-  min-height: 0;
-  margin-bottom: 2px;
-  padding-block: 4px;
-}
-
-.av-sidebar-l3-all > span:first-child,
-.av-sidebar-l3-row > span:first-child {
-  color: var(--text-4);
-  font-family: var(--font-mono);
-  font-size: 11px;
-  line-height: 1;
-  text-align: center;
-}
-
-.av-sidebar-l3-row > span:nth-child(2) {
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-
-.av-sidebar-l3-row > span:last-child {
-  color: var(--text-4);
-  font-size: 9.5px;
-}
-
-.av-sidebar-l3-row:hover,
-.av-sidebar-l3-row[data-active="true"] {
-  color: var(--text);
+  justify-content: flex-end;
+  margin-left: -16px;
+  padding: 0 11px 0 0;
+  width: 44px;
 }
 
 /*
@@ -733,6 +142,18 @@
   .av-sidebar-shell {
     flex-basis: var(--shell-sidebar-w-tablet, 240px);
     width: var(--shell-sidebar-w-tablet, 240px);
+  }
+
+  /* F210: at 240px an ellipsis cut category names to ~10 characters
+     ("Community &…"). Drop the L3 marker as the drawer does and let the name
+     wrap so every category stays readable. */
+  .av-sidebar-shell .av-sidebar-l3-indicator {
+    display: none;
+  }
+
+  .av-sidebar-shell .av-sidebar-category-label > span:nth-child(2) {
+    white-space: normal;
+    overflow-wrap: break-word;
   }
 }
 

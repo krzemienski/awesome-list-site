@@ -11,7 +11,6 @@ import { Textarea } from "@/components/ui/textarea";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Switch } from "@/components/ui/switch";
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
@@ -33,7 +32,9 @@ import { Paginator } from "@/components/ui/paginator";
 import { parsePageFromSearch } from "@/lib/page-param";
 // BUG-049: client-side validation mirrors the server's shared schemas so the
 // dialog flags bad input inline instead of only failing server-side.
-import { resourceTitleSchema, resourceDescriptionSchema, webUrlSchema, httpsUrlSchema } from "@shared/validation";
+import { resourceTitleSchema, optionalResourceDescriptionSchema, webUrlSchema, httpsUrlSchema } from "@shared/validation";
+import { extractFieldErrors } from "@/lib/apiError";
+import { handoffFocusOnUnmount } from "@/hooks/focus-handoff";
 import {
   RESOURCE_FORMAT_LABELS,
   RESOURCE_FORMAT_VALUES,
@@ -70,6 +71,8 @@ type AdminResourceWire = Omit<Resource, "kind" | "metadata"> & {
 type AdminResource = Omit<AdminResourceWire, "metadata"> & {
   metadata: ResourceMetadata | null;
   resolvedKind: ResourceKind;
+  /** What "Use inferred" resolves to, ignoring any stored override. */
+  inferredKind: ResourceKind;
 };
 type ResourcePatchResponse = AdminResourceWire;
 
@@ -89,12 +92,12 @@ const normalizeAdminResource = (resource: AdminResourceWire): AdminResource => {
   const metadata = safeResourceMetadata(resource.metadata);
   const parsedKind = resourceKindSchema.safeParse(resource.kind);
   const kind = parsedKind.success ? parsedKind.data : null;
-  const resolvedKind = resolveResourceKindFrom({
-    storedKind: kind,
+  const signals = {
     tags: safeResourceMetadataTags(metadata),
     taxonomy: [resource.category, resource.subcategory, resource.subSubcategory],
-  }).kind;
-  return { ...resource, kind, metadata, resolvedKind };
+  };
+  const inferredKind = resolveResourceKindFrom({ ...signals, storedKind: null }).kind;
+  return { ...resource, kind, metadata, resolvedKind: kind ?? inferredKind, inferredKind };
 };
 
 const featuredValue = (resource: AdminResource) => resource.metadata?.featured === true;
@@ -139,12 +142,12 @@ const normalizeAdminResourcesResponse = (
  * Tailwind palette classes.
  */
 const STATUS_OPTIONS = [
-  { value: "approved", label: "Approved", color: "bg-[#34d08c] text-black" }, // DS-OK: status ok
-  { value: "pending", label: "Pending", color: "bg-[#ffb84d] text-black" }, // DS-OK: status warn
-  { value: "rejected", label: "Rejected", color: "bg-[#ff5c7a] text-black" } // DS-OK: status bad
+  { value: "approved", label: "Approved", color: "bg-[var(--status-ok)] text-black" }, // DS-OK: status ok
+  { value: "pending", label: "Pending", color: "bg-[var(--status-warn)] text-black" }, // DS-OK: status warn
+  { value: "rejected", label: "Rejected", color: "bg-[var(--status-bad)] text-black" } // DS-OK: status bad
 ];
 
-export default function ResourceManager() {
+export default function ResourceManager({ createRequest = 0 }: { createRequest?: number }) {
   const { toast } = useToast();
   const queryClient = useQueryClient();
   
@@ -174,7 +177,9 @@ export default function ResourceManager() {
   // /admin?tab=resources&status=rejected both land on the same filtered table.
   const [statusFilter, setStatusFilter] = useState<string>(() => {
     const s = new URLSearchParams(window.location.search).get("status");
-    return s && STATUS_OPTIONS.some(o => o.value === s) ? s : "approved";
+    // C10-V5A-03: "all" is an explicit choice (distinct from the default
+    // "approved"), so it survives reload/Back and reads as a real value.
+    return s && (s === "all" || STATUS_OPTIONS.some(o => o.value === s)) ? s : "approved";
   });
 
   // Task 275: mirror the effective page into ?page= (replaceState, no history
@@ -217,7 +222,7 @@ export default function ResourceManager() {
   const [bulkApproveDialogOpen, setBulkApproveDialogOpen] = useState(false);
 
   // BUG-049: per-field inline errors + a dialog-level banner for server 400s.
-  const [fieldErrors, setFieldErrors] = useState<{ title?: string; url?: string; description?: string }>({});
+  const [fieldErrors, setFieldErrors] = useState<{ title?: string; url?: string; description?: string; category?: string }>({});
   const [formError, setFormError] = useState<string | null>(null);
   // Catalog controls use narrow PATCH endpoints. Keep failures next to the
   // control that initiated them so an error never closes/remounts the dialog.
@@ -250,10 +255,6 @@ export default function ResourceManager() {
     queryKey: ['/api/sub-subcategories']
   });
 
-  const { data: publicCatalogNav } = useQuery<{ totalResources?: number }>({
-    queryKey: ['/api/awesome-list/nav']
-  });
-
   const categoryNames = useMemo(() => {
     return categoriesData?.map(c => c.name) || [];
   }, [categoriesData]);
@@ -278,20 +279,22 @@ export default function ResourceManager() {
     params.set('limit', limit.toString());
     if (search) params.set('search', search);
     if (categoryFilter) params.set('category', categoryFilter);
-    if (statusFilter) params.set('status', statusFilter);
+    if (statusFilter && statusFilter !== 'all') params.set('status', statusFilter);
     return `/api/admin/resources?${params.toString()}`;
   };
 
-  const { data, isLoading, isError, refetch } = useQuery<ResourcesResponse>({
+  const { data, isLoading, isError, isPaused, refetch } = useQuery<ResourcesResponse>({
     queryKey: ['/api/admin/resources', page, limit, debouncedSearch, categoryFilter, statusFilter, sort],
     queryFn: async () => {
       const params = new URLSearchParams();
       params.set('page', page.toString());
       params.set('limit', limit.toString());
-      if (sort !== 'newest') params.set('sort', sort);
+      // C9-V5A-06: a search without an explicit sort is relevance-ordered server-side,
+      // so always send the chosen sort when searching.
+      if (sort !== 'newest' || debouncedSearch) params.set('sort', sort);
       if (debouncedSearch) params.set('search', debouncedSearch);
       if (categoryFilter) params.set('category', categoryFilter);
-      if (statusFilter) params.set('status', statusFilter);
+      if (statusFilter && statusFilter !== 'all') params.set('status', statusFilter);
       const response = await fetch(`/api/admin/resources?${params.toString()}`, {
         credentials: 'include'
       });
@@ -308,6 +311,25 @@ export default function ResourceManager() {
     staleTime: 30_000,
     refetchOnWindowFocus: true
   });
+
+  // C3-V5A-08: placeholderData keeps the previous page on screen while the
+  // next one loads (or, offline, while its fetch is paused). The footer and
+  // pager describe the rows actually shown, not the page that was requested.
+  const shownPage = data?.page ?? page;
+  const shownLimit = data?.limit ?? limit;
+  // C4-V5A-01: "Stay on page N" unmounts itself; land focus on the rows it
+  // kept instead of dropping it to <body>.
+  const tableRegionRef = useRef<HTMLDivElement>(null);
+  // C5-V5A-01: a confirmed bulk action clears the selection (unmounting the
+  // bar that opened its dialog) and a row delete removes its row, so the
+  // dialog's return-focus target is gone. Land on the table instead.
+  const focusTableOnCloseRef = useRef(false);
+  const restoreFocusToTable = (event: Event) => {
+    if (!focusTableOnCloseRef.current) return;
+    focusTableOnCloseRef.current = false;
+    event.preventDefault();
+    tableRegionRef.current?.focus();
+  };
 
   // Task 275: clamp an out-of-range page (stale ?page= link, shrunk result
   // set) back to the last real page instead of showing an empty table.
@@ -332,6 +354,24 @@ export default function ResourceManager() {
     staleTime: 60000
   });
 
+  // C3-V5A-02: a server 400 carries per-field messages; mark those fields
+  // inline and keep the banner for anything that has no field in the dialog.
+  const showServerFormError = (error: Error, fallback: string) => {
+    const serverFieldErrors = extractFieldErrors(error);
+    if (!serverFieldErrors) {
+      setFormError(error.message || fallback);
+      return;
+    }
+    const inline: { title?: string; url?: string; description?: string } = {};
+    const other: string[] = [];
+    for (const [field, message] of Object.entries(serverFieldErrors)) {
+      if (field === "title" || field === "url" || field === "description") inline[field] = message;
+      else other.push(`${field}: ${message}`);
+    }
+    setFieldErrors(inline);
+    setFormError(other.length > 0 ? other.join(" ") : "Please fix the highlighted fields.");
+  };
+
   const updateMutation = useMutation({
     mutationFn: async ({ id, data }: { id: number, data: Partial<AdminResource> }) => {
       return await apiRequest(`/api/admin/resources/${id}`, {
@@ -355,7 +395,7 @@ export default function ResourceManager() {
     onError: (error: Error) => {
       // BUG-049: keep the dialog open and surface the server's message inline
       // so the operator can correct the field, not just see a vanishing toast.
-      setFormError(error.message || "Failed to update resource");
+      showServerFormError(error, "Failed to update resource");
     }
   });
 
@@ -442,11 +482,11 @@ export default function ResourceManager() {
         kind,
         // The list stays responsive while the PATCH is in flight. Its
         // read-time inferred kind is reconciled from the server response below.
-        resolvedKind: kind ?? current?.resolvedKind ?? "other",
+        resolvedKind: kind ?? current?.inferredKind ?? "other",
       });
       setSelectedResource((resource) =>
         resource?.id === id
-          ? { ...resource, kind, resolvedKind: kind ?? resource.resolvedKind }
+          ? { ...resource, kind, resolvedKind: kind ?? resource.inferredKind }
           : resource,
       );
       return { snapshots, previousResource };
@@ -557,12 +597,14 @@ export default function ResourceManager() {
       resetEditForm();
       toast({
         title: "Resource Created",
-        description: `The new ${createdStatus} resource is now visible in the catalog.`,
+        description: createdStatus === "approved"
+          ? "The new resource is approved and now visible in the public catalog."
+          : `The new resource was saved as ${createdStatus} and is not public yet.`,
       });
     },
     onError: (error: Error) => {
       // BUG-049: surface server-side rejection inline in the open dialog.
-      setFormError(error.message || "Failed to create resource");
+      showServerFormError(error, "Failed to create resource");
     }
   });
 
@@ -636,6 +678,7 @@ export default function ResourceManager() {
       queryClient.invalidateQueries({ queryKey: ["awesome-list-nav"] });
       queryClient.invalidateQueries({ queryKey: ["/api/admin/stats"] });
       setSelectedResourceIds([]);
+      focusTableOnCloseRef.current = true;
       setRejectDialogOpen(false);
       toast({
         title: "Resources Rejected",
@@ -746,7 +789,8 @@ export default function ResourceManager() {
   };
 
   // Canonical masthead deep-link: open the existing create workflow, then strip
-  // the one-shot flag so refresh and Back do not reopen the modal.
+  // the one-shot flag so refresh and Back do not reopen the modal. Re-runs on
+  // each createRequest so New entry also works while this tab is already open.
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
     if (params.get("create") !== "1") return;
@@ -755,7 +799,7 @@ export default function ResourceManager() {
     url.searchParams.delete("create");
     window.history.replaceState({}, "", url.pathname + url.search + url.hash);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [createRequest]);
 
   // NEW-013: /admin/resources?resourceId=N (ResourceDetail's "Edit in Admin"
   // deep-link) opens that resource's edit dialog directly instead of dumping
@@ -778,7 +822,7 @@ export default function ResourceManager() {
     };
     fetch(`/api/resources/${rid}`, { credentials: "include" })
       .then((r) => (r.ok ? r.json() : Promise.reject(new Error(`HTTP ${r.status}`))))
-      .then((resource: AdminResource) => openEditDialog(resource))
+      .then((resource: AdminResourceWire) => openEditDialog(normalizeAdminResource(resource)))
       .catch(() => {
         toast({
           title: "Resource not found",
@@ -801,7 +845,7 @@ export default function ResourceManager() {
   // http:// URLs (server PUT uses webUrlSchema); Create requires https
   // (server POST uses httpsUrlSchema).
   const validateEditForm = (mode: 'edit' | 'create'): boolean => {
-    const errors: { title?: string; url?: string; description?: string } = {};
+    const errors: { title?: string; url?: string; description?: string; category?: string } = {};
     const titleParsed = resourceTitleSchema.safeParse(editForm.title.trim());
     if (!titleParsed.success) {
       errors.title = titleParsed.error.issues[0]?.message || "Invalid title";
@@ -811,18 +855,20 @@ export default function ResourceManager() {
     if (!urlParsed.success) {
       errors.url = urlParsed.error.issues[0]?.message || "Invalid URL";
     }
-    if (editForm.description.trim()) {
-      const descParsed = resourceDescriptionSchema.safeParse(editForm.description.trim());
-      if (!descParsed.success) {
-        errors.description = descParsed.error.issues[0]?.message || "Invalid description";
-      }
+    const descParsed = optionalResourceDescriptionSchema.safeParse(editForm.description);
+    if (!descParsed.success) {
+      errors.description = descParsed.error.issues[0]?.message || "Invalid description";
+    }
+    // C9-V5A-02: Create requires a category; flag the field, not just a banner.
+    if (mode === 'create' && !editForm.category) {
+      errors.category = "Category is required";
     }
     setFieldErrors(errors);
     setFormError(null);
     return Object.keys(errors).length === 0;
   };
 
-  const clearFieldError = (field: 'title' | 'url' | 'description') => {
+  const clearFieldError = (field: 'title' | 'url' | 'description' | 'category') => {
     setFieldErrors(prev => (prev[field] ? { ...prev, [field]: undefined } : prev));
   };
 
@@ -840,7 +886,11 @@ export default function ResourceManager() {
     });
   };
 
+  // C5-V5A-02: the Kind select and Feature switch stay focusable while a PATCH
+  // runs (aria-disabled, not disabled — a disabled control drops focus out of
+  // the open dialog to <body>), so the handlers ignore input until it settles.
   const handleKindChange = (value: string) => {
+    if (editControlsPending) return;
     const kind = value === "" ? null : (value as ResourceKind);
     setEditForm((form) => ({ ...form, kind: kind ?? "" }));
     if (selectedResource) {
@@ -849,6 +899,7 @@ export default function ResourceManager() {
   };
 
   const handleFeaturedChange = (featured: boolean) => {
+    if (editControlsPending) return;
     setEditForm((form) => ({ ...form, featured }));
     if (selectedResource) {
       featuredMutation.mutate({ id: selectedResource.id, featured });
@@ -857,12 +908,8 @@ export default function ResourceManager() {
 
   const handleCreate = () => {
     if (!validateEditForm('create')) return;
-    // Run16 BUG-031: require a category on create so new resources never
-    // land in the catalog as "Uncategorized".
-    if (!editForm.category) {
-      setFormError("Please select a category for the new resource");
-      return;
-    }
+    // Run16 BUG-031 / C9-V5A-02: validateEditForm('create') requires a
+    // category so new resources never land as "Uncategorized".
     const { featured, kind, ...fields } = editForm;
     createMutation.mutate({
       ...fields,
@@ -873,6 +920,9 @@ export default function ResourceManager() {
 
   const handleDelete = () => {
     if (!selectedResource) return;
+    // The confirm button closes the dialog at once; the row it opened from is
+    // about to go, so return focus to the table.
+    focusTableOnCloseRef.current = true;
     deleteMutation.mutate(selectedResource.id);
   };
 
@@ -882,6 +932,7 @@ export default function ResourceManager() {
   };
 
   const confirmBulkApprove = () => {
+    focusTableOnCloseRef.current = true;
     setBulkApproveDialogOpen(false);
     bulkApproveMutation.mutate(selectedResourceIds);
   };
@@ -904,12 +955,18 @@ export default function ResourceManager() {
     bulkRejectMutation.mutate({ ids: selectedResourceIds, reason: rejectReason });
   };
 
+  const bulkDeleteTitles = selectedResourceIds.map((id) => {
+    const row = data?.resources.find((r) => r.id === id);
+    return row ? row.title || `Resource #${id}` : `Resource #${id}`;
+  });
+
   const handleBulkDelete = () => {
     if (selectedResourceIds.length === 0) return;
     setBulkDeleteDialogOpen(true);
   };
 
   const confirmBulkDelete = () => {
+    focusTableOnCloseRef.current = true;
     setBulkDeleteDialogOpen(false);
     bulkDeleteMutation.mutate(selectedResourceIds);
   };
@@ -927,6 +984,7 @@ export default function ResourceManager() {
     setDebouncedSearch("");
     setCategoryFilter("");
     setStatusFilter("approved");
+    setSort("newest");
     setPage(1);
     setSelectedResourceIds([]);
   };
@@ -1004,7 +1062,7 @@ export default function ResourceManager() {
           <div>
             <CardTitle className="admin-catalog-resources__title flex items-center gap-2">
               <Database className="h-5 w-5" />
-              Resources ({data?.resources.length ?? 0} of {Number(publicCatalogNav?.totalResources ?? data?.total ?? 0).toLocaleString()})
+              Resources ({data?.resources.length ?? 0} of {(data?.total ?? 0).toLocaleString()})
             </CardTitle>
             <CardDescription className="admin-catalog-resources__subtitle">
               Manage every entry in the index
@@ -1022,13 +1080,17 @@ export default function ResourceManager() {
               type="button"
               variant="ghost"
               onClick={() => setCatalogToolsOpen((open) => !open)}
+              aria-label={catalogToolsOpen ? "Hide filters and tools" : "Show filters and tools"}
               aria-expanded={catalogToolsOpen}
               aria-controls="resource-filters"
               data-testid="button-resource-tools"
             >
-              {catalogToolsOpen ? "Hide filters and tools" : "Show filters and tools"}
+              <Filter className="admin-catalog-resources__tools-icon" aria-hidden="true" />
+              <span className="admin-catalog-resources__tools-label">
+                {catalogToolsOpen ? "Hide filters and tools" : "Show filters and tools"}
+              </span>
             </Button>
-            <button type="button" className="btn primary" onClick={openCreateDialog} data-testid="button-add-resource">
+            <button type="button" className="btn" onClick={openCreateDialog} data-testid="button-add-resource">
               <Plus className="h-3 w-3" />
               Add
             </button>
@@ -1071,7 +1133,7 @@ export default function ResourceManager() {
                 ))}
               </SelectContent>
             </Select>
-            <Select value={statusFilter} onValueChange={(v) => { setStatusFilter(v === "all" ? "" : v); setPage(1); setSelectedResourceIds([]); }}>
+            <Select value={statusFilter} onValueChange={(v) => { setStatusFilter(v); setPage(1); setSelectedResourceIds([]); }}>
               <SelectTrigger className="w-full sm:w-36" aria-label="Filter by status" data-testid="select-status-filter">
                 <SelectValue placeholder="All Status" />
               </SelectTrigger>
@@ -1114,7 +1176,7 @@ export default function ResourceManager() {
                   <Button
                     size="sm"
                     variant="outline"
-                    className={"bg-[#34d08c]/10 hover:bg-[#34d08c]/20 border-[#34d08c]/30 text-[#34d08c]" /* DS-OK: status ok */}
+                    className={"bg-[var(--status-ok)]/10 hover:bg-[var(--status-ok)]/20 border-[var(--status-ok)]/30 text-[var(--status-ok)]" /* DS-OK: status ok */}
                     onClick={handleBulkApprove}
                     disabled={bulkApproveMutation.isPending}
                     data-testid="button-bulk-approve"
@@ -1125,7 +1187,7 @@ export default function ResourceManager() {
                   <Button
                     size="sm"
                     variant="outline"
-                    className={"bg-[#ffb84d]/10 hover:bg-[#ffb84d]/20 border-[#ffb84d]/30 text-[#ffb84d]" /* DS-OK: status warn */}
+                    className={"bg-[var(--status-warn)]/10 hover:bg-[var(--status-warn)]/20 border-[var(--status-warn)]/30 text-[var(--status-warn)]" /* DS-OK: status warn */}
                     onClick={handleBulkReject}
                     disabled={bulkRejectMutation.isPending}
                     data-testid="button-bulk-reject"
@@ -1136,7 +1198,7 @@ export default function ResourceManager() {
                   <Button
                     size="sm"
                     variant="outline"
-                    className={"bg-[#ff5c7a]/10 hover:bg-[#ff5c7a]/20 border-[#ff5c7a]/30 text-[#ff5c7a]" /* DS-OK: status bad */}
+                    className={"bg-[var(--status-bad)]/10 hover:bg-[var(--status-bad)]/20 border-[var(--status-bad)]/30 text-[var(--status-bad)]" /* DS-OK: status bad */}
                     onClick={handleBulkDelete}
                     disabled={bulkDeleteMutation.isPending}
                     data-testid="button-bulk-delete"
@@ -1149,7 +1211,11 @@ export default function ResourceManager() {
               <Button
                 size="sm"
                 variant="ghost"
-                onClick={() => setSelectedResourceIds([])}
+                onClick={(event) => {
+                  // C6-V5A-04: the bar unmounts with its focused button.
+                  handoffFocusOnUnmount(event.currentTarget, () => tableRegionRef.current);
+                  setSelectedResourceIds([]);
+                }}
                 className="text-[var(--text-2)] hover:text-[var(--text)]"
                 data-testid="button-clear-selection"
               >
@@ -1160,11 +1226,11 @@ export default function ResourceManager() {
 
           {/* Bulk Reject Reason Dialog */}
           <Dialog open={rejectDialogOpen} onOpenChange={setRejectDialogOpen}>
-            <DialogContent>
+            <DialogContent onCloseAutoFocus={restoreFocusToTable}>
               <DialogHeader>
-                <DialogTitle>Reject Selected Resources</DialogTitle>
+                <DialogTitle>{selectedResourceIds.length === 1 ? "Reject Selected Resource" : "Reject Selected Resources"}</DialogTitle>
                 <DialogDescription>
-                  You are about to reject {selectedResourceIds.length} resource(s).
+                  You are about to reject {selectedResourceIds.length} {selectedResourceIds.length === 1 ? "resource" : "resources"}.
                   Please provide a reason (minimum 10 characters).
                 </DialogDescription>
               </DialogHeader>
@@ -1175,7 +1241,7 @@ export default function ResourceManager() {
                     id="reject-reason"
                     value={rejectReason}
                     onChange={(e) => setRejectReason(e.target.value)}
-                    placeholder="Explain why these resources are being rejected..."
+                    placeholder={selectedResourceIds.length === 1 ? "Explain why this resource is being rejected..." : "Explain why these resources are being rejected..."}
                     rows={4}
                   />
                   <p className="text-sm text-muted-foreground mt-1">
@@ -1190,7 +1256,7 @@ export default function ResourceManager() {
                 <Button
                   onClick={confirmBulkReject}
                   disabled={rejectReason.trim().length < 10}
-                  className={"bg-[#ffb84d] text-black hover:bg-[#ffb84d]/90" /* DS-OK: status warn */}
+                  className={"bg-[var(--status-warn)] text-black hover:bg-[var(--status-warn)]/90" /* DS-OK: status warn */}
                 >
                   Confirm Rejection
                 </Button>
@@ -1201,7 +1267,7 @@ export default function ResourceManager() {
           {/* R4-054: Bulk Approve Confirmation — states the exact count so a
               batch publish can't fire on a single misclick. */}
           <AlertDialog open={bulkApproveDialogOpen} onOpenChange={setBulkApproveDialogOpen}>
-            <AlertDialogContent data-testid="dialog-bulk-approve">
+            <AlertDialogContent data-testid="dialog-bulk-approve" onCloseAutoFocus={restoreFocusToTable}>
               <AlertDialogHeader>
                 <AlertDialogTitle>Approve {selectedResourceIds.length} resource{selectedResourceIds.length === 1 ? '' : 's'}?</AlertDialogTitle>
                 <AlertDialogDescription>
@@ -1213,7 +1279,7 @@ export default function ResourceManager() {
                 <AlertDialogCancel data-testid="button-bulk-approve-cancel">Cancel</AlertDialogCancel>
                 <AlertDialogAction
                   onClick={confirmBulkApprove}
-                  className={"bg-[#34d08c] text-black hover:bg-[#34d08c]/90" /* DS-OK: status ok */}
+                  className={"bg-[var(--status-ok)] text-black hover:bg-[var(--status-ok)]/90" /* DS-OK: status ok */}
                   data-testid="button-bulk-approve-confirm"
                 >
                   Approve {selectedResourceIds.length}
@@ -1224,7 +1290,7 @@ export default function ResourceManager() {
 
           {/* Bulk Delete Confirmation */}
           <AlertDialog open={bulkDeleteDialogOpen} onOpenChange={setBulkDeleteDialogOpen}>
-            <AlertDialogContent data-testid="dialog-bulk-delete">
+            <AlertDialogContent data-testid="dialog-bulk-delete" onCloseAutoFocus={restoreFocusToTable}>
               <AlertDialogHeader>
                 <AlertDialogTitle>Delete {selectedResourceIds.length} resource{selectedResourceIds.length === 1 ? '' : 's'}?</AlertDialogTitle>
                 <AlertDialogDescription>
@@ -1232,6 +1298,15 @@ export default function ResourceManager() {
                   the catalog, including any bookmarks, favorites, and journey references
                   pointing at {selectedResourceIds.length === 1 ? 'it' : 'them'}. This cannot be undone.
                 </AlertDialogDescription>
+                {/* C6-V5A-05: name the rows the permanent delete will remove. */}
+                {bulkDeleteTitles.length > 0 && (
+                  <ul className="list-disc pl-5 text-sm text-[var(--text-2)]" data-testid="list-bulk-delete-titles">
+                    {bulkDeleteTitles.slice(0, 5).map((title, index) => (
+                      <li key={index} className="break-words">{title}</li>
+                    ))}
+                    {selectedResourceIds.length > 5 && <li>and {selectedResourceIds.length - 5} more</li>}
+                  </ul>
+                )}
               </AlertDialogHeader>
               <AlertDialogFooter>
                 <AlertDialogCancel data-testid="button-bulk-delete-cancel">Cancel</AlertDialogCancel>
@@ -1268,46 +1343,106 @@ export default function ResourceManager() {
               <Button
                 variant="outline"
                 size="sm"
-                onClick={() => refetch()}
+                onClick={(event) => {
+                  handoffFocusOnUnmount(event.currentTarget, () => tableRegionRef.current);
+                  refetch();
+                }}
                 data-testid="button-resources-retry"
               >
                 Retry
               </Button>
             </div>
           )}
-          <div className="admin-catalog-resources__table-scroll overflow-auto">
-            <Table className="admin-catalog-resources__table">
-              <TableHeader>
-                <TableRow>
-                  <TableHead>ID</TableHead>
-                  <TableHead>Title</TableHead>
-                  <TableHead>Category</TableHead>
-                  <TableHead>Tags</TableHead>
-                  <TableHead>Featured</TableHead>
-                  <TableHead aria-label="Actions" />
-                </TableRow>
-              </TableHeader>
-              <TableBody>
+          {/* C3-V5A-08: offline the fetch pauses instead of failing, so the
+              error banner never fires; say so instead of relabelling stale rows. */}
+          {isPaused && !isError && (
+            <div
+              role="status"
+              className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 rounded-md border border-[var(--border)] bg-[var(--surface)] px-4 py-3"
+              data-testid="banner-resources-offline"
+            >
+              <p className="text-sm text-[var(--text)]">
+                {!data
+                  ? "You're offline. Resources will load when your connection returns."
+                  : shownPage !== page
+                    ? `You're offline. Page ${page.toLocaleString()} will load when your connection returns — still showing page ${shownPage.toLocaleString()}.`
+                    : "You're offline — showing the last loaded results."}
+              </p>
+              <div className="flex flex-wrap gap-2">
+                {data && shownPage !== page && (
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => {
+                      setPage(shownPage);
+                      tableRegionRef.current?.focus();
+                    }}
+                    data-testid="button-resources-offline-stay"
+                  >
+                    Stay on page {shownPage.toLocaleString()}
+                  </Button>
+                )}
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={(event) => {
+                    handoffFocusOnUnmount(event.currentTarget, () => tableRegionRef.current);
+                    refetch();
+                  }}
+                  data-testid="button-resources-offline-retry"
+                >
+                  Retry
+                </Button>
+              </div>
+            </div>
+          )}
+          <div
+            ref={tableRegionRef}
+            tabIndex={-1}
+            className="admin-catalog-resources__table-scroll overflow-auto"
+          >
+            <table className="table admin-catalog-resources__table">
+              <thead>
+                <tr>
+                  <th>ID</th>
+                  <th>Title</th>
+                  <th>Category</th>
+                  <th>Tags</th>
+                  <th>Featured</th>
+                  <th aria-label="Actions" />
+                </tr>
+              </thead>
+              <tbody>
                 {/* Run16 BUG-080: explicit empty state instead of a blank table. */}
                 {!isLoading && (data?.resources.length || 0) === 0 && (
-                  <TableRow>
-                    <TableCell colSpan={6} className="py-12 text-center text-sm text-[var(--text-2)]" data-testid="row-empty-state">
+                  <tr>
+                    <td colSpan={6} className="py-12 text-center text-sm text-[var(--text-2)]" data-testid="row-empty-state">
                       {(search || categoryFilter || statusFilter)
                         ? <>No resources match the current search or filters.{' '}
-                            <button type="button" className="text-primary underline" onClick={clearFilters} data-testid="button-empty-clear-filters">
+                            {/* C5-V5A-02: this row unmounts once results return;
+                                hand focus to the table that shows them. */}
+                            <button
+                              type="button"
+                              className="text-primary underline"
+                              onClick={() => {
+                                clearFilters();
+                                tableRegionRef.current?.focus();
+                              }}
+                              data-testid="button-empty-clear-filters"
+                            >
                               Clear filters
                             </button></>
                         : "No resources yet."}
-                    </TableCell>
-                  </TableRow>
+                    </td>
+                  </tr>
                 )}
                 {data?.resources.map((resource) => (
-                  <TableRow
+                  <tr
                     key={resource.id}
                     data-testid={`row-resource-${resource.id}`}
                     data-state={selectedResourceIds.includes(resource.id) ? "selected" : undefined}
                   >
-                    <TableCell className="admin-catalog-resources__id-cell">
+                    <td className="admin-catalog-resources__id-cell">
                       <span>{resource.id}</span>
                       <Checkbox
                         checked={selectedResourceIds.includes(resource.id)}
@@ -1315,31 +1450,34 @@ export default function ResourceManager() {
                         aria-label={`Select ${resource.title || `resource #${resource.id}`}`}
                         className="admin-catalog-resources__row-select h-8 w-8"
                       />
-                    </TableCell>
-                    <TableCell>
+                    </td>
+                    <td>
                         <div className="admin-catalog-resources__resource-title" title={resource.title || ''}>
                           {resource.title || 'Untitled'}
                         </div>
-                    </TableCell>
-                    <TableCell>
+                    </td>
+                    <td>
                       {resource.category || "Uncategorized"}
-                    </TableCell>
-                    <TableCell>
+                    </td>
+                    <td>
                       <div className="admin-catalog-resources__tags">
-                        {(safeResourceMetadataTags(resource.metadata) || []).slice(0, 2).map((tag, index) => (
-                          <Badge key={index} variant="chip">
-                            {typeof tag === "object" && tag && "name" in tag ? String(tag.name) : String(tag)}
-                          </Badge>
-                        ))}
+                        {(safeResourceMetadataTags(resource.metadata) || []).slice(0, 2).map((tag, index) => {
+                          const label = typeof tag === "object" && tag && "name" in tag ? String(tag.name) : String(tag);
+                          return (
+                            <Badge key={index} variant="chip" title={label}>
+                              {label}
+                            </Badge>
+                          );
+                        })}
                       </div>
-                    </TableCell>
-                    <TableCell>
+                    </td>
+                    <td>
                       {featuredValue(resource) ? <Badge variant="accent">★</Badge> : <span className="admin-catalog-resources__muted">—</span>}
-                    </TableCell>
-                    <TableCell className="admin-catalog-resources__actions-cell text-right">
+                    </td>
+                    <td className="admin-catalog-resources__actions-cell text-right">
                       <div className="admin-catalog-resources__row-actions">
                         <Button variant="ghost" size="sm" asChild>
-                          <a href={`/resource/${resource.id}`}>View</a>
+                          <a href={`/resource/${resource.id}`} aria-label={`View ${resource.title || `resource #${resource.id}`}`}>View</a>
                         </Button>
                         <Button
                           variant="ghost"
@@ -1361,15 +1499,15 @@ export default function ResourceManager() {
                           <Trash2 className="h-4 w-4" />
                         </Button>
                       </div>
-                    </TableCell>
-                  </TableRow>
+                    </td>
+                  </tr>
                 ))}
-              </TableBody>
-            </Table>
+              </tbody>
+            </table>
           </div>
           {/* Run17 BUG-033: same sideways-scroll hint the Users table has. */}
           <p className="admin-catalog-resources__scroll-hint text-xs text-muted-foreground mt-2 sm:hidden">
-            Swipe the table sideways to see category, status, and actions.
+            Swipe the table sideways to see category, tags, featured, and actions.
           </p>
 
           {/* Run16 BUG-035: page-size selector + first/last jump buttons. */}
@@ -1380,7 +1518,7 @@ export default function ResourceManager() {
                     and stats card). P1-05: count-aware noun — "1 resource". */}
                 {(data?.total || 0) === 0
                   ? "0 resources"
-                  : `Showing ${(((page - 1) * limit) + 1).toLocaleString()} - ${Math.min(page * limit, data?.total || 0).toLocaleString()} of ${(data?.total || 0).toLocaleString()} ${(data?.total || 0) === 1 ? 'resource' : 'resources'}`}
+                  : `Showing ${(((shownPage - 1) * shownLimit) + 1).toLocaleString()} - ${Math.min(shownPage * shownLimit, data?.total || 0).toLocaleString()} of ${(data?.total || 0).toLocaleString()} ${(data?.total || 0) === 1 ? 'resource' : 'resources'}`}
               </div>
               <Select value={String(limit)} onValueChange={(v) => { setLimit(parseInt(v, 10)); setPage(1); }}>
                 {/* Run17 BUG-034: shrink-0 — flexbox squeezed the trigger below w-28
@@ -1404,7 +1542,7 @@ export default function ResourceManager() {
               public listings) — any of the 100+ pages is reachable in ≤2
               interactions via the number links or the jump input. */}
           <Paginator
-            currentPage={page}
+            currentPage={shownPage}
             totalPages={totalPages}
             makeHref={(p) => {
               const url = new URL(window.location.href);
@@ -1426,13 +1564,14 @@ export default function ResourceManager() {
         }}
       >
         {/* NB-005 (run18): cap height to the small-viewport unit (svh accounts
-            for mobile URL bars) and scroll internally so every field + the
-            Save/Cancel footer stay reachable at 812×375 landscape. */}
+            for mobile URL bars). F893: only the field list scrolls; header and
+            Save/Cancel footer stay pinned so the footer is never half-clipped
+            (a click on its hidden half hit the overlay and closed unsaved). */}
         {/* P1-06: restore focus to the row's edit button on close. Radix's
             default drops focus to <body> because this one Dialog is shared
             across rows rather than nested under a per-row trigger. */}
         <DialogContent
-          className="max-w-2xl max-h-[90svh] overflow-y-auto bg-[var(--bg-2)] border-[var(--border)]"
+          className="flex max-w-2xl max-h-[90svh] flex-col overflow-hidden bg-[var(--bg-2)] border-[var(--border)]"
           onCloseAutoFocus={(e) => {
             const trigger = editTriggerRef.current;
             if (trigger && document.contains(trigger)) {
@@ -1451,7 +1590,7 @@ export default function ResourceManager() {
               Make changes to the resource below. Click save when done.
             </DialogDescription>
           </DialogHeader>
-          <div className="grid gap-4 py-4">
+          <div className="-mx-1 grid min-h-0 flex-1 gap-4 overflow-y-auto px-1 py-4">
             {/* BUG-049: dialog-level banner for server-side rejections. */}
             {formError && (
               <div
@@ -1511,7 +1650,7 @@ export default function ResourceManager() {
                 </p>
               )}
             </div>
-            <div className="grid grid-cols-2 gap-4">
+            <div className="grid gap-4 sm:grid-cols-2">
               <div className="grid gap-2">
                 <Label htmlFor="edit-category">Category</Label>
                 <Select 
@@ -1545,7 +1684,7 @@ export default function ResourceManager() {
                 </Select>
               </div>
             </div>
-            <div className="grid grid-cols-2 gap-4">
+            <div className="grid gap-4 sm:grid-cols-2">
               <div className="grid gap-2">
                 <Label htmlFor="edit-subcategory">Subcategory</Label>
                 <Select 
@@ -1591,12 +1730,14 @@ export default function ResourceManager() {
                     className="select admin-catalog-resources__native-select"
                     value={editForm.kind}
                     onChange={(event) => handleKindChange(event.target.value)}
-                    disabled={editControlsPending}
+                    aria-disabled={editControlsPending}
+                    aria-busy={kindMutation.isPending}
                     aria-describedby="edit-kind-hint"
                     data-testid="admin-resource-kind-select"
                   >
+                    {/* C3-V5A-06: the inferred kind, not the stored override. */}
                     <option value="">
-                      Use inferred — resolved: {selectedResource?.resolvedKind ?? "other"} (inferred)
+                      Use inferred — resolved: {selectedResource?.inferredKind ?? "other"} (inferred)
                     </option>
                     {RESOURCE_KIND_VALUES.map((kind) => (
                       <option key={kind} value={kind}>{resourceKindLabel(kind)}</option>
@@ -1606,7 +1747,7 @@ export default function ResourceManager() {
                 <p id="edit-kind-hint" className="text-xs text-[var(--text-2)]" data-testid="text-kind-storage-state">
                   {editForm.kind
                     ? `Stored override: ${resourceKindLabel(editForm.kind)}`
-                    : `resolved: ${selectedResource?.resolvedKind ?? "other"} (inferred)`}
+                    : `resolved: ${selectedResource?.inferredKind ?? "other"} (inferred)`}
                 </p>
                 {selectedResource && resourceActionErrors[`kind:${selectedResource.id}`] && (
                   <p role="alert" className="admin-catalog-resources__action-error" data-testid="error-resource-kind">
@@ -1621,7 +1762,8 @@ export default function ResourceManager() {
                     id="edit-featured"
                     checked={editForm.featured}
                     onCheckedChange={handleFeaturedChange}
-                    disabled={editControlsPending}
+                    aria-disabled={editControlsPending}
+                    aria-busy={featuredMutation.isPending}
                     aria-label="Feature this resource"
                     data-testid="admin-resource-featured-toggle"
                   />
@@ -1714,9 +1856,8 @@ export default function ResourceManager() {
       </Dialog>
 
       <Dialog open={createDialogOpen} onOpenChange={setCreateDialogOpen}>
-        {/* NB-005 (run18): same svh height cap as the edit dialog so the Create
-            form's footer stays reachable on short landscape viewports. */}
-        <DialogContent className="max-w-2xl max-h-[90svh] overflow-y-auto bg-[var(--bg-2)] border-[var(--border)]">
+        {/* NB-005 (run18) + F893: same svh cap and pinned footer as the edit dialog. */}
+        <DialogContent className="flex max-w-2xl max-h-[90svh] flex-col overflow-hidden bg-[var(--bg-2)] border-[var(--border)]">
           <DialogHeader>
             <DialogTitle className="flex items-center gap-2">
               <Plus className="h-5 w-5" />
@@ -1726,7 +1867,7 @@ export default function ResourceManager() {
               Create a new resource entry. Required fields are marked with *.
             </DialogDescription>
           </DialogHeader>
-          <div className="grid gap-4 py-4">
+          <div className="-mx-1 grid min-h-0 flex-1 gap-4 overflow-y-auto px-1 py-4">
             {/* BUG-049: dialog-level banner for server-side rejections. */}
             {formError && (
               <div
@@ -1789,14 +1930,22 @@ export default function ResourceManager() {
                 </p>
               )}
             </div>
-            <div className="grid grid-cols-2 gap-4">
-              <div className="grid gap-2">
-                <Label htmlFor="create-category">Category</Label>
+            {/* C10-V5A-01: content-start keeps the Status column from stretching
+                when the Category error adds a row beside it. */}
+            <div className="grid gap-4 sm:grid-cols-2">
+              <div className="grid content-start gap-2">
+                <Label htmlFor="create-category">Category *</Label>
                 <Select 
                   value={editForm.category} 
-                  onValueChange={(v) => setEditForm(f => ({ ...f, category: v, subcategory: "", subSubcategory: "" }))}
+                  onValueChange={(v) => { clearFieldError('category'); setEditForm(f => ({ ...f, category: v, subcategory: "", subSubcategory: "" })); }}
                 >
-                  <SelectTrigger id="create-category" data-testid="select-create-category">
+                  <SelectTrigger
+                    id="create-category"
+                    aria-required="true"
+                    aria-invalid={!!fieldErrors.category}
+                    aria-describedby={fieldErrors.category ? "create-category-error" : undefined}
+                    data-testid="select-create-category"
+                  >
                     <SelectValue placeholder="Select category" />
                   </SelectTrigger>
                   <SelectContent>
@@ -1805,8 +1954,13 @@ export default function ResourceManager() {
                     ))}
                   </SelectContent>
                 </Select>
+                {fieldErrors.category && (
+                  <p id="create-category-error" className="text-sm text-destructive" data-testid="error-create-category">
+                    {fieldErrors.category}
+                  </p>
+                )}
               </div>
-              <div className="grid gap-2">
+              <div className="grid content-start gap-2">
                 <Label htmlFor="create-status">Status</Label>
                 <Select 
                   value={editForm.status} 
@@ -1823,7 +1977,7 @@ export default function ResourceManager() {
                 </Select>
               </div>
             </div>
-            <div className="grid grid-cols-2 gap-4">
+            <div className="grid gap-4 sm:grid-cols-2">
               <div className="grid gap-2">
                 <Label htmlFor="create-subcategory">Subcategory</Label>
                 <Select 
@@ -1952,9 +2106,9 @@ export default function ResourceManager() {
       </Dialog>
 
       <AlertDialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
-        <AlertDialogContent className="bg-[var(--bg-2)] border-[var(--border)]">
+        <AlertDialogContent className="bg-[var(--bg-2)] border-[var(--border)]" onCloseAutoFocus={restoreFocusToTable}>
           <AlertDialogHeader>
-            <AlertDialogTitle className={"text-[#ff5c7a]" /* DS-OK: status bad */}>Delete Resource</AlertDialogTitle>
+            <AlertDialogTitle className={"text-[var(--status-bad)]" /* DS-OK: status bad */}>Delete Resource</AlertDialogTitle>
             <AlertDialogDescription>
               Are you sure you want to delete <strong className="text-white">"{selectedResource?.title}"</strong>? 
               This action cannot be undone.
@@ -1964,7 +2118,7 @@ export default function ResourceManager() {
             <AlertDialogCancel>Cancel</AlertDialogCancel>
             <AlertDialogAction
               onClick={handleDelete}
-              className={"bg-[#ff5c7a] text-black hover:bg-[#ff5c7a]/90" /* DS-OK: status bad */}
+              className={"bg-[var(--status-bad)] text-black hover:bg-[var(--status-bad)]/90" /* DS-OK: status bad */}
               data-testid="button-confirm-delete"
             >
               {deleteMutation.isPending ? "Deleting..." : "Delete"}

@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from "react";
+import { handoffFocusOnUnmount } from "@/hooks/focus-handoff";
 import { Link } from "wouter";
 import { useQuery } from "@tanstack/react-query";
 import { ArrowLeft, ArrowRight, Check, Sparkles } from "lucide-react";
@@ -87,14 +88,22 @@ export default function Onboarding() {
     let initialStep =
       stepFromUrl() ?? preferences?.onboardingStep ?? 1;
     const stored = safeGetItem(DRAFT_STORAGE_KEY);
-    if (stored && preferences?.onboardingStatus !== "completed") {
+    if (stored) {
       try {
         const draft = JSON.parse(stored) as {
           userId?: string;
           values?: LearningPreferencesValues;
           step?: number;
+          revision?: number | null;
         };
+        // C3-V4-03: a revisit of a completed onboarding keeps its unsaved
+        // choice across a reload too, but only while the saved preferences
+        // are the ones the draft was based on — a later edit elsewhere wins.
+        const draftIsCurrent =
+          preferences?.onboardingStatus !== "completed" ||
+          (preferences?.revision !== undefined && draft.revision === preferences.revision);
         if (
+          draftIsCurrent &&
           draft.userId === user.id &&
           draft.values &&
           Number.isInteger(draft.step) &&
@@ -158,7 +167,12 @@ export default function Onboarding() {
     if (!user?.id) return;
     safeSetItem(
       DRAFT_STORAGE_KEY,
-      JSON.stringify({ userId: user.id, values: nextValues, step: nextStep }),
+      JSON.stringify({
+        userId: user.id,
+        values: nextValues,
+        step: nextStep,
+        revision: preferences?.revision ?? null,
+      }),
     );
   };
 
@@ -237,11 +251,15 @@ export default function Onboarding() {
   };
 
   const handleSkip = async () => {
+    // Revisiting a finished onboarding edits saved preferences; leaving early
+    // keeps it completed, so the step being left must still be valid.
+    const alreadyCompleted = preferences?.onboardingStatus === "completed";
+    if (alreadyCompleted && !validateStep(step)) return;
     setRequestError(null);
     try {
       await savePreferencesAsync({
         ...values,
-        onboardingStatus: "dismissed",
+        onboardingStatus: alreadyCompleted ? "completed" : "dismissed",
         onboardingStep: step,
       });
       safeRemoveItem(DRAFT_STORAGE_KEY);
@@ -304,7 +322,8 @@ export default function Onboarding() {
         </p>
         <Button
           className="mt-4"
-          onClick={() => {
+          onClick={(e) => {
+            handoffFocusOnUnmount(e.currentTarget);
             void refetchPreferences();
             void refetchCategories();
           }}

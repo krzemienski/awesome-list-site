@@ -117,7 +117,11 @@ export function Paginator({
     const clamped = Math.min(Math.max(n, 1), totalPages);
     setJumpError(null);
     if (clamped !== currentPage) onNavigate(clamped);
-    else setJumpValue(String(currentPage));
+    // C4-V5A-01: the box mirrors the shown page, not the last request. When
+    // the requested page never arrives (offline, then "Stay on page N"),
+    // currentPage never changes, so the typed number used to linger and a
+    // later blur re-committed it. The effect above shows the new page on load.
+    setJumpValue(String(currentPage));
   };
 
   const linkBase =
@@ -176,8 +180,8 @@ export function Paginator({
               className={cn(
                 linkBase,
                 item === currentPage
-                  ? "border-[var(--accent)] bg-[var(--accent)] text-[var(--accent-contrast,white)] font-medium"
-                  : "border-[var(--border)] bg-transparent text-foreground hover:border-[var(--accent)] hover:text-[var(--accent)]",
+                  ? "border-[var(--border-strong)] bg-[var(--surface-2)] text-[var(--text)] font-medium"
+                  : "border-[var(--border)] bg-transparent text-foreground hover:border-[var(--border-strong)] hover:bg-[var(--surface)]",
               )}
               data-testid={pageLinkTestId(item)}
             >
@@ -248,7 +252,7 @@ export function Paginator({
         id={`${ids.jump}-error`}
         role="status"
         aria-live="polite"
-        className={cn("text-xs text-[var(--accent)]", !jumpError && "sr-only")}
+        className={cn("text-xs text-[var(--status-bad)]", !jumpError && "sr-only")}
         data-testid={ids.jumpError}
       >
         {jumpError ?? ""}

@@ -3,22 +3,24 @@ import { cva, type VariantProps } from "class-variance-authority"
 
 import { cn } from "@/lib/utils"
 
+// Every variant is a design-system `.chip`: paint, mono caps and the
+// per-system skins (Terminal brackets, Geist sentence case…) come from the
+// canonical sheet. Accent stays reserved for the explicit `accent` variant.
 const badgeVariants = cva(
-  "inline-flex items-center rounded-full border px-2.5 py-0.5 text-xs font-semibold transition-colors focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2",
+  "chip focus:outline-none",
   {
     variants: {
       variant: {
-        default:
-          "border-transparent bg-primary text-primary-foreground hover:bg-primary/80",
-        secondary:
-          "border-transparent bg-secondary text-secondary-foreground hover:bg-secondary/80",
-        destructive:
-          "border-transparent bg-destructive text-destructive-foreground hover:bg-destructive/80",
-        outline: "text-foreground",
-        chip:
-          "border-[var(--border)] bg-[var(--surface)] text-[var(--text-2)] font-mono uppercase tracking-[0.12em] text-[10px] px-2 py-[3px] hover:border-[var(--border-strong)] hover:text-[var(--text)]",
-        accent:
-          "border-[color-mix(in_srgb,var(--accent)_30%,transparent)] bg-[color-mix(in_srgb,var(--accent)_12%,transparent)] text-[var(--accent)] font-mono uppercase tracking-[0.12em] text-[10px] px-2 py-[3px]",
+        default: "",
+        secondary: "",
+        destructive: "bad",
+        outline: "",
+        chip: "",
+        accent: "accent",
+        ok: "ok",
+        warn: "warn",
+        bad: "bad",
+        muted: "muted",
       },
     },
     defaultVariants: {
@@ -35,7 +37,6 @@ function Badge({ className, variant, ...props }: BadgeProps) {
   return (
     <div
       className={cn(badgeVariants({ variant }), className)}
-      data-ds={variant === "chip" || variant === "accent" ? "chip" : undefined}
       {...props}
     />
   )

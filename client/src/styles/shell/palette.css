@@ -98,7 +98,7 @@
   padding: 10px 12px;
   border: 0;
   /* DS-OK: frozen CmdPalette row radius is fixed at 6px, not the system card radius. */
-  border-radius: 6px;
+  border-radius: 6px; /* DS-OK: frozen literal, reason above */
   background: transparent;
   color: var(--text-2);
   cursor: pointer;
@@ -178,6 +178,14 @@
 .search-palette-row[data-selected="true"] .search-palette-copy > span,
 .search-palette-row:hover .search-palette-copy > span {
   color: var(--accent);
+}
+
+/* Featured resources carry the same ★ as ResourceCard's chip, but in neutral
+   ink: up to four of them sit in the palette and the accent budget is spent
+   on the selected row. */
+.search-palette-featured-mark {
+  margin-inline-end: 6px;
+  color: var(--text-2);
 }
 
 .search-palette-copy small {
@@ -284,17 +292,6 @@
 
 .search-palette-footer-spacer {
   flex: 1;
-}
-
-.search-palette kbd {
-  padding: 2px 6px;
-  border: var(--hairline-w) solid var(--border);
-  /* DS-OK: frozen .kbd utility fixes keycap radius at 4px across systems. */
-  border-radius: 4px;
-  background: var(--surface);
-  color: inherit;
-  font-family: var(--font-mono);
-  font-size: 10.5px;
 }
 
 .search-palette-close {

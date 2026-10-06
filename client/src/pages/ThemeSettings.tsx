@@ -1,8 +1,7 @@
 import { useContext, useEffect, useRef, useState } from "react";
 import { Link } from "wouter";
-import { ArrowLeft, Check, Palette, Layers, Eye, Sparkles, Zap, Type } from "lucide-react";
+import { ArrowLeft, Check, Sparkles, Zap } from "lucide-react";
 import { ThemeProviderContext } from "@/components/ui/theme-provider";
-import { useToast } from "@/hooks/use-toast";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Card } from "@/components/ui/card";
@@ -23,11 +22,11 @@ import SEOHead from "@/components/layout/SEOHead";
 import { isSystemId } from "@/lib/design-system";
 import { safeGetItem, safeSetItem } from "@/lib/safeStorage";
 import "@/styles/pages/account.css";
+import "@/styles/pages/theme-settings.css";
 
 export default function ThemeSettings() {
   const { systemId, accentId, setSystem, setAccent, systems, accents } =
     useContext(ThemeProviderContext);
-  const { toast } = useToast();
 
   const activeSystem = systems[systemId];
   const activeAccent = accents.find((a) => a.id === accentId);
@@ -55,21 +54,18 @@ export default function ThemeSettings() {
     setFontId(id);
     const name = FONT_OPTIONS.find((f) => f.id === id)?.name ?? id;
     trackThemeChange(name, 'font');
-    toast({ title: "Font applied", description: `${name} is now active.` });
   };
 
   const handlePickSystem = (id: string) => {
     setSystem(id);
     const label = isSystemId(id) ? systems[id].name : id;
     trackThemeChange(label, 'system');
-    toast({ title: "Design system applied", description: `${label} is now active.` });
   };
 
   const handlePickAccent = (id: string) => {
     setAccent(id);
     const label = accents.find((a) => a.id === id)?.name ?? id;
     trackThemeChange(label, 'color');
-    toast({ title: "Accent applied", description: `${label} is now the active accent.` });
   };
 
   // NB-057 (run18): the three theme pickers are ARIA radiogroups built from
@@ -130,23 +126,19 @@ export default function ThemeSettings() {
           <ArrowLeft className="h-4 w-4" />
           Back
         </Link>
-        <div className="flex items-center gap-3">
-          {/* P5 — sparkle icon to match ref 08 */}
-          <Sparkles className="h-6 w-6 text-[var(--accent)]" />
-          <h1 className="display-h text-2xl">
-            Theme Settings
-          </h1>
-        </div>
-        <p className="text-sm sm:text-base text-[color:var(--text-2)] mt-2">
+        {/* docs/11 page head: eyebrow, display heading, lede. */}
+        <div className="eyebrow theme-page__eyebrow">── Settings · Theme</div>
+        <h1 className="display-h theme-page__title">Theme Settings</h1>
+        <p className="theme-page__lede">
           Pick a design system, accent, and (optionally) override the font. Changes apply instantly and persist across reloads.{" "}
-          <span role="status" aria-live="polite" aria-atomic="true" className="text-[color:var(--text-3)]" data-testid="text-active-preset">
+          <span role="status" aria-live="polite" aria-atomic="true" className="theme-page__status" data-testid="text-active-preset">
             Active: {activeSystem?.name ?? systemId} · {activeAccent?.name ?? accentId}
           </span>
         </p>
         {/* Task #346: living showcase — full token catalog + component anatomy. */}
         <Link
           href="/design-system"
-          className="inline-flex items-center gap-1.5 text-sm text-[var(--accent)] hover:underline mt-2 min-h-[44px]"
+          className="inline-flex items-center gap-1.5 text-sm text-[color:var(--text)] underline decoration-[color:var(--text-3)] underline-offset-4 hover:decoration-[color:var(--text)] mt-2 min-h-[44px]"
           data-testid="link-design-system-showcase"
         >
           Explore the full design-system showcase →
@@ -166,17 +158,10 @@ export default function ThemeSettings() {
         // Pinned BELOW the app header, which is itself sticky at top-0 with a
         // higher z-index. The shared shell variable keeps this offset aligned
         // with the header at every responsive breakpoint.
-        className="no-print sticky top-[var(--header-height)] z-20 -mx-4 border-b border-[color:var(--border)] bg-[var(--surface)] px-4 py-2 sm:-mx-6 sm:px-6 lg:hidden"
+        className="theme-sticky-preview no-print sticky top-[var(--header-height)] z-20 -mx-4 border-b border-[color:var(--border)] px-4 py-2 sm:-mx-6 sm:px-6 lg:hidden"
         data-testid="theme-sticky-preview"
       >
         <div className="flex items-center gap-3">
-          <span
-            aria-hidden
-            className="flex h-8 w-8 shrink-0 overflow-hidden rounded-[var(--radius-sm)] border border-[color:var(--border)]"
-          >
-            <span className="block h-full w-2/3 bg-[var(--accent)]" />
-            <span className="block h-full w-1/3 bg-[var(--accent-2)]" />
-          </span>
           {/* Both lines are `font-sans` on purpose. It resolves to
               `--font-body`, the one family BOTH pickers move: a design system
               sets --font-body/--font-display/--font-mono, but the font
@@ -187,9 +172,9 @@ export default function ThemeSettings() {
               solve. Do not "restore" a display face here. */}
           <span className="min-w-0 flex-1 font-sans">
             <span className="block truncate text-sm font-bold tracking-tight">
-              The quick brown fox <em className="text-[var(--accent)]">jumps</em>
+              The quick brown fox <em>jumps</em>
             </span>
-            <span className="block truncate text-[11px] uppercase tracking-wider text-[color:var(--text-3)]">
+            <span className="block truncate text-[11px] text-[color:var(--text-3)]">
               {activeSystem?.name ?? systemId} · {activeAccent?.name ?? accentId}
             </span>
           </span>
@@ -201,8 +186,7 @@ export default function ThemeSettings() {
           cards are buttons (hidden in print), which left orphan headings. */}
       <section aria-label="Design system picker" data-testid="system-picker" className="no-print">
         <div className="flex items-center gap-2 mb-4">
-          <Layers className="h-5 w-5 text-[var(--accent)]" />
-          <h2 className="font-sans font-semibold text-xl tracking-tight">Design System</h2>
+          <h2 className="display-h theme-section__title">Design System</h2>
         </div>
         <div
           role="radiogroup"
@@ -222,18 +206,14 @@ export default function ThemeSettings() {
                 onClick={() => handlePickSystem(id)}
                 onKeyDown={makeRadioKeyDown("system", systemIds, systemId, handlePickSystem)}
                 data-testid={`system-option-${id}`}
-                className="text-left rounded-[var(--radius)] border bg-[var(--surface)] p-4 transition-colors hover:border-[var(--border-strong)] focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent)] cursor-pointer"
-                style={{
-                  borderColor: isActive ? "var(--accent)" : "var(--border)",
-                }}
+                className="btn theme-option focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent)]"
               >
                 <div className="flex items-center justify-between mb-1">
                   <span className="font-semibold text-sm">{sys.name}</span>
-                  {isActive && <Check className="h-4 w-4 text-[var(--accent)]" />}
+                  {isActive && <Check className="theme-option__check" />}
                 </div>
-                <code className="block font-mono text-xs text-[color:var(--text-3)] tracking-wider uppercase mb-2">
-                  {sys.tag}
-                </code>
+                {/* The system's own tag hint, as the DS authors it. */}
+                <code className="theme-option__tag">{sys.tag}</code>
                 <p className="text-xs text-[color:var(--text-2)]">{sys.desc}</p>
               </button>
             );
@@ -244,8 +224,7 @@ export default function ThemeSettings() {
       {/* Accent Picker — 10 swatches */}
       <section aria-label="Accent picker" data-testid="accent-picker" className="no-print">
         <div className="flex items-center gap-2 mb-4">
-          <Palette className="h-5 w-5 text-[var(--accent)]" />
-          <h2 className="font-sans font-semibold text-xl tracking-tight">Accent</h2>
+          <h2 className="display-h theme-section__title">Accent</h2>
         </div>
         <div
           role="radiogroup"
@@ -265,14 +244,11 @@ export default function ThemeSettings() {
                 onClick={() => handlePickAccent(a.id)}
                 onKeyDown={makeRadioKeyDown("accent", accentIds, accentId, handlePickAccent)}
                 data-testid={`accent-option-${a.id}`}
-                className="text-left rounded-[var(--radius)] border bg-[var(--surface)] p-3 transition-colors hover:border-[var(--border-strong)] focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent)] cursor-pointer"
-                style={{
-                  borderColor: isActive ? a.primary : "var(--border)",
-                }}
+                className="btn theme-option theme-option--compact focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent)]"
               >
                 <div className="flex items-center justify-between mb-2">
                   <span className="font-semibold text-sm">{a.name}</span>
-                  {isActive && <Check className="h-4 w-4" style={{ color: a.primary }} />}
+                  {isActive && <Check className="theme-option__check" />}
                 </div>
                 <div className="flex h-9 w-full overflow-hidden rounded-[var(--radius-sm)] mb-2">
                   <div aria-hidden style={{ flex: 2, background: a.primary }} />
@@ -294,8 +270,7 @@ export default function ThemeSettings() {
       {/* I1 — Font override picker (hybrid: keeps 5×10 picker above, adds per-system font override) */}
       <section aria-label="Font override picker" data-testid="font-picker" className="no-print">
         <div className="flex items-center gap-2 mb-2">
-          <Type className="h-5 w-5 text-[var(--accent)]" />
-          <h2 className="font-sans font-semibold text-xl tracking-tight">Font</h2>
+          <h2 className="display-h theme-section__title">Font</h2>
         </div>
         <p className="text-xs text-[color:var(--text-2)] mb-4">
           Override the system&rsquo;s default font. &ldquo;System default&rdquo; falls back to the active design system&rsquo;s bundled font.
@@ -318,14 +293,11 @@ export default function ThemeSettings() {
                 onClick={() => handlePickFont(f.id)}
                 onKeyDown={makeRadioKeyDown("font", fontIds, fontId, handlePickFont)}
                 data-testid={`font-option-${f.id}`}
-                className="text-left rounded-[var(--radius)] border bg-[var(--surface)] p-4 transition-colors hover:border-[var(--border-strong)] focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent)] cursor-pointer"
-                style={{
-                  borderColor: isActive ? "var(--accent)" : "var(--border)",
-                }}
+                className="btn theme-option focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent)]"
               >
                 <div className="flex items-center justify-between mb-1">
                   <span className="font-semibold text-sm">{f.name}</span>
-                  {isActive && <Check className="h-4 w-4 text-[var(--accent)]" />}
+                  {isActive && <Check className="theme-option__check" />}
                 </div>
                 <p
                   className="text-sm text-[color:var(--text-2)]"
@@ -345,8 +317,7 @@ export default function ThemeSettings() {
           empty headings and blank bordered boxes; hide the whole preview. */}
       <section aria-label="Live preview" data-testid="theme-preview" className="no-print">
         <div className="flex items-center gap-2 mb-4">
-          <Eye className="h-5 w-5 text-[var(--accent)]" />
-          <h2 className="font-sans font-semibold text-xl tracking-tight">Live Preview</h2>
+          <h2 className="display-h theme-section__title">Live Preview</h2>
           <span className="ml-2 text-xs text-[color:var(--text-3)]">
             {activeSystem?.name ?? systemId} · {activeAccent?.name ?? accentId}
           </span>
@@ -357,7 +328,7 @@ export default function ThemeSettings() {
             is now `inert` (no pointer, focus, or AT exposure; lowercase
             string attr so React 18 forwards it — same pattern as the sidebar
             accordion bodies) and explicitly captioned as display-only. */}
-        <p className="text-xs text-[color:var(--text-3)] -mt-2 mb-4" data-testid="preview-display-only-note">
+        <p className="text-xs text-[color:var(--text-2)] -mt-2 mb-4" data-testid="preview-display-only-note">
           Display-only specimens — the controls below are intentionally inactive.
         </p>
         <Card
@@ -373,7 +344,7 @@ export default function ThemeSettings() {
             {/* Run15 BUG-027: type specimen, not a page heading — the page's
                 only h1 is "Theme Settings" at the top. */}
             <p className="font-display text-3xl font-bold tracking-tight">
-              The quick brown fox <em className="text-[var(--accent)]">jumps</em> over
+              The quick brown fox <em className="serif-italic">jumps</em> over
             </p>
             <h3 className="font-sans text-lg font-semibold">Section heading</h3>
             <p className="text-sm text-[color:var(--text-2)] max-w-2xl">
@@ -416,7 +387,7 @@ export default function ThemeSettings() {
               <Badge variant="secondary">Secondary</Badge>
               <Badge variant="outline">Outline</Badge>
               <Badge variant="destructive">Destructive</Badge>
-              <Badge className="bg-[var(--accent)] text-[var(--bg)] hover:bg-[var(--accent)]">
+              <Badge variant="accent">
                 Accent
               </Badge>
             </div>
@@ -442,13 +413,11 @@ export default function ThemeSettings() {
             <code className="block font-mono text-xs text-[color:var(--text-3)] tracking-wider uppercase">
               Active Tokens
             </code>
-            <div className="grid grid-cols-2 sm:grid-cols-5 gap-2 text-xs">
+            <div className="grid grid-cols-3 gap-2 text-xs">
               {[
                 { label: "bg", varName: "--bg" },
                 { label: "surface", varName: "--surface" },
                 { label: "border", varName: "--border" },
-                { label: "accent", varName: "--accent" },
-                { label: "accent-2", varName: "--accent-2" },
               ].map((t) => (
                 <div
                   key={t.varName}

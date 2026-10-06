@@ -1,4 +1,5 @@
-@import "../../../client/src/styles/design-system.css";
+@import "../../../client/public/ds/design-system.css";
+@import "../../../client/src/styles/app-bridge.css";
 
 :root { color-scheme: dark; }
 * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -42,6 +43,14 @@ button { color: inherit; }
   .ds-flow-scroll > .ds-flow-canvas {
     min-width: 700px;
   }
+  /* Approved comparison reference (CCR-44PX-CONTROLS-AND-NATURAL-WRAP): on
+     phones, buttons and tabs wrap their labels instead of scrolling sideways or
+     clipping, so every control stays fully visible without horizontal overflow. */
+  .btn,
+  .tab {
+    white-space: normal;
+    overflow-wrap: anywhere;
+  }
 }
 @media (max-width: 480px) {
   /* The token rows are fluid content, not fixed diagrams: reflow their
@@ -81,25 +90,26 @@ button { color: inherit; }
     max-width: 100%;
     overflow-x: auto;
   }
-  /* Colour chapter ink ramp: token, tier name, usage. The usage note reflows
-     under the token pair instead of squeezing into a 35px column. */
-  .ds-ink-row {
+  /* Showcase-only inline token and list specimens mirror the adjusted frozen
+     showcase. Documentation chapters intentionally retain their canonical row
+     widths unless a docs-specific contract rule above reflows them. */
+  .ds-shell .ds-ink-row {
     grid-template-columns: minmax(0, 1fr) auto !important;
     column-gap: 10px !important;
   }
-  .ds-ink-row > :nth-child(1) {
+  .ds-shell .ds-ink-row > :nth-child(1) {
     min-width: 0;
     overflow-wrap: anywhere;
   }
-  .ds-ink-row > :nth-child(3) {
+  .ds-shell .ds-ink-row > :nth-child(3) {
     grid-column: 1 / -1;
   }
-  .ds-list-row {
+  .ds-shell .ds-list-row {
     grid-template-columns: 36px minmax(0, 1fr) !important;
     column-gap: 12px !important;
   }
-  .ds-list-row > :nth-child(3),
-  .ds-list-row > :nth-child(4) {
+  .ds-shell .ds-list-row > :nth-child(3),
+  .ds-shell .ds-list-row > :nth-child(4) {
     grid-column: 2;
     text-align: left !important;
   }
@@ -213,7 +223,12 @@ button { color: inherit; }
 .tab,
 .ds-system-pill,
 .input,
-.select {
+.select,
+.artifact-docs button,
+.artifact-docs input,
+.artifact-docs select,
+.artifact-docs textarea {
+  box-sizing: border-box;
   min-height: var(--profile-control-height);
 }
 
@@ -250,21 +265,6 @@ button { color: inherit; }
   max-width: 100%;
 }
 
-/* The flow grammar metadata sits beside each diagram on larger screens. On
-   narrow screens it becomes a normal block so the fixed-width diagram's
-   local scrollport is the only horizontal overflow on the page. */
-.ds-flow-system-header {
-  min-width: 0;
-}
-
-@media (max-width: 767px) {
-  .ds-flow-system-header {
-    grid-template-columns: minmax(0, 1fr) !important;
-    gap: 14px !important;
-  }
-  .ds-flow-system-header > :nth-child(2) {
-    border-left: 0 !important;
-    border-top: 1px solid var(--border);
-    padding: 12px 0 0 !important;
-  }
+.artifact-docs .textarea {
+  min-height: 96px;
 }

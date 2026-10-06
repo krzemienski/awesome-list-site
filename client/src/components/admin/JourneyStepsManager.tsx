@@ -489,10 +489,13 @@ function StepsDialog({
           {groups.map((group, index) => {
             const primary = group.rows[0];
             const linkedRows = group.rows.filter((r) => r.resourceId !== null);
+            // C3-V5B-03: name the step in each control so the repeated icon
+            // buttons are distinguishable to screen-reader users.
+            const stepName = `step ${index + 1}: ${primary.title}`;
             return (
               <div
                 key={primary.id}
-                className="flex gap-3 items-start border rounded-md p-3"
+                className="flex flex-wrap sm:flex-nowrap gap-3 items-start border rounded-md p-3"
                 data-testid={`step-group-${primary.id}`}
               >
                 <div className="flex flex-col items-center gap-1 pt-1">
@@ -504,7 +507,7 @@ function StepsDialog({
                       className="h-8 w-8"
                       onClick={() => move(index, -1)}
                       disabled={index === 0 || reorderMutation.isPending}
-                      aria-label="Move step up"
+                      aria-label={`Move ${stepName} up`}
                       data-testid={`step-up-${primary.id}`}
                     >
                       <ArrowUp className="h-3 w-3" />
@@ -515,7 +518,7 @@ function StepsDialog({
                       className="h-8 w-8"
                       onClick={() => move(index, 1)}
                       disabled={index === groups.length - 1 || reorderMutation.isPending}
-                      aria-label="Move step down"
+                      aria-label={`Move ${stepName} down`}
                       data-testid={`step-down-${primary.id}`}
                     >
                       <ArrowDown className="h-3 w-3" />
@@ -540,8 +543,19 @@ function StepsDialog({
                       </span>
                       {linkedRows.map((row) => (
                         <Badge key={row.id} variant="outline" className="gap-1">
-                          <ExternalLink className="h-3 w-3" />
-                          #{row.resourceId}
+                          {/* C5-V5B-01: the chip carried a link icon but was
+                              plain text; it now opens the linked resource. */}
+                          <a
+                            href={`/resource/${row.resourceId}`}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="inline-flex min-h-[32px] items-center gap-1 underline-offset-2 hover:underline"
+                            aria-label={`Open resource #${row.resourceId} in a new tab`}
+                            data-testid={`step-resource-link-${row.id}`}
+                          >
+                            <ExternalLink className="h-3 w-3" aria-hidden="true" />
+                            #{row.resourceId}
+                          </a>
                           {group.rows.length > 1 && (
                             <Button
                               type="button"
@@ -561,12 +575,12 @@ function StepsDialog({
                   )}
                 </div>
 
-                <div className="flex gap-1">
+                <div className="flex w-full justify-end sm:w-auto gap-1">
                   <Button
                     size="icon"
                     variant="ghost"
                     onClick={() => setEditingGroup(group)}
-                    aria-label="Edit step"
+                    aria-label={`Edit ${stepName}`}
                     data-testid={`step-edit-${primary.id}`}
                   >
                     <Pencil className="h-4 w-4" />
@@ -575,7 +589,7 @@ function StepsDialog({
                     size="icon"
                     variant="ghost"
                     onClick={() => setDeletingGroup(group)}
-                    aria-label="Delete step"
+                    aria-label={`Delete ${stepName}`}
                     data-testid={`step-delete-${primary.id}`}
                   >
                     <Trash2 className="h-4 w-4" />
@@ -731,7 +745,9 @@ export default function JourneyStepsManager() {
               <div className="min-w-0">
                 <div className="flex items-center gap-2 flex-wrap">
                   <span className="font-medium line-clamp-1 break-words min-w-0" title={j.title}>{j.title}</span>
-                  <Badge variant="outline">{j.category}</Badge>
+                  <Badge variant="outline" className="max-w-full min-w-0" title={j.category}>
+                    <span className="truncate">{j.category}</span>
+                  </Badge>
                   {j.status && j.status !== "published" && (
                     <Badge variant="secondary">{j.status}</Badge>
                   )}
@@ -743,9 +759,13 @@ export default function JourneyStepsManager() {
                   </p>
                 )}
               </div>
+              {/* C3-V5B-04: shrink-0 keeps the full "Steps" label at phone width;
+                  the min-w-0 text column truncates instead. */}
               <Button
                 size="sm"
+                className="shrink-0"
                 onClick={() => setActiveJourney(j)}
+                aria-label={`Steps for ${j.title}`}
                 data-testid={`edit-steps-${j.id}`}
               >
                 <ListOrdered className="h-4 w-4 mr-1" />

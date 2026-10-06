@@ -150,12 +150,15 @@ export class UserRepository {
     const offset = (page - 1) * limit;
 
     // Optional search filter across email + first/last name (M17). A single
-    // combined predicate keeps count and page queries in lockstep.
-    const searchFilter = q && q.trim()
+    // combined predicate keeps count and page queries in lockstep. The
+    // "first last" match lets the name typed as the Name column shows it hit.
+    const term = q?.trim();
+    const searchFilter = term
       ? or(
-          ilike(users.email, `%${q.trim()}%`),
-          ilike(users.firstName, `%${q.trim()}%`),
-          ilike(users.lastName, `%${q.trim()}%`),
+          ilike(users.email, `%${term}%`),
+          ilike(users.firstName, `%${term}%`),
+          ilike(users.lastName, `%${term}%`),
+          ilike(sql`concat_ws(' ', ${users.firstName}, ${users.lastName})`, `%${term}%`),
         )
       : undefined;
 
@@ -180,11 +183,13 @@ export class UserRepository {
       case "email":
         orderExpr = textCol(users.email);
         break;
-      case "name":
-        orderExpr = dirDesc
-          ? sql`lower(coalesce(${users.firstName}, '') || ' ' || coalesce(${users.lastName}, '')) DESC NULLS LAST`
-          : sql`lower(coalesce(${users.firstName}, '') || ' ' || coalesce(${users.lastName}, '')) ASC NULLS LAST`;
+      case "name": {
+        // Sort on the value the Users table shows in the Name column: the
+        // full name, or the email (then id) for accounts without one.
+        const displayName = sql`lower(coalesce(nullif(trim(coalesce(${users.firstName}, '') || ' ' || coalesce(${users.lastName}, '')), ''), ${users.email}, ${users.id}))`;
+        orderExpr = dirDesc ? sql`${displayName} DESC` : sql`${displayName} ASC`;
         break;
+      }
       case "role":
         orderExpr = textCol(users.role);
         break;

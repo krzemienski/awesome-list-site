@@ -2,8 +2,9 @@ import type { Request, Response, NextFunction } from "express";
 import { storage } from "./storage";
 import { getAboutFaqs } from "@shared/faq";
 import { parsePageNumber, parseUrlPageStrict } from "@shared/page-param";
-import { normalizeSearchQuery } from "@shared/searchNormalize";
+import { isSearchableQuery, normalizeSearchQuery } from "@shared/searchNormalize";
 import { MAINTAINER } from "@shared/about-content";
+import { normalizeAdminTab } from "@shared/admin-tabs";
 import {
   repositoryDisplayName,
   resolveSiteIdentity,
@@ -33,6 +34,9 @@ import {
   tagDisplayNameBranded,
   tagSeoDescription,
   tagTitleCoreDeduped,
+  siteTagline,
+  signInSeoDescription,
+  signUpSeoDescription,
 } from "@shared/seo-templates";
 import {
   RESOURCE_FORMAT_LABELS,
@@ -75,8 +79,6 @@ import { loadHomeNav } from "./home-ssr-data";
 export const SITE_URL =
   process.env.PUBLIC_SITE_URL?.replace(/\/$/, "") || "https://awesome.video";
 export const SITE_NAME = "Awesome Video";
-export const SITE_TAGLINE =
-  "The curated index of 2,000+ video development resources — players, encoders, codecs, streaming, AI, tools, and community.";
 const collectionRepo = new CollectionRepository();
 
 export interface RouteMeta {
@@ -270,7 +272,7 @@ function ogImage(path: string) {
 function defaultMeta(url: string): RouteMeta {
   return {
     title: `${SITE_NAME} — Curated video development resources`,
-    description: SITE_TAGLINE,
+    description: siteTagline,
     url: abs(url),
     image: ogImage(url),
     imageAlt: `${SITE_NAME} — curated video development resources`,
@@ -734,7 +736,7 @@ function homeShellChrome(): string {
     // below) — only the new paths carry route metadata.
     "/sign-in": {
       title: `Sign In — ${SITE_NAME}`,
-      description: `Sign in to ${SITE_NAME} to save bookmarks, submit resources, and personalize your learning journey.`,
+      description: signInSeoDescription,
       // Utility auth page: thin, duplicate content with no search value. Mark
       // noindex so it does not compete in search (buildMetaTags then also drops
       // the canonical/og:url); the route still returns HTTP 200 (found: true).
@@ -742,7 +744,7 @@ function homeShellChrome(): string {
     },
     "/sign-up": {
       title: `Create an Account — ${SITE_NAME}`,
-      description: `Create an ${SITE_NAME} account to save bookmarks, submit resources, and track your learning journeys.`,
+      description: signUpSeoDescription,
       // Utility auth page — noindex for the same reason as /sign-in.
       noindex: true,
     },
@@ -829,7 +831,7 @@ function homeShellChrome(): string {
     },
     "/search": {
       title: `Search — ${SITE_NAME}`,
-      description: `Search 2,000+ curated video development tools, libraries, players, codecs, and learning resources.`,
+      description: `Search thousands of curated video development tools, libraries, players, codecs, and learning resources.`,
       // Search results pages are standard noindex (thin/duplicate content).
       noindex: true,
     },
@@ -848,12 +850,10 @@ function homeShellChrome(): string {
   };
   // Run3 audit R3-02: /admin/:section deep-links (e.g. /admin/users) are real
   // client routes that open the matching admin tab — serve them the /admin
-  // meta (noindex) instead of a soft-404. The section list mirrors
-  // AdminDashboard's tab ids; unknown sections still fall through to 404.
-  const adminSectionMatch = path.match(
-    /^\/admin\/(approvals|edits|enrichment|research|researcher|export|database|resources|categories|subcategories|subsubcategories|journeys|users|github|linkhealth|audit)$/,
-  );
-  const staticKey = adminSectionMatch ? "/admin" : path;
+  // meta (noindex) instead of a soft-404. The section ids and aliases are the
+  // ones AdminDashboard accepts; unknown sections still fall through to 404.
+  const adminSection = path.match(/^\/admin\/([^/]+)$/)?.[1];
+  const staticKey = adminSection && normalizeAdminTab(adminSection) ? "/admin" : path;
   if (staticRoutes[staticKey]) {
     const m = defaultMeta(path);
     Object.assign(m, staticRoutes[staticKey]);
@@ -930,6 +930,7 @@ function homeShellChrome(): string {
       const aboutSite = resolveSiteIdentity({
         ...config.site,
         name: config.site.title,
+        url: SITE_URL,
         ...(sourceRepoUrl
           ? { repoUrl: sourceRepoUrl, repoBranch: sourceParts[2] }
           : {}),
@@ -1078,7 +1079,10 @@ function homeShellChrome(): string {
       // whitespace-/control-only queries render the explicit "enter a search
       // term" prompt instead of catalog rows, and the SSR heading always
       // shows the query that was actually matched.
-      const q = normalizeSearchQuery(parseQueryParam(url));
+      // C5-API-02: the same minimum as the API and the hydrated page, so a
+      // one-letter query never renders a result count the client then hides.
+      const normalizedQuery = normalizeSearchQuery(parseQueryParam(url));
+      const q = isSearchableQuery(normalizedQuery) ? normalizedQuery : "";
       let results: { id: number; title: string; description?: string }[] = [];
       let total = 0;
       let sPage = parsePage(url);
@@ -2056,6 +2060,15 @@ export async function resolveOgImageMeta(
   return { pageTitle, category, kicker };
 }
 
+/**
+ * SPA routes whose last segment is an id or slug, not a file name. A dot in it
+ * ("/journey/1.5", "/category/foo.bar") must not turn the page into a
+ * static-asset request: it still gets the resolver's 404 page with app chrome.
+ */
+export function isEntityRoutePath(urlPath: string): boolean {
+  return /^\/(?:resource|journey|category|subcategory|sub-subcategory|tag)\/[^\/]+$/.test(urlPath);
+}
+
 // Express middleware that intercepts HTML responses and rewrites <head> with
 // route-specific OG/Twitter/SEO tags. Mount BEFORE any HTML-serving middleware
 // (vite dev middlewares or static index.html fallback).
@@ -2097,7 +2110,7 @@ export function ogInjectionMiddleware() {
       urlPath.startsWith("/@") ||
       urlPath.startsWith("/src/") ||
       urlPath.startsWith("/node_modules") ||
-      (/\.[a-z0-9]+$/i.test(urlPath) && !urlPath.startsWith("/tag/"))
+      (/\.[a-z0-9]+$/i.test(urlPath) && !urlPath.startsWith("/tag/") && !isEntityRoutePath(urlPath))
     ) {
       return next();
     }
@@ -2285,30 +2298,26 @@ export function ogInjectionMiddleware() {
       const safeNext = next && /^\/(?![/\\])/.test(next) ? next : null;
       return safeNext ? `${to}?redirect_url=${encodeURIComponent(safeNext)}` : to;
     };
-    if (urlPath === "/login" || urlPath === "/forgot-password" || urlPath === "/reset-password") {
-      return res.redirect(301, legacyAuthTarget("/sign-in"));
+    // BUG-009 / R3-08: /auth/* and /signup were never routes either; every
+    // alias shares the same ?next= carry-over (mirrors client LegacyAuthRedirect).
+    const legacyAuthAliases: Record<string, "/sign-in" | "/sign-up"> = {
+      "/login": "/sign-in",
+      "/forgot-password": "/sign-in",
+      "/reset-password": "/sign-in",
+      "/auth/login": "/sign-in",
+      "/register": "/sign-up",
+      "/auth/register": "/sign-up",
+      "/signup": "/sign-up",
+    };
+    const legacyAuthTo = legacyAuthAliases[urlPath];
+    if (legacyAuthTo) {
+      return res.redirect(301, legacyAuthTarget(legacyAuthTo));
     }
-    if (urlPath === "/register") {
-      return res.redirect(301, legacyAuthTarget("/sign-up"));
-    }
-    // BUG-009: /auth/* aliases were never routes — 301 to the canonical pages.
-    if (urlPath === "/auth/register") {
-      return res.redirect(301, "/sign-up");
-    }
-    if (urlPath === "/auth/login") {
-      return res.redirect(301, "/sign-in");
-    }
-    // Run3 audit R3-08/R3-09: more circulating URL shapes that were never
+    // Run3 audit R3-09: more circulating URL shapes that were never
     // routes — 301 them to their canonical pages instead of soft-404ing.
-    if (urlPath === "/signup") {
-      return res.redirect(301, "/sign-up");
-    }
-    if (urlPath === "/explore") {
-      return res.redirect(301, "/search");
-    }
-    if (/^\/resource\/?$/.test(urlPath)) {
-      // Bare /resource (often seen as /resource?q=term) — canonical is the
-      // search page; carry the query through. Exact-match so this never
+    if (urlPath === "/explore" || /^\/resource\/?$/.test(urlPath)) {
+      // /explore and bare /resource (often seen with ?q=term) — canonical is
+      // the search page; carry the query through. Exact-match so this never
       // hijacks the /resource/:id detail route.
       const qs = (req.originalUrl || req.url).split("?")[1] || "";
       const q = new URLSearchParams(qs).get("q");

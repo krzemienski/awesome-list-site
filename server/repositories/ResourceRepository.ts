@@ -79,6 +79,8 @@ export interface ListResourceOptions {
   /** Limit results to resources attached directly to this taxonomy level. */
   generalScope?: "category" | "subcategory";
   includeFacets?: boolean;
+  /** C9-V5A-06: admin lists must show exact full-text matches only, never fuzzy near-misses. */
+  exactSearchOnly?: boolean;
   /** R3-H08: whitelisted sort order; unknown/absent falls back to newest-first. */
   sort?: "relevance" | "name-asc" | "name-desc" | "newest" | "oldest";
   /**
@@ -387,6 +389,7 @@ export class ResourceRepository {
       sort,
       kind,
       includeFacets = false,
+      exactSearchOnly = false,
     } = options;
     const offset = options.offset ?? ((page - 1) * limit);
 
@@ -397,10 +400,31 @@ export class ResourceRepository {
     // GIN index and preserves the established order-independent token policy.
     const searchTokens = tokenizeSearchQuery(search);
     const normalizedSearch = searchTokens.join(" ");
-    const ftsTerms = searchTokens
-      .map((token) => token.toLowerCase().replace(/[^\p{L}\p{N}_]+/gu, ""))
-      .filter(Boolean);
-    const tsQuery = ftsTerms.map((term) => `${term}:*`).join(" & ");
+    // C3-V2-03: Postgres indexes dotted names ("hls.js", "video.js") as one
+    // host-style lexeme, so the punctuation-stripped prefix alone ("hlsjs:*")
+    // missed most of them. A dotted token matches either form.
+    const tsQuery = searchTokens
+      .map((token) => {
+        const lower = token.toLowerCase();
+        const stripped = lower.replace(/[^\p{L}\p{N}_]+/gu, "");
+        if (!stripped) return "";
+        // C8-V5A-05: Postgres indexes "low-latency" as the compound "low-lat"
+        // plus its parts, so the stripped "lowlatency:*" alone never matched
+        // it. Like a dotted name, a hyphenated token matches either form:
+        // the parser's compound-and-parts query, or the joined word that
+        // names such as "videojs-contrib-ads" are indexed under.
+        if (!lower.includes(".") && /[\p{L}\p{N}]-+[\p{L}\p{N}]/u.test(lower)) {
+          const hyphenated = lower
+            .replace(/[^\p{L}\p{N}_-]+/gu, "")
+            .replace(/-+/g, "-")
+            .replace(/^-|-$/g, "");
+          return `(${stripped}:* | ${hyphenated}:*)`;
+        }
+        const dotted = lower.match(/[\p{L}\p{N}_]+(?:\.[\p{L}\p{N}_]+)+/u)?.[0];
+        return dotted ? `(${stripped}:* | ${dotted}:*)` : `${stripped}:*`;
+      })
+      .filter(Boolean)
+      .join(" & ");
     const strictSearchCondition = tsQuery
       ? sql`${resources.searchTsv} @@ to_tsquery('english', ${tsQuery})`
       : undefined;
@@ -626,6 +650,15 @@ export class ResourceRepository {
         };
       }
 
+      if (exactSearchOnly) {
+        return {
+          resources: [],
+          total: 0,
+          ...(facets ? { facets } : {}),
+          search: { mode: "fts" },
+        };
+      }
+
       // Only a scoped strict miss reaches application scoring. The scoring
       // pool intentionally omits selectable facet filters so disjunctive facet
       // counts can still broaden one facet at a time; the result-id query below
@@ -773,11 +806,17 @@ export class ResourceRepository {
 
   /**
    * Create a new resource
-   * Automatically logs the creation to audit log
+   * Logs exactly one 'created' audit row attributed to resource.submittedBy.
+   * Callers that know more about the creation pass the row's changes/notes
+   * here rather than logging a second 'created' row themselves.
    * @param resource - Resource data to create
+   * @param audit - Changes and notes recorded on the 'created' audit row
    * @returns The created resource
    */
-  async createResource(resource: InsertResource): Promise<Resource> {
+  async createResource(
+    resource: InsertResource,
+    audit: { changes?: Record<string, unknown>; notes?: string } = {},
+  ): Promise<Resource> {
     // Task #248: universal write boundary — decode HTML entities in
     // title/description/hierarchy fields (never the URL) so "&amp;" text can
     // never be persisted, whatever the caller (routes, GitHub sync, AI).
@@ -811,7 +850,13 @@ export class ResourceRepository {
     invalidatePublicCache('resource-mutation');
 
     // Log the creation
-    await this.logResourceAudit(newResource.id, 'created', resource.submittedBy ?? undefined);
+    await this.logResourceAudit(
+      newResource.id,
+      'created',
+      resource.submittedBy ?? undefined,
+      audit.changes,
+      audit.notes,
+    );
 
     return newResource;
   }
@@ -877,12 +922,19 @@ export class ResourceRepository {
 
   /**
    * Update an existing resource
-   * Automatically logs the update to audit log
+   * Logs exactly one 'updated' audit row attributed to audit.performedBy
+   * (no actor = system). Pass audit=false only when the caller records its
+   * own audit row for this write.
    * @param id - Resource ID to update
    * @param resource - Partial resource data to update
+   * @param audit - Acting user and notes for the audit row, or false
    * @returns The updated resource
    */
-  async updateResource(id: number, resource: Partial<InsertResource>): Promise<Resource> {
+  async updateResource(
+    id: number,
+    resource: Partial<InsertResource>,
+    audit: { performedBy?: string; notes?: string } | false = {},
+  ): Promise<Resource> {
     // Task #248: same universal decode boundary as createResource.
     resource = this.normalizeResourceFacets(decodeResourceTextFields({ ...resource }), false);
     const [updatedResource] = await db
@@ -893,8 +945,9 @@ export class ResourceRepository {
 
     if (updatedResource) invalidatePublicCache('resource-mutation');
 
-    // Log the update
-    await this.logResourceAudit(id, 'updated', resource.submittedBy ?? undefined, resource);
+    if (audit) {
+      await this.logResourceAudit(id, 'updated', audit.performedBy, resource, audit.notes);
+    }
 
     return updatedResource;
   }

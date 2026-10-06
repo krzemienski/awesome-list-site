@@ -91,6 +91,8 @@ export default function ExportTab({ validationStatus: propValidationStatus }: Ex
   const queryClient = useQueryClient();
   const [isExporting, setIsExporting] = useState(false);
   const [isJsonExporting, setIsJsonExporting] = useState(false);
+  const [isCsvExporting, setIsCsvExporting] = useState(false);
+  const [isOpmlExporting, setIsOpmlExporting] = useState(false);
   // ADM-06: synchronous in-flight guard (mirrors the public exporter in
   // components/ui/export-tools.tsx). `isExporting` is React state set
   // asynchronously, so a rapid double-click can land the second click before
@@ -260,6 +262,62 @@ export default function ExportTab({ validationStatus: propValidationStatus }: Ex
     }
   };
 
+  const handleCsvExport = async () => {
+    try {
+      setIsCsvExporting(true);
+      const response = await fetch("/api/admin/export-csv", {
+        credentials: "include",
+      });
+      if (!response.ok) throw new ApiError(response.status, "CSV export failed");
+
+      triggerBlobDownload(
+        await response.blob(),
+        exportFileName(response, "resources-export.csv"),
+      );
+      void queryClient.invalidateQueries({ queryKey: ["/api/admin/audit-logs"] });
+      toast({
+        title: "CSV Export Successful",
+        description: "The resource table has been downloaded.",
+      });
+    } catch {
+      toast({
+        title: "CSV Export Failed",
+        description: "Failed to export the resource table. Please try again.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsCsvExporting(false);
+    }
+  };
+
+  const handleOpmlExport = async () => {
+    try {
+      setIsOpmlExporting(true);
+      const response = await fetch("/api/admin/export-opml", {
+        credentials: "include",
+      });
+      if (!response.ok) throw new ApiError(response.status, "OPML export failed");
+
+      triggerBlobDownload(
+        await response.blob(),
+        exportFileName(response, "categories-export.opml"),
+      );
+      void queryClient.invalidateQueries({ queryKey: ["/api/admin/audit-logs"] });
+      toast({
+        title: "OPML Export Successful",
+        description: "The category tree has been downloaded.",
+      });
+    } catch {
+      toast({
+        title: "OPML Export Failed",
+        description: "Failed to export the category tree. Please try again.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsOpmlExporting(false);
+    }
+  };
+
   const validateMutation = useMutation({
     mutationFn: async () => {
       const response: unknown = await apiRequest("/api/admin/validate", {
@@ -324,7 +382,15 @@ export default function ExportTab({ validationStatus: propValidationStatus }: Ex
       <div className="admin-ops-export__intro">
         <h2>Export Awesome List</h2>
         <div className="admin-ops-export__intro-actions">
-          <Button onClick={() => setConfirmAction("validate")} disabled={validateMutation.isPending}>
+          {/* C5-V5A-02: these buttons (and the Download / Generate cards below)
+              use aria-disabled, not disabled, while working — a disabled button
+              drops keyboard focus to <body>. */}
+          <Button
+            onClick={() => { if (!validateMutation.isPending) setConfirmAction("validate"); }}
+            aria-disabled={validateMutation.isPending}
+            aria-busy={validateMutation.isPending}
+            variant="outline"
+          >
             {validateMutation.isPending ? (
               <>
                 <RefreshCw className="h-4 w-4 animate-spin" />
@@ -338,8 +404,9 @@ export default function ExportTab({ validationStatus: propValidationStatus }: Ex
             )}
           </Button>
           <Button
-            onClick={() => setConfirmAction("links")}
-            disabled={checkLinksMutation.isPending}
+            onClick={() => { if (!checkLinksMutation.isPending) setConfirmAction("links"); }}
+            aria-disabled={checkLinksMutation.isPending}
+            aria-busy={checkLinksMutation.isPending}
             variant="outline"
           >
             {checkLinksMutation.isPending ? (
@@ -370,13 +437,14 @@ export default function ExportTab({ validationStatus: propValidationStatus }: Ex
             <FileJson className="h-5 w-5" />
           </div>
           <h3 className="admin-ops-export-card__title">JSON Snapshot</h3>
-          <p className="admin-ops-export-card__description">Complete dataset as a single JSON file. ~12 MB.</p>
+          <p className="admin-ops-export-card__description">Complete dataset as a single JSON file.</p>
           <Button
             className="admin-ops-export-card__action"
             onClick={() => {
-              void handleJsonExport();
+              if (!isJsonExporting) void handleJsonExport();
             }}
-            disabled={isJsonExporting}
+            aria-disabled={isJsonExporting}
+            aria-busy={isJsonExporting}
             data-testid="button-export-json"
           >
             {isJsonExporting ? <RefreshCw className="h-4 w-4 animate-spin" /> : <Download className="h-4 w-4" />}
@@ -384,13 +452,25 @@ export default function ExportTab({ validationStatus: propValidationStatus }: Ex
           </Button>
         </article>
 
-        <article className="card admin-ops-export-card admin-ops-export-card--unsupported">
+        <article className="card admin-ops-export-card hoverable">
           <div className="admin-ops-export-card__icon" aria-hidden="true">
             <TableProperties className="h-5 w-5" />
           </div>
           <h3 className="admin-ops-export-card__title">CSV (resources)</h3>
           <p className="admin-ops-export-card__description">Flat resource table for spreadsheet workflows.</p>
-          <Button className="admin-ops-export-card__action" onClick={() => unavailableExport("CSV")}>Download</Button>
+          <Button
+            className="admin-ops-export-card__action"
+            onClick={() => {
+              if (!isCsvExporting) void handleCsvExport();
+            }}
+            aria-disabled={isCsvExporting}
+            aria-busy={isCsvExporting}
+            variant="outline"
+            data-testid="button-export-csv"
+          >
+            {isCsvExporting && <RefreshCw className="h-4 w-4 animate-spin" />}
+            {isCsvExporting ? "Downloading..." : "Download"}
+          </Button>
         </article>
 
         <article className="card admin-ops-export-card hoverable">
@@ -404,23 +484,41 @@ export default function ExportTab({ validationStatus: propValidationStatus }: Ex
             onClick={() => {
               void handleExport();
             }}
-            disabled={isExporting}
+            aria-disabled={isExporting}
+            aria-busy={isExporting}
+            variant="outline"
             data-testid="button-export-markdown"
           >
             {isExporting ? <RefreshCw className="h-4 w-4 animate-spin" /> : <Download className="h-4 w-4" />}
-             {isExporting ? "Generating..." : "Generate"}
+            {isExporting ? "Generating..." : "Generate"}
+          </Button>
+        </article>
+
+        <article className="card admin-ops-export-card hoverable">
+          <div className="admin-ops-export-card__icon" aria-hidden="true">
+            <Database className="h-5 w-5" />
+          </div>
+          <h3 className="admin-ops-export-card__title">OPML (categories)</h3>
+          <p className="admin-ops-export-card__description">Hierarchical export for feed readers.</p>
+          <Button
+            className="admin-ops-export-card__action"
+            onClick={() => {
+              if (!isOpmlExporting) void handleOpmlExport();
+            }}
+            aria-disabled={isOpmlExporting}
+            aria-busy={isOpmlExporting}
+            variant="outline"
+            data-testid="button-export-opml"
+          >
+            {isOpmlExporting && <RefreshCw className="h-4 w-4 animate-spin" />}
+            {isOpmlExporting ? "Downloading..." : "Download"}
           </Button>
         </article>
 
         {[
           {
-            title: "OPML (categories)",
-            description: "Hierarchical export for feed readers.",
-            icon: <Database className="h-5 w-5" />,
-          },
-          {
             title: "SQL dump",
-             description: "PostgreSQL-compatible schema + data.",
+            description: "PostgreSQL-compatible schema + data.",
             icon: <TerminalSquare className="h-5 w-5" />,
           },
           {
@@ -438,6 +536,7 @@ export default function ExportTab({ validationStatus: propValidationStatus }: Ex
             <Button
               className="admin-ops-export-card__action"
               onClick={() => unavailableExport(format.title)}
+              variant="outline"
             >
               {format.title === "API token" ? "Generate" : "Download"}
             </Button>
@@ -456,8 +555,12 @@ export default function ExportTab({ validationStatus: propValidationStatus }: Ex
               type="button"
               variant="outline"
               size="sm"
-              disabled={!hasPreviousAuditHistoryPage || isExportHistoryLoading}
-              onClick={() => setAuditHistoryPage((page) => Math.max(0, page - 1))}
+              // C7-V5A-02: aria-disabled, never native disabled — while the next
+              // window loads its data is undefined, so a native disabled here
+              // dropped the pressed button's keyboard focus to <body>.
+              aria-disabled={!hasPreviousAuditHistoryPage || isExportHistoryLoading}
+              aria-busy={isExportHistoryLoading}
+              onClick={() => { if (hasPreviousAuditHistoryPage && !isExportHistoryLoading) setAuditHistoryPage((page) => Math.max(0, page - 1)); }}
               aria-label="Previous audit entries"
             >
               <ChevronLeft className="h-4 w-4" aria-hidden="true" />
@@ -467,8 +570,9 @@ export default function ExportTab({ validationStatus: propValidationStatus }: Ex
               type="button"
               variant="outline"
               size="sm"
-              disabled={!hasNextAuditHistoryPage || isExportHistoryLoading}
-              onClick={() => setAuditHistoryPage((page) => page + 1)}
+              aria-disabled={!hasNextAuditHistoryPage || isExportHistoryLoading}
+              aria-busy={isExportHistoryLoading}
+              onClick={() => { if (hasNextAuditHistoryPage && !isExportHistoryLoading) setAuditHistoryPage((page) => page + 1); }}
               aria-label="Next audit entries"
             >
               Next
@@ -545,9 +649,9 @@ export default function ExportTab({ validationStatus: propValidationStatus }: Ex
               <div className="admin-ops-validation-summary">
                 {/* DS-OK: global semantic status colors for validation outcomes. */}
                 {validationStatus.awesomeLint.valid ? (
-                  <CheckCircle2 className="h-4 w-4 text-[#34d08c]" aria-hidden="true" />
+                  <CheckCircle2 className="h-4 w-4 text-[var(--status-ok)]" aria-hidden="true" />
                 ) : (
-                  <XCircle className="h-4 w-4 text-[#ff5c7a]" aria-hidden="true" />
+                  <XCircle className="h-4 w-4 text-[var(--status-bad)]" aria-hidden="true" />
                 )}
                 <span className="admin-ops-validation-meta">
                   {validationStatus.awesomeLint.stats.totalResources} resources,{" "}
@@ -560,7 +664,9 @@ export default function ExportTab({ validationStatus: propValidationStatus }: Ex
                   <div>
                     {/* Run16 BUG-073: expanders get a ≥44px touch target. */}
                     <button
+                      type="button"
                       onClick={() => setShowErrors(!showErrors)}
+                      aria-expanded={showErrors}
                       className="admin-ops-validation-expander admin-ops-validation-expander--bad"
                     >
                       {showErrors ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}
@@ -594,7 +700,9 @@ export default function ExportTab({ validationStatus: propValidationStatus }: Ex
                   <div>
                     {/* Run16 BUG-073: 140×20px expander → ≥44px touch target. */}
                     <button
+                      type="button"
                       onClick={() => setShowWarnings(!showWarnings)}
+                      aria-expanded={showWarnings}
                       className="admin-ops-validation-expander admin-ops-validation-expander--warn"
                     >
                       {showWarnings ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}
@@ -661,7 +769,7 @@ export default function ExportTab({ validationStatus: propValidationStatus }: Ex
                 validationStatus.linkCheck.brokenResources.length > 0 && (
                   <div className="space-y-2">
                     {/* DS-OK: global semantic status color for broken-link headings. */}
-                    <h3 className="text-sm font-semibold text-[#ff5c7a]">
+                    <h3 className="text-sm font-semibold text-[var(--status-bad)]">
                       Broken links ({validationStatus.linkCheck.brokenResources.length})
                     </h3>
                     <ScrollArea className="admin-ops-validation-list admin-ops-validation-list--bad h-64">
@@ -670,14 +778,14 @@ export default function ExportTab({ validationStatus: propValidationStatus }: Ex
                           <div key={i} className="border-b border-[var(--border)] pb-3 last:border-0">
                             <div className="flex items-start gap-2">
                               {/* DS-OK: global semantic status color for broken-link icons. */}
-                              <XCircle className="mt-0.5 h-4 w-4 shrink-0 text-[#ff5c7a]" />
+                              <XCircle className="mt-0.5 h-4 w-4 shrink-0 text-[var(--status-bad)]" />
                               <div className="min-w-0 flex-1">
                                 <div className="text-sm font-semibold text-[var(--text)]">
                                   {link.resourceTitle ?? "Unknown Resource"}
                                 </div>
                                 <div className="break-all font-mono text-xs text-[var(--text-2)]">{link.url}</div>
                                 {/* DS-OK: global semantic status color for broken-link messages. */}
-                                <div className="mt-1 flex flex-wrap items-center gap-2 text-xs text-[#ff5c7a]">
+                                <div className="mt-1 flex flex-wrap items-center gap-2 text-xs text-[var(--status-bad)]">
                                   <StatusChip status={link.status >= 500 ? "Failed" : "Warning"} />
                                   <span>
                                     {link.status} {link.statusText}

@@ -8,7 +8,15 @@ import { tool, createSdkMcpServer } from '@anthropic-ai/claude-agent-sdk';
 import { z } from 'zod';
 import { AgentEventEmitter } from './agentEvents';
 import { cleanGithubSlugTitle } from '../lib/titleClean';
-import { decodeHtmlEntities } from '../github/importHygiene';
+
+/** Thrown when an approve/reject targets a discovery id that does not exist. */
+export class DiscoveryNotFoundError extends Error {
+  constructor() {
+    super("Discovery not found");
+    this.name = "DiscoveryNotFoundError";
+  }
+}
+import { decodeHtmlEntities, decodeResourceTextFields } from '../github/importHygiene';
 import { runAgentQuery, type AgentDefinitionInput } from './runAgentQuery';
 import { defaultResearchModel, defaultScoutModel, resolveModel, validateBaseUrl, type AgentRunConfig } from './agentRuntime';
 import { LinkChecker } from '../validation/linkChecker';
@@ -650,6 +658,11 @@ class ResearchService {
 
   /** Insert one discovery row + bump the job counter. Throws on failure — callers decide retry/queue. */
   private async insertDiscovery(ctx: ResearchRunContext, input: SaveDiscoveryInput): Promise<number> {
+    const taxonomy = decodeResourceTextFields({
+      category: input.suggested_category || '',
+      subcategory: input.suggested_subcategory || '',
+      subSubcategory: input.suggested_sub_subcategory || '',
+    });
     const rows = await withTimeout(
       db.insert(researchDiscoveries).values({
         jobId: ctx.jobId,
@@ -661,9 +674,9 @@ class ResearchService {
         title: decodeHtmlEntities(cleanGithubSlugTitle(input.title)),
         url: input.url,
         description: decodeHtmlEntities(input.description || ''),
-        suggestedCategory: decodeHtmlEntities(input.suggested_category || ''),
-        suggestedSubcategory: decodeHtmlEntities(input.suggested_subcategory || ''),
-        suggestedSubSubcategory: decodeHtmlEntities(input.suggested_sub_subcategory || ''),
+        suggestedCategory: taxonomy.category || '',
+        suggestedSubcategory: taxonomy.subcategory || '',
+        suggestedSubSubcategory: taxonomy.subSubcategory || '',
         // Clamp to the 1–100 contract so out-of-range model values can never
         // trigger a permanent DB rejection (e.g. int4 overflow).
         confidence: Math.min(100, Math.max(1, Math.round(input.confidence || 1))),
@@ -1343,7 +1356,7 @@ STOP TARGET: this run ends AUTOMATICALLY once ${targetDiscoveries} new discoveri
 
   async approveDiscovery(discoveryId: number, opts: { skipDuplicateCheck?: boolean } = {}): Promise<ResearchDiscovery> {
     const [discovery] = await db.select().from(researchDiscoveries).where(eq(researchDiscoveries.id, discoveryId));
-    if (!discovery) throw new Error("Discovery not found");
+    if (!discovery) throw new DiscoveryNotFoundError();
 
     // Normalized dedup guard (July 30, 2026): the per-job unique index only
     // stops exact same-job repeats — a single approve could still create a
@@ -1358,11 +1371,19 @@ STOP TARGET: this run ends AUTOMATICALLY once ${targetDiscoveries} new discoveri
       }
     }
 
+    // F201: split any "Parent › Child" path the model returned (including
+    // discoveries saved before the save-time split) into its own columns.
+    const taxonomy = decodeResourceTextFields({
+      category: discovery.suggestedCategory || '',
+      subcategory: discovery.suggestedSubcategory || '',
+      subSubcategory: discovery.suggestedSubSubcategory || '',
+    });
+
     await ensureSubSubcategoryExists(
       new CategoryRepository(),
-      discovery.suggestedCategory,
-      discovery.suggestedSubcategory,
-      discovery.suggestedSubSubcategory,
+      taxonomy.category,
+      taxonomy.subcategory,
+      taxonomy.subSubcategory,
     );
 
     const [newResource] = await db.insert(resources).values({
@@ -1371,9 +1392,9 @@ STOP TARGET: this run ends AUTOMATICALLY once ${targetDiscoveries} new discoveri
       title: decodeHtmlEntities(discovery.title),
       url: discovery.url,
       description: decodeHtmlEntities(discovery.description || ''),
-      category: decodeHtmlEntities(discovery.suggestedCategory || '') || 'Uncategorized',
-      subcategory: decodeHtmlEntities(discovery.suggestedSubcategory || '') || null,
-      subSubcategory: decodeHtmlEntities(discovery.suggestedSubSubcategory || '') || null,
+      category: taxonomy.category || 'Uncategorized',
+      subcategory: taxonomy.subcategory || null,
+      subSubcategory: taxonomy.subSubcategory || null,
       status: 'approved',
       metadata: { source: 'ai_researcher', discoveryId: discovery.id, confidence: discovery.confidence },
     }).returning();
@@ -1460,6 +1481,7 @@ STOP TARGET: this run ends AUTOMATICALLY once ${targetDiscoveries} new discoveri
       rejectionReason: reason || null,
     }).where(eq(researchDiscoveries.id, discoveryId)).returning();
 
+    if (!updated) throw new DiscoveryNotFoundError();
     if (updated.jobId) {
       await db.update(researchJobs)
         .set({ rejectedDiscoveries: sql`${researchJobs.rejectedDiscoveries} + 1` })

@@ -75,6 +75,19 @@ count is visible. The nine shell geometry tokens are runtime-only by name but
 are checked against the design's hard-coded measurements (rule 7), so they are
 excluded from that report.
 
+`--status-ok/--status-warn/--status-bad/--status-info` (#34d08c / #ffb84d /
+#ff5c7a / #5eddf2) come from the live Claude Design System project's
+`colors_and_type.css` `:root`, which the frozen `awesome-list-site-ds/` archive
+predates, so the gate reports them as runtime-only too. They are the one
+source for `.chip.ok/.warn/.bad`, `.dot.*` and the index.css
+`--color-destructive` / `--color-chart-2/3/4` bridge. The design's `.chip.*`
+and `.dot.*` rules still carry literals (`#34d08c`, `rgba(52,208,140,0.3)`, …),
+so rule 8 resolves runtime-only tokens and `color-mix(in srgb, #hex P%,
+transparent)` (same hue, alpha P/100) before comparing. The rule stays
+provably equal to the design, and design tokens are never substituted.
+Canaries `status-token-drift` and `status-mix-drift` prove a changed token or
+mix percentage still fails.
+
 **Revisit when:** the design source adds a token with one of these names; the
 gate then compares values automatically.
 
@@ -309,3 +322,23 @@ thresholds.
 **Revisit when:** the design moves the atmosphere off `.page`, gains a
 negative-`z-index` rule, or Chromium stops rasterising fully transparent
 gradient regions (then the deviation is pure cost and should be reverted).
+
+## 12. `body` keeps `min-height: 100%` instead of `height: 100%` (design: `html, body { height: 100% }`)
+
+NB-019 (run20): with `body { height: 100% }` the body box stays
+viewport-sized while content overflows it. When Radix scroll-lock sets
+`overflow: hidden` on body (any Select or popover opening), the document
+scroll range collapses, `window.scrollY` clamps to 0 and the page jumps to
+the top with the dropdown off-screen. The runtime keeps `html { height:
+100% }` and gives body `min-height: 100%`, which still fills the viewport on
+short pages without capping it.
+
+The gate compares `height` on `html` and `body` (rule 8b, `BASE_BOX_RULES`;
+an absent runtime height is `auto`) and honours the body mismatch as
+`rule:body:height`. Its `holds()` requires design `100%`, runtime `auto`,
+`body { min-height: 100% }` and `html { height: 100% }`. Canaries
+`body-height-deviation-stale`, `body-height-deviation-no-longer-holds` and
+`html-height-drift` prove the entry expires or fails when any of those change.
+
+**Revisit when:** the design stops capping body height, or scroll-lock no
+longer relies on body `overflow: hidden`.

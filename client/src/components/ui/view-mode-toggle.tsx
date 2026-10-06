@@ -27,12 +27,12 @@ export function ViewModeToggle({ value, onChange, className }: ViewModeTogglePro
       type="single" 
       value={value} 
       onValueChange={handleChange}
-      className={cn("border rounded-md p-0.5 sm:p-1", className)}
+      className={cn("gap-1", className)}
     >
       <ToggleGroupItem 
         value="grid" 
         aria-label="Grid view"
-        className="px-2.5 py-2 sm:px-2 sm:py-1 min-h-[44px] min-w-[44px] data-[state=on]:bg-accent touch-manipulation"
+        className="btn icon ghost min-h-[44px] min-w-[44px] data-[state=on]:bg-[var(--surface-2)] data-[state=on]:border-[var(--border-strong)] touch-manipulation"
         data-testid="view-mode-grid"
       >
         <LayoutGrid className="h-4 w-4" />
@@ -40,7 +40,7 @@ export function ViewModeToggle({ value, onChange, className }: ViewModeTogglePro
       <ToggleGroupItem 
         value="list" 
         aria-label="List view"
-        className="px-2.5 py-2 sm:px-2 sm:py-1 min-h-[44px] min-w-[44px] data-[state=on]:bg-accent touch-manipulation"
+        className="btn icon ghost min-h-[44px] min-w-[44px] data-[state=on]:bg-[var(--surface-2)] data-[state=on]:border-[var(--border-strong)] touch-manipulation"
         data-testid="view-mode-list"
       >
         <List className="h-4 w-4" />
@@ -48,7 +48,7 @@ export function ViewModeToggle({ value, onChange, className }: ViewModeTogglePro
       <ToggleGroupItem 
         value="compact" 
         aria-label="Compact view"
-        className="px-2.5 py-2 sm:px-2 sm:py-1 min-h-[44px] min-w-[44px] data-[state=on]:bg-accent touch-manipulation"
+        className="btn icon ghost min-h-[44px] min-w-[44px] data-[state=on]:bg-[var(--surface-2)] data-[state=on]:border-[var(--border-strong)] touch-manipulation"
         data-testid="view-mode-compact"
       >
         <LayoutList className="h-4 w-4" />

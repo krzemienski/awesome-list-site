@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { handoffFocusOnUnmount } from "@/hooks/focus-handoff";
 import { Link } from "wouter";
 import { useQuery } from "@tanstack/react-query";
 import SEOHead from "@/components/layout/SEOHead";
@@ -7,7 +8,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import CategoryExplorer from "@/components/ui/category-explorer";
 import CommunityMetrics from "@/components/ui/community-metrics";
-import ExportTools from "@/components/ui/export-tools";
+import ExportTools, { type ExportFormat } from "@/components/ui/export-tools";
 import AIRecommendationsPanel from "@/components/ui/ai-recommendations-panel";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Button } from "@/components/ui/button";
@@ -29,12 +30,13 @@ import {
 import { AwesomeList } from "@/types/awesome-list";
 import { fetchStaticAwesomeList } from "@/lib/static-data";
 import { writeFilterParams, usePopstateParams } from "@/lib/url-filter-state";
+import { queryUnavailableReason } from "@/lib/query-availability";
 import "@/styles/pages/discovery-tools.css";
 
 const VALID_ADVANCED_TABS = ["explorer", "metrics", "export", "recommendations"];
 // audit2 BUG-036: inner sub-tabs of the Metrics panel, deep-linkable via
 // ?sub= (only meaningful alongside tab=metrics).
-const VALID_METRICS_SUBTABS = ["overview", "contributors", "popular", "categories"];
+const VALID_METRICS_SUBTABS = ["overview", "categories"];
 
 export default function Advanced() {
   // BUG-038 (run14): ?tab= deep-links restore the selected tab, and switching
@@ -77,18 +79,23 @@ export default function Advanced() {
     );
   });
 
-  // BUG-026 (run13): selected export format, driven by the showcase cards.
-  const [exportFormat, setExportFormat] = useState<"markdown" | "json" | "csv" | "pdf" | "html" | "yaml" | undefined>();
+  // BUG-026 (run13): selected export format, shared by the showcase cards and
+  // the Export Format select (C3-V2-02: one state, so they stay in sync).
+  const [exportFormat, setExportFormat] = useState<ExportFormat>("markdown");
 
   // R4-033 (run21): share ONE catalog cache entry app-wide. App.tsx fetches
   // under ["awesome-list-data"] via fetchStaticAwesomeList; using the raw
   // '/api/awesome-list' key here created a second cache entry and a second
   // full 3.1MB download on this page.
-  const { data: awesomeList, isLoading, isError, refetch, isFetching } = useQuery<AwesomeList>({
+  const catalogQuery = useQuery<AwesomeList>({
     queryKey: ["awesome-list-data"],
     queryFn: fetchStaticAwesomeList,
     staleTime: 1000 * 60 * 60,
   });
+  const { data: awesomeList, isLoading, refetch, isFetching } = catalogQuery;
+  // C5-V2-03: a fetch started offline is paused, not failed — without this it
+  // fell through to the "Unable to load awesome list data" dead-end.
+  const catalogUnavailable = queryUnavailableReason(catalogQuery);
   const resources = awesomeList?.resources ?? [];
   const categories = awesomeList?.categories ?? [];
 
@@ -111,25 +118,31 @@ export default function Advanced() {
   // Run21 R4-032: a failed catalog fetch (429/500/network) gets an explicit
   // error state with a manual retry — the same treatment /search already has —
   // instead of the ambiguous "Unable to load" dead-end that offered no recovery.
-  if (isError && tab !== "recommendations") {
+  if (catalogUnavailable && tab !== "recommendations") {
+    const offline = catalogUnavailable === "offline";
     return (
       <div className="discovery-tools-page discovery-tools-page--advanced">
         <SEOHead title={advancedSeoTitle} description={advancedSeoDescription} />
         <div
           className="discovery-tools-state discovery-tools-state--error"
           role="alert"
-          data-testid="advanced-error"
+          data-testid={`advanced-${catalogUnavailable}`}
         >
-          <span className="chip bad discovery-tools-state-badge">Error · Catalog</span>
+          <span className="chip bad discovery-tools-state-badge">
+            {offline ? "Offline" : "Error · Catalog"}
+          </span>
           <AlertCircle className="discovery-tools-state-icon" aria-hidden="true" />
-          <h1 className="display-h discovery-tools-state-title">Couldn&apos;t load advanced features</h1>
+          <h1 className="display-h discovery-tools-state-title">
+            {offline ? "You’re offline." : "Couldn’t load advanced features"}
+          </h1>
           <p className="discovery-tools-state-copy">
-            We couldn&apos;t reach the catalog data. This is usually a temporary
-            network problem.
+            {offline
+              ? "Advanced features will load when your connection is back."
+              : "We couldn’t reach the catalog data. This is usually a temporary network problem."}
           </p>
           <Button
             variant="outline"
-            onClick={() => { if (!isFetching) void refetch(); }}
+            onClick={(e) => { if (isFetching) return; handoffFocusOnUnmount(e.currentTarget); void refetch(); }}
             aria-disabled={isFetching}
             data-testid="button-advanced-retry"
           >
@@ -239,7 +252,7 @@ export default function Advanced() {
                 <Card className="discovery-tools-stat-card">
                   <CardContent className="discovery-tools-stat-card-content">
                     <div className="discovery-tools-stat-value discovery-tools-stat-value--tertiary">
-                      {new Set(resources.flatMap((r) => r.metadata?.tags ?? r.tags ?? [])).size}
+                      {new Set(resources.flatMap((r) => r.metadata?.tags ?? r.tags ?? []).map((tag) => tag.toLowerCase())).size.toLocaleString()}
                     </div>
                     <div className="eyebrow discovery-tools-stat-label">Unique Tags</div>
                   </CardContent>
@@ -334,7 +347,8 @@ export default function Advanced() {
           {awesomeList ? (
             <ExportTools
               awesomeList={awesomeList}
-              formatOverride={exportFormat}
+              format={exportFormat}
+              onFormatChange={setExportFormat}
               className="discovery-tools-owned-panel discovery-tools-export-tools"
             />
           ) : null}

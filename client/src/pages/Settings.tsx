@@ -1,4 +1,5 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
+import { handoffFocusOnUnmount } from "@/hooks/focus-handoff";
 import { Link } from "wouter";
 import { useQuery } from "@tanstack/react-query";
 import { ArrowLeft, Palette, User, ShieldCheck, Bookmark, Sparkles, ChevronRight, LogIn, RotateCcw, SlidersHorizontal } from "lucide-react";
@@ -27,6 +28,7 @@ import {
 } from "@/components/ui/alert-dialog";
 import NotificationPreferencesCard from "@/components/notifications/NotificationPreferencesCard";
 import HomeLayoutPreferenceControl from "@/components/home/HomeLayoutPreferenceControl";
+import { useScrollToHash } from "@/lib/nav-history";
 import "@/styles/pages/account.css";
 
 interface CategoryOption {
@@ -106,6 +108,12 @@ export default function Settings() {
     enabled: isAuthenticated,
     staleTime: 5 * 60 * 1000,
   });
+  // Sections above a deep-linked one change height as they load, so scroll to
+  // #learning-preferences / #notification-settings only once they have.
+  useScrollToHash(
+    !isLoading &&
+      (!isAuthenticated || (!preferencesLoading && !categoriesLoading)),
+  );
   const [values, setValues] = useState<LearningPreferencesValues>(
     DEFAULT_LEARNING_PREFERENCES,
   );
@@ -117,6 +125,27 @@ export default function Settings() {
   >(null);
   const [showEmptyPreferencesEditor, setShowEmptyPreferencesEditor] =
     useState(false);
+  // C6-V3-01: Reset (confirmed) and "Choose preferences" both unmount the
+  // control that was pressed. Focus follows to whatever replaces it once it
+  // renders: the empty state's button, the form's first field, or back to
+  // Reset if the request failed.
+  const [pendingPreferencesFocus, setPendingPreferencesFocus] = useState<
+    "empty" | "form" | "reset" | null
+  >(null);
+  const preferencesContentRef = useRef<HTMLDivElement>(null);
+  const resetConfirmedRef = useRef(false);
+  useEffect(() => {
+    if (!pendingPreferencesFocus) return;
+    const selector = {
+      empty: '[data-testid="button-start-learning-preferences"]',
+      form: '[role="radio"][tabindex="0"], [role="radio"]',
+      reset: '[data-testid="button-reset-learning-preferences"]:not([disabled])',
+    }[pendingPreferencesFocus];
+    const target = preferencesContentRef.current?.querySelector<HTMLElement>(selector);
+    if (!target) return;
+    target.focus();
+    setPendingPreferencesFocus(null);
+  });
 
   useEffect(() => {
     setValues(
@@ -183,6 +212,7 @@ export default function Settings() {
       setValues(DEFAULT_LEARNING_PREFERENCES);
       setShowEmptyPreferencesEditor(false);
       setPreferenceErrors({});
+      setPendingPreferencesFocus("empty");
       toast({
         title: "Learning preferences reset",
         description:
@@ -194,6 +224,7 @@ export default function Settings() {
           ? error.message
           : "We couldn’t reset your learning preferences.",
       );
+      setPendingPreferencesFocus("reset");
     }
   };
   return (
@@ -223,18 +254,26 @@ export default function Settings() {
 
       <div className="grid gap-3 sm:grid-cols-2">
         {links.map(({ href, icon: Icon, title, description, testid }) => (
-          <Link key={testid} href={href} data-testid={testid}>
+          // C3-V3-01: the <article> card hides its heading from the link's
+          // computed name, so label the link from the visible title/text.
+          <Link
+            key={testid}
+            href={href}
+            data-testid={testid}
+            aria-labelledby={`${testid}-title`}
+            aria-describedby={`${testid}-description`}
+          >
             <Card
-              data-ds="card-hover"
+              hoverable
               className="h-full p-4 flex items-start gap-3 hover:border-[var(--accent)] transition-colors cursor-pointer"
             >
               <Icon className="h-5 w-5 text-[var(--accent)] mt-0.5 shrink-0" />
               <div className="min-w-0 flex-1">
                 <div className="flex items-center justify-between gap-2">
-                  <h2 className="font-sans font-semibold text-base">{title}</h2>
+                  <h2 id={`${testid}-title`} className="font-sans font-semibold text-base">{title}</h2>
                   <ChevronRight className="h-4 w-4 text-[color:var(--text-3)] shrink-0" />
                 </div>
-                <p className="text-sm text-[color:var(--text-2)] mt-1">{description}</p>
+                <p id={`${testid}-description`} className="text-sm text-[color:var(--text-2)] mt-1">{description}</p>
               </div>
             </Card>
           </Link>
@@ -272,7 +311,7 @@ export default function Settings() {
                 are not sent to analytics.
               </CardDescription>
             </CardHeader>
-            <CardContent>
+            <CardContent ref={preferencesContentRef}>
               {preferencesLoading || categoriesLoading ? (
                 <div className="space-y-3" aria-busy="true">
                   <div className="h-5 w-40 animate-pulse bg-muted" />
@@ -286,7 +325,8 @@ export default function Settings() {
                   <Button
                     variant="outline"
                     className="mt-3"
-                    onClick={() => {
+                    onClick={(e) => {
+                      handoffFocusOnUnmount(e.currentTarget);
                       void refetchPreferences();
                       void refetchCategories();
                     }}
@@ -308,7 +348,10 @@ export default function Settings() {
                   </p>
                   <Button
                     className="mt-4"
-                    onClick={() => setShowEmptyPreferencesEditor(true)}
+                    onClick={() => {
+                      setShowEmptyPreferencesEditor(true);
+                      setPendingPreferencesFocus("form");
+                    }}
                     data-testid="button-start-learning-preferences"
                   >
                     Choose preferences
@@ -349,7 +392,14 @@ export default function Settings() {
                           Reset preferences
                         </Button>
                       </AlertDialogTrigger>
-                      <AlertDialogContent>
+                      <AlertDialogContent
+                        onCloseAutoFocus={(event) => {
+                          // The trigger is disabled, then gone, after a
+                          // confirmed reset; the effect above places focus.
+                          if (resetConfirmedRef.current) event.preventDefault();
+                          resetConfirmedRef.current = false;
+                        }}
+                      >
                         <AlertDialogHeader>
                           <AlertDialogTitle>
                             Reset learning preferences?
@@ -363,7 +413,10 @@ export default function Settings() {
                         <AlertDialogFooter>
                           <AlertDialogCancel>Cancel</AlertDialogCancel>
                           <AlertDialogAction
-                            onClick={() => void handleResetPreferences()}
+                            onClick={() => {
+                              resetConfirmedRef.current = true;
+                              void handleResetPreferences();
+                            }}
                             data-testid="button-confirm-reset-learning-preferences"
                           >
                             Reset preferences
@@ -371,9 +424,12 @@ export default function Settings() {
                         </AlertDialogFooter>
                       </AlertDialogContent>
                     </AlertDialog>
+                    {/* C9-V3-01: aria-disabled (not native disabled) so a
+                        keyboard save keeps focus on the button. */}
                     <Button
-                      onClick={() => void handleSavePreferences()}
-                      disabled={isSaving || isResetting}
+                      onClick={() => { if (!isSaving && !isResetting) void handleSavePreferences(); }}
+                      aria-disabled={isSaving || isResetting}
+                      aria-busy={isSaving}
                       data-testid="button-save-learning-preferences"
                     >
                       {isSaving ? "Saving…" : "Save learning preferences"}
@@ -387,7 +443,7 @@ export default function Settings() {
       ) : null}
 
       {isAuthenticated ? (
-        <section aria-labelledby="notification-settings-title">
+        <section id="notification-settings" aria-labelledby="notification-settings-title">
           <NotificationPreferencesCard />
         </section>
       ) : null}

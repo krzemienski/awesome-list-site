@@ -1,8 +1,8 @@
-import { lazy, Suspense, type ReactNode } from "react";
+import { lazy, Suspense } from "react";
 import { Link, useLocation } from "wouter";
-import { BrandMark } from "@/components/BrandMark";
-import { openCookieSettings } from "@/components/ui/consent-banner";
-import type { AwesomeListNav } from "@/lib/static-data";
+import { hasAnalyticsVendors, openCookieSettings } from "@/components/ui/consent-banner";
+import { visibleNavCategories, type AwesomeListNav } from "@/lib/static-data";
+import { getCategoryGlyph } from "./category-glyphs";
 import "@/styles/shell/footer.css";
 
 const ContactFooter =
@@ -12,23 +12,30 @@ const ContactFooter =
     ? lazy(() => import("@/components/contact/contact-footer").then((module) => ({ default: module.ContactFooter })))
     : null;
 
-function Column({ title, children }: { title: string; children: ReactNode }) {
-  return <div className="footer-column"><h2>{title}</h2><div className="app-footer-links">{children}</div></div>;
-}
-
-function ExternalLink({ href, children, testId }: { href: string; children: ReactNode; testId?: string }) {
-  return <a href={href} target="_blank" rel="noopener noreferrer" data-testid={testId}>{children}</a>;
-}
-
-/** Keep the current deployment's established visible footer brand while
- * allowing another configured list to render its own identity. */
-function footerBrandName(siteName: string): string {
+/** The deployment's display identity is the lowercase domain, as in the
+ * reference PageFooter; another configured list keeps its own title. */
+function footerDisplayName(siteName: string): string {
   return /^awesome\s+video(?:\s+dashboard)?$/i.test(siteName.trim())
-    ? "Awesome Video"
+    ? "awesome.video"
     : siteName.trim();
 }
 
-/** Layout supplies its already-loaded lightweight tree; the footer never fetches the corpus. */
+/** Reference EXPLORE rows use a category's short name ("Community", "Media"). */
+function shortCategoryName(name: string): string {
+  return name.split(/\s+&\s+|\s+/)[0] || name;
+}
+
+function GitHubMark() {
+  return (
+    <svg width="13" height="13" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true">
+      <path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.012 8.012 0 0 0 16 8c0-4.42-3.58-8-8-8z" />
+    </svg>
+  );
+}
+
+/** Reference PageFooter (sidebar-variants.jsx): identity, index stats, explore
+ * and source columns over a mono meta strip. Layout supplies its
+ * already-loaded lightweight tree; the footer never fetches the corpus. */
 export default function AppFooter({ nav, site }: {
   nav?: AwesomeListNav;
   site: { name: string; tagline: string; repoUrl: string; repoBranch: string; issuesUrl?: string };
@@ -37,57 +44,81 @@ export default function AppFooter({ nav, site }: {
   if (location.startsWith("/admin")) return null;
 
   const repo = site.repoUrl.replace(/\/$/, "");
+  const repoLabel = repo.replace(/^https?:\/\/(www\.)?github\.com\//, "");
   const branch = encodeURIComponent(site.repoBranch);
-  const visibleBrandName = footerBrandName(site.name);
-  const categories = nav?.categories ?? [];
+  const displayName = footerDisplayName(site.name);
+  // C9-V1-01: count and link only the categories the rest of the site shows.
+  const categories = visibleNavCategories(nav?.categories);
   const subcategoryCount = categories.reduce((total, category) => total + (category.subcategories?.length ?? 0), 0);
+
   return (
-    <footer className="site-footer app-footer" data-testid="site-footer">
-      <div className="site-footer-inner">
-        <nav className="footer-grid" aria-label="Footer">
-          <div className="footer-brand">
-            <Link href="/" className="footer-brand-link" data-testid="footer-home" aria-label={`${site.name} home`}>
-              <BrandMark className="app-footer-mark" />
-              <span className="footer-wordmark">{visibleBrandName.toUpperCase()}</span>
-            </Link>
-            <p className="footer-tagline">{site.tagline}</p>
-            {nav && <div className="footer-stats">
-              {nav.totalResources.toLocaleString()} resources · {categories.length} categories · {subcategoryCount} subcategories
-              <span className="footer-live"><span className="live-dot" aria-hidden="true" />indexed live</span>
-            </div>}
-          </div>
-          <Column title="BROWSE">
-            {categories.slice(0, 6).map((category) => category.slug ? (
-              <Link key={category.slug} href={`/category/${encodeURIComponent(category.slug)}`}>{category.name}</Link>
-            ) : null)}
-            <Link href="/categories" data-testid="footer-categories">All categories →</Link>
-            <Link href="/journeys" data-testid="footer-journeys">Journeys</Link>
-          </Column>
-          <Column title="PROJECT">
-            <Link href="/about" data-testid="footer-about">About</Link>
-            <Link href="/submit" data-testid="footer-submit">Submit a resource</Link>
-            <Link href="/admin">Admin</Link>
-            <Link href="/terms" data-testid="footer-terms">Terms</Link>
-            <Link href="/privacy" data-testid="footer-privacy">Privacy</Link>
-            <Link href="/code-of-conduct" data-testid="footer-code-of-conduct">Code of Conduct</Link>
-            <button type="button" onClick={openCookieSettings} data-testid="footer-cookie-settings" className="footer-cookie-settings">Cookie settings</button>
-          </Column>
-          <Column title="SOURCE">
-            <ExternalLink href={repo} testId="footer-github">{repo.replace(/^https?:\/\/(www\.)?github\.com\//, "")} ↗</ExternalLink>
-            {site.issuesUrl ? <ExternalLink href={site.issuesUrl}>Report an issue ↗</ExternalLink> : null}
-            <ExternalLink href={`${repo}/blob/${branch}/CONTRIBUTING.md`}>Contributing ↗</ExternalLink>
-            <ExternalLink href="https://github.com/sindresorhus/awesome">awesome-list guidelines ↗</ExternalLink>
-            <ExternalLink href={`${repo}/tree/${branch}/docs`}>Docs ↗</ExternalLink>
-            <a href="/sitemap.xml">Sitemap</a>
-            {ContactFooter ? (
-              <div className="app-footer-contact"><Suspense fallback={null}><ContactFooter /></Suspense></div>
-            ) : null}
-          </Column>
-        </nav>
-        <div className="footer-bottom">
-          <span data-testid="footer-copyright">© {new Date().getFullYear()} {visibleBrandName} · content CC0, code MIT</span>
-          <span>Built with React &amp; shadcn/ui</span>
+    <footer className="app-footer" data-testid="site-footer">
+      <div className="app-footer-grid">
+        <div className="app-footer-identity">
+          <p className="eyebrow app-footer-eyebrow">── INDEX</p>
+          <Link href="/" className="display-h app-footer-name" data-testid="footer-home" aria-label={`${displayName} home`}>
+            {displayName}
+          </Link>
+          {site.tagline && <p className="app-footer-tagline">{site.tagline}</p>}
+          <div className="shimmer-line app-footer-shimmer" aria-hidden="true" />
         </div>
+
+        <div>
+          <h2 className="app-footer-heading">INDEXED</h2>
+          {nav && <>
+            <p className="display-h app-footer-total">{nav.totalResources.toLocaleString()}</p>
+            <p className="app-footer-stats">
+              {categories.length} categories<br />
+              {subcategoryCount} subcategories<br />
+              <span className="app-footer-live"><span className="live-dot" aria-hidden="true" /> live</span>
+            </p>
+          </>}
+        </div>
+
+        <nav aria-label="Explore categories">
+          <h2 className="app-footer-heading">EXPLORE</h2>
+          <div className="app-footer-explore">
+            {categories.map((category) => category.slug ? (
+              <Link key={category.slug} href={`/category/${encodeURIComponent(category.slug)}`} aria-label={category.name}>
+                <span className="app-footer-glyph" aria-hidden="true">{getCategoryGlyph(category.name)}</span>
+                <span aria-hidden="true">{shortCategoryName(category.name)}</span>
+              </Link>
+            ) : null)}
+          </div>
+        </nav>
+
+        <div>
+          <h2 className="app-footer-heading">SOURCE</h2>
+          <a className="app-footer-repo" href={repo} target="_blank" rel="noopener noreferrer" data-testid="footer-github">
+            <GitHubMark />
+            <span className="app-footer-repo-label">{repoLabel.split("/").map((part, i) => i === 0 ? part : <span key={i}>/<wbr />{part}</span>)}</span>
+            <span className="app-footer-repo-arrow" aria-hidden="true">↗</span>
+          </a>
+          <p className="app-footer-note">
+            Open-source.{" "}
+            <a href={`${repo}/blob/${branch}/CONTRIBUTING.md`} target="_blank" rel="noopener noreferrer">PRs welcome</a>.<br />
+            Indexed automatically from <span className="app-footer-mono">README.md</span>.
+          </p>
+          {ContactFooter ? (
+            <div className="app-footer-contact"><Suspense fallback={null}><ContactFooter /></Suspense></div>
+          ) : null}
+        </div>
+      </div>
+
+      <div className="app-footer-meta">
+        <span data-testid="footer-copyright">© {new Date().getFullYear()} {displayName} · content CC0, code MIT</span>
+        <nav className="app-footer-meta-links" aria-label="Site policies">
+          <Link href="/about" data-testid="footer-about">About</Link>
+          <Link href="/terms" data-testid="footer-terms">Terms</Link>
+          <Link href="/privacy" data-testid="footer-privacy">Privacy</Link>
+          <Link href="/code-of-conduct" data-testid="footer-code-of-conduct" aria-label="Code of Conduct">Conduct</Link>
+          {hasAnalyticsVendors && (
+            <button type="button" onClick={openCookieSettings} data-testid="footer-cookie-settings" className="btn ghost footer-cookie-settings">Cookie settings</button>
+          )}
+          <a href={site.issuesUrl || `${repo}/issues`} target="_blank" rel="noopener noreferrer">Issues ↗</a>
+          <a href="/sitemap.xml">Sitemap</a>
+        </nav>
+        <span>built with the awesome-list framework</span>
       </div>
     </footer>
   );

@@ -1,13 +1,21 @@
 /*
-  Foundation order matters: DS tokens MUST load before Tailwind so the
-  @theme inline block below can alias shadcn color keys to DS tokens.
+  The design system (/ds/design-system.css, linked in index.html before this
+  bundle) is unlayered and opens with `* { margin: 0; padding: 0; }`. An
+  unlayered rule beats every layered rule, so Tailwind's utilities cannot sit
+  in @layer utilities or every p-* / m-* utility computes to 0. They load
+  unlayered and first: a class (0,1,0) beats the DS `*` reset (0,0,0) on
+  specificity, and the app's own unlayered CSS below still wins ties.
 */
-@import './styles/design-system.css';
+@layer theme, base, components;
+@import "tailwindcss/theme.css" layer(theme);
+@import "tailwindcss/preflight.css" layer(base);
+@import "tailwindcss/utilities.css" source(none);
+
+@import './styles/app-bridge.css';
 @import './styles/mobile-optimizations.css';
 @import './styles/skeleton-animations.css';
 @import './styles/scrolling-fix.css';
 
-@import "tailwindcss" source(none);
 @source "../index.html";
 @source ".";
 
@@ -19,35 +27,34 @@
 @theme inline {
   --color-background: var(--bg);
   --color-foreground: var(--text);
-  /* MR-DS-20 — DS-OK: shadcn↔DS token bridge. Hex literals below
-     (#ff5c7a / #34d08c / #ffb84d / #000000) mirror DS status colors and
-     the on-accent ink color verbatim from design-system.css. */
+  /* shadcn↔DS token bridge. Status slots read the --status-* tokens and the
+     on-accent ink is --on-accent (both defined in app-bridge.css). */
   --color-card: var(--surface);
   --color-card-foreground: var(--text);
   --color-popover: var(--bg-2);
   --color-popover-foreground: var(--text);
   --color-primary: var(--accent);
-  --color-primary-foreground: #000000;
+  --color-primary-foreground: var(--on-accent);
   --color-secondary: var(--surface-2);
   --color-secondary-foreground: var(--text);
   --color-muted: var(--surface);
   --color-muted-foreground: var(--text-2);
   --color-accent: var(--surface-2);
   --color-accent-foreground: var(--text);
-  --color-destructive: #ff5c7a;
-  --color-destructive-foreground: #000000;
+  --color-destructive: var(--status-bad);
+  --color-destructive-foreground: var(--on-accent);
   --color-border: var(--border);
   --color-input: var(--border);
   --color-ring: var(--accent);
   --color-chart-1: var(--accent);
-  --color-chart-2: #34d08c;
-  --color-chart-3: #5eddf2;
-  --color-chart-4: #ffb84d;
-  --color-chart-5: #9d4edd;
+  --color-chart-2: var(--status-ok);
+  --color-chart-3: var(--status-info); /* fixed chart-series hue: the global status-info token, never the active accent */
+  --color-chart-4: var(--status-warn);
+  --color-chart-5: var(--status-info-2); /* fixed chart-series hue; series colors must not follow the active accent */
   --color-sidebar: var(--bg);
   --color-sidebar-foreground: var(--text);
   --color-sidebar-primary: var(--accent);
-  --color-sidebar-primary-foreground: #000000;
+  --color-sidebar-primary-foreground: var(--on-accent);
   --color-sidebar-accent: var(--surface-2);
   --color-sidebar-accent-foreground: var(--text);
   --color-sidebar-border: var(--border);
@@ -144,7 +151,7 @@
   }
 }
 
-/* selection rule lives in design-system.css with proper color-mix alpha */
+/* selection rule lives in /ds/design-system.css with proper color-mix alpha */
 
 /*
   Dev-only: suppress Vite's runtime error overlay.
@@ -230,14 +237,16 @@ vite-plugin-checker-error-overlay {
       filled cards no longer spill into near-blank orphan trailing pages (R4-070).
 */
 @media print {
+  /* Print is fixed paper paint, outside the five-system theme: the CSS system
+     colors Canvas / CanvasText / GrayText are the paper, ink and neutral rule. */
   /* White page, full-opacity black readable text everywhere. */
   html,
   body,
   #root,
   main,
   [role="main"] {
-    background: #fff !important;
-    color: #000 !important;
+    background: Canvas !important;
+    color: CanvasText !important;
   }
 
   /* Neutralise dark surfaces/shadows and kill sub-1 opacity so nothing prints
@@ -250,10 +259,10 @@ vite-plugin-checker-error-overlay {
     background-image: none !important;
     box-shadow: none !important;
     text-shadow: none !important;
-    color: #000 !important;
+    color: CanvasText !important;
     opacity: 1 !important;
     filter: none !important;
-    border-color: #bbb !important;
+    border-color: GrayText !important;
   }
 
   /* Hide ALL interactive chrome for a content-only printout (R4-039):
@@ -360,14 +369,14 @@ vite-plugin-checker-error-overlay {
   [role="main"],
   article,
   .prose {
-    color: #000 !important;
+    color: CanvasText !important;
   }
 
   /* Links stay readable as plain underlined text. The href expansion is dropped
      (R4-038): as inline pseudo-content it overlapped titles and was clipped at
      the card edge. */
   a {
-    color: #000 !important;
+    color: CanvasText !important;
     text-decoration: underline;
   }
   a[href]::after {

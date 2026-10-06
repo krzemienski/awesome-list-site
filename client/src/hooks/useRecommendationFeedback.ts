@@ -1,5 +1,5 @@
 import { useMutation, useQuery } from "@tanstack/react-query";
-import { apiRequest, queryClient } from "@/lib/queryClient";
+import { ApiError, apiRequest, queryClient } from "@/lib/queryClient";
 import { safeGetItem, safeSetItem } from "@/lib/safeStorage";
 import {
   recommendationFeedbackQueryKey,
@@ -139,5 +139,9 @@ export function useRecommendationFeedbackStates(
     },
     enabled: enabled && Boolean(userId),
     staleTime: 30_000,
+    // C6-V2-06: the first request after a reconnect can fail before the
+    // network is really back; retry transport failures instead of sticking in
+    // an error state. HTTP errors still surface immediately.
+    retry: (failureCount, error) => !(error instanceof ApiError) && failureCount < 4,
   });
 }

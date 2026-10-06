@@ -1,4 +1,5 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
+import { focusElement, focusPageHeading, handoffFocusOnUnmount, handoffFocusToSiblingControl } from "@/hooks/focus-handoff";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import {
   Archive,
@@ -62,6 +63,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Link } from "wouter";
+import { queryUnavailableReason } from "@/lib/query-availability";
 import { apiRequest, queryClient } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
 import { writeFilterParams, usePopstateParams } from "@/lib/url-filter-state";
@@ -100,6 +102,9 @@ function readCollection(params: URLSearchParams): string {
   return value && /^\d+$/.test(value) ? value : "all";
 }
 
+type FocusTarget = "all-saved" | "copy-link" | "publish-link";
+const FOCUS_AFTER_ACTION_TTL_MS = 5_000;
+
 type ActionRequest = {
   url: string;
   method: "POST" | "PATCH" | "PUT" | "DELETE";
@@ -118,30 +123,33 @@ export default function Bookmarks() {
   const [collectionDialogOpen, setCollectionDialogOpen] = useState(false);
   const [editingCollection, setEditingCollection] = useState<BookmarkCollection | null>(null);
   const [collectionName, setCollectionName] = useState("");
+  const collectionNameRef = useRef<HTMLInputElement>(null);
   const [deleteCollection, setDeleteCollection] = useState<BookmarkCollection | null>(null);
   const [bulkStatus, setBulkStatus] = useState<BookmarkQueueStatus>("watch-next");
   const [bulkDestination, setBulkDestination] = useState("");
   const [bulkTag, setBulkTag] = useState("");
   const [noteTarget, setNoteTarget] = useState<BookmarkedResource | null>(null);
   const [noteText, setNoteText] = useState("");
+  // C5-V4-03: Publish link, Unpublish, Delete and Go to All saved unmount the
+  // button that ran them. Name the control that takes its place; the effect
+  // below focuses it once it has rendered instead of leaving focus on <body>.
+  const [focusAfterAction, setFocusAfterActionState] = useState<{ target: FocusTarget; at: number } | null>(null);
+  const setFocusAfterAction = (target: FocusTarget) => setFocusAfterActionState({ target, at: Date.now() });
   const { toast } = useToast();
 
-  const {
-    data: bookmarks = [],
-    isLoading: bookmarksLoading,
-    error: bookmarksError,
-  } = useQuery<BookmarkedResource[]>({
+  const bookmarksQuery = useQuery<BookmarkedResource[]>({
     queryKey: ["/api/bookmarks"],
     staleTime: 30_000,
   });
-  const {
-    data: collections = [],
-    isLoading: collectionsLoading,
-    error: collectionsError,
-  } = useQuery<BookmarkCollection[]>({
+  const collectionsQuery = useQuery<BookmarkCollection[]>({
     queryKey: ["/api/collections?includeArchived=true"],
     staleTime: 30_000,
   });
+  const { data: bookmarks = [] } = bookmarksQuery;
+  const { data: collections = [] } = collectionsQuery;
+  const libraryUnavailable =
+    queryUnavailableReason(bookmarksQuery) ??
+    queryUnavailableReason(collectionsQuery);
 
   const refreshLibrary = async () => {
     await Promise.all([
@@ -174,6 +182,24 @@ export default function Bookmarks() {
         variant: "destructive",
       });
     },
+  });
+
+  useEffect(() => {
+    if (!focusAfterAction) return;
+    // A target that never renders (e.g. no public URL came back) must not
+    // grab focus later during unrelated work, so a request expires.
+    if (Date.now() - focusAfterAction.at > FOCUS_AFTER_ACTION_TTL_MS) {
+      setFocusAfterActionState(null);
+      return;
+    }
+    // The All saved entry is the sidebar button on lg and the Collection
+    // select below it; focus whichever one is displayed.
+    const target = Array.from(
+      document.querySelectorAll<HTMLElement>(`[data-focus-target="${focusAfterAction.target}"]`),
+    ).find((element) => element.getClientRects().length > 0);
+    if (!target) return;
+    target.focus();
+    setFocusAfterActionState(null);
   });
 
   usePopstateParams((params) => {
@@ -286,8 +312,12 @@ export default function Bookmarks() {
   };
 
   const reorderCollection = (index: number, direction: -1 | 1) => {
+    // The arrows stay enabled while a save is in flight (disabling the focused
+    // one drops keyboard focus to <body>), so repeat presses are ignored here.
+    if (actionMutation.isPending) return;
     const destination = index + direction;
     if (destination < 0 || destination >= collections.length) return;
+    const movedId = collections[index].id;
     const ordered = collections.map((collection) => collection.id);
     [ordered[index], ordered[destination]] = [ordered[destination], ordered[index]];
     actionMutation.mutate({
@@ -295,6 +325,17 @@ export default function Bookmarks() {
       method: "PUT",
       body: { orderedIds: ordered },
       success: "Collection order updated",
+      // Re-rendering in the new order can detach the pressed arrow (or disable
+      // it at the list edge), so put focus back on the moved collection.
+      after: () =>
+        requestAnimationFrame(() => {
+          const controls = document.querySelectorAll<HTMLButtonElement>(
+            `[data-reorder-collection="${movedId}"] button`,
+          );
+          const [up, down] = Array.from(controls);
+          const preferred = direction < 0 ? up : down;
+          (preferred && !preferred.disabled ? preferred : direction < 0 ? down : up)?.focus();
+        }),
     });
   };
 
@@ -308,7 +349,16 @@ export default function Bookmarks() {
         data.failed?.length
           ? `${data.succeeded.length} updated; ${data.failed.length} couldn't be changed`
           : message,
-      after: () => setSelected(new Set()),
+      after: () => {
+        // C6-V4-01: the bulk action row unmounts once the selection clears;
+        // move focus to "Select all shown", which survives, unless the user
+        // already moved it elsewhere.
+        const active = document.activeElement;
+        if (!active || active === document.body || active.closest('[aria-label="Bulk bookmark actions"]')) {
+          if (!focusElement(document.getElementById("bulk-select-all"))) focusPageHeading();
+        }
+        setSelected(new Set());
+      },
     });
   };
 
@@ -339,7 +389,7 @@ export default function Bookmarks() {
     }
   };
 
-  if (bookmarksLoading || collectionsLoading) {
+  if (bookmarksQuery.isLoading || collectionsQuery.isLoading) {
     return (
       <div className="account-page account-page--wide space-y-6" aria-busy="true" aria-live="polite">
         <SEOHead title="My Library - Loading" description="View your saved library" noindex />
@@ -353,7 +403,32 @@ export default function Bookmarks() {
     );
   }
 
-  if (bookmarksError || collectionsError) {
+  if (libraryUnavailable === "offline") {
+    return (
+      <div className="account-page account-page--wide space-y-6">
+        <SEOHead title="My Library - Offline" description="View your saved library" noindex />
+        <div className="text-center py-12" role="alert" data-testid="library-offline">
+          <BookmarkX className="h-16 w-16 mx-auto text-muted-foreground mb-4" />
+          <h1 className="display-h text-2xl mb-2">You’re offline</h1>
+          <p className="text-muted-foreground mb-5">
+            Your saves are still safe. Your library will load when your
+            connection is back.
+          </p>
+          <Button
+            onClick={(e) => {
+              handoffFocusOnUnmount(e.currentTarget);
+              void bookmarksQuery.refetch();
+              void collectionsQuery.refetch();
+            }}
+          >
+            Try again
+          </Button>
+        </div>
+      </div>
+    );
+  }
+
+  if (libraryUnavailable === "error") {
     return (
       <div className="account-page account-page--wide space-y-6">
         <SEOHead title="My Library - Error" description="View your saved library" noindex />
@@ -413,8 +488,7 @@ export default function Bookmarks() {
           <button
             key={key}
             type="button"
-            data-ds="card-hover"
-            className="account-list-item min-h-[72px] px-4 py-3 text-left"
+            className="card hoverable account-list-item min-h-[72px] px-4 py-3 text-left"
             onClick={() => {
               if (key === "active" || key === "archived") {
                 chooseArchive(key);
@@ -431,12 +505,13 @@ export default function Bookmarks() {
         ))}
       </section>
 
-      <div className="lg:grid lg:grid-cols-[15rem_minmax(0,1fr)] lg:gap-6">
+      <div className="lg:grid lg:grid-cols-[17rem_minmax(0,1fr)] lg:gap-6">
         <aside className="hidden lg:block" aria-label="Bookmark collections">
           <div className="account-collection-panel sticky top-24 space-y-2 p-3">
             <button
               type="button"
               aria-pressed={collectionFilter === "all"}
+              data-focus-target="all-saved"
               className={`account-collection-button flex min-h-11 w-full items-center justify-between px-3 text-left text-sm ${
                 collectionFilter === "all" ? "account-collection-button--active" : ""
               }`}
@@ -461,21 +536,24 @@ export default function Bookmarks() {
                   onClick={() => chooseCollection(String(collection.id))}
                   title={collection.name}
                 >
-                  <span className="flex items-center justify-between gap-2">
-                    <span className="truncate">
+                  {/* C4-V4-02: no line clamp. Beside the reorder arrows the name
+                      column is narrow, and clamping cut names sharing a prefix
+                      to identical text; wrap the full name instead. */}
+                  <span className="flex items-center justify-between gap-2 py-2">
+                    <span className="min-w-0 break-words [overflow-wrap:anywhere]">
                       {collection.archivedAt ? "Archived · " : ""}
                       {collection.name}
                     </span>
-                    <span>{collection.itemCount}</span>
+                    <span className="shrink-0">{collection.itemCount}</span>
                   </span>
                 </button>
-                <div className="flex" aria-label={`Reorder ${collection.name}`}>
+                {collections.length > 1 && <div className="flex" aria-label={`Reorder ${collection.name}`} data-reorder-collection={collection.id}>
                   <Button
                     type="button"
                     variant="ghost"
                     size="icon"
                     aria-label={`Move ${collection.name} up`}
-                    disabled={index === 0 || actionMutation.isPending}
+                    disabled={index === 0}
                     onClick={() => reorderCollection(index, -1)}
                   >
                     <ArrowUp className="h-4 w-4" aria-hidden="true" />
@@ -485,24 +563,25 @@ export default function Bookmarks() {
                     variant="ghost"
                     size="icon"
                     aria-label={`Move ${collection.name} down`}
-                    disabled={index === collections.length - 1 || actionMutation.isPending}
+                    disabled={index === collections.length - 1}
                     onClick={() => reorderCollection(index, 1)}
                   >
                     <ArrowDown className="h-4 w-4" aria-hidden="true" />
                   </Button>
-                </div>
+                </div>}
               </div>
             ))}
           </div>
         </aside>
 
-        <main className="min-w-0 space-y-5">
+        {/* C4-V4-01: the app shell already renders the page's one <main>. */}
+        <div className="min-w-0 space-y-5">
           <div className="lg:hidden">
             <Label htmlFor="mobile-collection-filter" className="mb-2 block">
               Collection
             </Label>
             <Select value={collectionFilter} onValueChange={chooseCollection}>
-              <SelectTrigger id="mobile-collection-filter">
+              <SelectTrigger id="mobile-collection-filter" data-focus-target="all-saved">
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>
@@ -522,8 +601,12 @@ export default function Bookmarks() {
               <div className="flex flex-wrap items-center justify-between gap-3">
                 <div className="min-w-0">
                   <div className="flex items-center gap-2">
-                    <Folder className="h-5 w-5 text-primary" aria-hidden="true" />
-                    <h2 className="truncate text-lg font-semibold">{selectedCollection.name}</h2>
+                    <Folder className="h-5 w-5 shrink-0 text-primary" aria-hidden="true" />
+                    {/* C4-V4-02: wrap, don't truncate; at phone width truncation
+                        cut prefix-sharing names to the same visible text. */}
+                    <h2 className="min-w-0 break-words text-lg font-semibold [overflow-wrap:anywhere]">
+                      {selectedCollection.name}
+                    </h2>
                     {selectedCollection.archivedAt && <Badge variant="secondary">Archived</Badge>}
                   </div>
                   <p className="mt-1 text-sm text-muted-foreground">
@@ -568,11 +651,13 @@ export default function Bookmarks() {
                       variant="outline"
                       size="sm"
                       className="min-h-11"
+                      data-focus-target="publish-link"
                       onClick={() =>
                         actionMutation.mutate({
                           url: `/api/collections/${selectedCollection.id}/publish`,
                           method: "POST",
                           success: "Read-only sharing enabled",
+                          after: () => setFocusAfterAction("copy-link"),
                         })
                       }
                     >
@@ -586,6 +671,7 @@ export default function Bookmarks() {
                         variant="outline"
                         size="sm"
                         className="min-h-11"
+                        data-focus-target="copy-link"
                         onClick={() => copyShareLink(selectedCollection.publicUrl!)}
                       >
                         <Clipboard className="h-4 w-4 mr-2" aria-hidden="true" />
@@ -600,6 +686,7 @@ export default function Bookmarks() {
                             url: `/api/collections/${selectedCollection.id}/publish`,
                             method: "DELETE",
                             success: "Public access revoked",
+                            after: () => setFocusAfterAction("publish-link"),
                           })
                         }
                       >
@@ -677,6 +764,7 @@ export default function Bookmarks() {
                           : new Set(),
                       )
                     }
+                    id="bulk-select-all"
                     aria-label="Select all visible bookmarks"
                     className="h-5 w-5"
                   />
@@ -831,7 +919,9 @@ export default function Bookmarks() {
                         ))}
                       </SelectContent>
                     </Select>
-                    <div className="flex min-w-0 flex-1 flex-wrap gap-1">
+                    {/* No min-w-0: the chips' own width must push Note/Archive onto the next
+                        toolbar line instead of letting a long tag overlap them. */}
+                    <div className="flex max-w-full flex-1 flex-wrap gap-1">
                       {resource.personalTags.map((tag) => (
                         <Badge key={tag} variant="secondary">#{tag}</Badge>
                       ))}
@@ -840,6 +930,9 @@ export default function Bookmarks() {
                       variant="ghost"
                       size="sm"
                       className="min-h-11"
+                      // C3-V4-02: name the resource so repeated card toolbars
+                      // don't announce identical "Note" / "Archive" buttons.
+                      aria-label={`Note: ${resource.title}`}
                       onClick={() => {
                         setNoteTarget(resource);
                         setNoteText(resource.notes ?? "");
@@ -852,14 +945,18 @@ export default function Bookmarks() {
                       variant="ghost"
                       size="sm"
                       className="min-h-11"
-                      onClick={() =>
+                      aria-label={`${resource.archivedAt ? "Restore" : "Archive"}: ${resource.title}`}
+                      data-card-archive
+                      onClick={(event) => {
+                        // C6-V4-03: archiving can drop the card from this view.
+                        handoffFocusToSiblingControl(event.currentTarget, "[data-card-archive]");
                         actionMutation.mutate({
                           url: `/api/bookmarks/${resource.id}/state`,
                           method: "PATCH",
                           body: { archived: !resource.archivedAt },
                           success: resource.archivedAt ? "Bookmark restored" : "Bookmark archived",
-                        })
-                      }
+                        });
+                      }}
                     >
                       {resource.archivedAt ? (
                         <RotateCcw className="h-4 w-4 mr-2" aria-hidden="true" />
@@ -901,6 +998,29 @@ export default function Bookmarks() {
                 <Button asChild><Link href="/">Explore resources</Link></Button>
               </CardContent>
             </Card>
+          ) : selectedCollection &&
+            selectedCollection.itemCount === 0 &&
+            statusFilter === "all" &&
+            archiveFilter === "active" ? (
+            <Card>
+              <CardContent className="flex flex-col items-center justify-center py-12 text-center">
+                <Folder className="h-10 w-10 text-primary mb-4" aria-hidden="true" />
+                <h2 className="text-xl font-semibold mb-2">This collection is empty</h2>
+                <p className="max-w-md text-muted-foreground mb-5">
+                  To add bookmarks, open All saved, select the bookmarks you want, then pick
+                  this collection under Move to collection and choose Move.
+                </p>
+                <Button
+                  variant="outline"
+                  onClick={() => {
+                    chooseCollection("all");
+                    setFocusAfterAction("all-saved");
+                  }}
+                >
+                  Go to All saved
+                </Button>
+              </CardContent>
+            </Card>
           ) : (
             <Card>
               <CardContent className="flex flex-col items-center justify-center py-12 text-center">
@@ -915,6 +1035,8 @@ export default function Bookmarks() {
                     chooseCollection("all");
                     chooseStatus("all");
                     chooseArchive("active");
+                    // C7-V4-02: this empty state unmounts; same hand-off as Go to All saved.
+                    setFocusAfterAction("all-saved");
                   }}
                 >
                   Clear filters
@@ -922,11 +1044,20 @@ export default function Bookmarks() {
               </CardContent>
             </Card>
           )}
-        </main>
+        </div>
       </div>
 
       <Dialog open={collectionDialogOpen} onOpenChange={setCollectionDialogOpen}>
-        <DialogContent>
+        <DialogContent
+          // C4-V4-03: focus the name field here, not via autoFocus. autoFocus
+          // ran before Radix's open-focus event, so DialogContent recorded the
+          // input (gone after close) as the return target and focus fell to
+          // <body> instead of going back to New collection / Rename.
+          onOpenAutoFocus={(event) => {
+            event.preventDefault();
+            collectionNameRef.current?.focus();
+          }}
+        >
           <DialogHeader>
             <DialogTitle>{editingCollection ? "Rename collection" : "Create a collection"}</DialogTitle>
             <DialogDescription>
@@ -943,11 +1074,11 @@ export default function Bookmarks() {
             <div>
               <Label htmlFor="collection-name" className="mb-2 block">Name</Label>
               <Input
+                ref={collectionNameRef}
                 id="collection-name"
                 value={collectionName}
                 onChange={(event) => setCollectionName(event.target.value)}
                 maxLength={80}
-                autoFocus
                 placeholder="e.g. Streaming fundamentals"
               />
             </div>
@@ -984,6 +1115,7 @@ export default function Bookmarks() {
                   after: () => {
                     chooseCollection("all");
                     setDeleteCollection(null);
+                    setFocusAfterAction("all-saved");
                   },
                 });
               }}

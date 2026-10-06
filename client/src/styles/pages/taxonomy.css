@@ -10,10 +10,11 @@
   animation: fadeIn 0.5s ease;
 }
 
-/* Canonical `.btn.ghost` geometry: 36px tall, 9px 16px padding, 13px label. */
+/* Canonical `.btn.ghost` padding and type within the approved target floor. */
 .taxonomy-back {
-  height: 36px;
-  min-height: 36px;
+  box-sizing: border-box;
+  height: auto;
+  min-height: 44px;
   gap: 8px;
   margin-bottom: 20px;
   padding: 9px 16px;
@@ -49,11 +50,11 @@
    the body face with its own weight/tracking/leading (pages.jsx). */
 .taxonomy-page .taxonomy-title {
   margin: 0 0 16px;
-  font-family: var(--font-body);
+  font-family: var(--font-display);
   font-size: clamp(36px, 5vw, 56px);
-  font-weight: 700;
-  line-height: 1.05;
-  letter-spacing: -1.5px;
+  font-weight: var(--display-weight);
+  line-height: var(--display-leading);
+  letter-spacing: var(--display-tracking);
   overflow-wrap: anywhere;
 }
 
@@ -61,10 +62,6 @@
 .taxonomy-page--sub-subcategory .taxonomy-title {
   margin-bottom: 12px;
   font-size: clamp(32px, 5vw, 52px);
-}
-
-.taxonomy-title-accent {
-  color: var(--accent);
 }
 
 .taxonomy-description {
@@ -126,6 +123,14 @@
   margin-top: 40px;
 }
 
+/* C8-V1-05 / C10-V1-02: the open filter controls (the Filters trigger below
+   lg, the "Narrow results" panel above it) stack on the results; keep a gap. */
+.taxonomy-page--category .taxonomy-results-layout > .taxonomy-production-controls--open,
+.taxonomy-page--subcategory .taxonomy-results-layout > .taxonomy-production-controls--open,
+.taxonomy-page--sub-subcategory .taxonomy-results-layout > .taxonomy-production-controls--open {
+  margin-bottom: 16px;
+}
+
 .taxonomy-children h2 {
   margin-bottom: 16px;
   color: var(--text-2);
@@ -180,12 +185,25 @@
   display: none !important;
 }
 
+.taxonomy-active-filters {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  margin-top: 16px;
+}
+
+.taxonomy-active-filters:empty {
+  display: none;
+}
+
 .taxonomy-production-controls--open {
   display: block !important;
 }
 
 .taxonomy-controls.taxonomy-production-controls--open {
   display: flex !important;
+  margin-top: 16px;
 }
 
 .taxonomy-view-toggle-row {
@@ -196,29 +214,78 @@
   min-height: 44px;
 }
 
-.taxonomy-view-toggle-label {
-  color: var(--text-3);
-  font-family: var(--font-mono);
-  font-size: 11px;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-}
-
 .taxonomy-tools-toggle {
   position: absolute;
   top: -6px;
   right: 0;
+  box-sizing: border-box;
+  min-height: 44px;
 }
 
+/* Below 640px the summary row has no room for the 44px toggle beside its
+   chips. The Category page's back-button row is 44px tall with an empty right
+   side, so the toggle shares that row instead of pushing content down. The
+   breadcrumb pages keep the toggle in flow after the summary. */
 @media (max-width: 639px) {
-  .taxonomy-summary {
-    padding-right: 0;
+  .taxonomy-page--category {
+    position: relative;
   }
 
-  .taxonomy-tools-toggle {
+  .taxonomy-page--category .taxonomy-summary {
     position: static;
-    margin-left: auto;
   }
+
+  .taxonomy-page--category .taxonomy-tools-toggle {
+    top: 0;
+  }
+
+  /* Breadcrumb pages have no spare row, and the frozen reference has no
+     control here. Pinned beside the chips, the toggle forced the parent label
+     onto a second line, so it collapses to a 44px icon button (its label stays
+     as the accessible name) in the breadcrumb band's reserved right column. */
+  .taxonomy-page--subcategory,
+  .taxonomy-page--sub-subcategory {
+    position: relative;
+  }
+
+  .taxonomy-page--subcategory .taxonomy-breadcrumbs,
+  .taxonomy-page--sub-subcategory .taxonomy-breadcrumbs {
+    padding-right: 52px;
+  }
+
+  .taxonomy-page--subcategory .taxonomy-summary,
+  .taxonomy-page--sub-subcategory .taxonomy-summary {
+    position: static;
+  }
+
+  .taxonomy-page--subcategory .taxonomy-tools-toggle,
+  .taxonomy-page--sub-subcategory .taxonomy-tools-toggle {
+    top: 0;
+    justify-content: center;
+    width: 44px;
+    padding: 0;
+  }
+
+  .taxonomy-page--subcategory .taxonomy-tools-toggle__icon,
+  .taxonomy-page--sub-subcategory .taxonomy-tools-toggle__icon {
+    display: block;
+  }
+
+  .taxonomy-page--subcategory .taxonomy-tools-toggle__label,
+  .taxonomy-page--sub-subcategory .taxonomy-tools-toggle__label {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip-path: inset(50%);
+    white-space: nowrap;
+  }
+}
+
+.taxonomy-tools-toggle__icon {
+  display: none;
+  width: 16px;
+  height: 16px;
 }
 
 .taxonomy-results-heading-row {
@@ -231,8 +298,8 @@
   font-weight: 600;
 }
 
-.taxonomy-page--subcategory .taxonomy-results-heading-row,
-.taxonomy-page--sub-subcategory .taxonomy-results-heading-row {
+.taxonomy-page--subcategory .taxonomy-results-heading-row:not(.taxonomy-results-heading-row--narrowed),
+.taxonomy-page--sub-subcategory .taxonomy-results-heading-row:not(.taxonomy-results-heading-row--narrowed) {
   position: absolute;
   width: 1px;
   height: 1px;
@@ -286,25 +353,120 @@
   margin: 0;
 }
 
-.taxonomy-page .resource-card--taxonomy .resource-card__meta-link,
+/* The frozen ResCard's chip row is featured + up to three `#tag` chips only.
+   The category and kind badges are plain metadata text, not controls: they
+   stay visually hidden (out of flow, so the chip row keeps the frozen
+   geometry) but in the accessibility tree; both are on the detail page. */
 .taxonomy-page .resource-card--taxonomy .resource-card__category-badge,
-.taxonomy-page .resource-card--taxonomy .resource-card__actions,
-.taxonomy-page .resource-card--taxonomy .resource-card__more-tags {
-  display: none;
+.taxonomy-page .resource-card--taxonomy .resource-card__kind-badge {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+  border-width: 0;
 }
 
-.taxonomy-page .resource-card--taxonomy:hover .resource-card__meta-link,
-.taxonomy-page .resource-card--taxonomy:focus-within .resource-card__meta-link,
-.taxonomy-page .resource-card--taxonomy:hover .resource-card__category-badge,
-.taxonomy-page .resource-card--taxonomy:focus-within .resource-card__category-badge,
-.taxonomy-page .resource-card--taxonomy:hover .resource-card__more-tags,
-.taxonomy-page .resource-card--taxonomy:focus-within .resource-card__more-tags {
-  display: inline-flex;
-}
-
-.taxonomy-page .resource-card--taxonomy:hover .resource-card__actions,
-.taxonomy-page .resource-card--taxonomy:focus-within .resource-card__actions {
+/* C4-V1-01: View Details, "+N more" and Open Link are production additions
+   revealed on hover/focus. Inserted into the chip row they pushed the tag
+   pills right/down and grew the card ~88px, so a click aimed at a pill landed
+   on View Details. They now float over the empty band right of the mark
+   (36px tall) and only toggle visibility, so nothing reflows. */
+.taxonomy-page .resource-card--taxonomy .resource-card__reveal {
+  position: absolute;
+  z-index: 10;
+  top: 20px;
+  right: 20px;
+  left: 68px;
   display: flex;
+  height: 36px;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 6px;
+  visibility: hidden;
+  opacity: 0;
+  transition: opacity 160ms ease, visibility 160ms;
+}
+
+.taxonomy-page .resource-card--taxonomy:hover .resource-card__reveal,
+.taxonomy-page .resource-card--taxonomy:focus-within .resource-card__reveal {
+  visibility: visible;
+  opacity: 1;
+}
+
+/* The tray takes the featured chip's corner while it is shown. */
+.taxonomy-page .resource-card--taxonomy:hover .resource-card__featured,
+.taxonomy-page .resource-card--taxonomy:focus-within .resource-card__featured {
+  visibility: hidden;
+}
+
+/* Touch screens never hover, so the tray stays shown there; it sits in the
+   empty band, so showing it costs no layout. */
+@media (hover: none) {
+  .taxonomy-page .resource-card--taxonomy .resource-card__reveal {
+    visibility: visible;
+    opacity: 1;
+  }
+
+  .taxonomy-page .resource-card--taxonomy .resource-card__featured {
+    visibility: hidden;
+  }
+}
+
+.taxonomy-page .resource-card--taxonomy .resource-card__reveal > *,
+.taxonomy-page .resource-card--taxonomy .resource-card__reveal .resource-card__visit-button {
+  flex: none;
+  min-height: 32px;
+  margin: 0;
+  white-space: nowrap;
+}
+
+/* The band right of the mark is 232px on the narrowest (320px) card, so Open
+   Link is icon-only here; its label stays as the accessible name. */
+.taxonomy-page .resource-card--taxonomy .resource-card__reveal .resource-card__visit-button {
+  width: 32px;
+  height: 32px;
+  padding: 0;
+}
+
+.taxonomy-page .resource-card--taxonomy .resource-card__reveal .resource-card__visit-button svg {
+  margin: 0;
+}
+
+/* C5-V1-01: with tags expanded, "Show fewer" is wider than "+N more", and a
+   labelled View Details pushed the right-aligned tray left over the mark
+   (257px of controls in a 230-247px band). It is icon-only here too, like
+   Open Link; the title link above already names the detail page. */
+.taxonomy-page .resource-card--taxonomy .resource-card__reveal .resource-card__meta-badge {
+  width: 32px;
+  height: 32px;
+  justify-content: center;
+  padding: 0;
+}
+
+.taxonomy-page .resource-card--taxonomy .resource-card__reveal .resource-card__meta-icon {
+  margin: 0;
+}
+
+.taxonomy-page .resource-card--taxonomy .resource-card__reveal .resource-card__meta-label {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+.taxonomy-page .resource-card--taxonomy .resource-card__reveal .resource-card__visit-label {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
 }
 
 .taxonomy-page .resource-card--taxonomy .resource-card__tag-link {
@@ -389,9 +551,9 @@
 }
 
 .taxonomy-pagination [data-testid="pagination-controls"] > div:first-child > a[aria-current="page"] {
-  border-color: var(--accent);
-  background: var(--accent);
-  color: #0a0a0a; /* DS-OK: on-accent ink, canonical .btn.primary */
+  border-color: var(--border-strong);
+  background: var(--surface-2);
+  color: var(--text);
   font-weight: 600;
 }
 
@@ -415,8 +577,8 @@
 .taxonomy-pagination [data-testid="input-page-jump"] {
   box-sizing: border-box;
   width: 64px;
-  height: 32px;
-  min-height: 0;
+  height: auto;
+  min-height: 44px;
   padding: 0 8px;
   border: var(--border-w) solid var(--border);
   border-radius: var(--radius-sm);

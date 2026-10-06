@@ -160,12 +160,12 @@ export function registerAiJobsRoutes(
       const job = await enrichmentRepo.getEnrichmentJob(jobId);
       
       if (!job) {
-        return res.json({
+        return res.status(404).json({
           success: false,
           message: 'Job not found'
         });
       }
-      
+
       res.json({
         success: true,
         job: stripJobAuthSecret(job)
@@ -184,6 +184,9 @@ export function registerAiJobsRoutes(
     try {
       const jobId = parseInt(req.params.id);
       if (Number.isNaN(jobId)) return res.status(400).json({ message: 'Invalid job ID' });
+      if (!(await enrichmentRepo.getEnrichmentJob(jobId))) {
+        return res.status(404).json({ message: 'Job not found' });
+      }
       const { getAgentEvents } = await import('../../ai/agentEvents');
       const afterSeq = req.query.afterSeq !== undefined ? parseInt(req.query.afterSeq as string) : undefined;
       const events = await getAgentEvents('enrichment', jobId, afterSeq);
@@ -229,7 +232,7 @@ export function registerAiJobsRoutes(
   // hierarchy columns via `promoteEnrichmentSuggestions`, auto-creating any
   // implied `sub_subcategories` rows. Idempotent — safe to re-run; only
   // touches rows where a corresponding hierarchy column is still blank.
-  app.post('/api/admin/enrichment/backfill-suggestions', isAuthenticated, isAdmin, async (_req, res) => {
+  app.post('/api/admin/enrichment/backfill-suggestions', isAuthenticated, isAdmin, async (req, res) => {
     try {
       const { promoteEnrichmentSuggestions } = await import('../../ai/promoteEnrichmentSuggestions');
 
@@ -277,7 +280,7 @@ export function registerAiJobsRoutes(
           );
 
           if (Object.keys(updates).length > 0) {
-            await resourceRepo.updateResource(row.id, updates);
+            await resourceRepo.updateResource(row.id, updates, { performedBy: req.dbUser?.id });
             resourcesUpdated++;
             updatedIds.push(row.id);
           }
@@ -476,6 +479,10 @@ export function registerAiJobsRoutes(
     try {
       const jobId = parseInt(req.params.id);
       if (Number.isNaN(jobId)) return res.status(400).json({ message: 'Invalid job ID' });
+      const { researchService } = await import('../../ai/researchService');
+      if (!(await researchService.getJob(jobId))) {
+        return res.status(404).json({ message: 'Job not found' });
+      }
       const { getAgentEvents } = await import('../../ai/agentEvents');
       const afterSeq = req.query.afterSeq !== undefined ? parseInt(req.query.afterSeq as string) : undefined;
       const events = await getAgentEvents('research', jobId, afterSeq);
@@ -536,6 +543,9 @@ export function registerAiJobsRoutes(
       const discovery = await researchService.approveDiscovery(parseInt(req.params.id));
       res.json({ success: true, discovery });
     } catch (error: any) {
+      if (error?.name === 'DiscoveryNotFoundError') {
+        return res.status(404).json({ message: 'Discovery not found' });
+      }
       res.status(500).json({ message: 'Failed to approve discovery', error: error.message });
     }
   });
@@ -547,6 +557,9 @@ export function registerAiJobsRoutes(
       const discovery = await researchService.rejectDiscovery(parseInt(req.params.id), reason);
       res.json({ success: true, discovery });
     } catch (error: any) {
+      if (error?.name === 'DiscoveryNotFoundError') {
+        return res.status(404).json({ message: 'Discovery not found' });
+      }
       res.status(500).json({ message: 'Failed to reject discovery', error: error.message });
     }
   });

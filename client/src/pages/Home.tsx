@@ -1,4 +1,5 @@
 import { lazy, Suspense, useEffect, useMemo, useState } from "react";
+import { focusPageHeading, handoffFocusOnUnmount } from "@/hooks/focus-handoff";
 import { Link, useSearch } from "wouter";
 import { useQuery } from "@tanstack/react-query";
 import { Card, CardContent } from "@/components/ui/card";
@@ -6,7 +7,10 @@ import { Button } from "@/components/ui/button";
 import { Category, Resource, Subcategory } from "@/types/awesome-list";
 import {
   fetchKindCounts,
+  isRealCategory,
+  navTotalCount,
   STRIP_KINDS,
+  visibleNavCategories,
   type AwesomeListNav,
   type AwesomeListNavNode,
   type ResourceKindCounts,
@@ -18,11 +22,13 @@ import {
 import SEOHead from "@/components/layout/SEOHead";
 import { useToast } from "@/hooks/use-toast";
 import { homeSeoTitle, homeSeoDescription } from "@shared/seo-templates";
+import { taxonomyScopeIntro } from "@shared/seo-content-templates";
 import { useAuth } from "@/hooks/useAuth";
 import { normalizeTag, parseTagsParam } from "@/lib/tags";
 import { writeFilterParams, usePopstateParams } from "@/lib/url-filter-state";
 import { processAwesomeListData } from "@/lib/parser";
 import { fetchStaticAwesomeList } from "@/lib/static-data";
+import { queryUnavailableReason } from "@/lib/query-availability";
 import { useLearningPreferences } from "@/hooks/use-learning-preferences";
 import { DEFAULT_LEARNING_PREFERENCES } from "@shared/onboarding-values";
 import { useHomeLayout } from "@/components/home/use-home-layout";
@@ -94,23 +100,6 @@ interface DisplayCategory {
   count: number;
   teaser?: { title: string; description: string };
   subcategories: AwesomeListNavNode[];
-}
-
-const EXCLUDED_CATEGORY_NAMES = ["Contributing", "License", "External Links", "Anti-features"];
-
-function isRealCategory(name: string): boolean {
-  return (
-    name !== "Table of contents" &&
-    !name.startsWith("List of") &&
-    !EXCLUDED_CATEGORY_NAMES.includes(name)
-  );
-}
-
-function navTotalCount(node: AwesomeListNavNode): number {
-  let total = node.resourceCount ?? 0;
-  for (const sub of node.subcategories ?? []) total += navTotalCount(sub);
-  for (const nested of node.subSubcategories ?? []) total += navTotalCount(nested);
-  return total;
 }
 
 function countSubcategories(categories: AwesomeListNavNode[]): number {
@@ -242,6 +231,15 @@ function HomeSkeleton({
           ))}
         </div>
       </div>
+      {layout === "index" ? (
+        <div className="home-skeleton-line home-skeleton-index-title" />
+      ) : (
+        <div className="home-hero">
+          <div className="home-skeleton-line home-skeleton-hero-title" />
+          <div className="home-skeleton-line home-skeleton-hero-lede" />
+          <div className="home-skeleton-line home-skeleton-hero-actions" />
+        </div>
+      )}
       <div className="home-stat-strip home-stat-strip-skeleton">
         {Array.from({ length: 4 }).map((_, index) => (
           <div className="home-stat-cell" key={index}>
@@ -257,7 +255,7 @@ function HomeSkeleton({
             {categorySkeletons.map((category, index) => (
               <div className="home-category-section" key={category?.slug ?? index}>
                 <div className="home-skeleton-line home-skeleton-category" />
-                {(category?.subcategories ?? Array.from({ length: 3 }, () => undefined)).map(
+                {(category?.subcategories ?? Array.from({ length: 3 }, () => undefined)).slice(0, 6).map(
                   (_, row) => (
                     <div className="home-skeleton-line home-skeleton-row" key={row} />
                   ),
@@ -286,18 +284,18 @@ function HomeSkeleton({
             ))}
           </div>
           <div className="home-skeleton-line home-skeleton-section-heading" />
-          <div className="home-skeleton-recent-table">
-            {Array.from({ length: 5 }).map((_, index) => (
-              <div className="home-skeleton-line home-skeleton-recent" key={index} />
-            ))}
-          </div>
-          <div className="home-skeleton-line home-skeleton-section-heading" />
           <div className="home-curated-category-grid">
             {categorySkeletons.map((category, index) => (
               <div className="home-skeleton-resource-card" key={category?.slug ?? index}>
                 <div className="home-skeleton-line home-skeleton-card-title" />
                 <div className="home-skeleton-line home-skeleton-card-copy short" />
               </div>
+            ))}
+          </div>
+          <div className="home-skeleton-line home-skeleton-section-heading" />
+          <div className="home-skeleton-recent-table">
+            {Array.from({ length: 5 }).map((_, index) => (
+              <div className="home-skeleton-line home-skeleton-recent" key={index} />
             ))}
           </div>
         </div>
@@ -311,7 +309,7 @@ function CatalogError({ onRetry, message }: { onRetry: () => void; message: stri
     <div className="home-error" role="alert">
       <h1 className="display-h">We couldn&apos;t load the catalog</h1>
       <p>{message}</p>
-      <Button onClick={onRetry} data-testid="button-retry-catalog">
+      <Button onClick={(e) => { handoffFocusOnUnmount(e.currentTarget); onRetry(); }} data-testid="button-retry-catalog">
         Retry
       </Button>
     </div>
@@ -554,16 +552,13 @@ export default function Home({ nav, navLoading }: HomeProps) {
   const corpusFilterActive = selectedTags.length > 0 || selectedKind !== null;
   const showFilters =
     selectedTags.length > 0 || sortBy !== "default" || currentParams.get("filters") === "1";
-  const {
-    data: rawCorpus,
-    isLoading: corpusLoading,
-    error: corpusError,
-  } = useQuery<unknown>({
+  const corpusQuery = useQuery<unknown>({
     queryKey: ["awesome-list-data"],
     queryFn: fetchStaticAwesomeList,
     staleTime: 1000 * 60 * 60,
     enabled: corpusFilterActive,
   });
+  const { data: rawCorpus, isLoading: corpusLoading, refetch: refetchCorpus } = corpusQuery;
   const awesomeList = rawCorpus ? processAwesomeListData(rawCorpus) : undefined;
 
   const { data: tagsData } = useQuery<{
@@ -578,25 +573,26 @@ export default function Home({ nav, navLoading }: HomeProps) {
     enabled: showFilters,
   });
 
-  const {
-    data: homeData,
-    isLoading: homeLoading,
-    error: homeError,
-    refetch: refetchHome,
-  } = useQuery<HomeApiResponse>({
+  const homeQuery = useQuery<HomeApiResponse>({
     queryKey: ["/api/home"],
     staleTime: 1000 * 60,
   });
+  const { data: homeData, isLoading: homeLoading, refetch: refetchHome } = homeQuery;
 
-  const {
-    data: kindCounts,
-    isLoading: kindCountsLoading,
-    isError: kindCountsError,
-  } = useQuery<ResourceKindCounts>({
+  const kindCountsQuery = useQuery<ResourceKindCounts>({
     queryKey: ["/api/resources/kinds/counts"],
     queryFn: () => fetchKindCounts(),
     staleTime: 1000 * 60,
   });
+  const { data: kindCounts, isLoading: kindCountsLoading } = kindCountsQuery;
+
+  // C4-V1-03: a fetch started offline is paused, not failed (no loading, no
+  // error, no data), so Home rendered zero kind counts, an empty Recently
+  // indexed list and "No categories match" as fact. Treat paused-without-data
+  // like a failure; the paused fetches resume on their own when back online.
+  const homeUnavailable = queryUnavailableReason(homeQuery);
+  const kindCountsUnavailable = queryUnavailableReason(kindCountsQuery) !== null;
+  const corpusUnavailable = corpusFilterActive ? queryUnavailableReason(corpusQuery) : null;
 
   const navCategories = useMemo<DisplayCategory[]>(() => {
     if (!nav?.categories) return [];
@@ -692,7 +688,12 @@ export default function Home({ nav, navLoading }: HomeProps) {
           slug: category.slug,
           count: category.count,
           icon: categoryIcon(category.name, category.slug),
-          description: category.teaser?.description,
+          description: taxonomyScopeIntro({
+            name: category.name,
+            level: "category",
+            totalResources: category.count,
+            childNames: category.subcategories.map((subcategory) => subcategory.name),
+          }),
           teaserTitle: category.teaser?.title,
           teaserDescription: category.teaser
             ? truncateAtWord(category.teaser.description, 110)
@@ -724,7 +725,7 @@ export default function Home({ nav, navLoading }: HomeProps) {
                 : (subcategory.subSubcategories?.length ?? 0) +
                   (subcategory.subcategories?.length ?? 0),
             };
-          }),
+          }).filter((subcategory) => !corpusFilterActive || subcategory.count > 0),
         };
       }),
     [
@@ -738,7 +739,8 @@ export default function Home({ nav, navLoading }: HomeProps) {
 
   const stats = useMemo<HomeStats>(() => {
     const realCategories = navCategories.length;
-    const rawCategories = nav?.categories ?? [];
+    // C8-V1-01: count only the taxonomy the public site shows.
+    const rawCategories = visibleNavCategories(nav?.categories);
     return {
       total: homeData?.total ?? nav?.totalResources ?? 0,
       categories: realCategories,
@@ -746,8 +748,9 @@ export default function Home({ nav, navLoading }: HomeProps) {
       nestedGroups: countNestedGroups(rawCategories),
       featured: homeData?.featuredCount ?? homeData?.featured?.length ?? 0,
       approvedThisWeek: homeData?.approvedThisWeek ?? 0,
+      matching: corpusFilterActive ? filteredCorpusResources.length : undefined,
     };
-  }, [homeData, nav?.categories, nav?.totalResources, navCategories.length]);
+  }, [homeData, nav?.categories, nav?.totalResources, navCategories.length, corpusFilterActive, filteredCorpusResources.length]);
 
   const filters = showFilters ? (
     <Suspense fallback={<FilterControlsFallback />}>
@@ -787,20 +790,25 @@ export default function Home({ nav, navLoading }: HomeProps) {
     );
   }
 
-  if (!nav || homeError || (corpusFilterActive && !awesomeList && corpusError)) {
-    const message = homeError
-      ? "The home index is temporarily unavailable. Please try again."
-      : "We couldn't load the catalog. Please try again.";
+  const corpusMissing = !awesomeList && corpusUnavailable !== null;
+  if (!nav || homeUnavailable || corpusMissing) {
+    const offline = (homeUnavailable ?? corpusUnavailable) === "offline";
+    const message = offline
+      ? "You're offline. The catalog will load when your connection is back."
+      : homeUnavailable
+        ? "The home index is temporarily unavailable. Please try again."
+        : "We couldn't load the catalog. Please try again.";
     return (
       <>
         <SEOHead />
         <CatalogError
           onRetry={() => {
-            if (homeError) {
-              void refetchHome();
-            } else {
+            if (!nav) {
               window.location.reload();
+              return;
             }
+            if (homeUnavailable) void refetchHome();
+            if (corpusMissing) void refetchCorpus();
           }}
           message={message}
         />
@@ -822,7 +830,7 @@ export default function Home({ nav, navLoading }: HomeProps) {
         stats={stats}
         kindCounts={kindCounts}
         kindCountsLoading={kindCountsLoading}
-        kindCountsError={kindCountsError}
+        kindCountsError={kindCountsUnavailable}
         selectedKind={selectedKind}
         onKindChange={handleKindChange}
         selectedTags={selectedTags}
@@ -839,8 +847,14 @@ export default function Home({ nav, navLoading }: HomeProps) {
               <span>The tag filter in the link you followed was empty, so it was ignored.</span>
               <button
                 type="button"
-                className="underline underline-offset-2"
-                onClick={() => setEmptyTagParamNotice(false)}
+                className="btn ghost"
+                onClick={() => {
+                  setEmptyTagParamNotice(false);
+                  // C6-SWEEP-03: the notice unmounts with this button; focus the page h1.
+                  focusPageHeading();
+                  // Replace, not push: Back must not resurrect the notice.
+                  writeFilterParams({ tags: null, tag: null }, "replace");
+                }}
                 data-testid="button-dismiss-empty-tag-param"
               >
                 Dismiss

@@ -11,26 +11,26 @@ import "./queues-agent.css";
  * Related event variants retain hierarchy through opacity.
  */
 const ACTOR_TYPE_STYLES: Record<string, string> = {
-  orchestrator: "border-[#5eddf2]/50 text-[#5eddf2]", // DS-OK: cyan info (DS chart/info constant)
-  subagent: "border-[#9d4edd]/50 text-[#9d4edd]", // DS-OK: violet info (DS chart/info constant)
-  tool: "border-[#5eddf2]/50 text-[#5eddf2]", // DS-OK: cyan info (DS chart/info constant)
-  system: "border-[#ffb84d]/50 text-[#ffb84d]", // DS-OK: status warn
+  orchestrator: "border-[var(--status-info)]/50 text-[var(--status-info)]", // DS-OK: cyan info (DS chart/info constant)
+  subagent: "border-[var(--status-info-2)]/50 text-[var(--status-info-2)]", // DS-OK: violet info (DS chart/info constant)
+  tool: "border-[var(--status-info)]/50 text-[var(--status-info)]", // DS-OK: cyan info (DS chart/info constant)
+  system: "border-[var(--status-warn)]/50 text-[var(--status-warn)]", // DS-OK: status warn
 };
 
 const EVENT_TYPE_STYLES: Record<string, string> = {
-  lifecycle: "border-[#ffb84d]/50 text-[#ffb84d]", // DS-OK: status warn
-  message: "border-[#5eddf2]/50 text-[#5eddf2]", // DS-OK: cyan info (DS chart/info constant)
+  lifecycle: "border-[var(--status-warn)]/50 text-[var(--status-warn)]", // DS-OK: status warn
+  message: "border-[var(--status-info)]/50 text-[var(--status-info)]", // DS-OK: cyan info (DS chart/info constant)
   thinking: "border-muted-foreground/40 text-muted-foreground",
-  tool_call: "border-[#5eddf2]/50 text-[#5eddf2]", // DS-OK: cyan info (DS chart/info constant)
-  tool_result: "border-[#34d08c]/50 text-[#34d08c]", // DS-OK: status ok
-  delegation: "border-[#9d4edd]/50 text-[#9d4edd]", // DS-OK: violet info (DS chart/info constant)
-  delegation_result: "border-[#9d4edd]/30 text-[#9d4edd]/80", // DS-OK: violet info (DS chart/info constant)
-  result: "border-[#34d08c]/60 text-[#34d08c]", // DS-OK: status ok
-  error: "border-[#ff5c7a]/50 text-[#ff5c7a]", // DS-OK: status bad
+  tool_call: "border-[var(--status-info)]/50 text-[var(--status-info)]", // DS-OK: cyan info (DS chart/info constant)
+  tool_result: "border-[var(--status-ok)]/50 text-[var(--status-ok)]", // DS-OK: status ok
+  delegation: "border-[var(--status-info-2)]/50 text-[var(--status-info-2)]", // DS-OK: violet info (DS chart/info constant)
+  delegation_result: "border-[var(--status-info-2)]/30 text-[var(--status-info-2)]/80", // DS-OK: violet info (DS chart/info constant)
+  result: "border-[var(--status-ok)]/60 text-[var(--status-ok)]", // DS-OK: status ok
+  error: "border-[var(--status-bad)]/50 text-[var(--status-bad)]", // DS-OK: status bad
 };
 
-const DELEGATION_TARGET_TEXT = "text-[#9d4edd]/80"; // DS-OK: violet info (DS chart/info constant)
-const TRUNCATION_TEXT = "text-[#ffb84d]/80"; // DS-OK: status warn
+const DELEGATION_TARGET_TEXT = "text-[var(--status-info-2)]/80"; // DS-OK: violet info (DS chart/info constant)
+const TRUNCATION_TEXT = "text-[var(--status-warn)]/80"; // DS-OK: status warn
 
 interface AgentEventLogProps {
   jobType: "research" | "enrichment";
@@ -98,7 +98,7 @@ export function AgentEventLog({ jobType, jobId, isActive, height = "360px" }: Ag
         </div>
       ) : (
         <ScrollArea
-          className="border rounded p-2 bg-black/40"
+          className="border rounded p-2 bg-black/40 [&_[data-radix-scroll-area-viewport]>div]:!block" /* C6-V5A-03: Radix wraps the content in display:table, which grows past the box; block keeps rows at its width */
           style={{ height }}
           role="log"
           aria-live="polite"
@@ -137,7 +137,7 @@ export function AgentEventLog({ jobType, jobId, isActive, height = "360px" }: Ag
                       const isLong = clean.length > SUMMARY_MAX;
                       return (
                         <span
-                          className="whitespace-pre-wrap break-words flex-1 text-foreground/90"
+                          className="whitespace-pre-wrap [overflow-wrap:anywhere] min-w-0 flex-1 text-foreground/90"
                           title={isLong ? clean : undefined}
                         >
                           {isLong ? `${clean.slice(0, SUMMARY_MAX)}…` : clean}

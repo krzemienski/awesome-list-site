@@ -2,16 +2,15 @@ import * as React from "react"
 
 import { cn } from "@/lib/utils"
 
+// The design system's `.card` paints surface, edge, radius and the per-system
+// hover; pass `hoverable` when the whole card is one link/button target.
 const Card = React.forwardRef<
   HTMLElement,
-  React.HTMLAttributes<HTMLElement>
->(({ className, ...props }, ref) => (
+  React.HTMLAttributes<HTMLElement> & { hoverable?: boolean }
+>(({ className, hoverable, ...props }, ref) => (
   <article
     ref={ref}
-    className={cn(
-      "rounded-lg border bg-card text-card-foreground shadow-[var(--shadow-sm)] transition-[transform,border-color,background-color,box-shadow] duration-[var(--motion-base)] ease-[var(--motion-ease)] hover:border-[var(--border-strong)]",
-      className
-    )}
+    className={cn("card text-card-foreground", hoverable && "hoverable", className)}
     {...props}
   />
 ))

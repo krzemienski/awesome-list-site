@@ -1,6 +1,7 @@
 import { useEffect, useRef } from "react";
+import { handoffFocusOnUnmount } from "@/hooks/focus-handoff";
 import { useQuery, useMutation } from "@tanstack/react-query";
-import { useParams, useLocation, Link } from "wouter";
+import { useParams, useLocation, useSearch, Link } from "wouter";
 import { Card, CardContent, CardDescription, CardHeader } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -24,6 +25,7 @@ import { useAuth } from "@/hooks/useAuth";
 import { useToast } from "@/hooks/use-toast";
 import { queryClient, apiRequest, ApiError } from "@/lib/queryClient";
 import { humanizeApiError } from "@/lib/apiError";
+import { queryUnavailableReason } from "@/lib/query-availability";
 import { mpTrack } from "@/lib/mixpanel";
 import {
   trackJourneyStart,
@@ -77,25 +79,40 @@ interface UserProgress {
 
 export default function JourneyDetail() {
   const { id } = useParams<{ id: string }>();
-  const [, setLocation] = useLocation();
+  // Journey ids are positive integers; anything else is a not-found URL, not a
+  // transient failure worth retrying (the API rejects it with 400).
+  const isValidId = /^[1-9]\d*$/.test(id ?? "");
+  const [location, setLocation] = useLocation();
+  const search = useSearch();
   const { isAuthenticated } = useAuth();
+  const returnPath = search ? `${location}?${search}` : location;
+  const loginHref = /^\/(?![/\\])/.test(returnPath)
+    ? `/sign-in?redirect_url=${encodeURIComponent(returnPath)}`
+    : "/sign-in";
   const { toast } = useToast();
 
   // Fetch journey details (includes progress if authenticated)
-  const {
-    data: journey,
-    isLoading: journeyLoading,
-    isError: journeyError,
-    error: journeyFetchError,
-    refetch: refetchJourney,
-  } = useQuery<Journey>({
+  const journeyQuery = useQuery<Journey>({
     queryKey: [`/api/journeys/${id}`],
     queryFn: async () => {
       const response = await fetch(`/api/journeys/${id}`);
       if (!response.ok) throw new ApiError(response.status, await response.text());
       return response.json();
     },
+    enabled: isValidId,
   });
+  const {
+    data: journey,
+    isLoading: journeyLoading,
+    error: journeyFetchError,
+    refetch: refetchJourney,
+  } = journeyQuery;
+  // C4-V2-02: a fetch started offline is paused (no data, no error); that is
+  // not "Journey not found". Only a real 404/400 answer is a missing journey.
+  const journeyMissing =
+    journeyFetchError instanceof ApiError &&
+    (journeyFetchError.status === 404 || journeyFetchError.status === 400);
+  const journeyUnavailable = journeyMissing ? null : queryUnavailableReason(journeyQuery);
 
   // Task #330: logical step count (distinct stepNumbers) for funnel events —
   // the same accounting the server uses for stepCount, never raw row count.
@@ -351,9 +368,10 @@ export default function JourneyDetail() {
     );
   }
 
-  if (journeyError && !(journeyFetchError instanceof ApiError && journeyFetchError.status === 404)) {
+  if (journeyUnavailable) {
+    const offline = journeyUnavailable === "offline";
     return (
-      <div className="journey-detail-page journey-detail-page--state" role="alert">
+      <div className="journey-detail-page journey-detail-page--state" role="alert" data-testid={`journey-${journeyUnavailable}`}>
         <SEOHead
           title="Journey unavailable"
           description="This learning journey could not be loaded."
@@ -361,16 +379,20 @@ export default function JourneyDetail() {
         />
         <div className="journeys-state journeys-state--error">
           <Badge variant="destructive" className="journeys-state__error-label">
-            Error · unavailable
+            {offline ? "Offline" : "Error · unavailable"}
           </Badge>
-          <h1 className="display-h journeys-state__title">Couldn’t load this journey.</h1>
+          <h1 className="display-h journeys-state__title">
+            {offline ? "You’re offline." : "Couldn’t load this journey."}
+          </h1>
           <p className="journeys-state__copy">
-            Something went wrong while fetching the learning path. Please try again.
+            {offline
+              ? "This journey will load when your connection is back."
+              : "Something went wrong while fetching the learning path. Please try again."}
           </p>
           <Button
             variant="outline"
             className="journeys-state__action"
-            onClick={() => void refetchJourney()}
+            onClick={(e) => { handoffFocusOnUnmount(e.currentTarget); void refetchJourney(); }}
             data-testid="button-retry-journey"
           >
             Try again
@@ -386,10 +408,11 @@ export default function JourneyDetail() {
         {/* BUG-031 (run22): not-found state gets its own head (noindex — matches
             the server's soft-404 contract) instead of inheriting a stale one. */}
         <SEOHead title="Journey Not Found" description="This learning journey may have been removed or archived." noindex />
+        <h1 className="display-h journeys-state__title">Journey not found.</h1>
         <Alert variant="destructive" className="journeys-alert">
           <AlertCircle className="h-4 w-4" />
           <AlertDescription>
-            Journey not found. It may have been removed or archived.
+            It may have been removed or archived.
           </AlertDescription>
         </Alert>
         <Button 
@@ -546,33 +569,33 @@ export default function JourneyDetail() {
             <Alert className="journey-enroll-note mt-6">
               <AlertCircle className="h-4 w-4" />
               <AlertDescription>
-                {/* R5-027 (run24): print-keep-text — in print this button's
-                    text stays inline so the sentence prints grammatically. */}
-                Please <button 
-                  className="print-keep-text underline font-medium min-h-[44px] px-2 inline-flex items-center"
-                  onClick={() => {
-                    // P1-08: mirror /submit's auth hand-off — route to the
-                    // canonical /sign-in with a redirect_url back to this
-                    // journey (same /^\/(?![/\\])/ safe-path guard the legacy
-                    // /login redirect uses) instead of a bare /login hop that
-                    // dropped the return path after sign-in.
-                    const current = window.location.pathname + window.location.search;
-                    const safe = /^\/(?![/\\])/.test(current)
-                      ? `/sign-in?redirect_url=${encodeURIComponent(current)}`
-                      : '/sign-in';
-                    setLocation(safe);
-                  }}
+                {/* P1-08: canonical /sign-in with a redirect_url back to this
+                    journey. A real link (not a button) so it opens in a new
+                    tab; inline padding widens the target without stretching
+                    the line box. */}
+                Please{" "}
+                <Link
+                  href={loginHref}
+                  className="underline font-medium py-0.5"
                   data-testid="button-login-journey"
                 >
                   log in
-                </button> to start this journey and track your progress.
+                </Link> to start this journey and track your progress.
               </AlertDescription>
             </Alert>
           ) : !isEnrolled && (
             <Button
               className="journey-detail-card__start mt-6"
-              onClick={() => startJourneyMutation.mutate()}
-              disabled={startJourneyMutation.isPending}
+              onClick={(e) => {
+                if (startJourneyMutation.isPending) return;
+                // C6-SWEEP-01: Start Journey is replaced by the progress UI;
+                // focus the first step's "Mark as Complete" once it renders.
+                handoffFocusOnUnmount(e.currentTarget, () =>
+                  document.querySelector<HTMLElement>('[data-testid^="button-complete-step-"]'));
+                startJourneyMutation.mutate();
+              }}
+              aria-disabled={startJourneyMutation.isPending}
+              aria-busy={startJourneyMutation.isPending}
               data-testid="button-start-journey"
             >
               {startJourneyMutation.isPending ? (
@@ -709,20 +732,32 @@ export default function JourneyDetail() {
                           </div>
                         )}
 
-                        {/* Complete Button */}
-                        {isEnrolled && !isStepCompleted && (
-                          <Button 
-                            variant="outline"
+                        {/* C6-V2-02: one button that switches between "Mark as
+                            Complete" and "Completed — Undo". Two conditional
+                            buttons unmounted the pressed one and dropped
+                            keyboard focus to <body>. */}
+                        {(isEnrolled || isStepCompleted) && (
+                          <Button
+                            variant={isStepCompleted ? "ghost" : "outline"}
                             className={cn(
-                              "journey-step-card__complete min-h-[44px]",
+                              isStepCompleted
+                                ? "journey-step-card__undo min-h-[44px] px-2"
+                                : "journey-step-card__complete min-h-[44px]",
                               completeStepMutation.isPending && "journey-step-card__complete--pending",
                             )}
-                            onClick={() => handleToggleStep(step.rowIds, true, step.stepNumber, index + 1)}
+                            onClick={() => handleToggleStep(step.rowIds, !isStepCompleted, step.stepNumber, index + 1)}
                             aria-disabled={completeStepMutation.isPending}
                             aria-busy={completeStepMutation.isPending}
-                            data-testid={`button-complete-step-${step.stepNumber}`}
+                            // C7-V2-03: six identical toggles; name the step (keeps the visible text first).
+                            aria-label={`${completeStepMutation.isPending ? (isStepCompleted ? "Updating..." : "Marking as Complete...") : isStepCompleted ? "Completed — Undo" : "Mark as Complete"}: ${step.title}`}
+                            data-testid={`button-${isStepCompleted ? "uncomplete" : "complete"}-step-${step.stepNumber}`}
                           >
-                            {completeStepMutation.isPending ? (
+                            {isStepCompleted ? (
+                              <>
+                                <CheckCircle2 className="h-4 w-4 mr-2" />
+                                {completeStepMutation.isPending ? "Updating..." : "Completed — Undo"}
+                              </>
+                            ) : completeStepMutation.isPending ? (
                               <>Marking as Complete...</>
                             ) : (
                               <>
@@ -730,23 +765,6 @@ export default function JourneyDetail() {
                                 Mark as Complete
                               </>
                             )}
-                          </Button>
-                        )}
-
-                        {isStepCompleted && (
-                          <Button
-                            variant="ghost"
-                            className={cn(
-                              "journey-step-card__undo min-h-[44px] px-2",
-                              completeStepMutation.isPending && "journey-step-card__complete--pending",
-                            )}
-                            onClick={() => handleToggleStep(step.rowIds, false, step.stepNumber, index + 1)}
-                            aria-disabled={completeStepMutation.isPending}
-                            aria-busy={completeStepMutation.isPending}
-                            data-testid={`button-uncomplete-step-${step.stepNumber}`}
-                          >
-                            <CheckCircle2 className="h-4 w-4 mr-2" />
-                            {completeStepMutation.isPending ? "Updating..." : "Completed — Undo"}
                           </Button>
                         )}
                       </div>

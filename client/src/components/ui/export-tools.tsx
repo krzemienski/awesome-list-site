@@ -22,14 +22,16 @@ interface ExportToolsProps {
   selectedCategory?: string;
   className?: string;
   /**
-   * BUG-026 (run13): lets the parent page (Advanced → format showcase cards)
-   * drive the selected export format so the cards are functional, not
-   * decorative.
+   * BUG-026 (run13) / C3-V2-02: the parent page (Advanced → format showcase
+   * cards) can own the selected format. When `format` is passed it is the
+   * single source of truth and the select reports changes back through
+   * `onFormatChange`, so the cards and the select can never disagree.
    */
-  formatOverride?: ExportFormat;
+  format?: ExportFormat;
+  onFormatChange?: (format: ExportFormat) => void;
 }
 
-type ExportFormat = "markdown" | "json" | "csv" | "pdf" | "html" | "yaml";
+export type ExportFormat = "markdown" | "json" | "csv" | "pdf" | "html" | "yaml";
 
 interface ExportOptions {
   format: ExportFormat;
@@ -81,7 +83,13 @@ function getResourceTags(resource: Resource): string[] {
   );
 }
 
-export default function ExportTools({ awesomeList, selectedCategory, className, formatOverride }: ExportToolsProps) {
+export default function ExportTools({
+  awesomeList,
+  selectedCategory,
+  className,
+  format: controlledFormat,
+  onFormatChange,
+}: ExportToolsProps) {
   const { toast } = useToast();
   const [exportOptions, setExportOptions] = useState<ExportOptions>({
     format: "markdown",
@@ -96,13 +104,11 @@ export default function ExportTools({ awesomeList, selectedCategory, className, 
   // is a render behind a fast double-click).
   const exportingRef = useRef(false);
 
-  // BUG-026 (run13): apply a parent-driven format selection (Advanced page
-  // format showcase cards) to the local export options.
-  useEffect(() => {
-    if (formatOverride) {
-      setExportOptions(prev => ({ ...prev, format: formatOverride }));
-    }
-  }, [formatOverride]);
+  const format = controlledFormat ?? exportOptions.format;
+  const setFormat = (next: ExportFormat) => {
+    if (onFormatChange) onFormatChange(next);
+    else setExportOptions(prev => ({ ...prev, format: next }));
+  };
 
   // BUG-005 (run14): checkbox semantics are now literal — checked categories
   // are exported, none checked = nothing to export. To keep "everything" as
@@ -502,7 +508,7 @@ export default function ExportTools({ awesomeList, selectedCategory, className, 
       let filename = '';
       let mimeType = '';
 
-      switch (exportOptions.format) {
+      switch (format) {
         case 'markdown':
           content = generateMarkdown(resources);
           filename = `${awesomeList.title.toLowerCase().replace(/\s+/g, '-')}.md`;
@@ -683,7 +689,7 @@ export default function ExportTools({ awesomeList, selectedCategory, className, 
           doc.save(`${baseName}.pdf`);
           toast({
             title: "Export Successful",
-            description: `${resources.length} resources exported as PDF`,
+            description: `${resources.length.toLocaleString()} resources exported as PDF`,
             variant: "default",
           });
           return;
@@ -703,7 +709,7 @@ export default function ExportTools({ awesomeList, selectedCategory, className, 
 
       toast({
         title: "Export Successful",
-        description: `${resources.length} resources exported as ${exportOptions.format.toUpperCase()}`,
+        description: `${resources.length.toLocaleString()} resources exported as ${format.toUpperCase()}`,
         variant: "default",
       });
 
@@ -766,14 +772,12 @@ export default function ExportTools({ awesomeList, selectedCategory, className, 
       <CardContent className="space-y-6">
         {/* Format Selection */}
         <div className="space-y-3">
-          <label className="text-sm font-medium">Export Format</label>
+          <label htmlFor="export-format" className="text-sm font-medium">Export Format</label>
           <Select
-            value={exportOptions.format}
-            onValueChange={(value: ExportFormat) => 
-              setExportOptions(prev => ({ ...prev, format: value }))
-            }
+            value={format}
+            onValueChange={(value: ExportFormat) => setFormat(value)}
           >
-            <SelectTrigger>
+            <SelectTrigger id="export-format">
               <SelectValue />
             </SelectTrigger>
             <SelectContent>
@@ -880,12 +884,12 @@ export default function ExportTools({ awesomeList, selectedCategory, className, 
         {/* Export Summary */}
         <div className="p-4 bg-muted">
           <div className="flex items-center gap-2 mb-2">
-            <CheckCircle className="h-4 w-4 text-[#34d08c]" />{/* DS-OK: status ok */}
+            <CheckCircle className="h-4 w-4 text-[var(--status-ok)]" />{/* DS-OK: status ok */}
             <span className="text-sm font-medium">Export Summary</span>
           </div>
           <div className="text-sm text-muted-foreground space-y-1">
-            <div>Format: <Badge variant="outline">{exportOptions.format.toUpperCase()}</Badge></div>
-            <div>Resources: <span className="font-medium">{resourceCount}</span></div>
+            <div>Format: <Badge variant="outline">{format.toUpperCase()}</Badge></div>
+            <div>Resources: <span className="font-medium">{resourceCount.toLocaleString()}</span></div>
             <div>Categories: <span className="font-medium">
               {exportOptions.selectedCategories.length === awesomeList.categories.length && awesomeList.categories.length > 0
                 ? `All (${awesomeList.categories.length})`
@@ -909,7 +913,7 @@ export default function ExportTools({ awesomeList, selectedCategory, className, 
           ) : (
             <>
               <Download className="h-4 w-4 mr-2" />
-              Export {resourceCount} Resources
+              Export {resourceCount.toLocaleString()} Resources
             </>
           )}
         </Button>

@@ -1,4 +1,5 @@
 import { formatDistanceToNow } from "date-fns";
+import { handoffFocusOnUnmount } from "@/hooks/focus-handoff";
 import {
   ArrowRight,
   BookOpen,
@@ -100,6 +101,7 @@ function ActiveJourneyCard({
             className="w-full"
             onClick={() => onResume(item)}
             disabled={pending}
+            aria-label={`${item.nextStep ? "Resume next step" : "Open journey"}: ${item.title}`}
             data-testid={`button-resume-journey-${item.journeyId}`}
           >
             <Play className="mr-2 h-4 w-4" />
@@ -201,7 +203,7 @@ export default function ContinueLearning() {
           </CardHeader>
           <CardContent className="flex flex-wrap justify-center gap-3 pb-10">
             <Button asChild>
-              <Link href="/sign-in">Sign in</Link>
+              <Link href="/sign-in?redirect_url=%2Fcontinue-learning">Sign in</Link>
             </Button>
             <Button variant="outline" asChild>
               <Link href="/journeys">Browse journeys as a guest</Link>
@@ -233,8 +235,9 @@ export default function ContinueLearning() {
             <Button
               variant="outline"
               size="sm"
-              onClick={() => refetch()}
-              disabled={isFetching}
+              onClick={(e) => { if (isFetching) return; handoffFocusOnUnmount(e.currentTarget); void refetch(); }}
+              aria-disabled={isFetching}
+              aria-busy={isFetching}
               data-testid="button-retry-continue-learning"
             >
               Retry

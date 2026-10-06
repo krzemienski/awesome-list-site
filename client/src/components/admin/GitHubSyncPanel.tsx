@@ -46,6 +46,7 @@ interface SyncHistory {
 interface SyncQueueItem {
   id: number;
   repositoryUrl: string;
+  branch?: string | null;
   action: string;
   status: string;
   errorMessage?: string;
@@ -222,7 +223,9 @@ export default function GitHubSyncPanel() {
             </div>
             <div className="ops-github-panel__repository-copy">
               <CardTitle className="ops-github-panel__repository-name">
-                {repoUrl || (configIsLoading ? "Loading repository…" : "Repository not configured")}
+                {/* C4-V5B-01: the card describes the configured repository (its
+                    branch, last sync and job count below), not the draft target. */}
+                {configuredRepo || (configIsLoading ? "Loading repository…" : "Repository not configured")}
               </CardTitle>
               <p className="ops-github-panel__repository-meta">
                 {configuredBranch} · {lastSync ? `last sync ${formatSyncDate(lastSync.createdAt)}` : "not synced yet"} · {syncQueueData?.total ?? 0} sync jobs
@@ -390,15 +393,15 @@ export default function GitHubSyncPanel() {
                   
                   <div className="grid grid-cols-4 gap-2 text-sm">
                     <div className="text-center">
-                      <div className={"text-[#34d08c] font-semibold" /* DS-OK: status ok */}>+{lastSync.resourcesAdded}</div>
+                      <div className={"text-[var(--status-ok)] font-semibold" /* DS-OK: status ok */}>+{lastSync.resourcesAdded}</div>
                       <div className="text-xs text-muted-foreground">Added</div>
                     </div>
                     <div className="text-center">
-                      <div className={"text-[#ffb84d] font-semibold" /* DS-OK: status warn */}>~{lastSync.resourcesUpdated}</div>
+                      <div className={"text-[var(--status-warn)] font-semibold" /* DS-OK: status warn */}>~{lastSync.resourcesUpdated}</div>
                       <div className="text-xs text-muted-foreground">Updated</div>
                     </div>
                     <div className="text-center">
-                      <div className={"text-[#ff5c7a] font-semibold" /* DS-OK: status bad */}>-{lastSync.resourcesRemoved}</div>
+                      <div className={"text-[var(--status-bad)] font-semibold" /* DS-OK: status bad */}>-{lastSync.resourcesRemoved}</div>
                       <div className="text-xs text-muted-foreground">Removed</div>
                     </div>
                     <div className="text-center">
@@ -455,12 +458,17 @@ export default function GitHubSyncPanel() {
                       >
                         <div className="flex items-center justify-between">
                           <div className="flex items-center gap-2">
-                            {item.status === 'completed' && <CheckCircle2 className={"h-4 w-4 text-[#34d08c]" /* DS-OK: status ok */} />}
-                            {item.status === 'failed' && <XCircle className={"h-4 w-4 text-[#ff5c7a]" /* DS-OK: status bad */} />}
+                            {item.status === 'completed' && <CheckCircle2 className={"h-4 w-4 text-[var(--status-ok)]" /* DS-OK: status ok */} />}
+                            {item.status === 'failed' && <XCircle className={"h-4 w-4 text-[var(--status-bad)]" /* DS-OK: status bad */} />}
                             {(item.status === 'pending' || item.status === 'processing') && (
-                              <RefreshCw className={"h-4 w-4 text-[#ffb84d] animate-spin" /* DS-OK: status warn */} />
+                              <RefreshCw className={"h-4 w-4 text-[var(--status-warn)] animate-spin" /* DS-OK: status warn */} />
                             )}
                             <span className="font-medium capitalize">{item.action}</span>
+                            {item.branch && (
+                              <span className="font-mono text-xs text-muted-foreground" title="Branch recorded for this job">
+                                {item.branch}
+                              </span>
+                            )}
                             <span className="text-xs text-muted-foreground">
                               {formatSyncDate(item.processedAt || item.createdAt)}
                             </span>
@@ -512,7 +520,7 @@ export default function GitHubSyncPanel() {
        ) : syncHistory && syncHistory.length > 0 ? (
         <TableShell
           title="Sync jobs"
-          sub={`Last ${Math.min(5, orderedHistory.length)} import/export operations`}
+          sub={`${showDetails ? "All" : "Last"} ${visibleHistory.length} import/export operation${visibleHistory.length === 1 ? "" : "s"}`}
           className="ops-github-panel__history-shell"
         >
             <div className="ops-github-panel__history-table-wrap">
@@ -535,13 +543,11 @@ export default function GitHubSyncPanel() {
                       </TableCell>
                       <TableCell>
                          {sync.status && (
-                           <span
-                             className={`chip ${sync.status === "completed" ? "ok" : sync.status === "failed" ? "bad" : sync.status === "pending" ? "warn" : ""}`}
+                           <StatusChip
+                             status={sync.status}
                              title={sync.errorMessage}
                              data-testid={`badge-sync-history-status-${sync.id}`}
-                           >
-                             {sync.status}
-                           </span>
+                           />
                          )}
                       </TableCell>
                       <TableCell className="text-right">
@@ -565,26 +571,24 @@ export default function GitHubSyncPanel() {
        ) : (
          <TableShell
            title="Sync jobs"
-           sub="No import/export operations have been recorded yet."
+           sub="No import/export operations yet."
            className="ops-github-panel__history-shell"
          >
-           <p className="text-sm text-muted-foreground" role="status">Start a pull or sync to see job details here.</p>
+           <p className="ops-github-panel__history-empty" role="status">Start a pull or sync to see job details here.</p>
          </TableShell>
        )}
 
-      <details className="admin-ops-more">
-        <summary
+      <div className="admin-ops-more">
+        <button
+          type="button"
           className="btn ghost"
-          onClick={(event) => {
-            event.preventDefault();
-            setShowDetails((visible) => !visible);
-          }}
+          onClick={() => setShowDetails((visible) => !visible)}
           aria-expanded={showDetails}
           data-testid="button-github-more"
         >
           {showDetails ? "Less" : "More"}
-        </summary>
-      </details>
+        </button>
+      </div>
 
       {/* Run16 BUG-039: confirm before firing import (rewrites local catalog)
           or export (pushes a real commit to the repository). */}

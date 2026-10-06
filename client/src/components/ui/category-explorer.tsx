@@ -7,7 +7,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
-import { useLocation } from "wouter";
+import { Link, useLocation } from "wouter";
 import { Category, Resource } from "@/types/awesome-list";
 import { cn } from "@/lib/utils";
 import { writeFilterParams, usePopstateParams } from "@/lib/url-filter-state";
@@ -229,7 +229,7 @@ export default function CategoryExplorer({ categories, resources, className }: C
             Category Explorer
           </CardTitle>
           <CardDescription>
-            Discover and explore {categories.length} categories with {resources.length} total resources
+            Discover and explore {categories.length} categories with {resources.length.toLocaleString()} total resources
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
@@ -250,7 +250,9 @@ export default function CategoryExplorer({ categories, resources, className }: C
               <Filter className="h-4 w-4 text-muted-foreground" />
               <span className="text-sm text-muted-foreground">Sort:</span>
               <Select value={sortBy} onValueChange={handleSortChange}>
-                <SelectTrigger className="w-32" aria-label="Sort categories">
+                {/* C5-V2-02: size to the selected label — a fixed w-32 clipped
+                    "Resource Count" to "Resource..." in every design system. */}
+                <SelectTrigger className="w-auto min-w-32" aria-label="Sort categories">
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
@@ -360,21 +362,19 @@ export default function CategoryExplorer({ categories, resources, className }: C
                           Button primitive defaults to nowrap, so long category
                           names pushed the trailing icon past the card edge at
                           narrow widths instead of wrapping. */}
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        onClick={() => navigate(`/category/${category.slug}`)}
-                        // BUG-048 (run18): min-h keeps the inline title link a tap
-                        // target; raised to the app-wide 40px touch minimum.
-                        className="p-0 h-auto min-h-10 font-semibold text-left hover:text-primary whitespace-normal break-words min-w-0"
+                      {/* BUG-048 (run18): min-h keeps the inline title link a tap
+                          target at the app-wide 40px touch minimum. cf-audit
+                          F1231: a real link, not a bordered p-0 ghost button. */}
+                      <Link
+                        href={`/category/${category.slug}`}
+                        className="inline-flex min-h-10 min-w-0 items-center font-semibold text-left hover:text-primary break-words"
                       >
                         {category.name}
-                      </Button>
-                      <ExternalLink className="h-4 w-4 text-muted-foreground shrink-0" />
+                      </Link>
                     </CardTitle>
                     <div className="flex flex-wrap items-center gap-x-4 gap-y-1 mt-2">
                       <span className="text-sm text-muted-foreground whitespace-nowrap">
-                        {stats.totalResources} {stats.totalResources === 1 ? "resource" : "resources"}
+                        {stats.totalResources.toLocaleString()} {stats.totalResources === 1 ? "resource" : "resources"}
                       </span>
                       {stats.subcategoryCount > 0 && (
                         <span className="text-sm text-muted-foreground whitespace-nowrap">
@@ -390,7 +390,7 @@ export default function CategoryExplorer({ categories, resources, className }: C
                         <span className="text-sm font-medium text-primary whitespace-nowrap">
                           {nameOnlyMatch
                             ? "matches category name"
-                            : `${matching.length} match${matching.length === 1 ? "es" : ""} filter`}
+                            : `${matching.length} ${matching.length === 1 ? "match" : "matches"}`}
                         </span>
                       )}
                     </div>
@@ -439,6 +439,9 @@ export default function CategoryExplorer({ categories, resources, className }: C
                         className="inline-flex min-h-10 items-center text-foreground hover:text-primary transition-colors font-medium"
                       >
                         {resource.title}
+                        {/* C7-V2-04: the cue belongs on the links that really open a new tab. */}
+                        <ExternalLink aria-hidden="true" className="ml-1.5 h-3.5 w-3.5 shrink-0 text-muted-foreground" />
+                        <span className="sr-only"> (opens in new tab)</span>
                       </a>
                       <p className="text-xs text-muted-foreground line-clamp-1">
                         {resource.description}
@@ -451,7 +454,8 @@ export default function CategoryExplorer({ categories, resources, className }: C
                   {previewResources.length > 3 && (
                     <p className="text-xs text-muted-foreground">
                       +{previewResources.length - 3} more{" "}
-                      {filterActive && !nameOnlyMatch ? "matching resources" : "resources"}
+                      {filterActive && !nameOnlyMatch ? "matching " : ""}
+                      {previewResources.length - 3 === 1 ? "resource" : "resources"}
                     </p>
                   )}
                 </div>

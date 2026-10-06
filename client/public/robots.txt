@@ -13,7 +13,7 @@ Allow: /journeys
 Allow: /advanced
 Allow: /about
 
-# Block API + private/auth routes (still admit social crawlers below)
+# Block API + private/auth routes
 Disallow: /api/
 Disallow: /admin
 Disallow: /profile
@@ -25,57 +25,41 @@ Sitemap: https://awesome.video/sitemap.xml
 
 Crawl-delay: 1
 
-# Social media crawlers: full access (needed for OG previews)
+# A crawler obeys only the most specific group that names it (RFC 9309), so
+# every named group below repeats the default group's Disallow lines.
+
+# Social media crawlers: all public pages (needed for OG previews)
 User-agent: facebookexternalhit
-Allow: /
-
 User-agent: Facebot
-Allow: /
-
 User-agent: Twitterbot
-Allow: /
-
 User-agent: LinkedInBot
-Allow: /
-
 User-agent: Slackbot
-Allow: /
-
 User-agent: Slackbot-LinkExpanding
-Allow: /
-
 User-agent: WhatsApp
-Allow: /
-
 User-agent: TelegramBot
-Allow: /
-
 User-agent: Discordbot
-Allow: /
-
 User-agent: Applebot
 Allow: /
+Disallow: /api/
+Disallow: /admin
+Disallow: /profile
+Disallow: /bookmarks
+Disallow: /settings/
 
 # Search engines
 User-agent: Googlebot
-Allow: /
-Crawl-delay: 1
-
 User-agent: Googlebot-Image
-Allow: /
-
 User-agent: Bingbot
-Allow: /
-Crawl-delay: 1
-
 User-agent: DuckDuckBot
-Allow: /
-
 User-agent: Baiduspider
-Allow: /
-
 User-agent: YandexBot
 Allow: /
+Disallow: /api/
+Disallow: /admin
+Disallow: /profile
+Disallow: /bookmarks
+Disallow: /settings/
+Crawl-delay: 1
 
 # AI search & assistant crawlers: explicitly allowed so AI answer engines
 # (ChatGPT, Perplexity, Claude, Gemini, Copilot, Meta AI) can crawl and cite

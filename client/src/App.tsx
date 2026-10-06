@@ -10,14 +10,16 @@ import {
   type ReactNode,
 } from "react";
 import { Switch, Route, Redirect, useLocation, useSearch } from "wouter";
-import { ClerkProvider, SignIn, SignUp, useClerk } from "@clerk/react";
+import { ClerkProvider, SignIn, SignUp, useAuth as useClerkAuth, useClerk } from "@clerk/react";
 import { AccountThemePreferenceBridge } from "@/components/ui/theme-provider";
 import { publishableKeyFromHost } from "@clerk/react/internal";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { noteLocationChange, useScrollRestoration } from "./lib/nav-history";
-import { useAuth } from "./hooks/useAuth";
+import { useAuth, clearSignedInClientState } from "./hooks/useAuth";
+import { findRouteSuggestion } from "./lib/not-found-suggestion";
 import { useAnalytics } from "./hooks/use-analytics";
 import { useCrossTabSync } from "./lib/crossTabSync";
+import { setSessionTokenRefresher } from "./lib/queryClient";
 import { useClerkAppearance } from "./lib/clerk-appearance";
 import {
   applyProductProfile,
@@ -26,11 +28,15 @@ import {
 
 import MainLayout from "@/components/layout/new/MainLayout";
 import SEOHead from "@/components/layout/SEOHead";
+import { signInSeoDescription, signUpSeoDescription } from "@shared/seo-templates";
 import AuthConversionTracker from "@/components/auth/AuthConversionTracker";
 import GuestBookmarkMerge from "@/components/auth/GuestBookmarkMerge";
+import StaleSessionGate from "@/components/auth/StaleSessionGate";
+import { ClerkUiFallback } from "@/components/auth/AuthUnavailable";
 import ConsentBanner from "@/components/ui/consent-banner";
 import ScrubbedParamsNotice from "@/components/ui/scrubbed-params-notice";
 import { Button } from "@/components/ui/button";
+import { focusPageHeading } from "@/hooks/focus-handoff";
 
 // Guard and terminal error surfaces only render after routing has selected a
 // matching branch. Keep them out of the anonymous entry while the auth/theme
@@ -129,9 +135,35 @@ function SearchDialogFallback() {
 // chunk manifest); if that still fails, the visitor gets an in-app retry
 // card. Vite caches the rejected import promise, so recovery must be a full
 // reload — a soft re-render would replay the same rejection.
+// C8-V2-01: Vite rejects a route import with "Unable to preload CSS for …"
+// when the route's stylesheet can't load (offline, rotated hash) — the same
+// failure as a missing script chunk.
 const CHUNK_ERROR_RE =
-  /Failed to fetch dynamically imported module|Importing a module script failed|error loading dynamically imported module|ChunkLoadError|Loading chunk [\d]+ failed/i;
+  /Failed to fetch dynamically imported module|Importing a module script failed|error loading dynamically imported module|ChunkLoadError|Loading chunk [\d]+ failed|Unable to preload CSS/i;
 const CHUNK_RELOAD_FLAG = "route-chunk-reload-attempted";
+// C10-V2-01: a keyboard user who was on the route error card when it reloads
+// the page lands on the recovered page's h1, not <body>.
+const ROUTE_RETRY_FOCUS_FLAG = "route-retry-focus-heading";
+
+function restoreRouteRetryFocus(): void {
+  let pending = false;
+  try {
+    pending = sessionStorage.getItem(ROUTE_RETRY_FOCUS_FLAG) === "1";
+    sessionStorage.removeItem(ROUTE_RETRY_FOCUS_FLAG);
+  } catch {
+    return;
+  }
+  if (!pending) return;
+  const startedAt = Date.now();
+  const tick = () => {
+    if (document.activeElement && document.activeElement !== document.body) return;
+    if (document.querySelector("#main h1") && focusPageHeading()) return;
+    if (Date.now() - startedAt < 10_000) window.setTimeout(tick, 200);
+  };
+  window.setTimeout(tick, 200);
+}
+
+if (typeof window !== "undefined") restoreRouteRetryFocus();
 
 function isChunkLoadError(error: unknown): boolean {
   return error instanceof Error && CHUNK_ERROR_RE.test(`${error.name}: ${error.message}`);
@@ -201,6 +233,20 @@ class RouteErrorBoundary extends Component<RouteErrorBoundaryProps, RouteErrorBo
     console.error("Route render error:", error);
   }
 
+  // C8-V2-01: like the app's other offline states, a route that failed to load
+  // offline retries by itself once the connection is back.
+  handleOnline = () => {
+    if (this.state.error && isChunkLoadError(this.state.error)) this.handleRetry();
+  };
+
+  componentDidMount() {
+    window.addEventListener("online", this.handleOnline);
+  }
+
+  componentWillUnmount() {
+    window.removeEventListener("online", this.handleOnline);
+  }
+
   componentDidUpdate(prevProps: RouteErrorBoundaryProps) {
     // Navigating away clears the error so the next route renders normally.
     if (this.state.error && prevProps.location !== this.props.location) {
@@ -225,6 +271,9 @@ class RouteErrorBoundary extends Component<RouteErrorBoundaryProps, RouteErrorBo
         CHUNK_RELOAD_FLAG,
         `${Date.now()}|${window.location.href}`,
       );
+      if (document.activeElement?.closest("[data-testid='route-error-boundary']")) {
+        sessionStorage.setItem(ROUTE_RETRY_FOCUS_FLAG, "1");
+      }
     } catch {
       // ignore
     }
@@ -329,7 +378,7 @@ const HomeRoute: HomeRouteComponent = (props) => <LazyHomeRoute {...props} />;
 // (sidebar/header) that made 404s look like real content pages.
 const KNOWN_ROUTE_PATTERNS: RegExp[] = [
   /^\/$/,
-  /^\/(login|logout|register|signup|explore|forgot-password|reset-password|categories|category|tag|recommendations|search|about|advanced|submit|journeys|journey|continue-learning|profile|contributions|bookmarks|favorites|account|admin|settings|notifications|onboarding|resource|terms|privacy|code-of-conduct)\/?$/,
+  /^\/(login|logout|register|signup|explore|forgot-password|reset-password|categories|category|subcategory|sub-subcategory|tag|recommendations|search|about|advanced|submit|journeys|journey|continue-learning|profile|contributions|bookmarks|favorites|account|admin|settings|notifications|onboarding|resource|terms|privacy|code-of-conduct)\/?$/,
   // Task #307: Clerk-hosted auth pages, including OAuth/verification sub-paths.
   /^\/(sign-in|sign-up)(\/.*)?$/,
   /^\/auth\/(login|register)\/?$/,
@@ -350,9 +399,14 @@ const KNOWN_ROUTE_PATTERNS: RegExp[] = [
 // browser hostname, so it must use the explicitly configured key instead of
 // passing an empty host to Clerk's host resolver. A missing build-time key is
 // a configuration error for both paths; never substitute a fake key.
+// A loopback host has no Clerk custom domain to derive (a production build
+// served on localhost would otherwise ask for clerk.localhost), so local runs
+// of either build use the configured key.
 const configuredClerkPubKey = import.meta.env.VITE_CLERK_PUBLISHABLE_KEY;
+const isLoopbackHost = (host: string) =>
+  host === "localhost" || host === "127.0.0.1" || host === "[::1]" || host.endsWith(".localhost");
 const clerkPubKey =
-  typeof window === "undefined"
+  typeof window === "undefined" || isLoopbackHost(window.location.hostname)
     ? configuredClerkPubKey
     : publishableKeyFromHost(window.location.hostname, configuredClerkPubKey);
 const clerkProxyUrl = import.meta.env.VITE_CLERK_PROXY_URL;
@@ -405,12 +459,16 @@ function SignInPage() {
       data-testid="page-sign-in"
     >
       {/* Title mirrors the og-middleware /sign-in template (two-pass parity). */}
-      <SEOHead title="Sign In" noindex />
-      <SignIn
-        routing="path"
-        path={`${basePath}/sign-in`}
-        signUpUrl={`${basePath}/sign-up`}
-      />
+      <SEOHead title="Sign In" description={signInSeoDescription} noindex />
+      <StaleSessionGate>
+        {/* C5-V3-01: never a blank body while Clerk's UI can't load. */}
+        <SignIn
+          routing="path"
+          path={`${basePath}/sign-in`}
+          signUpUrl={`${basePath}/sign-up`}
+          fallback={<ClerkUiFallback flow="sign-in" />}
+        />
+      </StaleSessionGate>
     </div>
   );
 }
@@ -425,12 +483,15 @@ function SignUpPage() {
       data-testid="page-sign-up"
     >
       {/* Title mirrors the og-middleware /sign-up template (two-pass parity). */}
-      <SEOHead title="Create an Account" noindex />
-      <SignUp
-        routing="path"
-        path={`${basePath}/sign-up`}
-        signInUrl={`${basePath}/sign-in`}
-      />
+      <SEOHead title="Create an Account" description={signUpSeoDescription} noindex />
+      <StaleSessionGate>
+        <SignUp
+          routing="path"
+          path={`${basePath}/sign-up`}
+          signInUrl={`${basePath}/sign-in`}
+          fallback={<ClerkUiFallback flow="sign-up" />}
+        />
+      </StaleSessionGate>
     </div>
   );
 }
@@ -440,8 +501,16 @@ function SignUpPage() {
 // user-scoped data leaks across identities.
 function ClerkQueryClientCacheInvalidator() {
   const { addListener } = useClerk();
+  const { getToken } = useClerkAuth();
   const qc = useQueryClient();
   const prevUserIdRef = useRef<string | null | undefined>(undefined);
+
+  // Lets the query cache refresh a stale __session token before treating a
+  // protected 401 as an expired session (C3-V5A-07).
+  useEffect(() => {
+    setSessionTokenRefresher(() => getToken({ skipCache: true }));
+    return () => setSessionTokenRefresher(null);
+  }, [getToken]);
 
   useEffect(() => {
     const unsubscribe = addListener(({ user }) => {
@@ -458,8 +527,10 @@ function ClerkQueryClientCacheInvalidator() {
         if (userId !== null) void qc.invalidateQueries();
       } else if (prevUserIdRef.current !== userId) {
         // A real identity switch (sign-in, sign-out, account change): nothing
-        // user-scoped may survive it.
-        qc.clear();
+        // user-scoped may survive it. resetQueries, not clear(): clear() drops
+        // the cache but leaves mounted observers holding their old result, so
+        // the header kept showing "Visitor" after sign-in until a reload.
+        void qc.resetQueries();
       }
       prevUserIdRef.current = userId;
     });
@@ -472,14 +543,22 @@ function ClerkQueryClientCacheInvalidator() {
 // SPA-side /logout. Both direct and client-side navigation render this route,
 // which signs out via Clerk and confirms invalidation before redirecting.
 function Logout() {
-  const { signOut } = useClerk();
+  const { isLoaded, signOut } = useClerkAuth();
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
+    // C3-V3-02: on a direct /logout load Clerk is still loading, and signOut()
+    // then only queues the call and resolves at once — the server check below
+    // saw a live session, and the queued signOut later routed to "/"
+    // client-side, leaving the cached signed-in user in the header.
+    if (!isLoaded) return;
     let cancelled = false;
     const doSignOut = async () => {
       try {
-        await signOut();
+        // The callback replaces Clerk's own navigation so the full reload
+        // below, not a client-side route change, ends the signed-in page.
+        await signOut(() => {});
+        clearSignedInClientState();
         const authCheck = await fetch("/api/auth/user", {
           credentials: "include",
           cache: "no-store",
@@ -502,7 +581,7 @@ function Logout() {
     return () => {
       cancelled = true;
     };
-  }, [signOut]);
+  }, [isLoaded, signOut]);
   return (
     // min-h-full, not min-h-screen: this screen renders inside the app shell's
     // <main>, and a row that claims a viewport height of its own pushes the
@@ -540,7 +619,6 @@ function Router({ homeComponent: Home }: { homeComponent: HomeRouteComponent }) 
   useCrossTabSync();
   const {
     user,
-    isLoading: authLoading,
     error: authError,
     refetchAuth,
     logout,
@@ -621,11 +699,14 @@ function Router({ homeComponent: Home }: { homeComponent: HomeRouteComponent }) 
 
   if (error) {
     return (
-      <RouteErrorBoundary location={location}>
-      <Suspense fallback={<RouteFallback />}>
-        <ErrorPage error={error} />
-      </Suspense>
-      </RouteErrorBoundary>
+      <div className="page">
+        <div className="grain" aria-hidden="true" />
+        <RouteErrorBoundary location={location}>
+        <Suspense fallback={<RouteFallback />}>
+          <ErrorPage error={error} />
+        </Suspense>
+        </RouteErrorBoundary>
+      </div>
     );
   }
 
@@ -645,7 +726,7 @@ function Router({ homeComponent: Home }: { homeComponent: HomeRouteComponent }) 
       <MainLayout productProfile={productProfile} nav={nav} isLoading={navLoading} navError={navError} onRetryNav={() => refetchNav()} user={user ?? undefined} onLogout={logout} logoutError={logoutError} renderSearchDialog={renderSearchDialog}>
         <RouteErrorBoundary location={location}>
         <Suspense fallback={<RouteFallback />}>
-          <NotFound />
+          <NotFound suggestion={findRouteSuggestion(location, nav)} />
         </Suspense>
         </RouteErrorBoundary>
       </MainLayout>
@@ -703,7 +784,7 @@ function Router({ homeComponent: Home }: { homeComponent: HomeRouteComponent }) 
         <Route path="/auth/register"><LegacyAuthRedirect to="/sign-up" /></Route>
         <Route path="/signup"><LegacyAuthRedirect to="/sign-up" /></Route>
         <Route path="/explore">
-          <Redirect to="/search" replace />
+          <Redirect to={legacyHomeQuery ? `/search?q=${encodeURIComponent(legacyHomeQuery)}` : "/search"} replace />
         </Route>
         <Route path="/resource">
           <Redirect to={legacyHomeQuery ? `/search?q=${encodeURIComponent(legacyHomeQuery)}` : "/search"} replace />
@@ -724,8 +805,16 @@ function Router({ homeComponent: Home }: { homeComponent: HomeRouteComponent }) 
             onRetry={() => refetchNav()}
           />
         </Route>
+        {/* R5-051: one bare-prefix policy with the server — taxonomy
+            prefixes without a slug land on the category index. */}
         <Route path="/category">
-          <Redirect to="/" replace />
+          <Redirect to="/categories" replace />
+        </Route>
+        <Route path="/subcategory">
+          <Redirect to="/categories" replace />
+        </Route>
+        <Route path="/sub-subcategory">
+          <Redirect to="/categories" replace />
         </Route>
         <Route path="/subcategory/:slug" component={Subcategory} />
         <Route path="/recommendations" component={Recommendations} />
@@ -791,7 +880,7 @@ function Router({ homeComponent: Home }: { homeComponent: HomeRouteComponent }) 
           </AuthGuard>
         </Route>
         <Route>
-          <NotFound />
+          <NotFound suggestion={findRouteSuggestion(location, nav)} />
         </Route>
       </Switch>
       </Suspense>

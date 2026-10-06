@@ -3,41 +3,67 @@ import * as TabsPrimitive from "@radix-ui/react-tabs"
 
 import { cn } from "@/lib/utils"
 
-const Tabs = TabsPrimitive.Root
+// The canonical sheet styles the selected tab as `.tab.active`, so the root
+// shares its current value with the triggers and each trigger adds `active`
+// itself. Works for both controlled (`value`) and uncontrolled (`defaultValue`) use.
+const TabsValueContext = React.createContext<string | undefined>(undefined)
+
+const Tabs = React.forwardRef<
+  React.ElementRef<typeof TabsPrimitive.Root>,
+  React.ComponentPropsWithoutRef<typeof TabsPrimitive.Root>
+>(({ value, defaultValue, onValueChange, ...props }, ref) => {
+  const [uncontrolledValue, setUncontrolledValue] = React.useState(defaultValue)
+  const currentValue = value ?? uncontrolledValue
+
+  const handleValueChange = React.useCallback(
+    (next: string) => {
+      if (value === undefined) setUncontrolledValue(next)
+      onValueChange?.(next)
+    },
+    [value, onValueChange]
+  )
+
+  return (
+    <TabsValueContext.Provider value={currentValue}>
+      <TabsPrimitive.Root
+        ref={ref}
+        value={currentValue}
+        onValueChange={handleValueChange}
+        {...props}
+      />
+    </TabsValueContext.Provider>
+  )
+})
+Tabs.displayName = TabsPrimitive.Root.displayName
 
 const TabsList = React.forwardRef<
   React.ElementRef<typeof TabsPrimitive.List>,
   React.ComponentPropsWithoutRef<typeof TabsPrimitive.List>
 >(({ className, ...props }, ref) => (
-  <TabsPrimitive.List
-    ref={ref}
-    className={cn(
-      // R5-054 (run24): rounded-full on a wrapping, auto-height list renders a
-      // giant stadium blob whose curved ends cut into the first/last tab rows
-      // (admin 15 tabs ≤1024, profile 5 tabs @768). Below xl — where tab lists
-      // can wrap — use the token card radius; the single-row pill look is
-      // preserved from xl (1280px) up.
-      "inline-flex h-10 items-center justify-center rounded-lg xl:rounded-full border border-border bg-[var(--surface)] p-1 text-muted-foreground",
-      className
-    )}
-    {...props}
-  />
+  <TabsPrimitive.List ref={ref} className={cn("tabs", className)} {...props} />
 ))
 TabsList.displayName = TabsPrimitive.List.displayName
 
 const TabsTrigger = React.forwardRef<
   React.ElementRef<typeof TabsPrimitive.Trigger>,
   React.ComponentPropsWithoutRef<typeof TabsPrimitive.Trigger>
->(({ className, ...props }, ref) => (
-  <TabsPrimitive.Trigger
-    ref={ref}
-    className={cn(
-      "inline-flex items-center justify-center whitespace-nowrap rounded-full px-3 py-1.5 text-sm font-medium ring-offset-background transition-all duration-[var(--motion-fast)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 hover:text-foreground data-[state=active]:bg-[var(--surface-3)] data-[state=active]:text-[var(--accent)] data-[state=active]:shadow-[var(--shadow-sm)]",
-      className
-    )}
-    {...props}
-  />
-))
+>(({ className, value, ...props }, ref) => {
+  const isActive = React.useContext(TabsValueContext) === value
+  return (
+    <TabsPrimitive.Trigger
+      ref={ref}
+      value={value}
+      className={cn(
+        // `.tab` keeps the UA button leading; min-h-11 is the 44px touch floor.
+        // justify-center only shows when a consumer stretches tabs into a grid.
+        "tab min-h-11 shrink-0 justify-center [line-height:normal] disabled:pointer-events-none disabled:opacity-50",
+        isActive && "active",
+        className
+      )}
+      {...props}
+    />
+  )
+})
 TabsTrigger.displayName = TabsPrimitive.Trigger.displayName
 
 const TabsContent = React.forwardRef<

@@ -388,16 +388,19 @@ async function parseMarkdown(content: string, repoUrl: string): Promise<AwesomeL
  */
 function validateUrl(url: string): { isValid: boolean; error?: string } {
   try {
-    const urlObj = new URL(url);
-    
-    if (!url.includes('raw.githubusercontent.com') && !url.includes('github.com') && !url.includes('gitlab.com')) {
+    // Match the parsed hostname, not a substring: "https://evil.test/?raw.githubusercontent.com"
+    // used to pass and the server fetched an arbitrary host.
+    const host = new URL(url).hostname;
+    const isHost = (domain: string) => host === domain || host.endsWith(`.${domain}`);
+
+    if (!isHost('raw.githubusercontent.com') && !isHost('github.com') && !isHost('gitlab.com')) {
       return {
         isValid: false,
         error: 'URL should be a raw GitHub/GitLab URL (e.g., https://raw.githubusercontent.com/user/repo/main/README.md)'
       };
     }
-    
-    if (url.includes('github.com') && !url.includes('raw.githubusercontent.com')) {
+
+    if (isHost('github.com')) {
       return {
         isValid: false,
         error: 'Please use the raw GitHub URL. Replace "github.com" with "raw.githubusercontent.com" and adjust the path.'

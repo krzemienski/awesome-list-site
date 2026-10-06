@@ -1,5 +1,7 @@
 import { useQuery } from "@tanstack/react-query";
+import { handoffFocusOnUnmount } from "@/hooks/focus-handoff";
 import { Link } from "wouter";
+import { queryUnavailableReason } from "@/lib/query-availability";
 import { apiRequest } from "@/lib/queryClient";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/components/ui/card";
@@ -16,12 +18,7 @@ export default function Recommendations() {
   const { isAuthenticated } = useAuth();
 
   // Anonymous browse: rule-based recommendations from the public GET endpoint.
-  const {
-    data: anonData,
-    isLoading: anonLoading,
-    isError: anonError,
-    refetch,
-  } = useQuery<RecommendationResult[]>({
+  const anonQuery = useQuery<RecommendationResult[]>({
     // GET /api/recommendations (anonymous fallback) returns a plain array of
     // RecommendationResult (the authed POST endpoint returns the same shape).
     queryKey: ["/api/recommendations", "anonymous"],
@@ -38,6 +35,10 @@ export default function Recommendations() {
     staleTime: 5 * 60 * 1000,
     retry: false,
   });
+  const { data: anonData, isLoading: anonLoading, refetch } = anonQuery;
+  // C6-V2-07: offline, the query is paused (not failed); don't call that "empty".
+  const anonUnavailable = queryUnavailableReason(anonQuery);
+  const anonError = anonUnavailable !== null;
 
   const anonRecommendations = Array.isArray(anonData) ? anonData : [];
 
@@ -94,9 +95,11 @@ export default function Recommendations() {
                   <span className="chip bad discovery-tools-state-badge">Error · Recommendations</span>
                   <AlertCircle className="discovery-tools-state-icon" aria-hidden="true" />
                   <p className="discovery-tools-state-copy">
-                    We couldn&apos;t load recommendations right now.
+                    {anonUnavailable === "offline"
+                      ? "You're offline, so recommendations can't load. They'll load when you reconnect, or try again."
+                      : "We couldn't load recommendations right now."}
                   </p>
-                  <Button variant="outline" onClick={() => void refetch()} data-testid="button-retry-recommendations">
+                  <Button variant="outline" onClick={(e) => { handoffFocusOnUnmount(e.currentTarget); void refetch(); }} data-testid="button-retry-recommendations">
                     Try again
                   </Button>
                 </CardContent>
@@ -145,7 +148,7 @@ export default function Recommendations() {
             <CardContent className="discovery-tools-panel-content">
               {/* BUG-049 (run26): asChild — no <a>-wrapping-<button> nesting. */}
               <Button asChild className="w-full sm:w-auto" data-testid="button-login-to-get-started">
-                <Link href="/sign-in">
+                <Link href="/sign-in?redirect_url=%2Frecommendations">
                   <LogIn className="mr-2 h-4 w-4" />
                   Sign in
                 </Link>

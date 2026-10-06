@@ -1,9 +1,11 @@
 import { useMutation, useQuery } from "@tanstack/react-query";
+import { handoffFocusOnUnmount } from "@/hooks/focus-handoff";
 import { Bell, Check, CheckCheck, Inbox, RefreshCw } from "lucide-react";
 import { Link } from "wouter";
 import SEOHead from "@/components/layout/SEOHead";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { queryUnavailableReason } from "@/lib/query-availability";
 import { apiRequest, queryClient } from "@/lib/queryClient";
 import "@/styles/pages/account.css";
 
@@ -31,6 +33,7 @@ export default function Notifications() {
   });
 
   const mutationError = readMutation.error ?? allMutation.error;
+  const unavailable = queryUnavailableReason(query);
 
   return (
     <div className="account-page account-page--form space-y-8 px-4 py-8 sm:px-6">
@@ -52,8 +55,14 @@ export default function Notifications() {
           <Button
             variant="outline"
             className="min-h-[44px] shrink-0"
-            onClick={() => allMutation.mutate()}
-            disabled={allMutation.isPending}
+            onClick={(e) => {
+              if (allMutation.isPending) return;
+              // C6-SWEEP-10: this button is removed once unreadCount hits 0.
+              handoffFocusOnUnmount(e.currentTarget);
+              allMutation.mutate();
+            }}
+            aria-disabled={allMutation.isPending}
+            aria-busy={allMutation.isPending}
           >
             <CheckCheck className="mr-2 h-4 w-4" />
             Mark all read
@@ -73,17 +82,19 @@ export default function Notifications() {
             <div className="skeleton h-20 w-full" />
           </CardContent>
         </Card>
-      ) : query.isError ? (
+      ) : unavailable ? (
         <Card>
-          <CardContent className="p-8 text-center" role="alert">
+          <CardContent className="p-8 text-center" role="alert" data-testid={`notifications-${unavailable}`}>
             <RefreshCw className="account-accent-icon mx-auto h-8 w-8" />
             <p className="account-muted mt-3 text-sm">
-              We couldn’t load your notifications.
+              {unavailable === "offline"
+                ? "You’re offline. Your notifications will load when your connection is back."
+                : "We couldn’t load your notifications."}
             </p>
             <Button
               variant="outline"
               className="mt-4 min-h-[44px]"
-              onClick={() => void query.refetch()}
+              onClick={(e) => { handoffFocusOnUnmount(e.currentTarget); void query.refetch(); }}
             >
               Try again
             </Button>
@@ -99,7 +110,7 @@ export default function Notifications() {
               will appear in this quiet inbox.
             </p>
             <Link
-              href="/settings"
+              href="/settings#notification-settings"
               className="account-accent mt-5 inline-flex min-h-[44px] items-center text-sm font-semibold underline underline-offset-4"
             >
               Review notification choices
@@ -167,8 +178,15 @@ export default function Notifications() {
                           <Button
                             variant="ghost"
                             className="min-h-[44px] px-2 text-xs"
-                            onClick={() => readMutation.mutate(notification.id)}
-                            disabled={readMutation.isPending}
+                            onClick={(e) => {
+                              if (readMutation.isPending) return;
+                              // C6-SWEEP-09: becomes a "Read" span on success; focus the row's link.
+                              const link = e.currentTarget.parentElement?.querySelector<HTMLElement>("a");
+                              handoffFocusOnUnmount(e.currentTarget, () => link);
+                              readMutation.mutate(notification.id);
+                            }}
+                            aria-disabled={readMutation.isPending}
+                            aria-busy={readMutation.isPending}
                           >
                             <Check className="mr-1.5 h-3.5 w-3.5" />
                             Mark read

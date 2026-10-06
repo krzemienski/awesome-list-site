@@ -1,7 +1,9 @@
-import { useState, memo } from "react";
+import { useState, useEffect, memo } from "react";
+import { useQuery } from "@tanstack/react-query";
 import { Button } from "@/components/ui/button";
 import { Heart } from "lucide-react";
 import { useFavoriteToggle } from "@/hooks/useResourceToggle";
+import { handoffFocusToSiblingControl } from "@/hooks/focus-handoff";
 import { useAuth } from "@/hooks/useAuth";
 import { cn } from "@/lib/utils";
 
@@ -12,6 +14,8 @@ interface FavoriteButtonProps {
   className?: string;
   size?: "sm" | "default" | "lg";
   showCount?: boolean;
+  /** Names the resource in the accessible label (see BookmarkButton). */
+  resourceTitle?: string;
 }
 
 // All toggle behavior (latest-wins rapid clicks, auth gate, error handling,
@@ -23,11 +27,28 @@ function FavoriteButton({
   favoriteCount: initialCount = 0,
   className,
   size = "default",
-  showCount = true
+  showCount = true,
+  resourceTitle,
 }: FavoriteButtonProps) {
   const [isFavorited, setIsFavorited] = useState(initialFavorited);
   const [favoriteCount, setFavoriteCount] = useState(initialCount);
   const { isAuthenticated } = useAuth();
+
+  // Most surfaces (bookmarks, search, list/compact modes) pass bare resources
+  // without isFavorited, so derive the state from the shared /api/favorites
+  // query the toggle hook invalidates; the prop only seeds it until the list
+  // loads (same approach as BookmarkButton).
+  const { data: favoritesList } = useQuery<Array<{ id: number | string }>>({
+    queryKey: ["/api/favorites"],
+    enabled: isAuthenticated,
+    staleTime: 60_000,
+  });
+  const serverFavorited = favoritesList !== undefined
+    ? favoritesList.some((f) => String(f.id) === String(resourceId))
+    : initialFavorited;
+  useEffect(() => {
+    setIsFavorited(isAuthenticated ? serverFavorited : false);
+  }, [isAuthenticated, serverFavorited]);
 
   // Favorites are account-only while bookmarks work for guests, so the two
   // otherwise-identical icon buttons must say which is which. Owned here (not
@@ -66,6 +87,8 @@ function FavoriteButton({
   const handleClick = (e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
+    // C6-VX-03: removing from a list card unmounts this button with the card.
+    if (isFavorited) handoffFocusToSiblingControl(e.currentTarget as HTMLElement, '[data-testid="button-favorite"]');
     favorite.toggle();
   };
 
@@ -83,7 +106,7 @@ function FavoriteButton({
       onClick={handleClick}
       aria-disabled={favorite.isPending}
       aria-busy={favorite.isPending}
-      aria-label={favoriteLabel}
+      aria-label={resourceTitle ? `${favoriteLabel}: ${resourceTitle}` : favoriteLabel}
       title={favoriteLabel}
       aria-pressed={isFavorited}
       data-testid="button-favorite"

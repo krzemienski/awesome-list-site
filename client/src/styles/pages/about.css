@@ -13,21 +13,6 @@
   animation: fadeIn 0.5s ease;
 }
 
-/*
- * Public prose routes keep the shell's compact 1240px measure, while the
- * canonical About surface is laid out against the wider editorial measure.
- * Only the wide desktop shell needs this local correction; tablet and phone
- * gutters intentionally remain owned by the shared shell.
- */
-@media (min-width: 1280px) {
-  .about-page {
-    margin-inline-start: calc(
-      (var(--content-max, 1240px) - var(--content-max-admin, 1400px)) / 2
-    );
-  }
-
-}
-
 .about-hero {
   width: 100%;
 }
@@ -55,15 +40,11 @@
 
 .about-title {
   margin: 0 0 18px;
-  font-family: var(--font-body);
+  font-family: var(--font-display);
   font-size: clamp(32px, 4.5vw, 48px);
-  font-weight: 700;
-  letter-spacing: -1.2px;
-  line-height: 1.1;
-}
-
-.about-title-accent {
-  color: var(--accent);
+  font-weight: var(--display-weight);
+  letter-spacing: var(--display-tracking);
+  line-height: var(--display-leading);
 }
 
 .about-shimmer-line {
@@ -114,7 +95,7 @@
 
 .about-callout-index {
   margin-bottom: 6px;
-  color: var(--accent);
+  color: var(--text-3);
   font-size: 10px;
   line-height: var(--body-leading);
 }
@@ -170,12 +151,12 @@
   width: 20px;
   height: 20px;
   flex: 0 0 auto;
-  color: var(--accent);
+  color: var(--text-2);
   stroke-width: 1.5;
 }
 
-.about-icon-accent {
-  color: var(--accent);
+.about-icon-ink {
+  color: var(--text-2);
 }
 
 .about-copy-stack {
@@ -197,15 +178,16 @@
   align-self: flex-start;
   gap: 8px;
   min-height: 24px;
-  color: var(--accent);
+  color: var(--text);
   font-size: 14px;
   font-weight: 500;
-  text-decoration: none;
+  text-decoration: underline;
+  text-decoration-color: var(--text-3);
+  text-underline-offset: 3px;
 }
 
 .about-inline-link:hover {
-  text-decoration: underline;
-  text-underline-offset: 3px;
+  text-decoration-color: var(--text);
 }
 
 .about-inline-link-text {
@@ -274,7 +256,7 @@
   width: 16px;
   height: 16px;
   flex: 0 0 auto;
-  color: var(--accent);
+  color: var(--text-2);
 }
 
 .about-source-external {
@@ -328,9 +310,9 @@
   width: 24px;
   height: 24px;
   margin-bottom: 8px;
-  border: var(--hairline-w) solid var(--accent);
+  border: var(--hairline-w) solid var(--border-strong);
   border-radius: var(--radius-sm);
-  color: var(--accent);
+  color: var(--text-3);
   font-size: 10px;
 }
 
@@ -381,13 +363,13 @@
   height: 8px;
   flex: 0 0 auto;
   margin-top: 7.2px;
-  border: var(--border-w) solid var(--accent);
+  border: var(--border-w) solid var(--text-3);
   border-radius: var(--radius-pill);
   background: transparent;
 }
 
 .about-tech-dot-filled {
-  background: var(--accent);
+  background: var(--text-3);
 }
 
 .about-tech-column .about-tech-item:nth-child(even) .about-tech-dot {
@@ -395,7 +377,7 @@
 }
 
 .about-tech-column .about-tech-item:nth-child(odd) .about-tech-dot {
-  background: var(--accent);
+  background: var(--text-3);
 }
 
 .about-tech-name {
@@ -425,7 +407,7 @@
   height: 6px;
   flex: 0 0 auto;
   border-radius: var(--radius-pill);
-  background: var(--accent);
+  background: var(--text-3);
 }
 
 .about-credits-grid {
@@ -475,7 +457,8 @@
   border-bottom: var(--hairline-w) solid var(--border);
 }
 
-.about-faq-trigger {
+/* DS .btn.ghost laid out as a full-width disclosure row. */
+.btn.about-faq-trigger {
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -491,10 +474,11 @@
   font-weight: 600;
   line-height: inherit;
   text-align: left;
+  white-space: normal;
 }
 
-.about-faq-trigger:hover {
-  color: var(--accent);
+.btn.about-faq-trigger:hover {
+  color: var(--text);
 }
 
 .about-faq-trigger:focus-visible {
@@ -512,7 +496,7 @@
 
 .about-faq-chevron-open {
   transform: rotate(0deg);
-  color: var(--accent);
+  color: var(--text);
 }
 
 .about-faq-panel {

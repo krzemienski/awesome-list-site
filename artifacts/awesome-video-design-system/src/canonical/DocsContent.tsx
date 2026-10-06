@@ -1,5 +1,5 @@
 // @ts-nocheck
-import { ACCENTS } from "../../../../client/src/lib/design-system";
+import { ACCENTS } from "../consumer";
 const SPACE_SCALE = [{name:'0',px:0},{name:'1',px:4},{name:'2',px:8},{name:'3',px:12},{name:'4',px:16},{name:'5',px:20},{name:'6',px:24},{name:'8',px:32},{name:'10',px:40},{name:'12',px:48},{name:'16',px:64},{name:'20',px:80}];
 /* =====================================================================
    DOCS CONTENT — every page lives here

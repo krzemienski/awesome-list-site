@@ -1,4 +1,5 @@
 import { formatDistanceToNow } from "date-fns";
+import { handoffFocusOnUnmount } from "@/hooks/focus-handoff";
 import { ArrowRight, BookOpen, Clock3, History, Play } from "lucide-react";
 import { Link } from "wouter";
 import { Button } from "@/components/ui/button";
@@ -55,8 +56,9 @@ export default function ContinueLearningPreview() {
           <Button
             variant="outline"
             size="sm"
-            onClick={() => refetch()}
-            disabled={isFetching}
+            onClick={(e) => { if (isFetching) return; handoffFocusOnUnmount(e.currentTarget); void refetch(); }}
+            aria-disabled={isFetching}
+            aria-busy={isFetching}
             data-testid="button-retry-learning-preview"
           >
             Retry
@@ -139,6 +141,7 @@ export default function ContinueLearningPreview() {
                   })
                 }
                 disabled={resumeJourney.isPending}
+                aria-label={`Resume: ${active.title}`}
                 data-testid={`button-preview-resume-${active.journeyId}`}
               >
                 <Play className="mr-2 h-4 w-4" />

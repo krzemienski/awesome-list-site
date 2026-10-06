@@ -79,7 +79,7 @@ function RecommendationCard({
           className="rounded-md border bg-muted/25 px-3 py-2 text-sm"
           data-testid={`recommendation-explanation-${resource.id}`}
         >
-          <summary className="cursor-pointer list-none font-medium focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring">
+          <summary aria-label={`Why this? ${resource.name}`} className="cursor-pointer list-none font-medium focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring">
             <span className="inline-flex items-center gap-2">
               <Lightbulb className="h-4 w-4 text-primary" />
               Why this?
@@ -118,6 +118,7 @@ function RecommendationCard({
               </p>
               <RecommendationFeedback
                 resourceId={Number(resource.id)}
+                title={resource.name}
                 initialFeedback={resource.feedback}
                 onFeedbackChange={onFeedbackChange}
               />
@@ -125,7 +126,7 @@ function RecommendationCard({
           ) : null}
 
           <Button asChild variant="outline" size="sm" className="w-full">
-            <a href={resource.url} target="_blank" rel="noopener noreferrer">
+            <a href={resource.url} target="_blank" rel="noopener noreferrer" aria-label={`View resource: ${resource.name} (opens in new tab)`}>
               <ExternalLink className="mr-2 h-4 w-4" />
               View resource
             </a>

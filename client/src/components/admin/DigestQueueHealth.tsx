@@ -4,6 +4,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { formatAdminDateTime } from "@/lib/utils";
 import { Stat } from "@/components/admin/AdminOpsPrimitives";
+import type { DigestJobStatus } from "@shared/notifications";
 import "@/styles/pages/admin-ops-github-links.css";
 
 interface Health {
@@ -15,11 +16,18 @@ interface Health {
 
 const title = (value: string) => value.replace(/_/g, " ").replace(/\b\w/g, (c) => c.toUpperCase());
 
+// C3-V5B-07: the health payload counts every digest job by status, including
+// finished ones (sent/failed/skipped). Only these are still in the queue.
+const IN_QUEUE_STATUSES: ReadonlySet<string> = new Set<DigestJobStatus>(["queued", "processing"]);
+
 export default function DigestQueueHealth() {
   const query = useQuery<Health>({ queryKey: ["/api/admin/digests/health"] });
   const total = query.data
     ? Object.values(query.data.queue).reduce(
-      (sum, statuses) => sum + Object.values(statuses).reduce((channelTotal, count) => channelTotal + count, 0),
+      (sum, statuses) => sum + Object.entries(statuses).reduce(
+        (channelTotal, [status, count]) => channelTotal + (IN_QUEUE_STATUSES.has(status) ? count : 0),
+        0,
+      ),
       0,
     )
     : 0;
@@ -27,7 +35,7 @@ export default function DigestQueueHealth() {
     <Card className="ops-digest-health" data-testid="card-digest-queue-health">
       <CardHeader className="ops-digest-health__header">
         <CardTitle className="flex items-center gap-2">
-          <Activity className="h-5 w-5 text-[var(--accent)]" />
+          <Activity className="h-5 w-5 text-[var(--text-2)]" />
           Digest delivery health
         </CardTitle>
         <p className="text-sm text-[color:var(--text-2)]">
@@ -58,7 +66,7 @@ export default function DigestQueueHealth() {
               <Stat
                 label={
                   <span className="ops-digest-health__stat-label-with-icon">
-                    <Radio className={`h-5 w-5 ${query.data.transport.available ? "text-[var(--accent)]" : "text-destructive"}`} />
+                    <Radio className={`h-5 w-5 ${query.data.transport.available ? "text-[var(--text-2)]" : "text-destructive"}`} />
                     Transport
                   </span>
                 }
@@ -75,7 +83,7 @@ export default function DigestQueueHealth() {
               <Stat
                 label={
                   <span className="ops-digest-health__stat-label-with-icon">
-                    <Clock3 className="h-5 w-5 text-[var(--accent)]" />
+                    <Clock3 className="h-5 w-5 text-[var(--text-2)]" />
                     Queue total
                   </span>
                 }
@@ -85,7 +93,7 @@ export default function DigestQueueHealth() {
               <Stat
                 label={
                   <span className="ops-digest-health__stat-label-with-icon">
-                    <CheckCircle2 className="h-5 w-5 text-[var(--accent)]" />
+                    <CheckCircle2 className="h-5 w-5 text-[var(--text-2)]" />
                     Oldest queued
                   </span>
                 }
@@ -97,27 +105,33 @@ export default function DigestQueueHealth() {
             </div>
 
             <section>
-              <h3 className="mb-3 text-sm font-semibold">Queue by channel and status</h3>
-              <div className="ops-digest-health__queue-grid">
-                {Object.entries(query.data.queue).map(([channel, statuses]) => (
-                  <div key={channel} className="ops-digest-health__queue-card">
-                    <p className="eyebrow">{title(channel)}</p>
-                    <dl className="mt-3 grid grid-cols-2 gap-2">
-                      {Object.entries(statuses).map(([status, count]) => (
-                        <div key={status} className="flex items-center justify-between text-sm">
-                          <dt className="text-[color:var(--text-2)]">{title(status)}</dt>
-                          <dd className="font-mono">{count}</dd>
-                        </div>
-                      ))}
-                    </dl>
-                  </div>
-                ))}
-              </div>
+              <h3 className="mb-3 text-sm font-semibold">Digest jobs by channel and status</h3>
+              {Object.keys(query.data.queue).length === 0 ? (
+                <p className="text-sm text-[color:var(--text-2)]">
+                  No digest jobs recorded.
+                </p>
+              ) : (
+                <div className="ops-digest-health__queue-grid">
+                  {Object.entries(query.data.queue).map(([channel, statuses]) => (
+                    <div key={channel} className="ops-digest-health__queue-card">
+                      <p className="eyebrow">{title(channel)}</p>
+                      <dl className="mt-3 grid grid-cols-2 gap-2">
+                        {Object.entries(statuses).map(([status, count]) => (
+                          <div key={status} className="flex items-center justify-between text-sm">
+                            <dt className="text-[color:var(--text-2)]">{title(status)}</dt>
+                            <dd className="font-mono">{count}</dd>
+                          </div>
+                        ))}
+                      </dl>
+                    </div>
+                  ))}
+                </div>
+              )}
             </section>
 
             <section>
               <h3 className="mb-3 flex items-center gap-2 text-sm font-semibold">
-                <AlertTriangle className="h-4 w-4 text-[var(--accent)]" />
+                <AlertTriangle className="h-4 w-4 text-[var(--text-2)]" />
                 Recent failure codes
               </h3>
               {query.data.recentFailureCodes.length ? (

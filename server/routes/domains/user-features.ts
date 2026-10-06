@@ -33,6 +33,7 @@ import {
   CollectionNotFoundError,
 } from "../../repositories";
 import { storage } from "../../storage";
+import { isForeignKeyViolation } from "../../errors/pgErrors";
 import { db } from "../../db";
 import {
   DEFAULT_HOME_LAYOUT,
@@ -58,6 +59,7 @@ import {
   personalTagsSchema,
 } from "@shared/bookmarkCollections";
 import { PG_INT_MAX } from "../../validation/inputs";
+import { stripInternalResourceFields } from "../../lib/publicResource";
 
 /**
  * Everything the user-features handlers need from the composition root.
@@ -80,6 +82,11 @@ export interface UserFeaturesContext {
   SITE_URL: string;
   parseBoundedInt: (value: unknown) => number | null;
 }
+
+
+// C7-API-02: bookmark Undo may restore its original saved date (C6-VX-01).
+const RESTORE_DATE_PATTERN = /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(?:\.\d{1,3})?Z$/;
+const RESTORE_DATE_FLOOR = Date.UTC(2000, 0, 1);
 
 export function registerUserFeatureRoutes(
   app: Express,
@@ -108,6 +115,9 @@ export function registerUserFeatureRoutes(
       await userFeatureRepo.addFavorite(userId, resourceId);
       res.json({ message: 'Favorite added successfully' });
     } catch (error) {
+      if (isForeignKeyViolation(error)) {
+        return res.status(404).json({ message: 'Resource not found' });
+      }
       console.error('Error adding favorite:', error);
       res.status(500).json({ message: 'Failed to add favorite' });
     }
@@ -132,7 +142,7 @@ export function registerUserFeatureRoutes(
     try {
       const userId = req.dbUser.id;
       const favorites = await userFeatureRepo.getUserFavorites(userId);
-      res.json(favorites);
+      res.json(favorites.map(stripInternalResourceFields));
     } catch (error) {
       console.error('Error fetching favorites:', error);
       res.status(500).json({ message: 'Failed to fetch favorites' });
@@ -147,13 +157,32 @@ export function registerUserFeatureRoutes(
     try {
       const userId = req.dbUser.id;
       const resourceId = parseInt(req.params.resourceId);
-      const { notes } = req.body;
+      const { notes, restoreCreatedAt } = req.body;
+      // C6-VX-01: Undo re-saves with the removed bookmark's original saved
+      // date so it keeps its place in "Newest saved". Only a valid past date
+      // is honoured; anything else is ignored and the row is dated now.
+      // C7-API-02: only the strict UTC ISO form the API itself returns, between
+      // 2000 and now; Date() alone accepted "1"/"Jan 1 2000", remapped years
+      // 0001-0099 and threw a 500 on year 0.
+      let savedAt: Date | undefined;
+      if (typeof restoreCreatedAt === 'string' && RESTORE_DATE_PATTERN.test(restoreCreatedAt)) {
+        const parsed = new Date(restoreCreatedAt);
+        const time = parsed.getTime();
+        // C8-API-02: Date rolls impossible dates over (Feb 30 -> Mar 2); the
+        // round-trip must give back the same calendar date and time.
+        const sameMoment = !Number.isNaN(time)
+          && parsed.toISOString().slice(0, 19) === restoreCreatedAt.slice(0, 19);
+        if (sameMoment && time >= RESTORE_DATE_FLOOR && time <= Date.now()) savedAt = parsed;
+      }
       
       // BUG-021: echo the canonical saved state so surfaces holding local
       // bookmark state (e.g. BookmarkButton) can sync notes after an edit.
-      const saved = await userFeatureRepo.addBookmark(userId, resourceId, notes);
+      const saved = await userFeatureRepo.addBookmark(userId, resourceId, notes, savedAt);
       res.json({ message: 'Bookmark added successfully', isBookmarked: true, notes: saved.notes ?? '' });
     } catch (error) {
+      if (isForeignKeyViolation(error)) {
+        return res.status(404).json({ message: 'Resource not found' });
+      }
       console.error('Error adding bookmark:', error);
       res.status(500).json({ message: 'Failed to add bookmark' });
     }
@@ -178,7 +207,7 @@ export function registerUserFeatureRoutes(
     try {
       const userId = req.dbUser.id;
       const bookmarks = await userFeatureRepo.getUserBookmarks(userId);
-      res.json(bookmarks);
+      res.json(bookmarks.map(stripInternalResourceFields));
     } catch (error) {
       console.error('Error fetching bookmarks:', error);
       res.status(500).json({ message: 'Failed to fetch bookmarks' });
@@ -483,6 +512,7 @@ export function registerUserFeatureRoutes(
 
   // ---- API key management (session-authed) -------------------------------
   // POST /api/user/api-keys — create a key; the plaintext is returned ONCE.
+  const MAX_API_KEY_EXPIRY_DAYS = 3650;
   app.post('/api/user/api-keys', isAuthenticated, async (req: any, res) => {
     try {
       const userId = req.dbUser.id;
@@ -497,8 +527,10 @@ export function registerUserFeatureRoutes(
       let expiresAt: Date | null = null;
       if (expiresInDays !== undefined && expiresInDays !== null) {
         const days = Number(expiresInDays);
-        if (!Number.isFinite(days) || days <= 0) {
-          return res.status(400).json({ message: '"expiresInDays" must be a positive number' });
+        // Bounded so the computed date stays valid (1e308 overflowed to an
+        // Invalid Date and crashed the insert with a 500).
+        if (!Number.isFinite(days) || days <= 0 || days > MAX_API_KEY_EXPIRY_DAYS) {
+          return res.status(400).json({ message: `"expiresInDays" must be a positive number of at most ${MAX_API_KEY_EXPIRY_DAYS}` });
         }
         expiresAt = new Date(Date.now() + days * 24 * 60 * 60 * 1000);
       }
@@ -927,10 +959,15 @@ export function registerUserFeatureRoutes(
         }
       }
 
+      // Dismissing is only meaningful before onboarding is finished; a stale
+      // tab or "save and browse later" on a revisit must not erase completion.
       const onboardingStatus: OnboardingStatus =
-        parsed.data.onboardingStatus ??
-        current?.onboardingStatus ??
-        'not_started';
+        parsed.data.onboardingStatus === 'dismissed' &&
+        current?.onboardingStatus === 'completed'
+          ? 'completed'
+          : parsed.data.onboardingStatus ??
+            current?.onboardingStatus ??
+            'not_started';
       const onboardingStep =
         parsed.data.onboardingStep ?? current?.onboardingStep ?? 1;
 
@@ -1060,19 +1097,21 @@ export function registerUserFeatureRoutes(
       const userId = req.dbUser.id;
       const { type, status, sort, q, page, limit } = parsed.data;
       const dashboard = await auditRepo.getContributorDashboardData(userId);
-      const statusCounts = {
-        pending: 0,
-        approved: 0,
-        rejected: 0,
-        withdrawn: 0,
-        superseded: 0,
+      const countByStatus = (items: typeof dashboard.items) => {
+        const counts = {
+          pending: 0,
+          approved: 0,
+          rejected: 0,
+          withdrawn: 0,
+          superseded: 0,
+        };
+        for (const item of items) counts[item.status]++;
+        return counts;
       };
-      for (const item of dashboard.items) statusCounts[item.status]++;
 
       const normalizedQuery = q.toLocaleLowerCase();
-      const filtered = dashboard.items.filter((item) => {
+      const inScope = dashboard.items.filter((item) => {
         if (type !== 'all' && item.kind !== type) return false;
-        if (status !== 'all' && item.status !== status) return false;
         if (!normalizedQuery) return true;
         const searchable = [
           item.title,
@@ -1089,6 +1128,10 @@ export function registerUserFeatureRoutes(
           .toLocaleLowerCase();
         return searchable.includes(normalizedQuery);
       });
+      const filtered =
+        status === 'all'
+          ? inScope
+          : inScope.filter((item) => item.status === status);
 
       filtered.sort((a, b) => {
         const byTime = a.changedAt.getTime() - b.changedAt.getTime();
@@ -1112,11 +1155,15 @@ export function registerUserFeatureRoutes(
           total,
           totalPages,
         },
+        // summary is the whole timeline (metrics, empty state); statusCounts
+        // honours the type and search filters so the status options offered
+        // for the current scope never promise results that aren't there.
         summary: {
           total: dashboard.items.length,
-          ...statusCounts,
+          ...countByStatus(dashboard.items),
           ...dashboard.impact,
         },
+        statusCounts: countByStatus(inScope),
         definitions: {
           acceptedContributions:
             'Resource submissions and edit suggestions that moderators approved.',

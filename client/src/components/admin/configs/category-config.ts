@@ -3,11 +3,12 @@ import { getCategoryIcon } from "@/config/navigation-icons";
 import { createElement } from "react";
 import { GenericCrudManagerProps, BaseEntityWithCount } from "../GenericCrudManager";
 
-interface CategoryWithCount extends BaseEntityWithCount {
+export interface CategoryWithCount extends BaseEntityWithCount {
   id: number;
   name: string;
   slug: string;
   resourceCount: number;
+  subcategoryCount: number;
 }
 
 export const categoryConfig: GenericCrudManagerProps<CategoryWithCount> = {
@@ -20,6 +21,7 @@ export const categoryConfig: GenericCrudManagerProps<CategoryWithCount> = {
   createUrl: "/api/admin/categories",
   updateUrl: (id: number) => `/api/admin/categories/${id}`,
   deleteUrl: (id: number) => `/api/admin/categories/${id}`,
+  childCount: { key: "subcategoryCount", singular: "subcategory", plural: "subcategories" },
   queryKey: "/api/admin/categories",
   publicQueryKey: "/api/categories",
   testIdPrefix: "category-manager",

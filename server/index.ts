@@ -31,7 +31,7 @@ import {
   hasValidAuditKey,
   hasValidAuthReturnAuditKey,
 } from "./clerkAuth";
-import { HASHED_ASSET_CACHE_CONTROL } from "./http-cache-policy";
+import { HASHED_ASSET_CACHE_CONTROL, SESSION_CACHE_CONTROL } from "./http-cache-policy";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -426,9 +426,16 @@ const clerkSessionMiddleware = clerkMiddleware((req) => ({
 // would always bounce to /sign-in. Anonymous dev loads of THESE paths still
 // take Clerk's handshake redirect — acceptable: they'd be redirected to
 // /sign-in anyway, and audit scripts reach them with the audit-key bypass.
+// Every client route that renders only inside AuthGuard/AdminGuard (no
+// signed-out state of its own) belongs here, so anonymous loads get the same
+// 302 instead of an SSR 200 shell that only redirects after hydration.
+// /bookmarks and /submit are deliberately absent: both render for guests.
 export const PROTECTED_PAGE_PATTERNS = [
   /^\/admin(\/|$)/,
   /^\/profile(\/|$)/,
+  /^\/onboarding\/?$/,
+  /^\/contributions\/?$/,
+  /^\/notifications\/?$/,
 ];
 const needsClerkAuth = (req: express.Request) =>
   req.path.startsWith("/api") ||
@@ -459,6 +466,12 @@ app.use((req, res, next) => {
   if (!needsClerkAuth(req)) return next();
   if (isProtectedPage(req) && hasValidAuthReturnAuditKey(req)) return next();
   return clerkUserContext(req, res, next);
+});
+// Session responses default to private, no-store; a handler that sets its own
+// Cache-Control later overrides this. See server/http-cache-policy.ts.
+app.use("/api", (req, res, next) => {
+  if (req.dbUser) res.set("Cache-Control", SESSION_CACHE_CONTROL);
+  next();
 });
 
 app.use((req, res, next) => {
@@ -550,7 +563,7 @@ app.use((req, res, next) => {
   // their real handlers, not intercepted) but BEFORE vite/static so the HTML
   // response is rewritten with route-specific tags for crawlers that don't
   // execute JavaScript (Twitter, Facebook, Slack, iMessage, LinkedIn, etc.).
-  const { ogInjectionMiddleware } = await import("./og-middleware");
+  const { ogInjectionMiddleware, isEntityRoutePath } = await import("./og-middleware");
   app.use(ogInjectionMiddleware());
 
   // importantly only setup vite in development and after
@@ -593,13 +606,15 @@ app.use((req, res, next) => {
     // index.html (soft-404 that masks dead assets and "confirms" sensitive
     // filenames). If the last path segment contains a dot and no real file
     // exists under the static root, answer 404 before serveStatic's fallback.
-    // Extension-less SPA routes are untouched. Dev is exempt on purpose: the
+    // Extension-less SPA routes are untouched, and so are id/slug routes whose
+    // segment merely contains a dot (/journey/1.5): og-middleware marks those
+    // 404 and the SPA renders its not-found page. Dev is exempt on purpose: the
     // Vite dev pipeline serves dotted module paths (/src/App.tsx, /@vite/…).
     const staticRoot = path.resolve(import.meta.dirname, "public");
     app.use((req, res, next) => {
       if (req.method !== "GET" && req.method !== "HEAD") return next();
       const lastSegment = req.path.split("/").pop() ?? "";
-      if (!lastSegment.includes(".")) return next();
+      if (!lastSegment.includes(".") || isEntityRoutePath(req.path)) return next();
       try {
         const decoded = decodeURIComponent(req.path);
         const candidate = path.resolve(staticRoot, "." + decoded);
@@ -647,6 +662,14 @@ app.use((req, res, next) => {
 
   server.listen(listenOptions, () => {
     log(`serving on port ${port} (${isProduction ? 'production' : 'development'} mode)`);
+
+    // A second deployment sharing the production database sets
+    // DISABLE_BACKGROUND_JOBS=1 so only the primary runs the schedulers and the
+    // startup watchdog, which fails every pending/processing enrichment job.
+    if (process.env.DISABLE_BACKGROUND_JOBS === '1') {
+      log('background jobs disabled (DISABLE_BACKGROUND_JOBS=1)');
+      return;
+    }
 
     // Run background initialization AFTER server is listening
     // This ensures fast startup for production deployments

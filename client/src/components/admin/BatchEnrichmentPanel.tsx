@@ -47,9 +47,11 @@ import { apiRequest, ApiError } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
 import { AgentEventLog } from "@/components/admin/AgentEventLog";
 import { AgentCommsGraph } from "@/components/admin/AgentCommsGraph";
-import { StatusChip, TableShell } from "@/components/admin/AdminOpsPrimitives";
+import { Stat, StatusChip, TableShell } from "@/components/admin/AdminOpsPrimitives";
 import type { EnrichmentJob } from "@shared/schema";
 import "./queues-agent.css";
+
+const CANONICAL_JOB_ROWS = 6;
 
 interface JobsResponse {
   success: boolean;
@@ -63,23 +65,23 @@ interface JobStatusResponse {
 
 /**
  * Enrichment colors use the global DS status constants:
- * DS-OK: #34d08c ok / #ffb84d warn / #ff5c7a bad / #5eddf2 info.
+ * DS-OK: var(--status-ok) ok / var(--status-warn) warn / var(--status-bad) bad / var(--status-info) info.
  */
-const JOB_PROCESSING_CLASS = 'bg-[#5eddf2] text-black hover:bg-[#5eddf2]/90 animate-pulse'; // DS-OK: cyan info (DS chart/info constant)
-const JOB_COMPLETED_CLASS = 'bg-[#34d08c] text-black hover:bg-[#34d08c]/90'; // DS-OK: status ok
-const JOB_FAILED_CLASS = 'bg-[#ff5c7a] text-black hover:bg-[#ff5c7a]/90'; // DS-OK: status bad
-const INFO_PANEL_CLASS = 'border-[#5eddf2]/20'; // DS-OK: cyan info (DS chart/info constant)
-const WARN_PANEL_CLASS = 'border-[#ffb84d]/20 bg-[#ffb84d]/5'; // DS-OK: status warn
-const OK_TEXT_CLASS = 'text-[#34d08c]'; // DS-OK: status ok
-const WARN_TEXT_CLASS = 'text-[#ffb84d]'; // DS-OK: status warn
-const BAD_TEXT_CLASS = 'text-[#ff5c7a]'; // DS-OK: status bad
-const INFO_TEXT_CLASS = 'text-[#5eddf2]'; // DS-OK: cyan info (DS chart/info constant)
-const OK_BORDER_CLASS = 'border-[#34d08c]/20'; // DS-OK: status ok
-const WARN_BORDER_CLASS = 'border-[#ffb84d]/20'; // DS-OK: status warn
-const BAD_BORDER_CLASS = 'border-[#ff5c7a]/20'; // DS-OK: status bad
-const OK_OUTLINE_CLASS = 'border-[#34d08c] text-[#34d08c]'; // DS-OK: status ok
-const WARN_OUTLINE_CLASS = 'border-[#ffb84d] text-[#ffb84d]'; // DS-OK: status warn
-const BAD_OUTLINE_CLASS = 'border-[#ff5c7a] text-[#ff5c7a]'; // DS-OK: status bad
+const JOB_PROCESSING_CLASS = 'bg-[var(--status-info)] text-black hover:bg-[var(--status-info)]/90 animate-pulse'; // DS-OK: cyan info (DS chart/info constant)
+const JOB_COMPLETED_CLASS = 'bg-[var(--status-ok)] text-black hover:bg-[var(--status-ok)]/90'; // DS-OK: status ok
+const JOB_FAILED_CLASS = 'bg-[var(--status-bad)] text-black hover:bg-[var(--status-bad)]/90'; // DS-OK: status bad
+const INFO_PANEL_CLASS = 'border-[var(--status-info)]/20'; // DS-OK: cyan info (DS chart/info constant)
+const WARN_PANEL_CLASS = 'border-[var(--status-warn)]/20 bg-[var(--status-warn)]/5'; // DS-OK: status warn
+const OK_TEXT_CLASS = 'text-[var(--status-ok)]'; // DS-OK: status ok
+const WARN_TEXT_CLASS = 'text-[var(--status-warn)]'; // DS-OK: status warn
+const BAD_TEXT_CLASS = 'text-[var(--status-bad)]'; // DS-OK: status bad
+const INFO_TEXT_CLASS = 'text-[var(--status-info)]'; // DS-OK: cyan info (DS chart/info constant)
+const OK_BORDER_CLASS = 'border-[var(--status-ok)]/20'; // DS-OK: status ok
+const WARN_BORDER_CLASS = 'border-[var(--status-warn)]/20'; // DS-OK: status warn
+const BAD_BORDER_CLASS = 'border-[var(--status-bad)]/20'; // DS-OK: status bad
+const OK_OUTLINE_CLASS = 'border-[var(--status-ok)] text-[var(--status-ok)]'; // DS-OK: status ok
+const WARN_OUTLINE_CLASS = 'border-[var(--status-warn)] text-[var(--status-warn)]'; // DS-OK: status warn
+const BAD_OUTLINE_CLASS = 'border-[var(--status-bad)] text-[var(--status-bad)]'; // DS-OK: status bad
 
 /**
  * Mean of the per-job cost the enrichment agent records
@@ -111,7 +113,10 @@ export default function BatchEnrichmentPanel() {
   const defaultBaseUrl = aiDefaults.config?.baseUrl;
   
   const [filter, setFilter] = useState<'all' | 'unenriched'>('unenriched');
-  const [batchSize, setBatchSize] = useState(10);
+  // C6-V5A-02: the field's own text, so it can be emptied; the number is derived.
+  const [batchSizeText, setBatchSizeText] = useState("10");
+  const parsedBatchSize = parseInt(batchSizeText, 10);
+  const batchSize = Number.isNaN(parsedBatchSize) ? 0 : parsedBatchSize;
   const [showAdvanced, setShowAdvanced] = useState(false);
   const [model, setModel] = useState("");
   const [baseUrl, setBaseUrl] = useState("");
@@ -122,6 +127,7 @@ export default function BatchEnrichmentPanel() {
   const [jobToCancel, setJobToCancel] = useState<number | null>(null);
   // Run23 NB-040: explicit confirmation before starting a paid enrichment job.
   const [confirmStart, setConfirmStart] = useState(false);
+  const [showAllJobs, setShowAllJobs] = useState(false);
 
   const [isPolling, setIsPolling] = useState(false);
 
@@ -225,6 +231,7 @@ export default function BatchEnrichmentPanel() {
   });
 
   const jobs = jobsData?.jobs || [];
+  const visibleJobs = showAllJobs ? jobs : jobs.slice(0, CANONICAL_JOB_ROWS);
   // A missing or failed list response cannot establish whether another job is
   // active. Keep paid launches disabled until the active-job state is known.
   const activeJobStateKnown =
@@ -386,23 +393,21 @@ export default function BatchEnrichmentPanel() {
           {(() => {
             const lastCompleted = jobs.find((job) => job.status === "completed");
             return (
-              <div className="card queues-agent__stat">
-                <div className="mono">Last enriched</div>
-                <div>{formatRelativeAgo(lastCompleted?.completedAt ?? null)}</div>
-                <div>{lastCompleted ? `batch #${lastCompleted.id} · ${lastCompleted.successfulResources || 0} entries` : "No completed batches"}</div>
-              </div>
+              <Stat
+                className="queues-agent__stat"
+                label="Last enriched"
+                value={formatRelativeAgo(lastCompleted?.completedAt ?? null)}
+                sub={lastCompleted ? `batch #${lastCompleted.id} · ${lastCompleted.successfulResources || 0} entries` : "No completed batches"}
+              />
             );
           })()}
-          <div className="card queues-agent__stat">
-            <div className="mono">Queue</div>
-            <div>{jobs.filter((job) => job.status === "pending" || job.status === "processing").length}</div>
-            <div>{hasActiveJob ? "active" : "idle"}</div>
-          </div>
-          <div className="card queues-agent__stat">
-            <div className="mono">Avg cost</div>
-            <div>{averageBatchCost(jobs)}</div>
-            <div>per batch</div>
-          </div>
+          <Stat
+            className="queues-agent__stat"
+            label="Queue"
+            value={jobs.filter((job) => job.status === "pending" || job.status === "processing").length}
+            sub={hasActiveJob ? "active" : "idle"}
+          />
+          <Stat className="queues-agent__stat" label="Avg cost" value={averageBatchCost(jobs)} sub="per batch" />
         </div>
         <TableShell
           title="Enrichment jobs"
@@ -420,21 +425,22 @@ export default function BatchEnrichmentPanel() {
             </Button>
           }
         >
-          <div className="queues-agent__canonical-table">
+          <div
+            className="queues-agent__canonical-table focus-visible:outline focus-visible:outline-2 focus-visible:outline-ring"
+            tabIndex={0}
+            role="region"
+            aria-label="Enrichment jobs table, scrollable"
+          >
             <table className="table">
               <thead>
-                <tr><th>Job</th><th>Status</th><th>Started</th><th>Completed</th><th /></tr>
+                <tr><th>Job</th><th>Status</th><th>Started</th><th>Completed</th><th><span className="sr-only">Actions</span></th></tr>
               </thead>
               <tbody>
-                {jobs.slice(0, 6).map((job) => (
+                {visibleJobs.map((job) => (
                   <tr key={job.id}>
                     <td className="mono queues-agent__cell-mono">#{job.id}</td>
                     <td>
-                      {(() => {
-                        const status = effectiveStatus(job);
-                        const tone = status === "completed" ? "ok" : status === "failed" ? "bad" : status === "pending" ? "warn" : status === "cancelled" ? "muted" : "";
-                        return <span className={`chip ${tone}`}>{status}</span>;
-                      })()}
+                      <StatusChip status={effectiveStatus(job)} />
                     </td>
                     <td className="mono muted queues-agent__cell-mono queues-agent__cell-muted">{job.startedAt ? new Date(job.startedAt).toLocaleString("en-US") : "—"}</td>
                     <td className="mono muted queues-agent__cell-mono queues-agent__cell-muted">{job.completedAt ? new Date(job.completedAt).toLocaleString("en-US") : "—"}</td>
@@ -453,6 +459,20 @@ export default function BatchEnrichmentPanel() {
             </table>
             {!isLoading && jobs.length === 0 ? <p className="queues-agent__empty">No enrichment jobs found.</p> : null}
           </div>
+          {jobs.length > CANONICAL_JOB_ROWS ? (
+            <div className="queues-agent__table-more">
+              <Button
+                type="button"
+                className="btn ghost"
+                variant="ghost"
+                onClick={() => setShowAllJobs((open) => !open)}
+                aria-expanded={showAllJobs}
+                data-testid="button-show-all-enrichment-jobs"
+              >
+                {showAllJobs ? "Show fewer" : `Show all ${jobs.length} jobs`}
+              </Button>
+            </div>
+          ) : null}
         </TableShell>
       </div>
       <details className="queues-agent__more">
@@ -509,13 +529,12 @@ export default function BatchEnrichmentPanel() {
                 type="number"
                 min={1}
                 max={50}
-                value={batchSize}
+                value={batchSizeText}
                 onChange={(e) => {
                   // Run15 BUG-019: parseInt(...) || 10 coerced 0 to 10, silently
                   // bypassing the 1-50 guard and starting a real job. Keep the
-                  // raw value so handleStartEnrichment can reject it.
-                  const v = parseInt(e.target.value, 10);
-                  setBatchSize(Number.isNaN(v) ? 0 : v);
+                  // raw text; empty/NaN derives 0 so the 1-50 guard rejects it.
+                  setBatchSizeText(e.target.value);
                 }}
                 disabled={hasActiveJob}
                 aria-invalid={batchSizeInvalid}
@@ -543,8 +562,10 @@ export default function BatchEnrichmentPanel() {
               type="button"
               variant="ghost"
               onClick={() => setShowAdvanced(v => !v)}
-              className="flex h-auto w-full items-center justify-between px-3 py-2 text-sm font-medium hover:bg-muted/50"
+              className="flex h-auto w-full items-center justify-between whitespace-normal px-3 py-2 text-left text-sm font-medium hover:bg-muted/50"
               disabled={hasActiveJob}
+              aria-expanded={showAdvanced}
+              aria-controls="advanced-enrichment-region"
               data-testid="button-toggle-advanced-enrichment"
             >
               <span className="flex items-center gap-2">
@@ -554,7 +575,7 @@ export default function BatchEnrichmentPanel() {
               {showAdvanced ? <ChevronDown className="w-4 h-4" /> : <ChevronRight className="w-4 h-4" />}
             </Button>
             {showAdvanced && (
-              <div className="space-y-3 border-t px-3 py-3">
+              <div id="advanced-enrichment-region" className="space-y-3 border-t px-3 py-3">
                 <div className="space-y-2">
                   <Label htmlFor="enrich-model" className="flex items-center gap-1.5">
                     <Cpu className="w-3.5 h-3.5 text-muted-foreground" />Model
@@ -946,17 +967,24 @@ export default function BatchEnrichmentPanel() {
             </Alert>
           )}
           {selectedJobData?.job && (
-            <ScrollArea className="max-h-[60vh] pr-4">
+            // Radix wraps viewport content in an inline display:table div that
+            // grows to the widest descendant's max-content (a long log line or
+            // model id), pushing the second grid column off-screen on mobile.
+            // Forcing it to block makes everything wrap to the dialog width.
+            <ScrollArea className="max-h-[60vh] pr-4" viewportClassName="[&>div]:!block [&>div]:!w-full [&>div]:!min-w-0">
               <div className="space-y-6">
                 <div>
                   <h3 className="font-semibold mb-2 flex items-center gap-2">
                     <Info className="h-4 w-4" />
                     Configuration
                   </h3>
-                  <div className="grid grid-cols-2 gap-4 text-sm">
+                  {/* min-w-0 + break-all: a long model id must wrap inside its
+                      column, or grid min-content widens the ScrollArea's table
+                      wrapper and clips the second column off-screen on mobile. */}
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-sm [&>div]:min-w-0">
                     <div>
                       <div className="text-muted-foreground">Filter</div>
-                      <div className="font-mono">{selectedJobData.job.filter || 'all'}</div>
+                      <div className="font-mono break-all">{selectedJobData.job.filter || 'all'}</div>
                     </div>
                     <div>
                       <div className="text-muted-foreground">Batch Size</div>
@@ -964,11 +992,11 @@ export default function BatchEnrichmentPanel() {
                     </div>
                     <div>
                       <div className="text-muted-foreground">Model</div>
-                      <div className="font-mono">{selectedJobData.job.model || (defaultEnrichmentModel ? `${defaultEnrichmentModel} (default)` : 'default')}</div>
+                      <div className="font-mono break-words">{selectedJobData.job.model || (defaultEnrichmentModel ? `${defaultEnrichmentModel} (default)` : 'default')}</div>
                     </div>
                     <div>
                       <div className="text-muted-foreground">Base URL</div>
-                      <div className="font-mono break-all">{selectedJobData.job.baseUrl || 'Platform default'}</div>
+                      <div className="font-mono break-words">{selectedJobData.job.baseUrl || 'Platform default'}</div>
                     </div>
                     <div>
                       <div className="text-muted-foreground">Auth Token</div>

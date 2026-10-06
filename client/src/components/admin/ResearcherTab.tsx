@@ -45,49 +45,50 @@ import {
 } from "lucide-react";
 import { formatAdminDate } from "@/lib/utils";
 import { fetchStaticAwesomeList } from "@/lib/static-data";
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { keepPreviousData, useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useAiDefaults } from "@/hooks/useAiDefaults";
 import { apiRequest, ApiError } from "@/lib/queryClient";
 import { sanitizeDisplay } from "@/lib/sanitize-display";
 import { useToast } from "@/hooks/use-toast";
 import type { ResearchJob, ResearchDiscovery } from "@shared/schema";
 import "./queues-agent.css";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 
-const INFO_STATUS_BADGE = "bg-[#5eddf2]/20 text-[#5eddf2] border-[#5eddf2]/30"; // DS-OK: cyan info (DS chart/info constant)
-const OK_STATUS_BADGE = "bg-[#34d08c]/20 text-[#34d08c] border-[#34d08c]/30"; // DS-OK: status ok
-const WARN_OUTLINE = "border-[#ffb84d]/30 text-[#ffb84d]"; // DS-OK: status warn
-const OK_OUTLINE = "text-xs shrink-0 text-[#34d08c] border-[#34d08c]/30"; // DS-OK: status ok
-const WARN_TEXT = "text-[#ffb84d]"; // DS-OK: status warn
-const INFO_BORDER = "border-[#5eddf2]/20"; // DS-OK: cyan info (DS chart/info constant)
-const OK_SOLID_BUTTON = "bg-[#34d08c] text-black hover:bg-[#34d08c]/90"; // DS-OK: status ok
-const OK_TEXT = "text-[#34d08c]"; // DS-OK: status ok
-const BAD_TEXT = "text-[#ff5c7a]"; // DS-OK: status bad
+const INFO_STATUS_BADGE = "bg-[var(--status-info)]/20 text-[var(--status-info)] border-[var(--status-info)]/30"; // DS-OK: cyan info (DS chart/info constant)
+const OK_STATUS_BADGE = "bg-[var(--status-ok)]/20 text-[var(--status-ok)] border-[var(--status-ok)]/30"; // DS-OK: status ok
+const WARN_OUTLINE = "border-[var(--status-warn)]/30 text-[var(--status-warn)]"; // DS-OK: status warn
+const OK_OUTLINE = "text-xs shrink-0 text-[var(--status-ok)] border-[var(--status-ok)]/30"; // DS-OK: status ok
+const WARN_TEXT = "text-[var(--status-warn)]"; // DS-OK: status warn
+const INFO_BORDER = "border-[var(--status-info)]/20"; // DS-OK: cyan info (DS chart/info constant)
+const OK_SOLID_BUTTON = "bg-[var(--status-ok)] text-black hover:bg-[var(--status-ok)]/90"; // DS-OK: status ok
+const OK_TEXT = "text-[var(--status-ok)]"; // DS-OK: status ok
+const BAD_TEXT = "text-[var(--status-bad)]"; // DS-OK: status bad
+const CANONICAL_JOB_ROWS = 5;
 
 /**
  * Agent roles use the global DS status/info constants. Related role variants
  * retain hierarchy through opacity rather than separate palette shades.
  */
 const AGENT_ROLE_BADGE_STYLES: Record<string, string> = {
-  error: "border-[#ff5c7a]/50 text-[#ff5c7a]", // DS-OK: status bad
-  tool_error: "border-[#ff5c7a]/50 text-[#ff5c7a]", // DS-OK: status bad
-  system: "border-[#ffb84d]/50 text-[#ffb84d]", // DS-OK: status warn
-  tool_call: "border-[#5eddf2]/50 text-[#5eddf2]", // DS-OK: cyan info (DS chart/info constant)
-  tool_result: "border-[#34d08c]/50 text-[#34d08c]", // DS-OK: status ok
-  web_search: "border-[#9d4edd]/50 text-[#9d4edd]", // DS-OK: violet info (DS chart/info constant)
-  web_search_result: "border-[#9d4edd]/30 text-[#9d4edd]/80", // DS-OK: violet info (DS chart/info constant)
-  assistant: "border-[#5eddf2]/50 text-[#5eddf2]/80", // DS-OK: cyan info (DS chart/info constant)
+  error: "border-[var(--status-bad)]/50 text-[var(--status-bad)]", // DS-OK: status bad
+  tool_error: "border-[var(--status-bad)]/50 text-[var(--status-bad)]", // DS-OK: status bad
+  system: "border-[var(--status-warn)]/50 text-[var(--status-warn)]", // DS-OK: status warn
+  tool_call: "border-[var(--status-info)]/50 text-[var(--status-info)]", // DS-OK: cyan info (DS chart/info constant)
+  tool_result: "border-[var(--status-ok)]/50 text-[var(--status-ok)]", // DS-OK: status ok
+  web_search: "border-[var(--status-info-2)]/50 text-[var(--status-info-2)]", // DS-OK: violet info (DS chart/info constant)
+  web_search_result: "border-[var(--status-info-2)]/30 text-[var(--status-info-2)]/80", // DS-OK: violet info (DS chart/info constant)
+  assistant: "border-[var(--status-info)]/50 text-[var(--status-info)]/80", // DS-OK: cyan info (DS chart/info constant)
 };
 
 const AGENT_ROLE_TEXT_STYLES: Record<string, string> = {
-  error: "text-[#ff5c7a]", // DS-OK: status bad
-  tool_error: "text-[#ff5c7a]", // DS-OK: status bad
-  system: "text-[#ffb84d]", // DS-OK: status warn
-  tool_call: "text-[#5eddf2]", // DS-OK: cyan info (DS chart/info constant)
-  tool_result: "text-[#34d08c]", // DS-OK: status ok
-  web_search: "text-[#9d4edd]", // DS-OK: violet info (DS chart/info constant)
-  web_search_result: "text-[#9d4edd]/80", // DS-OK: violet info (DS chart/info constant)
-  assistant: "text-[#5eddf2]/80", // DS-OK: cyan info (DS chart/info constant)
+  error: "text-[var(--status-bad)]", // DS-OK: status bad
+  tool_error: "text-[var(--status-bad)]", // DS-OK: status bad
+  system: "text-[var(--status-warn)]", // DS-OK: status warn
+  tool_call: "text-[var(--status-info)]", // DS-OK: cyan info (DS chart/info constant)
+  tool_result: "text-[var(--status-ok)]", // DS-OK: status ok
+  web_search: "text-[var(--status-info-2)]", // DS-OK: violet info (DS chart/info constant)
+  web_search_result: "text-[var(--status-info-2)]/80", // DS-OK: violet info (DS chart/info constant)
+  assistant: "text-[var(--status-info)]/80", // DS-OK: cyan info (DS chart/info constant)
 };
 
 function getStatusBadge(status: string) {
@@ -264,9 +265,24 @@ export default function ResearcherTab({ initialTab = "launch" }: ResearcherTabPr
     // R5-037: refresh admin data when the operator returns to the tab.
     staleTime: 30_000,
     refetchOnWindowFocus: true,
+    // C3-V5A-04: each "Load more" is a new key. Holding the current rows keeps
+    // the button mounted while the next window loads, so focus stays on it.
+    placeholderData: keepPreviousData,
   });
   const jobs = jobsData?.jobs;
   const jobsTotal = jobsData?.total ?? 0;
+  const [showAllJobs, setShowAllJobs] = useState(false);
+  const visibleJobs = showAllJobs ? (jobs ?? []) : (jobs ?? []).slice(0, CANONICAL_JOB_ROWS);
+  const hasMoreJobs = !!jobs && (jobs.length > visibleJobs.length || jobsTotal > jobs.length);
+  // When the last "Load more" removes the button, hand focus to the table
+  // region instead of letting it fall to <body>.
+  const jobsRegionRef = useRef<HTMLDivElement>(null);
+  const jobsMoreFocusPending = useRef(false);
+  useEffect(() => {
+    if (!jobsMoreFocusPending.current || jobsFetching) return;
+    jobsMoreFocusPending.current = false;
+    if (!hasMoreJobs) jobsRegionRef.current?.focus();
+  }, [hasMoreJobs, jobsFetching]);
   // A failed or still-loading job list cannot establish whether a research
   // job is active. Keep paid launches disabled until that state is known.
   const activeJobStateKnown =
@@ -582,23 +598,8 @@ export default function ResearcherTab({ initialTab = "launch" }: ResearcherTabPr
                   inputMode="decimal"
                 />
               </div>
-              <div className="field">
-                <label htmlFor="canonical-auto-approve">Auto-approve</label>
-                <select id="canonical-auto-approve" className="select" defaultValue="no">
-                  <option value="no">No</option>
-                  <option value="confidence">If confidence &gt; 0.8</option>
-                </select>
-              </div>
             </div>
             <div className="queues-agent__research-actions">
-              <Button
-                type="button"
-                className="btn ghost"
-                variant="ghost"
-                onClick={() => toast({ title: "Preset saved", description: "Research settings are preserved for this session." })}
-              >
-                Save preset
-              </Button>
               <Button
                 type="button"
                 className="btn primary"
@@ -611,21 +612,32 @@ export default function ResearcherTab({ initialTab = "launch" }: ResearcherTabPr
             </div>
           </div>
         </section>
-        <TableShell title="Researcher jobs" sub="Recent agentic research runs">
-          <div className="queues-agent__canonical-table queues-agent__canonical-table--research">
+        <TableShell
+          title="Researcher jobs"
+          sub={jobs && jobsTotal > visibleJobs.length
+            ? `Latest ${visibleJobs.length} of ${jobsTotal} research runs`
+            : "Recent agentic research runs"}
+        >
+          <div
+            ref={jobsRegionRef}
+            className="queues-agent__canonical-table queues-agent__canonical-table--research focus-visible:outline focus-visible:outline-2 focus-visible:outline-ring"
+            tabIndex={0}
+            role="region"
+            aria-label="Researcher jobs table, scrollable"
+          >
             <table className="table">
               <thead>
-                <tr><th>Status</th><th>Prompt</th><th>Found</th><th>Approved</th><th>Cost</th><th>Turns</th><th>Created</th></tr>
+                <tr><th>Status</th><th>Prompt</th><th>Found</th><th>Approved / Rejected</th><th>Cost</th><th>Turns</th><th>Created</th></tr>
               </thead>
               <tbody>
-                {(jobs || []).slice(0, 2).map((job) => (
+                {visibleJobs.map((job) => (
                   <tr key={job.id}>
-                    <td><span className={`chip ${job.status === "completed" ? "ok" : job.status === "failed" ? "bad" : job.status === "pending" ? "warn" : ""}`}>{job.status}</span></td>
+                    <td><StatusChip status={job.status} /></td>
                     <td className="prompt">{job.prompt || "Auto-generated research brief"}</td>
                     <td className="mono queues-agent__cell-mono">{job.totalDiscoveries || 0}</td>
                     <td className="mono queues-agent__cell-mono">{job.approvedDiscoveries || 0}/{job.rejectedDiscoveries || 0}</td>
                     <td className="mono accent queues-agent__cell-mono">{formatCost(job.estimatedCostUsd)}</td>
-                    <td className="mono queues-agent__cell-mono">{job.turnsUsed || 0}/{job.maxTurns || 0}</td>
+                    <td className="mono queues-agent__cell-mono">{job.turnsUsed || 0}/{job.maxTurns ?? "∞"}</td>
                     <td className="mono muted queues-agent__cell-mono queues-agent__cell-muted queues-agent__cell-created">{job.createdAt ? formatAdminDate(job.createdAt) : "—"}</td>
                   </tr>
                 ))}
@@ -633,6 +645,23 @@ export default function ResearcherTab({ initialTab = "launch" }: ResearcherTabPr
             </table>
             {!jobsLoading && (jobs || []).length === 0 ? <p className="queues-agent__empty">No research jobs found.</p> : null}
           </div>
+          {jobs && hasMoreJobs ? (
+            <div className="queues-agent__table-more">
+              <Button
+                type="button"
+                className="btn ghost"
+                variant="ghost"
+                onClick={() => {
+                  jobsMoreFocusPending.current = true;
+                  if (showAllJobs) setJobsLimit((l) => Math.min(l + 20, 200));
+                  setShowAllJobs(true);
+                }}
+                data-testid="button-show-more-research-jobs"
+              >
+                {showAllJobs ? `Load more (${jobs.length} of ${jobsTotal})` : "Show more"}
+              </Button>
+            </div>
+          ) : null}
         </TableShell>
       </div>
       <details className="queues-agent__more">
@@ -667,8 +696,11 @@ export default function ResearcherTab({ initialTab = "launch" }: ResearcherTabPr
                       size="sm"
                       variant="outline"
                       className="h-7 text-xs"
-                      onClick={() => briefMutation.mutate()}
-                      disabled={briefMutation.isPending}
+                      // C5-V5A-02: aria-disabled (not disabled) keeps keyboard
+                      // focus on the button while the brief generates.
+                      onClick={() => { if (!briefMutation.isPending) briefMutation.mutate(); }}
+                      aria-disabled={briefMutation.isPending}
+                      aria-busy={briefMutation.isPending}
                       data-testid="button-generate-brief"
                     >
                       {briefMutation.isPending
@@ -824,7 +856,9 @@ export default function ResearcherTab({ initialTab = "launch" }: ResearcherTabPr
                     type="button"
                     variant="ghost"
                     onClick={() => setShowAdvanced(v => !v)}
-                    className="flex h-auto w-full items-center justify-between px-3 py-2 text-sm font-medium hover:bg-muted/50"
+                    className="flex h-auto w-full items-center justify-between whitespace-normal px-3 py-2 text-left text-sm font-medium hover:bg-muted/50"
+                    aria-expanded={showAdvanced}
+                    aria-controls="advanced-researcher-region"
                     data-testid="button-toggle-advanced-researcher"
                   >
                     <span className="flex items-center gap-2">
@@ -834,7 +868,7 @@ export default function ResearcherTab({ initialTab = "launch" }: ResearcherTabPr
                     {showAdvanced ? <ChevronDown className="w-4 h-4" /> : <ChevronRight className="w-4 h-4" />}
                   </Button>
                   {showAdvanced && (
-                    <div className="space-y-3 border-t px-3 py-3">
+                    <div id="advanced-researcher-region" className="space-y-3 border-t px-3 py-3">
                       <div>
                         <Label htmlFor="research-model" className="flex items-center gap-1.5">
                           <Cpu className="w-3.5 h-3.5 text-muted-foreground" />Model
@@ -901,7 +935,11 @@ export default function ResearcherTab({ initialTab = "launch" }: ResearcherTabPr
                 <Alert>
                   <Zap className="w-4 h-4" />
                   <AlertDescription>
-                    Uses Claude Sonnet 4 (~$3/M input, $15/M output tokens).{" "}
+                    {/* C3-V5A-05: name the model this launch will actually use
+                        (custom override, else the server's resolved default). */}
+                    {model.trim() || defaultOrchestratorModel
+                      ? <>Uses <span className="font-mono" data-testid="text-research-launch-model">{model.trim() || defaultOrchestratorModel}</span>{model.trim() ? "" : " (server default)"}.</>
+                      : "Uses the server's default research model."}{" "}
                     {costMin !== null && costMax !== null
                       ? `Your past jobs have cost $${costMin.toFixed(2)}–$${costMax.toFixed(2)} depending on scope and duration (see Job History below).`
                       : "Cost depends on scope and duration — check Job History after your first run."}{" "}

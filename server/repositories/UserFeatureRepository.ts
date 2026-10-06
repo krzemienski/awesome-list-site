@@ -121,14 +121,15 @@ export class UserFeatureRepository {
    * @param userId - User ID
    * @param resourceId - Resource ID to bookmark
    * @param notes - Optional notes about the bookmark
+   * @param savedAt - Original saved date when Undo restores a removed bookmark (C6-VX-01)
    */
-  async addBookmark(userId: string, resourceId: number, notes?: string): Promise<typeof userBookmarks.$inferSelect> {
+  async addBookmark(userId: string, resourceId: number, notes?: string, savedAt?: Date): Promise<typeof userBookmarks.$inferSelect> {
     // BUG-021: return the canonical row so the API can echo the saved state
     // (POST /api/bookmarks/:id used to return only { message }, leaving
     // surfaces with hand-held local state stuck on stale notes).
     const [row] = await db
       .insert(userBookmarks)
-      .values({ userId, resourceId, notes })
+      .values({ userId, resourceId, notes, ...(savedAt ? { createdAt: savedAt } : {}) })
       .onConflictDoUpdate({
         target: [userBookmarks.userId, userBookmarks.resourceId],
         // A bare POST means “save this resource”, not “erase any existing
@@ -136,13 +137,12 @@ export class UserFeatureRepository {
         // duplicate saves idempotent and closes the guest-merge race where
         // another tab creates a noted bookmark after the merge's pre-dedupe
         // read but before its POST reaches PostgreSQL. An explicit empty
-        // string still intentionally clears notes via the editor.
+        // string still intentionally clears notes via the editor. createdAt is
+        // the saved date (it drives "Newest saved"), so a note edit never
+        // touches it.
         set: notes === undefined
-          ? {
-              notes: sql`${userBookmarks.notes}`,
-              createdAt: sql`${userBookmarks.createdAt}`,
-            }
-          : { notes, createdAt: new Date() }
+          ? { notes: sql`${userBookmarks.notes}` }
+          : { notes }
       })
       .returning();
     return row;

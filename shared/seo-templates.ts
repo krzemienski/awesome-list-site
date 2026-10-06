@@ -336,8 +336,10 @@ export function subcategorySeoTitleCore(
   const intent = (categorySlug && CATEGORY_INTENT_NOUNS[categorySlug]) || "tools & guides";
   const parent = categoryName ? `${name} — ${categoryName} ${intent}` : `${name} ${intent}`;
   if (parent.length <= SEO_TITLE_MAX - BRAND_SUFFIX.length) return parent;
-  const concise = `${name} ${intent}`;
-  return concise.length <= SEO_TITLE_MAX - BRAND_SUFFIX.length ? concise : name;
+  // F211: the bare "<name> <intent>" fallback read as a broken phrase
+  // ("Community Groups communities & events"); fall back to the same
+  // "child – parent" form the sub-subcategory titles use.
+  return categoryName ? withParentContext(name, categoryName) : name;
 }
 
 export function subcategorySeoDescription(
@@ -391,6 +393,17 @@ export function pagedSeoDescription(
 export const advancedSeoTitle = `Advanced — ${SITE_NAME}`;
 export const advancedSeoDescription =
   `Power-user tools for ${SITE_NAME}: category explorer, analytics dashboard, link health, and bulk export.`;
+
+// Default description for pages that supply none. Count-free on purpose: the
+// live total belongs to the pages that render it (homeSeoDescription), and a
+// literal here goes stale as the catalog grows.
+export const siteTagline =
+  "The curated index of video development resources — players, encoders, codecs, streaming, AI, tools, and community.";
+
+export const signInSeoDescription =
+  `Sign in to ${SITE_NAME} to save bookmarks, submit resources, and personalize your learning journey.`;
+export const signUpSeoDescription =
+  `Create an ${SITE_NAME} account to save bookmarks, submit resources, and track your learning journeys.`;
 
 export const submitSeoTitle = `Submit a Resource — ${SITE_NAME}`;
 export const submitSeoDescription =

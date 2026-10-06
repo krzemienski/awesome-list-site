@@ -37,11 +37,11 @@ import { Badge } from "@/components/ui/badge";
 import { ToastAction } from "@/components/ui/toast";
 import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/hooks/useAuth";
-import { apiRequest, queryClient } from "@/lib/queryClient";
+import { ApiError, apiRequest, queryClient } from "@/lib/queryClient";
 import { humanizeApiError } from "@/lib/apiError";
 import { mpTrack } from "@/lib/mixpanel";
 import type { Resource } from "@shared/schema";
-import { hasVisibleChars } from "@shared/validation";
+import { hasVisibleChars, isPlausiblePublicUrl, URL_HOSTNAME_MESSAGE, URL_WHITESPACE_MESSAGE } from "@shared/validation";
 
 // BUG-024 (run14): the HTTPS rule applies to NEW urls only. Legacy resources
 // whose canonical URL is still http:// (their https twin is broken — see the
@@ -58,7 +58,10 @@ const makeSuggestEditSchema = (originalUrl: string) => z.object({
     .url("Please enter a valid URL")
     .refine((url) => url === originalUrl || url.startsWith("https://"), {
       message: "New URLs must use HTTPS (keeping the current URL unchanged is fine)"
-    }),
+    })
+    // C9-V2-01: the same checks the server applies, so they show inline.
+    .refine((url) => url === originalUrl || !/\s/.test(url), URL_WHITESPACE_MESSAGE)
+    .refine((url) => url === originalUrl || /\s/.test(url) || isPlausiblePublicUrl(url), URL_HOSTNAME_MESSAGE),
   description: z.string()
     // Run22 BUG-021: an empty description should say it's required, not
     // surface the misleading minimum-length message.
@@ -72,6 +75,37 @@ const makeSuggestEditSchema = (originalUrl: string) => z.object({
 });
 
 type SuggestEditFormData = z.infer<ReturnType<typeof makeSuggestEditSchema>>;
+
+function formatWait(seconds: number): string {
+  if (seconds < 60) return `${seconds} second${seconds === 1 ? "" : "s"}`;
+  if (seconds < 3600) {
+    const minutes = Math.ceil(seconds / 60);
+    return `${minutes} minute${minutes === 1 ? "" : "s"}`;
+  }
+  const hours = Math.ceil(seconds / 3600);
+  return `${hours} hour${hours === 1 ? "" : "s"}`;
+}
+
+// Only transport failures and 5xx are worth retrying as-is. A 4xx (domain not
+// allowlisted, page unreadable) or a rate limit carries the server's reason,
+// and repeating the same request can't change the answer.
+function analyzeFailureToast(error: unknown): { title: string; description: string } {
+  if (!(error instanceof ApiError)) {
+    return { title: "Analysis Failed", description: "Could not analyze URL with AI. Please try again." };
+  }
+  if (error.status === 429) {
+    return {
+      title: "AI analysis limit reached",
+      description: error.retryAfterSec
+        ? `Try again in ${formatWait(error.retryAfterSec)}.`
+        : error.message,
+    };
+  }
+  if (error.status >= 400 && error.status < 500) {
+    return { title: "Can't analyze this URL", description: error.message };
+  }
+  return { title: "Analysis Failed", description: "Could not analyze URL with AI. Please try again." };
+}
 
 interface Category {
   id: number;
@@ -183,6 +217,22 @@ export function SuggestEditDialog({ resource, open, onOpenChange }: SuggestEditD
     },
   });
 
+  // Each open starts from the resource's current values. Cancel used to leave
+  // edited (even invalid) fields and their errors behind for the next open.
+  // Declared before the taxonomy effects so their setValue calls land after it.
+  useEffect(() => {
+    if (!open) return;
+    form.reset({
+      title: resource.title || "",
+      url: resource.url || "",
+      description: resource.description || "",
+      category: "",
+      subcategory: "",
+      subSubcategory: "",
+    });
+    setClaudeSuggestions(null);
+  }, [open, resource.id]);
+
   useEffect(() => {
     if (open && categories.length > 0) {
       const matchedCategory = categories.find(
@@ -240,12 +290,15 @@ export function SuggestEditDialog({ resource, open, onOpenChange }: SuggestEditD
     }
   );
 
+  // C5-V2-01: analyze the URL in the field (the user's proposed URL), not the
+  // stored one; an invalid field shows its own validation instead of a request.
   const handleAnalyzeWithAI = async () => {
+    if (!(await form.trigger("url"))) return;
     setAnalyzingWithAI(true);
     try {
       const response = await apiRequest('/api/claude/analyze', {
         method: 'POST',
-        body: JSON.stringify({ url: resource.url }),
+        body: JSON.stringify({ url: form.getValues("url") }),
       });
       
       if (response.available === false) {
@@ -263,11 +316,7 @@ export function SuggestEditDialog({ resource, open, onOpenChange }: SuggestEditD
         description: `Suggestions generated with ${Math.round(response.confidence * 100)}% confidence`,
       });
     } catch (error) {
-      toast({
-        title: "Analysis Failed",
-        description: "Could not analyze URL with AI. Please try again.",
-        variant: "destructive",
-      });
+      toast({ ...analyzeFailureToast(error), variant: "destructive" });
     } finally {
       setAnalyzingWithAI(false);
     }
@@ -519,7 +568,18 @@ export function SuggestEditDialog({ resource, open, onOpenChange }: SuggestEditD
               render={({ field }) => (
                 <FormItem>
                   <FormLabel>Category</FormLabel>
-                  <Select onValueChange={field.onChange} value={field.value}>
+                  {/* C3-V2-01: a new parent invalidates the child picks, or the
+                      form would submit e.g. Encoding & Codecs › Roku. */}
+                  <Select
+                    onValueChange={(value) => {
+                      if (value !== field.value) {
+                        form.setValue("subcategory", "");
+                        form.setValue("subSubcategory", "");
+                      }
+                      field.onChange(value);
+                    }}
+                    value={field.value}
+                  >
                     <FormControl>
                       <SelectTrigger data-testid="select-edit-category">
                         <SelectValue placeholder="Select category" />
@@ -545,7 +605,13 @@ export function SuggestEditDialog({ resource, open, onOpenChange }: SuggestEditD
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel>Subcategory (Optional)</FormLabel>
-                    <Select onValueChange={field.onChange} value={field.value}>
+                    <Select
+                      onValueChange={(value) => {
+                        if (value !== field.value) form.setValue("subSubcategory", "");
+                        field.onChange(value);
+                      }}
+                      value={field.value}
+                    >
                       <FormControl>
                         <SelectTrigger data-testid="select-edit-subcategory">
                           <SelectValue placeholder="Select subcategory" />
