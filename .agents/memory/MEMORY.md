@@ -167,3 +167,4 @@
 - [Workspace recycles kill long runs](workspace-recycle-long-runs.md) — container restarts ~hourly (not OOM); logs in .cache/runlogs, sleep ≤270 + uptime check, cut panels are VOID and rerun under a new name.
 - [FontFaceSet rebuild + cold switch](fontfaceset-rebuild-on-stylesheet-insert.md) — late sheets drop warmed unused faces (rAF re-warm starves: use timer ladder + `loadingdone`); a same-tick check after a system switch races the first fetch → idle-prewarm every family in the canonical font link.
 - [Dialog-open locator race](dialog-open-locator-race.md) — a closing Radix sheet is still role=dialog; interaction sweeps must wait for `[role="dialog"][data-state="open"]` of the target, or a harness race reads as an app bug.
+- [Stale git locks after recycle](git-stale-locks-after-recycle.md) — recycles leave 0-byte *.lock files across .git and half-done checkouts (truncated branch names); clear when no git proc runs.
