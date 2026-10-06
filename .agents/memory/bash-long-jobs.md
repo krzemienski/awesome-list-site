@@ -45,3 +45,4 @@ not `nohup … &` — the latter is gone before the first curl.
 Run the loop directly in the background task and write progress to a log you poll.
 Also: Playwright `context.request` withholds Secure cookies over http://127.0.0.1 —
 use in-page `fetch` for authed probes against the loopback dev server.
+- `pkill -f <pattern>` matches its own shell when the pattern appears in the command line, killing the call (exit -1); use `pgrep -af` first and kill PIDs.

@@ -12,3 +12,9 @@ After the Claude Design adoption merge, `verify-ds --mode full --deep` gives FAI
 
 **Why:** these are owner decisions (frozen gates or frozen pre-boot code). They are not regressions from later work.
 **How to apply:** if a run shows only these failures, it is baseline. Diff against this list before debugging. Deep runs rewrite tracked docs/parity/evidence, so `git checkout -- docs/parity` afterwards.
+
+## Status after the delegated-decision pass (2026-10-06)
+- Remaining deep FAILs are accepted residue: parity-systems BLOCK = axe color-contrast on `--text-3` meta only (canonical pair is sha-pinned; fix belongs at the design source), font-prepaint + live-probe stage 3 (#26 boot order), pixel-parity (#26 visual delta vs frozen EXPECTED, not re-baselined).
+- Several post-#26 "timeouts" were stale activation proofs in the gate, not app bugs; reproduce with `--only=<scope>` and print the full Playwright call log before touching app code.
+- Restoring evidence after a deep run: `git checkout` only the changed evidence files — a blanket `git checkout -- tests/parity` also reverts harness source edits.
+- Full deep pixel-parity is ~1.4 captures/min (~4 h for 83 screens) and outlives workspace recycles; scope it.
