@@ -39,6 +39,13 @@ from claims that actual production authentication was exercised.
 
 Production needs the same env vars (CLERK_SECRET_KEY, CLERK_PUBLISHABLE_KEY, VITE_CLERK_PUBLISHABLE_KEY, VITE_CLERK_PROXY_URL for the proxy) and the prod-only proxy path verified after the next publish.
 
+## Owner admin login + prod user management (verified 2026-10-06)
+- This is Replit-managed Clerk: NEVER ask the user for an `sk_live` key or send them to dashboard.clerk.com to create an instance — Clerk refuses ("awesome.video root domain is already in use by a Replit app"), and the user found this out the hard way. Run `checkClerkManagementStatus` and read this file FIRST for any login complaint.
+- The owner account krzemienski@gmail.com (prod row id 17784443, role admin) signs in with **Google or email code only — no password factor**. "Can't log in" with a password = this; answer is "Continue with Google".
+- Prod Clerk users: Auth pane → Users → Production (or the Replit-sanctioned Clerk dashboard marker with `prod`). Prod DB writes (e.g. setting role=admin): the user's Database pane → production → Edit toggle; agent `executeSql` production is a read-only replica. Once any admin can sign in, `PUT /api/admin/users/:id/role` promotes others.
+- Inserting a `users` row never creates a login.
+- **Why:** an earlier session misdiagnosed this as needing live Clerk secrets, despite the facts already being in this file.
+
 ## Dev vs prod Clerk instances (verified Aug 2026 post-publish)
 - Replit-managed Clerk has **two isolated instances**: workspace `CLERK_SECRET_KEY` = dev instance ONLY; prod live keys are swapped in at publish and are NOT visible from dev — no backend-API access to the prod user store from the workspace.
 - A user created via the workspace key does NOT exist on the published site (`form_identifier_not_found`). Never conclude "prod auth broken" from that.
