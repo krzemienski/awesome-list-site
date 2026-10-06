@@ -9,7 +9,6 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { Separator } from "@/components/ui/separator";
 import SEOHead from "@/components/layout/SEOHead";
 import { resourceSeoDescription } from "@shared/seo-templates";
-import { SuggestEditDialog } from "@/components/ui/suggest-edit-dialog";
 import {
   ArrowLeft,
   ExternalLink,
@@ -54,6 +53,13 @@ import {
 import { tagLandingPath } from "@shared/tagNormalize";
 import type { ResourceKind } from "@shared/resourceKinds";
 import "@/styles/pages/resource.css";
+
+// Match resource cards: fetch the editor and form dependencies only on demand.
+const SuggestEditDialog = lazy(() =>
+  import("@/components/ui/suggest-edit-dialog").then(({ SuggestEditDialog }) => ({
+    default: SuggestEditDialog,
+  })),
+);
 
 const VariantResourceAction = import.meta.env.VITE_CONTACT_VARIANT === "d"
   ? lazy(() => import("@/components/contact/contact-resource-action").then((module) => ({ default: module.ContactResourceAction })))
@@ -1177,11 +1183,15 @@ export default function ResourceDetail() {
         </div>
       </div>
 
-      <SuggestEditDialog
-        resource={resource}
-        open={suggestEditOpen}
-        onOpenChange={setSuggestEditOpen}
-      />
+      {suggestEditOpen && (
+        <Suspense fallback={<p role="status">Loading edit form…</p>}>
+          <SuggestEditDialog
+            resource={resource}
+            open={suggestEditOpen}
+            onOpenChange={setSuggestEditOpen}
+          />
+        </Suspense>
+      )}
     </div>
   );
 }
