@@ -189,14 +189,17 @@ export function hasValidAuthReturnAuditKey(req: Request): boolean {
 /**
  * Owner password sign-in ("break-glass" admin access that does not depend on
  * Clerk). POST /api/auth/admin-login checks the submitted password against
- * ADMIN_PASSWORD and, on success, sets a signed HttpOnly cookie that resolves
+ * OWNER_PASSWORD and, on success, sets a signed HttpOnly cookie that resolves
  * to the admin@example.com row exactly like the audit-key header does.
  *
  * Fails closed:
- *  - ADMIN_PASSWORD unset or shorter than 8 chars → login refused and every
+ *  - OWNER_PASSWORD unset or shorter than 8 chars → login refused and every
  *    cookie is ignored (same floor as the audit-key header; the login route
  *    is rate-limited to 10 attempts per 15 minutes).
- *  - Cookie = "<expiresAtMs>.<HMAC>", keyed by ADMIN_PASSWORD + SESSION_SECRET:
+ *  - Separate from ADMIN_PASSWORD, which stays the audit-key header secret:
+ *    production already held an older ADMIN_PASSWORD that publishing never
+ *    overwrites, so the owner login needs a name production never had.
+ *  - Cookie = "<expiresAtMs>.<HMAC>", keyed by OWNER_PASSWORD + SESSION_SECRET:
  *    rotating the password instantly invalidates every issued cookie.
  *  - Expired, future-dated beyond the TTL, or tampered cookies are ignored.
  */
@@ -205,7 +208,7 @@ export const ADMIN_SESSION_TTL_MS = 12 * 60 * 60 * 1000;
 const ADMIN_LOGIN_MIN_PASSWORD_LENGTH = 8;
 
 function adminLoginPassword(): string | null {
-  const password = process.env.ADMIN_PASSWORD;
+  const password = process.env.OWNER_PASSWORD;
   return password && password.length >= ADMIN_LOGIN_MIN_PASSWORD_LENGTH ? password : null;
 }
 

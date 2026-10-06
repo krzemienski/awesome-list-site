@@ -6,7 +6,7 @@ import { Label } from "@/components/ui/label";
 /**
  * Owner password sign-in, shown on /sign-in?admin. Posts to
  * /api/auth/admin-login, which sets a signed HttpOnly cookie for the
- * built-in admin account when the password matches ADMIN_PASSWORD.
+ * built-in admin account when the password matches OWNER_PASSWORD.
  * Not linked anywhere in the UI.
  */
 export function AdminPasswordSignIn() {

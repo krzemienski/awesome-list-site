@@ -54,6 +54,7 @@ Production needs the same env vars (CLERK_SECRET_KEY, CLERK_PUBLISHABLE_KEY, VIT
 - A full authed-session prod test needs a real inbox for the email code (sign-ups require verification; the Gmail connector is send-scope-only, cannot read codes) — final round-trip confirmation belongs to the account owner.
 
 ## Owner password sign-in (October 2026)
-- Admin access that does not depend on Clerk: `/sign-in?admin` + the `ADMIN_PASSWORD` secret (at least 8 chars) → signed HttpOnly cookie → admin@example.com row.
+- Admin access that does not depend on Clerk: `/sign-in?admin` + the `OWNER_PASSWORD` secret (at least 8 chars) → signed HttpOnly cookie → admin@example.com row.
 - `PROD_CLERK_SECRET_KEY` is irrelevant. Never ask for it, use it, or debug it.
 - **Why:** the user asked; the owner could not get admin through Clerk (Google/email-code only, no password) and wanted a password only they know.
+- Uses OWNER_PASSWORD, not ADMIN_PASSWORD: production already had a stale ADMIN_PASSWORD, and publishing only copies secrets production lacks (it never overwrites existing deployment secrets). Any secret rotation must account for this.

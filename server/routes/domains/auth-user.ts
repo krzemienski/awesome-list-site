@@ -15,7 +15,7 @@
  *   GET  /api/auth/me      — deprecated REST alias (401 style)
  *   GET  /api/auth/status  — deprecated lightweight probe
  *   POST /api/auth/logout-all — revoke every active Clerk session
- *   POST /api/auth/admin-login  — owner password sign-in (ADMIN_PASSWORD)
+ *   POST /api/auth/admin-login  — owner password sign-in (OWNER_PASSWORD)
  *   POST /api/auth/admin-logout — clear the owner password cookie
  *
  * Session state comes from `req.dbUser`, resolved by clerkUserContext
@@ -145,7 +145,7 @@ export function registerAuthUserRoutes(
   });
 
   // POST /api/auth/admin-login — owner password sign-in (no Clerk). A correct
-  // ADMIN_PASSWORD sets a signed 12-hour HttpOnly cookie that resolves to the
+  // OWNER_PASSWORD sets a signed 12-hour HttpOnly cookie that resolves to the
   // admin@example.com row (see clerkUserContext). Disabled and wrong
   // passwords get the same 401 so the endpoint never reveals its config.
   app.post("/api/auth/admin-login", adminLoginLimiter, (req, res) => {
