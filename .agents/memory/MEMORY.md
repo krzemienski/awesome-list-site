@@ -145,3 +145,5 @@
 - [Radix interaction pitfalls](radix-interaction-pitfalls.md) — close-animation pointer lock, focus-trap breakers, folded same-value tabs, and closing sheets still matching role=dialog.
 - [QA throwaway-user teardown](qa-throwaway-user-teardown.md) — sweep email LIKE __qa_test_% (residue accrues and contaminates recorded baselines); clear child FKs first; purge ALL even if that undershoots.
 - [Bash long jobs + gotchas](bash-long-jobs.md) — nohup and backgrounded subshells both die with the call (foreground loop + resumable cursor/JSONL, ~88s budget); never capture into UID.
+- [DS deep gates vs Claude Design](ds-gates-post-claude-design.md) — post-adoption deep verify FAIL is baseline (frozen gates/pre-boot, ENOENT design-system.css, swiss/orange gate race); restore docs/parity after runs.
+- [Platform git auto-commit/sync](platform-git-autocommit.md) — the platform auto-commits agent edits and may sync main to GitHub mid-session; check ls-remote before claiming main is untouched.
