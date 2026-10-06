@@ -25,13 +25,10 @@
 - [Playwright browsers here](playwright-browser-version-pin.md) — revision comes from @playwright/test + test:e2e:browsers; WebKitGTK runtime rules; WebKit never gets a Clerk session over http (skip, don't fix).
 - [Link-scan false positives](link-scan-false-positives.md) — connect timeouts from datacenter IPs are bot-blocks, never "dead"; only DNS/refused/404-410/SSL count; verify timeouts via web search.
 - [Prod status-change paths](prod-status-change-paths.md) — bulk/reject only works on pending resources; approved ones need PUT :id/reject|approve; bulk endpoints hide failures in counts.
-- [Bash long jobs + gotchas](bash-long-jobs.md) — nohup dies with the bash session (use resumable cursor+JSONL, ~88s budget); never capture into `UID` (readonly → silent wrong value).
 - [Playwright audit batching](playwright-audit-batching.md) — full-goto sweeps die at 120s (≤8/call); SPA pushState+popstate nav reuses the cached tree (~0.75s/route) → ~100 routes/call; count parity vs nested tree count.
 - [Client/server noindex lockstep](seo-client-server-noindex-lockstep.md) — every server-noindex route must pass `noindex` to client SEOHead, or hydration adds a contradictory indexable robots + self-canonical.
 - [Short-circuit masks throwing row](short-circuit-masks-throwing-row.md) — a ref only reached behind `a && expr` crashes ONLY the matching row (looks route-dependent); check props TYPE vs destructure.
 - [executeSql output format](executesql-output-format.md) — code_execution executeSql returns CSV-quoted TEXT in `.output` (no `.rows`); wrap queries in json_build_object + unwrap. Writes → use tsx/drizzle.
-- [Net-zero baseline contamination](qa-throwaway-user-teardown.md) — a captured "baseline" can already include prior-run `__qa_test` residue (not just users — e.g. a leftover journey); true net-zero = purge ALL `__qa_test`, even if that undershoots the recorded baseline count.
-- [QA throwaway-user teardown](qa-throwaway-user-teardown.md) — sweep `email LIKE '__qa_test_%'` (they accrue across sessions); del their resource_edits + NULL non-cascade FKs before DELETE user; feedback POST 200s on bogus userId.
 - [Client API shape drift](client-api-shape-drift.md) — hand-typed client interfaces silently diverge from real API payloads (tsc can't catch); React key warnings + /path/undefined nav are the tell.
 - [Default query fetcher reads only queryKey[0]](queryclient-fetcher-key0.md) — array key segments are cache-only; a param fetch with no custom queryFn silently hits the LIST url → data.job undefined, view renders defaults with no error.
 - [Canonical base env divergence](canonical-base-env-divergence.md) — client canonical uses VITE_SITE_URL (stale github.io in .env), server uses SITE_URL; they can disagree, but noindex pages omit canonicals so are safe.
@@ -62,16 +59,12 @@
 - [Vite workspace watch reload](vite-workspace-watch-reload.md) — ANY repo write (docs, touch, dir delete too) during a browser run reloads every open app page; stage in /tmp, copy after the last capture.
 - [Flex-anchor min-width:auto](flex-anchor-min-width.md) — raw text in a flex container is an anonymous item with min-width:auto that never wraps; wrap it in a min-w-0 span or long URLs blow dialogs.
 - [Full-origin CSRF comparison](origin-check-port-normalization.md) — compare normalized scheme+host+effective port; scripts hitting prod admin API MUST send Origin header or 403.
-- [Clerk headless UI sign-in](clerk-headless-ui-signin.md) — client-trust fields need accessible-label selection and sequential keypresses; only sign-UP has a captcha, and testing tokens alone don't bypass it.
-- [Clerk auth completion signal](clerk-auth-completion-signal.md) — the completed attempt and its session are never in the same update, so `createdSessionId` matching never fires; watch the attempt→session sequence.
 - [Headless E2E gotchas](headless-e2e-gotchas.md) — /submit consent banner eats clicks (dismiss first); toast = li[data-state]; agent-browser daemon dies between calls — prefer one-shot Playwright; verify "blank render" screenshots with a 2nd capture method.
 - [Parallel subagent file clobber](parallel-subagent-file-clobber.md) — subagents silently revert main-agent edits to shared files (README etc.); edit contested files after subagents finish + re-grep before wrap-up.
 - [Gitignore cleanup anchoring](gitignore-cleanup-anchoring.md) — root-anchor bulk-cleanup ignore patterns (`/screenshots/`) or they shadow kept dirs at depth (docs/screenshots); verify with check-ignore + ls-files -i -c.
 - [Suspense boundary guards](suspense-boundary-guards.md) — error boundaries render error-free WHILE a chunk fetches; never clear one-shot reload guards on clean render — use timestamp+cooldown.
 - [line-clamp on the clipping ancestor](line-clamp-anchor.md) — -webkit-line-clamp fails silently when an inline-block child wraps the text; clamp the element that directly holds the text node.
 - [Audit cold-boot flakes](audit-cold-boot-flake.md) — responsive (profile nameW=0) AND print (recommendations blank) false-fail right after a server restart; rerun once before debugging.
-- [Radix dialog close lock](radix-dialog-close-lock.md) — body pointer-events:none persists through close animation; condition-wait (not sleep) between dialogs or slow containers flake.
-- [Radix sheet focus-trap breakers](radix-sheet-focus-trap.md) — hidden autofocus targets silently disengage the trap; tooltip mount/unmount on blur makes FocusScope yank Tab focus back to the container.
 - [SDK block-split messages](sdk-block-split-messages.md) — one API turn = many assistant msgs sharing message.id; never count msgs as unanswered calls; dedupe tokens by id.
 - [MCP tool schema leniency](sdk-tool-schema-leniency.md) — SDK-side zod rejects loose tool args BEFORE the handler (no event); keep schemas lenient, validate in-handler.
 - [jsonb fingerprint stability](jsonb-fingerprint-stability.md) — jsonb reorders object keys, so JSON.stringify-equality dedupe guards silently never match; use recursive key-sorted stringify + verify with a live double-POST.
@@ -83,7 +76,6 @@
 - [awesome_bot export check](awesome-bot-export-check.md) — gem via nix-shell ruby; chunk big lists past the 5-min shell budget; ReadTimeout/418/202 are bot-blocks, not dead.
 - [www/apex split-brain DNS](www-domain-split-brain.md) — www is Cloudflare-proxied (525: origin lacks a www cert) while apex hits Replit's edge directly; only a CF redirect rule or Replit custom domain fixes it — never app code.
 - [z.json() wire vs memory](zod-json-wire-vs-memory.md) — res.json-wrapper validation sees pre-serialization bodies; z.json() rejects Dates → false mismatch spam; validate JSON.stringify-ability instead.
-- [Clerk backend-session API checks](clerk-backend-session-api-checks.md) — mint real throwaway-user sessions via Clerk backend API (users→sessions→tokens, external_id = bridge id); ~60s JWTs, sweep by __qa_test prefix.
 - [Validation workflow registration](validation-workflow-registration.md) — drift gates are validation workflows via setValidationCommand (configureWorkflow hits the 10-workflow cap); in-process contract harness must install+probe before registerRoutes.
 - [Completion gate DB contention](completion-gate-db-contention.md) — DB-outage + crawl gates must share the "db-heavy" file lease (gate-lease.mjs); fixed sleep staggers lose the race as the suite grows.
 - [Validation thread exhaustion](validation-thread-exhaustion.md) — concurrent Node EAGAIN and lost app listeners can cause cascading route failures; distinguish these from source-level defects.
@@ -105,7 +97,6 @@
 - [Dark-only means color-scheme, not light tokens](dark-only-color-scheme.md) — "light mode broken" findings are by design (0 `.light` selectors); the real defect is an undeclared `color-scheme`.
 - [Drift-gate mutation probing](drift-gate-mutation-probing.md) — prove a gate fails by mutating a /tmp copy of its inputs; parser-rot short-circuits parity checks, and literals need unescaping first.
 - [Sticky killed by overflow-x:hidden](sticky-vs-overflow-hidden.md) — hidden computes the other axis to auto → a scroll container that never scrolls, disabling sticky app-wide; use clip.
-- [Webfont download coverage](webfont-download-coverage.md) — the shell's ONE link = the design's nine-family css2 URL byte-for-byte (axis subsets change outlines); a token naming a family it lacks is token drift, never widen the URL.
 - [App-shell bottom bar](app-shell-bottom-bar.md) — an app-level bottom bar belongs in the shell column as its own row; every other row must fill what the column leaves, never claim the viewport.
 - [Vite SPA curl smoke checks](vite-spa-curl-smoke-checks.md) — curl sees only the static HTML shell; assert shell markers and route status, not copy rendered later by React.
 - [Browser response state assertions](browser-response-state-assertions.md) — shared response helpers validate transport/shape; scenarios own populated-vs-empty cardinality assertions.
@@ -119,52 +110,38 @@
 - [Product-profile gate target](product-profile-gate-target.md) — validate the design-system artifact, never the frozen canonical source; assert token consumers per selector, not substring.
 - [dead-exports forbids speculative exports](dead-exports-speculative.md) — export helpers with their first importer, never "for a later wave"; no pinned exceptions.
 - [Frozen reference roots in drift gates](standalone-palette-gate-scope.md) — an archive-identical dir can't take tokens or DS-OK; exclude it AND verify it against the zip each run.
-- [Read-only browser capture](read-only-browser-capture.md) — three layers (browser Fetch / context guards / sealed realm); page-scoped hooks miss anchor popups; LH needs a Playwright-context page via puppeteer handle; keep popup blocker ON.
-- [Parity harness disposable admin](parity-harness-disposable-admin.md) — prefix the email; cleanup must check Clerk leftovers as well as local rows; identity checks scope to main.
-- [Headless capture determinism](headless-capture-determinism.md) — backdrop-filter off both sides; `--disable-partial-raster`; stamp + API-quiet + font checks around every frame; wait, THEN snapshot.
 - [Shared test DB vs vitest file parallelism](vitest-shared-db-file-parallelism.md) — per-file cleanupDatabase() on ONE DB: parallel files wipe each other (500/401/never-429); run serially.
 - [Vitest spy calls vanish on mockRestore](vitest-spy-mockrestore.md) — `mockRestore()` also clears `mock.calls`; collect observed lines inside the mockImplementation or a live warning looks like "the observer never ran".
 - [Token parity by effective cascade](token-parity-effective-cascade.md) — one resolver over every sheet with ORDERED cascade layers (not a bit); element model + selector engine for shadows; in-gate canaries.
-- [Filmstrip prepaint proof](filmstrip-prepaint-check.md) — screencast frames before responseStart are the prior about:blank (white ≠ flash); prove no-flash via first document frame + attr timeline.
-- [Folded Radix tabs](radix-folded-tab-activation.md) — same-value selection suppresses onValueChange; verify subsection → highlighted-parent activation with pointer and keyboard.
 - [Tablet dual navigation](tablet-dual-navigation.md) — drawer availability does not imply hidden sidebar; simultaneous copies need unique disclosure IDs and surface-scoped scrolling.
 - [Admin kind resolution boundary](admin-kind-client-resolution.md) — shared client inference requires empty custom server mappings until admin responses expose authoritative resolution.
 - [Vite component probes](vite-browser-component-probes.md) — discover dependency URLs from transformed modules; optimized CJS React dependencies may expose default rather than named exports.
-- [Pixel reference reconciliation](pixel-reference-reconciliation.md) — preserve required live content/official branding; adapt expected captures in memory, never delete content or relax thresholds.
 - [cmdk live regions](cmdk-live-region-placement.md) — audit populated results too; aria-live count elements inside the listbox violate its required-child semantics.
 - [Browser lease cleanup ownership](browser-lease-cleanup-ownership.md) — a released slot can belong to another worker; verify the exact run's process tree before terminating browsers.
 - [Lighthouse Lantern loopback artifact](lantern-loopback-artifact.md) — simulate scores vs 127.0.0.1 sit ~5–15 below same-day prod for identical code (bundle/fonts enter the FCP graph, h1 chunk fan-out); compare same tool same day, probe with real throttling.
 - [Page atmosphere raster clip](page-atmosphere-raster-clip.md) — full-page radial atmosphere = seconds of raster on long pages; paint it on .page::after clipped by a per-system token, pixels unchanged; regenerate DS artifact tokens after adding tokens.
-- [LCP text candidate size](lcp-text-candidate-size.md) — Chrome fixes a text block's LCP size at first paint (font swap never updates it); a prerendered paragraph must beat the client re-render in fallback AND web font, probe with a PerformanceObserver.
-- [Paint before hydrate](paint-before-hydrate.md) — Vite head module entry evaluates before complete SSR markup is presented; defer via modulepreload + body-end double-rAF loader, keep ONE `<script type="module"` for ssr.ts.
 - [Census state replay](census-state-replay.md) — historical global control ordinals drift across layout/disclosure states; repeated controls require a stable resource owner.
 - [JIT teardown order](jit-teardown-order.md) — delete the Clerk user BEFORE the local row; a live session re-provisions it via JIT within seconds, faking net-zero.
 - [Tester false defects](tester-finding-retractions.md) — Radix/cmdk ArrowDown timing, outline 0px mid-transition, Clerk card "unreachable", dialog role=0: re-check recipes before logging a bug.
 - [Built-in tester batching](native-tester-batching.md) — ~45 s ceiling per execution: one family × ≤4 items per step, one navigation per step, running ledger; it may restart the wrong workflow.
 - [URL-sync effects vs history navigation](url-sync-effect-popstate.md) — a URL-mirroring effect must no-op once the document left its route, or popstate entries get overwritten and Back never leaves the page.
-- [Parity harness lessons](parity-harness-lessons.md) — frozen panels only flex-wrap; content (not pins) drives auto-table drift; token gate drops type selectors so `:not(.x)` fails.
 - [Route remounts + capture re-scroll](route-remount-causes.md) — inline `component={() => …}` routes and first-observation `qc.clear()` remount pages; reveal observers must disconnect after one reveal.
 - [A11y gates need two probes](a11y-gate-hidden-probes.md) — getByRole misses `inert` ancestors; sr-only controls need role/name + ARIA snapshot + ancestor walk; forced-colors borders die under any `border:0`.
 - [44px floor vs frozen controls](accessible-floor-vs-frozen-controls.md) — the 12 artifact parity fails are the a11y floor by contract, don't re-fix; scope table nowraps to ONE cell; sweep parity users after a killed run.
 - [Table action hitboxes](hidden-control-hitbox.md) — prefer visible normal-flow actions; hover/stacking fixes can still fail pointer reopen after Cancel despite keyboard success.
-- [Built-in tester + Clerk](native-tester-clerk-workaround.md) — tester Clerk helper fails on the proxied dev host; mint `+clerk_test` users via backend API, resend creds every follow-up, Clerk-first teardown + residue sweep.
-- [LCP dated to the bundle by re-inserting prerender](lcp-reinserted-prerender.md) — moving prerender nodes after the bundle runs re-registers a larger web-font LCP candidate; do holds in the pre-boot inline script, keep them semantic until adopted.
-- [Contract-over-reference residuals](contract-over-reference-residuals.md) — behaviour the contract requires but the prototype lacks: log its failing pixel rows the same pass; sr-only keeps crawler text.
 - [Skip-link route preservation](skip-link-route-preservation.md) — focus can land correctly while fragment routing switches pages; verify the current route and chapter remain intact too.
-- [Declared vs rendered font parity](font-declaration-vs-render-parity.md) — identical heading files can fail whole-document face parity when the canonical request adds a body family.
-- [Chromium capture ceiling](chromium-capture-ceiling.md) — full-page captures >16384px silently degrade on BOTH sides; tile + stitch, size the canvas to max(client, scroll widths).
 - [Run fingerprints vs live telemetry](run-fingerprint-live-telemetry.md) — project telemetry endpoints down to the fields the reference paints; drop counters only, never the whole endpoint.
 - [Evidence runner identity drift](evidence-runner-identity-drift.md) — assert demonstrator identity via the shared helper's exported constants, not a hard-coded name shape.
 - [Gates vs folded UI](gate-drift-from-folded-ui.md) — reveal every collapsed aria-expanded disclosure (never popups/tabs) before sweeping; folds hide selectors and new strays.
 - [SSR Clerk empty host](ssr-clerk-empty-host.md) — "Host must not be empty" = Clerk host-derived key at SSR module eval; resolve the explicit key, diagnose with a /tmp --ssr build only.
-- [fonts.check vs load](fonts-check-vs-load.md) — fonts.check() is false for loaded families with unused weights/subsets; prove with fonts.load() non-empty; prod prerenders .page before DS globals exist.
 - [Consensus audit panels](consensus-audit-panels.md) — blind auditors get skill+URL+private .cache dir only; dev panel then prod panel; save verdicts verbatim; waitForJob caps at 600 s.
-- [Reference adjustments → app lockstep](reference-adjustment-lockstep.md) — approved comparison-reference rules change EXPECTED only; port to app CSS same pass, check frozen JSX classes before calling accent drift, offsets fail all bands.
-- [Background shell subshell death](bash-long-jobs.md) — `( … ) &` inside a background ShellExec dies with the call; run the loop in the foreground of the background task, poll a log file.
-- [fonts.check probes weight 400 + capture rebuild](fonts-check-capture-rebuild.md) — check() is false until the 400 face loads; Playwright fullPage captures rebuild the FontFaceSet (unloaded) — warm on apply AND on resize.
-- [Verbatim skill Stage 6 vs shadcn hooks](verbatim-skill-vs-shadcn-hooks.md) — frozen skill's class predicate always FAILs this app (data-ds hooks by design); embedded file = design-zip skill, not the in-repo one — md5 both before a panel.
-- [awesome-ds-verify skill copies](awesome-ds-verify-skill-copies.md) — repo copy authoritative, mirror .local after edits; PASS needs --deep + auth env, non-deep full caps at INCOMPLETE; 404 page audited as rendered.
-- [Workspace recycles kill long runs](workspace-recycle-long-runs.md) — container restarts ~hourly (not OOM); logs in .cache/runlogs, sleep ≤270 + uptime check, cut panels are VOID and rerun under a new name.
-- [FontFaceSet rebuild + cold switch](fontfaceset-rebuild-on-stylesheet-insert.md) — late sheets drop warmed unused faces (rAF re-warm starves: use timer ladder + `loadingdone`); a same-tick check after a system switch races the first fetch → idle-prewarm every family in the canonical font link.
-- [Dialog-open locator race](dialog-open-locator-race.md) — a closing Radix sheet is still role=dialog; interaction sweeps must wait for `[role="dialog"][data-state="open"]` of the target, or a harness race reads as an app bug.
-- [Stale git locks after recycle](git-stale-locks-after-recycle.md) — recycles leave 0-byte *.lock files across .git and half-done checkouts (truncated branch names); clear when no git proc runs.
+- [Font loading & parity](font-loading-and-parity.md) — ONE canonical css2 link (never widen it); fonts.check() stays false until the 400 face loads; late sheets and fullPage captures rebuild the FontFaceSet.
+- [Clerk in automated tests](clerk-automated-testing.md) — prefer backend-minted throwaway sessions; headless sign-in needs label-based fields and the attempt→session sequence, never createdSessionId.
+- [Browser capture protocol](browser-capture-protocol.md) — determinism knobs, the 16384px tile-and-stitch ceiling, pre-paint filmstrip reading, and the three read-only enforcement layers.
+- [LCP and pre-paint ordering](lcp-and-prepaint.md) — text LCP size is fixed at first paint; re-inserted prerender nodes register a bigger candidate; defer the head module.
+- [Parity harness & reference rules](parity-harness-and-reference.md) — disposable admin + Clerk-aware cleanup; approved rules change EXPECTED only and must be ported to app CSS the same pass.
+- [DS verify skill copies](ds-verify-skill-copies.md) — repo copy authoritative (mirror .local); the frozen verbatim skill always FAILs this app’s data-ds hooks; md5 both before a panel.
+- [Workspace recycles](workspace-recycles.md) — containers restart ~hourly: resumable logs + short sleeps; recycles leave 0-byte git lock files and truncated checkouts.
+- [Radix interaction pitfalls](radix-interaction-pitfalls.md) — close-animation pointer lock, focus-trap breakers, folded same-value tabs, and closing sheets still matching role=dialog.
+- [QA throwaway-user teardown](qa-throwaway-user-teardown.md) — sweep email LIKE __qa_test_% (residue accrues and contaminates recorded baselines); clear child FKs first; purge ALL even if that undershoots.
+- [Bash long jobs + gotchas](bash-long-jobs.md) — nohup and backgrounded subshells both die with the call (foreground loop + resumable cursor/JSONL, ~88s budget); never capture into UID.
