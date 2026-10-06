@@ -21328,7 +21328,7 @@ paths:
       operationId: get:/api/admin/users/export
       responses:
         '200':
-          description: Users as CSV (emails masked)
+          description: Users as CSV (admin-only; includes email addresses)
           content:
             text/csv:
               schema:
