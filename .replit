@@ -628,6 +628,7 @@ ANTHROPIC_DEFAULT_HAIKU_MODEL = "cc/claude-haiku-4-5-20251001"
 ANTHROPIC_DEFAULT_OPUS_MODEL = "cc/claude-opus-5"
 ANTHROPIC_DEFAULT_SONNET_MODEL = "cc/claude-sonnet-5"
 ANTHROPIC_MODEL = "cc/claude-opus-5"
+CONTACT_ISSUES_URL = "https://github.com/krzemienski/awesome-video/issues"
 
 [userenv.development]
 
