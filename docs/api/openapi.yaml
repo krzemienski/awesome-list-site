@@ -604,6 +604,90 @@ components:
             items:
               type: string
               maxLength: 512
+    post_3a__2f_api_2f_auth_2f_admin-login.Query:
+      type: object
+      properties:
+        page:
+          type: string
+          pattern: ^\d+$
+        limit:
+          type: string
+          pattern: ^\d+$
+        offset:
+          type: string
+          pattern: ^\d+$
+        afterSeq:
+          type: string
+          pattern: ^\d+$
+        jobId:
+          type: string
+          pattern: ^\d+$
+        resourceId:
+          type: string
+          pattern: ^\d+$
+        categoryId:
+          type: string
+          pattern: ^\d+$
+        subcategoryId:
+          type: string
+          pattern: ^\d+$
+        per_page:
+          type: string
+          pattern: ^\d+$
+        cursor:
+          type: string
+          minLength: 1
+          maxLength: 512
+      additionalProperties:
+        anyOf:
+          - type: string
+            maxLength: 512
+          - type: array
+            items:
+              type: string
+              maxLength: 512
+    post_3a__2f_api_2f_auth_2f_admin-logout.Query:
+      type: object
+      properties:
+        page:
+          type: string
+          pattern: ^\d+$
+        limit:
+          type: string
+          pattern: ^\d+$
+        offset:
+          type: string
+          pattern: ^\d+$
+        afterSeq:
+          type: string
+          pattern: ^\d+$
+        jobId:
+          type: string
+          pattern: ^\d+$
+        resourceId:
+          type: string
+          pattern: ^\d+$
+        categoryId:
+          type: string
+          pattern: ^\d+$
+        subcategoryId:
+          type: string
+          pattern: ^\d+$
+        per_page:
+          type: string
+          pattern: ^\d+$
+        cursor:
+          type: string
+          minLength: 1
+          maxLength: 512
+      additionalProperties:
+        anyOf:
+          - type: string
+            maxLength: 512
+          - type: array
+            items:
+              type: string
+              maxLength: 512
     get_3a__2f_api_2f_auth_2f_status.Query:
       type: object
       properties:
@@ -10841,6 +10925,296 @@ paths:
         - requireAuth
       x-contract-schemas:
         query: post_3a__2f_api_2f_auth_2f_logout-all.Query
+        body: JsonObjectBody
+  /api/auth/admin-login:
+    post:
+      operationId: post:/api/auth/admin-login
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/JsonResponse'
+        '400':
+          description: Request validation failed
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationError'
+        '401':
+          description: Authentication required
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '403':
+          description: Insufficient permission
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '404':
+          description: Resource not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '409':
+          description: Request conflicts with current state
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '413':
+          description: Request body too large
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationError'
+        '422':
+          description: Request could not be processed
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '429':
+          description: Rate limit exceeded
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '503':
+          description: Service temporarily unavailable
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+      tags:
+        - auth
+      parameters:
+        - name: page
+          in: query
+          required: false
+          schema:
+            type: string
+            pattern: ^\d+$
+        - name: limit
+          in: query
+          required: false
+          schema:
+            type: string
+            pattern: ^\d+$
+        - name: offset
+          in: query
+          required: false
+          schema:
+            type: string
+            pattern: ^\d+$
+        - name: afterSeq
+          in: query
+          required: false
+          schema:
+            type: string
+            pattern: ^\d+$
+        - name: jobId
+          in: query
+          required: false
+          schema:
+            type: string
+            pattern: ^\d+$
+        - name: resourceId
+          in: query
+          required: false
+          schema:
+            type: string
+            pattern: ^\d+$
+        - name: categoryId
+          in: query
+          required: false
+          schema:
+            type: string
+            pattern: ^\d+$
+        - name: subcategoryId
+          in: query
+          required: false
+          schema:
+            type: string
+            pattern: ^\d+$
+        - name: per_page
+          in: query
+          required: false
+          schema:
+            type: string
+            pattern: ^\d+$
+        - name: cursor
+          in: query
+          required: false
+          schema:
+            type: string
+            minLength: 1
+            maxLength: 512
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/JsonObjectBody'
+      x-domain: auth
+      x-middleware: []
+      x-contract-schemas:
+        query: post_3a__2f_api_2f_auth_2f_admin-login.Query
+        body: JsonObjectBody
+  /api/auth/admin-logout:
+    post:
+      operationId: post:/api/auth/admin-logout
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/JsonResponse'
+        '400':
+          description: Request validation failed
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationError'
+        '401':
+          description: Authentication required
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '403':
+          description: Insufficient permission
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '404':
+          description: Resource not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '409':
+          description: Request conflicts with current state
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '413':
+          description: Request body too large
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationError'
+        '422':
+          description: Request could not be processed
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '429':
+          description: Rate limit exceeded
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '503':
+          description: Service temporarily unavailable
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+      tags:
+        - auth
+      parameters:
+        - name: page
+          in: query
+          required: false
+          schema:
+            type: string
+            pattern: ^\d+$
+        - name: limit
+          in: query
+          required: false
+          schema:
+            type: string
+            pattern: ^\d+$
+        - name: offset
+          in: query
+          required: false
+          schema:
+            type: string
+            pattern: ^\d+$
+        - name: afterSeq
+          in: query
+          required: false
+          schema:
+            type: string
+            pattern: ^\d+$
+        - name: jobId
+          in: query
+          required: false
+          schema:
+            type: string
+            pattern: ^\d+$
+        - name: resourceId
+          in: query
+          required: false
+          schema:
+            type: string
+            pattern: ^\d+$
+        - name: categoryId
+          in: query
+          required: false
+          schema:
+            type: string
+            pattern: ^\d+$
+        - name: subcategoryId
+          in: query
+          required: false
+          schema:
+            type: string
+            pattern: ^\d+$
+        - name: per_page
+          in: query
+          required: false
+          schema:
+            type: string
+            pattern: ^\d+$
+        - name: cursor
+          in: query
+          required: false
+          schema:
+            type: string
+            minLength: 1
+            maxLength: 512
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/JsonObjectBody'
+      x-domain: auth
+      x-middleware: []
+      x-contract-schemas:
+        query: post_3a__2f_api_2f_auth_2f_admin-logout.Query
         body: JsonObjectBody
   /api/auth/status:
     get:

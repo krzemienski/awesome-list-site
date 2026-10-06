@@ -33,6 +33,7 @@ import AuthConversionTracker from "@/components/auth/AuthConversionTracker";
 import GuestBookmarkMerge from "@/components/auth/GuestBookmarkMerge";
 import StaleSessionGate from "@/components/auth/StaleSessionGate";
 import { ClerkUiFallback } from "@/components/auth/AuthUnavailable";
+import { AdminPasswordSignIn } from "@/components/auth/AdminPasswordSignIn";
 import ConsentBanner from "@/components/ui/consent-banner";
 import ScrubbedParamsNotice from "@/components/ui/scrubbed-params-notice";
 import { Button } from "@/components/ui/button";
@@ -453,6 +454,10 @@ function LegacyAuthRedirect({ to }: { to: "/sign-in" | "/sign-up" }) {
 }
 
 function SignInPage() {
+  // /sign-in?admin shows the owner password form instead of Clerk.
+  const adminPasswordMode =
+    typeof window !== "undefined" &&
+    new URLSearchParams(window.location.search).has("admin");
   return (
     <div
       className="flex justify-center py-10"
@@ -460,6 +465,9 @@ function SignInPage() {
     >
       {/* Title mirrors the og-middleware /sign-in template (two-pass parity). */}
       <SEOHead title="Sign In" description={signInSeoDescription} noindex />
+      {adminPasswordMode ? (
+        <AdminPasswordSignIn />
+      ) : (
       <StaleSessionGate>
         {/* C5-V3-01: never a blank body while Clerk's UI can't load. */}
         <SignIn
@@ -469,6 +477,7 @@ function SignInPage() {
           fallback={<ClerkUiFallback flow="sign-in" />}
         />
       </StaleSessionGate>
+      )}
     </div>
   );
 }

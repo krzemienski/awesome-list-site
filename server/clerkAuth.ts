@@ -19,7 +19,7 @@
  *    misreported as "signed out").
  */
 import type { Request, RequestHandler } from "express";
-import { createHash, timingSafeEqual } from "node:crypto";
+import { createHash, createHmac, timingSafeEqual } from "node:crypto";
 import { getAuth } from "@clerk/express";
 import { eq } from "drizzle-orm";
 import { db } from "./db";
@@ -186,8 +186,83 @@ export function hasValidAuthReturnAuditKey(req: Request): boolean {
   return secretsMatch(headerValue, adminPassword);
 }
 
-async function resolveAuditKeyAdmin(req: Request): Promise<User | undefined> {
-  if (!hasValidAuditKey(req)) return undefined;
+/**
+ * Owner password sign-in ("break-glass" admin access that does not depend on
+ * Clerk). POST /api/auth/admin-login checks the submitted password against
+ * ADMIN_PASSWORD and, on success, sets a signed HttpOnly cookie that resolves
+ * to the admin@example.com row exactly like the audit-key header does.
+ *
+ * Fails closed:
+ *  - ADMIN_PASSWORD unset or shorter than 12 chars → login refused and every
+ *    cookie is ignored (internet-facing, so stricter than the 8-char header).
+ *  - Cookie = "<expiresAtMs>.<HMAC>", keyed by ADMIN_PASSWORD + SESSION_SECRET:
+ *    rotating the password instantly invalidates every issued cookie.
+ *  - Expired, future-dated beyond the TTL, or tampered cookies are ignored.
+ */
+export const ADMIN_SESSION_COOKIE = "av_admin_session";
+export const ADMIN_SESSION_TTL_MS = 12 * 60 * 60 * 1000;
+const ADMIN_LOGIN_MIN_PASSWORD_LENGTH = 12;
+
+function adminLoginPassword(): string | null {
+  const password = process.env.ADMIN_PASSWORD;
+  return password && password.length >= ADMIN_LOGIN_MIN_PASSWORD_LENGTH ? password : null;
+}
+
+export function isAdminPasswordLoginEnabled(): boolean {
+  return adminLoginPassword() !== null;
+}
+
+export function checkAdminPassword(candidate: string): boolean {
+  const password = adminLoginPassword();
+  if (!password) return false;
+  return secretsMatch(candidate, password);
+}
+
+function adminSessionSignature(expiresAt: number, password: string): string {
+  return createHmac("sha256", `${password}\0${process.env.SESSION_SECRET ?? ""}`)
+    .update(`admin-session-v1:${expiresAt}`)
+    .digest("base64url");
+}
+
+/** Returns a fresh cookie value, or null when password login is disabled. */
+export function issueAdminSessionToken(now = Date.now()): string | null {
+  const password = adminLoginPassword();
+  if (!password) return null;
+  const expiresAt = now + ADMIN_SESSION_TTL_MS;
+  return `${expiresAt}.${adminSessionSignature(expiresAt, password)}`;
+}
+
+function readCookie(req: Request, name: string): string | undefined {
+  const header = req.headers.cookie;
+  if (!header) return undefined;
+  for (const part of header.split(";")) {
+    const eq = part.indexOf("=");
+    if (eq === -1) continue;
+    if (part.slice(0, eq).trim() === name) return part.slice(eq + 1).trim();
+  }
+  return undefined;
+}
+
+export function hasValidAdminSessionCookie(req: Request): boolean {
+  const password = adminLoginPassword();
+  if (!password) return false;
+  const raw = readCookie(req, ADMIN_SESSION_COOKIE);
+  if (!raw) return false;
+  const dot = raw.indexOf(".");
+  if (dot <= 0) return false;
+  const expiresAt = Number(raw.slice(0, dot));
+  const now = Date.now();
+  if (!Number.isSafeInteger(expiresAt) || expiresAt <= now) return false;
+  if (expiresAt > now + ADMIN_SESSION_TTL_MS + 60_000) return false;
+  return secretsMatch(raw.slice(dot + 1), adminSessionSignature(expiresAt, password));
+}
+
+/** True when the request is admin-authenticated without Clerk (header or cookie). */
+export function hasAdminBypass(req: Request): boolean {
+  return hasValidAuditKey(req) || hasValidAdminSessionCookie(req);
+}
+
+async function resolveBypassAdmin(): Promise<User | undefined> {
   const [admin] = await db
     .select()
     .from(users)
@@ -208,17 +283,21 @@ export const clerkUserContext: RequestHandler = async (req, res, next) => {
   // path so the scripts need no Clerk session at all. Requests with a VALID
   // key skipped clerkMiddleware entirely (see server/index.ts), so this branch
   // must never fall through to getSessionIdentity for them.
-  if (hasValidAuditKey(req)) {
+  // The owner password cookie takes the same path (no Clerk session at all).
+  const viaAuditKey = hasValidAuditKey(req);
+  if (viaAuditKey || hasValidAdminSessionCookie(req)) {
     try {
-      const auditAdmin = await resolveAuditKeyAdmin(req);
+      const auditAdmin = await resolveBypassAdmin();
       if (auditAdmin) {
         req.dbUser = auditAdmin;
         req.clerkIdentity = undefined; // no Clerk session backs this request
-        console.log(`[clerkAuth] audit-key bypass: ${req.method} ${req.path}`);
+        if (viaAuditKey) {
+          console.log(`[clerkAuth] audit-key bypass: ${req.method} ${req.path}`);
+        }
       } else {
-        // Valid key but no seeded admin row: treat as anonymous.
+        // Valid credential but no seeded admin row: treat as anonymous.
         console.warn(
-          "[clerkAuth] audit-key valid but admin@example.com row missing — request stays anonymous",
+          "[clerkAuth] admin bypass valid but admin@example.com row missing — request stays anonymous",
         );
       }
     } catch (error) {

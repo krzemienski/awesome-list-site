@@ -109,6 +109,13 @@ export function useAuth() {
 
   /** Sign out via Clerk, then confirm the server no longer sees a session. */
   const clerkSignOutAndVerify = async () => {
+    // Clear the owner password cookie too (no-op for Clerk-only sessions),
+    // or the server would still see the admin after Clerk signs out.
+    await fetch('/api/auth/admin-logout', {
+      method: 'POST',
+      credentials: 'include',
+      signal: logoutRequestSignal(),
+    });
     // The no-op callback stops Clerk routing to its after-sign-out URL;
     // finishLogout does the full reload once the server confirms (C3-V3-02).
     await signOut(() => {});

@@ -308,7 +308,7 @@ export async function handleSSR(req: Request, res: Response, next: NextFunction)
     req.method !== "GET" ||
     req.path !== "/" ||
     !hasOnlyValidLayout ||
-    /(?:^|;\s*)__session[^=;]*=/.test(req.headers.cookie || "")
+    /(?:^|;\s*)(?:__session[^=;]*|av_admin_session)=/.test(req.headers.cookie || "")
   ) {
     return next();
   }

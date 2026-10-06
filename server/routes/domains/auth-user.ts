@@ -22,9 +22,36 @@
  */
 
 import type { Express, RequestHandler } from "express";
+import rateLimit from "express-rate-limit";
 import { clerkClient } from "@clerk/express";
 import type { User } from "@shared/schema";
 import { UserRepository } from "../../repositories";
+import {
+  ADMIN_SESSION_COOKIE,
+  ADMIN_SESSION_TTL_MS,
+  checkAdminPassword,
+  issueAdminSessionToken,
+} from "../../clerkAuth";
+import { negotiated429Handler } from "../../middleware/rateLimit";
+import { PgRateLimitStore } from "../../middleware/pgRateLimitStore";
+
+// Owner password sign-in: 10 attempts per 15 minutes per IP, on its own store
+// prefix so hits never double-count against the /api backstop limiter.
+const adminLoginLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  limit: 10,
+  standardHeaders: true,
+  legacyHeaders: false,
+  store: new PgRateLimitStore("admin-login"),
+  handler: negotiated429Handler("Too many sign-in attempts. Please try again later."),
+});
+
+const adminCookieOptions = {
+  httpOnly: true,
+  secure: process.env.NODE_ENV === "production",
+  sameSite: "lax" as const,
+  path: "/",
+};
 
 export interface AuthUserRoutesContext {
   /** Clerk-backed auth gate (kept in the ctx for wiring symmetry). */
@@ -113,6 +140,35 @@ export function registerAuthUserRoutes(
       console.error("[/api/auth/logout-all] Error:", error);
       res.status(500).json({ message: "Failed to sign out everywhere" });
     }
+  });
+
+  // POST /api/auth/admin-login — owner password sign-in (no Clerk). A correct
+  // ADMIN_PASSWORD sets a signed 12-hour HttpOnly cookie that resolves to the
+  // admin@example.com row (see clerkUserContext). Disabled and wrong
+  // passwords get the same 401 so the endpoint never reveals its config.
+  app.post("/api/auth/admin-login", adminLoginLimiter, (req, res) => {
+    const password = typeof req.body?.password === "string" ? req.body.password : "";
+    if (password.length === 0 || password.length > 256 || !checkAdminPassword(password)) {
+      console.warn(`[auth] admin password sign-in rejected from ${req.ip}`);
+      return res.status(401).json({ message: "Incorrect password" });
+    }
+    const token = issueAdminSessionToken();
+    if (!token) return res.status(401).json({ message: "Incorrect password" });
+    console.log(`[auth] admin password sign-in succeeded from ${req.ip}`);
+    res.cookie(ADMIN_SESSION_COOKIE, token, {
+      ...adminCookieOptions,
+      maxAge: ADMIN_SESSION_TTL_MS,
+    });
+    res.set("Cache-Control", "no-store");
+    return res.json({ ok: true });
+  });
+
+  // POST /api/auth/admin-logout — clears the owner password cookie. Always
+  // succeeds so the normal sign-out flow can call it unconditionally.
+  app.post("/api/auth/admin-logout", (_req, res) => {
+    res.clearCookie(ADMIN_SESSION_COOKIE, adminCookieOptions);
+    res.set("Cache-Control", "no-store");
+    return res.json({ ok: true });
   });
 
   // GET /api/auth/status — deprecated lightweight session probe.

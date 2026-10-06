@@ -28,7 +28,7 @@ import {
 } from "./middlewares/clerkProxyMiddleware";
 import {
   clerkUserContext,
-  hasValidAuditKey,
+  hasAdminBypass,
   hasValidAuthReturnAuditKey,
 } from "./clerkAuth";
 import { HASHED_ASSET_CACHE_CONTROL, SESSION_CACHE_CONTROL } from "./http-cache-policy";
@@ -336,8 +336,9 @@ app.use((req, res, next) => {
   }
   const origin = req.headers.origin;
   // Clerk's session cookie is `__session` (with optional per-instance
-  // suffixes like `__session_abc123`), replacing the old connect.sid.
-  const hasSessionCookie = /(?:^|;\s*)__session[^=;]*=/.test(
+  // suffixes like `__session_abc123`), replacing the old connect.sid. The
+  // owner password cookie (av_admin_session) carries admin rights too.
+  const hasSessionCookie = /(?:^|;\s*)(?:__session[^=;]*|av_admin_session)=/.test(
     req.headers.cookie ?? "",
   );
   const requiresOrigin =
@@ -455,7 +456,9 @@ app.use((req, res, next) => {
   // non-browser HTML requests to Clerk's dev-browser handshake, which breaks
   // fetch-based validation probes. Fail-closed: hasValidAuditKey is false
   // unless ADMIN_PASSWORD is set (>= 8 chars) and matches in constant time.
-  if (hasValidAuditKey(req)) return next();
+  // The owner password cookie (POST /api/auth/admin-login) is the browser
+  // equivalent and skips Clerk the same way.
+  if (hasAdminBypass(req)) return next();
   return clerkSessionMiddleware(req, res, next);
 });
 // Attach req.dbUser for signed-in visitors (JIT-provisions first-time Clerk
