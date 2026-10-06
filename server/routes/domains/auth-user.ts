@@ -15,6 +15,8 @@
  *   GET  /api/auth/me      — deprecated REST alias (401 style)
  *   GET  /api/auth/status  — deprecated lightweight probe
  *   POST /api/auth/logout-all — revoke every active Clerk session
+ *   POST /api/auth/admin-login  — owner password sign-in (ADMIN_PASSWORD)
+ *   POST /api/auth/admin-logout — clear the owner password cookie
  *
  * Session state comes from `req.dbUser`, resolved by clerkUserContext
  * (server/clerkAuth.ts) after clerkMiddleware verifies the Clerk session.

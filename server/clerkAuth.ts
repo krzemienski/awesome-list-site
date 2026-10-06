@@ -193,15 +193,16 @@ export function hasValidAuthReturnAuditKey(req: Request): boolean {
  * to the admin@example.com row exactly like the audit-key header does.
  *
  * Fails closed:
- *  - ADMIN_PASSWORD unset or shorter than 12 chars → login refused and every
- *    cookie is ignored (internet-facing, so stricter than the 8-char header).
+ *  - ADMIN_PASSWORD unset or shorter than 8 chars → login refused and every
+ *    cookie is ignored (same floor as the audit-key header; the login route
+ *    is rate-limited to 10 attempts per 15 minutes).
  *  - Cookie = "<expiresAtMs>.<HMAC>", keyed by ADMIN_PASSWORD + SESSION_SECRET:
  *    rotating the password instantly invalidates every issued cookie.
  *  - Expired, future-dated beyond the TTL, or tampered cookies are ignored.
  */
 export const ADMIN_SESSION_COOKIE = "av_admin_session";
 export const ADMIN_SESSION_TTL_MS = 12 * 60 * 60 * 1000;
-const ADMIN_LOGIN_MIN_PASSWORD_LENGTH = 12;
+const ADMIN_LOGIN_MIN_PASSWORD_LENGTH = 8;
 
 function adminLoginPassword(): string | null {
   const password = process.env.ADMIN_PASSWORD;
