@@ -10,6 +10,7 @@ import {
   useContinueLearningSummary,
   useResumeJourney,
 } from "@/hooks/useContinueLearning";
+import { queryUnavailableReason } from "@/lib/query-availability";
 
 function relativeTime(value: string): string {
   const date = new Date(value);
@@ -19,13 +20,9 @@ function relativeTime(value: string): string {
 }
 
 export default function ContinueLearningPreview() {
-  const {
-    data,
-    isLoading,
-    isError,
-    refetch,
-    isFetching,
-  } = useContinueLearningSummary(true);
+  const summaryQuery = useContinueLearningSummary(true);
+  const { data, isLoading, isError, refetch, isFetching } = summaryQuery;
+  const offline = queryUnavailableReason(summaryQuery) === "offline";
   const resumeJourney = useResumeJourney();
 
   if (isLoading) {
@@ -51,7 +48,9 @@ export default function ContinueLearningPreview() {
         </CardHeader>
         <CardContent className="flex flex-wrap items-center justify-between gap-3">
           <p className="text-sm text-muted-foreground">
-            We couldn't load your learning activity.
+            {offline
+              ? "You're offline. Your learning activity will load when your connection is back."
+              : "We couldn't load your learning activity."}
           </p>
           <Button
             variant="outline"

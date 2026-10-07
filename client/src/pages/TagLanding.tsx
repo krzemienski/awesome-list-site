@@ -22,6 +22,9 @@ import {
   tagSeoDescription,
   tagTitleCoreDeduped,
 } from "@shared/seo-templates";
+import OfflinePageState from "@/components/layout/OfflinePageState";
+import { queryUnavailableReason } from "@/lib/query-availability";
+import { TAG_MAX_LENGTH } from "@shared/validation";
 import {
   normalizeTagFilter,
   normalizeTagPathSegment,
@@ -68,6 +71,9 @@ export default function TagLanding() {
   const activeClamp = clamp && clamp.slug === slug && clamp.requested === requestedKey ? clamp : null;
   const page = activeClamp ? activeClamp.page : parsedPage.page;
   const offset = (page - 1) * PAGE_SIZE;
+  // The API rejects over-length tags with a 400 that no retry can fix; the
+  // server already answers such URLs 404, so the page must agree.
+  const tagIsQueryable = Boolean(slug) && slug.length <= TAG_MAX_LENGTH;
   const url = `/api/resources?tags=${encodeURIComponent(slug)}&limit=${PAGE_SIZE}&offset=${offset}&facets=true`;
   const listing = useQuery<TagListingResponse>({
     queryKey: [url],
@@ -81,7 +87,7 @@ export default function TagLanding() {
       }
       return apiRequest(url, { method: "GET" });
     },
-    enabled: Boolean(slug),
+    enabled: tagIsQueryable,
     staleTime: 60_000,
     // Hold the current page only while paging within this tag; another tag's
     // cards and total must never render under the new tag's heading.
@@ -102,7 +108,10 @@ export default function TagLanding() {
     return <Redirect to={`${canonicalPath}${page > 1 ? `?page=${page}` : ""}`} replace />;
   }
 
-  if (!slug) return <NotFound />;
+  if (!tagIsQueryable) return <NotFound />;
+  if (queryUnavailableReason(listing) === "offline") {
+    return <OfflinePageState onRetry={() => void listing.refetch()} testId="tag-offline" />;
+  }
   // isPending, not isLoading: offline the fetch is paused (isLoading false),
   // which fell through to the no-data 404 below.
   if (listing.isPending || (activeClamp && listing.isPlaceholderData)) {

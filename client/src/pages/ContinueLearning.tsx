@@ -18,6 +18,8 @@ import type {
   ContinueLearningRecentResource,
 } from "@shared/continueLearning";
 import SEOHead from "@/components/layout/SEOHead";
+import OfflinePageState from "@/components/layout/OfflinePageState";
+import { queryUnavailableReason } from "@/lib/query-availability";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -165,13 +167,8 @@ function LoadingState() {
 
 export default function ContinueLearning() {
   const { isAuthenticated, isLoading: authLoading } = useAuth();
-  const {
-    data,
-    isLoading,
-    isError,
-    refetch,
-    isFetching,
-  } = useContinueLearningSummary(isAuthenticated);
+  const summaryQuery = useContinueLearningSummary(isAuthenticated);
+  const { data, isLoading, isError, refetch, isFetching } = summaryQuery;
   const resumeJourney = useResumeJourney();
 
   if (authLoading) {
@@ -223,10 +220,15 @@ export default function ContinueLearning() {
     );
   }
 
+  if (queryUnavailableReason(summaryQuery) === "offline") {
+    return <OfflinePageState onRetry={() => void refetch()} testId="continue-learning-offline" />;
+  }
+
   if (isError || !data) {
     return (
       <div className="account-page account-page--form container mx-auto px-4 py-12">
         <SEOHead title="Continue Learning" description="Resume your learning activity on Awesome Video." noindex />
+        <h1 className="display-h mb-4 text-2xl">Continue Learning</h1>
         <Alert variant="destructive" data-testid="continue-learning-error">
           <RefreshCw className="h-4 w-4" />
           <AlertTitle>We couldn't load your learning activity</AlertTitle>

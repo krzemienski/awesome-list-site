@@ -10,6 +10,7 @@ import { SidebarProvider } from "@/components/ui/sidebar";
 import "@/styles/shell/layout.css";
 import type { ProductProfileId } from "@/lib/design-system";
 import { useHomeBoot } from "@/lib/home-boot";
+import { handoffFocusOnUnmount } from "@/hooks/focus-handoff";
 
 // Contact variants (docs/CONTACT-VARIANTS.md) are opt-in via
 // VITE_CONTACT_VARIANT; with it unset (the default) neither chunk is fetched
@@ -46,7 +47,12 @@ function BackToTop() {
     <Button
       variant="outline"
       size="icon"
-      onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
+      onClick={(e) => {
+        // The button unmounts once the page is back near the top; hand focus
+        // to the page heading so keyboard users don't drop to <body>.
+        handoffFocusOnUnmount(e.currentTarget);
+        window.scrollTo({ top: 0, behavior: "smooth" });
+      }}
       aria-label="Back to top"
       data-testid="button-back-to-top"
       // Fixed to the SCREEN, so it is lifted by the app shell's

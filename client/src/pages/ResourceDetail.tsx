@@ -38,6 +38,8 @@ import { formatAdminDate } from "@/lib/utils";
 import { fetchAwesomeListNav } from "@/lib/static-data";
 import { Blurhash } from "react-blurhash";
 import type { Resource } from "@shared/schema";
+import OfflinePageState from "@/components/layout/OfflinePageState";
+import { queryUnavailableReason } from "@/lib/query-availability";
 import type { BookmarkCollection } from "@/types/bookmarks";
 import { useGuestBookmarkIds } from "@/lib/guestBookmarks";
 import { restoreRemovedBookmark, type RemovedBookmark } from "@/lib/bookmarkRestore";
@@ -89,7 +91,7 @@ export default function ResourceDetail() {
   const [suggestEditOpen, setSuggestEditOpen] = useState(false);
   const [imageLoaded, setImageLoaded] = useState(false);
 
-  const { data: resource, isLoading, error } = useQuery<Resource & { resolvedKind?: ResourceKind; featured?: boolean }>({
+  const resourceQuery = useQuery<Resource & { resolvedKind?: ResourceKind; featured?: boolean }>({
     queryKey: ['/api/resources', id],
     queryFn: async () => {
       const response = await fetch(`/api/resources/${id}`, { credentials: 'include' });
@@ -98,6 +100,7 @@ export default function ResourceDetail() {
     },
     enabled: !!id
   });
+  const { data: resource, isLoading, error } = resourceQuery;
 
   const { data: favorites } = useQuery<Resource[]>({
     queryKey: ['/api/favorites'],
@@ -582,6 +585,10 @@ export default function ResourceDetail() {
         </div>
       </div>
     );
+  }
+
+  if (queryUnavailableReason(resourceQuery) === "offline") {
+    return <OfflinePageState onRetry={() => void resourceQuery.refetch()} testId="resource-offline" />;
   }
 
   if (error || !resource) {

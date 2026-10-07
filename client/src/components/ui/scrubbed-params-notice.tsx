@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { X } from "lucide-react";
+import { handoffFocusOnUnmount } from "@/hooks/focus-handoff";
 
 declare global {
   interface Window {
@@ -42,7 +43,10 @@ export default function ScrubbedParamsNotice() {
       <button
         type="button"
         className="inline-flex min-h-8 items-center gap-1 underline underline-offset-2"
-        onClick={() => setDismissed(true)}
+        onClick={(e) => {
+          handoffFocusOnUnmount(e.currentTarget);
+          setDismissed(true);
+        }}
         data-testid="button-dismiss-scrubbed-params"
         aria-label="Dismiss notice"
       >

@@ -25,6 +25,9 @@ import {
 import NotFound from "@/pages/not-found";
 import { findTaxonomySuggestion } from "@/lib/not-found-suggestion";
 import ErrorPage from "@/pages/ErrorPage";
+import OfflinePageState from "@/components/layout/OfflinePageState";
+import { queryUnavailableReason } from "@/lib/query-availability";
+import { resolveSiteIdentity } from "@shared/site-identity";
 import "@/styles/pages/taxonomy.css";
 import { parsePageParamStrict, pageNoticeFor } from "@/lib/page-param";
 import { safeGetItem, safeSetItem } from "@/lib/safeStorage";
@@ -117,7 +120,7 @@ export default function TaxonomyListing({ level }: Props) {
   const [location] = useLocation();
   const search = useSearch();
   const { data: publicConfig } = useContactConfig(true);
-  const siteName = publicConfig?.site.title.trim() || "the catalog";
+  const siteName = publicConfig ? resolveSiteIdentity({ name: publicConfig.site.title }).name : "the catalog";
   const params = new URLSearchParams(search);
   const initialPage = parsePageParamStrict(params.get("page"));
   const [page, setPage] = useState(initialPage.page);
@@ -427,6 +430,7 @@ export default function TaxonomyListing({ level }: Props) {
   // the panel closed): only a live, enabled request can fail the page.
   const taxonomySearchError = taxonomySearchEnabled ? taxonomySearch.error : null;
   if (listing.error || taxonomySearchError) return <ErrorPage error={listing.error ?? taxonomySearchError} />;
+  if (queryUnavailableReason(listing) === "offline") return <OfflinePageState onRetry={() => void listing.refetch()} testId="taxonomy-offline" />;
   if (!listingData || !name) return <NotFound />;
 
   // C3-V1-01: the active selection keeps its option even when the kind filter
