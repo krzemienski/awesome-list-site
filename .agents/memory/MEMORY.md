@@ -148,3 +148,4 @@
 - [DS deep gates vs Claude Design](ds-gates-post-claude-design.md) — post-adoption deep verify FAIL is baseline (frozen gates/pre-boot, ENOENT design-system.css, swiss/orange gate race); restore docs/parity after runs.
 - [Platform git auto-commit/sync](platform-git-autocommit.md) — the platform auto-commits agent edits and may sync main to GitHub mid-session; check ls-remote before claiming main is untouched.
 - [Offline-state verification](offline-state-verification.md) — prod warm-cache soft-nav vs dev auth-delay route trick; boot-cached queries; home account features need ?context=account.
+- [Undo after unmount](undo-after-unmount.md) — toast Undo for a removed item must be restored by the list owner; count rendered cards, not just the API.
