@@ -28,3 +28,6 @@ full text retained, focus kept, exactly one request for the complete string.
 the same component as the query-driven content. Check for this trap whenever a
 "search only searches the first letter" or "input loses focus while typing" report
 comes in.
+
+**Placeholder data trap:** with `placeholderData: keepPreviousData`, `data` still holds the PREVIOUS response while the new key loads. Any effect that reads a server-echoed value (e.g. `pagination.page` to detect clamped pages) must skip while `isPlaceholderData`, or it "corrects" the URL back to the old page and shows a false notice.
+**Why:** a pagination focus fix (keep the paginator mounted between pages) would otherwise have bounced every Next click.
