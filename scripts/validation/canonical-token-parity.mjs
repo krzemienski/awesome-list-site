@@ -74,7 +74,8 @@
  *      the design's default accent; client/src/lib/design-system.ts boots the
  *      applier's own fallbacks (DEFAULT_SYSTEM = its fallback system,
  *      DEFAULT_ACCENT = ACCENTS[0] = SYSTEM_DEFAULT_ACCENT[DEFAULT_SYSTEM]),
- *      restates none of the tables and reads the window globals; the index.html
+ *      reads the window globals and checks boot id/default metadata against
+ *      the canonical tables; the index.html
  *      pre-paint boot reads the same storage keys and falls back to the same
  *      system — as string literals or as fields of THEME_BOOT_DATA injected by
  *      vite.config.ts into the __AWESOME_VIDEO_THEME_BOOT__ marker.
@@ -241,7 +242,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { JSDOM } from 'jsdom';
-import { applierFallbacks, applierPaintsAccentPair, evaluateCanonicalRegistry } from '../generate-design-system-artifact.mjs';
+import { applierFallbacks, applierPaintsAccentPair, evaluateCanonicalRegistry, evaluateBootRegistry, readThemeBootData } from '../generate-design-system-artifact.mjs';
 
 const ROOT = fileURLToPath(new URL('../..', import.meta.url));
 
@@ -414,12 +415,37 @@ const ADMIN_COMPACT_CHIP_REASON =
 
 const pinned = (canonicalValue, appValue) => ({ canonical, app }) => canonical === canonicalValue && app === appValue;
 
-// Retired with the legacy runtime sheet (the app now serves the canonical
-// sheet verbatim, so these values can no longer differ): `<system>:--text-3`
-// (WCAG alpha), `rule:.kbd:font-size` (12px floor) and `rule:.page:background`
-// / `background-color` (atmosphere on .page pseudos). A stale entry fails this
-// gate, which is how they were found.
+function rgba(value) {
+  value = value?.replace(/\s*!important$/, '');
+  if (/^#[0-9a-f]{6}$/i.test(value)) return [1, 3, 5].map(i => parseInt(value.slice(i, i + 2), 16)).concat(1);
+  const parts = value?.match(/[\d.]+/g)?.map(Number);
+  return parts?.length === 4 ? parts : null;
+}
+function over(fg, bg) { return fg.slice(0, 3).map((v, i) => v * fg[3] + bg[i] * (1 - fg[3])).concat(1); }
+function luminance(c) {
+  return c.slice(0, 3).map(v => v / 255).map(v => v <= .04045 ? v / 12.92 : ((v + .055) / 1.055) ** 2.4)
+    .reduce((sum, v, i) => sum + v * [.2126, .7152, .0722][i], 0);
+}
+function text3ContrastHolds({ canonical, app, appMap }) {
+  const fg = rgba(app), old = rgba(canonical);
+  if (!fg || !old || old[3] >= fg[3] || fg.slice(0, 3).some((v, i) => v !== old[i])) return false;
+  const base = rgba(appMap.get('--bg'));
+  const raised = rgba(appMap.get('--bg-2'));
+  if (!base || !raised) return false;
+  const backgrounds = [base, raised, ...['--surface', '--surface-2', '--surface-3'].map(key => over(rgba(appMap.get(key)), raised))];
+  const contrast = (color, bg) => (luminance(over(color, bg)) + .05) / (luminance(bg) + .05);
+  return backgrounds.every(bg => contrast(fg, bg) >= 4.6) &&
+    backgrounds.some(bg => contrast([...fg.slice(0, 3), fg[3] - .01], bg) < 4.6) &&
+    backgrounds.some(bg => contrast(old, bg) < 4.6);
+}
+
+// Text-3 is corrected in the app boot registry, never in the frozen sheet.
+// All other token values retain canonical parity.
 export const DOCUMENTED_DEVIATIONS = new Map([
+  ...["editorial", "terminal", "geist", "brutalist", "swiss"].map(id => [`${id}:--text-3`, {
+    reason: "App-owned prepaint alpha correction: small metadata must meet the design's promised 4.6:1 on every neutral surface. Expires when canonical contrast catches up.",
+    holds: text3ContrastHolds,
+  }]),
   ['rule:body:height', { reason: BODY_HEIGHT_REASON, holds: bodyHeightHolds }],
   // Rule 11 (cascade shadows): `shadow:<winning rule key>:<property>`.
   ['shadow:client/src/styles/app-bridge.css .no-anim *:transition', { reason: NO_ANIM_REASON, holds: noAnimHolds }],
@@ -1469,6 +1495,18 @@ export function buildAppModel({ css, js, registry = null, indexHtml = null, vite
   const layers = classifyCustomProperties(sheet, DEFAULT_PATHS.appCss, mainOrder, mainLayer);
   if (!layers.root.size) throw new Error(`served ${DEFAULT_PATHS.appCss}: no bare :root block found`);
   const runtime = runtimeFromRegistry(js, DEFAULT_PATHS.appJs);
+  let bootRegistryMismatch = false;
+  if (indexHtml && registry) {
+    const painted = evaluateBootRegistry(js, indexHtml, registry);
+    runtime.systems = new Map(Object.entries(painted).map(([id, system]) => [id, new Map(Object.entries(system.vars))]));
+    const data = readThemeBootData(registry);
+    const canonical = evaluateCanonicalRegistry(js);
+    if (JSON.stringify(data.systemIds) !== JSON.stringify(Object.keys(canonical.systems)) ||
+        JSON.stringify(data.accentIds) !== JSON.stringify(canonical.accents.map(a => a.id)) ||
+        JSON.stringify(data.defaultAccents) !== JSON.stringify(canonical.systemDefaultAccents)) {
+      bootRegistryMismatch = true;
+    }
+  }
   const siblingDeclarations = [];
   const scoped = layers.scoped.map((record) => ({ ...record, file: DEFAULT_PATHS.appCss }));
   const sheets = [{ file: DEFAULT_PATHS.appCss, order: mainOrder, sheet, baseLayer: mainLayer ?? null, context: '' }];
@@ -1533,6 +1571,7 @@ export function buildAppModel({ css, js, registry = null, indexHtml = null, vite
     registry: appRegistry,
     load,
     boot,
+    bootRegistryMismatch,
     rules: sheet.rules,
     mergedRules,
     sheet,
@@ -2434,6 +2473,7 @@ export function compareModels(canonical, app, deviations = DOCUMENTED_DEVIATIONS
   // compare cannot see).
   const combos = [];
   if (canonical.paintsAccentPair === false) failures.push(`canonical ${DEFAULT_PATHS.canonicalJs}: applyDesignSystem no longer sets --accent/--accent-2 from primary/secondary — extend the model before trusting this gate`);
+  if (app.bootRegistryMismatch) failures.push('registry: Theme boot fallback ids/default accents differ from canonical registry');
   if (app.paintsAccentPair === false) failures.push(`served ${DEFAULT_PATHS.appJs}: applyDesignSystem no longer sets --accent/--accent-2 from primary/secondary — no accent paints`);
   for (const [id, canonAccent] of canonical.accents) {
     const appAccent = app.accents.get(id);

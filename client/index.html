@@ -293,14 +293,44 @@
         try {
           // Storage keys + fallback system from design-system.ts (Vite injects them).
           var THEME_BOOT = __AWESOME_VIDEO_THEME_BOOT__;
+          var FONT_BOOT = __AWESOME_VIDEO_FONT_BOOT__;
+          var fnt = null;
+          try { fnt = localStorage.getItem('ds-font-override'); } catch (_) {}
+          if (!Object.prototype.hasOwnProperty.call(FONT_BOOT.stacks, fnt)) fnt = FONT_BOOT.fallback;
+          root.setAttribute('data-font', fnt);
           var sys = null, acc = null;
           try { sys = localStorage.getItem(THEME_BOOT.systemKey); } catch (_) {}
           try { acc = localStorage.getItem(THEME_BOOT.accentKey); } catch (_) {}
+          if (!window.DESIGN_SYSTEMS) {
+            if (THEME_BOOT.systemIds.indexOf(sys) === -1) sys = THEME_BOOT.defaultSystem;
+            if (THEME_BOOT.accentIds.indexOf(acc) === -1) acc = THEME_BOOT.defaultAccents[sys];
+            root.setAttribute('data-system', sys);
+            root.setAttribute('data-accent', acc);
+          } else {
           if (!Object.prototype.hasOwnProperty.call(window.DESIGN_SYSTEMS, sys)) sys = THEME_BOOT.defaultSystem;
           var known = false;
           for (var i = 0; i < window.ACCENTS.length; i++) if (window.ACCENTS[i].id === acc) known = true;
           if (!known) acc = window.SYSTEM_DEFAULT_ACCENT[sys];
-          window.applyDesignSystem(sys, acc);
+          Object.keys(THEME_BOOT.text3Corrections).forEach(function (id) {
+            window.DESIGN_SYSTEMS[id].vars['--text-3'] = THEME_BOOT.text3Corrections[id];
+          });
+          var originalVars = window.DESIGN_SYSTEMS[sys].vars;
+          try {
+            if (fnt && FONT_BOOT.stacks[fnt]) {
+              window.DESIGN_SYSTEMS[sys].vars = Object.assign({}, originalVars, {
+                '--font-body': FONT_BOOT.stacks[fnt],
+                '--font-sans': FONT_BOOT.stacks[fnt]
+              });
+            }
+            if (typeof window.applyDesignSystem === 'function') window.applyDesignSystem(sys, acc);
+            else {
+              root.setAttribute('data-system', sys);
+              root.setAttribute('data-accent', acc);
+            }
+          } finally {
+            window.DESIGN_SYSTEMS[sys].vars = originalVars;
+          }
+          }
         } catch (_) {}
 
         try {
@@ -321,9 +351,6 @@
           // is stored: a first visit is pure applier state. The applier
           // clears --font-body on every switch, so the app re-applies the
           // override after each one (font-options.ts, single code path).
-          var FONT_BOOT = __AWESOME_VIDEO_FONT_BOOT__;
-          var fnt = null;
-          try { fnt = localStorage.getItem('ds-font-override'); } catch (_) {}
           if (fnt && Object.prototype.hasOwnProperty.call(FONT_BOOT.stacks, fnt) && FONT_BOOT.stacks[fnt]) {
             root.setAttribute('data-font', fnt);
             root.style.setProperty('--font-body', FONT_BOOT.stacks[fnt]);

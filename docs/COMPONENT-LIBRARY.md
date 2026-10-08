@@ -55,7 +55,6 @@ Components live under `client/src/components/`:
 | `onboarding/` | `learning-preferences-form`. |
 | `search/` | `SearchFilters`. |
 | `animations/` | `sidebar-morphing`. |
-| `BrandMark.tsx` | The brand tile (stays rounded in 0-radius systems — brand kit, not a bug). |
 | `ErrorBoundary.tsx` | Top-level React error boundary. |
 
 ---

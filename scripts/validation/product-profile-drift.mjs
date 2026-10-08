@@ -75,10 +75,13 @@ expect(
     profileCss.includes("animation-duration: 0.01ms !important"),
   "Shared profile foundation does not enforce reduced-motion behavior",
 );
-expect(
-  runtime.includes("defaultSystem: null") && runtime.includes("defaultAccent: null"),
-  "Embedded integrations are not host-neutral with inherited accent",
-);
+{
+  const profileTable = runtime.match(/export const PRODUCT_PROFILES = \{[\s\S]*?\n\} as const/)?.[0] ?? "";
+  expect(
+    profileTable.length > 0 && !/default(?:System|Accent)\s*:/.test(profileTable),
+    "PRODUCT_PROFILES carries a per-profile system/accent default; profiles are density hooks only",
+  );
+}
 expect(app.includes("resolveProductProfile(location)"), "SPA routes do not resolve a product profile");
 expect(app.includes("productProfile={productProfile}"), "MainLayout does not declare its product profile");
 // Profiles are layout-density hooks only: the system that paints is the
@@ -336,8 +339,8 @@ const routeFamilies = [
   {
     route: "/settings/theme",
     profile: "learning-workspace",
-    defaultSystem: "geist",
-    defaultAccent: "cyan",
+    defaultSystem: "editorial",
+    defaultAccent: "crimson",
     density: {
       "--profile-content-gap": "1.25rem",
       "--profile-control-height": "2.75rem",
@@ -349,8 +352,8 @@ const routeFamilies = [
   {
     route: "/admin",
     profile: "admin-operations",
-    defaultSystem: "swiss",
-    defaultAccent: "orange",
+    defaultSystem: "editorial",
+    defaultAccent: "crimson",
     density: {
       "--profile-content-gap": "0.75rem",
       // Every profile shares the 44px accessible-target floor (see
@@ -463,9 +466,17 @@ async function inspectRoute(browser, family, saved) {
       throw new Error(`${family.route} returned ${response?.status() ?? "no status"}`);
     }
     try {
+      // Mount is complete once React has re-asserted the route's product
+      // profile (the boot writes it first). data-system / data-accent are
+      // written once, by the inline boot: since the canonical applier owns
+      // them, ThemeProvider only mirrors them back into state.
       await page.waitForFunction(
-        () => Object.values(window.__profileAttributeWrites || {})
-          .every((writes) => writes.length >= 2),
+        () => {
+          const writes = window.__profileAttributeWrites || {};
+          return (writes["data-product-profile"] || []).length >= 2
+            && (writes["data-system"] || []).length >= 1
+            && (writes["data-accent"] || []).length >= 1;
+        },
         undefined,
         { timeout: 30_000 },
       );
@@ -599,9 +610,15 @@ async function inspectCrossTabThemeSync(browser) {
       { timeout: 10_000 },
     );
     state = await readTheme(receiver);
+    // No override = the canonical applier's own --font-body for the system
+    // (it writes every system var inline), not an empty value.
+    const systemBody = await receiver.evaluate(
+      (id) => window.DESIGN_SYSTEMS?.[id]?.vars?.["--font-body"] ?? null,
+      "terminal",
+    );
     expect(
-      state.fontBody === "",
-      `Cross-tab invalid font did not clear the override: ${state.fontBody}`,
+      Boolean(systemBody) && state.fontBody === systemBody,
+      `Cross-tab invalid font did not fall back to the system font: ${state.fontBody} (system ${systemBody})`,
     );
     expect(
       state.profile === "learning-workspace" && state.system === "terminal" && state.accent === "violet",
@@ -618,7 +635,7 @@ async function inspectCrossTabThemeSync(browser) {
     );
     state = await readTheme(receiver);
     expect(
-      state.font === "system" && state.fontBody === "",
+      state.font === "system" && state.fontBody === systemBody,
       `Cross-tab cleared font did not retain the system fallback: ${JSON.stringify(state)}`,
     );
 
@@ -743,13 +760,17 @@ try {
           `${family.route} ${scenario.name} unexpectedly regained localStorage access`,
         );
         expect(
-          result.storageCalls.getItem >= 1 && result.storageCalls.setItem >= 1,
-          `${family.route} ${scenario.name} did not exercise denied theme reads and writes`,
+          result.storageCalls.getItem >= 1,
+          `${family.route} ${scenario.name} did not exercise denied theme reads`,
         );
       } else {
+        // Storage holds the visitor's picks only (docs/05-theming.md
+        // "Persistence"): loading a page must never write a resolved default
+        // or rewrite an unknown saved id.
         expect(
-          result.saved.system === scenario.expectedSystem && result.saved.accent === scenario.expectedAccent,
-          `${family.route} ${scenario.name} did not persist the resolved theme consistently`,
+          result.saved.system === scenario.saved.system && result.saved.accent === scenario.saved.accent,
+          `${family.route} ${scenario.name} page load rewrote the saved theme: ` +
+            `seeded ${JSON.stringify(scenario.saved)}, found ${JSON.stringify(result.saved)}`,
         );
       }
     }

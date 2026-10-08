@@ -4,8 +4,9 @@
   The tables (DESIGN_SYSTEMS, ACCENTS, SYSTEM_DEFAULT_ACCENT, TYPE_SCALE,
   SPACE_SCALE) and the applier live in /ds/design-system.js, a verbatim copy of
   the design source that index.html loads synchronously before first paint.
-  This module never restates them: it reads the window globals, adds types,
-  and provides the persistence helpers from docs/05-theming.md.
+  This module reads the window globals, adds types, and provides persistence.
+  Boot-only id/default metadata is checked against the canonical tables by
+  canonical-token-parity; app-owned accessible text corrections live here.
 
   Import-safe on the server: nothing here touches `window` at module load, and
   every reader falls back to an empty table when the globals don't exist.
@@ -74,6 +75,22 @@ export const THEME_BOOT_DATA = {
   systemKey: SYSTEM_STORAGE_KEY,
   accentKey: ACCENT_STORAGE_KEY,
   defaultSystem: DEFAULT_SYSTEM,
+  systemIds: ["editorial", "terminal", "geist", "brutalist", "swiss"],
+  accentIds: ["crimson", "magenta", "orange", "amber", "emerald", "matrix", "cyan", "violet", "lime", "rose"],
+  defaultAccents: { editorial: "crimson", terminal: "matrix", geist: "cyan", brutalist: "amber", swiss: "orange" },
+  // Minimum hundredth alpha for >=4.6:1 across bg, bg-2 and all three
+  // surfaces composited on bg-2 (the lightest backing). Surface-3 is the
+  // limiting surface: editorial 4.6728, terminal 4.6253, geist 4.7085,
+  // brutalist 4.6763, swiss 4.7518. One hundredth lower fails each.
+  // RGB is unchanged from each canonical system; --text-4 is untouched.
+  text3Corrections: {
+    // DS-OK: app-owned AA token corrections; canonical-token-parity recomputes contrast and minimal alpha.
+    editorial: "rgba(244,243,238,0.49)",
+    terminal: "rgba(232,232,224,0.51)",
+    geist: "rgba(250,250,250,0.49)",
+    brutalist: "rgba(245,245,240,0.50)",
+    swiss: "rgba(250,250,248,0.48)",
+  },
 } as const;
 
 const hasWindow = () => typeof window !== "undefined";
@@ -184,47 +201,35 @@ export function setAccent(id: string): { system: SystemId; accent: AccentId } | 
 
 export interface ProductProfile {
   name: string;
-  defaultSystem: SystemId | null;
-  defaultAccent: AccentId | null;
   density: "comfortable" | "balanced" | "dense" | "document" | "compact";
 }
 
 export const PRODUCT_PROFILES = {
   "public-discovery": {
     name: "Public discovery",
-    defaultSystem: "editorial",
-    defaultAccent: "crimson",
     density: "comfortable",
   },
   "learning-workspace": {
     name: "Learning workspace",
-    defaultSystem: "geist",
-    defaultAccent: "cyan",
     density: "balanced",
   },
   "admin-operations": {
     name: "Admin operations",
-    defaultSystem: "swiss",
-    defaultAccent: "orange",
     density: "dense",
   },
   "standalone-exports": {
     name: "Standalone exports",
-    defaultSystem: "editorial",
-    defaultAccent: "crimson",
     density: "document",
   },
   "embedded-integrations": {
     name: "Embedded integrations",
-    defaultSystem: null,
-    defaultAccent: null,
     density: "compact",
   },
 } as const satisfies Record<string, ProductProfile>;
 
 export type ProductProfileId = keyof typeof PRODUCT_PROFILES;
 
-export const PRODUCT_PROFILE_ROUTE_PATTERNS = {
+const PRODUCT_PROFILE_ROUTE_PATTERNS = {
   admin: "^/admin(?:/|$)",
   learning:
     "^/(?:journeys|journey(?:/|$)|continue-learning|recommendations|bookmarks|favorites|profile|contributions|notifications|onboarding|settings(?:/|$)|account(?:/|$))",

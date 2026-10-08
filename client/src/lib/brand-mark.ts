@@ -1,18 +1,12 @@
 /* =====================================================================
-   BRAND MARK GEOMETRY — ONE COPY, TWO RENDERERS (task #389)
+   BRAND MARK GEOMETRY (task #389)
 
-   The awesome.video mark ("Inverted Monogram") has to be painted two
-   different ways inside the app:
-     · <BrandMark> renders it inline as JSX, so its border and glyphs can
-       reference var(--accent) and repaint the moment the visitor changes
-       design system or accent at /settings/theme.
-     · Clerk's auth card takes an image URL, not a node — a var() reference
-       resolves to nothing inside a standalone SVG document — so the same
-       mark has to be serialised with the RESOLVED accent baked in.
-
-   Both read the geometry from here. Hand-copying the paths a second time is
-   exactly how the auth-card mark ended up frozen at crimson while the header
-   mark tracked the accent.
+   Clerk's auth card takes an image URL, not a node — a var() reference
+   resolves to nothing inside a standalone SVG document — so the mark is
+   serialised here with the RESOLVED accent baked in (brandMarkDataUri).
+   The site header no longer renders this geometry: since the Claude Design
+   adoption it uses the design system's own `.header-logo` "av" tile, which
+   paints var(--accent) directly.
 
    Geometry is a 1:1 mirror of the generated asset
    brand/logo/svg/mark-small.svg (black rx16 tile, 5-unit border, outlined
@@ -25,10 +19,10 @@
    the accent token cannot be resolved.
    ===================================================================== */
 
-export const BRAND_MARK_VIEWBOX = "0 0 76 76";
+const BRAND_MARK_VIEWBOX = "0 0 76 76";
 
 /** The rounded tile the monogram sits on. Its stroke carries the accent. */
-export const BRAND_MARK_TILE = {
+const BRAND_MARK_TILE = {
   x: 2.5,
   y: 2.5,
   width: 71,
@@ -42,10 +36,10 @@ export const BRAND_MARK_TILE = {
    product surface, so border + glyphs track the active accent while the tile
    fill stays literal black (all five runtime skins are dark). On the default
    Editorial+Crimson skin this renders the exact official mark. */
-export const BRAND_MARK_TILE_FILL = "#000000"; // DS-OK: fixed brand paint
+const BRAND_MARK_TILE_FILL = "#000000"; // DS-OK: fixed brand paint
 
 /** The outlined "A" and "V" glyphs, in the accent. */
-export const BRAND_MARK_GLYPHS = [
+const BRAND_MARK_GLYPHS = [
   {
     transform: "translate(12.34 51.00) scale(0.016602 -0.016602)",
     d: "M439 0L47 0L544 1490L1017 1490L1529 0L1133 0L926 651Q876 814 829.500 997.500Q783 1181 736 1378L815 1378Q770 1180 728 996.500Q686 813 639 651ZM1192 317L385 317L385 587L1192 587Z",

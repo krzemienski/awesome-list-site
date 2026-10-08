@@ -295,7 +295,7 @@ export default function DesignSystemShowcase() {
         <div className="flex items-center gap-2">
           <Layers className="h-5 w-5 text-[var(--accent)]" />
           <h2 className={SECTION_HEADING}>Product profiles</h2>
-          <span className="text-xs text-[color:var(--text-3)]">one contract, surface-specific defaults</span>
+          <span className="text-xs text-[color:var(--text-3)]">one contract, surface-specific density</span>
         </div>
         <div className="grid gap-[var(--profile-content-gap)] sm:grid-cols-2">
           {Object.entries(PRODUCT_PROFILES).map(([id, profile]) => (
@@ -303,7 +303,7 @@ export default function DesignSystemShowcase() {
               <code className="font-mono text-xs text-[var(--accent)]">{id}</code>
               <h3 className="mt-2 font-semibold">{profile.name}</h3>
               <p className="mt-1 text-xs text-[color:var(--text-2)]">
-                {profile.defaultSystem ?? "host-neutral"} + {profile.defaultAccent ?? "inherited accent"} default · {profile.density} density
+                {profile.density} density
               </p>
             </Card>
           ))}

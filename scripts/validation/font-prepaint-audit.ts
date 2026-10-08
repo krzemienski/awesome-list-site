@@ -3,10 +3,12 @@ import path from "node:path";
 import { chromium } from "playwright";
 import { FONT_BOOT_DATA, FONT_LS_KEY, FONT_OPTIONS } from "../../client/src/lib/font-options";
 import { launchBrowserWithLease } from "./playwright-launch-lease.mjs";
+import { readCanonicalRegistry } from "../generate-design-system-artifact.mjs";
 
 const ROOT = path.resolve(import.meta.dirname, "..", "..");
 const BASE_URL = process.env.AUDIT_BASE_URL ?? "http://127.0.0.1:5000";
 const UNKNOWN_FONT_ID = "__unknown-font-audit__";
+const canonicalSystems = readCanonicalRegistry().systems;
 
 type FontWrites = {
   dataFont: string[];
@@ -125,6 +127,8 @@ try {
         fontSans: [],
       };
       return {
+        system: root.getAttribute("data-system"),
+        systemFont: window.DESIGN_SYSTEMS?.[root.getAttribute("data-system") as "editorial"]?.vars["--font-body"],
         firstWrites: {
           dataFont: writes.dataFont[0] ?? null,
           fontBody: writes.fontBody[0] ?? null,
@@ -138,13 +142,18 @@ try {
       };
     });
 
+    // An empty picker stack means canonical system font, not an empty body
+    // token: the parser-blocking canonical applier owns that first write.
+    const canonicalBody = canonicalSystems[observed.system ?? "editorial"].vars["--font-body"];
+    const expectedBody = scenario.expectedStack || canonicalBody;
     const expectedWrite = scenario.expectedStack || null;
     const passes =
+      observed.systemFont === canonicalBody &&
       observed.firstWrites.dataFont === scenario.expectedId &&
-      observed.firstWrites.fontBody === expectedWrite &&
+      observed.firstWrites.fontBody === expectedBody &&
       observed.firstWrites.fontSans === expectedWrite &&
       observed.inline.dataFont === scenario.expectedId &&
-      observed.inline.fontBody === scenario.expectedStack &&
+      observed.inline.fontBody === expectedBody &&
       observed.inline.fontSans === scenario.expectedStack;
 
     if (!passes) {
@@ -152,7 +161,7 @@ try {
         `font id ${JSON.stringify(scenario.requestedId)}: expected ` +
           `${JSON.stringify({
             dataFont: scenario.expectedId,
-            fontBody: scenario.expectedStack,
+            fontBody: expectedBody,
             fontSans: scenario.expectedStack,
           })}; observed pre-paint ${JSON.stringify(observed)}`,
       );

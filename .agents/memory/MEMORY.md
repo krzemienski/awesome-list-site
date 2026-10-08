@@ -151,3 +151,5 @@
 - [Undo after unmount](undo-after-unmount.md) — toast Undo for a removed item must be restored by the list owner; count rendered cards, not just the API.
 - [Fixed popover focus does not scroll](fixed-popover-focus-scroll.md) — focus() inside an open Radix popover never scrolls; scroll the trigger into view first after layout shifts.
 - [Shared-account audit baselines](shared-account-audit-baselines.md) — parallel agents on one prod account: baselines can catch others' QA writes; cached recs POST ok, refresh=true is paid.
+- [Dead-code gates miss harness readers](dead-code-harness-readers.md) — tests/parity reads app source by path; grep tests/ scripts/ for file+symbol before deleting or un-exporting.
+- [Axe first-frame animation race](axe-first-frame-race.md) — reduced-motion animations still paint opacity 0 for a frame; wait 2 rAF + finite animations before axe.

@@ -870,6 +870,20 @@ async function axeForScreen(page, screen, width, tokens, identityMode) {
       result.identityVerified = { name, role: "admin" };
     }
     await page.evaluate(() => document.fonts?.ready).catch(() => {});
+    // Page-enter fades (e.g. .submit-page fadeIn) are cut to 0.01ms by the
+    // reduced-motion rule, but a newly mounted animation stays pending at its
+    // first keyframe (opacity 0) until the next frame. The "h1 visible" check
+    // ignores opacity, so axe could blend colours through that frame and report
+    // contrast nobody ever sees. Let pending animations start, then wait for
+    // every finite one to finish.
+    await page.evaluate(async () => {
+      await new Promise((resolve) => requestAnimationFrame(() => requestAnimationFrame(resolve)));
+      const finite = document.getAnimations().filter((animation) => Number.isFinite(animation.effect?.getComputedTiming().endTime));
+      await Promise.race([
+        Promise.allSettled(finite.map((animation) => animation.finished)),
+        new Promise((resolve) => setTimeout(resolve, 2_000)),
+      ]);
+    });
     const axe = sanitiseAxe(await new AxeBuilder({ page }).analyze());
     result.ready = true;
     result.httpStatus = httpStatus;

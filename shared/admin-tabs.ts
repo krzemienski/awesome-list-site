@@ -1,7 +1,7 @@
 // Valid /admin/:section ids, shared by the admin SPA (which opens the tab) and
 // the SSR meta middleware (which must serve every such URL as the admin page,
 // never a 404).
-export const ADMIN_TAB_IDS = [
+const ADMIN_TAB_IDS = [
   "overview", "approvals", "edits", "enrichment", "researcher", "export", "database",
   "resources", "categories", "subcategories", "subsubcategories", "journeys",
   "users", "github", "linkhealth", "digests", "audit", "research",
@@ -10,7 +10,7 @@ export const ADMIN_TAB_IDS = [
 export type AdminTabId = (typeof ADMIN_TAB_IDS)[number];
 
 // Run16 BUG-085: human-guessable slug aliases → canonical tab ids.
-export const ADMIN_TAB_ALIASES: Readonly<Record<string, AdminTabId>> = {
+const ADMIN_TAB_ALIASES: Readonly<Record<string, AdminTabId>> = {
   "link-health": "linkhealth",
   "sub-subcategories": "subsubcategories",
   "sub-subcats": "subsubcategories",

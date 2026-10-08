@@ -225,7 +225,7 @@ function buildClerkAppearance(
   const origin = typeof window !== "undefined" ? window.location.origin : "";
 
   // The card's mark is an IMAGE URL to Clerk, not a node, so it cannot follow
-  // var(--accent) the way <BrandMark> does in the site header — which is why
+  // var(--accent) the way the header's `.header-logo` tile does — which is why
   // it used to be the only crimson thing left on a Matrix or Violet card.
   // Serialise the same geometry with the resolved accent baked in. The static
   // brand file (locked to Editorial+Crimson, and still the browser-tab

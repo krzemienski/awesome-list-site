@@ -143,12 +143,16 @@ app.disable("x-powered-by");
 // BUG-006 (run13): gzip/brotli-negotiated response compression. The
 // awesome-list JSON is ~3 MB uncompressed; without this every page load pays
 // the full transfer. Skip event-stream responses (compression buffering
-// breaks SSE-style streaming if ever added).
+// breaks SSE-style streaming if ever added). HTML documents are left
+// uncompressed: Replit's edge injects its consent-free analytics tracker only
+// into uncompressed HTML. JSON, JS and CSS (the bulk of the bytes) stay
+// compressed here.
 app.use(
   compression({
     filter: (req, res) => {
       const type = String(res.getHeader("Content-Type") || "");
       if (type.includes("text/event-stream")) return false;
+      if (type.includes("text/html")) return false;
       return compression.filter(req, res);
     },
   }),

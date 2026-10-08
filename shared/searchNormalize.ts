@@ -45,7 +45,7 @@ const SEARCHABLE_CHAR = /[\p{L}\p{N}]/u;
  * "C / C++" or "a b" through as bare one-letter prefixes (2,872 / 1,783 rows);
  * at least one word must carry 2 letters/digits, so "x 264" still searches.
  */
-export const SEARCH_QUERY_MIN_CHARS = 2;
+const SEARCH_QUERY_MIN_CHARS = 2;
 
 /**
  * C7-API-01 (C6-API-01 residual): Postgres's `english` config drops these

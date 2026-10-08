@@ -16,7 +16,6 @@ const sha256 = (value) => crypto.createHash("sha256").update(value).digest("hex"
 const here = path.dirname(fileURLToPath(import.meta.url));
 const repoRoot = path.resolve(here, "..", "..");
 const brandMarkSource = path.join(repoRoot, "client", "src", "lib", "brand-mark.ts");
-const brandMarkComponent = path.join(repoRoot, "client", "src", "components", "BrandMark.tsx");
 let officialBrandMarkProjection;
 
 /**
@@ -248,32 +247,27 @@ const xmlAttribute = (value, label) => {
 /**
  * Project the official mark from the source-owned geometry module.  The
  * geometry is transpiled rather than copied into this harness, so changes to
- * BrandMark's exported constants cannot silently drift from the expected
- * capture.  The component contract is checked as well because it defines the
- * official SVG structure and accessibility attributes.
+ * the BRAND_MARK_* constants cannot silently drift from the expected capture.
+ * They are module-private since the inline BrandMark component was retired
+ * (#26 header uses the DS .header-logo tile; brandMarkDataUri is the only app
+ * consumer), so the projection re-exports them from its own transpiled copy
+ * instead of widening the app module's public surface.
  */
 export async function projectOfficialBrandMark() {
   if (!officialBrandMarkProjection) {
     officialBrandMarkProjection = (async () => {
-      const [geometrySource, componentSource] = await Promise.all([
-        fs.readFile(brandMarkSource, "utf8"),
-        fs.readFile(brandMarkComponent, "utf8"),
-      ]);
-      const componentContract = [
-        "BRAND_MARK_GLYPHS",
-        "BRAND_MARK_TILE",
-        "BRAND_MARK_TILE_FILL",
-        "BRAND_MARK_VIEWBOX",
-        "<svg",
-        "className={className}",
-        "aria-hidden=\"true\"",
-        "focusable=\"false\"",
-        "data-testid=\"brand-mark\"",
-      ];
-      if (componentContract.some((literal) => !componentSource.includes(literal))) {
-        throw new Error("Official BrandMark projection rejected: BrandMark.tsx structure changed");
+      const geometrySource = await fs.readFile(brandMarkSource, "utf8");
+      const geometryNames = ["BRAND_MARK_VIEWBOX", "BRAND_MARK_TILE", "BRAND_MARK_TILE_FILL", "BRAND_MARK_GLYPHS"];
+      const missing = geometryNames.filter((name) => !new RegExp(`^(?:export )?const ${name}\\b`, "m").test(geometrySource));
+      if (missing.length) {
+        throw new Error(`Official BrandMark projection rejected: brand-mark.ts no longer declares ${missing.join(", ")}`);
       }
-      const compiled = await esbuild.transform(geometrySource, {
+      const reexport = `\nexport { ${geometryNames.join(", ")} };\n`;
+      const exportable = geometrySource.replace(
+        new RegExp(`^export (const (?:${geometryNames.join("|")})\\b)`, "gm"),
+        "$1",
+      ) + reexport;
+      const compiled = await esbuild.transform(exportable, {
         loader: "ts",
         format: "esm",
         platform: "node",
@@ -309,9 +303,9 @@ export async function projectOfficialBrandMark() {
       ].join("");
       return {
         svg,
-        source: "client/src/components/BrandMark.tsx + client/src/lib/brand-mark.ts (esbuild TS projection)",
+        source: "client/src/lib/brand-mark.ts (esbuild TS projection)",
         sha256: sha256(svg),
-        sourceSha256: sha256(`${componentSource}\n${geometrySource}`),
+        sourceSha256: sha256(geometrySource),
       };
     })().catch((error) => {
       officialBrandMarkProjection = null;

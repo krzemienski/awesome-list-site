@@ -2,6 +2,7 @@ import fs from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 import vm from "node:vm";
+import ts from "typescript";
 import {
   checkArtifactDocs,
   generateArtifactDocs,
@@ -51,6 +52,28 @@ export function evaluateCanonicalRegistry(source, filename = registryPath) {
 export function readCanonicalRegistry(rootDir = projectRoot, relativePath = registryPath) {
   const source = fs.readFileSync(path.join(rootDir, relativePath), "utf8");
   return { source, ...evaluateCanonicalRegistry(source, relativePath) };
+}
+
+export function readThemeBootData(source = fs.readFileSync(fromRoot(runtimePath), "utf8")) {
+  const output = ts.transpileModule(source, { compilerOptions: { module: ts.ModuleKind.CommonJS } }).outputText;
+  const exports = {};
+  vm.runInNewContext(output, { exports });
+  return exports.THEME_BOOT_DATA;
+}
+
+// Execute the actual inline boot, not an assumed patch: removing the patch in
+// index.html must change the model just as it changes the browser.
+export function evaluateBootRegistry(source, html, wrapper) {
+  const window = {};
+  const root = { style: { setProperty() {}, removeProperty() {} }, setAttribute() {}, classList: { add() {} } };
+  const context = { window, document: { documentElement: root }, localStorage: { getItem() { return null; } }, location: { pathname: "/" } };
+  vm.runInNewContext(source, context);
+  const body = [...html.matchAll(/<script\b[^>]*>([\s\S]*?)<\/script>/g)].map(m => m[1]).find(s => s.includes("__AWESOME_VIDEO_THEME_BOOT__"));
+  if (body) vm.runInNewContext(body
+    .replaceAll("__AWESOME_VIDEO_THEME_BOOT__", JSON.stringify(readThemeBootData(wrapper)))
+    .replaceAll("__AWESOME_VIDEO_FONT_BOOT__", '{"stacks":{"system":""},"fallback":"system"}')
+    .replaceAll("__AWESOME_VIDEO_PRODUCT_PROFILE_BOOT__", '{"routePatterns":{"admin":"^/admin","learning":"^/settings"}}'), context);
+  return window.DESIGN_SYSTEMS;
 }
 
 // applyDesignSystem() paints an accent as exactly these two inline
@@ -331,6 +354,7 @@ function main() {
   }
 
   const registry = evaluateCanonicalRegistry(registrySource);
+  for (const [id, value] of Object.entries(readThemeBootData().text3Corrections)) registry.systems[id].vars["--text-3"] = value;
   const structureIssues = registryStructureIssues(registry);
   if (structureIssues.length) {
     throw new Error(`${registryPath}: canonical theme registry is incomplete:\n  ${structureIssues.join("\n  ")}`);

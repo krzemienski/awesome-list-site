@@ -283,7 +283,7 @@ What each skin changes:
 
 Intentional divergences (per `replit.md` MR-DS-13 #5): non-DS badge variants (admin
 status badges) and secondary/ghost/destructive buttons keep plain shadcn styling; the
-BrandMark tile stays rounded in 0-radius systems (brand kit, not a radius bug).
+Clerk auth-card brand mark (`lib/brand-mark.ts`) stays rounded in 0-radius systems (brand kit, not a radius bug).
 Accent-discipline divergences from the frozen reference (rule 1 wins over the
 prototype, audit stage 7 `audit-567-ink-accent`): the category-header count chip
 (`pages.jsx` renders `chip accent`; the app renders a neutral `chip`), the admin
