@@ -1,4 +1,4 @@
-- [Publishing image size](publish-image-size.md) — bundle budgets do not measure image layers; preserve workspace evidence and trim development bulk only in the publishing copy.
+- [Publishing image size](publish-image-size.md) — 8 GiB limit counts ignored files; measure post-trim size after heavy evidence runs; trim evidence dirs by name, never all of .cache.
 - [Clerk auth migration](clerk-auth-migration.md) — READ FIRST on login complaints: owner admin = /sign-in?admin + OWNER_PASSWORD; PROD_CLERK_SECRET_KEY irrelevant; JIT fails closed.
 - [Identity sweep by claim token](identity-sweep-claim-token.md) — sweep auth refactors by claim pattern (claims.sub), not receiver name; `request.`/`(req as any).` aliases silently survive `req.user` seds and tsc can't catch them.
 - [Resource count source-of-truth](count-source-of-truth.md) — sidebar counts must come from ONE complete tree; orphan resources fold into nearest valid node or counts desync.

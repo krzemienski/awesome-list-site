@@ -15,12 +15,19 @@ import { fileURLToPath } from "node:url";
 //     2026-09-17 publish fail at startup with `exec: "npm": not found`.
 //   - audit-evidence, test-results, playwright-report: test run output
 //   - attached_assets: Vite build input already copied into dist/public
+//   - .cache/verify-ds, .cache/ds-consensus, .cache/audit-578: design-system
+//     verify runs and audit evidence (~4.6 GiB on 2026-10-08). Gitignored, but
+//     the publish copy includes ignored files; with them the copy left after
+//     trimming was 7.46 GiB, over the 8 GiB image limit before the Nix layer.
 // The 2026-09-17 publish with only the first two entries still exceeded the
 // 8 GiB image limit because the Nix layer (Chromium/GTK/GStreamer for browser
 // tests) plus the remaining repo bulk left no headroom.
 const targets = [
   "tests/parity/baseline",
   ".cache/ms-playwright",
+  ".cache/verify-ds",
+  ".cache/ds-consensus",
+  ".cache/audit-578",
   ".git",
   "docs/parity",
   "docs/parity-taxonomy",
