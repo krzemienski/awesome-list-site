@@ -1,4 +1,4 @@
-import { useState, useMemo } from "react";
+import { useState, useMemo, useRef } from "react";
 import { Search, Filter, Tag, Folder, ExternalLink, Star, ChevronRight } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -98,6 +98,14 @@ export default function CategoryExplorer({ categories, resources, className }: C
   const handleSearchChange = (value: string) => {
     setSearchTerm(value);
     syncExplorerParam("q", value || null, "replace");
+  };
+  // Both clear controls unmount once the filters are gone, so focus moves to
+  // the search field that stays on screen instead of dropping to <body>.
+  const searchInputRef = useRef<HTMLInputElement>(null);
+  const clearFilters = () => {
+    handleSearchChange("");
+    setSelectedTags([]);
+    searchInputRef.current?.focus();
   };
   const handleSortChange = (value: string) => {
     setSortBy(value);
@@ -237,6 +245,7 @@ export default function CategoryExplorer({ categories, resources, className }: C
           <div className="relative">
             <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
             <Input
+              ref={searchInputRef}
               placeholder="Search categories and resources..."
               value={searchTerm}
               onChange={(e) => handleSearchChange(e.target.value)}
@@ -321,10 +330,7 @@ export default function CategoryExplorer({ categories, resources, className }: C
               <Button
                 variant="ghost"
                 size="sm"
-                onClick={() => {
-                  handleSearchChange("");
-                  setSelectedTags([]);
-                }}
+                onClick={clearFilters}
                 className="min-h-10 px-2 text-xs"
               >
                 Clear all
@@ -520,10 +526,7 @@ export default function CategoryExplorer({ categories, resources, className }: C
             </p>
             <Button
               variant="outline"
-              onClick={() => {
-                handleSearchChange("");
-                setSelectedTags([]);
-              }}
+              onClick={clearFilters}
             >
               Clear filters
             </Button>

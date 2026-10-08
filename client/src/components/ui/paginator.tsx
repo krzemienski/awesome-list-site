@@ -79,6 +79,46 @@ function pageWindow(current: number, total: number): Array<number | "ellipsis"> 
   return out;
 }
 
+/**
+ * Previous/Next stay the same <a> element when they reach the first/last page
+ * (no href, aria-disabled). Swapping to a <span> replaced the node the user
+ * had just activated, so keyboard focus fell to <body>; keeping the element
+ * (focusable only programmatically, tabIndex -1) leaves focus where it was.
+ */
+function PrevNextLink({
+  enabled,
+  href,
+  onClick,
+  rel,
+  testId,
+  children,
+}: {
+  enabled: boolean;
+  href: string;
+  onClick: (e: React.MouseEvent) => void;
+  rel: "prev" | "next";
+  testId: string;
+  children: React.ReactNode;
+}) {
+  return (
+    <a
+      href={enabled ? href : undefined}
+      onClick={enabled ? onClick : undefined}
+      rel={enabled ? rel : undefined}
+      aria-disabled={enabled ? undefined : "true"}
+      tabIndex={enabled ? undefined : -1}
+      className={cn(
+        buttonVariants({ variant: "outline", size: "sm" }),
+        "gap-1",
+        !enabled && "pointer-events-none opacity-50",
+      )}
+      data-testid={testId}
+    >
+      {children}
+    </a>
+  );
+}
+
 export function Paginator({
   currentPage,
   totalPages,
@@ -136,30 +176,16 @@ export function Paginator({
       data-testid={ids.container}
     >
       <div className="flex flex-wrap items-center justify-center gap-1.5">
-        {currentPage > 1 ? (
-          <a
-            href={makeHref(currentPage - 1)}
-            onClick={go(currentPage - 1)}
-            className={cn(buttonVariants({ variant: "outline", size: "sm" }), "gap-1")}
-            rel="prev"
-            data-testid={ids.prev}
-          >
-            <ChevronLeft className="h-4 w-4" />
-            Previous
-          </a>
-        ) : (
-          <span
-            aria-disabled="true"
-            className={cn(
-              buttonVariants({ variant: "outline", size: "sm" }),
-              "gap-1 pointer-events-none opacity-50",
-            )}
-            data-testid={ids.prev}
-          >
-            <ChevronLeft className="h-4 w-4" />
-            Previous
-          </span>
-        )}
+        <PrevNextLink
+          enabled={currentPage > 1}
+          href={makeHref(currentPage - 1)}
+          onClick={go(currentPage - 1)}
+          rel="prev"
+          testId={ids.prev}
+        >
+          <ChevronLeft className="h-4 w-4" />
+          Previous
+        </PrevNextLink>
 
         {items.map((item, i) =>
           item === "ellipsis" ? (
@@ -190,30 +216,16 @@ export function Paginator({
           ),
         )}
 
-        {currentPage < totalPages ? (
-          <a
-            href={makeHref(currentPage + 1)}
-            onClick={go(currentPage + 1)}
-            className={cn(buttonVariants({ variant: "outline", size: "sm" }), "gap-1")}
-            rel="next"
-            data-testid={ids.next}
-          >
-            Next
-            <ChevronRight className="h-4 w-4" />
-          </a>
-        ) : (
-          <span
-            aria-disabled="true"
-            className={cn(
-              buttonVariants({ variant: "outline", size: "sm" }),
-              "gap-1 pointer-events-none opacity-50",
-            )}
-            data-testid={ids.next}
-          >
-            Next
-            <ChevronRight className="h-4 w-4" />
-          </span>
-        )}
+        <PrevNextLink
+          enabled={currentPage < totalPages}
+          href={makeHref(currentPage + 1)}
+          onClick={go(currentPage + 1)}
+          rel="next"
+          testId={ids.next}
+        >
+          Next
+          <ChevronRight className="h-4 w-4" />
+        </PrevNextLink>
       </div>
 
       <div className="flex flex-wrap items-center justify-center gap-2 text-sm text-muted-foreground">

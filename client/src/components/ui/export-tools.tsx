@@ -1,5 +1,6 @@
 import { useState, useEffect, useMemo, useRef } from "react";
 import { Button } from "@/components/ui/button";
+import { cn } from "@/lib/utils";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Checkbox } from "@/components/ui/checkbox";
@@ -899,10 +900,14 @@ export default function ExportTools({
         </div>
 
         {/* Export Button */}
+        {/* While exporting, aria-disabled (not disabled): a natively disabled
+            button loses focus to <body>, and exportingRef already blocks re-entry. */}
         <Button 
           onClick={handleExport} 
-          disabled={isExporting || resourceCount === 0}
-          className="w-full"
+          disabled={resourceCount === 0}
+          aria-disabled={isExporting || undefined}
+          aria-busy={isExporting || undefined}
+          className={cn("w-full", isExporting && "opacity-50 cursor-wait")}
           size="lg"
         >
           {isExporting ? (
