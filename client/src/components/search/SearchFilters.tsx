@@ -130,8 +130,23 @@ export default function SearchFilters({ state, facets, onChange, onClear, hideTa
       .filter(x => x.label.toLowerCase().includes(tagSearch.toLowerCase()))
       .sort((a, b) => Number(selected.has(b.value.toLowerCase())) - Number(selected.has(a.value.toLowerCase())));
   }, [allTags, state.tags, tagSearch]);
+  // Mirrors FacetList's own hide rules: when every group would render nothing
+  // (e.g. a listing whose resources are all unclassified and untagged), say
+  // so instead of opening a blank panel.
+  const renders = (items: unknown[], value: string, collapseInert = false) =>
+    items.length > 0 && !(collapseInert && items.length === 1 && !value);
+  const hasFacets =
+    allTags.length > 0 ||
+    (!hideTaxonomyFacets && (
+      renders(options(facets?.categories, state.category), state.category) ||
+      renders(options(facets?.subcategories, state.subcategory), state.subcategory) ||
+      renders(options(facets?.subSubcategories, state.subSubcategory), state.subSubcategory))) ||
+    renders(options(facets?.providers, state.provider, RESOURCE_PROVIDER_LABELS), state.provider, true) ||
+    renders(options(facets?.formats, state.format, RESOURCE_FORMAT_LABELS), state.format, true) ||
+    renders(options(facets?.skillLevels, state.skillLevel, RESOURCE_SKILL_LEVEL_LABELS), state.skillLevel, true);
   const content = (collapsible: boolean) => <div className="space-y-6">
     <div className="flex items-center justify-between"><div><p className="text-sm font-semibold">Narrow results</p><p className="text-xs text-muted-foreground">Counts update for this combination.</p></div>{activeCount > 0 && <Button variant="ghost" size="sm" onClick={clear} data-testid="button-clear-filters">Clear all</Button>}</div>
+    {facets && !hasFacets && <p className="text-sm text-muted-foreground" role="status" data-testid="text-no-facets">No further filters apply to these results. Use search, type or sort to narrow them.</p>}
     {/* Category is the entry point into the taxonomy, so it stays open; the two
         drill-down levels and the tag list are the long ones and open on demand. */}
     {!hideTaxonomyFacets && <FacetList title="Category" items={options(facets?.categories, state.category)} value={state.category} onSelect={v => applyChange("category", v)} testid="category" showAll />}

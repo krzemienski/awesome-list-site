@@ -1,6 +1,6 @@
 import { useMutation } from "@tanstack/react-query";
 import { apiRequest, ApiError, renewSessionToken } from "@/lib/queryClient";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { safeGetItem, safeSetItem, safeRemoveItem } from "@/lib/safeStorage";
 import type {
   RecommendationExplanation,
@@ -215,6 +215,10 @@ export function useAIRecommendations(
   // removing undoable "not for me" / "already known" cards from the surface
   // where the choice was just made. Hidden cards disappear immediately; all
   // other values update their selected state until the next refresh.
+  // Cards removed by "hidden", keyed by resource id with their position, so
+  // the toast's Undo (feedback cleared) can put the card back in place.
+  const hiddenCardsRef = useRef(new Map<number, { recommendation: RecommendationResult; index: number }>());
+
   useEffect(() => {
     const handleFeedbackSaved = (event: Event) => {
       const detail = (event as CustomEvent<{
@@ -222,21 +226,41 @@ export function useAIRecommendations(
         feedback?: unknown;
       }>).detail;
       if (typeof detail?.resourceId !== "number") return;
+      const resourceId = detail.resourceId;
       setLocalCache((current) => {
         if (!current) return current;
         if (detail.feedback === "hidden") {
+          const index = current.recommendations.findIndex(
+            (recommendation) => recommendation.resource.id === resourceId,
+          );
+          if (index === -1) return current;
+          hiddenCardsRef.current.set(resourceId, {
+            recommendation: current.recommendations[index],
+            index,
+          });
           return {
             ...current,
             recommendations: current.recommendations.filter(
-              (recommendation) =>
-                recommendation.resource.id !== detail.resourceId,
+              (_, i) => i !== index,
             ),
           };
+        }
+        const hidden = hiddenCardsRef.current.get(resourceId);
+        if (hidden && detail.feedback == null) {
+          hiddenCardsRef.current.delete(resourceId);
+          if (current.recommendations.some((r) => r.resource.id === resourceId)) return current;
+          const recommendations = [...current.recommendations];
+          recommendations.splice(
+            Math.min(hidden.index, recommendations.length),
+            0,
+            { ...hidden.recommendation, feedback: null },
+          );
+          return { ...current, recommendations };
         }
         return {
           ...current,
           recommendations: current.recommendations.map((recommendation) =>
-            recommendation.resource.id === detail.resourceId
+            recommendation.resource.id === resourceId
               ? {
                   ...recommendation,
                   feedback:

@@ -34,7 +34,7 @@ import { parsePageFromSearch } from "@/lib/page-param";
 // dialog flags bad input inline instead of only failing server-side.
 import { resourceTitleSchema, optionalResourceDescriptionSchema, webUrlSchema, httpsUrlSchema } from "@shared/validation";
 import { extractFieldErrors } from "@/lib/apiError";
-import { handoffFocusOnUnmount } from "@/hooks/focus-handoff";
+import { focusElement, focusPageHeading, handoffFocusOnUnmount } from "@/hooks/focus-handoff";
 import {
   RESOURCE_FORMAT_LABELS,
   RESOURCE_FORMAT_VALUES,
@@ -1574,11 +1574,15 @@ export default function ResourceManager({ createRequest = 0 }: { createRequest?:
           className="flex max-w-2xl max-h-[90svh] flex-col overflow-hidden bg-[var(--bg-2)] border-[var(--border)]"
           onCloseAutoFocus={(e) => {
             const trigger = editTriggerRef.current;
-            if (trigger && document.contains(trigger)) {
-              e.preventDefault();
-              trigger.focus();
-            }
             editTriggerRef.current = null;
+            e.preventDefault();
+            if (trigger && document.contains(trigger)) {
+              trigger.focus();
+              return;
+            }
+            // Deep-link / owner-shortcut path: the opener was on another
+            // route, so land on the resources table instead of <body>.
+            if (!focusElement(tableRegionRef.current)) focusPageHeading();
           }}
         >
           <DialogHeader>

@@ -169,9 +169,12 @@
             p.catch(function () {});
           } else if (tagMatch) {
             var tagPage = searchParams.get('page') || '1';
-            if (/^[1-9]\d*$/.test(tagPage)) {
+            var tagValue = decodeURIComponent(tagMatch[1]);
+            // Over-length tags (TAG_MAX_LENGTH = 50) are a 404 page; the API
+            // would answer 400, so skip the prefetch.
+            if (/^[1-9]\d*$/.test(tagPage) && tagValue.length <= 50) {
               var tagOffset = (Number(tagPage) - 1) * 24;
-              var tagUrl = '/api/resources?tags=' + encodeURIComponent(decodeURIComponent(tagMatch[1])) + '&limit=24&offset=' + tagOffset + '&facets=true';
+              var tagUrl = '/api/resources?tags=' + encodeURIComponent(tagValue) + '&limit=24&offset=' + tagOffset + '&facets=true';
               var tagFetch = fetch(tagUrl, { credentials: 'same-origin' });
               window.__tagListingEarlyFetch = { url: tagUrl, promise: tagFetch };
               tagFetch.catch(function () {});

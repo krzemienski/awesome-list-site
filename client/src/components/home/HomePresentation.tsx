@@ -210,7 +210,14 @@ function KindStrip({
           aria-label={`${KIND_LABELS[kind]} — ${counts ? formatCount(counts[kind]) : "loading"} resources`}
           title={`Browse ${KIND_LABELS[kind]}`}
           aria-pressed={selectedKind === kind}
-          onClick={() => onKindChange?.(selectedKind === kind ? null : kind)}
+          onClick={(event) => {
+            // The first filter fetches the corpus behind the home skeleton,
+            // which unmounts this chip; return focus to its remounted twin.
+            handoffFocusOnUnmount(event.currentTarget, () =>
+              document.querySelector<HTMLElement>(`[data-testid="home-kind-chip-${kind}"]`),
+            );
+            onKindChange?.(selectedKind === kind ? null : kind);
+          }}
         >
           <span>{KIND_LABELS[kind]}</span>
           <span className="home-kind-count mono">

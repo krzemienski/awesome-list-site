@@ -776,10 +776,10 @@ export default function Bookmarks() {
               </div>
 
               {selected.size > 0 && (
-                <div className="grid gap-3 xl:grid-cols-[1fr_1fr_1.3fr_auto]">
+                <div className="grid grid-cols-1 gap-3 xl:grid-cols-[1fr_1fr_1.3fr_auto]">
                   <div className="flex gap-2">
                     <Select value={bulkStatus} onValueChange={(value) => setBulkStatus(value as BookmarkQueueStatus)}>
-                      <SelectTrigger aria-label="Bulk queue status"><SelectValue /></SelectTrigger>
+                      <SelectTrigger aria-label="Bulk queue status" className="min-w-0 flex-1"><SelectValue /></SelectTrigger>
                       <SelectContent>
                         {BOOKMARK_QUEUE_STATUSES.map((status) => (
                           <SelectItem key={status} value={status}>{BOOKMARK_QUEUE_LABELS[status]}</SelectItem>
@@ -797,7 +797,7 @@ export default function Bookmarks() {
                   </div>
                   <div className="flex gap-2">
                     <Select value={bulkDestination} onValueChange={setBulkDestination}>
-                      <SelectTrigger aria-label="Move to collection"><SelectValue placeholder="Choose collection" /></SelectTrigger>
+                      <SelectTrigger aria-label="Move to collection" className="min-w-0 flex-1 [&>span]:break-all"><SelectValue placeholder="Choose collection" /></SelectTrigger>
                       <SelectContent>
                         {collections.filter((collection) => !collection.archivedAt).map((collection) => (
                           <SelectItem key={collection.id} value={String(collection.id)}>{collection.name}</SelectItem>
@@ -830,7 +830,7 @@ export default function Bookmarks() {
                       placeholder="Personal tag"
                       maxLength={40}
                       aria-label="Personal tag for selected bookmarks"
-                      className="min-h-11"
+                      className="min-h-11 min-w-0 flex-1"
                     />
                     <Button
                       variant="outline"
