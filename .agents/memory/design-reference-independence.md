@@ -31,3 +31,10 @@ written under `.local/` does not survive a task merge; commit ledgers into
 `validate:standalone-palette-drift` and `validate:product-profiles`; if the
 plan is "copy the archive in", the destination must be a frozen root and the
 sync record's hash/entry count must be updated in the same change.
+
+**Where the 2026-09-29 handoff lives:** only in Claude Design project
+49c7785a-b6d4-4c30-9d2d-9f0229ebc042 (fetched via the claude_design MCP into a
+gitignored `.cache/ds-fetch-20260929T0714Z/`). It is in no git branch, and the
+owner's "awesome_list_site_2" zip is the 09-10 prototype (identical to the
+frozen root). Check `styles.css` sha256 = 31fde358… before treating any upload
+as the 09-29 handoff.
