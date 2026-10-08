@@ -100,7 +100,12 @@ export default function AdvancedFilter({
       {showTagFilter && availableTags.length > 0 && (
         <Popover open={isOpen} onOpenChange={setIsOpen}>
           <PopoverTrigger asChild>
-            <Button variant="outline" size="sm" className="min-h-[44px] flex-1 sm:flex-none">
+            <Button
+              variant="outline"
+              size="sm"
+              className="min-h-[44px] flex-1 sm:flex-none"
+              data-testid="button-filter-by-tag"
+            >
               <SlidersHorizontal className="h-4 w-4 mr-2" />
               Filter by Tag
               {hasSelectedFilters && (
@@ -123,7 +128,14 @@ export default function AdvancedFilter({
                   <Button
                     variant="ghost"
                     size="sm"
-                    onClick={clearAll}
+                    onClick={(e) => {
+                      // Clear all disappears once no tag is selected; keep focus in the popover.
+                      handoffFocusOnUnmount(e.currentTarget, () =>
+                        document.querySelector<HTMLElement>('[data-testid="input-tag-search"]') ??
+                        document.querySelector<HTMLElement>('[data-testid="button-filter-by-tag"]'),
+                      );
+                      clearAll();
+                    }}
                     className="min-h-[44px] px-2 text-xs"
                   >
                     Clear all
@@ -168,7 +180,14 @@ export default function AdvancedFilter({
                         type="button"
                         key={tag}
                         className="flex w-full items-center space-x-2 rounded-sm p-2 text-left hover:bg-accent min-h-[44px]"
-                        onClick={() => toggleTag(tag)}
+                        onClick={(e) => {
+                          // A first tag on Home loads the corpus behind the page skeleton, which
+                          // remounts this filter with the popover closed; focus its trigger.
+                          handoffFocusOnUnmount(e.currentTarget, () =>
+                            document.querySelector<HTMLElement>('[data-testid="button-filter-by-tag"]'),
+                          );
+                          toggleTag(tag);
+                        }}
                         aria-pressed={isSelected(tag)}
                         aria-label={`${isSelected(tag) ? "Remove" : "Apply"} ${tag} tag filter`}
                       >

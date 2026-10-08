@@ -31,7 +31,7 @@ import DigestQueueHealth from "@/components/admin/DigestQueueHealth";
 import ErrorBoundary from "@/components/ErrorBoundary";
 import NotFound from "@/pages/not-found";
 import { ApiError } from "@/lib/queryClient";
-import { focusElement } from "@/hooks/focus-handoff";
+import { focusElement, handoffFocusOnUnmount } from "@/hooks/focus-handoff";
 // Run3 audit R3-02 / Run16 BUG-034/074/085: valid tab ids and aliases live in
 // one shared module so the SSR middleware accepts exactly the same
 // /admin/:section deep-links (unknown sections fall back to the default tab).
@@ -181,7 +181,14 @@ export default function AdminDashboard() {
       observer.disconnect();
     };
   }, [tabStripMounted]);
-  const scrollTabs = (direction: 1 | -1) => {
+  const scrollTabs = (direction: 1 | -1, arrow: HTMLElement) => {
+    // An arrow unmounts once the strip reaches its edge; hand focus to the
+    // opposite arrow (focusing a tab would scroll the strip back to it).
+    handoffFocusOnUnmount(arrow, () =>
+      document.querySelector<HTMLElement>(
+        `.admin-tab-scroller__edge--${direction === 1 ? "start" : "end"}`,
+      ),
+    );
     const scroller = document.querySelector<HTMLElement>(".admin-dashboard__tabs");
     scroller?.scrollBy({ left: direction * scroller.clientWidth * 0.6, behavior: "smooth" });
   };
@@ -375,7 +382,7 @@ export default function AdminDashboard() {
               className="admin-tab-scroller__edge admin-tab-scroller__edge--start"
               aria-label="Scroll tabs left"
               tabIndex={-1}
-              onClick={() => scrollTabs(-1)}
+              onClick={(event) => scrollTabs(-1, event.currentTarget)}
             >
               <ChevronLeft aria-hidden="true" size={16} />
             </button>
@@ -413,7 +420,7 @@ export default function AdminDashboard() {
               className="admin-tab-scroller__edge admin-tab-scroller__edge--end"
               aria-label="Scroll tabs right"
               tabIndex={-1}
-              onClick={() => scrollTabs(1)}
+              onClick={(event) => scrollTabs(1, event.currentTarget)}
             >
               <ChevronRight aria-hidden="true" size={16} />
             </button>

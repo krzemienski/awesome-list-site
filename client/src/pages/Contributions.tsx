@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { focusElement } from "@/hooks/focus-handoff";
 import { handoffFocusOnUnmount } from "@/hooks/focus-handoff";
-import { useMutation, useQuery } from "@tanstack/react-query";
+import { keepPreviousData, useMutation, useQuery } from "@tanstack/react-query";
 import { Link, useSearch } from "wouter";
 import { formatDistanceToNow } from "date-fns";
 import {
@@ -449,9 +449,15 @@ export default function Contributions() {
   const query = useQuery<ContributionsResponse>({
     queryKey: ["/api/user/contributions", queryUrl],
     queryFn: () => apiRequest(queryUrl, { method: "GET" }),
+    // Keep the current page on screen while the next one loads: swapping the
+    // list for a skeleton unmounted the paginator and dropped keyboard focus.
+    placeholderData: keepPreviousData,
   });
 
   useEffect(() => {
+    // Placeholder data still carries the previous page number; only a real
+    // response can say the requested page was clamped.
+    if (query.isPlaceholderData) return;
     const effectivePage = query.data?.pagination.page;
     if (!effectivePage || effectivePage === state.page) return;
     const requestedPage = state.page;
@@ -463,7 +469,7 @@ export default function Contributions() {
     setPageNotice(
       `Page ${requestedPage} is beyond the available results. Showing page ${effectivePage}.`,
     );
-  }, [query.data?.pagination.page, state.page]);
+  }, [query.data?.pagination.page, query.isPlaceholderData, state.page]);
 
   const withdrawnRef = useRef<{ kind: string; id: number | string } | null>(null);
   const withdrawMutation = useMutation({
@@ -686,7 +692,7 @@ export default function Contributions() {
 
         <Card className="account-filter-card mb-5">
           <CardHeader className="p-4">
-            <div className="grid gap-3 md:grid-cols-[minmax(13rem,1fr)_repeat(3,minmax(9rem,auto))]">
+            <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-[minmax(13rem,1fr)_repeat(3,minmax(9rem,auto))]">
               <div className="relative">
                 <Search
                   className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground"
@@ -882,7 +888,7 @@ export default function Contributions() {
                 ? "contribution"
                 : "contributions"}
             </p>
-            <div className="space-y-3">
+            <div className="space-y-3" aria-busy={query.isPlaceholderData || undefined}>
               {query.data?.items.map((item) => (
                 <ContributionCard
                   key={`${item.kind}-${item.id}`}
