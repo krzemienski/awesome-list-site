@@ -240,8 +240,10 @@ export function registerOperationsRoutes(
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="robots" content="noindex">
+<meta name="color-scheme" content="dark">
 <title>${esc(swaggerSpec.info?.title ?? 'Public API')} — API Documentation</title>
 <style>
+:root{color-scheme:dark}
 body{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;background:#0e0d0c;color:#e8e6e3;margin:2rem auto;max-width:60rem;padding:0 1rem;line-height:1.5}
 a{color:#ff3d52}table{border-collapse:collapse;width:100%;margin:1rem 0}
 td,th{border:1px solid #333;padding:.5rem;text-align:left}td:last-child{white-space:nowrap}code{color:#5eddf2}

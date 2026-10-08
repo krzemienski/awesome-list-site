@@ -130,10 +130,21 @@ export default function AdvancedFilter({
                     size="sm"
                     onClick={(e) => {
                       // Clear all disappears once no tag is selected; keep focus in the popover.
-                      handoffFocusOnUnmount(e.currentTarget, () =>
-                        document.querySelector<HTMLElement>('[data-testid="input-tag-search"]') ??
-                        document.querySelector<HTMLElement>('[data-testid="button-filter-by-tag"]'),
-                      );
+                      handoffFocusOnUnmount(e.currentTarget, () => {
+                        // Unfiltered pages can grow above the filter bar (Home's full
+                        // index). The popover is anchored to the trigger, so bring the
+                        // trigger back into view or the focused field sits off-screen.
+                        const trigger = document.querySelector<HTMLElement>('[data-testid="button-filter-by-tag"]');
+                        if (trigger) {
+                          const { top, bottom } = trigger.getBoundingClientRect();
+                          if (top < 0 || bottom > window.innerHeight) {
+                            trigger.scrollIntoView({ block: "start", behavior: "instant" });
+                          }
+                        }
+                        return (
+                          document.querySelector<HTMLElement>('[data-testid="input-tag-search"]') ?? trigger
+                        );
+                      });
                       clearAll();
                     }}
                     className="min-h-[44px] px-2 text-xs"

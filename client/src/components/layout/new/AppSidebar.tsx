@@ -627,6 +627,25 @@ export default function AppSidebar({
   // desktop user choice exposes the compact rail.
   const isRailCompact = !isDrawer && !open;
 
+  // Switching between the expanded sidebar and the compact rail unmounts the
+  // control that was activated. A keyboard user lands on its counterpart.
+  const navigationToggleFocusRef = useRef<"expand" | "collapse" | null>(null);
+  const setNavigationMode = (expanded: boolean, control: HTMLElement) => {
+    navigationToggleFocusRef.current =
+      document.activeElement === control ? (expanded ? "collapse" : "expand") : null;
+    setOpen(expanded);
+  };
+  useEffect(() => {
+    const target = navigationToggleFocusRef.current;
+    if (!target) return;
+    navigationToggleFocusRef.current = null;
+    document
+      .querySelector<HTMLElement>(
+        target === "expand" ? '[data-testid="sidebar-expanded-navigation"]' : ".av-sidebar-collapse-toggle",
+      )
+      ?.focus();
+  }, [isRailCompact]);
+
   const filtered = useMemo(() => filterCategories(categories), [categories]);
 
   useEffect(() => {
@@ -955,7 +974,7 @@ export default function AppSidebar({
             <SidebarMenuButton asChild className="min-h-[44px]">
               <button
                 type="button"
-                onClick={() => setOpen(false)}
+                onClick={(e) => setNavigationMode(false, e.currentTarget)}
                 data-testid="sidebar-compact-navigation"
                 aria-label="Compact navigation"
                 title="Compact navigation"
@@ -1039,7 +1058,7 @@ export default function AppSidebar({
       </div>
       <button
         type="button"
-        onClick={() => setOpen(false)}
+        onClick={(e) => setNavigationMode(false, e.currentTarget)}
         data-testid="sidebar-compact-navigation"
         aria-label="Collapse sidebar"
         title="Collapse sidebar"
@@ -1215,7 +1234,7 @@ export default function AppSidebar({
           >
             <button
               type="button"
-              onClick={() => setOpen(true)}
+              onClick={(e) => setNavigationMode(true, e.currentTarget)}
               className="icon-btn rail-icon-btn rail-expand-navigation touch-manipulation"
               data-testid="sidebar-expanded-navigation"
               aria-label="Expand sidebar"

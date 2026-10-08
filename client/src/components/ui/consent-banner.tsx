@@ -68,6 +68,28 @@ export default function ConsentBanner() {
     bannerRef.current = node;
     setBannerEl(node);
   }, []);
+  // Closing unmounts the banner, so a keyboard user focused inside it would
+  // drop to BODY. Remember who re-opened it and hand focus back there (or to
+  // the main landmark when the banner appeared on its own).
+  const openerRef = useRef<HTMLElement | null>(null);
+  const restoreFocusRef = useRef(false);
+  const closeBanner = useCallback(() => {
+    const banner = bannerRef.current;
+    restoreFocusRef.current = !!banner && banner.contains(document.activeElement);
+    setChoiceMade(true);
+  }, []);
+
+  useEffect(() => {
+    if (!choiceMade || !restoreFocusRef.current) return;
+    restoreFocusRef.current = false;
+    const opener = openerRef.current;
+    openerRef.current = null;
+    if (opener?.isConnected) {
+      opener.focus();
+    } else {
+      document.getElementById("main")?.focus({ preventScroll: true });
+    }
+  }, [choiceMade]);
 
   // Task #380: the banner no longer reaches into layout it does not own. It is
   // a row of the #root column (index.css) — `order-first` in flow at the top
@@ -121,17 +143,19 @@ export default function ConsentBanner() {
     if (choiceMade) return;
     const onKeyDown = (e: KeyboardEvent) => {
       if (e.key !== "Escape") return;
-      setChoiceMade(true);
+      closeBanner();
     };
     window.addEventListener("keydown", onKeyDown);
     return () => window.removeEventListener("keydown", onKeyDown);
-  }, [choiceMade]);
+  }, [choiceMade, closeBanner]);
 
   // R5-025 (run24): consent-reset path. "Cookie settings" links (Footer,
   // /privacy) dispatch this event to re-open the banner so a persisted choice
   // (or an Escape dismissal) can always be revisited in-product.
   useEffect(() => {
     const onOpen = () => {
+      const active = document.activeElement;
+      openerRef.current = active instanceof HTMLElement && active !== document.body ? active : null;
       setChoiceMade(false);
       // Re-focus after the banner re-renders. On phones the banner is an
       // in-flow row at the top of the document; prevent focus from preserving
@@ -153,7 +177,7 @@ export default function ConsentBanner() {
 
   const decide = (value: "granted" | "denied") => {
     setAnalyticsConsent(value);
-    setChoiceMade(true);
+    closeBanner();
     if (value === "granted") {
       initGA();
       initMixpanel();

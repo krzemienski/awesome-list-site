@@ -114,10 +114,11 @@ function render429Page(message: string, retryAfterSec: number): string {
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="robots" content="noindex">
+<meta name="color-scheme" content="dark">
 <meta http-equiv="refresh" content="${refreshIn}">
 <title>Taking a quick breather — awesome.video</title>
 <style>
-  :root { --bg:#000; --text:#f4f3ee; --text-2:rgba(244,243,238,.66); --accent:#ff3d52; --border:rgba(244,243,238,.16); }
+  :root { color-scheme:dark; --bg:#000; --text:#f4f3ee; --text-2:rgba(244,243,238,.66); --accent:#ff3d52; --border:rgba(244,243,238,.16); }
   * { box-sizing:border-box; margin:0; padding:0; }
   body { background:var(--bg); color:var(--text); font-family:'Inter',system-ui,-apple-system,sans-serif;
          min-height:100vh; display:flex; align-items:center; justify-content:center; padding:24px; }

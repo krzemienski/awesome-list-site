@@ -25,7 +25,9 @@ export default function AuthGuard({ children }: AuthGuardProps) {
         variant: "destructive"
       });
       const next = window.location.pathname + window.location.search;
-      setLocation(`/sign-in?redirect_url=${encodeURIComponent(next)}`);
+      // Replace: Back from sign-in must skip the guarded entry, or it lands
+      // here again and this effect pushes sign-in forward (a Back trap).
+      setLocation(`/sign-in?redirect_url=${encodeURIComponent(next)}`, { replace: true });
     }
   }, [isLoading, isAuthenticated, setLocation, toast]);
   
