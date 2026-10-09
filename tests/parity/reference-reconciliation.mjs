@@ -8,7 +8,7 @@ import React from "react";
 import { renderToStaticMarkup } from "react-dom/server";
 import { Clock, Grid2X2, Info, MoreHorizontal, Plus, Search } from "lucide-react";
 import { ACTIVE_REFERENCE } from "./reference-root.mjs";
-import { buildFooter0929, applyFooter0929 } from "./reference-footer-20260929.mjs";
+import { buildFooter0929, applyFooter0929, FOOTER_0929_SELECTOR } from "./reference-footer-20260929.mjs";
 import { buildHome0929, applyHome0929 } from "./reference-home-20260929.mjs";
 import {
   applyExpectedRetainedReferenceExtensions,
@@ -735,11 +735,33 @@ export async function applyExpectedPaletteControls(page, reconciliation) {
   };
 }
 
+/**
+ * The frozen MobileDrawer stays mounted while closed, parked at
+ * translateX(-100%) with a fractional 86% width, so its right hairline
+ * straddles x=0 and repaints differently between captures. The application's
+ * drawer is a Radix Dialog.Content without forceMount, which is unmounted
+ * while closed. Project that lifecycle: a closed reference drawer is not
+ * rendered. Throws if the app source starts force-mounting its drawer.
+ */
+const SIDEBAR_SOURCE = "client/src/components/ui/sidebar.tsx";
+async function applyClosedDrawerLifecycle(page) {
+  if (ACTIVE_REFERENCE.id !== "20260929") return null;
+  if (await page.locator(".mobile-drawer:not(.open)").count() === 0) return null;
+  const source = fsSync.readFileSync(fileURLToPath(new URL(`../../${SIDEBAR_SOURCE}`, import.meta.url)), "utf8");
+  const drawer = source.match(/<DialogPrimitive\.Root open=\{openMobile\}[\s\S]*?<DialogPrimitive\.Content([^>]*?)>/);
+  if (!drawer || /forceMount/.test(source)) {
+    throw new Error(`${SIDEBAR_SOURCE} no longer unmounts its closed mobile drawer (Radix Dialog.Content without forceMount)`);
+  }
+  await page.addStyleTag({ content: ".mobile-drawer:not(.open){display:none!important}" });
+  return `closed mobile drawer unmounted (${SIDEBAR_SOURCE} Dialog.Content lifecycle)`;
+}
+
 export async function applyExpectedDrawerControls(page, reconciliation) {
   const rootSelector = APPROVED_DRAWER_SCOPE.root;
   const rootCount = await page.locator(rootSelector).count();
   if (rootCount === 0) {
-    return { status: "not-applicable", modified: [], scope: { root: rootSelector, more: 0, links: 0, search: 0, targets: 0 }, source: [] };
+    const closed = await applyClosedDrawerLifecycle(page);
+    return { status: closed ? "closed-unmounted" : "not-applicable", modified: closed ? [closed] : [], scope: { root: rootSelector, more: 0, links: 0, search: 0, targets: 0 }, source: [] };
   }
   if (rootCount !== 1) throw new Error(`Drawer reconciliation expected one open reference drawer, found ${rootCount}`);
   const { moreLinks, sourceProof } = projectionValues(reconciliation);
@@ -835,7 +857,7 @@ export async function applyExpectedReferenceReconciliation(page, {
   if (paletteControls.status === "applied" || drawerControls.status === "applied") {
     await applyApprovedControlsStyle(page);
   }
-  const expectedFooterCount = await page.locator(ACTIVE_REFERENCE.id === "20260929" ? "main > footer" : "footer.site-footer").count();
+  const expectedFooterCount = await page.locator(ACTIVE_REFERENCE.id === "20260929" ? FOOTER_0929_SELECTOR : "footer.site-footer").count();
   const actualFooterCount = actualPage ? await actualPage.locator("footer.app-footer").count() : null;
   const provenance = {
     version: reconciliation.version,

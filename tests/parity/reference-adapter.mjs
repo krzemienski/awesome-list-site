@@ -20,6 +20,8 @@
  * as `unadapted`, never guessed.
  */
 import crypto from "node:crypto";
+import fs from "node:fs";
+import esbuild from "esbuild";
 import { indexCatalogPaths } from "./catalog-paths.mjs";
 import { buildReferenceReconciliation, projectOfficialBrandMark } from "./reference-reconciliation.mjs";
 
@@ -390,18 +392,38 @@ const ageOrDash = (value, frozenAtMs) => {
  * "unknown" state as `dot muted`, which neither stylesheet colours.
  */
 /**
- * Mirror of ResearchWorkspace.toResearchNote: the latest researcher jobs
- * become the workspace note cards (prompt, discovery count, "Active" while
- * pending/processing, otherwise completed/started/created age).
+ * ResearchWorkspace names each note card with researchNoteTitle(brief): the
+ * "campaign angle" of a scheduled brief, else its first sentence clipped to
+ * NOTE_TITLE_MAX. The function is compiled from the component source so the
+ * reference card title cannot drift from the application's; it throws if the
+ * source no longer declares it.
  */
-const buildResearchNotes = (jobs, frozenAtMs) =>
-  jobs.map((job) => ({
-    k: job.prompt,
+const RESEARCH_WORKSPACE_SOURCE = "client/src/components/admin/ResearchWorkspace.tsx";
+const loadResearchNoteTitle = () => {
+  const source = fs.readFileSync(RESEARCH_WORKSPACE_SOURCE, "utf8");
+  const limit = source.match(/^const NOTE_TITLE_MAX = (\d+);$/m);
+  const fn = source.match(/^function researchNoteTitle\(brief: string\): string \{\n[\s\S]*?\n\}$/m);
+  const fallback = source.includes("const brief = job.prompt?.trim() || `Research job #${job.id}`;");
+  if (!limit || !fn || !fallback) throw new Error(`${RESEARCH_WORKSPACE_SOURCE} no longer declares NOTE_TITLE_MAX, researchNoteTitle and the blank-prompt fallback`);
+  const { code } = esbuild.transformSync(`const NOTE_TITLE_MAX = ${limit[1]};\n${fn[0]}\nreturn researchNoteTitle;`, { loader: "ts" });
+  return new Function(code)();
+};
+
+/**
+ * Mirror of ResearchWorkspace.toResearchNote: the latest researcher jobs
+ * become the workspace note cards (source-compiled title, discovery count,
+ * "Active" while pending/processing, otherwise completed/started/created age).
+ */
+const buildResearchNotes = (jobs, frozenAtMs) => {
+  const researchNoteTitle = loadResearchNoteTitle();
+  return jobs.map((job) => ({
+    k: researchNoteTitle(job.prompt?.trim() || `Research job #${job.id}`),
     n: job.totalDiscoveries ?? 0,
     d: job.status === "pending" || job.status === "processing"
       ? "Active"
       : ageOrDash(job.completedAt ?? job.startedAt ?? job.createdAt, frozenAtMs),
   }));
+};
 
 const buildOverviewHealth = ({ operations, ai, githubQueue, githubHistory, linkStatus, linkHistory, enrichment }, frozenAtMs) => {
   const rows = [];

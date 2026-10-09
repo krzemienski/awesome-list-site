@@ -36,6 +36,11 @@ function projectResponsiveFooterCss(css) {
 }
 
 /** Read declarations, not actual-page DOM; no application stylesheet is served. */
+// The site's PageFooter is the footer directly inside the app <main>. The
+// design-system showcase (design-system.html) renders its own colophon footer
+// inside <main class="ds-shell">, which is not the PageFooter.
+export const FOOTER_0929_SELECTOR = "main:not(.ds-shell) > footer";
+
 export function buildFooter0929(nav, site) {
   const files = [
     "client/src/components/layout/new/AppFooter.tsx",
@@ -85,8 +90,8 @@ export function buildFooter0929(nav, site) {
 export async function applyFooter0929(page, reconciliation) {
   const projection = reconciliation.footer0929;
   if (!projection) throw new Error("0929 footer requires source-backed live projection");
-  await page.evaluate(({ projection, site, total }) => {
-    const footer = document.querySelector("main > footer");
+  await page.evaluate(({ projection, site, total, selector }) => {
+    const footer = document.querySelector(selector);
     const grid = footer?.children[0];
     const meta = footer?.children[1];
     if (!grid || grid.children.length !== 4 || !meta || meta.children.length < 2) throw new Error("0929 PageFooter four-column structure drift");
@@ -154,7 +159,7 @@ export async function applyFooter0929(page, reconciliation) {
     footer.style.paddingBottom = projection.paddingBottom;
     meta.style.gap = "0 16px";
     for (const span of meta.querySelectorAll(":scope > span")) Object.assign(span.style, { display: "inline-flex", alignItems: "center", minHeight: "44px" });
-  }, { projection, site: reconciliation.site, total: reconciliation.nav.totalResources });
+  }, { projection, site: reconciliation.site, total: reconciliation.nav.totalResources, selector: FOOTER_0929_SELECTOR });
   await page.addStyleTag({ content: projection.responsiveCss });
   return { modified: ["live PageFooter identity, taxonomy and repository", "retained repository-link containment (footer.css, AppFooter <wbr>)", "source-owned policy links and PRs welcome link", "approved 44px footer targets (strip padding from footer.css)", "approved responsive footer collapse (footer.css max-width blocks)"], sourceProof: projection.sourceProof };
 }
