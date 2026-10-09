@@ -375,7 +375,9 @@ export default function CategoryExplorer({ categories, resources, className }: C
                         href={`/category/${category.slug}`}
                         className="inline-flex min-h-10 min-w-0 items-center font-semibold text-left hover:text-primary break-words"
                       >
-                        {category.name}
+                        {/* Raw text in a flex box is an anonymous item with
+                            min-width:auto; the span lets unbroken names wrap. */}
+                        <span className="min-w-0 [overflow-wrap:anywhere]">{category.name}</span>
                       </Link>
                     </CardTitle>
                     <div className="flex flex-wrap items-center gap-x-4 gap-y-1 mt-2">

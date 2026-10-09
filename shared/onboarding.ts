@@ -66,7 +66,16 @@ export const learningPreferencesUpdateSchema = learningPreferencesValuesSchema
       .max(ONBOARDING_STEP_COUNT)
       .optional(),
     homeLayout: z.enum(HOME_LAYOUT_VALUES).optional(),
-    themeSystem: z.enum(THEME_SYSTEM_VALUES).optional(),
-    themeAccent: z.enum(THEME_ACCENT_VALUES).optional(),
+    // null clears the account theme so the device default applies again.
+    themeSystem: z.enum(THEME_SYSTEM_VALUES).nullable().optional(),
+    themeAccent: z.enum(THEME_ACCENT_VALUES).nullable().optional(),
   })
-  .strict();
+  .strict()
+  .refine(
+    ({ themeSystem, themeAccent }) =>
+      (themeSystem === null) === (themeAccent === null),
+    {
+      message: "Clear the theme system and accent together",
+      path: ["themeSystem"],
+    },
+  );

@@ -991,9 +991,13 @@ export function registerUserFeatureRoutes(
           ...values,
           homeLayout,
           themeSystem:
-            parsed.data.themeSystem ?? current?.themeSystem ?? null,
+            parsed.data.themeSystem !== undefined
+              ? parsed.data.themeSystem
+              : current?.themeSystem ?? null,
           themeAccent:
-            parsed.data.themeAccent ?? current?.themeAccent ?? null,
+            parsed.data.themeAccent !== undefined
+              ? parsed.data.themeAccent
+              : current?.themeAccent ?? null,
           onboardingStatus,
           onboardingStep: onboardingStatus === 'completed' ? 5 : onboardingStep,
           onboardingCompletedAt:

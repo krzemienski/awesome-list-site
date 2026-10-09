@@ -194,6 +194,14 @@
   font-size: 11px;
 }
 
+/* The selected tint darkens the row behind text-3 below 4.5:1 in some
+   system/accent pairs (Terminal/Matrix), so the caption steps up one ink
+   level with the row, as the title already does. */
+.search-palette-row[data-selected="true"] .search-palette-copy small,
+.search-palette-row:hover .search-palette-copy small {
+  color: var(--text-2);
+}
+
 /* The frozen palette's initial category and featured-resource hints inherit
    the dialog's Inter face. Page shortcuts intentionally retain mono detail. */
 .search-palette-default-jump .search-palette-copy small {

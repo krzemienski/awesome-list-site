@@ -220,8 +220,8 @@ export type LearningPreferencesUpdate = Partial<LearningPreferencesValues> & {
   onboardingStatus?: OnboardingStatus;
   onboardingStep?: number;
   homeLayout?: HomeLayout;
-  themeSystem?: ThemeSystemId;
-  themeAccent?: ThemeAccentId;
+  themeSystem?: ThemeSystemId | null;
+  themeAccent?: ThemeAccentId | null;
 };
 
 export const DEFAULT_LEARNING_PREFERENCES: LearningPreferencesValues = {
