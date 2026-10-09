@@ -1,0 +1,17 @@
+// G07 supplement: public page whose og:image is a literal loopback URL.
+import http from 'node:http';
+import { readFileSync } from 'node:fs';
+import { fetchUrlMetadata } from '/home/runner/workspace/server/ai/urlScraper.ts';
+const hits: string[] = [];
+const png = Buffer.from('iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8z8BQDwAEhQGAhKmMIQAAAABJRU5ErkJggg==', 'base64');
+const server = http.createServer((req, res) => { hits.push(req.url!); res.writeHead(200, { 'content-type': 'image/png' }); res.end(png); });
+await new Promise<void>((r) => server.listen(51999, '127.0.0.1', r));
+// httpbin's /base64 accepts only the standard alphabet, so the page uses
+// whitespace chosen so its URL-safe encoding contains no - or _ characters.
+const page: string = JSON.parse(readFileSync('/tmp/t586/cleanhtml.json', 'utf8'));
+const url = `https://httpbin.org/base64/${Buffer.from(page).toString('base64url')}`;
+console.log('public page served by httpbin:', JSON.stringify(page));
+const ctl = await fetch('http://127.0.0.1:51999/og.png'); console.log('control: plain fetch(http://127.0.0.1:51999/og.png) ->', ctl.status, 'hits=', hits.length); hits.length = 0;
+const r = await fetchUrlMetadata(url, 15000);
+console.log('[og:image literal loopback] fetchUrlMetadata ->', JSON.stringify(r), `listenerHits=${hits.length}`);
+server.close(); process.exit(0);

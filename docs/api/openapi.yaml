@@ -801,6 +801,48 @@ components:
                 type: string
               status:
                 type: string
+              metadata:
+                type: object
+                properties:
+                  tags:
+                    type: array
+                    items:
+                      type: string
+                  ogImage:
+                    type: string
+                  ogImageBlurhash:
+                    type: string
+                  favicon:
+                    type: string
+                  siteName:
+                    type: string
+                  author:
+                    type: string
+                  scrapedTitle:
+                    type: string
+                  scrapedDescription:
+                    type: string
+                  ogTitle:
+                    type: string
+                  ogDescription:
+                    type: string
+                  twitterCard:
+                    type: string
+                  featured:
+                    anyOf:
+                      - type: boolean
+                      - type: string
+                        enum:
+                          - 'true'
+                          - 'false'
+                  urlScraped:
+                    anyOf:
+                      - type: boolean
+                      - type: string
+                        enum:
+                          - 'true'
+                          - 'false'
+                additionalProperties: false
               kind:
                 nullable: true
                 type: string
@@ -843,6 +885,48 @@ components:
                 type: string
               status:
                 type: string
+              metadata:
+                type: object
+                properties:
+                  tags:
+                    type: array
+                    items:
+                      type: string
+                  ogImage:
+                    type: string
+                  ogImageBlurhash:
+                    type: string
+                  favicon:
+                    type: string
+                  siteName:
+                    type: string
+                  author:
+                    type: string
+                  scrapedTitle:
+                    type: string
+                  scrapedDescription:
+                    type: string
+                  ogTitle:
+                    type: string
+                  ogDescription:
+                    type: string
+                  twitterCard:
+                    type: string
+                  featured:
+                    anyOf:
+                      - type: boolean
+                      - type: string
+                        enum:
+                          - 'true'
+                          - 'false'
+                  urlScraped:
+                    anyOf:
+                      - type: boolean
+                      - type: string
+                        enum:
+                          - 'true'
+                          - 'false'
+                additionalProperties: false
               kind:
                 nullable: true
                 type: string
@@ -878,48 +962,131 @@ components:
         - recent
         - featured
       additionalProperties: false
-    get_3a__2f_api_2f_resources.Query:
+    ResourcesQuery:
       type: object
       properties:
+        q:
+          description: Search text; takes precedence over search
+          type: string
+        search:
+          description: Alias for q
+          type: string
+        category:
+          description: Category name or slug
+          type: string
+        subcategory:
+          description: Subcategory name or slug
+          type: string
+        subSubcategory:
+          type: string
+        generalScope:
+          type: string
+          enum:
+            - category
+            - subcategory
+        tags:
+          description: Comma-separated or repeated tags
+          anyOf:
+            - type: string
+            - type: array
+              items:
+                type: string
+        tag:
+          description: Alias for tags; combines with tags
+          anyOf:
+            - type: string
+            - type: array
+              items:
+                type: string
+        provider:
+          type: string
+          enum:
+            - unknown
+            - self-hosted
+            - github
+            - youtube
+            - vimeo
+            - aws
+            - google-cloud
+            - azure
+            - cloudflare
+            - mux
+            - akamai
+            - wowza
+            - brightcove
+            - bitmovin
+            - other
+        format:
+          type: string
+          enum:
+            - unknown
+            - tool
+            - library
+            - player
+            - sdk
+            - api-service
+            - platform
+            - course
+            - article
+            - video
+            - book
+            - specification
+            - dataset
+            - community
+            - other
+        skillLevel:
+          type: string
+          enum:
+            - unknown
+            - beginner
+            - intermediate
+            - advanced
+            - all-levels
+        kind:
+          type: string
+          enum:
+            - tools
+            - libraries
+            - standards
+            - events
+            - protocols
+            - other
+        sort:
+          type: string
+          enum:
+            - relevance
+            - name-asc
+            - name-desc
+            - newest
+            - oldest
+        facets:
+          type: string
+          enum:
+            - 'true'
+            - 'false'
+        status:
+          description: Default approved; other statuses require admin
+          type: string
+          enum:
+            - approved
+            - pending
+            - rejected
         page:
           type: string
           pattern: ^\d+$
+          description: Integer from 1 to 2147483647
         limit:
           type: string
           pattern: ^\d+$
+          description: Integer from 1 to 100
         offset:
           type: string
           pattern: ^\d+$
-        afterSeq:
-          type: string
-          pattern: ^\d+$
-        jobId:
-          type: string
-          pattern: ^\d+$
-        resourceId:
-          type: string
-          pattern: ^\d+$
-        categoryId:
-          type: string
-          pattern: ^\d+$
-        subcategoryId:
-          type: string
-          pattern: ^\d+$
-        per_page:
-          type: string
-          pattern: ^\d+$
+          description: Integer from 0 to 2147483647
         cursor:
+          description: Alias for offset; offset takes precedence
           type: string
-          minLength: 1
-          maxLength: 512
-      additionalProperties:
-        anyOf:
-          - type: string
-            maxLength: 512
-          - type: array
-            items:
-              type: string
-              maxLength: 512
+          pattern: ^\d+$
     ResourcesListResponse:
       type: object
       properties:
@@ -936,6 +1103,48 @@ components:
                 type: string
               status:
                 type: string
+              metadata:
+                type: object
+                properties:
+                  tags:
+                    type: array
+                    items:
+                      type: string
+                  ogImage:
+                    type: string
+                  ogImageBlurhash:
+                    type: string
+                  favicon:
+                    type: string
+                  siteName:
+                    type: string
+                  author:
+                    type: string
+                  scrapedTitle:
+                    type: string
+                  scrapedDescription:
+                    type: string
+                  ogTitle:
+                    type: string
+                  ogDescription:
+                    type: string
+                  twitterCard:
+                    type: string
+                  featured:
+                    anyOf:
+                      - type: boolean
+                      - type: string
+                        enum:
+                          - 'true'
+                          - 'false'
+                  urlScraped:
+                    anyOf:
+                      - type: boolean
+                      - type: string
+                        enum:
+                          - 'true'
+                          - 'false'
+                additionalProperties: false
               kind:
                 nullable: true
                 type: string
@@ -1073,48 +1282,21 @@ components:
         - other
         - total
       additionalProperties: false
-    get_3a__2f_api_2f_search.Query:
+    SearchQuery:
       type: object
       properties:
-        page:
+        q:
           type: string
-          pattern: ^\d+$
+        search:
+          description: Alias for q
+          type: string
         limit:
+          description: Default 100; numeric values clamped to 1–200
           type: string
-          pattern: ^\d+$
         offset:
           type: string
           pattern: ^\d+$
-        afterSeq:
-          type: string
-          pattern: ^\d+$
-        jobId:
-          type: string
-          pattern: ^\d+$
-        resourceId:
-          type: string
-          pattern: ^\d+$
-        categoryId:
-          type: string
-          pattern: ^\d+$
-        subcategoryId:
-          type: string
-          pattern: ^\d+$
-        per_page:
-          type: string
-          pattern: ^\d+$
-        cursor:
-          type: string
-          minLength: 1
-          maxLength: 512
-      additionalProperties:
-        anyOf:
-          - type: string
-            maxLength: 512
-          - type: array
-            items:
-              type: string
-              maxLength: 512
+          description: Integer from 0 to 2147483647
     post_3a__2f_api_2f_telemetry_2f_dead-link.Query:
       type: object
       properties:
@@ -1267,6 +1449,48 @@ components:
         subcategory:
           nullable: true
           type: string
+        metadata:
+          type: object
+          properties:
+            tags:
+              type: array
+              items:
+                type: string
+            ogImage:
+              type: string
+            ogImageBlurhash:
+              type: string
+            favicon:
+              type: string
+            siteName:
+              type: string
+            author:
+              type: string
+            scrapedTitle:
+              type: string
+            scrapedDescription:
+              type: string
+            ogTitle:
+              type: string
+            ogDescription:
+              type: string
+            twitterCard:
+              type: string
+            featured:
+              anyOf:
+                - type: boolean
+                - type: string
+                  enum:
+                    - 'true'
+                    - 'false'
+            urlScraped:
+              anyOf:
+                - type: boolean
+                - type: string
+                  enum:
+                    - 'true'
+                    - 'false'
+          additionalProperties: false
         kind:
           nullable: true
           type: string
@@ -1760,6 +1984,32 @@ components:
             items:
               type: string
               maxLength: 512
+    ApprovedResourceTagsResponse:
+      type: object
+      properties:
+        total:
+          type: integer
+          minimum: -9007199254740991
+          maximum: 9007199254740991
+        tags:
+          type: array
+          items:
+            type: object
+            properties:
+              tag:
+                type: string
+              count:
+                type: integer
+                minimum: -9007199254740991
+                maximum: 9007199254740991
+            required:
+              - tag
+              - count
+            additionalProperties: false
+      required:
+        - total
+        - tags
+      additionalProperties: false
     get_3a__2f_api_2f_subcategories.Query:
       type: object
       properties:
@@ -7848,6 +8098,15 @@ components:
           type: string
           enum:
             - '1'
+        kind:
+          type: string
+          enum:
+            - tools
+            - libraries
+            - standards
+            - events
+            - protocols
+            - other
       required:
         - level
         - slug
@@ -7955,6 +8214,48 @@ components:
                 type: string
               status:
                 type: string
+              metadata:
+                type: object
+                properties:
+                  tags:
+                    type: array
+                    items:
+                      type: string
+                  ogImage:
+                    type: string
+                  ogImageBlurhash:
+                    type: string
+                  favicon:
+                    type: string
+                  siteName:
+                    type: string
+                  author:
+                    type: string
+                  scrapedTitle:
+                    type: string
+                  scrapedDescription:
+                    type: string
+                  ogTitle:
+                    type: string
+                  ogDescription:
+                    type: string
+                  twitterCard:
+                    type: string
+                  featured:
+                    anyOf:
+                      - type: boolean
+                      - type: string
+                        enum:
+                          - 'true'
+                          - 'false'
+                  urlScraped:
+                    anyOf:
+                      - type: boolean
+                      - type: string
+                        enum:
+                          - 'true'
+                          - 'false'
+                additionalProperties: false
               kind:
                 nullable: true
                 type: string
@@ -8182,6 +8483,48 @@ components:
                 type: string
               status:
                 type: string
+              metadata:
+                type: object
+                properties:
+                  tags:
+                    type: array
+                    items:
+                      type: string
+                  ogImage:
+                    type: string
+                  ogImageBlurhash:
+                    type: string
+                  favicon:
+                    type: string
+                  siteName:
+                    type: string
+                  author:
+                    type: string
+                  scrapedTitle:
+                    type: string
+                  scrapedDescription:
+                    type: string
+                  ogTitle:
+                    type: string
+                  ogDescription:
+                    type: string
+                  twitterCard:
+                    type: string
+                  featured:
+                    anyOf:
+                      - type: boolean
+                      - type: string
+                        enum:
+                          - 'true'
+                          - 'false'
+                  urlScraped:
+                    anyOf:
+                      - type: boolean
+                      - type: string
+                        enum:
+                          - 'true'
+                          - 'false'
+                additionalProperties: false
               kind:
                 nullable: true
                 type: string
@@ -8271,6 +8614,48 @@ components:
                 type: string
               status:
                 type: string
+              metadata:
+                type: object
+                properties:
+                  tags:
+                    type: array
+                    items:
+                      type: string
+                  ogImage:
+                    type: string
+                  ogImageBlurhash:
+                    type: string
+                  favicon:
+                    type: string
+                  siteName:
+                    type: string
+                  author:
+                    type: string
+                  scrapedTitle:
+                    type: string
+                  scrapedDescription:
+                    type: string
+                  ogTitle:
+                    type: string
+                  ogDescription:
+                    type: string
+                  twitterCard:
+                    type: string
+                  featured:
+                    anyOf:
+                      - type: boolean
+                      - type: string
+                        enum:
+                          - 'true'
+                          - 'false'
+                  urlScraped:
+                    anyOf:
+                      - type: boolean
+                      - type: string
+                        enum:
+                          - 'true'
+                          - 'false'
+                additionalProperties: false
               kind:
                 nullable: true
                 type: string
@@ -11576,71 +11961,189 @@ paths:
       tags:
         - resources
       parameters:
+        - name: q
+          in: query
+          required: false
+          schema:
+            description: Search text; takes precedence over search
+            type: string
+        - name: search
+          in: query
+          required: false
+          schema:
+            description: Alias for q
+            type: string
+        - name: category
+          in: query
+          required: false
+          schema:
+            description: Category name or slug
+            type: string
+        - name: subcategory
+          in: query
+          required: false
+          schema:
+            description: Subcategory name or slug
+            type: string
+        - name: subSubcategory
+          in: query
+          required: false
+          schema:
+            type: string
+        - name: generalScope
+          in: query
+          required: false
+          schema:
+            type: string
+            enum:
+              - category
+              - subcategory
+        - name: tags
+          in: query
+          required: false
+          schema:
+            description: Comma-separated or repeated tags
+            anyOf:
+              - type: string
+              - type: array
+                items:
+                  type: string
+        - name: tag
+          in: query
+          required: false
+          schema:
+            description: Alias for tags; combines with tags
+            anyOf:
+              - type: string
+              - type: array
+                items:
+                  type: string
+        - name: provider
+          in: query
+          required: false
+          schema:
+            type: string
+            enum:
+              - unknown
+              - self-hosted
+              - github
+              - youtube
+              - vimeo
+              - aws
+              - google-cloud
+              - azure
+              - cloudflare
+              - mux
+              - akamai
+              - wowza
+              - brightcove
+              - bitmovin
+              - other
+        - name: format
+          in: query
+          required: false
+          schema:
+            type: string
+            enum:
+              - unknown
+              - tool
+              - library
+              - player
+              - sdk
+              - api-service
+              - platform
+              - course
+              - article
+              - video
+              - book
+              - specification
+              - dataset
+              - community
+              - other
+        - name: skillLevel
+          in: query
+          required: false
+          schema:
+            type: string
+            enum:
+              - unknown
+              - beginner
+              - intermediate
+              - advanced
+              - all-levels
+        - name: kind
+          in: query
+          required: false
+          schema:
+            type: string
+            enum:
+              - tools
+              - libraries
+              - standards
+              - events
+              - protocols
+              - other
+        - name: sort
+          in: query
+          required: false
+          schema:
+            type: string
+            enum:
+              - relevance
+              - name-asc
+              - name-desc
+              - newest
+              - oldest
+        - name: facets
+          in: query
+          required: false
+          schema:
+            type: string
+            enum:
+              - 'true'
+              - 'false'
+        - name: status
+          in: query
+          required: false
+          schema:
+            description: Default approved; other statuses require admin
+            type: string
+            enum:
+              - approved
+              - pending
+              - rejected
         - name: page
           in: query
           required: false
           schema:
             type: string
             pattern: ^\d+$
+            description: Integer from 1 to 2147483647
         - name: limit
           in: query
           required: false
           schema:
             type: string
             pattern: ^\d+$
+            description: Integer from 1 to 100
         - name: offset
           in: query
           required: false
           schema:
             type: string
             pattern: ^\d+$
-        - name: afterSeq
-          in: query
-          required: false
-          schema:
-            type: string
-            pattern: ^\d+$
-        - name: jobId
-          in: query
-          required: false
-          schema:
-            type: string
-            pattern: ^\d+$
-        - name: resourceId
-          in: query
-          required: false
-          schema:
-            type: string
-            pattern: ^\d+$
-        - name: categoryId
-          in: query
-          required: false
-          schema:
-            type: string
-            pattern: ^\d+$
-        - name: subcategoryId
-          in: query
-          required: false
-          schema:
-            type: string
-            pattern: ^\d+$
-        - name: per_page
-          in: query
-          required: false
-          schema:
-            type: string
-            pattern: ^\d+$
+            description: Integer from 0 to 2147483647
         - name: cursor
           in: query
           required: false
           schema:
+            description: Alias for offset; offset takes precedence
             type: string
-            minLength: 1
-            maxLength: 512
+            pattern: ^\d+$
       x-domain: resources
       x-middleware: []
       x-contract-schemas:
-        query: get_3a__2f_api_2f_resources.Query
+        query: ResourcesQuery
     post:
       operationId: post:/api/resources
       responses:
@@ -11955,71 +12458,34 @@ paths:
       tags:
         - search
       parameters:
-        - name: page
+        - name: q
           in: query
           required: false
           schema:
             type: string
-            pattern: ^\d+$
+        - name: search
+          in: query
+          required: false
+          schema:
+            description: Alias for q
+            type: string
         - name: limit
           in: query
           required: false
           schema:
+            description: Default 100; numeric values clamped to 1–200
             type: string
-            pattern: ^\d+$
         - name: offset
           in: query
           required: false
           schema:
             type: string
             pattern: ^\d+$
-        - name: afterSeq
-          in: query
-          required: false
-          schema:
-            type: string
-            pattern: ^\d+$
-        - name: jobId
-          in: query
-          required: false
-          schema:
-            type: string
-            pattern: ^\d+$
-        - name: resourceId
-          in: query
-          required: false
-          schema:
-            type: string
-            pattern: ^\d+$
-        - name: categoryId
-          in: query
-          required: false
-          schema:
-            type: string
-            pattern: ^\d+$
-        - name: subcategoryId
-          in: query
-          required: false
-          schema:
-            type: string
-            pattern: ^\d+$
-        - name: per_page
-          in: query
-          required: false
-          schema:
-            type: string
-            pattern: ^\d+$
-        - name: cursor
-          in: query
-          required: false
-          schema:
-            type: string
-            minLength: 1
-            maxLength: 512
+            description: Integer from 0 to 2147483647
       x-domain: search
       x-middleware: []
       x-contract-schemas:
-        query: get_3a__2f_api_2f_search.Query
+        query: SearchQuery
   /api/telemetry/dead-link:
     post:
       operationId: post:/api/telemetry/dead-link
@@ -13663,11 +14129,11 @@ paths:
       operationId: get:/api/tags
       responses:
         '200':
-          description: Successful response
+          description: Canonical tags and usage counts from approved resource metadata
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/JsonResponse'
+                $ref: '#/components/schemas/ApprovedResourceTagsResponse'
         '400':
           description: Request validation failed
           content:
@@ -32763,6 +33229,18 @@ paths:
             type: string
             enum:
               - '1'
+        - name: kind
+          in: query
+          required: false
+          schema:
+            type: string
+            enum:
+              - tools
+              - libraries
+              - standards
+              - events
+              - protocols
+              - other
       x-domain: awesome-list
       x-middleware: []
       x-contract-schemas:
@@ -35740,11 +36218,11 @@ paths:
       operationId: get:/api/public/tags
       responses:
         '200':
-          description: Successful response
+          description: Canonical tags and usage counts from approved resource metadata
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/JsonResponse'
+                $ref: '#/components/schemas/ApprovedResourceTagsResponse'
         '400':
           description: Request validation failed
           content:

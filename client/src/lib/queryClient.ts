@@ -65,7 +65,7 @@ export async function apiRequest(
 }
 
 /** Shared content-mutation cache graph, including URL-shaped detail keys. */
-export function invalidateCatalogQueries(): Promise<void> {
+function invalidateCatalogQueries(): Promise<void> {
   const prefixes = [
     '/api/resources', '/api/categories', '/api/subcategories', '/api/sub-subcategories',
     '/api/admin/resources', '/api/admin/pending-resources', '/api/admin/resource-edits',

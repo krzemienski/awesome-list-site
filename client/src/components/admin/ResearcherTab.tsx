@@ -1654,10 +1654,12 @@ export default function ResearcherTab({ initialTab = "launch" }: ResearcherTabPr
                         {d.status === 'pending_review' && (
                           <div className="flex gap-1 ml-2">
                             <Button size="sm" variant="ghost" className={`${OK_TEXT} h-7`}
+                              aria-label={`Approve discovery: ${sanitizeDisplay(d.title)}`}
                               onClick={() => approveMutation.mutate(d.id)}>
                               <ThumbsUp className="w-3 h-3" />
                             </Button>
                             <Button size="sm" variant="ghost" className={`${BAD_TEXT} h-7`}
+                              aria-label={`Reject discovery: ${sanitizeDisplay(d.title)}`}
                               onClick={() => setRejectDialogId(d.id)}>
                               <ThumbsDown className="w-3 h-3" />
                             </Button>

@@ -53,7 +53,10 @@ export function ResearchWorkspace() {
       return res.json();
     },
     staleTime: 30_000,
-    refetchInterval: 5_000,
+    // Active notes change every few seconds (candidate count, status); idle
+    // notes only need to notice a newly started job.
+    refetchInterval: (query) =>
+      query.state.data?.jobs.some((job) => job.status === "pending" || job.status === "processing") ? 5_000 : 30_000,
     refetchOnWindowFocus: true,
   });
   const { data: selectedJob, isError: detailError } = useQuery<ResearchJob>({
@@ -64,7 +67,8 @@ export function ResearchWorkspace() {
       if (!res.ok) throw new ApiError(res.status, `${res.status}: ${await res.text()}`);
       return res.json();
     },
-    refetchInterval: 5_000,
+    refetchInterval: (query) =>
+      query.state.data && query.state.data.status !== "pending" && query.state.data.status !== "processing" ? false : 5_000,
     refetchOnWindowFocus: true,
   });
   const notes = (data?.jobs ?? []).map((job) => toResearchNote(job));

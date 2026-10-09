@@ -1273,7 +1273,8 @@ STOP TARGET: this run ends AUTOMATICALLY once ${targetDiscoveries} new discoveri
     // case — keep whatever accounting was last persisted instead of
     // manufacturing a "0 turns / $0.0000" contradiction next to real finds.
     const abortedWithNoUsage =
-      result.aborted && result.numTurns === 0 && result.totalCostUsd === 0;
+      result.aborted && result.numTurns === 0 && result.totalCostUsd === 0 &&
+      result.tokensIn === 0 && result.tokensOut === 0;
     const finalStatus = result.aborted && !stoppedAtTarget ? 'cancelled' : 'completed';
     const usageFields = abortedWithNoUsage ? {} : {
       turnsUsed: result.numTurns,

@@ -1,0 +1,23 @@
+$ date -u: 2026-10-09T16:10:16Z
+$ curl -X POST /api/enrichment/start -d {"filter":"unenriched","batchSize":3}
+{"success":true,"jobId":48,"message":"Batch enrichment job started successfully"}
+t+8s processing processed=0 ok=0 failed=0 skipped=0 total=773
+t+16s processing processed=0 ok=0 failed=0 skipped=0 total=773
+t+24s processing processed=0 ok=0 failed=0 skipped=0 total=773
+t+32s processing processed=3 ok=3 failed=0 skipped=0 total=773
+t+40s processing processed=3 ok=3 failed=0 skipped=0 total=773
+t+48s processing processed=3 ok=3 failed=0 skipped=0 total=773
+t+56s processing processed=3 ok=3 failed=0 skipped=0 total=773
+t+64s processing processed=3 ok=3 failed=0 skipped=0 total=773
+t+72s processing processed=3 ok=3 failed=0 skipped=0 total=773
+t+80s processing processed=3 ok=3 failed=0 skipped=0 total=773
+t+88s processing processed=3 ok=3 failed=0 skipped=0 total=773
+t+96s processing processed=3 ok=3 failed=0 skipped=0 total=773
+t+104s processing processed=3 ok=3 failed=0 skipped=0 total=773
+t+112s processing processed=3 ok=3 failed=0 skipped=0 total=773
+t+120s processing processed=3 ok=3 failed=0 skipped=0 total=773
+t+128s processing processed=3 ok=3 failed=0 skipped=0 total=773
+t+136s processing processed=3 ok=3 failed=0 skipped=0 total=773
+t+144s processing processed=3 ok=3 failed=0 skipped=0 total=773
+t+152s processing processed=3 ok=3 failed=0 skipped=0 total=773
+t+160s processing processed=3 ok=3 failed=0 skipped=0 total=773

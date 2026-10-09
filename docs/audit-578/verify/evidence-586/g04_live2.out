@@ -1,0 +1,21 @@
+$ date -u: 2026-10-09T16:01:45Z
+$ curl -X POST /api/researcher/start -d {"prompt":"__qa_test_plan_586 cancel probe 2: ...","maxBudgetUsd":0.5,"maxTurns":8}
+{"success":true,"jobId":60,"message":"Research job started"}
+job=60
+t+6s status=processing logLen=1 turns=0 tokens_in=0
+t+12s status=processing logLen=1 turns=0 tokens_in=0
+t+18s status=processing logLen=1 turns=0 tokens_in=0
+t+24s status=processing logLen=1 turns=0 tokens_in=0
+t+30s status=processing logLen=1 turns=0 tokens_in=0
+t+36s status=processing logLen=1 turns=0 tokens_in=0
+t+42s status=processing logLen=1 turns=0 tokens_in=0
+t+48s status=processing logLen=1 turns=0 tokens_in=0
+$ curl -X DELETE /api/researcher/jobs/60
+{"success":true,"message":"Job cancelled"}
+-> HTTP 200
+$ curl -X DELETE /api/researcher/jobs/60  (repeat)
+{"success":true,"message":"Job cancelled"}
+-> HTTP 200
+after cancel+20s: status=cancelled completed_at=2026-10-09 16:02:34.558 turns=0 tokens_in=20 tokens_out=8 cost=0.0000 logLen=10
+last log: Research cancelled (cancelled). Turns: 0/8, Web searches: 4, Discoveries saved: 0, Duplicates skipped: 0, Tokens: in=20 out=8, Cost: $0.0000
+after +35s: status=cancelled logLen=10 tokens_in=20

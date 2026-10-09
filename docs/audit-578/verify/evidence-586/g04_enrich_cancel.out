@@ -1,0 +1,21 @@
+$ date -u: 2026-10-09T16:13:08Z
+before cancel: status=processing processed=3 ok=3 metadata={"agent": {"model": "cc/claude-haiku-4-5-20251001", "turns": 5, "batches": 1, "estimatedCostUsd": "0.0335", "totalInputTokens": 26, "totalOutputTokens": 1857}, "agentLog": [{"role": "system", "content": "Enrichment batch started. Model: cc/claude-haiku-4-5-20251001, Items: 3, Budget: $0.14, Max turn
+$ curl -X DELETE /api/enrichment/jobs/48
+{"success":true,"message":"Enrichment job 48 cancelled successfully"}
+-> HTTP 200
+right after cancel: status=cancelled completed_at=2026-10-09 16:13:08.612 processed=3
+cancel+45s: status=cancelled completed_at=2026-10-09 16:13:08.612 processed=3 ok=3 agent={"model": "cc/claude-haiku-4-5-20251001", "turns": 5, "batches": 2, "estimatedCostUsd": "0.0335", "totalInputTokens": 36, "totalOutputTokens": 1863}
+queue: completed=3
+queue: pending=770
+assistant|✅ **Batch enrichment complete!** 
+
+I've successfully enriched all 3 resources in the batch:
+
+| Resource | Title | Category | Tags | Confidence |
+|----------|-------|----------|------|-----------|
+| 188648 | redirect to p
+system|Batch success: 3/3 enriched, turns 5, cost $0.0335
+system|Enrichment batch started. Model: cc/claude-haiku-4-5-20251001, Items: 3, Budget: $0.14, Max turns: 24
+assistant|I'll start by retrieving the pending batch of resources to enrich.
+system|Run cancelled by user
+system|Batch cancelled: 0/3 enriched, turns 0, cost $0.0000

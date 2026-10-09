@@ -1,0 +1,28 @@
+control: plain fetch(http://127.0.0.1:51999/control) -> HTTP 200; listener hits=1 (expected 1)
+[direct loopback] fetchUrlMetadata -> error="Unsafe URL: destination is not a public IP address" title=undefined listenerHits+=0 (0ms)
+[localhost name] fetchUrlMetadata -> error="Unsafe URL: destination is not a public IP address" title=undefined listenerHits+=0 (4ms)
+[DNS name resolving to 127.0.0.1 (nip.io)] fetchUrlMetadata -> error="Unsafe URL: destination is not a public IP address" title=undefined listenerHits+=0 (1ms)
+[DNS name resolving to ::1 (localtest.me)] fetchUrlMetadata -> error="Unsafe URL: destination is not a public IP address" title=undefined listenerHits+=0 (359ms)
+[IPv6 loopback literal] fetchUrlMetadata -> error="Unsafe URL: destination is not a public IP address" title=undefined listenerHits+=0 (0ms)
+[IPv4-mapped IPv6 loopback] fetchUrlMetadata -> error="Unsafe URL: destination is not a public IP address" title=undefined listenerHits+=0 (0ms)
+[decimal-encoded 127.0.0.1] fetchUrlMetadata -> error="Unsafe URL: destination is not a public IP address" title=undefined listenerHits+=0 (0ms)
+[0.0.0.0] fetchUrlMetadata -> error="Unsafe URL: destination is not a public IP address" title=undefined listenerHits+=0 (1ms)
+[link-local metadata 169.254.169.254] fetchUrlMetadata -> error="Unsafe URL: destination is not a public IP address" title=undefined listenerHits+=0 (1ms)
+[RFC1918 10.0.0.1] fetchUrlMetadata -> error="Unsafe URL: destination is not a public IP address" title=undefined listenerHits+=0 (0ms)
+[RFC1918 192.168.1.1] fetchUrlMetadata -> error="Unsafe URL: destination is not a public IP address" title=undefined listenerHits+=0 (0ms)
+[credentials in URL] fetchUrlMetadata -> error="Unsafe URL: only uncredentialed HTTP/HTTPS URLs are allowed" title=undefined listenerHits+=0 (0ms)
+[non-http scheme] fetchUrlMetadata -> error="Invalid protocol - only HTTP/HTTPS supported" title=undefined listenerHits+=0 (0ms)
+[public redirect -> private (1 hop)] fetchUrlMetadata -> error="Unsafe URL: destination is not a public IP address" title=undefined listenerHits+=0 (162ms)
+[public redirect chain -> private (2 hops)] fetchUrlMetadata -> error="Unsafe URL: destination is not a public IP address" title=undefined listenerHits+=0 (498ms)
+[public redirect -> link-local metadata] fetchUrlMetadata -> error="Unsafe URL: destination is not a public IP address" title=undefined listenerHits+=0 (117ms)
+[og:image -> private listener] page title=undefined ogImage=undefined blurhash=undefined listenerHits+=0
+[twitter:image -> private listener] page title="__qa_test_plan_586 tw" ogImage=http://localtest.me:51999/tw.png blurhash=undefined listenerHits+=0
+[og:image -> public redirect -> private] page title="__qa_test_plan_586 og redirect" ogImage=https://httpbin.org/redirect-to?url=http%3A%2F%2F127.0.0.1%3A51999%2Fog-redir.png blurhash=undefined listenerHits+=0
+[positive: https://github.com/] title="GitHub · Change is constant. GitHub keeps you ahead. · GitHub · GitHub" ogImage=https://images.ctfassets.net/8aevphvgewt8/4pe4eOtUJ0ARpZRE4fNekf/f52b1f9c52f059a33170229883731ed0/GH-Homepage-Universe-img.png blurhash=yes(LBC~QBSo5y}*0vx7=Q5ZmJI]NE,U) error=undefined
+[positive: public redirect -> https://example.com/] title="Example Domain" error=undefined
+[body-read timeout] safeFetch(drip 8s body, timeout 3000) -> Request timeout after 3005ms
+[size cap https://httpbin.org/bytes/50000] maxBytes=10000 -> Response exceeds size limit
+[size cap https://httpbin.org/stream-bytes/50000?chunk_size=1024] maxBytes=10000 -> Response exceeds size limit
+
+TOTAL private listener hits during guarded fetches: 0
+VERDICT: PASS

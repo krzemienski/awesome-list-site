@@ -1,0 +1,187 @@
+// G05 + G06 real-browser proof against the DEV app on :5000.
+// Throwaway Clerk admin (__qa_test_plan_586_*), deleted Clerk-first then local row.
+import crypto from "node:crypto";
+import { execFileSync } from "node:child_process";
+import fs from "node:fs";
+import { chromium } from "/home/runner/workspace/node_modules/@playwright/test/index.mjs";
+import { launchBrowserWithLease } from "/home/runner/workspace/scripts/validation/playwright-launch-lease.mjs";
+
+const BASE = "http://127.0.0.1:5000";
+const SHOTS = "/tmp/t586/shots";
+const SECRET = process.env.CLERK_SECRET_KEY;
+const AUDIT = process.env.ADMIN_PASSWORD;
+const G05_JOB = Number(process.argv[2]);
+const log = (...a) => console.log(new Date().toISOString().slice(11, 19), ...a);
+const sql = (q) => execFileSync("psql", [process.env.DATABASE_URL, "-Atc", q], { encoding: "utf8" }).trim();
+
+const clerk = async (method, route, body) => {
+  const r = await fetch(`https://api.clerk.com/v1${route}`, {
+    method, headers: { Authorization: `Bearer ${SECRET}`, "Content-Type": "application/json" },
+    body: body === undefined ? undefined : JSON.stringify(body),
+  });
+  const data = await r.json().catch(() => null);
+  if (!r.ok) throw new Error(`Clerk ${method} ${route} -> ${r.status} ${JSON.stringify(data?.errors ?? data)}`);
+  return data;
+};
+const audit = async (method, route, body) => {
+  const r = await fetch(`${BASE}${route}`, {
+    method, headers: { "X-Admin-Audit-Key": AUDIT, Origin: BASE, Accept: "application/json", ...(body ? { "Content-Type": "application/json" } : {}) },
+    body: body ? JSON.stringify(body) : undefined,
+  });
+  const data = await r.json().catch(() => null);
+  if (!r.ok) throw new Error(`${method} ${route} -> ${r.status} ${JSON.stringify(data)}`);
+  return data;
+};
+
+const suffix = `${Date.now().toString(36)}${crypto.randomBytes(2).toString("hex")}`;
+const bridgeId = String(2_000_000_000 + crypto.randomInt(0, 147_000_000));
+const email = `__qa_test_plan_586_${suffix}+clerk_test@example.com`;
+const password = `Plan586-${crypto.randomBytes(12).toString("base64url")}!9`;
+let clerkUserId = null;
+const results = { g05: {}, g06: {} };
+let browser;
+let g06Job = null;
+
+async function signIn(page) {
+  await page.goto(`${BASE}/sign-in`, { waitUntil: "domcontentloaded", timeout: 60_000 });
+  await page.locator('input[name="identifier"]').fill(email);
+  await page.keyboard.press("Enter");
+  await page.locator('input[name="password"]').fill(password);
+  await page.keyboard.press("Enter");
+  const otp = page.locator('input[aria-label="Enter verification code"]');
+  const deadline = Date.now() + 90_000;
+  while (Date.now() < deadline) {
+    if (await page.evaluate(() => Boolean(window.Clerk?.user)).catch(() => false)) return;
+    if (await otp.isVisible().catch(() => false)) { await otp.click(); await page.keyboard.type("424242", { delay: 120 }); }
+    await page.waitForTimeout(500);
+  }
+  throw new Error("sign-in never completed");
+}
+async function authUser(page) {
+  return page.evaluate(async () => (await fetch("/api/auth/user", { credentials: "include" })).json().catch(() => null));
+}
+
+try {
+  log(`creating Clerk user ${email} (external_id ${bridgeId})`);
+  const u = await clerk("POST", "/users", { external_id: bridgeId, email_address: [email], password, first_name: "QA", last_name: "Plan586", skip_password_checks: true });
+  clerkUserId = u.id;
+  if (u.email_addresses?.[0]?.id) await clerk("PATCH", `/email_addresses/${u.email_addresses[0].id}`, { verified: true }).catch(() => {});
+
+  browser = await launchBrowserWithLease(chromium, { headless: true }, "task586-g05g06");
+  const ctx = await browser.newContext({ viewport: { width: 1440, height: 1000 }, locale: "en-US", timezoneId: "UTC", serviceWorkers: "block" });
+  const page = await ctx.newPage();
+  let navigations = 0;
+  page.on("framenavigated", (f) => { if (f === page.mainFrame()) navigations++; });
+  await signIn(page);
+  for (let i = 0; i < 30; i++) { const a = await authUser(page); if (a?.isAuthenticated) break; await page.waitForTimeout(1000); }
+  await audit("PUT", `/api/admin/users/${bridgeId}/role`, { role: "admin" });
+  for (let i = 0; i < 30; i++) { const a = await authUser(page); if ((a?.user?.role || a?.role) === "admin") break; await page.waitForTimeout(1000); }
+  log("signed in + promoted to admin");
+
+  // ---------------- G05 ----------------
+  log(`G05: job ${G05_JOB} DB before = ${sql(`select status from research_jobs where id=${G05_JOB}`)}`);
+  await page.goto(`${BASE}/admin/researcher`, { waitUntil: "domcontentloaded" });
+  const decline = page.getByRole("button", { name: "Decline", exact: true });
+  await decline.waitFor({ timeout: 30_000 }).then(() => decline.click()).catch(() => {});
+  await page.locator("summary", { hasText: "Advanced research controls" }).click();
+  const activeCard = page.locator("div").filter({ has: page.getByText(`Job #${G05_JOB}`, { exact: true }) }).filter({ has: page.getByRole("button", { name: "Cancel", exact: true }) }).last();
+  const cancelBtn = page.getByRole("button", { name: `Cancel job #${G05_JOB}` }).or(activeCard.getByRole("button", { name: "Cancel", exact: true })).first();
+  await cancelBtn.waitFor({ timeout: 60_000 });
+  // "Block the DELETE request in DevTools": abort only DELETEs to this job.
+  let blocked = 0;
+  const blocker = (route) => { if (route.request().method() === "DELETE") { blocked++; return route.abort("failed"); } return route.continue(); };
+  await page.route(`**/api/researcher/jobs/${G05_JOB}`, blocker);
+  await cancelBtn.click();
+  const alert = page.getByRole("alert").filter({ hasText: `Could not cancel job #${G05_JOB}` });
+  await alert.waitFor({ timeout: 15_000 });
+  await page.waitForTimeout(800);
+  await page.screenshot({ path: `${SHOTS}/G05-1-cancel-blocked.png` });
+  results.g05.blockedRequests = blocked;
+  results.g05.alertText = (await alert.innerText()).replace(/\s+/g, " ");
+  results.g05.toastText = (await page.locator("li[data-state]").allInnerTexts().catch(() => [])).join(" | ").replace(/\s+/g, " ");
+  results.g05.dbAfterBlocked = sql(`select status from research_jobs where id=${G05_JOB}`);
+  results.g05.cancelButtonStillShown = await cancelBtn.isVisible();
+  log("G05 blocked:", JSON.stringify(results.g05));
+  await page.unroute(`**/api/researcher/jobs/${G05_JOB}`, blocker);
+  await alert.getByRole("button", { name: "Retry cancellation" }).click();
+  await page.locator("li[data-state]").filter({ hasText: "Job cancelled" }).first().waitFor({ timeout: 15_000 });
+  await page.waitForTimeout(1500);
+  await page.screenshot({ path: `${SHOTS}/G05-2-retry-cancelled.png` });
+  results.g05.dbAfterRetry = sql(`select status||' completed_at='||coalesce(completed_at::text,'null') from research_jobs where id=${G05_JOB}`);
+  results.g05.alertGoneAfterRetry = (await alert.count()) === 0;
+  results.g05.cancelButtonGoneAfterRetry = (await cancelBtn.count()) === 0;
+  log("G05 retry:", JSON.stringify(results.g05));
+
+  // ---------------- G06 ----------------
+  g06Job = Number(sql(`with j as (insert into research_jobs (status,prompt,max_budget_usd,max_turns,total_discoveries,started_at) values ('processing','__qa_test_plan_586 G06 fixture brief. campaign angle: __qa_test_plan_586 live note','0.50',8,1,now()) returning id),
+    d as (insert into research_discoveries (job_id,title,url,description,status) select id,'__qa_test_plan_586 G06 candidate 1','https://example.com/__qa_test_plan_586/g06/1','fixture','pending_review' from j) select id from j`));
+  results.g06.job = g06Job;
+  await page.goto(`${BASE}/admin/research`, { waitUntil: "domcontentloaded" });
+  const card = page.getByTestId(`research-note-${g06Job}`);
+  await card.waitFor({ timeout: 60_000 });
+  results.g06.copy = (await page.locator("#admin-research-heading + p").innerText()).trim();
+  results.g06.cardBefore = (await card.innerText()).replace(/\s+/g, " ");
+  await page.getByTestId(`button-research-note-${g06Job}`).click();
+  const dialog = page.getByTestId("dialog-research-note");
+  await dialog.getByText(`Research job #${g06Job} · processing · 1 candidates`).waitFor({ timeout: 15_000 });
+  results.g06.dialogBefore = (await dialog.locator("p").first().innerText()).trim();
+  await page.screenshot({ path: `${SHOTS}/G06-1-note-open-active.png` });
+  const navBefore = navigations;
+  // The agent finds two more candidates.
+  sql(`insert into research_discoveries (job_id,title,url,description,status) select ${g06Job},'__qa_test_plan_586 G06 candidate '||n,'https://example.com/__qa_test_plan_586/g06/'||n,'fixture','pending_review' from generate_series(2,3) n; update research_jobs set total_discoveries=3 where id=${g06Job}`);
+  const t0 = Date.now();
+  await dialog.getByText(`Research job #${g06Job} · processing · 3 candidates`).waitFor({ timeout: 20_000 });
+  results.g06.countUpdateSeconds = ((Date.now() - t0) / 1000).toFixed(1);
+  await card.getByText("3 candidates").waitFor({ timeout: 20_000 });
+  await page.screenshot({ path: `${SHOTS}/G06-2-count-updated.png` });
+  // The job finishes.
+  sql(`update research_jobs set status='completed', completed_at=now() where id=${g06Job}`);
+  const t1 = Date.now();
+  await dialog.getByText(`Research job #${g06Job} · completed · 3 candidates`).waitFor({ timeout: 20_000 });
+  results.g06.statusUpdateSeconds = ((Date.now() - t1) / 1000).toFixed(1);
+  for (let i = 0; i < 40 && /Active/.test(await card.innerText()); i++) await page.waitForTimeout(1000);
+  results.g06.cardAfter = (await card.innerText()).replace(/\s+/g, " ");
+  results.g06.dialogAfter = (await dialog.locator("p").first().innerText()).trim();
+  results.g06.reloadsDuringUpdates = navigations - navBefore;
+  await page.screenshot({ path: `${SHOTS}/G06-3-status-completed.png` });
+  log("G06 refresh:", JSON.stringify(results.g06));
+  // Handoff.
+  await dialog.getByRole("link", { name: `Review candidates for job #${g06Job}` }).click();
+  await page.waitForURL(`**/admin/researcher?jobId=${g06Job}`, { timeout: 20_000 });
+  results.g06.handoffUrl = page.url().replace(BASE, "");
+  const jobDialog = page.getByRole("dialog").filter({ hasText: `Research Job #${g06Job}` });
+  await jobDialog.waitFor({ timeout: 30_000 });
+  for (const n of [1, 2, 3]) await jobDialog.getByText(`__qa_test_plan_586 G06 candidate ${n}`, { exact: true }).waitFor({ timeout: 30_000 });
+  results.g06.jobDialogHeading = (await jobDialog.getByRole("heading").first().innerText()).replace(/\s+/g, " ");
+  results.g06.moderationButtons = await jobDialog.getByRole("button", { name: /^(Approve|Reject) discovery:/ }).evaluateAll((els) => els.map((e) => e.getAttribute("aria-label")));
+  results.g06.otherJobCandidatesInDialog = await jobDialog.getByText("__qa_test_plan_586 G05 candidate").count();
+  await jobDialog.getByText("Discoveries from this job").scrollIntoViewIfNeeded();
+  await page.screenshot({ path: `${SHOTS}/G06-4-review-candidates.png`, fullPage: false });
+  log("G06 handoff:", JSON.stringify({ url: results.g06.handoffUrl, heading: results.g06.jobDialogHeading, buttons: results.g06.moderationButtons }));
+  // Use one moderation control from the handoff: reject candidate 1 through the real dialog.
+  results.g06.discoveriesBefore = sql(`select string_agg(id||':'||status, ',' order by id) from research_discoveries where job_id=${g06Job}`);
+  await jobDialog.getByRole("button", { name: "Reject discovery: __qa_test_plan_586 G06 candidate 1" }).click();
+  const rejectDialog = page.getByRole("dialog").filter({ hasText: "Reject Discovery" });
+  await rejectDialog.getByPlaceholder("Why is this resource being rejected?").fill("__qa_test_plan_586 handoff check");
+  await rejectDialog.getByRole("button", { name: "Reject", exact: true }).click();
+  await page.locator("li[data-state]").filter({ hasText: "Discovery rejected" }).first().waitFor({ timeout: 15_000 });
+  await page.waitForTimeout(1500);
+  results.g06.discoveriesAfter = sql(`select string_agg(id||':'||status, ',' order by id) from research_discoveries where job_id=${g06Job}`);
+  results.g06.jobCountersAfter = sql(`select 'rejected='||rejected_discoveries||' approved='||approved_discoveries from research_jobs where id=${g06Job}`);
+  await page.screenshot({ path: `${SHOTS}/G06-5-rejected-from-handoff.png` });
+} catch (e) {
+  results.error = String(e?.stack || e);
+  try { const pg = browser?.contexts()[0]?.pages()[0]; if (pg) { await pg.screenshot({ path: `${SHOTS}/error.png`, fullPage: true }); results.errorButtons = await pg.getByRole("button").evaluateAll((els) => els.map((e) => e.getAttribute("aria-label") || e.textContent.trim()).filter(Boolean).slice(0, 80)); } } catch {}
+  log("ERROR", results.error);
+} finally {
+  await browser?.close().catch(() => {});
+  // Clerk first, then local row.
+  if (clerkUserId) {
+    try { await clerk("DELETE", `/users/${clerkUserId}`); results.clerkDeleted = true; } catch (e) { results.clerkDeleted = String(e); }
+  }
+  try { await audit("DELETE", `/api/admin/users/${bridgeId}`); results.localDeleted = true; } catch (e) { results.localDeleted = String(e); }
+  results.bridgeId = bridgeId;
+  fs.writeFileSync("/tmp/t586/g05g06.json", JSON.stringify(results, null, 2));
+  log("RESULTS", JSON.stringify(results, null, 2));
+  process.exit(results.error ? 1 : 0);
+}

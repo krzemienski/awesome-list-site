@@ -29,7 +29,7 @@ export function useMissingRouteTelemetry(missing: boolean): void {
  * Dev → console only. Production → fire-and-forget POST to
  * /api/telemetry/dead-link (keepalive so it survives quick navigations).
  */
-export function reportDeadLink(path: string, referrer: string): void {
+function reportDeadLink(path: string, referrer: string): void {
   const payload = {
     path,
     referrer: referrer || null,

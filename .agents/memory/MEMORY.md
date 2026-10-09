@@ -157,3 +157,4 @@
 - [09-29 parity hybrid home](parity-0929-hybrid-home.md) — app home retains 09-10 blocks; reference defaults to featured layout; 09-29 footer has no breakpoints; view PNGs before porting.
 - [Publish snapshots in-flight edits](publish-snapshots-inflight-edits.md) — publishing while subagents edit ships their unverified partial work; never republish mid-wave.
 - [Parity residual diagnosis](parity-residual-diagnosis.md) — dump computed DOM both sides at capture point; blanket .btn.icon 44px adjustment silently beats source min-w utilities.
+- [Aborted agent run usage](aborted-agent-run-usage.md) — cancelled SDK runs emit no result msg; accumulate streamed usage (lower bound); count the enrichment queue the server way before paid scratch runs.

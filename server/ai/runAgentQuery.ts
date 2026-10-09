@@ -288,6 +288,12 @@ export async function runAgentQuery(params: RunAgentQueryParams): Promise<RunAge
   // API message ids whose usage has already been attributed to an event —
   // block-split assistant messages repeat the same usage per block.
   const seenUsageMessageIds = new Set<string>();
+  // Usage observed on streamed assistant messages (deduped by message id).
+  // A cancelled run never receives the SDK's final result message, so these
+  // running totals are the only record of what the run already consumed.
+  let observedTokensIn = 0;
+  let observedTokensOut = 0;
+  let sawResultMessage = false;
 
   // ── Task attribution: map task_id → actor name so task_updated /
   // task_notification events resolve the real subagent name instead of null.
@@ -487,6 +493,10 @@ export async function runAgentQuery(params: RunAgentQueryParams): Promise<RunAge
           const cacheCreation = usage?.cache_creation_input_tokens ?? 0;
           const rawIn = usage?.input_tokens ?? null;
           const totalTokensIn = rawIn !== null ? rawIn + cacheRead + cacheCreation : null;
+          if (!usageAlreadyCounted) {
+            observedTokensIn += rawIn ?? 0;
+            observedTokensOut += usage?.output_tokens ?? 0;
+          }
 
           await emitter.emit({
             actor,
@@ -659,6 +669,7 @@ export async function runAgentQuery(params: RunAgentQueryParams): Promise<RunAge
             result.terminalReason = (msg as any).terminal_reason;
           }
           terminalSdkError = msg.is_error === true;
+          sawResultMessage = true;
           result.totalCostUsd = typeof msg.total_cost_usd === "number" ? msg.total_cost_usd : 0;
           result.tokensIn = msg.usage?.input_tokens ?? 0;
           result.tokensOut = msg.usage?.output_tokens ?? 0;
@@ -742,6 +753,10 @@ export async function runAgentQuery(params: RunAgentQueryParams): Promise<RunAge
       // Persisted side-effects already survived; treat as a clean stop.
       result.aborted = true;
       result.subtype = result.subtype || "cancelled";
+      if (!sawResultMessage) {
+        result.tokensIn = observedTokensIn;
+        result.tokensOut = observedTokensOut;
+      }
       await emitter.emit({
         actor: "orchestrator",
         actorType: "system",

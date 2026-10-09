@@ -1,0 +1,98 @@
+// G07 SSRF proof: real scraper code against a real private listener.
+import http from 'node:http';
+import { fetchUrlMetadata } from '/home/runner/workspace/server/ai/urlScraper.ts';
+import { safeFetch } from '/home/runner/workspace/server/ai/safeFetch.ts';
+
+const PORT = 51999;
+const hits: string[] = [];
+const png = Buffer.from('iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8z8BQDwAEhQGAhKmMIQAAAABJRU5ErkJggg==', 'base64');
+const server = http.createServer((req, res) => {
+  hits.push(`${req.method} ${req.url} host=${req.headers.host}`);
+  if (req.url?.endsWith('.png')) { res.writeHead(200, { 'content-type': 'image/png' }); res.end(png); return; }
+  res.writeHead(200, { 'content-type': 'text/html' });
+  res.end('<html><head><title>PRIVATE LISTENER</title></head></html>');
+});
+await new Promise<void>((r) => server.listen(PORT, '127.0.0.1', r));
+const L = `http://127.0.0.1:${PORT}`;
+const b64 = (html: string) => `https://httpbin.org/base64/${Buffer.from(html).toString('base64url')}`;
+const enc = encodeURIComponent;
+
+// Control: the listener is reachable for an unguarded client.
+const ctl = await fetch(`${L}/control`).then((r) => r.status);
+console.log(`control: plain fetch(${L}/control) -> HTTP ${ctl}; listener hits=${hits.length} (expected 1)`);
+hits.length = 0;
+
+const cases: Array<[string, string]> = [
+  ['direct loopback', `${L}/direct`],
+  ['localhost name', `http://localhost:${PORT}/name`],
+  ['DNS name resolving to 127.0.0.1 (nip.io)', `http://127.0.0.1.nip.io:${PORT}/nip`],
+  ['DNS name resolving to ::1 (localtest.me)', `http://localtest.me:${PORT}/localtest`],
+  ['IPv6 loopback literal', `http://[::1]:${PORT}/v6`],
+  ['IPv4-mapped IPv6 loopback', `http://[::ffff:127.0.0.1]:${PORT}/mapped`],
+  ['decimal-encoded 127.0.0.1', `http://2130706433:${PORT}/decimal`],
+  ['0.0.0.0', `http://0.0.0.0:${PORT}/zero`],
+  ['link-local metadata 169.254.169.254', 'http://169.254.169.254/latest/meta-data/'],
+  ['RFC1918 10.0.0.1', 'http://10.0.0.1/'],
+  ['RFC1918 192.168.1.1', 'http://192.168.1.1/'],
+  ['credentials in URL', 'http://user:pass@example.com/'],
+  ['non-http scheme', 'file:///etc/passwd'],
+  ['public redirect -> private (1 hop)', `https://httpbin.org/redirect-to?url=${enc(`${L}/redir1`)}`],
+  ['public redirect chain -> private (2 hops)', `https://httpbin.org/redirect-to?url=${enc(`https://httpbin.org/redirect-to?url=${enc(`${L}/redir2`)}`)}`],
+  ['public redirect -> link-local metadata', `https://httpbin.org/redirect-to?url=${enc('http://169.254.169.254/latest/meta-data/')}`],
+];
+let allBlocked = true;
+for (const [name, url] of cases) {
+  const before = hits.length;
+  const t0 = Date.now();
+  const r = await fetchUrlMetadata(url, 8000);
+  const reached = hits.length - before;
+  if (!r.error || reached) allBlocked = false;
+  console.log(`[${name}] fetchUrlMetadata -> error=${JSON.stringify(r.error)} title=${JSON.stringify(r.title)} listenerHits+=${reached} (${Date.now() - t0}ms)`);
+}
+
+// Page-controlled images: public HTML whose og:image points at the private listener.
+const imgCases: Array<[string, string]> = [
+  ['og:image -> private listener', b64(`<html><head><title>__qa_test_plan_586 og direct</title><meta property="og:image" content="${L}/og-direct.png"></head></html>`)],
+  ['twitter:image -> private listener', b64(`<html><head><title>__qa_test_plan_586 tw</title><meta name="twitter:image" content="http://localtest.me:${PORT}/tw.png"></head></html>`)],
+  ['og:image -> public redirect -> private', b64(`<html><head><title>__qa_test_plan_586 og redirect</title><meta property="og:image" content="https://httpbin.org/redirect-to?url=${enc(`${L}/og-redir.png`)}"></head></html>`)],
+];
+for (const [name, url] of imgCases) {
+  const before = hits.length;
+  const r = await fetchUrlMetadata(url, 10000);
+  const reached = hits.length - before;
+  if (r.ogImageBlurhash || reached) allBlocked = false;
+  console.log(`[${name}] page title=${JSON.stringify(r.title)} ogImage=${r.ogImage ?? r.twitterImage} blurhash=${JSON.stringify(r.ogImageBlurhash)} listenerHits+=${reached}`);
+}
+
+// Positive controls: public page and public image still work.
+const pub = await fetchUrlMetadata('https://github.com/', 15000);
+console.log(`[positive: https://github.com/] title=${JSON.stringify(pub.title)} ogImage=${pub.ogImage} blurhash=${pub.ogImageBlurhash ? 'yes(' + pub.ogImageBlurhash + ')' : 'no'} error=${JSON.stringify(pub.error)}`);
+const pubRedirect = await fetchUrlMetadata(`https://httpbin.org/redirect-to?url=${enc('https://example.com/')}`, 15000);
+console.log(`[positive: public redirect -> https://example.com/] title=${JSON.stringify(pubRedirect.title)} error=${JSON.stringify(pubRedirect.error)}`);
+
+// Deadline covers the streaming body: headers arrive at once, body drips for 8 s.
+{
+  const t0 = Date.now();
+  try {
+    const r = await safeFetch('https://httpbin.org/drip?duration=8&numbytes=8&delay=0&code=200', { timeout: 3000 });
+    console.log(`[body-read timeout] UNEXPECTED success status=${r.status} after ${Date.now() - t0}ms`);
+    allBlocked = false;
+  } catch (e) {
+    console.log(`[body-read timeout] safeFetch(drip 8s body, timeout 3000) -> ${(e as Error).message} after ${Date.now() - t0}ms`);
+  }
+}
+// Size cap enforced while streaming (no trust in content-length).
+for (const u of ['https://httpbin.org/bytes/50000', 'https://httpbin.org/stream-bytes/50000?chunk_size=1024']) {
+  try {
+    const r = await safeFetch(u, { maxBytes: 10_000, timeout: 15000 });
+    console.log(`[size cap ${u}] UNEXPECTED success bytes=${r.body.length}`);
+    allBlocked = false;
+  } catch (e) {
+    console.log(`[size cap ${u}] maxBytes=10000 -> ${(e as Error).message}`);
+  }
+}
+
+console.log(`\nTOTAL private listener hits during guarded fetches: ${hits.length}${hits.length ? ' ' + JSON.stringify(hits) : ''}`);
+console.log(`VERDICT: ${allBlocked && hits.length === 0 ? 'PASS' : 'FAIL'}`);
+server.close();
+process.exit(0);

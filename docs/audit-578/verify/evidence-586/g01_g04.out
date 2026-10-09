@@ -1,0 +1,94 @@
+=== fixtures (scratch DB) ===
+job=55 d1=87 d2=88
+job counters before: approved=0 rejected=0
+
+=== G01: reject d1 twice ===
+$ curl -X POST /api/researcher/discoveries/87/reject -d '{"reason":"__qa_test_plan_586 first"}'
+{"success":true,"discovery":{"id":87,"jobId":55,"title":"__qa_test_plan_586_d1","url":"https://example.com/__qa_test_plan_586_d1","description":null,"suggestedCategory":"General Tools","suggestedSubcategory":null,"suggestedSubSubcategory":null,"confidence":0,"reasoning":null,"status":"rejected","verification":null,"approvedAt":null,"rejectedAt":"2026-10-09T15:56:09.585Z","rejectionReason":"__qa_te
+-> HTTP 200
+$ curl -X POST /api/researcher/discoveries/87/reject -d '{"reason":"__qa_test_plan_586 repeat"}'
+{"success":true,"discovery":{"id":87,"jobId":55,"title":"__qa_test_plan_586_d1","url":"https://example.com/__qa_test_plan_586_d1","description":null,"suggestedCategory":"General Tools","suggestedSubcategory":null,"suggestedSubSubcategory":null,"confidence":0,"reasoning":null,"status":"rejected","verification":null,"approvedAt":null,"rejectedAt":"2026-10-09T15:56:09.585Z","rejectionReason":"__qa_te
+-> HTTP 200
+job counters after 2 rejects: approved=0 rejected=1
+d1 status=rejected reason=__qa_test_plan_586 first
+
+=== G01: approve rejected d1 -> must 409, no resource ===
+$ curl -X POST /api/researcher/discoveries/87/approve 
+{"message":"Discovery has already been moderated"}
+-> HTTP 409
+resources with d1 url: 0
+d1 status=rejected created_resource_id=null
+
+=== G01: approve d2, then reject it -> 409, discovery + resource unchanged ===
+$ curl -X POST /api/researcher/discoveries/88/approve 
+{"success":true,"discovery":{"id":88,"jobId":55,"title":"__qa_test_plan_586_d2","url":"https://example.com/__qa_test_plan_586_d2","description":null,"suggestedCategory":"General Tools","suggestedSubcategory":null,"suggestedSubSubcategory":null,"confidence":0,"reasoning":null,"status":"approved","verification":null,"approvedAt":"2026-10-09T15:56:09.726Z","rejectedAt":null,"rejectionReason":null,"cr
+-> HTTP 200
+job counters after approve: approved=1 rejected=1
+$ curl -X POST /api/researcher/discoveries/88/reject -d '{"reason":"__qa_test_plan_586 flip attempt"}'
+{"message":"Discovery has already been moderated"}
+-> HTTP 409
+$ curl -X POST /api/researcher/discoveries/88/approve 
+{"message":"Discovery has already been moderated"}
+-> HTTP 409
+d2 status=approved created_resource_id=188645
+resource 188645 status=approved (count with d2 url=1)
+job counters final: approved=1 rejected=1
+
+=== G01: concurrent double reject on a fresh discovery (row lock) ===
+parallel reject 4 -> HTTP 200
+parallel reject 1 -> HTTP 200
+parallel reject 3 -> HTTP 200
+parallel reject 2 -> HTTP 200
+job rejected counter after 4 parallel rejects of d3: 2 (expected 2)
+$ curl -X POST /api/researcher/discoveries/999999999/reject -d '{}'
+{"message":"Discovery not found"}
+-> HTTP 404
+
+=== G04: nonexistent jobs ===
+$ curl -X DELETE /api/enrichment/jobs/2147483647 
+{"success":false,"message":"Job not found"}
+-> HTTP 404
+$ curl -X DELETE /api/researcher/jobs/2147483647 
+{"success":false,"message":"Job not found"}
+-> HTTP 404
+$ curl -X DELETE /api/researcher/jobs/99999999999 
+{"error":"validation_failed","message":"Invalid request parameters","fieldErrors":{"id":"id is out of range"},"errors":[{"code":"custom","path":["id"],"message":"id is out of range"}]}
+-> HTTP 400
+
+=== G04: completed jobs keep their history ===
+enrichment completed=46 research completed=56 research failed=57
+before: E=completed|2026-10-09 14:56:09.989332|2026-10-09 15:56:09.989332
+before: R=completed|2026-10-09 14:56:10.00783|0.1234|7
+before: F=failed|2026-10-09 14:56:10.024977|__qa_test_plan_586 boom
+$ curl -X DELETE /api/enrichment/jobs/46 
+{"success":false,"message":"Only active jobs can be cancelled"}
+-> HTTP 409
+$ curl -X DELETE /api/researcher/jobs/56 
+{"success":false,"message":"Only active jobs can be cancelled"}
+-> HTTP 409
+$ curl -X DELETE /api/researcher/jobs/57 
+{"success":false,"message":"Only active jobs can be cancelled"}
+-> HTTP 409
+after:  E=completed|2026-10-09 14:56:09.989332|2026-10-09 15:56:09.989332  unchanged=yes
+after:  R=completed|2026-10-09 14:56:10.00783|0.1234|7  unchanged=yes
+after:  F=failed|2026-10-09 14:56:10.024977|__qa_test_plan_586 boom  unchanged=yes
+
+=== G04: active fixture jobs cancel once, repeat is an idempotent no-op ===
+$ curl -X DELETE /api/enrichment/jobs/47 
+{"success":true,"message":"Enrichment job 47 cancelled successfully"}
+-> HTTP 200
+enrichment after 1st cancel: cancelled|2026-10-09 15:56:10.215
+$ curl -X DELETE /api/enrichment/jobs/47 
+{"success":true,"message":"Enrichment job 47 cancelled successfully"}
+-> HTTP 200
+enrichment after 2nd cancel: cancelled|2026-10-09 15:56:10.215 unchanged=yes
+$ curl -X DELETE /api/researcher/jobs/58 
+{"success":true,"message":"Job cancelled"}
+-> HTTP 200
+research after 1st cancel: cancelled|2026-10-09 15:56:10.284
+$ curl -X DELETE /api/researcher/jobs/58 
+{"success":true,"message":"Job cancelled"}
+-> HTTP 200
+research after 2nd cancel: cancelled|2026-10-09 15:56:10.284 unchanged=yes
+
+fixture ids: job=55 resource=188645 ej=46 rj=56 fj=57 aej=47 arj=58

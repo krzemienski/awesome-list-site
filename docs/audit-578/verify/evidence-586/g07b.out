@@ -1,0 +1,3 @@
+public page served by httpbin: "<html  ><head  ><title>qa plan 586</title ><meta property=\"og:image\"  content=\"http://127.0.0.1:51999/og.png\"  >  </head ></html >  "
+control: plain fetch(http://127.0.0.1:51999/og.png) -> 200 hits= 1
+[og:image literal loopback] fetchUrlMetadata -> {"title":"qa plan 586","ogImage":"http://127.0.0.1:51999/og.png"} listenerHits=0

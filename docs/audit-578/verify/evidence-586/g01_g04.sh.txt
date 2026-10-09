@@ -1,0 +1,87 @@
+#!/usr/bin/env bash
+# G01 + G04 lifecycle proof against the scratch instance (port 5101, DB awesome_scratch_586).
+set -u
+cd /home/runner/workspace
+SCR=$(echo "$DATABASE_URL" | sed -E 's#/heliumdb#/awesome_scratch_586#')
+B=http://127.0.0.1:5101
+H=(-H "X-Admin-Audit-Key: $ADMIN_PASSWORD" -H "Origin: $B" -H "Content-Type: application/json")
+q() { psql "$SCR" -Atc "$1"; }
+call() { # method path [body]
+  local m=$1 p=$2 d=${3:-}
+  echo "\$ curl -X $m $p ${d:+-d '$d'}"
+  if [ -n "$d" ]; then curl -s -w "\n-> HTTP %{http_code}\n" -X "$m" "${H[@]}" "$B$p" -d "$d" | cut -c1-400
+  else curl -s -w "\n-> HTTP %{http_code}\n" -X "$m" "${H[@]}" "$B$p" | cut -c1-400; fi
+}
+
+echo "=== fixtures (scratch DB) ==="
+JOB=$(q "insert into research_jobs (prompt,status,started_at,completed_at,total_discoveries) values ('__qa_test_plan_586 moderation job','completed',now()-interval '1 hour',now()-interval '30 minutes',3) returning id" | head -1)
+D1=$(q "insert into research_discoveries (job_id,title,url,suggested_category) values ($JOB,'__qa_test_plan_586_d1','https://example.com/__qa_test_plan_586_d1','General Tools') returning id" | head -1)
+D2=$(q "insert into research_discoveries (job_id,title,url,suggested_category) values ($JOB,'__qa_test_plan_586_d2','https://example.com/__qa_test_plan_586_d2','General Tools') returning id" | head -1)
+echo "job=$JOB d1=$D1 d2=$D2"
+q "select 'job counters before: approved='||approved_discoveries||' rejected='||rejected_discoveries from research_jobs where id=$JOB"
+
+echo; echo "=== G01: reject d1 twice ==="
+call POST /api/researcher/discoveries/$D1/reject '{"reason":"__qa_test_plan_586 first"}'
+call POST /api/researcher/discoveries/$D1/reject '{"reason":"__qa_test_plan_586 repeat"}'
+q "select 'job counters after 2 rejects: approved='||approved_discoveries||' rejected='||rejected_discoveries from research_jobs where id=$JOB"
+q "select 'd1 status='||status||' reason='||coalesce(rejection_reason,'') from research_discoveries where id=$D1"
+
+echo; echo "=== G01: approve rejected d1 -> must 409, no resource ==="
+call POST /api/researcher/discoveries/$D1/approve
+q "select 'resources with d1 url: '||count(*) from resources where url='https://example.com/__qa_test_plan_586_d1'"
+q "select 'd1 status='||status||' created_resource_id='||coalesce(created_resource_id::text,'null') from research_discoveries where id=$D1"
+
+echo; echo "=== G01: approve d2, then reject it -> 409, discovery + resource unchanged ==="
+call POST /api/researcher/discoveries/$D2/approve
+R2=$(q "select created_resource_id from research_discoveries where id=$D2")
+q "select 'job counters after approve: approved='||approved_discoveries||' rejected='||rejected_discoveries from research_jobs where id=$JOB"
+call POST /api/researcher/discoveries/$D2/reject '{"reason":"__qa_test_plan_586 flip attempt"}'
+call POST /api/researcher/discoveries/$D2/approve
+q "select 'd2 status='||status||' created_resource_id='||coalesce(created_resource_id::text,'null') from research_discoveries where id=$D2"
+q "select 'resource '||id||' status='||status||' (count with d2 url='||(select count(*) from resources where url='https://example.com/__qa_test_plan_586_d2')||')' from resources where id=$R2"
+q "select 'job counters final: approved='||approved_discoveries||' rejected='||rejected_discoveries from research_jobs where id=$JOB"
+
+echo; echo "=== G01: concurrent double reject on a fresh discovery (row lock) ==="
+D3=$(q "insert into research_discoveries (job_id,title,url,suggested_category) values ($JOB,'__qa_test_plan_586_d3','https://example.com/__qa_test_plan_586_d3','General Tools') returning id" | head -1)
+for i in 1 2 3 4; do curl -s -o /dev/null -w "parallel reject $i -> HTTP %{http_code}\n" -X POST "${H[@]}" "$B/api/researcher/discoveries/$D3/reject" -d '{}' & done; wait
+q "select 'job rejected counter after 4 parallel rejects of d3: '||rejected_discoveries||' (expected 2)' from research_jobs where id=$JOB"
+call POST /api/researcher/discoveries/999999999/reject '{}'
+
+echo; echo "=== G04: nonexistent jobs ==="
+call DELETE /api/enrichment/jobs/2147483647
+call DELETE /api/researcher/jobs/2147483647
+call DELETE /api/researcher/jobs/99999999999
+
+echo; echo "=== G04: completed jobs keep their history ==="
+EJ=$(q "insert into enrichment_jobs (status,filter,batch_size,total_resources,processed_resources,successful_resources,started_by,started_at,completed_at,metadata) values ('completed','__qa_test_plan_586',1,1,1,1,NULL,now()-interval '2 hours',now()-interval '1 hour','{\"note\":\"__qa_test_plan_586\"}') returning id" | head -1)
+RJ=$(q "insert into research_jobs (prompt,status,started_at,completed_at,estimated_cost_usd,turns_used) values ('__qa_test_plan_586 completed job','completed',now()-interval '2 hours',now()-interval '1 hour','0.1234',7) returning id" | head -1)
+FJ=$(q "insert into research_jobs (prompt,status,started_at,completed_at,error_message) values ('__qa_test_plan_586 failed job','failed',now()-interval '2 hours',now()-interval '1 hour','__qa_test_plan_586 boom') returning id" | head -1)
+echo "enrichment completed=$EJ research completed=$RJ research failed=$FJ"
+BE=$(q "select status||'|'||completed_at||'|'||updated_at from enrichment_jobs where id=$EJ")
+BR=$(q "select status||'|'||completed_at||'|'||estimated_cost_usd||'|'||turns_used from research_jobs where id=$RJ")
+BF=$(q "select status||'|'||completed_at||'|'||error_message from research_jobs where id=$FJ")
+echo "before: E=$BE"; echo "before: R=$BR"; echo "before: F=$BF"
+call DELETE /api/enrichment/jobs/$EJ
+call DELETE /api/researcher/jobs/$RJ
+call DELETE /api/researcher/jobs/$FJ
+AE=$(q "select status||'|'||completed_at||'|'||updated_at from enrichment_jobs where id=$EJ")
+AR=$(q "select status||'|'||completed_at||'|'||estimated_cost_usd||'|'||turns_used from research_jobs where id=$RJ")
+AF=$(q "select status||'|'||completed_at||'|'||error_message from research_jobs where id=$FJ")
+echo "after:  E=$AE  unchanged=$([ "$AE" = "$BE" ] && echo yes || echo NO)"
+echo "after:  R=$AR  unchanged=$([ "$AR" = "$BR" ] && echo yes || echo NO)"
+echo "after:  F=$AF  unchanged=$([ "$AF" = "$BF" ] && echo yes || echo NO)"
+
+echo; echo "=== G04: active fixture jobs cancel once, repeat is an idempotent no-op ==="
+AEJ=$(q "insert into enrichment_jobs (status,filter,batch_size,started_by,started_at) values ('processing','__qa_test_plan_586',1,NULL,now()) returning id" | head -1)
+ARJ=$(q "insert into research_jobs (prompt,status,started_at) values ('__qa_test_plan_586 active job','processing',now()) returning id" | head -1)
+call DELETE /api/enrichment/jobs/$AEJ
+C1=$(q "select status||'|'||completed_at from enrichment_jobs where id=$AEJ"); echo "enrichment after 1st cancel: $C1"
+call DELETE /api/enrichment/jobs/$AEJ
+C2=$(q "select status||'|'||completed_at from enrichment_jobs where id=$AEJ"); echo "enrichment after 2nd cancel: $C2 unchanged=$([ "$C1" = "$C2" ] && echo yes || echo NO)"
+call DELETE /api/researcher/jobs/$ARJ
+C3=$(q "select status||'|'||completed_at from research_jobs where id=$ARJ"); echo "research after 1st cancel: $C3"
+call DELETE /api/researcher/jobs/$ARJ
+C4=$(q "select status||'|'||completed_at from research_jobs where id=$ARJ"); echo "research after 2nd cancel: $C4 unchanged=$([ "$C3" = "$C4" ] && echo yes || echo NO)"
+
+echo "$JOB $R2 $EJ $RJ $FJ $AEJ $ARJ" > /tmp/t586/fixture-ids
+echo; echo "fixture ids: job=$JOB resource=$R2 ej=$EJ rj=$RJ fj=$FJ aej=$AEJ arj=$ARJ"

@@ -1,0 +1,40 @@
+{
+  "g05": {
+    "blockedRequests": 1,
+    "alertText": "Could not cancel job #51: Failed to fetchRetry cancellation",
+    "toastText": "Could not cancel job #51 Failed to fetch Retry",
+    "dbAfterBlocked": "processing",
+    "cancelButtonStillShown": true,
+    "dbAfterRetry": "cancelled completed_at=2026-10-09 16:20:19.35",
+    "alertGoneAfterRetry": true,
+    "cancelButtonGoneAfterRetry": true
+  },
+  "g06": {
+    "job": 52,
+    "copy": "Read-only briefs from the latest four research jobs. Open a brief to review its candidates in the researcher.",
+    "cardBefore": "NOTE · 01 __qa_test_plan_586 live note 1 candidates Active",
+    "dialogBefore": "Research job #52 · processing · 1 candidates",
+    "countUpdateSeconds": "5.4",
+    "statusUpdateSeconds": "4.9",
+    "cardAfter": "NOTE · 01 __qa_test_plan_586 live note 3 candidates 4s ago",
+    "dialogAfter": "Research job #52 · completed · 3 candidates",
+    "reloadsDuringUpdates": 0,
+    "handoffUrl": "/admin/researcher?jobId=52",
+    "jobDialogHeading": "Research Job #52 COMPLETED",
+    "moderationButtons": [
+      "Approve discovery: __qa_test_plan_586 G06 candidate 2",
+      "Reject discovery: __qa_test_plan_586 G06 candidate 2",
+      "Approve discovery: __qa_test_plan_586 G06 candidate 3",
+      "Reject discovery: __qa_test_plan_586 G06 candidate 3",
+      "Approve discovery: __qa_test_plan_586 G06 candidate 1",
+      "Reject discovery: __qa_test_plan_586 G06 candidate 1"
+    ],
+    "otherJobCandidatesInDialog": 0,
+    "discoveriesBefore": "86:pending_review,87:pending_review,88:pending_review",
+    "discoveriesAfter": "86:rejected,87:pending_review,88:pending_review",
+    "jobCountersAfter": "rejected=1 approved=0"
+  },
+  "clerkDeleted": true,
+  "localDeleted": true,
+  "bridgeId": "2024786952"
+}

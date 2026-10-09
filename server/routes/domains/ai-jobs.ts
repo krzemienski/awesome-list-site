@@ -199,9 +199,11 @@ export function registerAiJobsRoutes(
   // DELETE /api/enrichment/jobs/:id - Cancel a job
   app.delete('/api/enrichment/jobs/:id', isAuthenticated, isAdmin, async (req, res) => {
     try {
-      const jobId = parseInt(req.params.id);
+      const jobId = Number(req.params.id);
       
-      if (isNaN(jobId)) {
+      // int4 job ids: anything else can never exist and would surface as a
+      // Postgres range error (500) instead of a client error.
+      if (!Number.isInteger(jobId) || jobId <= 0 || jobId > 2147483647) {
         return res.status(400).json({
           success: false,
           message: 'Invalid job ID'
@@ -497,8 +499,12 @@ export function registerAiJobsRoutes(
 
   app.delete('/api/researcher/jobs/:id', isAuthenticated, isAdmin, async (req, res) => {
     try {
+      const jobId = Number(req.params.id);
+      if (!Number.isInteger(jobId) || jobId <= 0 || jobId > 2147483647) {
+        return res.status(400).json({ success: false, message: 'Invalid job ID' });
+      }
       const { researchService } = await import('../../ai/researchService');
-      await researchService.cancelJob(parseInt(req.params.id));
+      await researchService.cancelJob(jobId);
       res.json({ success: true, message: 'Job cancelled' });
     } catch (error: any) {
       if (error?.name === 'JobNotFoundError' || error?.name === 'JobConflictError') {
