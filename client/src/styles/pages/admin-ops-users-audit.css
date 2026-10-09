@@ -95,25 +95,6 @@
 }
 
 @media (max-width: 48rem) {
-  .admin-ops-users-table {
-    table-layout: auto;
-  }
-
-  .admin-ops-users-table th:nth-child(n) {
-    width: auto;
-  }
-
-  /* Auto layout sizes each column from its content, and the sort control is
-     positioned out of flow (so its 44px target cannot inflate the header row),
-     which removes the header label from the column's intrinsic width. The
-     frozen `.table` keeps "JOINED" in flow: its column measures 72px, while
-     the app's collapsed to 57px and wrapped every "Jul 6, 2026" onto three
-     lines (rows 87px instead of 73px). Restore the frozen label-driven
-     minimum for that column; the other four already match. */
-  .admin-ops-users-table th:nth-child(4) {
-    min-width: 4.5rem;
-  }
-
   .admin-ops-audit-toolbar {
     padding-inline: 1rem;
   }

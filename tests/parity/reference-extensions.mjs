@@ -4,6 +4,7 @@ import path from "node:path";
 import { operationsStyle, projectOperations } from "./reference-admin-operations.mjs";
 import { catalogStyle, projectCatalog } from "./reference-admin-catalog.mjs";
 import { ACTIVE_REFERENCE } from "./reference-root.mjs";
+import { buildAboutContactMarkup } from "./reference-pages-0929.mjs";
 
 const sha256 = (value) => crypto.createHash("sha256").update(value).digest("hex");
 
@@ -334,6 +335,7 @@ export function buildExpectedReferenceExtensions() {
       headings: ABOUT_HEADINGS,
       descriptions: ABOUT_DESCRIPTIONS,
       maintainer,
+      contactMarkup: buildAboutContactMarkup(),
       sourceProjects: [
         {
           name: "awesome-video",
@@ -570,10 +572,10 @@ const appendAboutProjection = (document, root, about) => {
   const deletion = node(document, "p", "", "Need your account or personal data deleted? Sign in and use ");
   deletion.append(link(document, "Profile → Security → Delete account & data", "/profile?tab=security"), text(document, " — it’s private and authenticated, so you never have to post personal details publicly."));
   maintainerCopy.append(deletion);
-  const contact = node(document, "p", "", "Questions or corrections? The best way to reach us is to ");
-  const issueLink = link(document, "open an issue on GitHub", "https://github.com/krzemienski/awesome-video/issues");
-  issueLink.append(svgIcon(document, "external"));
-  contact.append(issueLink, text(document, "."));
+  const contactTemplate = document.createElement("template");
+  contactTemplate.innerHTML = about.contactMarkup;
+  const contact = contactTemplate.content.firstElementChild;
+  if (!contact || contact.tagName !== "P") throw new Error("About source-rendered contact paragraph is missing");
   maintainerCopy.append(contact);
   const legal = node(document, "p", "", "Review the ");
   legal.append(link(document, "Terms of Use", "/terms"), text(document, " and "), link(document, "Privacy Policy", "/privacy"), text(document, " for the site’s legal and data practices."));

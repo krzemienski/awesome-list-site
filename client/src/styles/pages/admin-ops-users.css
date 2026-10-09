@@ -1,32 +1,10 @@
-/* Users tab: frozen column proportions, sort targets and row actions.
+/* Users tab: canonical auto layout, sort targets and retained row actions.
    Loaded by admin-ops-users-audit.css after admin-ops-table.css. */
 
-/* The frozen Users table is an auto-layout `.table`, but its cell content
-   (bare text) differs from the app's controls, so letting the app's content
-   drive the columns measured worse at every width (1440: 2.0% vs 0.47%).
-   Pin the frozen column proportions measured at 1440 instead. */
+/* Canonical auto layout lets the privacy and row controls participate in
+   intrinsic column sizing. Keep the retained narrow-screen scroll floor. */
 .admin-ops-users-table {
   min-width: 52rem;
-  table-layout: fixed;
-}
-
-.admin-ops-users-table th:nth-child(1) { width: 33.85%; }
-.admin-ops-users-table th:nth-child(2) { width: 40.10%; }
-.admin-ops-users-table th:nth-child(3) { width: 8.13%; }
-.admin-ops-users-table th:nth-child(4) { width: 11.01%; }
-.admin-ops-users-table th:nth-child(5) { width: 6.91%; }
-
-/* Tablet: the frozen auto layout gives the Email column more room once the
-   names wrap (column boxes measured at 1024 on the comparison reference:
-   279.84/416.81/84.5/89.06/71.78px of a 942px table; the last column holds
-   the 44px Edit target). Four decimals keep every column edge within a
-   quarter pixel of the reference. */
-@media (min-width: 769px) and (max-width: 1100px) {
-  .admin-ops-users-table th:nth-child(1) { width: 29.7074%; }
-  .admin-ops-users-table th:nth-child(2) { width: 44.2476%; }
-  .admin-ops-users-table th:nth-child(3) { width: 8.9703%; }
-  .admin-ops-users-table th:nth-child(4) { width: 9.4546%; }
-  .admin-ops-users-table th:nth-child(5) { width: 7.6201%; }
 }
 
 /* Frozen `.table td` inherits the 1.6 body leading; wrapped Email/Joined cells
@@ -54,12 +32,9 @@
   padding: 0;
 }
 
-/* The frozen `.table th` is 12px padding around one 11px/1.6 line plus half
-   of the collapsed hairline (42.09px measured on both sides). The 44px sort
-   target below is positioned out of flow and centred, so it keeps its full
-   box while overhanging the row rule by ~1px each side — the same treatment
-   as the audit detail button — instead of forcing every header row 2px
-   taller than the reference and shifting the whole table. */
+/* Canonical header leading plus cell padding and the collapsed hairline.
+   The 44px sort target stays centred out of flow, preserving the canonical
+   header line box without reducing the accessible target. */
 .admin-ops-users-table thead th {
   font-family: var(--font-body);
   height: calc(0.6875rem * 1.6 + 1.5rem + var(--hairline-w) / 2);

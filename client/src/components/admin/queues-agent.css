@@ -74,6 +74,13 @@
   padding: 20px;
 }
 
+/* The enrichment strip follows the 0929 Stat's neutral labels, not the
+   editorial skin's accent eyebrow. Scope above the skin without recoloring
+   other admin eyebrow/ink contracts. */
+.queues-agent--enrichment .queues-agent__stat .admin-ops-stat__label {
+  color: var(--text-3);
+}
+
 .queues-agent__canonical-table {
   overflow-x: auto;
 }

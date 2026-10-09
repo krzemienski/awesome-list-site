@@ -1,4 +1,12 @@
 /* Resource detail only. Shared shell and related-card skins are owned elsewhere. */
+/* ResourcePage's frozen page-content-wrap is left anchored, not centered.
+   Scope this correction to the detail route; retained sibling pages keep
+   their independently governed shell measures. */
+.app-shell-main > .page-content-wrap:has(> .resource-detail) { margin-inline: 0; }
+
+/* The frozen DESCRIPTION label is a block .mono div. Keep the semantic h2
+   and its tokenized eyebrow paint, without an inline-flex baseline strut. */
+.resource-detail-description h2 { display: block; }
 .resource-detail {
   width: 100%;
   max-width: 880px;

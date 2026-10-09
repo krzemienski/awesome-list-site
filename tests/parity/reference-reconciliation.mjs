@@ -10,6 +10,11 @@ import { Clock, Grid2X2, Info, MoreHorizontal, Plus, Search } from "lucide-react
 import { ACTIVE_REFERENCE } from "./reference-root.mjs";
 import { buildFooter0929, applyFooter0929, FOOTER_0929_SELECTOR } from "./reference-footer-20260929.mjs";
 import { buildHome0929, applyHome0929 } from "./reference-home-20260929.mjs";
+import { buildAdminOps0929, applyAdminOps0929 } from "./reference-admin-ops-0929.mjs";
+import { buildResource0929, applyResource0929 } from "./reference-resource-0929.mjs";
+import { buildAdminCatalog0929, applyAdminCatalog0929 } from "./reference-admin-catalog-0929.mjs";
+import { buildPages0929, applyPages0929 } from "./reference-pages-0929.mjs";
+import { buildAdminResearch0929, applyAdminResearch0929 } from "./reference-admin-research-0929.mjs";
 import {
   applyExpectedRetainedReferenceExtensions,
   buildExpectedReferenceExtensions,
@@ -369,6 +374,7 @@ export function buildReferenceReconciliation({
   featuredResources,
   frozenAt,
   officialBrandMark,
+  resourceDetail,
 }) {
   const approvedControlSource = assertCurrentControlDeclarations();
   const siteConfig = config?.site;
@@ -474,6 +480,11 @@ export function buildReferenceReconciliation({
     ...(ACTIVE_REFERENCE.id === "20260929" ? {
       footer0929: buildFooter0929(nav, { name: title, repoUrl, issuesUrl: siteConfig.issuesUrl }),
       home0929: buildHome0929(nav, home, kindCountValues, frozenAt),
+      adminOps0929: buildAdminOps0929(),
+      resource0929: buildResource0929(resourceDetail, nav),
+      adminCatalog0929: buildAdminCatalog0929(),
+      pages0929: buildPages0929(config, sourceBackedExtensions.about),
+      adminResearch0929: buildAdminResearch0929(),
     } : {}),
     site: {
       name: title,
@@ -875,6 +886,24 @@ export async function applyExpectedReferenceReconciliation(page, {
     retainedExtensions,
   };
 
+  // 0929 screen projections are independent of the footer: most admin and
+  // shell screens have no PageFooter on either side, and they must still be
+  // projected before the footer-count early returns below.
+  if (ACTIVE_REFERENCE.id === "20260929") {
+    const home = await applyHome0929(page, reconciliation);
+    const adminOps = await applyAdminOps0929(page, reconciliation);
+    const adminCatalog = await applyAdminCatalog0929(page, reconciliation);
+    const pages = await applyPages0929(page, reconciliation);
+    const adminResearch = await applyAdminResearch0929(page, reconciliation);
+    const resource = await applyResource0929(page, reconciliation);
+    Object.assign(provenance.retainedExtensions, { home, adminOps, adminCatalog, pages, adminResearch, resource });
+    provenance.reference = ACTIVE_REFERENCE.id;
+    provenance.adjustments = [...paletteControls.modified, ...drawerControls.modified,
+      ...(retainedExtensions.about?.modified || []), ...(retainedExtensions.admin?.modified || []),
+      ...home.modified, ...pages.modified, ...adminResearch.modified, ...adminCatalog.modified, ...resource.modified, ...adminOps.modified];
+    if (provenance.adjustments.length > 0) provenance.status = "applied";
+  }
+
   if (actualFooterCount === null && expectedFooterCount === 0) {
     provenance.reason = "determinism reference has no footer; actual footer count is intentionally unavailable";
     return provenance;
@@ -899,13 +928,9 @@ export async function applyExpectedReferenceReconciliation(page, {
   }
 
   if (ACTIVE_REFERENCE.id === "20260929") {
-    const home = await applyHome0929(page, reconciliation);
-    provenance.retainedExtensions.home = home;
     const footer = await applyFooter0929(page, reconciliation);
-    provenance.reference = ACTIVE_REFERENCE.id;
     provenance.status = actualFooterCount === null ? "source-projected" : "applied";
-    provenance.adjustments = [...footer.modified, ...paletteControls.modified, ...drawerControls.modified,
-      ...(retainedExtensions.about?.modified || []), ...(retainedExtensions.admin?.modified || []), ...home.modified];
+    provenance.adjustments.unshift(...footer.modified);
     provenance.footerSourceProof = footer.sourceProof;
     provenance.styles = { canonical: "0929 frozen PageFooter inline styles; retained link and accessibility declarations only (no app CSS)" };
     return provenance;

@@ -95,7 +95,7 @@
 
 .about-callout-index {
   margin-bottom: 6px;
-  color: var(--text-3);
+  color: var(--accent);
   font-size: 10px;
   line-height: var(--body-leading);
 }

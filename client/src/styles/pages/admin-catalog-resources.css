@@ -215,12 +215,10 @@
   color: var(--text-3);
 }
 
-/* The action column shrinks to its controls (View · Edit · 44px delete) so
-   every one of them stays inside the card. The 44px touch targets would push
-   the row to 73px at the frozen 14px padding; trimming only this cell's block
-   padding keeps the row at the frozen 56px. */
+/* The action column contains View, Edit and the retained 44px delete target,
+   surrounded by the same canonical padding as the other cells. */
 .admin-catalog-resources__table td.admin-catalog-resources__actions-cell {
-  padding-block: 5px;
+  padding-block: 14px;
   white-space: nowrap;
   width: 1%;
 }

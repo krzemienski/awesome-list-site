@@ -205,9 +205,13 @@
   padding: 12px 14px;
 }
 
-/* The 44px Logs/Recheck controls set the row height, so cells drop their
-   vertical inset to land on the canonical 56px row. */
-.ops-github-panel__history-table-wrap td,
+/* GitHub retains the design's 14px inset around its 44px Logs targets. */
+.ops-github-panel__history-table-wrap td {
+  padding: 14px;
+  line-height: 1.6;
+}
+
+/* Link-health keeps its independently scoped Recheck density. */
 .ops-link-health__flagged-table-wrap td {
   padding: 6px 14px;
   line-height: 1.6;

@@ -665,7 +665,7 @@ export default function ResourceDetail() {
 
       <div className="resource-detail-heading">
         <div className="eyebrow">RESOURCE · DETAIL</div>
-        <h1 data-testid="text-resource-title">{resource.title}</h1>
+        <h1 className="display-h" data-testid="text-resource-title">{resource.title}</h1>
         <div className="shimmer-line resource-detail-rule" aria-hidden="true" />
         <div className="resource-detail-chips">
           {resource.category && (

@@ -232,16 +232,14 @@
   width: auto;
 }
 
-/* The action column shrinks to its controls (Edit + the 44px delete target)
-   so both stay inside the card. Only this cell trims its block padding: the
-   44px targets then fit the frozen row height instead of stretching it. */
+/* Keep the same canonical cell padding around the retained 44px targets. */
 .admin-taxonomy-table .admin-taxonomy-column-actions {
   white-space: nowrap;
   width: 1%;
 }
 
 .admin-taxonomy-table tbody td.admin-taxonomy-column-actions {
-  padding-block: 5px;
+  padding-block: 14px;
 }
 
 .admin-taxonomy-table .admin-taxonomy-cell-count {

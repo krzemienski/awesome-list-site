@@ -24,6 +24,10 @@ import fs from "node:fs";
 import esbuild from "esbuild";
 import { indexCatalogPaths } from "./catalog-paths.mjs";
 import { buildReferenceReconciliation, projectOfficialBrandMark } from "./reference-reconciliation.mjs";
+import { buildAdminCatalogData0929 } from "./reference-admin-catalog-0929.mjs";
+import { buildAdminOps0929, fetchAdminOps0929Users, prepareAdminOpsUtilities0929 } from "./reference-admin-ops-0929.mjs";
+import { bindResearcher0929, getResearcherQuery0929 } from "./reference-admin-research-0929.mjs";
+import { prepareResource0929Utilities, bindResource0929Viewer } from "./reference-resource-0929.mjs";
 
 export const sha256 = (value) => crypto.createHash("sha256").update(value).digest("hex");
 
@@ -35,6 +39,32 @@ export const fetchJson = async (url, init = {}) => {
   if (!type.includes("json")) throw new Error(`${url} did not return JSON (${type || "missing content-type"})`);
   return response.json();
 };
+
+/** Same deterministic public detail/related reads as ResourceDetail.tsx. */
+async function fetchResourceDetail0929(appBase, resourceId) {
+  const source = fs.readFileSync(new URL("../../client/src/pages/ResourceDetail.tsx", import.meta.url), "utf8");
+  const service = fs.readFileSync(new URL("../../server/services/relatedResources.ts", import.meta.url), "utf8");
+  const route = fs.readFileSync(new URL("../../server/routes/domains/catalog-contributions.ts", import.meta.url), "utf8");
+  for (const declaration of [
+    'fetch(`/api/resources/${id}`, { credentials: \'include\' })',
+    'fetch(`/api/resources/${id}/related`, { credentials: \'include\' })',
+    'queryKey: [\'/api/favorites\']', 'queryKey: [\'/api/bookmarks\']',
+  ]) {
+    if (!source.includes(declaration)) throw new Error(`0929 resource endpoint declaration drift: ${declaration}`);
+  }
+  if (!service.includes("export function buildRelatedResources(") ||
+      !route.includes("const related = buildRelatedResources(resource, pool, limit);") ||
+      !route.includes("limit: 60,") || !route.includes("category: resource.category ?? undefined,")) {
+    throw new Error("0929 resource related endpoint deterministic scoring/pool source drift");
+  }
+  const [resource, related, utilities] = await Promise.all([
+    fetchJson(`${appBase}/api/resources/${encodeURIComponent(resourceId)}`),
+    fetchJson(`${appBase}/api/resources/${encodeURIComponent(resourceId)}/related`),
+    prepareResource0929Utilities(),
+  ]);
+  if (String(resource?.id) !== String(resourceId)) throw new Error("0929 resource detail response identity drift");
+  return { resource, related, utilities };
+}
 
 const recursiveCount = (node) =>
   Number(node?.resourceCount || 0) +
@@ -189,6 +219,7 @@ export async function buildCatalogAdapter(appBase, { frozenAt } = {}) {
     return mapped;
   });
   const officialBrandMark = await projectOfficialBrandMark();
+  const resourceDetail = await fetchResourceDetail0929(appBase, resolveCatalogTokens(adapter).values.resourceId);
   const reconciliation = buildReferenceReconciliation({
     config,
     nav,
@@ -197,6 +228,7 @@ export async function buildCatalogAdapter(appBase, { frozenAt } = {}) {
     featuredResources,
     frozenAt,
     officialBrandMark,
+    resourceDetail,
   });
   const reconciliationSnapshot = Buffer.from(JSON.stringify({ config, kindCounts, reconciliation }));
   return {
@@ -564,7 +596,7 @@ export async function buildAdminAdapter(fetchJson, frozenAtMs) {
     if (!result.ok) throw new Error(`${route} returned ${result.status} for the disposable admin`);
     return result.body;
   };
-  const [stats, usersPage, resourcesPage, pending, audit, contactResponse, operations, catalog, nav, syncHistory, resourceEdits, enrichmentJobsBody, linkHealthStatus, linkHealthBroken, researcherJobsBody, overviewReads] = await Promise.all([
+  const [stats, usersPage, resourcesPage, pending, audit, contactResponse, operations, catalog, nav, syncHistory, resourceEdits, enrichmentJobsBody, linkHealthStatus, linkHealthBroken, researcherJobsBody, researcherHistoryBody, overviewReads] = await Promise.all([
     get("/api/admin/stats"),
     get(ADMIN_USERS_ROUTE),
     get(ADMIN_RESOURCES_ROUTE),
@@ -583,6 +615,8 @@ export async function buildAdminAdapter(fetchJson, frozenAtMs) {
     get("/api/admin/link-health/broken-links"),
     // Research workspace notes (ResearchWorkspace.tsx): the latest four jobs.
     get("/api/researcher/jobs?limit=4"),
+    // ResearcherTab's initial history window is independent of note cards.
+    get(getResearcherQuery0929().route),
     // Overview "System health" reads (AdminOverview.tsx); a non-2xx response
     // is that panel's isError branch, so these are not fail-closed.
     (async () => ({
@@ -596,10 +630,18 @@ export async function buildAdminAdapter(fetchJson, frozenAtMs) {
     }))(),
   ]);
   const overviewHealth = buildOverviewHealth(overviewReads, frozenAtMs);
+  const [resourceDetailAuth, resourceDetailFavorites, resourceDetailBookmarks] = await Promise.all([
+    get("/api/auth/user"), get("/api/favorites"), get("/api/bookmarks"),
+  ]);
+  if (!resourceDetailAuth?.isAuthenticated || !resourceDetailAuth.user?.role ||
+      !Array.isArray(resourceDetailFavorites) || !Array.isArray(resourceDetailBookmarks)) {
+    throw new Error("0929 resource authenticated viewer reads are malformed");
+  }
   if (!Array.isArray(researcherJobsBody?.jobs)) {
     throw new Error("GET /api/researcher/jobs did not return { jobs: [] }; refusing invented research notes");
   }
   const researchNotes = buildResearchNotes(researcherJobsBody.jobs, frozenAtMs);
+  const researcher0929 = bindResearcher0929(researcherHistoryBody);
   // Edits / Enrichment / Link Health: the frozen panels declare fixture rows
   // locally. Bind the same live reads their application counterparts consume
   // (PendingEdits.tsx, BatchEnrichmentPanel.tsx, LinkHealthDashboard.tsx); an
@@ -696,14 +738,31 @@ export async function buildAdminAdapter(fetchJson, frozenAtMs) {
     .map((item) => Date.parse(item.createdAt))
     .filter(Number.isFinite)
     .sort((a, b) => a - b)[0];
+  const adminCatalog0929 = await buildAdminCatalogData0929(get, nav, usersPage, resourcesPage);
+  const maskedUsers = new Map(adminCatalog0929.panels.Users.rows.map((user) => [user.id, user]));
+  const overviewUsers0929 = await fetchAdminOps0929Users(get);
+  const adminOpsConfig0929 = await get("/api/config");
+  const adminOps0929 = await prepareAdminOpsUtilities0929(buildAdminOps0929({
+    stats, pending, audit, syncHistory, resourceEdits, enrichmentJobsBody,
+    linkHealthStatus, linkHealthBroken, overviewReads,
+    overviewUsers: overviewUsers0929, config: adminOpsConfig0929,
+  }, new Date(frozenAtMs).toISOString()));
   const globals = {
+    AV_ADMIN_OPS_0929: adminOps0929,
+    AV_RESOURCE_DETAIL_VIEWER: {
+      user: { role: resourceDetailAuth.user.role },
+      favorites: resourceDetailFavorites,
+      bookmarks: resourceDetailBookmarks,
+    },
+    AV_ADMIN_CATALOG_0929: adminCatalog0929,
+    AV_RESEARCHER_0929: researcher0929,
     AV_RETAINED_OPERATIONS: operations,
     AV_RETAINED_CATALOG: catalog,
     AV_TOTAL_USERS: Number(stats.users ?? users.length),
     AV_USERS: users.map((user) => ({
       id: user.id,
-      name: [user.firstName, user.lastName].filter(Boolean).join(" ") || user.email || user.id,
-      email: user.email || "",
+      name: maskedUsers.get(user.id).name,
+      email: maskedUsers.get(user.id).email,
       role: user.role || "user",
       joined: formatJoined(user.createdAt),
     })),
@@ -775,7 +834,9 @@ export async function buildAdminAdapter(fetchJson, frozenAtMs) {
       }
       : { available: false, status: Number(contactResponse?.status || 0), total: 0, submissions: [] },
   };
-  const snapshot = { stats, usersPage, resourcesPage, pending, audit, contactResponse, operations, catalog, nav, syncHistory, resourceEdits, enrichmentJobsBody, linkHealthStatus, linkHealthBroken, researcherJobsBody, overviewReads };
+  const snapshot = { stats, usersPage, resourcesPage, pending, audit, contactResponse, operations, catalog, nav, syncHistory, resourceEdits, enrichmentJobsBody, linkHealthStatus, linkHealthBroken, researcherJobsBody, researcherHistoryBody, overviewReads };
+  snapshot.resourceDetailViewer = globals.AV_RESOURCE_DETAIL_VIEWER;
+  snapshot.adminOps0929 = { overviewUsers: overviewUsers0929, config: adminOpsConfig0929 };
   return {
     globals,
     stats,
@@ -842,6 +903,12 @@ export function buildPlaceholderSubstitutions({ adapter, home, frozenAt, admin, 
     { file: "home-layouts.jsx", from: "CURATED · WEEK 37 ·", to: `CURATED · WEEK ${isoWeek(frozenAt)} ·`, source: "ISO week of the frozen clock", available: true },
     { file: "home-layouts.jsx", from: "['CONTRIBUTORS', 3, 'reviewing']", to: `['APPROVED THIS WEEK', ${addedThisWeek}, 'newly indexed']`, source: "/api/home approvedThisWeek (approvedAt with createdAt fallback)", available: true },
     { file: "design-systems.jsx", from: "'--text-3': 'rgba(244,243,238,0.4)'", to: "'--text-3': 'rgba(244,243,238,0.52)'", source: "approved expected-side Editorial AA contrast reconciliation (3.4:1 reference to 5.2:1 application)", available: true },
+    // Source-sized triggers must be present before the harness's native
+    // click/focus scroll, not expanded around a stale frozen scroll offset.
+    { file: "admin.jsx", from: '<div className="tabs" style={{ marginBottom: 28 }}>', to: '<div className="admin-tab-scroller" data-ops0929-initial="true"><div className="tabs" style={{ marginBottom: 0, scrollPaddingInline: window.AV_ADMIN_OPS_0929.tabScrollPadding }}><style>{window.AV_ADMIN_OPS_0929.tabSizingCss}</style>', source: "source TabsTrigger utilities and AdminDashboard scroll padding at first paint", available: Boolean(admin) },
+    { file: "admin.jsx", from: "      </div>\n\n      {tab === 'overview' && <AdminOverview />}", to: "      </div></div>\n\n      {tab === 'overview' && <AdminOverview />}", source: "source AdminDashboard tab host mounted before native activation; preserve focused scroller state", available: Boolean(admin) },
+    { file: "admin.jsx", from: "onClick={() => setTab(tb.id)}", to: "onMouseDown={(event) => new Function(\"event\", \"context\", \"value\", \"disabled\", window.AV_ADMIN_CATALOG_0929.tabPointerSelect)(event, { onValueChange: setTab }, tb.id, false)} onKeyDown={(event) => new Function(\"event\", \"context\", \"value\", \"disabled\", window.AV_ADMIN_CATALOG_0929.tabKeyboardSelect)(event, { onValueChange: setTab }, tb.id, false)}", source: "source Radix TabsTrigger selects on primary mousedown before native focus scrolling", available: Boolean(admin) },
+    { file: "admin.jsx", from: "className={'tab' + (tab === tb.id ? ' active' : '')}", to: "className={window.AV_ADMIN_OPS_0929.tabClassName + (tab === tb.id ? ' active' : '')} style={{ lineHeight: window.AV_ADMIN_OPS_0929.tabLineHeight }}", source: "source TabsTrigger class recipe and native leading before tab activation", available: Boolean(admin) },
     { file: "admin.jsx", from: 'sub="across 9 categories"', to: `sub="across ${categoriesCount} categories"`, source: "nav category count", available: true },
     { file: "admin.jsx", from: "const filtered = AV_RESOURCES.filter(r => r.title.toLowerCase().includes(search.toLowerCase()));", to: "const filtered = (window.AV_ADMIN_RESOURCES || AV_RESOURCES).filter(r => r.title.toLowerCase().includes(search.toLowerCase()));", source: "/api/admin/resources default 25-row page (admin session only)", available: Boolean(admin) },
     { file: "admin.jsx", from: "title={`Resources (${AV_RESOURCES.length} of ${AV_TOTAL.toLocaleString()})`}", to: "title={`Resources (${(window.AV_ADMIN_RESOURCES || AV_RESOURCES).length} of ${AV_TOTAL.toLocaleString()})`}", source: "/api/admin/resources default page size (admin session only)", available: Boolean(admin) },
@@ -950,6 +1017,7 @@ export function adaptReferenceSnapshot(referenceSnapshot, { adapterScript, subst
 }
 
 export function buildAdapterScript({ adapter, adminGlobals, appBase, snapshotBytes, frozenAt, reconciliation }) {
+  bindResource0929Viewer(reconciliation?.resource0929, adminGlobals?.AV_RESOURCE_DETAIL_VIEWER || null);
   const bound = {
     ...adapter,
     ...(adminGlobals || {}),

@@ -287,9 +287,12 @@ export class StructuredOutputError extends Error {
 const CACHE_MIN_CHARS = 4096 * 4;
 
 /**
- * One structured-output Messages call: the response is constrained to `schema`
- * by the API (`output_config.format`) and validated by zod on the way back.
- * Replaces the old "ask for JSON, regex the braces, hope" pattern.
+ * One structured-output Messages call, using a forced, strict response tool.
+ * Anthropic-compatible routers may ignore `output_config.format` and run their
+ * own skills instead, returning "[Skill result: ...]" text that messages.parse
+ * tries to decode as JSON. Explicitly supplying ONLY our response tool and
+ * forcing it keeps the router on the structured path. This tool is an output
+ * envelope, never executed by the application; its input is validated by zod.
  */
 export async function createStructuredMessage<T>(
   schema: z.ZodType<T>,
@@ -304,13 +307,20 @@ export async function createStructuredMessage<T>(
       : { type: "text", text: params.system },
   ];
 
-  const response = await client.messages.parse(
+  const responseTool = "structured_response";
+  const response = await client.messages.create(
     {
       model: params.model,
       max_tokens: params.maxTokens,
       system,
       messages: [{ role: "user", content: params.user }],
-      output_config: { format: zodOutputFormat(schema) },
+      tools: [{
+        name: responseTool,
+        description: "Return the requested data matching this schema. This is the only permitted tool; do not use skills or save memories.",
+        input_schema: zodOutputFormat(schema).schema as Anthropic.Tool.InputSchema,
+        strict: true,
+      }],
+      tool_choice: { type: "tool", name: responseTool, disable_parallel_tool_use: true },
     },
     { timeout: params.timeoutMs ?? DEFAULT_REQUEST_TIMEOUT_MS, signal: params.signal },
   );
@@ -332,13 +342,33 @@ export async function createStructuredMessage<T>(
   if (response.stop_reason === "refusal") {
     throw new StructuredOutputError("Model refused the request", "refusal", response.stop_reason);
   }
-  const parsed = response.parsed_output;
-  if (parsed === null || parsed === undefined) {
+  const outputs = response.content.filter(
+    (block): block is Anthropic.ToolUseBlock =>
+      block.type === "tool_use" && block.name === responseTool,
+  );
+  if (outputs.length === 0) {
     throw new StructuredOutputError(
-      `Model returned no parseable structured output (stop_reason ${response.stop_reason})`,
+      `Model returned no ${responseTool} tool output (stop_reason ${response.stop_reason})`,
       "empty",
       response.stop_reason,
     );
   }
-  return { data: parsed as T, model: response.model, usage };
+  if (outputs.length !== 1 || response.stop_reason !== "tool_use") {
+    throw new StructuredOutputError(
+      `Expected one completed ${responseTool} tool output (received ${outputs.length}, stop_reason ${response.stop_reason})`,
+      "invalid",
+      response.stop_reason,
+    );
+  }
+  const parsed = schema.safeParse(outputs[0].input);
+  if (!parsed.success) {
+    // Do not include raw model output or user data in logs.
+    const paths = parsed.error.issues.slice(0, 5).map(issue => issue.path.join(".") || "(root)");
+    throw new StructuredOutputError(
+      `Structured output failed schema validation at: ${paths.join(", ")}`,
+      "invalid",
+      response.stop_reason,
+    );
+  }
+  return { data: parsed.data, model: response.model, usage };
 }

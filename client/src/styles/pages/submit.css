@@ -388,11 +388,6 @@
     align-items: flex-start;
     flex-direction: column;
   }
-
-  /* C9-V3-02: two columns leave Tags too narrow for its placeholder. */
-  .submit-form-row {
-    grid-template-columns: minmax(0, 1fr);
-  }
 }
 
 /* mobile-optimizations.css lifts every textarea to 16px against iOS zoom and

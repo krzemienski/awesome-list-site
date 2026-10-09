@@ -264,6 +264,9 @@ export default function UsersTab() {
                   key={col.key}
                   aria-sort={sortBy === col.key ? (sortDir === "asc" ? "ascending" : "descending") : undefined}
                 >
+                  {/* Keep the canonical label in intrinsic layout while its
+                      retained 44px sort target remains centred out of flow. */}
+                  <span aria-hidden="true" className="invisible">{col.label}</span>
                   <Button
                     type="button"
                     variant="ghost"
