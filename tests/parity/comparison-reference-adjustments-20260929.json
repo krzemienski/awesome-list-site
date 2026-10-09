@@ -217,6 +217,21 @@
       ]
     },
     {
+      "id": "CCR-0929-SIDEBAR-OVERHANG-TARGETS",
+      "file": "styles.css",
+      "operation": "append",
+      "anchor": ".ds-system-pill.active {\n  background: var(--accent);\n  border-color: var(--accent);\n  color: #000;\n}",
+      "occurrences": 1,
+      "content": "\n\n/* 09-29 adoption: the Home row and collapse toggle keep their drawn size; the 44px target overhangs invisibly. */\naside.sidebar button.sub-item,aside.sidebar button[aria-label=\"Collapse sidebar\"]{min-height:0;min-width:0;position:relative}\naside.sidebar button.sub-item::after,aside.sidebar button[aria-label=\"Collapse sidebar\"]::after{content:\"\";position:absolute;left:50%;top:50%;width:max(100%,44px);height:max(100%,44px);transform:translate(-50%,-50%)}\n",
+      "rationale": "The 2026-10-06 Claude Design adoption keeps the 09-29 drawn sizes of the sidebar Home row and the 26px collapse toggle and meets the 44px target with an invisible overhang. The blanket sidebar-button minimum inflated their painted boxes instead. This rule restores the source-drawn size for exactly those two controls and keeps a 44px pointer target around each. It uses no application-derived values.",
+      "sourceAnchors": [
+        "contract:199-206",
+        "contract:420-421",
+        "sidebar-variants.jsx:267-290",
+        "sidebar-variants.jsx:353-362"
+      ]
+    },
+    {
       "id": "CCR-CANONICAL-NINE-FONTS-DOCS",
       "file": "docs.html",
       "operation": "replaceFontRequest",

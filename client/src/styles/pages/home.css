@@ -70,6 +70,10 @@
   flex-wrap: wrap;
 }
 
+/* `.btn` draws a 40.8px ghost button; the filter still needs the 44px target. */
+.home-kind-chip {
+  min-height: var(--profile-control-height);
+}
 
 /* Selected state can't rely on border hue alone: in brutalist the accent
    border is darker than the white unselected borders. */
@@ -160,12 +164,10 @@
 }
 
 /*
- * These links replace the reference's native buttons. Native button font
- * shorthand resets OpenType features, while application links otherwise
- * inherit the body ss01/cv11/tnum settings.
+ * The recent rows stand in for native buttons, whose font shorthand resets
+ * OpenType features; other links inherit the body ss01/cv11/tnum settings,
+ * as the design's category headings and subcategory rows do.
  */
-.home-category-heading,
-.home-subcategory-row,
 .home-recent-row,
 .home-curated-recent-row {
   font-feature-settings: normal;
@@ -207,11 +209,6 @@
   font-feature-settings: "tnum";
 }
 
-.home-subcategory-count {
-  min-width: 1.75rem;
-  text-align: right;
-}
-
 .home-subcategory-list {
   display: flex;
   flex-direction: column;
@@ -237,11 +234,10 @@
   color: var(--text);
 }
 
+/* Long names wrap, as in the design, rather than truncating. */
 .home-subcategory-name {
   min-width: 0;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
+  overflow-wrap: anywhere;
 }
 
 .home-subcategory-name::before {
@@ -441,7 +437,10 @@
   margin-bottom: 1.5rem;
 }
 
+/* `.eyebrow` is inline-flex; on its own line it would sit in a body-leading
+   line box and push the title 6px down. The design's eyebrow is a block. */
 .home-section-eyebrow {
+  display: flex;
   margin-bottom: 0.625rem;
 }
 
@@ -695,14 +694,9 @@
 }
 
 .home-curated-category p {
-  display: -webkit-box;
-  overflow: hidden;
   color: var(--text-2);
   font-size: 0.8125rem;
   line-height: 1.55;
-  -webkit-box-orient: vertical;
-  -webkit-line-clamp: 3;
-  line-clamp: 3;
 }
 
 .home-curated-explore {

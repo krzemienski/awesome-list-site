@@ -56,9 +56,25 @@ export function buildFooter0929(nav, site) {
   const displayName = compile(displayDeclaration, "footerDisplayName")(site.name);
   const policies = [...footer.matchAll(/<Link href="([^"]+)" data-testid="footer-[^"]+"[^>]*>([^<]+)<\/Link>/g)].map(([, href, label]) => ({ href, label }));
   if (policies.length !== 4 || !footer.includes("PRs welcome")) throw new Error("0929 footer retained policy declaration drift");
+  // The approved 44px meta-strip targets carry ~14px of their own box below
+  // the text line, so footer.css trims the frame's bottom padding to match
+  // (the same trade as the strip's 18px → 4px top padding). Project that one
+  // declaration from its source so both frames end the same distance below.
+  const rootPadding = footerCss.match(/\n\.app-footer \{[^}]*?\n  padding: (\d+px) (\d+px) (\d+px);/);
+  if (!rootPadding) throw new Error("0929 footer root padding declaration drift");
+  const paddingBottom = rootPadding[3];
+  // Retained repository-link containment: the app caps the link at its column
+  // and lets the label break only after the owner slash (a <wbr>), so the
+  // 09-29 link, which has neither, cannot push the page wider than the viewport.
+  const repoRule = footerCss.match(/\n\.app-footer-repo \{([^}]*)\}/)?.[1] || "";
+  if (!/\n  max-width: 100%;/.test(repoRule) || !/\n\.app-footer-repo-label \{ min-width: 0; \}/.test(footerCss) ||
+      !footer.includes('className="app-footer-repo-label">{repoLabel.split("/").map((part, i) => i === 0 ? part : <span key={i}>/<wbr />{part}</span>)}')) {
+    throw new Error("0929 footer retained repository-link containment drift");
+  }
   const cookie = [...analytics.matchAll(/configured: Boolean\(import\.meta\.env\.([A-Z_]+)\)/g)].some(([, key]) => Boolean(process.env[key]));
   return {
     responsiveCss,
+    paddingBottom,
     displayName,
     categories: visible(nav.categories).map((category) => ({ name: category.name, slug: category.slug, glyph: glyph(category.name), short: category.name.split(/\s+&\s+|\s+/)[0], subcategories: category.subcategories.length })),
     policies: [...policies, ...(cookie ? [{ label: "Cookie settings", href: "#" }] : []), { label: "Issues ↗", href: site.issuesUrl || `${site.repoUrl}/issues` }, { label: "Sitemap", href: "/sitemap.xml" }],
@@ -109,7 +125,11 @@ export async function applyFooter0929(page, reconciliation) {
     const repo = source.querySelector("a");
     if (!repo) throw new Error("0929 PageFooter SOURCE link missing");
     repo.href = site.repoUrl;
-    repo.children[1].textContent = site.repoUrl.replace(/^https?:\/\/(www\.)?github\.com\//, "");
+    const label = repo.children[1];
+    const [owner, ...rest] = site.repoUrl.replace(/^https?:\/\/(www\.)?github\.com\//, "").split("/");
+    label.replaceChildren(owner, ...rest.flatMap((part) => ["/", document.createElement("wbr"), part]));
+    repo.style.maxWidth = "100%";
+    label.style.minWidth = "0";
     const note = repo.nextElementSibling;
     const text = note?.firstChild;
     if (text?.nodeType !== Node.TEXT_NODE || !text.textContent.includes("PRs welcome")) throw new Error("0929 PageFooter source note drift");
@@ -131,9 +151,10 @@ export async function applyFooter0929(page, reconciliation) {
     }
     meta.insertBefore(policies, meta.lastElementChild);
     meta.style.paddingTop = "4px";
+    footer.style.paddingBottom = projection.paddingBottom;
     meta.style.gap = "0 16px";
     for (const span of meta.querySelectorAll(":scope > span")) Object.assign(span.style, { display: "inline-flex", alignItems: "center", minHeight: "44px" });
   }, { projection, site: reconciliation.site, total: reconciliation.nav.totalResources });
   await page.addStyleTag({ content: projection.responsiveCss });
-  return { modified: ["live PageFooter identity, taxonomy and repository", "source-owned policy links and PRs welcome link", "approved 44px footer targets", "approved responsive footer collapse (footer.css max-width blocks)"], sourceProof: projection.sourceProof };
+  return { modified: ["live PageFooter identity, taxonomy and repository", "retained repository-link containment (footer.css, AppFooter <wbr>)", "source-owned policy links and PRs welcome link", "approved 44px footer targets (strip padding from footer.css)", "approved responsive footer collapse (footer.css max-width blocks)"], sourceProof: projection.sourceProof };
 }

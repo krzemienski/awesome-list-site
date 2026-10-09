@@ -9,6 +9,7 @@ import { renderToStaticMarkup } from "react-dom/server";
 import { Clock, Grid2X2, Info, MoreHorizontal, Plus, Search } from "lucide-react";
 import { ACTIVE_REFERENCE } from "./reference-root.mjs";
 import { buildFooter0929, applyFooter0929 } from "./reference-footer-20260929.mjs";
+import { buildHome0929, applyHome0929 } from "./reference-home-20260929.mjs";
 import {
   applyExpectedRetainedReferenceExtensions,
   buildExpectedReferenceExtensions,
@@ -472,6 +473,7 @@ export function buildReferenceReconciliation({
     version: 1,
     ...(ACTIVE_REFERENCE.id === "20260929" ? {
       footer0929: buildFooter0929(nav, { name: title, repoUrl, issuesUrl: siteConfig.issuesUrl }),
+      home0929: buildHome0929(nav, home, kindCountValues, frozenAt),
     } : {}),
     site: {
       name: title,
@@ -875,11 +877,13 @@ export async function applyExpectedReferenceReconciliation(page, {
   }
 
   if (ACTIVE_REFERENCE.id === "20260929") {
+    const home = await applyHome0929(page, reconciliation);
+    provenance.retainedExtensions.home = home;
     const footer = await applyFooter0929(page, reconciliation);
     provenance.reference = ACTIVE_REFERENCE.id;
     provenance.status = actualFooterCount === null ? "source-projected" : "applied";
     provenance.adjustments = [...footer.modified, ...paletteControls.modified, ...drawerControls.modified,
-      ...(retainedExtensions.about?.modified || []), ...(retainedExtensions.admin?.modified || [])];
+      ...(retainedExtensions.about?.modified || []), ...(retainedExtensions.admin?.modified || []), ...home.modified];
     provenance.footerSourceProof = footer.sourceProof;
     provenance.styles = { canonical: "0929 frozen PageFooter inline styles; retained link and accessibility declarations only (no app CSS)" };
     return provenance;
