@@ -603,7 +603,8 @@ export const insertSubcategorySchema = createInsertSchema(subcategories).pick({
 });
 
 export const updateSubcategorySchema = insertSubcategorySchema.partial().extend({
-  categoryId: z.number().int().positive().max(2147483647).optional(),
+  categoryId: z.number({ error: 'categoryId must be an existing category id; a subcategory cannot be detached' })
+    .int().positive().max(2147483647).optional(),
 });
 
 export type InsertSubcategory = z.infer<typeof insertSubcategorySchema>;
@@ -650,7 +651,8 @@ export const insertSubSubcategorySchema = createInsertSchema(subSubcategories).p
 });
 
 export const updateSubSubcategorySchema = insertSubSubcategorySchema.partial().extend({
-  subcategoryId: z.number().int().positive().max(2147483647).optional(),
+  subcategoryId: z.number({ error: 'subcategoryId must be an existing subcategory id; a sub-subcategory cannot be detached' })
+    .int().positive().max(2147483647).optional(),
 });
 
 export type InsertSubSubcategory = z.infer<typeof insertSubSubcategorySchema>;

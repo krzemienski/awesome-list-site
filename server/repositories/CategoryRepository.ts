@@ -445,6 +445,23 @@ export class CategoryRepository {
     return Object.fromEntries(rows.map(row => [row.id, row.count]));
   }
 
+  /** Leaf display counts scoped to the full category > subcategory > leaf chain. */
+  async getScopedSubSubcategoryResourceCounts(): Promise<Record<number, number>> {
+    const rows = await db.select({
+      id: subSubcategories.id,
+      count: sql<number>`count(${resources.id})::int`,
+    }).from(subSubcategories)
+      .innerJoin(subcategories, eq(subcategories.id, subSubcategories.subcategoryId))
+      .innerJoin(categories, eq(categories.id, subcategories.categoryId))
+      .leftJoin(resources, and(
+        eq(resources.category, categories.name),
+        eq(resources.subcategory, subcategories.name),
+        eq(resources.subSubcategory, subSubcategories.name),
+      ))
+      .groupBy(subSubcategories.id);
+    return Object.fromEntries(rows.map(row => [row.id, row.count]));
+  }
+
   /**
    * Get the number of sub-subcategories under every subcategory in one query.
    * @returns Map of subcategory ID -> sub-subcategory count

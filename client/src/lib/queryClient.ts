@@ -40,7 +40,9 @@ export async function apiRequest(
   url: string,
   options?: RequestInit,
 ): Promise<any> {
+  const isRead = !options?.method || ['GET', 'HEAD'].includes(options.method.toUpperCase());
   const res = await fetch(url, {
+    ...(isRead && !options?.cache ? { cache: catalogRequestCache() } : {}),
     ...options,
     headers: {
       "Content-Type": "application/json",
@@ -64,8 +66,10 @@ export async function apiRequest(
   return res;
 }
 
+const CATALOG_HTTP_MAX_AGE_MS = 60_000;
 /** Shared content-mutation cache graph, including URL-shaped detail keys. */
 function invalidateCatalogQueries(): Promise<void> {
+  lastCatalogWriteAt = Date.now();
   const prefixes = [
     '/api/resources', '/api/categories', '/api/subcategories', '/api/sub-subcategories',
     '/api/admin/resources', '/api/admin/pending-resources', '/api/admin/resource-edits',
@@ -93,6 +97,7 @@ const getQueryFn: <T>(options: {
     try {
       const res = await fetch(url, {
         credentials: "include",
+        cache: catalogRequestCache(),
       });
 
       const endTime = performance.now();
@@ -286,3 +291,9 @@ export const queryClient = new QueryClient({
     },
   },
 });
+
+let lastCatalogWriteAt = Number.NEGATIVE_INFINITY;
+
+export function catalogRequestCache(): RequestCache {
+  return Date.now() - lastCatalogWriteAt < CATALOG_HTTP_MAX_AGE_MS ? 'no-cache' : 'default';
+}

@@ -102,6 +102,27 @@ const normalizeAdminResource = (resource: AdminResourceWire): AdminResource => {
 
 const featuredValue = (resource: AdminResource) => resource.metadata?.featured === true;
 
+/** Bulk endpoints answer 200 (all ok) or 207 (partial) with per-item failures. */
+interface BulkResourceResult {
+  succeeded?: number;
+  failed?: number;
+  failures?: { id: number; reason: string }[];
+}
+
+const bulkOutcomeToast = (verb: string, title: string, result: BulkResourceResult, requested: number) => {
+  const succeeded = result?.succeeded ?? requested;
+  const failed = result?.failed ?? 0;
+  if (failed === 0) {
+    return { title, description: `Successfully ${verb} ${succeeded} resource(s).` };
+  }
+  const first = result.failures?.[0];
+  return {
+    title: `Bulk action completed with failures`,
+    description: `${succeeded} ${verb}, ${failed} failed${first ? ` (#${first.id}: ${first.reason})` : ""}.`,
+    variant: "destructive" as const,
+  };
+};
+
 const formatResourceUpdatedAt = (updatedAt: Date | string | null | undefined) => {
   if (!updatedAt) return "—";
   const date = new Date(updatedAt);
@@ -643,17 +664,14 @@ export default function ResourceManager({ createRequest = 0 }: { createRequest?:
         body: JSON.stringify({ ids })
       });
     },
-    onSuccess: () => {
+    onSuccess: (result: BulkResourceResult, ids: number[]) => {
       queryClient.invalidateQueries({ queryKey: ['/api/admin/resources'] });
       queryClient.invalidateQueries({ queryKey: ['/api/resources'] });
       queryClient.invalidateQueries({ queryKey: ["awesome-list-data"] });
       queryClient.invalidateQueries({ queryKey: ["awesome-list-nav"] });
       queryClient.invalidateQueries({ queryKey: ["/api/admin/stats"] });
       setSelectedResourceIds([]);
-      toast({
-        title: "Resources Approved",
-        description: `Successfully approved ${selectedResourceIds.length} resource(s).`,
-      });
+      toast(bulkOutcomeToast("approved", "Resources Approved", result, ids.length));
     },
     onError: (error: any) => {
       toast({
@@ -671,7 +689,7 @@ export default function ResourceManager({ createRequest = 0 }: { createRequest?:
         body: JSON.stringify({ ids, reason })
       });
     },
-    onSuccess: () => {
+    onSuccess: (result: BulkResourceResult, variables: { ids: number[]; reason: string }) => {
       queryClient.invalidateQueries({ queryKey: ['/api/admin/resources'] });
       queryClient.invalidateQueries({ queryKey: ['/api/resources'] });
       queryClient.invalidateQueries({ queryKey: ["awesome-list-data"] });
@@ -680,10 +698,7 @@ export default function ResourceManager({ createRequest = 0 }: { createRequest?:
       setSelectedResourceIds([]);
       focusTableOnCloseRef.current = true;
       setRejectDialogOpen(false);
-      toast({
-        title: "Resources Rejected",
-        description: `Successfully rejected ${selectedResourceIds.length} resource(s).`,
-      });
+      toast(bulkOutcomeToast("rejected", "Resources Rejected", result, variables.ids.length));
     },
     onError: (error: any) => {
       toast({
@@ -701,17 +716,14 @@ export default function ResourceManager({ createRequest = 0 }: { createRequest?:
         body: JSON.stringify({ ids })
       });
     },
-    onSuccess: () => {
+    onSuccess: (result: BulkResourceResult, ids: number[]) => {
       queryClient.invalidateQueries({ queryKey: ['/api/admin/resources'] });
       queryClient.invalidateQueries({ queryKey: ['/api/resources'] });
       queryClient.invalidateQueries({ queryKey: ["awesome-list-data"] });
       queryClient.invalidateQueries({ queryKey: ["awesome-list-nav"] });
       queryClient.invalidateQueries({ queryKey: ["/api/admin/stats"] });
       setSelectedResourceIds([]);
-      toast({
-        title: "Resources Deleted",
-        description: `Successfully deleted ${selectedResourceIds.length} resource(s).`,
-      });
+      toast(bulkOutcomeToast("deleted", "Resources Deleted", result, ids.length));
     },
     onError: (error: any) => {
       toast({

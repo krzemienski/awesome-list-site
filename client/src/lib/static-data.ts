@@ -6,7 +6,7 @@
  */
 
 import type { ResourceKind } from "@shared/resourceKinds";
-import { apiRequest } from "@/lib/queryClient";
+import { apiRequest, catalogRequestCache } from "@/lib/queryClient";
 
 /**
  * Fetch the awesome-list payload with a per-attempt timeout and one retry.
@@ -20,7 +20,7 @@ async function fetchWithTimeout(url: string, timeoutMs: number): Promise<Respons
   const controller = new AbortController();
   const timer = setTimeout(() => controller.abort(), timeoutMs);
   try {
-    return await fetch(url, { signal: controller.signal, credentials: 'same-origin' });
+    return await fetch(url, { signal: controller.signal, credentials: 'same-origin', cache: catalogRequestCache() });
   } finally {
     clearTimeout(timer);
   }

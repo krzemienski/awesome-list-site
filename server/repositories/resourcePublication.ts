@@ -45,7 +45,12 @@ export async function transitionResourceInTransaction(
     data.approvedBy = status === 'approved' ? actor ?? null : null;
     data.contributorRejectionReason = status === 'rejected' ? options.rejectionReason ?? null : null;
   }
-  if (status === 'approved') {
+  // Publishing applies the one minimum-description policy. Later admin edits to
+  // an already-published row keep the admin's validated (10+ visible chars)
+  // text as an intentional override, but blanking it re-applies the fallback
+  // so a public row never ends up with an empty description.
+  const blankedPublished = patch.description !== undefined && !(patch.description ?? '').trim();
+  if (status === 'approved' && (changed || blankedPublished)) {
     data.description = ensureMinDescription(
       patch.description ?? before.description ?? '',
       patch.title ?? before.title,

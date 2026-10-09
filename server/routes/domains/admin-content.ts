@@ -83,14 +83,24 @@ import type {
 
 // Every value resources.status can hold (shared/schema.ts resources.status).
 const ADMIN_RESOURCE_STATUSES = ['approved', 'pending', 'rejected', 'withdrawn', 'archived'];
+
+const REJECTION_REASON_MESSAGE = 'Rejection reason is required (minimum 10 characters)';
 const resourceRejectionSchema = z.object({
-  reason: z.string().trim().min(10, 'Rejection reason must contain at least 10 characters').max(5000),
+  reason: z.string({ error: REJECTION_REASON_MESSAGE }).trim().min(10, REJECTION_REASON_MESSAGE).max(5000),
 });
 const bulkResourceIdsSchema = z.object({
   ids: z.array(z.number().int().positive().max(PG_INT_MAX)).min(1).max(1000)
     .refine(ids => new Set(ids).size === ids.length, 'Resource IDs must be unique'),
 });
 
+/** Honest bulk summary: names the failures instead of a bare success count. */
+function bulkOutcomeMessage(verb: string, succeeded: number, failures: { id: number; reason: string }[]): string {
+  if (failures.length === 0) return `${verb[0].toUpperCase()}${verb.slice(1)} ${succeeded} resource(s)`;
+  const first = `#${failures[0].id}: ${failures[0].reason}`;
+  return succeeded === 0
+    ? `No resources were ${verb}; ${failures.length} failed (${first})`
+    : `${verb[0].toUpperCase()}${verb.slice(1)} ${succeeded} resource(s); ${failures.length} failed (${first})`;
+}
 function taxonomyConflict(error: unknown): boolean {
   if (error instanceof ConflictError) return true;
   if (!(error instanceof Object)) return false;
@@ -510,7 +520,6 @@ export function registerAdminContentRoutes(
     try {
       const resourceId = parseInt(req.params.id);
       const userId = req.dbUser.id;
-      const { reason } = req.body ?? {};
       
       if (isNaN(resourceId)) {
         return res.status(400).json({ message: 'Invalid resource ID' });
@@ -522,9 +531,9 @@ export function registerAdminContentRoutes(
         return res.status(404).json({ message: 'Resource not found' });
       }
       
-      const rejection = resourceRejectionSchema.safeParse(req.body);
+      const rejection = resourceRejectionSchema.safeParse(req.body ?? {});
       if (!rejection.success) {
-        return res.status(400).json(buildValidationEnvelope(rejection.error));
+        return res.status(400).json(buildValidationEnvelope(rejection.error, REJECTION_REASON_MESSAGE));
       }
 
       // Run16 BUG-046: rejecting a non-pending resource used to fall through
@@ -535,7 +544,7 @@ export function registerAdminContentRoutes(
         });
       }
 
-      await resourceRepo.rejectResource(resourceId, userId, reason);
+      await resourceRepo.rejectResource(resourceId, userId, rejection.data.reason);
       const updatedResource = await resourceRepo.getResource(resourceId);
       
       res.json(updatedResource);
@@ -832,7 +841,7 @@ export function registerAdminContentRoutes(
         }
       }
 
-      res.status(succeeded === 0 ? 409 : failed ? 207 : 200).json({ message: `Approved ${succeeded} resource(s)`, succeeded, failed, failures });
+      res.status(succeeded === 0 ? 409 : failed ? 207 : 200).json({ message: bulkOutcomeMessage('approved', succeeded, failures), succeeded, failed, failures });
     } catch (error) {
       console.error('Error in bulk approve:', error);
       sendOperationalFailure(res, error, 'Failed to bulk approve resources');
@@ -861,7 +870,7 @@ export function registerAdminContentRoutes(
         }
       }
 
-      res.status(succeeded === 0 ? 409 : failed ? 207 : 200).json({ message: `Rejected ${succeeded} resource(s)`, succeeded, failed, failures });
+      res.status(succeeded === 0 ? 409 : failed ? 207 : 200).json({ message: bulkOutcomeMessage('rejected', succeeded, failures), succeeded, failed, failures });
     } catch (error) {
       console.error('Error in bulk reject:', error);
       sendOperationalFailure(res, error, 'Failed to bulk reject resources');
@@ -900,7 +909,7 @@ export function registerAdminContentRoutes(
         }
       }
 
-      res.status(succeeded === 0 ? 409 : failed ? 207 : 200).json({ message: `Deleted ${succeeded} resource(s)`, succeeded, failed, failures });
+      res.status(succeeded === 0 ? 409 : failed ? 207 : 200).json({ message: bulkOutcomeMessage('deleted', succeeded, failures), succeeded, failed, failures });
     } catch (error) {
       console.error('Error in bulk delete:', error);
       sendOperationalFailure(res, error, 'Failed to bulk delete resources');
@@ -1141,17 +1150,20 @@ export function registerAdminContentRoutes(
     try {
       const editId = parseInt(req.params.id);
       const userId = req.dbUser.id;
-      const { reason } = req.body;
       
       if (isNaN(editId)) {
         return res.status(400).json({ message: 'Invalid edit ID' });
       }
       
-      if (typeof reason !== 'string' || reason.trim().length < 10 || reason.length > 2000) {
-        return res.status(400).json({ message: 'Rejection reason must be a string of 10 to 2000 characters' });
+      // D11: one strict schema for every moderation reason (edits keep their 2000-char cap).
+      const rejection = resourceRejectionSchema
+        .extend({ reason: resourceRejectionSchema.shape.reason.max(2000) })
+        .safeParse(req.body ?? {});
+      if (!rejection.success) {
+        return res.status(400).json(buildValidationEnvelope(rejection.error, REJECTION_REASON_MESSAGE));
       }
       
-      await auditRepo.rejectResourceEdit(editId, userId, reason);
+      await auditRepo.rejectResourceEdit(editId, userId, rejection.data.reason);
       
       res.json({ message: 'Edit rejected successfully' });
     } catch (error: any) {
@@ -1295,10 +1307,7 @@ export function registerAdminContentRoutes(
       const validationResult = insertCategorySchema.safeParse(req.body);
       
       if (!validationResult.success) {
-        return res.status(400).json({ 
-          message: 'Validation failed', 
-          errors: validationResult.error.issues
-        });
+        return res.status(400).json(buildValidationEnvelope(validationResult.error));
       }
       
       const newCategory = await categoryRepo.createCategory(validationResult.data);
@@ -1338,10 +1347,7 @@ export function registerAdminContentRoutes(
       const validationResult = updateCategorySchema.safeParse(req.body);
       
       if (!validationResult.success) {
-        return res.status(400).json({ 
-          message: 'Validation failed', 
-          errors: validationResult.error.issues
-        });
+        return res.status(400).json(buildValidationEnvelope(validationResult.error));
       }
       
       const existingCategory = await categoryRepo.getCategory(categoryId);
@@ -1441,15 +1447,12 @@ export function registerAdminContentRoutes(
       const validationResult = insertSubcategorySchema.safeParse(req.body);
       
       if (!validationResult.success) {
-        return res.status(400).json({ 
-          message: 'Validation failed', 
-          errors: validationResult.error.issues
-        });
+        return res.status(400).json(buildValidationEnvelope(validationResult.error));
       }
       
       const categoryId = validationResult.data.categoryId;
       if (!categoryId) {
-        return res.status(400).json({ message: 'Category ID is required' });
+        return res.status(400).json({ message: 'Category ID is required', fieldErrors: { categoryId: 'Choose a parent category' } });
       }
       
       const category = await categoryRepo.getCategory(categoryId);
@@ -1506,10 +1509,7 @@ export function registerAdminContentRoutes(
       const validationResult = updateSubcategorySchema.safeParse(req.body);
       
       if (!validationResult.success) {
-        return res.status(400).json({ 
-          message: 'Validation failed', 
-          errors: validationResult.error.issues
-        });
+        return res.status(400).json(buildValidationEnvelope(validationResult.error));
       }
       
       const existingSubcategory = await categoryRepo.getSubcategory(subcategoryId);
@@ -1608,12 +1608,11 @@ export function registerAdminContentRoutes(
       
       const subSubcategories = await categoryRepo.listSubSubcategories(subcategoryId);
       
-      const subSubcategoriesWithCounts = await Promise.all(
-        subSubcategories.map(async (subSub) => {
-          const count = await categoryRepo.getSubSubcategoryResourceCount(subSub.name);
-          return { ...subSub, resourceCount: count };
-        })
-      );
+      // D05: parent-chain-scoped display counts in one query (delete guards stay name-global).
+      const resourceCounts = await categoryRepo.getScopedSubSubcategoryResourceCounts();
+      const subSubcategoriesWithCounts = subSubcategories.map((subSub) => (
+        { ...subSub, resourceCount: resourceCounts[subSub.id] ?? 0 }
+      ));
       
       res.json(subSubcategoriesWithCounts);
     } catch (error) {
@@ -1630,15 +1629,12 @@ export function registerAdminContentRoutes(
       const validationResult = insertSubSubcategorySchema.safeParse(req.body);
       
       if (!validationResult.success) {
-        return res.status(400).json({ 
-          message: 'Validation failed', 
-          errors: validationResult.error.issues
-        });
+        return res.status(400).json(buildValidationEnvelope(validationResult.error));
       }
       
       const subcategoryId = validationResult.data.subcategoryId;
       if (!subcategoryId) {
-        return res.status(400).json({ message: 'Subcategory ID is required' });
+        return res.status(400).json({ message: 'Subcategory ID is required', fieldErrors: { subcategoryId: 'Choose a parent subcategory' } });
       }
       
       const subcategory = await categoryRepo.getSubcategory(subcategoryId);
@@ -1693,10 +1689,7 @@ export function registerAdminContentRoutes(
       const validationResult = updateSubSubcategorySchema.safeParse(req.body);
       
       if (!validationResult.success) {
-        return res.status(400).json({ 
-          message: 'Validation failed', 
-          errors: validationResult.error.issues
-        });
+        return res.status(400).json(buildValidationEnvelope(validationResult.error));
       }
       
       const existingSubSubcategory = await categoryRepo.getSubSubcategory(subSubcategoryId);
