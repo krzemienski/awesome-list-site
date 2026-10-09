@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 /**
  * Visual parity harness: app (and design-system artifact) vs the canonical
- * awesome-list-site-ds reference, pixel-for-pixel on a union canvas.
+ * frozen design reference (tests/parity/reference-root.mjs), pixel-for-pixel on a union canvas.
  *
  * Entry point for `npm run test:parity`. See cli.mjs for flags, inventory.mjs
  * for the row catalogue, readiness.mjs for the capture contract, actions.mjs
@@ -49,10 +49,11 @@ import { applyExpectedReferenceReconciliation } from "./reference-reconciliation
 import { applyComparisonReferenceAdjustments, collectReferenceAdjustmentGeometry } from "./comparison-reference-adjustments.mjs";
 import { QA_PREFIX, identityAvailability, createDisposableAdmin, sweepDisposableAdmins } from "./identity.mjs";
 import { renderReport, renderStatus } from "./report.mjs";
+import { ACTIVE_REFERENCE, referenceRootPath, verifyReferenceIntegrity } from "./reference-root.mjs";
 
 const here = path.dirname(fileURLToPath(import.meta.url));
 const repoRoot = path.resolve(here, "..", "..");
-const referenceRoot = path.join(repoRoot, "awesome-list-site-ds");
+const referenceRoot = referenceRootPath();
 const docsParityDir = path.join(repoRoot, "docs", "parity");
 const harnessEvidenceDir = path.join(docsParityDir, "evidence", "harness");
 
@@ -414,6 +415,8 @@ const main = async () => {
       frozenAt,
       reconciliation: catalogBinding.reconciliation,
     });
+    const referenceIntegrity = verifyReferenceIntegrity();
+    log(`[parity] reference ${referenceIntegrity.reference} (${referenceIntegrity.root}/) verified by ${referenceIntegrity.verifiedBy}`);
     const rawSnapshot = await snapshotDirectory(referenceRoot);
     const adapted = adaptReferenceSnapshot(rawSnapshot, { adapterScript, substitutions });
     const adjusted = applyComparisonReferenceAdjustments(rawSnapshot, adapted.served);
@@ -459,7 +462,7 @@ const main = async () => {
     };
     const startFingerprints = await fingerprintInputs();
     const gitCommit = execFileSync("git", ["rev-parse", "HEAD"], { cwd: repoRoot, encoding: "utf8" }).trim();
-    const gitDirty = execFileSync("git", ["status", "--porcelain=v1", "--", "client", "server", "shared", "awesome-list-site-ds", "artifacts/awesome-video-design-system", "tests/parity/inventory", "awesome-list.config.yaml"], { cwd: repoRoot, encoding: "utf8" }).trim().split("\n").filter(Boolean);
+    const gitDirty = execFileSync("git", ["status", "--porcelain=v1", "--", "client", "server", "shared", ACTIVE_REFERENCE.dir, "artifacts/awesome-video-design-system", "tests/parity/inventory", "awesome-list.config.yaml"], { cwd: repoRoot, encoding: "utf8" }).trim().split("\n").filter(Boolean);
 
     // ---- determinism mode ---------------------------------------------------
     if (cli.determinism) {
@@ -753,12 +756,13 @@ const main = async () => {
         documentReloads,
         fontFamilies: PARITY_FONT_FAMILIES,
         rowTimeoutMs: ROW_TIMEOUT_MS,
-        targets: { app: appBase, artifact: artifactBase, reference: "in-memory snapshot of awesome-list-site-ds on an ephemeral loopback port" },
+        targets: { app: appBase, artifact: artifactBase, reference: `in-memory snapshot of ${ACTIVE_REFERENCE.dir} on an ephemeral loopback port` },
       },
       inventory: { screens: inventory.screens.length, eligibility: countEligibility(inventory), generatedHash: sha256(await fsp.readFile(path.join(here, "inventory.json"))) },
       provenance: {
         gitCommit,
         gitDirtyPaths: gitDirty,
+        reference: referenceIntegrity,
         snapshot: { sha256: sha256(catalogBinding.snapshotBytes), categories: catalogBinding.adapter.AV_CATEGORIES.length, totalResources: catalogBinding.adapter.AV_TOTAL, reconciledPaths: catalogBinding.reconciledPaths },
         referenceAdapter: {
           adminGlobals: admin ? Object.keys(admin.globals) : [],

@@ -32,7 +32,7 @@
       "referenceAction": "mobile-drawer-responsive",
       "actualReadySelector": "header",
       "referenceReadySelector": "header",
-      "notes": "Open drawer through the actual header trigger at <=1024; at 1440 assert the trigger is hidden and capture the canonical closed desktop state."
+      "notes": "Open the drawer through the header trigger below 768px; at 768 and 1024 capture both sides closed (drawer is strictly below 768px by contract); at 1440 assert the trigger is hidden."
     },
     {
       "id": "app.not-found",

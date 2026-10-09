@@ -470,7 +470,7 @@
       "referenceAction": "home-curated",
       "actualReadySelector": "[data-testid=home-layout-curated] [data-testid=list-categories]",
       "referenceReadySelector": "main",
-      "notes": "Reference switches the tweaks-panel Home Layout to 'Curated · featured-first' (homeLayout=curated). The app uses the documented URL override so no forbidden on-page layout toggle is required."
+      "notes": "Reference switches the tweaks-panel Home Layout to the active reference's curated option ('Featured Grid' in the 09-29 handoff; homeLayout=curated). The app uses the documented URL override so no forbidden on-page layout toggle is required."
     },
     {
       "family": "home",
@@ -600,7 +600,7 @@
       "referenceAction": "mobile-drawer-responsive",
       "actualReadySelector": "header",
       "referenceReadySelector": "header",
-      "notes": "Open drawer through the actual header trigger at <=1024; at 1440 assert the trigger is hidden and capture the canonical closed desktop state."
+      "notes": "Open the drawer through the header trigger below 768px; at 768 and 1024 capture both sides closed (drawer is strictly below 768px by contract); at 1440 assert the trigger is hidden."
     },
     {
       "family": "shell",

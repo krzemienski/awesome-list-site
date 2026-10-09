@@ -2,9 +2,10 @@ import crypto from "node:crypto";
 import fs from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
+import { ACTIVE_REFERENCE } from "./reference-root.mjs";
 
 const here = path.dirname(fileURLToPath(import.meta.url));
-const manifestPath = path.join(here, "comparison-reference-adjustments.json");
+const manifestPath = path.join(here, ACTIVE_REFERENCE.adjustments);
 export const COMPARISON_REFERENCE_ADJUSTMENTS = Object.freeze(
   JSON.parse(fs.readFileSync(manifestPath, "utf8")),
 );
@@ -133,7 +134,7 @@ export function applyComparisonReferenceAdjustments(rawSnapshot, adaptedSnapshot
     served,
     provenance: {
       schemaVersion: manifest.schemaVersion,
-      manifest: "tests/parity/comparison-reference-adjustments.json",
+      manifest: `tests/parity/${ACTIVE_REFERENCE.adjustments}`,
       manifestSha256: sha256(fs.readFileSync(manifestPath)),
       decision: manifest.decision,
       application: "Exact, fail-closed transformation of in-memory served bytes before the reference server starts; frozen source files are not written.",

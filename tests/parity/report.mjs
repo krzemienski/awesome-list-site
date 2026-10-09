@@ -137,7 +137,7 @@ export function renderReport(results, { linkPrefix, stageRoot, determinismEviden
     "",
     describeRecoveries(results.configuration),
     "",
-    `Machine-readable result: ${link("results.json", "results.json")}; output hashes: ${link("OUTPUT-MANIFEST.json", "OUTPUT-MANIFEST.json")}. The reference was served from an in-memory snapshot on an ephemeral loopback port; awesome-list-site-ds/ was not modified (raw and served hashes are both recorded).`,
+    `Machine-readable result: ${link("results.json", "results.json")}; output hashes: ${link("OUTPUT-MANIFEST.json", "OUTPUT-MANIFEST.json")}. The reference was served from an in-memory snapshot on an ephemeral loopback port; the frozen reference root was not modified (raw and served hashes are both recorded).`,
     "",
     `Inputs changed during run: ${results.provenance.workspace.inputsChangedDuringRun ? "YES — stale" : "no"}. Live catalog/admin adapter hashes were re-read after the final row${results.provenance.referenceAdapter?.live?.error ? `, but the re-read was incomplete: ${results.provenance.referenceAdapter.live.error}` : ""}; ${measured.length ? `${measured.filter((row) => row.actualCaptureStability?.stableAttempts?.[0] > 1 || row.expectedCaptureStability?.stableAttempts?.[0] > 1).length} comparisons needed more than one raw frame before two consecutive frames were byte-identical; every attempt is retained.` : ""}`,
     "",

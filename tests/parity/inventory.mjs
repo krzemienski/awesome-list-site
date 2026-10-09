@@ -53,7 +53,7 @@ const screenSchema = z
       .optional()
       .describe("Subset of the configured widths; omit for all four"),
     actualPath: z.string().regex(pathPattern).optional().describe("Path on the actual target; {categorySlug} {subcategorySlug} {subSubcategorySlug} {resourceId} are resolved from the live catalog"),
-    referencePath: z.string().regex(pathPattern).optional().describe("Path inside awesome-list-site-ds served from the in-memory snapshot"),
+    referencePath: z.string().regex(pathPattern).optional().describe("Path inside the frozen reference root served from the in-memory snapshot"),
     actualAction: z.string().regex(actionPattern).optional().describe("Action id applied on the actual page before settling (see runner ACTIONS)"),
     referenceAction: z.string().regex(actionPattern).optional().describe("Action id applied on the reference page before settling"),
     actualReadySelector: z.string().min(1).optional(),

@@ -24,7 +24,7 @@
       "referenceAction": "home-curated",
       "actualReadySelector": "[data-testid=home-layout-curated] [data-testid=list-categories]",
       "referenceReadySelector": "main",
-      "notes": "Reference switches the tweaks-panel Home Layout to 'Curated · featured-first' (homeLayout=curated). The app uses the documented URL override so no forbidden on-page layout toggle is required."
+      "notes": "Reference switches the tweaks-panel Home Layout to the active reference's curated option ('Featured Grid' in the 09-29 handoff; homeLayout=curated). The app uses the documented URL override so no forbidden on-page layout toggle is required."
     },
     {
       "id": "app.search",

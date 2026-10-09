@@ -7,6 +7,8 @@ import esbuild from "esbuild";
 import React from "react";
 import { renderToStaticMarkup } from "react-dom/server";
 import { Clock, Grid2X2, Info, MoreHorizontal, Plus, Search } from "lucide-react";
+import { ACTIVE_REFERENCE } from "./reference-root.mjs";
+import { buildFooter0929, applyFooter0929 } from "./reference-footer-20260929.mjs";
 import {
   applyExpectedRetainedReferenceExtensions,
   buildExpectedReferenceExtensions,
@@ -468,6 +470,9 @@ export function buildReferenceReconciliation({
 
   return {
     version: 1,
+    ...(ACTIVE_REFERENCE.id === "20260929" ? {
+      footer0929: buildFooter0929(nav, { name: title, repoUrl, issuesUrl: siteConfig.issuesUrl }),
+    } : {}),
     site: {
       name: title,
       tagline: requireString(siteConfig.description, "config.site.description"),
@@ -555,6 +560,8 @@ const applyApprovedControlsStyle = async (page) => {
 };
 
 export async function applyExpectedPaletteControls(page, reconciliation) {
+  // CmdPalette's input/list/footer contract is identical in both frozen
+  // layout.jsx files. Share the projection, not a replacement app modal.
   const rootSelector = APPROVED_PALETTE_SCOPE.root;
   const rootCount = await page.locator(rootSelector).count();
   if (rootCount === 0) {
@@ -713,6 +720,7 @@ export async function applyExpectedPaletteControls(page, reconciliation) {
 
   return {
     status: "applied",
+    ...(ACTIVE_REFERENCE.id === "20260929" ? { reference: ACTIVE_REFERENCE.id, contract: "0929 CmdPalette retains the 0910 input/list/footer structure" } : {}),
     modified: ["palette Pages controls", "palette focused-input treatment", ...(result.history ? ["palette Recent searches controls"] : [])],
     scope: { root: rootSelector, pages: result.pages, history: result.history, rows: result.rows, focus: result.focus },
     source: [
@@ -733,13 +741,21 @@ export async function applyExpectedDrawerControls(page, reconciliation) {
   }
   if (rootCount !== 1) throw new Error(`Drawer reconciliation expected one open reference drawer, found ${rootCount}`);
   const { moreLinks, sourceProof } = projectionValues(reconciliation);
-  const result = await page.evaluate(({ moreLinks, moreIconSvg }) => {
+  const result = await page.evaluate(({ moreLinks, moreIconSvg, referenceId }) => {
     const drawer = document.querySelector(".mobile-drawer.open");
     if (!(drawer instanceof HTMLElement)) throw new Error("Drawer reconciliation could not find the frozen open drawer");
     drawer.dataset.parityDrawer = "approved";
     const footer = drawer.lastElementChild;
     if (!(footer instanceof HTMLElement)) throw new Error("Drawer reconciliation could not find the frozen drawer footer");
-    const footerLinks = footer.querySelector(":scope > div");
+    let footerLinks = footer.querySelector(":scope > div");
+    if (referenceId === "20260929" && !footerLinks) {
+      // 09-29 ends in a plain resource-count block, not 09-10's link group.
+      // Retain that design content and append only the approved More control.
+      footerLinks = document.createElement("div");
+      footerLinks.style.display = "flex";
+      footerLinks.style.justifyContent = "flex-end";
+      footer.append(footerLinks);
+    }
     if (!(footerLinks instanceof HTMLElement)) throw new Error("Drawer reconciliation could not find the frozen footer link group");
     const searchInput = drawer.querySelector(":scope > div:nth-child(2) input.search-input");
     if (!(searchInput instanceof HTMLInputElement)) throw new Error("Drawer reconciliation could not find the frozen drawer search input");
@@ -779,7 +795,7 @@ export async function applyExpectedDrawerControls(page, reconciliation) {
         ...more.querySelectorAll(":scope > summary"),
       ].length,
     };
-  }, { moreLinks, moreIconSvg: APPROVED_DRAWER_MORE_ICON_SVG });
+  }, { moreLinks, moreIconSvg: APPROVED_DRAWER_MORE_ICON_SVG, referenceId: ACTIVE_REFERENCE.id });
   return {
     status: "applied",
     modified: ["drawer More navigation", "drawer 44px target minimums"],
@@ -817,7 +833,7 @@ export async function applyExpectedReferenceReconciliation(page, {
   if (paletteControls.status === "applied" || drawerControls.status === "applied") {
     await applyApprovedControlsStyle(page);
   }
-  const expectedFooterCount = await page.locator("footer.site-footer").count();
+  const expectedFooterCount = await page.locator(ACTIVE_REFERENCE.id === "20260929" ? "main > footer" : "footer.site-footer").count();
   const actualFooterCount = actualPage ? await actualPage.locator("footer.app-footer").count() : null;
   const provenance = {
     version: reconciliation.version,
@@ -856,6 +872,17 @@ export async function applyExpectedReferenceReconciliation(page, {
     const error = new Error(`Expected reference footer count must be one for deterministic reconciliation (expected=${expectedFooterCount})`);
     error.referenceReconciliation = provenance;
     throw error;
+  }
+
+  if (ACTIVE_REFERENCE.id === "20260929") {
+    const footer = await applyFooter0929(page, reconciliation);
+    provenance.reference = ACTIVE_REFERENCE.id;
+    provenance.status = actualFooterCount === null ? "source-projected" : "applied";
+    provenance.adjustments = [...footer.modified, ...paletteControls.modified, ...drawerControls.modified,
+      ...(retainedExtensions.about?.modified || []), ...(retainedExtensions.admin?.modified || [])];
+    provenance.footerSourceProof = footer.sourceProof;
+    provenance.styles = { canonical: "0929 frozen PageFooter inline styles; retained link and accessibility declarations only (no app CSS)" };
+    return provenance;
   }
 
   await page.evaluate(({ reconciliation }) => {
@@ -950,7 +977,7 @@ export async function applyExpectedReferenceReconciliation(page, {
   provenance.styles = {
     inline: footerStyle,
     inlineSha256: sha256(footerStyle),
-    canonical: "awesome-list-site-ds/styles.css and frozen reference inline styles only",
+    canonical: "frozen reference styles.css and inline styles only",
   };
   return provenance;
 }

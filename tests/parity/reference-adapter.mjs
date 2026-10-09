@@ -1,11 +1,11 @@
 /**
  * Reference data adapters.
  *
- * The design source under awesome-list-site-ds/ renders from `AV_*` globals in
+ * The frozen design source (tests/parity/reference-root.mjs) renders from `AV_*` globals in
  * data.js plus a handful of hard-coded placeholder literals. To compare it
  * against the live app the harness binds those globals to the app's real data
  * at run time — in memory, on the served bytes only. Nothing under
- * awesome-list-site-ds/ is ever written.
+ * the frozen reference root is ever written.
  *
  * Two adapters exist:
  *   - catalog adapter: public, credential-less `/api/awesome-list(+/nav)`,
@@ -922,7 +922,7 @@ export function adaptReferenceSnapshot(referenceSnapshot, { adapterScript, subst
       unadapted,
       rawHashes: Object.fromEntries([...referenceSnapshot].map(([relative, bytes]) => [relative, sha256(bytes)])),
       servedHashes: Object.fromEntries([...served].map(([relative, bytes]) => [relative, sha256(bytes)])),
-      rule: "Substitutions are applied to the served in-memory bytes only; files under awesome-list-site-ds/ are never modified. Unavailable literals are left as designed and listed under unadapted.",
+      rule: "Substitutions are applied to the served in-memory bytes only; files under the frozen reference root are never modified. Unavailable literals are left as designed and listed under unadapted.",
     },
   };
 }

@@ -158,7 +158,7 @@
                 "pattern": "^\\/[^\\s]*$"
               },
               "referencePath": {
-                "description": "Path inside awesome-list-site-ds served from the in-memory snapshot",
+                "description": "Path inside the frozen reference root served from the in-memory snapshot",
                 "type": "string",
                 "pattern": "^\\/[^\\s]*$"
               },

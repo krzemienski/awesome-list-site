@@ -7,6 +7,8 @@
  * yet throws ActionUnavailableError, which the runner records as BLOCKED with
  * the reason — never silently captured as a different state.
  */
+import { ACTIVE_REFERENCE } from "./reference-root.mjs";
+
 export class ActionUnavailableError extends Error {
   constructor(message) {
     super(message);
@@ -162,14 +164,17 @@ export async function applyAction(page, action, side, { tokens }) {
   if (action === "home-index") {
     if (side === "reference") {
       await referenceGo(page, "home", tokens);
-      await page.waitForFunction(() => /INDEX ·/.test(document.body.innerText), null, { timeout: 15_000 });
+      const { tweak, eyebrow } = ACTIVE_REFERENCE.homeLayouts.index;
+      if (tweak) await setReferenceTweak(page, tweak, eyebrow);
+      else await page.waitForFunction((pattern) => new RegExp(pattern).test(document.body.innerText), eyebrow, { timeout: 15_000 });
     }
     return;
   }
   if (action === "home-curated") {
     if (side === "reference") {
       await referenceGo(page, "home", tokens);
-      await setReferenceTweak(page, "Curated · featured-first", "CURATED ·");
+      const { tweak, eyebrow } = ACTIVE_REFERENCE.homeLayouts.curated;
+      await setReferenceTweak(page, tweak, eyebrow);
       return;
     }
     const control = page.locator('[data-testid="home-layout-curated"]').or(page.getByRole("button", { name: /curated/i })).or(page.getByRole("tab", { name: /curated/i })).first();
@@ -181,6 +186,14 @@ export async function applyAction(page, action, side, { tokens }) {
     await control.click();
     return;
   }
+  if (side === "reference" && (action === "palette" || action.startsWith("mobile-drawer"))) {
+    // Shell overlays sit on "/", which the app renders in its default Index
+    // layout (DEFAULT_HOME_LAYOUT). A reference whose own default differs
+    // must be switched first, or the page under the overlay is another layout.
+    await referenceGo(page, "home", tokens);
+    const { tweak, eyebrow } = ACTIVE_REFERENCE.homeLayouts.index;
+    if (tweak) await setReferenceTweak(page, tweak, eyebrow);
+  }
   if (action === "palette") {
     await page.locator(side === "actual" ? "[data-testid=list-categories]" : "header").first().waitFor({ state: "visible", timeout: 60_000 });
     await page.keyboard.press("Control+K");
@@ -190,6 +203,12 @@ export async function applyAction(page, action, side, { tokens }) {
   if (action === "mobile-drawer-responsive" && page.viewportSize().width > 1024) {
     const trigger = page.getByRole("button", { name: side === "actual" ? "Toggle sidebar" : "Open menu", exact: true });
     if (await trigger.isVisible()) throw new ActionUnavailableError("Desktop drawer trigger must be hidden above 1024px");
+    return;
+  }
+  if (action === "mobile-drawer-responsive" && page.viewportSize().width >= 768) {
+    // The approved contract reserves the drawer for widths strictly below
+    // 768px; at tablet widths both sides are captured closed, so an extra
+    // trigger on either side shows up as a real header difference.
     return;
   }
   if (action === "mobile-drawer" || action === "mobile-drawer-responsive") {

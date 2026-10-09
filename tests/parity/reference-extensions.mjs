@@ -3,6 +3,7 @@ import fsSync from "node:fs";
 import path from "node:path";
 import { operationsStyle, projectOperations } from "./reference-admin-operations.mjs";
 import { catalogStyle, projectCatalog } from "./reference-admin-catalog.mjs";
+import { ACTIVE_REFERENCE } from "./reference-root.mjs";
 
 const sha256 = (value) => crypto.createHash("sha256").update(value).digest("hex");
 
@@ -1113,6 +1114,10 @@ export async function applyExpectedRetainedReferenceExtensions(page, extension) 
   }, { extension, source: browserProjectionSource });
   return {
     status: [result.about, result.admin, result.taxonomy].some((item) => item?.status === "applied") ? "applied" : "not-applicable",
+    ...(ACTIVE_REFERENCE.id === "20260929" ? {
+      reference: ACTIVE_REFERENCE.id,
+      contract: "0929 retains main .page-content and AboutPage; retired admin projections remain disabled",
+    } : {}),
     about: result.about,
     admin: result.admin,
     taxonomy: result.taxonomy,

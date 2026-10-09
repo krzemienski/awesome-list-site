@@ -2,6 +2,7 @@ import crypto from "node:crypto";
 import fs from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
+import { referenceFilePath } from "./reference-root.mjs";
 
 /*
  * This is an expected-side projection for the three retained admin product
@@ -23,8 +24,8 @@ const sourcePaths = Object.freeze({
   enrichmentRepository: path.join(repoRoot, "server", "repositories", "EnrichmentRepository.ts"),
   schema: path.join(repoRoot, "shared", "schema.ts"),
   validation: path.join(repoRoot, "shared", "validation.ts"),
-  frozenAdmin: path.join(repoRoot, "awesome-list-site-ds", "admin.jsx"),
-  frozenStyles: path.join(repoRoot, "awesome-list-site-ds", "styles.css"),
+  frozenAdmin: referenceFilePath("admin.jsx"),
+  frozenStyles: referenceFilePath("styles.css"),
 });
 
 const readSourceContract = () => {

@@ -2,6 +2,7 @@ import crypto from "node:crypto";
 import fsSync from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
+import { ACTIVE_REFERENCE, referenceFilePath } from "./reference-root.mjs";
 
 const repoRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..", "..");
 const sha256 = (value) => crypto.createHash("sha256").update(value).digest("hex");
@@ -21,8 +22,8 @@ const operationsSourcePaths = Object.freeze({
   database: path.join(repoRoot, "client", "src", "components", "admin", "DatabaseTab.tsx"),
   export: path.join(repoRoot, "client", "src", "components", "admin", "ExportTab.tsx"),
   github: path.join(repoRoot, "client", "src", "components", "admin", "GitHubSyncPanel.tsx"),
-  frozenAdmin: path.join(repoRoot, "awesome-list-site-ds", "admin.jsx"),
-  frozenStyles: path.join(repoRoot, "awesome-list-site-ds", "styles.css"),
+  frozenAdmin: referenceFilePath("admin.jsx"),
+  frozenStyles: referenceFilePath("styles.css"),
 });
 
 /**
@@ -46,11 +47,11 @@ const READ_ONLY_OPERATION_ROUTES = Object.freeze({
  */
 const operationsStyleOrigins = Object.freeze([
   Object.freeze({
-    file: "awesome-list-site-ds/admin.jsx",
+    file: `${ACTIVE_REFERENCE.dir}/admin.jsx`,
     primitives: [".card", ".btn", ".table", ".chip", ".tabs", ".tab.active"],
   }),
   Object.freeze({
-    file: "awesome-list-site-ds/styles.css",
+    file: `${ACTIVE_REFERENCE.dir}/styles.css`,
     tokens: [
       "--text",
       "--text-2",
