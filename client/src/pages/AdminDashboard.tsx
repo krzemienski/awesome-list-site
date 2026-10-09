@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { signInHrefForCurrentLocation } from "@/lib/returnUrl";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Shield, Activity, Sparkles, Zap, List, ArrowRight, Database, Folder, Users, LayoutGrid, Plus, Settings, ChevronLeft, ChevronRight } from "lucide-react";
 import { useAdmin } from "@/hooks/useAdmin";
@@ -75,7 +76,13 @@ function revealTabTrigger(scroller: HTMLElement, trigger: HTMLElement) {
 }
 
 export default function AdminDashboard() {
-  const { stats, isLoading, error } = useAdmin();
+  const { stats, isLoading, error: statsError } = useAdmin();
+  // Only a first-load failure or an expired session replaces the dashboard;
+  // a failed background poll keeps the last good stats on screen.
+  const error =
+    statsError && (!stats || (statsError instanceof ApiError && statsError.status === 401))
+      ? statsError
+      : null;
   const { isAuthenticated, user, isLoading: authLoading } = useAuth();
   const isAdmin = Boolean(user && (user as { role?: string }).role === "admin");
 
@@ -255,7 +262,7 @@ export default function AdminDashboard() {
               <p className="text-sm text-[var(--text)] mb-3">
                 You must be signed in as an administrator to view this page.
               </p>
-              <WLink href="/sign-in" className="inline-flex items-center gap-2 text-sm font-medium text-[var(--accent)] underline" data-testid="link-admin-login">
+              <WLink href={signInHrefForCurrentLocation("/admin")} className="inline-flex items-center gap-2 text-sm font-medium text-[var(--accent)] underline" data-testid="link-admin-login">
                 Sign in to continue →
               </WLink>
             </>
@@ -293,7 +300,7 @@ export default function AdminDashboard() {
                 Your session has expired. Sign in again to continue.
               </p>
               <WLink
-                href={`/sign-in?redirect_url=${encodeURIComponent(window.location.pathname + window.location.search)}`}
+                href={signInHrefForCurrentLocation("/admin")}
                 className="inline-flex items-center gap-2 text-sm font-medium text-[var(--accent)] underline"
                 data-testid="link-session-expired-login"
               >

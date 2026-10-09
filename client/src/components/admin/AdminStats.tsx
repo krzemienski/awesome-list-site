@@ -1,3 +1,4 @@
+import { useEffect, useRef } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { apiRequest } from "@/lib/queryClient";
 import { formatRelativeAgo } from "@/lib/utils";
@@ -98,11 +99,27 @@ export default function AdminStats({
   isLoading,
   onNavigate,
 }: AdminStatsProps) {
+  // The oldest-age subtext needs the pending list itself. Poll it on the same
+  // 30s cadence as the stats query (useAdmin) and re-read it immediately
+  // whenever the polled authoritative count moves, so the count and its age
+  // never describe different snapshots for long.
   const pending = useQuery<PendingResponse>({
     queryKey: ["/api/admin/pending-resources", "overview-stat"],
     queryFn: () => apiRequest("/api/admin/pending-resources"),
     staleTime: 30_000,
+    refetchInterval: 30_000,
+    refetchOnWindowFocus: true,
   });
+  const polledPendingTotal = stats?.totalPending ?? stats?.pendingApprovals;
+  const lastPolledTotal = useRef(polledPendingTotal);
+  const { refetch: refetchPending } = pending;
+  useEffect(() => {
+    if (polledPendingTotal === undefined) return;
+    if (lastPolledTotal.current !== undefined && lastPolledTotal.current !== polledPendingTotal) {
+      void refetchPending();
+    }
+    lastPolledTotal.current = polledPendingTotal;
+  }, [polledPendingTotal, refetchPending]);
   const users = useQuery<UserSummary[]>({
     queryKey: ["/api/admin/users", "overview-all"],
     queryFn: getAllUsers,
@@ -119,10 +136,11 @@ export default function AdminStats({
     staleTime: 60_000,
   });
   const pendingResources = pending.data?.resources ?? [];
-  const pendingCount = pending.data?.total
-    ?? pending.data?.resources?.length
-    ?? stats?.totalPending
-    ?? stats?.pendingApprovals;
+  // The polled stats count is authoritative; the separately cached list only
+  // fills in before stats arrive (it must never override a fresher count).
+  const pendingCount = polledPendingTotal
+    ?? pending.data?.total
+    ?? pending.data?.resources?.length;
   // The stats route intentionally does not forward the repository's
   // all-users count. Keep this card tied to the sequential user pages so its
   // value and role split use the same 30-day updatedAt definition.

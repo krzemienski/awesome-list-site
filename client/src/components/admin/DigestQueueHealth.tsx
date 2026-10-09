@@ -1,5 +1,5 @@
 import { useQuery } from "@tanstack/react-query";
-import { Activity, AlertTriangle, CheckCircle2, Clock3, Radio } from "lucide-react";
+import { Activity, AlertTriangle, CheckCircle2, Clock3, Radio, RefreshCw } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { formatAdminDateTime } from "@/lib/utils";
@@ -20,8 +20,26 @@ const title = (value: string) => value.replace(/_/g, " ").replace(/\b\w/g, (c) =
 // finished ones (sent/failed/skipped). Only these are still in the queue.
 const IN_QUEUE_STATUSES: ReadonlySet<string> = new Set<DigestJobStatus>(["queued", "processing"]);
 
+// The hourly scheduler and workers change queue state independently of this
+// page, so health is polled (the global defaults never refetch on their own).
+const DIGEST_HEALTH_POLL_MS = 30_000;
+
+const formatUpdatedAt = (timestamp: number) =>
+  new Date(timestamp).toLocaleTimeString("en-US", {
+    hour: "2-digit", minute: "2-digit", second: "2-digit",
+  });
+
 export default function DigestQueueHealth() {
-  const query = useQuery<Health>({ queryKey: ["/api/admin/digests/health"] });
+  const query = useQuery<Health>({
+    queryKey: ["/api/admin/digests/health"],
+    staleTime: DIGEST_HEALTH_POLL_MS / 2,
+    refetchInterval: DIGEST_HEALTH_POLL_MS,
+    refetchOnWindowFocus: true,
+    retry: false,
+  });
+  // A failed poll after a good load keeps the last snapshot on screen but
+  // marks it stale; it never silently pretends to be current.
+  const staleSnapshot = query.isError && query.data !== undefined;
   const total = query.data
     ? Object.values(query.data.queue).reduce(
       (sum, statuses) => sum + Object.entries(statuses).reduce(
@@ -42,6 +60,30 @@ export default function DigestQueueHealth() {
           Aggregate transport and queue signals only. No message contents, user
           data, recipient identifiers, or secret tokens are shown.
         </p>
+        <div className="flex flex-wrap items-center gap-3">
+          <p
+            className="text-xs text-[color:var(--text-2)]"
+            aria-live="polite"
+            data-testid="text-digest-health-updated"
+          >
+            {query.dataUpdatedAt
+              ? `${staleSnapshot ? "Last good update" : "Updated"} ${formatUpdatedAt(query.dataUpdatedAt)} · refreshes every ${DIGEST_HEALTH_POLL_MS / 1000}s`
+              : `Refreshes every ${DIGEST_HEALTH_POLL_MS / 1000}s`}
+          </p>
+          <Button
+            type="button"
+            variant="outline"
+            size="sm"
+            className="min-h-[44px]"
+            onClick={() => { if (!query.isFetching) void query.refetch(); }}
+            aria-disabled={query.isFetching}
+            aria-busy={query.isFetching}
+            data-testid="button-digest-health-refresh"
+          >
+            <RefreshCw className={`h-4 w-4 mr-2 ${query.isFetching ? "animate-spin" : ""}`} aria-hidden="true" />
+            Refresh
+          </Button>
+        </div>
       </CardHeader>
       <CardContent>
         {query.isLoading ? (
@@ -49,7 +91,7 @@ export default function DigestQueueHealth() {
             <div className="skeleton h-16 w-full" />
             <div className="skeleton h-28 w-full" />
           </div>
-        ) : query.isError ? (
+        ) : query.isError && !query.data ? (
           <div className="p-4 text-sm" role="alert">
             <p className="text-destructive">Health data is unavailable.</p>
             <Button
@@ -62,6 +104,18 @@ export default function DigestQueueHealth() {
           </div>
         ) : query.data ? (
           <div className="space-y-6">
+            {staleSnapshot && (
+              <div
+                className="rounded border border-destructive/40 bg-destructive/10 p-3 text-sm"
+                role="alert"
+                data-testid="alert-digest-health-stale"
+              >
+                <p className="text-destructive font-medium">
+                  Couldn&apos;t refresh health data. Showing the last successful
+                  snapshot{query.dataUpdatedAt ? ` from ${formatUpdatedAt(query.dataUpdatedAt)}` : ""}; it may be out of date.
+                </p>
+              </div>
+            )}
             <div className="ops-digest-health__stat-grid">
               <Stat
                 label={

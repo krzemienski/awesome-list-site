@@ -80,6 +80,33 @@ const ACTION_STATUS: Record<string, string> = {
   "database.exported": "completed",
   maintenance_backfill_approved_at: "completed",
   maintenance_canonicalize_tags: "completed",
+  "user.name_changed": "completed",
+  "user.role_changed": "completed",
+  "user.deleted": "completed",
+  "journey.updated": "completed",
+  "journey.step_created": "completed",
+  "journey.step_updated": "completed",
+  "journey.step_group_updated": "completed",
+  "journey.step_deleted": "completed",
+  "journey.step_group_deleted": "completed",
+  "journey.steps_reordered": "completed",
+};
+
+/* User-management and journey entries carry their own target identity in
+   `changes.target` (copied at write time so it survives deletion). User
+   targets are emails, so they follow the same mask as the actor column. */
+const recordedTarget = (changes: AuditLogEntry["changes"]): string | null => {
+  const target = changes?.target;
+  if (!target || typeof target !== "object") return null;
+  if (target.type === "user") {
+    return typeof target.email === "string" && target.email
+      ? `User ${maskEmail(target.email)}`
+      : `User ${String(target.id ?? "").slice(0, 12)}`;
+  }
+  if (target.type === "journey") {
+    return typeof target.label === "string" ? `Journey: ${target.label}` : `Journey #${target.id}`;
+  }
+  return null;
 };
 
 const LIMIT_OPTIONS = ["25", "50", "100", "200"];
@@ -170,6 +197,8 @@ export default function AuditTab() {
   // recorded title (nested `changes.resource.title` for delete/approve rows,
   // flat `changes.title` for edits), else the resource number, else "System".
   const targetLabel = (log: AuditLogEntry): string => {
+    const recorded = recordedTarget(log.changes);
+    if (recorded) return recorded;
     const nested = log.changes?.resource;
     const title = (nested && typeof nested === "object" && typeof nested.title === "string"
       ? nested.title
@@ -477,7 +506,7 @@ export default function AuditTab() {
                     {selectedLog.action.replace(/_/g, ' ')} ·{" "}
                     {selectedLog.originalResourceId || selectedLog.resourceId
                       ? `Resource #${selectedLog.originalResourceId || selectedLog.resourceId}`
-                      : "system"}{" "}
+                      : recordedTarget(selectedLog.changes) ?? "system"}{" "}
                     · {formatDate(selectedLog.createdAt)}
                   </>
                 )}

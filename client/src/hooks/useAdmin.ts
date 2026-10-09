@@ -54,7 +54,10 @@ export function useAdmin() {
   });
 
   return {
-    stats: isAdmin && !error ? stats : undefined,
+    // A failed poll keeps the last good snapshot: one dropped request must
+    // not blank the whole dashboard (AdminDashboard only hard-fails when
+    // there is nothing to show or the session expired).
+    stats: isAdmin ? stats : undefined,
     isLoading: isAdmin ? isLoading : false,
     error: isAdmin ? error : undefined,
   };

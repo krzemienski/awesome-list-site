@@ -190,6 +190,13 @@
       "when": 1787330100000,
       "tag": "0050_account_theme_preferences",
       "breakpoints": true
+    },
+    {
+      "idx": 27,
+      "version": "7",
+      "when": 1791561600000,
+      "tag": "0053_deleted_user_tombstones",
+      "breakpoints": true
     }
   ]
 }

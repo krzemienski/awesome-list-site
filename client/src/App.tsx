@@ -10,6 +10,7 @@ import {
   type ReactNode,
 } from "react";
 import { Switch, Route, Redirect, useLocation, useSearch } from "wouter";
+import { foldInheritedHashIntoRedirect, sanitizeRedirectParam } from "@/lib/returnUrl";
 import { discoveryRedirect } from "@shared/discovery-params";
 import { ClerkProvider, SignIn, SignUp, useAuth as useClerkAuth, useClerk } from "@clerk/react";
 import { AccountThemePreferenceBridge } from "@/components/ui/theme-provider";
@@ -455,6 +456,11 @@ function LegacyAuthRedirect({ to }: { to: "/sign-in" | "/sign-up" }) {
 }
 
 function SignInPage() {
+  // A server-guard 302 from /admin#users keeps "#users" on this URL but not in
+  // redirect_url; fold it in before Clerk reads the parameter (idempotent).
+  // Unsafe redirect_url values are dropped first so Clerk never sees them.
+  sanitizeRedirectParam();
+  foldInheritedHashIntoRedirect();
   // /sign-in?admin shows the owner password form instead of Clerk.
   const adminPasswordMode =
     typeof window !== "undefined" &&

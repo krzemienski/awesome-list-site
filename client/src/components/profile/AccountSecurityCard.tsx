@@ -26,6 +26,7 @@ export default function AccountSecurityCard() {
         <CardDescription>
           Change your password, review devices where you're signed in, and
           manage connected sign-in methods in your secure account settings.
+          App API keys are managed separately, below.
         </CardDescription>
       </CardHeader>
       <CardContent>

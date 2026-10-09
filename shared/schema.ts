@@ -124,6 +124,30 @@ export type UpsertUser = typeof users.$inferInsert;
 export type User = typeof users.$inferSelect;
 
 /**
+ * Deleted account tombstones (migrations/0053_deleted_user_tombstones.sql).
+ * Written in the same transaction that removes a user row. Clerk session JWTs
+ * are verified offline, so a token minted before deletion stays valid for up
+ * to its lifetime; JIT provisioning refuses any bridge id OR Clerk user id
+ * listed here so a deleted account can never be silently re-created. No FKs:
+ * the tombstone must outlive the user row it describes.
+ */
+export const deletedUserTombstones = pgTable(
+  "deleted_user_tombstones",
+  {
+    bridgeUserId: varchar("bridge_user_id").primaryKey(),
+    clerkUserId: varchar("clerk_user_id"),
+    email: varchar("email"),
+    deletedBy: varchar("deleted_by"),
+    deletedAt: timestamp("deleted_at").defaultNow().notNull(),
+  },
+  (table) => [
+    index("deleted_user_tombstones_clerk_user_id_idx").on(table.clerkUserId),
+  ],
+);
+
+export type DeletedUserTombstone = typeof deletedUserTombstones.$inferSelect;
+
+/**
  * API Keys table for programmatic API access
  *
  * Stores API keys for third-party integrations and programmatic access to resources.

@@ -143,7 +143,7 @@ export default function UsersTab() {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['/api/admin/users'] });
-      toast({ title: "User Deleted", description: "The user account has been removed." });
+      toast({ title: "User Deleted", description: "The account and its sign-in identity have been removed." });
       deletedUserRef.current = true;
       setUserToDelete(null);
     },
@@ -552,9 +552,11 @@ export default function UsersTab() {
                     ? (revealedIds.has(userToDelete.id) ? userToDelete.email : maskEmail(userToDelete.email))
                     : userToDelete?.id}
                 </span>{" "}
-                along with their bookmarks, favorites, progress, and API keys.
-                Any resources they submitted stay in the catalog (attribution is
-                removed). This cannot be undone.
+                along with their sign-in identity, bookmarks, favorites, progress,
+                and API keys. They are signed out everywhere and the account
+                cannot be re-created from an old session. Any resources they
+                submitted stay in the catalog (attribution is removed). This
+                cannot be undone.
               </AlertDialogDescription>
             </AlertDialogHeader>
             <AlertDialogFooter>

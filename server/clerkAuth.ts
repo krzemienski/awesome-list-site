@@ -21,9 +21,9 @@
 import type { Request, RequestHandler } from "express";
 import { createHash, createHmac, timingSafeEqual } from "node:crypto";
 import { getAuth } from "@clerk/express";
-import { eq } from "drizzle-orm";
+import { eq, or } from "drizzle-orm";
 import { db } from "./db";
-import { users, type User } from "@shared/schema";
+import { deletedUserTombstones, users, type User } from "@shared/schema";
 import { trackServerEvent } from "./lib/mixpanelServer";
 
 export interface ClerkSessionIdentity {
@@ -94,6 +94,27 @@ export async function ensureDbUser(
     .where(eq(users.id, identity.bridgeUserId))
     .limit(1);
   if (existing) return existing;
+
+  // Admin-deleted accounts leave a tombstone (bridge id + Clerk id). Session
+  // JWTs are verified offline, so a token minted before the deletion can
+  // still arrive here; never re-provision it. Only checked on the JIT path,
+  // so signed-in requests for existing rows pay nothing extra.
+  const [tombstone] = await db
+    .select({ bridgeUserId: deletedUserTombstones.bridgeUserId })
+    .from(deletedUserTombstones)
+    .where(
+      or(
+        eq(deletedUserTombstones.bridgeUserId, identity.bridgeUserId),
+        eq(deletedUserTombstones.clerkUserId, identity.clerkUserId),
+      ),
+    )
+    .limit(1);
+  if (tombstone) {
+    console.warn(
+      `[clerkAuth] refusing JIT provisioning for deleted account ${identity.bridgeUserId}`,
+    );
+    return undefined;
+  }
 
   await db
     .insert(users)

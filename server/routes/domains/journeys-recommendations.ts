@@ -376,7 +376,7 @@ export function registerJourneyRoutes(
       if (!journey) {
         return res.status(404).json({ message: 'Journey not found' });
       }
-      const updated = await learningJourneyRepo.updateLearningJourney(journeyId, parsed.data);
+      const updated = await learningJourneyRepo.updateLearningJourney(journeyId, parsed.data, { actorId: (req as any).dbUser?.id });
       res.json(updated);
     } catch (error) {
       console.error('Error updating journey:', error);
@@ -437,7 +437,7 @@ export function registerJourneyRoutes(
         description: parsed.description ?? null,
         resourceId: parsed.resourceId ?? null,
         isOptional: parsed.isOptional ?? false,
-      });
+      }, { actorId: (req as any).dbUser?.id });
       res.status(201).json(step);
     } catch (error) {
       if (error instanceof z.ZodError) {
@@ -485,7 +485,7 @@ export function registerJourneyRoutes(
         if (req.query.group === 'true' && parsed.resourceId !== undefined && steps.filter(s => s.stepNumber === existing.stepNumber).length > 1) {
           return res.status(400).json({ message: 'Edit individual resource links separately from group content' });
         }
-        const updated = await learningJourneyRepo.updateJourneyStep(stepId, parsed, req.query.group === 'true');
+        const updated = await learningJourneyRepo.updateJourneyStep(stepId, parsed, req.query.group === 'true', { actorId: (req as any).dbUser?.id });
         res.json(updated);
       } catch (error) {
         if (error instanceof z.ZodError) {
@@ -525,7 +525,7 @@ export function registerJourneyRoutes(
         if (req.query.group !== undefined && req.query.group !== 'true') {
           return res.status(400).json({ message: 'group must be true when supplied' });
         }
-        await learningJourneyRepo.deleteJourneyStep(stepId, req.query.group === 'true');
+        await learningJourneyRepo.deleteJourneyStep(stepId, req.query.group === 'true', { actorId: (req as any).dbUser?.id });
         res.json({ success: true });
       } catch (error) {
         console.error('Error deleting journey step:', error);
@@ -585,6 +585,7 @@ export function registerJourneyRoutes(
           groups.flatMap((groupIds, i) =>
             groupIds.map((id) => ({ id, stepNumber: i + 1 })),
           ),
+          { actorId: (req as any).dbUser?.id },
         );
         res.json({ steps });
       } catch (error) {

@@ -64,6 +64,7 @@ import FavoriteButton from "@/components/resource/FavoriteButton";
 import BookmarkButton from "@/components/resource/BookmarkButton";
 import AIRecommendationsPanel from "@/components/ui/ai-recommendations-panel";
 import AccountSecurityCard from "@/components/profile/AccountSecurityCard";
+import ApiKeysCard from "@/components/profile/ApiKeysCard";
 import ContinueLearningPreview from "@/components/learning/ContinueLearningPreview";
 import { useAuth } from "@/hooks/useAuth";
 import { formatDistanceToNow } from "date-fns";
@@ -913,6 +914,8 @@ export default function Profile({ user }: ProfileProps) {
         <TabsContent value="security" data-testid="tab-security">
           <div className="space-y-6">
             <AccountSecurityCard />
+
+            <ApiKeysCard />
 
             {/* Run22 BUG-020: private account/data-deletion request — no
                 public GitHub issue (or personal-data exposure) required. */}

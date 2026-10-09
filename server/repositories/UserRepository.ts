@@ -24,6 +24,8 @@
 import {
   users,
   apiKeys,
+  deletedUserTombstones,
+  resourceAuditLog,
   type User,
   type UpsertUser,
   type ApiKey,
@@ -36,6 +38,20 @@ import { generateApiKey, hashApiKey } from "../apiKeyUtils";
 /**
  * Repository class for user-related database operations
  */
+/**
+ * Target identity copied into user-management audit entries so the record
+ * stays meaningful after the user row (and the FK-joined email) is gone.
+ */
+function userAuditTarget(user: Pick<User, "id" | "email" | "firstName" | "lastName">) {
+  const name = [user.firstName, user.lastName].filter(Boolean).join(" ");
+  return {
+    type: "user" as const,
+    id: user.id,
+    email: user.email ?? null,
+    label: user.email ?? (name || user.id),
+  };
+}
+
 export class UserRepository {
   /**
    * Get a user by their ID
@@ -263,6 +279,80 @@ export class UserRepository {
   }
 
   /**
+   * Admin rename with its audit entry in ONE transaction (no audit row for a
+   * failed write, no write without its audit row). The target identity is
+   * copied into `changes.target` so the entry survives the user's deletion.
+   * @returns the updated user, or undefined when no user has that id
+   */
+  async adminUpdateUserName(
+    userId: string,
+    profile: { firstName?: string | null; lastName?: string | null },
+    actorId: string | undefined,
+  ): Promise<User | undefined> {
+    return await db.transaction(async (tx) => {
+      const [before] = await tx.select().from(users).where(eq(users.id, userId)).for("update");
+      if (!before) return undefined;
+      const unchanged =
+        (profile.firstName === undefined || profile.firstName === before.firstName) &&
+        (profile.lastName === undefined || profile.lastName === before.lastName);
+      // A no-op rename changes nothing, so it writes no audit entry.
+      if (unchanged) return before;
+      const set: Record<string, unknown> = { updatedAt: new Date() };
+      if (profile.firstName !== undefined) set.firstName = profile.firstName;
+      if (profile.lastName !== undefined) set.lastName = profile.lastName;
+      const [after] = await tx.update(users).set(set).where(eq(users.id, userId)).returning();
+      await tx.insert(resourceAuditLog).values({
+        resourceId: null,
+        originalResourceId: null,
+        action: "user.name_changed",
+        performedBy: actorId,
+        changes: {
+          target: userAuditTarget(before),
+          before: { firstName: before.firstName, lastName: before.lastName },
+          after: { firstName: after.firstName, lastName: after.lastName },
+        },
+        notes: `Display name changed for ${userAuditTarget(before).label}`,
+      });
+      return after;
+    });
+  }
+
+  /**
+   * Admin role change with its audit entry in ONE transaction.
+   * @returns the updated user, or undefined when no user has that id
+   */
+  async adminUpdateUserRole(
+    userId: string,
+    role: string,
+    actorId: string | undefined,
+  ): Promise<User | undefined> {
+    return await db.transaction(async (tx) => {
+      const [before] = await tx.select().from(users).where(eq(users.id, userId)).for("update");
+      if (!before) return undefined;
+      // A no-op role change changes nothing, so it writes no audit entry.
+      if (before.role === role) return before;
+      const [after] = await tx
+        .update(users)
+        .set({ role, updatedAt: new Date() })
+        .where(eq(users.id, userId))
+        .returning();
+      await tx.insert(resourceAuditLog).values({
+        resourceId: null,
+        originalResourceId: null,
+        action: "user.role_changed",
+        performedBy: actorId,
+        changes: {
+          target: userAuditTarget(before),
+          before: { role: before.role },
+          after: { role: after.role },
+        },
+        notes: `Role changed from ${before.role ?? "user"} to ${after.role ?? "user"} for ${userAuditTarget(before).label}`,
+      });
+      return after;
+    });
+  }
+
+  /**
    * Set or clear the account-deletion request marker (Run22 BUG-020).
    * A timestamp = pending private deletion request; NULL = none. Idempotent:
    * re-requesting keeps the ORIGINAL request time (first-come queue order),
@@ -298,8 +388,17 @@ export class UserRepository {
    * @param userId - ID of the user to delete
    * @returns Counts of detached resources and deleted edit suggestions
    */
-  async deleteUserWithCleanup(userId: string): Promise<{ resourcesDetached: number; editsDeleted: number }> {
+  async deleteUserWithCleanup(
+    userId: string,
+    options: {
+      /** Durable JIT block (bridge id + Clerk id); see deletedUserTombstones. */
+      tombstone?: { clerkUserId: string | null; deletedBy: string | undefined };
+      /** Actor-attributed user.deleted audit entry, written in the same tx. */
+      audit?: { actorId: string | undefined; clerkIdentity: string };
+    } = {},
+  ): Promise<{ resourcesDetached: number; editsDeleted: number }> {
     return await db.transaction(async (tx) => {
+      const [target] = await tx.select().from(users).where(eq(users.id, userId)).for("update");
       const detachedSubmitted = await tx.execute(
         sql`UPDATE resources SET submitted_by = NULL WHERE submitted_by = ${userId}`
       );
@@ -313,11 +412,52 @@ export class UserRepository {
       await tx.execute(sql`UPDATE github_sync_history SET performed_by = NULL WHERE performed_by = ${userId}`);
       await tx.execute(sql`UPDATE enrichment_jobs SET started_by = NULL WHERE started_by = ${userId}`);
       await tx.execute(sql`UPDATE research_jobs SET started_by = NULL WHERE started_by = ${userId}`);
-      await tx.delete(users).where(eq(users.id, userId));
-      return {
+      const deleted = await tx.delete(users).where(eq(users.id, userId)).returning({ id: users.id });
+      const summary = {
         resourcesDetached: (detachedSubmitted.rowCount ?? 0) + (detachedApproved.rowCount ?? 0),
         editsDeleted: editsDeleted.rowCount ?? 0,
       };
+      if (deleted.length > 0 && options.tombstone) {
+        await tx
+          .insert(deletedUserTombstones)
+          .values({
+            bridgeUserId: userId,
+            clerkUserId: options.tombstone.clerkUserId,
+            email: target?.email ?? null,
+            deletedBy: options.tombstone.deletedBy ?? null,
+          })
+          .onConflictDoUpdate({
+            target: deletedUserTombstones.bridgeUserId,
+            set: {
+              clerkUserId: options.tombstone.clerkUserId,
+              email: target?.email ?? null,
+              deletedBy: options.tombstone.deletedBy ?? null,
+              deletedAt: new Date(),
+            },
+          });
+      }
+      if (deleted.length > 0 && options.audit && target) {
+        await tx.insert(resourceAuditLog).values({
+          resourceId: null,
+          originalResourceId: null,
+          action: "user.deleted",
+          performedBy: options.audit.actorId,
+          changes: {
+            target: userAuditTarget(target),
+            before: {
+              role: target.role,
+              firstName: target.firstName,
+              lastName: target.lastName,
+              createdAt: target.createdAt,
+            },
+            after: null,
+            clerkIdentity: options.audit.clerkIdentity,
+            ...summary,
+          },
+          notes: `Account deleted: ${userAuditTarget(target).label}`,
+        });
+      }
+      return summary;
     });
   }
 

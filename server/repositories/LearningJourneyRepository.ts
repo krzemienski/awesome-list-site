@@ -25,6 +25,7 @@ import {
   journeySteps,
   userJourneyProgress,
   resources,
+  resourceAuditLog,
   type LearningJourney,
   type InsertLearningJourney,
   type JourneyStep,
@@ -65,6 +66,51 @@ export type JourneyProgressUpdateResult = {
 /**
  * Repository class for learning journey-related database operations
  */
+/**
+ * Admin actor context for journey edits. When supplied, the repository writes
+ * the journey.* audit entry inside the SAME transaction as the edit, so a
+ * failed edit never leaves a success entry and a committed edit always has one.
+ */
+export interface JourneyAuditContext {
+  actorId: string | undefined;
+}
+
+type JourneyTx = Parameters<Parameters<typeof db.transaction>[0]>[0];
+
+function stepSummary(step: Pick<JourneyStep, "id" | "stepNumber" | "title" | "resourceId" | "isOptional"> & { description?: string | null }) {
+  return {
+    id: step.id,
+    stepNumber: step.stepNumber,
+    title: step.title,
+    description: step.description ?? null,
+    resourceId: step.resourceId ?? null,
+    isOptional: step.isOptional ?? false,
+  };
+}
+
+async function writeJourneyAudit(
+  tx: JourneyTx,
+  audit: JourneyAuditContext,
+  journeyId: number,
+  action: string,
+  changes: Record<string, unknown>,
+  notes: string,
+): Promise<void> {
+  const [journey] = await tx
+    .select({ id: learningJourneys.id, title: learningJourneys.title })
+    .from(learningJourneys)
+    .where(eq(learningJourneys.id, journeyId));
+  const label = journey?.title ?? `Journey #${journeyId}`;
+  await tx.insert(resourceAuditLog).values({
+    resourceId: null,
+    originalResourceId: null,
+    action,
+    performedBy: audit.actorId,
+    changes: { target: { type: "journey", id: journeyId, title: journey?.title ?? null, label }, ...changes },
+    notes: `${notes} — ${label}`,
+  });
+}
+
 export class LearningJourneyRepository {
   /**
    * Bounded source rows for the Continue Learning dashboard. The LEFT JOIN is
@@ -209,6 +255,7 @@ export class LearningJourneyRepository {
   async setJourneyStepNumbers(
     journeyId: number,
     assignments: { id: number; stepNumber: number }[],
+    audit?: JourneyAuditContext,
   ): Promise<JourneyStep[]> {
     if (assignments.length === 0) {
       return this.listJourneySteps(journeyId);
@@ -242,6 +289,17 @@ export class LearningJourneyRepository {
         .update(learningJourneys)
         .set({ updatedAt: new Date() })
         .where(eq(learningJourneys.id, journeyId));
+      if (audit) {
+        const byId = new Map(existing.map((step) => [step.id, step]));
+        await writeJourneyAudit(tx, audit, journeyId, "journey.steps_reordered", {
+          before: [...existing]
+            .sort((a, b) => a.stepNumber - b.stepNumber || a.id - b.id)
+            .map((step) => ({ id: step.id, stepNumber: step.stepNumber, title: step.title })),
+          after: [...assignments]
+            .sort((a, b) => a.stepNumber - b.stepNumber || a.id - b.id)
+            .map(({ id, stepNumber }) => ({ id, stepNumber, title: byId.get(id)?.title ?? null })),
+        }, `Reordered ${assignments.length} step row(s)`);
+      }
     });
 
     return this.listJourneySteps(journeyId);
@@ -273,13 +331,30 @@ export class LearningJourneyRepository {
    * @param journey - Partial journey data to update
    * @returns The updated journey
    */
-  async updateLearningJourney(id: number, journey: Partial<InsertLearningJourney>): Promise<LearningJourney> {
-    const [updatedJourney] = await db
-      .update(learningJourneys)
-      .set({ ...journey, updatedAt: new Date() })
-      .where(eq(learningJourneys.id, id))
-      .returning();
-    return updatedJourney;
+  async updateLearningJourney(
+    id: number,
+    journey: Partial<InsertLearningJourney>,
+    audit?: JourneyAuditContext,
+  ): Promise<LearningJourney> {
+    return db.transaction(async (tx) => {
+      const [before] = await tx.select().from(learningJourneys).where(eq(learningJourneys.id, id)).for('update');
+      const [updatedJourney] = await tx
+        .update(learningJourneys)
+        .set({ ...journey, updatedAt: new Date() })
+        .where(eq(learningJourneys.id, id))
+        .returning();
+      if (audit && before && updatedJourney) {
+        const fields = Object.keys(journey) as (keyof LearningJourney)[];
+        const pick = (row: LearningJourney) =>
+          Object.fromEntries(fields.map((field) => [field, row[field] ?? null]));
+        await writeJourneyAudit(tx, audit, id, "journey.updated", {
+          fields,
+          before: pick(before),
+          after: pick(updatedJourney),
+        }, `Updated ${fields.join(", ")}`);
+      }
+      return updatedJourney;
+    });
   }
 
   /**
@@ -343,7 +418,7 @@ export class LearningJourneyRepository {
    * @param step - Step data to create
    * @returns The created step
    */
-  async createJourneyStep(step: InsertJourneyStep): Promise<JourneyStep> {
+  async createJourneyStep(step: InsertJourneyStep, audit?: JourneyAuditContext): Promise<JourneyStep> {
     return db.transaction(async (tx) => {
       await tx.select({ id: learningJourneys.id }).from(learningJourneys)
         .where(eq(learningJourneys.id, step.journeyId)).for('update');
@@ -357,6 +432,12 @@ export class LearningJourneyRepository {
         .update(learningJourneys)
         .set({ updatedAt: new Date() })
         .where(eq(learningJourneys.id, step.journeyId));
+      if (audit) {
+        await writeJourneyAudit(tx, audit, step.journeyId, "journey.step_created", {
+          before: null,
+          after: stepSummary(newStep),
+        }, `Added step ${newStep.stepNumber} "${newStep.title}"`);
+      }
       return newStep;
     });
   }
@@ -367,7 +448,12 @@ export class LearningJourneyRepository {
    * @param step - Partial step data to update
    * @returns The updated step
    */
-  async updateJourneyStep(id: number, step: Partial<InsertJourneyStep>, wholeGroup = false): Promise<JourneyStep> {
+  async updateJourneyStep(
+    id: number,
+    step: Partial<InsertJourneyStep>,
+    wholeGroup = false,
+    audit?: JourneyAuditContext,
+  ): Promise<JourneyStep> {
     return db.transaction(async (tx) => {
       const [anchor] = await tx.select().from(journeySteps).where(eq(journeySteps.id, id));
       if (!anchor) throw Object.assign(new Error('Step no longer exists. Reload the steps.'), { code: 'STEP_CONFLICT' });
@@ -380,18 +466,36 @@ export class LearningJourneyRepository {
           .where(and(eq(resources.id, step.resourceId), eq(resources.status, 'approved'))).for('share');
         if (!resource) throw Object.assign(new Error('Selected resource no longer exists or is not approved. Choose another resource.'), { code: 'INVALID_STEP_RESOURCE' });
       }
-      const [updatedStep] = await tx
+      const scope = wholeGroup
+        ? and(eq(journeySteps.journeyId, existing.journeyId), eq(journeySteps.stepNumber, existing.stepNumber))
+        : eq(journeySteps.id, id);
+      const beforeRows = audit ? await tx.select().from(journeySteps).where(scope) : [];
+      const updatedRows = await tx
         .update(journeySteps)
         .set(step)
-        .where(wholeGroup
-          ? and(eq(journeySteps.journeyId, existing.journeyId), eq(journeySteps.stepNumber, existing.stepNumber))
-          : eq(journeySteps.id, id))
+        .where(scope)
         .returning();
+      // Keep the historical contract: the anchor row (or first row) is returned.
+      const updatedStep = updatedRows.find((row) => row.id === id) ?? updatedRows[0];
       if (updatedStep) {
         await tx
           .update(learningJourneys)
           .set({ updatedAt: new Date() })
           .where(eq(learningJourneys.id, updatedStep.journeyId));
+        if (audit) {
+          await writeJourneyAudit(
+            tx,
+            audit,
+            updatedStep.journeyId,
+            wholeGroup ? "journey.step_group_updated" : "journey.step_updated",
+            {
+              fields: Object.keys(step),
+              before: beforeRows.map(stepSummary),
+              after: updatedRows.map(stepSummary),
+            },
+            `Edited step ${existing.stepNumber}${wholeGroup ? ` (${updatedRows.length} row group)` : ""}`,
+          );
+        }
       }
       return updatedStep;
     });
@@ -401,7 +505,7 @@ export class LearningJourneyRepository {
    * Delete a journey step
    * @param id - Step ID to delete
    */
-  async deleteJourneyStep(id: number, wholeGroup = false): Promise<void> {
+  async deleteJourneyStep(id: number, wholeGroup = false, audit?: JourneyAuditContext): Promise<void> {
     await db.transaction(async (tx) => {
       const [existing] = await tx.select().from(journeySteps).where(eq(journeySteps.id, id));
       if (!existing) return;
@@ -429,6 +533,20 @@ export class LearningJourneyRepository {
         await tx.update(journeySteps).set({ stepNumber: numbers.indexOf(step.stepNumber) + 1 }).where(eq(journeySteps.id, step.id));
       }
       await tx.update(learningJourneys).set({ updatedAt: new Date() }).where(eq(learningJourneys.id, existing.journeyId));
+      if (audit && removed.size) {
+        await writeJourneyAudit(
+          tx,
+          audit,
+          existing.journeyId,
+          wholeGroup ? "journey.step_group_deleted" : "journey.step_deleted",
+          {
+            before: steps.filter((s) => removed.has(s.id)).map(stepSummary),
+            after: null,
+            remainingRows: remaining.length,
+          },
+          `Removed step ${current.stepNumber} "${current.title}"${wholeGroup ? ` (${removed.size} row group)` : ""}`,
+        );
+      }
     });
   }
 

@@ -72,6 +72,7 @@ import { claudeService } from "../../ai/claudeService";
 import { send429 } from "../../middleware/rateLimit";
 import { ConflictError } from "../../middleware/errors";
 import { buildValidationEnvelope } from "../../contracts/envelope";
+import { deleteClerkIdentity } from "../../lib/clerkAccountDeletion";
 import type {
   UserRepository,
   ResourceRepository,
@@ -272,7 +273,7 @@ export function registerAdminContentRoutes(
   // Exists primarily so the prod data-fix script can backfill names for
   // accounts registered before names were derived at signup (prod DB is not
   // agent-writable; all prod data fixes go through the live admin API).
-  app.patch('/api/admin/users/:id/name', isAuthenticated, isAdmin, async (req, res) => {
+  app.patch('/api/admin/users/:id/name', isAuthenticated, isAdmin, async (req: any, res) => {
     try {
       const { firstName, lastName } = req.body ?? {};
       // Run21 R4-049/050: same rules as the profile editor — zero-width chars
@@ -290,14 +291,18 @@ export function registerAdminContentRoutes(
       if (first === undefined && last === undefined) {
         return res.status(400).json({ message: 'firstName or lastName (string or null) is required' });
       }
-      const existing = await userRepo.getUser(req.params.id);
-      if (!existing) {
+      // Audited in the same transaction as the write (user.name_changed).
+      const updated = await userRepo.adminUpdateUserName(
+        req.params.id,
+        {
+          ...(first !== undefined ? { firstName: first } : {}),
+          ...(last !== undefined ? { lastName: last } : {}),
+        },
+        req.dbUser?.id,
+      );
+      if (!updated) {
         return res.status(404).json({ message: 'User not found' });
       }
-      const updated = await userRepo.updateUserProfile(req.params.id, {
-        ...(first !== undefined ? { firstName: first } : {}),
-        ...(last !== undefined ? { lastName: last } : {}),
-      });
       res.json(sanitizeUser(updated));
     } catch (error) {
       console.error('Error updating user name:', error);
@@ -321,7 +326,8 @@ export function registerAdminContentRoutes(
         return res.status(400).json({ message: 'You cannot change your own role' });
       }
       
-      const user = await userRepo.updateUserRole(userId, role);
+      // Audited in the same transaction as the write (user.role_changed).
+      const user = await userRepo.adminUpdateUserRole(userId, role, req.dbUser?.id);
       if (!user) {
         return res.status(404).json({ message: 'User not found' });
       }
@@ -334,11 +340,15 @@ export function registerAdminContentRoutes(
     }
   });
   
-  // DELETE /api/admin/users/:id - Delete a user (NEW-004: QA/test account
-  // cleanup). Self-deletion is blocked. Content is preserved: the user's
-  // submitted/approved resources are detached (attribution nulled) rather than
-  // cascade-deleted; their pending edit suggestions are removed. Personal data
-  // (bookmarks, favorites, progress, preferences, API keys) cascades away.
+  // DELETE /api/admin/users/:id - Permanently delete an account (NEW-004).
+  // Self-deletion is blocked. Clerk-first: the sign-in identity is deleted
+  // (revoking every session) BEFORE the local row, and a tombstone written in
+  // the same transaction as the row removal stops still-valid session JWTs
+  // from JIT re-provisioning the account. If Clerk can't be reached the
+  // request fails with 502 and nothing local changes. Content is preserved:
+  // submitted/approved resources are detached (attribution nulled); pending
+  // edit suggestions are removed; personal data (bookmarks, favorites,
+  // progress, preferences, API keys) cascades away.
   app.delete('/api/admin/users/:id', isAuthenticated, isAdmin, async (req: any, res) => {
     try {
       const targetId = req.params.id;
@@ -349,8 +359,29 @@ export function registerAdminContentRoutes(
       if (!target) {
         return res.status(404).json({ message: 'User not found' });
       }
-      const summary = await userRepo.deleteUserWithCleanup(targetId);
-      res.json({ success: true, deletedUserId: targetId, email: target.email, ...summary });
+      let clerk;
+      try {
+        clerk = await deleteClerkIdentity(targetId);
+      } catch (clerkError) {
+        console.error('Error deleting Clerk identity for user:', clerkError);
+        return res.status(502).json({
+          message: 'Could not delete the sign-in identity. Nothing was deleted; try again.',
+        });
+      }
+      const summary = await userRepo.deleteUserWithCleanup(targetId, {
+        tombstone: {
+          clerkUserId: clerk.clerkUserId ?? (targetId.startsWith('user_') ? targetId : null),
+          deletedBy: req.dbUser?.id,
+        },
+        audit: { actorId: req.dbUser?.id, clerkIdentity: clerk.outcome },
+      });
+      res.json({
+        success: true,
+        deletedUserId: targetId,
+        email: target.email,
+        clerkIdentity: clerk.outcome,
+        ...summary,
+      });
     } catch (error) {
       console.error('Error deleting user:', error);
       res.status(500).json({ message: 'Failed to delete user' });
