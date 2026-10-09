@@ -281,12 +281,13 @@ try {
   }
   if (!bookmarkVisible) throw new Error(`Bookmark card ${resource.id} did not render after ready reload`);
   const libraryText = await page.locator("#main").innerText();
+  // innerText applies text-transform, and the design-system Badge renders tag
+  // chips uppercase, so the tag is matched case-insensitively.
+  const tagRendered = libraryText.toLowerCase().includes(`#audit-${suffix}`.toLowerCase());
   log(
     "library:state-rendered",
-    libraryText.includes(resource.title) &&
-      libraryText.includes("In progress") &&
-      libraryText.includes(`#audit-${suffix}`),
-    `resource=${libraryText.includes(resource.title)} status=${libraryText.includes("In progress")} tag=${libraryText.includes(`#audit-${suffix}`)}`,
+    libraryText.includes(resource.title) && libraryText.includes("In progress") && tagRendered,
+    `resource=${libraryText.includes(resource.title)} status=${libraryText.includes("In progress")} tag=${tagRendered}`,
   );
   await page.getByLabel("Select all visible bookmarks").click();
   const selectedText = await page.getByText(/bookmark selected/).first().textContent();

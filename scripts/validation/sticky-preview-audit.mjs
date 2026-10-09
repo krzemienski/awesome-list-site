@@ -97,7 +97,7 @@ function auditSharedHeaderHeightSource() {
     /<SidebarProvider\b[\s\S]*?\bclassName="([^"]*)"/,
   )?.[1] ?? "";
   const definesPhone = shellClass.split(/\s+/).includes("[--header-height:56px]");
-  const definesTablet = shellClass.split(/\s+/).includes("min-[769px]:[--header-height:60px]");
+  const definesTablet = shellClass.split(/\s+/).includes("min-[768px]:[--header-height:60px]");
   log(
     "shared-header-height-shell-source",
     definesPhone && definesTablet,
@@ -251,10 +251,11 @@ async function auditViewport(width, height, expectedOffset) {
 }
 
 try {
-  // Keep the existing phone regression check intact, and also exercise the
-  // exact canonical 768px breakpoint where both use the 56px header offset.
+  // Phone (<768) uses the 56px header; 768 is the first tablet width, where
+  // the header and the shared sticky offset are both 60px
+  // (docs/parity/DESIGN-SYNC.md: --shell-header-h 60px; 56px below 768px).
   await auditViewport(375, 812, 56);
-  await auditViewport(768, 900, 56);
+  await auditViewport(768, 900, 60);
 } finally {
   fs.writeFileSync(`${OUT}/sticky-preview-audit.json`, JSON.stringify(results, null, 2));
   await browser.close();

@@ -286,6 +286,18 @@ async function main() {
       l.res.status === 200 && cc === 'public, max-age=60' && !!etag,
       `status=${l.res.status} cc=${JSON.stringify(cc)} etag=${etag && etag.slice(0, 14)}…`,
     );
+    // Responses depend on the Authorization header (valid key → own bucket,
+    // bad key → 401): shared caches must key on it, and a bad key's 401 must
+    // never be stored.
+    const vary = (header(l.res, 'vary') || '').toLowerCase();
+    record('public list Vary: Authorization', vary.split(/\s*,\s*/).includes('authorization'), `vary=${JSON.stringify(vary)}`);
+    const badKeyOpts = publicApiOptions();
+    const bad = await timedFetch('/api/public/resources?limit=5', { headers: { ...badKeyOpts.headers, Authorization: 'Bearer not-a-real-key' } });
+    record(
+      'public bad key 401 no-store',
+      bad.res.status === 401 && header(bad.res, 'cache-control') === 'no-store' && (header(bad.res, 'vary') || '').toLowerCase().includes('authorization'),
+      `status=${bad.res.status} cc=${JSON.stringify(header(bad.res, 'cache-control'))} vary=${JSON.stringify(header(bad.res, 'vary'))}`,
+    );
     if (etag) {
       const c = await rawConditionalGet('/api/public/resources?limit=5', etag, 'GET', publicApiOptions().headers);
       record('public list 304 revalidation', c.status === 304, `status=${c.status} TTFB=${c.ttfbMs.toFixed(0)}ms`);

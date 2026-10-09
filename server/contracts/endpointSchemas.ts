@@ -26,6 +26,7 @@ import { z } from "zod";
 import { RESOURCE_KIND_VALUES } from "@shared/resourceKinds";
 import { RESOURCE_FORMAT_VALUES, RESOURCE_PROVIDER_VALUES, RESOURCE_SKILL_LEVEL_VALUES, RESOURCE_SEARCH_SORT_VALUES } from "@shared/resourceFacets";
 import { setRouteQuerySchema, setRouteResponseSchema } from "./install";
+import { genericQuerySchema, MAX_PARAM_LENGTH } from "./inference";
 
 // ---------------------------------------------------------------------------
 // Shared primitives
@@ -397,20 +398,20 @@ const boundedQueryInteger = (min: number, max: number) =>
   z.string().regex(/^\d+$/).refine((value) => Number(value) >= min && Number(value) <= max)
     .describe(`Integer from ${min} to ${max}`);
 const resourcesQuerySchema = z.object({
-  q: z.string().optional().describe("Search text; takes precedence over search"),
-  search: z.string().optional().describe("Alias for q"),
-  category: z.string().optional().describe("Category name or slug"),
-  subcategory: z.string().optional().describe("Subcategory name or slug"),
-  subSubcategory: z.string().optional(),
-  generalScope: z.enum(["category", "subcategory"]).optional(),
+  q: z.string().max(MAX_PARAM_LENGTH).optional().describe("Full-text search (title, description, tags); queries shorter than the searchable minimum behave like no search"),
+  search: z.string().max(MAX_PARAM_LENGTH).optional().describe("Alias for q; wins when both are sent"),
+  category: z.string().max(MAX_PARAM_LENGTH).optional().describe("Category display name or URL slug"),
+  subcategory: z.string().max(MAX_PARAM_LENGTH).optional().describe("Subcategory display name or URL slug (resolved globally when category is absent)"),
+  subSubcategory: z.string().max(MAX_PARAM_LENGTH).optional().describe("Sub-subcategory display name"),
+  generalScope: z.enum(["category", "subcategory"]).optional().describe("Restrict to resources filed directly at that level (no deeper taxonomy)"),
   tags: z.union([z.string(), z.array(z.string())]).optional().describe("Comma-separated or repeated tags"),
   tag: z.union([z.string(), z.array(z.string())]).optional().describe("Alias for tags; combines with tags"),
-  provider: z.enum(RESOURCE_PROVIDER_VALUES).optional(),
-  format: z.enum(RESOURCE_FORMAT_VALUES).optional(),
-  skillLevel: z.enum(RESOURCE_SKILL_LEVEL_VALUES).optional(),
-  kind: resourceKindSchema.optional(),
-  sort: z.enum(RESOURCE_SEARCH_SORT_VALUES).optional(),
-  facets: z.enum(["true", "false"]).optional(),
+  provider: z.enum(RESOURCE_PROVIDER_VALUES).optional().describe("Case-insensitive; other values return 400 invalid_provider"),
+  format: z.enum(RESOURCE_FORMAT_VALUES).optional().describe("Resource format; case-insensitive; other values return 400 invalid_format"),
+  skillLevel: z.enum(RESOURCE_SKILL_LEVEL_VALUES).optional().describe("Case-insensitive; other values return 400 invalid_skillLevel"),
+  kind: resourceKindSchema.optional().describe("Resolved kind (stored or tag-inferred); other values return 400 invalid_kind"),
+  sort: z.enum(RESOURCE_SEARCH_SORT_VALUES).optional().describe("Other values return 400 invalid_sort"),
+  facets: z.enum(["true", "false"]).optional().describe("true adds provider/format/skillLevel/kind facet counts to the response"),
   status: z.enum(["approved", "pending", "rejected"]).optional().describe("Default approved; other statuses require admin"),
   page: boundedQueryInteger(1, 2147483647).optional(),
   limit: boundedQueryInteger(1, 100).optional(),
@@ -418,9 +419,9 @@ const resourcesQuerySchema = z.object({
   cursor: boundedQueryInteger(0, 2147483647).optional().describe("Alias for offset; offset takes precedence"),
 });
 const searchQuerySchema = z.object({
-  q: z.string().optional(),
-  search: z.string().optional().describe("Alias for q"),
-  limit: z.string().optional().describe("Default 100; numeric values clamped to 1–200"),
+  q: z.string().max(MAX_PARAM_LENGTH).optional().describe("Full-text search text (title, description, tags); wins over search. Blank or too-short queries return total 0"),
+  search: z.string().max(MAX_PARAM_LENGTH).optional().describe("Alias for q"),
+  limit: z.string().regex(/^\d+$/).optional().describe("Default 100; clamped to 1–200; non-numeric values return 400 validation_failed"),
   offset: boundedQueryInteger(0, 2147483647).optional(),
 });
 // ---------------------------------------------------------------------------
@@ -530,14 +531,35 @@ export function registerCoreEndpointSchemas(): void {
     description: "Paginated list of approved public resources with pagination metadata",
     schema: resourcesListResponseSchema,
   });
+  // The handlers own value validation (specific invalid_<param> codes,
+  // case-insensitive facets, first-value-wins for repeated keys), so the
+  // request-time guard stays the bounded generic one; the exact schemas
+  // above document the real filters in OpenAPI.
   setRouteQuerySchema("get", "/api/resources", {
     name: "ResourcesQuery",
     schema: resourcesQuerySchema,
+    guard: genericQuerySchema,
   });
   setRouteQuerySchema("get", "/api/search", {
     name: "SearchQuery",
     schema: searchQuerySchema,
+    guard: genericQuerySchema,
   });
+  setRouteQuerySchema("get", "/api/public/resources", {
+    name: "PublicResourcesQuery",
+    schema: z.object({
+      page: z.string().regex(/^\d+$/).optional().describe("Page number ≥ 1 (default 1); invalid values return 400"),
+      limit: z.string().regex(/^\d+$/).optional().describe("Items per page (default 20); values above 100 are clamped to 100"),
+      category: z.string().max(MAX_PARAM_LENGTH).optional().describe("Category display name"),
+      subcategory: z.string().max(MAX_PARAM_LENGTH).optional().describe("Subcategory display name"),
+      search: z.string().max(MAX_PARAM_LENGTH).optional().describe("Full-text search"),
+    }),
+    guard: genericQuerySchema,
+  });
+  const noQuerySchema = z.object({});
+  for (const path of ["/api/public/categories", "/api/public/tags", "/api/tags"]) {
+    setRouteQuerySchema("get", path, { name: "NoQueryParameters", schema: noQuerySchema, guard: genericQuerySchema });
+  }
   for (const path of ["/api/tags", "/api/public/tags"]) {
     setRouteResponseSchema("get", path, {
       name: "ApprovedResourceTagsResponse",

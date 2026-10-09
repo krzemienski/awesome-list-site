@@ -167,8 +167,10 @@ for (const w of [768, 320]) {
     `chips=${chips.count} clipped=${chips.clipped}${chips.sample ? ` sample="${chips.sample}"` : ''}`);
 
   if (w === 768) {
-    // The strict phone boundary is below 768: the 240px tablet sidebar stays
-    // visible at exactly 768 while the header trigger still opens its drawer.
+    // /advanced is not a browse route: the persistent sidebar is reserved for
+    // home + taxonomy pages (MainLayout hasBrowseSidebar), so here only the
+    // header drawer trigger remains. The browse-route 768 contract (240px
+    // sidebar + trigger) is sidebar-boundary@768 below.
     // See docs/parity/assumptions/shell-sidebar.md.
     const sb = await page.evaluate(() => {
       const visible = (el) => !!el && el.getBoundingClientRect().width > 0 && el.getBoundingClientRect().height > 0;
@@ -179,7 +181,7 @@ for (const w of [768, 320]) {
         triggerVisible: visible(document.querySelector('button[data-sidebar="trigger"]')),
       };
     });
-    log('sidebar-drawer@768', sb.sidebarVisible && sb.sidebarWidth === 240 && sb.triggerVisible, JSON.stringify(sb));
+    log('sidebar-drawer@768', !sb.sidebarVisible && sb.triggerVisible, JSON.stringify(sb));
 
     // ---- single "Toggle sidebar" accessible label + no interactive rail ----
     const tog = await page.evaluate(() => {

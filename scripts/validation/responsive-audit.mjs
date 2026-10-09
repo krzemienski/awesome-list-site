@@ -273,7 +273,10 @@ for (const [w, route, name] of [[375, '/profile', 'tabs-profile-375'], [500, '/p
   });
   if (!r) { log(name, false, 'no tablist found'); continue; }
   const radPx = parseFloat(r.radius);
-  const pass = w >= 1280 ? radPx > 100 || r.radius.includes('9999') : radPx <= 16;
+  // R5-054 guarded against a pill radius on a wrapped tablist. Since the design
+  // system adoption the tab strip is an underlined row with no pill at any
+  // width, so: never a pill radius, and at desktop width it stays one row.
+  const pass = radPx <= 16 && (w < 1280 || !r.wrapped);
   log(name, pass, `radius=${r.radius} wrapped=${r.wrapped} h=${Math.round(r.h)}`);
   await page.locator('[role="tablist"]').first().screenshot({ path: `${OUT}/${name}.png` }).catch(() => {});
 }

@@ -180,7 +180,7 @@ export default function MainLayout({ productProfile, nav, isLoading, navError, o
       // bottom row past the fold, and on a short page a first paint would show
       // that row over the end of this one. Growing past the column on long
       // pages still works: a flex item never shrinks below its content.
-      className="flex-col flex-1 min-h-[auto] [--header-height:56px] min-[769px]:[--header-height:60px]"
+      className="flex-col flex-1 min-h-[auto] [--header-height:56px] min-[768px]:[--header-height:60px]"
     >
       {/* CC-17 — Skip-link is the first focusable element on every page. */}
       <a href="#main" className="skip-link">Skip to main content</a>

@@ -20,8 +20,15 @@ methods, auth, parameters, and schemas.
 ## Public API (`/api/public/*`)
 
 Read-only, rate-limited endpoints for external consumers. They work without
-authentication (free tier) or with an API key for higher limits. Only
-`approved` resources are exposed. Source: `server/api/public.ts`.
+authentication (free tier) or with an API key (standard tier, own bucket).
+Only `approved` resources are exposed, through the same public field
+allowlist as the in-app catalog. Source: `server/api/public.ts`.
+
+The key, tier and cache rules below cover the developer endpoints in this
+table plus `GET /api/public/me`. `GET /api/public/collections/:shareId` is a
+site endpoint behind the shared-collection page: it is unmetered by API tier,
+ignores `Authorization` entirely (a key neither helps nor is rejected) and is
+listed with the site endpoints further down.
 
 | Method | Path | Description |
 |--------|------|-------------|
@@ -69,9 +76,29 @@ Bearer token:
 Authorization: Bearer YOUR_API_KEY
 ```
 
-Unauthenticated requests are allowed but rate-limited (free tier, 60 req/hour).
-Rate-limit headers are returned on every response: `RateLimit-Limit`,
-`RateLimit-Remaining`, `RateLimit-Reset`.
+| Caller | Tier | Limit | Bucket |
+|--------|------|-------|--------|
+| No `Authorization` header | free | 60 requests/hour | per client IP |
+| Valid API key | standard | 1,000 requests/hour | per key (independent of your IP) |
+
+- The tier is assigned by the server. Every valid key is `standard`; there is
+  no premium tier, and key `scopes` are your own labels — they grant nothing.
+  Creating a key with a reserved tier name (`free`, `standard`, `premium`)
+  as a scope is rejected with `400`.
+- A presented key that is invalid, revoked or expired returns `401` with a
+  `message` naming the reason — it is never silently downgraded to the free
+  tier. Remove the header to call anonymously.
+- `GET /api/public/me` echoes the key's `tier` and `rateLimit`
+  (`{ limit, windowSeconds }`).
+- Rate-limit headers are returned on every response: `RateLimit-Limit`,
+  `RateLimit-Remaining`, `RateLimit-Reset`; a `429` also carries
+  `Retry-After`.
+- Caching: anonymous responses are `Cache-Control: public, max-age=60`;
+  responses to a valid key are `private, no-store`, and key errors (`401`)
+  are `no-store`. Every developer-endpoint response sends
+  `Vary: Authorization`, so a cached anonymous answer is never reused for a
+  keyed request (an anonymous cached hit does not count against the 60/hour
+  bucket).
 
 ### Examples
 
@@ -84,7 +111,7 @@ curl -H "Authorization: Bearer YOUR_API_KEY" \
   "http://localhost:5000/api/public/resources?category=Encoding%20%26%20Codecs&page=2"
 
 # Single resource
-curl "http://localhost:5000/api/public/resources/42"
+curl "http://localhost:5000/api/public/resources/185125"
 
 # Verify a key
 curl -H "Authorization: Bearer YOUR_API_KEY" \
@@ -146,7 +173,35 @@ email/password login endpoint was removed.
 | GET | `/api/journeys` | List learning journeys (`?category=`) |
 | GET | `/api/journeys/:id` | Journey with steps |
 | GET | `/api/github/awesome-lists` | Browse awesome lists (discovery) |
-| GET | `/api/public/collections/:shareId` | Read a published bookmark collection (each resource carries `kind` + `resolvedKind`; never `metadata`) |
+| GET | `/api/public/collections/:shareId` | Read a published bookmark collection (each resource carries `kind` + `resolvedKind`; never `metadata`). Not part of the developer API: no API-key handling or tier limit |
+
+### Catalog filters (`/api/resources`, `/api/search`)
+
+The exact parameter list, enums and bounds are in `/api/openapi.json`
+(`ResourcesQuery`, `SearchQuery`, `AwesomeListListingQuery`). Summary:
+
+| Parameter | `/api/resources` | `/api/search` | Notes |
+|-----------|:---:|:---:|-------|
+| `q` / `search` | ✓ | ✓ | Full-text. On `/api/resources` `search` wins when both are sent; on `/api/search` `q` wins. Too-short queries behave like no query |
+| `category`, `subcategory` | ✓ | – | Display name or URL slug |
+| `subSubcategory` | ✓ | – | Display name |
+| `generalScope` | ✓ | – | `category` \| `subcategory` |
+| `tags` / `tag` | ✓ | – | 1–10 comma-separated or repeated values |
+| `provider`, `format`, `skillLevel`, `kind` | ✓ | – | Controlled values, case-insensitive; unknown → `400 invalid_<param>` with `allowed` |
+| `sort` | ✓ | – | `relevance`, `name-asc`, `name-desc`, `newest`, `oldest`; unknown → `400 invalid_sort` |
+| `facets` | ✓ | – | `true` adds facet counts |
+| `page`, `limit` (1–100), `offset`, `cursor` | ✓ | – | `cursor` aliases `offset`; out-of-range → `400` |
+| `limit`, `offset` | – | ✓ | `limit` defaults to 100 and is clamped to 1–200; non-numeric → `400` |
+
+`GET /api/awesome-list/listing` takes `level`, `slug`, `page`, `subcategory`,
+`subSubcategory`, `general=1` and `kind`.
+
+```bash
+curl "http://localhost:5000/api/resources?q=hls&kind=tools&sort=name-asc&limit=5"
+curl "http://localhost:5000/api/resources?tags=open-source&facets=true&limit=1"
+curl "http://localhost:5000/api/search?q=webrtc&limit=5"
+curl "http://localhost:5000/api/awesome-list/listing?level=category&slug=encoding-codecs&kind=tools"
+```
 
 ### Resource kinds
 
@@ -394,7 +449,8 @@ interface Tag { id: number; name: string; slug: string; createdAt: string }
 
 ## Rate limiting
 
-- Public API: free tier ≈ 60 requests/hour; API keys can raise the limit.
+- Public API: 60 requests/hour per IP without a key; 1,000 requests/hour per
+  valid API key (server-assigned standard tier). See "Authentication (API keys)".
 - AI endpoints (`/api/claude/*`): additionally
   gated by an AI rate limiter and by upstream Anthropic/OpenAI limits.
 - GitHub endpoints: subject to GitHub API limits.

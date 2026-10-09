@@ -1,27 +1,24 @@
 import rateLimit from "express-rate-limit";
-import type { Request, Response } from "express";
+import type { NextFunction, Request, Response } from "express";
 import { PgRateLimitStore } from "./pgRateLimitStore";
 
 /**
  * Rate Limiting Middleware
  *
- * Implements tiered rate limiting for the public API based on API key scopes.
- * Prevents abuse while allowing legitimate usage from authenticated clients.
+ * Public developer API (/api/public/*) tiers. The tier is SERVER-OWNED: it is
+ * derived only from whether a valid API key was presented, never from the
+ * key's user-chosen scopes (a self-created key used to be able to claim a
+ * "premium" scope).
  *
- * Rate limit tiers:
- * - Free tier: 60 requests per hour (for unauthenticated or free API keys)
- * - Standard tier: 1,000 requests per hour (for standard API keys)
- * - Premium tier: 10,000 requests per hour (for premium API keys)
+ * - Free tier: 60 requests per hour, keyed by client IP (no API key)
+ * - Standard tier: 1,000 requests per hour, keyed by API key id (any valid,
+ *   unrevoked, unexpired key)
  *
- * Rate limiting is keyed by:
- * - API key if present (from req.apiKey.id set by requireApiKey middleware)
- * - IP address if no API key is present
+ * There is no premium tier.
  *
- * Response headers:
- * - X-RateLimit-Limit: Maximum requests allowed in window
- * - X-RateLimit-Remaining: Requests remaining in current window
- * - X-RateLimit-Reset: Timestamp when the rate limit resets
- * - Retry-After: Seconds to wait before retrying (on 429 responses)
+ * Response headers (IETF draft, express-rate-limit standardHeaders):
+ * - RateLimit-Limit / RateLimit-Remaining / RateLimit-Reset
+ * - Retry-After on 429 responses
  */
 
 export interface RateLimitTier {
@@ -47,17 +44,12 @@ export const RATE_LIMIT_TIERS = {
     max: 1000,
     windowMs: 60 * 60 * 1000, // 1 hour
   },
-  premium: {
-    name: "premium",
-    max: 10000,
-    windowMs: 60 * 60 * 1000, // 1 hour
-  },
 } as const;
 
 /**
  * Custom key generator for rate limiting
  *
- * Uses API key ID if available (set by requireApiKey middleware),
+ * Uses API key ID if available (set by the API key middleware),
  * otherwise falls back to IP address for unauthenticated requests.
  *
  * @param req - Express request object
@@ -219,46 +211,19 @@ export function createRateLimiter(tier: RateLimitTier) {
 }
 
 /**
- * Dynamic rate limiter that selects the appropriate tier based on API key scopes
- *
- * Checks the API key scopes (if present) and applies the appropriate rate limit:
- * - premium scope → Premium tier (10,000 req/hour)
- * - standard scope → Standard tier (1,000 req/hour)
- * - No API key or no special scope → Free tier (60 req/hour)
- *
- * Note: This middleware should be applied AFTER the requireApiKey middleware
- * (or used on routes where requireApiKey is optional) so that req.apiKey is available.
+ * Pre-configured rate limiters for each tier. Each owns a distinct store
+ * prefix, and exactly one runs per request (see publicApiRateLimiter), so the
+ * shared Postgres store never double-counts.
  */
-export function dynamicRateLimiter(req: Request, res: Response, next: () => void) {
-  const apiKey = (req as any).apiKey;
-
-  let tier: RateLimitTier;
-
-  if (apiKey?.scopes) {
-    const scopes = apiKey.scopes as string[];
-
-    if (scopes.includes("premium")) {
-      tier = RATE_LIMIT_TIERS.premium;
-    } else if (scopes.includes("standard")) {
-      tier = RATE_LIMIT_TIERS.standard;
-    } else {
-      tier = RATE_LIMIT_TIERS.free;
-    }
-  } else {
-    // No API key present - use free tier
-    tier = RATE_LIMIT_TIERS.free;
-  }
-
-  // Apply the selected tier's rate limiter
-  const limiter = createRateLimiter(tier);
-  return limiter(req, res, next);
-}
+const freeTierLimiter = createRateLimiter(RATE_LIMIT_TIERS.free);
+const standardTierLimiter = createRateLimiter(RATE_LIMIT_TIERS.standard);
 
 /**
- * Pre-configured rate limiters for each tier
- *
- * Use these for routes where the tier is fixed and doesn't depend on API key scopes.
+ * Public developer API limiter. Must run AFTER optionalApiKey: a request that
+ * presented a valid key (req.apiKey set) is counted in that key's own
+ * standard-tier bucket; every other request shares its IP's free-tier bucket.
  */
-export const freeTierLimiter = createRateLimiter(RATE_LIMIT_TIERS.free);
-export const standardTierLimiter = createRateLimiter(RATE_LIMIT_TIERS.standard);
-export const premiumTierLimiter = createRateLimiter(RATE_LIMIT_TIERS.premium);
+export function publicApiRateLimiter(req: Request, res: Response, next: NextFunction) {
+  const limiter = (req as any).apiKey?.id ? standardTierLimiter : freeTierLimiter;
+  return limiter(req, res, next);
+}

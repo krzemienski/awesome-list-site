@@ -161,3 +161,4 @@
 - [Live smoke of production](live-smoke-prod-revision.md) — publish may leave prod on the parent commit; verify by server-behaviour markers; prod sign-up blocked → owner account net-zero.
 - [Polled query outage proof](polled-query-outage-proof.md) — background poll failures keep last-good data (hard-fail only first load/401); prove unattended, not via Refresh.
 - [Catalog HTTP cache vs invalidation](catalog-http-cache-vs-invalidation.md) — max-age=60 catalog GETs make invalidated refetches return stale bodies; post-write reads must use no-cache.
+- [API key tier entitlements](api-key-tier-entitlements.md) — every valid key = server-assigned standard tier; bad key = 401; scopes grant nothing, tier names rejected.

@@ -1790,6 +1790,7 @@ function homeShellChrome(): string {
             title: string;
             description?: string;
             isOptional: boolean;
+            hasUnavailableResources: boolean;
             resources: { id: number; title: string; description?: string | null }[];
           }>();
           for (const step of [...steps].sort(
@@ -1802,15 +1803,16 @@ function homeShellChrome(): string {
                 title: step.title,
                 description: step.description || undefined,
                 isOptional: true,
+                hasUnavailableResources: false,
                 resources: [],
               };
               logicalStepMap.set(step.stepNumber, group);
             }
             group.isOptional = group.isOptional && Boolean(step.isOptional);
+            // The notice stays out of the step description, mirroring the
+            // client card, so crawler and hydrated syllabus text stay identical.
             if (step.resource) group.resources.push(step.resource);
-            else if (step.resourceId != null && !group.description?.includes("Some resources in this step are no longer available.")) {
-              group.description = `${group.description || ""} Some resources in this step are no longer available.`.trim();
-            }
+            else if (step.resourceId != null) group.hasUnavailableResources = true;
           }
           const logicalSteps = [...logicalStepMap.values()];
           const duration = String((journey as any).estimatedDuration ?? "").match(/^(\d+)\s*hours?$/i);

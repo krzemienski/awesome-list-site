@@ -1,0 +1,1159 @@
+{
+  "run": "__qa_test_plan_580_1791562070462",
+  "base": "http://127.0.0.1:5000",
+  "startedAt": "2026-10-09T16:07:50.462Z",
+  "checks": [
+    {
+      "item": "setup",
+      "ok": true,
+      "label": "two throwaway Clerk users JIT-provisioned",
+      "detail": {
+        "a": "__qa_test_plan_580_1791562070462_a",
+        "b": "__qa_test_plan_580_1791562070462_b",
+        "aRole": "user",
+        "bRole": "user"
+      }
+    },
+    {
+      "item": "setup",
+      "ok": true,
+      "label": "fixtures moderated via real admin/owner APIs",
+      "detail": {
+        "ap1": 200,
+        "ap5": 200,
+        "rj3": 200,
+        "wd4": {
+          "status": 200,
+          "body": "{\"message\":\"Resource submission withdrawn\",\"current\":{\"id\":188657,\"kind\":\"resource\",\"status\":\"withdrawn\",\"changedAt\":\"2026-10-09T16:07:52.098Z\"}}"
+        },
+        "db": [
+          {
+            "id": 188654,
+            "status": "approved",
+            "has_private": true
+          },
+          {
+            "id": 188655,
+            "status": "pending",
+            "has_private": true
+          },
+          {
+            "id": 188656,
+            "status": "rejected",
+            "has_private": true
+          },
+          {
+            "id": 188657,
+            "status": "withdrawn",
+            "has_private": true
+          },
+          {
+            "id": 188658,
+            "status": "approved",
+            "has_private": true
+          }
+        ]
+      }
+    },
+    {
+      "item": "A01",
+      "ok": true,
+      "label": "anon GET /api/resources/:id: 200, fixture present, private markers absent",
+      "detail": {
+        "status": 200,
+        "body": "{\"id\":188654,\"title\":\"__qa_test_plan_580_1791562070462 zqxplanmv15ssse r1-approved\",\"url\":\"https://example.com/__qa_test_plan_580_1791562070462/r1-approved\",\"description\":\"__qa_test_plan_580_179156207"
+      }
+    },
+    {
+      "item": "A01",
+      "ok": true,
+      "label": "anon GET /api/resources?tags=<fixture tag>: 200, fixture present, private markers absent",
+      "detail": {
+        "status": 200,
+        "body": "{\"resources\":[{\"id\":188658,\"title\":\"__qa_test_plan_580_1791562070462 zqxplanmv15ssse r5-formerly-approved\",\"url\":\"https://example.com/__qa_test_plan_580_1791562070462/r5-formerly-approved\",\"descriptio"
+      }
+    },
+    {
+      "item": "A01",
+      "ok": true,
+      "label": "anon GET /api/resources?q=<fixture word>&facets=true: 200, fixture present, private markers absent",
+      "detail": {
+        "status": 200,
+        "body": "{\"resources\":[{\"id\":188654,\"title\":\"__qa_test_plan_580_1791562070462 zqxplanmv15ssse r1-approved\",\"url\":\"https://example.com/__qa_test_plan_580_1791562070462/r1-approved\",\"description\":\"__qa_test_plan"
+      }
+    },
+    {
+      "item": "A01",
+      "ok": true,
+      "label": "anon GET /api/search?q=<fixture word>: 200, fixture present, private markers absent",
+      "detail": {
+        "status": 200,
+        "body": "{\"query\":\"zqxplanmv15ssse\",\"total\":2,\"limit\":100,\"offset\":0,\"nextOffset\":null,\"results\":[{\"id\":188654,\"title\":\"__qa_test_plan_580_1791562070462 zqxplanmv15ssse r1-approved\",\"url\":\"https://example.com/"
+      }
+    },
+    {
+      "item": "A01",
+      "ok": true,
+      "label": "anon GET /api/home: 200, fixture present, private markers absent",
+      "detail": {
+        "status": 200,
+        "body": "{\"total\":1818,\"approvedThisWeek\":2,\"featuredCount\":0,\"recent\":[{\"id\":188658,\"title\":\"__qa_test_plan_580_1791562070462 zqxplanmv15ssse r5-formerly-approved\",\"url\":\"https://example.com/__qa_test_plan_58"
+      }
+    },
+    {
+      "item": "A01",
+      "ok": true,
+      "label": "anon GET /api/resources/:id/related: 200, fixture present, private markers absent",
+      "detail": {
+        "status": 200,
+        "body": "{\"similar\":[{\"resource\":{\"id\":188658,\"title\":\"__qa_test_plan_580_1791562070462 zqxplanmv15ssse r5-formerly-approved\",\"url\":\"https://example.com/__qa_test_plan_580_1791562070462/r5-formerly-approved\",\""
+      }
+    },
+    {
+      "item": "A01",
+      "ok": true,
+      "label": "anon GET /api/awesome-list: 200, fixture present, private markers absent",
+      "detail": {
+        "status": 200,
+        "body": "{\"title\":\"Awesome Video\",\"description\":\"A curated list of awesome video tools, frameworks, libraries, and learning resources\",\"repoUrl\":\"https://github.com/krzemienski/awesome-video\",\"resources\":[{\"id"
+      }
+    },
+    {
+      "item": "A01",
+      "ok": true,
+      "label": "anon GET /api/awesome-list?category=Encoding & Codecs: 200, fixture present, private markers absent",
+      "detail": {
+        "status": 200,
+        "body": "{\"title\":\"Awesome Video\",\"description\":\"A curated list of awesome video tools, frameworks, libraries, and learning resources\",\"repoUrl\":\"https://github.com/krzemienski/awesome-video\",\"resources\":[{\"id"
+      }
+    },
+    {
+      "item": "A01",
+      "ok": true,
+      "label": "anon GET /api/awesome-list/listing?level=category&slug=encoding-codecs: 200, fixture absent, private markers absent",
+      "detail": {
+        "status": 200,
+        "body": "{\"level\":\"category\",\"node\":{\"name\":\"Encoding & Codecs\",\"slug\":\"encoding-codecs\"},\"parents\":{\"category\":{\"name\":\"Encoding & Codecs\",\"slug\":\"encoding-codecs\"}},\"page\":1,\"pageSize\":24,\"total\":335,\"totalP"
+      }
+    },
+    {
+      "item": "A01",
+      "ok": true,
+      "label": "anon GET /api/public/resources?search=<word>: 200, fixture present, private markers absent",
+      "detail": {
+        "status": 200,
+        "body": "{\"resources\":[{\"id\":188654,\"title\":\"__qa_test_plan_580_1791562070462 zqxplanmv15ssse r1-approved\",\"url\":\"https://example.com/__qa_test_plan_580_1791562070462/r1-approved\",\"description\":\"__qa_test_plan"
+      }
+    },
+    {
+      "item": "A01",
+      "ok": true,
+      "label": "anon GET /api/public/resources/:id: 200, fixture present, private markers absent",
+      "detail": {
+        "status": 200,
+        "body": "{\"id\":188654,\"title\":\"__qa_test_plan_580_1791562070462 zqxplanmv15ssse r1-approved\",\"url\":\"https://example.com/__qa_test_plan_580_1791562070462/r1-approved\",\"description\":\"__qa_test_plan_580_179156207"
+      }
+    },
+    {
+      "item": "A01",
+      "ok": true,
+      "label": "anon GET /api/recommendations (guest, no refresh): 200, fixture present, private markers absent",
+      "detail": {
+        "status": 200,
+        "body": "[{\"resource\":{\"id\":188015,\"title\":\"srtdroid\",\"url\":\"https://github.com/ThibaultBee/srtdroid\",\"description\":\"Native Java/Kotlin SRT protocol implementation for Android mobile streaming applications\",\"c"
+      }
+    },
+    {
+      "item": "A01",
+      "ok": true,
+      "label": "anon GET /resource/:id (SSR HTML): 200, fixture present, private markers absent",
+      "detail": {
+        "status": 200,
+        "body": "<!DOCTYPE html>\n<html lang=\"en\" class=\"dark\" data-product-profile=\"public-discovery\">\n  <head>\n    <!--OG_META_INJECTED-->\n    <title data-react-helmet=\"true\">__qa_test_plan_580_1791562070462 zqxplanm"
+      }
+    },
+    {
+      "item": "A01",
+      "ok": true,
+      "label": "owner bookmark/favorite/view/collection publish succeed for the approved fixture",
+      "detail": {
+        "bm": 200,
+        "fv": 200,
+        "vw": 201,
+        "col": 201,
+        "add": 201,
+        "pub": 200
+      }
+    },
+    {
+      "item": "A01",
+      "ok": true,
+      "label": "signed-in GET /api/bookmarks: 200, fixture present, private markers absent",
+      "detail": {
+        "status": 200,
+        "body": "[{\"id\":188654,\"title\":\"__qa_test_plan_580_1791562070462 zqxplanmv15ssse r1-approved\",\"url\":\"https://example.com/__qa_test_plan_580_1791562070462/r1-approved\",\"description\":\"__qa_test_plan_580_17915620"
+      }
+    },
+    {
+      "item": "A01",
+      "ok": true,
+      "label": "signed-in GET /api/favorites: 200, fixture present, private markers absent",
+      "detail": {
+        "status": 200,
+        "body": "[{\"id\":188654,\"title\":\"__qa_test_plan_580_1791562070462 zqxplanmv15ssse r1-approved\",\"url\":\"https://example.com/__qa_test_plan_580_1791562070462/r1-approved\",\"description\":\"__qa_test_plan_580_17915620"
+      }
+    },
+    {
+      "item": "A01",
+      "ok": true,
+      "label": "signed-in GET /api/user/continue-learning: 200, fixture present, private markers absent",
+      "detail": {
+        "status": 200,
+        "body": "{\"activeJourneys\":[],\"recentResources\":[{\"resourceId\":188654,\"title\":\"__qa_test_plan_580_1791562070462 zqxplanmv15ssse r1-approved\",\"category\":\"Encoding & Codecs\",\"viewedAt\":\"2026-10-09T16:07:54.372Z\""
+      }
+    },
+    {
+      "item": "A01",
+      "ok": true,
+      "label": "signed-in GET /api/collections: 200, fixture present, private markers absent",
+      "detail": {
+        "status": 200,
+        "body": "[{\"id\":479,\"userId\":\"__qa_test_plan_580_1791562070462_a\",\"name\":\"__qa_test_plan_580_1791562070462 collection\",\"position\":0,\"archivedAt\":null,\"shareId\":\"tJ0UIEZW6a8mkfdtFW0daU0w\",\"publishedAt\":\"2026-10"
+      }
+    },
+    {
+      "item": "A01",
+      "ok": true,
+      "label": "signed-in GET /api/resources/:id: 200, fixture present, private markers absent",
+      "detail": {
+        "status": 200,
+        "body": "{\"id\":188654,\"title\":\"__qa_test_plan_580_1791562070462 zqxplanmv15ssse r1-approved\",\"url\":\"https://example.com/__qa_test_plan_580_1791562070462/r1-approved\",\"description\":\"__qa_test_plan_580_179156207"
+      }
+    },
+    {
+      "item": "A01",
+      "ok": true,
+      "label": "anon GET /api/public/collections/:shareId: 200, fixture present, private markers absent",
+      "detail": {
+        "status": 200,
+        "body": "{\"shareId\":\"tJ0UIEZW6a8mkfdtFW0daU0w\",\"name\":\"__qa_test_plan_580_1791562070462 collection\",\"publishedAt\":\"2026-10-09T16:07:54.675Z\",\"resources\":[{\"id\":188654,\"title\":\"__qa_test_plan_580_1791562070462 "
+      }
+    },
+    {
+      "item": "A01",
+      "ok": true,
+      "label": "detail metadata is the allowlisted projection (tags kept, private keys dropped)",
+      "detail": {
+        "keys": [
+          "id",
+          "title",
+          "url",
+          "description",
+          "category",
+          "subcategory",
+          "subSubcategory",
+          "resourceFormat",
+          "provider",
+          "skillLevel",
+          "kind",
+          "status",
+          "createdAt",
+          "metadata",
+          "resolvedKind"
+        ],
+        "metadata": {
+          "tags": [
+            "qa-test-plan-580-mv15ssse"
+          ]
+        }
+      }
+    },
+    {
+      "item": "A02",
+      "ok": true,
+      "label": "approved saves still work (R1, R5 while approved)",
+      "detail": {
+        "preF": 200,
+        "preB": 200,
+        "okF": 200,
+        "okB": 200
+      }
+    },
+    {
+      "item": "A02",
+      "ok": true,
+      "label": "admin archives formerly approved R5",
+      "detail": {
+        "status": 200,
+        "body": "{\"id\":188658,\"title\":\"__qa_test_plan_580_1791562070462 zqxplanmv15ssse r5-formerly-approved\",\"url\":\"https://example.com/__qa_test_plan_580_17915620704"
+      }
+    },
+    {
+      "item": "A02",
+      "ok": true,
+      "label": "B on pending R2: detail 404, favorite 404, bookmark 404",
+      "detail": {
+        "d": {
+          "status": 404,
+          "body": "{\"message\":\"Resource not found\"}"
+        },
+        "f": {
+          "status": 404,
+          "body": "{\"message\":\"Resource not found\"}"
+        },
+        "b": {
+          "status": 404,
+          "body": "{\"message\":\"Resource not found\"}"
+        }
+      }
+    },
+    {
+      "item": "A02",
+      "ok": true,
+      "label": "B on rejected R3: detail 404, favorite 404, bookmark 404",
+      "detail": {
+        "d": {
+          "status": 404,
+          "body": "{\"message\":\"Resource not found\"}"
+        },
+        "f": {
+          "status": 404,
+          "body": "{\"message\":\"Resource not found\"}"
+        },
+        "b": {
+          "status": 404,
+          "body": "{\"message\":\"Resource not found\"}"
+        }
+      }
+    },
+    {
+      "item": "A02",
+      "ok": true,
+      "label": "B on withdrawn R4: detail 404, favorite 404, bookmark 404",
+      "detail": {
+        "d": {
+          "status": 404,
+          "body": "{\"message\":\"Resource not found\"}"
+        },
+        "f": {
+          "status": 404,
+          "body": "{\"message\":\"Resource not found\"}"
+        },
+        "b": {
+          "status": 404,
+          "body": "{\"message\":\"Resource not found\"}"
+        }
+      }
+    },
+    {
+      "item": "A02",
+      "ok": true,
+      "label": "B on formerly-approved R5: detail 404, favorite 404, bookmark 404",
+      "detail": {
+        "d": {
+          "status": 404,
+          "body": "{\"message\":\"Resource not found\"}"
+        },
+        "f": {
+          "status": 404,
+          "body": "{\"message\":\"Resource not found\"}"
+        },
+        "b": {
+          "status": 404,
+          "body": "{\"message\":\"Resource not found\"}"
+        }
+      }
+    },
+    {
+      "item": "A02",
+      "ok": true,
+      "label": "owner A saving own pending R2: favorite 404, bookmark 404"
+    },
+    {
+      "item": "A02",
+      "ok": true,
+      "label": "B GET /api/bookmarks: R1 listed, no non-public ids/titles/urls",
+      "detail": {
+        "ids": [
+          188654
+        ],
+        "leakIds": [],
+        "leakText": []
+      }
+    },
+    {
+      "item": "A02",
+      "ok": true,
+      "label": "B GET /api/favorites: R1 listed, no non-public ids/titles/urls",
+      "detail": {
+        "ids": [
+          188654
+        ],
+        "leakIds": [],
+        "leakText": []
+      }
+    },
+    {
+      "item": "A02",
+      "ok": true,
+      "label": "A GET /api/bookmarks: R1 listed, no non-public ids/titles/urls",
+      "detail": {
+        "ids": [
+          188654
+        ],
+        "leakIds": [],
+        "leakText": []
+      }
+    },
+    {
+      "item": "A02",
+      "ok": true,
+      "label": "A GET /api/favorites: R1 listed, no non-public ids/titles/urls",
+      "detail": {
+        "ids": [
+          188654
+        ],
+        "leakIds": [],
+        "leakText": []
+      }
+    },
+    {
+      "item": "A02",
+      "ok": true,
+      "label": "B view of archived R5 → 404; continue-learning shows no R5 title",
+      "detail": {
+        "status": 200,
+        "body": "{\"activeJourneys\":[],\"recentResources\":[],\"completedMilestones\":[],\"suggestedJourneys\":[{\"journeyId\":6,\"title\":\"Video Streaming Fundamentals\",\"description\":\"Learn how video actually gets from a camera"
+      }
+    },
+    {
+      "item": "A03",
+      "ok": true,
+      "label": "multiline/tab/markup text note round-trips verbatim",
+      "detail": {
+        "status": 200,
+        "echoed": "__qa_test_plan_580_1791562070462 line one\nline two\r\n\ttabbed <script>alert(1)</script> & \"quotes\""
+      }
+    },
+    {
+      "item": "A03",
+      "ok": true,
+      "label": "notes=object → 400, prior note kept",
+      "detail": {
+        "resp": {
+          "status": 400,
+          "body": "{\"message\":\"notes must be a plain-text string of at most 500 characters without control characters\",\"error\":\"validation_failed\",\"fieldErrors\":{},\"errors\":[]}"
+        },
+        "kept": true
+      }
+    },
+    {
+      "item": "A03",
+      "ok": true,
+      "label": "notes=array → 400, prior note kept",
+      "detail": {
+        "resp": {
+          "status": 400,
+          "body": "{\"message\":\"notes must be a plain-text string of at most 500 characters without control characters\",\"error\":\"validation_failed\",\"fieldErrors\":{},\"errors\":[]}"
+        },
+        "kept": true
+      }
+    },
+    {
+      "item": "A03",
+      "ok": true,
+      "label": "notes=boolean → 400, prior note kept",
+      "detail": {
+        "resp": {
+          "status": 400,
+          "body": "{\"message\":\"notes must be a plain-text string of at most 500 characters without control characters\",\"error\":\"validation_failed\",\"fieldErrors\":{},\"errors\":[]}"
+        },
+        "kept": true
+      }
+    },
+    {
+      "item": "A03",
+      "ok": true,
+      "label": "notes=number → 400, prior note kept",
+      "detail": {
+        "resp": {
+          "status": 400,
+          "body": "{\"message\":\"notes must be a plain-text string of at most 500 characters without control characters\",\"error\":\"validation_failed\",\"fieldErrors\":{},\"errors\":[]}"
+        },
+        "kept": true
+      }
+    },
+    {
+      "item": "A03",
+      "ok": true,
+      "label": "notes=null → 400, prior note kept",
+      "detail": {
+        "resp": {
+          "status": 400,
+          "body": "{\"message\":\"notes must be a plain-text string of at most 500 characters without control characters\",\"error\":\"validation_failed\",\"fieldErrors\":{},\"errors\":[]}"
+        },
+        "kept": true
+      }
+    },
+    {
+      "item": "A03",
+      "ok": true,
+      "label": "notes=501 chars → 400, prior note kept",
+      "detail": {
+        "resp": {
+          "status": 400,
+          "body": "{\"message\":\"notes must be a plain-text string of at most 500 characters without control characters\",\"error\":\"validation_failed\",\"fieldErrors\":{},\"errors\":[]}"
+        },
+        "kept": true
+      }
+    },
+    {
+      "item": "A03",
+      "ok": true,
+      "label": "notes=control char \\u0007 → 400, prior note kept",
+      "detail": {
+        "resp": {
+          "status": 400,
+          "body": "{\"error\":\"validation_failed\",\"message\":\"Invalid request body\",\"fieldErrors\":{\"notes\":\"must not contain control characters\"},\"errors\":[{\"code\":\"custom\",\"message\""
+        },
+        "kept": true
+      }
+    },
+    {
+      "item": "A03",
+      "ok": true,
+      "label": "notes=NUL → 400, prior note kept",
+      "detail": {
+        "resp": {
+          "status": 400,
+          "body": "{\"error\":\"validation_failed\",\"message\":\"Invalid request body\",\"fieldErrors\":{\"notes\":\"must not contain control characters\"},\"errors\":[{\"code\":\"custom\",\"message\""
+        },
+        "kept": true
+      }
+    },
+    {
+      "item": "A03",
+      "ok": true,
+      "label": "500-character note → 200 and stored"
+    },
+    {
+      "item": "A03",
+      "ok": true,
+      "label": "bare duplicate save (no notes) → 200, annotation preserved"
+    },
+    {
+      "item": "A03",
+      "ok": true,
+      "label": "empty-string notes clears the annotation",
+      "detail": {
+        "clr": {
+          "status": 200,
+          "body": "{\"message\":\"Bookmark added successfully\",\"isBookmarked\":true,\"notes\":\"\"}"
+        },
+        "listNotes": "<omitted>",
+        "dbNotes": ""
+      }
+    },
+    {
+      "item": "A04",
+      "ok": true,
+      "label": "self-assigning a tier scope (premium / Standard) → 400",
+      "detail": {
+        "prem": {
+          "status": 400,
+          "body": "{\"message\":\"Rate-limit tiers are assigned by the server and cannot be requested as scopes (free, standard and premium are reserved)\",\"error\":\"validation_failed\",\"fieldErrors\":{},\"errors\":[]}"
+        },
+        "std": 400
+      }
+    },
+    {
+      "item": "A04",
+      "ok": true,
+      "label": "guest: RateLimit-Limit 60, IP bucket decrements",
+      "detail": {
+        "g1": {
+          "status": 200,
+          "limit": "60",
+          "remaining": "51",
+          "policy": "60;w=3600"
+        },
+        "g2": {
+          "status": 200,
+          "limit": "60",
+          "remaining": "50",
+          "policy": "60;w=3600"
+        }
+      }
+    },
+    {
+      "item": "A04",
+      "ok": true,
+      "label": "valid key: RateLimit-Limit 1000 on all 4 public endpoints, own bucket decrements",
+      "detail": [
+        {
+          "ep": "/api/public/resources?limit=1",
+          "status": 200,
+          "limit": "1000",
+          "remaining": "999",
+          "policy": "1000;w=3600"
+        },
+        {
+          "ep": "/api/public/resources/188654",
+          "status": 200,
+          "limit": "1000",
+          "remaining": "998",
+          "policy": "1000;w=3600"
+        },
+        {
+          "ep": "/api/public/categories",
+          "status": 200,
+          "limit": "1000",
+          "remaining": "997",
+          "policy": "1000;w=3600"
+        },
+        {
+          "ep": "/api/public/tags",
+          "status": 200,
+          "limit": "1000",
+          "remaining": "996",
+          "policy": "1000;w=3600"
+        }
+      ]
+    },
+    {
+      "item": "A04",
+      "ok": true,
+      "label": "key calls did not consume the guest IP bucket",
+      "detail": {
+        "g2": {
+          "status": 200,
+          "limit": "60",
+          "remaining": "50",
+          "policy": "60;w=3600"
+        },
+        "g3": {
+          "status": 200,
+          "limit": "60",
+          "remaining": "49",
+          "policy": "60;w=3600"
+        }
+      }
+    },
+    {
+      "item": "A04",
+      "ok": true,
+      "label": "/api/public/me reports server-assigned standard tier",
+      "detail": {
+        "authenticated": true,
+        "userId": "__qa_test_plan_580_1791562070462_a",
+        "keyName": "__qa_test_plan_580_1791562070462 k1",
+        "scopes": [
+          "read"
+        ],
+        "tier": "standard",
+        "rateLimit": {
+          "limit": 1000,
+          "windowSeconds": 3600
+        }
+      }
+    },
+    {
+      "item": "A04",
+      "ok": true,
+      "label": "legacy key row with scopes=[premium] still limited at 1000 (no upgrade)",
+      "detail": {
+        "status": 200,
+        "limit": "1000",
+        "remaining": "995",
+        "policy": "1000;w=3600"
+      }
+    },
+    {
+      "item": "A04",
+      "ok": true,
+      "label": "invalid key → 401 (Unauthorized: Invalid API key)",
+      "detail": {
+        "status": 401,
+        "body": "{\"message\":\"Unauthorized: Invalid API key\"}"
+      }
+    },
+    {
+      "item": "A04",
+      "ok": true,
+      "label": "revoked key → 401 (Unauthorized: API key has been revoked)",
+      "detail": {
+        "status": 401,
+        "body": "{\"message\":\"Unauthorized: API key has been revoked\"}"
+      }
+    },
+    {
+      "item": "A04",
+      "ok": true,
+      "label": "expired key → 401 (Unauthorized: API key has expired)",
+      "detail": {
+        "status": 401,
+        "body": "{\"message\":\"Unauthorized: API key has expired\"}"
+      }
+    },
+    {
+      "item": "A04",
+      "ok": true,
+      "label": "malformed header → 401 (Unauthorized: Invalid Authorization header format. Expected: Bearer <api-key>)",
+      "detail": {
+        "status": 401,
+        "body": "{\"message\":\"Unauthorized: Invalid Authorization header format. Expected: Bearer <api-key>\"}"
+      }
+    },
+    {
+      "item": "A04",
+      "ok": true,
+      "label": "shared store holds a standard-tier bucket keyed by the key id",
+      "detail": [
+        {
+          "limiter": "tier:standard",
+          "key": "apikey:65eb3201-49c8-452f-a182-fd2bc803b05e",
+          "hits": 5
+        }
+      ]
+    },
+    {
+      "item": "A05",
+      "ok": true,
+      "label": "/api/public/tags deep-equals /api/tags (1536 tags)",
+      "detail": {
+        "publicTotal": 1536,
+        "catalogTotal": 1536,
+        "sqlDistinctApprovedTags": 1536,
+        "first5": [
+          {
+            "tag": "open-source",
+            "count": 158
+          },
+          {
+            "tag": "video-streaming",
+            "count": 118
+          },
+          {
+            "tag": "streaming",
+            "count": 100
+          },
+          {
+            "tag": "video-processing",
+            "count": 81
+          },
+          {
+            "tag": "ffmpeg",
+            "count": 78
+          }
+        ]
+      }
+    },
+    {
+      "item": "A05",
+      "ok": true,
+      "label": "fixture tag counted (1); top tag \"open-source\" browse total equals its count",
+      "detail": {
+        "fx": {
+          "tag": "qa-test-plan-580-mv15ssse",
+          "count": 1
+        },
+        "browseTotal": 158,
+        "topCount": 158
+      }
+    },
+    {
+      "item": "A06",
+      "ok": true,
+      "label": "/api/resources documents every real filter and no unrelated generic keys",
+      "detail": [
+        "q",
+        "search",
+        "category",
+        "subcategory",
+        "subSubcategory",
+        "generalScope",
+        "tags",
+        "tag",
+        "provider",
+        "format",
+        "skillLevel",
+        "kind",
+        "sort",
+        "facets",
+        "status",
+        "page",
+        "limit",
+        "offset",
+        "cursor"
+      ]
+    },
+    {
+      "item": "A06",
+      "ok": true,
+      "label": "/api/search documents q/search/limit/offset only",
+      "detail": [
+        "q",
+        "search",
+        "limit",
+        "offset"
+      ]
+    },
+    {
+      "item": "A06",
+      "ok": true,
+      "label": "/api/awesome-list/listing documents kind",
+      "detail": [
+        "level",
+        "slug",
+        "page",
+        "subcategory",
+        "subSubcategory",
+        "general",
+        "kind"
+      ]
+    },
+    {
+      "item": "A06",
+      "ok": true,
+      "label": "/api/public/resources documents its real filters; /api/public/tags has none",
+      "detail": {
+        "pubR": [
+          "page",
+          "limit",
+          "category",
+          "subcategory",
+          "search"
+        ]
+      }
+    },
+    {
+      "item": "A06",
+      "ok": true,
+      "label": "GET /api/resources?q=hls&kind=tools&sort=name-asc&limit=5 → 200",
+      "detail": {
+        "status": 200,
+        "body": "{\"resources\":[{\"id\":185632,\"title\":\"Hlstools\",\"url\":\"https://github.com/muxinc/hlstools\",\"description\":\"Tools for working with HLS streams, including parsing, inspection, and manipulation of HTTP Live Streaming manifest "
+      }
+    },
+    {
+      "item": "A06",
+      "ok": true,
+      "label": "GET /api/resources?tags=open-source&facets=true&limit=1 → 200",
+      "detail": {
+        "status": 200,
+        "body": "{\"resources\":[{\"id\":186683,\"title\":\"libmpeg2\",\"url\":\"https://libmpeg2.sourceforge.net/\",\"description\":\"A free library for decoding MPEG-1 and MPEG-2 video streams. It's lightweight and portable, used in several open sour"
+      }
+    },
+    {
+      "item": "A06",
+      "ok": true,
+      "label": "GET /api/search?q=webrtc&limit=5 → 200",
+      "detail": {
+        "status": 200,
+        "body": "{\"query\":\"webrtc\",\"total\":54,\"limit\":5,\"offset\":0,\"nextOffset\":5,\"results\":[{\"id\":185125,\"title\":\"WebRTC\",\"url\":\"https://webrtc.org/\",\"description\":\"WebRTC (Web Real-Time Communication) is a free and open-source project "
+      }
+    },
+    {
+      "item": "A06",
+      "ok": true,
+      "label": "GET /api/awesome-list/listing?level=category&slug=encoding-codecs&kind=tools → 200",
+      "detail": {
+        "status": 200,
+        "body": "{\"level\":\"category\",\"node\":{\"name\":\"Encoding & Codecs\",\"slug\":\"encoding-codecs\"},\"parents\":{\"category\":{\"name\":\"Encoding & Codecs\",\"slug\":\"encoding-codecs\"}},\"page\":1,\"pageSize\":24,\"total\":5,\"totalPages\":1,\"totalAll\":5,\""
+      }
+    },
+    {
+      "item": "A06",
+      "ok": true,
+      "label": "GET /api/resources?provider=YouTube&limit=1 → 200",
+      "detail": {
+        "status": 200,
+        "body": "{\"resources\":[],\"total\":0,\"limit\":1,\"offset\":0,\"nextOffset\":null,\"nextCursor\":null,\"pagination\":{\"page\":1,\"limit\":1,\"total\":0,\"totalPages\":1,\"hasMore\":false}}"
+      }
+    },
+    {
+      "item": "A06",
+      "ok": true,
+      "label": "GET /api/resources?kind=bogus → 400",
+      "detail": {
+        "status": 400,
+        "body": "{\"error\":\"invalid_kind\",\"message\":\"kind must be one of: tools, libraries, standards, events, protocols, other\",\"allowed\":[\"tools\",\"libraries\",\"standards\",\"events\",\"protocols\",\"other\"],\"fieldErrors\":{},\"errors\":[]}"
+      }
+    },
+    {
+      "item": "A06",
+      "ok": true,
+      "label": "GET /api/resources?sort=bogus → 400",
+      "detail": {
+        "status": 400,
+        "body": "{\"error\":\"invalid_sort\",\"message\":\"sort must be one of: relevance, name-asc, name-desc, newest, oldest\",\"allowed\":[\"relevance\",\"name-asc\",\"name-desc\",\"newest\",\"oldest\"],\"fieldErrors\":{},\"errors\":[]}"
+      }
+    },
+    {
+      "item": "A06",
+      "ok": true,
+      "label": "GET /api/resources?provider=nope → 400",
+      "detail": {
+        "status": 400,
+        "body": "{\"error\":\"invalid_provider\",\"message\":\"provider must be one of: unknown, self-hosted, github, youtube, vimeo, aws, google-cloud, azure, cloudflare, mux, akamai, wowza, brightcove, bitmovin, other\",\"allowed\":[\"unknown\",\"s"
+      }
+    },
+    {
+      "item": "A06",
+      "ok": true,
+      "label": "GET /api/resources?limit=500 → 400",
+      "detail": {
+        "status": 400,
+        "body": "{\"error\":\"invalid_limit\",\"message\":\"limit must be an integer between 1 and 100\",\"fieldErrors\":{},\"errors\":[]}"
+      }
+    },
+    {
+      "item": "A06",
+      "ok": true,
+      "label": "GET /api/resources?q=hls&q=dash&limit=1 → 200",
+      "detail": {
+        "status": 200,
+        "body": "{\"resources\":[{\"id\":185515,\"title\":\"hlsjs-p2p-engine\",\"url\":\"https://cdnbye.github.io/hlsjs-p2p-engine/\",\"description\":\"hlsjs-p2p-engine enhances video streaming scalability by implementing WebRTC data channels to create"
+      }
+    },
+    {
+      "item": "A06",
+      "ok": true,
+      "label": "GET /api/search?q=webrtc&limit=abc → 400",
+      "detail": {
+        "status": 400,
+        "body": "{\"error\":\"validation_failed\",\"message\":\"Invalid query parameters\",\"fieldErrors\":{\"limit\":\"must be a positive integer\"},\"errors\":[{\"origin\":\"string\",\"code\":\"invalid_format\",\"format\":\"regex\",\"pattern\":\"/^\\\\d+$/\",\"path\":[\"l"
+      }
+    },
+    {
+      "item": "A06",
+      "ok": true,
+      "label": "GET /api/search?q=webrtc&limit=999 → 200",
+      "detail": {
+        "status": 200,
+        "body": "{\"query\":\"webrtc\",\"total\":54,\"limit\":200,\"offset\":0,\"nextOffset\":null,\"results\":[{\"id\":185125,\"title\":\"WebRTC\",\"url\":\"https://webrtc.org/\",\"description\":\"WebRTC (Web Real-Time Communication) is a free and open-source pro"
+      }
+    },
+    {
+      "item": "A06",
+      "ok": true,
+      "label": "GET /api/awesome-list/listing?level=category&slug=encoding-codecs&kind=bogus → 400",
+      "detail": {
+        "status": 400,
+        "body": "{\"error\":\"validation_failed\",\"message\":\"Invalid query parameters\",\"fieldErrors\":{\"kind\":\"Invalid option: expected one of \\\"tools\\\"|\\\"libraries\\\"|\\\"standards\\\"|\\\"events\\\"|\\\"protocols\\\"|\\\"other\\\"\"},\"errors\":[{\"code\":\"inval"
+      }
+    },
+    {
+      "item": "teardown",
+      "ok": true,
+      "label": "residue SQL returns 0 on every surface",
+      "detail": [
+        {
+          "s": "resources",
+          "n": 0
+        },
+        {
+          "s": "users",
+          "n": 0
+        },
+        {
+          "s": "api_keys",
+          "n": 0
+        },
+        {
+          "s": "bookmark_collections",
+          "n": 0
+        },
+        {
+          "s": "user_bookmarks",
+          "n": 0
+        },
+        {
+          "s": "user_favorites",
+          "n": 0
+        },
+        {
+          "s": "user_interactions",
+          "n": 0
+        },
+        {
+          "s": "rate_limit_hits(api keys)",
+          "n": 0
+        }
+      ]
+    }
+  ],
+  "fixtures": {
+    "R1": 188654,
+    "R2": 188655,
+    "R3": 188656,
+    "R4": 188657,
+    "R5": 188658
+  },
+  "a01DetailSample": {
+    "keys": [
+      "id",
+      "title",
+      "url",
+      "description",
+      "category",
+      "subcategory",
+      "subSubcategory",
+      "resourceFormat",
+      "provider",
+      "skillLevel",
+      "kind",
+      "status",
+      "createdAt",
+      "metadata",
+      "resolvedKind"
+    ],
+    "metadata": {
+      "tags": [
+        "qa-test-plan-580-mv15ssse"
+      ]
+    }
+  },
+  "a02": {
+    "bRowForR5Retained": 1
+  },
+  "a04Keys": {
+    "K1": "65eb3201-49c8-452f-a182-fd2bc803b05e",
+    "K2": "e6c4c3ed-e1d5-4569-b27e-73fed87da25c",
+    "K3": "06310aa6-036b-4025-8228-9aa0b7af3df7",
+    "revoke": 200
+  },
+  "a04Buckets": [
+    {
+      "limiter": "tier:standard",
+      "key": "apikey:65eb3201-49c8-452f-a182-fd2bc803b05e",
+      "hits": 5
+    }
+  ],
+  "a05": {
+    "publicTotal": 1536,
+    "catalogTotal": 1536,
+    "sqlDistinctApprovedTags": 1536,
+    "first5": [
+      {
+        "tag": "open-source",
+        "count": 158
+      },
+      {
+        "tag": "video-streaming",
+        "count": 118
+      },
+      {
+        "tag": "streaming",
+        "count": 100
+      },
+      {
+        "tag": "video-processing",
+        "count": 81
+      },
+      {
+        "tag": "ffmpeg",
+        "count": 78
+      }
+    ]
+  },
+  "a06": {
+    "resources": [
+      "q",
+      "search",
+      "category",
+      "subcategory",
+      "subSubcategory",
+      "generalScope",
+      "tags",
+      "tag",
+      "provider",
+      "format",
+      "skillLevel",
+      "kind",
+      "sort",
+      "facets",
+      "status",
+      "page",
+      "limit",
+      "offset",
+      "cursor"
+    ],
+    "search": [
+      "q",
+      "search",
+      "limit",
+      "offset"
+    ],
+    "listing": [
+      "level",
+      "slug",
+      "page",
+      "subcategory",
+      "subSubcategory",
+      "general",
+      "kind"
+    ],
+    "publicResources": [
+      "page",
+      "limit",
+      "category",
+      "subcategory",
+      "search"
+    ],
+    "publicTags": [],
+    "kindParam": {
+      "name": "kind",
+      "in": "query",
+      "required": false,
+      "schema": {
+        "description": "Resolved kind (stored or tag-inferred); other values return 400 invalid_kind",
+        "type": "string",
+        "enum": [
+          "tools",
+          "libraries",
+          "standards",
+          "events",
+          "protocols",
+          "other"
+        ]
+      }
+    }
+  },
+  "residue": [
+    {
+      "s": "resources",
+      "n": 0
+    },
+    {
+      "s": "users",
+      "n": 0
+    },
+    {
+      "s": "api_keys",
+      "n": 0
+    },
+    {
+      "s": "bookmark_collections",
+      "n": 0
+    },
+    {
+      "s": "user_bookmarks",
+      "n": 0
+    },
+    {
+      "s": "user_favorites",
+      "n": 0
+    },
+    {
+      "s": "user_interactions",
+      "n": 0
+    },
+    {
+      "s": "rate_limit_hits(api keys)",
+      "n": 0
+    }
+  ],
+  "failures": 0,
+  "finishedAt": "2026-10-09T16:08:01.875Z"
+}

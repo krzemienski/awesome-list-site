@@ -79,3 +79,12 @@
   font-size: 11px;
   letter-spacing: 0.02em;
 }
+
+/* BUG-041 legibility floor on the display-only preview card: the design sets
+   .chip and .kbd at 10.5px; specimens here render at 12px minimum
+   (docs/parity/assumptions/tokens.md §2). Scoped so canonical sizes hold
+   everywhere else. */
+[data-testid="preview-card"] .chip,
+[data-testid="preview-card"] .kbd {
+  font-size: 12px;
+}

@@ -1,0 +1,792 @@
+{
+  "run": "__qa_test_plan_580_1791564675559",
+  "base": "http://127.0.0.1:5000",
+  "startedAt": "2026-10-09T16:51:15.560Z",
+  "checks": [
+    {
+      "item": "setup",
+      "ok": true,
+      "label": "two throwaway Clerk users JIT-provisioned",
+      "detail": {
+        "a": "__qa_test_plan_580_1791564675559_a",
+        "b": "__qa_test_plan_580_1791564675559_b",
+        "aRole": "user",
+        "bRole": "user"
+      }
+    },
+    {
+      "item": "setup",
+      "ok": true,
+      "label": "fixtures moderated via real admin/owner APIs",
+      "detail": {
+        "ap1": 200,
+        "ap5": 200,
+        "rj3": 200,
+        "wd4": {
+          "status": 200,
+          "body": "{\"message\":\"Resource submission withdrawn\",\"current\":{\"id\":188669,\"kind\":\"resource\",\"status\":\"withdrawn\",\"changedAt\":\"2026-10-09T16:51:40.313Z\"}}"
+        },
+        "db": [
+          {
+            "id": 188666,
+            "status": "approved",
+            "has_private": true
+          },
+          {
+            "id": 188667,
+            "status": "pending",
+            "has_private": true
+          },
+          {
+            "id": 188668,
+            "status": "rejected",
+            "has_private": true
+          },
+          {
+            "id": 188669,
+            "status": "withdrawn",
+            "has_private": true
+          },
+          {
+            "id": 188670,
+            "status": "approved",
+            "has_private": true
+          }
+        ]
+      }
+    },
+    {
+      "item": "A01",
+      "ok": true,
+      "label": "anon GET /api/resources/:id: 200, fixture present, private markers absent",
+      "detail": {
+        "status": 200,
+        "body": "{\"id\":188666,\"title\":\"__qa_test_plan_580_1791564675559 zqxplanmv17cmw7 r1-approved\",\"url\":\"https://example.com/__qa_test_plan_580_1791564675559/r1-approved\",\"description\":\"__qa_test_plan_580_179156467"
+      }
+    },
+    {
+      "item": "A01",
+      "ok": true,
+      "label": "anon GET /api/resources?tags=<fixture tag>: 200, fixture present, private markers absent",
+      "detail": {
+        "status": 200,
+        "body": "{\"resources\":[{\"id\":188670,\"title\":\"__qa_test_plan_580_1791564675559 zqxplanmv17cmw7 r5-formerly-approved\",\"url\":\"https://example.com/__qa_test_plan_580_1791564675559/r5-formerly-approved\",\"descriptio"
+      }
+    },
+    {
+      "item": "A01",
+      "ok": true,
+      "label": "anon GET /api/resources?q=<fixture word>&facets=true: 200, fixture present, private markers absent",
+      "detail": {
+        "status": 200,
+        "body": "{\"resources\":[{\"id\":188666,\"title\":\"__qa_test_plan_580_1791564675559 zqxplanmv17cmw7 r1-approved\",\"url\":\"https://example.com/__qa_test_plan_580_1791564675559/r1-approved\",\"description\":\"__qa_test_plan"
+      }
+    },
+    {
+      "item": "A01",
+      "ok": true,
+      "label": "anon GET /api/search?q=<fixture word>: 200, fixture present, private markers absent",
+      "detail": {
+        "status": 200,
+        "body": "{\"query\":\"zqxplanmv17cmw7\",\"total\":2,\"limit\":100,\"offset\":0,\"nextOffset\":null,\"results\":[{\"id\":188666,\"title\":\"__qa_test_plan_580_1791564675559 zqxplanmv17cmw7 r1-approved\",\"url\":\"https://example.com/"
+      }
+    },
+    {
+      "item": "A01",
+      "ok": true,
+      "label": "anon GET /api/home: 200, fixture present, private markers absent",
+      "detail": {
+        "status": 200,
+        "body": "{\"total\":1818,\"approvedThisWeek\":2,\"featuredCount\":0,\"recent\":[{\"id\":188670,\"title\":\"__qa_test_plan_580_1791564675559 zqxplanmv17cmw7 r5-formerly-approved\",\"url\":\"https://example.com/__qa_test_plan_58"
+      }
+    },
+    {
+      "item": "A01",
+      "ok": true,
+      "label": "anon GET /api/resources/:id/related: 200, fixture present, private markers absent",
+      "detail": {
+        "status": 200,
+        "body": "{\"similar\":[{\"resource\":{\"id\":188670,\"title\":\"__qa_test_plan_580_1791564675559 zqxplanmv17cmw7 r5-formerly-approved\",\"url\":\"https://example.com/__qa_test_plan_580_1791564675559/r5-formerly-approved\",\""
+      }
+    },
+    {
+      "item": "A01",
+      "ok": true,
+      "label": "anon GET /api/awesome-list: 200, fixture present, private markers absent",
+      "detail": {
+        "status": 200,
+        "body": "{\"title\":\"Awesome Video\",\"description\":\"A curated list of awesome video tools, frameworks, libraries, and learning resources\",\"repoUrl\":\"https://github.com/krzemienski/awesome-video\",\"resources\":[{\"id"
+      }
+    },
+    {
+      "item": "A01",
+      "ok": true,
+      "label": "anon GET /api/awesome-list?category=Encoding & Codecs: 200, fixture present, private markers absent",
+      "detail": {
+        "status": 200,
+        "body": "{\"title\":\"Awesome Video\",\"description\":\"A curated list of awesome video tools, frameworks, libraries, and learning resources\",\"repoUrl\":\"https://github.com/krzemienski/awesome-video\",\"resources\":[{\"id"
+      }
+    },
+    {
+      "item": "A01",
+      "ok": true,
+      "label": "anon GET /api/awesome-list/listing?level=category&slug=encoding-codecs: 200, fixture absent, private markers absent",
+      "detail": {
+        "status": 200,
+        "body": "{\"level\":\"category\",\"node\":{\"name\":\"Encoding & Codecs\",\"slug\":\"encoding-codecs\"},\"parents\":{\"category\":{\"name\":\"Encoding & Codecs\",\"slug\":\"encoding-codecs\"}},\"page\":1,\"pageSize\":24,\"total\":335,\"totalP"
+      }
+    },
+    {
+      "item": "A01",
+      "ok": true,
+      "label": "anon GET /api/public/resources?search=<word>: 200, fixture present, private markers absent",
+      "detail": {
+        "status": 200,
+        "body": "{\"resources\":[{\"id\":188666,\"title\":\"__qa_test_plan_580_1791564675559 zqxplanmv17cmw7 r1-approved\",\"url\":\"https://example.com/__qa_test_plan_580_1791564675559/r1-approved\",\"description\":\"__qa_test_plan"
+      }
+    },
+    {
+      "item": "A01",
+      "ok": true,
+      "label": "anon GET /api/public/resources/:id: 200, fixture present, private markers absent",
+      "detail": {
+        "status": 200,
+        "body": "{\"id\":188666,\"title\":\"__qa_test_plan_580_1791564675559 zqxplanmv17cmw7 r1-approved\",\"url\":\"https://example.com/__qa_test_plan_580_1791564675559/r1-approved\",\"description\":\"__qa_test_plan_580_179156467"
+      }
+    },
+    {
+      "item": "A01",
+      "ok": true,
+      "label": "anon GET /api/recommendations (guest, no refresh): 200, fixture present, private markers absent",
+      "detail": {
+        "status": 200,
+        "body": "[{\"resource\":{\"id\":188015,\"title\":\"srtdroid\",\"url\":\"https://github.com/ThibaultBee/srtdroid\",\"description\":\"Native Java/Kotlin SRT protocol implementation for Android mobile streaming applications\",\"c"
+      }
+    },
+    {
+      "item": "A01",
+      "ok": true,
+      "label": "anon GET /resource/:id (SSR HTML): 200, fixture present, private markers absent",
+      "detail": {
+        "status": 200,
+        "body": "<!DOCTYPE html>\n<html lang=\"en\" class=\"dark\" data-product-profile=\"public-discovery\">\n  <head>\n    <!--OG_META_INJECTED-->\n    <title data-react-helmet=\"true\">__qa_test_plan_580_1791564675559 zqxplanm"
+      }
+    },
+    {
+      "item": "A01",
+      "ok": true,
+      "label": "owner bookmark/favorite/view/collection publish succeed for the approved fixture",
+      "detail": {
+        "bm": 200,
+        "fv": 200,
+        "vw": 201,
+        "col": 201,
+        "add": 201,
+        "pub": 200
+      }
+    },
+    {
+      "item": "A01",
+      "ok": true,
+      "label": "shared collection read ignores Authorization (documented site-endpoint exemption from the developer key policy)",
+      "detail": {
+        "anon": {
+          "status": 200,
+          "limit": "600",
+          "vary": "Accept-Encoding",
+          "cc": null,
+          "bytes": 604
+        },
+        "badKey": {
+          "status": 200,
+          "limit": "600",
+          "vary": "Accept-Encoding",
+          "cc": null,
+          "bytes": 604
+        }
+      }
+    },
+    {
+      "item": "A01",
+      "ok": true,
+      "label": "signed-in GET /api/bookmarks: 200, fixture present, private markers absent",
+      "detail": {
+        "status": 200,
+        "body": "[{\"id\":188666,\"title\":\"__qa_test_plan_580_1791564675559 zqxplanmv17cmw7 r1-approved\",\"url\":\"https://example.com/__qa_test_plan_580_1791564675559/r1-approved\",\"description\":\"__qa_test_plan_580_17915646"
+      }
+    },
+    {
+      "item": "A01",
+      "ok": true,
+      "label": "signed-in GET /api/favorites: 200, fixture present, private markers absent",
+      "detail": {
+        "status": 200,
+        "body": "[{\"id\":188666,\"title\":\"__qa_test_plan_580_1791564675559 zqxplanmv17cmw7 r1-approved\",\"url\":\"https://example.com/__qa_test_plan_580_1791564675559/r1-approved\",\"description\":\"__qa_test_plan_580_17915646"
+      }
+    },
+    {
+      "item": "A01",
+      "ok": true,
+      "label": "signed-in GET /api/user/continue-learning: 200, fixture present, private markers absent",
+      "detail": {
+        "status": 200,
+        "body": "{\"activeJourneys\":[],\"recentResources\":[{\"resourceId\":188666,\"title\":\"__qa_test_plan_580_1791564675559 zqxplanmv17cmw7 r1-approved\",\"category\":\"Encoding & Codecs\",\"viewedAt\":\"2026-10-09T16:51:47.839Z\""
+      }
+    },
+    {
+      "item": "A01",
+      "ok": true,
+      "label": "signed-in GET /api/collections: 200, fixture present, private markers absent",
+      "detail": {
+        "status": 200,
+        "body": "[{\"id\":485,\"userId\":\"__qa_test_plan_580_1791564675559_a\",\"name\":\"__qa_test_plan_580_1791564675559 collection\",\"position\":0,\"archivedAt\":null,\"shareId\":\"DJ45mdVzBho1ml5wZyGQlOO2\",\"publishedAt\":\"2026-10"
+      }
+    },
+    {
+      "item": "A01",
+      "ok": true,
+      "label": "signed-in GET /api/resources/:id: 200, fixture present, private markers absent",
+      "detail": {
+        "status": 200,
+        "body": "{\"id\":188666,\"title\":\"__qa_test_plan_580_1791564675559 zqxplanmv17cmw7 r1-approved\",\"url\":\"https://example.com/__qa_test_plan_580_1791564675559/r1-approved\",\"description\":\"__qa_test_plan_580_179156467"
+      }
+    },
+    {
+      "item": "A01",
+      "ok": true,
+      "label": "anon GET /api/public/collections/:shareId: 200, fixture present, private markers absent",
+      "detail": {
+        "status": 200,
+        "body": "{\"shareId\":\"DJ45mdVzBho1ml5wZyGQlOO2\",\"name\":\"__qa_test_plan_580_1791564675559 collection\",\"publishedAt\":\"2026-10-09T16:51:48.534Z\",\"resources\":[{\"id\":188666,\"title\":\"__qa_test_plan_580_1791564675559 "
+      }
+    },
+    {
+      "item": "A01",
+      "ok": true,
+      "label": "detail metadata is the allowlisted projection (tags kept, private keys dropped)",
+      "detail": {
+        "keys": [
+          "id",
+          "title",
+          "url",
+          "description",
+          "category",
+          "subcategory",
+          "subSubcategory",
+          "resourceFormat",
+          "provider",
+          "skillLevel",
+          "kind",
+          "status",
+          "createdAt",
+          "metadata",
+          "resolvedKind"
+        ],
+        "metadata": {
+          "tags": [
+            "qa-test-plan-580-mv17cmw7"
+          ]
+        }
+      }
+    },
+    {
+      "item": "A04",
+      "ok": true,
+      "label": "self-assigning a tier scope (premium / Standard) → 400",
+      "detail": {
+        "prem": {
+          "status": 400,
+          "body": "{\"message\":\"Rate-limit tiers are assigned by the server and cannot be requested as scopes (free, standard and premium are reserved)\",\"error\":\"validation_failed\",\"fieldErrors\":{},\"errors\":[]}"
+        },
+        "std": 400
+      }
+    },
+    {
+      "item": "A04",
+      "ok": true,
+      "label": "guest: RateLimit-Limit 60, IP bucket decrements",
+      "detail": {
+        "g1": {
+          "status": 200,
+          "limit": "60",
+          "remaining": "33",
+          "policy": "60;w=3600"
+        },
+        "g2": {
+          "status": 200,
+          "limit": "60",
+          "remaining": "32",
+          "policy": "60;w=3600"
+        }
+      }
+    },
+    {
+      "item": "A04",
+      "ok": true,
+      "label": "valid key: RateLimit-Limit 1000 on all 4 public endpoints, own bucket decrements",
+      "detail": [
+        {
+          "ep": "/api/public/resources?limit=1",
+          "status": 200,
+          "limit": "1000",
+          "remaining": "999",
+          "policy": "1000;w=3600"
+        },
+        {
+          "ep": "/api/public/resources/188666",
+          "status": 200,
+          "limit": "1000",
+          "remaining": "998",
+          "policy": "1000;w=3600"
+        },
+        {
+          "ep": "/api/public/categories",
+          "status": 200,
+          "limit": "1000",
+          "remaining": "997",
+          "policy": "1000;w=3600"
+        },
+        {
+          "ep": "/api/public/tags",
+          "status": 200,
+          "limit": "1000",
+          "remaining": "996",
+          "policy": "1000;w=3600"
+        }
+      ]
+    },
+    {
+      "item": "A04",
+      "ok": true,
+      "label": "key calls did not consume the guest IP bucket",
+      "detail": {
+        "g2": {
+          "status": 200,
+          "limit": "60",
+          "remaining": "32",
+          "policy": "60;w=3600"
+        },
+        "g3": {
+          "status": 200,
+          "limit": "60",
+          "remaining": "31",
+          "policy": "60;w=3600"
+        }
+      }
+    },
+    {
+      "item": "A04",
+      "ok": true,
+      "label": "/api/public/me reports server-assigned standard tier",
+      "detail": {
+        "authenticated": true,
+        "userId": "__qa_test_plan_580_1791564675559_a",
+        "keyName": "__qa_test_plan_580_1791564675559 k1",
+        "scopes": [
+          "read"
+        ],
+        "tier": "standard",
+        "rateLimit": {
+          "limit": 1000,
+          "windowSeconds": 3600
+        }
+      }
+    },
+    {
+      "item": "A04",
+      "ok": true,
+      "label": "legacy key row with scopes=[premium] still limited at 1000 (no upgrade)",
+      "detail": {
+        "status": 200,
+        "limit": "1000",
+        "remaining": "994",
+        "policy": "1000;w=3600"
+      }
+    },
+    {
+      "item": "A04",
+      "ok": true,
+      "label": "invalid key → 401 (Unauthorized: Invalid API key)",
+      "detail": {
+        "status": 401,
+        "body": "{\"message\":\"Unauthorized: Invalid API key\"}"
+      }
+    },
+    {
+      "item": "A04",
+      "ok": true,
+      "label": "revoked key → 401 (Unauthorized: API key has been revoked)",
+      "detail": {
+        "status": 401,
+        "body": "{\"message\":\"Unauthorized: API key has been revoked\"}"
+      }
+    },
+    {
+      "item": "A04",
+      "ok": true,
+      "label": "expired key → 401 (Unauthorized: API key has expired)",
+      "detail": {
+        "status": 401,
+        "body": "{\"message\":\"Unauthorized: API key has expired\"}"
+      }
+    },
+    {
+      "item": "A04",
+      "ok": true,
+      "label": "malformed header → 401 (Unauthorized: Invalid Authorization header format. Expected: Bearer <api-key>)",
+      "detail": {
+        "status": 401,
+        "body": "{\"message\":\"Unauthorized: Invalid Authorization header format. Expected: Bearer <api-key>\"}"
+      }
+    },
+    {
+      "item": "A04",
+      "ok": true,
+      "label": "anonymous public responses: public, max-age=60 + Vary: Authorization",
+      "detail": [
+        {
+          "ep": "/api/public/resources?limit=1",
+          "status": 200,
+          "cc": "public, max-age=60",
+          "vary": "Authorization, Accept-Encoding",
+          "limit": "60"
+        },
+        {
+          "ep": "/api/public/resources/188666",
+          "status": 200,
+          "cc": "public, max-age=60",
+          "vary": "Authorization, Accept-Encoding",
+          "limit": "60"
+        },
+        {
+          "ep": "/api/public/categories",
+          "status": 200,
+          "cc": "public, max-age=60",
+          "vary": "Authorization, Accept-Encoding",
+          "limit": "60"
+        },
+        {
+          "ep": "/api/public/tags",
+          "status": 200,
+          "cc": "public, max-age=60",
+          "vary": "Authorization, Accept-Encoding",
+          "limit": "60"
+        }
+      ]
+    },
+    {
+      "item": "A04",
+      "ok": true,
+      "label": "keyed public responses: private, no-store + Vary: Authorization",
+      "detail": [
+        {
+          "ep": "/api/public/resources?limit=1",
+          "status": 200,
+          "cc": "private, no-store",
+          "vary": "Authorization, Accept-Encoding",
+          "limit": "1000"
+        },
+        {
+          "ep": "/api/public/resources/188666",
+          "status": 200,
+          "cc": "private, no-store",
+          "vary": "Authorization, Accept-Encoding",
+          "limit": "1000"
+        },
+        {
+          "ep": "/api/public/categories",
+          "status": 200,
+          "cc": "private, no-store",
+          "vary": "Authorization, Accept-Encoding",
+          "limit": "1000"
+        },
+        {
+          "ep": "/api/public/tags",
+          "status": 200,
+          "cc": "private, no-store",
+          "vary": "Authorization, Accept-Encoding",
+          "limit": "1000"
+        }
+      ]
+    },
+    {
+      "item": "A04",
+      "ok": true,
+      "label": "bad-key 401s: no-store + Vary: Authorization",
+      "detail": [
+        {
+          "ep": "/api/public/resources?limit=1",
+          "status": 401,
+          "cc": "no-store",
+          "vary": "Authorization, Accept-Encoding",
+          "limit": "600"
+        },
+        {
+          "ep": "/api/public/resources/188666",
+          "status": 401,
+          "cc": "no-store",
+          "vary": "Authorization, Accept-Encoding",
+          "limit": "600"
+        },
+        {
+          "ep": "/api/public/categories",
+          "status": 401,
+          "cc": "no-store",
+          "vary": "Authorization, Accept-Encoding",
+          "limit": "600"
+        },
+        {
+          "ep": "/api/public/tags",
+          "status": 401,
+          "cc": "no-store",
+          "vary": "Authorization, Accept-Encoding",
+          "limit": "600"
+        }
+      ]
+    },
+    {
+      "item": "A04",
+      "ok": true,
+      "label": "/api/public/me is rate-limited in the key's standard bucket and never cached",
+      "detail": {
+        "status": 200,
+        "cc": "private, no-store",
+        "vary": "Authorization, Accept-Encoding",
+        "limit": "1000"
+      }
+    },
+    {
+      "item": "A04",
+      "ok": true,
+      "label": "shared store holds a standard-tier bucket keyed by the key id",
+      "detail": [
+        {
+          "limiter": "tier:standard",
+          "key": "apikey:9dc75bc5-314c-4acd-ac1d-a9bd537b4368",
+          "hits": 11
+        }
+      ]
+    },
+    {
+      "item": "teardown",
+      "ok": true,
+      "label": "residue SQL returns 0 on every surface",
+      "detail": [
+        {
+          "s": "resources",
+          "n": 0
+        },
+        {
+          "s": "users",
+          "n": 0
+        },
+        {
+          "s": "api_keys",
+          "n": 0
+        },
+        {
+          "s": "bookmark_collections",
+          "n": 0
+        },
+        {
+          "s": "user_bookmarks",
+          "n": 0
+        },
+        {
+          "s": "user_favorites",
+          "n": 0
+        },
+        {
+          "s": "user_interactions",
+          "n": 0
+        },
+        {
+          "s": "rate_limit_hits(api keys)",
+          "n": 0
+        }
+      ]
+    }
+  ],
+  "fixtures": {
+    "R1": 188666,
+    "R2": 188667,
+    "R3": 188668,
+    "R4": 188669,
+    "R5": 188670
+  },
+  "sharedCollectionExemption": {
+    "anon": {
+      "status": 200,
+      "limit": "600",
+      "vary": "Accept-Encoding",
+      "cc": null,
+      "bytes": 604
+    },
+    "badKey": {
+      "status": 200,
+      "limit": "600",
+      "vary": "Accept-Encoding",
+      "cc": null,
+      "bytes": 604
+    }
+  },
+  "a01DetailSample": {
+    "keys": [
+      "id",
+      "title",
+      "url",
+      "description",
+      "category",
+      "subcategory",
+      "subSubcategory",
+      "resourceFormat",
+      "provider",
+      "skillLevel",
+      "kind",
+      "status",
+      "createdAt",
+      "metadata",
+      "resolvedKind"
+    ],
+    "metadata": {
+      "tags": [
+        "qa-test-plan-580-mv17cmw7"
+      ]
+    }
+  },
+  "a04Keys": {
+    "K1": "9dc75bc5-314c-4acd-ac1d-a9bd537b4368",
+    "K2": "abedb247-5c62-4604-adf4-b8c34fb4c651",
+    "K3": "94f9f878-6d5a-4f52-abef-ef3181eadc58",
+    "revoke": 200
+  },
+  "a04Cache": [
+    {
+      "ep": "/api/public/resources?limit=1",
+      "anon": {
+        "status": 200,
+        "cc": "public, max-age=60",
+        "vary": "Authorization, Accept-Encoding",
+        "limit": "60"
+      },
+      "keyed": {
+        "status": 200,
+        "cc": "private, no-store",
+        "vary": "Authorization, Accept-Encoding",
+        "limit": "1000"
+      },
+      "bad": {
+        "status": 401,
+        "cc": "no-store",
+        "vary": "Authorization, Accept-Encoding",
+        "limit": "600"
+      }
+    },
+    {
+      "ep": "/api/public/resources/188666",
+      "anon": {
+        "status": 200,
+        "cc": "public, max-age=60",
+        "vary": "Authorization, Accept-Encoding",
+        "limit": "60"
+      },
+      "keyed": {
+        "status": 200,
+        "cc": "private, no-store",
+        "vary": "Authorization, Accept-Encoding",
+        "limit": "1000"
+      },
+      "bad": {
+        "status": 401,
+        "cc": "no-store",
+        "vary": "Authorization, Accept-Encoding",
+        "limit": "600"
+      }
+    },
+    {
+      "ep": "/api/public/categories",
+      "anon": {
+        "status": 200,
+        "cc": "public, max-age=60",
+        "vary": "Authorization, Accept-Encoding",
+        "limit": "60"
+      },
+      "keyed": {
+        "status": 200,
+        "cc": "private, no-store",
+        "vary": "Authorization, Accept-Encoding",
+        "limit": "1000"
+      },
+      "bad": {
+        "status": 401,
+        "cc": "no-store",
+        "vary": "Authorization, Accept-Encoding",
+        "limit": "600"
+      }
+    },
+    {
+      "ep": "/api/public/tags",
+      "anon": {
+        "status": 200,
+        "cc": "public, max-age=60",
+        "vary": "Authorization, Accept-Encoding",
+        "limit": "60"
+      },
+      "keyed": {
+        "status": 200,
+        "cc": "private, no-store",
+        "vary": "Authorization, Accept-Encoding",
+        "limit": "1000"
+      },
+      "bad": {
+        "status": 401,
+        "cc": "no-store",
+        "vary": "Authorization, Accept-Encoding",
+        "limit": "600"
+      }
+    }
+  ],
+  "a04Buckets": [
+    {
+      "limiter": "tier:standard",
+      "key": "apikey:9dc75bc5-314c-4acd-ac1d-a9bd537b4368",
+      "hits": 11
+    }
+  ],
+  "residue": [
+    {
+      "s": "resources",
+      "n": 0
+    },
+    {
+      "s": "users",
+      "n": 0
+    },
+    {
+      "s": "api_keys",
+      "n": 0
+    },
+    {
+      "s": "bookmark_collections",
+      "n": 0
+    },
+    {
+      "s": "user_bookmarks",
+      "n": 0
+    },
+    {
+      "s": "user_favorites",
+      "n": 0
+    },
+    {
+      "s": "user_interactions",
+      "n": 0
+    },
+    {
+      "s": "rate_limit_hits(api keys)",
+      "n": 0
+    }
+  ],
+  "failures": 0,
+  "finishedAt": "2026-10-09T16:51:59.276Z"
+}

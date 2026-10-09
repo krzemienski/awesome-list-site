@@ -7,7 +7,10 @@ import {
   closeTestDb,
   createTestResource,
   createTestUser,
+  getTestDb,
 } from "../../helpers/db-helper";
+import { eq } from "drizzle-orm";
+import { resources } from "../../../shared/schema";
 import {
   cleanupClerkTestUsers,
   createClerkAuthenticatedAgent,
@@ -66,9 +69,10 @@ describe("Collections and learning queue API", () => {
         status: "approved",
       }),
       createTestResource({
+        // Saved while approved, then moved out of public status below.
         title: "Pending Private Resource",
         url: "https://example.com/collection-pending",
-        status: "pending",
+        status: "approved",
       }),
       createTestResource({
         title: "Other Owner Resource",
@@ -123,6 +127,16 @@ describe("Collections and learning queue API", () => {
         .post(`/api/collections/${inbox.body.id}/items/${resourceId}`)
         .expect(201);
     }
+    // Saves of non-public resources are refused (404), and a resource that
+    // leaves public status afterwards drops out of every list.
+    await getTestDb()
+      .update(resources)
+      .set({ status: "pending" })
+      .where(eq(resources.id, pending.id));
+    await owner.post(`/api/bookmarks/${pending.id}`).expect(404);
+    await other.post(`/api/favorites/${pending.id}`).expect(404);
+    const afterDemotion = await owner.get("/api/bookmarks").expect(200);
+    expect(afterDemotion.body.map((item: any) => item.id)).not.toContain(pending.id);
     await owner
       .post(`/api/collections/${inbox.body.id}/items/${otherResource.id}`)
       .expect(409);
@@ -242,5 +256,5 @@ describe("Collections and learning queue API", () => {
     await request(app)
       .get(`/api/public/collections/${firstPublish.body.shareId}`)
       .expect(404);
-  });
+  }, 30_000);
 });

@@ -630,6 +630,7 @@ export function renderJourneyContent(opts: {
     title: string;
     description?: string;
     isOptional?: boolean;
+    hasUnavailableResources?: boolean;
     resources: { id: number; title: string; description?: string | null }[];
   }[];
 }): string {
@@ -643,6 +644,8 @@ export function renderJourneyContent(opts: {
       step.isOptional ? ' <span class="ssr-meta">(optional)</span>' : ""
     }</h3>${
       step.description ? `<p data-seo-step-description>${escapeHtml(step.description)}</p>` : ""
+    }${
+      step.hasUnavailableResources ? "<p>Some resources in this step are no longer available.</p>" : ""
     }${resources.length ? linkList(resources) : ""}</section>`;
   }).join("");
   return shell(

@@ -49,9 +49,17 @@ screen the theme-settings task owns. The runtime therefore keeps 12px, encoded
 as the `rule:.kbd:font-size` deviation whose `holds()` requires canonical
 < 12px and runtime ≥ 12px.
 
-**Revisit when:** the theme-settings task replaces the `.kbd` in the preview
-card (or the tablet-audit floor moves), at which point the deviation entry is
-deleted and `.kbd` takes the canonical 10.5px.
+**Current state (2026-10-09):** the Claude Design adoption serves the frozen
+`client/public/ds/design-system.css`, so global `.kbd` and `.chip` both render
+at the canonical 10.5px, and the Badge primitive now emits the raw `.chip`
+class. The 12px floor is kept as an app-owned override scoped to the
+display-only preview card (`[data-testid="preview-card"] .chip, .kbd` in
+`client/src/styles/pages/theme-settings.css`); canonical sizes hold everywhere
+else.
+
+**Revisit when:** the theme-settings task replaces the chips/`.kbd` in the
+preview card (or the tablet-audit floor moves), at which point the scoped
+override is deleted.
 
 ## 3. `.stat` and `.section-title` are not defined anywhere in the design source
 

@@ -78,7 +78,7 @@ const BODY_METHODS = new Set<HttpMethod>(["post", "put", "patch", "delete"]);
 const routeResponseOverrideMap = new Map<string, import("./registry").NamedResponseSchema>();
 const routeQueryOverrideMap = new Map<
   string,
-  { name: string; schema: ZodTypeAny }
+  { name: string; schema: ZodTypeAny; guard?: ZodTypeAny }
 >();
 
 /**
@@ -99,12 +99,15 @@ export function setRouteResponseSchema(
 }
 
 /** Register an exact query-string schema for a route that cannot use the
- * broad inferred query contract. This drives both runtime validation and
- * generated OpenAPI parameters. */
+ * broad inferred query contract. `schema` drives the generated OpenAPI
+ * parameters and, by default, runtime validation. Pass `guard` when the
+ * handler owns finer-grained validation (specific error codes, duplicate-key
+ * and case tolerance): the guard then runs at request time instead, so the
+ * documented contract can stay exact without changing handler semantics. */
 export function setRouteQuerySchema(
   method: string,
   path: string,
-  query: { name: string; schema: ZodTypeAny },
+  query: { name: string; schema: ZodTypeAny; guard?: ZodTypeAny },
 ): void {
   routeQueryOverrideMap.set(`${method.toLowerCase()} ${path}`, query);
 }
@@ -471,9 +474,9 @@ export function installApiContractRegistration(
       const priorMiddleware = handlers.slice(0, -1);
 
       const paramsSchema = inferParamsSchema(path, method);
+      const queryOverride = routeQueryOverrideMap.get(`${method} ${path}`);
       const querySchema =
-        routeQueryOverrideMap.get(`${method} ${path}`)?.schema ??
-        genericQuerySchema;
+        queryOverride?.guard ?? queryOverride?.schema ?? genericQuerySchema;
       // Always run the structural guard here. A route-specific validateBody
       // middleware has already run in the preserved prior chain and its exact
       // schema is recorded in the contract/OpenAPI declaration above.

@@ -26,6 +26,12 @@ expects a visible 240px sidebar at both `768px` and `1024px` instead of the old
 `sidebar-collapsed` rail, while still requiring the drawer trigger at `768px`.
 At `767px` and below it expects only the drawer path.
 
+The persistent sidebar is a browse-shell element: it renders on home and the
+category / subcategory / sub-subcategory routes only. Other routes (for example
+`/advanced`, resources, journeys, account pages) hide it at every width and
+keep the header drawer trigger, so the tablet audit checks the 240px contract
+on `/` and checks "no sidebar, trigger present" on `/advanced`.
+
 ## Row and accessibility contract
 
 Category rows keep the production `data-testid` values and count source. The

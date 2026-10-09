@@ -264,14 +264,17 @@ const cardChecks = [
 await printCheck(anonCtx, await firstCategoryRoute(), 'category', cardChecks);
 await printCheck(anonCtx, '/search?q=ffmpeg', 'search', cardChecks.slice(0, 2).concat(cardChecks.slice(4)));
 
-// Journey — R5-027: login button prints as inline text (print-keep-text exemption).
+// Journey — R5-027: the login prompt prints as an inline sentence. P1-08 made
+// the control a real link (not a print-keep-text button), so assert the link
+// and its sentence survive print.
 await printCheck(anonCtx, await firstJourneyRoute(), 'journey-anon', [
   { id: 'login-inline-visible', fn: new Function(`
-      const b = [...document.querySelectorAll('button.print-keep-text')];
-      const vis = b.filter(e => getComputedStyle(e).display !== 'none');
-      const txt = document.body.innerText;
-      const hasSentence = /log in/i.test(txt);
-      return { pass: vis.length > 0 && hasSentence, detail: b.length + ' print-keep-text btns, ' + vis.length + ' visible; sentence present: ' + hasSentence };`) },
+      const links = [...document.querySelectorAll('[data-testid="button-login-journey"]')];
+      const vis = links.filter(e => { let n = e; while (n && n !== document.body) { if (getComputedStyle(n).display === 'none') return false; n = n.parentElement; } return true; });
+      const inline = vis.filter(e => getComputedStyle(e).display === 'inline');
+      const sentence = vis[0]?.parentElement?.innerText || '';
+      const hasSentence = /log in to start this journey/i.test(sentence);
+      return { pass: inline.length > 0 && hasSentence, detail: links.length + ' login links, ' + vis.length + ' visible, ' + inline.length + ' inline; sentence present: ' + hasSentence };`) },
 ]);
 
 // Recommendations (auth) — R5-027: "helpful" feedback row hidden.

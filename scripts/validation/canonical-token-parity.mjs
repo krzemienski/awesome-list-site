@@ -378,6 +378,13 @@ function bodyHeightHolds({ canonical, app, appRules }) {
 const ADMIN_TAGS_CHIP = 'client/src/styles/pages/admin-catalog-resources.css .admin-catalog-resources__tags .chip';
 const ADMIN_TABLE_CHIP = 'client/src/styles/pages/admin-catalog-resources.css .admin-catalog-resources__table .chip';
 const JOURNEY_CARD_CHIP = 'client/src/styles/pages/discovery-journeys.css .journeys-page .journey-card .chip';
+const PREVIEW_CARD_KBD = 'client/src/styles/pages/theme-settings.css [data-testid="preview-card"] .kbd';
+const PREVIEW_TEXT_FLOOR_REASON =
+  'The theme settings preview card renders .kbd as specimen text, and the tablet-audit ' +
+  'theme-preview-text check holds every preview glyph to a 12px floor (BUG-041). The 12px ' +
+  'override is scoped to [data-testid="preview-card"]; global .kbd keeps the canonical 10.5px ' +
+  '(docs/parity/assumptions/tokens.md section 2). Expires when the preview card stops rendering .kbd ' +
+  'or the floor moves.';
 const RESOURCE_SECTION_EYEBROW = 'client/src/styles/pages/resource.css [data-system="editorial"] .resource-detail-sections h2.eyebrow';
 
 const ADMIN_TAG_TRUNCATE_REASON =
@@ -463,6 +470,7 @@ export const DOCUMENTED_DEVIATIONS = new Map([
   [`shadow:${ADMIN_TABLE_CHIP}:letter-spacing`, { reason: ADMIN_TABLE_CHIP_MONO_REASON, holds: pinned('0', '0.6px') }],
   [`shadow:${ADMIN_TAGS_CHIP}:padding`, { reason: ADMIN_COMPACT_CHIP_REASON, holds: pinned('4px 10px', '2px 6px') }],
   [`shadow:${ADMIN_TABLE_CHIP}:font-size`, { reason: ADMIN_COMPACT_CHIP_REASON, holds: pinned('10.5px', '9.5px') }],
+  [`shadow:${PREVIEW_CARD_KBD}:font-size`, { reason: PREVIEW_TEXT_FLOOR_REASON, holds: pinned('10.5px', '12px') }],
   [`shadow:${RESOURCE_SECTION_EYEBROW}:font-weight`, { reason: RESOURCE_LABEL_WEIGHT_REASON, holds: pinned('700', '400') }],
 ]);
 

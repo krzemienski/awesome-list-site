@@ -966,20 +966,29 @@ components:
       type: object
       properties:
         q:
-          description: Search text; takes precedence over search
+          description: >-
+            Full-text search (title, description, tags); queries shorter than the searchable minimum behave like no
+            search
           type: string
+          maxLength: 512
         search:
-          description: Alias for q
+          description: Alias for q; wins when both are sent
           type: string
+          maxLength: 512
         category:
-          description: Category name or slug
+          description: Category display name or URL slug
           type: string
+          maxLength: 512
         subcategory:
-          description: Subcategory name or slug
+          description: Subcategory display name or URL slug (resolved globally when category is absent)
           type: string
+          maxLength: 512
         subSubcategory:
+          description: Sub-subcategory display name
           type: string
+          maxLength: 512
         generalScope:
+          description: Restrict to resources filed directly at that level (no deeper taxonomy)
           type: string
           enum:
             - category
@@ -999,6 +1008,7 @@ components:
               items:
                 type: string
         provider:
+          description: Case-insensitive; other values return 400 invalid_provider
           type: string
           enum:
             - unknown
@@ -1017,6 +1027,7 @@ components:
             - bitmovin
             - other
         format:
+          description: Resource format; case-insensitive; other values return 400 invalid_format
           type: string
           enum:
             - unknown
@@ -1035,6 +1046,7 @@ components:
             - community
             - other
         skillLevel:
+          description: Case-insensitive; other values return 400 invalid_skillLevel
           type: string
           enum:
             - unknown
@@ -1043,6 +1055,7 @@ components:
             - advanced
             - all-levels
         kind:
+          description: Resolved kind (stored or tag-inferred); other values return 400 invalid_kind
           type: string
           enum:
             - tools
@@ -1052,6 +1065,7 @@ components:
             - protocols
             - other
         sort:
+          description: Other values return 400 invalid_sort
           type: string
           enum:
             - relevance
@@ -1060,6 +1074,7 @@ components:
             - newest
             - oldest
         facets:
+          description: true adds provider/format/skillLevel/kind facet counts to the response
           type: string
           enum:
             - 'true'
@@ -1286,13 +1301,19 @@ components:
       type: object
       properties:
         q:
+          description: >-
+            Full-text search text (title, description, tags); wins over search. Blank or too-short queries return total
+            0
           type: string
+          maxLength: 512
         search:
           description: Alias for q
           type: string
+          maxLength: 512
         limit:
-          description: Default 100; numeric values clamped to 1–200
+          description: Default 100; clamped to 1–200; non-numeric values return 400 validation_failed
           type: string
+          pattern: ^\d+$
         offset:
           type: string
           pattern: ^\d+$
@@ -1942,48 +1963,9 @@ components:
             items:
               type: string
               maxLength: 512
-    get_3a__2f_api_2f_tags.Query:
+    NoQueryParameters:
       type: object
-      properties:
-        page:
-          type: string
-          pattern: ^\d+$
-        limit:
-          type: string
-          pattern: ^\d+$
-        offset:
-          type: string
-          pattern: ^\d+$
-        afterSeq:
-          type: string
-          pattern: ^\d+$
-        jobId:
-          type: string
-          pattern: ^\d+$
-        resourceId:
-          type: string
-          pattern: ^\d+$
-        categoryId:
-          type: string
-          pattern: ^\d+$
-        subcategoryId:
-          type: string
-          pattern: ^\d+$
-        per_page:
-          type: string
-          pattern: ^\d+$
-        cursor:
-          type: string
-          minLength: 1
-          maxLength: 512
-      additionalProperties:
-        anyOf:
-          - type: string
-            maxLength: 512
-          - type: array
-            items:
-              type: string
-              maxLength: 512
+      properties: {}
     ApprovedResourceTagsResponse:
       type: object
       properties:
@@ -9420,48 +9402,29 @@ components:
             items:
               type: string
               maxLength: 512
-    get_3a__2f_api_2f_public_2f_resources.Query:
+    PublicResourcesQuery:
       type: object
       properties:
         page:
+          description: Page number ≥ 1 (default 1); invalid values return 400
           type: string
           pattern: ^\d+$
         limit:
+          description: Items per page (default 20); values above 100 are clamped to 100
           type: string
           pattern: ^\d+$
-        offset:
+        category:
+          description: Category display name
           type: string
-          pattern: ^\d+$
-        afterSeq:
-          type: string
-          pattern: ^\d+$
-        jobId:
-          type: string
-          pattern: ^\d+$
-        resourceId:
-          type: string
-          pattern: ^\d+$
-        categoryId:
-          type: string
-          pattern: ^\d+$
-        subcategoryId:
-          type: string
-          pattern: ^\d+$
-        per_page:
-          type: string
-          pattern: ^\d+$
-        cursor:
-          type: string
-          minLength: 1
           maxLength: 512
-      additionalProperties:
-        anyOf:
-          - type: string
-            maxLength: 512
-          - type: array
-            items:
-              type: string
-              maxLength: 512
+        subcategory:
+          description: Subcategory display name
+          type: string
+          maxLength: 512
+        search:
+          description: Full-text search
+          type: string
+          maxLength: 512
     get_3a__2f_api_2f_public_2f_resources_2f__7b_id_7d_.Params:
       type: object
       properties:
@@ -9472,90 +9435,6 @@ components:
         - id
       additionalProperties: {}
     get_3a__2f_api_2f_public_2f_resources_2f__7b_id_7d_.Query:
-      type: object
-      properties:
-        page:
-          type: string
-          pattern: ^\d+$
-        limit:
-          type: string
-          pattern: ^\d+$
-        offset:
-          type: string
-          pattern: ^\d+$
-        afterSeq:
-          type: string
-          pattern: ^\d+$
-        jobId:
-          type: string
-          pattern: ^\d+$
-        resourceId:
-          type: string
-          pattern: ^\d+$
-        categoryId:
-          type: string
-          pattern: ^\d+$
-        subcategoryId:
-          type: string
-          pattern: ^\d+$
-        per_page:
-          type: string
-          pattern: ^\d+$
-        cursor:
-          type: string
-          minLength: 1
-          maxLength: 512
-      additionalProperties:
-        anyOf:
-          - type: string
-            maxLength: 512
-          - type: array
-            items:
-              type: string
-              maxLength: 512
-    get_3a__2f_api_2f_public_2f_categories.Query:
-      type: object
-      properties:
-        page:
-          type: string
-          pattern: ^\d+$
-        limit:
-          type: string
-          pattern: ^\d+$
-        offset:
-          type: string
-          pattern: ^\d+$
-        afterSeq:
-          type: string
-          pattern: ^\d+$
-        jobId:
-          type: string
-          pattern: ^\d+$
-        resourceId:
-          type: string
-          pattern: ^\d+$
-        categoryId:
-          type: string
-          pattern: ^\d+$
-        subcategoryId:
-          type: string
-          pattern: ^\d+$
-        per_page:
-          type: string
-          pattern: ^\d+$
-        cursor:
-          type: string
-          minLength: 1
-          maxLength: 512
-      additionalProperties:
-        anyOf:
-          - type: string
-            maxLength: 512
-          - type: array
-            items:
-              type: string
-              maxLength: 512
-    get_3a__2f_api_2f_public_2f_tags.Query:
       type: object
       properties:
         page:
@@ -11965,35 +11844,44 @@ paths:
           in: query
           required: false
           schema:
-            description: Search text; takes precedence over search
+            description: >-
+              Full-text search (title, description, tags); queries shorter than the searchable minimum behave like no
+              search
             type: string
+            maxLength: 512
         - name: search
           in: query
           required: false
           schema:
-            description: Alias for q
+            description: Alias for q; wins when both are sent
             type: string
+            maxLength: 512
         - name: category
           in: query
           required: false
           schema:
-            description: Category name or slug
+            description: Category display name or URL slug
             type: string
+            maxLength: 512
         - name: subcategory
           in: query
           required: false
           schema:
-            description: Subcategory name or slug
+            description: Subcategory display name or URL slug (resolved globally when category is absent)
             type: string
+            maxLength: 512
         - name: subSubcategory
           in: query
           required: false
           schema:
+            description: Sub-subcategory display name
             type: string
+            maxLength: 512
         - name: generalScope
           in: query
           required: false
           schema:
+            description: Restrict to resources filed directly at that level (no deeper taxonomy)
             type: string
             enum:
               - category
@@ -12022,6 +11910,7 @@ paths:
           in: query
           required: false
           schema:
+            description: Case-insensitive; other values return 400 invalid_provider
             type: string
             enum:
               - unknown
@@ -12043,6 +11932,7 @@ paths:
           in: query
           required: false
           schema:
+            description: Resource format; case-insensitive; other values return 400 invalid_format
             type: string
             enum:
               - unknown
@@ -12064,6 +11954,7 @@ paths:
           in: query
           required: false
           schema:
+            description: Case-insensitive; other values return 400 invalid_skillLevel
             type: string
             enum:
               - unknown
@@ -12075,6 +11966,7 @@ paths:
           in: query
           required: false
           schema:
+            description: Resolved kind (stored or tag-inferred); other values return 400 invalid_kind
             type: string
             enum:
               - tools
@@ -12087,6 +11979,7 @@ paths:
           in: query
           required: false
           schema:
+            description: Other values return 400 invalid_sort
             type: string
             enum:
               - relevance
@@ -12098,6 +11991,7 @@ paths:
           in: query
           required: false
           schema:
+            description: true adds provider/format/skillLevel/kind facet counts to the response
             type: string
             enum:
               - 'true'
@@ -12462,19 +12356,25 @@ paths:
           in: query
           required: false
           schema:
+            description: >-
+              Full-text search text (title, description, tags); wins over search. Blank or too-short queries return
+              total 0
             type: string
+            maxLength: 512
         - name: search
           in: query
           required: false
           schema:
             description: Alias for q
             type: string
+            maxLength: 512
         - name: limit
           in: query
           required: false
           schema:
-            description: Default 100; numeric values clamped to 1–200
+            description: Default 100; clamped to 1–200; non-numeric values return 400 validation_failed
             type: string
+            pattern: ^\d+$
         - name: offset
           in: query
           required: false
@@ -14196,72 +14096,10 @@ paths:
                 $ref: '#/components/schemas/ErrorResponse'
       tags:
         - tags
-      parameters:
-        - name: page
-          in: query
-          required: false
-          schema:
-            type: string
-            pattern: ^\d+$
-        - name: limit
-          in: query
-          required: false
-          schema:
-            type: string
-            pattern: ^\d+$
-        - name: offset
-          in: query
-          required: false
-          schema:
-            type: string
-            pattern: ^\d+$
-        - name: afterSeq
-          in: query
-          required: false
-          schema:
-            type: string
-            pattern: ^\d+$
-        - name: jobId
-          in: query
-          required: false
-          schema:
-            type: string
-            pattern: ^\d+$
-        - name: resourceId
-          in: query
-          required: false
-          schema:
-            type: string
-            pattern: ^\d+$
-        - name: categoryId
-          in: query
-          required: false
-          schema:
-            type: string
-            pattern: ^\d+$
-        - name: subcategoryId
-          in: query
-          required: false
-          schema:
-            type: string
-            pattern: ^\d+$
-        - name: per_page
-          in: query
-          required: false
-          schema:
-            type: string
-            pattern: ^\d+$
-        - name: cursor
-          in: query
-          required: false
-          schema:
-            type: string
-            minLength: 1
-            maxLength: 512
       x-domain: tags
       x-middleware: []
       x-contract-schemas:
-        query: get_3a__2f_api_2f_tags.Query
+        query: NoQueryParameters
   /api/subcategories:
     get:
       operationId: get:/api/subcategories
@@ -35869,67 +35707,46 @@ paths:
           in: query
           required: false
           schema:
+            description: Page number ≥ 1 (default 1); invalid values return 400
             type: string
             pattern: ^\d+$
         - name: limit
           in: query
           required: false
           schema:
+            description: Items per page (default 20); values above 100 are clamped to 100
             type: string
             pattern: ^\d+$
-        - name: offset
+        - name: category
           in: query
           required: false
           schema:
+            description: Category display name
             type: string
-            pattern: ^\d+$
-        - name: afterSeq
+            maxLength: 512
+        - name: subcategory
           in: query
           required: false
           schema:
+            description: Subcategory display name
             type: string
-            pattern: ^\d+$
-        - name: jobId
+            maxLength: 512
+        - name: search
           in: query
           required: false
           schema:
+            description: Full-text search
             type: string
-            pattern: ^\d+$
-        - name: resourceId
-          in: query
-          required: false
-          schema:
-            type: string
-            pattern: ^\d+$
-        - name: categoryId
-          in: query
-          required: false
-          schema:
-            type: string
-            pattern: ^\d+$
-        - name: subcategoryId
-          in: query
-          required: false
-          schema:
-            type: string
-            pattern: ^\d+$
-        - name: per_page
-          in: query
-          required: false
-          schema:
-            type: string
-            pattern: ^\d+$
-        - name: cursor
-          in: query
-          required: false
-          schema:
-            type: string
-            minLength: 1
             maxLength: 512
       x-domain: public
-      x-middleware: []
+      x-rate-limiters:
+        - publicApiRateLimiter
+      x-middleware:
+        - varyOnAuthorization
+        - optionalApiKey
+        - publicApiRateLimiter
       x-contract-schemas:
-        query: get_3a__2f_api_2f_public_2f_resources.Query
+        query: PublicResourcesQuery
   /api/public/resources/{id}:
     get:
       operationId: get:/api/public/resources/{id}
@@ -36071,7 +35888,12 @@ paths:
             minLength: 1
             maxLength: 512
       x-domain: public
-      x-middleware: []
+      x-rate-limiters:
+        - publicApiRateLimiter
+      x-middleware:
+        - varyOnAuthorization
+        - optionalApiKey
+        - publicApiRateLimiter
       x-contract-schemas:
         params: get_3a__2f_api_2f_public_2f_resources_2f__7b_id_7d_.Params
         query: get_3a__2f_api_2f_public_2f_resources_2f__7b_id_7d_.Query
@@ -36147,72 +35969,15 @@ paths:
                 $ref: '#/components/schemas/ErrorResponse'
       tags:
         - public
-      parameters:
-        - name: page
-          in: query
-          required: false
-          schema:
-            type: string
-            pattern: ^\d+$
-        - name: limit
-          in: query
-          required: false
-          schema:
-            type: string
-            pattern: ^\d+$
-        - name: offset
-          in: query
-          required: false
-          schema:
-            type: string
-            pattern: ^\d+$
-        - name: afterSeq
-          in: query
-          required: false
-          schema:
-            type: string
-            pattern: ^\d+$
-        - name: jobId
-          in: query
-          required: false
-          schema:
-            type: string
-            pattern: ^\d+$
-        - name: resourceId
-          in: query
-          required: false
-          schema:
-            type: string
-            pattern: ^\d+$
-        - name: categoryId
-          in: query
-          required: false
-          schema:
-            type: string
-            pattern: ^\d+$
-        - name: subcategoryId
-          in: query
-          required: false
-          schema:
-            type: string
-            pattern: ^\d+$
-        - name: per_page
-          in: query
-          required: false
-          schema:
-            type: string
-            pattern: ^\d+$
-        - name: cursor
-          in: query
-          required: false
-          schema:
-            type: string
-            minLength: 1
-            maxLength: 512
       x-domain: public
-      x-middleware: []
+      x-rate-limiters:
+        - publicApiRateLimiter
+      x-middleware:
+        - varyOnAuthorization
+        - optionalApiKey
+        - publicApiRateLimiter
       x-contract-schemas:
-        query: get_3a__2f_api_2f_public_2f_categories.Query
+        query: NoQueryParameters
   /api/public/tags:
     get:
       operationId: get:/api/public/tags
@@ -36285,72 +36050,15 @@ paths:
                 $ref: '#/components/schemas/ErrorResponse'
       tags:
         - public
-      parameters:
-        - name: page
-          in: query
-          required: false
-          schema:
-            type: string
-            pattern: ^\d+$
-        - name: limit
-          in: query
-          required: false
-          schema:
-            type: string
-            pattern: ^\d+$
-        - name: offset
-          in: query
-          required: false
-          schema:
-            type: string
-            pattern: ^\d+$
-        - name: afterSeq
-          in: query
-          required: false
-          schema:
-            type: string
-            pattern: ^\d+$
-        - name: jobId
-          in: query
-          required: false
-          schema:
-            type: string
-            pattern: ^\d+$
-        - name: resourceId
-          in: query
-          required: false
-          schema:
-            type: string
-            pattern: ^\d+$
-        - name: categoryId
-          in: query
-          required: false
-          schema:
-            type: string
-            pattern: ^\d+$
-        - name: subcategoryId
-          in: query
-          required: false
-          schema:
-            type: string
-            pattern: ^\d+$
-        - name: per_page
-          in: query
-          required: false
-          schema:
-            type: string
-            pattern: ^\d+$
-        - name: cursor
-          in: query
-          required: false
-          schema:
-            type: string
-            minLength: 1
-            maxLength: 512
       x-domain: public
-      x-middleware: []
+      x-rate-limiters:
+        - publicApiRateLimiter
+      x-middleware:
+        - varyOnAuthorization
+        - optionalApiKey
+        - publicApiRateLimiter
       x-contract-schemas:
-        query: get_3a__2f_api_2f_public_2f_tags.Query
+        query: NoQueryParameters
   /api/public/me:
     get:
       operationId: get:/api/public/me
@@ -36489,8 +36197,12 @@ paths:
         - BearerAuth: []
       x-domain: public
       x-requires-auth: true
+      x-rate-limiters:
+        - publicApiRateLimiter
       x-middleware:
+        - varyOnAuthorization
         - requireApiKey
+        - publicApiRateLimiter
       x-contract-schemas:
         query: get_3a__2f_api_2f_public_2f_me.Query
   /api/openapi.json:

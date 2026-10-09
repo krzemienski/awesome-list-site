@@ -535,6 +535,15 @@ export function registerUserFeatureRoutes(
       if (scopes !== undefined && (!Array.isArray(scopes) || scopes.some((s: unknown) => typeof s !== 'string'))) {
         return res.status(400).json({ message: '"scopes" must be an array of strings' });
       }
+      // Rate-limit tiers are server-assigned (every valid key is "standard");
+      // a caller must not be able to label its own key with a tier name and
+      // look entitled to more than it gets.
+      const RESERVED_TIER_SCOPES = new Set(['free', 'standard', 'premium']);
+      if (Array.isArray(scopes) && scopes.some((s: string) => RESERVED_TIER_SCOPES.has(s.trim().toLowerCase()))) {
+        return res.status(400).json({
+          message: 'Rate-limit tiers are assigned by the server and cannot be requested as scopes (free, standard and premium are reserved)',
+        });
+      }
       let expiresAt: Date | null = null;
       if (expiresInDays !== undefined && expiresInDays !== null) {
         const days = Number(expiresInDays);

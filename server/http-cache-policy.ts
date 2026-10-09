@@ -10,7 +10,10 @@
  * | Catalog reads (awesome-list,   | public, max-age=60, must-revalidate      | Backed by the in-process public cache with the same 60s TTL; cross-instance staleness of ≤60s is already the system-wide contract, so letting browsers/shared caches reuse for 60s adds no new staleness class while removing a request per SPA navigation. ETag enables 304 afterwards. |
  * |   nav, categories, tags,       |                                          |     |
  * |   subcategories, sub-subcats)  |                                          |     |
- * | Public REST API (/api/public/*)| public, max-age=60                       | Read-only, anonymous, DB-fresh data for external consumers; 60s shared caching bounds staleness to the same contract as catalog reads. Express's default weak ETag still provides 304 revalidation. |
+ * | Developer API (server/api/     | public, max-age=60 + Vary: Authorization | Read-only, anonymous, DB-fresh data for external consumers; 60s shared caching bounds staleness to the same contract as catalog reads. Express's default weak ETag still provides 304 revalidation. Vary keeps a cached anonymous 200 from answering a request that carries a (possibly bad) key. |
+ * |   public.ts; not the shared-   |                                          |     |
+ * |   collection site read)        |                                          |     |
+ * | Developer API with a valid key | private, no-store                        | Key revocation (401) and the per-key standard-tier bucket must apply on every call. |
  * | Non-200 public API results     | no-store                                 | A 404 can flip to 200 the moment a resource is approved — never pin negative results in shared caches. |
  * | Auth/admin/user responses      | private, no-store (default for any /api  | Session-specific. Handlers may set a stricter no-store or, where the |
  * |                                |   request with a session; per-route      |   body is session-independent (/api/home), a public catalog policy.  |
@@ -44,6 +47,13 @@ export const UNCACHED_CATALOG_CACHE_CONTROL = "public, max-age=0, must-revalidat
 
 /** Anonymous read-only /api/public/* success responses. */
 export const PUBLIC_API_CACHE_CONTROL = "public, max-age=60";
+
+/**
+ * /api/public/* responses to a request that presented a valid API key: never
+ * shared-cached, so key revocation and per-key limits apply on every call
+ * (handlers also send Vary: Authorization).
+ */
+export const PUBLIC_API_KEYED_CACHE_CONTROL = "private, no-store";
 
 /** Non-200 outcomes on public endpoints (negative results must not stick). */
 export const PUBLIC_API_ERROR_CACHE_CONTROL = "no-store";

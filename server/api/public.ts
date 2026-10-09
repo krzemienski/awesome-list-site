@@ -8,7 +8,8 @@
  * approved resources, categories, and tags.
  *
  * FEATURES:
- * - Rate-limited access (60 requests/hour for free tier by default)
+ * - Rate-limited access: 60 requests/hour per IP without a key; 1,000
+ *   requests/hour in a per-key bucket with any valid API key
  * - API key authentication support (optional, can also be accessed without auth)
  * - Pagination support for resource listings
  * - Search and filtering capabilities
@@ -21,24 +22,47 @@
  *
  * AUTHENTICATION:
  * - These routes can be accessed without authentication
- * - API keys can be used for higher rate limits (via requireApiKey middleware)
+ * - An optional "Authorization: Bearer <api-key>" moves the caller to the
+ *   server-assigned standard tier with its own bucket (optionalApiKey). The
+ *   tier never comes from user-chosen key scopes. A presented key that is
+ *   invalid, revoked or expired is a 401.
  * - All routes are rate-limited to prevent abuse
  *
  * See /docs/API.md and /api/docs for complete API documentation.
  * ============================================================================
  */
 
-import type { Express, Request, Response } from "express";
+import type { Express, Request, RequestHandler, Response } from "express";
 import { storage } from "../storage";
-import { freeTierLimiter } from "../middleware/rateLimit";
-import { requireApiKey } from "../middleware/apiAuth";
+import { publicApiRateLimiter, RATE_LIMIT_TIERS } from "../middleware/rateLimit";
+import { optionalApiKey, requireApiKey } from "../middleware/apiAuth";
 import { stripInternalResourceFields } from "../lib/publicResource";
 import { listApprovedResourceTags } from "../repositories/TagRepository";
 import { parseBoundedInt } from "../validation/inputs";
 import {
   PUBLIC_API_CACHE_CONTROL,
   PUBLIC_API_ERROR_CACHE_CONTROL,
+  PUBLIC_API_KEYED_CACHE_CONTROL,
 } from "../http-cache-policy";
+
+/**
+ * Responses differ by the Authorization header (valid key → own bucket,
+ * bad key → 401), so shared caches must key on it. Set before key parsing so
+ * 401s carry it too.
+ */
+const varyOnAuthorization: RequestHandler = (_req, res, next) => {
+  res.vary("Authorization");
+  next();
+};
+
+/**
+ * Anonymous successes may be shared-cached for 60s; key-authenticated ones
+ * never are, so every keyed request reaches the origin for key validation
+ * and per-key rate-limit accounting.
+ */
+function publicApiCacheControl(req: Request): string {
+  return (req as any).apiKey ? PUBLIC_API_KEYED_CACHE_CONTROL : PUBLIC_API_CACHE_CONTROL;
+}
 
 /**
  * Register all public API routes
@@ -151,7 +175,7 @@ export function registerPublicApiRoutes(app: Express): void {
    *   totalPages: number
    * }
    */
-  app.get('/api/public/resources', freeTierLimiter, async (req: Request, res: Response) => {
+  app.get('/api/public/resources', varyOnAuthorization, optionalApiKey, publicApiRateLimiter, async (req: Request, res: Response) => {
     try {
       // NB-003/NB-004 (run23): page/limit must be validated positive ints.
       // limit=-1 previously passed Math.min unchecked and PG treats LIMIT -1
@@ -193,7 +217,7 @@ export function registerPublicApiRoutes(app: Express): void {
       // Task #327 cache contract: anonymous read-only data — allow 60s of
       // browser/shared caching; Express's default weak ETag provides 304
       // revalidation afterwards. See server/http-cache-policy.ts.
-      res.set('Cache-Control', PUBLIC_API_CACHE_CONTROL);
+      res.set('Cache-Control', publicApiCacheControl(req));
       res.json({
         ...result,
         page,
@@ -268,7 +292,7 @@ export function registerPublicApiRoutes(app: Express): void {
    * - 404: Resource not found or not approved
    * - 500: Server error
    */
-  app.get('/api/public/resources/:id', freeTierLimiter, async (req: Request, res: Response) => {
+  app.get('/api/public/resources/:id', varyOnAuthorization, optionalApiKey, publicApiRateLimiter, async (req: Request, res: Response) => {
     try {
       // NB-008 (run23): bound-check — all-digit ids past int4 range used to
       // overflow inside PG → 500.
@@ -294,7 +318,7 @@ export function registerPublicApiRoutes(app: Express): void {
       }
 
       // Task #327 cache contract: see server/http-cache-policy.ts.
-      res.set('Cache-Control', PUBLIC_API_CACHE_CONTROL);
+      res.set('Cache-Control', publicApiCacheControl(req));
       res.json(stripInternalResourceFields(resource));
     } catch (error) {
       console.error('Error fetching public resource:', error);
@@ -343,11 +367,11 @@ export function registerPublicApiRoutes(app: Express): void {
    *   categories: Category[]
    * }
    */
-  app.get('/api/public/categories', freeTierLimiter, async (req: Request, res: Response) => {
+  app.get('/api/public/categories', varyOnAuthorization, optionalApiKey, publicApiRateLimiter, async (req: Request, res: Response) => {
     try {
       const categories = await storage.listCategories();
       // Task #327 cache contract: see server/http-cache-policy.ts.
-      res.set('Cache-Control', PUBLIC_API_CACHE_CONTROL);
+      res.set('Cache-Control', publicApiCacheControl(req));
       res.json({ categories });
     } catch (error) {
       console.error('Error fetching public categories:', error);
@@ -396,11 +420,11 @@ export function registerPublicApiRoutes(app: Express): void {
    *   tags: Tag[]
    * }
    */
-  app.get('/api/public/tags', freeTierLimiter, async (req: Request, res: Response) => {
+  app.get('/api/public/tags', varyOnAuthorization, optionalApiKey, publicApiRateLimiter, async (req: Request, res: Response) => {
     try {
       const payload = await listApprovedResourceTags();
       // Task #327 cache contract: see server/http-cache-policy.ts.
-      res.set('Cache-Control', PUBLIC_API_CACHE_CONTROL);
+      res.set('Cache-Control', publicApiCacheControl(req));
       res.json(payload);
     } catch (error) {
       console.error('Error fetching public tags:', error);
@@ -417,16 +441,22 @@ export function registerPublicApiRoutes(app: Express): void {
    * canonical endpoint for a client to confirm its API key authenticates.
    *
    * Responses:
-   * - 200: { authenticated, userId, keyName, scopes }
+   * - 200: { authenticated, userId, keyName, scopes, tier, rateLimit }
+   *   `tier` is server-assigned (always "standard"); `scopes` are the
+   *   caller's own labels and grant nothing.
    * - 401: missing/invalid/revoked/expired key
    */
-  app.get('/api/public/me', requireApiKey, (req: Request, res: Response) => {
+  app.get('/api/public/me', varyOnAuthorization, requireApiKey, publicApiRateLimiter, (req: Request, res: Response) => {
     const apiKey = (req as any).apiKey;
+    res.set('Cache-Control', PUBLIC_API_KEYED_CACHE_CONTROL);
+    const tier = RATE_LIMIT_TIERS.standard;
     res.json({
       authenticated: true,
       userId: apiKey?.userId,
       keyName: apiKey?.name,
       scopes: apiKey?.scopes ?? [],
+      tier: apiKey?.tier ?? tier.name,
+      rateLimit: { limit: tier.max, windowSeconds: tier.windowMs / 1000 },
     });
   });
 }
