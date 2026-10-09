@@ -243,6 +243,7 @@ import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { JSDOM } from 'jsdom';
 import { applierFallbacks, applierPaintsAccentPair, evaluateCanonicalRegistry, evaluateBootRegistry, readThemeBootData } from '../generate-design-system-artifact.mjs';
+import { accentContrastTable } from './app-accent-contrast.mjs';
 
 const ROOT = fileURLToPath(new URL('../..', import.meta.url));
 
@@ -442,6 +443,10 @@ function text3ContrastHolds({ canonical, app, appMap }) {
 // Text-3 is corrected in the app boot registry, never in the frozen sheet.
 // All other token values retain canonical parity.
 export const DOCUMENTED_DEVIATIONS = new Map([
+  ['shadow:client/src/styles/app-bridge.css :root .chip.accent:color', {
+    reason: "Approved app-owned small accent ink: decorative palette remains frozen, while every neutral raised backing and 8%/14% tinted state must meet AA. Expires when the canonical chip uses accessible ink.",
+    holds: values => pinned('var(--accent)', 'var(--accent-ink)')(values) && accentContrastTable().every(row => row.ratio >= 4.5),
+  }],
   ...["editorial", "terminal", "geist", "brutalist", "swiss"].map(id => [`${id}:--text-3`, {
     reason: "App-owned prepaint alpha correction: small metadata must meet the design's promised 4.6:1 on every neutral surface. Expires when canonical contrast catches up.",
     holds: text3ContrastHolds,
@@ -3302,6 +3307,12 @@ if (isMain) {
   const canonical = buildCanonicalModel({ css: inputs.canonicalCss, js: inputs.canonicalJs, appJsx: inputs.canonicalApp, layoutJsx: inputs.canonicalLayout });
   const app = buildAppModel(appModelInputs(inputs));
   const result = compareModels(canonical, app);
+  try {
+    const contrastRows = accentContrastTable();
+    console.log(`PASS app-owned contrast deviations :: ${contrastRows.length} backing/tint rows across all 50 pairs`);
+  } catch (error) {
+    result.failures.push(`App accent accessibility: ${error.message}`);
+  }
   result.failures.unshift(...pinFailures);
   if (canaryFailures.length) result.failures.unshift(`canaries: ${canaryFailures.map((r) => r.id).join(', ')} escaped — see above`);
   result.ok = result.failures.length === 0;

@@ -24,6 +24,9 @@
 
   /* Ink drawn on top of an --accent fill: every system's --bg is pure black. */
   --on-accent: var(--bg);
+  /* DS-OK: app-owned accessible small-text ink, tested over every raised
+     surface and 8%/14% accent tint. Decorative --accent stays frozen. */
+  --accent-ink: color-mix(in srgb, var(--accent) 75%, #ffffff);
 
   --radius-xs: 3px;
 
@@ -55,6 +58,16 @@
    Select/popover open) the document scroll range collapses and scrollY clamps
    to 0. min-height keeps short pages viewport-tall without the cap. */
 body { height: auto; min-height: 100%; }
+
+/* Approved accessibility deviations from the immutable handoff. Preserve
+   Terminal's outline/tint grammar and Brutalist's existing black fill ink. */
+:root:not([data-system="terminal"]) .btn.primary { color: var(--on-accent); }
+:root .chip.accent,
+:root .btn.danger,
+:root .btn.link,
+:root .journey-card__progress-value,
+:root .journey-detail-card__progress-value,
+:root[data-system="terminal"] .btn.primary { color: var(--accent-ink); }
 
 /* Global "reduce motion" toggle: extends the canonical .no-anim to every
    descendant, not just the three helper classes it names. */

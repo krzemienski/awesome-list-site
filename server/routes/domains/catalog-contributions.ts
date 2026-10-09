@@ -84,11 +84,11 @@ import { ensureSubSubcategoryExists } from "../../repositories/ensureSubSubcateg
 import { ensureMinDescription, decodeResourceTextFields } from "../../github/importHygiene";
 import { buildRelatedResources } from "../../services/relatedResources";
 import { stripInternalResourceFields } from "../../lib/publicResource";
-import { claudeService } from "../../ai/claudeService";
 import { getPublicCacheValue } from "../../cache/publicCache";
 import { isDatabaseUnavailableError } from "../../db/errors";
 import { ServiceUnavailableError } from "../../middleware/errors";
 import { registerHomeFeed } from "./home-feed";
+import { listApprovedResourceTags } from "../../repositories/TagRepository";
 
 /**
  * Copied verbatim from server/routes.ts (module-level helper). Duplicated here
@@ -942,9 +942,21 @@ export function registerCatalogContributionsRoutes(
   // POST /api/resources/:id/edits - Submit edit suggestion for a resource (authenticated)
   app.post('/api/resources/:id/edits', isAuthenticated, async (req: any, res) => {
     try {
+      if (!req.body || typeof req.body !== 'object' || Array.isArray(req.body)) {
+        return res.status(400).json({ message: 'Edit request must be an object' });
+      }
       const userId = req.dbUser.id;
       const resourceId = parseInt(req.params.id);
-      const { proposedChanges, proposedData, claudeMetadata, triggerClaudeAnalysis } = req.body;
+      const { proposedChanges, proposedData, triggerClaudeAnalysis } = req.body;
+      if ('claudeMetadata' in req.body || 'claudeAnalyzedAt' in req.body) {
+        return res.status(400).json({ message: 'Client-provided AI analysis is not accepted' });
+      }
+      if (triggerClaudeAnalysis !== undefined && typeof triggerClaudeAnalysis !== 'boolean') {
+        return res.status(400).json({ message: 'triggerClaudeAnalysis must be a boolean' });
+      }
+      if (triggerClaudeAnalysis) {
+        return res.status(403).json({ message: 'Edit submission does not run AI analysis. Administrators must use /api/claude/analyze.' });
+      }
       
       if (isNaN(resourceId)) {
         return res.status(400).json({ message: 'Invalid resource ID' });
@@ -955,8 +967,35 @@ export function registerCatalogContributionsRoutes(
         return res.status(404).json({ message: 'Resource not found' });
       }
       
-      if (!proposedChanges || !proposedData) {
-        return res.status(400).json({ message: 'proposedChanges and proposedData are required' });
+      const isObject = (value: unknown): value is Record<string, unknown> =>
+        value !== null && typeof value === 'object' && !Array.isArray(value);
+      for (const [field, value] of Object.entries({ proposedChanges, proposedData })) {
+        if (!isObject(value) || Object.keys(value).length === 0 ||
+            Object.keys(value).some(key => !(EDITABLE_RESOURCE_FIELDS as readonly string[]).includes(key))) {
+          return res.status(400).json({ message: `${field} must be a non-empty object containing only editable fields`, field });
+        }
+      }
+      for (const [field, value] of Object.entries(proposedChanges)) {
+        if (!isObject(value) || !('old' in value) || !('new' in value) ||
+            Object.keys(value).some(key => key !== 'old' && key !== 'new')) {
+          return res.status(400).json({ message: `proposedChanges.${field} must contain old and new values`, field });
+        }
+        for (const entry of [value.old, value.new]) {
+          if (entry !== null && typeof entry !== 'string' &&
+              !(field === 'tags' && Array.isArray(entry) && entry.length <= 20 && entry.every(tag => typeof tag === 'string'))) {
+            return res.status(400).json({ message: `Invalid proposedChanges.${field} value`, field });
+          }
+        }
+      }
+      for (const [field, value] of Object.entries(proposedData)) {
+        if (typeof value === 'string' && value.length > 10000) {
+          return res.status(400).json({ message: `proposedData.${field} is too long`, field });
+        }
+        const nullable = ['subcategory', 'subSubcategory', 'resourceFormat', 'provider', 'skillLevel'].includes(field);
+        if (field === 'tags' ? !Array.isArray(value) || value.some(tag => typeof tag !== 'string') :
+            typeof value !== 'string' && !(nullable && value === null)) {
+          return res.status(400).json({ message: `Invalid proposedData.${field} type`, field });
+        }
       }
       
       // SECURITY FIX: Whitelist of editable fields only (ISSUE 1)
@@ -1056,12 +1095,25 @@ export function registerCatalogContributionsRoutes(
       // or "&amp;" pasted into a suggestion resurfaces site-wide on approval.
       decodeResourceTextFields(sanitizedProposedData);
       
-      let aiMetadata = claudeMetadata;
-      if (triggerClaudeAnalysis && resource.url) {
-        try {
-          aiMetadata = await claudeService.analyzeURL(resource.url);
-        } catch (error) {
-          console.error('Error analyzing URL with Claude:', error);
+      // The stored values are authoritative; never trust a separately supplied diff.
+      for (const field of Object.keys(sanitizedChanges)) delete sanitizedChanges[field];
+      for (const field of Object.keys(sanitizedProposedData)) {
+        const oldValue = field === 'tags' ? resource.metadata?.tags ?? [] :
+          (resource as unknown as Record<string, unknown>)[field] ?? null;
+        const newValue = sanitizedProposedData[field];
+        if (JSON.stringify(oldValue) === JSON.stringify(newValue)) {
+          delete sanitizedProposedData[field];
+        } else {
+          sanitizedChanges[field] = { old: oldValue, new: newValue };
+        }
+      }
+      if (Object.keys(sanitizedChanges).length === 0) {
+        return res.status(400).json({ message: 'An edit must change at least one field' });
+      }
+      if (sanitizedProposedData.url) {
+        const conflict = await resourceRepo.getResourceByUrl(sanitizedProposedData.url);
+        if (conflict && conflict.id !== resourceId) {
+          return res.status(409).json({ message: 'That URL already belongs to another resource', conflictingResourceId: conflict.id, title: conflict.title });
         }
       }
       
@@ -1095,28 +1147,10 @@ export function registerCatalogContributionsRoutes(
         originalResourceUpdatedAt: resource.updatedAt ?? new Date(),
         proposedChanges: sanitizedChanges,
         proposedData: sanitizedProposedData,
-        claudeMetadata: aiMetadata,
-        claudeAnalyzedAt: aiMetadata ? new Date() : undefined,
       });
 
-      // Run19 BUG-015: the "AI Analysis" column in the admin Edits queue was
-      // permanently "No AI" because nothing ever ran analysis for suggested
-      // edits. Kick it off in the background (never blocks the 201 response;
-      // failures just leave the column honest about having no analysis).
-      if (!aiMetadata && resource.url) {
-        claudeService
-          .analyzeURL(resource.url)
-          .then((analysis) => {
-            if (analysis) {
-              // analyzeURL's return shape matches the claudeMetadata column
-              // type (suggestedTitle/suggestedDescription/…/keyTopics).
-              return auditRepo.updateResourceEditAnalysis(edit.id, analysis);
-            }
-          })
-          .catch((error) => {
-            console.error(`Background Claude analysis for edit ${edit.id} failed:`, error);
-          });
-      }
+      // Manual-only submission: paid analysis is admitted exclusively by the
+      // existing admin analysis endpoint, with its authorization/quota/limiter.
 
       res.status(201).json(edit);
     } catch (error) {
@@ -1169,23 +1203,7 @@ export function registerCatalogContributionsRoutes(
         namespace: 'catalog-taxonomy',
         key: 'tags',
         ttlMs: 60_000,
-        load: async () => {
-          const result = await db.execute(sql`
-            SELECT lower(regexp_replace(btrim(tag), '[[:space:]_]+', '-', 'g')) AS tag,
-                   count(*)::int AS count
-            FROM resources r,
-                 jsonb_array_elements_text(r.metadata->'tags') AS tag
-            WHERE r.status = 'approved'
-              AND jsonb_typeof(r.metadata->'tags') = 'array'
-              AND btrim(tag) <> ''
-            GROUP BY 1
-            ORDER BY count DESC, tag ASC
-          `);
-          return {
-            total: result.rows.length,
-            tags: result.rows.map((r: any) => ({ tag: r.tag, count: r.count })),
-          };
-        },
+        load: listApprovedResourceTags,
       });
       // Task #327 cache contract: see server/http-cache-policy.ts.
       res.set('Cache-Control', CATALOG_CACHE_CONTROL);

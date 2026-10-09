@@ -834,8 +834,8 @@ describe('Resources API Integration Tests', () => {
         .post(`/api/resources/${resource.id}/edits`)
         .send({
           proposedChanges: {
-            title: 'Updated Resource',
-            description: 'Updated description',
+            title: { old: 'Original Resource', new: 'Updated Resource' },
+            description: { old: 'Original description', new: 'Updated description' },
           },
           proposedData: {
             title: 'Updated Resource',
@@ -849,8 +849,8 @@ describe('Resources API Integration Tests', () => {
       expect(response.body).toHaveProperty('resourceId', resource.id);
       expect(response.body).toHaveProperty('submittedBy', regularUserId);
       expect(response.body.proposedChanges).toEqual({
-        title: 'Updated Resource',
-        description: 'Updated description',
+        title: { old: 'Original Resource', new: 'Updated Resource' },
+        description: { old: 'Original description', new: 'Updated description' },
       });
       expect(response.body).toHaveProperty('status', 'pending');
     });
@@ -900,7 +900,7 @@ describe('Resources API Integration Tests', () => {
       const response = await agent
         .post(`/api/resources/${resource.id}/edits`)
         .send({
-          proposedChanges: { title: 'Admin Updated Title' },
+          proposedChanges: { title: { old: 'Test Resource', new: 'Admin Updated Title' } },
           proposedData: { title: 'Admin Updated Title' },
         })
         .expect(201);
@@ -908,7 +908,7 @@ describe('Resources API Integration Tests', () => {
       expect(response.body.submittedBy).toBe(adminUserId);
     });
 
-    it('should accept edit with claude metadata', async () => {
+    it('should reject client-supplied claude metadata', async () => {
       const resource = await createTestResource({
         title: 'Test Resource',
         url: 'https://example.com/test',
@@ -920,16 +920,16 @@ describe('Resources API Integration Tests', () => {
       const response = await agent
         .post(`/api/resources/${resource.id}/edits`)
         .send({
-          proposedChanges: { title: 'AI Updated Title' },
+          proposedChanges: { title: { old: 'Test Resource', new: 'AI Updated Title' } },
           proposedData: { title: 'AI Updated Title' },
           claudeMetadata: {
             analysisId: 'claude-123',
             confidence: 0.95,
           },
         })
-        .expect(201);
+        .expect(400);
 
-      expect(response.body).toHaveProperty('claudeMetadata');
+      expect(response.body.message).toContain('Client-provided AI analysis');
     });
   });
 

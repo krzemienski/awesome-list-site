@@ -29,8 +29,27 @@ import {
   type InsertTag,
 } from "@shared/schema";
 import { db } from "../db";
-import { eq, and, asc } from "drizzle-orm";
+import { eq, and, asc, sql } from "drizzle-orm";
 import { invalidatePublicCache } from "../cache/publicCache";
+
+/** Canonical public vocabulary: tags belong to approved resource metadata. */
+export async function listApprovedResourceTags(): Promise<{ total: number; tags: Array<{ tag: string; count: number }> }> {
+  const result = await db.execute(sql`
+    SELECT lower(regexp_replace(btrim(tag), '[[:space:]_]+', '-', 'g')) AS tag,
+           count(*)::int AS count
+    FROM resources r,
+         jsonb_array_elements_text(
+           CASE WHEN jsonb_typeof(r.metadata->'tags') = 'array'
+                THEN r.metadata->'tags' ELSE '[]'::jsonb END
+         ) AS tag
+    WHERE r.status = 'approved' AND btrim(tag) <> ''
+    GROUP BY 1 ORDER BY count DESC, tag ASC
+  `);
+  return {
+    total: result.rows.length,
+    tags: result.rows.map((row) => ({ tag: String(row.tag), count: Number(row.count) })),
+  };
+}
 
 /**
  * Repository class for tag-related database operations

@@ -1,10 +1,12 @@
 import type { LinkHealthJob, LinkHealthCheck, LinkHealthJobRow, LinkHealthCheckRow } from "@shared/schema";
 import { linkHealthJobs, linkHealthChecks, resources as resourcesTable } from "@shared/schema";
 import { db } from "../db";
-import { desc, eq, ne, and, inArray, lt } from "drizzle-orm";
+import { desc, eq, ne, and, inArray, lt, sql } from "drizzle-orm";
 import { storage } from "../storage";
 import { checkResourceLinks, browserVerifyLink, type LinkCheckResult } from "../validation/linkChecker";
 import { runHeavyWork } from "../ops/heavyWork";
+
+const scanControllers = new Map<number, AbortController>();
 
 export type BrokenLinkCheck = LinkHealthCheck & {
   resource?: { id: number; title: string; category: string };
@@ -133,20 +135,25 @@ export const linkHealthService = {
   },
 
   async startCheck(): Promise<LinkHealthJob> {
-    const [activeJob] = await db
-      .select({ id: linkHealthJobs.id })
-      .from(linkHealthJobs)
-      .where(inArray(linkHealthJobs.status, ['pending', 'processing']))
-      .limit(1);
-    if (activeJob) {
-      throw new Error('A link health check is already running');
-    }
+    const row = await db.transaction(async (tx) => {
+      await tx.execute(sql`SELECT pg_advisory_xact_lock(5116, 7)`);
+      const [activeJob] = await tx
+        .select({ id: linkHealthJobs.id })
+        .from(linkHealthJobs)
+        .where(inArray(linkHealthJobs.status, ['pending', 'processing']))
+        .limit(1);
+      if (activeJob) {
+        throw new Error('A link health check is already running');
+      }
 
-    const [row] = await db
-      .insert(linkHealthJobs)
-      .values({ status: 'processing', startedAt: new Date() })
-      .returning();
+      const [created] = await tx
+        .insert(linkHealthJobs)
+        .values({ status: 'processing', startedAt: new Date() })
+        .returning();
+      return created;
+    });
 
+    scanControllers.set(row.id, new AbortController());
     this.runCheckInBackground(row.id).catch(err => {
       console.error('[LinkHealth] Background check failed:', err);
     });
@@ -155,8 +162,12 @@ export const linkHealthService = {
   },
 
   async runCheckInBackground(jobId: number): Promise<void> {
+    const controller = scanControllers.get(jobId) ?? new AbortController();
+    scanControllers.set(jobId, controller);
+    const signal = controller.signal;
     try {
       await runHeavyWork('link-health', async () => {
+      signal.throwIfAborted();
       const resources = await storage.getAllApprovedResources();
       const resourcesToCheck = resources.map(r => ({
         id: r.id,
@@ -174,6 +185,7 @@ export const linkHealthService = {
       // sweep instead of 0 until the final commit. Throttled to ~1 write/2s.
       let lastProgressWrite = 0;
       const report = await checkResourceLinks(resourcesToCheck, {
+        signal,
         timeout: 15000,
         concurrent: 10,
         retryCount: 1,
@@ -217,9 +229,10 @@ export const linkHealthService = {
       const VERIFY_CONC = 10;
       let verified = 0;
       for (let i = 0; i < toVerify.length; i += VERIFY_CONC) {
+        signal.throwIfAborted();
         const batch = toVerify.slice(i, i + VERIFY_CONC);
         await Promise.all(batch.map(async (r) => {
-          const v = await browserVerifyLink(r.url);
+          const v = await browserVerifyLink(r.url, 15000, signal);
           if (v.confirmedDead) {
             // Keep the pass-1 status unless the browser check refined it
             // (e.g. timeout in pass 1, 404 under browser UA -> broken).
@@ -270,10 +283,16 @@ export const linkHealthService = {
         };
       });
 
+      // Publish checks and counters atomically. Cancellation and admission use
+      // the same lock: cancelled scans can never prune a completed scan.
+      await db.transaction(async tx => {
+      await tx.execute(sql`SELECT pg_advisory_xact_lock(5116, 7)`);
+      const [finalizing] = await tx.select().from(linkHealthJobs).where(eq(linkHealthJobs.id, jobId));
+      if (finalizing?.status !== 'processing' || signal.aborted) return;
       // Insert in chunks to stay well under Postgres parameter limits.
       const CHUNK = 500;
       for (let i = 0; i < checkRows.length; i += CHUNK) {
-        await db.insert(linkHealthChecks).values(checkRows.slice(i, i + CHUNK));
+        await tx.insert(linkHealthChecks).values(checkRows.slice(i, i + CHUNK));
       }
 
       // Counters derive from the post-verification statuses so they always
@@ -284,7 +303,7 @@ export const linkHealthService = {
       const brokenCount = countBy('broken') + countBy('dns_failure');
       const redirectCount = countBy('redirect');
       const timeoutCount = countBy('timeout');
-      await db
+      await tx
         .update(linkHealthJobs)
         .set({
           checkedLinks: report.totalLinks,
@@ -296,15 +315,17 @@ export const linkHealthService = {
           status: 'completed',
           completedAt: new Date(),
         })
-        .where(eq(linkHealthJobs.id, jobId));
+        .where(and(eq(linkHealthJobs.id, jobId), eq(linkHealthJobs.status, 'processing')));
 
       // Prune per-link rows of older jobs: only the latest completed scan's
       // checks are ever served, and each scan writes ~1,800 rows.
-      await db.delete(linkHealthChecks).where(lt(linkHealthChecks.jobId, jobId));
+      await tx.delete(linkHealthChecks).where(lt(linkHealthChecks.jobId, jobId));
 
       console.log(`[LinkHealth] Check completed for job ${jobId}: ${healthyCount} healthy, ${suspectCount} suspect, ${brokenCount} broken, ${redirectCount} redirects, ${timeoutCount} timeouts out of ${report.totalLinks} total (verification pass cleared ${toVerify.length - (brokenCount + timeoutCount)} bot-block false positives)`);
       });
+      });
     } catch (err: any) {
+      if (signal.aborted) return;
       await db
         .update(linkHealthJobs)
         .set({
@@ -315,13 +336,23 @@ export const linkHealthService = {
         .where(and(eq(linkHealthJobs.id, jobId), eq(linkHealthJobs.status, 'processing')))
         .catch(e => console.error('[LinkHealth] Failed to mark job failed:', e.message));
       throw err;
+    } finally {
+      scanControllers.delete(jobId);
     }
   },
 
-  async cancelJob(jobId: number): Promise<void> {
-    await db
-      .update(linkHealthJobs)
-      .set({ status: 'cancelled', completedAt: new Date() })
-      .where(and(eq(linkHealthJobs.id, jobId), eq(linkHealthJobs.status, 'processing')));
+  async cancelJob(jobId: number): Promise<'cancelled' | 'not-found' | 'terminal'> {
+    const outcome = await db.transaction(async tx => {
+      await tx.execute(sql`SELECT pg_advisory_xact_lock(5116, 7)`);
+      const [job] = await tx.select().from(linkHealthJobs).where(eq(linkHealthJobs.id, jobId));
+      if (!job) return 'not-found' as const;
+      if (!['pending', 'processing'].includes(job.status)) return 'terminal' as const;
+      await tx.update(linkHealthJobs)
+        .set({ status: 'cancelled', errorMessage: 'Cancelled by administrator', completedAt: new Date() })
+        .where(eq(linkHealthJobs.id, jobId));
+      return 'cancelled' as const;
+    });
+    if (outcome === 'cancelled') scanControllers.get(jobId)?.abort();
+    return outcome;
   }
 };

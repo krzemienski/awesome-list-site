@@ -55,6 +55,7 @@ import {
   normalizeLearningGoals,
 } from "@shared/onboarding";
 import { db } from "../db";
+import { stripInternalResourceFields } from "../lib/publicResource";
 import { eq, and, desc, sql } from "drizzle-orm";
 
 /**
@@ -104,11 +105,11 @@ export class UserFeatureRepository {
       })
       .from(userFavorites)
       .innerJoin(resources, eq(userFavorites.resourceId, resources.id))
-      .where(eq(userFavorites.userId, userId))
+      .where(and(eq(userFavorites.userId, userId), eq(resources.status, "approved")))
       .orderBy(desc(userFavorites.createdAt));
 
     return result.map(r => ({
-      ...r.resource,
+      ...stripInternalResourceFields(r.resource),
       // Keep the legacy alias consumed by older clients and integration
       // surfaces while `id` remains the canonical flattened resource id.
       resourceId: r.resource.id,
@@ -181,7 +182,7 @@ export class UserFeatureRepository {
       })
       .from(userBookmarks)
       .innerJoin(resources, eq(userBookmarks.resourceId, resources.id))
-      .where(eq(userBookmarks.userId, userId))
+      .where(and(eq(userBookmarks.userId, userId), eq(resources.status, "approved")))
       .orderBy(desc(userBookmarks.createdAt));
 
     const memberships = await db
@@ -199,7 +200,7 @@ export class UserFeatureRepository {
     }
 
     return result.map(r => ({
-      ...r.resource,
+      ...stripInternalResourceFields(r.resource),
       resourceId: r.resource.id,
       notes: r.notes || undefined,
       bookmarkedAt: r.bookmarkedAt!,
@@ -638,6 +639,8 @@ export class UserFeatureRepository {
           title: resources.title,
           category: resources.category,
           status: resources.status,
+          kind: resources.kind,
+          metadata: resources.metadata,
         },
       })
       .from(userInteractions)
@@ -656,7 +659,8 @@ export class UserFeatureRepository {
       ...row,
       viewedAt: new Date(row.viewedAt),
       resource:
-        row.resource && row.resource.id != null ? row.resource : null,
+        row.resource && row.resource.id != null && row.resource.status === "approved"
+          ? stripInternalResourceFields(row.resource) : null,
     }));
   }
 

@@ -20,7 +20,8 @@ import {
   isNull,
   sql,
 } from "drizzle-orm";
-import { withResourceKindFields, type ResourceKind } from "../lib/resourceKinds";
+import { type ResourceKind } from "../lib/resourceKinds";
+import { stripInternalResourceFields } from "../lib/publicResource";
 
 export interface CollectionWithCount extends BookmarkCollection {
   itemCount: number;
@@ -588,8 +589,9 @@ export class CollectionRepository {
     // Rebuilt field by field (not spread) so the wire projection is exactly
     // the PublicCollectionResource interface: `metadata` cannot leak and a
     // dropped kind field is a compile error here, not a contract mismatch.
-    const publicResources: PublicCollectionResource[] = publicRows.map((row) => {
-      const { kind, resolvedKind } = withResourceKindFields(row);
+    const publicResources: PublicCollectionResource[] = publicRows.map((raw) => {
+      const row = stripInternalResourceFields(raw);
+      const { kind, resolvedKind } = row;
       return {
         id: row.id,
         title: row.title,

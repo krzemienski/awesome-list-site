@@ -26,6 +26,7 @@ import {
   subcategories,
   subSubcategories,
   resources,
+  learningJourneys,
   type Category,
   type InsertCategory,
   type Subcategory,
@@ -34,7 +35,7 @@ import {
   type InsertSubSubcategory,
 } from "@shared/schema";
 import { db } from "../db";
-import { eq, and, or, sql, asc } from "drizzle-orm";
+import { eq, and, or, ne, sql, asc } from "drizzle-orm";
 import { invalidatePublicCache } from "../cache/publicCache";
 import { ConflictError } from "../middleware/errors";
 
@@ -97,10 +98,10 @@ export class CategoryRepository {
     const [existing] = await db
       .select()
       .from(categories)
-      .where(eq(categories.slug, category.slug));
+      .where(or(eq(categories.slug, category.slug), sql`lower(${categories.name}) = lower(${category.name})`));
 
     if (existing) {
-      throw new Error(`Category with slug "${category.slug}" already exists`);
+      throw new ConflictError('Category name or slug already exists; choose a unique name and slug');
     }
 
     const [newCategory] = await db.insert(categories).values(category).returning();
@@ -115,11 +116,24 @@ export class CategoryRepository {
    * @returns Updated category object
    */
   async updateCategory(id: number, category: Partial<InsertCategory>): Promise<Category> {
-    const [updatedCategory] = await db
-      .update(categories)
-      .set({ ...category, updatedAt: new Date() })
-      .where(eq(categories.id, id))
-      .returning();
+    const updatedCategory = await db.transaction(async tx => {
+      const [existing] = await tx.select().from(categories).where(eq(categories.id, id)).for('update');
+      if (!existing) throw new Error('Category not found');
+      const [duplicate] = await tx.select().from(categories).where(and(ne(categories.id, id), or(
+        eq(categories.slug, category.slug ?? existing.slug),
+        sql`lower(${categories.name}) = lower(${category.name ?? existing.name})`,
+      )));
+      if (duplicate) throw new ConflictError('Category name or slug already exists; choose a unique name and slug');
+      const [updated] = await tx.update(categories).set({ ...category, updatedAt: new Date() })
+        .where(eq(categories.id, id)).returning();
+      if (updated.name !== existing.name) {
+        await tx.update(resources).set({ category: updated.name, updatedAt: new Date() })
+          .where(eq(resources.category, existing.name));
+        await tx.update(learningJourneys).set({ category: updated.name })
+          .where(eq(learningJourneys.category, existing.name));
+      }
+      return updated;
+    });
     if (updatedCategory) invalidatePublicCache('category-mutation');
     return updatedCategory;
   }
@@ -300,7 +314,7 @@ export class CategoryRepository {
         );
 
       if (existing) {
-        throw new Error(`Subcategory with slug "${subcategory.slug}" already exists in this category`);
+        throw new ConflictError(`Subcategory with slug "${subcategory.slug}" already exists in this category`);
       }
     }
 
@@ -325,13 +339,30 @@ export class CategoryRepository {
    * @returns Updated subcategory object
    */
   async updateSubcategory(id: number, subcategory: Partial<InsertSubcategory>): Promise<Subcategory> {
-    const existing = await this.getSubcategory(id);
     const [updatedSubcategory] = await db.transaction(async (tx) => {
+      const [existing] = await tx.select().from(subcategories).where(eq(subcategories.id, id)).for('update');
+      if (!existing) throw new Error('Subcategory not found');
+      const parentId = subcategory.categoryId ?? existing.categoryId;
+      if (parentId == null) throw new Error('Category ID is required');
+      const [duplicate] = await tx.select().from(subcategories).where(and(
+        ne(subcategories.id, id), eq(subcategories.categoryId, parentId),
+        or(eq(subcategories.slug, subcategory.slug ?? existing.slug),
+          sql`lower(${subcategories.name}) = lower(${subcategory.name ?? existing.name})`),
+      ));
+      if (duplicate) throw new ConflictError('Subcategory name or slug already exists in this category');
+      const [oldParent] = existing.categoryId == null ? [] : await tx.select().from(categories).where(eq(categories.id, existing.categoryId));
+      const [newParent] = await tx.select().from(categories).where(eq(categories.id, parentId));
+      if (!newParent) throw new Error('Parent category not found');
       const updated = await tx
         .update(subcategories)
         .set({ ...subcategory, updatedAt: new Date() })
         .where(eq(subcategories.id, id))
         .returning();
+      if (oldParent && (existing.name !== updated[0].name || existing.categoryId !== parentId)) {
+        await tx.update(resources).set({
+          category: newParent.name, subcategory: updated[0].name, updatedAt: new Date(),
+        }).where(and(eq(resources.category, oldParent.name), eq(resources.subcategory, existing.name)));
+      }
       const parentIds = new Set(
         [existing?.categoryId, updated[0]?.categoryId].filter(
           (parentId): parentId is number => parentId != null,
@@ -397,6 +428,21 @@ export class CategoryRepository {
       .from(resources)
       .where(eq(resources.subcategory, subcategoryName));
     return result?.count ?? 0;
+  }
+
+  /** Admin display counts use the complete chain; deletion guards remain global. */
+  async getScopedSubcategoryResourceCounts(): Promise<Record<number, number>> {
+    const rows = await db.select({
+      id: subcategories.id,
+      count: sql<number>`count(${resources.id})::int`,
+    }).from(subcategories)
+      .innerJoin(categories, eq(categories.id, subcategories.categoryId))
+      .leftJoin(resources, and(
+        eq(resources.category, categories.name),
+        eq(resources.subcategory, subcategories.name),
+      ))
+      .groupBy(subcategories.id);
+    return Object.fromEntries(rows.map(row => [row.id, row.count]));
   }
 
   /**
@@ -480,15 +526,15 @@ export class CategoryRepository {
    * into per-import copies (HLS x11, FFmpeg x10 in the run19 audit), so every
    * create path must treat a global match as "already exists".
    */
-  async findSubSubcategoryDuplicateGlobal(name: string, slug: string): Promise<SubSubcategory | undefined> {
+  async findSubSubcategoryDuplicateGlobal(name: string, slug: string, excludeId?: number): Promise<SubSubcategory | undefined> {
     const [row] = await db
       .select()
       .from(subSubcategories)
       .where(
-        or(
+        and(excludeId === undefined ? undefined : ne(subSubcategories.id, excludeId), or(
           sql`lower(${subSubcategories.name}) = lower(${name})`,
           eq(subSubcategories.slug, slug),
-        ),
+        )),
       )
       .limit(1);
     return row;
@@ -514,7 +560,7 @@ export class CategoryRepository {
         );
 
       if (existing) {
-        throw new Error(`Sub-subcategory with slug "${subSubcategory.slug}" already exists in this subcategory`);
+        throw new ConflictError(`Sub-subcategory with slug "${subSubcategory.slug}" already exists in this subcategory`);
       }
     }
 
@@ -539,13 +585,34 @@ export class CategoryRepository {
    * @returns Updated sub-subcategory object
    */
   async updateSubSubcategory(id: number, subSubcategory: Partial<InsertSubSubcategory>): Promise<SubSubcategory> {
-    const existing = await this.getSubSubcategory(id);
     const [updatedSubSubcategory] = await db.transaction(async (tx) => {
+      const [existing] = await tx.select().from(subSubcategories).where(eq(subSubcategories.id, id)).for('update');
+      if (!existing) throw new Error('Sub-subcategory not found');
+      const [duplicate] = await tx.select().from(subSubcategories).where(and(ne(subSubcategories.id, id), or(
+        eq(subSubcategories.slug, subSubcategory.slug ?? existing.slug),
+        sql`lower(${subSubcategories.name}) = lower(${subSubcategory.name ?? existing.name})`,
+      )));
+      if (duplicate) throw new ConflictError('Sub-subcategory name or slug already exists; reuse it or choose a unique name and slug');
+      const parentId = subSubcategory.subcategoryId ?? existing.subcategoryId;
+      if (parentId == null) throw new Error('Subcategory ID is required');
+      const chain = (parent: number) => tx.select({ category: categories.name, subcategory: subcategories.name })
+        .from(subcategories).innerJoin(categories, eq(categories.id, subcategories.categoryId))
+        .where(eq(subcategories.id, parent));
+      const [oldParent] = existing.subcategoryId == null ? [] : await chain(existing.subcategoryId);
+      const [newParent] = await chain(parentId);
+      if (!newParent) throw new Error('Parent subcategory not found');
       const updated = await tx
         .update(subSubcategories)
         .set({ ...subSubcategory, updatedAt: new Date() })
         .where(eq(subSubcategories.id, id))
         .returning();
+      if (oldParent && (existing.name !== updated[0].name || existing.subcategoryId !== parentId)) {
+        await tx.update(resources).set({
+          category: newParent.category, subcategory: newParent.subcategory,
+          subSubcategory: updated[0].name, updatedAt: new Date(),
+        }).where(and(eq(resources.category, oldParent.category),
+          eq(resources.subcategory, oldParent.subcategory), eq(resources.subSubcategory, existing.name)));
+      }
       const parentIds = new Set(
         [existing?.subcategoryId, updated[0]?.subcategoryId].filter(
           (parentId): parentId is number => parentId != null,

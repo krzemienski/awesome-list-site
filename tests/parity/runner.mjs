@@ -350,7 +350,7 @@ const main = async () => {
 
   const runStartedAt = new Date();
   const frozenAt = new Date(Math.floor(runStartedAt.getTime() / 60_000) * 60_000);
-  const runId = `${runStartedAt.toISOString().replace(/[:.]/g, "-")}-${process.pid}`;
+  const runId = `${runStartedAt.toISOString().replace(/[:.]/g, "-")}-${process.pid}-${cli.theme.system}-${cli.theme.accent}`;
   const stageRoot = path.join("/tmp", "parity-baseline", runId);
   const dirs = Object.fromEntries(["expected", "actual", "diff", "determinism", "diagnostics"].map((name) => [name, path.join(stageRoot, name)]));
   await Promise.all(Object.values(dirs).map((directory) => fsp.mkdir(directory, { recursive: true })));
@@ -394,6 +394,20 @@ const main = async () => {
         auditKey: process.env.ADMIN_PASSWORD,
         log,
       });
+      // Only this runner's disposable identity is written. Account theme must
+      // agree with local boot state; otherwise preference hydration undoes it.
+      await identity.page.evaluate(async ({ system, accent }) => {
+        const response = await fetch("/api/user/preferences", {
+          method: "PUT", credentials: "include",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ themeSystem: system, themeAccent: accent }),
+        });
+        if (!response.ok) throw new Error(`Owned QA theme write failed: HTTP ${response.status}`);
+        const check = await fetch("/api/user/preferences", { credentials: "include" });
+        const data = await check.json();
+        if (data.theme?.systemId !== system || data.theme?.accentId !== accent)
+          throw new Error("Owned QA theme preference did not persist");
+      }, cli.theme);
     }
 
     // ---- reference data binding ----------------------------------------------
@@ -554,7 +568,7 @@ const main = async () => {
     };
     const throttleGuard = createThrottleGuard();
     const documentReloads = [];
-    const captureContext = { browser, appBase, artifactBase, referenceBase, frozenAt, tokens, adapter: catalogBinding.adapter, identity, dirs, plan, byId, throttleGuard, documentReloads, reconciliation: catalogBinding.reconciliation };
+    const captureContext = { browser, appBase, artifactBase, referenceBase, frozenAt, tokens, adapter: catalogBinding.adapter, identity, dirs, plan, byId, throttleGuard, documentReloads, reconciliation: catalogBinding.reconciliation, theme: cli.theme };
 
     // Cells run in plan order, except that a cell whose app limiter window is
     // currently closed is moved behind the remaining cells so the wait overlaps
@@ -565,7 +579,7 @@ const main = async () => {
     while (queue.length) {
       const cell = queue.shift();
       const { screen, width } = cell;
-      const base = { screen: screen.id, width, family: screen.family, kind: screen.kind, eligibility: screen.eligibility, denominator: false };
+      const base = { screen: screen.id, width, system: cli.theme.system, accent: cli.theme.accent, family: screen.family, kind: screen.kind, eligibility: screen.eligibility, denominator: false };
       if (screen.kind === "app" && screen.eligibility === "pixel") {
         const pending = throttleWaitNeeded(throttleGuard, screen);
         if (pending && queue.some((other) => !(other.screen.kind === "app" && throttleWaitNeeded(throttleGuard, other.screen)))) {
@@ -584,7 +598,7 @@ const main = async () => {
         continue;
       }
       if (screen.eligibility === "token-only") {
-        pushRow({ ...base, status: "UNVERIFIED", reason: screen.reason || "Token-only row: verified by token audits, never by pixel comparison." });
+        pushRow({ ...base, status: "UNVERIFIED", reason: `${screen.reason || "No active whole-screen reference."} Run tests/parity/nonpixel-runner.mjs for separate per-screen/system computed-style, hook and axe evidence; this row never enters the pixel denominator.` });
         continue;
       }
       const needsAdmin = (screen.requires || []).includes("admin-session");
@@ -750,7 +764,7 @@ const main = async () => {
         viewportHeights: VIEWPORT_HEIGHTS,
         captureNormalisations: CAPTURE_NORMALISATIONS,
         chromiumArgs: CHROMIUM_ARGS,
-        captureState: CAPTURE_STATE,
+        captureState: captureState(cli.theme),
         throttleWaits: throttleGuard.waits,
         throttleDeferrals,
         documentReloads,
@@ -863,14 +877,40 @@ export const CAPTURE_STATE = {
   reference: { localStorage: { "av-ds-system": "editorial", "av-ds-accent": "crimson" } },
 };
 
-const stateInitScript = (isReference) => `(() => {
-  const entries = ${JSON.stringify(Object.entries(isReference ? CAPTURE_STATE.reference.localStorage : CAPTURE_STATE.app.localStorage))};
+export const captureState = ({ system, accent } = CAPTURE_STATE.theme) => ({
+  theme: { system, accent },
+  app: { localStorage: { "ds-system": system, "ds-accent": accent, "analytics-consent": "denied" } },
+  reference: { localStorage: {} },
+});
+
+const stateInitScript = (isReference, theme) => `(() => {
+  const state = ${JSON.stringify(captureState(theme))};
+  const entries = Object.entries(${isReference ? "state.reference" : "state.app"}.localStorage);
   try { for (const [key, value] of entries) localStorage.setItem(key, value); } catch {}
 })();`;
 
 const throwIfCaptureAborted = (signal) => {
   if (signal?.aborted) throw signal.reason || new CaptureTimeoutError("capture", ROW_TIMEOUT_MS);
 };
+
+export async function assertCaptureTheme(page, theme) {
+  await page.waitForFunction(({ system, accent }) =>
+    document.documentElement.dataset.system === system &&
+    document.documentElement.dataset.accent === accent &&
+    Boolean(window.DESIGN_SYSTEMS?.[system] && window.ACCENTS),
+  theme, { timeout: 30_000 });
+  const proof = await page.evaluate(({ system, accent }) => {
+    const root = document.documentElement;
+    const style = getComputedStyle(root);
+    const vars = window.DESIGN_SYSTEMS[system].vars;
+    const pair = window.ACCENTS.find(item => item.id === accent);
+    const expected = { "--font-display": vars["--font-display"], "--font-body": vars["--font-body"], "--radius-sm": vars["--radius-sm"], "--bg": vars["--bg"], "--accent": pair.primary, "--accent-2": pair.secondary };
+    return Object.entries(expected).map(([token, want]) => ({ token, want, actual: style.getPropertyValue(token).trim() }));
+  }, theme);
+  const bad = proof.filter(row => row.want?.replace(/\s+/g, "") !== row.actual.replace(/\s+/g, ""));
+  if (bad.length) throw new Error(`Theme registry did not paint ${theme.system}/${theme.accent}: ${JSON.stringify(bad)}`);
+  return proof;
+}
 
 const registerCaptureContext = (ctx, context) => {
   ctx.activeContexts?.add(context);
@@ -903,7 +943,7 @@ const closeCaptureContexts = async (ctx) => {
   await Promise.all(contexts.map((context) => closeCaptureContext(ctx, context)));
 };
 
-const newCaptureContext = async ({ browser, frozenAt }, width, { reference, storageState }) => {
+const newCaptureContext = async ({ browser, frozenAt, theme }, width, { reference, storageState }) => {
   const context = await browser.newContext({
     viewport: { width, height: VIEWPORT_HEIGHTS[width] },
     deviceScaleFactor: 1,
@@ -917,7 +957,7 @@ const newCaptureContext = async ({ browser, frozenAt }, width, { reference, stor
   try {
     context.setDefaultTimeout(30_000);
     await context.clock.setFixedTime(frozenAt);
-    await context.addInitScript(stateInitScript(reference));
+    await context.addInitScript(stateInitScript(reference, theme));
     return context;
   } catch (error) {
     // A half-configured context must not outlive its setup failure.
@@ -959,7 +999,8 @@ const attachDiagnostics = (page) => {
 
 const dumpDiagnostics = async (ctx, page, screen, width, side, error) => {
   if (!ctx.dirs?.diagnostics) return null;
-  const stem = `${screen.id}-${width}-${side}`;
+  const theme = ctx.theme || CAPTURE_STATE.theme;
+  const stem = `${screen.id}-${width}-${theme.system}-${theme.accent}-${side}`;
   const record = {
     screen: screen.id,
     width,
@@ -1133,7 +1174,16 @@ const openSideOn = async (ctx, screen, width, side, { context, page, base, isRef
   // resource objects); path templates and identity checks use the flat `values`.
   if (action) await applyAction(page, action, isReference ? "reference" : "actual", { tokens: ctx.tokens });
   const selector = isReference ? screen.referenceReadySelector : screen.actualReadySelector;
+  const theme = ctx.theme || CAPTURE_STATE.theme;
+  if (isReference) {
+    // Frozen useTweaks ignores storage. Wait for App's initial effect before
+    // calling the actual registry applier, never host controls or file edits.
+    await settlePage(page, selector, { side: "reference" });
+    await page.evaluate(({ system, accent }) => window.applyDesignSystem(system, accent), theme);
+  }
+  await assertCaptureTheme(page, theme);
   const settled = await settlePage(page, selector, { side: isReference ? "reference" : "actual" });
+  await assertCaptureTheme(page, theme);
   throwIfCaptureAborted(ctx.signal);
   if (!isReference && kind === "app") noteRateLimits(ctx.throttleGuard, page, screen);
   const faces = await collectFontFaces(page);
@@ -1169,7 +1219,8 @@ const isInfrastructureFailure = (error) => {
 };
 
 const captureRow = async (ctx, screen, width) => {
-  const stem = `${screen.id}-${width}`;
+  const theme = ctx.theme || CAPTURE_STATE.theme;
+  const stem = `${screen.id}-${width}-${theme.system}-${theme.accent}`;
   const actualFile = path.join(ctx.dirs.actual, `${stem}.png`);
   const expectedFile = path.join(ctx.dirs.expected, `${stem}.png`);
   const diffFile = path.join(ctx.dirs.diff, `${stem}.png`);
@@ -1289,7 +1340,7 @@ const captureRow = async (ctx, screen, width) => {
 // Determinism proof (reference side, fresh context per capture)
 // ---------------------------------------------------------------------------
 const runDeterminism = async ({ browser, plan, byId, cli, tokens, referenceBase, frozenAt, dirs, reconciliation }) => {
-  const ctx = { browser, referenceBase, frozenAt, tokens, dirs, throttleGuard: createThrottleGuard(), reconciliation };
+  const ctx = { browser, referenceBase, frozenAt, tokens, dirs, throttleGuard: createThrottleGuard(), reconciliation, theme: cli.theme };
   const cells = [];
   for (const { screen: candidate, width } of plan) {
     const screen = candidate.aliasOf ? byId.get(candidate.aliasOf) : candidate;
@@ -1299,7 +1350,8 @@ const runDeterminism = async ({ browser, plan, byId, cli, tokens, referenceBase,
     let failure = null;
     let referenceReconciliationEvidence = null;
     for (let attempt = 1; attempt <= cli.determinism && !failure; attempt += 1) {
-      const file = path.join(dirs.determinism, `${screen.id}-${width}.capture-${attempt}.png`);
+      const theme = ctx.theme || CAPTURE_STATE.theme;
+      const file = path.join(dirs.determinism, `${screen.id}-${width}-${theme.system}-${theme.accent}.capture-${attempt}.png`);
       let side = null;
       try {
         side = await openSide(ctx, screen, width, "expected");
@@ -1316,7 +1368,8 @@ const runDeterminism = async ({ browser, plan, byId, cli, tokens, referenceBase,
       }
     }
     const identical = !failure && hashes.length === cli.determinism && hashes.every((hash) => hash === hashes[0]);
-    cells.push({ screen: screen.id, width, hashes, identical, failure, referenceReconciliation: referenceReconciliationEvidence, files: hashes.map((_, index) => `determinism/${screen.id}-${width}.capture-${index + 1}.png`) });
+    const theme = ctx.theme || CAPTURE_STATE.theme;
+    cells.push({ screen: screen.id, width, system: theme.system, accent: theme.accent, hashes, identical, failure, referenceReconciliation: referenceReconciliationEvidence, files: hashes.map((_, index) => `determinism/${screen.id}-${width}-${theme.system}-${theme.accent}.capture-${index + 1}.png`) });
     log(`[parity] determinism ${screen.id}@${width}: ${identical ? "identical" : failure ? `FAILED on capture ${failure.attempt}: ${failure.error}` : "DIFFERENT"} ${hashes.map((hash) => hash.slice(0, 12)).join(" ")}`);
   }
   if (!cells.length) throw new CliError("--determinism needs at least one visitor-capturable pixel row in the selection");

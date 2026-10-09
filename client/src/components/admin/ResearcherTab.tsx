@@ -50,6 +50,7 @@ import { useAiDefaults } from "@/hooks/useAiDefaults";
 import { apiRequest, ApiError } from "@/lib/queryClient";
 import { sanitizeDisplay } from "@/lib/sanitize-display";
 import { useToast } from "@/hooks/use-toast";
+import { ToastAction } from "@/components/ui/toast";
 import type { ResearchJob, ResearchDiscovery } from "@shared/schema";
 import "./queues-agent.css";
 import { useState, useEffect, useRef } from "react";
@@ -230,8 +231,16 @@ export default function ResearcherTab({ initialTab = "launch" }: ResearcherTabPr
   const [scoutModel, setScoutModel] = useState("");
   const [baseUrl, setBaseUrl] = useState("");
   const [authToken, setAuthToken] = useState("");
-  const [selectedJobId, setSelectedJobId] = useState<number | null>(null);
-  const [showJobDetails, setShowJobDetails] = useState(false);
+  const [selectedJobId, setSelectedJobId] = useState<number | null>(() => {
+    if (typeof window === 'undefined') return null;
+    const value = Number(new URLSearchParams(window.location.search).get('jobId'));
+    return Number.isSafeInteger(value) && value > 0 ? value : null;
+  });
+  const [showJobDetails, setShowJobDetails] = useState(() => {
+    if (typeof window === 'undefined') return false;
+    const value = Number(new URLSearchParams(window.location.search).get('jobId'));
+    return Number.isSafeInteger(value) && value > 0;
+  });
   const [rejectDialogId, setRejectDialogId] = useState<number | null>(null);
   const [rejectReason, setRejectReason] = useState("");
   const [confirmApproveAll, setConfirmApproveAll] = useState(false);
@@ -493,6 +502,16 @@ export default function ResearcherTab({ initialTab = "launch" }: ResearcherTabPr
       queryClient.invalidateQueries({ queryKey: ['/api/researcher/jobs'] });
       toast({ title: "Job cancelled" });
     },
+    onError: (error, jobId) => {
+      toast({
+        title: `Could not cancel job #${jobId}`,
+        description: mutationErrorMessage(error),
+        variant: "destructive",
+        action: <ToastAction altText="Retry cancellation" onClick={() => {
+          if (!cancelMutation.isPending) cancelMutation.mutate(jobId);
+        }}>Retry</ToastAction>,
+      });
+    },
   });
 
   // Bulk approve every pending discovery (server auto-rejects exact-URL
@@ -561,6 +580,18 @@ export default function ResearcherTab({ initialTab = "launch" }: ResearcherTabPr
 
   return (
     <div className="queues-agent queues-agent--research">
+      {cancelMutation.isError && (
+        <Alert variant="destructive" role="alert">
+          <AlertCircle className="w-4 h-4" />
+          <AlertDescription>
+            Could not cancel job #{cancelMutation.variables}: {mutationErrorMessage(cancelMutation.error)}
+            <Button variant="outline" disabled={cancelMutation.isPending}
+              onClick={() => {
+                if (cancelMutation.variables != null) cancelMutation.mutate(cancelMutation.variables);
+              }}>Retry cancellation</Button>
+          </AlertDescription>
+        </Alert>
+      )}
       <div className="queues-agent__canonical">
         <section className="card queues-agent__research-form">
           <h3>Run a research task</h3>
@@ -1081,6 +1112,7 @@ export default function ResearcherTab({ initialTab = "launch" }: ResearcherTabPr
                                 size="sm"
                                 variant="destructive"
                                 onClick={() => cancelMutation.mutate(job.id)}
+                                disabled={cancelMutation.isPending}
                               >
                                 <XCircle className="w-3 h-3 mr-1" />Cancel
                               </Button>
@@ -1397,6 +1429,7 @@ export default function ResearcherTab({ initialTab = "launch" }: ResearcherTabPr
                                   variant="ghost"
                                   className="text-destructive"
                                   onClick={() => cancelMutation.mutate(job.id)}
+                                  disabled={cancelMutation.isPending}
                                   aria-label={`Cancel job #${job.id}`}
                                 >
                                   <XCircle className="w-3 h-3" />

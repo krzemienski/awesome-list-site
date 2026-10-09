@@ -45,15 +45,15 @@ describe('Phase 8 — Sidebar UX static guards (BUG-007 + BUG-043)', () => {
   const css = SIDEBAR_CSS.map((file) => readFileSync(file, 'utf-8')).join('\n');
 
   describe('BUG-007 — chevron hit area (≥24 wide × ≥44 tall)', () => {
-    it('AppSidebar top-level chevron declares a 40×44px minimum hit area', () => {
+    it('top-level disclosure belongs to the full accordion button', () => {
       // The top-level chevron is the toggle-cat-<slug> button.
       const toggleButtonBlock = tsx.match(
-        /data-testid=\{`toggle-cat-\$\{catSlug\}`\}(?:(?!<\/?button\b)[\s\S])*<\/button>/,
+        /<button[\s\S]*?data-testid=\{`accordion-cat-\$\{catSlug\}`\}[\s\S]*?<\/button>/,
       );
       expect(toggleButtonBlock, 'toggle-cat button block must exist').toBeTruthy();
-      expect(toggleButtonBlock![0]).toMatch(/min-h-\[44px\]/);
-      expect(toggleButtonBlock![0]).toMatch(/\bw-10\b/);
-      expect(toggleButtonBlock![0]).toMatch(/\bmin-w-10\b/);
+      expect(toggleButtonBlock![0]).toContain('aria-expanded=');
+      expect(toggleButtonBlock![0]).toContain('subs.length > 0 ? onToggle');
+      expect(css).toMatch(/\.accordion-header\s*\{[^}]*min-height:\s*44px/);
     });
 
     it('AppSidebar subcategory chevron declares a 40×44px minimum hit area', () => {
@@ -64,9 +64,9 @@ describe('Phase 8 — Sidebar UX static guards (BUG-007 + BUG-043)', () => {
         /data-testid=\{`expand-sub-\$\{subSlug\}`\}(?:(?!<\/?button\b)[\s\S])*<\/button>/,
       );
       expect(expandButtonBlock, 'expand-sub button block must exist').toBeTruthy();
-      expect(expandButtonBlock![0]).toMatch(/\bw-10\b/);
-      expect(expandButtonBlock![0]).toMatch(/\bmin-w-10\b/);
-      expect(expandButtonBlock![0]).toMatch(/min-h-\[44px\]/);
+      expect(expandButtonBlock![0]).toContain('aria-expanded=');
+      expect(css).toMatch(/\.av-sidebar-l2-toggle\s*\{[^}]*min-width:\s*44px/);
+      expect(css).toMatch(/\.av-sidebar-l2-toggle\s*\{[^}]*min-height:\s*44px/);
     });
 
     it('sidebar.css declares min-height: 44px on .accordion-header', () => {
@@ -90,14 +90,14 @@ describe('Phase 8 — Sidebar UX static guards (BUG-007 + BUG-043)', () => {
       expect(labelSpan![1], 'category label must NOT truncate').not.toMatch(/\btruncate\b/);
     });
 
-    it('SubItem label uses break-words (not truncate)', () => {
+    it('ellipsised leaves retain the full label and accessible hover title', () => {
       // The SubItem label span sits right before {label} inside its <a>.
       const subLabelSpan = tsx.match(
-        /<span[^>]*>\{label\}<\/span>/,
+        /<span[^>]*className="av-sidebar-leaf-label"[^>]*>\{label\}<\/span>/,
       );
       expect(subLabelSpan, 'SubItem label span must exist').toBeTruthy();
-      expect(subLabelSpan![0]).toMatch(/break-words/);
-      expect(subLabelSpan![0], 'SubItem label must NOT truncate').not.toMatch(/\btruncate\b/);
+      expect(subLabelSpan![0]).toContain('title={label}');
+      expect(css).toMatch(/\.av-sidebar-leaf-label\s*\{[^}]*text-overflow:\s*ellipsis/);
     });
 
     it('sidebar.css declares a regression net under .accordion-header .truncate', () => {
@@ -119,13 +119,13 @@ describe('Phase 8 — Sidebar UX static guards (BUG-007 + BUG-043)', () => {
     });
   });
 
-  it('uses canonical sticky geometry and the inclusive mobile cutoff', () => {
+  it('uses canonical sticky geometry and the exclusive mobile cutoff', () => {
     // Canonical styles.css .sidebar and responsive rules; rationale in
     // docs/parity/assumptions/shell-sidebar.md.
     expect(css).toMatch(/position:\s*sticky/);
     expect(css).toMatch(/var\(--shell-sidebar-w[,)]/);
     expect(css).toMatch(/var\(--shell-sidebar-w-tablet[,)]/);
-    expect(css).toMatch(/max-width:\s*768px/);
+    expect(css).toMatch(/max-width:\s*767px/);
     expect(css).toMatch(/max-width:\s*1024px/);
   });
 });

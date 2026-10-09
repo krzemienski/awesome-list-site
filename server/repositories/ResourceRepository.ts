@@ -41,6 +41,7 @@ import { eq, and, sql, asc, desc, like, inArray, isNull, getTableColumns } from 
 import { tokenizeSearchQuery } from "@shared/searchNormalize";
 import { decodeResourceTextFields } from "../github/importHygiene";
 import { invalidatePublicCache } from "../cache/publicCache";
+import { transitionResourceInTransaction, withResourcePublication } from "./resourcePublication";
 import {
   resourceFormatSchema,
   resourceProviderSchema,
@@ -821,6 +822,17 @@ export class ResourceRepository {
     // title/description/hierarchy fields (never the URL) so "&amp;" text can
     // never be persisted, whatever the caller (routes, GitHub sync, AI).
     resource = this.normalizeResourceFacets(decodeResourceTextFields({ ...resource }), true);
+    if (resource.status === 'approved') {
+      return withResourcePublication(async tx => {
+        const [created] = await tx.insert(resources).values({ ...resource, status: 'pending' }).returning();
+        await tx.insert(resourceAuditLog).values({
+          resourceId: created.id, originalResourceId: created.id, action: 'created',
+          performedBy: resource.submittedBy, changes: audit.changes, notes: audit.notes,
+        });
+        return transitionResourceInTransaction(tx, created.id, { status: 'approved' },
+          resource.submittedBy ?? undefined, { expectedStatus: 'pending', notes: audit.notes });
+      });
+    }
     let newResource: Resource;
     try {
       [newResource] = await db.insert(resources).values(resource).returning();
@@ -937,19 +949,10 @@ export class ResourceRepository {
   ): Promise<Resource> {
     // Task #248: same universal decode boundary as createResource.
     resource = this.normalizeResourceFacets(decodeResourceTextFields({ ...resource }), false);
-    const [updatedResource] = await db
-      .update(resources)
-      .set({ ...resource, updatedAt: new Date() })
-      .where(eq(resources.id, id))
-      .returning();
-
-    if (updatedResource) invalidatePublicCache('resource-mutation');
-
-    if (audit) {
-      await this.logResourceAudit(id, 'updated', audit.performedBy, resource, audit.notes);
-    }
-
-    return updatedResource;
+    return withResourcePublication(tx => transitionResourceInTransaction(
+      tx, id, resource, audit ? audit.performedBy : undefined,
+      { audit: audit !== false, notes: audit ? audit.notes : undefined },
+    ));
   }
 
   /**
@@ -1010,61 +1013,15 @@ export class ResourceRepository {
    * @returns The updated resource
    */
   async updateResourceStatus(id: number, status: string, approvedBy?: string): Promise<Resource> {
-    const now = new Date();
     const expectedCurrentStatus =
       status === 'approved' || status === 'rejected'
         ? 'pending'
         : status === 'pending'
           ? 'approved'
           : undefined;
-    const updateData: Partial<typeof resources.$inferInsert> = {
-      status,
-      statusChangedAt: now,
-      updatedAt: now,
-    };
-
-    if (status === 'approved' && approvedBy) {
-      updateData.approvedBy = approvedBy;
-      updateData.approvedAt = now;
-      updateData.contributorRejectionReason = null;
-    }
-
-    const updatedResource = await db.transaction(async (tx) => {
-      const [updated] = await tx
-        .update(resources)
-        .set(updateData)
-        .where(
-          expectedCurrentStatus
-            ? and(
-                eq(resources.id, id),
-                eq(resources.status, expectedCurrentStatus),
-              )
-            : eq(resources.id, id),
-        )
-        .returning();
-      if (!updated) return undefined;
-
-      await tx.insert(resourceAuditLog).values({
-        resourceId: id,
-        originalResourceId: id,
-        action: status,
-        performedBy: approvedBy,
-        changes: { status },
-      });
-      return updated;
-    });
-
-    if (!updatedResource) {
-      throw new Error(
-        expectedCurrentStatus === 'pending'
-          ? 'Resource is not pending approval'
-          : expectedCurrentStatus === 'approved'
-            ? 'Resource is not approved'
-            : 'Resource not found',
-      );
-    }
-    invalidatePublicCache('resource-mutation');
-    return updatedResource;
+    return withResourcePublication(tx => transitionResourceInTransaction(
+      tx, id, { status }, approvedBy, { expectedStatus: expectedCurrentStatus },
+    ));
   }
 
   /**
@@ -1158,36 +1115,10 @@ export class ResourceRepository {
    * @throws Error if resource not found or not pending
    */
   async approveResource(id: number, approvedBy: string): Promise<Resource> {
-    const approved = await db.transaction(async (tx) => {
-      const now = new Date();
-      const [updated] = await tx
-        .update(resources)
-        .set({
-          status: 'approved',
-          approvedBy,
-          approvedAt: now,
-          contributorRejectionReason: null,
-          statusChangedAt: now,
-          updatedAt: now,
-        })
-        .where(and(eq(resources.id, id), eq(resources.status, 'pending')))
-        .returning();
-      if (!updated) return undefined;
-
-      await tx.insert(resourceAuditLog).values({
-        resourceId: id,
-        originalResourceId: id,
-        action: 'approved',
-        performedBy: approvedBy,
-        changes: { previousStatus: 'pending', newStatus: 'approved' },
-        notes: 'Resource approved by admin',
-      });
-      return updated;
-    });
-
-    if (!approved) throw new Error('Resource is not pending approval');
-    invalidatePublicCache('resource-mutation');
-    return approved;
+    return withResourcePublication(tx => transitionResourceInTransaction(
+      tx, id, { status: 'approved' }, approvedBy,
+      { expectedStatus: 'pending', notes: 'Resource approved by admin' },
+    ));
   }
 
   /**
@@ -1199,41 +1130,14 @@ export class ResourceRepository {
    * @throws Error if resource not found, not pending, or reason too short
    */
   async rejectResource(id: number, adminId: string, reason: string): Promise<void> {
-    if (!reason || reason.trim().length < 10) {
+    if (typeof reason !== 'string' || reason.trim().length < 10) {
       throw new Error('Rejection reason must be at least 10 characters');
     }
 
-    const rejected = await db.transaction(async (tx) => {
-      const now = new Date();
-      const contributorReason = reason.trim();
-      const [updated] = await tx
-        .update(resources)
-        .set({
-          status: 'rejected',
-          contributorRejectionReason: contributorReason,
-          statusChangedAt: now,
-          updatedAt: now,
-        })
-        .where(and(eq(resources.id, id), eq(resources.status, 'pending')))
-        .returning();
-      if (!updated) return undefined;
-
-      await tx.insert(resourceAuditLog).values({
-        resourceId: id,
-        originalResourceId: id,
-        action: 'rejected',
-        performedBy: adminId,
-        changes: {
-          previousStatus: 'pending',
-          newStatus: 'rejected',
-          reason: contributorReason,
-        },
-        notes: `Resource rejected: ${contributorReason}`,
-      });
-      return updated;
-    });
-    if (!rejected) throw new Error('Resource is not pending approval');
-    invalidatePublicCache('resource-mutation');
+    await withResourcePublication(tx => transitionResourceInTransaction(
+      tx, id, { status: 'rejected' }, adminId,
+      { expectedStatus: 'pending', rejectionReason: reason.trim(), notes: `Resource rejected: ${reason.trim()}` },
+    ));
   }
 
   /**

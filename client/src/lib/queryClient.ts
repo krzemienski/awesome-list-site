@@ -50,11 +50,35 @@ export async function apiRequest(
   });
 
   await throwIfResNotOk(res);
+  // All admin catalog callers (including edits, bulk operations and undo/redo)
+  // pass this boundary. Invalidate the whole catalog graph after a successful
+  // write, not just whichever manager happens to be mounted.
+  if (options?.method && !['GET', 'HEAD'].includes(options.method.toUpperCase()) &&
+      /^\/api\/admin\/(?:resources|resource-edits|categories|subcategories|sub-subcategories)(?:\/|$)/.test(url)) {
+    void invalidateCatalogQueries();
+  }
   const contentType = res.headers.get("content-type");
   if (contentType && contentType.includes("application/json")) {
     return await res.json();
   }
   return res;
+}
+
+/** Shared content-mutation cache graph, including URL-shaped detail keys. */
+export function invalidateCatalogQueries(): Promise<void> {
+  const prefixes = [
+    '/api/resources', '/api/categories', '/api/subcategories', '/api/sub-subcategories',
+    '/api/admin/resources', '/api/admin/pending-resources', '/api/admin/resource-edits',
+    '/api/admin/categories', '/api/admin/subcategories', '/api/admin/sub-subcategories',
+    '/api/admin/stats', '/api/admin/audit-logs', '/api/search', '/api/tags',
+    'awesome-list-nav', 'awesome-list-data', 'awesome-list-listing',
+  ];
+  return queryClient.invalidateQueries({
+    predicate: query => typeof query.queryKey[0] === 'string' &&
+      prefixes.some(prefix => query.queryKey[0] === prefix ||
+        (query.queryKey[0] as string).startsWith(`${prefix}/`) ||
+        (query.queryKey[0] as string).startsWith(`${prefix}?`)),
+  });
 }
 
 type UnauthorizedBehavior = "returnNull" | "throw";

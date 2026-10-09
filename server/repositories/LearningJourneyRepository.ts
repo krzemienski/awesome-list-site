@@ -38,7 +38,8 @@ import {
 } from "@shared/journeyProgress";
 import { db } from "../db";
 import { eq, and, asc, desc, inArray, getTableColumns, sql } from "drizzle-orm";
-import { resolveResourceKind, type ResourceKind } from "../lib/resourceKinds";
+import { type ResourceKind } from "../lib/resourceKinds";
+import { stripInternalResourceFields } from "../lib/publicResource";
 
 /** Public projection of a step's linked resource (never the raw row). */
 export interface JourneyStepResource {
@@ -295,7 +296,8 @@ export class LearningJourneyRepository {
    * @returns Array of journey steps ordered by step number
    */
   async listJourneySteps(
-    journeyId: number
+    journeyId: number,
+    includeUnapproved = false,
   ): Promise<(JourneyStep & { resource?: JourneyStepResource })[]> {
     // Hydrate each step with its linked resource so the journey detail UI can
     // render real, clickable resource links (the frontend reads step.resource).
@@ -317,7 +319,10 @@ export class LearningJourneyRepository {
         },
       })
       .from(journeySteps)
-      .leftJoin(resources, eq(journeySteps.resourceId, resources.id))
+      .leftJoin(resources, and(
+        eq(journeySteps.resourceId, resources.id),
+        includeUnapproved ? undefined : eq(resources.status, 'approved'),
+      ))
       .where(eq(journeySteps.journeyId, journeyId))
       // Run22 BUG-034: deterministic within-step ordering — rows sharing a
       // stepNumber (multi-part resources) must always come back in id order,
@@ -328,14 +333,7 @@ export class LearningJourneyRepository {
       ...r.step,
       resource:
         r.resource && r.resource.id != null
-          ? {
-              id: r.resource.id,
-              title: r.resource.title,
-              url: r.resource.url,
-              description: r.resource.description,
-              kind: r.resource.kind ?? null,
-              resolvedKind: resolveResourceKind(r.resource).kind,
-            }
+          ? stripInternalResourceFields(r.resource)
           : undefined,
     }));
   }
@@ -347,6 +345,13 @@ export class LearningJourneyRepository {
    */
   async createJourneyStep(step: InsertJourneyStep): Promise<JourneyStep> {
     return db.transaction(async (tx) => {
+      await tx.select({ id: learningJourneys.id }).from(learningJourneys)
+        .where(eq(learningJourneys.id, step.journeyId)).for('update');
+      if (step.resourceId != null) {
+        const [resource] = await tx.select({ id: resources.id }).from(resources)
+          .where(and(eq(resources.id, step.resourceId), eq(resources.status, 'approved'))).for('share');
+        if (!resource) throw Object.assign(new Error('Selected resource no longer exists or is not approved. Choose another resource.'), { code: 'INVALID_STEP_RESOURCE' });
+      }
       const [newStep] = await tx.insert(journeySteps).values(step).returning();
       await tx
         .update(learningJourneys)
@@ -362,12 +367,25 @@ export class LearningJourneyRepository {
    * @param step - Partial step data to update
    * @returns The updated step
    */
-  async updateJourneyStep(id: number, step: Partial<InsertJourneyStep>): Promise<JourneyStep> {
+  async updateJourneyStep(id: number, step: Partial<InsertJourneyStep>, wholeGroup = false): Promise<JourneyStep> {
     return db.transaction(async (tx) => {
+      const [anchor] = await tx.select().from(journeySteps).where(eq(journeySteps.id, id));
+      if (!anchor) throw Object.assign(new Error('Step no longer exists. Reload the steps.'), { code: 'STEP_CONFLICT' });
+      await tx.select({ id: learningJourneys.id }).from(learningJourneys)
+        .where(eq(learningJourneys.id, anchor.journeyId)).for('update');
+      const [existing] = await tx.select().from(journeySteps).where(eq(journeySteps.id, id)).for('update');
+      if (!existing) throw Object.assign(new Error('Step no longer exists. Reload the steps.'), { code: 'STEP_CONFLICT' });
+      if (step.resourceId != null) {
+        const [resource] = await tx.select({ id: resources.id }).from(resources)
+          .where(and(eq(resources.id, step.resourceId), eq(resources.status, 'approved'))).for('share');
+        if (!resource) throw Object.assign(new Error('Selected resource no longer exists or is not approved. Choose another resource.'), { code: 'INVALID_STEP_RESOURCE' });
+      }
       const [updatedStep] = await tx
         .update(journeySteps)
         .set(step)
-        .where(eq(journeySteps.id, id))
+        .where(wholeGroup
+          ? and(eq(journeySteps.journeyId, existing.journeyId), eq(journeySteps.stepNumber, existing.stepNumber))
+          : eq(journeySteps.id, id))
         .returning();
       if (updatedStep) {
         await tx
@@ -383,18 +401,34 @@ export class LearningJourneyRepository {
    * Delete a journey step
    * @param id - Step ID to delete
    */
-  async deleteJourneyStep(id: number): Promise<void> {
+  async deleteJourneyStep(id: number, wholeGroup = false): Promise<void> {
     await db.transaction(async (tx) => {
-      const [deletedStep] = await tx
-        .delete(journeySteps)
-        .where(eq(journeySteps.id, id))
-        .returning({ journeyId: journeySteps.journeyId });
-      if (deletedStep) {
-        await tx
-          .update(learningJourneys)
-          .set({ updatedAt: new Date() })
-          .where(eq(learningJourneys.id, deletedStep.journeyId));
+      const [existing] = await tx.select().from(journeySteps).where(eq(journeySteps.id, id));
+      if (!existing) return;
+      await tx.select({ id: learningJourneys.id }).from(learningJourneys)
+        .where(eq(learningJourneys.id, existing.journeyId)).for('update');
+      const steps = await tx.select().from(journeySteps)
+        .where(eq(journeySteps.journeyId, existing.journeyId)).for('update');
+      const current = steps.find(s => s.id === id);
+      if (!current) return;
+      const removed = new Set(steps.filter(s => wholeGroup ? s.stepNumber === current.stepNumber : s.id === id).map(s => s.id));
+      const remaining = steps.filter(s => !removed.has(s.id));
+      const progressRows = await tx.select().from(userJourneyProgress)
+        .where(eq(userJourneyProgress.journeyId, existing.journeyId)).for('update');
+      for (const progress of progressRows) {
+        const completedSteps = (progress.completedSteps ?? []).map(Number).filter(sid => !removed.has(sid));
+        await tx.update(userJourneyProgress).set({
+          completedSteps,
+          completedAt: areAllLogicalJourneyStepsComplete(remaining, new Set(completedSteps)) ? progress.completedAt ?? new Date() : null,
+          currentStepId: progress.currentStepId != null && removed.has(progress.currentStepId) ? null : progress.currentStepId,
+        }).where(eq(userJourneyProgress.id, progress.id));
       }
+      if (removed.size) await tx.delete(journeySteps).where(inArray(journeySteps.id, [...removed]));
+      const numbers = [...new Set(remaining.map(s => s.stepNumber))].sort((a, b) => a - b);
+      for (const step of remaining) {
+        await tx.update(journeySteps).set({ stepNumber: numbers.indexOf(step.stepNumber) + 1 }).where(eq(journeySteps.id, step.id));
+      }
+      await tx.update(learningJourneys).set({ updatedAt: new Date() }).where(eq(learningJourneys.id, existing.journeyId));
     });
   }
 
@@ -494,21 +528,24 @@ export class LearningJourneyRepository {
     // with foreign step ids (breaking completion math on BOTH journeys' UIs).
     // Validate BEFORE any write and surface a typed error for the route to
     // map to a 4xx.
-    const allSteps = await this.listJourneySteps(journeyId);
-    const validIds = new Set(allSteps.map((s) => s.id));
-    const foreign = stepIds.filter((id) => !validIds.has(id));
-    if (foreign.length > 0) {
-      const err: any = new Error(
-        `Step id(s) ${foreign.join(', ')} do not belong to journey ${journeyId}`,
-      );
-      err.code = 'FOREIGN_STEP';
-      err.foreignStepIds = foreign;
-      throw err;
-    }
-
-    // Serialize same-user/journey writes. This avoids lost JSONB updates and
-    // makes each transition flag truthful across stale tabs and devices.
     return db.transaction(async (tx) => {
+      // Share the journey lock with structural edits before reading row membership.
+      await tx.select({ id: learningJourneys.id }).from(learningJourneys)
+        .where(eq(learningJourneys.id, journeyId)).for('share');
+      const allSteps = await tx.select().from(journeySteps).where(eq(journeySteps.journeyId, journeyId));
+      const validIds = new Set(allSteps.map((s) => s.id));
+      const foreign = stepIds.filter((id) => !validIds.has(id));
+      if (foreign.length > 0) {
+        const err: any = new Error(
+          `Step id(s) ${foreign.join(', ')} do not belong to journey ${journeyId}`,
+        );
+        err.code = 'FOREIGN_STEP';
+        err.foreignStepIds = foreign;
+        throw err;
+      }
+
+      // Serialize same-user/journey writes. This avoids lost JSONB updates and
+      // makes each transition flag truthful across stale tabs and devices.
       const [current] = await tx
         .select()
         .from(userJourneyProgress)

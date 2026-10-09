@@ -59,12 +59,13 @@ import {
   httpsUrlSchema,
   resourceTitleSchema,
   optionalResourceDescriptionSchema,
+  editableResourceMetadataSchema,
   DISPLAY_NAME_MAX,
   stripInvisible,
   parseIntInRange,
 } from "@shared/validation";
 import { sanitizeUser, parseBoundedInt, PG_INT_MAX, validateBody } from "../../validation/inputs";
-import { ensureMinDescription, decodeResourceTextFields } from "../../github/importHygiene";
+import { decodeResourceTextFields } from "../../github/importHygiene";
 import { ensureSubSubcategoryExists } from "../../repositories/ensureSubSubcategory";
 import { isDatabaseUnavailableError } from "../../db/errors";
 import { claudeService } from "../../ai/claudeService";
@@ -81,6 +82,27 @@ import type {
 
 // Every value resources.status can hold (shared/schema.ts resources.status).
 const ADMIN_RESOURCE_STATUSES = ['approved', 'pending', 'rejected', 'withdrawn', 'archived'];
+const resourceRejectionSchema = z.object({
+  reason: z.string().trim().min(10, 'Rejection reason must contain at least 10 characters').max(5000),
+});
+const bulkResourceIdsSchema = z.object({
+  ids: z.array(z.number().int().positive().max(PG_INT_MAX)).min(1).max(1000)
+    .refine(ids => new Set(ids).size === ids.length, 'Resource IDs must be unique'),
+});
+
+function taxonomyConflict(error: unknown): boolean {
+  if (error instanceof ConflictError) return true;
+  if (!(error instanceof Object)) return false;
+  const cause = error as { code?: string; cause?: unknown };
+  return cause.code === '23505' || (cause.cause !== error && taxonomyConflict(cause.cause));
+}
+
+function sendTaxonomyConflict(res: Response, error: unknown): boolean {
+  if (!taxonomyConflict(error)) return false;
+  const message = error instanceof ConflictError ? error.message : 'Taxonomy name or slug already exists; choose a unique value in the destination parent';
+  res.status(409).json({ message, fieldErrors: { name: message, slug: message } });
+  return true;
+}
 
 /**
  * Explicit dependency context for the admin-content routes. Everything the
@@ -439,13 +461,6 @@ export function registerAdminContentRoutes(
         return res.status(404).json({ message: 'Resource not found' });
       }
       
-      // Run3 audit R3-28: approval gate — sanitize or backfill a fallback
-      // description so no live resource has a stub under 20 chars.
-      const cleanDescription = ensureMinDescription(existing.description || '', existing.title, existing.url);
-      if (cleanDescription !== (existing.description || '')) {
-        await resourceRepo.updateResource(resourceId, { description: cleanDescription }, { performedBy: userId });
-      }
-      
       const updatedResource = await resourceRepo.approveResource(resourceId, userId);
       
       res.json(updatedResource);
@@ -464,7 +479,7 @@ export function registerAdminContentRoutes(
     try {
       const resourceId = parseInt(req.params.id);
       const userId = req.dbUser.id;
-      const { reason } = req.body;
+      const { reason } = req.body ?? {};
       
       if (isNaN(resourceId)) {
         return res.status(400).json({ message: 'Invalid resource ID' });
@@ -476,8 +491,9 @@ export function registerAdminContentRoutes(
         return res.status(404).json({ message: 'Resource not found' });
       }
       
-      if (!reason || reason.trim().length < 10) {
-        return res.status(400).json({ message: 'Rejection reason is required (minimum 10 characters)' });
+      const rejection = resourceRejectionSchema.safeParse(req.body);
+      if (!rejection.success) {
+        return res.status(400).json(buildValidationEnvelope(rejection.error));
       }
 
       // Run16 BUG-046: rejecting a non-pending resource used to fall through
@@ -567,6 +583,7 @@ export function registerAdminContentRoutes(
         title: resourceTitleSchema.optional(),
         description: optionalResourceDescriptionSchema.optional(),
         url: httpsUrlSchema.optional(),
+        metadata: editableResourceMetadataSchema.optional(),
       });
       const validationResult = updateSchema.safeParse(bodyForValidation);
       
@@ -605,6 +622,9 @@ export function registerAdminContentRoutes(
       if (validatedData.provider !== undefined) updateData.provider = validatedData.provider;
       if (validatedData.skillLevel !== undefined) updateData.skillLevel = validatedData.skillLevel;
       if (validatedData.status !== undefined) updateData.status = validatedData.status;
+      if (validatedData.metadata !== undefined) {
+        updateData.metadata = { ...(resource.metadata ?? {}), ...validatedData.metadata };
+      }
       // Design parity: the admin editor may set or clear the stored kind here
       // too (null = back to read-time resolution).
       if (validatedData.kind !== undefined) updateData.kind = validatedData.kind;
@@ -761,22 +781,13 @@ export function registerAdminContentRoutes(
   app.post('/api/admin/resources/bulk/approve', isAuthenticated, isAdmin, async (req: any, res) => {
     try {
       const userId = req.dbUser.id;
-      const { ids } = req.body as { ids?: unknown };
-
-      if (!Array.isArray(ids) || ids.length === 0) {
-        return res.status(400).json({ message: 'ids must be a non-empty array of resource IDs' });
-      }
-
-      const numericIds = ids
-        .map((id) => (typeof id === 'number' ? id : parseInt(String(id), 10)))
-        .filter((id) => !Number.isNaN(id));
-
-      if (numericIds.length === 0) {
-        return res.status(400).json({ message: 'No valid resource IDs provided' });
-      }
+      const input = bulkResourceIdsSchema.safeParse(req.body);
+      if (!input.success) return res.status(400).json(buildValidationEnvelope(input.error));
+      const numericIds = input.data.ids;
 
       let succeeded = 0;
       let failed = 0;
+      const failures: { id: number; reason: string }[] = [];
       // Sequential on purpose: a bulk moderation request must not monopolize
       // all three database connections and starve sessions/catalog reads.
       for (const id of numericIds) {
@@ -786,10 +797,11 @@ export function registerAdminContentRoutes(
         } catch (error) {
           if (isDatabaseUnavailableError(error)) throw error;
           failed++;
+          failures.push({ id, reason: error instanceof Error ? error.message : 'Approval failed' });
         }
       }
 
-      res.json({ message: `Approved ${succeeded} resource(s)`, succeeded, failed });
+      res.status(succeeded === 0 ? 409 : failed ? 207 : 200).json({ message: `Approved ${succeeded} resource(s)`, succeeded, failed, failures });
     } catch (error) {
       console.error('Error in bulk approve:', error);
       sendOperationalFailure(res, error, 'Failed to bulk approve resources');
@@ -800,26 +812,13 @@ export function registerAdminContentRoutes(
   app.post('/api/admin/resources/bulk/reject', isAuthenticated, isAdmin, async (req: any, res) => {
     try {
       const userId = req.dbUser.id;
-      const { ids, reason } = req.body as { ids?: unknown; reason?: string };
-
-      if (!Array.isArray(ids) || ids.length === 0) {
-        return res.status(400).json({ message: 'ids must be a non-empty array of resource IDs' });
-      }
-
-      if (!reason || typeof reason !== 'string' || reason.trim().length < 10) {
-        return res.status(400).json({ message: 'Rejection reason is required (minimum 10 characters)' });
-      }
-
-      const numericIds = ids
-        .map((id) => (typeof id === 'number' ? id : parseInt(String(id), 10)))
-        .filter((id) => !Number.isNaN(id));
-
-      if (numericIds.length === 0) {
-        return res.status(400).json({ message: 'No valid resource IDs provided' });
-      }
+      const input = bulkResourceIdsSchema.merge(resourceRejectionSchema).safeParse(req.body);
+      if (!input.success) return res.status(400).json(buildValidationEnvelope(input.error));
+      const { ids: numericIds, reason } = input.data;
 
       let succeeded = 0;
       let failed = 0;
+      const failures: { id: number; reason: string }[] = [];
       for (const id of numericIds) {
         try {
           await resourceRepo.rejectResource(id, userId, reason);
@@ -827,10 +826,11 @@ export function registerAdminContentRoutes(
         } catch (error) {
           if (isDatabaseUnavailableError(error)) throw error;
           failed++;
+          failures.push({ id, reason: error instanceof Error ? error.message : 'Rejection failed' });
         }
       }
 
-      res.json({ message: `Rejected ${succeeded} resource(s)`, succeeded, failed });
+      res.status(succeeded === 0 ? 409 : failed ? 207 : 200).json({ message: `Rejected ${succeeded} resource(s)`, succeeded, failed, failures });
     } catch (error) {
       console.error('Error in bulk reject:', error);
       sendOperationalFailure(res, error, 'Failed to bulk reject resources');
@@ -841,27 +841,19 @@ export function registerAdminContentRoutes(
   app.post('/api/admin/resources/bulk/delete', isAuthenticated, isAdmin, async (req: any, res) => {
     try {
       const userId = req.dbUser.id;
-      const { ids } = req.body as { ids?: unknown };
-
-      if (!Array.isArray(ids) || ids.length === 0) {
-        return res.status(400).json({ message: 'ids must be a non-empty array of resource IDs' });
-      }
-
-      const numericIds = ids
-        .map((id) => (typeof id === 'number' ? id : parseInt(String(id), 10)))
-        .filter((id) => !Number.isNaN(id));
-
-      if (numericIds.length === 0) {
-        return res.status(400).json({ message: 'No valid resource IDs provided' });
-      }
+      const input = bulkResourceIdsSchema.safeParse(req.body);
+      if (!input.success) return res.status(400).json(buildValidationEnvelope(input.error));
+      const numericIds = input.data.ids;
 
       let succeeded = 0;
       let failed = 0;
+      const failures: { id: number; reason: string }[] = [];
       for (const id of numericIds) {
         try {
           const resource = await resourceRepo.getResource(id);
           if (!resource) {
             failed++;
+            failures.push({ id, reason: 'Resource not found' });
             continue;
           }
           // deleteResource records the 'deleted' audit row before removing the row,
@@ -873,10 +865,11 @@ export function registerAdminContentRoutes(
           console.error(`Error deleting resource ${id} in bulk:`, err);
           if (isDatabaseUnavailableError(err)) throw err;
           failed++;
+          failures.push({ id, reason: 'Deletion failed; resource could have dependent records' });
         }
       }
 
-      res.json({ message: `Deleted ${succeeded} resource(s)`, succeeded, failed });
+      res.status(succeeded === 0 ? 409 : failed ? 207 : 200).json({ message: `Deleted ${succeeded} resource(s)`, succeeded, failed, failures });
     } catch (error) {
       console.error('Error in bulk delete:', error);
       sendOperationalFailure(res, error, 'Failed to bulk delete resources');
@@ -959,6 +952,7 @@ export function registerAdminContentRoutes(
         title: resourceTitleSchema,
         url: httpsUrlSchema,
         description: optionalResourceDescriptionSchema.optional(),
+        metadata: editableResourceMetadataSchema.optional(),
       });
       
       const validationResult = createSchema.safeParse(req.body);
@@ -1060,6 +1054,9 @@ export function registerAdminContentRoutes(
     try {
       const editId = parseInt(req.params.id);
       const userId = req.dbUser.id;
+      if (req.body?.reason !== undefined && (typeof req.body.reason !== 'string' || req.body.reason.length > 2000)) {
+        return res.status(400).json({ message: 'reason must be a string of at most 2000 characters' });
+      }
       
       if (isNaN(editId)) {
         return res.status(400).json({ message: 'Invalid edit ID' });
@@ -1070,6 +1067,27 @@ export function registerAdminContentRoutes(
       res.json({ message: 'Edit approved and merged successfully' });
     } catch (error: any) {
       console.error('Error approving edit:', error);
+      // Drizzle wraps PostgreSQL errors in cause; a URL race must remain a
+      // useful conflict response, never leak SQL or change the pending edit.
+      let cause = error;
+      for (let depth = 0; cause && depth < 8; depth++, cause = cause.cause) {
+        if (cause.code === 'EDIT_URL_CONFLICT' || cause.code === '23505') {
+          let conflictingResourceId = cause.conflictingResourceId;
+          let title = cause.title;
+          if (!conflictingResourceId) {
+            try {
+              const edit = await auditRepo.getResourceEdit(Number(req.params.id));
+              const url = (edit?.proposedData as { url?: string } | undefined)?.url;
+              const conflict = url ? await resourceRepo.getResourceByUrl(url) : undefined;
+              conflictingResourceId = conflict?.id;
+              title = conflict?.title;
+            } catch {
+              // The conflict response is still actionable if lookup fails.
+            }
+          }
+          return res.status(409).json({ message: 'That URL already belongs to another resource. Revise the suggestion before approving.', conflictingResourceId, title });
+        }
+      }
       
       if (
         error.message &&
@@ -1083,7 +1101,7 @@ export function registerAdminContentRoutes(
         });
       }
       
-      res.status(500).json({ message: error.message || 'Failed to approve edit' });
+      res.status(500).json({ message: 'Failed to approve edit' });
     }
   });
   
@@ -1098,8 +1116,8 @@ export function registerAdminContentRoutes(
         return res.status(400).json({ message: 'Invalid edit ID' });
       }
       
-      if (!reason || reason.trim().length < 10) {
-        return res.status(400).json({ message: 'Rejection reason is required (minimum 10 characters)' });
+      if (typeof reason !== 'string' || reason.trim().length < 10 || reason.length > 2000) {
+        return res.status(400).json({ message: 'Rejection reason must be a string of 10 to 2000 characters' });
       }
       
       await auditRepo.rejectResourceEdit(editId, userId, reason);
@@ -1265,6 +1283,7 @@ export function registerAdminContentRoutes(
       res.status(201).json(newCategory);
     } catch (error) {
       console.error('Error creating category:', error);
+      if (sendTaxonomyConflict(res, error)) return;
       
       if (error instanceof Error && error.message.includes('already exists')) {
         return res.status(409).json({ message: error.message });
@@ -1312,6 +1331,7 @@ export function registerAdminContentRoutes(
       res.json(updatedCategory);
     } catch (error) {
       console.error('Error updating category:', error);
+      if (sendTaxonomyConflict(res, error)) return;
       res.status(500).json({ message: 'Failed to update category' });
     }
   });
@@ -1366,10 +1386,11 @@ export function registerAdminContentRoutes(
       
       const subcategories = await categoryRepo.listSubcategories(categoryId);
       const subSubcategoryCounts = await categoryRepo.getSubSubcategoryCountsBySubcategory();
+      const resourceCounts = await categoryRepo.getScopedSubcategoryResourceCounts();
 
       const subcategoriesWithCounts = await Promise.all(
         subcategories.map(async (sub) => {
-          const count = await categoryRepo.getSubcategoryResourceCount(sub.name);
+          const count = resourceCounts[sub.id] ?? 0;
           return { ...sub, resourceCount: count, subSubcategoryCount: subSubcategoryCounts[sub.id] ?? 0 };
         })
       );
@@ -1414,9 +1435,7 @@ export function registerAdminContentRoutes(
         (s) => s.name.trim().toLowerCase() === requestedName
       );
       if (nameDup) {
-        return res.status(409).json({
-          message: `A subcategory named "${nameDup.name}" already exists under ${category.name} (id ${nameDup.id}). Rename it or reuse the existing one.`,
-        });
+        throw new ConflictError(`A subcategory named "${nameDup.name}" already exists under ${category.name} (id ${nameDup.id}). Rename it or reuse the existing one.`);
       }
       
       const newSubcategory = await categoryRepo.createSubcategory(validationResult.data);
@@ -1432,6 +1451,7 @@ export function registerAdminContentRoutes(
       res.status(201).json(newSubcategory);
     } catch (error) {
       console.error('Error creating subcategory:', error);
+      if (sendTaxonomyConflict(res, error)) return;
       
       if (error instanceof Error && error.message.includes('already exists')) {
         return res.status(409).json({ message: error.message });
@@ -1485,9 +1505,7 @@ export function registerAdminContentRoutes(
           (s) => s.id !== subcategoryId && s.name.trim().toLowerCase() === effectiveName
         );
         if (nameDup) {
-          return res.status(409).json({
-            message: `A subcategory named "${nameDup.name}" already exists under this category (id ${nameDup.id}).`,
-          });
+          throw new ConflictError(`A subcategory named "${nameDup.name}" already exists under this category (id ${nameDup.id}).`);
         }
       }
       
@@ -1504,6 +1522,7 @@ export function registerAdminContentRoutes(
       res.json(updatedSubcategory);
     } catch (error) {
       console.error('Error updating subcategory:', error);
+      if (sendTaxonomyConflict(res, error)) return;
       res.status(500).json({ message: 'Failed to update subcategory' });
     }
   });
@@ -1603,9 +1622,7 @@ export function registerAdminContentRoutes(
         validationResult.data.slug,
       );
       if (globalDup) {
-        return res.status(409).json({
-          message: `A sub-subcategory named "${globalDup.name}" (slug "${globalDup.slug}") already exists (id ${globalDup.id}). Duplicate sub-subcategories fragment the taxonomy — reuse the existing one or rename it instead.`,
-        });
+        throw new ConflictError(`A sub-subcategory named "${globalDup.name}" (slug "${globalDup.slug}") already exists (id ${globalDup.id}). Reuse the existing one or choose a unique name and slug.`);
       }
       
       const newSubSubcategory = await categoryRepo.createSubSubcategory(validationResult.data);
@@ -1621,6 +1638,7 @@ export function registerAdminContentRoutes(
       res.status(201).json(newSubSubcategory);
     } catch (error) {
       console.error('Error creating sub-subcategory:', error);
+      if (sendTaxonomyConflict(res, error)) return;
       
       if (error instanceof Error && error.message.includes('already exists')) {
         return res.status(409).json({ message: error.message });
@@ -1675,6 +1693,7 @@ export function registerAdminContentRoutes(
       res.json(updatedSubSubcategory);
     } catch (error) {
       console.error('Error updating sub-subcategory:', error);
+      if (sendTaxonomyConflict(res, error)) return;
       res.status(500).json({ message: 'Failed to update sub-subcategory' });
     }
   });

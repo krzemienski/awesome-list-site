@@ -380,7 +380,6 @@ export function SuggestEditDialog({ resource, open, onOpenChange }: SuggestEditD
         body: JSON.stringify({
           proposedChanges,
           proposedData,
-          claudeMetadata: claudeSuggestions,
         }),
       });
     },

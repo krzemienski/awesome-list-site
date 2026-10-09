@@ -3,6 +3,7 @@ import path from "node:path";
 import { fileURLToPath } from "node:url";
 import vm from "node:vm";
 import ts from "typescript";
+import { accentContrastTable } from "./validation/app-accent-contrast.mjs";
 import {
   checkArtifactDocs,
   generateArtifactDocs,
@@ -452,6 +453,15 @@ function main() {
   };
 
   const next = `${JSON.stringify(document, null, 2)}\n`;
+  const contrastPath = "artifacts/awesome-video-design-system/contrast.json";
+  const contrastNext = `${JSON.stringify(accentContrastTable(), null, 2)}\n`;
+  if (checkOnly) {
+    if (!fs.existsSync(fromRoot(contrastPath)) || fs.readFileSync(fromRoot(contrastPath), "utf8") !== contrastNext)
+      throw new Error("Design-system artifact contrast table is stale");
+  } else {
+    fs.writeFileSync(fromRoot(outputPath), next);
+    fs.writeFileSync(fromRoot(contrastPath), contrastNext);
+  }
   const current = fs.existsSync(fromRoot(outputPath))
     ? fs.readFileSync(fromRoot(outputPath), "utf8")
     : "";

@@ -1,10 +1,12 @@
 import fetch from 'node-fetch';
 import { db } from "./db";
 import { categories, subcategories, subSubcategories, resources, users, resourceEdits, tags, resourceTags } from "@shared/schema";
-import { eq } from "drizzle-orm";
+import { eq, sql } from "drizzle-orm";
 import { mapCategoryName } from "@shared/categoryMapping";
 import { seedJourneyStepsForExisting } from "./cli/seedJourneyStepsForExisting";
 import { invalidatePublicCache } from "./cache/publicCache";
+
+const invalidateSeedCache = () => invalidatePublicCache('seed-mutation');
 
 /**
  * Helper function to generate slugs from category names
@@ -26,7 +28,10 @@ function generateSlug(name: string): string {
  * Returns the number of rows actually inserted this run (conflict-skipped
  * rows are not counted).
  */
-async function seedTagsFromResourceMetadata(): Promise<{ tagRows: number; linkRows: number }> {
+type SeedConnection = Pick<typeof db, 'select' | 'insert' | 'delete' | 'execute'>;
+
+async function seedTagsFromResourceMetadata(connection: SeedConnection = db): Promise<{ tagRows: number; linkRows: number }> {
+  const db = connection;
   const allResources = await db
     .select({ id: resources.id, metadata: resources.metadata })
     .from(resources)
@@ -261,6 +266,73 @@ async function seedAdminUser(): Promise<boolean> {
  * Populates the database with categories, subcategories, sub-subcategories, and resources
  */
 export async function seedDatabase(options: { clearExisting?: boolean } = {}): Promise<SeedResult> {
+  // Download and validate before any write, including admin provisioning.
+  const source = process.env.SEED_SOURCE_URL || "https://hack-ski.s3.us-east-1.amazonaws.com/av/recategorized_with_researchers_2010_projects.json";
+  const response = await fetch(source, { signal: AbortSignal.timeout(60_000), size: 50_000_000 });
+  if (!response.ok) throw new Error(`Seed source HTTP ${response.status}; database unchanged`);
+  const awesomeData = await response.json() as {
+    categories?: VideoCategory[];
+    projects?: { title: string; homepage: string; description: string; category: string[]; tags?: string[] }[];
+  };
+  if (!Array.isArray(awesomeData.categories) || !awesomeData.categories.length ||
+      !Array.isArray(awesomeData.projects) || !awesomeData.projects.length ||
+      awesomeData.categories.some(c => !c || typeof c.id !== 'string' || typeof c.title !== 'string')) {
+    throw new Error("Invalid seed source structure; database unchanged");
+  }
+  if (options.clearExisting && awesomeData.projects.some(p =>
+    !p || typeof p.title !== 'string' || !p.title.trim() ||
+    typeof p.homepage !== 'string' || !/^https?:\/\//.test(p.homepage) ||
+    typeof p.description !== 'string' || !Array.isArray(p.category) || !p.category.length ||
+    p.category.some(id => !awesomeData.categories!.some(c => c.id === id))
+  )) throw new Error('Invalid reseed resource; database unchanged');
+  const apply = async (connection: SeedConnection) => {
+    const result = await applySeed(connection, awesomeData as SeedData, options);
+    if (options.clearExisting && result.errors.length) {
+      throw new Error(`Reseed rolled back: ${result.errors.join('; ')}`);
+    }
+    return result;
+  };
+  const result = options.clearExisting
+    ? await db.transaction(async tx => {
+        // Serialize replacement and refuse all dependent data, including cascade
+        // children. Refusal preserves edits, discoveries, bookmarks and journeys
+        // exactly, rather than silently destroying them.
+        await tx.execute(sql`LOCK TABLE resources, categories, subcategories, sub_subcategories IN ACCESS EXCLUSIVE MODE`);
+        const refs = await tx.execute(sql`
+          SELECT DISTINCT ns.nspname AS schema, tab.relname AS table, att.attname AS column
+          FROM pg_constraint c
+          JOIN pg_class tab ON tab.oid = c.conrelid
+          JOIN pg_namespace ns ON ns.oid = tab.relnamespace
+          JOIN pg_attribute att ON att.attrelid = c.conrelid AND att.attnum = ANY(c.conkey)
+          WHERE c.contype = 'f'
+            AND c.confrelid IN ('resources'::regclass, 'categories'::regclass, 'subcategories'::regclass, 'sub_subcategories'::regclass)
+            AND c.conrelid NOT IN ('resources'::regclass, 'categories'::regclass, 'subcategories'::regclass, 'sub_subcategories'::regclass)
+          ORDER BY ns.nspname, tab.relname, att.attname
+        `);
+        for (const ref of refs.rows as { schema: string; table: string; column: string }[]) {
+          const table = sql`${sql.identifier(ref.schema)}.${sql.identifier(ref.table)}`;
+          await tx.execute(sql`LOCK TABLE ${table} IN SHARE ROW EXCLUSIVE MODE`);
+          const dependent = await tx.execute(sql`SELECT 1 FROM ${table} WHERE ${sql.identifier(ref.column)} IS NOT NULL LIMIT 1`);
+          if (dependent.rows.length) throw new Error(`Reseed refused: ${ref.table}.${ref.column} contains dependent data. Nothing changed; use additive Seed Database instead.`);
+        }
+        return apply(tx);
+      })
+    : await apply(db);
+  invalidatePublicCache('seed-mutation');
+  return result;
+}
+
+type SeedData = {
+  categories: VideoCategory[];
+  projects: { title: string; homepage: string; description: string; category: string[]; tags?: string[] }[];
+};
+
+async function applySeed(db: SeedConnection, awesomeData: SeedData, options: { clearExisting?: boolean }): Promise<SeedResult> {
+  // Replacement invalidation happens only after commit; additive inserts may
+  // commit independently and therefore invalidate as they succeed.
+  const invalidatePublicCache = (_reason: string) => {
+    if (!options.clearExisting) invalidateSeedCache();
+  };
   const result: SeedResult = {
     categoriesInserted: 0,
     subcategoriesInserted: 0,
@@ -273,7 +345,7 @@ export async function seedDatabase(options: { clearExisting?: boolean } = {}): P
   try {
     console.log("🌱 Starting database seeding...");
     
-    result.adminUserCreated = await seedAdminUser();
+    if (!options.clearExisting) result.adminUserCreated = await seedAdminUser();
 
     // Optional: Clear existing data
     if (options.clearExisting) {
@@ -286,25 +358,6 @@ export async function seedDatabase(options: { clearExisting?: boolean } = {}): P
       await db.delete(categories);
       invalidatePublicCache('seed-mutation');
       console.log("✅ Existing data cleared");
-    }
-
-    // Fetch raw JSON data directly
-    console.log("📥 Fetching awesome-video data...");
-    const jsonUrl = "https://hack-ski.s3.us-east-1.amazonaws.com/av/recategorized_with_researchers_2010_projects.json";
-    const response = await fetch(jsonUrl);
-    
-    if (!response.ok) {
-      throw new Error(`HTTP error! status: ${response.status}`);
-    }
-    
-    const awesomeData = await response.json() as { 
-      title?: string; 
-      categories?: VideoCategory[]; 
-      projects?: { title: string; homepage: string; description: string; category: string[]; tags?: string[]; }[];
-    };
-    
-    if (!awesomeData.categories || !awesomeData.projects) {
-      throw new Error("Invalid data structure from awesome-video JSON");
     }
 
     console.log(`📊 Found ${awesomeData.categories.length} categories and ${awesomeData.projects.length} resources`);
@@ -531,7 +584,7 @@ export async function seedDatabase(options: { clearExisting?: boolean } = {}): P
     // public API (/api/public/tags) reflects the tags the UI renders instead
     // of returning an empty list. Idempotent via onConflictDoNothing.
     try {
-      const tagsSeeded = await seedTagsFromResourceMetadata();
+      const tagsSeeded = await seedTagsFromResourceMetadata(db);
       if (tagsSeeded.tagRows > 0 || tagsSeeded.linkRows > 0) {
         invalidatePublicCache('seed-mutation');
       }
@@ -545,7 +598,7 @@ export async function seedDatabase(options: { clearExisting?: boolean } = {}): P
     // Backfill canonical learning-journey steps so /journey/:id pages are
     // never empty. Idempotent — no-ops when steps are already present.
     try {
-      await seedJourneyStepsForExisting();
+      if (!options.clearExisting) await seedJourneyStepsForExisting();
     } catch (journeyErr: unknown) {
       const msg = journeyErr instanceof Error ? journeyErr.message : 'Unknown error';
       console.error(`  ⚠️ Journey-step backfill reported an issue: ${msg}`);

@@ -19,7 +19,7 @@
       "actualPath": "/#anatomy",
       "referencePath": "/design-system.html",
       "readySelector": "main",
-      "reason": "The registered artifact has no independently routeable anatomy state; both captures are diagnostic only."
+      "reason": "The artifact independently routes /#anatomy. The active frozen showcase embeds FlowDiagramsSection among other sections, not as a standalone page; no unmasked like-for-like whole-page capture exists. Both captures are diagnostic only."
     }
   ]
 }

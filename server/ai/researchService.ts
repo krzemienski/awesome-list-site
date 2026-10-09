@@ -16,6 +16,12 @@ export class DiscoveryNotFoundError extends Error {
     this.name = "DiscoveryNotFoundError";
   }
 }
+export class DiscoveryConflictError extends Error {
+  constructor() {
+    super("Discovery has already been moderated");
+    this.name = "DiscoveryConflictError";
+  }
+}
 import { decodeHtmlEntities, decodeResourceTextFields } from '../github/importHygiene';
 import { runAgentQuery, type AgentDefinitionInput } from './runAgentQuery';
 import { defaultResearchModel, defaultScoutModel, resolveModel, validateBaseUrl, type AgentRunConfig } from './agentRuntime';
@@ -1004,10 +1010,10 @@ class ResearchService {
           const existing = Array.isArray(cur?.agentLog) ? (cur!.agentLog as any[]) : [];
           existing.push({ role: 'error', content: `Job failed: ${msg}`, timestamp: new Date().toISOString() });
           await db.update(researchJobs).set({
-            status: 'failed',
+            status: sql`case when ${researchJobs.status} = 'cancelled' then 'cancelled' else 'failed' end`,
             errorMessage: msg,
             agentLog: existing,
-            completedAt: new Date(),
+            completedAt: sql`coalesce(${researchJobs.completedAt}, now())`,
           }).where(eq(researchJobs.id, job.id));
         } catch (persistErr: any) {
           console.error(`[research:${job.id}] failed to persist failure:`, persistErr?.message);
@@ -1069,7 +1075,11 @@ class ResearchService {
         // Timeout-guarded: addLog(..., true) is awaited inside tool handlers,
         // so a wedged pool hanging this update would stall the whole run.
         await withTimeout(
-          db.update(researchJobs).set({ agentLog, ...extra }).where(eq(researchJobs.id, jobId)),
+          db.update(researchJobs).set({
+            agentLog, ...extra,
+            ...(extra.status ? { status: sql`case when ${researchJobs.status} = 'cancelled' then 'cancelled' else ${extra.status} end` } : {}),
+            ...(extra.completedAt ? { completedAt: sql`coalesce(${researchJobs.completedAt}, ${extra.completedAt.toISOString()}::timestamp)` } : {}),
+          }).where(eq(researchJobs.id, jobId)),
           TOOL_DB_TIMEOUT_MS,
           'agentLog persist',
         );
@@ -1283,7 +1293,11 @@ STOP TARGET: this run ends AUTOMATICALLY once ${targetDiscoveries} new discoveri
       try {
         await withTimeout(
           db.update(researchJobs)
-            .set({ status: finalStatus, completedAt: new Date(), ...usageFields })
+            .set({
+              status: sql`case when ${researchJobs.status} = 'cancelled' then 'cancelled' else ${finalStatus} end`,
+              completedAt: sql`coalesce(${researchJobs.completedAt}, now())`,
+              ...usageFields,
+            })
             .where(eq(researchJobs.id, jobId)),
           TOOL_DB_TIMEOUT_MS,
           'final status update',
@@ -1305,10 +1319,17 @@ STOP TARGET: this run ends AUTOMATICALLY once ${targetDiscoveries} new discoveri
   }
 
   async cancelJob(jobId: number): Promise<void> {
+    const [changed] = await db.update(researchJobs)
+      .set({ status: 'cancelled', completedAt: new Date() })
+      .where(and(eq(researchJobs.id, jobId), sql`${researchJobs.status} in ('pending', 'processing')`))
+      .returning({ id: researchJobs.id });
+    if (!changed) {
+      const job = await this.getJob(jobId);
+      if (!job) throw Object.assign(new Error('Job not found'), { name: 'JobNotFoundError' });
+      if (job.status !== 'cancelled') throw Object.assign(new Error('Only active jobs can be cancelled'), { name: 'JobConflictError' });
+    }
     const activeJob = this.activeJobs.get(jobId);
     if (activeJob) activeJob.abortController.abort();
-    await db.update(researchJobs).set({ status: 'cancelled', completedAt: new Date() }).where(eq(researchJobs.id, jobId));
-    this.activeJobs.delete(jobId);
   }
 
   async getJob(jobId: number): Promise<ResearchJob | undefined> {
@@ -1355,8 +1376,10 @@ STOP TARGET: this run ends AUTOMATICALLY once ${targetDiscoveries} new discoveri
   }
 
   async approveDiscovery(discoveryId: number, opts: { skipDuplicateCheck?: boolean } = {}): Promise<ResearchDiscovery> {
-    const [discovery] = await db.select().from(researchDiscoveries).where(eq(researchDiscoveries.id, discoveryId));
+    const result = await db.transaction(async (tx) => {
+    const [discovery] = await tx.select().from(researchDiscoveries).where(eq(researchDiscoveries.id, discoveryId)).for('update');
     if (!discovery) throw new DiscoveryNotFoundError();
+    if (discovery.status !== 'pending_review') throw new DiscoveryConflictError();
 
     // Normalized dedup guard (July 30, 2026): the per-job unique index only
     // stops exact same-job repeats — a single approve could still create a
@@ -1364,7 +1387,7 @@ STOP TARGET: this run ends AUTOMATICALLY once ${targetDiscoveries} new discoveri
     // approve pre-checks with its own shared set, so it opts out here.
     if (!opts.skipDuplicateCheck) {
       const norm = normalizeUrl(discovery.url);
-      const existingRows = await db.select({ id: resources.id, url: resources.url }).from(resources);
+      const existingRows = await tx.select({ id: resources.id, url: resources.url }).from(resources);
       const dup = existingRows.find(r => normalizeUrl(r.url) === norm);
       if (dup) {
         throw new Error(`URL already exists in the database (resource #${dup.id}) — reject this discovery instead of approving it`);
@@ -1386,7 +1409,7 @@ STOP TARGET: this run ends AUTOMATICALLY once ${targetDiscoveries} new discoveri
       taxonomy.subSubcategory,
     );
 
-    const [newResource] = await db.insert(resources).values({
+    const [newResource] = await tx.insert(resources).values({
       // Task #248: decode again at approval so discoveries saved BEFORE the
       // save-time decode (pre-existing pending rows) still land clean.
       title: decodeHtmlEntities(discovery.title),
@@ -1398,21 +1421,23 @@ STOP TARGET: this run ends AUTOMATICALLY once ${targetDiscoveries} new discoveri
       status: 'approved',
       metadata: { source: 'ai_researcher', discoveryId: discovery.id, confidence: discovery.confidence },
     }).returning();
-    invalidatePublicCache('resource-mutation');
 
-    const [updated] = await db.update(researchDiscoveries).set({
+    const [updated] = await tx.update(researchDiscoveries).set({
       status: 'approved',
       approvedAt: new Date(),
       createdResourceId: newResource.id,
-    }).where(eq(researchDiscoveries.id, discoveryId)).returning();
+    }).where(and(eq(researchDiscoveries.id, discoveryId), eq(researchDiscoveries.status, 'pending_review'))).returning();
 
     if (discovery.jobId) {
-      await db.update(researchJobs)
+      await tx.update(researchJobs)
         .set({ approvedDiscoveries: sql`${researchJobs.approvedDiscoveries} + 1` })
         .where(eq(researchJobs.id, discovery.jobId));
     }
 
     return updated;
+    });
+    invalidatePublicCache('resource-mutation');
+    return result;
   }
 
   /**
@@ -1475,20 +1500,26 @@ STOP TARGET: this run ends AUTOMATICALLY once ${targetDiscoveries} new discoveri
   }
 
   async rejectDiscovery(discoveryId: number, reason?: string): Promise<ResearchDiscovery> {
-    const [updated] = await db.update(researchDiscoveries).set({
+    return db.transaction(async (tx) => {
+    const [discovery] = await tx.select().from(researchDiscoveries).where(eq(researchDiscoveries.id, discoveryId)).for('update');
+    if (!discovery) throw new DiscoveryNotFoundError();
+    if (discovery.status === 'rejected') return discovery;
+    if (discovery.status !== 'pending_review') throw new DiscoveryConflictError();
+    const [updated] = await tx.update(researchDiscoveries).set({
       status: 'rejected',
       rejectedAt: new Date(),
       rejectionReason: reason || null,
-    }).where(eq(researchDiscoveries.id, discoveryId)).returning();
+    }).where(and(eq(researchDiscoveries.id, discoveryId), eq(researchDiscoveries.status, 'pending_review'))).returning();
 
     if (!updated) throw new DiscoveryNotFoundError();
     if (updated.jobId) {
-      await db.update(researchJobs)
+      await tx.update(researchJobs)
         .set({ rejectedDiscoveries: sql`${researchJobs.rejectedDiscoveries} + 1` })
         .where(eq(researchJobs.id, updated.jobId));
     }
 
     return updated;
+    });
   }
 
   isJobActive(jobId: number): boolean {

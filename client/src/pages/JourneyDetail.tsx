@@ -181,12 +181,13 @@ export default function JourneyDetail() {
   // mark all of its row ids — otherwise the journey can never finalize.
   // NB-024/NB-059 (run24): latest desired toggle recorded while a PUT is in
   // flight; onSettled converges toward it with at most one follow-up PUT.
-  const pendingDesiredRef = useRef<{
+  const pendingDesiredRef = useRef(new Map<number, {
     stepIds: number[];
     completed: boolean;
     stepNumber: number;
     stepPosition: number;
-  } | null>(null);
+  }>());
+  const progressWriteInFlight = useRef(false);
 
   // Run17 BUG-016: all row ids go in ONE PUT (stepIds + explicit completed
   // flag) instead of a sequential per-row PUT loop (3 writes per click).
@@ -289,17 +290,13 @@ export default function JourneyDetail() {
       // NB-024/NB-059 (run24): latest-wins — if clicks landed while this PUT
       // was in flight, fire at most ONE follow-up PUT toward the latest
       // desired state instead of dropping them or queueing one per click.
-      const desired = pendingDesiredRef.current;
-      pendingDesiredRef.current = null;
-      if (
-        desired &&
-        !(desired.completed === vars.completed &&
-          desired.stepIds.length === vars.stepIds.length &&
-          desired.stepIds.every((sid) => vars.stepIds.includes(sid)))
-      ) {
+      const desired = pendingDesiredRef.current.values().next().value;
+      if (desired) {
+        pendingDesiredRef.current.delete(desired.stepNumber);
         completeStepMutation.mutate(desired);
         return; // reconcile after the follow-up settles instead
       }
+      progressWriteInFlight.current = false;
       // Reconcile with the server truth either way (completedAt, currentStepId).
       queryClient.invalidateQueries({ queryKey: [`/api/journeys/${id}`] });
       queryClient.invalidateQueries({ queryKey: ['/api/journeys'] });
@@ -324,8 +321,8 @@ export default function JourneyDetail() {
     // NB-024/NB-059 (run24): a click during an in-flight PUT flips the cache
     // optimistically and records the desired final state; the mutation's
     // onSettled converges with one follow-up PUT (latest wins).
-    if (completeStepMutation.isPending) {
-      pendingDesiredRef.current = { stepIds, completed, stepNumber, stepPosition };
+    if (progressWriteInFlight.current) {
+      pendingDesiredRef.current.set(stepNumber, { stepIds, completed, stepNumber, stepPosition });
       const previous = queryClient.getQueryData<Journey>([`/api/journeys/${id}`]);
       if (previous?.progress) {
         const current = (previous.progress.completedSteps || []).map(Number);
@@ -347,6 +344,7 @@ export default function JourneyDetail() {
       });
       return;
     }
+    progressWriteInFlight.current = true;
     completeStepMutation.mutate({ stepIds, completed, stepNumber, stepPosition });
   };
 
@@ -440,7 +438,7 @@ export default function JourneyDetail() {
       description: string;
       isOptional: boolean;
       rowIds: number[];
-      rows: Array<{ id: number; stepNumber: number; isOptional: boolean }>;
+      rows: JourneyStep[];
       resources: NonNullable<JourneyStep["resource"]>[];
     }>();
     for (const s of journey?.steps || []) {
@@ -450,7 +448,7 @@ export default function JourneyDetail() {
         map.set(s.stepNumber, g);
       }
       g.rowIds.push(s.id);
-      g.rows.push({ id: s.id, stepNumber: s.stepNumber, isOptional: s.isOptional });
+      g.rows.push(s);
       g.isOptional = g.isOptional && s.isOptional;
       if (s.resource) g.resources.push(s.resource);
     }
@@ -672,6 +670,11 @@ export default function JourneyDetail() {
                         </div>
 
                         {/* Resource Links */}
+                        {step.rows.some(row => row.resourceId !== null && !row.resource) && (
+                          <p className="text-sm text-muted-foreground mb-4">
+                            Some resources in this step are no longer available. Your step progress is unchanged.
+                          </p>
+                        )}
                         {step.resources.length > 0 && (
                           <div className="journey-step-card__resources mb-4">
                             {step.resources.map((resource) => (

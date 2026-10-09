@@ -75,7 +75,7 @@ import { validateAwesomeList, formatValidationReport } from "../../validation/aw
 import { checkResourceLinks, formatLinkCheckReport } from "../../validation/linkChecker";
 import { seedDatabase } from "../../seed";
 import { buildCanonicalTagMap, canonicalizeTagArray } from "../../lib/tagCanonicalize";
-import { getPublicCacheValue } from "../../cache/publicCache";
+import { getPublicCacheValue, invalidatePublicCache } from "../../cache/publicCache";
 import {
   CATALOG_CACHE_CONTROL,
   UNCACHED_CATALOG_CACHE_CONTROL,
@@ -87,6 +87,7 @@ import {
   findSubcategory,
   findSubSubcategory,
   flattenListingResources,
+  scopeTaxonomyResources,
   type ListingLevel,
 } from "../../seo-content";
 import { normalizeTagFilter } from "@shared/tagNormalize";
@@ -229,12 +230,14 @@ export function registerExportLinkHealthRoutes(
           await githubSyncRepo.updateGithubSyncStatus(
             queueItem.id,
             completed ? 'completed' : 'failed',
-            completed ? undefined : result.errors.slice(0, 3).join('; '),
+            result.errors.length ? result.errors.join('; ') : undefined,
             {
               imported: result.imported,
               updated: result.updated,
               skipped: result.skipped,
               errors: result.errors.length,
+              outcome: result.errors.length > 0 ? (completed ? 'partial' : 'failed') : 'completed',
+              errorMessages: result.errors,
             },
             result.branch,
           );
@@ -366,8 +369,9 @@ export function registerExportLinkHealthRoutes(
           repositoryUrl: q.repositoryUrl,
           branch: q.branch,
           action: q.action,
-          status: q.status,
+          status: (q.metadata as any)?.outcome === 'partial' ? 'partial' : q.status,
           errorMessage: q.errorMessage,
+          importResult: q.action === 'import' ? q.metadata : undefined,
           resourceCount: Array.isArray(q.resourceIds) ? q.resourceIds.length : 0,
           createdAt: q.createdAt,
           processedAt: q.processedAt,
@@ -463,7 +467,7 @@ export function registerExportLinkHealthRoutes(
         // 'failed'). Surface it as `status` so failed/orphaned rows are
         // badged like the Recent Sync Jobs section, not shown as successes.
         const outcome = (h.metadata as any)?.outcome;
-        const status = outcome === 'failed' ? 'failed' : 'completed';
+        const status = outcome === 'failed' ? 'failed' : outcome === 'partial' ? 'partial' : 'completed';
         return {
           id: h.id,
           repositoryUrl: h.repositoryUrl,
@@ -471,7 +475,7 @@ export function registerExportLinkHealthRoutes(
           status,
           commitSha: h.commitSha,
           commitMessage: h.commitMessage,
-          errorMessage: status === 'failed' ? snapshotError(h.snapshot) : null,
+          errorMessage: status === 'failed' ? snapshotError(h.snapshot) : status === 'partial' ? ((h.metadata as any)?.errorMessages ?? []).join('; ') : null,
           commitUrl: h.commitUrl,
           resourcesAdded: h.resourcesAdded,
           resourcesUpdated: h.resourcesUpdated,
@@ -762,12 +766,14 @@ export function registerExportLinkHealthRoutes(
         'database.exported',
         req.dbUser?.id,
         { resources: resources.length, users: usersList.length, format: 'json' },
-        `Admin exported full database JSON backup (${resources.length} resources, ${usersList.length} users)`
+        `Admin exported non-restorable catalog JSON snapshot (${resources.length} resources, ${usersList.length} user summaries)`
       );
 
       return {
         exportedAt: new Date().toISOString(),
         version: '1.0.0',
+        scope: 'Non-restorable catalog snapshot; not a full database backup',
+        omissions: ['user identities', 'favorites', 'bookmarks', 'contributions', 'audit history', 'AI jobs and discoveries', 'notification preferences', 'other application state'],
         schema: {
           // ADM-02: field list matches Object.keys(data.resources[0]) exactly
           // (the internal `searchTsv` tsvector is stripped above and omitted here).
@@ -808,7 +814,7 @@ export function registerExportLinkHealthRoutes(
 
       // Set headers for JSON download
       res.setHeader('Content-Type', 'application/json');
-      res.setHeader('Content-Disposition', `attachment; filename="awesome-list-backup-${new Date().toISOString().split('T')[0]}.json"`);
+      res.setHeader('Content-Disposition', `attachment; filename="awesome-list-catalog-snapshot-${new Date().toISOString().split('T')[0]}.json"`);
       
       res.json(exportData);
     } catch (error) {
@@ -1002,8 +1008,8 @@ export function registerExportLinkHealthRoutes(
       
       // Return results
       res.json({
-        success: true,
-        message: 'Database seeding completed successfully',
+        success: result.errors.length === 0,
+        message: result.errors.length > 0 ? 'Database seeding completed with errors' : 'Database seeding completed successfully',
         counts: {
           categoriesInserted: result.categoriesInserted,
           subcategoriesInserted: result.subcategoriesInserted,
@@ -1191,6 +1197,7 @@ export function registerExportLinkHealthRoutes(
             WHERE id = ${r.id}
           `);
           resourcesUpdated++;
+          invalidatePublicCache('resource-mutation');
         }
       }
       await auditRepo.logResourceAudit(
@@ -1593,42 +1600,13 @@ export function registerAwesomeListDiscoveryRoutes(
                 count: countNodeResourcesForKind(subSub),
               }))
             : [];
-      const validSubcategory =
-        level === "category" &&
-        requestedSubcategory &&
-        children.some((child: any) => child.name === requestedSubcategory);
-      const validSubSubcategory =
-        level === "category" &&
-        requestedSubcategory &&
-        requestedSubSubcategory &&
-        children.some((child: any) =>
-          child.name === requestedSubcategory &&
-          child.subSubcategories.some((subSub: any) => subSub.name === requestedSubSubcategory),
-        );
-      const validChild =
-        level === "subcategory" &&
-        requestedSubcategory &&
-        children.some((child: any) => child.name === requestedSubcategory);
-      const ignoredSubcategory = Boolean(
-        requestedSubcategory &&
-          !((level === "category" && validSubcategory) || (level === "subcategory" && validChild)),
-      );
-      const ignoredSubSubcategory = Boolean(
-        requestedSubSubcategory && !(level === "category" && validSubSubcategory),
-      );
-      const generalIgnored = requestedGeneral && directResources.size === 0;
-
-      let scoped = allResources;
-      if (requestedGeneral && !generalIgnored) {
-        scoped = scoped.filter((item: any) => directResources.has(`${item?.id ?? ""}|${item?.url ?? ""}`));
-      } else if (level === "category" && validSubcategory) {
-        scoped = scoped.filter((item: any) =>
-          item.subcategory === requestedSubcategory &&
-          (!requestedSubSubcategory || !validSubSubcategory || item.subSubcategory === requestedSubSubcategory),
-        );
-      } else if (level === "subcategory" && validChild) {
-        scoped = scoped.filter((item: any) => item.subSubcategory === requestedSubcategory);
-      }
+      const {
+        resources: scoped, ignoredSubcategory, ignoredSubSubcategory, generalIgnored,
+      } = scopeTaxonomyResources(match.node, level, allResources, {
+        subcategory: requestedSubcategory,
+        subSubcategory: requestedSubSubcategory,
+        general: requestedGeneral,
+      });
 
       const tagCounts = new Map<string, number>();
       for (const item of allResources) {

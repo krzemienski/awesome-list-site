@@ -10,6 +10,7 @@ import {
   type ReactNode,
 } from "react";
 import { Switch, Route, Redirect, useLocation, useSearch } from "wouter";
+import { discoveryRedirect } from "@shared/discovery-params";
 import { ClerkProvider, SignIn, SignUp, useAuth as useClerkAuth, useClerk } from "@clerk/react";
 import { AccountThemePreferenceBridge } from "@/components/ui/theme-provider";
 import { publishableKeyFromHost } from "@clerk/react/internal";
@@ -793,13 +794,13 @@ function Router({ homeComponent: Home }: { homeComponent: HomeRouteComponent }) 
         <Route path="/auth/register"><LegacyAuthRedirect to="/sign-up" /></Route>
         <Route path="/signup"><LegacyAuthRedirect to="/sign-up" /></Route>
         <Route path="/explore">
-          <Redirect to={legacyHomeQuery ? `/search?q=${encodeURIComponent(legacyHomeQuery)}` : "/search"} replace />
+          <Redirect to={discoveryRedirect("/search", search)} replace />
         </Route>
         <Route path="/resource">
-          <Redirect to={legacyHomeQuery ? `/search?q=${encodeURIComponent(legacyHomeQuery)}` : "/search"} replace />
+          <Redirect to={discoveryRedirect("/search", search)} replace />
         </Route>
         <Route path="/category/:slug/:subSlug">
-          {(params) => <Redirect to={`/subcategory/${params.subSlug}`} replace />}
+          {(params) => <Redirect to={discoveryRedirect(`/subcategory/${params.subSlug}`, search)} replace />}
         </Route>
         <Route path="/category/:slug" component={Category} />
         <Route path="/tag">
@@ -830,7 +831,7 @@ function Router({ homeComponent: Home }: { homeComponent: HomeRouteComponent }) 
         <Route path="/search" component={Search} />
         <Route path="/sub-subcategory/:slug" component={SubSubcategory} />
         <Route path="/subsubcategory/:slug">
-          {(params) => <Redirect to={`/sub-subcategory/${params.slug}`} replace />}
+          {(params) => <Redirect to={discoveryRedirect(`/sub-subcategory/${params.slug}`, search)} replace />}
         </Route>
         <Route path="/resource/:id" component={ResourceDetail} />
         <Route path="/about" component={About} />

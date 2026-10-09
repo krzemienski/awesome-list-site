@@ -8,7 +8,9 @@ import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Separator } from "@/components/ui/separator";
 import SEOHead from "@/components/layout/SEOHead";
-import { resourceSeoDescription } from "@shared/seo-templates";
+import { resourceSeoDescription, missingPageSeo } from "@shared/seo-templates";
+import { categoryGlyph } from "@/lib/category-glyph";
+import { useMissingRouteTelemetry } from "@/lib/route-monitor";
 import {
   ArrowLeft,
   ExternalLink,
@@ -29,7 +31,7 @@ import {
 import BookmarkNotesDialog from "@/components/resource/BookmarkNotesDialog";
 import { useAuth } from "@/hooks/useAuth";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { apiRequest } from "@/lib/queryClient";
+import { apiRequest, ApiError } from "@/lib/queryClient";
 import { useFavoriteToggle, useBookmarkToggle } from "@/hooks/useResourceToggle";
 import { trackSelectContent, trackShare, trackResourceFavorite, trackResourceClick } from "@/lib/analytics";
 import { useToast } from "@/hooks/use-toast";
@@ -93,14 +95,12 @@ export default function ResourceDetail() {
 
   const resourceQuery = useQuery<Resource & { resolvedKind?: ResourceKind; featured?: boolean }>({
     queryKey: ['/api/resources', id],
-    queryFn: async () => {
-      const response = await fetch(`/api/resources/${id}`, { credentials: 'include' });
-      if (!response.ok) throw new Error('Resource not found');
-      return response.json();
-    },
+    queryFn: () => apiRequest(`/api/resources/${id}`, { method: "GET" }),
     enabled: !!id
   });
   const { data: resource, isLoading, error } = resourceQuery;
+  const resourceMissing = error instanceof ApiError && error.status === 404;
+  useMissingRouteTelemetry(resourceMissing);
 
   const { data: favorites } = useQuery<Resource[]>({
     queryKey: ['/api/favorites'],
@@ -160,15 +160,12 @@ export default function ResourceDetail() {
     return out;
   }, [awesomeListTree, resource]);
 
-  const { data: relatedResources } = useQuery<{ similar: { resource: Resource; score: number; reasons: string[] }[] }>({
+  const relatedQuery = useQuery<{ similar: { resource: Resource; score: number; reasons: string[] }[] }>({
     queryKey: ['/api/resources', id, 'related'],
-    queryFn: async () => {
-      const response = await fetch(`/api/resources/${id}/related`, { credentials: 'include' });
-      if (!response.ok) throw new Error('Failed to fetch related resources');
-      return response.json();
-    },
-    enabled: !!id
+    queryFn: () => apiRequest(`/api/resources/${id}/related`, { method: "GET" }),
+    enabled: !!resource
   });
+  const relatedResources = relatedQuery.data;
 
   // Task #329: signed-out visitors derive saved state from the on-device
   // guest store (the authed /api/bookmarks query above is disabled for them).
@@ -592,13 +589,26 @@ export default function ResourceDetail() {
   }
 
   if (error || !resource) {
+    if (!resourceMissing) {
+      return (
+        <Card className="m-auto w-full max-w-lg" data-testid="resource-unavailable">
+          <CardHeader>
+            <h1 className="text-2xl font-semibold">Resource temporarily unavailable</h1>
+            <CardDescription role="alert">We couldn't load this resource. Please try again.</CardDescription>
+          </CardHeader>
+          <CardContent><Button onClick={() => void resourceQuery.refetch()}>Retry</Button></CardContent>
+        </Card>
+      );
+    }
     const requestedIdentifier = id || "unknown";
     return (
       <div className="flex items-center justify-center min-h-full px-4">
         <SEOHead
-          title="Resource Not Found"
-          description={`The requested resource "${requestedIdentifier}" could not be found on Awesome Video.`}
+          title={missingPageSeo.title}
+          description={missingPageSeo.description}
           noindex
+          ogUrl={`${(import.meta.env.VITE_SITE_URL || "https://awesome.video").replace(/\/+$/, "")}/`}
+          image={`${(import.meta.env.VITE_SITE_URL || "https://awesome.video").replace(/\/+$/, "")}/og-image.png?path=%2F`}
         />
         <Card className="w-full max-w-lg" data-testid="resource-not-found">
           <CardHeader>
@@ -673,13 +683,13 @@ export default function ResourceDetail() {
               {taxonomySlugs.category
                 ? (
                   <Link href={`/category/${taxonomySlugs.category}`} className="chip" data-testid="badge-category">
-                    <span aria-hidden="true">⟁</span>
+                    <span aria-hidden="true">{categoryGlyph(taxonomySlugs.category || resource.category)}</span>
                     <span className="resource-detail-chip-label">{resource.category}</span>
                   </Link>
                 )
                 : (
                   <span className="chip" data-testid="badge-category">
-                    <span aria-hidden="true">⟁</span>
+                    <span aria-hidden="true">{categoryGlyph(taxonomySlugs.category || resource.category)}</span>
                     <span className="resource-detail-chip-label">{resource.category}</span>
                   </span>
                 )}
@@ -1100,7 +1110,14 @@ export default function ResourceDetail() {
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-2">
-              {filteredRelatedResources.length === 0 && (
+              {relatedQuery.isLoading && <p role="status">Loading related resources…</p>}
+              {relatedQuery.isError && (
+                <div role="alert">
+                  <p>Related resources are temporarily unavailable.</p>
+                  <Button variant="outline" onClick={() => void relatedQuery.refetch()}>Retry related resources</Button>
+                </div>
+              )}
+              {!relatedQuery.isLoading && !relatedQuery.isError && filteredRelatedResources.length === 0 && (
                 <p
                   className="text-sm text-muted-foreground"
                   data-testid="related-empty-state"

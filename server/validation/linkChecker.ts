@@ -10,6 +10,7 @@ import * as http from 'node:http';
 import * as net from 'node:net';
 import { lookup as dnsLookup } from 'node:dns/promises';
 import { X509Certificate } from 'node:crypto';
+import { setTimeout as delay } from 'node:timers/promises';
 
 export interface LinkCheckResult {
   url: string;
@@ -43,6 +44,7 @@ export interface LinkCheckReport {
 }
 
 export interface LinkCheckOptions {
+  signal?: AbortSignal;
   timeout?: number; // Default 10 seconds
   followRedirects?: boolean; // Default true
   userAgent?: string;
@@ -156,7 +158,8 @@ export function evaluateRedirectSuspicion(
 }
 
 export class LinkChecker {
-  private options: Required<Omit<LinkCheckOptions, 'onProgress'>>;
+  private options: Required<Omit<LinkCheckOptions, 'onProgress' | 'signal'>>;
+  private signal?: AbortSignal;
   // R5-008: optional incremental-progress callback (not part of the Required
   // options bag — it has no sensible default).
   private onProgress?: (checked: number, total: number) => void;
@@ -170,6 +173,7 @@ export class LinkChecker {
       retryCount: options.retryCount || 1
     };
     this.onProgress = options.onProgress;
+    this.signal = options.signal;
   }
 
   /**
@@ -183,6 +187,7 @@ export class LinkChecker {
     const batches = this.createBatches(links, this.options.concurrent);
     
     for (const batch of batches) {
+      this.signal?.throwIfAborted();
       const batchResults = await Promise.all(
         batch.map(link => this.checkSingleLink(link))
       );
@@ -230,6 +235,7 @@ export class LinkChecker {
     let result: LinkCheckResult | undefined;
 
     while (attempts <= this.options.retryCount) {
+      this.signal?.throwIfAborted();
       try {
         result = await this.performCheck(link);
         if (result.valid || result.status < 500) {
@@ -237,6 +243,7 @@ export class LinkChecker {
           break;
         }
       } catch (error) {
+        this.signal?.throwIfAborted();
         lastError = error as Error;
       }
       attempts++;
@@ -289,7 +296,7 @@ export class LinkChecker {
       try {
         const response = await fetch(link.url, {
           method: 'HEAD', // Use HEAD to avoid downloading content
-          signal: controller.signal,
+          signal: this.signal ? AbortSignal.any([controller.signal, this.signal]) : controller.signal,
           headers: {
             'User-Agent': this.options.userAgent,
             'Accept': '*/*'
@@ -339,7 +346,7 @@ export class LinkChecker {
 
         // If HEAD fails, try GET (some servers don't support HEAD)
         if (fetchError instanceof Error && fetchError.name !== 'AbortError') {
-          const getResponse = await this.tryGetRequest(link.url, controller.signal);
+          const getResponse = await this.tryGetRequest(link.url, this.signal ? AbortSignal.any([AbortSignal.timeout(this.options.timeout), this.signal]) : AbortSignal.timeout(this.options.timeout));
           if (getResponse) {
             const responseTime = Date.now() - startTime;
             return {
@@ -354,6 +361,7 @@ export class LinkChecker {
         throw fetchError;
       }
     } catch (error: unknown) {
+      this.signal?.throwIfAborted();
       const responseTime = Date.now() - startTime;
 
       // Handle specific error types
@@ -454,7 +462,7 @@ export class LinkChecker {
     try {
       const response = await fetch(url, {
         method: 'GET',
-        signal: controller.signal,
+        signal: this.signal ? AbortSignal.any([controller.signal, this.signal]) : controller.signal,
         headers: {
           'User-Agent': this.options.userAgent,
           'Accept': 'text/html',
@@ -488,7 +496,7 @@ export class LinkChecker {
    * Sleep for the specified milliseconds
    */
   private sleep(ms: number): Promise<void> {
-    return new Promise(resolve => setTimeout(resolve, ms));
+    return delay(ms, undefined, { signal: this.signal });
   }
 }
 
@@ -738,7 +746,8 @@ export function isPrivateAddress(ip: string): boolean {
  * Returns the response body, or null when anything is off. Exported for
  * regression coverage.
  */
-export async function fetchAiaUrlSafely(rawUrl: string, timeoutMs: number): Promise<Buffer | null> {
+export async function fetchAiaUrlSafely(rawUrl: string, timeoutMs: number, signal?: AbortSignal): Promise<Buffer | null> {
+  signal?.throwIfAborted();
   let u: URL;
   try { u = new URL(rawUrl); } catch { return null; }
   if (u.protocol !== 'http:' && u.protocol !== 'https:') return null;
@@ -776,7 +785,7 @@ export async function fetchAiaUrlSafely(rawUrl: string, timeoutMs: number): Prom
     const res = await fetch(u.toString(), {
       method: 'GET',
       redirect: 'manual', // never follow: a redirect could point anywhere
-      signal: ctrl.signal,
+      signal: signal ? AbortSignal.any([ctrl.signal, signal]) : ctrl.signal,
       agent,
       size: 262144, // an intermediate cert is a few KB; hard-cap the body
     } as any);
@@ -795,7 +804,8 @@ export async function fetchAiaUrlSafely(rawUrl: string, timeoutMs: number): Prom
  * "CA Issuers" URLs to download the missing intermediate(s). The downloads
  * are UNTRUSTED input — callers must pass them through validateAiaChain.
  */
-async function fetchAiaLeafAndIntermediates(url: string, timeoutMs: number): Promise<{ leaf: X509Certificate; intermediates: X509Certificate[] } | null> {
+async function fetchAiaLeafAndIntermediates(url: string, timeoutMs: number, signal?: AbortSignal): Promise<{ leaf: X509Certificate; intermediates: X509Certificate[] } | null> {
+  signal?.throwIfAborted();
   const parsed = new URL(url);
   if (parsed.protocol !== 'https:') return null;
   const leaf = await new Promise<X509Certificate | null>((resolve) => {
@@ -815,6 +825,10 @@ async function fetchAiaLeafAndIntermediates(url: string, timeoutMs: number): Pro
     );
     sock.on('error', () => resolve(null));
     sock.on('timeout', () => { sock.destroy(); resolve(null); });
+    const abort = () => { sock.destroy(); resolve(null); };
+    signal?.addEventListener('abort', abort, { once: true });
+    sock.on('close', () => signal?.removeEventListener('abort', abort));
+    if (signal?.aborted) abort();
   });
 
   if (!leaf) return null;
@@ -825,7 +839,8 @@ async function fetchAiaLeafAndIntermediates(url: string, timeoutMs: number): Pro
     const aia = current.infoAccess?.match(/CA Issuers - URI:(\S+)/);
     if (!aia) break;
     try {
-      const body = await fetchAiaUrlSafely(aia[1], timeoutMs);
+      signal?.throwIfAborted();
+      const body = await fetchAiaUrlSafely(aia[1], timeoutMs, signal);
       if (!body) break;
       const issuer = new X509Certificate(body);
       if (issuer.subject === issuer.issuer) break; // self-signed root: never collect
@@ -844,8 +859,9 @@ async function fetchAiaLeafAndIntermediates(url: string, timeoutMs: number): Pro
  * null when no recovery was possible (no AIA, download failed, or the chain
  * still doesn't verify — e.g. untrusted root, expired intermediate).
  */
-async function retryWithCompletedChain(url: string, timeoutMs: number): Promise<{ status: number; finalUrl?: string } | null> {
-  const fetched = await fetchAiaLeafAndIntermediates(url, timeoutMs);
+async function retryWithCompletedChain(url: string, timeoutMs: number, signal?: AbortSignal): Promise<{ status: number; finalUrl?: string } | null> {
+  const fetched = await fetchAiaLeafAndIntermediates(url, timeoutMs, signal);
+  signal?.throwIfAborted();
   if (!fetched || fetched.intermediates.length === 0) return null;
   // Trust boundary: the downloaded chain must first verify link-by-link up to
   // an EXISTING system root (signatures, CA flag, validity, hostname). Only
@@ -859,7 +875,7 @@ async function retryWithCompletedChain(url: string, timeoutMs: number): Promise<
     const r = await fetch(url, {
       method: 'GET',
       redirect: 'follow',
-      signal: ctrl.signal,
+      signal: signal ? AbortSignal.any([ctrl.signal, signal]) : ctrl.signal,
       agent: (parsedUrl: URL) => (parsedUrl.protocol === 'https:' ? agent : undefined),
       headers: {
         'User-Agent': BROWSER_UA,
@@ -877,14 +893,15 @@ async function retryWithCompletedChain(url: string, timeoutMs: number): Promise<
   }
 }
 
-export async function browserVerifyLink(url: string, timeoutMs = 15000): Promise<BrowserVerification> {
+export async function browserVerifyLink(url: string, timeoutMs = 15000, signal?: AbortSignal): Promise<BrowserVerification> {
+  signal?.throwIfAborted();
   const ctrl = new AbortController();
   const t = setTimeout(() => ctrl.abort(), timeoutMs);
   try {
     const r = await fetch(url, {
       method: 'GET',
       redirect: 'follow',
-      signal: ctrl.signal,
+      signal: signal ? AbortSignal.any([ctrl.signal, signal]) : ctrl.signal,
       headers: {
         'User-Agent': BROWSER_UA,
         'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
@@ -892,15 +909,16 @@ export async function browserVerifyLink(url: string, timeoutMs = 15000): Promise
       },
     });
     // Drain/cancel the body so sockets are released promptly.
-    try { await (r.body as any)?.cancel?.(); } catch { /* ignore */ }
+    try { (r.body as any)?.destroy?.(); } catch { /* ignore */ }
     return { status: r.status, finalUrl: r.url, ...classifyBrowserVerification(r.status) };
   } catch (e: any) {
+    signal?.throwIfAborted();
     const rawCode = String(e?.cause?.code || e?.code || e?.name || 'unknown');
     const code = 'ERR:' + rawCode;
     // Missing-intermediate chains are browser-recoverable via AIA — retry
     // with the completed chain before declaring the link dead.
     if (MISSING_INTERMEDIATE_CODES.test(rawCode)) {
-      const recovered = await retryWithCompletedChain(url, timeoutMs);
+      const recovered = await retryWithCompletedChain(url, timeoutMs, signal);
       if (recovered && recovered.status >= 200 && recovered.status < 400) {
         return {
           status: recovered.status,

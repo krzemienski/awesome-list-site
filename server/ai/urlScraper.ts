@@ -1,4 +1,4 @@
-import fetch from 'node-fetch';
+import { safeFetch } from './safeFetch';
 import * as cheerio from 'cheerio';
 import { encode } from 'blurhash';
 import sharp from 'sharp';
@@ -27,21 +27,14 @@ export async function fetchUrlMetadata(url: string, timeout: number = 10000): Pr
       return { error: 'Invalid protocol - only HTTP/HTTPS supported' };
     }
 
-    // Fetch with timeout
-    const controller = new AbortController();
-    const timeoutId = setTimeout(() => controller.abort(), timeout);
-
-    const response = await fetch(url, {
+    const response = await safeFetch(url, {
       headers: {
         'User-Agent': 'Mozilla/5.0 (compatible; AwesomeVideoBot/1.0; +https://awesome.video)',
         'Accept': 'text/html,application/xhtml+xml',
       },
-      signal: controller.signal,
-      redirect: 'follow',
-      size: 5 * 1024 * 1024 // 5MB max
+      timeout,
+      maxBytes: 5 * 1024 * 1024 // 5MB max
     });
-
-    clearTimeout(timeoutId);
 
     if (!response.ok) {
       return { error: `HTTP ${response.status}: ${response.statusText}` };
@@ -52,8 +45,8 @@ export async function fetchUrlMetadata(url: string, timeout: number = 10000): Pr
       return { error: `Not HTML content: ${contentType}` };
     }
 
-    const html = await response.text();
-    return await parseHtmlMetadata(html, url);
+    const html = response.body.toString('utf8');
+    return await parseHtmlMetadata(html, response.url);
 
   } catch (error: unknown) {
     if (error instanceof Error && error.name === 'AbortError') {
@@ -65,24 +58,19 @@ export async function fetchUrlMetadata(url: string, timeout: number = 10000): Pr
 
 async function generateBlurhash(imageUrl: string): Promise<string | undefined> {
   try {
-    const controller = new AbortController();
-    const timeoutId = setTimeout(() => controller.abort(), 5000);
-
-    const response = await fetch(imageUrl, {
+    const response = await safeFetch(imageUrl, {
       headers: {
         'User-Agent': 'Mozilla/5.0 (compatible; AwesomeVideoBot/1.0; +https://awesome.video)',
       },
-      signal: controller.signal,
-      size: 2 * 1024 * 1024 // 2MB max for images
+      timeout: 5000,
+      maxBytes: 2 * 1024 * 1024 // 2MB max for images
     });
-
-    clearTimeout(timeoutId);
 
     if (!response.ok) {
       return undefined;
     }
 
-    const buffer = await response.buffer();
+    const buffer = response.body;
 
     // Resize image to 32x32 for blurhash generation
     const { data, info } = await sharp(buffer)

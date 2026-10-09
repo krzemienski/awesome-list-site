@@ -20,8 +20,30 @@ export default tseslint.config(
   {
     languageOptions: {
       parserOptions: {
-        projectService: true,
+        project: "./tsconfig.eslint.json",
         tsconfigRootDir: import.meta.dirname,
+      },
+    },
+  },
+
+  // Executable JS tooling is deliberately untyped (not part of a TS program).
+  {
+    files: ["**/*.{js,mjs,cjs}"],
+    ...tseslint.configs.disableTypeChecked,
+    languageOptions: {
+      ...tseslint.configs.disableTypeChecked.languageOptions,
+      globals: {
+        process: "readonly", console: "readonly", Buffer: "readonly",
+        setTimeout: "readonly", clearTimeout: "readonly", setInterval: "readonly",
+        clearInterval: "readonly", URL: "readonly", URLSearchParams: "readonly",
+        fetch: "readonly", AbortController: "readonly", structuredClone: "readonly",
+        document: "readonly", window: "readonly", localStorage: "readonly",
+        navigator: "readonly", requestAnimationFrame: "readonly",
+        performance: "readonly", Event: "readonly", PopStateEvent: "readonly",
+        getComputedStyle: "readonly", HTMLElement: "readonly",
+        HTMLInputElement: "readonly", ResizeObserver: "readonly",
+        MutationObserver: "readonly", Node: "readonly",
+        __dirname: "readonly", module: "readonly", require: "readonly",
       },
     },
   },
@@ -103,8 +125,20 @@ export default tseslint.config(
       "dist/**",
       "build/**",
       ".auto-claude/**",
-      "**/*.test.ts",
-      "**/*.test.tsx",
+      ".cache/**",
+      ".agents/**",
+      ".local/**",
+      "attached_assets/**",
+      "scripts/archive/**",
+      "docs/**",
+      "reports/**",
+      "awesome-list-site-ds/**",
+      "awesome-list-site-ds-20260929/**",
+      "client/public/ds/**",
+      "artifacts/r6/**",
+      "**/node_modules/**",
+      "**/dist/**",
+      "**/*.generated.*",
     ],
   },
 );

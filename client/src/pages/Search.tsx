@@ -5,7 +5,7 @@ import { Link, useSearch } from "wouter";
 import { useQuery } from "@tanstack/react-query";
 import { apiRequest, ApiError } from "@/lib/queryClient";
 import { writeFilterParams } from "@/lib/url-filter-state";
-import { parseTagsParam, normalizeTag } from "@/lib/tags";
+import { normalizeTag } from "@/lib/tags";
 import { isSearchableQuery, normalizeSearchQuery, SEARCH_QUERY_MAX_LENGTH } from "@shared/searchNormalize";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -20,15 +20,12 @@ import { Paginator } from "@/components/ui/paginator";
 import SearchFilters, { ActiveFilters, sortLabels } from "@/components/search/SearchFilters";
 import { parsePageFromSearch, pageNoticeFor } from "@/lib/page-param";
 import { trackFilterUsage, trackSearch, trackSortChange, trackTagInteraction } from "@/lib/analytics";
+import { readSearchState, searchApiParams, searchCanBrowse } from "@shared/discovery-params";
 
 type State = { q: string; category: string; subcategory: string; subSubcategory: string; tags: string[]; provider: string; format: string; skillLevel: string; sort: string; page: number };
 const PAGE_SIZE = 24;
 const readState = (search: string): State => {
-  const p = new URLSearchParams(search);
-  // `q` is the canonical public URL key, but older/external entry points may
-  // still use `search`. When both are present, explicit canonical `q` wins.
-  const query = p.has("q") ? p.get("q") ?? "" : p.get("search") ?? "";
-  return { q: query, category: p.get("category") ?? "", subcategory: p.get("subcategory") ?? "", subSubcategory: p.get("subSubcategory") ?? "", tags: parseTagsParam(p).map(normalizeTag), provider: p.get("provider") ?? "", format: p.get("format") ?? "", skillLevel: p.get("skillLevel") ?? "", sort: p.get("sort") ?? "relevance", page: parsePageFromSearch(search).page };
+  return readSearchState(search);
 };
 const facetState = (s: State) => [s.category, s.subcategory, s.subSubcategory, s.provider, s.format, s.skillLevel].some(Boolean) || s.tags.length > 0;
 const searchFilterSignature = (s: State) => JSON.stringify([
@@ -189,10 +186,10 @@ export default function Search() {
   const normalized = normalizeSearchQuery(state.q);
   const queryTooLong = normalized.length > SEARCH_QUERY_MAX_LENGTH;
   const hasActiveFilters = facetState(state);
-  const canBrowse = hasActiveFilters || state.sort !== "relevance";
+  const canBrowse = searchCanBrowse(state);
   const queryReady = isSearchableQuery(normalized);
   const shouldShowResults = queryReady || canBrowse;
-  const queryUrl = useMemo(() => { const p = new URLSearchParams({ page: String(state.page), limit: String(PAGE_SIZE), facets: "true" }); if (queryReady) p.set("search", normalized); /* C7-API-01: a query below the minimum is never sent, even while browsing filters */ if (state.category) p.set("category", state.category); if (state.subcategory) p.set("subcategory", state.subcategory); if (state.subSubcategory) p.set("subSubcategory", state.subSubcategory); if (state.tags.length) p.set("tags", state.tags.join(",")); if (state.provider) p.set("provider", state.provider); if (state.format) p.set("format", state.format); if (state.skillLevel) p.set("skillLevel", state.skillLevel); if (state.sort !== "relevance") p.set("sort", state.sort); return `/api/resources?${p.toString()}`; }, [normalized, queryReady, canBrowse, state]);
+  const queryUrl = useMemo(() => `/api/resources?${searchApiParams(state, PAGE_SIZE).toString()}`, [state]);
   // Fetch the unfiltered first page even while the prompt is visible. Its rows
   // stay hidden, but its facet metadata makes filter-only browsing possible.
   const query = useQuery<{ resources: DbResource[]; total: number; facets: ResourceSearchFacets; search?: { mode: "fts" | "fuzzy"; suggestion?: string } }>({ queryKey: [queryUrl], queryFn: () => apiRequest(queryUrl, { method: "GET" }), enabled: !queryTooLong, staleTime: 60_000 });

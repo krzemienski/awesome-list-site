@@ -1,3 +1,23 @@
+import { useEffect, useRef } from "react";
+import { useLocation, useSearch } from "wouter";
+
+/** Report a confirmed missing page once per route visit, including StrictMode. */
+export function useMissingRouteTelemetry(missing: boolean): void {
+  const [pathname] = useLocation();
+  const search = useSearch();
+  const reported = useRef<string | null>(null);
+  useEffect(() => {
+    const path = pathname + (search ? `?${search.replace(/^\?/, "")}` : "");
+    if (!missing) {
+      reported.current = null;
+      return;
+    }
+    if (reported.current === path) return;
+    reported.current = path;
+    reportDeadLink(path, document.referrer);
+  }, [missing, pathname, search]);
+}
+
 /**
  * Route-resolution failure telemetry.
  *

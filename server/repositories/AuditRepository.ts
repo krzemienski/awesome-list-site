@@ -36,7 +36,7 @@ import {
   type InsertResourceEdit,
 } from "@shared/schema";
 import { db } from "../db";
-import { decodeHtmlEntities, splitTaxonomyPathFields } from "../github/importHygiene";
+import { splitTaxonomyPathFields } from "../github/importHygiene";
 import {
   resourceFormatSchema,
   resourceProviderSchema,
@@ -642,6 +642,28 @@ export class AuditRepository {
         return { kind: 'superseded' as const };
       }
 
+      // Older submissions could contain independently forged diff/value maps.
+      // Refuse them rather than applying values the moderator never reviewed.
+      const values = edit.proposedData as Record<string, unknown> | null;
+      const changes = edit.proposedChanges as Record<string, { old: unknown; new: unknown }> | null;
+      if (!values || !changes || Array.isArray(values) || Array.isArray(changes) ||
+          Object.keys(values).length === 0 ||
+          Object.keys(values).some(field =>
+            !(EDITABLE_RESOURCE_FIELDS as readonly string[]).includes(field) ||
+            !changes[field] || JSON.stringify(changes[field].new) !== JSON.stringify(values[field])) ||
+          Object.keys(changes).some(field => !(field in values))) {
+        throw new Error('Conflict detected: This legacy suggestion has inconsistent review data. Please resubmit it.');
+      }
+      if (typeof values.url === 'string' && values.url !== currentResource.url) {
+        const [conflict] = await tx.select({ id: resources.id, title: resources.title })
+          .from(resources).where(eq(resources.url, values.url)).limit(1);
+        if (conflict) {
+          throw Object.assign(new Error('That URL already belongs to another resource'), {
+            code: 'EDIT_URL_CONFLICT', conflictingResourceId: conflict.id, title: conflict.title,
+          });
+        }
+      }
+
       // SAFE MERGE: Only update whitelisted fields from proposedData.
       const updates: Record<string, any> = {};
       const proposedData = edit.proposedData as any;
@@ -667,10 +689,9 @@ export class AuditRepository {
         } else if (field === 'skillLevel') {
           updates[field] = resourceSkillLevelSchema.parse(proposedData[field]);
         } else {
-          updates[field] =
-            typeof proposedData[field] === 'string' && field !== 'url'
-              ? decodeHtmlEntities(proposedData[field])
-              : proposedData[field];
+          // Submission canonicalizes text before building the reviewed diff.
+          // Decoding again here could apply a different value than that diff.
+          updates[field] = proposedData[field];
         }
       }
 

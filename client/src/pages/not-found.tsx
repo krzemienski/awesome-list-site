@@ -4,7 +4,8 @@ import { Home, List, ArrowRight } from "lucide-react";
 import { Link } from "wouter";
 import SEOHead from "@/components/layout/SEOHead";
 import { trackEvent } from "@/lib/analytics";
-import { reportDeadLink } from "@/lib/route-monitor";
+import { useMissingRouteTelemetry } from "@/lib/route-monitor";
+import { missingPageSeo } from "@shared/seo-templates";
 import "@/styles/pages/system.css";
 
 // Must equal the server's SITE_URL so the 404 og:url/og:image match the
@@ -24,10 +25,10 @@ interface NotFoundProps {
 }
 
 export default function NotFound({ suggestion }: NotFoundProps) {
+  useMissingRouteTelemetry(true);
   useEffect(() => {
     const path = window.location.pathname + window.location.search;
     trackEvent("page_not_found", "navigation", path);
-    reportDeadLink(path, document.referrer);
   }, []);
 
   // min-h-full, not a 100vh calc: <main> already fills whatever the app shell
@@ -40,8 +41,8 @@ export default function NotFound({ suggestion }: NotFoundProps) {
           notFoundMeta: same title/description/noindex, og tags kept, og:url
           pointing at the site card (never the dead URL). */}
       <SEOHead
-        title="Page Not Found"
-        description="The page you're looking for doesn't exist on Awesome Video. Browse the curated index of video development resources instead."
+        title={missingPageSeo.title}
+        description={missingPageSeo.description}
         noindex
         ogUrl={`${SITE_BASE}/`}
         image={`${SITE_BASE}/og-image.png?path=%2F`}

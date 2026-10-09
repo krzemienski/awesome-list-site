@@ -324,6 +324,12 @@ export const tagSchema = z
   .refine((v) => !NO_HTML_RE.test(v), "Tags must not contain HTML tags")
   .transform((v) => stripInvisible(v));
 
+/** Only these bounded metadata fields are editable in the admin resource form. */
+export const editableResourceMetadataSchema = z.object({
+  tags: z.array(tagSchema).max(30, 'Use at most 30 tags').optional(),
+  featured: z.boolean().optional(),
+}).strict();
+
 // ---------------------------------------------------------------------------
 // Taxonomy + journeys (R5-002: names/slugs/step content had ZERO validation)
 // ---------------------------------------------------------------------------

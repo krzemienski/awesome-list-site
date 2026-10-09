@@ -3,6 +3,8 @@ import { storage } from "./storage";
 import { getAboutFaqs } from "@shared/faq";
 import { parsePageNumber, parseUrlPageStrict } from "@shared/page-param";
 import { isSearchableQuery, normalizeSearchQuery } from "@shared/searchNormalize";
+import { readSearchState, searchCanBrowse, searchStateValid, discoveryRedirect } from "@shared/discovery-params";
+import { listDiscoveryResources, resolveTaxonomyPage } from "./services/public-discovery";
 import { MAINTAINER } from "@shared/about-content";
 import { normalizeAdminTab } from "@shared/admin-tabs";
 import {
@@ -37,6 +39,8 @@ import {
   siteTagline,
   signInSeoDescription,
   signUpSeoDescription,
+  missingPageSeo,
+  bookmarksPageSeo,
 } from "@shared/seo-templates";
 import {
   RESOURCE_FORMAT_LABELS,
@@ -61,7 +65,6 @@ import {
   renderStaticPageContent,
   renderSearchContent,
   renderCategoriesContent,
-  flattenListingResources,
   LISTING_PAGE_SIZE,
   countNodeResources,
   findCategory,
@@ -293,13 +296,6 @@ function parsePage(url: string): number {
   return n != null && n > 1 ? n : 1;
 }
 
-// Parse and bound the ?q= search term (BUG-002). Capped so an attacker cannot
-// blow up the rendered HTML; escaping happens at render time.
-function parseQueryParam(url: string): string {
-  const q = url.split("?")[1] || "";
-  return (new URLSearchParams(q).get("q") || "").trim().slice(0, 100);
-}
-
 async function resolveRoute(
   url: string,
   signal?: AbortSignal,
@@ -309,6 +305,7 @@ async function resolveRoute(
   // (cache poisoning / unbounded memory). Always bypass the cache.
   if (
     cleanPath === "/search" ||
+    (/^\/(category|subcategory|sub-subcategory)\//.test(cleanPath) && url.includes("?")) ||
     // Shared collections are revocable. Never let the metadata cache keep a
     // just-unpublished or deleted collection reachable for another 60 seconds.
     cleanPath.startsWith("/collection/")
@@ -332,8 +329,8 @@ async function resolveRoute(
 // a static robots noindex tag; the middleware additionally sets HTTP 404.
 function notFoundMeta(url: string): RouteMeta {
   const m = defaultMeta(url);
-  m.title = `Page Not Found — ${SITE_NAME}`;
-  m.description = `The page you're looking for doesn't exist on ${SITE_NAME}. Browse the curated index of video development resources instead.`;
+  m.title = `${missingPageSeo.title} — ${SITE_NAME}`;
+  m.description = missingPageSeo.description;
   m.image = ogImage("/");
   m.type = "website";
   m.noindex = true;
@@ -777,8 +774,8 @@ function homeShellChrome(): string {
       noindex: true,
     },
     "/bookmarks": {
-      title: `Bookmarks — ${SITE_NAME}`,
-      description: `Your saved video development resources on ${SITE_NAME}.`,
+      title: `${bookmarksPageSeo.title} — ${SITE_NAME}`,
+      description: bookmarksPageSeo.description,
       // Personalized, auth-gated account page — noindex like /profile.
       noindex: true,
     },
@@ -1081,21 +1078,17 @@ function homeShellChrome(): string {
       // shows the query that was actually matched.
       // C5-API-02: the same minimum as the API and the hydrated page, so a
       // one-letter query never renders a result count the client then hides.
-      const normalizedQuery = normalizeSearchQuery(parseQueryParam(url));
+      const searchState = readSearchState(url.split("?")[1] || "");
+      const normalizedQuery = normalizeSearchQuery(searchState.q);
       const q = isSearchableQuery(normalizedQuery) ? normalizedQuery : "";
       let results: { id: number; title: string; description?: string }[] = [];
       let total = 0;
       let sPage = parsePage(url);
       let sTotalPages = 1;
-      if (q) {
+      const canBrowse = searchCanBrowse(searchState);
+      if ((q || canBrowse) && searchStateValid(searchState)) {
         try {
-          const fetchPage = (p: number) =>
-            storage.listResources({
-              page: p,
-              limit: LISTING_PAGE_SIZE,
-              status: "approved",
-              search: q,
-            });
+          const fetchPage = (p: number) => listDiscoveryResources(url.split("?")[1] || "", p);
           let { resources, total: t } = await fetchPage(sPage);
           sTotalPages = Math.max(1, Math.ceil(t / LISTING_PAGE_SIZE));
           if ((resources ?? []).length === 0 && t > 0 && sPage > sTotalPages) {
@@ -1118,6 +1111,9 @@ function homeShellChrome(): string {
         total,
         page: sPage,
         totalPages: sTotalPages,
+        browse: canBrowse,
+        searchParams: url.split("?")[1] || "",
+        invalid: !searchStateValid(searchState),
       });
     } else if (path === "/categories") {
       // BUG-007: overview page listing every top-level category with its count.
@@ -1192,11 +1188,9 @@ function homeShellChrome(): string {
         // different ordering and 100/page; its "truncated tree slice" rationale
         // was stale — the tree builder has no per-node caps.)
         // LOCKSTEP: client/src/pages/Category.tsx treeResources memo.
-        const flat = flattenListingResources(found.node, "category");
-        const totalPages = Math.max(
-          1,
-          Math.ceil(flat.length / LISTING_PAGE_SIZE),
-        );
+        const listing = await resolveTaxonomyPage(found, "category", url.split("?")[1] || "", parsePage(url));
+        const flat = listing.allResources;
+        const { totalPages, page, total } = listing;
         // BUG-027 (audit 2): an out-of-range ?page is a real 404 — never a
         // silent clamp serving page-1 duplicate content on infinite URLs.
         if (page > totalPages) {
@@ -1204,20 +1198,17 @@ function homeShellChrome(): string {
         }
         m.title = `${pagedSeoTitleCore(titleCore, page)} — ${SITE_NAME}`;
         m.description = pagedSeoDescription(
-          categorySeoDescription(found.name, slug, found.count),
+          categorySeoDescription(found.name, slug, total),
           page,
           totalPages,
         );
-        const pageResources = flat.slice(
-          (page - 1) * LISTING_PAGE_SIZE,
-          page * LISTING_PAGE_SIZE,
-        );
+        const pageResources = listing.resources;
         m.structuredData = [
           collectionPageSchema({
             name: found.name,
             description: m.description,
             path: page > 1 ? `${path}?page=${page}` : path,
-            numberOfItems: found.count,
+            numberOfItems: total,
             items: pageResources.map((r: any) => ({
               name: r.title,
               path: `/resource/${r.id}`,
@@ -1251,13 +1242,14 @@ function homeShellChrome(): string {
             slug: s.slug,
             count: countNodeResources(s),
           })),
-          resources: flat.map((r: any) => ({
+          resources: pageResources.map((r: any) => ({
             id: r.id,
             title: r.title,
             description: r.description,
           })),
           page,
-          basePath: path,
+          totalResources: total,
+          basePath: discoveryRedirect(found.path, url.split("?")[1] || ""),
         });
         return { meta: m, found: true, bodyHtml };
       }
@@ -1409,31 +1401,26 @@ function homeShellChrome(): string {
         // tree source, same flatten order, same 24-per-page slice (the old
         // BUG-001 listResources fetch ordered differently at 100/page).
         // LOCKSTEP: client/src/pages/Subcategory.tsx staticResources.
-        const flat = flattenListingResources(found.node, "subcategory");
-        const totalPages = Math.max(
-          1,
-          Math.ceil(flat.length / LISTING_PAGE_SIZE),
-        );
+        const listing = await resolveTaxonomyPage(found, "subcategory", url.split("?")[1] || "", parsePage(url));
+        const flat = listing.allResources;
+        const { totalPages, page, total } = listing;
         // BUG-027 (audit 2): out-of-range ?page → real 404, not a clamp.
         if (page > totalPages) {
           return { meta: notFoundMeta(path), found: false };
         }
         m.title = `${pagedSeoTitleCore(titleCore, page)} — ${SITE_NAME}`;
         m.description = pagedSeoDescription(
-          subcategorySeoDescription(found.name, categoryName, found.count),
+          subcategorySeoDescription(found.name, categoryName, total),
           page,
           totalPages,
         );
-        const pageResources = flat.slice(
-          (page - 1) * LISTING_PAGE_SIZE,
-          page * LISTING_PAGE_SIZE,
-        );
+        const pageResources = listing.resources;
         m.structuredData = [
           collectionPageSchema({
             name: found.name,
             description: m.description,
             path: page > 1 ? `${path}?page=${page}` : path,
-            numberOfItems: found.count,
+            numberOfItems: total,
             items: pageResources.map((r: any) => ({
               name: r.title,
               path: `/resource/${r.id}`,
@@ -1466,13 +1453,14 @@ function homeShellChrome(): string {
             slug: s.slug,
             count: countNodeResources(s),
           })),
-          resources: flat.map((r: any) => ({
+          resources: pageResources.map((r: any) => ({
             id: r.id,
             title: r.title,
             description: r.description,
           })),
           page,
-          basePath: path,
+          totalResources: total,
+          basePath: discoveryRedirect(found.path, url.split("?")[1] || ""),
         });
         return { meta: m, found: true, bodyHtml };
       }
@@ -1506,11 +1494,9 @@ function homeShellChrome(): string {
         // the parent category's approved set at 100/page in a different order
         // and filtered by name).
         // LOCKSTEP: client/src/pages/SubSubcategory.tsx staticResources.
-        const flat = flattenListingResources(found.node, "sub-subcategory");
-        const totalPages = Math.max(
-          1,
-          Math.ceil(flat.length / LISTING_PAGE_SIZE),
-        );
+        const listing = await resolveTaxonomyPage(found, "sub-subcategory", url.split("?")[1] || "", parsePage(url));
+        const flat = listing.allResources;
+        const { totalPages, page, total } = listing;
         // BUG-027 (audit 2): out-of-range ?page → real 404, not a clamp.
         if (page > totalPages) {
           return { meta: notFoundMeta(path), found: false };
@@ -1520,21 +1506,18 @@ function homeShellChrome(): string {
           subSubcategorySeoDescription(
             found.name,
             parentSubName ?? "video development",
-            found.count,
+            total,
           ),
           page,
           totalPages,
         );
-        const pageResources = flat.slice(
-          (page - 1) * LISTING_PAGE_SIZE,
-          page * LISTING_PAGE_SIZE,
-        );
+        const pageResources = listing.resources;
         m.structuredData = [
           collectionPageSchema({
             name: found.name,
             description: m.description,
             path: page > 1 ? `${path}?page=${page}` : path,
-            numberOfItems: found.count,
+            numberOfItems: total,
             items: pageResources.map((r: any) => ({
               name: r.title,
               path: `/resource/${r.id}`,
@@ -1558,13 +1541,14 @@ function homeShellChrome(): string {
             formats: flat.map((resource: any) => resource.resourceFormat),
           }),
           crumbs: found.crumbs,
-          resources: flat.map((r: any) => ({
+          resources: pageResources.map((r: any) => ({
             id: r.id,
             title: r.title,
             description: r.description,
           })),
           page,
-          basePath: path,
+          totalResources: total,
+          basePath: discoveryRedirect(found.path, url.split("?")[1] || ""),
         });
         return { meta: m, found: true, bodyHtml };
       }
@@ -1824,6 +1808,9 @@ function homeShellChrome(): string {
             }
             group.isOptional = group.isOptional && Boolean(step.isOptional);
             if (step.resource) group.resources.push(step.resource);
+            else if (step.resourceId != null && !group.description?.includes("Some resources in this step are no longer available.")) {
+              group.description = `${group.description || ""} Some resources in this step are no longer available.`.trim();
+            }
           }
           const logicalSteps = [...logicalStepMap.values()];
           const duration = String((journey as any).estimatedDuration ?? "").match(/^(\d+)\s*hours?$/i);
@@ -2120,13 +2107,32 @@ export function ogInjectionMiddleware() {
     // "/Category/Encoding-Codecs") 301 to the canonical lowercase, no-slash
     // form. Case redirects only fire when the lowercased path actually
     // resolves, so genuinely unknown mixed-case URLs still soft-404.
+    // Resolve decoded taxonomy identity BEFORE generic case handling. Escape
+    // bytes are not slug letters; %2D and %2d both redirect to the tree path.
+    const taxonomyVariant = urlPath.replace(/\/+$/, "").match(/^\/(category|subcategory|sub-subcategory)\/([^/]+)$/i);
+    if (taxonomyVariant) {
+      try {
+        const tree = await getTreeCached();
+        const level = taxonomyVariant[1].toLowerCase();
+        const identity = safeDecode(taxonomyVariant[2]).toLowerCase();
+        const match = level === "category" ? findCategory(tree, identity)
+          : level === "subcategory" ? findSubcategory(tree, identity)
+          : findSubSubcategory(tree, identity);
+        if (match && urlPath !== match.path) {
+          const query = (req.originalUrl || req.url).split("?")[1];
+          return res.redirect(301, match.path + (query ? `?${query}` : ""));
+        }
+      } catch {
+        // Preserve dependency fail-open behavior; never guess a canonical.
+      }
+    }
     {
       const search = (req.originalUrl || req.url).split("?")[1];
       const suffix = search ? `?${search}` : "";
       const trimmed =
         urlPath.length > 1 ? urlPath.replace(/\/+$/, "") || "/" : urlPath;
       let redirectTo: string | null = trimmed !== urlPath ? trimmed : null;
-      if (/[A-Z]/.test(trimmed) && !trimmed.startsWith("/tag/")) {
+      if (/[A-Z]/.test(trimmed) && !trimmed.startsWith("/tag/") && !taxonomyVariant) {
         const lower = trimmed.toLowerCase();
         try {
           if ((await resolveRoute(lower)).found) redirectTo = lower;
@@ -2156,6 +2162,7 @@ export function ogInjectionMiddleware() {
     }
 
     // Tolerant redirects for URL shapes that circulate but were never routes.
+    const aliasTarget = (path: string) => discoveryRedirect(path, (req.originalUrl || req.url).split("?")[1] || "");
     // Nested /category/:cat/:sub deep links 301 to the canonical flat
     // /subcategory/:sub when the subcategory exists; unknown ones fall through
     // to the normal resolver and get the standard 404 treatment.
@@ -2165,7 +2172,7 @@ export function ogInjectionMiddleware() {
       try {
         const found = findSubcategory(await getTreeCached(), subSlug);
         if (found) {
-          return res.redirect(301, `/subcategory/${encodeURIComponent(subSlug)}`);
+          return res.redirect(301, aliasTarget(found.path));
         }
       } catch {
         // tree lookup failed — fall through to the resolver's fail-open path
@@ -2186,10 +2193,10 @@ export function ogInjectionMiddleware() {
         );
         if (!isCategory) {
           if (findSubcategory(tree, maybeSlug)) {
-            return res.redirect(301, `/subcategory/${encodeURIComponent(maybeSlug)}`);
+            return res.redirect(301, aliasTarget(`/subcategory/${encodeURIComponent(maybeSlug)}`));
           }
           if (findSubSubcategory(tree, maybeSlug)) {
-            return res.redirect(301, `/sub-subcategory/${encodeURIComponent(maybeSlug)}`);
+            return res.redirect(301, aliasTarget(`/sub-subcategory/${encodeURIComponent(maybeSlug)}`));
           }
         }
       } catch {
@@ -2210,13 +2217,13 @@ export function ogInjectionMiddleware() {
           if (findSubSubcategory(tree, maybeSlug)) {
             return res.redirect(
               301,
-              `/sub-subcategory/${encodeURIComponent(maybeSlug)}`,
+              aliasTarget(`/sub-subcategory/${encodeURIComponent(maybeSlug)}`),
             );
           }
           if ((tree?.categories ?? []).some((c: any) => c.slug === maybeSlug)) {
             return res.redirect(
               301,
-              `/category/${encodeURIComponent(maybeSlug)}`,
+              aliasTarget(`/category/${encodeURIComponent(maybeSlug)}`),
             );
           }
         }
@@ -2233,13 +2240,13 @@ export function ogInjectionMiddleware() {
           if (findSubcategory(tree, maybeSlug)) {
             return res.redirect(
               301,
-              `/subcategory/${encodeURIComponent(maybeSlug)}`,
+              aliasTarget(`/subcategory/${encodeURIComponent(maybeSlug)}`),
             );
           }
           if ((tree?.categories ?? []).some((c: any) => c.slug === maybeSlug)) {
             return res.redirect(
               301,
-              `/category/${encodeURIComponent(maybeSlug)}`,
+              aliasTarget(`/category/${encodeURIComponent(maybeSlug)}`),
             );
           }
         }
@@ -2319,11 +2326,9 @@ export function ogInjectionMiddleware() {
       // /explore and bare /resource (often seen with ?q=term) — canonical is
       // the search page; carry the query through. Exact-match so this never
       // hijacks the /resource/:id detail route.
-      const qs = (req.originalUrl || req.url).split("?")[1] || "";
-      const q = new URLSearchParams(qs).get("q");
       return res.redirect(
         301,
-        q && q.trim() ? `/search?q=${encodeURIComponent(q.trim())}` : "/search",
+        aliasTarget("/search"),
       );
     }
     // Run22 BUG-007: non-canonical /resource/:id shapes — leading zeros
@@ -2361,7 +2366,7 @@ export function ogInjectionMiddleware() {
     if (noHyphenSubSub) {
       return res.redirect(
         301,
-        `/sub-subcategory/${encodeURIComponent(safeDecode(noHyphenSubSub[1]))}`,
+        aliasTarget(`/sub-subcategory/${encodeURIComponent(safeDecode(noHyphenSubSub[1]))}`),
       );
     }
 
@@ -2378,7 +2383,7 @@ export function ogInjectionMiddleware() {
         try {
           const tree = await getTreeCached();
           if (!findSubSubcategory(tree, rawSlug) && findSubSubcategory(tree, bare[1])) {
-            return res.redirect(301, `/sub-subcategory/${encodeURIComponent(bare[1])}`);
+            return res.redirect(301, aliasTarget(`/sub-subcategory/${encodeURIComponent(bare[1])}`));
           }
         } catch {
           // tree lookup failed — fall through to the resolver's fail-open path

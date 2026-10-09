@@ -8,6 +8,8 @@ Selection
   --only <id>[,<id>]     run only these inventory rows (repeatable)
   --screen <id>          alias of --only with a single id
   --width <w>[,<w>]      restrict widths (375, 768, 1024, 1440)
+  --system <id>         editorial, terminal, geist, brutalist, swiss
+  --accent <id>         registry accent (defaults to system's natural accent)
 
 Identity
   --as <admin|visitor>   admin (default) signs in a disposable Clerk admin
@@ -43,6 +45,8 @@ export function parseCli(argv) {
         screen: { type: "string" },
         width: { type: "string", multiple: true, default: [] },
         as: { type: "string", default: "admin" },
+        system: { type: "string", default: "editorial" },
+        accent: { type: "string" },
         "keep-user": { type: "boolean", default: false },
         sweep: { type: "boolean", default: false },
         list: { type: "boolean", default: false },
@@ -66,6 +70,10 @@ export function parseCli(argv) {
     if (!ALLOWED_WIDTHS.includes(width)) throw new CliError(`--width must be one of ${ALLOWED_WIDTHS.join(", ")} (received ${width})`);
   }
   if (!["admin", "visitor"].includes(values.as)) throw new CliError(`--as must be admin or visitor (received ${values.as})`);
+  const natural = { editorial: "crimson", terminal: "matrix", geist: "cyan", brutalist: "amber", swiss: "orange" };
+  if (!Object.hasOwn(natural, values.system)) throw new CliError(`Unknown --system ${values.system}`);
+  const accent = values.accent || natural[values.system];
+  if (!["crimson", "magenta", "orange", "amber", "emerald", "matrix", "cyan", "violet", "lime", "rose"].includes(accent)) throw new CliError(`Unknown --accent ${accent}`);
   let determinism = null;
   if (values.determinism !== undefined) {
     determinism = values.determinism === "" ? 3 : decimal(values.determinism, "--determinism");
@@ -90,6 +98,7 @@ export function parseCli(argv) {
     only: only.length ? [...new Set(only)] : null,
     widths: widths.length ? [...new Set(widths)].sort((a, b) => a - b) : null,
     as: values.as,
+    theme: { system: values.system, accent },
     keepUser: values["keep-user"],
   };
 }

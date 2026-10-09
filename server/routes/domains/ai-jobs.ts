@@ -216,6 +216,9 @@ export function registerAiJobsRoutes(
       });
     } catch (error: any) {
       console.error('Error cancelling job:', error);
+      if (error?.name === 'JobNotFoundError' || error?.name === 'JobConflictError') {
+        return res.status(error.name === 'JobNotFoundError' ? 404 : 409).json({ success: false, message: error.message });
+      }
       res.status(500).json({
         success: false,
         message: 'Failed to cancel job',
@@ -498,6 +501,9 @@ export function registerAiJobsRoutes(
       await researchService.cancelJob(parseInt(req.params.id));
       res.json({ success: true, message: 'Job cancelled' });
     } catch (error: any) {
+      if (error?.name === 'JobNotFoundError' || error?.name === 'JobConflictError') {
+        return res.status(error.name === 'JobNotFoundError' ? 404 : 409).json({ success: false, message: error.message });
+      }
       res.status(500).json({ message: 'Failed to cancel job', error: error.message });
     }
   });
@@ -546,6 +552,9 @@ export function registerAiJobsRoutes(
       if (error?.name === 'DiscoveryNotFoundError') {
         return res.status(404).json({ message: 'Discovery not found' });
       }
+      if (error?.name === 'DiscoveryConflictError') {
+        return res.status(409).json({ message: error.message });
+      }
       res.status(500).json({ message: 'Failed to approve discovery', error: error.message });
     }
   });
@@ -559,6 +568,9 @@ export function registerAiJobsRoutes(
     } catch (error: any) {
       if (error?.name === 'DiscoveryNotFoundError') {
         return res.status(404).json({ message: 'Discovery not found' });
+      }
+      if (error?.name === 'DiscoveryConflictError') {
+        return res.status(409).json({ message: error.message });
       }
       res.status(500).json({ message: 'Failed to reject discovery', error: error.message });
     }

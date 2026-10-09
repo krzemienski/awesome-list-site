@@ -71,6 +71,7 @@ interface SeedDatabaseResponse {
     resourcesInserted: number;
   };
   totalErrors: number;
+  errors: string[];
 }
 
 /**
@@ -90,6 +91,7 @@ export default function DatabaseTab({ stats }: DatabaseTabProps) {
   // before firing (consistent with Clear & Re-seed, which types RESEED).
   // A simple confirm dialog suffices since seeding is additive, not destructive.
   const [seedDialogOpen, setSeedDialogOpen] = useState(false);
+  const [seedResult, setSeedResult] = useState<SeedDatabaseResponse | null>(null);
 
   const seedDatabaseMutation = useMutation({
     mutationFn: async (options: { clearExisting?: boolean } = {}) => {
@@ -99,9 +101,11 @@ export default function DatabaseTab({ stats }: DatabaseTabProps) {
       })) as SeedDatabaseResponse;
     },
     onSuccess: (data: SeedDatabaseResponse) => {
+      setSeedResult(data);
       void queryClient.invalidateQueries({ queryKey: ["/api/admin/stats"] });
       toast({
-        title: "Database Seeded Successfully",
+        title: data.totalErrors > 0 ? "Database Seeding Partially Failed" : "Database Seeded Successfully",
+        variant: data.totalErrors > 0 ? "destructive" : "default",
         description: `Added ${data.counts.resourcesInserted} resources, ${data.counts.categoriesInserted} categories, ${data.counts.subcategoriesInserted} subcategories, and ${data.counts.subSubcategoriesInserted} sub-subcategories.`,
       });
     },
@@ -135,6 +139,13 @@ export default function DatabaseTab({ stats }: DatabaseTabProps) {
 
   return (
     <div className="admin-ops-database">
+      {seedResult && (
+        <section role={seedResult.totalErrors > 0 ? "alert" : "status"} className="card p-4">
+          <h2>{seedResult.totalErrors > 0 ? "Seeding completed with errors" : "Seeding completed"}</h2>
+          <p>Inserted {seedResult.counts.resourcesInserted} resources, {seedResult.counts.categoriesInserted} categories, {seedResult.counts.subcategoriesInserted} subcategories and {seedResult.counts.subSubcategoriesInserted} sub-subcategories. Errors: {seedResult.totalErrors}.</p>
+          <ul>{seedResult.errors.map((error, index) => <li key={index}>{error}</li>)}</ul>
+        </section>
+      )}
       <div className="admin-ops-stat-strip">
         <Stat
           label="Tables"

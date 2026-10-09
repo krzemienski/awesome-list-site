@@ -180,7 +180,7 @@ export function registerJourneyRoutes(
       }
       const journey = await learningJourneyRepo.getLearningJourney(id);
       
-      if (!journey) {
+      if (!journey || journey.status !== 'published') {
         return res.status(404).json({ message: 'Journey not found' });
       }
       
@@ -220,8 +220,12 @@ export function registerJourneyRoutes(
   app.post('/api/journeys/:id/start', isAuthenticated, async (req: any, res) => {
     try {
       const userId = req.dbUser.id;
-      const journeyId = parseInt(req.params.id);
-      if (isNaN(journeyId)) {
+      const journeyId = parseBoundedInt(req.params.id);
+      if (journeyId === null) {
+        return res.status(404).json({ message: 'Journey not found' });
+      }
+      const journey = await learningJourneyRepo.getLearningJourney(journeyId);
+      if (!journey || journey.status !== 'published') {
         return res.status(404).json({ message: 'Journey not found' });
       }
       
@@ -240,8 +244,8 @@ export function registerJourneyRoutes(
   app.put('/api/journeys/:id/progress', isAuthenticated, async (req: any, res) => {
     try {
       const userId = req.dbUser.id;
-      const journeyId = parseInt(req.params.id);
-      if (isNaN(journeyId)) {
+      const journeyId = parseBoundedInt(req.params.id);
+      if (journeyId === null) {
         return res.status(404).json({ message: 'Journey not found' });
       }
       // Run17 BUG-016: accept either a single stepId (legacy) or a stepIds
@@ -253,18 +257,18 @@ export function registerJourneyRoutes(
       // status is reserved for real journeys receiving another journey's step
       // ids). Check existence BEFORE any validation that could write.
       const journeyExists = await learningJourneyRepo.getLearningJourney(journeyId);
-      if (!journeyExists) {
+      if (!journeyExists || journeyExists.status !== 'published') {
         return res.status(404).json({ message: 'Journey not found' });
       }
 
       const { stepId, stepIds, completed } = req.body ?? {};
-      const ids: number[] = Array.isArray(stepIds)
-        ? stepIds.filter((n: unknown) => Number.isInteger(n))
-        : Number.isInteger(stepId) ? [stepId] : [];
-
-      if (ids.length === 0) {
-        return res.status(400).json({ message: 'Step ID is required' });
+      const parsedIds = z.array(z.number().int().positive().max(PG_INT_MAX))
+        .min(1).max(100).refine(ids => new Set(ids).size === ids.length)
+        .safeParse(stepIds === undefined ? [stepId] : stepIds);
+      if (!parsedIds.success || (stepIds !== undefined && stepId !== undefined)) {
+        return res.status(400).json({ message: 'Provide either stepId or 1–100 unique positive integer stepIds' });
       }
+      const ids = parsedIds.data;
       if (typeof completed !== 'boolean' && typeof completed !== 'undefined') {
         return res.status(400).json({ message: 'completed must be a boolean' });
       }
@@ -301,8 +305,12 @@ export function registerJourneyRoutes(
   app.get('/api/journeys/:id/progress', isAuthenticated, async (req: any, res) => {
     try {
       const userId = req.dbUser.id;
-      const journeyId = parseInt(req.params.id);
-      if (isNaN(journeyId)) {
+      const journeyId = parseBoundedInt(req.params.id);
+      if (journeyId === null) {
+        return res.status(404).json({ message: 'Journey not found' });
+      }
+      const journey = await learningJourneyRepo.getLearningJourney(journeyId);
+      if (!journey || journey.status !== 'published') {
         return res.status(404).json({ message: 'Journey not found' });
       }
       
@@ -387,7 +395,7 @@ export function registerJourneyRoutes(
       if (!journey) {
         return res.status(404).json({ message: 'Journey not found' });
       }
-      const steps = await learningJourneyRepo.listJourneySteps(journeyId);
+      const steps = await learningJourneyRepo.listJourneySteps(journeyId, true);
       res.json({ steps });
     } catch (error) {
       console.error('Error listing journey steps:', error);
@@ -436,6 +444,9 @@ export function registerJourneyRoutes(
         return res.status(400).json({ message: 'Invalid step data', errors: error.issues });
       }
       console.error('Error creating journey step:', error);
+      if (isForeignKeyViolation(error) || (error as any)?.code === 'INVALID_STEP_RESOURCE') {
+        return res.status(400).json({ message: 'Selected resource no longer exists or is not approved. Choose another resource.' });
+      }
       res.status(500).json({ message: 'Failed to create journey step' });
     }
   });
@@ -468,13 +479,25 @@ export function registerJourneyRoutes(
         });
         const parsed = updateSchema.parse(req.body);
 
-        const updated = await learningJourneyRepo.updateJourneyStep(stepId, parsed);
+        if (req.query.group !== undefined && req.query.group !== 'true') {
+          return res.status(400).json({ message: 'group must be true when supplied' });
+        }
+        if (req.query.group === 'true' && parsed.resourceId !== undefined && steps.filter(s => s.stepNumber === existing.stepNumber).length > 1) {
+          return res.status(400).json({ message: 'Edit individual resource links separately from group content' });
+        }
+        const updated = await learningJourneyRepo.updateJourneyStep(stepId, parsed, req.query.group === 'true');
         res.json(updated);
       } catch (error) {
         if (error instanceof z.ZodError) {
           return res.status(400).json({ message: 'Invalid step data', errors: error.issues });
         }
         console.error('Error updating journey step:', error);
+        if (isForeignKeyViolation(error) || (error as any)?.code === 'INVALID_STEP_RESOURCE') {
+          return res.status(400).json({ message: 'Selected resource no longer exists or is not approved. Choose another resource.' });
+        }
+        if ((error as any)?.code === 'STEP_CONFLICT') {
+          return res.status(409).json({ message: 'Step no longer exists. Reload the steps.' });
+        }
         res.status(500).json({ message: 'Failed to update journey step' });
       }
     },
@@ -499,27 +522,10 @@ export function registerJourneyRoutes(
           return res.status(404).json({ message: 'Step not found for this journey' });
         }
 
-        await learningJourneyRepo.deleteJourneyStep(stepId);
-
-        // Run16 BUG-013: renumber remaining steps GROUP-aware. Rows sharing a
-        // stepNumber are one logical step (multi-resource); the old row-based
-        // renumber (1..N per row) exploded 6 logical steps into 18 after any
-        // single delete. Groups keep their membership; group numbers become
-        // contiguous 1..G.
-        const remaining = steps.filter((s) => s.id !== stepId);
-        if (remaining.length > 0) {
-          const groupNumbers = [...new Set(remaining.map((s) => s.stepNumber))].sort(
-            (a, b) => a - b,
-          );
-          const newNumberByOld = new Map(groupNumbers.map((n, i) => [n, i + 1]));
-          await learningJourneyRepo.setJourneyStepNumbers(
-            journeyId,
-            remaining.map((s) => ({
-              id: s.id,
-              stepNumber: newNumberByOld.get(s.stepNumber)!,
-            })),
-          );
+        if (req.query.group !== undefined && req.query.group !== 'true') {
+          return res.status(400).json({ message: 'group must be true when supplied' });
         }
+        await learningJourneyRepo.deleteJourneyStep(stepId, req.query.group === 'true');
         res.json({ success: true });
       } catch (error) {
         console.error('Error deleting journey step:', error);
@@ -655,6 +661,16 @@ export function registerRecommendationRoutes(
   // GET /api/recommendations - Get personalized recommendations
   app.get("/api/recommendations", async (req, res) => {
     try {
+      const profileQuery = z.object({
+        categories: z.string().max(1000).optional(),
+        goals: z.string().max(1000).optional(),
+        types: z.string().max(1000).optional(),
+        skillLevel: z.enum(['beginner', 'intermediate', 'advanced']).optional(),
+        timeCommitment: z.enum(['daily', 'weekly', 'flexible']).optional(),
+      }).safeParse(req.query);
+      if (!profileQuery.success) {
+        return res.status(400).json({ message: 'Invalid recommendation profile query', errors: profileQuery.error.issues });
+      }
       const limit = parseRecommendationLimit(req.query.limit, 10);
       if (limit === null) {
         return res.status(400).json({ message: 'limit must be a positive integer (max 50)' });

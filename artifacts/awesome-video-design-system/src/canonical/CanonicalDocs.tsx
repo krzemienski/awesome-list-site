@@ -3,6 +3,8 @@ import { useEffect, useMemo, useState } from "react";
 import { DOC_PAGES } from "./DocsContent";
 import "./ArtifactDocs.css";
 import { SkipLink } from "./SkipLink";
+import runtimeTokens from "../../tokens.json";
+import contrastRows from "../../contrast.json";
 
 export const NAV_GROUPS = [
   { label: "Start", items: [{ id: "overview", title: "Overview" }, { id: "principles", title: "Principles" }, { id: "getting-started", title: "Getting started" }] },
@@ -95,6 +97,18 @@ export function CanonicalDocs() {
     <DocsNav active={active} onPick={pick} />
       <main id="docs-main" className="docs-main" tabIndex={-1}>
       <div className="docs-meta"><span>{meta?.group}</span><span style={{ color: "var(--text-3)" }}>/</span><span style={{ color: "var(--text-2)" }}>{meta?.title}</span></div>
+      {["tokens", "color", "a11y"].includes(active) && <section className="card" style={{ padding: 24, marginBottom: 32 }}>
+        <h2>Live app-runtime accessibility addendum</h2>
+        <p>The chapter below is historical upstream documentation. Its 38–42% ink and ~6:1 Violet claims are not runtime guidance. Decorative accent is unchanged; small text uses --accent-ink (75% accent + 25% white), filled buttons use black --on-accent, and Terminal stays outlined.</p>
+        <p>Computed sRGB alpha contrast across both bases, all raised surfaces and 8%/14% tints. Actual painted ancestry and atmosphere still require browser measurement.</p>
+        <div role="region" aria-label="Runtime contrast table" tabIndex={0} style={{ overflowX: "auto" }}>
+          <table><thead><tr><th>System</th><th>Live text-3</th><th>Accent</th><th>Minimum accent ink contrast</th></tr></thead>
+            <tbody>{Object.entries(runtimeTokens.themes).flatMap(([system, theme]) => Object.keys(runtimeTokens.accents).map(accent =>
+              <tr key={`${system}-${accent}`}><td>{system}</td><td>{theme.tokens["--text-3"]}</td><td>{accent}</td><td>{Math.min(...contrastRows.filter(row => row.system === system && row.accent === accent && row.ink === "--accent-ink").map(row => row.ratio)).toFixed(4)}:1</td></tr>
+            ))}</tbody></table>
+        </div>
+        <p>Reproduce: node scripts/validation/app-accent-contrast.mjs --json. These approved accessibility deviations never authorise lowering contrast for pixel parity.</p>
+      </section>}
       <Page />
       <div className="docs-pager" style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 14, marginTop: 80, paddingTop: 32, borderTop: "var(--hairline-w) solid var(--border)" }}>
         {previous ? <button className="card hoverable" onClick={() => pick(previous)} style={{ padding: 20, textAlign: "left", cursor: "pointer", fontFamily: "inherit", color: "inherit" }}><div className="mono" style={{ fontSize: 10, color: "var(--text-3)", letterSpacing: "0.18em", marginBottom: 8 }}>← PREVIOUS</div><div style={{ fontWeight: 600, fontSize: 15 }}>{lookup(previous)?.title}</div></button> : <div />}

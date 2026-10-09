@@ -101,13 +101,13 @@ export function renderReport(results, { linkPrefix, stageRoot, determinismEviden
     "",
     "## Rows",
     "",
-    "| Screen | Width | Class | Status | Diff px | Diff % | Actual vs expected size | Evidence / reason |",
-    "|---|---:|---|---|---:|---:|---|---|",
+    "| Screen | Width | System/accent | Class | Status | Diff px | Diff % | Actual vs expected size | Evidence / reason |",
+    "|---|---:|---|---|---|---:|---:|---|---|",
     ...rows.map((row) => {
       const evidence = row.links?.diff
         ? `${link(row.links.actual, "actual")} · ${link(row.links.expected, "expected")} · ${link(row.links.diff, "diff")}${row.reason ? ` — ${row.reason}` : ""}`
         : (row.reason || (row.aliasOf ? `alias of ${row.aliasOf}` : "—"));
-      return `| ${row.screen} | ${row.width} | ${row.eligibility} | ${row.status}${row.evidenceKind ? ` (${row.evidenceKind})` : ""} | ${pixels(row)} | ${percent(row)} | ${dims(row)} | ${evidence} |`;
+      return `| ${row.screen} | ${row.width} | ${row.system || results.configuration.captureState?.theme?.system || "editorial"}/${row.accent || results.configuration.captureState?.theme?.accent || "crimson"} | ${row.eligibility} | ${row.status}${row.evidenceKind ? ` (${row.evidenceKind})` : ""} | ${pixels(row)} | ${percent(row)} | ${dims(row)} | ${evidence} |`;
     }),
     "",
     "## Font-face parity",

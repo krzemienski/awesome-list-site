@@ -53,30 +53,7 @@ interface ResourceCardProps {
   variant?: "default" | "taxonomy";
 }
 
-const RESOURCE_CATEGORY_MARKS: Record<string, string> = {
-  "community-events": "◈",
-  "encoding-codecs": "◇",
-  "general-tools": "◆",
-  "infrastructure-delivery": "▣",
-  "intro-learning": "▤",
-  "media-tools": "▥",
-  "players-clients": "▶",
-  "protocols-transport": "⟁",
-  "standards-industry": "◉",
-};
-
-function resourceCategoryMark(category?: string): string {
-  if (!category) return "◆";
-
-  const slug = category
-    .trim()
-    .toLowerCase()
-    .replace(/&/g, "")
-    .replace(/[^a-z0-9]+/g, "-")
-    .replace(/^-|-$/g, "");
-
-  return RESOURCE_CATEGORY_MARKS[slug] || "◆";
-}
+import { categoryGlyph as resourceCategoryMark } from "@/lib/category-glyph";
 
 function ResourceCard({
   resource,

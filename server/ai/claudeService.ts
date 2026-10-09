@@ -679,22 +679,14 @@ export class ClaudeService {
       let pageContent = '';
 
       try {
-        const fetch = (await import('node-fetch')).default;
-
-        // Fetch with safeguards - timeout handling
-        const controller = new AbortController();
-        const timeoutId = setTimeout(() => controller.abort(), 10000); // 10s timeout
-
-        const response = await fetch(url, {
-          signal: controller.signal,
+        const { safeFetch } = await import('./safeFetch');
+        const response = await safeFetch(url, {
+          timeout: 10000,
+          maxBytes: 5 * 1024 * 1024,
           headers: {
             'User-Agent': 'AwesomeVideoBot/1.0',
           },
-          redirect: 'follow',
-          follow: 5
         });
-
-        clearTimeout(timeoutId);
 
         if (!response.ok) {
           throw new Error(`Failed to fetch URL: ${response.status}`);
@@ -706,7 +698,7 @@ export class ClaudeService {
           throw new Error('Content too large (max 5MB)');
         }
 
-        const html = await response.text();
+        const html = response.body.toString('utf8');
 
         // Additional size check after fetching
         if (html.length > 5 * 1024 * 1024) {

@@ -1,6 +1,6 @@
 import * as React from "react";
 import { useState, useMemo, ReactNode, useRef, useEffect } from "react";
-import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { useQuery, useQueries, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useToast } from "@/hooks/use-toast";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -1572,18 +1572,18 @@ export default function GenericCrudManager<T extends BaseEntityWithCount>({
   });
 
   // Fetch parent data
-  const parentQueries = parents.map(parent =>
-    useQuery<BaseEntityWithCount[]>({
+  const parentQueries = useQueries({
+    queries: parents.map(parent => ({
       queryKey: [parent.queryKey],
-      queryFn: async () => {
+      queryFn: async (): Promise<BaseEntityWithCount[]> => {
         const response = await fetch(parent.fetchUrl, {
           credentials: 'include'
         });
         if (!response.ok) throw new ApiError(response.status, `Failed to fetch ${parent.label.toLowerCase()}`);
         return response.json();
       }
-    })
-  );
+    })),
+  });
 
   const parentData: Record<string, BaseEntityWithCount[]> = {};
   parents.forEach((parent, index) => {

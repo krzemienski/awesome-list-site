@@ -47,8 +47,16 @@ export default async function globalSetup() {
     }
   }
 
-  // Apply the current schema to the test database via drizzle-kit push.
-  console.log('🧪 Applying schema to test database...');
+  // Use the production migrator first: dashboard statistics read its genuine
+  // journal. push alone creates tables but never records migration history.
+  console.log('🧪 Applying journaled migrations to test database...');
+  execFileSync('npx', ['tsx', 'scripts/migrate.ts'], {
+    stdio: 'inherit',
+    env: { ...process.env, DATABASE_URL: testDatabaseUrl },
+  });
+
+  // During parallel development additive schema changes may not be journaled
+  // yet. Reconcile them without fabricating entries in the migration ledger.
   execFileSync('npx', ['drizzle-kit', 'push', '--force'], {
     stdio: 'inherit',
     env: { ...process.env, DATABASE_URL: testDatabaseUrl },

@@ -1,3 +1,12 @@
+/** Utility and missing-page metadata must be identical on both render passes. */
+export const missingPageSeo = {
+  title: "Page Not Found",
+  description: "The page you're looking for doesn't exist on Awesome Video. Browse the curated index of video development resources instead.",
+};
+export const bookmarksPageSeo = {
+  title: "Bookmarks",
+  description: "Your saved video development resources on Awesome Video.",
+};
 // Keyword-optimized, GEO-friendly SEO title/description templates shared VERBATIM
 // between the server SEO authority (server/og-middleware.ts) and the client
 // react-helmet mirror (client/src/pages/*). Because both sides import the SAME

@@ -120,20 +120,10 @@ function countNestedGroups(categories: AwesomeListNavNode[]): number {
   }, 0);
 }
 
-const categoryMarks: Record<string, string> = {
-  "community-events": "◈",
-  "encoding-codecs": "◇",
-  "general-tools": "◆",
-  "infrastructure-delivery": "▣",
-  "intro-learning": "▤",
-  "media-tools": "▥",
-  "players-clients": "▶",
-  "protocols-transport": "⟁",
-  "standards-industry": "◉",
-};
+import { categoryGlyph } from "@/lib/category-glyph";
 
 function categoryIcon(name: string, slug: string): string {
-  return categoryMarks[slug] ?? name.slice(0, 1).toUpperCase() ?? "◆";
+  return categoryGlyph(slug || name);
 }
 
 function getAllResources(category: Category): Resource[] {

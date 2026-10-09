@@ -1,6 +1,34 @@
 // Server-side prerendered content for indexable public routes (Task #80).
 import { resourceFactsSummary } from "@shared/seo-content-templates";
 import { tagLandingPath } from "@shared/tagNormalize";
+
+/** Identical child/general scope policy for crawler and public listing API. */
+export function scopeTaxonomyResources(
+  node: any,
+  level: ListingLevel,
+  allResources: any[],
+  options: { subcategory?: string; subSubcategory?: string; general?: boolean },
+) {
+  const children = level === "category" ? node.subcategories ?? [] : node.subSubcategories ?? [];
+  const child = children.find((item: any) => item.name === options.subcategory);
+  const deep = level === "category" && child?.subSubcategories?.some((item: any) => item.name === options.subSubcategory);
+  const direct = new Set((node.resources ?? []).map((item: any) => `${item.id}|${item.url}`));
+  const generalIgnored = Boolean(options.general && !allResources.some(item => direct.has(`${item.id}|${item.url}`)));
+  let resources = allResources;
+  if (options.general && !generalIgnored) {
+    resources = resources.filter(item => direct.has(`${item.id}|${item.url}`));
+  } else if (level === "category" && child) {
+    resources = resources.filter(item => item.subcategory === options.subcategory && (!deep || item.subSubcategory === options.subSubcategory));
+  } else if (level === "subcategory" && child) {
+    resources = resources.filter(item => item.subSubcategory === options.subcategory);
+  }
+  return {
+    resources,
+    ignoredSubcategory: Boolean(options.subcategory && !child),
+    ignoredSubSubcategory: Boolean(options.subSubcategory && !deep),
+    generalIgnored,
+  };
+}
 //
 // Why this exists: the app is a Vite SPA whose initial HTML is an empty
 // `<div id="root"><!--app-html--></div>` shell. Non-JavaScript crawlers (GPTBot,
@@ -297,7 +325,13 @@ function pagination(
 ): string {
   if (!basePath) return "";
   return paginationWithHref(
-    (p: number) => internalHref(p <= 1 ? basePath : `${basePath}?page=${p}`),
+    (page: number) => {
+      const [path, query = ""] = basePath.split("?");
+      const params = new URLSearchParams(query);
+      page > 1 ? params.set("page", String(page)) : params.delete("page");
+      const suffix = params.toString();
+      return internalHref(path + (suffix ? `?${suffix}` : ""));
+    },
     page,
     totalPages,
   );
@@ -407,6 +441,9 @@ export function renderTaxonomyContent(opts: {
 // escaped; results are capped by the caller.
 export function renderSearchContent(opts: {
   query: string;
+  browse?: boolean;
+  invalid?: boolean;
+  searchParams?: string;
   results: { id: number; title: string; description?: string }[];
   /**
    * BUG-007 (audit 2): the REAL total from the same query the client's
@@ -431,19 +468,20 @@ export function renderSearchContent(opts: {
   const totalPages = opts.totalPages ?? 1;
   // ?q= is preserved in every page link (a page link that dropped the query
   // would land on the empty search page). internalHref escapes for HTML.
-  const searchHref = (p: number) =>
-    internalHref(
-      p <= 1
-        ? `/search?q=${encodeURIComponent(q)}`
-        : `/search?q=${encodeURIComponent(q)}&page=${p}`,
-    );
-  const pager = q ? paginationWithHref(searchHref, page, totalPages) : "";
-  const body = !q
+  const searchHref = (page: number) => {
+    const params = new URLSearchParams(opts.searchParams ?? "");
+    page > 1 ? params.set("page", String(page)) : params.delete("page");
+    return internalHref(`/search?${params.toString()}`);
+  };
+  const pager = q || opts.browse ? paginationWithHref(searchHref, page, totalPages) : "";
+  const body = opts.invalid
+    ? `<p class="ssr-lead">Invalid search filters. Clear invalid filters to try again.</p>`
+    : !q && !opts.browse
     ? `<p class="ssr-lead">Enter a search term to find curated video development resources.</p>`
     : links.length
       ? `<p class="ssr-lead">${count(total)} result${
           total === 1 ? "" : "s"
-        } for “${escapeHtml(q)}”.</p><h2>Results</h2>${linkList(links)}${pager}`
+        }${q ? ` for “${escapeHtml(q)}”` : ""}.</p><h2>Results</h2>${linkList(links)}${pager}`
       : `<p class="ssr-lead">No results found for “${escapeHtml(
           q,
         )}”. Try a different term or browse the categories below.</p>`;

@@ -798,9 +798,9 @@ ${taxonomyHint}`;
   }
 
   async cancelJob(jobId: number): Promise<void> {
+    await this.enrichmentRepo.cancelEnrichmentJob(jobId);
     const active = this.activeJobs.get(jobId);
     if (active) active.abortController.abort();
-    await this.enrichmentRepo.cancelEnrichmentJob(jobId);
   }
 
   private isValidUrl(url: string): boolean {

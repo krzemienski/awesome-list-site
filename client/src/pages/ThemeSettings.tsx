@@ -25,7 +25,7 @@ import "@/styles/pages/account.css";
 import "@/styles/pages/theme-settings.css";
 
 export default function ThemeSettings() {
-  const { systemId, accentId, setSystem, setAccent, systems, accents } =
+  const { systemId, accentId, setSystem, setAccent, systems, accents, accountSync, accountSyncError, retryAccountSync } =
     useContext(ThemeProviderContext);
 
   const activeSystem = systems[systemId];
@@ -115,6 +115,15 @@ export default function ThemeSettings() {
         description="Customize the look and feel of Awesome Video — switch fonts and color themes."
         noindex
       />
+      <div role={accountSync === "failed" ? "alert" : "status"} aria-live="polite">
+        {accountSync === "local" && <p>Theme choices are saved on this device.</p>}
+        {accountSync === "syncing" && <p>Saving theme to your account…</p>}
+        {accountSync === "saved" && <p>Theme saved to your account.</p>}
+        {accountSync === "failed" && <>
+          <p>{accountSyncError}</p>
+          <Button variant="outline" onClick={retryAccountSync}>Retry account save</Button>
+        </>}
+      </div>
       <div>
         <Link
           href="/"

@@ -112,6 +112,10 @@ export function registerUserFeatureRoutes(
       const userId = req.dbUser.id;
       const resourceId = parseInt(req.params.resourceId);
       
+      const resource = Number.isSafeInteger(resourceId) ? await resourceRepo.getResource(resourceId) : undefined;
+      if (!resource || resource.status !== "approved") {
+        return res.status(404).json({ message: "Resource not found" });
+      }
       await userFeatureRepo.addFavorite(userId, resourceId);
       res.json({ message: 'Favorite added successfully' });
     } catch (error) {
@@ -158,6 +162,13 @@ export function registerUserFeatureRoutes(
       const userId = req.dbUser.id;
       const resourceId = parseInt(req.params.resourceId);
       const { notes, restoreCreatedAt } = req.body;
+      if (notes !== undefined && (typeof notes !== "string" || notes.length > 500 || /[\u0000-\u0008\u000b\u000c\u000e-\u001f\u007f-\u009f]/.test(notes))) {
+        return res.status(400).json({ message: "notes must be a plain-text string of at most 500 characters without control characters" });
+      }
+      const resource = Number.isSafeInteger(resourceId) ? await resourceRepo.getResource(resourceId) : undefined;
+      if (!resource || resource.status !== "approved") {
+        return res.status(404).json({ message: "Resource not found" });
+      }
       // C6-VX-01: Undo re-saves with the removed bookmark's original saved
       // date so it keeps its place in "Newest saved". Only a valid past date
       // is honoured; anything else is ignored and the row is dated now.

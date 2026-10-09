@@ -23,9 +23,15 @@ describe('Clerk sign-in static-source invariants', () => {
   it('keeps legacy login and recovery URLs on the Clerk sign-in surface', () => {
     for (const path of ['/login', '/forgot-password', '/reset-password']) {
       expect(APP_SRC).toContain(
-        `<Route path="${path}" component={() => <LegacyAuthRedirect to="/sign-in" />} />`,
+        `<Route path="${path}"><LegacyAuthRedirect to="/sign-in" /></Route>`,
       );
     }
+  });
+
+  it('preserves only safe local return destinations', () => {
+    expect(APP_SRC).toContain('next && /^\\/(?![/\\\\])/.test(next)');
+    expect(APP_SRC).toContain('redirect_url');
+    expect(APP_SRC).not.toMatch(/component=\{\(\)\s*=>\s*<LegacyAuthRedirect/);
   });
 });
 

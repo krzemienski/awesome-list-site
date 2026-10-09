@@ -25,8 +25,12 @@ import {
   resolveFontOverrideId,
 } from "@/lib/font-options";
 import { useLearningPreferences } from "@/hooks/use-learning-preferences";
+import { ApiError } from "@/lib/queryClient";
 
 interface ThemeProviderState {
+  accountSync: "local" | "syncing" | "saved" | "failed";
+  accountSyncError: string | null;
+  retryAccountSync: () => void;
   systemId: DesignSystemId;
   accentId: AccentId;
   setSystem: (id: string) => void;
@@ -37,6 +41,9 @@ interface ThemeProviderState {
 }
 
 const initialState: ThemeProviderState = {
+  accountSync: "local",
+  accountSyncError: null,
+  retryAccountSync: () => null,
   systemId: DEFAULT_SYSTEM,
   accentId: DEFAULT_ACCENT,
   setSystem: () => null,
@@ -124,6 +131,9 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
   return (
     <ThemeProviderContext.Provider
       value={{
+        accountSync: "local",
+        accountSyncError: null,
+        retryAccountSync: () => null,
         systemId,
         accentId,
         setSystem,
@@ -159,6 +169,9 @@ export function AccountThemePreferenceBridge({ children }: { children: ReactNode
   const saveQueue = useRef<Promise<unknown>>(Promise.resolve());
   const selectedSystem = useRef(theme.systemId);
   const selectedAccent = useRef(theme.accentId);
+  const [accountSync, setAccountSync] = useState<ThemeProviderState["accountSync"]>("local");
+  const [accountSyncError, setAccountSyncError] = useState<string | null>(null);
+  const saveGeneration = useRef(0);
 
   useEffect(() => {
     selectedSystem.current = theme.systemId;
@@ -177,16 +190,31 @@ export function AccountThemePreferenceBridge({ children }: { children: ReactNode
     selectedAccent.current = accountTheme.accentId;
     applySystem(accountTheme.systemId);
     applyAccent(accountTheme.accentId);
+    setAccountSync("saved");
   }, [accountTheme, applyAccent, applySystem, isLoading]);
 
   const persist = useCallback(
     (themeSystem: DesignSystemId, themeAccent: AccentId) => {
       if (!isAuthenticated) return;
+      const generation = ++saveGeneration.current;
+      setAccountSync("syncing");
+      setAccountSyncError(null);
       saveQueue.current = saveQueue.current
         .catch(() => undefined)
-        .then(() => saveThemeAsync({ themeSystem, themeAccent }))
-        .catch(async () => {
-          await refetch();
+        .then(async () => {
+          await saveThemeAsync({ themeSystem, themeAccent });
+          if (generation === saveGeneration.current) setAccountSync("saved");
+        })
+        .catch(async (error: unknown) => {
+          if (generation === saveGeneration.current) {
+            setAccountSync("failed");
+            setAccountSyncError(error instanceof ApiError && error.status === 409
+              ? "Your account changed elsewhere. This selection is saved only on this device. Retry to save it to your account."
+              : "Couldn't save to your account. This selection is saved only on this device.");
+          }
+          // Retain the explicit local selection, but refresh the revision so
+          // a user-initiated retry reconciles a conflict rather than looping.
+          try { await refetch(); } catch { /* The visible failure remains. */ }
         });
     },
     [isAuthenticated, refetch, saveThemeAsync],
@@ -215,7 +243,10 @@ export function AccountThemePreferenceBridge({ children }: { children: ReactNode
   }, [applyAccent, persist]);
 
   return (
-    <ThemeProviderContext.Provider value={{ ...theme, setSystem, setAccent }}>
+    <ThemeProviderContext.Provider value={{
+      ...theme, setSystem, setAccent, accountSync, accountSyncError,
+      retryAccountSync: () => persist(selectedSystem.current, selectedAccent.current),
+    }}>
       {children}
     </ThemeProviderContext.Provider>
   );

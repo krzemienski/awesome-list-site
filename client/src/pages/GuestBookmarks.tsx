@@ -3,6 +3,7 @@ import { useQueries } from "@tanstack/react-query";
 import { Link, useLocation } from "wouter";
 import { AlertTriangle, Bookmark, BookmarkX, CloudUpload, LogIn } from "lucide-react";
 import SEOHead from "@/components/layout/SEOHead";
+import { bookmarksPageSeo } from "@shared/seo-templates";
 import ResourceCard from "@/components/resource/ResourceCard";
 import { ResourceCardSkeleton } from "@/components/ui/skeletons";
 import { Button } from "@/components/ui/button";
@@ -107,8 +108,8 @@ export default function GuestBookmarks() {
     return (
       <div className="account-page account-page--wide space-y-6">
         <SEOHead
-          title="Saved on This Device"
-          description="Resources you saved as a guest — sign in to keep them in your account"
+          title={bookmarksPageSeo.title}
+          description={bookmarksPageSeo.description}
           noindex
         />
         <div className="text-center py-12">
@@ -141,8 +142,8 @@ export default function GuestBookmarks() {
   return (
     <div className="account-page account-page--wide space-y-6">
       <SEOHead
-        title="Saved on This Device"
-        description="Resources you saved as a guest — sign in to keep them in your account"
+        title={bookmarksPageSeo.title}
+        description={bookmarksPageSeo.description}
         noindex
       />
 

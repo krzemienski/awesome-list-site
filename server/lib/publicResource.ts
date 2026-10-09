@@ -1,7 +1,7 @@
 /**
  * Public-facing resource serialization.
  *
- * Strips internal-only columns from resource objects before they cross the
+ * Allowlists public columns and metadata before resource objects cross the
  * public API boundary. Applied at EVERY public send site that returns a
  * resource — list, search, detail, related, the awesome-list tree, and the
  * `/api/public/*` surface — so internal fields never leak and responses stay
@@ -33,8 +33,7 @@
  * Because this is the single choke point, every public surface — list,
  * search, detail, related, the awesome-list tree + listing pages, the
  * `/api/public/*` surface and recommendations — gains both fields at once;
- * journey step embeds (a 4-column projection) attach them separately in
- * LearningJourneyRepository.listJourneySteps.
+ * journey step embeds must call this same projection after checking status.
  */
 import { withResourceKindFields, type ResourceKind } from "./resourceKinds";
 
@@ -43,50 +42,39 @@ export interface PublicResourceFields {
   resolvedKind: ResourceKind;
 }
 
-const INTERNAL_METADATA_KEYS = [
-  "source",
-  "confidence",
-  "discoveryId",
-  "researchJobId",
-  "enrichmentError",
-  "enrichment_error",
-  // Audit2 BUG-013: import/sync bookkeeping + AI scratch fields, never
-  // consumed by any client code (verified by grep + live payload scan).
-  "sourceList",
-  "sourceCategories",
-  "importedAt",
-  "importedFrom",
-  "lastUpdatedAt",
-  "lastUpdatedFrom",
-  "categoryId",
-  "subcategoryId",
-  "subSubcategoryId",
-  "aiModel",
-  "aiEnriched",
-  "aiEnrichedAt",
-  "suggestedTags",
-  "suggestedCategory",
-  "suggestedSubcategory",
-  "urlScrapedAt",
+const PUBLIC_METADATA_STRINGS = [
+  "ogImage", "ogImageBlurhash", "favicon", "siteName", "author",
+  "scrapedTitle", "scrapedDescription", "ogTitle", "ogDescription", "twitterCard",
+] as const;
+
+// Explicitly include user-owned bookmark annotations, not arbitrary row columns.
+const PUBLIC_RESOURCE_KEYS = [
+  "id", "title", "url", "description", "category", "subcategory", "subSubcategory",
+  "resourceFormat", "provider", "skillLevel", "kind", "status", "createdAt",
+  "resourceId", "favoritedAt", "notes", "bookmarkedAt", "queueStatus", "archivedAt",
+  "personalTags", "collectionIds",
 ] as const;
 
 export function stripInternalResourceFields<T extends Record<string, any>>(r: T): T & PublicResourceFields {
   if (!r || typeof r !== "object") return r;
-  const {
-    searchTsv, submittedBy, approvedBy, githubSynced, lastSyncedAt, updatedAt, approvedAt,
-    contributorRejectionReason, statusChangedAt,
-    ...rest
-  } = r as any;
-  if (rest.metadata && typeof rest.metadata === "object" && !Array.isArray(rest.metadata)) {
-    const meta = { ...rest.metadata };
-    let changed = false;
-    for (const key of INTERNAL_METADATA_KEYS) {
-      if (key in meta) {
-        delete meta[key];
-        changed = true;
+  const rest: Record<string, any> = {};
+  for (const key of PUBLIC_RESOURCE_KEYS) {
+    if (Object.prototype.hasOwnProperty.call(r, key)) rest[key] = r[key];
+  }
+  if (r.metadata && typeof r.metadata === "object" && !Array.isArray(r.metadata)) {
+    const meta: Record<string, unknown> = {};
+    for (const key of PUBLIC_METADATA_STRINGS) {
+      if (typeof r.metadata[key] === "string") meta[key] = r.metadata[key];
+    }
+    if (Array.isArray(r.metadata.tags)) {
+      meta.tags = r.metadata.tags.filter((tag: unknown) => typeof tag === "string");
+    }
+    for (const key of ["featured", "urlScraped"] as const) {
+      if (typeof r.metadata[key] === "boolean" || r.metadata[key] === "true" || r.metadata[key] === "false") {
+        meta[key] = r.metadata[key];
       }
     }
-    if (changed) rest.metadata = meta;
+    rest.metadata = meta;
   }
   return withResourceKindFields(rest as T);
 }

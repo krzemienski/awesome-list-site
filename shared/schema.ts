@@ -578,7 +578,9 @@ export const insertSubcategorySchema = createInsertSchema(subcategories).pick({
   slug: slugSchema,
 });
 
-export const updateSubcategorySchema = insertSubcategorySchema.partial();
+export const updateSubcategorySchema = insertSubcategorySchema.partial().extend({
+  categoryId: z.number().int().positive().max(2147483647).optional(),
+});
 
 export type InsertSubcategory = z.infer<typeof insertSubcategorySchema>;
 export type UpdateSubcategory = z.infer<typeof updateSubcategorySchema>;
@@ -623,7 +625,9 @@ export const insertSubSubcategorySchema = createInsertSchema(subSubcategories).p
   slug: slugSchema,
 });
 
-export const updateSubSubcategorySchema = insertSubSubcategorySchema.partial();
+export const updateSubSubcategorySchema = insertSubSubcategorySchema.partial().extend({
+  subcategoryId: z.number().int().positive().max(2147483647).optional(),
+});
 
 export type InsertSubSubcategory = z.infer<typeof insertSubSubcategorySchema>;
 export type UpdateSubSubcategory = z.infer<typeof updateSubSubcategorySchema>;

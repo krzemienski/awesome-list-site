@@ -114,17 +114,7 @@ type HealthState = "ok" | "warn" | "bad" | "unknown";
  * presentation metadata, so keep this small canonical mapping at the panel
  * boundary rather than changing the shared/API category contract.
  */
-const CATEGORY_ICONS: Record<string, string> = {
-  "community-events": "◈",
-  "encoding-codecs": "◇",
-  "general-tools": "◆",
-  "infrastructure-delivery": "▣",
-  "intro-learning": "▤",
-  "media-tools": "▥",
-  "players-clients": "▶",
-  "protocols-transport": "⟁",
-  "standards-industry": "◉",
-};
+import { CATEGORY_GLYPHS as CATEGORY_ICONS } from "@/lib/category-glyph";
 
 const categoryIcon = (category: CategorySummary) =>
   category.icon ?? (category.slug ? CATEGORY_ICONS[category.slug] : undefined) ?? "◆";

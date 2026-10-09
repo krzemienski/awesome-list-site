@@ -2,6 +2,80 @@
 source: awesome-list-site-ds/docs/17-accessibility.md
 sha256: f1b0bdaf0b78fb8bcbea5348ea9dadd757cdbffb218de868009d36ebf3659e9e
 ---
+# App-runtime accessibility addendum (authoritative for Awesome.Video)
+
+The source text below is historical, verbatim handoff documentation, NOT current runtime contrast guidance. Its 38–42%/40% white and ~6:1 Violet claims are obsolete. Frozen source files remain unchanged.
+
+Live --text-3 is corrected per system; --accent remains decorative. Small accent text uses --accent-ink (75% accent + 25% white in sRGB); filled primary labels use black --on-accent. Terminal retains its outlined grammar. These are approved accessibility deviations, not pixel-parity exceptions.
+
+| System | Live text-3 | Minimum neutral contrast |
+|---|---|---:|
+| editorial | rgba(244,243,238,0.49) | 4.6728:1 |
+| terminal | rgba(232,232,224,0.51) | 4.6253:1 |
+| geist | rgba(250,250,250,0.49) | 4.7085:1 |
+| brutalist | rgba(245,245,240,0.50) | 4.6763:1 |
+| swiss | rgba(250,250,248,0.48) | 4.7518:1 |
+
+All 50 system/accent pairs (minimum across bg, bg-2, surface/surface-2/surface-3 over each base, including 0%, 8% chip and 14% control tints):
+
+| System | Accent | Accent ink minimum | Filled label (Terminal: outlined) |
+|---|---|---:|---:|
+| editorial | crimson | 5.5597:1 | 6.0413:1 |
+| editorial | magenta | 5.6479:1 | 5.9535:1 |
+| editorial | orange | 6.8181:1 | 8.1032:1 |
+| editorial | amber | 8.5939:1 | 12.2154:1 |
+| editorial | emerald | 7.8911:1 | 10.5471:1 |
+| editorial | matrix | 9.6218:1 | 15.6595:1 |
+| editorial | cyan | 8.8975:1 | 13.1007:1 |
+| editorial | violet | 5.0157:1 | 4.5675:1 |
+| editorial | lime | 10.1611:1 | 17.0132:1 |
+| editorial | rose | 6.9836:1 | 8.4028:1 |
+| terminal | crimson | 6.3726:1 | outlined |
+| terminal | magenta | 6.4768:1 | outlined |
+| terminal | orange | 7.8676:1 | outlined |
+| terminal | amber | 9.9710:1 | outlined |
+| terminal | emerald | 8.9419:1 | outlined |
+| terminal | matrix | 10.8852:1 | outlined |
+| terminal | cyan | 10.1712:1 | outlined |
+| terminal | violet | 5.6964:1 | outlined |
+| terminal | lime | 11.6870:1 | outlined |
+| terminal | rose | 8.0738:1 | outlined |
+| geist | crimson | 5.0396:1 | 6.0413:1 |
+| geist | magenta | 5.1092:1 | 5.9535:1 |
+| geist | orange | 6.1394:1 | 8.1032:1 |
+| geist | amber | 7.6964:1 | 12.2154:1 |
+| geist | emerald | 7.0825:1 | 10.5471:1 |
+| geist | matrix | 8.6267:1 | 15.6595:1 |
+| geist | cyan | 7.9612:1 | 13.1007:1 |
+| geist | violet | 4.5394:1 | 4.5675:1 |
+| geist | lime | 9.0859:1 | 17.0132:1 |
+| geist | rose | 6.2816:1 | 8.4028:1 |
+| brutalist | crimson | 5.0396:1 | 6.0413:1 |
+| brutalist | magenta | 5.1092:1 | 5.9535:1 |
+| brutalist | orange | 6.1394:1 | 8.1032:1 |
+| brutalist | amber | 7.6964:1 | 12.2154:1 |
+| brutalist | emerald | 7.0825:1 | 10.5471:1 |
+| brutalist | matrix | 8.6267:1 | 15.6595:1 |
+| brutalist | cyan | 7.9612:1 | 13.1007:1 |
+| brutalist | violet | 4.5394:1 | 4.5675:1 |
+| brutalist | lime | 9.0859:1 | 17.0132:1 |
+| brutalist | rose | 6.2816:1 | 8.4028:1 |
+| swiss | crimson | 5.7757:1 | 6.0413:1 |
+| swiss | magenta | 5.8698:1 | 5.9535:1 |
+| swiss | orange | 7.1092:1 | 8.1032:1 |
+| swiss | amber | 8.9875:1 | 12.2154:1 |
+| swiss | emerald | 8.2368:1 | 10.5471:1 |
+| swiss | matrix | 10.0526:1 | 15.6595:1 |
+| swiss | cyan | 9.2970:1 | 13.1007:1 |
+| swiss | violet | 5.2072:1 | 4.5675:1 |
+| swiss | lime | 10.6424:1 | 17.0132:1 |
+| swiss | rose | 7.2817:1 | 8.4028:1 |
+
+Reproduce: node scripts/validation/app-accent-contrast.mjs --json. WCAG relative luminance, sRGB alpha compositing before linearisation. Values describe token backings, not browser-measured atmosphere/ancestry; browser contrast and axe proof remains required. No claim is made that uncorrected --accent passes small-text AA.
+
+---
+
+# Historical upstream documentation
 # 17 · Accessibility
 
 > Dark with confidence — but every system must clear the bar.

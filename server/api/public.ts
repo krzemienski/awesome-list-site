@@ -33,6 +33,7 @@ import { storage } from "../storage";
 import { freeTierLimiter } from "../middleware/rateLimit";
 import { requireApiKey } from "../middleware/apiAuth";
 import { stripInternalResourceFields } from "../lib/publicResource";
+import { listApprovedResourceTags } from "../repositories/TagRepository";
 import { parseBoundedInt } from "../validation/inputs";
 import {
   PUBLIC_API_CACHE_CONTROL,
@@ -397,10 +398,10 @@ export function registerPublicApiRoutes(app: Express): void {
    */
   app.get('/api/public/tags', freeTierLimiter, async (req: Request, res: Response) => {
     try {
-      const tags = await storage.listTags();
+      const payload = await listApprovedResourceTags();
       // Task #327 cache contract: see server/http-cache-policy.ts.
       res.set('Cache-Control', PUBLIC_API_CACHE_CONTROL);
-      res.json({ tags });
+      res.json(payload);
     } catch (error) {
       console.error('Error fetching public tags:', error);
       res.status(500).json({ message: 'Failed to fetch tags' });

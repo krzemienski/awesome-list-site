@@ -18,7 +18,6 @@ import {
   Link,
   RefreshCw,
   TableProperties,
-  TerminalSquare,
   XCircle,
 } from "lucide-react";
 import {
@@ -64,6 +63,7 @@ interface AuditLogsResponse {
 }
 
 const AUDIT_HISTORY_PAGE_SIZE = 50;
+const EXPORT_ACTIONS = new Set(["catalog.exported", "database.exported", "resources.exported", "categories.exported"]);
 
 const EXPORT_TITLE = "Awesome Video";
 const EXPORT_DESCRIPTION =
@@ -156,7 +156,7 @@ export default function ExportTab({ validationStatus: propValidationStatus }: Ex
         ? "Exports among audit entries 0–0 of 0; no audit entries are available."
         : `Exports among audit entries ${auditHistoryOffset + 1}–${auditHistoryEnd} of ${auditHistoryTotal} (50-entry bounded window); ${
             exportHistoryData?.logs.some(
-              (entry) => entry.action === "catalog.exported" || entry.action === "database.exported",
+              (entry) => EXPORT_ACTIONS.has(entry.action),
             )
               ? "exports found on this audit page."
               : hasNextAuditHistoryPage
@@ -167,7 +167,7 @@ export default function ExportTab({ validationStatus: propValidationStatus }: Ex
   const exportHistory = useMemo(
     () =>
       (exportHistoryData?.logs ?? [])
-        .filter((entry) => entry.action === "catalog.exported" || entry.action === "database.exported"),
+        .filter((entry) => EXPORT_ACTIONS.has(entry.action)),
     [exportHistoryData],
   );
 
@@ -185,14 +185,6 @@ export default function ExportTab({ validationStatus: propValidationStatus }: Ex
   };
 
   const validationStatus = propValidationStatus ?? fetchedValidationStatus;
-
-  const unavailableExport = (format: string) => {
-    toast({
-      title: `${format} export unavailable`,
-      description: "No supported admin endpoint is currently available for this format.",
-      variant: "destructive",
-    });
-  };
 
   const handleExport = async () => {
     // ADM-06: bail synchronously if an export is already in flight.
@@ -244,17 +236,17 @@ export default function ExportTab({ validationStatus: propValidationStatus }: Ex
 
       triggerBlobDownload(
         await response.blob(),
-        exportFileName(response, "awesome-list-backup.json"),
+        exportFileName(response, "awesome-list-catalog-snapshot.json"),
       );
       void queryClient.invalidateQueries({ queryKey: ["/api/admin/audit-logs"] });
       toast({
         title: "JSON Export Successful",
-        description: "The database backup has been downloaded.",
+        description: "The catalog snapshot has been downloaded. This is not a restorable database backup.",
       });
     } catch {
       toast({
         title: "JSON Export Failed",
-        description: "Failed to export the database backup. Please try again.",
+        description: "Failed to export the catalog snapshot. Please try again.",
         variant: "destructive",
       });
     } finally {
@@ -437,7 +429,7 @@ export default function ExportTab({ validationStatus: propValidationStatus }: Ex
             <FileJson className="h-5 w-5" />
           </div>
           <h3 className="admin-ops-export-card__title">JSON Snapshot</h3>
-          <p className="admin-ops-export-card__description">Complete dataset as a single JSON file.</p>
+          <p className="admin-ops-export-card__description">Non-restorable catalog snapshot, not a full database backup. Includes resources, category hierarchy, tags, learning journeys, sync queue and limited user summaries. Omits user identities, favorites, bookmarks, contributions, audit history, AI jobs and discoveries, notification preferences and other application state.</p>
           <Button
             className="admin-ops-export-card__action"
             onClick={() => {
@@ -515,33 +507,6 @@ export default function ExportTab({ validationStatus: propValidationStatus }: Ex
           </Button>
         </article>
 
-        {[
-          {
-            title: "SQL dump",
-            description: "PostgreSQL-compatible schema + data.",
-            icon: <TerminalSquare className="h-5 w-5" />,
-          },
-          {
-            title: "API token",
-            description: "Generate a personal access token.",
-            icon: <FileCheck className="h-5 w-5" />,
-          },
-        ].map((format) => (
-          <article className="card admin-ops-export-card admin-ops-export-card--unsupported" key={format.title}>
-            <div className="admin-ops-export-card__icon" aria-hidden="true">
-              {format.icon}
-            </div>
-            <h3 className="admin-ops-export-card__title">{format.title}</h3>
-            <p className="admin-ops-export-card__description">{format.description}</p>
-            <Button
-              className="admin-ops-export-card__action"
-              onClick={() => unavailableExport(format.title)}
-              variant="outline"
-            >
-              {format.title === "API token" ? "Generate" : "Download"}
-            </Button>
-          </article>
-        ))}
       </div>
 
       <details className="admin-ops-more">
@@ -618,7 +583,7 @@ export default function ExportTab({ validationStatus: propValidationStatus }: Ex
                 const rowCount = entry.changes?.rowCount ?? entry.changes?.resources;
                 return (
                   <tr key={entry.id}>
-                    <td>{isDatabaseExport ? "Database snapshot" : "Catalog"}</td>
+                    <td>{isDatabaseExport ? "Catalog snapshot" : "Catalog"}</td>
                     <td className="admin-ops-table__mono">{format}</td>
                     <td><StatusChip status="Completed" /></td>
                     <td className="admin-ops-table__mono">

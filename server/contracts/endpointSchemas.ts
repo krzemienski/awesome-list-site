@@ -24,6 +24,7 @@
  */
 import { z } from "zod";
 import { RESOURCE_KIND_VALUES } from "@shared/resourceKinds";
+import { RESOURCE_FORMAT_VALUES, RESOURCE_PROVIDER_VALUES, RESOURCE_SKILL_LEVEL_VALUES, RESOURCE_SEARCH_SORT_VALUES } from "@shared/resourceFacets";
 import { setRouteQuerySchema, setRouteResponseSchema } from "./install";
 
 // ---------------------------------------------------------------------------
@@ -59,6 +60,22 @@ const resourceKindFields = {
   resolvedKind: resourceKindSchema,
 } as const;
 
+const publicMetadataSchema = z.object({
+  tags: z.array(z.string()).optional(),
+  ogImage: z.string().optional(),
+  ogImageBlurhash: z.string().optional(),
+  favicon: z.string().optional(),
+  siteName: z.string().optional(),
+  author: z.string().optional(),
+  scrapedTitle: z.string().optional(),
+  scrapedDescription: z.string().optional(),
+  ogTitle: z.string().optional(),
+  ogDescription: z.string().optional(),
+  twitterCard: z.string().optional(),
+  featured: z.union([z.boolean(), z.enum(["true", "false"])]).optional(),
+  urlScraped: z.union([z.boolean(), z.enum(["true", "false"])]).optional(),
+}).strict();
+
 /**
  * A public resource row after `stripInternalResourceFields`. We only assert
  * the stable, client-critical keys; extra columns are allowed via passthrough.
@@ -69,6 +86,7 @@ const publicResourceSchema = z
     title: z.string(),
     url: z.string(),
     status: z.string(),
+    metadata: publicMetadataSchema.optional(),
     ...resourceKindFields,
   })
   .passthrough();
@@ -256,6 +274,7 @@ const singleResourceResponseSchema = z
     status: z.string(),
     category: z.string().nullable().optional(),
     subcategory: z.string().nullable().optional(),
+    metadata: publicMetadataSchema.optional(),
     ...resourceKindFields,
   })
   .passthrough();
@@ -371,6 +390,38 @@ const awesomeListListingQuerySchema = z.object({
   subcategory: z.string().min(1).max(512).optional(),
   subSubcategory: z.string().min(1).max(512).optional(),
   general: z.literal("1").optional(),
+  kind: resourceKindSchema.optional(),
+});
+
+const boundedQueryInteger = (min: number, max: number) =>
+  z.string().regex(/^\d+$/).refine((value) => Number(value) >= min && Number(value) <= max)
+    .describe(`Integer from ${min} to ${max}`);
+const resourcesQuerySchema = z.object({
+  q: z.string().optional().describe("Search text; takes precedence over search"),
+  search: z.string().optional().describe("Alias for q"),
+  category: z.string().optional().describe("Category name or slug"),
+  subcategory: z.string().optional().describe("Subcategory name or slug"),
+  subSubcategory: z.string().optional(),
+  generalScope: z.enum(["category", "subcategory"]).optional(),
+  tags: z.union([z.string(), z.array(z.string())]).optional().describe("Comma-separated or repeated tags"),
+  tag: z.union([z.string(), z.array(z.string())]).optional().describe("Alias for tags; combines with tags"),
+  provider: z.enum(RESOURCE_PROVIDER_VALUES).optional(),
+  format: z.enum(RESOURCE_FORMAT_VALUES).optional(),
+  skillLevel: z.enum(RESOURCE_SKILL_LEVEL_VALUES).optional(),
+  kind: resourceKindSchema.optional(),
+  sort: z.enum(RESOURCE_SEARCH_SORT_VALUES).optional(),
+  facets: z.enum(["true", "false"]).optional(),
+  status: z.enum(["approved", "pending", "rejected"]).optional().describe("Default approved; other statuses require admin"),
+  page: boundedQueryInteger(1, 2147483647).optional(),
+  limit: boundedQueryInteger(1, 100).optional(),
+  offset: boundedQueryInteger(0, 2147483647).optional(),
+  cursor: boundedQueryInteger(0, 2147483647).optional().describe("Alias for offset; offset takes precedence"),
+});
+const searchQuerySchema = z.object({
+  q: z.string().optional(),
+  search: z.string().optional().describe("Alias for q"),
+  limit: z.string().optional().describe("Default 100; numeric values clamped to 1–200"),
+  offset: boundedQueryInteger(0, 2147483647).optional(),
 });
 // ---------------------------------------------------------------------------
 // Contact (docs/CONTACT-VARIANTS.md "Backend"; client type ContactPublicConfig)
@@ -479,6 +530,21 @@ export function registerCoreEndpointSchemas(): void {
     description: "Paginated list of approved public resources with pagination metadata",
     schema: resourcesListResponseSchema,
   });
+  setRouteQuerySchema("get", "/api/resources", {
+    name: "ResourcesQuery",
+    schema: resourcesQuerySchema,
+  });
+  setRouteQuerySchema("get", "/api/search", {
+    name: "SearchQuery",
+    schema: searchQuerySchema,
+  });
+  for (const path of ["/api/tags", "/api/public/tags"]) {
+    setRouteResponseSchema("get", path, {
+      name: "ApprovedResourceTagsResponse",
+      description: "Canonical tags and usage counts from approved resource metadata",
+      schema: z.object({ total: z.number().int(), tags: z.array(z.object({ tag: z.string(), count: z.number().int() })) }),
+    });
+  }
 
   setRouteResponseSchema("get", "/api/recommendations", {
     name: "RecommendationsResponse",

@@ -461,7 +461,7 @@ export default function PendingEdits() {
                       {edit.claudeMetadata && (
                         <span className="queue-review-sub queue-review-ai">
                           <Sparkles className="h-3 w-3" aria-hidden="true" />
-                          AI {Math.round((edit.claudeMetadata.confidence || 0) * 100)}%
+                          Unverified legacy analysis
                         </span>
                       )}
                     </td>
@@ -582,13 +582,13 @@ export default function PendingEdits() {
                 <div>
                   <h3 className="font-semibold mb-2 flex items-center gap-2">
                     <Sparkles className={"h-4 w-4 text-[var(--status-info-2)]" /* DS-OK: violet info (DS chart/info constant) */} />
-                    AI Analysis
+                    Unverified legacy analysis
                   </h3>
                   <div className={"bg-[var(--status-info-2)]/10 rounded-lg p-3 space-y-2" /* DS-OK: violet info (DS chart/info constant) */}>
                     <div className="flex items-center justify-between">
-                      <span className="text-sm font-medium">Confidence</span>
+                      <span className="text-sm font-medium">Provenance</span>
                       <Badge variant="secondary">
-                        {Math.round((selectedEdit.claudeMetadata.confidence || 0) * 100)}%
+                        Unverified — not trusted AI output
                       </Badge>
                     </div>
                     {selectedEdit.claudeMetadata.keyTopics && (

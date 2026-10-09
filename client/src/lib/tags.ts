@@ -24,3 +24,12 @@ export function parseTagsParam(params: URLSearchParams): string[] {
 export function normalizeTag(tag: string): string {
   return normalizeTagFilter(tag);
 }
+
+/** Catalog tags live in metadata; normalize options and predicates identically. */
+export function resourceTags(resource: { metadata?: unknown; tags?: string[] }): string[] {
+  const metadata = resource.metadata as { tags?: unknown } | undefined;
+  const tags = metadata?.tags ?? resource.tags;
+  return Array.isArray(tags)
+    ? [...new Set(tags.filter((tag): tag is string => typeof tag === "string").map(normalizeTag).filter(Boolean))]
+    : [];
+}

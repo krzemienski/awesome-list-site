@@ -43,7 +43,7 @@ function toResearchNote(job: ResearchJob, now = Date.now()) {
  * empty grid rather than invented notes.
  */
 export function ResearchWorkspace() {
-  const [selectedJob, setSelectedJob] = useState<ResearchJob | null>(null);
+  const [selectedJobId, setSelectedJobId] = useState<number | null>(null);
   const noteTriggerRef = useRef<HTMLButtonElement | null>(null);
   const { data, isError, isLoading } = useQuery<{ jobs: ResearchJob[]; total: number }>({
     queryKey: ["/api/researcher/jobs", { limit: RESEARCH_WORKSPACE_LIMIT }],
@@ -53,6 +53,19 @@ export function ResearchWorkspace() {
       return res.json();
     },
     staleTime: 30_000,
+    refetchInterval: 5_000,
+    refetchOnWindowFocus: true,
+  });
+  const { data: selectedJob, isError: detailError } = useQuery<ResearchJob>({
+    queryKey: ["/api/researcher/jobs", selectedJobId],
+    enabled: selectedJobId !== null,
+    queryFn: async () => {
+      const res = await fetch(`/api/researcher/jobs/${selectedJobId}`, { credentials: "include" });
+      if (!res.ok) throw new ApiError(res.status, `${res.status}: ${await res.text()}`);
+      return res.json();
+    },
+    refetchInterval: 5_000,
+    refetchOnWindowFocus: true,
   });
   const notes = (data?.jobs ?? []).map((job) => toResearchNote(job));
 
@@ -60,7 +73,7 @@ export function ResearchWorkspace() {
     <section className="admin-research-panel" aria-labelledby="admin-research-heading" data-testid="research-review-panel">
       <div className="card admin-research-workspace">
         <h2 id="admin-research-heading">Research workspace</h2>
-        <p>Drafts, notes, and research-in-progress. Promote to &quot;Approvals&quot; once ready.</p>
+        <p>Read-only briefs from the latest four research jobs. Open a brief to review its candidates in the researcher.</p>
         {isError ? (
           <p role="alert" className="admin-research-notes__status" data-testid="research-notes-error">
             Research notes are unavailable right now.
@@ -85,7 +98,7 @@ export function ResearchWorkspace() {
                 className="admin-research-note__open w-full text-left"
                 onClick={(event) => {
                   noteTriggerRef.current = event.currentTarget;
-                  if (job) setSelectedJob(job);
+                  if (job) setSelectedJobId(job.id);
                 }}
                 aria-haspopup="dialog"
                 aria-label={`Open research note: ${note.title}`}
@@ -103,9 +116,9 @@ export function ResearchWorkspace() {
         </div>
       </div>
       <Dialog
-        open={selectedJob !== null}
+        open={selectedJobId !== null}
         onOpenChange={(open) => {
-          if (!open) setSelectedJob(null);
+          if (!open) setSelectedJobId(null);
         }}
       >
         <DialogContent
@@ -126,8 +139,13 @@ export function ResearchWorkspace() {
                 : "Read-only research note details"}
             </DialogDescription>
           </DialogHeader>
+          {detailError && <p role="alert">Research details could not be refreshed. Please try again.</p>}
+          {!selectedJob && !detailError && <p role="status">Loading research details…</p>}
           {selectedJob && (
             <div className="space-y-4">
+              <a className="text-primary underline" href={`/admin/researcher?jobId=${selectedJob.id}`}>
+                Review candidates for job #{selectedJob.id}
+              </a>
               <div>
                 <h3 className="mb-2 text-sm font-semibold">Full research brief</h3>
                 <div

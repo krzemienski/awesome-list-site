@@ -111,7 +111,12 @@ export class EnrichmentRepository {
   async updateEnrichmentJob(id: number, data: Partial<EnrichmentJob>): Promise<EnrichmentJob> {
     const [job] = await db
       .update(enrichmentJobs)
-      .set({ ...data, updatedAt: new Date() })
+      .set({
+        ...data,
+        ...(data.status ? { status: sql`case when ${enrichmentJobs.status} = 'cancelled' then 'cancelled' else ${data.status} end` } : {}),
+        ...(data.completedAt ? { completedAt: sql`case when ${enrichmentJobs.status} = 'cancelled' then ${enrichmentJobs.completedAt} else ${data.completedAt.toISOString()}::timestamp end` } : {}),
+        updatedAt: new Date()
+      })
       .where(eq(enrichmentJobs.id, id))
       .returning();
     return job;
@@ -129,10 +134,12 @@ export class EnrichmentRepository {
     queueItems: InsertEnrichmentQueue[]
   ): Promise<void> {
     await db.transaction(async (tx) => {
-      await tx
+      const [initialized] = await tx
         .update(enrichmentJobs)
         .set({ ...data, updatedAt: new Date() })
-        .where(eq(enrichmentJobs.id, jobId));
+        .where(and(eq(enrichmentJobs.id, jobId), eq(enrichmentJobs.status, 'pending')))
+        .returning({ id: enrichmentJobs.id });
+      if (!initialized) throw new Error('Enrichment job is no longer pending');
       for (let i = 0; i < queueItems.length; i += 500) {
         await tx.insert(enrichmentQueue).values(queueItems.slice(i, i + 500));
       }
@@ -144,14 +151,20 @@ export class EnrichmentRepository {
    * @param id - Job ID to cancel
    */
   async cancelEnrichmentJob(id: number): Promise<void> {
-    await db
+    const [changed] = await db
       .update(enrichmentJobs)
       .set({
         status: 'cancelled',
         completedAt: new Date(),
         updatedAt: new Date()
       })
-      .where(eq(enrichmentJobs.id, id));
+      .where(and(eq(enrichmentJobs.id, id), inArray(enrichmentJobs.status, ['pending', 'processing'])))
+      .returning({ id: enrichmentJobs.id });
+    if (!changed) {
+      const job = await this.getEnrichmentJob(id);
+      if (!job) throw Object.assign(new Error('Job not found'), { name: 'JobNotFoundError' });
+      if (job.status !== 'cancelled') throw Object.assign(new Error('Only active jobs can be cancelled'), { name: 'JobConflictError' });
+    }
   }
 
   /**

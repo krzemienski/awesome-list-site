@@ -50,6 +50,7 @@ interface SyncQueueItem {
   action: string;
   status: string;
   errorMessage?: string;
+  importResult?: { imported?: number; updated?: number; errors?: number; errorMessages?: string[] };
   createdAt: string;
   processedAt?: string;
 }
@@ -103,6 +104,8 @@ export default function GitHubSyncPanel() {
     refetch: refetchSyncHistory,
   } = useQuery<SyncHistory[]>({
     queryKey: ['/api/github/sync-history'],
+    staleTime: 0,
+    refetchOnWindowFocus: true,
   });
 
   const {
@@ -113,7 +116,18 @@ export default function GitHubSyncPanel() {
     refetch: refetchSyncQueue,
   } = useQuery<SyncQueueResponse>({
     queryKey: ['/api/github/sync-status'],
+    staleTime: 0,
+    refetchOnWindowFocus: true,
+    refetchInterval: (query) => query.state.data?.items.some(
+      (item) => item.status === 'pending' || item.status === 'processing'
+    ) ? 3000 : false,
   });
+
+  useEffect(() => {
+    if (syncQueueData) {
+      void queryClient.invalidateQueries({ queryKey: ['/api/github/sync-history'] });
+    }
+  }, [syncQueueData, queryClient]);
 
   const importMutation = useMutation({
     mutationFn: async () => {
@@ -483,7 +497,8 @@ export default function GitHubSyncPanel() {
                           </StatusChip>
                         </div>
                         {/* Run16 BUG-015: failed jobs must show WHY they failed. */}
-                        {item.status === 'failed' && item.errorMessage && (
+                        {item.importResult && <p>Imported: {item.importResult.imported ?? 0}; updated: {item.importResult.updated ?? 0}; failed: {item.importResult.errors ?? 0}.</p>}
+                        {(item.status === 'failed' || item.status === 'partial') && item.errorMessage && (
                           <p className="text-xs font-mono text-destructive break-words pl-6">
                             {item.errorMessage}
                           </p>

@@ -28,8 +28,15 @@ authentication (free tier) or with an API key for higher limits. Only
 | GET | `/api/public/resources` | List approved resources (paginated, filterable) |
 | GET | `/api/public/resources/:id` | Get one approved resource by numeric ID |
 | GET | `/api/public/categories` | List all categories |
-| GET | `/api/public/tags` | List all tags |
+| GET | `/api/public/tags` | Approved-resource tags with usage counts |
 | GET | `/api/public/me` | Verify an API key (requires `Authorization` header) |
+
+`GET /api/public/tags` shares the catalog `/api/tags` contract:
+`{ "total": number, "tags": [{ "tag": string, "count": number }] }`.
+Tags come from approved resources' `metadata.tags`, with lowercase and
+whitespace/underscore-to-hyphen normalization. Results are ordered by count
+descending, then tag ascending. Use a returned tag with
+`GET /api/resources?tags=open-source` to browse matching resources.
 
 ### List resources — query parameters
 

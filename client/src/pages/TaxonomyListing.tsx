@@ -43,11 +43,7 @@ import { trackCategoryView, trackFilterUsage, trackSearch, trackSortChange, trac
 
 const PAGE_SIZE = 24;
 type Props = { level: ListingLevel };
-const categoryMarks: Record<string, string> = {
-  "community-events": "◈", "encoding-codecs": "◇", "general-tools": "◆",
-  "infrastructure-delivery": "▣", "intro-learning": "▤", "media-tools": "▥",
-  "players-clients": "▶", "protocols-transport": "⟁", "standards-industry": "◉",
-};
+import { CATEGORY_GLYPHS as categoryMarks } from "@/lib/category-glyph";
 
 const CANONICAL_SORTS = new Set(["default", "name-asc", "name-desc"]);
 
@@ -539,10 +535,10 @@ export default function TaxonomyListing({ level }: Props) {
       ? subcategorySeoTitleCore(name, parentCategory?.name ?? "", parentCategory?.slug)
       : subSubcategorySeoTitleCore(name, parentSubcategory?.name);
   const seoDescription = level === "category"
-    ? categorySeoDescription(name, slug, listingData.totalAll)
+    ? categorySeoDescription(name, slug, total)
     : level === "subcategory"
-      ? subcategorySeoDescription(name, parentCategory?.name ?? "", listingData.totalAll)
-      : subSubcategorySeoDescription(name, parentSubcategory?.name ?? "", listingData.totalAll);
+      ? subcategorySeoDescription(name, parentCategory?.name ?? "", total)
+      : subSubcategorySeoDescription(name, parentSubcategory?.name ?? "", total);
   const filterState = {
     category: "",
     subcategory: "",

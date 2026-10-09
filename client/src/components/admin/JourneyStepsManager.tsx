@@ -1,4 +1,5 @@
-import { useState, useMemo, useEffect } from "react";
+import { useState, useMemo, useEffect, useRef } from "react";
+import { queryUnavailableReason } from "@/lib/query-availability";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { apiRequest, ApiError } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
@@ -112,7 +113,7 @@ function ResourcePicker({
   const [query, setQuery] = useState("");
   const [open, setOpen] = useState(false);
 
-  const { data, isFetching } = useQuery<{ resources: ResourceLite[]; total: number }>({
+  const resourcesQuery = useQuery<{ resources: ResourceLite[]; total: number }>({
     queryKey: ["/api/resources", { search: query, limit: 10 }],
     queryFn: async () => {
       const params = new URLSearchParams({ limit: "10" });
@@ -125,6 +126,8 @@ function ResourcePicker({
     },
     enabled: open,
   });
+  const { data, isFetching } = resourcesQuery;
+  const unavailable = queryUnavailableReason(resourcesQuery);
 
   const { data: selectedResource } = useQuery<ResourceLite | null>({
     queryKey: ["/api/resources/picker", value],
@@ -181,10 +184,16 @@ function ResourcePicker({
             {isFetching && (
               <p className="text-xs text-muted-foreground p-2">Searching…</p>
             )}
-            {!isFetching && (data?.resources?.length ?? 0) === 0 && (
+            {unavailable && (
+              <div role="alert" className="p-2 text-sm">
+                {unavailable === "offline" ? "You're offline. Reconnect to search resources." : "Resources could not be loaded."}
+                <Button type="button" variant="outline" onClick={() => void resourcesQuery.refetch()}>Retry</Button>
+              </div>
+            )}
+            {!unavailable && !isFetching && data && data.resources.length === 0 && (
               <p className="text-xs text-muted-foreground p-2">No results.</p>
             )}
-            {data?.resources?.map((r) => (
+            {!unavailable && data?.resources?.map((r) => (
               <button
                 key={r.id}
                 type="button"
@@ -215,6 +224,8 @@ function StepEditor({
   onSubmit,
   isPending,
   showResourcePicker = true,
+  targetId,
+  error,
 }: {
   open: boolean;
   onOpenChange: (open: boolean) => void;
@@ -224,12 +235,16 @@ function StepEditor({
   onSubmit: (form: StepFormState) => void;
   isPending: boolean;
   showResourcePicker?: boolean;
+  targetId?: number;
+  error?: string;
 }) {
   const [form, setForm] = useState<StepFormState>(initial);
+  const initialized = useRef<{ open: boolean; targetId?: number }>({ open: false });
 
   useEffect(() => {
-    if (open) setForm(initial);
-  }, [open, initial]);
+    if (open && (!initialized.current.open || initialized.current.targetId !== targetId)) setForm(initial);
+    initialized.current = { open, targetId };
+  }, [open, initial, targetId]);
 
   const canSubmit = form.title.trim().length > 0 && !isPending;
 
@@ -243,6 +258,7 @@ function StepEditor({
           </DialogDescription>
         </DialogHeader>
         <div className="space-y-4">
+          {error && <p role="alert" className="text-sm text-destructive">{error}</p>}
           <div className="space-y-2">
             <Label htmlFor="step-title">Title *</Label>
             <Input
@@ -324,7 +340,7 @@ function StepsDialog({
   const queryClient = useQueryClient();
   const journeyId = journey.id;
 
-  const { data, isLoading } = useQuery<{ steps: JourneyStep[] }>({
+  const stepsQuery = useQuery<{ steps: JourneyStep[] }>({
     queryKey: ["/api/admin/journeys", journeyId, "steps"],
     queryFn: async () => {
       const res = await fetch(`/api/admin/journeys/${journeyId}/steps`, {
@@ -335,6 +351,8 @@ function StepsDialog({
     },
     enabled: open,
   });
+  const { data, isLoading } = stepsQuery;
+  const unavailable = queryUnavailableReason(stepsQuery);
 
   const steps = useMemo(() => data?.steps ?? [], [data]);
   // Run16 BUG-013: render LOGICAL steps (rows grouped by stepNumber), not raw
@@ -364,8 +382,6 @@ function StepsDialog({
       setCreateOpen(false);
       invalidate();
     },
-    onError: (err: Error) =>
-      toast({ title: "Could not add step", description: err.message, variant: "destructive" }),
   });
 
   // Group edit: title/description/isOptional apply to EVERY row of the logical
@@ -373,25 +389,19 @@ function StepsDialog({
   // where the picker is shown and resourceId is editable).
   const updateMutation = useMutation({
     mutationFn: async ({ group, form }: { group: StepGroup; form: StepFormState }) => {
-      for (const row of group.rows) {
-        await apiRequest(`/api/admin/journeys/${journeyId}/steps/${row.id}`, {
+        await apiRequest(`/api/admin/journeys/${journeyId}/steps/${group.rows[0].id}?group=true`, {
           method: "PATCH",
           body: JSON.stringify({
             title: form.title,
             description: form.description || null,
-            resourceId: group.rows.length === 1 ? form.resourceId : row.resourceId,
+            ...(group.rows.length === 1 ? { resourceId: form.resourceId } : {}),
             isOptional: form.isOptional,
           }),
         });
-      }
     },
     onSuccess: () => {
       toast({ title: "Step saved" });
       setEditingGroup(null);
-      invalidate();
-    },
-    onError: (err: Error) => {
-      toast({ title: "Could not save step", description: err.message, variant: "destructive" });
       invalidate();
     },
   });
@@ -400,11 +410,9 @@ function StepsDialog({
   // remaining steps group-aware.
   const deleteGroupMutation = useMutation({
     mutationFn: async (group: StepGroup) => {
-      for (const row of group.rows) {
-        await apiRequest(`/api/admin/journeys/${journeyId}/steps/${row.id}`, {
+        await apiRequest(`/api/admin/journeys/${journeyId}/steps/${group.rows[0].id}?group=true`, {
           method: "DELETE",
         });
-      }
     },
     onSuccess: () => {
       toast({ title: "Step deleted" });
@@ -467,6 +475,7 @@ function StepsDialog({
         <div className="flex justify-end">
           <Button
             onClick={() => setCreateOpen(true)}
+            disabled={!!unavailable || !data}
             data-testid="add-step-button"
           >
             <Plus className="h-4 w-4 mr-1" />
@@ -481,12 +490,18 @@ function StepsDialog({
               <Skeleton className="h-20 w-full" />
             </>
           )}
-          {!isLoading && steps.length === 0 && (
+          {unavailable && (
+            <div role="alert" className="text-sm">
+              {unavailable === "offline" ? "You're offline. Reconnect to load journey steps." : "Journey steps could not be loaded."}
+              <Button type="button" variant="outline" onClick={() => void stepsQuery.refetch()}>Retry</Button>
+            </div>
+          )}
+          {!unavailable && !isLoading && data && steps.length === 0 && (
             <p className="text-sm text-muted-foreground text-center py-6">
               No steps yet — click "Add step" to create the first one.
             </p>
           )}
-          {groups.map((group, index) => {
+          {!unavailable && groups.map((group, index) => {
             const primary = group.rows[0];
             const linkedRows = group.rows.filter((r) => r.resourceId !== null);
             // C3-V5B-03: name the step in each control so the repeated icon
@@ -608,10 +623,13 @@ function StepsDialog({
           submitLabel={createMutation.isPending ? "Adding…" : "Add step"}
           onSubmit={(form) => createMutation.mutate(form)}
           isPending={createMutation.isPending}
+          error={createMutation.error?.message}
         />
 
         <StepEditor
           open={editingGroup !== null}
+          targetId={editingGroup?.rows[0].id}
+          error={updateMutation.error?.message}
           onOpenChange={(o) => {
             if (!o) setEditingGroup(null);
           }}

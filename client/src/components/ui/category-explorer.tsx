@@ -11,6 +11,7 @@ import { Link, useLocation } from "wouter";
 import { Category, Resource } from "@/types/awesome-list";
 import { cn } from "@/lib/utils";
 import { writeFilterParams, usePopstateParams } from "@/lib/url-filter-state";
+import { resourceTags } from "@/lib/tags";
 
 interface CategoryExplorerProps {
   categories: Category[];
@@ -129,7 +130,7 @@ export default function CategoryExplorer({ categories, resources, className }: C
   const allTags = useMemo(() => {
     const tags = new Set<string>();
     resources.forEach(resource => {
-      resource.tags?.forEach(tag => tags.add(tag));
+      resourceTags(resource).forEach(tag => tags.add(tag));
     });
     return Array.from(tags).sort();
   }, [resources]);
@@ -150,7 +151,7 @@ export default function CategoryExplorer({ categories, resources, className }: C
 
       const matchesTags = selectedTags.length === 0 ||
         allResources.some(resource =>
-          resource.tags?.some(tag => selectedTags.includes(tag))
+          resourceTags(resource).some(tag => selectedTags.includes(tag))
         );
 
       return matchesSearch && matchesTags;
@@ -192,7 +193,7 @@ export default function CategoryExplorer({ categories, resources, className }: C
         resource.description.toLowerCase().includes(q);
       const matchesTags =
         selectedTags.length === 0 ||
-        resource.tags?.some((tag) => selectedTags.includes(tag));
+        resourceTags(resource).some((tag) => selectedTags.includes(tag));
       return matchesSearch && matchesTags;
     });
   };

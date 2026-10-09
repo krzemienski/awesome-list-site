@@ -1,0 +1,14 @@
+{
+  "extends": "./tsconfig.json",
+  "include": [
+    "client/src/**/*", "server/**/*", "shared/**/*",
+    "scripts/**/*.ts", "tests/**/*.ts", "tests/**/*.tsx",
+    "*.ts", "artifacts/awesome-video-design-system/src/**/*",
+    "artifacts/awesome-video-design-system/*.ts"
+  ],
+  "exclude": [
+    "node_modules", "**/node_modules", "dist", "**/dist",
+    "build", ".cache", "scripts/archive"
+  ],
+  "compilerOptions": { "incremental": false }
+}

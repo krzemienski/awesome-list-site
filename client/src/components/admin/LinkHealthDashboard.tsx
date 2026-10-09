@@ -109,12 +109,12 @@ export default function LinkHealthDashboard() {
   const [confirmRun, setConfirmRun] = useState(false);
   const [showDetails, setShowDetails] = useState(false);
 
-  const { data: statusData, isLoading: isStatusLoading } = useQuery<LinkHealthStatusResponse>({
+  const { data: statusData, isLoading: isStatusLoading, isError: statusError, refetch: retryStatus } = useQuery<LinkHealthStatusResponse>({
     queryKey: ['/api/admin/link-health/status'],
     refetchInterval: isPolling ? 3000 : 60000
   });
 
-  const { data: historyData } = useQuery<LinkHealthHistoryResponse>({
+  const { data: historyData, isError: historyError, refetch: retryHistory } = useQuery<LinkHealthHistoryResponse>({
     queryKey: ['/api/admin/link-health/history'],
     // R5-037: refresh admin data when the operator returns to the tab.
     staleTime: 30_000,
@@ -125,7 +125,7 @@ export default function LinkHealthDashboard() {
   // summary counters and the table rows are driven by the SAME dataset. The old
   // server-filtered query made the counters (from the job record) reconcile
   // against a different/stale set than the visible rows.
-  const { data: brokenLinksData } = useQuery<BrokenLinksResponse>({
+  const { data: brokenLinksData, isError: linksError, refetch: retryLinks } = useQuery<BrokenLinksResponse>({
     queryKey: ['/api/admin/link-health/broken-links'],
     queryFn: () => apiRequest('/api/admin/link-health/broken-links'),
     // R5-037: refresh admin data when the operator returns to the tab.
@@ -136,7 +136,7 @@ export default function LinkHealthDashboard() {
   // BUG-014 (run25): current approved-catalog size, used to state the check's
   // honest scope (a completed job's totalLinks snapshots the catalog at check
   // start and goes stale as the catalog grows).
-  const { data: coverageData } = useQuery<{ approvedTotal: number }>({
+  const { data: coverageData, isError: coverageError, refetch: retryCoverage } = useQuery<{ approvedTotal: number }>({
     queryKey: ['/api/admin/enrichment/coverage'],
     staleTime: 60_000,
   });
@@ -302,6 +302,16 @@ export default function LinkHealthDashboard() {
 
   return (
     <div className="ops-link-health">
+      {(statusError || historyError || linksError || coverageError) && (
+        <div role="alert" className="card p-4">
+          <p>Link health data could not be refreshed. Previously loaded results below may be stale; missing counts are not evidence of healthy links.</p>
+          {statusError && <Button onClick={() => void retryStatus()}>Retry scan status</Button>}
+          {historyError && <Button onClick={() => void retryHistory()}>Retry scan history</Button>}
+          {linksError && <Button onClick={() => void retryLinks()}>Retry problem links</Button>}
+          {coverageError && <Button onClick={() => void retryCoverage()}>Retry catalog coverage</Button>}
+        </div>
+      )}
+      {((statusError && !statusData) || (historyError && !historyData) || (linksError && !brokenLinksData) || (coverageError && !coverageData)) ? <p>Link health results unavailable until the failed requests recover.</p> : <>
       <div className="ops-link-health__stat-grid" aria-label="Link health status summary">
         {([
           ["Healthy", summaryCounts.healthy, statusTone("healthy")],
@@ -342,6 +352,12 @@ export default function LinkHealthDashboard() {
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
+          {latestJob?.status === 'failed' && (
+            <div role="alert">
+              <p>Scan failed: {latestJob.errorMessage || 'No failure reason was recorded.'}</p>
+              <p>Started {formatAdminDateTime(latestJob.createdAt)}. Results below are from the previous completed scan. Use Run Check to try again.</p>
+            </div>
+          )}
           {latestJob ? (
             <>
               {isActiveJob && (
@@ -741,6 +757,7 @@ export default function LinkHealthDashboard() {
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
+    </>}
     </div>
   );
 }
