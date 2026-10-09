@@ -31,6 +31,7 @@
  *     - GET  /api/admin/validation-status
  *     - GET  /api/admin/link-health/status
  *     - POST /api/admin/link-health/run
+ *     - DELETE /api/admin/link-health/jobs/:id
  *     - GET  /api/admin/link-health/history
  *     - GET  /api/admin/link-health/broken-links
  *     - POST /api/admin/seed-database
@@ -72,8 +73,7 @@ import { fetchAwesomeLists, searchAwesomeLists } from "../../github-api";
 import { syncService } from "../../github/syncService";
 import { AwesomeListFormatter } from "../../github/formatter";
 import { validateAwesomeList, formatValidationReport } from "../../validation/awesomeLint";
-import { checkResourceLinks, formatLinkCheckReport } from "../../validation/linkChecker";
-import { seedDatabase } from "../../seed";
+import { seedDatabase, SeedAbortedError } from "../../seed";
 import { buildCanonicalTagMap, canonicalizeTagArray } from "../../lib/tagCanonicalize";
 import { getPublicCacheValue, invalidatePublicCache } from "../../cache/publicCache";
 import {
@@ -224,7 +224,7 @@ export function registerExportLinkHealthRoutes(
       await startHeavyWork('github-sync', async () => {
         await githubSyncRepo.updateGithubSyncStatus(queueItem.id, 'processing');
         try {
-          const result = await syncService.importFromGitHub(repositoryUrl, options);
+          const result = await syncService.importFromGitHub(repositoryUrl, options, { queueRowOwnedByCaller: true });
           console.log('GitHub import completed:', result);
           const completed = result.errors.length === 0 || result.imported > 0 || result.updated > 0;
           await githubSyncRepo.updateGithubSyncStatus(
@@ -364,18 +364,34 @@ export function registerExportLinkHealthRoutes(
       // fields; full detail stays available per-row via /sync-status/:id.
       res.json({
         total: queueItems.length,
-        items: queueItems.map(q => ({
+        items: queueItems.map(q => {
+          // F13: one normalized import summary (queued rows store counts as
+          // one-element arrays) carrying the outcome and every item error.
+          const md = (q.metadata ?? {}) as Record<string, any>;
+          const count = (v: unknown): number => Array.isArray(v) ? (Number(v[0]) || 0) : (Number(v) || 0);
+          const errorMessages: string[] = Array.isArray(md.errorMessages) ? md.errorMessages.map(String) : [];
+          return {
           id: q.id,
           repositoryUrl: q.repositoryUrl,
           branch: q.branch,
           action: q.action,
-          status: (q.metadata as any)?.outcome === 'partial' ? 'partial' : q.status,
-          errorMessage: q.errorMessage,
-          importResult: q.action === 'import' ? q.metadata : undefined,
+          status: md.outcome === 'partial' ? 'partial' : q.status,
+          errorMessage: q.errorMessage ?? (errorMessages.length ? errorMessages.join('; ') : null),
+          importResult: q.action === 'import' && q.status !== 'pending' && q.status !== 'processing'
+            ? {
+                imported: count(md.imported),
+                updated: count(md.updated),
+                skipped: count(md.skipped),
+                errors: typeof md.errors === 'number' ? md.errors : errorMessages.length,
+                outcome: typeof md.outcome === 'string' ? md.outcome : undefined,
+                errorMessages,
+              }
+            : undefined,
           resourceCount: Array.isArray(q.resourceIds) ? q.resourceIds.length : 0,
           createdAt: q.createdAt,
           processedAt: q.processedAt,
-        }))
+          };
+        })
       });
     } catch (error) {
       console.error('Error fetching sync status:', error);
@@ -437,12 +453,18 @@ export function registerExportLinkHealthRoutes(
             direction: q.action,
             // ADM-03/04: carry the outcome so the UI can badge failed/orphaned
             // rows honestly instead of rendering every row as a success.
-            status: q.status,
+            // F13: a partial import stays partial in history too.
+            status: md.outcome === 'partial' ? 'partial' : q.status,
             commitSha: md.commitSha ?? null,
             // A failure reason is not a commit message; the panel labels
             // errorMessage as "Error".
             commitMessage: md.commitMessage ?? null,
-            errorMessage: q.status === 'failed' ? (q.errorMessage || 'Sync failed') : null,
+            errorMessage: q.status === 'failed'
+              ? (q.errorMessage || 'Sync failed')
+              : md.outcome === 'partial'
+                ? (Array.isArray(md.errorMessages) ? md.errorMessages.join('; ') : (q.errorMessage || null))
+                : null,
+            errorMessages: Array.isArray(md.errorMessages) ? md.errorMessages.map(String) : [],
             commitUrl: null,
             resourcesAdded: added,
             resourcesUpdated: updated,
@@ -476,6 +498,7 @@ export function registerExportLinkHealthRoutes(
           commitSha: h.commitSha,
           commitMessage: h.commitMessage,
           errorMessage: status === 'failed' ? snapshotError(h.snapshot) : status === 'partial' ? ((h.metadata as any)?.errorMessages ?? []).join('; ') : null,
+          errorMessages: Array.isArray((h.metadata as any)?.errorMessages) ? (h.metadata as any).errorMessages.map(String) : [],
           commitUrl: h.commitUrl,
           resourcesAdded: h.resourcesAdded,
           resourcesUpdated: h.resourcesUpdated,
@@ -870,49 +893,26 @@ export function registerExportLinkHealthRoutes(
     }
   });
 
-  // POST /api/admin/check-links - Run link checker on all resources
-  app.post('/api/admin/check-links', isAuthenticated, isAdmin, async (req: any, res) => {
+  // POST /api/admin/check-links - Start the export link check.
+  // F11: this no longer holds one HTTP request open for the whole catalog.
+  // It starts (or reports) the persistent link-health job, so the check is
+  // observable after navigation, has progress, can be cancelled, and ends in
+  // an explicit interrupted state if the server restarts. It checks the
+  // STORED URLs of approved resources — the same URLs the exports write.
+  app.post('/api/admin/check-links', isAuthenticated, isAdmin, async (_req: any, res) => {
     try {
-      const linkCheckReport = await runHeavyWork('link-health', async () => {
-        const resources = await resourceRepo.getAllApprovedResources();
-        const {
-          timeout = 10000,
-          concurrent = 5,
-          retryCount = 1
-        } = req.body;
-        const resourcesToCheck = resources.map(r => ({
-          id: r.id,
-          title: r.title,
-          url: r.url
-        }));
-        return checkResourceLinks(resourcesToCheck, {
-          timeout,
-          concurrent,
-          retryCount
-        });
-      });
-      
-      // Store link check result for later retrieval
-      await adminRepo.storeValidationResult({
-        type: 'link-check',
-        result: linkCheckReport,
-        timestamp: linkCheckReport.timestamp
-      });
-      
-      // Return link check results
-      res.json({
-        totalLinks: linkCheckReport.totalLinks,
-        validLinks: linkCheckReport.validLinks,
-        brokenLinks: linkCheckReport.brokenLinks,
-        redirects: linkCheckReport.redirects,
-        errors: linkCheckReport.errors,
-        summary: linkCheckReport.summary,
-        report: formatLinkCheckReport(linkCheckReport),
-        brokenResources: linkCheckReport.results.filter(r => !r.valid && r.status >= 400)
-      });
+      const { linkHealthService } = await import('../../services/linkHealthService');
+      try {
+        const job = await linkHealthService.startCheck();
+        res.status(202).json({ success: true, started: true, job, scope: 'stored-approved-resource-urls' });
+      } catch (error: any) {
+        if (!error.message?.includes('already running')) throw error;
+        const job = await linkHealthService.getLatestJob();
+        res.status(409).json({ success: false, started: false, message: error.message, job, scope: 'stored-approved-resource-urls' });
+      }
     } catch (error) {
-      console.error('Error checking links:', error);
-      sendOperationalFailure(res, error, 'Failed to check links');
+      console.error('Error starting export link check:', error);
+      sendOperationalFailure(res, error, 'Failed to start link check');
     }
   });
 
@@ -960,6 +960,31 @@ export function registerExportLinkHealthRoutes(
         return res.status(409).json({ success: false, message: error.message });
       }
       sendOperationalFailure(res, error, 'Failed to start link health check');
+    }
+  });
+
+  // DELETE /api/admin/link-health/jobs/:id - Cancel a pending/processing scan
+  // F10: aborts in-flight requests of both passes; completed results of the
+  // previous scan stay served; a new scan can start immediately.
+  app.delete('/api/admin/link-health/jobs/:id', isAuthenticated, isAdmin, async (req, res) => {
+    try {
+      const jobId = Number.parseInt(String(req.params.id), 10);
+      if (!Number.isSafeInteger(jobId) || jobId <= 0) {
+        return res.status(400).json({ success: false, message: 'Invalid job id' });
+      }
+      const { linkHealthService } = await import('../../services/linkHealthService');
+      const outcome = await linkHealthService.cancelJob(jobId);
+      if (outcome === 'not-found') {
+        return res.status(404).json({ success: false, message: 'Link health job not found' });
+      }
+      const job = await linkHealthService.getJob(jobId);
+      if (outcome === 'terminal') {
+        return res.status(409).json({ success: false, message: `Job ${jobId} already finished (${job?.status ?? 'unknown'})`, job });
+      }
+      res.json({ success: true, job });
+    } catch (error) {
+      console.error('Error cancelling link health job:', error);
+      sendOperationalFailure(res, error, 'Failed to cancel link health job');
     }
   });
 
@@ -1015,12 +1040,18 @@ export function registerExportLinkHealthRoutes(
           subcategoriesInserted: result.subcategoriesInserted,
           subSubcategoriesInserted: result.subSubcategoriesInserted,
           resourcesInserted: result.resourcesInserted,
+          resourcesPreserved: result.resourcesPreserved,
         },
         errors: result.errors,
         totalErrors: result.errors.length
       });
     } catch (error: any) {
       console.error('Error seeding database:', error);
+      if (error instanceof SeedAbortedError) {
+        // Nothing was committed; the message says why and that the catalog
+        // is unchanged, so the admin sees the real reason.
+        return res.status(422).json({ success: false, unchanged: true, message: error.message });
+      }
       if (
         error instanceof ServiceUnavailableError ||
         isDatabaseUnavailableError(error)
@@ -1053,31 +1084,31 @@ export function registerExportLinkHealthRoutes(
       
       console.log(`GitHub import completed: ${result.imported} imported, ${result.updated} updated, ${result.skipped} skipped`);
       
-      // If validation failed, return 400 with validation details
-      if (!result.validationPassed && result.errors.length > 0) {
-        return res.status(400).json({
-          success: false,
-          message: 'Import rejected: awesome-lint validation failed',
-          validationPassed: result.validationPassed,
-          validationStats: result.validationStats,
-          validationErrors: result.validationErrors.filter(e => e.severity === 'error'),
-          validationWarnings: result.validationErrors.filter(e => e.severity === 'warning'),
-          errors: result.errors
-        });
-      }
-      
-      res.json({
-        success: true,
+      // F13: awesome-lint is informational on import (syncService never
+      // blocks on it), so a lint-invalid list may already have written rows.
+      // Every result — lint-valid or not — goes through the outcome/count
+      // response below; lint findings ride along as validationErrors.
+      // F13: the direct path reports the same outcome as the queued one — a
+      // run with item errors is partial (or failed), never plain success.
+      const outcome = result.errors.length === 0
+        ? 'completed'
+        : result.imported > 0 || result.updated > 0 ? 'partial' : 'failed';
+      res.status(outcome === 'failed' ? 422 : 200).json({
+        success: outcome === 'completed',
+        outcome,
         imported: result.imported,
         updated: result.updated,
         skipped: result.skipped,
         errors: result.errors,
+        totalErrors: result.errors.length,
         warnings: result.warnings,
         validationPassed: result.validationPassed,
         validationStats: result.validationStats,
         validationErrors: result.validationErrors.filter(e => e.severity === 'error'),
         validationWarnings: result.validationErrors.filter(e => e.severity === 'warning'),
-        message: `Successfully imported ${result.imported} resources from ${repoUrl}`
+        message: outcome === 'completed'
+          ? `Imported ${result.imported} and updated ${result.updated} resources from ${repoUrl}`
+          : `${outcome === 'partial' ? 'Partial import' : 'Import failed'} from ${repoUrl}: ${result.imported} imported, ${result.updated} updated, ${result.errors.length} failed`
       });
     } catch (error: any) {
       console.error('Error importing from GitHub:', error);

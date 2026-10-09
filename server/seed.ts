@@ -1,7 +1,7 @@
 import fetch from 'node-fetch';
 import { db } from "./db";
-import { categories, subcategories, subSubcategories, resources, users, resourceEdits, tags, resourceTags } from "@shared/schema";
-import { eq, sql } from "drizzle-orm";
+import { categories, subcategories, subSubcategories, resources, users, tags, resourceTags } from "@shared/schema";
+import { eq, notInArray, sql } from "drizzle-orm";
 import { mapCategoryName } from "@shared/categoryMapping";
 import { seedJourneyStepsForExisting } from "./cli/seedJourneyStepsForExisting";
 import { invalidatePublicCache } from "./cache/publicCache";
@@ -207,6 +207,8 @@ export interface SeedResult {
   subcategoriesInserted: number;
   subSubcategoriesInserted: number;
   resourcesInserted: number;
+  /** Clear & Re-seed only: resources kept because dependent data references them. */
+  resourcesPreserved: number;
   adminUserCreated: boolean;
   errors: string[];
 }
@@ -262,44 +264,84 @@ async function seedAdminUser(): Promise<boolean> {
 }
 
 /**
+ * A seed run that stopped before committing anything. The message is safe to
+ * show an administrator verbatim and always states that nothing changed.
+ */
+export class SeedAbortedError extends Error {
+  constructor(message: string) {
+    super(message);
+    this.name = 'SeedAbortedError';
+  }
+}
+
+/**
+ * Dependent tables whose rows may be dropped (or unlinked) together with a
+ * replaced resource: derived tag links are rebuilt by the seed itself,
+ * enrichment queue rows are operational job state for the replaced row, and
+ * audit-log rows survive with a NULL resource id (ON DELETE SET NULL). Every
+ * other table referencing resources holds editorial or user data, so the
+ * resources it references are PRESERVED by Clear & Re-seed.
+ */
+const RESEED_REPLACEABLE_DEPENDENTS = new Set(['resource_tags', 'enrichment_queue', 'resource_audit_log']);
+
+/**
  * Main seeding function
  * Populates the database with categories, subcategories, sub-subcategories, and resources
  */
 export async function seedDatabase(options: { clearExisting?: boolean } = {}): Promise<SeedResult> {
   // Download and validate before any write, including admin provisioning.
   const source = process.env.SEED_SOURCE_URL || "https://hack-ski.s3.us-east-1.amazonaws.com/av/recategorized_with_researchers_2010_projects.json";
-  const response = await fetch(source, { signal: AbortSignal.timeout(60_000), size: 50_000_000 });
-  if (!response.ok) throw new Error(`Seed source HTTP ${response.status}; database unchanged`);
-  const awesomeData = await response.json() as {
+  let response: Awaited<ReturnType<typeof fetch>>;
+  try {
+    response = await fetch(source, { signal: AbortSignal.timeout(60_000), size: 50_000_000 });
+  } catch (error: unknown) {
+    const reason = error instanceof Error ? error.message : String(error);
+    throw new SeedAbortedError(`Seed source unavailable (${reason}); database unchanged`);
+  }
+  if (!response.ok) throw new SeedAbortedError(`Seed source HTTP ${response.status}; database unchanged`);
+  let awesomeData: {
     categories?: VideoCategory[];
     projects?: { title: string; homepage: string; description: string; category: string[]; tags?: string[] }[];
   };
-  if (!Array.isArray(awesomeData.categories) || !awesomeData.categories.length ||
+  try {
+    awesomeData = await response.json() as typeof awesomeData;
+  } catch {
+    throw new SeedAbortedError('Seed source is not valid JSON; database unchanged');
+  }
+  if (!awesomeData || !Array.isArray(awesomeData.categories) || !awesomeData.categories.length ||
       !Array.isArray(awesomeData.projects) || !awesomeData.projects.length ||
       awesomeData.categories.some(c => !c || typeof c.id !== 'string' || typeof c.title !== 'string')) {
-    throw new Error("Invalid seed source structure; database unchanged");
+    throw new SeedAbortedError("Invalid seed source structure; database unchanged");
   }
-  if (options.clearExisting && awesomeData.projects.some(p =>
-    !p || typeof p.title !== 'string' || !p.title.trim() ||
-    typeof p.homepage !== 'string' || !/^https?:\/\//.test(p.homepage) ||
-    typeof p.description !== 'string' || !Array.isArray(p.category) || !p.category.length ||
-    p.category.some(id => !awesomeData.categories!.some(c => c.id === id))
-  )) throw new Error('Invalid reseed resource; database unchanged');
-  const apply = async (connection: SeedConnection) => {
-    const result = await applySeed(connection, awesomeData as SeedData, options);
+  if (options.clearExisting) {
+    const invalid = awesomeData.projects.find(p =>
+      !p || typeof p.title !== 'string' || !p.title.trim() ||
+      typeof p.homepage !== 'string' || !/^https?:\/\//.test(p.homepage) ||
+      typeof p.description !== 'string' || !Array.isArray(p.category) || !p.category.length ||
+      p.category.some(id => !awesomeData.categories!.some(c => c.id === id))
+    );
+    if (invalid) {
+      const label = invalid && typeof invalid.title === 'string' ? `"${invalid.title}"` : 'an untitled entry';
+      throw new SeedAbortedError(`Invalid reseed resource ${label}; database unchanged`);
+    }
+  }
+  const apply = async (connection: SeedConnection, preservedResourceIds: number[] = []) => {
+    const result = await applySeed(connection, awesomeData as SeedData, options, preservedResourceIds);
     if (options.clearExisting && result.errors.length) {
-      throw new Error(`Reseed rolled back: ${result.errors.join('; ')}`);
+      throw new SeedAbortedError(`Reseed rolled back, database unchanged: ${result.errors.slice(0, 5).join('; ')}${result.errors.length > 5 ? ` (+${result.errors.length - 5} more)` : ''}`);
     }
     return result;
   };
   const result = options.clearExisting
     ? await db.transaction(async tx => {
-        // Serialize replacement and refuse all dependent data, including cascade
-        // children. Refusal preserves edits, discoveries, bookmarks and journeys
-        // exactly, rather than silently destroying them.
+        // One transaction: any failure rolls the whole replacement back.
+        // Resources referenced by editorial/user data (edits, research
+        // discoveries, journey steps, bookmarks, favorites, interactions,
+        // feedback, notifications, and any future FK) are preserved with
+        // their ids, so no dependent row is deleted or re-pointed.
         await tx.execute(sql`LOCK TABLE resources, categories, subcategories, sub_subcategories IN ACCESS EXCLUSIVE MODE`);
         const refs = await tx.execute(sql`
-          SELECT DISTINCT ns.nspname AS schema, tab.relname AS table, att.attname AS column
+          SELECT DISTINCT ns.nspname AS schema, tab.relname AS table, att.attname AS column, c.confrelid::regclass::text AS target
           FROM pg_constraint c
           JOIN pg_class tab ON tab.oid = c.conrelid
           JOIN pg_namespace ns ON ns.oid = tab.relnamespace
@@ -309,13 +351,22 @@ export async function seedDatabase(options: { clearExisting?: boolean } = {}): P
             AND c.conrelid NOT IN ('resources'::regclass, 'categories'::regclass, 'subcategories'::regclass, 'sub_subcategories'::regclass)
           ORDER BY ns.nspname, tab.relname, att.attname
         `);
-        for (const ref of refs.rows as { schema: string; table: string; column: string }[]) {
+        const preserved = new Set<number>();
+        for (const ref of refs.rows as { schema: string; table: string; column: string; target: string }[]) {
           const table = sql`${sql.identifier(ref.schema)}.${sql.identifier(ref.table)}`;
           await tx.execute(sql`LOCK TABLE ${table} IN SHARE ROW EXCLUSIVE MODE`);
-          const dependent = await tx.execute(sql`SELECT 1 FROM ${table} WHERE ${sql.identifier(ref.column)} IS NOT NULL LIMIT 1`);
-          if (dependent.rows.length) throw new Error(`Reseed refused: ${ref.table}.${ref.column} contains dependent data. Nothing changed; use additive Seed Database instead.`);
+          if (ref.target !== 'resources') {
+            // Taxonomy rows are replaced wholesale; an external reference to
+            // them cannot be preserved, so refuse rather than destroy it.
+            const dependent = await tx.execute(sql`SELECT 1 FROM ${table} WHERE ${sql.identifier(ref.column)} IS NOT NULL LIMIT 1`);
+            if (dependent.rows.length) throw new SeedAbortedError(`Reseed refused: ${ref.table}.${ref.column} references the taxonomy. Nothing changed; use additive Seed Database instead.`);
+            continue;
+          }
+          if (RESEED_REPLACEABLE_DEPENDENTS.has(ref.table)) continue;
+          const ids = await tx.execute(sql`SELECT DISTINCT ${sql.identifier(ref.column)} AS id FROM ${table} WHERE ${sql.identifier(ref.column)} IS NOT NULL`);
+          for (const row of ids.rows as { id: number }[]) preserved.add(Number(row.id));
         }
-        return apply(tx);
+        return apply(tx, Array.from(preserved));
       })
     : await apply(db);
   invalidatePublicCache('seed-mutation');
@@ -327,7 +378,7 @@ type SeedData = {
   projects: { title: string; homepage: string; description: string; category: string[]; tags?: string[] }[];
 };
 
-async function applySeed(db: SeedConnection, awesomeData: SeedData, options: { clearExisting?: boolean }): Promise<SeedResult> {
+async function applySeed(db: SeedConnection, awesomeData: SeedData, options: { clearExisting?: boolean }, preservedResourceIds: number[] = []): Promise<SeedResult> {
   // Replacement invalidation happens only after commit; additive inserts may
   // commit independently and therefore invalidate as they succeed.
   const invalidatePublicCache = (_reason: string) => {
@@ -338,6 +389,7 @@ async function applySeed(db: SeedConnection, awesomeData: SeedData, options: { c
     subcategoriesInserted: 0,
     subSubcategoriesInserted: 0,
     resourcesInserted: 0,
+    resourcesPreserved: 0,
     adminUserCreated: false,
     errors: [],
   };
@@ -350,9 +402,14 @@ async function applySeed(db: SeedConnection, awesomeData: SeedData, options: { c
     // Optional: Clear existing data
     if (options.clearExisting) {
       console.log("🗑️  Clearing existing data...");
-      // Clear tables in correct order respecting foreign key constraints
-      await db.delete(resourceEdits); // Must delete before resources (FK constraint)
-      await db.delete(resources);
+      // Resources referenced by editorial/user data keep their ids (and the
+      // dependent rows keep their links); everything else is replaced.
+      if (preservedResourceIds.length > 0) {
+        await db.delete(resources).where(notInArray(resources.id, preservedResourceIds));
+      } else {
+        await db.delete(resources);
+      }
+      result.resourcesPreserved = preservedResourceIds.length;
       await db.delete(subSubcategories);
       await db.delete(subcategories);
       await db.delete(categories);

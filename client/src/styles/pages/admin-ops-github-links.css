@@ -411,3 +411,46 @@
     transition: none;
   }
 }
+/* F09/F10: latest-scan state banner (running / failed / cancelled). */
+.ops-link-health__job-banner {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem 1rem;
+  padding: 1rem 1.25rem;
+  font-size: 0.8125rem;
+  color: var(--text);
+}
+
+.ops-link-health__job-banner p {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.25rem;
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+
+.ops-link-health__job-banner > div {
+  display: grid;
+  gap: 0.35rem;
+  min-width: 0;
+  flex: 1 1 18rem;
+}
+
+.ops-link-health__job-banner--terminal {
+  /* DS-OK: global semantic WARN status color for a terminal scan state. */
+  border-color: color-mix(in srgb, var(--status-warn) 45%, var(--border));
+}
+
+/* F13: every failed item of a partial/failed GitHub import. */
+.ops-github-panel__error-list {
+  display: grid;
+  gap: 0.25rem;
+  margin: 0;
+  padding-left: 1.25rem;
+  list-style: disc;
+  overflow-wrap: anywhere;
+  font-size: 0.75rem;
+}

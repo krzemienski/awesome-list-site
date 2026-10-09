@@ -35,6 +35,7 @@ interface CommitResult {
 
 export class GitHubClient {
   private octokit: Octokit;
+  private token?: string;
   private rateLimitRemaining: number = 5000;
   private rateLimitReset: Date = new Date();
 
@@ -43,6 +44,7 @@ export class GitHubClient {
       token = process.env.GITHUB_PERSONAL_ACCESS_TOKEN || process.env.GITHUB_PUSH_TOKEN || process.env.GITHUB_TOKEN;
     }
 
+    this.token = token;
     if (!token) {
       console.warn('GitHub token not provided. Limited functionality available.');
       // Create a basic client without authentication for read-only operations
@@ -123,7 +125,12 @@ export class GitHubClient {
         const rawUrl = `https://raw.githubusercontent.com/${owner}/${repo}/refs/heads/${branchName}/${path}`;
         console.log(`Fetching from: ${rawUrl}`);
         
-        const response = await fetch(rawUrl);
+        // Private repositories need the token; a stale token must not break
+        // public imports, so an authenticated miss retries anonymously.
+        let response = await fetch(rawUrl, this.token ? { headers: { Authorization: `token ${this.token}` } } : undefined);
+        if (!response.ok && this.token) {
+          response = await fetch(rawUrl);
+        }
         
         if (response.ok) {
           const content = await response.text();

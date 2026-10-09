@@ -131,6 +131,7 @@ const STATUS_VARIANTS: Record<string, string> = {
   running: "warn",
   warning: "warn",
   stale: "warn",
+  partial: "warn",
   admin: "accent",
   moderator: "warn",
   user: "muted",

@@ -36,6 +36,8 @@ interface SyncHistory {
   commitUrl?: string;
   repositoryUrl?: string;
   errorMessage?: string;
+  /** F13: every per-item error of a partial/failed import. */
+  errorMessages?: string[];
   resourcesAdded: number;
   resourcesUpdated: number;
   resourcesRemoved: number;
@@ -50,7 +52,7 @@ interface SyncQueueItem {
   action: string;
   status: string;
   errorMessage?: string;
-  importResult?: { imported?: number; updated?: number; errors?: number; errorMessages?: string[] };
+  importResult?: { imported?: number; updated?: number; skipped?: number; errors?: number; outcome?: string; errorMessages?: string[] };
   createdAt: string;
   processedAt?: string;
 }
@@ -374,9 +376,10 @@ export default function GitHubSyncPanel() {
               // ADM-03: badge the Last Import/Export by its real outcome — a
               // failed/orphaned sync must not render a green success checkmark.
               const lastSyncFailed = lastSync.status === 'failed';
+              const lastSyncPartial = lastSync.status === 'partial';
               return (
               <Alert variant={lastSyncFailed ? 'destructive' : undefined} data-testid="alert-last-sync">
-                {lastSyncFailed ? <XCircle className="h-4 w-4" /> : <CheckCircle2 className="h-4 w-4" />}
+                {lastSyncFailed || lastSyncPartial ? <XCircle className="h-4 w-4" /> : <CheckCircle2 className="h-4 w-4" />}
                 <AlertDescription className="space-y-2">
                   <div className="flex items-center justify-between">
                     <span className="font-semibold">
@@ -386,6 +389,11 @@ export default function GitHubSyncPanel() {
                       <StatusChip status="failed" data-testid="badge-last-sync-failed">
                         <XCircle className="h-3 w-3 mr-1" />
                         failed
+                      </StatusChip>
+                    )}
+                    {lastSync.status === 'partial' && (
+                      <StatusChip status="partial" data-testid="badge-last-sync-partial">
+                        partial · {lastSync.errorMessages?.length ?? 0} failed
                       </StatusChip>
                     )}
                     <Badge variant="outline">
@@ -399,7 +407,7 @@ export default function GitHubSyncPanel() {
                       {lastSync.commitMessage}
                     </p>
                   )}
-                  {lastSyncFailed && lastSync.errorMessage && (
+                  {(lastSyncFailed || lastSyncPartial) && lastSync.errorMessage && (
                     <p className="text-sm font-mono text-destructive break-words">
                       Error: {lastSync.errorMessage}
                     </p>
@@ -497,11 +505,21 @@ export default function GitHubSyncPanel() {
                           </StatusChip>
                         </div>
                         {/* Run16 BUG-015: failed jobs must show WHY they failed. */}
-                        {item.importResult && <p>Imported: {item.importResult.imported ?? 0}; updated: {item.importResult.updated ?? 0}; failed: {item.importResult.errors ?? 0}.</p>}
-                        {(item.status === 'failed' || item.status === 'partial') && item.errorMessage && (
-                          <p className="text-xs font-mono text-destructive break-words pl-6">
-                            {item.errorMessage}
+                        {item.importResult && (
+                          <p data-testid={`sync-queue-counts-${item.id}`}>
+                            Imported: {item.importResult.imported ?? 0}; updated: {item.importResult.updated ?? 0}; skipped: {item.importResult.skipped ?? 0}; failed: {item.importResult.errors ?? 0}.
                           </p>
+                        )}
+                        {(item.status === 'failed' || item.status === 'partial') && (
+                          item.importResult?.errorMessages && item.importResult.errorMessages.length > 0 ? (
+                            <ul className="ops-github-panel__error-list" data-testid={`sync-queue-errors-${item.id}`}>
+                              {item.importResult.errorMessages.map((message, i) => <li key={i}>{message}</li>)}
+                            </ul>
+                          ) : item.errorMessage ? (
+                            <p className="text-xs font-mono text-destructive break-words pl-6">
+                              {item.errorMessage}
+                            </p>
+                          ) : null
                         )}
                       </div>
                     ))}
@@ -684,14 +702,27 @@ export default function GitHubSyncPanel() {
                   <dd className="break-words rounded border p-2 font-mono text-xs">{selectedHistory.commitMessage}</dd>
                 </div>
               )}
-              {selectedHistory.errorMessage && (
+              {selectedHistory.errorMessages && selectedHistory.errorMessages.length > 0 ? (
+                <div role="alert">
+                  <dt className="mb-1 text-destructive">
+                    {selectedHistory.status === "partial"
+                      ? `Failed items (${selectedHistory.errorMessages.length})`
+                      : `Errors (${selectedHistory.errorMessages.length})`}
+                  </dt>
+                  <dd className="rounded border border-destructive/40 bg-destructive/10 p-2 font-mono text-xs">
+                    <ul className="ops-github-panel__error-list" data-testid="sync-history-error-list">
+                      {selectedHistory.errorMessages.map((message, i) => <li key={i}>{message}</li>)}
+                    </ul>
+                  </dd>
+                </div>
+              ) : selectedHistory.errorMessage ? (
                 <div role="alert">
                   <dt className="mb-1 text-destructive">Error</dt>
                   <dd className="break-words rounded border border-destructive/40 bg-destructive/10 p-2 font-mono text-xs">
                     {selectedHistory.errorMessage}
                   </dd>
                 </div>
-              )}
+              ) : null}
               {selectedHistory.commitUrl && (
                 <a
                   href={selectedHistory.commitUrl}

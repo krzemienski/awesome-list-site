@@ -69,6 +69,8 @@ interface SeedDatabaseResponse {
     subcategoriesInserted: number;
     subSubcategoriesInserted: number;
     resourcesInserted: number;
+    /** Clear & Re-seed only: resources kept because edits, discoveries or user data reference them. */
+    resourcesPreserved?: number;
   };
   totalErrors: number;
   errors: string[];
@@ -91,7 +93,10 @@ export default function DatabaseTab({ stats }: DatabaseTabProps) {
   // before firing (consistent with Clear & Re-seed, which types RESEED).
   // A simple confirm dialog suffices since seeding is additive, not destructive.
   const [seedDialogOpen, setSeedDialogOpen] = useState(false);
-  const [seedResult, setSeedResult] = useState<SeedDatabaseResponse | null>(null);
+  // F01/F02: the outcome of the last run stays on screen (toasts vanish) and
+  // never claims success when items failed or the run was rolled back.
+  const [seedResult, setSeedResult] = useState<(SeedDatabaseResponse & { mode: "seed" | "reseed" }) | null>(null);
+  const [seedFailure, setSeedFailure] = useState<{ mode: "seed" | "reseed"; message: string } | null>(null);
 
   const seedDatabaseMutation = useMutation({
     mutationFn: async (options: { clearExisting?: boolean } = {}) => {
@@ -100,8 +105,12 @@ export default function DatabaseTab({ stats }: DatabaseTabProps) {
         body: JSON.stringify(options),
       })) as SeedDatabaseResponse;
     },
-    onSuccess: (data: SeedDatabaseResponse) => {
-      setSeedResult(data);
+    onMutate: () => {
+      setSeedResult(null);
+      setSeedFailure(null);
+    },
+    onSuccess: (data: SeedDatabaseResponse, options) => {
+      setSeedResult({ ...data, mode: options.clearExisting ? "reseed" : "seed" });
       void queryClient.invalidateQueries({ queryKey: ["/api/admin/stats"] });
       toast({
         title: data.totalErrors > 0 ? "Database Seeding Partially Failed" : "Database Seeded Successfully",
@@ -109,7 +118,11 @@ export default function DatabaseTab({ stats }: DatabaseTabProps) {
         description: `Added ${data.counts.resourcesInserted} resources, ${data.counts.categoriesInserted} categories, ${data.counts.subcategoriesInserted} subcategories, and ${data.counts.subSubcategoriesInserted} sub-subcategories.`,
       });
     },
-    onError: (error: unknown) => {
+    onError: (error: unknown, options) => {
+      setSeedFailure({
+        mode: options.clearExisting ? "reseed" : "seed",
+        message: error instanceof Error ? error.message : "Failed to seed database. Please try again.",
+      });
       toast({
         title: "Database Seeding Failed",
         description: error instanceof Error
@@ -139,13 +152,6 @@ export default function DatabaseTab({ stats }: DatabaseTabProps) {
 
   return (
     <div className="admin-ops-database">
-      {seedResult && (
-        <section role={seedResult.totalErrors > 0 ? "alert" : "status"} className="card p-4">
-          <h2>{seedResult.totalErrors > 0 ? "Seeding completed with errors" : "Seeding completed"}</h2>
-          <p>Inserted {seedResult.counts.resourcesInserted} resources, {seedResult.counts.categoriesInserted} categories, {seedResult.counts.subcategoriesInserted} subcategories and {seedResult.counts.subSubcategoriesInserted} sub-subcategories. Errors: {seedResult.totalErrors}.</p>
-          <ul>{seedResult.errors.map((error, index) => <li key={index}>{error}</li>)}</ul>
-        </section>
-      )}
       <div className="admin-ops-stat-strip">
         <Stat
           label="Tables"
@@ -238,38 +244,71 @@ export default function DatabaseTab({ stats }: DatabaseTabProps) {
                   </>
                 )}
               </Button>
-              <p>Remove all data and re-populate (use with caution)</p>
+              <p>Replace the catalog from the source; rolls back entirely on any failure</p>
             </div>
           </div>
 
-          {seedDatabaseMutation.isSuccess && seedDatabaseMutation.data && (
-            <Alert className="admin-ops-database__seed-result">
-              {/* DS-OK: global semantic status color for a completed seed result. */}
-              <CheckCircle2 className="h-4 w-4 text-[var(--status-ok)]" />
+          {seedFailure && (
+            <Alert
+              variant="destructive"
+              role="alert"
+              className="admin-ops-database__seed-result admin-ops-database__seed-result--bad"
+              data-testid="seed-result-failed"
+            >
+              <AlertCircle className="h-4 w-4" />
               <AlertTitle className="flex flex-wrap items-center gap-2">
-                Seeding Completed Successfully
-                <StatusChip status="Completed" />
+                {seedFailure.mode === "reseed" ? "Clear & Re-seed failed" : "Seeding failed"}
+                <StatusChip status="Failed" />
+              </AlertTitle>
+              <AlertDescription>
+                <p>{seedFailure.message}</p>
+              </AlertDescription>
+            </Alert>
+          )}
+
+          {seedResult && (
+            <Alert
+              variant={seedResult.totalErrors > 0 ? "destructive" : "default"}
+              role={seedResult.totalErrors > 0 ? "alert" : "status"}
+              className={`admin-ops-database__seed-result${seedResult.totalErrors > 0 ? " admin-ops-database__seed-result--warn" : ""}`}
+              data-testid={seedResult.totalErrors > 0 ? "seed-result-partial" : "seed-result-success"}
+            >
+              {seedResult.totalErrors > 0 ? (
+                <AlertTriangle className="h-4 w-4" />
+              ) : (
+                /* DS-OK: global semantic status color for a completed seed result. */
+                <CheckCircle2 className="h-4 w-4 text-[var(--status-ok)]" />
+              )}
+              <AlertTitle className="flex flex-wrap items-center gap-2">
+                {seedResult.totalErrors > 0
+                  ? `Seeding partially failed — ${seedResult.totalErrors} item${seedResult.totalErrors === 1 ? "" : "s"} not imported`
+                  : seedResult.mode === "reseed" ? "Clear & Re-seed completed" : "Seeding completed"}
+                <StatusChip status={seedResult.totalErrors > 0 ? "Warning" : "Completed"} />
               </AlertTitle>
               <AlertDescription>
                 <dl>
                   <dt>Categories inserted:</dt>
-                  <dd>{seedDatabaseMutation.data.counts.categoriesInserted}</dd>
+                  <dd>{seedResult.counts.categoriesInserted}</dd>
                   <dt>Subcategories inserted:</dt>
-                  <dd>{seedDatabaseMutation.data.counts.subcategoriesInserted}</dd>
+                  <dd>{seedResult.counts.subcategoriesInserted}</dd>
                   <dt>Sub-subcategories inserted:</dt>
-                  <dd>{seedDatabaseMutation.data.counts.subSubcategoriesInserted}</dd>
+                  <dd>{seedResult.counts.subSubcategoriesInserted}</dd>
                   <dt>Resources inserted:</dt>
-                  <dd>{seedDatabaseMutation.data.counts.resourcesInserted}</dd>
-                  {seedDatabaseMutation.data.totalErrors > 0 ? (
+                  <dd data-testid="seed-result-resources-inserted">{seedResult.counts.resourcesInserted}</dd>
+                  {seedResult.mode === "reseed" && typeof seedResult.counts.resourcesPreserved === "number" ? (
                     <>
-                      <dt>Errors:</dt>
-                      <dd className="admin-ops-database__seed-errors">
-                        {seedDatabaseMutation.data.totalErrors}
-                        <span className="ml-2"><StatusChip status="Warning" /></span>
-                      </dd>
+                      <dt>Resources preserved (referenced by edits, discoveries or user data):</dt>
+                      <dd data-testid="seed-result-resources-preserved">{seedResult.counts.resourcesPreserved}</dd>
                     </>
                   ) : null}
+                  <dt>Errors:</dt>
+                  <dd className="admin-ops-database__seed-errors" data-testid="seed-result-error-count">{seedResult.totalErrors}</dd>
                 </dl>
+                {seedResult.errors.length > 0 ? (
+                  <ul className="admin-ops-database__seed-error-list" data-testid="seed-result-errors">
+                    {seedResult.errors.map((error, index) => <li key={index}>{error}</li>)}
+                  </ul>
+                ) : null}
               </AlertDescription>
             </Alert>
           )}
@@ -338,9 +377,12 @@ export default function DatabaseTab({ stats }: DatabaseTabProps) {
               Clear all data and re-seed?
             </AlertDialogTitle>
             <AlertDialogDescription>
-              This permanently deletes <strong>all existing resources, categories, and
-              related data</strong> from the database and re-populates it from the
-              awesome-video source. This action cannot be undone.
+              This replaces <strong>all categories and every resource that nothing else
+              references</strong> with the awesome-video source. Resources referenced by edits,
+              research discoveries, journeys, bookmarks, favorites or other user data are kept
+              with their ids. The source is downloaded and validated first, and the whole
+              replacement runs in one transaction: if anything fails, nothing changes.
+              A successful run cannot be undone.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <div className="space-y-2">

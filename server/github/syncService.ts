@@ -219,8 +219,12 @@ export class GitHubSyncService {
    */
   async importFromGitHub(
     repoUrl: string, 
-    options: SyncOptions & { strictMode?: boolean } = {}
+    options: SyncOptions & { strictMode?: boolean } = {},
+    // F13: the queued route already owns a queue row for this run; recording
+    // another here showed every queued import twice in Recent Sync Jobs.
+    tracking: { queueRowOwnedByCaller?: boolean } = {}
   ): Promise<ImportResult> {
+    const recordQueueRow = !options.dryRun && !tracking.queueRowOwnedByCaller;
     const result: ImportResult = {
       imported: 0,
       updated: 0,
@@ -441,18 +445,28 @@ export class GitHubSyncService {
         }
       }
       
+      // F13: one outcome for every record of this run — a run with item
+      // errors is 'partial' when something landed, otherwise 'failed', and
+      // every item error is kept (not just the first few).
+      const importOutcome = result.errors.length === 0
+        ? 'completed'
+        : result.imported > 0 || result.updated > 0 ? 'partial' : 'failed';
+
       // Add to sync queue for tracking
       if (!options.dryRun) {
-        await this.syncRepo.addToGithubSyncQueue({
+        if (recordQueueRow) await this.syncRepo.addToGithubSyncQueue({
           repositoryUrl: repoUrl,
           branch: result.branch ?? null,
           action: 'import',
-          status: 'completed',
+          status: importOutcome === 'failed' ? 'failed' : 'completed',
           resourceIds: result.resources.map(r => r.id),
           metadata: {
             imported: [result.imported] as [any, ...any[]],
             updated: [result.updated] as [any, ...any[]],
-            skipped: [result.skipped] as [any, ...any[]]
+            skipped: [result.skipped] as [any, ...any[]],
+            errors: result.errors.length,
+            outcome: importOutcome,
+            errorMessages: result.errors,
           }
         });
 
@@ -475,8 +489,8 @@ export class GitHubSyncService {
               resources: result.resources.map(r => ({ id: r.id, title: r.title, url: r.url })),
             },
             metadata: {
-              outcome: result.errors.length > 0 ? 'partial' : 'completed',
-              errorMessages: result.errors.slice(0, 10),
+              outcome: importOutcome,
+              errorMessages: result.errors,
             },
           });
         } catch (historyErr: any) {
@@ -491,7 +505,7 @@ export class GitHubSyncService {
       
       // Log failed import
       if (!options.dryRun) {
-        await this.syncRepo.addToGithubSyncQueue({
+        if (recordQueueRow) await this.syncRepo.addToGithubSyncQueue({
           repositoryUrl: repoUrl,
           branch: result.branch ?? null,
           action: 'import',
@@ -980,15 +994,24 @@ export class GitHubSyncService {
         await this.syncRepo.updateGithubSyncStatus(item.id, 'processing');
 
         if (item.action === 'import') {
-          const result = await this.importFromGitHub(item.repositoryUrl, {
-            dryRun: false
-          });
+          // This queue row is the import's tracking row; don't let
+          // importFromGitHub insert a second one.
+          const result = await this.importFromGitHub(
+            item.repositoryUrl,
+            { dryRun: false },
+            { queueRowOwnedByCaller: true },
+          );
 
+          // F13: queued imports record the same outcome shape as direct ones —
+          // a partial import keeps its 'partial' outcome and EVERY item error.
+          const succeededSome = result.imported > 0 || result.updated > 0;
           const metadata = {
             imported: [result.imported],
             updated: [result.updated],
             skipped: [result.skipped],
-            errors: result.errors.length
+            errors: result.errors.length,
+            outcome: result.errors.length === 0 ? 'completed' : succeededSome ? 'partial' : 'failed',
+            errorMessages: result.errors,
           };
 
           if (result.errors.length === 0) {
@@ -996,8 +1019,8 @@ export class GitHubSyncService {
           } else {
             await this.syncRepo.updateGithubSyncStatus(
               item.id,
-              result.imported > 0 || result.updated > 0 ? 'completed' : 'failed',
-              result.errors.slice(0, 3).join('; '),
+              succeededSome ? 'completed' : 'failed',
+              result.errors.join('; '),
               metadata,
               result.branch
             );

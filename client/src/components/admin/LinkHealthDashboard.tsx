@@ -108,6 +108,8 @@ export default function LinkHealthDashboard() {
   // Run23 NB-040: explicit confirmation before starting a link-check job.
   const [confirmRun, setConfirmRun] = useState(false);
   const [showDetails, setShowDetails] = useState(false);
+  // F10: cancelling a running scan is destructive to its progress — confirm.
+  const [confirmCancel, setConfirmCancel] = useState(false);
 
   const { data: statusData, isLoading: isStatusLoading, isError: statusError, refetch: retryStatus } = useQuery<LinkHealthStatusResponse>({
     queryKey: ['/api/admin/link-health/status'],
@@ -164,6 +166,26 @@ export default function LinkHealthDashboard() {
         variant: "destructive"
       });
     }
+  });
+
+  // F10: cancel the running scan; the server aborts in-flight requests and
+  // keeps the previous completed results.
+  const cancelScanMutation = useMutation({
+    mutationFn: async (jobId: number): Promise<unknown> =>
+      apiRequest(`/api/admin/link-health/jobs/${jobId}`, { method: 'DELETE' }),
+    onSuccess: () => {
+      void queryClient.invalidateQueries({ queryKey: ['/api/admin/link-health/status'] });
+      void queryClient.invalidateQueries({ queryKey: ['/api/admin/link-health/history'] });
+      toast({ title: "Link health scan cancelled", description: "Previous completed results remain available." });
+    },
+    onError: (error: Error) => {
+      void queryClient.invalidateQueries({ queryKey: ['/api/admin/link-health/status'] });
+      toast({
+        title: "Could not cancel the scan",
+        description: error.message ?? "The cancel request failed.",
+        variant: "destructive",
+      });
+    },
   });
 
   const latestJob = statusData?.job;
@@ -312,6 +334,54 @@ export default function LinkHealthDashboard() {
         </div>
       )}
       {((statusError && !statusData) || (historyError && !historyData) || (linksError && !brokenLinksData) || (coverageError && !coverageData)) ? <p>Link health results unavailable until the failed requests recover.</p> : <>
+      {/* F09/F10: the latest scan's state is always visible — a running scan
+          can be cancelled, and a failed or cancelled scan states its reason
+          while the counts below are labelled as the previous completed scan. */}
+      {latestJob && isActiveJob && (
+        <div className="card ops-link-health__job-banner" role="status" data-testid="link-health-job-running">
+          <p>
+            <RefreshCw className="h-4 w-4 animate-spin" aria-hidden="true" />{" "}
+            Scan #{latestJob.id} running — {(latestJob.checkedLinks || 0).toLocaleString()} of{" "}
+            {(latestJob.totalLinks || 0).toLocaleString()} links checked ({calculateProgress(latestJob)}%).
+          </p>
+          <Button
+            variant="outline"
+            onClick={() => { if (!cancelScanMutation.isPending) setConfirmCancel(true); }}
+            aria-disabled={cancelScanMutation.isPending}
+            aria-busy={cancelScanMutation.isPending}
+            data-testid="button-cancel-running-scan"
+          >
+            {cancelScanMutation.isPending ? "Cancelling…" : "Cancel running scan"}
+          </Button>
+        </div>
+      )}
+      {latestJob && isTerminalWithoutResults && (
+        <div
+          className="card ops-link-health__job-banner ops-link-health__job-banner--terminal"
+          role={latestJob.status === 'failed' ? 'alert' : 'status'}
+          data-testid={`link-health-job-${latestJob.status}`}
+        >
+          <div>
+            <p>
+              <strong>Scan #{latestJob.id} {latestJob.status === 'failed' ? 'failed' : 'was cancelled'}</strong>
+              {latestJob.completedAt ? ` at ${formatAdminDateTime(latestJob.completedAt)}` : ''}:{" "}
+              <span data-testid="link-health-job-reason">{latestJob.errorMessage || 'No reason was recorded.'}</span>
+            </p>
+            <p>
+              {lastCompletedJob
+                ? `Counts and problem links below are from the previous completed scan (#${lastCompletedJob.id}, ${formatAdminDateTime(lastCompletedJob.createdAt)}).`
+                : 'No scan has completed yet, so there are no verified results to show.'}
+            </p>
+          </div>
+          <Button
+            onClick={() => { if (!runCheckMutation.isPending) setConfirmRun(true); }}
+            aria-disabled={runCheckMutation.isPending}
+            data-testid="button-link-health-rerun"
+          >
+            Run scan again
+          </Button>
+        </div>
+      )}
       <div className="ops-link-health__stat-grid" aria-label="Link health status summary">
         {([
           ["Healthy", summaryCounts.healthy, statusTone("healthy")],
@@ -352,12 +422,6 @@ export default function LinkHealthDashboard() {
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
-          {latestJob?.status === 'failed' && (
-            <div role="alert">
-              <p>Scan failed: {latestJob.errorMessage || 'No failure reason was recorded.'}</p>
-              <p>Started {formatAdminDateTime(latestJob.createdAt)}. Results below are from the previous completed scan. Use Run Check to try again.</p>
-            </div>
-          )}
           {latestJob ? (
             <>
               {isActiveJob && (
@@ -734,6 +798,30 @@ export default function LinkHealthDashboard() {
           )}
         </CardContent>
       </Card>}
+
+      <AlertDialog open={confirmCancel} onOpenChange={(open) => { if (!open) setConfirmCancel(false); }}>
+        <AlertDialogContent data-testid="dialog-confirm-cancel-scan">
+          <AlertDialogHeader>
+            <AlertDialogTitle>Cancel the running scan?</AlertDialogTitle>
+            <AlertDialogDescription>
+              In-flight link requests stop immediately and this scan's partial results are discarded.
+              The previous completed scan stays available, and you can start a new scan right away.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel data-testid="button-keep-scan">Keep scanning</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={() => {
+                setConfirmCancel(false);
+                if (latestJob && isActiveJob) cancelScanMutation.mutate(latestJob.id);
+              }}
+              data-testid="button-confirm-cancel-scan"
+            >
+              Cancel scan
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
 
       {/* Run23 NB-040: explicit confirmation before starting a link-check job. */}
       <AlertDialog open={confirmRun} onOpenChange={(open) => { if (!open) setConfirmRun(false); }}>

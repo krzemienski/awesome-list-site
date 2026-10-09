@@ -259,6 +259,14 @@ const ROOT_CONFIG_MANIFEST = [
 // completed one-offs accumulate in the active scripts directory unnoticed.
 const MANUAL_RUNBOOK_MANIFEST = [
   {
+    file: 'scripts/run-ds.sh',
+    note: 'retained interactive Claude Code launcher for the design-system run; run by hand from a local checkout',
+  },
+  {
+    file: 'scripts/setup-ds-run.sh',
+    note: 'retained setup + launch helper for the interactive design-system run; run by hand from a local checkout',
+  },
+  {
     file: 'scripts/migrate.ts',
     note: 'retained standalone migration runner for non-Replit/self-hosted recovery',
   },

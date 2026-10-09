@@ -89,6 +89,11 @@ export const linkHealthService = {
     return row ? jobRowToApi(row) : null;
   },
 
+  async getJob(jobId: number): Promise<LinkHealthJob | null> {
+    const [row] = await db.select().from(linkHealthJobs).where(eq(linkHealthJobs.id, jobId)).limit(1);
+    return row ? jobRowToApi(row) : null;
+  },
+
   async getJobHistory(): Promise<LinkHealthJob[]> {
     const rows = await db
       .select()

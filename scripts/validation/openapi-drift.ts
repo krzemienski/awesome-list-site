@@ -39,16 +39,17 @@ import {
 // same way server/index.ts mounts it). When another task lands routes in
 // parallel, recompute from this gate's own "got N/hash" line after merging
 // instead of adding counts by hand.
+// 183 = 182 + DELETE /api/admin/link-health/jobs/:id (cancel a running scan).
 const BASELINES = {
   replit: {
-    apiCount: 182,
-    apiHash: "23ff79dca343ce8a5f494b30bcb01e966540795285db7c4ad14eb3f8c56831da",
+    apiCount: 183,
+    apiHash: "11f7080493d8ca3933ca8102c4c4170139894895262b459bebc26db2f5806465",
     nonApiCount: 7,
     nonApiHash: "d8f02ed21a7ee98464146ef8958d38a24113b0a47dbbe4132e2da54f00d61a89",
   },
   portable: {
-    apiCount: 182,
-    apiHash: "23ff79dca343ce8a5f494b30bcb01e966540795285db7c4ad14eb3f8c56831da",
+    apiCount: 183,
+    apiHash: "11f7080493d8ca3933ca8102c4c4170139894895262b459bebc26db2f5806465",
     nonApiCount: 7,
     nonApiHash: "d8f02ed21a7ee98464146ef8958d38a24113b0a47dbbe4132e2da54f00d61a89",
   },

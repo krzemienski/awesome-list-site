@@ -31,6 +31,7 @@ import {
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { Link as RouterLink } from "wouter";
 import { apiRequest, ApiError } from "@/lib/queryClient";
 import { formatAdminDateTime } from "@/lib/utils";
 import { useToast } from "@/hooks/use-toast";
@@ -41,6 +42,7 @@ import {
   TableShell,
 } from "@/components/admin/AdminOpsPrimitives";
 import type { ValidationStatus } from "@/components/admin/types/validation";
+import type { LinkHealthJob } from "@shared/schema";
 import "./admin-ops-export-database.css";
 
 interface ExportTabProps {
@@ -339,29 +341,67 @@ export default function ExportTab({ validationStatus: propValidationStatus }: Ex
     },
   });
 
+  // F11: Run Link Check starts the persistent link-health job (the same job
+  // /admin/linkhealth runs) and this tab follows it by polling its status,
+  // so the check survives navigation, shows progress and can be cancelled.
+  const { data: linkJobData, isError: isLinkJobError, refetch: refetchLinkJob } = useQuery<{ success: boolean; job: LinkHealthJob | null }>({
+    queryKey: ["/api/admin/link-health/status"],
+    staleTime: 0,
+    refetchOnWindowFocus: true,
+    refetchInterval: (query) => {
+      const status = query.state.data?.job?.status;
+      return status === "pending" || status === "processing" ? 3000 : false;
+    },
+  });
+  const linkJob = linkJobData?.job ?? null;
+  const isLinkJobActive = linkJob?.status === "pending" || linkJob?.status === "processing";
+
   const checkLinksMutation = useMutation({
     mutationFn: async () => {
-      const response: unknown = await apiRequest("/api/admin/check-links", {
-        method: "POST",
-        body: JSON.stringify({
-          timeout: 10000,
-          concurrent: 5,
-          retryCount: 1,
-        }),
+      try {
+        return (await apiRequest("/api/admin/check-links", { method: "POST" })) as { job: LinkHealthJob | null };
+      } catch (error) {
+        // 409: a scan is already running — follow it instead of failing.
+        if (error instanceof ApiError && error.status === 409) {
+          return { job: null, alreadyRunning: true };
+        }
+        throw error;
+      }
+    },
+    onSuccess: (data: { job: LinkHealthJob | null; alreadyRunning?: boolean }) => {
+      if (data.job) queryClient.setQueryData(["/api/admin/link-health/status"], { success: true, job: data.job });
+      void queryClient.invalidateQueries({ queryKey: ["/api/admin/link-health/status"] });
+      void queryClient.invalidateQueries({ queryKey: ["/api/admin/link-health/history"] });
+      toast({
+        title: data.alreadyRunning ? "A link check is already running" : "Link check started",
+        description: data.alreadyRunning
+          ? "Following the scan that is already in progress."
+          : "Progress is shown below and on the Link Health tab.",
       });
-      return response;
+    },
+    onError: (error: unknown) => {
+      toast({
+        title: "Link check could not start",
+        description: error instanceof Error ? error.message : "Failed to start the link check. Please try again.",
+        variant: "destructive",
+      });
+    },
+  });
+
+  const cancelLinkCheckMutation = useMutation({
+    mutationFn: async (jobId: number) =>
+      apiRequest(`/api/admin/link-health/jobs/${jobId}`, { method: "DELETE" }),
+    onSettled: () => {
+      void queryClient.invalidateQueries({ queryKey: ["/api/admin/link-health/status"] });
+      void queryClient.invalidateQueries({ queryKey: ["/api/admin/link-health/history"] });
     },
     onSuccess: () => {
-      void queryClient.invalidateQueries({ queryKey: ["/api/admin/validation-status"] });
-      toast({
-        title: "Link Check Complete",
-        description: "All resource links have been checked.",
-      });
+      toast({ title: "Link check cancelled", description: "Previous completed results remain available." });
     },
-    onError: () => {
+    onError: (error: unknown) => {
       toast({
-        title: "Link Check Failed",
-        description: "Failed to check links. Please try again.",
+        title: "Could not cancel the link check",
+        description: error instanceof Error ? error.message : "The cancel request failed.",
         variant: "destructive",
       });
     },
@@ -396,15 +436,16 @@ export default function ExportTab({ validationStatus: propValidationStatus }: Ex
             )}
           </Button>
           <Button
-            onClick={() => { if (!checkLinksMutation.isPending) setConfirmAction("links"); }}
-            aria-disabled={checkLinksMutation.isPending}
+            onClick={() => { if (!checkLinksMutation.isPending && !isLinkJobActive) setConfirmAction("links"); }}
+            aria-disabled={checkLinksMutation.isPending || isLinkJobActive}
             aria-busy={checkLinksMutation.isPending}
             variant="outline"
+            data-testid="button-run-link-check"
           >
-            {checkLinksMutation.isPending ? (
+            {checkLinksMutation.isPending || isLinkJobActive ? (
               <>
                 <RefreshCw className="h-4 w-4 animate-spin" />
-                Checking Links...
+                {checkLinksMutation.isPending ? "Starting..." : "Link check running"}
               </>
             ) : (
               <>
@@ -422,6 +463,62 @@ export default function ExportTab({ validationStatus: propValidationStatus }: Ex
         </div>
       </div>
       </details>
+
+      {/* F11: the export link check is the persistent link-health job. */}
+      {(linkJob || isLinkJobError) && (
+        <section className="card admin-ops-export__link-job" data-testid="export-link-check-job" aria-label="Export link check">
+          {isLinkJobError && !linkJob ? (
+            <div role="alert" className="admin-ops-export__link-job-row">
+              <p>Link check status could not be loaded; this is not evidence that links are healthy.</p>
+              <Button variant="outline" size="sm" onClick={() => void refetchLinkJob()}>Retry</Button>
+            </div>
+          ) : linkJob ? (
+            <>
+              <div className="admin-ops-export__link-job-row">
+                <h2>
+                  Link check #{linkJob.id}{" "}
+                  <StatusChip
+                    status={
+                      isLinkJobActive ? "Running"
+                        : linkJob.status === "completed" ? "Completed"
+                          : linkJob.status === "failed" ? "Failed" : "Cancelled"
+                    }
+                  />
+                </h2>
+                {isLinkJobActive ? (
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => { if (!cancelLinkCheckMutation.isPending) cancelLinkCheckMutation.mutate(linkJob.id); }}
+                    aria-disabled={cancelLinkCheckMutation.isPending}
+                    aria-busy={cancelLinkCheckMutation.isPending}
+                    data-testid="button-cancel-export-link-check"
+                  >
+                    {cancelLinkCheckMutation.isPending ? "Cancelling…" : "Cancel link check"}
+                  </Button>
+                ) : null}
+              </div>
+              <p className="admin-ops-export__link-job-scope">
+                Checks the stored URL of every approved resource — the same URLs the exports write.
+              </p>
+              <p role="status" data-testid="export-link-check-progress">
+                {isLinkJobActive
+                  ? `${(linkJob.checkedLinks || 0).toLocaleString()} of ${(linkJob.totalLinks || 0).toLocaleString()} links checked (started ${linkJob.startedAt ? formatAdminDateTime(linkJob.startedAt) : formatAdminDateTime(linkJob.createdAt)}).`
+                  : linkJob.status === "completed"
+                    ? `Completed ${linkJob.completedAt ? formatAdminDateTime(linkJob.completedAt) : ""}: ${(linkJob.healthyLinks || 0).toLocaleString()} healthy, ${(linkJob.brokenLinks || 0).toLocaleString()} broken, ${(linkJob.redirectLinks || 0).toLocaleString()} redirects, ${(linkJob.timeoutLinks || 0).toLocaleString()} timeouts of ${(linkJob.totalLinks || 0).toLocaleString()}.`
+                    : `${linkJob.status === "failed" ? "Failed" : "Cancelled"}${linkJob.completedAt ? ` ${formatAdminDateTime(linkJob.completedAt)}` : ""}: ${linkJob.errorMessage || "No reason was recorded."}`}
+              </p>
+              {isLinkJobError ? (
+                <p role="alert" className="admin-ops-export__link-job-row">
+                  Status refresh failed; the progress above may be stale.
+                  <Button variant="outline" size="sm" onClick={() => void refetchLinkJob()}>Retry</Button>
+                </p>
+              ) : null}
+              <RouterLink className="admin-ops-export__link-job-link" href="/admin/linkhealth">Open Link Health for problem links</RouterLink>
+            </>
+          ) : null}
+        </section>
+      )}
 
       <div className="admin-ops-export__cards">
         <article className="card admin-ops-export-card hoverable">
@@ -557,8 +654,8 @@ export default function ExportTab({ validationStatus: propValidationStatus }: Ex
             {auditHistoryTotal === 0
               ? "No audit entries are available."
               : hasNextAuditHistoryPage
-                ? "No catalog exports on this audit page. Use Next to inspect the next bounded audit window."
-                : "No catalog exports on this final audit page. Use Previous to inspect earlier windows."}
+                ? "No exports on this audit page. Use Next to inspect the next bounded audit window."
+                : "No exports on this final audit page. Use Previous to inspect earlier windows."}
           </p>
         ) : (
           <Table className="table admin-ops-table" data-testid="table-export-history">
@@ -581,9 +678,18 @@ export default function ExportTab({ validationStatus: propValidationStatus }: Ex
                       ? "json"
                       : "markdown";
                 const rowCount = entry.changes?.rowCount ?? entry.changes?.resources;
+                // F05: name each export by what it actually contains.
+                const exportType =
+                  entry.action === "database.exported"
+                    ? "Catalog snapshot"
+                    : entry.action === "resources.exported"
+                      ? "Resources"
+                      : entry.action === "categories.exported"
+                        ? "Category tree"
+                        : "Awesome list";
                 return (
-                  <tr key={entry.id}>
-                    <td>{isDatabaseExport ? "Catalog snapshot" : "Catalog"}</td>
+                  <tr key={entry.id} data-testid={`export-history-row-${entry.id}`} data-export-action={entry.action}>
+                    <td>{exportType}</td>
                     <td className="admin-ops-table__mono">{format}</td>
                     <td><StatusChip status="Completed" /></td>
                     <td className="admin-ops-table__mono">
@@ -701,81 +807,7 @@ export default function ExportTab({ validationStatus: propValidationStatus }: Ex
           </section>
         )}
 
-        {validationStatus?.linkCheck && (
-          <section className="card admin-ops-validation-panel">
-            <header className="admin-ops-validation-panel__header">
-              <div>
-                <h2>Link Check Results</h2>
-                <p>Live resource link health from the last check</p>
-              </div>
-              <StatusChip status={validationStatus.linkCheck.brokenLinks > 0 ? "Warning" : "Healthy"} />
-            </header>
-            <div className="admin-ops-validation-panel__body space-y-4">
-              <div className="admin-ops-validation-counts">
-                <div className="admin-ops-validation-count admin-ops-validation-count--ok">
-                  <strong>{validationStatus.linkCheck.validLinks}</strong>
-                  <span>Valid links</span>
-                </div>
-                <div className="admin-ops-validation-count admin-ops-validation-count--bad">
-                  <strong>{validationStatus.linkCheck.brokenLinks}</strong>
-                  <span>Broken links</span>
-                </div>
-                <div className="admin-ops-validation-count admin-ops-validation-count--warn">
-                  <strong>{validationStatus.linkCheck.redirects}</strong>
-                  <span>Redirects</span>
-                </div>
-                <div className="admin-ops-validation-count">
-                  <strong>{validationStatus.linkCheck.errors}</strong>
-                  <span>Errors</span>
-                </div>
-              </div>
-
-              {validationStatus.linkCheck.brokenResources &&
-                validationStatus.linkCheck.brokenResources.length > 0 && (
-                  <div className="space-y-2">
-                    {/* DS-OK: global semantic status color for broken-link headings. */}
-                    <h3 className="text-sm font-semibold text-[var(--status-bad)]">
-                      Broken links ({validationStatus.linkCheck.brokenResources.length})
-                    </h3>
-                    <ScrollArea className="admin-ops-validation-list admin-ops-validation-list--bad h-64">
-                      <div className="space-y-3">
-                        {validationStatus.linkCheck.brokenResources.map((link, i) => (
-                          <div key={i} className="border-b border-[var(--border)] pb-3 last:border-0">
-                            <div className="flex items-start gap-2">
-                              {/* DS-OK: global semantic status color for broken-link icons. */}
-                              <XCircle className="mt-0.5 h-4 w-4 shrink-0 text-[var(--status-bad)]" />
-                              <div className="min-w-0 flex-1">
-                                <div className="text-sm font-semibold text-[var(--text)]">
-                                  {link.resourceTitle ?? "Unknown Resource"}
-                                </div>
-                                <div className="break-all font-mono text-xs text-[var(--text-2)]">{link.url}</div>
-                                {/* DS-OK: global semantic status color for broken-link messages. */}
-                                <div className="mt-1 flex flex-wrap items-center gap-2 text-xs text-[var(--status-bad)]">
-                                  <StatusChip status={link.status >= 500 ? "Failed" : "Warning"} />
-                                  <span>
-                                    {link.status} {link.statusText}
-                                    {link.error && ` - ${link.error}`}
-                                  </span>
-                                </div>
-                              </div>
-                            </div>
-                          </div>
-                        ))}
-                      </div>
-                    </ScrollArea>
-                  </div>
-                )}
-
-              {validationStatus.linkCheck.summary && (
-                <div className="text-xs text-[var(--text-2)]">
-                  Average response time: {validationStatus.linkCheck.summary.averageResponseTime.toFixed(0)}ms
-                </div>
-              )}
-            </div>
-          </section>
-        )}
-
-        {!validationStatus?.awesomeLint && !validationStatus?.linkCheck && (
+        {!validationStatus?.awesomeLint && (
           <section className="card admin-ops-validation-panel">
             <div className="admin-ops-validation-panel__body py-8 text-center">
               <AlertCircle className="mx-auto mb-4 h-12 w-12 text-[var(--text-2)]" />
@@ -800,7 +832,7 @@ export default function ExportTab({ validationStatus: propValidationStatus }: Ex
             <AlertDialogDescription>
               {confirmAction === "validate"
                 ? "This validates the exported markdown against awesome-lint rules. It runs in the background and can take a minute."
-                : "This checks the links in the exported markdown against the live web. It runs in the background and can take several minutes."}
+                : "This starts a link-health job that checks the stored URL of every approved resource (the URLs the exports write) against the live web. It runs in the background, shows progress here and on the Link Health tab, and can be cancelled."}
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>

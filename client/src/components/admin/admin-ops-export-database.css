@@ -11,6 +11,9 @@
 
 .admin-ops-export {
   display: grid;
+  /* One shrinkable column: an expanded history table's min-content must
+     scroll inside its own shell, not widen every sibling past a phone. */
+  grid-template-columns: minmax(0, 1fr);
 }
 
 .admin-ops-export,
@@ -459,6 +462,30 @@
   color: var(--status-warn);
 }
 
+/* F01/F02: partial and failed seed runs never wear the OK frame. */
+.admin-ops-database__seed-result--warn {
+  /* DS-OK: global semantic WARN status color. */
+  border-color: color-mix(in srgb, var(--status-warn) 40%, transparent);
+  background: color-mix(in srgb, var(--status-warn) 6%, transparent);
+}
+
+.admin-ops-database__seed-result--bad {
+  /* DS-OK: global semantic BAD status color. */
+  border-color: color-mix(in srgb, var(--status-bad) 40%, transparent);
+  background: color-mix(in srgb, var(--status-bad) 6%, transparent);
+}
+
+.admin-ops-database__seed-error-list {
+  display: grid;
+  gap: 0.25rem;
+  margin-top: 0.75rem;
+  padding-left: 1rem;
+  list-style: disc;
+  font-size: 0.75rem;
+  color: var(--text);
+  overflow-wrap: anywhere;
+}
+
 .admin-ops-database__unsupported {
   align-items: flex-start;
   display: grid;
@@ -613,4 +640,41 @@
 /* Last-write column: the canonical table paints it in the tertiary ink. */
 .admin-ops-database .admin-ops-table .admin-ops-table__muted {
   color: var(--text-3);
+}
+
+/* F11: export link check follows the persistent link-health job. */
+.admin-ops-export__link-job {
+  display: grid;
+  gap: 0.5rem;
+  padding: 1rem 1.25rem;
+  font-size: 0.8125rem;
+  color: var(--text);
+}
+
+.admin-ops-export__link-job h2 {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.875rem;
+  font-weight: 600;
+}
+
+.admin-ops-export__link-job-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem 1rem;
+}
+
+.admin-ops-export__link-job-scope {
+  color: var(--text-2);
+}
+
+.admin-ops-export__link-job-link {
+  color: var(--accent-ink);
+  text-decoration: underline;
+  text-underline-offset: 2px;
+  justify-self: start;
 }
