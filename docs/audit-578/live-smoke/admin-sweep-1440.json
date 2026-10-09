@@ -1,0 +1,512 @@
+{
+ "blocked": [
+  "POST /api/send",
+  "POST /api/send",
+  "POST /api/send",
+  "POST /api/send",
+  "POST /api/send",
+  "POST /api/send",
+  "POST /api/send",
+  "POST /api/send",
+  "POST /api/send",
+  "POST /api/send",
+  "POST /api/send",
+  "POST /api/send",
+  "POST /api/send"
+ ],
+ "results": [
+  {
+   "section": "overview",
+   "status": 200,
+   "ms": 6361,
+   "url": "/admin/overview",
+   "title": "Admin \u2014 Awesome Video",
+   "selectedTab": "Overview",
+   "h": [
+    "Operations dashboard",
+    "Recent activity",
+    "System health",
+    "Top categories"
+   ],
+   "errorText": null,
+   "skeletons": 0,
+   "panelTextLen": 1274,
+   "consoleErrors": [
+    "Failed to load resource: net::ERR_FAILED"
+   ],
+   "pageErrors": [],
+   "bad": [],
+   "apis": [
+    "200 /api/awesome-list/nav",
+    "200 /api/auth/user",
+    "307 /api/__clerk/npm/@clerk/clerk-js@6/dist/clerk.browser.js",
+    "200 /api/__clerk/npm/@clerk/clerk-js@6.38.0/dist/clerk.browser.js",
+    "200 /api/config",
+    "200 /api/user/preferences",
+    "200 /api/notifications",
+    "307 /api/__clerk/npm/@clerk/ui@1/dist/ui.browser.js",
+    "200 /api/__clerk/npm/@clerk/ui@1.39.0/dist/ui.browser.js",
+    "200 /api/__clerk/v1/environment",
+    "200 /api/__clerk/v1/client",
+    "200 /api/__clerk/npm/@clerk/ui@1.39.0/dist/framework_ui_2784f6_1.39.0.js",
+    "200 /api/__clerk/npm/@clerk/ui@1.39.0/dist/ui-common_ui_2784f6_1.39.0.js",
+    "200 /api/__clerk/npm/@clerk/ui@1.39.0/dist/subscriptionDetails_ui_2784f6_1.39.0.js",
+    "200 /api/__clerk/npm/@clerk/ui@1.39.0/dist/vendors_ui_2784f6_1.39.0.js",
+    "200 /api/admin/stats",
+    "200 /api/admin/pending-resources",
+    "200 /api/health/ai",
+    "200 /api/admin/users",
+    "200 /api/categories",
+    "200 /api/enrichment/jobs",
+    "200 /api/github/sync-status",
+    "200 /api/admin/link-health/history",
+    "200 /api/admin/link-health/status",
+    "200 /api/subcategories",
+    "200 /api/admin/audit-logs",
+    "200 /api/admin/operations/health",
+    "200 /api/github/sync-history"
+   ]
+  },
+  {
+   "section": "approvals",
+   "status": 200,
+   "ms": 6218,
+   "url": "/admin/approvals",
+   "title": "Admin \u2014 Awesome Video",
+   "selectedTab": "Approvals",
+   "h": [
+    "Operations dashboard",
+    "Pending approvals"
+   ],
+   "errorText": null,
+   "skeletons": 0,
+   "panelTextLen": 4489,
+   "consoleErrors": [
+    "Failed to load resource: net::ERR_FAILED"
+   ],
+   "pageErrors": [],
+   "bad": [],
+   "apis": [
+    "200 /api/awesome-list/nav",
+    "307 /api/__clerk/npm/@clerk/clerk-js@6/dist/clerk.browser.js",
+    "200 /api/auth/user",
+    "200 /api/config",
+    "200 /api/notifications",
+    "200 /api/user/preferences",
+    "200 /api/__clerk/npm/@clerk/clerk-js@6.38.0/dist/clerk.browser.js",
+    "307 /api/__clerk/npm/@clerk/ui@1/dist/ui.browser.js",
+    "200 /api/__clerk/npm/@clerk/ui@1.39.0/dist/ui.browser.js",
+    "200 /api/admin/stats",
+    "200 /api/admin/pending-resources",
+    "200 /api/__clerk/v1/environment",
+    "200 /api/__clerk/v1/client",
+    "200 /api/__clerk/npm/@clerk/ui@1.39.0/dist/framework_ui_2784f6_1.39.0.js",
+    "200 /api/__clerk/npm/@clerk/ui@1.39.0/dist/ui-common_ui_2784f6_1.39.0.js",
+    "200 /api/__clerk/npm/@clerk/ui@1.39.0/dist/subscriptionDetails_ui_2784f6_1.39.0.js",
+    "200 /api/__clerk/npm/@clerk/ui@1.39.0/dist/vendors_ui_2784f6_1.39.0.js"
+   ]
+  },
+  {
+   "section": "edits",
+   "status": 200,
+   "ms": 6230,
+   "url": "/admin/edits",
+   "title": "Admin \u2014 Awesome Video",
+   "selectedTab": "Edits",
+   "h": [
+    "Operations dashboard",
+    "Edit history"
+   ],
+   "errorText": null,
+   "skeletons": 0,
+   "panelTextLen": 443,
+   "consoleErrors": [
+    "Failed to load resource: net::ERR_FAILED"
+   ],
+   "pageErrors": [],
+   "bad": [],
+   "apis": [
+    "200 /api/awesome-list/nav",
+    "200 /api/auth/user",
+    "200 /api/config",
+    "307 /api/__clerk/npm/@clerk/clerk-js@6/dist/clerk.browser.js",
+    "200 /api/user/preferences",
+    "200 /api/notifications",
+    "200 /api/__clerk/npm/@clerk/clerk-js@6.38.0/dist/clerk.browser.js",
+    "307 /api/__clerk/npm/@clerk/ui@1/dist/ui.browser.js",
+    "200 /api/__clerk/npm/@clerk/ui@1.39.0/dist/ui.browser.js",
+    "200 /api/admin/stats",
+    "200 /api/__clerk/v1/environment",
+    "200 /api/__clerk/v1/client",
+    "200 /api/admin/resource-edits",
+    "200 /api/__clerk/npm/@clerk/ui@1.39.0/dist/framework_ui_2784f6_1.39.0.js",
+    "200 /api/__clerk/npm/@clerk/ui@1.39.0/dist/ui-common_ui_2784f6_1.39.0.js",
+    "200 /api/__clerk/npm/@clerk/ui@1.39.0/dist/subscriptionDetails_ui_2784f6_1.39.0.js",
+    "200 /api/__clerk/npm/@clerk/ui@1.39.0/dist/vendors_ui_2784f6_1.39.0.js"
+   ]
+  },
+  {
+   "section": "resources",
+   "status": 200,
+   "ms": 6208,
+   "url": "/admin/resources",
+   "title": "Admin \u2014 Awesome Video",
+   "selectedTab": "Resources",
+   "h": [
+    "Operations dashboard"
+   ],
+   "errorText": null,
+   "skeletons": 0,
+   "panelTextLen": 2485,
+   "consoleErrors": [
+    "Failed to load resource: net::ERR_FAILED",
+    "Failed to load resource: net::ERR_FAILED"
+   ],
+   "pageErrors": [],
+   "bad": [],
+   "apis": [
+    "200 /api/awesome-list/nav",
+    "307 /api/__clerk/npm/@clerk/clerk-js@6/dist/clerk.browser.js",
+    "200 /api/auth/user",
+    "200 /api/config",
+    "200 /api/__clerk/npm/@clerk/clerk-js@6.38.0/dist/clerk.browser.js",
+    "200 /api/notifications",
+    "200 /api/user/preferences",
+    "307 /api/__clerk/npm/@clerk/ui@1/dist/ui.browser.js",
+    "200 /api/__clerk/npm/@clerk/ui@1.39.0/dist/ui.browser.js",
+    "200 /api/admin/stats",
+    "200 /api/categories",
+    "200 /api/admin/resources",
+    "200 /api/__clerk/v1/client",
+    "200 /api/subcategories",
+    "200 /api/sub-subcategories",
+    "200 /api/__clerk/v1/environment",
+    "200 /api/__clerk/npm/@clerk/ui@1.39.0/dist/ui-common_ui_2784f6_1.39.0.js",
+    "200 /api/__clerk/npm/@clerk/ui@1.39.0/dist/framework_ui_2784f6_1.39.0.js",
+    "200 /api/__clerk/npm/@clerk/ui@1.39.0/dist/subscriptionDetails_ui_2784f6_1.39.0.js",
+    "200 /api/__clerk/npm/@clerk/ui@1.39.0/dist/vendors_ui_2784f6_1.39.0.js"
+   ]
+  },
+  {
+   "section": "categories",
+   "status": 200,
+   "ms": 6359,
+   "url": "/admin/categories",
+   "title": "Admin \u2014 Awesome Video",
+   "selectedTab": "Categories",
+   "h": [
+    "Operations dashboard"
+   ],
+   "errorText": null,
+   "skeletons": 0,
+   "panelTextLen": 887,
+   "consoleErrors": [
+    "Failed to load resource: net::ERR_FAILED"
+   ],
+   "pageErrors": [],
+   "bad": [],
+   "apis": [
+    "200 /api/awesome-list/nav",
+    "200 /api/auth/user",
+    "200 /api/config",
+    "307 /api/__clerk/npm/@clerk/clerk-js@6/dist/clerk.browser.js",
+    "200 /api/notifications",
+    "200 /api/__clerk/npm/@clerk/clerk-js@6.38.0/dist/clerk.browser.js",
+    "200 /api/user/preferences",
+    "307 /api/__clerk/npm/@clerk/ui@1/dist/ui.browser.js",
+    "200 /api/__clerk/npm/@clerk/ui@1.39.0/dist/ui.browser.js",
+    "200 /api/admin/stats",
+    "200 /api/admin/categories",
+    "200 /api/__clerk/v1/client",
+    "200 /api/__clerk/v1/environment",
+    "200 /api/__clerk/npm/@clerk/ui@1.39.0/dist/framework_ui_2784f6_1.39.0.js",
+    "200 /api/__clerk/npm/@clerk/ui@1.39.0/dist/ui-common_ui_2784f6_1.39.0.js",
+    "200 /api/__clerk/npm/@clerk/ui@1.39.0/dist/subscriptionDetails_ui_2784f6_1.39.0.js",
+    "200 /api/__clerk/npm/@clerk/ui@1.39.0/dist/vendors_ui_2784f6_1.39.0.js"
+   ]
+  },
+  {
+   "section": "journeys",
+   "status": 200,
+   "ms": 6336,
+   "url": "/admin/journeys",
+   "title": "Admin \u2014 Awesome Video",
+   "selectedTab": null,
+   "h": [
+    "Operations dashboard"
+   ],
+   "errorText": null,
+   "skeletons": 0,
+   "panelTextLen": 1945,
+   "consoleErrors": [
+    "Failed to load resource: net::ERR_FAILED"
+   ],
+   "pageErrors": [],
+   "bad": [],
+   "apis": [
+    "200 /api/awesome-list/nav",
+    "200 /api/auth/user",
+    "200 /api/config",
+    "307 /api/__clerk/npm/@clerk/clerk-js@6/dist/clerk.browser.js",
+    "200 /api/notifications",
+    "200 /api/user/preferences",
+    "200 /api/__clerk/npm/@clerk/clerk-js@6.38.0/dist/clerk.browser.js",
+    "307 /api/__clerk/npm/@clerk/ui@1/dist/ui.browser.js",
+    "200 /api/__clerk/npm/@clerk/ui@1.39.0/dist/ui.browser.js",
+    "200 /api/admin/stats",
+    "200 /api/__clerk/v1/environment",
+    "200 /api/__clerk/v1/client",
+    "200 /api/__clerk/npm/@clerk/ui@1.39.0/dist/framework_ui_2784f6_1.39.0.js",
+    "200 /api/__clerk/npm/@clerk/ui@1.39.0/dist/ui-common_ui_2784f6_1.39.0.js",
+    "200 /api/admin/journeys",
+    "200 /api/__clerk/npm/@clerk/ui@1.39.0/dist/subscriptionDetails_ui_2784f6_1.39.0.js",
+    "200 /api/__clerk/npm/@clerk/ui@1.39.0/dist/vendors_ui_2784f6_1.39.0.js"
+   ]
+  },
+  {
+   "section": "users",
+   "status": 200,
+   "ms": 6274,
+   "url": "/admin/users",
+   "title": "Admin \u2014 Awesome Video",
+   "selectedTab": "Users",
+   "h": [
+    "Operations dashboard",
+    "Users (119)"
+   ],
+   "errorText": null,
+   "skeletons": 0,
+   "panelTextLen": 1648,
+   "consoleErrors": [
+    "Failed to load resource: net::ERR_FAILED"
+   ],
+   "pageErrors": [],
+   "bad": [],
+   "apis": [
+    "200 /api/awesome-list/nav",
+    "200 /api/auth/user",
+    "200 /api/config",
+    "307 /api/__clerk/npm/@clerk/clerk-js@6/dist/clerk.browser.js",
+    "200 /api/notifications",
+    "200 /api/__clerk/npm/@clerk/clerk-js@6.38.0/dist/clerk.browser.js",
+    "200 /api/user/preferences",
+    "307 /api/__clerk/npm/@clerk/ui@1/dist/ui.browser.js",
+    "200 /api/__clerk/npm/@clerk/ui@1.39.0/dist/ui.browser.js",
+    "200 /api/admin/stats",
+    "200 /api/__clerk/v1/environment",
+    "200 /api/__clerk/v1/client",
+    "200 /api/admin/users",
+    "200 /api/__clerk/npm/@clerk/ui@1.39.0/dist/framework_ui_2784f6_1.39.0.js",
+    "200 /api/__clerk/npm/@clerk/ui@1.39.0/dist/ui-common_ui_2784f6_1.39.0.js",
+    "200 /api/__clerk/npm/@clerk/ui@1.39.0/dist/subscriptionDetails_ui_2784f6_1.39.0.js",
+    "200 /api/__clerk/npm/@clerk/ui@1.39.0/dist/vendors_ui_2784f6_1.39.0.js"
+   ]
+  },
+  {
+   "section": "export",
+   "status": 200,
+   "ms": 6240,
+   "url": "/admin/export",
+   "title": "Admin \u2014 Awesome Video",
+   "selectedTab": "Export",
+   "h": [
+    "Operations dashboard",
+    "Export Awesome List",
+    "JSON Snapshot",
+    "CSV (resources)"
+   ],
+   "errorText": null,
+   "skeletons": 0,
+   "panelTextLen": 771,
+   "consoleErrors": [
+    "Failed to load resource: net::ERR_FAILED"
+   ],
+   "pageErrors": [],
+   "bad": [],
+   "apis": [
+    "200 /api/awesome-list/nav",
+    "200 /api/config",
+    "200 /api/auth/user",
+    "307 /api/__clerk/npm/@clerk/clerk-js@6/dist/clerk.browser.js",
+    "200 /api/notifications",
+    "200 /api/user/preferences",
+    "200 /api/__clerk/npm/@clerk/clerk-js@6.38.0/dist/clerk.browser.js",
+    "307 /api/__clerk/npm/@clerk/ui@1/dist/ui.browser.js",
+    "200 /api/__clerk/npm/@clerk/ui@1.39.0/dist/ui.browser.js",
+    "200 /api/admin/stats",
+    "200 /api/admin/validation-status",
+    "200 /api/__clerk/v1/environment",
+    "200 /api/__clerk/v1/client",
+    "200 /api/admin/audit-logs",
+    "200 /api/__clerk/npm/@clerk/ui@1.39.0/dist/framework_ui_2784f6_1.39.0.js",
+    "200 /api/__clerk/npm/@clerk/ui@1.39.0/dist/ui-common_ui_2784f6_1.39.0.js",
+    "200 /api/__clerk/npm/@clerk/ui@1.39.0/dist/subscriptionDetails_ui_2784f6_1.39.0.js",
+    "200 /api/__clerk/npm/@clerk/ui@1.39.0/dist/vendors_ui_2784f6_1.39.0.js"
+   ]
+  },
+  {
+   "section": "linkhealth",
+   "status": 200,
+   "ms": 6209,
+   "url": "/admin/linkhealth",
+   "title": "Admin \u2014 Awesome Video",
+   "selectedTab": "Link Health",
+   "h": [
+    "Operations dashboard",
+    "Recent failures"
+   ],
+   "errorText": null,
+   "skeletons": 0,
+   "panelTextLen": 3940,
+   "consoleErrors": [
+    "Failed to load resource: net::ERR_FAILED"
+   ],
+   "pageErrors": [],
+   "bad": [],
+   "apis": [
+    "200 /api/awesome-list/nav",
+    "200 /api/config",
+    "200 /api/auth/user",
+    "307 /api/__clerk/npm/@clerk/clerk-js@6/dist/clerk.browser.js",
+    "200 /api/notifications",
+    "200 /api/user/preferences",
+    "200 /api/__clerk/npm/@clerk/clerk-js@6.38.0/dist/clerk.browser.js",
+    "307 /api/__clerk/npm/@clerk/ui@1/dist/ui.browser.js",
+    "200 /api/__clerk/npm/@clerk/ui@1.39.0/dist/ui.browser.js",
+    "200 /api/admin/stats",
+    "200 /api/__clerk/v1/client",
+    "200 /api/__clerk/v1/environment",
+    "200 /api/admin/link-health/history",
+    "200 /api/admin/link-health/status",
+    "200 /api/admin/enrichment/coverage",
+    "200 /api/__clerk/npm/@clerk/ui@1.39.0/dist/framework_ui_2784f6_1.39.0.js",
+    "200 /api/__clerk/npm/@clerk/ui@1.39.0/dist/ui-common_ui_2784f6_1.39.0.js",
+    "200 /api/__clerk/npm/@clerk/ui@1.39.0/dist/subscriptionDetails_ui_2784f6_1.39.0.js",
+    "200 /api/__clerk/npm/@clerk/ui@1.39.0/dist/vendors_ui_2784f6_1.39.0.js",
+    "200 /api/admin/link-health/broken-links"
+   ]
+  },
+  {
+   "section": "github",
+   "status": 200,
+   "ms": 6197,
+   "url": "/admin/github",
+   "title": "Admin \u2014 Awesome Video",
+   "selectedTab": "GitHub",
+   "h": [
+    "Operations dashboard",
+    "Sync jobs"
+   ],
+   "errorText": null,
+   "skeletons": 0,
+   "panelTextLen": 616,
+   "consoleErrors": [
+    "Failed to load resource: net::ERR_FAILED"
+   ],
+   "pageErrors": [],
+   "bad": [],
+   "apis": [
+    "200 /api/awesome-list/nav",
+    "200 /api/config",
+    "200 /api/auth/user",
+    "307 /api/__clerk/npm/@clerk/clerk-js@6/dist/clerk.browser.js",
+    "200 /api/notifications",
+    "200 /api/__clerk/npm/@clerk/clerk-js@6.38.0/dist/clerk.browser.js",
+    "200 /api/user/preferences",
+    "307 /api/__clerk/npm/@clerk/ui@1/dist/ui.browser.js",
+    "200 /api/__clerk/npm/@clerk/ui@1.39.0/dist/ui.browser.js",
+    "200 /api/admin/stats",
+    "200 /api/github/sync-status",
+    "200 /api/__clerk/v1/environment",
+    "200 /api/__clerk/v1/client",
+    "200 /api/__clerk/npm/@clerk/ui@1.39.0/dist/framework_ui_2784f6_1.39.0.js",
+    "200 /api/github/sync-history",
+    "200 /api/__clerk/npm/@clerk/ui@1.39.0/dist/ui-common_ui_2784f6_1.39.0.js",
+    "200 /api/__clerk/npm/@clerk/ui@1.39.0/dist/vendors_ui_2784f6_1.39.0.js",
+    "200 /api/__clerk/npm/@clerk/ui@1.39.0/dist/subscriptionDetails_ui_2784f6_1.39.0.js"
+   ]
+  },
+  {
+   "section": "research",
+   "status": 200,
+   "ms": 6223,
+   "url": "/admin/research",
+   "title": "Admin \u2014 Awesome Video",
+   "selectedTab": "Research",
+   "h": [
+    "Operations dashboard",
+    "Research workspace",
+    "Academic papers with code",
+    "Conference talks & videos"
+   ],
+   "errorText": null,
+   "skeletons": 0,
+   "panelTextLen": 638,
+   "consoleErrors": [
+    "Failed to load resource: net::ERR_FAILED"
+   ],
+   "pageErrors": [],
+   "bad": [],
+   "apis": [
+    "200 /api/auth/user",
+    "307 /api/__clerk/npm/@clerk/clerk-js@6/dist/clerk.browser.js",
+    "200 /api/config",
+    "200 /api/awesome-list/nav",
+    "200 /api/notifications",
+    "200 /api/user/preferences",
+    "200 /api/__clerk/npm/@clerk/clerk-js@6.38.0/dist/clerk.browser.js",
+    "307 /api/__clerk/npm/@clerk/ui@1/dist/ui.browser.js",
+    "200 /api/__clerk/npm/@clerk/ui@1.39.0/dist/ui.browser.js",
+    "200 /api/admin/stats",
+    "200 /api/__clerk/v1/client",
+    "200 /api/__clerk/v1/environment",
+    "200 /api/__clerk/npm/@clerk/ui@1.39.0/dist/framework_ui_2784f6_1.39.0.js",
+    "200 /api/__clerk/npm/@clerk/ui@1.39.0/dist/ui-common_ui_2784f6_1.39.0.js",
+    "200 /api/__clerk/npm/@clerk/ui@1.39.0/dist/vendors_ui_2784f6_1.39.0.js",
+    "200 /api/__clerk/npm/@clerk/ui@1.39.0/dist/subscriptionDetails_ui_2784f6_1.39.0.js",
+    "200 /api/researcher/jobs"
+   ]
+  },
+  {
+   "section": "enrichment",
+   "status": 200,
+   "ms": 6211,
+   "url": "/admin/enrichment",
+   "title": "Admin \u2014 Awesome Video",
+   "selectedTab": "Enrichment",
+   "h": [
+    "Operations dashboard",
+    "Enrichment jobs"
+   ],
+   "errorText": null,
+   "skeletons": 0,
+   "panelTextLen": 924,
+   "consoleErrors": [
+    "Failed to load resource: net::ERR_FAILED"
+   ],
+   "pageErrors": [],
+   "bad": [],
+   "apis": [
+    "200 /api/awesome-list/nav",
+    "307 /api/__clerk/npm/@clerk/clerk-js@6/dist/clerk.browser.js",
+    "200 /api/auth/user",
+    "200 /api/config",
+    "200 /api/notifications",
+    "200 /api/user/preferences",
+    "200 /api/__clerk/npm/@clerk/clerk-js@6.38.0/dist/clerk.browser.js",
+    "307 /api/__clerk/npm/@clerk/ui@1/dist/ui.browser.js",
+    "200 /api/__clerk/npm/@clerk/ui@1.39.0/dist/ui.browser.js",
+    "200 /api/__clerk/v1/environment",
+    "200 /api/__clerk/v1/client",
+    "200 /api/__clerk/npm/@clerk/ui@1.39.0/dist/framework_ui_2784f6_1.39.0.js",
+    "200 /api/__clerk/npm/@clerk/ui@1.39.0/dist/ui-common_ui_2784f6_1.39.0.js",
+    "200 /api/admin/stats",
+    "200 /api/__clerk/npm/@clerk/ui@1.39.0/dist/subscriptionDetails_ui_2784f6_1.39.0.js",
+    "200 /api/__clerk/npm/@clerk/ui@1.39.0/dist/vendors_ui_2784f6_1.39.0.js",
+    "200 /api/health/ai",
+    "200 /api/enrichment/jobs",
+    "200 /api/admin/enrichment/coverage"
+   ]
+  }
+ ]
+}

@@ -1,0 +1,2 @@
+POST /api/journeys/9/start 200 {"id":6,"journeyId":9,"completedSteps":[],"currentStepId":219,"created":false}
+user journeys 5 [[9,[],null],[7,[184,185,186,187,188,189,190,191,192,193,194,195,196,197,198,181,182,183],"2026-10-06T10:42:26.853Z"],[6,[172,175,166,167,168,169,171],null],[10,[],null],[8,[],null]]

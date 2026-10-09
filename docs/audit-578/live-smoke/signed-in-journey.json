@@ -1,0 +1,94 @@
+{
+  "before": {
+    "theme": {
+      "systemId": "terminal",
+      "accentId": "matrix"
+    },
+    "homeLayout": "index",
+    "preferences": null,
+    "bookmarks": [
+      "184751:",
+      "184763:",
+      "184789:",
+      "184838:",
+      "184847:",
+      "185574:",
+      "186145:",
+      "186212:",
+      "186231:",
+      "186477:",
+      "186609:",
+      "187911:"
+    ],
+    "favorites": [
+      185551,
+      186357
+    ],
+    "journey9": {
+      "completedSteps": [],
+      "currentStepId": 219
+    }
+  },
+  "after": {
+    "theme": {
+      "systemId": "terminal",
+      "accentId": "matrix"
+    },
+    "homeLayout": "index",
+    "preferences": null,
+    "bookmarks": [
+      "184751:",
+      "184763:",
+      "184789:",
+      "184838:",
+      "184847:",
+      "185574:",
+      "186145:",
+      "186212:",
+      "186231:",
+      "186477:",
+      "186609:",
+      "187911:"
+    ],
+    "favorites": [
+      185551,
+      186357
+    ],
+    "journey9": {
+      "completedSteps": [],
+      "currentStepId": 219
+    }
+  },
+  "diff": [],
+  "target": {
+    "id": 190152,
+    "title": "AV1 Encoding with libsvtav1 on Qencode"
+  },
+  "result": {
+    "startVisible": 0,
+    "putComplete": {
+      "status": 200,
+      "completedSteps": [
+        217,
+        218,
+        219
+      ]
+    },
+    "journeyAfterComplete": [
+      217,
+      218,
+      219
+    ],
+    "progressText": "17%",
+    "putUndo": {
+      "status": 200,
+      "completedSteps": []
+    },
+    "journeyAfterUndo": []
+  },
+  "writes": [
+    "PUT /api/journeys/9/progress -> 200",
+    "PUT /api/journeys/9/progress -> 200"
+  ],
+  "consoleErrors": []
+}

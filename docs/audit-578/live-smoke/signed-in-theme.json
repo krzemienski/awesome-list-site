@@ -1,0 +1,90 @@
+{
+  "before": {
+    "theme": {
+      "systemId": "terminal",
+      "accentId": "matrix"
+    },
+    "homeLayout": "index",
+    "preferences": null,
+    "bookmarks": [
+      "184751:",
+      "184763:",
+      "184789:",
+      "184838:",
+      "184847:",
+      "185574:",
+      "186145:",
+      "186212:",
+      "186231:",
+      "186477:",
+      "186609:",
+      "187911:"
+    ],
+    "favorites": [
+      185551,
+      186357
+    ],
+    "journey9": {
+      "completedSteps": [],
+      "currentStepId": 219
+    }
+  },
+  "after": {
+    "theme": {
+      "systemId": "terminal",
+      "accentId": "matrix"
+    },
+    "homeLayout": "index",
+    "preferences": null,
+    "bookmarks": [
+      "184751:",
+      "184763:",
+      "184789:",
+      "184838:",
+      "184847:",
+      "185574:",
+      "186145:",
+      "186212:",
+      "186231:",
+      "186477:",
+      "186609:",
+      "187911:"
+    ],
+    "favorites": [
+      185551,
+      186357
+    ],
+    "journey9": {
+      "completedSteps": [],
+      "currentStepId": 219
+    }
+  },
+  "diff": [],
+  "target": {
+    "id": 190152,
+    "title": "AV1 Encoding with libsvtav1 on Qencode"
+  },
+  "result": {
+    "systemBefore": "terminal",
+    "systemAfterClick": "brutalist",
+    "prefsAfterClick": {
+      "systemId": "brutalist",
+      "accentId": "amber"
+    },
+    "systemAfterReload": "brutalist",
+    "prefsRestored": {
+      "systemId": "terminal",
+      "accentId": "matrix"
+    },
+    "systemRestored": [
+      "terminal",
+      "matrix"
+    ]
+  },
+  "writes": [
+    "PUT /api/user/preferences -> 200",
+    "PUT /api/user/preferences -> 200",
+    "PUT /api/user/preferences -> 200"
+  ],
+  "consoleErrors": []
+}

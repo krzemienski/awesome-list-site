@@ -1,0 +1,90 @@
+{
+  "before": {
+    "theme": {
+      "systemId": "terminal",
+      "accentId": "matrix"
+    },
+    "homeLayout": "index",
+    "preferences": null,
+    "bookmarks": [
+      "184751:",
+      "184763:",
+      "184789:",
+      "184838:",
+      "184847:",
+      "185574:",
+      "186145:",
+      "186212:",
+      "186231:",
+      "186477:",
+      "186609:",
+      "187911:"
+    ],
+    "favorites": [
+      185551,
+      186357
+    ],
+    "journey9": {
+      "completedSteps": [],
+      "currentStepId": 219
+    }
+  },
+  "after": {
+    "theme": {
+      "systemId": "terminal",
+      "accentId": "matrix"
+    },
+    "homeLayout": "index",
+    "preferences": null,
+    "bookmarks": [
+      "184751:",
+      "184763:",
+      "184789:",
+      "184838:",
+      "184847:",
+      "185574:",
+      "186145:",
+      "186212:",
+      "186231:",
+      "186477:",
+      "186609:",
+      "187911:"
+    ],
+    "favorites": [
+      185551,
+      186357
+    ],
+    "journey9": {
+      "completedSteps": [],
+      "currentStepId": 219
+    }
+  },
+  "diff": [],
+  "target": {
+    "id": 190152,
+    "title": "AV1 Encoding with libsvtav1 on Qencode"
+  },
+  "result": {
+    "noteShown": "__qa_test_578_ live smoke note",
+    "bookmarkApi": [
+      {
+        "id": 190152,
+        "notes": "__qa_test_578_ live smoke note"
+      }
+    ],
+    "bookmarkRemoved": true,
+    "noteGone": true,
+    "favAdded": true,
+    "favAriaOn": "true",
+    "favRemoved": true,
+    "favAriaOff": "false"
+  },
+  "writes": [
+    "POST /api/interactions -> 201",
+    "POST /api/bookmarks/190152 -> 200",
+    "DELETE /api/bookmarks/190152 -> 200",
+    "POST /api/favorites/190152 -> 200",
+    "DELETE /api/favorites/190152 -> 200"
+  ],
+  "consoleErrors": []
+}
