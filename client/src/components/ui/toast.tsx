@@ -85,6 +85,8 @@ const ToastClose = React.forwardRef<
       className,
     )}
     toast-close=""
+    // Stage-6 hook: the dismiss control is the DS ghost icon button.
+    data-ds-variant="ghost"
     aria-label="Dismiss notification"
     {...props}
   >

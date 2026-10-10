@@ -112,7 +112,7 @@
 }
 .admin-research-note__eyebrow {
   margin-bottom: 6px;
-  color: var(--accent);
+  color: var(--accent-ink);
   font-family: var(--font-mono);
   font-size: 10px;
   letter-spacing: 1px;

@@ -107,7 +107,7 @@ export function ContactDialogHost() {
         <DialogHeader>
           <div className="eyebrow" aria-hidden>{"// Contact"}</div>
           <DialogTitle className="font-display text-2xl font-medium tracking-tight">
-            Contact <em className="not-italic text-[var(--accent)]">maintainers</em>
+            Contact <em className="not-italic text-[var(--accent-ink)]">maintainers</em>
           </DialogTitle>
           <DialogDescription>
             Send a message to the maintainers. Submissions are stored for review; this form does not promise email delivery.

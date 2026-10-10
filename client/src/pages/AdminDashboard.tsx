@@ -160,6 +160,9 @@ export default function AdminDashboard() {
     const userScrollEvents = ["pointerdown", "wheel", "touchstart"] as const;
     userScrollEvents.forEach((type) => host.addEventListener(type, release, { passive: true }));
     observer.observe(scroller);
+    // A late display-face swap (e.g. Terminal's mono) widens the tabs without
+    // resizing the scroller itself, so also watch every tab trigger.
+    scroller.querySelectorAll<HTMLElement>('[role="tab"]').forEach((tab) => observer.observe(tab));
     document.fonts?.ready.then(reveal);
     return () => {
       release();
@@ -242,7 +245,7 @@ export default function AdminDashboard() {
       <div className="container mx-auto px-4 py-8 max-w-2xl">
         <SEOHead title="Admin Dashboard" noindex />
         <h1 className="display-h text-2xl sm:text-3xl text-[var(--text)] mb-4 flex items-center gap-2">
-          <Shield className="h-6 w-6 text-[var(--accent)]" />
+          <Shield className="h-6 w-6 text-[var(--accent-ink)]" />
           Admin Dashboard
         </h1>
         <div className="alert warn border border-[color-mix(in_srgb,var(--accent)_30%,transparent)] bg-[color-mix(in_srgb,var(--accent)_8%,transparent)] p-4 rounded-lg" role="alert">
@@ -253,7 +256,7 @@ export default function AdminDashboard() {
                 administrators — your account is signed in, but doesn&apos;t have the
                 admin role.
               </p>
-              <WLink href="/" className="inline-flex items-center gap-2 text-sm font-medium text-[var(--accent)] underline" data-testid="link-admin-home">
+              <WLink href="/" className="inline-flex items-center gap-2 text-sm font-medium text-[var(--accent-ink)] underline" data-testid="link-admin-home">
                 Back to home →
               </WLink>
             </>
@@ -262,7 +265,7 @@ export default function AdminDashboard() {
               <p className="text-sm text-[var(--text)] mb-3">
                 You must be signed in as an administrator to view this page.
               </p>
-              <WLink href={signInHrefForCurrentLocation("/admin")} className="inline-flex items-center gap-2 text-sm font-medium text-[var(--accent)] underline" data-testid="link-admin-login">
+              <WLink href={signInHrefForCurrentLocation("/admin")} className="inline-flex items-center gap-2 text-sm font-medium text-[var(--accent-ink)] underline" data-testid="link-admin-login">
                 Sign in to continue →
               </WLink>
             </>
@@ -293,7 +296,7 @@ export default function AdminDashboard() {
     return (
       <div className="min-h-full flex items-center justify-center bg-background">
         <div className="text-center max-w-md px-4">
-          <Shield className="h-12 w-12 text-[var(--accent)] mx-auto mb-4" />
+          <Shield className="h-12 w-12 text-[var(--accent-ink)] mx-auto mb-4" />
           {sessionExpired ? (
             <>
               <p className="text-[var(--text)] mb-3" data-testid="text-session-expired">
@@ -301,14 +304,14 @@ export default function AdminDashboard() {
               </p>
               <WLink
                 href={signInHrefForCurrentLocation("/admin")}
-                className="inline-flex items-center gap-2 text-sm font-medium text-[var(--accent)] underline"
+                className="inline-flex items-center gap-2 text-sm font-medium text-[var(--accent-ink)] underline"
                 data-testid="link-session-expired-login"
               >
                 Sign in to continue →
               </WLink>
             </>
           ) : (
-            <p className="text-[var(--accent)]">Error loading admin dashboard</p>
+            <p className="text-[var(--accent-ink)]">Error loading admin dashboard</p>
           )}
         </div>
       </div>

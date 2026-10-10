@@ -42,7 +42,7 @@ export function AuthUnavailableCard({
       <h1 className="display-h text-xl">{title}</h1>
       <p className="text-sm text-muted-foreground">{body}</p>
       {stillOffline && (
-        <p className="text-sm font-medium text-[var(--accent)]" data-testid="text-still-offline">
+        <p className="text-sm font-medium text-[var(--accent-ink)]" data-testid="text-still-offline">
           Still offline — reconnect and try again.
         </p>
       )}

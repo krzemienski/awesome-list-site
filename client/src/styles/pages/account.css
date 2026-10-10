@@ -36,7 +36,7 @@
 }
 
 .account-page .account-accent {
-  color: var(--accent);
+  color: var(--accent-ink);
 }
 
 .account-page .account-muted {
@@ -53,7 +53,7 @@
 
 .account-page .account-avatar-fallback {
   background: color-mix(in srgb, var(--accent) 14%, transparent);
-  color: var(--accent);
+  color: var(--accent-ink);
 }
 
 .account-page .account-profile-meta {
@@ -61,7 +61,7 @@
 }
 
 .account-page .account-stat--accent {
-  color: var(--accent);
+  color: var(--accent-ink);
 }
 
 .account-page .account-stat--secondary {
@@ -125,7 +125,7 @@
 .account-page .account-empty-icon {
   border-radius: var(--radius-pill);
   background: color-mix(in srgb, var(--accent) 10%, transparent);
-  color: var(--accent);
+  color: var(--accent-ink);
 }
 
 .account-page .account-collection-panel,
@@ -290,7 +290,7 @@
 }
 
 .account-page .account-accent-icon {
-  color: var(--accent);
+  color: var(--accent-ink);
 }
 
 .account-page .account-accent-rule {
@@ -372,15 +372,15 @@
 }
 
 .account-page .account-recent-resource:hover .account-recent-resource-title {
-  color: var(--accent);
+  color: var(--accent-ink);
 }
 
 .account-page .account-completed-icon {
-  color: var(--accent);
+  color: var(--accent-ink);
 }
 
 .account-page .account-reason {
-  color: var(--accent);
+  color: var(--accent-ink);
 }
 
 @media (prefers-reduced-motion: reduce) {

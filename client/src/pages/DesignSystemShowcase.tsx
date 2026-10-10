@@ -205,7 +205,7 @@ export default function DesignSystemShowcase() {
           Theme Settings
         </Link>
         <div className="flex items-center gap-3">
-          <Shapes className="h-6 w-6 text-[var(--accent)]" />
+          <Shapes className="h-6 w-6 text-[var(--accent-ink)]" />
           <h1 className="display-h text-3xl" data-testid="text-ds-title">Design System</h1>
         </div>
         <p className="text-sm sm:text-base text-[color:var(--text-2)] mt-2 max-w-3xl">
@@ -221,7 +221,7 @@ export default function DesignSystemShowcase() {
       {/* ── System switcher ── */}
       <section aria-label="System switcher" className="no-print space-y-4" data-testid="ds-system-switcher">
         <div className="flex items-center gap-2">
-          <Layers className="h-5 w-5 text-[var(--accent)]" />
+          <Layers className="h-5 w-5 text-[var(--accent-ink)]" />
           <h2 className={SECTION_HEADING}>Systems</h2>
           <span className="text-xs text-[color:var(--text-3)]">5 personalities, one contract</span>
         </div>
@@ -254,7 +254,7 @@ export default function DesignSystemShowcase() {
       {/* ── Accent ramp ── */}
       <section aria-label="Accent ramp" className="no-print space-y-4" data-testid="ds-accent-ramp">
         <div className="flex items-center gap-2">
-          <Palette className="h-5 w-5 text-[var(--accent)]" />
+          <Palette className="h-5 w-5 text-[var(--accent-ink)]" />
           <h2 className={SECTION_HEADING}>Accent ramp</h2>
           <span className="text-xs text-[color:var(--text-3)]">10 accents · primary + secondary pair</span>
         </div>
@@ -293,14 +293,14 @@ export default function DesignSystemShowcase() {
       {/* ── Token catalog ── */}
       <section aria-label="Product profiles" className="space-y-4" data-testid="ds-product-profiles">
         <div className="flex items-center gap-2">
-          <Layers className="h-5 w-5 text-[var(--accent)]" />
+          <Layers className="h-5 w-5 text-[var(--accent-ink)]" />
           <h2 className={SECTION_HEADING}>Product profiles</h2>
           <span className="text-xs text-[color:var(--text-3)]">one contract, surface-specific density</span>
         </div>
         <div className="grid gap-[var(--profile-content-gap)] sm:grid-cols-2">
           {Object.entries(PRODUCT_PROFILES).map(([id, profile]) => (
             <Card key={id} className="p-[var(--profile-panel-padding)] bg-[var(--surface)] border-[color:var(--border)]">
-              <code className="font-mono text-xs text-[var(--accent)]">{id}</code>
+              <code className="font-mono text-xs text-[var(--accent-ink)]">{id}</code>
               <h3 className="mt-2 font-semibold">{profile.name}</h3>
               <p className="mt-1 text-xs text-[color:var(--text-2)]">
                 {profile.density} density
@@ -317,7 +317,7 @@ export default function DesignSystemShowcase() {
       {/* ── Token catalog ── */}
       <section aria-label="Token catalog" className="space-y-4" data-testid="ds-token-catalog">
         <div className="flex items-center gap-2">
-          <SlidersHorizontal className="h-5 w-5 text-[var(--accent)]" />
+          <SlidersHorizontal className="h-5 w-5 text-[var(--accent-ink)]" />
           <h2 className={SECTION_HEADING}>Token catalog</h2>
           <span className="text-xs text-[color:var(--text-3)]">
             resolved live for {activeSystem?.name ?? systemId} × {activeAccent?.name ?? accentId}
@@ -327,7 +327,7 @@ export default function DesignSystemShowcase() {
           {TOKEN_GROUPS.map((g) => (
             <Card key={g.group} className="p-4 sm:p-5 bg-[var(--surface)] border-[color:var(--border)]" data-testid={`ds-token-group-${g.group.toLowerCase().replace(/[^a-z0-9]+/g, "-")}`}>
               <div className="mb-3">
-                <code className="block font-mono text-xs text-[var(--accent)] tracking-wider uppercase">{g.group}</code>
+                <code className="block font-mono text-xs text-[var(--accent-ink)] tracking-wider uppercase">{g.group}</code>
                 <p className="text-xs text-[color:var(--text-2)] mt-1">{g.note}</p>
               </div>
               <div className="divide-y divide-[color:var(--hairline)]">
@@ -360,13 +360,13 @@ export default function DesignSystemShowcase() {
       {/* ── Type scale ── */}
       <section aria-label="Type scale" className="space-y-4" data-testid="ds-type-scale">
         <div className="flex items-center gap-2">
-          <Type className="h-5 w-5 text-[var(--accent)]" />
+          <Type className="h-5 w-5 text-[var(--accent-ink)]" />
           <h2 className={SECTION_HEADING}>Type scale</h2>
         </div>
         <Card className="p-6 space-y-5 bg-[var(--surface)] border-[color:var(--border)]">
           <div className="eyebrow">── 01 / Eyebrow label</div>
           <p className="display-h text-4xl sm:text-5xl">
-            Display <em className="text-[var(--accent)]">drop</em>
+            Display <em className="text-[var(--accent-ink)]">drop</em>
           </p>
           <p className="display-h text-2xl">Section display — {activeSystem?.name} metrics</p>
           <h3 className="font-sans text-lg font-semibold">Sans heading · weight 600</h3>
@@ -396,7 +396,7 @@ export default function DesignSystemShowcase() {
       {/* ── Core components ── */}
       <section aria-label="Core components" className="space-y-4" data-testid="ds-components">
         <div className="flex items-center gap-2">
-          <Sparkles className="h-5 w-5 text-[var(--accent)]" />
+          <Sparkles className="h-5 w-5 text-[var(--accent-ink)]" />
           <h2 className={SECTION_HEADING}>Core components</h2>
         </div>
         <p className="text-xs text-[color:var(--text-2)] -mt-2" data-testid="ds-display-only-note">
@@ -500,7 +500,7 @@ export default function DesignSystemShowcase() {
       {/* ── Per-system skin notes ── */}
       <section aria-label="Skin notes" className="space-y-4" data-testid="ds-skin-notes">
         <div className="flex items-center gap-2">
-          <Layers className="h-5 w-5 text-[var(--accent)]" />
+          <Layers className="h-5 w-5 text-[var(--accent-ink)]" />
           <h2 className={SECTION_HEADING}>What the {activeSystem?.name ?? systemId} skin changes</h2>
         </div>
         <Card className="p-5 bg-[var(--surface)] border-[color:var(--border)]">

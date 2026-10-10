@@ -449,7 +449,7 @@ export function SuggestEditDialog({ resource, open, onOpenChange }: SuggestEditD
             {/* BUG-048 (run14): user-facing copy, not dev jargon */}
             <div className="eyebrow" aria-hidden>// Sign in required</div>
             <DialogTitle className="font-display text-2xl font-medium tracking-tight">
-              Sign in <em className="not-italic" style={{ fontStyle: 'italic', color: 'var(--accent)' }}>required</em>
+              Sign in <em className="not-italic" style={{ fontStyle: 'italic', color: 'var(--accent-ink)' }}>required</em>
             </DialogTitle>
             <DialogDescription>
               Please sign in to suggest edits for this resource. This helps us maintain the quality of our curated list and track contributions.
@@ -494,7 +494,7 @@ export function SuggestEditDialog({ resource, open, onOpenChange }: SuggestEditD
         <DialogHeader>
           <div className="eyebrow" aria-hidden>// Suggest edit</div>
           <DialogTitle className="font-display text-2xl font-medium tracking-tight">
-            Suggest <em className="not-italic" style={{ fontStyle: 'italic', color: 'var(--accent)' }}>edit</em>
+            Suggest <em className="not-italic" style={{ fontStyle: 'italic', color: 'var(--accent-ink)' }}>edit</em>
             <span className="block text-sm font-body font-normal mt-1" style={{ color: 'var(--text-2)' }}>
               for “{resource.title}”
             </span>

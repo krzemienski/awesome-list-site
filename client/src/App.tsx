@@ -313,7 +313,7 @@ class RouteErrorBoundary extends Component<RouteErrorBoundaryProps, RouteErrorBo
           </p>
           {this.state.stillOffline && (
             <p
-              className="max-w-md text-sm font-medium text-[var(--accent)]"
+              className="max-w-md text-sm font-medium text-[var(--accent-ink)]"
               data-testid="text-still-offline"
             >
               Still offline — reconnect and try again.

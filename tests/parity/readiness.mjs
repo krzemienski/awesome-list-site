@@ -256,7 +256,9 @@ export function renderFontGapMarkdown(rowId, width, comparison) {
   return lines.join("\n");
 }
 
-export async function settlePage(page, selector, { side } = {}) {
+// `theme` is the capture cell's system/accent pair; the default is the frozen
+// reference's boot pair (it holds until the runner calls the registry applier).
+export async function settlePage(page, selector, { side, theme = { system: "editorial", accent: "crimson" } } = {}) {
   await page.waitForLoadState("domcontentloaded");
   await page.waitForFunction(() => document.readyState === "complete", null, { timeout: 60_000 });
   // Only the design's SPA entry boots React and exposes __avGo; docs.html and
@@ -285,10 +287,10 @@ export async function settlePage(page, selector, { side } = {}) {
   await page.waitForFunction(() => ["Inter", "Fraunces", "JetBrains Mono"].every(
     (family) => [...document.fonts].some((face) => face.family.replace(/^['"]|['"]$/g, "") === family),
   ), null, { timeout: 15_000 }).catch(() => false);
-  await page.waitForFunction(() => {
+  await page.waitForFunction(({ system, accent }) => {
     const root = document.documentElement;
-    return root.dataset.system === "editorial" && root.dataset.accent === "crimson";
-  }, null, { timeout: 15_000 });
+    return root.dataset.system === system && root.dataset.accent === accent;
+  }, theme, { timeout: 15_000 });
   const fontReadiness = await page.evaluate(async (parityFamilies) => {
     await document.fonts.ready;
     const stripQuotes = (value) => String(value).replace(/^['"]|['"]$/g, "");
@@ -378,7 +380,11 @@ export async function settlePage(page, selector, { side } = {}) {
       check: document.fonts.check(`${item.style} ${item.weight} 16px "${item.family}"`),
     }));
     const nativeDefects = checks
-      .filter((check) => check.label === "display-italic-400" && !check.loadedFace)
+      // Only a defect when a visible element actually renders that face in
+      // italic (terminal's IBM Plex Mono has no italic in the frozen font link,
+      // on both sides, and no terminal surface uses it).
+      .filter((check) => check.label === "display-italic-400" && !check.loadedFace &&
+        used.some((item) => item.family.toLowerCase() === check.family.toLowerCase() && item.style === "italic"))
       .map((check) => `Canonical display italic face ${check.family} is not registered/loaded; synthetic italic is a visual defect when used`);
     document.body.classList.add("no-anim");
     window.scrollTo(0, 0);

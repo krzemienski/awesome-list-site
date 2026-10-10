@@ -36,7 +36,7 @@ export default function AdminGuard({ children }: AdminGuardProps) {
       <div className="container mx-auto px-4 py-8 max-w-2xl">
         <SEOHead title="Admin Dashboard" noindex />
         <h1 className="display-h text-2xl sm:text-3xl text-[var(--text)] mb-4 flex items-center gap-2">
-          <Shield className="h-6 w-6 text-[var(--accent)]" />
+          <Shield className="h-6 w-6 text-[var(--accent-ink)]" />
           Admin Dashboard
         </h1>
         <div className="alert warn border border-[color-mix(in_srgb,var(--accent)_30%,transparent)] bg-[color-mix(in_srgb,var(--accent)_8%,transparent)] p-4 rounded-lg" role="alert">
@@ -47,7 +47,7 @@ export default function AdminGuard({ children }: AdminGuardProps) {
                 administrators — your account is signed in, but doesn't have the
                 admin role.
               </p>
-              <WLink href="/" className="inline-flex items-center gap-2 text-sm font-medium text-[var(--accent)] underline" data-testid="link-admin-home">
+              <WLink href="/" className="inline-flex items-center gap-2 text-sm font-medium text-[var(--accent-ink)] underline" data-testid="link-admin-home">
                 Back to home →
               </WLink>
             </>
@@ -63,7 +63,7 @@ export default function AdminGuard({ children }: AdminGuardProps) {
                   — including the #tab, which the server never sees. */}
               <WLink
                 href={signInHrefForCurrentLocation("/admin")}
-                className="inline-flex items-center gap-2 text-sm font-medium text-[var(--accent)] underline"
+                className="inline-flex items-center gap-2 text-sm font-medium text-[var(--accent-ink)] underline"
                 data-testid="link-admin-login"
               >
                 Sign in to continue →

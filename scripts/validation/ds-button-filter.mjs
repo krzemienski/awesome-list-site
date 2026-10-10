@@ -35,13 +35,15 @@ export function collectStrayButtons() {
     !b.closest('[data-ds="card-hover"]') &&                 // in-card chrome (tag expanders)
     !['footer-cookie-settings',                             // small tokenized text buttons
       'button-clear-recent-searches',
+      'button-privacy-cookie-settings',
       'button-dismiss-scrubbed-params'].includes(b.getAttribute('data-testid')) &&
     !b.matches('.about-faq-item > .about-faq-trigger[aria-expanded][aria-controls]') && // About FAQ disclosure rows
     !b.matches('button.card.hoverable') &&                  // canonical card-as-button (account lists): skins key on .card.hoverable
     !b.matches('.admin-tab-scroller > button.admin-tab-scroller__edge[aria-label]') && // admin tab-strip scroll arrows
     /* 5 · Clerk-hosted auth widget (third-party DOM the app cannot mark).
            Positive AND per control: excluded ONLY while the widget is themed
-           from the DS (its primary button paints the live --accent) AND this
+           from the DS (its primary button paints the live --accent as fill, or as
+         border in Terminal's outline grammar) AND this
            very control paints in a DS face (--font-body / --font-display /
            --font-mono first family) — a Clerk control still in its vendor
            font is swept like anything else. */
@@ -53,7 +55,9 @@ export function collectStrayButtons() {
       root.appendChild(probe);
       const want = getComputedStyle(probe).backgroundColor;
       probe.remove();
-      if (getComputedStyle(primary).backgroundColor !== want) return false;
+      // Filled primary (bg = accent) or Terminal's outlined primary (border = accent).
+      const ps = getComputedStyle(primary);
+      if (ps.backgroundColor !== want && ps.borderTopColor !== want) return false;
       const face = (v) => String(v || '').split(',')[0].replace(/\x22|\x27/g, '').trim().toLowerCase();
       const rs = getComputedStyle(document.documentElement);
       const ds = ['--font-body', '--font-display', '--font-mono'].map(t => face(rs.getPropertyValue(t)));
@@ -100,7 +104,9 @@ export function collectStrayInputs() {
       root.appendChild(probe);
       const want = getComputedStyle(probe).backgroundColor;
       probe.remove();
-      if (getComputedStyle(primary).backgroundColor !== want) return false;
+      // Filled primary (bg = accent) or Terminal's outlined primary (border = accent).
+      const ps = getComputedStyle(primary);
+      if (ps.backgroundColor !== want && ps.borderTopColor !== want) return false;
       const face = (v) => String(v || '').split(',')[0].replace(/\x22|\x27/g, '').trim().toLowerCase();
       const rs = getComputedStyle(document.documentElement);
       const ds = ['--font-body', '--font-display', '--font-mono'].map(t => face(rs.getPropertyValue(t)));
@@ -277,7 +283,18 @@ export function collectStrayEyebrows() {
         probe.remove();
         return face(cs.fontFamily) === face(getComputedStyle(document.documentElement).getPropertyValue('--font-mono')) &&
           cs.fontSize === '10px' && cs.color === accent;
-      })(el))
+      })(el)) &&
+    /* 6 · the frozen SubcategoryPage breadcrumb trail ONLY (pages.jsx:83-93
+           renders it as a .mono 11px uppercase crumb row, not .eyebrow). A
+           trail is navigation, not a section label. Narrow (that nav) AND
+           positive: the nav must paint --font-mono at 11px */
+    !(el.closest('nav.taxonomy-breadcrumbs') &&
+      ((nav) => {
+        const face = (v) => String(v || '').split(',')[0].replace(/\x22|\x27/g, '').trim().toLowerCase();
+        const cs = getComputedStyle(nav);
+        return face(cs.fontFamily) === face(getComputedStyle(document.documentElement).getPropertyValue('--font-mono')) &&
+          cs.fontSize === '11px';
+      })(el.closest('nav.taxonomy-breadcrumbs')))
   );
   // STAGE6-EYEBROW-FILTER-END
   return {

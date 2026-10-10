@@ -36,7 +36,7 @@
 .search-palette [cmdk-input-wrapper] {
   padding: 14px 18px;
   border-bottom: var(--hairline-w) solid var(--hairline);
-  color: var(--accent);
+  color: var(--accent-ink);
 }
 
 .search-palette [cmdk-input-wrapper] > svg {
@@ -147,13 +147,13 @@
 }
 
 .search-palette-kind-category {
-  color: var(--accent);
+  color: var(--accent-ink);
 }
 
 .search-palette-row[data-selected="true"] .search-palette-kind,
 .search-palette-row:hover .search-palette-kind,
 .search-palette-view-all .search-palette-kind {
-  color: var(--accent);
+  color: var(--accent-ink);
 }
 
 .search-palette-copy {
@@ -177,7 +177,7 @@
 
 .search-palette-row[data-selected="true"] .search-palette-copy > span,
 .search-palette-row:hover .search-palette-copy > span {
-  color: var(--accent);
+  color: var(--accent-ink);
 }
 
 /* Featured resources carry the same ★ as ResourceCard's chip, but in neutral
@@ -210,7 +210,7 @@
 
 .search-palette-arrow {
   align-self: center;
-  color: var(--accent);
+  color: var(--accent-ink);
   visibility: hidden;
 }
 
@@ -240,7 +240,7 @@
 .search-palette-status svg {
   width: 20px;
   height: 20px;
-  color: var(--accent);
+  color: var(--accent-ink);
 }
 
 .search-palette-status strong {

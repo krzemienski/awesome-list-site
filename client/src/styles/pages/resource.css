@@ -85,7 +85,7 @@
 }
 
 .resource-detail-actions > button[aria-pressed="true"] {
-  color: var(--accent);
+  color: var(--accent-ink);
   background: color-mix(in srgb, var(--accent) 8%, transparent);
   border-color: color-mix(in srgb, var(--accent) 35%, var(--border));
 }
@@ -110,7 +110,7 @@
 .resource-detail-description h2,
 .resource-detail-sections h2 {
   margin-bottom: 10px;
-  color: var(--accent);
+  color: var(--accent-ink);
   font-family: var(--font-mono);
   font-size: 10px;
   font-weight: 400;

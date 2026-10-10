@@ -267,7 +267,7 @@ export default function Settings() {
               hoverable
               className="h-full p-4 flex items-start gap-3 hover:border-[var(--accent)] transition-colors cursor-pointer"
             >
-              <Icon className="h-5 w-5 text-[var(--accent)] mt-0.5 shrink-0" />
+              <Icon className="h-5 w-5 text-[var(--accent-ink)] mt-0.5 shrink-0" />
               <div className="min-w-0 flex-1">
                 <div className="flex items-center justify-between gap-2">
                   <h2 id={`${testid}-title`} className="font-sans font-semibold text-base">{title}</h2>
@@ -302,7 +302,7 @@ export default function Settings() {
                 id="learning-preferences-title"
                 className="flex items-center gap-2"
               >
-                <SlidersHorizontal className="h-5 w-5 text-[var(--accent)]" />
+                <SlidersHorizontal className="h-5 w-5 text-[var(--accent-ink)]" />
                 Learning preferences
               </CardTitle>
               <CardDescription>
@@ -451,7 +451,7 @@ export default function Settings() {
       {showSignInPrompt && (
         <Card className="p-5" data-testid="card-settings-signin">
           <div className="flex items-start gap-3">
-            <LogIn className="h-5 w-5 text-[var(--accent)] mt-0.5 shrink-0" />
+            <LogIn className="h-5 w-5 text-[var(--accent-ink)] mt-0.5 shrink-0" />
             <div className="min-w-0 flex-1">
               <h2 className="font-sans font-semibold text-base">Sign in for more</h2>
               <p className="text-sm text-[color:var(--text-2)] mt-1 mb-3">

@@ -647,10 +647,19 @@ const main = async () => {
       // A canonical face that is declared but not registered (synthetic italic)
       // is a deterministic property of the page, so it is a row defect rather
       // than a capture failure: the capture faithfully shows it.
-      const fontDefects = [
-        ...row.fontsSettled.actual.nativeDefects.map((defect) => `app: ${defect}`),
-        ...row.fontsSettled.expected.nativeDefects.map((defect) => `reference: ${defect}`),
-      ];
+      // A defect the frozen reference shows identically (e.g. Terminal/Geist
+      // display italics the design's byte-locked Google Fonts link never
+      // loads) is reference-faithful: it is recorded as a shared baseline
+      // defect, never hidden, but only app-only defects fail the row.
+      const referenceDefects = new Set(row.fontsSettled.expected.nativeDefects);
+      const sharedFontDefects = row.fontsSettled.actual.nativeDefects.filter((defect) => referenceDefects.has(defect));
+      const fontDefects = row.fontsSettled.actual.nativeDefects
+        .filter((defect) => !referenceDefects.has(defect))
+        .map((defect) => `app: ${defect}`);
+      const referenceOnlyFontDefects = row.fontsSettled.expected.nativeDefects
+        .filter((defect) => !row.fontsSettled.actual.nativeDefects.includes(defect));
+      row.sharedFontDefects = sharedFontDefects;
+      row.referenceOnlyFontDefects = referenceOnlyFontDefects;
       const visualOk = row.comparison.withinCeiling && row.backdropFilters.match && row.identity.ok !== false;
       const reasons = [];
       if (!row.comparison.withinCeiling) reasons.push(`${row.comparison.diffPercent.toFixed(3)}% differing pixels exceeds the ${MAXIMUM_DIFF_PERCENT}% ceiling`);
@@ -658,6 +667,11 @@ const main = async () => {
       if (row.identity.ok === false) reasons.push(row.identity.reason);
       if (fontGap) reasons.push(`@font-face parity gap: ${row.fontParity.gaps.length} face(s) declared on one side only`);
       if (fontDefects.length) reasons.push(`font defect — ${fontDefects.join("; ")}`);
+      const notes = [
+        ...sharedFontDefects.map((defect) => `shared reference baseline font defect: ${defect}`),
+        ...referenceOnlyFontDefects.map((defect) => `reference-only font defect (face unused by app): ${defect}`),
+      ];
+      if (notes.length) row.fontNotes = notes;
       if (evidenceKind) {
         pushRow({ ...row, status: "EVIDENCE", evidenceKind, fontDefects, reason: reasons.join("; ") || undefined });
       } else {
@@ -1178,11 +1192,15 @@ const openSideOn = async (ctx, screen, width, side, { context, page, base, isRef
   if (isReference) {
     // Frozen useTweaks ignores storage. Wait for App's initial effect before
     // calling the actual registry applier, never host controls or file edits.
-    await settlePage(page, selector, { side: "reference" });
+    // A full settlePage here would inject the render normalisation (which
+    // disables backdrop-filter) before the real settle samples it, so the
+    // reference would always report no blur. Only wait for App to mount.
+    await page.waitForFunction(() => typeof window.__avGo === "function" && typeof window.applyDesignSystem === "function", null, { timeout: 60_000 });
+    if (selector) await page.locator(selector).first().waitFor({ state: "visible", timeout: 60_000 });
     await page.evaluate(({ system, accent }) => window.applyDesignSystem(system, accent), theme);
   }
   await assertCaptureTheme(page, theme);
-  const settled = await settlePage(page, selector, { side: isReference ? "reference" : "actual" });
+  const settled = await settlePage(page, selector, { side: isReference ? "reference" : "actual", theme });
   await assertCaptureTheme(page, theme);
   throwIfCaptureAborted(ctx.signal);
   if (!isReference && kind === "app") noteRateLimits(ctx.throttleGuard, page, screen);

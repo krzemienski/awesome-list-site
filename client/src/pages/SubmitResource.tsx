@@ -526,7 +526,7 @@ export default function SubmitResource() {
       <SEOHead title={submitSeoTitle} description={submitSeoDescription} />
 
       <div className="submit-page">
-        <div className="submit-eyebrow">
+        <div className="eyebrow submit-eyebrow">
           <Plus aria-hidden="true" />
           SUBMIT A RESOURCE
         </div>

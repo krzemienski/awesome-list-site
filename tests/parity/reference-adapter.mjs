@@ -46,8 +46,9 @@ async function fetchResourceDetail0929(appBase, resourceId) {
   const service = fs.readFileSync(new URL("../../server/services/relatedResources.ts", import.meta.url), "utf8");
   const route = fs.readFileSync(new URL("../../server/routes/domains/catalog-contributions.ts", import.meta.url), "utf8");
   for (const declaration of [
-    'fetch(`/api/resources/${id}`, { credentials: \'include\' })',
-    'fetch(`/api/resources/${id}/related`, { credentials: \'include\' })',
+    // apiRequest = credentialed GET (credentials default "include").
+    'apiRequest(`/api/resources/${id}`, { method: "GET" })',
+    'apiRequest(`/api/resources/${id}/related`, { method: "GET" })',
     'queryKey: [\'/api/favorites\']', 'queryKey: [\'/api/bookmarks\']',
   ]) {
     if (!source.includes(declaration)) throw new Error(`0929 resource endpoint declaration drift: ${declaration}`);

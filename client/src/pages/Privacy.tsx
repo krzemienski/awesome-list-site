@@ -19,7 +19,7 @@ export default function Privacy() {
       />
       <div className="legal-header">
         <h1 className="display-h legal-title text-2xl sm:text-3xl flex items-center gap-2" data-testid="heading-privacy">
-          <Shield className="h-6 w-6 text-[var(--accent)]" />
+          <Shield className="h-6 w-6 text-[var(--accent-ink)]" />
           Privacy Policy
         </h1>
         <p className="legal-updated text-sm text-[color:var(--text-3)]">Last updated: September 1, 2026</p>

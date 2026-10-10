@@ -24,9 +24,11 @@
 
   /* Ink drawn on top of an --accent fill: every system's --bg is pure black. */
   --on-accent: var(--bg);
-  /* DS-OK: app-owned accessible small-text ink, tested over every raised
-     surface and 8%/14% accent tint. Decorative --accent stays frozen. */
-  --accent-ink: color-mix(in srgb, var(--accent) 75%, #ffffff);
+  /* DS-OK: app-owned accessible small-text ink. Accents that already pass
+     AA on every raised surface and 8%/14% tint keep their exact hue; the
+     pairs below get the minimal sRGB white mix (>=4.6:1 static, leaving
+     headroom for atmosphere). Decorative --accent stays frozen. */
+  --accent-ink: var(--accent);
 
   --radius-xs: 3px;
 
@@ -50,6 +52,21 @@
   --shell-footer-measure:   var(--content-max);
 }
 
+/* Per system/accent accessible ink (verified by app-accent-contrast.mjs). */
+:root[data-system="editorial"][data-accent="crimson"] { --accent-ink: color-mix(in srgb, var(--accent) 92%, #ffffff); } /* DS-OK: accessible ink token */
+:root[data-system="geist"][data-accent="crimson"] { --accent-ink: color-mix(in srgb, var(--accent) 83%, #ffffff); } /* DS-OK: accessible ink token */
+:root[data-system="brutalist"][data-accent="crimson"] { --accent-ink: color-mix(in srgb, var(--accent) 83%, #ffffff); } /* DS-OK: accessible ink token */
+:root[data-system="swiss"][data-accent="crimson"] { --accent-ink: color-mix(in srgb, var(--accent) 97%, #ffffff); } /* DS-OK: accessible ink token */
+:root[data-system="editorial"][data-accent="magenta"] { --accent-ink: color-mix(in srgb, var(--accent) 92%, #ffffff); } /* DS-OK: accessible ink token */
+:root[data-system="geist"][data-accent="magenta"] { --accent-ink: color-mix(in srgb, var(--accent) 83%, #ffffff); } /* DS-OK: accessible ink token */
+:root[data-system="brutalist"][data-accent="magenta"] { --accent-ink: color-mix(in srgb, var(--accent) 83%, #ffffff); } /* DS-OK: accessible ink token */
+:root[data-system="swiss"][data-accent="magenta"] { --accent-ink: color-mix(in srgb, var(--accent) 95%, #ffffff); } /* DS-OK: accessible ink token */
+:root[data-system="editorial"][data-accent="violet"] { --accent-ink: color-mix(in srgb, var(--accent) 80%, #ffffff); } /* DS-OK: accessible ink token */
+:root[data-system="terminal"][data-accent="violet"] { --accent-ink: color-mix(in srgb, var(--accent) 87%, #ffffff); } /* DS-OK: accessible ink token */
+:root[data-system="geist"][data-accent="violet"] { --accent-ink: color-mix(in srgb, var(--accent) 74%, #ffffff); } /* DS-OK: accessible ink token */
+:root[data-system="brutalist"][data-accent="violet"] { --accent-ink: color-mix(in srgb, var(--accent) 74%, #ffffff); } /* DS-OK: accessible ink token */
+:root[data-system="swiss"][data-accent="violet"] { --accent-ink: color-mix(in srgb, var(--accent) 82%, #ffffff); } /* DS-OK: accessible ink token */
+
 @media (min-width: 768px) and (max-width: 1023px) { :root { --shell-sidebar-w: var(--shell-sidebar-w-tablet); } }
 @media (max-width: 767px) { :root { --shell-header-h: 56px; } }
 
@@ -65,6 +82,14 @@ body { height: auto; min-height: 100%; }
 :root .chip.accent,
 :root .btn.danger,
 :root .btn.link,
+:root[data-system="terminal"] .eyebrow,
+:root[data-system="geist"] .eyebrow,
+:root[data-system="brutalist"] .eyebrow,
+:root .sub-item.active,
+:root .tab.active,
+:root .icon-rail .icon-btn.active,
+:root[data-system="editorial"] .serif-italic,
+:root[data-system="editorial"] .eyebrow,
 :root .journey-card__progress-value,
 :root .journey-detail-card__progress-value,
 :root[data-system="terminal"] .btn.primary { color: var(--accent-ink); }
@@ -116,7 +141,7 @@ body { height: auto; min-height: 100%; }
   outline-offset: 2px;
 }
 [data-collapsible="icon"] .rail-icon-btn.active {
-  color: var(--accent);
+  color: var(--accent-ink);
   background: color-mix(in srgb, var(--accent) 12%, transparent);
   border-color: color-mix(in srgb, var(--accent) 30%, var(--border));
 }
@@ -129,7 +154,7 @@ body { height: auto; min-height: 100%; }
 
 /* shadcn's `link` Button variant: the design system has no link-style .btn,
    so it keeps the .btn geometry and reads as an inline accent link. */
-.btn.link { background: transparent; border-color: transparent; color: var(--accent); }
+.btn.link { background: transparent; border-color: transparent; color: var(--accent-ink); }
 .btn.link:hover { background: transparent; text-decoration: underline; transform: none; box-shadow: none; }
 
 /* Clerk's sign-in field: `.input` paints it, this keeps the 44px touch target. */

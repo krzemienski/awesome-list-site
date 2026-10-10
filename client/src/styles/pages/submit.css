@@ -13,18 +13,11 @@
   animation: fadeIn 0.5s ease;
 }
 
+/* Paired with the DS .eyebrow helper (frozen pages.jsx Submit): ink, weight
+   and the Terminal "> " prompt / Swiss grey come from the per-system skin. */
 .submit-eyebrow {
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
   margin-bottom: 16px;
-  color: var(--accent);
-  font-family: var(--font-mono);
-  font-size: var(--mono-size-step);
-  font-weight: 700;
-  letter-spacing: var(--eyebrow-tracking);
   line-height: var(--body-leading);
-  text-transform: uppercase;
 }
 
 .submit-eyebrow svg {
@@ -44,11 +37,11 @@
 }
 
 .submit-title-accent {
-  color: var(--accent);
+  color: var(--accent-ink);
 }
 
+/* No own measure: the frozen lede fills the 720px page column. */
 .submit-lede {
-  max-width: 680px;
   margin-bottom: 36px;
   color: var(--text-2);
   font-size: 15px;
@@ -286,7 +279,7 @@
 }
 
 .submit-auth-alert a {
-  color: var(--accent);
+  color: var(--accent-ink);
   text-decoration: underline;
   text-underline-offset: 2px;
 }

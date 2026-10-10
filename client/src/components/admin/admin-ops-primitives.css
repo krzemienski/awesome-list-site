@@ -97,7 +97,7 @@
 }
 
 .admin-ops-stat__value--accent {
-  color: var(--accent);
+  color: var(--accent-ink);
 }
 
 .admin-ops-stat__description {
@@ -136,7 +136,7 @@
 .admin-ops-status-chip--accent {
   background: color-mix(in srgb, var(--accent) 8%, transparent);
   border-color: color-mix(in srgb, var(--accent) 35%, transparent);
-  color: var(--accent);
+  color: var(--accent-ink);
 }
 
 .admin-ops-status-chip--warn {

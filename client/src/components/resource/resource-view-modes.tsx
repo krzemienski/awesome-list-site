@@ -67,7 +67,7 @@ export function ResourceListRow({ resource }: { resource: ViewModeResource }) {
           {resource.id !== "" && (
             <Badge
               variant="outline"
-              className="text-xs border-[color-mix(in_srgb,var(--accent)_30%,transparent)] text-[var(--accent)] shrink-0"
+              className="text-xs border-[color-mix(in_srgb,var(--accent)_30%,transparent)] text-[var(--accent-ink)] shrink-0"
             >
               Details
             </Badge>

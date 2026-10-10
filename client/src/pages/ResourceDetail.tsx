@@ -980,8 +980,8 @@ export default function ResourceDetail() {
                 <>
                   <Separator />
                   <div>
-                    <h2 className="text-sm font-semibold mb-2 text-muted-foreground flex items-center gap-2">
-                      <ImageIcon className="h-4 w-4" />
+                    <h2 className="eyebrow mb-2 flex items-center gap-2">
+                      <ImageIcon className="h-4 w-4" aria-hidden="true" />
                       Page Description
                     </h2>
                     <p className="text-sm text-muted-foreground leading-relaxed">

@@ -364,7 +364,7 @@ export default function Advanced() {
       {/* Call to Action */}
       <Card className="discovery-tools-panel discovery-tools-cta-panel">
         <CardContent className="discovery-tools-cta-content">
-          <h3 className="discovery-tools-cta-title">Explore More Features</h3>
+          <h2 className="discovery-tools-cta-title">Explore More Features</h2>
           <p className="discovery-tools-cta-copy">
             These advanced features help you discover, analyze, and share awesome list data more effectively
           </p>

@@ -20,7 +20,7 @@ export default function CodeOfConduct() {
       />
       <div className="legal-header">
         <h1 className="display-h legal-title text-2xl sm:text-3xl flex items-center gap-2" data-testid="heading-code-of-conduct">
-          <HeartHandshake className="h-6 w-6 text-[var(--accent)]" />
+          <HeartHandshake className="h-6 w-6 text-[var(--accent-ink)]" />
           Code of Conduct
         </h1>
         <p className="legal-updated text-sm text-[color:var(--text-3)]">Last updated: July 16, 2026</p>

@@ -1029,8 +1029,15 @@ function parseCssAccentOverrides(cssSrc) {
   const src = stripCommentsPreservingLines(cssSrc);
   const out = [];
   const lineAt = (offset) => src.slice(0, offset).split('\n').length;
-  for (const rule of src.matchAll(/([^{};]+)\{/g)) {
-    if (/\[data-accent\b/.test(rule[1])) out.push({ what: `a [data-accent] rule (${rule[1].trim().replace(/\s+/g, ' ')})`, line: lineAt(rule.index + rule[1].search(/\S/)) });
+  for (const rule of src.matchAll(/([^{};]+)\{([^{}]*)\}?/g)) {
+    if (!/\[data-accent\b/.test(rule[1])) continue;
+    // The one approved [data-accent] use: a per system/accent accessible
+    // text ink (--accent-ink, app-bridge.css, verified by
+    // app-accent-contrast.mjs). It never redeclares the painted accent, so a
+    // body that declares --accent-ink and nothing else is not a repaint.
+    const props = [...(rule[2] || '').matchAll(/(--[\w-]+|[a-z-]+)\s*:/gi)].map(m => m[1]);
+    if (props.length && props.every(p => p === '--accent-ink')) continue;
+    out.push({ what: `a [data-accent] rule (${rule[1].trim().replace(/\s+/g, ' ')})`, line: lineAt(rule.index + rule[1].search(/\S/)) });
   }
   for (const m of src.matchAll(/(^|[\s;{])(--accent(?:-2)?)\s*:/g)) {
     out.push({ what: `a ${m[2]} declaration`, line: lineAt(m.index + m[1].length) });

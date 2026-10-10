@@ -35,7 +35,7 @@ const files = [
   "client/src/components/ui/button.tsx", "client/src/components/ui/card.tsx",
   "client/src/components/ui/badge.tsx", "client/src/components/ui/separator.tsx",
   "shared/resourceFacets-core.ts", "shared/seo-content-templates.ts",
-  "shared/tagNormalize.ts", "client/src/lib/utils.ts", "client/src/index.css",
+  "shared/tagNormalize.ts", "client/src/lib/utils.ts", "client/src/lib/category-glyph.ts", "client/src/index.css",
   "shared/styles/product-profiles.css", "client/src/styles/app-bridge.css",
   "server/services/relatedResources.ts",
   "server/routes/domains/catalog-contributions.ts",
@@ -134,6 +134,7 @@ function renderRetainedResource(data, nav, viewer) {
   const dateSource = read("client/src/lib/utils.ts").match(/export function formatAdminDate\([\s\S]*?\n}/)?.[0];
   if (!dateSource) throw new Error("0929 retained resource: formatAdminDate declaration drift");
   const formatAdminDate = compile(dateSource, {}, "formatAdminDate");
+  const categoryGlyph = compile(read("client/src/lib/category-glyph.ts"), {}, "categoryGlyph");
   const kindLabels = exactSlice(source, "const RESOURCE_KIND_LABELS:", "\nfunction ContactResourceAction(", "kind labels");
   const taxonomy = exactSlice(source, "    const out: { category?: string;", "\n  }, [awesomeListTree, resource]);", "taxonomy resolver");
   const derived = exactSlice(source, "  const metadata = resource?.metadata", "\n  if (isLoading) {", "visible derivations");
@@ -149,13 +150,15 @@ function renderRetainedResource(data, nav, viewer) {
   const bindings = {
     React, Fragment, Suspense, ...primitives, ...glyphs, ...facets, resourceFactsSummary: facts,
     Link: React.forwardRef(({ children, ...props }, ref) => React.createElement("a", { ...props, ref }, children)),
-    formatAdminDate, tagLandingPath,
+    formatAdminDate, tagLandingPath, categoryGlyph,
     // These non-visual components never produce content in a closed initial
     // capture. Effects and handlers are not executed in the reference renderer.
     SEOHead: () => null, BookmarkNotesDialog: () => null, SuggestEditDialog: () => null,
     ContactResourceAction: ({ fallback }) => fallback,
     Blurhash: () => null,
     resource, relatedResources: related, awesomeListTree: nav,
+    // Settled related query (the capture waits for it): no loading/error UI.
+    relatedQuery: { data: related, isLoading: false, isError: false, refetch: noop },
     user: viewer?.user || null,
     isFavorite: viewer?.favorites?.some((item) => String(item.id) === String(resource.id)) ?? false,
     isBookmarked: viewer?.bookmarks?.some((item) => String(item.id) === String(resource.id)) ?? false,

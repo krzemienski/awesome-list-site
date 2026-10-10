@@ -159,7 +159,7 @@ export default function DigestQueueHealth() {
             </div>
 
             <section>
-              <h3 className="mb-3 text-sm font-semibold">Digest jobs by channel and status</h3>
+              <h2 className="mb-3 text-sm font-semibold">Digest jobs by channel and status</h2>
               {Object.keys(query.data.queue).length === 0 ? (
                 <p className="text-sm text-[color:var(--text-2)]">
                   No digest jobs recorded.
@@ -184,10 +184,10 @@ export default function DigestQueueHealth() {
             </section>
 
             <section>
-              <h3 className="mb-3 flex items-center gap-2 text-sm font-semibold">
+              <h2 className="mb-3 flex items-center gap-2 text-sm font-semibold">
                 <AlertTriangle className="h-4 w-4 text-[var(--text-2)]" />
                 Recent failure codes
-              </h3>
+              </h2>
               {query.data.recentFailureCodes.length ? (
                 <ul className="ops-digest-health__failure-list">
                   {query.data.recentFailureCodes.map((failure) => (

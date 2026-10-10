@@ -454,6 +454,10 @@ export const DOCUMENTED_DEVIATIONS = new Map([
     reason: "Approved app-owned small accent ink: decorative palette remains frozen, while every neutral raised backing and 8%/14% tinted state must meet AA. Expires when the canonical chip uses accessible ink.",
     holds: values => pinned('var(--accent)', 'var(--accent-ink)')(values) && accentContrastTable().every(row => row.ratio >= 4.5),
   }],
+  ...[':root[data-system="editorial"] .serif-italic', ...["editorial", "terminal", "geist", "brutalist"].map(id => `:root[data-system="${id}"] .eyebrow`)].map(selector => [`shadow:client/src/styles/app-bridge.css ${selector}:color`, {
+    reason: "Approved app-owned small accent ink for eyebrows/italic accents: equals --accent wherever the accent already passes AA, minimal white mix otherwise (Swiss keeps its text-3 eyebrow). Expires when the canonical sheet uses accessible ink.",
+    holds: values => pinned('var(--accent)', 'var(--accent-ink)')(values) && accentContrastTable().every(row => row.ratio >= 4.5),
+  }]),
   ...["editorial", "terminal", "geist", "brutalist", "swiss"].map(id => [`${id}:--text-3`, {
     reason: "App-owned prepaint alpha correction: small metadata must meet the design's promised 4.6:1 on every neutral surface. Expires when canonical contrast catches up.",
     holds: text3ContrastHolds,

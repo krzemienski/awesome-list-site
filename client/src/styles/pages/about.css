@@ -22,7 +22,7 @@
   align-items: center;
   gap: 8px;
   margin-bottom: 16px;
-  color: var(--accent);
+  color: var(--accent-ink);
   font-family: var(--font-mono);
   font-size: var(--mono-size-step);
   font-weight: 700;
@@ -95,7 +95,7 @@
 
 .about-callout-index {
   margin-bottom: 6px;
-  color: var(--accent);
+  color: var(--accent-ink);
   font-size: 10px;
   line-height: var(--body-leading);
 }

@@ -41,7 +41,7 @@
   align-items: center;
   gap: 8px;
   margin-bottom: 14px;
-  color: var(--accent);
+  color: var(--accent-ink);
   font-family: var(--font-mono);
   font-size: var(--mono-size-step);
   font-weight: 600;
@@ -226,7 +226,7 @@
 }
 
 .journey-card__title-link:hover {
-  color: var(--accent);
+  color: var(--accent-ink);
   text-decoration: underline;
   text-underline-offset: 3px;
 }
@@ -277,7 +277,7 @@
 
 .journey-card__progress-value,
 .journey-detail-card__progress-value {
-  color: var(--accent);
+  color: var(--accent-ink);
   font-family: var(--font-mono);
   font-weight: 600;
 }
@@ -469,7 +469,7 @@
 
 .journey-enroll-note a,
 .journey-enroll-note button {
-  color: var(--accent);
+  color: var(--accent-ink);
 }
 
 .journey-detail-card__start {
@@ -605,7 +605,7 @@
 
 .journey-resource__link:hover,
 .journey-resource__external:hover {
-  color: var(--accent);
+  color: var(--accent-ink);
 }
 
 .journey-resource__external {
@@ -624,13 +624,13 @@
 
 .journey-step-card__complete {
   border-color: color-mix(in srgb, var(--accent) 45%, var(--border));
-  color: var(--accent);
+  color: var(--accent-ink);
 }
 
 .journey-step-card__complete:hover {
   border-color: var(--accent);
   background: color-mix(in srgb, var(--accent) 10%, transparent);
-  color: var(--accent);
+  color: var(--accent-ink);
 }
 
 .journey-step-card__undo {

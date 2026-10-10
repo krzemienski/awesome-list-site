@@ -130,7 +130,7 @@ function renderRuntimeAddendum(rootDir) {
     "",
     "The source text below is historical, verbatim handoff documentation, NOT current runtime contrast guidance. Its 38–42%/40% white and ~6:1 Violet claims are obsolete. Frozen source files remain unchanged.",
     "",
-    "Live --text-3 is corrected per system; --accent remains decorative. Small accent text uses --accent-ink (75% accent + 25% white in sRGB); filled primary labels use black --on-accent. Terminal retains its outlined grammar. These are approved accessibility deviations, not pixel-parity exceptions.",
+    "Live --text-3 is corrected per system; --accent remains decorative. Small accent text uses --accent-ink: the exact accent where it already passes, otherwise the minimal sRGB white mix per system/accent (share column below); filled primary labels use black --on-accent. Terminal retains its outlined grammar. These are approved accessibility deviations, not pixel-parity exceptions.",
     "",
     "| System | Live text-3 | Minimum neutral contrast |",
     "|---|---|---:|",
@@ -138,12 +138,13 @@ function renderRuntimeAddendum(rootDir) {
     "",
     "All 50 system/accent pairs (minimum across bg, bg-2, surface/surface-2/surface-3 over each base, including 0%, 8% chip and 14% control tints):",
     "",
-    "| System | Accent | Accent ink minimum | Filled label (Terminal: outlined) |",
-    "|---|---|---:|---:|",
+    "| System | Accent | Ink share | Upstream accent minimum | Accent ink minimum | Filled label (Terminal: outlined) |",
+    "|---|---|---:|---:|---:|---:|",
     ...Object.keys(tokens.themes).flatMap(system => Object.keys(tokens.accents).map(accent => {
       const pair = rows.filter(row => row.system === system && row.accent === accent);
       const filled = pair.find(row => row.ink === "--on-accent");
-      return `| ${system} | ${accent} | ${Math.min(...pair.filter(row => row.ink === "--accent-ink").map(row => row.ratio)).toFixed(4)}:1 | ${filled ? `${filled.ratio.toFixed(4)}:1` : "outlined"} |`;
+      const ink = pair.filter(row => row.ink === "--accent-ink");
+      return `| ${system} | ${accent} | ${Math.round(ink[0].inkShare * 100)}% | ${Math.min(...ink.map(row => row.upstreamRatio)).toFixed(4)}:1 | ${Math.min(...ink.map(row => row.ratio)).toFixed(4)}:1 | ${filled ? `${filled.ratio.toFixed(4)}:1` : "outlined"} |`;
     })),
     "",
     "Reproduce: node scripts/validation/app-accent-contrast.mjs --json. WCAG relative luminance, sRGB alpha compositing before linearisation. Values describe token backings, not browser-measured atmosphere/ancestry; browser contrast and axe proof remains required. No claim is made that uncorrected --accent passes small-text AA.",

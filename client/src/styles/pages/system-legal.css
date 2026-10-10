@@ -24,7 +24,8 @@
   gap: 10px;
   margin: 0 0 12px;
   color: var(--text);
-  font-family: var(--font-body);
+  /* .display-h heading: the system's display face, like every other page h1. */
+  font-family: var(--font-display);
   font-size: clamp(32px, 4.5vw, 48px);
   font-weight: 700;
   letter-spacing: -1.2px;
@@ -35,7 +36,7 @@
   width: 24px;
   height: 24px;
   flex: 0 0 auto;
-  color: var(--accent);
+  color: var(--accent-ink);
   stroke-width: 1.5;
 }
 
@@ -107,7 +108,7 @@
   min-height: 24px;
   padding: 0;
   vertical-align: baseline;
-  color: var(--accent);
+  color: var(--accent-ink);
   font-size: inherit;
   font-weight: 500;
   line-height: inherit;

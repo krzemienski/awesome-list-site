@@ -42,7 +42,7 @@
   width: 24px;
   height: 24px;
   flex: 0 0 auto;
-  color: var(--accent);
+  color: var(--accent-ink);
 }
 
 .discovery-tools-page-title {
@@ -119,7 +119,7 @@
 .discovery-tools-tab[data-state="active"] {
   border-bottom-color: var(--accent);
   background: var(--surface-2);
-  color: var(--accent);
+  color: var(--accent-ink);
 }
 
 .discovery-tools-tab-panel {
@@ -170,7 +170,7 @@
   width: 18px;
   height: 18px;
   flex: 0 0 auto;
-  color: var(--accent);
+  color: var(--accent-ink);
 }
 
 .discovery-tools-panel-description {
@@ -220,7 +220,7 @@
 }
 
 .discovery-tools-stat-value--primary {
-  color: var(--accent);
+  color: var(--accent-ink);
 }
 
 .discovery-tools-stat-value--secondary {
@@ -292,7 +292,7 @@
 }
 
 .discovery-tools-format-card svg {
-  color: var(--accent);
+  color: var(--accent-ink);
 }
 
 .discovery-tools-owned-panel {
@@ -449,7 +449,7 @@
 .discovery-tools-state-icon {
   width: 40px;
   height: 40px;
-  color: var(--accent);
+  color: var(--accent-ink);
 }
 
 .discovery-tools-state-title {

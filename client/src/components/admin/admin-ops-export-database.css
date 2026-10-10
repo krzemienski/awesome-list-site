@@ -79,7 +79,7 @@
   background: var(--surface-2);
   border: var(--hairline-w) solid var(--border);
   border-radius: var(--radius-sm);
-  color: var(--accent);
+  color: var(--accent-ink);
   display: flex;
   height: 2.25rem;
   justify-content: center;

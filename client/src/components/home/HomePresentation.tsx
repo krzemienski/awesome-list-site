@@ -334,7 +334,7 @@ function ResourceCard({
       <h3 className="home-resource-title">
         <ResourceLink
           resource={resource}
-          className="hover:text-[var(--accent)] transition-colors"
+          className="hover:text-[var(--accent-ink)] transition-colors"
           dataTestId={`link-home-resource-${resource.id}`}
         >
           {resource.title}
@@ -432,6 +432,9 @@ function CategoryIndex({ categories, selectedTags, selectedKind, onClearFilters 
 
   return (
     <div className="home-category-grid" data-testid="list-categories">
+      {/* Outline level for the per-category h3s (h1 → h2 → h3); the frozen
+          index paints no visible section title here. */}
+      <h2 className="sr-only">Categories</h2>
       {categories.map((category) => {
         const hidden = category.subcategories.length - INDEX_SUBCATEGORY_LIMIT;
         return (

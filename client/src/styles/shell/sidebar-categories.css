@@ -267,7 +267,7 @@
 
 .av-sidebar-compact-footer-links a:hover {
   border-color: color-mix(in srgb, var(--accent) 35%, var(--border));
-  color: var(--accent);
+  color: var(--accent-ink);
 }
 
 .av-sidebar-compact-footer .av-sidebar-more-navigation {
@@ -393,5 +393,5 @@
 .av-sidebar-shell .sub-item[data-active="true"],
 .av-sidebar-drawer .sub-item[data-active="true"] {
   background: color-mix(in srgb, var(--accent) 8%, transparent);
-  color: var(--accent);
+  color: var(--accent-ink);
 }

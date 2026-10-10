@@ -56,7 +56,7 @@
 }
 
 .system-consent-banner__privacy-link:hover {
-  color: var(--accent);
+  color: var(--accent-ink);
 }
 
 .system-consent-banner__actions {

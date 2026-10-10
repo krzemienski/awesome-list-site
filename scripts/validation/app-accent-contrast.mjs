@@ -22,21 +22,24 @@ export function contrast(fg, bg) {
 // Read the actual bridge declaration, rather than a second palette.
 export function accentContrastTable(rootDir = ROOT) {
   const bridge = fs.readFileSync(path.join(rootDir, "client/src/styles/app-bridge.css"), "utf8");
-  const match = bridge.match(/--accent-ink:\s*color-mix\(in srgb, var\(--accent\) (\d+)%?, (#ffffff)\)/);
-  if (!match) throw new Error("Missing app-owned accent-ink sRGB correction");
-  const share = Number(match[1]) / 100;
+  if (!/--accent-ink:\s*var\(--accent\);/.test(bridge)) throw new Error("Missing app-owned --accent-ink default");
+  const shares = new Map();
+  for (const m of bridge.matchAll(/:root\[data-system="(\w+)"\]\[data-accent="(\w+)"\]\s*\{\s*--accent-ink:\s*color-mix\(in srgb, var\(--accent\) (\d+)%, #ffffff\);\s*\}/g))
+    shares.set(`${m[1]}:${m[2]}`, Number(m[3]) / 100);
+  if (!shares.size) throw new Error("Missing per-pair accent-ink corrections");
   const registry = readCanonicalRegistry(rootDir);
   const corrections = readThemeBootData(fs.readFileSync(path.join(rootDir, "client/src/lib/design-system.ts"), "utf8")).text3Corrections;
   const rows = [];
   for (const [system, entry] of Object.entries(registry.systems)) for (const accent of registry.accents) {
     const tokens = entry.vars;
+    const share = shares.get(`${system}:${accent.id}`) ?? 1;
     const ink = rgba(accent.primary).map((v, i) => i < 3 ? v * share + 255 * (1 - share) : 1);
     const backings = { "--bg": rgba(tokens["--bg"]), "--bg-2": rgba(tokens["--bg-2"]) };
     for (const bg of ["--bg", "--bg-2"]) for (const key of ["--surface", "--surface-2", "--surface-3"])
       backings[`${key} over ${bg}`] = over(rgba(tokens[key]), backings[bg]);
     for (const [backing, neutral] of Object.entries(backings)) for (const tint of [0, .08, .14]) {
       const bg = over([...rgba(accent.primary).slice(0, 3), tint], neutral);
-      rows.push({ system, accent: accent.id, backing, tint, ink: "--accent-ink", ratio: contrast(ink, bg), upstreamRatio: contrast(rgba(accent.primary), bg) });
+      rows.push({ system, accent: accent.id, backing, tint, ink: "--accent-ink", inkShare: share, ratio: contrast(ink, bg), upstreamRatio: contrast(rgba(accent.primary), bg) });
       if (!tint) rows.push({ system, accent: accent.id, backing, tint, ink: "--text-3", ratio: contrast(rgba(corrections[system]), bg), upstreamRatio: contrast(rgba(tokens["--text-3"]), bg) });
     }
     if (system !== "terminal") rows.push({ system, accent: accent.id, backing: "filled primary", tint: 1, ink: "--on-accent", ratio: contrast(rgba(tokens["--bg"]), rgba(accent.primary)), upstreamRatio: contrast(rgba(system === "brutalist" ? "#000000" : "#0a0a0a"), rgba(accent.primary)) });

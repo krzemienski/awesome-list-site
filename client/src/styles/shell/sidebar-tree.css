@@ -38,7 +38,7 @@
 }
 
 .av-sidebar-l2-row.active .av-sidebar-l2-link {
-  color: var(--accent);
+  color: var(--accent-ink);
 }
 
 .av-sidebar-l2-link > span:first-child {
@@ -55,7 +55,7 @@
 }
 
 .av-sidebar-l2-row.active .av-sidebar-l2-link > span:last-child {
-  color: var(--accent);
+  color: var(--accent-ink);
 }
 
 .av-sidebar-l2-toggle {
@@ -151,7 +151,7 @@
 }
 
 .av-sidebar-leaf[data-active="true"] .av-sidebar-leaf-count {
-  color: var(--accent);
+  color: var(--accent-ink);
 }
 
 /*
@@ -243,7 +243,7 @@
 }
 .av-sidebar-l2-row.active .av-sidebar-nested-count {
   border-color: color-mix(in srgb, var(--accent) 30%, var(--border));
-  color: var(--accent);
+  color: var(--accent-ink);
 }
 
 /* The disclosure's chevron sits 8px after the count, as in V2's single

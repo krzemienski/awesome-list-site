@@ -192,7 +192,7 @@ export default function TagLanding() {
           heading below. */}
       <h1 className="display-h discovery-title discovery-header">{name}</h1>
       <section aria-labelledby="tag-scope-heading" data-seo-section="tag-intro">
-        <h2 id="tag-scope-heading" className="discovery-section-title">About this collection</h2>
+        <h2 id="tag-scope-heading" className="eyebrow discovery-section-title">About this collection</h2>
         {/* Task #379 (uxv1-06): max-w-prose (65ch) instead of max-w-3xl (~105ch
             at this size) keeps the measure readable on wide desktop screens. */}
         <p className="mt-1 max-w-prose text-sm leading-relaxed text-muted-foreground">{intro}</p>

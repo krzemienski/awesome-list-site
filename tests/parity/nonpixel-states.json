@@ -1,0 +1,46 @@
+{
+ "$comment": "Real activations for nonpixel-runner.mjs. Transient states use real network transitions plus real typing/clicks; nothing is mocked or injected.",
+ "app.collection": {
+  "setup": "owned-collection",
+  "path": "/collection/{ownedShareId}"
+ },
+ "app.error.empty": {
+  "path": "/search?q=zzqxv-nothing",
+  "readySelector": "[data-testid=\"text-no-results\"]"
+ },
+ "app.error.loading": {
+  "path": "/search",
+  "warmSelector": "[data-testid=\"input-search-page\"]",
+  "transition": "slow",
+  "typeSelector": "[data-testid=\"input-search-page\"]",
+  "typeText": "ffmpeg",
+  "readySelector": "[data-testid=\"search-results-loading\"]"
+ },
+ "app.system.loading": {
+  "path": "/search",
+  "warmSelector": "[data-testid=\"input-search-page\"]",
+  "transition": "slow",
+  "typeSelector": "[data-testid=\"input-search-page\"]",
+  "typeText": "ffmpeg",
+  "readySelector": "[data-testid=\"search-results-loading\"]"
+ },
+ "app.error.route": {
+  "path": "/search?q=ffmpeg&tags=aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+  "readySelector": "[data-testid=\"search-results-error\"]",
+  "note": "Real server 400 (tags over 50 chars) rendered by the search error card. An offline transition does NOT reach the error card: React Query pauses the query offline and the page shows the empty 'No resources match' state (recorded as a finding)."
+ },
+ "app.system.empty-search": {
+  "path": "/search?q=zzqxv-nothing",
+  "readySelector": "[data-testid=\"text-no-results\"]"
+ },
+ "app.system.toast": {
+  "path": "/resource/{resourceId}",
+  "warmSelector": "[data-testid=\"button-favorite\"]",
+  "triggerSelector": "[data-testid=\"button-favorite\"]",
+  "readySelector": "li[data-state=\"open\"]",
+  "note": "Real favourite mutation on the owned QA identity (favourites cascade with the user at teardown); the success toast is the audited state."
+ },
+ "app.system.error": {
+  "unverified": "ErrorPage renders only when the corpus fetch fails on a corpus route. Going offline before that navigation also fails the lazy ErrorPage chunk, which trips the one-shot chunk reload guard and replaces the page with the browser's offline document. No real, non-injected activation reaches ErrorPage itself; the offline search error card (app.error.route) and the natural 404 (app.system.not-found) cover the error-state pattern."
+ }
+}

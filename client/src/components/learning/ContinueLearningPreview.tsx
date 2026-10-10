@@ -88,7 +88,7 @@ export default function ContinueLearningPreview() {
               // Your learning
             </p>
             <CardTitle className="flex items-center gap-2 text-xl">
-              <BookOpen className="h-5 w-5 text-[var(--accent)]" />
+              <BookOpen className="h-5 w-5 text-[var(--accent-ink)]" />
               Continue Learning
             </CardTitle>
           </div>
@@ -161,7 +161,7 @@ export default function ContinueLearningPreview() {
               </p>
               <Link
                 href={recent.href}
-                className="mt-1 block min-h-8 truncate font-semibold leading-8 hover:text-[var(--accent)] hover:underline"
+                className="mt-1 block min-h-8 truncate font-semibold leading-8 hover:text-[var(--accent-ink)] hover:underline"
               >
                 {recent.title}
               </Link>

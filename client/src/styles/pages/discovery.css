@@ -23,6 +23,7 @@
   overflow-wrap: anywhere;
 }
 
+/* Paired with the DS .eyebrow helper (per-system ink, tracking and skins). */
 .discovery-section-title {
   font-family: var(--font-mono);
   font-size: var(--mono-size-step);

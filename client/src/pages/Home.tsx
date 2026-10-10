@@ -393,7 +393,7 @@ function AccountFeatures({
         <div className="mb-4 space-y-2">
           <Link
             href="/recommendations"
-            className="flex w-fit items-center gap-2 text-inherit no-underline transition-colors hover:text-[var(--accent)] sm:gap-3"
+            className="flex w-fit items-center gap-2 text-inherit no-underline transition-colors hover:text-[var(--accent-ink)] sm:gap-3"
             data-testid="link-recommendations-heading"
           >
             <h2 className="font-sans text-2xl font-bold tracking-tight sm:text-3xl">

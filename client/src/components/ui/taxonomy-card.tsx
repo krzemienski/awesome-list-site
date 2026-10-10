@@ -51,7 +51,7 @@ export function TaxonomyCard({
               height: 32,
               borderRadius: 8,
               background: "color-mix(in srgb, var(--accent) 12%, transparent)",
-              color: "var(--accent)",
+              color: "var(--accent-ink)",
             }}
           >
             <Icon className="size-4" />

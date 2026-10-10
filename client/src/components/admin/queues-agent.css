@@ -108,7 +108,7 @@
 }
 
 .queues-agent__canonical-table td.accent {
-  color: var(--accent);
+  color: var(--accent-ink);
 }
 
 .queues-agent__canonical-table td.actions {

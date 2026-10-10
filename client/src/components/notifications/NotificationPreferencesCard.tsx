@@ -160,7 +160,7 @@ export default function NotificationPreferencesCard() {
   return (
     <Card data-testid="card-notification-preferences">
       <CardHeader>
-        <CardTitle id="notification-settings-title" className="flex items-center gap-2"><Bell className="h-5 w-5 text-[var(--accent)]" /> Notifications</CardTitle>
+        <CardTitle id="notification-settings-title" className="flex items-center gap-2"><Bell className="h-5 w-5 text-[var(--accent-ink)]" /> Notifications</CardTitle>
         <CardDescription>Quiet, useful updates for your Awesome Video learning space. Every channel starts off until you explicitly opt in.</CardDescription>
       </CardHeader>
       <CardContent className="space-y-6">
@@ -178,7 +178,7 @@ export default function NotificationPreferencesCard() {
               <Toggle checked={values.inAppEnabled} onChange={(v) => update("inAppEnabled", v)} label="In-app updates" description="A small inbox inside your account." icon={Bell} />
             </div>
             <div className="flex gap-3 border border-[color-mix(in_srgb,var(--accent)_25%,transparent)] bg-[color-mix(in_srgb,var(--accent)_7%,transparent)] p-4 text-sm">
-              <ShieldCheck className="mt-0.5 h-5 w-5 shrink-0 text-[var(--accent)]" />
+              <ShieldCheck className="mt-0.5 h-5 w-5 shrink-0 text-[var(--accent-ink)]" />
               <p className="text-[color:var(--text-2)]">These channels are independent. Delivery content excludes private notes, learning history, and external URLs.</p>
             </div>
             <section aria-labelledby="notification-sections">
@@ -208,11 +208,11 @@ export default function NotificationPreferencesCard() {
             </div>
             {paused ? <p className="flex items-center gap-2 text-xs text-[color:var(--text-2)]"><Clock3 className="h-4 w-4" />Paused until {new Date(values.pausedUntil!).toLocaleDateString()}.</p> : null}
             {requestError ? <p className="border border-destructive/40 bg-destructive/10 p-3 text-sm text-destructive" role="alert">{requestError}</p> : null}
-            {savedMessage ? <p className="flex items-center gap-2 text-sm text-[var(--accent)]" role="status"><Check className="h-4 w-4 shrink-0" />{savedMessage}</p> : null}
+            {savedMessage ? <p className="flex items-center gap-2 text-sm text-[var(--accent-ink)]" role="status"><Check className="h-4 w-4 shrink-0" />{savedMessage}</p> : null}
             <Separator />
             <section aria-labelledby="digest-preview">
-              <div className="flex items-start justify-between gap-3"><div><h3 id="digest-preview" className="flex items-center gap-2 text-sm font-semibold"><Eye className="h-4 w-4 text-[var(--accent)]" />Preview</h3><p className="mt-1 text-xs text-[color:var(--text-2)]">This uses the same rules as delivery.</p></div>{previewQuery.data ? <span className="font-mono text-xs text-[color:var(--text-2)]">{previewQuery.data.itemCount} {previewQuery.data.itemCount === 1 ? "item" : "items"}</span> : null}</div>
-              {previewQuery.isLoading ? <div className="mt-3 space-y-2"><div className="skeleton h-12 w-full" /><div className="skeleton h-12 w-full" /></div> : previewQuery.isError ? <p className="mt-3 text-sm text-destructive" role="alert">Preview is unavailable right now. Your choices have not changed.</p> : previewItems.length === 0 ? <div className="mt-3 border border-dashed border-[var(--border-strong)] p-4 text-sm text-[color:var(--text-2)]"><Info className="mb-2 h-4 w-4 text-[var(--accent)]" /><p>No saved content matches these rules yet. When there is something to share, it will appear here.</p></div> : <div className="mt-3 space-y-2">{previewItems.map((item, index) => <a key={`${item.href}-${index}`} href={item.href} className="block border-l-2 border-[var(--accent)] bg-[var(--surface-2)] px-3 py-2 transition-colors hover:bg-[var(--surface-3)]"><span className="font-mono text-[10px] uppercase tracking-[0.12em] text-[var(--accent)]">{item.sectionTitle}</span><span className="mt-1 block text-sm font-semibold">{item.title}</span><span className="mt-0.5 block text-xs text-[color:var(--text-2)]">{item.description}</span></a>)}</div>}
+              <div className="flex items-start justify-between gap-3"><div><h3 id="digest-preview" className="flex items-center gap-2 text-sm font-semibold"><Eye className="h-4 w-4 text-[var(--accent-ink)]" />Preview</h3><p className="mt-1 text-xs text-[color:var(--text-2)]">This uses the same rules as delivery.</p></div>{previewQuery.data ? <span className="font-mono text-xs text-[color:var(--text-2)]">{previewQuery.data.itemCount} {previewQuery.data.itemCount === 1 ? "item" : "items"}</span> : null}</div>
+              {previewQuery.isLoading ? <div className="mt-3 space-y-2"><div className="skeleton h-12 w-full" /><div className="skeleton h-12 w-full" /></div> : previewQuery.isError ? <p className="mt-3 text-sm text-destructive" role="alert">Preview is unavailable right now. Your choices have not changed.</p> : previewItems.length === 0 ? <div className="mt-3 border border-dashed border-[var(--border-strong)] p-4 text-sm text-[color:var(--text-2)]"><Info className="mb-2 h-4 w-4 text-[var(--accent-ink)]" /><p>No saved content matches these rules yet. When there is something to share, it will appear here.</p></div> : <div className="mt-3 space-y-2">{previewItems.map((item, index) => <a key={`${item.href}-${index}`} href={item.href} className="block border-l-2 border-[var(--accent)] bg-[var(--surface-2)] px-3 py-2 transition-colors hover:bg-[var(--surface-3)]"><span className="font-mono text-[10px] uppercase tracking-[0.12em] text-[var(--accent-ink)]">{item.sectionTitle}</span><span className="mt-1 block text-sm font-semibold">{item.title}</span><span className="mt-0.5 block text-xs text-[color:var(--text-2)]">{item.description}</span></a>)}</div>}
             </section>
           </>
         )}

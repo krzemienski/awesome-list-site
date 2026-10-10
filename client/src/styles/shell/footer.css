@@ -19,6 +19,9 @@
 .app-footer p { margin: 0; }
 
 .app-footer .app-footer-eyebrow { display: flex; font-size: 10px; margin-bottom: 12px; }
+/* The frozen footer label is plain .mono ("── INDEX"), so the Terminal
+   eyebrow prompt must not prefix it; the .eyebrow hook stays for stage 6. */
+[data-system="terminal"] .app-footer .app-footer-eyebrow::before { content: none; }
 .app-footer .app-footer-name {
   display: block;
   width: fit-content;
@@ -59,7 +62,7 @@
   transition: color 140ms ease;
 }
 .app-footer-explore > a:first-child { margin-top: -11.6px; }
-.app-footer-explore > a:hover { color: var(--accent); }
+.app-footer-explore > a:hover { color: var(--accent-ink); }
 /* The overhanging targets would draw an offset ring across the neighbouring
    labels; keep it inside the focused row instead. */
 .app-footer .app-footer-explore > a:focus-visible { position: relative; outline-offset: -2px; }
@@ -89,7 +92,7 @@
 .app-footer-repo-label { min-width: 0; }
 .app-footer-repo-arrow { flex-shrink: 0; }
 .app-footer-repo-arrow { color: var(--text-3); }
-.app-footer-repo:hover { border-color: var(--accent); color: var(--accent); }
+.app-footer-repo:hover { border-color: var(--accent); color: var(--accent-ink); }
 .app-footer-note { color: var(--text-2); font-size: 11.5px; line-height: 1.6; }
 .app-footer-note a { color: inherit; text-decoration: underline; text-underline-offset: 2px; }
 .app-footer-note a:hover { color: var(--text); }

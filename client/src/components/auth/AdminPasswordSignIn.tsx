@@ -63,7 +63,7 @@ export function AdminPasswordSignIn() {
         />
       </div>
       {error && (
-        <p className="text-sm font-medium text-[var(--accent)]" role="alert" data-testid="text-admin-password-error">
+        <p className="text-sm font-medium text-[var(--accent-ink)]" role="alert" data-testid="text-admin-password-error">
           {error}
         </p>
       )}

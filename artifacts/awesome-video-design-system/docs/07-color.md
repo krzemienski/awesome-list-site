@@ -6,7 +6,7 @@ sha256: e6320c732732573000f3d8ff76d892c4c13fcbe74983aef69955d0071c1e2dd4
 
 The source text below is historical, verbatim handoff documentation, NOT current runtime contrast guidance. Its 38–42%/40% white and ~6:1 Violet claims are obsolete. Frozen source files remain unchanged.
 
-Live --text-3 is corrected per system; --accent remains decorative. Small accent text uses --accent-ink (75% accent + 25% white in sRGB); filled primary labels use black --on-accent. Terminal retains its outlined grammar. These are approved accessibility deviations, not pixel-parity exceptions.
+Live --text-3 is corrected per system; --accent remains decorative. Small accent text uses --accent-ink: the exact accent where it already passes, otherwise the minimal sRGB white mix per system/accent (share column below); filled primary labels use black --on-accent. Terminal retains its outlined grammar. These are approved accessibility deviations, not pixel-parity exceptions.
 
 | System | Live text-3 | Minimum neutral contrast |
 |---|---|---:|
@@ -18,58 +18,58 @@ Live --text-3 is corrected per system; --accent remains decorative. Small accent
 
 All 50 system/accent pairs (minimum across bg, bg-2, surface/surface-2/surface-3 over each base, including 0%, 8% chip and 14% control tints):
 
-| System | Accent | Accent ink minimum | Filled label (Terminal: outlined) |
-|---|---|---:|---:|
-| editorial | crimson | 5.5597:1 | 6.0413:1 |
-| editorial | magenta | 5.6479:1 | 5.9535:1 |
-| editorial | orange | 6.8181:1 | 8.1032:1 |
-| editorial | amber | 8.5939:1 | 12.2154:1 |
-| editorial | emerald | 7.8911:1 | 10.5471:1 |
-| editorial | matrix | 9.6218:1 | 15.6595:1 |
-| editorial | cyan | 8.8975:1 | 13.1007:1 |
-| editorial | violet | 5.0157:1 | 4.5675:1 |
-| editorial | lime | 10.1611:1 | 17.0132:1 |
-| editorial | rose | 6.9836:1 | 8.4028:1 |
-| terminal | crimson | 6.3726:1 | outlined |
-| terminal | magenta | 6.4768:1 | outlined |
-| terminal | orange | 7.8676:1 | outlined |
-| terminal | amber | 9.9710:1 | outlined |
-| terminal | emerald | 8.9419:1 | outlined |
-| terminal | matrix | 10.8852:1 | outlined |
-| terminal | cyan | 10.1712:1 | outlined |
-| terminal | violet | 5.6964:1 | outlined |
-| terminal | lime | 11.6870:1 | outlined |
-| terminal | rose | 8.0738:1 | outlined |
-| geist | crimson | 5.0396:1 | 6.0413:1 |
-| geist | magenta | 5.1092:1 | 5.9535:1 |
-| geist | orange | 6.1394:1 | 8.1032:1 |
-| geist | amber | 7.6964:1 | 12.2154:1 |
-| geist | emerald | 7.0825:1 | 10.5471:1 |
-| geist | matrix | 8.6267:1 | 15.6595:1 |
-| geist | cyan | 7.9612:1 | 13.1007:1 |
-| geist | violet | 4.5394:1 | 4.5675:1 |
-| geist | lime | 9.0859:1 | 17.0132:1 |
-| geist | rose | 6.2816:1 | 8.4028:1 |
-| brutalist | crimson | 5.0396:1 | 6.0413:1 |
-| brutalist | magenta | 5.1092:1 | 5.9535:1 |
-| brutalist | orange | 6.1394:1 | 8.1032:1 |
-| brutalist | amber | 7.6964:1 | 12.2154:1 |
-| brutalist | emerald | 7.0825:1 | 10.5471:1 |
-| brutalist | matrix | 8.6267:1 | 15.6595:1 |
-| brutalist | cyan | 7.9612:1 | 13.1007:1 |
-| brutalist | violet | 4.5394:1 | 4.5675:1 |
-| brutalist | lime | 9.0859:1 | 17.0132:1 |
-| brutalist | rose | 6.2816:1 | 8.4028:1 |
-| swiss | crimson | 5.7757:1 | 6.0413:1 |
-| swiss | magenta | 5.8698:1 | 5.9535:1 |
-| swiss | orange | 7.1092:1 | 8.1032:1 |
-| swiss | amber | 8.9875:1 | 12.2154:1 |
-| swiss | emerald | 8.2368:1 | 10.5471:1 |
-| swiss | matrix | 10.0526:1 | 15.6595:1 |
-| swiss | cyan | 9.2970:1 | 13.1007:1 |
-| swiss | violet | 5.2072:1 | 4.5675:1 |
-| swiss | lime | 10.6424:1 | 17.0132:1 |
-| swiss | rose | 7.2817:1 | 8.4028:1 |
+| System | Accent | Ink share | Upstream accent minimum | Accent ink minimum | Filled label (Terminal: outlined) |
+|---|---|---:|---:|---:|---:|
+| editorial | crimson | 92% | 4.3293:1 | 4.6354:1 | 6.0413:1 |
+| editorial | magenta | 92% | 4.2254:1 | 4.6035:1 | 5.9535:1 |
+| editorial | orange | 100% | 5.4270:1 | 5.4270:1 | 8.1032:1 |
+| editorial | amber | 100% | 7.5224:1 | 7.5224:1 | 12.2154:1 |
+| editorial | emerald | 100% | 6.7359:1 | 6.7359:1 | 10.5471:1 |
+| editorial | matrix | 100% | 9.3766:1 | 9.3766:1 | 15.6595:1 |
+| editorial | cyan | 100% | 7.9825:1 | 7.9825:1 | 13.1007:1 |
+| editorial | violet | 80% | 3.3154:1 | 4.6151:1 | 4.5675:1 |
+| editorial | lime | 100% | 9.8227:1 | 9.8227:1 | 17.0132:1 |
+| editorial | rose | 100% | 5.5797:1 | 5.5797:1 | 8.4028:1 |
+| terminal | crimson | 100% | 4.9623:1 | 4.9623:1 | outlined |
+| terminal | magenta | 100% | 4.8455:1 | 4.8455:1 | outlined |
+| terminal | orange | 100% | 6.2625:1 | 6.2625:1 | outlined |
+| terminal | amber | 100% | 8.7278:1 | 8.7278:1 | outlined |
+| terminal | emerald | 100% | 7.6329:1 | 7.6329:1 | outlined |
+| terminal | matrix | 100% | 10.6078:1 | 10.6078:1 | outlined |
+| terminal | cyan | 100% | 9.1251:1 | 9.1251:1 | outlined |
+| terminal | violet | 87% | 3.7653:1 | 4.6636:1 | outlined |
+| terminal | lime | 100% | 11.2979:1 | 11.2979:1 | outlined |
+| terminal | rose | 100% | 6.4507:1 | 6.4507:1 | outlined |
+| geist | crimson | 83% | 3.9243:1 | 4.6014:1 | 6.0413:1 |
+| geist | magenta | 83% | 3.8223:1 | 4.6262:1 | 5.9535:1 |
+| geist | orange | 100% | 4.8868:1 | 4.8868:1 | 8.1032:1 |
+| geist | amber | 100% | 6.7368:1 | 6.7368:1 | 12.2154:1 |
+| geist | emerald | 100% | 6.0457:1 | 6.0457:1 | 10.5471:1 |
+| geist | matrix | 100% | 8.4068:1 | 8.4068:1 | 15.6595:1 |
+| geist | cyan | 100% | 7.1425:1 | 7.1425:1 | 13.1007:1 |
+| geist | violet | 74% | 3.0005:1 | 4.6153:1 | 4.5675:1 |
+| geist | lime | 100% | 8.7833:1 | 8.7833:1 | 17.0132:1 |
+| geist | rose | 100% | 5.0188:1 | 5.0188:1 | 8.4028:1 |
+| brutalist | crimson | 83% | 3.9243:1 | 4.6014:1 | 6.0413:1 |
+| brutalist | magenta | 83% | 3.8223:1 | 4.6262:1 | 5.9535:1 |
+| brutalist | orange | 100% | 4.8868:1 | 4.8868:1 | 8.1032:1 |
+| brutalist | amber | 100% | 6.7368:1 | 6.7368:1 | 12.2154:1 |
+| brutalist | emerald | 100% | 6.0457:1 | 6.0457:1 | 10.5471:1 |
+| brutalist | matrix | 100% | 8.4068:1 | 8.4068:1 | 15.6595:1 |
+| brutalist | cyan | 100% | 7.1425:1 | 7.1425:1 | 13.1007:1 |
+| brutalist | violet | 74% | 3.0005:1 | 4.6153:1 | 4.5675:1 |
+| brutalist | lime | 100% | 8.7833:1 | 8.7833:1 | 17.0132:1 |
+| brutalist | rose | 100% | 5.0188:1 | 5.0188:1 | 8.4028:1 |
+| swiss | crimson | 97% | 4.4975:1 | 4.6073:1 | 6.0413:1 |
+| swiss | magenta | 95% | 4.3914:1 | 4.6285:1 | 5.9535:1 |
+| swiss | orange | 100% | 5.6588:1 | 5.6588:1 | 8.1032:1 |
+| swiss | amber | 100% | 7.8669:1 | 7.8669:1 | 12.2154:1 |
+| swiss | emerald | 100% | 7.0310:1 | 7.0310:1 | 10.5471:1 |
+| swiss | matrix | 100% | 9.7964:1 | 9.7964:1 | 15.6595:1 |
+| swiss | cyan | 100% | 8.3408:1 | 8.3408:1 | 13.1007:1 |
+| swiss | violet | 82% | 3.4419:1 | 4.6340:1 | 4.5675:1 |
+| swiss | lime | 100% | 10.2880:1 | 10.2880:1 | 17.0132:1 |
+| swiss | rose | 100% | 5.8179:1 | 5.8179:1 | 8.4028:1 |
 
 Reproduce: node scripts/validation/app-accent-contrast.mjs --json. WCAG relative luminance, sRGB alpha compositing before linearisation. Values describe token backings, not browser-measured atmosphere/ancestry; browser contrast and axe proof remains required. No claim is made that uncorrected --accent passes small-text AA.
 
