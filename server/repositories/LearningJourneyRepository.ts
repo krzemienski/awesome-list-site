@@ -39,6 +39,8 @@ import {
 } from "@shared/journeyProgress";
 import { db } from "../db";
 import { eq, and, asc, desc, inArray, getTableColumns, sql } from "drizzle-orm";
+
+type DbTransaction = Parameters<Parameters<typeof db.transaction>[0]>[0];
 import { type ResourceKind } from "../lib/resourceKinds";
 import { stripInternalResourceFields } from "../lib/publicResource";
 
@@ -404,13 +406,22 @@ export class LearningJourneyRepository {
       // not whatever the planner happens to emit.
       .orderBy(asc(journeySteps.stepNumber), asc(journeySteps.id));
 
-    return rows.map((r) => ({
-      ...r.step,
-      resource:
-        r.resource && r.resource.id != null
-          ? stripInternalResourceFields(r.resource)
-          : undefined,
-    }));
+    return rows.map((r) => {
+      if (!r.resource || r.resource.id == null) return { ...r.step, resource: undefined };
+      // Shared public projection first (sanitizes + resolves kind), then keep
+      // only the documented JourneyStepResource embed — taxonomy and metadata
+      // were selected for kind resolution and are not part of the step contract.
+      const pub = stripInternalResourceFields(r.resource);
+      const resource: JourneyStepResource = {
+        id: pub.id,
+        title: pub.title,
+        url: pub.url,
+        description: pub.description,
+        kind: pub.kind,
+        resolvedKind: pub.resolvedKind,
+      };
+      return { ...r.step, resource };
+    });
   }
 
   /**
@@ -509,45 +520,89 @@ export class LearningJourneyRepository {
     await db.transaction(async (tx) => {
       const [existing] = await tx.select().from(journeySteps).where(eq(journeySteps.id, id));
       if (!existing) return;
-      await tx.select({ id: learningJourneys.id }).from(learningJourneys)
-        .where(eq(learningJourneys.id, existing.journeyId)).for('update');
-      const steps = await tx.select().from(journeySteps)
-        .where(eq(journeySteps.journeyId, existing.journeyId)).for('update');
-      const current = steps.find(s => s.id === id);
-      if (!current) return;
-      const removed = new Set(steps.filter(s => wholeGroup ? s.stepNumber === current.stepNumber : s.id === id).map(s => s.id));
-      const remaining = steps.filter(s => !removed.has(s.id));
-      const progressRows = await tx.select().from(userJourneyProgress)
-        .where(eq(userJourneyProgress.journeyId, existing.journeyId)).for('update');
-      for (const progress of progressRows) {
-        const completedSteps = (progress.completedSteps ?? []).map(Number).filter(sid => !removed.has(sid));
-        await tx.update(userJourneyProgress).set({
-          completedSteps,
-          completedAt: areAllLogicalJourneyStepsComplete(remaining, new Set(completedSteps)) ? progress.completedAt ?? new Date() : null,
-          currentStepId: progress.currentStepId != null && removed.has(progress.currentStepId) ? null : progress.currentStepId,
-        }).where(eq(userJourneyProgress.id, progress.id));
-      }
-      if (removed.size) await tx.delete(journeySteps).where(inArray(journeySteps.id, [...removed]));
-      const numbers = [...new Set(remaining.map(s => s.stepNumber))].sort((a, b) => a - b);
-      for (const step of remaining) {
-        await tx.update(journeySteps).set({ stepNumber: numbers.indexOf(step.stepNumber) + 1 }).where(eq(journeySteps.id, step.id));
-      }
-      await tx.update(learningJourneys).set({ updatedAt: new Date() }).where(eq(learningJourneys.id, existing.journeyId));
-      if (audit && removed.size) {
+      const { removed, remainingCount } = await this.removeJourneyStepRowsInTx(tx, existing.journeyId, (steps) => {
+        const anchor = steps.find(s => s.id === id);
+        if (!anchor) return [];
+        return steps.filter(s => wholeGroup ? s.stepNumber === anchor.stepNumber : s.id === id);
+      });
+      const current = removed.find(s => s.id === id);
+      if (audit && current) {
         await writeJourneyAudit(
           tx,
           audit,
           existing.journeyId,
           wholeGroup ? "journey.step_group_deleted" : "journey.step_deleted",
           {
-            before: steps.filter((s) => removed.has(s.id)).map(stepSummary),
+            before: removed.map(stepSummary),
             after: null,
-            remainingRows: remaining.length,
+            remainingRows: remainingCount,
           },
-          `Removed step ${current.stepNumber} "${current.title}"${wholeGroup ? ` (${removed.size} row group)` : ""}`,
+          `Removed step ${current.stepNumber} "${current.title}"${wholeGroup ? ` (${removed.length} row group)` : ""}`,
         );
       }
     });
+  }
+
+  /**
+   * Transaction-safe: removes every journey step row linked to `resourceId`
+   * and reconciles all progress that pointed at those rows (completedSteps,
+   * completedAt, currentStepId) and renumbers the affected journeys, all on
+   * the caller's transaction. Call it before deleting a resource so the
+   * resource FK cascade never hits a progress pointer (current_step_id has no
+   * ON DELETE action) or leaves gaps in the step numbering.
+   * @returns the number of step rows removed
+   */
+  async clearProgressPointersToResource(tx: DbTransaction, resourceId: number): Promise<number> {
+    const linked = await tx.select({ journeyId: journeySteps.journeyId }).from(journeySteps)
+      .where(eq(journeySteps.resourceId, resourceId));
+    let removedCount = 0;
+    for (const journeyId of [...new Set(linked.map(r => r.journeyId))].sort((a, b) => a - b)) {
+      const { removed } = await this.removeJourneyStepRowsInTx(
+        tx, journeyId, (steps) => steps.filter(s => s.resourceId === resourceId),
+      );
+      removedCount += removed.length;
+    }
+    return removedCount;
+  }
+
+  /**
+   * Locks one journey, removes the selected step rows, reconciles every
+   * progress row of that journey and renumbers logical steps contiguously —
+   * all on the given transaction, so a failure leaves nothing half-applied.
+   */
+  private async removeJourneyStepRowsInTx(
+    tx: DbTransaction,
+    journeyId: number,
+    select: (steps: JourneyStep[]) => JourneyStep[],
+  ): Promise<{ removed: JourneyStep[]; remainingCount: number }> {
+    await tx.select({ id: learningJourneys.id }).from(learningJourneys)
+      .where(eq(learningJourneys.id, journeyId)).for('update');
+    const steps = await tx.select().from(journeySteps)
+      .where(eq(journeySteps.journeyId, journeyId)).for('update');
+    const removedRows = select(steps);
+    const removed = new Set(removedRows.map(s => s.id));
+    if (!removed.size) return { removed: [], remainingCount: steps.length };
+    const remaining = steps.filter(s => !removed.has(s.id));
+    const progressRows = await tx.select().from(userJourneyProgress)
+      .where(eq(userJourneyProgress.journeyId, journeyId)).for('update');
+    for (const progress of progressRows) {
+      const completedSteps = (progress.completedSteps ?? []).map(Number).filter(sid => !removed.has(sid));
+      await tx.update(userJourneyProgress).set({
+        completedSteps,
+        completedAt: areAllLogicalJourneyStepsComplete(remaining, new Set(completedSteps)) ? progress.completedAt ?? new Date() : null,
+        currentStepId: progress.currentStepId != null && removed.has(progress.currentStepId) ? null : progress.currentStepId,
+      }).where(eq(userJourneyProgress.id, progress.id));
+    }
+    await tx.delete(journeySteps).where(inArray(journeySteps.id, [...removed]));
+    const numbers = [...new Set(remaining.map(s => s.stepNumber))].sort((a, b) => a - b);
+    for (const step of remaining) {
+      const stepNumber = numbers.indexOf(step.stepNumber) + 1;
+      if (stepNumber !== step.stepNumber) {
+        await tx.update(journeySteps).set({ stepNumber }).where(eq(journeySteps.id, step.id));
+      }
+    }
+    await tx.update(learningJourneys).set({ updatedAt: new Date() }).where(eq(learningJourneys.id, journeyId));
+    return { removed: removedRows, remainingCount: remaining.length };
   }
 
   /**

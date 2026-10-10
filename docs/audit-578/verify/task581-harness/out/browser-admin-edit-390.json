@@ -1,0 +1,171 @@
+{
+  "phase": "edit",
+  "vp": "390",
+  "fixtureRows": {
+    "a": [
+      356,
+      357,
+      358
+    ],
+    "b": [
+      359,
+      360
+    ],
+    "c": [
+      361
+    ]
+  },
+  "b08_pending": {
+    "title": "__qa_test_plan_581_edited title 1791562839717",
+    "description": "__qa_test_plan_581_edited description",
+    "optional": "checked",
+    "resource": "#184745 — VIDEO SERVICES FORUM (VSF)",
+    "submit": "Saving…"
+  },
+  "screenshots": [
+    "/tmp/b581shots/B08-save-pending-draft-kept-390.png",
+    "/tmp/b581shots/B08-forced-500-inline-error-390.png",
+    "/tmp/b581shots/B06-stale-resource-inline-error-390.png",
+    "/tmp/b581shots/B08-group-save-pending-390.png",
+    "/tmp/b581shots/B08-after-saves-list-390.png"
+  ],
+  "b08_afterForced500": {
+    "title": "__qa_test_plan_581_edited title 1791562839717",
+    "description": "__qa_test_plan_581_edited description",
+    "optional": "checked",
+    "resource": "#184745 — VIDEO SERVICES FORUM (VSF)",
+    "submit": "Save changes",
+    "dialogOpen": true,
+    "inlineError": "Nothing was changed because the server hit an error. Reload the steps and try again.",
+    "toasts": "",
+    "rows": [
+      {
+        "id": 356,
+        "step_number": 1,
+        "resource_id": 184739,
+        "title": "__qa_test_plan_581_group1",
+        "description": "__qa_test_plan_581_group1 description",
+        "is_optional": false
+      },
+      {
+        "id": 357,
+        "step_number": 1,
+        "resource_id": 184740,
+        "title": "__qa_test_plan_581_group1",
+        "description": "__qa_test_plan_581_group1 description",
+        "is_optional": false
+      },
+      {
+        "id": 358,
+        "step_number": 1,
+        "resource_id": 184741,
+        "title": "__qa_test_plan_581_group1",
+        "description": "__qa_test_plan_581_group1 description",
+        "is_optional": false
+      },
+      {
+        "id": 359,
+        "step_number": 2,
+        "resource_id": 184742,
+        "title": "__qa_test_plan_581_group2",
+        "description": "__qa_test_plan_581_group2 description",
+        "is_optional": false
+      },
+      {
+        "id": 360,
+        "step_number": 2,
+        "resource_id": 184743,
+        "title": "__qa_test_plan_581_group2",
+        "description": "__qa_test_plan_581_group2 description",
+        "is_optional": false
+      },
+      {
+        "id": 361,
+        "step_number": 3,
+        "resource_id": 184744,
+        "title": "__qa_test_plan_581_group3",
+        "description": "__qa_test_plan_581_group3 description",
+        "is_optional": false
+      }
+    ]
+  },
+  "b08_success": {
+    "rows": [
+      {
+        "id": 361,
+        "step_number": 3,
+        "resource_id": 184745,
+        "title": "__qa_test_plan_581_edited title 1791562839717",
+        "description": "__qa_test_plan_581_edited description",
+        "is_optional": true
+      }
+    ]
+  },
+  "b06_staleSelection": {
+    "httpStatus": 400,
+    "body": "{\"message\":\"Selected resource no longer exists or is not approved. Choose another resource.\",\"error\":\"validation_failed\",\"fieldErrors\":{},\"errors\":[]}",
+    "inlineError": "Selected resource no longer exists or is not approved. Choose another resource.",
+    "draft": {
+      "title": "__qa_test_plan_581_stale attempt 1791562839717",
+      "description": "__qa_test_plan_581_edited description",
+      "optional": "checked",
+      "resource": "#188654",
+      "submit": "Save changes"
+    },
+    "dialogOpen": true,
+    "rowsUnchanged": true
+  },
+  "b06_recovered": {
+    "rows": [
+      {
+        "id": 361,
+        "step_number": 3,
+        "resource_id": null,
+        "title": "__qa_test_plan_581_stale attempt 1791562839717",
+        "description": "__qa_test_plan_581_edited description",
+        "is_optional": true
+      }
+    ]
+  },
+  "b08_group_pending": {
+    "title": "__qa_test_plan_581_group edit 1791562839717",
+    "optional": "checked",
+    "submit": "Saving…"
+  },
+  "b08_group_saved": {
+    "rows": [
+      {
+        "id": 356,
+        "step_number": 1,
+        "resource_id": 184739,
+        "title": "__qa_test_plan_581_group edit 1791562839717",
+        "description": "__qa_test_plan_581_group1 description",
+        "is_optional": true
+      },
+      {
+        "id": 357,
+        "step_number": 1,
+        "resource_id": 184740,
+        "title": "__qa_test_plan_581_group edit 1791562839717",
+        "description": "__qa_test_plan_581_group1 description",
+        "is_optional": true
+      },
+      {
+        "id": 358,
+        "step_number": 1,
+        "resource_id": 184741,
+        "title": "__qa_test_plan_581_group edit 1791562839717",
+        "description": "__qa_test_plan_581_group1 description",
+        "is_optional": true
+      }
+    ]
+  },
+  "cleanup": {
+    "clerkDeleted": "user_3KStY3VM0PHOvZyQvnDXyHNr4qw",
+    "bridgeId": "__qa_test_plan_581_adm_edit_1791562839901",
+    "journey": 42,
+    "resources": [
+      188654
+    ]
+  }
+}

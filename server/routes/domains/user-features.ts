@@ -734,9 +734,15 @@ export function registerUserFeatureRoutes(
       // every enrolled journey is done, no current path is reported.
       let currentPath: string | undefined;
       const activeJourneys = journeyProgress.filter(p => !p.completedAt);
-      if (activeJourneys.length > 0) {
-        const journey = await learningJourneyRepo.getLearningJourney(activeJourneys[0].journeyId);
-        currentPath = journey?.title;
+      // Only a published journey may name the current path: an enrolled
+      // journey that was later unpublished must not leak its (possibly
+      // re-edited draft) title to the learner.
+      for (const active of activeJourneys) {
+        const journey = await learningJourneyRepo.getLearningJourney(active.journeyId);
+        if (journey?.status === 'published') {
+          currentPath = journey.title;
+          break;
+        }
       }
 
       // Run22 BUG-043: totalTimeSpent was hardcoded '0h 0m' even with real
@@ -1364,9 +1370,13 @@ export function registerUserFeatureRoutes(
       const journeysWithDetails = await Promise.all(
         journeyProgress.map(async (progress) => {
           const journey = await learningJourneyRepo.getLearningJourney(progress.journeyId);
+          // Unpublished (draft/archived) journeys stay counted as started but
+          // their metadata is withheld, matching the public 404 on detail.
+          const isAvailable = journey?.status === 'published';
           return {
             ...progress,
-            journey
+            journey: isAvailable ? journey : null,
+            isAvailable,
           };
         })
       );
@@ -1425,13 +1435,15 @@ export function registerUserFeatureRoutes(
           return {
             progressId: progress.id,
             journeyId: progress.journeyId,
-            title: journey?.title || 'Unavailable learning journey',
+            // Unpublished journeys get the generic fallback only — never the
+            // (possibly re-edited) draft metadata.
+            title: (isAvailable && journey?.title) || 'Unavailable learning journey',
             description:
-              journey?.description ||
+              (isAvailable && journey?.description) ||
               'This journey is no longer available. Browse current journeys to keep learning.',
-            category: journey?.category || 'Learning',
-            difficulty: journey?.difficulty || 'unknown',
-            estimatedDuration: journey?.estimatedDuration ?? null,
+            category: (isAvailable && journey?.category) || 'Learning',
+            difficulty: (isAvailable && journey?.difficulty) || 'unknown',
+            estimatedDuration: isAvailable ? journey?.estimatedDuration ?? null : null,
             isAvailable,
             totalSteps: logical.totalSteps,
             completedSteps: logical.completedSteps,

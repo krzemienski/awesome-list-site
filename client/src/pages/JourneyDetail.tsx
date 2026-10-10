@@ -36,6 +36,7 @@ import SEOHead from "@/components/layout/SEOHead";
 import { isLogicalJourneyStepComplete } from "@shared/journeyProgress";
 import { journeySeoDescription, missingPageSeo } from "@shared/seo-templates";
 import "@/styles/pages/discovery-journeys.css";
+import { useMissingRouteTelemetry } from "@/lib/route-monitor";
 
 interface JourneyStep {
   id: number;
@@ -77,6 +78,19 @@ interface UserProgress {
   completedAt: string | null;
 }
 
+function toggleStepIds(current: number[], stepIds: number[], completed: boolean): number[] {
+  return completed
+    ? Array.from(new Set([...current, ...stepIds]))
+    : current.filter((sid) => !stepIds.includes(sid));
+}
+
+/** Optimistically flip one logical step's row ids in a cached journey. */
+function applyOptimisticToggle(journey: Journey, stepIds: number[], completed: boolean): Journey {
+  if (!journey.progress) return journey;
+  const current = (journey.progress.completedSteps || []).map(Number);
+  const next = toggleStepIds(current, stepIds, completed);
+  return { ...journey, progress: { ...journey.progress, completedSteps: next } };
+}
 export default function JourneyDetail() {
   const { id } = useParams<{ id: string }>();
   // Journey ids are positive integers; anything else is a not-found URL, not a
@@ -112,7 +126,13 @@ export default function JourneyDetail() {
   const journeyMissing =
     journeyFetchError instanceof ApiError &&
     (journeyFetchError.status === 404 || journeyFetchError.status === 400);
-  const journeyUnavailable = journeyMissing ? null : queryUnavailableReason(journeyQuery);
+  // A failed background refetch keeps the last loaded journey on screen; only
+  // a first load with no data becomes the full-page unavailable state.
+  const journeyUnavailable =
+    journeyMissing || journey ? null : queryUnavailableReason(journeyQuery);
+  // H08: a missing (or draft/archived — indistinguishable 404) journey reports
+  // the same dead-link telemetry as a missing resource page.
+  useMissingRouteTelemetry(!isValidId || journeyMissing);
 
   // Task #330: logical step count (distinct stepNumbers) for funnel events —
   // the same accounting the server uses for stepCount, never raw row count.
@@ -188,6 +208,11 @@ export default function JourneyDetail() {
     stepPosition: number;
   }>());
   const progressWriteInFlight = useRef(false);
+  // Last server-confirmed completedSteps for the current write chain. A failed
+  // write rolls back to this plus the still-queued intents; a per-mutation
+  // cache snapshot cannot be used, because a queued step's optimistic flip is
+  // already in the cache when its own mutation starts.
+  const confirmedStepsRef = useRef<number[] | null>(null);
 
   // Run17 BUG-016: all row ids go in ONE PUT (stepIds + explicit completed
   // flag) instead of a sequential per-row PUT loop (3 writes per click).
@@ -222,14 +247,10 @@ export default function JourneyDetail() {
       await queryClient.cancelQueries({ queryKey: [`/api/journeys/${id}`] });
       const previous = queryClient.getQueryData<Journey>([`/api/journeys/${id}`]);
       if (previous?.progress) {
-        const current = (previous.progress.completedSteps || []).map(Number);
-        const next = completed
-          ? Array.from(new Set([...current, ...stepIds]))
-          : current.filter((sid: number) => !stepIds.includes(sid));
-        queryClient.setQueryData<Journey>([`/api/journeys/${id}`], {
-          ...previous,
-          progress: { ...previous.progress, completedSteps: next },
-        });
+        queryClient.setQueryData<Journey>(
+          [`/api/journeys/${id}`],
+          applyOptimisticToggle(previous, stepIds, completed),
+        );
       }
       return { previous };
     },
@@ -237,7 +258,13 @@ export default function JourneyDetail() {
       const transition = data as {
         logicalStepBecameComplete?: boolean;
         journeyBecameComplete?: boolean;
+        completedSteps?: unknown;
       };
+      if (Array.isArray(transition.completedSteps)) {
+        confirmedStepsRef.current = transition.completedSteps.map(Number);
+      } else if (confirmedStepsRef.current) {
+        confirmedStepsRef.current = toggleStepIds(confirmedStepsRef.current, vars.stepIds, vars.completed);
+      }
       // Task #232/#330: one funnel event per logical-step transition, never
       // per row id. The server serializes writes and reports the transition,
       // preventing duplicate events from stale tabs/retried idempotent PUTs.
@@ -275,9 +302,20 @@ export default function JourneyDetail() {
       });
     },
     onError: (error: Error, _vars, context) => {
-      // Roll back the optimistic flip to the pre-mutation snapshot.
-      if (context?.previous) {
-        queryClient.setQueryData([`/api/journeys/${id}`], context.previous);
+      // Roll back the failed flip: start from the last server-confirmed
+      // progress, then re-apply clicks that are still queued (they will be
+      // sent by onSettled, so their optimistic state stays).
+      const cached = queryClient.getQueryData<Journey>([`/api/journeys/${id}`]);
+      const confirmed = confirmedStepsRef.current;
+      let restored: Journey | undefined =
+        cached?.progress && confirmed
+          ? { ...cached, progress: { ...cached.progress, completedSteps: confirmed } }
+          : context?.previous;
+      if (restored) {
+        for (const pending of pendingDesiredRef.current.values()) {
+          restored = applyOptimisticToggle(restored, pending.stepIds, pending.completed);
+        }
+        queryClient.setQueryData([`/api/journeys/${id}`], restored);
       }
       // Run21 R4-057: friendly copy instead of raw server error stringification.
       toast({
@@ -287,9 +325,9 @@ export default function JourneyDetail() {
       });
     },
     onSettled: (_data, _error, vars) => {
-      // NB-024/NB-059 (run24): latest-wins — if clicks landed while this PUT
-      // was in flight, fire at most ONE follow-up PUT toward the latest
-      // desired state instead of dropping them or queueing one per click.
+      // B04: clicks that landed while this PUT was in flight are coalesced
+      // per logical step (latest wins for the SAME step); drain them one
+      // step at a time so clicks on DIFFERENT steps are never dropped.
       const desired = pendingDesiredRef.current.values().next().value;
       if (desired) {
         pendingDesiredRef.current.delete(desired.stepNumber);
@@ -325,14 +363,10 @@ export default function JourneyDetail() {
       pendingDesiredRef.current.set(stepNumber, { stepIds, completed, stepNumber, stepPosition });
       const previous = queryClient.getQueryData<Journey>([`/api/journeys/${id}`]);
       if (previous?.progress) {
-        const current = (previous.progress.completedSteps || []).map(Number);
-        const next = completed
-          ? Array.from(new Set([...current, ...stepIds]))
-          : current.filter((sid: number) => !stepIds.includes(sid));
-        queryClient.setQueryData<Journey>([`/api/journeys/${id}`], {
-          ...previous,
-          progress: { ...previous.progress, completedSteps: next },
-        });
+        queryClient.setQueryData<Journey>(
+          [`/api/journeys/${id}`],
+          applyOptimisticToggle(previous, stepIds, completed),
+        );
       }
       return;
     }
@@ -345,6 +379,11 @@ export default function JourneyDetail() {
       return;
     }
     progressWriteInFlight.current = true;
+    // No write is in flight, so the cache holds the server truth.
+    const baseline = queryClient.getQueryData<Journey>([`/api/journeys/${id}`]);
+    confirmedStepsRef.current = baseline?.progress
+      ? (baseline.progress.completedSteps || []).map(Number)
+      : null;
     completeStepMutation.mutate({ stepIds, completed, stepNumber, stepPosition });
   };
 

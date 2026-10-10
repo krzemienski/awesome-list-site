@@ -529,7 +529,10 @@ export function registerJourneyRoutes(
         res.json({ success: true });
       } catch (error) {
         console.error('Error deleting journey step:', error);
-        res.status(500).json({ message: 'Failed to delete journey step' });
+        // B05: the delete runs in one transaction, so a failure changed nothing.
+        // The response contract replaces 500 bodies with a generic message, so
+        // the admin editor renders its own "nothing was changed" text for 5xx.
+        res.status(500).json({ message: 'Could not delete the step — nothing was changed. Reload the steps and try again.' });
       }
     },
   );
@@ -680,11 +683,13 @@ export function registerRecommendationRoutes(
       // Create a user profile for anonymous users from query params
       const userProfile: AIUserProfile = {
         userId: 'anonymous',
-        preferredCategories: (req.query.categories as string)?.split(',').filter(Boolean) || [],
-        skillLevel: (req.query.skillLevel as string || 'intermediate') as 'beginner' | 'intermediate' | 'advanced',
-        learningGoals: (req.query.goals as string)?.split(',').filter(Boolean) || [],
-        preferredResourceTypes: (req.query.types as string)?.split(',').filter(Boolean) || [],
-        timeCommitment: (req.query.timeCommitment as string || 'flexible') as 'daily' | 'weekly' | 'flexible',
+        // B09: read only the validated scalar values — Express parses repeated
+        // or bracketed params into arrays/objects, which the schema rejects.
+        preferredCategories: profileQuery.data.categories?.split(',').filter(Boolean) ?? [],
+        skillLevel: profileQuery.data.skillLevel ?? 'intermediate',
+        learningGoals: profileQuery.data.goals?.split(',').filter(Boolean) ?? [],
+        preferredResourceTypes: profileQuery.data.types?.split(',').filter(Boolean) ?? [],
+        timeCommitment: profileQuery.data.timeCommitment ?? 'flexible',
         viewHistory: [],
         bookmarks: [],
         completedResources: [],

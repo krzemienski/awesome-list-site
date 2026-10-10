@@ -1,0 +1,6 @@
+BEFORE {"steps":[{"id":293,"step_number":1,"resource_id":184739},{"id":294,"step_number":2,"resource_id":188650},{"id":295,"step_number":3,"resource_id":184740}],"progress":[{"current_step_id":294,"completed_steps":[293,294],"completed_at":null}]}
+{"event":"ops.db_query","command":"delete","durationMs":9,"outcome":"error","errorClass":"sqlstate_23"}
+CONTROL delete without helper: rejected — 23503 user_journey_progress_current_step_id_journey_steps_id_fk
+HELPER removed rows: 1
+AFTER {"steps":[{"id":293,"step_number":1,"resource_id":184739},{"id":295,"step_number":2,"resource_id":184740}],"progress":[{"current_step_id":null,"completed_steps":[293],"completed_at":null}]}
+RESIDUE [{"j":0,"r":0,"u":0}]

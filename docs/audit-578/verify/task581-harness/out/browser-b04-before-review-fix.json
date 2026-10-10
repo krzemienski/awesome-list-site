@@ -1,0 +1,362 @@
+{
+  "390": {
+    "uiImmediatelyAfterClicks": [
+      1,
+      2,
+      3
+    ],
+    "puts1": [
+      {
+        "stepIds": [
+          181,
+          182,
+          183
+        ],
+        "completed": true,
+        "result": 200
+      },
+      {
+        "stepIds": [
+          184,
+          185,
+          186
+        ],
+        "completed": true,
+        "result": 200
+      },
+      {
+        "stepIds": [
+          187,
+          188,
+          189
+        ],
+        "completed": true,
+        "result": 200
+      }
+    ],
+    "dbAfterScenario1": [
+      1,
+      2,
+      3
+    ],
+    "uiAfterScenario1": [
+      1,
+      2,
+      3
+    ],
+    "puts2": [
+      {
+        "stepIds": [
+          190,
+          191,
+          192
+        ],
+        "completed": true,
+        "result": 200
+      },
+      {
+        "stepIds": [
+          193,
+          194,
+          195
+        ],
+        "completed": false,
+        "result": 200
+      },
+      {
+        "stepIds": [
+          190,
+          191,
+          192
+        ],
+        "completed": true,
+        "result": 200
+      }
+    ],
+    "dbAfterScenario2": [
+      1,
+      2,
+      3,
+      4
+    ],
+    "uiAfterScenario2": [
+      1,
+      2,
+      3,
+      4
+    ],
+    "uiDuringFailure": [
+      2,
+      3,
+      4,
+      6
+    ],
+    "puts3": [
+      {
+        "stepIds": [
+          196,
+          197,
+          198
+        ],
+        "completed": true,
+        "result": "forced-500"
+      },
+      {
+        "stepIds": [
+          181,
+          182,
+          183
+        ],
+        "completed": false,
+        "result": 200
+      }
+    ],
+    "dbAfterScenario3": [
+      2,
+      3,
+      4
+    ],
+    "uiAfterScenario3": [
+      2,
+      3,
+      4
+    ],
+    "scenario4Steps": {
+      "stepA": 1,
+      "stepB": 5,
+      "before": [
+        2,
+        3,
+        4
+      ]
+    },
+    "uiDuringScenario4": [
+      1,
+      2,
+      3,
+      4,
+      5
+    ],
+    "puts4": [
+      {
+        "stepIds": [
+          181,
+          182,
+          183
+        ],
+        "completed": true,
+        "result": 200
+      },
+      {
+        "stepIds": [
+          193,
+          194,
+          195
+        ],
+        "completed": true,
+        "result": "forced-500"
+      }
+    ],
+    "blockedDetailGets4": 1,
+    "uiAfterScenario4NoReload": [],
+    "dbAfterScenario4": [
+      1,
+      2,
+      3,
+      4
+    ],
+    "scenario4Pass": false,
+    "stepCardsVisible4": 0,
+    "pageTextScenario4": "Home\nLearning Journeys\nCouldn’t load this journey.\nERROR · UNAVAILABLE\nCouldn’t load this journey.\n\nSomething went wrong while fetching the learning path. Please try again.\n\nTry again",
+    "scenario4Screenshot": "/tmp/b04-before/B04-queued-failure-no-reload-390.png",
+    "uiAfterReload": [
+      1,
+      2,
+      3,
+      4
+    ],
+    "screenshot": "/tmp/b04-before/B04-journey7-after-reload-390.png"
+  },
+  "desktop": {
+    "uiImmediatelyAfterClicks": [
+      1,
+      2,
+      3
+    ],
+    "puts1": [
+      {
+        "stepIds": [
+          181,
+          182,
+          183
+        ],
+        "completed": true,
+        "result": 200
+      },
+      {
+        "stepIds": [
+          184,
+          185,
+          186
+        ],
+        "completed": true,
+        "result": 200
+      },
+      {
+        "stepIds": [
+          187,
+          188,
+          189
+        ],
+        "completed": true,
+        "result": 200
+      }
+    ],
+    "dbAfterScenario1": [
+      1,
+      2,
+      3
+    ],
+    "uiAfterScenario1": [
+      1,
+      2,
+      3
+    ],
+    "puts2": [
+      {
+        "stepIds": [
+          190,
+          191,
+          192
+        ],
+        "completed": true,
+        "result": 200
+      },
+      {
+        "stepIds": [
+          193,
+          194,
+          195
+        ],
+        "completed": false,
+        "result": 200
+      },
+      {
+        "stepIds": [
+          190,
+          191,
+          192
+        ],
+        "completed": true,
+        "result": 200
+      }
+    ],
+    "dbAfterScenario2": [
+      1,
+      2,
+      3,
+      4
+    ],
+    "uiAfterScenario2": [
+      1,
+      2,
+      3,
+      4
+    ],
+    "uiDuringFailure": [
+      2,
+      3,
+      4,
+      6
+    ],
+    "puts3": [
+      {
+        "stepIds": [
+          196,
+          197,
+          198
+        ],
+        "completed": true,
+        "result": "forced-500"
+      },
+      {
+        "stepIds": [
+          181,
+          182,
+          183
+        ],
+        "completed": false,
+        "result": 200
+      }
+    ],
+    "dbAfterScenario3": [
+      2,
+      3,
+      4
+    ],
+    "uiAfterScenario3": [
+      2,
+      3,
+      4
+    ],
+    "scenario4Steps": {
+      "stepA": 1,
+      "stepB": 5,
+      "before": [
+        2,
+        3,
+        4
+      ]
+    },
+    "uiDuringScenario4": [
+      1,
+      2,
+      3,
+      4,
+      5
+    ],
+    "puts4": [
+      {
+        "stepIds": [
+          181,
+          182,
+          183
+        ],
+        "completed": true,
+        "result": 200
+      },
+      {
+        "stepIds": [
+          193,
+          194,
+          195
+        ],
+        "completed": true,
+        "result": "forced-500"
+      }
+    ],
+    "blockedDetailGets4": 1,
+    "uiAfterScenario4NoReload": [],
+    "dbAfterScenario4": [
+      1,
+      2,
+      3,
+      4
+    ],
+    "scenario4Pass": false,
+    "stepCardsVisible4": 0,
+    "pageTextScenario4": "Home\nLearning Journeys\nCouldn’t load this journey.\nERROR · UNAVAILABLE\nCouldn’t load this journey.\n\nSomething went wrong while fetching the learning path. Please try again.\n\nTry again",
+    "scenario4Screenshot": "/tmp/b04-before/B04-queued-failure-no-reload-desktop.png",
+    "uiAfterReload": [
+      1,
+      2,
+      3,
+      4
+    ],
+    "screenshot": "/tmp/b04-before/B04-journey7-after-reload-desktop.png"
+  },
+  "cleanup": {
+    "clerkDeleted": "user_3KVNcI3GLHnHuRH2NFbIjQFSbkN",
+    "bridgeId": "__qa_test_plan_581_b04_1791638852195"
+  }
+}

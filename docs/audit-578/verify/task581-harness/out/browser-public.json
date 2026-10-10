@@ -1,0 +1,122 @@
+{
+  "journey9-desktop": {
+    "screenshot": "docs/audit-578/verify/screenshots/B02-journey9-step4-desktop.png",
+    "rejectedLeakInDom": [],
+    "cardText": "4 Monitoring & Analytics Instrument the live pipeline for real-time QoE, error rates and concurrent viewers. Set actionable alerts. Some resources in this step are no longer available. Your step progress is unchanged. Streaming With SRT Protocol in OBS Guide for configuring and using the SRT protocol within OBS Studio for reliable streaming to various destinations.",
+    "links": [
+      "/resource/186035",
+      "https://obsproject.com/wiki/Streaming-With-SRT-Protocol"
+    ],
+    "stepCards": 6,
+    "internalLinkFollowed": {
+      "url": "http://127.0.0.1:5000/resource/186035",
+      "h1": "Advanced Live Streaming Architecture"
+    }
+  },
+  "journey6-desktop": {
+    "screenshot": "docs/audit-578/verify/screenshots/B02-journey6-step6-desktop.png",
+    "rejectedLeakInDom": [],
+    "cardText": "6 Putting It All Together Trace a complete streaming pipeline from ingest to playback so you can reason about every link in the chain before going deeper. Some resources in this step are no longer available. Your step progress is unchanged. PTZOptics Hive Tutorial Series A YouTube tutorial series by PTZOptics focusing on remote camera control and cloud-based video production. The series offers step-by-step guides on effectively using Hive for managing remote productions, covering topics like camera linking and dynamic zoom. Matrox Video Learning Resources A collection of technology guides, web",
+    "links": [
+      "/resource/184942",
+      "https://web.archive.org/web/20250905130722/https://remoteproduction.com/the-best-resources-for-learning-remote-production-technology/",
+      "/resource/184876",
+      "https://video.matrox.com/en/learning/resources"
+    ],
+    "stepCards": 6,
+    "internalLinkFollowed": {
+      "url": "http://127.0.0.1:5000/resource/184942",
+      "h1": "Video Streaming Fundamentals"
+    }
+  },
+  "journey9-390": {
+    "screenshot": "docs/audit-578/verify/screenshots/B02-journey9-step4-390.png",
+    "rejectedLeakInDom": [],
+    "cardText": "4 Monitoring & Analytics Instrument the live pipeline for real-time QoE, error rates and concurrent viewers. Set actionable alerts. Some resources in this step are no longer available. Your step progress is unchanged. Streaming With SRT Protocol in OBS Guide for configuring and using the SRT protocol within OBS Studio for reliable streaming to various destinations.",
+    "links": [
+      "/resource/186035",
+      "https://obsproject.com/wiki/Streaming-With-SRT-Protocol"
+    ],
+    "stepCards": 6
+  },
+  "journey6-390": {
+    "screenshot": "docs/audit-578/verify/screenshots/B02-journey6-step6-390.png",
+    "rejectedLeakInDom": [],
+    "cardText": "6 Putting It All Together Trace a complete streaming pipeline from ingest to playback so you can reason about every link in the chain before going deeper. Some resources in this step are no longer available. Your step progress is unchanged. PTZOptics Hive Tutorial Series A YouTube tutorial series by PTZOptics focusing on remote camera control and cloud-based video production. The series offers step-by-step guides on effectively using Hive for managing remote productions, covering topics like camera linking and dynamic zoom. Matrox Video Learning Resources A collection of technology guides, web",
+    "links": [
+      "/resource/184942",
+      "https://web.archive.org/web/20250905130722/https://remoteproduction.com/the-best-resources-for-learning-remote-production-technology/",
+      "/resource/184876",
+      "https://video.matrox.com/en/learning/resources"
+    ],
+    "stepCards": 6
+  },
+  "H08 /journey/2147483000 desktop": {
+    "httpStatus": 404,
+    "telemetry": [
+      "[route-monitor] dead link: {path: /journey/2147483000, referrer: null, ts: 2026-10-09T16:08:01.805Z}"
+    ],
+    "h1": "Journey not found.",
+    "privateLeak": false,
+    "screenshot": "docs/audit-578/verify/screenshots/H08_journey_2147483000-desktop.png"
+  },
+  "H08 /journey/30 desktop": {
+    "httpStatus": 404,
+    "telemetry": [
+      "[route-monitor] dead link: {path: /journey/30, referrer: null, ts: 2026-10-09T16:08:05.058Z}"
+    ],
+    "h1": "Journey not found.",
+    "privateLeak": false,
+    "screenshot": "docs/audit-578/verify/screenshots/H08_journey_30-desktop.png"
+  },
+  "H08 /journey/not-a-number desktop": {
+    "httpStatus": 404,
+    "telemetry": [
+      "[route-monitor] dead link: {path: /journey/not-a-number, referrer: null, ts: 2026-10-09T16:08:08.162Z}"
+    ],
+    "h1": "Journey not found.",
+    "privateLeak": false,
+    "screenshot": "docs/audit-578/verify/screenshots/H08_journey_not_a_number-desktop.png"
+  },
+  "H08 /journey/7 desktop": {
+    "httpStatus": 200,
+    "telemetry": [],
+    "h1": "Building Your First Streaming Platform",
+    "privateLeak": false,
+    "screenshot": "docs/audit-578/verify/screenshots/H08_journey_7-desktop.png"
+  },
+  "H08 /journey/2147483000 390": {
+    "httpStatus": 404,
+    "telemetry": [
+      "[route-monitor] dead link: {path: /journey/2147483000, referrer: null, ts: 2026-10-09T16:08:14.362Z}"
+    ],
+    "h1": "Journey not found.",
+    "privateLeak": false,
+    "screenshot": "docs/audit-578/verify/screenshots/H08_journey_2147483000-390.png"
+  },
+  "H08 /journey/30 390": {
+    "httpStatus": 404,
+    "telemetry": [
+      "[route-monitor] dead link: {path: /journey/30, referrer: null, ts: 2026-10-09T16:08:17.327Z}"
+    ],
+    "h1": "Journey not found.",
+    "privateLeak": false,
+    "screenshot": "docs/audit-578/verify/screenshots/H08_journey_30-390.png"
+  },
+  "H08 /journey/not-a-number 390": {
+    "httpStatus": 404,
+    "telemetry": [
+      "[route-monitor] dead link: {path: /journey/not-a-number, referrer: null, ts: 2026-10-09T16:08:19.955Z}"
+    ],
+    "h1": "Journey not found.",
+    "privateLeak": false,
+    "screenshot": "docs/audit-578/verify/screenshots/H08_journey_not_a_number-390.png"
+  },
+  "H08 /journey/7 390": {
+    "httpStatus": 200,
+    "telemetry": [],
+    "h1": "Building Your First Streaming Platform",
+    "privateLeak": false,
+    "screenshot": "docs/audit-578/verify/screenshots/H08_journey_7-390.png"
+  }
+}

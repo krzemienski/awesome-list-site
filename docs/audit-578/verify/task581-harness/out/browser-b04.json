@@ -1,0 +1,264 @@
+{
+  "390": {
+    "uiImmediatelyAfterClicks": [
+      1,
+      2,
+      3
+    ],
+    "puts1": [
+      {
+        "stepIds": [
+          181,
+          182,
+          183
+        ],
+        "completed": true,
+        "result": 200
+      },
+      {
+        "stepIds": [
+          184,
+          185,
+          186
+        ],
+        "completed": true,
+        "result": 200
+      },
+      {
+        "stepIds": [
+          187,
+          188,
+          189
+        ],
+        "completed": true,
+        "result": 200
+      }
+    ],
+    "dbAfterScenario1": [
+      1,
+      2,
+      3
+    ],
+    "uiAfterScenario1": [
+      1,
+      2,
+      3
+    ],
+    "puts2": [
+      {
+        "stepIds": [
+          190,
+          191,
+          192
+        ],
+        "completed": true,
+        "result": 200
+      },
+      {
+        "stepIds": [
+          193,
+          194,
+          195
+        ],
+        "completed": false,
+        "result": 200
+      },
+      {
+        "stepIds": [
+          190,
+          191,
+          192
+        ],
+        "completed": true,
+        "result": 200
+      }
+    ],
+    "dbAfterScenario2": [
+      1,
+      2,
+      3,
+      4
+    ],
+    "uiAfterScenario2": [
+      1,
+      2,
+      3,
+      4
+    ],
+    "uiDuringFailure": [
+      2,
+      3,
+      4,
+      6
+    ],
+    "puts3": [
+      {
+        "stepIds": [
+          196,
+          197,
+          198
+        ],
+        "completed": true,
+        "result": "forced-500"
+      },
+      {
+        "stepIds": [
+          181,
+          182,
+          183
+        ],
+        "completed": false,
+        "result": 200
+      }
+    ],
+    "dbAfterScenario3": [
+      2,
+      3,
+      4
+    ],
+    "uiAfterScenario3": [
+      2,
+      3,
+      4
+    ],
+    "uiAfterReload": [
+      2,
+      3,
+      4
+    ],
+    "screenshot": "docs/audit-578/verify/screenshots/B04-journey7-after-reload-390.png"
+  },
+  "desktop": {
+    "uiImmediatelyAfterClicks": [
+      1,
+      2,
+      3
+    ],
+    "puts1": [
+      {
+        "stepIds": [
+          181,
+          182,
+          183
+        ],
+        "completed": true,
+        "result": 200
+      },
+      {
+        "stepIds": [
+          184,
+          185,
+          186
+        ],
+        "completed": true,
+        "result": 200
+      },
+      {
+        "stepIds": [
+          187,
+          188,
+          189
+        ],
+        "completed": true,
+        "result": 200
+      }
+    ],
+    "dbAfterScenario1": [
+      1,
+      2,
+      3
+    ],
+    "uiAfterScenario1": [
+      1,
+      2,
+      3
+    ],
+    "puts2": [
+      {
+        "stepIds": [
+          190,
+          191,
+          192
+        ],
+        "completed": true,
+        "result": 200
+      },
+      {
+        "stepIds": [
+          193,
+          194,
+          195
+        ],
+        "completed": false,
+        "result": 200
+      },
+      {
+        "stepIds": [
+          190,
+          191,
+          192
+        ],
+        "completed": true,
+        "result": 200
+      }
+    ],
+    "dbAfterScenario2": [
+      1,
+      2,
+      3,
+      4
+    ],
+    "uiAfterScenario2": [
+      1,
+      2,
+      3,
+      4
+    ],
+    "uiDuringFailure": [
+      2,
+      3,
+      4,
+      6
+    ],
+    "puts3": [
+      {
+        "stepIds": [
+          196,
+          197,
+          198
+        ],
+        "completed": true,
+        "result": "forced-500"
+      },
+      {
+        "stepIds": [
+          181,
+          182,
+          183
+        ],
+        "completed": false,
+        "result": 200
+      }
+    ],
+    "dbAfterScenario3": [
+      2,
+      3,
+      4
+    ],
+    "uiAfterScenario3": [
+      2,
+      3,
+      4
+    ],
+    "uiAfterReload": [
+      2,
+      3,
+      4
+    ],
+    "screenshot": "docs/audit-578/verify/screenshots/B04-journey7-after-reload-desktop.png"
+  },
+  "cleanup": {
+    "clerkDeleted": "user_3KSsQKo7majkYpkg8Z2ei3t2ltQ",
+    "bridgeId": "__qa_test_plan_581_b04_1791562286295"
+  }
+}

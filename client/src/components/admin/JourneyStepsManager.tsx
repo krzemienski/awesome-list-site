@@ -82,6 +82,17 @@ const EMPTY_FORM: StepFormState = {
   isOptional: false,
 };
 
+// B05/B08: the server's response contract replaces every 500 body with a bare
+// "Internal Server Error". Step writes run in one transaction, so a server
+// failure changed nothing — say so, and what to do next, instead.
+function stepWriteError(err: Error | null | undefined): string | undefined {
+  if (!err) return undefined;
+  if (err instanceof ApiError && err.status >= 500) {
+    return "Nothing was changed because the server hit an error. Reload the steps and try again.";
+  }
+  return err.message;
+}
+
 // Run16 BUG-013: the DB stores one row per step-resource (up to 3 rows share a
 // stepNumber). The editor previously rendered every raw row as its own step
 // (badges 1,1,1,2,2,2…) while the card/public page said "6 steps". The dialog
@@ -143,15 +154,20 @@ function ResourcePicker({
 
   return (
     <div className="space-y-2">
-      <div className="flex items-center gap-2">
+      <div className="flex flex-wrap items-center gap-2">
         {value !== null ? (
-          <Badge variant="secondary" className="gap-1" data-testid="step-resource-selected">
-            #{value}
-            {selectedResource ? ` — ${selectedResource.title}` : ""}
+          <Badge variant="secondary" className="gap-1 min-w-0 max-w-full" data-testid="step-resource-selected">
+            {/* The resource title is long raw text in a flex badge: wrap it in a
+                shrinkable span so it truncates instead of pushing the clear and
+                Change controls off narrow screens. */}
+            <span className="min-w-0 truncate">
+              #{value}
+              {selectedResource ? ` — ${selectedResource.title}` : ""}
+            </span>
             <button
               type="button"
               onClick={() => onChange(null)}
-              className="inline-flex items-center justify-center min-h-[32px] min-w-[32px] -my-1 hover:opacity-80"
+              className="inline-flex shrink-0 items-center justify-center min-h-[32px] min-w-[32px] -my-1 hover:opacity-80"
               aria-label="Clear resource"
               data-testid="step-resource-clear"
             >
@@ -185,7 +201,7 @@ function ResourcePicker({
               <p className="text-xs text-muted-foreground p-2">Searching…</p>
             )}
             {unavailable && (
-              <div role="alert" className="p-2 text-sm">
+              <div role="alert" className="flex flex-wrap items-center gap-2 p-2 text-sm">
                 {unavailable === "offline" ? "You're offline. Reconnect to search resources." : "Resources could not be loaded."}
                 <Button type="button" variant="outline" onClick={() => void resourcesQuery.refetch()}>Retry</Button>
               </div>
@@ -420,7 +436,7 @@ function StepsDialog({
       invalidate();
     },
     onError: (err: Error) => {
-      toast({ title: "Could not delete step", description: err.message, variant: "destructive" });
+      toast({ title: "Could not delete step", description: stepWriteError(err), variant: "destructive" });
       invalidate();
     },
   });
@@ -435,7 +451,7 @@ function StepsDialog({
       invalidate();
     },
     onError: (err: Error) =>
-      toast({ title: "Could not remove resource", description: err.message, variant: "destructive" }),
+      toast({ title: "Could not remove resource", description: stepWriteError(err), variant: "destructive" }),
   });
 
   const reorderMutation = useMutation({
@@ -446,7 +462,7 @@ function StepsDialog({
       }),
     onSuccess: () => invalidate(),
     onError: (err: Error) =>
-      toast({ title: "Could not reorder", description: err.message, variant: "destructive" }),
+      toast({ title: "Could not reorder", description: stepWriteError(err), variant: "destructive" }),
   });
 
   const [createOpen, setCreateOpen] = useState(false);
@@ -474,7 +490,7 @@ function StepsDialog({
 
         <div className="flex justify-end">
           <Button
-            onClick={() => setCreateOpen(true)}
+            onClick={() => { createMutation.reset(); setCreateOpen(true); }}
             disabled={!!unavailable || !data}
             data-testid="add-step-button"
           >
@@ -491,7 +507,7 @@ function StepsDialog({
             </>
           )}
           {unavailable && (
-            <div role="alert" className="text-sm">
+            <div role="alert" className="flex flex-wrap items-center gap-2 text-sm">
               {unavailable === "offline" ? "You're offline. Reconnect to load journey steps." : "Journey steps could not be loaded."}
               <Button type="button" variant="outline" onClick={() => void stepsQuery.refetch()}>Retry</Button>
             </div>
@@ -594,7 +610,7 @@ function StepsDialog({
                   <Button
                     size="icon"
                     variant="ghost"
-                    onClick={() => setEditingGroup(group)}
+                    onClick={() => { updateMutation.reset(); setEditingGroup(group); }}
                     aria-label={`Edit ${stepName}`}
                     data-testid={`step-edit-${primary.id}`}
                   >
@@ -623,13 +639,13 @@ function StepsDialog({
           submitLabel={createMutation.isPending ? "Adding…" : "Add step"}
           onSubmit={(form) => createMutation.mutate(form)}
           isPending={createMutation.isPending}
-          error={createMutation.error?.message}
+          error={stepWriteError(createMutation.error)}
         />
 
         <StepEditor
           open={editingGroup !== null}
           targetId={editingGroup?.rows[0].id}
-          error={updateMutation.error?.message}
+          error={stepWriteError(updateMutation.error)}
           onOpenChange={(o) => {
             if (!o) setEditingGroup(null);
           }}

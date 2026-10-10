@@ -1,0 +1,57 @@
+[setup] auth user {"status":200,"bridgeId":"__qa_test_plan_581_api_1791637617887"}
+[B01] anon GET /api/journeys/54 (draft) {"status":404,"body":"{\"message\":\"Journey not found\"}","leaksPrivate":false}
+[B01] anon GET /journey/54 HTML (draft) {"status":404,"leaksPrivate":false}
+[B01] signed-in user on draft {"detail":404,"start":404,"startBody":"{\"message\":\"Journey not found\"}","putProgress":404,"getProgress":404}
+[B01] anon GET /api/journeys/55 (archived) {"status":404,"body":"{\"message\":\"Journey not found\"}","leaksPrivate":false}
+[B01] anon GET /journey/55 HTML (archived) {"status":404,"leaksPrivate":false}
+[B01] signed-in user on archived {"detail":404,"start":404,"startBody":"{\"message\":\"Journey not found\"}","putProgress":404,"getProgress":404}
+[B01] anon GET /api/journeys/2147483000 (missing) {"status":404,"body":"{\"message\":\"Journey not found\"}","leaksPrivate":false}
+[B01] anon GET /journey/2147483000 HTML (missing) {"status":404,"leaksPrivate":false}
+[B01] signed-in user on missing {"detail":404,"start":404,"startBody":"{\"message\":\"Journey not found\"}","putProgress":404,"getProgress":404}
+[B01] progress rows created for draft/archived {"rows":0}
+[B01] admin list + steps editor still load drafts {"listStatus":200,"adminIds":["54:draft","55:archived"],"stepsStatus":200,"stepCount":1}
+[B01] after admin publishes the draft {"publish":200,"anonDetail":200,"title":"__qa_test_plan_581_b01_draft","start":200,"created":true}
+[B01] published journey 7 unaffected {"status":200}
+[B02] journey 6 {"apiStatus":200,"htmlStatus":200,"stepCount":6,"logicalGroups":6,"unavailableRows":[{"id":178,"stepNumber":6,"resourceId":184980,"resource":null}],"rejectedFieldsInApi":[],"rejectedFieldsInHtml":[],"htmlHasUnavailableNote":true}
+[B02] journey 9 {"apiStatus":200,"htmlStatus":200,"stepCount":6,"logicalGroups":6,"unavailableRows":[{"id":226,"stepNumber":4,"resourceId":186453,"resource":null},{"id":228,"stepNumber":4,"resourceId":184773,"resource":null},{"id":229,"stepNumber":5,"resourceId":186448,"resource":null},{"id":231,"stepNumber":5,"resourceId":185324,"resource":null}],"rejectedFieldsInApi":[],"rejectedFieldsInHtml":[],"htmlHasUnavail
+[B02] journey 10 {"apiStatus":200,"htmlStatus":200,"stepCount":6,"logicalGroups":6,"unavailableRows":[{"id":241,"stepNumber":3,"resourceId":185082,"resource":null}],"rejectedFieldsInApi":[],"rejectedFieldsInHtml":[],"htmlHasUnavailableNote":true}
+[B02] QA journey with mixed-status resources (anon API) {"status":200,"byStatus":{"pending":{"resource":null},"rejected":{"resource":null},"withdrawn":{"resource":null},"archived":{"resource":null},"approved":{"resource":{"id":188680,"title":"__qa_test_plan_581_res_b02_approved"}}},"secretInApi":[],"approvedInApi":true}
+[B02] QA journey server HTML {"status":200,"secretInHtml":[],"approvedInHtml":true,"unavailableNote":true}
+[B02] admin editor still hydrates non-approved resources {"status":200,"hydrated":5,"of":5}
+[B02] six rejected linked resources still rejected {"rows":[{"id":184773,"status":"rejected"},{"id":184980,"status":"rejected"},{"id":185082,"status":"rejected"},{"id":185324,"status":"rejected"},{"id":186448,"status":"rejected"},{"id":186453,"status":"rejected"}]}
+[B03] valid three-row group {"start":200,"first":200,"firstFlags":{"logical":true,"journey":false},"completedSteps":[181,182,183],"repeatFlags":{"logical":false}}
+[B03] mixed string {"body":"{\"stepIds\":[181,\"bad\"],\"completed\":false}","status":400,"message":"Provide either stepId or 1–100 unique positive integer stepIds","progressUnchanged":true}
+[B03] null member {"body":"{\"stepIds\":[181,null],\"completed\":false}","status":400,"message":"Provide either stepId or 1–100 unique positive integer stepIds","progressUnchanged":true}
+[B03] fraction {"body":"{\"stepIds\":[181,1.5],\"completed\":false}","status":400,"message":"Provide either stepId or 1–100 unique positive integer stepIds","progressUnchanged":true}
+[B03] int overflow {"body":"{\"stepIds\":[181,2147483648],\"completed\":false}","status":400,"message":"Provide either stepId or 1–100 unique positive integer stepIds","progressUnchanged":true}
+[B03] negative {"body":"{\"stepIds\":[181,-4],\"completed\":false}","status":400,"message":"Provide either stepId or 1–100 unique positive integer stepIds","progressUnchanged":true}
+[B03] empty array {"body":"{\"stepIds\":[],\"completed\":false}","status":400,"message":"Provide either stepId or 1–100 unique positive integer stepIds","progressUnchanged":true}
+[B03] duplicates {"body":"{\"stepIds\":[181,181],\"completed\":false}","status":400,"message":"Provide either stepId or 1–100 unique positive integer stepIds","progressUnchanged":true}
+[B03] string ids {"body":"{\"stepIds\":\"181\",\"completed\":false}","status":400,"message":"Provide either stepId or 1–100 unique positive integer stepIds","progressUnchanged":true}
+[B03] 101 ids {"body":"{\"stepIds\":[1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26","status":400,"message":"Provide either stepId or 1–100 unique positive integer stepIds","progressUnchanged":true}
+[B03] stepId+stepIds {"body":"{\"stepId\":181,\"stepIds\":[181],\"completed\":false}","status":400,"message":"Provide either stepId or 1–100 unique positive integer stepIds","progressUnchanged":true}
+[B03] completed not boolean {"body":"{\"stepIds\":[181],\"completed\":\"no\"}","status":400,"message":"completed must be a boolean","progressUnchanged":true}
+[B03] foreign step id keeps 422 {"status":422,"message":"Step ID(s) do not belong to this journey: 199","progressUnchanged":true}
+[B06] POST step with missing resourceId 2147483647 {"status":400,"message":"Selected resource no longer exists or is not approved. Choose another resource."}
+[B06] PATCH step with missing resourceId 2147483647 {"status":400,"message":"Selected resource no longer exists or is not approved. Choose another resource."}
+[B06] PATCH step with rejected resource 184980 {"status":400,"message":"Selected resource no longer exists or is not approved. Choose another resource."}
+[B06] PATCH a step id that does not exist {"status":404,"message":"Step not found for this journey"}
+[B06] step rows unchanged {"unchanged":true,"rows":[{"id":398,"step_number":1,"resource_id":184740,"title":"__qa_test_plan_581_b06_step"}]}
+[B05] before group delete {"steps":[{"id":399,"step_number":1},{"id":400,"step_number":1},{"id":401,"step_number":1},{"id":402,"step_number":2},{"id":403,"step_number":3}],"progress":[{"completed_steps":[399,400,401,402],"current_step_id":400,"completed_at":null}]}
+[B05] DELETE middle row 400 ?group=true {"status":200,"body":{"success":true},"steps":[{"id":402,"step_number":1},{"id":403,"step_number":2}],"progress":[{"completed_steps":[402],"current_step_id":null,"completed_at":null}]}
+[B05] before single-row remove {"steps":[{"id":402,"step_number":1},{"id":403,"step_number":2},{"id":404,"step_number":3}],"progress":[{"completed_steps":[402,403,404],"current_step_id":404,"completed_at":null}]}
+[B05] DELETE referenced single row 404 {"status":200,"steps":[{"id":402,"step_number":1},{"id":403,"step_number":2}],"progress":[{"completed_steps":[402,403],"current_step_id":null,"completed_at":"2026-10-10T13:07:03.653Z"}]}
+[B05] user GET progress after deletes {"status":200,"completedSteps":[402,403],"currentStepId":null}
+[B09] GET /api/recommendations?categories=a&categories=b {"status":400,"message":"Invalid recommendation profile query"}
+[B09] GET /api/recommendations?goals=x&goals=y {"status":400,"message":"Invalid recommendation profile query"}
+[B09] GET /api/recommendations?types=video&types=article {"status":400,"message":"Invalid recommendation profile query"}
+[B09] GET /api/recommendations?categories[a]=b {"status":400,"message":"Invalid query parameters"}
+[B09] GET /api/recommendations?goals[]=x {"status":400,"message":"Invalid recommendation profile query"}
+[B09] GET /api/recommendations?skillLevel=beginner&skillLevel=advanced {"status":400,"message":"Invalid recommendation profile query"}
+[B09] GET /api/recommendations?timeCommitment[x]=1 {"status":400,"message":"Invalid query parameters"}
+[B09] GET /api/recommendations?limit=5&limit=6 {"status":400,"message":"Invalid query parameters"}
+[B09] GET /api/recommendations?limit[a]=1 {"status":400,"message":"Invalid query parameters"}
+[B09] GET /api/recommendations?skillLevel=expert {"status":400,"message":"Invalid recommendation profile query"}
+[B09] GET /api/recommendations?categories=Encoding%20%26%20Codecs,Streaming&limit=5 {"status":200,"items":5,"firstType":"rule_based"}
+[B09] GET /api/recommendations?skillLevel=beginner&goals=learn-fundamentals&types=video&limit=3 {"status":200,"items":3,"firstType":"rule_based"}
+[B09] GET /api/recommendations? {"status":200,"items":10,"firstType":"rule_based"}

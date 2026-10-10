@@ -1,0 +1,47 @@
+{
+  "phase": "b07",
+  "vp": "desktop",
+  "fixtureRows": {
+    "a": [
+      302,
+      303,
+      304
+    ],
+    "b": [
+      305,
+      306
+    ],
+    "c": [
+      307
+    ]
+  },
+  "stepsFailure": {
+    "alert": "Journey steps could not be loaded.Retry",
+    "noStepsTextShown": 0
+  },
+  "screenshots": [
+    "/tmp/b581shots/B07-steps-load-failure-desktop.png",
+    "/tmp/b581shots/B07-steps-after-retry-desktop.png",
+    "/tmp/b581shots/B07-picker-load-failure-desktop.png",
+    "/tmp/b581shots/B07-picker-after-retry-desktop.png"
+  ],
+  "stepsRecovered": {
+    "groups": 3,
+    "alertGone": true
+  },
+  "pickerFailure": {
+    "alert": "Resources could not be loaded.Retry",
+    "noResultsShown": 0
+  },
+  "pickerRecovered": {
+    "options": 10,
+    "titleKept": "__qa_test_plan_581_typed title survives",
+    "searchKept": "Streaming"
+  },
+  "cleanup": {
+    "clerkDeleted": "user_3KSt6WQhHSFnamqff1WbbK444cW",
+    "bridgeId": "__qa_test_plan_581_adm_b07_1791562621736",
+    "journey": 33,
+    "resources": []
+  }
+}

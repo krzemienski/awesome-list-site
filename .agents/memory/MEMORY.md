@@ -166,3 +166,6 @@
 - [Shared queryKey error shape](shared-querykey-error-shape.md) — every queryFn sharing a key must throw the same ApiError shape, or status-aware error UI races.
 - [Alternate-system pixel parity](alternate-system-parity.md) — per-system skins lose to Editorial-specific page CSS; crop uniform 1px shifts before "fixing".
 - [ds-button-sweep empty-queue dependency](ds-sweep-empty-queue-dependency.md) — admin tab checks wait for empty-state controls; pending QA fixtures fail them; run DS verify after cleanup.
+- [Contract masks 500 bodies](contract-500-body-masking.md) — every /api 500 body becomes "Internal Server Error"; actionable failure text must use a non-500 status or client-side 5xx mapping.
+- [Queued optimistic rollback](queued-optimistic-rollback.md) — queued writes must roll back to last server-confirmed state, not their onMutate snapshot; failed refetch keeps loaded page.
+- [cache-headers boot locks DEV](cache-headers-boot-migrator-locks.md) — spawned prod server runs boot DDL on dev mid-crawl → seo-snapshot sheds random /tag/* 503s; retry or lease db-heavy.

@@ -1,0 +1,277 @@
+{
+  "phase": "delete",
+  "vp": "390",
+  "fixtureRows": {
+    "a": [
+      338,
+      339,
+      340
+    ],
+    "b": [
+      341,
+      342
+    ],
+    "c": [
+      343
+    ]
+  },
+  "beforeDelete": {
+    "steps": [
+      {
+        "id": 338,
+        "step_number": 1,
+        "resource_id": 184739,
+        "title": "__qa_test_plan_581_group1",
+        "description": "__qa_test_plan_581_group1 description",
+        "is_optional": false
+      },
+      {
+        "id": 339,
+        "step_number": 1,
+        "resource_id": 184740,
+        "title": "__qa_test_plan_581_group1",
+        "description": "__qa_test_plan_581_group1 description",
+        "is_optional": false
+      },
+      {
+        "id": 340,
+        "step_number": 1,
+        "resource_id": 184741,
+        "title": "__qa_test_plan_581_group1",
+        "description": "__qa_test_plan_581_group1 description",
+        "is_optional": false
+      },
+      {
+        "id": 341,
+        "step_number": 2,
+        "resource_id": 184742,
+        "title": "__qa_test_plan_581_group2",
+        "description": "__qa_test_plan_581_group2 description",
+        "is_optional": false
+      },
+      {
+        "id": 342,
+        "step_number": 2,
+        "resource_id": 184743,
+        "title": "__qa_test_plan_581_group2",
+        "description": "__qa_test_plan_581_group2 description",
+        "is_optional": false
+      },
+      {
+        "id": 343,
+        "step_number": 3,
+        "resource_id": 184744,
+        "title": "__qa_test_plan_581_group3",
+        "description": "__qa_test_plan_581_group3 description",
+        "is_optional": false
+      }
+    ],
+    "progress": [
+      {
+        "completed_steps": [
+          338,
+          339,
+          340,
+          341,
+          342
+        ],
+        "current_step_id": 339,
+        "completed_at": null
+      }
+    ]
+  },
+  "screenshots": [
+    "/tmp/b581shots/B05-before-delete-390.png",
+    "/tmp/b581shots/B05-delete-failure-group-intact-390.png",
+    "/tmp/b581shots/B05-delete-success-renumbered-390.png",
+    "/tmp/b581shots/B05-remove-referenced-resource-390.png"
+  ],
+  "failurePath": {
+    "httpStatus": 500,
+    "body": "{\"message\":\"Internal Server Error\"}",
+    "toast": "Could not delete step\nNothing was changed because the server hit an error. Reload the steps and try again.",
+    "steps": [
+      {
+        "id": 338,
+        "step_number": 1,
+        "resource_id": 184739,
+        "title": "__qa_test_plan_581_group1",
+        "description": "__qa_test_plan_581_group1 description",
+        "is_optional": false
+      },
+      {
+        "id": 339,
+        "step_number": 1,
+        "resource_id": 184740,
+        "title": "__qa_test_plan_581_group1",
+        "description": "__qa_test_plan_581_group1 description",
+        "is_optional": false
+      },
+      {
+        "id": 340,
+        "step_number": 1,
+        "resource_id": 184741,
+        "title": "__qa_test_plan_581_group1",
+        "description": "__qa_test_plan_581_group1 description",
+        "is_optional": false
+      },
+      {
+        "id": 341,
+        "step_number": 2,
+        "resource_id": 184742,
+        "title": "__qa_test_plan_581_group2",
+        "description": "__qa_test_plan_581_group2 description",
+        "is_optional": false
+      },
+      {
+        "id": 342,
+        "step_number": 2,
+        "resource_id": 184743,
+        "title": "__qa_test_plan_581_group2",
+        "description": "__qa_test_plan_581_group2 description",
+        "is_optional": false
+      },
+      {
+        "id": 343,
+        "step_number": 3,
+        "resource_id": 184744,
+        "title": "__qa_test_plan_581_group3",
+        "description": "__qa_test_plan_581_group3 description",
+        "is_optional": false
+      }
+    ],
+    "progress": [
+      {
+        "completed_steps": [
+          338,
+          339,
+          340,
+          341,
+          342
+        ],
+        "current_step_id": 339,
+        "completed_at": null
+      }
+    ],
+    "uiGroups": 3
+  },
+  "successPath": {
+    "httpStatus": 200,
+    "steps": [
+      {
+        "id": 341,
+        "step_number": 1,
+        "resource_id": 184742,
+        "title": "__qa_test_plan_581_group2",
+        "description": "__qa_test_plan_581_group2 description",
+        "is_optional": false
+      },
+      {
+        "id": 342,
+        "step_number": 1,
+        "resource_id": 184743,
+        "title": "__qa_test_plan_581_group2",
+        "description": "__qa_test_plan_581_group2 description",
+        "is_optional": false
+      },
+      {
+        "id": 343,
+        "step_number": 2,
+        "resource_id": 184744,
+        "title": "__qa_test_plan_581_group3",
+        "description": "__qa_test_plan_581_group3 description",
+        "is_optional": false
+      }
+    ],
+    "progress": [
+      {
+        "completed_steps": [
+          341,
+          342
+        ],
+        "current_step_id": null,
+        "completed_at": null
+      }
+    ],
+    "uiBadges": 1,
+    "uiGroupTitles": [
+      "1\n__qa_test_plan_581_group2\n\n__qa_test_plan_581_group2 description\n\n2 linked resources:\n#184742\n#184743",
+      "2\n__qa_test_plan_581_group3\n\n__qa_test_plan_581_group3 description\n\n1 linked resource:\n#184744"
+    ]
+  },
+  "beforeRemove": {
+    "steps": [
+      {
+        "id": 341,
+        "step_number": 1,
+        "resource_id": 184742,
+        "title": "__qa_test_plan_581_group2",
+        "description": "__qa_test_plan_581_group2 description",
+        "is_optional": false
+      },
+      {
+        "id": 342,
+        "step_number": 1,
+        "resource_id": 184743,
+        "title": "__qa_test_plan_581_group2",
+        "description": "__qa_test_plan_581_group2 description",
+        "is_optional": false
+      },
+      {
+        "id": 343,
+        "step_number": 2,
+        "resource_id": 184744,
+        "title": "__qa_test_plan_581_group3",
+        "description": "__qa_test_plan_581_group3 description",
+        "is_optional": false
+      }
+    ],
+    "progress": [
+      {
+        "completed_steps": [
+          341,
+          342
+        ],
+        "current_step_id": 342,
+        "completed_at": null
+      }
+    ]
+  },
+  "removeResource": {
+    "httpStatus": 200,
+    "steps": [
+      {
+        "id": 341,
+        "step_number": 1,
+        "resource_id": 184742,
+        "title": "__qa_test_plan_581_group2",
+        "description": "__qa_test_plan_581_group2 description",
+        "is_optional": false
+      },
+      {
+        "id": 343,
+        "step_number": 2,
+        "resource_id": 184744,
+        "title": "__qa_test_plan_581_group3",
+        "description": "__qa_test_plan_581_group3 description",
+        "is_optional": false
+      }
+    ],
+    "progress": [
+      {
+        "completed_steps": [
+          341
+        ],
+        "current_step_id": null,
+        "completed_at": null
+      }
+    ],
+    "toast": "Resource removed from step"
+  },
+  "cleanup": {
+    "clerkDeleted": "user_3KStQGmUCIulcPhOrjGhzoblZds",
+    "bridgeId": "__qa_test_plan_581_adm_delete_1791562777970",
+    "journey": 39,
+    "resources": []
+  }
+}
