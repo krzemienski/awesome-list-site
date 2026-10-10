@@ -116,7 +116,8 @@ export default function AppHeader({ onSearchOpen, user, onLogout, logoutError, c
           <button type="button" className="user-pill" aria-label={`Account · ${role}`}>
             {user ? <Avatar className="header-avatar">
               <AvatarImage src={user.avatar} alt="" />
-              <AvatarFallback>{getInitials(user.name, user.email)}</AvatarFallback>
+              {/* The header chip shows one letter, as in the reference design. */}
+              <AvatarFallback>{Array.from(getInitials(user.name, user.email))[0]}</AvatarFallback>
             </Avatar> : <span className="header-avatar"><LogIn size={12} aria-hidden="true" /></span>}
             <span className="header-account-name hide-mobile">{user ? firstName : "Sign in"}</span>
           </button>

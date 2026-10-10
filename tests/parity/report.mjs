@@ -6,6 +6,12 @@ import fs from "node:fs";
 import path from "node:path";
 
 const percent = (row) => (row.comparison ? `${row.comparison.diffPercent.toFixed(4)}%` : "—");
+const bandSplit = (row) => {
+  const bands = row.comparison?.bands;
+  if (!bands) return "—";
+  const split = `${bands.header.diffPercent.toFixed(2)}% / ${bands.body.diffPercent.toFixed(4)}%`;
+  return row.comparison.verdict?.mode === "header-band-split" ? `${split} (split)` : split;
+};
 const pixels = (row) => (row.comparison ? String(row.comparison.differingPixels) : "—");
 const dims = (row) => (row.comparison
   ? `${row.comparison.actualDimensions.width}×${row.comparison.actualDimensions.height} vs ${row.comparison.expectedDimensions.width}×${row.comparison.expectedDimensions.height}`
@@ -101,13 +107,13 @@ export function renderReport(results, { linkPrefix, stageRoot, determinismEviden
     "",
     "## Rows",
     "",
-    "| Screen | Width | System/accent | Class | Status | Diff px | Diff % | Actual vs expected size | Evidence / reason |",
-    "|---|---:|---|---|---|---:|---:|---|---|",
+    "| Screen | Width | System/accent | Class | Status | Diff px | Diff % | Header band / body % | Actual vs expected size | Evidence / reason |",
+    "|---|---:|---|---|---|---:|---:|---:|---|---|",
     ...rows.map((row) => {
       const evidence = row.links?.diff
         ? `${link(row.links.actual, "actual")} · ${link(row.links.expected, "expected")} · ${link(row.links.diff, "diff")}${row.reason ? ` — ${row.reason}` : ""}`
         : (row.reason || (row.aliasOf ? `alias of ${row.aliasOf}` : "—"));
-      return `| ${row.screen} | ${row.width} | ${row.system || results.configuration.captureState?.theme?.system || "editorial"}/${row.accent || results.configuration.captureState?.theme?.accent || "crimson"} | ${row.eligibility} | ${row.status}${row.evidenceKind ? ` (${row.evidenceKind})` : ""} | ${pixels(row)} | ${percent(row)} | ${dims(row)} | ${evidence} |`;
+      return `| ${row.screen} | ${row.width} | ${row.system || results.configuration.captureState?.theme?.system || "editorial"}/${row.accent || results.configuration.captureState?.theme?.accent || "crimson"} | ${row.eligibility} | ${row.status}${row.evidenceKind ? ` (${row.evidenceKind})` : ""} | ${pixels(row)} | ${percent(row)} | ${bandSplit(row)} | ${dims(row)} | ${evidence} |`;
     }),
     "",
     "## Font-face parity",
@@ -127,7 +133,7 @@ export function renderReport(results, { linkPrefix, stageRoot, determinismEviden
     "",
     "## Capture contract",
     "",
-    `Chromium ${results.configuration.browserVersion}; DPR 1; en-US; UTC; dark; reduced motion; viewport heights ${JSON.stringify(results.configuration.viewportHeights)}; pixelmatch threshold ${results.configuration.pixelmatchThreshold}; includeAA false; ceiling ${results.configuration.maximumDiffPercent}% of the union canvas. Full-page captures; unequal sizes are compared on an unscaled union canvas where every unmatched pixel counts. No masking, no cropping, no resizing; documents taller than Chromium's single-surface capture limit are captured as lossless document-coordinate tiles and stitched (recorded per row as \`captureMethod\`) on both sides identically. Normalisations applied to both sides: ${results.configuration.captureNormalisations.join("; ")}. Backdrop-filter values are compared per row via computed style before normalisation.${results.configuration.captureState ? ` Pre-seeded state: theme ${results.configuration.captureState.theme.system} × ${results.configuration.captureState.theme.accent} on both sides; app localStorage ${JSON.stringify(results.configuration.captureState.app.localStorage)}.` : ""}`,
+    `Chromium ${results.configuration.browserVersion}; DPR 1; en-US; UTC; dark; reduced motion; viewport heights ${JSON.stringify(results.configuration.viewportHeights)}; pixelmatch threshold ${results.configuration.pixelmatchThreshold}; includeAA false; ceiling ${results.configuration.maximumDiffPercent}% of the union canvas.${results.configuration.headerBand ? ` Every row also reports the shell header band (rows above the deeper of the two header bottoms, \`${results.configuration.headerBand.selectors.actual}\` vs \`${results.configuration.headerBand.selectors.expected}\`) and the body below it; at widths with approved header deviations (${results.configuration.headerBand.approvedDeviations.map((entry) => `${entry.id} @ ${entry.widths.join("/")}`).join("; ")}) the body is judged against the ${results.configuration.maximumDiffPercent}% ceiling and the band against its own ${results.configuration.headerBand.maximumDiffPercent}% budget — nothing is masked.` : ""} Full-page captures; unequal sizes are compared on an unscaled union canvas where every unmatched pixel counts. No masking, no cropping, no resizing; documents taller than Chromium's single-surface capture limit are captured as lossless document-coordinate tiles and stitched (recorded per row as \`captureMethod\`) on both sides identically. Normalisations applied to both sides: ${results.configuration.captureNormalisations.join("; ")}. Backdrop-filter values are compared per row via computed style before normalisation.${results.configuration.captureState ? ` Pre-seeded state: theme ${results.configuration.captureState.theme.system} × ${results.configuration.captureState.theme.accent} on both sides; app localStorage ${JSON.stringify(results.configuration.captureState.app.localStorage)}.` : ""}`,
     "",
     results.determinism
       ? describeDeterminism(results.determinism, "this run", link("determinism.json", "determinism.json"))
@@ -169,9 +175,9 @@ export function renderStatus(results) {
     "",
     "## Largest measured gaps",
     "",
-    "| Screen | Width | Diff % | Reason |",
-    "|---|---:|---:|---|",
-    ...worst.map((row) => `| ${row.screen} | ${row.width} | ${percent(row)} | ${row.reason || "pixel diff above ceiling"} |`),
+    "| Screen | Width | Diff % | Header band / body % | Reason |",
+    "|---|---:|---:|---:|---|",
+    ...worst.map((row) => `| ${row.screen} | ${row.width} | ${percent(row)} | ${bandSplit(row)} | ${row.reason || "pixel diff above ceiling"} |`),
     "",
     "## Blocked rows",
     "",

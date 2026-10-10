@@ -223,9 +223,37 @@ compared with pixelmatch (threshold 0.1, `includeAA: false`) and **every pixel
 outside the overlap counts as differing**. `diffPercent` is
 `differingPixels / canvasPixels × 100`; the ceiling is 0.5 %.
 
+### Header band split
+
+Every app row also reports the shell header band separately: the rows above
+the deeper of the two header bottoms (`.app-canonical-header` on the app,
+`header.header` on the reference, measured at capture time), and the body
+below it (`comparison.bands` in `results.json`, the "Header band / body %"
+column in `REPORT.md`). Both counts come from the same full-canvas pixelmatch,
+so header + body always equals `differingPixels`.
+
+At widths with an **approved header deviation** (`APPROVED_HEADER_DEVIATIONS`
+in `runner.mjs`) the verdict is split (`comparison.verdict.mode =
+"header-band-split"`): the body must stay within the 0.5 % ceiling and the
+band within its own 5 % budget. The approved deviations are the user's
+2026-10-10 header decision (see `docs/audit-578/verify/I05.md`, "Header
+decision"):
+
+- `tablet-drawer-trigger` (768, 1024): the header menu button stays, because
+  it is the only header route to Browse/Submit/About/Admin there.
+- `tablet-search-label` (768, 1024): the search box keeps the word "Search"
+  beside ⌘K (usability finding F210).
+
+The 5 % budget was calibrated on the admin rows (the deviations cost 3.4–4.4 %
+of the band at 768 and 2.5–3.3 % at 1024), so an unapproved header change
+still fails. At every other width the whole-canvas rule applies unchanged.
+Add a deviation here only after the product owner approves it, and record
+the decision next to it.
+
 ### No-masking rule
 
-No region is ignored, blurred, painted over or excluded. Dynamic content is
+No region is ignored, blurred, painted over or excluded (the header band
+split above changes how the counted pixels are judged, not which are counted). Dynamic content is
 handled by making both sides show the same data (adapter + frozen clock + real
 identity), never by hiding it. The only per-side state changes are the
 pre-seeded localStorage entries above, and every normalisation is applied to

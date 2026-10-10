@@ -59,6 +59,26 @@ const harnessEvidenceDir = path.join(docsParityDir, "evidence", "harness");
 
 const PIXELMATCH_THRESHOLD = 0.1;
 const MAXIMUM_DIFF_PERCENT = 0.5;
+/**
+ * Approved app-shell header deviations (user decision 2026-10-10, recorded in
+ * docs/audit-578/verify/I05.md "Header decision"). At these widths the shell
+ * header band is judged on its own budget and the rest of the page against the
+ * normal ceiling, so a short page is not failed for an approved shell choice.
+ * Everywhere else the whole-canvas rule is unchanged (the split is still
+ * reported). Nothing is masked: every pixel is still compared and counted.
+ */
+const APPROVED_HEADER_DEVIATIONS = [
+  { id: "tablet-drawer-trigger", widths: [768, 1024], summary: "the header menu button stays at 768–1024px (the only header route to Browse/Submit/About/Admin there)" },
+  { id: "tablet-search-label", widths: [768, 1024], summary: "the tablet search box keeps the word \"Search\" beside ⌘K (usability finding F210)" },
+];
+/**
+ * Share of the header band's pixels that may differ where an approved deviation
+ * applies. Calibrated 2026-10-10 on the admin rows: the two deviations cost
+ * 3.4–4.4% of the band at 768 and 2.5–3.3% at 1024 (Brutalist heaviest), so 5%
+ * leaves ~300px of headroom at 768 before an unapproved header change fails.
+ */
+const HEADER_BAND_MAXIMUM_DIFF_PERCENT = 5;
+const HEADER_SELECTORS = { actual: ".app-canonical-header", expected: "header.header" };
 const VIEWPORT_HEIGHTS = { 375: 812, 768: 1024, 1024: 768, 1440: 900 };
 const ROW_TIMEOUT_MS = 150_000;
 /** Raw stability frames: `<stem>.attempt-N.png` and `<stem>.repeat.png` (never compared, never committed). */
@@ -198,7 +218,7 @@ const coversInventory = (inventory, only, widths) => {
  * pixel outside the overlap counts as differing (it exists on one side only).
  * Nothing is scaled, masked, or cropped.
  */
-const compareCaptures = async (actualFile, expectedFile, diffFile) => {
+const compareCaptures = async (actualFile, expectedFile, diffFile, headerBandHeight = null) => {
   const [actualMeta, expectedMeta] = await Promise.all([sharp(actualFile).metadata(), sharp(expectedFile).metadata()]);
   const width = Math.max(actualMeta.width, expectedMeta.width);
   const height = Math.max(actualMeta.height, expectedMeta.height);
@@ -233,6 +253,29 @@ const compareCaptures = async (actualFile, expectedFile, diffFile) => {
   const unmatchedDimensionPixels = canvasPixels - overlapWidth * overlapHeight;
   const differingPixels = overlapDifferingPixels + unmatchedDimensionPixels;
   const diffPercent = (differingPixels / canvasPixels) * 100;
+  let bands = null;
+  if (headerBandHeight && headerBandHeight < overlapHeight) {
+    // pixelmatch paints differing pixels in exactly diffColor/diffColorAlt and
+    // everything else in grey or AA yellow, so the header band's share of the
+    // same count is read from the diff image (columns outside the overlap
+    // count as differing, as in the canvas total).
+    let headerDiffering = (width - overlapWidth) * headerBandHeight;
+    for (let y = 0; y < headerBandHeight; y += 1) {
+      for (let x = 0; x < overlapWidth; x += 1) {
+        const i = (y * width + x) * 4;
+        const r = output[i], g = output[i + 1], b = output[i + 2];
+        if ((r === 255 && g === 0 && b === 64) || (r === 0 && g === 180 && b === 255)) headerDiffering += 1;
+      }
+    }
+    const headerPixels = width * headerBandHeight;
+    const bodyPixels = canvasPixels - headerPixels;
+    const bodyDiffering = differingPixels - headerDiffering;
+    bands = {
+      headerBandHeight,
+      header: { differingPixels: headerDiffering, pixels: headerPixels, diffPercent: (headerDiffering / headerPixels) * 100 },
+      body: { differingPixels: bodyDiffering, pixels: bodyPixels, diffPercent: (bodyDiffering / bodyPixels) * 100 },
+    };
+  }
   return {
     differingPixels,
     overlapDifferingPixels,
@@ -244,7 +287,34 @@ const compareCaptures = async (actualFile, expectedFile, diffFile) => {
     canvas: { width, height },
     dimensionsMatch: actualMeta.width === expectedMeta.width && actualMeta.height === expectedMeta.height,
     withinCeiling: diffPercent <= MAXIMUM_DIFF_PERCENT,
+    bands,
   };
+};
+
+/** Bottom edge (document px) of the shell header, or null when the page has none at the top. */
+const measureHeaderBand = (page, selector) => page.evaluate((sel) => {
+  const header = document.querySelector(sel);
+  if (!header) return null;
+  const rect = header.getBoundingClientRect();
+  if (!rect.height || Math.abs(rect.top + window.scrollY) > 1) return null;
+  return Math.ceil(rect.bottom + window.scrollY);
+}, selector);
+
+/**
+ * The row's visual verdict. Where an approved header deviation applies and both
+ * sides render the shell header, the band and the body are judged separately;
+ * otherwise the whole canvas is judged against the single ceiling.
+ */
+const judgeComparison = (comparison, width) => {
+  const deviations = APPROVED_HEADER_DEVIATIONS.filter((entry) => entry.widths.includes(width)).map((entry) => entry.id);
+  if (!deviations.length || !comparison.bands) {
+    return { mode: "canvas", ok: comparison.withinCeiling, reasons: comparison.withinCeiling ? [] : [`${comparison.diffPercent.toFixed(3)}% differing pixels exceeds the ${MAXIMUM_DIFF_PERCENT}% ceiling`] };
+  }
+  const { header, body } = comparison.bands;
+  const reasons = [];
+  if (body.diffPercent > MAXIMUM_DIFF_PERCENT) reasons.push(`${body.diffPercent.toFixed(3)}% of the page below the header differs, above the ${MAXIMUM_DIFF_PERCENT}% ceiling`);
+  if (header.diffPercent > HEADER_BAND_MAXIMUM_DIFF_PERCENT) reasons.push(`${header.diffPercent.toFixed(2)}% of the header band differs, above its ${HEADER_BAND_MAXIMUM_DIFF_PERCENT}% budget for the approved deviations (${deviations.join(", ")})`);
+  return { mode: "header-band-split", approvedHeaderDeviations: deviations, ok: !reasons.length, reasons };
 };
 
 // ---------------------------------------------------------------------------
@@ -660,9 +730,10 @@ const main = async () => {
         .filter((defect) => !row.fontsSettled.actual.nativeDefects.includes(defect));
       row.sharedFontDefects = sharedFontDefects;
       row.referenceOnlyFontDefects = referenceOnlyFontDefects;
-      const visualOk = row.comparison.withinCeiling && row.backdropFilters.match && row.identity.ok !== false;
-      const reasons = [];
-      if (!row.comparison.withinCeiling) reasons.push(`${row.comparison.diffPercent.toFixed(3)}% differing pixels exceeds the ${MAXIMUM_DIFF_PERCENT}% ceiling`);
+      const verdict = judgeComparison(row.comparison, width);
+      row.comparison.verdict = verdict;
+      const visualOk = verdict.ok && row.backdropFilters.match && row.identity.ok !== false;
+      const reasons = [...verdict.reasons];
       if (!row.backdropFilters.match) reasons.push(`backdrop-filter sets differ (app ${JSON.stringify(row.backdropFilters.actual)} vs reference ${JSON.stringify(row.backdropFilters.expected)})`);
       if (row.identity.ok === false) reasons.push(row.identity.reason);
       if (fontGap) reasons.push(`@font-face parity gap: ${row.fontParity.gaps.length} face(s) declared on one side only`);
@@ -677,7 +748,8 @@ const main = async () => {
       } else {
         pushRow({ ...row, status: visualOk && !fontGap && !fontDefects.length ? "PASS" : "FAIL", denominator: true, fontGap, fontDefects, reason: reasons.join("; ") || undefined });
       }
-      log(`  ${rows.at(-1).status} ${row.comparison.diffPercent.toFixed(4)}% (${row.comparison.differingPixels}px)`);
+      const bands = row.comparison.bands;
+      log(`  ${rows.at(-1).status} ${row.comparison.diffPercent.toFixed(4)}% (${row.comparison.differingPixels}px)${bands ? ` · header ${bands.header.diffPercent.toFixed(2)}% · body ${bands.body.diffPercent.toFixed(4)}%${verdict.mode === "header-band-split" ? " [split]" : ""}` : ""}`);
     }
     rows.sort((a, b) => planOrder.get(`${a.screen}@${a.width}`) - planOrder.get(`${b.screen}@${b.width}`));
 
@@ -775,6 +847,7 @@ const main = async () => {
         browserVersion,
         pixelmatchThreshold: PIXELMATCH_THRESHOLD,
         maximumDiffPercent: MAXIMUM_DIFF_PERCENT,
+        headerBand: { selectors: HEADER_SELECTORS, maximumDiffPercent: HEADER_BAND_MAXIMUM_DIFF_PERCENT, approvedDeviations: APPROVED_HEADER_DEVIATIONS },
         viewportHeights: VIEWPORT_HEIGHTS,
         captureNormalisations: CAPTURE_NORMALISATIONS,
         chromiumArgs: CHROMIUM_ARGS,
@@ -829,7 +902,7 @@ const main = async () => {
         },
         workspace: { startFingerprints: sha256(Buffer.from(JSON.stringify(startFingerprints))), endFingerprints: sha256(Buffer.from(JSON.stringify(endFingerprints))), inputsChangedDuringRun, changedInputs: inputsChangedDuringRun ? changedFingerprintPaths(startFingerprints, endFingerprints) : [] },
       },
-      summary: { denominator: measured.length, pass, fail, incomplete, incompleteEvidence, fontGapOnlyFails: measured.filter((row) => row.status === "FAIL" && row.fontGap && row.comparison?.withinCeiling && row.backdropFilters?.match && row.identity?.ok !== false).length, blocked, evidence: rows.filter((row) => row.status === "EVIDENCE").length, unverified: rows.filter((row) => row.status === "UNVERIFIED").length, aliases: rows.filter((row) => row.status === "ALIAS").length },
+      summary: { denominator: measured.length, pass, fail, incomplete, incompleteEvidence, fontGapOnlyFails: measured.filter((row) => row.status === "FAIL" && row.fontGap && (row.comparison?.verdict?.ok ?? row.comparison?.withinCeiling) && row.backdropFilters?.match && row.identity?.ok !== false).length, blocked, evidence: rows.filter((row) => row.status === "EVIDENCE").length, unverified: rows.filter((row) => row.status === "UNVERIFIED").length, aliases: rows.filter((row) => row.status === "ALIAS").length },
       rows,
     };
     await fsp.writeFile(path.join(stageRoot, "results.json"), JSON.stringify(results, null, 2));
@@ -1321,7 +1394,13 @@ const captureRow = async (ctx, screen, width) => {
           slug,
         )
       : { checked: false };
-    const comparison = await compareCaptures(actualFile, expectedFile, diffFile);
+    const [actualHeaderBottom, expectedHeaderBottom] = await Promise.all([
+      measureHeaderBand(sides.actual.page, HEADER_SELECTORS.actual),
+      measureHeaderBand(sides.expected.page, HEADER_SELECTORS.expected),
+    ]);
+    const headerBandHeight = actualHeaderBottom && expectedHeaderBottom ? Math.max(actualHeaderBottom, expectedHeaderBottom) : null;
+    const comparison = await compareCaptures(actualFile, expectedFile, diffFile, headerBandHeight);
+    comparison.headerBottoms = { actual: actualHeaderBottom, expected: expectedHeaderBottom };
     const fontComparison = compareFontFaces(sides.actual.faces, sides.expected.faces);
     const fontParity = {
       ok: fontComparison.ok,
