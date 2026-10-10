@@ -232,7 +232,7 @@ export default function Profile({ user }: ProfileProps) {
       });
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["/api/auth/user"] });
+      void queryClient.invalidateQueries({ queryKey: ["/api/auth/user"] });
       setNameDialogOpen(false);
       toast({ title: "Name updated", description: "Your display name has been saved." });
     },
@@ -254,7 +254,7 @@ export default function Profile({ user }: ProfileProps) {
       return apiRequest("/api/user/deletion-request", { method: "POST" });
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["/api/auth/user"] });
+      void queryClient.invalidateQueries({ queryKey: ["/api/auth/user"] });
       setDeletionDialogOpen(false);
       toast({
         title: "Deletion request submitted",
@@ -277,7 +277,7 @@ export default function Profile({ user }: ProfileProps) {
       return apiRequest("/api/user/deletion-request", { method: "DELETE" });
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["/api/auth/user"] });
+      void queryClient.invalidateQueries({ queryKey: ["/api/auth/user"] });
       toast({
         title: "Deletion request withdrawn",
         description: "Your account will not be deleted.",
@@ -404,7 +404,7 @@ export default function Profile({ user }: ProfileProps) {
             which sizes children to max-content; w-full bounds it to the
             viewport so a long name truncates there too. */}
         <div className="flex-1 min-w-0 w-full sm:w-auto text-center sm:text-left">
-          <div className="eyebrow mb-2" aria-hidden>// Profile</div>
+          <div className="eyebrow mb-2" aria-hidden>{"// Profile"}</div>
           <h1 className="display-h text-3xl sm:text-4xl mb-2 flex items-center gap-2 justify-center sm:justify-start min-w-0">
             {/* Run17 BUG-012: truncate — CSS defense for names at the 50-char cap */}
             <span className="truncate">{user.name || "User"}</span>

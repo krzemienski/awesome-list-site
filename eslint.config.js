@@ -65,6 +65,9 @@ export default tseslint.config(
       ...reactPlugin.configs.recommended.rules,
       ...reactPlugin.configs["jsx-runtime"].rules,
       ...reactHooksPlugin.configs.recommended.rules,
+      // Stale hook dependencies are a correctness bug, not style (J05). The
+      // lint-ratchet gate holds application code at zero for this rule.
+      "react-hooks/exhaustive-deps": "error",
       "react-refresh/only-export-components": [
         "warn",
         { allowConstantExport: true },

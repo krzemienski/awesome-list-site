@@ -72,13 +72,12 @@ function openBreaker(reason: string): void {
 }
 
 function withTimeout<T>(p: Promise<T>): Promise<T> {
-  return new Promise<T>((resolve, reject) => {
-    const t = setTimeout(() => reject(new Error("query timeout")), QUERY_TIMEOUT_MS);
-    p.then(
-      (v) => { clearTimeout(t); resolve(v); },
-      (e) => { clearTimeout(t); reject(e); },
-    );
+  let t: ReturnType<typeof setTimeout> | undefined;
+  const timeout = new Promise<never>((_resolve, reject) => {
+    t = setTimeout(() => reject(new Error("query timeout")), QUERY_TIMEOUT_MS);
   });
+  // The query's own rejection reason passes through unchanged.
+  return Promise.race([p, timeout]).finally(() => clearTimeout(t));
 }
 
 export class PgRateLimitStore implements Store {
@@ -154,7 +153,7 @@ export class PgRateLimitStore implements Store {
   }
 
   async resetKey(key: string): Promise<void> {
-    this.fallback.resetKey(key);
+    await this.fallback.resetKey(key);
     try {
       await withTimeout(
         getPool().query(

@@ -156,7 +156,7 @@ let periodicTimer: NodeJS.Timeout | null = null;
 
 export function startOrphanWatchdogPeriodic(): void {
   if (periodicTimer) return; // idempotent — never double-schedule
-  periodicTimer = setInterval(async () => {
+  periodicTimer = setInterval(() => void (async () => {
     try {
       // Dynamic imports keep the watchdog free of load-order coupling.
       const [{ enrichmentService }, { syncService }, { researchService }] = await Promise.all([
@@ -177,7 +177,7 @@ export function startOrphanWatchdogPeriodic(): void {
     } catch (err: any) {
       console.error('❌ Orphan watchdog periodic sweep failed (non-fatal):', err?.message || err);
     }
-  }, PERIODIC_SWEEP_INTERVAL_MS);
+  })(), PERIODIC_SWEEP_INTERVAL_MS);
   // Never keep the process alive just for the watchdog.
   periodicTimer.unref?.();
 }

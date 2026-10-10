@@ -194,12 +194,12 @@ function useResourceToggle(
       opts.onOptimistic(!vars.remove, vars);
     },
     onSuccess: (data, vars) => {
-      queryClient.invalidateQueries({ queryKey: [config.listKey] });
+      void queryClient.invalidateQueries({ queryKey: [config.listKey] });
       // Both key shapes are in use across surfaces — invalidate each.
-      queryClient.invalidateQueries({
+      void queryClient.invalidateQueries({
         queryKey: [`/api/resources/${opts.resourceId}`],
       });
-      queryClient.invalidateQueries({
+      void queryClient.invalidateQueries({
         queryKey: ["/api/resources", String(opts.resourceId)],
       });
       // R4-081: mirror the change into other open tabs.

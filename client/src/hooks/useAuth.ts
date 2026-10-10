@@ -105,6 +105,9 @@ export function useAuth() {
       mpIdentify(identity);
       phIdentify(identity);
     }
+    // Identify once per signed-in user id (session start/restore), not on
+    // every profile-field refetch.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [authedUser?.id]);
 
   /** Sign out via Clerk, then confirm the server no longer sees a session. */
@@ -132,7 +135,7 @@ export function useAuth() {
 
   const finishLogout = () => {
       // Clear auth cache only after the server confirms invalidation.
-      queryClient.invalidateQueries({ queryKey: ['/api/auth/user'] });
+      void queryClient.invalidateQueries({ queryKey: ['/api/auth/user'] });
       queryClient.setQueryData(['/api/auth/user'], { user: null, isAuthenticated: false });
       clearSignedInClientState();
       window.location.href = '/';

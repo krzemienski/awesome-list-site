@@ -25,6 +25,7 @@ import { eq, or } from "drizzle-orm";
 import { db } from "./db";
 import { deletedUserTombstones, users, type User } from "@shared/schema";
 import { trackServerEvent } from "./lib/mixpanelServer";
+import { asyncHandler } from "./middleware/asyncHandler";
 
 export interface ClerkSessionIdentity {
   /** Legacy bridge id — equals users.id for migrated users. */
@@ -302,7 +303,7 @@ async function resolveBypassAdmin(): Promise<User | undefined> {
  * On DB failure it records the error in res.locals so `requireAuth` can
  * surface an honest 503 instead of a false 401.
  */
-export const clerkUserContext: RequestHandler = async (req, res, next) => {
+export const clerkUserContext: RequestHandler = asyncHandler(async function clerkUserContext(req, res, next) {
   if (skipUserContext(req)) return next();
   // Audit-key bypass (pre-publish browser audits) — checked before the Clerk
   // path so the scripts need no Clerk session at all. Requests with a VALID
@@ -343,7 +344,7 @@ export const clerkUserContext: RequestHandler = async (req, res, next) => {
     res.locals.clerkUserLookupError = error;
   }
   next();
-};
+});
 
 /**
  * Auth gate for protected endpoints. Canonical 401 body matches the legacy

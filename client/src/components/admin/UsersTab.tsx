@@ -122,7 +122,7 @@ export default function UsersTab() {
       });
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['/api/admin/users'] });
+      void queryClient.invalidateQueries({ queryKey: ['/api/admin/users'] });
       toast({ title: "Role Updated", description: "User role has been changed." });
     },
     onError: (error: Error) => {
@@ -142,7 +142,7 @@ export default function UsersTab() {
       return await apiRequest(`/api/admin/users/${userId}`, { method: 'DELETE' });
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['/api/admin/users'] });
+      void queryClient.invalidateQueries({ queryKey: ['/api/admin/users'] });
       toast({ title: "User Deleted", description: "The account and its sign-in identity have been removed." });
       deletedUserRef.current = true;
       setUserToDelete(null);

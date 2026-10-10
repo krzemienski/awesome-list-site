@@ -903,7 +903,7 @@ export default function ExportTools({
         {/* While exporting, aria-disabled (not disabled): a natively disabled
             button loses focus to <body>, and exportingRef already blocks re-entry. */}
         <Button 
-          onClick={handleExport} 
+          onClick={() => void handleExport()} 
           disabled={resourceCount === 0}
           aria-disabled={isExporting || undefined}
           aria-busy={isExporting || undefined}

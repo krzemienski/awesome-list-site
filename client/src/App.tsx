@@ -739,7 +739,7 @@ function Router({ homeComponent: Home }: { homeComponent: HomeRouteComponent }) 
   // of hitting a dead end.
   if (!isKnownRoute) {
     return (
-      <MainLayout productProfile={productProfile} nav={nav} isLoading={navLoading} navError={navError} onRetryNav={() => refetchNav()} user={user ?? undefined} onLogout={logout} logoutError={logoutError} renderSearchDialog={renderSearchDialog}>
+      <MainLayout productProfile={productProfile} nav={nav} isLoading={navLoading} navError={navError} onRetryNav={() => void refetchNav()} user={user ?? undefined} onLogout={logout} logoutError={logoutError} renderSearchDialog={renderSearchDialog}>
         <RouteErrorBoundary location={location}>
         <Suspense fallback={<RouteFallback />}>
           <NotFound suggestion={findRouteSuggestion(location, nav)} />
@@ -750,7 +750,7 @@ function Router({ homeComponent: Home }: { homeComponent: HomeRouteComponent }) 
   }
 
   return (
-    <MainLayout productProfile={productProfile} nav={nav} isLoading={navLoading} navError={navError} onRetryNav={() => refetchNav()} user={user ?? undefined} onLogout={logout} logoutError={logoutError} renderSearchDialog={renderSearchDialog}>
+    <MainLayout productProfile={productProfile} nav={nav} isLoading={navLoading} navError={navError} onRetryNav={() => void refetchNav()} user={user ?? undefined} onLogout={logout} logoutError={logoutError} renderSearchDialog={renderSearchDialog}>
       {/* NB-028 (run18): when the auth check itself fails (429/500/network),
           the app keeps working logged-out — surface it once with a manual
           retry instead of silently looping refetches behind a skeleton. */}
@@ -769,7 +769,7 @@ function Router({ homeComponent: Home }: { homeComponent: HomeRouteComponent }) 
             type="button"
             variant="link"
             className="underline underline-offset-2"
-            onClick={() => refetchAuth()}
+            onClick={() => void refetchAuth()}
             data-testid="button-auth-retry"
           >
             Retry
@@ -824,7 +824,7 @@ function Router({ homeComponent: Home }: { homeComponent: HomeRouteComponent }) 
             nav={nav}
             isLoading={navLoading}
             error={navError}
-            onRetry={() => refetchNav()}
+            onRetry={() => void refetchNav()}
           />
         </Route>
         {/* R5-051: one bare-prefix policy with the server — taxonomy

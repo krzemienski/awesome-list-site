@@ -710,7 +710,6 @@ export default function AppSidebar({
         }
       }
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [categories, location]);
 
   /* BUG-011 (run26): deep links must bring the active tree item into the

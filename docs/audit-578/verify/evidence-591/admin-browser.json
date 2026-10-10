@@ -1,0 +1,85 @@
+{
+  "results": [
+    {
+      "name": "categories row visible",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "name": "category edit saved",
+      "pass": true,
+      "detail": "__qa_test_plan_j05 Category edited"
+    },
+    {
+      "name": "undo/redo controls absent (undoRedoEnabled is off in every taxonomy config)",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "name": "category renamed back via edit form",
+      "pass": true,
+      "detail": "__qa_test_plan_j05 Category"
+    },
+    {
+      "name": "panel switch categories→subcategories",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "name": "subcategory row shows parent name (parent query data)",
+      "pass": true,
+      "detail": "__qa_test_plan_j05 Sub qa-test-plan-j05-sub __qa_test_plan_j05 Category 0 Edit"
+    },
+    {
+      "name": "create: parent category option listed",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "name": "create: parent selection sticks",
+      "pass": true,
+      "detail": "__qa_test_plan_j05 Category"
+    },
+    {
+      "name": "edit: existing parent preselected",
+      "pass": true,
+      "detail": "__qa_test_plan_j05 Category"
+    },
+    {
+      "name": "sub-subcategories row visible",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "name": "sub-subcategory row shows both parents",
+      "pass": true,
+      "detail": "__qa_test_plan_j05 SubSub qa-test-plan-j05-subsub __qa_test_plan_j05 Category __qa_test_plan_j05 Sub 0 Edit"
+    },
+    {
+      "name": "create: subcategory select disabled until category chosen",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "name": "create: subcategory select enabled after category",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "name": "create: subcategory options filtered to chosen category",
+      "pass": true,
+      "detail": "[\"__qa_test_plan_j05 Sub\"]"
+    },
+    {
+      "name": "edit: both parents preselected",
+      "pass": true,
+      "detail": "__qa_test_plan_j05 Category / __qa_test_plan_j05 Sub"
+    },
+    {
+      "name": "no hook-order errors in console",
+      "pass": true,
+      "detail": "[]"
+    }
+  ],
+  "consoleErrors": []
+}

@@ -376,10 +376,10 @@ function StepsDialog({
   const groups = useMemo(() => groupSteps(steps), [steps]);
 
   const invalidate = () => {
-    queryClient.invalidateQueries({ queryKey: ["/api/admin/journeys", journeyId, "steps"] });
-    queryClient.invalidateQueries({ queryKey: ["/api/admin/journeys"] });
-    queryClient.invalidateQueries({ queryKey: [`/api/journeys/${journeyId}`] });
-    queryClient.invalidateQueries({ queryKey: ["/api/journeys"] });
+    void queryClient.invalidateQueries({ queryKey: ["/api/admin/journeys", journeyId, "steps"] });
+    void queryClient.invalidateQueries({ queryKey: ["/api/admin/journeys"] });
+    void queryClient.invalidateQueries({ queryKey: [`/api/journeys/${journeyId}`] });
+    void queryClient.invalidateQueries({ queryKey: ["/api/journeys"] });
   };
 
   const createMutation = useMutation({

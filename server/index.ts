@@ -33,6 +33,7 @@ import {
 } from "./clerkAuth";
 import { HASHED_ASSET_CACHE_CONTROL, SESSION_CACHE_CONTROL } from "./http-cache-policy";
 import { mountVersionRoute } from "./version-route";
+import { asyncHandler } from "./middleware/asyncHandler";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -496,7 +497,7 @@ app.use((req, res, next) => {
   next();
 });
 
-(async () => {
+void (async () => {
   const isProduction = process.env.NODE_ENV === 'production';
 
   // Run migrations before starting server in production
@@ -560,7 +561,7 @@ app.use((req, res, next) => {
   // response is rewritten with route-specific tags for crawlers that don't
   // execute JavaScript (Twitter, Facebook, Slack, iMessage, LinkedIn, etc.).
   const { ogInjectionMiddleware, isEntityRoutePath } = await import("./og-middleware");
-  app.use(ogInjectionMiddleware());
+  app.use(asyncHandler(ogInjectionMiddleware()));
 
   // importantly only setup vite in development and after
   // setting up all the other routes so the catch-all route
@@ -572,7 +573,7 @@ app.use((req, res, next) => {
     await setupVite(app, server);
   } else {
     // In production, add SSR handler before serving static files
-    app.use(handleSSR);
+    app.use(asyncHandler(handleSSR));
     // Run16 BUG-016: Vite emits content-hashed filenames under /assets, so
     // they are safe to cache for a year as immutable. serveStatic
     // (server/vite.ts, unmodifiable) mounts express.static with the default

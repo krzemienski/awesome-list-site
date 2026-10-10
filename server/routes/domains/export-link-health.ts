@@ -106,6 +106,7 @@ import type {
   AdminRepository,
   LegacyRepository,
 } from "../../repositories";
+import { asyncHandler } from "../../middleware/asyncHandler";
 /**
  * Explicit dependency context for the export/link-health/GitHub-sync routes
  * and the public awesome-list/discovery routes. Everything the handlers need —
@@ -164,7 +165,7 @@ export function registerExportLinkHealthRoutes(
   // --- GitHub Sync Routes ---
   
   // POST /api/github/configure - Configure GitHub repository
-  app.post('/api/github/configure', isAuthenticated, isAdmin, async (req: any, res) => {
+  app.post('/api/github/configure', isAuthenticated, isAdmin, asyncHandler(async (req: any, res) => {
     try {
       const { repositoryUrl, token } = req.body;
       
@@ -189,10 +190,10 @@ export function registerExportLinkHealthRoutes(
       console.error('Error configuring GitHub repository:', error);
       res.status(500).json({ message: 'Failed to configure GitHub repository' });
     }
-  });
+  }));
   
   // POST /api/github/import - Import resources from GitHub awesome list
-  app.post('/api/github/import', isAuthenticated, isAdmin, async (req: any, res) => {
+  app.post('/api/github/import', isAuthenticated, isAdmin, asyncHandler(async (req: any, res) => {
     let queueItemId: number | undefined;
     try {
       const { repositoryUrl: rawImportRepo, options = {} } = req.body;
@@ -268,10 +269,10 @@ export function registerExportLinkHealthRoutes(
       }
       sendOperationalFailure(res, error, 'Failed to start GitHub import');
     }
-  });
+  }));
   
   // POST /api/github/export - Export approved resources to GitHub
-  app.post('/api/github/export', isAuthenticated, isAdmin, async (req: any, res) => {
+  app.post('/api/github/export', isAuthenticated, isAdmin, asyncHandler(async (req: any, res) => {
     let queueItemId: number | undefined;
     try {
       const { repositoryUrl: rawExportRepo, options = {} } = req.body;
@@ -350,10 +351,10 @@ export function registerExportLinkHealthRoutes(
       }
       sendOperationalFailure(res, error, 'Failed to start GitHub export');
     }
-  });
+  }));
   
   // GET /api/github/sync-status - Check sync queue status
-  app.get('/api/github/sync-status', isAuthenticated, isAdmin, async (req, res) => {
+  app.get('/api/github/sync-status', isAuthenticated, isAdmin, asyncHandler(async (req, res) => {
     try {
       const status = req.query.status as string;
       const queueItems = await githubSyncRepo.getGithubSyncQueue(status);
@@ -397,10 +398,10 @@ export function registerExportLinkHealthRoutes(
       console.error('Error fetching sync status:', error);
       res.status(500).json({ message: 'Failed to fetch sync status' });
     }
-  });
+  }));
   
   // GET /api/github/sync-status/:id - Get specific sync item status
-  app.get('/api/github/sync-status/:id', isAuthenticated, isAdmin, async (req, res) => {
+  app.get('/api/github/sync-status/:id', isAuthenticated, isAdmin, asyncHandler(async (req, res) => {
     try {
       const id = parseInt(req.params.id);
       const queueItems = await githubSyncRepo.getGithubSyncQueue();
@@ -415,10 +416,10 @@ export function registerExportLinkHealthRoutes(
       console.error('Error fetching sync item:', error);
       res.status(500).json({ message: 'Failed to fetch sync item' });
     }
-  });
+  }));
   
   // GET /api/github/sync-history - Get all sync history
-  app.get('/api/github/sync-history', isAuthenticated, isAdmin, async (req, res) => {
+  app.get('/api/github/sync-history', isAuthenticated, isAdmin, asyncHandler(async (req, res) => {
     try {
       // Run16 BUG-038: older sync runs were only recorded in github_sync_queue
       // (the canonical github_sync_history table came later and is empty on
@@ -516,10 +517,10 @@ export function registerExportLinkHealthRoutes(
       console.error('Error fetching sync history:', error);
       res.status(500).json({ message: 'Failed to fetch sync history' });
     }
-  });
+  }));
   
   // POST /api/github/process-queue - Manually trigger queue processing
-  app.post('/api/github/process-queue', isAuthenticated, isAdmin, async (req, res) => {
+  app.post('/api/github/process-queue', isAuthenticated, isAdmin, asyncHandler(async (req, res) => {
     try {
       // Acquire bounded heavy-work capacity before acknowledging the job.
       await startHeavyWork('github-sync', async () => {
@@ -535,12 +536,12 @@ export function registerExportLinkHealthRoutes(
       console.error('Error starting queue processing:', error);
       sendOperationalFailure(res, error, 'Failed to start queue processing');
     }
-  });
+  }));
 
   // --- Awesome List Export & Validation Routes ---
 
   // POST /api/admin/export - Generate and download awesome list markdown
-  app.post('/api/admin/export', isAuthenticated, isAdmin, async (req: any, res) => {
+  app.post('/api/admin/export', isAuthenticated, isAdmin, asyncHandler(async (req: any, res) => {
     try {
       const { resources, markdown } = await runHeavyWork('catalog-export', async () => {
         // Export the public catalog (deduped, orphan-excluded).
@@ -582,12 +583,12 @@ export function registerExportLinkHealthRoutes(
       console.error('Error generating awesome list export:', error);
       sendOperationalFailure(res, error, 'Failed to generate awesome list export');
     }
-  });
+  }));
 
   // GET /api/admin/export-csv - Flat resource table for spreadsheet workflows
   // (the admin Export tab's "CSV (resources)" card). All statuses, one row per
   // resource; cells are formula-neutralised like the users CSV export.
-  app.get('/api/admin/export-csv', isAuthenticated, isAdmin, async (req: any, res) => {
+  app.get('/api/admin/export-csv', isAuthenticated, isAdmin, asyncHandler(async (req: any, res) => {
     try {
       const rows = await runHeavyWork('database-export', async () => {
         const all = await resourceRepo.listResources({ limit: 100000 });
@@ -623,12 +624,12 @@ export function registerExportLinkHealthRoutes(
       console.error('Error generating CSV export:', error);
       sendOperationalFailure(res, error, 'Failed to generate CSV export');
     }
-  });
+  }));
 
   // GET /api/admin/export-opml - Category tree (category → subcategory →
   // sub-subcategory) with each approved resource as a link outline, for feed
   // readers and outliners (the Export tab's "OPML (categories)" card).
-  app.get('/api/admin/export-opml', isAuthenticated, isAdmin, async (req: any, res) => {
+  app.get('/api/admin/export-opml', isAuthenticated, isAdmin, asyncHandler(async (req: any, res) => {
     try {
       const { categories, subcategories, subSubcategories, rows } = await runHeavyWork('database-export', async () => ({
         categories: await categoryRepo.listCategories(),
@@ -639,6 +640,7 @@ export function registerExportLinkHealthRoutes(
       }));
       const xml = (v: unknown) => String(v ?? '')
         .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
+        // eslint-disable-next-line no-control-regex -- deliberate: this pattern exists to match control characters
         .replace(/"/g, '&quot;').replace(/[\u0000-\u0008\u000B\u000C\u000E-\u001F]/g, '');
       const links = (pick: (r: any) => boolean, indent: string) => rows
         .filter(pick)
@@ -686,10 +688,10 @@ export function registerExportLinkHealthRoutes(
       console.error('Error generating OPML export:', error);
       sendOperationalFailure(res, error, 'Failed to generate OPML export');
     }
-  });
+  }));
 
   // GET /api/admin/export-json - Export full database as JSON for backup
-  app.get('/api/admin/export-json', isAuthenticated, isAdmin, async (req, res) => {
+  app.get('/api/admin/export-json', isAuthenticated, isAdmin, asyncHandler(async (req, res) => {
     try {
       const exportData = await runHeavyWork('database-export', async () => {
         // Sequential reads intentionally use at most one pool connection at a
@@ -844,10 +846,10 @@ export function registerExportLinkHealthRoutes(
       console.error('Error generating JSON export:', error);
       sendOperationalFailure(res, error, 'Failed to generate JSON export');
     }
-  });
+  }));
 
   // POST /api/admin/validate - Run awesome-lint validation on current data
-  app.post('/api/admin/validate', isAuthenticated, isAdmin, async (req: any, res) => {
+  app.post('/api/admin/validate', isAuthenticated, isAdmin, asyncHandler(async (req: any, res) => {
     try {
       const { markdown, validationResult } = await runHeavyWork('catalog-validation', async () => {
         const resources = await getPublicCatalogResources();
@@ -891,7 +893,7 @@ export function registerExportLinkHealthRoutes(
       console.error('Error validating awesome list:', error);
       sendOperationalFailure(res, error, 'Failed to validate awesome list');
     }
-  });
+  }));
 
   // POST /api/admin/check-links - Start the export link check.
   // F11: this no longer holds one HTTP request open for the whole catalog.
@@ -899,7 +901,7 @@ export function registerExportLinkHealthRoutes(
   // observable after navigation, has progress, can be cancelled, and ends in
   // an explicit interrupted state if the server restarts. It checks the
   // STORED URLs of approved resources — the same URLs the exports write.
-  app.post('/api/admin/check-links', isAuthenticated, isAdmin, async (_req: any, res) => {
+  app.post('/api/admin/check-links', isAuthenticated, isAdmin, asyncHandler(async (_req: any, res) => {
     try {
       const { linkHealthService } = await import('../../services/linkHealthService');
       try {
@@ -914,10 +916,10 @@ export function registerExportLinkHealthRoutes(
       console.error('Error starting export link check:', error);
       sendOperationalFailure(res, error, 'Failed to start link check');
     }
-  });
+  }));
 
   // GET /api/admin/validation-status - Get last validation results
-  app.get('/api/admin/validation-status', isAuthenticated, isAdmin, async (req, res) => {
+  app.get('/api/admin/validation-status', isAuthenticated, isAdmin, asyncHandler(async (req, res) => {
     try {
       const fn = (adminRepo as any).getLatestValidationResults;
       const validationResults = typeof fn === 'function'
@@ -932,12 +934,12 @@ export function registerExportLinkHealthRoutes(
       console.error('Error fetching validation status:', error);
       sendOperationalFailure(res, error, 'Failed to fetch validation status');
     }
-  });
+  }));
 
   // --- Link Health Check Routes ---
   
   // GET /api/admin/link-health/status - Get current/latest job status
-  app.get('/api/admin/link-health/status', isAuthenticated, isAdmin, async (req, res) => {
+  app.get('/api/admin/link-health/status', isAuthenticated, isAdmin, asyncHandler(async (req, res) => {
     try {
       const { linkHealthService } = await import('../../services/linkHealthService');
       const job = await linkHealthService.getLatestJob();
@@ -946,10 +948,10 @@ export function registerExportLinkHealthRoutes(
       console.error('Error fetching link health status:', error);
       sendOperationalFailure(res, error, 'Failed to fetch link health status');
     }
-  });
+  }));
 
   // POST /api/admin/link-health/run - Start a new link health check
-  app.post('/api/admin/link-health/run', isAuthenticated, isAdmin, async (req, res) => {
+  app.post('/api/admin/link-health/run', isAuthenticated, isAdmin, asyncHandler(async (req, res) => {
     try {
       const { linkHealthService } = await import('../../services/linkHealthService');
       const job = await linkHealthService.startCheck();
@@ -961,12 +963,12 @@ export function registerExportLinkHealthRoutes(
       }
       sendOperationalFailure(res, error, 'Failed to start link health check');
     }
-  });
+  }));
 
   // DELETE /api/admin/link-health/jobs/:id - Cancel a pending/processing scan
   // F10: aborts in-flight requests of both passes; completed results of the
   // previous scan stay served; a new scan can start immediately.
-  app.delete('/api/admin/link-health/jobs/:id', isAuthenticated, isAdmin, async (req, res) => {
+  app.delete('/api/admin/link-health/jobs/:id', isAuthenticated, isAdmin, asyncHandler(async (req, res) => {
     try {
       const jobId = Number.parseInt(String(req.params.id), 10);
       if (!Number.isSafeInteger(jobId) || jobId <= 0) {
@@ -986,10 +988,10 @@ export function registerExportLinkHealthRoutes(
       console.error('Error cancelling link health job:', error);
       sendOperationalFailure(res, error, 'Failed to cancel link health job');
     }
-  });
+  }));
 
   // GET /api/admin/link-health/history - Get job history
-  app.get('/api/admin/link-health/history', isAuthenticated, isAdmin, async (req, res) => {
+  app.get('/api/admin/link-health/history', isAuthenticated, isAdmin, asyncHandler(async (req, res) => {
     try {
       const { linkHealthService } = await import('../../services/linkHealthService');
       const history = await linkHealthService.getJobHistory();
@@ -998,10 +1000,10 @@ export function registerExportLinkHealthRoutes(
       console.error('Error fetching link health history:', error);
       sendOperationalFailure(res, error, 'Failed to fetch link health history');
     }
-  });
+  }));
 
   // GET /api/admin/link-health/broken-links - Get broken links with optional filter
-  app.get('/api/admin/link-health/broken-links', isAuthenticated, isAdmin, async (req, res) => {
+  app.get('/api/admin/link-health/broken-links', isAuthenticated, isAdmin, asyncHandler(async (req, res) => {
     try {
       const { linkHealthService } = await import('../../services/linkHealthService');
       const filter = req.query.status as string;
@@ -1011,14 +1013,14 @@ export function registerExportLinkHealthRoutes(
       console.error('Error fetching broken links:', error);
       sendOperationalFailure(res, error, 'Failed to fetch broken links');
     }
-  });
+  }));
 
   // POST /api/admin/seed-database - Manual database seeding (optional)
   // Note: Database is automatically seeded on first startup. This endpoint is for:
   // - Re-seeding after data changes
   // - Clearing and rebuilding the database
   // - Manual admin intervention when needed
-  app.post('/api/admin/seed-database', isAuthenticated, isAdmin, async (req, res) => {
+  app.post('/api/admin/seed-database', isAuthenticated, isAdmin, asyncHandler(async (req, res) => {
     try {
       console.log('Starting manual database seeding...');
       
@@ -1063,10 +1065,10 @@ export function registerExportLinkHealthRoutes(
       }
       res.status(500).json({ success: false, message: 'Failed to seed database' });
     }
-  });
+  }));
 
   // POST /api/admin/import-github - Import awesome list from GitHub URL
-  app.post('/api/admin/import-github', isAuthenticated, isAdmin, async (req, res) => {
+  app.post('/api/admin/import-github', isAuthenticated, isAdmin, asyncHandler(async (req, res) => {
     try {
       const { repoUrl, dryRun = false, strictMode = false } = req.body;
       
@@ -1124,14 +1126,14 @@ export function registerExportLinkHealthRoutes(
         error: error.message 
       });
     }
-  });
+  }));
 
   // --- Admin Maintenance Routes (Run23) ---
 
   // Run23 NB-046: tag-coverage visibility — the July bulk import left more
   // than half the catalog untagged and the gap was invisible in the admin.
   // This read-only census powers a coverage line in the enrichment panel.
-  app.get('/api/admin/enrichment/coverage', isAuthenticated, isAdmin, async (_req, res) => {
+  app.get('/api/admin/enrichment/coverage', isAuthenticated, isAdmin, asyncHandler(async (_req, res) => {
     try {
       const result = await db.execute(sql`
         SELECT
@@ -1156,14 +1158,14 @@ export function registerExportLinkHealthRoutes(
       console.error('Error computing tag coverage:', error);
       res.status(500).json({ message: 'Failed to compute tag coverage' });
     }
-  });
+  }));
 
   // Run23 NB-054: 2,283/2,292 approved resources carry approved_at = null
   // (bulk imports were created already-approved without stamping the field).
   // Backfill approved_at from created_at — the moment an imported row was
   // created IS the moment it became approved. Idempotent: second run is a
   // no-op (0 rows).
-  app.post('/api/admin/maintenance/backfill-approved-at', isAuthenticated, isAdmin, async (req: any, res) => {
+  app.post('/api/admin/maintenance/backfill-approved-at', isAuthenticated, isAdmin, asyncHandler(async (req: any, res) => {
     try {
       const result = await db.execute(sql`
         UPDATE resources
@@ -1188,7 +1190,7 @@ export function registerExportLinkHealthRoutes(
       console.error('Error backfilling approved_at:', error);
       res.status(500).json({ message: 'Failed to backfill approved_at' });
     }
-  });
+  }));
 
   // Run23 NB-055: tag-value casing chaos — the same tag exists in up to three
   // spellings (FFMPEG/FFmpeg/ffmpeg, NGINX/Nginx/nginx, ...), splitting filter
@@ -1200,7 +1202,7 @@ export function registerExportLinkHealthRoutes(
   // (live streaming/live_streaming/live-streaming), merges singular/plural
   // families, and applies the extended brand-casing map. Logic lives in
   // server/lib/tagCanonicalize.ts.
-  app.post('/api/admin/maintenance/canonicalize-tags', isAuthenticated, isAdmin, async (req: any, res) => {
+  app.post('/api/admin/maintenance/canonicalize-tags', isAuthenticated, isAdmin, asyncHandler(async (req: any, res) => {
     try {
       const rowsResult = await db.execute(sql`
         SELECT id, metadata->'tags' AS tags
@@ -1243,7 +1245,7 @@ export function registerExportLinkHealthRoutes(
       console.error('Error canonicalizing tags:', error);
       res.status(500).json({ message: 'Failed to canonicalize tags' });
     }
-  });
+  }));
 }
 
 /**
@@ -1275,7 +1277,7 @@ export function registerAwesomeListDiscoveryRoutes(
   // R4-031: the heaviest public read now shares the resource-read rate limit
   // (100 req/min/IP, 429 + Retry-After) — the server cache + ETag/304 make
   // real browsing cheap, so only scripted hammering ever hits the cap.
-  app.get("/api/awesome-list", resourceReadLimiter, async (req, res) => {
+  app.get("/api/awesome-list", resourceReadLimiter, asyncHandler(async (req, res) => {
     try {
       // Extract query parameters for filtering
       const { category, subcategory, subSubcategory } = req.query;
@@ -1445,7 +1447,7 @@ export function registerAwesomeListDiscoveryRoutes(
       console.error('Error processing awesome list:', error);
       sendOperationalFailure(res, error, 'Failed to process awesome list');
     }
-  });
+  }));
 
   // Run22 BUG-008: lightweight taxonomy/nav payload. The sidebar, header
   // breadcrumbs, and resource-detail slug resolution only need names, slugs,
@@ -1453,7 +1455,7 @@ export function registerAwesomeListDiscoveryRoutes(
   // ~2.7MB corpus for them. This serves a ~few-KB tree with the same 60s
   // TTL + ETag/304 discipline as the corpus route, so pages that don't
   // render resource listings never download the corpus at all.
-  app.get("/api/awesome-list/nav", resourceReadLimiter, async (req, res) => {
+  app.get("/api/awesome-list/nav", resourceReadLimiter, asyncHandler(async (req, res) => {
     try {
       // Run23 R-06: each category carries a tiny teaser (first direct
       // resource's title/description) so the Home grid renders card blurbs
@@ -1527,12 +1529,12 @@ export function registerAwesomeListDiscoveryRoutes(
       console.error('Error building awesome-list nav:', error);
       sendOperationalFailure(res, error, 'Failed to build navigation tree');
     }
-  });
+  }));
 
   // Taxonomy pages need exactly one tree-ordered resource slice. The crawler
   // uses the same cached tree and flattenListingResources(), so page N has one
   // authoritative order for both SSR and the live React view.
-  app.get("/api/awesome-list/listing", resourceReadLimiter, async (req, res) => {
+  app.get("/api/awesome-list/listing", resourceReadLimiter, asyncHandler(async (req, res) => {
     try {
       const level = req.query.level;
       const slug = req.query.slug;
@@ -1701,13 +1703,13 @@ export function registerAwesomeListDiscoveryRoutes(
       console.error("Error building awesome-list listing:", error);
       sendOperationalFailure(res, error, "Failed to build taxonomy listing");
     }
-  });
+  }));
 
   // GitHub awesome lists discovery routes
   // Admin-only for the same reason as /api/github/search below. GitHub search
   // serves at most 1000 results, so pages past that are clamped rather than
   // surfacing its 422 as a 500.
-  app.get("/api/github/awesome-lists", isAuthenticated, isAdmin, async (req, res) => {
+  app.get("/api/github/awesome-lists", isAuthenticated, isAdmin, asyncHandler(async (req, res) => {
     try {
       const perPage = Math.min(Math.max(parseInt(req.query.per_page as string) || 30, 1), 100);
       const page = Math.min(Math.max(parseInt(req.query.page as string) || 1, 1), Math.floor(1000 / perPage));
@@ -1718,13 +1720,13 @@ export function registerAwesomeListDiscoveryRoutes(
       console.error('Error fetching awesome lists from GitHub:', error);
       res.status(500).json({ message: 'Failed to fetch awesome lists' });
     }
-  });
+  }));
 
   // NB-006 (run23): this proxy hits GitHub's search API, which is a shared
   // 10-req/min quota per IP when unauthenticated. It only serves the admin
   // GitHub-import discovery surface, so require admin (anonymous → 401) and
   // send the server-side token from searchAwesomeLists when configured.
-  app.get("/api/github/search", isAuthenticated, isAdmin, async (req, res) => {
+  app.get("/api/github/search", isAuthenticated, isAdmin, asyncHandler(async (req, res) => {
     try {
       const query = req.query.q as string;
       const page = Math.min(Math.max(parseInt(req.query.page as string) || 1, 1), 50);
@@ -1739,5 +1741,5 @@ export function registerAwesomeListDiscoveryRoutes(
       console.error('Error searching awesome lists:', error);
       res.status(500).json({ message: 'Failed to search awesome lists' });
     }
-  });
+  }));
 }

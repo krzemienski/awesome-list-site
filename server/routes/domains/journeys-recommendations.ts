@@ -42,6 +42,7 @@ import {
 } from "@shared/recommendations";
 import { DEFAULT_LEARNING_PREFERENCES } from "@shared/onboarding";
 import { isForeignKeyViolation } from "../../errors/pgErrors";
+import { asyncHandler } from "../../middleware/asyncHandler";
 
 // ---------------------------------------------------------------------------
 // Journeys registrar
@@ -72,7 +73,7 @@ export function registerJourneyRoutes(
   // --- Learning Journey Routes ---
   
   // GET /api/journeys - List all journeys
-  app.get('/api/journeys', async (req: any, res) => {
+  app.get('/api/journeys', asyncHandler(async (req: any, res) => {
     try {
       const category = req.query.category as string;
       const journeys = await learningJourneyRepo.listLearningJourneys(category);
@@ -166,10 +167,10 @@ export function registerJourneyRoutes(
       console.error('Error fetching journeys:', error);
       res.status(500).json({ message: 'Failed to fetch journeys' });
     }
-  });
+  }));
   
   // GET /api/journeys/:id - Get journey details
-  app.get('/api/journeys/:id', async (req: any, res) => {
+  app.get('/api/journeys/:id', asyncHandler(async (req: any, res) => {
     try {
       // BUG-004 (run8): non-numeric ids (e.g. /api/journeys/some-slug) previously
       // reached the DB with NaN and threw -> 500. Treat them as not found.
@@ -214,10 +215,10 @@ export function registerJourneyRoutes(
       console.error('Error fetching journey:', error);
       res.status(500).json({ message: 'Failed to fetch journey' });
     }
-  });
+  }));
   
   // POST /api/journeys/:id/start - Start journey
-  app.post('/api/journeys/:id/start', isAuthenticated, async (req: any, res) => {
+  app.post('/api/journeys/:id/start', isAuthenticated, asyncHandler(async (req: any, res) => {
     try {
       const userId = req.dbUser.id;
       const journeyId = parseBoundedInt(req.params.id);
@@ -238,10 +239,10 @@ export function registerJourneyRoutes(
       console.error('Error starting journey:', error);
       res.status(500).json({ message: 'Failed to start journey' });
     }
-  });
+  }));
   
   // PUT /api/journeys/:id/progress - Update progress
-  app.put('/api/journeys/:id/progress', isAuthenticated, async (req: any, res) => {
+  app.put('/api/journeys/:id/progress', isAuthenticated, asyncHandler(async (req: any, res) => {
     try {
       const userId = req.dbUser.id;
       const journeyId = parseBoundedInt(req.params.id);
@@ -299,10 +300,10 @@ export function registerJourneyRoutes(
       console.error('Error updating journey progress:', error);
       res.status(500).json({ message: 'Failed to update journey progress' });
     }
-  });
+  }));
   
   // GET /api/journeys/:id/progress - Get user's progress
-  app.get('/api/journeys/:id/progress', isAuthenticated, async (req: any, res) => {
+  app.get('/api/journeys/:id/progress', isAuthenticated, asyncHandler(async (req: any, res) => {
     try {
       const userId = req.dbUser.id;
       const journeyId = parseBoundedInt(req.params.id);
@@ -325,12 +326,12 @@ export function registerJourneyRoutes(
       console.error('Error fetching journey progress:', error);
       res.status(500).json({ message: 'Failed to fetch journey progress' });
     }
-  });
+  }));
 
   // --- Admin Journey & Step Routes ---
 
   // GET /api/admin/journeys - List ALL journeys (including drafts/archived)
-  app.get('/api/admin/journeys', isAuthenticated, isAdmin, async (_req, res) => {
+  app.get('/api/admin/journeys', isAuthenticated, isAdmin, asyncHandler(async (_req, res) => {
     try {
       const journeys = await learningJourneyRepo.listAllLearningJourneys();
       const stepsMap = await learningJourneyRepo.listJourneyStepsBatch(
@@ -353,13 +354,13 @@ export function registerJourneyRoutes(
       console.error('Error fetching admin journeys:', error);
       res.status(500).json({ message: 'Failed to fetch journeys' });
     }
-  });
+  }));
 
   // PUT /api/admin/journeys/:id - Update journey metadata (title, description,
   // difficulty, duration, etc.). NEW-005: added so template-boilerplate journey
   // descriptions can be corrected via the admin API (including on production,
   // which has no direct DB access).
-  app.put('/api/admin/journeys/:id', isAuthenticated, isAdmin, async (req, res) => {
+  app.put('/api/admin/journeys/:id', isAuthenticated, isAdmin, asyncHandler(async (req, res) => {
     try {
       const journeyId = parseInt(req.params.id, 10);
       if (isNaN(journeyId)) {
@@ -382,10 +383,10 @@ export function registerJourneyRoutes(
       console.error('Error updating journey:', error);
       res.status(500).json({ message: 'Failed to update journey' });
     }
-  });
+  }));
 
   // GET /api/admin/journeys/:id/steps - List steps for a journey
-  app.get('/api/admin/journeys/:id/steps', isAuthenticated, isAdmin, async (req, res) => {
+  app.get('/api/admin/journeys/:id/steps', isAuthenticated, isAdmin, asyncHandler(async (req, res) => {
     try {
       const journeyId = parseInt(req.params.id, 10);
       if (isNaN(journeyId)) {
@@ -401,10 +402,10 @@ export function registerJourneyRoutes(
       console.error('Error listing journey steps:', error);
       res.status(500).json({ message: 'Failed to list journey steps' });
     }
-  });
+  }));
 
   // POST /api/admin/journeys/:id/steps - Create a step (appended to end)
-  app.post('/api/admin/journeys/:id/steps', isAuthenticated, isAdmin, async (req, res) => {
+  app.post('/api/admin/journeys/:id/steps', isAuthenticated, isAdmin, asyncHandler(async (req, res) => {
     try {
       const journeyId = parseInt(req.params.id, 10);
       if (isNaN(journeyId)) {
@@ -449,14 +450,14 @@ export function registerJourneyRoutes(
       }
       res.status(500).json({ message: 'Failed to create journey step' });
     }
-  });
+  }));
 
   // PATCH /api/admin/journeys/:journeyId/steps/:stepId - Update a step
   app.patch(
     '/api/admin/journeys/:journeyId/steps/:stepId',
     isAuthenticated,
     isAdmin,
-    async (req, res) => {
+    asyncHandler(async (req, res) => {
       try {
         const journeyId = parseInt(req.params.journeyId, 10);
         const stepId = parseInt(req.params.stepId, 10);
@@ -500,7 +501,7 @@ export function registerJourneyRoutes(
         }
         res.status(500).json({ message: 'Failed to update journey step' });
       }
-    },
+    }),
   );
 
   // DELETE /api/admin/journeys/:journeyId/steps/:stepId - Delete a step
@@ -508,7 +509,7 @@ export function registerJourneyRoutes(
     '/api/admin/journeys/:journeyId/steps/:stepId',
     isAuthenticated,
     isAdmin,
-    async (req, res) => {
+    asyncHandler(async (req, res) => {
       try {
         const journeyId = parseInt(req.params.journeyId, 10);
         const stepId = parseInt(req.params.stepId, 10);
@@ -534,7 +535,7 @@ export function registerJourneyRoutes(
         // the admin editor renders its own "nothing was changed" text for 5xx.
         res.status(500).json({ message: 'Could not delete the step — nothing was changed. Reload the steps and try again.' });
       }
-    },
+    }),
   );
 
   // POST /api/admin/journeys/:id/steps/reorder - Reorder steps
@@ -542,7 +543,7 @@ export function registerJourneyRoutes(
     '/api/admin/journeys/:id/steps/reorder',
     isAuthenticated,
     isAdmin,
-    async (req, res) => {
+    asyncHandler(async (req, res) => {
       try {
         const journeyId = parseInt(req.params.id, 10);
         if (isNaN(journeyId)) {
@@ -598,7 +599,7 @@ export function registerJourneyRoutes(
         console.error('Error reordering journey steps:', error);
         res.status(500).json({ message: 'Failed to reorder journey steps' });
       }
-    },
+    }),
   );
 }
 
@@ -635,14 +636,14 @@ export function registerRecommendationRoutes(
   // --- AI Recommendation Routes ---
 
   // GET /api/recommendations/init - Initialize recommendation engine
-  app.get("/api/recommendations/init", async (req, res) => {
+  app.get("/api/recommendations/init", asyncHandler(async (req, res) => {
     try {
       res.json({ status: 'ready', message: 'Recommendation engine initialized' });
     } catch (error) {
       console.error('Error initializing recommendations:', error);
       res.status(500).json({ message: 'Failed to initialize recommendations' });
     }
-  });
+  }));
 
   // NB-007/NB-015 (run23): recommendation responses embed full resource rows —
   // they must pass the same public serializer as every other resource surface.
@@ -663,7 +664,7 @@ export function registerRecommendationRoutes(
   };
 
   // GET /api/recommendations - Get personalized recommendations
-  app.get("/api/recommendations", async (req, res) => {
+  app.get("/api/recommendations", asyncHandler(async (req, res) => {
     try {
       const profileQuery = z.object({
         categories: z.string().max(1000).optional(),
@@ -710,10 +711,10 @@ export function registerRecommendationRoutes(
       console.error('Error generating recommendations:', error);
       res.status(500).json({ message: 'Failed to generate recommendations' });
     }
-  });
+  }));
 
   // POST /api/recommendations - Get personalized recommendations for authenticated users
-  app.post("/api/recommendations", isAuthenticated, aiLimiter, async (req: any, res) => {
+  app.post("/api/recommendations", isAuthenticated, aiLimiter, asyncHandler(async (req: any, res) => {
     try {
       const userId = req.dbUser?.id;
       if (!userId) {
@@ -768,13 +769,13 @@ export function registerRecommendationRoutes(
       console.error('Error generating AI recommendations:', error);
       res.status(500).json({ message: 'Failed to generate recommendations' });
     }
-  });
+  }));
 
   // POST /api/recommendations/feedback - Record user feedback on recommendations
   // NB-016 (run23): was an unauthenticated write with a spoofable body userId —
   // the sibling /api/interactions was hardened in Run22 but this was missed.
   // Require a session and derive the identity from it; body userId is ignored.
-  app.post("/api/recommendations/feedback", isAuthenticated, async (req: any, res) => {
+  app.post("/api/recommendations/feedback", isAuthenticated, asyncHandler(async (req: any, res) => {
     try {
       const userId = req.dbUser?.id;
       if (!userId) {
@@ -832,11 +833,11 @@ export function registerRecommendationRoutes(
       console.error('Error recording recommendation feedback:', error);
       res.status(500).json({ message: 'Failed to record feedback' });
     }
-  });
+  }));
 
   // One current-state read and mutation contract is shared by every signed-in
   // recommendation surface. Identity always comes from the session.
-  app.get("/api/recommendations/feedback", isAuthenticated, async (req: any, res) => {
+  app.get("/api/recommendations/feedback", isAuthenticated, asyncHandler(async (req: any, res) => {
     try {
       const userId = req.dbUser?.id;
       if (!userId) return res.status(401).json({ message: 'Unauthorized' });
@@ -857,9 +858,9 @@ export function registerRecommendationRoutes(
       console.error('Error listing recommendation feedback:', error);
       res.status(500).json({ message: 'Failed to load recommendation feedback' });
     }
-  });
+  }));
 
-  app.put("/api/recommendations/:resourceId/feedback", isAuthenticated, async (req: any, res) => {
+  app.put("/api/recommendations/:resourceId/feedback", isAuthenticated, asyncHandler(async (req: any, res) => {
     try {
       const userId = req.dbUser?.id;
       if (!userId) return res.status(401).json({ message: 'Unauthorized' });
@@ -894,10 +895,10 @@ export function registerRecommendationRoutes(
       console.error('Error updating recommendation feedback:', error);
       res.status(500).json({ message: 'Failed to update recommendation feedback' });
     }
-  });
+  }));
 
   // POST /api/recommendations/:resourceId/feedback - Record thumbs up/down feedback on a recommendation
-  app.post("/api/recommendations/:resourceId/feedback", isAuthenticated, async (req: any, res) => {
+  app.post("/api/recommendations/:resourceId/feedback", isAuthenticated, asyncHandler(async (req: any, res) => {
     try {
       const userId = req.dbUser?.id;
       if (!userId) {
@@ -933,7 +934,7 @@ export function registerRecommendationRoutes(
       console.error('Error recording recommendation feedback:', error);
       res.status(500).json({ message: 'Failed to record feedback' });
     }
-  });
+  }));
 
   // Track user interaction for improving recommendations.
   // Run22 BUG-050: this write endpoint was fully anonymous — any client could
@@ -941,7 +942,7 @@ export function registerRecommendationRoutes(
   // sense for signed-in users (both client call sites already gate on a
   // logged-in user), so require authentication and derive the identity from
   // the session — the spoofable body `userId` is ignored.
-  app.post("/api/interactions", isAuthenticated, async (req: any, res) => {
+  app.post("/api/interactions", isAuthenticated, asyncHandler(async (req: any, res) => {
     try {
       const userId = req.dbUser?.id;
       const { resourceId, interactionType } = req.body ?? {};
@@ -1001,5 +1002,5 @@ export function registerRecommendationRoutes(
       console.error('Error recording interaction:', error);
       res.status(500).json({ message: 'Failed to record interaction' });
     }
-  });
+  }));
 }

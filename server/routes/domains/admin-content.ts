@@ -80,6 +80,7 @@ import type {
   AuditRepository,
   AdminRepository,
 } from "../../repositories";
+import { asyncHandler } from "../../middleware/asyncHandler";
 
 // Every value resources.status can hold (shared/schema.ts resources.status).
 const ADMIN_RESOURCE_STATUSES = ['approved', 'pending', 'rejected', 'withdrawn', 'archived'];
@@ -156,7 +157,7 @@ export function registerAdminContentRoutes(
   // --- Admin Routes ---
   
   // GET /api/admin/stats - Dashboard statistics
-  app.get('/api/admin/stats', isAuthenticated, isAdmin, async (req, res) => {
+  app.get('/api/admin/stats', isAuthenticated, isAdmin, asyncHandler(async (req, res) => {
     try {
       const [stats, database] = await Promise.all([
         adminRepo.getAdminStats(),
@@ -182,10 +183,10 @@ export function registerAdminContentRoutes(
       console.error('Error fetching admin stats:', error);
       res.status(500).json({ message: 'Failed to fetch admin statistics' });
     }
-  });
+  }));
   
   // GET /api/admin/users - List users
-  app.get('/api/admin/users', isAuthenticated, isAdmin, async (req, res) => {
+  app.get('/api/admin/users', isAuthenticated, isAdmin, asyncHandler(async (req, res) => {
     try {
       // NB-024 (run23): validate pagination like every public surface —
       // page=-1 previously drove a negative OFFSET into PG → 500, and
@@ -221,13 +222,13 @@ export function registerAdminContentRoutes(
       console.error('Error fetching users:', error);
       res.status(500).json({ message: 'Failed to fetch users' });
     }
-  });
+  }));
   
   // GET /api/admin/users/export - CSV export of all users (R2-L08).
   // Password hashes are never included. Cells that could be interpreted as
   // spreadsheet formulas (= + - @ prefixes) are quoted with a leading
   // apostrophe to prevent CSV-injection when opened in Excel/Sheets.
-  app.get('/api/admin/users/export', isAuthenticated, isAdmin, async (req: any, res) => {
+  app.get('/api/admin/users/export', isAuthenticated, isAdmin, asyncHandler(async (req: any, res) => {
     try {
       const allUsers = await userRepo.listAllUsers();
       // R5-029 (run24): a bulk unmasked-PII export is the highest-sensitivity
@@ -276,14 +277,14 @@ export function registerAdminContentRoutes(
       console.error('Error exporting users:', error);
       res.status(500).json({ message: 'Failed to export users' });
     }
-  });
+  }));
 
   // PUT /api/admin/users/:id/role - Change user role
   // PATCH /api/admin/users/:id/name — admin-set display name (BUG-009 run19).
   // Exists primarily so the prod data-fix script can backfill names for
   // accounts registered before names were derived at signup (prod DB is not
   // agent-writable; all prod data fixes go through the live admin API).
-  app.patch('/api/admin/users/:id/name', isAuthenticated, isAdmin, async (req: any, res) => {
+  app.patch('/api/admin/users/:id/name', isAuthenticated, isAdmin, asyncHandler(async (req: any, res) => {
     try {
       const { firstName, lastName } = req.body ?? {};
       // Run21 R4-049/050: same rules as the profile editor — zero-width chars
@@ -318,9 +319,9 @@ export function registerAdminContentRoutes(
       console.error('Error updating user name:', error);
       res.status(500).json({ message: 'Failed to update user name' });
     }
-  });
+  }));
 
-  app.put('/api/admin/users/:id/role', isAuthenticated, isAdmin, async (req: any, res) => {
+  app.put('/api/admin/users/:id/role', isAuthenticated, isAdmin, asyncHandler(async (req: any, res) => {
     try {
       const userId = req.params.id;
       const { role } = req.body;
@@ -348,7 +349,7 @@ export function registerAdminContentRoutes(
       console.error('Error updating user role:', error);
       res.status(500).json({ message: 'Failed to update user role' });
     }
-  });
+  }));
   
   // DELETE /api/admin/users/:id - Permanently delete an account (NEW-004).
   // Self-deletion is blocked. Clerk-first: the sign-in identity is deleted
@@ -359,7 +360,7 @@ export function registerAdminContentRoutes(
   // submitted/approved resources are detached (attribution nulled); pending
   // edit suggestions are removed; personal data (bookmarks, favorites,
   // progress, preferences, API keys) cascades away.
-  app.delete('/api/admin/users/:id', isAuthenticated, isAdmin, async (req: any, res) => {
+  app.delete('/api/admin/users/:id', isAuthenticated, isAdmin, asyncHandler(async (req: any, res) => {
     try {
       const targetId = req.params.id;
       if (req.dbUser?.id === targetId) {
@@ -396,12 +397,12 @@ export function registerAdminContentRoutes(
       console.error('Error deleting user:', error);
       res.status(500).json({ message: 'Failed to delete user' });
     }
-  });
+  }));
 
   // --- Audit Log Routes ---
 
   // GET /api/admin/audit-logs - List audit log entries
-  app.get('/api/admin/audit-logs', isAuthenticated, isAdmin, async (req, res) => {
+  app.get('/api/admin/audit-logs', isAuthenticated, isAdmin, asyncHandler(async (req, res) => {
     try {
       // Run16 BUG-041: honor offset + return the REAL total.
       // Run21 R4-079: invalid pagination/filter params are a CLIENT error —
@@ -462,12 +463,12 @@ export function registerAdminContentRoutes(
       console.error('Error fetching audit logs:', error);
       res.status(500).json({ message: 'Failed to fetch audit logs' });
     }
-  });
+  }));
 
   // --- Resource Approval Routes ---
   
   // GET /api/admin/pending-resources - Get all pending resources for approval
-  app.get('/api/admin/pending-resources', isAuthenticated, isAdmin, async (req, res) => {
+  app.get('/api/admin/pending-resources', isAuthenticated, isAdmin, asyncHandler(async (req, res) => {
     try {
       const result = await resourceRepo.getPendingResources();
       
@@ -476,12 +477,12 @@ export function registerAdminContentRoutes(
       console.error('Error fetching pending resources:', error);
       res.status(500).json({ message: 'Failed to fetch pending resources' });
     }
-  });
+  }));
   
   // POST /api/admin/resources/:id/approve - Approve a pending resource
   // :id is constrained to digits so it cannot shadow the literal /resources/bulk/* routes
   // registered later (Express matches first-registered; an unconstrained :id would capture "bulk").
-  app.post('/api/admin/resources/:id(\\d+)/approve', isAuthenticated, isAdmin, async (req: any, res) => {
+  app.post('/api/admin/resources/:id(\\d+)/approve', isAuthenticated, isAdmin, asyncHandler(async (req: any, res) => {
     try {
       const resourceId = parseInt(req.params.id);
       const userId = req.dbUser.id;
@@ -512,11 +513,11 @@ export function registerAdminContentRoutes(
       }
       res.status(500).json({ message: 'Failed to approve resource' });
     }
-  });
+  }));
   
   // POST /api/admin/resources/:id/reject - Reject a pending resource
   // :id constrained to digits so it cannot shadow the literal /resources/bulk/* routes.
-  app.post('/api/admin/resources/:id(\\d+)/reject', isAuthenticated, isAdmin, async (req: any, res) => {
+  app.post('/api/admin/resources/:id(\\d+)/reject', isAuthenticated, isAdmin, asyncHandler(async (req: any, res) => {
     try {
       const resourceId = parseInt(req.params.id);
       const userId = req.dbUser.id;
@@ -555,11 +556,11 @@ export function registerAdminContentRoutes(
       }
       res.status(500).json({ message: 'Failed to reject resource' });
     }
-  });
+  }));
 
   // POST /api/admin/resources/:id/unapprove - Revert an approved resource to pending
   // BUG-010: safe reversal of approval. :id constrained to digits to avoid shadowing bulk routes.
-  app.post('/api/admin/resources/:id(\\d+)/unapprove', isAuthenticated, isAdmin, async (req: any, res) => {
+  app.post('/api/admin/resources/:id(\\d+)/unapprove', isAuthenticated, isAdmin, asyncHandler(async (req: any, res) => {
     try {
       const resourceId = parseInt(req.params.id);
       const userId = req.dbUser.id;
@@ -588,10 +589,10 @@ export function registerAdminContentRoutes(
       }
       res.status(500).json({ message: 'Failed to unapprove resource' });
     }
-  });
+  }));
 
   // PUT /api/admin/resources/:id - Update a resource (admin only)
-  app.put('/api/admin/resources/:id', isAuthenticated, isAdmin, async (req: any, res) => {
+  app.put('/api/admin/resources/:id', isAuthenticated, isAdmin, asyncHandler(async (req: any, res) => {
     try {
       const resourceId = parseInt(req.params.id);
       const userId = req.dbUser.id;
@@ -702,7 +703,7 @@ export function registerAdminContentRoutes(
       console.error('Error updating resource:', error);
       res.status(500).json({ message: 'Failed to update resource' });
     }
-  });
+  }));
 
   // Design parity (resource kinds): two narrow admin edits used by the catalog
   // table's kind select and featured toggle. Both are admin-only, Zod-checked
@@ -718,7 +719,7 @@ export function registerAdminContentRoutes(
     isAuthenticated,
     isAdmin,
     validateBody(kindBodySchema),
-    async (req: Request, res: Response) => {
+    asyncHandler(async (req: Request, res: Response) => {
       try {
         const resourceId = parseBoundedInt(req.params.id);
         if (resourceId === null) {
@@ -745,7 +746,7 @@ export function registerAdminContentRoutes(
         console.error('Error updating resource kind:', error);
         sendOperationalFailure(res, error, 'Failed to update resource kind');
       }
-    },
+    }),
   );
 
   // PATCH /api/admin/resources/:id/featured - Toggle the featured flag
@@ -755,7 +756,7 @@ export function registerAdminContentRoutes(
     isAuthenticated,
     isAdmin,
     validateBody(featuredBodySchema),
-    async (req: Request, res: Response) => {
+    asyncHandler(async (req: Request, res: Response) => {
       try {
         const resourceId = parseBoundedInt(req.params.id);
         if (resourceId === null) {
@@ -786,11 +787,11 @@ export function registerAdminContentRoutes(
         console.error('Error updating resource featured flag:', error);
         sendOperationalFailure(res, error, 'Failed to update resource featured flag');
       }
-    },
+    }),
   );
 
   // DELETE /api/admin/resources/:id - Delete a resource (admin only)
-  app.delete('/api/admin/resources/:id', isAuthenticated, isAdmin, async (req: any, res) => {
+  app.delete('/api/admin/resources/:id', isAuthenticated, isAdmin, asyncHandler(async (req: any, res) => {
     try {
       const resourceId = parseInt(req.params.id);
       const userId = req.dbUser.id;
@@ -820,10 +821,10 @@ export function registerAdminContentRoutes(
       console.error('Error deleting resource:', error);
       sendOperationalFailure(res, error, 'Failed to delete resource');
     }
-  });
+  }));
 
   // POST /api/admin/resources/bulk/approve - Bulk approve resources
-  app.post('/api/admin/resources/bulk/approve', isAuthenticated, isAdmin, async (req: any, res) => {
+  app.post('/api/admin/resources/bulk/approve', isAuthenticated, isAdmin, asyncHandler(async (req: any, res) => {
     try {
       const userId = req.dbUser.id;
       const input = bulkResourceIdsSchema.safeParse(req.body);
@@ -851,10 +852,10 @@ export function registerAdminContentRoutes(
       console.error('Error in bulk approve:', error);
       sendOperationalFailure(res, error, 'Failed to bulk approve resources');
     }
-  });
+  }));
 
   // POST /api/admin/resources/bulk/reject - Bulk reject resources
-  app.post('/api/admin/resources/bulk/reject', isAuthenticated, isAdmin, async (req: any, res) => {
+  app.post('/api/admin/resources/bulk/reject', isAuthenticated, isAdmin, asyncHandler(async (req: any, res) => {
     try {
       const userId = req.dbUser.id;
       const input = bulkResourceIdsSchema.merge(resourceRejectionSchema).safeParse(req.body);
@@ -880,10 +881,10 @@ export function registerAdminContentRoutes(
       console.error('Error in bulk reject:', error);
       sendOperationalFailure(res, error, 'Failed to bulk reject resources');
     }
-  });
+  }));
 
   // POST /api/admin/resources/bulk/delete - Bulk delete resources
-  app.post('/api/admin/resources/bulk/delete', isAuthenticated, isAdmin, async (req: any, res) => {
+  app.post('/api/admin/resources/bulk/delete', isAuthenticated, isAdmin, asyncHandler(async (req: any, res) => {
     try {
       const userId = req.dbUser.id;
       const input = bulkResourceIdsSchema.safeParse(req.body);
@@ -923,10 +924,10 @@ export function registerAdminContentRoutes(
       console.error('Error in bulk delete:', error);
       sendOperationalFailure(res, error, 'Failed to bulk delete resources');
     }
-  });
+  }));
 
   // GET /api/admin/resources - Get all resources for admin (with pagination and filters)
-  app.get('/api/admin/resources', isAuthenticated, isAdmin, async (req, res) => {
+  app.get('/api/admin/resources', isAuthenticated, isAdmin, asyncHandler(async (req, res) => {
     try {
       // Audit2 BUG-046 + BUG-013: validate pagination like /api/admin/users —
       // page=-5 previously drove a negative OFFSET into PG → 500, and
@@ -987,10 +988,10 @@ export function registerAdminContentRoutes(
       console.error('Error fetching admin resources:', error);
       res.status(500).json({ message: 'Failed to fetch resources' });
     }
-  });
+  }));
 
   // POST /api/admin/resources - Create a new resource (admin only)
-  app.post('/api/admin/resources', isAuthenticated, isAdmin, async (req: any, res) => {
+  app.post('/api/admin/resources', isAuthenticated, isAdmin, asyncHandler(async (req: any, res) => {
     try {
       const userId = req.dbUser.id;
       
@@ -1072,12 +1073,12 @@ export function registerAdminContentRoutes(
       console.error('Error creating resource:', error);
       res.status(500).json({ message: 'Failed to create resource' });
     }
-  });
+  }));
   
   // --- Resource Edit Management Routes ---
   
   // GET /api/admin/resource-edits - Get all pending resource edits (admin only)
-  app.get('/api/admin/resource-edits', isAuthenticated, isAdmin, async (req, res) => {
+  app.get('/api/admin/resource-edits', isAuthenticated, isAdmin, asyncHandler(async (req, res) => {
     try {
       const edits = await auditRepo.getPendingResourceEdits();
       
@@ -1096,10 +1097,10 @@ export function registerAdminContentRoutes(
       console.error('Error fetching pending edits:', error);
       res.status(500).json({ message: 'Failed to fetch pending edits' });
     }
-  });
+  }));
   
   // POST /api/admin/resource-edits/:id/approve - Approve an edit (admin only)
-  app.post('/api/admin/resource-edits/:id/approve', isAuthenticated, isAdmin, async (req: any, res) => {
+  app.post('/api/admin/resource-edits/:id/approve', isAuthenticated, isAdmin, asyncHandler(async (req: any, res) => {
     try {
       const editId = parseInt(req.params.id);
       const userId = req.dbUser.id;
@@ -1156,10 +1157,10 @@ export function registerAdminContentRoutes(
       
       res.status(500).json({ message: 'Failed to approve edit' });
     }
-  });
+  }));
   
   // POST /api/admin/resource-edits/:id/reject - Reject an edit (admin only)
-  app.post('/api/admin/resource-edits/:id/reject', isAuthenticated, isAdmin, async (req: any, res) => {
+  app.post('/api/admin/resource-edits/:id/reject', isAuthenticated, isAdmin, asyncHandler(async (req: any, res) => {
     try {
       const editId = parseInt(req.params.id);
       const userId = req.dbUser.id;
@@ -1186,7 +1187,7 @@ export function registerAdminContentRoutes(
       }
       res.status(500).json({ message: 'Failed to reject edit' });
     }
-  });
+  }));
   
   // POST /api/claude/analyze - Analyze URL with Claude AI (ADMIN ONLY)
   // NB-022 (run23): this endpoint runs a paid Claude call per request; behind
@@ -1199,7 +1200,7 @@ export function registerAdminContentRoutes(
   // daily quota is kept as defense-in-depth for admin accounts.
   const CLAUDE_ANALYZE_DAILY_LIMIT = 20;
   const claudeAnalyzeQuota = new Map<string, { day: string; count: number }>();
-  app.post('/api/claude/analyze', isAuthenticated, isAdmin, aiLimiter, async (req: any, res) => {
+  app.post('/api/claude/analyze', isAuthenticated, isAdmin, aiLimiter, asyncHandler(async (req: any, res) => {
     try {
       const { url } = req.body ?? {};
 
@@ -1281,12 +1282,12 @@ export function registerAdminContentRoutes(
       console.error('Error analyzing URL:', error);
       res.status(500).json({ message: 'Failed to analyze URL' });
     }
-  });
+  }));
 
   // --- Category Management Routes ---
   
   // GET /api/admin/categories - List all categories
-  app.get('/api/admin/categories', isAuthenticated, isAdmin, async (req, res) => {
+  app.get('/api/admin/categories', isAuthenticated, isAdmin, asyncHandler(async (req, res) => {
     try {
       const categories = await categoryRepo.listCategories();
 
@@ -1310,10 +1311,10 @@ export function registerAdminContentRoutes(
       console.error('Error fetching categories:', error);
       res.status(500).json({ message: 'Failed to fetch categories' });
     }
-  });
+  }));
   
   // POST /api/admin/categories - Create a new category
-  app.post('/api/admin/categories', isAuthenticated, isAdmin, async (req: any, res) => {
+  app.post('/api/admin/categories', isAuthenticated, isAdmin, asyncHandler(async (req: any, res) => {
     try {
       const { insertCategorySchema } = await import('@shared/schema');
       
@@ -1344,10 +1345,10 @@ export function registerAdminContentRoutes(
       
       res.status(500).json({ message: 'Failed to create category' });
     }
-  });
+  }));
   
   // PATCH /api/admin/categories/:id - Update a category
-  app.patch('/api/admin/categories/:id', isAuthenticated, isAdmin, async (req: any, res) => {
+  app.patch('/api/admin/categories/:id', isAuthenticated, isAdmin, asyncHandler(async (req: any, res) => {
     try {
       const categoryId = parseInt(req.params.id);
       
@@ -1384,10 +1385,10 @@ export function registerAdminContentRoutes(
       if (sendTaxonomyConflict(res, error)) return;
       res.status(500).json({ message: 'Failed to update category' });
     }
-  });
+  }));
   
   // DELETE /api/admin/categories/:id - Delete a category
-  app.delete('/api/admin/categories/:id', isAuthenticated, isAdmin, async (req: any, res) => {
+  app.delete('/api/admin/categories/:id', isAuthenticated, isAdmin, asyncHandler(async (req: any, res) => {
     try {
       const categoryId = parseInt(req.params.id);
       
@@ -1425,12 +1426,12 @@ export function registerAdminContentRoutes(
       console.error('Error deleting category:', error);
       res.status(500).json({ message: 'Failed to delete category' });
     }
-  });
+  }));
   
   // --- Subcategory Management Routes ---
   
   // GET /api/admin/subcategories - List all subcategories (optionally filtered by category)
-  app.get('/api/admin/subcategories', isAuthenticated, isAdmin, async (req, res) => {
+  app.get('/api/admin/subcategories', isAuthenticated, isAdmin, asyncHandler(async (req, res) => {
     try {
       const categoryId = req.query.categoryId ? parseInt(req.query.categoryId as string) : undefined;
       
@@ -1450,10 +1451,10 @@ export function registerAdminContentRoutes(
       console.error('Error fetching subcategories:', error);
       res.status(500).json({ message: 'Failed to fetch subcategories' });
     }
-  });
+  }));
   
   // POST /api/admin/subcategories - Create a new subcategory
-  app.post('/api/admin/subcategories', isAuthenticated, isAdmin, async (req: any, res) => {
+  app.post('/api/admin/subcategories', isAuthenticated, isAdmin, asyncHandler(async (req: any, res) => {
     try {
       const { insertSubcategorySchema } = await import('@shared/schema');
       
@@ -1506,10 +1507,10 @@ export function registerAdminContentRoutes(
       
       res.status(500).json({ message: 'Failed to create subcategory' });
     }
-  });
+  }));
   
   // PATCH /api/admin/subcategories/:id - Update a subcategory
-  app.patch('/api/admin/subcategories/:id', isAuthenticated, isAdmin, async (req: any, res) => {
+  app.patch('/api/admin/subcategories/:id', isAuthenticated, isAdmin, asyncHandler(async (req: any, res) => {
     try {
       const subcategoryId = parseInt(req.params.id);
       
@@ -1569,10 +1570,10 @@ export function registerAdminContentRoutes(
       if (sendTaxonomyConflict(res, error)) return;
       res.status(500).json({ message: 'Failed to update subcategory' });
     }
-  });
+  }));
   
   // DELETE /api/admin/subcategories/:id - Delete a subcategory
-  app.delete('/api/admin/subcategories/:id', isAuthenticated, isAdmin, async (req: any, res) => {
+  app.delete('/api/admin/subcategories/:id', isAuthenticated, isAdmin, asyncHandler(async (req: any, res) => {
     try {
       const subcategoryId = parseInt(req.params.id);
       
@@ -1610,12 +1611,12 @@ export function registerAdminContentRoutes(
       console.error('Error deleting subcategory:', error);
       res.status(500).json({ message: 'Failed to delete subcategory' });
     }
-  });
+  }));
   
   // --- Sub-subcategory Management Routes ---
   
   // GET /api/admin/sub-subcategories - List all sub-subcategories (optionally filtered by subcategory)
-  app.get('/api/admin/sub-subcategories', isAuthenticated, isAdmin, async (req, res) => {
+  app.get('/api/admin/sub-subcategories', isAuthenticated, isAdmin, asyncHandler(async (req, res) => {
     try {
       const subcategoryId = req.query.subcategoryId ? parseInt(req.query.subcategoryId as string) : undefined;
       
@@ -1632,10 +1633,10 @@ export function registerAdminContentRoutes(
       console.error('Error fetching sub-subcategories:', error);
       res.status(500).json({ message: 'Failed to fetch sub-subcategories' });
     }
-  });
+  }));
   
   // POST /api/admin/sub-subcategories - Create a new sub-subcategory
-  app.post('/api/admin/sub-subcategories', isAuthenticated, isAdmin, async (req: any, res) => {
+  app.post('/api/admin/sub-subcategories', isAuthenticated, isAdmin, asyncHandler(async (req: any, res) => {
     try {
       const { insertSubSubcategorySchema } = await import('@shared/schema');
       
@@ -1686,10 +1687,10 @@ export function registerAdminContentRoutes(
       
       res.status(500).json({ message: 'Failed to create sub-subcategory' });
     }
-  });
+  }));
   
   // PATCH /api/admin/sub-subcategories/:id - Update a sub-subcategory
-  app.patch('/api/admin/sub-subcategories/:id', isAuthenticated, isAdmin, async (req: any, res) => {
+  app.patch('/api/admin/sub-subcategories/:id', isAuthenticated, isAdmin, asyncHandler(async (req: any, res) => {
     try {
       const subSubcategoryId = parseInt(req.params.id);
       
@@ -1733,10 +1734,10 @@ export function registerAdminContentRoutes(
       if (sendTaxonomyConflict(res, error)) return;
       res.status(500).json({ message: 'Failed to update sub-subcategory' });
     }
-  });
+  }));
   
   // DELETE /api/admin/sub-subcategories/:id - Delete a sub-subcategory
-  app.delete('/api/admin/sub-subcategories/:id', isAuthenticated, isAdmin, async (req: any, res) => {
+  app.delete('/api/admin/sub-subcategories/:id', isAuthenticated, isAdmin, asyncHandler(async (req: any, res) => {
     try {
       const subSubcategoryId = parseInt(req.params.id);
       
@@ -1774,5 +1775,5 @@ export function registerAdminContentRoutes(
       console.error('Error deleting sub-subcategory:', error);
       res.status(500).json({ message: 'Failed to delete sub-subcategory' });
     }
-  });
+  }));
 }

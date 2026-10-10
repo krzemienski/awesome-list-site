@@ -228,7 +228,7 @@ export default function ResourceDetail() {
     },
     onErrorRevert: () => {
       // Cache truth is server-side — refetch the list instead of guessing.
-      queryClient.invalidateQueries({ queryKey: ['/api/favorites'] });
+      void queryClient.invalidateQueries({ queryKey: ['/api/favorites'] });
     },
   });
 
@@ -254,7 +254,7 @@ export default function ResourceDetail() {
           action: (
             <ToastAction
               altText="Undo bookmark removal"
-              onClick={async () => {
+              onClick={() => void (async () => {
                 try {
                   const { partial } = await restoreRemovedBookmark(id || '', removed);
                   showToast(
@@ -273,7 +273,7 @@ export default function ResourceDetail() {
                     variant: "destructive",
                   });
                 }
-              }}
+              })()}
               data-testid="button-undo-bookmark-removal"
             >
               Undo
@@ -309,8 +309,8 @@ export default function ResourceDetail() {
               }),
             ),
           ]).then((results) => {
-            queryClient.invalidateQueries({ queryKey: ["/api/bookmarks"] });
-            queryClient.invalidateQueries({
+            void queryClient.invalidateQueries({ queryKey: ["/api/bookmarks"] });
+            void queryClient.invalidateQueries({
               queryKey: ["/api/collections?includeArchived=true"],
             });
             if (results.some((result) => result.status === "rejected")) {
@@ -329,7 +329,7 @@ export default function ResourceDetail() {
       setTempNotes("");
     },
     onErrorRevert: () => {
-      queryClient.invalidateQueries({ queryKey: ['/api/bookmarks'] });
+      void queryClient.invalidateQueries({ queryKey: ['/api/bookmarks'] });
     },
   });
 
@@ -417,7 +417,7 @@ export default function ResourceDetail() {
       });
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["/api/user/continue-learning"] });
+      void queryClient.invalidateQueries({ queryKey: ["/api/user/continue-learning"] });
     },
   });
 
@@ -430,6 +430,9 @@ export default function ResourceDetail() {
         metadata: { timestamp: new Date().toISOString() }
       });
     }
+    // One view per resource per user; refetches of the same resource and the
+    // mutation object's per-render identity must not log extra views.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [resource?.id, user?.id]);
 
   // GA4 select_content — fires for all visitors when a resource detail loads.
@@ -440,6 +443,8 @@ export default function ResourceDetail() {
         content_category: resource.category,
       });
     }
+    // One select_content event per resource, not per refetch.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [resource?.id]);
 
   const handleShare = async () => {
@@ -796,7 +801,7 @@ export default function ResourceDetail() {
           <Button 
             variant="outline" 
             size="sm" 
-            onClick={handleShare} 
+            onClick={() => void handleShare()} 
             data-testid="button-share"
             className="min-h-[44px] px-4"
             aria-label="Share this resource"

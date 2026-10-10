@@ -172,19 +172,14 @@ async function waitForRouteResolution<T>(
   if (!signal) return promise;
   throwIfRouteResolutionAborted(signal);
 
-  return new Promise<T>((resolve, reject) => {
-    const onAbort = () => reject(routeResolutionAbortedError());
+  let onAbort: (() => void) | undefined;
+  const aborted = new Promise<never>((_resolve, reject) => {
+    onAbort = () => reject(routeResolutionAbortedError());
     signal.addEventListener("abort", onAbort, { once: true });
-    promise.then(
-      (value) => {
-        signal.removeEventListener("abort", onAbort);
-        resolve(value);
-      },
-      (error) => {
-        signal.removeEventListener("abort", onAbort);
-        reject(error);
-      },
-    );
+  });
+  // The resolution's own rejection reason passes through unchanged.
+  return Promise.race([promise, aborted]).finally(() => {
+    if (onAbort) signal.removeEventListener("abort", onAbort);
   });
 }
 

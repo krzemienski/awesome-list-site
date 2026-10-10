@@ -163,7 +163,7 @@ export default function AdminDashboard() {
     // A late display-face swap (e.g. Terminal's mono) widens the tabs without
     // resizing the scroller itself, so also watch every tab trigger.
     scroller.querySelectorAll<HTMLElement>('[role="tab"]').forEach((tab) => observer.observe(tab));
-    document.fonts?.ready.then(reveal);
+    void document.fonts?.ready.then(reveal);
     return () => {
       release();
       userScrollEvents.forEach((type) => host.removeEventListener(type, release));

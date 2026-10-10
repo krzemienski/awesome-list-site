@@ -268,7 +268,11 @@ function explicitResponseStatuses(handlers: unknown[]): number[] {
   const statuses = new Set<number>();
   for (const handler of handlers) {
     if (typeof handler !== "function") continue;
-    const source = Function.prototype.toString.call(handler);
+    // asyncHandler() wrappers expose the real handler for introspection.
+    const inner = (handler as { wrappedHandler?: unknown }).wrappedHandler;
+    const source = Function.prototype.toString.call(
+      typeof inner === "function" ? inner : handler,
+    );
     for (const match of source.matchAll(
       /\.(?:status|sendStatus)\(\s*(\d{3})\s*\)|\.redirect\(\s*(\d{3})\s*,/g,
     )) {

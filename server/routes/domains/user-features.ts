@@ -60,6 +60,7 @@ import {
 } from "@shared/bookmarkCollections";
 import { PG_INT_MAX } from "../../validation/inputs";
 import { stripInternalResourceFields } from "../../lib/publicResource";
+import { asyncHandler } from "../../middleware/asyncHandler";
 
 /**
  * Everything the user-features handlers need from the composition root.
@@ -107,7 +108,7 @@ export function registerUserFeatureRoutes(
   // --- User Interaction Routes ---
 
   // POST /api/favorites/:resourceId - Add favorite
-  app.post('/api/favorites/:resourceId', isAuthenticated, async (req: any, res) => {
+  app.post('/api/favorites/:resourceId', isAuthenticated, asyncHandler(async (req: any, res) => {
     try {
       const userId = req.dbUser.id;
       const resourceId = parseInt(req.params.resourceId);
@@ -125,10 +126,10 @@ export function registerUserFeatureRoutes(
       console.error('Error adding favorite:', error);
       res.status(500).json({ message: 'Failed to add favorite' });
     }
-  });
+  }));
   
   // DELETE /api/favorites/:resourceId - Remove favorite
-  app.delete('/api/favorites/:resourceId', isAuthenticated, async (req: any, res) => {
+  app.delete('/api/favorites/:resourceId', isAuthenticated, asyncHandler(async (req: any, res) => {
     try {
       const userId = req.dbUser.id;
       const resourceId = parseInt(req.params.resourceId);
@@ -139,10 +140,10 @@ export function registerUserFeatureRoutes(
       console.error('Error removing favorite:', error);
       res.status(500).json({ message: 'Failed to remove favorite' });
     }
-  });
+  }));
   
   // GET /api/favorites - Get user's favorites
-  app.get('/api/favorites', isAuthenticated, async (req: any, res) => {
+  app.get('/api/favorites', isAuthenticated, asyncHandler(async (req: any, res) => {
     try {
       const userId = req.dbUser.id;
       const favorites = await userFeatureRepo.getUserFavorites(userId);
@@ -151,10 +152,10 @@ export function registerUserFeatureRoutes(
       console.error('Error fetching favorites:', error);
       res.status(500).json({ message: 'Failed to fetch favorites' });
     }
-  });
+  }));
   
   // POST /api/bookmarks/:resourceId - Add bookmark
-  app.post('/api/bookmarks/:resourceId', isAuthenticated, async (req: any, res, next) => {
+  app.post('/api/bookmarks/:resourceId', isAuthenticated, asyncHandler(async (req: any, res, next) => {
     // Express matches in declaration order. Let the reserved segment reach the
     // additive bulk handler registered below instead of parsing it as an ID.
     if (req.params.resourceId === "bulk") return next("route");
@@ -162,6 +163,7 @@ export function registerUserFeatureRoutes(
       const userId = req.dbUser.id;
       const resourceId = parseInt(req.params.resourceId);
       const { notes, restoreCreatedAt } = req.body;
+      // eslint-disable-next-line no-control-regex -- deliberate: this pattern exists to match control characters
       if (notes !== undefined && (typeof notes !== "string" || notes.length > 500 || /[\u0000-\u0008\u000b\u000c\u000e-\u001f\u007f-\u009f]/.test(notes))) {
         return res.status(400).json({ message: "notes must be a plain-text string of at most 500 characters without control characters" });
       }
@@ -197,10 +199,10 @@ export function registerUserFeatureRoutes(
       console.error('Error adding bookmark:', error);
       res.status(500).json({ message: 'Failed to add bookmark' });
     }
-  });
+  }));
   
   // DELETE /api/bookmarks/:resourceId - Remove bookmark
-  app.delete('/api/bookmarks/:resourceId', isAuthenticated, async (req: any, res) => {
+  app.delete('/api/bookmarks/:resourceId', isAuthenticated, asyncHandler(async (req: any, res) => {
     try {
       const userId = req.dbUser.id;
       const resourceId = parseInt(req.params.resourceId);
@@ -211,10 +213,10 @@ export function registerUserFeatureRoutes(
       console.error('Error removing bookmark:', error);
       res.status(500).json({ message: 'Failed to remove bookmark' });
     }
-  });
+  }));
   
   // GET /api/bookmarks - Get user's bookmarks
-  app.get('/api/bookmarks', isAuthenticated, async (req: any, res) => {
+  app.get('/api/bookmarks', isAuthenticated, asyncHandler(async (req: any, res) => {
     try {
       const userId = req.dbUser.id;
       const bookmarks = await userFeatureRepo.getUserBookmarks(userId);
@@ -223,7 +225,7 @@ export function registerUserFeatureRoutes(
       console.error('Error fetching bookmarks:', error);
       res.status(500).json({ message: 'Failed to fetch bookmarks' });
     }
-  });
+  }));
 
   // --- Bookmark Collections & Learning Queue (Task #295) ---
   // Additive to the existing bookmark routes above: user_bookmarks remains the
@@ -299,7 +301,7 @@ export function registerUserFeatureRoutes(
       errors: parsed.error.issues,
     });
 
-  app.get('/api/collections', isAuthenticated, async (req: any, res) => {
+  app.get('/api/collections', isAuthenticated, asyncHandler(async (req: any, res) => {
     try {
       if (
         req.query.includeArchived !== undefined &&
@@ -317,9 +319,9 @@ export function registerUserFeatureRoutes(
       console.error('Error fetching bookmark collections:', error);
       res.status(500).json({ message: 'Failed to fetch collections' });
     }
-  });
+  }));
 
-  app.post('/api/collections', isAuthenticated, async (req: any, res) => {
+  app.post('/api/collections', isAuthenticated, asyncHandler(async (req: any, res) => {
     const parsed = collectionCreateSchema.safeParse(req.body ?? {});
     if (!parsed.success) return validationError(res, parsed);
     try {
@@ -332,9 +334,9 @@ export function registerUserFeatureRoutes(
       console.error('Error creating bookmark collection:', error);
       res.status(500).json({ message: 'Failed to create collection' });
     }
-  });
+  }));
 
-  app.put('/api/collections/reorder', isAuthenticated, async (req: any, res) => {
+  app.put('/api/collections/reorder', isAuthenticated, asyncHandler(async (req: any, res) => {
     const parsed = collectionReorderSchema.safeParse(req.body ?? {});
     if (!parsed.success) return validationError(res, parsed);
     try {
@@ -348,9 +350,9 @@ export function registerUserFeatureRoutes(
       console.error('Error reordering bookmark collections:', error);
       res.status(500).json({ message: 'Failed to reorder collections' });
     }
-  });
+  }));
 
-  app.patch('/api/collections/:collectionId', isAuthenticated, async (req: any, res) => {
+  app.patch('/api/collections/:collectionId', isAuthenticated, asyncHandler(async (req: any, res) => {
     const collectionId = parseCollectionId(req.params.collectionId);
     if (!collectionId) return res.status(400).json({ message: 'Invalid collection ID' });
     const parsed = collectionPatchSchema.safeParse(req.body ?? {});
@@ -367,9 +369,9 @@ export function registerUserFeatureRoutes(
       console.error('Error updating bookmark collection:', error);
       res.status(500).json({ message: 'Failed to update collection' });
     }
-  });
+  }));
 
-  app.delete('/api/collections/:collectionId', isAuthenticated, async (req: any, res) => {
+  app.delete('/api/collections/:collectionId', isAuthenticated, asyncHandler(async (req: any, res) => {
     const collectionId = parseCollectionId(req.params.collectionId);
     if (!collectionId) return res.status(400).json({ message: 'Invalid collection ID' });
     try {
@@ -380,12 +382,12 @@ export function registerUserFeatureRoutes(
       console.error('Error deleting bookmark collection:', error);
       res.status(500).json({ message: 'Failed to delete collection' });
     }
-  });
+  }));
 
   app.post(
     '/api/collections/:collectionId/items/:resourceId',
     isAuthenticated,
-    async (req: any, res) => {
+    asyncHandler(async (req: any, res) => {
       const collectionId = parseCollectionId(req.params.collectionId);
       const resourceId = parseIntInRange(req.params.resourceId, { min: 1, max: PG_INT_MAX });
       if (!collectionId || !resourceId) {
@@ -408,13 +410,13 @@ export function registerUserFeatureRoutes(
         console.error('Error adding bookmark to collection:', error);
         res.status(500).json({ message: 'Failed to add bookmark to collection' });
       }
-    },
+    }),
   );
 
   app.delete(
     '/api/collections/:collectionId/items/:resourceId',
     isAuthenticated,
-    async (req: any, res) => {
+    asyncHandler(async (req: any, res) => {
       const collectionId = parseCollectionId(req.params.collectionId);
       const resourceId = parseIntInRange(req.params.resourceId, { min: 1, max: PG_INT_MAX });
       if (!collectionId || !resourceId) {
@@ -434,10 +436,10 @@ export function registerUserFeatureRoutes(
         console.error('Error removing bookmark from collection:', error);
         res.status(500).json({ message: 'Failed to remove bookmark from collection' });
       }
-    },
+    }),
   );
 
-  app.post('/api/collections/:collectionId/publish', isAuthenticated, async (req: any, res) => {
+  app.post('/api/collections/:collectionId/publish', isAuthenticated, asyncHandler(async (req: any, res) => {
     const collectionId = parseCollectionId(req.params.collectionId);
     if (!collectionId) return res.status(400).json({ message: 'Invalid collection ID' });
     try {
@@ -448,9 +450,9 @@ export function registerUserFeatureRoutes(
       console.error('Error publishing bookmark collection:', error);
       res.status(500).json({ message: 'Failed to publish collection' });
     }
-  });
+  }));
 
-  app.delete('/api/collections/:collectionId/publish', isAuthenticated, async (req: any, res) => {
+  app.delete('/api/collections/:collectionId/publish', isAuthenticated, asyncHandler(async (req: any, res) => {
     const collectionId = parseCollectionId(req.params.collectionId);
     if (!collectionId) return res.status(400).json({ message: 'Invalid collection ID' });
     try {
@@ -461,9 +463,9 @@ export function registerUserFeatureRoutes(
       console.error('Error unpublishing bookmark collection:', error);
       res.status(500).json({ message: 'Failed to unpublish collection' });
     }
-  });
+  }));
 
-  app.patch('/api/bookmarks/:resourceId/state', isAuthenticated, async (req: any, res) => {
+  app.patch('/api/bookmarks/:resourceId/state', isAuthenticated, asyncHandler(async (req: any, res) => {
     const resourceId = parseIntInRange(req.params.resourceId, { min: 1, max: PG_INT_MAX });
     if (!resourceId) return res.status(400).json({ message: 'Invalid resource ID' });
     const parsed = bookmarkStateSchema.safeParse(req.body ?? {});
@@ -480,9 +482,9 @@ export function registerUserFeatureRoutes(
       console.error('Error updating bookmark state:', error);
       res.status(500).json({ message: 'Failed to update bookmark state' });
     }
-  });
+  }));
 
-  app.post('/api/bookmarks/bulk', isAuthenticated, async (req: any, res) => {
+  app.post('/api/bookmarks/bulk', isAuthenticated, asyncHandler(async (req: any, res) => {
     const parsed = bookmarkBulkSchema.safeParse(req.body ?? {});
     if (!parsed.success) return validationError(res, parsed);
     try {
@@ -500,9 +502,9 @@ export function registerUserFeatureRoutes(
       console.error('Error applying bulk bookmark action:', error);
       res.status(500).json({ message: 'Failed to update bookmarks' });
     }
-  });
+  }));
 
-  app.get('/api/public/collections/:shareId', async (req, res) => {
+  app.get('/api/public/collections/:shareId', asyncHandler(async (req, res) => {
     const parsed = collectionShareIdSchema.safeParse(req.params.shareId);
     if (!parsed.success) return res.status(404).json({ message: 'Collection not found' });
     try {
@@ -513,7 +515,7 @@ export function registerUserFeatureRoutes(
       console.error('Error fetching public bookmark collection:', error);
       res.status(500).json({ message: 'Failed to fetch collection' });
     }
-  });
+  }));
 
   // --- User Profile & Progress Routes ---
 
@@ -524,7 +526,7 @@ export function registerUserFeatureRoutes(
   // ---- API key management (session-authed) -------------------------------
   // POST /api/user/api-keys — create a key; the plaintext is returned ONCE.
   const MAX_API_KEY_EXPIRY_DAYS = 3650;
-  app.post('/api/user/api-keys', isAuthenticated, async (req: any, res) => {
+  app.post('/api/user/api-keys', isAuthenticated, asyncHandler(async (req: any, res) => {
     try {
       const userId = req.dbUser.id;
       const { name, scopes, expiresInDays } = req.body ?? {};
@@ -577,10 +579,10 @@ export function registerUserFeatureRoutes(
       console.error('[POST /api/user/api-keys] Error:', error);
       return res.status(500).json({ message: 'Failed to create API key' });
     }
-  });
+  }));
 
   // GET /api/user/api-keys — list the caller's keys (never returns the secret).
-  app.get('/api/user/api-keys', isAuthenticated, async (req: any, res) => {
+  app.get('/api/user/api-keys', isAuthenticated, asyncHandler(async (req: any, res) => {
     try {
       const userId = req.dbUser.id;
       const keys = await storage.listApiKeys(userId);
@@ -589,10 +591,10 @@ export function registerUserFeatureRoutes(
       console.error('[GET /api/user/api-keys] Error:', error);
       return res.status(500).json({ message: 'Failed to list API keys' });
     }
-  });
+  }));
 
   // DELETE /api/user/api-keys/:id — revoke one of the caller's keys.
-  app.delete('/api/user/api-keys/:id', isAuthenticated, async (req: any, res) => {
+  app.delete('/api/user/api-keys/:id', isAuthenticated, asyncHandler(async (req: any, res) => {
     try {
       const userId = req.dbUser.id;
       const revoked = await storage.revokeApiKey(req.params.id, userId);
@@ -604,11 +606,11 @@ export function registerUserFeatureRoutes(
       console.error('[DELETE /api/user/api-keys/:id] Error:', error);
       return res.status(500).json({ message: 'Failed to revoke API key' });
     }
-  });
+  }));
 
   // PATCH /api/user/profile — self-service display-name edit (Run15 BUG-049).
   // Only firstName/lastName; email/password/role have their own guarded flows.
-  app.patch('/api/user/profile', isAuthenticated, async (req: any, res) => {
+  app.patch('/api/user/profile', isAuthenticated, asyncHandler(async (req: any, res) => {
     try {
       const userId = req.dbUser.id;
       // Run17 BUG-012: cap at 50; Run21 R4-049: shared displayNameSchema also
@@ -651,14 +653,14 @@ export function registerUserFeatureRoutes(
       console.error('[PATCH /api/user/profile] Error:', error);
       return res.status(500).json({ message: 'Failed to update profile' });
     }
-  });
+  }));
 
   // POST /api/user/deletion-request — Run22 BUG-020: private account/data
   // deletion channel. Authenticated (session), so no personal data ever has
   // to be posted in a public GitHub issue. Idempotent: re-requesting keeps
   // the original request timestamp. Admins see the pending marker in the
   // users table and action it via the existing guarded delete-user flow.
-  app.post('/api/user/deletion-request', isAuthenticated, async (req: any, res) => {
+  app.post('/api/user/deletion-request', isAuthenticated, asyncHandler(async (req: any, res) => {
     try {
       const userId = req.dbUser.id;
       const existing = await userRepo.getUser(userId);
@@ -680,10 +682,10 @@ export function registerUserFeatureRoutes(
       console.error('[POST /api/user/deletion-request] Error:', error);
       return res.status(500).json({ message: 'Failed to submit deletion request' });
     }
-  });
+  }));
 
   // DELETE /api/user/deletion-request — withdraw a pending deletion request.
-  app.delete('/api/user/deletion-request', isAuthenticated, async (req: any, res) => {
+  app.delete('/api/user/deletion-request', isAuthenticated, asyncHandler(async (req: any, res) => {
     try {
       const userId = req.dbUser.id;
       const existing = await userRepo.getUser(userId);
@@ -699,7 +701,7 @@ export function registerUserFeatureRoutes(
       console.error('[DELETE /api/user/deletion-request] Error:', error);
       return res.status(500).json({ message: 'Failed to withdraw deletion request' });
     }
-  });
+  }));
 
   // journey_steps stores multiple rows per logical stepNumber. The imported
   // helper is shared with write-time completion and Journey Detail so grouped
@@ -715,7 +717,7 @@ export function registerUserFeatureRoutes(
     return { totalSteps, completedSteps };
   }
 
-  app.get('/api/user/progress', isAuthenticated, async (req: any, res) => {
+  app.get('/api/user/progress', isAuthenticated, asyncHandler(async (req: any, res) => {
     try {
       const userId = req.dbUser.id;
 
@@ -863,7 +865,7 @@ export function registerUserFeatureRoutes(
       console.error('Error fetching user progress:', error);
       res.status(500).json({ message: 'Failed to fetch user progress' });
     }
-  });
+  }));
 
   // --- Learning preferences / optional onboarding ---
 
@@ -877,7 +879,7 @@ export function registerUserFeatureRoutes(
 
   // GET does not create a row. A missing row is meaningful: the user has not
   // started onboarding and can be invited without being blocked from browsing.
-  app.get('/api/user/preferences', isAuthenticated, async (req: any, res) => {
+  app.get('/api/user/preferences', isAuthenticated, asyncHandler(async (req: any, res) => {
     try {
       const userId = req.dbUser?.id;
       const preferences = await userFeatureRepo.getUserPreferences(userId);
@@ -900,11 +902,11 @@ export function registerUserFeatureRoutes(
       console.error('Error fetching user preferences:', error);
       res.status(500).json({ message: 'Failed to fetch learning preferences' });
     }
-  });
+  }));
 
   // PUT is an idempotent upsert into the user_id-unique preference row. Draft
   // saves may be partial; a completed profile must satisfy the full contract.
-  app.put('/api/user/preferences', isAuthenticated, async (req: any, res) => {
+  app.put('/api/user/preferences', isAuthenticated, asyncHandler(async (req: any, res) => {
     try {
       const userId = req.dbUser?.id;
       const parsed = learningPreferencesUpdateSchema.safeParse(req.body);
@@ -1061,9 +1063,9 @@ export function registerUserFeatureRoutes(
       console.error('Error saving user preferences:', error);
       res.status(500).json({ message: 'Failed to save learning preferences' });
     }
-  });
+  }));
 
-  app.delete('/api/user/preferences', isAuthenticated, async (req: any, res) => {
+  app.delete('/api/user/preferences', isAuthenticated, asyncHandler(async (req: any, res) => {
     try {
       const userId = req.dbUser?.id;
       const rawExpected = req.body?.expectedRevision;
@@ -1100,7 +1102,7 @@ export function registerUserFeatureRoutes(
       console.error('Error resetting user preferences:', error);
       res.status(500).json({ message: 'Failed to reset learning preferences' });
     }
-  });
+  }));
 
   const contributionQuerySchema = z.object({
     type: z.enum(['all', 'resource', 'edit']).default('all'),
@@ -1115,7 +1117,7 @@ export function registerUserFeatureRoutes(
 
   // GET /api/user/contributions - One ownership-scoped, safely serialized
   // timeline for resource submissions and edit suggestions.
-  app.get('/api/user/contributions', isAuthenticated, async (req: any, res) => {
+  app.get('/api/user/contributions', isAuthenticated, asyncHandler(async (req: any, res) => {
     try {
       const parsed = contributionQuerySchema.safeParse(req.query);
       if (!parsed.success) {
@@ -1207,11 +1209,11 @@ export function registerUserFeatureRoutes(
       console.error('Error fetching contributor dashboard:', error);
       return res.status(500).json({ message: 'Failed to fetch contributions' });
     }
-  });
+  }));
 
   // Compatibility endpoint for older profile clients. It is still
   // ownership-scoped, but new clients use the paginated safe serializer above.
-  app.get('/api/user/submissions', isAuthenticated, async (req: any, res) => {
+  app.get('/api/user/submissions', isAuthenticated, asyncHandler(async (req: any, res) => {
     try {
       const userId = req.dbUser.id;
       const dashboard = await auditRepo.getContributorDashboardData(userId);
@@ -1254,7 +1256,7 @@ export function registerUserFeatureRoutes(
       console.error('Error fetching user submissions:', error);
       return res.status(500).json({ message: 'Failed to fetch user submissions' });
     }
-  });
+  }));
 
   const withdrawContribution = async (
     req: any,
@@ -1347,14 +1349,14 @@ export function registerUserFeatureRoutes(
   app.post(
     '/api/user/contributions/:kind(resource|edit)/:id/withdraw',
     isAuthenticated,
-    (req, res) => withdrawContribution(req, res),
+    asyncHandler((req, res) => withdrawContribution(req, res)),
   );
-  app.delete('/api/user/submissions/:id', isAuthenticated, (req, res) => {
+  app.delete('/api/user/submissions/:id', isAuthenticated, asyncHandler((req, res) => {
     return withdrawContribution(req, res, 'resource');
-  });
+  }));
 
   // GET /api/user/journeys - Get user's learning journeys with details
-  app.get('/api/user/journeys', isAuthenticated, async (req: any, res) => {
+  app.get('/api/user/journeys', isAuthenticated, asyncHandler(async (req: any, res) => {
     try {
       const userId = req.dbUser.id;
       // NB-018 (run23): per-user progress must never come from the browser's
@@ -1386,10 +1388,10 @@ export function registerUserFeatureRoutes(
       console.error('Error fetching user journeys:', error);
       res.status(500).json({ message: 'Failed to fetch user journeys' });
     }
-  });
+  }));
 
   // GET /api/user/continue-learning - One bounded, user-scoped resume summary.
-  app.get('/api/user/continue-learning', isAuthenticated, async (req: any, res) => {
+  app.get('/api/user/continue-learning', isAuthenticated, asyncHandler(async (req: any, res) => {
     try {
       const userId = req.dbUser.id;
       res.set('Cache-Control', 'no-store');
@@ -1558,5 +1560,5 @@ export function registerUserFeatureRoutes(
       console.error('Error fetching Continue Learning summary:', error);
       return res.status(500).json({ message: 'Failed to load your learning summary' });
     }
-  });
+  }));
 }

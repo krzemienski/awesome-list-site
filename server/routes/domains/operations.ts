@@ -33,6 +33,7 @@ import { getHeavyWorkSnapshot } from "../../ops/heavyWork";
 import { getOperationalTelemetrySnapshot } from "../../ops/operationalTelemetry";
 import { getPublicCacheSnapshot } from "../../cache/publicCache";
 import type { UserRepository } from "../../repositories";
+import { asyncHandler } from "../../middleware/asyncHandler";
 
 /**
  * Dependencies the operational handlers need from the composing module. These
@@ -67,20 +68,20 @@ export function registerOperationsRoutes(
     res.set("Cache-Control", "no-store");
     res.json({ status: "ok" });
   });
-  app.get("/api/health/ready", async (_req, res) => {
+  app.get("/api/health/ready", asyncHandler(async (_req, res) => {
     const readiness = await checkReadiness();
     res.set("Cache-Control", "no-store");
     if (!readiness.ready) res.set("Retry-After", "1");
     res.status(readiness.ready ? 200 : 503).json({
       status: readiness.ready ? "ready" : "not_ready",
     });
-  });
+  }));
 
   app.get(
     "/api/admin/operations/health",
     isAuthenticated,
     isAdmin,
-    async (_req, res) => {
+    asyncHandler(async (_req, res) => {
       const readiness = await checkReadiness();
       res.set("Cache-Control", "no-store");
       res.json({
@@ -97,7 +98,7 @@ export function registerOperationsRoutes(
         heavyWork: getHeavyWorkSnapshot(),
         telemetry: getOperationalTelemetrySnapshot(),
       });
-    },
+    }),
   );
 
   // AI service health check (documented in docs/AI-SERVICES.md).
@@ -106,7 +107,7 @@ export function registerOperationsRoutes(
   // and ?deep=1 — which spends a real paid Claude round-trip — requires an
   // admin session (anonymous → 401, non-admin → 403). Before this, any
   // visitor could trigger paid API calls in a loop and read internal stats.
-  app.get("/api/health/ai", async (req: any, res) => {
+  app.get("/api/health/ai", asyncHandler(async (req: any, res) => {
     try {
       const stats = claudeService.getStats();
       const deep = req.query.deep === '1' || req.query.deep === 'true';
@@ -149,7 +150,7 @@ export function registerOperationsRoutes(
       console.error('Error checking AI health:', error);
       res.status(500).json({ status: 'error', error: 'Failed to check AI service health' });
     }
-  });
+  }));
 
   // Public developer API (read-only, rate-limited) + API-key identity endpoint.
   // Registered here so its concrete /api/public/* routes are matched before the

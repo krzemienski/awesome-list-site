@@ -614,7 +614,7 @@ export default function Contributions() {
       />
 
       <header className="account-page-header mb-8 pb-6">
-        <div className="eyebrow mb-3">// Contributor dashboard</div>
+        <div className="eyebrow mb-3">{"// Contributor dashboard"}</div>
         <div className="flex flex-col gap-5 sm:flex-row sm:items-end sm:justify-between">
           <div className="max-w-2xl">
             <h1 className="display-h text-3xl sm:text-4xl">

@@ -211,7 +211,7 @@ export default function Search() {
     if (lastTrackedSearchIntentRef.current === intent) return;
     lastTrackedSearchIntentRef.current = intent;
     trackSearch(normalized, data.total, "search_page");
-  }, [data, normalized, state.category, state.format, state.provider, state.skillLevel, state.sort, state.subSubcategory, state.subcategory, state.tags]);
+  }, [data, normalized, queryReady, state.category, state.format, state.provider, state.skillLevel, state.sort, state.subSubcategory, state.subcategory, state.tags]);
   useEffect(() => {
     const pending = pendingAnalyticsRef.current;
     if (!pending || !data || pending.signature !== searchFilterSignature(state)) return;
@@ -230,7 +230,7 @@ export default function Search() {
   if (data?.facets) lastFacets.current = data.facets;
   useEffect(() => { if (data && state.page > totalPages) { preservePageNoticeRef.current = true; setState(s => ({ ...s, page: totalPages })); writeFilterParams({ page: totalPages > 1 ? String(totalPages) : null }, "replace"); setPageNotice(`Page ${state.page} is beyond the available results. Showing page ${totalPages}.`); } }, [data, state.page, totalPages]);
   const gotoPage = (n: number) => { setState(s => ({ ...s, page: n })); writeFilterParams({ page: n > 1 ? String(n) : null }, "push"); setPageNotice(null); pendingResultsFocusRef.current = true; window.scrollTo({ top: 0, behavior: "smooth" }); };
-  const makePageHref = (n: number) => { const p = new URLSearchParams(window.location.search); n > 1 ? p.set("page", String(n)) : p.delete("page"); return `/search?${p.toString()}`; };
+  const makePageHref = (n: number) => { const p = new URLSearchParams(window.location.search); if (n > 1) p.set("page", String(n)); else p.delete("page"); return `/search?${p.toString()}`; };
   const invalid = query.error instanceof ApiError && query.error.status === 400;
   return <div className="discovery-page space-y-6">
     <SEOHead title={`${searchPageSeo.titleCore(normalized)} — Awesome Video`} description={searchPageSeo.description} noindex />

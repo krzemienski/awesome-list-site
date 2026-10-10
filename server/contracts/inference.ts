@@ -174,6 +174,7 @@ export const boundedSafeStringSchema = z
   .string()
   .min(1, "must not be empty")
   .max(MAX_PARAM_LENGTH, `must be at most ${MAX_PARAM_LENGTH} characters`)
+  // eslint-disable-next-line no-control-regex -- deliberate: this pattern exists to match control characters
   .refine((s) => !/[\u0000-\u001F\u007F]/.test(s), "must not contain control characters");
 
 /**
@@ -265,6 +266,7 @@ const boundedCursorString = z
   .string()
   .min(1, "cursor must not be empty")
   .max(MAX_PARAM_LENGTH, `cursor must be at most ${MAX_PARAM_LENGTH} characters`)
+  // eslint-disable-next-line no-control-regex -- deliberate: this pattern exists to match control characters
   .refine((s) => !/[\u0000-\u001F\u007F]/.test(s), "cursor must not contain control characters");
 
 /**
@@ -275,6 +277,7 @@ const boundedCursorString = z
 const boundedQueryString = z
   .string()
   .max(MAX_PARAM_LENGTH, `must be at most ${MAX_PARAM_LENGTH} characters`)
+  // eslint-disable-next-line no-control-regex -- deliberate: this pattern exists to match control characters
   .refine((s) => !/[\u0000-\u001F\u007F]/.test(s), "must not contain control characters");
 // One string branch (empty allowed, e.g. ?q=): with two string branches a
 // too-long value failed both and zod reported only "Invalid input", hiding

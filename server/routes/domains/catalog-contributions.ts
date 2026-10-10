@@ -89,6 +89,7 @@ import { isDatabaseUnavailableError } from "../../db/errors";
 import { ServiceUnavailableError } from "../../middleware/errors";
 import { registerHomeFeed } from "./home-feed";
 import { listApprovedResourceTags } from "../../repositories/TagRepository";
+import { asyncHandler } from "../../middleware/asyncHandler";
 
 /**
  * Copied verbatim from server/routes.ts (module-level helper). Duplicated here
@@ -165,7 +166,7 @@ export function registerCatalogContributionsRoutes(
   };
 
   // GET /api/resources - List approved resources (public)
-  app.get('/api/resources', resourceReadLimiter, async (req, res) => {
+  app.get('/api/resources', resourceReadLimiter, asyncHandler(async (req, res) => {
     try {
       // Support explicit offset/limit for pagination (BUG-003). When offset is
       // provided, it overrides `page`. Clamp to safe integers; reject non-numeric
@@ -419,7 +420,7 @@ export function registerCatalogContributionsRoutes(
       console.error('Error fetching resources:', error);
       sendOperationalFailure(res, error, 'Failed to fetch resources');
     }
-  });
+  }));
 
   // GET /api/resources/kinds/counts - Full-set counts of approved resources per
   // resolved kind { tools, libraries, standards, events, protocols, other,
@@ -428,7 +429,7 @@ export function registerCatalogContributionsRoutes(
   // counts and the filtered page totals can never disagree. Optional
   // ?category= (name or slug) scopes the counts to one category. Cached and
   // cache-controlled like the sibling aggregate endpoints (/api/tags).
-  app.get('/api/resources/kinds/counts', async (req, res) => {
+  app.get('/api/resources/kinds/counts', asyncHandler(async (req, res) => {
     try {
       const rawCategory = firstQueryValue(req.query.category);
       if (req.query.category !== undefined && rawCategory === undefined) {
@@ -477,7 +478,7 @@ export function registerCatalogContributionsRoutes(
       console.error('Error counting resources by kind:', error);
       sendOperationalFailure(res, error, 'Failed to count resources by kind');
     }
-  });
+  }));
 
   // GET /api/search?q= - Public JSON search across approved resources. A thin
   // alias over listResources so the /search UI page and external/API callers
@@ -487,7 +488,7 @@ export function registerCatalogContributionsRoutes(
   // BUG-v3-M14 (run12): the public search endpoint shares the resource-read
   // rate limit (100 req/min/IP, 429 + Retry-After) like the other public
   // GET resource surfaces.
-  app.get('/api/search', resourceReadLimiter, async (req, res) => {
+  app.get('/api/search', resourceReadLimiter, asyncHandler(async (req, res) => {
     try {
       // NEW-012 + audit2: the same shared normalization as /api/resources and
       // the /search page (control chars incl. NUL count as whitespace, runs
@@ -540,7 +541,7 @@ export function registerCatalogContributionsRoutes(
       console.error('Error searching resources:', error);
       sendOperationalFailure(res, error, 'Failed to search resources');
     }
-  });
+  }));
 
   // POST /api/telemetry/dead-link - Client-side 404 telemetry (public, fire-and-forget)
   app.post('/api/telemetry/dead-link', (req, res) => {
@@ -579,7 +580,7 @@ export function registerCatalogContributionsRoutes(
   });
 
   // GET /api/resources/check-url - Check if URL already exists (public)
-  app.get('/api/resources/check-url', async (req, res) => {
+  app.get('/api/resources/check-url', asyncHandler(async (req, res) => {
     try {
       // Run15 BUG-037: trim like the submit schema does — a pasted URL with a
       // trailing space must resolve to the same duplicate-check result.
@@ -610,7 +611,7 @@ export function registerCatalogContributionsRoutes(
       console.error('Error checking URL:', error);
       sendOperationalFailure(res, error, 'Failed to check URL');
     }
-  });
+  }));
 
   // GET /api/resources/:id - Get single resource
   // :id constrained to digits so literal sub-routes like /api/resources/pending and
@@ -651,10 +652,10 @@ export function registerCatalogContributionsRoutes(
       sendOperationalFailure(res, error, 'Failed to fetch resource');
     }
   };
-  app.get('/api/resources/:id(\\d+)', resourceReadLimiter, getResourceByIdHandler);
-  app.get('/api/resource/:id(\\d+)', resourceReadLimiter, getResourceByIdHandler);
+  app.get('/api/resources/:id(\\d+)', resourceReadLimiter, asyncHandler(getResourceByIdHandler));
+  app.get('/api/resource/:id(\\d+)', resourceReadLimiter, asyncHandler(getResourceByIdHandler));
 
-  app.get('/api/resources/:id/related', resourceReadLimiter, async (req, res) => {
+  app.get('/api/resources/:id/related', resourceReadLimiter, asyncHandler(async (req, res) => {
     const empty = { similar: [], prerequisites: [], nextSteps: [], totalFound: 0 };
     try {
       // NB-008 (run23): bound-check (int4 overflow → 500 otherwise).
@@ -700,7 +701,7 @@ export function registerCatalogContributionsRoutes(
       console.error('Error fetching related resources:', error);
       sendOperationalFailure(res, error, 'Failed to fetch related resources');
     }
-  });
+  }));
 
   // POST /api/resources - Submit new resource (authenticated)
   // Mounted on both the canonical path and the /api/submit alias (BUG-019) via a
@@ -854,11 +855,11 @@ export function registerCatalogContributionsRoutes(
       sendOperationalFailure(res, error, 'Failed to create resource');
     }
   };
-  app.post('/api/resources', isAuthenticated, createResourceHandler);
-  app.post('/api/submit', isAuthenticated, createResourceHandler);
+  app.post('/api/resources', isAuthenticated, asyncHandler(createResourceHandler));
+  app.post('/api/submit', isAuthenticated, asyncHandler(createResourceHandler));
   
   // GET /api/resources/pending - List pending resources (admin only)
-  app.get('/api/resources/pending', isAuthenticated, isAdmin, async (req, res) => {
+  app.get('/api/resources/pending', isAuthenticated, isAdmin, asyncHandler(async (req, res) => {
     try {
       const page = parseInt(req.query.page as string) || 1;
       const limit = parseInt(req.query.limit as string) || 20;
@@ -874,10 +875,10 @@ export function registerCatalogContributionsRoutes(
       console.error('Error fetching pending resources:', error);
       res.status(500).json({ message: 'Failed to fetch pending resources' });
     }
-  });
+  }));
   
   // PUT /api/resources/:id/approve - Approve resource (admin)
-  app.put('/api/resources/:id/approve', isAuthenticated, isAdmin, async (req: any, res) => {
+  app.put('/api/resources/:id/approve', isAuthenticated, isAdmin, asyncHandler(async (req: any, res) => {
     try {
       const id = parseInt(req.params.id);
       const userId = req.dbUser.id;
@@ -909,10 +910,10 @@ export function registerCatalogContributionsRoutes(
       }
       res.status(500).json({ message: 'Failed to approve resource' });
     }
-  });
+  }));
   
   // PUT /api/resources/:id/reject - Reject resource (admin)
-  app.put('/api/resources/:id/reject', isAuthenticated, isAdmin, async (req: any, res) => {
+  app.put('/api/resources/:id/reject', isAuthenticated, isAdmin, asyncHandler(async (req: any, res) => {
     try {
       const id = parseInt(req.params.id);
       const userId = req.dbUser.id;
@@ -937,10 +938,10 @@ export function registerCatalogContributionsRoutes(
       }
       res.status(500).json({ message: 'Failed to reject resource' });
     }
-  });
+  }));
   
   // POST /api/resources/:id/edits - Submit edit suggestion for a resource (authenticated)
-  app.post('/api/resources/:id/edits', isAuthenticated, async (req: any, res) => {
+  app.post('/api/resources/:id/edits', isAuthenticated, asyncHandler(async (req: any, res) => {
     try {
       if (!req.body || typeof req.body !== 'object' || Array.isArray(req.body)) {
         return res.status(400).json({ message: 'Edit request must be an object' });
@@ -1204,12 +1205,12 @@ export function registerCatalogContributionsRoutes(
       console.error('Error creating edit suggestion:', error);
       res.status(500).json({ message: 'Failed to create edit suggestion' });
     }
-  });
+  }));
 
   // --- Category Routes ---
   
   // GET /api/categories - List all categories (public)
-  app.get('/api/categories', async (req, res) => {
+  app.get('/api/categories', asyncHandler(async (req, res) => {
     try {
       const enriched = await getPublicCacheValue({
         namespace: 'catalog-taxonomy',
@@ -1232,12 +1233,12 @@ export function registerCatalogContributionsRoutes(
       console.error('Error fetching categories:', error);
       sendOperationalFailure(res, error, 'Failed to fetch categories');
     }
-  });
+  }));
 
   // GET /api/tags - Aggregated tag counts (public, R2-M02). Tags live in
   // resources.metadata->'tags' (jsonb string array), not the (empty) tags
   // table, so aggregate over approved resources. ~2k rows → single-digit ms.
-  app.get('/api/tags', async (_req, res) => {
+  app.get('/api/tags', asyncHandler(async (_req, res) => {
     try {
       // run9 BUG-018: canonicalize before aggregating — lowercase and collapse
       // spaces/underscores to hyphens so "open source", "Open Source" and
@@ -1256,10 +1257,10 @@ export function registerCatalogContributionsRoutes(
       console.error('Error aggregating tags:', error);
       sendOperationalFailure(res, error, 'Failed to fetch tags');
     }
-  });
+  }));
 
   // GET /api/subcategories - List all subcategories (public)
-  app.get('/api/subcategories', async (req, res) => {
+  app.get('/api/subcategories', asyncHandler(async (req, res) => {
     try {
       let categoryId: number | undefined = undefined;
       
@@ -1299,10 +1300,10 @@ export function registerCatalogContributionsRoutes(
       console.error('Error fetching subcategories:', error);
       sendOperationalFailure(res, error, 'Failed to fetch subcategories');
     }
-  });
+  }));
 
   // GET /api/sub-subcategories - List all sub-subcategories (public)
-  app.get('/api/sub-subcategories', async (req, res) => {
+  app.get('/api/sub-subcategories', asyncHandler(async (req, res) => {
     try {
       let subcategoryId: number | undefined = undefined;
       
@@ -1341,5 +1342,5 @@ export function registerCatalogContributionsRoutes(
       console.error('Error fetching sub-subcategories:', error);
       sendOperationalFailure(res, error, 'Failed to fetch sub-subcategories');
     }
-  });
+  }));
 }

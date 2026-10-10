@@ -95,7 +95,7 @@ export default function GuestBookmarks() {
 
   const retryFailed = () => {
     for (const id of failedIds) {
-      queryClient.invalidateQueries({ queryKey: [`/api/resources/${id}`] });
+      void queryClient.invalidateQueries({ queryKey: [`/api/resources/${id}`] });
     }
   };
 
@@ -259,7 +259,7 @@ export default function GuestBookmarks() {
               // C7-V4-01: the banner unmounts on reconnect; hand focus on like Retry does.
               handoffFocusOnUnmount(e.currentTarget);
               for (const entry of sortedEntries) {
-                queryClient.invalidateQueries({ queryKey: [`/api/resources/${entry.id}`] });
+                void queryClient.invalidateQueries({ queryKey: [`/api/resources/${entry.id}`] });
               }
             }}
             data-testid="button-guest-offline-retry"

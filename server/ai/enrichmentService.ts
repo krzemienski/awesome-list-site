@@ -232,6 +232,9 @@ export class EnrichmentService {
         status: 'failed',
         errorMessage: error.message,
         completedAt: new Date()
+      }).catch(updateError => {
+        // Previously an unhandled rejection; the job row stays as it was.
+        console.error(`Failed to mark enrichment job ${job.id} as failed:`, updateError);
       });
     });
 

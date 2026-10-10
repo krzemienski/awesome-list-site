@@ -1,5 +1,5 @@
 import * as React from "react";
-import { useState, useMemo, ReactNode, useRef, useEffect } from "react";
+import { useState, useMemo, useCallback, ReactNode, useRef, useEffect } from "react";
 import { useQuery, useQueries, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useToast } from "@/hooks/use-toast";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -1251,9 +1251,9 @@ export default function GenericCrudManager<T extends BaseEntityWithCount>({
       if (operation.type === 'create') {
         // Undo create: delete the created entity
         await apiRequest(deleteUrl(operation.entityId), { method: 'DELETE' });
-        queryClient.invalidateQueries({ queryKey: [queryKey] });
+        void queryClient.invalidateQueries({ queryKey: [queryKey] });
         if (publicQueryKey) {
-          queryClient.invalidateQueries({ queryKey: [publicQueryKey] });
+          void queryClient.invalidateQueries({ queryKey: [publicQueryKey] });
         }
         toast({
           title: "Undo",
@@ -1266,9 +1266,9 @@ export default function GenericCrudManager<T extends BaseEntityWithCount>({
             method: 'PATCH',
             body: JSON.stringify(operation.previousData)
           });
-          queryClient.invalidateQueries({ queryKey: [queryKey] });
+          void queryClient.invalidateQueries({ queryKey: [queryKey] });
           if (publicQueryKey) {
-            queryClient.invalidateQueries({ queryKey: [publicQueryKey] });
+            void queryClient.invalidateQueries({ queryKey: [publicQueryKey] });
           }
           toast({
             title: "Undo",
@@ -1282,9 +1282,9 @@ export default function GenericCrudManager<T extends BaseEntityWithCount>({
             method: 'POST',
             body: JSON.stringify(operation.previousData)
           });
-          queryClient.invalidateQueries({ queryKey: [queryKey] });
+          void queryClient.invalidateQueries({ queryKey: [queryKey] });
           if (publicQueryKey) {
-            queryClient.invalidateQueries({ queryKey: [publicQueryKey] });
+            void queryClient.invalidateQueries({ queryKey: [publicQueryKey] });
           }
           toast({
             title: "Undo",
@@ -1321,9 +1321,9 @@ export default function GenericCrudManager<T extends BaseEntityWithCount>({
             method: 'POST',
             body: JSON.stringify(operation.newData)
           });
-          queryClient.invalidateQueries({ queryKey: [queryKey] });
+          void queryClient.invalidateQueries({ queryKey: [queryKey] });
           if (publicQueryKey) {
-            queryClient.invalidateQueries({ queryKey: [publicQueryKey] });
+            void queryClient.invalidateQueries({ queryKey: [publicQueryKey] });
           }
           toast({
             title: "Redo",
@@ -1337,9 +1337,9 @@ export default function GenericCrudManager<T extends BaseEntityWithCount>({
             method: 'PATCH',
             body: JSON.stringify(operation.newData)
           });
-          queryClient.invalidateQueries({ queryKey: [queryKey] });
+          void queryClient.invalidateQueries({ queryKey: [queryKey] });
           if (publicQueryKey) {
-            queryClient.invalidateQueries({ queryKey: [publicQueryKey] });
+            void queryClient.invalidateQueries({ queryKey: [publicQueryKey] });
           }
           toast({
             title: "Redo",
@@ -1349,9 +1349,9 @@ export default function GenericCrudManager<T extends BaseEntityWithCount>({
       } else if (operation.type === 'delete') {
         // Redo delete: delete the entity again
         await apiRequest(deleteUrl(operation.entityId), { method: 'DELETE' });
-        queryClient.invalidateQueries({ queryKey: [queryKey] });
+        void queryClient.invalidateQueries({ queryKey: [queryKey] });
         if (publicQueryKey) {
-          queryClient.invalidateQueries({ queryKey: [publicQueryKey] });
+          void queryClient.invalidateQueries({ queryKey: [publicQueryKey] });
         }
         toast({
           title: "Redo",
@@ -1374,7 +1374,9 @@ export default function GenericCrudManager<T extends BaseEntityWithCount>({
    * Helper to check field permissions based on mode and entity
    * Returns { visible, editable, message } based on field's permission config
    */
-  const checkFieldPermissions = (
+  // Pure (reads only its arguments), so a stable identity is safe and lets
+  // the memoised column filter below list it as a dependency.
+  const checkFieldPermissions = useCallback((
     permissions: FieldPermissions | undefined,
     mode: 'create' | 'edit' | 'view',
     entity?: T
@@ -1406,7 +1408,7 @@ export default function GenericCrudManager<T extends BaseEntityWithCount>({
     }
 
     return { visible, editable };
-  };
+  }, []);
 
   /**
    * Filter columns based on permissions for table view
@@ -1416,7 +1418,7 @@ export default function GenericCrudManager<T extends BaseEntityWithCount>({
       const { visible } = checkFieldPermissions(col.permissions, 'view');
       return visible;
     });
-  }, [columns]);
+  }, [columns, checkFieldPermissions]);
 
   /**
    * Filter custom fields based on permissions for a given mode
@@ -1663,7 +1665,11 @@ export default function GenericCrudManager<T extends BaseEntityWithCount>({
     }
   }, [searchQuery, totalPages, currentPage]);
 
-  // Keyboard shortcuts for undo/redo
+  // Keyboard shortcuts for undo/redo. The handlers are recreated every
+  // render; the listener reads the latest pair through a ref so it never
+  // runs a stale closure and only re-binds when the feature toggles.
+  const undoRedoHandlersRef = useRef({ handleUndo, handleRedo });
+  undoRedoHandlersRef.current = { handleUndo, handleRedo };
   useEffect(() => {
     if (!undoRedoEnabled) return;
 
@@ -1671,19 +1677,19 @@ export default function GenericCrudManager<T extends BaseEntityWithCount>({
       // Ctrl+Z or Cmd+Z for undo
       if ((e.ctrlKey || e.metaKey) && e.key === 'z' && !e.shiftKey) {
         e.preventDefault();
-        handleUndo();
+        void undoRedoHandlersRef.current.handleUndo();
       }
       // Ctrl+Shift+Z or Cmd+Shift+Z or Ctrl+Y or Cmd+Y for redo
       if (((e.ctrlKey || e.metaKey) && e.shiftKey && e.key === 'z') ||
           ((e.ctrlKey || e.metaKey) && e.key === 'y')) {
         e.preventDefault();
-        handleRedo();
+        void undoRedoHandlersRef.current.handleRedo();
       }
     };
 
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [undoRedoEnabled, historyPointer, history]);
+  }, [undoRedoEnabled]);
 
   // Paginate the filtered items
   const paginatedItems = useMemo(() => {
@@ -1783,9 +1789,9 @@ export default function GenericCrudManager<T extends BaseEntityWithCount>({
     onSuccess: (newEntity: T) => {
       void queryClient.invalidateQueries({ queryKey: ["awesome-list-nav"] });
       void queryClient.invalidateQueries({ queryKey: ["awesome-list-data"] });
-      queryClient.invalidateQueries({ queryKey: [queryKey] });
+      void queryClient.invalidateQueries({ queryKey: [queryKey] });
       if (publicQueryKey) {
-        queryClient.invalidateQueries({ queryKey: [publicQueryKey] });
+        void queryClient.invalidateQueries({ queryKey: [publicQueryKey] });
       }
 
       // Record the create operation for undo/redo
@@ -1841,9 +1847,9 @@ export default function GenericCrudManager<T extends BaseEntityWithCount>({
     onSuccess: ({ updatedEntity, previousData }) => {
       void queryClient.invalidateQueries({ queryKey: ["awesome-list-nav"] });
       void queryClient.invalidateQueries({ queryKey: ["awesome-list-data"] });
-      queryClient.invalidateQueries({ queryKey: [queryKey] });
+      void queryClient.invalidateQueries({ queryKey: [queryKey] });
       if (publicQueryKey) {
-        queryClient.invalidateQueries({ queryKey: [publicQueryKey] });
+        void queryClient.invalidateQueries({ queryKey: [publicQueryKey] });
       }
 
       // Record the update operation for undo/redo
@@ -1886,9 +1892,9 @@ export default function GenericCrudManager<T extends BaseEntityWithCount>({
     onSuccess: ({ id, previousData }) => {
       void queryClient.invalidateQueries({ queryKey: ["awesome-list-nav"] });
       void queryClient.invalidateQueries({ queryKey: ["awesome-list-data"] });
-      queryClient.invalidateQueries({ queryKey: [queryKey] });
+      void queryClient.invalidateQueries({ queryKey: [queryKey] });
       if (publicQueryKey) {
-        queryClient.invalidateQueries({ queryKey: [publicQueryKey] });
+        void queryClient.invalidateQueries({ queryKey: [publicQueryKey] });
       }
 
       // Record the delete operation for undo/redo
@@ -1950,9 +1956,9 @@ export default function GenericCrudManager<T extends BaseEntityWithCount>({
       }
     },
     onSuccess: (_, deletedIds) => {
-      queryClient.invalidateQueries({ queryKey: [queryKey] });
+      void queryClient.invalidateQueries({ queryKey: [queryKey] });
       if (publicQueryKey) {
-        queryClient.invalidateQueries({ queryKey: [publicQueryKey] });
+        void queryClient.invalidateQueries({ queryKey: [publicQueryKey] });
       }
       toast({
         title: "Success",
@@ -2687,7 +2693,7 @@ export default function GenericCrudManager<T extends BaseEntityWithCount>({
             {undoRedoEnabled && (
               <>
                 <Button
-                  onClick={handleUndo}
+                  onClick={() => void handleUndo()}
                   disabled={historyPointer < 0}
                   variant="outline"
                   data-testid="button-undo"
@@ -2697,7 +2703,7 @@ export default function GenericCrudManager<T extends BaseEntityWithCount>({
                   Undo
                 </Button>
                 <Button
-                  onClick={handleRedo}
+                  onClick={() => void handleRedo()}
                   disabled={historyPointer >= history.length - 1}
                   variant="outline"
                   data-testid="button-redo"
@@ -2755,7 +2761,7 @@ export default function GenericCrudManager<T extends BaseEntityWithCount>({
             <Button
               variant="outline"
               size="sm"
-              onClick={() => failedParentQueries.forEach(({ query }) => query.refetch())}
+              onClick={() => failedParentQueries.forEach(({ query }) => { void query.refetch(); })}
               data-testid="button-retry-parents"
             >
               Retry

@@ -420,7 +420,7 @@ export default function SearchDialog({ isOpen, setIsOpen }: SearchDialogProps) {
                     ) : (
                       <>
                         <span>Search failed. Please try again.</span>
-                        <button type="button" onKeyDown={keepNativeEnter} onClick={() => resourceQuery.refetch()}>Try again</button>
+                        <button type="button" onKeyDown={keepNativeEnter} onClick={() => void resourceQuery.refetch()}>Try again</button>
                       </>
                     )}
                   </div>

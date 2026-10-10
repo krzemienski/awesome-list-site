@@ -1,5 +1,6 @@
 import type { Request, RequestHandler } from "express";
 import { storage } from "../storage";
+import { asyncHandler } from "./asyncHandler";
 
 /**
  * API Key Authentication Middleware
@@ -80,7 +81,7 @@ async function resolveApiKey(req: Request, authHeader: string): Promise<ApiKeyRe
 }
 
 /** Require a valid API key; 401 when it is missing or invalid. */
-export const requireApiKey: RequestHandler = async (req, res, next) => {
+export const requireApiKey: RequestHandler = asyncHandler(async function requireApiKey(req, res, next) {
   const authHeader = req.headers.authorization;
   if (!authHeader) {
     return res.status(401).set("Cache-Control", "no-store").json({ message: "Unauthorized: Missing Authorization header" });
@@ -93,7 +94,7 @@ export const requireApiKey: RequestHandler = async (req, res, next) => {
     console.error("API key authentication error:", error);
     return res.status(500).json({ message: "Internal server error during authentication" });
   }
-};
+});
 
 /**
  * Optional API key for the public developer API. No Authorization header →
@@ -101,7 +102,7 @@ export const requireApiKey: RequestHandler = async (req, res, next) => {
  * invalid, revoked or expired key is a 401 rather than a silent downgrade,
  * so integrators learn their key stopped working.
  */
-export const optionalApiKey: RequestHandler = async (req, res, next) => {
+export const optionalApiKey: RequestHandler = asyncHandler(async function optionalApiKey(req, res, next) {
   const authHeader = req.headers.authorization;
   if (!authHeader) return next();
   try {
@@ -112,4 +113,4 @@ export const optionalApiKey: RequestHandler = async (req, res, next) => {
     console.error("API key authentication error:", error);
     return res.status(500).json({ message: "Internal server error during authentication" });
   }
-};
+});

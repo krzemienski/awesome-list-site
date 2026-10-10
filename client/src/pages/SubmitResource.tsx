@@ -363,7 +363,6 @@ export default function SubmitResource() {
       subscription.unsubscribe();
       if (draftSaveTimer.current) clearTimeout(draftSaveTimer.current);
     };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [form]);
 
   // R5-015: live cross-tab propagation — the `storage` event fires only in

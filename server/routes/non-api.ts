@@ -43,6 +43,7 @@ import type {
   LearningJourneyRepository,
   ResourceRepository,
 } from "../repositories";
+import { asyncHandler } from "../middleware/asyncHandler";
 
 /**
  * Dependencies the non-api handlers need from the composing module. These
@@ -568,6 +569,7 @@ ${urls.join('\n')}
         typeof rawPath !== 'string' ||
         !rawPath.startsWith('/') ||
         rawPath.length > 512 ||
+        // eslint-disable-next-line no-control-regex -- deliberate: this pattern exists to match control characters
         /[\u0000-\u001f\u007f]/.test(rawPath)
       ) {
         return { ok: false, status: 400, message: 'Invalid path parameter' };
@@ -683,7 +685,7 @@ ${urls.join('\n')}
   });
 
   // SEO routes
-  app.get("/sitemap.xml", generateSitemap);
-  app.get("/og-image.svg", generateOpenGraphImage);
-  app.get("/og-image.png", generateOpenGraphImagePng);
+  app.get("/sitemap.xml", asyncHandler(generateSitemap));
+  app.get("/og-image.svg", asyncHandler(generateOpenGraphImage));
+  app.get("/og-image.png", asyncHandler(generateOpenGraphImagePng));
 }

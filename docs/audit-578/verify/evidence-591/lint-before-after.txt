@@ -1,0 +1,8 @@
+== /tmp/j05/before.json total 6764
+by area {"artifacts":311,"client":1235,"deploy":5,"playwright.config.ts":2,"scripts":617,"server":3611,"shared":31,"tests":952}
+app correctness 380 [["@typescript-eslint/no-misused-promises",202],["@typescript-eslint/no-floating-promises",122],["react-hooks/exhaustive-deps",15],["no-control-regex",14],["react/jsx-no-comment-textnodes",12],["@typescript-eslint/no-unused-expressions",5],["@typescript-eslint/prefer-promise-reject-errors",4],["no-misleading-character-class",3],["(eslint-directive)",2],["react/no-unknown-property",1]]
+top rules [["@typescript-eslint/no-unsafe-member-access",2109],["@typescript-eslint/no-unsafe-assignment",920],["@typescript-eslint/no-explicit-any",793],["@typescript-eslint/prefer-nullish-coalescing",648],["@typescript-eslint/no-unsafe-argument",397],["@typescript-eslint/no-unsafe-call",272],["@typescript-eslint/no-misused-promises",206],["@typescript-eslint/no-empty-function",179],["@typescript-eslint/no-unsafe-return",158],["@typescript-eslint/no-unused-vars",156]]
+== /tmp/j05/final.json total 6382
+by area {"artifacts":311,"client":1064,"deploy":5,"playwright.config.ts":2,"scripts":617,"server":3404,"shared":27,"tests":952}
+app correctness 0 []
+top rules [["@typescript-eslint/no-unsafe-member-access",2109],["@typescript-eslint/no-unsafe-assignment",920],["@typescript-eslint/no-explicit-any",792],["@typescript-eslint/prefer-nullish-coalescing",648],["@typescript-eslint/no-unsafe-argument",397],["@typescript-eslint/no-unsafe-call",272],["@typescript-eslint/no-empty-function",179],["@typescript-eslint/no-unsafe-return",158],["@typescript-eslint/no-unused-vars",156],["@typescript-eslint/array-type",89]]

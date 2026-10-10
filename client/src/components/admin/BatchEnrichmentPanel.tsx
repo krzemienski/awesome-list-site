@@ -202,7 +202,7 @@ export default function BatchEnrichmentPanel() {
       setIsPolling(true);
       setAuthToken("");
       setConfirmStart(false);
-      queryClient.invalidateQueries({ queryKey: ['/api/enrichment/jobs'] });
+      void queryClient.invalidateQueries({ queryKey: ['/api/enrichment/jobs'] });
       toast({
         title: "Batch enrichment started",
         description: "AI enrichment job has been queued successfully."
@@ -219,7 +219,7 @@ export default function BatchEnrichmentPanel() {
       });
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['/api/enrichment/jobs'] });
+      void queryClient.invalidateQueries({ queryKey: ['/api/enrichment/jobs'] });
       setJobToCancel(null);
       toast({
         title: "Job cancelled",

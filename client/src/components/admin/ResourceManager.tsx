@@ -401,11 +401,11 @@ export default function ResourceManager({ createRequest = 0 }: { createRequest?:
       });
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['/api/admin/resources'] });
-      queryClient.invalidateQueries({ queryKey: ['/api/resources'] });
-      queryClient.invalidateQueries({ queryKey: ["awesome-list-data"] });
-      queryClient.invalidateQueries({ queryKey: ["awesome-list-nav"] });
-      queryClient.invalidateQueries({ queryKey: ["/api/admin/stats"] });
+      void queryClient.invalidateQueries({ queryKey: ['/api/admin/resources'] });
+      void queryClient.invalidateQueries({ queryKey: ['/api/resources'] });
+      void queryClient.invalidateQueries({ queryKey: ["awesome-list-data"] });
+      void queryClient.invalidateQueries({ queryKey: ["awesome-list-nav"] });
+      void queryClient.invalidateQueries({ queryKey: ["/api/admin/stats"] });
       setEditDialogOpen(false);
       setSelectedResource(null);
       toast({
@@ -596,11 +596,11 @@ export default function ResourceManager({ createRequest = 0 }: { createRequest?:
       });
     },
     onSuccess: (createdResource: AdminResource) => {
-      queryClient.invalidateQueries({ queryKey: ['/api/admin/resources'] });
-      queryClient.invalidateQueries({ queryKey: ['/api/resources'] });
-      queryClient.invalidateQueries({ queryKey: ["awesome-list-data"] });
-      queryClient.invalidateQueries({ queryKey: ["awesome-list-nav"] });
-      queryClient.invalidateQueries({ queryKey: ["/api/admin/stats"] });
+      void queryClient.invalidateQueries({ queryKey: ['/api/admin/resources'] });
+      void queryClient.invalidateQueries({ queryKey: ['/api/resources'] });
+      void queryClient.invalidateQueries({ queryKey: ["awesome-list-data"] });
+      void queryClient.invalidateQueries({ queryKey: ["awesome-list-nav"] });
+      void queryClient.invalidateQueries({ queryKey: ["/api/admin/stats"] });
       // The catalog opens on approved resources, while admin-created entries
       // normally enter the pending workflow. Move the table to the response's
       // actual status and clear stale filters so the new row is immediately
@@ -636,11 +636,11 @@ export default function ResourceManager({ createRequest = 0 }: { createRequest?:
       });
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['/api/admin/resources'] });
-      queryClient.invalidateQueries({ queryKey: ['/api/resources'] });
-      queryClient.invalidateQueries({ queryKey: ["awesome-list-data"] });
-      queryClient.invalidateQueries({ queryKey: ["awesome-list-nav"] });
-      queryClient.invalidateQueries({ queryKey: ["/api/admin/stats"] });
+      void queryClient.invalidateQueries({ queryKey: ['/api/admin/resources'] });
+      void queryClient.invalidateQueries({ queryKey: ['/api/resources'] });
+      void queryClient.invalidateQueries({ queryKey: ["awesome-list-data"] });
+      void queryClient.invalidateQueries({ queryKey: ["awesome-list-nav"] });
+      void queryClient.invalidateQueries({ queryKey: ["/api/admin/stats"] });
       setDeleteDialogOpen(false);
       setSelectedResource(null);
       toast({
@@ -665,11 +665,11 @@ export default function ResourceManager({ createRequest = 0 }: { createRequest?:
       });
     },
     onSuccess: (result: BulkResourceResult, ids: number[]) => {
-      queryClient.invalidateQueries({ queryKey: ['/api/admin/resources'] });
-      queryClient.invalidateQueries({ queryKey: ['/api/resources'] });
-      queryClient.invalidateQueries({ queryKey: ["awesome-list-data"] });
-      queryClient.invalidateQueries({ queryKey: ["awesome-list-nav"] });
-      queryClient.invalidateQueries({ queryKey: ["/api/admin/stats"] });
+      void queryClient.invalidateQueries({ queryKey: ['/api/admin/resources'] });
+      void queryClient.invalidateQueries({ queryKey: ['/api/resources'] });
+      void queryClient.invalidateQueries({ queryKey: ["awesome-list-data"] });
+      void queryClient.invalidateQueries({ queryKey: ["awesome-list-nav"] });
+      void queryClient.invalidateQueries({ queryKey: ["/api/admin/stats"] });
       setSelectedResourceIds([]);
       toast(bulkOutcomeToast("approved", "Resources Approved", result, ids.length));
     },
@@ -690,11 +690,11 @@ export default function ResourceManager({ createRequest = 0 }: { createRequest?:
       });
     },
     onSuccess: (result: BulkResourceResult, variables: { ids: number[]; reason: string }) => {
-      queryClient.invalidateQueries({ queryKey: ['/api/admin/resources'] });
-      queryClient.invalidateQueries({ queryKey: ['/api/resources'] });
-      queryClient.invalidateQueries({ queryKey: ["awesome-list-data"] });
-      queryClient.invalidateQueries({ queryKey: ["awesome-list-nav"] });
-      queryClient.invalidateQueries({ queryKey: ["/api/admin/stats"] });
+      void queryClient.invalidateQueries({ queryKey: ['/api/admin/resources'] });
+      void queryClient.invalidateQueries({ queryKey: ['/api/resources'] });
+      void queryClient.invalidateQueries({ queryKey: ["awesome-list-data"] });
+      void queryClient.invalidateQueries({ queryKey: ["awesome-list-nav"] });
+      void queryClient.invalidateQueries({ queryKey: ["/api/admin/stats"] });
       setSelectedResourceIds([]);
       focusTableOnCloseRef.current = true;
       setRejectDialogOpen(false);
@@ -717,11 +717,11 @@ export default function ResourceManager({ createRequest = 0 }: { createRequest?:
       });
     },
     onSuccess: (result: BulkResourceResult, ids: number[]) => {
-      queryClient.invalidateQueries({ queryKey: ['/api/admin/resources'] });
-      queryClient.invalidateQueries({ queryKey: ['/api/resources'] });
-      queryClient.invalidateQueries({ queryKey: ["awesome-list-data"] });
-      queryClient.invalidateQueries({ queryKey: ["awesome-list-nav"] });
-      queryClient.invalidateQueries({ queryKey: ["/api/admin/stats"] });
+      void queryClient.invalidateQueries({ queryKey: ['/api/admin/resources'] });
+      void queryClient.invalidateQueries({ queryKey: ['/api/resources'] });
+      void queryClient.invalidateQueries({ queryKey: ["awesome-list-data"] });
+      void queryClient.invalidateQueries({ queryKey: ["awesome-list-nav"] });
+      void queryClient.invalidateQueries({ queryKey: ["/api/admin/stats"] });
       setSelectedResourceIds([]);
       toast(bulkOutcomeToast("deleted", "Resources Deleted", result, ids.length));
     },
@@ -1357,7 +1357,7 @@ export default function ResourceManager({ createRequest = 0 }: { createRequest?:
                 size="sm"
                 onClick={(event) => {
                   handoffFocusOnUnmount(event.currentTarget, () => tableRegionRef.current);
-                  refetch();
+                  void refetch();
                 }}
                 data-testid="button-resources-retry"
               >
@@ -1399,7 +1399,7 @@ export default function ResourceManager({ createRequest = 0 }: { createRequest?:
                   size="sm"
                   onClick={(event) => {
                     handoffFocusOnUnmount(event.currentTarget, () => tableRegionRef.current);
-                    refetch();
+                    void refetch();
                   }}
                   data-testid="button-resources-offline-retry"
                 >

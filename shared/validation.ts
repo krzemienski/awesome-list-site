@@ -51,6 +51,7 @@ const COMBINING_MARKS_RE = /\p{Mn}/gu;
  * Control characters for SINGLE-LINE fields (titles, tags, names, slugs,
  * prompts): every C0 control + DEL is rejected, including \t \n \r (R5-019).
  */
+// eslint-disable-next-line no-control-regex -- deliberate: this pattern exists to match control characters
 export const SINGLE_LINE_CONTROL_RE = /[\u0000-\u001F\u007F]/;
 
 /**
@@ -58,6 +59,7 @@ export const SINGLE_LINE_CONTROL_RE = /[\u0000-\u001F\u007F]/;
  * tolerated (the description transform collapses them to single spaces);
  * everything else — NUL, BEL, ESC, DEL … — is rejected (R5-019).
  */
+// eslint-disable-next-line no-control-regex -- deliberate: this pattern exists to match control characters
 export const MULTILINE_CONTROL_RE = /[\u0000-\u0008\u000B\u000C\u000E-\u001F\u007F]/;
 
 const CONTROL_CHARS_MESSAGE = "must not contain control characters";
@@ -253,6 +255,7 @@ const urlCoreChecks = (schema: z.ZodString) =>
     .trim()
     .min(1, "URL is required")
     .max(MAX_URL_LENGTH, `URL must be at most ${MAX_URL_LENGTH} characters`)
+    // eslint-disable-next-line no-control-regex -- deliberate: this pattern exists to match control characters
     .refine((v) => !/[\u0000-\u001F\u007F]/.test(v), "URL must not contain control characters")
     .refine((v) => !v.includes("\\"), "URL must not contain backslashes")
     .refine((v) => !/\s/.test(v), URL_WHITESPACE_MESSAGE);

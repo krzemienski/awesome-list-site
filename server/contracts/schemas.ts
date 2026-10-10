@@ -111,6 +111,7 @@ export const httpsUrlContractSchema = z
   .trim()
   .min(1, "URL is required")
   .max(MAX_URL_LENGTH, `URL must be at most ${MAX_URL_LENGTH} characters`)
+  // eslint-disable-next-line no-control-regex -- deliberate: this pattern exists to match control characters
   .refine((v) => !/[\u0000-\u001F\u007F]/.test(v), "URL must not contain control characters")
   .refine((v) => !v.includes("\\"), "URL must not contain backslashes")
   .refine((v) => HTTPS_URL_RE.test(v), "Must be a valid HTTPS URL")
@@ -125,6 +126,7 @@ export const webUrlContractSchema = z
   .trim()
   .min(1, "URL is required")
   .max(MAX_URL_LENGTH, `URL must be at most ${MAX_URL_LENGTH} characters`)
+  // eslint-disable-next-line no-control-regex -- deliberate: this pattern exists to match control characters
   .refine((v) => !/[\u0000-\u001F\u007F]/.test(v), "URL must not contain control characters")
   .refine((v) => !v.includes("\\"), "URL must not contain backslashes")
   .refine((v) => WEB_URL_RE.test(v), "URL must start with http:// or https://")

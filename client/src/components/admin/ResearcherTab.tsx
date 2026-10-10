@@ -392,8 +392,8 @@ export default function ResearcherTab({ initialTab = "launch" }: ResearcherTabPr
     onSuccess: (data: any) => {
       setConfirmLaunch(false);
       setIsPolling(true);
-      queryClient.invalidateQueries({ queryKey: ['/api/researcher/jobs'] });
-      queryClient.invalidateQueries({ queryKey: ['/api/researcher/discoveries'] });
+      void queryClient.invalidateQueries({ queryKey: ['/api/researcher/jobs'] });
+      void queryClient.invalidateQueries({ queryKey: ['/api/researcher/discoveries'] });
       // Auto-open the live log so the admin can see exactly what's happening.
       if (data?.jobId) {
         setSelectedJobId(data.jobId);
@@ -499,7 +499,7 @@ export default function ResearcherTab({ initialTab = "launch" }: ResearcherTabPr
       return await apiRequest(`/api/researcher/jobs/${jobId}`, { method: 'DELETE' });
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['/api/researcher/jobs'] });
+      void queryClient.invalidateQueries({ queryKey: ['/api/researcher/jobs'] });
       toast({ title: "Job cancelled" });
     },
     onError: (error, jobId) => {
@@ -522,8 +522,8 @@ export default function ResearcherTab({ initialTab = "launch" }: ResearcherTabPr
     },
     onSuccess: (data: any) => {
       setConfirmApproveAll(false);
-      queryClient.invalidateQueries({ queryKey: ['/api/researcher/discoveries'] });
-      queryClient.invalidateQueries({ queryKey: ['/api/researcher/jobs'] });
+      void queryClient.invalidateQueries({ queryKey: ['/api/researcher/discoveries'] });
+      void queryClient.invalidateQueries({ queryKey: ['/api/researcher/jobs'] });
       const parts = [`${data?.approved ?? 0} approved`];
       if (data?.skippedDuplicates) parts.push(`${data.skippedDuplicates} skipped as duplicates`);
       if (data?.failed?.length) parts.push(`${data.failed.length} failed`);
@@ -542,8 +542,8 @@ export default function ResearcherTab({ initialTab = "launch" }: ResearcherTabPr
       return await apiRequest(`/api/researcher/discoveries/${discoveryId}/approve`, { method: 'POST' });
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['/api/researcher/discoveries'] });
-      queryClient.invalidateQueries({ queryKey: ['/api/researcher/jobs'] });
+      void queryClient.invalidateQueries({ queryKey: ['/api/researcher/discoveries'] });
+      void queryClient.invalidateQueries({ queryKey: ['/api/researcher/jobs'] });
       toast({ title: "Resource approved", description: "Discovery added to the database." });
     },
     onError: (error: any) => {
@@ -559,8 +559,8 @@ export default function ResearcherTab({ initialTab = "launch" }: ResearcherTabPr
       });
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['/api/researcher/discoveries'] });
-      queryClient.invalidateQueries({ queryKey: ['/api/researcher/jobs'] });
+      void queryClient.invalidateQueries({ queryKey: ['/api/researcher/discoveries'] });
+      void queryClient.invalidateQueries({ queryKey: ['/api/researcher/jobs'] });
       setRejectDialogId(null);
       setRejectReason("");
       toast({ title: "Discovery rejected" });
@@ -576,7 +576,7 @@ export default function ResearcherTab({ initialTab = "launch" }: ResearcherTabPr
     if (hasActive !== isPolling) {
       setIsPolling(hasActive);
     }
-  }, [activeJobs.length]);
+  }, [activeJobs.length, isPolling]);
 
   return (
     <div className="queues-agent queues-agent--research">

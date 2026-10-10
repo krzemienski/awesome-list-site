@@ -231,6 +231,9 @@ export function SuggestEditDialog({ resource, open, onOpenChange }: SuggestEditD
       subSubcategory: "",
     });
     setClaudeSuggestions(null);
+    // Deliberately keyed to open + resource identity only: re-running when the
+    // same resource's fields refetch mid-edit would wipe the user's typing.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [open, resource.id]);
 
   useEffect(() => {
@@ -245,8 +248,11 @@ export function SuggestEditDialog({ resource, open, onOpenChange }: SuggestEditD
     }
   }, [open, categories, resource.category, form]);
 
+  const watchedCategoryId = form.watch('category');
+  const watchedSubcategoryId = form.watch('subcategory');
+
   useEffect(() => {
-    const selectedCategoryId = form.watch('category');
+    const selectedCategoryId = watchedCategoryId;
     if (open && subcategories.length > 0 && selectedCategoryId && resource.subcategory) {
       const matchedSubcategory = subcategories.find(
         s => s.categoryId === parseInt(selectedCategoryId) &&
@@ -257,10 +263,10 @@ export function SuggestEditDialog({ resource, open, onOpenChange }: SuggestEditD
         form.setValue('subcategory', matchedSubcategory.id.toString());
       }
     }
-  }, [open, subcategories, resource.subcategory, form.watch('category'), form]);
+  }, [open, subcategories, resource.subcategory, watchedCategoryId, form]);
 
   useEffect(() => {
-    const selectedSubcategoryId = form.watch('subcategory');
+    const selectedSubcategoryId = watchedSubcategoryId;
     if (open && subSubcategories.length > 0 && selectedSubcategoryId && resource.subSubcategory) {
       const matchedSubSubcategory = subSubcategories.find(
         s => s.subcategoryId === parseInt(selectedSubcategoryId) &&
@@ -271,7 +277,7 @@ export function SuggestEditDialog({ resource, open, onOpenChange }: SuggestEditD
         form.setValue('subSubcategory', matchedSubSubcategory.id.toString());
       }
     }
-  }, [open, subSubcategories, resource.subSubcategory, form.watch('subcategory'), form]);
+  }, [open, subSubcategories, resource.subSubcategory, watchedSubcategoryId, form]);
 
   const selectedCategory = form.watch("category");
   const selectedSubcategory = form.watch("subcategory");
@@ -396,8 +402,8 @@ export function SuggestEditDialog({ resource, open, onOpenChange }: SuggestEditD
       onOpenChange(false);
       form.reset();
       setClaudeSuggestions(null);
-      queryClient.invalidateQueries({ queryKey: ['/api/resources'] });
-      queryClient.invalidateQueries({ queryKey: ['/api/user/contributions'] });
+      void queryClient.invalidateQueries({ queryKey: ['/api/resources'] });
+      void queryClient.invalidateQueries({ queryKey: ['/api/user/contributions'] });
     },
     onError: (error: Error) => {
       // C05: a duplicate URL is a field problem — explain it next to the URL.
@@ -450,7 +456,7 @@ export function SuggestEditDialog({ resource, open, onOpenChange }: SuggestEditD
         <DialogContent className="max-w-md">
           <DialogHeader>
             {/* BUG-048 (run14): user-facing copy, not dev jargon */}
-            <div className="eyebrow" aria-hidden>// Sign in required</div>
+            <div className="eyebrow" aria-hidden>{"// Sign in required"}</div>
             <DialogTitle className="font-display text-2xl font-medium tracking-tight">
               Sign in <em className="not-italic" style={{ fontStyle: 'italic', color: 'var(--accent-ink)' }}>required</em>
             </DialogTitle>
@@ -495,7 +501,7 @@ export function SuggestEditDialog({ resource, open, onOpenChange }: SuggestEditD
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
         <DialogHeader>
-          <div className="eyebrow" aria-hidden>// Suggest edit</div>
+          <div className="eyebrow" aria-hidden>{"// Suggest edit"}</div>
           <DialogTitle className="font-display text-2xl font-medium tracking-tight">
             Suggest <em className="not-italic" style={{ fontStyle: 'italic', color: 'var(--accent-ink)' }}>edit</em>
             <span className="block text-sm font-body font-normal mt-1" style={{ color: 'var(--text-2)' }}>
@@ -508,7 +514,7 @@ export function SuggestEditDialog({ resource, open, onOpenChange }: SuggestEditD
         </DialogHeader>
 
         <Form {...form}>
-          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+          <form onSubmit={(event) => void form.handleSubmit(onSubmit)(event)} className="space-y-4">
             <FormField
               control={form.control}
               name="title"
@@ -667,7 +673,7 @@ export function SuggestEditDialog({ resource, open, onOpenChange }: SuggestEditD
               <Button
                 type="button"
                 variant="outline"
-                onClick={handleAnalyzeWithAI}
+                onClick={() => void handleAnalyzeWithAI()}
                 disabled={analyzingWithAI}
                 data-testid="button-analyze-ai"
               >

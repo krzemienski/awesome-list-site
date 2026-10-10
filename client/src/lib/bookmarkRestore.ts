@@ -59,8 +59,8 @@ export async function restoreRemovedBookmark(
     partial = results.some((result) => result.status === "rejected");
   }
 
-  queryClient.invalidateQueries({ queryKey: ["/api/bookmarks"] });
-  queryClient.invalidateQueries({ queryKey: ["/api/collections?includeArchived=true"] });
-  queryClient.invalidateQueries({ queryKey: [`/api/resources/${resourceId}`] });
+  void queryClient.invalidateQueries({ queryKey: ["/api/bookmarks"] });
+  void queryClient.invalidateQueries({ queryKey: ["/api/collections?includeArchived=true"] });
+  void queryClient.invalidateQueries({ queryKey: [`/api/resources/${resourceId}`] });
   return { partial };
 }

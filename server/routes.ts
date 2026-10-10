@@ -99,7 +99,7 @@ function sendOperationalFailure(
   return res.status(500).json({ message: fallbackMessage });
 }
 
-const isAdmin = async (req: any, res: Response, next: any) => {
+const isAdmin = (req: any, res: Response, next: any) => {
   try {
     // req.dbUser is resolved fresh per request by clerkUserContext, so role
     // changes apply immediately (same semantics as the old per-request fetch).

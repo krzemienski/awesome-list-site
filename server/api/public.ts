@@ -44,6 +44,7 @@ import {
   PUBLIC_API_ERROR_CACHE_CONTROL,
   PUBLIC_API_KEYED_CACHE_CONTROL,
 } from "../http-cache-policy";
+import { asyncHandler } from "../middleware/asyncHandler";
 
 /**
  * Responses differ by the Authorization header (valid key → own bucket,
@@ -175,7 +176,7 @@ export function registerPublicApiRoutes(app: Express): void {
    *   totalPages: number
    * }
    */
-  app.get('/api/public/resources', varyOnAuthorization, optionalApiKey, publicApiRateLimiter, async (req: Request, res: Response) => {
+  app.get('/api/public/resources', varyOnAuthorization, optionalApiKey, publicApiRateLimiter, asyncHandler(async (req: Request, res: Response) => {
     try {
       // NB-003/NB-004 (run23): page/limit must be validated positive ints.
       // limit=-1 previously passed Math.min unchecked and PG treats LIMIT -1
@@ -229,7 +230,7 @@ export function registerPublicApiRoutes(app: Express): void {
       console.error('Error fetching public resources:', error);
       res.status(500).json({ message: 'Failed to fetch resources' });
     }
-  });
+  }));
 
   /**
    * @swagger
@@ -292,7 +293,7 @@ export function registerPublicApiRoutes(app: Express): void {
    * - 404: Resource not found or not approved
    * - 500: Server error
    */
-  app.get('/api/public/resources/:id', varyOnAuthorization, optionalApiKey, publicApiRateLimiter, async (req: Request, res: Response) => {
+  app.get('/api/public/resources/:id', varyOnAuthorization, optionalApiKey, publicApiRateLimiter, asyncHandler(async (req: Request, res: Response) => {
     try {
       // NB-008 (run23): bound-check — all-digit ids past int4 range used to
       // overflow inside PG → 500.
@@ -324,7 +325,7 @@ export function registerPublicApiRoutes(app: Express): void {
       console.error('Error fetching public resource:', error);
       res.status(500).json({ message: 'Failed to fetch resource' });
     }
-  });
+  }));
 
   // ============= Public Category Routes =============
 
@@ -367,7 +368,7 @@ export function registerPublicApiRoutes(app: Express): void {
    *   categories: Category[]
    * }
    */
-  app.get('/api/public/categories', varyOnAuthorization, optionalApiKey, publicApiRateLimiter, async (req: Request, res: Response) => {
+  app.get('/api/public/categories', varyOnAuthorization, optionalApiKey, publicApiRateLimiter, asyncHandler(async (req: Request, res: Response) => {
     try {
       const categories = await storage.listCategories();
       // Task #327 cache contract: see server/http-cache-policy.ts.
@@ -377,7 +378,7 @@ export function registerPublicApiRoutes(app: Express): void {
       console.error('Error fetching public categories:', error);
       res.status(500).json({ message: 'Failed to fetch categories' });
     }
-  });
+  }));
 
   // ============= Public Tag Routes =============
 
@@ -420,7 +421,7 @@ export function registerPublicApiRoutes(app: Express): void {
    *   tags: Tag[]
    * }
    */
-  app.get('/api/public/tags', varyOnAuthorization, optionalApiKey, publicApiRateLimiter, async (req: Request, res: Response) => {
+  app.get('/api/public/tags', varyOnAuthorization, optionalApiKey, publicApiRateLimiter, asyncHandler(async (req: Request, res: Response) => {
     try {
       const payload = await listApprovedResourceTags();
       // Task #327 cache contract: see server/http-cache-policy.ts.
@@ -430,7 +431,7 @@ export function registerPublicApiRoutes(app: Express): void {
       console.error('Error fetching public tags:', error);
       res.status(500).json({ message: 'Failed to fetch tags' });
     }
-  });
+  }));
 
   // ============= API Key Identity Route =============
 

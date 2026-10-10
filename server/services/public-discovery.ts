@@ -77,7 +77,8 @@ export async function resolveTaxonomyPage(match: TaxonomyMatch, level: ListingLe
   api.delete("subcategory");
   api.delete("subSubcategory");
   api.set("search", query);
-  sort === "default" ? api.delete("sort") : api.set("sort", sort);
+  if (sort === "default") api.delete("sort");
+  else api.set("sort", sort);
   if (kind) api.set("kind", kind);
   if (level === "category") {
     api.set("category", match.node.slug);

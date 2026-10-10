@@ -1,0 +1,1760 @@
+{
+  "description": "Per-file, per-rule ESLint counts that may only shrink. Written by `npm run lint:ratchet -- --update`; see scripts/validation/lint-ratchet.mjs.",
+  "totals": {
+    "@typescript-eslint/array-type": 89,
+    "@typescript-eslint/ban-ts-comment": 4,
+    "@typescript-eslint/consistent-generic-constructors": 7,
+    "@typescript-eslint/consistent-indexed-object-style": 10,
+    "@typescript-eslint/consistent-type-definitions": 60,
+    "@typescript-eslint/dot-notation": 1,
+    "@typescript-eslint/no-base-to-string": 16,
+    "@typescript-eslint/no-empty-function": 179,
+    "@typescript-eslint/no-empty-object-type": 1,
+    "@typescript-eslint/no-explicit-any": 792,
+    "@typescript-eslint/no-floating-promises": 4,
+    "@typescript-eslint/no-inferrable-types": 36,
+    "@typescript-eslint/no-misused-promises": 4,
+    "@typescript-eslint/no-redundant-type-constituents": 7,
+    "@typescript-eslint/no-unnecessary-type-assertion": 76,
+    "@typescript-eslint/no-unsafe-argument": 397,
+    "@typescript-eslint/no-unsafe-assignment": 920,
+    "@typescript-eslint/no-unsafe-call": 272,
+    "@typescript-eslint/no-unsafe-member-access": 2109,
+    "@typescript-eslint/no-unsafe-return": 158,
+    "@typescript-eslint/no-unused-vars": 156,
+    "@typescript-eslint/non-nullable-type-assertion-style": 10,
+    "@typescript-eslint/only-throw-error": 2,
+    "@typescript-eslint/prefer-for-of": 1,
+    "@typescript-eslint/prefer-includes": 4,
+    "@typescript-eslint/prefer-nullish-coalescing": 648,
+    "@typescript-eslint/prefer-optional-chain": 54,
+    "@typescript-eslint/prefer-regexp-exec": 59,
+    "@typescript-eslint/prefer-string-starts-ends-with": 9,
+    "@typescript-eslint/require-await": 64,
+    "@typescript-eslint/restrict-template-expressions": 1,
+    "@typescript-eslint/unbound-method": 2,
+    "no-dupe-keys": 1,
+    "no-empty": 20,
+    "no-redeclare": 2,
+    "no-regex-spaces": 6,
+    "no-undef": 45,
+    "no-unsafe-finally": 2,
+    "no-useless-escape": 48,
+    "prefer-const": 12,
+    "react-refresh/only-export-components": 11,
+    "react/no-unescaped-entities": 76,
+    "react/prop-types": 7
+  },
+  "files": {
+    "artifacts/awesome-video-design-system/src/canonical/CanonicalDocs.tsx": {
+      "@typescript-eslint/ban-ts-comment": 1,
+      "@typescript-eslint/no-unsafe-argument": 1,
+      "@typescript-eslint/no-unsafe-assignment": 1,
+      "@typescript-eslint/no-unsafe-call": 1,
+      "@typescript-eslint/no-unsafe-return": 1,
+      "@typescript-eslint/prefer-nullish-coalescing": 3
+    },
+    "artifacts/awesome-video-design-system/src/canonical/CanonicalShowcase.tsx": {
+      "@typescript-eslint/ban-ts-comment": 1,
+      "@typescript-eslint/no-unsafe-argument": 1,
+      "@typescript-eslint/no-unsafe-assignment": 141,
+      "@typescript-eslint/no-unsafe-call": 10,
+      "@typescript-eslint/no-unsafe-member-access": 109,
+      "@typescript-eslint/no-unsafe-return": 3,
+      "@typescript-eslint/no-unused-vars": 5,
+      "@typescript-eslint/prefer-nullish-coalescing": 4
+    },
+    "artifacts/awesome-video-design-system/src/canonical/DocsContent.tsx": {
+      "@typescript-eslint/ban-ts-comment": 1,
+      "@typescript-eslint/no-unsafe-assignment": 9,
+      "@typescript-eslint/no-unsafe-call": 4,
+      "@typescript-eslint/no-unsafe-member-access": 8,
+      "@typescript-eslint/no-unused-vars": 1,
+      "@typescript-eslint/prefer-nullish-coalescing": 2
+    },
+    "artifacts/awesome-video-design-system/src/canonical/useShowcaseTheme.ts": {
+      "@typescript-eslint/consistent-type-definitions": 1,
+      "@typescript-eslint/prefer-nullish-coalescing": 1
+    },
+    "artifacts/awesome-video-design-system/vite.config.ts": {
+      "@typescript-eslint/prefer-nullish-coalescing": 2
+    },
+    "client/src/App.tsx": {
+      "@typescript-eslint/consistent-type-definitions": 1,
+      "@typescript-eslint/no-empty-function": 1,
+      "@typescript-eslint/no-unsafe-argument": 1,
+      "@typescript-eslint/no-unsafe-assignment": 6,
+      "@typescript-eslint/no-unsafe-member-access": 1,
+      "@typescript-eslint/prefer-nullish-coalescing": 3,
+      "react/no-unescaped-entities": 1
+    },
+    "client/src/components/admin/AdminOverview.tsx": {
+      "@typescript-eslint/no-unused-vars": 1
+    },
+    "client/src/components/admin/AgentCommsGraph.tsx": {
+      "@typescript-eslint/prefer-nullish-coalescing": 2
+    },
+    "client/src/components/admin/AgentEventLog.tsx": {
+      "@typescript-eslint/no-base-to-string": 1,
+      "@typescript-eslint/no-explicit-any": 10,
+      "@typescript-eslint/no-unsafe-member-access": 10,
+      "@typescript-eslint/prefer-nullish-coalescing": 2
+    },
+    "client/src/components/admin/AuditTab.tsx": {
+      "@typescript-eslint/no-explicit-any": 1,
+      "@typescript-eslint/no-unsafe-argument": 1,
+      "@typescript-eslint/no-unsafe-assignment": 4,
+      "@typescript-eslint/no-unsafe-call": 1,
+      "@typescript-eslint/no-unsafe-member-access": 12,
+      "@typescript-eslint/no-unsafe-return": 2,
+      "@typescript-eslint/prefer-nullish-coalescing": 2,
+      "react/no-unescaped-entities": 1
+    },
+    "client/src/components/admin/BatchEnrichmentPanel.tsx": {
+      "@typescript-eslint/no-unsafe-return": 3,
+      "@typescript-eslint/prefer-nullish-coalescing": 34,
+      "react/no-unescaped-entities": 4
+    },
+    "client/src/components/admin/DatabaseTab.tsx": {
+      "@typescript-eslint/no-unused-vars": 1
+    },
+    "client/src/components/admin/ExportTab.tsx": {
+      "@typescript-eslint/no-unsafe-return": 1,
+      "@typescript-eslint/prefer-nullish-coalescing": 2
+    },
+    "client/src/components/admin/GenericCrudManager.tsx": {
+      "@typescript-eslint/array-type": 4,
+      "@typescript-eslint/consistent-indexed-object-style": 1,
+      "@typescript-eslint/no-explicit-any": 22,
+      "@typescript-eslint/no-unnecessary-type-assertion": 5,
+      "@typescript-eslint/no-unsafe-argument": 7,
+      "@typescript-eslint/no-unsafe-assignment": 17,
+      "@typescript-eslint/no-unsafe-call": 4,
+      "@typescript-eslint/no-unsafe-member-access": 16,
+      "@typescript-eslint/no-unsafe-return": 7,
+      "@typescript-eslint/no-unused-vars": 4,
+      "@typescript-eslint/prefer-nullish-coalescing": 46,
+      "@typescript-eslint/prefer-optional-chain": 2,
+      "react/no-unescaped-entities": 4
+    },
+    "client/src/components/admin/GitHubSyncPanel.tsx": {
+      "@typescript-eslint/no-unsafe-return": 2,
+      "@typescript-eslint/no-unused-vars": 2,
+      "@typescript-eslint/prefer-nullish-coalescing": 7
+    },
+    "client/src/components/admin/JourneyStepsManager.tsx": {
+      "@typescript-eslint/no-unsafe-assignment": 4,
+      "@typescript-eslint/no-unsafe-member-access": 3,
+      "@typescript-eslint/no-unsafe-return": 6,
+      "react/no-unescaped-entities": 7
+    },
+    "client/src/components/admin/LinkHealthDashboard.tsx": {
+      "@typescript-eslint/prefer-nullish-coalescing": 11,
+      "react/no-unescaped-entities": 1
+    },
+    "client/src/components/admin/PendingEdits.tsx": {
+      "@typescript-eslint/no-base-to-string": 2,
+      "@typescript-eslint/no-unnecessary-type-assertion": 2,
+      "@typescript-eslint/no-unsafe-assignment": 1,
+      "@typescript-eslint/no-unsafe-return": 2,
+      "react/no-unescaped-entities": 2
+    },
+    "client/src/components/admin/PendingResources.tsx": {
+      "@typescript-eslint/no-explicit-any": 1,
+      "@typescript-eslint/no-unnecessary-type-assertion": 2,
+      "@typescript-eslint/no-unsafe-assignment": 3,
+      "@typescript-eslint/no-unsafe-member-access": 2
+    },
+    "client/src/components/admin/ResearchWorkspace.tsx": {
+      "@typescript-eslint/no-unsafe-return": 2,
+      "@typescript-eslint/prefer-nullish-coalescing": 1,
+      "@typescript-eslint/prefer-regexp-exec": 1
+    },
+    "client/src/components/admin/ResearcherTab.tsx": {
+      "@typescript-eslint/array-type": 2,
+      "@typescript-eslint/no-explicit-any": 10,
+      "@typescript-eslint/no-unnecessary-type-assertion": 1,
+      "@typescript-eslint/no-unsafe-argument": 2,
+      "@typescript-eslint/no-unsafe-assignment": 4,
+      "@typescript-eslint/no-unsafe-call": 3,
+      "@typescript-eslint/no-unsafe-member-access": 23,
+      "@typescript-eslint/no-unsafe-return": 10,
+      "@typescript-eslint/prefer-nullish-coalescing": 40,
+      "react/no-unescaped-entities": 3
+    },
+    "client/src/components/admin/ResourceManager.tsx": {
+      "@typescript-eslint/no-explicit-any": 3,
+      "@typescript-eslint/no-unnecessary-type-assertion": 1,
+      "@typescript-eslint/no-unsafe-assignment": 4,
+      "@typescript-eslint/no-unsafe-member-access": 3,
+      "@typescript-eslint/no-unsafe-return": 6,
+      "@typescript-eslint/no-unused-vars": 7,
+      "@typescript-eslint/prefer-nullish-coalescing": 17,
+      "react/no-unescaped-entities": 2
+    },
+    "client/src/components/admin/UsersTab.tsx": {
+      "@typescript-eslint/no-unsafe-assignment": 1,
+      "@typescript-eslint/no-unsafe-return": 3,
+      "@typescript-eslint/prefer-nullish-coalescing": 13
+    },
+    "client/src/components/admin/configs/subcategory-config.ts": {
+      "@typescript-eslint/no-unused-vars": 1
+    },
+    "client/src/components/admin/configs/subsubcategory-config.ts": {
+      "@typescript-eslint/prefer-nullish-coalescing": 2
+    },
+    "client/src/components/admin/types/validation.ts": {
+      "@typescript-eslint/array-type": 3,
+      "@typescript-eslint/consistent-indexed-object-style": 1
+    },
+    "client/src/components/auth/AdminGuard.tsx": {
+      "react/no-unescaped-entities": 3
+    },
+    "client/src/components/auth/AuthConversionTracker.tsx": {
+      "@typescript-eslint/consistent-type-definitions": 1
+    },
+    "client/src/components/auth/GuestBookmarkMerge.tsx": {
+      "@typescript-eslint/array-type": 1
+    },
+    "client/src/components/auth/StaleSessionGate.tsx": {
+      "@typescript-eslint/no-empty-function": 2,
+      "@typescript-eslint/no-unsafe-member-access": 1
+    },
+    "client/src/components/home/use-home-layout.ts": {
+      "@typescript-eslint/prefer-optional-chain": 1
+    },
+    "client/src/components/layout/OfflinePageState.tsx": {
+      "react/no-unescaped-entities": 2
+    },
+    "client/src/components/layout/SEOHead.tsx": {
+      "@typescript-eslint/prefer-nullish-coalescing": 5,
+      "@typescript-eslint/prefer-regexp-exec": 1,
+      "@typescript-eslint/prefer-string-starts-ends-with": 1,
+      "no-useless-escape": 3
+    },
+    "client/src/components/layout/new/AppFooter.tsx": {
+      "@typescript-eslint/prefer-nullish-coalescing": 1
+    },
+    "client/src/components/layout/new/AppHeader.tsx": {
+      "@typescript-eslint/prefer-nullish-coalescing": 1
+    },
+    "client/src/components/layout/new/AppSidebar.tsx": {
+      "@typescript-eslint/array-type": 2,
+      "@typescript-eslint/no-base-to-string": 1,
+      "@typescript-eslint/no-explicit-any": 6,
+      "@typescript-eslint/no-unsafe-argument": 1,
+      "@typescript-eslint/no-unsafe-assignment": 2,
+      "@typescript-eslint/no-unsafe-call": 2,
+      "@typescript-eslint/no-unsafe-member-access": 9,
+      "@typescript-eslint/no-unsafe-return": 1,
+      "@typescript-eslint/prefer-nullish-coalescing": 24,
+      "react/no-unescaped-entities": 1
+    },
+    "client/src/components/learning/ContinueLearningPreview.tsx": {
+      "@typescript-eslint/prefer-nullish-coalescing": 1
+    },
+    "client/src/components/profile/AccountSecurityCard.tsx": {
+      "react/no-unescaped-entities": 1
+    },
+    "client/src/components/profile/ApiKeysCard.tsx": {
+      "@typescript-eslint/no-unsafe-return": 2
+    },
+    "client/src/components/resource/BookmarkButton.tsx": {
+      "@typescript-eslint/array-type": 1,
+      "@typescript-eslint/no-unsafe-argument": 2,
+      "@typescript-eslint/no-unsafe-member-access": 4
+    },
+    "client/src/components/resource/FavoriteButton.tsx": {
+      "@typescript-eslint/array-type": 1,
+      "@typescript-eslint/no-unsafe-argument": 2,
+      "@typescript-eslint/no-unsafe-member-access": 4
+    },
+    "client/src/components/resource/ResourceCard.tsx": {
+      "@typescript-eslint/no-unsafe-assignment": 3,
+      "@typescript-eslint/prefer-nullish-coalescing": 6
+    },
+    "client/src/components/search/SearchFilters.tsx": {
+      "@typescript-eslint/consistent-type-definitions": 3,
+      "@typescript-eslint/no-unnecessary-type-assertion": 1,
+      "@typescript-eslint/no-unused-vars": 4,
+      "react-refresh/only-export-components": 1,
+      "react/no-unescaped-entities": 2
+    },
+    "client/src/components/ui/badge.tsx": {
+      "react-refresh/only-export-components": 1
+    },
+    "client/src/components/ui/button.tsx": {
+      "react-refresh/only-export-components": 1
+    },
+    "client/src/components/ui/category-explorer.tsx": {
+      "@typescript-eslint/no-explicit-any": 4,
+      "@typescript-eslint/no-unsafe-argument": 2,
+      "@typescript-eslint/no-unused-vars": 2,
+      "@typescript-eslint/prefer-nullish-coalescing": 5,
+      "prefer-const": 1,
+      "react/no-unescaped-entities": 2
+    },
+    "client/src/components/ui/chip-button.tsx": {
+      "react/prop-types": 4
+    },
+    "client/src/components/ui/community-metrics.tsx": {
+      "@typescript-eslint/no-explicit-any": 1,
+      "@typescript-eslint/no-unsafe-argument": 1,
+      "@typescript-eslint/no-unsafe-member-access": 2,
+      "@typescript-eslint/no-unused-vars": 3,
+      "@typescript-eslint/prefer-nullish-coalescing": 2,
+      "react/no-unescaped-entities": 2
+    },
+    "client/src/components/ui/consent-banner.tsx": {
+      "react-refresh/only-export-components": 1
+    },
+    "client/src/components/ui/dialog.tsx": {
+      "react-refresh/only-export-components": 1
+    },
+    "client/src/components/ui/export-tools.tsx": {
+      "@typescript-eslint/no-base-to-string": 2,
+      "@typescript-eslint/no-unnecessary-type-assertion": 2,
+      "@typescript-eslint/no-unused-vars": 2
+    },
+    "client/src/components/ui/form.tsx": {
+      "@typescript-eslint/consistent-type-definitions": 2,
+      "react-refresh/only-export-components": 1
+    },
+    "client/src/components/ui/paginator.tsx": {
+      "@typescript-eslint/array-type": 2
+    },
+    "client/src/components/ui/progress.tsx": {
+      "@typescript-eslint/prefer-nullish-coalescing": 1
+    },
+    "client/src/components/ui/search-dialog.tsx": {
+      "@typescript-eslint/no-unsafe-assignment": 1,
+      "@typescript-eslint/no-unsafe-return": 1,
+      "@typescript-eslint/prefer-nullish-coalescing": 1
+    },
+    "client/src/components/ui/sidebar.tsx": {
+      "@typescript-eslint/consistent-type-definitions": 1,
+      "@typescript-eslint/prefer-regexp-exec": 1,
+      "react-refresh/only-export-components": 1
+    },
+    "client/src/components/ui/suggest-edit-dialog.tsx": {
+      "@typescript-eslint/no-explicit-any": 1,
+      "@typescript-eslint/no-unsafe-argument": 1,
+      "@typescript-eslint/no-unsafe-assignment": 3,
+      "@typescript-eslint/no-unsafe-member-access": 3,
+      "@typescript-eslint/no-unsafe-return": 1,
+      "@typescript-eslint/no-unused-vars": 1,
+      "@typescript-eslint/prefer-nullish-coalescing": 1
+    },
+    "client/src/components/ui/table.tsx": {
+      "react/prop-types": 2
+    },
+    "client/src/components/ui/textarea.tsx": {
+      "@typescript-eslint/no-empty-object-type": 1
+    },
+    "client/src/components/ui/theme-provider.tsx": {
+      "react-refresh/only-export-components": 1
+    },
+    "client/src/components/ui/toaster.tsx": {
+      "react/prop-types": 1
+    },
+    "client/src/components/ui/toggle-group.tsx": {
+      "@typescript-eslint/prefer-nullish-coalescing": 2
+    },
+    "client/src/components/ui/toggle.tsx": {
+      "react-refresh/only-export-components": 1
+    },
+    "client/src/components/ui/view-mode-toggle.tsx": {
+      "react-refresh/only-export-components": 1
+    },
+    "client/src/hooks/focus-handoff.ts": {
+      "@typescript-eslint/prefer-optional-chain": 1
+    },
+    "client/src/hooks/use-toast.ts": {
+      "@typescript-eslint/array-type": 1,
+      "@typescript-eslint/no-unused-vars": 1
+    },
+    "client/src/hooks/use-user-profile.tsx": {
+      "@typescript-eslint/no-unsafe-argument": 1,
+      "@typescript-eslint/no-unsafe-assignment": 1
+    },
+    "client/src/hooks/useAIRecommendations.ts": {
+      "@typescript-eslint/no-unsafe-return": 1
+    },
+    "client/src/hooks/useAdmin.ts": {
+      "@typescript-eslint/no-explicit-any": 1,
+      "@typescript-eslint/no-unsafe-assignment": 1,
+      "@typescript-eslint/no-unsafe-member-access": 1,
+      "@typescript-eslint/no-unsafe-return": 1
+    },
+    "client/src/hooks/useAuth.ts": {
+      "@typescript-eslint/no-empty-function": 1,
+      "@typescript-eslint/no-unsafe-argument": 1,
+      "@typescript-eslint/no-unsafe-assignment": 2,
+      "@typescript-eslint/no-unsafe-member-access": 2,
+      "@typescript-eslint/no-unsafe-return": 1,
+      "@typescript-eslint/prefer-nullish-coalescing": 1
+    },
+    "client/src/hooks/useResourceToggle.ts": {
+      "@typescript-eslint/no-explicit-any": 4,
+      "@typescript-eslint/no-unnecessary-type-assertion": 1,
+      "@typescript-eslint/no-unsafe-argument": 1,
+      "@typescript-eslint/no-unsafe-assignment": 1,
+      "@typescript-eslint/no-unsafe-member-access": 1,
+      "@typescript-eslint/no-unsafe-return": 1
+    },
+    "client/src/lib/acquisition.ts": {
+      "@typescript-eslint/no-unnecessary-type-assertion": 2
+    },
+    "client/src/lib/amplitude.ts": {
+      "@typescript-eslint/consistent-type-definitions": 1,
+      "@typescript-eslint/no-empty-function": 1,
+      "@typescript-eslint/no-unnecessary-type-assertion": 1
+    },
+    "client/src/lib/analytics.ts": {
+      "@typescript-eslint/array-type": 2,
+      "@typescript-eslint/consistent-type-definitions": 1,
+      "@typescript-eslint/no-unnecessary-type-assertion": 1,
+      "@typescript-eslint/no-unused-vars": 1
+    },
+    "client/src/lib/apiError.ts": {
+      "@typescript-eslint/no-explicit-any": 7,
+      "@typescript-eslint/no-unsafe-argument": 2,
+      "@typescript-eslint/no-unsafe-member-access": 7,
+      "@typescript-eslint/prefer-regexp-exec": 2
+    },
+    "client/src/lib/clerk-appearance.ts": {
+      "@typescript-eslint/consistent-type-definitions": 1
+    },
+    "client/src/lib/contact.ts": {
+      "@typescript-eslint/consistent-type-definitions": 1
+    },
+    "client/src/lib/font-options.ts": {
+      "@typescript-eslint/consistent-type-definitions": 1
+    },
+    "client/src/lib/guestBookmarks.ts": {
+      "@typescript-eslint/array-type": 1,
+      "@typescript-eslint/consistent-generic-constructors": 1,
+      "@typescript-eslint/no-empty-function": 1,
+      "@typescript-eslint/prefer-nullish-coalescing": 2
+    },
+    "client/src/lib/home-boot.tsx": {
+      "react-refresh/only-export-components": 1
+    },
+    "client/src/lib/mixpanel.ts": {
+      "@typescript-eslint/array-type": 1,
+      "@typescript-eslint/consistent-type-definitions": 1,
+      "@typescript-eslint/no-unnecessary-type-assertion": 1,
+      "@typescript-eslint/no-unsafe-assignment": 1
+    },
+    "client/src/lib/not-found-suggestion.ts": {
+      "@typescript-eslint/array-type": 1
+    },
+    "client/src/lib/parser.ts": {
+      "@typescript-eslint/no-unnecessary-type-assertion": 2,
+      "@typescript-eslint/no-unused-vars": 1,
+      "@typescript-eslint/prefer-nullish-coalescing": 12
+    },
+    "client/src/lib/posthog.ts": {
+      "@typescript-eslint/array-type": 1,
+      "@typescript-eslint/consistent-type-definitions": 1,
+      "@typescript-eslint/no-unnecessary-type-assertion": 2
+    },
+    "client/src/lib/queryClient.ts": {
+      "@typescript-eslint/no-explicit-any": 1,
+      "@typescript-eslint/no-unsafe-assignment": 1,
+      "@typescript-eslint/no-unsafe-member-access": 1,
+      "@typescript-eslint/no-unsafe-return": 1,
+      "@typescript-eslint/prefer-nullish-coalescing": 1,
+      "@typescript-eslint/prefer-optional-chain": 1
+    },
+    "client/src/lib/safeStorage.ts": {
+      "no-empty": 2
+    },
+    "client/src/lib/static-data.ts": {
+      "@typescript-eslint/array-type": 3,
+      "@typescript-eslint/no-explicit-any": 11,
+      "@typescript-eslint/no-unsafe-assignment": 5,
+      "@typescript-eslint/no-unsafe-call": 1,
+      "@typescript-eslint/no-unsafe-member-access": 14,
+      "@typescript-eslint/no-unsafe-return": 4,
+      "@typescript-eslint/no-unused-vars": 1,
+      "@typescript-eslint/prefer-nullish-coalescing": 1
+    },
+    "client/src/main.tsx": {
+      "@typescript-eslint/prefer-nullish-coalescing": 1
+    },
+    "client/src/pages/Bookmarks.tsx": {
+      "@typescript-eslint/consistent-type-definitions": 1,
+      "@typescript-eslint/no-explicit-any": 3,
+      "@typescript-eslint/no-unsafe-member-access": 5,
+      "@typescript-eslint/prefer-optional-chain": 1,
+      "@typescript-eslint/prefer-regexp-exec": 1,
+      "react/no-unescaped-entities": 1
+    },
+    "client/src/pages/Categories.tsx": {
+      "@typescript-eslint/prefer-nullish-coalescing": 1,
+      "react/no-unescaped-entities": 1
+    },
+    "client/src/pages/CodeOfConduct.tsx": {
+      "react/no-unescaped-entities": 3
+    },
+    "client/src/pages/ContinueLearning.tsx": {
+      "@typescript-eslint/prefer-nullish-coalescing": 2,
+      "react/no-unescaped-entities": 3
+    },
+    "client/src/pages/Contributions.tsx": {
+      "@typescript-eslint/array-type": 2,
+      "@typescript-eslint/no-unnecessary-type-assertion": 1,
+      "react/no-unescaped-entities": 1
+    },
+    "client/src/pages/DesignSystemShowcase.tsx": {
+      "@typescript-eslint/no-explicit-any": 1
+    },
+    "client/src/pages/ErrorPage.tsx": {
+      "@typescript-eslint/no-redundant-type-constituents": 1
+    },
+    "client/src/pages/GuestBookmarks.tsx": {
+      "react/no-unescaped-entities": 5
+    },
+    "client/src/pages/JourneyDetail.tsx": {
+      "@typescript-eslint/no-unsafe-return": 3,
+      "@typescript-eslint/no-unused-vars": 4,
+      "@typescript-eslint/prefer-nullish-coalescing": 2,
+      "react/no-unescaped-entities": 4
+    },
+    "client/src/pages/Journeys.tsx": {
+      "@typescript-eslint/prefer-nullish-coalescing": 4
+    },
+    "client/src/pages/Notifications.tsx": {
+      "@typescript-eslint/consistent-type-definitions": 2
+    },
+    "client/src/pages/Onboarding.tsx": {
+      "@typescript-eslint/no-unsafe-assignment": 4,
+      "@typescript-eslint/no-unsafe-member-access": 4
+    },
+    "client/src/pages/Privacy.tsx": {
+      "react/no-unescaped-entities": 6
+    },
+    "client/src/pages/Profile.tsx": {
+      "@typescript-eslint/no-explicit-any": 4,
+      "@typescript-eslint/no-unsafe-argument": 6,
+      "@typescript-eslint/no-unsafe-assignment": 6,
+      "@typescript-eslint/no-unsafe-call": 8,
+      "@typescript-eslint/no-unsafe-member-access": 23,
+      "@typescript-eslint/no-unsafe-return": 3,
+      "@typescript-eslint/no-unused-vars": 6,
+      "@typescript-eslint/prefer-nullish-coalescing": 10,
+      "react/no-unescaped-entities": 3
+    },
+    "client/src/pages/ResourceDetail.tsx": {
+      "@typescript-eslint/no-explicit-any": 2,
+      "@typescript-eslint/no-unnecessary-type-assertion": 3,
+      "@typescript-eslint/no-unsafe-assignment": 6,
+      "@typescript-eslint/no-unsafe-return": 1,
+      "@typescript-eslint/no-unused-vars": 1,
+      "@typescript-eslint/prefer-nullish-coalescing": 6,
+      "react/no-unescaped-entities": 2
+    },
+    "client/src/pages/Search.tsx": {
+      "@typescript-eslint/consistent-type-definitions": 1,
+      "@typescript-eslint/no-unnecessary-type-assertion": 1
+    },
+    "client/src/pages/SubmitResource.tsx": {
+      "@typescript-eslint/no-unsafe-assignment": 2,
+      "@typescript-eslint/no-unsafe-member-access": 3,
+      "@typescript-eslint/prefer-nullish-coalescing": 4
+    },
+    "client/src/pages/TagLanding.tsx": {
+      "@typescript-eslint/array-type": 1,
+      "@typescript-eslint/no-explicit-any": 4,
+      "@typescript-eslint/no-unsafe-assignment": 7,
+      "@typescript-eslint/no-unsafe-call": 1,
+      "@typescript-eslint/no-unsafe-member-access": 17,
+      "@typescript-eslint/no-unsafe-return": 3,
+      "@typescript-eslint/prefer-optional-chain": 1
+    },
+    "client/src/pages/TaxonomyListing.tsx": {
+      "@typescript-eslint/consistent-type-definitions": 1,
+      "@typescript-eslint/no-explicit-any": 5,
+      "@typescript-eslint/no-unsafe-assignment": 16,
+      "@typescript-eslint/no-unsafe-call": 2,
+      "@typescript-eslint/no-unsafe-member-access": 25,
+      "@typescript-eslint/no-unsafe-return": 2,
+      "@typescript-eslint/prefer-nullish-coalescing": 5,
+      "react/no-unescaped-entities": 2
+    },
+    "client/src/pages/Terms.tsx": {
+      "react/no-unescaped-entities": 4
+    },
+    "client/src/pages/ThemeSettings.tsx": {
+      "@typescript-eslint/no-explicit-any": 1
+    },
+    "client/src/pages/not-found.tsx": {
+      "react/no-unescaped-entities": 3
+    },
+    "deploy/cloudflare/src/index.ts": {
+      "@typescript-eslint/no-unsafe-call": 3,
+      "@typescript-eslint/no-unsafe-member-access": 1,
+      "@typescript-eslint/no-unsafe-return": 1
+    },
+    "playwright.config.ts": {
+      "@typescript-eslint/prefer-includes": 1,
+      "@typescript-eslint/prefer-nullish-coalescing": 1
+    },
+    "scripts/audit-567-browser.mjs": {
+      "@typescript-eslint/no-empty-function": 10,
+      "@typescript-eslint/no-unused-vars": 2,
+      "no-empty": 1
+    },
+    "scripts/audit-sidebar-exhaustive-clicks.mjs": {
+      "@typescript-eslint/no-empty-function": 2,
+      "@typescript-eslint/no-unused-vars": 1,
+      "no-empty": 4,
+      "no-undef": 4,
+      "no-useless-escape": 1
+    },
+    "scripts/build-static.ts": {
+      "@typescript-eslint/no-floating-promises": 1,
+      "@typescript-eslint/no-unsafe-argument": 2,
+      "@typescript-eslint/no-unsafe-assignment": 3,
+      "@typescript-eslint/no-unsafe-call": 3,
+      "@typescript-eslint/no-unsafe-member-access": 6,
+      "@typescript-eslint/no-unsafe-return": 1
+    },
+    "scripts/check-migration-drift.ts": {
+      "@typescript-eslint/no-explicit-any": 1,
+      "@typescript-eslint/no-unsafe-argument": 1,
+      "@typescript-eslint/no-unsafe-assignment": 12,
+      "@typescript-eslint/no-unsafe-call": 5,
+      "@typescript-eslint/no-unsafe-member-access": 37,
+      "@typescript-eslint/no-unsafe-return": 1
+    },
+    "scripts/export-openapi-yaml.ts": {
+      "@typescript-eslint/no-floating-promises": 1
+    },
+    "scripts/generate-design-system-artifact.mjs": {
+      "@typescript-eslint/no-empty-function": 4
+    },
+    "scripts/migrate.ts": {
+      "@typescript-eslint/no-floating-promises": 1
+    },
+    "scripts/prod-link-scan.ts": {
+      "@typescript-eslint/no-explicit-any": 3,
+      "@typescript-eslint/no-unsafe-argument": 4,
+      "@typescript-eslint/no-unsafe-assignment": 10,
+      "@typescript-eslint/no-unsafe-member-access": 20,
+      "@typescript-eslint/no-unsafe-return": 2,
+      "@typescript-eslint/prefer-nullish-coalescing": 4
+    },
+    "scripts/qa/run25-task243-fixtures.ts": {
+      "@typescript-eslint/no-explicit-any": 3,
+      "@typescript-eslint/no-unnecessary-type-assertion": 1,
+      "@typescript-eslint/no-unsafe-argument": 2
+    },
+    "scripts/test-feedback-loop.ts": {
+      "@typescript-eslint/no-explicit-any": 3,
+      "@typescript-eslint/no-unnecessary-type-assertion": 1,
+      "@typescript-eslint/no-unsafe-argument": 1,
+      "@typescript-eslint/no-unsafe-member-access": 1,
+      "@typescript-eslint/prefer-nullish-coalescing": 4
+    },
+    "scripts/validation/accent-contrast-browser.mjs": {
+      "@typescript-eslint/no-empty-function": 1,
+      "@typescript-eslint/no-unused-vars": 1,
+      "no-undef": 3
+    },
+    "scripts/validation/accent-drift.mjs": {
+      "@typescript-eslint/no-empty-function": 1,
+      "@typescript-eslint/no-unused-vars": 2,
+      "no-undef": 1
+    },
+    "scripts/validation/audit-567-compiled-server.ts": {
+      "@typescript-eslint/consistent-type-definitions": 1,
+      "@typescript-eslint/no-explicit-any": 9,
+      "@typescript-eslint/no-misused-promises": 2,
+      "@typescript-eslint/no-redundant-type-constituents": 1,
+      "@typescript-eslint/no-unsafe-argument": 1,
+      "@typescript-eslint/no-unsafe-assignment": 6,
+      "@typescript-eslint/no-unsafe-call": 5,
+      "@typescript-eslint/no-unsafe-member-access": 27,
+      "@typescript-eslint/no-unsafe-return": 1,
+      "@typescript-eslint/no-unused-vars": 1,
+      "@typescript-eslint/prefer-nullish-coalescing": 1,
+      "@typescript-eslint/prefer-optional-chain": 1
+    },
+    "scripts/validation/audit-567-ink-accent.mjs": {
+      "@typescript-eslint/no-empty-function": 5,
+      "no-empty": 2
+    },
+    "scripts/validation/audit-567-states.mjs": {
+      "@typescript-eslint/no-empty-function": 18,
+      "no-undef": 1,
+      "no-unsafe-finally": 2
+    },
+    "scripts/validation/auth-return-audit.mjs": {
+      "@typescript-eslint/no-empty-function": 4
+    },
+    "scripts/validation/canonical-token-parity-browser-check.mjs": {
+      "@typescript-eslint/no-empty-function": 1,
+      "no-redeclare": 2
+    },
+    "scripts/validation/canonical-token-parity.mjs": {
+      "no-dupe-keys": 1,
+      "no-undef": 1
+    },
+    "scripts/validation/catalog-database-resilience.ts": {
+      "@typescript-eslint/no-explicit-any": 1,
+      "@typescript-eslint/no-unsafe-argument": 1,
+      "@typescript-eslint/no-unsafe-assignment": 6,
+      "@typescript-eslint/no-unsafe-call": 1,
+      "@typescript-eslint/no-unsafe-member-access": 3,
+      "@typescript-eslint/prefer-nullish-coalescing": 1
+    },
+    "scripts/validation/collections-audit.mjs": {
+      "@typescript-eslint/no-empty-function": 5,
+      "no-empty": 1
+    },
+    "scripts/validation/db-pool-probe.mjs": {
+      "no-undef": 2
+    },
+    "scripts/validation/dead-components.mjs": {
+      "@typescript-eslint/no-unused-vars": 2
+    },
+    "scripts/validation/design-system-showcase.mjs": {
+      "no-undef": 4
+    },
+    "scripts/validation/ds-button-sweep.mjs": {
+      "@typescript-eslint/no-empty-function": 15,
+      "@typescript-eslint/no-unused-vars": 7
+    },
+    "scripts/validation/font-prepaint-audit.ts": {
+      "@typescript-eslint/consistent-type-definitions": 1,
+      "@typescript-eslint/no-unsafe-argument": 2,
+      "@typescript-eslint/no-unsafe-assignment": 10,
+      "@typescript-eslint/no-unsafe-call": 15,
+      "@typescript-eslint/no-unsafe-member-access": 24,
+      "@typescript-eslint/unbound-method": 2
+    },
+    "scripts/validation/gate-lease.mjs": {
+      "no-empty": 1
+    },
+    "scripts/validation/guest-recommendations.mjs": {
+      "@typescript-eslint/no-empty-function": 2
+    },
+    "scripts/validation/home-browser.mjs": {
+      "no-undef": 1
+    },
+    "scripts/validation/http-cache-headers.mjs": {
+      "@typescript-eslint/no-unused-vars": 1,
+      "no-undef": 2
+    },
+    "scripts/validation/journey-funnel-transition-races.ts": {
+      "@typescript-eslint/no-explicit-any": 1,
+      "@typescript-eslint/no-unsafe-assignment": 7,
+      "@typescript-eslint/no-unsafe-member-access": 13,
+      "@typescript-eslint/no-unsafe-return": 1
+    },
+    "scripts/validation/journey-progress-consistency.ts": {
+      "@typescript-eslint/consistent-type-definitions": 1
+    },
+    "scripts/validation/normal-lighthouse.mjs": {
+      "@typescript-eslint/no-empty-function": 3,
+      "no-useless-escape": 1
+    },
+    "scripts/validation/openapi-drift.ts": {
+      "@typescript-eslint/no-explicit-any": 1,
+      "@typescript-eslint/no-unsafe-argument": 2,
+      "@typescript-eslint/no-unsafe-assignment": 4,
+      "@typescript-eslint/no-unsafe-member-access": 14,
+      "@typescript-eslint/prefer-includes": 1
+    },
+    "scripts/validation/palette-drift.mjs": {
+      "@typescript-eslint/no-unused-vars": 8
+    },
+    "scripts/validation/playwright-launch-lease.mjs": {
+      "no-empty": 1
+    },
+    "scripts/validation/preferences-revision-races.ts": {
+      "@typescript-eslint/consistent-type-definitions": 1,
+      "@typescript-eslint/no-explicit-any": 2,
+      "@typescript-eslint/no-unnecessary-type-assertion": 1,
+      "@typescript-eslint/no-unsafe-assignment": 21,
+      "@typescript-eslint/no-unsafe-call": 2,
+      "@typescript-eslint/no-unsafe-member-access": 37,
+      "@typescript-eslint/no-unsafe-return": 1
+    },
+    "scripts/validation/print-audit.mjs": {
+      "@typescript-eslint/no-empty-function": 4
+    },
+    "scripts/validation/prod-rate-limit-check.mjs": {
+      "no-empty": 1
+    },
+    "scripts/validation/product-profile-drift.mjs": {
+      "@typescript-eslint/no-empty-function": 1,
+      "no-undef": 3
+    },
+    "scripts/validation/production-baseline-lib.mjs": {
+      "@typescript-eslint/no-empty-function": 13,
+      "no-useless-escape": 1
+    },
+    "scripts/validation/response-contract-drift.ts": {
+      "@typescript-eslint/array-type": 2
+    },
+    "scripts/validation/responsive-audit.mjs": {
+      "@typescript-eslint/no-empty-function": 13
+    },
+    "scripts/validation/seo-snapshot.mjs": {
+      "@typescript-eslint/no-empty-function": 1,
+      "@typescript-eslint/no-unused-vars": 1,
+      "no-undef": 1
+    },
+    "scripts/validation/serve-performance-build.mjs": {
+      "no-undef": 1
+    },
+    "scripts/validation/standalone-palette-drift.mjs": {
+      "@typescript-eslint/no-empty-function": 1,
+      "@typescript-eslint/no-unused-vars": 1
+    },
+    "scripts/validation/sticky-preview-audit.mjs": {
+      "@typescript-eslint/no-empty-function": 4
+    },
+    "scripts/validation/tablet-audit.mjs": {
+      "@typescript-eslint/no-empty-function": 15
+    },
+    "scripts/validation/tag-route-audit.mjs": {
+      "@typescript-eslint/no-empty-function": 3,
+      "@typescript-eslint/no-unused-vars": 1
+    },
+    "scripts/validation/tls-recovery-check.ts": {
+      "@typescript-eslint/no-explicit-any": 1,
+      "@typescript-eslint/no-floating-promises": 1,
+      "@typescript-eslint/no-unsafe-assignment": 1,
+      "@typescript-eslint/no-unsafe-member-access": 1
+    },
+    "scripts/validation/touch-target-sweep.mjs": {
+      "@typescript-eslint/no-empty-function": 4
+    },
+    "scripts/validation/url-params-audit.mjs": {
+      "@typescript-eslint/no-empty-function": 13,
+      "no-undef": 7
+    },
+    "scripts/verify-boot-migration-safety.ts": {
+      "@typescript-eslint/no-explicit-any": 1,
+      "@typescript-eslint/no-unsafe-assignment": 1,
+      "@typescript-eslint/no-unsafe-call": 1,
+      "@typescript-eslint/no-unsafe-member-access": 7
+    },
+    "scripts/vg2-ga4-validate.mjs": {
+      "@typescript-eslint/no-empty-function": 8,
+      "@typescript-eslint/no-unused-vars": 1,
+      "no-empty": 5
+    },
+    "server/ai/agentEvents.ts": {
+      "@typescript-eslint/no-explicit-any": 2,
+      "@typescript-eslint/no-unsafe-member-access": 1,
+      "@typescript-eslint/prefer-nullish-coalescing": 1
+    },
+    "server/ai/agentRuntime.ts": {
+      "@typescript-eslint/no-explicit-any": 3,
+      "@typescript-eslint/no-unsafe-argument": 2,
+      "@typescript-eslint/no-unsafe-assignment": 4,
+      "@typescript-eslint/no-unsafe-call": 4,
+      "@typescript-eslint/no-unsafe-member-access": 8,
+      "@typescript-eslint/no-unused-vars": 1,
+      "@typescript-eslint/prefer-nullish-coalescing": 1,
+      "@typescript-eslint/prefer-optional-chain": 1
+    },
+    "server/ai/claudeService.ts": {
+      "@typescript-eslint/consistent-indexed-object-style": 1,
+      "@typescript-eslint/consistent-type-definitions": 1,
+      "@typescript-eslint/no-explicit-any": 6,
+      "@typescript-eslint/no-inferrable-types": 2,
+      "@typescript-eslint/no-redundant-type-constituents": 1,
+      "@typescript-eslint/no-unsafe-assignment": 3,
+      "@typescript-eslint/no-unsafe-member-access": 6,
+      "@typescript-eslint/no-unsafe-return": 1,
+      "@typescript-eslint/no-unused-vars": 2,
+      "@typescript-eslint/prefer-nullish-coalescing": 5,
+      "@typescript-eslint/require-await": 1
+    },
+    "server/ai/embeddingService.ts": {
+      "@typescript-eslint/array-type": 2,
+      "@typescript-eslint/no-explicit-any": 1,
+      "@typescript-eslint/no-unsafe-member-access": 4,
+      "@typescript-eslint/prefer-nullish-coalescing": 2
+    },
+    "server/ai/enrichmentService.ts": {
+      "@typescript-eslint/array-type": 4,
+      "@typescript-eslint/consistent-generic-constructors": 2,
+      "@typescript-eslint/no-explicit-any": 12,
+      "@typescript-eslint/no-unnecessary-type-assertion": 2,
+      "@typescript-eslint/no-unsafe-argument": 3,
+      "@typescript-eslint/no-unsafe-assignment": 5,
+      "@typescript-eslint/no-unsafe-member-access": 13,
+      "@typescript-eslint/prefer-nullish-coalescing": 37,
+      "@typescript-eslint/prefer-optional-chain": 1,
+      "@typescript-eslint/prefer-regexp-exec": 1,
+      "@typescript-eslint/require-await": 1
+    },
+    "server/ai/recommendationEngine.ts": {
+      "@typescript-eslint/array-type": 2,
+      "@typescript-eslint/consistent-generic-constructors": 1,
+      "@typescript-eslint/no-explicit-any": 11,
+      "@typescript-eslint/no-inferrable-types": 2,
+      "@typescript-eslint/no-unsafe-argument": 5,
+      "@typescript-eslint/no-unsafe-assignment": 17,
+      "@typescript-eslint/no-unsafe-call": 10,
+      "@typescript-eslint/no-unsafe-member-access": 35,
+      "@typescript-eslint/no-unsafe-return": 2,
+      "@typescript-eslint/prefer-nullish-coalescing": 16,
+      "@typescript-eslint/prefer-optional-chain": 1,
+      "prefer-const": 1
+    },
+    "server/ai/recommendations.ts": {
+      "@typescript-eslint/no-inferrable-types": 1,
+      "@typescript-eslint/no-unused-vars": 2
+    },
+    "server/ai/researchService.ts": {
+      "@typescript-eslint/array-type": 6,
+      "@typescript-eslint/consistent-generic-constructors": 1,
+      "@typescript-eslint/no-empty-function": 1,
+      "@typescript-eslint/no-explicit-any": 26,
+      "@typescript-eslint/no-unnecessary-type-assertion": 2,
+      "@typescript-eslint/no-unsafe-assignment": 8,
+      "@typescript-eslint/no-unsafe-call": 1,
+      "@typescript-eslint/no-unsafe-member-access": 36,
+      "@typescript-eslint/no-unsafe-return": 1,
+      "@typescript-eslint/no-unused-vars": 1,
+      "@typescript-eslint/prefer-nullish-coalescing": 47,
+      "@typescript-eslint/prefer-optional-chain": 2,
+      "@typescript-eslint/prefer-regexp-exec": 1,
+      "@typescript-eslint/require-await": 1,
+      "no-useless-escape": 2,
+      "prefer-const": 1
+    },
+    "server/ai/runAgentQuery.ts": {
+      "@typescript-eslint/no-empty-function": 1,
+      "@typescript-eslint/no-explicit-any": 13,
+      "@typescript-eslint/no-unnecessary-type-assertion": 3,
+      "@typescript-eslint/no-unsafe-argument": 10,
+      "@typescript-eslint/no-unsafe-assignment": 45,
+      "@typescript-eslint/no-unsafe-call": 5,
+      "@typescript-eslint/no-unsafe-member-access": 96,
+      "@typescript-eslint/no-unsafe-return": 3,
+      "@typescript-eslint/prefer-nullish-coalescing": 14,
+      "@typescript-eslint/require-await": 1
+    },
+    "server/ai/tagging.ts": {
+      "@typescript-eslint/no-unused-vars": 1
+    },
+    "server/ai/test-blurhash.ts": {
+      "@typescript-eslint/no-explicit-any": 1,
+      "@typescript-eslint/no-unsafe-member-access": 1,
+      "@typescript-eslint/prefer-nullish-coalescing": 4
+    },
+    "server/ai/urlScraper.ts": {
+      "@typescript-eslint/no-inferrable-types": 1,
+      "@typescript-eslint/no-unused-vars": 1,
+      "@typescript-eslint/prefer-nullish-coalescing": 10
+    },
+    "server/ai/webResearch.ts": {
+      "@typescript-eslint/consistent-generic-constructors": 1,
+      "@typescript-eslint/no-empty-function": 1,
+      "@typescript-eslint/no-explicit-any": 1,
+      "@typescript-eslint/no-unsafe-member-access": 1,
+      "@typescript-eslint/no-unused-vars": 3,
+      "@typescript-eslint/prefer-nullish-coalescing": 5
+    },
+    "server/api/public.ts": {
+      "@typescript-eslint/no-explicit-any": 2,
+      "@typescript-eslint/no-unsafe-assignment": 5,
+      "@typescript-eslint/no-unsafe-member-access": 6
+    },
+    "server/awesome-video-parser-clean.ts": {
+      "@typescript-eslint/consistent-indexed-object-style": 1,
+      "@typescript-eslint/no-unnecessary-type-assertion": 4,
+      "@typescript-eslint/no-unused-vars": 1,
+      "@typescript-eslint/prefer-nullish-coalescing": 4,
+      "@typescript-eslint/prefer-optional-chain": 5,
+      "no-useless-escape": 1,
+      "prefer-const": 5
+    },
+    "server/cache/publicCache.ts": {
+      "@typescript-eslint/consistent-type-definitions": 2,
+      "@typescript-eslint/no-unnecessary-type-assertion": 1,
+      "@typescript-eslint/prefer-optional-chain": 1
+    },
+    "server/cli/parse-list.ts": {
+      "@typescript-eslint/prefer-nullish-coalescing": 1
+    },
+    "server/cli/seedJourneys.ts": {
+      "@typescript-eslint/consistent-indexed-object-style": 1,
+      "@typescript-eslint/no-inferrable-types": 1,
+      "@typescript-eslint/no-unsafe-assignment": 3,
+      "@typescript-eslint/no-unsafe-call": 2,
+      "@typescript-eslint/no-unsafe-member-access": 8,
+      "@typescript-eslint/no-unsafe-return": 1,
+      "@typescript-eslint/no-unused-vars": 2,
+      "@typescript-eslint/prefer-optional-chain": 1
+    },
+    "server/config.ts": {
+      "@typescript-eslint/array-type": 2,
+      "@typescript-eslint/prefer-nullish-coalescing": 6
+    },
+    "server/contracts/bodyGuard.ts": {
+      "@typescript-eslint/no-unnecessary-type-assertion": 1
+    },
+    "server/contracts/inference.ts": {
+      "@typescript-eslint/no-unnecessary-type-assertion": 1,
+      "@typescript-eslint/prefer-string-starts-ends-with": 2
+    },
+    "server/contracts/install.ts": {
+      "@typescript-eslint/no-unnecessary-type-assertion": 1
+    },
+    "server/contracts/middleware.ts": {
+      "@typescript-eslint/no-explicit-any": 6,
+      "@typescript-eslint/no-unsafe-argument": 3,
+      "@typescript-eslint/no-unsafe-assignment": 6,
+      "@typescript-eslint/no-unsafe-member-access": 15,
+      "@typescript-eslint/prefer-regexp-exec": 1
+    },
+    "server/contracts/openapiGenerator.ts": {
+      "@typescript-eslint/no-explicit-any": 17,
+      "@typescript-eslint/no-unnecessary-type-assertion": 1,
+      "@typescript-eslint/no-unsafe-argument": 3,
+      "@typescript-eslint/no-unsafe-assignment": 9,
+      "@typescript-eslint/no-unsafe-member-access": 6
+    },
+    "server/contracts/responseValidation.ts": {
+      "@typescript-eslint/prefer-optional-chain": 2
+    },
+    "server/db/errors.ts": {
+      "@typescript-eslint/no-explicit-any": 3,
+      "@typescript-eslint/no-unsafe-assignment": 1,
+      "@typescript-eslint/no-unsafe-member-access": 4
+    },
+    "server/db/index.ts": {
+      "@typescript-eslint/no-explicit-any": 8,
+      "@typescript-eslint/no-unnecessary-type-assertion": 1,
+      "@typescript-eslint/no-unsafe-assignment": 7,
+      "@typescript-eslint/no-unsafe-call": 7,
+      "@typescript-eslint/no-unsafe-member-access": 9,
+      "@typescript-eslint/no-unsafe-return": 5
+    },
+    "server/email.ts": {
+      "@typescript-eslint/no-unused-vars": 2
+    },
+    "server/errors/ApiError.ts": {
+      "@typescript-eslint/no-explicit-any": 3,
+      "@typescript-eslint/no-inferrable-types": 5,
+      "@typescript-eslint/no-unsafe-assignment": 1
+    },
+    "server/github-api.ts": {
+      "@typescript-eslint/no-unsafe-argument": 1,
+      "@typescript-eslint/no-unsafe-assignment": 6,
+      "@typescript-eslint/no-unsafe-call": 2,
+      "@typescript-eslint/no-unsafe-member-access": 6
+    },
+    "server/github/client.ts": {
+      "@typescript-eslint/no-inferrable-types": 2,
+      "@typescript-eslint/no-unused-vars": 2,
+      "@typescript-eslint/prefer-nullish-coalescing": 7,
+      "no-useless-escape": 5
+    },
+    "server/github/formatter.ts": {
+      "@typescript-eslint/consistent-indexed-object-style": 1,
+      "@typescript-eslint/prefer-nullish-coalescing": 4,
+      "@typescript-eslint/prefer-optional-chain": 1,
+      "@typescript-eslint/prefer-regexp-exec": 1,
+      "@typescript-eslint/prefer-string-starts-ends-with": 4,
+      "no-useless-escape": 2
+    },
+    "server/github/importHygiene.ts": {
+      "@typescript-eslint/no-explicit-any": 4,
+      "@typescript-eslint/no-unsafe-argument": 2,
+      "@typescript-eslint/no-unsafe-assignment": 1,
+      "@typescript-eslint/no-unsafe-call": 1,
+      "@typescript-eslint/no-unsafe-member-access": 2,
+      "@typescript-eslint/prefer-regexp-exec": 2,
+      "prefer-const": 1
+    },
+    "server/github/parser.ts": {
+      "@typescript-eslint/no-explicit-any": 2,
+      "@typescript-eslint/prefer-for-of": 1,
+      "@typescript-eslint/prefer-nullish-coalescing": 1,
+      "@typescript-eslint/prefer-regexp-exec": 2,
+      "@typescript-eslint/require-await": 1,
+      "no-useless-escape": 1
+    },
+    "server/github/replitConnection.ts": {
+      "@typescript-eslint/prefer-nullish-coalescing": 2
+    },
+    "server/github/syncService.ts": {
+      "@typescript-eslint/array-type": 1,
+      "@typescript-eslint/consistent-generic-constructors": 1,
+      "@typescript-eslint/no-explicit-any": 26,
+      "@typescript-eslint/no-unnecessary-type-assertion": 1,
+      "@typescript-eslint/no-unsafe-argument": 2,
+      "@typescript-eslint/no-unsafe-assignment": 12,
+      "@typescript-eslint/no-unsafe-call": 4,
+      "@typescript-eslint/no-unsafe-member-access": 34,
+      "@typescript-eslint/non-nullable-type-assertion-style": 5,
+      "@typescript-eslint/prefer-nullish-coalescing": 19,
+      "@typescript-eslint/prefer-regexp-exec": 2,
+      "no-useless-escape": 5
+    },
+    "server/health.ts": {
+      "@typescript-eslint/consistent-type-definitions": 1
+    },
+    "server/index.ts": {
+      "@typescript-eslint/no-explicit-any": 1,
+      "@typescript-eslint/no-unsafe-member-access": 1,
+      "@typescript-eslint/no-unused-vars": 5,
+      "@typescript-eslint/prefer-nullish-coalescing": 7,
+      "@typescript-eslint/prefer-optional-chain": 1,
+      "@typescript-eslint/prefer-regexp-exec": 1
+    },
+    "server/jobs/linkHealthScheduler.ts": {
+      "@typescript-eslint/no-unsafe-member-access": 1
+    },
+    "server/jobs/orphanJobWatchdog.ts": {
+      "@typescript-eslint/no-explicit-any": 2,
+      "@typescript-eslint/no-unsafe-member-access": 2,
+      "@typescript-eslint/no-unused-vars": 1,
+      "@typescript-eslint/prefer-nullish-coalescing": 2
+    },
+    "server/lib/mixpanelServer.ts": {
+      "@typescript-eslint/no-unsafe-member-access": 2,
+      "@typescript-eslint/prefer-nullish-coalescing": 1
+    },
+    "server/lib/publicResource.ts": {
+      "@typescript-eslint/no-explicit-any": 2,
+      "@typescript-eslint/no-unsafe-assignment": 1,
+      "@typescript-eslint/no-unsafe-call": 1,
+      "@typescript-eslint/no-unsafe-member-access": 8
+    },
+    "server/lib/tagCanonicalize.ts": {
+      "prefer-const": 1
+    },
+    "server/lib/titleClean.ts": {
+      "@typescript-eslint/prefer-regexp-exec": 1
+    },
+    "server/middleware/apiAuth.ts": {
+      "@typescript-eslint/no-explicit-any": 2,
+      "@typescript-eslint/no-unsafe-member-access": 1
+    },
+    "server/middleware/errorHandler.ts": {
+      "@typescript-eslint/no-explicit-any": 6,
+      "@typescript-eslint/no-unsafe-assignment": 2,
+      "@typescript-eslint/no-unsafe-member-access": 6,
+      "@typescript-eslint/no-unused-vars": 1
+    },
+    "server/middleware/errors.ts": {
+      "@typescript-eslint/no-explicit-any": 2,
+      "@typescript-eslint/no-inferrable-types": 9,
+      "@typescript-eslint/no-unsafe-assignment": 1
+    },
+    "server/middleware/pgRateLimitStore.ts": {
+      "@typescript-eslint/no-explicit-any": 4,
+      "@typescript-eslint/no-unsafe-argument": 6,
+      "@typescript-eslint/no-unsafe-assignment": 2,
+      "@typescript-eslint/no-unsafe-member-access": 9
+    },
+    "server/middleware/rateLimit.ts": {
+      "@typescript-eslint/no-explicit-any": 2,
+      "@typescript-eslint/no-unsafe-assignment": 1,
+      "@typescript-eslint/no-unsafe-member-access": 4,
+      "@typescript-eslint/prefer-nullish-coalescing": 3
+    },
+    "server/middlewares/clerkProxyMiddleware.ts": {
+      "@typescript-eslint/dot-notation": 1,
+      "@typescript-eslint/prefer-nullish-coalescing": 6,
+      "@typescript-eslint/restrict-template-expressions": 1
+    },
+    "server/migrate.ts": {
+      "@typescript-eslint/array-type": 1,
+      "@typescript-eslint/no-explicit-any": 2,
+      "@typescript-eslint/no-unsafe-assignment": 2,
+      "@typescript-eslint/no-unsafe-call": 2,
+      "@typescript-eslint/no-unsafe-member-access": 8
+    },
+    "server/og-middleware.ts": {
+      "@typescript-eslint/array-type": 4,
+      "@typescript-eslint/consistent-type-definitions": 1,
+      "@typescript-eslint/no-explicit-any": 73,
+      "@typescript-eslint/no-unnecessary-type-assertion": 2,
+      "@typescript-eslint/no-unsafe-argument": 10,
+      "@typescript-eslint/no-unsafe-assignment": 72,
+      "@typescript-eslint/no-unsafe-call": 21,
+      "@typescript-eslint/no-unsafe-member-access": 135,
+      "@typescript-eslint/no-unsafe-return": 7,
+      "@typescript-eslint/prefer-nullish-coalescing": 7,
+      "@typescript-eslint/prefer-optional-chain": 3,
+      "@typescript-eslint/prefer-regexp-exec": 18,
+      "no-useless-escape": 18,
+      "prefer-const": 1
+    },
+    "server/openapi.ts": {
+      "@typescript-eslint/no-explicit-any": 1
+    },
+    "server/ops/heavyWork.ts": {
+      "@typescript-eslint/consistent-type-definitions": 1
+    },
+    "server/ops/operationalTelemetry.ts": {
+      "@typescript-eslint/consistent-type-definitions": 1,
+      "@typescript-eslint/no-base-to-string": 1,
+      "@typescript-eslint/no-explicit-any": 1,
+      "@typescript-eslint/no-unsafe-assignment": 1,
+      "@typescript-eslint/no-unsafe-member-access": 4
+    },
+    "server/ops/requestContext.ts": {
+      "@typescript-eslint/consistent-type-definitions": 1
+    },
+    "server/parser.ts": {
+      "@typescript-eslint/no-unused-vars": 4,
+      "@typescript-eslint/prefer-nullish-coalescing": 2,
+      "@typescript-eslint/prefer-regexp-exec": 5,
+      "@typescript-eslint/require-await": 1,
+      "no-useless-escape": 6
+    },
+    "server/recommendation-engine.ts": {
+      "@typescript-eslint/no-inferrable-types": 3,
+      "@typescript-eslint/no-unnecessary-type-assertion": 1,
+      "@typescript-eslint/prefer-nullish-coalescing": 2
+    },
+    "server/repositories/AdminRepository.ts": {
+      "@typescript-eslint/no-explicit-any": 3,
+      "@typescript-eslint/no-unsafe-assignment": 2,
+      "@typescript-eslint/require-await": 2
+    },
+    "server/repositories/AuditLogRepository.ts": {
+      "@typescript-eslint/no-explicit-any": 2,
+      "@typescript-eslint/no-unnecessary-type-assertion": 2,
+      "@typescript-eslint/no-unused-vars": 1
+    },
+    "server/repositories/AuditRepository.ts": {
+      "@typescript-eslint/array-type": 1,
+      "@typescript-eslint/no-base-to-string": 1,
+      "@typescript-eslint/no-explicit-any": 7,
+      "@typescript-eslint/no-unnecessary-type-assertion": 1,
+      "@typescript-eslint/no-unsafe-argument": 1,
+      "@typescript-eslint/no-unsafe-assignment": 3,
+      "@typescript-eslint/prefer-optional-chain": 1
+    },
+    "server/repositories/CategoryRepository.ts": {
+      "@typescript-eslint/no-explicit-any": 2,
+      "@typescript-eslint/no-unsafe-assignment": 2
+    },
+    "server/repositories/EnrichmentRepository.ts": {
+      "@typescript-eslint/no-explicit-any": 1,
+      "@typescript-eslint/no-inferrable-types": 2,
+      "@typescript-eslint/no-unsafe-member-access": 1
+    },
+    "server/repositories/FavoriteRepository.ts": {
+      "@typescript-eslint/array-type": 1
+    },
+    "server/repositories/GithubSyncRepository.ts": {
+      "@typescript-eslint/no-explicit-any": 4,
+      "@typescript-eslint/no-inferrable-types": 1,
+      "@typescript-eslint/no-unsafe-argument": 1,
+      "@typescript-eslint/no-unsafe-assignment": 2
+    },
+    "server/repositories/HierarchyRepository.ts": {
+      "@typescript-eslint/no-explicit-any": 6,
+      "@typescript-eslint/no-unsafe-argument": 2,
+      "@typescript-eslint/no-unsafe-assignment": 4,
+      "@typescript-eslint/no-unsafe-member-access": 8
+    },
+    "server/repositories/HomeNavRepository.ts": {
+      "@typescript-eslint/array-type": 5,
+      "@typescript-eslint/consistent-type-definitions": 2
+    },
+    "server/repositories/JourneyRepository.ts": {
+      "@typescript-eslint/no-explicit-any": 1,
+      "@typescript-eslint/no-unsafe-assignment": 1
+    },
+    "server/repositories/LearningJourneyRepository.ts": {
+      "@typescript-eslint/array-type": 1,
+      "@typescript-eslint/consistent-type-definitions": 2,
+      "@typescript-eslint/no-explicit-any": 1,
+      "@typescript-eslint/no-unnecessary-type-assertion": 1,
+      "@typescript-eslint/no-unsafe-member-access": 2,
+      "@typescript-eslint/prefer-optional-chain": 2
+    },
+    "server/repositories/LegacyRepository.ts": {
+      "@typescript-eslint/no-unused-vars": 3
+    },
+    "server/repositories/ResourceRepository.ts": {
+      "@typescript-eslint/array-type": 1,
+      "@typescript-eslint/consistent-type-definitions": 3,
+      "@typescript-eslint/no-explicit-any": 1,
+      "@typescript-eslint/no-unnecessary-type-assertion": 6,
+      "@typescript-eslint/no-unsafe-assignment": 2,
+      "@typescript-eslint/no-unsafe-member-access": 5,
+      "@typescript-eslint/no-unused-vars": 3,
+      "@typescript-eslint/prefer-nullish-coalescing": 6,
+      "@typescript-eslint/prefer-regexp-exec": 1
+    },
+    "server/repositories/TagRepository.ts": {
+      "@typescript-eslint/array-type": 1
+    },
+    "server/repositories/UserFeatureRepository.ts": {
+      "@typescript-eslint/array-type": 4,
+      "@typescript-eslint/no-explicit-any": 2,
+      "@typescript-eslint/no-unsafe-argument": 1,
+      "@typescript-eslint/no-unsafe-member-access": 2,
+      "@typescript-eslint/no-unused-vars": 1,
+      "@typescript-eslint/prefer-nullish-coalescing": 3,
+      "@typescript-eslint/prefer-optional-chain": 2
+    },
+    "server/repositories/UserRepository.ts": {
+      "@typescript-eslint/no-explicit-any": 1,
+      "@typescript-eslint/no-unnecessary-type-assertion": 1,
+      "@typescript-eslint/no-unsafe-argument": 1,
+      "@typescript-eslint/no-unused-vars": 2,
+      "@typescript-eslint/prefer-nullish-coalescing": 2,
+      "@typescript-eslint/require-await": 1
+    },
+    "server/repositories/ensureSubSubcategory.ts": {
+      "@typescript-eslint/prefer-optional-chain": 1
+    },
+    "server/routes.ts": {
+      "@typescript-eslint/no-explicit-any": 3,
+      "@typescript-eslint/no-unsafe-assignment": 2,
+      "@typescript-eslint/no-unsafe-call": 4,
+      "@typescript-eslint/no-unsafe-member-access": 5,
+      "@typescript-eslint/prefer-nullish-coalescing": 2,
+      "@typescript-eslint/require-await": 1
+    },
+    "server/routes/domains/admin-content.ts": {
+      "@typescript-eslint/no-base-to-string": 1,
+      "@typescript-eslint/no-explicit-any": 34,
+      "@typescript-eslint/no-unnecessary-type-assertion": 1,
+      "@typescript-eslint/no-unsafe-argument": 48,
+      "@typescript-eslint/no-unsafe-assignment": 36,
+      "@typescript-eslint/no-unsafe-call": 9,
+      "@typescript-eslint/no-unsafe-member-access": 99,
+      "@typescript-eslint/prefer-nullish-coalescing": 6,
+      "@typescript-eslint/prefer-optional-chain": 2,
+      "@typescript-eslint/require-await": 1
+    },
+    "server/routes/domains/ai-jobs.ts": {
+      "@typescript-eslint/no-base-to-string": 2,
+      "@typescript-eslint/no-explicit-any": 27,
+      "@typescript-eslint/no-unsafe-argument": 5,
+      "@typescript-eslint/no-unsafe-assignment": 45,
+      "@typescript-eslint/no-unsafe-member-access": 54,
+      "@typescript-eslint/prefer-nullish-coalescing": 5
+    },
+    "server/routes/domains/auth-user.ts": {
+      "@typescript-eslint/no-explicit-any": 3,
+      "@typescript-eslint/no-unsafe-argument": 2,
+      "@typescript-eslint/no-unsafe-assignment": 2,
+      "@typescript-eslint/no-unsafe-member-access": 7,
+      "@typescript-eslint/prefer-nullish-coalescing": 1
+    },
+    "server/routes/domains/catalog-contributions.ts": {
+      "@typescript-eslint/no-explicit-any": 15,
+      "@typescript-eslint/no-unnecessary-type-assertion": 1,
+      "@typescript-eslint/no-unsafe-argument": 15,
+      "@typescript-eslint/no-unsafe-assignment": 16,
+      "@typescript-eslint/no-unsafe-call": 25,
+      "@typescript-eslint/no-unsafe-member-access": 50,
+      "@typescript-eslint/no-unsafe-return": 11,
+      "@typescript-eslint/no-unused-vars": 2,
+      "@typescript-eslint/non-nullable-type-assertion-style": 4,
+      "@typescript-eslint/prefer-nullish-coalescing": 8,
+      "@typescript-eslint/prefer-optional-chain": 4
+    },
+    "server/routes/domains/contact.ts": {
+      "@typescript-eslint/prefer-nullish-coalescing": 2
+    },
+    "server/routes/domains/export-link-health.ts": {
+      "@typescript-eslint/array-type": 1,
+      "@typescript-eslint/no-base-to-string": 2,
+      "@typescript-eslint/no-explicit-any": 64,
+      "@typescript-eslint/no-unnecessary-type-assertion": 6,
+      "@typescript-eslint/no-unsafe-argument": 17,
+      "@typescript-eslint/no-unsafe-assignment": 86,
+      "@typescript-eslint/no-unsafe-call": 19,
+      "@typescript-eslint/no-unsafe-member-access": 157,
+      "@typescript-eslint/no-unsafe-return": 11,
+      "@typescript-eslint/no-unused-vars": 2,
+      "@typescript-eslint/prefer-nullish-coalescing": 18
+    },
+    "server/routes/domains/journeys-recommendations.ts": {
+      "@typescript-eslint/no-explicit-any": 27,
+      "@typescript-eslint/no-unsafe-argument": 45,
+      "@typescript-eslint/no-unsafe-assignment": 28,
+      "@typescript-eslint/no-unsafe-call": 2,
+      "@typescript-eslint/no-unsafe-member-access": 52,
+      "@typescript-eslint/no-unsafe-return": 1,
+      "@typescript-eslint/no-unused-vars": 1,
+      "@typescript-eslint/prefer-nullish-coalescing": 5,
+      "@typescript-eslint/prefer-optional-chain": 7,
+      "@typescript-eslint/require-await": 1
+    },
+    "server/routes/domains/operations.ts": {
+      "@typescript-eslint/array-type": 1,
+      "@typescript-eslint/no-explicit-any": 8,
+      "@typescript-eslint/no-unsafe-argument": 6,
+      "@typescript-eslint/no-unsafe-assignment": 4,
+      "@typescript-eslint/no-unsafe-call": 4,
+      "@typescript-eslint/no-unsafe-member-access": 25,
+      "@typescript-eslint/no-unsafe-return": 2,
+      "@typescript-eslint/prefer-nullish-coalescing": 1
+    },
+    "server/routes/domains/user-features.ts": {
+      "@typescript-eslint/array-type": 1,
+      "@typescript-eslint/no-explicit-any": 34,
+      "@typescript-eslint/no-unnecessary-type-assertion": 1,
+      "@typescript-eslint/no-unsafe-argument": 83,
+      "@typescript-eslint/no-unsafe-assignment": 32,
+      "@typescript-eslint/no-unsafe-member-access": 67,
+      "@typescript-eslint/no-unsafe-return": 1,
+      "@typescript-eslint/no-unused-vars": 3,
+      "@typescript-eslint/prefer-nullish-coalescing": 5,
+      "@typescript-eslint/prefer-optional-chain": 2,
+      "@typescript-eslint/prefer-regexp-exec": 1,
+      "prefer-const": 1
+    },
+    "server/routes/non-api.ts": {
+      "@typescript-eslint/no-base-to-string": 1,
+      "@typescript-eslint/no-explicit-any": 13,
+      "@typescript-eslint/no-unsafe-argument": 3,
+      "@typescript-eslint/no-unsafe-assignment": 3,
+      "@typescript-eslint/no-unsafe-call": 14,
+      "@typescript-eslint/no-unsafe-member-access": 20,
+      "@typescript-eslint/no-unsafe-return": 4,
+      "@typescript-eslint/prefer-nullish-coalescing": 2,
+      "no-useless-escape": 1
+    },
+    "server/seed.ts": {
+      "@typescript-eslint/consistent-type-definitions": 1,
+      "@typescript-eslint/no-unused-vars": 1,
+      "@typescript-eslint/prefer-nullish-coalescing": 1
+    },
+    "server/seo-content.ts": {
+      "@typescript-eslint/consistent-type-definitions": 3,
+      "@typescript-eslint/no-base-to-string": 2,
+      "@typescript-eslint/no-explicit-any": 25,
+      "@typescript-eslint/no-inferrable-types": 1,
+      "@typescript-eslint/no-unsafe-argument": 1,
+      "@typescript-eslint/no-unsafe-assignment": 31,
+      "@typescript-eslint/no-unsafe-call": 6,
+      "@typescript-eslint/no-unsafe-member-access": 59,
+      "@typescript-eslint/no-unsafe-return": 4
+    },
+    "server/services/digestService.ts": {
+      "@typescript-eslint/array-type": 3,
+      "@typescript-eslint/consistent-type-definitions": 1,
+      "@typescript-eslint/no-unnecessary-type-assertion": 1,
+      "@typescript-eslint/prefer-nullish-coalescing": 1,
+      "@typescript-eslint/prefer-optional-chain": 1
+    },
+    "server/services/linkHealthService.ts": {
+      "@typescript-eslint/no-explicit-any": 1,
+      "@typescript-eslint/no-unsafe-assignment": 1,
+      "@typescript-eslint/no-unsafe-member-access": 3,
+      "@typescript-eslint/prefer-nullish-coalescing": 2,
+      "@typescript-eslint/prefer-optional-chain": 2
+    },
+    "server/services/public-discovery.ts": {
+      "@typescript-eslint/no-unsafe-argument": 6,
+      "@typescript-eslint/no-unsafe-member-access": 5,
+      "@typescript-eslint/prefer-nullish-coalescing": 7
+    },
+    "server/services/relatedResources.ts": {
+      "@typescript-eslint/prefer-nullish-coalescing": 2
+    },
+    "server/ssr-dev.ts": {
+      "@typescript-eslint/no-unsafe-argument": 1,
+      "@typescript-eslint/no-unsafe-assignment": 3,
+      "@typescript-eslint/no-unsafe-call": 1,
+      "@typescript-eslint/require-await": 1
+    },
+    "server/ssr.ts": {
+      "@typescript-eslint/consistent-indexed-object-style": 1,
+      "@typescript-eslint/consistent-type-definitions": 1,
+      "@typescript-eslint/prefer-nullish-coalescing": 3,
+      "@typescript-eslint/prefer-regexp-exec": 1
+    },
+    "server/storage.ts": {
+      "@typescript-eslint/array-type": 6,
+      "@typescript-eslint/no-explicit-any": 21,
+      "@typescript-eslint/no-redundant-type-constituents": 4,
+      "@typescript-eslint/no-unsafe-assignment": 1,
+      "@typescript-eslint/no-unsafe-member-access": 2,
+      "@typescript-eslint/no-unsafe-return": 2,
+      "@typescript-eslint/no-unused-vars": 2,
+      "@typescript-eslint/prefer-nullish-coalescing": 2
+    },
+    "server/validation/awesomeLint.ts": {
+      "@typescript-eslint/consistent-indexed-object-style": 1,
+      "@typescript-eslint/no-unused-vars": 1,
+      "@typescript-eslint/prefer-includes": 1,
+      "@typescript-eslint/prefer-nullish-coalescing": 1,
+      "@typescript-eslint/prefer-regexp-exec": 4,
+      "@typescript-eslint/prefer-string-starts-ends-with": 2
+    },
+    "server/validation/exportLinkGate.ts": {
+      "@typescript-eslint/array-type": 2
+    },
+    "server/validation/inputs.ts": {
+      "@typescript-eslint/no-explicit-any": 4,
+      "@typescript-eslint/no-unsafe-member-access": 1,
+      "@typescript-eslint/no-unsafe-return": 2
+    },
+    "server/validation/linkChecker.ts": {
+      "@typescript-eslint/array-type": 4,
+      "@typescript-eslint/consistent-indexed-object-style": 2,
+      "@typescript-eslint/no-explicit-any": 9,
+      "@typescript-eslint/no-unsafe-argument": 2,
+      "@typescript-eslint/no-unsafe-assignment": 2,
+      "@typescript-eslint/no-unsafe-call": 4,
+      "@typescript-eslint/no-unsafe-member-access": 6,
+      "@typescript-eslint/no-unused-vars": 1,
+      "@typescript-eslint/prefer-nullish-coalescing": 13,
+      "@typescript-eslint/prefer-optional-chain": 1,
+      "@typescript-eslint/prefer-regexp-exec": 2
+    },
+    "server/version-route.ts": {
+      "@typescript-eslint/prefer-nullish-coalescing": 3
+    },
+    "shared/admin-tabs.ts": {
+      "@typescript-eslint/no-unnecessary-type-assertion": 1
+    },
+    "shared/faq.ts": {
+      "@typescript-eslint/prefer-nullish-coalescing": 1
+    },
+    "shared/journeyProgress.ts": {
+      "@typescript-eslint/prefer-nullish-coalescing": 2
+    },
+    "shared/schema.ts": {
+      "@typescript-eslint/array-type": 1,
+      "@typescript-eslint/no-explicit-any": 11,
+      "@typescript-eslint/no-unused-vars": 2
+    },
+    "shared/seo-templates.ts": {
+      "@typescript-eslint/prefer-nullish-coalescing": 3,
+      "@typescript-eslint/prefer-optional-chain": 2,
+      "@typescript-eslint/prefer-regexp-exec": 1,
+      "no-useless-escape": 1
+    },
+    "shared/site-identity.ts": {
+      "@typescript-eslint/prefer-nullish-coalescing": 1
+    },
+    "shared/validation.ts": {
+      "@typescript-eslint/prefer-regexp-exec": 1
+    },
+    "tests/e2e/admin-operations.spec.ts": {
+      "@typescript-eslint/array-type": 1,
+      "@typescript-eslint/no-unnecessary-type-assertion": 1,
+      "@typescript-eslint/no-unsafe-argument": 1,
+      "@typescript-eslint/no-unsafe-assignment": 1,
+      "@typescript-eslint/no-unsafe-member-access": 2
+    },
+    "tests/e2e/admin-users-audit.spec.ts": {
+      "@typescript-eslint/consistent-type-definitions": 4,
+      "@typescript-eslint/no-unsafe-assignment": 1,
+      "@typescript-eslint/non-nullable-type-assertion-style": 1
+    },
+    "tests/e2e/browse-categories.spec.ts": {
+      "@typescript-eslint/no-unused-vars": 1,
+      "@typescript-eslint/prefer-nullish-coalescing": 9
+    },
+    "tests/e2e/continue-learning.spec.ts": {
+      "@typescript-eslint/consistent-type-definitions": 3
+    },
+    "tests/e2e/favorites.spec.ts": {
+      "@typescript-eslint/no-unused-vars": 2
+    },
+    "tests/e2e/resource-detail.spec.ts": {
+      "@typescript-eslint/no-unused-vars": 1,
+      "@typescript-eslint/prefer-nullish-coalescing": 5,
+      "@typescript-eslint/prefer-regexp-exec": 1
+    },
+    "tests/e2e/search.spec.ts": {
+      "@typescript-eslint/no-unused-vars": 1,
+      "@typescript-eslint/prefer-nullish-coalescing": 1
+    },
+    "tests/e2e/task549-admin-fixtures.ts": {
+      "@typescript-eslint/ban-ts-comment": 1,
+      "@typescript-eslint/consistent-type-definitions": 5,
+      "@typescript-eslint/no-unsafe-assignment": 1,
+      "@typescript-eslint/no-unsafe-call": 1,
+      "@typescript-eslint/prefer-includes": 1,
+      "@typescript-eslint/prefer-nullish-coalescing": 1
+    },
+    "tests/helpers/api-helper.ts": {
+      "@typescript-eslint/consistent-type-definitions": 1,
+      "@typescript-eslint/no-explicit-any": 3,
+      "@typescript-eslint/no-inferrable-types": 6,
+      "@typescript-eslint/no-unsafe-argument": 3,
+      "@typescript-eslint/no-unsafe-assignment": 10,
+      "@typescript-eslint/no-unsafe-member-access": 8,
+      "@typescript-eslint/no-unused-vars": 4,
+      "@typescript-eslint/only-throw-error": 2
+    },
+    "tests/helpers/db-helper.ts": {
+      "@typescript-eslint/no-unused-vars": 1
+    },
+    "tests/integration/api/admin.test.ts": {
+      "@typescript-eslint/no-explicit-any": 5,
+      "@typescript-eslint/no-unsafe-assignment": 4,
+      "@typescript-eslint/no-unsafe-call": 7,
+      "@typescript-eslint/no-unsafe-member-access": 72,
+      "@typescript-eslint/no-unused-vars": 3
+    },
+    "tests/integration/api/auth.test.ts": {
+      "@typescript-eslint/no-unsafe-member-access": 4
+    },
+    "tests/integration/api/categories.test.ts": {
+      "@typescript-eslint/no-explicit-any": 5,
+      "@typescript-eslint/no-unsafe-assignment": 3,
+      "@typescript-eslint/no-unsafe-call": 5,
+      "@typescript-eslint/no-unsafe-member-access": 80,
+      "@typescript-eslint/no-unsafe-return": 3,
+      "@typescript-eslint/no-unused-vars": 2
+    },
+    "tests/integration/api/collections.test.ts": {
+      "@typescript-eslint/no-explicit-any": 6,
+      "@typescript-eslint/no-unsafe-assignment": 6,
+      "@typescript-eslint/no-unsafe-call": 7,
+      "@typescript-eslint/no-unsafe-member-access": 45,
+      "@typescript-eslint/no-unsafe-return": 2
+    },
+    "tests/integration/api/contact.test.ts": {
+      "@typescript-eslint/no-empty-function": 1,
+      "@typescript-eslint/no-misused-promises": 1,
+      "@typescript-eslint/no-unsafe-argument": 1,
+      "@typescript-eslint/no-unsafe-assignment": 12,
+      "@typescript-eslint/no-unsafe-call": 2,
+      "@typescript-eslint/no-unsafe-member-access": 16
+    },
+    "tests/integration/api/favorites.test.ts": {
+      "@typescript-eslint/no-explicit-any": 4,
+      "@typescript-eslint/no-unsafe-call": 4,
+      "@typescript-eslint/no-unsafe-member-access": 56,
+      "@typescript-eslint/no-unused-vars": 2
+    },
+    "tests/integration/api/resource-kinds.test.ts": {
+      "@typescript-eslint/consistent-type-definitions": 1,
+      "@typescript-eslint/no-explicit-any": 11,
+      "@typescript-eslint/no-misused-promises": 1,
+      "@typescript-eslint/no-unsafe-argument": 6,
+      "@typescript-eslint/no-unsafe-assignment": 13,
+      "@typescript-eslint/no-unsafe-call": 12,
+      "@typescript-eslint/no-unsafe-member-access": 110,
+      "@typescript-eslint/no-unsafe-return": 9
+    },
+    "tests/integration/api/resources.test.ts": {
+      "@typescript-eslint/no-explicit-any": 4,
+      "@typescript-eslint/no-unsafe-assignment": 1,
+      "@typescript-eslint/no-unsafe-call": 6,
+      "@typescript-eslint/no-unsafe-member-access": 83,
+      "@typescript-eslint/no-unsafe-return": 1,
+      "@typescript-eslint/no-unused-vars": 3
+    },
+    "tests/integration/security-headers.test.ts": {
+      "@typescript-eslint/no-unsafe-assignment": 1,
+      "@typescript-eslint/no-unsafe-member-access": 3
+    },
+    "tests/parity/actions.mjs": {
+      "@typescript-eslint/no-empty-function": 1
+    },
+    "tests/parity/comparison-reference-adjustments.mjs": {
+      "no-undef": 1
+    },
+    "tests/parity/identity.mjs": {
+      "@typescript-eslint/no-empty-function": 3
+    },
+    "tests/parity/nonpixel-runner.mjs": {
+      "@typescript-eslint/no-empty-function": 1,
+      "no-undef": 2
+    },
+    "tests/parity/readiness.mjs": {
+      "no-undef": 4
+    },
+    "tests/parity/reference-admin-catalog-0929.mjs": {
+      "@typescript-eslint/no-empty-function": 1,
+      "no-regex-spaces": 3,
+      "no-undef": 2
+    },
+    "tests/parity/reference-admin-ops-0929.mjs": {
+      "@typescript-eslint/no-empty-function": 1,
+      "no-undef": 1
+    },
+    "tests/parity/reference-admin-research-0929.mjs": {
+      "@typescript-eslint/no-empty-function": 1,
+      "no-regex-spaces": 1,
+      "no-undef": 1
+    },
+    "tests/parity/reference-footer-20260929.mjs": {
+      "no-regex-spaces": 2
+    },
+    "tests/parity/reference-home-20260929.mjs": {
+      "no-undef": 1
+    },
+    "tests/parity/reference-reconciliation.mjs": {
+      "no-empty": 1,
+      "no-undef": 1
+    },
+    "tests/parity/reference-resource-0929.mjs": {
+      "@typescript-eslint/no-empty-function": 1,
+      "no-undef": 1
+    },
+    "tests/parity/runner.mjs": {
+      "@typescript-eslint/no-empty-function": 6,
+      "no-empty": 1
+    },
+    "tests/setup.ts": {
+      "@typescript-eslint/require-await": 2
+    },
+    "tests/unit/anthropic-config-precedence.test.ts": {
+      "@typescript-eslint/array-type": 1
+    },
+    "tests/unit/anthropic-structured-output.test.ts": {
+      "@typescript-eslint/no-unsafe-assignment": 1,
+      "@typescript-eslint/no-unsafe-call": 8,
+      "@typescript-eslint/no-unsafe-member-access": 13
+    },
+    "tests/unit/auth.test.ts": {
+      "@typescript-eslint/no-explicit-any": 2,
+      "@typescript-eslint/no-unsafe-argument": 2
+    },
+    "tests/unit/client-resource-kinds.test.ts": {
+      "@typescript-eslint/require-await": 3
+    },
+    "tests/unit/mixpanel-server.test.ts": {
+      "@typescript-eslint/no-unsafe-assignment": 3,
+      "@typescript-eslint/no-unsafe-member-access": 9,
+      "@typescript-eslint/require-await": 1
+    },
+    "tests/unit/parser.test.ts": {
+      "@typescript-eslint/no-empty-function": 3,
+      "@typescript-eslint/no-explicit-any": 43,
+      "@typescript-eslint/no-unsafe-argument": 43,
+      "@typescript-eslint/no-unsafe-return": 3,
+      "@typescript-eslint/no-unused-vars": 2,
+      "@typescript-eslint/require-await": 39
+    },
+    "tests/unit/personalized-recommendation-signals.test.ts": {
+      "@typescript-eslint/no-unsafe-member-access": 2
+    },
+    "tests/unit/promote-enrichment-suggestions.test.ts": {
+      "@typescript-eslint/array-type": 1,
+      "@typescript-eslint/no-explicit-any": 5,
+      "@typescript-eslint/no-unsafe-argument": 5,
+      "@typescript-eslint/require-await": 6
+    },
+    "tests/unit/recommendation-engine.test.ts": {
+      "@typescript-eslint/no-unsafe-assignment": 2,
+      "@typescript-eslint/no-unused-vars": 2,
+      "@typescript-eslint/prefer-nullish-coalescing": 1
+    },
+    "tests/unit/sidebar-ux-css.test.ts": {
+      "@typescript-eslint/prefer-regexp-exec": 6
+    }
+  }
+}

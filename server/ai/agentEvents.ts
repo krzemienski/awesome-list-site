@@ -53,13 +53,12 @@ const MAX_SUMMARY = 4000;
 const EMIT_TIMEOUT_MS = 8000;
 
 function withEmitTimeout<T>(p: PromiseLike<T>): Promise<T> {
-  return new Promise<T>((resolve, reject) => {
-    const t = setTimeout(() => reject(new Error(`emit timed out after ${EMIT_TIMEOUT_MS}ms`)), EMIT_TIMEOUT_MS);
-    Promise.resolve(p).then(
-      (v) => { clearTimeout(t); resolve(v); },
-      (e) => { clearTimeout(t); reject(e); },
-    );
+  let t: ReturnType<typeof setTimeout> | undefined;
+  const timeout = new Promise<never>((_resolve, reject) => {
+    t = setTimeout(() => reject(new Error(`emit timed out after ${EMIT_TIMEOUT_MS}ms`)), EMIT_TIMEOUT_MS);
   });
+  // The insert's own rejection reason passes through unchanged.
+  return Promise.race([Promise.resolve(p), timeout]).finally(() => clearTimeout(t));
 }
 
 export class AgentEventEmitter {

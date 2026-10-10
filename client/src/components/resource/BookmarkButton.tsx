@@ -124,14 +124,14 @@ function BookmarkButton({
         // so a misclick isn't permanent (notes are restored too).
         const restoredNotes = notes;
         const removedEntry = removedEntryRef.current;
-        queryClient.invalidateQueries({ queryKey: ["/api/collections?includeArchived=true"] });
+        void queryClient.invalidateQueries({ queryKey: ["/api/collections?includeArchived=true"] });
         showToast({
           description: "Bookmark removed",
           duration: 6000,
           action: (
             <ToastAction
               altText="Undo bookmark removal"
-              onClick={async () => {
+              onClick={() => void (async () => {
                 try {
                   const { partial } = await restoreRemovedBookmark(resourceId, {
                     ...removedEntry,
@@ -154,7 +154,7 @@ function BookmarkButton({
                     variant: "destructive",
                   });
                 }
-              }}
+              })()}
             >
               Undo
             </ToastAction>
@@ -184,8 +184,8 @@ function BookmarkButton({
               }),
             ),
           ]).then((results) => {
-            queryClient.invalidateQueries({ queryKey: ["/api/bookmarks"] });
-            queryClient.invalidateQueries({
+            void queryClient.invalidateQueries({ queryKey: ["/api/bookmarks"] });
+            void queryClient.invalidateQueries({
               queryKey: ["/api/collections?includeArchived=true"],
             });
             if (results.some((result) => result.status === "rejected")) {

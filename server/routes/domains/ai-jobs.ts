@@ -36,6 +36,7 @@ import {
   SINGLE_LINE_CONTROL_RE,
   visibleLength,
 } from "@shared/validation";
+import { asyncHandler } from "../../middleware/asyncHandler";
 
 /**
  * Dependencies the AI job handlers need from the composing module. These mirror
@@ -64,7 +65,7 @@ export function registerAiJobsRoutes(
   // --- Enrichment API Routes ---
 
   // POST /api/enrichment/start - Start batch enrichment job
-  app.post('/api/enrichment/start', isAuthenticated, isAdmin, async (req: any, res) => {
+  app.post('/api/enrichment/start', isAuthenticated, isAdmin, asyncHandler(async (req: any, res) => {
     try {
       const { filter = 'unenriched', batchSize = 10 } = req.body;
       const userId = req.dbUser?.id;
@@ -114,10 +115,10 @@ export function registerAiJobsRoutes(
         error: error.message
       });
     }
-  });
+  }));
   
   // GET /api/enrichment/jobs - List all enrichment jobs
-  app.get('/api/enrichment/jobs', isAuthenticated, isAdmin, async (req, res) => {
+  app.get('/api/enrichment/jobs', isAuthenticated, isAdmin, asyncHandler(async (req, res) => {
     try {
       const rawLimit = String(req.query.limit ?? '');
       const limit = rawLimit === ''
@@ -143,10 +144,10 @@ export function registerAiJobsRoutes(
         error: error.message
       });
     }
-  });
+  }));
   
   // GET /api/enrichment/jobs/:id - Get job status with progress
-  app.get('/api/enrichment/jobs/:id', isAuthenticated, isAdmin, async (req, res) => {
+  app.get('/api/enrichment/jobs/:id', isAuthenticated, isAdmin, asyncHandler(async (req, res) => {
     try {
       const jobId = parseInt(req.params.id);
       
@@ -178,9 +179,9 @@ export function registerAiJobsRoutes(
         error: error.message
       });
     }
-  });
+  }));
 
-  app.get('/api/enrichment/jobs/:id/events', isAuthenticated, isAdmin, async (req, res) => {
+  app.get('/api/enrichment/jobs/:id/events', isAuthenticated, isAdmin, asyncHandler(async (req, res) => {
     try {
       const jobId = parseInt(req.params.id);
       if (Number.isNaN(jobId)) return res.status(400).json({ message: 'Invalid job ID' });
@@ -194,10 +195,10 @@ export function registerAiJobsRoutes(
     } catch (error: any) {
       res.status(500).json({ message: 'Failed to get agent events', error: error.message });
     }
-  });
+  }));
   
   // DELETE /api/enrichment/jobs/:id - Cancel a job
-  app.delete('/api/enrichment/jobs/:id', isAuthenticated, isAdmin, async (req, res) => {
+  app.delete('/api/enrichment/jobs/:id', isAuthenticated, isAdmin, asyncHandler(async (req, res) => {
     try {
       const jobId = Number(req.params.id);
       
@@ -227,7 +228,7 @@ export function registerAiJobsRoutes(
         error: error.message
       });
     }
-  });
+  }));
 
   // POST /api/admin/enrichment/backfill-suggestions
   // One-shot backfill: take resources that were enriched BEFORE task #59
@@ -237,7 +238,7 @@ export function registerAiJobsRoutes(
   // hierarchy columns via `promoteEnrichmentSuggestions`, auto-creating any
   // implied `sub_subcategories` rows. Idempotent — safe to re-run; only
   // touches rows where a corresponding hierarchy column is still blank.
-  app.post('/api/admin/enrichment/backfill-suggestions', isAuthenticated, isAdmin, async (req, res) => {
+  app.post('/api/admin/enrichment/backfill-suggestions', isAuthenticated, isAdmin, asyncHandler(async (req, res) => {
     try {
       const { promoteEnrichmentSuggestions } = await import('../../ai/promoteEnrichmentSuggestions');
 
@@ -320,11 +321,11 @@ export function registerAiJobsRoutes(
         error: error.message,
       });
     }
-  });
+  }));
 
   // --- AI Researcher Routes ---
 
-  app.post('/api/researcher/start', isAuthenticated, isAdmin, async (req: any, res) => {
+  app.post('/api/researcher/start', isAuthenticated, isAdmin, asyncHandler(async (req: any, res) => {
     try {
       const { researchService } = await import('../../ai/researchService');
       const { prompt, categoryFocus, maxBudgetUsd, maxTurns } = req.body ?? {};
@@ -433,11 +434,11 @@ export function registerAiJobsRoutes(
       console.error('Error starting research job:', error);
       res.status(500).json({ success: false, message: error.message || 'Failed to start research job' });
     }
-  });
+  }));
 
   // WS1 (July 30, 2026): preview the auto-generated research brief so the
   // admin can inspect/edit it in the textarea before launching.
-  app.get('/api/researcher/brief', isAuthenticated, isAdmin, async (_req, res) => {
+  app.get('/api/researcher/brief', isAuthenticated, isAdmin, asyncHandler(async (_req, res) => {
     try {
       const { researchService } = await import('../../ai/researchService');
       const { brief, angle } = await researchService.generateBrief();
@@ -446,9 +447,9 @@ export function registerAiJobsRoutes(
       console.error('Error generating research brief:', error);
       res.status(500).json({ success: false, message: error.message || 'Failed to generate research brief' });
     }
-  });
+  }));
 
-  app.get('/api/researcher/jobs', isAuthenticated, isAdmin, async (req, res) => {
+  app.get('/api/researcher/jobs', isAuthenticated, isAdmin, asyncHandler(async (req, res) => {
     try {
       const { researchService } = await import('../../ai/researchService');
       // Run23 NB-039: ship the total alongside the latest-20 list so the UI
@@ -467,9 +468,9 @@ export function registerAiJobsRoutes(
     } catch (error: any) {
       res.status(500).json({ message: 'Failed to list research jobs', error: error.message });
     }
-  });
+  }));
 
-  app.get('/api/researcher/jobs/:id', isAuthenticated, isAdmin, async (req, res) => {
+  app.get('/api/researcher/jobs/:id', isAuthenticated, isAdmin, asyncHandler(async (req, res) => {
     try {
       const { researchService } = await import('../../ai/researchService');
       const job = await researchService.getJob(parseInt(req.params.id));
@@ -478,9 +479,9 @@ export function registerAiJobsRoutes(
     } catch (error: any) {
       res.status(500).json({ message: 'Failed to get job', error: error.message });
     }
-  });
+  }));
 
-  app.get('/api/researcher/jobs/:id/events', isAuthenticated, isAdmin, async (req, res) => {
+  app.get('/api/researcher/jobs/:id/events', isAuthenticated, isAdmin, asyncHandler(async (req, res) => {
     try {
       const jobId = parseInt(req.params.id);
       if (Number.isNaN(jobId)) return res.status(400).json({ message: 'Invalid job ID' });
@@ -495,9 +496,9 @@ export function registerAiJobsRoutes(
     } catch (error: any) {
       res.status(500).json({ message: 'Failed to get agent events', error: error.message });
     }
-  });
+  }));
 
-  app.delete('/api/researcher/jobs/:id', isAuthenticated, isAdmin, async (req, res) => {
+  app.delete('/api/researcher/jobs/:id', isAuthenticated, isAdmin, asyncHandler(async (req, res) => {
     try {
       const jobId = Number(req.params.id);
       if (!Number.isInteger(jobId) || jobId <= 0 || jobId > 2147483647) {
@@ -512,9 +513,9 @@ export function registerAiJobsRoutes(
       }
       res.status(500).json({ message: 'Failed to cancel job', error: error.message });
     }
-  });
+  }));
 
-  app.get('/api/researcher/discoveries', isAuthenticated, isAdmin, async (req, res) => {
+  app.get('/api/researcher/discoveries', isAuthenticated, isAdmin, asyncHandler(async (req, res) => {
     try {
       const { researchService } = await import('../../ai/researchService');
       const jobId = req.query.jobId ? parseInt(req.query.jobId as string) : undefined;
@@ -525,12 +526,12 @@ export function registerAiJobsRoutes(
     } catch (error: any) {
       res.status(500).json({ message: 'Failed to get discoveries', error: error.message });
     }
-  });
+  }));
 
   // Bulk approve: every pending discovery (optionally scoped to one job).
   // Registered before the /:id routes are matched by method+path anyway, but
   // 'approve-all' would also parse as :id — keep it above them for clarity.
-  app.post('/api/researcher/discoveries/approve-all', isAuthenticated, isAdmin, async (req: any, res) => {
+  app.post('/api/researcher/discoveries/approve-all', isAuthenticated, isAdmin, asyncHandler(async (req: any, res) => {
     try {
       const { researchService } = await import('../../ai/researchService');
       const rawJobId = req.body?.jobId;
@@ -548,9 +549,9 @@ export function registerAiJobsRoutes(
     } catch (error: any) {
       res.status(500).json({ message: 'Failed to bulk-approve discoveries', error: error.message });
     }
-  });
+  }));
 
-  app.post('/api/researcher/discoveries/:id/approve', isAuthenticated, isAdmin, async (req: any, res) => {
+  app.post('/api/researcher/discoveries/:id/approve', isAuthenticated, isAdmin, asyncHandler(async (req: any, res) => {
     try {
       const { researchService } = await import('../../ai/researchService');
       const discovery = await researchService.approveDiscovery(parseInt(req.params.id), { actorId: req.dbUser?.id });
@@ -564,9 +565,9 @@ export function registerAiJobsRoutes(
       }
       res.status(500).json({ message: 'Failed to approve discovery', error: error.message });
     }
-  });
+  }));
 
-  app.post('/api/researcher/discoveries/:id/reject', isAuthenticated, isAdmin, async (req, res) => {
+  app.post('/api/researcher/discoveries/:id/reject', isAuthenticated, isAdmin, asyncHandler(async (req, res) => {
     try {
       const { researchService } = await import('../../ai/researchService');
       const { reason } = req.body;
@@ -581,5 +582,5 @@ export function registerAiJobsRoutes(
       }
       res.status(500).json({ message: 'Failed to reject discovery', error: error.message });
     }
-  });
+  }));
 }

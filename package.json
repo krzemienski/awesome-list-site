@@ -12,6 +12,7 @@
     "db:studio": "drizzle-kit studio",
     "lint": "eslint .",
     "lint:css": "stylelint \"client/**/*.css\"",
+    "lint:ratchet": "node scripts/validation/lint-ratchet.mjs",
     "validate:stylelint-system-tokens": "node scripts/validation/stylelint-design-system-token-contract.mjs",
     "format": "prettier --write .",
     "format:check": "prettier --check .",

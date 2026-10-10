@@ -328,7 +328,8 @@ function pagination(
     (page: number) => {
       const [path, query = ""] = basePath.split("?");
       const params = new URLSearchParams(query);
-      page > 1 ? params.set("page", String(page)) : params.delete("page");
+      if (page > 1) params.set("page", String(page));
+      else params.delete("page");
       const suffix = params.toString();
       return internalHref(path + (suffix ? `?${suffix}` : ""));
     },
@@ -470,7 +471,8 @@ export function renderSearchContent(opts: {
   // would land on the empty search page). internalHref escapes for HTML.
   const searchHref = (page: number) => {
     const params = new URLSearchParams(opts.searchParams ?? "");
-    page > 1 ? params.set("page", String(page)) : params.delete("page");
+    if (page > 1) params.set("page", String(page));
+    else params.delete("page");
     return internalHref(`/search?${params.toString()}`);
   };
   const pager = q || opts.browse ? paginationWithHref(searchHref, page, totalPages) : "";

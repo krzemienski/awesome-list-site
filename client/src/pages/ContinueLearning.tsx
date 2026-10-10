@@ -266,7 +266,7 @@ export default function ContinueLearning() {
 
       <header className="max-w-3xl space-y-3">
         <p className="eyebrow" aria-hidden>
-          // Learning dashboard
+          {"// Learning dashboard"}
         </p>
         <h1 className="display-h text-3xl sm:text-4xl">Continue Learning</h1>
         <p className="text-base text-muted-foreground sm:text-lg">
@@ -317,7 +317,7 @@ export default function ContinueLearning() {
           <div className="mb-4 flex flex-wrap items-end justify-between gap-2">
             <div>
               <p className="eyebrow mb-1" aria-hidden>
-                // In progress
+                {"// In progress"}
               </p>
               <h2 id="active-learning-heading" className="text-2xl font-bold">
                 Resume a journey
@@ -352,7 +352,7 @@ export default function ContinueLearning() {
         <section aria-labelledby="recent-resources-heading">
           <div className="mb-4">
             <p className="eyebrow mb-1" aria-hidden>
-              // Recent
+              {"// Recent"}
             </p>
             <h2 id="recent-resources-heading" className="flex items-center gap-2 text-2xl font-bold">
               <History className="account-accent-icon h-5 w-5" />
@@ -371,7 +371,7 @@ export default function ContinueLearning() {
         <section aria-labelledby="completed-learning-heading">
           <div className="mb-4">
             <p className="eyebrow mb-1" aria-hidden>
-              // Milestones
+              {"// Milestones"}
             </p>
             <h2 id="completed-learning-heading" className="flex items-center gap-2 text-2xl font-bold">
               <Trophy className="account-accent-icon h-5 w-5" />
@@ -406,7 +406,7 @@ export default function ContinueLearning() {
         <section aria-labelledby="suggested-learning-heading">
           <div className="mb-4">
             <p className="eyebrow mb-1" aria-hidden>
-              // Next up
+              {"// Next up"}
             </p>
             <h2 id="suggested-learning-heading" className="flex items-center gap-2 text-2xl font-bold">
               <Sparkles className="account-accent-icon h-5 w-5" />

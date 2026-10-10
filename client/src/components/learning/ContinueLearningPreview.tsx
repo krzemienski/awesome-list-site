@@ -85,7 +85,7 @@ export default function ContinueLearningPreview() {
         <div className="flex flex-wrap items-start justify-between gap-3">
           <div>
             <p className="eyebrow mb-1" aria-hidden>
-              // Your learning
+              {"// Your learning"}
             </p>
             <CardTitle className="flex items-center gap-2 text-xl">
               <BookOpen className="h-5 w-5 text-[var(--accent-ink)]" />

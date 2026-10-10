@@ -45,7 +45,7 @@ export function AdminPasswordSignIn() {
 
   return (
     <form
-      onSubmit={handleSubmit}
+      onSubmit={(event) => void handleSubmit(event)}
       className="flex w-full max-w-sm flex-col gap-4 px-4"
       data-testid="form-admin-password"
     >

@@ -31,6 +31,7 @@ const MIN_REJECTION_REASON_LENGTH = 10;
 // could approve an edit that visibly changed nothing. Replace each invisible
 // code point with its ‹U+XXXX› escape and flag values that contain them.
 // (Covers Cf/Cs zero-widths, bidi controls, BOM, blank-rendering glyphs.)
+// eslint-disable-next-line no-control-regex, no-misleading-character-class -- deliberate: each invisible code point is matched on its own
 const INVISIBLE_CHAR_RE = /[\u0000-\u0008\u000B\u000C\u000E-\u001F\u007F\u00AD\u034F\u061C\u115F\u1160\u17B4\u17B5\u180B-\u180E\u200B-\u200F\u202A-\u202E\u2060-\u206F\u2800\u3164\uFE00-\uFE0F\uFEFF\uFFA0]/g;
 
 function revealInvisible(value: string): { text: string; count: number } {
@@ -162,9 +163,9 @@ export default function PendingEdits() {
     },
     onSuccess: (_data, editId) => {
       planFocusAfterRemoval(editId);
-      queryClient.invalidateQueries({ queryKey: ['/api/admin/resource-edits'] });
-      queryClient.invalidateQueries({ queryKey: ['/api/admin/stats'] });
-      queryClient.invalidateQueries({ queryKey: ['/api/resources'] });
+      void queryClient.invalidateQueries({ queryKey: ['/api/admin/resource-edits'] });
+      void queryClient.invalidateQueries({ queryKey: ['/api/admin/stats'] });
+      void queryClient.invalidateQueries({ queryKey: ['/api/resources'] });
       setApproveDialogOpen(false);
       setEditToApprove(null);
       setApproveError(null);
@@ -188,8 +189,8 @@ export default function PendingEdits() {
     },
     onSuccess: (_data, { editId }) => {
       planFocusAfterRemoval(editId);
-      queryClient.invalidateQueries({ queryKey: ['/api/admin/resource-edits'] });
-      queryClient.invalidateQueries({ queryKey: ['/api/admin/stats'] });
+      void queryClient.invalidateQueries({ queryKey: ['/api/admin/resource-edits'] });
+      void queryClient.invalidateQueries({ queryKey: ['/api/admin/stats'] });
       setRejectDialogOpen(false);
       setEditToReject(null);
       setRejectionReason("");

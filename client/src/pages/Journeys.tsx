@@ -147,10 +147,10 @@ export default function Journeys() {
         });
       }
       // Same cache set the detail page's start button invalidates (NB-018).
-      queryClient.invalidateQueries({ queryKey: ['/api/journeys'] });
-      queryClient.invalidateQueries({ queryKey: [`/api/journeys/${journey.id}`] });
-      queryClient.invalidateQueries({ queryKey: ['/api/user/journeys'] });
-      queryClient.invalidateQueries({ queryKey: ['/api/user/continue-learning'] });
+      void queryClient.invalidateQueries({ queryKey: ['/api/journeys'] });
+      void queryClient.invalidateQueries({ queryKey: [`/api/journeys/${journey.id}`] });
+      void queryClient.invalidateQueries({ queryKey: ['/api/user/journeys'] });
+      void queryClient.invalidateQueries({ queryKey: ['/api/user/continue-learning'] });
       toast({
         title: "Journey Started!",
         description: "You've successfully enrolled in this learning journey.",

@@ -36,6 +36,7 @@ import { validateBody } from "../../validation/inputs";
 import { negotiated429Handler } from "../../middleware/rateLimit";
 import { PgRateLimitStore } from "../../middleware/pgRateLimitStore";
 import { isDatabaseUnavailableError } from "../../db/errors";
+import { asyncHandler } from "../../middleware/asyncHandler";
 
 export interface ContactRoutesContext {
   isAuthenticated: RequestHandler;
@@ -255,7 +256,7 @@ export function registerContactRoutes(app: Express, ctx: ContactRoutesContext): 
     contactSameOrigin,
     contactLimiter,
     validateBody(contactSubmissionSchema),
-    async (req, res) => {
+    asyncHandler(async (req, res) => {
       // validateBody(contactSubmissionSchema) already parsed + replaced req.body.
       const input = req.body as ContactSubmissionInput;
       const ipHash = hashContactIp(clientIp(req), config.contact.ip_hash_secret);
@@ -283,12 +284,12 @@ export function registerContactRoutes(app: Express, ctx: ContactRoutesContext): 
       } catch (error) {
         return sendDatabaseFailure(res, error, "persistence failed", "Could not save contact request");
       }
-    },
+    }),
   );
 
   // Admin inbox. Same pagination contract as GET /api/admin/audit-logs:
   // invalid limit/offset is a client error, the response carries the real total.
-  app.get("/api/admin/contact-submissions", isAuthenticated, isAdmin, async (req, res) => {
+  app.get("/api/admin/contact-submissions", isAuthenticated, isAdmin, asyncHandler(async (req, res) => {
     const rawLimit = req.query.limit as string | undefined;
     const rawOffset = req.query.offset as string | undefined;
 
@@ -319,5 +320,5 @@ export function registerContactRoutes(app: Express, ctx: ContactRoutesContext): 
     } catch (error) {
       return sendDatabaseFailure(res, error, "inbox listing failed", "Could not list contact submissions");
     }
-  });
+  }));
 }

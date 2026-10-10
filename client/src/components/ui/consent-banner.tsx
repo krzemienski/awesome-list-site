@@ -119,7 +119,7 @@ export default function ConsentBanner() {
       setChoiceMade(true);
     }
     setLegacyConsentReconciled(true);
-  }, [homeBoot?.consent, isInitialHomeHydration, legacyConsentReconciled]);
+  }, [homeBoot, isInitialHomeHydration, legacyConsentReconciled]);
 
   // The prepaint marker is only a one-render bridge. In particular it must be
   // removed once a persisted choice is reconciled, or Cookie settings would

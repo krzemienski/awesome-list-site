@@ -181,8 +181,9 @@ export default function AIRecommendationsPanel({
       );
       if (focusElement(summary)) return;
     }
-    focusElement(document.querySelector<HTMLElement>('[data-testid="recommendations-list"] h2'))
-      || focusPageHeading();
+    if (!focusElement(document.querySelector<HTMLElement>('[data-testid="recommendations-list"] h2'))) {
+      focusPageHeading();
+    }
   }, [visibleRecommendations.length]);
 
   useEffect(() => {

@@ -72,10 +72,20 @@ import type { Request, Response, NextFunction } from "express";
  * }));
  * ```
  */
-export function asyncHandler(
-  fn: (req: Request, res: Response, next: NextFunction) => Promise<any>
-) {
-  return (req: Request, res: Response, next: NextFunction) => {
-    Promise.resolve(fn(req, res, next)).catch(next);
+export function asyncHandler<Req = Request, Res = Response>(
+  fn: (req: Req, res: Res, next: NextFunction) => Promise<unknown>,
+): (req: Req, res: Res, next: NextFunction) => void {
+  // Express 4 ignores the promise a handler returns, so a rejection would
+  // otherwise escape as an unhandled rejection and leave the request hanging.
+  // The handler's own try/catch still answers every expected failure; this
+  // only forwards what escapes it to the error middleware.
+  const wrapped = (req: Req, res: Res, next: NextFunction) => {
+    fn(req, res, next).catch(next);
   };
+  // Route-contract introspection (server/contracts/install.ts) reads handler
+  // names and literal res.status() codes for the OpenAPI document; keep the
+  // wrapped handler visible so wrapping does not change the published spec.
+  Object.defineProperty(wrapped, "name", { value: fn.name });
+  Object.defineProperty(wrapped, "wrappedHandler", { value: fn });
+  return wrapped;
 }

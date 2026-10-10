@@ -207,6 +207,10 @@ args = "webfont-fetch"
 task = "workflow.run"
 args = "artifact-deps"
 
+[[workflows.workflow.tasks]]
+task = "workflow.run"
+args = "lint-ratchet"
+
 [[workflows.workflow]]
 name = "Start application"
 author = "agent"
@@ -637,6 +641,17 @@ author = "agent"
 [[workflows.workflow.tasks]]
 task = "shell.exec"
 args = "npm run validate:artifact-deps"
+
+[workflows.workflow.metadata]
+isValidation = true
+
+[[workflows.workflow]]
+name = "lint-ratchet"
+author = "agent"
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = "npm run lint:ratchet"
 
 [workflows.workflow.metadata]
 isValidation = true

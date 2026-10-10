@@ -30,9 +30,9 @@ export function useResumeJourney() {
       return href;
     },
     onSuccess: (href, variables) => {
-      queryClient.invalidateQueries({ queryKey: SUMMARY_KEY });
-      queryClient.invalidateQueries({ queryKey: ["/api/user/journeys"] });
-      queryClient.invalidateQueries({
+      void queryClient.invalidateQueries({ queryKey: SUMMARY_KEY });
+      void queryClient.invalidateQueries({ queryKey: ["/api/user/journeys"] });
+      void queryClient.invalidateQueries({
         queryKey: [`/api/journeys/${variables.journeyId}`],
       });
       setLocation(href);

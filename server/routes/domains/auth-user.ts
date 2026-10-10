@@ -36,6 +36,7 @@ import {
 } from "../../clerkAuth";
 import { negotiated429Handler } from "../../middleware/rateLimit";
 import { PgRateLimitStore } from "../../middleware/pgRateLimitStore";
+import { asyncHandler } from "../../middleware/asyncHandler";
 
 // Owner password sign-in: 10 attempts per 15 minutes per IP, on its own store
 // prefix so hits never double-count against the /api backstop limiter.
@@ -119,7 +120,7 @@ export function registerAuthUserRoutes(
   // Clerk session for the caller. Uses the Clerk-native user id (NOT the
   // bridge id) because this talks to the Clerk API. A deliberate user action,
   // so a Clerk API round-trip here is fine (unlike per-request lookups).
-  app.post("/api/auth/logout-all", isAuthenticated, async (req, res) => {
+  app.post("/api/auth/logout-all", isAuthenticated, asyncHandler(async (req, res) => {
     try {
       const clerkUserId = req.clerkIdentity?.clerkUserId;
       if (!clerkUserId) {
@@ -142,7 +143,7 @@ export function registerAuthUserRoutes(
       console.error("[/api/auth/logout-all] Error:", error);
       res.status(500).json({ message: "Failed to sign out everywhere" });
     }
-  });
+  }));
 
   // POST /api/auth/admin-login — owner password sign-in (no Clerk). A correct
   // OWNER_PASSWORD sets a signed 12-hour HttpOnly cookie that resolves to the

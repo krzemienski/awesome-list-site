@@ -41,6 +41,7 @@ export const DEFAULT_BODY_LIMITS: BodyGuardLimits = {
 };
 
 /** Control chars rejected inside strings: C0 + DEL, but NOT \t (\x09) \n (\x0A) \r (\x0D). */
+// eslint-disable-next-line no-control-regex -- deliberate: this pattern exists to match control characters
 const FORBIDDEN_CONTROL_RE = /[\u0000-\u0008\u000B\u000C\u000E-\u001F\u007F]/;
 
 export interface BodyIssue {

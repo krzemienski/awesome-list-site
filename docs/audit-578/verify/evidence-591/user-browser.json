@@ -1,0 +1,135 @@
+{
+  "results": [
+    {
+      "name": "consent banner shows for a new visitor",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "name": "consent Decline hides the banner",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "name": "consent choice persists across reload",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "name": "admin password form submit runs and shows an error for a wrong password",
+      "pass": true,
+      "detail": "Incorrect password."
+    },
+    {
+      "name": "still on sign-in after wrong password",
+      "pass": true,
+      "detail": "http://127.0.0.1:5000/sign-in?admin"
+    },
+    {
+      "name": "search page renders results for q=hls",
+      "pass": true,
+      "detail": "Page 1 of 8 · showing 1–24 of 179 results for “hls”"
+    },
+    {
+      "name": "journey #step-2 anchor scrolls into view and takes focus",
+      "pass": true,
+      "detail": "active=step-2 top=164"
+    },
+    {
+      "name": "fixture precondition: resource not bookmarked by admin",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "name": "bookmark click opens notes dialog and Save saves",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "name": "second click removes",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "name": "removal toast offers Undo",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "name": "Undo action (wrapped async handler) restores the bookmark",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "name": "cleanup: bookmark removed again (net zero)",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "name": "share button (wrapped handler) copies the resource URL or shows feedback",
+      "pass": true,
+      "detail": "clip=http://127.0.0.1:5000/resource/188015 toast=[\"Link copied\\nResource link copied to clipboard\"]"
+    },
+    {
+      "name": "suggest-edit: subcategory options follow the newly chosen category (watched value)",
+      "pass": true,
+      "detail": "category=Community & Events before=Select subcategory options=[\"Community Groups\",\"Events & Conferences\"]"
+    },
+    {
+      "name": "bookmarks page renders",
+      "pass": true,
+      "detail": "Home Bookmarks // LEARNING LIBRARY Saved, then finished. Turn bookmarks into a q"
+    },
+    {
+      "name": "settings page renders",
+      "pass": true,
+      "detail": "Home Settings Back Settings Manage your preferences and account. Pick a section "
+    },
+    {
+      "name": "continue-learning page renders",
+      "pass": true,
+      "detail": "Home Continue Learning // LEARNING DASHBOARD Continue Learning Pick up from your"
+    },
+    {
+      "name": "continue-learning page eyebrow comment text renders literally",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "name": "profile page renders",
+      "pass": true,
+      "detail": "Home Profile AU // PROFILE Admin User admin@example.com Joined 11 months ago Beg"
+    },
+    {
+      "name": "profile page eyebrow comment text renders literally",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "name": "admin researcher tab renders",
+      "pass": true,
+      "detail": "Home Admin Authorized admin area ADMIN CONSOLE · ADMIN USER Operations dashboard"
+    },
+    {
+      "name": "admin github tab renders",
+      "pass": true,
+      "detail": "Home Admin Authorized admin area ADMIN CONSOLE · ADMIN USER Operations dashboard"
+    },
+    {
+      "name": "admin edits tab renders",
+      "pass": true,
+      "detail": "Home Admin Authorized admin area ADMIN CONSOLE · ADMIN USER Operations dashboard"
+    },
+    {
+      "name": "search dialog (Ctrl+K) returns results",
+      "pass": true,
+      "detail": "options=16"
+    },
+    {
+      "name": "no page errors / unexpected console errors",
+      "pass": true,
+      "detail": "[]"
+    }
+  ],
+  "errors": []
+}

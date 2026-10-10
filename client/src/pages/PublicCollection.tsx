@@ -91,7 +91,7 @@ export default function PublicCollection({ shareId }: { shareId: string }) {
         ogUrl={publicUrl}
       />
       <header className="discovery-header">
-        <div className="eyebrow" aria-hidden>// Shared collection</div>
+        <div className="eyebrow" aria-hidden>{"// Shared collection"}</div>
         <div className="mt-2 flex items-start gap-3">
           <BookOpen className="h-8 w-8 shrink-0 text-primary" aria-hidden="true" />
           <div className="min-w-0">

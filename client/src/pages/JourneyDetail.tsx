@@ -153,6 +153,9 @@ export default function JourneyDetail() {
       target.focus({ preventScroll: true });
     });
     return () => cancelAnimationFrame(frame);
+    // Keyed to journey identity and step count: a background refetch (new
+    // object, same journey) must not scroll the reader back to the anchor.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [journey?.id, journey?.steps?.length]);
 
   // Start journey mutation
@@ -172,12 +175,12 @@ export default function JourneyDetail() {
           totalSteps: totalLogicalSteps,
         });
       }
-      queryClient.invalidateQueries({ queryKey: [`/api/journeys/${id}`] });
-      queryClient.invalidateQueries({ queryKey: ['/api/journeys'] });
+      void queryClient.invalidateQueries({ queryKey: [`/api/journeys/${id}`] });
+      void queryClient.invalidateQueries({ queryKey: ['/api/journeys'] });
       // NB-018 (run23): Profile's "My Journeys" card reads /api/user/journeys —
       // invalidate it too or it shows stale enrollment/progress until reload.
-      queryClient.invalidateQueries({ queryKey: ['/api/user/journeys'] });
-      queryClient.invalidateQueries({ queryKey: ['/api/user/continue-learning'] });
+      void queryClient.invalidateQueries({ queryKey: ['/api/user/journeys'] });
+      void queryClient.invalidateQueries({ queryKey: ['/api/user/continue-learning'] });
       toast({
         title: "Journey Started!",
         description: "You've successfully enrolled in this learning journey.",
@@ -336,11 +339,11 @@ export default function JourneyDetail() {
       }
       progressWriteInFlight.current = false;
       // Reconcile with the server truth either way (completedAt, currentStepId).
-      queryClient.invalidateQueries({ queryKey: [`/api/journeys/${id}`] });
-      queryClient.invalidateQueries({ queryKey: ['/api/journeys'] });
+      void queryClient.invalidateQueries({ queryKey: [`/api/journeys/${id}`] });
+      void queryClient.invalidateQueries({ queryKey: ['/api/journeys'] });
       // NB-018 (run23): keep Profile's journeys card in sync with progress.
-      queryClient.invalidateQueries({ queryKey: ['/api/user/journeys'] });
-      queryClient.invalidateQueries({ queryKey: ['/api/user/continue-learning'] });
+      void queryClient.invalidateQueries({ queryKey: ['/api/user/journeys'] });
+      void queryClient.invalidateQueries({ queryKey: ['/api/user/continue-learning'] });
     },
   });
 

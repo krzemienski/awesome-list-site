@@ -242,13 +242,12 @@ function sleep(ms: number): Promise<void> {
 }
 
 function withTimeout<T>(p: PromiseLike<T>, ms: number, label: string): Promise<T> {
-  return new Promise<T>((resolve, reject) => {
-    const t = setTimeout(() => reject(new Error(`${label} timed out after ${ms}ms`)), ms);
-    Promise.resolve(p).then(
-      v => { clearTimeout(t); resolve(v); },
-      e => { clearTimeout(t); reject(e); },
-    );
+  let t: ReturnType<typeof setTimeout> | undefined;
+  const timeout = new Promise<never>((_resolve, reject) => {
+    t = setTimeout(() => reject(new Error(`${label} timed out after ${ms}ms`)), ms);
   });
+  // The operation's own rejection reason passes through unchanged.
+  return Promise.race([Promise.resolve(p), timeout]).finally(() => clearTimeout(t));
 }
 
 /** Run a non-essential DB side-effect (counters, log rows) without ever letting it fail the tool. */

@@ -11,6 +11,7 @@ import {
   unsubscribeDigestToken,
   updateNotificationPreferences,
 } from "../services/digestService";
+import { asyncHandler } from "../middleware/asyncHandler";
 
 type AuthedRequest = Parameters<RequestHandler>[0];
 
@@ -48,16 +49,16 @@ export function registerNotificationRoutes(
   app.get(
     "/api/notification-preferences",
     isAuthenticated,
-    async (request: AuthedRequest, response) => {
+    asyncHandler(async (request: AuthedRequest, response) => {
       response.set("Cache-Control", "no-store");
       response.json(await getNotificationPreferences(userIdOf(request)));
-    },
+    }),
   );
 
   app.put(
     "/api/notification-preferences",
     isAuthenticated,
-    async (request: AuthedRequest, response) => {
+    asyncHandler(async (request: AuthedRequest, response) => {
       const parsed = notificationPreferencesUpdateSchema.safeParse(request.body);
       if (!parsed.success) {
         return response.status(400).json({
@@ -94,22 +95,22 @@ export function registerNotificationRoutes(
           .status(500)
           .json({ message: "Could not save reminder settings." });
       }
-    },
+    }),
   );
 
   app.get(
     "/api/digests/preview",
     isAuthenticated,
-    async (request: AuthedRequest, response) => {
+    asyncHandler(async (request: AuthedRequest, response) => {
       response.set("Cache-Control", "no-store");
       response.json(await selectDigestContent(userIdOf(request)));
-    },
+    }),
   );
 
   app.get(
     "/api/notifications",
     isAuthenticated,
-    async (request: AuthedRequest, response) => {
+    asyncHandler(async (request: AuthedRequest, response) => {
       const rawLimit =
         typeof request.query.limit === "string" ? request.query.limit : "50";
       const limit = parseIntInRange(rawLimit, { min: 1, max: 100 });
@@ -120,13 +121,13 @@ export function registerNotificationRoutes(
       }
       response.set("Cache-Control", "no-store");
       return response.json(await listNotifications(userIdOf(request), limit));
-    },
+    }),
   );
 
   app.patch(
     "/api/notifications/:id/read",
     isAuthenticated,
-    async (request: AuthedRequest, response) => {
+    asyncHandler(async (request: AuthedRequest, response) => {
       const id = parseIntInRange(request.params.id, {
         min: 1,
         max: 2_147_483_647,
@@ -138,16 +139,16 @@ export function registerNotificationRoutes(
       return found
         ? response.json({ id, read: true })
         : response.status(404).json({ message: "Notification not found" });
-    },
+    }),
   );
 
   app.post(
     "/api/notifications/read-all",
     isAuthenticated,
-    async (request: AuthedRequest, response) => {
+    asyncHandler(async (request: AuthedRequest, response) => {
       const updated = await markAllNotificationsRead(userIdOf(request));
       response.json({ updated });
-    },
+    }),
   );
 
   app.get("/unsubscribe/digest/:token", (request, response) => {
@@ -164,22 +165,22 @@ export function registerNotificationRoutes(
       .type("html")
       .send(unsubscribeConfirmationPage(request.params.token));
   });
-  app.post("/unsubscribe/digest/:token", async (request, response) => {
+  app.post("/unsubscribe/digest/:token", asyncHandler(async (request, response) => {
     const success = await unsubscribeDigestToken(request.params.token);
     return response
       .status(success ? 200 : 410)
       .set("Cache-Control", "no-store")
       .type("html")
       .send(unsubscribePage(success));
-  });
+  }));
 
   app.get(
     "/api/admin/digests/health",
     isAuthenticated,
     isAdmin,
-    async (_request, response) => {
+    asyncHandler(async (_request, response) => {
       response.set("Cache-Control", "no-store");
       response.json(await getDigestQueueHealth());
-    },
+    }),
   );
 }

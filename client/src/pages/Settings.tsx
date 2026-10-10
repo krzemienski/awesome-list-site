@@ -134,6 +134,9 @@ export default function Settings() {
   >(null);
   const preferencesContentRef = useRef<HTMLDivElement>(null);
   const resetConfirmedRef = useRef(false);
+  // Runs after every render on purpose: the replacement control mounts in a
+  // later render without the pending flag changing, so deps would miss it.
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   useEffect(() => {
     if (!pendingPreferencesFocus) return;
     const selector = {

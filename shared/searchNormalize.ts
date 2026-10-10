@@ -27,6 +27,7 @@
 export const SEARCH_QUERY_MAX_LENGTH = 512;
 
 // C0 control chars + DEL — treated as whitespace, never passed to Postgres.
+// eslint-disable-next-line no-control-regex -- deliberate: this pattern exists to match control characters
 const CONTROL_CHARS = /[\u0000-\u001f\u007f]/g;
 
 // ASCII + typographic quotes, guillemets, backtick — stripped at token edges.

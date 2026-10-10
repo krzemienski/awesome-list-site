@@ -142,8 +142,8 @@ export default function GitHubSyncPanel() {
       });
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['/api/github/sync-history'] });
-      queryClient.invalidateQueries({ queryKey: ['/api/github/sync-status'] });
+      void queryClient.invalidateQueries({ queryKey: ['/api/github/sync-history'] });
+      void queryClient.invalidateQueries({ queryKey: ['/api/github/sync-status'] });
       toast({
         title: "Import Started",
         description: `Importing resources from ${repoUrl}`,
@@ -169,8 +169,8 @@ export default function GitHubSyncPanel() {
       });
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['/api/github/sync-history'] });
-      queryClient.invalidateQueries({ queryKey: ['/api/github/sync-status'] });
+      void queryClient.invalidateQueries({ queryKey: ['/api/github/sync-history'] });
+      void queryClient.invalidateQueries({ queryKey: ['/api/github/sync-status'] });
       toast({
         title: "Export Started",
         description: `Exporting resources to ${repoUrl}`,
@@ -193,7 +193,7 @@ export default function GitHubSyncPanel() {
   );
   const lastSync = orderedHistory[0];
   const visibleHistory = showDetails ? orderedHistory : orderedHistory.slice(0, 5);
-  const syncQueue = syncQueueData?.items || [];
+  const syncQueue = useMemo(() => syncQueueData?.items || [], [syncQueueData]);
   const pendingJobs = syncQueue.filter(item => item.status === 'pending' || item.status === 'processing').length;
   // Run16 BUG-015: a broken integration must be VISIBLE. Surface failed jobs
   // (e.g. "Bad credentials") prominently instead of hiding them — previously a

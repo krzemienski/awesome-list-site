@@ -184,6 +184,9 @@ export default function Bookmarks() {
     },
   });
 
+  // Runs after every render on purpose: the focus target can mount in a later
+  // render without focusAfterAction changing, so a dependency list would miss it.
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   useEffect(() => {
     if (!focusAfterAction) return;
     // A target that never renders (e.g. no public URL came back) must not
@@ -453,7 +456,7 @@ export default function Bookmarks() {
       />
 
       <header className="space-y-2">
-        <div className="eyebrow" aria-hidden>// Learning library</div>
+        <div className="eyebrow" aria-hidden>{"// Learning library"}</div>
         <div className="flex flex-wrap items-center justify-between gap-4">
           <div>
             <div className="flex items-center gap-3">
@@ -672,7 +675,7 @@ export default function Bookmarks() {
                         size="sm"
                         className="min-h-11"
                         data-focus-target="copy-link"
-                        onClick={() => copyShareLink(selectedCollection.publicUrl!)}
+                        onClick={() => void copyShareLink(selectedCollection.publicUrl!)}
                       >
                         <Clipboard className="h-4 w-4 mr-2" aria-hidden="true" />
                         Copy link

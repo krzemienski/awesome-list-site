@@ -113,7 +113,7 @@ export default function GuestBookmarkMerge() {
         if (!outcome) return;
 
         if (outcome.merged > 0) {
-          queryClient.invalidateQueries({ queryKey: ["/api/bookmarks"] });
+          void queryClient.invalidateQueries({ queryKey: ["/api/bookmarks"] });
           notifyCrossTabSync();
         }
         trackBookmarksMerged(outcome);
