@@ -28,6 +28,8 @@ const targets = [
   ".cache/verify-ds",
   ".cache/ds-consensus",
   ".cache/audit-578",
+  ".cache/parity-0929",
+  ".cache/plan-0109",
   ".git",
   "docs/parity",
   "docs/parity-taxonomy",

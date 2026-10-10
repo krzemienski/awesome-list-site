@@ -67,6 +67,8 @@
     "(^|/)react-blurhash/",
     "(^|/)blurhash/",
     "(^|/)remark(?:-parse)?/",
-    "(^|/)unist-util-visit/"
+    "(^|/)unist-util-visit/",
+    "(^|/)zod/",
+    "(^|/)shared/resourceFacets\\.ts$"
   ]
 }

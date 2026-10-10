@@ -170,4 +170,5 @@
 - [Queued optimistic rollback](queued-optimistic-rollback.md) — queued writes must roll back to last server-confirmed state, not their onMutate snapshot; failed refetch keeps loaded page.
 - [cache-headers boot locks DEV](cache-headers-boot-migrator-locks.md) — spawned prod server runs boot DDL on dev mid-crawl → seo-snapshot sheds random /tag/* 503s; retry or lease db-heavy.
 - [Before-fix proof instance](before-fix-proof-instance.md) — run pre-fix code from a /tmp copy + git show HEAD files on a 2nd port; worktree blocked, nohup dies; use run_in_background.
+- [Initial bundle zod boundary](initial-bundle-zod-boundary.md) — shell-reachable shared code must import resourceFacets-core; zod in entry failed publish; diff vs last-published build in /tmp.
 - [ESLint ratchet](eslint-ratchet.md) — app correctness rules held at 0, rest per-file ratchet that only shrinks; Node API needs TSESTREE_SINGLE_RUN=true to match CLI counts.

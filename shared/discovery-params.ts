@@ -1,7 +1,7 @@
 import { parsePageNumber } from "./page-param";
 import { parseTagFilterValues } from "./tagNormalize";
 import { normalizeSearchQuery, isSearchableQuery, SEARCH_QUERY_MAX_LENGTH } from "./searchNormalize";
-import { RESOURCE_SEARCH_SORT_VALUES, RESOURCE_PROVIDER_VALUES, RESOURCE_FORMAT_VALUES, RESOURCE_SKILL_LEVEL_VALUES } from "./resourceFacets";
+import { RESOURCE_SEARCH_SORT_VALUES, RESOURCE_PROVIDER_VALUES, RESOURCE_FORMAT_VALUES, RESOURCE_SKILL_LEVEL_VALUES } from "./resourceFacets-core";
 
 export function readSearchState(search: string) {
   const p = new URLSearchParams(search);
