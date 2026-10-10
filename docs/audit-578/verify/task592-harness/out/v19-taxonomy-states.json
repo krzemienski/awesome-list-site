@@ -1,0 +1,328 @@
+{
+  "started": "2026-10-10T19:22:43.342Z",
+  "steps": [
+    {
+      "at": "2026-10-10T19:22:43.788Z",
+      "name": "fixtures",
+      "big": 21,
+      "sub": 7,
+      "leaf": 7,
+      "featuredId": 423,
+      "sqlCounts": {
+        "big_total": 198,
+        "tag_total": 31,
+        "categories_before_api": 4
+      }
+    },
+    {
+      "at": "2026-10-10T19:22:54.495Z",
+      "name": "admin-api-create",
+      "empty": {
+        "status": 201,
+        "id": 22
+      },
+      "child": {
+        "status": 201,
+        "id": 8
+      },
+      "extras": [
+        201,
+        201,
+        201,
+        201,
+        201,
+        201,
+        201,
+        201
+      ],
+      "categoriesTotal": 13
+    },
+    {
+      "375": {
+        "http": 200,
+        "heading": "__qa_test_plan_592_v19 Empty",
+        "resultsHeading": "Coming soon",
+        "dataTotal": "0",
+        "cards": 0,
+        "tagChips": 0,
+        "tagFilter": 0,
+        "recovery": "No resources here yet Nothing has been approved for this category yet. Browse the wider catalog in the meantime. Search all of Awesome Video / Search all of Awesome Video",
+        "mainText": "Home __qa_test_plan_592_v19 Empty Browse _ CATEGORY · __QA_TEST_PLAN_592_V19 EMPTY __qa_test_plan_592_v19 Empty About this collection __qa_test_plan_592_v19 Empty brings together 0 curated resources from across the video technology landscape. 0 RESOURCES 1 SUBCATEGORY Filters & view Subcategories __qa_test_plan_592_v19 Empty Child 0 Coming soon No resources here yet Nothing has been approved for this category yet. Browse the wider catalog in the meantime. Search all of Awesome Video",
+        "overflowX": 0,
+        "errors": []
+      },
+      "768": {
+        "http": 200,
+        "heading": "__qa_test_plan_592_v19 Empty",
+        "resultsHeading": "Coming soon",
+        "dataTotal": "0",
+        "cards": 0,
+        "tagChips": 0,
+        "tagFilter": 0,
+        "recovery": "No resources here yet Nothing has been approved for this category yet. Browse the wider catalog in the meantime. Search all of Awesome Video / Search all of Awesome Video",
+        "mainText": "Home __qa_test_plan_592_v19 Empty Browse _ CATEGORY · __QA_TEST_PLAN_592_V19 EMPTY __qa_test_plan_592_v19 Empty About this collection __qa_test_plan_592_v19 Empty brings together 0 curated resources from across the video technology landscape. 0 RESOURCES 1 SUBCATEGORY Filters & view Subcategories __qa_test_plan_592_v19 Empty Child 0 Coming soon No resources here yet Nothing has been approved for this category yet. Browse the wider catalog in the meantime. Search all of Awesome Video",
+        "overflowX": 0,
+        "errors": []
+      },
+      "1440": {
+        "http": 200,
+        "heading": "__qa_test_plan_592_v19 Empty",
+        "resultsHeading": "Coming soon",
+        "dataTotal": "0",
+        "cards": 0,
+        "tagChips": 0,
+        "tagFilter": 0,
+        "recovery": "No resources here yet Nothing has been approved for this category yet. Browse the wider catalog in the meantime. Search all of Awesome Video / Search all of Awesome Video",
+        "mainText": "Home __qa_test_plan_592_v19 Empty Browse _ CATEGORY · __QA_TEST_PLAN_592_V19 EMPTY __qa_test_plan_592_v19 Empty About this collection __qa_test_plan_592_v19 Empty brings together 0 curated resources from across the video technology landscape. 0 RESOURCES 1 SUBCATEGORY Filters & view Subcategories __qa_test_plan_592_v19 Empty Child 0 Coming soon No resources here yet Nothing has been approved for this category yet. Browse the wider catalog in the meantime. Search all of Awesome Video",
+        "overflowX": 0,
+        "errors": [],
+        "broadenHref": "/search",
+        "child": {
+          "heading": "__qa_test_plan_592_v19 Empty Child",
+          "cards": 0,
+          "text": "Home __qa_test_plan_592_v19 Empty __qa_test_plan_592_v19 Empty Child HOME / __QA_TEST_PLAN_592_V19 EMPTY / __QA_TEST_PLAN_592_V19 EMPTY CHILD __qa_test_plan_592_v19 Empty Child About this collection __qa_test_plan_592_v19 Empty Child is a focused collection within __qa_test_plan_592_v19 Empty, with 0 curated resources. 0 RESOURCES in __qa_test_plan_592_v19 Empty Filters & view 0 resources No resources here yet Nothing has been approved for this collection yet. Browse the wider catalog in the mea"
+        }
+      },
+      "at": "2026-10-10T19:23:19.385Z",
+      "name": "empty-taxonomy"
+    },
+    {
+      "at": "2026-10-10T19:23:48.301Z",
+      "name": "pagination-1440",
+      "results": "Resources (198)",
+      "page1Cards": 24,
+      "indicator": "Page 1 of 9",
+      "pageLinks": [
+        "1",
+        "2",
+        "9"
+      ],
+      "jumpInput": 1,
+      "last": {
+        "url": "http://127.0.0.1:5165/category/qatestplan592v19-big?page=9",
+        "cards": 6,
+        "indicator": "Page 9 of 9",
+        "nextDisabled": "true"
+      },
+      "jump5": {
+        "url": "http://127.0.0.1:5165/category/qatestplan592v19-big?page=5",
+        "cards": 24,
+        "indicator": "Page 5 of 9",
+        "firstTitle": "__qa_test_plan_592_v19 item 117"
+      },
+      "first": {
+        "url": "http://127.0.0.1:5165/category/qatestplan592v19-big",
+        "prevDisabled": "true"
+      },
+      "back1": {
+        "url": "http://127.0.0.1:5165/category/qatestplan592v19-big?page=5",
+        "indicator": "Page 5 of 9"
+      },
+      "back2": {
+        "url": "http://127.0.0.1:5165/category/qatestplan592v19-big?page=9",
+        "indicator": "Page 9 of 9"
+      },
+      "forward": {
+        "url": "http://127.0.0.1:5165/category/qatestplan592v19-big?page=5",
+        "indicator": "Page 5 of 9"
+      },
+      "outOfRange": {
+        "url": "http://127.0.0.1:5165/category/qatestplan592v19-big?page=9",
+        "notice": "Page 99 is not available; showing page 9 instead.Dismiss",
+        "cards": 6,
+        "indicator": "Page 9 of 9"
+      },
+      "badJump": {
+        "url": "http://127.0.0.1:5165/category/qatestplan592v19-big?page=9",
+        "inputValue": "9",
+        "ariaInvalid": null,
+        "error": ""
+      },
+      "errors": []
+    },
+    {
+      "at": "2026-10-10T19:23:56.940Z",
+      "name": "pagination-768",
+      "cards": 24,
+      "indicator": "Page 4 of 9",
+      "overflowX": 0,
+      "pagerBox": {
+        "x": 280,
+        "y": 476.328125,
+        "width": 448,
+        "height": 152
+      },
+      "afterNext": {
+        "url": "http://127.0.0.1:5165/category/qatestplan592v19-big?page=5",
+        "indicator": "Page 5 of 9"
+      }
+    },
+    {
+      "at": "2026-10-10T19:24:06.001Z",
+      "name": "pagination-375",
+      "cards": 24,
+      "indicator": "Page 4 of 9",
+      "overflowX": 0,
+      "pagerBox": {
+        "x": 40,
+        "y": 370.296875,
+        "width": 295,
+        "height": 152
+      },
+      "afterNext": {
+        "url": "http://127.0.0.1:5165/category/qatestplan592v19-big?page=5",
+        "indicator": "Page 5 of 9"
+      }
+    },
+    {
+      "at": "2026-10-10T19:24:16.456Z",
+      "name": "admin-pagination",
+      "pagerPresent": 1,
+      "page1Rows": 10,
+      "pagerText": "Rows per page: 10 Previous 1 2 Next Page 1 of 2",
+      "page2Rows": 3,
+      "page2Names": [
+        "\t__qa_test_plan_592_v19 Extra 06\tqatestplan592v19-extra-6\t0\t",
+        "\t__qa_test_plan_592_v19 Extra 07\tqatestplan592v19-extra-7\t0\t",
+        "\t__qa_test_plan_592_v19 Extra 08\tqatestplan592v19-extra-8\t0\t"
+      ],
+      "pagerText2": "Rows per page: 10 Previous 1 2 Next Page 2 of 2"
+    },
+    {
+      "at": "2026-10-10T19:24:59.171Z",
+      "name": "featured-deep-tagged",
+      "homeApi": {
+        "stats": null,
+        "featuredIds": [
+          423
+        ]
+      },
+      "featuredCard": 1,
+      "cardText": "◈ ★ FEATURED __qa_test_plan_592_v19 Featured Deep Owned QA featured deep-tagged fixture. #QA592V19-ALPHA #QA592V19-FEATURED",
+      "cardLinks": [
+        "/resource/423",
+        "/?tags=qa592v19-alpha",
+        "/?tags=qa592v19-featured"
+      ],
+      "emptyNotice": 0,
+      "paletteFeatured": 1,
+      "paletteText": "★\nFeatured:\n__qa_test_plan_592_v19 Featured Deep",
+      "paletteDest": "http://127.0.0.1:5165/resource/423",
+      "detail": {
+        "title": "__qa_test_plan_592_v19 Featured Deep",
+        "featuredBadge": 1,
+        "chips": [
+          {
+            "t": "badge-category",
+            "href": "/category/qatestplan592v19-big",
+            "text": "◆__qa_test_plan_592_v19 Big"
+          },
+          {
+            "t": "badge-subcategory",
+            "href": "/subcategory/qatestplan592v19-big-sub",
+            "text": "__qa_test_plan_592_v19 Big Sub"
+          },
+          {
+            "t": "badge-sub-subcategory",
+            "href": "/sub-subcategory/qatestplan592v19-big-leaf",
+            "text": "__qa_test_plan_592_v19 Big Leaf"
+          }
+        ],
+        "tags": [
+          {
+            "text": "#qa592v19-alpha",
+            "href": "/tag/qa592v19-alpha"
+          },
+          {
+            "text": "#qa592v19-featured",
+            "href": "/tag/qa592v19-featured"
+          }
+        ]
+      },
+      "visits": [
+        {
+          "chip": "badge-sub-subcategory",
+          "url": "http://127.0.0.1:5165/sub-subcategory/qatestplan592v19-big-leaf",
+          "h1": "__qa_test_plan_592_v19 Big Leaf",
+          "crumbs": [
+            "Home",
+            "",
+            "__qa_test_plan_592_v19 Big",
+            "",
+            "__qa_test_plan_592_v19 Big Sub",
+            "",
+            "__qa_test_plan_592_v19 Big Leaf"
+          ],
+          "hasFeatured": 1
+        },
+        {
+          "chip": "badge-subcategory",
+          "url": "http://127.0.0.1:5165/subcategory/qatestplan592v19-big-sub",
+          "h1": "__qa_test_plan_592_v19 Big Sub",
+          "crumbs": [
+            "Home",
+            "",
+            "__qa_test_plan_592_v19 Big",
+            "",
+            "__qa_test_plan_592_v19 Big Sub"
+          ],
+          "hasFeatured": 1
+        },
+        {
+          "chip": "badge-category",
+          "url": "http://127.0.0.1:5165/category/qatestplan592v19-big",
+          "h1": "__qa_test_plan_592_v19 Big",
+          "crumbs": [
+            "Home",
+            "",
+            "__qa_test_plan_592_v19 Big"
+          ],
+          "hasFeatured": 0
+        },
+        {
+          "chip": "tag-link-0",
+          "url": "http://127.0.0.1:5165/tag/qa592v19-alpha",
+          "h1": "Qa592v19 Alpha",
+          "mainExcerpt": "Home Browse Tag: Qa592v19 Alpha Back to Home Qa592v19 Alpha ABOUT THIS COLLECTION Qa592v19 Alpha brings together 31 curated resources for video developers. Explore projects and guidance across __qa_test_plan_592_v19 Big. Showing 1–24 of 31 resources ◆ __qa_test_plan_592_v19 Featured Deep Owned QA fe"
+        }
+      ],
+      "errors": []
+    },
+    {
+      "at": "2026-10-10T19:25:37.788Z",
+      "name": "fresh-after-delete",
+      "del": [
+        "sub-subcategories/7:200",
+        "subcategories/7:200",
+        "subcategories/8:200",
+        "categories/22:200",
+        "categories/23:200",
+        "categories/24:200",
+        "categories/25:200",
+        "categories/26:200",
+        "categories/27:200",
+        "categories/28:200",
+        "categories/29:200",
+        "categories/30:200",
+        "categories/21:200"
+      ],
+      "featuredIds": [],
+      "homeStats": null,
+      "v19CategoriesInApi": 0,
+      "bigCategoryPageStatus": 404,
+      "tagPageStatus": 404
+    },
+    {
+      "at": "2026-10-10T19:25:42.022Z",
+      "name": "cleanup",
+      "residue": {
+        "qa_users": 0,
+        "resources": 0,
+        "categories": 0,
+        "subcategories": 0,
+        "leaves": 0
+      }
+    }
+  ],
+  "error": "locator.click: Timeout 30000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('[data-testid=\"button-breadcrumb-ellipsis\"]')\u001b[22m\n\u001b[2m    - locator resolved to <button type=\"button\" tabindex=\"-1\" id=\"radix-:r9:\" data-state=\"closed\" aria-haspopup=\"menu\" aria-expanded=\"false\" data-ds-variant=\"ghost\" data-component-name=\"Button\" title=\"Show 3 hidden breadcrumb levels\" data-testid=\"button-breadcrumb-ellipsis\" aria-label=\"Show 3 hidden breadcrumb levels\" data-replit-metadata=\"client/src/components/layout/new/ResourceBreadcrumbAncestorDisclosure.tsx:101:12\" class=\"btn disabled:pointer-events-none [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0 ghost ic…>…</button>\u001b[22m\n\u001b[2m  - attempting click action\u001b[22m\n\u001b[2m    2 × waiting for element to be visible, enabled and stable\u001b[22m\n\u001b[2m      - element is visible, enabled and stable\u001b[22m\n\u001b[2m      - scrolling into view if needed\u001b[22m\n\u001b[2m      - done scrolling\u001b[22m\n\u001b[2m      - <div data-admin=\"false\" data-component-name=\"div\" class=\"page-content-wrap\" data-replit-metadata=\"client/src/components/layout/new/MainLayout.tsx:240:10\">…</div> intercepts pointer events\u001b[22m\n\u001b[2m    - retrying click action\u001b[22m\n\u001b[2m    - waiting 20ms\u001b[22m\n\u001b[2m    - waiting for element to be visible, enabled and stable\u001b[22m\n\u001b[2m    - element is visible, enabled and stable\u001b[22m\n\u001b[2m    - scrolling into view if needed\u001b[22m\n\u001b[2m    - done scrolling\u001b[22m\n\u001b[2m    - <div data-admin=\"false\" data-component-name=\"div\" class=\"page-content-wrap\" data-replit-metadata=\"client/src/components/layout/new/MainLayout.tsx:240:10\">…</div> intercepts pointer events\u001b[22m\n\u001b[2m  2 × retrying click action\u001b[22m\n\u001b[2m      - waiting 100ms\u001b[22m\n\u001b[2m      - waiting for element to be visible, enabled and stable\u001b[22m\n\u001b[2m      - element is visible, enabled and stable\u001b[22m\n\u001b[2m      - scrolling into view if needed\u001b[22m\n\u001b[2m      - done scrolling\u001b[22m\n\u001b[2m      - <button data-ds-variant=\"ghost\" data-testid=\"button-back\" data-component-name=\"Button\" data-replit-metadata=\"client/src/pages/ResourceDetail.tsx:659:8\" class=\"btn disabled:pointer-events-none [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0 ghost min-h-[max(44px,var(--profile-control-height))] min-w-[44px] px-3 gap-2\">…</button> from <div class=\"resource-detail\" data-component-name=\"div\" data-replit-metadata=\"client/src/pages/ResourceDetail.tsx:649:4\">…</div> subtree intercepts pointer events\u001b[22m\n\u001b[2m  14 × retrying click action\u001b[22m\n\u001b[2m       - waiting 500ms\u001b[22m\n\u001b[2m       - waiting for element to be visible, enabled and stable\u001b[22m\n\u001b[2m       - element is visible, enabled and stable\u001b[22m\n\u001b[2m       - scrolling into view if needed\u001b[22m\n\u001b[2m       - done scrolling\u001b[22m\n\u001b[2m       - <div data-admin=\"false\" data-component-name=\"div\" class=\"page-content-wrap\" data-replit-metadata=\"client/src/components/layout/new/MainLayout.tsx:240:10\">…</div> intercepts pointer events\u001b[22m\n\u001b[2m     - retrying click action\u001b[22m\n\u001b[2m       - waiting 500ms\u001b[22m\n\u001b[2m       - waiting for element to be visible, enabled and stable\u001b[22m\n\u001b[2m       - element is visible, enabled and stable\u001b[22m\n\u001b[2m       - scrolling into view if needed\u001b[22m\n\u001b[2m       - done scrolling\u001b[22m\n\u001b[2m       - <div data-admin=\"false\" data-component-name=\"div\" class=\"page-content-wrap\" data-replit-metadata=\"client/src/components/layout/new/MainLayout.tsx:240:10\">…</div> intercepts pointer events\u001b[22m\n\u001b[2m     - retrying click action\u001b[22m\n\u001b[2m       - waiting 500ms\u001b[22m\n\u001b[2m       - waiting for element to be visible, enabled and stable\u001b[22m\n\u001b[2m       - element is visible, enabled and stable\u001b[22m\n\u001b[2m       - scrolling into view if needed\u001b[22m\n\u001b[2m       - done scrolling\u001b[22m\n\u001b[2m       - <button data-ds-variant=\"ghost\" data-testid=\"button-back\" data-component-name=\"Button\" data-replit-metadata=\"client/src/pages/ResourceDetail.tsx:659:8\" class=\"btn disabled:pointer-events-none [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0 ghost min-h-[max(44px,var(--profile-control-height))] min-w-[44px] px-3 gap-2\">…</button> from <div class=\"resource-detail\" data-component-name=\"div\" data-replit-metadata=\"client/src/pages/ResourceDetail.tsx:649:4\">…</div> subtree intercepts pointer events\u001b[22m\n\u001b[2m     - retrying click action\u001b[22m\n\u001b[2m       - waiting 500ms\u001b[22m\n\u001b[2m       - waiting for element to be visible, enabled and stable\u001b[22m\n\u001b[2m       - element is visible, enabled and stable\u001b[22m\n\u001b[2m       - scrolling into view if needed\u001b[22m\n\u001b[2m       - done scrolling\u001b[22m\n\u001b[2m       - <button data-ds-variant=\"ghost\" data-testid=\"button-back\" data-component-name=\"Button\" data-replit-metadata=\"client/src/pages/ResourceDetail.tsx:659:8\" class=\"btn disabled:pointer-events-none [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0 ghost min-h-[max(44px,var(--profile-control-height))] min-w-[44px] px-3 gap-2\">…</button> from <div class=\"resource-detail\" data-component-name=\"div\" data-replit-metadata=\"client/src/pages/ResourceDetail.tsx:649:4\">…</div> subtree intercepts pointer events\u001b[22m\n\u001b[2m  - retrying click action\u001b[22m\n\u001b[2m    - waiting 500ms\u001b[22m\n\u001b[2m    - waiting for element to be visible, enabled and stable\u001b[22m\n\u001b[2m    - element is visible, enabled and stable\u001b[22m\n\u001b[2m    - scrolling into view if needed\u001b[22m\n\u001b[2m    - done scrolling\u001b[22m\n\u001b[2m    - <div data-admin=\"false\" data-component-name=\"div\" class=\"page-content-wrap\" data-replit-metadata=\"client/src/components/layout/new/MainLayout.tsx:240:10\">…</div> intercepts pointer events\u001b[22m\n\u001b[2m  - retrying click action\u001b[22m\n\u001b[2m    - waiting 500ms\u001b[22m\n\n    at /home/runner/workspace/docs/audit-578/verify/task592-harness/v19-taxonomy-states.mjs:214:34"
+}

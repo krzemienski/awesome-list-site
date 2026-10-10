@@ -1,0 +1,405 @@
+{
+  "started": "2026-10-10T19:01:18.136Z",
+  "steps": [
+    {
+      "at": "2026-10-10T19:01:18.557Z",
+      "name": "fixtures",
+      "ids": {
+        "live": 15,
+        "gone404": 16,
+        "sameHostRedirect": 17,
+        "slow": 18,
+        "forbidden403": 19,
+        "rootCollapse": 20,
+        "offHost": 21,
+        "refused": 22
+      },
+      "approvedTotal": 13,
+      "jobsBefore": 0
+    },
+    {
+      "at": "2026-10-10T19:01:30.193Z",
+      "name": "C-up",
+      "upMs": 4075
+    },
+    {
+      "at": "2026-10-10T19:01:51.591Z",
+      "name": "export-validate-ui",
+      "before": "No validation results yet",
+      "dialog": "Run awesome-lint validation? This validates the exported markdown against awesome-lint rules. It runs in the background and can take a minute. Cancel Run validation",
+      "status": 200,
+      "valid": true,
+      "errors": 0,
+      "warnings": 14,
+      "stats": {
+        "totalLines": 48,
+        "totalResources": 13,
+        "totalCategories": 3
+      },
+      "firstErrors": [],
+      "firstWarnings": [
+        {
+          "line": 12,
+          "rule": "category-capital",
+          "message": "Category should start with capital letter",
+          "severity": "warning"
+        },
+        {
+          "line": 28,
+          "rule": "category-capital",
+          "message": "Category should start with capital letter",
+          "severity": "warning"
+        },
+        {
+          "line": 40,
+          "rule": "category-capital",
+          "message": "Category should start with capital letter",
+          "severity": "warning"
+        },
+        {
+          "line": 31,
+          "rule": "url-https",
+          "message": "Consider using HTTPS instead of HTTP: http://127.0.0.1:5196/forbidden/page",
+          "severity": "warning"
+        }
+      ],
+      "panelText": "Validation Results Awesome-lint compliance check on exported markdown PASSED 13 resources, 3 categories Warnings (14) url-https 8 Line 31: Consider using HTTPS instead of HTTP: http://127.0.0.1:5196/forbidden/page Line 32: Consider using HTTPS instead of HTTP: http://127.0.0.1:5196/gone/page Line 33: Consider using HTTPS instead of HTTP: http://127.0.0.1:5196/ok/page Line 34: Consider using HTTPS instead of HTTP: http://127.0.0.1:5196/offhost/page Line 35: Consider using HTTPS instead of HTTP: http://127.0.0.1:5195/closed/page Line 36: Consider using HTTPS instead of HTTP: http://127.0.0.1:5196/collapse/deep/page Line 37: Consider using HTTPS instead of HTTP: http://127.0.0.1:5196/moved/page Line 38: Consider using HTTPS instead of HTTP: http://127.0.0.1:5196/slow/page category-capital 3 Line 12: Category should start with capital letter Line 28: Category should start with capital letter",
+      "toasts": "Validation Complete\nAwesome list validation has been completed."
+    },
+    {
+      "at": "2026-10-10T19:02:27.011Z",
+      "name": "export-linkcheck",
+      "start": {
+        "status": 202,
+        "started": true,
+        "scope": "stored-approved-resource-urls",
+        "jobId": 1
+      },
+      "progressRunning": "0 of 13 links checked (started Oct 10, 2026, 07:01 PM).",
+      "duplicateStart": {
+        "status": 409,
+        "message": "A link health check is already running"
+      },
+      "final": {
+        "id": 1,
+        "status": "completed",
+        "total_links": 13,
+        "checked_links": 13,
+        "healthy_links": 9,
+        "broken_links": 2,
+        "redirect_links": 0,
+        "timeout_links": 0,
+        "suspect_links": 2,
+        "error_message": null,
+        "ms": 24043
+      },
+      "progressDone": "Completed Oct 10, 2026, 07:02 PM: 9 healthy, 2 broken, 0 redirects, 0 timeouts of 13.",
+      "toasts": "",
+      "scope": {
+        "approvedResources": 13,
+        "checkRows": 13,
+        "everyApprovedChecked": true,
+        "urlsEqualStored": true
+      },
+      "fixtureVerdicts": [
+        {
+          "t": "live",
+          "status": "healthy",
+          "http": 200,
+          "final": "http://127.0.0.1:5196/ok/page",
+          "msg": ""
+        },
+        {
+          "t": "gone404",
+          "status": "broken",
+          "http": 404,
+          "final": "http://127.0.0.1:5196/gone/page",
+          "msg": "dead: 404 confirmed under browser UA"
+        },
+        {
+          "t": "sameHostRedirect",
+          "status": "healthy",
+          "http": 200,
+          "final": "http://127.0.0.1:5196/ok/landing",
+          "msg": ""
+        },
+        {
+          "t": "slow",
+          "status": "healthy",
+          "http": 0,
+          "final": null,
+          "msg": "likely bot-block (ERR:AbortError under browser UA) | The operation was aborted."
+        },
+        {
+          "t": "forbidden403",
+          "status": "healthy",
+          "http": 403,
+          "final": "http://127.0.0.1:5196/forbidden/page",
+          "msg": "likely bot-block/auth wall (403 under browser UA)"
+        },
+        {
+          "t": "rootCollapse",
+          "status": "suspect",
+          "http": 200,
+          "final": "http://127.0.0.1:5196/",
+          "msg": "deep link collapsed to site root: /collapse/deep/page -> /"
+        },
+        {
+          "t": "offHost",
+          "status": "suspect",
+          "http": 200,
+          "final": "http://localhost:5196/ok/page",
+          "msg": "redirects off-domain: 0.1 -> localhost (http://localhost:5196/ok/page)"
+        },
+        {
+          "t": "refused",
+          "status": "broken",
+          "http": 0,
+          "final": null,
+          "msg": "dead: connection refused (browser-UA verified) | request to http://127.0.0.1:5195/closed/page failed, reason: connect ECONNREFUSED 127.0.0.1"
+        }
+      ],
+      "dbCountsByStatus": [
+        {
+          "status": "broken",
+          "n": 2
+        },
+        {
+          "status": "healthy",
+          "n": 9
+        },
+        {
+          "status": "suspect",
+          "n": 2
+        }
+      ],
+      "exportMarkdown": {
+        "status": 200,
+        "fixtureUrlsInExport": [
+          "live",
+          "gone404",
+          "sameHostRedirect",
+          "slow",
+          "forbidden403",
+          "rootCollapse",
+          "offHost",
+          "refused"
+        ],
+        "length": 2438
+      }
+    },
+    {
+      "at": "2026-10-10T19:03:24.931Z",
+      "name": "linkhealth-populated",
+      "statText": "Healthy 9 Redirect 0 Broken 2 Timeout 0 Suspect 2",
+      "failuresText": "Recent failures Broken, DNS and timeout failures plus links flagged for review from the last sweep Run full check RESOURCE URL STATUS LAST CHECKED __qa_test_plan_592_v18 gone404 __qa_test_plan_592_v16 Cat B http://127.0.0.1:5196/gone/page dead: 404 confirmed under browser UA BROKEN Oct 10, 2026, 07:02 PM __qa_test_plan_592_v18 rootCollapse __qa_test_plan_592_v16 Cat B http://127.0.0.1:5196/collapse/deep/page deep link collapsed to site root: /collapse/deep/page -> / SUSPECT Oct 10, 2026, 07:02 PM __qa_test_plan_592_v18 offHost __qa_test_plan_592_v16 Cat B http://127.0.0.1:5196/offhost/page redirects off-domain: 0.1 -> localhost (http://localhost:5196/ok/page) SUSPECT Oct 10, 2026, 07:02 PM _",
+      "filters": {
+        "all": {
+          "ui": "Problem Links 4 ISSUES Links that require attention from the latest sweep. All Issues STATUS RESOURCE CATEGORY URL FAILURES FLAGGED BROKEN __qa_test_plan_592_v18 gone404 __qa_test_plan_592_v16 Cat B http://127.0.0.1:5196/gone/page dead: 404 confirmed under browser UA 1 FLAGGED SUSPECT __qa_test_plan_592_v18 rootCollapse __qa_test_plan_592_v16 Cat B http://127.0.0.1:5196/collapse/deep/page deep link collapsed to site root: /collapse/deep/page -> / 1 FLAGGED SUSPECT __qa_test_plan_592_v18 offHost __qa_test_plan_592_v16 Cat B http://127.0.0.1:5196/offhost/page redirects off-domain: 0.1 -> localho",
+          "api": [
+            "broken:gone404",
+            "suspect:rootCollapse",
+            "suspect:offHost",
+            "broken:refused"
+          ]
+        },
+        "broken": {
+          "ui": "Problem Links 2 ISSUES Links that require attention from the latest sweep. Broken Links STATUS RESOURCE CATEGORY URL FAILURES FLAGGED BROKEN __qa_test_plan_592_v18 gone404 __qa_test_plan_592_v16 Cat B http://127.0.0.1:5196/gone/page dead: 404 confirmed under browser UA 1 FLAGGED BROKEN __qa_test_plan_592_v18 refused __qa_test_plan_592_v16 Cat B http://127.0.0.1:5195/closed/page dead: connection refused (browser-UA verified) | request to http://127.0.0.1:5195/closed/page failed, reason: connect ECONNREFUSED 127.0.0.1:5195 1 FLAGGED",
+          "api": [
+            "broken:refused",
+            "broken:gone404"
+          ]
+        },
+        "timeout": {
+          "ui": "Problem Links Links that require attention from the latest sweep. Timeouts No timeout links found.",
+          "api": []
+        },
+        "redirect": {
+          "ui": "Problem Links Links that require attention from the latest sweep. Redirects No redirect links found.",
+          "api": []
+        },
+        "suspect": {
+          "ui": "Problem Links 2 ISSUES Links that require attention from the latest sweep. Suspect (takeover/parked) STATUS RESOURCE CATEGORY URL FAILURES FLAGGED SUSPECT __qa_test_plan_592_v18 rootCollapse __qa_test_plan_592_v16 Cat B http://127.0.0.1:5196/collapse/deep/page deep link collapsed to site root: /collapse/deep/page -> / 1 FLAGGED SUSPECT __qa_test_plan_592_v18 offHost __qa_test_plan_592_v16 Cat B http://127.0.0.1:5196/offhost/page redirects off-domain: 0.1 -> localhost (http://localhost:5196/ok/page) 1 FLAGGED",
+          "api": [
+            "suspect:offHost",
+            "suspect:rootCollapse"
+          ]
+        }
+      }
+    },
+    {
+      "at": "2026-10-10T19:04:06.083Z",
+      "name": "dashboard-run-cancel",
+      "job2": 2,
+      "runningText": "Scan #2 running — 0 of 13 links checked (0%). Cancel running scan",
+      "cancelledText": "Scan #2 was cancelled at Oct 10, 2026, 07:03 PM: Cancelled by administrator Counts and problem links below are from the previous completed scan (#1, Oct 10, 2026, 07:01 PM). Run scan again",
+      "statAfterCancel": "Healthy 9 Redirect 0 Broken 2 Timeout 0 Suspect 2",
+      "dbJob2": {
+        "id": 2,
+        "status": "cancelled",
+        "total_links": 13,
+        "checked_links": 0,
+        "healthy_links": 0,
+        "broken_links": 0,
+        "redirect_links": 0,
+        "timeout_links": 0,
+        "suspect_links": 0,
+        "error_message": "Cancelled by administrator"
+      },
+      "checksOfJob2": 0,
+      "checksOfJob1Retained": 13,
+      "toasts": ""
+    },
+    {
+      "at": "2026-10-10T19:04:32.349Z",
+      "name": "restart-interrupted",
+      "job3": 3,
+      "duringKill": {
+        "id": 3,
+        "status": "processing",
+        "total_links": 13,
+        "checked_links": 0,
+        "healthy_links": 0,
+        "broken_links": 0,
+        "redirect_links": 0,
+        "timeout_links": 0,
+        "suspect_links": 0,
+        "error_message": null
+      },
+      "afterKill": {
+        "id": 3,
+        "status": "processing",
+        "total_links": 13,
+        "checked_links": 0,
+        "healthy_links": 0,
+        "broken_links": 0,
+        "redirect_links": 0,
+        "timeout_links": 0,
+        "suspect_links": 0,
+        "error_message": null
+      },
+      "upMs": 3050,
+      "recovered": {
+        "id": 3,
+        "status": "failed",
+        "total_links": 13,
+        "checked_links": 0,
+        "healthy_links": 0,
+        "broken_links": 0,
+        "redirect_links": 0,
+        "timeout_links": 0,
+        "suspect_links": 0,
+        "error_message": "Interrupted by server restart"
+      },
+      "failedText": "Scan #3 failed at Oct 10, 2026, 07:04 PM: Interrupted by server restart Counts and problem links below are from the previous completed scan (#1, Oct 10, 2026, 07:01 PM). Run scan again",
+      "recLog": [
+        "[LinkHealth] Marked 1 interrupted job(s) as failed after restart: 3"
+      ]
+    },
+    {
+      "at": "2026-10-10T19:05:13.562Z",
+      "name": "recovery-complete",
+      "job4": 4,
+      "fin4": {
+        "id": 4,
+        "status": "completed",
+        "total_links": 13,
+        "checked_links": 13,
+        "healthy_links": 9,
+        "broken_links": 2,
+        "redirect_links": 0,
+        "timeout_links": 0,
+        "suspect_links": 2,
+        "error_message": null,
+        "ms": 28041
+      },
+      "statText": "Healthy 9 Redirect 0 Broken 2 Timeout 0 Suspect 2",
+      "trendExcerpt": "Link Health Trends Health status trends across the last 2 completed checks Oct 10, 2026, 07:04 PM 0 20 40 60 80 Percentage (%) HealthyBrokenRedirectsTimeouts Recent failures Broken, DNS and timeout failures plus links ",
+      "history": [
+        "4:completed:9/2/2/0",
+        "3:failed:0/0/0/0:Interrupted by server restart",
+        "2:cancelled:0/0/0/0:Cancelled by administrator",
+        "1:completed:9/2/2/0"
+      ],
+      "checksPrunedToLatest": [
+        {
+          "job_id": 4,
+          "n": 13
+        }
+      ]
+    },
+    {
+      "at": "2026-10-10T19:05:20.094Z",
+      "name": "mobile",
+      "horizontalOverflowPx": 0,
+      "errors": []
+    },
+    {
+      "at": "2026-10-10T19:05:25.879Z",
+      "name": "cleanup",
+      "residue": {
+        "qa_users": 0,
+        "v18_resources": 0,
+        "jobs": 0,
+        "checks": 0
+      },
+      "originHitCount": 54
+    }
+  ],
+  "originHits": [
+    "19:01:51 HEAD /offhost/page Mozilla/5.0 (compatible; AwesomeListBot/",
+    "19:01:51 HEAD /collapse/deep/page Mozilla/5.0 (compatible; AwesomeListBot/",
+    "19:01:51 HEAD /forbidden/page Mozilla/5.0 (compatible; AwesomeListBot/",
+    "19:01:51 HEAD /slow/page Mozilla/5.0 (compatible; AwesomeListBot/",
+    "19:01:51 HEAD /moved/page Mozilla/5.0 (compatible; AwesomeListBot/",
+    "19:01:51 HEAD /gone/page Mozilla/5.0 (compatible; AwesomeListBot/",
+    "19:01:51 HEAD /ok/page Mozilla/5.0 (compatible; AwesomeListBot/",
+    "19:01:51 HEAD / Mozilla/5.0 (compatible; AwesomeListBot/",
+    "19:01:51 HEAD /ok/landing Mozilla/5.0 (compatible; AwesomeListBot/",
+    "19:01:51 GET /ok/page Mozilla/5.0 (compatible; AwesomeListBot/",
+    "19:01:51 HEAD /ok/page Mozilla/5.0 (compatible; AwesomeListBot/",
+    "19:01:51 GET /ok/landing Mozilla/5.0 (compatible; AwesomeListBot/",
+    "19:02:07 GET /forbidden/page Mozilla/5.0 (Windows NT 10.0; Win64; x64",
+    "19:02:07 GET /slow/page Mozilla/5.0 (Windows NT 10.0; Win64; x64",
+    "19:02:07 GET /gone/page Mozilla/5.0 (Windows NT 10.0; Win64; x64",
+    "19:03:25 HEAD /offhost/page Mozilla/5.0 (compatible; AwesomeListBot/",
+    "19:03:25 HEAD /collapse/deep/page Mozilla/5.0 (compatible; AwesomeListBot/",
+    "19:03:25 HEAD /forbidden/page Mozilla/5.0 (compatible; AwesomeListBot/",
+    "19:03:25 HEAD /slow/page Mozilla/5.0 (compatible; AwesomeListBot/",
+    "19:03:25 HEAD /moved/page Mozilla/5.0 (compatible; AwesomeListBot/",
+    "19:03:25 HEAD /gone/page Mozilla/5.0 (compatible; AwesomeListBot/",
+    "19:03:25 HEAD /ok/page Mozilla/5.0 (compatible; AwesomeListBot/",
+    "19:03:25 HEAD /ok/page Mozilla/5.0 (compatible; AwesomeListBot/",
+    "19:03:25 HEAD / Mozilla/5.0 (compatible; AwesomeListBot/",
+    "19:03:25 HEAD /ok/landing Mozilla/5.0 (compatible; AwesomeListBot/",
+    "19:03:25 GET /ok/page Mozilla/5.0 (compatible; AwesomeListBot/",
+    "19:03:25 GET /ok/landing Mozilla/5.0 (compatible; AwesomeListBot/",
+    "19:04:06 HEAD /offhost/page Mozilla/5.0 (compatible; AwesomeListBot/",
+    "19:04:06 HEAD /collapse/deep/page Mozilla/5.0 (compatible; AwesomeListBot/",
+    "19:04:06 HEAD /forbidden/page Mozilla/5.0 (compatible; AwesomeListBot/",
+    "19:04:06 HEAD /slow/page Mozilla/5.0 (compatible; AwesomeListBot/",
+    "19:04:06 HEAD /moved/page Mozilla/5.0 (compatible; AwesomeListBot/",
+    "19:04:06 HEAD /gone/page Mozilla/5.0 (compatible; AwesomeListBot/",
+    "19:04:06 HEAD /ok/page Mozilla/5.0 (compatible; AwesomeListBot/",
+    "19:04:06 HEAD / Mozilla/5.0 (compatible; AwesomeListBot/",
+    "19:04:06 HEAD /ok/page Mozilla/5.0 (compatible; AwesomeListBot/",
+    "19:04:06 HEAD /ok/landing Mozilla/5.0 (compatible; AwesomeListBot/",
+    "19:04:06 GET /ok/page Mozilla/5.0 (compatible; AwesomeListBot/",
+    "19:04:06 GET /ok/landing Mozilla/5.0 (compatible; AwesomeListBot/",
+    "19:04:32 HEAD /offhost/page Mozilla/5.0 (compatible; AwesomeListBot/",
+    "19:04:32 HEAD /collapse/deep/page Mozilla/5.0 (compatible; AwesomeListBot/",
+    "19:04:32 HEAD /forbidden/page Mozilla/5.0 (compatible; AwesomeListBot/",
+    "19:04:32 HEAD /slow/page Mozilla/5.0 (compatible; AwesomeListBot/",
+    "19:04:32 HEAD /moved/page Mozilla/5.0 (compatible; AwesomeListBot/",
+    "19:04:32 HEAD /gone/page Mozilla/5.0 (compatible; AwesomeListBot/",
+    "19:04:32 HEAD /ok/page Mozilla/5.0 (compatible; AwesomeListBot/",
+    "19:04:32 HEAD / Mozilla/5.0 (compatible; AwesomeListBot/",
+    "19:04:32 HEAD /ok/landing Mozilla/5.0 (compatible; AwesomeListBot/",
+    "19:04:32 GET /ok/page Mozilla/5.0 (compatible; AwesomeListBot/",
+    "19:04:32 HEAD /ok/page Mozilla/5.0 (compatible; AwesomeListBot/",
+    "19:04:32 GET /ok/landing Mozilla/5.0 (compatible; AwesomeListBot/",
+    "19:04:47 GET /forbidden/page Mozilla/5.0 (Windows NT 10.0; Win64; x64",
+    "19:04:47 GET /slow/page Mozilla/5.0 (Windows NT 10.0; Win64; x64",
+    "19:04:47 GET /gone/page Mozilla/5.0 (Windows NT 10.0; Win64; x64"
+  ]
+}

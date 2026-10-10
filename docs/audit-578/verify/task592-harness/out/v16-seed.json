@@ -1,0 +1,636 @@
+{
+  "started": "2026-10-10T18:08:42.803Z",
+  "steps": [
+    {
+      "at": "2026-10-10T18:08:56.316Z",
+      "name": "boot-autoseed-aborted",
+      "upMs": 4387,
+      "sourceHits": 1,
+      "bootLog": [
+        "Checking if database needs seeding...",
+        "📦 Database needs seeding (categories: 0, resources: 0)...",
+        "⚙️  Running database seeding in development mode...",
+        "❌ Error during auto-seeding (non-fatal): SeedAbortedError: Seed source HTTP 503; database unchanged",
+        "    at seedDatabase (/home/runner/workspace/server/seed.ts:301:27)",
+        "Server will continue without seeding. You can manually seed via /api/admin/seed-database"
+      ],
+      "snapshot": {
+        "md5": "d41d8cd98f00b204e9800998ecf8427e",
+        "resources": 0,
+        "categories": 0,
+        "subcategories": 0,
+        "sub_subcategories": 0
+      }
+    },
+    {
+      "at": "2026-10-10T18:09:10.809Z",
+      "name": "F1-source-down-ui",
+      "status": 422,
+      "body": {
+        "success": false,
+        "unchanged": true,
+        "message": "Seed source HTTP 503; database unchanged"
+      },
+      "card": "Seeding failed FAILED Seed source HTTP 503; database unchanged",
+      "unchanged": true
+    },
+    {
+      "at": "2026-10-10T18:09:16.646Z",
+      "name": "seed-v1-ui",
+      "status": 200,
+      "body": {
+        "success": true,
+        "message": "Database seeding completed successfully",
+        "counts": {
+          "categoriesInserted": 2,
+          "subcategoriesInserted": 1,
+          "subSubcategoriesInserted": 1,
+          "resourcesInserted": 4,
+          "resourcesPreserved": 0
+        },
+        "errors": [],
+        "totalErrors": 0
+      },
+      "card": "Seeding completed COMPLETED Categories inserted: 2 Subcategories inserted: 1 Sub-subcategories inserted: 1 Resources inserted: 4 Errors: 0",
+      "snapshot": {
+        "md5": "17611d500c240bfec96d52dbca8146cc",
+        "resources": 4,
+        "categories": 2,
+        "subcategories": 1,
+        "sub_subcategories": 1
+      },
+      "rows": [
+        {
+          "id": 1,
+          "title": "__qa_test_plan_592_v16 P1",
+          "url": "https://example.org/__qa_test_plan_592_v16/p1",
+          "category": "__qa_test_plan_592_v16 Cat A",
+          "subcategory": "__qa_test_plan_592_v16 Sub A1",
+          "sub_subcategory": "__qa_test_plan_592_v16 Leaf A1x",
+          "tags": [
+            "FFmpeg",
+            "ffmpeg"
+          ],
+          "status": "approved"
+        },
+        {
+          "id": 2,
+          "title": "__qa_test_plan_592_v16 P2",
+          "url": "https://example.org/__qa_test_plan_592_v16/p2",
+          "category": "__qa_test_plan_592_v16 Cat A",
+          "subcategory": "__qa_test_plan_592_v16 Sub A1",
+          "sub_subcategory": null,
+          "tags": [
+            "live_streaming",
+            "Live Streaming"
+          ],
+          "status": "approved"
+        },
+        {
+          "id": 3,
+          "title": "__qa_test_plan_592_v16 P3",
+          "url": "https://example.org/__qa_test_plan_592_v16/p3",
+          "category": "__qa_test_plan_592_v16 Cat B",
+          "subcategory": null,
+          "sub_subcategory": null,
+          "tags": [
+            "codecs"
+          ],
+          "status": "approved"
+        },
+        {
+          "id": 4,
+          "title": "__qa_test_plan_592_v16 P4",
+          "url": "https://example.org/__qa_test_plan_592_v16/p4",
+          "category": "__qa_test_plan_592_v16 Cat A",
+          "subcategory": null,
+          "sub_subcategory": null,
+          "tags": [
+            "codec"
+          ],
+          "status": "approved"
+        }
+      ],
+      "publicCategories": {
+        "before": {
+          "status": 200,
+          "names": []
+        },
+        "after": {
+          "status": 200,
+          "names": [
+            "__qa_test_plan_592_v16 Cat A",
+            "__qa_test_plan_592_v16 Cat B"
+          ]
+        }
+      },
+      "auditAdminRow": 1
+    },
+    {
+      "at": "2026-10-10T18:09:36.604Z",
+      "name": "seed-rerun-ui",
+      "status": 200,
+      "body": {
+        "success": true,
+        "message": "Database seeding completed successfully",
+        "counts": {
+          "categoriesInserted": 0,
+          "subcategoriesInserted": 0,
+          "subSubcategoriesInserted": 0,
+          "resourcesInserted": 0,
+          "resourcesPreserved": 0
+        },
+        "errors": [],
+        "totalErrors": 0
+      },
+      "card": "Seeding completed COMPLETED Categories inserted: 0 Subcategories inserted: 0 Sub-subcategories inserted: 0 Resources inserted: 0 Errors: 0",
+      "unchanged": true
+    },
+    {
+      "at": "2026-10-10T18:09:37.707Z",
+      "name": "dependents",
+      "P2": 2,
+      "P3": 3,
+      "bookmarkStatus": 200,
+      "editId": 1
+    },
+    {
+      "at": "2026-10-10T18:09:39.312Z",
+      "name": "reseed-fail-source-503",
+      "status": 422,
+      "body": {
+        "success": false,
+        "unchanged": true,
+        "message": "Seed source HTTP 503; database unchanged"
+      },
+      "card": null,
+      "unchanged": true
+    },
+    {
+      "at": "2026-10-10T18:09:40.852Z",
+      "name": "reseed-fail-invalid-json",
+      "status": 422,
+      "body": {
+        "success": false,
+        "unchanged": true,
+        "message": "Seed source is not valid JSON; database unchanged"
+      },
+      "card": null,
+      "unchanged": true
+    },
+    {
+      "at": "2026-10-10T18:09:42.420Z",
+      "name": "reseed-fail-unknown-category",
+      "status": 422,
+      "body": {
+        "success": false,
+        "unchanged": true,
+        "message": "Invalid reseed resource \"__qa_test_plan_592_v16 P9\"; database unchanged"
+      },
+      "card": null,
+      "unchanged": true
+    },
+    {
+      "at": "2026-10-10T18:09:57.307Z",
+      "name": "reseed-fail-rollback-empty-title",
+      "status": 422,
+      "body": {
+        "success": false,
+        "unchanged": true,
+        "message": "Reseed rolled back, database unchanged: No valid category name for \"__qa_test_plan_592_v16 P11\" with deepest category: c9 (raw: )"
+      },
+      "card": "Clear & Re-seed failed FAILED Reseed rolled back, database unchanged: No valid category name for \"__qa_test_plan_592_v16 P11\" with deepest category: c9 (raw: )",
+      "unchanged": true
+    },
+    {
+      "at": "2026-10-10T18:10:02.100Z",
+      "name": "reseed-fail-fk-refused",
+      "status": 422,
+      "body": {
+        "success": false,
+        "unchanged": true,
+        "message": "Reseed refused: qa592_taxo_ref.category_id references the taxonomy. Nothing changed; use additive Seed Database instead."
+      },
+      "card": "Clear & Re-seed failed FAILED Reseed refused: qa592_taxo_ref.category_id references the taxonomy. Nothing changed; use additive Seed Database instead.",
+      "unchanged": true
+    },
+    {
+      "at": "2026-10-10T18:10:10.914Z",
+      "name": "reseed-v2-ui-390",
+      "disabledLower": false,
+      "disabledTyped": false,
+      "status": 200,
+      "body": {
+        "success": true,
+        "message": "Database seeding completed successfully",
+        "counts": {
+          "categoriesInserted": 3,
+          "subcategoriesInserted": 1,
+          "subSubcategoriesInserted": 1,
+          "resourcesInserted": 3,
+          "resourcesPreserved": 2
+        },
+        "errors": [],
+        "totalErrors": 0
+      },
+      "card": "Clear & Re-seed completed COMPLETED Categories inserted: 3 Subcategories inserted: 1 Sub-subcategories inserted: 1 Resources inserted: 3 Resources preserved (referenced by edits, discoveries or user data): 2 Errors: 0",
+      "mobileOverflowPx": 0,
+      "rows": [
+        {
+          "id": 2,
+          "title": "__qa_test_plan_592_v16 P2",
+          "url": "https://example.org/__qa_test_plan_592_v16/p2",
+          "category": "__qa_test_plan_592_v16 Cat A",
+          "subcategory": "__qa_test_plan_592_v16 Sub A1",
+          "sub_subcategory": null,
+          "tags": [
+            "live_streaming",
+            "Live Streaming"
+          ]
+        },
+        {
+          "id": 3,
+          "title": "__qa_test_plan_592_v16 P3",
+          "url": "https://example.org/__qa_test_plan_592_v16/p3",
+          "category": "__qa_test_plan_592_v16 Cat B",
+          "subcategory": null,
+          "sub_subcategory": null,
+          "tags": [
+            "codecs"
+          ]
+        },
+        {
+          "id": 6,
+          "title": "__qa_test_plan_592_v16 P6",
+          "url": "https://example.org/__qa_test_plan_592_v16/p6",
+          "category": "__qa_test_plan_592_v16 Cat C",
+          "subcategory": null,
+          "sub_subcategory": null,
+          "tags": [
+            "Codec",
+            "FFMPEG"
+          ]
+        },
+        {
+          "id": 7,
+          "title": "__qa_test_plan_592_v16 P7",
+          "url": "https://example.org/__qa_test_plan_592_v16/p7",
+          "category": "__qa_test_plan_592_v16 Cat A",
+          "subcategory": "__qa_test_plan_592_v16 Sub A1",
+          "sub_subcategory": "__qa_test_plan_592_v16 Leaf A1x",
+          "tags": [
+            "live-streaming"
+          ]
+        },
+        {
+          "id": 8,
+          "title": "__qa_test_plan_592_v16 P8",
+          "url": "https://example.org/__qa_test_plan_592_v16/p8",
+          "category": "__qa_test_plan_592_v16 Cat A",
+          "subcategory": null,
+          "sub_subcategory": null,
+          "tags": [
+            "Live Streaming"
+          ]
+        }
+      ],
+      "bookmarks": [
+        {
+          "resource_id": 2,
+          "notes": "__qa_test_plan_592_v16 bookmark note"
+        }
+      ],
+      "edit": {
+        "resource_id": 3,
+        "status": "pending"
+      },
+      "taxonomy": [
+        {
+          "k": "c",
+          "id": 6,
+          "name": "__qa_test_plan_592_v16 Cat A"
+        },
+        {
+          "k": "c",
+          "id": 7,
+          "name": "__qa_test_plan_592_v16 Cat B"
+        },
+        {
+          "k": "c",
+          "id": 8,
+          "name": "__qa_test_plan_592_v16 Cat C"
+        },
+        {
+          "k": "s",
+          "id": 3,
+          "name": "__qa_test_plan_592_v16 Sub A1"
+        },
+        {
+          "k": "ss",
+          "id": 3,
+          "name": "__qa_test_plan_592_v16 Leaf A1x"
+        }
+      ],
+      "publicCategories": {
+        "status": 200,
+        "names": [
+          "__qa_test_plan_592_v16 Cat A",
+          "__qa_test_plan_592_v16 Cat B",
+          "__qa_test_plan_592_v16 Cat C"
+        ]
+      },
+      "publicP2": {
+        "status": 200,
+        "title": "__qa_test_plan_592_v16 P2"
+      },
+      "publicDeletedP1": 404,
+      "snapshot": {
+        "md5": "d35d7327850cbd040f6d0486d1d588d8",
+        "resources": 5,
+        "categories": 3,
+        "subcategories": 1,
+        "sub_subcategories": 1
+      }
+    },
+    {
+      "at": "2026-10-10T18:10:12.299Z",
+      "name": "E030-backfill-approved-at",
+      "nullBefore": 5,
+      "first": {
+        "status": 200,
+        "json": {
+          "backfilled": 5,
+          "remainingNull": 0
+        },
+        "text": "{\"backfilled\":5,\"remainingNull\":0}"
+      },
+      "second": {
+        "status": 200,
+        "json": {
+          "backfilled": 0,
+          "remainingNull": 0
+        },
+        "text": "{\"backfilled\":0,\"remainingNull\":0}"
+      },
+      "sql": {
+        "eq_created": 5,
+        "still_null": 0
+      },
+      "publicP6approvedAt": {
+        "before": null,
+        "after": null
+      }
+    },
+    {
+      "at": "2026-10-10T18:10:13.509Z",
+      "name": "E031-canonicalize-tags",
+      "first": {
+        "status": 200,
+        "json": {
+          "variantFamiliesFound": 2,
+          "pluralMerges": 1,
+          "resourcesUpdated": 4
+        },
+        "text": "{\"variantFamiliesFound\":2,\"pluralMerges\":1,\"resourcesUpdated\":4}"
+      },
+      "second": {
+        "status": 200,
+        "json": {
+          "variantFamiliesFound": 0,
+          "pluralMerges": 0,
+          "resourcesUpdated": 0
+        },
+        "text": "{\"variantFamiliesFound\":0,\"pluralMerges\":0,\"resourcesUpdated\":0}"
+      },
+      "before": [
+        {
+          "id": 2,
+          "title": "__qa_test_plan_592_v16 P2",
+          "tags": [
+            "live_streaming",
+            "Live Streaming"
+          ]
+        },
+        {
+          "id": 3,
+          "title": "__qa_test_plan_592_v16 P3",
+          "tags": [
+            "codecs"
+          ]
+        },
+        {
+          "id": 6,
+          "title": "__qa_test_plan_592_v16 P6",
+          "tags": [
+            "Codec",
+            "FFMPEG"
+          ]
+        },
+        {
+          "id": 7,
+          "title": "__qa_test_plan_592_v16 P7",
+          "tags": [
+            "live-streaming"
+          ]
+        },
+        {
+          "id": 8,
+          "title": "__qa_test_plan_592_v16 P8",
+          "tags": [
+            "Live Streaming"
+          ]
+        }
+      ],
+      "after": [
+        {
+          "id": 2,
+          "title": "__qa_test_plan_592_v16 P2",
+          "tags": [
+            "Live Streaming"
+          ]
+        },
+        {
+          "id": 3,
+          "title": "__qa_test_plan_592_v16 P3",
+          "tags": [
+            "Codec"
+          ]
+        },
+        {
+          "id": 6,
+          "title": "__qa_test_plan_592_v16 P6",
+          "tags": [
+            "Codec",
+            "FFmpeg"
+          ]
+        },
+        {
+          "id": 7,
+          "title": "__qa_test_plan_592_v16 P7",
+          "tags": [
+            "Live Streaming"
+          ]
+        },
+        {
+          "id": 8,
+          "title": "__qa_test_plan_592_v16 P8",
+          "tags": [
+            "Live Streaming"
+          ]
+        }
+      ],
+      "publicP7tags": {
+        "before": [
+          "live-streaming"
+        ],
+        "after": [
+          "Live Streaming"
+        ]
+      }
+    },
+    {
+      "at": "2026-10-10T18:10:14.810Z",
+      "name": "E012-backfill-suggestions",
+      "first": {
+        "status": 200,
+        "json": {
+          "success": true,
+          "message": "Backfill complete: 2/2 resources updated, 1 sub_subcategories created",
+          "report": {
+            "scanned": 2,
+            "resourcesUpdated": 2,
+            "subSubcategoriesCreated": 1,
+            "updatedIds": [
+              6,
+              8
+            ],
+            "errors": []
+          }
+        },
+        "text": "{\"success\":true,\"message\":\"Backfill complete: 2/2 resources updated, 1 sub_subcategories created\",\"report\":{\"scanned\":2,\"resourcesUpdated\":2,\"subSubcategoriesCreated\":1,\"updatedIds\":[6,8],\"errors\":[]}}"
+      },
+      "second": {
+        "status": 200,
+        "json": {
+          "success": true,
+          "message": "Backfill complete: 0/0 resources updated, 0 sub_subcategories created",
+          "report": {
+            "scanned": 0,
+            "resourcesUpdated": 0,
+            "subSubcategoriesCreated": 0,
+            "updatedIds": [],
+            "errors": []
+          }
+        },
+        "text": "{\"success\":true,\"message\":\"Backfill complete: 0/0 resources updated, 0 sub_subcategories created\",\"report\":{\"scanned\":0,\"resourcesUpdated\":0,\"subSubcategoriesCreated\":0,\"updatedIds\":[],\"errors\":[]}}"
+      },
+      "subSubBefore": [
+        {
+          "id": 3,
+          "name": "__qa_test_plan_592_v16 Leaf A1x",
+          "subcategory_id": 3
+        }
+      ],
+      "subSubAfter": [
+        {
+          "id": 3,
+          "name": "__qa_test_plan_592_v16 Leaf A1x",
+          "subcategory_id": 3
+        },
+        {
+          "id": 4,
+          "name": "__qa_test_plan_592_v16 Leaf A1 new",
+          "subcategory_id": 3
+        }
+      ],
+      "resources": [
+        {
+          "id": 6,
+          "title": "__qa_test_plan_592_v16 P6",
+          "category": "__qa_test_plan_592_v16 Cat C",
+          "subcategory": "__qa_test_plan_592_v16 Sub C1",
+          "sub_subcategory": "__qa_test_plan_592_v16 Leaf C1x"
+        },
+        {
+          "id": 8,
+          "title": "__qa_test_plan_592_v16 P8",
+          "category": "__qa_test_plan_592_v16 Cat A",
+          "subcategory": "__qa_test_plan_592_v16 Sub A1",
+          "sub_subcategory": "__qa_test_plan_592_v16 Leaf A1 new"
+        }
+      ],
+      "subcategoryRowForSubC1": 0,
+      "publicP8": {
+        "subcategory": "__qa_test_plan_592_v16 Sub A1",
+        "subSubcategory": "__qa_test_plan_592_v16 Leaf A1 new"
+      },
+      "categoriesStatusBefore": 200
+    },
+    {
+      "at": "2026-10-10T18:10:16.911Z",
+      "name": "residue",
+      "qa_users": 0,
+      "bookmarks": 0,
+      "edits": 0,
+      "fk_table": 0
+    }
+  ],
+  "sourceHits": [
+    {
+      "at": "2026-10-10T18:08:48.222Z",
+      "mode": "down",
+      "url": "/seed.json"
+    },
+    {
+      "at": "2026-10-10T18:09:09.424Z",
+      "mode": "down",
+      "url": "/seed.json"
+    },
+    {
+      "at": "2026-10-10T18:09:11.231Z",
+      "mode": "v1",
+      "url": "/seed.json"
+    },
+    {
+      "at": "2026-10-10T18:09:27.657Z",
+      "mode": "v1",
+      "url": "/seed.json"
+    },
+    {
+      "at": "2026-10-10T18:09:38.343Z",
+      "mode": "down",
+      "url": "/seed.json"
+    },
+    {
+      "at": "2026-10-10T18:09:39.821Z",
+      "mode": "badjson",
+      "url": "/seed.json"
+    },
+    {
+      "at": "2026-10-10T18:09:41.323Z",
+      "mode": "badcat",
+      "url": "/seed.json"
+    },
+    {
+      "at": "2026-10-10T18:09:55.020Z",
+      "mode": "emptytitle",
+      "url": "/seed.json"
+    },
+    {
+      "at": "2026-10-10T18:10:00.528Z",
+      "mode": "v2",
+      "url": "/seed.json"
+    },
+    {
+      "at": "2026-10-10T18:10:08.325Z",
+      "mode": "v2",
+      "url": "/seed.json"
+    }
+  ],
+  "residue": {
+    "qa_users": 0,
+    "bookmarks": 0,
+    "edits": 0,
+    "fk_table": 0
+  }
+}

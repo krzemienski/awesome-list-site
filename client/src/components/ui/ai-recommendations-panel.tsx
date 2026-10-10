@@ -7,6 +7,7 @@ import {
   RefreshCw,
   Sparkles,
   Target,
+  WifiOff,
   Zap,
 } from "lucide-react";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
@@ -15,7 +16,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 import RecommendationCard from "@/components/ai/RecommendationCard";
-import { useAIRecommendations } from "@/hooks/useAIRecommendations";
+import { hasFreshRecommendationsCache, useAIRecommendations } from "@/hooks/useAIRecommendations";
 import {
   useRecommendationFeedback,
   useRecommendationFeedbackStates,
@@ -87,11 +88,21 @@ export default function AIRecommendationsPanel({
     [user?.id, localProfile, preferences],
   );
 
+  const generationKey = JSON.stringify({
+    userId: effectiveProfile.userId,
+    categories: effectiveProfile.preferredCategories,
+    skill: effectiveProfile.skillLevel,
+    goals: effectiveProfile.learningGoals,
+    formats: effectiveProfile.preferredResourceTypes,
+    time: effectiveProfile.timeCommitment,
+  });
+
   const {
     generateRecommendations,
     refreshRecommendations,
     recommendations,
     isLoading,
+    isPaused,
     isError,
     error,
     hasUsefulResults,
@@ -101,16 +112,9 @@ export default function AIRecommendationsPanel({
   } = useAIRecommendations(undefined, {
     limit: 10,
     cacheUserId: user?.id,
+    cacheFingerprint: generationKey,
   });
 
-  const generationKey = JSON.stringify({
-    userId: effectiveProfile.userId,
-    categories: effectiveProfile.preferredCategories,
-    skill: effectiveProfile.skillLevel,
-    goals: effectiveProfile.learningGoals,
-    formats: effectiveProfile.preferredResourceTypes,
-    time: effectiveProfile.timeCommitment,
-  });
   const generatedKeyRef = useRef<string | null>(null);
 
   useEffect(() => {
@@ -123,7 +127,18 @@ export default function AIRecommendationsPanel({
     ) {
       return;
     }
+    // A surface mounting right after another one (Home → Profile →
+    // Recommendations) reuses this device's fresh results for the same
+    // profile instead of spending another rate-limited AI request; stale
+    // results still refresh in the background, and Refresh always asks.
+    const cacheOwner = user?.id;
+    const reuseFreshCache =
+      generatedKeyRef.current === null
+      && isAuthenticated
+      && typeof cacheOwner === "string"
+      && hasFreshRecommendationsCache(cacheOwner, generationKey);
     generatedKeyRef.current = generationKey;
+    if (reuseFreshCache) return;
     generateRecommendations(isAuthenticated ? effectiveProfile : undefined);
   }, [
     authLoading,
@@ -133,6 +148,7 @@ export default function AIRecommendationsPanel({
     effectiveProfile,
     generationKey,
     generateRecommendations,
+    user?.id,
   ]);
 
   const goalLabels = useMemo(
@@ -277,7 +293,7 @@ export default function AIRecommendationsPanel({
       data-testid="button-generate-recommendations"
     >
       <RefreshCw className={`mr-2 h-4 w-4 ${isLoading ? "animate-spin" : ""}`} />
-      {isLoading ? "Refreshing…" : "Refresh recommendations"}
+      {isPaused ? "Waiting for connection…" : isLoading ? "Refreshing…" : "Refresh recommendations"}
     </Button>
   );
 
@@ -455,6 +471,18 @@ export default function AIRecommendationsPanel({
             <Button type="button" size="sm" variant="outline" onClick={(e) => { handoffFocusOnUnmount(e.currentTarget); retry(); }}>
               Try again
             </Button>
+          </AlertDescription>
+        </Alert>
+      ) : null}
+
+      {isPaused ? (
+        <Alert data-testid="offline-refresh-state" role="status">
+          <WifiOff className="h-4 w-4" />
+          <AlertTitle>You’re offline</AlertTitle>
+          <AlertDescription>
+            {hasUsefulResults
+              ? "Your refresh will finish when you reconnect. The recommendations below are your saved results."
+              : "Recommendations will load when you reconnect."}
           </AlertDescription>
         </Alert>
       ) : null}

@@ -1,0 +1,106 @@
+{
+  "started": "2026-10-10T16:29:27.706Z",
+  "vp": "desktop",
+  "steps": [
+    {
+      "name": "links",
+      "/about": {
+        "url": "http://127.0.0.1:5000/profile?tab=security",
+        "securityPanelState": "active",
+        "securityTrigger": "true"
+      },
+      "/privacy": {
+        "url": "http://127.0.0.1:5000/profile?tab=security",
+        "securityPanelState": "active",
+        "securityTrigger": "true"
+      }
+    },
+    {
+      "name": "cancel",
+      "db": null,
+      "focus": "button-request-deletion"
+    },
+    {
+      "name": "escape",
+      "db": null,
+      "focus": "button-request-deletion"
+    },
+    {
+      "name": "confirm",
+      "db": "2026-10-10T16:29:35.301Z",
+      "toast": "Deletion request submitted\nA maintainer will process your request privately. You can withdraw it any time before it's processed.",
+      "pendingText": "Your deletion request from 10/10/2026 is pending. A maintainer will process it privately. You can withdraw it any time before then.",
+      "withdrawVisible": 1,
+      "repeatPost": {
+        "status": 200,
+        "already": true,
+        "sameTs": true
+      },
+      "approvedDelta": 0
+    },
+    {
+      "name": "withdraw",
+      "db": null,
+      "focus": "button-request-deletion",
+      "toast": "Deletion request withdrawn\nYour account will not be deleted."
+    },
+    {
+      "name": "logout-all",
+      "s2Before": true,
+      "afterCancel": {
+        "p1": true,
+        "p2": true,
+        "focus": "button-logout-all"
+      },
+      "p1After": false,
+      "p2After": false,
+      "clerkSessionStatuses": [
+        "revoked",
+        "revoked",
+        "revoked"
+      ]
+    },
+    {
+      "name": "sign-out",
+      "p3State": {
+        "authed": false,
+        "draft": null
+      },
+      "p4Authed": true,
+      "protectedUrl": "http://127.0.0.1:5000/bookmarks",
+      "protectedText": "Home Bookmarks Nothing saved on this device Tap the bookmark icon on any resource to save it — no account needed. Sign in to keep your saves across devices. Explore resources Sign in",
+      "signinHref": null
+    },
+    {
+      "name": "switch-user",
+      "me": "__qa_test_plan_592_v08b_1791649768097",
+      "isB": true,
+      "bookmarksForB": 0,
+      "mentionsA": false,
+      "draft": null,
+      "recCacheA": null
+    }
+  ],
+  "signOutDebug": {
+    "url": "http://127.0.0.1:5000/",
+    "toast": "",
+    "banner": null
+  },
+  "protectedRoute": {
+    "profileSignedOutUrl": "http://127.0.0.1:5000/sign-in?redirect_url=%2Fprofile",
+    "ctaUrl": null
+  },
+  "pageErrors": [
+    [],
+    []
+  ],
+  "residue": {
+    "users": 0,
+    "resources": 0,
+    "journeys": 0,
+    "categories": 0,
+    "subcategories": 0,
+    "collections": 0,
+    "edits": 0
+  }
+}

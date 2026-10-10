@@ -1,0 +1,136 @@
+{
+  "started": "2026-10-10T16:53:06.919Z",
+  "steps": [
+    {
+      "name": "setup",
+      "putStatus": 200,
+      "put": {
+        "email": true,
+        "inApp": true
+      },
+      "tokenLen": 43,
+      "jobs": {
+        "email": 3,
+        "in_app": 4
+      },
+      "before": {
+        "email": true,
+        "in_app": true,
+        "policy_version": 1,
+        "email_unsubscribed_at": null,
+        "updated_at": "2026-10-10T16:53:08.291Z",
+        "token_used_at": null,
+        "email_job": "queued/-",
+        "in_app_job": "queued/-"
+      }
+    },
+    {
+      "name": "get-desktop",
+      "status": [
+        200,
+        200
+      ],
+      "cacheControl": "no-store",
+      "look": {
+        "h1": "Unsubscribe from email digests?",
+        "p": "This stops email digests only. In-app reminders will not change.",
+        "bg": "rgb(8, 7, 6)",
+        "btnH": 47.59375,
+        "robots": "noindex"
+      },
+      "cspViolations": [],
+      "afterTwoGets": {
+        "email": true,
+        "in_app": true,
+        "policy_version": 1,
+        "email_unsubscribed_at": null,
+        "updated_at": "2026-10-10T16:53:08.291Z",
+        "token_used_at": null,
+        "email_job": "queued/-",
+        "in_app_job": "queued/-"
+      }
+    },
+    {
+      "name": "get-390",
+      "status": [
+        200,
+        200
+      ],
+      "cacheControl": "no-store",
+      "look": {
+        "h1": "Unsubscribe from email digests?",
+        "p": "This stops email digests only. In-app reminders will not change.",
+        "bg": "rgb(8, 7, 6)",
+        "btnH": 47.59375,
+        "robots": "noindex"
+      },
+      "cspViolations": [],
+      "afterTwoGets": {
+        "email": true,
+        "in_app": true,
+        "policy_version": 1,
+        "email_unsubscribed_at": null,
+        "updated_at": "2026-10-10T16:53:08.291Z",
+        "token_used_at": null,
+        "email_job": "queued/-",
+        "in_app_job": "queued/-"
+      }
+    },
+    {
+      "name": "post-confirm",
+      "status": 200,
+      "method": "POST",
+      "text": "AWESOME VIDEO Email digests unsubscribed You will no longer receive Awesome Video email digests. In-app reminders were not changed. Open Settings",
+      "after": {
+        "email": false,
+        "in_app": true,
+        "policy_version": 2,
+        "email_unsubscribed_at": "2026-10-10T16:53:09.654Z",
+        "updated_at": "2026-10-10T16:53:09.654Z",
+        "token_used_at": "2026-10-10T16:53:09.654Z",
+        "email_job": "skipped/unsubscribed",
+        "in_app_job": "queued/-"
+      },
+      "apiAfter": {
+        "email": false,
+        "inApp": true
+      }
+    },
+    {
+      "name": "reuse",
+      "status": 410,
+      "text": "AWESOME VIDEO Link unavailable This unsubscribe link is invalid or expired. You can still change reminder settings after signing in. Open Settings",
+      "policyUnchanged": true
+    },
+    {
+      "name": "recovery-link",
+      "url": "http://127.0.0.1:5000/settings",
+      "heading": "Settings"
+    },
+    {
+      "name": "expired",
+      "status": 410,
+      "text": "AWESOME VIDEO Link unavailable This unsubscribe link is invalid or expired. You can still change reminder settings after signing in. Open Settings",
+      "expiredTokenUsedAt": null
+    },
+    {
+      "name": "malformed",
+      "status": 400,
+      "title": "Link unavailable"
+    },
+    {
+      "name": "one-click-post",
+      "status": 200,
+      "prefs": {
+        "email": false,
+        "in_app": true
+      }
+    }
+  ],
+  "residue": {
+    "users": 0,
+    "jobs": 0,
+    "tokens": 0,
+    "prefs": 0
+  }
+}

@@ -505,7 +505,7 @@ export default function ExportTab({ validationStatus: propValidationStatus }: Ex
                 {isLinkJobActive
                   ? `${(linkJob.checkedLinks || 0).toLocaleString()} of ${(linkJob.totalLinks || 0).toLocaleString()} links checked (started ${linkJob.startedAt ? formatAdminDateTime(linkJob.startedAt) : formatAdminDateTime(linkJob.createdAt)}).`
                   : linkJob.status === "completed"
-                    ? `Completed ${linkJob.completedAt ? formatAdminDateTime(linkJob.completedAt) : ""}: ${(linkJob.healthyLinks || 0).toLocaleString()} healthy, ${(linkJob.brokenLinks || 0).toLocaleString()} broken, ${(linkJob.redirectLinks || 0).toLocaleString()} redirects, ${(linkJob.timeoutLinks || 0).toLocaleString()} timeouts of ${(linkJob.totalLinks || 0).toLocaleString()}.`
+                    ? `Completed ${linkJob.completedAt ? formatAdminDateTime(linkJob.completedAt) : ""}: ${(linkJob.healthyLinks ?? 0).toLocaleString()} healthy, ${(linkJob.brokenLinks ?? 0).toLocaleString()} broken, ${(linkJob.redirectLinks ?? 0).toLocaleString()} redirects, ${(linkJob.timeoutLinks ?? 0).toLocaleString()} timeouts, ${(linkJob.suspectLinks ?? 0).toLocaleString()} suspect of ${(linkJob.totalLinks ?? 0).toLocaleString()}.`
                     : `${linkJob.status === "failed" ? "Failed" : "Cancelled"}${linkJob.completedAt ? ` ${formatAdminDateTime(linkJob.completedAt)}` : ""}: ${linkJob.errorMessage || "No reason was recorded."}`}
               </p>
               {isLinkJobError ? (

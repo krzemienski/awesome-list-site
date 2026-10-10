@@ -1,0 +1,100 @@
+{
+  "started": "2026-10-10T18:58:39.994Z",
+  "steps": [
+    {
+      "at": "2026-10-10T18:58:48.160Z",
+      "name": "repo-ready",
+      "status": 201,
+      "private": true,
+      "commit": "552eedc4651dd86199b1d7e5e6d0f774c21d33ca",
+      "anonymousRawStatus": 404,
+      "rawWaitMs": 152
+    },
+    {
+      "at": "2026-10-10T18:58:51.576Z",
+      "name": "import",
+      "dryRun": {
+        "status": 200,
+        "outcome": "partial",
+        "imported": 1,
+        "updated": 0,
+        "errors": [
+          "Error processing __qa_test_plan_592_v16 P2: Category hierarchy error: Failed to create or find category: qatestplan592v16 Cat A - Category name or slug already exists; choose a unique name and slug",
+          "Error processing __qa_test_plan_592_v17c R7: Category hierarchy error: Failed to create or find category: qatestplan592v16 Cat A - Category name or slug already exists; choose a unique name and slug"
+        ]
+      },
+      "real": {
+        "status": 200,
+        "success": false,
+        "outcome": "partial",
+        "imported": 1,
+        "updated": 0,
+        "skipped": 0,
+        "totalErrors": 2,
+        "errors": [
+          "Error processing __qa_test_plan_592_v16 P2: Category hierarchy error: Failed to create or find category: qatestplan592v16 Cat A - Category name or slug already exists; choose a unique name and slug",
+          "Error processing __qa_test_plan_592_v17c R7: Category hierarchy error: Failed to create or find category: qatestplan592v16 Cat A - Category name or slug already exists; choose a unique name and slug"
+        ],
+        "message": "Partial import from krzemienski/__qa_test_plan_592_gh2: 1 imported, 0 updated, 2 failed"
+      },
+      "p2Before": {
+        "id": 2,
+        "title": "__qa_test_plan_592_v16 P2",
+        "category": "__qa_test_plan_592_v16 Cat A",
+        "subcategory": "__qa_test_plan_592_v16 Sub A1",
+        "sub_subcategory": "__qa_test_plan_592_v16 Leaf A1 second",
+        "updated_at": "2026-10-10T18:45:04.674Z"
+      },
+      "p2After": {
+        "id": 2,
+        "title": "__qa_test_plan_592_v16 P2",
+        "category": "__qa_test_plan_592_v16 Cat A",
+        "subcategory": "__qa_test_plan_592_v16 Sub A1",
+        "sub_subcategory": "__qa_test_plan_592_v16 Leaf A1 second",
+        "updated_at": "2026-10-10T18:45:04.674Z"
+      },
+      "p2Unchanged": true,
+      "r7Created": false,
+      "r8": {
+        "id": 14,
+        "title": "__qa_test_plan_592_v17c R8",
+        "category": "QA592 v17c Fresh",
+        "subcategory": null,
+        "sub_subcategory": null,
+        "updated_at": "2026-10-10T18:58:51.385Z"
+      },
+      "r8CategoryRow": [
+        {
+          "id": 10,
+          "name": "QA592 v17c Fresh",
+          "slug": "qa592-v17c-fresh"
+        }
+      ],
+      "orphansBefore": 0,
+      "orphansAfter": 0,
+      "log": [
+        "Error creating hierarchy for qatestplan592v16 Cat A||: Failed to create or find category: qatestplan592v16 Cat A - Category name or slug already exists; choose a unique name and slug",
+        "Error processing __qa_test_plan_592_v16 P2: Category hierarchy error: Failed to create or find category: qatestplan592v16 Cat A - Category name or slug already exists; choose a unique name and slug",
+        "Error processing __qa_test_plan_592_v17c R7: Category hierarchy error: Failed to create or find category: qatestplan592v16 Cat A - Category name or slug already exists; choose a unique name and slug",
+        "✓ Imported: __qa_test_plan_592_v17c R8",
+        "Error creating hierarchy for qatestplan592v16 Cat A||: Failed to create or find category: qatestplan592v16 Cat A - Category name or slug already exists; choose a unique name and slug",
+        "Error processing __qa_test_plan_592_v16 P2: Category hierarchy error: Failed to create or find category: qatestplan592v16 Cat A - Category name or slug already exists; choose a unique name and slug",
+        "Error processing __qa_test_plan_592_v17c R7: Category hierarchy error: Failed to create or find category: qatestplan592v16 Cat A - Category name or slug already exists; choose a unique name and slug",
+        "✓ Imported: __qa_test_plan_592_v17c R8"
+      ]
+    },
+    {
+      "at": "2026-10-10T18:58:58.312Z",
+      "name": "cleanup",
+      "repo": {
+        "deleteStatus": 204,
+        "getAfter": 404
+      },
+      "residue": {
+        "qa_users": 0,
+        "v17c_resources": 0,
+        "v17c_categories": 0
+      }
+    }
+  ]
+}

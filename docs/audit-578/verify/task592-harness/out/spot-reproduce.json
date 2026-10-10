@@ -1,0 +1,138 @@
+{
+  "at": "2026-10-10T19:58:12.725Z",
+  "base": "http://127.0.0.1:5000",
+  "checks": [
+    {
+      "item": "A05",
+      "recipe": "GET /api/public/tags vs /api/tags",
+      "pass": true,
+      "observed": {
+        "status": [
+          200,
+          200
+        ],
+        "identical": true,
+        "total": 1535
+      }
+    },
+    {
+      "item": "A01",
+      "recipe": "GET /api/resources?limit=24 metadata keys",
+      "pass": true,
+      "observed": {
+        "status": 200,
+        "banned": [],
+        "sampleKeys": [
+          "ogImage",
+          "favicon",
+          "scrapedTitle",
+          "scrapedDescription",
+          "ogTitle",
+          "ogDescription",
+          "twitterCard",
+          "urlScraped",
+          "ogImageBlurhash",
+          "tags"
+        ]
+      }
+    },
+    {
+      "item": "B01",
+      "recipe": "no unpublished journey in DEV to probe",
+      "pass": true,
+      "observed": {
+        "note": "skipped: no draft row"
+      }
+    },
+    {
+      "item": "B09",
+      "recipe": "anon GET /api/recommendations?categories=a&categories=b",
+      "pass": true,
+      "observed": {
+        "status": 400
+      }
+    },
+    {
+      "item": "C04",
+      "recipe": "POST /api/resources/184739/edits malformed",
+      "pass": true,
+      "observed": {
+        "status": 400,
+        "body": "{\"message\":\"proposedData must be a non-empty object containing only editable fields\",\"field\":\"proposedData\",\"error\":\"val",
+        "editsDelta": 0
+      }
+    },
+    {
+      "item": "D02",
+      "recipe": "POST /api/admin/categories duplicate name \"Intro & Learning\"",
+      "pass": true,
+      "observed": {
+        "status": 409,
+        "body": "{\"message\":\"Category name or slug already exists; choose a unique name and slug\",\"fieldErrors\":{\"name\":\"Category name or slug already exists; choose a unique na",
+        "categoriesDelta": 0
+      }
+    },
+    {
+      "item": "E05",
+      "recipe": "GET /api/admin/digests/health (admin)",
+      "pass": true,
+      "observed": {
+        "status": 200,
+        "keys": [
+          "transport",
+          "queue",
+          "recentFailureCodes",
+          "oldestQueuedAt"
+        ]
+      }
+    },
+    {
+      "item": "F04",
+      "recipe": "GET /api/admin/export/sql, POST /api/admin/export/api-token",
+      "pass": true,
+      "observed": {
+        "status": [
+          404,
+          404
+        ]
+      }
+    },
+    {
+      "item": "G06",
+      "recipe": "GET /api/researcher/jobs (admin)",
+      "pass": true,
+      "observed": {
+        "status": 200,
+        "sample": "{\"jobs\":[{\"id\":50,\"status\":\"failed\",\"prompt\":\"Find 3 open-source AV1 encoder tools on GitHub that ar"
+      }
+    },
+    {
+      "item": "H05",
+      "recipe": "GET /subsubcategory/av1?page=2",
+      "pass": true,
+      "observed": {
+        "status": 301,
+        "location": "/sub-subcategory/av1?page=2"
+      }
+    },
+    {
+      "item": "H05",
+      "recipe": "GET /explore?q=ffmpeg&tags=open-source&page=2",
+      "pass": true,
+      "observed": {
+        "status": 301,
+        "location": "/search?q=ffmpeg&tags=open-source&page=2"
+      }
+    },
+    {
+      "item": "H04",
+      "recipe": "GET /category/encoding%2Dcodecs",
+      "pass": true,
+      "observed": {
+        "status": 301,
+        "location": "/category/encoding-codecs"
+      }
+    }
+  ],
+  "residue": 0
+}

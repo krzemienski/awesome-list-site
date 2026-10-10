@@ -1,0 +1,51 @@
+{
+  "started": "2026-10-10T17:31:43.356Z",
+  "steps": [
+    {
+      "name": "reuse",
+      "recommendationsCards": 10,
+      "postsOnFirstMount": 1,
+      "advancedCards": 10,
+      "homeCards": 10,
+      "postsAfterAdvancedAndHome": 0,
+      "sameOrder": true
+    },
+    {
+      "name": "undo-reload",
+      "hidden": 186681,
+      "cacheEntriesAfterHide": 1,
+      "cacheEntriesAfterUndo": 0,
+      "reloadPosted": 1,
+      "restoredCardBackAfterReload": true,
+      "positionAfterReload": 0,
+      "positionBefore": 0
+    },
+    {
+      "name": "second-device-390",
+      "posts": 1,
+      "cards": 10,
+      "horizontalOverflow": 0
+    }
+  ],
+  "posts": [
+    {
+      "label": "desktop",
+      "url": "/api/recommendations?limit=10",
+      "at": "2026-10-10T17:31:47.397Z"
+    },
+    {
+      "label": "desktop",
+      "url": "/api/recommendations?limit=10",
+      "at": "2026-10-10T17:32:00.188Z"
+    },
+    {
+      "label": "390",
+      "url": "/api/recommendations?limit=10",
+      "at": "2026-10-10T17:32:04.523Z"
+    }
+  ],
+  "residue": {
+    "users": 0,
+    "feedback": 0
+  }
+}

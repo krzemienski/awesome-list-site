@@ -1,0 +1,61 @@
+{
+  "started": "2026-10-10T19:26:21.519Z",
+  "steps": [
+    {
+      "name": "breadcrumb-1024",
+      "width": 1024,
+      "ellipsisCount": 1,
+      "tabIndex": "-1",
+      "inSrOnly": true,
+      "srCrumbs": [
+        "Home",
+        "",
+        "Show 3 hidden breadcrumb levels",
+        "",
+        "__qa_test_plan_592_v19b Deep"
+      ],
+      "visibleChips": [
+        "◆__qa_test_plan_592_v19b Cat -> /category/qatestplan592v19b-cat",
+        "__qa_test_plan_592_v19b Sub -> /subcategory/qatestplan592v19b-sub",
+        "__qa_test_plan_592_v19b Leaf -> /sub-subcategory/qatestplan592v19b-leaf"
+      ],
+      "menuItems": [
+        "__qa_test_plan_592_v19b Cat -> /category/qatestplan592v19b-cat",
+        "__qa_test_plan_592_v19b Sub -> /subcategory/qatestplan592v19b-sub",
+        "__qa_test_plan_592_v19b Leaf -> /sub-subcategory/qatestplan592v19b-leaf"
+      ],
+      "afterActivate": {
+        "url": "http://127.0.0.1:5165/subcategory/qatestplan592v19b-sub",
+        "h1": "__qa_test_plan_592_v19b Sub"
+      },
+      "errors": []
+    },
+    {
+      "name": "breadcrumb-1440",
+      "width": 1440,
+      "ellipsisCount": 0,
+      "tabIndex": null,
+      "inSrOnly": null,
+      "srCrumbs": [
+        "Home",
+        "",
+        "__qa_test_plan_592_v19b Deep"
+      ],
+      "visibleChips": [
+        "◆__qa_test_plan_592_v19b Cat -> /category/qatestplan592v19b-cat",
+        "__qa_test_plan_592_v19b Sub -> /subcategory/qatestplan592v19b-sub",
+        "__qa_test_plan_592_v19b Leaf -> /sub-subcategory/qatestplan592v19b-leaf"
+      ],
+      "errors": []
+    },
+    {
+      "name": "cleanup",
+      "residue": {
+        "resources": 0,
+        "categories": 0,
+        "subs": 0,
+        "leaves": 0
+      }
+    }
+  ]
+}

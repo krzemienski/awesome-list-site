@@ -1,0 +1,168 @@
+{
+  "started": "2026-10-10T16:00:12.814Z",
+  "steps": [
+    {
+      "name": "initial",
+      "attrs": {
+        "system": "editorial",
+        "accent": "crimson",
+        "lsSystem": null,
+        "lsAccent": null
+      },
+      "prefs": null
+    },
+    {
+      "name": "rapid-save",
+      "putBodies": [
+        {
+          "s": "terminal",
+          "a": "matrix",
+          "rev": null
+        },
+        {
+          "s": "terminal",
+          "a": "matrix",
+          "rev": 1
+        },
+        {
+          "s": "swiss",
+          "a": "orange",
+          "rev": 2
+        },
+        {
+          "s": "swiss",
+          "a": "violet",
+          "rev": 3
+        }
+      ],
+      "serverTheme": {
+        "systemId": "swiss",
+        "accentId": "violet"
+      },
+      "revision": 4,
+      "attrs": {
+        "system": "swiss",
+        "accent": "violet",
+        "lsSystem": "swiss",
+        "lsAccent": "violet"
+      },
+      "status": "Theme saved to your account."
+    },
+    {
+      "name": "reload",
+      "attrs": {
+        "system": "swiss",
+        "accent": "violet",
+        "lsSystem": "swiss",
+        "lsAccent": "violet"
+      },
+      "swissChecked": "true",
+      "violetChecked": "true"
+    },
+    {
+      "name": "fresh-context-hydration",
+      "beforeSignIn": {
+        "system": "editorial",
+        "accent": "crimson",
+        "lsSystem": null,
+        "lsAccent": null
+      },
+      "afterSignIn": {
+        "system": "swiss",
+        "accent": "violet",
+        "lsSystem": "swiss",
+        "lsAccent": "violet"
+      }
+    },
+    {
+      "name": "fresh-context-new-page",
+      "attrs": {
+        "system": "swiss",
+        "accent": "violet",
+        "lsSystem": "swiss",
+        "lsAccent": "violet"
+      }
+    },
+    {
+      "name": "offline-pending",
+      "attrs": {
+        "system": "brutalist",
+        "accent": "violet",
+        "lsSystem": "brutalist",
+        "lsAccent": "violet"
+      },
+      "status": "Saving theme to your account…",
+      "toast": "",
+      "serverTheme": {
+        "systemId": "swiss",
+        "accentId": "violet"
+      }
+    },
+    {
+      "name": "online-recovered",
+      "serverTheme": {
+        "systemId": "brutalist",
+        "accentId": "violet"
+      },
+      "status": "Theme saved to your account.",
+      "toastAfter": ""
+    },
+    {
+      "name": "conflict",
+      "tab2PutStatuses": [
+        409
+      ],
+      "tab2Status": "Your account changed elsewhere. This selection is saved only on this device. Retry to save it to your account.\n\nRetry account save",
+      "serverTheme": {
+        "systemId": "terminal",
+        "accentId": "violet"
+      }
+    },
+    {
+      "name": "conflict-retry",
+      "tab2PutStatuses": [
+        409,
+        200
+      ],
+      "serverTheme": {
+        "systemId": "geist",
+        "accentId": "violet"
+      }
+    },
+    {
+      "name": "B-seed",
+      "status": 200,
+      "theme": {
+        "systemId": "editorial",
+        "accentId": "emerald"
+      }
+    },
+    {
+      "name": "second-user-wins",
+      "attrs": {
+        "system": "editorial",
+        "accent": "emerald",
+        "lsSystem": "editorial",
+        "lsAccent": "emerald"
+      },
+      "serverB": {
+        "systemId": "editorial",
+        "accentId": "emerald"
+      },
+      "serverA": {
+        "systemId": "geist",
+        "accentId": "violet"
+      }
+    }
+  ],
+  "pageErrors": [],
+  "residue": {
+    "users": 0,
+    "resources": 0,
+    "journeys": 0,
+    "categories": 0,
+    "subcategories": 0,
+    "collections": 0,
+    "edits": 0
+  }
+}

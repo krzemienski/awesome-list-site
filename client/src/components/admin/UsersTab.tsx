@@ -146,6 +146,10 @@ export default function UsersTab() {
       toast({ title: "User Deleted", description: "The account and its sign-in identity have been removed." });
       deletedUserRef.current = true;
       setUserToDelete(null);
+      // The Action button closes the dialog on click, so Radix usually
+      // returns focus to the row's Delete trigger before this resolves; that
+      // trigger unmounts with the row on refetch, dropping focus to <body>.
+      searchInputRef.current?.focus();
     },
     onError: (error: Error) => {
       toast({ title: "Delete Failed", description: error.message, variant: "destructive" });
@@ -422,7 +426,10 @@ export default function UsersTab() {
                           variant="ghost"
                           size="sm"
                           className="h-8 w-8 p-0 text-destructive hover:text-destructive"
-                          onClick={() => setUserToDelete(user)}
+                          onClick={() => {
+                            deletedUserRef.current = false;
+                            setUserToDelete(user);
+                          }}
                           aria-label={`Delete user ${
                             /* R4-H05: keep the raw email out of the DOM unless revealed.
                                R5-012: masked emails can collide (j***@gmail.com), so the

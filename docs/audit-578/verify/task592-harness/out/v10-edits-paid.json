@@ -1,0 +1,194 @@
+{
+  "started": "2026-10-10T17:33:52.515Z",
+  "steps": [
+    {
+      "name": "fixtures",
+      "R1": {
+        "id": 188688,
+        "title": "__qa_test_plan_592_v10 r1 resource",
+        "url": "https://example.org/__qa_test_plan_592_v10_r1_1791653632600",
+        "description": "QA fixture r1 for the suggest-edit proof."
+      },
+      "R2": {
+        "id": 188689,
+        "title": "__qa_test_plan_592_v10 r2 resource",
+        "url": "https://example.org/__qa_test_plan_592_v10_r2_1791653632600",
+        "description": "QA fixture r2 for the suggest-edit proof."
+      },
+      "category": {
+        "sub": "Encoding Tools",
+        "cat": "Encoding & Codecs"
+      }
+    },
+    {
+      "name": "empty-diff",
+      "analyzeButtonForNonAdmin": 0,
+      "toast": "No changes to submit\nThe form matches the current resource — edit a field first.",
+      "postsSent": 0
+    },
+    {
+      "name": "invalid-https",
+      "fieldErrors": [
+        "New URLs must use HTTPS (keeping the current URL unchanged is fine)"
+      ],
+      "postsSent": 0
+    },
+    {
+      "name": "duplicate-url",
+      "status": 409,
+      "body": {
+        "message": "That URL already belongs to another resource (#188689: \"__qa_test_plan_592_v10 r2 resource\"). Suggest a different URL, or suggest edits on that resource instead.",
+        "field": "url",
+        "conflictingResourceId": 188689,
+        "title": "__qa_test_plan_592_v10 r2 resource"
+      },
+      "fieldErrors": [
+        "That URL already belongs to another resource (#188689: \"__qa_test_plan_592_v10 r2 resource\"). Suggest a different URL, or suggest edits on that resource instead."
+      ],
+      "dialogStillOpen": true
+    },
+    {
+      "name": "valid-submit",
+      "status": 201,
+      "editId": 75,
+      "proposedChanges": {
+        "description": {
+          "new": "QA fixture r1 — improved description proposed by a contributor (1791653632600).",
+          "old": "QA fixture r1 for the suggest-edit proof."
+        }
+      },
+      "toast": "Edit Suggestion Submitted\nYour edit is pending review and now appears in your contribution timeline.\nView status",
+      "catalogDescriptionUnchanged": true
+    },
+    {
+      "name": "view-status",
+      "url": "/contributions",
+      "row": "EDIT SUGGESTION PENDING __qa_test_plan_592_v10 r1 resource Submitted less than a minute ago 1 proposed change Description QA fixture r1 for the suggest-edit proof. QA fixture r1 — improved description proposed by a contributor (1791653632600). Waiting for moderator review. Withdraw"
+    },
+    {
+      "name": "duplicate-suggestion",
+      "status": 409,
+      "body": {
+        "message": "An identical edit suggestion is already pending review for this resource.",
+        "existingEditId": 75
+      },
+      "toast": "Submission Failed\nAn identical edit suggestion is already pending review for this resource."
+    },
+    {
+      "name": "api-failure",
+      "toast": "Submission Failed\nCould not reach the server. Please check your connection and try again.",
+      "dialogStillOpen": true,
+      "editsInDb": [
+        {
+          "id": 75,
+          "status": "pending"
+        }
+      ]
+    },
+    {
+      "name": "withdraw",
+      "afterCancel": "pending",
+      "confirm": [
+        "POST",
+        200
+      ],
+      "dbStatus": "withdrawn",
+      "rowAfterReload": "EDIT SUGGESTION WITHDRAWN __qa_test_plan_592_v10 r1 resource Submitted less than a minute ago Status changed less than a minute ago 1 proposed change Description QA fixture r1 for the suggest-edit proof. QA fixture r1 — improved description proposed by a contributor (1791653632600). Withdrawn by you"
+    },
+    {
+      "name": "390",
+      "horizontalOverflow": 0,
+      "dialogWidth": 358
+    },
+    {
+      "name": "admin-analyze-apply",
+      "analyzeStatus": 200,
+      "busyLabel": "Analyzing...",
+      "suggestion": {
+        "title": "VLC Media Player - Open-Source Universal Multimedia Engine",
+        "description": "VLC is a free, open-source media player and multimedia engine that plays virtually any audio/video format, runs on all major platforms, and provides libVLC for ",
+        "confidence": 0.92
+      },
+      "before": {
+        "title": "__qa_test_plan_592_v10 r2 resource",
+        "description": "QA fixture r2 for the suggest-edit proof."
+      },
+      "applied": {
+        "title": "VLC Media Player - Open-Source Universal Multimedia Engine",
+        "description": "VLC is a free, open-source media player and multimedia engine that plays virtually any audio/video format, runs on all major platforms, and provides libVLC for embedding into third-party applications. It supports playback, streaming, encoding, format conversion, and stream manipulation across Windows, macOS, Linux, BSD, Android, and iOS."
+      },
+      "submit": 201,
+      "editId": 76,
+      "changedFields": [
+        "title",
+        "category",
+        "description"
+      ],
+      "catalogUnchangedBeforeApproval": true
+    },
+    {
+      "name": "admin-approve",
+      "status": 200,
+      "catalogAfter": {
+        "title": "VLC Media Player - Open-Source Universal Multimedia Engine",
+        "description": "VLC is a free, open-source media player and multimedia engine that plays virtually any audio/video format, runs on all major platforms, and provides libVLC for "
+      },
+      "matchesApplied": true
+    }
+  ],
+  "analyzeRaw": {
+    "status": 200,
+    "body": {
+      "suggestedTitle": "VLC Media Player - Open-Source Universal Multimedia Engine",
+      "suggestedDescription": "VLC is a free, open-source media player and multimedia engine that plays virtually any audio/video format, runs on all major platforms, and provides libVLC for embedding into third-party applications. It supports playback, streaming, encoding, format conversion, and stream manipulation across Windows, macOS, Linux, BSD, Android, and iOS.",
+      "suggestedTags": [
+        "libVLC",
+        "multimedia",
+        "streaming",
+        "encoding",
+        "cross-platform"
+      ],
+      "suggestedCategory": "Media Tools",
+      "suggestedSubcategory": "Players & Framework Libraries",
+      "suggestedSubSubcategory": "libVLC (Embeddable Engine)",
+      "confidence": 0.92,
+      "keyTopics": [
+        "libVLC API",
+        "Cross-platform Media Playback",
+        "Audio/Video Codec Support",
+        "Stream Encoding & Transcoding",
+        "Open-Source Multimedia Framework"
+      ]
+    }
+  },
+  "editPosts": [
+    {
+      "at": "2026-10-10T17:33:59.170Z",
+      "url": "/api/resources/188688/edits"
+    },
+    {
+      "at": "2026-10-10T17:34:00.480Z",
+      "url": "/api/resources/188688/edits"
+    },
+    {
+      "at": "2026-10-10T17:34:04.363Z",
+      "url": "/api/resources/188688/edits"
+    },
+    {
+      "at": "2026-10-10T17:34:05.875Z",
+      "url": "/api/resources/188688/edits"
+    }
+  ],
+  "residue": {
+    "users": 0,
+    "resources": 0,
+    "journeys": 0,
+    "categories": 0,
+    "subcategories": 0,
+    "collections": 0,
+    "edits": 0
+  },
+  "residueByIds": {
+    "n": 0
+  }
+}

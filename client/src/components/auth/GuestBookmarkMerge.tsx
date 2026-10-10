@@ -1,4 +1,5 @@
 import { useEffect, useRef } from "react";
+import { useClerk } from "@clerk/react";
 import { queryClient, apiRequest, ApiError } from "@/lib/queryClient";
 import { notifyCrossTabSync } from "@/lib/crossTabSync";
 import { useToast } from "@/hooks/use-toast";
@@ -24,18 +25,26 @@ import {
 //   the authed API error rate (the task's guardrail) and retrying forever.
 // - Clears the local store ONLY for confirmed outcomes (merged, already in
 //   the account, or resource gone). Failed pushes stay for the next visit.
+// - Binds each run to the identity that started it: the bookmark API rides
+//   the session cookie, so a run that kept going after an in-app account
+//   switch would POST the device's saves into the NEXT account. The run stops
+//   at the first item after the identity changes (unsent ids stay local for
+//   the new account's own run), and only one run is ever in flight.
 
 interface MergeOutcome {
   merged: number;
   duplicates: number;
   failed: number;
   removedMissing: number;
+  /** The signed-in identity changed mid-run; the rest stays local. */
+  interrupted: boolean;
 }
 
-async function pushGuestBookmarks(): Promise<MergeOutcome | null> {
+async function pushGuestBookmarks(isStillOwner: () => boolean): Promise<MergeOutcome | null> {
   const ids = getGuestBookmarks().map((entry) => entry.id);
   if (ids.length === 0) return null;
 
+  if (!isStillOwner()) return null;
   const existing = (await apiRequest("/api/bookmarks", {
     credentials: "include",
   })) as Array<{ id: number | string }>;
@@ -49,10 +58,15 @@ async function pushGuestBookmarks(): Promise<MergeOutcome | null> {
   const merged: number[] = [];
   const missing: number[] = [];
   const failed: number[] = [];
+  let interrupted = false;
 
   // Sequential on purpose: at most GUEST_BOOKMARK_CAP items, and a polite
   // one-at-a-time drip never trips the per-minute API limiters.
   for (const id of ids) {
+    if (!isStillOwner()) {
+      interrupted = true;
+      break;
+    }
     if (existingIds.has(id)) {
       duplicates.push(id);
       continue;
@@ -66,6 +80,10 @@ async function pushGuestBookmarks(): Promise<MergeOutcome | null> {
         failed.push(id); // transient trouble — keep the save for a later retry
       }
       continue;
+    }
+    if (!isStillOwner()) {
+      interrupted = true;
+      break;
     }
     try {
       await apiRequest(`/api/bookmarks/${id}`, {
@@ -86,36 +104,56 @@ async function pushGuestBookmarks(): Promise<MergeOutcome | null> {
     duplicates: duplicates.length,
     failed: failed.length,
     removedMissing: missing.length,
+    interrupted,
   };
 }
 
 export default function GuestBookmarkMerge() {
-  const { isAuthenticated } = useAuth();
+  const { isAuthenticated, user } = useAuth();
+  const clerk = useClerk();
   const { toast } = useToast();
   const guestEntries = useGuestBookmarks();
+  const serverUserId = user?.id ?? null;
+  // Live identity, read at each checkpoint (render snapshots go stale while a
+  // run is awaiting the network).
+  const serverUserIdRef = useRef(serverUserId);
+  serverUserIdRef.current = isAuthenticated ? serverUserId : null;
+  const runInFlight = useRef<Promise<unknown>>(Promise.resolve());
 
-  // One merge attempt per signed-in session per app load: ids that fail stay
+  // One merge attempt per signed-in account per app load: ids that fail stay
   // local and retry on the next visit (an immediate loop would just replay
-  // the same failure against the API).
-  const attemptedRef = useRef(false);
+  // the same failure against the API). Keyed by account so a direct switch
+  // to another account gets its own attempt.
+  const attemptedFor = useRef<string | null>(null);
 
   useEffect(() => {
-    if (!isAuthenticated) {
-      attemptedRef.current = false;
+    if (!isAuthenticated || !serverUserId) {
+      attemptedFor.current = null;
       return;
     }
-    if (guestEntries.length === 0 || attemptedRef.current) return;
-    attemptedRef.current = true;
+    if (guestEntries.length === 0 || attemptedFor.current === serverUserId) return;
+    attemptedFor.current = serverUserId;
 
-    void (async () => {
+    const ownerServerId = serverUserId;
+    const ownerClerkId = clerk.user?.id ?? null;
+    const isStillOwner = () =>
+      serverUserIdRef.current === ownerServerId &&
+      (clerk.user?.id ?? null) === ownerClerkId;
+
+    // Wait for any earlier run (it stops at its next checkpoint once the
+    // identity changed) so two runs never POST the same ids concurrently.
+    runInFlight.current = runInFlight.current.catch(() => undefined).then(async () => {
       try {
-        const outcome = await pushGuestBookmarks();
+        const outcome = await pushGuestBookmarks(isStillOwner);
         if (!outcome) return;
-
         if (outcome.merged > 0) {
           void queryClient.invalidateQueries({ queryKey: ["/api/bookmarks"] });
           notifyCrossTabSync();
         }
+        // An interrupted run belongs to an account that is no longer signed
+        // in here: no toast for it; the new account's run reports its own.
+        if (outcome.interrupted || !isStillOwner()) return;
+
         trackBookmarksMerged(outcome);
 
         const noun = (n: number) => (n === 1 ? "resource" : "resources");
@@ -160,8 +198,8 @@ export default function GuestBookmarkMerge() {
         // after sign-in). Local saves are untouched; retry next app load.
         console.error("Guest bookmark merge failed:", error);
       }
-    })();
-  }, [isAuthenticated, guestEntries.length, toast]);
+    });
+  }, [isAuthenticated, serverUserId, clerk, guestEntries.length, toast]);
 
   return null;
 }

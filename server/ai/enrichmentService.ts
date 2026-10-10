@@ -11,7 +11,7 @@ import { humanizeTitle, sanitizeDescription, decodeHtmlEntities } from '../githu
 import { tool, createSdkMcpServer } from '@anthropic-ai/claude-agent-sdk';
 import { z } from 'zod';
 import { AgentEventEmitter } from './agentEvents';
-import { runAgentQuery } from './runAgentQuery';
+import { runAgentQuery, agentUsageFromError } from './runAgentQuery';
 import { defaultEnrichmentModel, resolveModel, type AgentRunConfig } from './agentRuntime';
 import type { EnrichmentJob, EnrichmentQueueItem } from '@shared/schema';
 
@@ -289,6 +289,14 @@ export class EnrichmentService {
       });
     } catch (error: any) {
       console.error(`Error processing job ${jobId}:`, error);
+      // A failed batch still spent tokens; fold its reported usage into the totals.
+      const usage = agentUsageFromError(error);
+      if (usage) {
+        totals.turns += usage.numTurns;
+        totals.tokensIn += usage.tokensIn;
+        totals.tokensOut += usage.tokensOut;
+        totals.costUsd += usage.totalCostUsd;
+      }
       const cur = await this.enrichmentRepo.getEnrichmentJob(jobId);
       agentLog.push({ role: 'error', content: `Job failed: ${error.message}`, timestamp: new Date().toISOString() });
       // BUG-013 (run25): status must reflect the work, not just the exception.
@@ -657,6 +665,27 @@ ${taxonomyHint}`;
       aiModel: model,
       ...scrapedFields,
     };
+
+    // Promote AI tags into the live `tags` field when the resource has none.
+    // The "unenriched" filter and the coverage banner both count resources
+    // with no metadata.tags; storing only suggestedTags left every enriched
+    // resource "unenriched" forever, so each later run re-enriched (and
+    // re-paid for) the same rows. Existing tags are never overwritten.
+    const existingTags = (item.metadata as Record<string, unknown> | null | undefined)?.tags;
+    if (!(Array.isArray(existingTags) && existingTags.length > 0)) {
+      const seen = new Set<string>();
+      const promoted: string[] = [];
+      for (const raw of ai.tags ?? []) {
+        if (typeof raw !== 'string') continue;
+        const tag = decodeHtmlEntities(raw).trim().replace(/\s+/g, ' ').slice(0, 50);
+        const key = tag.toLowerCase();
+        if (!tag || seen.has(key)) continue;
+        seen.add(key);
+        promoted.push(tag);
+        if (promoted.length >= 5) break;
+      }
+      if (promoted.length > 0) (enhancedMetadata as Record<string, unknown>).tags = promoted;
+    }
 
     const updates: any = { metadata: enhancedMetadata };
 

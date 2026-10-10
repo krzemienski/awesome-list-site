@@ -1,0 +1,131 @@
+{
+  "started": "2026-10-10T16:11:38.713Z",
+  "steps": [
+    {
+      "name": "create-rename-reorder",
+      "order": [
+        {
+          "name": "__qa_test_plan_592_v03 beta",
+          "position": 0
+        },
+        {
+          "name": "__qa_test_plan_592_v03 alpha renamed",
+          "position": 1
+        }
+      ]
+    },
+    {
+      "name": "assign",
+      "items": [
+        {
+          "resource_id": 184739
+        },
+        {
+          "resource_id": 184740
+        }
+      ]
+    },
+    {
+      "name": "publish-copy",
+      "copied": "https://awesome.video/collection/Cy6fdQGy_xP8ii0hKPvXkSPL",
+      "shareId": "Cy6fdQGy_xP8ii0hKPvXkSPL",
+      "toast": "Public collection link copied"
+    },
+    {
+      "name": "anon-api",
+      "status": 200,
+      "keys": [
+        "shareId",
+        "name",
+        "publishedAt",
+        "resources"
+      ],
+      "resourceKeys": [
+        "id",
+        "title",
+        "url",
+        "description",
+        "category",
+        "subcategory",
+        "subSubcategory",
+        "resourceFormat",
+        "provider",
+        "skillLevel",
+        "kind",
+        "resolvedKind"
+      ],
+      "leaks": {
+        "userId": false,
+        "email": false,
+        "notes": false,
+        "personalTags": false
+      }
+    },
+    {
+      "name": "anon-render-desktop",
+      "titles": [
+        true,
+        true
+      ],
+      "leaks": {
+        "userId": false,
+        "email": false,
+        "notes": false,
+        "personalTags": false
+      },
+      "hOverflow": false
+    },
+    {
+      "name": "anon-render-390",
+      "titles": [
+        true,
+        true
+      ],
+      "leaks": {
+        "userId": false,
+        "email": false,
+        "notes": false,
+        "personalTags": false
+      },
+      "hOverflow": false
+    },
+    {
+      "name": "unpublish",
+      "api": 404,
+      "rendered": "Collection not found"
+    },
+    {
+      "name": "republish",
+      "oldShareId": "Cy6fdQGy_xP8ii0hKPvXkSPL",
+      "newShareId": "Cy6fdQGy_xP8ii0hKPvXkSPL",
+      "oldLinkStatus": 200,
+      "newLinkStatus": 200
+    },
+    {
+      "name": "delete",
+      "toast": "Collection deleted; bookmarks preserved",
+      "collectionRows": 0,
+      "bookmarks": [
+        {
+          "resource_id": 184739,
+          "notes": "__qa_test_plan_592_secret note 184739"
+        },
+        {
+          "resource_id": 184740,
+          "notes": "__qa_test_plan_592_secret note 184740"
+        }
+      ],
+      "shareAfterDelete": 404
+    }
+  ],
+  "pageErrors": [],
+  "residue": {
+    "users": 0,
+    "resources": 0,
+    "journeys": 0,
+    "categories": 0,
+    "subcategories": 0,
+    "collections": 0,
+    "edits": 0
+  }
+}

@@ -1,0 +1,608 @@
+{
+  "started": "2026-10-10T18:22:51.133Z",
+  "steps": [
+    {
+      "at": "2026-10-10T18:22:58.800Z",
+      "name": "repo-ready",
+      "status": 201,
+      "private": true,
+      "defaultBranch": "main",
+      "commitV1": "0aca49e951240e6fc9c363412e2253a2c54e576e",
+      "anonymousRawStatus": 404,
+      "rawWaitMs": 158
+    },
+    {
+      "at": "2026-10-10T18:23:01.347Z",
+      "name": "E107-configure",
+      "ok": {
+        "status": 200,
+        "json": {
+          "success": true,
+          "message": "Repository configured successfully",
+          "hasAccess": true
+        },
+        "text": "{\"success\":true,\"message\":\"Repository configured successfully\",\"hasAccess\":true}"
+      },
+      "fullUrl": {
+        "status": 200,
+        "json": {
+          "success": true,
+          "message": "Repository configured successfully",
+          "hasAccess": true
+        },
+        "text": "{\"success\":true,\"message\":\"Repository configured successfully\",\"hasAccess\":true}"
+      },
+      "malformed": {
+        "status": 400,
+        "json": {
+          "message": "Invalid repository. Use owner/repository (e.g. krzemienski/awesome-video) or a github.com URL.",
+          "error": "validation_failed",
+          "fieldErrors": {},
+          "errors": []
+        },
+        "text": "{\"message\":\"Invalid repository. Use owner/repository (e.g. krzemienski/awesome-video) or a github.com URL.\",\"error\":\"validation_failed\",\"fieldErrors\":{},\"errors\":[]}"
+      },
+      "missingRepo": {
+        "status": 400,
+        "json": {
+          "success": false,
+          "message": "No write access to repository. Please check your GitHub token permissions.",
+          "hasAccess": false,
+          "error": "validation_failed",
+          "fieldErrors": {},
+          "errors": []
+        },
+        "text": "{\"success\":false,\"message\":\"No write access to repository. Please check your GitHub token permissions.\",\"hasAccess\":false,\"error\":\"validation_failed\",\"fieldErrors\":{},\"errors\":[]}"
+      },
+      "rejectedToken": {
+        "status": 400,
+        "json": {
+          "success": false,
+          "message": "Configuration failed: Bad credentials - https://docs.github.com/rest",
+          "hasAccess": false,
+          "error": "validation_failed",
+          "fieldErrors": {},
+          "errors": []
+        },
+        "text": "{\"success\":false,\"message\":\"Configuration failed: Bad credentials - https://docs.github.com/rest\",\"hasAccess\":false,\"error\":\"validation_failed\",\"fieldErrors\":{},\"errors\":[]}"
+      }
+    },
+    {
+      "at": "2026-10-10T18:23:43.760Z",
+      "name": "pull-1-ui",
+      "dialog": "Import from GitHub? This pulls the resource list from krzemienski/__qa_test_plan_592_gh and updates the database to match — new resources are added and existing ones may be updated. Cancel Start Import",
+      "status": 200,
+      "body": {
+        "message": "Import started",
+        "queueId": 1,
+        "status": "processing"
+      },
+      "final": {
+        "id": 1,
+        "action": "import",
+        "status": "completed",
+        "branch": "main",
+        "error_message": null,
+        "metadata": {
+          "errors": 0,
+          "outcome": "completed",
+          "skipped": 0,
+          "updated": 0,
+          "imported": 3,
+          "errorMessages": []
+        },
+        "ms": 1503
+      },
+      "uiCounts": "Imported: 3; updated: 0; skipped: 0; failed: 0.",
+      "uiErrors": null,
+      "toasts": "",
+      "before": {
+        "queue": 0,
+        "history": 0,
+        "resources": 5,
+        "v17": 0
+      },
+      "after": {
+        "queue": 1,
+        "history": 1,
+        "resources": 8,
+        "v17": 3
+      },
+      "rows": [
+        {
+          "id": 9,
+          "title": "__qa_test_plan_592_v17 R1",
+          "url": "https://www.rfc-editor.org/rfc/rfc6716.html",
+          "category": "qatestplan592v17 Cat X",
+          "subcategory": null,
+          "status": "approved"
+        },
+        {
+          "id": 10,
+          "title": "__qa_test_plan_592_v17 R2",
+          "url": "https://www.rfc-editor.org/rfc/rfc8216.html",
+          "category": "qatestplan592v17 Cat X",
+          "subcategory": null,
+          "status": "approved"
+        },
+        {
+          "id": 11,
+          "title": "__qa_test_plan_592_v17 R3",
+          "url": "https://www.rfc-editor.org/rfc/rfc7798.html",
+          "category": "qatestplan592v17 Cat X",
+          "subcategory": "qatestplan592v17 Sub X1",
+          "status": "approved"
+        }
+      ],
+      "history": [
+        {
+          "id": 1,
+          "direction": "import",
+          "resources_added": 3,
+          "resources_updated": 0,
+          "total_resources": 3,
+          "by_set": false,
+          "outcome": "completed"
+        }
+      ],
+      "taxonomy": []
+    },
+    {
+      "at": "2026-10-10T18:24:19.408Z",
+      "name": "pull-2-ui-repeat",
+      "dialog": "Import from GitHub? This pulls the resource list from krzemienski/__qa_test_plan_592_gh and updates the database to match — new resources are added and existing ones may be updated. Cancel Start Import",
+      "status": 200,
+      "body": {
+        "message": "Import started",
+        "queueId": 2,
+        "status": "processing"
+      },
+      "final": {
+        "id": 2,
+        "action": "import",
+        "status": "completed",
+        "branch": "main",
+        "error_message": null,
+        "metadata": {
+          "errors": 0,
+          "outcome": "completed",
+          "skipped": 0,
+          "updated": 3,
+          "imported": 0,
+          "errorMessages": []
+        },
+        "ms": 1503
+      },
+      "uiCounts": "Imported: 0; updated: 3; skipped: 0; failed: 0.",
+      "uiErrors": null,
+      "toasts": "",
+      "before": {
+        "queue": 1,
+        "history": 1,
+        "resources": 8,
+        "v17": 3
+      },
+      "after": {
+        "queue": 2,
+        "history": 2,
+        "resources": 8,
+        "v17": 3
+      },
+      "rows": [
+        {
+          "id": 9,
+          "title": "__qa_test_plan_592_v17 R1",
+          "url": "https://www.rfc-editor.org/rfc/rfc6716.html",
+          "category": "qatestplan592v17 Cat X",
+          "subcategory": null,
+          "status": "approved"
+        },
+        {
+          "id": 10,
+          "title": "__qa_test_plan_592_v17 R2",
+          "url": "https://www.rfc-editor.org/rfc/rfc8216.html",
+          "category": "qatestplan592v17 Cat X",
+          "subcategory": null,
+          "status": "approved"
+        },
+        {
+          "id": 11,
+          "title": "__qa_test_plan_592_v17 R3",
+          "url": "https://www.rfc-editor.org/rfc/rfc7798.html",
+          "category": "qatestplan592v17 Cat X",
+          "subcategory": "qatestplan592v17 Sub X1",
+          "status": "approved"
+        }
+      ]
+    },
+    {
+      "at": "2026-10-10T18:28:02.859Z",
+      "name": "E018-direct",
+      "commitV2": "ffe91f0c99e0c478f9ab7cdc25bb7d88b2dbea15",
+      "rawWaitMs": 221175,
+      "dryRun": {
+        "status": 200,
+        "json": {
+          "success": true,
+          "outcome": "completed",
+          "imported": 1,
+          "updated": 3,
+          "skipped": 0,
+          "errors": [],
+          "totalErrors": 0,
+          "warnings": [
+            "Line 9: [category-capital] Category should start with capital letter",
+            "Line 18: [license] Consider adding a license section (CC0 recommended for awesome lists)"
+          ],
+          "validationPassed": false,
+          "validationStats": {
+            "totalLines": 18,
+            "totalResources": 4,
+            "totalCategories": 1
+          },
+          "validationErrors": [
+            {
+              "line": 7,
+              "rule": "toc-format",
+              "message": "Invalid TOC link format",
+              "severity": "error"
+            }
+          ],
+          "validationWarnings": 2,
+          "message": "Imported 1 and updated 3 resources from krzemienski/__qa_test_plan_592_gh"
+        }
+      },
+      "beforeDry": {
+        "queue": 2,
+        "history": 2,
+        "resources": 8,
+        "v17": 3
+      },
+      "afterDry": {
+        "queue": 2,
+        "history": 2,
+        "resources": 8,
+        "v17": 3
+      },
+      "real": {
+        "status": 200,
+        "json": {
+          "success": true,
+          "outcome": "completed",
+          "imported": 1,
+          "updated": 3,
+          "skipped": 0,
+          "errors": [],
+          "totalErrors": 0,
+          "warnings": [
+            "Line 9: [category-capital] Category should start with capital letter",
+            "Line 18: [license] Consider adding a license section (CC0 recommended for awesome lists)"
+          ],
+          "validationPassed": false,
+          "validationStats": {
+            "totalLines": 18,
+            "totalResources": 4,
+            "totalCategories": 1
+          },
+          "validationErrors": [
+            {
+              "line": 7,
+              "rule": "toc-format",
+              "message": "Invalid TOC link format",
+              "severity": "error"
+            }
+          ],
+          "validationWarnings": 2,
+          "message": "Imported 1 and updated 3 resources from krzemienski/__qa_test_plan_592_gh"
+        }
+      },
+      "afterReal": {
+        "queue": 3,
+        "history": 3,
+        "resources": 9,
+        "v17": 4
+      },
+      "rows": [
+        {
+          "id": 9,
+          "title": "__qa_test_plan_592_v17 R1",
+          "url": "https://www.rfc-editor.org/rfc/rfc6716.html",
+          "category": "qatestplan592v17 Cat X",
+          "subcategory": null,
+          "status": "approved"
+        },
+        {
+          "id": 10,
+          "title": "__qa_test_plan_592_v17 R2",
+          "url": "https://www.rfc-editor.org/rfc/rfc8216.html",
+          "category": "qatestplan592v17 Cat X",
+          "subcategory": null,
+          "status": "approved"
+        },
+        {
+          "id": 11,
+          "title": "__qa_test_plan_592_v17 R3",
+          "url": "https://www.rfc-editor.org/rfc/rfc7798.html",
+          "category": "qatestplan592v17 Cat X",
+          "subcategory": "qatestplan592v17 Sub X1",
+          "status": "approved"
+        },
+        {
+          "id": 12,
+          "title": "__qa_test_plan_592_v17 R4",
+          "url": "https://www.rfc-editor.org/rfc/rfc6184.html",
+          "category": "qatestplan592v17 Cat X",
+          "subcategory": "qatestplan592v17 Sub X1",
+          "status": "approved"
+        }
+      ]
+    },
+    {
+      "at": "2026-10-10T18:33:07.414Z",
+      "name": "E110-process-queue",
+      "commitV3": "e017fe6b03c13740bc263d89bf96bbb81978b9c7",
+      "rawWaitMs": 301741,
+      "queueRowId": 4,
+      "response": {
+        "status": 200,
+        "json": {
+          "message": "Queue processing started",
+          "status": "processing"
+        },
+        "text": "{\"message\":\"Queue processing started\",\"status\":\"processing\"}"
+      },
+      "final": {
+        "id": 4,
+        "action": "import",
+        "status": "completed",
+        "branch": "main",
+        "error_message": null,
+        "metadata": {
+          "errors": 0,
+          "outcome": "completed",
+          "skipped": [
+            0
+          ],
+          "updated": [
+            4
+          ],
+          "imported": [
+            1
+          ],
+          "errorMessages": []
+        },
+        "ms": 1504
+      },
+      "before": {
+        "queue": 4,
+        "history": 3,
+        "resources": 9,
+        "v17": 4
+      },
+      "after": {
+        "queue": 4,
+        "history": 4,
+        "resources": 10,
+        "v17": 5
+      },
+      "rows": [
+        {
+          "id": 9,
+          "title": "__qa_test_plan_592_v17 R1",
+          "url": "https://www.rfc-editor.org/rfc/rfc6716.html",
+          "category": "qatestplan592v17 Cat X",
+          "subcategory": null,
+          "status": "approved"
+        },
+        {
+          "id": 10,
+          "title": "__qa_test_plan_592_v17 R2",
+          "url": "https://www.rfc-editor.org/rfc/rfc8216.html",
+          "category": "qatestplan592v17 Cat X",
+          "subcategory": null,
+          "status": "approved"
+        },
+        {
+          "id": 11,
+          "title": "__qa_test_plan_592_v17 R3",
+          "url": "https://www.rfc-editor.org/rfc/rfc7798.html",
+          "category": "qatestplan592v17 Cat X",
+          "subcategory": "qatestplan592v17 Sub X1",
+          "status": "approved"
+        },
+        {
+          "id": 12,
+          "title": "__qa_test_plan_592_v17 R4",
+          "url": "https://www.rfc-editor.org/rfc/rfc6184.html",
+          "category": "qatestplan592v17 Cat X",
+          "subcategory": "qatestplan592v17 Sub X1",
+          "status": "approved"
+        },
+        {
+          "id": 13,
+          "title": "__qa_test_plan_592_v17 R5",
+          "url": "https://www.rfc-editor.org/rfc/rfc3550.html",
+          "category": "qatestplan592v17 Cat X",
+          "subcategory": "qatestplan592v17 Sub X1",
+          "status": "approved"
+        }
+      ]
+    },
+    {
+      "at": "2026-10-10T18:38:15.953Z",
+      "name": "pull-partial-ui",
+      "commitV4": "e4881d86994db383d7f358a702d06d7dde4a4458",
+      "rawWaitMs": 301492,
+      "dialog": "Import from GitHub? This pulls the resource list from krzemienski/__qa_test_plan_592_gh and updates the database to match — new resources are added and existing ones may be updated. Cancel Start Import",
+      "status": 200,
+      "body": {
+        "message": "Import started",
+        "queueId": 5,
+        "status": "processing"
+      },
+      "final": {
+        "id": 5,
+        "action": "import",
+        "status": "completed",
+        "branch": "main",
+        "error_message": "Error processing __qa_test_plan_592_v17 R6: invalid byte sequence for encoding \"UTF8\": 0x00",
+        "metadata": {
+          "errors": 1,
+          "outcome": "partial",
+          "skipped": 0,
+          "updated": 5,
+          "imported": 0,
+          "errorMessages": [
+            "Error processing __qa_test_plan_592_v17 R6: invalid byte sequence for encoding \"UTF8\": 0x00"
+          ]
+        },
+        "ms": 1504
+      },
+      "uiCounts": "Imported: 0; updated: 5; skipped: 0; failed: 1.",
+      "uiErrors": "Error processing __qa_test_plan_592_v17 R6: invalid byte sequence for encoding \"UTF8\": 0x00",
+      "toasts": "Import Started\nImporting resources from krzemienski/__qa_test_plan_592_gh",
+      "before": {
+        "queue": 4,
+        "history": 4,
+        "resources": 10,
+        "v17": 5
+      },
+      "after": {
+        "queue": 5,
+        "history": 5,
+        "resources": 10,
+        "v17": 5
+      },
+      "rows": [
+        {
+          "id": 9,
+          "title": "__qa_test_plan_592_v17 R1",
+          "url": "https://www.rfc-editor.org/rfc/rfc6716.html",
+          "category": "qatestplan592v17 Cat X",
+          "subcategory": null,
+          "status": "approved"
+        },
+        {
+          "id": 10,
+          "title": "__qa_test_plan_592_v17 R2",
+          "url": "https://www.rfc-editor.org/rfc/rfc8216.html",
+          "category": "qatestplan592v17 Cat X",
+          "subcategory": null,
+          "status": "approved"
+        },
+        {
+          "id": 11,
+          "title": "__qa_test_plan_592_v17 R3",
+          "url": "https://www.rfc-editor.org/rfc/rfc7798.html",
+          "category": "qatestplan592v17 Cat X",
+          "subcategory": "qatestplan592v17 Sub X1",
+          "status": "approved"
+        },
+        {
+          "id": 12,
+          "title": "__qa_test_plan_592_v17 R4",
+          "url": "https://www.rfc-editor.org/rfc/rfc6184.html",
+          "category": "qatestplan592v17 Cat X",
+          "subcategory": "qatestplan592v17 Sub X1",
+          "status": "approved"
+        },
+        {
+          "id": 13,
+          "title": "__qa_test_plan_592_v17 R5",
+          "url": "https://www.rfc-editor.org/rfc/rfc3550.html",
+          "category": "qatestplan592v17 Cat X",
+          "subcategory": "qatestplan592v17 Sub X1",
+          "status": "approved"
+        }
+      ]
+    },
+    {
+      "at": "2026-10-10T18:39:22.788Z",
+      "name": "sync-1-blocked",
+      "dialog": "Export to GitHub? This pushes the approved catalog as a commit to krzemienski/__qa_test_plan_592_gh, rewriting its README resource list. Cancel Start Export",
+      "status": 200,
+      "body": {
+        "message": "Export started",
+        "queueId": 6,
+        "status": "processing"
+      },
+      "final": {
+        "id": 6,
+        "action": "export",
+        "status": "failed",
+        "branch": null,
+        "error_message": "Export failed: GitHub export blocked: export link check found 5 confirmed-broken link(s) in the generated README (checked 10, allowlisted 3; bot-blocks/timeouts do not count):\n  - https://example.org/__qa_test_plan_592_v16/p6 (dead: 404 confirmed under browser UA)\n  - https://example.org/__qa_test_plan_592_v16/p7 (dead: 404 confirmed under browser UA)\n  - https://example.org/__qa_test_plan_592_v16/p8 (dead: 404 confirmed under browser UA)\n  - https://example.org/__qa_test_plan_592_v16/p2 (dead: 404 confirmed under browser UA)\n  - https://example.org/__qa_test_plan_592_v16/p3 (dead: 404 confirmed under browser UA)\nFix or remove these resources (or add documented false positives to scripts/awesome-bot-allowlist.txt) and re-export. This check is separate from the Link Health dashboard.",
+        "metadata": {
+          "createPullRequest": false
+        },
+        "ms": 3006
+      },
+      "uiCounts": null,
+      "uiErrors": null,
+      "toasts": "",
+      "remoteHeadBefore": "e4881d86994db383d7f358a702d06d7dde4a4458",
+      "remoteHeadAfter": "e4881d86994db383d7f358a702d06d7dde4a4458",
+      "remoteUnchanged": true
+    },
+    {
+      "at": "2026-10-10T18:40:35.460Z",
+      "name": "sync-2-ok-390",
+      "dialog": "Export to GitHub? This pushes the approved catalog as a commit to krzemienski/__qa_test_plan_592_gh, rewriting its README resource list. Cancel Start Export",
+      "status": 200,
+      "body": {
+        "message": "Export started",
+        "queueId": 7,
+        "status": "processing"
+      },
+      "final": {
+        "id": 7,
+        "action": "export",
+        "status": "completed",
+        "branch": "main",
+        "error_message": null,
+        "metadata": {
+          "exported": 10,
+          "commitSha": "13097d939b97998e61df18dec2d5a3d400d2108a",
+          "commitUrl": "https://github.com/krzemienski/__qa_test_plan_592_gh/commit/13097d939b97998e61df18dec2d5a3d400d2108a"
+        },
+        "ms": 6011
+      },
+      "uiCounts": null,
+      "uiErrors": null,
+      "toasts": "",
+      "mobileOverflowPx": 0,
+      "approvedInDb": 10,
+      "remote": {
+        "head": "13097d939b97998e61df18dec2d5a3d400d2108a",
+        "message": "Initial awesome list export",
+        "files": [
+          "CONTRIBUTING.md",
+          "README.md"
+        ],
+        "readmeListItems": 10,
+        "qaTitlesInReadme": 25,
+        "contributing": 200,
+        "readmeHead": "# Awesome __qa_test_plan_592_gh [![Awesome](https://awesome.re/badge.svg)](https://awesome.re)\n\n> Disposable QA repo for an isolated GitHub sync proof; deleted after the run.\n\n**[View on Website](https://awesome.video)** - Submit new resources and browse the curated collection with advanced filterin"
+      },
+      "history": [
+        {
+          "id": 6,
+          "direction": "export",
+          "commit_sha": "13097d939b97998e61df18dec2d5a3d400d2108a",
+          "commit_url": "https://github.com/krzemienski/__qa_test_plan_592_gh/commit/13097d939b97998e61df18dec2d5a3d400d2108a",
+          "resources_added": 10,
+          "total_resources": 10
+        }
+      ],
+      "commitMatchesQueue": true
+    },
+    {
+      "at": "2026-10-10T18:40:39.476Z",
+      "name": "residue",
+      "qa_users": 0
+    }
+  ],
+  "residue": {
+    "qa_users": 0
+  }
+}

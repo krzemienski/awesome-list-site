@@ -1,0 +1,311 @@
+{
+  "started": "2026-10-10T17:54:39.801Z",
+  "steps": [
+    {
+      "at": "2026-10-10T17:54:44.897Z",
+      "name": "B-started",
+      "pid": 11282,
+      "upMs": 3059
+    },
+    {
+      "at": "2026-10-10T17:54:59.102Z",
+      "name": "brief",
+      "status": 200,
+      "ms": 2447,
+      "angle": "Conference talks & videos",
+      "briefChars": 2498,
+      "briefHead": "AUTO-GENERATED RESEARCH BRIEF (2026-10-10) — campaign angle: Conference talks & videos.\n\nBias this run toward conference material: Demuxed, IBC, NAB, Mile High Video, Streaming Media, FOSDEM open-media devroom. Hunt talk pages/recordings AND the specific proje",
+      "textareaFilled": true,
+      "editable": true,
+      "providerRequests": 0
+    },
+    {
+      "at": "2026-10-10T17:55:05.048Z",
+      "name": "paid-start",
+      "dialog": "Launch research job? This starts a Claude research agent with a budget of up to $0.30 and 12 turns. It will stop automatically after 1 new discovery. The job runs in the background and incurs real API cost. Cancel Launch",
+      "status": 200,
+      "body": {
+        "success": true,
+        "jobId": 51,
+        "message": "Research job started"
+      }
+    },
+    {
+      "at": "2026-10-10T17:55:05.088Z",
+      "name": "paid-poll",
+      "status": "processing",
+      "turns": 0,
+      "discoveries": 0,
+      "events": 0,
+      "cost": "0.00"
+    },
+    {
+      "at": "2026-10-10T17:55:35.336Z",
+      "name": "paid-poll",
+      "status": "processing",
+      "turns": 0,
+      "discoveries": 0,
+      "events": 12,
+      "cost": "0.00"
+    },
+    {
+      "at": "2026-10-10T17:56:00.767Z",
+      "name": "paid-result",
+      "job": {
+        "status": "failed",
+        "turnsUsed": 0,
+        "maxTurns": 12,
+        "maxBudgetUsd": "0.30",
+        "targetDiscoveries": 1,
+        "totalDiscoveries": 0,
+        "duplicatesSkipped": 0,
+        "inTok": 0,
+        "outTok": 0,
+        "cost": "0.00",
+        "error": "Claude Code returned an error result: Reached maximum budget ($0.3)",
+        "model": null
+      },
+      "events": {
+        "count": 22,
+        "polledInOrder": true,
+        "afterSeqTailEmpty": true,
+        "types": [
+          "lifecycle",
+          "message",
+          "tool_call",
+          "tool_result",
+          "delegation",
+          "result",
+          "error"
+        ],
+        "last": [
+          "19:tool_call:{\"query\":\"BRISQUE NIQE no-reference video quality assessment python PyTorch open source\"}",
+          "20:result:Run error: Reached maximum budget ($0.3) (reason: budget_exhausted)",
+          "21:error:Claude Code returned an error result: Reached maximum budget ($0.3)"
+        ]
+      },
+      "discoveries": [],
+      "secretsInJobOrEvents": false
+    },
+    {
+      "at": "2026-10-10T17:56:00.875Z",
+      "name": "seeded",
+      "qaJob": 52,
+      "otherJob": 53,
+      "existing": {
+        "id": 184758,
+        "url": "https://github.com/fluid-player/fluid-player"
+      },
+      "D1": {
+        "id": 84,
+        "url": "https://example.org/__qa_test_plan_592_v15/one"
+      },
+      "D2": {
+        "id": 85,
+        "url": "http://www.github.com/fluid-player/fluid-player/?utm_source=qa592"
+      },
+      "D3": {
+        "id": 86,
+        "url": "https://WWW.example.org/__qa_test_plan_592_v15/one/?utm_source=qa592"
+      },
+      "D4": {
+        "id": 87,
+        "url": "https://example.org/__qa_test_plan_592_v15/four"
+      },
+      "D5": {
+        "id": 88,
+        "url": "https://example.org/__qa_test_plan_592_v15/five"
+      },
+      "D6": {
+        "id": 89,
+        "url": "https://example.org/__qa_test_plan_592_v15/six"
+      }
+    },
+    {
+      "at": "2026-10-10T17:56:09.951Z",
+      "name": "individual",
+      "approveStatus": 200,
+      "approveBody": {
+        "status": "approved",
+        "createdResourceId": 188691
+      },
+      "toast": "Resource approved\nDiscovery added to the database.",
+      "resource": {
+        "id": 188691,
+        "status": "approved",
+        "title": "__qa_test_plan_592_v15 individual-approve",
+        "approved_by": "__qa_test_plan_592_v15admin_1791654879908",
+        "approved_at": "2026-10-10T17:56:05.648Z"
+      },
+      "publicGet": {
+        "status": 200,
+        "title": "__qa_test_plan_592_v15 individual-approve"
+      },
+      "rejectStatus": 200,
+      "d5": {
+        "status": "rejected",
+        "rejection_reason": "__qa_test_plan_592_v15 not relevant"
+      },
+      "mobileOverflowPx": 0
+    },
+    {
+      "at": "2026-10-10T17:56:10.105Z",
+      "name": "non-admin",
+      "status": 403,
+      "body": "{\"message\":\"Forbidden: Admin access required\"}",
+      "qaPendingAfter": 3
+    },
+    {
+      "at": "2026-10-10T17:56:10.189Z",
+      "name": "approve-all",
+      "status": 200,
+      "result": {
+        "approved": 1,
+        "skippedDuplicates": 2,
+        "failed": []
+      },
+      "rows": [
+        {
+          "id": 84,
+          "status": "approved",
+          "created_resource_id": 188692,
+          "reason": ""
+        },
+        {
+          "id": 85,
+          "status": "rejected",
+          "created_resource_id": null,
+          "reason": "Bulk approve: URL already exists in the database (resource #184758)"
+        },
+        {
+          "id": 86,
+          "status": "rejected",
+          "created_resource_id": null,
+          "reason": "Bulk approve: URL already exists in the database (resource #188692)"
+        },
+        {
+          "id": 87,
+          "status": "approved",
+          "created_resource_id": 188691,
+          "reason": ""
+        },
+        {
+          "id": 88,
+          "status": "rejected",
+          "created_resource_id": null,
+          "reason": "__qa_test_plan_592_v15 not relevant"
+        }
+      ],
+      "createdD1": {
+        "id": 188692,
+        "status": "approved",
+        "url": "https://example.org/__qa_test_plan_592_v15/one",
+        "approved_by": "d460f5e7-a085-4083-96a2-2f20dc9315c4"
+      },
+      "publicGetD1": 200,
+      "auditD1": [
+        {
+          "action": "approved",
+          "performed_by": "d460f5e7-a085-4083-96a2-2f20dc9315c4",
+          "notes": "AI researcher approval: discovery #84 (research job #52)"
+        }
+      ],
+      "qaJobCounts": {
+        "approved_discoveries": 2,
+        "rejected_discoveries": 3
+      },
+      "otherPending": {
+        "before": 49,
+        "after": 49,
+        "d6": "pending_review"
+      },
+      "resourceRowsForOneUrlFamily": 1
+    },
+    {
+      "at": "2026-10-10T17:56:16.181Z",
+      "name": "cancel",
+      "start": 200,
+      "jobId": 54,
+      "statusBefore": "processing",
+      "isActiveBefore": true,
+      "providerRequests": 1,
+      "deleteStatus": 200,
+      "finalStatus": "cancelled",
+      "isActiveAfter": false,
+      "completedAt": "2026-10-10T17:56:13.117Z",
+      "eventsBefore": 1,
+      "eventsAfter": 2,
+      "lastEvent": "Run cancelled by user",
+      "secondDelete": {
+        "status": 200,
+        "message": "Job cancelled"
+      }
+    },
+    {
+      "at": "2026-10-10T17:56:17.844Z",
+      "name": "restart-mid-run",
+      "start": 200,
+      "jobId": 55,
+      "status": "processing",
+      "isActive": true,
+      "events": 1
+    },
+    {
+      "at": "2026-10-10T17:56:30.499Z",
+      "name": "B-restarted",
+      "pid": 11648,
+      "upMs": 9401
+    },
+    {
+      "at": "2026-10-10T17:56:30.544Z",
+      "name": "restart-after-boot",
+      "status": "processing",
+      "isActive": false
+    },
+    {
+      "at": "2026-10-10T18:01:52.854Z",
+      "name": "restart-recovered",
+      "status": "failed",
+      "error": "Orphaned by server restart",
+      "minutesAfterRestart": "5.5",
+      "priorEventsRetained": true,
+      "eventsAfter": 1,
+      "newRunAfterRecovery": {
+        "start": 200,
+        "jobId": 56,
+        "deleteStatus": 200
+      }
+    },
+    {
+      "at": "2026-10-10T18:02:00.929Z",
+      "name": "residue",
+      "resources": 0,
+      "jobs": 0,
+      "discoveries": 0,
+      "events": 0,
+      "users": 0,
+      "active_jobs": 0
+    }
+  ],
+  "pendingOtherBefore": 48,
+  "jobIds": [
+    51,
+    52,
+    53,
+    54,
+    55,
+    56
+  ],
+  "createdResources": [
+    188691,
+    188692
+  ],
+  "residue": {
+    "resources": 0,
+    "jobs": 0,
+    "discoveries": 0,
+    "events": 0,
+    "users": 0,
+    "active_jobs": 0
+  }
+}

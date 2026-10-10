@@ -1,0 +1,134 @@
+{
+  "started": "2026-10-10T17:26:16.025Z",
+  "steps": [
+    {
+      "name": "fixtures",
+      "R1": {
+        "id": 188684,
+        "title": "__qa_test_plan_592_v10 r1 resource",
+        "url": "https://example.org/__qa_test_plan_592_v10_r1_1791653180776",
+        "description": "QA fixture r1 for the suggest-edit proof."
+      },
+      "R2": {
+        "id": 188685,
+        "title": "__qa_test_plan_592_v10 r2 resource",
+        "url": "https://example.org/__qa_test_plan_592_v10_r2_1791653180776",
+        "description": "QA fixture r2 for the suggest-edit proof."
+      },
+      "category": {
+        "sub": "Encoding Tools",
+        "cat": "Encoding & Codecs"
+      }
+    },
+    {
+      "name": "empty-diff",
+      "analyzeButtonForNonAdmin": 0,
+      "toast": "No changes to submit\nThe form matches the current resource — edit a field first.",
+      "postsSent": 0
+    },
+    {
+      "name": "invalid-https",
+      "fieldErrors": [
+        "New URLs must use HTTPS (keeping the current URL unchanged is fine)"
+      ],
+      "postsSent": 0
+    },
+    {
+      "name": "duplicate-url",
+      "status": 409,
+      "body": {
+        "message": "That URL already belongs to another resource (#188685: \"__qa_test_plan_592_v10 r2 resource\"). Suggest a different URL, or suggest edits on that resource instead.",
+        "field": "url",
+        "conflictingResourceId": 188685,
+        "title": "__qa_test_plan_592_v10 r2 resource"
+      },
+      "fieldErrors": [
+        "That URL already belongs to another resource (#188685: \"__qa_test_plan_592_v10 r2 resource\"). Suggest a different URL, or suggest edits on that resource instead."
+      ],
+      "dialogStillOpen": true
+    },
+    {
+      "name": "valid-submit",
+      "status": 201,
+      "editId": 73,
+      "proposedChanges": {
+        "description": {
+          "new": "QA fixture r1 — improved description proposed by a contributor (1791653180776).",
+          "old": "QA fixture r1 for the suggest-edit proof."
+        }
+      },
+      "toast": "Edit Suggestion Submitted\nYour edit is pending review and now appears in your contribution timeline.\nView status",
+      "catalogDescriptionUnchanged": true
+    },
+    {
+      "name": "view-status",
+      "url": "/contributions",
+      "row": "EDIT SUGGESTION PENDING __qa_test_plan_592_v10 r1 resource Submitted less than a minute ago 1 proposed change Description QA fixture r1 for the suggest-edit proof. QA fixture r1 — improved description proposed by a contributor (1791653180776). Waiting for moderator review. Withdraw"
+    },
+    {
+      "name": "duplicate-suggestion",
+      "status": 409,
+      "body": {
+        "message": "An identical edit suggestion is already pending review for this resource.",
+        "existingEditId": 73
+      },
+      "toast": "Submission Failed\nAn identical edit suggestion is already pending review for this resource."
+    },
+    {
+      "name": "api-failure",
+      "toast": "Submission Failed\nCould not reach the server. Please check your connection and try again.",
+      "dialogStillOpen": true,
+      "editsInDb": [
+        {
+          "id": 73,
+          "status": "pending"
+        }
+      ]
+    },
+    {
+      "name": "withdraw",
+      "afterCancel": "pending",
+      "confirm": [
+        "POST",
+        200
+      ],
+      "dbStatus": "withdrawn",
+      "rowAfterReload": "EDIT SUGGESTION WITHDRAWN __qa_test_plan_592_v10 r1 resource Submitted less than a minute ago Status changed less than a minute ago 1 proposed change Description QA fixture r1 for the suggest-edit proof. QA fixture r1 — improved description proposed by a contributor (1791653180776). Withdrawn by you"
+    },
+    {
+      "name": "390",
+      "horizontalOverflow": 0,
+      "dialogWidth": 358
+    }
+  ],
+  "editPosts": [
+    {
+      "at": "2026-10-10T17:26:29.578Z",
+      "url": "/api/resources/188684/edits"
+    },
+    {
+      "at": "2026-10-10T17:26:30.903Z",
+      "url": "/api/resources/188684/edits"
+    },
+    {
+      "at": "2026-10-10T17:26:34.934Z",
+      "url": "/api/resources/188684/edits"
+    },
+    {
+      "at": "2026-10-10T17:26:36.409Z",
+      "url": "/api/resources/188684/edits"
+    }
+  ],
+  "residue": {
+    "users": 0,
+    "resources": 0,
+    "journeys": 0,
+    "categories": 0,
+    "subcategories": 0,
+    "collections": 0,
+    "edits": 0
+  },
+  "residueByIds": {
+    "n": 0
+  }
+}

@@ -1,0 +1,15 @@
+http://127.0.0.1:5196/ipjump/page -> http://127.0.0.2:5196/ok/page 
+  before: {"suspicion":"domain-takeover","suspicionDetail":"redirects off-domain: 0.1 -> 0.2 (http://127.0.0.2:5196/ok/page)"} 
+  after:  {"suspicion":"domain-takeover","suspicionDetail":"redirects off-domain: 127.0.0.1 -> 127.0.0.2 (http://127.0.0.2:5196/ok/page)"}
+http://127.0.0.1:5196/offhost/page -> http://localhost:5196/ok/page 
+  before: {"suspicion":"domain-takeover","suspicionDetail":"redirects off-domain: 0.1 -> localhost (http://localhost:5196/ok/page)"} 
+  after:  {"suspicion":"domain-takeover","suspicionDetail":"redirects off-domain: 127.0.0.1 -> localhost (http://localhost:5196/ok/page)"}
+https://www.example.com/a -> https://example.com/a 
+  before: {} 
+  after:  {}
+https://youtu.be/x -> https://www.youtube.com/watch?v=x 
+  before: {} 
+  after:  {}
+http://127.0.0.1:5196/ipjump/page -> http://127.1.0.1:5196/ok/page 
+  before: {} 
+  after:  {"suspicion":"domain-takeover","suspicionDetail":"redirects off-domain: 127.0.0.1 -> 127.1.0.1 (http://127.1.0.1:5196/ok/page)"}

@@ -76,7 +76,12 @@ const TWO_PART_TLDS = new Set([
 ]);
 
 export function registrableDomain(hostname: string): string {
-  const parts = hostname.toLowerCase().replace(/\.$/, '').split('.');
+  const host = hostname.toLowerCase().replace(/\.$/, '');
+  // IP literals have no registrable suffix: the whole address is the identity.
+  // Splitting on dots would make 10.0.0.1 and 20.0.0.1 both "0.1" (a missed
+  // off-host redirect) and label 127.0.0.1 as "0.1" in suspicion details.
+  if (/^\d{1,3}(\.\d{1,3}){3}$/.test(host) || host.includes(':')) return host;
+  const parts = host.split('.');
   if (parts.length <= 2) return parts.join('.');
   const lastTwo = parts.slice(-2).join('.');
   if (TWO_PART_TLDS.has(lastTwo)) return parts.slice(-3).join('.');

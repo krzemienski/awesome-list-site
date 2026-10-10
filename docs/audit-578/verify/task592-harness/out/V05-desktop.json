@@ -1,0 +1,106 @@
+{
+  "started": "2026-10-10T16:18:11.266Z",
+  "vp": "desktop",
+  "steps": [
+    {
+      "name": "start",
+      "progress": {
+        "n": 0,
+        "completedAt": null
+      },
+      "cards": 6
+    },
+    {
+      "name": "after-3",
+      "progress": {
+        "n": 9,
+        "completedAt": null
+      }
+    },
+    {
+      "name": "continue-learning",
+      "resumeLabel": "Resume next step: Building Your First Streaming Platform",
+      "item": {
+        "completedSteps": 3,
+        "totalSteps": 6,
+        "percent": 50,
+        "nextStep": {
+          "stepNumber": 4,
+          "title": "CDN Integration & Caching",
+          "href": "/journey/7#step-4"
+        }
+      }
+    },
+    {
+      "name": "resume",
+      "url": "http://127.0.0.1:5000/journey/7#step-4",
+      "focusedOrHash": {
+        "hash": "#step-4",
+        "active": "step-4"
+      }
+    },
+    {
+      "name": "complete-all",
+      "progress": {
+        "n": 18,
+        "completedAt": "2026-10-10T16:18:19.391Z"
+      },
+      "badge": 1,
+      "toast": "Progress Updated\nYour journey progress has been saved."
+    },
+    {
+      "name": "milestone",
+      "milestones": [
+        {
+          "journeyId": 7,
+          "title": "Building Your First Streaming Platform",
+          "completedAt": "2026-10-10T16:18:19.391Z"
+        }
+      ]
+    },
+    {
+      "name": "profile",
+      "journeysProgress": "1 completed of 1 started"
+    },
+    {
+      "name": "undo",
+      "progress": {
+        "n": 15,
+        "completedAt": null
+      },
+      "milestones": 0,
+      "badge": 0
+    },
+    {
+      "name": "reload",
+      "done": 5,
+      "open": 1
+    },
+    {
+      "name": "owned-grouped",
+      "cards": 2,
+      "completedSteps": [
+        284,
+        285
+      ],
+      "completedAt": null
+    },
+    {
+      "name": "unpublished",
+      "adminPut": 200,
+      "detailText": "Home\nLearning Journeys\nJourney not found.\nJourney not found.\nIt may have been removed or archived.\nBack to Journeys",
+      "anonApi": 404,
+      "continueLearningListsIt": false
+    }
+  ],
+  "pageErrors": [],
+  "residue": {
+    "users": 0,
+    "resources": 0,
+    "journeys": 0,
+    "categories": 0,
+    "subcategories": 0,
+    "collections": 0,
+    "edits": 0
+  }
+}

@@ -1,0 +1,100 @@
+{
+  "started": "2026-10-10T16:13:41.272Z",
+  "vp": "390",
+  "steps": [
+    {
+      "name": "empty-submit",
+      "errors": [
+        "Title is required",
+        "URL is required",
+        "Please select a category",
+        "Description is required"
+      ],
+      "posts": 0
+    },
+    {
+      "name": "invalid-submit",
+      "errors": [
+        "Title must not contain HTML tags",
+        "URL must use HTTPS protocol",
+        "Please select a category",
+        "Description must be at least 10 characters"
+      ],
+      "posts": 0
+    },
+    {
+      "name": "duplicate",
+      "url": "https://www.mpeg.org/standards/",
+      "warning": true,
+      "posts": [
+        {
+          "status": 409,
+          "body": "{\"error\":\"duplicate_url\",\"message\":\"This URL is already in the catalog\"}"
+        }
+      ],
+      "toast": "Submission Failed\nThis URL is already in the catalog",
+      "errors": []
+    },
+    {
+      "name": "success",
+      "lastPost": {
+        "status": 201,
+        "body": "{\"id\":188655,\"title\":\"__qa_test_plan_592_v04 390 1791648827043\",\"url\":\"https://example.com/__qa_test_plan_592_v04-390-1791648831205\",\"description\":\"QA fixture for the task-592 submit round trip; safe "
+      },
+      "row": {
+        "id": 188655,
+        "status": "pending",
+        "submitted_by": "__qa_test_plan_592_v04a_1791648821391"
+      },
+      "draft": null,
+      "titleAfter": "",
+      "focused": "status"
+    },
+    {
+      "name": "owned-duplicate-warning",
+      "shown": true,
+      "checkUrl": {
+        "exists": true
+      }
+    },
+    {
+      "name": "timeline",
+      "count": "1 matching contribution",
+      "rowText": "RESOURCE SUBMISSION\nPENDING\n__qa_test_plan_592_v04 390 1791648827043\nSubmitted less than a minute ago\n\nQA fixture for the task-592 submit round trip; safe to delete.\n\nhttps://example.com/__qa_test_plan_592_v04-390-1791648831205\nCOMMUNITY & EVENTS\n\nWaiting for moderator review.\n\nWithdraw"
+    },
+    {
+      "name": "withdraw-cancel",
+      "status": "pending",
+      "focus": "button-withdraw-resource-188655"
+    },
+    {
+      "name": "withdraw-confirm",
+      "toast": "Contribution withdrawn\nYour resource submission remains in your history as Withdrawn.",
+      "status": "withdrawn"
+    },
+    {
+      "name": "after-reload",
+      "rowText": "RESOURCE SUBMISSION\nWITHDRAWN\n__qa_test_plan_592_v04 390 1791648827043\nSubmitted less than a minute ago\nStatus changed less than a minute ago\n\nQA fixture for the task-592 submit round trip; safe to delete.\n\nhttps://example.com/__qa_test_plan_592_v04-390-1791648831205\nCOMMUNITY & EVENTS\n\nWithdrawn by",
+      "withdrawButton": 0
+    },
+    {
+      "name": "isolation",
+      "bListStatus": 200,
+      "bSeesRow": false,
+      "bWithdraw": 404,
+      "bWithdrawBody": {
+        "message": "Contribution not found"
+      }
+    }
+  ],
+  "pageErrors": [],
+  "residue": {
+    "users": 0,
+    "resources": 0,
+    "journeys": 0,
+    "categories": 0,
+    "subcategories": 0,
+    "collections": 0,
+    "edits": 0
+  }
+}

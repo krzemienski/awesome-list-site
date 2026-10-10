@@ -1,0 +1,426 @@
+{
+  "started": "2026-10-10T19:39:18.011Z",
+  "steps": [
+    {
+      "at": "2026-10-10T19:39:18.039Z",
+      "name": "sql-truth",
+      "categories": 9,
+      "withResources": 9,
+      "truth": [
+        {
+          "slug": "community-events",
+          "name": "Community & Events",
+          "n": 80
+        },
+        {
+          "slug": "encoding-codecs",
+          "name": "Encoding & Codecs",
+          "n": 333
+        },
+        {
+          "slug": "general-tools",
+          "name": "General Tools",
+          "n": 134
+        },
+        {
+          "slug": "infrastructure-delivery",
+          "name": "Infrastructure & Delivery",
+          "n": 191
+        },
+        {
+          "slug": "intro-learning",
+          "name": "Intro & Learning",
+          "n": 187
+        },
+        {
+          "slug": "media-tools",
+          "name": "Media Tools",
+          "n": 266
+        },
+        {
+          "slug": "players-clients",
+          "name": "Players & Clients",
+          "n": 239
+        },
+        {
+          "slug": "protocols-transport",
+          "name": "Protocols & Transport",
+          "n": 213
+        },
+        {
+          "slug": "standards-industry",
+          "name": "Standards & Industry",
+          "n": 173
+        }
+      ]
+    },
+    {
+      "at": "2026-10-10T19:39:31.167Z",
+      "name": "booted",
+      "ms": 8727,
+      "healthyNav": {
+        "status": 200,
+        "ms": 473,
+        "retryAfter": null,
+        "body": "{\"title\":\"Awesome Video\",\"totalResources\":1816,\"categories\":[{\"name\":\"Community & Events\",\"slug\":\"community-events\",\"res"
+      }
+    },
+    {
+      "at": "2026-10-10T19:40:49.109Z",
+      "name": "scenario-1440-categories",
+      "route": "/categories",
+      "docMs": 5344,
+      "document": "503 retry-after=1 text/html; charset=utf-8",
+      "before": {
+        "status": 503,
+        "ms": 2059,
+        "retryAfter": "1",
+        "body": "{\"message\":\"Service is temporarily unavailable\"}"
+      },
+      "errorCardShown": true,
+      "msToErrorCard": 7945,
+      "cardText": "Couldn't load categories Something went wrong while fetching the category list. Check your connection and try again. Retry",
+      "apiResponsesWhileFailing": [
+        "503 /api/awesome-list/nav",
+        "503 /api/awesome-list/nav"
+      ],
+      "skeletonStillShown": 0,
+      "keyboard": {
+        "tabsToRetry": 9,
+        "retryFocused": true,
+        "focusVisible": true
+      },
+      "afterRestoreProbe": {
+        "status": 200,
+        "ms": 346,
+        "retryAfter": null,
+        "body": "{\"title\":\"Awesome Video\",\"totalResources\":1816,\"categories\":[{\"name\":\"Community & Events\",\"slug\":\"community-events\",\"res"
+      },
+      "recovery": {
+        "url": "http://127.0.0.1:5166/categories",
+        "errorCardGone": true,
+        "apiResponsesAfterRetry": [
+          "200 /api/awesome-list/nav"
+        ],
+        "renderedCategoryLinks": 9,
+        "renderedSlugs": [
+          "community-events",
+          "encoding-codecs",
+          "general-tools",
+          "infrastructure-delivery",
+          "intro-learning",
+          "media-tools",
+          "players-clients",
+          "protocols-transport",
+          "standards-industry"
+        ],
+        "focusAfter": {
+          "tag": "H1",
+          "id": null,
+          "testid": null,
+          "text": "All Categories",
+          "isBody": false
+        },
+        "renderedCounts": [
+          {
+            "slug": "community-events",
+            "text": "Community & Events 80 resources"
+          },
+          {
+            "slug": "encoding-codecs",
+            "text": "Encoding & Codecs 333 resources"
+          },
+          {
+            "slug": "general-tools",
+            "text": "General Tools 134 resources"
+          },
+          {
+            "slug": "infrastructure-delivery",
+            "text": "Infrastructure & Delivery 191 resources"
+          },
+          {
+            "slug": "intro-learning",
+            "text": "Intro & Learning 187 resources"
+          },
+          {
+            "slug": "media-tools",
+            "text": "Media Tools 266 resources"
+          },
+          {
+            "slug": "players-clients",
+            "text": "Players & Clients 239 resources"
+          },
+          {
+            "slug": "protocols-transport",
+            "text": "Protocols & Transport 213 resources"
+          },
+          {
+            "slug": "standards-industry",
+            "text": "Standards & Industry 173 resources"
+          }
+        ],
+        "navVsSql": [
+          {
+            "slug": "community-events",
+            "nav": 0,
+            "sql": 80
+          },
+          {
+            "slug": "encoding-codecs",
+            "nav": 92,
+            "sql": 333
+          },
+          {
+            "slug": "general-tools",
+            "nav": 72,
+            "sql": 134
+          },
+          {
+            "slug": "infrastructure-delivery",
+            "nav": 111,
+            "sql": 191
+          },
+          {
+            "slug": "intro-learning",
+            "nav": 113,
+            "sql": 187
+          },
+          {
+            "slug": "media-tools",
+            "nav": 134,
+            "sql": 266
+          },
+          {
+            "slug": "players-clients",
+            "nav": 117,
+            "sql": 239
+          },
+          {
+            "slug": "protocols-transport",
+            "nav": 75,
+            "sql": 213
+          },
+          {
+            "slug": "standards-industry",
+            "nav": 118,
+            "sql": 173
+          }
+        ],
+        "navMatchesSql": false
+      },
+      "errors": []
+    },
+    {
+      "at": "2026-10-10T19:42:04.756Z",
+      "name": "scenario-390-categories",
+      "route": "/categories",
+      "docMs": 2847,
+      "document": "503 retry-after=1 text/html; charset=utf-8",
+      "before": {
+        "status": 503,
+        "ms": 2046,
+        "retryAfter": "1",
+        "body": "{\"message\":\"Service is temporarily unavailable\"}"
+      },
+      "errorCardShown": true,
+      "msToErrorCard": 6392,
+      "cardText": "Couldn't load categories Something went wrong while fetching the category list. Check your connection and try again. Retry",
+      "apiResponsesWhileFailing": [
+        "503 /api/awesome-list/nav",
+        "503 /api/awesome-list/nav"
+      ],
+      "skeletonStillShown": 0,
+      "keyboard": {
+        "tabsToRetry": 6,
+        "retryFocused": true,
+        "focusVisible": true
+      },
+      "afterRestoreProbe": {
+        "status": 200,
+        "ms": 192,
+        "retryAfter": null,
+        "body": "{\"title\":\"Awesome Video\",\"totalResources\":1816,\"categories\":[{\"name\":\"Community & Events\",\"slug\":\"community-events\",\"res"
+      },
+      "recovery": {
+        "url": "http://127.0.0.1:5166/categories",
+        "errorCardGone": true,
+        "apiResponsesAfterRetry": [
+          "200 /api/awesome-list/nav"
+        ],
+        "renderedCategoryLinks": 9,
+        "renderedSlugs": [
+          "community-events",
+          "encoding-codecs",
+          "general-tools",
+          "infrastructure-delivery",
+          "intro-learning",
+          "media-tools",
+          "players-clients",
+          "protocols-transport",
+          "standards-industry"
+        ],
+        "focusAfter": {
+          "tag": "H1",
+          "id": null,
+          "testid": null,
+          "text": "All Categories",
+          "isBody": false
+        },
+        "renderedCounts": [
+          {
+            "slug": "community-events",
+            "text": "Community & Events 80 resources"
+          },
+          {
+            "slug": "encoding-codecs",
+            "text": "Encoding & Codecs 333 resources"
+          },
+          {
+            "slug": "general-tools",
+            "text": "General Tools 134 resources"
+          },
+          {
+            "slug": "infrastructure-delivery",
+            "text": "Infrastructure & Delivery 191 resources"
+          },
+          {
+            "slug": "intro-learning",
+            "text": "Intro & Learning 187 resources"
+          },
+          {
+            "slug": "media-tools",
+            "text": "Media Tools 266 resources"
+          },
+          {
+            "slug": "players-clients",
+            "text": "Players & Clients 239 resources"
+          },
+          {
+            "slug": "protocols-transport",
+            "text": "Protocols & Transport 213 resources"
+          },
+          {
+            "slug": "standards-industry",
+            "text": "Standards & Industry 173 resources"
+          }
+        ],
+        "navVsSql": [
+          {
+            "slug": "community-events",
+            "nav": 0,
+            "sql": 80
+          },
+          {
+            "slug": "encoding-codecs",
+            "nav": 92,
+            "sql": 333
+          },
+          {
+            "slug": "general-tools",
+            "nav": 72,
+            "sql": 134
+          },
+          {
+            "slug": "infrastructure-delivery",
+            "nav": 111,
+            "sql": 191
+          },
+          {
+            "slug": "intro-learning",
+            "nav": 113,
+            "sql": 187
+          },
+          {
+            "slug": "media-tools",
+            "nav": 134,
+            "sql": 266
+          },
+          {
+            "slug": "players-clients",
+            "nav": 117,
+            "sql": 239
+          },
+          {
+            "slug": "protocols-transport",
+            "nav": 75,
+            "sql": 213
+          },
+          {
+            "slug": "standards-industry",
+            "nav": 118,
+            "sql": 173
+          }
+        ],
+        "navMatchesSql": false
+      },
+      "errors": []
+    },
+    {
+      "at": "2026-10-10T19:43:21.777Z",
+      "name": "scenario-1440-home",
+      "route": "/",
+      "docMs": 2705,
+      "document": "503 retry-after=1 text/html; charset=utf-8",
+      "before": {
+        "status": 503,
+        "ms": 2035,
+        "retryAfter": "1",
+        "body": "{\"message\":\"Service is temporarily unavailable\"}"
+      },
+      "errorCardShown": true,
+      "msToErrorCard": 6697,
+      "cardText": "We couldn't load the catalog The home index is temporarily unavailable. Please try again. Retry",
+      "apiResponsesWhileFailing": [
+        "503 /api/awesome-list/nav",
+        "503 /api/home",
+        "503 /api/awesome-list/nav"
+      ],
+      "skeletonStillShown": 0,
+      "keyboard": {
+        "tabsToRetry": 14,
+        "retryFocused": true,
+        "focusVisible": true
+      },
+      "afterRestoreProbe": {
+        "status": 200,
+        "ms": 174,
+        "retryAfter": null,
+        "body": "{\"title\":\"Awesome Video\",\"totalResources\":1816,\"categories\":[{\"name\":\"Community & Events\",\"slug\":\"community-events\",\"res"
+      },
+      "recovery": {
+        "url": "http://127.0.0.1:5166/",
+        "errorCardGone": true,
+        "apiResponsesAfterRetry": [
+          "200 /api/awesome-list/nav",
+          "200 /api/home"
+        ],
+        "renderedCategoryLinks": 9,
+        "renderedSlugs": [
+          "community-events",
+          "encoding-codecs",
+          "general-tools",
+          "infrastructure-delivery",
+          "intro-learning",
+          "media-tools",
+          "players-clients",
+          "protocols-transport",
+          "standards-industry"
+        ],
+        "focusAfter": {
+          "tag": "BODY",
+          "id": null,
+          "testid": null,
+          "text": "<div style=\"max-width:640px;margin:80px auto;padding:24px;fo",
+          "isBody": true
+        }
+      },
+      "errors": []
+    },
+    {
+      "at": "2026-10-10T19:43:24.347Z",
+      "name": "cleanup",
+      "accessExclusiveLocksLeft": 0,
+      "writes": "none (read-only scenario; lock released by COMMIT of an empty transaction)"
+    }
+  ]
+}

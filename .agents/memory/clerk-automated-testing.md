@@ -13,3 +13,7 @@ Consolidated index for driving Clerk from test harnesses.
 
 **Why:** every one of these cost a long debugging detour that looked like an app bug.
 **How to apply:** reach for a backend-minted session first; only drive the UI when the UI itself is under test.
+## Session JWT lifetime
+- Backend-minted session JWTs expire after ~60 s. Long harnesses must re-mint a token (`POST /sessions/:id/tokens`) right before each authed call, including the cleanup calls, or teardown silently 401s and leaves residue.
+
+**Client Trust (seen 2026-10-10):** after many password sign-ins from this container, DEV Clerk began routing audit sign-ins to `/sign-in/client-trust` (new-device verification), failing `auth-return-audit` at random cases. Not an app regression — backend-minted sessions are unaffected; fix by disabling Client Trust on the DEV instance or moving that audit to minted sessions.

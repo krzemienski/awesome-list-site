@@ -1,0 +1,482 @@
+{
+  "started": "2026-10-10T17:16:13.083Z",
+  "steps": [
+    {
+      "name": "A-cold-mount",
+      "cards": 10,
+      "ids": [
+        186681,
+        188015,
+        186679,
+        188014,
+        188011,
+        188012,
+        188009,
+        188010,
+        186822,
+        188008
+      ],
+      "aiCalls": 0
+    },
+    {
+      "name": "A-feedback",
+      "helpful": 200,
+      "notForMe": 200,
+      "alreadyKnown": 200,
+      "hide": 200,
+      "hiddenCardGone": true,
+      "toast": "Recommendation hidden\nIt will stay out of future recommendations until restored.\nUndo",
+      "undo": [
+        "PUT",
+        200
+      ],
+      "cardBackAfterUndo": true,
+      "positionRestored": true,
+      "serverState": [
+        {
+          "resourceId": 186679,
+          "feedback": "already_known",
+          "updatedAt": "2026-10-10T17:16:28.015Z",
+          "resource": {
+            "id": 186679,
+            "title": "VLMC (VideoLAN Movie Creator)",
+            "url": "https://www.videolan.org/vlmc/",
+            "description": "An experimental non-linear video editing software from the VideoLAN project. Aims to offer basic editing (cutting, transitions, etc.) with a simple interface, built on libVLC.",
+            "category": "Encoding & Codecs",
+            "subcategory": "Encoding Tools",
+            "subSubcategory": null,
+            "resourceFormat": "unknown",
+            "provider": "unknown",
+            "skillLevel": "unknown",
+            "kind": null,
+            "status": "approved",
+            "createdAt": "2026-01-20T20:31:16.909Z",
+            "metadata": {
+              "tags": [
+                "video editing",
+                "libVLC",
+                "non-linear editing",
+                "open-source"
+              ]
+            },
+            "resolvedKind": "other"
+          }
+        },
+        {
+          "resourceId": 188015,
+          "feedback": "not_for_me",
+          "updatedAt": "2026-10-10T17:16:27.248Z",
+          "resource": {
+            "id": 188015,
+            "title": "srtdroid",
+            "url": "https://github.com/ThibaultBee/srtdroid",
+            "description": "Native Java/Kotlin SRT protocol implementation for Android mobile streaming applications",
+            "category": "Protocols & Transport",
+            "subcategory": "Transport Protocols",
+            "subSubcategory": "SRT",
+            "resourceFormat": "unknown",
+            "provider": "unknown",
+            "skillLevel": "unknown",
+            "kind": null,
+            "status": "approved",
+            "createdAt": "2026-07-24T19:37:52.257Z",
+            "metadata": {
+              "ogImage": "https://opengraph.githubassets.com/6d3b8fc8cea3e475fc41589c8657669725c5f8adb40379d683f4da9ee5c0905a/ThibaultBee/srtdroid",
+              "favicon": "https://github.githubassets.com/favicons/favicon.svg",
+              "scrapedTitle": "GitHub - ThibaultBee/srtdroid: Secure Reliable Transport (SRT) Protocol for Android · GitHub",
+              "scrapedDescription": "Secure Reliable Transport (SRT) Protocol for Android - ThibaultBee/srtdroid",
+              "ogTitle": "GitHub - ThibaultBee/srtdroid: Secure Reliable Transport (SRT) Protocol for Android",
+              "ogDescription": "Secure Reliable Transport (SRT) Protocol for Android - ThibaultBee/srtdroid",
+              "twitterCard": "summary_large_image",
+              "urlScraped": true
+            },
+            "resolvedKind": "other"
+          }
+        },
+        {
+          "resourceId": 186681,
+          "feedback": "helpful",
+          "updatedAt": "2026-10-10T17:16:26.013Z",
+          "resource": {
+            "id": 186681,
+            "title": "scikit-video",
+            "url": "https://github.com/aizvorski/scikit-video",
+            "description": "A set of video processing routines for use with SciPy, providing basic video reading and writing capabilities for scientific computing workflows in Python.",
+            "category": "Encoding & Codecs",
+            "subcategory": "Encoding Tools",
+            "subSubcategory": null,
+            "resourceFormat": "unknown",
+            "provider": "unknown",
+            "skillLevel": "unknown",
+            "kind": null,
+            "status": "approved",
+            "createdAt": "2026-01-20T20:31:16.993Z",
+            "metadata": {},
+            "resolvedKind": "other"
+          }
+        }
+      ]
+    },
+    {
+      "name": "A-restore-reload-crosstab",
+      "hiddenListVisible": true,
+      "restore": [
+        "PUT",
+        200
+      ],
+      "cardBackAfterRestore": true,
+      "secondHidden": 188011,
+      "tab2": {
+        "hasHiddenCard": false,
+        "restoreOffered": true,
+        "helpfulPressed": "true"
+      },
+      "reload": {
+        "hasHiddenCard": false,
+        "restoreOffered": true
+      },
+      "serverState": [
+        {
+          "resourceId": 188011,
+          "feedback": "hidden",
+          "updatedAt": "2026-10-10T17:16:48.969Z",
+          "resource": {
+            "id": 188011,
+            "title": "DRMreview",
+            "url": "https://github.com/espio999/DRMreview",
+            "description": "Android application for checking DRM and HDCP security levels on mobile devices",
+            "category": "General Tools",
+            "subcategory": "DRM Testing & Validation Tools",
+            "subSubcategory": null,
+            "resourceFormat": "unknown",
+            "provider": "unknown",
+            "skillLevel": "unknown",
+            "kind": null,
+            "status": "approved",
+            "createdAt": "2026-07-24T19:37:52.129Z",
+            "metadata": {
+              "ogImage": "https://opengraph.githubassets.com/4317e9a159cb79391325503d230a3841e8e6c1f631a9780d2b8e2a44e046bbe5/espio999/DRMreview",
+              "ogImageBlurhash": "LHSF-IRjIU-;_JM{M{axVixuofaf",
+              "favicon": "https://github.githubassets.com/favicons/favicon.svg",
+              "scrapedTitle": "GitHub - espio999/DRMreview: Android application for checking security level of DRM and HDCP · GitHub",
+              "scrapedDescription": "Android application for checking security level of DRM and HDCP - espio999/DRMreview",
+              "ogTitle": "GitHub - espio999/DRMreview: Android application for checking security level of DRM and HDCP",
+              "ogDescription": "Android application for checking security level of DRM and HDCP - espio999/DRMreview",
+              "twitterCard": "summary_large_image",
+              "urlScraped": true
+            },
+            "resolvedKind": "other"
+          }
+        },
+        {
+          "resourceId": 186679,
+          "feedback": "already_known",
+          "updatedAt": "2026-10-10T17:16:28.015Z",
+          "resource": {
+            "id": 186679,
+            "title": "VLMC (VideoLAN Movie Creator)",
+            "url": "https://www.videolan.org/vlmc/",
+            "description": "An experimental non-linear video editing software from the VideoLAN project. Aims to offer basic editing (cutting, transitions, etc.) with a simple interface, built on libVLC.",
+            "category": "Encoding & Codecs",
+            "subcategory": "Encoding Tools",
+            "subSubcategory": null,
+            "resourceFormat": "unknown",
+            "provider": "unknown",
+            "skillLevel": "unknown",
+            "kind": null,
+            "status": "approved",
+            "createdAt": "2026-01-20T20:31:16.909Z",
+            "metadata": {
+              "tags": [
+                "video editing",
+                "libVLC",
+                "non-linear editing",
+                "open-source"
+              ]
+            },
+            "resolvedKind": "other"
+          }
+        },
+        {
+          "resourceId": 188015,
+          "feedback": "not_for_me",
+          "updatedAt": "2026-10-10T17:16:27.248Z",
+          "resource": {
+            "id": 188015,
+            "title": "srtdroid",
+            "url": "https://github.com/ThibaultBee/srtdroid",
+            "description": "Native Java/Kotlin SRT protocol implementation for Android mobile streaming applications",
+            "category": "Protocols & Transport",
+            "subcategory": "Transport Protocols",
+            "subSubcategory": "SRT",
+            "resourceFormat": "unknown",
+            "provider": "unknown",
+            "skillLevel": "unknown",
+            "kind": null,
+            "status": "approved",
+            "createdAt": "2026-07-24T19:37:52.257Z",
+            "metadata": {
+              "ogImage": "https://opengraph.githubassets.com/6d3b8fc8cea3e475fc41589c8657669725c5f8adb40379d683f4da9ee5c0905a/ThibaultBee/srtdroid",
+              "favicon": "https://github.githubassets.com/favicons/favicon.svg",
+              "scrapedTitle": "GitHub - ThibaultBee/srtdroid: Secure Reliable Transport (SRT) Protocol for Android · GitHub",
+              "scrapedDescription": "Secure Reliable Transport (SRT) Protocol for Android - ThibaultBee/srtdroid",
+              "ogTitle": "GitHub - ThibaultBee/srtdroid: Secure Reliable Transport (SRT) Protocol for Android",
+              "ogDescription": "Secure Reliable Transport (SRT) Protocol for Android - ThibaultBee/srtdroid",
+              "twitterCard": "summary_large_image",
+              "urlScraped": true
+            },
+            "resolvedKind": "other"
+          }
+        },
+        {
+          "resourceId": 186681,
+          "feedback": "helpful",
+          "updatedAt": "2026-10-10T17:16:26.013Z",
+          "resource": {
+            "id": 186681,
+            "title": "scikit-video",
+            "url": "https://github.com/aizvorski/scikit-video",
+            "description": "A set of video processing routines for use with SciPy, providing basic video reading and writing capabilities for scientific computing workflows in Python.",
+            "category": "Encoding & Codecs",
+            "subcategory": "Encoding Tools",
+            "subSubcategory": null,
+            "resourceFormat": "unknown",
+            "provider": "unknown",
+            "skillLevel": "unknown",
+            "kind": null,
+            "status": "approved",
+            "createdAt": "2026-01-20T20:31:16.993Z",
+            "metadata": {},
+            "resolvedKind": "other"
+          }
+        }
+      ],
+      "aiCalls": 0
+    },
+    {
+      "name": "A-offline",
+      "offline": {
+        "button": "Waiting for connection…",
+        "offlineNotice": "You’re offline\nYour refresh will finish when you reconnect. The recommendations below are your saved results.",
+        "cards": 10
+      },
+      "afterReconnect": {
+        "request": 200,
+        "button": "Refresh recommendations",
+        "alert": false,
+        "offlineNoticeGone": true,
+        "cards": 10
+      }
+    },
+    {
+      "name": "A-netfail-retry",
+      "failState": "Showing your last useful recommendations The latest refresh failed, so these saved results were kept. Last updated 10/10/2026, 5:17:29 PM. Try again",
+      "cardsKeptDuringFailure": 10,
+      "retry": 200,
+      "errorGone": true,
+      "cardsAfter": 10
+    },
+    {
+      "name": "A-feedback-netfail",
+      "resourceId": 186822,
+      "toast": "Feedback wasn’t saved\nYour previous choice was restored. Please try again.",
+      "pressedAfterFailure": "false",
+      "serverRow": null
+    },
+    {
+      "name": "A-390-keyboard",
+      "cards": 10,
+      "keyboardEnter": 200,
+      "pressed": "true",
+      "horizontalOverflow": 0,
+      "aiCalls": 0
+    },
+    {
+      "name": "A-guest",
+      "links": [
+        [
+          "Theme",
+          "/settings/theme"
+        ],
+        [
+          "Sign in",
+          "/sign-in?redirect_url=%2Frecommendations"
+        ]
+      ],
+      "afterClick": "http://127.0.0.1:5000/sign-in?redirect_url=%2Frecommendations"
+    },
+    {
+      "name": "B-first-mount",
+      "status": 200,
+      "ms": 14606,
+      "aiDelta": 0,
+      "cards": 8,
+      "bookmarkedExcluded": true,
+      "explanations": [
+        {
+          "id": 186398,
+          "title": "Per-Title Encode Optimization – Netflix TechBlog",
+          "reason": "Supports your goal: Optimize encoding and quality and matches your preferred format: Articles",
+          "confidence": 98,
+          "type": "ai_powered"
+        },
+        {
+          "id": 186424,
+          "title": "Optimized Shot-Based Encodes for 4K: Now Streaming!",
+          "reason": "Supports your goal: Optimize encoding and quality and matches your preferred format: Articles and a good fit for intermediate learners",
+          "confidence": 96,
+          "type": "ai_powered"
+        },
+        {
+          "id": 185966,
+          "title": "Loop file and generate multiple video bitrates muxed in MPEG-TS with FFmpeg",
+          "reason": "Supports your goal: Optimize encoding and quality and matches your preferred format: Articles and a good fit for intermediate learners",
+          "confidence": 95,
+          "type": "rule_based"
+        },
+        {
+          "id": 186494,
+          "title": "AV1 vs HEVC – Bitmovin Compression Efficiency Results",
+          "reason": "Supports your goal: Optimize encoding and quality and matches your preferred format: Articles and a good fit for intermediate learners",
+          "confidence": 94,
+          "type": "ai_powered"
+        }
+      ]
+    },
+    {
+      "name": "B-refresh",
+      "status": 200,
+      "aiDelta": 0,
+      "busyLabel": "Refreshing…",
+      "busyAria": 1,
+      "before": [
+        186398,
+        186424,
+        185966,
+        186494,
+        186430,
+        186425,
+        186229,
+        185828
+      ],
+      "after": [
+        186398,
+        186424,
+        185966,
+        186494,
+        185769,
+        186430,
+        186425,
+        186229
+      ],
+      "changed": true,
+      "reasons": [
+        "Supports your goal: Optimize encoding and quality and matches your preferred format: Articles",
+        "Supports your goal: Optimize encoding and quality and matches your preferred format: Articles and a good fit for interme",
+        "Supports your goal: Optimize encoding and quality and matches your preferred format: Articles and a good fit for interme"
+      ],
+      "localCache": [
+        {
+          "k": "ai_recommendations_cache:__qa_test_plan_592_v06est_179165266",
+          "ts": 1791652692425
+        }
+      ]
+    },
+    {
+      "name": "B-panels-cache",
+      "panels": {
+        "/?context=account": {
+          "request": "none (device cache reused)",
+          "cards": 8,
+          "aiDelta": 0
+        },
+        "/profile": {
+          "request": "none (device cache reused)",
+          "cards": 8,
+          "aiDelta": 0
+        },
+        "/advanced": {
+          "request": "none (device cache reused)",
+          "cards": 0,
+          "aiDelta": 0
+        }
+      },
+      "reloadCards": 8,
+      "lastUpdatedShown": null,
+      "aiTotalDelta": 0
+    },
+    {
+      "name": "C-outage-api",
+      "status": 200,
+      "count": 7,
+      "firstReason": "Supports your goal: Optimize encoding and quality and matches your preferred format: Articles and a good fit for intermediate learners",
+      "outageInstanceAiCount": [
+        0,
+        0
+      ]
+    }
+  ],
+  "paidCalls": [
+    {
+      "at": "2026-10-10T17:18:04.787Z",
+      "endpoint": "POST /api/recommendations?limit=10",
+      "purpose": "V06 first mount, established user",
+      "delta": 0
+    },
+    {
+      "at": "2026-10-10T17:18:13.673Z",
+      "endpoint": "POST /api/recommendations?limit=10&refresh=true",
+      "purpose": "V06 Refresh button, established user",
+      "delta": 0
+    }
+  ],
+  "recommendationPosts": [
+    {
+      "label": "cold-desktop",
+      "url": "/api/recommendations?limit=10",
+      "at": "2026-10-10T17:16:24.576Z"
+    },
+    {
+      "label": "cold-tab2",
+      "url": "/api/recommendations?limit=10",
+      "at": "2026-10-10T17:16:51.600Z"
+    },
+    {
+      "label": "cold-desktop",
+      "url": "/api/recommendations?limit=10&refresh=true",
+      "at": "2026-10-10T17:17:29.597Z"
+    },
+    {
+      "label": "cold-desktop",
+      "url": "/api/recommendations?limit=10&refresh=true",
+      "at": "2026-10-10T17:17:31.238Z"
+    },
+    {
+      "label": "cold-desktop",
+      "url": "/api/recommendations?limit=10&refresh=true",
+      "at": "2026-10-10T17:17:31.733Z"
+    },
+    {
+      "label": "cold-390",
+      "url": "/api/recommendations?limit=10",
+      "at": "2026-10-10T17:17:37.824Z"
+    },
+    {
+      "label": "established",
+      "url": "/api/recommendations?limit=10",
+      "at": "2026-10-10T17:17:51.131Z"
+    },
+    {
+      "label": "established",
+      "url": "/api/recommendations?limit=10&refresh=true",
+      "at": "2026-10-10T17:18:05.241Z"
+    }
+  ],
+  "residue": {
+    "users": 0,
+    "feedback": 0,
+    "prefs": 0,
+    "bookmarks": 0,
+    "interactions": 0
+  }
+}

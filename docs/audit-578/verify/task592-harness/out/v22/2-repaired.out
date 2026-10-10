@@ -1,0 +1,67 @@
+[pre-publish] gate started 2026-10-10T19:55:49Z — logs in /tmp/v22logs/repaired
+[pre-publish] running typecheck: npx tsc
+[pre-publish] PASS typecheck (22s)
+[pre-publish] running migration-drift: npx tsx scripts/check-migration-drift.ts --journal-only
+[pre-publish] PASS migration-drift (2s)
+[pre-publish] SKIP print-audit + responsive-audit — publish build (no app; these run as dev workflows instead)
+[pre-publish] running product-profile-drift: npm run validate:product-profiles
+[pre-publish] PASS product-profile-drift (1s)
+[pre-publish] running standalone-palette-drift: npm run validate:standalone-palette-drift
+[pre-publish] PASS standalone-palette-drift (2s)
+[pre-publish] running build: npm run build
+[pre-publish] PASS build (20s)
+[pre-publish] running bundle-budget: npm run bundle:budget
+[pre-publish] PASS bundle-budget (6s)
+[pre-publish] SKIP image cleanup — publish marker absent (REPLIT_PUBLISH_IMAGE_TRIM/REPLIT_DEPLOYMENT).
+[pre-publish]   Replit-provided variable NAMES visible to this build (values withheld):
+[pre-publish]     REPL_HOME
+[pre-publish]     REPL_ID
+[pre-publish]     REPL_IDENTITY
+[pre-publish]     REPL_IDENTITY_KEY
+[pre-publish]     REPL_IN_MICROVM
+[pre-publish]     REPLIT_ARTIFACT_ROUTER
+[pre-publish]     REPLIT_ASKPASS_PID2_SESSION
+[pre-publish]     REPLIT_BASHRC
+[pre-publish]     REPLIT_CLI
+[pre-publish]     REPLIT_CLUSTER
+[pre-publish]     REPLIT_CONNECTORS_HOSTNAME
+[pre-publish]     REPLIT_CONNECTOR_TOOLS_PATH
+[pre-publish]     REPLIT_CONTAINER
+[pre-publish]     REPLIT_DB_URL
+[pre-publish]     REPLIT_DEV_DOMAIN
+[pre-publish]     REPLIT_DOMAINS
+[pre-publish]     REPLIT_ENVIRONMENT
+[pre-publish]     REPLIT_EXPO_DEV_DOMAIN
+[pre-publish]     REPLIT_GIT_PROXY_SOURCE_ORIGINS
+[pre-publish]     REPLIT_HELIUM_ENABLED
+[pre-publish]     REPLIT_HELIUM_USER_QUOTA_BYTES
+[pre-publish]     REPLIT_LD_AUDIT
+[pre-publish]     REPLIT_LD_LIBRARY_PATH
+[pre-publish]     REPLIT_NIX_CHANNEL
+[pre-publish]     REPLIT_NIX_PACKAGE_STORE_ROOT
+[pre-publish]     REPLIT_PID1_FLAG_NO_SNIX
+[pre-publish]     REPLIT_PID1_NIX_BIN_DIR
+[pre-publish]     REPLIT_PID1_VERSION
+[pre-publish]     REPLIT_PID2
+[pre-publish]     REPLIT_PLAYWRIGHT_CHROMIUM_EXECUTABLE
+[pre-publish]     REPLIT_PYTHON_LD_LIBRARY_PATH
+[pre-publish]     REPLIT_PYTHONPATH
+[pre-publish]     REPLIT_RIPPKGS_INDICES
+[pre-publish]     REPLIT_RTLD_LOADER
+[pre-publish]     REPLIT_RUN_PATH
+[pre-publish]     REPLIT_SEMGREP_RUNTIME_PATH
+[pre-publish]     REPLIT_SESSION
+[pre-publish]     REPLIT_USER
+[pre-publish]     REPLIT_USERID
+[pre-publish]     REPLIT_USER_RUN
+[pre-publish]     REPL_LANGUAGE
+[pre-publish]     REPL_ORG_ID
+[pre-publish]     REPL_ORG_IS_ENTERPRISE
+[pre-publish]     REPL_ORG_TYPE
+[pre-publish]     REPL_OWNER
+[pre-publish]     REPL_OWNER_ID
+[pre-publish]     REPL_PUBKEYS
+[pre-publish]     REPL_SLUG
+
+[pre-publish] ALL CHECKS PASSED — build artifacts are ready in dist/
+EXIT=0

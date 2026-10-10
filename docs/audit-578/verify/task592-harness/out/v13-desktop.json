@@ -1,0 +1,380 @@
+{
+  "started": "2026-10-10T16:50:09.446Z",
+  "vp": "desktop",
+  "steps": [
+    {
+      "name": "fixtures",
+      "J1": 35,
+      "J2": 36,
+      "J3": 37,
+      "resources": [
+        188680,
+        188681,
+        188682,
+        188683
+      ],
+      "g2": [
+        318,
+        319,
+        320
+      ],
+      "s2": 321,
+      "g3": [
+        322,
+        323,
+        324
+      ],
+      "s3": 325
+    },
+    {
+      "name": "A0-empty",
+      "emptyStateShown": true,
+      "listBadgeBefore": "0"
+    },
+    {
+      "name": "A1-add-first",
+      "toast": "Step added",
+      "groups": [
+        "326"
+      ],
+      "listBadge": "1",
+      "focus": "add-step-button",
+      "sql": [
+        {
+          "id": 326,
+          "resource_id": 188680,
+          "step_number": 1,
+          "title": "__qa_test_plan_592_v13_desktop_1791651009446 step one",
+          "description": "First QA step description",
+          "is_optional": false
+        }
+      ]
+    },
+    {
+      "name": "A2-http-error",
+      "httpStatus": 400,
+      "alert": "Selected resource no longer exists or is not approved. Choose another resource.",
+      "title": "__qa_test_plan_592_v13_desktop_1791651009446 step two",
+      "description": "Draft text that must survive an error",
+      "resourceStillSelected": true,
+      "sqlRowCount": 1
+    },
+    {
+      "name": "A3-add-second-after-recovery",
+      "toast": "Step added",
+      "groups": [
+        "326",
+        "327"
+      ],
+      "listBadge": "2",
+      "focus": "add-step-button",
+      "stepNumbers": [
+        1,
+        2
+      ],
+      "sql": [
+        {
+          "id": 326,
+          "resource_id": 188680,
+          "step_number": 1,
+          "title": "__qa_test_plan_592_v13_desktop_1791651009446 step one",
+          "description": "First QA step description",
+          "is_optional": false
+        },
+        {
+          "id": 327,
+          "resource_id": 188683,
+          "step_number": 2,
+          "title": "__qa_test_plan_592_v13_desktop_1791651009446 step two",
+          "description": "Draft text that must survive an error",
+          "is_optional": false
+        }
+      ]
+    },
+    {
+      "name": "A4-publish",
+      "put": 200,
+      "status": "published",
+      "publicStatus": 200,
+      "publicSteps": [
+        [
+          1,
+          "__qa_test_plan_592_v13_desktop_1791651009446 step one",
+          188680
+        ],
+        [
+          2,
+          "__qa_test_plan_592_v13_desktop_1791651009446 step two",
+          188683
+        ]
+      ]
+    },
+    {
+      "name": "A5-edit-single",
+      "prefilled": "__qa_test_plan_592_v13_desktop_1791651009446 step one",
+      "toast": "Step saved",
+      "sql": {
+        "id": 326,
+        "resource_id": 188680,
+        "step_number": 1,
+        "title": "__qa_test_plan_592_v13_desktop_1791651009446 step one EDITED",
+        "description": "First QA step description",
+        "is_optional": true
+      },
+      "publicFirst": {
+        "title": "__qa_test_plan_592_v13_desktop_1791651009446 step one EDITED",
+        "isOptional": true
+      },
+      "focus": "step-edit-326"
+    },
+    {
+      "name": "A6-delete-first",
+      "toast": "Step deleted",
+      "groups": [
+        "327"
+      ],
+      "listBadge": "1",
+      "focus": "steps-dialog",
+      "sqlNumbers": [
+        1
+      ]
+    },
+    {
+      "name": "A6-delete-second",
+      "toast": "Step deleted",
+      "groups": [],
+      "listBadge": "0",
+      "focus": "steps-dialog",
+      "sqlNumbers": []
+    },
+    {
+      "name": "B0-initial",
+      "groups": [
+        "318",
+        "321"
+      ],
+      "upDisabledFirst": true,
+      "downDisabledLast": true
+    },
+    {
+      "name": "B1-group-edit",
+      "pickerHidden": true,
+      "toast": "Step saved",
+      "sql": [
+        [
+          318,
+          1,
+          "Triple A shared EDIT",
+          "Shared description across three rows",
+          188680
+        ],
+        [
+          319,
+          1,
+          "Triple A shared EDIT",
+          "Shared description across three rows",
+          188681
+        ],
+        [
+          320,
+          1,
+          "Triple A shared EDIT",
+          "Shared description across three rows",
+          188682
+        ],
+        [
+          321,
+          2,
+          "Single B",
+          "seeded",
+          188683
+        ]
+      ]
+    },
+    {
+      "name": "B2-step-down",
+      "groups": [
+        "321",
+        "318"
+      ],
+      "downDisabledOnMovedLast": true,
+      "upDisabledOnNewFirst": true,
+      "focusAfterDown": "step-up-318",
+      "focusAfterTab": "step-resource-link-318",
+      "sql": [
+        [
+          321,
+          1
+        ],
+        [
+          318,
+          2
+        ],
+        [
+          319,
+          2
+        ],
+        [
+          320,
+          2
+        ]
+      ],
+      "publicOrder": [
+        [
+          321,
+          1
+        ],
+        [
+          318,
+          2
+        ],
+        [
+          319,
+          2
+        ],
+        [
+          320,
+          2
+        ]
+      ]
+    },
+    {
+      "name": "B3-reload-persist",
+      "groups": [
+        "321",
+        "318"
+      ]
+    },
+    {
+      "name": "B4-step-up",
+      "groups": [
+        "318",
+        "321"
+      ],
+      "upDisabledOnFirst": true,
+      "focusAfterUp": "step-down-318",
+      "sql": [
+        [
+          318,
+          1
+        ],
+        [
+          319,
+          1
+        ],
+        [
+          320,
+          1
+        ],
+        [
+          321,
+          2
+        ]
+      ],
+      "publicOrder": [
+        [
+          318,
+          1
+        ],
+        [
+          319,
+          1
+        ],
+        [
+          320,
+          1
+        ],
+        [
+          321,
+          2
+        ]
+      ]
+    },
+    {
+      "name": "B5-remove-resource",
+      "removeText": "Remove this resource? Resource #188681 will be unlinked from \"Triple A shared EDIT\". The step itself stays. Cancel Remove",
+      "rowsAfterCancel": 4,
+      "toast": "Resource removed from step",
+      "chipsBefore": 3,
+      "chipsAfter": 2,
+      "logicalGroups": 2,
+      "listBadge": "2",
+      "focus": "steps-dialog",
+      "sql": [
+        [
+          318,
+          188680,
+          1
+        ],
+        [
+          320,
+          188682,
+          1
+        ],
+        [
+          321,
+          188683,
+          2
+        ]
+      ],
+      "resourceStillExists": 1,
+      "progress": {
+        "current_step_id": null,
+        "completed_steps": [
+          318
+        ],
+        "completed_at": null
+      }
+    },
+    {
+      "name": "C1-delete-group-with-progress",
+      "delText": "Delete this step? Removing \"Del triple\" and its 3 linked resources will renumber the remaining steps. This cannot be undone. Cancel Delete",
+      "rowsAfterCancel": 4,
+      "toast": "Step deleted",
+      "groups": [
+        "325"
+      ],
+      "badge": null,
+      "listBadge": "1",
+      "focus": "steps-dialog",
+      "sql": [
+        [
+          325,
+          1
+        ]
+      ],
+      "progress": {
+        "current_step_id": null,
+        "completed_steps": [],
+        "completed_at": null
+      }
+    },
+    {
+      "name": "page-errors",
+      "errors": []
+    },
+    {
+      "name": "residue",
+      "residue": {
+        "users": 0,
+        "resources": 0,
+        "journeys": 0,
+        "categories": 0,
+        "subcategories": 0,
+        "collections": 0,
+        "edits": 0
+      },
+      "journeyStepResidue": 0
+    }
+  ],
+  "residue": {
+    "users": 0,
+    "resources": 0,
+    "journeys": 0,
+    "categories": 0,
+    "subcategories": 0,
+    "collections": 0,
+    "edits": 0
+  },
+  "journeyStepResidue": 0
+}

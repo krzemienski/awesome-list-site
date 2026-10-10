@@ -1,0 +1,52 @@
+{
+  "started": "2026-10-10T19:08:12.503Z",
+  "steps": [
+    {
+      "at": "2026-10-10T19:08:37.814Z",
+      "name": "result",
+      "ids": {
+        "ipJump": 25,
+        "offHost": 26
+      },
+      "job": {
+        "id": 5,
+        "status": "completed",
+        "total": 7,
+        "healthy": 5,
+        "broken": 0,
+        "redirect": 0,
+        "timeout": 0,
+        "suspect": 2
+      },
+      "summary": "Completed Oct 10, 2026, 07:08 PM: 5 healthy, 0 broken, 0 redirects, 0 timeouts, 2 suspect of 7.",
+      "sumAddsUp": true,
+      "fixtures": [
+        {
+          "title": "__qa_test_plan_592_v18b ipJump",
+          "status": "suspect",
+          "http_status": 200,
+          "final_url": "http://127.1.0.1:5196/ok/page",
+          "error_message": "redirects off-domain: 127.0.0.1 -> 127.1.0.1 (http://127.1.0.1:5196/ok/page)"
+        },
+        {
+          "title": "__qa_test_plan_592_v18b offHost",
+          "status": "suspect",
+          "http_status": 200,
+          "final_url": "http://localhost:5196/ok/page",
+          "error_message": "redirects off-domain: 127.0.0.1 -> localhost (http://localhost:5196/ok/page)"
+        }
+      ],
+      "flaggedExcerpt": "__qa_test_plan_592_v18b offHost __qa_test_plan_592_v16 Cat B http://127.0.0.1:5196/offhost/page redirects off-domain: 127.0.0.1 -> localhost (http://localhost:5196/ok/page) SUSPECT Oct 10, 2026, 07:08 PM __qa_test_plan_592_v18b ipJump __qa_test_plan_592_v16 Cat B http://127.0.0.1:5196/ipjump/page redirects off-domain: 127.0.0.1 -> 127.1.0.1 (http://127.1.0.1:5196/ok/page) SUSPECT Oct 10, 2026, 07:08 PM"
+    },
+    {
+      "at": "2026-10-10T19:08:42.082Z",
+      "name": "cleanup",
+      "residue": {
+        "qa_users": 0,
+        "v18_resources": 0,
+        "jobs": 0,
+        "checks": 0
+      }
+    }
+  ]
+}

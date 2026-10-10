@@ -1,0 +1,45 @@
+{
+  "started": "2026-10-10T18:04:33.831Z",
+  "start": {
+    "status": 200,
+    "body": {
+      "success": true,
+      "jobId": 57,
+      "message": "Research job started"
+    }
+  },
+  "job": {
+    "status": "failed",
+    "error": "Claude Code returned an error result: Reached maximum budget ($0.05)",
+    "turnsUsed": 2,
+    "inTok": 0,
+    "outTok": 0,
+    "cost": "0.1162",
+    "totalDiscoveries": 0
+  },
+  "resultEvent": {
+    "seq": 7,
+    "summary": "Run error: Reached maximum budget ($0.05) (reason: budget_exhausted)",
+    "tokensIn": 0,
+    "tokensOut": 0,
+    "cost": "0.1162",
+    "detail": {
+      "subtype": "error_max_budget_usd",
+      "is_error": true,
+      "num_turns": 2,
+      "duration_api_ms": 0
+    }
+  },
+  "eventCount": 10,
+  "match": {
+    "turns": true,
+    "tokensIn": true,
+    "tokensOut": true,
+    "cost": true
+  },
+  "residue": {
+    "jobs": 0,
+    "events": 0,
+    "active": 0
+  }
+}

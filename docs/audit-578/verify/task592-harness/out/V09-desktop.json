@@ -1,0 +1,166 @@
+{
+  "started": "2026-10-10T16:34:38.255Z",
+  "vp": "desktop",
+  "steps": [
+    {
+      "name": "initial",
+      "initial": {
+        "email": false,
+        "inApp": false,
+        "newRes": true,
+        "watch": true,
+        "journey": true,
+        "cadence": "weekly",
+        "tz": null,
+        "pausedUntil": null
+      },
+      "previewEmpty": "Preview This uses the same rules as delivery. 0 items No saved content matches these rules yet. When there is something to share, it will appear here."
+    },
+    {
+      "name": "invalid-timezone",
+      "alerts": [
+        "Choose a valid IANA time zone."
+      ],
+      "ariaInvalid": "true",
+      "putsSent": 0,
+      "server": {
+        "email": false,
+        "inApp": false,
+        "newRes": true,
+        "watch": true,
+        "journey": true,
+        "cadence": "weekly",
+        "tz": null,
+        "pausedUntil": null
+      }
+    },
+    {
+      "name": "save-reload",
+      "status": "Your choices are saved.",
+      "saved": {
+        "email": true,
+        "inApp": true,
+        "newRes": true,
+        "watch": true,
+        "journey": false,
+        "cadence": "biweekly",
+        "tz": "Europe/Warsaw",
+        "pausedUntil": null
+      },
+      "formAfterReload": {
+        "email": true,
+        "cadence": "biweekly",
+        "tz": "Europe/Warsaw",
+        "journey": false
+      }
+    },
+    {
+      "name": "pause-with-draft",
+      "pauseMsg": "Notifications paused. Your other changes aren't saved yet — use Save choices.",
+      "server": {
+        "email": true,
+        "inApp": true,
+        "newRes": true,
+        "watch": true,
+        "journey": false,
+        "cadence": "biweekly",
+        "tz": "Europe/Warsaw",
+        "pausedUntil": "2026-10-17T16:34:47.849Z"
+      },
+      "formCadenceKeptDraft": "monthly",
+      "pausedAfterReload": {
+        "button": 1,
+        "text": "Paused until 10/17/2026.",
+        "cadence": "biweekly"
+      },
+      "lastPutBody": {
+        "emailDigestEnabled": true,
+        "inAppEnabled": true,
+        "includeNewResources": true,
+        "includeWatchNext": true,
+        "includeJourneyStep": false,
+        "cadence": "biweekly",
+        "timezone": "Europe/Warsaw",
+        "pausedUntil": "2026-10-17T16:34:47.849Z"
+      }
+    },
+    {
+      "name": "resume-with-draft",
+      "msg": "Notifications resumed. Your other changes aren't saved yet — use Save choices.",
+      "server": {
+        "email": true,
+        "inApp": true,
+        "newRes": true,
+        "watch": true,
+        "journey": false,
+        "cadence": "biweekly",
+        "tz": "Europe/Warsaw",
+        "pausedUntil": null
+      },
+      "formCadence": "monthly"
+    },
+    {
+      "name": "unsubscribe-all",
+      "msg": "Email and in-app updates are off. Your other changes aren't saved yet — use Save choices.",
+      "server": {
+        "email": false,
+        "inApp": false,
+        "newRes": true,
+        "watch": true,
+        "journey": false,
+        "cadence": "biweekly",
+        "tz": "Europe/Warsaw",
+        "pausedUntil": null
+      },
+      "formCadence": "monthly",
+      "unsubAriaDisabled": "true"
+    },
+    {
+      "name": "preview-populated",
+      "apiItemCount": 1,
+      "sections": [
+        [
+          "Watch next",
+          1
+        ]
+      ],
+      "watchTitleShown": true,
+      "emailJobsForUser": 0
+    },
+    {
+      "name": "reset",
+      "toast": "Learning preferences reset\nPersonalized surfaces will use general picks until you choose new preferences.",
+      "afterReset": {
+        "preferences": null,
+        "homeLayout": "curated",
+        "theme": {
+          "systemId": "swiss",
+          "accentId": "violet"
+        },
+        "revision": 2
+      },
+      "stalePut": [
+        409,
+        "Your learning preferences changed in another tab. Reload before saving again."
+      ],
+      "staleDelete": [
+        409,
+        "Your learning preferences changed in another tab. Reload before resetting."
+      ],
+      "finalServer": null,
+      "onboardingStep": "Step 1 of 5",
+      "skillChecked": 1,
+      "paintedSystem": "swiss"
+    }
+  ],
+  "pageErrors": [],
+  "residue": {
+    "users": 0,
+    "resources": 0,
+    "journeys": 0,
+    "categories": 0,
+    "subcategories": 0,
+    "collections": 0,
+    "edits": 0
+  }
+}

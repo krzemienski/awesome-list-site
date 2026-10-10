@@ -111,10 +111,12 @@ const visible = (page, sel) => page.locator(sel).first().isVisible().catch(() =>
 
 // ---- 1b. False-positive guard: prose that merely LOOKS markup-shaped must
 // survive the pre-boot scrubber and run a real search (index.html scrubs only a
-// tag-open sequence, so "a < b > c" and bare "javascript:" are plain text).
+// tag-open sequence, so "ffmpeg < x264 > av1" and bare "javascript:" are plain
+// text). The prose must hold a searchable token: since the 2-character minimum,
+// single-letter prose like "a < b > c" correctly shows the "Keep typing" prompt.
 for (const [label, query] of [
   ['colon-scheme-prose', 'javascript: the good parts'],
-  ['angle-bracket-prose', 'a < b > c'],
+  ['angle-bracket-prose', 'ffmpeg < x264 > av1'],
 ]) {
   const page = await openPage(
     `/search?q=${encodeURIComponent(query)}`,

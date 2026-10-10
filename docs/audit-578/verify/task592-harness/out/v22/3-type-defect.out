@@ -1,0 +1,11 @@
+[pre-publish] gate started 2026-10-10T19:56:46Z — logs in /tmp/v22logs/typedefect
+[pre-publish] running typecheck: npx tsc
+
+================================================================
+PRE-PUBLISH GATE FAILED: typecheck
+Publishing is blocked until this check passes.
+Full log: /tmp/v22logs/typedefect/typecheck.log
+---- last 40 log lines -----------------------------------------
+  client/src/pages/About.tsx(563,14): error TS2322: Type 'string' is not assignable to type 'number'.
+================================================================
+EXIT=1

@@ -835,7 +835,7 @@ export default function JourneyDetail() {
         <Card className="journey-completion-card mt-8">
           <CardContent className="journey-completion-card__content p-6 text-center">
             <Trophy className="journey-completion-card__icon" aria-hidden />
-            <h3 className="journey-completion-card__title">🎉 Congratulations!</h3>
+            <h3 className="journey-completion-card__title">Congratulations!</h3>
             <p className="journey-completion-card__copy">
               You've completed the "{journey.title}" learning journey!
             </p>

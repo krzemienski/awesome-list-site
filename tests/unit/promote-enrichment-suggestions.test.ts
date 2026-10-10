@@ -118,11 +118,12 @@ describe('promoteEnrichmentSuggestions', () => {
       },
     );
 
-    // Subcategory is still promoted onto the resource as a hint, but the
-    // guard intentionally won't create a level-3 row under an unknown
-    // level-2 parent — level-1/2 creation stays admin-driven.
-    expect(updates.subcategory).toBe('Unknown Subcategory');
-    expect(updates.subSubcategory).toBe('WebRTC Servers');
+    // Level-1/2 creation stays admin-driven, so neither label can be placed
+    // in the hierarchy. Writing them would leave orphan labels that only the
+    // tree builder's fold hides (the ensureSubSubcategoryExists contract);
+    // the guesses remain available in metadata for an admin to act on.
+    expect(updates.subcategory).toBeUndefined();
+    expect(updates.subSubcategory).toBeUndefined();
     expect(repo.createCalls).toHaveLength(0);
   });
 

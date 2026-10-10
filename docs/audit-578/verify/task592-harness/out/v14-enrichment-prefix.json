@@ -1,0 +1,185 @@
+{
+  "started": "2026-10-10T17:42:25.601Z",
+  "steps": [
+    {
+      "at": "2026-10-10T17:42:26.626Z",
+      "name": "fixtures",
+      "R1": {
+        "id": 188686,
+        "url": "https://github.com/Netflix/vmaf"
+      },
+      "R2": {
+        "id": 188687,
+        "url": "https://github.com/shaka-project/shaka-packager",
+        "metadata": {
+          "tags": [
+            "qa-existing-tag"
+          ]
+        }
+      },
+      "approvedResourcesVisibleToRun": 2
+    },
+    {
+      "at": "2026-10-10T17:42:34.363Z",
+      "name": "run1-start",
+      "confirmDialog": "Start enrichment job? This starts a Claude AI enrichment run over unenriched resources in batches of 1. The job runs in the background and incurs real API cost. Cancel Start enrichment",
+      "status": 200,
+      "body": {
+        "success": true,
+        "jobId": 44,
+        "message": "Batch enrichment job started successfully"
+      }
+    },
+    {
+      "at": "2026-10-10T17:42:34.395Z",
+      "name": "run1-concurrent-start",
+      "status": 409,
+      "message": "Enrichment job #44 is already processing. Wait for it to finish or cancel it before starting a new one."
+    },
+    {
+      "at": "2026-10-10T17:42:42.883Z",
+      "name": "run1-poll",
+      "status": "processing",
+      "processed": 0,
+      "total": 1,
+      "events": 1,
+      "lastSeq": 0
+    },
+    {
+      "at": "2026-10-10T17:43:02.421Z",
+      "name": "run1-result",
+      "job": {
+        "status": "completed",
+        "total": 1,
+        "processed": 1,
+        "successful": 1,
+        "failed": 0,
+        "skipped": 0,
+        "error": null,
+        "hasAuthSecretField": false
+      },
+      "events": {
+        "count": 13,
+        "polledInOrder": true,
+        "afterSeqTailEmpty": true,
+        "types": [
+          "lifecycle",
+          "message",
+          "tool_call",
+          "tool_result",
+          "result"
+        ],
+        "first": [
+          "0:lifecycle:Run started (model cc/claude-haiku-4-5-20251001, maxTurns 16, budget $0.08)",
+          "1:message:(no text)",
+          "2:message:→ tools: mcp__enrichment__get_pending_batch"
+        ],
+        "costUsd": 0.0189
+      },
+      "secretsInJobOrEvents": false,
+      "R1": {
+        "aiEnriched": true,
+        "description": "__qa_test_plan_592_v14 untagged - A GitHub repository for video/multimedia development",
+        "category": "Encoding & Codecs",
+        "subcategory": "Encoding Tools"
+      },
+      "R2unchanged": true,
+      "auditR1": [
+        {
+          "action": "ai_enriched",
+          "performed_by": null,
+          "notes": "AI enrichment completed with confidence 0.95"
+        }
+      ]
+    },
+    {
+      "at": "2026-10-10T17:43:05.618Z",
+      "name": "B-started",
+      "pid": 10508,
+      "upMs": 3177
+    },
+    {
+      "at": "2026-10-10T17:43:41.248Z",
+      "name": "run2-cancel",
+      "jobId": 45,
+      "statusBeforeCancel": "processing",
+      "providerRequestsSeen": 1,
+      "afterKeepRunning": "processing",
+      "deleteStatus": 200,
+      "toast": "Job cancelled\nEnrichment job has been cancelled.",
+      "finalStatus": "cancelled",
+      "completedAt": "2026-10-10T17:43:18.737Z",
+      "queue": [
+        {
+          "status": "pending",
+          "n": 2
+        }
+      ],
+      "noWritesToR3After20s": true,
+      "eventsRetained": 2
+    },
+    {
+      "at": "2026-10-10T17:43:42.880Z",
+      "name": "run3-mid-run",
+      "start": 200,
+      "jobId": 46,
+      "status": "processing",
+      "startedAt": "2026-10-10T17:43:41.322Z",
+      "events": 1,
+      "providerRequestsSeen": 1
+    },
+    {
+      "at": "2026-10-10T17:43:50.002Z",
+      "name": "B-restarted",
+      "pid": 10668,
+      "upMs": 4108
+    },
+    {
+      "at": "2026-10-10T17:43:50.086Z",
+      "name": "run3-after-restart",
+      "status": "processing",
+      "newStartWhileOrphanPending": {
+        "status": 409,
+        "message": "Enrichment job #46 is already processing. Wait for it to finish or cancel it before starting a new one."
+      }
+    },
+    {
+      "at": "2026-10-10T17:48:51.757Z",
+      "name": "run3-recovered",
+      "status": "failed",
+      "error": "Orphaned by server restart",
+      "minutesAfterRestart": "5.1",
+      "eventsBefore": 1,
+      "eventsAfter": 1,
+      "priorEventsRetained": true
+    },
+    {
+      "at": "2026-10-10T17:48:57.889Z",
+      "name": "run4-new-run-after-recovery",
+      "start": 200,
+      "jobId": 47,
+      "deleteStatus": 200,
+      "finalStatus": "cancelled"
+    },
+    {
+      "at": "2026-10-10T17:49:05.100Z",
+      "name": "residue",
+      "fixtures": 0,
+      "users": 0,
+      "approved_restored": 1816,
+      "active_jobs": 0
+    }
+  ],
+  "jobIds": [
+    44,
+    45,
+    46,
+    47
+  ],
+  "residue": {
+    "fixtures": 0,
+    "users": 0,
+    "approved_restored": 1816,
+    "active_jobs": 0
+  }
+}

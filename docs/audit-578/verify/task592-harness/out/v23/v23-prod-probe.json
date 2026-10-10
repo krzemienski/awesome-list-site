@@ -1,0 +1,137 @@
+{
+  "base": "https://awesome.video",
+  "at": "2026-10-10T20:11:24.829Z",
+  "version": {
+    "revision": "572e6739578cbe2cc96ef6f607ba9b8a37ddabf4"
+  },
+  "paletteRoot": {
+    "system": "terminal",
+    "accent": "matrix"
+  },
+  "openedBy": "Control+k",
+  "selectedRow": "catEncoding & Codecscategory · 579→",
+  "captionStyles": {
+    "caption": "category · 579",
+    "color": "rgba(232, 232, 224, 0.62)",
+    "rowBg": "color(srgb 0 1 0.533333 / 0.12)"
+  },
+  "paletteAxe": {
+    "violations": [],
+    "passes": [
+      {
+        "target": "#radix-\\:rl\\: > .search-palette-kind-category.search-palette-kind",
+        "summary": {
+          "fgColor": "#00ff88",
+          "bgColor": "#042214",
+          "contrastRatio": 12.58,
+          "fontSize": "6.8pt (9px)",
+          "fontWeight": "normal",
+          "expectedContrastRatio": "4.5:1"
+        }
+      },
+      {
+        "target": "#radix-\\:rl\\: > .search-palette-copy > span",
+        "summary": {
+          "fgColor": "#00ff88",
+          "bgColor": "#042214",
+          "contrastRatio": 12.58,
+          "fontSize": "10.1pt (13.5px)",
+          "fontWeight": "normal",
+          "expectedContrastRatio": "4.5:1"
+        }
+      },
+      {
+        "target": "#radix-\\:rl\\: > .search-palette-copy > small",
+        "summary": {
+          "fgColor": "#919d92",
+          "bgColor": "#042214",
+          "contrastRatio": 5.98,
+          "fontSize": "8.3pt (11px)",
+          "fontWeight": "normal",
+          "expectedContrastRatio": "4.5:1"
+        }
+      }
+    ],
+    "incomplete": [
+      {
+        "target": "#radix-\\:rl\\: > .search-palette-arrow[aria-hidden=\"true\"]",
+        "summary": {
+          "messageKey": "nonBmp"
+        }
+      }
+    ]
+  },
+  "paletteWrites": [],
+  "explorerReal": [
+    {
+      "name": "Community & Events",
+      "spanRight": 239,
+      "cardRight": 376,
+      "inside": true,
+      "lines": 1
+    },
+    {
+      "name": "Encoding & Codecs",
+      "spanRight": 578,
+      "cardRight": 728,
+      "inside": true,
+      "lines": 1
+    },
+    {
+      "name": "General Tools",
+      "spanRight": 180,
+      "cardRight": 376,
+      "inside": true,
+      "lines": 1
+    },
+    {
+      "name": "Infrastructure & Delivery",
+      "spanRight": 621,
+      "cardRight": 728,
+      "inside": true,
+      "lines": 1
+    },
+    {
+      "name": "Intro & Learning",
+      "spanRight": 196,
+      "cardRight": 376,
+      "inside": true,
+      "lines": 1
+    },
+    {
+      "name": "Media Tools",
+      "spanRight": 519,
+      "cardRight": 728,
+      "inside": true,
+      "lines": 1
+    },
+    {
+      "name": "Players & Clients",
+      "spanRight": 206,
+      "cardRight": 376,
+      "inside": true,
+      "lines": 1
+    },
+    {
+      "name": "Protocols & Transport",
+      "spanRight": 597,
+      "cardRight": 728,
+      "inside": true,
+      "lines": 1
+    },
+    {
+      "name": "Standards & Industry",
+      "spanRight": 238,
+      "cardRight": 376,
+      "inside": true,
+      "lines": 1
+    }
+  ],
+  "explorerLong": {
+    "name": "__qa_test_plan_592_SupercalifragilisticexpialidociousSuperca",
+    "spanRight": 307,
+    "cardRight": 376,
+    "inside": true,
+    "lines": 5
+  }
+}

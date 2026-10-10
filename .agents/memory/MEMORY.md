@@ -172,3 +172,6 @@
 - [Before-fix proof instance](before-fix-proof-instance.md) — run pre-fix code from a /tmp copy + git show HEAD files on a 2nd port; worktree blocked, nohup dies; use run_in_background.
 - [Initial bundle zod boundary](initial-bundle-zod-boundary.md) — shell-reachable shared code must import resourceFacets-core; zod in entry failed publish; diff vs last-published build in /tmp.
 - [ESLint ratchet](eslint-ratchet.md) — app correctness rules held at 0, rest per-file ratchet that only shrinks; Node API needs TSESTREE_SINGLE_RUN=true to match CLI counts.
+- [Initial bundle zod-free](initial-bundle-zod.md) — shell imports must use resourceFacets-core; zod in App.tsx graph blew bundle-budget and blocked publish; run the publish gate before asking to republish.
+- [og-middleware outage shell](og-middleware-outage-shell.md) — DB outage: HTML navigations get SPA shell + 503/Retry-After (client error card), non-HTML keeps JSON 503 (resilience gate contract).
+- [Publish gate offline repro](pre-publish-gate-offline-repro.md) — run pre-publish-gate.sh --publish in a /tmp tar copy (keep .agents+docs, BUILD_REVISION set, bogus DATABASE_URL) to prove blocking.

@@ -1,0 +1,25 @@
+{
+  "started": "2026-10-10T19:09:28.511Z",
+  "steps": [
+    {
+      "at": "2026-10-10T19:09:44.690Z",
+      "name": "validate",
+      "fixtureId": 27,
+      "status": 200,
+      "valid": true,
+      "errors": [],
+      "warningsCount": 6,
+      "hasErrorsExpander": 0,
+      "panelText": "Validation Results Awesome-lint compliance check on exported markdown PASSED 6 resources, 3 categories Warnings (6)",
+      "toasts": "Validation Complete\nAwesome list validation has been completed."
+    },
+    {
+      "at": "2026-10-10T19:09:48.941Z",
+      "name": "cleanup",
+      "residue": {
+        "qa_users": 0,
+        "v18_resources": 0
+      }
+    }
+  ]
+}

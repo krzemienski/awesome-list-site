@@ -460,9 +460,16 @@ function StepsDialog({
         method: "POST",
         body: JSON.stringify({ stepGroups }),
       }),
-    onSuccess: () => invalidate(),
-    onError: (err: Error) =>
-      toast({ title: "Could not reorder", description: stepWriteError(err), variant: "destructive" }),
+    // Keep the mutation pending until the reordered list has been refetched, so
+    // the focus restore below runs against the final DOM order.
+    onSuccess: async () => {
+      await queryClient.invalidateQueries({ queryKey: ["/api/admin/journeys", journeyId, "steps"] });
+      invalidate();
+    },
+    onError: (err: Error) => {
+      focusAfterMove.current = null;
+      toast({ title: "Could not reorder", description: stepWriteError(err), variant: "destructive" });
+    },
   });
 
   const [createOpen, setCreateOpen] = useState(false);
@@ -470,9 +477,27 @@ function StepsDialog({
   const [deletingGroup, setDeletingGroup] = useState<StepGroup | null>(null);
   const [removingRow, setRemovingRow] = useState<JourneyStep | null>(null);
 
+  // The arrow buttons are disabled while a reorder is in flight and React moves
+  // the card's DOM node, both of which drop keyboard focus to the dialog. Put
+  // it back on the moved card's arrow (the other arrow at a list boundary).
+  const focusAfterMove = useRef<{ id: number; direction: -1 | 1 } | null>(null);
+  useEffect(() => {
+    const target = focusAfterMove.current;
+    if (!target || reorderMutation.isPending) return;
+    focusAfterMove.current = null;
+    const preferred = document.querySelector<HTMLButtonElement>(
+      `[data-testid="step-${target.direction === -1 ? "up" : "down"}-${target.id}"]`,
+    );
+    const fallback = document.querySelector<HTMLButtonElement>(
+      `[data-testid="step-${target.direction === -1 ? "down" : "up"}-${target.id}"]`,
+    );
+    (preferred && !preferred.disabled ? preferred : fallback)?.focus();
+  }, [groups, reorderMutation.isPending]);
+
   const move = (index: number, direction: -1 | 1) => {
     const target = index + direction;
     if (target < 0 || target >= groups.length) return;
+    focusAfterMove.current = { id: groups[index].rows[0].id, direction };
     const next = [...groups];
     [next[index], next[target]] = [next[target], next[index]];
     reorderMutation.mutate(next.map((g) => g.rows.map((r) => r.id)));

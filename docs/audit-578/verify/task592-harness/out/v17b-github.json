@@ -1,0 +1,257 @@
+{
+  "started": "2026-10-10T18:44:37.611Z",
+  "steps": [
+    {
+      "at": "2026-10-10T18:44:52.372Z",
+      "name": "C-normal-up",
+      "upMs": 9824,
+      "remoteHead": "13097d939b97998e61df18dec2d5a3d400d2108a",
+      "remoteMessage": "Initial awesome list export",
+      "rawWaitMs": 167
+    },
+    {
+      "at": "2026-10-10T18:45:10.476Z",
+      "name": "roundtrip-pull-after-fix",
+      "status": 200,
+      "body": {
+        "message": "Import started",
+        "queueId": 8,
+        "status": "processing"
+      },
+      "final": {
+        "id": 8,
+        "action": "import",
+        "status": "completed",
+        "branch": "main",
+        "error_message": "Category hierarchy error: Failed to create or find category: qatestplan592v16 Cat C - Category name or slug already exists; choose a unique name and slug; Category hierarchy error: Failed to create or find category: qatestplan592v16 Cat A - Category name or slug already exists; choose a unique name and slug; Category hierarchy error: Failed to create or find category: qatestplan592v16 Cat A - Category name or slug already exists; choose a unique name and slug; Category hierarchy error: Failed to create or find category: qatestplan592v16 Cat A - Category name or slug already exists; choose a unique name and slug; Category hierarchy error: Failed to create or find category: qatestplan592v16 Cat B - Category name or slug already exists; choose a unique name and slug",
+        "metadata": {
+          "errors": 5,
+          "outcome": "partial",
+          "skipped": 5,
+          "updated": 5,
+          "imported": 0,
+          "errorMessages": [
+            "Category hierarchy error: Failed to create or find category: qatestplan592v16 Cat C - Category name or slug already exists; choose a unique name and slug",
+            "Category hierarchy error: Failed to create or find category: qatestplan592v16 Cat A - Category name or slug already exists; choose a unique name and slug",
+            "Category hierarchy error: Failed to create or find category: qatestplan592v16 Cat A - Category name or slug already exists; choose a unique name and slug",
+            "Category hierarchy error: Failed to create or find category: qatestplan592v16 Cat A - Category name or slug already exists; choose a unique name and slug",
+            "Category hierarchy error: Failed to create or find category: qatestplan592v16 Cat B - Category name or slug already exists; choose a unique name and slug"
+          ]
+        },
+        "created_at": "2026-10-10T18:45:04.484Z",
+        "processed_at": "2026-10-10T18:45:04.722Z",
+        "ms": 1515
+      },
+      "uiCounts": "Imported: 0; updated: 5; skipped: 5; failed: 5.",
+      "uiErrors": "Category hierarchy error: Failed to create or find category: qatestplan592v16 Cat C - Category name or slug already exists; choose a unique name and slug\nCategory hierarchy error: Failed to create or find category: qatestplan592v16 Cat A - Category name or slug already exists; choose a unique name and slug\nCategory hierarchy error: Failed to create or find category: qatestplan592v16 Cat A - Category name or slug already exists; choose a unique name and slug\nCategory hierarchy error: Failed to create or find category: qatestplan592v16 Cat A - Category name or slug already exists; choose a unique name and slug\nCategory hierarchy error: Failed to create or find category: qatestplan592v16 Cat B - Category name or slug already exists; choose a unique name and slug",
+      "toasts": "",
+      "jobsText": "Jobs Import main Oct 10, 2026, 06:45 PM PARTIAL Imported: 0; updated: 5; skipped: 5; failed: 5. Category hierarchy error: Failed to create or find category: qatestplan592v16 Cat C - Category name or slug already exists; choose a unique name and slug Category hierarchy error: Failed to create or find category: qatestplan592v16 Cat A - Category name or slug already exists; choose a unique name and slug Category hierarchy error: Failed to create or find category: qatestplan592v16 Cat A - Category name or slug already exists; choose a unique name and slug Category hierarchy error: Failed to create or ",
+      "resourcesBefore": 10,
+      "resourcesAfter": 10,
+      "updatedAtChangedIds": [
+        2,
+        3,
+        6,
+        7,
+        8
+      ],
+      "updatedAuditRowsAdded": 5
+    },
+    {
+      "at": "2026-10-10T18:45:17.546Z",
+      "name": "C-badcreds-up",
+      "upMs": 3055
+    },
+    {
+      "at": "2026-10-10T18:46:37.377Z",
+      "name": "bad-credentials",
+      "configure": {
+        "status": 400,
+        "json": {
+          "success": false,
+          "message": "Configuration failed: Bad credentials - https://docs.github.com/rest",
+          "hasAccess": false,
+          "error": "validation_failed",
+          "fieldErrors": {},
+          "errors": []
+        },
+        "text": "{\"success\":false,\"message\":\"Configuration failed: Bad credentials - https://docs.github.com/rest\",\"hasAccess\":false,\"error\":\"validation_failed\",\"fieldErrors\":{},\"errors\":[]}"
+      },
+      "export": {
+        "status": 200,
+        "body": {
+          "message": "Export started",
+          "queueId": 9,
+          "status": "processing"
+        },
+        "final": {
+          "id": 9,
+          "action": "export",
+          "status": "failed",
+          "branch": null,
+          "error_message": "Export failed: No working GitHub credentials. Re-authorize the Replit GitHub connection or refresh the GITHUB_PERSONAL_ACCESS_TOKEN secret.",
+          "metadata": {
+            "createPullRequest": false
+          },
+          "created_at": "2026-10-10T18:45:24.899Z",
+          "processed_at": "2026-10-10T18:45:25.073Z",
+          "ms": 1518
+        },
+        "uiCounts": null,
+        "uiErrors": null,
+        "toasts": "",
+        "jobsText": "Jobs Export Oct 10, 2026, 06:45 PM FAILED Export failed: No working GitHub credentials. Re-authorize the Replit GitHub connection or refresh the GITHUB_PERSONAL_ACCESS_TOKEN secret. Import main Oct 10, 2026, 06:45 PM PARTIAL Imported: 0; updated: 5; skipped: 5; failed: 5. Category hierarchy error: Failed to create or find category: qatestplan592v16 Cat C - Category name or slug already exists; choose a unique name and slug Category hierarchy error: Failed to create or find category: qatestplan592v16 Cat A - Category name or slug already exists; choose a unique name and slug Category hierarchy erro"
+      },
+      "import": {
+        "status": 200,
+        "body": {
+          "message": "Import started",
+          "queueId": 10,
+          "status": "processing"
+        },
+        "final": {
+          "id": 10,
+          "action": "import",
+          "status": "failed",
+          "branch": null,
+          "error_message": "Import failed: File not found: README.md in krzemienski/__qa_test_plan_592_gh",
+          "metadata": {
+            "errors": 1,
+            "outcome": "failed",
+            "skipped": 0,
+            "updated": 0,
+            "imported": 0,
+            "errorMessages": [
+              "Import failed: File not found: README.md in krzemienski/__qa_test_plan_592_gh"
+            ]
+          },
+          "created_at": "2026-10-10T18:46:31.170Z",
+          "processed_at": "2026-10-10T18:46:31.490Z",
+          "ms": 1515
+        },
+        "uiCounts": "Imported: 0; updated: 0; skipped: 0; failed: 1.",
+        "uiErrors": "Import failed: File not found: README.md in krzemienski/__qa_test_plan_592_gh",
+        "toasts": "",
+        "jobsText": "Jobs Import Oct 10, 2026, 06:46 PM FAILED Imported: 0; updated: 0; skipped: 0; failed: 1. Import failed: File not found: README.md in krzemienski/__qa_test_plan_592_gh Export Oct 10, 2026, 06:45 PM FAILED Export failed: No working GitHub credentials. Re-authorize the Replit GitHub connection or refresh the GITHUB_PERSONAL_ACCESS_TOKEN secret. Import main Oct 10, 2026, 06:45 PM PARTIAL Imported: 0; updated: 5; skipped: 5; failed: 5. Category hierarchy error: Failed to create or find category: qatestplan592v16 Cat C - Category name or slug already exists; choose a unique name and slug Category hiera"
+      },
+      "remoteUnchanged": true,
+      "log": [
+        "Replit GitHub connector unavailable: getaddrinfo ENOTFOUND qa592-connector.invalid",
+        "GitHub personal access token was rejected by GitHub (bad credentials).",
+        "GitHub export error: Export failed: No working GitHub credentials. Re-authorize the Replit GitHub connection or refresh the GITHUB_PERSONAL_ACCESS_TOKEN secret.",
+        "  'Export failed: No working GitHub credentials. Re-authorize the Replit GitHub connection or refresh the GITHUB_PERSONAL_ACCESS_TOKEN secret.'"
+      ]
+    },
+    {
+      "at": "2026-10-10T18:46:54.890Z",
+      "name": "C-hang-up",
+      "upMs": 13132
+    },
+    {
+      "at": "2026-10-10T18:47:19.314Z",
+      "name": "killed-mid-job",
+      "start": {
+        "status": 200,
+        "json": {
+          "message": "Export started",
+          "queueId": 11,
+          "status": "processing"
+        },
+        "text": "{\"message\":\"Export started\",\"queueId\":11,\"status\":\"processing\"}"
+      },
+      "during": {
+        "id": 11,
+        "action": "export",
+        "status": "processing",
+        "branch": null,
+        "error_message": null,
+        "metadata": {},
+        "created_at": "2026-10-10T18:46:55.264Z",
+        "processed_at": null
+      },
+      "afterKill": {
+        "id": 11,
+        "action": "export",
+        "status": "processing",
+        "branch": null,
+        "error_message": null,
+        "metadata": {},
+        "created_at": "2026-10-10T18:46:55.264Z",
+        "processed_at": null
+      }
+    },
+    {
+      "at": "2026-10-10T18:52:45.679Z",
+      "name": "orphan-watchdog",
+      "upMs": 3072,
+      "waitedMs": 323287,
+      "final": {
+        "id": 11,
+        "action": "export",
+        "status": "failed",
+        "branch": null,
+        "error_message": "Orphaned by server restart",
+        "metadata": {},
+        "created_at": "2026-10-10T18:46:55.264Z",
+        "processed_at": "2026-10-10T18:52:22.303Z"
+      },
+      "uiExcerpt": "t 10, 2026, 06:52 PM · 11 sync jobs Pull Sync now Target Repository Format: owner/repository (configured: krzemienski/awesome-video) Sync Status 4 FAILED 4 of 11 recent sync jobs failed Latest error: Orphaned by server restart Review the latest error before retrying the sync. Last Export FAILED OCT 10, 20"
+    },
+    {
+      "at": "2026-10-10T18:52:51.595Z",
+      "name": "recovery-pull",
+      "status": 200,
+      "body": {
+        "message": "Import started",
+        "queueId": 12,
+        "status": "processing"
+      },
+      "final": {
+        "id": 12,
+        "action": "import",
+        "status": "failed",
+        "branch": "main",
+        "error_message": "Category hierarchy error: Failed to create or find category: qatestplan592v16 Cat C - Category name or slug already exists; choose a unique name and slug; Category hierarchy error: Failed to create or find category: qatestplan592v16 Cat A - Category name or slug already exists; choose a unique name and slug; Category hierarchy error: Failed to create or find category: qatestplan592v16 Cat A - Category name or slug already exists; choose a unique name and slug; Category hierarchy error: Failed to create or find category: qatestplan592v16 Cat A - Category name or slug already exists; choose a unique name and slug; Category hierarchy error: Failed to create or find category: qatestplan592v16 Cat B - Category name or slug already exists; choose a unique name and slug",
+        "metadata": {
+          "errors": 5,
+          "outcome": "failed",
+          "skipped": 10,
+          "updated": 0,
+          "imported": 0,
+          "errorMessages": [
+            "Category hierarchy error: Failed to create or find category: qatestplan592v16 Cat C - Category name or slug already exists; choose a unique name and slug",
+            "Category hierarchy error: Failed to create or find category: qatestplan592v16 Cat A - Category name or slug already exists; choose a unique name and slug",
+            "Category hierarchy error: Failed to create or find category: qatestplan592v16 Cat A - Category name or slug already exists; choose a unique name and slug",
+            "Category hierarchy error: Failed to create or find category: qatestplan592v16 Cat A - Category name or slug already exists; choose a unique name and slug",
+            "Category hierarchy error: Failed to create or find category: qatestplan592v16 Cat B - Category name or slug already exists; choose a unique name and slug"
+          ]
+        },
+        "created_at": "2026-10-10T18:52:45.995Z",
+        "processed_at": "2026-10-10T18:52:46.249Z",
+        "ms": 1524
+      },
+      "uiCounts": "Imported: 0; updated: 0; skipped: 10; failed: 5.",
+      "uiErrors": "Category hierarchy error: Failed to create or find category: qatestplan592v16 Cat C - Category name or slug already exists; choose a unique name and slug\nCategory hierarchy error: Failed to create or find category: qatestplan592v16 Cat A - Category name or slug already exists; choose a unique name and slug\nCategory hierarchy error: Failed to create or find category: qatestplan592v16 Cat A - Category name or slug already exists; choose a unique name and slug\nCategory hierarchy error: Failed to create or find category: qatestplan592v16 Cat A - Category name or slug already exists; choose a unique name and slug\nCategory hierarchy error: Failed to create or find category: qatestplan592v16 Cat B - Category name or slug already exists; choose a unique name and slug",
+      "toasts": "",
+      "jobsText": "Jobs Import main Oct 10, 2026, 06:52 PM FAILED Imported: 0; updated: 0; skipped: 10; failed: 5. Category hierarchy error: Failed to create or find category: qatestplan592v16 Cat C - Category name or slug already exists; choose a unique name and slug Category hierarchy error: Failed to create or find category: qatestplan592v16 Cat A - Category name or slug already exists; choose a unique name and slug Category hierarchy error: Failed to create or find category: qatestplan592v16 Cat A - Category name or slug already exists; choose a unique name and slug Category hierarchy error: Failed to create or "
+    },
+    {
+      "at": "2026-10-10T18:53:01.356Z",
+      "name": "cleanup",
+      "repo": {
+        "deleteStatus": 204,
+        "getAfter": 404
+      },
+      "residue": {
+        "qa_users": 0
+      }
+    }
+  ],
+  "repoDeleted": {
+    "deleteStatus": 204,
+    "getAfter": 404
+  },
+  "residue": {
+    "qa_users": 0
+  }
+}

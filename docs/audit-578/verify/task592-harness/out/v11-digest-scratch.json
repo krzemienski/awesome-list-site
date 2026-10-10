@@ -1,0 +1,303 @@
+{
+  "started": "2026-10-10T16:56:39.279Z",
+  "steps": [
+    {
+      "name": "setup",
+      "eligibleOtherUsersOnScratch": 0,
+      "putStatus": 200,
+      "previewStatus": 200,
+      "preview": {
+        "itemCount": 2,
+        "sections": [
+          [
+            "Watch next",
+            [
+              "MPEG Standards Documentation"
+            ]
+          ],
+          [
+            "Continue your journey",
+            [
+              "Introduction to Video Streaming"
+            ]
+          ]
+        ]
+      }
+    },
+    {
+      "name": "cycle1",
+      "result": {
+        "recovered": 0,
+        "queued": 2,
+        "processed": 2,
+        "cleaned": {
+          "notifications": 0,
+          "jobs": 0,
+          "tokens": 0
+        }
+      },
+      "jobs": [
+        {
+          "id": 5,
+          "channel": "email",
+          "status": "sent",
+          "attempt_count": 1,
+          "max_attempts": 3,
+          "policy_version": 1,
+          "last_error_code": null,
+          "worker_id": null,
+          "backoff_pending": false
+        },
+        {
+          "id": 6,
+          "channel": "in_app",
+          "status": "sent",
+          "attempt_count": 1,
+          "max_attempts": 3,
+          "policy_version": 1,
+          "last_error_code": null,
+          "worker_id": null,
+          "backoff_pending": false
+        }
+      ],
+      "attempts": [
+        {
+          "job_id": 5,
+          "attempt_number": 1,
+          "outcome": "sent",
+          "error_code": null,
+          "provider_message_id": "1a126beeb4524611"
+        },
+        {
+          "job_id": 6,
+          "attempt_number": 1,
+          "outcome": "sent",
+          "error_code": null,
+          "provider_message_id": null
+        }
+      ],
+      "unsubscribeTokens": {
+        "c": 1,
+        "ttl": {
+          "days": 399,
+          "hours": 23,
+          "minutes": 59,
+          "seconds": 59,
+          "milliseconds": 366.377
+        },
+        "hashed": true
+      },
+      "prefs": {
+        "email_stamped": true,
+        "inapp_stamped": true
+      }
+    },
+    {
+      "name": "gmail-readback",
+      "status": 403,
+      "body": "{\n  \"error\": {\n    \"code\": 403,\n    \"message\": \"Missing access token for authorization. Request: MailboxService.GetMessage\",\n    \"errors\": [\n      {\n        \"message\": \"Missing access token for authorization. Request: MailboxService.GetMessage\",\n        \"domain\": \"global\",\n        \"reason\": \"forbidden\"\n      }\n    ],\n    \"status\": \"PERMISSION_DENIED\"\n  }\n}\n"
+    },
+    {
+      "name": "cycle2-same-period",
+      "result": {
+        "recovered": 0,
+        "queued": 0,
+        "processed": 0,
+        "cleaned": {
+          "notifications": 0,
+          "jobs": 0,
+          "tokens": 0
+        }
+      },
+      "jobCount": 2,
+      "sentAttempts": 2
+    },
+    {
+      "name": "in-app",
+      "before": {
+        "unread": 2,
+        "total": 2,
+        "titles": [
+          "Introduction to Video Streaming",
+          "MPEG Standards Documentation"
+        ]
+      },
+      "markOne": 200,
+      "headerAfterOne": "1 unread",
+      "afterOne": 1,
+      "markAll": [
+        200,
+        {
+          "updated": 1
+        }
+      ],
+      "afterAll": 0,
+      "headerAfterAll": "All caught up",
+      "markAllButtonGone": true,
+      "pageErrors": []
+    },
+    {
+      "name": "provider-rejection",
+      "rejection": [
+        {
+          "cycle": 1,
+          "queued": 1,
+          "processed": 1,
+          "job": {
+            "id": 7,
+            "channel": "email",
+            "status": "queued",
+            "attempt_count": 1,
+            "max_attempts": 3,
+            "policy_version": 2,
+            "last_error_code": "transport_send_failed",
+            "worker_id": null,
+            "backoff_pending": true
+          }
+        },
+        {
+          "cycle": 2,
+          "queued": 0,
+          "processed": 1,
+          "job": {
+            "id": 7,
+            "channel": "email",
+            "status": "queued",
+            "attempt_count": 2,
+            "max_attempts": 3,
+            "policy_version": 2,
+            "last_error_code": "transport_send_failed",
+            "worker_id": null,
+            "backoff_pending": true
+          }
+        },
+        {
+          "cycle": 3,
+          "queued": 0,
+          "processed": 1,
+          "job": {
+            "id": 7,
+            "channel": "email",
+            "status": "failed",
+            "attempt_count": 3,
+            "max_attempts": 3,
+            "policy_version": 2,
+            "last_error_code": "transport_send_failed",
+            "worker_id": null,
+            "backoff_pending": true
+          }
+        }
+      ],
+      "attempts": [
+        {
+          "job_id": 7,
+          "attempt_number": 1,
+          "outcome": "failed",
+          "error_code": "transport_send_failed",
+          "provider_message_id": null
+        },
+        {
+          "job_id": 7,
+          "attempt_number": 2,
+          "outcome": "failed",
+          "error_code": "transport_send_failed",
+          "provider_message_id": null
+        },
+        {
+          "job_id": 7,
+          "attempt_number": 3,
+          "outcome": "failed",
+          "error_code": "transport_send_failed",
+          "provider_message_id": null
+        }
+      ]
+    },
+    {
+      "name": "after-exhaustion",
+      "result": {
+        "recovered": 0,
+        "queued": 0,
+        "processed": 0,
+        "cleaned": {
+          "notifications": 0,
+          "jobs": 0,
+          "tokens": 0
+        }
+      },
+      "jobsForPolicy": 1
+    },
+    {
+      "name": "lease-recovery",
+      "result": {
+        "recovered": 1,
+        "queued": 0,
+        "processed": 0,
+        "cleaned": {
+          "notifications": 0,
+          "jobs": 0,
+          "tokens": 0
+        }
+      },
+      "job": {
+        "id": 11,
+        "channel": "email",
+        "status": "failed",
+        "attempt_count": 1,
+        "max_attempts": 3,
+        "policy_version": 3,
+        "last_error_code": "delivery_unknown_after_worker_restart",
+        "worker_id": null,
+        "backoff_pending": false
+      },
+      "attempt": [
+        {
+          "job_id": 11,
+          "attempt_number": 1,
+          "outcome": "delivery_unknown",
+          "error_code": "worker_lease_expired",
+          "provider_message_id": null
+        }
+      ],
+      "newEmailJobsQueued": 0,
+      "providerSendsBefore": 1,
+      "providerSendsAfter": 1,
+      "emailStamped": true
+    },
+    {
+      "name": "admin-health",
+      "status": 200,
+      "body": {
+        "transport": {
+          "available": true
+        },
+        "queue": {
+          "email": {
+            "failed": 2,
+            "sent": 1
+          },
+          "in_app": {
+            "sent": 1
+          }
+        },
+        "recentFailureCodes": [
+          {
+            "code": "delivery_unknown_after_worker_restart",
+            "count": 1
+          },
+          {
+            "code": "transport_send_failed",
+            "count": 1
+          }
+        ],
+        "oldestQueuedAt": null
+      }
+    }
+  ],
+  "residue": {
+    "users": 0,
+    "jobs": 0,
+    "notifications": 0,
+    "tokens": 0,
+    "bookmarks": 0
+  }
+}

@@ -1,0 +1,190 @@
+{
+  "started": "2026-10-10T18:17:25.822Z",
+  "steps": [
+    {
+      "at": "2026-10-10T18:17:39.869Z",
+      "name": "pre-fix-state-left-by-v16",
+      "p6": {
+        "id": 6,
+        "subcategory": "__qa_test_plan_592_v16 Sub C1",
+        "sub_subcategory": "__qa_test_plan_592_v16 Leaf C1x",
+        "sub_row_exists": false
+      }
+    },
+    {
+      "at": "2026-10-10T18:17:40.267Z",
+      "name": "E012-after-fix",
+      "before": [
+        {
+          "id": 2,
+          "title": "__qa_test_plan_592_v16 P2",
+          "category": "__qa_test_plan_592_v16 Cat A",
+          "subcategory": "__qa_test_plan_592_v16 Sub A1",
+          "sub_subcategory": null,
+          "s_sub": null,
+          "s_ss": "__qa_test_plan_592_v16 Leaf A1 second"
+        },
+        {
+          "id": 3,
+          "title": "__qa_test_plan_592_v16 P3",
+          "category": "__qa_test_plan_592_v16 Cat B",
+          "subcategory": null,
+          "sub_subcategory": null,
+          "s_sub": "__qa_test_plan_592_v16 Sub A1",
+          "s_ss": "__qa_test_plan_592_v16 Leaf B wrong parent"
+        },
+        {
+          "id": 6,
+          "title": "__qa_test_plan_592_v16 P6",
+          "category": "__qa_test_plan_592_v16 Cat C",
+          "subcategory": null,
+          "sub_subcategory": null,
+          "s_sub": "__qa_test_plan_592_v16 Sub C1",
+          "s_ss": "__qa_test_plan_592_v16 Leaf C1x"
+        }
+      ],
+      "subSubBefore": [
+        {
+          "id": 3,
+          "name": "__qa_test_plan_592_v16 Leaf A1x",
+          "subcategory_id": 3
+        },
+        {
+          "id": 4,
+          "name": "__qa_test_plan_592_v16 Leaf A1 new",
+          "subcategory_id": 3
+        }
+      ],
+      "first": {
+        "status": 200,
+        "json": {
+          "success": true,
+          "message": "Backfill complete: 1/3 resources updated, 1 sub_subcategories created",
+          "report": {
+            "scanned": 3,
+            "resourcesUpdated": 1,
+            "subSubcategoriesCreated": 1,
+            "updatedIds": [
+              2
+            ],
+            "errors": []
+          }
+        }
+      },
+      "afterFirst": [
+        {
+          "id": 2,
+          "title": "__qa_test_plan_592_v16 P2",
+          "category": "__qa_test_plan_592_v16 Cat A",
+          "subcategory": "__qa_test_plan_592_v16 Sub A1",
+          "sub_subcategory": "__qa_test_plan_592_v16 Leaf A1 second",
+          "s_sub": null,
+          "s_ss": "__qa_test_plan_592_v16 Leaf A1 second"
+        },
+        {
+          "id": 3,
+          "title": "__qa_test_plan_592_v16 P3",
+          "category": "__qa_test_plan_592_v16 Cat B",
+          "subcategory": null,
+          "sub_subcategory": null,
+          "s_sub": "__qa_test_plan_592_v16 Sub A1",
+          "s_ss": "__qa_test_plan_592_v16 Leaf B wrong parent"
+        },
+        {
+          "id": 6,
+          "title": "__qa_test_plan_592_v16 P6",
+          "category": "__qa_test_plan_592_v16 Cat C",
+          "subcategory": null,
+          "sub_subcategory": null,
+          "s_sub": "__qa_test_plan_592_v16 Sub C1",
+          "s_ss": "__qa_test_plan_592_v16 Leaf C1x"
+        }
+      ],
+      "second": {
+        "status": 200,
+        "json": {
+          "success": true,
+          "message": "Backfill complete: 0/2 resources updated, 0 sub_subcategories created",
+          "report": {
+            "scanned": 2,
+            "resourcesUpdated": 0,
+            "subSubcategoriesCreated": 0,
+            "updatedIds": [],
+            "errors": []
+          }
+        }
+      },
+      "after": [
+        {
+          "id": 2,
+          "title": "__qa_test_plan_592_v16 P2",
+          "category": "__qa_test_plan_592_v16 Cat A",
+          "subcategory": "__qa_test_plan_592_v16 Sub A1",
+          "sub_subcategory": "__qa_test_plan_592_v16 Leaf A1 second",
+          "s_sub": null,
+          "s_ss": "__qa_test_plan_592_v16 Leaf A1 second"
+        },
+        {
+          "id": 3,
+          "title": "__qa_test_plan_592_v16 P3",
+          "category": "__qa_test_plan_592_v16 Cat B",
+          "subcategory": null,
+          "sub_subcategory": null,
+          "s_sub": "__qa_test_plan_592_v16 Sub A1",
+          "s_ss": "__qa_test_plan_592_v16 Leaf B wrong parent"
+        },
+        {
+          "id": 6,
+          "title": "__qa_test_plan_592_v16 P6",
+          "category": "__qa_test_plan_592_v16 Cat C",
+          "subcategory": null,
+          "sub_subcategory": null,
+          "s_sub": "__qa_test_plan_592_v16 Sub C1",
+          "s_ss": "__qa_test_plan_592_v16 Leaf C1x"
+        }
+      ],
+      "subSubAfter": [
+        {
+          "id": 3,
+          "name": "__qa_test_plan_592_v16 Leaf A1x",
+          "subcategory_id": 3
+        },
+        {
+          "id": 4,
+          "name": "__qa_test_plan_592_v16 Leaf A1 new",
+          "subcategory_id": 3
+        },
+        {
+          "id": 5,
+          "name": "__qa_test_plan_592_v16 Leaf A1 second",
+          "subcategory_id": 3
+        }
+      ],
+      "orphanSubcategoryLabels": 0,
+      "publicP2": {
+        "subcategory": "__qa_test_plan_592_v16 Sub A1",
+        "subSubcategory": "__qa_test_plan_592_v16 Leaf A1 second"
+      }
+    },
+    {
+      "at": "2026-10-10T18:17:53.296Z",
+      "name": "reseed-confirm-guard",
+      "disabled": {
+        "empty": true,
+        "partial": true,
+        "wrongWord": true,
+        "caseInsensitiveTrimmed": false
+      },
+      "dialogClosed": true,
+      "unchanged": true
+    },
+    {
+      "at": "2026-10-10T18:17:55.030Z",
+      "name": "residue",
+      "qa_users": 0
+    }
+  ],
+  "residue": {
+    "qa_users": 0
+  }
+}

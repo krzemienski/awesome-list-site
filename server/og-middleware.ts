@@ -2420,6 +2420,10 @@ export function ogInjectionMiddleware() {
 
     let meta: RouteMeta;
     let notFound = false;
+    // Task 592 V20: set when route resolution hit a bounded dependency failure
+    // on a browser navigation — the SPA shell is still served (with HTTP 503 +
+    // Retry-After) so the client can render its own error card and Retry.
+    let dependencyUnavailable = false;
     let bodyHtml: string | undefined;
     if (forcedNotFound) {
       // Malformed ?page short-circuits the resolver entirely so the junk URL
@@ -2451,15 +2455,28 @@ export function ogInjectionMiddleware() {
             urlPath,
             String((e as any)?.message ?? e),
           );
-          return res
-            .status(503)
-            .set("Retry-After", "1")
-            .json({ message: "Service is temporarily unavailable" });
+          // Task 592 V20: a browser navigation (Accept: text/html) used to get
+          // a raw JSON body here, so a visitor saw `{"message":…}` instead of
+          // the app's catalog error card + Retry. Browsers now get the SPA
+          // shell with the same 503 + Retry-After (crawlers treat 5xx as
+          // transient and ignore the body); non-HTML clients — including the
+          // cheap cache-admission rejection probed by the resilience gate —
+          // keep the generic JSON body.
+          if (!String(req.headers.accept ?? "").includes("text/html")) {
+            return res
+              .status(503)
+              .set("Retry-After", "1")
+              .json({ message: "Service is temporarily unavailable" });
+          }
+          dependencyUnavailable = true;
+          meta = defaultMeta(urlPath);
+          notFound = false;
+        } else {
+          console.warn("[og-middleware] meta lookup failed for", urlPath, e);
+          // Fail open: never demote a real page to 404 on a transient lookup error.
+          meta = defaultMeta(urlPath);
+          notFound = false;
         }
-        console.warn("[og-middleware] meta lookup failed for", urlPath, e);
-        // Fail open: never demote a real page to 404 on a transient lookup error.
-        meta = defaultMeta(urlPath);
-        notFound = false;
       } finally {
         req.off("aborted", abortRouteResolution);
         res.off("close", abortRouteResolution);
@@ -2499,6 +2516,10 @@ export function ogInjectionMiddleware() {
       // rather than in the framework-managed server/vite.ts.
       if (notFound && checkHtml() && !res.headersSent) {
         res.statusCode = 404;
+      }
+      if (dependencyUnavailable && checkHtml() && !res.headersSent) {
+        res.statusCode = 503;
+        res.setHeader("Retry-After", "1");
       }
       if (checkHtml() && chunks.length) {
         try {

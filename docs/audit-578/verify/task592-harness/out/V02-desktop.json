@@ -1,0 +1,162 @@
+{
+  "started": "2026-10-10T16:08:41.143Z",
+  "vp": "desktop",
+  "steps": [
+    {
+      "name": "A-fixture",
+      "bookmark": 200,
+      "state": 200,
+      "collection": 201,
+      "membership": 201,
+      "before": [
+        {
+          "resource_id": 184739,
+          "notes": "__qa_test_plan_592_private note",
+          "queue_status": "in-progress",
+          "personal_tags": [
+            "qa592tag"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "guest-saved",
+      "localIds": [
+        184739,
+        184740
+      ]
+    },
+    {
+      "name": "merge",
+      "requests": [
+        "GET /api/resources/184740",
+        "GET /api/resources/184740",
+        "GET /api/resources/184740",
+        "POST /api/bookmarks/184740"
+      ],
+      "toast": "Your saves are in your library\n1 saved resource from this device is now in your account. 1 was already in your library.",
+      "localIdsAfter": [],
+      "after": [
+        {
+          "resource_id": 184739,
+          "notes": "__qa_test_plan_592_private note",
+          "queue_status": "in-progress",
+          "personal_tags": [
+            "qa592tag"
+          ]
+        },
+        {
+          "resource_id": 184740,
+          "notes": null,
+          "queue_status": "saved",
+          "personal_tags": []
+        }
+      ],
+      "collectionItems": [
+        {
+          "resource_id": 184739
+        }
+      ]
+    },
+    {
+      "name": "offline-detail",
+      "requests": [
+        "GET /api/resources/184741",
+        "POST /api/bookmarks/184741",
+        "GET /api/resources/184742"
+      ],
+      "toast": "Your saves are in your library\n1 saved resource from this device is now in your account. 1 couldn't be moved and stays saved on this device.",
+      "localIdsAfter": [
+        184742
+      ],
+      "accountIds": [
+        184739,
+        184740,
+        184741
+      ]
+    },
+    {
+      "name": "next-load-retry",
+      "requests": [
+        "GET /api/resources/184742",
+        "POST /api/bookmarks/184742"
+      ],
+      "toast": "Your saves are in your library\n1 saved resource from this device is now in your account.",
+      "localIdsAfter": [],
+      "accountIds": [
+        184739,
+        184740,
+        184741,
+        184742
+      ]
+    },
+    {
+      "name": "identity-switch",
+      "switchAt": 1791648541879,
+      "requests": [
+        {
+          "t": 1791648542332,
+          "req": "GET /api/resources/184743",
+          "auth": "cookie",
+          "dt": 453
+        },
+        {
+          "t": 1791648546380,
+          "req": "GET /api/resources/184743",
+          "auth": "cookie",
+          "dt": 4501
+        },
+        {
+          "t": 1791648550414,
+          "req": "POST /api/bookmarks/184743",
+          "auth": "cookie",
+          "dt": 8535
+        },
+        {
+          "t": 1791648550443,
+          "req": "GET /api/resources/184744",
+          "auth": "cookie",
+          "dt": 8564
+        },
+        {
+          "t": 1791648554473,
+          "req": "POST /api/bookmarks/184744",
+          "auth": "cookie",
+          "dt": 12594
+        },
+        {
+          "t": 1791648554505,
+          "req": "GET /api/resources/184745",
+          "auth": "cookie",
+          "dt": 12626
+        },
+        {
+          "t": 1791648558714,
+          "req": "POST /api/bookmarks/184745",
+          "auth": "cookie",
+          "dt": 16835
+        }
+      ],
+      "toast": "Your saves are in your library\n3 saved resources from this device are now in your account.",
+      "localIdsAfter": [],
+      "aHas": [],
+      "bHas": [
+        184743,
+        184744,
+        184745
+      ]
+    }
+  ],
+  "switchMode": "in-SPA (no reload; Clerk.signOut + ticket sign-in)",
+  "switchToast": "Your saves are in your library\n3 saved resources from this device are now in your account.",
+  "pageErrors": [],
+  "residue": {
+    "users": 0,
+    "resources": 0,
+    "journeys": 0,
+    "categories": 0,
+    "subcategories": 0,
+    "collections": 0,
+    "edits": 0
+  }
+}

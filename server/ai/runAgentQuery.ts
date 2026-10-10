@@ -159,6 +159,22 @@ export interface RunAgentQueryResult {
   errorMessage?: string;
 }
 
+/** Usage an agent run had already consumed when it failed. */
+export interface AgentRunUsage {
+  numTurns: number;
+  tokensIn: number;
+  tokensOut: number;
+  totalCostUsd: number;
+}
+
+/** Usage attached to an error thrown by runAgentQuery, or null when none was observed. */
+export function agentUsageFromError(err: unknown): AgentRunUsage | null {
+  const u = err && typeof err === "object" ? (err as { agentUsage?: AgentRunUsage }).agentUsage : undefined;
+  if (!u) return null;
+  if (u.numTurns === 0 && u.tokensIn === 0 && u.tokensOut === 0 && u.totalCostUsd === 0) return null;
+  return u;
+}
+
 function actorFromMessage(msg: any): { actor: string; actorType: "orchestrator" | "subagent" } {
   const sub = msg?.subagent_type;
   if (sub) return { actor: String(sub), actorType: "subagent" };
@@ -783,6 +799,17 @@ export async function runAgentQuery(params: RunAgentQueryParams): Promise<RunAge
         detail: { name: err?.name },
       });
       await mirror("error", emsg);
+      // An SDK error result (e.g. error_max_budget_usd with is_error) still
+      // reports the spend; carry it on the error so callers persist real
+      // usage instead of 0 turns / $0.00 next to a run that cost money.
+      if (err && typeof err === "object") {
+        (err as { agentUsage?: AgentRunUsage }).agentUsage = {
+          numTurns: result.numTurns,
+          tokensIn: sawResultMessage ? result.tokensIn : observedTokensIn,
+          tokensOut: sawResultMessage ? result.tokensOut : observedTokensOut,
+          totalCostUsd: result.totalCostUsd,
+        };
+      }
       throw err;
     }
   } finally {

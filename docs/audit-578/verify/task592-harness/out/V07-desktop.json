@@ -1,0 +1,128 @@
+{
+  "started": "2026-10-10T16:20:40.728Z",
+  "vp": "desktop",
+  "steps": [
+    {
+      "name": "empty-states",
+      "/bookmarks": "Home Bookmarks // LEARNING LIBRARY Saved, then finished. Turn bookmarks into a queue you can actually work through. New collection 0 Active 0 Saved 0 Watch next 0 In progress 0 Done 0 Archived All saved 0 Queue status All statuses Visibility Active bookmarks S",
+      "/contributions": "Home Your Contributions // CONTRIBUTOR DASHBOARD Your contributions Follow every resource submission and edit suggestion from review to outcome, then see the impact of accepted work. Submit a resource Recorded impact Definitions are shown under every metric. A",
+      "/continue-learning": "Home Continue Learning // LEARNING DASHBOARD Continue Learning Pick up from your exact next step, revisit recent resources, and see what you've completed—all from the progress you already made. Build your first learning thread Start a guided journey or open a ",
+      "/notifications": "Home Notifications ── PERSONAL INBOX Notifications A private record of the updates you chose to receive. Nothing here yet When you opt in to updates and something matches your choices, it will appear in this quiet inbox. Review notification choices"
+    },
+    {
+      "name": "not-now",
+      "status": "dismissed",
+      "dismissedAt": "2026-10-10T16:21:03.808Z",
+      "cardAfterReload": 0
+    },
+    {
+      "name": "reload-halfway",
+      "afterStep1": "Step 2 of 5",
+      "catChosen": "Community & Events",
+      "goalChosen": "Learn the fundamentals",
+      "urlBefore": "http://127.0.0.1:5000/onboarding?step=4",
+      "labelBefore": "Step 4 of 5",
+      "urlAfter": "http://127.0.0.1:5000/onboarding?step=4",
+      "labelAfter": "Step 4 of 5",
+      "saved": {
+        "status": "in_progress",
+        "step": 4,
+        "cats": [
+          "Community & Events"
+        ],
+        "goals": [
+          "learn-fundamentals"
+        ]
+      }
+    },
+    {
+      "name": "save-browse-later",
+      "emptyStepValidation": {
+        "checkedBefore": 0,
+        "message": "Choose"
+      },
+      "fmtChosen": "Videos",
+      "status": "dismissed",
+      "step": 4,
+      "formats": [
+        "video"
+      ]
+    },
+    {
+      "name": "reenter-back-forward",
+      "reenter": {
+        "label": "Step 4 of 5",
+        "checked": 1
+      },
+      "at5": "Step 5 of 5",
+      "afterBack": {
+        "label": "Step 4 of 5",
+        "url": "http://127.0.0.1:5000/onboarding?step=4"
+      },
+      "afterFwd": {
+        "label": "Step 5 of 5",
+        "url": "http://127.0.0.1:5000/onboarding?step=5"
+      }
+    },
+    {
+      "name": "complete-then-dismiss",
+      "completedText": "Home\nLearning Preferences\nYour learning profile is ready\n\nPersonalized Recommendations can now use these choices. Public browsing and search stay the same for e",
+      "status": "completed",
+      "step": 5,
+      "completedAt": "2026-10-10T16:21:19.011Z",
+      "dismissPut": 400,
+      "after": {
+        "status": "completed",
+        "step": 5,
+        "completedAt": "2026-10-10T16:21:19.011Z"
+      }
+    },
+    {
+      "name": "settings",
+      "layoutSaved": "curated",
+      "tab2": {
+        "newerGoal": "Build video applications",
+        "toast": "Learning preferences saved\nClearly labeled personalized recommendations will use your updated choices."
+      },
+      "tab1Conflict": "Your learning preferences changed in another tab. Reload before saving again.",
+      "serverGoals": [
+        "learn-fundamentals",
+        "build-video-apps"
+      ],
+      "revision": 9
+    },
+    {
+      "name": "home-layout",
+      "curatedGrid": 61,
+      "indexGrid": 0,
+      "invitation": 0
+    },
+    {
+      "name": "server-validation",
+      "badCategory": [
+        400,
+        "Please check your learning preferences"
+      ],
+      "incompleteCompleted": [
+        400,
+        "Please check your learning preferences",
+        [
+          {
+            "field": "",
+            "message": "Unrecognized keys: \"id\", \"userId\", \"onboardingCompletedAt\", \"onboardingDismissedAt\", \"revision\", \"createdAt\", \"updatedAt\""
+          }
+        ]
+      ]
+    }
+  ],
+  "pageErrors": [],
+  "residue": {
+    "users": 0,
+    "resources": 0,
+    "journeys": 0,
+    "categories": 0,
+    "subcategories": 0,
+    "collections": 0,
+    "edits": 0
+  }
+}

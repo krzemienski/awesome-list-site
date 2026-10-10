@@ -13,3 +13,4 @@ description: How to classify dead links safely when scanning from Replit's cloud
 - Timeout/reset-only failures: verify via `webSearch` liveness queries (external human-vantage evidence) before any status change.
 - Known cloud-IP blockers seen in this catalog: trac.ffmpeg.org (Trac), cta.tech, jplayer.org, forum.kaltura.org, medium.com, nabshow.com. openelec.tv is genuinely dead (project discontinued).
 - Match error strings case-insensitively (`/TIMEOUT|ABORT|EAI_AGAIN/i`).
+- IP-literal URLs (e.g. `http://203.0.113.5/…`) have no registrable domain. Treat the full host as its own "domain" or the off-domain redirect classifier throws or flags them as suspect.

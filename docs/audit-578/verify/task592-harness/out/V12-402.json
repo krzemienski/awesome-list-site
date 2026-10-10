@@ -1,0 +1,127 @@
+{
+  "started": "2026-10-10T16:43:19.390Z",
+  "vp": "402",
+  "steps": [
+    {
+      "name": "fixtures",
+      "bookmark": 200,
+      "favorite": 200,
+      "apiKey": 201,
+      "submit": {
+        "status": 201,
+        "id": 188667
+      },
+      "editId": 72,
+      "children": {
+        "bookmarks": 1,
+        "favorites": 1,
+        "api_keys": 1,
+        "edits": 1,
+        "user_row": 1
+      }
+    },
+    {
+      "name": "role-cancel",
+      "dialogText": "Change user role? This will change _•••@example.com from user to moderator. Cancel Change Role",
+      "sqlRole": "user",
+      "focus": "button-edit-user-__qa_test_plan_592_v12role_1791650600263"
+    },
+    {
+      "name": "role-confirm",
+      "toast": "Role Updated\nUser role has been changed.",
+      "chip": "MODERATOR",
+      "sqlRole": "moderator",
+      "focus": "button-edit-user-__qa_test_plan_592_v12role_1791650600263",
+      "audit": [
+        {
+          "action": "user.role_changed",
+          "notes": "Role changed from user to moderator for __qa_test_plan_592_v12role_1791650600263@example.com",
+          "performed_by": "__qa_test_plan_592_v12adm_1791650599479"
+        }
+      ]
+    },
+    {
+      "name": "role-restore",
+      "chip": "USER",
+      "sqlRole": "user",
+      "focus": "button-edit-user-__qa_test_plan_592_v12role_1791650600263",
+      "auditCount": 2
+    },
+    {
+      "name": "row-actions",
+      "deleteVisibleBefore": false,
+      "deleteVisibleAfter": true,
+      "expanded": "true"
+    },
+    {
+      "name": "delete-cancel",
+      "children": {
+        "bookmarks": 1,
+        "favorites": 1,
+        "api_keys": 1,
+        "edits": 1,
+        "user_row": 1
+      },
+      "focus": "button-delete-user-__qa_test_plan_592_v12del_1791650600945"
+    },
+    {
+      "name": "delete-confirm",
+      "status": 200,
+      "body": {
+        "success": true,
+        "deletedUserId": "__qa_test_plan_592_v12del_1791650600945",
+        "email": "__qa_test_plan_592_v12del_1791650600945@example.com",
+        "clerkIdentity": "deleted",
+        "resourcesDetached": 1,
+        "editsDeleted": 1
+      },
+      "toast": "User Deleted\nThe account and its sign-in identity have been removed.",
+      "rowsLeft": 0,
+      "tableText": "NAME EMAIL ROLE JOINED No users match \"__qa_test_plan_592_v12del_1791650600945\"",
+      "focus": "input-user-search",
+      "children": {
+        "bookmarks": 0,
+        "favorites": 0,
+        "api_keys": 0,
+        "edits": 0,
+        "user_row": 0
+      },
+      "submittedResource": {
+        "status": "pending",
+        "submitted_by": null
+      },
+      "audit": [
+        {
+          "action": "user.deleted",
+          "notes": "Account deleted: __qa_test_plan_592_v12del_1791650600945@example.com",
+          "clerk": "deleted"
+        }
+      ],
+      "tombstone": [
+        {
+          "bridge_user_id": "__qa_test_plan_592_v12del_1791650600945",
+          "has_clerk": true
+        }
+      ],
+      "clerkUser": "404"
+    },
+    {
+      "name": "old-session",
+      "status": 200,
+      "isAuthenticated": false,
+      "userRow": 0
+    }
+  ],
+  "pageErrors": [],
+  "residue": {
+    "users": 0,
+    "resources": 0,
+    "journeys": 0,
+    "categories": 0,
+    "subcategories": 0,
+    "collections": 0,
+    "edits": 0,
+    "tombstones": 0,
+    "notifications": 0
+  }
+}

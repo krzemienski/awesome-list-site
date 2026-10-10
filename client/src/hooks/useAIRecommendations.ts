@@ -55,6 +55,40 @@ interface UseAIRecommendationsOptions {
   autoLoad?: boolean;
   cacheTime?: number;
   cacheUserId?: string;
+  /** Inputs that shaped the results; stored with the device cache entry. */
+  cacheFingerprint?: string;
+}
+
+const RECOMMENDATIONS_CACHE_PREFIX = "ai_recommendations_cache:";
+const DEFAULT_CACHE_TIME = 5 * 60 * 1000;
+
+/**
+ * True when this device holds results younger than `cacheTime` that were
+ * generated for exactly `fingerprint`. Read synchronously so a newly mounted
+ * surface can decide not to ask the server again: every signed-in panel mount
+ * used to POST, and those POSTs share the AI rate limit (10 per 15 minutes),
+ * so ordinary navigation between Home, Profile and Recommendations ran into
+ * "Too many AI requests" without a single model call.
+ */
+export function hasFreshRecommendationsCache(
+  cacheUserId: string,
+  fingerprint: string,
+  cacheTime: number = DEFAULT_CACHE_TIME,
+): boolean {
+  const raw = safeGetItem(`${RECOMMENDATIONS_CACHE_PREFIX}${cacheUserId}`);
+  if (!raw) return false;
+  try {
+    const parsed: unknown = JSON.parse(raw);
+    return (
+      isRecord(parsed)
+      && parsed.fingerprint === fingerprint
+      && typeof parsed.timestamp === "number"
+      && Date.now() - parsed.timestamp < cacheTime
+      && parseCachedRecommendations(raw) !== null
+    );
+  } catch {
+    return false;
+  }
 }
 
 function isRecord(value: unknown): value is Record<string, unknown> {
@@ -111,14 +145,15 @@ export function useAIRecommendations(
   const {
     limit = 10,
     autoLoad = false,
-    cacheTime = 5 * 60 * 1000,
+    cacheTime = DEFAULT_CACHE_TIME,
     cacheUserId,
+    cacheFingerprint,
   } = options;
   const [localCache, setLocalCache] = useState<RecommendationsResponse | null>(null);
   const [isStale, setIsStale] = useState(false);
   const [isFromCache, setIsFromCache] = useState(false);
   const [lastUpdatedAt, setLastUpdatedAt] = useState<number | null>(null);
-  const cacheKey = `ai_recommendations_cache:${cacheUserId ?? userProfile?.userId ?? 'anonymous'}`;
+  const cacheKey = `${RECOMMENDATIONS_CACHE_PREFIX}${cacheUserId ?? userProfile?.userId ?? 'anonymous'}`;
 
   // Fetch recommendations mutation
   const recommendationsMutation = useMutation({
@@ -179,7 +214,8 @@ export function useAIRecommendations(
       if (typeof window !== 'undefined') {
         safeSetItem(cacheKey, JSON.stringify({
           data,
-          timestamp: Date.now()
+          timestamp: Date.now(),
+          fingerprint: cacheFingerprint,
         }));
       }
     }
@@ -316,6 +352,9 @@ export function useAIRecommendations(
     
     // State
     isLoading: recommendationsMutation.isPending,
+    // Offline, React Query pauses the request instead of failing it; it
+    // resumes on reconnect. Surfaces explain the wait instead of spinning.
+    isPaused: recommendationsMutation.isPaused,
     isError: recommendationsMutation.isError,
     error: recommendationsMutation.error,
     isSuccess: recommendationsMutation.isSuccess || recommendations.length > 0,

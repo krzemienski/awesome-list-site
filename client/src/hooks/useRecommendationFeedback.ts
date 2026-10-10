@@ -1,6 +1,6 @@
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { ApiError, apiRequest, queryClient } from "@/lib/queryClient";
-import { safeGetItem, safeSetItem } from "@/lib/safeStorage";
+import { safeGetItem, safeRemoveItem, safeSetItem } from "@/lib/safeStorage";
 import {
   recommendationFeedbackQueryKey,
   updateSerializedRecommendationCache,
@@ -39,6 +39,17 @@ function isFeedbackState(value: unknown): value is RecommendationFeedbackState {
   );
 }
 
+function storedCacheHasResource(serialized: string, resourceId: number): boolean {
+  try {
+    const parsed: unknown = JSON.parse(serialized);
+    const list: unknown = (parsed as { data?: { recommendations?: unknown } } | null)?.data?.recommendations;
+    return Array.isArray(list) && list.some((item: unknown) =>
+      (item as { resource?: { id?: unknown } } | null)?.resource?.id === resourceId);
+  } catch {
+    return false;
+  }
+}
+
 function patchStoredRecommendationCache(
   userId: string,
   resourceId: number,
@@ -52,7 +63,15 @@ function patchStoredRecommendationCache(
       resourceId,
       feedback,
     );
-    if (updated) safeSetItem(key, updated);
+    // Clearing a choice that had removed the card (hide / not for me / already
+    // know) cannot put it back from here: the stored list no longer has it.
+    // Drop the device cache so the next surface asks the server again rather
+    // than reusing a list that is missing the restored card.
+    if (feedback === null && !storedCacheHasResource(serialized, resourceId)) {
+      safeRemoveItem(key);
+    } else if (updated) {
+      safeSetItem(key, updated);
+    }
   }
   window.dispatchEvent(new CustomEvent("recommendation-feedback-saved", {
     detail: { resourceId, feedback },

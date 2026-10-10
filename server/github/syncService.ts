@@ -337,6 +337,11 @@ export class GitHubSyncService {
       
       // Create all category hierarchies
       const hierarchyIds = new Map<string, { categoryId: number; subcategoryId?: number; subSubcategoryId?: number }>();
+      // Hierarchies that could not be resolved. Items under them are refused
+      // in STEP 4 (one item error each) instead of being written with
+      // category text that names no taxonomy row (orphan resources desync
+      // sidebar counts and browse pages).
+      const failedHierarchies = new Map<string, string>();
       for (const [key, hierarchy] of Array.from(uniqueHierarchies.entries())) {
         try {
           const ids = await ensureCategoryHierarchy(
@@ -348,7 +353,7 @@ export class GitHubSyncService {
           hierarchyIds.set(key, ids);
         } catch (error: any) {
           console.error(`Error creating hierarchy for ${key}: ${error.message}`);
-          result.errors.push(`Category hierarchy error: ${error.message}`);
+          failedHierarchies.set(key, error instanceof Error ? error.message : String(error));
         }
       }
       
@@ -360,6 +365,13 @@ export class GitHubSyncService {
           // Get hierarchy IDs for this resource
           const hierarchyKey = `${resource.category}|${resource.subcategory || ''}|${resource.subSubcategory || ''}`;
           const hierarchyId = hierarchyIds.get(hierarchyKey);
+          const hierarchyFailure = failedHierarchies.get(hierarchyKey);
+          if (hierarchyFailure !== undefined) {
+            const errorMsg = `Error processing ${resource.title}: Category hierarchy error: ${hierarchyFailure}`;
+            console.error(errorMsg);
+            result.errors.push(errorMsg);
+            continue;
+          }
           
           const conflict = await this.checkConflict(resource);
           
@@ -1115,12 +1127,16 @@ export class GitHubSyncService {
     }
 
     // Check if there are differences
-    const hasChanges = 
-      existing.title !== resource.title ||
-      existing.description !== resource.description ||
-      existing.category !== resource.category ||
-      existing.subcategory !== resource.subcategory ||
-      existing.subSubcategory !== resource.subSubcategory;
+    // The parser leaves absent levels undefined while stored rows hold null;
+    // compare nullishly or every unchanged re-import is miscounted as an
+    // update (and rewrites updated_at plus an audit row per resource).
+    const differs = (a: unknown, b: unknown) => (a ?? null) !== (b ?? null);
+    const hasChanges =
+      differs(existing.title, resource.title) ||
+      differs(existing.description, resource.description) ||
+      differs(existing.category, resource.category) ||
+      differs(existing.subcategory, resource.subcategory) ||
+      differs(existing.subSubcategory, resource.subSubcategory);
 
     if (hasChanges) {
       // Merge descriptions if different

@@ -1,0 +1,119 @@
+{
+  "started": "2026-10-10T19:45:26.951Z",
+  "steps": [
+    {
+      "at": "2026-10-10T19:45:31.311Z",
+      "name": "booted",
+      "ms": 4356
+    },
+    {
+      "at": "2026-10-10T19:45:31.861Z",
+      "name": "before",
+      "resources": 1993,
+      "v21_resources": 0,
+      "max_resource_id": 188015,
+      "audit_rows": 6498
+    },
+    {
+      "at": "2026-10-10T19:45:32.863Z",
+      "name": "first-guest-submit",
+      "status": 401,
+      "contentType": "application/json; charset=utf-8",
+      "retryAfter": null,
+      "rateLimit": null,
+      "rateLimitPolicy": "600;w=60",
+      "limit": "600",
+      "remaining": "598",
+      "reset": "59",
+      "body": "{\"message\":\"Unauthorized\"}"
+    },
+    {
+      "at": "2026-10-10T19:45:37.677Z",
+      "name": "burst",
+      "sent": 601,
+      "ms": 4814,
+      "tally": {
+        "401": 599,
+        "429": 2
+      },
+      "first429": {
+        "status": 429,
+        "contentType": "application/json; charset=utf-8",
+        "retryAfter": "54",
+        "rateLimit": null,
+        "rateLimitPolicy": "600;w=60",
+        "limit": "600",
+        "remaining": "0",
+        "reset": "54",
+        "body": "{\"message\":\"Too many requests. Please slow down and try again shortly.\",\"error\":\"Rate limit exceeded\",\"retryAfter\":54}"
+      }
+    },
+    {
+      "at": "2026-10-10T19:45:37.700Z",
+      "name": "while-limited",
+      "htmlAccept": {
+        "status": 429,
+        "contentType": "text/html; charset=utf-8",
+        "retryAfter": "54",
+        "rateLimit": null,
+        "rateLimitPolicy": "600;w=60",
+        "limit": "600",
+        "remaining": "0",
+        "reset": "54",
+        "body": "<!DOCTYPE html>\n<html lang=\"en\">\n<head>\n<meta charset=\"utf-8\">\n<meta name=\"viewport\" content=\"width=device-width, initial-scale=1\">\n<meta name=\"robots\" content=\"noindex\">\n<meta name=\"color-scheme\" con"
+      },
+      "navRead": {
+        "status": 429,
+        "retryAfter": "54",
+        "body": "{\"message\":\"Too many requests. Please slow down and try again shortly.\",\"error\":\"Rate limit exceeded\",\"retryAfter\":54}"
+      }
+    },
+    {
+      "at": "2026-10-10T19:45:37.704Z",
+      "name": "no-inserts",
+      "before": {
+        "resources": 1993,
+        "v21_resources": 0,
+        "max_resource_id": 188015,
+        "audit_rows": 6498
+      },
+      "after": {
+        "resources": 1993,
+        "v21_resources": 0,
+        "max_resource_id": 188015,
+        "audit_rows": 6498
+      },
+      "resourcesDelta": 0,
+      "v21Rows": 0,
+      "maxIdUnchanged": true,
+      "auditDelta": 0
+    },
+    {
+      "at": "2026-10-10T19:45:37.894Z",
+      "name": "waiting-for-reset",
+      "waitMs": 55000
+    },
+    {
+      "at": "2026-10-10T19:46:33.183Z",
+      "name": "recovered",
+      "recovered": {
+        "status": 401,
+        "contentType": "application/json; charset=utf-8",
+        "retryAfter": null,
+        "rateLimit": null,
+        "rateLimitPolicy": "600;w=60",
+        "limit": "600",
+        "remaining": "599",
+        "reset": "60",
+        "body": "{\"message\":\"Unauthorized\"}"
+      },
+      "navAfter": 200
+    },
+    {
+      "at": "2026-10-10T19:46:35.702Z",
+      "name": "cleanup",
+      "residueResources": 0,
+      "rateLimitHitsRowsInScratch": 2
+    }
+  ]
+}

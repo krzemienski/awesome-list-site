@@ -23,7 +23,7 @@ export class DiscoveryConflictError extends Error {
   }
 }
 import { decodeHtmlEntities, decodeResourceTextFields } from '../github/importHygiene';
-import { runAgentQuery, type AgentDefinitionInput } from './runAgentQuery';
+import { runAgentQuery, agentUsageFromError, type AgentDefinitionInput } from './runAgentQuery';
 import { defaultResearchModel, defaultScoutModel, resolveModel, validateBaseUrl, type AgentRunConfig } from './agentRuntime';
 import { LinkChecker } from '../validation/linkChecker';
 import { isPlausiblePublicUrl } from '@shared/validation';
@@ -1061,9 +1061,16 @@ class ResearchService {
           const [cur] = await db.select({ agentLog: researchJobs.agentLog }).from(researchJobs).where(eq(researchJobs.id, job.id));
           const existing = Array.isArray(cur?.agentLog) ? (cur!.agentLog as any[]) : [];
           existing.push({ role: 'error', content: `Job failed: ${msg}`, timestamp: new Date().toISOString() });
+          const usage = agentUsageFromError(err);
           await db.update(researchJobs).set({
             status: sql`case when ${researchJobs.status} = 'cancelled' then 'cancelled' else 'failed' end`,
             errorMessage: msg,
+            ...(usage ? {
+              turnsUsed: usage.numTurns,
+              totalInputTokens: usage.tokensIn,
+              totalOutputTokens: usage.tokensOut,
+              estimatedCostUsd: usage.totalCostUsd.toFixed(4),
+            } : {}),
             agentLog: existing,
             completedAt: sql`coalesce(${researchJobs.completedAt}, now())`,
           }).where(eq(researchJobs.id, job.id));

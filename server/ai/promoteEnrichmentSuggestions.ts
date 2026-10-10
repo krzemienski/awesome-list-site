@@ -95,22 +95,31 @@ export async function promoteEnrichmentSuggestions(
     updates.category = suggestedCategory;
   }
 
-  const finalSubcategory = existingSubcategory ?? suggestedSubcategory;
-  if (!existingSubcategory && suggestedSubcategory) {
-    updates.subcategory = suggestedSubcategory;
+  // Level-2 creation stays admin-driven: a suggested subcategory is promoted
+  // only when that node already exists under the resource's category, so an
+  // AI guess can never leave an orphan label the tree builder has to hide.
+  let promotedSubcategory: string | null = null;
+  if (!existingSubcategory && suggestedSubcategory && finalCategory) {
+    const category = await categoryRepo.getCategoryByName(finalCategory);
+    if (category && await categoryRepo.getSubcategoryByName(suggestedSubcategory, category.id)) {
+      promotedSubcategory = suggestedSubcategory;
+      updates.subcategory = suggestedSubcategory;
+    }
   }
+  const finalSubcategory = existingSubcategory ?? promotedSubcategory;
 
   const finalSubSubcategory = existingSubSubcategory ?? suggestedSubSubcategory;
-  if (!existingSubSubcategory && suggestedSubSubcategory) {
-    updates.subSubcategory = suggestedSubSubcategory;
-  }
-
-  await ensureSubSubcategoryExists(
+  const contained = await ensureSubSubcategoryExists(
     categoryRepo,
     finalCategory,
     finalSubcategory,
     finalSubSubcategory,
   );
+  // Promote a suggested sub-subcategory only when the guard could place it
+  // under a real category > subcategory chain (existing or just created).
+  if (!existingSubSubcategory && suggestedSubSubcategory && contained) {
+    updates.subSubcategory = suggestedSubSubcategory;
+  }
 
   return updates;
 }
