@@ -1,0 +1,159 @@
+{
+  "baseUrl": "http://localhost:5000",
+  "landingThreshold": 5,
+  "discovery": {
+    "url": "http://localhost:5000/api/resources?limit=1&facets=true",
+    "status": 200,
+    "bodyExcerpt": null,
+    "facetTagCount": 1535,
+    "eligibleCount": 215,
+    "error": null
+  },
+  "expectedRevision": null,
+  "observedRevision": null,
+  "observedRevisionStatus": null,
+  "revisionMatched": null,
+  "tag": {
+    "slug": "open-source",
+    "total": 158
+  },
+  "results": [
+    {
+      "name": "eligible-tag-discovery",
+      "pass": true,
+      "detail": "/tag/open-source (158 approved resources; 215 of 1535 tags reach 5)"
+    },
+    {
+      "name": "client-side-redirect",
+      "pass": true,
+      "detail": "url=http://localhost:5000/categories"
+    },
+    {
+      "name": "history-navigation",
+      "pass": true,
+      "detail": "back=/ forward=/categories"
+    },
+    {
+      "name": "direct-redirect",
+      "pass": true,
+      "detail": "url=http://localhost:5000/categories"
+    },
+    {
+      "name": "live-tag-rendering",
+      "pass": true,
+      "detail": "url=http://localhost:5000/tag/open-source total=158 cards=24"
+    }
+  ],
+  "pages": {
+    "direct": {
+      "finalUrl": "http://localhost:5000/categories",
+      "title": "All Categories — Awesome Video",
+      "h1": "All Categories",
+      "cardCount": 9,
+      "resultsTotal": null,
+      "console": [],
+      "pageErrors": [],
+      "failedRequests": [
+        {
+          "method": "GET",
+          "url": "https://replit.com/public/js/replit-dev-banner.js",
+          "failure": "net::ERR_BLOCKED_BY_ORB"
+        }
+      ],
+      "apiErrors": [],
+      "inFlightApiRequests": []
+    },
+    "tag-landing": {
+      "finalUrl": "http://localhost:5000/tag/open-source",
+      "title": "Open Source Video Resources & Tools — Awesome Video",
+      "h1": "Open Source",
+      "cardCount": 24,
+      "resultsTotal": "158",
+      "console": [
+        {
+          "type": "warning",
+          "text": "Clerk: Clerk has been loaded with development keys. Development instances have strict usage limits and should not be used when deploying your application to production. Learn more: https://clerk.com/docs/deployments/overview"
+        },
+        {
+          "type": "warning",
+          "text": "Clerk: Clerk has been loaded with development keys. Development instances have strict usage limits and should not be used when deploying your application to production. Learn more: https://clerk.com/docs/deployments/overview"
+        },
+        {
+          "type": "warning",
+          "text": "Clerk: Clerk has been loaded with development keys. Development instances have strict usage limits and should not be used when deploying your application to production. Learn more: https://clerk.com/docs/deployments/overview"
+        }
+      ],
+      "pageErrors": [],
+      "failedRequests": [
+        {
+          "method": "GET",
+          "url": "https://replit.com/public/js/replit-dev-banner.js",
+          "failure": "net::ERR_BLOCKED_BY_ORB"
+        },
+        {
+          "method": "GET",
+          "url": "http://localhost:5000/api/resources/kinds/counts",
+          "failure": "net::ERR_ABORTED"
+        },
+        {
+          "method": "GET",
+          "url": "https://replit.com/public/js/replit-dev-banner.js",
+          "failure": "net::ERR_BLOCKED_BY_ORB"
+        },
+        {
+          "method": "GET",
+          "url": "https://replit.com/public/js/replit-dev-banner.js",
+          "failure": "net::ERR_BLOCKED_BY_ORB"
+        }
+      ],
+      "apiErrors": [],
+      "inFlightApiRequests": []
+    },
+    "main": {
+      "finalUrl": "http://localhost:5000/tag/open-source",
+      "title": "Open Source Video Resources & Tools — Awesome Video",
+      "h1": "Open Source",
+      "cardCount": 24,
+      "resultsTotal": "158",
+      "console": [
+        {
+          "type": "warning",
+          "text": "Clerk: Clerk has been loaded with development keys. Development instances have strict usage limits and should not be used when deploying your application to production. Learn more: https://clerk.com/docs/deployments/overview"
+        },
+        {
+          "type": "warning",
+          "text": "Clerk: Clerk has been loaded with development keys. Development instances have strict usage limits and should not be used when deploying your application to production. Learn more: https://clerk.com/docs/deployments/overview"
+        },
+        {
+          "type": "warning",
+          "text": "Clerk: Clerk has been loaded with development keys. Development instances have strict usage limits and should not be used when deploying your application to production. Learn more: https://clerk.com/docs/deployments/overview"
+        }
+      ],
+      "pageErrors": [],
+      "failedRequests": [
+        {
+          "method": "GET",
+          "url": "https://replit.com/public/js/replit-dev-banner.js",
+          "failure": "net::ERR_BLOCKED_BY_ORB"
+        },
+        {
+          "method": "GET",
+          "url": "http://localhost:5000/api/resources/kinds/counts",
+          "failure": "net::ERR_ABORTED"
+        },
+        {
+          "method": "GET",
+          "url": "https://replit.com/public/js/replit-dev-banner.js",
+          "failure": "net::ERR_BLOCKED_BY_ORB"
+        },
+        {
+          "method": "GET",
+          "url": "https://replit.com/public/js/replit-dev-banner.js",
+          "failure": "net::ERR_BLOCKED_BY_ORB"
+        }
+      ],
+      "apiErrors": [],
+      "inFlightApiRequests": []
+    }
+  }
+}

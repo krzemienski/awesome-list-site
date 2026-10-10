@@ -26,7 +26,102 @@ const PREFIX = "__qa_test_auth_return_audit_";
 fs.mkdirSync(OUT, { recursive: true });
 
 function screenshotNameForRoute(route) {
-  return route.replace(/^\/+/, "").replaceAll("/", "-");
+  return route.replace(/[?#].*$/, "").replace(/^\/+/, "").replaceAll("/", "-");
+}
+
+// Exercise both kinds of protected entry point:
+// - /profile and /admin/* are guarded by the server on a hard navigation.
+// - /contributions, /notifications, and /onboarding use AuthGuard in the SPA.
+// - /bookmarks intentionally remains guest-readable, but its account upgrade
+//   action must still carry the page back through Clerk sign-in.
+// `route` is the full deep target: path + query must survive the round trip
+// exactly. Hash fragments are not audited: every guarded page is also behind
+// the server guard on a hard navigation, and browsers never send a fragment
+// to the server, so no redirect can carry it (AuthGuard does carry it on
+// in-app navigation, where window.location.hash is readable).
+const DEEP_PAGE_ROUTES = [
+  { route: "/profile?tab=favorites", entry: "server redirect" },
+  { route: "/admin", entry: "server redirect", admin: true },
+  { route: "/admin/resources?status=pending", entry: "server redirect", admin: true },
+  { route: "/contributions", entry: "client guard" },
+  { route: "/bookmarks", entry: "guest sign-in action" },
+  { route: "/notifications?filter=unread", entry: "client guard" },
+  { route: "/onboarding", entry: "client guard" },
+];
+// Guest-readable pages whose sign-in action is still audited, deliberately not
+// behind a guard (local-storage guest bookmarks).
+const GUEST_RETURN_EXCEPTIONS = new Set(["/bookmarks"]);
+
+// Route-inventory contract: every page guarded in the SPA (AuthGuard /
+// AdminGuard) or by the server's PROTECTED_PAGE_PATTERNS must be covered by a
+// DEEP_PAGE_ROUTES entry, and every entry must still be protected (or a listed
+// guest exception). A new protected page without an audit entry fails here,
+// by name, before any browser starts. Sources are overridable so the contract
+// can be mutation-probed on /tmp copies.
+function protectedRouteInventory() {
+  const appSource = fs.readFileSync(
+    process.env.AUTH_RETURN_APP_SOURCE || path.join(ROOT, "client/src/App.tsx"), "utf8");
+  const serverSource = fs.readFileSync(
+    process.env.AUTH_RETURN_SERVER_SOURCE || path.join(ROOT, "server/index.ts"), "utf8");
+  const clientRoutes = [];
+  const routeRe = /<Route\s+path="([^"]+)"([^>]*?)(\/?)>/g;
+  for (let m; (m = routeRe.exec(appSource)); ) {
+    if (m[3] === "/") {
+      if (/component=\{(?:AuthGuard|AdminGuard)\b/.test(m[2])) clientRoutes.push(m[1]);
+      continue;
+    }
+    const close = appSource.indexOf("</Route>", routeRe.lastIndex);
+    if (close === -1) throw new Error(`App.tsx: unterminated <Route path="${m[1]}">`);
+    const body = appSource.slice(routeRe.lastIndex, close);
+    if (/<(?:AuthGuard|AdminGuard)\b/.test(body)) clientRoutes.push(m[1]);
+  }
+  const block = serverSource.match(/PROTECTED_PAGE_PATTERNS\s*=\s*\[([\s\S]*?)\];/);
+  if (!block) throw new Error("server/index.ts: PROTECTED_PAGE_PATTERNS not found (parser rot)");
+  const serverPatterns = [...block[1].matchAll(/\/((?:\\.|[^/\n])+)\/([a-z]*)\s*,/g)]
+    .map((m) => new RegExp(m[1], m[2]));
+  if (clientRoutes.length === 0 || serverPatterns.length === 0) {
+    throw new Error(`inventory parser rot: client=${clientRoutes.length} server=${serverPatterns.length}`);
+  }
+  return { clientRoutes, serverPatterns };
+}
+
+function checkProtectedRouteInventory() {
+  const failures = [];
+  const { clientRoutes, serverPatterns } = protectedRouteInventory();
+  const audited = DEEP_PAGE_ROUTES.map(({ route }) => new URL(route, "http://x").pathname);
+  for (const routePath of clientRoutes) {
+    const re = new RegExp(`^${routePath.replace(/:[A-Za-z]+/g, "[^/]+")}/?$`);
+    if (!audited.some((p) => re.test(p))) {
+      failures.push(`client-guarded route ${routePath} has no DEEP_PAGE_ROUTES entry`);
+    }
+  }
+  for (const pattern of serverPatterns) {
+    if (!audited.some((p) => pattern.test(p))) {
+      failures.push(`server PROTECTED_PAGE_PATTERNS ${pattern} has no DEEP_PAGE_ROUTES entry`);
+    }
+  }
+  for (const p of audited) {
+    const guarded = serverPatterns.some((re) => re.test(p)) || clientRoutes.some((r) =>
+      new RegExp(`^${r.replace(/:[A-Za-z]+/g, "[^/]+")}/?$`).test(p));
+    if (!guarded && !GUEST_RETURN_EXCEPTIONS.has(p)) {
+      failures.push(`DEEP_PAGE_ROUTES entry ${p} is no longer protected (stale entry)`);
+    }
+  }
+  return { failures, clientRoutes, serverPatterns };
+}
+
+{
+  const inv = checkProtectedRouteInventory();
+  console.log(
+    `[inventory] client-guarded: ${inv.clientRoutes.join(", ")} | server: ${inv.serverPatterns.join(" ")}`,
+  );
+  for (const f of inv.failures) console.log(`[FAIL] inventory: ${f}`);
+  if (inv.failures.length) {
+    console.log(`\nINVENTORY FAIL ${inv.failures.length}`);
+    process.exit(1);
+  }
+  console.log(`[PASS] inventory: ${DEEP_PAGE_ROUTES.length} audited entries cover every protected route`);
+  if (process.argv.includes("--inventory-only")) process.exit(0);
 }
 
 if (!DATABASE_URL) {
@@ -474,19 +569,7 @@ try {
   page = undefined;
   anonymousProtectedNavigations = undefined;
 
-  // Exercise both kinds of protected entry point:
-  // - /profile and /admin/* are guarded by the server on a hard navigation.
-  // - /contributions, /notifications, and /onboarding use AuthGuard in the SPA.
-  // - /bookmarks intentionally remains guest-readable, but its account upgrade
-  //   action must still carry the page back through Clerk sign-in.
-  const deepPageRoutes = [
-    { route: "/profile", entry: "server redirect" },
-    { route: "/admin/resources", entry: "server redirect", admin: true },
-    { route: "/contributions", entry: "client guard" },
-    { route: "/bookmarks", entry: "guest sign-in action" },
-    { route: "/notifications", entry: "client guard" },
-    { route: "/onboarding", entry: "client guard" },
-  ];
+  const deepPageRoutes = DEEP_PAGE_ROUTES;
 
   for (const [routeIndex, { route, entry, admin = false }] of deepPageRoutes.entries()) {
     ({ context, page, anonymousProtectedNavigations, authState: loggedOutState } =
@@ -496,24 +579,30 @@ try {
       loggedOutState?.isAuthenticated === false,
       `authenticated=${loggedOutState?.isAuthenticated}`,
     );
-    if (entry === "server redirect") anonymousProtectedNavigations.add(route);
+    const routeUrl = new URL(route, BASE);
+    // Hash fragments never reach the server, so a server guard can only carry
+    // path+query; client guards must carry the hash as well.
+    const expectedTarget = entry === "server redirect"
+      ? routeUrl.pathname + routeUrl.search
+      : routeUrl.pathname + routeUrl.search + routeUrl.hash;
+    if (entry === "server redirect") anonymousProtectedNavigations.add(routeUrl.pathname);
     await gotoPage(page, route);
 
     if (route === "/bookmarks") {
       const guestSignIn = page.getByTestId("button-guest-empty-signin");
       await guestSignIn.waitFor({ state: "visible", timeout: 30_000 });
       await Promise.all([
-        waitForSignInRedirect(page, route),
+        waitForSignInRedirect(page, expectedTarget),
         guestSignIn.click(),
       ]);
     } else {
-      await waitForSignInRedirect(page, route);
+      await waitForSignInRedirect(page, expectedTarget);
     }
 
     const signInUrl = new URL(page.url());
     log(
       `logged-out${route}:deep-return`,
-      signInUrl.searchParams.get("redirect_url") === route,
+      signInUrl.searchParams.get("redirect_url") === expectedTarget,
       `entry=${entry} path=${signInUrl.pathname} redirect_url=${signInUrl.searchParams.get("redirect_url")}`,
     );
 
@@ -545,32 +634,54 @@ try {
     }
 
     await signInWithClerk(page, routeEmail, routePassword);
-    const routeAuthState = await waitForAuthenticatedSession(page, route);
-    const returnedRoute = new URL(page.url()).pathname;
+    const routeAuthState = await waitForAuthenticatedSession(page, routeUrl.pathname);
+    const returned = new URL(page.url());
+    const returnedRoute = returned.pathname + returned.search + returned.hash;
+    // The destination page may ADD its own state params after landing (e.g.
+    // onboarding normalizes to ?step=1); every requested param must survive
+    // with its exact value, and nothing requested may be dropped.
+    const expectedUrl = new URL(expectedTarget, BASE);
+    const requestedParamsKept = [...expectedUrl.searchParams].every(
+      ([key, value]) => returned.searchParams.getAll(key).includes(value),
+    );
     log(
       `clerk-auth${route}:return-to-deep-page`,
-      returnedRoute === route && routeAuthState?.isAuthenticated === true,
-      `path=${returnedRoute} authenticated=${routeAuthState?.isAuthenticated}`,
+      returned.pathname === expectedUrl.pathname && requestedParamsKept &&
+        (!expectedUrl.hash || returned.hash === expectedUrl.hash) &&
+        returned.origin === new URL(BASE).origin &&
+        routeAuthState?.isAuthenticated === true,
+      `url=${returnedRoute} expected=${expectedTarget} authenticated=${routeAuthState?.isAuthenticated}`,
     );
+    // Back must stay on this origin (no bounce to an external host) and must
+    // not re-enter a sign-in loop for the now-authenticated user.
+    await page.goBack({ waitUntil: "domcontentloaded" }).catch(() => null);
+    await page.waitForTimeout(1_500);
+    const afterBack = new URL(page.url());
+    log(
+      `clerk-auth${route}:back-recovers`,
+      afterBack.origin === new URL(BASE).origin,
+      `after_back=${afterBack.pathname}${afterBack.search}`,
+    );
+    await page.goto(`${BASE}${route}`, { waitUntil: "domcontentloaded" }).catch(() => null);
     if (admin) {
       const adminRole = routeAuthState?.user?.role;
       // Clerk completion and the app's cached auth query settle independently.
       // Reload the returned URL with the real session (the anonymous handshake
       // bypass was one-shot) so AdminGuard resolves fresh authoritative state.
       await gotoPage(page, route);
-      const reloadedAdminPath = new URL(page.url()).pathname;
+      const reloadedAdminPath = new URL(page.url()).pathname + new URL(page.url()).search;
       const adminMarker = page.getByTestId("admin-authorized");
       const adminGuardPassed = await adminMarker
         .waitFor({ state: "attached", timeout: 30_000 })
         .then(() => true)
         .catch(() => false);
       log(
-        "clerk-auth/admin/resources:authorized-page",
-        adminRole === "admin" && reloadedAdminPath === route && adminGuardPassed,
+        `clerk-auth${route}:authorized-page`,
+        adminRole === "admin" && reloadedAdminPath === expectedTarget && adminGuardPassed,
         `role=${adminRole} path=${reloadedAdminPath} authorized_guard=${adminGuardPassed}`,
       );
-      if (adminRole !== "admin" || reloadedAdminPath !== route || !adminGuardPassed) {
-        throw new Error("Admin account returned to /admin/resources without authorized content");
+      if (adminRole !== "admin" || reloadedAdminPath !== expectedTarget || !adminGuardPassed) {
+        throw new Error(`Admin account returned to ${route} without authorized content`);
       }
     }
     await page.screenshot({

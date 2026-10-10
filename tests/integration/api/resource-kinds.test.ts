@@ -346,7 +346,15 @@ describe('Resource kinds API', () => {
       for (const step of detail.body.steps) {
         expectKindFields(step.resource, `journey step ${step.title}`);
         const row = stepResources.find((r) => r.id === step.resource.id)!;
-        expect(Object.keys(step.resource).sort()).toEqual(['description', 'id', 'kind', 'resolvedKind', 'title', 'url']);
+        // Step embeds go through the shared public serializer (one choke
+        // point): only the projected public columns, sanitized metadata.
+        expect(Object.keys(step.resource).sort()).toEqual([
+          'category', 'description', 'id', 'kind', 'metadata', 'resolvedKind',
+          'subSubcategory', 'subcategory', 'title', 'url',
+        ]);
+        for (const internal of ['submittedBy', 'approvedBy', 'status', 'searchTsv', 'updatedAt']) {
+          expect(step.resource).not.toHaveProperty(internal);
+        }
         expect(step.resource.kind).toBe(row.kind ?? null);
         expect(step.resource.resolvedKind).toBe(resolveResourceKind(row).kind);
       }

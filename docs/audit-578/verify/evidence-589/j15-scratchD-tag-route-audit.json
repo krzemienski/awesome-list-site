@@ -1,0 +1,52 @@
+{
+  "baseUrl": "http://127.0.0.1:5189",
+  "landingThreshold": 5,
+  "discovery": {
+    "url": "http://127.0.0.1:5189/api/resources?limit=1&facets=true",
+    "status": 200,
+    "bodyExcerpt": null,
+    "facetTagCount": 1,
+    "eligibleCount": 1,
+    "error": null
+  },
+  "expectedRevision": null,
+  "observedRevision": null,
+  "observedRevisionStatus": null,
+  "revisionMatched": null,
+  "tag": {
+    "slug": "-qa-test-plan-codec-lab",
+    "total": 6
+  },
+  "results": [
+    {
+      "name": "eligible-tag-discovery",
+      "pass": true,
+      "detail": "/tag/-qa-test-plan-codec-lab (6 approved resources; 1 of 1 tags reach 5)"
+    },
+    {
+      "name": "audit-runtime",
+      "pass": false,
+      "detail": "page.goto: net::ERR_CONNECTION_REFUSED at http://127.0.0.1:5189/\nCall log:\n\u001b[2m  - navigating to \"http://127.0.0.1:5189/\", waiting until \"domcontentloaded\"\u001b[22m\n"
+    }
+  ],
+  "pages": {
+    "main": {
+      "finalUrl": "chrome-error://chromewebdata/",
+      "title": "127.0.0.1",
+      "h1": "This site can’t be reached",
+      "cardCount": 0,
+      "resultsTotal": null,
+      "console": [],
+      "pageErrors": [],
+      "failedRequests": [
+        {
+          "method": "GET",
+          "url": "http://127.0.0.1:5189/",
+          "failure": "net::ERR_CONNECTION_REFUSED"
+        }
+      ],
+      "apiErrors": [],
+      "inFlightApiRequests": []
+    }
+  }
+}

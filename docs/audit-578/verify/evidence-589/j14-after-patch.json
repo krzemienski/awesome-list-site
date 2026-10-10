@@ -1,0 +1,156 @@
+{
+  "generatedAt": "2026-10-09T23:04:21.202Z",
+  "artifact": "artifacts/awesome-video-design-system",
+  "policyMinSeverity": "moderate",
+  "closureSize": 130,
+  "verdict": "fail",
+  "findings": [
+    {
+      "package": "vite",
+      "advisory": 1123525,
+      "severity": "high",
+      "title": "vite: `server.fs.deny` bypass on Windows alternate paths",
+      "url": "https://github.com/advisories/GHSA-fx2h-pf6j-xcff",
+      "range": "<=6.4.2",
+      "nodes": [
+        "node_modules/vite"
+      ],
+      "fixAvailable": {
+        "name": "vite",
+        "version": "8.3.4",
+        "isSemVerMajor": true
+      }
+    },
+    {
+      "package": "esbuild",
+      "advisory": 1102341,
+      "severity": "moderate",
+      "title": "esbuild enables any website to send any requests to the development server and read the response",
+      "url": "https://github.com/advisories/GHSA-67mh-4wv8-2f99",
+      "range": "<=0.24.2",
+      "nodes": [
+        "node_modules/vite/node_modules/esbuild"
+      ],
+      "fixAvailable": {
+        "name": "vite",
+        "version": "8.3.4",
+        "isSemVerMajor": true
+      }
+    },
+    {
+      "package": "vite",
+      "advisory": 1116229,
+      "severity": "moderate",
+      "title": "Vite Vulnerable to Path Traversal in Optimized Deps `.map` Handling",
+      "url": "https://github.com/advisories/GHSA-4w7w-66w2-5vf9",
+      "range": "<=6.4.1",
+      "nodes": [
+        "node_modules/vite"
+      ],
+      "fixAvailable": {
+        "name": "vite",
+        "version": "8.3.4",
+        "isSemVerMajor": true
+      }
+    },
+    {
+      "package": "vite",
+      "advisory": 1120784,
+      "severity": "moderate",
+      "title": "launch-editor: NTLMv2 hash disclosure via UNC path handling on Windows",
+      "url": "https://github.com/advisories/GHSA-v6wh-96g9-6wx3",
+      "range": "<=6.4.2",
+      "nodes": [
+        "node_modules/vite"
+      ],
+      "fixAvailable": {
+        "name": "vite",
+        "version": "8.3.4",
+        "isSemVerMajor": true
+      }
+    }
+  ],
+  "reviewed": [],
+  "failures": [
+    {
+      "kind": "artifact-advisory",
+      "finding": {
+        "package": "vite",
+        "advisory": 1123525,
+        "severity": "high",
+        "title": "vite: `server.fs.deny` bypass on Windows alternate paths",
+        "url": "https://github.com/advisories/GHSA-fx2h-pf6j-xcff",
+        "range": "<=6.4.2",
+        "nodes": [
+          "node_modules/vite"
+        ],
+        "fixAvailable": {
+          "name": "vite",
+          "version": "8.3.4",
+          "isSemVerMajor": true
+        }
+      },
+      "message": "HIGH vite (<=6.4.2) — vite: `server.fs.deny` bypass on Windows alternate paths https://github.com/advisories/GHSA-fx2h-pf6j-xcff — at node_modules/vite; no reviewed exception"
+    },
+    {
+      "kind": "artifact-advisory",
+      "finding": {
+        "package": "esbuild",
+        "advisory": 1102341,
+        "severity": "moderate",
+        "title": "esbuild enables any website to send any requests to the development server and read the response",
+        "url": "https://github.com/advisories/GHSA-67mh-4wv8-2f99",
+        "range": "<=0.24.2",
+        "nodes": [
+          "node_modules/vite/node_modules/esbuild"
+        ],
+        "fixAvailable": {
+          "name": "vite",
+          "version": "8.3.4",
+          "isSemVerMajor": true
+        }
+      },
+      "message": "MODERATE esbuild (<=0.24.2) — esbuild enables any website to send any requests to the development server and read the response https://github.com/advisories/GHSA-67mh-4wv8-2f99 — at node_modules/vite/node_modules/esbuild; no reviewed exception"
+    },
+    {
+      "kind": "artifact-advisory",
+      "finding": {
+        "package": "vite",
+        "advisory": 1116229,
+        "severity": "moderate",
+        "title": "Vite Vulnerable to Path Traversal in Optimized Deps `.map` Handling",
+        "url": "https://github.com/advisories/GHSA-4w7w-66w2-5vf9",
+        "range": "<=6.4.1",
+        "nodes": [
+          "node_modules/vite"
+        ],
+        "fixAvailable": {
+          "name": "vite",
+          "version": "8.3.4",
+          "isSemVerMajor": true
+        }
+      },
+      "message": "MODERATE vite (<=6.4.1) — Vite Vulnerable to Path Traversal in Optimized Deps `.map` Handling https://github.com/advisories/GHSA-4w7w-66w2-5vf9 — at node_modules/vite; no reviewed exception"
+    },
+    {
+      "kind": "artifact-advisory",
+      "finding": {
+        "package": "vite",
+        "advisory": 1120784,
+        "severity": "moderate",
+        "title": "launch-editor: NTLMv2 hash disclosure via UNC path handling on Windows",
+        "url": "https://github.com/advisories/GHSA-v6wh-96g9-6wx3",
+        "range": "<=6.4.2",
+        "nodes": [
+          "node_modules/vite"
+        ],
+        "fixAvailable": {
+          "name": "vite",
+          "version": "8.3.4",
+          "isSemVerMajor": true
+        }
+      },
+      "message": "MODERATE vite (<=6.4.2) — launch-editor: NTLMv2 hash disclosure via UNC path handling on Windows https://github.com/advisories/GHSA-v6wh-96g9-6wx3 — at node_modules/vite; no reviewed exception"
+    }
+  ]
+}

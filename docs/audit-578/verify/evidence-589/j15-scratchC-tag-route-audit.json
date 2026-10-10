@@ -1,0 +1,95 @@
+{
+  "baseUrl": "http://127.0.0.1:5189",
+  "landingThreshold": 5,
+  "discovery": {
+    "url": "http://127.0.0.1:5189/api/resources?limit=1&facets=true",
+    "status": 200,
+    "bodyExcerpt": null,
+    "facetTagCount": 1,
+    "eligibleCount": 1,
+    "error": null
+  },
+  "expectedRevision": null,
+  "observedRevision": null,
+  "observedRevisionStatus": null,
+  "revisionMatched": null,
+  "tag": {
+    "slug": "-qa-test-plan-codec-lab",
+    "total": 6
+  },
+  "results": [
+    {
+      "name": "eligible-tag-discovery",
+      "pass": true,
+      "detail": "/tag/-qa-test-plan-codec-lab (6 approved resources; 1 of 1 tags reach 5)"
+    },
+    {
+      "name": "client-side-redirect",
+      "pass": true,
+      "detail": "url=http://127.0.0.1:5189/categories"
+    },
+    {
+      "name": "history-navigation",
+      "pass": true,
+      "detail": "back=/ forward=/categories"
+    },
+    {
+      "name": "direct-redirect",
+      "pass": true,
+      "detail": "url=http://127.0.0.1:5189/categories"
+    },
+    {
+      "name": "live-tag-rendering",
+      "pass": true,
+      "detail": "url=http://127.0.0.1:5189/tag/-qa-test-plan-codec-lab total=6 cards=6"
+    }
+  ],
+  "pages": {
+    "direct": {
+      "finalUrl": "http://127.0.0.1:5189/categories",
+      "title": "All Categories — Awesome Video",
+      "h1": "All Categories",
+      "cardCount": 9,
+      "resultsTotal": null,
+      "console": [],
+      "pageErrors": [],
+      "failedRequests": [],
+      "apiErrors": [],
+      "inFlightApiRequests": []
+    },
+    "tag-landing": {
+      "finalUrl": "http://127.0.0.1:5189/tag/-qa-test-plan-codec-lab",
+      "title": "Qa Test Plan Codec Lab Video Resources & Tools",
+      "h1": "Qa Test Plan Codec Lab",
+      "cardCount": 6,
+      "resultsTotal": "6",
+      "console": [
+        {
+          "type": "warning",
+          "text": "Clerk: Clerk has been loaded with development keys. Development instances have strict usage limits and should not be used when deploying your application to production. Learn more: https://clerk.com/docs/deployments/overview"
+        }
+      ],
+      "pageErrors": [],
+      "failedRequests": [],
+      "apiErrors": [],
+      "inFlightApiRequests": []
+    },
+    "main": {
+      "finalUrl": "http://127.0.0.1:5189/tag/-qa-test-plan-codec-lab",
+      "title": "Qa Test Plan Codec Lab Video Resources & Tools",
+      "h1": "Qa Test Plan Codec Lab",
+      "cardCount": 6,
+      "resultsTotal": "6",
+      "console": [
+        {
+          "type": "warning",
+          "text": "Clerk: Clerk has been loaded with development keys. Development instances have strict usage limits and should not be used when deploying your application to production. Learn more: https://clerk.com/docs/deployments/overview"
+        }
+      ],
+      "pageErrors": [],
+      "failedRequests": [],
+      "apiErrors": [],
+      "inFlightApiRequests": []
+    }
+  }
+}

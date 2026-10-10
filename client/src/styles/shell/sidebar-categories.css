@@ -43,6 +43,15 @@
   background: var(--surface);
 }
 
+/* The owning .accordion-item clips overflow and the header fills it edge to
+   edge, so the global ring (outline-offset: 2px) was drawn wholly outside the
+   clip box: keyboard focus on a top-level category was invisible. Inset the
+   ring so it paints inside the header. */
+.av-sidebar-shell .accordion-header:focus-visible,
+.av-sidebar-drawer .accordion-header:focus-visible {
+  outline-offset: -2px;
+}
+
 /* Refined desktop taxonomy uses the V2 24px marker; the frozen drawer keeps
    the original 22px marker declared by layout.jsx. */
 .av-sidebar-category-label {

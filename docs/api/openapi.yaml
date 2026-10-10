@@ -1008,62 +1008,30 @@ components:
               items:
                 type: string
         provider:
-          description: Case-insensitive; other values return 400 invalid_provider
+          description: >-
+            Case-insensitive; one of: unknown, self-hosted, github, youtube, vimeo, aws, google-cloud, azure,
+            cloudflare, mux, akamai, wowza, brightcove, bitmovin, other. Other values answer 400 invalid_provider with
+            allowed[]
           type: string
-          enum:
-            - unknown
-            - self-hosted
-            - github
-            - youtube
-            - vimeo
-            - aws
-            - google-cloud
-            - azure
-            - cloudflare
-            - mux
-            - akamai
-            - wowza
-            - brightcove
-            - bitmovin
-            - other
+          maxLength: 512
         format:
-          description: Resource format; case-insensitive; other values return 400 invalid_format
+          description: >-
+            Case-insensitive; one of: unknown, tool, library, player, sdk, api-service, platform, course, article,
+            video, book, specification, dataset, community, other. Other values answer 400 invalid_format with allowed[]
           type: string
-          enum:
-            - unknown
-            - tool
-            - library
-            - player
-            - sdk
-            - api-service
-            - platform
-            - course
-            - article
-            - video
-            - book
-            - specification
-            - dataset
-            - community
-            - other
+          maxLength: 512
         skillLevel:
-          description: Case-insensitive; other values return 400 invalid_skillLevel
+          description: >-
+            Case-insensitive; one of: unknown, beginner, intermediate, advanced, all-levels. Other values answer 400
+            invalid_skillLevel with allowed[]
           type: string
-          enum:
-            - unknown
-            - beginner
-            - intermediate
-            - advanced
-            - all-levels
+          maxLength: 512
         kind:
-          description: Resolved kind (stored or tag-inferred); other values return 400 invalid_kind
+          description: >-
+            Case-insensitive; one of: tools, libraries, standards, events, protocols, other. Other values answer 400
+            invalid_kind with allowed[]
           type: string
-          enum:
-            - tools
-            - libraries
-            - standards
-            - events
-            - protocols
-            - other
+          maxLength: 512
         sort:
           description: Other values return 400 invalid_sort
           type: string
@@ -8586,9 +8554,80 @@ components:
               - kind
               - resolvedKind
             additionalProperties: {}
+          confidence:
+            type: integer
+            minimum: 0
+            maximum: 100
+          reason:
+            type: string
+            minLength: 1
+          type:
+            type: string
+            enum:
+              - ai_powered
+              - rule_based
+              - hybrid
+          score:
+            type: number
+            minimum: 0
+            maximum: 1
+          aiGenerated:
+            type: boolean
+          explanation:
+            type: object
+            properties:
+              summary:
+                type: string
+                minLength: 1
+              signals:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    code:
+                      type: string
+                      enum:
+                        - goal_match
+                        - format_match
+                        - time_fit
+                        - topic_match
+                        - skill_match
+                        - journey_context
+                        - positive_feedback
+                        - popular
+                    label:
+                      type: string
+                      minLength: 1
+                    evidence:
+                      type: string
+                  required:
+                    - code
+                    - label
+                  additionalProperties: false
+            required:
+              - summary
+              - signals
+            additionalProperties: false
+          feedback:
+            nullable: true
+            type: string
+            enum:
+              - helpful
+              - not_for_me
+              - already_known
+              - hidden
+              - null
+          personalized:
+            type: boolean
         required:
           - resource
-        additionalProperties: {}
+          - confidence
+          - reason
+          - type
+          - explanation
+          - feedback
+          - personalized
+        additionalProperties: false
     post_3a__2f_api_2f_recommendations.Query:
       type: object
       properties:
@@ -8717,9 +8756,80 @@ components:
               - kind
               - resolvedKind
             additionalProperties: {}
+          confidence:
+            type: integer
+            minimum: 0
+            maximum: 100
+          reason:
+            type: string
+            minLength: 1
+          type:
+            type: string
+            enum:
+              - ai_powered
+              - rule_based
+              - hybrid
+          score:
+            type: number
+            minimum: 0
+            maximum: 1
+          aiGenerated:
+            type: boolean
+          explanation:
+            type: object
+            properties:
+              summary:
+                type: string
+                minLength: 1
+              signals:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    code:
+                      type: string
+                      enum:
+                        - goal_match
+                        - format_match
+                        - time_fit
+                        - topic_match
+                        - skill_match
+                        - journey_context
+                        - positive_feedback
+                        - popular
+                    label:
+                      type: string
+                      minLength: 1
+                    evidence:
+                      type: string
+                  required:
+                    - code
+                    - label
+                  additionalProperties: false
+            required:
+              - summary
+              - signals
+            additionalProperties: false
+          feedback:
+            nullable: true
+            type: string
+            enum:
+              - helpful
+              - not_for_me
+              - already_known
+              - hidden
+              - null
+          personalized:
+            type: boolean
         required:
           - resource
-        additionalProperties: {}
+          - confidence
+          - reason
+          - type
+          - explanation
+          - feedback
+          - personalized
+        additionalProperties: false
     post_3a__2f_api_2f_recommendations_2f_feedback.Query:
       type: object
       properties:
@@ -11961,71 +12071,40 @@ paths:
           in: query
           required: false
           schema:
-            description: Case-insensitive; other values return 400 invalid_provider
+            description: >-
+              Case-insensitive; one of: unknown, self-hosted, github, youtube, vimeo, aws, google-cloud, azure,
+              cloudflare, mux, akamai, wowza, brightcove, bitmovin, other. Other values answer 400 invalid_provider with
+              allowed[]
             type: string
-            enum:
-              - unknown
-              - self-hosted
-              - github
-              - youtube
-              - vimeo
-              - aws
-              - google-cloud
-              - azure
-              - cloudflare
-              - mux
-              - akamai
-              - wowza
-              - brightcove
-              - bitmovin
-              - other
+            maxLength: 512
         - name: format
           in: query
           required: false
           schema:
-            description: Resource format; case-insensitive; other values return 400 invalid_format
+            description: >-
+              Case-insensitive; one of: unknown, tool, library, player, sdk, api-service, platform, course, article,
+              video, book, specification, dataset, community, other. Other values answer 400 invalid_format with
+              allowed[]
             type: string
-            enum:
-              - unknown
-              - tool
-              - library
-              - player
-              - sdk
-              - api-service
-              - platform
-              - course
-              - article
-              - video
-              - book
-              - specification
-              - dataset
-              - community
-              - other
+            maxLength: 512
         - name: skillLevel
           in: query
           required: false
           schema:
-            description: Case-insensitive; other values return 400 invalid_skillLevel
+            description: >-
+              Case-insensitive; one of: unknown, beginner, intermediate, advanced, all-levels. Other values answer 400
+              invalid_skillLevel with allowed[]
             type: string
-            enum:
-              - unknown
-              - beginner
-              - intermediate
-              - advanced
-              - all-levels
+            maxLength: 512
         - name: kind
           in: query
           required: false
           schema:
-            description: Resolved kind (stored or tag-inferred); other values return 400 invalid_kind
+            description: >-
+              Case-insensitive; one of: tools, libraries, standards, events, protocols, other. Other values answer 400
+              invalid_kind with allowed[]
             type: string
-            enum:
-              - tools
-              - libraries
-              - standards
-              - events
-              - protocols
-              - other
+            maxLength: 512
         - name: sort
           in: query
           required: false

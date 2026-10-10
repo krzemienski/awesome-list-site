@@ -1,0 +1,83 @@
+{
+  "base": "http://127.0.0.1:5101",
+  "email": "__qa_test_plan_j13_1791588232700+clerk_test@example.com",
+  "checks": [
+    {
+      "n": "signed in as owned throwaway account",
+      "p": true,
+      "d": {
+        "email": "__qa_test_plan_j13_1791588232700+clerk_test@example.com"
+      }
+    },
+    {
+      "n": "panel request (account POST, no refresh) 200",
+      "p": true,
+      "d": {
+        "method": "POST",
+        "url": "http://127.0.0.1:5101/api/recommendations?limit=10",
+        "count": 10
+      }
+    },
+    {
+      "n": "owned-account GET /api/recommendations 200",
+      "p": true,
+      "d": {
+        "count": 10
+      }
+    },
+    {
+      "n": "items present",
+      "p": true,
+      "d": {
+        "url": "http://127.0.0.1:5101/api/recommendations?limit=10",
+        "count": 20
+      }
+    },
+    {
+      "n": "every item has bounded/typed fields",
+      "p": true,
+      "d": {
+        "sample": {
+          "resource": {
+            "id": 186681,
+            "title": "scikit-video"
+          },
+          "confidence": 77,
+          "reason": "A good fit for getting started",
+          "explanation": {
+            "summary": "A good fit for getting started",
+            "signals": [
+              {
+                "code": "skill_match",
+                "label": "Skill-level fit",
+                "evidence": "beginner"
+              }
+            ]
+          },
+          "type": "rule_based",
+          "score": 0.6662626262626262,
+          "feedback": null,
+          "personalized": true
+        },
+        "problems": []
+      }
+    },
+    {
+      "n": "signed-in explanation renders API summary",
+      "p": true,
+      "d": {
+        "open": true,
+        "text": "Why this?A good fit for getting startedSkill-level fit: beginner",
+        "id": "recommendation-explanation-186681"
+      }
+    },
+    {
+      "n": "teardown residue 0 (Clerk + local)",
+      "p": true,
+      "d": {
+        "local": 0,
+        "clerk": 0
+      }
+    }
+  ]
+}

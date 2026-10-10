@@ -375,7 +375,9 @@ describe('Admin API Integration Tests', () => {
         .expect('Content-Type', /json/)
         .expect(400);
 
+      expect(response.body.error).toBe('validation_failed');
       expect(response.body.message).toContain('minimum 10 characters');
+      expect(String(response.body.fieldErrors.reason)).toMatch(/minimum 10 characters/);
     });
 
     it('should return 404 for non-existent resource', async () => {
@@ -663,7 +665,9 @@ describe('Admin API Integration Tests', () => {
 
       const updates = {
         title: 'Updated Title',
-        description: 'Updated description',
+        // Approved resources keep a >=20-char description (R3-28 gate); a
+        // shorter one is replaced by the generated fallback.
+        description: 'Updated description for the admin edit test',
       };
 
       const response = await adminAgent
@@ -673,7 +677,7 @@ describe('Admin API Integration Tests', () => {
         .expect(200);
 
       expect(response.body.title).toBe('Updated Title');
-      expect(response.body.description).toBe('Updated description');
+      expect(response.body.description).toBe('Updated description for the admin edit test');
     });
 
     it('should allow admin to change resource status', async () => {

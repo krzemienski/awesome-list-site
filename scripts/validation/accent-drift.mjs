@@ -492,21 +492,29 @@ function unescapeLiteral(raw) {
 function parseObjectEntries(body) {
   const entries = new Map();
   const malformed = [];
+  const duplicates = [];
   for (const part of splitTopLevel(stripComments(body))) {
     const m = OBJECT_ENTRY_RE.exec(part);
     if (!m) {
       malformed.push(part.replace(/\s+/g, ' ').slice(0, 120));
       continue;
     }
-    entries.set(m[2] ?? m[3], m[4].trim());
+    const key = m[2] ?? m[3];
+    // A duplicate key collapses before any parity check can see it: a JS
+    // object literal keeps the LAST value, so first-wins elsewhere disagrees.
+    if (entries.has(key)) {
+      duplicates.push(key);
+      continue;
+    }
+    entries.set(key, m[4].trim());
   }
-  return { entries, malformed };
+  return { entries, malformed, duplicates };
 }
 
 // Same, restricted to string-valued entries. A non-string value (a computed
 // key, a nested object) is reported as malformed rather than skipped.
 function parseObjectStringEntries(body) {
-  const { entries, malformed } = parseObjectEntries(body);
+  const { entries, malformed, duplicates } = parseObjectEntries(body);
   const strings = new Map();
   for (const [key, raw] of entries) {
     const m = STRING_LITERAL_RE.exec(raw);
@@ -516,7 +524,7 @@ function parseObjectStringEntries(body) {
     }
     strings.set(key, unescapeLiteral(m[2]));
   }
-  return { entries: strings, malformed };
+  return { entries: strings, malformed, duplicates };
 }
 
 // A string field of an object literal, read by NAME. Unlike a naive
@@ -586,11 +594,16 @@ function parseCssRootFonts(cssSrc) {
 // "System default" option — and must never be confused with a missing field).
 function parseTsFontOptions(fontsSrc) {
   const m = /export\s+const\s+FONT_OPTIONS\s*(?::[^=]*)?=\s*\[([\s\S]*?)\n\];/.exec(fontsSrc);
-  if (!m) return { fonts: new Map(), order: [], malformed: [], found: false };
+  if (!m) return { fonts: new Map(), order: [], malformed: [], duplicates: [], found: false };
   const body = stripComments(m[1]);
   const fonts = new Map();
   const order = [];
   const malformed = [];
+  // Duplicate ids are rejected BEFORE the map is built: Map.set would keep the
+  // last stack, Object.fromEntries (FONT_BOOT_DATA) the last, but the runtime
+  // applyFontOverride() uses FONT_OPTIONS.find() — the FIRST. Boot and runtime
+  // would then paint different faces for one stored id.
+  const duplicates = [];
   for (const objMatch of body.matchAll(/\{[^{}]*\}/g)) {
     const obj = objMatch[0];
     const id = stringField(obj, 'id');
@@ -599,10 +612,14 @@ function parseTsFontOptions(fontsSrc) {
       malformed.push(obj.replace(/\s+/g, ' ').slice(0, 120));
       continue;
     }
+    if (fonts.has(id)) {
+      duplicates.push({ id, first: fonts.get(id), duplicate: stack });
+      continue;
+    }
     fonts.set(id, stack);
     order.push(id);
   }
-  return { fonts, order, malformed, found: true };
+  return { fonts, order, malformed, duplicates, found: true };
 }
 
 function parseFontRegistry(fontsSrc, parsedFonts = parseTsFontOptions(fontsSrc)) {
@@ -634,9 +651,9 @@ function parseFontRegistry(fontsSrc, parsedFonts = parseTsFontOptions(fontsSrc))
 // loadFontOverride()), so `export` is optional in the match.
 function parseTsStringMap(src, name) {
   const m = new RegExp(`(?:export\\s+)?const\\s+${name}\\s*(?::[^=]*)?=\\s*\\{([\\s\\S]*?)\\n\\};`).exec(src);
-  if (!m) return { entries: new Map(), malformed: [], found: false };
-  const { entries, malformed } = parseObjectStringEntries(m[1]);
-  return { entries, malformed, found: true };
+  if (!m) return { entries: new Map(), malformed: [], duplicates: [], found: false };
+  const { entries, malformed, duplicates } = parseObjectStringEntries(m[1]);
+  return { entries, malformed, duplicates, found: true };
 }
 
 const THEME_BOOT_MARKER = '__AWESOME_VIDEO_THEME_BOOT__';
@@ -918,23 +935,90 @@ function checkThemeBoot(htmlSrc, viteSrc, wrapper, registry) {
 // attribute block alike must name a system the registry offers.
 const SYSTEM_SKIN_SELECTOR_RE = /\[data-system\s*=\s*(["'])([A-Za-z0-9_-]+)\1\s*\]/g;
 
+// Attribute selectors are parsed STRUCTURALLY, not by matching the valid
+// subset: every `[`…`]` in a selector is read, and one that targets
+// data-system but is not a complete `[data-system=<id>]` (unclosed bracket,
+// missing value, mismatched quote, a prefix/substring operator) or whose
+// attribute name is a near-miss of data-system (data-sytem, data_system,
+// data-systems) is reported with its line — a malformed skin would otherwise
+// match nothing and silently drop out of validation.
+const SYSTEM_ATTR = 'data-system';
+function editDistance(a, b) {
+  const dp = Array.from({ length: a.length + 1 }, (_, i) => [i, ...Array(b.length).fill(0)]);
+  for (let j = 1; j <= b.length; j++) dp[0][j] = j;
+  for (let i = 1; i <= a.length; i++) {
+    for (let j = 1; j <= b.length; j++) {
+      dp[i][j] = Math.min(dp[i - 1][j] + 1, dp[i][j - 1] + 1, dp[i - 1][j - 1] + (a[i - 1] === b[j - 1] ? 0 : 1));
+    }
+  }
+  return dp[a.length][b.length];
+}
+
+function parseSystemAttributeSelectors(selectorText) {
+  const out = [];
+  for (let i = selectorText.indexOf('['); i !== -1; i = selectorText.indexOf('[', i + 1)) {
+    const nameMatch = /^\[\s*([A-Za-z_][\w-]*)/.exec(selectorText.slice(i));
+    if (!nameMatch) continue;
+    const name = nameMatch[1];
+    const lower = name.toLowerCase();
+    const near = lower !== SYSTEM_ATTR && lower.startsWith('data') && editDistance(lower.replace(/_/g, '-'), SYSTEM_ATTR) <= 2;
+    if (lower !== SYSTEM_ATTR && !near) continue;
+    const close = selectorText.indexOf(']', i);
+    const raw = (close === -1 ? selectorText.slice(i) : selectorText.slice(i, close + 1)).trim();
+    if (near) {
+      out.push({ offset: i, error: `attribute "${name}" looks like a misspelt ${SYSTEM_ATTR}`, raw });
+      continue;
+    }
+    if (name !== SYSTEM_ATTR) {
+      out.push({ offset: i, error: `attribute "${name}" must be spelled exactly "${SYSTEM_ATTR}"`, raw });
+      continue;
+    }
+    if (close === -1) {
+      out.push({ offset: i, error: 'unclosed attribute selector (missing "]")', raw });
+      continue;
+    }
+    const body = selectorText.slice(i + 1, close);
+    const m = /^\s*data-system\s*=\s*(?:(["'])([A-Za-z0-9_-]+)\1|([A-Za-z_][\w-]*))\s*(?:\s[si])?\s*$/.exec(body);
+    if (!m) {
+      out.push({ offset: i, error: 'not a complete [data-system="<id>"] equality selector', raw });
+      continue;
+    }
+    out.push({ offset: i, id: m[2] ?? m[3] });
+  }
+  return out;
+}
+
 function parseCssSystemSkins(cssSrc) {
+  return parseCssSystemSelectors(cssSrc).skins;
+}
+
+function parseCssSystemSelectors(cssSrc) {
   const src = stripCommentsPreservingLines(cssSrc);
   const skins = [];
+  const malformed = [];
   for (const rule of src.matchAll(/([^{};]+)\{/g)) {
     const selectorText = rule[1];
     const selector = selectorText.trim();
     if (!selector) continue;
-    for (const match of selectorText.matchAll(SYSTEM_SKIN_SELECTOR_RE)) {
-      const offset = rule.index + match.index;
-      skins.push({
-        id: match[2],
+    for (const attr of parseSystemAttributeSelectors(selectorText)) {
+      const offset = rule.index + attr.offset;
+      const entry = {
         line: src.slice(0, offset).split('\n').length,
         selector: selector.replace(/\s+/g, ' '),
-      });
+      };
+      if (attr.error) malformed.push({ ...entry, error: attr.error, raw: attr.raw });
+      else skins.push({ ...entry, id: attr.id });
     }
   }
-  return skins;
+  return { skins, malformed };
+}
+
+function compareMalformedSystemSelectors(malformed, rel) {
+  return malformed.map(({ line, selector, error, raw }) => ({
+    kind: 'system-skin-malformed',
+    id: raw,
+    message: `${rel} line ${line}: ${error} — ${raw} in selector "${selector.slice(0, 160)}" matches no design system, so this skin silently escapes validation and never paints`,
+  }));
 }
 
 // accent-paint (app side): applyDesignSystem() writes --accent/--accent-2
@@ -2204,6 +2288,21 @@ function runCanaries() {
     'unknown system rule reports its file, id and source line',
   );
   eq(parseCssSystemSkins(':root { --bg: #000000; }').length, 0, 'zero [data-system] rules is detectable, not an empty pass');
+  const malformedSample = [
+    '[data-system="terminal" .btn { color: red; }',
+    '[data-system] .btn { color: red; }',
+    '[data-system^="term"] .btn { color: red; }',
+    '[data-system="swiss\'] .btn { color: red; }',
+    '[data-sytem="swiss"] .btn { color: red; }',
+    '[data_system="swiss"] .btn { color: red; }',
+    '[data-system=geist] .btn { color: red; }',
+    '[data-state="open"] .btn { color: red; }',
+  ].join('\n');
+  const parsedMalformed = parseCssSystemSelectors(malformedSample);
+  eq(parsedMalformed.malformed.map(({ line }) => line), [1, 2, 3, 4, 5, 6], 'unclosed / valueless / prefix-operator / mismatched-quote / misspelt data-system selectors are each reported with their line');
+  eq(parsedMalformed.skins.map(({ id }) => id), ['geist'], 'an unquoted identifier value is valid CSS and is validated, not skipped; unrelated attributes are ignored');
+  const malformedFailures = compareMalformedSystemSelectors(parsedMalformed.malformed, 'sample.css');
+  eq(malformedFailures.every((f) => f.kind === 'system-skin-malformed' && f.message.includes('sample.css line')), true, 'malformed selector failures name file and line');
 
   // App-sheet accent overrides.
   eq(
@@ -2234,6 +2333,18 @@ function runCanaries() {
   eq(parsedTsFonts.malformed.length, 1, 'entry missing stack is reported, never silently dropped');
   eq(parsedTsFonts.order[0], 'system', 'FONT_OPTIONS[0] (the runtime fallback) identified by position');
   eq(parseTsFontOptions('const OTHER = [\n];').found, false, 'renamed/absent FONT_OPTIONS is detectable');
+  const dupFonts = parseTsFontOptions([
+    'export const FONT_OPTIONS: FontOption[] = [',
+    '  { id: "inter", name: "Inter", stack: "\'Inter\', sans-serif" },',
+    '  { id: "mono", name: "Mono", stack: "monospace" },',
+    '  { id: "inter", name: "Inter 2", stack: "\'Geist\', sans-serif" },',
+    '];',
+  ].join('\n'));
+  eq(dupFonts.duplicates.map((d) => d.id), ['inter'], 'duplicate FONT_OPTIONS id is reported, never collapsed');
+  eq(dupFonts.fonts.get('inter'), "'Inter', sans-serif", 'duplicate keeps the FIRST stack (FONT_OPTIONS.find semantics), not the last');
+  eq(dupFonts.order, ['inter', 'mono'], 'duplicate id does not enter the option order twice');
+  const dupSheets = parseTsStringMap('const FONT_STYLESHEETS = {\n  inter: "https://a.test/1",\n  inter: "https://a.test/2",\n};', 'FONT_STYLESHEETS');
+  eq(dupSheets.duplicates, ['inter'], 'duplicate FONT_STYLESHEETS key is reported, never collapsed');
   const escapedStackSample = [
     'export const FONT_OPTIONS: FontOption[] = [',
     "  { id: 'inter', name: 'Inter', stack: '\\'Inter\\', system-ui, sans-serif' },",
@@ -3114,12 +3225,15 @@ function runCanaries() {
 // downgrade the run to "offline only", which reads exactly like a pass.
 const argv = process.argv.slice(2);
 const NETWORK = argv.includes('--network');
-const unknownArgs = argv.filter((a) => a !== '--network');
+const unknownArgs = argv.filter((a) => a !== '--network' && !(NETWORK && /^--evidence=.+/.test(a)));
 if (unknownArgs.length) {
+  // Exit 64 (EX_USAGE), never 2: 2 is reserved for an inconclusive --network
+  // run (provider outage), which CI treats as a warning.
   console.error(`FAIL usage :: unknown argument(s): ${unknownArgs.join(' ')}`);
-  console.error('       usage: node scripts/validation/accent-drift.mjs [--network]');
-  console.error('       --network adds the opt-in live webfont probe (npm run validate:webfont-fetch).');
-  process.exit(2);
+  console.error('       usage: node scripts/validation/accent-drift.mjs [--network [--evidence=<file.json>]]');
+  console.error('       --network adds the opt-in live webfont probe (npm run validate:webfont-fetch);');
+  console.error('       exit 0 pass · 1 defect · 2 inconclusive (provider/network outage).');
+  process.exit(64);
 }
 
 runCanaries();
@@ -3213,7 +3327,9 @@ if (defaultSystemId && systemIds.length && !systemIds.includes(defaultSystemId))
 const systemBlocks = registrySystemBlocks(registry.systems);
 if (systemIds.length) failures.push(...compareSystemPaint(systemIds, systemBlocks));
 
-const cssSystemSkins = parseCssSystemSkins(cssSrc);
+const cssSystemParsed = parseCssSystemSelectors(cssSrc);
+const cssSystemSkins = cssSystemParsed.skins;
+failures.push(...compareMalformedSystemSelectors(cssSystemParsed.malformed, CSS_REL));
 if (!cssSystemSkins.length) {
   fail('parser-rot', `parsed ZERO [data-system="…"] component skin rules out of ${CSS_REL}`);
 } else if (systemIds.length) {
@@ -3221,7 +3337,8 @@ if (!cssSystemSkins.length) {
 }
 const appSystemSkins = [];
 for (const { rel, src } of appSheets) {
-  const skins = parseCssSystemSkins(src);
+  const { skins, malformed: malformedSkins } = parseCssSystemSelectors(src);
+  failures.push(...compareMalformedSystemSelectors(malformedSkins, rel));
   appSystemSkins.push(...skins);
   if (systemIds.length) failures.push(...compareSystemSkins(systemIds, skins, rel));
 }
@@ -3268,6 +3385,9 @@ if (!tsFonts.fonts.size) fail('parser-rot', `parsed ZERO options out of FONT_OPT
 for (const obj of tsFonts.malformed) {
   fail('parser-rot', `FONT_OPTIONS entry in ${FONTS_REL} is missing id/stack: ${obj}`);
 }
+for (const d of tsFonts.duplicates) {
+  fail('font-duplicate-id', `FONT_OPTIONS in ${FONTS_REL} declares id "${d.id}" twice (first stack ${JSON.stringify(d.first)}, later ${JSON.stringify(d.duplicate)}) — the picker would list two entries for one stored value, FONT_BOOT_DATA keeps the last stack while applyFontOverride() finds the first, so boot and runtime paint different faces`);
+}
 if (!fontRegistry.found) fail('parser-rot', `${FONTS_REL} does not export FONT_BOOT_DATA`);
 for (const issue of fontRegistry.issues) fail('font-boot-registry', issue);
 if (!bootFonts.found) fail('parser-rot', `could not locate "var FONT_BOOT = ${FONT_BOOT_MARKER}" in ${HTML_REL}`);
@@ -3293,6 +3413,9 @@ if (fontSheets.found && !fontSheets.entries.size) {
 }
 for (const part of fontSheets.malformed) {
   fail('parser-rot', `FONT_STYLESHEETS entry in ${FONTS_REL} is not an "id: 'href'" pair: ${part}`);
+}
+for (const id of fontSheets.duplicates) {
+  fail('font-duplicate-id', `FONT_STYLESHEETS in ${FONTS_REL} declares key "${id}" twice — the object literal silently keeps the LAST href, so the gate would verify a URL the runtime never requests`);
 }
 if (tsFonts.fonts.size && fontSheets.entries.size) {
   failures.push(...compareFontStylesheets(tsFonts.fonts, fontSheets.entries));
@@ -3484,7 +3607,8 @@ console.log('\nPASS accent-drift :: the canonical /ds registry, its wrapper, the
 // arguments and stops here: the validation suite stays offline, so no Google
 // Fonts outage or egress proxy can fail an unrelated change.
 if (!NETWORK) {
-  console.log('\nNOTE  the live webfont probe did NOT run (offline by default, and not registered as a gate).');
+  console.log('\nNOTE  the live webfont probe did NOT run here (this offline gate never touches the network;');
+  console.log('       the hosted check is the separate `webfont-fetch` validation command and CI job).');
   console.log('       Every check above compares one file in this repo against another, so a family');
   console.log('       misspelled in BOTH a stack and its URL agrees with itself and passes here while');
   console.log('       fonts.googleapis.com answers 400 and the face never arrives.');
@@ -3558,8 +3682,60 @@ for (let i = 0; i < verifiable.length; i++) {
   );
 }
 
+// Outage vs defect. A transport error / 5xx / 429 after every retry says the
+// network or provider is down, not that the repo is wrong — that is
+// INCONCLUSIVE (exit 2), so CI can warn without blaming a font change. A 4xx,
+// a 200 that lacks the asked-for family, or a CSP-blocked file is the
+// provider's actual answer about this repo's URL — a DEFECT (exit 1).
+const outageTargetIds = new Set(
+  verifiable.filter((_, i) => responses[i].error).map((target) => target.id),
+);
+const isOutageFailure = (f) => f.kind === 'webfont-http' && outageTargetIds.has(f.id);
+const defectFailures = probeFailures.filter((f) => !isOutageFailure(f));
+const outageFailures = probeFailures.filter(isOutageFailure);
+const webfontVerdict = defectFailures.length ? 'fail' : outageFailures.length ? 'inconclusive' : 'pass';
+
+// --evidence=<file>: keep the raw per-URL answers (status, attempts, transport
+// error, served families, a bounded body excerpt) so a CI failure can be
+// diagnosed from the artifact without rerunning.
+const evidenceArg = argv.find((arg) => arg.startsWith('--evidence='));
+if (evidenceArg) {
+  const evidencePath = path.resolve(evidenceArg.slice('--evidence='.length));
+  const evidence = {
+    generatedAt: new Date().toISOString(),
+    verdict: webfontVerdict,
+    targets: verifiable.map((target, i) => {
+      const response = responses[i];
+      const served = response.status === 200 ? parseServedFamilies(response.body) : { families: new Set(), blocks: 0 };
+      return {
+        id: target.id,
+        href: target.href,
+        requestedFamilies: target.families,
+        status: response.status,
+        attempts: response.attempts,
+        transportError: response.error ?? null,
+        servedFamilies: [...served.families],
+        fontFaceBlocks: served.blocks,
+        bodyExcerpt: String(response.body ?? '').slice(0, 600),
+      };
+    }),
+    failures: probeFailures.map((f) => ({ ...f, class: isOutageFailure(f) ? 'outage' : 'defect' })),
+  };
+  fs.mkdirSync(path.dirname(evidencePath), { recursive: true });
+  fs.writeFileSync(evidencePath, `${JSON.stringify(evidence, null, 2)}\n`);
+  console.log(`       evidence written to ${evidencePath}`);
+}
+
+if (webfontVerdict === 'inconclusive') {
+  for (const f of outageFailures) console.error(`WARN ${f.kind} :: ${f.message}`);
+  console.error(`\nINCONCLUSIVE webfont-fetch :: ${outageFailures.length} URL(s) got no usable answer after ${PROBE_ATTEMPTS} attempts (transport error / 5xx / 429).`);
+  console.error('       This is a network or provider outage, not a verdict on the URLs. Rerun when the');
+  console.error('       provider is reachable; exit 2 lets CI report it as a warning, not a defect.');
+  process.exit(2);
+}
+
 if (probeFailures.length) {
-  for (const f of probeFailures) console.error(`FAIL ${f.kind} :: ${f.message}`);
+  for (const f of probeFailures) console.error(`FAIL ${f.kind}${isOutageFailure(f) ? ' (outage)' : ''} :: ${f.message}`);
   console.error(`\n${probeFailures.length} live webfont failure(s).`);
   console.error(`       These URLs are what actually download the faces ${FONTS_REL} and`);
   console.error(`       ${HTML_REL} promise. A URL that 400s, or answers 200 without the`);

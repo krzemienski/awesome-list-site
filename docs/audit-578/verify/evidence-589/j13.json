@@ -1,0 +1,40 @@
+{
+  "section": "j13",
+  "base": "http://127.0.0.1:5000",
+  "at": "2026-10-09T23:20:22.994Z",
+  "checks": [
+    {
+      "name": "recommendations response observed",
+      "pass": true,
+      "detail": {
+        "url": "http://127.0.0.1:5000/api/recommendations?limit=10",
+        "status": 200,
+        "count": 10
+      }
+    },
+    {
+      "name": "details opens and shows summary text",
+      "pass": true,
+      "detail": {}
+    },
+    {
+      "name": "explanations render the API explanation summary",
+      "pass": true,
+      "detail": [
+        {
+          "id": "recommendation-explanation-188015",
+          "text": "Why this?A good fit for intermediate learnersSkill-level fit: intermediate"
+        },
+        {
+          "id": "recommendation-explanation-188014",
+          "text": "Why this?A good fit for intermediate learnersSkill-level fit: intermediate"
+        },
+        {
+          "id": "recommendation-explanation-188012",
+          "text": "Why this?A good fit for intermediate learnersSkill-level fit: intermediate"
+        }
+      ]
+    }
+  ],
+  "consoleErrors": []
+}

@@ -1,0 +1,30 @@
+{
+  "section": "j14",
+  "base": "http://127.0.0.1:5000",
+  "at": "2026-10-09T23:24:53.066Z",
+  "checks": [
+    {
+      "name": "preview renders",
+      "pass": true,
+      "detail": {
+        "title": "Awesome.Video Design System",
+        "h1": "Five systems.One taxonomy.",
+        "textLen": 7182,
+        "links": [
+          "#showcase-main",
+          "#showcase",
+          "#docs-overview",
+          "#showcase"
+        ]
+      }
+    },
+    {
+      "name": "docs route renders",
+      "pass": true,
+      "detail": {
+        "docLink": "#docs-overview"
+      }
+    }
+  ],
+  "consoleErrors": []
+}

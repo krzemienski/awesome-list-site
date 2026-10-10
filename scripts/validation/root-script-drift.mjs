@@ -255,50 +255,99 @@ const ROOT_CONFIG_MANIFEST = [
 ];
 
 // Manual runbooks cannot be discovered by a tool, so they need an explicit
-// out-of-band pin. Keep the reason beside the pin: a bare allowlist would let
-// completed one-offs accumulate in the active scripts directory unnoticed.
+// out-of-band pin. A note alone is not enough — a reason written once never
+// expires, so completed one-offs would accumulate behind stale prose. Every pin
+// therefore carries:
+//   · keep     — machine-checkable conditions that make the reason TRUE today:
+//                { documentedIn: 'docs/X.md' } the runbook's supported
+//                invocation is still documented there (the doc names the
+//                script path), and/or { requires: 'path' } the thing it
+//                operates on still exists. Any false condition = stale pin.
+//   · reviewed — ISO date a human last confirmed the pin; older than
+//                MANUAL_PIN_MAX_AGE_DAYS = stale pin (re-review or archive).
+const MANUAL_PIN_MAX_AGE_DAYS = 365;
 const MANUAL_RUNBOOK_MANIFEST = [
-  {
-    file: 'scripts/run-ds.sh',
-    note: 'retained interactive Claude Code launcher for the design-system run; run by hand from a local checkout',
-  },
-  {
-    file: 'scripts/setup-ds-run.sh',
-    note: 'retained setup + launch helper for the interactive design-system run; run by hand from a local checkout',
-  },
   {
     file: 'scripts/migrate.ts',
     note: 'retained standalone migration runner for non-Replit/self-hosted recovery',
+    keep: [{ documentedIn: 'docs/DATABASE.md' }, { requires: 'migrations/meta/_journal.json' }],
+    reviewed: '2026-10-09',
   },
   {
     file: 'scripts/prod-link-scan.ts',
     note: 'retained resumable production URL sweep; read-only and intentionally run by hand',
+    keep: [{ documentedIn: 'docs/ADMIN-GUIDE.md' }],
+    reviewed: '2026-10-09',
   },
   {
     file: 'scripts/verify-docker-deployment.sh',
     note: 'retained self-hosted Docker deployment verification runbook',
+    keep: [{ documentedIn: 'docs/DOCKER.md' }, { requires: 'docker-compose.yml' }],
+    reviewed: '2026-10-09',
   },
   {
     file: 'scripts/verify-non-replit-build.sh',
     note: 'retained non-Replit production build verification runbook',
+    keep: [{ documentedIn: 'docs/DOCKER.md' }, { requires: 'Dockerfile' }],
+    reviewed: '2026-10-09',
   },
   {
     file: 'scripts/vg2-ga4-validate.mjs',
     note: 'retained real-browser GA4 validation runbook, invoked after analytics changes',
+    keep: [{ documentedIn: 'docs/ANALYTICS.md' }],
+    reviewed: '2026-10-09',
   },
   {
     file: 'scripts/vg2-teardown.ts',
     note: 'retained cleanup runbook for the GA4 validation harness when automatic cleanup is incomplete',
+    keep: [{ documentedIn: 'docs/ANALYTICS.md' }, { requires: 'scripts/vg2-ga4-validate.mjs' }],
+    reviewed: '2026-10-09',
   },
   {
     file: 'scripts/export-openapi-yaml.ts',
     note: 'retained on-demand OpenAPI artifact export used when refreshing checked-in API documentation',
+    keep: [{ requires: 'docs/api/openapi.yaml' }],
+    reviewed: '2026-10-09',
   },
   {
     file: 'scripts/test-feedback-loop.ts',
     note: 'retained opt-in database-backed recommendation regression probe with QA-only teardown',
+    keep: [{ requires: 'server/ai/recommendationEngine.ts' }],
+    reviewed: '2026-10-09',
   },
 ];
+
+// Why a manual pin no longer holds, or null when every condition is true.
+// `readFile(rel)` returns the file text or null when absent (injectable for
+// canaries); `today` is a Date.
+function staleManualPinReason(entry, { readFile = readRootFile, today = new Date() } = {}) {
+  if (typeof entry.note !== 'string' || !entry.note.trim()) return 'listed in MANUAL_RUNBOOK_MANIFEST without a documented non-empty reason';
+  if (!Array.isArray(entry.keep) || !entry.keep.length) return 'pinned in MANUAL_RUNBOOK_MANIFEST without any machine-checkable keep condition';
+  for (const cond of entry.keep) {
+    if (cond && typeof cond.documentedIn === 'string') {
+      const doc = readFile(cond.documentedIn);
+      if (doc === null) return `keep condition failed: ${cond.documentedIn} (where its invocation is documented) no longer exists`;
+      if (!doc.includes(entry.file)) return `keep condition failed: ${cond.documentedIn} no longer documents ${entry.file}`;
+    } else if (cond && typeof cond.requires === 'string') {
+      if (readFile(cond.requires) === null) return `keep condition failed: required ${cond.requires} no longer exists`;
+    } else {
+      return `unrecognized keep condition ${JSON.stringify(cond)}`;
+    }
+  }
+  const reviewed = typeof entry.reviewed === 'string' ? new Date(`${entry.reviewed}T00:00:00Z`) : null;
+  if (!reviewed || Number.isNaN(reviewed.getTime())) return 'pinned without a valid `reviewed` ISO date';
+  const ageDays = Math.floor((today.getTime() - reviewed.getTime()) / 86_400_000);
+  if (ageDays > MANUAL_PIN_MAX_AGE_DAYS) return `pin last reviewed ${entry.reviewed} (${ageDays} days ago, limit ${MANUAL_PIN_MAX_AGE_DAYS}) — re-confirm the reason or archive the script`;
+  return null;
+}
+
+function readRootFile(rel) {
+  try {
+    return fs.readFileSync(path.join(ROOT, rel), 'utf8');
+  } catch {
+    return null;
+  }
+}
 
 // Execution trees: walked for CODE files, which contribute IMPORT EDGES ONLY.
 // Their text is never searched for filenames — see "two kinds of evidence".
@@ -855,15 +904,16 @@ function resolveRootTarget(spec, importerAbs, rootFileNames) {
 // rootEdges:   Map<rootFileName, Set<rootFileName>> edges from other root files
 // deps:        Set<string> of declared package names
 // ---------------------------------------------------------------------------
-function directEvidence(name, { surfaces, importedBy, deps, npmScripts, pkgFields, manualRunbooks = MANUAL_RUNBOOK_MANIFEST }) {
+function directEvidence(name, { surfaces, importedBy, deps, npmScripts, pkgFields, manualRunbooks = MANUAL_RUNBOOK_MANIFEST, manualPinCheck = staleManualPinReason }) {
   const config = ROOT_CONFIG_MANIFEST.find((e) => e.file === name);
   if (config && deps.has(config.pkg)) {
     return { kind: 'recognized-config', where: `${config.pkg} — ${config.note}` };
   }
 
   const manual = manualRunbooks.find((e) => e.file === name);
-  if (manual && typeof manual.note === 'string' && manual.note.trim()) {
-    return { kind: 'manual-runbook', where: manual.note.trim() };
+  const manualStale = manual ? manualPinCheck(manual) : null;
+  if (manual && !manualStale) {
+    return { kind: 'manual-runbook', where: `${manual.note.trim()} (reviewed ${manual.reviewed})` };
   }
 
   for (const [scriptName, command] of npmScripts) {
@@ -907,10 +957,7 @@ function directEvidence(name, { surfaces, importedBy, deps, npmScripts, pkgField
     };
   }
   if (manual) {
-    return {
-      kind: 'stray',
-      why: 'listed in MANUAL_RUNBOOK_MANIFEST without a documented non-empty reason',
-    };
+    return { kind: 'stray', why: `stale manual pin — ${manualStale}` };
   }
   return { kind: 'stray', why: null };
 }
@@ -992,10 +1039,21 @@ function activeScriptFiles() {
   } catch {
     return [];
   }
+  // Extensionless direct children count when they carry a recognized
+  // shebang — the same rule as the root, so `scripts/foo` (chmod +x, no
+  // extension) cannot hide from the inventory just by dropping its suffix.
+  const isShebangScript = (n) => {
+    if (path.extname(n) !== '' || n.startsWith('.')) return false;
+    try {
+      return recognizedShebangInterpreter(fs.readFileSync(path.join(dir, n), 'utf8')) !== null;
+    } catch {
+      return false;
+    }
+  };
   return entries
     .filter((e) => e.isFile())
     .map((e) => e.name)
-    .filter((n) => CHECKED_EXTS.has(path.extname(n)) && !n.endsWith('.d.ts'))
+    .filter((n) => (CHECKED_EXTS.has(path.extname(n)) && !n.endsWith('.d.ts')) || isShebangScript(n))
     .map((n) => `${ACTIVE_SCRIPT_DIR}/${n}`)
     .sort();
 }
@@ -1336,8 +1394,24 @@ function runCanaries() {
   eq(kindOf('scripts/probe.mjs', { importedBy: new Map([['scripts/probe.mjs', 'scripts/validation/x.mjs']]) }), 'import', 'a real import keeps an active script');
   const manualRunbook = MANUAL_RUNBOOK_MANIFEST[0].file;
   eq(kindOf(manualRunbook), 'manual-runbook', 'a documented manual runbook is pinned');
-  eq(kindOf('scripts/probe.mjs', { manualRunbooks: [{ file: 'scripts/probe.mjs', note: 'synthetic manual reason' }] }), 'manual-runbook', 'a documented manual reason can pin a runbook');
-  eq(kindOf('scripts/probe.mjs', { manualRunbooks: [{ file: 'scripts/probe.mjs', note: '   ' }] }), 'stray', 'a manual pin without a documented reason cannot pass');
+  const fakeFiles = { 'docs/RUN.md': 'Run `tsx scripts/probe.mjs` by hand.', 'data/target.json': '{}' };
+  const fakeRead = (rel) => (rel in fakeFiles ? fakeFiles[rel] : null);
+  const today = new Date('2026-10-09T12:00:00Z');
+  const pinCheck = (entry) => staleManualPinReason(entry, { readFile: fakeRead, today });
+  const goodPin = { file: 'scripts/probe.mjs', note: 'synthetic manual reason', keep: [{ documentedIn: 'docs/RUN.md' }, { requires: 'data/target.json' }], reviewed: '2026-10-01' };
+  const pinKind = (entry) => kindOf('scripts/probe.mjs', { manualRunbooks: [entry], manualPinCheck: pinCheck });
+  eq(pinKind(goodPin), 'manual-runbook', 'a documented, condition-backed, recently reviewed pin keeps a runbook');
+  eq(pinKind({ ...goodPin, note: '   ' }), 'stray', 'a manual pin without a documented reason cannot pass');
+  eq(pinKind({ ...goodPin, keep: [] }), 'stray', 'a note-only pin (no keep condition) cannot pass');
+  eq(pinKind({ ...goodPin, keep: [{ documentedIn: 'docs/GONE.md' }] }), 'stray', 'a pin whose documenting file vanished is stale');
+  eq(pinKind({ ...goodPin, keep: [{ documentedIn: 'data/target.json' }] }), 'stray', 'a pin whose doc no longer names the script is stale');
+  eq(pinKind({ ...goodPin, keep: [{ requires: 'data/gone.json' }] }), 'stray', 'a pin whose required target vanished is stale');
+  eq(pinKind({ ...goodPin, reviewed: '2025-01-01' }), 'stray', 'a pin reviewed more than a year ago is stale');
+  eq(pinKind({ ...goodPin, reviewed: undefined }), 'stray', 'a pin without a review date is stale');
+  for (const entry of MANUAL_RUNBOOK_MANIFEST) {
+    const why = staleManualPinReason(entry);
+    if (why) throw new Error(`canary: real manual pin ${entry.file} is stale — ${why}`);
+  }
   eq(isCommandSurface('scripts/archive/old.sh'), false, 'archive scripts are not command surfaces');
 
   // package.json is read field by field: only fields that npm resolves to a

@@ -1,0 +1,316 @@
+{
+  "section": "j02",
+  "base": "http://127.0.0.1:5000",
+  "at": "2026-10-09T23:16:03.438Z",
+  "checks": [
+    {
+      "name": "767: sidebar hidden, drawer trigger shown",
+      "pass": true,
+      "detail": {
+        "sidebarVisible": false,
+        "triggerVisible": true
+      }
+    },
+    {
+      "name": "767: pointer toggles top-level without navigation",
+      "pass": true,
+      "detail": {
+        "exp0": "false",
+        "exp1": "true",
+        "before": "/",
+        "after": "/",
+        "height": 48,
+        "name": "Community & Events"
+      }
+    },
+    {
+      "name": "767: top-level target >= 44px tall",
+      "pass": true,
+      "detail": {
+        "h": 48,
+        "w": 339
+      }
+    },
+    {
+      "name": "767: pointer toggles nested without navigation",
+      "pass": true,
+      "detail": {
+        "n0": "false",
+        "n1": "true",
+        "nAfter": "/"
+      }
+    },
+    {
+      "name": "767: nested target >= 44x44",
+      "pass": true,
+      "detail": {
+        "h": 44,
+        "w": 44
+      }
+    },
+    {
+      "name": "767: keyboard Enter toggles nested with visible focus",
+      "pass": true,
+      "detail": {
+        "focusedIsNested": true,
+        "n2": "false",
+        "outline": {
+          "outlineStyle": "solid",
+          "outlineWidth": "2px",
+          "boxShadow": "none"
+        }
+      }
+    },
+    {
+      "name": "767: keyboard Enter toggles top-level, no navigation, focus-visible",
+      "pass": true,
+      "detail": {
+        "fv": true,
+        "exp2": "false",
+        "urlK": "/"
+      }
+    },
+    {
+      "name": "767: ellipsised leaves expose full name via title",
+      "pass": true,
+      "detail": {
+        "leaves": 3,
+        "truncated": 0,
+        "sample": [],
+        "bad": []
+      }
+    },
+    {
+      "name": "768: persistent sidebar visible",
+      "pass": true,
+      "detail": {
+        "sidebarVisible": true,
+        "triggerVisible": true
+      }
+    },
+    {
+      "name": "768: pointer toggles top-level without navigation",
+      "pass": true,
+      "detail": {
+        "exp0": "false",
+        "exp1": "true",
+        "before": "/",
+        "after": "/",
+        "height": 50,
+        "name": "Community & Events"
+      }
+    },
+    {
+      "name": "768: top-level target >= 44px tall",
+      "pass": true,
+      "detail": {
+        "h": 50,
+        "w": 239
+      }
+    },
+    {
+      "name": "768: pointer toggles nested without navigation",
+      "pass": true,
+      "detail": {
+        "n0": "false",
+        "n1": "true",
+        "nAfter": "/"
+      }
+    },
+    {
+      "name": "768: nested target >= 44x44",
+      "pass": true,
+      "detail": {
+        "h": 44,
+        "w": 44
+      }
+    },
+    {
+      "name": "768: keyboard Enter toggles nested with visible focus",
+      "pass": true,
+      "detail": {
+        "focusedIsNested": true,
+        "n2": "false",
+        "outline": {
+          "outlineStyle": "solid",
+          "outlineWidth": "2px",
+          "boxShadow": "none"
+        }
+      }
+    },
+    {
+      "name": "768: keyboard Enter toggles top-level, no navigation, focus-visible",
+      "pass": true,
+      "detail": {
+        "fv": true,
+        "exp2": "false",
+        "urlK": "/"
+      }
+    },
+    {
+      "name": "768: ellipsised leaves expose full name via title",
+      "pass": true,
+      "detail": {
+        "leaves": 3,
+        "truncated": 0,
+        "sample": [],
+        "bad": []
+      }
+    },
+    {
+      "name": "1024: persistent sidebar visible",
+      "pass": true,
+      "detail": {
+        "sidebarVisible": true,
+        "triggerVisible": true
+      }
+    },
+    {
+      "name": "1024: pointer toggles top-level without navigation",
+      "pass": true,
+      "detail": {
+        "exp0": "false",
+        "exp1": "true",
+        "before": "/",
+        "after": "/",
+        "height": 50,
+        "name": "Community & Events"
+      }
+    },
+    {
+      "name": "1024: top-level target >= 44px tall",
+      "pass": true,
+      "detail": {
+        "h": 50,
+        "w": 239
+      }
+    },
+    {
+      "name": "1024: pointer toggles nested without navigation",
+      "pass": true,
+      "detail": {
+        "n0": "false",
+        "n1": "true",
+        "nAfter": "/"
+      }
+    },
+    {
+      "name": "1024: nested target >= 44x44",
+      "pass": true,
+      "detail": {
+        "h": 44,
+        "w": 44
+      }
+    },
+    {
+      "name": "1024: keyboard Enter toggles nested with visible focus",
+      "pass": true,
+      "detail": {
+        "focusedIsNested": true,
+        "n2": "false",
+        "outline": {
+          "outlineStyle": "solid",
+          "outlineWidth": "2px",
+          "boxShadow": "none"
+        }
+      }
+    },
+    {
+      "name": "1024: keyboard Enter toggles top-level, no navigation, focus-visible",
+      "pass": true,
+      "detail": {
+        "fv": true,
+        "exp2": "false",
+        "urlK": "/"
+      }
+    },
+    {
+      "name": "1024: ellipsised leaves expose full name via title",
+      "pass": true,
+      "detail": {
+        "leaves": 3,
+        "truncated": 0,
+        "sample": [],
+        "bad": []
+      }
+    },
+    {
+      "name": "1280: persistent sidebar visible",
+      "pass": true,
+      "detail": {
+        "sidebarVisible": true,
+        "triggerVisible": false
+      }
+    },
+    {
+      "name": "1280: pointer toggles top-level without navigation",
+      "pass": true,
+      "detail": {
+        "exp0": "false",
+        "exp1": "true",
+        "before": "/",
+        "after": "/",
+        "height": 50,
+        "name": "Community & Events"
+      }
+    },
+    {
+      "name": "1280: top-level target >= 44px tall",
+      "pass": true,
+      "detail": {
+        "h": 50,
+        "w": 279
+      }
+    },
+    {
+      "name": "1280: pointer toggles nested without navigation",
+      "pass": true,
+      "detail": {
+        "n0": "false",
+        "n1": "true",
+        "nAfter": "/"
+      }
+    },
+    {
+      "name": "1280: nested target >= 44x44",
+      "pass": true,
+      "detail": {
+        "h": 44,
+        "w": 44
+      }
+    },
+    {
+      "name": "1280: keyboard Enter toggles nested with visible focus",
+      "pass": true,
+      "detail": {
+        "focusedIsNested": true,
+        "n2": "false",
+        "outline": {
+          "outlineStyle": "solid",
+          "outlineWidth": "2px",
+          "boxShadow": "none"
+        }
+      }
+    },
+    {
+      "name": "1280: keyboard Enter toggles top-level, no navigation, focus-visible",
+      "pass": true,
+      "detail": {
+        "fv": true,
+        "exp2": "false",
+        "urlK": "/"
+      }
+    },
+    {
+      "name": "1280: ellipsised leaves expose full name via title",
+      "pass": true,
+      "detail": {
+        "leaves": 3,
+        "truncated": 0,
+        "sample": [],
+        "bad": []
+      }
+    }
+  ],
+  "consoleErrors": []
+}

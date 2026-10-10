@@ -1,0 +1,27 @@
+{
+  "section": "j03",
+  "base": "http://127.0.0.1:5000",
+  "at": "2026-10-09T23:19:08.048Z",
+  "checks": [
+    {
+      "name": "admin stats 200 in browser",
+      "pass": true,
+      "detail": {
+        "status": 200,
+        "migrations": {
+          "applied": 27,
+          "journaled": 27
+        }
+      }
+    },
+    {
+      "name": "Database panel renders metrics",
+      "pass": true,
+      "detail": {
+        "live": "10,948",
+        "migrationsSnippet": "MIGRATIONS 27 0 pending Database seeding Tables PostgreSQL — primary database NAME ROWS "
+      }
+    }
+  ],
+  "consoleErrors": []
+}

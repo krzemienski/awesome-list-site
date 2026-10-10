@@ -199,6 +199,14 @@ args = "canonical-token-parity"
 task = "workflow.run"
 args = "admin-catalog-kind-mappings"
 
+[[workflows.workflow.tasks]]
+task = "workflow.run"
+args = "webfont-fetch"
+
+[[workflows.workflow.tasks]]
+task = "workflow.run"
+args = "artifact-deps"
+
 [[workflows.workflow]]
 name = "Start application"
 author = "agent"
@@ -607,6 +615,28 @@ author = "agent"
 [[workflows.workflow.tasks]]
 task = "shell.exec"
 args = "node scripts/validation/admin-catalog-kind-mappings.mjs"
+
+[workflows.workflow.metadata]
+isValidation = true
+
+[[workflows.workflow]]
+name = "webfont-fetch"
+author = "agent"
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = "npm run validate:webfont-fetch"
+
+[workflows.workflow.metadata]
+isValidation = true
+
+[[workflows.workflow]]
+name = "artifact-deps"
+author = "agent"
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = "npm run validate:artifact-deps"
 
 [workflows.workflow.metadata]
 isValidation = true

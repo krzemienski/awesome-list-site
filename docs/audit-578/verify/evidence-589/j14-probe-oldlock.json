@@ -1,0 +1,441 @@
+{
+  "generatedAt": "2026-10-09T23:04:51.732Z",
+  "artifact": "artifacts/awesome-video-design-system",
+  "policyMinSeverity": "moderate",
+  "closureSize": 130,
+  "verdict": "fail",
+  "findings": [
+    {
+      "package": "browserslist",
+      "advisory": 1153171,
+      "severity": "high",
+      "title": "Browserslist: Unbounded memory growth (no cache eviction) via distinct query results, leading to eventual OOM",
+      "url": "https://github.com/advisories/GHSA-c83g-rgw3-j3cx",
+      "range": "<=4.28.6",
+      "nodes": [
+        "node_modules/browserslist"
+      ],
+      "fixAvailable": true
+    },
+    {
+      "package": "browserslist",
+      "advisory": 1153172,
+      "severity": "high",
+      "title": "Browserslist: Uncaught crash / prototype write via untrusted browserslist-stats.json custom stats (normalizeStats)",
+      "url": "https://github.com/advisories/GHSA-73wf-gq98-2v4g",
+      "range": "<=4.28.6",
+      "nodes": [
+        "node_modules/browserslist"
+      ],
+      "fixAvailable": true
+    },
+    {
+      "package": "nanoid",
+      "advisory": 1138811,
+      "severity": "high",
+      "title": "nanoid: non-secure generators can loop indefinitely with negative size",
+      "url": "https://github.com/advisories/GHSA-28wg-ghj8-5hjv",
+      "range": "<3.3.16",
+      "nodes": [
+        "node_modules/postcss/node_modules/nanoid"
+      ],
+      "fixAvailable": true
+    },
+    {
+      "package": "nanoid",
+      "advisory": 1139427,
+      "severity": "high",
+      "title": "nanoid: custom generators can loop indefinitely when size is zero",
+      "url": "https://github.com/advisories/GHSA-2v37-7h3g-55p8",
+      "range": "<3.3.18",
+      "nodes": [
+        "node_modules/postcss/node_modules/nanoid"
+      ],
+      "fixAvailable": true
+    },
+    {
+      "package": "postcss",
+      "advisory": 1124252,
+      "severity": "high",
+      "title": "PostCSS: Arbitrary file read and information disclosure via attacker-controlled sourceMappingURL in CSS comments",
+      "url": "https://github.com/advisories/GHSA-6g55-p6wh-862q",
+      "range": "<=8.5.11",
+      "nodes": [
+        "node_modules/postcss"
+      ],
+      "fixAvailable": true
+    },
+    {
+      "package": "postcss",
+      "advisory": 1139510,
+      "severity": "high",
+      "title": "PostCSS: Path Traversal in Previous Source Map Auto-Loading (sourceMappingURL) leads to Arbitrary .map File Disclosure",
+      "url": "https://github.com/advisories/GHSA-r28c-9q8g-f849",
+      "range": "<=8.5.17",
+      "nodes": [
+        "node_modules/postcss"
+      ],
+      "fixAvailable": true
+    },
+    {
+      "package": "source-map-js",
+      "advisory": 1241209,
+      "severity": "high",
+      "title": "source-map-js allows event-loop denial of service through indexed source-map section offsets",
+      "url": "https://github.com/advisories/GHSA-68fv-2mgg-jv7q",
+      "range": ">=1.0.0 <1.2.2",
+      "nodes": [
+        "node_modules/source-map-js"
+      ],
+      "fixAvailable": true
+    },
+    {
+      "package": "vite",
+      "advisory": 1123525,
+      "severity": "high",
+      "title": "vite: `server.fs.deny` bypass on Windows alternate paths",
+      "url": "https://github.com/advisories/GHSA-fx2h-pf6j-xcff",
+      "range": "<=6.4.2",
+      "nodes": [
+        "node_modules/vite"
+      ],
+      "fixAvailable": {
+        "name": "vite",
+        "version": "8.3.4",
+        "isSemVerMajor": true
+      }
+    },
+    {
+      "package": "baseline-browser-mapping",
+      "advisory": 1193686,
+      "severity": "moderate",
+      "title": "baseline-browser-mapping process termination on invalid input causes denial of service",
+      "url": "https://github.com/advisories/GHSA-w5vr-8v7q-w6rv",
+      "range": ">=2.0.0 <2.11.0",
+      "nodes": [
+        "node_modules/baseline-browser-mapping"
+      ],
+      "fixAvailable": true
+    },
+    {
+      "package": "esbuild",
+      "advisory": 1102341,
+      "severity": "moderate",
+      "title": "esbuild enables any website to send any requests to the development server and read the response",
+      "url": "https://github.com/advisories/GHSA-67mh-4wv8-2f99",
+      "range": "<=0.24.2",
+      "nodes": [
+        "node_modules/vite/node_modules/esbuild"
+      ],
+      "fixAvailable": {
+        "name": "vite",
+        "version": "8.3.4",
+        "isSemVerMajor": true
+      }
+    },
+    {
+      "package": "postcss",
+      "advisory": 1117015,
+      "severity": "moderate",
+      "title": "PostCSS has XSS via Unescaped </style> in its CSS Stringify Output",
+      "url": "https://github.com/advisories/GHSA-qx2v-qp2m-jg93",
+      "range": "<8.5.10",
+      "nodes": [
+        "node_modules/postcss"
+      ],
+      "fixAvailable": true
+    },
+    {
+      "package": "postcss",
+      "advisory": 1130709,
+      "severity": "moderate",
+      "title": "PostCSS: incomplete fix of GHSA-6g55-p6wh-862q — attacker-controlled sourceMappingURL reads arbitrary .map files when `from` is unset",
+      "url": "https://github.com/advisories/GHSA-fxqj-rqcc-2cmp",
+      "range": "<=8.5.22",
+      "nodes": [
+        "node_modules/postcss"
+      ],
+      "fixAvailable": true
+    },
+    {
+      "package": "vite",
+      "advisory": 1116229,
+      "severity": "moderate",
+      "title": "Vite Vulnerable to Path Traversal in Optimized Deps `.map` Handling",
+      "url": "https://github.com/advisories/GHSA-4w7w-66w2-5vf9",
+      "range": "<=6.4.1",
+      "nodes": [
+        "node_modules/vite"
+      ],
+      "fixAvailable": {
+        "name": "vite",
+        "version": "8.3.4",
+        "isSemVerMajor": true
+      }
+    },
+    {
+      "package": "vite",
+      "advisory": 1120784,
+      "severity": "moderate",
+      "title": "launch-editor: NTLMv2 hash disclosure via UNC path handling on Windows",
+      "url": "https://github.com/advisories/GHSA-v6wh-96g9-6wx3",
+      "range": "<=6.4.2",
+      "nodes": [
+        "node_modules/vite"
+      ],
+      "fixAvailable": {
+        "name": "vite",
+        "version": "8.3.4",
+        "isSemVerMajor": true
+      }
+    }
+  ],
+  "reviewed": [
+    {
+      "package": "vite",
+      "advisory": 1123525,
+      "severity": "high",
+      "title": "vite: `server.fs.deny` bypass on Windows alternate paths",
+      "url": "https://github.com/advisories/GHSA-fx2h-pf6j-xcff",
+      "range": "<=6.4.2",
+      "nodes": [
+        "node_modules/vite"
+      ],
+      "fixAvailable": {
+        "name": "vite",
+        "version": "8.3.4",
+        "isSemVerMajor": true
+      },
+      "exception": {
+        "ok": true,
+        "why": "server.fs.deny bypass via Windows alternate path forms (8.3 names / ADS). The artifact's Vite dev server runs only on the Linux workspace container; the artifact has no production service (artifact.toml defines a development run only), so the Windows path forms cannot reach it.",
+        "reviewed": "2026-10-09"
+      }
+    },
+    {
+      "package": "esbuild",
+      "advisory": 1102341,
+      "severity": "moderate",
+      "title": "esbuild enables any website to send any requests to the development server and read the response",
+      "url": "https://github.com/advisories/GHSA-67mh-4wv8-2f99",
+      "range": "<=0.24.2",
+      "nodes": [
+        "node_modules/vite/node_modules/esbuild"
+      ],
+      "fixAvailable": {
+        "name": "vite",
+        "version": "8.3.4",
+        "isSemVerMajor": true
+      },
+      "exception": {
+        "ok": true,
+        "why": "The advisory concerns esbuild's own serve() development server answering cross-origin requests. Vite 5 bundles esbuild only as a transform/pre-bundle library and never starts esbuild's serve mode, so the vulnerable server is not running.",
+        "reviewed": "2026-10-09"
+      }
+    },
+    {
+      "package": "vite",
+      "advisory": 1116229,
+      "severity": "moderate",
+      "title": "Vite Vulnerable to Path Traversal in Optimized Deps `.map` Handling",
+      "url": "https://github.com/advisories/GHSA-4w7w-66w2-5vf9",
+      "range": "<=6.4.1",
+      "nodes": [
+        "node_modules/vite"
+      ],
+      "fixAvailable": {
+        "name": "vite",
+        "version": "8.3.4",
+        "isSemVerMajor": true
+      },
+      "exception": {
+        "ok": true,
+        "why": "Path traversal in optimized-deps .map handling affects a running Vite DEV server only. This artifact is never built into or served by the published app (no production service in artifact.toml); exposure is limited to the workspace dev preview while it is open. Remove when the shared Vite major upgrade lands.",
+        "reviewed": "2026-10-09"
+      }
+    },
+    {
+      "package": "vite",
+      "advisory": 1120784,
+      "severity": "moderate",
+      "title": "launch-editor: NTLMv2 hash disclosure via UNC path handling on Windows",
+      "url": "https://github.com/advisories/GHSA-v6wh-96g9-6wx3",
+      "range": "<=6.4.2",
+      "nodes": [
+        "node_modules/vite"
+      ],
+      "fixAvailable": {
+        "name": "vite",
+        "version": "8.3.4",
+        "isSemVerMajor": true
+      },
+      "exception": {
+        "ok": true,
+        "why": "launch-editor NTLMv2 hash disclosure through UNC paths is Windows-only (SMB authentication on a Windows host). The dev server runs on Linux and no production service exists for this artifact.",
+        "reviewed": "2026-10-09"
+      }
+    }
+  ],
+  "failures": [
+    {
+      "kind": "artifact-advisory",
+      "finding": {
+        "package": "browserslist",
+        "advisory": 1153171,
+        "severity": "high",
+        "title": "Browserslist: Unbounded memory growth (no cache eviction) via distinct query results, leading to eventual OOM",
+        "url": "https://github.com/advisories/GHSA-c83g-rgw3-j3cx",
+        "range": "<=4.28.6",
+        "nodes": [
+          "node_modules/browserslist"
+        ],
+        "fixAvailable": true
+      },
+      "message": "HIGH browserslist (<=4.28.6) — Browserslist: Unbounded memory growth (no cache eviction) via distinct query results, leading to eventual OOM https://github.com/advisories/GHSA-c83g-rgw3-j3cx — at node_modules/browserslist; no reviewed exception"
+    },
+    {
+      "kind": "artifact-advisory",
+      "finding": {
+        "package": "browserslist",
+        "advisory": 1153172,
+        "severity": "high",
+        "title": "Browserslist: Uncaught crash / prototype write via untrusted browserslist-stats.json custom stats (normalizeStats)",
+        "url": "https://github.com/advisories/GHSA-73wf-gq98-2v4g",
+        "range": "<=4.28.6",
+        "nodes": [
+          "node_modules/browserslist"
+        ],
+        "fixAvailable": true
+      },
+      "message": "HIGH browserslist (<=4.28.6) — Browserslist: Uncaught crash / prototype write via untrusted browserslist-stats.json custom stats (normalizeStats) https://github.com/advisories/GHSA-73wf-gq98-2v4g — at node_modules/browserslist; no reviewed exception"
+    },
+    {
+      "kind": "artifact-advisory",
+      "finding": {
+        "package": "nanoid",
+        "advisory": 1138811,
+        "severity": "high",
+        "title": "nanoid: non-secure generators can loop indefinitely with negative size",
+        "url": "https://github.com/advisories/GHSA-28wg-ghj8-5hjv",
+        "range": "<3.3.16",
+        "nodes": [
+          "node_modules/postcss/node_modules/nanoid"
+        ],
+        "fixAvailable": true
+      },
+      "message": "HIGH nanoid (<3.3.16) — nanoid: non-secure generators can loop indefinitely with negative size https://github.com/advisories/GHSA-28wg-ghj8-5hjv — at node_modules/postcss/node_modules/nanoid; no reviewed exception"
+    },
+    {
+      "kind": "artifact-advisory",
+      "finding": {
+        "package": "nanoid",
+        "advisory": 1139427,
+        "severity": "high",
+        "title": "nanoid: custom generators can loop indefinitely when size is zero",
+        "url": "https://github.com/advisories/GHSA-2v37-7h3g-55p8",
+        "range": "<3.3.18",
+        "nodes": [
+          "node_modules/postcss/node_modules/nanoid"
+        ],
+        "fixAvailable": true
+      },
+      "message": "HIGH nanoid (<3.3.18) — nanoid: custom generators can loop indefinitely when size is zero https://github.com/advisories/GHSA-2v37-7h3g-55p8 — at node_modules/postcss/node_modules/nanoid; no reviewed exception"
+    },
+    {
+      "kind": "artifact-advisory",
+      "finding": {
+        "package": "postcss",
+        "advisory": 1124252,
+        "severity": "high",
+        "title": "PostCSS: Arbitrary file read and information disclosure via attacker-controlled sourceMappingURL in CSS comments",
+        "url": "https://github.com/advisories/GHSA-6g55-p6wh-862q",
+        "range": "<=8.5.11",
+        "nodes": [
+          "node_modules/postcss"
+        ],
+        "fixAvailable": true
+      },
+      "message": "HIGH postcss (<=8.5.11) — PostCSS: Arbitrary file read and information disclosure via attacker-controlled sourceMappingURL in CSS comments https://github.com/advisories/GHSA-6g55-p6wh-862q — at node_modules/postcss; no reviewed exception"
+    },
+    {
+      "kind": "artifact-advisory",
+      "finding": {
+        "package": "postcss",
+        "advisory": 1139510,
+        "severity": "high",
+        "title": "PostCSS: Path Traversal in Previous Source Map Auto-Loading (sourceMappingURL) leads to Arbitrary .map File Disclosure",
+        "url": "https://github.com/advisories/GHSA-r28c-9q8g-f849",
+        "range": "<=8.5.17",
+        "nodes": [
+          "node_modules/postcss"
+        ],
+        "fixAvailable": true
+      },
+      "message": "HIGH postcss (<=8.5.17) — PostCSS: Path Traversal in Previous Source Map Auto-Loading (sourceMappingURL) leads to Arbitrary .map File Disclosure https://github.com/advisories/GHSA-r28c-9q8g-f849 — at node_modules/postcss; no reviewed exception"
+    },
+    {
+      "kind": "artifact-advisory",
+      "finding": {
+        "package": "source-map-js",
+        "advisory": 1241209,
+        "severity": "high",
+        "title": "source-map-js allows event-loop denial of service through indexed source-map section offsets",
+        "url": "https://github.com/advisories/GHSA-68fv-2mgg-jv7q",
+        "range": ">=1.0.0 <1.2.2",
+        "nodes": [
+          "node_modules/source-map-js"
+        ],
+        "fixAvailable": true
+      },
+      "message": "HIGH source-map-js (>=1.0.0 <1.2.2) — source-map-js allows event-loop denial of service through indexed source-map section offsets https://github.com/advisories/GHSA-68fv-2mgg-jv7q — at node_modules/source-map-js; no reviewed exception"
+    },
+    {
+      "kind": "artifact-advisory",
+      "finding": {
+        "package": "baseline-browser-mapping",
+        "advisory": 1193686,
+        "severity": "moderate",
+        "title": "baseline-browser-mapping process termination on invalid input causes denial of service",
+        "url": "https://github.com/advisories/GHSA-w5vr-8v7q-w6rv",
+        "range": ">=2.0.0 <2.11.0",
+        "nodes": [
+          "node_modules/baseline-browser-mapping"
+        ],
+        "fixAvailable": true
+      },
+      "message": "MODERATE baseline-browser-mapping (>=2.0.0 <2.11.0) — baseline-browser-mapping process termination on invalid input causes denial of service https://github.com/advisories/GHSA-w5vr-8v7q-w6rv — at node_modules/baseline-browser-mapping; no reviewed exception"
+    },
+    {
+      "kind": "artifact-advisory",
+      "finding": {
+        "package": "postcss",
+        "advisory": 1117015,
+        "severity": "moderate",
+        "title": "PostCSS has XSS via Unescaped </style> in its CSS Stringify Output",
+        "url": "https://github.com/advisories/GHSA-qx2v-qp2m-jg93",
+        "range": "<8.5.10",
+        "nodes": [
+          "node_modules/postcss"
+        ],
+        "fixAvailable": true
+      },
+      "message": "MODERATE postcss (<8.5.10) — PostCSS has XSS via Unescaped </style> in its CSS Stringify Output https://github.com/advisories/GHSA-qx2v-qp2m-jg93 — at node_modules/postcss; no reviewed exception"
+    },
+    {
+      "kind": "artifact-advisory",
+      "finding": {
+        "package": "postcss",
+        "advisory": 1130709,
+        "severity": "moderate",
+        "title": "PostCSS: incomplete fix of GHSA-6g55-p6wh-862q — attacker-controlled sourceMappingURL reads arbitrary .map files when `from` is unset",
+        "url": "https://github.com/advisories/GHSA-fxqj-rqcc-2cmp",
+        "range": "<=8.5.22",
+        "nodes": [
+          "node_modules/postcss"
+        ],
+        "fixAvailable": true
+      },
+      "message": "MODERATE postcss (<=8.5.22) — PostCSS: incomplete fix of GHSA-6g55-p6wh-862q — attacker-controlled sourceMappingURL reads arbitrary .map files when `from` is unset https://github.com/advisories/GHSA-fxqj-rqcc-2cmp — at node_modules/postcss; no reviewed exception"
+    }
+  ]
+}

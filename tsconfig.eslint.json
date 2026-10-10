@@ -3,7 +3,7 @@
   "include": [
     "client/src/**/*", "server/**/*", "shared/**/*",
     "scripts/**/*.ts", "tests/**/*.ts", "tests/**/*.tsx",
-    "*.ts", "artifacts/awesome-video-design-system/src/**/*",
+    "*.ts", "client/*.d.ts", "deploy/**/*.ts", "artifacts/awesome-video-design-system/src/**/*",
     "artifacts/awesome-video-design-system/*.ts"
   ],
   "exclude": [

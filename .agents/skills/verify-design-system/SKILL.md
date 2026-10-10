@@ -347,8 +347,14 @@ rg -i '\brgba?\(' client/src \
 > ignoredDirectories = [".git", "dist", "node_modules", "uploads", "docs"]
 > tokenSourceExclusions = ["**/design-system.css", "artifacts/*/src/index.css"]
 > unmanifestedArtifactExclusions = [{"path":"artifacts/r6","reason":"release-audit evidence bundle containing claims Markdown and screenshots, not a runnable UI artifact"}]
+> evidenceOnlyExtensions = [".md", ".txt", ".png", ".jpg", ".jpeg", ".gif", ".webp", ".svg", ".pdf"]
 > frozenReferenceRoots = [{"path":"awesome-list-site-ds","reason":"canonical design archive kept byte-identical to the upload; validated through its registered artifact port"}]
 > -->
+
+An `unmanifestedArtifactExclusions` entry is justified by its content, so
+the gate fails (`stale-evidence-exclusion`) the moment the folder holds any
+file outside `evidenceOnlyExtensions` — runnable JS/TS/HTML/CSS, a
+`package.json`, a manifest. Give such a folder a manifest instead.
 
 For standalone artifacts, run the same scans over the artifact's files,
 excluding the design-system stylesheet itself.

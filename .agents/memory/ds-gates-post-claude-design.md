@@ -18,3 +18,8 @@ After the Claude Design adoption merge, `verify-ds --mode full --deep` gives FAI
 - Several post-#26 "timeouts" were stale activation proofs in the gate, not app bugs; reproduce with `--only=<scope>` and print the full Playwright call log before touching app code.
 - Restoring evidence after a deep run: `git checkout` only the changed evidence files — a blanket `git checkout -- tests/parity` also reverts harness source edits.
 - Full deep pixel-parity is ~1.4 captures/min (~4 h for 83 screens) and outlives workspace recycles; scope it.
+
+## ink-accent renderer crash (2026-10-09)
+- ink-accent can crash Chromium's renderer after roughly 30 cells. The point moves between runs: brutalist × 1440 in one run, swiss × 375 on the resource page in another. There was no cgroup OOM and /dev/shm was empty.
+- Treat this as UNVERIFIED (environment), not a FIX finding. Cite the completed cells' 0 violations.
+- A fix would belong in the gate (fresh page per cell), not in app CSS.

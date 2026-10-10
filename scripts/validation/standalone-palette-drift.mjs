@@ -39,6 +39,11 @@ const STANDALONE_SCOPE = {
       reason: 'release-audit evidence bundle containing claims Markdown and screenshots, not a runnable UI artifact',
     },
   ],
+  // An unmanifested exclusion is justified by its CONTENT (evidence only), so
+  // it may hold nothing but these documentation/image types. Any other file —
+  // runnable JS/TS/HTML/CSS, a package.json, a manifest — means the folder grew
+  // into a UI and its exemption is stale.
+  evidenceOnlyExtensions: ['.md', '.txt', '.png', '.jpg', '.jpeg', '.gif', '.webp', '.svg', '.pdf'],
   // Reference material that is contractually kept byte-identical to an
   // external upload. It is never served, cannot take tokens or DS-OK tags,
   // and its UI is validated through the registered artifact that ports it.
@@ -139,6 +144,17 @@ function runCanaries() {
       [path.join(canaryRoot, 'new-mockup')],
       'unmanifested source-bearing mockup detector',
     );
+    fs.mkdirSync(path.join(canaryRoot, 'evidence', 'shots'), { recursive: true });
+    fs.writeFileSync(path.join(canaryRoot, 'evidence', 'CLAIMS.md'), '# claims\n');
+    fs.writeFileSync(path.join(canaryRoot, 'evidence', 'shots', 'a.png'), '');
+    assertEqual(staleEvidenceExclusionFiles(path.join(canaryRoot, 'evidence')), [], 'Markdown + screenshots keep an evidence exclusion valid');
+    for (const runnable of ['src/App.tsx', 'index.html', 'main.js', 'package.json', 'theme.css']) {
+      const full = path.join(canaryRoot, 'evidence', runnable);
+      fs.mkdirSync(path.dirname(full), { recursive: true });
+      fs.writeFileSync(full, '\n');
+      assertEqual(staleEvidenceExclusionFiles(path.join(canaryRoot, 'evidence')), [full], `${runnable} under an evidence exclusion makes it stale`);
+      fs.rmSync(full);
+    }
   } finally {
     fs.rmSync(canaryRoot, { recursive: true, force: true });
   }
@@ -258,7 +274,7 @@ function extractDocumentedScope(skillText) {
 
   const section = skillText.slice(markerIndex + marker.length, endIndex);
   const documented = {};
-  for (const [, key, rawValue] of section.matchAll(/^\s*>?\s*(roots|sourceExtensions|ignoredDirectories|tokenSourceExclusions|unmanifestedArtifactExclusions|frozenReferenceRoots)\s*=\s*(\[[^\n]+\])\s*$/gm)) {
+  for (const [, key, rawValue] of section.matchAll(/^\s*>?\s*(roots|sourceExtensions|ignoredDirectories|tokenSourceExclusions|unmanifestedArtifactExclusions|evidenceOnlyExtensions|frozenReferenceRoots)\s*=\s*(\[[^\n]+\])\s*$/gm)) {
     documented[key] = JSON.parse(rawValue);
   }
 
@@ -330,6 +346,26 @@ function findUnmanifestedSourceDirectories(artifactsRoot, exclusions = STANDALON
       hasSourceFiles(artifactRoot),
     )
     .sort();
+}
+
+/**
+ * Files inside an evidence-only exclusion that are not documentation/images.
+ * Walks EVERYTHING (no ignored directories): a node_modules or dist inside an
+ * "evidence bundle" is itself proof the folder became runnable.
+ */
+function staleEvidenceExclusionFiles(dir, allowed = STANDALONE_SCOPE.evidenceOnlyExtensions) {
+  const allowedSet = new Set(allowed);
+  const offenders = [];
+  if (!fs.existsSync(dir)) return offenders;
+  const visit = (current) => {
+    for (const entry of fs.readdirSync(current, { withFileTypes: true })) {
+      const full = path.join(current, entry.name);
+      if (entry.isDirectory()) visit(full);
+      else if (!allowedSet.has(path.extname(entry.name).toLowerCase())) offenders.push(full);
+    }
+  };
+  visit(dir);
+  return offenders.sort();
 }
 
 function discoverRoots() {
@@ -715,6 +751,22 @@ checkStandaloneScopeParity();
 runCanaries();
 console.log('PASS canaries :: standalone Stage 5 detectors, unmanifested-artifact discovery, DS-OK parser, and shrink-only ratchet verified');
 checkFrozenReferenceRoots();
+
+let staleExclusions = 0;
+for (const exclusion of STANDALONE_SCOPE.unmanifestedArtifactExclusions) {
+  for (const file of staleEvidenceExclusionFiles(path.resolve(ROOT, exclusion.path))) {
+    staleExclusions++;
+    console.error(`FAIL stale-evidence-exclusion :: ${path.relative(ROOT, file)} sits under the evidence-only exclusion ${exclusion.path} ("${exclusion.reason}") but is not documentation/an image`);
+  }
+}
+if (staleExclusions) {
+  console.error(`\nAn evidence-only exclusion may hold only ${STANDALONE_SCOPE.evidenceOnlyExtensions.join(' ')} files.`);
+  console.error('Move runnable files out, or give the folder an artifact manifest and drop the exclusion so it is scanned.');
+  process.exit(1);
+}
+console.log(
+  `PASS evidence-exclusions :: ${STANDALONE_SCOPE.unmanifestedArtifactExclusions.map((e) => e.path).join(', ')} hold only documentation/images`,
+);
 
 const unmanifestedSourceDirectories = findUnmanifestedSourceDirectories(ARTIFACTS_ROOT);
 for (const directory of unmanifestedSourceDirectories) {

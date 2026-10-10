@@ -1,0 +1,160 @@
+{
+  "generatedAt": "2026-10-09T23:04:48.412Z",
+  "artifact": "artifacts/awesome-video-design-system",
+  "policyMinSeverity": "moderate",
+  "closureSize": 130,
+  "verdict": "pass",
+  "findings": [
+    {
+      "package": "vite",
+      "advisory": 1123525,
+      "severity": "high",
+      "title": "vite: `server.fs.deny` bypass on Windows alternate paths",
+      "url": "https://github.com/advisories/GHSA-fx2h-pf6j-xcff",
+      "range": "<=6.4.2",
+      "nodes": [
+        "node_modules/vite"
+      ],
+      "fixAvailable": {
+        "name": "vite",
+        "version": "8.3.4",
+        "isSemVerMajor": true
+      }
+    },
+    {
+      "package": "esbuild",
+      "advisory": 1102341,
+      "severity": "moderate",
+      "title": "esbuild enables any website to send any requests to the development server and read the response",
+      "url": "https://github.com/advisories/GHSA-67mh-4wv8-2f99",
+      "range": "<=0.24.2",
+      "nodes": [
+        "node_modules/vite/node_modules/esbuild"
+      ],
+      "fixAvailable": {
+        "name": "vite",
+        "version": "8.3.4",
+        "isSemVerMajor": true
+      }
+    },
+    {
+      "package": "vite",
+      "advisory": 1116229,
+      "severity": "moderate",
+      "title": "Vite Vulnerable to Path Traversal in Optimized Deps `.map` Handling",
+      "url": "https://github.com/advisories/GHSA-4w7w-66w2-5vf9",
+      "range": "<=6.4.1",
+      "nodes": [
+        "node_modules/vite"
+      ],
+      "fixAvailable": {
+        "name": "vite",
+        "version": "8.3.4",
+        "isSemVerMajor": true
+      }
+    },
+    {
+      "package": "vite",
+      "advisory": 1120784,
+      "severity": "moderate",
+      "title": "launch-editor: NTLMv2 hash disclosure via UNC path handling on Windows",
+      "url": "https://github.com/advisories/GHSA-v6wh-96g9-6wx3",
+      "range": "<=6.4.2",
+      "nodes": [
+        "node_modules/vite"
+      ],
+      "fixAvailable": {
+        "name": "vite",
+        "version": "8.3.4",
+        "isSemVerMajor": true
+      }
+    }
+  ],
+  "reviewed": [
+    {
+      "package": "vite",
+      "advisory": 1123525,
+      "severity": "high",
+      "title": "vite: `server.fs.deny` bypass on Windows alternate paths",
+      "url": "https://github.com/advisories/GHSA-fx2h-pf6j-xcff",
+      "range": "<=6.4.2",
+      "nodes": [
+        "node_modules/vite"
+      ],
+      "fixAvailable": {
+        "name": "vite",
+        "version": "8.3.4",
+        "isSemVerMajor": true
+      },
+      "exception": {
+        "ok": true,
+        "why": "server.fs.deny bypass via Windows alternate path forms (8.3 names / ADS). The artifact's Vite dev server runs only on the Linux workspace container; the artifact has no production service (artifact.toml defines a development run only), so the Windows path forms cannot reach it.",
+        "reviewed": "2026-10-09"
+      }
+    },
+    {
+      "package": "esbuild",
+      "advisory": 1102341,
+      "severity": "moderate",
+      "title": "esbuild enables any website to send any requests to the development server and read the response",
+      "url": "https://github.com/advisories/GHSA-67mh-4wv8-2f99",
+      "range": "<=0.24.2",
+      "nodes": [
+        "node_modules/vite/node_modules/esbuild"
+      ],
+      "fixAvailable": {
+        "name": "vite",
+        "version": "8.3.4",
+        "isSemVerMajor": true
+      },
+      "exception": {
+        "ok": true,
+        "why": "The advisory concerns esbuild's own serve() development server answering cross-origin requests. Vite 5 bundles esbuild only as a transform/pre-bundle library and never starts esbuild's serve mode, so the vulnerable server is not running.",
+        "reviewed": "2026-10-09"
+      }
+    },
+    {
+      "package": "vite",
+      "advisory": 1116229,
+      "severity": "moderate",
+      "title": "Vite Vulnerable to Path Traversal in Optimized Deps `.map` Handling",
+      "url": "https://github.com/advisories/GHSA-4w7w-66w2-5vf9",
+      "range": "<=6.4.1",
+      "nodes": [
+        "node_modules/vite"
+      ],
+      "fixAvailable": {
+        "name": "vite",
+        "version": "8.3.4",
+        "isSemVerMajor": true
+      },
+      "exception": {
+        "ok": true,
+        "why": "Path traversal in optimized-deps .map handling affects a running Vite DEV server only. This artifact is never built into or served by the published app (no production service in artifact.toml); exposure is limited to the workspace dev preview while it is open. Remove when the shared Vite major upgrade lands.",
+        "reviewed": "2026-10-09"
+      }
+    },
+    {
+      "package": "vite",
+      "advisory": 1120784,
+      "severity": "moderate",
+      "title": "launch-editor: NTLMv2 hash disclosure via UNC path handling on Windows",
+      "url": "https://github.com/advisories/GHSA-v6wh-96g9-6wx3",
+      "range": "<=6.4.2",
+      "nodes": [
+        "node_modules/vite"
+      ],
+      "fixAvailable": {
+        "name": "vite",
+        "version": "8.3.4",
+        "isSemVerMajor": true
+      },
+      "exception": {
+        "ok": true,
+        "why": "launch-editor NTLMv2 hash disclosure through UNC paths is Windows-only (SMB authentication on a Windows host). The dev server runs on Linux and no production service exists for this artifact.",
+        "reviewed": "2026-10-09"
+      }
+    }
+  ],
+  "failures": []
+}

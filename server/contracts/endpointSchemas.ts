@@ -25,6 +25,7 @@
 import { z } from "zod";
 import { RESOURCE_KIND_VALUES } from "@shared/resourceKinds";
 import { RESOURCE_FORMAT_VALUES, RESOURCE_PROVIDER_VALUES, RESOURCE_SKILL_LEVEL_VALUES, RESOURCE_SEARCH_SORT_VALUES } from "@shared/resourceFacets";
+import { RECOMMENDATION_FEEDBACK_VALUES, RECOMMENDATION_SIGNAL_CODES } from "@shared/recommendations";
 import { setRouteQuerySchema, setRouteResponseSchema } from "./install";
 import { genericQuerySchema, MAX_PARAM_LENGTH } from "./inference";
 
@@ -219,20 +220,39 @@ const resourcesListResponseSchema = z.object({
   }).optional(),
 });
 
-// ---------------------------------------------------------------------------
-// GET + POST /api/recommendations
-// ---------------------------------------------------------------------------
-
 /**
- * Each recommendation item wraps a public resource in a `resource` field.
- * We assert `resource` is present and structurally valid; all other fields
- * on the item (score, reason, etc.) are allowed via passthrough.
+ * Each recommendation item wraps a public resource in a `resource` field and
+ * carries the engine's ranking + explanation fields (RecommendationResult in
+ * server/ai/recommendationEngine.ts). Every field is part of the contract:
+ * `confidence` is an integer percentage, `score` the 0–1 ranking value,
+ * `explanation` only server-derived named signals. `.strict()` makes a new or
+ * renamed item field a reported drift instead of silently passing through.
  */
+const recommendationExplanationSignalSchema = z
+  .object({
+    code: z.enum(RECOMMENDATION_SIGNAL_CODES),
+    label: z.string().min(1),
+    evidence: z.string().optional(),
+  })
+  .strict();
 const recommendationItemSchema = z
   .object({
     resource: publicResourceSchema,
+    confidence: z.number().int().min(0).max(100),
+    reason: z.string().min(1),
+    type: z.enum(["ai_powered", "rule_based", "hybrid"]),
+    score: z.number().min(0).max(1).optional(),
+    aiGenerated: z.boolean().optional(),
+    explanation: z
+      .object({
+        summary: z.string().min(1),
+        signals: z.array(recommendationExplanationSignalSchema),
+      })
+      .strict(),
+    feedback: z.enum(RECOMMENDATION_FEEDBACK_VALUES).nullable(),
+    personalized: z.boolean(),
   })
-  .passthrough();
+  .strict();
 
 const recommendationsResponseSchema = z.array(recommendationItemSchema);
 
@@ -397,6 +417,12 @@ const awesomeListListingQuerySchema = z.object({
 const boundedQueryInteger = (min: number, max: number) =>
   z.string().regex(/^\d+$/).refine((value) => Number(value) >= min && Number(value) <= max)
     .describe(`Integer from ${min} to ${max}`);
+
+const controlledFacetQuery = (param: string, allowed: readonly string[]) =>
+  z.string().max(MAX_PARAM_LENGTH).optional().describe(
+    `Case-insensitive; one of: ${allowed.join(", ")}. Other values answer 400 invalid_${param} with allowed[]`,
+  );
+
 const resourcesQuerySchema = z.object({
   q: z.string().max(MAX_PARAM_LENGTH).optional().describe("Full-text search (title, description, tags); queries shorter than the searchable minimum behave like no search"),
   search: z.string().max(MAX_PARAM_LENGTH).optional().describe("Alias for q; wins when both are sent"),
@@ -406,10 +432,10 @@ const resourcesQuerySchema = z.object({
   generalScope: z.enum(["category", "subcategory"]).optional().describe("Restrict to resources filed directly at that level (no deeper taxonomy)"),
   tags: z.union([z.string(), z.array(z.string())]).optional().describe("Comma-separated or repeated tags"),
   tag: z.union([z.string(), z.array(z.string())]).optional().describe("Alias for tags; combines with tags"),
-  provider: z.enum(RESOURCE_PROVIDER_VALUES).optional().describe("Case-insensitive; other values return 400 invalid_provider"),
-  format: z.enum(RESOURCE_FORMAT_VALUES).optional().describe("Resource format; case-insensitive; other values return 400 invalid_format"),
-  skillLevel: z.enum(RESOURCE_SKILL_LEVEL_VALUES).optional().describe("Case-insensitive; other values return 400 invalid_skillLevel"),
-  kind: resourceKindSchema.optional().describe("Resolved kind (stored or tag-inferred); other values return 400 invalid_kind"),
+  provider: controlledFacetQuery("provider", RESOURCE_PROVIDER_VALUES),
+  format: controlledFacetQuery("format", RESOURCE_FORMAT_VALUES),
+  skillLevel: controlledFacetQuery("skillLevel", RESOURCE_SKILL_LEVEL_VALUES),
+  kind: controlledFacetQuery("kind", RESOURCE_KIND_VALUES),
   sort: z.enum(RESOURCE_SEARCH_SORT_VALUES).optional().describe("Other values return 400 invalid_sort"),
   facets: z.enum(["true", "false"]).optional().describe("true adds provider/format/skillLevel/kind facet counts to the response"),
   status: z.enum(["approved", "pending", "rejected"]).optional().describe("Default approved; other statuses require admin"),

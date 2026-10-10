@@ -1,0 +1,29 @@
+{
+  "_doc": "Reviewed advisory exceptions for artifacts/awesome-video-design-system (read by artifact-dependency-audit.mjs). Each entry needs a concrete reason and a reviewed date no older than 120 days; an entry that no longer matches an advisory fails the gate so it cannot linger. All four below are fixed only in vite 6.4.3+/8.x, a semver-major upgrade shared with the root app's build, so they cannot be patched within the declared ^5.4.21 range.",
+  "exceptions": [
+    {
+      "package": "vite",
+      "advisory": 1123525,
+      "reviewed": "2026-10-09",
+      "reason": "server.fs.deny bypass via Windows alternate path forms (8.3 names / ADS). The artifact's Vite dev server runs only on the Linux workspace container; the artifact has no production service (artifact.toml defines a development run only), so the Windows path forms cannot reach it."
+    },
+    {
+      "package": "vite",
+      "advisory": 1120784,
+      "reviewed": "2026-10-09",
+      "reason": "launch-editor NTLMv2 hash disclosure through UNC paths is Windows-only (SMB authentication on a Windows host). The dev server runs on Linux and no production service exists for this artifact."
+    },
+    {
+      "package": "vite",
+      "advisory": 1116229,
+      "reviewed": "2026-10-09",
+      "reason": "Path traversal in optimized-deps .map handling affects a running Vite DEV server only. This artifact is never built into or served by the published app (no production service in artifact.toml); exposure is limited to the workspace dev preview while it is open. Remove when the shared Vite major upgrade lands."
+    },
+    {
+      "package": "esbuild",
+      "advisory": 1102341,
+      "reviewed": "2026-10-09",
+      "reason": "The advisory concerns esbuild's own serve() development server answering cross-origin requests. Vite 5 bundles esbuild only as a transform/pre-bundle library and never starts esbuild's serve mode, so the vulnerable server is not running."
+    }
+  ]
+}

@@ -8,17 +8,21 @@ export const RECOMMENDATION_FEEDBACK_VALUES = [
 export type RecommendationFeedbackValue =
   (typeof RECOMMENDATION_FEEDBACK_VALUES)[number];
 
-// Type contract only — nothing iterates the codes at runtime (unlike
-// RECOMMENDATION_FEEDBACK_VALUES above, which callers validate against).
-export type RecommendationSignalCode =
-  | "goal_match"
-  | "format_match"
-  | "time_fit"
-  | "topic_match"
-  | "skill_match"
-  | "journey_context"
-  | "positive_feedback"
-  | "popular";
+// The response contract (server/contracts/endpointSchemas.ts) validates
+// explanation signals against this list, so it is the single source for both
+// the type and the runtime/OpenAPI enum.
+export const RECOMMENDATION_SIGNAL_CODES = [
+  "goal_match",
+  "format_match",
+  "time_fit",
+  "topic_match",
+  "skill_match",
+  "journey_context",
+  "positive_feedback",
+  "popular",
+] as const;
+
+export type RecommendationSignalCode = (typeof RECOMMENDATION_SIGNAL_CODES)[number];
 
 /**
  * Only server-derived, named evidence is exposed to recommendation clients.

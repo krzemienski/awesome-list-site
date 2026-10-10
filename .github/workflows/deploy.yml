@@ -190,5 +190,5 @@ jobs:
       - name: Surface tag route failure
         if: always() && steps.tag-routes.outcome == 'failure'
         run: |
-          echo "::error::Post-publish tag navigation failed. The release remains published; download the tag-route-evidence-${{ github.run_id }} artifact for direct redirect, client-side redirect, live tag rendering, and history navigation results."
+          echo "::error::Post-publish tag navigation failed. The release remains published; download the tag-route-evidence-${{ github.run_id }} artifact (tag-route-audit.json) for the eligible-tag discovery request, direct redirect, client-side redirect, live tag rendering and history navigation results, plus per-page console errors, page errors, failed and in-flight API requests, API error bodies, final URL, rendered card count and failure screenshots."
           exit 1

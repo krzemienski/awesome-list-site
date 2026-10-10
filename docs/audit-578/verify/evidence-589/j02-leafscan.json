@@ -1,0 +1,72 @@
+{
+ "768": {
+  "categoriesExpanded": 9,
+  "subsExpanded": 19,
+  "leaves": 119,
+  "truncated": 49,
+  "bad": 0,
+  "samples": [
+   {
+    "t": true,
+    "text": "Benchmarking & Performance Tools for Codecs",
+    "title": "Benchmarking & Performance Tools for Codecs",
+    "name": null,
+    "h": 44
+   },
+   {
+    "t": true,
+    "text": "Cloud-Based Encoding Solutions",
+    "title": "Cloud-Based Encoding Solutions",
+    "name": null,
+    "h": 44
+   },
+   {
+    "t": true,
+    "text": "Comparative Analysis of Codecs",
+    "title": "Comparative Analysis of Codecs",
+    "name": null,
+    "h": 44
+   }
+  ],
+  "firstTr": "sub-benchmarking-performance-tools-for-codecs",
+  "snap": {
+   "role": "A",
+   "href": "/subcategory/benchmarking-performance-tools-for-codecs"
+  }
+ },
+ "1280": {
+  "categoriesExpanded": 9,
+  "subsExpanded": 19,
+  "leaves": 119,
+  "truncated": 18,
+  "bad": 0,
+  "samples": [
+   {
+    "t": true,
+    "text": "Benchmarking & Performance Tools for Codecs",
+    "title": "Benchmarking & Performance Tools for Codecs",
+    "name": null,
+    "h": 44
+   },
+   {
+    "t": true,
+    "text": "Hardware Accelerated Transcoding",
+    "title": "Hardware Accelerated Transcoding",
+    "name": null,
+    "h": 44
+   },
+   {
+    "t": true,
+    "text": "Next-Generation Codecs AV1 VVC",
+    "title": "Next-Generation Codecs AV1 VVC",
+    "name": null,
+    "h": 44
+   }
+  ],
+  "firstTr": "sub-benchmarking-performance-tools-for-codecs",
+  "snap": {
+   "role": "A",
+   "href": "/subcategory/benchmarking-performance-tools-for-codecs"
+  }
+ }
+}

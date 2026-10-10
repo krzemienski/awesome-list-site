@@ -1,0 +1,142 @@
+{
+  "section": "j07",
+  "base": "http://127.0.0.1:5000",
+  "at": "2026-10-09T23:24:09.588Z",
+  "checks": [
+    {
+      "name": "375 editorial: skin applied",
+      "pass": true,
+      "detail": {
+        "system": "editorial",
+        "btnBg": "rgb(255, 61, 82)",
+        "btnRadius": "8px",
+        "btnFont": "Inter",
+        "h1Font": "Fraunces",
+        "h1Weight": "500"
+      }
+    },
+    {
+      "name": "375 terminal: skin applied",
+      "pass": true,
+      "detail": {
+        "system": "terminal",
+        "btnBg": "rgba(0, 0, 0, 0)",
+        "btnRadius": "0px",
+        "btnFont": "\"IBM Plex Mono\"",
+        "h1Font": "\"IBM Plex Mono\"",
+        "h1Weight": "600"
+      }
+    },
+    {
+      "name": "375 geist: skin applied",
+      "pass": true,
+      "detail": {
+        "system": "geist",
+        "btnBg": "rgb(94, 221, 242)",
+        "btnRadius": "6px",
+        "btnFont": "Geist",
+        "h1Font": "Geist",
+        "h1Weight": "600"
+      }
+    },
+    {
+      "name": "375 brutalist: skin applied",
+      "pass": true,
+      "detail": {
+        "system": "brutalist",
+        "btnBg": "rgb(255, 184, 77)",
+        "btnRadius": "0px",
+        "btnFont": "\"Space Grotesk\"",
+        "h1Font": "\"Instrument Serif\"",
+        "h1Weight": "400"
+      }
+    },
+    {
+      "name": "375 swiss: skin applied",
+      "pass": true,
+      "detail": {
+        "system": "swiss",
+        "btnBg": "rgb(255, 122, 61)",
+        "btnRadius": "2px",
+        "btnFont": "Manrope",
+        "h1Font": "Manrope",
+        "h1Weight": "700"
+      }
+    },
+    {
+      "name": "375: five skins render distinct button/heading styling",
+      "pass": true,
+      "detail": {
+        "distinct": 5
+      }
+    },
+    {
+      "name": "1440 editorial: skin applied",
+      "pass": true,
+      "detail": {
+        "system": "editorial",
+        "btnBg": "rgb(255, 61, 82)",
+        "btnRadius": "8px",
+        "btnFont": "Inter",
+        "h1Font": "Fraunces",
+        "h1Weight": "500"
+      }
+    },
+    {
+      "name": "1440 terminal: skin applied",
+      "pass": true,
+      "detail": {
+        "system": "terminal",
+        "btnBg": "rgba(0, 0, 0, 0)",
+        "btnRadius": "0px",
+        "btnFont": "\"IBM Plex Mono\"",
+        "h1Font": "\"IBM Plex Mono\"",
+        "h1Weight": "600"
+      }
+    },
+    {
+      "name": "1440 geist: skin applied",
+      "pass": true,
+      "detail": {
+        "system": "geist",
+        "btnBg": "rgb(94, 221, 242)",
+        "btnRadius": "6px",
+        "btnFont": "Geist",
+        "h1Font": "Geist",
+        "h1Weight": "600"
+      }
+    },
+    {
+      "name": "1440 brutalist: skin applied",
+      "pass": true,
+      "detail": {
+        "system": "brutalist",
+        "btnBg": "rgb(255, 184, 77)",
+        "btnRadius": "0px",
+        "btnFont": "\"Space Grotesk\"",
+        "h1Font": "\"Instrument Serif\"",
+        "h1Weight": "400"
+      }
+    },
+    {
+      "name": "1440 swiss: skin applied",
+      "pass": true,
+      "detail": {
+        "system": "swiss",
+        "btnBg": "rgb(255, 122, 61)",
+        "btnRadius": "2px",
+        "btnFont": "Manrope",
+        "h1Font": "Manrope",
+        "h1Weight": "700"
+      }
+    },
+    {
+      "name": "1440: five skins render distinct button/heading styling",
+      "pass": true,
+      "detail": {
+        "distinct": 5
+      }
+    }
+  ],
+  "consoleErrors": []
+}

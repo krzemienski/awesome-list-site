@@ -1,0 +1,33 @@
+{
+  "section": "j01",
+  "base": "http://127.0.0.1:5000",
+  "at": "2026-10-09T23:15:59.747Z",
+  "checks": [
+    {
+      "name": "/login?next=/bookmarks",
+      "pass": true,
+      "detail": "final=/sign-in?redirect_url=%2Fbookmarks"
+    },
+    {
+      "name": "/forgot-password?next=/bookmarks",
+      "pass": true,
+      "detail": "final=/sign-in?redirect_url=%2Fbookmarks"
+    },
+    {
+      "name": "/reset-password?next=/bookmarks",
+      "pass": true,
+      "detail": "final=/sign-in?redirect_url=%2Fbookmarks"
+    },
+    {
+      "name": "/login?next=//evil.example dropped",
+      "pass": true,
+      "detail": "final=/sign-in host=127.0.0.1:5000"
+    },
+    {
+      "name": "/forgot-password?next=//evil.example dropped",
+      "pass": true,
+      "detail": "final=/sign-in host=127.0.0.1:5000"
+    }
+  ],
+  "consoleErrors": []
+}

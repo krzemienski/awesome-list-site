@@ -1,0 +1,123 @@
+{
+  "section": "j08",
+  "base": "http://127.0.0.1:5000",
+  "at": "2026-10-09T23:24:28.082Z",
+  "checks": [
+    {
+      "name": "picker shows six unique ids and labels",
+      "pass": true,
+      "detail": [
+        {
+          "id": "system",
+          "label": "System default"
+        },
+        {
+          "id": "inter",
+          "label": "Inter"
+        },
+        {
+          "id": "dm-sans",
+          "label": "DM Sans"
+        },
+        {
+          "id": "source-sans",
+          "label": "Source Sans 3"
+        },
+        {
+          "id": "ibm-plex",
+          "label": "IBM Plex Sans"
+        },
+        {
+          "id": "jetbrains",
+          "label": "JetBrains Mono"
+        }
+      ]
+    },
+    {
+      "name": "font system survives reload and renders its face",
+      "pass": true,
+      "detail": {
+        "dataFont": "system",
+        "stored": "system",
+        "bodyFirst": "Inter",
+        "faces": null,
+        "check": null,
+        "checked": "font-option-system"
+      }
+    },
+    {
+      "name": "font inter survives reload and renders its face",
+      "pass": true,
+      "detail": {
+        "dataFont": "inter",
+        "stored": "inter",
+        "bodyFirst": "Inter",
+        "faces": [
+          "Inter/400/loaded",
+          "Inter/400/loaded"
+        ],
+        "check": true,
+        "checked": "font-option-inter"
+      }
+    },
+    {
+      "name": "font dm-sans survives reload and renders its face",
+      "pass": true,
+      "detail": {
+        "dataFont": "dm-sans",
+        "stored": "dm-sans",
+        "bodyFirst": "DM Sans",
+        "faces": [
+          "DM Sans/400/loaded"
+        ],
+        "check": true,
+        "checked": "font-option-dm-sans"
+      }
+    },
+    {
+      "name": "font source-sans survives reload and renders its face",
+      "pass": true,
+      "detail": {
+        "dataFont": "source-sans",
+        "stored": "source-sans",
+        "bodyFirst": "Source Sans 3",
+        "faces": [
+          "Source Sans 3/400/loaded"
+        ],
+        "check": true,
+        "checked": "font-option-source-sans"
+      }
+    },
+    {
+      "name": "font ibm-plex survives reload and renders its face",
+      "pass": true,
+      "detail": {
+        "dataFont": "ibm-plex",
+        "stored": "ibm-plex",
+        "bodyFirst": "IBM Plex Sans",
+        "faces": [
+          "IBM Plex Sans/400/loaded",
+          "IBM Plex Sans/400/loaded"
+        ],
+        "check": true,
+        "checked": "font-option-ibm-plex"
+      }
+    },
+    {
+      "name": "font jetbrains survives reload and renders its face",
+      "pass": true,
+      "detail": {
+        "dataFont": "jetbrains",
+        "stored": "jetbrains",
+        "bodyFirst": "JetBrains Mono",
+        "faces": [
+          "JetBrains Mono/400/loaded",
+          "JetBrains Mono/400/loaded"
+        ],
+        "check": true,
+        "checked": "font-option-jetbrains"
+      }
+    }
+  ],
+  "consoleErrors": []
+}

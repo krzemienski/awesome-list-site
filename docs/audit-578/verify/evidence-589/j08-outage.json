@@ -1,0 +1,130 @@
+{
+  "generatedAt": "2026-10-09T23:02:05.896Z",
+  "verdict": "inconclusive",
+  "targets": [
+    {
+      "id": "html:pre-paint",
+      "href": "https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Fraunces:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500;1,600&family=JetBrains+Mono:wght@400;500;600;700&family=Geist:wght@400;500;600;700&family=Instrument+Serif:ital@0;1&family=Space+Grotesk:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600;700&family=IBM+Plex+Sans:wght@400;500;600;700&family=Manrope:wght@400;500;600;700;800&display=swap",
+      "requestedFamilies": [
+        "Inter",
+        "Fraunces",
+        "JetBrains Mono",
+        "Geist",
+        "Instrument Serif",
+        "Space Grotesk",
+        "IBM Plex Mono",
+        "IBM Plex Sans",
+        "Manrope"
+      ],
+      "status": null,
+      "attempts": 3,
+      "transportError": "fetch failed",
+      "servedFamilies": [],
+      "fontFaceBlocks": 0,
+      "bodyExcerpt": ""
+    },
+    {
+      "id": "font:inter",
+      "href": "https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap",
+      "requestedFamilies": [
+        "Inter"
+      ],
+      "status": null,
+      "attempts": 3,
+      "transportError": "fetch failed",
+      "servedFamilies": [],
+      "fontFaceBlocks": 0,
+      "bodyExcerpt": ""
+    },
+    {
+      "id": "font:dm-sans",
+      "href": "https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&display=swap",
+      "requestedFamilies": [
+        "DM Sans"
+      ],
+      "status": null,
+      "attempts": 3,
+      "transportError": "fetch failed",
+      "servedFamilies": [],
+      "fontFaceBlocks": 0,
+      "bodyExcerpt": ""
+    },
+    {
+      "id": "font:source-sans",
+      "href": "https://fonts.googleapis.com/css2?family=Source+Sans+3:wght@400;500;600;700&display=swap",
+      "requestedFamilies": [
+        "Source Sans 3"
+      ],
+      "status": null,
+      "attempts": 3,
+      "transportError": "fetch failed",
+      "servedFamilies": [],
+      "fontFaceBlocks": 0,
+      "bodyExcerpt": ""
+    },
+    {
+      "id": "font:ibm-plex",
+      "href": "https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&display=swap",
+      "requestedFamilies": [
+        "IBM Plex Sans"
+      ],
+      "status": null,
+      "attempts": 3,
+      "transportError": "fetch failed",
+      "servedFamilies": [],
+      "fontFaceBlocks": 0,
+      "bodyExcerpt": ""
+    },
+    {
+      "id": "font:jetbrains",
+      "href": "https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&display=swap",
+      "requestedFamilies": [
+        "JetBrains Mono"
+      ],
+      "status": null,
+      "attempts": 3,
+      "transportError": "fetch failed",
+      "servedFamilies": [],
+      "fontFaceBlocks": 0,
+      "bodyExcerpt": ""
+    }
+  ],
+  "failures": [
+    {
+      "kind": "webfont-http",
+      "id": "html:pre-paint",
+      "message": "the pre-paint <link rel=\"stylesheet\"> in client/index.html → https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Fraunces:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500;1,600&family=JetBrains+Mono:wght@400;500;600;700&family=Geist:wght@400;500;600;700&family=Instrument+Serif:ital@0;1&family=Space+Grotesk:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600;700&family=IBM+Plex+Sans:wght@400;500;600;700&family=Manrope:wght@400;500;600;700;800&display=swap answered no usable response (fetch failed) — the file never arrives, so every page, on every system, paints in the next family of the stack instead of the primary face",
+      "class": "outage"
+    },
+    {
+      "kind": "webfont-http",
+      "id": "font:inter",
+      "message": "FONT_STYLESHEETS[\"inter\"] in client/src/lib/font-options.ts → https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap answered no usable response (fetch failed) — the file never arrives, so choosing font option \"inter\" reports the new setting and keeps rendering in the fallback face — the page just looks unchanged",
+      "class": "outage"
+    },
+    {
+      "kind": "webfont-http",
+      "id": "font:dm-sans",
+      "message": "FONT_STYLESHEETS[\"dm-sans\"] in client/src/lib/font-options.ts → https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&display=swap answered no usable response (fetch failed) — the file never arrives, so choosing font option \"dm-sans\" reports the new setting and keeps rendering in the fallback face — the page just looks unchanged",
+      "class": "outage"
+    },
+    {
+      "kind": "webfont-http",
+      "id": "font:source-sans",
+      "message": "FONT_STYLESHEETS[\"source-sans\"] in client/src/lib/font-options.ts → https://fonts.googleapis.com/css2?family=Source+Sans+3:wght@400;500;600;700&display=swap answered no usable response (fetch failed) — the file never arrives, so choosing font option \"source-sans\" reports the new setting and keeps rendering in the fallback face — the page just looks unchanged",
+      "class": "outage"
+    },
+    {
+      "kind": "webfont-http",
+      "id": "font:ibm-plex",
+      "message": "FONT_STYLESHEETS[\"ibm-plex\"] in client/src/lib/font-options.ts → https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&display=swap answered no usable response (fetch failed) — the file never arrives, so choosing font option \"ibm-plex\" reports the new setting and keeps rendering in the fallback face — the page just looks unchanged",
+      "class": "outage"
+    },
+    {
+      "kind": "webfont-http",
+      "id": "font:jetbrains",
+      "message": "FONT_STYLESHEETS[\"jetbrains\"] in client/src/lib/font-options.ts → https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&display=swap answered no usable response (fetch failed) — the file never arrives, so choosing font option \"jetbrains\" reports the new setting and keeps rendering in the fallback face — the page just looks unchanged",
+      "class": "outage"
+    }
+  ]
+}

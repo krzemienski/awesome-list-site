@@ -60,8 +60,10 @@ describe('Phase 8 — Sidebar UX static guards (BUG-007 + BUG-043)', () => {
       // The subcategory chevron is the expand-sub-<slug> button.
       // Stop at this button's boundary, not a character budget that changes
       // when a noninteractive nested-count badge or formatting is added.
+      // Attribute order is not behaviour: capture the whole owning <button>
+      // from its opening tag, wherever the test id sits among its props.
       const expandButtonBlock = tsx.match(
-        /data-testid=\{`expand-sub-\$\{subSlug\}`\}(?:(?!<\/?button\b)[\s\S])*<\/button>/,
+        /<button\b(?:(?!<\/?button\b)[\s\S])*?data-testid=\{`expand-sub-\$\{subSlug\}`\}(?:(?!<\/?button\b)[\s\S])*<\/button>/,
       );
       expect(expandButtonBlock, 'expand-sub button block must exist').toBeTruthy();
       expect(expandButtonBlock![0]).toContain('aria-expanded=');
@@ -73,6 +75,15 @@ describe('Phase 8 — Sidebar UX static guards (BUG-007 + BUG-043)', () => {
       const headerBlock = css.match(/\.accordion-header\s*\{[\s\S]*?\}/);
       expect(headerBlock, '.accordion-header rule must exist').toBeTruthy();
       expect(headerBlock![0]).toMatch(/min-height:\s*44px/);
+    });
+
+    it('insets the top-level focus ring inside the clipping accordion item', () => {
+      // .accordion-item clips overflow and the header fills it, so an outset
+      // ring is drawn entirely outside the clip box (keyboard focus invisible;
+      // reproduced in a real browser at 767–1280px).
+      expect(css).toMatch(
+        /\.av-sidebar-shell \.accordion-header:focus-visible,\s*\.av-sidebar-drawer \.accordion-header:focus-visible\s*\{[^}]*outline-offset:\s*-2px/,
+      );
     });
   });
 
