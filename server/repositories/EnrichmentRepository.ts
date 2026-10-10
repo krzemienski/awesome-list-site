@@ -29,10 +29,45 @@ import {
 } from "@shared/schema";
 import { db } from "../db";
 import { eq, and, desc, asc, inArray, sql } from "drizzle-orm";
+import { isJobOrphaned, livenessUnchangedSince, ORPHANED_BY_RESTART_MESSAGE, WORKER_ID } from "../ai/jobLiveness";
+
+type DbOrTx = typeof db | Parameters<Parameters<typeof db.transaction>[0]>[0];
+
+/** Queue-item status for resources a job never got to (job ended first). */
+export const QUEUE_ITEM_CANCELLED_STATUS = 'cancelled';
+
+/**
+ * Close out a job's unfinished queue items once the job reaches a terminal
+ * state (cancelled, failed, budget stop, orphaned). Without this the rows of
+ * an ended job stay 'pending' forever and read as work still queued. Job
+ * counters are deliberately untouched: these resources were never processed,
+ * so they must not inflate processed/skipped totals.
+ */
+export async function closeOutEnrichmentQueue(executor: DbOrTx, jobId: number, reason: string): Promise<number> {
+  const rows = await executor
+    .update(enrichmentQueue)
+    .set({
+      status: QUEUE_ITEM_CANCELLED_STATUS,
+      errorMessage: reason,
+      processedAt: new Date(),
+      updatedAt: new Date(),
+    })
+    .where(and(eq(enrichmentQueue.jobId, jobId), inArray(enrichmentQueue.status, ['pending', 'processing'])))
+    .returning({ id: enrichmentQueue.id });
+  return rows.length;
+}
 
 /**
  * Repository class for enrichment-related database operations
  */
+/** The 409 admission refusal the start route maps by its `code`. */
+function enrichmentJobActiveError(id: number, status: string): Error & { code: string } {
+  return Object.assign(
+    new Error(`Enrichment job #${id} is already ${status}. Wait for it to finish or cancel it before starting a new one.`),
+    { code: "ENRICHMENT_JOB_ACTIVE" },
+  );
+}
+
 export class EnrichmentRepository {
   /**
    * Create a new enrichment job
@@ -53,26 +88,93 @@ export class EnrichmentRepository {
    * lock, so the second request sees the first's committed row and gets a
    * distinctive ENRICHMENT_JOB_ACTIVE error. The active-status query is
    * unbounded (no recency window) — an old stuck pending/processing row
-   * must still block new admissions until it is cancelled/failed.
+   * must still block new admissions until it is cancelled/failed — UNLESS
+   * its worker is provably gone (server/ai/jobLiveness.ts: dead owner pid in
+   * this container, or a stale heartbeat). Such a restart-orphaned row is
+   * reclaimed (failed + queue closed out) inside the same locked transaction,
+   * so a restart never leaves a window where new starts 409 on a dead job.
+   *
+   * @param isLocallyOwned - whether a live worker in THIS process owns a job id
    */
-  async createEnrichmentJobExclusive(data: InsertEnrichmentJob): Promise<EnrichmentJob> {
+  async createEnrichmentJobExclusive(
+    data: InsertEnrichmentJob,
+    isLocallyOwned: (jobId: number) => boolean = () => false,
+  ): Promise<EnrichmentJob> {
     return await db.transaction(async (tx) => {
       await tx.execute(sql`SELECT pg_advisory_xact_lock(hashtext('enrichment_job_admission'))`);
-      const [active] = await tx
-        .select({ id: enrichmentJobs.id, status: enrichmentJobs.status })
+      const activeRows = await tx
+        .select({
+          id: enrichmentJobs.id,
+          status: enrichmentJobs.status,
+          workerId: enrichmentJobs.workerId,
+          heartbeatAt: enrichmentJobs.heartbeatAt,
+          startedAt: enrichmentJobs.startedAt,
+          createdAt: enrichmentJobs.createdAt,
+        })
         .from(enrichmentJobs)
-        .where(inArray(enrichmentJobs.status, ["pending", "processing"]))
-        .limit(1);
-      if (active) {
-        const err: any = new Error(
-          `Enrichment job #${active.id} is already ${active.status}. Wait for it to finish or cancel it before starting a new one.`
-        );
-        err.code = "ENRICHMENT_JOB_ACTIVE";
-        throw err;
+        .where(inArray(enrichmentJobs.status, ["pending", "processing"]));
+      const now = Date.now();
+      const live = activeRows.find((row) => !isJobOrphaned(row, isLocallyOwned(row.id), now));
+      if (live) {
+        throw enrichmentJobActiveError(live.id, live.status);
       }
-      const [job] = await tx.insert(enrichmentJobs).values(data).returning();
+      for (const orphan of activeRows) {
+        const [reclaimed] = await tx
+          .update(enrichmentJobs)
+          .set({
+            status: 'failed',
+            errorMessage: ORPHANED_BY_RESTART_MESSAGE,
+            completedAt: new Date(),
+            updatedAt: new Date(),
+          })
+          .where(and(
+            eq(enrichmentJobs.id, orphan.id),
+            inArray(enrichmentJobs.status, ['pending', 'processing']),
+            livenessUnchangedSince(enrichmentJobs, orphan),
+          ))
+          .returning({ id: enrichmentJobs.id });
+        if (reclaimed) {
+          await closeOutEnrichmentQueue(tx, orphan.id, 'Not processed: the job was orphaned by a server restart');
+          console.log(`🧹 Enrichment admission reclaimed orphaned job #${orphan.id} (worker gone)`);
+          continue;
+        }
+        // No match: either it finished meanwhile (fine) or its worker just
+        // heartbeated, which proves it alive — then it still blocks admission.
+        const [still] = await tx
+          .select({ status: enrichmentJobs.status })
+          .from(enrichmentJobs)
+          .where(and(eq(enrichmentJobs.id, orphan.id), inArray(enrichmentJobs.status, ['pending', 'processing'])));
+        if (still) {
+          throw enrichmentJobActiveError(orphan.id, still.status);
+        }
+      }
+      const [job] = await tx
+        .insert(enrichmentJobs)
+        .values({ ...data, workerId: WORKER_ID, heartbeatAt: new Date() })
+        .returning();
       return job;
     });
+  }
+
+  /**
+   * Refresh the owning worker's heartbeat while the job is active. Returns the
+   * row's current status (null when the row is gone) so the worker notices a
+   * cancel issued on another instance or a reclaim.
+   */
+  async heartbeatEnrichmentJob(id: number): Promise<string | null> {
+    const [beat] = await db
+      .update(enrichmentJobs)
+      .set({ heartbeatAt: new Date(), workerId: WORKER_ID })
+      .where(and(eq(enrichmentJobs.id, id), inArray(enrichmentJobs.status, ['pending', 'processing'])))
+      .returning({ status: enrichmentJobs.status });
+    if (beat) return beat.status;
+    const [row] = await db.select({ status: enrichmentJobs.status }).from(enrichmentJobs).where(eq(enrichmentJobs.id, id));
+    return row?.status ?? null;
+  }
+
+  /** Mark a terminal job's remaining (never-processed) queue items cancelled. */
+  async closeOutQueue(jobId: number, reason: string): Promise<number> {
+    return closeOutEnrichmentQueue(db, jobId, reason);
   }
 
   /**
@@ -151,15 +253,21 @@ export class EnrichmentRepository {
    * @param id - Job ID to cancel
    */
   async cancelEnrichmentJob(id: number): Promise<void> {
-    const [changed] = await db
-      .update(enrichmentJobs)
-      .set({
-        status: 'cancelled',
-        completedAt: new Date(),
-        updatedAt: new Date()
-      })
-      .where(and(eq(enrichmentJobs.id, id), inArray(enrichmentJobs.status, ['pending', 'processing'])))
-      .returning({ id: enrichmentJobs.id });
+    // Job + its unprocessed queue items flip together, so a cancelled job can
+    // never be left with rows that still read as queued work.
+    const changed = await db.transaction(async (tx) => {
+      const [row] = await tx
+        .update(enrichmentJobs)
+        .set({
+          status: 'cancelled',
+          completedAt: new Date(),
+          updatedAt: new Date()
+        })
+        .where(and(eq(enrichmentJobs.id, id), inArray(enrichmentJobs.status, ['pending', 'processing'])))
+        .returning({ id: enrichmentJobs.id });
+      if (row) await closeOutEnrichmentQueue(tx, id, 'Not processed: the job was cancelled');
+      return row;
+    });
     if (!changed) {
       const job = await this.getEnrichmentJob(id);
       if (!job) throw Object.assign(new Error('Job not found'), { name: 'JobNotFoundError' });

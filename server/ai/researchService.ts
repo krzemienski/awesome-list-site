@@ -23,7 +23,8 @@ export class DiscoveryConflictError extends Error {
   }
 }
 import { decodeHtmlEntities, decodeResourceTextFields } from '../github/importHygiene';
-import { runAgentQuery, agentUsageFromError, type AgentDefinitionInput } from './runAgentQuery';
+import { runAgentQuery, agentUsageFromError, isBudgetCapStop, BUDGET_STOPPED_STATUS, type AgentDefinitionInput } from './runAgentQuery';
+import { startJobHeartbeat, WORKER_ID } from './jobLiveness';
 import { defaultResearchModel, defaultScoutModel, resolveModel, validateBaseUrl, type AgentRunConfig } from './agentRuntime';
 import { LinkChecker } from '../validation/linkChecker';
 import { isPlausiblePublicUrl } from '@shared/validation';
@@ -415,6 +416,10 @@ function transactionalTaxonomyAccess(tx: ApprovalTx, onCreate: () => void): SubS
 class ResearchService {
   private static instance: ResearchService;
   private activeJobs: Map<number, ActiveJob> = new Map();
+  // Jobs reclaimed as orphaned (by the watchdog or another instance) while
+  // this process was still running them — their 'failed' verdict must not be
+  // overwritten by this run's own terminal write.
+  private reclaimedJobs = new Set<number>();
 
   private constructor() {}
 
@@ -1031,10 +1036,33 @@ class ResearchService {
       authTokenLast4: options.authTokenLast4 || null,
       status: 'processing',
       startedAt: new Date(),
+      workerId: WORKER_ID,
+      heartbeatAt: new Date(),
     }).returning();
 
     const abortController = new AbortController();
     this.activeJobs.set(job.id, { jobId: job.id, abortController });
+
+    // Liveness heartbeat (server/ai/jobLiveness.ts): lets a restarted or
+    // sibling instance reclaim this row as soon as this worker is gone. If
+    // the row leaves 'processing' under us (cancelled on another instance,
+    // or reclaimed after missed heartbeats) stop the run.
+    const stopHeartbeat = startJobHeartbeat({
+      label: `research:${job.id}`,
+      beat: async () => {
+        const [beat] = await db.update(researchJobs)
+          .set({ heartbeatAt: new Date(), workerId: WORKER_ID })
+          .where(and(eq(researchJobs.id, job.id), sql`${researchJobs.status} in ('pending', 'processing')`))
+          .returning({ status: researchJobs.status });
+        if (beat) return beat.status;
+        const [row] = await db.select({ status: researchJobs.status }).from(researchJobs).where(eq(researchJobs.id, job.id));
+        return row?.status ?? null;
+      },
+      onLost: (status) => {
+        if (status !== 'cancelled') this.reclaimedJobs.add(job.id);
+        abortController.abort();
+      },
+    });
 
     const config: AgentRunConfig = {
       model: options.model || null,
@@ -1062,9 +1090,14 @@ class ResearchService {
           const existing = Array.isArray(cur?.agentLog) ? (cur!.agentLog as any[]) : [];
           existing.push({ role: 'error', content: `Job failed: ${msg}`, timestamp: new Date().toISOString() });
           const usage = agentUsageFromError(err);
+          // Hitting the configured USD cap is a budget stop, not a crash.
+          const failStatus = isBudgetCapStop(err) ? BUDGET_STOPPED_STATUS : 'failed';
+          const reclaimed = this.reclaimedJobs.has(job.id);
           await db.update(researchJobs).set({
-            status: sql`case when ${researchJobs.status} = 'cancelled' then 'cancelled' else 'failed' end`,
-            errorMessage: msg,
+            ...(reclaimed ? {} : {
+              status: sql`case when ${researchJobs.status} = 'cancelled' then 'cancelled' else ${failStatus} end`,
+              errorMessage: msg,
+            }),
             ...(usage ? {
               turnsUsed: usage.numTurns,
               totalInputTokens: usage.tokensIn,
@@ -1079,7 +1112,9 @@ class ResearchService {
         }
       })
       .finally(() => {
+        stopHeartbeat();
         this.activeJobs.delete(job.id);
+        this.reclaimedJobs.delete(job.id);
       });
 
     return job.id;
@@ -1321,7 +1356,7 @@ STOP TARGET: this run ends AUTOMATICALLY once ${targetDiscoveries} new discoveri
     const stoppedAtTarget = runCtx.targetReached;
     await addLog(
       'system',
-      `Research ${result.aborted ? (stoppedAtTarget ? 'completed (discovery target reached)' : 'cancelled') : 'completed'} (${result.subtype || 'done'}). Turns: ${result.numTurns}/${maxTurns ?? '∞'}, ` +
+      `Research ${result.aborted ? (stoppedAtTarget ? 'completed (discovery target reached)' : 'cancelled') : (!stoppedAtTarget && isBudgetCapStop(result) ? 'stopped at budget cap' : 'completed')} (${result.subtype || 'done'}). Turns: ${result.numTurns}/${maxTurns ?? '∞'}, ` +
       `Web searches: ${result.webSearchCount}, Discoveries saved: ${finalJob?.totalDiscoveries || 0}, ` +
       `Duplicates skipped: ${finalJob?.duplicatesSkipped || 0}, ` +
       `Tokens: in=${result.tokensIn} out=${result.tokensOut}, Cost: $${result.totalCostUsd.toFixed(4)}`,
@@ -1334,7 +1369,15 @@ STOP TARGET: this run ends AUTOMATICALLY once ${targetDiscoveries} new discoveri
     const abortedWithNoUsage =
       result.aborted && result.numTurns === 0 && result.totalCostUsd === 0 &&
       result.tokensIn === 0 && result.tokensOut === 0;
-    const finalStatus = result.aborted && !stoppedAtTarget ? 'cancelled' : 'completed';
+    // A run the SDK stopped at its configured USD cap gets a distinct
+    // terminal state ("Stopped at budget") rather than reading as a normal
+    // completion or a crash. Reaching the discovery target wins over it.
+    const budgetStopped = !stoppedAtTarget && !result.aborted && isBudgetCapStop(result);
+    const finalStatus = result.aborted && !stoppedAtTarget
+      ? 'cancelled'
+      : budgetStopped ? BUDGET_STOPPED_STATUS : 'completed';
+    // Reclaimed as orphaned mid-run: persist usage/log, keep the 'failed' verdict.
+    const reclaimed = this.reclaimedJobs.has(jobId);
     const usageFields = abortedWithNoUsage ? {} : {
       turnsUsed: result.numTurns,
       totalInputTokens: result.tokensIn,
@@ -1354,7 +1397,9 @@ STOP TARGET: this run ends AUTOMATICALLY once ${targetDiscoveries} new discoveri
         await withTimeout(
           db.update(researchJobs)
             .set({
-              status: sql`case when ${researchJobs.status} = 'cancelled' then 'cancelled' else ${finalStatus} end`,
+              ...(reclaimed ? {} : {
+                status: sql`case when ${researchJobs.status} = 'cancelled' then 'cancelled' else ${finalStatus} end`,
+              }),
               completedAt: sql`coalesce(${researchJobs.completedAt}, now())`,
               ...usageFields,
             })
@@ -1372,7 +1417,7 @@ STOP TARGET: this run ends AUTOMATICALLY once ${targetDiscoveries} new discoveri
     // Then the heavyweight agentLog snapshot. It re-asserts status/usage as
     // belt-and-braces in case all three dedicated attempts above failed.
     await persist({
-      status: finalStatus,
+      ...(reclaimed ? {} : { status: finalStatus }),
       ...usageFields,
       completedAt: new Date(),
     });

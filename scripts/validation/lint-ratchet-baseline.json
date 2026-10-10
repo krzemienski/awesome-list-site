@@ -10,7 +10,7 @@
     "@typescript-eslint/no-base-to-string": 16,
     "@typescript-eslint/no-empty-function": 179,
     "@typescript-eslint/no-empty-object-type": 1,
-    "@typescript-eslint/no-explicit-any": 792,
+    "@typescript-eslint/no-explicit-any": 791,
     "@typescript-eslint/no-floating-promises": 4,
     "@typescript-eslint/no-inferrable-types": 36,
     "@typescript-eslint/no-misused-promises": 4,
@@ -19,9 +19,9 @@
     "@typescript-eslint/no-unsafe-argument": 397,
     "@typescript-eslint/no-unsafe-assignment": 920,
     "@typescript-eslint/no-unsafe-call": 272,
-    "@typescript-eslint/no-unsafe-member-access": 2108,
+    "@typescript-eslint/no-unsafe-member-access": 2107,
     "@typescript-eslint/no-unsafe-return": 158,
-    "@typescript-eslint/no-unused-vars": 156,
+    "@typescript-eslint/no-unused-vars": 154,
     "@typescript-eslint/non-nullable-type-assertion-style": 10,
     "@typescript-eslint/only-throw-error": 2,
     "@typescript-eslint/prefer-for-of": 1,
@@ -37,7 +37,7 @@
     "no-empty": 20,
     "no-redeclare": 2,
     "no-regex-spaces": 6,
-    "no-undef": 45,
+    "no-undef": 44,
     "no-unsafe-finally": 2,
     "no-useless-escape": 48,
     "prefer-const": 12,
@@ -860,7 +860,6 @@
       "@typescript-eslint/no-unsafe-assignment": 4,
       "@typescript-eslint/no-unsafe-call": 4,
       "@typescript-eslint/no-unsafe-member-access": 8,
-      "@typescript-eslint/no-unused-vars": 1,
       "@typescript-eslint/prefer-nullish-coalescing": 1,
       "@typescript-eslint/prefer-optional-chain": 1
     },
@@ -1120,7 +1119,6 @@
     "server/jobs/orphanJobWatchdog.ts": {
       "@typescript-eslint/no-explicit-any": 2,
       "@typescript-eslint/no-unsafe-member-access": 2,
-      "@typescript-eslint/no-unused-vars": 1,
       "@typescript-eslint/prefer-nullish-coalescing": 2
     },
     "server/lib/mixpanelServer.ts": {
@@ -1246,9 +1244,7 @@
       "@typescript-eslint/no-unsafe-assignment": 2
     },
     "server/repositories/EnrichmentRepository.ts": {
-      "@typescript-eslint/no-explicit-any": 1,
-      "@typescript-eslint/no-inferrable-types": 2,
-      "@typescript-eslint/no-unsafe-member-access": 1
+      "@typescript-eslint/no-inferrable-types": 2
     },
     "server/repositories/FavoriteRepository.ts": {
       "@typescript-eslint/array-type": 1
@@ -1687,8 +1683,7 @@
     },
     "tests/parity/reference-admin-research-0929.mjs": {
       "@typescript-eslint/no-empty-function": 1,
-      "no-regex-spaces": 1,
-      "no-undef": 1
+      "no-regex-spaces": 1
     },
     "tests/parity/reference-footer-20260929.mjs": {
       "no-regex-spaces": 2

@@ -1636,7 +1636,7 @@ export const enrichmentJobs = pgTable(
   "enrichment_jobs",
   {
     id: serial("id").primaryKey(),
-    status: text("status").notNull().default("pending"), // pending, processing, completed, failed, cancelled
+    status: text("status").notNull().default("pending"), // pending, processing, completed, failed, cancelled, budget_stopped
     filter: text("filter").default("all"), // all, unenriched
     batchSize: integer("batch_size").default(10),
     totalResources: integer("total_resources").default(0),
@@ -1659,6 +1659,12 @@ export const enrichmentJobs = pgTable(
     completedAt: timestamp("completed_at"),
     createdAt: timestamp("created_at").defaultNow(),
     updatedAt: timestamp("updated_at").defaultNow(),
+    // Liveness of the owning worker process (server/ai/jobLiveness.ts):
+    // workerId identifies the process running the job; heartbeatAt is
+    // refreshed while it runs. Lets a restarted/other instance reclaim an
+    // orphaned job immediately instead of waiting out an age threshold.
+    workerId: text("worker_id"),
+    heartbeatAt: timestamp("heartbeat_at"),
   },
   (table) => [
     index("idx_enrichment_jobs_status").on(table.status),
@@ -1713,7 +1719,7 @@ export const enrichmentQueue = pgTable(
     id: serial("id").primaryKey(),
     jobId: integer("job_id").references(() => enrichmentJobs.id, { onDelete: "cascade" }).notNull(),
     resourceId: integer("resource_id").references(() => resources.id, { onDelete: "cascade" }).notNull(),
-    status: text("status").notNull().default("pending"), // pending, processing, completed, failed, skipped
+    status: text("status").notNull().default("pending"), // pending, processing, completed, failed, skipped, cancelled (job ended before this item ran)
     retryCount: integer("retry_count").default(0),
     maxRetries: integer("max_retries").default(3),
     errorMessage: text("error_message"),
@@ -1868,6 +1874,9 @@ export const researchJobs = pgTable(
     startedAt: timestamp("started_at"),
     completedAt: timestamp("completed_at"),
     createdAt: timestamp("created_at").defaultNow(),
+    // Worker liveness — see enrichmentJobs.workerId/heartbeatAt.
+    workerId: text("worker_id"),
+    heartbeatAt: timestamp("heartbeat_at"),
   },
   (table) => [
     index("idx_research_jobs_status").on(table.status),

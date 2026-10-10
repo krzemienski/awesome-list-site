@@ -230,9 +230,14 @@ export async function parseAgentConfigFromRequest(body: any): Promise<ParsedAgen
 /**
  * Remove the encrypted auth-token blob from a job row before returning it to any client.
  * The masked `authTokenLast4` field is preserved so the UI can show which token was used.
+ * Internal worker-liveness bookkeeping (process identity + heartbeat, see
+ * server/ai/jobLiveness.ts) is infrastructure detail and is dropped too.
  */
 export function stripJobAuthSecret<T extends Record<string, any>>(job: T): T {
   if (!job || typeof job !== "object") return job;
-  const { authTokenEncrypted: _omit, ...rest } = job;
+  const rest: Record<string, unknown> = { ...job };
+  delete rest.authTokenEncrypted;
+  delete rest.workerId;
+  delete rest.heartbeatAt;
   return rest as T;
 }

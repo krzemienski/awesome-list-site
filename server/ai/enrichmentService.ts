@@ -11,7 +11,8 @@ import { humanizeTitle, sanitizeDescription, decodeHtmlEntities } from '../githu
 import { tool, createSdkMcpServer } from '@anthropic-ai/claude-agent-sdk';
 import { z } from 'zod';
 import { AgentEventEmitter } from './agentEvents';
-import { runAgentQuery, agentUsageFromError } from './runAgentQuery';
+import { runAgentQuery, agentUsageFromError, isBudgetCapStop, BUDGET_STOPPED_STATUS } from './runAgentQuery';
+import { startJobHeartbeat, WORKER_ID } from './jobLiveness';
 import { defaultEnrichmentModel, resolveModel, type AgentRunConfig } from './agentRuntime';
 import type { EnrichmentJob, EnrichmentQueueItem } from '@shared/schema';
 
@@ -187,13 +188,15 @@ export class EnrichmentService {
     // resource set (duplicate spend, racing writes). Admission is atomic
     // (advisory-locked transaction in the repository), so simultaneous
     // requests cannot both pass a read-before-insert check.
+    // A pending/processing row whose worker is provably gone (restart) is
+    // reclaimed inside admission; only a job a live worker owns blocks.
     const job = await this.enrichmentRepo.createEnrichmentJobExclusive({
       filter,
       batchSize,
       startedBy: startedBy || undefined,
       model: options.model || undefined,
       baseUrl: options.baseUrl || undefined,
-    });
+    }, (id) => this.processingJobs.has(id));
 
     // Initialization is one transaction, and any failure marks the admitted
     // job failed before rethrowing — a job stuck in 'pending' would otherwise
@@ -232,10 +235,12 @@ export class EnrichmentService {
         status: 'failed',
         errorMessage: error.message,
         completedAt: new Date()
-      }).catch(updateError => {
-        // Previously an unhandled rejection; the job row stays as it was.
-        console.error(`Failed to mark enrichment job ${job.id} as failed:`, updateError);
-      });
+      })
+        .then(() => this.enrichmentRepo.closeOutQueue(job.id, 'Not processed: the job failed'))
+        .catch(updateError => {
+          // Previously an unhandled rejection; the job row stays as it was.
+          console.error(`Failed to mark enrichment job ${job.id} as failed:`, updateError);
+        });
     });
 
     return job.id;
@@ -255,6 +260,21 @@ export class EnrichmentService {
     const totals: EnrichmentRunTotals = { costUsd: 0, tokensIn: 0, tokensOut: 0, turns: 0, batches: 0 };
     const agentLog: Array<{ role: string; content: string; timestamp: string }> = [];
 
+    // Liveness heartbeat: lets another instance (or this one after a restart)
+    // tell a running job from an orphaned one. If the row leaves the active
+    // states under us — cancelled from another instance, or reclaimed as
+    // orphaned after missed heartbeats — stop the run. A reclaimed job keeps
+    // the reclaim's 'failed' verdict instead of being overwritten below.
+    let reclaimed = false;
+    const stopHeartbeat = startJobHeartbeat({
+      label: `enrichment:${jobId}`,
+      beat: () => this.enrichmentRepo.heartbeatEnrichmentJob(jobId),
+      onLost: (status) => {
+        if (status !== 'cancelled') reclaimed = true;
+        abortController.abort();
+      },
+    });
+
     try {
       const job = await this.enrichmentRepo.getEnrichmentJob(jobId);
       if (!job) {
@@ -268,7 +288,9 @@ export class EnrichmentService {
 
       await this.enrichmentRepo.updateEnrichmentJob(jobId, {
         status: 'processing',
-        startedAt: new Date()
+        startedAt: new Date(),
+        workerId: WORKER_ID,
+        heartbeatAt: new Date(),
       });
 
       const config: AgentRunConfig = {
@@ -281,12 +303,22 @@ export class EnrichmentService {
       await this.processJobBatches(jobId, job.batchSize || 10, model, config, abortController, emitter, totals, agentLog);
 
       const updatedJob = await this.enrichmentRepo.getEnrichmentJob(jobId);
+      if (reclaimed || updatedJob?.status === 'failed') {
+        // Reclaimed as orphaned while we ran: record usage, keep its verdict.
+        await this.enrichmentRepo.updateEnrichmentJob(jobId, {
+          metadata: this.buildJobMetadata(updatedJob, model, totals, agentLog),
+        });
+        await this.enrichmentRepo.closeOutQueue(jobId, 'Not processed: the job was orphaned by a server restart');
+        return;
+      }
       const cancelled = updatedJob?.status === 'cancelled' || abortController.signal.aborted;
       await this.enrichmentRepo.updateEnrichmentJob(jobId, {
         status: cancelled ? 'cancelled' : 'completed',
         completedAt: new Date(),
         metadata: this.buildJobMetadata(updatedJob, model, totals, agentLog),
       });
+      // A completed run drained its queue; a cancelled one leaves items behind.
+      await this.enrichmentRepo.closeOutQueue(jobId, 'Not processed: the job was cancelled');
     } catch (error: any) {
       console.error(`Error processing job ${jobId}:`, error);
       // A failed batch still spent tokens; fold its reported usage into the totals.
@@ -307,13 +339,21 @@ export class EnrichmentService {
       const processed = cur?.processedResources || 0;
       const failedItems = cur?.failedResources || 0;
       const finishedAllWork = total > 0 && processed >= total && failedItems === 0 && (cur?.successfulResources || 0) > 0;
+      // A batch that hit its configured USD cap is a budget stop, not a crash:
+      // give it a distinct status so admins can tell "spent its allowance"
+      // from "broke".
+      const budgetStop = isBudgetCapStop(error);
+      const status = finishedAllWork ? 'completed' : budgetStop ? BUDGET_STOPPED_STATUS : 'failed';
       await this.enrichmentRepo.updateEnrichmentJob(jobId, {
-        status: finishedAllWork ? 'completed' : 'failed',
-        errorMessage: error.message,
-        completedAt: new Date(),
+        ...(reclaimed ? {} : { status, errorMessage: error.message, completedAt: new Date() }),
         metadata: this.buildJobMetadata(cur, cur?.model || defaultEnrichmentModel(), totals, agentLog),
       });
+      await this.enrichmentRepo.closeOutQueue(
+        jobId,
+        budgetStop ? 'Not processed: the job stopped at its budget cap' : 'Not processed: the job failed',
+      );
     } finally {
+      stopHeartbeat();
       this.processingJobs.delete(jobId);
       this.activeJobs.delete(jobId);
     }
@@ -354,8 +394,8 @@ export class EnrichmentService {
       if (abortController.signal.aborted) break;
 
       const job = await this.enrichmentRepo.getEnrichmentJob(jobId);
-      if (!job || job.status === 'cancelled') {
-        console.log(`Job ${jobId} was cancelled or not found`);
+      if (!job || (job.status !== 'pending' && job.status !== 'processing')) {
+        console.log(`Job ${jobId} was cancelled, reclaimed or not found`);
         break;
       }
 
@@ -373,7 +413,7 @@ export class EnrichmentService {
       await this.runEnrichmentBatch(jobId, batch, model, config, abortController, emitter, totals, agentLog);
 
       // A user cancel mid-run must not count as a retry (which could force-fail
-      // an item at maxRetries-1); leave unsubmitted items pending and stop.
+      // an item at maxRetries-1); stop — the cancel closes out unsubmitted items.
       if (abortController.signal.aborted) break;
 
       // Anything still pending after the run didn't get submitted this pass →
@@ -628,6 +668,19 @@ ${taxonomyHint}`;
     await this.enrichmentRepo.updateEnrichmentJob(jobId, {
       metadata: this.buildJobMetadata(cur, model, totals, agentLog),
     });
+
+    // The SDK can also RETURN (not throw) a budget-cap result. With items of
+    // this batch still unsubmitted, the next loop pass would re-run them and
+    // pay again; stop the job here so processJob records budget_stopped.
+    // Usage is already folded into totals above, so the error carries none.
+    if (!result.aborted && submitted < items && isBudgetCapStop(result)) {
+      const stop = new Error(
+        `Reached maximum budget (${maxBudgetUsd}) for an enrichment batch with ${submitted}/${items} enriched`,
+      ) as Error & { agentSubtype?: string; agentTerminalReason?: string };
+      stop.agentSubtype = 'error_max_budget_usd';
+      if (result.terminalReason) stop.agentTerminalReason = result.terminalReason;
+      throw stop;
+    }
   }
 
   /**

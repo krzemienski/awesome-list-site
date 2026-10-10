@@ -46,3 +46,12 @@ V14 and V15 ran on the scratch clone `awesome_scratch_592` (instance A on :5161)
 | 7 | 2026-10-10 ~18:05 | `POST /api/researcher/start` (API, budget $0.05, 12 turns, target 1) | research 57 | V15 re-proof after the `runAgentQuery` usage fix | failed "Reached maximum budget ($0.05)"; job row now records 2 turns and $0.1162, equal to the `result` event. The SDK checks the cap between turns, so one opus turn overshot the $0.05 cap |
 
 **Running total for task 592: 7 of 8.**
+
+### Task 621 (job-state fixes, DEV :5000)
+
+| # | Date (UTC) | Endpoint | Job | Purpose | Evidence |
+|---|---|---|---|---|---|
+| 621-1 | 2026-10-10 ~21:53 | `POST /api/researcher/start` (API, budget $0.03, 40 turns) | research 51 | budget-stop status proof | `budget_stopped`, "Reached maximum budget ($0.03)", 2 turns, $0.1164 |
+| 621-2 | 2026-10-10 ~21:55 | `POST /api/researcher/start` (API, budget $0.30, 40 turns) | research 52 | restart-reclaim proof; killed by a workflow restart after ~26 s | `failed` "Orphaned by server restart" at boot. Usage was not recorded because the process died mid-run (spend ≤ $0.30 cap) |
+
+Both rows and their events were deleted after the proof.

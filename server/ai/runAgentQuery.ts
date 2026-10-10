@@ -175,6 +175,32 @@ export function agentUsageFromError(err: unknown): AgentRunUsage | null {
   return u;
 }
 
+/** Terminal job status for a run the configured USD budget cap stopped. */
+export const BUDGET_STOPPED_STATUS = "budget_stopped";
+
+const BUDGET_CAP_MESSAGE_RE = /maximum budget|max budget|budget \(\$/i;
+
+/**
+ * Whether a run ended because it hit its configured budget cap — either a
+ * returned result (subtype error_max_budget_usd / terminal_reason
+ * budget_exhausted) or an error runAgentQuery threw for an SDK error result
+ * carrying that subtype. Callers persist BUDGET_STOPPED_STATUS instead of a
+ * generic failure so admins can tell "spent its allowance" from "broke".
+ */
+export function isBudgetCapStop(source: unknown): boolean {
+  if (!source || typeof source !== "object") return false;
+  const s = source as {
+    subtype?: string;
+    terminalReason?: string;
+    agentSubtype?: string;
+    agentTerminalReason?: string;
+    message?: unknown;
+  };
+  if (s.subtype === "error_max_budget_usd" || s.agentSubtype === "error_max_budget_usd") return true;
+  if (s.terminalReason === "budget_exhausted" || s.agentTerminalReason === "budget_exhausted") return true;
+  return source instanceof Error && BUDGET_CAP_MESSAGE_RE.test(source.message);
+}
+
 function actorFromMessage(msg: any): { actor: string; actorType: "orchestrator" | "subagent" } {
   const sub = msg?.subagent_type;
   if (sub) return { actor: String(sub), actorType: "subagent" };
@@ -762,7 +788,7 @@ export async function runAgentQuery(params: RunAgentQueryParams): Promise<RunAge
       ? `\nClaude process stderr:\n${stderrLines.join("\n")}`
       : "";
     const emsg = `${err?.message || String(err)}${processDetail}`;
-    const isBudget = /maximum budget|max budget|budget \(\$/i.test(emsg);
+    const isBudget = BUDGET_CAP_MESSAGE_RE.test(emsg);
     const isTurns = /maximum (number of )?turns|max turns/i.test(emsg);
     if (abortController.signal.aborted) {
       // Controlled user cancel: abort makes the generator throw a generic Error.
@@ -803,6 +829,10 @@ export async function runAgentQuery(params: RunAgentQueryParams): Promise<RunAge
       // reports the spend; carry it on the error so callers persist real
       // usage instead of 0 turns / $0.00 next to a run that cost money.
       if (err && typeof err === "object") {
+        // Carry the SDK's terminal classification so callers can tell a
+        // budget-cap stop (isBudgetCapStop) from a genuine failure.
+        if (result.subtype) (err as { agentSubtype?: string }).agentSubtype = result.subtype;
+        if (result.terminalReason) (err as { agentTerminalReason?: string }).agentTerminalReason = result.terminalReason;
         (err as { agentUsage?: AgentRunUsage }).agentUsage = {
           numTurns: result.numTurns,
           tokensIn: sawResultMessage ? result.tokensIn : observedTokensIn,

@@ -121,6 +121,13 @@ async function main() {
       console.error('FATAL: dist/index.js missing — run `npm run build` first.');
       process.exit(1);
     }
+    // The spawned production server runs the boot migrator against the SAME
+    // dev database; its idempotent DDL briefly takes table locks, and a
+    // concurrent seo-snapshot crawl then sheds random /tag/* pages as 503.
+    // Hold "db-heavy" while our server is up (lock order: dist → db-heavy;
+    // no gate takes them in the reverse order).
+    const releaseDbLease = await acquireGateLease('db-heavy', 'http-cache-headers');
+    process.on('exit', () => { try { releaseDbLease(); } catch { /* released */ } });
     BASE = `http://127.0.0.1:${PORT}`;
     console.log(`Booting production server on :${PORT} …`);
     child = spawn('node', ['dist/index.js'], {

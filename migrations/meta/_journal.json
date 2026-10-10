@@ -197,6 +197,13 @@
       "when": 1791561600000,
       "tag": "0053_deleted_user_tombstones",
       "breakpoints": true
+    },
+    {
+      "idx": 28,
+      "version": "7",
+      "when": 1791648000000,
+      "tag": "0054_ai_job_worker_liveness",
+      "breakpoints": true
     }
   ]
 }
