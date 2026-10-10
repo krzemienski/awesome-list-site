@@ -2,7 +2,9 @@
 // and account-recovery contracts. Starts logged out on /submit, follows its
 // sign-in link, then repeats the same return check for every representative
 // account entry point before signing out and completing Clerk's email-code
-// recovery flow.
+// recovery flow. Sign-ins use backend-minted Clerk sign-in tickets on the real
+// /sign-in page (see signInWithClerkTicket) so Clerk's new-device verification
+// cannot make the gate flaky; recovery still drives Clerk's email-code UI.
 //
 // Requires the development server on :5000, DATABASE_URL, and CLERK_SECRET_KEY.
 // Evidence is written only to /tmp/validation/auth-return-audit.
@@ -251,47 +253,35 @@ async function gotoPage(page, route) {
   throw new Error(`Unable to load ${route} for auth return audit (${last})`);
 }
 
-async function signInWithClerk(page, email, password) {
-  const identifier = page.locator('input[name="identifier"]');
-  await identifier.waitFor({ timeout: 30_000 });
-  await identifier.fill(email);
-  await page.keyboard.press("Enter");
-
-  const passwordField = page.locator('input[name="password"]');
-  await passwordField.waitFor({ timeout: 30_000 });
-  await passwordField.fill(password);
-  await page.keyboard.press("Enter");
-
-  const otp = page.locator('input[aria-label="Enter verification code"]');
-  const emailCodeButton = page
-    .getByRole("button", { name: /^email code to /i })
-    .first();
-  let selectedEmailCode = false;
+// Sign in through the real <SignIn> component with a backend-minted sign-in
+// ticket instead of typing a password. Clerk's Client Trust feature routes
+// repeated password sign-ins from this container to /sign-in/client-trust
+// (new-device verification), which tests Clerk's risk state rather than the
+// app's return contract. A `__clerk_ticket` on the current sign-in URL keeps
+// everything the audit owns intact: the page is still /sign-in carrying the
+// app-built redirect_url, and Clerk's own component completes the ticket and
+// performs the redirect the audit then verifies.
+async function signInWithClerkTicket(page, clerkUserId) {
+  const signInUrl = new URL(page.url());
+  if (!signInUrl.pathname.startsWith("/sign-in")) {
+    throw new Error(`ticket sign-in must start on /sign-in; path=${signInUrl.pathname}`);
+  }
+  const ticket = await clerkApi("POST", "/sign_in_tokens", {
+    user_id: clerkUserId,
+    expires_in_seconds: 600,
+  });
+  signInUrl.searchParams.set("__clerk_ticket", ticket.token);
+  await gotoPage(page, signInUrl.pathname + signInUrl.search);
   const deadline = Date.now() + 90_000;
   while (Date.now() < deadline) {
     const signedIn = await page
       .evaluate(() => Boolean(window.Clerk?.user))
       .catch(() => false);
-    if (signedIn || !new URL(page.url()).pathname.startsWith("/sign-in")) {
-      return;
-    }
-    if (await otp.isVisible().catch(() => false)) {
-      await otp.click();
-      await page.keyboard.type("424242", { delay: 120 });
-      return;
-    }
-    if (
-      !selectedEmailCode &&
-      await emailCodeButton.isVisible().catch(() => false)
-    ) {
-      selectedEmailCode = true;
-      await emailCodeButton.click();
-      continue;
-    }
+    if (signedIn || !new URL(page.url()).pathname.startsWith("/sign-in")) return;
     await page.waitForTimeout(500);
   }
   throw new Error(
-    `Clerk sign-in did not reach an authenticated session or verification step; ` +
+    `Clerk ticket sign-in did not reach an authenticated session; ` +
       `path=${new URL(page.url()).pathname}`,
   );
 }
@@ -552,7 +542,7 @@ try {
     throw new Error("Disposable Clerk account was not visible immediately after creation");
   }
 
-  await signInWithClerk(page, email, password);
+  await signInWithClerkTicket(page, createdClerkUser.id);
 
   const authState = await waitForAuthenticatedSession(page, "/submit");
 
@@ -633,7 +623,7 @@ try {
       );
     }
 
-    await signInWithClerk(page, routeEmail, routePassword);
+    await signInWithClerkTicket(page, routeClerkUser.id);
     const routeAuthState = await waitForAuthenticatedSession(page, routeUrl.pathname);
     const returned = new URL(page.url());
     const returnedRoute = returned.pathname + returned.search + returned.hash;
