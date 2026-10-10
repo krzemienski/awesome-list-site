@@ -175,3 +175,4 @@
 - [Initial bundle zod-free](initial-bundle-zod.md) — shell imports must use resourceFacets-core; zod in App.tsx graph blew bundle-budget and blocked publish; run the publish gate before asking to republish.
 - [og-middleware outage shell](og-middleware-outage-shell.md) — DB outage: HTML navigations get SPA shell + 503/Retry-After (client error card), non-HTML keeps JSON 503 (resilience gate contract).
 - [Publish gate offline repro](pre-publish-gate-offline-repro.md) — run pre-publish-gate.sh --publish in a /tmp tar copy (keep .agents+docs, BUILD_REVISION set, bogus DATABASE_URL) to prove blocking.
+- [GitHub import taxonomy merge](github-import-taxonomy-merge.md) — import headings colliding by slug/case merge into the existing node + canonical names; no suffixed slugs; dryRun still creates nodes.

@@ -111,8 +111,45 @@ function generateSlug(name: string): string {
 }
 
 /**
- * Ensure category hierarchy exists in database, creating entries as needed
- * Returns the IDs for the category, subcategory, and sub-subcategory
+ * Pick the taxonomy node an imported heading belongs to.
+ *
+ * Imported headings pass through normalizeCategory(), which keeps only
+ * letters, digits, spaces, "&" and "-". Two headings whose slugs collide
+ * therefore differ only in case or punctuation ("Audio & Video" vs
+ * "Audio-Video", or an exported "__qa_ Cat A" re-imported as "qa Cat A"), so
+ * they name the SAME node. Resolution order is deterministic:
+ *   1. exact name, 2. same slug, 3. case-insensitive name.
+ * The slug step matches what the per-parent unique constraint would reject,
+ * so a colliding heading merges into the existing node instead of failing.
+ */
+function pickNode<T extends { name: string; slug: string }>(
+  rows: T[],
+  name: string,
+  slug: string,
+): T | undefined {
+  const lower = name.toLowerCase();
+  return rows.find(r => r.name === name)
+    ?? (slug ? rows.find(r => r.slug === slug) : undefined)
+    ?? rows.find(r => r.name.toLowerCase() === lower);
+}
+
+/**
+ * A hierarchy level that was merged into an existing node with a different
+ * spelling. Reported as an import warning so the rename is visible.
+ */
+interface HierarchyMerge {
+  level: 'category' | 'subcategory' | 'sub-subcategory';
+  imported: string;
+  existing: string;
+}
+
+/**
+ * Ensure category hierarchy exists in database, creating entries as needed.
+ * Returns the IDs AND the canonical names for each level. When an imported
+ * heading collides (same slug / case-insensitive name) with an existing node,
+ * the existing node is reused and its name is returned, so callers must write
+ * the canonical names onto resources (never the imported spelling, which
+ * would name no taxonomy row and orphan the resource).
  */
 async function ensureCategoryHierarchy(
   categoryRepo: CategoryRepository,
@@ -123,73 +160,106 @@ async function ensureCategoryHierarchy(
   categoryId: number;
   subcategoryId?: number;
   subSubcategoryId?: number;
+  category: string;
+  subcategory?: string;
+  subSubcategory?: string;
+  merges: HierarchyMerge[];
 }> {
+  const merges: HierarchyMerge[] = [];
+  const noteMerge = (level: HierarchyMerge['level'], imported: string, existing: string) => {
+    if (imported !== existing) merges.push({ level, imported, existing });
+  };
+
   // 1. Ensure category exists
-  let category = await categoryRepo.getCategoryByName(categoryName);
+  const categorySlug = generateSlug(categoryName);
+  const findCategory = async () =>
+    (await categoryRepo.getCategoryByName(categoryName))
+    ?? (categorySlug ? await categoryRepo.getCategoryBySlug(categorySlug) : undefined)
+    ?? pickNode(await categoryRepo.listCategories(), categoryName, categorySlug);
+  let category = await findCategory();
   if (!category) {
     try {
       category = await categoryRepo.createCategory({
         name: categoryName,
-        slug: generateSlug(categoryName),
+        slug: categorySlug,
       });
       console.log(`  Created category: ${categoryName}`);
     } catch (e: any) {
       // May already exist due to race condition, try to fetch again
-      category = await categoryRepo.getCategoryByName(categoryName);
+      category = await findCategory();
       if (!category) {
         throw new Error(`Failed to create or find category: ${categoryName} - ${e.message}`);
       }
     }
   }
+  noteMerge('category', categoryName, category.name);
 
   // 2. Ensure subcategory exists (if provided)
   let subcategory;
   if (subcategoryName) {
-    subcategory = await categoryRepo.getSubcategoryByName(subcategoryName, category.id);
+    const parentId = category.id;
+    const subSlug = generateSlug(subcategoryName);
+    const findSubcategory = async () =>
+      (await categoryRepo.getSubcategoryByName(subcategoryName, parentId))
+      ?? (subSlug ? await categoryRepo.getSubcategoryBySlug(subSlug, parentId) : undefined)
+      ?? pickNode(await categoryRepo.listSubcategories(parentId), subcategoryName, subSlug);
+    subcategory = await findSubcategory();
     if (!subcategory) {
       try {
         subcategory = await categoryRepo.createSubcategory({
           name: subcategoryName,
-          slug: generateSlug(subcategoryName),
-          categoryId: category.id,
+          slug: subSlug,
+          categoryId: parentId,
         });
-        console.log(`  Created subcategory: ${subcategoryName} under ${categoryName}`);
+        console.log(`  Created subcategory: ${subcategoryName} under ${category.name}`);
       } catch (e: any) {
         // May already exist due to race condition
-        subcategory = await categoryRepo.getSubcategoryByName(subcategoryName, category.id);
+        subcategory = await findSubcategory();
         if (!subcategory) {
           throw new Error(`Failed to create or find subcategory: ${subcategoryName} - ${e.message}`);
         }
       }
     }
+    noteMerge('subcategory', subcategoryName, subcategory.name);
   }
 
   // 3. Ensure sub-subcategory exists (if provided)
   let subSubcategory;
   if (subSubcategoryName && subcategory) {
-    subSubcategory = await categoryRepo.getSubSubcategoryByName(subSubcategoryName, subcategory.id);
+    const parentId = subcategory.id;
+    const subSubSlug = generateSlug(subSubcategoryName);
+    const findSubSubcategory = async () =>
+      (await categoryRepo.getSubSubcategoryByName(subSubcategoryName, parentId))
+      ?? (subSubSlug ? await categoryRepo.getSubSubcategoryBySlug(subSubSlug, parentId) : undefined)
+      ?? pickNode(await categoryRepo.listSubSubcategories(parentId), subSubcategoryName, subSubSlug);
+    subSubcategory = await findSubSubcategory();
     if (!subSubcategory) {
       try {
         subSubcategory = await categoryRepo.createSubSubcategory({
           name: subSubcategoryName,
-          slug: generateSlug(subSubcategoryName),
-          subcategoryId: subcategory.id,
+          slug: subSubSlug,
+          subcategoryId: parentId,
         });
-        console.log(`  Created sub-subcategory: ${subSubcategoryName} under ${subcategoryName}`);
+        console.log(`  Created sub-subcategory: ${subSubcategoryName} under ${subcategory.name}`);
       } catch (e: any) {
         // May already exist due to race condition
-        subSubcategory = await categoryRepo.getSubSubcategoryByName(subSubcategoryName, subcategory.id);
+        subSubcategory = await findSubSubcategory();
         if (!subSubcategory) {
           throw new Error(`Failed to create or find sub-subcategory: ${subSubcategoryName} - ${e.message}`);
         }
       }
     }
+    noteMerge('sub-subcategory', subSubcategoryName, subSubcategory.name);
   }
 
   return {
     categoryId: category.id,
     subcategoryId: subcategory?.id,
     subSubcategoryId: subSubcategory?.id,
+    category: category.name,
+    subcategory: subcategory?.name,
+    subSubcategory: subSubcategory?.name,
+    merges,
   };
 }
 
@@ -336,7 +406,7 @@ export class GitHubSyncService {
       console.log(`Found ${uniqueHierarchies.size} unique category hierarchies`);
       
       // Create all category hierarchies
-      const hierarchyIds = new Map<string, { categoryId: number; subcategoryId?: number; subSubcategoryId?: number }>();
+      const hierarchyIds = new Map<string, Awaited<ReturnType<typeof ensureCategoryHierarchy>>>();
       // Hierarchies that could not be resolved. Items under them are refused
       // in STEP 4 (one item error each) instead of being written with
       // category text that names no taxonomy row (orphan resources desync
@@ -351,6 +421,12 @@ export class GitHubSyncService {
             hierarchy.subSubcategory
           );
           hierarchyIds.set(key, ids);
+          for (const m of ids.merges) {
+            const note = `Imported ${m.level} "${m.imported}" merged into existing ${m.level} "${m.existing}" (same slug or name)`;
+            if (result.warnings.includes(note)) continue;
+            console.log(`  ${note}`);
+            result.warnings.push(note);
+          }
         } catch (error: any) {
           console.error(`Error creating hierarchy for ${key}: ${error.message}`);
           failedHierarchies.set(key, error instanceof Error ? error.message : String(error));
@@ -371,6 +447,14 @@ export class GitHubSyncService {
             console.error(errorMsg);
             result.errors.push(errorMsg);
             continue;
+          }
+          // Write the canonical taxonomy names: a heading merged into an
+          // existing node must not keep its imported spelling, or the
+          // resource's category text names no taxonomy row (orphan).
+          if (hierarchyId) {
+            resource.category = hierarchyId.category;
+            resource.subcategory = hierarchyId.subcategory ?? resource.subcategory;
+            resource.subSubcategory = hierarchyId.subSubcategory ?? resource.subSubcategory;
           }
           
           const conflict = await this.checkConflict(resource);
