@@ -365,22 +365,16 @@ export function SuggestEditDialog({ resource, open, onOpenChange }: SuggestEditD
   };
 
   const submitMutation = useMutation({
-    mutationFn: async ({ data, proposedChanges }: { data: SuggestEditFormData; proposedChanges: Record<string, { old: unknown; new: unknown }> }) => {
-      const proposedData = {
-        title: data.title,
-        url: data.url,
-        description: data.description,
-        category: data.category,
-        subcategory: data.subcategory,
-        subSubcategory: data.subSubcategory,
-      };
-      
+    mutationFn: async ({ data, changedFields }: { data: SuggestEditFormData; changedFields: string[] }) => {
+      // C01/C02: send ONE value map of the changed fields only. The server
+      // derives the reviewed diff from it against the stored resource, and
+      // AI analysis output is never sent (Analyze/Apply only fills the form).
+      const proposedData = Object.fromEntries(
+        changedFields.map((field) => [field, data[field as keyof SuggestEditFormData] ?? ""]),
+      );
       return apiRequest(`/api/resources/${resource.id}/edits`, {
         method: 'POST',
-        body: JSON.stringify({
-          proposedChanges,
-          proposedData,
-        }),
+        body: JSON.stringify({ proposedData }),
       });
     },
     onSuccess: () => {
@@ -406,6 +400,15 @@ export function SuggestEditDialog({ resource, open, onOpenChange }: SuggestEditD
       queryClient.invalidateQueries({ queryKey: ['/api/user/contributions'] });
     },
     onError: (error: Error) => {
+      // C05: a duplicate URL is a field problem — explain it next to the URL.
+      if (error instanceof ApiError && error.status === 409) {
+        let body: { field?: string; message?: string } | null = null;
+        try { body = JSON.parse(error.body); } catch { body = null; }
+        if (body?.field === 'url' && body.message) {
+          form.setError('url', { type: 'server', message: body.message });
+          return;
+        }
+      }
       // BUG-007 (run14): map raw "STATUS: body" API errors to friendly copy.
       toast({
         title: "Submission Failed",
@@ -438,7 +441,7 @@ export function SuggestEditDialog({ resource, open, onOpenChange }: SuggestEditD
       return;
     }
 
-    submitMutation.mutate({ data: resolved, proposedChanges });
+    submitMutation.mutate({ data: resolved, changedFields: Object.keys(proposedChanges) });
   };
 
   if (!isAuthenticated) {

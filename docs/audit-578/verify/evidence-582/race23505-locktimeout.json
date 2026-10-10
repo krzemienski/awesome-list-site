@@ -1,0 +1,31 @@
+[
+  {
+    "label": "C05-23505 proposal",
+    "status": 201,
+    "id": 78
+  },
+  {
+    "label": "C05-23505 approve while competitor commits",
+    "status": 503,
+    "body": {
+      "message": "Service is temporarily unavailable"
+    }
+  },
+  {
+    "label": "C05-23505 after",
+    "before": {
+      "title": "__qa_test_plan_582_1791561997330_race",
+      "url": "https://example.com/__qa_test_plan_582_1791561997330_concurrent_3"
+    },
+    "after": {
+      "title": "__qa_test_plan_582_1791561997330_race",
+      "url": "https://example.com/__qa_test_plan_582_1791561997330_concurrent_3"
+    },
+    "b": {
+      "url": "https://example.com/__qa_test_plan_582_1791561997330_uncommitted_race"
+    },
+    "edit": {
+      "status": "pending"
+    }
+  }
+]

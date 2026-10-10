@@ -1,0 +1,34 @@
+[
+  {
+    "label": "C05-23505 proposal",
+    "status": 201,
+    "id": 79
+  },
+  {
+    "label": "C05-23505 approve while competitor commits",
+    "status": 409,
+    "body": {
+      "message": "That URL already belongs to another resource (#188648: \"__qa_test_plan_582_1791561997330_url_b\"). Revise or reject the suggestion; it stays pending.",
+      "conflictingResourceId": 188648,
+      "title": "__qa_test_plan_582_1791561997330_url_b",
+      "conflict": true
+    }
+  },
+  {
+    "label": "C05-23505 after",
+    "before": {
+      "title": "__qa_test_plan_582_1791561997330_race",
+      "url": "https://example.com/__qa_test_plan_582_1791561997330_concurrent_3"
+    },
+    "after": {
+      "title": "__qa_test_plan_582_1791561997330_race",
+      "url": "https://example.com/__qa_test_plan_582_1791561997330_concurrent_3"
+    },
+    "b": {
+      "url": "https://example.com/__qa_test_plan_582_1791561997330_uncommitted_race2"
+    },
+    "edit": {
+      "status": "pending"
+    }
+  }
+]

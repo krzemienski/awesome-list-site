@@ -931,6 +931,72 @@ describe('Resources API Integration Tests', () => {
 
       expect(response.body.message).toContain('Client-provided AI analysis');
     });
+
+    it('derives the reviewed diff from proposedData alone', async () => {
+      const resource = await createTestResource({
+        title: 'Diff Source', url: 'https://example.com/diff-source', status: 'approved',
+      });
+      const agent = await createClerkAuthenticatedAgent(app, regularUser);
+      const response = await agent
+        .post(`/api/resources/${resource.id}/edits`)
+        .send({ proposedData: { title: 'Diff Source Renamed' } })
+        .expect(201);
+      expect(response.body.proposedChanges).toEqual({ title: { old: 'Diff Source', new: 'Diff Source Renamed' } });
+      expect(response.body.proposedData).toEqual({ title: 'Diff Source Renamed' });
+    });
+
+    it('rejects a supplied diff that disagrees with proposedData', async () => {
+      const resource = await createTestResource({
+        title: 'Mismatch', url: 'https://example.com/mismatch', status: 'approved',
+      });
+      const agent = await createClerkAuthenticatedAgent(app, regularUser);
+      const response = await agent
+        .post(`/api/resources/${resource.id}/edits`)
+        .send({
+          proposedChanges: { title: { old: 'Mismatch', new: 'Innocent title' } },
+          proposedData: { title: 'Innocent title', url: 'https://evil.example.org/' },
+        })
+        .expect(400);
+      expect(response.body.field).toBe('url');
+    });
+
+    it.each([
+      ['string proposedData', { proposedData: 'string' }],
+      ['array proposedData', { proposedData: [] }],
+      ['null proposedData', { proposedData: null }],
+      ['numeric proposedChanges', { proposedData: { title: 'x title' }, proposedChanges: 5 }],
+      ['malformed change entry', { proposedData: { title: 'x title' }, proposedChanges: { title: 'x title' } }],
+    ])('returns 400 for %s', async (_label, body) => {
+      const resource = await createTestResource({
+        title: 'Shape', url: 'https://example.com/shape', status: 'approved',
+      });
+      const agent = await createClerkAuthenticatedAgent(app, regularUser);
+      await agent.post(`/api/resources/${resource.id}/edits`).send(body).expect(400);
+    });
+
+    it('refuses no-op edits and explicit AI requests', async () => {
+      const resource = await createTestResource({
+        title: 'Noop', url: 'https://example.com/noop', status: 'approved',
+      });
+      const agent = await createClerkAuthenticatedAgent(app, regularUser);
+      await agent.post(`/api/resources/${resource.id}/edits`)
+        .send({ proposedData: { title: 'Noop' } }).expect(400);
+      await agent.post(`/api/resources/${resource.id}/edits`)
+        .send({ proposedData: { title: 'Noop changed' }, triggerClaudeAnalysis: true }).expect(403);
+    });
+
+    it('rejects a duplicate URL with 409 naming the public owner', async () => {
+      const owner = await createTestResource({
+        title: 'URL Owner', url: 'https://example.com/url-owner', status: 'approved',
+      });
+      const resource = await createTestResource({
+        title: 'URL Taker', url: 'https://example.com/url-taker', status: 'approved',
+      });
+      const agent = await createClerkAuthenticatedAgent(app, regularUser);
+      const response = await agent.post(`/api/resources/${resource.id}/edits`)
+        .send({ proposedData: { url: 'https://example.com/url-owner' } }).expect(409);
+      expect(response.body).toMatchObject({ field: 'url', conflictingResourceId: owner.id, title: 'URL Owner' });
+    });
   });
 
   describe('Resources API - Integration Flows', () => {

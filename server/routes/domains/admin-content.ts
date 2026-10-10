@@ -1094,15 +1094,16 @@ export function registerAdminContentRoutes(
     try {
       const editId = parseInt(req.params.id);
       const userId = req.dbUser.id;
-      if (req.body?.reason !== undefined && (typeof req.body.reason !== 'string' || req.body.reason.length > 2000)) {
-        return res.status(400).json({ message: 'reason must be a string of at most 2000 characters' });
+      const approveReason = (req.body ?? {}).reason;
+      if (approveReason !== undefined && (typeof approveReason !== 'string' || approveReason.length > 2000)) {
+        return res.status(400).json({ message: 'reason must be a string of at most 2000 characters', field: 'reason' });
       }
       
       if (isNaN(editId)) {
         return res.status(400).json({ message: 'Invalid edit ID' });
       }
       
-      await auditRepo.approveResourceEdit(editId, userId);
+      await auditRepo.approveResourceEdit(editId, userId, approveReason?.trim() || undefined);
       
       res.json({ message: 'Edit approved and merged successfully' });
     } catch (error: any) {
@@ -1111,7 +1112,9 @@ export function registerAdminContentRoutes(
       // useful conflict response, never leak SQL or change the pending edit.
       let cause = error;
       for (let depth = 0; cause && depth < 8; depth++, cause = cause.cause) {
-        if (cause.code === 'EDIT_URL_CONFLICT' || cause.code === '23505') {
+        // Only the resources.url unique constraint is a URL conflict.
+        if (cause.code === 'EDIT_URL_CONFLICT' ||
+            (cause.code === '23505' && (!cause.constraint || String(cause.constraint).includes('url')))) {
           let conflictingResourceId = cause.conflictingResourceId;
           let title = cause.title;
           if (!conflictingResourceId) {
@@ -1125,7 +1128,8 @@ export function registerAdminContentRoutes(
               // The conflict response is still actionable if lookup fails.
             }
           }
-          return res.status(409).json({ message: 'That URL already belongs to another resource. Revise the suggestion before approving.', conflictingResourceId, title });
+          const owner = conflictingResourceId ? ` (#${conflictingResourceId}${title ? `: "${title}"` : ''})` : '';
+          return res.status(409).json({ message: `That URL already belongs to another resource${owner}. Revise or reject the suggestion; it stays pending.`, conflictingResourceId, title, conflict: true });
         }
       }
       
@@ -1171,7 +1175,7 @@ export function registerAdminContentRoutes(
       if (error?.message?.includes('not pending')) {
         return res.status(409).json({ message: error.message });
       }
-      res.status(500).json({ message: error.message || 'Failed to reject edit' });
+      res.status(500).json({ message: 'Failed to reject edit' });
     }
   });
   

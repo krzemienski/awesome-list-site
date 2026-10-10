@@ -969,13 +969,18 @@ export function registerCatalogContributionsRoutes(
       
       const isObject = (value: unknown): value is Record<string, unknown> =>
         value !== null && typeof value === 'object' && !Array.isArray(value);
-      for (const [field, value] of Object.entries({ proposedChanges, proposedData })) {
+      // proposedData is the single authoritative value map. proposedChanges is
+      // optional (older clients still send it) and is only ever checked for
+      // agreement below — the reviewed diff is always derived server-side.
+      const maps: Record<string, unknown> = { proposedData };
+      if (proposedChanges !== undefined) maps.proposedChanges = proposedChanges;
+      for (const [field, value] of Object.entries(maps)) {
         if (!isObject(value) || Object.keys(value).length === 0 ||
             Object.keys(value).some(key => !(EDITABLE_RESOURCE_FIELDS as readonly string[]).includes(key))) {
           return res.status(400).json({ message: `${field} must be a non-empty object containing only editable fields`, field });
         }
       }
-      for (const [field, value] of Object.entries(proposedChanges)) {
+      for (const [field, value] of Object.entries((proposedChanges ?? {}) as Record<string, unknown>)) {
         if (!isObject(value) || !('old' in value) || !('new' in value) ||
             Object.keys(value).some(key => key !== 'old' && key !== 'new')) {
           return res.status(400).json({ message: `proposedChanges.${field} must contain old and new values`, field });
@@ -991,10 +996,18 @@ export function registerCatalogContributionsRoutes(
         if (typeof value === 'string' && value.length > 10000) {
           return res.status(400).json({ message: `proposedData.${field} is too long`, field });
         }
-        const nullable = ['subcategory', 'subSubcategory', 'resourceFormat', 'provider', 'skillLevel'].includes(field);
+        const nullable = field === 'subcategory' || field === 'subSubcategory';
         if (field === 'tags' ? !Array.isArray(value) || value.some(tag => typeof tag !== 'string') :
             typeof value !== 'string' && !(nullable && value === null)) {
           return res.status(400).json({ message: `Invalid proposedData.${field} type`, field });
+        }
+        if ((field === 'category' || nullable) && typeof value === 'string' && value.includes('›')) {
+          // Approval applies values verbatim; a joined taxonomy path would be
+          // re-split into other columns and differ from the reviewed diff.
+          return res.status(400).json({ message: `proposedData.${field} must be a single taxonomy name, not a path`, field });
+        }
+        if (field === 'category' && typeof value === 'string' && value.trim() === '') {
+          return res.status(400).json({ message: 'proposedData.category cannot be empty', field });
         }
       }
       
@@ -1007,11 +1020,12 @@ export function registerCatalogContributionsRoutes(
         }
       }
       
-      // Sanitize proposedChanges
-      const sanitizedChanges: Record<string, any> = {};
-      for (const field of EDITABLE_RESOURCE_FIELDS) {
-        if (proposedChanges && field in proposedChanges) {
-          sanitizedChanges[field] = proposedChanges[field];
+      const sanitizedChanges: Record<string, { old: unknown; new: unknown }> = {};
+      for (const field of ['category', 'subcategory', 'subSubcategory'] as const) {
+        if (typeof sanitizedProposedData[field] === 'string') {
+          const trimmed = stripInvisible(sanitizedProposedData[field]);
+          // An emptied optional level means "clear it" — store NULL like the column.
+          sanitizedProposedData[field] = trimmed === '' && field !== 'category' ? null : trimmed;
         }
       }
       
@@ -1096,7 +1110,6 @@ export function registerCatalogContributionsRoutes(
       decodeResourceTextFields(sanitizedProposedData);
       
       // The stored values are authoritative; never trust a separately supplied diff.
-      for (const field of Object.keys(sanitizedChanges)) delete sanitizedChanges[field];
       for (const field of Object.keys(sanitizedProposedData)) {
         const oldValue = field === 'tags' ? resource.metadata?.tags ?? [] :
           (resource as unknown as Record<string, unknown>)[field] ?? null;
@@ -1110,10 +1123,41 @@ export function registerCatalogContributionsRoutes(
       if (Object.keys(sanitizedChanges).length === 0) {
         return res.status(400).json({ message: 'An edit must change at least one field' });
       }
+      // C01: a supplied diff must describe exactly the changes proposedData
+      // makes. Otherwise a reviewer could be shown one change while approval
+      // applies another, so refuse instead of silently picking one map.
+      if (proposedChanges !== undefined) {
+        const loose = (v: unknown): unknown =>
+          v === null || v === undefined || v === '' ? null :
+          typeof v === 'string' ? v.trim() :
+          Array.isArray(v) ? v.map(loose) : v;
+        const supplied = proposedChanges as Record<string, { new: unknown }>;
+        const derivedFields = Object.keys(sanitizedChanges).sort();
+        const suppliedFields = Object.keys(supplied).sort();
+        const mismatch = derivedFields.length !== suppliedFields.length ||
+          derivedFields.some((field, i) => field !== suppliedFields[i]) ? (derivedFields.find(f => !(f in supplied)) ?? suppliedFields.find(f => !(f in sanitizedChanges)))
+          : derivedFields.find(field => JSON.stringify(loose(supplied[field].new)) !== JSON.stringify(loose(sanitizedChanges[field].new)));
+        if (mismatch) {
+          return res.status(400).json({
+            message: `proposedChanges does not match proposedData (field "${mismatch}"). Send proposedData only; the reviewed diff is derived from it.`,
+            field: mismatch,
+          });
+        }
+      }
       if (sanitizedProposedData.url) {
         const conflict = await resourceRepo.getResourceByUrl(sanitizedProposedData.url);
         if (conflict && conflict.id !== resourceId) {
-          return res.status(409).json({ message: 'That URL already belongs to another resource', conflictingResourceId: conflict.id, title: conflict.title });
+          // Only a public (approved) resource is named; an unpublished one
+          // belonging to someone else must not leak its title to submitters.
+          const isPublic = conflict.status === 'approved';
+          return res.status(409).json({
+            message: isPublic
+              ? `That URL already belongs to another resource (#${conflict.id}: "${conflict.title}"). Suggest a different URL, or suggest edits on that resource instead.`
+              : 'That URL already belongs to another resource that is not yet published. Suggest a different URL.',
+            field: 'url',
+            conflictingResourceId: isPublic ? conflict.id : null,
+            title: isPublic ? conflict.title : null,
+          });
         }
       }
       

@@ -1,0 +1,17 @@
+{
+  "admin": {
+    "status": 400,
+    "ratelimit": null,
+    "ratelimitPolicy": "10;w=900",
+    "remaining": "8",
+    "body": "{\"message\":\"URL must be a valid absolute http(s) URL\",\"error\":\"validation_failed\",\"fieldErrors\":{},\"errors\":[]}"
+  },
+  "submitter": {
+    "status": 403,
+    "ratelimit": null,
+    "ratelimitPolicy": "600;w=60",
+    "remaining": "571",
+    "body": "{\"message\":\"Forbidden: Admin access required\"}"
+  },
+  "aiHealth": 1
+}

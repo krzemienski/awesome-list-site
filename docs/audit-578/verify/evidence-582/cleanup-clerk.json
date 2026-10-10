@@ -1,0 +1,20 @@
+{
+  "startedAt": "2026-10-09T16:27:43.343Z",
+  "steps": [
+    {
+      "label": "clerk delete submitter",
+      "clerkId": "user_3KSrq6sIINxBh6hK9QqENqbFz3b",
+      "ok": true
+    },
+    {
+      "label": "clerk delete second",
+      "clerkId": "user_3KSrqG9ROqoOM6ipGzzUZXcRYNx",
+      "ok": true
+    },
+    {
+      "label": "clerk delete admin",
+      "clerkId": "user_3KSrqCuv6NMQSuGoKxItyfeqlo1",
+      "ok": true
+    }
+  ]
+}

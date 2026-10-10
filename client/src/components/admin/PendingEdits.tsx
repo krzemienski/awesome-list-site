@@ -42,11 +42,12 @@ function revealInvisible(value: string): { text: string; count: number } {
   return { text, count };
 }
 
-function DiffValue({ value }: { value: string | number | null }) {
+function DiffValue({ value }: { value: unknown }) {
   if (value === null || value === undefined || String(value) === "") {
     return <>(empty)</>;
   }
-  if (typeof value !== "string") return <>{String(value)}</>;
+  if (Array.isArray(value)) return <>{value.map(String).join(", ") || "(empty)"}</>;
+  if (typeof value !== "string") return <>{typeof value === "object" ? JSON.stringify(value) : String(value)}</>;
   const { text, count } = revealInvisible(value);
   const visibleRest = text.replace(/‹U\+[0-9A-F]{4,6}›/g, "").trim();
   return (
@@ -248,8 +249,16 @@ export default function PendingEdits() {
   // BUG-027 (run19): shared site-wide date+time style from lib/utils.
   const formatDate = (dateString: string | Date) => formatAdminDateTime(dateString);
 
-  const renderDiff = (changes: Record<string, { old: string | number | null; new: string | number | null }>) => {
-    return Object.entries(changes).map(([field, { old: oldValue, new: newValue }]) => (
+  // Legacy rows can hold malformed shapes; render them inertly instead of
+  // crashing the queue (approval refuses such rows server-side).
+  const renderDiff = (changes: unknown) => {
+    const entries = changes && typeof changes === "object" && !Array.isArray(changes)
+      ? Object.entries(changes as Record<string, unknown>) : [];
+    return entries.map(([field, change]) => {
+      const entry = change && typeof change === "object" ? change as { old?: unknown; new?: unknown } : {};
+      const oldValue = entry.old;
+      const newValue = entry.new;
+      return (
       <div key={field} className={"border-l-4 border-[var(--status-warn)] pl-3 py-2 mb-2" /* DS-OK: status warn */}>
         <p className="text-sm font-semibold capitalize">{field}</p>
         <div className="mt-1 space-y-1">
@@ -263,7 +272,8 @@ export default function PendingEdits() {
           </p>
         </div>
       </div>
-    ));
+      );
+    });
   };
 
   if (unavailable) {
@@ -428,7 +438,8 @@ export default function PendingEdits() {
               </thead>
               <tbody>
                 {edits.map((edit) => {
-                  const fields = Object.keys(edit.proposedChanges);
+                  const fields = edit.proposedChanges && typeof edit.proposedChanges === "object"
+                    ? Object.keys(edit.proposedChanges) : [];
                   const title = edit.resource?.title || 'Unknown Resource';
                   return (
                   <tr key={edit.id} data-testid={`row-pending-edit-${edit.id}`}>
@@ -574,7 +585,7 @@ export default function PendingEdits() {
               <div>
                 <h3 className="font-semibold mb-2">Proposed Changes</h3>
                 <div className="bg-muted/50 rounded-lg p-3">
-                  {renderDiff(selectedEdit.proposedChanges as Record<string, { old: string | number | null; new: string | number | null }>)}
+                  {renderDiff(selectedEdit.proposedChanges)}
                 </div>
               </div>
 
@@ -591,13 +602,13 @@ export default function PendingEdits() {
                         Unverified — not trusted AI output
                       </Badge>
                     </div>
-                    {selectedEdit.claudeMetadata.keyTopics && (
+                    {Array.isArray(selectedEdit.claudeMetadata.keyTopics) && (
                       <div>
                         <span className="text-sm font-medium">Key Topics</span>
                         <div className="flex flex-wrap gap-1 mt-1">
-                          {selectedEdit.claudeMetadata.keyTopics.map((topic: string, i: number) => (
+                          {selectedEdit.claudeMetadata.keyTopics.map((topic: unknown, i: number) => (
                             <Badge key={i} variant="outline" className="text-xs">
-                              {topic}
+                              {String(topic)}
                             </Badge>
                           ))}
                         </div>

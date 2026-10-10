@@ -1,0 +1,148 @@
+{
+  "startedAt": "2026-10-09T16:29:21.481Z",
+  "steps": [
+    {
+      "label": "unexpected extra prefixed resources",
+      "rows": []
+    },
+    {
+      "label": "resource_edits",
+      "deleted": 15
+    },
+    {
+      "label": "resource_audit_log",
+      "deleted": 23
+    },
+    {
+      "label": "api_keys.user_id->users",
+      "deleted": 0
+    },
+    {
+      "label": "enrichment_jobs.started_by->users",
+      "deleted": 0
+    },
+    {
+      "label": "enrichment_queue.resource_id->resources",
+      "deleted": 0
+    },
+    {
+      "label": "github_sync_history.performed_by->users",
+      "deleted": 0
+    },
+    {
+      "label": "journey_steps.resource_id->resources",
+      "deleted": 0
+    },
+    {
+      "label": "research_discoveries.created_resource_id->resources",
+      "deleted": 0
+    },
+    {
+      "label": "research_jobs.started_by->users",
+      "deleted": 0
+    },
+    {
+      "label": "resource_audit_log.performed_by->users",
+      "deleted": 0
+    },
+    {
+      "label": "resource_tags.resource_id->resources",
+      "deleted": 0
+    },
+    {
+      "label": "resources.approved_by->users",
+      "deleted": 8
+    },
+    {
+      "label": "resources.submitted_by->users",
+      "deleted": 0
+    },
+    {
+      "label": "user_bookmarks.resource_id->resources",
+      "deleted": 0
+    },
+    {
+      "label": "user_bookmarks.user_id->users",
+      "deleted": 0
+    },
+    {
+      "label": "user_favorites.resource_id->resources",
+      "deleted": 0
+    },
+    {
+      "label": "user_favorites.user_id->users",
+      "deleted": 0
+    },
+    {
+      "label": "user_interactions.resource_id->resources",
+      "deleted": 0
+    },
+    {
+      "label": "user_interactions.user_id->users",
+      "deleted": 0
+    },
+    {
+      "label": "user_journey_progress.user_id->users",
+      "deleted": 0
+    },
+    {
+      "label": "user_preferences.user_id->users",
+      "deleted": 0
+    },
+    {
+      "label": "password_reset_tokens.user_id->users",
+      "deleted": 0
+    },
+    {
+      "label": "bookmark_collections.user_id->users",
+      "deleted": 0
+    },
+    {
+      "label": "digest_jobs.user_id->users",
+      "deleted": 0
+    },
+    {
+      "label": "digest_unsubscribe_tokens.user_id->users",
+      "deleted": 0
+    },
+    {
+      "label": "in_app_notifications.user_id->users",
+      "deleted": 0
+    },
+    {
+      "label": "in_app_notifications.resource_id->resources",
+      "deleted": 0
+    },
+    {
+      "label": "notification_preferences.user_id->users",
+      "deleted": 0
+    },
+    {
+      "label": "user_recommendation_feedback.user_id->users",
+      "deleted": 0
+    },
+    {
+      "label": "user_recommendation_feedback.resource_id->resources",
+      "deleted": 0
+    },
+    {
+      "label": "contact_submissions.user_id->users",
+      "deleted": 0
+    },
+    {
+      "label": "resources",
+      "deleted": 0
+    },
+    {
+      "label": "users",
+      "deleted": 3
+    },
+    {
+      "label": "residue",
+      "users": 0,
+      "resources": 0,
+      "resource_edits": 0,
+      "audit_rows": 0
+    }
+  ]
+}

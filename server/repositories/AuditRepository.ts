@@ -36,7 +36,6 @@ import {
   type InsertResourceEdit,
 } from "@shared/schema";
 import { db } from "../db";
-import { splitTaxonomyPathFields } from "../github/importHygiene";
 import {
   resourceFormatSchema,
   resourceProviderSchema,
@@ -590,9 +589,10 @@ export class AuditRepository {
    * Approve a resource edit and apply the changes
    * @param editId - Resource edit ID to approve
    * @param adminId - Admin user ID approving the edit
+   * @param reason - Optional moderator note, recorded on the audit row
    * @throws Error if edit not found, already processed, resource not found, or merge conflict detected
    */
-  async approveResourceEdit(editId: number, adminId: string): Promise<void> {
+  async approveResourceEdit(editId: number, adminId: string, reason?: string): Promise<void> {
     const outcome = await db.transaction(async (tx) => {
       // Lock the contribution before inspecting it. A contributor withdrawal
       // racing this moderation action will either commit first (and be seen
@@ -654,6 +654,26 @@ export class AuditRepository {
           Object.keys(changes).some(field => !(field in values))) {
         throw new Error('Conflict detected: This legacy suggestion has inconsistent review data. Please resubmit it.');
       }
+      // Values must also be applicable verbatim: anything approval would have
+      // to coerce, re-split or truncate would differ from what was reviewed.
+      const facetSchemas: Record<string, { safeParse: (v: unknown) => { success: boolean } }> = {
+        resourceFormat: resourceFormatSchema,
+        provider: resourceProviderSchema,
+        skillLevel: resourceSkillLevelSchema,
+      };
+      const unapplicable = Object.entries(values).some(([field, value]) => {
+        if (field === 'tags') {
+          return !Array.isArray(value) || value.length > 20 || value.some(tag => typeof tag !== 'string' || tag.trim() === '');
+        }
+        if (facetSchemas[field]) return !facetSchemas[field].safeParse(value).success;
+        if (field === 'subcategory' || field === 'subSubcategory') {
+          return value !== null && (typeof value !== 'string' || value.includes('›'));
+        }
+        return typeof value !== 'string' || (field === 'category' && (value.includes('›') || value.trim() === ''));
+      });
+      if (unapplicable) {
+        throw new Error('Conflict detected: This legacy suggestion contains values that cannot be applied exactly as reviewed. Please resubmit it.');
+      }
       if (typeof values.url === 'string' && values.url !== currentResource.url) {
         const [conflict] = await tx.select({ id: resources.id, title: resources.title })
           .from(resources).where(eq(resources.url, values.url)).limit(1);
@@ -664,40 +684,26 @@ export class AuditRepository {
         }
       }
 
-      // SAFE MERGE: Only update whitelisted fields from proposedData.
+      // SAFE MERGE: apply exactly the reviewed values (validated above) for
+      // whitelisted fields only — no re-normalization, truncation or path split.
       const updates: Record<string, any> = {};
-      const proposedData = edit.proposedData as any;
       for (const field of EDITABLE_RESOURCE_FIELDS) {
-        if (!proposedData || !(field in proposedData)) continue;
+        if (!(field in values)) continue;
         if (field === 'tags') {
-          if (Array.isArray(proposedData.tags)) {
-            const normalizedTags = proposedData.tags
-              .filter((tag: unknown): tag is string => typeof tag === 'string')
-              .map((tag: string) => tag.trim())
-              .filter((tag: string) => tag.length > 0)
-              .slice(0, 20);
-            updates.metadata = {
-              ...((currentResource.metadata as Record<string, any> | null) ?? {}),
-              ...((updates.metadata as Record<string, any> | undefined) ?? {}),
-              tags: normalizedTags,
-            };
-          }
-        } else if (field === 'resourceFormat') {
-          updates[field] = resourceFormatSchema.parse(proposedData[field]);
-        } else if (field === 'provider') {
-          updates[field] = resourceProviderSchema.parse(proposedData[field]);
-        } else if (field === 'skillLevel') {
-          updates[field] = resourceSkillLevelSchema.parse(proposedData[field]);
+          updates.metadata = {
+            ...((currentResource.metadata as Record<string, any> | null) ?? {}),
+            tags: values.tags,
+          };
         } else {
           // Submission canonicalizes text before building the reviewed diff.
           // Decoding again here could apply a different value than that diff.
-          updates[field] = proposedData[field];
+          updates[field] = values[field];
         }
       }
 
       await tx
         .update(resources)
-        .set({ ...splitTaxonomyPathFields(updates), updatedAt: now })
+        .set({ ...updates, updatedAt: now })
         .where(eq(resources.id, edit.resourceId));
       await tx
         .update(resourceEdits)
@@ -713,8 +719,8 @@ export class AuditRepository {
         originalResourceId: edit.resourceId,
         action: 'edit_approved',
         performedBy: adminId,
-        changes: { changes: edit.proposedChanges },
-        notes: `Edit #${editId} approved and merged`,
+        changes: { changes: edit.proposedChanges, ...(reason ? { reason } : {}) },
+        notes: reason ? `Edit #${editId} approved and merged: ${reason}` : `Edit #${editId} approved and merged`,
       });
       return { kind: 'approved' as const };
     });

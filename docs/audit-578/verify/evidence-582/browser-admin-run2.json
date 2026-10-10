@@ -1,0 +1,85 @@
+{
+  "conflictTarget": [
+    {
+      "url": "https://example.com/__qa_test_plan_582_1791561997330_uncommitted_race2",
+      "owner": 188648
+    }
+  ],
+  "conflictApproveError": "That URL already belongs to another resource (#188648: \"__qa_test_plan_582_1791561997330_url_b\"). Revise or reject the suggestion; it stays pending.",
+  "c01Reviewed": {
+    "url": {
+      "new": "https://example.org/__qa_test_plan_582_1791561997330_diff_new",
+      "old": "https://example.com/__qa_test_plan_582_1791561997330_diff"
+    },
+    "title": {
+      "new": "__qa_test_plan_582_1791561997330_diff renamed",
+      "old": "__qa_test_plan_582_1791561997330_diff"
+    }
+  },
+  "c01Applied": {
+    "title": "__qa_test_plan_582_1791561997330_diff renamed",
+    "url": "https://example.org/__qa_test_plan_582_1791561997330_diff_new"
+  },
+  "stateAfter": [
+    {
+      "id": 69,
+      "status": "approved"
+    },
+    {
+      "id": 70,
+      "status": "pending"
+    },
+    {
+      "id": 71,
+      "status": "approved"
+    },
+    {
+      "id": 79,
+      "status": "pending"
+    }
+  ],
+  "resourcesAfter": [
+    {
+      "id": 188645,
+      "title": "__qa_test_plan_582_1791561997330_diff renamed",
+      "url": "https://example.org/__qa_test_plan_582_1791561997330_diff_new"
+    },
+    {
+      "id": 188646,
+      "title": "__qa_test_plan_582_1791561997330_legacy",
+      "url": "https://example.com/__qa_test_plan_582_1791561997330_legacy"
+    },
+    {
+      "id": 188647,
+      "title": "__qa_test_plan_582_1791561997330_url_a",
+      "url": "https://example.com/__qa_test_plan_582_1791561997330_race_target"
+    },
+    {
+      "id": 188648,
+      "title": "__qa_test_plan_582_1791561997330_url_b",
+      "url": "https://example.com/__qa_test_plan_582_1791561997330_uncommitted_race2"
+    }
+  ],
+  "requests": [
+    {
+      "url": "/api/admin/resource-edits/79/approve",
+      "body": null
+    },
+    {
+      "url": "/api/admin/resource-edits/69/approve",
+      "body": null
+    }
+  ],
+  "responses": [
+    {
+      "url": "/api/admin/resource-edits/79/approve",
+      "status": 409,
+      "body": "{\"message\":\"That URL already belongs to another resource (#188648: \\\"__qa_test_plan_582_1791561997330_url_b\\\"). Revise or reject the suggestion; it stays pending.\",\"conflictingResourceId\":188648,\"title\":\"__qa_test_plan_582_1791561997330_url_b\",\"conflict\":true}"
+    },
+    {
+      "url": "/api/admin/resource-edits/69/approve",
+      "status": 200,
+      "body": "{\"message\":\"Edit approved and merged successfully\"}"
+    }
+  ]
+}

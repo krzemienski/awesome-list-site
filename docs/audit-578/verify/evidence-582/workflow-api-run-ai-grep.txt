@@ -1,0 +1,7 @@
+workflow log window: 4:05:22 PM .. 4:08:16 PM
+lines matching Claude provider activity:
+1
+HTTP 500 status lines:
+0
+the single match is the boot banner (line 10), not a provider request:
+10:Claude service initialized: router router.hack.ski (bearer token); models haiku=... primary=...

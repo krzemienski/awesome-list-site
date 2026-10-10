@@ -1,0 +1,42 @@
+{
+  "analyzeButtonVisibleForUser": 0,
+  "inlineUrlError": "That URL already belongs to another resource (#188647: \"__qa_test_plan_582_1791561997330_url_a\"). Suggest a different URL, or suggest edits on that resource instead.",
+  "urlInvalid": "true",
+  "editsAfterDup": 0,
+  "storedEdit": {
+    "id": 80,
+    "proposed_changes": {
+      "title": {
+        "new": "__qa_test_plan_582_1791561997330_ui browser edit",
+        "old": "__qa_test_plan_582_1791561997330_ui"
+      }
+    },
+    "proposed_data": {
+      "title": "__qa_test_plan_582_1791561997330_ui browser edit"
+    },
+    "claude_metadata": null,
+    "claude_analyzed_at": null
+  },
+  "requests": [
+    {
+      "url": "/api/resources/188651/edits",
+      "body": "{\"proposedData\":{\"url\":\"https://example.com/__qa_test_plan_582_1791561997330_url_a\"}}"
+    },
+    {
+      "url": "/api/resources/188651/edits",
+      "body": "{\"proposedData\":{\"title\":\"__qa_test_plan_582_1791561997330_ui browser edit\"}}"
+    }
+  ],
+  "responses": [
+    {
+      "url": "/api/resources/188651/edits",
+      "status": 409,
+      "body": "{\"message\":\"That URL already belongs to another resource (#188647: \\\"__qa_test_plan_582_1791561997330_url_a\\\"). Suggest a different URL, or suggest edits on that resource instead.\",\"field\":\"url\",\"conflictingResourceId\":188647,\"title\":\"__qa_test_plan_582_1791561997330_url_a\"}"
+    },
+    {
+      "url": "/api/resources/188651/edits",
+      "status": 201,
+      "body": "{\"id\":80,\"resourceId\":188651,\"submittedBy\":\"__qa_test_plan_582_1791561997330_submitter\",\"status\":\"pending\",\"originalResourceUpdatedAt\":\"2026-10-09T16:06:39.549Z\",\"proposedChanges\":{\"title\":{\"new\":\"__qa_test_plan_582_1791561997330_ui browser edit\",\"old\":\"__qa_test_plan_582_1791561997330_ui\"}},\"proposedData\":{\"title\":\"__qa_test_plan_582_1791561997330_ui browser edit\"},\"claudeMetadata\":null,\"claudeAnalyzedAt\":null,\"handledBy\":null,\"handledAt\":null,\"withdrawnAt\":null,\"rejectionReason\":null,\"createdAt\":\"2026-10-09T16:15:08.064Z\",\"updatedAt\":\"2026-10-09T16:15:08.064Z\"}"
+    }
+  ]
+}

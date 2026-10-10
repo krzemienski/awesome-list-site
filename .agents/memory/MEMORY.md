@@ -165,3 +165,4 @@
 - [API key tier entitlements](api-key-tier-entitlements.md) — every valid key = server-assigned standard tier; bad key = 401; scopes grant nothing, tier names rejected.
 - [Shared queryKey error shape](shared-querykey-error-shape.md) — every queryFn sharing a key must throw the same ApiError shape, or status-aware error UI races.
 - [Alternate-system pixel parity](alternate-system-parity.md) — per-system skins lose to Editorial-specific page CSS; crop uniform 1px shifts before "fixing".
+- [ds-button-sweep empty-queue dependency](ds-sweep-empty-queue-dependency.md) — admin tab checks wait for empty-state controls; pending QA fixtures fail them; run DS verify after cleanup.

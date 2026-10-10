@@ -1,0 +1,99 @@
+{
+  "startedAt": "2026-10-09T16:17:08.533Z",
+  "aiHealthBefore": {
+    "status": "healthy",
+    "available": true,
+    "requestCount": 0,
+    "cacheSize": 0,
+    "cacheHitRate": 0,
+    "config": {
+      "endpoint": "router",
+      "label": "router router.hack.ski (bearer token)",
+      "baseUrlHost": "router.hack.ski",
+      "baseUrl": "https://router.hack.ski",
+      "primaryModel": "cc/claude-opus-5",
+      "models": {
+        "haiku": "cc/claude-haiku-4-5-20251001",
+        "sonnet": "cc/claude-sonnet-5",
+        "opus": "cc/claude-opus-5",
+        "fable": "cc/claude-fable-5"
+      },
+      "flows": {
+        "urlAnalysis": "cc/claude-haiku-4-5-20251001",
+        "tagging": "cc/claude-haiku-4-5-20251001",
+        "recommendations": "cc/claude-haiku-4-5-20251001",
+        "journeySeeding": "cc/claude-sonnet-5",
+        "enrichment": "cc/claude-haiku-4-5-20251001",
+        "researchScout": "cc/claude-haiku-4-5-20251001",
+        "researchOrchestrator": "cc/claude-opus-5"
+      }
+    }
+  },
+  "formBefore": {
+    "title": "__qa_test_plan_582_1791561997330_ui",
+    "description": "__qa_test_plan_582_1791561997330_ui fixture description for edit proofs"
+  },
+  "formAfterApply": {
+    "title": "FFmpeg: Comprehensive Multimedia Processing Libraries and Tools",
+    "description": "FFmpeg is a collection of powerful libraries and command-line tools for processing multimedia content including audio, video, subtitles, and metadata. It provides codec implementations (libavcodec), streaming protocol support (libavformat), filtering capabilities (libavfilter), and utilities for color conversion, resampling, and device access—widely used for encoding, transcoding, and streaming applications."
+  },
+  "requests": [
+    {
+      "url": "/api/claude/analyze",
+      "body": "{\"url\":\"https://github.com/FFmpeg/FFmpeg\"}"
+    },
+    {
+      "url": "/api/resources/188651/edits",
+      "body": "{\"proposedData\":{\"title\":\"FFmpeg: Comprehensive Multimedia Processing Libraries and Tools\",\"description\":\"FFmpeg is a collection of powerful libraries and command-line tools for processing multimedia content including audio, video, subtitles, and metadata. It provides codec implementations (libavcodec), streaming protocol support (libavformat), filtering capabilities (libavfilter), and utilities for color conversion, resampling, and device access—widely used for encoding, transcoding, and streaming applications.\",\"url\":\"https://github.com/FFmpeg/FFmpeg\",\"category\":\"Media Tools\"}}"
+    }
+  ],
+  "responses": [
+    {
+      "url": "/api/claude/analyze",
+      "status": 200,
+      "body": "{\"suggestedTitle\":\"FFmpeg: Comprehensive Multimedia Processing Libraries and Tools\",\"suggestedDescription\":\"FFmpeg is a collection of powerful libraries and command-line tools for processing multimedia content including audio, video, subtitles, and metadata. It provides codec implementations (libavcodec), streaming protocol support (libavformat), filtering capabilities (libavfilter), and utilities for color conversion, resampling, and device access—widely used for encoding, transcoding, and streaming applications.\",\"suggestedTags\":[\"FFmpeg\",\"libavcodec\",\"multimedia\",\"video encoding\",\"streaming"
+    },
+    {
+      "url": "/api/resources/188651/edits",
+      "status": 409,
+      "body": "{\"message\":\"That URL already belongs to another resource (#185662: \\\"FFmpeg (GitHub mirror)\\\"). Suggest a different URL, or suggest edits on that resource instead.\",\"field\":\"url\",\"conflictingResourceId\":185662,\"title\":\"FFmpeg (GitHub mirror)\"}"
+    }
+  ],
+  "aiHealthAfter": {
+    "status": "healthy",
+    "available": true,
+    "requestCount": 1,
+    "cacheSize": 0,
+    "cacheHitRate": 0,
+    "config": {
+      "endpoint": "router",
+      "label": "router router.hack.ski (bearer token)",
+      "baseUrlHost": "router.hack.ski",
+      "baseUrl": "https://router.hack.ski",
+      "primaryModel": "cc/claude-opus-5",
+      "models": {
+        "haiku": "cc/claude-haiku-4-5-20251001",
+        "sonnet": "cc/claude-sonnet-5",
+        "opus": "cc/claude-opus-5",
+        "fable": "cc/claude-fable-5"
+      },
+      "flows": {
+        "urlAnalysis": "cc/claude-haiku-4-5-20251001",
+        "tagging": "cc/claude-haiku-4-5-20251001",
+        "recommendations": "cc/claude-haiku-4-5-20251001",
+        "journeySeeding": "cc/claude-sonnet-5",
+        "enrichment": "cc/claude-haiku-4-5-20251001",
+        "researchScout": "cc/claude-haiku-4-5-20251001",
+        "researchOrchestrator": "cc/claude-opus-5"
+      }
+    }
+  },
+  "latestEdit": {
+    "id": 80,
+    "proposed_data": {
+      "title": "__qa_test_plan_582_1791561997330_ui browser edit"
+    },
+    "claude_metadata": null,
+    "claude_analyzed_at": null
+  }
+}

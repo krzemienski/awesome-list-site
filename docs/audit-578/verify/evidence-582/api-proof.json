@@ -1,0 +1,702 @@
+[
+  {
+    "label": "C03 ai requestCount before",
+    "requestCount": 0
+  },
+  {
+    "label": "C04 body is JSON array",
+    "status": 400,
+    "body": {
+      "error": "validation_failed",
+      "message": "Invalid request body",
+      "fieldErrors": {
+        "form": "Invalid input: expected record, received array"
+      },
+      "errors": [
+        {
+          "expected": "record",
+          "code": "invalid_type",
+          "path": [],
+          "message": "Invalid input: expected record, received array"
+        }
+      ]
+    }
+  },
+  {
+    "label": "C04 proposedData missing",
+    "status": 400,
+    "body": {
+      "message": "proposedData must be a non-empty object containing only editable fields",
+      "field": "proposedData",
+      "error": "validation_failed",
+      "fieldErrors": {},
+      "errors": []
+    }
+  },
+  {
+    "label": "C04 proposedData string",
+    "status": 400,
+    "body": {
+      "message": "proposedData must be a non-empty object containing only editable fields",
+      "field": "proposedData",
+      "error": "validation_failed",
+      "fieldErrors": {},
+      "errors": []
+    }
+  },
+  {
+    "label": "C04 proposedData number",
+    "status": 400,
+    "body": {
+      "message": "proposedData must be a non-empty object containing only editable fields",
+      "field": "proposedData",
+      "error": "validation_failed",
+      "fieldErrors": {},
+      "errors": []
+    }
+  },
+  {
+    "label": "C04 proposedData boolean",
+    "status": 400,
+    "body": {
+      "message": "proposedData must be a non-empty object containing only editable fields",
+      "field": "proposedData",
+      "error": "validation_failed",
+      "fieldErrors": {},
+      "errors": []
+    }
+  },
+  {
+    "label": "C04 proposedData null",
+    "status": 400,
+    "body": {
+      "message": "proposedData must be a non-empty object containing only editable fields",
+      "field": "proposedData",
+      "error": "validation_failed",
+      "fieldErrors": {},
+      "errors": []
+    }
+  },
+  {
+    "label": "C04 proposedData array",
+    "status": 400,
+    "body": {
+      "message": "proposedData must be a non-empty object containing only editable fields",
+      "field": "proposedData",
+      "error": "validation_failed",
+      "fieldErrors": {},
+      "errors": []
+    }
+  },
+  {
+    "label": "C04 proposedData empty object",
+    "status": 400,
+    "body": {
+      "message": "proposedData must be a non-empty object containing only editable fields",
+      "field": "proposedData",
+      "error": "validation_failed",
+      "fieldErrors": {},
+      "errors": []
+    }
+  },
+  {
+    "label": "C04 proposedData unknown field",
+    "status": 400,
+    "body": {
+      "message": "proposedData must be a non-empty object containing only editable fields",
+      "field": "proposedData",
+      "error": "validation_failed",
+      "fieldErrors": {},
+      "errors": []
+    }
+  },
+  {
+    "label": "C04 proposedData.title number",
+    "status": 400,
+    "body": {
+      "message": "Invalid proposedData.title type",
+      "field": "title",
+      "error": "validation_failed",
+      "fieldErrors": {},
+      "errors": []
+    }
+  },
+  {
+    "label": "C04 proposedData.tags string",
+    "status": 400,
+    "body": {
+      "message": "Invalid proposedData.tags type",
+      "field": "tags",
+      "error": "validation_failed",
+      "fieldErrors": {},
+      "errors": []
+    }
+  },
+  {
+    "label": "C04 proposedData.category path",
+    "status": 400,
+    "body": {
+      "message": "proposedData.category must be a single taxonomy name, not a path",
+      "field": "category",
+      "error": "validation_failed",
+      "fieldErrors": {},
+      "errors": []
+    }
+  },
+  {
+    "label": "C04 proposedChanges number",
+    "status": 400,
+    "body": {
+      "message": "proposedChanges must be a non-empty object containing only editable fields",
+      "field": "proposedChanges",
+      "error": "validation_failed",
+      "fieldErrors": {},
+      "errors": []
+    }
+  },
+  {
+    "label": "C04 proposedChanges array",
+    "status": 400,
+    "body": {
+      "message": "proposedChanges must be a non-empty object containing only editable fields",
+      "field": "proposedChanges",
+      "error": "validation_failed",
+      "fieldErrors": {},
+      "errors": []
+    }
+  },
+  {
+    "label": "C04 proposedChanges null",
+    "status": 400,
+    "body": {
+      "message": "proposedChanges must be a non-empty object containing only editable fields",
+      "field": "proposedChanges",
+      "error": "validation_failed",
+      "fieldErrors": {},
+      "errors": []
+    }
+  },
+  {
+    "label": "C04 change entry primitive",
+    "status": 400,
+    "body": {
+      "message": "proposedChanges.title must contain old and new values",
+      "field": "title",
+      "error": "validation_failed",
+      "fieldErrors": {},
+      "errors": []
+    }
+  },
+  {
+    "label": "C04 change entry missing new",
+    "status": 400,
+    "body": {
+      "message": "proposedChanges.title must contain old and new values",
+      "field": "title",
+      "error": "validation_failed",
+      "fieldErrors": {},
+      "errors": []
+    }
+  },
+  {
+    "label": "C04 change entry extra key",
+    "status": 400,
+    "body": {
+      "message": "proposedChanges.title must contain old and new values",
+      "field": "title",
+      "error": "validation_failed",
+      "fieldErrors": {},
+      "errors": []
+    }
+  },
+  {
+    "label": "C04 change entry object value",
+    "status": 400,
+    "body": {
+      "message": "Invalid proposedChanges.title value",
+      "field": "title",
+      "error": "validation_failed",
+      "fieldErrors": {},
+      "errors": []
+    }
+  },
+  {
+    "label": "C04 no-op edit (same title)",
+    "status": 400,
+    "body": {
+      "message": "An edit must change at least one field",
+      "error": "validation_failed",
+      "fieldErrors": {},
+      "errors": []
+    }
+  },
+  {
+    "label": "C04 resource_edits rows after malformed batch",
+    "rows": 0
+  },
+  {
+    "label": "C04 valid manual edit still works",
+    "status": 201,
+    "proposedChanges": {
+      "description": {
+        "new": "__qa_test_plan_582_1791561997330_shape improved description text",
+        "old": "__qa_test_plan_582_1791561997330_shape fixture description for edit proofs"
+      }
+    },
+    "claudeMetadata": null
+  },
+  {
+    "label": "C02 forged claudeMetadata",
+    "status": 400,
+    "body": {
+      "message": "Client-provided AI analysis is not accepted",
+      "error": "validation_failed",
+      "fieldErrors": {},
+      "errors": []
+    }
+  },
+  {
+    "label": "C02 forged claudeAnalyzedAt",
+    "status": 400,
+    "body": {
+      "message": "Client-provided AI analysis is not accepted",
+      "error": "validation_failed",
+      "fieldErrors": {},
+      "errors": []
+    }
+  },
+  {
+    "label": "C02 rows with forged titles",
+    "rows": 0
+  },
+  {
+    "label": "C03 trigger omitted",
+    "status": 201,
+    "claudeMetadata": null,
+    "claudeAnalyzedAt": null
+  },
+  {
+    "label": "C03 trigger false (second user)",
+    "status": 201,
+    "claudeMetadata": null
+  },
+  {
+    "label": "C03 trigger true",
+    "status": 403,
+    "body": {
+      "message": "Edit submission does not run AI analysis. Administrators must use /api/claude/analyze."
+    }
+  },
+  {
+    "label": "C03 trigger non-boolean",
+    "status": 400,
+    "body": {
+      "message": "triggerClaudeAnalysis must be a boolean",
+      "error": "validation_failed",
+      "fieldErrors": {},
+      "errors": []
+    }
+  },
+  {
+    "label": "C03 duplicate resubmission (no AI before rejection)",
+    "status": 409,
+    "body": {
+      "message": "An identical edit suggestion is already pending review for this resource.",
+      "existingEditId": 67
+    }
+  },
+  {
+    "label": "C03 non-admin /api/claude/analyze",
+    "status": 403,
+    "body": {
+      "message": "Forbidden: Admin access required"
+    }
+  },
+  {
+    "label": "C01 inconsistent maps (hidden URL in proposedData)",
+    "status": 400,
+    "body": {
+      "message": "proposedChanges does not match proposedData (field \"url\"). Send proposedData only; the reviewed diff is derived from it.",
+      "field": "url",
+      "error": "validation_failed",
+      "fieldErrors": {},
+      "errors": []
+    }
+  },
+  {
+    "label": "C01 inconsistent new value",
+    "status": 400,
+    "body": {
+      "message": "proposedChanges does not match proposedData (field \"title\"). Send proposedData only; the reviewed diff is derived from it.",
+      "field": "title",
+      "error": "validation_failed",
+      "fieldErrors": {},
+      "errors": []
+    }
+  },
+  {
+    "label": "C01 rows with hidden url",
+    "rows": 0
+  },
+  {
+    "label": "C01 single value map -> server-derived canonical diff",
+    "status": 201,
+    "proposedChanges": {
+      "url": {
+        "new": "https://example.org/__qa_test_plan_582_1791561997330_diff_new",
+        "old": "https://example.com/__qa_test_plan_582_1791561997330_diff"
+      },
+      "title": {
+        "new": "__qa_test_plan_582_1791561997330_diff renamed",
+        "old": "__qa_test_plan_582_1791561997330_diff"
+      }
+    },
+    "proposedData": {
+      "url": "https://example.org/__qa_test_plan_582_1791561997330_diff_new",
+      "title": "__qa_test_plan_582_1791561997330_diff renamed"
+    }
+  },
+  {
+    "label": "C01 approve inconsistent legacy edit",
+    "status": 409,
+    "body": {
+      "message": "Conflict detected: This legacy suggestion has inconsistent review data. Please resubmit it.",
+      "conflict": true
+    }
+  },
+  {
+    "label": "C01 legacy after refusal",
+    "edit": {
+      "status": "pending"
+    },
+    "resource": {
+      "title": "__qa_test_plan_582_1791561997330_legacy",
+      "url": "https://example.com/__qa_test_plan_582_1791561997330_legacy"
+    }
+  },
+  {
+    "label": "C05 submit A->B url",
+    "status": 409,
+    "body": {
+      "message": "That URL already belongs to another resource (#188648: \"__qa_test_plan_582_1791561997330_url_b\"). Suggest a different URL, or suggest edits on that resource instead.",
+      "field": "url",
+      "conflictingResourceId": 188648,
+      "title": "__qa_test_plan_582_1791561997330_url_b"
+    }
+  },
+  {
+    "label": "C05 edits on A after dup submit",
+    "rows": 0
+  },
+  {
+    "label": "C05 unique proposal",
+    "status": 201,
+    "id": 71
+  },
+  {
+    "label": "C05 admin moves B onto proposal URL",
+    "status": 200,
+    "url": "https://example.com/__qa_test_plan_582_1791561997330_race_target"
+  },
+  {
+    "label": "C05 approve after B took the URL",
+    "status": 409,
+    "body": {
+      "message": "That URL already belongs to another resource (#188648: \"__qa_test_plan_582_1791561997330_url_b\"). Revise or reject the suggestion; it stays pending.",
+      "conflictingResourceId": 188648,
+      "title": "__qa_test_plan_582_1791561997330_url_b",
+      "conflict": true
+    }
+  },
+  {
+    "label": "C05 state after conflict",
+    "edit": {
+      "status": "pending"
+    },
+    "a": {
+      "url": "https://example.com/__qa_test_plan_582_1791561997330_url_a"
+    },
+    "b": {
+      "url": "https://example.com/__qa_test_plan_582_1791561997330_race_target"
+    }
+  },
+  {
+    "label": "C05 concurrent round 0",
+    "submit": 201,
+    "approve": 200,
+    "move": 409,
+    "moveBody": {
+      "message": "Another resource already uses this URL (id 188649: \"__qa_test_plan_582_1791561997330_race\"). URLs must be unique.",
+      "conflictingResourceId": 188649
+    },
+    "owners": [
+      188649
+    ],
+    "editStatus": "approved"
+  },
+  {
+    "label": "C05 concurrent round 1",
+    "submit": 201,
+    "approve": 200,
+    "move": 409,
+    "moveBody": {
+      "message": "Another resource already uses this URL (id 188649: \"__qa_test_plan_582_1791561997330_race\"). URLs must be unique.",
+      "conflictingResourceId": 188649
+    },
+    "owners": [
+      188649
+    ],
+    "editStatus": "approved"
+  },
+  {
+    "label": "C05 concurrent round 2",
+    "submit": 201,
+    "approve": 200,
+    "move": 409,
+    "moveBody": {
+      "message": "Another resource already uses this URL (id 188649: \"__qa_test_plan_582_1791561997330_race\"). URLs must be unique.",
+      "conflictingResourceId": 188649
+    },
+    "owners": [
+      188649
+    ],
+    "editStatus": "approved"
+  },
+  {
+    "label": "C05 concurrent round 3",
+    "submit": 201,
+    "approve": 200,
+    "move": 409,
+    "moveBody": {
+      "message": "Another resource already uses this URL. URLs must be unique."
+    },
+    "owners": [
+      188649
+    ],
+    "editStatus": "approved"
+  },
+  {
+    "label": "D11 reject no body",
+    "status": 400,
+    "body": {
+      "message": "Rejection reason must be a string of 10 to 2000 characters",
+      "field": "reason",
+      "error": "validation_failed",
+      "fieldErrors": {},
+      "errors": []
+    }
+  },
+  {
+    "label": "D11 reject reason number",
+    "status": 400,
+    "body": {
+      "message": "Rejection reason must be a string of 10 to 2000 characters",
+      "field": "reason",
+      "error": "validation_failed",
+      "fieldErrors": {},
+      "errors": []
+    }
+  },
+  {
+    "label": "D11 reject reason object",
+    "status": 400,
+    "body": {
+      "message": "Rejection reason must be a string of 10 to 2000 characters",
+      "field": "reason",
+      "error": "validation_failed",
+      "fieldErrors": {},
+      "errors": []
+    }
+  },
+  {
+    "label": "D11 reject reason array",
+    "status": 400,
+    "body": {
+      "message": "Rejection reason must be a string of 10 to 2000 characters",
+      "field": "reason",
+      "error": "validation_failed",
+      "fieldErrors": {},
+      "errors": []
+    }
+  },
+  {
+    "label": "D11 reject reason null",
+    "status": 400,
+    "body": {
+      "message": "Rejection reason must be a string of 10 to 2000 characters",
+      "field": "reason",
+      "error": "validation_failed",
+      "fieldErrors": {},
+      "errors": []
+    }
+  },
+  {
+    "label": "D11 reject reason too short",
+    "status": 400,
+    "body": {
+      "message": "Rejection reason must be a string of 10 to 2000 characters",
+      "field": "reason",
+      "error": "validation_failed",
+      "fieldErrors": {},
+      "errors": []
+    }
+  },
+  {
+    "label": "D11 reject reason 2001 chars",
+    "status": 400,
+    "body": {
+      "message": "Rejection reason must be a string of 10 to 2000 characters",
+      "field": "reason",
+      "error": "validation_failed",
+      "fieldErrors": {},
+      "errors": []
+    }
+  },
+  {
+    "label": "D11 reject body JSON null",
+    "status": 400,
+    "body": {
+      "message": "Invalid JSON payload",
+      "error": "validation_failed",
+      "fieldErrors": {},
+      "errors": []
+    }
+  },
+  {
+    "label": "D11 approve reason number",
+    "status": 400,
+    "body": {
+      "message": "reason must be a string of at most 2000 characters",
+      "field": "reason",
+      "error": "validation_failed",
+      "fieldErrors": {},
+      "errors": []
+    }
+  },
+  {
+    "label": "D11 approve reason object",
+    "status": 400,
+    "body": {
+      "message": "reason must be a string of at most 2000 characters",
+      "field": "reason",
+      "error": "validation_failed",
+      "fieldErrors": {},
+      "errors": []
+    }
+  },
+  {
+    "label": "D11 approve reason 2001 chars",
+    "status": 400,
+    "body": {
+      "message": "reason must be a string of at most 2000 characters",
+      "field": "reason",
+      "error": "validation_failed",
+      "fieldErrors": {},
+      "errors": []
+    }
+  },
+  {
+    "label": "D11 edit still pending after malformed requests",
+    "edit": {
+      "status": "pending"
+    },
+    "auditRows": 1
+  },
+  {
+    "label": "D11 valid reject",
+    "status": 200,
+    "body": {
+      "message": "Edit rejected successfully"
+    }
+  },
+  {
+    "label": "D11 valid approve with reason",
+    "status": 200,
+    "body": {
+      "message": "Edit approved and merged successfully"
+    }
+  },
+  {
+    "label": "D11 audit rows",
+    "rows": [
+      {
+        "action": "edit_suggested",
+        "performed_by": "__qa_test_plan_582_1791561997330_submitter",
+        "changes": {
+          "proposedChanges": {
+            "description": {
+              "new": "__qa_test_plan_582_1791561997330_moderation to be rejected later",
+              "old": "__qa_test_plan_582_1791561997330_moderation fixture description for edit proofs"
+            }
+          }
+        },
+        "notes": "User submitted edit suggestion"
+      },
+      {
+        "action": "edit_rejected",
+        "performed_by": "__qa_test_plan_582_1791561997330_admin",
+        "changes": {
+          "reason": "Duplicate of existing description, please add new information."
+        },
+        "notes": "Edit #76 rejected: Duplicate of existing description, please add new information."
+      },
+      {
+        "action": "edit_suggested",
+        "performed_by": "__qa_test_plan_582_1791561997330_submitter",
+        "changes": {
+          "proposedChanges": {
+            "description": {
+              "new": "__qa_test_plan_582_1791561997330_moderation approved with a note",
+              "old": "__qa_test_plan_582_1791561997330_moderation fixture description for edit proofs"
+            }
+          }
+        },
+        "notes": "User submitted edit suggestion"
+      },
+      {
+        "action": "edit_approved",
+        "performed_by": "__qa_test_plan_582_1791561997330_admin",
+        "changes": {
+          "reason": "Verified against the source page.",
+          "changes": {
+            "description": {
+              "new": "__qa_test_plan_582_1791561997330_moderation approved with a note",
+              "old": "__qa_test_plan_582_1791561997330_moderation fixture description for edit proofs"
+            }
+          }
+        },
+        "notes": "Edit #77 approved and merged: Verified against the source page."
+      }
+    ]
+  },
+  {
+    "label": "D11 edit rows",
+    "rows": [
+      {
+        "id": 76,
+        "status": "rejected",
+        "rejection_reason": "Duplicate of existing description, please add new information.",
+        "handled_by": "__qa_test_plan_582_1791561997330_admin"
+      },
+      {
+        "id": 77,
+        "status": "approved",
+        "rejection_reason": null,
+        "handled_by": "__qa_test_plan_582_1791561997330_admin"
+      }
+    ]
+  },
+  {
+    "label": "C03 ai requestCount after all non-admin submissions",
+    "before": 0,
+    "after": 0
+  },
+  {
+    "label": "C03 edits with claude metadata on QA resources",
+    "rows": 0
+  },
+  {
+    "label": "C03 enrichment queue rows for QA resources",
+    "queue": 0
+  }
+]
