@@ -3,6 +3,7 @@ import { Search, Filter, Tag, Folder, ExternalLink, Star, ChevronRight } from "l
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import { ChipButton } from "@/components/ui/chip-button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Checkbox } from "@/components/ui/checkbox";
@@ -127,13 +128,21 @@ export default function CategoryExplorer({ categories, resources, className }: C
   const [collapsedCategories, setCollapsedCategories] = useState<Set<string>>(new Set());
 
   // Extract all unique tags
+  // Most-used first so common facets (HLS, WebRTC…) sit in the visible set;
+  // the rest stay reachable behind "Show all tags".
   const allTags = useMemo(() => {
-    const tags = new Set<string>();
+    const counts = new Map<string, number>();
     resources.forEach(resource => {
-      resourceTags(resource).forEach(tag => tags.add(tag));
+      resourceTags(resource).forEach(tag => counts.set(tag, (counts.get(tag) ?? 0) + 1));
     });
-    return Array.from(tags).sort();
+    return Array.from(counts.entries())
+      .sort((a, b) => b[1] - a[1] || a[0].localeCompare(b[0]))
+      .map(([tag]) => tag);
   }, [resources]);
+  const [showAllTags, setShowAllTags] = useState(false);
+  const visibleTags = showAllTags
+    ? allTags
+    : [...allTags.slice(0, 20), ...selectedTags.filter(tag => !allTags.slice(0, 20).includes(tag))];
 
   // Filter and sort categories
   const filteredCategories = useMemo(() => {
@@ -222,7 +231,7 @@ export default function CategoryExplorer({ categories, resources, className }: C
     const totalResources = getTotalResourceCount(category);
     const subcategoryCount = category.subcategories?.length || 0;
     const uniqueTags = new Set(
-      getAllCategoryResources(category).flatMap((r) => ((r as any).metadata?.tags as string[] | undefined) ?? r.tags ?? [])
+      getAllCategoryResources(category).flatMap((r) => resourceTags(r))
     ).size;
 
     return { totalResources, subcategoryCount, uniqueTags };
@@ -294,21 +303,30 @@ export default function CategoryExplorer({ categories, resources, className }: C
                 <Tag className="h-4 w-4 text-muted-foreground" />
                 <span className="text-sm text-muted-foreground">Filter by tags:</span>
               </div>
-              <div className="flex flex-wrap gap-1 max-h-20 overflow-y-auto">
-                {allTags.slice(0, 20).map(tag => (
-                  <Badge
+              <div className={cn("flex flex-wrap gap-1 overflow-y-auto", showAllTags ? "max-h-64" : "max-h-28")} role="group" aria-label="Filter by tags">
+                {visibleTags.map(tag => (
+                  <ChipButton
                     key={tag}
-                    variant={selectedTags.includes(tag) ? "default" : "outline"}
-                    className="cursor-pointer hover:bg-accent transition-colors text-xs"
+                    aria-pressed={selectedTags.includes(tag)}
+                    className="text-xs"
                     onClick={() => toggleTag(tag)}
+                    data-testid={`button-explorer-tag-${tag}`}
                   >
                     {tag}
-                  </Badge>
+                  </ChipButton>
                 ))}
                 {allTags.length > 20 && (
-                  <span className="text-xs text-muted-foreground px-2 py-1">
-                    +{allTags.length - 20} more tags
-                  </span>
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    size="sm"
+                    className="min-h-10 px-2 text-xs"
+                    aria-expanded={showAllTags}
+                    onClick={() => setShowAllTags(value => !value)}
+                    data-testid="button-explorer-tags-toggle"
+                  >
+                    {showAllTags ? "Show fewer tags" : `Show all ${allTags.length} tags`}
+                  </Button>
                 )}
               </div>
             </div>

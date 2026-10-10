@@ -806,7 +806,13 @@ function Router({ homeComponent: Home }: { homeComponent: HomeRouteComponent }) 
           <Redirect to={discoveryRedirect("/search", search)} replace />
         </Route>
         <Route path="/category/:slug/:subSlug">
-          {(params) => <Redirect to={discoveryRedirect(`/subcategory/${params.subSlug}`, search)} replace />}
+          {/* Mirrors og-middleware: only a real subcategory slug redirects;
+              an unknown nested slug stays a 404 at the URL the visitor used. */}
+          {(params) =>
+            navLoading ? null
+            : nav?.categories.some((c) => (c.subcategories ?? []).some((sub) => sub.slug === params.subSlug))
+              ? <Redirect to={discoveryRedirect(`/subcategory/${params.subSlug}`, search)} replace />
+              : <NotFound suggestion={findRouteSuggestion(location, nav)} />}
         </Route>
         <Route path="/category/:slug" component={Category} />
         <Route path="/tag">

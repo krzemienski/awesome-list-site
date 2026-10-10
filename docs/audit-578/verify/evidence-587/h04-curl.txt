@@ -1,0 +1,10 @@
+### http://127.0.0.1:5000
+/category/encoding%2Dcodecs -> http://127.0.0.1:5000/category/encoding-codecs code=200 redirects=1
+/category/encoding%2dcodecs -> http://127.0.0.1:5000/category/encoding-codecs code=200 redirects=1
+/subcategory/community%2Dgroups -> http://127.0.0.1:5000/subcategory/community-groups code=200 redirects=1
+/sub-subcategory/web%2dplayers -> http://127.0.0.1:5000/sub-subcategory/web-players code=200 redirects=1
+### https://awesome.video
+/category/encoding%2Dcodecs -> https://awesome.video/category/encoding%2Dcodecs code=200 redirects=0
+/category/encoding%2dcodecs -> https://awesome.video/category/encoding%2dcodecs code=200 redirects=0
+/subcategory/community%2Dgroups -> https://awesome.video/subcategory/community%2Dgroups code=200 redirects=0
+/sub-subcategory/web%2dplayers -> https://awesome.video/sub-subcategory/web%2dplayers code=200 redirects=0

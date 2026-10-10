@@ -163,3 +163,4 @@
 - [Polled query outage proof](polled-query-outage-proof.md) — background poll failures keep last-good data (hard-fail only first load/401); prove unattended, not via Refresh.
 - [Catalog HTTP cache vs invalidation](catalog-http-cache-vs-invalidation.md) — max-age=60 catalog GETs make invalidated refetches return stale bodies; post-write reads must use no-cache.
 - [API key tier entitlements](api-key-tier-entitlements.md) — every valid key = server-assigned standard tier; bad key = 401; scopes grant nothing, tier names rejected.
+- [Shared queryKey error shape](shared-querykey-error-shape.md) — every queryFn sharing a key must throw the same ApiError shape, or status-aware error UI races.

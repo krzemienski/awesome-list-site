@@ -41,6 +41,7 @@ import {
   signUpSeoDescription,
   missingPageSeo,
   bookmarksPageSeo,
+  searchPageSeo,
 } from "@shared/seo-templates";
 import {
   RESOURCE_FORMAT_LABELS,
@@ -827,8 +828,8 @@ function homeShellChrome(): string {
       noindex: true,
     },
     "/search": {
-      title: `Search — ${SITE_NAME}`,
-      description: `Search thousands of curated video development tools, libraries, players, codecs, and learning resources.`,
+      title: `${searchPageSeo.titleCore("")} — ${SITE_NAME}`,
+      description: searchPageSeo.description,
       // Search results pages are standard noindex (thin/duplicate content).
       noindex: true,
     },
@@ -1081,6 +1082,8 @@ function homeShellChrome(): string {
       const searchState = readSearchState(url.split("?")[1] || "");
       const normalizedQuery = normalizeSearchQuery(searchState.q);
       const q = isSearchableQuery(normalizedQuery) ? normalizedQuery : "";
+      // Two-pass parity: Search.tsx titles from the same normalized query.
+      m.title = `${searchPageSeo.titleCore(normalizedQuery)} — ${SITE_NAME}`;
       let results: { id: number; title: string; description?: string }[] = [];
       let total = 0;
       let sPage = parsePage(url);

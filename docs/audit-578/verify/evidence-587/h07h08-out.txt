@@ -1,0 +1,463 @@
+{
+ "h07": [
+  {
+   "base": "http://127.0.0.1:5000",
+   "system": "editorial",
+   "w": 1440,
+   "case": "bookmarks-empty",
+   "status": 200,
+   "ssr": {
+    "title": "Bookmarks — Awesome Video",
+    "desc": "Your saved video development resources on Awesome Video.",
+    "robots": "noindex, nofollow",
+    "canonicals": 0
+   },
+   "reload": {
+    "title": "Bookmarks — Awesome Video",
+    "desc": "Your saved video development resources on Awesome Video.",
+    "robots": [
+     "noindex, nofollow"
+    ],
+    "canonicals": 0,
+    "h1": "Nothing saved on this device"
+   },
+   "spa": {
+    "title": "Bookmarks — Awesome Video",
+    "desc": "Your saved video development resources on Awesome Video.",
+    "robots": [
+     "noindex, nofollow"
+    ],
+    "canonicals": 0,
+    "h1": "Nothing saved on this device"
+   },
+   "reloadEq": true,
+   "spaEq": true
+  },
+  {
+   "base": "http://127.0.0.1:5000",
+   "system": "editorial",
+   "w": 1440,
+   "case": "bookmarks-populated",
+   "status": 200,
+   "ssr": {
+    "title": "Bookmarks — Awesome Video",
+    "desc": "Your saved video development resources on Awesome Video.",
+    "robots": "noindex, nofollow",
+    "canonicals": 0
+   },
+   "reload": {
+    "title": "Bookmarks — Awesome Video",
+    "desc": "Your saved video development resources on Awesome Video.",
+    "robots": [
+     "noindex, nofollow"
+    ],
+    "canonicals": 0,
+    "h1": "Saved, for now."
+   },
+   "spa": {
+    "title": "Bookmarks — Awesome Video",
+    "desc": "Your saved video development resources on Awesome Video.",
+    "robots": [
+     "noindex, nofollow"
+    ],
+    "canonicals": 0,
+    "h1": "Saved, for now."
+   },
+   "reloadEq": true,
+   "spaEq": true
+  },
+  {
+   "base": "http://127.0.0.1:5000",
+   "system": "editorial",
+   "w": 1440,
+   "case": "resource-missing",
+   "status": 404,
+   "ssr": {
+    "title": "Page Not Found — Awesome Video",
+    "desc": "The page you're looking for doesn't exist on Awesome Video. Browse the curated index of video development resources instead.",
+    "robots": "noindex, nofollow",
+    "canonicals": 0
+   },
+   "reload": {
+    "title": "Page Not Found — Awesome Video",
+    "desc": "The page you're looking for doesn't exist on Awesome Video. Browse the curated index of video development resources instead.",
+    "robots": [
+     "noindex, nofollow"
+    ],
+    "canonicals": 0,
+    "h1": "Resource Not Found"
+   },
+   "spa": {
+    "title": "Page Not Found — Awesome Video",
+    "desc": "The page you're looking for doesn't exist on Awesome Video. Browse the curated index of video development resources instead.",
+    "robots": [
+     "noindex, nofollow"
+    ],
+    "canonicals": 0,
+    "h1": "Resource Not Found"
+   },
+   "reloadEq": true,
+   "spaEq": true
+  },
+  {
+   "base": "http://127.0.0.1:5000",
+   "system": "brutalist",
+   "w": 390,
+   "case": "bookmarks-empty",
+   "status": 200,
+   "ssr": {
+    "title": "Bookmarks — Awesome Video",
+    "desc": "Your saved video development resources on Awesome Video.",
+    "robots": "noindex, nofollow",
+    "canonicals": 0
+   },
+   "reload": {
+    "title": "Bookmarks — Awesome Video",
+    "desc": "Your saved video development resources on Awesome Video.",
+    "robots": [
+     "noindex, nofollow"
+    ],
+    "canonicals": 0,
+    "h1": "Nothing saved on this device"
+   },
+   "spa": {
+    "title": "Bookmarks — Awesome Video",
+    "desc": "Your saved video development resources on Awesome Video.",
+    "robots": [
+     "noindex, nofollow"
+    ],
+    "canonicals": 0,
+    "h1": "Nothing saved on this device"
+   },
+   "reloadEq": true,
+   "spaEq": true
+  },
+  {
+   "base": "http://127.0.0.1:5000",
+   "system": "brutalist",
+   "w": 390,
+   "case": "bookmarks-populated",
+   "status": 200,
+   "ssr": {
+    "title": "Bookmarks — Awesome Video",
+    "desc": "Your saved video development resources on Awesome Video.",
+    "robots": "noindex, nofollow",
+    "canonicals": 0
+   },
+   "reload": {
+    "title": "Bookmarks — Awesome Video",
+    "desc": "Your saved video development resources on Awesome Video.",
+    "robots": [
+     "noindex, nofollow"
+    ],
+    "canonicals": 0,
+    "h1": "Saved, for now."
+   },
+   "spa": {
+    "title": "Bookmarks — Awesome Video",
+    "desc": "Your saved video development resources on Awesome Video.",
+    "robots": [
+     "noindex, nofollow"
+    ],
+    "canonicals": 0,
+    "h1": "Saved, for now."
+   },
+   "reloadEq": true,
+   "spaEq": true
+  },
+  {
+   "base": "http://127.0.0.1:5000",
+   "system": "brutalist",
+   "w": 390,
+   "case": "resource-missing",
+   "status": 404,
+   "ssr": {
+    "title": "Page Not Found — Awesome Video",
+    "desc": "The page you're looking for doesn't exist on Awesome Video. Browse the curated index of video development resources instead.",
+    "robots": "noindex, nofollow",
+    "canonicals": 0
+   },
+   "reload": {
+    "title": "Page Not Found — Awesome Video",
+    "desc": "The page you're looking for doesn't exist on Awesome Video. Browse the curated index of video development resources instead.",
+    "robots": [
+     "noindex, nofollow"
+    ],
+    "canonicals": 0,
+    "h1": "Resource Not Found"
+   },
+   "spa": {
+    "title": "Page Not Found — Awesome Video",
+    "desc": "The page you're looking for doesn't exist on Awesome Video. Browse the curated index of video development resources instead.",
+    "robots": [
+     "noindex, nofollow"
+    ],
+    "canonicals": 0,
+    "h1": "Resource Not Found"
+   },
+   "reloadEq": true,
+   "spaEq": true
+  },
+  {
+   "base": "http://127.0.0.1:5055",
+   "system": "editorial",
+   "w": 1440,
+   "case": "bookmarks-empty",
+   "status": 200,
+   "ssr": {
+    "title": "Bookmarks — Awesome Video",
+    "desc": "Your saved video development resources on Awesome Video.",
+    "robots": "noindex, nofollow",
+    "canonicals": 0
+   },
+   "reload": {
+    "title": "Bookmarks — Awesome Video",
+    "desc": "Your saved video development resources on Awesome Video.",
+    "robots": [
+     "noindex, nofollow"
+    ],
+    "canonicals": 0,
+    "h1": "Nothing saved on this device"
+   },
+   "spa": {
+    "title": "Bookmarks — Awesome Video",
+    "desc": "Your saved video development resources on Awesome Video.",
+    "robots": [
+     "noindex, nofollow"
+    ],
+    "canonicals": 0,
+    "h1": "Nothing saved on this device"
+   },
+   "reloadEq": true,
+   "spaEq": true
+  },
+  {
+   "base": "http://127.0.0.1:5055",
+   "system": "editorial",
+   "w": 1440,
+   "case": "bookmarks-populated",
+   "status": 200,
+   "ssr": {
+    "title": "Bookmarks — Awesome Video",
+    "desc": "Your saved video development resources on Awesome Video.",
+    "robots": "noindex, nofollow",
+    "canonicals": 0
+   },
+   "reload": {
+    "title": "Bookmarks — Awesome Video",
+    "desc": "Your saved video development resources on Awesome Video.",
+    "robots": [
+     "noindex, nofollow"
+    ],
+    "canonicals": 0,
+    "h1": "Saved, for now."
+   },
+   "spa": {
+    "title": "Bookmarks — Awesome Video",
+    "desc": "Your saved video development resources on Awesome Video.",
+    "robots": [
+     "noindex, nofollow"
+    ],
+    "canonicals": 0,
+    "h1": "Saved, for now."
+   },
+   "reloadEq": true,
+   "spaEq": true
+  },
+  {
+   "base": "http://127.0.0.1:5055",
+   "system": "editorial",
+   "w": 1440,
+   "case": "resource-missing",
+   "status": 404,
+   "ssr": {
+    "title": "Page Not Found — Awesome Video",
+    "desc": "The page you're looking for doesn't exist on Awesome Video. Browse the curated index of video development resources instead.",
+    "robots": "noindex, nofollow",
+    "canonicals": 0
+   },
+   "reload": {
+    "title": "Page Not Found — Awesome Video",
+    "desc": "The page you're looking for doesn't exist on Awesome Video. Browse the curated index of video development resources instead.",
+    "robots": [
+     "noindex, nofollow"
+    ],
+    "canonicals": 0,
+    "h1": "Resource Not Found"
+   },
+   "spa": {
+    "title": "Page Not Found — Awesome Video",
+    "desc": "The page you're looking for doesn't exist on Awesome Video. Browse the curated index of video development resources instead.",
+    "robots": [
+     "noindex, nofollow"
+    ],
+    "canonicals": 0,
+    "h1": "Resource Not Found"
+   },
+   "reloadEq": true,
+   "spaEq": true
+  },
+  {
+   "base": "http://127.0.0.1:5055",
+   "system": "brutalist",
+   "w": 390,
+   "case": "bookmarks-empty",
+   "status": 200,
+   "ssr": {
+    "title": "Bookmarks — Awesome Video",
+    "desc": "Your saved video development resources on Awesome Video.",
+    "robots": "noindex, nofollow",
+    "canonicals": 0
+   },
+   "reload": {
+    "title": "Bookmarks — Awesome Video",
+    "desc": "Your saved video development resources on Awesome Video.",
+    "robots": [
+     "noindex, nofollow"
+    ],
+    "canonicals": 0,
+    "h1": "Nothing saved on this device"
+   },
+   "spa": {
+    "title": "Bookmarks — Awesome Video",
+    "desc": "Your saved video development resources on Awesome Video.",
+    "robots": [
+     "noindex, nofollow"
+    ],
+    "canonicals": 0,
+    "h1": "Nothing saved on this device"
+   },
+   "reloadEq": true,
+   "spaEq": true
+  },
+  {
+   "base": "http://127.0.0.1:5055",
+   "system": "brutalist",
+   "w": 390,
+   "case": "bookmarks-populated",
+   "status": 200,
+   "ssr": {
+    "title": "Bookmarks — Awesome Video",
+    "desc": "Your saved video development resources on Awesome Video.",
+    "robots": "noindex, nofollow",
+    "canonicals": 0
+   },
+   "reload": {
+    "title": "Bookmarks — Awesome Video",
+    "desc": "Your saved video development resources on Awesome Video.",
+    "robots": [
+     "noindex, nofollow"
+    ],
+    "canonicals": 0,
+    "h1": "Saved, for now."
+   },
+   "spa": {
+    "title": "Bookmarks — Awesome Video",
+    "desc": "Your saved video development resources on Awesome Video.",
+    "robots": [
+     "noindex, nofollow"
+    ],
+    "canonicals": 0,
+    "h1": "Saved, for now."
+   },
+   "reloadEq": true,
+   "spaEq": true
+  },
+  {
+   "base": "http://127.0.0.1:5055",
+   "system": "brutalist",
+   "w": 390,
+   "case": "resource-missing",
+   "status": 404,
+   "ssr": {
+    "title": "Page Not Found — Awesome Video",
+    "desc": "The page you're looking for doesn't exist on Awesome Video. Browse the curated index of video development resources instead.",
+    "robots": "noindex, nofollow",
+    "canonicals": 0
+   },
+   "reload": {
+    "title": "Page Not Found — Awesome Video",
+    "desc": "The page you're looking for doesn't exist on Awesome Video. Browse the curated index of video development resources instead.",
+    "robots": [
+     "noindex, nofollow"
+    ],
+    "canonicals": 0,
+    "h1": "Resource Not Found"
+   },
+   "spa": {
+    "title": "Page Not Found — Awesome Video",
+    "desc": "The page you're looking for doesn't exist on Awesome Video. Browse the curated index of video development resources instead.",
+    "robots": [
+     "noindex, nofollow"
+    ],
+    "canonicals": 0,
+    "h1": "Resource Not Found"
+   },
+   "reloadEq": true,
+   "spaEq": true
+  }
+ ],
+ "h08": [
+  {
+   "path": "/resource/99999999",
+   "fail503": false,
+   "h1": "Resource Not Found",
+   "posts": 1,
+   "detail": [
+    {
+     "url": "/api/telemetry/dead-link",
+     "body": "{\"path\":\"/resource/99999999\",\"referrer\":null,\"ts\":\"2026-10-09T16:22:20.416Z\"}"
+    }
+   ],
+   "statuses": [
+    204
+   ]
+  },
+  {
+   "path": "/category/nope-xyz-587",
+   "fail503": false,
+   "h1": "Page Not Found",
+   "posts": 1,
+   "detail": [
+    {
+     "url": "/api/telemetry/dead-link",
+     "body": "{\"path\":\"/category/nope-xyz-587\",\"referrer\":null,\"ts\":\"2026-10-09T16:22:26.613Z\"}"
+    }
+   ],
+   "statuses": [
+    204
+   ]
+  },
+  {
+   "path": "/no-such-route-587",
+   "fail503": false,
+   "h1": "Page Not Found",
+   "posts": 1,
+   "detail": [
+    {
+     "url": "/api/telemetry/dead-link",
+     "body": "{\"path\":\"/no-such-route-587\",\"referrer\":null,\"ts\":\"2026-10-09T16:22:32.967Z\"}"
+    }
+   ],
+   "statuses": [
+    204
+   ]
+  },
+  {
+   "path": "/resource/184739",
+   "fail503": true,
+   "h1": "Resource temporarily unavailable",
+   "posts": 0,
+   "detail": [],
+   "statuses": []
+  },
+  {
+   "path": "/resource/184739",
+   "fail503": false,
+   "h1": "MPEG Standards Documentation",
+   "posts": 0,
+   "detail": [],
+   "statuses": []
+  }
+ ]
+}

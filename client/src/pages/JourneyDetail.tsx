@@ -34,7 +34,7 @@ import {
 } from "@/lib/analytics";
 import SEOHead from "@/components/layout/SEOHead";
 import { isLogicalJourneyStepComplete } from "@shared/journeyProgress";
-import { journeySeoDescription } from "@shared/seo-templates";
+import { journeySeoDescription, missingPageSeo } from "@shared/seo-templates";
 import "@/styles/pages/discovery-journeys.css";
 
 interface JourneyStep {
@@ -405,7 +405,9 @@ export default function JourneyDetail() {
       <div className="journey-detail-page journey-detail-page--state">
         {/* BUG-031 (run22): not-found state gets its own head (noindex — matches
             the server's soft-404 contract) instead of inheriting a stale one. */}
-        <SEOHead title="Journey Not Found" description="This learning journey may have been removed or archived." noindex />
+        {/* Task #587 (H07): same head as the server's soft-404 so crawl and
+            render passes agree; the visible h1 stays journey-specific. */}
+        <SEOHead title={missingPageSeo.title} description={missingPageSeo.description} noindex />
         <h1 className="display-h journeys-state__title">Journey not found.</h1>
         <Alert variant="destructive" className="journeys-alert">
           <AlertCircle className="h-4 w-4" />

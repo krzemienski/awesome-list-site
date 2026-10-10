@@ -1,0 +1,10 @@
+{"request":"/category/encoding%2Dcodecs","hops":1,"final":"/category/encoding-codecs","status":200,"canonical":"https://awesome.video/category/encoding-codecs","title":""}
+{"request":"/category/encoding%2dcodecs","hops":1,"final":"/category/encoding-codecs","status":200,"canonical":"https://awesome.video/category/encoding-codecs","title":""}
+{"request":"/category/Encoding%2Dcodecs","hops":1,"final":"/category/encoding-codecs","status":200,"canonical":"https://awesome.video/category/encoding-codecs","title":""}
+{"request":"/category/encoding%2Dcodecs?page=2","hops":1,"final":"/category/encoding-codecs?page=2","status":200,"canonical":"https://awesome.video/category/encoding-codecs?page=2","title":""}
+{"request":"/subcategory/community%2Dgroups","hops":1,"final":"/subcategory/community-groups","status":200,"canonical":"https://awesome.video/subcategory/community-groups","title":""}
+{"request":"/subcategory/community%2dgroups","hops":1,"final":"/subcategory/community-groups","status":200,"canonical":"https://awesome.video/subcategory/community-groups","title":""}
+{"request":"/subcategory/%63ommunity-groups","hops":1,"final":"/subcategory/community-groups","status":200,"canonical":"https://awesome.video/subcategory/community-groups","title":""}
+{"request":"/sub-subcategory/web%2Dplayers","hops":1,"final":"/sub-subcategory/web-players","status":200,"canonical":"https://awesome.video/sub-subcategory/web-players","title":""}
+{"request":"/sub-subcategory/web%2dplayers","hops":1,"final":"/sub-subcategory/web-players","status":200,"canonical":"https://awesome.video/sub-subcategory/web-players","title":""}
+{"request":"/sub-subcategory/quality%2Dtesting?page=2","hops":1,"final":"/sub-subcategory/quality-testing?page=2","status":200,"canonical":"https://awesome.video/sub-subcategory/quality-testing?page=2","title":""}

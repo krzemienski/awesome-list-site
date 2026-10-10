@@ -26,6 +26,8 @@ import {
 } from "@/lib/font-options";
 import { useLearningPreferences } from "@/hooks/use-learning-preferences";
 import { ApiError } from "@/lib/queryClient";
+import { useToast } from "@/hooks/use-toast";
+import { ToastAction } from "@/components/ui/toast";
 
 interface ThemeProviderState {
   accountSync: "local" | "syncing" | "saved" | "failed";
@@ -165,6 +167,7 @@ export function AccountThemePreferenceBridge({ children }: { children: ReactNode
     saveThemeAsync,
     refetch,
   } = useLearningPreferences();
+  const { toast } = useToast();
   const localSelectionMade = useRef(false);
   const saveQueue = useRef<Promise<unknown>>(Promise.resolve());
   const selectedSystem = useRef(theme.systemId);
@@ -172,6 +175,8 @@ export function AccountThemePreferenceBridge({ children }: { children: ReactNode
   const [accountSync, setAccountSync] = useState<ThemeProviderState["accountSync"]>("local");
   const [accountSyncError, setAccountSyncError] = useState<string | null>(null);
   const saveGeneration = useRef(0);
+  const failureToast = useRef<{ dismiss: () => void } | null>(null);
+  const persistRef = useRef<(system: DesignSystemId, accent: AccentId) => void>(() => undefined);
 
   useEffect(() => {
     selectedSystem.current = theme.systemId;
@@ -203,22 +208,47 @@ export function AccountThemePreferenceBridge({ children }: { children: ReactNode
         .catch(() => undefined)
         .then(async () => {
           await saveThemeAsync({ themeSystem, themeAccent });
-          if (generation === saveGeneration.current) setAccountSync("saved");
+          if (generation === saveGeneration.current) {
+            setAccountSync("saved");
+            failureToast.current?.dismiss();
+            failureToast.current = null;
+          }
         })
         .catch(async (error: unknown) => {
           if (generation === saveGeneration.current) {
-            setAccountSync("failed");
-            setAccountSyncError(error instanceof ApiError && error.status === 409
+            const message = error instanceof ApiError && error.status === 409
               ? "Your account changed elsewhere. This selection is saved only on this device. Retry to save it to your account."
-              : "Couldn't save to your account. This selection is saved only on this device.");
+              : "Couldn't save to your account. This selection is saved only on this device.";
+            setAccountSync("failed");
+            setAccountSyncError(message);
+            // The pickers sit far below the page's status line (and the
+            // showcase has none), so the failure must also surface where the
+            // visitor is looking, with the same retry.
+            failureToast.current?.dismiss();
+            failureToast.current = toast({
+              variant: "destructive",
+              title: "Theme not saved to your account",
+              description: message,
+              action: (
+                <ToastAction
+                  altText="Retry saving the theme to your account"
+                  onClick={() => persistRef.current(selectedSystem.current, selectedAccent.current)}
+                >
+                  Retry
+                </ToastAction>
+              ),
+            });
           }
           // Retain the explicit local selection, but refresh the revision so
           // a user-initiated retry reconciles a conflict rather than looping.
           try { await refetch(); } catch { /* The visible failure remains. */ }
         });
     },
-    [isAuthenticated, refetch, saveThemeAsync],
+    [isAuthenticated, refetch, saveThemeAsync, toast],
   );
+  useEffect(() => {
+    persistRef.current = persist;
+  }, [persist]);
 
   const setSystem = useCallback((id: string) => {
     if (!isSystemId(id)) return;

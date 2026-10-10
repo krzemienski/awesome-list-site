@@ -1,0 +1,3 @@
+{"request":"/category/encoding%2Dcodecs","hops":0,"final":"/category/encoding%2Dcodecs","status":200,"canonical":"https://awesome.video/category/encoding-codecs"}
+{"request":"/category/encoding%2dcodecs","hops":0,"final":"/category/encoding%2dcodecs","status":200,"canonical":"https://awesome.video/category/encoding-codecs"}
+{"request":"/subcategory/community%2Dgroups","hops":0,"final":"/subcategory/community%2Dgroups","status":200,"canonical":"https://awesome.video/subcategory/community-groups"}

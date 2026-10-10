@@ -3,6 +3,11 @@ export const missingPageSeo = {
   title: "Page Not Found",
   description: "The page you're looking for doesn't exist on Awesome Video. Browse the curated index of video development resources instead.",
 };
+/** /search is noindex; both passes still render the same title/description. */
+export const searchPageSeo = {
+  description: "Search curated video development tools, libraries, players, codecs, and learning resources.",
+  titleCore: (normalizedQuery: string) => (normalizedQuery ? `Search: ${normalizedQuery}` : "Search"),
+};
 export const bookmarksPageSeo = {
   title: "Bookmarks",
   description: "Your saved video development resources on Awesome Video.",

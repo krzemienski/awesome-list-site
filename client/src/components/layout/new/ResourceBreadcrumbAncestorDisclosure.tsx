@@ -2,6 +2,7 @@ import { useMemo } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { MoreHorizontal } from "lucide-react";
 import type { AwesomeListNavNode } from "@/lib/static-data";
+import { apiRequest } from "@/lib/queryClient";
 import { Button } from "@/components/ui/button";
 import {
   BreadcrumbItem,
@@ -45,13 +46,10 @@ export default function ResourceBreadcrumbAncestorDisclosure({
 }: ResourceBreadcrumbAncestorDisclosureProps) {
   const { data: resource } = useQuery<ResourceTaxonomy>({
     queryKey: ["/api/resources", resourceId],
-    queryFn: async () => {
-      const response = await fetch(`/api/resources/${resourceId}`, {
-        credentials: "include",
-      });
-      if (!response.ok) throw new Error("Resource breadcrumb unavailable");
-      return response.json();
-    },
+    // Same fetcher as ResourceDetail: whichever observer settles the shared
+    // entry must leave a status-bearing ApiError, or a 404 written here makes
+    // the detail page misreport a missing resource as a temporary failure.
+    queryFn: () => apiRequest(`/api/resources/${resourceId}`, { method: "GET" }),
     staleTime: Infinity,
   });
 

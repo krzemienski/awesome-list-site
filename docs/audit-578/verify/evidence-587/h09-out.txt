@@ -1,0 +1,29 @@
+clerk user created user_3KSv5Vex3aS1m2utQqF89bT4Pa9 bridge __qa_test_plan_h09_1791563600016
+
+[desktop] start system=editorial status=status: Theme choices are saved on this device.
+[desktop] server before: null
+[desktop] after blocked PUT: applied=brutalist puts=1 alert: Couldn't save to your account. This selection is saved only on this device.Retry account save
+[desktop] toast visible-in-viewport=true text="Theme not saved to your accountCouldn't save to your account. This selection is saved only on this device.Retry"
+[desktop] server after blocked PUT: null
+[desktop] after retry: status: Theme saved to your account. | no toast
+[desktop] server after retry: {"systemId":"brutalist","accentId":"amber"} revision 1
+[desktop] other-device write: 200 theme={"systemId":"geist","accentId":"crimson"} revision=2
+[desktop] conflict PUT statuses=409 alert: Your account changed elsewhere. This selection is saved only on this device. Retry to save it to your account.Retry account save applied=brutalist/magenta
+[desktop] scrollY=127 toast visible-in-viewport=true text="Theme not saved to your accountYour account changed elsewhere. This selection is saved only on this device. Retry to save it to your account.Retry"
+[desktop] toast-retry after conflict statuses=409,200 status: Theme saved to your account. | no toast server={"systemId":"brutalist","accentId":"magenta"}
+[desktop] fresh device applied=brutalist/magenta expected=brutalist/magenta status: Theme saved to your account.
+
+[390] start system=brutalist status=status: Theme saved to your account.
+[390] server before: {"systemId":"brutalist","accentId":"magenta"}
+[390] after blocked PUT: applied=editorial puts=1 alert: Couldn't save to your account. This selection is saved only on this device.Retry account save
+[390] toast visible-in-viewport=true text="Theme not saved to your accountCouldn't save to your account. This selection is saved only on this device.Retry"
+[390] server after blocked PUT: {"systemId":"brutalist","accentId":"magenta"}
+[390] after retry: status: Theme saved to your account. | no toast
+[390] server after retry: {"systemId":"editorial","accentId":"magenta"} revision 4
+[390] other-device write: 200 theme={"systemId":"geist","accentId":"crimson"} revision=5
+[390] conflict PUT statuses=409 alert: Your account changed elsewhere. This selection is saved only on this device. Retry to save it to your account.Retry account save applied=editorial/orange
+[390] scrollY=1264 toast visible-in-viewport=true text="Theme not saved to your accountYour account changed elsewhere. This selection is saved only on this device. Retry to save it to your account.Retry"
+[390] toast-retry after conflict statuses=409,200 status: Theme saved to your account. | no toast server={"systemId":"editorial","accentId":"orange"}
+[390] fresh device applied=editorial/orange expected=editorial/orange status: Theme saved to your account.
+clerk user deleted
+residue {"users":0,"prefs":0}

@@ -1,0 +1,78 @@
+[
+ {
+  "system": "editorial",
+  "w": 1440,
+  "detail503": {
+   "h1": "Resource temporarily unavailable",
+   "alert": "We couldn't load this resource. Please try again.",
+   "removedCopy": false,
+   "title": "MPEG Standards Documentation — Awesome Video",
+   "robots": [
+    "index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1"
+   ],
+   "attempts": 1
+  },
+  "related500": {
+   "h1": "MPEG Standards Documentation",
+   "emptyClaim": false,
+   "relatedErr": true,
+   "attempts": 1
+  },
+  "relatedRestored": {
+   "relatedCards": 5,
+   "relatedErr": false
+  },
+  "offline": {
+   "offline": true,
+   "unavailable": false,
+   "text": "~/awesome.video/offline → paused\n\nYou're offline\n\nThis page couldn't load because your device has no connection. It will load on its own when you reconnect.\n\nTr"
+  },
+  "reconnected": {
+   "h1": "100ms: RTMP vs WebRTC vs HLS - Live Video Streaming Protocols Compared",
+   "url": "/resource/185020"
+  },
+  "missing": {
+   "docStatus": 404,
+   "h1": "Resource Not Found",
+   "retryButton": 0
+  }
+ },
+ {
+  "system": "brutalist",
+  "w": 390,
+  "detail503": {
+   "h1": "Resource temporarily unavailable",
+   "alert": "We couldn't load this resource. Please try again.",
+   "removedCopy": false,
+   "title": "MPEG Standards Documentation — Awesome Video",
+   "robots": [
+    "index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1"
+   ],
+   "attempts": 1
+  },
+  "related500": {
+   "h1": "MPEG Standards Documentation",
+   "emptyClaim": false,
+   "relatedErr": true,
+   "attempts": 1
+  },
+  "relatedRestored": {
+   "relatedCards": 5,
+   "relatedErr": false
+  },
+  "offline": {
+   "offline": true,
+   "unavailable": false,
+   "text": "~/awesome.video/offline → paused\n\nYou're offline\n\nThis page couldn't load because your device has no connection. It will load on its own when you reconnect.\n\nTR"
+  },
+  "reconnected": {
+   "h1": "100ms: RTMP vs WebRTC vs HLS - Live Video Streaming Protocols Compared",
+   "url": "/resource/185020"
+  },
+  "missing": {
+   "docStatus": 404,
+   "h1": "Resource Not Found",
+   "retryButton": 0
+  }
+ }
+]

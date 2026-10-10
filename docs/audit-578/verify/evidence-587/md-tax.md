@@ -1,0 +1,34 @@
+| Combo | URL | HTTP | SSR total | API total | SSR ids = API ids = DOM ids | SSR title = DOM title | robots | canonical |
+|---|---|---|---|---|---|---|---|---|
+| editorial-1440 | `/category/encoding-codecs?kind=libraries` | 200 | 9 | 9 | yes (9) | yes | index, follow, m | https://awesome.video/category/encoding-codecs |
+| editorial-1440 | `/category/encoding-codecs?kind=libraries&page=2` | 200 | 9 | 9 | yes (9) | yes | index, follow, m | https://awesome.video/category/encoding-codecs |
+| editorial-1440 | `/category/encoding-codecs?subcategory=Codecs` | 200 | 23 | 23 | yes (23) | yes | index, follow, m | https://awesome.video/category/encoding-codecs |
+| editorial-1440 | `/category/encoding-codecs?filter=general` | 200 | 92 | 92 | yes (24) | yes | index, follow, m | https://awesome.video/category/encoding-codecs |
+| editorial-1440 | `/category/encoding-codecs?search=ffmpeg` | 200 | 124 | 124 | yes (24) | yes | index, follow, m | https://awesome.video/category/encoding-codecs |
+| editorial-1440 | `/category/encoding-codecs?sort=name-asc` | 200 | 333 | 333 | yes (24) | yes | index, follow, m | https://awesome.video/category/encoding-codecs |
+| editorial-1440 | `/category/encoding-codecs?sort=name-desc&page=2` | 200 | 333 | 333 | yes (24) | yes | index, follow, m | https://awesome.video/category/encoding-codecs?page=2 |
+| editorial-1440 | `/category/encoding-codecs?tags=open-source&format=tool` | 200 | None | 0 | yes (0) | yes | index, follow, m | https://awesome.video/category/encoding-codecs |
+| editorial-1440 | `/category/encoding-codecs?page=2` | 200 | 333 | 333 | yes (24) | yes | index, follow, m | https://awesome.video/category/encoding-codecs?page=2 |
+| editorial-1440 | `/subcategory/mobile-web-players?subcategory=Web%20Players` | 200 | 19 | 19 | yes (19) | yes | index, follow, m | https://awesome.video/subcategory/mobile-web-players |
+| editorial-1440 | `/subcategory/mobile-web-players?filter=general` | 200 | 10 | 10 | yes (10) | yes | index, follow, m | https://awesome.video/subcategory/mobile-web-players |
+| editorial-1440 | `/subcategory/mobile-web-players?sortBy=name-desc` | 200 | 67 | 67 | yes (24) | yes | index, follow, m | https://awesome.video/subcategory/mobile-web-players |
+| editorial-1440 | `/subcategory/mobile-web-players?kind=libraries` | 200 | 3 | 3 | yes (3) | yes | index, follow, m | https://awesome.video/subcategory/mobile-web-players |
+| editorial-1440 | `/sub-subcategory/quality-testing?sortBy=name-asc` | 200 | 33 | 33 | yes (24) | yes | index, follow, m | https://awesome.video/sub-subcategory/quality-testing |
+| editorial-1440 | `/sub-subcategory/quality-testing?search=vmaf` | 200 | 4 | 4 | yes (4) | yes | index, follow, m | https://awesome.video/sub-subcategory/quality-testing |
+| editorial-1440 | `/sub-subcategory/quality-testing?page=2` | 200 | 33 | 33 | yes (9) | yes | index, follow, m | https://awesome.video/sub-subcategory/quality-testing?page=2 |
+| brutalist-390 | `/category/encoding-codecs?kind=libraries` | 200 | 9 | 9 | yes (9) | yes | index, follow, m | https://awesome.video/category/encoding-codecs |
+| brutalist-390 | `/category/encoding-codecs?kind=libraries&page=2` | 200 | 9 | 9 | yes (9) | yes | index, follow, m | https://awesome.video/category/encoding-codecs |
+| brutalist-390 | `/category/encoding-codecs?subcategory=Codecs` | 200 | 23 | 23 | yes (23) | yes | index, follow, m | https://awesome.video/category/encoding-codecs |
+| brutalist-390 | `/category/encoding-codecs?filter=general` | 200 | 92 | 92 | yes (24) | yes | index, follow, m | https://awesome.video/category/encoding-codecs |
+| brutalist-390 | `/category/encoding-codecs?search=ffmpeg` | 200 | 124 | 124 | yes (24) | yes | index, follow, m | https://awesome.video/category/encoding-codecs |
+| brutalist-390 | `/category/encoding-codecs?sort=name-asc` | 200 | 333 | 333 | yes (24) | yes | index, follow, m | https://awesome.video/category/encoding-codecs |
+| brutalist-390 | `/category/encoding-codecs?sort=name-desc&page=2` | 200 | 333 | 333 | yes (24) | yes | index, follow, m | https://awesome.video/category/encoding-codecs?page=2 |
+| brutalist-390 | `/category/encoding-codecs?tags=open-source&format=tool` | 200 | None | 0 | yes (0) | yes | index, follow, m | https://awesome.video/category/encoding-codecs |
+| brutalist-390 | `/category/encoding-codecs?page=2` | 200 | 333 | 333 | yes (24) | yes | index, follow, m | https://awesome.video/category/encoding-codecs?page=2 |
+| brutalist-390 | `/subcategory/mobile-web-players?subcategory=Web%20Players` | 200 | 19 | 19 | yes (19) | yes | index, follow, m | https://awesome.video/subcategory/mobile-web-players |
+| brutalist-390 | `/subcategory/mobile-web-players?filter=general` | 200 | 10 | 10 | yes (10) | yes | index, follow, m | https://awesome.video/subcategory/mobile-web-players |
+| brutalist-390 | `/subcategory/mobile-web-players?sortBy=name-desc` | 200 | 67 | 67 | yes (24) | yes | index, follow, m | https://awesome.video/subcategory/mobile-web-players |
+| brutalist-390 | `/subcategory/mobile-web-players?kind=libraries` | 200 | 3 | 3 | yes (3) | yes | index, follow, m | https://awesome.video/subcategory/mobile-web-players |
+| brutalist-390 | `/sub-subcategory/quality-testing?sortBy=name-asc` | 200 | 33 | 33 | yes (24) | yes | index, follow, m | https://awesome.video/sub-subcategory/quality-testing |
+| brutalist-390 | `/sub-subcategory/quality-testing?search=vmaf` | 200 | 4 | 4 | yes (4) | yes | index, follow, m | https://awesome.video/sub-subcategory/quality-testing |
+| brutalist-390 | `/sub-subcategory/quality-testing?page=2` | 200 | 33 | 33 | yes (9) | yes | index, follow, m | https://awesome.video/sub-subcategory/quality-testing?page=2 |

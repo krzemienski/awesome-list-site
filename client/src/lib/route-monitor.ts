@@ -8,11 +8,9 @@ export function useMissingRouteTelemetry(missing: boolean): void {
   const reported = useRef<string | null>(null);
   useEffect(() => {
     const path = pathname + (search ? `?${search.replace(/^\?/, "")}` : "");
-    if (!missing) {
-      reported.current = null;
-      return;
-    }
-    if (reported.current === path) return;
+    // A refetch of a missing entity passes through pending (missing=false)
+    // and back; that is the same visit, so only a path change re-arms.
+    if (!missing || reported.current === path) return;
     reported.current = path;
     reportDeadLink(path, document.referrer);
   }, [missing, pathname, search]);

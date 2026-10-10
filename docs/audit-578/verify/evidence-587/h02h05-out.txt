@@ -1,0 +1,280 @@
+editorial 1440 [
+ {
+  "h02": {
+   "p1": [
+    185062,
+    186483,
+    186357,
+    185935,
+    184847
+   ],
+   "p2": {
+    "url": "/search?q=video&category=encoding-codecs&sort=name-asc&page=2",
+    "ids": [
+     186122,
+     186674,
+     186487,
+     186197,
+     185637
+    ],
+    "count": "Page 2 of 10 · showing 25–48 of 224 results for “video”"
+   },
+   "back": {
+    "url": "/search?q=video&category=encoding-codecs&sort=name-asc",
+    "ids": [
+     185062,
+     186483,
+     186357,
+     185935,
+     184847
+    ],
+    "count": "Page 1 of 10 · showing 1–24 of 224 results for “video”"
+   },
+   "backIdsEqP1": true,
+   "fwd": {
+    "url": "/search?q=video&category=encoding-codecs&sort=name-asc&page=2",
+    "ids": [
+     186122,
+     186674,
+     186487,
+     186197,
+     185637
+    ]
+   }
+  }
+ },
+ {
+  "alias": "/subsubcategory/quality-testing?page=2",
+  "docStatus": 200,
+  "final": "/sub-subcategory/quality-testing?page=2",
+  "h1": "Quality & Testing",
+  "count": "Page 2 of 2",
+  "first": [
+   185773,
+   185910,
+   186152,
+   186213,
+   186105
+  ]
+ },
+ {
+  "alias": "/category/players-clients/mobile-web-players?kind=libraries&sortBy=name-desc",
+  "docStatus": 200,
+  "final": "/subcategory/mobile-web-players?sortBy=name-desc&kind=libraries",
+  "h1": "Mobile & Web Players",
+  "count": null,
+  "first": [
+   185680,
+   185669,
+   186650
+  ]
+ },
+ {
+  "alias": "/explore?category=encoding-codecs&sort=name-asc",
+  "docStatus": 200,
+  "final": "/search?category=encoding-codecs&sort=name-asc",
+  "h1": "Search",
+  "count": "Page 1 of 14 · showing 1–24 of 333 results",
+  "first": [
+   185752,
+   185903,
+   185871,
+   185062,
+   186483
+  ]
+ },
+ {
+  "alias": "/explore?q=ffmpeg&tags=open-source",
+  "docStatus": 200,
+  "final": "/search?q=ffmpeg&tags=open-source",
+  "h1": "Search",
+  "count": "7 results for “ffmpeg”",
+  "first": [
+   185214,
+   184771,
+   184846,
+   186506,
+   185501
+  ]
+ },
+ {
+  "alias": "/category/encoding-codecs/nope-xyz",
+  "docStatus": 404,
+  "final": "/category/encoding-codecs/nope-xyz",
+  "h1": "Page Not Found",
+  "count": null,
+  "first": []
+ },
+ {
+  "spa": {
+   "spa1": {
+    "url": "/sub-subcategory/quality-testing?page=2",
+    "first": [
+     185773,
+     185910,
+     186152,
+     186213,
+     186105
+    ]
+   },
+   "spa2": {
+    "url": "/search?category=encoding-codecs&sort=name-asc",
+    "first": [
+     185752,
+     185903,
+     185871,
+     185062,
+     186483
+    ],
+    "len": 11
+   },
+   "back1": "/sub-subcategory/quality-testing?page=2",
+   "back2": "/",
+   "forward1": "/sub-subcategory/quality-testing?page=2",
+   "spaUnknown": {
+    "url": "/category/encoding-codecs/nope-xyz",
+    "h1": "Page Not Found"
+   }
+  }
+ }
+]
+brutalist 390 [
+ {
+  "h02": {
+   "p1": [
+    185062,
+    186483,
+    186357,
+    185935,
+    184847
+   ],
+   "p2": {
+    "url": "/search?q=video&category=encoding-codecs&sort=name-asc&page=2",
+    "ids": [
+     186122,
+     186674,
+     186487,
+     186197,
+     185637
+    ],
+    "count": "Page 2 of 10 · showing 25–48 of 224 results for “video”"
+   },
+   "back": {
+    "url": "/search?q=video&category=encoding-codecs&sort=name-asc",
+    "ids": [
+     185062,
+     186483,
+     186357,
+     185935,
+     184847
+    ],
+    "count": "Page 1 of 10 · showing 1–24 of 224 results for “video”"
+   },
+   "backIdsEqP1": true,
+   "fwd": {
+    "url": "/search?q=video&category=encoding-codecs&sort=name-asc&page=2",
+    "ids": [
+     186122,
+     186674,
+     186487,
+     186197,
+     185637
+    ]
+   }
+  }
+ },
+ {
+  "alias": "/subsubcategory/quality-testing?page=2",
+  "docStatus": 200,
+  "final": "/sub-subcategory/quality-testing?page=2",
+  "h1": "Quality & Testing",
+  "count": "Page 2 of 2",
+  "first": [
+   185773,
+   185910,
+   186152,
+   186213,
+   186105
+  ]
+ },
+ {
+  "alias": "/category/players-clients/mobile-web-players?kind=libraries&sortBy=name-desc",
+  "docStatus": 200,
+  "final": "/subcategory/mobile-web-players?sortBy=name-desc&kind=libraries",
+  "h1": "Mobile & Web Players",
+  "count": null,
+  "first": [
+   185680,
+   185669,
+   186650
+  ]
+ },
+ {
+  "alias": "/explore?category=encoding-codecs&sort=name-asc",
+  "docStatus": 200,
+  "final": "/search?category=encoding-codecs&sort=name-asc",
+  "h1": "Search",
+  "count": "Page 1 of 14 · showing 1–24 of 333 results",
+  "first": [
+   185752,
+   185903,
+   185871,
+   185062,
+   186483
+  ]
+ },
+ {
+  "alias": "/explore?q=ffmpeg&tags=open-source",
+  "docStatus": 200,
+  "final": "/search?q=ffmpeg&tags=open-source",
+  "h1": "Search",
+  "count": "7 results for “ffmpeg”",
+  "first": [
+   185214,
+   184771,
+   184846,
+   186506,
+   185501
+  ]
+ },
+ {
+  "alias": "/category/encoding-codecs/nope-xyz",
+  "docStatus": 404,
+  "final": "/category/encoding-codecs/nope-xyz",
+  "h1": "Page Not Found",
+  "count": null,
+  "first": []
+ },
+ {
+  "spa": {
+   "spa1": {
+    "url": "/sub-subcategory/quality-testing?page=2",
+    "first": [
+     185773,
+     185910,
+     186152,
+     186213,
+     186105
+    ]
+   },
+   "spa2": {
+    "url": "/search?category=encoding-codecs&sort=name-asc",
+    "first": [
+     185752,
+     185903,
+     185871,
+     185062,
+     186483
+    ],
+    "len": 11
+   },
+   "back1": "/sub-subcategory/quality-testing?page=2",
+   "back2": "/",
+   "forward1": "/sub-subcategory/quality-testing?page=2",
+   "spaUnknown": {
+    "url": "/category/encoding-codecs/nope-xyz",
+    "h1": "Page Not Found"
+   }
+  }
+ }
+]
