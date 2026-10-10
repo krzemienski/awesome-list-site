@@ -130,6 +130,15 @@
   line-height: 1.6;
 }
 
+/* The frozen Enrichment TableShell heading, subtitle and status chips inherit
+   the system's body leading (1.55 Terminal/Geist/Swiss, 1.5 Brutalist); the
+   projected Researcher/Research shells keep the fixed 1.6 above. */
+.queues-agent--enrichment .admin-ops-table-shell__title,
+.queues-agent--enrichment .admin-ops-table-shell__description,
+.queues-agent--enrichment .admin-ops-status-chip {
+  line-height: var(--body-leading);
+}
+
 .queues-agent__empty {
   color: var(--text-3);
   font-size: 12px;

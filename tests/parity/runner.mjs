@@ -1184,11 +1184,19 @@ const openSideOn = async (ctx, screen, width, side, { context, page, base, isRef
   }
   throwIfCaptureAborted(ctx.signal);
   const action = isReference ? screen.referenceAction : screen.actualAction;
+  const theme = ctx.theme || CAPTURE_STATE.theme;
+  if (isReference && action?.startsWith("admin-tab:")) {
+    // The app clicks its admin tab already in the target system, so the
+    // strip scrolls with that system's trigger widths. Clicking the frozen
+    // tab in Editorial and switching afterwards left the reference strip at an
+    // Editorial scroll offset whenever the wider system fonts overflow it.
+    await page.waitForFunction(() => typeof window.__avGo === "function" && typeof window.applyDesignSystem === "function", null, { timeout: 60_000 });
+    await page.evaluate(({ system, accent }) => window.applyDesignSystem(system, accent), theme);
+  }
   // Actions receive the structured catalog tokens (category/subcategory/leaf/
   // resource objects); path templates and identity checks use the flat `values`.
   if (action) await applyAction(page, action, isReference ? "reference" : "actual", { tokens: ctx.tokens });
   const selector = isReference ? screen.referenceReadySelector : screen.actualReadySelector;
-  const theme = ctx.theme || CAPTURE_STATE.theme;
   if (isReference) {
     // Frozen useTweaks ignores storage. Wait for App's initial effect before
     // calling the actual registry applier, never host controls or file edits.

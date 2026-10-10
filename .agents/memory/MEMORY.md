@@ -164,7 +164,7 @@
 - [Catalog HTTP cache vs invalidation](catalog-http-cache-vs-invalidation.md) — max-age=60 catalog GETs make invalidated refetches return stale bodies; post-write reads must use no-cache.
 - [API key tier entitlements](api-key-tier-entitlements.md) — every valid key = server-assigned standard tier; bad key = 401; scopes grant nothing, tier names rejected.
 - [Shared queryKey error shape](shared-querykey-error-shape.md) — every queryFn sharing a key must throw the same ApiError shape, or status-aware error UI races.
-- [Alternate-system pixel parity](alternate-system-parity.md) — per-system skins lose to Editorial-specific page CSS; crop uniform 1px shifts before "fixing".
+- [Alternate-system pixel parity](alternate-system-parity.md) — app restating Editorial values beats per-system skins; "1px row drift" was hard-coded 1.6 vs --body-leading; adapter inline-projection traps.
 - [ds-button-sweep empty-queue dependency](ds-sweep-empty-queue-dependency.md) — admin tab checks wait for empty-state controls; pending QA fixtures fail them; run DS verify after cleanup.
 - [Contract masks 500 bodies](contract-500-body-masking.md) — every /api 500 body becomes "Internal Server Error"; actionable failure text must use a non-500 status or client-side 5xx mapping.
 - [Queued optimistic rollback](queued-optimistic-rollback.md) — queued writes must roll back to last server-confirmed state, not their onMutate snapshot; failed refetch keeps loaded page.

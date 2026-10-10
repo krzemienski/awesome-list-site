@@ -62,6 +62,9 @@ function tabFromWindow(): string | null {
 // under the overlaid scroll-arrow buttons. 1px tolerance so a sub-pixel
 // overhang never nudges the strip.
 function revealTabTrigger(scroller: HTMLElement, trigger: HTMLElement) {
+  // A transient zero-width layout (e.g. a 1×1 capture viewport) is not a
+  // position to reveal against; measuring it would scroll to the far end.
+  if (scroller.clientWidth === 0) return;
   if (scroller.scrollWidth <= scroller.clientWidth) return;
   const style = getComputedStyle(scroller);
   const insetStart = parseFloat(style.scrollPaddingInlineStart) || 0;

@@ -20,8 +20,11 @@ const between = (source, start, end, label) => {
   if (from < 0 || to < 0) throw new Error(`0929 admin operations declaration drift: ${label}`);
   return source.slice(from, to);
 };
+// Strip only declaration keywords. A bare /\bexport / also deleted the word
+// from rendered copy ("Hierarchical export for feed readers." lost "export").
+const stripExports = (source) => source.replace(/^(\s*)export\s+(?=(?:default\s+|async\s+)?(?:function|const|let|var|class|interface|type|enum)\b)/gm, "$1");
 const compile = (source, bindings, expression) => new Function(...Object.keys(bindings),
-  esbuild.transformSync(source.replace(/\bexport /g, ""), { loader: "tsx", jsx: "transform", format: "cjs" }).code +
+  esbuild.transformSync(stripExports(source), { loader: "tsx", jsx: "transform", format: "cjs" }).code +
     `\nreturn ${expression};`)(...Object.values(bindings));
 const render = (jsx, bindings) => renderToStaticMarkup(compile(`const Atom = () => (${jsx});`, bindings, "React.createElement(Atom)"));
 
@@ -540,6 +543,32 @@ export async function applyAdminOps0929(page, reconciliation) {
       }
       applyRules(host);
     };
+    function systemSkinRules() {
+      const system = document.documentElement.dataset.system;
+      const out = [];
+      if (!system) return out;
+      const prefix = `[data-system="${system}"]`;
+      const walk = (rules) => {
+        for (const rule of rules) {
+          if (rule.cssRules && !rule.selectorText) {
+            if (!rule.media || window.matchMedia(rule.media.mediaText).matches) walk(rule.cssRules);
+            continue;
+          }
+          if (!rule.selectorText) continue;
+          for (const selector of rule.selectorText.split(",").map((part) => part.trim())) {
+            if (!selector.startsWith(prefix) || /:(?:hover|focus|active|:)/.test(selector)) continue;
+            const specificity = (selector.match(/#[\w-]+/g)?.length || 0) * 10000 +
+              (selector.match(/\.[\w-]+|\[[^\]]+\]|:(?!:)[\w-]+(?:\([^)]*\))?/g)?.length || 0) * 100 +
+              (selector.match(/(?:^|[\s>+~])(?:[a-z][\w-]*)/gi)?.length || 0);
+            out.push({ selector, specificity, props: new Set([...rule.style]) });
+          }
+        }
+      };
+      for (const sheet of document.styleSheets) {
+        try { walk(sheet.cssRules); } catch { /* cross-origin sheet */ }
+      }
+      return out;
+    }
     function applyRules(root) {
       for (const { prop, value } of [...(data.utilityTokens || []), ...contract.semanticTokens]) root.style.setProperty(prop, value);
       const candidates = new Map();
@@ -567,8 +596,22 @@ export async function applyAdminOps0929(page, reconciliation) {
           }
         }
       }
+      // Inline declarations would also beat the frozen per-system skins
+      // (`[data-system="brutalist"] .card`, `… .chip`, …), which outrank these
+      // single-class source rules in the app's own cascade. Leave a property
+      // to the cascade when a matching skin rule is more specific.
+      const skinRules = systemSkinRules();
+      const longhands = (prop) => {
+        const probe = document.createElement("div").style;
+        probe.setProperty(prop, "inherit");
+        return probe.length ? [...probe] : [prop];
+      };
       for (const [node, declarations] of candidates) {
-        for (const { prop, value, important } of declarations.values()) node.style.setProperty(prop, value, important ? "important" : "");
+        for (const { prop, value, important, score } of declarations.values()) {
+          if (!important && skinRules.some((skin) => skin.specificity > score && node.matches(skin.selector) &&
+            longhands(prop).some((longhand) => skin.props.has(longhand)))) continue;
+          node.style.setProperty(prop, value, important ? "important" : "");
+        }
       }
       root.querySelectorAll("button:not(.tab),summary.btn").forEach((node) => {
         if (node.classList.contains("admin-tab-scroller__edge")) return;
@@ -586,6 +629,10 @@ export async function applyAdminOps0929(page, reconciliation) {
     const settle = () => { if (!released) reveal(tabs, active); updateEdges(); };
     const observer = new ResizeObserver(settle);
     observer.observe(tabs);
+    // The runner applies a non-Editorial system AFTER this reveal; the strip's
+    // own box keeps its width while the triggers grow with the system font,
+    // so observe the triggers too or the reveal stays at Editorial metrics.
+    for (const trigger of tabs.querySelectorAll(".tab")) observer.observe(trigger);
     document.fonts?.ready.then(settle);
     ["pointerdown", "wheel", "touchstart"].forEach((type) => host.addEventListener(type, () => { released = true; }, { passive: true }));
     modified.push("admin tabs: source edge fades/chevrons and nearest-edge active trigger reveal");

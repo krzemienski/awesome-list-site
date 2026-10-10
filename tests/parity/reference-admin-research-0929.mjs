@@ -157,6 +157,11 @@ export function buildAdminResearch0929() {
     const match = requireMatch(read(FILES.bridge), new RegExp(`--status-${tone}:\\s*([^;]+);`), `status ${tone} token`);
     return [`--status-${tone}`, match[1].trim()];
   }));
+  // Projected `td.accent { color: var(--accent-ink) }` needs the bridge's base
+  // ink (frozen admin.jsx paints cost cells with var(--accent)); without it the
+  // declaration is invalid at computed time and the cell inherits --text. The
+  // per-pair accessible mixes stay app-only (I01).
+  tokens["--accent-ink"] = requireMatch(read(FILES.bridge), /--accent-ink:\s*(var\(--accent\));/, "base accent ink token")[1];
   return { clamp, rules, tokens, controlHeight: [...heights][0],
     sourceProof: Object.values(FILES).map((file) => ({ file, sha256: crypto.createHash("sha256").update(read(file)).digest("hex") })) };
 }
@@ -202,12 +207,16 @@ export async function applyAdminResearch0929(page, reconciliation) {
     root.replaceWith(replacement);
     Object.entries(tokens).forEach(([prop, value]) => replacement.style.setProperty(prop, value));
     replacement.style.setProperty("--profile-control-height", controlHeight);
-    for (const { selector, media, declarations } of rules) {
-      if (!media.every((query) => matchMedia(query).matches)) continue;
-      const nodes = [...replacement.querySelectorAll(selector)];
-      if (replacement.matches(selector)) nodes.unshift(replacement);
-      nodes.forEach((node) => declarations.forEach(({ prop, value, important }) => node.style.setProperty(prop, value, important ? "important" : "")));
-    }
+    // Project the source rules as a stylesheet, not inline styles: inline
+    // declarations beat the frozen per-system skins (e.g. Geist's
+    // `[data-system="geist"] .chip` body face), which the app's cascade keeps.
+    const sheet = document.createElement("style");
+    sheet.dataset.parityProjection = "admin-research-0929";
+    sheet.textContent = rules.map(({ selector, media, declarations }) => {
+      const body = `${selector}{${declarations.map(({ prop, value, important }) => `${prop}:${value}${important ? " !important" : ""}`).join(";")}}`;
+      return media.reduce((inner, query) => `@media ${query}{${inner}}`, body);
+    }).join("\n");
+    document.head.append(sheet);
     replacement.querySelectorAll("button.btn").forEach((node) => {
       node.style.minHeight = "max(44px,var(--profile-control-height))";
       node.style.minWidth = "44px";

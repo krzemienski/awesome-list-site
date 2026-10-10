@@ -632,12 +632,50 @@ export async function applyAdminCatalog0929(page, reconciliation) {
         return css;
       }).join("\n") + "}";
       document.head.append(sourceStyle);
-    } else for (const rule of projection.rules) {
-      if (!rule.media.every((query) => matchMedia(query).matches)) continue;
-      for (const node of inserted) {
-        if (!node.matches(rule.selector)) continue;
-        for (const { prop, value, important } of rule.declarations) node.style.setProperty(prop,
-          value.replaceAll("var(--profile-control-height)", projection.controlHeight), important ? "important" : "");
+    } else {
+      // Inline declarations would also beat the frozen per-system skins
+      // (`[data-system="brutalist"] .btn`, `… .card`, …) that outrank these
+      // source rules in the app's own cascade; leave such properties to it.
+      const specificityOf = (selector) => (selector.match(/#[\w-]+/g)?.length || 0) * 10000 +
+        (selector.match(/\.[\w-]+|\[[^\]]+\]|:(?!:)[\w-]+(?:\([^)]*\))?/g)?.length || 0) * 100 +
+        (selector.match(/(?:^|[\s>+~])(?:[a-z][\w-]*)/gi)?.length || 0);
+      const skinPrefix = `[data-system="${document.documentElement.dataset.system}"]`;
+      const skinRules = [];
+      const walkSkins = (list) => {
+        for (const rule of list) {
+          if (rule.cssRules && !rule.selectorText) {
+            if (!rule.media || window.matchMedia(rule.media.mediaText).matches) walkSkins(rule.cssRules);
+            continue;
+          }
+          for (const selector of rule.selectorText?.split(",").map((part) => part.trim()) || []) {
+            if (!selector.startsWith(skinPrefix) || /:(?:hover|focus|active|:)/.test(selector)) continue;
+            skinRules.push({ selector, specificity: specificityOf(selector), props: new Set([...rule.style]) });
+          }
+        }
+      };
+      if (document.documentElement.dataset.system) {
+        for (const sheet of document.styleSheets) {
+          try { walkSkins(sheet.cssRules); } catch { /* cross-origin sheet */ }
+        }
+      }
+      const longhands = (prop) => {
+        const probe = document.createElement("div").style;
+        probe.setProperty(prop, "inherit");
+        return probe.length ? [...probe] : [prop];
+      };
+      for (const rule of projection.rules) {
+        if (!rule.media.every((query) => matchMedia(query).matches)) continue;
+        for (const node of inserted) {
+          if (!node.matches(rule.selector)) continue;
+          const score = Math.max(...rule.selector.split(",").map((part) => part.trim())
+            .filter((part) => { try { return node.matches(part); } catch { return false; } }).map(specificityOf), 0);
+          for (const { prop, value, important } of rule.declarations) {
+            if (!important && skinRules.some((skin) => skin.specificity > score && node.matches(skin.selector) &&
+              longhands(prop).some((longhand) => skin.props.has(longhand)))) continue;
+            node.style.setProperty(prop,
+              value.replaceAll("var(--profile-control-height)", projection.controlHeight), important ? "important" : "");
+          }
+        }
       }
     }
     for (const node of inserted) {

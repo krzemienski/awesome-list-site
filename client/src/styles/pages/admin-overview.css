@@ -12,7 +12,8 @@
 
 .admin-overview-stats-canonical .admin-canonical-stat {
   min-width: 0;
-  border-color: var(--border);
+  /* No border-color here: the frozen `.card` edge (and per-system skins such
+     as Brutalist's --text edge) must win, as on the reference. */
   border-radius: var(--radius, var(--radius-md));
   box-shadow: none;
   text-align: start;
@@ -30,13 +31,14 @@
   padding: var(--space-5, 1.25rem) var(--space-5, 1.25rem) 0;
 }
 
-/* Canonical Stat label: a 10px .mono block at body leading (16px line box). */
+/* Canonical Stat label: a 10px .mono block at the system's body leading
+   (16px line box in Editorial, 15.5px at 1.55). */
 .admin-overview-stats-canonical .admin-canonical-stat__label.eyebrow {
   color: var(--text-3, var(--text-2));
   font-size: 0.625rem;
   font-weight: 400;
   letter-spacing: 1.4px;
-  line-height: 1.6;
+  line-height: var(--body-leading);
 }
 
 .admin-overview-stats-canonical .admin-canonical-stat__title-link {
@@ -76,8 +78,9 @@
   margin-block-start: var(--space-2, 0.5rem);
   color: var(--text-2);
   font-size: 0.75rem;
-  /* Canonical sub inherits body leading (19.2px line box at 12px). */
-  line-height: 1.6;
+  /* Canonical sub inherits the system's body leading (19.2px at 12px in
+     Editorial). */
+  line-height: var(--body-leading);
 }
 
 .admin-overview-stats-canonical .admin-canonical-stat__sub button {
@@ -112,9 +115,13 @@
   min-width: 0;
   overflow: hidden;
   padding: 22px;
-  border-color: var(--border);
+  /* Frozen `.card` edge and fill: the legacy `.admin-panel` hairline/--card
+     pair (0,1,0) would otherwise win. Border colour is left to `.admin-panel`
+     so the frozen per-system skins (e.g. Brutalist's --text edge, 0,2,0) still
+     apply, exactly as on the reference. */
+  border-width: var(--border-w);
   border-radius: var(--radius, var(--radius-md));
-  background: var(--surface-1, var(--card));
+  background: var(--surface);
   box-shadow: none;
 }
 

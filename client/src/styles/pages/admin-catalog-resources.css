@@ -68,7 +68,7 @@
   font-size: 14px;
   font-weight: 600;
   letter-spacing: normal;
-  line-height: 1.6;
+  line-height: var(--body-leading);
 }
 
 .admin-catalog-resources__title > svg {
@@ -78,7 +78,7 @@
 .admin-catalog-resources__subtitle {
   color: var(--text-3);
   font-size: 12px;
-  line-height: 1.6;
+  line-height: var(--body-leading);
   margin-top: 4px;
 }
 

@@ -57,10 +57,6 @@
   box-shadow: none;
 }
 
-.ops-github-panel__repository-card {
-  min-height: 90.78125px;
-}
-
 .ops-github-panel__repository-heading {
   display: flex;
   align-items: flex-start;
@@ -81,9 +77,10 @@
   font-size: 0.875rem;
   font-weight: 600;
   letter-spacing: normal;
-  /* The frozen repository name is a plain h3 inheriting the 1.6 body leading;
-     CardTitle's leading-none shaved 8px off the row and pulled the table up. */
-  line-height: 1.6;
+  /* The frozen repository name is a plain h3 inheriting the system's body
+     leading; CardTitle's leading-none shaved 8px off the row and pulled the
+     table up, and a fixed 1.6 ran 0.7px long outside Editorial. */
+  line-height: var(--body-leading);
 }
 
 .ops-github-panel__repository-meta {
@@ -224,14 +221,17 @@
   padding: 5px 10px;
 }
 
-.ops-github-panel .admin-ops-table-shell__title,
-.ops-link-health .admin-ops-table-shell__title {
+.ops-link-health .admin-ops-table-shell__title,
+.ops-link-health .admin-ops-table-shell__description {
   line-height: 1.6;
 }
 
-.ops-github-panel .admin-ops-table-shell__description,
-.ops-link-health .admin-ops-table-shell__description {
-  line-height: 1.6;
+/* The frozen GitHub "Sync jobs" TableShell heading and subtitle inherit the
+   system's body leading (a fixed 1.6 shifted every row below it outside
+   Editorial); Link Health's projected shell keeps 1.6 above. */
+.ops-github-panel .admin-ops-table-shell__title,
+.ops-github-panel .admin-ops-table-shell__description {
+  line-height: var(--body-leading);
 }
 
 .ops-github-panel__history-table-wrap tbody tr:hover,

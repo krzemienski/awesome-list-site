@@ -42,7 +42,7 @@
   color: var(--text);
   font-size: 0.875rem;
   font-weight: 600;
-  line-height: 1.6;
+  line-height: var(--body-leading);
   letter-spacing: normal;
 }
 
@@ -54,7 +54,7 @@
   margin-top: 0.25rem;
   color: var(--text-3);
   font-size: 0.75rem;
-  line-height: 1.6;
+  line-height: var(--body-leading);
 }
 
 .admin-taxonomy-header-actions {
@@ -162,8 +162,8 @@
 }
 
 /* The frozen admin.jsx puts `mono` on the CELL (slug, resource count,
-   subcategory count): 12px mono with the 1.6 body leading, so the glyphs sit
-   on the cell's own 19.2px line box. Styling only an inner span left a 13px
+   subcategory count): 12px mono with the system's body leading (1.6 Editorial,
+   1.5 Brutalist, 1.55 elsewhere), so the glyphs sit on the cell's own line box. Styling only an inner span left a 13px
    Inter strut under a 12px inline, dropping every mono glyph ~1px. Canonical
    slug sizes per panel: categories 12px, subcategories 11.5px. */
 .admin-taxonomy-table tbody .admin-taxonomy-column-slug,
@@ -171,7 +171,7 @@
 .admin-taxonomy-table tbody .admin-taxonomy-column-subcategories {
   font-family: var(--font-mono);
   font-size: 0.75rem;
-  line-height: 1.6;
+  line-height: var(--body-leading);
 }
 
 .admin-taxonomy-table tbody .admin-taxonomy-column-slug {
@@ -272,6 +272,10 @@
   border-radius: var(--radius-sm);
   color: var(--text);
   font-size: 0.75rem;
+  /* A frozen <button class="btn"> keeps the UA `line-height: normal`; the
+     preflight's inherited body leading set the label ~1px high outside
+     Editorial. */
+  line-height: normal;
 }
 
 .admin-taxonomy-row-action:hover {
