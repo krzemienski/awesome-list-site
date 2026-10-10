@@ -169,3 +169,4 @@
 - [Contract masks 500 bodies](contract-500-body-masking.md) — every /api 500 body becomes "Internal Server Error"; actionable failure text must use a non-500 status or client-side 5xx mapping.
 - [Queued optimistic rollback](queued-optimistic-rollback.md) — queued writes must roll back to last server-confirmed state, not their onMutate snapshot; failed refetch keeps loaded page.
 - [cache-headers boot locks DEV](cache-headers-boot-migrator-locks.md) — spawned prod server runs boot DDL on dev mid-crawl → seo-snapshot sheds random /tag/* 503s; retry or lease db-heavy.
+- [Before-fix proof instance](before-fix-proof-instance.md) — run pre-fix code from a /tmp copy + git show HEAD files on a 2nd port; worktree blocked, nohup dies; use run_in_background.

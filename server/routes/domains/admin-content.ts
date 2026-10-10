@@ -804,16 +804,21 @@ export function registerAdminContentRoutes(
         return res.status(404).json({ message: 'Resource not found' });
       }
       
-      // deleteResource writes the 'deleted' audit row itself, before the row is
-      // removed, so the audit FK stays valid. Logging again here would insert a row
-      // referencing the now-deleted resource and throw, masking a successful delete
-      // as a 500.
-      await resourceRepo.deleteResource(resourceId, userId);
+      // deleteResource is one transaction: it writes the single 'deleted' audit
+      // row and all dependent cleanup, or (on any failure) changes nothing.
+      // Logging again here would duplicate the audit entry.
+      const cleanup = await resourceRepo.deleteResource(resourceId, userId);
 
-      res.json({ message: 'Resource deleted successfully' });
+      res.json({ message: 'Resource deleted successfully', cleanup });
     } catch (error) {
+      if (error instanceof ConflictError) {
+        return res.status(409).json({ message: error.message });
+      }
+      if (error instanceof Error && error.name === 'ResourceNotFoundError') {
+        return res.status(404).json({ message: 'Resource not found' });
+      }
       console.error('Error deleting resource:', error);
-      res.status(500).json({ message: 'Failed to delete resource' });
+      sendOperationalFailure(res, error, 'Failed to delete resource');
     }
   });
 
@@ -896,16 +901,20 @@ export function registerAdminContentRoutes(
             failures.push({ id, reason: 'Resource not found' });
             continue;
           }
-          // deleteResource records the 'deleted' audit row before removing the row,
-          // keeping the audit FK valid; a second log here would reference the deleted
-          // id and throw.
+          // deleteResource is transactional per resource: it records the one
+          // 'deleted' audit row with its cleanup, or rolls back everything.
           await resourceRepo.deleteResource(id, userId);
           succeeded++;
         } catch (err) {
           console.error(`Error deleting resource ${id} in bulk:`, err);
           if (isDatabaseUnavailableError(err)) throw err;
           failed++;
-          failures.push({ id, reason: 'Deletion failed; resource could have dependent records' });
+          failures.push({
+            id,
+            reason: err instanceof ConflictError
+              ? err.message
+              : 'Deletion failed; nothing was changed for this resource',
+          });
         }
       }
 

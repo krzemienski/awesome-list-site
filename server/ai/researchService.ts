@@ -1,9 +1,9 @@
 import { db } from '../db';
-import { resources, researchJobs, researchDiscoveries, agentEvents } from '@shared/schema';
-import { and, eq, sql, getTableColumns } from 'drizzle-orm';
+import { resources, researchJobs, researchDiscoveries, agentEvents, categories, subcategories, subSubcategories } from '@shared/schema';
+import { and, eq, ne, or, sql, getTableColumns } from 'drizzle-orm';
 import type { ResearchJob, ResearchDiscovery, DiscoveryVerification } from '@shared/schema';
-import { CategoryRepository } from '../repositories/CategoryRepository';
-import { ensureSubSubcategoryExists } from '../repositories/ensureSubSubcategory';
+import { ensureSubSubcategoryExists, type SubSubcategoryTaxonomyAccess } from '../repositories/ensureSubSubcategory';
+import { transitionResourceInTransaction, withResourcePublication } from '../repositories/resourcePublication';
 import { tool, createSdkMcpServer } from '@anthropic-ai/claude-agent-sdk';
 import { z } from 'zod';
 import { AgentEventEmitter } from './agentEvents';
@@ -17,8 +17,8 @@ export class DiscoveryNotFoundError extends Error {
   }
 }
 export class DiscoveryConflictError extends Error {
-  constructor() {
-    super("Discovery has already been moderated");
+  constructor(message = "Discovery has already been moderated") {
+    super(message);
     this.name = "DiscoveryConflictError";
   }
 }
@@ -358,6 +358,59 @@ interface ResearchRunContext {
   /** Aborts the SDK query (slightly delayed so the in-flight tool result can land). */
   requestStop: () => void;
   addLog: (role: string, content: string, persistNow?: boolean) => Promise<void>;
+}
+
+type ApprovalTx = Parameters<Parameters<typeof db.transaction>[0]>[0];
+
+/**
+ * Taxonomy access bound to the approval transaction (mirrors the
+ * CategoryRepository reads used by ensureSubSubcategoryExists). The insert runs
+ * in a savepoint so a concurrent-create unique violation can be absorbed and
+ * re-read without aborting the enclosing approval.
+ */
+function transactionalTaxonomyAccess(tx: ApprovalTx, onCreate: () => void): SubSubcategoryTaxonomyAccess {
+  return {
+    async getCategoryByName(name) {
+      const [row] = await tx.select().from(categories).where(eq(categories.name, name));
+      return row;
+    },
+    async getSubcategoryByName(name, categoryId) {
+      const [row] = await tx.select().from(subcategories)
+        .where(and(eq(subcategories.name, name), eq(subcategories.categoryId, categoryId)));
+      return row;
+    },
+    async getSubSubcategoryByName(name, subcategoryId) {
+      const [row] = await tx.select().from(subSubcategories)
+        .where(and(eq(subSubcategories.name, name), eq(subSubcategories.subcategoryId, subcategoryId)));
+      return row;
+    },
+    async getSubSubcategoryBySlug(slug, subcategoryId) {
+      const [row] = await tx.select().from(subSubcategories)
+        .where(and(eq(subSubcategories.slug, slug), eq(subSubcategories.subcategoryId, subcategoryId)));
+      return row;
+    },
+    async findSubSubcategoryDuplicateGlobal(name, slug, excludeId) {
+      const [row] = await tx.select().from(subSubcategories)
+        .where(and(
+          excludeId === undefined ? undefined : ne(subSubcategories.id, excludeId),
+          or(sql`lower(${subSubcategories.name}) = lower(${name})`, eq(subSubcategories.slug, slug)),
+        ))
+        .limit(1);
+      return row;
+    },
+    async createSubSubcategory(values) {
+      const created = await tx.transaction(async (sp) => {
+        const [row] = await sp.insert(subSubcategories).values(values).returning();
+        if (values.subcategoryId != null) {
+          await sp.update(subcategories).set({ updatedAt: new Date() })
+            .where(eq(subcategories.id, values.subcategoryId));
+        }
+        return row;
+      });
+      onCreate();
+      return created;
+    },
+  };
 }
 
 class ResearchService {
@@ -1376,10 +1429,26 @@ STOP TARGET: this run ends AUTOMATICALLY once ${targetDiscoveries} new discoveri
     return db.select().from(researchDiscoveries).where(eq(researchDiscoveries.status, 'pending_review')).orderBy(sql`${researchDiscoveries.createdAt} DESC`);
   }
 
-  async approveDiscovery(discoveryId: number, opts: { skipDuplicateCheck?: boolean } = {}): Promise<ResearchDiscovery> {
-    const result = await db.transaction(async (tx) => {
+  /**
+   * Approve one discovery: create its resource, publish it through the shared
+   * publication helper (description gate, approvedAt/approvedBy/statusChangedAt
+   * and the one 'approved' audit row naming the acting admin), auto-create any
+   * implied sub-subcategory, mark the discovery approved and bump the job's
+   * counter — ALL in one transaction. A failure at any step leaves no resource,
+   * no taxonomy node and a still-pending discovery, so a retry can finish the
+   * original approval. Public caches are invalidated only after commit.
+   * Idempotent: re-approving an already-approved discovery returns it unchanged
+   * (no second resource, no second counter increment).
+   */
+  async approveDiscovery(
+    discoveryId: number,
+    opts: { skipDuplicateCheck?: boolean; actorId?: string } = {},
+  ): Promise<ResearchDiscovery> {
+    let createdTaxonomyNode = false;
+    const result = await withResourcePublication(async (tx) => {
     const [discovery] = await tx.select().from(researchDiscoveries).where(eq(researchDiscoveries.id, discoveryId)).for('update');
     if (!discovery) throw new DiscoveryNotFoundError();
+    if (discovery.status === 'approved' && discovery.createdResourceId != null) return discovery;
     if (discovery.status !== 'pending_review') throw new DiscoveryConflictError();
 
     // Normalized dedup guard (July 30, 2026): the per-job unique index only
@@ -1391,7 +1460,7 @@ STOP TARGET: this run ends AUTOMATICALLY once ${targetDiscoveries} new discoveri
       const existingRows = await tx.select({ id: resources.id, url: resources.url }).from(resources);
       const dup = existingRows.find(r => normalizeUrl(r.url) === norm);
       if (dup) {
-        throw new Error(`URL already exists in the database (resource #${dup.id}) — reject this discovery instead of approving it`);
+        throw new DiscoveryConflictError(`URL already exists in the database (resource #${dup.id}) — reject this discovery instead of approving it`);
       }
     }
 
@@ -1403,14 +1472,17 @@ STOP TARGET: this run ends AUTOMATICALLY once ${targetDiscoveries} new discoveri
       subSubcategory: discovery.suggestedSubSubcategory || '',
     });
 
-    await ensureSubSubcategoryExists(
-      new CategoryRepository(),
+    // Tx-backed taxonomy access: an auto-created node commits or rolls back
+    // with the approval. Run21 R4-037: an uncontainable label is stored null.
+    const taxonomyAccess = transactionalTaxonomyAccess(tx, () => { createdTaxonomyNode = true; });
+    const contained = await ensureSubSubcategoryExists(
+      taxonomyAccess,
       taxonomy.category,
       taxonomy.subcategory,
       taxonomy.subSubcategory,
     );
 
-    const [newResource] = await tx.insert(resources).values({
+    const [pendingResource] = await tx.insert(resources).values({
       // Task #248: decode again at approval so discoveries saved BEFORE the
       // save-time decode (pre-existing pending rows) still land clean.
       title: decodeHtmlEntities(discovery.title),
@@ -1418,16 +1490,28 @@ STOP TARGET: this run ends AUTOMATICALLY once ${targetDiscoveries} new discoveri
       description: decodeHtmlEntities(discovery.description || ''),
       category: taxonomy.category || 'Uncategorized',
       subcategory: taxonomy.subcategory || null,
-      subSubcategory: taxonomy.subSubcategory || null,
-      status: 'approved',
+      subSubcategory: contained ? taxonomy.subSubcategory || null : null,
+      status: 'pending',
       metadata: { source: 'ai_researcher', discoveryId: discovery.id, confidence: discovery.confidence },
     }).returning();
+
+    await transitionResourceInTransaction(
+      tx,
+      pendingResource.id,
+      { status: 'approved' },
+      opts.actorId,
+      {
+        expectedStatus: 'pending',
+        notes: `AI researcher approval: discovery #${discovery.id}${discovery.jobId ? ` (research job #${discovery.jobId})` : ''}`,
+      },
+    );
 
     const [updated] = await tx.update(researchDiscoveries).set({
       status: 'approved',
       approvedAt: new Date(),
-      createdResourceId: newResource.id,
+      createdResourceId: pendingResource.id,
     }).where(and(eq(researchDiscoveries.id, discoveryId), eq(researchDiscoveries.status, 'pending_review'))).returning();
+    if (!updated) throw new DiscoveryConflictError();
 
     if (discovery.jobId) {
       await tx.update(researchJobs)
@@ -1437,7 +1521,7 @@ STOP TARGET: this run ends AUTOMATICALLY once ${targetDiscoveries} new discoveri
 
     return updated;
     });
-    invalidatePublicCache('resource-mutation');
+    if (createdTaxonomyNode) invalidatePublicCache('category-mutation');
     return result;
   }
 
@@ -1452,7 +1536,7 @@ STOP TARGET: this run ends AUTOMATICALLY once ${targetDiscoveries} new discoveri
    * and the set is updated as the batch approves so intra-batch dupes are
    * caught too.
    */
-  async approveAllPendingDiscoveries(jobId?: number): Promise<{
+  async approveAllPendingDiscoveries(jobId?: number, actorId?: string): Promise<{
     approved: number;
     skippedDuplicates: number;
     failed: Array<{ id: number; title: string; error: string }>;
@@ -1487,7 +1571,7 @@ STOP TARGET: this run ends AUTOMATICALLY once ${targetDiscoveries} new discoveri
           skippedDuplicates++;
           continue;
         }
-        const created = await this.approveDiscovery(row.id, { skipDuplicateCheck: true });
+        const created = await this.approveDiscovery(row.id, { skipDuplicateCheck: true, actorId });
         if (created?.createdResourceId != null) {
           existingByNormUrl.set(norm, created.createdResourceId);
         }

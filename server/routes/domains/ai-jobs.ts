@@ -530,7 +530,7 @@ export function registerAiJobsRoutes(
   // Bulk approve: every pending discovery (optionally scoped to one job).
   // Registered before the /:id routes are matched by method+path anyway, but
   // 'approve-all' would also parse as :id — keep it above them for clarity.
-  app.post('/api/researcher/discoveries/approve-all', isAuthenticated, isAdmin, async (req, res) => {
+  app.post('/api/researcher/discoveries/approve-all', isAuthenticated, isAdmin, async (req: any, res) => {
     try {
       const { researchService } = await import('../../ai/researchService');
       const rawJobId = req.body?.jobId;
@@ -542,17 +542,18 @@ export function registerAiJobsRoutes(
         }
         jobId = n;
       }
-      const result = await researchService.approveAllPendingDiscoveries(jobId);
+      // The acting admin is stamped as approvedBy + audit performer per resource.
+      const result = await researchService.approveAllPendingDiscoveries(jobId, req.dbUser?.id);
       res.json({ success: true, ...result });
     } catch (error: any) {
       res.status(500).json({ message: 'Failed to bulk-approve discoveries', error: error.message });
     }
   });
 
-  app.post('/api/researcher/discoveries/:id/approve', isAuthenticated, isAdmin, async (req, res) => {
+  app.post('/api/researcher/discoveries/:id/approve', isAuthenticated, isAdmin, async (req: any, res) => {
     try {
       const { researchService } = await import('../../ai/researchService');
-      const discovery = await researchService.approveDiscovery(parseInt(req.params.id));
+      const discovery = await researchService.approveDiscovery(parseInt(req.params.id), { actorId: req.dbUser?.id });
       res.json({ success: true, discovery });
     } catch (error: any) {
       if (error?.name === 'DiscoveryNotFoundError') {

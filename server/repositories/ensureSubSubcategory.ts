@@ -24,7 +24,22 @@
  * ============================================================================
  */
 
-import { CategoryRepository } from './CategoryRepository';
+import type { CategoryRepository } from './CategoryRepository';
+
+/**
+ * The taxonomy reads/writes this helper needs. A CategoryRepository satisfies
+ * it; transactional callers (research approval) pass a tx-backed adapter so
+ * an auto-created node rolls back with the rest of their write.
+ */
+export type SubSubcategoryTaxonomyAccess = Pick<
+  CategoryRepository,
+  | 'getCategoryByName'
+  | 'getSubcategoryByName'
+  | 'getSubSubcategoryByName'
+  | 'getSubSubcategoryBySlug'
+  | 'findSubSubcategoryDuplicateGlobal'
+  | 'createSubSubcategory'
+>;
 
 function generateSlug(name: string): string {
   // BUG-055 (run25): transliterate diacritics instead of deleting them so
@@ -41,7 +56,7 @@ function generateSlug(name: string): string {
 }
 
 export async function ensureSubSubcategoryExists(
-  categoryRepo: CategoryRepository,
+  categoryRepo: SubSubcategoryTaxonomyAccess,
   categoryName: string | null | undefined,
   subcategoryName: string | null | undefined,
   subSubcategoryName: string | null | undefined,

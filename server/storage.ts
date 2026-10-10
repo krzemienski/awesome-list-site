@@ -435,7 +435,7 @@ export class DatabaseStorage implements IStorage {
   }
 
   async deleteResource(id: number): Promise<void> {
-    return this.resourceRepo.deleteResource(id);
+    await this.resourceRepo.deleteResource(id);
   }
 
   async getPendingResources(): Promise<{ resources: Resource[]; total: number }> {

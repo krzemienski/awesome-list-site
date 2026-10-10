@@ -42,6 +42,8 @@ import { tokenizeSearchQuery } from "@shared/searchNormalize";
 import { decodeResourceTextFields } from "../github/importHygiene";
 import { invalidatePublicCache } from "../cache/publicCache";
 import { transitionResourceInTransaction, withResourcePublication } from "./resourcePublication";
+import { LearningJourneyRepository } from "./LearningJourneyRepository";
+import { ConflictError } from "../middleware/errors";
 import {
   resourceFormatSchema,
   resourceProviderSchema,
@@ -357,6 +359,25 @@ function bestSearchSuggestion(query: string, titles: string[]): string | undefin
   }
   return best?.display;
 }
+
+/** Thrown by deleteResource when the resource row does not exist. */
+export class ResourceNotFoundError extends Error {
+  constructor() {
+    super('Resource not found');
+    this.name = 'ResourceNotFoundError';
+  }
+}
+
+/** Dependent rows removed or detached by a committed resource deletion. */
+export interface ResourceDeletionSummary {
+  removedEdits: number;
+  removedPendingEdits: number;
+  removedJourneySteps: number;
+  detachedDiscoveries: number;
+}
+
+// Owns journey-step removal + progress-pointer reconciliation on our transaction.
+const journeyRepo = new LearningJourneyRepository();
 
 /**
  * Repository class for resource-related database operations
@@ -1025,47 +1046,77 @@ export class ResourceRepository {
   }
 
   /**
-   * Delete a resource
-   * Logs deletion to audit log before removing the resource
-   * @param id - Resource ID to delete
-   * @throws Error if resource not found
+   * Delete a resource and every dependent row in ONE transaction.
+   *
+   * Order inside the transaction: lock the resource row, write the single
+   * 'deleted' audit entry (its resource_id FK is ON DELETE SET NULL and
+   * original_resource_id keeps the id), remove edit suggestions (no ON DELETE
+   * action), null research-discovery back-references (history is kept), then
+   * remove linked journey steps through the journeys helper — which reconciles
+   * every progress row that pointed at them (current_step_id has no ON DELETE
+   * action, so a bare cascade would fail) — and finally delete the resource.
+   * Favorites, bookmarks, tags and interactions cascade with it.
+   *
+   * Any failure rolls back EVERYTHING: edits, steps, progress, favorites,
+   * bookmarks and the audit entry are untouched and no deletion is recorded.
+   * A foreign-key refusal surfaces as a ConflictError (HTTP 409) naming the
+   * blocking table. Public caches are invalidated only after commit.
+   * @throws ResourceNotFoundError when the resource does not exist
    */
-  async deleteResource(id: number, performedBy?: string): Promise<void> {
-    // Get resource before deletion for audit log
-    const resource = await this.getResource(id);
-    if (!resource) {
-      throw new Error('Resource not found');
+  async deleteResource(id: number, performedBy?: string): Promise<ResourceDeletionSummary> {
+    try {
+      const summary = await db.transaction(async (tx) => {
+        const [resource] = await tx.select().from(resources).where(eq(resources.id, id)).for('update');
+        if (!resource) throw new ResourceNotFoundError();
+
+        const [{ count: pendingEdits }] = await tx
+          .select({ count: sql<number>`count(*) filter (where ${resourceEdits.status} = 'pending')::int` })
+          .from(resourceEdits)
+          .where(eq(resourceEdits.resourceId, id));
+        const removedEdits = await tx.delete(resourceEdits)
+          .where(eq(resourceEdits.resourceId, id))
+          .returning({ id: resourceEdits.id });
+        const detachedDiscoveries = await tx.update(researchDiscoveries)
+          .set({ createdResourceId: null })
+          .where(eq(researchDiscoveries.createdResourceId, id))
+          .returning({ id: researchDiscoveries.id });
+        const removedJourneySteps = await journeyRepo.clearProgressPointersToResource(tx, id);
+
+        const result: ResourceDeletionSummary = {
+          removedEdits: removedEdits.length,
+          removedPendingEdits: pendingEdits,
+          removedJourneySteps,
+          detachedDiscoveries: detachedDiscoveries.length,
+        };
+        await tx.insert(resourceAuditLog).values({
+          resourceId: id,
+          originalResourceId: id,
+          action: 'deleted',
+          performedBy,
+          changes: {
+            resource: { title: resource.title, url: resource.url, category: resource.category, status: resource.status },
+            cleanup: result,
+          },
+          notes: `Deleted resource: ${resource.title}`,
+        });
+
+        await tx.delete(resources).where(eq(resources.id, id));
+        return result;
+      });
+      invalidatePublicCache('resource-mutation');
+      return summary;
+    } catch (error) {
+      const code = (error as { code?: string; cause?: { code?: string } })?.code
+        ?? (error as { cause?: { code?: string } })?.cause?.code;
+      if (code === '23503') {
+        const detail = (error as { table?: string; cause?: { table?: string } });
+        const table = detail.table ?? detail.cause?.table ?? 'another table';
+        throw new ConflictError(
+          `Resource #${id} could not be deleted because records in ${table} still reference it. Nothing was changed; remove or reassign those records and try again.`,
+        );
+      }
+      throw error;
     }
-
-    // Log the deletion BEFORE deleting: the audit row's resource_id FK references
-    // resources(id), so it must be written while the row still exists. This is the
-    // single source of the 'deleted' audit entry — callers must NOT log it again
-    // afterward, or the post-delete insert violates the FK and the delete reports a
-    // false 500 despite having succeeded.
-    await this.logResourceAudit(
-      id,
-      'deleted',
-      performedBy,
-      { resource: { title: resource.title, url: resource.url, category: resource.category } },
-      `Deleted resource: ${resource.title}`
-    );
-
-    // resource_edits FK to resources(id) has no ON DELETE CASCADE (unlike the
-    // other child tables), so any suggested/approved edit rows must be removed
-    // first or the resource delete fails with a foreign-key violation (false 500).
-    await db.delete(resourceEdits).where(eq(resourceEdits.resourceId, id));
-
-    // research_discoveries.created_resource_id is a nullable FK to resources(id)
-    // with no ON DELETE action, so it would also block the delete with a
-    // foreign-key violation (false 500). The discovery record itself is history
-    // worth keeping, so null the back-reference rather than deleting the row.
-    await db
-      .update(researchDiscoveries)
-      .set({ createdResourceId: null })
-      .where(eq(researchDiscoveries.createdResourceId, id));
-
-    await db.delete(resources).where(eq(resources.id, id));
-    invalidatePublicCache('resource-mutation');
   }
 
   /**
