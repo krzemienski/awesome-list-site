@@ -18,6 +18,7 @@ description: Why pushes touching .github/workflows fail and how to push from thi
 - The platform askpass helper can return invalid Git credentials even while the GitHub integration reports healthy. An existing valid PAT through an askpass helper can authenticate without reconnecting the integration.
 - `GIT_ASKPASS` overrides repository `core.askPass`; verify the intended path rather than assuming a Git config change overrides the environment.
 - Never put credentials in a remote URL, shell command argument, or tracked helper. A helper should reference a secret environment variable and fail explicitly if absent.
+- On 2026-10-10 a plain `git push origin HEAD:refs/heads/main` from bash succeeded with a range that changed `.github/workflows/*`. Try the plain push first; fall back to the PAT path only on an actual workflow-scope rejection.
 - As of 2026-09-12, ordinary shell fetch, fast-forward merge, and push work; old claims that these are universally blocked are stale. Respect actual tool restrictions if encountered.
 - Stale `.git/*.lock` files (from interrupted operations) block the user's Git pane too; check lock file mtimes vs running git processes before assuming auth problems.
 - The code-execution notebook's `process.env` does NOT pick up secrets added after the notebook process started — freshly added secrets are visible in new bash sessions instead.
