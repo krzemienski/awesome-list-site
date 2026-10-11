@@ -1,3 +1,4 @@
+import { AsyncLocalStorage } from 'node:async_hooks';
 import { drizzle } from 'drizzle-orm/node-postgres';
 import pkg from 'pg';
 const { Pool } = pkg;
@@ -146,8 +147,53 @@ const originalPoolQuery = pool.query.bind(pool);
   }
 };
 
-// Create Drizzle ORM instance
-export const db = drizzle(pool, { schema });
+const baseDb = drizzle(pool, { schema });
+type Database = typeof baseDb;
+type Transaction = Parameters<Parameters<Database['transaction']>[0]>[0];
+interface TransactionScope {
+  tx: Transaction;
+  open: boolean;
+  afterCommit: Array<() => void>;
+}
+const transactionScope = new AsyncLocalStorage<TransactionScope>();
+
+/**
+ * Every repository imports `db`. Inside runInTransaction() it resolves to the
+ * open transaction, so a write and its audit row commit or roll back together
+ * without threading `tx` through each repository. Work that outlives the scope
+ * (un-awaited promises) falls back to the pool once the transaction closes.
+ */
+export const db: Database = new Proxy(baseDb, {
+  get(target, prop) {
+    const scope = transactionScope.getStore();
+    const active = scope?.open ? (scope.tx as unknown as Database) : target;
+    const value = Reflect.get(active, prop, active);
+    return typeof value === 'function' ? value.bind(active) : value;
+  },
+});
+
+export async function runInTransaction<T>(work: () => Promise<T>): Promise<T> {
+  if (transactionScope.getStore()?.open) return work();
+  let scope: TransactionScope | undefined;
+  try {
+    const result = await baseDb.transaction((tx) => {
+      scope = { tx, open: true, afterCommit: [] };
+      return transactionScope.run(scope, work);
+    });
+    scope!.open = false;
+    for (const callback of scope!.afterCommit) callback();
+    return result;
+  } finally {
+    if (scope) scope.open = false;
+  }
+}
+
+/** Run now, or after the surrounding runInTransaction() commits (never on rollback). */
+export function afterCommit(callback: () => void): void {
+  const scope = transactionScope.getStore();
+  if (scope?.open) scope.afterCommit.push(callback);
+  else callback();
+}
 
 // Export pool for connection testing
 export { pool };

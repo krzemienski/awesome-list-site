@@ -68,6 +68,7 @@ import { sanitizeUser, parseBoundedInt, PG_INT_MAX, validateBody } from "../../v
 import { decodeResourceTextFields } from "../../github/importHygiene";
 import { ensureSubSubcategoryExists } from "../../repositories/ensureSubSubcategory";
 import { isDatabaseUnavailableError } from "../../db/errors";
+import { runInTransaction } from "../../db";
 import { isUniqueViolation } from "../../errors/pgErrors";
 import { claudeService } from "../../ai/claudeService";
 import { send429 } from "../../middleware/rateLimit";
@@ -677,19 +678,21 @@ export function registerAdminContentRoutes(
       // existing value. Run21 R4-037: when the label can't be contained under
       // the effective category > subcategory chain, persist null instead of
       // leaving an orphan label on the row.
-      const updateContained = await ensureSubSubcategoryExists(
-        categoryRepo,
-        updateData.category ?? resource.category,
-        updateData.subcategory ?? resource.subcategory,
-        updateData.subSubcategory ?? resource.subSubcategory,
-      );
-      if (!updateContained && (updateData.subSubcategory ?? resource.subSubcategory)) {
-        updateData.subSubcategory = null;
-      }
-
-      const updatedResource = await resourceRepo.updateResource(resourceId, updateData, {
-        performedBy: userId,
-        notes: 'Resource updated by admin',
+      // An auto-created node rolls back with a failed resource write.
+      const updatedResource = await runInTransaction(async () => {
+        const updateContained = await ensureSubSubcategoryExists(
+          categoryRepo,
+          updateData.category ?? resource.category,
+          updateData.subcategory ?? resource.subcategory,
+          updateData.subSubcategory ?? resource.subSubcategory,
+        );
+        if (!updateContained && (updateData.subSubcategory ?? resource.subSubcategory)) {
+          updateData.subSubcategory = null;
+        }
+        return resourceRepo.updateResource(resourceId, updateData, {
+          performedBy: userId,
+          notes: 'Resource updated by admin',
+        });
       });
       
       res.json(updatedResource);
@@ -731,17 +734,22 @@ export function registerAdminContentRoutes(
         if (!existing) {
           return res.status(404).json({ message: 'Resource not found' });
         }
-        const updated = await resourceRepo.setResourceKind(resourceId, kind);
+        const updated = await runInTransaction(async () => {
+          const updated = await resourceRepo.setResourceKind(resourceId, kind);
+          if (updated) {
+            await auditRepo.logResourceAudit(
+              resourceId,
+              'updated',
+              req.dbUser?.id,
+              { kind, previousKind: existing.kind ?? null },
+              kind === null ? 'Resource kind cleared by admin' : 'Resource kind set by admin',
+            );
+          }
+          return updated;
+        });
         if (!updated) {
           return res.status(404).json({ message: 'Resource not found' });
         }
-        await auditRepo.logResourceAudit(
-          resourceId,
-          'updated',
-          req.dbUser?.id,
-          { kind, previousKind: existing.kind ?? null },
-          kind === null ? 'Resource kind cleared by admin' : 'Resource kind set by admin',
-        );
         res.json(updated);
       } catch (error) {
         console.error('Error updating resource kind:', error);
@@ -768,21 +776,26 @@ export function registerAdminContentRoutes(
         if (!existing) {
           return res.status(404).json({ message: 'Resource not found' });
         }
-        const updated = await resourceRepo.setResourceFeatured(resourceId, featured);
-        if (!updated) {
-          return res.status(404).json({ message: 'Resource not found' });
-        }
         const previousFeatured =
           existing.metadata && typeof existing.metadata === 'object' && !Array.isArray(existing.metadata)
             ? (existing.metadata as Record<string, unknown>).featured === true
             : false;
-        await auditRepo.logResourceAudit(
-          resourceId,
-          'updated',
-          req.dbUser?.id,
-          { featured, previousFeatured },
-          featured ? 'Resource featured by admin' : 'Resource unfeatured by admin',
-        );
+        const updated = await runInTransaction(async () => {
+          const updated = await resourceRepo.setResourceFeatured(resourceId, featured);
+          if (updated) {
+            await auditRepo.logResourceAudit(
+              resourceId,
+              'updated',
+              req.dbUser?.id,
+              { featured, previousFeatured },
+              featured ? 'Resource featured by admin' : 'Resource unfeatured by admin',
+            );
+          }
+          return updated;
+        });
+        if (!updated) {
+          return res.status(404).json({ message: 'Resource not found' });
+        }
         res.json(updated);
       } catch (error) {
         console.error('Error updating resource featured flag:', error);
@@ -1034,34 +1047,37 @@ export function registerAdminContentRoutes(
 
       // Run21 R4-037: null out labels that can't be contained under the
       // resolved category > subcategory chain instead of storing orphans.
-      const createContained = await ensureSubSubcategoryExists(
-        categoryRepo,
-        resolvedCategory,
-        resolvedSubcategory,
-        resolvedSubSubcategory,
-      );
-      if (!createContained) resolvedSubSubcategory = null;
+      // An auto-created node rolls back with a failed resource write.
+      const newResource = await runInTransaction(async () => {
+        const createContained = await ensureSubSubcategoryExists(
+          categoryRepo,
+          resolvedCategory,
+          resolvedSubcategory,
+          resolvedSubSubcategory,
+        );
+        if (!createContained) resolvedSubSubcategory = null;
 
-      const newResource = await resourceRepo.createResource({
-        title: validatedData.title,
-        url: validatedData.url,
-        description: validatedData.description || '',
-        category: resolvedCategory,
-        subcategory: resolvedSubcategory,
-        subSubcategory: resolvedSubSubcategory,
-        resourceFormat: validatedData.resourceFormat,
-        provider: validatedData.provider,
-        skillLevel: validatedData.skillLevel,
-        status: validatedData.status || 'approved',
-        submittedBy: userId,
-        kind: validatedData.kind ?? null,
-         // The admin editor submits metadata.featured on create. Preserve the
-         // validated metadata payload just like the admin update path does;
-         // omitting it here silently discarded the featured toggle.
-         metadata: validatedData.metadata,
-      }, {
-        changes: { title: validatedData.title, url: validatedData.url },
-        notes: 'Resource created by admin',
+        return resourceRepo.createResource({
+          title: validatedData.title,
+          url: validatedData.url,
+          description: validatedData.description || '',
+          category: resolvedCategory,
+          subcategory: resolvedSubcategory,
+          subSubcategory: resolvedSubSubcategory,
+          resourceFormat: validatedData.resourceFormat,
+          provider: validatedData.provider,
+          skillLevel: validatedData.skillLevel,
+          status: validatedData.status || 'approved',
+          submittedBy: userId,
+          kind: validatedData.kind ?? null,
+           // The admin editor submits metadata.featured on create. Preserve the
+           // validated metadata payload just like the admin update path does;
+           // omitting it here silently discarded the featured toggle.
+           metadata: validatedData.metadata,
+        }, {
+          changes: { title: validatedData.title, url: validatedData.url },
+          notes: 'Resource created by admin',
+        });
       });
       
       res.status(201).json(newResource);
@@ -1325,15 +1341,17 @@ export function registerAdminContentRoutes(
         return res.status(400).json(buildValidationEnvelope(validationResult.error));
       }
       
-      const newCategory = await categoryRepo.createCategory(validationResult.data);
-      
-      await auditRepo.logResourceAudit(
-        null,
-        'category_created',
-        req.dbUser.id,
-        { category: newCategory },
-        `Created category: ${newCategory.name}`
-      );
+      const newCategory = await runInTransaction(async () => {
+        const newCategory = await categoryRepo.createCategory(validationResult.data);
+        await auditRepo.logResourceAudit(
+          null,
+          'category_created',
+          req.dbUser.id,
+          { category: newCategory },
+          `Created category: ${newCategory.name}`
+        );
+        return newCategory;
+      });
       
       res.status(201).json(newCategory);
     } catch (error) {
@@ -1370,15 +1388,17 @@ export function registerAdminContentRoutes(
         return res.status(404).json({ message: 'Category not found' });
       }
       
-      const updatedCategory = await categoryRepo.updateCategory(categoryId, validationResult.data);
-      
-      await auditRepo.logResourceAudit(
-        null,
-        'category_updated',
-        req.dbUser.id,
-        { before: existingCategory, after: updatedCategory },
-        `Updated category: ${existingCategory.name}`
-      );
+      const updatedCategory = await runInTransaction(async () => {
+        const updatedCategory = await categoryRepo.updateCategory(categoryId, validationResult.data);
+        await auditRepo.logResourceAudit(
+          null,
+          'category_updated',
+          req.dbUser.id,
+          { before: existingCategory, after: updatedCategory },
+          `Updated category: ${existingCategory.name}`
+        );
+        return updatedCategory;
+      });
       
       res.json(updatedCategory);
     } catch (error) {
@@ -1409,15 +1429,16 @@ export function registerAdminContentRoutes(
         });
       }
       
-      await categoryRepo.deleteCategory(categoryId);
-      
-      await auditRepo.logResourceAudit(
-        null,
-        'category_deleted',
-        req.dbUser.id,
-        { category },
-        `Deleted category: ${category.name}`
-      );
+      await runInTransaction(async () => {
+        await categoryRepo.deleteCategory(categoryId);
+        await auditRepo.logResourceAudit(
+          null,
+          'category_deleted',
+          req.dbUser.id,
+          { category },
+          `Deleted category: ${category.name}`
+        );
+      });
       
       res.json({ message: 'Category deleted successfully' });
     } catch (error) {
@@ -1487,15 +1508,17 @@ export function registerAdminContentRoutes(
         throw new ConflictError(`A subcategory named "${nameDup.name}" already exists under ${category.name} (id ${nameDup.id}). Rename it or reuse the existing one.`);
       }
       
-      const newSubcategory = await categoryRepo.createSubcategory(validationResult.data);
-      
-      await auditRepo.logResourceAudit(
-        null,
-        'subcategory_created',
-        req.dbUser.id,
-        { subcategory: newSubcategory },
-        `Created subcategory: ${newSubcategory.name} under ${category.name}`
-      );
+      const newSubcategory = await runInTransaction(async () => {
+        const newSubcategory = await categoryRepo.createSubcategory(validationResult.data);
+        await auditRepo.logResourceAudit(
+          null,
+          'subcategory_created',
+          req.dbUser.id,
+          { subcategory: newSubcategory },
+          `Created subcategory: ${newSubcategory.name} under ${category.name}`
+        );
+        return newSubcategory;
+      });
       
       res.status(201).json(newSubcategory);
     } catch (error) {
@@ -1555,15 +1578,17 @@ export function registerAdminContentRoutes(
         }
       }
       
-      const updatedSubcategory = await categoryRepo.updateSubcategory(subcategoryId, validationResult.data);
-      
-      await auditRepo.logResourceAudit(
-        null,
-        'subcategory_updated',
-        req.dbUser.id,
-        { before: existingSubcategory, after: updatedSubcategory },
-        `Updated subcategory: ${existingSubcategory.name}`
-      );
+      const updatedSubcategory = await runInTransaction(async () => {
+        const updatedSubcategory = await categoryRepo.updateSubcategory(subcategoryId, validationResult.data);
+        await auditRepo.logResourceAudit(
+          null,
+          'subcategory_updated',
+          req.dbUser.id,
+          { before: existingSubcategory, after: updatedSubcategory },
+          `Updated subcategory: ${existingSubcategory.name}`
+        );
+        return updatedSubcategory;
+      });
       
       res.json(updatedSubcategory);
     } catch (error) {
@@ -1594,15 +1619,16 @@ export function registerAdminContentRoutes(
         });
       }
       
-      await categoryRepo.deleteSubcategory(subcategoryId);
-      
-      await auditRepo.logResourceAudit(
-        null,
-        'subcategory_deleted',
-        req.dbUser.id,
-        { subcategory },
-        `Deleted subcategory: ${subcategory.name}`
-      );
+      await runInTransaction(async () => {
+        await categoryRepo.deleteSubcategory(subcategoryId);
+        await auditRepo.logResourceAudit(
+          null,
+          'subcategory_deleted',
+          req.dbUser.id,
+          { subcategory },
+          `Deleted subcategory: ${subcategory.name}`
+        );
+      });
       
       res.json({ message: 'Subcategory deleted successfully' });
     } catch (error) {
@@ -1667,15 +1693,17 @@ export function registerAdminContentRoutes(
         throw new ConflictError(`A sub-subcategory named "${globalDup.name}" (slug "${globalDup.slug}") already exists (id ${globalDup.id}). Reuse the existing one or choose a unique name and slug.`);
       }
       
-      const newSubSubcategory = await categoryRepo.createSubSubcategory(validationResult.data);
-      
-      await auditRepo.logResourceAudit(
-        null,
-        'sub_subcategory_created',
-        req.dbUser.id,
-        { subSubcategory: newSubSubcategory },
-        `Created sub-subcategory: ${newSubSubcategory.name} under ${subcategory.name}`
-      );
+      const newSubSubcategory = await runInTransaction(async () => {
+        const newSubSubcategory = await categoryRepo.createSubSubcategory(validationResult.data);
+        await auditRepo.logResourceAudit(
+          null,
+          'sub_subcategory_created',
+          req.dbUser.id,
+          { subSubcategory: newSubSubcategory },
+          `Created sub-subcategory: ${newSubSubcategory.name} under ${subcategory.name}`
+        );
+        return newSubSubcategory;
+      });
       
       res.status(201).json(newSubSubcategory);
     } catch (error) {
@@ -1719,15 +1747,17 @@ export function registerAdminContentRoutes(
         }
       }
       
-      const updatedSubSubcategory = await categoryRepo.updateSubSubcategory(subSubcategoryId, validationResult.data);
-      
-      await auditRepo.logResourceAudit(
-        null,
-        'sub_subcategory_updated',
-        req.dbUser.id,
-        { before: existingSubSubcategory, after: updatedSubSubcategory },
-        `Updated sub-subcategory: ${existingSubSubcategory.name}`
-      );
+      const updatedSubSubcategory = await runInTransaction(async () => {
+        const updatedSubSubcategory = await categoryRepo.updateSubSubcategory(subSubcategoryId, validationResult.data);
+        await auditRepo.logResourceAudit(
+          null,
+          'sub_subcategory_updated',
+          req.dbUser.id,
+          { before: existingSubSubcategory, after: updatedSubSubcategory },
+          `Updated sub-subcategory: ${existingSubSubcategory.name}`
+        );
+        return updatedSubSubcategory;
+      });
       
       res.json(updatedSubSubcategory);
     } catch (error) {
@@ -1758,15 +1788,16 @@ export function registerAdminContentRoutes(
         });
       }
       
-      await categoryRepo.deleteSubSubcategory(subSubcategoryId);
-      
-      await auditRepo.logResourceAudit(
-        null,
-        'sub_subcategory_deleted',
-        req.dbUser.id,
-        { subSubcategory },
-        `Deleted sub-subcategory: ${subSubcategory.name}`
-      );
+      await runInTransaction(async () => {
+        await categoryRepo.deleteSubSubcategory(subSubcategoryId);
+        await auditRepo.logResourceAudit(
+          null,
+          'sub_subcategory_deleted',
+          req.dbUser.id,
+          { subSubcategory },
+          `Deleted sub-subcategory: ${subSubcategory.name}`
+        );
+      });
       
       res.json({ message: 'Sub-subcategory deleted successfully' });
     } catch (error) {

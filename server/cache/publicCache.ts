@@ -12,6 +12,7 @@
  * - committed entries, approximate bytes, and concurrent rebuilds are bounded
  */
 import { ServiceUnavailableError } from "../middleware/errors";
+import { afterCommit } from "../db";
 
 export const PUBLIC_CACHE_SCHEMA_VERSION = 1;
 
@@ -187,6 +188,12 @@ export async function getPublicCacheValue<T>(options: {
 }
 
 export function invalidatePublicCache(reason: PublicCacheInvalidationReason): void {
+  // Inside a transaction, clearing now would let a concurrent reader re-cache
+  // the pre-commit rows; a rolled-back write needs no invalidation at all.
+  afterCommit(() => clearPublicCache(reason));
+}
+
+function clearPublicCache(reason: PublicCacheInvalidationReason): void {
   generation++;
   invalidations[reason]++;
   entries.clear();

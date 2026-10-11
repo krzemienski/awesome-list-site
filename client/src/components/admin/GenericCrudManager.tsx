@@ -14,7 +14,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Plus, Trash2, Save, X, LucideIcon, Upload, FileIcon, XCircle, Bold, Italic, Underline, Strikethrough, Link, Heading, List, ListOrdered, Quote, Code, Check, ChevronsUpDown, Search, Download, Square, CheckSquare, Minus, Undo, Redo, History, Clock } from "lucide-react";
 import { Checkbox } from "@/components/ui/checkbox";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
-import { describeWriteError } from "@/lib/apiError";
+import { describeWriteError, NOTHING_CHANGED_OUTCOME } from "@/lib/apiError";
 import { formatAdminDateTime, slugify } from "@/lib/utils";
 import { apiRequest, ApiError } from "@/lib/queryClient";
 import { fetchAwesomeListNav, type AwesomeListNav } from "@/lib/static-data";
@@ -1827,7 +1827,7 @@ export default function GenericCrudManager<T extends BaseEntityWithCount>({
       // Run15 BUG-015: surface a human sentence, not a raw "400: {json}" blob.
       // P1-02/07: keep the dialog open and show the server rejection inline so
       // the operator can correct the offending field (matches ResourceManager).
-      setFormError(describeWriteError(error, { fallback: `Failed to create ${entityName.toLowerCase()}` }));
+      setFormError(describeWriteError(error, { fallback: `Failed to create ${entityName.toLowerCase()}`, outcome: NOTHING_CHANGED_OUTCOME }));
     }
   });
 
@@ -1885,7 +1885,7 @@ export default function GenericCrudManager<T extends BaseEntityWithCount>({
     onError: (error: any) => {
       // Run15 BUG-015: surface a human sentence, not a raw "400: {json}" blob.
       // P1-03/07: inline banner, dialog stays open (matches ResourceManager).
-      setFormError(describeWriteError(error, { fallback: `Failed to update ${entityName.toLowerCase()}` }));
+      setFormError(describeWriteError(error, { fallback: `Failed to update ${entityName.toLowerCase()}`, outcome: NOTHING_CHANGED_OUTCOME }));
     }
   });
 
@@ -1931,7 +1931,7 @@ export default function GenericCrudManager<T extends BaseEntityWithCount>({
       // Run15 BUG-015: surface a human sentence, not a raw "400: {json}" blob.
       toast({
         title: "Error",
-        description: describeWriteError(error, { fallback: `Failed to delete ${entityName.toLowerCase()}`, outcome: "It may not have been deleted. Refresh the list to check before trying again." }),
+        description: describeWriteError(error, { fallback: `Failed to delete ${entityName.toLowerCase()}`, outcome: NOTHING_CHANGED_OUTCOME }),
         variant: "destructive"
       });
       setDeleteDialogOpen(false);

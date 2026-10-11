@@ -1,7 +1,7 @@
 import { type MouseEvent, useEffect, useMemo, useRef, useState } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { apiRequest } from "@/lib/queryClient";
-import { describeWriteError } from "@/lib/apiError";
+import { describeWriteError, NOTHING_CHANGED_OUTCOME } from "@/lib/apiError";
 
 import { formatAdminDate, formatRelativeAgo } from "@/lib/utils";
 import { useToast } from "@/hooks/use-toast";
@@ -213,7 +213,7 @@ export default function PendingResources() {
       });
     },
     onError: (error: Error) => {
-      setApproveError(describeWriteError(error, { fallback: "Failed to approve resource. Please try again." }));
+      setApproveError(describeWriteError(error, { fallback: "Failed to approve resource. Please try again.", outcome: NOTHING_CHANGED_OUTCOME }));
     }
   });
 
@@ -238,7 +238,7 @@ export default function PendingResources() {
       });
     },
     onError: (error: Error) => {
-      setRejectError(describeWriteError(error, { fallback: "Failed to reject resource. Please try again." }));
+      setRejectError(describeWriteError(error, { fallback: "Failed to reject resource. Please try again.", outcome: NOTHING_CHANGED_OUTCOME }));
     }
   });
 

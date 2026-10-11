@@ -33,7 +33,7 @@ import { parsePageFromSearch } from "@/lib/page-param";
 // BUG-049: client-side validation mirrors the server's shared schemas so the
 // dialog flags bad input inline instead of only failing server-side.
 import { resourceTitleSchema, optionalResourceDescriptionSchema, webUrlSchema, httpsUrlSchema } from "@shared/validation";
-import { describeWriteError, extractFieldErrors } from "@/lib/apiError";
+import { describeWriteError, NOTHING_CHANGED_OUTCOME, extractFieldErrors } from "@/lib/apiError";
 import { focusElement, focusPageHeading, handoffFocusOnUnmount } from "@/hooks/focus-handoff";
 import {
   RESOURCE_FORMAT_LABELS,
@@ -381,7 +381,7 @@ export default function ResourceManager({ createRequest = 0 }: { createRequest?:
   const showServerFormError = (error: Error, fallback: string) => {
     const serverFieldErrors = extractFieldErrors(error);
     if (!serverFieldErrors) {
-      setFormError(describeWriteError(error, { fallback }));
+      setFormError(describeWriteError(error, { fallback, outcome: NOTHING_CHANGED_OUTCOME }));
       return;
     }
     const inline: { title?: string; url?: string; description?: string } = {};
@@ -528,7 +528,7 @@ export default function ResourceManager({ createRequest = 0 }: { createRequest?:
       }
       setResourceActionErrors((previousErrors) => ({
         ...previousErrors,
-        [`kind:${id}`]: describeWriteError(error, { fallback: "Failed to update resource kind" }),
+        [`kind:${id}`]: describeWriteError(error, { fallback: "Failed to update resource kind", outcome: NOTHING_CHANGED_OUTCOME }),
       }));
     },
     onSettled: (_updated, _error, { id }) => {
@@ -576,7 +576,7 @@ export default function ResourceManager({ createRequest = 0 }: { createRequest?:
       setEditForm((form) => ({ ...form, featured: previousFeatured }));
       setResourceActionErrors((previousErrors) => ({
         ...previousErrors,
-        [`featured:${id}`]: describeWriteError(error, { fallback: "Failed to update featured status" }),
+        [`featured:${id}`]: describeWriteError(error, { fallback: "Failed to update featured status", outcome: NOTHING_CHANGED_OUTCOME }),
       }));
     },
     onSettled: (_updated, _error, { id }) => {

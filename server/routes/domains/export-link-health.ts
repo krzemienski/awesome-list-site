@@ -70,7 +70,7 @@ import {
 } from "@shared/resourceKinds";
 import { taxonomyScopeIntro } from "@shared/seo-content-templates";
 import { normalizeGithubRepoInput } from "@shared/validation";
-import { db } from "../../db";
+import { db, runInTransaction } from "../../db";
 import { fetchAwesomeLists, searchAwesomeLists } from "../../github-api";
 import { syncService } from "../../github/syncService";
 import { AwesomeListFormatter } from "../../github/formatter";
@@ -299,25 +299,27 @@ export function registerExportLinkHealthRoutes(
       }
       
       // Add to queue for processing
-      const queueItem = await githubSyncRepo.addToGithubSyncQueue({
-        repositoryUrl,
-        branch: null,
-        action: 'export',
-        status: 'pending',
-        resourceIds: [],
-        metadata: options
-      });
-      queueItemId = queueItem.id;
-
       // R5-029 (run24) sweep: every bulk-export-shaped admin action leaves an
       // audit-trail entry (who, what, when) like users/export.
-      await auditRepo.logResourceAudit(
-        null,
-        'catalog.exported_github',
-        req.dbUser?.id,
-        { repositoryUrl, queueId: queueItem.id },
-        `Admin started GitHub export to ${repositoryUrl}`
-      );
+      const queueItem = await runInTransaction(async () => {
+        const queueItem = await githubSyncRepo.addToGithubSyncQueue({
+          repositoryUrl,
+          branch: null,
+          action: 'export',
+          status: 'pending',
+          resourceIds: [],
+          metadata: options
+        });
+        await auditRepo.logResourceAudit(
+          null,
+          'catalog.exported_github',
+          req.dbUser?.id,
+          { repositoryUrl, queueId: queueItem.id },
+          `Admin started GitHub export to ${repositoryUrl}`
+        );
+        return queueItem;
+      });
+      queueItemId = queueItem.id;
       
       // Process immediately in the bounded background gate.
       await startHeavyWork('github-sync', async () => {
@@ -1277,24 +1279,27 @@ export function registerExportLinkHealthRoutes(
   // no-op (0 rows).
   app.post('/api/admin/maintenance/backfill-approved-at', isAuthenticated, isAdmin, asyncHandler(async (req: any, res) => {
     try {
-      const result = await db.execute(sql`
-        UPDATE resources
-        SET approved_at = created_at
-        WHERE status = 'approved' AND approved_at IS NULL AND created_at IS NOT NULL
-        RETURNING id
-      `);
-      const backfilled = (result.rows as any[]).length;
-      const remaining = await db.execute(sql`
-        SELECT count(*)::int AS n FROM resources
-        WHERE status = 'approved' AND approved_at IS NULL
-      `);
-      await auditRepo.logResourceAudit(
-        null,
-        'maintenance_backfill_approved_at',
-        req.dbUser.id,
-        { backfilled },
-        `Backfilled approved_at from created_at on ${backfilled} approved resources`
-      );
+      const { backfilled, remaining } = await runInTransaction(async () => {
+        const result = await db.execute(sql`
+          UPDATE resources
+          SET approved_at = created_at
+          WHERE status = 'approved' AND approved_at IS NULL AND created_at IS NOT NULL
+          RETURNING id
+        `);
+        const backfilled = (result.rows as any[]).length;
+        const remaining = await db.execute(sql`
+          SELECT count(*)::int AS n FROM resources
+          WHERE status = 'approved' AND approved_at IS NULL
+        `);
+        await auditRepo.logResourceAudit(
+          null,
+          'maintenance_backfill_approved_at',
+          req.dbUser.id,
+          { backfilled },
+          `Backfilled approved_at from created_at on ${backfilled} approved resources`
+        );
+        return { backfilled, remaining };
+      });
       res.json({ backfilled, remainingNull: (remaining.rows as any[])[0].n });
     } catch (error) {
       console.error('Error backfilling approved_at:', error);
@@ -1330,26 +1335,29 @@ export function registerExportLinkHealthRoutes(
       const { canonicalByRaw, variantFamilies, pluralMerges } = buildCanonicalTagMap(allTags);
 
       // Rewrite arrays that change (canonicalize + dedupe, keep order).
-      let resourcesUpdated = 0;
-      for (const r of rows) {
-        const next = canonicalizeTagArray(r.tags, canonicalByRaw);
-        if (JSON.stringify(next) !== JSON.stringify(r.tags)) {
-          await db.execute(sql`
-            UPDATE resources
-            SET metadata = jsonb_set(metadata, '{tags}', ${JSON.stringify(next)}::jsonb)
-            WHERE id = ${r.id}
-          `);
-          resourcesUpdated++;
-          invalidatePublicCache('resource-mutation');
+      const resourcesUpdated = await runInTransaction(async () => {
+        let resourcesUpdated = 0;
+        for (const r of rows) {
+          const next = canonicalizeTagArray(r.tags, canonicalByRaw);
+          if (JSON.stringify(next) !== JSON.stringify(r.tags)) {
+            await db.execute(sql`
+              UPDATE resources
+              SET metadata = jsonb_set(metadata, '{tags}', ${JSON.stringify(next)}::jsonb)
+              WHERE id = ${r.id}
+            `);
+            resourcesUpdated++;
+          }
         }
-      }
-      await auditRepo.logResourceAudit(
-        null,
-        'maintenance_canonicalize_tags',
-        req.dbUser.id,
-        { variantFamilies, pluralMerges, resourcesUpdated },
-        `Canonicalized tags: ${variantFamilies} variant families, ${pluralMerges} plural merges, ${resourcesUpdated} resources rewritten`
-      );
+        await auditRepo.logResourceAudit(
+          null,
+          'maintenance_canonicalize_tags',
+          req.dbUser.id,
+          { variantFamilies, pluralMerges, resourcesUpdated },
+          `Canonicalized tags: ${variantFamilies} variant families, ${pluralMerges} plural merges, ${resourcesUpdated} resources rewritten`
+        );
+        return resourcesUpdated;
+      });
+      if (resourcesUpdated > 0) invalidatePublicCache('resource-mutation');
       res.json({ variantFamiliesFound: variantFamilies, pluralMerges, resourcesUpdated });
     } catch (error) {
       console.error('Error canonicalizing tags:', error);

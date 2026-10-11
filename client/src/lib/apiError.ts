@@ -133,24 +133,27 @@ export function isServerError(error: unknown): boolean {
 }
 
 /**
- * Default outcome for a failed write. Deliberately uncertain: most admin
- * routes commit the write before a separate audit-log insert, so a 500 can
- * arrive after the change landed. Retrying on a false "nothing was saved"
- * creates duplicates or conflicts.
+ * Default outcome for a failed write. Deliberately uncertain: bulk actions,
+ * job starts and other multi-step writes can fail after part of the work
+ * landed, and retrying on a false "nothing was saved" creates duplicates.
  */
 const DEFAULT_WRITE_OUTCOME = "Your change may not have been saved. Refresh to check before trying again.";
+
+/**
+ * Outcome for single-item admin writes whose change and audit row share one
+ * database transaction (moderation, edits, resource and taxonomy CRUD, kind,
+ * featured): a 5xx there means the transaction rolled back.
+ */
+export const NOTHING_CHANGED_OUTCOME = "Nothing was changed. Please try again.";
 
 export interface WriteErrorOptions {
   /** Copy for non-5xx errors whose body has no human-readable message. */
   fallback?: string;
   /**
    * Sentence telling the admin what happened to their change and what to do
-   * next. Defaults to an uncertain "may not have been saved" sentence:
-   * many routes commit the write and then fail on a follow-up step (audit
-   * log, cache), so a 500 does not prove nothing changed. Claim "nothing
-   * changed" only for routes whose write and audit share one transaction. Pass a specific
-   * one when the default is not accurate — e.g. bulk actions that are not
-   * all-or-nothing, or actions that start a job rather than save data.
+   * next. Defaults to an uncertain "may not have been saved" sentence. Pass
+   * NOTHING_CHANGED_OUTCOME only for routes whose write and audit share one
+   * transaction, or a specific sentence for bulk/job-start actions.
    */
   outcome?: string;
 }

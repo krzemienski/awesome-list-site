@@ -36,7 +36,7 @@ import {
   type Resource,
   type InsertResource,
 } from "@shared/schema";
-import { db } from "../db";
+import { db, runInTransaction } from "../db";
 import { eq, and, sql, asc, desc, like, inArray, isNull, getTableColumns } from "drizzle-orm";
 import { tokenizeSearchQuery } from "@shared/searchNormalize";
 import { decodeResourceTextFields } from "../github/importHygiene";
@@ -856,9 +856,28 @@ export class ResourceRepository {
           resource.submittedBy ?? undefined, { expectedStatus: 'pending', notes: audit.notes });
       });
     }
-    let newResource: Resource;
+    const newResource = await runInTransaction(async () => {
+      const created = await this.insertResourceHealingSequence(resource);
+      await this.logResourceAudit(
+        created.id,
+        'created',
+        resource.submittedBy ?? undefined,
+        audit.changes,
+        audit.notes,
+      );
+      return created;
+    });
+    invalidatePublicCache('resource-mutation');
+    return newResource;
+  }
+
+  private async insertResourceHealingSequence(resource: InsertResource): Promise<Resource> {
     try {
-      [newResource] = await db.insert(resources).values(resource).returning();
+      // Savepoint: a failed insert must not abort the surrounding transaction.
+      return await db.transaction(async (tx) => {
+        const [created] = await tx.insert(resources).values(resource).returning();
+        return created;
+      });
     } catch (error: any) {
       // Task #215: if the resources id sequence has drifted behind max(id)
       // (rows were ever inserted with explicit ids by imports/seeds), the
@@ -869,31 +888,16 @@ export class ResourceRepository {
       const cause = error?.cause ?? error;
       const code = error?.code ?? cause?.code;
       const constraint = String(error?.constraint ?? cause?.constraint ?? '');
-      if (code === '23505' && constraint === 'resources_pkey') {
-        console.warn(
-          'resources_id_seq drift detected (23505 on resources_pkey); resyncing sequence and retrying insert',
-        );
-        await db.execute(
-          sql`SELECT setval('resources_id_seq', (SELECT COALESCE(max(id), 1) FROM resources))`,
-        );
-        [newResource] = await db.insert(resources).values(resource).returning();
-      } else {
-        throw error;
-      }
+      if (code !== '23505' || constraint !== 'resources_pkey') throw error;
+      console.warn(
+        'resources_id_seq drift detected (23505 on resources_pkey); resyncing sequence and retrying insert',
+      );
+      await db.execute(
+        sql`SELECT setval('resources_id_seq', (SELECT COALESCE(max(id), 1) FROM resources))`,
+      );
+      const [created] = await db.insert(resources).values(resource).returning();
+      return created;
     }
-
-    invalidatePublicCache('resource-mutation');
-
-    // Log the creation
-    await this.logResourceAudit(
-      newResource.id,
-      'created',
-      resource.submittedBy ?? undefined,
-      audit.changes,
-      audit.notes,
-    );
-
-    return newResource;
   }
 
   /**

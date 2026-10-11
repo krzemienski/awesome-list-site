@@ -25,7 +25,7 @@ Verification is by real browser use / curl only (no proof packets or gates since
 | N-06 | Sub-subcategory pages, breadcrumbs, empty nodes | OPEN | |
 | N-07 | Advanced/Explorer filters survive URL reload | OPEN | |
 | N-08 | ⌘K palette keyboard flow and focus return in every system | OPEN | |
-| N-09 | Production canonical on encoded taxonomy URLs | OPEN | |
+| N-09 | Production canonical on encoded taxonomy URLs | FIXED — cause: dotted tags (video.js, node.js) were singularised; canonical/robots match per page kind on dev and prod | |
 | N-10 | Pagination, back/forward, scroll restoration | OPEN | |
 | N-11 | *(carried)* url-params-audit angle-bracket case: real regression or scrubber behaviour | OPEN | |
 | N-12 | *(discovered in N-01)* Category page subcategory cards sum below the category total; resources filed directly under the category have no card (Players & Clients 122 vs 239 dev, 330 vs 447 prod) | CONFIRMED | [N-12](proof/N-12/packet.md) |
@@ -68,7 +68,7 @@ Verification is by real browser use / curl only (no proof packets or gates since
 | M-06 | Audit tab fixed height (Actor, PII masking, status vocabulary, pagination) | FIXED — 25 per page, one-line rows (56px) in every system at 375/768/1440; target truncates with title + detail dialog; table scrolls inside its region at 375 | |
 | M-07 | Journey step editor | OPEN | |
 | M-08 | Overview tiles match SQL | OPEN | |
-| M-09 | Audit insert in the write transaction; definitive error copy | OPEN | |
+| M-09 | Audit insert in the write transaction; definitive error copy | FIXED — admin writes (taxonomy CRUD, kind, featured, resource create/update incl. auto-created sub-subcategory, export queue, tag canonicalize) run in one transaction with their audit row; cache invalidates after commit. Held ACCESS EXCLUSIVE lock on resource_audit_log: category rename and featured toggle → 503, dialog reads "Nothing was changed. Please try again.", nothing persisted; unlocked rename/delete update the public catalog immediately. Bulk/job/undo copy stays uncertain | |
 | M-10 | Admin at 375/768 in all 5 systems, no horizontal overflow | OPEN | |
 
 ## WS6 Admin operations
@@ -114,7 +114,7 @@ Verification is by real browser use / curl only (no proof packets or gates since
 | ID | Item | Status | Packet |
 |---|---|---|---|
 | S-01 | Zero hydration warnings on SSR routes | FIXED — 0 hydration warnings observed in browser console on SSR routes | |
-| S-02 | Sitemap, robots, OG, canonicals per page kind | OPEN | |
+| S-02 | Sitemap, robots, OG, canonicals per page kind | FIXED — 25 sampled sitemap URLs 200 with self-canonical; OG and robots.txt correct; dotted-tag fix shared with N-09 | |
 | S-03 | Developer API keys, rate limits, OpenAPI Try-it-out | OPEN | |
 | S-04 | Security headers; secrets in committed config | OPEN | |
 | S-05 | npm audit 0 high / 0 critical | FIXED — 0 high/0 critical (4 moderate inside drizzle-kit, fix is a downgrade) | |
