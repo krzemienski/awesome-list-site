@@ -71,7 +71,7 @@ All 50 system/accent pairs (minimum across bg, bg-2, surface/surface-2/surface-3
 | swiss | lime | 100% | 10.2880:1 | 10.2880:1 | 17.0132:1 |
 | swiss | rose | 100% | 5.8179:1 | 5.8179:1 | 8.4028:1 |
 
-Reproduce: node scripts/validation/app-accent-contrast.mjs --json. WCAG relative luminance, sRGB alpha compositing before linearisation. Values describe token backings, not browser-measured atmosphere/ancestry; browser contrast and axe proof remains required. No claim is made that uncorrected --accent passes small-text AA.
+Reproduce: node scripts/generate-design-system-artifact.mjs. WCAG relative luminance, sRGB alpha compositing before linearisation. Values describe token backings, not browser-measured atmosphere/ancestry; browser contrast and axe proof remains required. No claim is made that uncorrected --accent passes small-text AA.
 
 ---
 

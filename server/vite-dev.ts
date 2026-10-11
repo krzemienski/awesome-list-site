@@ -39,7 +39,10 @@ export async function setupVite(app: Express, server: Server) {
     try {
       const clientTemplate = path.resolve(import.meta.dirname, "..", "client", "index.html");
       const template = await fs.promises.readFile(clientTemplate, "utf-8");
-      const page = await vite.transformIndexHtml(url, template);
+      // Pathname only: with a query on "/" (e.g. /?tags=x) Vite resolves the
+      // HTML to the existing client/ directory, derives the inline-style proxy
+      // file as "/" and adds the whole filesystem to its watcher (OOM).
+      const page = await vite.transformIndexHtml(new URL(url, "http://localhost").pathname, template);
       res.status(200).set({ "Content-Type": "text/html" }).end(page);
     } catch (error) {
       vite.ssrFixStacktrace(error as Error);

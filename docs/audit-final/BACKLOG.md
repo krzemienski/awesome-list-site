@@ -27,7 +27,7 @@ Verification is by real browser use / curl only (no proof packets or gates since
 | N-08 | ⌘K palette keyboard flow and focus return in every system | OPEN | |
 | N-09 | Production canonical on encoded taxonomy URLs | FIXED — cause: dotted tags (video.js, node.js) were singularised; canonical/robots match per page kind on dev and prod | |
 | N-10 | Pagination, back/forward, scroll restoration | OPEN | |
-| N-11 | *(carried)* url-params-audit angle-bracket case: real regression or scrubber behaviour | OPEN | |
+| N-11 | *(carried)* url-params-audit angle-bracket case: real regression or scrubber behaviour | DECIDED — scrubber behaviour, not a regression: markup-shaped q/tags (incl. double-encoded) are stripped with a visible "Part of the link … was ignored" notice on /search and home; `a < b > c` and normal queries are kept. The earlier home failures were a dev-server crash (fixed: a query on "/" made Vite watch the whole filesystem → OOM) | |
 | N-12 | *(discovered in N-01)* Category page subcategory cards sum below the category total; resources filed directly under the category have no card (Players & Clients 122 vs 239 dev, 330 vs 447 prod) | CONFIRMED | [N-12](proof/N-12/packet.md) |
 | N-13 | *(discovered in N-01)* Off-origin 429 = GitHub OG thumbnail; a failed thumbnail left an empty/blurred 8rem frame on cards (and detail) | FIXED in code; AFTER capture waits for a real failure | [N-13](proof/N-13/packet.md) |
 | N-14 | *(discovered in N-12)* Sidebar child rows under a category sum below the category badge (direct resources have no row; an "All in …" row exists) | CONFIRMED | [N-14](proof/N-14/packet.md) |

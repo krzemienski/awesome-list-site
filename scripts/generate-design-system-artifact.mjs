@@ -3,11 +3,11 @@ import path from "node:path";
 import { fileURLToPath } from "node:url";
 import vm from "node:vm";
 import ts from "typescript";
-import { accentContrastTable } from "./validation/app-accent-contrast.mjs";
+import { accentContrastTable } from "./design-system/accent-contrast.mjs";
 import {
   checkArtifactDocs,
   generateArtifactDocs,
-} from "./validation/design-system-artifact-docs.mjs";
+} from "./design-system/artifact-docs.mjs";
 
 const projectRoot = path.resolve(
   path.dirname(fileURLToPath(import.meta.url)),
