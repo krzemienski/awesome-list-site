@@ -107,7 +107,7 @@
 - [Page atmosphere raster clip](page-atmosphere-raster-clip.md) — full-page radial atmosphere = seconds of raster on long pages; paint it on .page::after clipped by a per-system token, pixels unchanged; regenerate DS artifact tokens after adding tokens.
 - [Census state replay](census-state-replay.md) — historical global control ordinals drift across layout/disclosure states; repeated controls require a stable resource owner.
 - [JIT teardown order](jit-teardown-order.md) — delete the Clerk user BEFORE the local row; a live session re-provisions it via JIT within seconds, faking net-zero.
-- [Tester false defects](tester-finding-retractions.md) — Radix/cmdk ArrowDown timing, outline 0px mid-transition, Clerk card "unreachable", dialog role=0: re-check recipes before logging a bug.
+- [Tester false defects](tester-finding-retractions.md) — Radix/cmdk ArrowDown timing, outline 0px mid-transition, Clerk card "unreachable", dialog role=0, Select scroll-to-top mid smooth scroll: re-check recipes before logging a bug.
 - [Built-in tester batching](native-tester-batching.md) — ~45 s ceiling per execution: one family × ≤4 items per step, one navigation per step, running ledger; it may restart the wrong workflow.
 - [URL-sync effects vs history navigation](url-sync-effect-popstate.md) — a URL-mirroring effect must no-op once the document left its route, or popstate entries get overwritten and Back never leaves the page.
 - [Route remounts + capture re-scroll](route-remount-causes.md) — inline `component={() => …}` routes and first-observation `qc.clear()` remount pages; reveal observers must disconnect after one reveal.

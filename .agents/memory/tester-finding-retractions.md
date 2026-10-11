@@ -16,3 +16,5 @@ Re-check these before recording a defect:
 - "Sticky header clips content" at 375: content scrolling under the 56 px sticky header is by design; measure the target after scrollIntoView and click it before logging.
 - Near-black intermediate captures on the dark theme with a live DOM are the tester's capture pipeline, not a render defect; judge by final captures.
 - Admin table census taken at 2 buttons instead of ~20: the table was still loading; gate on "row count stable across two reads 2 s apart + no in-flight /api for 1 s" before counting.
+
+- **"Opening a Select jumps the page to the top"** — Playwright `locator.click()` issued while a smooth scroll (html `scroll-behavior:smooth`, or `scrollIntoView` without `behavior:'instant'`) is still animating sends the page to y=0. Real mouse click, wheel-then-click and keyboard Enter don't. Scroll with `behavior:'instant'` and click with `page.mouse.click(x,y)` before calling it a bug.
