@@ -89,3 +89,19 @@ real.
 
 **How to apply:** Gate these flows on a `pk_test_` publishable key plus a
 backend secret and report them as an explicit SKIP otherwise — never as a pass.
+
+## Session-only harnesses must use tickets
+
+**Rule:** Any validation gate that only needs a signed-in session signs in via
+the shared ticket helper in scripts/validation (backend `sign_in_tokens` +
+`__clerk_ticket` on /sign-in), never by typing a password. Only gates that
+measure the password/OTP screens themselves drive those screens.
+
+**Why:** Password-typing gates (button sweep, collections audit) failed one
+completion run after another with "did not produce an authenticated session"
+whenever Client Trust escalated to the factor chooser under suite load; each
+passed solo, so the failures looked like random flakes.
+
+**How to apply:** New gates import the helper; when an AdminGuard-style wait
+fails, report which branch rendered (authorized/forbidden/signed-out/pending),
+not a bare timeout.

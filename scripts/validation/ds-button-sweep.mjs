@@ -123,6 +123,7 @@ import { fileURLToPath } from 'url';
 import pg from 'pg';
 import { launchBrowserWithLease } from './playwright-launch-lease.mjs';
 import { acquireGateLease } from './gate-lease.mjs';
+import { signInWithClerkTicket } from './clerk-ticket-signin.mjs';
 import { collectStrayButtons, collectStrayInputs, collectStrayChips, collectStrayCards, collectStrayH1s, collectStrayEyebrows } from './ds-button-filter.mjs';
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..', '..');
@@ -973,21 +974,15 @@ try {
     throw new Error('Clerk client-trust verification did not produce an authenticated session');
   };
 
-  const signInWithClerk = async (pageToAuth, email, password) => {
+  // Session-only sign-ins use a backend-minted ticket on the real /sign-in
+  // page; the password + client-trust screens are measured separately above.
+  const signInWithClerk = async (pageToAuth, clerkUserId) => {
     await pageToAuth.goto(`${BASE}/sign-in`, { waitUntil: 'domcontentloaded', timeout: 60000 });
-    const identifier = pageToAuth.locator('input[name="identifier"]');
-    await identifier.waitFor({ timeout: 30000 });
-    await identifier.fill(email);
-    await pageToAuth.keyboard.press('Enter');
-    const passwordField = pageToAuth.locator('input[name="password"]');
-    await passwordField.waitFor({ timeout: 30000 });
-    await passwordField.fill(password);
-    await pageToAuth.keyboard.press('Enter');
-    const otp = pageToAuth.locator('input[aria-label="Enter verification code"]');
-    if (await otp.waitFor({ timeout: 20000 }).then(() => true).catch(() => false)) {
-      await otp.click();
-      await pageToAuth.keyboard.type('424242', { delay: 120 });
-    }
+    await signInWithClerkTicket(pageToAuth, {
+      clerkApi,
+      clerkUserId,
+      navigate: (route) => pageToAuth.goto(`${BASE}${route}`, { waitUntil: 'domcontentloaded', timeout: 60000 }),
+    });
     const deadline = Date.now() + 60000;
     let authenticated = false;
     while (Date.now() < deadline && !authenticated) {
@@ -997,7 +992,7 @@ try {
       });
       if (!authenticated) await pageToAuth.waitForTimeout(1500);
     }
-    if (!authenticated) throw new Error('Clerk UI sign-in did not produce an authenticated session');
+    if (!authenticated) throw new Error('Clerk ticket sign-in did not produce an app session');
   };
 
   // -------------------------------------------------------------------------
@@ -1023,7 +1018,7 @@ try {
   try {
     await purgeClerkQaUsers(PREFIX);
     await purgeLocalQaUsers();
-    await clerkApi('POST', '/users', { email_address: [email], password, skip_password_checks: true });
+    const authedClerkUser = await clerkApi('POST', '/users', { email_address: [email], password, skip_password_checks: true });
 
     verificationContext = await browser.newContext({ viewport: DESKTOP });
     const verificationPage = await verificationContext.newPage();
@@ -1034,7 +1029,7 @@ try {
     authedContext = await browser.newContext({ viewport: DESKTOP });
     const authedPage = await authedContext.newPage();
     await openClerkVerificationCodeStep(authedPage, email);
-    await signInWithClerk(authedPage, email, password);
+    await signInWithClerk(authedPage, authedClerkUser.id);
 
     // JIT provisioning created the local row during the auth poll above.
     const userId = (await pool.query('SELECT id FROM users WHERE email = $1', [email])).rows[0]?.id;
@@ -1471,7 +1466,9 @@ try {
     const existingAdmin = (await listClerkUsers()).find(
       (user) => (user.email_addresses ?? []).some((address) => address.email_address === adminEmail),
     );
+    let adminClerkUserId;
     if (existingAdmin) {
+      adminClerkUserId = existingAdmin.id;
       await clerkApi('PATCH', `/users/${existingAdmin.id}`, {
         password: adminPassword,
         skip_password_checks: true,
@@ -1479,12 +1476,12 @@ try {
       });
       console.log(`admin scenario: reusing persistent QA admin (Clerk ${existingAdmin.id}), password rotated`);
     } else {
-      await clerkApi('POST', '/users', {
+      adminClerkUserId = (await clerkApi('POST', '/users', {
         email_address: [adminEmail],
         password: adminPassword,
         skip_password_checks: true,
         ...(localAdmin ? { external_id: localAdmin.id } : {}),
-      });
+      })).id;
       console.log(localAdmin
         ? 'admin scenario: restored missing Clerk identity against the existing local admin bridge'
         : 'admin scenario: persistent QA admin not found — created it (reused on future runs)');
@@ -1498,7 +1495,7 @@ try {
         adminContext = await browser.newContext({ viewport: DESKTOP });
         adminPage = await adminContext.newPage();
         try {
-          await signInWithClerk(adminPage, adminEmail, adminPassword);
+          await signInWithClerk(adminPage, adminClerkUserId);
           return;
         } catch (error) {
           lastError = error;

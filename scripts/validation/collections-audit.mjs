@@ -10,6 +10,7 @@ import { fileURLToPath } from "url";
 import pg from "pg";
 import { launchBrowserWithLease } from "./playwright-launch-lease.mjs";
 import { acquireGateLease } from "./gate-lease.mjs";
+import { signInWithClerkTicket } from "./clerk-ticket-signin.mjs";
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..", "..");
 const { chromium } = await import(path.join(ROOT, "node_modules/playwright/index.mjs"));
@@ -62,25 +63,15 @@ async function purgeClerkQaUsers() {
   }
 }
 
-// Drive the real Clerk sign-in UI (post-Clerk there is no local login API).
-// Headless/new-device sessions land on the client-trust OTP step; +clerk_test
-// emails accept the fixed code 424242.
-async function signInWithClerk(page, signInEmail, signInPassword) {
+// Sign in via a backend-minted ticket on the real /sign-in page, then wait
+// for the app's JIT-provisioned session.
+async function signInWithClerk(page, clerkUserId) {
   await gotoPage(page, "/sign-in");
-  const identifier = page.locator('input[name="identifier"]');
-  await identifier.waitFor({ timeout: 30_000 });
-  await identifier.fill(signInEmail);
-  await page.keyboard.press("Enter");
-  const passwordField = page.locator('input[name="password"]');
-  await passwordField.waitFor({ timeout: 30_000 });
-  await passwordField.fill(signInPassword);
-  await page.keyboard.press("Enter");
-  const otp = page.locator('input[aria-label="Enter verification code"]');
-  const otpNeeded = await otp.waitFor({ timeout: 20_000 }).then(() => true).catch(() => false);
-  if (otpNeeded) {
-    await otp.click();
-    await page.keyboard.type("424242", { delay: 120 });
-  }
+  await signInWithClerkTicket(page, {
+    clerkApi,
+    clerkUserId,
+    navigate: (route) => gotoPage(page, route),
+  });
   const deadline = Date.now() + 60_000;
   while (Date.now() < deadline) {
     const auth = await page.evaluate(async () => {
@@ -90,7 +81,7 @@ async function signInWithClerk(page, signInEmail, signInPassword) {
     if (auth?.isAuthenticated === true) return;
     await page.waitForTimeout(1500);
   }
-  throw new Error("Clerk UI sign-in did not produce an authenticated session");
+  throw new Error("Clerk ticket sign-in did not produce an app session");
 }
 
 const pool = new Pool({ connectionString: DATABASE_URL });
@@ -235,11 +226,10 @@ try {
     skip_password_checks: true,
   });
   const signInPage = await ownerContext.newPage();
-  await signInWithClerk(signInPage, email, password);
+  await signInWithClerk(signInPage, clerkUser.id);
   await signInPage.close();
   const auth = await requestJson(request, "GET", "/api/auth/user");
   log("auth:clerk-session", auth.data?.isAuthenticated === true, `authenticated=${auth.data?.isAuthenticated}`);
-  void clerkUser;
 
   const catalog = await requestJson(request, "GET", "/api/resources?limit=2");
   const resources = catalog.data?.resources ?? catalog.data ?? [];

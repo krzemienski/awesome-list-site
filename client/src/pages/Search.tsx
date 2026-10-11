@@ -194,7 +194,7 @@ export default function Search() {
   const queryUrl = useMemo(() => `/api/resources?${searchApiParams(state, PAGE_SIZE).toString()}`, [state]);
   // Fetch the unfiltered first page even while the prompt is visible. Its rows
   // stay hidden, but its facet metadata makes filter-only browsing possible.
-  const query = useQuery<{ resources: DbResource[]; total: number; facets: ResourceSearchFacets; search?: { mode: "fts" | "fuzzy"; suggestion?: string } }>({ queryKey: [queryUrl], queryFn: () => apiRequest(queryUrl, { method: "GET" }), enabled: !queryTooLong, staleTime: 60_000 });
+  const query = useQuery<{ resources: DbResource[]; total: number; facets: ResourceSearchFacets; search?: { mode: "fts" | "fuzzy"; suggestion?: string }; resolvedFilters?: ResolvedFilters }>({ queryKey: [queryUrl], queryFn: () => apiRequest(queryUrl, { method: "GET" }), enabled: !queryTooLong, staleTime: 60_000 });
   const data = query.data; const results = data?.resources ?? []; const total = data?.total ?? 0; const totalPages = Math.max(1, Math.ceil(total / PAGE_SIZE)); const safePage = Math.min(state.page, totalPages);
   useEffect(() => {
     if (!queryReady || !data) return;
@@ -229,6 +229,20 @@ export default function Search() {
   }, [data, query.isLoading]);
   const lastFacets = useRef<ResourceSearchFacets>();
   if (data?.facets) lastFacets.current = data.facets;
+  // A link can name the category/subcategory by slug (?category=encoding-codecs,
+  // also the /explore redirect target). The API filters by the resolved
+  // canonical name and echoes it; the sidebar and chips must use that name so
+  // the real facet row is ticked instead of a phantom zero-count slug row. The
+  // URL keeps the slug. Resolutions are remembered so later loads don't flash
+  // the raw slug.
+  const resolvedNames = useRef<{ category: Map<string, string>; subcategory: Map<string, string> }>({ category: new Map(), subcategory: new Map() });
+  if (data?.resolvedFilters?.category) resolvedNames.current.category.set(data.resolvedFilters.category.requested, data.resolvedFilters.category.name);
+  if (data?.resolvedFilters?.subcategory) resolvedNames.current.subcategory.set(data.resolvedFilters.subcategory.requested, data.resolvedFilters.subcategory.name);
+  const filterState = {
+    ...state,
+    category: resolvedNames.current.category.get(state.category) ?? state.category,
+    subcategory: resolvedNames.current.subcategory.get(state.subcategory) ?? state.subcategory,
+  };
   useEffect(() => { if (data && state.page > totalPages) { preservePageNoticeRef.current = true; setState(s => ({ ...s, page: totalPages })); writeFilterParams({ page: totalPages > 1 ? String(totalPages) : null }, "replace"); setPageNotice(`Page ${state.page} is beyond the available results. Showing page ${totalPages}.`); } }, [data, state.page, totalPages]);
   const gotoPage = (n: number) => { setState(s => ({ ...s, page: n })); writeFilterParams({ page: n > 1 ? String(n) : null }, "push"); setPageNotice(null); pendingResultsFocusRef.current = true; window.scrollTo({ top: 0, behavior: "smooth" }); };
   const makePageHref = (n: number) => { const p = new URLSearchParams(window.location.search); if (n > 1) p.set("page", String(n)); else p.delete("page"); return `/search?${p.toString()}`; };
@@ -255,9 +269,9 @@ export default function Search() {
       <div className="flex flex-col gap-3 sm:flex-row sm:items-center"><div className="relative min-w-0 flex-1"><SearchIcon className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" /><Input ref={inputRef} value={input} onChange={e => { pristine.current = false; setInput(e.target.value); }} onMouseDown={() => { pristine.current = false; }} onKeyDown={e => { if (e.key === "/" && pristine.current && !e.ctrlKey && !e.metaKey && !e.altKey) { e.preventDefault(); window.dispatchEvent(new Event("awesome:open-search-palette")); } if (e.key === "Escape" && input) { e.preventDefault(); setInput(""); } pristine.current = false; }} placeholder="Search resources..." className="min-h-11 pl-10" aria-label="Search resources" data-testid="input-search-page" /></div>
         <div className="flex items-center gap-2"><span className="text-xs text-muted-foreground">Sort</span><Select value={state.sort} onValueChange={v => update("sort", v)}><SelectTrigger className="min-h-11 w-36" aria-label="Sort results" data-testid="select-search-sort"><SelectValue /></SelectTrigger><SelectContent>{Object.entries(sortLabels).map(([v, text]) => <SelectItem key={v} value={v}>{text}</SelectItem>)}</SelectContent></Select></div></div>
     </header>
-    <ActiveFilters state={state} onChange={update} onClear={() => clearFilters()} />
+    <ActiveFilters state={filterState} onChange={update} onClear={() => clearFilters()} />
     {pageNotice && <div className="flex items-center justify-between rounded-md border border-[var(--border)] bg-[var(--surface)] px-4 py-2 text-sm" role="status" data-testid="notice-page-adjusted"><span>{pageNotice}</span><button className="min-h-8 underline" onClick={() => { setPageNotice(null); /* C6-SWEEP-04: the notice unmounts; focus the results region */ resultsRef.current?.focus({ preventScroll: true }); }} data-testid="button-dismiss-page-notice">Dismiss</button></div>}
-    <div className="flex flex-col items-stretch gap-4 lg:flex-row lg:items-start lg:gap-6"><SearchFilters state={state} facets={data?.facets ?? lastFacets.current} onChange={update} onClear={() => clearFilters()} /><section ref={resultsRef} tabIndex={-1} aria-label="Search results" className="min-w-0 flex-1 outline-none">
+    <div className="flex flex-col items-stretch gap-4 lg:flex-row lg:items-start lg:gap-6"><SearchFilters state={filterState} facets={data?.facets ?? lastFacets.current} onChange={update} onClear={() => clearFilters()} /><section ref={resultsRef} tabIndex={-1} aria-label="Search results" className="min-w-0 flex-1 outline-none">
       {!shouldShowResults ? <Card data-testid="text-search-prompt"><CardContent className="flex flex-col items-center gap-3 py-12 text-center"><SearchIcon className="h-8 w-8 text-muted-foreground" /><h2 className="text-sm font-semibold">{normalized ? "Keep typing to search" : "Enter a query or choose filters"}</h2><p className="text-xs text-muted-foreground">{normalized ? "Type a word of at least 2 letters or digits (common words like “and” or “the” are skipped), or choose a filter to browse." : "Narrow the catalog by category, provider, format, skill level, or tag."}</p><Button asChild variant="outline"><Link href="/categories">Browse categories</Link></Button></CardContent></Card>
        : queryTooLong ? <Card data-testid="search-query-too-long"><CardContent className="flex flex-col items-center gap-3 py-10 text-center"><AlertCircle className="h-8 w-8 text-[var(--accent-ink)]" /><p className="text-sm text-muted-foreground" role="alert">Search is limited to {SEARCH_QUERY_MAX_LENGTH} characters. This query has {normalized.length.toLocaleString()} — shorten it to search.</p><Button variant="outline" onClick={clearSearch} data-testid="button-clear-long-query">Clear search</Button></CardContent></Card>
        : offline ? <Card data-testid="search-results-offline"><CardContent className="flex flex-col items-center gap-3 py-10 text-center" role="alert"><WifiOff className="h-8 w-8 text-[var(--accent-ink)]" aria-hidden="true" /><h2 className="text-sm font-semibold">You’re offline</h2><p className="text-sm text-muted-foreground">Search couldn’t reach the catalog because your device has no connection. Results will load on their own when you reconnect.</p>{stillOffline && <p className="text-xs text-muted-foreground" data-testid="text-search-still-offline">Still offline — reconnect and try again.</p>}<Button variant="outline" onClick={retrySearch} data-testid="button-retry-offline-search">Try again</Button></CardContent></Card>
@@ -268,3 +282,8 @@ export default function Search() {
     </section></div>
   </div>;
 }
+
+
+interface ResolvedFilter { requested: string; name: string }
+
+interface ResolvedFilters { category?: ResolvedFilter; subcategory?: ResolvedFilter }

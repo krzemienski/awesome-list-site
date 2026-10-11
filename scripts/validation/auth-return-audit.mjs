@@ -14,6 +14,7 @@ import { fileURLToPath } from "url";
 import pg from "pg";
 import { launchBrowserWithLease } from "./playwright-launch-lease.mjs";
 import { acquireGateLease } from "./gate-lease.mjs";
+import { signInWithClerkTicket } from "./clerk-ticket-signin.mjs";
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..", "..");
 const { chromium } = await import(path.join(ROOT, "node_modules/playwright/index.mjs"));
@@ -251,39 +252,6 @@ async function gotoPage(page, route) {
     }
   }
   throw new Error(`Unable to load ${route} for auth return audit (${last})`);
-}
-
-// Sign in through the real <SignIn> component with a backend-minted sign-in
-// ticket instead of typing a password. Clerk's Client Trust feature routes
-// repeated password sign-ins from this container to /sign-in/client-trust
-// (new-device verification), which tests Clerk's risk state rather than the
-// app's return contract. A `__clerk_ticket` on the current sign-in URL keeps
-// everything the audit owns intact: the page is still /sign-in carrying the
-// app-built redirect_url, and Clerk's own component completes the ticket and
-// performs the redirect the audit then verifies.
-async function signInWithClerkTicket(page, clerkUserId) {
-  const signInUrl = new URL(page.url());
-  if (!signInUrl.pathname.startsWith("/sign-in")) {
-    throw new Error(`ticket sign-in must start on /sign-in; path=${signInUrl.pathname}`);
-  }
-  const ticket = await clerkApi("POST", "/sign_in_tokens", {
-    user_id: clerkUserId,
-    expires_in_seconds: 600,
-  });
-  signInUrl.searchParams.set("__clerk_ticket", ticket.token);
-  await gotoPage(page, signInUrl.pathname + signInUrl.search);
-  const deadline = Date.now() + 90_000;
-  while (Date.now() < deadline) {
-    const signedIn = await page
-      .evaluate(() => Boolean(window.Clerk?.user))
-      .catch(() => false);
-    if (signedIn || !new URL(page.url()).pathname.startsWith("/sign-in")) return;
-    await page.waitForTimeout(500);
-  }
-  throw new Error(
-    `Clerk ticket sign-in did not reach an authenticated session; ` +
-      `path=${new URL(page.url()).pathname}`,
-  );
 }
 
 async function waitForAuthenticatedSession(page, expectedPath) {
@@ -542,7 +510,11 @@ try {
     throw new Error("Disposable Clerk account was not visible immediately after creation");
   }
 
-  await signInWithClerkTicket(page, createdClerkUser.id);
+  await signInWithClerkTicket(page, {
+    clerkApi,
+    clerkUserId: createdClerkUser.id,
+    navigate: (route) => gotoPage(page, route),
+  });
 
   const authState = await waitForAuthenticatedSession(page, "/submit");
 
@@ -623,7 +595,11 @@ try {
       );
     }
 
-    await signInWithClerkTicket(page, routeClerkUser.id);
+    await signInWithClerkTicket(page, {
+      clerkApi,
+      clerkUserId: routeClerkUser.id,
+      navigate: (route) => gotoPage(page, route),
+    });
     const routeAuthState = await waitForAuthenticatedSession(page, routeUrl.pathname);
     const returned = new URL(page.url());
     const returnedRoute = returned.pathname + returned.search + returned.hash;
@@ -660,15 +636,28 @@ try {
       // bypass was one-shot) so AdminGuard resolves fresh authoritative state.
       await gotoPage(page, route);
       const reloadedAdminPath = new URL(page.url()).pathname + new URL(page.url()).search;
-      const adminMarker = page.getByTestId("admin-authorized");
-      const adminGuardPassed = await adminMarker
-        .waitFor({ state: "attached", timeout: 30_000 })
-        .then(() => true)
-        .catch(() => false);
+      // Wait for AdminGuard to leave its "Verifying access" state and name the
+      // branch it settled on, so a failure says forbidden/signed-out/pending
+      // instead of a bare timeout when the full suite saturates the machine.
+      const guardBranch = await page
+        .locator(
+          '[data-testid="admin-authorized"], [data-testid="text-admin-forbidden"], [data-testid="link-admin-login"]',
+        )
+        .first()
+        .waitFor({ state: "attached", timeout: 60_000 })
+        .then(() =>
+          page.evaluate(() => {
+            if (document.querySelector('[data-testid="admin-authorized"]')) return "authorized";
+            if (document.querySelector('[data-testid="text-admin-forbidden"]')) return "forbidden";
+            return "signed-out";
+          }),
+        )
+        .catch(() => "still-verifying");
+      const adminGuardPassed = guardBranch === "authorized";
       log(
         `clerk-auth${route}:authorized-page`,
         adminRole === "admin" && reloadedAdminPath === expectedTarget && adminGuardPassed,
-        `role=${adminRole} path=${reloadedAdminPath} authorized_guard=${adminGuardPassed}`,
+        `role=${adminRole} path=${reloadedAdminPath} guard=${guardBranch}`,
       );
       if (adminRole !== "admin" || reloadedAdminPath !== expectedTarget || !adminGuardPassed) {
         throw new Error(`Admin account returned to ${route} without authorized content`);

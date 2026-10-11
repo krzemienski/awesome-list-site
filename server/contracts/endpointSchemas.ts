@@ -199,6 +199,8 @@ const authUserResponseSchema = z.object({
 // GET /api/resources
 // ---------------------------------------------------------------------------
 
+const resolvedFilterSchema = z.object({ requested: z.string(), name: z.string() });
+
 const resourcesListResponseSchema = z.object({
   resources: z.array(publicResourceSchema),
   total: z.number(),
@@ -217,6 +219,12 @@ const resourcesListResponseSchema = z.object({
   search: z.object({
     mode: z.enum(["fts", "fuzzy"]),
     suggestion: z.string().optional(),
+  }).optional(),
+  // Present only when a ?category= / ?subcategory= slug resolved to a
+  // canonical taxonomy name; `requested` is the value as sent.
+  resolvedFilters: z.object({
+    category: resolvedFilterSchema.optional(),
+    subcategory: resolvedFilterSchema.optional(),
   }).optional(),
 });
 

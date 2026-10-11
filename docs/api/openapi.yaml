@@ -1209,6 +1209,32 @@ components:
           required:
             - mode
           additionalProperties: false
+        resolvedFilters:
+          type: object
+          properties:
+            category:
+              type: object
+              properties:
+                requested:
+                  type: string
+                name:
+                  type: string
+              required:
+                - requested
+                - name
+              additionalProperties: false
+            subcategory:
+              type: object
+              properties:
+                requested:
+                  type: string
+                name:
+                  type: string
+              required:
+                - requested
+                - name
+              additionalProperties: false
+          additionalProperties: false
       required:
         - resources
         - total

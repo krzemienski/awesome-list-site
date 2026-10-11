@@ -306,11 +306,16 @@ export function registerCatalogContributionsRoutes(
       // (no wasted query for the common name-based calls). Subcategory slugs are
       // unique only per category, so they resolve only once the category does.
       const SLUG_SHAPE = /^[a-z0-9-]+$/;
+      // Echo every slug-to-name resolution so the client can show the facet
+      // row and chip under the canonical name the facet counts use, instead
+      // of a phantom zero-count row named after the raw slug.
+      const resolvedFilters: { category?: { requested: string; name: string }; subcategory?: { requested: string; name: string } } = {};
       let resolvedCategory: { id: number; name: string } | undefined;
       if (category && SLUG_SHAPE.test(category)) {
         const cat = await categoryRepo.getCategoryBySlug(category);
         if (cat) {
           resolvedCategory = cat;
+          resolvedFilters.category = { requested: category, name: cat.name };
           category = cat.name;
         }
       }
@@ -321,7 +326,10 @@ export function registerCatalogContributionsRoutes(
         const sub = resolvedCategory
           ? await categoryRepo.getSubcategoryBySlug(subcategory, resolvedCategory.id)
           : await categoryRepo.getSubcategoryBySlugGlobal(subcategory);
-        if (sub) subcategory = sub.name;
+        if (sub) {
+          resolvedFilters.subcategory = { requested: subcategory, name: sub.name };
+          subcategory = sub.name;
+        }
       }
 
       // BUG-002: sub-subcategory filter. The audit's reproduction passes the
@@ -415,6 +423,7 @@ export function registerCatalogContributionsRoutes(
           totalPages,
           hasMore: nextOffset !== null,
         },
+        ...(Object.keys(resolvedFilters).length ? { resolvedFilters } : {}),
       });
     } catch (error) {
       console.error('Error fetching resources:', error);
