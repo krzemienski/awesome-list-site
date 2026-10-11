@@ -158,3 +158,4 @@
 - [Edge decodes %-escapes](edge-percent-decoding.md) — prod edge decodes %2D etc. before the app, so escape-normalising 301s never fire on awesome.video; probe via trailing-slash echo.
 - [Symbol glyph fallback faces](symbol-glyph-font-faces.md) — unicode-range family augmentation must mirror every weight/style (Chrome); Vite inlines <4KB fonts; no url rebasing.
 - [Retry predicates that never stop](query-retry-predicate-forever.md) — a local useQuery retry fn ignoring failureCount loops 5xx forever (skeleton, no error UI); folded admin panels need unfolding in proofs.
+- [Vite transformIndexHtml query OOM](vite-transform-html-query-oom.md) — pass pathname only; a query on "/" makes Vite watch the whole filesystem → OOM + fake "all files changed" bursts.

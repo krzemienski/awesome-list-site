@@ -69,7 +69,7 @@ Verification is by real browser use / curl only (no proof packets or gates since
 | M-07 | Journey step editor | OPEN | |
 | M-08 | Overview tiles match SQL | OPEN | |
 | M-09 | Audit insert in the write transaction; definitive error copy | FIXED — admin writes (taxonomy CRUD, kind, featured, resource create/update incl. auto-created sub-subcategory, export queue, tag canonicalize) run in one transaction with their audit row; cache invalidates after commit. Held ACCESS EXCLUSIVE lock on resource_audit_log: category rename and featured toggle → 503, dialog reads "Nothing was changed. Please try again.", nothing persisted; unlocked rename/delete update the public catalog immediately. Bulk/job/undo copy stays uncertain | |
-| M-10 | Admin at 375/768 in all 5 systems, no horizontal overflow | OPEN | |
+| M-10 | Admin at 375/768 in all 5 systems, no horizontal overflow | NOT-REPRODUCED — all 15 admin tabs (activation checked) × 5 systems × 375/768: document scrollWidth = clientWidth; wide tables scroll inside their own region | |
 
 ## WS6 Admin operations
 | ID | Item | Status | Packet |
