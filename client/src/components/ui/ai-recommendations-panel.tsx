@@ -522,7 +522,7 @@ export default function AIRecommendationsPanel({
       {isError && !hasUsefulResults ? (
         <Alert variant="destructive" data-testid="error-state">
           <AlertCircle className="h-4 w-4" />
-          <AlertTitle>Recommendations couldn’t be refreshed</AlertTitle>
+          <AlertTitle>Recommendations couldn’t load</AlertTitle>
           <AlertDescription className="space-y-3">
             <p>{error instanceof Error ? error.message : "An unexpected error occurred."}</p>
             <Button type="button" size="sm" variant="outline" onClick={(e) => { handoffFocusOnUnmount(e.currentTarget); retry(); }}>
