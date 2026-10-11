@@ -130,11 +130,11 @@ export default function TagLanding() {
         <h1 className="display-h">Error Loading Tag</h1>
         <p>Please try again.</p>
         <div className="flex flex-wrap justify-center gap-2">
-          <Button variant="outline" className="min-h-10" onClick={(e) => { handoffFocusOnUnmount(e.currentTarget); void listing.refetch(); }}>Retry</Button>
-          <Button asChild variant="outline" className="min-h-10">
+          <Button variant="outline" className="min-h-11" onClick={(e) => { handoffFocusOnUnmount(e.currentTarget); void listing.refetch(); }}>Retry</Button>
+          <Button asChild variant="outline" className="min-h-11">
             <Link href="/categories" data-testid="link-tag-error-categories">Browse categories</Link>
           </Button>
-          <Button asChild className="min-h-10">
+          <Button asChild className="min-h-11">
             <Link href="/" data-testid="link-tag-error-home"><ArrowLeft className="h-4 w-4" />Back to Home</Link>
           </Button>
         </div>
@@ -239,13 +239,13 @@ export default function TagLanding() {
           <h2 id="related-topics-heading" className="text-base font-semibold">Explore related topics</h2>
           <div className="flex flex-wrap gap-2">
             {categories.map((category) => (
-              <Link key={category.value} href={`/category/${slugify(category.value)}`} className="inline-flex min-h-10 items-center">
-                <Badge variant="secondary" className="min-h-10 px-3">{category.value} ({category.count})</Badge>
+              <Link key={category.value} href={`/category/${slugify(category.value)}`} className="inline-flex min-h-11 items-center">
+                <Badge variant="secondary" className="min-h-11 px-3">{category.value} ({category.count})</Badge>
               </Link>
             ))}
             {relatedTags.map(([related, count]) => (
-              <Link key={related} href={tagLandingPath(related)} className="inline-flex min-h-10 items-center">
-                <Badge variant="outline" className="min-h-10 px-3">#{tagDisplayName(related)} ({count})</Badge>
+              <Link key={related} href={tagLandingPath(related)} className="inline-flex min-h-11 items-center">
+                <Badge variant="outline" className="min-h-11 px-3">#{tagDisplayName(related)} ({count})</Badge>
               </Link>
             ))}
           </div>

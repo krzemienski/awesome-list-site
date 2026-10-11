@@ -58,6 +58,7 @@
 .header-account-menu [role="menuitem"] { min-height: 44px; }
 @media (max-width: 1180px) { .app-canonical-header .header-search-trigger { min-width: 180px; } }
 @media (max-width: 1024px) {
+  .app-canonical-header .header-brand { min-width: 44px; min-height: 44px; }
   /* Overrides canonical `@media (min-width: 769px) .mobile-menu-btn { display: none !important }`. */
   .app-canonical-header .mobile-menu-btn { display: inline-flex !important; }
   .app-canonical-header .header-menu-control { display: inline-flex; }

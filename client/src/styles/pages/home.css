@@ -910,6 +910,18 @@
 }
 
 @media (max-width: 1024px) {
+  .home-category-heading,
+  .home-subcategory-row {
+    min-height: 44px;
+  }
+
+  .home-subcategory-more {
+    display: inline-flex;
+    align-items: center;
+    min-height: 44px;
+    margin-top: 0;
+  }
+
   .home-index-grid {
     grid-template-columns: 1fr;
   }

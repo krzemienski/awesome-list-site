@@ -166,7 +166,7 @@ function RecommendationFeedback({
               variant="outline"
               size="sm"
               className={cn(
-                "h-9 min-h-9 whitespace-nowrap",
+                "h-11 min-h-11 min-[1025px]:h-9 min-[1025px]:min-h-9 whitespace-nowrap",
                 selected && option.activeClass,
               )}
               onClick={(event) => {

@@ -160,6 +160,12 @@
     border: var(--border-w) solid ButtonText;
   }
 }
+@media (max-width: 1024px) {
+  .app-footer .app-footer-name { display: flex; align-items: center; min-height: 44px; }
+  .app-footer-repo { min-height: 44px; }
+  .app-footer-meta-links > a,
+  .app-footer-meta-links > button { min-width: 44px; justify-content: center; }
+}
 @media (max-width: 1100px) {
   .app-footer-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 40px 32px; }
   .app-footer-identity { grid-column: 1 / -1; }

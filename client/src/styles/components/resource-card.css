@@ -316,6 +316,14 @@
   background: color-mix(in srgb, var(--accent) 10%, transparent);
 }
 
+/* Touch widths: the card's own controls reach the 44px floor. */
+@media (max-width: 1024px) {
+  .resource-card__meta-link,
+  .btn.resource-card__more-tags {
+    min-height: 44px;
+  }
+}
+
 @media (max-width: 40rem) {
   .resource-card {
     padding: 1rem;

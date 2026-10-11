@@ -165,7 +165,7 @@ export function Paginator({
   };
 
   const linkBase =
-    "inline-flex h-8 min-w-8 items-center justify-center px-2 text-sm tabular-nums rounded-[var(--radius)] border transition-colors";
+    "inline-flex h-11 min-w-11 min-[1025px]:h-8 min-[1025px]:min-w-8 items-center justify-center px-2 text-sm tabular-nums rounded-[var(--radius)] border transition-colors";
 
   const items = pageWindow(currentPage, totalPages);
 
