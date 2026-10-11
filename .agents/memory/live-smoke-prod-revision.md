@@ -7,4 +7,7 @@ description: How to tell which code production really runs, and how to do signed
   **How to apply:** before calling a publish "live", diff a server-behaviour marker from that commit against prod (response shape, serializer output), not just `/api/version`.
 - Throwaway prod accounts can't be created: prod /sign-up has a Cloudflare Turnstile challenge plus a real emailed code.
   **How to apply:** ask the owner to approve using the owner admin account, snapshot bookmarks/favorites/prefs/journey progress first, drive writes through the UI, and diff the snapshot after (restore the theme to the exact prior value, never both-null).
+- Read-only proof that a prod admin write route exists without calling it: send an anonymous request with that method (plus Origin). 401 means the route is mounted; an unknown /api/admin/* path gives 404.
+  **Why:** you get route-level proof for cancel/start endpoints without the side effects of an authenticated call.
+- For signed-in read-only admin sweeps, route-abort every non-GET /api request in the page. The only ones seen are `POST /api/send`. These are the Replit-injected widget beacon, not app writes.
 - A one-off 500 from admin-login with no 5xx in the deployment logs is the platform edge; retry once.

@@ -1,0 +1,52 @@
+admin-login 200
+auth/user role= admin
+version {"revision":"b051a2e4972f93b53603fc3fe0d2c575c34323c6"}
+
+== GET /api/admin/link-health/status 200 job keys: id,status,totalLinks,checkedLinks,healthyLinks,brokenLinks,redirectLinks,timeoutLinks,suspectLinks,startedAt,completedAt,createdAt
+{"id":8,"status":"completed","totalLinks":3823,"checkedLinks":3823,"startedAt":"2026-08-04T23:01:48.126Z","completedAt":"2026-08-05T00:18:50.812Z"}
+
+== GET /api/admin/link-health/history 200 top keys: success,jobs
+  #8 completed err=null 2026-08-05T00:18:50.812Z
+  #7 failed err="Interrupted by server restart" 2026-08-04T22:53:57.790Z
+  #6 failed err="Interrupted by server restart" 2026-08-04T22:15:43.329Z
+  #5 completed err=null 2026-08-04T16:21:35.628Z
+  #4 completed err=null 2026-08-04T15:03:13.790Z
+  #3 completed err=null 2026-08-04T04:54:45.500Z
+  #2 completed err=null 2026-07-21T08:36:04.534Z
+  #1 completed err=null 2026-07-21T07:47:14.896Z
+
+== GET /api/github/sync-status 200 total 49
+item key union: id,repositoryUrl,branch,action,status,errorMessage,importResult,resourceCount,createdAt,processedAt
+  #1 import failed importResult={"imported":0,"updated":0,"skipped":0,"errors":0,"errorMessages":[]} err="Orphaned by server restart"
+  #2 import failed importResult={"imported":0,"updated":0,"skipped":0,"errors":0,"errorMessages":[]} err=null
+  #3 import failed importResult={"imported":0,"updated":0,"skipped":0,"errors":0,"errorMessages":[]} err="Orphaned by server restart"
+  #4 import completed importResult={"imported":241,"updated":557,"skipped":0,"errors":0,"errorMessages":[]} err=null
+  #5 export failed importResult=null err=null
+  #6 export failed importResult=null err=null
+  #7 export failed importResult=null err=null
+  #8 export failed importResult=null err=null
+  #9 import completed importResult={"imported":252,"updated":546,"skipped":0,"errors":0,"errorMessages":[]} err=null
+  #10 import failed importResult={"imported":0,"updated":0,"skipped":0,"errors":0,"errorMessages":[]} err=null
+  #11 import completed importResult={"imported":201,"updated":597,"skipped":0,"errors":0,"errorMessages":[]} err=null
+  #12 export failed importResult=null err="Orphaned by server restart"
+  #13 export failed importResult=null err=null
+  #14 export failed importResult=null err=null
+  #15 export failed importResult=null err=null
+terminal imports: 22 with importResult: 22 with errorMessages array: 22 partial: 0
+
+== GET /api/github/sync-history 200 rows 49
+   {"id":4,"repositoryUrl":"krzemienski/awesome-video","direction":"export","status":"completed","commitSha":"be0c146ae2dbab74e21ba6bc65706545d5fb02b5","commitMessage":"Initial awesome list export","errorMessage":null,"errorMessages":[],"commitUrl":"https://github.com/krzemienski/awesome-video/commit/b
+   {"id":3,"repositoryUrl":"https://github.com/krzemienski/awesome-video","direction":"export","status":"completed","commitSha":"e72762098f6f76bb741053db56ffaa34ec5debb1","commitMessage":"Added 0 resources, updated 488, removed 0","errorMessage":null,"errorMessages":[],"commitUrl":"https://github.com/k
+   {"id":2,"repositoryUrl":"https://github.com/krzemienski/awesome-video","direction":"export","status":"completed","commitSha":"3f83f3b8c66e2f404cc7979c030f5a4c9033b695","commitMessage":"Added 4 resources, updated 369, removed 4","errorMessage":null,"errorMessages":[],"commitUrl":"https://github.com/k
+   {"id":1,"repositoryUrl":"https://github.com/krzemienski/awesome-video","direction":"export","status":"completed","commitSha":"7505d39b404b04a204afbef3c2507f14107a31e9","commitMessage":"Initial awesome list export","errorMessage":null,"errorMessages":[],"commitUrl":"https://github.com/krzemienski/awe
+   {"id":1000045,"repositoryUrl":"https://github.com/krzemienski/awesome-video","direction":"export","status":"failed","commitSha":null,"commitMessage":null,"errorMessage":"Export failed: timeout exceeded when trying to connect","errorMessages":[],"commitUrl":null,"resourcesAdded":0,"resourcesUpdated":
+   {"id":1000044,"repositoryUrl":"https://github.com/krzemienski/awesome-video","direction":"export","status":"completed","commitSha":null,"commitMessage":null,"errorMessage":null,"errorMessages":[],"commitUrl":null,"resourcesAdded":0,"resourcesUpdated":0,"resourcesRemoved":0,"totalResources":2302,"per
+
+== GET /api/admin/audit-logs?limit=50&offset=0 200 total 16581 export rows in window: 4
+  #27235 categories.exported 2026-10-09T04:17:42.675Z {"format":"opml","resources":3824,"categories":9}
+  #27234 catalog.exported 2026-10-09T04:17:40.765Z {"format":"markdown","rowCount":3824}
+  #27233 resources.exported 2026-10-09T04:17:39.571Z {"format":"csv","rowCount":4038}
+  #27232 database.exported 2026-10-09T04:17:38.924Z {"users":118,"format":"json","resources":4038}
+export actions in last 500 audit rows: {"categories.exported":10,"catalog.exported":10,"resources.exported":10,"database.exported":10}
+
+admin-logout 200

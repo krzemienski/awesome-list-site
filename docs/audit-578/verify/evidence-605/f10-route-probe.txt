@@ -1,0 +1,2 @@
+anonymous DELETE https://awesome.video/api/admin/link-health/jobs/999999999 -> 401 {"message":"Unauthorized"}
+anonymous DELETE https://awesome.video/api/admin/zz-no-such-route-605 -> 404 {"message":"Not found"}

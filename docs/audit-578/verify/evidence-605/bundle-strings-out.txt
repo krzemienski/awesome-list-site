@@ -1,0 +1,15 @@
+chunks downloaded: 131
+F01        absent "database unchanged" 
+F01        FOUND  "seed-result-failed" /assets/AdminDashboard-DBSwr9iN.js
+F02        FOUND  "Seeding partially failed" /assets/AdminDashboard-DBSwr9iN.js
+F02        FOUND  "seed-result-partial" /assets/AdminDashboard-DBSwr9iN.js
+F03        FOUND  "Non-restorable catalog snapshot" /assets/AdminDashboard-DBSwr9iN.js
+F04_absent absent "No supported admin endpoint is currently available for this format" 
+F05        FOUND  "resources.exported" /assets/AdminDashboard-DBSwr9iN.js
+F05        FOUND  "categories.exported" /assets/AdminDashboard-DBSwr9iN.js
+F08        FOUND  "Link health data could not be refreshed" /assets/AdminDashboard-DBSwr9iN.js
+F09        FOUND  "Counts and problem links below are from the previous completed scan" /assets/AdminDashboard-DBSwr9iN.js
+F10        FOUND  "Cancel running scan" /assets/AdminDashboard-DBSwr9iN.js
+F11        FOUND  "Cancel link check" /assets/AdminDashboard-DBSwr9iN.js
+F11        FOUND  "Checks the stored URL of every approved resource" /assets/AdminDashboard-DBSwr9iN.js
+F13        FOUND  "Failed items (" /assets/AdminDashboard-DBSwr9iN.js

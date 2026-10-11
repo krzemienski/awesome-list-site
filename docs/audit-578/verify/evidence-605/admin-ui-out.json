@@ -1,0 +1,250 @@
+{
+  "390": {
+    "exp": {
+      "cards": [
+        {
+          "title": "JSON Snapshot",
+          "desc": "Non-restorable catalog snapshot, not a full database backup. Includes resources, category hierarchy, tags, learning journeys, sync queue and limited user summaries. Omits user identities, favorites, bookmarks, contributions, audit history, AI jobs and discoveries, notification preferences and other application state.",
+          "button": "Download"
+        },
+        {
+          "title": "CSV (resources)",
+          "desc": "Flat resource table for spreadsheet workflows.",
+          "button": "Download"
+        },
+        {
+          "title": "README.md",
+          "desc": "Awesome-list flavored Markdown for the GitHub repo.",
+          "button": "Generate"
+        },
+        {
+          "title": "OPML (categories)",
+          "desc": "Hierarchical export for feed readers.",
+          "button": "Download"
+        }
+      ],
+      "hasSqlDump": false,
+      "hasApiToken": false,
+      "historyRows": [
+        {
+          "action": "categories.exported",
+          "text": "Category tree opml COMPLETED 3,824 Oct 9, 2026, 04:17 AM"
+        },
+        {
+          "action": "catalog.exported",
+          "text": "Awesome list markdown COMPLETED 3,824 Oct 9, 2026, 04:17 AM"
+        },
+        {
+          "action": "resources.exported",
+          "text": "Resources csv COMPLETED 4,038 Oct 9, 2026, 04:17 AM"
+        },
+        {
+          "action": "database.exported",
+          "text": "Catalog snapshot json COMPLETED 4,038 Oct 9, 2026, 04:17 AM"
+        }
+      ],
+      "linkJobPanel": "Link check #8 COMPLETED Checks the stored URL of every approved resource — the same URLs the exports write. Completed Aug 5, 2026, 12:18 AM: 3,809 healthy, 12 broken, 0 redirects, 0 timeouts, 2 suspect of 3,823. Open Link Health for problem links",
+      "runLinkCheckButton": true,
+      "buttons": [
+        "Settings",
+        "New entry",
+        "Overview",
+        "Approvals",
+        "Edits",
+        "Enrichment",
+        "Researcher",
+        "Export",
+        "Database",
+        "Resources",
+        "Categories",
+        "Subcategories",
+        "Users",
+        "GitHub",
+        "Link Health",
+        "Audit",
+        "Research",
+        "Run Validation",
+        "Run Link Check",
+        "Download",
+        "Download",
+        "Generate",
+        "Download",
+        "Previous",
+        "Next"
+      ],
+      "docScrollW": 390
+    },
+    "lh": {
+      "alerts": [],
+      "noDataCopy": false,
+      "cancelBtn": false,
+      "head": "Home\nAdmin\nLink Health\nAuthorized admin area\nADMIN CONSOLE · ADMIN USER\nOperations dashboard\nManage the 3,824 resources, jobs, and contributors that keep the index alive.\nSettings\nNew entry\nOverview\nApprovals\nEdits\nEnrichment\nResearcher\nExport\nDatabase\nResources\nCategories\nSubcategories\nUsers\nGitHub\nLink Health\nAudit\nResearch\nHealthy\n3,809\nRedirect\n0\nBroken\n11\nTimeout\n0\nSuspect\n2\nRecent failures\nBroken, DNS and timeout failures plus links flagged for review from the last sweep\nRun full check\nRESOURCE\tURL\tSTATUS\tLAST CHECKED\nPerformance Comparison of AV1, JEM, VP9, and HEVC Encoders\nEncoding & Codecs\n\t\nhttps://iphome.hhi.de/marpe/download/spie-2017.pdf\ndead: SSL failure (ERR:UNABLE_TO_VERIFY_LEAF_SIGNATURE) | request to https://iphome.hhi.de/marpe/download/spie-2017.pdf failed, reason: unable to verify the first certificate\n\tBROKEN\tAug 5, 2026, 12:18 AM\nRTC.ON Conference\nCommunity & Event"
+    },
+    "gh": {
+      "alerts": [],
+      "importedLines": [],
+      "partialMentions": [],
+      "head": "Home\nAdmin\nGitHub\nAuthorized admin area\nADMIN CONSOLE · ADMIN USER\nOperations dashboard\nManage the 3,824 resources, jobs, and contributors that keep the index alive.\nSettings\nNew entry\nOverview\nApprovals\nEdits\nEnrichment\nResearcher\nExport\nDatabase\nResources\nCategories\nSubcategories\nUsers\nGitHub\nLink Health\nAudit\nResearch\nkrzemienski/awesome-video\nmaster · last sync Jul 20, 2026, 06:42 PM · 49 sync jobs\nPull\nSync now\nSync jobs\nLast 5 import/export operations\nID\tTYPE\tSTATUS\t\n#4\tExport\tCOMPLETED\tLogs\n#3\tExport\tCOMPLETED\tLogs\n#2\tExport\tCOMPLETED\tLogs\n#1\tExport\tCOMPLETED\tLogs\n#1000045\tExport\tFAILED\tLogs\nMore"
+    },
+    "ghReqs": [
+      "03:49:48.934"
+    ],
+    "dbt": {
+      "buttons": [
+        "Settings",
+        "New entry",
+        "Overview",
+        "Approvals",
+        "Edits",
+        "Enrichment",
+        "Researcher",
+        "Export",
+        "Database",
+        "Resources",
+        "Categories",
+        "Subcategories",
+        "Users",
+        "GitHub",
+        "Link Health",
+        "Audit",
+        "Research",
+        "Seed Database",
+        "Clear & Re-seed"
+      ],
+      "resultPanels": [],
+      "head": "Home\nAdmin\nDatabase\nAuthorized admin area\nADMIN CONSOLE · ADMIN USER\nOperations dashboard\nManage the 3,824 resources, jobs, and contributors that keep the index alive.\nSettings\nNew entry\nOverview\nApprovals\nEdits\nEnrichment\nResearcher\nExport\nDatabase\nResources\nCategories\nSubcategories\nUsers\nGitHub\nLink Health\nAudit\nResearch\nTABLES\n40\nROWS\n65,993\nDISK\n63 MB\nMIGRATIONS\n28\n0 pending\nDatabase seeding\nTables\nPostgreSQL — primary database\nNAME\tROWS\tSIZE\tNEWEST ROW\nresources\t4,040\t28 MB\t13h ago\ncategories\t9\t96 KB\t53d ago\nsubcategories\t99\t88 KB\t53d ago\nusers\t121\t120 KB\t13h ago\nresource_audit_log\t16,581\t4.2 MB\t13h ago\nenrichment_jobs\t31\t96 KB\t86d ago"
+    },
+    "blocked": [
+      "POST /api/send",
+      "POST /api/send",
+      "POST /api/send",
+      "POST /api/send"
+    ],
+    "bad": [],
+    "pageErrors": []
+  },
+  "1440": {
+    "exp": {
+      "cards": [
+        {
+          "title": "JSON Snapshot",
+          "desc": "Non-restorable catalog snapshot, not a full database backup. Includes resources, category hierarchy, tags, learning journeys, sync queue and limited user summaries. Omits user identities, favorites, bookmarks, contributions, audit history, AI jobs and discoveries, notification preferences and other application state.",
+          "button": "Download"
+        },
+        {
+          "title": "CSV (resources)",
+          "desc": "Flat resource table for spreadsheet workflows.",
+          "button": "Download"
+        },
+        {
+          "title": "README.md",
+          "desc": "Awesome-list flavored Markdown for the GitHub repo.",
+          "button": "Generate"
+        },
+        {
+          "title": "OPML (categories)",
+          "desc": "Hierarchical export for feed readers.",
+          "button": "Download"
+        }
+      ],
+      "hasSqlDump": false,
+      "hasApiToken": false,
+      "historyRows": [
+        {
+          "action": "categories.exported",
+          "text": "Category tree opml COMPLETED 3,824 Oct 9, 2026, 04:17 AM"
+        },
+        {
+          "action": "catalog.exported",
+          "text": "Awesome list markdown COMPLETED 3,824 Oct 9, 2026, 04:17 AM"
+        },
+        {
+          "action": "resources.exported",
+          "text": "Resources csv COMPLETED 4,038 Oct 9, 2026, 04:17 AM"
+        },
+        {
+          "action": "database.exported",
+          "text": "Catalog snapshot json COMPLETED 4,038 Oct 9, 2026, 04:17 AM"
+        }
+      ],
+      "linkJobPanel": "Link check #8 COMPLETED Checks the stored URL of every approved resource — the same URLs the exports write. Completed Aug 5, 2026, 12:18 AM: 3,809 healthy, 12 broken, 0 redirects, 0 timeouts, 2 suspect of 3,823. Open Link Health for problem links",
+      "runLinkCheckButton": true,
+      "buttons": [
+        "Settings",
+        "New entry",
+        "Overview",
+        "Approvals",
+        "Edits",
+        "Enrichment",
+        "Researcher",
+        "Export",
+        "Database",
+        "Resources",
+        "Categories",
+        "Subcategories",
+        "Users",
+        "GitHub",
+        "Link Health",
+        "Audit",
+        "Research",
+        "Run Validation",
+        "Run Link Check",
+        "Download",
+        "Download",
+        "Generate",
+        "Download",
+        "Previous",
+        "Next"
+      ],
+      "docScrollW": 1440
+    },
+    "lh": {
+      "alerts": [],
+      "noDataCopy": false,
+      "cancelBtn": false,
+      "head": "Home\nAdmin\nLink Health\nAuthorized admin area\nADMIN CONSOLE · ADMIN USER\nOperations dashboard\nManage the 3,824 resources, jobs, and contributors that keep the index alive.\nSettings\nNew entry\nOverview\nApprovals\nEdits\nEnrichment\nResearcher\nExport\nDatabase\nResources\nCategories\nSubcategories\nUsers\nGitHub\nLink Health\nAudit\nResearch\nHealthy\n3,809\nRedirect\n0\nBroken\n11\nTimeout\n0\nSuspect\n2\nRecent failures\nBroken, DNS and timeout failures plus links flagged for review from the last sweep\nRun full check\nRESOURCE\tURL\tSTATUS\tLAST CHECKED\nPerformance Comparison of AV1, JEM, VP9, and HEVC Encoders\nEncoding & Codecs\n\t\nhttps://iphome.hhi.de/marpe/download/spie-2017.pdf\ndead: SSL failure (ERR:UNABLE_TO_VERIFY_LEAF_SIGNATURE) | request to https://iphome.hhi.de/marpe/download/spie-2017.pdf failed, reason: unable to verify the first certificate\n\tBROKEN\tAug 5, 2026, 12:18 AM\nRTC.ON Conference\nCommunity & Event"
+    },
+    "gh": {
+      "alerts": [],
+      "importedLines": [],
+      "partialMentions": [],
+      "head": "Home\nAdmin\nGitHub\nAuthorized admin area\nADMIN CONSOLE · ADMIN USER\nOperations dashboard\nManage the 3,824 resources, jobs, and contributors that keep the index alive.\nSettings\nNew entry\nOverview\nApprovals\nEdits\nEnrichment\nResearcher\nExport\nDatabase\nResources\nCategories\nSubcategories\nUsers\nGitHub\nLink Health\nAudit\nResearch\nkrzemienski/awesome-video\nmaster · last sync Jul 20, 2026, 06:42 PM · 49 sync jobs\nPull\nSync now\nSync jobs\nLast 5 import/export operations\nID\tTYPE\tSTATUS\t\n#4\tExport\tCOMPLETED\tLogs\n#3\tExport\tCOMPLETED\tLogs\n#2\tExport\tCOMPLETED\tLogs\n#1\tExport\tCOMPLETED\tLogs\n#1000045\tExport\tFAILED\tLogs\nMore"
+    },
+    "ghReqs": [
+      "03:49:20.194"
+    ],
+    "dbt": {
+      "buttons": [
+        "Settings",
+        "New entry",
+        "Overview",
+        "Approvals",
+        "Edits",
+        "Enrichment",
+        "Researcher",
+        "Export",
+        "Database",
+        "Resources",
+        "Categories",
+        "Subcategories",
+        "Users",
+        "GitHub",
+        "Link Health",
+        "Audit",
+        "Research",
+        "Seed Database",
+        "Clear & Re-seed"
+      ],
+      "resultPanels": [],
+      "head": "Home\nAdmin\nDatabase\nAuthorized admin area\nADMIN CONSOLE · ADMIN USER\nOperations dashboard\nManage the 3,824 resources, jobs, and contributors that keep the index alive.\nSettings\nNew entry\nOverview\nApprovals\nEdits\nEnrichment\nResearcher\nExport\nDatabase\nResources\nCategories\nSubcategories\nUsers\nGitHub\nLink Health\nAudit\nResearch\nTABLES\n40\nROWS\n65,991\nDISK\n63 MB\nMIGRATIONS\n28\n0 pending\nDatabase seeding\nTables\nPostgreSQL — primary database\nNAME\tROWS\tSIZE\tNEWEST ROW\nresources\t4,040\t28 MB\t13h ago\ncategories\t9\t96 KB\t53d ago\nsubcategories\t99\t88 KB\t53d ago\nusers\t121\t120 KB\t13h ago\nresource_audit_log\t16,581\t4.2 MB\t13h ago\nenrichment_jobs\t31\t96 KB\t86d ago"
+    },
+    "blocked": [
+      "POST /api/send",
+      "POST /api/send",
+      "POST /api/send",
+      "POST /api/send"
+    ],
+    "bad": [],
+    "pageErrors": []
+  }
+}
