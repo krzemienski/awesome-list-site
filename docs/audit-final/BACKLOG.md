@@ -122,7 +122,7 @@ Verification is by real browser use / curl only (no proof packets or gates since
 ## WS10 Hygiene
 | ID | Item | Status | Packet |
 |---|---|---|---|
-| C-01 | Consolidate ds duplicates and middleware/middlewares split | OPEN | |
+| C-01 | Consolidate ds duplicates and middleware/middlewares split | FIXED — clerkProxyMiddleware moved into server/middleware (single dir); build passes; sign-in + home load clean. DECIDED: awesome-list-site-ds and -20260929 are distinct frozen references (09-10 vs 09-29, 10 files differ), nothing imports them — kept untouched | |
 | C-02 | Remove unused dependencies | FIXED — 16 unused packages removed; app browser-checked | |
 | C-03 | Stale PRs #19/#21/#24/#25 (needs owner confirmation) | OPEN | |
 | C-04 | Close #18 and #20 with packet links (needs owner confirmation) | OPEN | |

@@ -15,7 +15,7 @@
  * - Must be mounted BEFORE express.json() middleware
  *
  * Usage in app.ts:
- *   import { CLERK_PROXY_PATH, clerkProxyMiddleware } from "./middlewares/clerkProxyMiddleware";
+ *   import { CLERK_PROXY_PATH, clerkProxyMiddleware } from "./middleware/clerkProxyMiddleware";
  *   app.use(CLERK_PROXY_PATH, clerkProxyMiddleware());
  */
 

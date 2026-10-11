@@ -25,7 +25,7 @@ import {
   CLERK_PROXY_PATH,
   clerkProxyMiddleware,
   getClerkProxyHost,
-} from "./middlewares/clerkProxyMiddleware";
+} from "./middleware/clerkProxyMiddleware";
 import {
   clerkUserContext,
   hasAdminBypass,
