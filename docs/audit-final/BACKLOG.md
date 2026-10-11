@@ -94,7 +94,7 @@ Verification is by real browser use / curl only (no proof packets or gates since
 | D-04 | Header deviations kept (decision 4): ledger row | OPEN | |
 | D-05 | Submit actions at 375 stack full width, 44px | FIXED — /submit at 375 in all 5 systems: Cancel above Submit, full width, 44px; 768 unchanged | |
 | D-06 | Brutalist overview category-bar track vs AA | DECIDED — track uses --surface-3 (reference --border is near-opaque in Brutalist and hides the bar); bar vs track ≥15:1 in all 5 systems | |
-| D-07 | app.system.error reachable by a real offline corpus failure | OPEN | |
+| D-07 | app.system.error reachable by a real offline corpus failure | FIXED — cause: ErrorPage was a lazy chunk and the corpus query paused offline (networkMode online) so it never errored; now bundled with the shell + networkMode always. Browser offline → /advanced renders the error page in editorial 375/1440, terminal 375/768, geist 1280, brutalist 375, swiss 768, no overflow; online /advanced unchanged | |
 | D-08 | Full visual sweep vs frozen reference | OPEN | |
 | D-09 | 44px touch targets at ≤1024 | FIXED — pagination, card actions, recommendation feedback, "+N more", home index rows, logo link, footer and related-tag links ≥44px at ≤1024; frozen chips/pills keep their sizes (≥24px AA) by decision | |
 | D-10 | Category glyph fallback on WebKit / Android emulation | OPEN | |

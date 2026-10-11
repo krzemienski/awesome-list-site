@@ -40,13 +40,15 @@ import ConsentBanner from "@/components/ui/consent-banner";
 import ScrubbedParamsNotice from "@/components/ui/scrubbed-params-notice";
 import { Button } from "@/components/ui/button";
 import { focusPageHeading } from "@/hooks/focus-handoff";
+// Static, not lazy: a corpus failure while offline must render this page
+// without fetching another chunk.
+import ErrorPage from "@/pages/ErrorPage";
 
 // Guard and terminal error surfaces only render after routing has selected a
 // matching branch. Keep them out of the anonymous entry while the auth/theme
 // provider and the shell remain eager.
 const AdminGuard = lazy(() => import("@/components/auth/AdminGuard"));
 const AuthGuard = lazy(() => import("@/components/auth/AuthGuard"));
-const ErrorPage = lazy(() => import("@/pages/ErrorPage"));
 const NotFound = lazy(() => import("@/pages/not-found"));
 const LazyHomeRoute = lazy(() => import("@/pages/Home"));
 
@@ -706,6 +708,9 @@ function Router({ homeComponent: Home }: { homeComponent: HomeRouteComponent }) 
     queryFn: fetchStaticAwesomeList,
     staleTime: 1000 * 60 * 60,
     enabled: corpusNeeded,
+    // The default "online" mode pauses offline and never errors, which left
+    // the chunk-failure fallback as the only thing an offline visitor saw.
+    networkMode: "always",
   });
 
   /* MR-DS-03 — Orphan `/` + Ctrl/Cmd+K listener removed. The header
@@ -718,9 +723,7 @@ function Router({ homeComponent: Home }: { homeComponent: HomeRouteComponent }) 
       <div className="page">
         <div className="grain" aria-hidden="true" />
         <RouteErrorBoundary location={location}>
-        <Suspense fallback={<RouteFallback />}>
           <ErrorPage error={error} />
-        </Suspense>
         </RouteErrorBoundary>
       </div>
     );
