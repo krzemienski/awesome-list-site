@@ -13,6 +13,7 @@ import { Category, Resource } from "@/types/awesome-list";
 import { cn } from "@/lib/utils";
 import { writeFilterParams, usePopstateParams } from "@/lib/url-filter-state";
 import { resourceTags } from "@/lib/tags";
+import { parseTagFilterValues } from "@shared/tagNormalize";
 
 interface CategoryExplorerProps {
   categories: Category[];
@@ -92,7 +93,13 @@ export default function CategoryExplorer({ categories, resources, className }: C
   const [searchTerm, setSearchTerm] = useState(
     () => new URLSearchParams(window.location.search).get("q") || "",
   );
-  const [selectedTags, setSelectedTags] = useState<string[]>([]);
+  const [selectedTags, setSelectedTags] = useState<string[]>(
+    () => parseTagFilterValues(new URLSearchParams(window.location.search).getAll("tags")),
+  );
+  const applyTags = (next: string[]) => {
+    setSelectedTags(next);
+    syncExplorerParam("tags", next.length ? next.join(",") : null);
+  };
   const [sortBy, setSortBy] = useState(() => {
     const s = new URLSearchParams(window.location.search).get("sort");
     return s && VALID_EXPLORER_SORTS.includes(s) ? s : "name";
@@ -105,8 +112,9 @@ export default function CategoryExplorer({ categories, resources, className }: C
   // the search field that stays on screen instead of dropping to <body>.
   const searchInputRef = useRef<HTMLInputElement>(null);
   const clearFilters = () => {
-    handleSearchChange("");
+    setSearchTerm("");
     setSelectedTags([]);
+    writeFilterParams({ q: null, tags: null });
     searchInputRef.current?.focus();
   };
   const handleSortChange = (value: string) => {
@@ -114,11 +122,12 @@ export default function CategoryExplorer({ categories, resources, className }: C
     syncExplorerParam("sort", value === "name" ? null : value);
   };
 
-  // Run22 BUG-016: Back/Forward restore explorer search + sort from the URL.
+  // Run22 BUG-016: Back/Forward restore explorer search, sort and tags from the URL.
   usePopstateParams((params) => {
     setSearchTerm(params.get("q") || "");
     const s = params.get("sort");
     setSortBy(s && VALID_EXPLORER_SORTS.includes(s) ? s : "name");
+    setSelectedTags(parseTagFilterValues(params.getAll("tags")));
   });
   const [showSubcategories, setShowSubcategories] = useState(true);
   // Run16 BUG-024: the toggle used to gate only a per-card chevron whose
@@ -208,11 +217,7 @@ export default function CategoryExplorer({ categories, resources, className }: C
   };
 
   const toggleTag = (tag: string) => {
-    setSelectedTags(prev => 
-      prev.includes(tag) 
-        ? prev.filter(t => t !== tag)
-        : [...prev, tag]
-    );
+    applyTags(selectedTags.includes(tag) ? selectedTags.filter(t => t !== tag) : [...selectedTags, tag]);
   };
 
   const toggleCategoryExpansion = (categoryName: string) => {
