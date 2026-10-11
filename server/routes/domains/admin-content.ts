@@ -68,6 +68,7 @@ import { sanitizeUser, parseBoundedInt, PG_INT_MAX, validateBody } from "../../v
 import { decodeResourceTextFields } from "../../github/importHygiene";
 import { ensureSubSubcategoryExists } from "../../repositories/ensureSubSubcategory";
 import { isDatabaseUnavailableError } from "../../db/errors";
+import { isUniqueViolation } from "../../errors/pgErrors";
 import { claudeService } from "../../ai/claudeService";
 import { send429 } from "../../middleware/rateLimit";
 import { ConflictError } from "../../middleware/errors";
@@ -695,7 +696,7 @@ export function registerAdminContentRoutes(
     } catch (error: any) {
       // Task #212 safety net: a concurrent writer can still win the race past
       // the pre-check — map the unique-URL violation to the same 409.
-      if (error?.code === '23505' && String(error?.constraint || '').includes('resources_url')) {
+      if (isUniqueViolation(error, 'resources_url')) {
         return res.status(409).json({
           message: 'Another resource already uses this URL. URLs must be unique.',
         });
@@ -1067,7 +1068,7 @@ export function registerAdminContentRoutes(
     } catch (error: any) {
       // Race window: two concurrent creates can both pass the pre-check; the
       // loser's unique-violation is still a duplicate, not a server fault.
-      if (error?.code === '23505' && String(error?.constraint ?? '').includes('url')) {
+      if (isUniqueViolation(error, 'url')) {
         return res.status(409).json({ message: 'Another resource already uses this URL. URLs must be unique.' });
       }
       console.error('Error creating resource:', error);

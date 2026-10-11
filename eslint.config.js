@@ -65,8 +65,7 @@ export default tseslint.config(
       ...reactPlugin.configs.recommended.rules,
       ...reactPlugin.configs["jsx-runtime"].rules,
       ...reactHooksPlugin.configs.recommended.rules,
-      // Stale hook dependencies are a correctness bug, not style (J05). The
-      // lint-ratchet gate holds application code at zero for this rule.
+      // Stale hook dependencies are a correctness bug, not style.
       "react-hooks/exhaustive-deps": "error",
       "react-refresh/only-export-components": [
         "warn",
@@ -97,27 +96,6 @@ export default tseslint.config(
     rules: {
       // Allow require() in config files
       "@typescript-eslint/no-require-imports": "off",
-    },
-  },
-
-  // The task 566 browser harness is a checked-in ESM JavaScript validator,
-  // rather than an application module included by tsconfig.json. Keep the
-  // normal JavaScript checks while opting this file out of TypeScript-only
-  // rules that require a typed program.
-  {
-    files: ["scripts/validation/contact-variants-566.mjs"],
-    ...tseslint.configs.disableTypeChecked,
-    languageOptions: {
-      ...tseslint.configs.disableTypeChecked.languageOptions,
-      globals: {
-        document: "readonly",
-        Event: "readonly",
-        fetch: "readonly",
-        getComputedStyle: "readonly",
-        HTMLInputElement: "readonly",
-        process: "readonly",
-        URL: "readonly",
-      },
     },
   },
 

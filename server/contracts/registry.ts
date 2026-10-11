@@ -13,10 +13,10 @@
  * The registry powers three consumers:
  *   1. request/response validation (./middleware.ts, ./responseValidation.ts)
  *   2. OpenAPI 3 generation (./openapiGenerator.ts)
- *   3. drift comparison against live-observed routes (./drift.ts)
+ *   3. the live-route observer (./middleware.ts)
  *
  * Everything is zod v4 and fully typed; nothing here imports Express, so the
- * registry can be consumed by build scripts (scripts/validation/*) too.
+ * registry can be consumed outside the HTTP stack too.
  * ============================================================================
  */
 import type { ZodTypeAny } from "zod";
@@ -123,8 +123,8 @@ export function contractKey(method: string, path: string): string {
  * Normalize an Express path for comparison: collapse duplicate slashes, drop a
  * trailing slash (except root), and canonicalize param names to `:param` so
  * "/x/:id" and "/x/:resourceId" compare structurally when needed elsewhere.
- * (Kept conservative — param NAMES are preserved here; drift.ts does the
- * structural collapse.)
+ * (Kept conservative — param NAMES are preserved here; no structural
+ * collapse is applied.)
  */
 export function normalizePath(path: string): string {
   let p = path.replace(/\/{2,}/g, "/");

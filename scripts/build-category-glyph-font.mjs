@@ -31,7 +31,7 @@
  *   node scripts/build-category-glyph-font.mjs --check   # verify, write nothing
  * Font sources: DEJAVU_DIR (default /usr/share/fonts/truetype/dejavu) and
  * NOTO_MATH_OTF (default: the Nix store's noto-fonts NotoSansMath-Regular.otf).
- * tests/unit/category-glyph-font.test.ts runs the --check logic.
+ * --check reports stale CSS or fonts without writing.
  */
 import fs from "node:fs";
 import path from "node:path";

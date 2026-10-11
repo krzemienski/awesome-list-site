@@ -31,7 +31,7 @@
 import type { Request, Response, NextFunction } from "express";
 import { AppError, ValidationError } from "./errors";
 import { ZodError } from "zod";
-import { isDatabaseUnavailableError } from "../db/errors";
+import { databaseErrorCode, isDatabaseUnavailableError } from "../db/errors";
 import {
   buildValidationEnvelope,
   normalizeValidationBody,
@@ -94,7 +94,7 @@ export function errorHandler(
   // client, so this is a 400, not a server fault. NARROW backstop: only this
   // exact SQLSTATE; every other PG error still surfaces as a 500 so real
   // server bugs stay loud.
-  if ((err as any)?.code === "22021") {
+  if (databaseErrorCode(err) === "22021") {
     res.status(400).json(
       normalizeValidationBody({
         message: "Request contains invalid characters",

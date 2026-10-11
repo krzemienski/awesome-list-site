@@ -24,7 +24,6 @@ import { fileURLToPath } from "node:url";
 // 8 GiB image limit because the Nix layer (Chromium/GTK/GStreamer for browser
 // tests) plus the remaining repo bulk left no headroom.
 const targets = [
-  "tests/parity/baseline",
   ".cache/ms-playwright",
   ".cache/verify-ds",
   ".cache/ds-consensus",

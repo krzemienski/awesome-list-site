@@ -128,10 +128,6 @@ export {
 } from "./openapiGenerator";
 export type { OpenApiDocOptions } from "./openapiGenerator";
 
-// --- Drift comparison ---
-export { compareDrift, formatDriftReport, canonicalKey } from "./drift";
-export type { DriftReport, DriftEntry, DriftOptions } from "./drift";
-
 // --- Reusable zod schemas / primitives ---
 export {
   PG_INT4_MAX,

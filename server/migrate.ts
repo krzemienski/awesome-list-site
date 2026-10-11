@@ -109,7 +109,8 @@ export async function runMigrations(databaseUrl: string = process.env.DATABASE_U
   } catch (error: any) {
     await pool.end();
     markMigrationsFailed();
-    if (error?.code === '42P07' || (error?.message?.includes('already exists') && error?.message?.includes('relation'))) {
+    const cause = error?.cause ?? error;
+    if (cause?.code === '42P07' || error?.code === '42P07' || (cause?.message?.includes('already exists') && cause?.message?.includes('relation'))) {
       console.error(
         'Migration failed with "already exists" (42P07). This means a migration is NOT idempotent — ' +
         'the rest of its batched statements were rolled back and the schema may be incomplete. ' +

@@ -21,7 +21,7 @@ import { markRequestDatabaseUnavailable } from '../ops/requestContext';
 // - A cold catalog-tree rebuild takes 4 sequential queries; taxonomy loaders
 //   add 1-2 more. max=8 lets ~2-3 faceted listings plus background work
 //   overlap without queueing anywhere near the 3s acquisition bound
-//   (validated by scripts/validation/db-pool-probe.mjs: 20 concurrent
+//   (measured with 20 concurrent
 //   faceted listings, zero acquisition timeouts).
 // - Budget per instance = 8 here + 2 in the rate-limit store's dedicated
 //   pool (server/middleware/pgRateLimitStore.ts) = 10; even several

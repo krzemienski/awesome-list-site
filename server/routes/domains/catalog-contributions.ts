@@ -86,6 +86,7 @@ import { buildRelatedResources } from "../../services/relatedResources";
 import { stripInternalResourceFields } from "../../lib/publicResource";
 import { getPublicCacheValue } from "../../cache/publicCache";
 import { isDatabaseUnavailableError } from "../../db/errors";
+import { isUniqueViolation } from "../../errors/pgErrors";
 import { ServiceUnavailableError } from "../../middleware/errors";
 import { registerHomeFeed } from "./home-feed";
 import { listApprovedResourceTags } from "../../repositories/TagRepository";
@@ -851,7 +852,7 @@ export function registerCatalogContributionsRoutes(
 
         res.status(201).json(resource);
       } catch (createError: any) {
-        if (createError.code === '23505' || (createError.message && createError.message.includes('unique'))) {
+        if (isUniqueViolation(createError)) {
           return res.status(409).json({ error: 'duplicate_url', message: 'This URL is already in the catalog' });
         }
         throw createError;

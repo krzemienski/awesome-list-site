@@ -588,7 +588,7 @@ function getSystemRoots(): Map<string, X509Certificate[]> {
  * hostname, and the terminal issuer must be an EXISTING platform system root.
  * A hostile endpoint publishing AIA links to its own intermediate/self-signed
  * root fails here — the downloaded chain never reaches a system trust anchor.
- * Exported for regression coverage (scripts/validation/tls-recovery-check.ts).
+ * Exported for reuse.
  */
 export function validateAiaChain(
   leaf: X509Certificate,
@@ -628,7 +628,7 @@ export function validateAiaChain(
  * SSRF guard for AIA "CA Issuers" URLs: those URLs come from an UNVERIFIED
  * peer certificate, i.e. fully attacker-controlled input, so the downloader
  * must never be usable to reach internal services or cloud metadata.
- * Exported for regression coverage (scripts/validation/tls-recovery-check.ts).
+ * Exported for reuse.
  */
 export function isPrivateAddress(ip: string): boolean {
   const family = net.isIP(ip);
