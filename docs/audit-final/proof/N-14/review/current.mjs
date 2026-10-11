@@ -1,0 +1,11 @@
+import {open} from '/tmp/af/lib.mjs';
+import {go,cap} from '../N-12/common.mjs';
+const s=await open(),p=s.page;
+await go(p,'/category/players-clients');
+await p.getByTestId('expand-sub-mobile-web-players').click();
+await p.getByTestId('subsub-mobile-web-players-uncategorized').click();
+await p.waitForTimeout(600);
+await cap(s,'N-14','nested-current-detail','guest',{sidebarCurrent:await p.locator('[data-sidebar=sidebar] [aria-current]').evaluateAll(es=>es.map(e=>({text:e.innerText,href:e.getAttribute('href'),current:e.getAttribute('aria-current'),class:e.className})))});
+await p.reload();await p.waitForTimeout(1300);
+await cap(s,'N-14','nested-current-reload','guest',{sidebarCurrent:await p.locator('[data-sidebar=sidebar] [aria-current]').evaluateAll(es=>es.map(e=>({text:e.innerText,href:e.getAttribute('href'),current:e.getAttribute('aria-current')})))});
+await s.browser.close();

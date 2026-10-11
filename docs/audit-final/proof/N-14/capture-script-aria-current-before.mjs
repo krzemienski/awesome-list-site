@@ -1,0 +1,10 @@
+import { open, shot, log } from "./lib.mjs";
+const BASE = "https://awesome.video";
+const s = await open("chromium", { width: 1440, height: 900 }); const p = s.page;
+await p.goto(BASE + "/sub-subcategory/android", { waitUntil: "load" }); await p.waitForTimeout(4000);
+await p.getByRole("button", { name: "Decline" }).click().catch(() => {});
+const cur = await p.evaluate(() => [...document.querySelectorAll('[data-sidebar="sidebar"] [aria-current="page"]')].map(a => a.getAttribute("href") + " :: " + a.textContent.trim().replace(/\s+/g, " ").slice(0, 40)));
+await p.locator('[data-sidebar="sidebar"] [aria-current="page"]').first().scrollIntoViewIfNeeded();
+await shot(p, s, "N-14", "before2-subsub-two-current-prod-chromium-1440", "guest", { extra: JSON.stringify(cur) });
+const rev = await (await fetch(BASE + "/api/version")).json();
+console.log(JSON.stringify({ rev, cur })); log("N-14", { phase: "before2-prod", rev, cur }); await s.browser.close();

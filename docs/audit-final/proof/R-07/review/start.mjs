@@ -1,0 +1,10 @@
+import {makePersona} from '/tmp/af/persona.mjs';
+import {open} from '/tmp/af/lib.mjs';
+import {go,cap} from '../N-12/common.mjs';
+const user=await makePersona('review_final_r07');
+console.log('PERSONA',user.label,user.statePath);
+const s=await open('chromium',{storageState:user.statePath,width:375,height:812});
+await go(s.page,'/onboarding');await cap(s,'R-07','initial',user.label);
+console.log(await s.page.locator('main').innerText());
+console.log(await s.page.locator('main button').evaluateAll(es=>es.map(e=>({text:e.innerText,testid:e.getAttribute('data-testid')}))));
+await s.browser.close();

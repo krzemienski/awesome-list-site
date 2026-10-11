@@ -1,0 +1,47 @@
+=== https://awesome.video/
+HTTP/2 200 
+cache-control: no-store
+content-security-policy: default-src 'self'; script-src 'self' 'nonce-…' https://www.googletagmanager.com https://cdn.mxpnl.com https://us-assets.i.posthog.com https://cdn.amplitude.com https://replit.com https://replit-cdn.com https://i.replit.com https://cha
+cross-origin-opener-policy: same-origin-allow-popups
+cross-origin-resource-policy: same-origin
+permissions-policy: camera=(), microphone=(), geolocation=()
+referrer-policy: strict-origin-when-cross-origin
+server: Google Frontend
+set-cookie: GAESA=Cp4BMDAxMGRkODYwNzNkOGMwMWQ5NmM2OWRhNmNhZjYzZWNmOGU4ZDEwOThhMDlmYjZiZjE3MmUxY2NjMGQxNzlhZDg3NzhhZDRkZTczY2NlYzQ5YTY3ODQ5YTdhMGFlMTE1Y2IzOWExOTc5N2NiMzkxMTQ2Y2Q4MmJmNjhkNzJmYjYzOTY3OTc5NDc4YWQ4OWNmOTY5ZjkwOTQyNWYyNGQQta6O5ZI0; expires=Tue, 10-
+strict-transport-security: max-age=63072000; includeSubDomains
+x-content-type-options: nosniff
+x-frame-options: DENY
+=== https://awesome.video/api/categories
+HTTP/2 200 
+cache-control: private, max-age=60, must-revalidate
+content-security-policy: default-src 'self'; script-src 'self' 'nonce-…' https://www.googletagmanager.com https://cdn.mxpnl.com https://us-assets.i.posthog.com https://cdn.amplitude.com https://replit.com https://replit-cdn.com https://i.replit.com https://cha
+cross-origin-opener-policy: same-origin-allow-popups
+cross-origin-resource-policy: same-origin
+permissions-policy: camera=(), microphone=(), geolocation=()
+referrer-policy: strict-origin-when-cross-origin
+server: Google Frontend
+set-cookie: GAESA=Cp4BMDAxMGRkODYwNzNkOGMwMWQ5NmM2OWRhNmNhZjYzZWNmOGU4ZDEwOThhMDlmYjZiZjE3MmUxY2NjMGQxNzlhZDg3NzhhZDRkZTczY2NlYzQ5YTY3ODQ5YTdhMGFlMTE1Y2IzOWExOTc5N2NiMzkxMTQ2Y2Q4MmJmNjhkNzJmYjYzOTY3OTc5NDc4YWQ4OWNmOTY5ZjkwOTQyNWYyNGQQ-7GO5ZI0; expires=Tue, 10-
+strict-transport-security: max-age=63072000; includeSubDomains
+x-content-type-options: nosniff
+x-frame-options: DENY
+=== https://awesome.video/resource/1
+HTTP/2 404 
+cache-control: no-store
+content-security-policy: default-src 'self'; script-src 'self' 'nonce-…' https://www.googletagmanager.com https://cdn.mxpnl.com https://us-assets.i.posthog.com https://cdn.amplitude.com https://replit.com https://replit-cdn.com https://i.replit.com https://cha
+cross-origin-opener-policy: same-origin-allow-popups
+cross-origin-resource-policy: same-origin
+permissions-policy: camera=(), microphone=(), geolocation=()
+referrer-policy: strict-origin-when-cross-origin
+server: Google Frontend
+set-cookie: GAESA=Cp4BMDAxMGRkODYwNzNkOGMwMWQ5NmM2OWRhNmNhZjYzZWNmOGU4ZDEwOThhMDlmYjZiZjE3MmUxY2NjMGQxNzlhZDg3NzhhZDRkZTczY2NlYzQ5YTY3ODQ5YTdhMGFlMTE1Y2IzOWExOTc5N2NiMzkxMTQ2Y2Q4MmJmNjhkNzJmYjYzOTY3OTc5NDc4YWQ4OWNmOTY5ZjkwOTQyNWYyNGQQysqO5ZI0; expires=Tue, 10-
+strict-transport-security: max-age=63072000; includeSubDomains
+x-content-type-options: nosniff
+x-frame-options: DENY
+=== http://127.0.0.1:5000/
+HTTP/1.1 200 OK
+X-Content-Type-Options: nosniff
+Referrer-Policy: strict-origin-when-cross-origin
+Permissions-Policy: camera=(), microphone=(), geolocation=()
+Cross-Origin-Opener-Policy: same-origin-allow-popups
+Cross-Origin-Resource-Policy: same-origin
+Cache-Control: no-store

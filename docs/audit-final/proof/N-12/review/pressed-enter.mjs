@@ -1,0 +1,12 @@
+import {open} from '/tmp/af/lib.mjs';
+import {go,cap} from './common.mjs';
+const s=await open(),p=s.page;
+await go(p,'/category/players-clients');
+await p.getByTestId('taxonomy-child-uncategorized').click();await p.waitForTimeout(500);
+await p.reload();await p.waitForTimeout(1000);
+await p.goBack();await p.waitForTimeout(500);
+await p.goForward();await p.waitForTimeout(500);
+await p.getByTestId('taxonomy-child-uncategorized').focus();
+await p.keyboard.press('Enter');await p.waitForTimeout(600);
+await cap(s,'N-12','pressed-enter-off','guest',{heading:await p.getByTestId('text-results-count').innerText(),pressed:await p.getByTestId('taxonomy-child-uncategorized').getAttribute('aria-pressed')});
+await s.browser.close();

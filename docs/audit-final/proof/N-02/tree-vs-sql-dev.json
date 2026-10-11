@@ -1,0 +1,22 @@
+{
+ "base": "http://127.0.0.1:5000",
+ "rev": {
+  "revision": "2349a26c27f732e515acdfafdf042c7f4e9b25cc+workspace"
+ },
+ "nodes": 119,
+ "mismatches": 0,
+ "rows": [],
+ "sqlOnlySub": [],
+ "sqlOnlySubSub": [
+  {
+   "k": "players & clients|web players|web players",
+   "n": 1
+  }
+ ],
+ "sampleKeys": [
+  "name",
+  "slug",
+  "resources",
+  "subSubcategories"
+ ]
+}

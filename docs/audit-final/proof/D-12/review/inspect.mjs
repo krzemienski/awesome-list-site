@@ -1,0 +1,10 @@
+import {open} from '/tmp/af/lib.mjs';
+import {go,cap} from '../N-12/common.mjs';
+const s=await open('chromium',{width:375,height:812}),p=s.page;
+await go(p,'/category/players-clients');
+await p.getByRole('button',{name:'Toggle sidebar',exact:true}).click();await p.waitForTimeout(400);
+await cap(s,'D-12','inspect');
+console.log(await p.locator('.av-sidebar-drawer').evaluate(e=>({html:e.outerHTML.slice(0,6000),scroll:e.scrollHeight,client:e.clientHeight})));
+console.log(await p.locator('.av-sidebar-drawer *').evaluateAll(es=>es.filter(e=>e.scrollHeight>e.clientHeight+5).map(e=>({tag:e.tagName,class:e.className,scroll:e.scrollHeight,client:e.clientHeight,overflow:getComputedStyle(e).overflowY})).slice(0,20)));
+console.log(await p.locator('.av-sidebar-drawer button').evaluateAll(es=>es.map(e=>({text:e.innerText,aria:e.getAttribute('aria-label'),testid:e.getAttribute('data-testid')}))));
+await s.browser.close();
