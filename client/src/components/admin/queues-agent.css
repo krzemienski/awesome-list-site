@@ -481,3 +481,9 @@
   line-height: 1.4;
   overflow: hidden;
 }
+
+/* Load-error state in place of the empty-table line (keeps the table gutter). */
+.queues-agent .queues-agent__inline-error {
+  margin: 12px 22px 18px;
+  width: auto;
+}

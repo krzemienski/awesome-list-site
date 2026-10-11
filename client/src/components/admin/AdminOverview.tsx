@@ -4,6 +4,7 @@ import { apiRequest } from "@/lib/queryClient";
 import type { EnrichmentJob, LinkHealthJob } from "@shared/schema";
 import StatStatusChip from "@/components/admin/canonical/StatusChip";
 import TableShell from "@/components/admin/canonical/TableShell";
+import { AdminLoadError } from "@/components/admin/AdminLoadError";
 import { formatRelativeAgo } from "@/lib/utils";
 import "@/styles/pages/admin-overview.css";
 
@@ -357,6 +358,18 @@ export default function AdminOverview({ stats }: AdminOverviewProps) {
     ai,
     enrichment,
   );
+  // A failed health request renders its row as "unavailable"; say why and
+  // offer one Retry for every failed request.
+  const healthQueries: UseQueryResult<unknown>[] = [
+    operations,
+    githubQueue,
+    githubHistory,
+    linkStatus,
+    linkHistory,
+    ai,
+    enrichment,
+  ];
+  const failedHealthQueries = healthQueries.filter((query) => query.isError);
   const healthSubtitle = healthRows.some((row) => row.state === "bad")
     ? "One or more systems need attention"
     : healthRows.some((row) => row.state === "unknown")
@@ -384,9 +397,14 @@ export default function AdminOverview({ stats }: AdminOverviewProps) {
           {audit.isPending ? (
             <p className="admin-canonical-empty">Loading activity…</p>
           ) : audit.isError ? (
-            <p className="admin-canonical-empty" role="alert">
-              Activity is unavailable. Open Audit to retry.
-            </p>
+            <AdminLoadError
+              subject="recent activity"
+              error={audit.error}
+              onRetry={() => { void audit.refetch(); }}
+              retrying={audit.isFetching}
+              testId="alert-overview-activity-error"
+              retryTestId="button-retry-overview-activity"
+            />
           ) : audit.data?.logs.length ? (
             <div className="admin-canonical-activity-list admin-table-wrap">
               {audit.data.logs.slice(0, 6).map((entry) => (
@@ -442,6 +460,18 @@ export default function AdminOverview({ stats }: AdminOverviewProps) {
               </div>
             ))}
           </div>
+          {failedHealthQueries.length > 0 ? (
+            <AdminLoadError
+              subject={failedHealthQueries.length === healthQueries.length ? "system health" : "some health checks"}
+              error={failedHealthQueries[0].error}
+              note="Rows marked unavailable could not be checked."
+              onRetry={() => failedHealthQueries.forEach((query) => { void query.refetch(); })}
+              retrying={failedHealthQueries.some((query) => query.isFetching)}
+              className="mt-3"
+              testId="alert-overview-health-error"
+              retryTestId="button-retry-overview-health"
+            />
+          ) : null}
         </TableShell>
 
         <TableShell
@@ -453,7 +483,14 @@ export default function AdminOverview({ stats }: AdminOverviewProps) {
           {categories.isPending ? (
             <p className="admin-canonical-empty">Loading categories…</p>
           ) : categories.isError ? (
-            <p className="admin-canonical-empty" role="alert">Category data is unavailable.</p>
+            <AdminLoadError
+              subject="top categories"
+              error={categories.error}
+              onRetry={() => { void categories.refetch(); }}
+              retrying={categories.isFetching}
+              testId="alert-overview-categories-error"
+              retryTestId="button-retry-overview-categories"
+            />
           ) : topCategories.length ? (
             <div className="admin-canonical-category-list">
               {topCategories.map((category, index) => {

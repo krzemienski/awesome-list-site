@@ -158,13 +158,17 @@ export function AgentCommsGraph({ jobType, jobId, isActive }: AgentCommsGraphPro
   const apiBase = jobType === "research" ? "/api/researcher" : "/api/enrichment";
   const url = `${apiBase}/jobs/${jobId}/events`;
 
-  const { data: events = [] } = useQuery<AgentEvent[]>({
+  // Same query key as AgentEventLog, which renders directly below and owns
+  // the load-error banner + Retry for this request; the graph only says why
+  // it is empty so one failed request never shows two retry alerts.
+  const { data, isError } = useQuery<AgentEvent[]>({
     queryKey: [url],
     enabled: !!jobId,
     refetchInterval: isActive ? 2000 : false,
   });
+  const loadFailed = isError && !data;
 
-  const graph = useMemo(() => buildGraph(events), [events]);
+  const graph = useMemo(() => buildGraph(data ?? []), [data]);
 
   const summary = useMemo(() => {
     const subs = graph.nodes.filter((n) => n.type === "subagent").length;
@@ -187,7 +191,9 @@ export function AgentCommsGraph({ jobType, jobId, isActive }: AgentCommsGraphPro
 
       {graph.nodes.length === 0 ? (
         <div className="h-[100px] border rounded p-4 flex items-center justify-center text-xs text-muted-foreground">
-          {isActive ? "Waiting for agent activity…" : "No agent activity recorded."}
+          {loadFailed
+            ? "Couldn't load agent activity, so there is no graph to show. Retry from Agent Events below."
+            : isActive ? "Waiting for agent activity…" : "No agent activity recorded."}
         </div>
       ) : (
         <div

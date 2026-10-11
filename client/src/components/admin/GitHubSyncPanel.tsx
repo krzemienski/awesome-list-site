@@ -24,6 +24,7 @@ import {
 // shared formatter keeps every admin table's timestamps identical.
 import { formatAdminDateTime as formatSyncDate } from "@/lib/utils";
 import { normalizeGithubRepoInput } from "@shared/validation";
+import { AdminLoadError } from "@/components/admin/AdminLoadError";
 import "@/styles/pages/admin-ops-github-links.css";
 
 interface SyncHistory {
@@ -69,7 +70,14 @@ export default function GitHubSyncPanel() {
   // The public config is the single source of truth for the deployment's
   // repository. Keep the field empty until it arrives rather than falling
   // back to a repository that could send an export to the wrong destination.
-  const { data: publicConfig, isLoading: configIsLoading, isError: configIsError } = useContactConfig(true);
+  const {
+    data: publicConfig,
+    isLoading: configIsLoading,
+    isError: configIsError,
+    error: configError,
+    isFetching: configIsFetching,
+    refetch: refetchConfig,
+  } = useContactConfig(true);
   const configuredRepo = useMemo(
     () => normalizeGithubRepoInput(publicConfig?.site?.repoUrl),
     [publicConfig?.site?.repoUrl],
@@ -103,6 +111,7 @@ export default function GitHubSyncPanel() {
     data: syncHistory,
     isLoading: syncHistoryIsLoading,
     isError: syncHistoryIsError,
+    error: syncHistoryError,
     isFetching: syncHistoryIsFetching,
     refetch: refetchSyncHistory,
   } = useQuery<SyncHistory[]>({
@@ -115,6 +124,7 @@ export default function GitHubSyncPanel() {
     data: syncQueueData,
     isLoading: syncQueueIsLoading,
     isError: syncQueueIsError,
+    error: syncQueueError,
     isFetching: syncQueueIsFetching,
     refetch: refetchSyncQueue,
   } = useQuery<SyncQueueResponse>({
@@ -271,12 +281,15 @@ export default function GitHubSyncPanel() {
             </div>
           </div>
           {configIsError && !repoUrl && (
-            <Alert variant="destructive" data-testid="alert-github-config-error">
-              <XCircle className="h-4 w-4" />
-              <AlertDescription>
-                The configured repository is unavailable. Pull and export are disabled until the site repository is configured.
-              </AlertDescription>
-            </Alert>
+            <AdminLoadError
+              subject="the repository settings"
+              error={configError}
+              note="Pull and export stay disabled until they load."
+              onRetry={() => { void refetchConfig(); }}
+              retrying={configIsFetching}
+              testId="alert-github-config-error"
+              retryTestId="button-retry-github-config"
+            />
           )}
           {showDetails && <div className="ops-github-panel__repository-editor">
             <Label htmlFor="repo-url">Target Repository</Label>
@@ -342,7 +355,7 @@ export default function GitHubSyncPanel() {
             </CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">
-            {!syncQueue.length && !lastSync && (
+            {!syncQueue.length && !lastSync && !syncQueueIsError && !syncHistoryIsError && (
               <div className="ops-github-panel__empty-state">
                 <Clock className="h-5 w-5" aria-hidden="true" />
                 <div>
@@ -453,22 +466,14 @@ export default function GitHubSyncPanel() {
             })()}
 
              {syncQueueIsError ? (
-               <Alert variant="destructive" data-testid="alert-sync-queue-error">
-                 <XCircle className="h-4 w-4" />
-                 <AlertDescription className="flex flex-wrap items-center gap-3">
-                   <span>Sync queue status is unavailable.</span>
-                   <Button
-                     type="button"
-                     variant="outline"
-                     size="sm"
-                     onClick={() => { void refetchSyncQueue(); }}
-                     disabled={syncQueueIsFetching}
-                     data-testid="button-retry-sync-queue"
-                   >
-                     {syncQueueIsFetching ? "Retrying…" : "Retry"}
-                   </Button>
-                 </AlertDescription>
-               </Alert>
+               <AdminLoadError
+                 subject="the sync queue"
+                 error={syncQueueError}
+                 onRetry={() => { void refetchSyncQueue(); }}
+                 retrying={syncQueueIsFetching}
+                 testId="alert-sync-queue-error"
+                 retryTestId="button-retry-sync-queue"
+               />
              ) : syncQueue && syncQueue.length > 0 && (
               <div className="space-y-2">
                 <h4 className="text-sm font-semibold">Recent Sync Jobs</h4>
@@ -537,19 +542,14 @@ export default function GitHubSyncPanel() {
            sub="The sync history could not be loaded."
            className="ops-github-panel__history-shell"
          >
-           <div className="flex flex-wrap items-center gap-3" role="alert">
-             <span className="text-sm text-muted-foreground">Try again to inspect previous import/export operations.</span>
-             <Button
-               type="button"
-               variant="outline"
-               size="sm"
-               onClick={() => { void refetchSyncHistory(); }}
-               disabled={syncHistoryIsFetching}
-               data-testid="button-retry-sync-history"
-             >
-               {syncHistoryIsFetching ? "Retrying…" : "Retry"}
-             </Button>
-           </div>
+           <AdminLoadError
+             subject="sync history"
+             error={syncHistoryError}
+             onRetry={() => { void refetchSyncHistory(); }}
+             retrying={syncHistoryIsFetching}
+             testId="alert-sync-history-error"
+             retryTestId="button-retry-sync-history"
+           />
          </TableShell>
        ) : syncHistory && syncHistory.length > 0 ? (
         <TableShell

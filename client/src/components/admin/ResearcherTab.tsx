@@ -4,6 +4,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Alert, AlertDescription } from "@/components/ui/alert";
+import { AdminLoadError } from "@/components/admin/AdminLoadError";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
@@ -140,11 +141,6 @@ function formatCost(value: string | number | null | undefined): string {
 
 // Cancelling a job that the server failed to stop: it may still be running.
 const CANCEL_OUTCOME = "The job may still be running. Refresh the job list, then try again.";
-
-function mutationErrorMessage(error: unknown): string {
-  if (error instanceof Error && error.message) return error.message;
-  return "The request could not be completed. Please try again.";
-}
 
 function getDiscoveryStatusBadge(status: string) {
   switch (status) {
@@ -319,6 +315,8 @@ export default function ResearcherTab({ initialTab = "launch" }: ResearcherTabPr
     data: selectedJob,
     error: selectedJobError,
     isError: selectedJobIsError,
+    isFetching: selectedJobFetching,
+    refetch: refetchSelectedJob,
   } = useQuery<ResearchJob & { isActive: boolean }>({
     queryKey: ['/api/researcher/jobs', selectedJobId],
     enabled: !!selectedJobId,
@@ -355,6 +353,8 @@ export default function ResearcherTab({ initialTab = "launch" }: ResearcherTabPr
     data: jobDiscoveries,
     error: jobDiscoveriesError,
     isError: jobDiscoveriesIsError,
+    isFetching: jobDiscoveriesFetching,
+    refetch: refetchJobDiscoveries,
   } = useQuery<ResearchDiscovery[]>({
     queryKey: ['/api/researcher/discoveries', selectedJobId ? `?jobId=${selectedJobId}` : ''],
     enabled: !!selectedJobId && showJobDetails,
@@ -681,7 +681,18 @@ export default function ResearcherTab({ initialTab = "launch" }: ResearcherTabPr
                 ))}
               </tbody>
             </table>
-            {!jobsLoading && (jobs || []).length === 0 ? <p className="queues-agent__empty">No research jobs found.</p> : null}
+            {jobsIsError ? (
+              <AdminLoadError
+                subject="research jobs"
+                error={jobsError}
+                note={jobs ? "The rows above may be out of date." : undefined}
+                onRetry={() => { void refetchJobs(); }}
+                retrying={jobsFetching}
+                className="queues-agent__inline-error"
+                testId="error-research-jobs-canonical"
+                retryTestId="button-retry-research-jobs-canonical"
+              />
+            ) : !jobsLoading && (jobs || []).length === 0 ? <p className="queues-agent__empty">No research jobs found.</p> : null}
           </div>
           {jobs && hasMoreJobs ? (
             <div className="queues-agent__table-more">
@@ -1046,22 +1057,15 @@ export default function ResearcherTab({ initialTab = "launch" }: ResearcherTabPr
                     Checking for active research jobs…
                   </div>
                 ) : jobsIsError ? (
-                  <Alert variant="destructive" className="queues-agent__inline-error" role="alert" data-testid="error-research-jobs">
-                    <AlertCircle className="w-4 h-4" />
-                    <AlertDescription className="flex flex-wrap items-center gap-3">
-                      <span>Unable to load research jobs: {mutationErrorMessage(jobsError)}</span>
-                      <Button
-                        type="button"
-                        variant="outline"
-                        size="sm"
-                        onClick={() => { void refetchJobs(); }}
-                        disabled={jobsFetching}
-                        data-testid="button-retry-research-jobs"
-                      >
-                        {jobsFetching ? "Retrying…" : "Retry"}
-                      </Button>
-                    </AlertDescription>
-                  </Alert>
+                  <AdminLoadError
+                    subject="research jobs"
+                    error={jobsError}
+                    onRetry={() => { void refetchJobs(); }}
+                    retrying={jobsFetching}
+                    className="queues-agent__inline-error"
+                    testId="error-research-jobs"
+                    retryTestId="button-retry-research-jobs"
+                  />
                 ) : activeJobs.length === 0 ? (
                   <p className="text-sm text-muted-foreground text-center py-8">No active research jobs</p>
                 ) : (
@@ -1203,22 +1207,15 @@ export default function ResearcherTab({ initialTab = "launch" }: ResearcherTabPr
                   Loading pending discoveries…
                 </div>
               ) : pendingDiscoveriesIsError ? (
-                <Alert variant="destructive" className="queues-agent__inline-error" role="alert" data-testid="error-research-discoveries">
-                  <AlertCircle className="w-4 h-4" />
-                  <AlertDescription className="flex flex-wrap items-center gap-3">
-                    <span>Unable to load pending discoveries: {mutationErrorMessage(pendingDiscoveriesError)}</span>
-                    <Button
-                      type="button"
-                      variant="outline"
-                      size="sm"
-                      onClick={() => { void refetchPendingDiscoveries(); }}
-                      disabled={pendingDiscoveriesFetching}
-                      data-testid="button-retry-research-discoveries"
-                    >
-                      {pendingDiscoveriesFetching ? "Retrying…" : "Retry"}
-                    </Button>
-                  </AlertDescription>
-                </Alert>
+                <AdminLoadError
+                  subject="pending discoveries"
+                  error={pendingDiscoveriesError}
+                  onRetry={() => { void refetchPendingDiscoveries(); }}
+                  retrying={pendingDiscoveriesFetching}
+                  className="queues-agent__inline-error"
+                  testId="error-research-discoveries"
+                  retryTestId="button-retry-research-discoveries"
+                />
               ) : !pendingDiscoveries || pendingDiscoveries.length === 0 ? (
                 <p className="admin-empty text-center">No pending discoveries to review</p>
               ) : (
@@ -1303,22 +1300,15 @@ export default function ResearcherTab({ initialTab = "launch" }: ResearcherTabPr
                   ))}
                 </div>
               ) : jobsIsError ? (
-                <Alert variant="destructive" className="queues-agent__inline-error" role="alert" data-testid="error-research-jobs">
-                  <AlertCircle className="w-4 h-4" />
-                  <AlertDescription className="flex flex-wrap items-center gap-3">
-                    <span>Unable to load research jobs: {mutationErrorMessage(jobsError)}</span>
-                    <Button
-                      type="button"
-                      variant="outline"
-                      size="sm"
-                      onClick={() => { void refetchJobs(); }}
-                      disabled={jobsFetching}
-                      data-testid="button-retry-research-jobs"
-                    >
-                      {jobsFetching ? "Retrying…" : "Retry"}
-                    </Button>
-                  </AlertDescription>
-                </Alert>
+                <AdminLoadError
+                  subject="research jobs"
+                  error={jobsError}
+                  onRetry={() => { void refetchJobs(); }}
+                  retrying={jobsFetching}
+                  className="queues-agent__inline-error"
+                  testId="error-research-jobs"
+                  retryTestId="button-retry-research-jobs"
+                />
               ) : !jobs || jobs.length === 0 ? (
                 <p className="text-sm text-muted-foreground text-center py-8">No research jobs yet</p>
               ) : (
@@ -1497,10 +1487,16 @@ export default function ResearcherTab({ initialTab = "launch" }: ResearcherTabPr
             </DialogDescription>
           </DialogHeader>
           {selectedJobIsError && (
-            <Alert variant="destructive" className="queues-agent__inline-error" role="alert">
-              <AlertCircle className="w-4 h-4" />
-              <AlertDescription>{mutationErrorMessage(selectedJobError)}</AlertDescription>
-            </Alert>
+            <AdminLoadError
+              subject="this job's details"
+              error={selectedJobError}
+              note={selectedJob ? "The details below may be out of date." : undefined}
+              onRetry={() => { void refetchSelectedJob(); }}
+              retrying={selectedJobFetching}
+              className="queues-agent__inline-error"
+              testId="error-research-job-detail"
+              retryTestId="button-retry-research-job-detail"
+            />
           )}
           {selectedJob && (
             <div className="space-y-4">
@@ -1678,10 +1674,15 @@ export default function ResearcherTab({ initialTab = "launch" }: ResearcherTabPr
                 </>
               )}
               {jobDiscoveriesIsError && (
-                <Alert variant="destructive" className="queues-agent__inline-error" role="alert">
-                  <AlertCircle className="w-4 h-4" />
-                  <AlertDescription>{mutationErrorMessage(jobDiscoveriesError)}</AlertDescription>
-                </Alert>
+                <AdminLoadError
+                  subject="this job's discoveries"
+                  error={jobDiscoveriesError}
+                  onRetry={() => { void refetchJobDiscoveries(); }}
+                  retrying={jobDiscoveriesFetching}
+                  className="queues-agent__inline-error"
+                  testId="error-research-job-discoveries"
+                  retryTestId="button-retry-research-job-discoveries"
+                />
               )}
             </div>
           )}

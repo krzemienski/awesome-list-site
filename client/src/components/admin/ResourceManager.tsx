@@ -52,6 +52,7 @@ import {
   resourceKindSchema,
   type ResourceKind,
 } from "@shared/resourceKinds";
+import { AdminLoadError } from "@/components/admin/AdminLoadError";
 import "@/styles/pages/admin-catalog-resources.css";
 
 const RESOURCE_KIND_LABELS: Record<ResourceKind, string> = {
@@ -304,7 +305,7 @@ export default function ResourceManager({ createRequest = 0 }: { createRequest?:
     return `/api/admin/resources?${params.toString()}`;
   };
 
-  const { data, isLoading, isError, isPaused, refetch } = useQuery<ResourcesResponse>({
+  const { data, isLoading, isError, error: resourcesError, isFetching: resourcesFetching, isPaused, refetch } = useQuery<ResourcesResponse>({
     queryKey: ['/api/admin/resources', page, limit, debouncedSearch, categoryFilter, statusFilter, sort],
     queryFn: async () => {
       const params = new URLSearchParams();
@@ -1342,28 +1343,18 @@ export default function ResourceManager({ createRequest = 0 }: { createRequest?:
               the error and offer a retry (stale rows stay visible if we have
               them via placeholderData). */}
           {isError && (
-            <div
-              role="alert"
-              className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 rounded-md border border-destructive/40 bg-destructive/10 px-4 py-3"
-              data-testid="banner-resources-error"
-            >
-              <p className="text-sm text-[var(--text)]">
-                {data
-                  ? "Refreshing the resource list failed — showing the last loaded results."
-                  : "Couldn't load resources. Check your connection and try again."}
-              </p>
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={(event) => {
-                  handoffFocusOnUnmount(event.currentTarget, () => tableRegionRef.current);
-                  void refetch();
-                }}
-                data-testid="button-resources-retry"
-              >
-                Retry
-              </Button>
-            </div>
+            <AdminLoadError
+              subject="resources"
+              error={resourcesError}
+              note={data ? "Showing the last loaded results." : undefined}
+              onRetry={(event) => {
+                handoffFocusOnUnmount(event.currentTarget, () => tableRegionRef.current);
+                void refetch();
+              }}
+              retrying={resourcesFetching}
+              testId="banner-resources-error"
+              retryTestId="button-resources-retry"
+            />
           )}
           {/* C3-V5A-08: offline the fetch pauses instead of failing, so the
               error banner never fires; say so instead of relabelling stale rows. */}
@@ -1426,7 +1417,7 @@ export default function ResourceManager({ createRequest = 0 }: { createRequest?:
               </thead>
               <tbody>
                 {/* Run16 BUG-080: explicit empty state instead of a blank table. */}
-                {!isLoading && (data?.resources.length || 0) === 0 && (
+                {!isLoading && !isError && (data?.resources.length || 0) === 0 && (
                   <tr>
                     <td colSpan={6} className="py-12 text-center text-sm text-[var(--text-2)]" data-testid="row-empty-state">
                       {(search || categoryFilter || statusFilter)

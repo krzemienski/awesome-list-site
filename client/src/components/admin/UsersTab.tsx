@@ -14,6 +14,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { ChevronLeft, ChevronRight, Trash2, Search, Eye, EyeOff, Download, ArrowUpDown, ArrowUp, ArrowDown, Plus, X } from "lucide-react";
 import type { User } from "@shared/schema";
 import { AdminOpsTable as Table, StatusChip, TableShell } from "@/components/admin/AdminOpsPrimitives";
+import { AdminLoadError } from "@/components/admin/AdminLoadError";
 import "@/styles/pages/admin-ops-users-audit.css";
 
 interface UsersResponse {
@@ -88,7 +89,7 @@ export default function UsersTab() {
     if (target === "next") nextPageRef.current?.focus();
   }, [page]);
 
-  const { data, isLoading } = useQuery<UsersResponse>({
+  const { data, isLoading, isError, error, isFetching, refetch } = useQuery<UsersResponse>({
     queryKey: ['/api/admin/users', page, limit, searchQuery, sortBy, sortDir],
     // R5-037: refresh admin data when the operator returns to the tab.
     staleTime: 30_000,
@@ -182,7 +183,7 @@ export default function UsersTab() {
 
   return (
     <TableShell
-      title={`Users (${data?.total ?? 0})`}
+      title={data ? `Users (${data.total})` : "Users"}
       description="Admins and contributors"
       className={`admin-ops-users-shell${userToolsOpen ? " admin-ops-users-shell--tools-open" : ""}`}
       actions={
@@ -247,6 +248,21 @@ export default function UsersTab() {
         </>
       }
     >
+        {/* A failed load is never shown as "No users found". The search box
+            above stays mounted so the query can be corrected or retried. */}
+        {isError && (
+          <AdminLoadError
+            subject="users"
+            error={error}
+            note={data ? "Showing the previous results." : undefined}
+            onRetry={() => { void refetch(); }}
+            retrying={isFetching}
+            className="mb-4"
+            testId="alert-users-error"
+            retryTestId="button-retry-users"
+          />
+        )}
+        {isError && !data ? null : <>
         {/* Run16 BUG-088: on narrow screens the table scrolls sideways — a
             right-edge fade + explicit hint make the hidden columns
             discoverable instead of silently clipping them. */}
@@ -500,6 +516,7 @@ export default function UsersTab() {
             </div>
           </div>
         )}
+        </>}
 
         {/* Run16 BUG-037: explicit confirmation before applying a role change. */}
         <AlertDialog open={!!pendingRoleChange} onOpenChange={(open) => { if (!open) setPendingRoleChange(null); }}>

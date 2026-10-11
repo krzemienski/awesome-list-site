@@ -20,6 +20,7 @@ import { apiRequest, ApiError } from "@/lib/queryClient";
 import { fetchAwesomeListNav, type AwesomeListNav } from "@/lib/static-data";
 // Task 275: same fast numbered + jump pagination as the public listings.
 import { Paginator } from "@/components/ui/paginator";
+import { AdminLoadError } from "@/components/admin/AdminLoadError";
 import "@/styles/pages/admin-catalog-taxonomy.css";
 
 /**
@@ -1605,7 +1606,14 @@ export default function GenericCrudManager<T extends BaseEntityWithCount>({
   // second tab's create/edit/delete becomes visible on focus (or after a
   // mutation invalidates [queryKey]) instead of staying stale until a hard
   // refresh.
-  const { data: items, isLoading } = useQuery<T[]>({
+  const {
+    data: items,
+    isLoading,
+    isError: itemsIsError,
+    error: itemsError,
+    isFetching: itemsIsFetching,
+    refetch: refetchItems,
+  } = useQuery<T[]>({
     queryKey: [queryKey],
     queryFn: async () => {
       const response = await fetch(fetchUrl, {
@@ -2771,7 +2779,19 @@ export default function GenericCrudManager<T extends BaseEntityWithCount>({
             </Button>
           </div>
         )}
-        {isLoading ? (
+        {itemsIsError && (
+          <AdminLoadError
+            subject={entityNamePlural.toLowerCase()}
+            error={itemsError}
+            note={items ? "The list below may be out of date." : undefined}
+            onRetry={() => { void refetchItems(); }}
+            retrying={itemsIsFetching}
+            className="mb-4"
+            testId={`alert-${testIdEntityPlural}-load-error`}
+            retryTestId={`button-retry-${testIdEntityPlural}`}
+          />
+        )}
+        {itemsIsError && !items ? null : isLoading ? (
           <div className="admin-taxonomy-loading space-y-2">
             {[...Array(5)].map((_, i) => (
               <Skeleton key={i} className="h-12 w-full" />

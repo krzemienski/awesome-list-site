@@ -5,6 +5,7 @@ import { describeWriteError } from "@/lib/apiError";
 import { formatAdminDateTime, formatRelativeAgo, maskEmail } from "@/lib/utils";
 import { useToast } from "@/hooks/use-toast";
 import { queryUnavailableReason } from "@/lib/query-availability";
+import { AdminLoadError } from "@/components/admin/AdminLoadError";
 import { handoffFocusOnUnmount } from "@/hooks/focus-handoff";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -282,25 +283,38 @@ export default function PendingEdits() {
     return (
       <section className="admin-panel queue-review-shell" aria-label="Pending edits">
         <div className="admin-panel__heading queue-review-shell-heading"><h2>Pending edits</h2></div>
-        <div className="queue-review-empty" role="alert" data-testid="pending-edits-load-error">
-          <p>
-            {unavailable === "offline"
-              ? "You're offline, so pending edits can't be loaded. The queue may still contain suggestions awaiting review."
-              : "Unable to load pending edits. The queue may still contain suggestions awaiting review."}
-          </p>
-          <Button
-            aria-disabled={isFetching}
-            aria-busy={isFetching}
-            onClick={(event) => {
-              if (isFetching) return;
+        {unavailable === "offline" ? (
+          <div className="queue-review-empty" role="alert" data-testid="pending-edits-load-error">
+            <p>
+              {"You're offline, so pending edits can't be loaded. The queue may still contain suggestions awaiting review."}
+            </p>
+            <Button
+              aria-disabled={isFetching}
+              aria-busy={isFetching}
+              onClick={(event) => {
+                if (isFetching) return;
+                handoffFocusOnUnmount(event.currentTarget, () => document.getElementById("pending-edits-heading"));
+                void refetch();
+              }}
+              data-testid="pending-edits-retry"
+            >
+              {isFetching ? "Retrying…" : "Retry"}
+            </Button>
+          </div>
+        ) : (
+          <AdminLoadError
+            subject="pending edits"
+            error={editsQuery.error}
+            note="The queue may still contain suggestions awaiting review."
+            onRetry={(event) => {
               handoffFocusOnUnmount(event.currentTarget, () => document.getElementById("pending-edits-heading"));
               void refetch();
             }}
-            data-testid="pending-edits-retry"
-          >
-            {isFetching ? "Retrying…" : "Retry"}
-          </Button>
-        </div>
+            retrying={isFetching}
+            testId="pending-edits-load-error"
+            retryTestId="pending-edits-retry"
+          />
+        )}
       </section>
     );
   }

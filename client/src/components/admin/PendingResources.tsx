@@ -6,6 +6,7 @@ import { describeWriteError } from "@/lib/apiError";
 import { formatAdminDate, formatRelativeAgo } from "@/lib/utils";
 import { useToast } from "@/hooks/use-toast";
 import { queryUnavailableReason } from "@/lib/query-availability";
+import { AdminLoadError } from "@/components/admin/AdminLoadError";
 import { handoffFocusOnUnmount } from "@/hooks/focus-handoff";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -430,25 +431,38 @@ export default function PendingResources() {
     return (
       <section className="admin-panel queue-review-shell" aria-label="Approvals">
         <div className="admin-panel__heading queue-review-shell-heading"><h2>Approvals</h2></div>
-        <div className="queue-review-empty" role="alert" data-testid="pending-resources-load-error">
-          <p>
-            {unavailable === "offline"
-              ? "You're offline, so the approvals queue can't be loaded. It may still contain items awaiting review."
-              : "Unable to load pending resources. The queue may still contain items awaiting review."}
-          </p>
-          <Button
-            aria-disabled={isFetching}
-            aria-busy={isFetching}
-            onClick={(event) => {
-              if (isFetching) return;
+        {unavailable === "offline" ? (
+          <div className="queue-review-empty" role="alert" data-testid="pending-resources-load-error">
+            <p>
+              {"You're offline, so the approvals queue can't be loaded. It may still contain items awaiting review."}
+            </p>
+            <Button
+              aria-disabled={isFetching}
+              aria-busy={isFetching}
+              onClick={(event) => {
+                if (isFetching) return;
+                handoffFocusOnUnmount(event.currentTarget, () => document.getElementById("pending-resources-heading"));
+                void refetch();
+              }}
+              data-testid="pending-resources-retry"
+            >
+              {isFetching ? "Retrying…" : "Retry"}
+            </Button>
+          </div>
+        ) : (
+          <AdminLoadError
+            subject="pending resources"
+            error={pendingQuery.error}
+            note="The queue may still contain items awaiting review."
+            onRetry={(event) => {
               handoffFocusOnUnmount(event.currentTarget, () => document.getElementById("pending-resources-heading"));
               void refetch();
             }}
-            data-testid="pending-resources-retry"
-          >
-            {isFetching ? "Retrying…" : "Retry"}
-          </Button>
-        </div>
+            retrying={isFetching}
+            testId="pending-resources-load-error"
+            retryTestId="pending-resources-retry"
+          />
+        )}
       </section>
     );
   }

@@ -8,7 +8,7 @@ import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
-import { Eye, Search, RefreshCw, AlertCircle } from "lucide-react";
+import { Eye, Search, RefreshCw } from "lucide-react";
 import { parseIntInRange, PG_INT4_MAX } from "@shared/validation";
 import {
   AdminOpsScrollArea as ScrollArea,
@@ -17,6 +17,7 @@ import {
   TableShell,
 } from "@/components/admin/AdminOpsPrimitives";
 import ContactSubmissions from "@/components/admin/ContactSubmissions";
+import { AdminLoadError } from "@/components/admin/AdminLoadError";
 import "@/styles/pages/admin-ops-users-audit.css";
 import "@/styles/pages/admin-ops-audit.css";
 
@@ -131,7 +132,7 @@ export default function AuditTab() {
 
   // Run23 NB-041: surface fetch failures as a distinct error state instead of
   // letting them render as the "No audit log entries found" empty state.
-  const { data, isLoading, isError, refetch, isFetching, isPlaceholderData } = useQuery<AuditLogsResponse>({
+  const { data, isLoading, isError, error, refetch, isFetching, isPlaceholderData } = useQuery<AuditLogsResponse>({
     queryKey: ['/api/admin/audit-logs', appliedFilter, appliedLimit, offset],
     queryFn: async () => {
       const params = new URLSearchParams({ limit: appliedLimit, offset: String(offset) });
@@ -328,29 +329,15 @@ export default function AuditTab() {
         {/* Run23 NB-041: fetch failures render a distinct, retryable error
             state — never the "No audit log entries found" empty state. */}
         {isError ? (
-          <div
-            className="border border-destructive/40 bg-destructive/10 rounded p-8 text-center"
-            role="alert"
-            data-testid="alert-audit-error"
-          >
-            <AlertCircle className="h-10 w-10 mx-auto mb-3 text-destructive" />
-            <p className="font-medium mb-1">Couldn't load the audit log</p>
-            <p className="text-sm text-muted-foreground mb-4">
-              The server returned an error while fetching entries. Your filter is still applied — try again.
-            </p>
-            <Button
-              type="button"
-              variant="outline"
-              size="sm"
-              onClick={() => { if (!isFetching) void refetch(); }}
-              aria-disabled={isFetching}
-              aria-busy={isFetching}
-              data-testid="button-audit-retry"
-            >
-              <RefreshCw className={`h-4 w-4 mr-2 ${isFetching ? 'animate-spin' : ''}`} />
-              Try again
-            </Button>
-          </div>
+          <AdminLoadError
+            subject="the audit log"
+            error={error}
+            note="Your filter is still applied."
+            onRetry={() => { void refetch(); }}
+            retrying={isFetching}
+            testId="alert-audit-error"
+            retryTestId="button-audit-retry"
+          />
         ) : (
         <>
         {/* Run16 BUG-088: on narrow screens the table scrolls sideways — a

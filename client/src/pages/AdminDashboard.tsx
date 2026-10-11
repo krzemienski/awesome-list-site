@@ -6,6 +6,7 @@ import { useAdmin } from "@/hooks/useAdmin";
 import { useAuth } from "@/hooks/useAuth";
 import { Link as WLink, useRoute } from "wouter";
 import AdminStats from "@/components/admin/AdminStats";
+import { AdminLoadError } from "@/components/admin/AdminLoadError";
 import AdminOverview from "@/components/admin/AdminOverview";
 import { Button } from "@/components/ui/button";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
@@ -79,7 +80,7 @@ function revealTabTrigger(scroller: HTMLElement, trigger: HTMLElement) {
 }
 
 export default function AdminDashboard() {
-  const { stats, isLoading, error: statsError } = useAdmin();
+  const { stats, isLoading, error: statsError, isFetching: statsFetching, refetch: refetchStats } = useAdmin();
   // Only a first-load failure or an expired session replaces the dashboard;
   // a failed background poll keeps the last good stats on screen.
   const error =
@@ -314,7 +315,15 @@ export default function AdminDashboard() {
               </WLink>
             </>
           ) : (
-            <p className="text-[var(--accent-ink)]">Error loading admin dashboard</p>
+            <AdminLoadError
+              subject="the admin dashboard"
+              error={error}
+              onRetry={() => { void refetchStats(); }}
+              retrying={statsFetching}
+              className="text-left"
+              testId="alert-admin-dashboard-error"
+              retryTestId="button-retry-admin-dashboard"
+            />
           )}
         </div>
       </div>
@@ -443,7 +452,13 @@ export default function AdminDashboard() {
         {/* R2-L13: each tab body sits in its own ErrorBoundary so a render
             crash in one panel can't blank the entire admin dashboard. */}
         <TabsContent value="overview" data-testid="content-overview">
-          <AdminStats stats={stats} isLoading={isLoading} onNavigate={(tab) => {
+          <AdminStats
+            stats={stats}
+            isLoading={isLoading}
+            statsError={statsError}
+            statsRetrying={statsFetching}
+            onRetryStats={() => { void refetchStats(); }}
+            onNavigate={(tab) => {
             // C8-V5A-02: the tile unmounts with the Overview panel, so hand
             // keyboard focus to the newly selected tab trigger.
             handleTabChange(tab);

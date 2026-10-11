@@ -4,6 +4,7 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import { Badge } from "@/components/ui/badge";
 import { ChevronRight, ChevronDown } from "lucide-react";
 import type { AgentEvent } from "@shared/schema";
+import { AdminLoadError } from "@/components/admin/AdminLoadError";
 import "./queues-agent.css";
 
 /**
@@ -50,11 +51,12 @@ export function AgentEventLog({ jobType, jobId, isActive, height = "360px" }: Ag
   const apiBase = jobType === "research" ? "/api/researcher" : "/api/enrichment";
   const url = `${apiBase}/jobs/${jobId}/events`;
 
-  const { data: events = [], isLoading } = useQuery<AgentEvent[]>({
+  const { data, isLoading, isError, error, isFetching, refetch } = useQuery<AgentEvent[]>({
     queryKey: [url],
     enabled: !!jobId,
     refetchInterval: isActive ? 2000 : false,
   });
+  const events = data ?? [];
 
   const toggle = (id: number) =>
     setExpanded((prev) => ({ ...prev, [id]: !prev[id] }));
@@ -88,7 +90,18 @@ export function AgentEventLog({ jobType, jobId, isActive, height = "360px" }: Ag
         </span>
       </div>
 
-      {isLoading && events.length === 0 ? (
+      {isError && (
+        <AdminLoadError
+          subject="agent events"
+          error={error}
+          note={data ? "The events below may be out of date." : undefined}
+          onRetry={() => { void refetch(); }}
+          retrying={isFetching}
+          testId="alert-agent-events-error"
+          retryTestId="button-retry-agent-events"
+        />
+      )}
+      {isError && !data ? null : isLoading && events.length === 0 ? (
         <div className="h-[120px] border rounded p-4 flex items-center justify-center text-xs text-muted-foreground">
           Loading events…
         </div>

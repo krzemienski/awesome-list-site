@@ -7,6 +7,7 @@ import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } f
 import { Skeleton } from "@/components/ui/skeleton";
 import { AlertCircle, ChevronLeft, ChevronRight, RefreshCw } from "lucide-react";
 import { AdminOpsTable as Table, TableShell } from "@/components/admin/AdminOpsPrimitives";
+import { AdminLoadError } from "@/components/admin/AdminLoadError";
 import "@/styles/pages/admin-ops-users-audit.css";
 
 interface ContactSubmission {
@@ -72,9 +73,9 @@ export default function ContactSubmissions() {
     placeholderData: keepPreviousData,
     staleTime: 30_000,
     refetchOnWindowFocus: true,
-    // A missing inbox route is an honest unavailable state, not a transient
-    // request failure worth retrying three times.
-    retry: (_failureCount, queryError) => errorStatus(queryError) !== 404,
+    // No local retry override: the global policy retries only short 429s.
+    // The old predicate (retry unless 404) returned true forever, so a 5xx
+    // kept the skeleton on screen instead of ever reaching the error state.
   });
 
   const pageSize = data?.limit ?? PAGE_SIZE;
@@ -102,7 +103,7 @@ export default function ContactSubmissions() {
     <div data-testid="contact-submissions-shell">
       <TableShell
         title="Contact submissions"
-        description={`Private inbox · ${total} ${total === 1 ? "message" : "messages"}`}
+        description={data ? `Private inbox · ${total} ${total === 1 ? "message" : "messages"}` : "Private inbox"}
         className="admin-ops-contact-shell"
       >
         {isError ? (
@@ -130,28 +131,14 @@ export default function ContactSubmissions() {
               </Button>
             </div>
           ) : (
-            <div
-              className="admin-ops-status-panel"
-              role="alert"
-              data-testid="alert-contact-submissions-error"
-            >
-              <AlertCircle className="h-8 w-8 mx-auto mb-3 text-destructive" />
-              <p className="font-medium mb-1">Couldn&apos;t load contact submissions</p>
-              <p className="text-sm text-muted-foreground mb-4">
-                The server returned an error while fetching the private inbox. Try again.
-              </p>
-              <Button
-                type="button"
-                variant="outline"
-                size="sm"
-                onClick={() => { void refetch(); }}
-                disabled={isFetching}
-                data-testid="button-contact-submissions-retry"
-              >
-                <RefreshCw className={`h-4 w-4 mr-2 ${isFetching ? "animate-spin" : ""}`} />
-                Try again
-              </Button>
-            </div>
+            <AdminLoadError
+              subject="contact submissions"
+              error={error}
+              onRetry={() => { void refetch(); }}
+              retrying={isFetching}
+              testId="alert-contact-submissions-error"
+              retryTestId="button-contact-submissions-retry"
+            />
           )
         ) : (
           <>

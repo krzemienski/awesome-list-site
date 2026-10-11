@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Alert, AlertDescription } from "@/components/ui/alert";
+import { AdminLoadError } from "@/components/admin/AdminLoadError";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
@@ -101,11 +102,6 @@ function averageBatchCost(jobs: EnrichmentJob[]): string {
   return `$${mean.toFixed(2)}`;
 }
 
-function mutationErrorMessage(error: unknown): string {
-  if (error instanceof Error && error.message) return error.message;
-  return "The request could not be completed. Please try again.";
-}
-
 export default function BatchEnrichmentPanel() {
   const { toast } = useToast();
   const queryClient = useQueryClient();
@@ -172,6 +168,8 @@ export default function BatchEnrichmentPanel() {
     data: selectedJobData,
     error: selectedJobError,
     isError: selectedJobIsError,
+    isFetching: selectedJobIsFetching,
+    refetch: refetchSelectedJob,
   } = useQuery<JobStatusResponse>({
     queryKey: ['/api/enrichment/jobs', selectedJobId],
     enabled: !!selectedJobId && isDetailsModalOpen,
@@ -398,15 +396,15 @@ export default function BatchEnrichmentPanel() {
                 className="queues-agent__stat"
                 label="Last enriched"
                 value={formatRelativeAgo(lastCompleted?.completedAt ?? null)}
-                sub={lastCompleted ? `batch #${lastCompleted.id} · ${lastCompleted.successfulResources || 0} entries` : "No completed batches"}
+                sub={jobsIsError && !jobsData ? "unavailable" : lastCompleted ? `batch #${lastCompleted.id} · ${lastCompleted.successfulResources || 0} entries` : "No completed batches"}
               />
             );
           })()}
           <Stat
             className="queues-agent__stat"
             label="Queue"
-            value={jobs.filter((job) => job.status === "pending" || job.status === "processing").length}
-            sub={hasActiveJob ? "active" : "idle"}
+            value={jobsIsError && !jobsData ? "—" : jobs.filter((job) => job.status === "pending" || job.status === "processing").length}
+            sub={jobsIsError && !jobsData ? "unavailable" : hasActiveJob ? "active" : "idle"}
           />
           <Stat className="queues-agent__stat" label="Avg cost" value={averageBatchCost(jobs)} sub="per batch" />
         </div>
@@ -458,7 +456,18 @@ export default function BatchEnrichmentPanel() {
                 ))}
               </tbody>
             </table>
-            {!isLoading && jobs.length === 0 ? <p className="queues-agent__empty">No enrichment jobs found.</p> : null}
+            {jobsIsError ? (
+              <AdminLoadError
+                subject="enrichment jobs"
+                error={jobsError}
+                note={jobsData ? "The rows above may be out of date." : undefined}
+                onRetry={() => { void refetchJobs(); }}
+                retrying={jobsIsFetching}
+                className="queues-agent__inline-error"
+                testId="error-enrichment-jobs-canonical"
+                retryTestId="button-retry-enrichment-jobs-canonical"
+              />
+            ) : !isLoading && jobs.length === 0 ? <p className="queues-agent__empty">No enrichment jobs found.</p> : null}
           </div>
           {jobs.length > CANONICAL_JOB_ROWS ? (
             <div className="queues-agent__table-more">
@@ -783,22 +792,15 @@ export default function BatchEnrichmentPanel() {
               <RefreshCw className="h-6 w-6 animate-spin text-muted-foreground" />
             </div>
           ) : jobsIsError ? (
-            <Alert variant="destructive" className="queues-agent__inline-error" role="alert" data-testid="error-enrichment-jobs">
-              <AlertCircle className="h-4 w-4" />
-              <AlertDescription className="flex flex-wrap items-center gap-3">
-                <span>Unable to load enrichment jobs: {mutationErrorMessage(jobsError)}</span>
-                <Button
-                  type="button"
-                  variant="outline"
-                  size="sm"
-                  onClick={() => { void refetchJobs(); }}
-                  disabled={jobsIsFetching}
-                  data-testid="button-retry-enrichment-jobs"
-                >
-                  {jobsIsFetching ? "Retrying…" : "Retry"}
-                </Button>
-              </AlertDescription>
-            </Alert>
+            <AdminLoadError
+              subject="enrichment jobs"
+              error={jobsError}
+              onRetry={() => { void refetchJobs(); }}
+              retrying={jobsIsFetching}
+              className="queues-agent__inline-error"
+              testId="error-enrichment-jobs"
+              retryTestId="button-retry-enrichment-jobs"
+            />
           ) : jobs.length === 0 ? (
             <Alert>
               <Info className="h-4 w-4" />
@@ -962,10 +964,16 @@ export default function BatchEnrichmentPanel() {
           </DialogHeader>
           
           {selectedJobIsError && (
-            <Alert variant="destructive" className="queues-agent__inline-error" role="alert">
-              <AlertCircle className="h-4 w-4" />
-              <AlertDescription>{mutationErrorMessage(selectedJobError)}</AlertDescription>
-            </Alert>
+            <AdminLoadError
+              subject="this job's details"
+              error={selectedJobError}
+              note={selectedJobData?.job ? "The details below may be out of date." : undefined}
+              onRetry={() => { void refetchSelectedJob(); }}
+              retrying={selectedJobIsFetching}
+              className="queues-agent__inline-error"
+              testId="error-enrichment-job-detail"
+              retryTestId="button-retry-enrichment-job-detail"
+            />
           )}
           {selectedJobData?.job && (
             // Radix wraps viewport content in an inline display:table div that

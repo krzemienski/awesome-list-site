@@ -186,6 +186,39 @@ export function describeWriteError(error: unknown, options: WriteErrorOptions = 
 }
 
 /**
+ * Message for a failed admin READ (a list, table, stats or status panel that
+ * could not load). Pair it with a "Couldn't load <subject>" title and a Retry
+ * action — the shared admin load-error component does both.
+ *
+ * Every /api 500 body is masked to a bare "Internal Server Error", so for
+ * 5xx responses this returns a sentence that says the server failed, that a
+ * failed read changed nothing, and that retrying is safe. A specific,
+ * human-readable message on a non-500 5xx is kept as-is, matching
+ * describeWriteError. Everything else (4xx, network errors) goes through
+ * humanizeApiError.
+ */
+export function describeLoadError(error: unknown): string {
+  const status = errorStatus(error);
+  if (status === undefined || status < 500 || status > 599) {
+    return humanizeApiError(error, "Something went wrong while loading. Please retry.");
+  }
+  if (status !== 500) {
+    // Only a JSON body is the server's own wording; several admin queryFns
+    // throw ApiError with a client-authored placeholder ("Failed to fetch
+    // users") that must not replace this guidance.
+    const body = errorBody(error);
+    const specific = body.trim().startsWith("{") ? humanizeStatusBody(status, body, "") : "";
+    if (specific && specific !== STATUS_FALLBACKS[status] && !isGenericOutageText(specific)) {
+      return specific;
+    }
+    if (status === 502 || status === 503 || status === 504) {
+      return "The server is temporarily unavailable. Nothing was changed — retry in a moment.";
+    }
+  }
+  return "The server hit an error. Nothing was changed — retry to load it again.";
+}
+
+/**
  * BUG-005 (run19): extract the server's structured per-field validation
  * messages from an ApiError so forms can render them at the offending fields
  * instead of discarding them behind a generic toast. Returns null when the

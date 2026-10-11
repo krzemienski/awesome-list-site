@@ -27,6 +27,7 @@ import { describeWriteError } from "@/lib/apiError";
 import { useToast } from "@/hooks/use-toast";
 import type { LinkHealthJob, LinkHealthCheck } from "@shared/schema";
 import { AdminOpsTable as Table, StatusChip, TableShell } from "@/components/admin/AdminOpsPrimitives";
+import { AdminLoadError } from "@/components/admin/AdminLoadError";
 import "@/styles/pages/admin-ops-github-links.css";
 import type { LinkHealthTrendPoint } from "@/components/admin/LinkHealthTrendChart";
 
@@ -112,12 +113,12 @@ export default function LinkHealthDashboard() {
   // F10: cancelling a running scan is destructive to its progress — confirm.
   const [confirmCancel, setConfirmCancel] = useState(false);
 
-  const { data: statusData, isLoading: isStatusLoading, isError: statusError, refetch: retryStatus } = useQuery<LinkHealthStatusResponse>({
+  const { data: statusData, isLoading: isStatusLoading, isError: statusError, error: statusErrorValue, isFetching: statusFetching, refetch: retryStatus } = useQuery<LinkHealthStatusResponse>({
     queryKey: ['/api/admin/link-health/status'],
     refetchInterval: isPolling ? 3000 : 60000
   });
 
-  const { data: historyData, isError: historyError, refetch: retryHistory } = useQuery<LinkHealthHistoryResponse>({
+  const { data: historyData, isError: historyError, error: historyErrorValue, isFetching: historyFetching, refetch: retryHistory } = useQuery<LinkHealthHistoryResponse>({
     queryKey: ['/api/admin/link-health/history'],
     // R5-037: refresh admin data when the operator returns to the tab.
     staleTime: 30_000,
@@ -128,7 +129,7 @@ export default function LinkHealthDashboard() {
   // summary counters and the table rows are driven by the SAME dataset. The old
   // server-filtered query made the counters (from the job record) reconcile
   // against a different/stale set than the visible rows.
-  const { data: brokenLinksData, isError: linksError, refetch: retryLinks } = useQuery<BrokenLinksResponse>({
+  const { data: brokenLinksData, isError: linksError, error: linksErrorValue, isFetching: linksFetching, refetch: retryLinks } = useQuery<BrokenLinksResponse>({
     queryKey: ['/api/admin/link-health/broken-links'],
     queryFn: () => apiRequest('/api/admin/link-health/broken-links'),
     // R5-037: refresh admin data when the operator returns to the tab.
@@ -139,7 +140,7 @@ export default function LinkHealthDashboard() {
   // BUG-014 (run25): current approved-catalog size, used to state the check's
   // honest scope (a completed job's totalLinks snapshots the catalog at check
   // start and goes stale as the catalog grows).
-  const { data: coverageData, isError: coverageError, refetch: retryCoverage } = useQuery<{ approvedTotal: number }>({
+  const { data: coverageData, isError: coverageError, error: coverageErrorValue, isFetching: coverageFetching, refetch: retryCoverage } = useQuery<{ approvedTotal: number }>({
     queryKey: ['/api/admin/enrichment/coverage'],
     staleTime: 60_000,
   });
@@ -214,6 +215,9 @@ export default function LinkHealthDashboard() {
       check.status === 'dns_failure' ||
       check.status === 'timeout',
   );
+  // A failed status or problem-link read means the empty lists below are
+  // unverified — never present them as an all-clear.
+  const problemLinksUnverified = statusError || linksError;
   const brokenLinks = statusFilter === 'all'
     ? allProblemLinks
     : allProblemLinks.filter((c) =>
@@ -323,18 +327,28 @@ export default function LinkHealthDashboard() {
     timeout: ((job.timeoutLinks || 0) / (job.totalLinks || 1)) * 100,
   }));
 
+  // One load-error banner names every failed request; Retry re-runs them all.
+  const failedLinkHealthParts = [
+    { failed: statusError, label: "scan status", error: statusErrorValue, fetching: statusFetching, retry: retryStatus },
+    { failed: historyError, label: "scan history", error: historyErrorValue, fetching: historyFetching, retry: retryHistory },
+    { failed: linksError, label: "problem links", error: linksErrorValue, fetching: linksFetching, retry: retryLinks },
+    { failed: coverageError, label: "catalog coverage", error: coverageErrorValue, fetching: coverageFetching, retry: retryCoverage },
+  ].filter((part) => part.failed);
+
   return (
     <div className="ops-link-health">
-      {(statusError || historyError || linksError || coverageError) && (
-        <div role="alert" className="card p-4">
-          <p>Link health data could not be refreshed. Previously loaded results below may be stale; missing counts are not evidence of healthy links.</p>
-          {statusError && <Button onClick={() => void retryStatus()}>Retry scan status</Button>}
-          {historyError && <Button onClick={() => void retryHistory()}>Retry scan history</Button>}
-          {linksError && <Button onClick={() => void retryLinks()}>Retry problem links</Button>}
-          {coverageError && <Button onClick={() => void retryCoverage()}>Retry catalog coverage</Button>}
-        </div>
+      {failedLinkHealthParts.length > 0 && (
+        <AdminLoadError
+          subject={failedLinkHealthParts.map((part) => part.label).join(", ")}
+          error={failedLinkHealthParts[0].error}
+          note="Previously loaded results may be out of date; missing counts are not evidence of healthy links."
+          onRetry={() => failedLinkHealthParts.forEach((part) => { void part.retry(); })}
+          retrying={failedLinkHealthParts.some((part) => part.fetching)}
+          testId="alert-link-health-error"
+          retryTestId="button-retry-link-health"
+        />
       )}
-      {((statusError && !statusData) || (historyError && !historyData) || (linksError && !brokenLinksData) || (coverageError && !coverageData)) ? <p>Link health results unavailable until the failed requests recover.</p> : <>
+      {((statusError && !statusData) || (historyError && !historyData) || (linksError && !brokenLinksData) || (coverageError && !coverageData)) ? <p className="text-sm text-muted-foreground">Link health results will appear once the failed requests load.</p> : <>
       {/* F09/F10: the latest scan's state is always visible — a running scan
           can be cancelled, and a failed or cancelled scan states its reason
           while the counts below are labelled as the previous completed scan. */}
@@ -371,7 +385,9 @@ export default function LinkHealthDashboard() {
             <p>
               {lastCompletedJob
                 ? `Counts and problem links below are from the previous completed scan (#${lastCompletedJob.id}, ${formatAdminDateTime(lastCompletedJob.createdAt)}).`
-                : 'No scan has completed yet, so there are no verified results to show.'}
+                : historyError
+                  ? "Scan history couldn't be loaded, so the previous completed scan is unknown."
+                  : 'No scan has completed yet, so there are no verified results to show.'}
             </p>
           </div>
           <Button
@@ -418,7 +434,9 @@ export default function LinkHealthDashboard() {
           <CardDescription>
             {latestJob
               ? `Last check: ${formatAdminDateTime(latestJob.createdAt)}`
-              : 'No link health checks performed yet'
+              : statusError
+                ? 'Last check unavailable'
+                : 'No link health checks performed yet'
             }
           </CardDescription>
         </CardHeader>
@@ -595,7 +613,9 @@ export default function LinkHealthDashboard() {
                 </thead>
               </table>
               <p className="ops-link-health__empty" role="status">
-                {isJobInProgress
+                {problemLinksUnverified
+                  ? "Recent failures couldn't be loaded. This is not evidence that links are healthy."
+                  : isJobInProgress
                   ? "Recent failures will appear when the current check completes."
                   : latestJob
                     ? "No recent failures or review flags were found."
@@ -719,7 +739,9 @@ export default function LinkHealthDashboard() {
                     "Run Check Now", so the instruction now matches. */}
                 {/* R4-043: never claim an all-clear while a check is still
                     running — results aren't in yet, so say so instead. */}
-                {!latestJob
+                {problemLinksUnverified
+                  ? "Problem links couldn't be loaded. This is not evidence that links are healthy."
+                  : !latestJob
                   ? 'No link check has been run yet. Click "Run Link Check" to scan the catalog.'
                   : isJobInProgress
                     ? 'Link check in progress — results will appear here when it completes.'

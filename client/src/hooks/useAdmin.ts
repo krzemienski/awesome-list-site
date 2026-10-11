@@ -35,7 +35,7 @@ export function useAdmin() {
   const { user } = useAuth();
   const isAdmin = Boolean(user && (user as any).role === "admin");
   
-  const { data: stats, isLoading, error } = useQuery<AdminStats>({
+  const { data: stats, isLoading, error, isFetching, refetch } = useQuery<AdminStats>({
     queryKey: ["/api/admin/stats"],
     queryFn: async () => {
       // Use apiRequest to ensure credentials are included
@@ -60,5 +60,7 @@ export function useAdmin() {
     stats: isAdmin ? stats : undefined,
     isLoading: isAdmin ? isLoading : false,
     error: isAdmin ? error : undefined,
+    isFetching: isAdmin ? isFetching : false,
+    refetch,
   };
 }

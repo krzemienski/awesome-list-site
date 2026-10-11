@@ -3,6 +3,7 @@ import { useQuery } from "@tanstack/react-query";
 import { apiRequest } from "@/lib/queryClient";
 import { formatRelativeAgo } from "@/lib/utils";
 import Stat from "@/components/admin/canonical/Stat";
+import { AdminLoadError } from "@/components/admin/AdminLoadError";
 
 interface AdminStatsProps {
   stats?: {
@@ -19,6 +20,10 @@ interface AdminStatsProps {
     activeUsers?: number;
   };
   isLoading: boolean;
+  /** Failure of the polled stats request (useAdmin); the last good stats stay shown. */
+  statsError?: unknown;
+  statsRetrying?: boolean;
+  onRetryStats?: () => void;
   /** R4-L17: when provided, stat cards become clickable and jump to the matching admin tab. */
   onNavigate?: (tab: string) => void;
 }
@@ -97,6 +102,9 @@ function oldestPendingAge(resources: PendingResource[] | undefined): string {
 export default function AdminStats({
   stats,
   isLoading,
+  statsError,
+  statsRetrying = false,
+  onRetryStats,
   onNavigate,
 }: AdminStatsProps) {
   // The oldest-age subtext needs the pending list itself. Poll it on the same
@@ -166,7 +174,17 @@ export default function AdminStats({
   const subcategoriesLoading = subcategories.isPending || (isLoading && !stats);
   const pendingLoading = pending.isPending || (isLoading && !stats);
 
+  // One banner names every tile source that failed; Retry re-runs them all.
+  const failedStatParts = [
+    { failed: Boolean(statsError), label: "dashboard totals", error: statsError, fetching: statsRetrying, retry: () => onRetryStats?.() },
+    { failed: categories.isError, label: "categories", error: categories.error, fetching: categories.isFetching, retry: () => categories.refetch() },
+    { failed: subcategories.isError, label: "subcategories", error: subcategories.error, fetching: subcategories.isFetching, retry: () => subcategories.refetch() },
+    { failed: users.isError, label: "active users", error: users.error, fetching: users.isFetching, retry: () => users.refetch() },
+    { failed: pending.isError, label: "pending approvals", error: pending.error, fetching: pending.isFetching, retry: () => pending.refetch() },
+  ].filter((part) => part.failed);
+
   return (
+    <>
     <div
       className="admin-stat-strip admin-overview-stats-canonical"
       data-testid="admin-stats"
@@ -228,5 +246,18 @@ export default function AdminStats({
         testId="stat-card-approvals"
       />
     </div>
+    {failedStatParts.length > 0 && (
+      <AdminLoadError
+        subject={`stats for ${failedStatParts.map((part) => part.label).join(", ")}`}
+        error={failedStatParts[0].error}
+        note="Affected tiles keep their last loaded value or are marked unavailable."
+        onRetry={() => failedStatParts.forEach((part) => { void part.retry(); })}
+        retrying={failedStatParts.some((part) => part.fetching)}
+        className="mb-4"
+        testId="alert-admin-stats-error"
+        retryTestId="button-retry-admin-stats"
+      />
+    )}
+    </>
   );
 }

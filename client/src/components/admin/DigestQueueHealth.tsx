@@ -4,6 +4,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { formatAdminDateTime } from "@/lib/utils";
 import { Stat } from "@/components/admin/AdminOpsPrimitives";
+import { AdminLoadError } from "@/components/admin/AdminLoadError";
 import type { DigestJobStatus } from "@shared/notifications";
 import "@/styles/pages/admin-ops-github-links.css";
 
@@ -92,16 +93,14 @@ export default function DigestQueueHealth() {
             <div className="skeleton h-28 w-full" />
           </div>
         ) : query.isError && !query.data ? (
-          <div className="p-4 text-sm" role="alert">
-            <p className="text-destructive">Health data is unavailable.</p>
-            <Button
-              variant="outline"
-              className="mt-3 min-h-[44px]"
-              onClick={() => void query.refetch()}
-            >
-              Try again
-            </Button>
-          </div>
+          <AdminLoadError
+            subject="digest delivery health"
+            error={query.error}
+            onRetry={() => { void query.refetch(); }}
+            retrying={query.isFetching}
+            testId="alert-digest-health-error"
+            retryTestId="button-retry-digest-health"
+          />
         ) : query.data ? (
           <div className="space-y-6">
             {staleSnapshot && (

@@ -40,6 +40,7 @@ import {
   Trash2,
   X,
 } from "lucide-react";
+import { AdminLoadError } from "@/components/admin/AdminLoadError";
 
 interface JourneyStep {
   id: number;
@@ -533,10 +534,21 @@ function StepsDialog({
             </>
           )}
           {unavailable && (
-            <div role="alert" className="flex flex-wrap items-center gap-2 text-sm">
-              {unavailable === "offline" ? "You're offline. Reconnect to load journey steps." : "Journey steps could not be loaded."}
-              <Button type="button" variant="outline" onClick={() => void stepsQuery.refetch()}>Retry</Button>
-            </div>
+            unavailable === "offline" ? (
+              <div role="alert" className="flex flex-wrap items-center gap-2 text-sm">
+                You&apos;re offline. Reconnect to load journey steps.
+                <Button type="button" variant="outline" onClick={() => void stepsQuery.refetch()}>Retry</Button>
+              </div>
+            ) : (
+              <AdminLoadError
+                subject="journey steps"
+                error={stepsQuery.error}
+                onRetry={() => { void stepsQuery.refetch(); }}
+                retrying={stepsQuery.isFetching}
+                testId="alert-journey-steps-error"
+                retryTestId="button-retry-journey-steps"
+              />
+            )
           )}
           {!unavailable && !isLoading && data && steps.length === 0 && (
             <p className="text-sm text-muted-foreground text-center py-6">
@@ -754,7 +766,7 @@ function StepsDialog({
 }
 
 export default function JourneyStepsManager() {
-  const { data, isLoading, error } = useQuery<{ journeys: AdminJourney[] }>({
+  const { data, isLoading, error, refetch, isFetching } = useQuery<{ journeys: AdminJourney[] }>({
     queryKey: ["/api/admin/journeys"],
     queryFn: async () => {
       const res = await fetch("/api/admin/journeys", { credentials: "include" });
@@ -790,7 +802,15 @@ export default function JourneyStepsManager() {
           </div>
         )}
         {error && (
-          <p className="text-sm text-destructive">Failed to load journeys.</p>
+          <AdminLoadError
+            subject="journeys"
+            error={error}
+            note={data ? "The list below may be out of date." : undefined}
+            onRetry={() => { void refetch(); }}
+            retrying={isFetching}
+            testId="alert-journeys-error"
+            retryTestId="button-retry-journeys"
+          />
         )}
         {!isLoading && !error && (data?.journeys?.length ?? 0) === 0 && (
           <p className="text-sm text-muted-foreground">No journeys yet.</p>

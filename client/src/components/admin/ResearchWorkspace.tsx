@@ -4,6 +4,7 @@ import type { ResearchJob } from "@shared/schema";
 import { ApiError } from "@/lib/queryClient";
 import { formatRelativeAgo } from "@/lib/utils";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { AdminLoadError } from "@/components/admin/AdminLoadError";
 import "./queues-agent.css";
 
 const RESEARCH_WORKSPACE_LIMIT = 4;
@@ -45,7 +46,7 @@ function toResearchNote(job: ResearchJob, now = Date.now()) {
 export function ResearchWorkspace() {
   const [selectedJobId, setSelectedJobId] = useState<number | null>(null);
   const noteTriggerRef = useRef<HTMLButtonElement | null>(null);
-  const { data, isError, isLoading } = useQuery<{ jobs: ResearchJob[]; total: number }>({
+  const { data, isError, error, isLoading, isFetching, refetch } = useQuery<{ jobs: ResearchJob[]; total: number }>({
     queryKey: ["/api/researcher/jobs", { limit: RESEARCH_WORKSPACE_LIMIT }],
     queryFn: async () => {
       const res = await fetch(`/api/researcher/jobs?limit=${RESEARCH_WORKSPACE_LIMIT}`, { credentials: "include" });
@@ -59,7 +60,7 @@ export function ResearchWorkspace() {
       query.state.data?.jobs.some((job) => job.status === "pending" || job.status === "processing") ? 5_000 : 30_000,
     refetchOnWindowFocus: true,
   });
-  const { data: selectedJob, isError: detailError } = useQuery<ResearchJob>({
+  const { data: selectedJob, isError: detailError, error: detailErrorValue, isFetching: detailFetching, refetch: refetchDetail } = useQuery<ResearchJob>({
     queryKey: ["/api/researcher/jobs", selectedJobId],
     enabled: selectedJobId !== null,
     queryFn: async () => {
@@ -79,9 +80,15 @@ export function ResearchWorkspace() {
         <h2 id="admin-research-heading">Research workspace</h2>
         <p>Read-only briefs from the latest four research jobs. Open a brief to review its candidates in the researcher.</p>
         {isError ? (
-          <p role="alert" className="admin-research-notes__status" data-testid="research-notes-error">
-            Research notes are unavailable right now.
-          </p>
+          <AdminLoadError
+            subject="research notes"
+            error={error}
+            note={data ? "The notes below may be out of date." : undefined}
+            onRetry={() => { void refetch(); }}
+            retrying={isFetching}
+            testId="research-notes-error"
+            retryTestId="button-retry-research-notes"
+          />
         ) : null}
         <div className="admin-research-notes" aria-busy={isLoading || undefined} data-testid="research-notes">
           {isLoading ? (
@@ -143,7 +150,17 @@ export function ResearchWorkspace() {
                 : "Read-only research note details"}
             </DialogDescription>
           </DialogHeader>
-          {detailError && <p role="alert">Research details could not be refreshed. Please try again.</p>}
+          {detailError && (
+            <AdminLoadError
+              subject="research details"
+              error={detailErrorValue}
+              note={selectedJob ? "The details below may be out of date." : undefined}
+              onRetry={() => { void refetchDetail(); }}
+              retrying={detailFetching}
+              testId="research-detail-error"
+              retryTestId="button-retry-research-detail"
+            />
+          )}
           {!selectedJob && !detailError && <p role="status">Loading research details…</p>}
           {selectedJob && (
             <div className="space-y-4">

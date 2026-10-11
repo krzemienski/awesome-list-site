@@ -45,6 +45,7 @@ import {
 import type { ValidationStatus } from "@/components/admin/types/validation";
 import type { LinkHealthJob } from "@shared/schema";
 import DatabaseBackupPanel from "@/components/admin/DatabaseBackupPanel";
+import { AdminLoadError } from "@/components/admin/AdminLoadError";
 import "./admin-ops-export-database.css";
 
 interface ExportTabProps {
@@ -122,6 +123,9 @@ export default function ExportTab({ validationStatus: propValidationStatus }: Ex
     data: exportHistoryData,
     isLoading: isExportHistoryLoading,
     isError: isExportHistoryError,
+    error: exportHistoryError,
+    isFetching: isExportHistoryFetching,
+    refetch: refetchExportHistory,
   } = useQuery<AuditLogsResponse>({
     queryKey: ["/api/admin/audit-logs", "export-history", auditHistoryPage],
     staleTime: 30_000,
@@ -346,7 +350,7 @@ export default function ExportTab({ validationStatus: propValidationStatus }: Ex
   // F11: Run Link Check starts the persistent link-health job (the same job
   // /admin/linkhealth runs) and this tab follows it by polling its status,
   // so the check survives navigation, shows progress and can be cancelled.
-  const { data: linkJobData, isError: isLinkJobError, refetch: refetchLinkJob } = useQuery<{ success: boolean; job: LinkHealthJob | null }>({
+  const { data: linkJobData, isError: isLinkJobError, error: linkJobError, isFetching: isLinkJobFetching, refetch: refetchLinkJob } = useQuery<{ success: boolean; job: LinkHealthJob | null }>({
     queryKey: ["/api/admin/link-health/status"],
     staleTime: 0,
     refetchOnWindowFocus: true,
@@ -470,10 +474,15 @@ export default function ExportTab({ validationStatus: propValidationStatus }: Ex
       {(linkJob || isLinkJobError) && (
         <section className="card admin-ops-export__link-job" data-testid="export-link-check-job" aria-label="Export link check">
           {isLinkJobError && !linkJob ? (
-            <div role="alert" className="admin-ops-export__link-job-row">
-              <p>Link check status could not be loaded; this is not evidence that links are healthy.</p>
-              <Button variant="outline" size="sm" onClick={() => void refetchLinkJob()}>Retry</Button>
-            </div>
+            <AdminLoadError
+              subject="the link check status"
+              error={linkJobError}
+              note="This is not evidence that links are healthy."
+              onRetry={() => { void refetchLinkJob(); }}
+              retrying={isLinkJobFetching}
+              testId="alert-export-link-check-error"
+              retryTestId="button-retry-export-link-check"
+            />
           ) : linkJob ? (
             <>
               <div className="admin-ops-export__link-job-row">
@@ -511,10 +520,15 @@ export default function ExportTab({ validationStatus: propValidationStatus }: Ex
                     : `${linkJob.status === "failed" ? "Failed" : "Cancelled"}${linkJob.completedAt ? ` ${formatAdminDateTime(linkJob.completedAt)}` : ""}: ${linkJob.errorMessage || "No reason was recorded."}`}
               </p>
               {isLinkJobError ? (
-                <p role="alert" className="admin-ops-export__link-job-row">
-                  Status refresh failed; the progress above may be stale.
-                  <Button variant="outline" size="sm" onClick={() => void refetchLinkJob()}>Retry</Button>
-                </p>
+                <AdminLoadError
+                  subject="the latest link check status"
+                  error={linkJobError}
+                  note="The progress above may be out of date."
+                  onRetry={() => { void refetchLinkJob(); }}
+                  retrying={isLinkJobFetching}
+                  testId="alert-export-link-check-stale"
+                  retryTestId="button-retry-export-link-check"
+                />
               ) : null}
               <RouterLink className="admin-ops-export__link-job-link" href="/admin/linkhealth">Open Link Health for problem links</RouterLink>
             </>
@@ -648,9 +662,14 @@ export default function ExportTab({ validationStatus: propValidationStatus }: Ex
         {isExportHistoryLoading ? (
           <p className="admin-ops-table__empty">Loading export history...</p>
         ) : isExportHistoryError ? (
-          <p className="admin-ops-table__error" role="alert">
-            Export history is unavailable. The audit log endpoint returned an error.
-          </p>
+          <AdminLoadError
+            subject="export history"
+            error={exportHistoryError}
+            onRetry={() => { void refetchExportHistory(); }}
+            retrying={isExportHistoryFetching}
+            testId="alert-export-history-error"
+            retryTestId="button-retry-export-history"
+          />
         ) : exportHistory.length === 0 ? (
           <p className="admin-ops-table__empty">
             {auditHistoryTotal === 0

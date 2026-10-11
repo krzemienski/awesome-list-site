@@ -7,6 +7,7 @@ import { describeWriteError, isServerError } from "@/lib/apiError";
 import { formatAdminDateTime } from "@/lib/utils";
 import { useToast } from "@/hooks/use-toast";
 import { AdminOpsTable as Table, TableShell } from "@/components/admin/AdminOpsPrimitives";
+import { AdminLoadError } from "@/components/admin/AdminLoadError";
 
 interface DatabaseBackupSummary {
   id: string;
@@ -61,7 +62,7 @@ export default function DatabaseBackupPanel() {
   const queryClient = useQueryClient();
   const [showContents, setShowContents] = useState(false);
 
-  const { data, isLoading, isError, error, refetch } = useQuery<DatabaseBackupList>({
+  const { data, isLoading, isError, error, refetch, isFetching } = useQuery<DatabaseBackupList>({
     queryKey: BACKUPS_KEY,
     queryFn: () => apiRequest("/api/admin/database-backups", { cache: "no-store" }),
     staleTime: 30_000,
@@ -137,10 +138,14 @@ export default function DatabaseBackupPanel() {
       {isLoading ? (
         <p className="admin-ops-table__empty">Loading backups...</p>
       ) : isError ? (
-        <p className="admin-ops-table__error" role="alert">
-          Backups could not be listed{error instanceof Error ? `: ${error.message}` : ""}.{" "}
-          <Button type="button" variant="outline" size="sm" onClick={() => void refetch()}>Retry</Button>
-        </p>
+        <AdminLoadError
+          subject="the backup list"
+          error={error}
+          onRetry={() => { void refetch(); }}
+          retrying={isFetching}
+          testId="alert-database-backups-error"
+          retryTestId="button-retry-database-backups"
+        />
       ) : unavailable ? (
         <p className="admin-ops-table__error" role="alert">
           Backup storage is not configured for this environment, so no backup can be taken.
