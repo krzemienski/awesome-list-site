@@ -1,0 +1,18 @@
+[
+ {"kind":"tax","path":"/category/encoding-codecs?kind=libraries","shot":"tax-cat-kind"},
+ {"kind":"tax","path":"/category/encoding-codecs?kind=libraries&page=2"},
+ {"kind":"tax","path":"/category/encoding-codecs?subcategory=Codecs","shot":"tax-cat-sub"},
+ {"kind":"tax","path":"/category/encoding-codecs?filter=general"},
+ {"kind":"tax","path":"/category/encoding-codecs?search=ffmpeg"},
+ {"kind":"tax","path":"/category/encoding-codecs?sort=name-asc"},
+ {"kind":"tax","path":"/category/encoding-codecs?sort=name-desc&page=2"},
+ {"kind":"tax","path":"/category/encoding-codecs?tags=open-source&format=tool"},
+ {"kind":"tax","path":"/category/encoding-codecs?page=2"},
+ {"kind":"tax","path":"/subcategory/mobile-web-players?subcategory=Web%20Players"},
+ {"kind":"tax","path":"/subcategory/mobile-web-players?filter=general"},
+ {"kind":"tax","path":"/subcategory/mobile-web-players?sortBy=name-desc","shot":"tax-sub-sort"},
+ {"kind":"tax","path":"/subcategory/mobile-web-players?kind=libraries"},
+ {"kind":"tax","path":"/sub-subcategory/quality-testing?sortBy=name-asc"},
+ {"kind":"tax","path":"/sub-subcategory/quality-testing?search=vmaf"},
+ {"kind":"tax","path":"/sub-subcategory/quality-testing?page=2"}
+]

@@ -1,0 +1,5 @@
+### H07 missing-page server titles, https://awesome.video
+/resource/99999999 status=404 title=Page Not Found — Awesome Video robots=<meta name="robots" content="noindex, nofollow" canonicals=0
+/journey/99999999 status=404 title=Page Not Found — Awesome Video robots=<meta name="robots" content="noindex, nofollow" canonicals=0
+/journey/2147483000 status=404 title=Page Not Found — Awesome Video robots=<meta name="robots" content="noindex, nofollow" canonicals=0
+/bookmarks status=200 title=Bookmarks — Awesome Video robots=<meta name="robots" content="noindex, nofollow" canonicals=0

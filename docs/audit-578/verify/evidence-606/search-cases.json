@@ -1,0 +1,9 @@
+[
+ {"kind":"search","path":"/search?q=video&category=encoding-codecs&sort=name-asc","shot":"search-filtered-sorted"},
+ {"kind":"search","path":"/search?q=video&category=encoding-codecs&sort=name-asc&page=2"},
+ {"kind":"search","path":"/search?q=video&tags=open-source"},
+ {"kind":"search","path":"/search?category=encoding-codecs","shot":"search-filter-only"},
+ {"kind":"search","path":"/search?search=ffmpeg","shot":"search-alias"},
+ {"kind":"search","path":"/search?q=player&format=library&sort=name-desc"},
+ {"kind":"search","path":"/search?q=hls"}
+]

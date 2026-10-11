@@ -179,3 +179,4 @@
 - [AI job liveness](ai-job-liveness.md) — enrichment/research orphans judged by worker_id+heartbeat, not age; queue leftovers → 'cancelled'; USD-cap stops = budget_stopped.
 - [Full database backup design](database-backup-design.md) — private storage, no download route, CLI-only restore, archive-derived counts; never claim api_keys are hashed.
 - [Parity header-band split](header-band-split.md) — approved tablet header deviations judged band (≤5%) vs body (≤0.5%); add widths only with user approval.
+- [Edge decodes %-escapes](edge-percent-decoding.md) — prod edge decodes %2D etc. before the app, so escape-normalising 301s never fire on awesome.video; probe via trailing-slash echo.

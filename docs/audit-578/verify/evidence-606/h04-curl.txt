@@ -1,0 +1,6 @@
+### curl -L https://awesome.video
+/category/encoding%2Dcodecs -> https://awesome.video/category/encoding%2Dcodecs code=200 redirects=0
+/category/encoding%2dcodecs -> https://awesome.video/category/encoding%2dcodecs code=200 redirects=0
+/subcategory/community%2Dgroups -> https://awesome.video/subcategory/community%2Dgroups code=200 redirects=0
+/sub-subcategory/web%2dplayers -> https://awesome.video/sub-subcategory/web%2dplayers code=200 redirects=0
+/sub-subcategory/quality%2Dtesting?page=2 -> https://awesome.video/sub-subcategory/quality%2Dtesting?page=2 code=200 redirects=0

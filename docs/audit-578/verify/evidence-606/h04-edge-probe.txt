@@ -1,0 +1,5 @@
+### Edge-normalisation probe (trailing-slash redirect echoes the path the app received)
+http://127.0.0.1:5000/abo%75t/ -> 301 location=http://127.0.0.1:5000/abo%75t
+http://127.0.0.1:5000/category/encoding%2Dcodecs/ -> 301 location=http://127.0.0.1:5000/category/encoding-codecs
+https://awesome.video/abo%75t/ -> 301 location=https://awesome.video/about
+https://awesome.video/category/encoding%2Dcodecs/ -> 301 location=https://awesome.video/category/encoding-codecs

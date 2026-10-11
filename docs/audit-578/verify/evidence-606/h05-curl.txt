@@ -1,0 +1,6 @@
+### H05 compatibility redirects, https://awesome.video (no -L)
+/subsubcategory/av1?page=2 -> 301 https://awesome.video/sub-subcategory/av1?page=2
+/explore?category=encoding-codecs&sort=name-asc -> 301 https://awesome.video/search?category=encoding-codecs&sort=name-asc
+/explore?q=ffmpeg&tags=open-source&page=2 -> 301 https://awesome.video/search?q=ffmpeg&tags=open-source&page=2
+/category/encoding-codecs/codecs?page=2&sort=name-asc -> 301 https://awesome.video/subcategory/codecs?sort=name-asc&page=2
+/category/encoding-codecs/nope-606 -> 404 
