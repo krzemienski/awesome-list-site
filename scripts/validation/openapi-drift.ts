@@ -40,16 +40,17 @@ import {
 // parallel, recompute from this gate's own "got N/hash" line after merging
 // instead of adding counts by hand.
 // 183 = 182 + DELETE /api/admin/link-health/jobs/:id (cancel a running scan).
+// 185 = 183 + GET/POST /api/admin/database-backups (full restorable backup).
 const BASELINES = {
   replit: {
-    apiCount: 183,
-    apiHash: "11f7080493d8ca3933ca8102c4c4170139894895262b459bebc26db2f5806465",
+    apiCount: 185,
+    apiHash: "d028fb4e262c58a7de190aa1ba9a85c68786eccc7fd06a73d0c49c9fdd4ca008",
     nonApiCount: 7,
     nonApiHash: "d8f02ed21a7ee98464146ef8958d38a24113b0a47dbbe4132e2da54f00d61a89",
   },
   portable: {
-    apiCount: 183,
-    apiHash: "11f7080493d8ca3933ca8102c4c4170139894895262b459bebc26db2f5806465",
+    apiCount: 185,
+    apiHash: "d028fb4e262c58a7de190aa1ba9a85c68786eccc7fd06a73d0c49c9fdd4ca008",
     nonApiCount: 7,
     nonApiHash: "d8f02ed21a7ee98464146ef8958d38a24113b0a47dbbe4132e2da54f00d61a89",
   },

@@ -320,16 +320,24 @@ Only **published** journeys are visible to end users on `/journeys`.
 2. Downloads awesome-lint compliant README.md
 3. Use for GitHub repositories
 
-### JSON Backup
-1. Admin → Export → Download JSON
-2. Includes:
-   - All resources (all statuses)
-   - Category hierarchy
-   - Users (sanitized)
-   - Tags
-   - Learning journeys
-   - Sync queue
-3. Use for full backup/migration
+### JSON Snapshot (not a backup)
+1. Admin → Export → JSON Snapshot → Download
+2. Includes resources (all statuses), the category hierarchy, tags, learning
+   journeys, the sync queue and limited user summaries.
+3. It is a **non-restorable catalog snapshot**: it omits user identities,
+   favorites, bookmarks, contributions, audit history, AI jobs and
+   discoveries, notification preferences and other application state. Do not
+   rely on it to recover the site.
+
+### Full database backup (restorable)
+1. Admin → Export → **Full database backup** → Create backup.
+2. Takes a `pg_dump` of every table, row, key, index and sequence (including
+   user accounts, favorites, bookmarks, journeys, audit history, AI jobs and
+   preferences) and stores it in the project's **private App Storage**. It is
+   never downloaded to the browser.
+3. The panel lists each backup with its table count, row count, size and
+   SHA-256, plus the per-table row counts of the latest one.
+4. Restore with the operator runbook: [DATABASE-BACKUP.md](DATABASE-BACKUP.md).
 
 ## Database Operations
 
@@ -345,7 +353,7 @@ All admin actions are logged:
 - Category changes
 - Approval/rejection decisions
 - User role changes
-- Bulk exports (Markdown/JSON/GitHub)
+- Bulk exports (Markdown/JSON/GitHub) and full database backups (`database.backed_up`)
 
 Browse entries in the **Audit** tab, or query the `resource_audit_log` table
 directly in the database.

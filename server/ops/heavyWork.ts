@@ -4,6 +4,7 @@ export type HeavyWorkLabel =
   | "catalog-export"
   | "catalog-validation"
   | "database-export"
+  | "database-backup"
   | "github-sync"
   | "link-health"
   | "automatic-seed"

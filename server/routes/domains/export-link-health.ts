@@ -26,6 +26,8 @@
  *     - POST /api/github/process-queue
  *     - POST /api/admin/export
  *     - GET  /api/admin/export-json
+ *     - GET  /api/admin/database-backups
+ *     - POST /api/admin/database-backups
  *     - POST /api/admin/validate
  *     - POST /api/admin/check-links
  *     - GET  /api/admin/validation-status
@@ -95,6 +97,15 @@ import { resolveResourceKind } from "../../lib/resourceKinds";
 import { isDatabaseUnavailableError } from "../../db/errors";
 import { ServiceUnavailableError } from "../../middleware/errors";
 import { runHeavyWork, startHeavyWork } from "../../ops/heavyWork";
+import {
+  DatabaseBackupError,
+  backupEnvironment,
+  createDatabaseBackup,
+  isBackupInFlight,
+  isBackupStorageConfigured,
+  listDatabaseBackups,
+  type BackupManifest,
+} from "../../backup/databaseBackup";
 import type {
   UserRepository,
   ResourceRepository,
@@ -845,6 +856,105 @@ export function registerExportLinkHealthRoutes(
     } catch (error) {
       console.error('Error generating JSON export:', error);
       sendOperationalFailure(res, error, 'Failed to generate JSON export');
+    }
+  }));
+
+  // --- Full database backup (restorable; see docs/DATABASE-BACKUP.md) ---
+  // The archive goes to the private App Storage bucket only. There is
+  // deliberately no download route: it contains personal data. Restore is the
+  // operator CLI (`npm run db:backup -- restore <id>`). Failures answer with
+  // the backup error's own non-500 status so the message reaches the admin
+  // (the contract layer masks 500 bodies).
+  const summarizeBackup = (m: BackupManifest) => {
+    const inv = m.coverage.inventory;
+    // Table names are already listed (with counts) in `tables`.
+    const inventory = {
+      schemas: inv.schemas,
+      columns: inv.columns,
+      primaryKeys: inv.primaryKeys,
+      foreignKeys: inv.foreignKeys,
+      uniqueConstraints: inv.uniqueConstraints,
+      checkConstraints: inv.checkConstraints,
+      indexes: inv.indexes,
+      sequences: inv.sequences,
+      views: inv.views,
+      functions: inv.functions,
+      triggers: inv.triggers,
+      enumTypes: inv.enumTypes,
+      extensions: inv.extensions,
+    };
+    return {
+      id: m.id,
+      environment: m.environment,
+      createdAt: m.createdAt,
+      completedAt: m.completedAt,
+      durationMs: m.durationMs,
+      createdBy: m.createdBy,
+      bytes: m.dump.bytes,
+      sha256: m.dump.sha256,
+      totalRows: m.coverage.totalRows,
+      tableCount: m.coverage.tables.length,
+      sequenceCount: m.coverage.sequences.length,
+      excludedSchemas: m.coverage.excludedSchemas,
+      inventory,
+      tables: m.coverage.tables,
+    };
+  };
+  const sendBackupFailure = (res: Response, error: unknown, fallback: string) => {
+    if (error instanceof DatabaseBackupError) {
+      res.status(error.status).json({ message: error.message });
+      return;
+    }
+    sendOperationalFailure(res, error, fallback);
+  };
+
+  // GET /api/admin/database-backups - Backup metadata only (never the archive)
+  app.get('/api/admin/database-backups', isAuthenticated, isAdmin, asyncHandler(async (_req, res) => {
+    const environment = backupEnvironment();
+    res.set('Cache-Control', 'no-store');
+    if (!isBackupStorageConfigured()) {
+      res.json({ environment, storageConfigured: false, inFlight: false, backups: [] });
+      return;
+    }
+    try {
+      const backups = await listDatabaseBackups(environment);
+      res.json({
+        environment,
+        storageConfigured: true,
+        inFlight: isBackupInFlight(),
+        backups: backups.map(summarizeBackup),
+      });
+    } catch (error) {
+      console.error('Error listing database backups:', error);
+      sendBackupFailure(res, error, 'Failed to list database backups');
+    }
+  }));
+
+  // POST /api/admin/database-backups - Take a full backup now (synchronous:
+  // autoscale deployments only run code while a request is open).
+  app.post('/api/admin/database-backups', isAuthenticated, isAdmin, asyncHandler(async (req, res) => {
+    try {
+      const manifest = await runHeavyWork('database-backup', () =>
+        createDatabaseBackup({ createdBy: req.dbUser?.id ?? null }));
+      await auditRepo.logResourceAudit(
+        null,
+        'database.backed_up',
+        req.dbUser?.id,
+        {
+          backupId: manifest.id,
+          environment: manifest.environment,
+          tables: manifest.coverage.tables.length,
+          rows: manifest.coverage.totalRows,
+          bytes: manifest.dump.bytes,
+          sha256: manifest.dump.sha256,
+        },
+        `Admin took a full database backup (${manifest.coverage.tables.length} tables, ${manifest.coverage.totalRows} rows) into private storage`
+      );
+      res.set('Cache-Control', 'no-store');
+      res.status(201).json(summarizeBackup(manifest));
+    } catch (error) {
+      console.error('Error creating database backup:', error);
+      sendBackupFailure(res, error, 'Failed to create database backup');
     }
   }));
 

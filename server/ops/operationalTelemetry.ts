@@ -144,6 +144,7 @@ export function endpointGroup(path: string): EndpointGroup {
   if (
     path === "/api/admin/export" ||
     path === "/api/admin/export-json" ||
+    path === "/api/admin/database-backups" ||
     path === "/api/admin/validate" ||
     path === "/api/admin/check-links" ||
     path === "/api/admin/seed-database"

@@ -521,6 +521,30 @@ const adminContactSubmissionsQuerySchema = z.object({
  * Idempotent: calling it multiple times in the same process is safe (the
  * override map is simply overwritten with the same values).
  */
+/** GET /api/admin/database-backups — metadata of private full backups. */
+const databaseBackupSummarySchema = z.object({
+  id: z.string(),
+  environment: z.enum(["production", "development"]),
+  createdAt: z.string(),
+  completedAt: z.string(),
+  durationMs: z.number(),
+  createdBy: z.string().nullable(),
+  bytes: z.number(),
+  sha256: z.string(),
+  totalRows: z.number(),
+  tableCount: z.number(),
+  sequenceCount: z.number(),
+  excludedSchemas: z.array(z.string()),
+  inventory: z.object({}).passthrough(),
+  tables: z.array(z.object({ table: z.string(), rows: z.number() })),
+});
+const databaseBackupListResponseSchema = z.object({
+  environment: z.enum(["production", "development"]),
+  storageConfigured: z.boolean(),
+  inFlight: z.boolean(),
+  backups: z.array(databaseBackupSummarySchema),
+});
+
 export function registerCoreEndpointSchemas(): void {
   // --- Text downloads: document the real media type, not JSON ---
   setRouteResponseSchema("post", "/api/admin/export", {
@@ -623,6 +647,12 @@ export function registerCoreEndpointSchemas(): void {
     name: "AuthMeResponse",
     description: "Deprecated /me alias: returns the authenticated user object directly",
     schema: authMeResponseSchema,
+  });
+
+  setRouteResponseSchema("get", "/api/admin/database-backups", {
+    name: "DatabaseBackupList",
+    description: "Full database backups held in private App Storage (metadata only; archives are never served over HTTP)",
+    schema: databaseBackupListResponseSchema,
   });
 
   setRouteResponseSchema("get", "/api/admin/stats", {

@@ -14,6 +14,8 @@ Schema and migration reference for the Awesome Video resource platform.
 - **Schema management:** `drizzle-kit push` in development; journaled SQL migrations in
   `migrations/` applied by a boot-time migrator in production (see
   [Migrations & schema changes](#migrations--schema-changes)).
+- **Backup & restore:** full restorable `pg_dump` backups in private App Storage —
+  see [DATABASE-BACKUP.md](DATABASE-BACKUP.md).
 - **Tables:** 38 `pgTable` definitions in `shared/schema.ts`.
 
 The schema supports the local application identity bridged from Clerk, a 3-level

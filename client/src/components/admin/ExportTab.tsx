@@ -43,6 +43,7 @@ import {
 } from "@/components/admin/AdminOpsPrimitives";
 import type { ValidationStatus } from "@/components/admin/types/validation";
 import type { LinkHealthJob } from "@shared/schema";
+import DatabaseBackupPanel from "@/components/admin/DatabaseBackupPanel";
 import "./admin-ops-export-database.css";
 
 interface ExportTabProps {
@@ -526,7 +527,7 @@ export default function ExportTab({ validationStatus: propValidationStatus }: Ex
             <FileJson className="h-5 w-5" />
           </div>
           <h3 className="admin-ops-export-card__title">JSON Snapshot</h3>
-          <p className="admin-ops-export-card__description">Non-restorable catalog snapshot, not a full database backup. Includes resources, category hierarchy, tags, learning journeys, sync queue and limited user summaries. Omits user identities, favorites, bookmarks, contributions, audit history, AI jobs and discoveries, notification preferences and other application state.</p>
+          <p className="admin-ops-export-card__description">Non-restorable catalog snapshot, not a full database backup. Includes resources, category hierarchy, tags, learning journeys, sync queue and limited user summaries. Omits user identities, favorites, bookmarks, contributions, audit history, AI jobs and discoveries, notification preferences and other application state. For a restorable copy, use Full database backup below.</p>
           <Button
             className="admin-ops-export-card__action"
             onClick={() => {
@@ -822,6 +823,8 @@ export default function ExportTab({ validationStatus: propValidationStatus }: Ex
 
       {/* Run23 NB-040: explicit confirmation before starting validation/link-check jobs. */}
       </details>
+
+      <DatabaseBackupPanel />
 
       <AlertDialog open={confirmAction !== null} onOpenChange={(open) => { if (!open) setConfirmAction(null); }}>
         <AlertDialogContent data-testid="dialog-confirm-export-job">

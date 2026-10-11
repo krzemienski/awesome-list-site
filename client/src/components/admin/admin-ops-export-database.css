@@ -678,3 +678,38 @@
   text-underline-offset: 2px;
   justify-self: start;
 }
+
+/* Full database backup (restorable pg_dump in private App Storage). */
+.admin-ops-backup__scope {
+  display: grid;
+  gap: 0.5rem;
+  padding: 0 1.25rem 1rem;
+  font-size: 0.8125rem;
+  color: var(--text-2);
+  max-width: 72ch;
+}
+
+.admin-ops-backup__scope strong {
+  color: var(--text);
+}
+
+.admin-ops-backup__scope code,
+.admin-ops-backup__inventory {
+  font-family: var(--font-mono);
+}
+
+.admin-ops-backup__contents {
+  display: grid;
+  gap: 0.5rem;
+  padding: 1rem 1.25rem;
+}
+
+.admin-ops-backup__inventory {
+  color: var(--text-2);
+  font-size: 0.75rem;
+}
+
+.admin-ops-backup__toggle {
+  justify-self: start;
+  min-height: 44px;
+}

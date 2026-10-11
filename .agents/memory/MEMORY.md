@@ -1,4 +1,3 @@
-// hint: Logic changed on both sides. Requires understanding intent of each change.
 - [Publishing image size](publish-image-size.md) — 8 GiB limit counts ignored files; measure post-trim size after heavy evidence runs; trim evidence dirs by name, never all of .cache.
 - [Clerk auth migration](clerk-auth-migration.md) — READ FIRST on login complaints: owner admin = /sign-in?admin + OWNER_PASSWORD; PROD_CLERK_SECRET_KEY irrelevant; JIT fails closed.
 - [Identity sweep by claim token](identity-sweep-claim-token.md) — sweep auth refactors by claim pattern (claims.sub), not receiver name; `request.`/`(req as any).` aliases silently survive `req.user` seds and tsc can't catch them.
@@ -178,4 +177,5 @@
 - [Publish gate offline repro](pre-publish-gate-offline-repro.md) — run pre-publish-gate.sh --publish in a /tmp tar copy (keep .agents+docs, BUILD_REVISION set, bogus DATABASE_URL) to prove blocking.
 - [GitHub import taxonomy merge](github-import-taxonomy-merge.md) — import headings colliding by slug/case merge into the existing node + canonical names; no suffixed slugs; dryRun still creates nodes.
 - [AI job liveness](ai-job-liveness.md) — enrichment/research orphans judged by worker_id+heartbeat, not age; queue leftovers → 'cancelled'; USD-cap stops = budget_stopped.
+- [Full database backup design](database-backup-design.md) — private storage, no download route, CLI-only restore, archive-derived counts; never claim api_keys are hashed.
 - [Parity header-band split](header-band-split.md) — approved tablet header deviations judged band (≤5%) vs body (≤0.5%); add widths only with user approval.
