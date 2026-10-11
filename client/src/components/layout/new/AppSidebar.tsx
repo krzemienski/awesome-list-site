@@ -524,7 +524,9 @@ function CategoryAccordion({
                           navigate(subPath);
                         }}
                         data-testid={`sub-${subSlug}`}
-                        aria-current={subActive ? "page" : undefined}
+                        // The row highlight marks the group holding the current
+                        // page; only the exact unfiltered listing is "page".
+                        aria-current={activePath === subPath && !generalActive ? "page" : undefined}
                         data-active={subActive || undefined}
                         title={sub.name}
                         className="av-sidebar-l2-link no-underline"
