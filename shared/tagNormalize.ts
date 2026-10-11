@@ -10,7 +10,24 @@ export const TAG_PLURAL_KEEP = new Set([
   "kubernetes", "less", "sass", "aws", "cors", "https", "dns", "tls",
   "sas", "saas", "paas", "iaas", "ffmpeg-libs", "canvas", "atmos",
   "axios", "redis", "postgres", "jenkins", "devops", "chaos",
+  // Names and singular nouns that end in "s" and occur as catalog tags.
+  "windows", "aaos", "kinesis", "bioinformatics", "esports", "haptics",
+  "jingos", "libopus", "llhls", "lufs", "mpegts", "vorbis", "ptzoptics",
+  "qualabs", "lms", "unityads", "vcms", "series",
 ]);
+
+/**
+ * Slugs the fold produced before those names joined TAG_PLURAL_KEEP. They were
+ * public (/tag/window was indexed), so old links resolve to the corrected tag.
+ */
+const RETIRED_TAG_SLUGS: Record<string, string> = {
+  window: "windows", aao: "aaos", "amazon-kinesi": "amazon-kinesis",
+  bioinformatic: "bioinformatics", esport: "esports", haptic: "haptics",
+  jingo: "jingos", libopu: "libopus", llhl: "llhls", luf: "lufs",
+  mpegt: "mpegts", "ogg-vorbi": "ogg-vorbis", ptzoptic: "ptzoptics",
+  qualab: "qualabs", "tutor-lm": "tutor-lms", unityad: "unityads",
+  vcm: "vcms", "vega-sery": "vega-series",
+};
 
 /** Minimum approved-resource count for an indexable tag landing page. */
 export const TAG_LANDING_MIN_RESOURCES = 5;
@@ -18,7 +35,7 @@ export const TAG_LANDING_MIN_RESOURCES = 5;
 const TAG_DISPLAY_ACRONYMS = new Set([
   "ai", "amd", "api", "av1", "cdn", "dash", "drm", "ffmpeg", "hls", "hdr", "hevc",
   "html5", "ios", "mpeg", "obs", "ott", "rtmp", "sdk", "srt", "ssai",
-  "vmaf", "vp9", "webrtc",
+  "vmaf", "vp9", "webrtc", "aaos", "llhls", "lufs", "lms", "vcms", "mpegts",
 ]);
 
 export function normalizeTagFilter(tag: string): string {
@@ -45,7 +62,8 @@ export function normalizeTagFilter(tag: string): string {
 /** Decode a route segment and return its canonical tag identity. */
 export function normalizeTagPathSegment(segment: string): string {
   try {
-    return normalizeTagFilter(decodeURIComponent(segment));
+    const tag = normalizeTagFilter(decodeURIComponent(segment));
+    return RETIRED_TAG_SLUGS[tag] ?? tag;
   } catch {
     return "";
   }
