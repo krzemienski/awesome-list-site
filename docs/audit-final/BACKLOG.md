@@ -7,7 +7,8 @@ Verification is by real browser use / curl only (no proof packets or gates since
 | ID | Item | Status | Packet |
 |---|---|---|---|
 | R-01 | Issue #20: Skill level / Time commitment controls jump the page instead of opening | NOT-REPRODUCED — CONFIRMED (review-r01, ab6da9f9) | [R-01](proof/R-01/packet.md) |
-| R-02 | Every Select / Popover / DropdownMenu checked for the same scroll jump | OPEN | |
+| R-02 | Every Select / Popover / DropdownMenu checked for the same scroll jump | NOT-REPRODUCED — every aria-haspopup/combobox trigger on public pages, member pages (bookmarks, contributions, settings, profile) and all 15 admin tabs at 1280 and 375 opens in place with a real mouse click (jump 0, focus returns on Escape). The only jump seen (/advanced sort → page top) is a Playwright artifact: `locator.click()` during an in-flight smooth scroll; real mouse click, wheel-then-click and keyboard Enter keep position | |
+| R-08 | *(discovered in R-02)* Member recommendations could list one resource twice (AI list repeats an id → React duplicate-key warning on /profile) | FIXED — final list (and cold-start list) deduped by resource id before caching; /profile POST returned 6 unique, no key warning | |
 | R-03 | Recommendations guest + member: refresh, feedback, Undo/Restore, empty, offline | OPEN | |
 | R-04 | Onboarding progress survives reload and sign-in; dismissal sticks | OPEN | |
 | R-05 | Resetting learning preferences changes the next recommendations | OPEN | |

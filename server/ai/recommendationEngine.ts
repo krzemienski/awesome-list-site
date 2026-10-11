@@ -128,6 +128,15 @@ export function calculateColdStartBlend(
   return { skillScore, goalsScore, typeScore, timeScore, score };
 }
 
+function uniqueByResourceId(recommendations: RecommendationResult[]): RecommendationResult[] {
+  const seen = new Set<number>();
+  return recommendations.filter((rec) => {
+    if (seen.has(rec.resource.id)) return false;
+    seen.add(rec.resource.id);
+    return true;
+  });
+}
+
 export class RecommendationEngine {
   private static instance: RecommendationEngine;
   private recommendationCache: Map<string, { recommendations: RecommendationResult[], timestamp: number }>;
@@ -514,6 +523,7 @@ export class RecommendationEngine {
           };
         }));
 
+        recommendations = uniqueByResourceId(recommendations);
         // Cache and return early for cold-start users
         this.recommendationCache.set(cacheKey, {
           recommendations,
@@ -598,9 +608,10 @@ export class RecommendationEngine {
         recommendations = [...recommendations, ...uniqueRuleBased];
       }
 
-      // Sort by confidence score
+      // Sort by confidence score; the AI list can name one resource twice, so
+      // keep only its highest-confidence entry.
       recommendations.sort((a, b) => b.confidence - a.confidence);
-      recommendations = recommendations.slice(0, limit);
+      recommendations = uniqueByResourceId(recommendations).slice(0, limit);
 
       // Debug: Log final recommendations with categories
       console.log('[RECOMMENDATIONS DEBUG]', {
