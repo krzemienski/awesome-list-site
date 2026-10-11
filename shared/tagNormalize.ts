@@ -30,6 +30,9 @@ export function normalizeTagFilter(tag: string): string {
   // (broken slug + mis-titled h1 on the public tag page).
   const lastToken = folded.slice(folded.lastIndexOf("-") + 1);
   if (TAG_PLURAL_KEEP.has(lastToken)) return folded;
+  // A final word after a dot is a name suffix ("video.js", "node.js"), never
+  // a plural; trimming it produced /tag/video.j.
+  if (folded.lastIndexOf(".") > folded.lastIndexOf("-")) return folded;
   if (folded.length > 4 && folded.endsWith("ies")) {
     return folded.slice(0, -3) + "y";
   }

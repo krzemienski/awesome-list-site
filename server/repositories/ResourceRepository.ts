@@ -485,6 +485,8 @@ export class ResourceRepository {
         THEN ${foldTagSql}
       WHEN regexp_replace(${foldTagSql}, '.*-', '') IN (${keepListSql})
         THEN ${foldTagSql}
+      WHEN ${foldTagSql} ~ '[.][^-]*$'
+        THEN ${foldTagSql}
       WHEN length(${foldTagSql}) > 4 AND right(${foldTagSql}, 3) = 'ies'
         THEN left(${foldTagSql}, length(${foldTagSql}) - 3) || 'y'
       WHEN length(${foldTagSql}) > 3 AND right(${foldTagSql}, 1) = 's'
