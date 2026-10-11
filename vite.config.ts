@@ -187,6 +187,10 @@ export default defineConfig({
     emptyOutDir: true,
     // Logical source keys make bundle budgets stable across hashed filenames.
     manifest: true,
+    // The category glyph faces (styles/category-glyph-faces.css) reference one
+    // of three ~4 KB fonts from ~47 @font-face rules; inlining would paste the
+    // base64 into the entry CSS once per rule. Keep fonts as hashed files.
+    assetsInlineLimit: (filePath) => (/\.(otf|ttf|woff2?)$/i.test(filePath) ? false : undefined),
     rollupOptions: {
       output: {
         // Rollup otherwise absorbs each manual chunk's transitive imports into

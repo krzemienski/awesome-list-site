@@ -15,6 +15,7 @@
 @import './styles/mobile-optimizations.css';
 @import './styles/skeleton-animations.css';
 @import './styles/scrolling-fix.css';
+@import './styles/category-glyph-faces.css';
 
 @source "../index.html";
 @source ".";
