@@ -23,6 +23,7 @@ import {
 } from "lucide-react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { apiRequest } from "@/lib/queryClient";
+import { describeWriteError } from "@/lib/apiError";
 import { formatRelativeAgo } from "@/lib/utils";
 import type { AdminDatabaseOverview } from "@/hooks/useAdmin";
 import { useToast } from "@/hooks/use-toast";
@@ -119,15 +120,22 @@ export default function DatabaseTab({ stats }: DatabaseTabProps) {
       });
     },
     onError: (error: unknown, options) => {
+      // A reseed's data swap is transactional, but the route can still fail
+      // after it commits, so neither mode can promise the catalog is
+      // unchanged; a plain seed inserts as it goes.
+      const message = describeWriteError(error, {
+        fallback: "Failed to seed database. Please try again.",
+        outcome: options.clearExisting
+          ? "The catalog may not have changed. Check the catalog counts before trying again."
+          : "Some items may already have been added. Check the catalog counts, then try again.",
+      });
       setSeedFailure({
         mode: options.clearExisting ? "reseed" : "seed",
-        message: error instanceof Error ? error.message : "Failed to seed database. Please try again.",
+        message,
       });
       toast({
         title: "Database Seeding Failed",
-        description: error instanceof Error
-          ? error.message
-          : "Failed to seed database. Please try again.",
+        description: message,
         variant: "destructive",
       });
     },

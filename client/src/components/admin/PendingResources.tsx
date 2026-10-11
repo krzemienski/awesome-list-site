@@ -1,6 +1,8 @@
 import { type MouseEvent, useEffect, useMemo, useRef, useState } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { apiRequest } from "@/lib/queryClient";
+import { describeWriteError } from "@/lib/apiError";
+
 import { formatAdminDate, formatRelativeAgo } from "@/lib/utils";
 import { useToast } from "@/hooks/use-toast";
 import { queryUnavailableReason } from "@/lib/query-availability";
@@ -17,6 +19,10 @@ import { Label } from "@/components/ui/label";
 import { ExternalLink, Calendar, User, FolderTree, RefreshCw, AlertCircle } from "lucide-react";
 import type { Resource } from "@shared/schema";
 import "./queues-review.css";
+
+// Bulk actions process resources one by one, so a server failure can leave
+// some of the selection already changed.
+const BULK_WRITE_OUTCOME = "Some selected resources may already have changed. Refresh the queue, then try again.";
 
 // BUG-040 (run19): the detail dialog renders whatever string is stored in
 // resource.url — only make it clickable when it is a well-formed http(s)
@@ -206,7 +212,7 @@ export default function PendingResources() {
       });
     },
     onError: (error: Error) => {
-      setApproveError(error.message || "Failed to approve resource. Please try again.");
+      setApproveError(describeWriteError(error, { fallback: "Failed to approve resource. Please try again." }));
     }
   });
 
@@ -231,7 +237,7 @@ export default function PendingResources() {
       });
     },
     onError: (error: Error) => {
-      setRejectError(error.message || "Failed to reject resource. Please try again.");
+      setRejectError(describeWriteError(error, { fallback: "Failed to reject resource. Please try again." }));
     }
   });
 
@@ -267,7 +273,7 @@ export default function PendingResources() {
       });
     },
     onError: (error: Error) => {
-      setBulkApproveError(error.message || "Failed to approve selected resources. Please try again.");
+      setBulkApproveError(describeWriteError(error, { fallback: "Failed to approve selected resources. Please try again.", outcome: BULK_WRITE_OUTCOME }));
     }
   });
 
@@ -307,7 +313,7 @@ export default function PendingResources() {
       });
     },
     onError: (error: Error) => {
-      setBulkRejectError(error.message || "Failed to reject selected resources. Please try again.");
+      setBulkRejectError(describeWriteError(error, { fallback: "Failed to reject selected resources. Please try again.", outcome: BULK_WRITE_OUTCOME }));
     }
   });
 

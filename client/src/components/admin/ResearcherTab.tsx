@@ -48,6 +48,7 @@ import { fetchStaticAwesomeList } from "@/lib/static-data";
 import { keepPreviousData, useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useAiDefaults } from "@/hooks/useAiDefaults";
 import { apiRequest, ApiError } from "@/lib/queryClient";
+import { describeWriteError } from "@/lib/apiError";
 import { sanitizeDisplay } from "@/lib/sanitize-display";
 import { useToast } from "@/hooks/use-toast";
 import { ToastAction } from "@/components/ui/toast";
@@ -136,6 +137,9 @@ function humanizeJobError(msg: string): string {
 function formatCost(value: string | number | null | undefined): string {
   return `$${Number(value ?? 0).toFixed(4)}`;
 }
+
+// Cancelling a job that the server failed to stop: it may still be running.
+const CANCEL_OUTCOME = "The job may still be running. Refresh the job list, then try again.";
 
 function mutationErrorMessage(error: unknown): string {
   if (error instanceof Error && error.message) return error.message;
@@ -270,7 +274,7 @@ export default function ResearcherTab({ initialTab = "launch" }: ResearcherTabPr
     queryKey: ['/api/researcher/jobs', { limit: jobsLimit }],
     queryFn: async () => {
       const res = await fetch(`/api/researcher/jobs?limit=${jobsLimit}`, { credentials: 'include' });
-      if (!res.ok) throw new ApiError(res.status, `${res.status}: ${await res.text()}`);
+      if (!res.ok) throw new ApiError(res.status, await res.text());
       return res.json();
     },
     refetchInterval: isPolling ? 3000 : false,
@@ -483,7 +487,7 @@ export default function ResearcherTab({ initialTab = "launch" }: ResearcherTabPr
   const briefMutation = useMutation({
     mutationFn: async () => {
       const res = await fetch('/api/researcher/brief', { credentials: 'include' });
-      if (!res.ok) throw new ApiError(res.status, `${res.status}: ${await res.text()}`);
+      if (!res.ok) throw new ApiError(res.status, await res.text());
       return res.json();
     },
     onSuccess: (data: any) => {
@@ -493,7 +497,7 @@ export default function ResearcherTab({ initialTab = "launch" }: ResearcherTabPr
       }
     },
     onError: (error: any) => {
-      toast({ title: "Failed to generate brief", description: error.message, variant: "destructive" });
+      toast({ title: "Failed to generate brief", description: describeWriteError(error, { outcome: "No brief was generated. Please try again." }), variant: "destructive" });
     },
   });
 
@@ -508,7 +512,7 @@ export default function ResearcherTab({ initialTab = "launch" }: ResearcherTabPr
     onError: (error, jobId) => {
       toast({
         title: `Could not cancel job #${jobId}`,
-        description: mutationErrorMessage(error),
+        description: describeWriteError(error, { outcome: CANCEL_OUTCOME }),
         variant: "destructive",
         action: <ToastAction altText="Retry cancellation" onClick={() => {
           if (!cancelMutation.isPending) cancelMutation.mutate(jobId);
@@ -550,7 +554,7 @@ export default function ResearcherTab({ initialTab = "launch" }: ResearcherTabPr
       toast({ title: "Resource approved", description: "Discovery added to the database." });
     },
     onError: (error: any) => {
-      toast({ title: "Failed to approve", description: error.message, variant: "destructive" });
+      toast({ title: "Failed to approve", description: describeWriteError(error), variant: "destructive" });
     },
   });
 
@@ -587,7 +591,7 @@ export default function ResearcherTab({ initialTab = "launch" }: ResearcherTabPr
         <Alert variant="destructive" role="alert">
           <AlertCircle className="w-4 h-4" />
           <AlertDescription>
-            Could not cancel job #{cancelMutation.variables}: {mutationErrorMessage(cancelMutation.error)}
+            Could not cancel job #{cancelMutation.variables}: {describeWriteError(cancelMutation.error, { outcome: CANCEL_OUTCOME })}
             <Button variant="outline" disabled={cancelMutation.isPending}
               onClick={() => {
                 if (cancelMutation.variables != null) cancelMutation.mutate(cancelMutation.variables);
@@ -1008,7 +1012,7 @@ export default function ResearcherTab({ initialTab = "launch" }: ResearcherTabPr
                     {startMutation.isError && (
                       <Alert variant="destructive" className="queues-agent__inline-error" role="alert">
                         <AlertCircle className="w-4 h-4" />
-                        <AlertDescription>{mutationErrorMessage(startMutation.error)}</AlertDescription>
+                        <AlertDescription>{describeWriteError(startMutation.error, { outcome: "The job may not have started. Check the job list before starting another." })}</AlertDescription>
                       </Alert>
                     )}
                     <AlertDialogFooter>
@@ -1173,7 +1177,7 @@ export default function ResearcherTab({ initialTab = "launch" }: ResearcherTabPr
                   {approveAllMutation.isError && (
                     <Alert variant="destructive" className="queues-agent__inline-error" role="alert">
                       <AlertCircle className="w-4 h-4" />
-                      <AlertDescription>{mutationErrorMessage(approveAllMutation.error)}</AlertDescription>
+                      <AlertDescription>{describeWriteError(approveAllMutation.error, { outcome: "Some discoveries may already be approved. Refresh the list, then try again." })}</AlertDescription>
                     </Alert>
                   )}
                   <AlertDialogFooter>
@@ -1696,7 +1700,7 @@ export default function ResearcherTab({ initialTab = "launch" }: ResearcherTabPr
           {rejectMutation.isError && (
             <Alert variant="destructive" className="queues-agent__inline-error" role="alert">
               <AlertCircle className="w-4 h-4" />
-              <AlertDescription>{mutationErrorMessage(rejectMutation.error)}</AlertDescription>
+              <AlertDescription>{describeWriteError(rejectMutation.error)}</AlertDescription>
             </Alert>
           )}
           <div className="space-y-3">

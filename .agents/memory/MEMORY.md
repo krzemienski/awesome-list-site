@@ -166,7 +166,7 @@
 - [Shared queryKey error shape](shared-querykey-error-shape.md) — every queryFn sharing a key must throw the same ApiError shape, or status-aware error UI races.
 - [Alternate-system pixel parity](alternate-system-parity.md) — app restating Editorial values beats per-system skins; "1px row drift" was hard-coded 1.6 vs --body-leading; adapter inline-projection traps.
 - [ds-button-sweep empty-queue dependency](ds-sweep-empty-queue-dependency.md) — admin tab checks wait for empty-state controls; pending QA fixtures fail them; run DS verify after cleanup.
-- [Contract masks 500 bodies](contract-500-body-masking.md) — every /api 500 body becomes "Internal Server Error"; actionable failure text must use a non-500 status or client-side 5xx mapping.
+- [Contract masks 500 bodies](contract-500-body-masking.md) — every /api 500 body becomes "Internal Server Error"; 5xx ≠ nothing changed (write commits before audit) — keep describeWriteError copy uncertain.
 - [Queued optimistic rollback](queued-optimistic-rollback.md) — queued writes must roll back to last server-confirmed state, not their onMutate snapshot; failed refetch keeps loaded page.
 - [cache-headers boot locks DEV](cache-headers-boot-migrator-locks.md) — spawned prod server runs boot DDL on dev; must hold db-heavy lease while up or seo-snapshot sheds random /tag/* 503s.
 - [Before-fix proof instance](before-fix-proof-instance.md) — run pre-fix code from a /tmp copy + git show HEAD files on a 2nd port; worktree blocked, nohup dies; use run_in_background.

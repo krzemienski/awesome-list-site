@@ -45,6 +45,7 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useAiDefaults } from "@/hooks/useAiDefaults";
 import { apiRequest, ApiError } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
+import { describeWriteError } from "@/lib/apiError";
 import { AgentEventLog } from "@/components/admin/AgentEventLog";
 import { AgentCommsGraph } from "@/components/admin/AgentCommsGraph";
 import { Stat, StatusChip, TableShell } from "@/components/admin/AdminOpsPrimitives";
@@ -1146,7 +1147,7 @@ export default function BatchEnrichmentPanel() {
           {cancelMutation.isError && (
             <Alert variant="destructive" className="queues-agent__inline-error" role="alert">
               <AlertCircle className="h-4 w-4" />
-              <AlertDescription>{mutationErrorMessage(cancelMutation.error)}</AlertDescription>
+              <AlertDescription>{describeWriteError(cancelMutation.error, { outcome: "The job may still be running. Refresh the job list, then try again." })}</AlertDescription>
             </Alert>
           )}
           <AlertDialogFooter>
@@ -1179,7 +1180,7 @@ export default function BatchEnrichmentPanel() {
           {startMutation.isError && (
             <Alert variant="destructive" className="queues-agent__inline-error" role="alert">
               <AlertCircle className="h-4 w-4" />
-              <AlertDescription>{mutationErrorMessage(startMutation.error)}</AlertDescription>
+              <AlertDescription>{describeWriteError(startMutation.error, { outcome: "The job may not have started. Check the job list before starting another." })}</AlertDescription>
             </Alert>
           )}
           <AlertDialogFooter>

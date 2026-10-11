@@ -30,6 +30,20 @@ function looksHumanReadable(text: string): boolean {
   return true;
 }
 
+/** HTTP status lines ("Internal Server Error", "Bad Gateway") carry no guidance. */
+function isBareStatusText(text: string): boolean {
+  return /^(internal server error|bad gateway|service unavailable|gateway timeout)\.?$/i.test(text.trim());
+}
+
+/**
+ * Generic outage wording the server sends with 503s (operational request
+ * context, central error handler). Accurate, but it does not tell an admin
+ * whether their change landed — the write helper below replaces it.
+ */
+function isGenericOutageText(text: string): boolean {
+  return /^(service|database) is temporarily unavailable\.?$/i.test(text.trim());
+}
+
 /**
  * Run22 BUG-039: core status+body → human copy mapper. Used by ApiError's
  * constructor (queryClient.ts) so error.message is ALWAYS user-safe, and by
@@ -51,11 +65,14 @@ export function humanizeStatusBody(
         (typeof parsed.message === "string" && parsed.message) ||
         (typeof parsed.error === "string" && parsed.error) ||
         "";
-      if (looksHumanReadable(candidate)) return candidate;
+      // The API contract rewrites every 500 body to the bare
+      // {"message":"Internal Server Error"}; that is a status line, not
+      // guidance, so fall through to the friendly per-status copy.
+      if (looksHumanReadable(candidate) && !isBareStatusText(candidate)) return candidate;
     } catch {
       // fall through to status fallback
     }
-  } else if (looksHumanReadable(trimmed) && !/^[A-Za-z ]*Error/.test(trimmed)) {
+  } else if (looksHumanReadable(trimmed) && !/^[A-Za-z ]*Error/.test(trimmed) && !isBareStatusText(trimmed)) {
     return trimmed;
   }
   return STATUS_FALLBACKS[status] ?? fallback;
@@ -89,6 +106,83 @@ export function humanizeApiError(error: unknown, fallback = "Something went wron
   }
 
   return humanizeStatusBody(parseInt(match[1], 10), match[2], fallback);
+}
+
+/** Status of a structured ApiError-like value, or undefined. */
+function errorStatus(error: unknown): number | undefined {
+  if (error && typeof error === "object") {
+    const { status } = error as { status?: unknown };
+    if (typeof status === "number") return status;
+  }
+  return undefined;
+}
+
+/** Raw response body of a structured ApiError-like value, or "". */
+function errorBody(error: unknown): string {
+  if (error && typeof error === "object") {
+    const { body } = error as { body?: unknown };
+    if (typeof body === "string") return body;
+  }
+  return "";
+}
+
+/** True when the error is an HTTP 5xx response from our API. */
+export function isServerError(error: unknown): boolean {
+  const status = errorStatus(error);
+  return status !== undefined && status >= 500 && status <= 599;
+}
+
+/**
+ * Default outcome for a failed write. Deliberately uncertain: most admin
+ * routes commit the write before a separate audit-log insert, so a 500 can
+ * arrive after the change landed. Retrying on a false "nothing was saved"
+ * creates duplicates or conflicts.
+ */
+const DEFAULT_WRITE_OUTCOME = "Your change may not have been saved. Refresh to check before trying again.";
+
+export interface WriteErrorOptions {
+  /** Copy for non-5xx errors whose body has no human-readable message. */
+  fallback?: string;
+  /**
+   * Sentence telling the admin what happened to their change and what to do
+   * next. Defaults to an uncertain "may not have been saved" sentence:
+   * many routes commit the write and then fail on a follow-up step (audit
+   * log, cache), so a 500 does not prove nothing changed. Claim "nothing
+   * changed" only for routes whose write and audit share one transaction. Pass a specific
+   * one when the default is not accurate — e.g. bulk actions that are not
+   * all-or-nothing, or actions that start a job rather than save data.
+   */
+  outcome?: string;
+}
+
+/**
+ * Message for a failed admin write (toast description or inline error).
+ *
+ * The API contract rewrites every 500 body to a bare "Internal Server
+ * Error" so internals never leak, which leaves the admin with no next step.
+ * For 5xx responses this returns a clear sentence that says the server
+ * failed, what that means for the change, and to try again. A specific,
+ * human-readable message on a non-500 5xx (e.g. a 502 "Could not delete the
+ * sign-in identity. Nothing was deleted; try again.") is kept as-is.
+ * Everything else (4xx, network errors) goes through humanizeApiError.
+ */
+export function describeWriteError(error: unknown, options: WriteErrorOptions = {}): string {
+  const fallback = options.fallback ?? "Something went wrong. Please try again.";
+  const outcome = options.outcome ?? DEFAULT_WRITE_OUTCOME;
+  const status = errorStatus(error);
+  if (status === undefined || status < 500 || status > 599) {
+    return humanizeApiError(error, fallback);
+  }
+  if (status !== 500) {
+    const specific = humanizeStatusBody(status, errorBody(error), "");
+    if (specific && specific !== STATUS_FALLBACKS[status] && !isGenericOutageText(specific)) {
+      return specific;
+    }
+    if (status === 502 || status === 503 || status === 504) {
+      return `The server is temporarily unavailable. ${outcome}`;
+    }
+  }
+  return `The server hit an error. ${outcome}`;
 }
 
 /**

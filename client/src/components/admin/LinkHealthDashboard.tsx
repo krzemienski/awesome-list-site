@@ -23,6 +23,7 @@ import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, 
 import { formatAdminDateTime, formatAdminDate } from "@/lib/utils";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { apiRequest } from "@/lib/queryClient";
+import { describeWriteError } from "@/lib/apiError";
 import { useToast } from "@/hooks/use-toast";
 import type { LinkHealthJob, LinkHealthCheck } from "@shared/schema";
 import { AdminOpsTable as Table, StatusChip, TableShell } from "@/components/admin/AdminOpsPrimitives";
@@ -162,7 +163,7 @@ export default function LinkHealthDashboard() {
     onError: (error: Error) => {
       toast({
         title: "Failed to start check",
-        description: error.message ?? "An error occurred while starting the link health check.",
+        description: describeWriteError(error, { fallback: "An error occurred while starting the link health check.", outcome: "The scan may not have started. Check its status before starting another." }),
         variant: "destructive"
       });
     }
@@ -182,7 +183,7 @@ export default function LinkHealthDashboard() {
       void queryClient.invalidateQueries({ queryKey: ['/api/admin/link-health/status'] });
       toast({
         title: "Could not cancel the scan",
-        description: error.message ?? "The cancel request failed.",
+        description: describeWriteError(error, { fallback: "The cancel request failed.", outcome: "The scan may still be running. Please try again." }),
         variant: "destructive",
       });
     },

@@ -2,6 +2,7 @@ import { useState, useMemo, useEffect, useRef } from "react";
 import { queryUnavailableReason } from "@/lib/query-availability";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { apiRequest, ApiError } from "@/lib/queryClient";
+import { describeWriteError } from "@/lib/apiError";
 import { useToast } from "@/hooks/use-toast";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -84,13 +85,13 @@ const EMPTY_FORM: StepFormState = {
 
 // B05/B08: the server's response contract replaces every 500 body with a bare
 // "Internal Server Error". Step writes run in one transaction, so a server
-// failure changed nothing — say so, and what to do next, instead.
+// failure changed nothing — the shared write-error helper says so, and what
+// to do next, instead.
 function stepWriteError(err: Error | null | undefined): string | undefined {
   if (!err) return undefined;
-  if (err instanceof ApiError && err.status >= 500) {
-    return "Nothing was changed because the server hit an error. Reload the steps and try again.";
-  }
-  return err.message;
+  return describeWriteError(err, {
+    outcome: "Nothing was changed. Reload the steps and try again.",
+  });
 }
 
 // Run16 BUG-013: the DB stores one row per step-resource (up to 3 rows share a

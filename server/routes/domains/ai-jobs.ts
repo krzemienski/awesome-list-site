@@ -37,6 +37,7 @@ import {
   visibleLength,
 } from "@shared/validation";
 import { asyncHandler } from "../../middleware/asyncHandler";
+import { isUniqueViolation } from "../../errors/pgErrors";
 
 /**
  * Dependencies the AI job handlers need from the composing module. These mirror
@@ -562,6 +563,14 @@ export function registerAiJobsRoutes(
       }
       if (error?.name === 'DiscoveryConflictError') {
         return res.status(409).json({ message: error.message });
+      }
+      // The duplicate pre-check runs inside the approval transaction, but a
+      // concurrent create of the same URL can still win the race and trip the
+      // resources.url unique index. Nothing was committed; say why.
+      if (isUniqueViolation(error, 'url')) {
+        return res.status(409).json({
+          message: 'Another resource with this URL was just added. Nothing was approved — reject this discovery as a duplicate.',
+        });
       }
       res.status(500).json({ message: 'Failed to approve discovery', error: error.message });
     }

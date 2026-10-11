@@ -33,6 +33,7 @@ import {
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { Link as RouterLink } from "wouter";
 import { apiRequest, ApiError } from "@/lib/queryClient";
+import { describeWriteError } from "@/lib/apiError";
 import { formatAdminDateTime } from "@/lib/utils";
 import { useToast } from "@/hooks/use-toast";
 import {
@@ -383,7 +384,7 @@ export default function ExportTab({ validationStatus: propValidationStatus }: Ex
     onError: (error: unknown) => {
       toast({
         title: "Link check could not start",
-        description: error instanceof Error ? error.message : "Failed to start the link check. Please try again.",
+        description: describeWriteError(error, { fallback: "Failed to start the link check. Please try again.", outcome: "The link check may not have started. Check its status before starting another." }),
         variant: "destructive",
       });
     },
@@ -402,7 +403,7 @@ export default function ExportTab({ validationStatus: propValidationStatus }: Ex
     onError: (error: unknown) => {
       toast({
         title: "Could not cancel the link check",
-        description: error instanceof Error ? error.message : "The cancel request failed.",
+        description: describeWriteError(error, { fallback: "The cancel request failed.", outcome: "The link check may still be running. Please try again." }),
         variant: "destructive",
       });
     },

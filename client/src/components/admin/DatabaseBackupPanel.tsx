@@ -3,6 +3,7 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { ChevronDown, ChevronUp, DatabaseBackup, RefreshCw } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { apiRequest } from "@/lib/queryClient";
+import { describeWriteError, isServerError } from "@/lib/apiError";
 import { formatAdminDateTime } from "@/lib/utils";
 import { useToast } from "@/hooks/use-toast";
 import { AdminOpsTable as Table, TableShell } from "@/components/admin/AdminOpsPrimitives";
@@ -126,7 +127,10 @@ export default function DatabaseBackupPanel() {
 
       {createBackup.isError ? (
         <p className="admin-ops-table__error" role="alert" data-testid="database-backup-error">
-          Backup failed: {createBackup.error instanceof Error ? createBackup.error.message : "unknown error"}. Nothing was stored.
+          Backup failed:{" "}
+          {isServerError(createBackup.error)
+            ? describeWriteError(createBackup.error, { outcome: "A backup may still have been stored. Refresh the backup list before trying again." })
+            : `${describeWriteError(createBackup.error, { fallback: "unknown error" }).replace(/\.$/, "")}. Nothing was stored.`}
         </p>
       ) : null}
 

@@ -14,7 +14,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Plus, Trash2, Save, X, LucideIcon, Upload, FileIcon, XCircle, Bold, Italic, Underline, Strikethrough, Link, Heading, List, ListOrdered, Quote, Code, Check, ChevronsUpDown, Search, Download, Square, CheckSquare, Minus, Undo, Redo, History, Clock } from "lucide-react";
 import { Checkbox } from "@/components/ui/checkbox";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
-import { humanizeApiError } from "@/lib/apiError";
+import { describeWriteError } from "@/lib/apiError";
 import { formatAdminDateTime, slugify } from "@/lib/utils";
 import { apiRequest, ApiError } from "@/lib/queryClient";
 import { fetchAwesomeListNav, type AwesomeListNav } from "@/lib/static-data";
@@ -1298,7 +1298,7 @@ export default function GenericCrudManager<T extends BaseEntityWithCount>({
     } catch (error: any) {
       toast({
         title: "Undo Failed",
-        description: error.message || "Failed to undo operation",
+        description: describeWriteError(error, { fallback: "Failed to undo operation", outcome: "The undo may not have been applied. Refresh the list to check before trying again." }),
         variant: "destructive"
       });
     }
@@ -1364,7 +1364,7 @@ export default function GenericCrudManager<T extends BaseEntityWithCount>({
     } catch (error: any) {
       toast({
         title: "Redo Failed",
-        description: error.message || "Failed to redo operation",
+        description: describeWriteError(error, { fallback: "Failed to redo operation", outcome: "The redo may not have been applied. Refresh the list to check before trying again." }),
         variant: "destructive"
       });
     }
@@ -1819,7 +1819,7 @@ export default function GenericCrudManager<T extends BaseEntityWithCount>({
       // Run15 BUG-015: surface a human sentence, not a raw "400: {json}" blob.
       // P1-02/07: keep the dialog open and show the server rejection inline so
       // the operator can correct the offending field (matches ResourceManager).
-      setFormError(humanizeApiError(error, `Failed to create ${entityName.toLowerCase()}`));
+      setFormError(describeWriteError(error, { fallback: `Failed to create ${entityName.toLowerCase()}` }));
     }
   });
 
@@ -1877,7 +1877,7 @@ export default function GenericCrudManager<T extends BaseEntityWithCount>({
     onError: (error: any) => {
       // Run15 BUG-015: surface a human sentence, not a raw "400: {json}" blob.
       // P1-03/07: inline banner, dialog stays open (matches ResourceManager).
-      setFormError(humanizeApiError(error, `Failed to update ${entityName.toLowerCase()}`));
+      setFormError(describeWriteError(error, { fallback: `Failed to update ${entityName.toLowerCase()}` }));
     }
   });
 
@@ -1923,7 +1923,7 @@ export default function GenericCrudManager<T extends BaseEntityWithCount>({
       // Run15 BUG-015: surface a human sentence, not a raw "400: {json}" blob.
       toast({
         title: "Error",
-        description: humanizeApiError(error, `Failed to delete ${entityName.toLowerCase()}`),
+        description: describeWriteError(error, { fallback: `Failed to delete ${entityName.toLowerCase()}`, outcome: "It may not have been deleted. Refresh the list to check before trying again." }),
         variant: "destructive"
       });
       setDeleteDialogOpen(false);
@@ -1971,7 +1971,10 @@ export default function GenericCrudManager<T extends BaseEntityWithCount>({
       // Run15 BUG-015: surface a human sentence, not a raw "400: {json}" blob.
       toast({
         title: "Error",
-        description: humanizeApiError(error, `Failed to delete ${entityNamePlural.toLowerCase()}`),
+        description: describeWriteError(error, {
+          fallback: `Failed to delete ${entityNamePlural.toLowerCase()}`,
+          outcome: `Some ${entityNamePlural.toLowerCase()} may already be deleted. Refresh the list, then try again.`,
+        }),
         variant: "destructive"
       });
       setBulkDeleteDialogOpen(false);

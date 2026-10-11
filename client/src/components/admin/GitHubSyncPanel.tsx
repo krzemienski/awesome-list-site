@@ -11,6 +11,7 @@ import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, 
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { apiRequest } from "@/lib/queryClient";
+import { describeWriteError } from "@/lib/apiError";
 import { useToast } from "@/hooks/use-toast";
 import { useContactConfig } from "@/lib/contact";
 import {
@@ -152,7 +153,7 @@ export default function GitHubSyncPanel() {
     onError: (error: Error) => {
       toast({
         title: "Import Failed",
-        description: error.message || "Failed to start import",
+        description: describeWriteError(error, { fallback: "Failed to start import", outcome: "The import may not have started. Check the sync history before trying again." }),
         variant: "destructive"
       });
     }
@@ -179,7 +180,7 @@ export default function GitHubSyncPanel() {
     onError: (error: Error) => {
       toast({
         title: "Export Failed",
-        description: error.message || "Failed to start export",
+        description: describeWriteError(error, { fallback: "Failed to start export", outcome: "The export may not have started. Check the sync history before trying again." }),
         variant: "destructive"
       });
     }

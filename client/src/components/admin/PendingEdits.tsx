@@ -1,6 +1,7 @@
 import { type MouseEvent, useEffect, useRef, useState } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { apiRequest } from "@/lib/queryClient";
+import { describeWriteError } from "@/lib/apiError";
 import { formatAdminDateTime, formatRelativeAgo, maskEmail } from "@/lib/utils";
 import { useToast } from "@/hooks/use-toast";
 import { queryUnavailableReason } from "@/lib/query-availability";
@@ -175,7 +176,7 @@ export default function PendingEdits() {
       });
     },
     onError: (error: Error) => {
-      setApproveError(error.message || "Failed to approve edit. Please try again.");
+      setApproveError(describeWriteError(error, { fallback: "Failed to approve edit. Please try again." }));
       // The dialog remains open so the inline error can be read and retried.
     }
   });
@@ -201,7 +202,7 @@ export default function PendingEdits() {
       });
     },
     onError: (error: Error) => {
-      setRejectError(error.message || "Failed to reject edit. Please try again.");
+      setRejectError(describeWriteError(error, { fallback: "Failed to reject edit. Please try again." }));
     }
   });
 

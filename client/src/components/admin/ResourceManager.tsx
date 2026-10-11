@@ -33,7 +33,7 @@ import { parsePageFromSearch } from "@/lib/page-param";
 // BUG-049: client-side validation mirrors the server's shared schemas so the
 // dialog flags bad input inline instead of only failing server-side.
 import { resourceTitleSchema, optionalResourceDescriptionSchema, webUrlSchema, httpsUrlSchema } from "@shared/validation";
-import { extractFieldErrors } from "@/lib/apiError";
+import { describeWriteError, extractFieldErrors } from "@/lib/apiError";
 import { focusElement, focusPageHeading, handoffFocusOnUnmount } from "@/hooks/focus-handoff";
 import {
   RESOURCE_FORMAT_LABELS,
@@ -380,7 +380,7 @@ export default function ResourceManager({ createRequest = 0 }: { createRequest?:
   const showServerFormError = (error: Error, fallback: string) => {
     const serverFieldErrors = extractFieldErrors(error);
     if (!serverFieldErrors) {
-      setFormError(error.message || fallback);
+      setFormError(describeWriteError(error, { fallback }));
       return;
     }
     const inline: { title?: string; url?: string; description?: string } = {};
@@ -527,7 +527,7 @@ export default function ResourceManager({ createRequest = 0 }: { createRequest?:
       }
       setResourceActionErrors((previousErrors) => ({
         ...previousErrors,
-        [`kind:${id}`]: error instanceof Error ? error.message : "Failed to update resource kind",
+        [`kind:${id}`]: describeWriteError(error, { fallback: "Failed to update resource kind" }),
       }));
     },
     onSettled: (_updated, _error, { id }) => {
@@ -575,7 +575,7 @@ export default function ResourceManager({ createRequest = 0 }: { createRequest?:
       setEditForm((form) => ({ ...form, featured: previousFeatured }));
       setResourceActionErrors((previousErrors) => ({
         ...previousErrors,
-        [`featured:${id}`]: error instanceof Error ? error.message : "Failed to update featured status",
+        [`featured:${id}`]: describeWriteError(error, { fallback: "Failed to update featured status" }),
       }));
     },
     onSettled: (_updated, _error, { id }) => {
@@ -651,7 +651,7 @@ export default function ResourceManager({ createRequest = 0 }: { createRequest?:
     onError: (error: Error) => {
       toast({
         title: "Deletion Failed",
-        description: error.message || "Failed to delete resource",
+        description: describeWriteError(error, { fallback: "Failed to delete resource", outcome: "It may not have been deleted. Refresh the list to check before trying again." }),
         variant: "destructive"
       });
     }
@@ -676,7 +676,7 @@ export default function ResourceManager({ createRequest = 0 }: { createRequest?:
     onError: (error: any) => {
       toast({
         title: "Bulk Approve Failed",
-        description: error.message || "Failed to approve resources",
+        description: describeWriteError(error, { fallback: "Failed to approve resources", outcome: "Some selected resources may already have changed. Refresh the list, then try again." }),
         variant: "destructive"
       });
     }
@@ -703,7 +703,7 @@ export default function ResourceManager({ createRequest = 0 }: { createRequest?:
     onError: (error: any) => {
       toast({
         title: "Bulk Reject Failed",
-        description: error.message || "Failed to reject resources",
+        description: describeWriteError(error, { fallback: "Failed to reject resources", outcome: "Some selected resources may already have changed. Refresh the list, then try again." }),
         variant: "destructive"
       });
     }
@@ -728,7 +728,7 @@ export default function ResourceManager({ createRequest = 0 }: { createRequest?:
     onError: (error: any) => {
       toast({
         title: "Bulk Delete Failed",
-        description: error.message || "Failed to delete resources",
+        description: describeWriteError(error, { fallback: "Failed to delete resources", outcome: "Some selected resources may already have changed. Refresh the list, then try again." }),
         variant: "destructive"
       });
     }

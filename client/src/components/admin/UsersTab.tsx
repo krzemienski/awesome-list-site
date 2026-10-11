@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import { useQuery, useMutation, useQueryClient, keepPreviousData } from "@tanstack/react-query";
 import { apiRequest, ApiError } from "@/lib/queryClient";
+import { describeWriteError } from "@/lib/apiError";
 import { maskEmail } from "@/lib/utils";
 import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/hooks/useAuth";
@@ -126,7 +127,7 @@ export default function UsersTab() {
       toast({ title: "Role Updated", description: "User role has been changed." });
     },
     onError: (error: Error) => {
-      toast({ title: "Update Failed", description: error.message, variant: "destructive" });
+      toast({ title: "Update Failed", description: describeWriteError(error, { outcome: "The role may not have changed. Refresh the user list to check before trying again." }), variant: "destructive" });
     },
   });
 
@@ -152,7 +153,7 @@ export default function UsersTab() {
       searchInputRef.current?.focus();
     },
     onError: (error: Error) => {
-      toast({ title: "Delete Failed", description: error.message, variant: "destructive" });
+      toast({ title: "Delete Failed", description: describeWriteError(error, { outcome: "The account may be partly removed. Refresh the user list, then try again." }), variant: "destructive" });
       setUserToDelete(null);
     },
   });
