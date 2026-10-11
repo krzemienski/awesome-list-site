@@ -114,9 +114,9 @@ const LIMIT_OPTIONS = ["25", "50", "100", "200"];
 
 export default function AuditTab() {
   const [resourceIdFilter, setResourceIdFilter] = useState("");
-  const [limit, setLimit] = useState("50");
+  const [limit, setLimit] = useState("25");
   const [appliedFilter, setAppliedFilter] = useState<string>("");
-  const [appliedLimit, setAppliedLimit] = useState("50");
+  const [appliedLimit, setAppliedLimit] = useState("25");
   // Run16 BUG-083: clicking a row opens a detail view with the full payload.
   const [selectedLog, setSelectedLog] = useState<AuditLogEntry | null>(null);
   const [showTools, setShowTools] = useState(false);
@@ -399,7 +399,7 @@ export default function AuditTab() {
                     <TableCell className="text-sm">
                       {log.action.replace(/_/g, " ")}
                     </TableCell>
-                    <TableCell className="text-sm">
+                    <TableCell className="text-sm" title={targetLabel(log)}>
                        {targetLabel(log)}
                     </TableCell>
                     <TableCell>

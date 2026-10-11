@@ -90,6 +90,12 @@
   width: 100%;
 }
 
+/* Column labels never wrap: the region scrolls horizontally instead of
+   stacking "Approved / Rejected" over three lines in wide mono systems. */
+.queues-agent__canonical-table th {
+  white-space: nowrap;
+}
+
 .queues-agent__canonical-table .queues-agent__cell-mono {
   font-family: var(--font-mono);
   font-size: 12px;

@@ -33,8 +33,11 @@
   line-height: 1.6; /* body leading */
 }
 
+/* One line per entry so every page of the log has the same height; the full
+   target is in the row's title and its detail dialog. */
 .admin-ops-audit-shell .admin-ops-audit-table tbody td {
   padding: 14px;
+  white-space: nowrap;
 }
 
 .admin-ops-audit-shell .admin-ops-audit-table tbody td:first-child,
@@ -51,6 +54,9 @@
   color: var(--text);
   font-size: 13px;
   line-height: 1.6; /* body leading */
+  max-width: 18rem;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .admin-ops-audit-shell .admin-ops-audit-table tbody td:first-child {

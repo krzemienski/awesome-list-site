@@ -1459,7 +1459,7 @@ export default function ResourceManager({ createRequest = 0 }: { createRequest?:
                           {resource.title || 'Untitled'}
                         </div>
                     </td>
-                    <td>
+                    <td className="admin-catalog-resources__category-cell">
                       {resource.category || "Uncategorized"}
                     </td>
                     <td>
