@@ -102,6 +102,10 @@
   background: var(--border);
 }
 
+.home-stat-strip[data-cells="3"] {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
 .home-stat-cell {
   min-width: 0;
   padding: 1rem 1.125rem;
@@ -916,8 +920,13 @@
 }
 
 @media (max-width: 640px) {
-  .home-stat-strip {
+  .home-stat-strip,
+  .home-stat-strip[data-cells="3"] {
     grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .home-stat-cell:last-child:nth-child(odd) {
+    grid-column: 1 / -1;
   }
 
   .home-stat-strip-skeleton {

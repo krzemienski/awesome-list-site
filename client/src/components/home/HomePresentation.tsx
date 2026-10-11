@@ -150,24 +150,26 @@ function StatStrip({ stats, layout }: { stats: HomeStats; layout: "index" | "cur
     stats.matching === undefined
       ? `+${formatCount(stats.approvedThisWeek)} this week`
       : `${formatCount(stats.matching)} match this filter`;
+  const featuredCell = stats.featured > 0 ? [["FEATURED", formatCount(stats.featured), "hand-picked"]] : [];
   const items =
     layout === "index"
       ? [
           ["RESOURCES", formatCount(stats.total), resourcesSub],
           ["CATEGORIES", formatCount(stats.categories), `${formatCount(stats.subcategories)} subcategories`],
           ["NESTED GROUPS", formatCount(stats.nestedGroups), "L3 depth"],
-          ["FEATURED", formatCount(stats.featured), "hand-picked"],
+          ...featuredCell,
         ]
       : [
           ["RESOURCES", formatCount(stats.total), resourcesSub],
           ["CATEGORIES", formatCount(stats.categories), `${formatCount(stats.subcategories)} subcategories`],
-          ["FEATURED", formatCount(stats.featured), "hand-picked"],
+          ...featuredCell,
           ["APPROVED THIS WEEK", formatCount(stats.approvedThisWeek), "newly indexed"],
         ];
 
   return (
     <div
       className="home-stat-strip"
+      data-cells={items.length}
       data-testid="home-stat-strip"
       aria-label="Catalog statistics"
     >
@@ -592,21 +594,17 @@ function CuratedLayout({
         </div>
       </div>
       <StatStrip stats={stats} layout="curated" />
-      <div className="home-curated-section home-curated-featured">
-        <SectionHeader
-          eyebrow="── FEATURED RESOURCES"
-          title={
-            <>
-              Hand-picked <span className="serif-italic home-accent-italic">highlights</span>
-            </>
-          }
-          sub={
-            shownFeatured.length > 0
-              ? `${formatCount(shownFeatured.length)} of ${formatCount(stats.total)} resources stand out this week.`
-              : undefined
-          }
-        />
-        {shownFeatured.length > 0 ? (
+      {shownFeatured.length > 0 ? (
+        <div className="home-curated-section home-curated-featured">
+          <SectionHeader
+            eyebrow="── FEATURED RESOURCES"
+            title={
+              <>
+                Hand-picked <span className="serif-italic home-accent-italic">highlights</span>
+              </>
+            }
+            sub={`${formatCount(shownFeatured.length)} of ${formatCount(stats.total)} resources stand out this week.`}
+          />
           <div className="home-resource-grid">
             {shownFeatured.map((resource) => (
               <ResourceCard
@@ -617,12 +615,8 @@ function CuratedLayout({
               />
             ))}
           </div>
-        ) : (
-          <p className="home-empty-section" data-testid="home-featured-empty">
-            No featured resources have been selected yet.
-          </p>
-        )}
-      </div>
+        </div>
+      ) : null}
 
       <div className="home-curated-section home-curated-categories">
         <SectionHeader
