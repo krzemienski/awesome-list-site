@@ -23,7 +23,7 @@ Verification is by real browser use / curl only (no proof packets or gates since
 | N-01 | Issue #18: nav / overview / category header / listing totals disagree | NOT-REPRODUCED — CONFIRMED (review-n01, ab6da9f9 dev + 26450e08 prod) | [N-01](proof/N-01/packet.md) |
 | N-02 | Count agreement for every subcategory and sub-subcategory | NOT-REPRODUCED — browser sweep of all 92 subcategory + 27 sub-subcategory pages: page stat, results header, every category-page link count and sidebar count equal the SQL approved count (0 mismatches); all 25 "Uncategorized" remainder views (8 category, 17 subcategory) show the sidebar count and the right card count on the last page | |
 | N-03 | Home "Featured 0" → hide when empty (decision 3) | FIXED — browser-checked index+curated at 1280/375 | |
-| N-04 | Search facet counts vs results under filters, sort, pagination | OPEN | |
+| N-04 | Search facet counts vs results under filters, sort, pagination | NOT-REPRODUCED — browser, /search?q=streaming: category facets sum to the 610 total and each of the 9 equals its filtered total; subcategory facets and category→subcategory→tag stacks equal their totals (49, 12); all 5 sorts keep the total, name sorts order correctly across pages with no duplicates; page 2 + sort survive reload; last page shows the remainder (7 of 127) and page=9 clamps to 6; the 375 filter sheet sums, applies, closes and badges correctly | |
 | N-05 | Tag landing pages: counts, pagination, empty tags | OPEN | |
 | N-06 | Sub-subcategory pages, breadcrumbs, empty nodes | OPEN | |
 | N-07 | Advanced/Explorer filters survive URL reload | OPEN | |
