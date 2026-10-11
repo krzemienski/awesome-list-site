@@ -1,6 +1,6 @@
 import { ResourceCardSkeleton } from "@/components/ui/skeletons";
 import "@/styles/pages/discovery.css";
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState, type MouseEvent } from "react";
 import { Link, useSearch } from "wouter";
 import { useQuery } from "@tanstack/react-query";
 import { apiRequest, ApiError } from "@/lib/queryClient";
@@ -11,7 +11,8 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Search as SearchIcon, AlertCircle } from "lucide-react";
+import { Search as SearchIcon, AlertCircle, WifiOff } from "lucide-react";
+import { queryUnavailableReason } from "@/lib/query-availability";
 import SEOHead from "@/components/layout/SEOHead";
 import ResourceCard from "@/components/resource/ResourceCard";
 import type { Resource as DbResource } from "@shared/schema";
@@ -232,6 +233,22 @@ export default function Search() {
   const gotoPage = (n: number) => { setState(s => ({ ...s, page: n })); writeFilterParams({ page: n > 1 ? String(n) : null }, "push"); setPageNotice(null); pendingResultsFocusRef.current = true; window.scrollTo({ top: 0, behavior: "smooth" }); };
   const makePageHref = (n: number) => { const p = new URLSearchParams(window.location.search); if (n > 1) p.set("page", String(n)); else p.delete("page"); return `/search?${p.toString()}`; };
   const invalid = query.error instanceof ApiError && query.error.status === 400;
+  // A search started offline is paused, not failed: isLoading and isError are
+  // both false and there is no data, so without this branch the page fell
+  // through to "No resources match" for a request that never reached the
+  // catalog. The paused query resumes by itself on reconnect.
+  const offline = queryUnavailableReason(query) === "offline";
+  // A request that failed in transport (no HTTP response) is a connection
+  // problem, not a server verdict — say so instead of a generic failure.
+  const connectionFailed = query.isError && !(query.error instanceof ApiError);
+  const [stillOffline, setStillOffline] = useState(false);
+  useEffect(() => { if (!offline) setStillOffline(false); }, [offline]);
+  const retrySearch = (e: MouseEvent<HTMLButtonElement>) => {
+    if (navigator.onLine === false) { setStillOffline(true); return; }
+    /* C6-SWEEP-06: the card unmounts once the refetch succeeds */
+    if (document.activeElement === e.currentTarget) pendingResultsFocusRef.current = true;
+    void query.refetch();
+  };
   return <div className="discovery-page space-y-6">
     <SEOHead title={`${searchPageSeo.titleCore(normalized)} — Awesome Video`} description={searchPageSeo.description} noindex />
     <header className="discovery-header space-y-4"><div className="flex items-center gap-3"><SearchIcon className="h-6 w-6 text-[var(--accent-ink)]" /><div><h1 className="display-h discovery-title">Search</h1><p className="discovery-lede text-sm">A precise index of tools, standards, and ideas for video developers.</p></div></div>
@@ -243,8 +260,9 @@ export default function Search() {
     <div className="flex flex-col items-stretch gap-4 lg:flex-row lg:items-start lg:gap-6"><SearchFilters state={state} facets={data?.facets ?? lastFacets.current} onChange={update} onClear={() => clearFilters()} /><section ref={resultsRef} tabIndex={-1} aria-label="Search results" className="min-w-0 flex-1 outline-none">
       {!shouldShowResults ? <Card data-testid="text-search-prompt"><CardContent className="flex flex-col items-center gap-3 py-12 text-center"><SearchIcon className="h-8 w-8 text-muted-foreground" /><h2 className="text-sm font-semibold">{normalized ? "Keep typing to search" : "Enter a query or choose filters"}</h2><p className="text-xs text-muted-foreground">{normalized ? "Type a word of at least 2 letters or digits (common words like “and” or “the” are skipped), or choose a filter to browse." : "Narrow the catalog by category, provider, format, skill level, or tag."}</p><Button asChild variant="outline"><Link href="/categories">Browse categories</Link></Button></CardContent></Card>
        : queryTooLong ? <Card data-testid="search-query-too-long"><CardContent className="flex flex-col items-center gap-3 py-10 text-center"><AlertCircle className="h-8 w-8 text-[var(--accent-ink)]" /><p className="text-sm text-muted-foreground" role="alert">Search is limited to {SEARCH_QUERY_MAX_LENGTH} characters. This query has {normalized.length.toLocaleString()} — shorten it to search.</p><Button variant="outline" onClick={clearSearch} data-testid="button-clear-long-query">Clear search</Button></CardContent></Card>
-       : query.isLoading ? <div className="grid gap-4 [grid-template-columns:repeat(auto-fill,minmax(min(100%,300px),1fr))]" data-testid="search-results-loading" aria-busy="true">{Array.from({ length: 6 }).map((_, i) => <ResourceCardSkeleton key={i} />)}</div>
-       : query.isError ? <Card data-testid="search-results-error"><CardContent className="flex flex-col items-center gap-3 py-10 text-center"><AlertCircle className="h-8 w-8 text-[var(--accent-ink)]" /><p className="text-sm text-muted-foreground">{invalid ? query.error.message : "Search failed. Please try again."}</p><Button variant="outline" onClick={invalid ? clearInvalidRequest : (e) => { /* C6-SWEEP-06: the error card unmounts once the refetch succeeds */ if (document.activeElement === e.currentTarget) pendingResultsFocusRef.current = true; void query.refetch(); }} data-testid={invalid ? "button-clear-invalid-filters" : "button-retry-search"}>{invalid ? "Clear invalid filters" : "Try again"}</Button></CardContent></Card>
+       : offline ? <Card data-testid="search-results-offline"><CardContent className="flex flex-col items-center gap-3 py-10 text-center" role="alert"><WifiOff className="h-8 w-8 text-[var(--accent-ink)]" aria-hidden="true" /><h2 className="text-sm font-semibold">You’re offline</h2><p className="text-sm text-muted-foreground">Search couldn’t reach the catalog because your device has no connection. Results will load on their own when you reconnect.</p>{stillOffline && <p className="text-xs text-muted-foreground" data-testid="text-search-still-offline">Still offline — reconnect and try again.</p>}<Button variant="outline" onClick={retrySearch} data-testid="button-retry-offline-search">Try again</Button></CardContent></Card>
+       : query.isLoading || (!data && !query.isError) ? <div className="grid gap-4 [grid-template-columns:repeat(auto-fill,minmax(min(100%,300px),1fr))]" data-testid="search-results-loading" aria-busy="true">{Array.from({ length: 6 }).map((_, i) => <ResourceCardSkeleton key={i} />)}</div>
+       : query.isError ? <Card data-testid="search-results-error"><CardContent className="flex flex-col items-center gap-3 py-10 text-center"><AlertCircle className="h-8 w-8 text-[var(--accent-ink)]" /><p className="text-sm text-muted-foreground">{invalid ? query.error.message : connectionFailed ? "Search couldn't reach the catalog. Check your connection and try again." : "Search failed. Please try again."}</p><Button variant="outline" onClick={invalid ? clearInvalidRequest : retrySearch} data-testid={invalid ? "button-clear-invalid-filters" : "button-retry-search"}>{invalid ? "Clear invalid filters" : "Try again"}</Button></CardContent></Card>
         : results.length === 0 ? <Card><CardContent className="flex flex-col items-center gap-3 py-12 text-center"><SearchIcon className="h-8 w-8 text-muted-foreground" /><h2 className="text-sm font-semibold" data-testid="text-no-results">{normalized || canBrowse ? "No resources match this combination" : "Enter a query or choose filters"}</h2><p className="text-xs text-muted-foreground">Try broadening your filters or search terms.</p><div className="flex flex-wrap justify-center gap-2">{hasActiveFilters && <Button variant="outline" onClick={() => clearFilters()} data-testid="button-clear-search-filters">Clear filters</Button>}{normalized && <Button variant="ghost" onClick={clearSearch} data-testid="button-clear-search-query">Clear search</Button>}<Button asChild variant="secondary"><Link href="/categories" data-testid="link-empty-browse-categories">Browse categories</Link></Button><Button asChild variant="secondary"><Link href="/advanced" data-testid="link-empty-advanced-discovery">Advanced discovery</Link></Button></div></CardContent></Card>
        : <>{data?.search?.mode === "fuzzy" && data.search.suggestion && <div className="mb-4 flex flex-wrap items-center gap-2 rounded-md border border-[var(--border)] bg-[var(--surface)] px-4 py-3 text-sm" role="status" data-testid="notice-search-suggestion"><span>No exact matches. Did you mean</span><Button variant="link" className="h-auto p-0" onClick={() => { setInput(data.search!.suggestion!); update("q", data.search!.suggestion!); inputRef.current?.focus(); /* C6-V2-01: the notice unmounts with this button */ }}>{data.search.suggestion}</Button><span>?</span></div>}<p className="mb-4 text-sm text-muted-foreground" data-testid="text-result-count">{totalPages > 1 ? `Page ${safePage} of ${totalPages} · showing ${(safePage - 1) * PAGE_SIZE + 1}–${(safePage - 1) * PAGE_SIZE + results.length} of ${total} results` : `${total} result${total === 1 ? "" : "s"}`}{queryReady ? ` for “${normalized}”` : ""}</p><div className="grid gap-4 [grid-template-columns:repeat(auto-fill,minmax(min(100%,300px),1fr))]" data-testid="search-results-grid">{results.map(r => <ResourceCard key={r.id} resource={{ id: String(r.id), name: r.title, url: r.url, description: r.description ?? undefined, category: r.category ?? undefined }} fullResource={r} />)}</div><Paginator currentPage={safePage} totalPages={totalPages} makeHref={makePageHref} onNavigate={gotoPage} className="pt-4" testIds={{ container: "search-pagination", prev: "button-search-prev", next: "button-search-next", jump: "input-search-page-jump" }} /></>}
     </section></div>

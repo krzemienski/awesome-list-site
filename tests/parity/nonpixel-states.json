@@ -27,7 +27,7 @@
  "app.error.route": {
   "path": "/search?q=ffmpeg&tags=aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
   "readySelector": "[data-testid=\"search-results-error\"]",
-  "note": "Real server 400 (tags over 50 chars) rendered by the search error card. An offline transition does NOT reach the error card: React Query pauses the query offline and the page shows the empty 'No resources match' state (recorded as a finding)."
+  "note": "Real server 400 (tags over 50 chars) rendered by the search error card. An offline transition does NOT reach this card: React Query pauses (not fails) the query offline, and the page renders its own offline card [data-testid=\"search-results-offline\"] with a Try again button instead (never the 'No resources match' empty state)."
  },
  "app.system.empty-search": {
   "path": "/search?q=zzqxv-nothing",
