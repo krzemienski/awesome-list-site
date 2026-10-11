@@ -353,7 +353,7 @@ export default function Onboarding() {
             Personalized Recommendations can now use these choices. Public
             browsing and search stay the same for everyone.
           </p>
-          <div className="mt-6 flex flex-col gap-3 sm:flex-row">
+          <div className="account-onboarding-actions mt-6 flex flex-col gap-3 sm:flex-row">
             <Button asChild>
               <Link href="/recommendations">
                 <Sparkles className="mr-2 h-4 w-4" />

@@ -66,7 +66,9 @@ function ResourceCard({
 }: ResourceCardProps) {
   const [, setLocation] = useLocation();
   const [suggestEditOpen, setSuggestEditOpen] = useState(false);
-  const [imageLoaded, setImageLoaded] = useState(false);
+  // Keyed by src so a recycled card never inherits another image's state.
+  const [loadedImage, setLoadedImage] = useState<string | null>(null);
+  const [failedImage, setFailedImage] = useState<string | null>(null);
   const cardRef = useRef<HTMLDivElement>(null);
   // Run15 BUG-022: expandable tag row ("+N more" reveals the hidden tags)
   const [showAllTags, setShowAllTags] = useState(false);
@@ -347,9 +349,9 @@ function ResourceCard({
       <CardContent className="resource-card__content">
         {fullResource?.metadata?.urlScraped && (
           <div className="resource-card__scraped">
-            {fullResource.metadata.ogImage && (
+            {fullResource.metadata.ogImage && failedImage !== fullResource.metadata.ogImage && (
               <div className="resource-card__image-frame">
-                {fullResource.metadata.ogImageBlurhash && !imageLoaded && (
+                {fullResource.metadata.ogImageBlurhash && loadedImage !== fullResource.metadata.ogImage && (
                   <div className="resource-card__blurhash">
                     <Blurhash
                       hash={fullResource.metadata.ogImageBlurhash}
@@ -366,10 +368,8 @@ function ResourceCard({
                   alt={fullResource.metadata.ogTitle || resource.name}
                   className="resource-card__image"
                   loading="lazy"
-                  onLoad={() => setImageLoaded(true)}
-                  onError={(e) => {
-                    (e.target as HTMLImageElement).style.display = 'none';
-                  }}
+                  onLoad={(e) => setLoadedImage(e.currentTarget.getAttribute("src"))}
+                  onError={(e) => setFailedImage(e.currentTarget.getAttribute("src"))}
                 />
               </div>
             )}

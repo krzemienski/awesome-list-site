@@ -30,6 +30,7 @@ import {
   DEFAULT_LEARNING_PREFERENCES,
   LEARNING_FORMAT_OPTIONS,
   LEARNING_GOAL_OPTIONS,
+  TIME_COMMITMENT_OPTIONS,
   hasMeaningfulLearningPreferences,
 } from "@shared/onboarding-values";
 import type { RecommendationFeedbackValue } from "@shared/recommendations";
@@ -159,6 +160,9 @@ export default function AIRecommendationsPanel({
     () => new Map(LEARNING_FORMAT_OPTIONS.map((option) => [option.value, option.label])),
     [],
   );
+  const timeLabel = TIME_COMMITMENT_OPTIONS.find(
+    (option) => option.value === effectiveProfile.timeCommitment,
+  )?.label;
 
   const authoritativeExcludedIds = new Set(
     feedbackStates
@@ -336,6 +340,9 @@ export default function AIRecommendationsPanel({
                 {formatLabels.get(format) ?? format}
               </Badge>
             ))}
+            {timeLabel ? (
+              <Badge variant="outline" data-testid="active-preference-time">{timeLabel}</Badge>
+            ) : null}
           </div>
         ) : null}
         <div className="flex flex-col gap-3 sm:flex-row sm:flex-wrap">

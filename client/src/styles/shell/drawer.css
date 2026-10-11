@@ -39,6 +39,11 @@
   flex-direction: column;
   inset: 0 auto 0 0;
   max-width: 340px;
+  /* Canonical .mobile-drawer is itself the scroller, so the absolutely
+     placed close button scrolls away with its header row instead of
+     floating over the category counts. */
+  overflow-x: clip;
+  overflow-y: auto;
   padding: 0;
   position: fixed;
   transform: translateX(-100%);
@@ -61,11 +66,9 @@
 .av-sidebar-drawer > [data-sidebar="drawer-navigation"] {
   background: var(--bg-2);
   display: flex;
+  flex: 0 0 auto;
   flex-direction: column;
-  height: 100%;
-  min-height: 0;
-  overflow-x: clip;
-  overflow-y: auto;
+  min-height: 100%;
   width: 100%;
 }
 

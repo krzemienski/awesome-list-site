@@ -65,8 +65,13 @@ interface AppSidebarProps {
 
 /* -------- helpers -------- */
 
+// Resources filed on the node itself, not in any child.
+function directResourceCount(item: any): number {
+  return item.resources ? item.resources.length : (item.resourceCount ?? 0);
+}
+
 function getTotalResourceCount(item: any): number {
-  let total = item.resources ? item.resources.length : (item.resourceCount ?? 0);
+  let total = directResourceCount(item);
   if (item.subcategories) {
     total += item.subcategories.reduce(
       (sum: number, sub: any) => sum + getTotalResourceCount(sub),
@@ -339,6 +344,7 @@ function CategoryAccordion({
   onToggle,
   isActive,
   activePath,
+  generalActive,
   navigate,
   matchQuery,
   openSubs,
@@ -349,6 +355,8 @@ function CategoryAccordion({
   onToggle: () => void;
   isActive: boolean;
   activePath: string;
+  /** The current page is a listing narrowed to its directly filed resources (?filter=general). */
+  generalActive: boolean;
   navigate: (path: string) => void;
   matchQuery: string;
   openSubs: string[];
@@ -368,6 +376,9 @@ function CategoryAccordion({
   // nearest valid node, so this always equals COUNT(*) WHERE category = X and
   // always equals (direct + sum of child badges) — no "mixed validators".
   const totalCount = getTotalResourceCount(cat);
+  // Without this row the child badges sum short of the category badge.
+  const catDirectCount = directResourceCount(cat);
+  const catGeneralPath = `${catPath}?filter=general`;
   const hasGrandchildren = subs.some(
     (sub) => (sub.subSubcategories?.length ?? 0) > 0,
   );
@@ -462,7 +473,7 @@ function CategoryAccordion({
                   navigate(catPath);
                 }}
                 className="sub-item av-sidebar-all-category no-underline"
-                aria-current={activePath === catPath ? "page" : undefined}
+                aria-current={activePath === catPath && !generalActive ? "page" : undefined}
               >
                 <span>All in {cat.name} →</span>
               </a>
@@ -486,6 +497,8 @@ function CategoryAccordion({
                       `/sub-subcategory/${ss.slug || slugify(ss.name)}`,
                   );
                 const subOpen = openSubs.includes(subKey(sub.name));
+                const subDirectCount = directResourceCount(sub);
+                const subGeneralPath = `${subPath}?filter=general`;
 
                 if (subSubs.length === 0) {
                   return (
@@ -569,18 +582,45 @@ function CategoryAccordion({
                                 aria-current={activePath === ssPath ? "page" : undefined}
                                 className="av-sidebar-l3-row no-underline"
                               >
-                                <span aria-hidden="true">{index === subSubs.length - 1 ? "└" : "├"}</span>
+                                <span aria-hidden="true">{index === subSubs.length - 1 && subDirectCount === 0 ? "└" : "├"}</span>
                                 <span title={ss.name}>{ss.name}</span>
                                 <span className="font-mono tabular-nums">{formatCount(getTotalResourceCount(ss))}</span>
                               </a>
                             );
                           })}
+                          {subDirectCount > 0 && (
+                            <a
+                              href={subGeneralPath}
+                              onClick={(event) => {
+                                event.preventDefault();
+                                navigate(subGeneralPath);
+                              }}
+                              data-testid={`subsub-${subSlug}-uncategorized`}
+                              data-active={(activePath === subPath && generalActive) || undefined}
+                              aria-current={activePath === subPath && generalActive ? "page" : undefined}
+                              className="av-sidebar-l3-row no-underline"
+                            >
+                              <span aria-hidden="true">└</span>
+                              <span title={`Uncategorized in ${sub.name}`}>Uncategorized</span>
+                              <span className="font-mono tabular-nums">{formatCount(subDirectCount)}</span>
+                            </a>
+                          )}
                         </div>
                       )}
                     </MeasuredAccordionBody>
                   </div>
                 );
               })}
+              {catDirectCount > 0 && !matchQuery && (
+                <SubItem
+                  label="Uncategorized"
+                  count={catDirectCount}
+                  href={catGeneralPath}
+                  active={activePath === catPath && generalActive}
+                  onClick={() => navigate(catGeneralPath)}
+                  testId={`sub-${catSlug}-uncategorized`}
+                />
+              )}
             </div>
           )}
         </MeasuredAccordionBody>
@@ -606,6 +646,7 @@ export default function AppSidebar({
   const isInitialHomeHydration = homeBoot?.isAnonymous === true;
   const [location, setLocation] = useLocation();
   const activeSearch = useSearch();
+  const generalFilterActive = new URLSearchParams(activeSearch).get("filter") === "general";
   const [openCategories, setOpenCategories] = useState<string[]>(() =>
     isInitialHomeHydration ? [] : readOpenKeys(OPEN_CATEGORIES_STORAGE_KEY),
   );
@@ -854,6 +895,7 @@ export default function AppSidebar({
                 }
                 isActive={catActive}
                 activePath={activePath}
+                generalActive={generalFilterActive}
                 navigate={navigate}
                 matchQuery=""
                 openSubs={openSubcategories}

@@ -89,12 +89,9 @@
 /*
  * The frozen drawer scrolls as one document: categories retain natural height
  * and the footer follows the complete taxonomy. These narrow overrides undo
- * the desktop sidebar's inner tree scrollport only inside the drawer.
+ * the desktop sidebar's inner tree scrollport only inside the drawer (the
+ * drawer element itself is the scroller, see drawer.css).
  */
-.av-sidebar-drawer[data-sidebar="sidebar"] > [data-sidebar="drawer-navigation"] {
-  overflow-y: auto;
-}
-
 .av-sidebar-drawer[data-sidebar="sidebar"] > [data-sidebar="drawer-navigation"] > .av-sidebar-tree-scroll {
   flex: 0 0 auto;
   flex-shrink: 0;

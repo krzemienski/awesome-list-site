@@ -91,7 +91,9 @@ export default function ResourceDetail() {
   const queryClient = useQueryClient();
   const [, setLocation] = useLocation();
   const [suggestEditOpen, setSuggestEditOpen] = useState(false);
-  const [imageLoaded, setImageLoaded] = useState(false);
+  // Keyed by src: the page stays mounted across /resource/:id navigations.
+  const [loadedImage, setLoadedImage] = useState<string | null>(null);
+  const [failedImage, setFailedImage] = useState<string | null>(null);
 
   const resourceQuery = useQuery<Resource & { resolvedKind?: ResourceKind; featured?: boolean }>({
     queryKey: ['/api/resources', id],
@@ -535,7 +537,7 @@ export default function ResourceDetail() {
   };
 
   const metadata = resource?.metadata as Record<string, any> | undefined;
-  const hasOgImage = metadata?.ogImage;
+  const ogImage = metadata?.ogImage && failedImage !== metadata.ogImage ? metadata.ogImage : null;
   // Imported rows store this state in metadata; feed projections may also
   // expose an additive top-level flag. Accept both public response shapes.
   const isFeatured =
@@ -874,9 +876,9 @@ export default function ResourceDetail() {
       <div className="resource-detail-body">
         <div>
           <Card className="resource-detail-content">
-            {hasOgImage && (
+            {ogImage && (
               <div className="relative w-full h-48 md:h-64 overflow-hidden bg-gradient-to-b from-primary/10 to-transparent">
-                {metadata.ogImageBlurhash && !imageLoaded && (
+                {metadata?.ogImageBlurhash && loadedImage !== ogImage && (
                   <div className="absolute inset-0">
                     <Blurhash
                       hash={metadata.ogImageBlurhash}
@@ -889,14 +891,12 @@ export default function ResourceDetail() {
                   </div>
                 )}
                 <img
-                  src={metadata.ogImage}
+                  src={ogImage}
                   alt={resource.title}
                   className="w-full h-full object-cover relative z-10"
                   loading="lazy"
-                  onLoad={() => setImageLoaded(true)}
-                  onError={(e) => {
-                    (e.target as HTMLImageElement).style.display = 'none';
-                  }}
+                  onLoad={(e) => setLoadedImage(e.currentTarget.getAttribute("src"))}
+                  onError={(e) => setFailedImage(e.currentTarget.getAttribute("src"))}
                 />
                 <div className="resource-detail-image-shade absolute inset-0" />
               </div>

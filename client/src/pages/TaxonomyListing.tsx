@@ -461,6 +461,16 @@ export default function TaxonomyListing({ level }: Props) {
       tagAction,
     };
   };
+  // One path for the subcategory select and the "Uncategorized" tile, so both
+  // set the same URL state, analytics event and focus target.
+  const applySelection = (nextSelection: string) => {
+    const next = { ...currentFilterState, selection: nextSelection };
+    setSelection(nextSelection);
+    setGeneral(nextSelection === "__general__");
+    setPage(1);
+    queueAnalytics(next, "taxonomy_scope", nextSelection);
+    requestResultsFocus();
+  };
   const onFacetChange = (key: FacetKey, value: string | string[]) => {
     const next = { ...currentFilterState };
     if (key === "tags" && Array.isArray(value)) {
@@ -561,7 +571,9 @@ export default function TaxonomyListing({ level }: Props) {
   const broadenHref = `${broadenBase}${broadenParams.size ? `?${broadenParams}` : ""}`;
   // C3-V1-03: an empty search/filter result is "Resources (0)"; "Coming soon"
   // is only for a category with nothing in it.
-  const narrowed = serverFilterActive || selection !== "all" || general;
+  const scopeNarrowed = selection !== "all" || general;
+  const narrowed = serverFilterActive || scopeNarrowed;
+  const scopeLabel = general ? "Uncategorized" : selection;
   // V19: an unfiltered collection with zero approved resources is empty, not a
   // filter miss — "No resources match this combination" told visitors to clear
   // filters they never set.
@@ -592,7 +604,7 @@ export default function TaxonomyListing({ level }: Props) {
     {/* Directly under the header's toggle: after the subcategory tiles the
         opened panel landed below the fold at 1440x900 and the click looked inert. */}
     <div id="taxonomy-tools-panel" className={`taxonomy-controls taxonomy-production-controls ${toolsOpen ? "taxonomy-production-controls--open" : ""} flex flex-col gap-4`}><div className="relative"><Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" /><Input ref={searchInputRef} className="pl-10" value={searchTerm} onChange={(event) => { setSearchTerm(event.target.value); setPage(1); }} placeholder={`Search in ${name}...`} aria-label={`Search in ${name}`} data-testid="input-search-resources" /></div>
-       {level !== "sub-subcategory" && optionChildren.length > 0 && <select className="select min-h-11" aria-label={`Limit ${name} by subcategory`} value={selection} onChange={(event) => { const nextSelection = event.target.value; const next = { ...currentFilterState, selection: nextSelection }; setSelection(nextSelection); setGeneral(nextSelection === "__general__"); setPage(1); queueAnalytics(next, "taxonomy_scope", nextSelection); requestResultsFocus(); }} data-testid="select-subcategory-filter"><option value="all">All subcategories</option>{listingData.generalCount > 0 && <option value="__general__">Uncategorized ({listingData.generalCount})</option>}{optionChildren.map((item) => <option key={item.value} value={item.value}>{item.value} ({item.count})</option>)}</select>}
+       {level !== "sub-subcategory" && optionChildren.length > 0 && <select className="select min-h-11" aria-label={`Limit ${name} by subcategory`} value={selection} onChange={(event) => applySelection(event.target.value)} data-testid="select-subcategory-filter"><option value="all">All subcategories</option>{listingData.generalCount > 0 && <option value="__general__">Uncategorized ({listingData.generalCount})</option>}{optionChildren.map((item) => <option key={item.value} value={item.value}>{item.value} ({item.count})</option>)}</select>}
        <select className="select min-h-11" aria-label="Limit by resource kind" value={kind ?? ""} onChange={(event) => { const nextKind = parseKindParam(event.target.value); setKind(nextKind); setPage(1); requestResultsFocus(); }} data-testid="select-kind-filter"><option value="">All resource kinds</option>{RESOURCE_KIND_VALUES.map((value) => <option key={value} value={value}>{value.replace(/[-_]/g, " ").replace(/\b\w/g, (letter) => letter.toUpperCase())}</option>)}</select>
        <AdvancedFilter selectedTags={tags} sortBy={sort} availableTags={listingData.tags} onTagsChange={(value) => onFacetChange("tags", value)} onSortChange={(value) => onFacetChange("sort", value)} showCountSorts={false} showTagFilter={false} />
        <div className="taxonomy-view-toggle-row" aria-label="View mode">
@@ -606,9 +618,10 @@ export default function TaxonomyListing({ level }: Props) {
          />
        </div>
     </div>
-    {level === "category" && childTiles.length > 0 && <section className="taxonomy-children" aria-labelledby="taxonomy-children-heading"><h2 id="taxonomy-children-heading">Subcategories</h2><div className="taxonomy-child-grid">{childTiles.map((child, index) => <Link key={child.slug} className="taxonomy-child card hoverable" style={{ animationDelay: `${index * 30}ms` }} href={`${routeFor("subcategory", child.slug)}${kind ? `?kind=${kind}` : ""}`}><span>{child.name}</span><span className="chip mono">{child.count}</span></Link>)}</div></section>}
+    {level === "category" && childTiles.length > 0 && <section className="taxonomy-children" aria-labelledby="taxonomy-children-heading"><h2 id="taxonomy-children-heading">Subcategories</h2><div className="taxonomy-child-grid">{childTiles.map((child, index) => <Link key={child.slug} className="taxonomy-child card hoverable" style={{ animationDelay: `${index * 30}ms` }} href={`${routeFor("subcategory", child.slug)}${kind ? `?kind=${kind}` : ""}`}><span>{child.name}</span><span className="chip mono">{child.count}</span></Link>)}{/* Resources filed directly under the category have no subcategory page;
+        without this tile the grid summed short of the category total. */}{listingData.generalCount > 0 && <button type="button" className="taxonomy-child card hoverable" style={{ animationDelay: `${childTiles.length * 30}ms` }} aria-pressed={general} onClick={() => applySelection(general ? "all" : "__general__")} data-testid="taxonomy-child-uncategorized"><span>Uncategorized</span><span className={`chip mono${general ? " accent" : ""}`}>{listingData.generalCount}</span></button>}</div></section>}
     {/* C9-V1-02: active filters stay visible while the tools panel is closed. */}
-    <div className="taxonomy-active-filters">{!toolsOpen && normalizedSearch && <button type="button" className="btn ghost search-filter-chip" aria-label={`Remove search “${normalizedSearch}”`} onClick={() => { setSearchTerm(""); setPage(1); requestResultsFocus(); }}>Search: “{normalizedSearch}”<X className="h-3.5 w-3.5" aria-hidden="true" /></button>}<ActiveFilters state={filterState} onChange={onFacetChange} onClear={clearAllFilters} defaultSort="default" /></div>
+    <div className="taxonomy-active-filters">{!toolsOpen && scopeNarrowed && <button type="button" className="btn ghost search-filter-chip" aria-label={`Remove filter “${scopeLabel}”`} onClick={broadenScope} data-testid="chip-taxonomy-scope">{scopeLabel}<X className="h-3.5 w-3.5" aria-hidden="true" /></button>}{!toolsOpen && normalizedSearch && <button type="button" className="btn ghost search-filter-chip" aria-label={`Remove search “${normalizedSearch}”`} onClick={() => { setSearchTerm(""); setPage(1); requestResultsFocus(); }}>Search: “{normalizedSearch}”<X className="h-3.5 w-3.5" aria-hidden="true" /></button>}<ActiveFilters state={filterState} onChange={onFacetChange} onClear={clearAllFilters} defaultSort="default" /></div>
     <div className="taxonomy-results-layout">
       <div className={`taxonomy-production-controls ${toolsOpen ? "taxonomy-production-controls--open" : ""}`} aria-busy={toolsOpen && taxonomySearch.isLoading}><SearchFilters state={filterState} facets={taxonomySearch.data?.facets} onChange={onFacetChange} onClear={clearFacetFilters} hideTaxonomyFacets /></div>
       <div className="min-w-0 flex-1">
@@ -616,7 +629,9 @@ export default function TaxonomyListing({ level }: Props) {
           {/* The listing's single count statement: visible range, matching total,
               and — only while a filter narrows the collection — what it was
               narrowed from. */}
-           <div className={`taxonomy-results-heading-row${serverFilterActive ? " taxonomy-results-heading-row--narrowed" : ""}`}><h2 id="taxonomy-results-heading" data-testid="text-results-count" data-total={total}>{level === "category" ? (total > 0 || narrowed ? `Resources (${total})` : "Coming soon") : serverFilterActive ? `${total} of ${listingData.totalAll} ${resourceNoun(listingData.totalAll)} match` : <span className="sr-only">{total} {resourceNoun(total)}</span>}</h2></div>
+           {/* Below the category level the count stays screen-reader-only until
+               something narrows the list; a scope selection narrows it too. */}
+           <div className={`taxonomy-results-heading-row${narrowed ? " taxonomy-results-heading-row--narrowed" : ""}`}><h2 id="taxonomy-results-heading" data-testid="text-results-count" data-total={total}>{level === "category" ? (total > 0 || narrowed ? `Resources (${total})` : "Coming soon") : narrowed ? `${total} of ${listingData.totalAll} ${resourceNoun(listingData.totalAll)} match` : <span className="sr-only">{total} {resourceNoun(total)}</span>}</h2></div>
           {notice && <div role="status" data-testid="notice-page-adjusted" className="rounded border p-3 text-sm">{notice}<button type="button" className="btn ghost ml-2 min-h-8" onClick={() => { setNotice(null); /* C6-SWEEP-07: notice unmounts; focus the results region */ resultsRef.current?.focus({ preventScroll: true }); }}>Dismiss</button></div>}
           {(listingData.scope.ignoredSubcategory || listingData.scope.ignoredSubSubcategory) && <div role="status" data-testid="notice-unknown-subcategory" className="rounded border p-3 text-sm">“{selection}” isn't a subcategory of {name}, so that filter was ignored.<button type="button" className="btn ghost ml-2 min-h-8" onClick={broadenScope}>Remove it</button></div>}
           {serverSearchActive && !taxonomySearch.isPlaceholderData && taxonomySearch.data?.search?.mode === "fuzzy" && taxonomySearch.data.search.suggestion && <div className="flex flex-wrap items-center justify-center gap-2 rounded border p-3 text-sm" role="status" data-testid="notice-taxonomy-search-suggestion"><span>No exact matches. Did you mean</span><Button variant="link" className="h-auto p-0" onClick={() => { setSearchTerm(taxonomySearch.data!.search!.suggestion!); setPage(1); /* C6-SWEEP-08: the notice unmounts with this button; the input is display:none while the tools panel is closed, so fall back to the results region */ const input = searchInputRef.current; if (input && input.offsetParent !== null) input.focus(); else resultsRef.current?.focus({ preventScroll: true }); }}>{taxonomySearch.data.search.suggestion}</Button><span>?</span></div>}

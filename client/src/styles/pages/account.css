@@ -338,6 +338,13 @@
   color: var(--bg);
 }
 
+/* The DS .btn is nowrap; in the narrow completion card the longer action
+   label must wrap inside its button instead of overflowing both edges. */
+.account-page .account-onboarding-actions .btn {
+  white-space: normal;
+  text-align: center;
+}
+
 .account-page .account-onboarding-link {
   color: var(--text-2);
 }

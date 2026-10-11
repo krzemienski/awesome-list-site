@@ -9,6 +9,7 @@ import { fileURLToPath } from "node:url";
 // point) and is never read by `node dist/index.js`:
 //   - .git: history/packs (~2.4 GiB); the runtime only sees the baked revision
 //   - parity baselines / docs/parity*: frozen capture evidence (~5.6 GiB)
+//   - docs/audit-final/proof: per-row screenshots and recordings (~10 MB/row)
 //   - .cache/ms-playwright: Playwright browser binaries. NEVER widen this to
 //     all of .cache: .cache/replit/ holds the module environment (nodejs-20,
 //     env/latest.json with the runtime PATH); deleting it made the 4th
@@ -35,6 +36,7 @@ const targets = [
   "docs/parity-taxonomy",
   "docs/parity-545",
   "docs/parity-547",
+  "docs/audit-final/proof",
   "audit-evidence",
   "test-results",
   "playwright-report",
