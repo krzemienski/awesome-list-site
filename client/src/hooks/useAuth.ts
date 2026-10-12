@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useQuery, useMutation } from '@tanstack/react-query';
-import { useClerk } from '@clerk/react';
+import { whenClerkLoaded } from '@/lib/clerk-bridge';
 import { queryClient, ApiError, renewSessionToken } from '@/lib/queryClient';
 import { notifyCrossTabSync } from '@/lib/crossTabSync';
 import { safeRemoveItem } from '@/lib/safeStorage';
@@ -72,7 +72,6 @@ async function fetchAuthUser(): Promise<AuthResponse> {
 
 export function useAuth() {
   const { toast } = useToast();
-  const { signOut } = useClerk();
   const [logoutError, setLogoutError] = useState<string | null>(null);
   const { data, isLoading, error, refetch } = useQuery<AuthResponse>({
     queryKey: ['/api/auth/user'],
@@ -120,9 +119,11 @@ export function useAuth() {
       credentials: 'include',
       signal: logoutRequestSignal(),
     });
-    // The no-op callback stops Clerk routing to its after-sign-out URL;
-    // finishLogout does the full reload once the server confirms (C3-V3-02).
-    await signOut(() => {});
+    // Clerk loads on demand (backlog X-03); the bridged signOut skips Clerk's
+    // after-sign-out navigation, and finishLogout does the full reload once
+    // the server confirms (C3-V3-02).
+    const clerk = await whenClerkLoaded();
+    await clerk.signOut();
     const authCheck = await fetch('/api/auth/user', {
       credentials: 'include',
       cache: 'no-store',

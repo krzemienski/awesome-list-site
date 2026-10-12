@@ -9,3 +9,9 @@ The bundle-in-FCP-graph part is NOT pure topology: a `<head>` module entry evalu
 **Why:** three quiet runs after fixing real regressions still read 79/62 vs same-day production 84/78; a CDP-throttled Playwright load showed FCP at 1.1s with nothing blocking. An HTTP/2 self-signed terminator in front of the local server did NOT close the gap (TLS+proxy hop made Home worse).
 
 **How to apply:** compare production with the SAME tool on the SAME day, never a stored number; treat unthrottled `observed*` deltas and real-throttling probes as the regression signal; on HTTP/1.1 local origins a 40-chunk route fan-out costs ~1.5s under throttling (6 connections × 150ms RTT) — that is topology unless the chunk count itself grew. `--preset=perf` switches to devtools throttling (obsFCP === fcp) and is not comparable to simulate numbers.
+
+## Listing SSR lost to the SPA path under Lantern (2026-10-12)
+Server-rendering the 24-card taxonomy listing made the document ~227 KB uncompressed; FCP went ~2.5 s → ~3.5 s (scores 62–70 vs SPA 70–75). It only won when gzipped (38 KB, 72–78), and HTML must stay uncompressed so the platform can inject its analytics script. The owner chose no listing SSR.
+
+**Why:** Lantern charges document bytes to FCP; the split CSS links were not the cost (removing them caused CLS 0.17–0.34).
+**How to apply:** don't re-propose listing SSR without solving document size first. The category TBT is React re-rendering the card grid across several data-arrival commits (≈730 fibers each) plus forced layout, so fewer renders is the lever, not Clerk.

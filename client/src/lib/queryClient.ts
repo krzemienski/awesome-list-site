@@ -1,6 +1,7 @@
 import { QueryClient, QueryCache, MutationCache, QueryFunction } from "@tanstack/react-query";
 import { trackApiPerformance, trackError } from "./analytics";
 import { humanizeStatusBody } from "./apiError";
+import { isClerkRequested, whenClerkLoaded } from "./clerk-bridge";
 
 // NB-028 (run18): errors must carry the HTTP status as a real property —
 // retry predicates checking `'status' in error` silently failed against the
@@ -176,6 +177,11 @@ const SESSION_RECHECK_TIMEOUT_MS = 5_000;
  * can tell a stale cookie from a real sign-out.
  */
 export async function renewSessionToken(): Promise<boolean> {
+  // Clerk loads on demand (backlog X-03). When it has been requested but is
+  // still loading, wait for it rather than calling a live session stale.
+  if (!refreshSessionToken && isClerkRequested()) {
+    await whenClerkLoaded(SESSION_RECHECK_TIMEOUT_MS).catch(() => undefined);
+  }
   if (!refreshSessionToken) return false;
   try {
     const token = await Promise.race([

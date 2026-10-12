@@ -7,6 +7,7 @@ import type { useAuth } from "@/hooks/useAuth";
 import type { AwesomeListNavNode } from "@/lib/static-data";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { getInitials } from "@/lib/utils";
+import { requestClerk } from "@/lib/clerk-bridge";
 import {
   DropdownMenu, DropdownMenuContent, DropdownMenuItem,
   DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger,
@@ -111,9 +112,11 @@ export default function AppHeader({ onSearchOpen, user, onLogout, logoutError, c
         <a className="nav-link" href="/design-system" target="_blank" rel="noopener noreferrer">Docs ↗</a>
         {user?.role === "admin" && <Link href="/admin" className={`nav-link${location.startsWith("/admin") ? " active" : ""}`} aria-current={location.startsWith("/admin") ? "page" : undefined}>Admin<span className="header-live-dot" aria-hidden="true" /></Link>}
       </nav>
-      <DropdownMenu modal={false}>
+      {/* Backlog X-03: Clerk loads on demand — warm it when the visitor
+          reaches for the account menu, ahead of the sign-in page. */}
+      <DropdownMenu modal={false} onOpenChange={(open) => { if (open) requestClerk(); }}>
         <DropdownMenuTrigger asChild>
-          <button type="button" className="user-pill">
+          <button type="button" className="user-pill" onPointerEnter={requestClerk}>
             {user ? <Avatar className="header-avatar" aria-hidden="true">
               <AvatarImage src={user.avatar} alt="" />
               {/* The header chip shows one letter, as in the reference design. */}

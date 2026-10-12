@@ -3,7 +3,7 @@
 - [Runtime lessons](runtime-verification-lessons.md) — font fallback, retries, Vite, SSR, job liveness; SEO and auth topic indexes.
 - [Robots parser precedence](robots-parser-precedence.md) — Python 3.11 robotparser uses first-match rules; use longest-match semantics to verify Allow: / plus private exclusions.
 - [Publishing image size](publish-image-size.md) — 8 GiB limit counts ignored files; measure post-trim size after heavy evidence runs; trim evidence dirs by name, never all of .cache.
-- [Clerk auth migration](clerk-auth-migration.md) — READ FIRST on login complaints: owner admin = /sign-in?admin + OWNER_PASSWORD; PROD_CLERK_SECRET_KEY irrelevant; JIT fails closed.
+- [Clerk auth migration](clerk-auth-migration.md) — READ FIRST on login issues: owner admin = /sign-in?admin + OWNER_PASSWORD; PROD_CLERK_SECRET_KEY irrelevant; JIT fails closed; SDK loads lazily.
 - [Identity sweep by claim token](identity-sweep-claim-token.md) — sweep auth refactors by claim pattern (claims.sub), not receiver name; `request.`/`(req as any).` aliases silently survive `req.user` seds and tsc can't catch them.
 - [Resource count source-of-truth](count-source-of-truth.md) — sidebar counts must come from ONE complete tree; orphan resources fold into nearest valid node or counts desync.
 - [Public resource/journey status gate](resource-status-public-gate.md) — public resources are status "approved" (NOT "published"); journeys are "published". Counting resources by "published" returns 0.
@@ -169,7 +169,6 @@
 - [Publish snapshots in-flight edits](publish-snapshots-inflight-edits.md) — publishing while subagents edit ships their unverified partial work; never republish mid-wave.
 - [Aborted agent run usage](aborted-agent-run-usage.md) — cancelled SDK runs emit no result msg; accumulate streamed usage (lower bound); count the enrichment queue the server way before paid scratch runs.
 - [Live smoke of production](live-smoke-prod-revision.md) — publish may leave prod on the parent commit; verify by server-behaviour markers; prod sign-up blocked → owner account net-zero.
-- [Initial bundle zod-free](initial-bundle-zod.md) — shell imports must use resourceFacets-core; zod in App.tsx graph blew bundle-budget and blocked publish; run the publish gate before asking to republish.
 - [Edge decodes %-escapes](edge-percent-decoding.md) — prod edge decodes %2D etc. before the app, so escape-normalising 301s never fire on awesome.video; probe via trailing-slash echo.
 - [Initial bundle zod boundary](initial-bundle-zod-boundary.md) — shell-reachable shared code must import resourceFacets-core; zod in entry failed publish; diff vs last-published build in /tmp.
 - [Reference sync gate history](design-reference-independence.md) — the design archive root is a frozen reference excluded from palette/profile gates; the frozen check reads a gitignored zip by recorded path → ENOENT elsewhere.

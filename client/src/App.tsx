@@ -10,20 +10,15 @@ import {
   type ReactNode,
 } from "react";
 import { Switch, Route, Redirect, useLocation, useSearch } from "wouter";
-import { foldInheritedHashIntoRedirect, sanitizeRedirectParam } from "@/lib/returnUrl";
 import { discoveryRedirect } from "@shared/discovery-params";
-import { ClerkProvider, SignIn, SignUp, useAuth as useClerkAuth, useClerk } from "@clerk/react";
 import { AccountThemePreferenceBridge } from "@/components/ui/theme-provider";
-import { publishableKeyFromHost } from "@clerk/react/internal";
-import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { useQuery } from "@tanstack/react-query";
 import { noteLocationChange, useScrollRestoration } from "./lib/nav-history";
-import { useAuth, clearSignedInClientState } from "./hooks/useAuth";
-import { trackLoggedOut } from "@/lib/analytics";
+import { useAuth } from "./hooks/useAuth";
 import { findRouteSuggestion } from "./lib/not-found-suggestion";
 import { useAnalytics } from "./hooks/use-analytics";
 import { useCrossTabSync } from "./lib/crossTabSync";
-import { setSessionTokenRefresher } from "./lib/queryClient";
-import { useClerkAppearance } from "./lib/clerk-appearance";
+import { hasClerkSessionHint, requestClerk, routeNeedsClerk, useClerkBridge } from "./lib/clerk-bridge";
 import {
   applyProductProfile,
   resolveProductProfile,
@@ -31,12 +26,6 @@ import {
 
 import MainLayout from "@/components/layout/new/MainLayout";
 import SEOHead from "@/components/layout/SEOHead";
-import { signInSeoDescription, signUpSeoDescription } from "@shared/seo-templates";
-import AuthConversionTracker from "@/components/auth/AuthConversionTracker";
-import GuestBookmarkMerge from "@/components/auth/GuestBookmarkMerge";
-import StaleSessionGate from "@/components/auth/StaleSessionGate";
-import { ClerkUiFallback } from "@/components/auth/AuthUnavailable";
-import { AdminPasswordSignIn } from "@/components/auth/AdminPasswordSignIn";
 import ConsentBanner from "@/components/ui/consent-banner";
 import ScrubbedParamsNotice from "@/components/ui/scrubbed-params-notice";
 import { Button } from "@/components/ui/button";
@@ -52,6 +41,12 @@ const AdminGuard = lazy(() => import("@/components/auth/AdminGuard"));
 const AuthGuard = lazy(() => import("@/components/auth/AuthGuard"));
 const NotFound = lazy(() => import("@/pages/not-found"));
 const LazyHomeRoute = lazy(() => import("@/pages/Home"));
+// Backlog X-03: the Clerk SDK is not part of the anonymous entry. Auth pages
+// are route chunks, and the Clerk runtime mounts only once requested.
+const SignInPage = lazy(() => import("@/pages/AuthPages").then((m) => ({ default: m.SignInPage })));
+const SignUpPage = lazy(() => import("@/pages/AuthPages").then((m) => ({ default: m.SignUpPage })));
+const Logout = lazy(() => import("@/pages/AuthPages").then((m) => ({ default: m.Logout })));
+const ClerkRuntime = lazy(() => import("@/components/auth/ClerkRuntime"));
 
 // Admin dashboard is the only heavy, role-gated surface. Lazy-load it so the
 // entire admin tree (and its /api/admin/* fetch strings) lands in a separate
@@ -400,53 +395,6 @@ const KNOWN_ROUTE_PATTERNS: RegExp[] = [
   /^\/design-system\/?$/,
 ];
 
-// Task #307 — Clerk auth wiring. Browser loads derive the publishable key from
-// the current hostname so one build can serve multiple domains. SSR has no
-// browser hostname, so it must use the explicitly configured key instead of
-// passing an empty host to Clerk's host resolver. A missing build-time key is
-// a configuration error for both paths; never substitute a fake key.
-// A loopback host has no Clerk custom domain to derive (a production build
-// served on localhost would otherwise ask for clerk.localhost), so local runs
-// of either build use the configured key.
-const configuredClerkPubKey = import.meta.env.VITE_CLERK_PUBLISHABLE_KEY;
-const isLoopbackHost = (host: string) =>
-  host === "localhost" || host === "127.0.0.1" || host === "[::1]" || host.endsWith(".localhost");
-const clerkPubKey =
-  typeof window === "undefined" || isLoopbackHost(window.location.hostname)
-    ? configuredClerkPubKey
-    : publishableKeyFromHost(window.location.hostname, configuredClerkPubKey);
-const clerkProxyUrl = import.meta.env.VITE_CLERK_PROXY_URL;
-const basePath = import.meta.env.BASE_URL.replace(/\/$/, "");
-
-// Clerk passes full paths to routerPush/routerReplace, but wouter's
-// setLocation prepends the base — strip it to avoid doubling.
-function stripBase(path: string): string {
-  return basePath && path.startsWith(basePath)
-    ? path.slice(basePath.length) || "/"
-    : path;
-}
-
-if (!clerkPubKey) {
-  throw new Error(
-    "Missing VITE_CLERK_PUBLISHABLE_KEY: configure the Clerk publishable key for SSR and browser auth",
-  );
-}
-
-const clerkLocalization = {
-  signIn: {
-    start: {
-      title: "Welcome back",
-      subtitle: "Sign in to continue to Awesome Video",
-    },
-  },
-  signUp: {
-    start: {
-      title: "Create your account",
-      subtitle: "Track journeys, bookmarks, and recommendations",
-    },
-  },
-};
-
 /** Legacy auth URL redirect: maps the old validated ?next= param onto Clerk's
  * ?redirect_url= so pre-migration links keep returning users to their page. */
 function LegacyAuthRedirect({ to }: { to: "/sign-in" | "/sign-up" }) {
@@ -458,174 +406,42 @@ function LegacyAuthRedirect({ to }: { to: "/sign-in" | "/sign-up" }) {
   return <Redirect to={`${to}${suffix}`} replace />;
 }
 
-function SignInPage() {
-  // A server-guard 302 from /admin#users keeps "#users" on this URL but not in
-  // redirect_url; fold it in before Clerk reads the parameter (idempotent).
-  // Unsafe redirect_url values are dropped first so Clerk never sees them.
-  sanitizeRedirectParam();
-  foldInheritedHashIntoRedirect();
-  // /sign-in?admin shows the owner password form instead of Clerk.
-  const adminPasswordMode =
-    typeof window !== "undefined" &&
-    new URLSearchParams(window.location.search).has("admin");
-  return (
-    <div
-      className="flex justify-center py-10"
-      data-testid="page-sign-in"
-    >
-      {/* Title mirrors the og-middleware /sign-in template (two-pass parity). */}
-      <SEOHead title="Sign In" description={signInSeoDescription} noindex />
-      {adminPasswordMode ? (
-        <AdminPasswordSignIn />
-      ) : (
-      <StaleSessionGate>
-        {/* C5-V3-01: never a blank body while Clerk's UI can't load. */}
-        <SignIn
-          routing="path"
-          path={`${basePath}/sign-in`}
-          signUpUrl={`${basePath}/sign-up`}
-          fallback={<ClerkUiFallback flow="sign-in" />}
-        />
-      </StaleSessionGate>
-      )}
-    </div>
-  );
+/** A Clerk runtime that fails to load (offline, blocked CDN, rotated chunk)
+ * must never take the app down: auth surfaces show their own fallbacks. */
+class ClerkRuntimeBoundary extends Component<{ children: ReactNode }, { failed: boolean }> {
+  state = { failed: false };
+
+  static getDerivedStateFromError() {
+    return { failed: true };
+  }
+
+  componentDidCatch(error: Error) {
+    console.error("[auth] Clerk runtime failed to load", error);
+  }
+
+  render() {
+    return this.state.failed ? null : this.props.children;
+  }
 }
 
-function SignUpPage() {
+/**
+ * Mounts the Clerk runtime once something needs it (see lib/clerk-bridge).
+ * The first render is always empty, on the server and during hydration;
+ * session hints and Clerk routes request it from an effect.
+ */
+function ClerkHost() {
+  const { requested } = useClerkBridge();
+  const [location] = useLocation();
+  useEffect(() => {
+    if (routeNeedsClerk(location) || hasClerkSessionHint()) requestClerk();
+  }, [location]);
+  if (!requested) return null;
   return (
-    <div
-      // F009: the Clerk card's Continue button used to sit under the fixed
-      // consent banner. The banner is now an in-flow row of the app shell
-      // (index.css `#root`), so plain page padding is all this needs.
-      className="flex justify-center py-10"
-      data-testid="page-sign-up"
-    >
-      {/* Title mirrors the og-middleware /sign-up template (two-pass parity). */}
-      <SEOHead title="Create an Account" description={signUpSeoDescription} noindex />
-      <StaleSessionGate>
-        <SignUp
-          routing="path"
-          path={`${basePath}/sign-up`}
-          signInUrl={`${basePath}/sign-in`}
-          fallback={<ClerkUiFallback flow="sign-up" />}
-        />
-      </StaleSessionGate>
-    </div>
-  );
-}
-
-// Keeps the webview truthful when the signed-in user changes: any Clerk user
-// switch (sign-in, sign-out, account change) clears the query cache so no
-// user-scoped data leaks across identities.
-function ClerkQueryClientCacheInvalidator() {
-  const { addListener } = useClerk();
-  const { getToken } = useClerkAuth();
-  const qc = useQueryClient();
-  const prevUserIdRef = useRef<string | null | undefined>(undefined);
-
-  // Lets the query cache refresh a stale __session token before treating a
-  // protected 401 as an expired session (C3-V5A-07).
-  useEffect(() => {
-    setSessionTokenRefresher(() => getToken({ skipCache: true }));
-    return () => setSessionTokenRefresher(null);
-  }, [getToken]);
-
-  useEffect(() => {
-    const unsubscribe = addListener(({ user }) => {
-      const userId = user?.id ?? null;
-      if (prevUserIdRef.current === undefined) {
-        // The first callback may already contain a restored Clerk user. The
-        // anonymous SSR/query cache must not outlive that first authenticated
-        // observation, but it holds no other identity's data (the session
-        // cookie was already sent with every client fetch), so refetch it in
-        // place rather than clearing it: `clear()` here also dropped
-        // /api/auth/user and every guard flashed "Verifying access…", which
-        // remounted the whole signed-in page tree 50–400 ms after load and
-        // lost its scroll positions and any early input.
-        if (userId !== null) void qc.invalidateQueries();
-      } else if (prevUserIdRef.current !== userId) {
-        // A real identity switch (sign-in, sign-out, account change): nothing
-        // user-scoped may survive it. resetQueries, not clear(): clear() drops
-        // the cache but leaves mounted observers holding their old result, so
-        // the header kept showing "Visitor" after sign-in until a reload.
-        void qc.resetQueries();
-      }
-      prevUserIdRef.current = userId;
-    });
-    return unsubscribe;
-  }, [addListener, qc]);
-
-  return null;
-}
-
-// SPA-side /logout. Both direct and client-side navigation render this route,
-// which signs out via Clerk and confirms invalidation before redirecting.
-function Logout() {
-  const { isLoaded, signOut } = useClerkAuth();
-  const [error, setError] = useState<string | null>(null);
-
-  useEffect(() => {
-    // C3-V3-02: on a direct /logout load Clerk is still loading, and signOut()
-    // then only queues the call and resolves at once — the server check below
-    // saw a live session, and the queued signOut later routed to "/"
-    // client-side, leaving the cached signed-in user in the header.
-    if (!isLoaded) return;
-    let cancelled = false;
-    const doSignOut = async () => {
-      try {
-        // The callback replaces Clerk's own navigation so the full reload
-        // below, not a client-side route change, ends the signed-in page.
-        await signOut(() => {});
-        // Before the identity reset, so the event stays on this account.
-        trackLoggedOut("this_device");
-        clearSignedInClientState();
-        const authCheck = await fetch("/api/auth/user", {
-          credentials: "include",
-          cache: "no-store",
-          signal: AbortSignal.timeout(5_000),
-        });
-        const state = authCheck.ok ? await authCheck.json() : null;
-        if (!authCheck.ok || state?.isAuthenticated !== false) {
-          throw new Error("The server could not confirm that your session ended");
-        }
-        if (!cancelled) window.location.replace("/");
-      } catch (reason) {
-        if (!cancelled) {
-          setError(
-            reason instanceof Error ? reason.message : "Sign out failed",
-          );
-        }
-      }
-    };
-    void doSignOut();
-    return () => {
-      cancelled = true;
-    };
-  }, [isLoaded, signOut]);
-  return (
-    // min-h-full, not min-h-screen: this screen renders inside the app shell's
-    // <main>, and a row that claims a viewport height of its own pushes the
-    // shell's bottom bar row past the fold.
-    <div className="min-h-full flex items-center justify-center bg-background">
-      <div className="text-center">
-        {error ? (
-          <>
-            <p className="text-destructive font-medium" role="alert">
-              {error}. You are still signed in.
-            </p>
-            <Button className="mt-4" onClick={() => window.location.reload()}>
-              Try again
-            </Button>
-          </>
-        ) : (
-          <>
-            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto mb-4"></div>
-            <p className="text-muted-foreground">Signing out…</p>
-          </>
-        )}
-      </div>
-    </div>
+    <ClerkRuntimeBoundary>
+      <Suspense fallback={null}>
+        <ClerkRuntime />
+      </Suspense>
+    </ClerkRuntimeBoundary>
   );
 }
 
@@ -646,6 +462,10 @@ function Router({ homeComponent: Home }: { homeComponent: HomeRouteComponent }) 
     logoutError,
   } = useAuth();
   const [location] = useLocation();
+  // A signed-in visitor needs Clerk for token refresh and sign-out.
+  useEffect(() => {
+    if (user) requestClerk();
+  }, [user]);
   // Legacy `/?q=` and `/resource?q=` searches redirect to /search. Read the
   // query through the router (not window.location at mount) so the routes
   // below can be plain children: an inline `component={() => …}` is a new
@@ -932,11 +752,6 @@ export function App({
 }: {
   homeComponent?: HomeRouteComponent;
 } = {}) {
-  const [, setLocation] = useLocation();
-  // Task #376: the Clerk widget paints from resolved DS tokens and re-resolves
-  // when the visitor changes system/accent at /settings/theme.
-  const clerkAppearance = useClerkAppearance(basePath);
-
   // R4-057: the server (og-middleware) injects a full crawl-time meta set into
   // <head>; after hydration react-helmet renders its own tags (marked with
   // data-react-helmet), leaving DUPLICATE title/description/og/twitter tags in
@@ -986,26 +801,7 @@ export function App({
   }, []);
 
   return (
-    <ClerkProvider
-      publishableKey={clerkPubKey}
-      proxyUrl={clerkProxyUrl}
-      appearance={clerkAppearance}
-      signInUrl={`${basePath}/sign-in`}
-      signUpUrl={`${basePath}/sign-up`}
-      localization={clerkLocalization}
-      routerPush={(to) => setLocation(stripBase(to))}
-      routerReplace={(to) => setLocation(stripBase(to), { replace: true })}
-    >
-      <AccountThemePreferenceBridge>
-      <ClerkQueryClientCacheInvalidator />
-      {/* Task #393: fires the GA4 login / sign_up conversions once per
-          completed Clerk auth attempt (never on a session restore or token
-          refresh) — see the component for how the two are told apart. */}
-      <AuthConversionTracker />
-      {/* Task #329: pushes on-device guest saves into the account after
-          sign-in (SPA transition or full-reload) — see the component for the
-          dedupe/cleanup rules. */}
-      <GuestBookmarkMerge />
+    <AccountThemePreferenceBridge>
       {/* BUG-020 (run13): analytics consent banner — analytics loads only
           after an explicit grant through the shared post-paint coordinator.
           BUG-054 (run26): rendered AFTER the router so the layout's
@@ -1016,8 +812,8 @@ export function App({
           content, with Escape still dismissing it for the session. */}
       <Router homeComponent={homeComponent} />
       <ConsentBanner />
-      </AccountThemePreferenceBridge>
-    </ClerkProvider>
+      <ClerkHost />
+    </AccountThemePreferenceBridge>
   );
 }
 

@@ -3,7 +3,8 @@
  * Passwords, connected sign-in methods, and active sessions are managed by
  * the auth provider's account portal, opened as a themed in-app modal.
  */
-import { useClerk } from "@clerk/react";
+import { useEffect } from "react";
+import { requestClerk, useClerkBridge } from "@/lib/clerk-bridge";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -16,7 +17,12 @@ import { ShieldCheck } from "lucide-react";
 import { trackAccountSecurityOpened } from "@/lib/analytics";
 
 export default function AccountSecurityCard() {
-  const { openUserProfile } = useClerk();
+  // Signed-in pages load Clerk anyway; request it here too so the portal
+  // button is ready, and keep it disabled until clerk-js has loaded.
+  const { loaded, clerk } = useClerkBridge();
+  useEffect(() => {
+    requestClerk();
+  }, []);
   return (
     <Card data-testid="card-account-security">
       <CardHeader>
@@ -33,9 +39,11 @@ export default function AccountSecurityCard() {
       <CardContent>
         <Button
           variant="outline"
+          disabled={!loaded || !clerk}
           onClick={() => {
+            if (!clerk) return;
             trackAccountSecurityOpened("manage_button");
-            openUserProfile();
+            clerk.openUserProfile();
           }}
           data-testid="button-open-account-security"
         >

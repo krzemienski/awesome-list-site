@@ -58,3 +58,8 @@ Production needs the same env vars (CLERK_SECRET_KEY, CLERK_PUBLISHABLE_KEY, VIT
 - `PROD_CLERK_SECRET_KEY` is irrelevant. Never ask for it, use it, or debug it.
 - **Why:** the user asked; the owner could not get admin through Clerk (Google/email-code only, no password) and wanted a password only they know.
 - Uses OWNER_PASSWORD, not ADMIN_PASSWORD: production already had a stale ADMIN_PASSWORD, and publishing only copies secrets production lacks (it never overwrites existing deployment secrets). Any secret rotation must account for this.
+
+## Clerk loads lazily (2026-10-12)
+The Clerk SDK is activated only from effects/handlers: sign-in/up pages, account-menu hover/open, protected pages, or when /api/auth/user reports a signed-in user. Identity on public pages comes from /api/auth/user, never from Clerk state.
+**Why:** Clerk JS/UI cost ~0.5 s of throttled main thread on every page; resource 84→89 and home 68→76 after deferral.
+**How to apply:** never import @clerk/* from App.tsx or other eager shell modules; go through the bridge, and wait for its loaded promise before reading tokens.
