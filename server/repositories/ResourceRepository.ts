@@ -56,6 +56,7 @@ import {
 import { normalizeTagFilter, TAG_PLURAL_KEEP } from "@shared/tagNormalize";
 import { RESOURCE_KIND_VALUES } from "@shared/resourceKinds";
 import {
+  classifyKindForStorage,
   emptyResourceKindCounts,
   resolvedResourceKindSql,
   type ResourceKind,
@@ -867,6 +868,9 @@ export class ResourceRepository {
     // title/description/hierarchy fields (never the URL) so "&amp;" text can
     // never be persisted, whatever the caller (routes, GitHub sync, AI).
     resource = this.normalizeResourceFacets(decodeResourceTextFields({ ...resource }), true);
+    // Task #661: every new row is stored with a kind. An explicit kind (admin
+    // override) wins; otherwise the deterministic classifier decides.
+    if (!resource.kind) resource = { ...resource, kind: classifyKindForStorage(resource) };
     if (resource.status === 'approved') {
       return withResourcePublication(async tx => {
         const [created] = await tx.insert(resources).values({ ...resource, status: 'pending' }).returning();
@@ -948,14 +952,79 @@ export class ResourceRepository {
   }
 
   /**
-   * Admin: set or clear the stored kind. null returns the resource to
-   * read-time resolution. Returns undefined when the resource does not exist.
-   * Audit logging is the caller's job (it knows the acting admin).
+   * Fill `kind` for every resource that has none, using the deterministic
+   * classifier. Idempotent and safe to run on every boot: it only touches
+   * rows WHERE kind IS NULL (re-checked in the UPDATE itself), so an admin's
+   * stored choice — or a value written concurrently — is never overwritten.
+   * `updatedAt` is left alone: classification is not a content edit.
+   */
+  async countResourcesWithoutKind(): Promise<number> {
+    const [row] = await db
+      .select({ count: sql<number>`count(*)::int` })
+      .from(resources)
+      .where(isNull(resources.kind));
+    return Number(row?.count ?? 0);
+  }
+
+  async backfillMissingResourceKinds(): Promise<{
+    filled: number;
+    byKind: Record<ResourceKind, number>;
+  }> {
+    const rows = await db
+      .select({
+        id: resources.id,
+        title: resources.title,
+        description: resources.description,
+        url: resources.url,
+        category: resources.category,
+        subcategory: resources.subcategory,
+        subSubcategory: resources.subSubcategory,
+        metadata: resources.metadata,
+      })
+      .from(resources)
+      .where(isNull(resources.kind));
+    const idsByKind = new Map<ResourceKind, number[]>();
+    for (const row of rows) {
+      const kind = classifyKindForStorage(row);
+      const ids = idsByKind.get(kind) ?? [];
+      ids.push(row.id);
+      idsByKind.set(kind, ids);
+    }
+    const byKind = Object.fromEntries(RESOURCE_KIND_VALUES.map((kind) => [kind, 0])) as Record<ResourceKind, number>;
+    let filled = 0;
+    for (const [kind, ids] of idsByKind) {
+      for (let start = 0; start < ids.length; start += 500) {
+        // One PG array literal (trusted integer ids) — see drizzle array binds.
+        const chunk = `{${ids.slice(start, start + 500).join(",")}}`;
+        const updated = await db
+          .update(resources)
+          .set({ kind })
+          .where(and(isNull(resources.kind), sql`${resources.id} = ANY(${chunk}::int[])`))
+          .returning({ id: resources.id });
+        byKind[kind] += updated.length;
+        filled += updated.length;
+      }
+    }
+    if (filled > 0) invalidatePublicCache("resource-mutation");
+    return { filled, byKind };
+  }
+
+  /**
+   * Admin: set the stored kind. null means "Automatic": the classifier's
+   * answer for the row's current fields is stored instead, so a resource is
+   * never left without a kind. Returns undefined when the resource does not
+   * exist. Audit logging is the caller's job (it knows the acting admin).
    */
   async setResourceKind(id: number, kind: ResourceKind | null): Promise<Resource | undefined> {
+    let storedKind = kind;
+    if (storedKind === null) {
+      const existing = await this.getResource(id);
+      if (!existing) return undefined;
+      storedKind = classifyKindForStorage(existing);
+    }
     const [updated] = await db
       .update(resources)
-      .set({ kind, updatedAt: new Date() })
+      .set({ kind: storedKind, updatedAt: new Date() })
       .where(eq(resources.id, id))
       .returning();
     if (updated) invalidatePublicCache("resource-mutation");

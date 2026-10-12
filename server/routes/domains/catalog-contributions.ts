@@ -845,8 +845,8 @@ export function registerCatalogContributionsRoutes(
           ...resourceData,
           submittedBy: userId,
           status: 'pending',
-          // Contributor submissions never carry a stored kind; the public
-          // classification resolves at read time until an admin sets one.
+          // Contributors never choose a kind; createResource stores the
+          // classifier's answer and an admin can override it on review.
           kind: null,
         });
 

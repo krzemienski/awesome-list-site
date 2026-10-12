@@ -466,5 +466,25 @@ export async function runBackgroundInitialization(): Promise<void> {
     );
   }
 
+  // Task #661: give every resource that still has no kind a stored one
+  // (classifier in shared/resourceKindClassifier.ts). DML only, fills NULLs
+  // only — an admin-set kind is never overwritten — so it is safe on every
+  // boot and is how existing production rows get classified on republish.
+  try {
+    const before = await withRetry(() => resourceRepo.countResourcesWithoutKind());
+    if (before > 0) {
+      const result = await resourceRepo.backfillMissingResourceKinds();
+      const after = await withRetry(() => resourceRepo.countResourcesWithoutKind());
+      console.log(
+        `🏷️  Resource kind backfill: ${before} without kind → filled ${result.filled} ` +
+          `(${Object.entries(result.byKind).map(([kind, n]) => `${kind} ${n}`).join(", ")}); ${after} remain without kind`,
+      );
+    } else {
+      console.log("✓ Resource kinds: every resource already has a stored kind");
+    }
+  } catch (error) {
+    console.error("❌ Resource kind backfill failed (non-fatal):", error);
+  }
+
   console.log("✅ Background initialization complete");
 }

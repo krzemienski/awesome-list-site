@@ -288,10 +288,11 @@ export const resources = pgTable(
     resourceFormat: text("resource_format").$type<ResourceFormat>().notNull().default("unknown"),
     provider: text("provider").$type<ResourceProvider>().notNull().default("unknown"),
     skillLevel: text("skill_level").$type<ResourceSkillLevel>().notNull().default("unknown"),
-    // Design-parity kind override (migrations/0047_resource_kind_and_contact.sql).
-    // Nullable and additive: existing imports omit it and the read-time resolver
-    // in shared/resourceKinds.ts infers a kind from tags when it is null. Never
-    // backfilled; a stored value always wins over inference.
+    // Resource kind (migrations/0047_resource_kind_and_contact.sql). Stored for
+    // every row: creation/import classify with shared/resourceKindClassifier.ts
+    // and the boot backfill fills any NULL left behind (never overwrites a
+    // stored value, so an admin's choice wins). The read-time tag resolver in
+    // shared/resourceKinds.ts is only a fallback. See docs/RESOURCE-KINDS.md.
     kind: text("kind").$type<ResourceKind>(),
     status: text("status").default("approved"), // pending, approved, rejected, withdrawn, archived
     submittedBy: varchar("submitted_by").references(() => users.id, { onDelete: "cascade" }),

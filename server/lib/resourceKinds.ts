@@ -24,6 +24,7 @@ import {
   type ResourceKind,
   type ResourceKindMappings,
 } from "@shared/resourceKinds";
+import { classifyResourceKind } from "@shared/resourceKindClassifier";
 import { config } from "../config";
 
 export type { ResourceKind } from "@shared/resourceKinds";
@@ -84,6 +85,34 @@ export function resolveResourceKind(
     },
     { tag_mappings: compiled.tags, category_mappings: compiled.categories },
   );
+}
+
+/** Row fields the write-time classifier reads (everything optional). */
+export interface ResourceKindClassifierRow {
+  title?: string | null;
+  description?: string | null;
+  url?: string | null;
+  category?: string | null;
+  subcategory?: string | null;
+  subSubcategory?: string | null;
+  metadata?: unknown;
+}
+
+/**
+ * The kind to STORE for a resource that has none yet (create, import, AI
+ * approval, enrichment, boot backfill, admin "Automatic"). Deterministic —
+ * see shared/resourceKindClassifier.ts and docs/RESOURCE-KINDS.md.
+ */
+export function classifyKindForStorage(row: ResourceKindClassifierRow): ResourceKind {
+  return classifyResourceKind({
+    title: row.title,
+    description: row.description,
+    url: row.url,
+    category: row.category,
+    subcategory: row.subcategory,
+    subSubcategory: row.subSubcategory,
+    tags: metadataTags(row.metadata),
+  }).kind;
 }
 
 /**

@@ -77,8 +77,10 @@ immediately**; closing the dialog does not undo a successful change.
 Failed updates show an inline error and restore the previous value.
 
 Kinds are `tools`, `libraries`, `standards`, `events`, `protocols`, and
-`other`. **Use inferred** clears the stored override and displays the resolved
-kind inferred from tags; it does not backfill classifications into the catalog.
+`other`. Every resource has a stored kind chosen by the automatic classifier.
+**Automatic — X** throws away a manual choice and stores the classifier's
+answer X again. Editing other fields does not reclassify a stored kind. See
+[RESOURCE-KINDS.md](RESOURCE-KINDS.md) for how the classifier decides.
 Curated placement persists `metadata.featured` while preserving other metadata.
 The create form also offers these fields, saved with the new resource.
 

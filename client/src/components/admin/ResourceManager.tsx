@@ -48,10 +48,10 @@ import {
 } from "@shared/resourceFacets";
 import {
   RESOURCE_KIND_VALUES,
-  resolveResourceKindFrom,
   resourceKindSchema,
   type ResourceKind,
 } from "@shared/resourceKinds";
+import { classifyResourceKind } from "@shared/resourceKindClassifier";
 import { AdminLoadError } from "@/components/admin/AdminLoadError";
 import { ChipButton } from "@/components/ui/chip-button";
 import "@/styles/pages/admin-catalog-resources.css";
@@ -73,7 +73,7 @@ type AdminResourceWire = Omit<Resource, "kind" | "metadata"> & {
 type AdminResource = Omit<AdminResourceWire, "metadata"> & {
   metadata: ResourceMetadata | null;
   resolvedKind: ResourceKind;
-  /** What "Use inferred" resolves to, ignoring any stored override. */
+  /** What "Automatic" stores: the shared classifier's answer for this row. */
   inferredKind: ResourceKind;
 };
 type ResourcePatchResponse = AdminResourceWire;
@@ -94,14 +94,26 @@ const normalizeAdminResource = (resource: AdminResourceWire): AdminResource => {
   const metadata = safeResourceMetadata(resource.metadata);
   const parsedKind = resourceKindSchema.safeParse(resource.kind);
   const kind = parsedKind.success ? parsedKind.data : null;
-  const signals = {
+  // Same deterministic classifier the server stores on create/import/backfill
+  // (shared/resourceKindClassifier.ts), so "Automatic" here = what is stored.
+  const inferredKind = classifyResourceKind({
+    title: resource.title,
+    description: resource.description,
+    url: resource.url,
+    category: resource.category,
+    subcategory: resource.subcategory,
+    subSubcategory: resource.subSubcategory,
     tags: safeResourceMetadataTags(metadata),
-    taxonomy: [resource.category, resource.subcategory, resource.subSubcategory],
-  };
-  const inferredKind = resolveResourceKindFrom({ ...signals, storedKind: null }).kind;
+  }).kind;
   return { ...resource, kind, metadata, resolvedKind: kind ?? inferredKind, inferredKind };
 };
 
+/**
+ * The edit select's value: "" (Automatic) when the stored kind is what the
+ * classifier would store anyway, otherwise the admin's override.
+ */
+const kindSelectValue = (resource: Pick<AdminResource, "kind" | "inferredKind">): ResourceKind | "" =>
+  resource.kind && resource.kind !== resource.inferredKind ? resource.kind : "";
 const featuredValue = (resource: AdminResource) => resource.metadata?.featured === true;
 
 /** Bulk endpoints answer 200 (all ok) or 207 (partial) with per-item failures. */
@@ -524,7 +536,7 @@ export default function ResourceManager({ createRequest = 0 }: { createRequest?:
     });
 
     if (field === "kind") {
-      setEditForm((form) => ({ ...form, kind: normalized.kind ?? "" }));
+      setEditForm((form) => ({ ...form, kind: kindSelectValue(normalized) }));
     } else {
       setEditForm((form) => ({
         ...form,
@@ -548,8 +560,9 @@ export default function ResourceManager({ createRequest = 0 }: { createRequest?:
       const previousResource = current ? { ...current } : undefined;
       const snapshots = patchAdminResourceCaches(id, {
         kind,
-        // The list stays responsive while the PATCH is in flight. Its
-        // read-time inferred kind is reconciled from the server response below.
+        // The list stays responsive while the PATCH is in flight. "Automatic"
+        // (null) stores the classifier's answer; the server response below
+        // reconciles the stored value.
         resolvedKind: kind ?? current?.inferredKind ?? "other",
       });
       setSelectedResource((resource) =>
@@ -570,7 +583,7 @@ export default function ResourceManager({ createRequest = 0 }: { createRequest?:
       const previous = context?.previousResource;
       if (previous) {
         setSelectedResource((resource) => resource?.id === id ? previous : resource);
-        setEditForm((form) => ({ ...form, kind: previous.kind ?? "" }));
+        setEditForm((form) => ({ ...form, kind: kindSelectValue(previous) }));
       }
       setResourceActionErrors((previousErrors) => ({
         ...previousErrors,
@@ -832,7 +845,7 @@ export default function ResourceManager({ createRequest = 0 }: { createRequest?:
       resourceFormat: resource.resourceFormat || "unknown",
       provider: resource.provider || "unknown",
       skillLevel: resource.skillLevel || "unknown",
-      kind: resource.kind ?? "",
+      kind: kindSelectValue(resource),
       featured: featuredValue(resource),
       status: resource.status || "approved"
     });
@@ -1817,9 +1830,9 @@ export default function ResourceManager({ createRequest = 0 }: { createRequest?:
                     aria-describedby="edit-kind-hint"
                     data-testid="admin-resource-kind-select"
                   >
-                    {/* C3-V5A-06: the inferred kind, not the stored override. */}
+                    {/* C3-V5A-06: the classifier's kind, not the stored override. */}
                     <option value="">
-                      Use inferred — resolved: {selectedResource?.inferredKind ?? "other"} (inferred)
+                      Automatic — {resourceKindLabel(selectedResource?.inferredKind ?? "other")}
                     </option>
                     {RESOURCE_KIND_VALUES.map((kind) => (
                       <option key={kind} value={kind}>{resourceKindLabel(kind)}</option>
@@ -1829,7 +1842,7 @@ export default function ResourceManager({ createRequest = 0 }: { createRequest?:
                 <p id="edit-kind-hint" className="text-xs text-[var(--text-2)]" data-testid="text-kind-storage-state">
                   {editForm.kind
                     ? `Stored override: ${resourceKindLabel(editForm.kind)}`
-                    : `resolved: ${selectedResource?.inferredKind ?? "other"} (inferred)`}
+                    : `Automatic: ${resourceKindLabel(selectedResource?.inferredKind ?? "other")} (decided from category, link and title)`}
                 </p>
                 {selectedResource && resourceActionErrors[`kind:${selectedResource.id}`] && (
                   <p role="alert" className="admin-catalog-resources__action-error" data-testid="error-resource-kind">
@@ -2100,9 +2113,9 @@ export default function ResourceManager({ createRequest = 0 }: { createRequest?:
                 <Label htmlFor="create-kind">Kind override</Label>
                 <Select value={editForm.kind || "inferred"} onValueChange={(value) => setEditForm((form) => ({ ...form, kind: value === "inferred" ? "" : value as ResourceKind }))}>
                   <SelectTrigger id="create-kind" className="min-h-11" data-testid="select-create-kind"><SelectValue /></SelectTrigger>
-                  <SelectContent><SelectItem value="inferred">No override (infer from tags)</SelectItem>{RESOURCE_KIND_VALUES.map((kind) => <SelectItem key={kind} value={kind}>{resourceKindLabel(kind)}</SelectItem>)}</SelectContent>
+                  <SelectContent><SelectItem value="inferred">Automatic (classified on save)</SelectItem>{RESOURCE_KIND_VALUES.map((kind) => <SelectItem key={kind} value={kind}>{resourceKindLabel(kind)}</SelectItem>)}</SelectContent>
                 </Select>
-                <p className="text-xs text-[var(--text-2)]" data-testid="text-create-kind-storage-state">{editForm.kind ? `Stored override: ${editForm.kind}` : "Stored: null · resolved after creation"}</p>
+                <p className="text-xs text-[var(--text-2)]" data-testid="text-create-kind-storage-state">{editForm.kind ? `Stored override: ${resourceKindLabel(editForm.kind)}` : "Kind is decided from category, link and title when the resource is saved"}</p>
               </div>
               <div className="grid gap-2">
                 <Label htmlFor="create-featured">Curated placement</Label>

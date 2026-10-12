@@ -7,6 +7,7 @@ import { AuditRepository } from '../repositories/AuditRepository';
 import { CategoryRepository } from '../repositories/CategoryRepository';
 import { fetchUrlMetadata, type UrlMetadata } from './urlScraper';
 import { promoteEnrichmentSuggestions } from './promoteEnrichmentSuggestions';
+import { classifyKindForStorage } from '../lib/resourceKinds';
 import { humanizeTitle, sanitizeDescription, decodeHtmlEntities } from '../github/importHygiene';
 import { tool, createSdkMcpServer } from '@anthropic-ai/claude-agent-sdk';
 import { z } from 'zod';
@@ -56,6 +57,8 @@ interface BatchItem {
   category: string | null;
   subcategory: string | null;
   subSubcategory: string | null;
+  /** Stored kind at batch time; null means enrichment should fill it. */
+  kind: string | null;
   metadata: Record<string, any>;
   urlMetadata: UrlMetadata | null;
   submitted: boolean;
@@ -494,6 +497,7 @@ export class EnrichmentService {
         category: resource.category,
         subcategory: resource.subcategory,
         subSubcategory: resource.subSubcategory,
+        kind: resource.kind ?? null,
         metadata,
         urlMetadata,
         submitted: false,
@@ -771,6 +775,21 @@ ${taxonomyHint}`;
     // HTML entities, or email bylines into the live columns.
     if (updates.title) updates.title = humanizeTitle(updates.title);
     if (updates.description) updates.description = sanitizeDescription(updates.description);
+
+    // Task #661: a resource that still has no kind gets the classifier's
+    // answer for its enriched fields. A stored kind (admin or earlier
+    // classification) is never touched here.
+    if (!item.kind) {
+      updates.kind = classifyKindForStorage({
+        title: updates.title ?? item.title,
+        description: updates.description ?? item.description,
+        url: item.url,
+        category: updates.category ?? item.category,
+        subcategory: updates.subcategory !== undefined ? updates.subcategory : item.subcategory,
+        subSubcategory: updates.subSubcategory !== undefined ? updates.subSubcategory : item.subSubcategory,
+        metadata: enhancedMetadata,
+      });
+    }
 
     await this.resourceRepo.updateResource(item.resourceId, updates, false);
 

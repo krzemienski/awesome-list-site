@@ -124,8 +124,11 @@ performance:
   lazy_loading: true
 
 # Resource Kinds Configuration
-# A stored resource kind always wins. When a resource has no stored kind, the
-# read-time resolver infers one from its tags using these mappings (merged with
+# Every resource normally has a STORED kind, set by the deterministic
+# classifier (shared/resourceKindClassifier.ts, docs/RESOURCE-KINDS.md) on
+# creation/import and by the boot backfill. A stored kind always wins. These
+# mappings only feed the read-time fallback: when a resource has no stored
+# kind, the resolver infers one from its tags using these mappings (merged with
 # the generic defaults in shared/resourceKinds.ts), then from its category /
 # subcategory / sub-subcategory name using category_mappings (no generic
 # defaults), and finally falls back to "other". Words are matched after

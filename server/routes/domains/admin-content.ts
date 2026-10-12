@@ -55,6 +55,7 @@ import type { RequestHandler } from "express";
 import { z } from "zod";
 import { adminResourceWriteSchema } from "@shared/schema";
 import { resourceKindSchema } from "@shared/resourceKinds";
+import { classifyKindForStorage } from "../../lib/resourceKinds";
 import {
   httpsUrlSchema,
   resourceTitleSchema,
@@ -682,9 +683,16 @@ export function registerAdminContentRoutes(
       if (validatedData.metadata !== undefined) {
         updateData.metadata = { ...(resource.metadata ?? {}), ...validatedData.metadata };
       }
-      // Design parity: the admin editor may set or clear the stored kind here
-      // too (null = back to read-time resolution).
-      if (validatedData.kind !== undefined) updateData.kind = validatedData.kind;
+      // Design parity: the admin editor may set the stored kind here too.
+      // null = "Automatic": store the classifier's answer for the post-update
+      // fields, so a resource never goes back to having no kind (task #661).
+      if (validatedData.kind !== undefined) {
+        updateData.kind = validatedData.kind ?? classifyKindForStorage({
+          ...resource,
+          ...updateData,
+          metadata: updateData.metadata ?? resource.metadata,
+        });
+      }
 
       // Auto-create the implied sub_subcategories row so the resource never
       // disappears from the category drilldown (task #57). Uses the post-update
@@ -755,8 +763,8 @@ export function registerAdminContentRoutes(
               resourceId,
               'updated',
               req.dbUser?.id,
-              { kind, previousKind: existing.kind ?? null },
-              kind === null ? 'Resource kind cleared by admin' : 'Resource kind set by admin',
+              { kind: updated.kind, previousKind: existing.kind ?? null, automatic: kind === null },
+              kind === null ? 'Resource kind reset to automatic by admin' : 'Resource kind set by admin',
             );
           }
           return updated;

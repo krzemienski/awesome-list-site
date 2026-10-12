@@ -5,6 +5,7 @@ import { eq, notInArray, sql } from "drizzle-orm";
 import { mapCategoryName } from "@shared/categoryMapping";
 import { seedJourneyStepsForExisting } from "./cli/seedJourneyStepsForExisting";
 import { invalidatePublicCache } from "./cache/publicCache";
+import { classifyKindForStorage } from "./lib/resourceKinds";
 
 const invalidateSeedCache = () => invalidatePublicCache('seed-mutation');
 
@@ -615,6 +616,15 @@ async function applySeed(db: SeedConnection, awesomeData: SeedData, options: { c
           category: categoryName,
           subcategory: subcategoryName,
           subSubcategory: subSubcategoryName,
+          kind: classifyKindForStorage({
+            title: project.title,
+            description: project.description || '',
+            url: project.homepage,
+            category: categoryName,
+            subcategory: subcategoryName,
+            subSubcategory: subSubcategoryName,
+            metadata: { tags: project.tags ?? [] },
+          }),
           status: 'approved',
           metadata: {
             tags: project.tags ?? [],

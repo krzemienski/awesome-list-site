@@ -29,6 +29,7 @@ import { defaultResearchModel, defaultScoutModel, resolveModel, validateBaseUrl,
 import { LinkChecker } from '../validation/linkChecker';
 import { isPlausiblePublicUrl } from '@shared/validation';
 import { invalidatePublicCache } from '../cache/publicCache';
+import { classifyKindForStorage } from '../lib/resourceKinds';
 
 // Cap how much pre-computed context we inline into the orchestrator system prompt.
 const MAX_TAXONOMY_LINES = 200;
@@ -1533,7 +1534,7 @@ STOP TARGET: this run ends AUTOMATICALLY once ${targetDiscoveries} new discoveri
       taxonomy.subSubcategory,
     );
 
-    const [pendingResource] = await tx.insert(resources).values({
+    const approvedFields = {
       // Task #248: decode again at approval so discoveries saved BEFORE the
       // save-time decode (pre-existing pending rows) still land clean.
       title: decodeHtmlEntities(discovery.title),
@@ -1542,6 +1543,11 @@ STOP TARGET: this run ends AUTOMATICALLY once ${targetDiscoveries} new discoveri
       category: taxonomy.category || 'Uncategorized',
       subcategory: taxonomy.subcategory || null,
       subSubcategory: contained ? taxonomy.subSubcategory || null : null,
+    };
+    const [pendingResource] = await tx.insert(resources).values({
+      ...approvedFields,
+      // Task #661: AI-approved resources land with a stored kind too.
+      kind: classifyKindForStorage(approvedFields),
       status: 'pending',
       metadata: { source: 'ai_researcher', discoveryId: discovery.id, confidence: discovery.confidence },
     }).returning();
