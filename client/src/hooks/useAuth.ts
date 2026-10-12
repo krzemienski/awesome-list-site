@@ -6,6 +6,7 @@ import { notifyCrossTabSync } from '@/lib/crossTabSync';
 import { safeRemoveItem } from '@/lib/safeStorage';
 import { mpIdentify, mpReset } from '@/lib/mixpanel';
 import { phIdentify, phReset } from '@/lib/posthog';
+import { trackLoggedOut } from '@/lib/analytics';
 import { useToast } from '@/hooks/use-toast';
 
 /**
@@ -133,7 +134,10 @@ export function useAuth() {
     }
   };
 
-  const finishLogout = () => {
+  const finishLogout = (scope: 'this_device' | 'all_devices') => {
+      // Before clearSignedInClientState resets the analytics identities, so
+      // the event is attributed to the account that signed out.
+      trackLoggedOut(scope);
       // Clear auth cache only after the server confirms invalidation.
       void queryClient.invalidateQueries({ queryKey: ['/api/auth/user'] });
       queryClient.setQueryData(['/api/auth/user'], { user: null, isAuthenticated: false });
@@ -157,7 +161,7 @@ export function useAuth() {
       setLogoutError(null);
       await clerkSignOutAndVerify();
     },
-    onSuccess: finishLogout,
+    onSuccess: () => finishLogout('this_device'),
     onError: handleLogoutError,
   });
 
@@ -178,7 +182,7 @@ export function useAuth() {
       }
       await clerkSignOutAndVerify();
     },
-    onSuccess: finishLogout,
+    onSuccess: () => finishLogout('all_devices'),
     onError: handleLogoutError,
   });
 

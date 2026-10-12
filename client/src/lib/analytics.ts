@@ -429,7 +429,8 @@ export const trackResourceSaveToggle = (
 export const trackResourceClick = (
   resourceTitle: string,
   resourceUrl: string,
-  category: string
+  category: string,
+  surface?: string,
 ) => {
   const linkDomain = domainOf(resourceUrl);
   track(
@@ -439,6 +440,7 @@ export const trackResourceClick = (
       link_url: resourceUrl,
       link_domain: linkDomain,
       category,
+      surface,
     },
     {
       ga: {
@@ -447,6 +449,7 @@ export const trackResourceClick = (
           content_type: 'resource',
           content_name: resourceTitle,
           content_category: category,
+          surface,
           value: 1,
         },
       },
@@ -656,6 +659,7 @@ export const trackResourceEditSubmitted = (resourceId: string | number) => {
   track('resource_edit_submitted', { resource_id: String(resourceId) }, { ga: false });
 };
 
+export type CommandPaletteOpenMethod = 'keyboard_shortcut' | 'slash_key' | 'header_button';
 const referrerOrigin = (): string | undefined => {
   if (typeof document === 'undefined' || !document.referrer) return undefined;
   try {
@@ -686,3 +690,92 @@ interface TrackOptions {
 let dispatch: ((request: AnalyticsDispatchRequest) => void) | null = null;
 
 type EventProps = Record<string, unknown>;
+
+export const trackCommandPaletteOpened = (method: CommandPaletteOpenMethod) => {
+  track('command_palette_opened', { open_method: method });
+};
+
+export const trackExportStarted = (info: ExportEventInfo) => {
+  track('export_started', exportProps(info));
+};
+
+export const trackHomeLayoutChanged = (layout: string, previousLayout: string) => {
+  track('home_layout_changed', { home_layout: layout, previous_layout: previousLayout });
+};
+
+export const trackAccountDeletionDialogOpened = () => {
+  track('account_deletion_dialog_opened');
+};
+
+export const trackAccountSecurityOpened = (entryPoint: 'profile_tab' | 'manage_button') => {
+  track('account_security_opened', { entry_point: entryPoint });
+};
+
+export const trackResourceCardOpened = (
+  resourceId: string | number,
+  surface: string,
+  control: 'title' | 'view_details' | 'card',
+) => {
+  track('resource_card_opened', {
+    resource_id: String(resourceId),
+    surface,
+    card_control: control,
+  });
+};
+
+export const trackApiKeyCopied = (copyMethod: 'clipboard' | 'manual_select') => {
+  track('api_key_copied', { copy_method: copyMethod });
+};
+
+const exportProps = ({ format, scope, categoryCount, resourceCount }: ExportEventInfo) => ({
+  export_format: format,
+  export_scope: scope,
+  category_count: categoryCount,
+  resource_count: resourceCount,
+});
+
+export const trackAccountDeletionWithdrawn = () => {
+  track('account_deletion_withdrawn');
+};
+
+export const trackSidebarToggled = (
+  state: 'expanded' | 'collapsed',
+  mode: 'drawer' | 'docked',
+) => {
+  track('sidebar_toggled', {
+    toggle_method: 'keyboard_shortcut',
+    sidebar_state: state,
+    sidebar_mode: mode,
+  });
+};
+
+export const trackLoggedOut = (scope: 'this_device' | 'all_devices') => {
+  track('logged_out', { logout_scope: scope });
+};
+
+export const trackProfileNameUpdated = () => {
+  track('profile_name_updated');
+};
+
+interface ExportEventInfo {
+  format: string;
+  scope: 'all' | 'selected_categories';
+  categoryCount: number;
+  resourceCount: number;
+}
+
+export const trackExportDownloaded = (info: ExportEventInfo) => {
+  track('export_downloaded', exportProps(info));
+};
+
+export const trackApiKeyCreated = (expiry: string) => {
+  track('api_key_created', { expiry_option: expiry });
+};
+
+export const trackApiKeyRevoked = () => {
+  track('api_key_revoked');
+};
+
+export const trackAccountDeletionRequested = () => {
+  track('account_deletion_requested');
+};

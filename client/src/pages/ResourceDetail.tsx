@@ -506,7 +506,7 @@ export default function ResourceDetail() {
   // and fires the toast.
   const handleVisitResource = () => {
     if (resource) {
-      trackResourceClick(resource.title, resource.url, resource.category ?? "uncategorized");
+      trackResourceClick(resource.title, resource.url, resource.category ?? "uncategorized", "resource_detail");
       // The analytics event above never reaches the user's interaction
       // history; record the visit there like the page view.
       if (user?.id) {

@@ -18,6 +18,7 @@ import { publishableKeyFromHost } from "@clerk/react/internal";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { noteLocationChange, useScrollRestoration } from "./lib/nav-history";
 import { useAuth, clearSignedInClientState } from "./hooks/useAuth";
+import { trackLoggedOut } from "@/lib/analytics";
 import { findRouteSuggestion } from "./lib/not-found-suggestion";
 import { useAnalytics } from "./hooks/use-analytics";
 import { useCrossTabSync } from "./lib/crossTabSync";
@@ -576,6 +577,8 @@ function Logout() {
         // The callback replaces Clerk's own navigation so the full reload
         // below, not a client-side route change, ends the signed-in page.
         await signOut(() => {});
+        // Before the identity reset, so the event stays on this account.
+        trackLoggedOut("this_device");
         clearSignedInClientState();
         const authCheck = await fetch("/api/auth/user", {
           credentials: "include",

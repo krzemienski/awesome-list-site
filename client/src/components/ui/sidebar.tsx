@@ -6,6 +6,7 @@ import { PanelLeft, X } from "lucide-react"
 
 import { useIsMobile } from "@/hooks/use-mobile"
 import { cn } from "@/lib/utils"
+import { trackSidebarToggled } from "@/lib/analytics"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Separator } from "@/components/ui/separator"
@@ -191,13 +192,15 @@ const SidebarProvider = React.forwardRef<
           (event.metaKey || event.ctrlKey)
         ) {
           event.preventDefault()
+          const nextOpen = isDrawer ? !openMobile : !open
+          trackSidebarToggled(nextOpen ? "expanded" : "collapsed", isDrawer ? "drawer" : "docked")
           toggleSidebar()
         }
       }
 
       window.addEventListener("keydown", handleKeyDown)
       return () => window.removeEventListener("keydown", handleKeyDown)
-    }, [toggleSidebar])
+    }, [toggleSidebar, isDrawer, open, openMobile])
 
     // We add a state so that we can do data-state="expanded" or "collapsed".
     // This makes it easier to style the sidebar with Tailwind classes.

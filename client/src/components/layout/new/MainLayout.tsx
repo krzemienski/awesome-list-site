@@ -11,6 +11,7 @@ import "@/styles/shell/layout.css";
 import type { ProductProfileId } from "@/lib/design-system";
 import { useHomeBoot } from "@/lib/home-boot";
 import { handoffFocusOnUnmount } from "@/hooks/focus-handoff";
+import { trackCommandPaletteOpened, type CommandPaletteOpenMethod } from "@/lib/analytics";
 
 // Contact variants (docs/CONTACT-VARIANTS.md) are opt-in via
 // VITE_CONTACT_VARIANT; with it unset (the default) neither chunk is fetched
@@ -134,6 +135,11 @@ export default function MainLayout({ productProfile, nav, isLoading, navError, o
   // Keep the lightweight global trigger in the eager shell. The palette code
   // itself is loaded only after one of these controls opens it.
   useEffect(() => {
+    // One open event per closed → open transition, tagged with its trigger.
+    const openPalette = (method: CommandPaletteOpenMethod) => {
+      if (!searchOpen) trackCommandPaletteOpened(method);
+      setSearchOpen(true);
+    };
     const handleKeyDown = (event: KeyboardEvent) => {
       const target = event.target as Element | null;
       const inField =
@@ -145,7 +151,7 @@ export default function MainLayout({ productProfile, nav, isLoading, navError, o
         event.key.toLowerCase() === "k"
       ) {
         event.preventDefault();
-        setSearchOpen(true);
+        openPalette("keyboard_shortcut");
         return;
       }
       if (
@@ -160,11 +166,12 @@ export default function MainLayout({ productProfile, nav, isLoading, navError, o
         }
         if (!inField) {
           event.preventDefault();
-          setSearchOpen(true);
+          openPalette("slash_key");
         }
       }
     };
-    const openSearch = () => setSearchOpen(true);
+    // Only the /search page input dispatches this (on a pristine "/" press).
+    const openSearch = () => openPalette("slash_key");
     document.addEventListener("keydown", handleKeyDown);
     window.addEventListener("awesome:open-search-palette", openSearch);
     return () => {
@@ -213,7 +220,10 @@ export default function MainLayout({ productProfile, nav, isLoading, navError, o
       >
         <div className="grain" aria-hidden="true" />
         <AppHeader
-          onSearchOpen={() => setSearchOpen(true)}
+          onSearchOpen={() => {
+            if (!searchOpen) trackCommandPaletteOpened("header_button");
+            setSearchOpen(true);
+          }}
           siteName={publicConfig?.site?.title}
           user={user}
           onLogout={onLogout}

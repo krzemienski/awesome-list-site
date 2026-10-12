@@ -6,6 +6,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Checkbox } from "@/components/ui/checkbox";
 import { Badge } from "@/components/ui/badge";
 import { useToast } from "@/hooks/use-toast";
+import { trackExportDownloaded, trackExportStarted } from "@/lib/analytics";
 import { 
   Download, 
   FileText, 
@@ -505,6 +506,18 @@ export default function ExportTools({
     
     try {
       const resources = getFilteredResources();
+      // Format + scope only — never the generated file contents.
+      const selectedCount = exportOptions.selectedCategories.length;
+      const exportInfo = {
+        format,
+        scope:
+          selectedCount === 0 || selectedCount === awesomeList.categories.length
+            ? ('all' as const)
+            : ('selected_categories' as const),
+        categoryCount: selectedCount === 0 ? awesomeList.categories.length : selectedCount,
+        resourceCount: resources.length,
+      };
+      trackExportStarted(exportInfo);
       let content = '';
       let filename = '';
       let mimeType = '';
@@ -688,6 +701,7 @@ export default function ExportTools({
           }
 
           doc.save(`${baseName}.pdf`);
+          trackExportDownloaded(exportInfo);
           toast({
             title: "Export Successful",
             description: `${resources.length.toLocaleString()} resources exported as PDF`,
@@ -707,6 +721,7 @@ export default function ExportTools({
       link.click();
       document.body.removeChild(link);
       URL.revokeObjectURL(url);
+      trackExportDownloaded(exportInfo);
 
       toast({
         title: "Export Successful",

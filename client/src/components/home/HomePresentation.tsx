@@ -9,6 +9,7 @@ import { getCategoryGlyph } from "@/components/layout/new/category-glyphs";
 import { ChipButton } from "@/components/ui/chip-button";
 import { Button } from "@/components/ui/button";
 import { handoffFocusOnUnmount } from "@/hooks/focus-handoff";
+import { trackResourceCardOpened, trackResourceClick, trackTagInteraction } from "@/lib/analytics";
 
 export interface HomeSubcategoryView {
   name: string;
@@ -283,16 +284,24 @@ function ResourceLink({
   children,
   className,
   dataTestId,
+  analyticsSurface,
 }: {
   resource: Resource;
   children: ReactNode;
   className?: string;
   dataTestId?: string;
+  /** Home surface reported with the card-open / outbound-link event. */
+  analyticsSurface: string;
 }) {
   const href = resourceHref(resource);
   if (href.startsWith("/")) {
     return (
-      <Link href={href} className={className} data-testid={dataTestId}>
+      <Link
+        href={href}
+        className={className}
+        onClick={() => trackResourceCardOpened(resource.id, analyticsSurface, "title")}
+        data-testid={dataTestId}
+      >
         {children}
       </Link>
     );
@@ -303,6 +312,9 @@ function ResourceLink({
       target="_blank"
       rel="noopener noreferrer"
       className={className}
+      onClick={() =>
+        trackResourceClick(resource.title, resource.url, resource.category || "uncategorized", analyticsSurface)
+      }
       data-testid={dataTestId}
     >
       {children}
@@ -339,6 +351,7 @@ function ResourceCard({
           resource={resource}
           className="hover:text-[var(--accent-ink)] transition-colors"
           dataTestId={`link-home-resource-${resource.id}`}
+          analyticsSurface="home_card"
         >
           {resource.title}
         </ResourceLink>
@@ -346,7 +359,12 @@ function ResourceCard({
       <p className="home-resource-description">{resource.description}</p>
       <div className="home-resource-tags" aria-label={`Tags for ${resource.title}`}>
         {tags.slice(0, 3).map((tag) => (
-          <Link key={tag} href={tagHref(tag)} className="home-resource-tag chip mono">
+          <Link
+            key={tag}
+            href={tagHref(tag)}
+            className="home-resource-tag chip mono"
+            onClick={() => trackTagInteraction(tag, "card_click", "home_card")}
+          >
             #{tag}
           </Link>
         ))}
@@ -503,6 +521,7 @@ function RecentRail({ recent }: { recent: Resource[] }) {
               resource={resource}
               className="home-recent-row"
               dataTestId={`link-home-recent-${resource.id}`}
+              analyticsSurface="home_recent_rail"
             >
               <span className="home-recent-number mono">{String(index + 1).padStart(2, "0")}</span>
               <span className="home-recent-copy">
@@ -673,6 +692,7 @@ function CuratedLayout({
                 resource={resource}
                 className="home-curated-recent-row"
                 dataTestId={`link-home-curated-recent-${resource.id}`}
+                analyticsSurface="home_recent_list"
               >
                 <span className="home-recent-number mono">{String(index + 1).padStart(2, "0")}</span>
                 <span className="home-curated-recent-copy">

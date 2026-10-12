@@ -67,6 +67,13 @@ import AccountSecurityCard from "@/components/profile/AccountSecurityCard";
 import ApiKeysCard from "@/components/profile/ApiKeysCard";
 import ContinueLearningPreview from "@/components/learning/ContinueLearningPreview";
 import { useAuth } from "@/hooks/useAuth";
+import {
+  trackAccountDeletionDialogOpened,
+  trackAccountDeletionRequested,
+  trackAccountDeletionWithdrawn,
+  trackAccountSecurityOpened,
+  trackProfileNameUpdated,
+} from "@/lib/analytics";
 import { formatDistanceToNow } from "date-fns";
 import { useLocation, Link } from "wouter";
 import SEOHead from "@/components/layout/SEOHead";
@@ -171,6 +178,9 @@ export default function Profile({ user }: ProfileProps) {
   // Tab clicks write ?tab= (push) so reload/share restore the tab and Back
   // steps through tab changes, matching the shared URL-state convention.
   const handleTabChange = (next: string) => {
+    if (next === "security" && activeTab !== "security") {
+      trackAccountSecurityOpened("profile_tab");
+    }
     setActiveTab(next);
     writeFilterParams({ tab: next === "overview" ? null : next });
   };
@@ -232,6 +242,7 @@ export default function Profile({ user }: ProfileProps) {
       });
     },
     onSuccess: () => {
+      trackProfileNameUpdated();
       void queryClient.invalidateQueries({ queryKey: ["/api/auth/user"] });
       setNameDialogOpen(false);
       toast({ title: "Name updated", description: "Your display name has been saved." });
@@ -254,6 +265,7 @@ export default function Profile({ user }: ProfileProps) {
       return apiRequest("/api/user/deletion-request", { method: "POST" });
     },
     onSuccess: () => {
+      trackAccountDeletionRequested();
       void queryClient.invalidateQueries({ queryKey: ["/api/auth/user"] });
       setDeletionDialogOpen(false);
       toast({
@@ -277,6 +289,7 @@ export default function Profile({ user }: ProfileProps) {
       return apiRequest("/api/user/deletion-request", { method: "DELETE" });
     },
     onSuccess: () => {
+      trackAccountDeletionWithdrawn();
       void queryClient.invalidateQueries({ queryKey: ["/api/auth/user"] });
       toast({
         title: "Deletion request withdrawn",
@@ -964,7 +977,10 @@ export default function Profile({ user }: ProfileProps) {
                     </p>
                     <Button
                       variant="destructive"
-                      onClick={() => setDeletionDialogOpen(true)}
+                      onClick={() => {
+                        trackAccountDeletionDialogOpened();
+                        setDeletionDialogOpen(true);
+                      }}
                       data-testid="button-request-deletion"
                     >
                       Request account deletion

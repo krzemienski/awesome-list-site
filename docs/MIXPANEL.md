@@ -48,7 +48,8 @@ no PII (enforced by the shared sender's property hygiene).
 |---|---|---|---|
 | `page_viewed` | Every SPA navigation (single source, exactly once) | `page_path`, `page_title`, `referrer_origin` | `lib/analytics.ts trackPageView` via `use-analytics` |
 | `resource_viewed` | Resource detail opened | `resource_id`, extras from caller | `trackSelectContent('resource', …)` |
-| `resource_link_opened` | Outbound resource link clicked | `resource_title`, `link_url`, `link_domain`, `category` | `trackResourceClick` |
+| `resource_link_opened` | Outbound resource link clicked (palette, detail page, resource / taxonomy / home cards) | `resource_title`, `link_url`, `link_domain`, `category`, `surface` | `trackResourceClick` |
+| `resource_card_opened` | Card title / View Details clicked → detail page | `resource_id`, `surface`, `card_control` | `trackResourceCardOpened` |
 | `search_performed` | Search executed with results | `search_term`, `result_count` | `trackSearch` |
 | `category_viewed` | Category / subcategory / sub-subcategory page, once per resolved node | `category` | `TaxonomyListing` via `trackCategoryView` |
 | `sign_up_completed` | Clerk user is first provisioned into the application DB | `sign_up_method: 'clerk'`, acquisition, `tracked_from: 'server'` | **server** — Clerk JIT provisioning (`server/clerkAuth.ts`) |
@@ -64,6 +65,15 @@ no PII (enforced by the shared sender's property hygiene).
 | `guest_bookmark_added` / `guest_bookmark_removed` | Signed-out visitor toggles an on-device save (Task #329 guest funnel) | `resource_id`, `guest_saved_count` | `useResourceToggle` guest branch |
 | `auth_prompt_shown` | Save-intent sign-in prompt shown to a guest | `prompt_context` (`'guest_save_toast'` \| `'guest_save_cap'` \| `'bookmarks_page'`), `guest_saved_count` | toggle hook + `GuestBookmarks` page |
 | `bookmarks_merged` | On-device guest saves pushed into the account after sign-in | `merged_count`, `duplicate_count`, `failed_count` | `GuestBookmarkMerge` |
+| `command_palette_opened` | Search palette opens (closed → open) | `open_method` | `MainLayout` |
+| `export_started` / `export_downloaded` | Export begun / file download triggered | `export_format`, `export_scope`, `category_count`, `resource_count` | `export-tools` |
+| `api_key_created` / `api_key_copied` / `api_key_revoked` | API key created (server-confirmed) / secret copied / revoked (server-confirmed) — never the key | `expiry_option` / `copy_method` / — | `ApiKeysCard` |
+| `profile_name_updated` | Display name saved (server-confirmed) — never the name | — | `Profile` |
+| `logged_out` | Sign-out confirmed, sent before `mpReset()` | `logout_scope` | `useAuth`, `/logout` route |
+| `account_deletion_dialog_opened` / `account_deletion_requested` / `account_deletion_withdrawn` | Deletion dialog opened / request submitted / withdrawn (last two server-confirmed) | — | `Profile` |
+| `account_security_opened` | Security tab or account-security modal opened | `entry_point` | `Profile`, `AccountSecurityCard` |
+| `home_layout_changed` | Home layout preference switched | `home_layout`, `previous_layout` | `use-home-layout` |
+| `sidebar_toggled` | Sidebar toggled with ⌘/Ctrl+B | `toggle_method`, `sidebar_state`, `sidebar_mode` | `ui/sidebar` |
 
 All events also carry auto props `platform: 'web'` and `page_path` from `mpTrack`.
 Every client event in this table is also sent, with the same name and

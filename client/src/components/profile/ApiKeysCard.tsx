@@ -15,6 +15,7 @@ import { useMutation, useQuery } from "@tanstack/react-query";
 import { Check, Copy, KeyRound } from "lucide-react";
 import { formatDistanceToNow } from "date-fns";
 import { apiRequest, queryClient } from "@/lib/queryClient";
+import { trackApiKeyCopied, trackApiKeyCreated, trackApiKeyRevoked } from "@/lib/analytics";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -112,15 +113,18 @@ export default function ApiKeysCard() {
   });
 
   const createMutation = useMutation({
-    mutationFn: async (): Promise<CreatedKey> =>
+    // The expiry option rides along as the mutation variable so the success
+    // event reports what was actually sent.
+    mutationFn: async (chosenExpiry: string): Promise<CreatedKey> =>
       apiRequest("/api/user/api-keys", {
         method: "POST",
         body: JSON.stringify({
           name: name.trim(),
-          ...(expiry === "never" ? {} : { expiresInDays: Number(expiry) }),
+          ...(chosenExpiry === "never" ? {} : { expiresInDays: Number(chosenExpiry) }),
         }),
       }),
-    onSuccess: (result) => {
+    onSuccess: (result, chosenExpiry) => {
+      trackApiKeyCreated(chosenExpiry);
       setCreated(result);
       setCopyState("idle");
       setCreateError(null);
@@ -136,6 +140,7 @@ export default function ApiKeysCard() {
     mutationFn: async (id: string) =>
       apiRequest(`/api/user/api-keys/${encodeURIComponent(id)}`, { method: "DELETE" }),
     onSuccess: () => {
+      trackApiKeyRevoked();
       setKeyToRevoke(null);
       setRevokeError(null);
       void queryClient.invalidateQueries({ queryKey: API_KEYS_QUERY_KEY });
@@ -149,7 +154,7 @@ export default function ApiKeysCard() {
   const handleCreate = (event: FormEvent) => {
     event.preventDefault();
     if (!trimmedName || createMutation.isPending) return;
-    createMutation.mutate();
+    createMutation.mutate(expiry);
   };
 
   const handleCopy = async () => {
@@ -157,11 +162,13 @@ export default function ApiKeysCard() {
     try {
       await navigator.clipboard.writeText(created.key);
       setCopyState("copied");
+      trackApiKeyCopied("clipboard");
     } catch {
       // Clipboard can be blocked (permissions, insecure context): select the
       // text so the user can copy it by hand.
       secretInputRef.current?.select();
       setCopyState("manual");
+      trackApiKeyCopied("manual_select");
     }
   };
 

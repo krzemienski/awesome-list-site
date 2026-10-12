@@ -184,7 +184,7 @@ export default function SearchDialog({ isOpen, setIsOpen }: SearchDialogProps) {
   }, [isOpen, query, recentSearches.length, firstCategoryValue]);
 
   const openResource = (resource: DbSearchResource) => {
-    trackResourceClick(resource.title, resource.url, resource.category || "");
+    trackResourceClick(resource.title, resource.url, resource.category || "", "search_palette");
     if (isSearchableQuery(queryTrimmed)) setRecentSearches(saveRecentSearch(queryTrimmed));
     setIsOpen(false);
     navigate(`/resource/${resource.id}`);

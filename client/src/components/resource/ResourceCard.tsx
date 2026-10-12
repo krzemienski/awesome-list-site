@@ -11,6 +11,7 @@ import { Blurhash } from "react-blurhash";
 import type { Resource } from "@shared/schema";
 import type { ResourceKind } from "@shared/resourceKinds";
 import { tagLandingPath } from "@shared/tagNormalize";
+import { trackResourceCardOpened, trackResourceClick, trackTagInteraction } from "@/lib/analytics";
 import "@/styles/components/resource-card.css";
 
 // This form is only needed after an authenticated visitor explicitly chooses
@@ -75,6 +76,12 @@ function ResourceCard({
 
   const numericId = parseInt(resource.id);
   const isValidDbResource = !isNaN(numericId) && numericId > 0;
+
+  // Card-level analytics. The hosting page is identified by the auto-attached
+  // page_path; hosts that pass onClick/onTagClick own those interactions.
+  const analyticsSurface = variant === "taxonomy" ? "taxonomy_card" : "resource_card";
+  const trackOutbound = () =>
+    trackResourceClick(resource.name, resource.url, resource.category ?? "uncategorized", analyticsSurface);
 
   const handleCardClick = () => {
     if (onClick) {
@@ -160,6 +167,7 @@ function ResourceCard({
     <Link
       href={`/resource/${resource.id}`}
       className="resource-card__title-link"
+      onClick={() => trackResourceCardOpened(resource.id, analyticsSurface, "title")}
       data-testid={`link-resource-title-${resource.id}`}
     >
       {resource.name}
@@ -168,6 +176,7 @@ function ResourceCard({
     <a
       href={resource.url}
       target="_blank"
+      onClick={trackOutbound}
       rel="noopener noreferrer"
       className="resource-card__title-link"
       data-testid={`link-resource-title-${resource.id}`}
@@ -188,6 +197,7 @@ function ResourceCard({
     <Link
       href={`/resource/${resource.id}`}
       className="resource-card__meta-link no-print relative z-10"
+      onClick={() => trackResourceCardOpened(resource.id, analyticsSurface, "view_details")}
       data-testid={`link-view-details-${resource.id}`}
       aria-label={`View details for ${resource.name}`}
       title="View details"
@@ -234,7 +244,10 @@ function ResourceCard({
           href={resource.url}
           target="_blank"
           rel="noopener noreferrer"
-          onClick={(e) => e.stopPropagation()}
+          onClick={(e) => {
+            e.stopPropagation();
+            trackOutbound();
+          }}
           data-testid={`button-visit-${resource.id}`}
           title="Open Link"
         >
@@ -416,7 +429,7 @@ function ResourceCard({
                     event.preventDefault();
                     event.stopPropagation();
                     onTagClick(tag);
-                  } : undefined}
+                  } : () => trackTagInteraction(tag, "card_click", analyticsSurface)}
                   data-testid={`tag-pill-${resource.id}-${tag}`}
                   aria-label={onTagClick ? `Filter by tag ${tag}` : `Browse resources tagged ${tag}`}
                 >

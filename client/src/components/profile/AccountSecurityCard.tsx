@@ -13,6 +13,7 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { ShieldCheck } from "lucide-react";
+import { trackAccountSecurityOpened } from "@/lib/analytics";
 
 export default function AccountSecurityCard() {
   const { openUserProfile } = useClerk();
@@ -32,7 +33,10 @@ export default function AccountSecurityCard() {
       <CardContent>
         <Button
           variant="outline"
-          onClick={() => openUserProfile()}
+          onClick={() => {
+            trackAccountSecurityOpened("manage_button");
+            openUserProfile();
+          }}
           data-testid="button-open-account-security"
         >
           Manage account security

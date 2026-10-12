@@ -160,9 +160,26 @@ the naming rules).
 | — | **Guest → account** (existing funnel) | `guest_bookmark_added` → `auth_prompt_shown` → `sign_up_completed` (server) / `logged_in` → `bookmarks_merged` | listed | live |
 | — | **Discovery** (existing) | `search_performed` / `category_viewed` / `filter_applied` → `resource_viewed` → `resource_link_opened` | listed | live |
 
-Remaining site-wide actions (theme and layout changes, exports, keyboard
-shortcuts and the like) are added by the remaining-site-wide-actions area task
-only when they answer one of the questions above or a new one added here.
+| 8 | **Feature reach & account health** — which site-wide tools (palette, export, API keys, layout, shortcuts) do people actually use, and how often do accounts leave? | share of weekly active users firing each tool event; palette `open_method` mix; `export_started` → `export_downloaded`; `api_key_created` → `api_key_copied` (→ `api_key_revoked`); `account_deletion_dialog_opened` → `account_deletion_requested` (→ `account_deletion_withdrawn`) | `command_palette_opened`, `export_started`, `export_downloaded`, `api_key_created`, `api_key_copied`, `api_key_revoked`, `profile_name_updated`, `logged_out`, `account_deletion_*`, `account_security_opened`, `home_layout_changed`, `sidebar_toggled` | live |
+
+**How the events answer these questions.** Activation (1) and the Discovery
+funnel start at `page_viewed` and end at the first value event; card-level
+events (`resource_card_opened`, `resource_link_opened` with a `surface`, and
+`tag_interaction` with `action: 'card_click'`) show *which surface* produced
+that value — palette, catalogue card, taxonomy card, home card / recent list or
+the resource page itself — and `command_palette_opened` (`open_method`) sits in
+front of the palette's own `search_performed` → `resource_link_opened` path.
+Retention (2) re-uses the same value events weekly, joined with the area events
+that bring people back: notification and digest opens (4), journey resumes,
+collection activity (3) and recommendation opens (6). Contribution (5) and
+onboarding (7) remain their own funnels. Question 8 covers the rest of the
+product surface: tool adoption (palette, export, API keys, home layout,
+keyboard sidebar toggle) as a share of active users, and the account lifecycle
+from `logged_in` / `sign_up_completed` to `logged_out` (scope) and the
+deletion request funnel, so churn signals can be segmented by what each
+account used before it left. Empty-state calls to action are not instrumented
+separately; the event that follows the click (filter, search, journey start…)
+already records the outcome.
 
 ### Shared event catalog
 
@@ -175,12 +192,12 @@ taxonomy further down and are not repeated here.
 |---|---|---|---|---|
 | `page_viewed` | `page_view` | all four | `page_title`, `referrer_origin` (GA4: page context only) | `trackPageView` ← `use-analytics` |
 | `resource_viewed` | `select_content` | all four | `resource_id` + caller extras (GA4: `content_type`, `content_id`, extras) | `trackSelectContent('resource', …)` |
-| `resource_link_opened` | `resource_click` (+ GA4-only `outbound_link`) | all four | `resource_title`, `link_url` (origin+path), `link_domain`, `category` | `trackResourceClick` |
+| `resource_link_opened` | `resource_click` (+ GA4-only `outbound_link`) | all four | `resource_title`, `link_url` (origin+path), `link_domain`, `category`, `surface` (`search_palette` \| `resource_detail` \| `resource_card` \| `taxonomy_card` \| `home_card` \| `home_recent_rail` \| `home_recent_list`) | `trackResourceClick` ← palette, detail page, `ResourceCard`, home cards |
 | `search_performed` | `search` | all four | `search_term`, `result_count`, `surface` | `trackSearch` |
 | `category_viewed` | `category_view` | all four | `category` (GA4: `content_category`) | `trackCategoryView` |
 | `filter_applied` | `filter_applied` | all four | `filter_type`, `filter_value`, `result_count`, `zero_results`, `surface` | `trackFilterUsage` |
 | `sort_changed` | `sort_change` | all four | `sort_type`, `surface`, `result_count`, `zero_results` | `trackSortChange` |
-| `tag_interaction` | `tag_interaction` | all four | `tag`, `action`, `surface`, `result_count`, `zero_results` | `trackTagInteraction` |
+| `tag_interaction` | `tag_interaction` | all four | `tag`, `action`, `surface`, `result_count`, `zero_results` | `trackTagInteraction` (cards: `action: 'card_click'` only when the pill navigates; pages that filter in place via `onTagClick` keep their own `apply` event) |
 | `logged_in` | `login` | all four | `login_method` (GA4: `method`) + acquisition | `trackLogin` ← `AuthConversionTracker` |
 | `content_shared` | `share` | all four | `share_method` (GA4: `method`), `content_type`, `content_id` | `trackShare` |
 | `journey_started` | `journey_start` | all four | `journey_id`, `journey_title`, `total_steps` | `trackJourneyStart` |
@@ -193,6 +210,18 @@ taxonomy further down and are not repeated here.
 | `guest_bookmark_added` / `guest_bookmark_removed` | same | all four | `resource_id`, `guest_saved_count` | `trackGuestBookmarkAdded` / `Removed` |
 | `auth_prompt_shown` | same | all four | `prompt_context`, `guest_saved_count` | `trackAuthPromptShown` |
 | `bookmarks_merged` | same | all four | `merged_count`, `duplicate_count`, `failed_count` | `trackBookmarksMerged` |
+| `resource_card_opened` | same | all four | `resource_id`, `surface`, `card_control` (`title` \| `view_details`) | `trackResourceCardOpened` ← `ResourceCard`, home cards (the detail page's `resource_viewed` fires on arrival) |
+| `command_palette_opened` | same | all four | `open_method` (`keyboard_shortcut` \| `slash_key` \| `header_button`) — closed → open only | `trackCommandPaletteOpened` ← `MainLayout` |
+| `export_started` / `export_downloaded` | same | all four | `export_format`, `export_scope` (`all` \| `selected_categories`), `category_count`, `resource_count` — never file contents | `trackExportStarted` / `trackExportDownloaded` ← `export-tools` |
+| `api_key_created` | same | all four | `expiry_option` (`30` \| `90` \| `365` \| `never`) — never the key or its name | `trackApiKeyCreated` ← `ApiKeysCard` (server-confirmed) |
+| `api_key_copied` | same | all four | `copy_method` (`clipboard` \| `manual_select`) | `trackApiKeyCopied` ← `ApiKeysCard` |
+| `api_key_revoked` | same | all four | — | `trackApiKeyRevoked` ← `ApiKeysCard` (server-confirmed) |
+| `profile_name_updated` | same | all four | — (never the name) | `trackProfileNameUpdated` ← `Profile` (server-confirmed) |
+| `logged_out` | same | all four | `logout_scope` (`this_device` \| `all_devices`) — fired after the server confirms, before identities reset | `trackLoggedOut` ← `useAuth`, `/logout` route |
+| `account_deletion_dialog_opened` / `account_deletion_requested` / `account_deletion_withdrawn` | same | all four | — (requested / withdrawn are server-confirmed) | `trackAccountDeletion*` ← `Profile` |
+| `account_security_opened` | same | all four | `entry_point` (`profile_tab` \| `manage_button`) | `trackAccountSecurityOpened` ← `Profile`, `AccountSecurityCard` |
+| `home_layout_changed` | same | all four | `home_layout`, `previous_layout` (signed-in: after the server saves) | `trackHomeLayoutChanged` ← `use-home-layout` |
+| `sidebar_toggled` | same | all four | `toggle_method: 'keyboard_shortcut'`, `sidebar_state`, `sidebar_mode` (`drawer` \| `docked`) | `trackSidebarToggled` ← `ui/sidebar` (⌘/Ctrl+B) |
 | `sign_up_completed` | (`sign_up`, GA4-only client event) | Mixpanel, **server** | see `MIXPANEL.md` | server — Clerk JIT provisioning |
 | `resource_submitted` | (`generate_lead`, GA4-only client event) | Mixpanel, **server** | see `MIXPANEL.md` | server — resource-submit handler |
 

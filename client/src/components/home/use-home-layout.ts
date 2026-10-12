@@ -6,6 +6,7 @@ import { useAuth } from "@/hooks/useAuth";
 import { apiRequest, queryClient } from "@/lib/queryClient";
 import { safeGetItem, safeSetItem } from "@/lib/safeStorage";
 import { useHomeBoot } from "@/lib/home-boot";
+import { trackHomeLayoutChanged } from "@/lib/analytics";
 
 const HOME_LAYOUT_STORAGE_KEY = "awesome-video-home-layout";
 const PREFERENCES_QUERY_KEY = ["/api/user/preferences"] as const;
@@ -166,11 +167,17 @@ export function useHomeLayout() {
       return parseHomeLayoutResponse(response);
     },
     onMutate: (nextLayout) => {
+      const previousLayout = savedLayout;
       setSavedLayout(nextLayout);
+      return { previousLayout };
     },
-    onSuccess: (response) => {
+    onSuccess: (response, _nextLayout, context) => {
       queryClient.setQueryData(PREFERENCES_QUERY_KEY, response);
       setSavedLayout(response.homeLayout);
+      // Signed-in switches count once the server has saved them.
+      if (context && context.previousLayout !== response.homeLayout) {
+        trackHomeLayoutChanged(response.homeLayout, context.previousLayout);
+      }
     },
     onError: () => {
       setSavedLayout(preferencesQuery.data?.homeLayout ?? DEFAULT_HOME_LAYOUT);
@@ -188,9 +195,10 @@ export function useHomeLayout() {
       if (typeof document !== "undefined") {
         document.cookie = `${HOME_LAYOUT_STORAGE_KEY}=${nextLayout}; Path=/; Max-Age=31536000; SameSite=Lax`;
       }
+      if (nextLayout !== savedLayout) trackHomeLayoutChanged(nextLayout, savedLayout);
       setSavedLayout(nextLayout);
     },
-    [isAuthenticated, saveMutation],
+    [isAuthenticated, saveMutation, savedLayout],
   );
 
   return {
