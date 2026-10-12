@@ -99,6 +99,8 @@ ANTHROPIC_DEFAULT_OPUS_MODEL = "cc/claude-opus-5"
 ANTHROPIC_DEFAULT_SONNET_MODEL = "cc/claude-sonnet-5"
 ANTHROPIC_MODEL = "cc/claude-opus-5"
 CONTACT_ISSUES_URL = "https://github.com/krzemienski/awesome-video/issues"
+CONTACT_ENABLED = "true"
+VITE_CONTACT_VARIANT = "b"
 
 [userenv.development]
 

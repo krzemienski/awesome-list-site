@@ -3,7 +3,9 @@ name: Playwright browsers on this host
 description: Why browser launches fail or WebKit misbehaves here, and the rules that avoid re-debugging it (revision source, WebKitGTK runtime, Clerk cookies, hover-only controls).
 ---
 
-**Rule 1 — one package decides the browser revision.** Import `chromium`/`firefox`/`webkit` from `@playwright/test` (the package that runs the suite), never from the floating root `playwright` dependency, and install browsers with the repo's `test:e2e:browsers` script (workspace cache `.cache/ms-playwright`, which survives restarts; `~/.cache` does not).
+**Current state:** the repo's Playwright test suite/config were removed (no validation tooling). For ad-hoc browser checks use playwright 1.60 installed under /tmp/tools (matches cached firefox-1522 + webkit-2287; 1.61 fails Firefox with a protocol error) and pass explicit `executablePath`s from `.cache/ms-playwright`; Rule 2's WebKit env still applies at launch.
+
+**Rule 1 (historical) — one package decides the browser revision.** Import `chromium`/`firefox`/`webkit` from `@playwright/test` (the package that runs the suite), never from the floating root `playwright` dependency, and install browsers with the repo's `test:e2e:browsers` script (workspace cache `.cache/ms-playwright`, which survives restarts; `~/.cache` does not).
 **Why:** two packages expect two revisions; the wrong one reports "Executable doesn't exist" even though a browser is installed, and reinstalling clobbers harnesses that pin the cache.
 **Concretely:** the floating root `playwright` has drifted ahead of `@playwright/test` and demands a chromium revision that **cannot be installed on this host at all** — `test:e2e:browsers` dies on host-requirement validation (missing `libgles2`, `gstreamer1.0-libav`), and `PLAYWRIGHT_SKIP_VALIDATE_HOST_REQUIREMENTS=1 npx playwright install chromium` silently downloads nothing and still fails. Do not chase the install. Any ad-hoc script (audits, one-off probes) must `import { chromium } from '@playwright/test'` and run with `PLAYWRIGHT_BROWSERS_PATH=.cache/ms-playwright`.
 

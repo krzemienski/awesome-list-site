@@ -26,3 +26,5 @@ provider was also dead weight and was removed.
 user explicitly asks for one. Before accepting a theming finding, grep for
 `.light` selectors / light token blocks to confirm the feature is supposed to
 exist. When auditors report a theming problem, check `color-scheme` first.
+
+**Print corollary:** CSS system colors (Canvas/CanvasText/GrayText) follow the used color-scheme, so a dark-only site's print sheet built on them prints white-on-dark — and blank (white-on-white) with background graphics off, the browser default. Print must force `color-scheme: light` on html. Verify with real PDFs (printBackground false) rendered to images; computed colors read right after emulateMedia('print') can be mid-transition.
