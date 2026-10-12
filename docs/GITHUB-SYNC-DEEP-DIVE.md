@@ -250,31 +250,16 @@ or the `skipLinkCheck` export option. Findings are logged with the
 `[export-link-check]` prefix only — they are never written to the Link Health
 dashboard.
 
-#### Optional: awesome_bot link check (pre-publish, repository scope)
+#### Export link check
 
-Beyond format linting, the exported Markdown can be link-checked with the
-open-source [`awesome_bot`](https://github.com/dkhamsing/awesome_bot) checker:
-
-```bash
-npm run check:awesome-bot            # generates the export Markdown from the dev DB, then checks it
-bash scripts/check-awesome-bot.sh my-list.md   # or check an existing Markdown file
-```
-
-- **Scope**: this validates the *export/repository* artifact before it reaches
-  the repository list. It is deliberately separate from the production
-  **Link Health dashboard** (Admin → Link Health), which scans approved
-  resources in the live database. Never treat awesome_bot output as dashboard
-  data — results are written to `/tmp/validation/awesome-bot/`, not the DB.
-- **False positives**: the check follows the project's strict dead-link policy.
-  Timeouts, redirects, and bot-block status codes (401/403/418/429/5xx/999…)
-  are allowed; only DNS failures, connection-refused, confirmed 404/410, and
-  SSL failures fail the check. Documented exclusions live in
-  `scripts/awesome-bot-allowlist.txt`.
-- **CI**: `.github/workflows/awesome-bot.yml` runs the same check (same script,
-  same allowlist) against the exported list repo's README weekly and on demand.
-- **Runtime note**: a full ~1,800-link sweep takes longer than a 5-minute shell
-  budget in the workspace; split the Markdown into chunks (`split -n l/8`) and
-  run the script per chunk if needed. CI has no such limit.
+GitHub export runs a link check on the generated README before pushing
+(`server/validation/exportLinkGate.ts`). Only confirmed failures block the
+export: DNS failures, connection refused, 404/410 under a browser user agent,
+and SSL errors. Timeouts, redirects and bot-block status codes
+(401/403/418/429/5xx/999) do not count. Documented false positives live in
+`scripts/awesome-bot-allowlist.txt`. This check is separate from the Link
+Health dashboard (Admin → Link Health), which scans approved resources in the
+live database.
 
 ### Step 4: Calculate Diff
 

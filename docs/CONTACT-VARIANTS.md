@@ -59,7 +59,7 @@ Submission intake is default-off: a deployment that sets none of the `CONTACT_*`
 | `CONTACT_DISCUSSIONS_URL` + `CONTACT_DISCUSSIONS_VERIFIED` / YAML | env > YAML | empty / `false` | Discussions is offered only when both the URL and the verified flag are set. |
 | YAML `contact.retention_days` | YAML only | 180 | Retention horizon for the scheduled hourly purge. |
 
-Contracts live in `docs/api/openapi.yaml` (`PublicConfigResponse`, `ContactSubmissionReceipt`, `AdminContactSubmissionsResponse`) and are enforced by the `openapi-drift` and `response-contract-drift` gates; behaviour is covered by `tests/integration/api/contact.test.ts` (disabled 404, misconfigured 503, happy path with keyed IP hash and user id, honeypot, validation 400, origin 403, sixth-request 429 with headers, admin listing and pagination).
+Contracts live in `docs/api/openapi.yaml` (`PublicConfigResponse`, `ContactSubmissionReceipt`, `AdminContactSubmissionsResponse`).
 
 ## Evidence status
 

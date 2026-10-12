@@ -16,8 +16,7 @@
  *   - HTTP 404/410 confirmed under a browser User-Agent
  *   - SSL certificate failures
  * Timeouts, 401/403/418/429/999, 5xx and other bot-block shapes never fail
- * the export. Documented exclusions live in scripts/awesome-bot-allowlist.txt
- * (shared with the awesome_bot check).
+ * the export. Documented exclusions live in scripts/awesome-bot-allowlist.txt.
  */
 
 import { readFileSync } from 'fs';

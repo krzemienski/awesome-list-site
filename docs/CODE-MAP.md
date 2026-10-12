@@ -182,13 +182,8 @@ helpers from past QA runs. The durable, canonical scripts are:
 |------|---------|
 | `build-static.ts` | Static build generation |
 | `migrate.ts` | Standalone Drizzle migration runner |
-| `check-migration-drift.ts` | Verify migrations reproduce `shared/schema.ts` |
-| `verify-boot-migration-safety.ts` | Assert migrations are idempotent for boot |
-| `pre-publish-gate.sh` | Pre-deploy verification gate |
-| `audit-sidebar.sh` | Sidebar audit (`npm run audit:sidebar`) |
-| `check-awesome-bot.sh` | Validate exported links (`npm run check:awesome-bot`) |
+| `publish-build.sh` | Publish build (`npm run build` + publish-image trim) |
 | `export-openapi-yaml.ts` | Export the OpenAPI spec |
-| `validation/openapi-drift.ts` | Block method/path, contract, OpenAPI, auth, and baseline drift |
 
 ## Configuration Files
 

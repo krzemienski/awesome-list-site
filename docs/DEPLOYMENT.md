@@ -56,12 +56,10 @@ Key runtime facts (verified against the code in this repo):
 Replit is the primary deployment target for this project (`.replit` is
 preconfigured).
 
-- **Build** runs `bash scripts/pre-publish-gate.sh --publish`: typecheck,
-  journal-only migration-drift validation, production build, then the bundle
-  budget. It deliberately does not boot the app or touch the production
-  database during the build. Print and responsive audits are separate
-  validation workflows; non-publish preflight runs them when a dev app is
-  already serving on port 5000.
+- **Build** runs `bash scripts/publish-build.sh`: `npm run build`, then trims
+  development-only files from the publish image. It does not boot the app or
+  touch the production database. See [RELEASE.md](../RELEASE.md) for the
+  release checklist and the production QA identity.
 - **Run**: `npm run start`.
 - **Target**: `autoscale`, exposing internal port 5000 as external port 80.
 
@@ -71,22 +69,14 @@ Steps:
 2. Add Replit PostgreSQL (or another reachable PostgreSQL provider), then set
    the Clerk keys and any optional feature keys in **Secrets**. The application
    receives `DATABASE_URL` from the database integration.
-3. Click **Deploy**. The build gate runs; on success the app is published.
+3. Click **Deploy**. The build runs; on success the app is published.
 
 Replit provides managed PostgreSQL with separate development and production
 databases. An external PostgreSQL provider also works.
 
-For the GitHub Pages release path, `.github/workflows/deploy.yml` runs
-production-safe GA4/INP and guest-recommendation checks after `deploy-pages`
-reports success. The recommendation check targets the `PRODUCTION_URL`
-repository variable (defaulting to `https://awesome.video`) in fresh mobile and
-desktop guest contexts. It keeps the release published if a smoke check fails,
-uploads each check's evidence as a workflow artifact, and then fails the
-workflow with a direct pointer to the relevant artifact. Before browser smoke
-checks begin, it waits up to ten minutes for that backend's `/api/version` to
-equal the release's `github.sha`. The production backend must therefore deploy
-from the same GitHub push; a missing, stale, or independently built backend
-revision deliberately fails the release check with both revisions in evidence.
+For the GitHub Pages release path, `.github/workflows/deploy.yml` builds the
+static site (`scripts/build-static.ts` + `npm run build`) on every push to
+`main` and deploys it to GitHub Pages. It runs no post-deploy checks.
 
 ## Docker / Self-Hosting
 

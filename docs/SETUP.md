@@ -84,10 +84,9 @@ npm run db:studio        # open Drizzle Studio (GUI)
 | `npm run format` / `npm run format:check` | Prettier write / check |
 | `npm run db:push` | Sync schema to the database |
 | `npm run db:studio` | Open Drizzle Studio |
-| `npm run test:unit` | Vitest unit tests (`tests/unit`) |
-| `npm run test:integration` | Vitest integration tests (`tests/integration`) |
-| `npm run test:e2e` | Playwright end-to-end tests |
-| `npm run audit:sidebar` | Sidebar/navigation audit script |
+| `npm run db:backup` | Full database backup (see [DATABASE-BACKUP.md](./DATABASE-BACKUP.md)) |
+| `npm run digest:dispatch` | Run one digest dispatch pass |
+| `npm run generate:design-system-artifact` | Regenerate the design-system artifact from the tokens |
 
 > See `package.json` for the complete current command inventory. There is no
 > generic `seed` or `migrate` npm script; use the flows described above.

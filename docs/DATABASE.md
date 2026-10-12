@@ -616,8 +616,6 @@ migrations for production**. Both derive from the same `shared/schema.ts`.
 | `migrations/meta/_journal.json` | Journal that pairs each `.sql` with a timestamp; the migrator only runs journaled files |
 | `server/migrate.ts` | Boot-time migrator run by `server/index.ts` in production |
 | `scripts/migrate.ts` | Standalone Drizzle migration runner (`npx tsx scripts/migrate.ts`) |
-| `scripts/check-migration-drift.ts` | Fails if `migrations/` can no longer reproduce `shared/schema.ts` |
-| `scripts/migrate-*.ts` | One-off data-migration/backfill scripts |
 
 ### Available npm scripts
 Only these DB scripts exist in `package.json` (there is **no** `db:generate` or `db:migrate`):
@@ -659,20 +657,11 @@ also generate a migration (below) so a fresh deploy can reproduce the schema.
 4. If `migrations/` is missing but the `resources` table already exists (a database
    provisioned via `db:push`), the boot migrator logs "schema already exists" and continues.
 
-### Migration drift check
-`scripts/check-migration-drift.ts` is part of the pre-publish gate
-(`scripts/pre-publish-gate.sh`). It:
-1. verifies every `.sql` file is journaled (and vice versa), then
-2. spins up a throwaway database, runs the migrator, and runs `drizzle-kit push --force`
-   against it — requiring **"no changes detected"**. Any diff means `migrations/` no longer
-   reproduces `shared/schema.ts`, so a fresh deploy would drift. Fix by running
-   `npx drizzle-kit generate` and committing the new migration.
-
-Run it manually with:
-
-```bash
-npx tsx scripts/check-migration-drift.ts   # exit 0 = clean, 1 = drift
-```
+### Keeping migrations in step with the schema
+There is no automated drift check. After changing `shared/schema.ts`, run
+`npx drizzle-kit generate`, review the generated `.sql` for idempotency
+(`IF NOT EXISTS` / guarded `DO` blocks), confirm it is listed in
+`migrations/meta/_journal.json`, and apply it to the dev database.
 
 ### One-off data migrations
 For data transformations (backfills, dedupe, normalization) that aren't plain schema DDL,
