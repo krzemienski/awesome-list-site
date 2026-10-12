@@ -13,6 +13,7 @@ type Notification = { id: number | string; kind: string; title: string; descript
 type NotificationResponse = { notifications: Notification[]; unreadCount: number };
 
 const kindLabel: Record<string, string> = { new_resource: "New resource", watch_next: "Watch next", journey_step: "Journey step" };
+const actionLabel: Record<string, string> = { new_resource: "View resource", watch_next: "Open in bookmarks", journey_step: "Continue journey" };
 const formatDate = (value: string) => new Intl.DateTimeFormat(undefined, { dateStyle: "medium", timeStyle: "short" }).format(new Date(value));
 
 export default function Notifications() {
@@ -142,7 +143,7 @@ export default function Notifications() {
                           ? "account-notification-dot--read"
                           : "account-notification-dot--unread"
                       }`}
-                      aria-label={notification.readAt ? "Read" : "Unread"}
+                      aria-hidden="true"
                     />
                     <div className="min-w-0 flex-1">
                       <div className="flex flex-wrap items-center gap-x-2 gap-y-1">
@@ -157,6 +158,7 @@ export default function Notifications() {
                         </time>
                       </div>
                       <h2 className="mt-1 text-sm font-semibold">
+                        {notification.readAt ? null : <span className="sr-only">Unread: </span>}
                         {notification.title}
                       </h2>
                       <p className="account-muted mt-1 text-sm">
@@ -165,6 +167,7 @@ export default function Notifications() {
                       <div className="mt-3 flex flex-wrap items-center gap-2">
                         <Link
                           href={notification.href}
+                          aria-label={`${actionLabel[notification.kind] ?? "Open"}: ${notification.title}`}
                           onClick={() => {
                             if (!notification.readAt) {
                               readMutation.mutate(notification.id);
@@ -172,7 +175,7 @@ export default function Notifications() {
                           }}
                           className="account-accent inline-flex min-h-[44px] items-center text-sm font-semibold underline underline-offset-4"
                         >
-                          Open target
+                          {actionLabel[notification.kind] ?? "Open"}
                         </Link>
                         {!notification.readAt ? (
                           <Button
@@ -185,6 +188,7 @@ export default function Notifications() {
                               handoffFocusOnUnmount(e.currentTarget, () => link);
                               readMutation.mutate(notification.id);
                             }}
+                            aria-label={`Mark read: ${notification.title}`}
                             aria-disabled={readMutation.isPending}
                             aria-busy={readMutation.isPending}
                           >
