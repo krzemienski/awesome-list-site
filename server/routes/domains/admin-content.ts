@@ -328,8 +328,10 @@ export function registerAdminContentRoutes(
       const userId = req.params.id;
       const { role } = req.body;
       
-      if (!role || !['user', 'admin', 'moderator'].includes(role)) {
-        return res.status(400).json({ message: 'Invalid role' });
+      // No permission check grants "moderator" anything, so assigning it
+      // would silently leave the account a plain user.
+      if (!role || !['user', 'admin'].includes(role)) {
+        return res.status(400).json({ message: 'Role must be "user" or "admin"' });
       }
       
       // Run16 BUG-014: block self role changes server-side — a one-click
