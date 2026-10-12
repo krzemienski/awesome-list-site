@@ -811,7 +811,13 @@ export default function PendingResources() {
               </div>
               <div>
                 <Label className="text-sm font-semibold">Description</Label>
-                <p className="text-sm mt-1">{selectedResource.description}</p>
+                {selectedResource.description?.trim() ? (
+                  <p className="text-sm mt-1">{selectedResource.description}</p>
+                ) : (
+                  <p className="text-sm mt-1 text-muted-foreground" data-testid="text-detail-description-missing">
+                    No description. Approving adds a generic one built from the title and site, which you can edit afterwards.
+                  </p>
+                )}
               </div>
               {/* BUG-034 (run14): tags visible in the detail modal too. */}
               {getSubmissionTags(selectedResource).length > 0 && (
