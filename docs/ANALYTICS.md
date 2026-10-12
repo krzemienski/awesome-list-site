@@ -153,7 +153,7 @@ the naming rules).
 |---|---|---|---|---|
 | 1 | **Activation** — do new visitors reach a first moment of value? | `page_viewed` (first session) → any value event within the session: `resource_link_opened`, `resource_bookmarked` / `guest_bookmark_added`, `journey_started` | listed | live |
 | 2 | **Retention** — do activated visitors come back and get value again? | weekly cohort retention on the same value events; returning-learner path `journey_resumed` → `journey_step_completed` | value events (live) + `journey_resumed` (live) | live — continue-learning area |
-| 3 | **Collection usage** — are collections created, filled and shared? | `collection_created` → `collection_resource_added` → `collection_shared` → `public_collection_viewed` | `collection_created`, `collection_resource_added`, `collection_resource_removed`, `collection_shared`, `collection_deleted`, `public_collection_viewed` | planned — collections area |
+| 3 | **Collection usage** — are collections created, filled and shared? | `collection_created` → `collection_resource_added` / `collection_items_moved` → `collection_published` → `collection_shared` → `public_collection_viewed` → `public_collection_resource_opened` (owner and public events join on `collection_share_id`) | the collection rows in the catalog below | live |
 | 4 | **Notification engagement** — do notifications and digests bring people back? | `notification_opened` → value event; opt-ins / opt-outs via `notification_preference_changed`, `notifications_paused` / `notifications_resumed`, `notifications_unsubscribed_all`; preview interest via `digest_preview_item_opened` | `notification_opened`, `notification_marked_read`, `notifications_marked_all_read`, `notification_preference_changed`, `notifications_paused`, `notifications_resumed`, `notifications_unsubscribed_all`, `digest_preview_item_opened`, `learning_preferences_saved`, `learning_preferences_reset` | live (in-app + Settings); email opens/clicks not tracked |
 | 5 | **Contribution funnel** — how many visitors who start a submission or edit finish it, and how many get approved? | `resource_submit_started` → `resource_submitted` (server) → approval (server status) ; `resource_edit_started` (`entry_point`) → optional `resource_edit_ai_analysis_requested` → `resource_edit_ai_suggestions_applied` → `resource_edit_submitted`, exits via `resource_edit_cancelled`; follow-up on `/contributions` (`contribution_withdrawn`, `contribution_public_resource_opened`) | `resource_submit_started`, `resource_submitted` (server, live), `resource_edit_*` (live), `contribution_*` (live) | edit funnel + contributions page live; `resource_submit_started` planned — contributions area |
 | 6 | **Recommendation quality** — are recommendations opened, and from which position? Is feedback positive? | `recommendations_viewed` (`recommendation_count`, `signed_in`, `source`) → `recommendation_opened` (`position`, `resource_id`, `recommendation_type`) → value event on that resource; quality via `recommendation_feedback_saved` (`feedback`) and `recommendation_restored`; guest upgrade via `recommendation_sign_in_clicked` | `recommendations_viewed`, `recommendations_refreshed`, `recommendations_retried`, `recommendation_opened`, `recommendation_feedback_saved`, `recommendation_restored`, `recommendation_sign_in_clicked` | live |
@@ -179,9 +179,11 @@ product surface: tool adoption (palette, export, API keys, home layout,
 keyboard sidebar toggle) as a share of active users, and the account lifecycle
 from `logged_in` / `sign_up_completed` to `logged_out` (scope) and the
 deletion request funnel, so churn signals can be segmented by what each
-account used before it left. Empty-state calls to action are not instrumented
-separately; the event that follows the click (filter, search, journey start…)
-already records the outcome.
+account used before it left. Empty-state calls to action are mostly not
+instrumented separately; the event that follows the click (filter, search,
+journey start…) already records the outcome. The exception is the Bookmarks
+empty state's Explore resources (`library_explore_clicked`), which has no
+single follow-up event.
 
 ### Shared event catalog
 
@@ -211,6 +213,19 @@ taxonomy further down and are not repeated here.
 | `guest_bookmark_added` / `guest_bookmark_removed` | same | all four | `resource_id`, `guest_saved_count` | `trackGuestBookmarkAdded` / `Removed` |
 | `auth_prompt_shown` | same | all four | `prompt_context`, `guest_saved_count` | `trackAuthPromptShown` |
 | `bookmarks_merged` | same | all four | `merged_count`, `duplicate_count`, `failed_count` | `trackBookmarksMerged` |
+| `collection_created` | same | all four | `collection_id`, `collection_count` (the owner's collections after this one) — server-confirmed `POST /api/collections` | `trackCollectionCreated` ← `Bookmarks` |
+| `collection_renamed` | same | all four | `collection_id`, `item_count` — server-confirmed rename (the name itself is never sent) | `trackCollectionRenamed` ← `Bookmarks` |
+| `collection_deleted` | same | all four | `collection_id`, `item_count`, `was_published` — server-confirmed delete | `trackCollectionDeleted` ← `Bookmarks` |
+| `collection_archived` / `collection_restored` | same | all four | `collection_id`, `item_count` — server-confirmed archive toggle (archiving also revokes sharing server-side; no separate unpublish event) | `trackCollectionArchiveChanged` ← `Bookmarks` |
+| `collection_published` / `collection_unpublished` | same | all four | `collection_id`, `item_count`, `collection_share_id` — server-confirmed Publish link / Unpublish | `trackCollectionPublishChanged` ← `Bookmarks` |
+| `collection_shared` | same | all four | `collection_id`, `item_count`, `collection_share_id`, `share_method: "clipboard"` — after the public link is written to the clipboard (a failed copy sends nothing) | `trackCollectionShared` ← `Bookmarks` |
+| `collections_reordered` | same | all four | `collection_id` (the moved one), `from_position`, `to_position` (1-based), `direction: "up" \| "down"`, `collection_count` — server-confirmed reorder | `trackCollectionsReordered` ← `Bookmarks` |
+| `collection_items_moved` | same | all four | `destination_collection_id`, `source_collection_id` (absent when moving from All saved), `moved_count` (only resources not already in the destination — the server accepts those but changes nothing), `failed_count` — server-confirmed bulk Move; one event per bulk action, none when nothing moved | `trackCollectionItemsMoved` ← `Bookmarks` |
+| `collection_resource_added` / `collection_resource_removed` | same | all four | `collection_id`, `resource_id`, `source: "bookmark_button" \| "resource_detail"`, `dialog_mode: "add" \| "edit"` — one per membership request the server accepted from the bookmark notes dialog; rejected requests and bookmark Undo restores send nothing | `trackCollectionMembershipResults` ← `BookmarkButton`, `ResourceDetail` |
+| `library_explore_clicked` | same | all four | `surface: "bookmarks_empty_state"` — Explore resources on the empty library | `trackLibraryExploreClicked` ← `Bookmarks` |
+| `public_collection_viewed` | same | all four | `collection_share_id`, `item_count` — once per shared collection per page visit when it loads (refetches don't re-fire), or when the visitor grants consent after it loaded; never the owner's identity or the collection name | `trackPublicCollectionViewed` ← `PublicCollection` |
+| `public_collection_resource_opened` | same | all four | `collection_share_id`, `resource_id`, `position` (1-based), `item_count`, `link_target: "detail" \| "external"` — click or middle-click on a card's title / View Details (detail) or Open Link (external) | `trackPublicCollectionResourceOpened` ← `PublicCollection` |
+| `public_collection_recovery_clicked` | same | all four | `collection_share_id` (only when well-formed), `recovery_action: "retry_error" \| "retry_offline" \| "explore_journeys" \| "home" \| "categories"`, `page_state: "not_found" \| "error" \| "offline"` | `trackPublicCollectionRecoveryClicked` ← `PublicCollection` |
 | `resource_card_opened` | same | all four | `resource_id`, `surface`, `card_control` (`title` \| `view_details`) | `trackResourceCardOpened` ← `ResourceCard`, home cards (the detail page's `resource_viewed` fires on arrival) |
 | `command_palette_opened` | same | all four | `open_method` (`keyboard_shortcut` \| `slash_key` \| `header_button`) — closed → open only | `trackCommandPaletteOpened` ← `MainLayout` |
 | `export_started` / `export_downloaded` | same | all four | `export_format`, `export_scope` (`all` \| `selected_categories`), `category_count`, `resource_count` — never file contents | `trackExportStarted` / `trackExportDownloaded` ← `export-tools` |

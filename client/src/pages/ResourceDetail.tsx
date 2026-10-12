@@ -37,6 +37,7 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { apiRequest, ApiError } from "@/lib/queryClient";
 import { useFavoriteToggle, useBookmarkToggle } from "@/hooks/useResourceToggle";
 import { trackSelectContent, trackShare, trackResourceFavorite, trackResourceClick } from "@/lib/analytics";
+import { trackCollectionMembershipResults } from "@/lib/analytics-collections";
 import { useToast } from "@/hooks/use-toast";
 import { ToastAction } from "@/components/ui/toast";
 import { formatAdminDate } from "@/lib/utils";
@@ -304,6 +305,8 @@ export default function ResourceDetail() {
         const additions = Array.from(desired).filter((collectionId) => !original.has(collectionId));
         const removals = Array.from(original).filter((collectionId) => !desired.has(collectionId));
         if (additions.length || removals.length) {
+          // Read now: saveModeRef resets to "add" before the requests settle.
+          const dialogMode = saveModeRef.current;
           void Promise.allSettled([
             ...additions.map((collectionId) =>
               apiRequest(`/api/collections/${collectionId}/items/${id}`, {
@@ -316,6 +319,14 @@ export default function ResourceDetail() {
               }),
             ),
           ]).then((results) => {
+            trackCollectionMembershipResults({
+              resourceId: id,
+              additions,
+              removals,
+              results,
+              source: "resource_detail",
+              dialogMode,
+            });
             void queryClient.invalidateQueries({ queryKey: ["/api/bookmarks"] });
             void queryClient.invalidateQueries({
               queryKey: ["/api/collections?includeArchived=true"],

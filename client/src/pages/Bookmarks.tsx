@@ -65,6 +65,17 @@ import { queryUnavailableReason } from "@/lib/query-availability";
 import { apiRequest, queryClient } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
 import { writeFilterParams, usePopstateParams } from "@/lib/url-filter-state";
+import {
+  trackCollectionArchiveChanged,
+  trackCollectionCreated,
+  trackCollectionDeleted,
+  trackCollectionItemsMoved,
+  trackCollectionPublishChanged,
+  trackCollectionRenamed,
+  trackCollectionShared,
+  trackCollectionsReordered,
+  trackLibraryExploreClicked,
+} from "@/lib/analytics-collections";
 import "@/styles/pages/account.css";
 
 type StatusFilter = BookmarkQueueStatus | "all";
@@ -109,7 +120,17 @@ type ActionRequest = {
   body?: unknown;
   success: string | ((data: any) => string);
   after?: (data: any) => void;
+  /** Analytics for the confirmed action; runs first in onSuccess, once. */
+  analytics?: (data: ActionResponse | undefined) => void;
 };
+
+/** The response fields the analytics callbacks read (collection or bulk result). */
+interface ActionResponse {
+  id?: number;
+  shareId?: string | null;
+  succeeded?: number[];
+  failed?: unknown[];
+}
 
 export default function Bookmarks() {
   const initialParams = useMemo(() => new URLSearchParams(window.location.search), []);
@@ -163,6 +184,7 @@ export default function Bookmarks() {
         body: body === undefined ? undefined : JSON.stringify(body),
       }),
     onSuccess: async (data, request) => {
+      request.analytics?.(data as ActionResponse | undefined);
       await refreshLibrary();
       request.after?.(data);
       toast({
@@ -303,6 +325,16 @@ export default function Bookmarks() {
       method: editingCollection ? "PATCH" : "POST",
       body: { name },
       success: editingCollection ? "Collection renamed" : "Collection created",
+      analytics: (data) => {
+        if (editingCollection) {
+          trackCollectionRenamed({
+            collectionId: editingCollection.id,
+            itemCount: editingCollection.itemCount,
+          });
+        } else if (data?.id) {
+          trackCollectionCreated(data.id, collections.length + 1);
+        }
+      },
       after: (data) => {
         setCollectionDialogOpen(false);
         setCollectionName("");
@@ -326,6 +358,13 @@ export default function Bookmarks() {
       method: "PUT",
       body: { orderedIds: ordered },
       success: "Collection order updated",
+      analytics: () =>
+        trackCollectionsReordered({
+          collectionId: movedId,
+          fromPosition: index + 1,
+          toPosition: destination + 1,
+          collectionCount: ordered.length,
+        }),
       // Re-rendering in the new order can detach the pressed arrow (or disable
       // it at the list edge), so put focus back on the moved collection.
       after: () =>
@@ -340,12 +379,17 @@ export default function Bookmarks() {
     });
   };
 
-  const runBulk = (action: unknown, message: string) => {
+  const runBulk = (
+    action: unknown,
+    message: string,
+    analytics?: ActionRequest["analytics"],
+  ) => {
     if (!selectedIds.length) return;
     actionMutation.mutate({
       url: "/api/bookmarks/bulk",
       method: "POST",
       body: { resourceIds: selectedIds, action },
+      analytics,
       success: (data) =>
         data.failed?.length
           ? `${data.succeeded.length} updated; ${data.failed.length} couldn't be changed`
@@ -377,9 +421,15 @@ export default function Bookmarks() {
     });
   };
 
-  const copyShareLink = async (url: string) => {
+  const copyShareLink = async (collection: BookmarkCollection, url: string) => {
     try {
       await navigator.clipboard.writeText(url);
+      trackCollectionShared({
+        collectionId: collection.id,
+        itemCount: collection.itemCount,
+        shareId: collection.shareId,
+        method: "clipboard",
+      });
       toast({ description: "Public collection link copied" });
     } catch {
       toast({
@@ -621,6 +671,14 @@ export default function Bookmarks() {
                         success: selectedCollection.archivedAt
                           ? "Collection restored"
                           : "Collection archived and sharing revoked",
+                        analytics: () =>
+                          trackCollectionArchiveChanged(
+                            {
+                              collectionId: selectedCollection.id,
+                              itemCount: selectedCollection.itemCount,
+                            },
+                            !selectedCollection.archivedAt,
+                          ),
                       })
                     }
                   >
@@ -642,6 +700,15 @@ export default function Bookmarks() {
                           url: `/api/collections/${selectedCollection.id}/publish`,
                           method: "POST",
                           success: "Read-only sharing enabled",
+                          analytics: (data) =>
+                            trackCollectionPublishChanged(
+                              {
+                                collectionId: selectedCollection.id,
+                                itemCount: selectedCollection.itemCount,
+                                shareId: data?.shareId,
+                              },
+                              true,
+                            ),
                           after: () => setFocusAfterAction("copy-link"),
                         })
                       }
@@ -657,7 +724,7 @@ export default function Bookmarks() {
                         size="sm"
                         className="min-h-11"
                         data-focus-target="copy-link"
-                        onClick={() => void copyShareLink(selectedCollection.publicUrl!)}
+                        onClick={() => void copyShareLink(selectedCollection, selectedCollection.publicUrl!)}
                       >
                         <Clipboard className="h-4 w-4 mr-2" aria-hidden="true" />
                         Copy link
@@ -671,6 +738,15 @@ export default function Bookmarks() {
                             url: `/api/collections/${selectedCollection.id}/publish`,
                             method: "DELETE",
                             success: "Public access revoked",
+                            analytics: () =>
+                              trackCollectionPublishChanged(
+                                {
+                                  collectionId: selectedCollection.id,
+                                  itemCount: selectedCollection.itemCount,
+                                  shareId: selectedCollection.shareId,
+                                },
+                                false,
+                              ),
                             after: () => setFocusAfterAction("publish-link"),
                           })
                         }
@@ -793,17 +869,36 @@ export default function Bookmarks() {
                       variant="outline"
                       className="min-h-11"
                       disabled={!bulkDestination || actionMutation.isPending}
-                      onClick={() =>
+                      onClick={() => {
+                        const destinationId = Number(bulkDestination);
+                        // The server accepts resources already in the destination
+                        // (its insert skips them), so count only real membership
+                        // changes, judged from the list as it was at click time.
+                        const alreadyInDestination = new Set(
+                          bookmarks
+                            .filter((bookmark) => bookmark.collectionIds.includes(destinationId))
+                            .map((bookmark) => bookmark.resourceId),
+                        );
                         runBulk(
                           {
                             type: "move",
-                            destinationCollectionId: Number(bulkDestination),
+                            destinationCollectionId: destinationId,
                             sourceCollectionId:
                               collectionFilter === "all" ? null : Number(collectionFilter),
                           },
                           "Bookmarks moved",
-                        )
-                      }
+                          (data) =>
+                            trackCollectionItemsMoved({
+                              destinationCollectionId: destinationId,
+                              sourceCollectionId:
+                                collectionFilter === "all" ? null : Number(collectionFilter),
+                              movedCount: (data?.succeeded ?? []).filter(
+                                (resourceId) => !alreadyInDestination.has(resourceId),
+                              ).length,
+                              failedCount: data?.failed?.length ?? 0,
+                            }),
+                        );
+                      }}
                     >
                       Move
                     </Button>
@@ -970,7 +1065,7 @@ export default function Bookmarks() {
             </div>
           ) : bookmarks.length === 0 ? (
             <StatePanel tone="empty" label="No saves" title="Your learning library is empty" inline
-              actions={<Button asChild><Link href="/">Explore resources</Link></Button>}>
+              actions={<Button asChild><Link href="/" onClick={trackLibraryExploreClicked}>Explore resources</Link></Button>}>
               Bookmark resources as you browse. They will land here ready to organize.
             </StatePanel>
           ) : selectedCollection &&
@@ -1079,6 +1174,12 @@ export default function Bookmarks() {
                   url: `/api/collections/${deleteCollection.id}`,
                   method: "DELETE",
                   success: "Collection deleted; bookmarks preserved",
+                  analytics: () =>
+                    trackCollectionDeleted({
+                      collectionId: deleteCollection.id,
+                      itemCount: deleteCollection.itemCount,
+                      wasPublished: !!deleteCollection.publishedAt,
+                    }),
                   after: () => {
                     chooseCollection("all");
                     setDeleteCollection(null);

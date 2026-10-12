@@ -1,3 +1,5 @@
+import { useEffect, useRef } from "react";
+import type { MouseEvent } from "react";
 import { useQuery } from "@tanstack/react-query";
 import "@/styles/pages/discovery.css";
 import { BookOpen } from "lucide-react";
@@ -10,6 +12,13 @@ import NotFound from "@/pages/not-found";
 import { ApiError } from "@/lib/queryClient";
 import { queryUnavailableReason } from "@/lib/query-availability";
 import type { PublicCollection as PublicCollectionData } from "@/types/bookmarks";
+import {
+  trackPublicCollectionRecoveryClicked,
+  trackPublicCollectionResourceOpened,
+  trackPublicCollectionViewed,
+} from "@/lib/analytics-collections";
+import type { PublicCollectionRecoveryAction } from "@/lib/analytics-collections";
+import { getAnalyticsConsent } from "@/lib/analytics";
 
 const CANONICAL_BASE = (import.meta.env.VITE_SITE_URL || "https://awesome.video").replace(
   /\/+$/,
@@ -31,6 +40,50 @@ export default function PublicCollection({ shareId }: { shareId: string }) {
   });
   const { data, isLoading, error, refetch } = collectionQuery;
   const publicUrl = `${CANONICAL_BASE}/collection/${encodeURIComponent(shareId)}`;
+  const itemCount = data?.resources.length;
+
+  // One view per collection per page visit: refetches (staleTime 0, window
+  // focus) must not re-fire it, but moving to another shared collection does.
+  // A visit only counts once it is actually sent: pre-consent the shared
+  // sender drops events, so a visitor who accepts analytics after the
+  // collection loaded records the view at that moment instead.
+  const viewedShareIdRef = useRef<string | null>(null);
+  useEffect(() => {
+    if (!data || itemCount === undefined) return;
+    const recordView = () => {
+      if (viewedShareIdRef.current === data.shareId) return;
+      if (getAnalyticsConsent() !== "granted") return;
+      viewedShareIdRef.current = data.shareId;
+      trackPublicCollectionViewed(data.shareId, itemCount);
+    };
+    recordView();
+    window.addEventListener("analytics-consent-changed", recordView);
+    return () => window.removeEventListener("analytics-consent-changed", recordView);
+  }, [data, itemCount]);
+
+  // ResourceCard owns its links (stretched title link to the detail page and
+  // the external Open Link, which stops propagation), so listen in the
+  // capture phase on the grid instead of changing the shared card.
+  const handleResourceLink = (event: MouseEvent<HTMLDivElement>) => {
+    if (!data) return;
+    if (event.type === "auxclick" && event.button !== 1) return;
+    const anchor = (event.target as HTMLElement).closest<HTMLAnchorElement>("a[href]");
+    if (!anchor || !event.currentTarget.contains(anchor)) return;
+    const card = anchor.closest<HTMLElement>('[data-testid^="card-resource-"]');
+    const resourceId = card?.dataset.testid?.slice("card-resource-".length);
+    if (!resourceId) return;
+    const position = data.resources.findIndex((resource) => String(resource.id) === resourceId);
+    if (position < 0) return;
+    trackPublicCollectionResourceOpened({
+      shareId: data.shareId,
+      resourceId,
+      position: position + 1,
+      itemCount: data.resources.length,
+      linkTarget: anchor.target === "_blank" ? "external" : "detail",
+    });
+  };
+  const recover = (action: PublicCollectionRecoveryAction, state: "not_found" | "error" | "offline") =>
+    trackPublicCollectionRecoveryClicked(shareId, action, state);
 
   if (isLoading) {
     return (
@@ -54,11 +107,33 @@ export default function PublicCollection({ shareId }: { shareId: string }) {
   // Malformed, unknown, unpublished and deleted links all answer 404: the
   // shared not-found page (same head the server sends for these URLs).
   if (error instanceof ApiError && error.status === 404) {
-    return <NotFound suggestion={{ label: "Explore learning journeys", href: "/journeys" }} />;
+    // display:contents keeps NotFound's layout; the capture listener reads
+    // which of its recovery links was used without changing the shared page.
+    return (
+      <div
+        className="contents"
+        onClickCapture={(event) => {
+          const href = (event.target as HTMLElement).closest("a[href]")?.getAttribute("href");
+          if (href === "/journeys") recover("explore_journeys", "not_found");
+          else if (href === "/categories") recover("categories", "not_found");
+          else if (href === "/") recover("home", "not_found");
+        }}
+      >
+        <NotFound suggestion={{ label: "Explore learning journeys", href: "/journeys" }} />
+      </div>
+    );
   }
 
   if (queryUnavailableReason(collectionQuery) === "offline") {
-    return <OfflinePageState onRetry={() => void refetch()} testId="collection-offline" />;
+    return (
+      <OfflinePageState
+        onRetry={() => {
+          recover("retry_offline", "offline");
+          void refetch();
+        }}
+        testId="collection-offline"
+      />
+    );
   }
 
   if (error || !data) {
@@ -72,7 +147,7 @@ export default function PublicCollection({ shareId }: { shareId: string }) {
         />
         <StatePanel tone="error" label="Error · unavailable" title="Couldn’t load this collection" headingLevel={1}
           testId="collection-unavailable"
-          actions={<RetryButton onRetry={() => void refetch()} testId="button-collection-retry" />}>
+          actions={<RetryButton onRetry={() => { recover("retry_error", "error"); void refetch(); }} testId="button-collection-retry" />}>
           Something went wrong while fetching it. Please try again.
         </StatePanel>
       </div>
@@ -104,7 +179,11 @@ export default function PublicCollection({ shareId }: { shareId: string }) {
       </header>
 
       {data.resources.length > 0 ? (
-        <div className="discovery-grid">
+        <div
+          className="discovery-grid"
+          onClickCapture={handleResourceLink}
+          onAuxClickCapture={handleResourceLink}
+        >
           {data.resources.map((resource) => (
             <ResourceCard
               key={resource.id}

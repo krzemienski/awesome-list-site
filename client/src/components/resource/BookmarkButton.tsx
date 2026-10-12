@@ -12,6 +12,7 @@ import { useGuestBookmarkIds } from "@/lib/guestBookmarks";
 import { handoffFocusToSiblingControl } from "@/hooks/focus-handoff";
 import { restoreRemovedBookmark } from "@/lib/bookmarkRestore";
 import { cn } from "@/lib/utils";
+import { trackCollectionMembershipResults } from "@/lib/analytics-collections";
 import type { BookmarkCollection } from "@/types/bookmarks";
 import type { BookmarkQueueStatus } from "@shared/bookmarkCollections";
 
@@ -172,6 +173,8 @@ function BookmarkButton({
         const additions = Array.from(desired).filter((id) => !original.has(id));
         const removals = Array.from(original).filter((id) => !desired.has(id));
         if (additions.length || removals.length) {
+          // Read now: saveModeRef resets to "add" before the requests settle.
+          const dialogMode = saveModeRef.current;
           void Promise.allSettled([
             ...additions.map((collectionId) =>
               apiRequest(`/api/collections/${collectionId}/items/${resourceId}`, {
@@ -184,6 +187,14 @@ function BookmarkButton({
               }),
             ),
           ]).then((results) => {
+            trackCollectionMembershipResults({
+              resourceId: resourceId,
+              additions,
+              removals,
+              results,
+              source: "bookmark_button",
+              dialogMode,
+            });
             void queryClient.invalidateQueries({ queryKey: ["/api/bookmarks"] });
             void queryClient.invalidateQueries({
               queryKey: ["/api/collections?includeArchived=true"],
