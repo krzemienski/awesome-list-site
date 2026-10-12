@@ -31,6 +31,7 @@ import {
 import { parseIntInRange } from "@shared/validation";
 import type { ContactRepository } from "../../repositories";
 import { config } from "../../config";
+import { configuredContactDestinations, configuredSourceRepository } from "../../public-contact";
 import { SITE_URL } from "../../og-middleware";
 import { validateBody } from "../../validation/inputs";
 import { negotiated429Handler } from "../../middleware/rateLimit";
@@ -48,74 +49,11 @@ export interface ContactRoutesContext {
 export const CONTACT_RATE_LIMIT = { windowMs: 60 * 60 * 1000, limit: 5 } as const;
 export const CONTACT_LIST_MAX_LIMIT = 500;
 const CONTACT_LIST_DEFAULT_LIMIT = 50;
-
-interface ContactLinkEntry {
-  available: boolean;
-  href?: string;
-  unavailableReason?: string;
-}
-
 interface ContactFormEntry {
   available: boolean;
   persistence?: "database";
   unavailableReason?: string;
 }
-
-function unavailable(reason: string): ContactLinkEntry {
-  return { available: false, unavailableReason: reason };
-}
-
-function validatedHref(value: string | undefined, protocol: "https:" | "mailto:"): string | undefined {
-  if (!value) return undefined;
-  try {
-    const parsed = new URL(value);
-    return parsed.protocol === protocol ? parsed.toString() : undefined;
-  } catch {
-    return undefined;
-  }
-}
-
-function configuredEmail(): ContactLinkEntry {
-  const href = validatedHref(config.contact.email, "mailto:");
-  return href ? { available: true, href } : unavailable("No contact email is configured");
-}
-
-/**
- * Issues are offered only when an issue tracker is configured explicitly
- * (CONTACT_ISSUES_URL or the YAML `issues_url`). Deriving one from
- * `source.url` would advertise a tracker nobody opted into — with the built-in
- * awesome-go default it would even point at a stranger's repository.
- */
-function configuredIssues(): ContactLinkEntry {
-  const href = validatedHref(config.contact.issues_url, "https:");
-  return href ? { available: true, href } : unavailable("No issue tracker is configured");
-}
-
-/** Discussions need both a URL and the explicit "verified enabled" flag. */
-function configuredDiscussions(): ContactLinkEntry {
-  const href = config.contact.discussions_verified
-    ? validatedHref(config.contact.discussions_url, "https:")
-    : undefined;
-  return href
-    ? { available: true, href }
-    : unavailable("No verified discussions destination is configured");
-}
-
-function configuredSourceRepository(): { repoUrl: string; repoBranch: string } {
-  const parsed = new URL(config.source.url);
-  if (parsed.hostname !== "raw.githubusercontent.com") {
-    throw new Error("The configured source URL is not a raw GitHub repository URL");
-  }
-  const [owner, repo, branch] = parsed.pathname.split("/").filter(Boolean);
-  if (!owner || !repo || !branch) {
-    throw new Error("The configured source URL is missing its GitHub owner, repository, or branch");
-  }
-  return {
-    repoUrl: `https://github.com/${owner}/${repo}`,
-    repoBranch: branch,
-  };
-}
-
 function isFormReady(): boolean {
   return config.contact.enabled && config.contact.ip_hash_secret.length > 0;
 }
@@ -242,9 +180,7 @@ export function registerContactRoutes(app: Express, ctx: ContactRoutesContext): 
         ...sourceRepository,
       },
       contact: {
-        email: configuredEmail(),
-        issues: configuredIssues(),
-        discussions: configuredDiscussions(),
+        ...configuredContactDestinations(),
         form: configuredForm(),
       },
     });

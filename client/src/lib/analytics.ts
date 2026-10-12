@@ -222,45 +222,6 @@ export const sendGaEvent = (
 
   window.gtag('event', name, merged);
 };
-/**
- * GA4 half of the shared dispatcher (analytics-dispatch.ts is its only
- * caller). `params` arrive already cleaned by analytics-hygiene, and
- * `context` is the sanitized page context from `gaPageContext` (page_location
- * with only utm_* and click-id params, path-only page_path, origin+path
- * referrer), captured when the event was dispatched. The context is also
- * pinned with gtag('set') so hits gtag sends on its own (enhanced measurement)
- * reuse it instead of the raw document URL and referrer. When there is no
- * document.referrer the dispatcher supplies the previous sanitized location as
- * page_referrer, so gtag never falls back to the raw previous SPA URL.
- */
-export const sendGaEvent = (
-  name: string,
-  params: Record<string, unknown> = {},
-  context: Record<string, unknown> = {},
-) => {
-  if (typeof window === 'undefined') return;
-  if (getAnalyticsConsent() !== 'granted') return;
-  if (!window.gtag) {
-    // With a persisted grant, React can emit its initial page_view before the
-    // deferred post-paint SDK bootstrap. Preserve those events without ever
-    // queueing anything before consent.
-    pendingEvents.push({ name, params, context });
-    return;
-  }
-
-  const pinned: Record<string, unknown> = {};
-  for (const key of ['page_location', 'page_referrer', 'page_title'] as const) {
-    if (context[key] !== undefined) pinned[key] = context[key];
-  }
-  if (Object.keys(pinned).length > 0) window.gtag('set', pinned);
-
-  const merged: Record<string, unknown> = { ...context, ...params };
-  Object.keys(merged).forEach((key) => {
-    if (merged[key] === undefined || merged[key] === null) delete merged[key];
-  });
-
-  window.gtag('event', name, merged);
-};
 export const trackPageView = (_url?: string) => {
   track(
     'page_viewed',

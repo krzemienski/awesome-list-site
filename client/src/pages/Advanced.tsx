@@ -4,6 +4,7 @@ import { Link } from "wouter";
 import { useQuery } from "@tanstack/react-query";
 import SEOHead from "@/components/layout/SEOHead";
 import { advancedSeoTitle, advancedSeoDescription } from "@shared/seo-templates";
+import { advancedHeading } from "@shared/page-headings";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import CategoryExplorer from "@/components/ui/category-explorer";
@@ -135,7 +136,7 @@ export default function Advanced() {
   if (!awesomeList && tab !== "recommendations") {
     return (
       <div className="discovery-tools-page discovery-tools-page--advanced">
-        <StatePanel tone="empty" label="No catalog data" title="Advanced features" headingLevel={1}
+        <StatePanel tone="empty" label="No catalog data" title={advancedHeading} headingLevel={1}
           actions={<RetryButton onRetry={() => void refetch()} />}>
           The catalog came back empty, so there is nothing to explore yet.
         </StatePanel>
@@ -151,7 +152,7 @@ export default function Advanced() {
       <div className="discovery-tools-masthead">
         <div className="discovery-tools-title-row">
           <Sparkles className="discovery-tools-masthead-icon" aria-hidden="true" />
-          <h1 className="page-title discovery-tools-page-title">Advanced Features</h1>
+          <h1 className="page-title discovery-tools-page-title">{advancedHeading}</h1>
         </div>
         <p className="discovery-tools-page-lede">
           Discover powerful tools for exploring, analyzing, and sharing awesome list data

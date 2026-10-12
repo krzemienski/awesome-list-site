@@ -30,6 +30,7 @@ import { queryUnavailableReason } from "@/lib/query-availability";
 import {
   trackJourneyStart,
   trackJourneyStepComplete,
+  trackJourneyStepUncomplete,
   trackJourneyComplete,
 } from "@/lib/analytics";
 import SEOHead from "@/components/layout/SEOHead";

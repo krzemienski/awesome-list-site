@@ -1,3 +1,4 @@
+import { homeHeading } from "@shared/page-headings";
 import type { ReactNode } from "react";
 import { Link } from "wouter";
 import type { Resource } from "@/types/awesome-list";
@@ -539,8 +540,8 @@ function IndexLayout({
   return (
     <>
       <h1 className="home-index-title mono">
-        <span className="caret">~/awesome.video</span>
-        <span className="sr-only"> — Awesome Video Resources</span>
+        <span className="caret" aria-hidden="true">~/awesome.video</span>
+        <span className="sr-only">{homeHeading}</span>
       </h1>
       <StatStrip stats={stats} layout="index" />
       <div className="home-index-grid">
@@ -573,7 +574,9 @@ function CuratedLayout({
     <>
       <div className="home-hero">
         <h1 className="page-title home-hero-title">
-          Awesome <span className="serif-italic">video</span> resources
+          {homeHeading.split(" ").map((word, index) => (
+            <span key={word}>{index > 0 ? " " : ""}{index === 1 ? <span className="serif-italic">{word}</span> : word}</span>
+          ))}
         </h1>
         <p className="home-hero-lede">
           A curated index of <span className="mono home-hero-figure">{formatCount(stats.total)}</span>{" "}

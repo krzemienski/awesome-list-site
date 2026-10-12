@@ -1,5 +1,6 @@
 import { useQuery } from "@tanstack/react-query";
 import { apiRequest } from "@/lib/queryClient";
+export { preferredContactDestination } from "@shared/contact-destination";
 
 const CONTACT_VARIANTS = ["a", "b", "c", "d", "e"] as const;
 export type ContactVariant = (typeof CONTACT_VARIANTS)[number];
@@ -31,56 +32,6 @@ export interface ContactPublicConfig {
     discussions: ContactDestination;
     form: ContactFormConfig;
   };
-}
-
-export type PreferredContactDestination = {
-  href: string;
-  kind: "issues" | "discussions" | "email";
-  label: string;
-};
-
-/**
- * Pick the first configured public destination for prose pages that need to
- * tell a visitor how to reach the maintainers. In particular, never derive an
- * issues URL from the repository URL: the server intentionally reports an
- * unavailable destination when the deployment has not opted into one.
- */
-export function preferredContactDestination(
-  config: ContactPublicConfig | undefined,
-): PreferredContactDestination | null {
-  if (!config) return null;
-
-  if (config.contact.issues.available && config.contact.issues.href) {
-    const repositoryIsGitHub = (() => {
-      try {
-        return new URL(config.site.repoUrl).hostname === "github.com";
-      } catch {
-        return false;
-      }
-    })();
-    return {
-      href: config.contact.issues.href,
-      kind: "issues",
-      label: repositoryIsGitHub
-        ? "open an issue on the project's GitHub repository"
-        : "open an issue on the project's repository",
-    };
-  }
-  if (config.contact.discussions.available && config.contact.discussions.href) {
-    return {
-      href: config.contact.discussions.href,
-      kind: "discussions",
-      label: "join the project's discussions",
-    };
-  }
-  if (config.contact.email.available && config.contact.email.href) {
-    return {
-      href: config.contact.email.href,
-      kind: "email",
-      label: "email the project maintainers",
-    };
-  }
-  return null;
 }
 
 export interface ContactSubmission {

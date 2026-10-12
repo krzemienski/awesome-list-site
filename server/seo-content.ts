@@ -1,3 +1,7 @@
+import { createElement } from "react";
+import { renderToStaticMarkup } from "react-dom/server";
+import { LegalPolicyContent, legalPolicies, type LegalPolicyPath } from "@shared/legal-policy-content";
+import type { PreferredContactDestination } from "@shared/contact-destination";
 // Server-side prerendered content for indexable public routes (Task #80).
 import { resourceFactsSummary } from "@shared/seo-content-templates";
 import { tagLandingPath } from "@shared/tagNormalize";
@@ -666,6 +670,7 @@ export function renderStaticPageContent(opts: {
   links?: { path: string; label: string }[];
   categories?: { name: string; slug: string; count: number }[];
   faqs?: { question: string; answer: string }[];
+  policy?: { path: LegalPolicyPath; contactDestination: PreferredContactDestination | null };
   form?: {
     action: string;
     heading?: string;
@@ -767,6 +772,12 @@ export function renderStaticPageContent(opts: {
   return shell(
     `<h1>${escapeHtml(opts.heading)}</h1>` +
       `<p class="ssr-lead">${escapeHtml(opts.description)}</p>` +
+      (opts.policy
+        ? `<p>Last updated: ${escapeHtml(legalPolicies[opts.policy.path].updated)}</p>` +
+          `<article data-seo-section="legal-policy">` +
+          renderToStaticMarkup(createElement(LegalPolicyContent, opts.policy)) +
+          `</article>`
+        : "") +
       paras +
       formHtml +
       faqHtml +

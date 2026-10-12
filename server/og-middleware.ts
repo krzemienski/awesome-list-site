@@ -13,6 +13,10 @@ import {
   resolveSiteIdentity,
 } from "@shared/site-identity";
 import { config } from "./config";
+import { homeHeading, advancedHeading } from "@shared/page-headings";
+import { legalPolicies, type LegalPolicyPath } from "@shared/legal-policy-content";
+import { preferredContactDestination } from "@shared/contact-destination";
+import { configuredContactDestinations, configuredSourceRepository } from "./public-contact";
 import {
   homeSeoTitle,
   homeSeoDescription,
@@ -646,7 +650,7 @@ function homeShellChrome(): string {
    const bodyHtml =
      homeShellChrome() +
      renderHomeContent({
-       heading: SITE_NAME,
+       heading: homeHeading,
        description: m.description,
        categories,
      });
@@ -699,19 +703,19 @@ function homeShellChrome(): string {
     // BUG-019 (run13): legal pages — indexable + listed in the sitemap.
     // Titles must mirror the client SEOHead titles exactly (two-pass parity).
     "/terms": {
-      title: `Terms of Use — ${SITE_NAME}`,
-      description: `The terms that govern your use of ${SITE_NAME} — a free, community-curated directory of video development resources.`,
+      title: `${legalPolicies["/terms"].heading} — ${SITE_NAME}`,
+      description: legalPolicies["/terms"].description,
     },
     "/privacy": {
-      title: `Privacy Policy — ${SITE_NAME}`,
-      description: `How ${SITE_NAME} handles your data: what we collect, how it's used, and the analytics choices you control.`,
+      title: `${legalPolicies["/privacy"].heading} — ${SITE_NAME}`,
+      description: legalPolicies["/privacy"].description,
     },
     // Companion legal/community page — indexable + listed in the sitemap.
     // Title/description mirror the client CodeOfConduct SEOHead exactly
     // (two-pass parity).
     "/code-of-conduct": {
-      title: `Code of Conduct — ${SITE_NAME}`,
-      description: `The standards of behavior we expect from everyone who participates in ${SITE_NAME} — a free, community-curated directory of video development resources.`,
+      title: `${legalPolicies["/code-of-conduct"].heading} — ${SITE_NAME}`,
+      description: legalPolicies["/code-of-conduct"].description,
     },
     "/advanced": {
       title: advancedSeoTitle,
@@ -887,6 +891,24 @@ function homeShellChrome(): string {
       } catch (error) {
         rethrowBoundedDependencyFailure(error);
       }
+    } else if (Object.hasOwn(legalPolicies, path)) {
+      const policyPath = path as LegalPolicyPath;
+      const policy = legalPolicies[policyPath];
+      bodyHtml = renderStaticPageContent({
+        heading: policy.heading,
+        description: policy.description,
+        policy: {
+          path: policyPath,
+          contactDestination: preferredContactDestination({
+            site: configuredSourceRepository(),
+            contact: configuredContactDestinations(),
+          }),
+        },
+        links: Object.entries(legalPolicies).map(([path, policy]) => ({
+          path,
+          label: policy.heading,
+        })),
+      });
     } else if (path === "/about" || path === "/advanced" || path === "/submit") {
       let categories: { name: string; slug: string; count: number }[] = [];
       // Run22 BUG-018: FAQ count claim comes from the live catalog total so
@@ -957,7 +979,7 @@ function homeShellChrome(): string {
         ];
       }
       bodyHtml = renderStaticPageContent({
-        heading: m.title.split(" — ")[0],
+        heading: path === "/advanced" ? advancedHeading : m.title.split(" — ")[0],
         description: m.description,
         ...(path === "/submit"
           ? {
