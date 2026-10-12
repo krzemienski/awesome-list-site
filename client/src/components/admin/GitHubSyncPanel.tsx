@@ -29,6 +29,8 @@ import "@/styles/pages/admin-ops-github-links.css";
 
 interface SyncHistory {
   id: number;
+  /** Display id: "Run #n" for history rows, "Job #n" for queue rows. */
+  label: string;
   direction: string;
   // ADM-03/04: sync-history rows now carry their outcome so failed/orphaned
   // syncs are badged honestly instead of rendered as successes.
@@ -213,6 +215,12 @@ export default function GitHubSyncPanel() {
   const latestFailure = failedJobs
     .slice()
     .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())[0];
+  // Only a failure that is still the newest finished job needs action; a
+  // later success means the integration works again.
+  const latestFinished = syncQueue
+    .filter(item => item.status === 'completed' || item.status === 'failed')
+    .sort((a, b) => new Date(b.processedAt ?? b.createdAt).getTime() - new Date(a.processedAt ?? a.createdAt).getTime())[0];
+  const failureIsCurrent = latestFinished?.status === 'failed';
 
   // Run17 BUG-031: repeated retries of the same action/status/error read as
   // duplicate rows — collapse them into one entry with a ×N counter (most
@@ -368,7 +376,12 @@ export default function GitHubSyncPanel() {
                 </div>
               </div>
             )}
-            {failedJobs.length > 0 && (
+            {failedJobs.length > 0 && !failureIsCurrent && (
+              <p className="text-sm text-muted-foreground" data-testid="note-earlier-sync-failures">
+                {failedJobs.length} earlier sync job{failedJobs.length !== 1 ? 's' : ''} failed; the latest sync completed.
+              </p>
+            )}
+            {failureIsCurrent && (
               <Alert variant="destructive" data-testid="alert-sync-failures">
                 <XCircle className="h-4 w-4" />
                 <AlertDescription className="space-y-1">
@@ -571,7 +584,7 @@ export default function GitHubSyncPanel() {
                 {visibleHistory.map((sync) => {
                   return (
                   <TableRow key={sync.id} data-testid={`sync-history-row-${sync.id}`}>
-                       <TableCell className="font-mono text-xs">#{sync.id}</TableCell>
+                       <TableCell className="font-mono text-xs">{sync.label}</TableCell>
                        <TableCell className="ops-github-panel__history-direction">
                          {sync.direction}
                       </TableCell>
@@ -589,7 +602,7 @@ export default function GitHubSyncPanel() {
                            type="button"
                            className="btn ghost ops-github-panel__logs"
                            onClick={() => setSelectedHistory(sync)}
-                           aria-label={`View details for sync job ${sync.id}`}
+                           aria-label={`View logs for ${sync.direction} ${sync.label}`}
                            data-testid={`button-sync-details-${sync.id}`}
                          >
                            Logs
@@ -668,7 +681,7 @@ export default function GitHubSyncPanel() {
       <Dialog open={selectedHistory !== null} onOpenChange={(open) => { if (!open) setSelectedHistory(null); }}>
         <DialogContent className="max-w-lg">
           <DialogHeader>
-            <DialogTitle>Sync job #{selectedHistory?.id}</DialogTitle>
+            <DialogTitle>Sync {selectedHistory?.label}</DialogTitle>
             <DialogDescription>
               {selectedHistory
                 ? `${selectedHistory.direction === "export" ? "Export" : "Import"} · ${formatSyncDate(selectedHistory.createdAt)}`
@@ -676,7 +689,7 @@ export default function GitHubSyncPanel() {
             </DialogDescription>
           </DialogHeader>
           {selectedHistory && (
-            <dl className="grid gap-3 text-sm">
+            <dl className="grid grid-cols-1 gap-3 text-sm">
               <div className="flex items-center justify-between gap-4">
                 <dt className="text-muted-foreground">Status</dt>
                 <dd><StatusChip status={selectedHistory.status ?? "recorded"} /></dd>
@@ -700,7 +713,7 @@ export default function GitHubSyncPanel() {
               {selectedHistory.commitMessage && (
                 <div>
                   <dt className="mb-1 text-muted-foreground">Commit message</dt>
-                  <dd className="break-words rounded border p-2 font-mono text-xs">{selectedHistory.commitMessage}</dd>
+                  <dd className="whitespace-pre-wrap rounded border p-2 font-mono text-xs [overflow-wrap:anywhere]">{selectedHistory.commitMessage}</dd>
                 </div>
               )}
               {selectedHistory.errorMessages && selectedHistory.errorMessages.length > 0 ? (
@@ -710,7 +723,7 @@ export default function GitHubSyncPanel() {
                       ? `Failed items (${selectedHistory.errorMessages.length})`
                       : `Errors (${selectedHistory.errorMessages.length})`}
                   </dt>
-                  <dd className="rounded border border-destructive/40 bg-destructive/10 p-2 font-mono text-xs">
+                  <dd className="rounded border border-destructive/40 bg-destructive/10 p-2 font-mono text-xs [overflow-wrap:anywhere]">
                     <ul className="ops-github-panel__error-list" data-testid="sync-history-error-list">
                       {selectedHistory.errorMessages.map((message, i) => <li key={i}>{message}</li>)}
                     </ul>
@@ -719,7 +732,7 @@ export default function GitHubSyncPanel() {
               ) : selectedHistory.errorMessage ? (
                 <div role="alert">
                   <dt className="mb-1 text-destructive">Error</dt>
-                  <dd className="break-words rounded border border-destructive/40 bg-destructive/10 p-2 font-mono text-xs">
+                  <dd className="max-h-[50vh] overflow-y-auto whitespace-pre-wrap rounded border border-destructive/40 bg-destructive/10 p-2 font-mono text-xs [overflow-wrap:anywhere]">
                     {selectedHistory.errorMessage}
                   </dd>
                 </div>

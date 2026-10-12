@@ -171,9 +171,12 @@ export const linkHealthService = {
     scanControllers.set(jobId, controller);
     const signal = controller.signal;
     try {
-      await runHeavyWork('link-health', async () => {
       signal.throwIfAborted();
-      const resources = await storage.getAllApprovedResources();
+      // Only the catalog read takes the shared heavy-work slot. The sweep
+      // itself is network-bound and runs for 20-40 minutes; holding the slot
+      // through it made every GitHub sync, export and backup 503 meanwhile.
+      const resources = await runHeavyWork('link-health', () => storage.getAllApprovedResources());
+      await (async () => {
       const resourcesToCheck = resources.map(r => ({
         id: r.id,
         title: r.title,
@@ -328,7 +331,7 @@ export const linkHealthService = {
 
       console.log(`[LinkHealth] Check completed for job ${jobId}: ${healthyCount} healthy, ${suspectCount} suspect, ${brokenCount} broken, ${redirectCount} redirects, ${timeoutCount} timeouts out of ${report.totalLinks} total (verification pass cleared ${toVerify.length - (brokenCount + timeoutCount)} bot-block false positives)`);
       });
-      });
+      })();
     } catch (err: any) {
       if (signal.aborted) return;
       await db

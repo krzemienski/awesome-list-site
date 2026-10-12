@@ -400,6 +400,13 @@ export default function LinkHealthDashboard() {
           </Button>
         </div>
       )}
+      {/* Until a scan completes there are no measured counts; zeros here
+          read as "0 healthy links", so the tiles show a dash instead. */}
+      {!lastCompletedJob && !historyError && !(latestJob && isTerminalWithoutResults) && (
+        <p className="text-sm text-muted-foreground" data-testid="link-health-no-results">
+          No scan has completed yet. Counts appear here when a scan finishes.
+        </p>
+      )}
       <div className="ops-link-health__stat-grid" aria-label="Link health status summary">
         {([
           ["Healthy", summaryCounts.healthy, statusTone("healthy")],
@@ -410,7 +417,7 @@ export default function LinkHealthDashboard() {
         ] as const).map(([label, value, tone]) => (
           <div key={label} className={`card ops-link-health__stat-card ops-link-health__stat-card--${tone}`}>
             <div className="mono ops-link-health__stat-label">{label}</div>
-            <div>{typeof value === "number" ? value.toLocaleString() : value}</div>
+            <div>{!lastCompletedJob ? <span aria-label="No result yet">—</span> : typeof value === "number" ? value.toLocaleString() : value}</div>
           </div>
         ))}
       </div>

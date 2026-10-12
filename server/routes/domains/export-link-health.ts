@@ -233,7 +233,7 @@ export function registerExportLinkHealthRoutes(
       queueItemId = queueItem.id;
       
       // Acquire bounded capacity before acknowledging background processing.
-      await startHeavyWork('github-sync', async () => {
+      await startHeavyWork('github-sync', () => syncService.runOwnedQueueItem(queueItem.id, async () => {
         await githubSyncRepo.updateGithubSyncStatus(queueItem.id, 'processing');
         try {
           const result = await syncService.importFromGitHub(repositoryUrl, options, { queueRowOwnedByCaller: true });
@@ -262,7 +262,7 @@ export function registerExportLinkHealthRoutes(
           ).catch(() => undefined);
           throw error;
         }
-      });
+      }));
       
       res.json({
         message: 'Import started',
@@ -322,7 +322,7 @@ export function registerExportLinkHealthRoutes(
       queueItemId = queueItem.id;
       
       // Process immediately in the bounded background gate.
-      await startHeavyWork('github-sync', async () => {
+      await startHeavyWork('github-sync', () => syncService.runOwnedQueueItem(queueItem.id, async () => {
         await githubSyncRepo.updateGithubSyncStatus(queueItem.id, 'processing');
         try {
           const result = await syncService.exportToGitHub(repositoryUrl, options);
@@ -346,7 +346,7 @@ export function registerExportLinkHealthRoutes(
           ).catch(() => undefined);
           throw error;
         }
-      });
+      }));
       
       res.json({
         message: 'Export started',
@@ -463,6 +463,8 @@ export function registerExportLinkHealthRoutes(
           return {
             // Offset keeps queue-derived ids from colliding with real history ids.
             id: 1_000_000 + q.id,
+            // Admins see the real queue id (the offset is only a row key).
+            label: `Job #${q.id}`,
             repositoryUrl: q.repositoryUrl,
             direction: q.action,
             // ADM-03/04: carry the outcome so the UI can badge failed/orphaned
@@ -506,6 +508,7 @@ export function registerExportLinkHealthRoutes(
         const status = outcome === 'failed' ? 'failed' : outcome === 'partial' ? 'partial' : 'completed';
         return {
           id: h.id,
+          label: `Run #${h.id}`,
           repositoryUrl: h.repositoryUrl,
           direction: h.direction,
           status,

@@ -1166,6 +1166,21 @@ export class GitHubSyncService {
   }
 
   /**
+   * Mark a queue row as owned by this process while `work` runs, so the
+   * periodic orphan sweep never fails a live sync. The admin routes run
+   * imports and exports directly (not via processQueue); an export's
+   * pre-push link check alone outlasts the sweep's 5-minute age threshold.
+   */
+  async runOwnedQueueItem<T>(queueId: number, work: () => Promise<T>): Promise<T> {
+    this.activeQueueIds.add(queueId);
+    try {
+      return await work();
+    } finally {
+      this.activeQueueIds.delete(queueId);
+    }
+  }
+
+  /**
    * Check for conflicts with existing resources
    */
   private async checkConflict(resource: Partial<Resource>): Promise<ConflictResolution> {
