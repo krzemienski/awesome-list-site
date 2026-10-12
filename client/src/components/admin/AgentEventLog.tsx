@@ -126,7 +126,10 @@ export function AgentEventLog({ jobType, jobId, isActive, height = "360px" }: Ag
               const isOpen = !!expanded[ev.id];
               return (
                 <div key={ev.id} className="border-b border-border/30 pb-1.5 last:border-0" data-testid={`row-event-${ev.seq}`} role="listitem">
-                  <div className="flex gap-2 items-start">
+                  {/* Metadata and message are separate groups so the message drops to
+                      its own full-width line when the badges leave it too little room. */}
+                  <div className="flex flex-wrap gap-x-2 gap-y-1 items-start">
+                    <div className="flex flex-wrap gap-2 items-start max-w-full">
                     <span className="text-muted-foreground shrink-0 w-[64px]">
                       {ev.ts ? new Date(ev.ts).toLocaleTimeString() : ""}
                     </span>
@@ -145,6 +148,8 @@ export function AgentEventLog({ jobType, jobId, isActive, height = "360px" }: Ag
                     {ev.targetActor && (
                       <span className={`${DELEGATION_TARGET_TEXT} shrink-0`}>→ {ev.targetActor}</span>
                     )}
+                    </div>
+                    <div className="flex gap-2 items-start flex-1 min-w-[min(100%,14rem)]">
                     {(() => {
                       const clean = sanitizeText(ev.summary);
                       const isLong = clean.length > SUMMARY_MAX;
@@ -161,17 +166,19 @@ export function AgentEventLog({ jobType, jobId, isActive, height = "360px" }: Ag
                       <button
                         type="button"
                         onClick={() => toggle(ev.id)}
-                        className="shrink-0 text-muted-foreground hover:text-foreground"
+                        className="shrink-0 inline-flex items-center justify-center min-h-6 min-w-6 text-muted-foreground hover:text-foreground"
                         aria-label={isOpen ? `Hide detail for event ${ev.seq}` : `Show detail for event ${ev.seq}`}
+                        aria-expanded={isOpen}
                         data-testid={`button-toggle-detail-${ev.seq}`}
                       >
                         {isOpen ? <ChevronDown className="h-3.5 w-3.5" /> : <ChevronRight className="h-3.5 w-3.5" />}
                       </button>
                     )}
+                    </div>
                   </div>
 
                   {(ev.model || ev.tokensIn != null || ev.tokensOut != null || ev.costUsd || ev.durationMs != null) && (
-                    <div className="flex gap-3 pl-[72px] mt-0.5 text-[10px] text-muted-foreground flex-wrap">
+                    <div className="flex gap-3 sm:pl-[72px] mt-0.5 text-[10px] text-muted-foreground flex-wrap">
                       {ev.model && <span>{ev.model}</span>}
                       {ev.tokensIn != null && (
                         <span title={
@@ -197,7 +204,7 @@ export function AgentEventLog({ jobType, jobId, isActive, height = "360px" }: Ag
                     const raw = sanitizeText(JSON.stringify(ev.detail, null, 2));
                     const truncated = raw.length > DETAIL_MAX;
                     return (
-                      <pre className="pl-[72px] mt-1 text-[10px] text-muted-foreground whitespace-pre-wrap break-all">
+                      <pre className="sm:pl-[72px] mt-1 text-[10px] text-muted-foreground whitespace-pre-wrap break-all">
                         {truncated ? raw.slice(0, DETAIL_MAX) : raw}
                         {truncated && (
                           <span className={TRUNCATION_TEXT}>
