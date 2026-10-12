@@ -44,6 +44,7 @@
  */
 
 import type { Express, Response, RequestHandler } from "express";
+import rateLimit from "express-rate-limit";
 import { z } from "zod";
 import { sql } from "drizzle-orm";
 import { db } from "../../db";
@@ -91,6 +92,8 @@ import { ServiceUnavailableError } from "../../middleware/errors";
 import { registerHomeFeed } from "./home-feed";
 import { listApprovedResourceTags } from "../../repositories/TagRepository";
 import { asyncHandler } from "../../middleware/asyncHandler";
+import { negotiated429Handler } from "../../middleware/rateLimit";
+import { PgRateLimitStore } from "../../middleware/pgRateLimitStore";
 
 /**
  * Copied verbatim from server/routes.ts (module-level helper). Duplicated here
@@ -114,10 +117,13 @@ function sendOperationalFailure(
   return res.status(500).json({ message: fallbackMessage });
 }
 
+const RESOURCE_SUBMISSION_LIMIT = { windowMs: 60 * 60 * 1000, limit: 20 } as const;
+
 /**
  * Everything the copied catalog/contribution handlers reference from the
  * `registerRoutes` closure in server/routes.ts.
  */
+
 export interface CatalogContributionsRoutesContext {
   /** Public resource-read limiter (240/min/IP). */
   resourceReadLimiter: RequestHandler;
@@ -788,7 +794,8 @@ export function registerCatalogContributionsRoutes(
         // (and never consumed existingId).
         return res.status(409).json({
           error: 'duplicate_url',
-          message: 'This URL is already in the catalog'
+          message: 'This URL is already in the catalog',
+          fieldErrors: { url: 'This URL is already in the catalog.' },
         });
       }
 
@@ -799,7 +806,8 @@ export function registerCatalogContributionsRoutes(
       if (existingTitle) {
         return res.status(409).json({
           error: 'duplicate_title',
-          message: 'A resource with this exact title is already in the catalog. Pick a more specific title (e.g. add the platform or format) or suggest an edit to the existing entry.'
+          message: 'A resource with this exact title is already in the catalog. Pick a more specific title (e.g. add the platform or format) or suggest an edit to the existing entry.',
+          fieldErrors: { title: 'A resource with this exact title is already in the catalog. Add the platform or format to make it specific.' },
         });
       }
 
@@ -865,8 +873,22 @@ export function registerCatalogContributionsRoutes(
       sendOperationalFailure(res, error, 'Failed to create resource');
     }
   };
-  app.post('/api/resources', isAuthenticated, asyncHandler(createResourceHandler));
-  app.post('/api/submit', isAuthenticated, asyncHandler(createResourceHandler));
+  // Per member, not per IP: only accepted submissions count (validation and
+  // duplicate rejections are refunded), so a member fixing a form never hits it.
+  const submissionLimiter = rateLimit({
+    windowMs: RESOURCE_SUBMISSION_LIMIT.windowMs,
+    limit: RESOURCE_SUBMISSION_LIMIT.limit,
+    standardHeaders: true,
+    legacyHeaders: false,
+    skipFailedRequests: true,
+    keyGenerator: (req: any) => `user:${req.dbUser.id}`,
+    store: new PgRateLimitStore("resource-submit"),
+    handler: negotiated429Handler(
+      `You've submitted ${RESOURCE_SUBMISSION_LIMIT.limit} resources in the last hour. Please wait a while before submitting more.`,
+    ),
+  });
+  app.post('/api/resources', isAuthenticated, submissionLimiter, asyncHandler(createResourceHandler));
+  app.post('/api/submit', isAuthenticated, submissionLimiter, asyncHandler(createResourceHandler));
   
   // GET /api/resources/pending - List pending resources (admin only)
   app.get('/api/resources/pending', isAuthenticated, isAdmin, asyncHandler(async (req, res) => {
