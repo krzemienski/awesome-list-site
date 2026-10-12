@@ -163,7 +163,7 @@
 
 /* The frozen admin.jsx puts `mono` on the CELL (slug, resource count,
    subcategory count): 12px mono with the system's body leading (1.6 Editorial,
-   1.5 Brutalist, 1.55 elsewhere), so the glyphs sit on the cell's own line box. Styling only an inner span left a 13px
+   1.55 Geist), so the glyphs sit on the cell's own line box. Styling only an inner span left a 13px
    Inter strut under a 12px inline, dropping every mono glyph ~1px. Canonical
    slug sizes per panel: categories 12px, subcategories 11.5px. */
 .admin-taxonomy-table tbody .admin-taxonomy-column-slug,

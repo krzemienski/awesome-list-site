@@ -578,7 +578,8 @@ a { color: inherit; }
 
 /* =====================================================================
    PER-SYSTEM SKINS
-   These reach in and reshape components per system. Keep them tight —
+   These reach in and reshape components per system (the two kept systems:
+   Editorial and Geist). Keep them tight —
    tokens carry most of the weight; this is for things tokens can't express.
    ===================================================================== */
 
@@ -587,39 +588,6 @@ a { color: inherit; }
 [data-system="editorial"] .serif-italic { color: var(--accent); }
 [data-system="editorial"] .eyebrow { color: var(--accent); font-weight: 700; }
 
-/* ─── TERMINAL ─── square everything, scanlines, brackets, glow */
-[data-system="terminal"] body { letter-spacing: 0; }
-[data-system="terminal"] .card,
-[data-system="terminal"] .btn,
-[data-system="terminal"] .chip,
-[data-system="terminal"] .input,
-[data-system="terminal"] .select,
-[data-system="terminal"] .textarea,
-[data-system="terminal"] .search-input,
-[data-system="terminal"] .modal,
-[data-system="terminal"] .kbd { border-radius: 0 !important; }
-[data-system="terminal"] .chip { text-transform: uppercase; }
-[data-system="terminal"] .chip::before { content: '['; margin-right: 2px; opacity: 0.55; }
-[data-system="terminal"] .chip::after  { content: ']'; margin-left: 2px;  opacity: 0.55; }
-[data-system="terminal"] .btn.primary {
-  background: transparent;
-  color: var(--accent);
-  border: 1px solid var(--accent);
-  text-shadow: 0 0 12px color-mix(in srgb, var(--accent) 60%, transparent);
-}
-[data-system="terminal"] .btn.primary:hover {
-  background: color-mix(in srgb, var(--accent) 14%, transparent);
-  box-shadow: 0 0 0 1px var(--accent), inset 0 0 30px color-mix(in srgb, var(--accent) 14%, transparent);
-}
-[data-system="terminal"] .eyebrow { font-weight: 600; }
-[data-system="terminal"] .eyebrow::before { content: '> '; opacity: 0.6; }
-[data-system="terminal"] .card.hoverable:hover {
-  border-color: var(--accent);
-  box-shadow: 0 0 0 1px color-mix(in srgb, var(--accent) 35%, transparent);
-  transform: none;
-}
-[data-system="terminal"] .accordion-header.active::before { box-shadow: none; }
-
 /* ─── GEIST ─── soft, neutral, hover glow on cards */
 [data-system="geist"] .display-h { letter-spacing: -0.04em; }
 [data-system="geist"] .card.hoverable:hover {
@@ -627,70 +595,6 @@ a { color: inherit; }
 }
 [data-system="geist"] .btn { font-weight: 500; }
 [data-system="geist"] .chip { text-transform: none; letter-spacing: 0; font-family: var(--font-body); font-weight: 500; }
-
-/* ─── BRUTALIST ─── hard offset shadows, slab serif drops */
-[data-system="brutalist"] .card,
-[data-system="brutalist"] .btn,
-[data-system="brutalist"] .input,
-[data-system="brutalist"] .select,
-[data-system="brutalist"] .textarea,
-[data-system="brutalist"] .search-input,
-[data-system="brutalist"] .modal,
-[data-system="brutalist"] .chip,
-[data-system="brutalist"] .kbd { border-radius: 0 !important; }
-[data-system="brutalist"] .card { border-color: var(--text); }
-[data-system="brutalist"] .card.hoverable:hover {
-  transform: translate(-2px, -2px);
-  box-shadow: 6px 6px 0 0 var(--text);
-  background: var(--surface-2);
-}
-[data-system="brutalist"] .btn {
-  border-color: var(--text);
-  border-width: 2px;
-  font-weight: 600;
-  text-transform: uppercase;
-  letter-spacing: 0.04em;
-  font-size: 12px;
-}
-[data-system="brutalist"] .btn:hover {
-  transform: translate(-2px, -2px);
-  box-shadow: 4px 4px 0 0 var(--text);
-}
-[data-system="brutalist"] .btn.primary {
-  background: var(--accent);
-  border-color: var(--text);
-  color: #000;
-}
-[data-system="brutalist"] .btn.primary:hover {
-  box-shadow: 4px 4px 0 0 var(--text);
-}
-[data-system="brutalist"] .chip { border-width: 1.5px; border-color: var(--text-2); text-transform: uppercase; }
-[data-system="brutalist"] .eyebrow { font-family: var(--font-mono); font-weight: 700; }
-[data-system="brutalist"] .accordion-header.active::before {
-  width: 3px;
-  background: var(--text);
-  box-shadow: none;
-}
-
-/* ─── SWISS ─── hairlines, mono numerals, grid feel */
-[data-system="swiss"] body {
-  font-feature-settings: "ss01", "tnum", "lnum", "kern";
-}
-[data-system="swiss"] .card,
-[data-system="swiss"] .btn,
-[data-system="swiss"] .input,
-[data-system="swiss"] .search-input { border-width: 0.5px; }
-[data-system="swiss"] .card.hoverable:hover {
-  border-color: var(--text-3);
-  box-shadow: none;
-  transform: none;
-  background: var(--surface-2);
-}
-[data-system="swiss"] .display-h { font-weight: 700; }
-[data-system="swiss"] .eyebrow { font-family: var(--font-mono); font-weight: 500; color: var(--text-3); }
-[data-system="swiss"] .chip { font-family: var(--font-mono); font-weight: 500; }
-[data-system="swiss"] .btn { font-weight: 600; }
-[data-system="swiss"] .accordion-header.active::before { width: 1px; box-shadow: none; }
 
 /* ============== SHOWCASE-PAGE-ONLY (design-system.html) ============== */
 .ds-shell {

@@ -1,24 +1,17 @@
----
-source: awesome-list-site-ds/docs/04-tokens.md
-sha256: 9fa54765d1a5fe8bed234a8c7def608efe638cff2a11e608ae6b0fc8bd359d87
----
 # App-runtime accessibility addendum (authoritative for Awesome.Video)
 
 The source text below is historical, verbatim handoff documentation, NOT current runtime contrast guidance. Its 38–42%/40% white and ~6:1 Violet claims are obsolete. Frozen source files remain unchanged.
 
-Live --text-3 is corrected per system; --accent remains decorative. Small accent text uses --accent-ink: the exact accent where it already passes, otherwise the minimal sRGB white mix per system/accent (share column below); filled primary labels use black --on-accent. Terminal retains its outlined grammar. These are approved accessibility deviations, not pixel-parity exceptions.
+Live --text-3 is corrected per system; --accent remains decorative. Small accent text uses --accent-ink: the exact accent where it already passes, otherwise the minimal sRGB white mix per system/accent (share column below); filled primary labels use black --on-accent. These are approved accessibility deviations, not pixel-parity exceptions.
 
 | System | Live text-3 | Minimum neutral contrast |
 |---|---|---:|
 | editorial | rgba(244,243,238,0.49) | 4.6728:1 |
-| terminal | rgba(232,232,224,0.51) | 4.6253:1 |
 | geist | rgba(250,250,250,0.49) | 4.7085:1 |
-| brutalist | rgba(245,245,240,0.50) | 4.6763:1 |
-| swiss | rgba(250,250,248,0.48) | 4.7518:1 |
 
-All 50 system/accent pairs (minimum across bg, bg-2, surface/surface-2/surface-3 over each base, including 0%, 8% chip and 14% control tints):
+All 20 system/accent pairs (minimum across bg, bg-2, surface/surface-2/surface-3 over each base, including 0%, 8% chip and 14% control tints):
 
-| System | Accent | Ink share | Upstream accent minimum | Accent ink minimum | Filled label (Terminal: outlined) |
+| System | Accent | Ink share | Upstream accent minimum | Accent ink minimum | Filled label |
 |---|---|---:|---:|---:|---:|
 | editorial | crimson | 92% | 4.3293:1 | 4.6354:1 | 6.0413:1 |
 | editorial | magenta | 92% | 4.2254:1 | 4.6035:1 | 5.9535:1 |
@@ -30,16 +23,6 @@ All 50 system/accent pairs (minimum across bg, bg-2, surface/surface-2/surface-3
 | editorial | violet | 80% | 3.3154:1 | 4.6151:1 | 4.5675:1 |
 | editorial | lime | 100% | 9.8227:1 | 9.8227:1 | 17.0132:1 |
 | editorial | rose | 100% | 5.5797:1 | 5.5797:1 | 8.4028:1 |
-| terminal | crimson | 100% | 4.9623:1 | 4.9623:1 | outlined |
-| terminal | magenta | 100% | 4.8455:1 | 4.8455:1 | outlined |
-| terminal | orange | 100% | 6.2625:1 | 6.2625:1 | outlined |
-| terminal | amber | 100% | 8.7278:1 | 8.7278:1 | outlined |
-| terminal | emerald | 100% | 7.6329:1 | 7.6329:1 | outlined |
-| terminal | matrix | 100% | 10.6078:1 | 10.6078:1 | outlined |
-| terminal | cyan | 100% | 9.1251:1 | 9.1251:1 | outlined |
-| terminal | violet | 87% | 3.7653:1 | 4.6636:1 | outlined |
-| terminal | lime | 100% | 11.2979:1 | 11.2979:1 | outlined |
-| terminal | rose | 100% | 6.4507:1 | 6.4507:1 | outlined |
 | geist | crimson | 83% | 3.9243:1 | 4.6014:1 | 6.0413:1 |
 | geist | magenta | 83% | 3.8223:1 | 4.6262:1 | 5.9535:1 |
 | geist | orange | 100% | 4.8868:1 | 4.8868:1 | 8.1032:1 |
@@ -50,26 +33,6 @@ All 50 system/accent pairs (minimum across bg, bg-2, surface/surface-2/surface-3
 | geist | violet | 74% | 3.0005:1 | 4.6153:1 | 4.5675:1 |
 | geist | lime | 100% | 8.7833:1 | 8.7833:1 | 17.0132:1 |
 | geist | rose | 100% | 5.0188:1 | 5.0188:1 | 8.4028:1 |
-| brutalist | crimson | 83% | 3.9243:1 | 4.6014:1 | 6.0413:1 |
-| brutalist | magenta | 83% | 3.8223:1 | 4.6262:1 | 5.9535:1 |
-| brutalist | orange | 100% | 4.8868:1 | 4.8868:1 | 8.1032:1 |
-| brutalist | amber | 100% | 6.7368:1 | 6.7368:1 | 12.2154:1 |
-| brutalist | emerald | 100% | 6.0457:1 | 6.0457:1 | 10.5471:1 |
-| brutalist | matrix | 100% | 8.4068:1 | 8.4068:1 | 15.6595:1 |
-| brutalist | cyan | 100% | 7.1425:1 | 7.1425:1 | 13.1007:1 |
-| brutalist | violet | 74% | 3.0005:1 | 4.6153:1 | 4.5675:1 |
-| brutalist | lime | 100% | 8.7833:1 | 8.7833:1 | 17.0132:1 |
-| brutalist | rose | 100% | 5.0188:1 | 5.0188:1 | 8.4028:1 |
-| swiss | crimson | 97% | 4.4975:1 | 4.6073:1 | 6.0413:1 |
-| swiss | magenta | 95% | 4.3914:1 | 4.6285:1 | 5.9535:1 |
-| swiss | orange | 100% | 5.6588:1 | 5.6588:1 | 8.1032:1 |
-| swiss | amber | 100% | 7.8669:1 | 7.8669:1 | 12.2154:1 |
-| swiss | emerald | 100% | 7.0310:1 | 7.0310:1 | 10.5471:1 |
-| swiss | matrix | 100% | 9.7964:1 | 9.7964:1 | 15.6595:1 |
-| swiss | cyan | 100% | 8.3408:1 | 8.3408:1 | 13.1007:1 |
-| swiss | violet | 82% | 3.4419:1 | 4.6340:1 | 4.5675:1 |
-| swiss | lime | 100% | 10.2880:1 | 10.2880:1 | 17.0132:1 |
-| swiss | rose | 100% | 5.8179:1 | 5.8179:1 | 8.4028:1 |
 
 Reproduce: node scripts/generate-design-system-artifact.mjs. WCAG relative luminance, sRGB alpha compositing before linearisation. Values describe token backings, not browser-measured atmosphere/ancestry; browser contrast and axe proof remains required. No claim is made that uncorrected --accent passes small-text AA.
 
@@ -96,8 +59,8 @@ plus a couple of atmosphere extras.
 | `--surface-2` | `rgba(244,243,238,0.05)` | Card hover, secondary surface. ~5–8 %. |
 | `--surface-3` | `rgba(244,243,238,0.08)` | Pressed / focused surface. ~8–12 %. |
 | `--bg-atmosphere` | `radial-gradient(…)` | Background art behind everything. |
-| `--bg-atmosphere-size` | `auto` | Optional sizing for repeating patterns (Swiss grid). |
-| `--grain-opacity` | `0.32` | Strength of the noise overlay (0 in Geist, 0.55 in Brutalist). |
+| `--bg-atmosphere-size` | `auto` | Optional sizing for repeating atmosphere patterns. |
+| `--grain-opacity` | `0.32` | Strength of the noise overlay (0 in Geist). |
 
 ## Border
 
@@ -106,8 +69,8 @@ plus a couple of atmosphere extras.
 | `--border` | `rgba(244,243,238,0.08)` | Default edge. |
 | `--border-strong` | `rgba(244,243,238,0.16)` | Hover / active edge. |
 | `--hairline` | `rgba(244,243,238,0.06)` | Sub-divider edge (between table rows). |
-| `--border-w` | `1px` | Default border width. `2px` in Brutalist. |
-| `--hairline-w` | `1px` | Sub-divider width. `0.5px` in Swiss. |
+| `--border-w` | `1px` | Default border width. `1px` in both systems. |
+| `--hairline-w` | `1px` | Sub-divider width. `1px` in both systems. |
 
 ## Text
 
@@ -129,7 +92,7 @@ plus a couple of atmosphere extras.
 | `--font-display` | `'Fraunces', Georgia, serif` | Display family — headlines. |
 | `--font-body` | `'Inter', system-ui, sans-serif` | Body family — UI + prose. |
 | `--font-mono` | `'JetBrains Mono', monospace` | Mono family — code, eyebrows, keys. |
-| `--display-weight` | `500` | Display weight. 400 (Brutalist) → 700 (Swiss). |
+| `--display-weight` | `500` | Display weight. 500 (Editorial), 600 (Geist). |
 | `--display-tracking` | `-0.02em` | Display letter-spacing (tight). |
 | `--display-leading` | `1.04` | Display line-height (tight). |
 | `--body-leading` | `1.6` | Body line-height (generous). |
@@ -140,15 +103,15 @@ plus a couple of atmosphere extras.
 
 | Token | Default | What it is |
 |-------|---------|------------|
-| `--radius` | `12px` | Default radius. 0 in Terminal/Brutalist. |
+| `--radius` | `12px` | Default radius. `10px` in Geist. |
 | `--radius-sm` | `8px` | Small radius — chips, inputs. |
-| `--radius-pill` | `999px` | Pill / circle. `0px` in Terminal/Brutalist. |
+| `--radius-pill` | `999px` | Pill / circle. |
 
 ## Shadow
 
 | Token | Default | What it is |
 |-------|---------|------------|
-| `--shadow-sm` | `0 1px 2px rgba(0,0,0,0.3)` | Resting shadow. `none` in Terminal/Swiss. |
+| `--shadow-sm` | `0 1px 2px rgba(0,0,0,0.3)` | Resting shadow. |
 | `--shadow` | `0 6px 24px -8px rgba(0,0,0,0.5)` | Hover shadow. |
 | `--shadow-lg` | `0 24px 60px -20px rgba(0,0,0,0.7)` | Modal / floating panel. |
 | `--shadow-accent` | (accent halo) | Accent glow on hover. |
@@ -192,7 +155,7 @@ No magic numbers, no hex codes outside `design-systems.js`.
 
 ## Adding a new token
 
-1. Add it to **all five systems** in `design-systems.js`. Don't add it to
+1. Add it to **both systems** in `design-systems.js`. Don't add it to
    one and let the others fall through to default — every system must
    declare every token.
 2. Reference it in `styles.css` with `var(--your-token)`.

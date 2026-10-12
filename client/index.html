@@ -261,23 +261,25 @@
 
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <!-- The ONE webfont request, copied byte-for-byte from the design source
-         (awesome-list-site-ds/index.html). Pixel parity with the design needs
+    <!-- The ONE webfont request, originally copied byte-for-byte from the
+         design source (awesome-list-site-ds/index.html). Pixel parity with the design needs
          both documents to declare the same @font-face set — same families,
          weights, styles and axes — because a different axis subset (Fraunces
          with `opsz`, Inter without 800) shapes different glyph outlines and
-         metrics. All nine families every design system names ride on this
-         single pre-paint link, so switching systems never fetches another
+         metrics. The families the two kept design systems (Editorial, Geist)
+         name, plus IBM Plex Sans for the font picker, ride on this single
+         pre-paint link, so switching systems never fetches another
          stylesheet; only picker overrides not in this set load on demand
-         (client/src/lib/font-options.ts). The accent-drift gate holds this
-         href equal to the design's. Unused families cost only CSS bytes: the
+         (client/src/lib/font-options.ts). Families only the removed systems
+         used (Instrument Serif, Space Grotesk, IBM Plex Mono, Manrope) were
+         dropped; never add families here. Unused families cost only CSS bytes: the
          font files themselves download when a face is first used.
          BUG-014: no inline onload handler (the nonce-based CSP would block it).
          X-03: the link starts as media="print" so the cross-origin request
          never blocks first paint; the nonce-stamped script beside it switches
          it to "all" once it loads. display=swap keeps FOUT control. -->
     <link rel="stylesheet" id="shell-webfonts" media="print"
-           href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Fraunces:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500;1,600&family=JetBrains+Mono:wght@400;500;600;700&family=Geist:wght@400;500;600;700&family=Instrument+Serif:ital@0;1&family=Space+Grotesk:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600;700&family=IBM+Plex+Sans:wght@400;500;600;700&family=Manrope:wght@400;500;600;700;800&display=swap" />
+           href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Fraunces:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500;1,600&family=JetBrains+Mono:wght@400;500;600;700&family=Geist:wght@400;500;600;700&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap" />
     <script>
       (function () {
         var l = document.getElementById("shell-webfonts");
@@ -286,7 +288,7 @@
         if (l.sheet) on(); else { l.addEventListener("load", on); l.addEventListener("error", on); }
       })();
     </script>
-    <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Fraunces:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500;1,600&family=JetBrains+Mono:wght@400;500;600;700&family=Geist:wght@400;500;600;700&family=Instrument+Serif:ital@0;1&family=Space+Grotesk:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600;700&family=IBM+Plex+Sans:wght@400;500;600;700&family=Manrope:wght@400;500;600;700;800&display=swap" /></noscript>
+    <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Fraunces:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500;1,600&family=JetBrains+Mono:wght@400;500;600;700&family=Geist:wght@400;500;600;700&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap" /></noscript>
 
     <!-- The design system, verbatim from the design source (never edited here;
          app CSS lives in the Vite bundle, which links after this sheet). -->
@@ -311,8 +313,18 @@
           var sys = null, acc = null;
           try { sys = localStorage.getItem(THEME_BOOT.systemKey); } catch (_) {}
           try { acc = localStorage.getItem(THEME_BOOT.accentKey); } catch (_) {}
+          // A removed system (terminal/brutalist/swiss) lands on the default
+          // pair before paint, and the stored pair is rewritten to match.
+          if (THEME_BOOT.removedSystemIds.indexOf(sys) !== -1) {
+            sys = THEME_BOOT.defaultSystem;
+            acc = THEME_BOOT.defaultAccents[sys];
+            try {
+              localStorage.setItem(THEME_BOOT.systemKey, sys);
+              localStorage.setItem(THEME_BOOT.accentKey, acc);
+            } catch (_) {}
+          }
+          if (THEME_BOOT.systemIds.indexOf(sys) === -1) sys = THEME_BOOT.defaultSystem;
           if (!window.DESIGN_SYSTEMS) {
-            if (THEME_BOOT.systemIds.indexOf(sys) === -1) sys = THEME_BOOT.defaultSystem;
             if (THEME_BOOT.accentIds.indexOf(acc) === -1) acc = THEME_BOOT.defaultAccents[sys];
             root.setAttribute('data-system', sys);
             root.setAttribute('data-accent', acc);

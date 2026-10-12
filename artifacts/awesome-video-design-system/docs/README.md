@@ -1,12 +1,8 @@
----
-source: awesome-list-site-ds/docs/README.md
-sha256: 995c700e5cd839a01627b7a4442f8ae3a98164b9c7fce52cca1e5eddd07ea7ca
----
 # Awesome.Video Design System
 
-> A token-based, multi-personality dark design system. Five distinct visual
-> languages share one component contract — switch them with a single
-> attribute.
+> A token-based, two-personality dark design system. Editorial (the
+> default, Crimson red) and Geist (neutral black) share one component
+> contract — switch them with a single attribute.
 
 This folder is the **portable spec** of the design system. The HTML docs at
 `/docs.html` are nice, but these `.md` files are what you copy into a new
@@ -25,7 +21,7 @@ Every page is self-contained and small enough to be read in one sitting.
 
 ### Start here
 1. **[Overview](./01-overview.md)** — what this is, what it solves, what's inside.
-2. **[Principles](./02-principles.md)** — six rules that hold five personalities together.
+2. **[Principles](./02-principles.md)** — six rules that hold both personalities together.
 3. **[Getting started](./03-getting-started.md)** — the 3-step install for any HTML page.
 
 ### Foundations
@@ -53,24 +49,21 @@ Every page is self-contained and small enough to be read in one sitting.
 
 ---
 
-## The five systems
+## The two systems
 
 | System    | Personality                          | Display font       | Body font       | Edge   | Shadow grammar    |
 |-----------|--------------------------------------|--------------------|-----------------|--------|-------------------|
 | Editorial | Refined magazine, italic accents     | Fraunces italic    | Inter           | 12px   | soft falloff      |
-| Terminal  | Mono CRT, ASCII rules                | IBM Plex Mono      | IBM Plex Mono   | 0px    | accent glow only  |
 | Geist     | Vercel-clean, quiet hover            | Geist Sans         | Geist Sans      | 10px   | subtle box ring   |
-| Brutalist | Slab serif, hard offset              | Instrument Serif   | Space Grotesk   | 0px    | `4px 4px 0 0`     |
-| Swiss     | Hairline grid, tabular numerals      | Manrope            | Manrope         | 4px    | none              |
 
-All five share:
+Both share:
 - Flat **#000000** background.
 - A 4-tier ink ramp (`--text`, `--text-2/3/4`).
 - The same 10 accent palette.
 - The same component class names (`.btn`, `.card`, `.chip`, …).
 
 Switching systems means swapping `data-system="editorial"` for
-`data-system="terminal"` on `<html>`. CSS variables update; component skins
+`data-system="geist"` on `<html>`. CSS variables update; component skins
 react via attribute selectors.
 
 ---
@@ -81,7 +74,7 @@ Everything ships as four files. Drop them into any codebase.
 
 ```
 styles.css           Tokens, components, per-system skins.    ~22 KB
-design-systems.jsx   The 5 system definitions + applier.       ~14 KB
+design-systems.jsx   The 2 system definitions + applier.       ~14 KB
 docs.html            (optional) the docs UI for your team.
 README.md            (this folder) the portable spec.
 ```
@@ -121,8 +114,8 @@ etc. now inherits the system. See **[03-getting-started](./03-getting-started.md
 ## License & attribution
 
 The design system is original work by the Awesome.Video team. Fonts are
-loaded from Google Fonts (Fraunces, Inter, Geist, Instrument Serif, Space
-Grotesk, IBM Plex Mono, Manrope, JetBrains Mono) under the OFL.
+loaded from Google Fonts (Fraunces, Inter, Geist, JetBrains Mono) under the
+OFL.
 ---
 
 ## Live artifact docs

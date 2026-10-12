@@ -198,7 +198,7 @@ export default function ThemeSettings() {
         </div>
       </div>
 
-      {/* System Picker — 5 cards */}
+      {/* System Picker — one card per kept system */}
       {/* R5-027 (run24): pickers are pure interactive chrome — their option
           cards are buttons (hidden in print), which left orphan headings. */}
       <section aria-label="Design system picker" data-testid="system-picker" className="no-print">
@@ -208,7 +208,7 @@ export default function ThemeSettings() {
         <div
           role="radiogroup"
           aria-label="Design system"
-          className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3"
+          className="grid grid-cols-1 sm:grid-cols-2 gap-3"
         >
           {Object.entries(systems).map(([id, sys]) => {
             const isActive = id === systemId;
@@ -284,7 +284,7 @@ export default function ThemeSettings() {
         </p>
       </section>
 
-      {/* I1 — Font override picker (hybrid: keeps 5×10 picker above, adds per-system font override) */}
+      {/* I1 — Font override picker (hybrid: keeps the system × accent picker above, adds per-system font override) */}
       <section aria-label="Font override picker" data-testid="font-picker" className="no-print">
         <div className="flex items-center gap-2 mb-2">
           <h2 className="display-h theme-section__title">Font</h2>

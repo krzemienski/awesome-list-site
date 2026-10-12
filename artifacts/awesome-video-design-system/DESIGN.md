@@ -28,7 +28,7 @@ parity; captures of the main application's `/design-system` cannot.
 | `tokens.json` | Generated machine-readable projection for Replit and tooling |
 | `src/index.css` | Imports the shipping runtime stylesheet directly |
 | `src/App.tsx` | Living reference that imports the shipping runtime registry directly |
-| `client/src/styles/design-system.css` | Canonical CSS tokens, component classes, accents, and five personality skins |
+| `client/src/styles/design-system.css` | Canonical CSS tokens, component classes, accents, and the two personality skins |
 | `client/src/lib/design-system.ts` | Canonical runtime metadata, defaults, applier, and product profiles |
 | `shared/styles/product-profiles.css` | Canonical cross-product density and motion roles |
 | `docs/DESIGN-SYSTEM.md` | Full rationale and token catalog |
@@ -46,7 +46,8 @@ The artifact refuses to start or build when this projection is stale.
 
 - Dark-only; do not invent light tokens.
 - Default expression: **Editorial + Crimson**.
-- Personalities: Editorial, Terminal, Geist, Brutalist, Swiss.
+- Personalities: Editorial (default) and Geist. The kept list is `THEME_SYSTEM_VALUES`
+  in `shared/onboarding-values.ts`.
 - Accents: Crimson, Magenta, Orange, Amber, Emerald, Matrix, Cyan, Violet, Lime, Rose.
 - Brand identity remains Editorial + Crimson. Other personalities are product themes,
   not alternate brands.
@@ -64,7 +65,7 @@ fork foundational values, accessible behavior, status semantics, or motion prefe
 The frozen design source (`awesome-list-site-ds/styles.css` for the bare `:root`,
 `design-systems.jsx` for per-system overrides, accents and default accents) is the
 authority for every painted token. `npm run validate:canonical-token-parity` resolves the
-effective cascade for each of the five systems and compares it, plus the ten accent pairs
+effective cascade for each of the two systems and compares it, plus the ten accent pairs
 and the registry defaults, against the design (165 shared values, zero drift allowed). It
 also checks the shell geometry tokens below against the numbers the design hard-codes and
 holds the canonical utility rules (`.page`, `.grain`, `.card…`, `.chip…`, `.dot…`,
@@ -81,7 +82,7 @@ every run.
 Two deviations are deliberate and self-expiring (each carries a reason and a machine check
 in the gate's `DOCUMENTED_DEVIATIONS`; see `docs/parity/assumptions/tokens.md`):
 
-- `--text-3` keeps `0.52` alpha in all five systems (design: `0.36`–`0.4`). The design
+- `--text-3` keeps `0.52` alpha in both systems (design: `0.36`–`0.4`). The design
   documents 4.6:1 AA contrast for this role, but its literal alpha resolves to ~3.4:1; the
   runtime value is the one that delivers the documented contract.
 - `.kbd` renders at `12px` (design: `10.5px`) — the 12px microtext legibility floor the
@@ -107,8 +108,8 @@ Saved user theme choices always win over first-visit profile defaults.
 3. Keep all targets at least 44×44 CSS pixels and preserve visible focus.
 4. Never convey state with color alone.
 5. Respect `prefers-reduced-motion`.
-6. Verify all five personalities and the default Editorial + Crimson expression.
-7. New products compose approved patterns; they do not create a sixth foundation.
+6. Verify both personalities and the default Editorial + Crimson expression.
+7. New products compose approved patterns; they do not create a third foundation.
 
 See `docs/AGENTS.md` for the enforceable contract and
 `.agents/skills/verify-design-system/SKILL.md` for the compliance gate.

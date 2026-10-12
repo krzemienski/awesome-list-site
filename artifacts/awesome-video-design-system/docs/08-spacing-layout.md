@@ -1,7 +1,3 @@
----
-source: awesome-list-site-ds/docs/08-spacing-layout.md
-sha256: 637b852813c4565d534d4b844d8a3729c1f61372f883e6a989d44f72311edada
----
 # 08 · Spacing & layout
 
 > 4px base scale. 1240px max width. Centered content with hairline rules.
@@ -92,8 +88,7 @@ For complex dashboards, use a 12-column grid with **24px gutters**:
 .col-span-8 { grid-column: span 8; }
 ```
 
-Swiss treats the grid as a **visible** substrate (32px hairline lines in
-the page background). Other systems treat it as invisible scaffolding.
+Both systems treat the grid as invisible scaffolding.
 
 ## The list-pattern grid
 

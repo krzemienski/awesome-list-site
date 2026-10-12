@@ -1,29 +1,24 @@
----
-source: awesome-list-site-ds/docs/02-principles.md
-sha256: d25feef86fb7ca5d184eaeabd6f5cb32ffc553e7b693329109bf00b6378d7b13
----
 # 02 · Principles
 
-> Six rules that make five different systems feel like one product.
+> Six rules that make two different systems feel like one product.
 
 ## 01 · Commit to the personality
 
-A system fails when it hedges. Editorial is *genuinely* soft. Brutalist
-*genuinely* yells. Don't average them.
+A system fails when it hedges. Editorial is *genuinely* soft and warm.
+Geist is *genuinely* quiet and neutral. Don't average them.
 
-When you add a system, push it further than feels comfortable. If
-Brutalist's shadow is `4px 4px`, try `6px 6px`. If Swiss's borders are
-`1px`, push them to `0.5px`. Restraint is itself a personality; halfway is
-not.
+When you tune a system, push it further than feels comfortable. Editorial's
+italic display accents should read as editorial; Geist's restraint should
+read as deliberate. Restraint is itself a personality; halfway is not.
 
 > **RULE:** If two systems feel similar in a side-by-side preview, one of
 > them isn't trying hard enough.
 
 ## 02 · Black is the canvas, not a color
 
-All five systems use flat `#000000` for `--bg`. Surfaces are *alpha
+Both systems use flat `#000000` for `--bg`. Surfaces are *alpha
 overlays* on top of that black, so the page **atmosphere** (radial gradient,
-scanline, grid lines) shines through.
+grain) shines through.
 
 ```css
 /* ✅ correct */
@@ -85,8 +80,8 @@ Hardcoded hex values and px numbers belong in **only two places**:
 
 1. `design-systems.js` — token definitions per system.
 2. `styles.css`, inside a `[data-system="…"]` selector — for things that
-   genuinely can't be a token (e.g. `box-shadow: 4px 4px 0 0 var(--text)`
-   only makes sense in Brutalist).
+   genuinely can't be a token (e.g. the italic accent color on
+   `.display-h em` only makes sense in Editorial).
 
 Everywhere else, you reach a token first.
 

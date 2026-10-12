@@ -11,6 +11,7 @@ import {
   isSystemId,
   readAppliedTheme,
   resolveAccentId,
+  resolveStoredTheme,
   resolveSystemId,
   selectSystem,
   setAccent as persistAccent,
@@ -106,9 +107,11 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
       syncTimer = window.setTimeout(() => {
         // Coalesce the two native events from a paired system/accent change,
         // then resolve both values from the writer's completed storage state.
-        const nextSystem = resolveSystemId(safeGetItem(THEME_BOOT_DATA.systemKey));
-        const nextAccent = resolveAccentId(safeGetItem(THEME_BOOT_DATA.accentKey), nextSystem);
-        window.applyDesignSystem?.(nextSystem, nextAccent);
+        const next = resolveStoredTheme(
+          safeGetItem(THEME_BOOT_DATA.systemKey),
+          safeGetItem(THEME_BOOT_DATA.accentKey),
+        );
+        window.applyDesignSystem?.(next.system, next.accent);
         syncTimer = null;
       }, 0);
     };

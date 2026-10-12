@@ -1,7 +1,3 @@
----
-source: awesome-list-site-ds/docs/12-integration-html.md
-sha256: e9979c4781fda6b85a0539ec03b1c8d405d92e7ce717c1e05509385e7e0476a9
----
 # 12 · Integration: plain HTML
 
 > Adding the system to a static / server-rendered / no-framework site.
@@ -76,7 +72,7 @@ Copy these into your project root (or an `/assets` folder):
 ```
 
 That's a fully-themed page. Open it in a browser, change `'editorial'` to
-`'terminal'`, refresh — the entire page transforms.
+`'geist'`, refresh — the entire page transforms.
 
 ## Multi-page sites
 
@@ -154,10 +150,7 @@ For when you want users to pick:
   z-index: 50;
 ">
   <button class="btn ghost" data-sys="editorial">Editorial</button>
-  <button class="btn ghost" data-sys="terminal">Terminal</button>
   <button class="btn ghost" data-sys="geist">Geist</button>
-  <button class="btn ghost" data-sys="brutalist">Brutalist</button>
-  <button class="btn ghost" data-sys="swiss">Swiss</button>
 </div>
 
 <script>
@@ -180,7 +173,7 @@ If you know which system to ship (no per-user choice), you can render the
 attribute on the server and skip the inline script:
 
 ```html
-<html lang="en" data-system="brutalist" data-accent="amber">
+<html lang="en" data-system="geist" data-accent="cyan">
 ```
 
 Then in your `<head>`, only load `styles.css` — the attribute selectors
@@ -189,26 +182,26 @@ writes them to `:root`. You have two options:
 
 ### Option A: precompile the tokens
 
-Bake the chosen system's tokens directly into a `theme-brutalist.css`:
+Bake the chosen system's tokens directly into a `theme-geist.css`:
 
 ```css
 :root {
   --bg: #000000;
-  --surface: rgba(255,255,255,0.025);
-  --text: #f5f5f0;
-  --font-display: "Instrument Serif", serif;
-  --radius: 0px;
-  --border-w: 2px;
+  --surface: rgba(255,255,255,0.04);
+  --text: #fafafa;
+  --font-display: "Geist", "Inter", system-ui, sans-serif;
+  --radius: 10px;
+  --border-w: 1px;
   /* ...etc, all 30 tokens */
-  --accent: #ffb84d;
-  --accent-2: #ffd86b;
+  --accent: #5eddf2;
+  --accent-2: #7dd3fc;
 }
 ```
 
 Then in HTML:
 
 ```html
-<link rel="stylesheet" href="/theme-brutalist.css">
+<link rel="stylesheet" href="/theme-geist.css">
 <link rel="stylesheet" href="/styles.css">
 ```
 

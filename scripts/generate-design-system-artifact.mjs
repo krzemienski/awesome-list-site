@@ -4,10 +4,6 @@ import { fileURLToPath } from "node:url";
 import vm from "node:vm";
 import ts from "typescript";
 import { accentContrastTable } from "./design-system/accent-contrast.mjs";
-import {
-  checkArtifactDocs,
-  generateArtifactDocs,
-} from "./design-system/artifact-docs.mjs";
 
 const projectRoot = path.resolve(
   path.dirname(fileURLToPath(import.meta.url)),
@@ -55,11 +51,23 @@ export function readCanonicalRegistry(rootDir = projectRoot, relativePath = regi
   return { source, ...evaluateCanonicalRegistry(source, relativePath) };
 }
 
-export function readThemeBootData(source = fs.readFileSync(fromRoot(runtimePath), "utf8")) {
+// design-system.ts imports the kept-systems list from shared/; evaluate
+// those relative TS imports the same way (transpile + vm), resolved from the
+// runtime wrapper's directory.
+function evaluateTsModule(source, fileDir) {
   const output = ts.transpileModule(source, { compilerOptions: { module: ts.ModuleKind.CommonJS } }).outputText;
-  const exports = {};
-  vm.runInNewContext(output, { exports });
-  return exports.THEME_BOOT_DATA;
+  const module = { exports: {} };
+  const require = (specifier) => {
+    if (!specifier.startsWith(".")) throw new Error(`readThemeBootData: unsupported import ${specifier}`);
+    const target = path.resolve(fileDir, specifier.endsWith(".ts") ? specifier : `${specifier}.ts`);
+    return evaluateTsModule(fs.readFileSync(target, "utf8"), path.dirname(target));
+  };
+  vm.runInNewContext(output, { module, exports: module.exports, require });
+  return module.exports;
+}
+
+export function readThemeBootData(source = fs.readFileSync(fromRoot(runtimePath), "utf8")) {
+  return evaluateTsModule(source, path.dirname(fromRoot(runtimePath))).THEME_BOOT_DATA;
 }
 
 // Execute the actual inline boot, not an assumed patch: removing the patch in
@@ -142,24 +150,6 @@ if (isMain) main();
 
 function main() {
   const checkOnly = process.argv.includes("--check");
-  const docsOnly = process.argv.includes("--docs");
-
-  // Docs are a source-preserving projection and intentionally have an isolated
-  // mode so generation never needs to parse the token registry first.
-  if (docsOnly) {
-    if (checkOnly) {
-      const result = checkArtifactDocs({ rootDir: projectRoot });
-      console.log(
-        `Design-system artifact docs: up to date (${result.chapters} chapters, ${result.checked} files)`,
-      );
-    } else {
-      const result = generateArtifactDocs({ rootDir: projectRoot });
-      console.log(
-        `Generated ${result.outputRoot} (${result.chapters} chapters, ${result.generated} files)`,
-      );
-    }
-    process.exit(0);
-  }
 
   const css = fs.readFileSync(fromRoot(cssPath), "utf8");
   const bridgeCss = fs.readFileSync(fromRoot(bridgePath), "utf8");
@@ -466,20 +456,9 @@ function main() {
     ? fs.readFileSync(fromRoot(outputPath), "utf8")
     : "";
 
-  // Keep docs drift checks on the ordinary generator path too. This must run
-  // before the token-current early exit or an up-to-date token projection would
-  // silently skip docs generation/checking.
-  if (checkOnly) {
-    const result = checkArtifactDocs({ rootDir: projectRoot });
-    console.log(
-      `Design-system artifact docs: up to date (${result.chapters} chapters, ${result.checked} files)`,
-    );
-  } else {
-    const result = generateArtifactDocs({ rootDir: projectRoot });
-    console.log(
-      `Generated ${result.outputRoot} (${result.chapters} chapters, ${result.generated} files)`,
-    );
-  }
+  // The artifact docs (artifacts/awesome-video-design-system/docs) are
+  // hand-owned since the site kept only Editorial and Geist: the frozen
+  // handoff docs still describe five systems, so they are no longer projected.
 
   if (current === next) {
     console.log("Design-system artifact tokens: up to date");

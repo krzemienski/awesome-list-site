@@ -19,7 +19,7 @@ A production-ready React application for browsing and discovering 2,200+ curated
 - **Learning Journeys**: Guided learning paths for skill development
 - **Bookmarks & Favorites**: Save resources for later
 - **Mobile-Optimized**: Responsive design with WCAG AAA touch targets
-- **Theme Switcher**: 5 design systems (Editorial, Terminal, Geist, Brutalist, Swiss) × 10 accent colors at `/settings/theme`
+- **Theme Switcher**: 2 design systems (Editorial — the default — and Geist) × 10 accent colors at `/settings/theme`
 
 ### For Administrators
 - **Resource Curation**: Approve/reject submissions, edit resources

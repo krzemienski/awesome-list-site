@@ -99,7 +99,7 @@ export function CanonicalDocs() {
       <div className="docs-meta"><span>{meta?.group}</span><span style={{ color: "var(--text-3)" }}>/</span><span style={{ color: "var(--text-2)" }}>{meta?.title}</span></div>
       {["tokens", "color", "a11y"].includes(active) && <section className="card" style={{ padding: 24, marginBottom: 32 }}>
         <h2>Live app-runtime accessibility addendum</h2>
-        <p>The chapter below is historical upstream documentation. Its 38–42% ink and ~6:1 Violet claims are not runtime guidance. Decorative accent is unchanged; small text uses --accent-ink (the exact accent where it passes, otherwise the minimal per-pair white mix shown below), filled buttons use black --on-accent, and Terminal stays outlined.</p>
+        <p>The chapter below is historical upstream documentation. Its 38–42% ink and ~6:1 Violet claims are not runtime guidance. Decorative accent is unchanged; small text uses --accent-ink (the exact accent where it passes, otherwise the minimal per-pair white mix shown below), and filled buttons use black --on-accent.</p>
         <p>Computed sRGB alpha contrast across both bases, all raised surfaces and 8%/14% tints. Actual painted ancestry and atmosphere still require browser measurement.</p>
         <div role="region" aria-label="Runtime contrast table" tabIndex={0} style={{ overflowX: "auto" }}>
           <table><thead><tr><th>System</th><th>Live text-3</th><th>Accent</th><th>Ink share</th><th>Upstream accent minimum</th><th>Minimum accent ink contrast</th></tr></thead>

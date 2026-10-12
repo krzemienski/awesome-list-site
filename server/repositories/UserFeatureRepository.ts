@@ -38,6 +38,11 @@ import {
   type UserRecommendationFeedback,
 } from "@shared/schema";
 import type { RecommendationFeedbackValue } from "@shared/recommendations";
+import {
+  DEFAULT_THEME_ACCENT,
+  DEFAULT_THEME_SYSTEM,
+  isThemeSystemId,
+} from "@shared/onboarding-values";
 import type {
   LearningFormat,
   LearningGoal,
@@ -338,11 +343,26 @@ export class UserFeatureRepository {
    * @returns UserPreferences record or undefined if not found
    */
   async getUserPreferences(userId: string): Promise<UserPreferences | undefined> {
-    const [prefs] = await db
+    let [prefs] = await db
       .select()
       .from(userPreferences)
       .where(eq(userPreferences.userId, userId));
     if (!prefs) return undefined;
+    // A saved system that is no longer offered (terminal/brutalist/swiss)
+    // is rewritten to the default pair on read, so every client converges.
+    if (prefs.themeSystem !== null && !isThemeSystemId(prefs.themeSystem)) {
+      const [rewritten] = await db
+        .update(userPreferences)
+        .set({
+          themeSystem: DEFAULT_THEME_SYSTEM,
+          themeAccent: DEFAULT_THEME_ACCENT,
+          revision: sql`${userPreferences.revision} + 1`,
+          updatedAt: new Date(),
+        })
+        .where(eq(userPreferences.id, prefs.id))
+        .returning();
+      prefs = rewritten ?? { ...prefs, themeSystem: DEFAULT_THEME_SYSTEM, themeAccent: DEFAULT_THEME_ACCENT };
+    }
     const learningGoals = normalizeLearningGoals(prefs.learningGoals);
     const preferredResourceTypes = normalizeLearningFormats(
       prefs.preferredResourceTypes,

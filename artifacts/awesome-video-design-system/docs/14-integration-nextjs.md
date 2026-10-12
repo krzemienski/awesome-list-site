@@ -1,7 +1,3 @@
----
-source: awesome-list-site-ds/docs/14-integration-nextjs.md
-sha256: 48a26566d786bc566fb808b016a61652ee542c0ded22ad81a2810d2f888697c7
----
 # 14 · Integration: Next.js
 
 > App Router, server components, and zero-flash theming.
@@ -89,10 +85,7 @@ export function PreApplyScript() {
 (function(){
   var SYS_DEFAULT = {
     editorial:'crimson',
-    terminal:'matrix',
-    geist:'cyan',
-    brutalist:'amber',
-    swiss:'orange'
+    geist:'cyan'
   };
   try {
     var sys = localStorage.getItem('ds-system') || 'editorial';
@@ -125,10 +118,7 @@ attribute:
   --font-display: 'Fraunces', Georgia, serif;
   /* ...all 30 tokens... */
 }
-[data-system="terminal"] { /* ... */ }
 [data-system="geist"]    { /* ... */ }
-[data-system="brutalist"]{ /* ... */ }
-[data-system="swiss"]    { /* ... */ }
 
 [data-accent="crimson"]  { --accent: #ff3d52; --accent-2: #b84dff; }
 [data-accent="matrix"]   { --accent: #00ff88; --accent-2: #39ff14; }
@@ -167,7 +157,7 @@ Run as a `prebuild` hook in `package.json`:
 }
 ```
 
-Now setting `data-system="terminal"` in the inline script is enough — the
+Now setting `data-system="geist"` in the inline script is enough — the
 tokens cascade via the attribute selector. **Zero flash, zero JS for
 theming.**
 
@@ -278,7 +268,7 @@ the attribute on `<html>`:
 // app/embed/layout.tsx
 export default function EmbedLayout({ children }: { children: ReactNode }) {
   return (
-    <html lang="en" data-system="terminal" data-accent="matrix">
+    <html lang="en" data-system="geist" data-accent="cyan">
       <body>{children}</body>
     </html>
   );

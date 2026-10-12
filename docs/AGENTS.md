@@ -48,10 +48,10 @@ with a reason or the audit will flag it.
 - **shadcn primitives first** (`@/components/ui/*` — see
   [`docs/COMPONENT-LIBRARY.md`](COMPONENT-LIBRARY.md)). They are pre-bridged: `Button`
   emits `data-ds-variant` and renders `.btn`, every `Badge` variant renders `.chip`, so
-  per-system skins (terminal brackets, brutalist slabs, swiss hairlines) apply for
+  per-system skins (Editorial accent eyebrows, Geist sentence-case chips) apply for
   free. Do **not** hand-roll buttons, dialogs, dropdowns, or tabs.
 - **Interactive cards** pass `hoverable` to `Card` (renders `.card.hoverable`) so hover
-  behavior follows the active system (lift / glow / slab / color-only).
+  behavior follows the active system (Editorial lift / Geist ring glow).
 - **Page-title `h1`s use `.display-h`** — never `font-sans` or `font-medium` on them
   (breaks per-system display faces/weights). `<em>` inside display copy is the
   approved accent-emphasis device.
@@ -79,13 +79,14 @@ with a reason or the audit will flag it.
   respect `prefers-reduced-motion` (the global collapse handles CSS; gate JS-driven
   animation yourself).
 
-## 4. Survive all five systems
+
+## 4. Survive both systems
 
 Any new surface must remain correct under every `data-system`:
 
-- No assumptions about radius (`0px` in Terminal/Brutalist), border width (`2px`
-  Brutalist, `0.5px` Swiss), shadows (none in Swiss), or body face (mono in
-  Terminal).
+- No assumptions about radius (`12px` Editorial, `10px` Geist), display face
+  (Fraunces vs Geist Sans), shadows (soft falloff vs ring glow), or chip casing
+  (mono caps vs sentence case).
 - Don't fight the skins: no `rounded-full`-style hardcoding on chips (use
   `--radius-pill` / the `chip` Badge variant), no overriding button casing.
 - Sanity-check by cycling systems at `/settings/theme` or `/design-system`. Formal

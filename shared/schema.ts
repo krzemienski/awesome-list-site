@@ -1232,7 +1232,7 @@ export const userPreferences = pgTable(
     check("user_preferences_onboarding_status_check", sql`${table.onboardingStatus} IN ('not_started','in_progress','completed','dismissed')`),
     check("user_preferences_onboarding_step_check", sql`${table.onboardingStep} BETWEEN 1 AND 5`),
     check("user_preferences_revision_check", sql`${table.revision} >= 1`),
-    check("user_preferences_theme_system_check", sql`${table.themeSystem} IS NULL OR ${table.themeSystem} IN ('editorial','terminal','geist','brutalist','swiss')`),
+    check("user_preferences_theme_system_check", sql`${table.themeSystem} IS NULL OR ${table.themeSystem} IN ('editorial','geist')`),
     check("user_preferences_theme_accent_check", sql`${table.themeAccent} IS NULL OR ${table.themeAccent} IN ('crimson','magenta','orange','amber','emerald','matrix','cyan','violet','lime','rose')`),
     check("user_preferences_learning_goals_values_check", sql`${table.learningGoals} <@ '["learn-fundamentals","build-video-apps","improve-streaming","optimize-encoding","operate-infrastructure","keep-current"]'::jsonb`),
     check("user_preferences_resource_types_values_check", sql`${table.preferredResourceTypes} <@ '["video","course","article","book","specification","tool","library","community"]'::jsonb`),

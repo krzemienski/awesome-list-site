@@ -1,10 +1,6 @@
----
-source: awesome-list-site-ds/docs/01-overview.md
-sha256: 7434b385729ad6e1a8592161ae6bb8b0a0898bc8c58fad6152c4fc4ccee2582a
----
 # 01 · Overview
 
-> Five distinct dark design systems behind one component contract. Switch
+> Two distinct dark design systems behind one component contract. Switch
 > personalities with a single HTML attribute.
 
 ## What this is
@@ -13,18 +9,16 @@ A token-driven, opinion-heavy design system for content directories and
 reference tools — built originally for **awesome.video**, a curated index of
 ~2,000 video resources.
 
-It ships with **five** complete visual languages:
+It ships with **two** complete visual languages:
 
 | ID | Name | One-line |
 |----|------|----------|
 | `editorial` | Editorial | Refined magazine. Italic Fraunces accents on Inter body. Soft, generous, warm ink. |
-| `terminal`  | Terminal  | Pure mono. Square edges. ASCII rules and brackets. Scanline overlay. |
 | `geist`     | Geist     | Vercel-clean. Geist Sans, neutral grays, soft 10px radii, quiet hover glow. |
-| `brutalist` | Brutalist | Slab. Instrument Serif headlines. Hard 2px borders. `4px 4px 0 0` offset shadow. |
-| `swiss`     | Swiss     | Tight grid. Manrope, hairline 0.5px borders, tabular numerals, no shadow. |
 
-Each system is more than a recolor: it changes edges, type stacks, surface
-treatments, shadow grammars, and component skins.
+Editorial is the default (with the Crimson red accent); Geist is the neutral
+black alternative. Each system is more than a recolor: it changes edges, type
+stacks, surface treatments, shadow grammars, and component skins.
 
 ## What it isn't
 
@@ -43,18 +37,18 @@ dashboard) where:
 - You want **dense, scannable** layouts (tables, lists of resources).
 - You want **one place to change** the entire feel without touching pages.
 
-Most design systems give you one polite voice. This one gives you five
+Most design systems give you one polite voice. This one gives you two
 distinct voices and lets the user (or you) pick on demand.
 
 ## What's inside
 
-- ~36 design tokens per system (~180 total), all exposed as CSS variables.
+- ~36 design tokens per system (~72 total), all exposed as CSS variables.
 - 10 accent colors with smart per-system defaults.
 - Component CSS for `.btn`, `.card`, `.chip`, `.input`, `.select`, `.textarea`,
   `.tabs`, `.table`, `.kbd`, `.eyebrow`, `.dot`, `.live-dot`,
   `.shimmer-line`, `.sidebar`, `.accordion-*`, `.mobile-drawer`, `.modal`.
 - Per-system attribute selectors that reshape components beyond what tokens
-  can express (square corners, brackets on chips, offset shadows).
+  can express (italic display accents, quiet sentence-case chips, hover rings).
 - A flow-diagram grammar (nodes / decisions / arrows / lanes) that adapts to
   the active system.
 
@@ -71,14 +65,14 @@ distinct voices and lets the user (or you) pick on demand.
   <span class="chip accent">live</span>
 
   <script src="design-systems.js"></script>
-  <script>applyDesignSystem('brutalist', 'amber');</script>
+  <script>applyDesignSystem('geist', 'cyan');</script>
 </body>
 </html>
 ```
 
-That button is now a hard 2px-bordered Space Grotesk slab with `4px 4px 0 0`
-amber offset shadow. Change `'brutalist'` to `'editorial'` and you get a soft
-12px-radius Inter button with crimson accent glow on hover. Same HTML.
+That button is now a Geist Sans button with soft 10px radii and a cyan fill.
+Change `'geist'` to `'editorial'` (and the accent to `'crimson'`) and you get
+a soft 12px-radius Inter button with crimson accent glow on hover. Same HTML.
 
 ## Pre-reqs
 

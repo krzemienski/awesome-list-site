@@ -1,7 +1,7 @@
 import type { Config } from "tailwindcss";
 
 /*
- * Dark-mode class collapsed (CC-10): Terminal is dark-only.
+ * Dark-mode class collapsed (CC-10): the site is dark-only.
  * `xs` breakpoint set to 375 px (CC-13): aligned with Phase-2 mobile viewport.
  * Color keys aliased to DS tokens — see `client/src/styles/design-system.css`
  * and the `@theme inline` block in `client/src/index.css`. Legacy shadcn

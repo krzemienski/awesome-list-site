@@ -63,8 +63,8 @@ export const FONT_BOOT_DATA = {
 // Sans, JetBrains Mono) keep an entry so the picker contract stays uniform;
 // their weights mirror the shell's so the two declarations agree. The
 // per-system faces need no map at all: the shell <link> in client/index.html
-// fetches every family the five systems name (see the header above), so
-// switching systems is attribute-only.
+// fetches every family the two kept systems (Editorial, Geist) name (see the
+// header above), so switching systems is attribute-only.
 const FONT_STYLESHEETS: Record<string, string> = {
   inter: "https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap",
   "dm-sans": "https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&display=swap",

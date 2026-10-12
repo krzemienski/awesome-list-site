@@ -17,7 +17,7 @@ import "@/styles/pages/system.css";
 
 /**
  * Design-system showcase (Task #346) — the living anatomy of the runtime
- * 5-system × 10-accent design system. Everything on this page reads the SAME
+ * 2-system × 10-accent design system (Editorial, Geist). Everything on this page reads the SAME
  * CSS custom properties the app itself consumes (via the shadcn↔DS bridge in
  * client/src/index.css), so the page can never drift from the code: resolved
  * token values are read live from getComputedStyle after every switch.
@@ -84,7 +84,7 @@ const TOKEN_GROUPS: { group: string; note: string; tokens: { name: string; kind:
   },
   {
     group: "Radius ladder",
-    note: "radius > radius-sm > radius-xs; pill for chips. Terminal/Brutalist collapse to 0.",
+    note: "radius > radius-sm > radius-xs; pill for chips.",
     tokens: [
       { name: "--radius", kind: "text" },
       { name: "--radius-sm", kind: "text" },
@@ -94,7 +94,7 @@ const TOKEN_GROUPS: { group: string; note: string; tokens: { name: string; kind:
   },
   {
     group: "Shadow ladder",
-    note: "Per-system personality: Editorial soft falloff, Terminal glow, Geist ring, Brutalist hard offset, Swiss none.",
+    note: "Per-system personality: Editorial soft falloff, Geist ring.",
     tokens: [
       { name: "--shadow-sm", kind: "text" },
       { name: "--shadow", kind: "text" },
@@ -130,24 +130,9 @@ const SKIN_NOTES: Record<string, string[]> = {
     "Eyebrows are accent-colored and bold.",
     "Cards lift on hover (translateY −2px) with a soft shadow.",
   ],
-  terminal: [
-    "Everything squares off — border-radius forced to 0.",
-    "Chips/badges gain [brackets] and uppercase; eyebrows gain a '> ' prompt.",
-    "Primary buttons become accent-outlined with a text glow; cards glow on hover instead of lifting.",
-  ],
   geist: [
     "Chips drop the mono uppercase treatment for quiet sentence-case body face.",
     "Cards get a ring + large soft shadow on hover; buttons at weight 500.",
-  ],
-  brutalist: [
-    "Radius 0 everywhere; borders jump to 2px in the ink color.",
-    "Buttons go uppercase/tracked; hover translates −2px,−2px with a hard 4px offset shadow.",
-    "Cards hover with a 6px offset slab shadow.",
-  ],
-  swiss: [
-    "Hairline discipline — 0.5px borders on cards, buttons, and inputs.",
-    "No transforms or shadows on hover; state changes are color-only.",
-    "Eyebrows demote to --text-3 mono at weight 500.",
   ],
 };
 
@@ -190,7 +175,7 @@ export default function DesignSystemShowcase() {
     <div className="system-showcase space-y-12">
       <SEOHead
         title="Design System"
-        description="The Awesome Video design system — 5 systems × 10 accents, live tokens, type scale, and core components."
+        description="The Awesome Video design system — 2 systems × 10 accents, live tokens, type scale, and core components."
         noindex
       />
 
@@ -209,7 +194,7 @@ export default function DesignSystemShowcase() {
           <h1 className="page-title text-3xl" data-testid="text-ds-title">Design System</h1>
         </div>
         <p className="text-sm sm:text-base text-[color:var(--text-2)] mt-2 max-w-3xl">
-          The living anatomy of the runtime design system: five visual languages × ten accents
+          The living anatomy of the runtime design system: two visual languages × ten accents
           sharing one component contract. Every value below is read live from the active
           stylesheet — switch a system or accent and watch the whole catalog re-derive.{" "}
           <span className="text-[color:var(--text-3)]" data-testid="text-ds-active">
@@ -223,7 +208,7 @@ export default function DesignSystemShowcase() {
         <div className="flex items-center gap-2">
           <Layers className="h-5 w-5 text-[var(--accent-ink)]" />
           <h2 className={SECTION_HEADING}>Systems</h2>
-          <span className="text-xs text-[color:var(--text-3)]">5 personalities, one contract</span>
+          <span className="text-xs text-[color:var(--text-3)]">2 personalities, one contract</span>
         </div>
         <div className="flex flex-wrap gap-2">
           {Object.entries(systems).map(([id, sys]) => {
@@ -310,7 +295,7 @@ export default function DesignSystemShowcase() {
         </div>
         <p className="text-xs text-[color:var(--text-2)] max-w-3xl">
           Profiles set semantic density and composition defaults. The active system and accent remain
-          visitor-selectable, so Editorial, Terminal, Geist, Brutalist, and Swiss stay available everywhere.
+          visitor-selectable, so Editorial and Geist stay available everywhere.
         </p>
       </section>
 

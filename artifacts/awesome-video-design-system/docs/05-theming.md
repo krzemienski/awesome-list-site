@@ -1,7 +1,3 @@
----
-source: awesome-list-site-ds/docs/05-theming.md
-sha256: 98359a32a71ce808059c38c510c6bc83c199bdaea0be7b1835e0b9b9500d6371
----
 # 05 · Theming & switching
 
 > How systems are stored, applied, persisted, and swapped without a flash.
@@ -16,7 +12,7 @@ Effects, in order:
 
 1. Looks up `DESIGN_SYSTEMS[systemId]`. Falls back to `editorial` if unknown.
 2. Removes every token that was set by the previous call (so swaps are
-   clean — no stale Editorial radii sneaking into your Terminal page).
+   clean — no stale Editorial radii sneaking into your Geist page).
 3. Writes the new system's tokens onto `:root`.
 4. Looks up `ACCENTS.find(a => a.id === accentId)`. Falls back to
    `ACCENTS[0]` (crimson).
@@ -33,21 +29,18 @@ can't express as a single value* — live as `[data-system="…"]` attribute
 selectors in `styles.css`:
 
 ```css
-/* Terminal: bracket every chip */
-[data-system="terminal"] .chip::before { content: '['; }
-[data-system="terminal"] .chip::after  { content: ']'; }
+/* Editorial: italic display accents and eyebrows take the accent */
+[data-system="editorial"] .display-h em,
+[data-system="editorial"] .serif-italic { color: var(--accent); }
+[data-system="editorial"] .eyebrow { color: var(--accent); font-weight: 700; }
 
-/* Brutalist: hard offset shadow on hover */
-[data-system="brutalist"] .card.hoverable:hover {
-  transform: translate(-2px, -2px);
-  box-shadow: 6px 6px 0 0 var(--text);
-}
-
-/* Swiss: replace the box-shadow on hover with a color change */
-[data-system="swiss"] .card.hoverable:hover {
-  box-shadow: none;
-  border-color: var(--text-3);
-  transform: none;
+/* Geist: quiet sentence-case chips in the body face */
+[data-system="geist"] .btn { font-weight: 500; }
+[data-system="geist"] .chip {
+  text-transform: none;
+  letter-spacing: 0;
+  font-family: var(--font-body);
+  font-weight: 500;
 }
 ```
 
@@ -59,12 +52,18 @@ These are the *only* place hex codes / px values can live outside
 Store user picks in `localStorage`:
 
 ```js
-localStorage.setItem('ds-system', 'terminal');
-localStorage.setItem('ds-accent', 'matrix');
+localStorage.setItem('ds-system', 'geist');
+localStorage.setItem('ds-accent', 'cyan');
 ```
 
-(In awesome.video we use the keys `av-ds-system` and `av-ds-accent` — pick a
+(In awesome.video the keys are `ds-system` and `ds-accent` — pick a
 namespace and stick with it.)
+
+Only two systems exist: `editorial` (the default) and `geist`. A stored id
+that is no longer offered (awesome.video once shipped a larger set) must
+resolve to the default pair (Editorial × Crimson) in the pre-paint boot, and the boot rewrites storage so the next
+visit is clean. Signed-in preferences saved on a removed system are
+rewritten to the same default on the server.
 
 ## Preventing the flash
 
@@ -104,17 +103,14 @@ Each system declares a natural default accent in `SYSTEM_DEFAULT_ACCENT`:
 ```js
 window.SYSTEM_DEFAULT_ACCENT = {
   editorial: 'crimson',
-  terminal:  'matrix',
   geist:     'cyan',
-  brutalist: 'amber',
-  swiss:     'orange',
 };
 ```
 
 This is purely UX: when a user picks a system without specifying an accent
 (first visit, or "reset" action), we move them to the system's natural
 color so the first impression isn't wrong. After that, accent + system are
-independent — if the user picks Violet on Editorial, switching to Brutalist
+independent — if the user picks Violet on Editorial, switching to Geist
 keeps Violet.
 
 The recommended interaction:
@@ -144,8 +140,8 @@ function selectSystem(id) {
 Once everything's wired, swaps are trivial:
 
 ```js
-document.getElementById('terminal-btn').onclick = () =>
-  applyDesignSystem('terminal', 'matrix');
+document.getElementById('geist-btn').onclick = () =>
+  applyDesignSystem('geist', 'cyan');
 ```
 
 The whole page reshapes in a single frame because CSS variables are
@@ -165,9 +161,9 @@ per-region theming works automatically:
 <html data-system="editorial">
   <body>
     <main>…editorial content…</main>
-    <aside data-system="terminal" style="…">
-      <button class="btn primary">RUN</button>
-      <!-- this button is Terminal-styled,
+    <aside data-system="geist" style="…">
+      <button class="btn primary">Run</button>
+      <!-- this button is Geist-styled,
            even though the page is Editorial -->
     </aside>
   </body>

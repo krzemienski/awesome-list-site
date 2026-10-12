@@ -14,7 +14,7 @@
 }
 
 /* Paired with the DS .eyebrow helper (frozen pages.jsx Submit): ink, weight
-   and the Terminal "> " prompt / Swiss grey come from the per-system skin. */
+   and weight come from the per-system skin. */
 .submit-eyebrow {
   margin-bottom: 16px;
   line-height: var(--body-leading);

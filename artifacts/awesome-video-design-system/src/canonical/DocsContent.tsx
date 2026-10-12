@@ -59,13 +59,13 @@ function Overview() {
     <>
       <H1>Awesome.Video Design System</H1>
       <Lead>
-        A token-based, multi-personality dark design system. Five distinct visual languages share one
+        A token-based, multi-personality dark design system. Two distinct visual languages share one
         component contract — switch them with a single attribute.
       </Lead>
       <Grid2>
         <div className="card" style={{ padding: 22 }}>
-          <div className="mono" style={{ fontSize: 10, color: 'var(--accent)', letterSpacing: '0.18em', marginBottom: 8 }}>5 SYSTEMS</div>
-          <P>Editorial, Terminal, Geist, Brutalist, Swiss. Each commits hard to a personality.</P>
+          <div className="mono" style={{ fontSize: 10, color: 'var(--accent)', letterSpacing: '0.18em', marginBottom: 8 }}>2 SYSTEMS</div>
+          <P>Editorial (the default) and Geist. Each commits hard to a personality.</P>
         </div>
         <div className="card" style={{ padding: 22 }}>
           <div className="mono" style={{ fontSize: 10, color: 'var(--accent)', letterSpacing: '0.18em', marginBottom: 8 }}>~36 TOKENS</div>
@@ -98,7 +98,7 @@ function Overview() {
 /* ---------- 02 Principles ---------- */
 function Principles() {
   const ps = [
-    { n: '01', t: 'Commit to the personality', d: 'A system fails when it hedges. Editorial is genuinely soft. Brutalist genuinely yells. Don\'t average them.' },
+    { n: '01', t: 'Commit to the personality', d: 'A system fails when it hedges. Editorial is genuinely soft. Geist is genuinely quiet. Don\'t average them.' },
     { n: '02', t: 'Black is the canvas, not a color', d: 'Backgrounds are flat #000. Surfaces are alpha overlays. The page atmosphere is the only background art.' },
     { n: '03', t: 'One accent per page', d: 'Accent is reserved. It marks the active state, the primary action, the brand moment — never decoration.' },
     { n: '04', t: 'Tokens before classes', d: 'If a value appears in two places, it\'s a token. We add tokens before we copy values.' },
@@ -108,7 +108,7 @@ function Principles() {
   return (
     <>
       <H1>Principles</H1>
-      <Lead>Six rules that make these five systems feel like one product.</Lead>
+      <Lead>Six rules that make these two systems feel like one product.</Lead>
       <div style={{ display: 'flex', flexDirection: 'column', gap: 1, background: 'var(--border)', border: 'var(--hairline-w) solid var(--border)', borderRadius: 'var(--radius)', overflow: 'hidden' }}>
         {ps.map(p => (
           <div key={p.n} style={{ background: 'var(--bg)', padding: '24px 28px', display: 'grid', gridTemplateColumns: '60px 1fr', gap: 24 }}>
@@ -131,7 +131,7 @@ function GettingStarted() {
       <H1>Getting started</H1>
       <Lead>Add the system to any HTML page in three steps.</Lead>
       <H2>1. Drop in the styles + system definitions</H2>
-      <P>Two files: <code className="mono" style={{color:'var(--accent)'}}>styles.css</code> defines tokens + components; <code className="mono" style={{color:'var(--accent)'}}>design-systems.jsx</code> defines the five token packs and the apply function.</P>
+      <P>Two files: <code className="mono" style={{color:'var(--accent)'}}>styles.css</code> defines tokens + components; <code className="mono" style={{color:'var(--accent)'}}>design-systems.jsx</code> defines the two token packs and the apply function.</P>
       <Code>{`<span class="c-com">&lt;!-- in &lt;head&gt; --&gt;</span>
 <span class="c-key">&lt;link</span> rel=<span class="c-str">"stylesheet"</span> href=<span class="c-str">"styles.css"</span><span class="c-key">&gt;</span>
 
@@ -168,16 +168,16 @@ function Tokens() {
         ['--surface', 'Card / input idle. Alpha overlay (~2-4%).'],
         ['--surface-2', 'Card hover, secondary surface. ~5-8% alpha.'],
         ['--surface-3', 'Pressed / focused surface. ~8-12% alpha.'],
-        ['--bg-atmosphere', 'Background art behind everything. Gradients, scanlines, grid lines.'],
-        ['--grain-opacity', 'Strength of the noise overlay. 0 in Geist, 0.55 in Brutalist.'],
+        ['--bg-atmosphere', 'Background art behind everything. Soft radial gradients.'],
+        ['--grain-opacity', 'Strength of the noise overlay. 0.32 in Editorial, 0 in Geist.'],
       ]} />
       <H2>Border</H2>
       <Spec rows={[
         ['--border', 'Default edge. ~8% white in dark systems.'],
         ['--border-strong', 'Hover / active edge. ~16% white.'],
         ['--hairline', 'Sub-divider edge. ~6% white. Used between rows of a table.'],
-        ['--border-w', 'Default border width. 1px most systems, 2px in Brutalist.'],
-        ['--hairline-w', 'Sub-divider width. 0.5px in Swiss, 1px elsewhere.'],
+        ['--border-w', 'Default border width. 1px in both systems.'],
+        ['--hairline-w', 'Sub-divider width. 1px in both systems.'],
       ]} />
       <H2>Text</H2>
       <Spec rows={[
@@ -191,7 +191,7 @@ function Tokens() {
         ['--font-display', 'Display family — headlines.'],
         ['--font-body', 'Body family — UI + prose.'],
         ['--font-mono', 'Mono family — code, eyebrows, keys.'],
-        ['--display-weight', 'Display weight. 400 (Brutalist) → 700 (Swiss).'],
+        ['--display-weight', 'Display weight. 500 (Editorial), 600 (Geist).'],
         ['--display-tracking', 'Display letter-spacing. Tight everywhere.'],
         ['--display-leading', 'Display line-height.'],
         ['--body-leading', 'Body line-height.'],
@@ -200,13 +200,13 @@ function Tokens() {
       ]} />
       <H2>Shape</H2>
       <Spec rows={[
-        ['--radius', 'Default radius. 0 in Terminal/Brutalist, 4 in Swiss, 10-12 in Editorial/Geist.'],
+        ['--radius', 'Default radius. 12px in Editorial, 10px in Geist.'],
         ['--radius-sm', 'Small radius for chips, inputs.'],
-        ['--radius-pill', '999px or 0px depending on system.'],
+        ['--radius-pill', '999px in both systems.'],
       ]} />
       <H2>Shadow</H2>
       <Spec rows={[
-        ['--shadow-sm', 'Resting shadow. None in Terminal/Swiss.'],
+        ['--shadow-sm', 'Resting shadow. A soft 1–2px drop in both systems.'],
         ['--shadow', 'Hover shadow.'],
         ['--shadow-lg', 'Modal / floating panel.'],
         ['--shadow-accent', 'Accent glow / accent halo.'],
@@ -238,26 +238,25 @@ applyDesignSystem(systemId, accentId);
 <span class="c-com">// 2. writes ~36 CSS variables to :root</span>
 <span class="c-com">// 3. sets data-system + data-accent on &lt;html&gt;</span>`}</Code>
       <H2>Why the data-system attribute matters</H2>
-      <P>Tokens cover most differences, but some component shifts can't be expressed as a single value: square-vs-pill, brackets around chips, offset shadow vs. soft falloff. Those live as <code className="mono" style={{color:'var(--accent)'}}>[data-system="…"]</code> overrides in styles.css.</P>
-      <Code>{`<span class="c-key">[data-system=<span class="c-str">"terminal"</span>] .chip::before</span> {
-  content: <span class="c-str">'['</span>;
-  margin-right: <span class="c-num">2px</span>;
+      <P>Tokens cover most differences, but some component shifts can't be expressed as a single value: italic accent colour, sentence-case chips, ring glow vs. soft falloff. Those live as <code className="mono" style={{color:'var(--accent)'}}>[data-system="…"]</code> overrides in styles.css.</P>
+      <Code>{`<span class="c-key">[data-system=<span class="c-str">"editorial"</span>] .eyebrow</span> {
+  color: var(--accent);
+  font-weight: <span class="c-num">700</span>;
 }
 
-<span class="c-key">[data-system=<span class="c-str">"brutalist"</span>] .card.hoverable:hover</span> {
-  transform: translate(-<span class="c-num">2px</span>, -<span class="c-num">2px</span>);
-  box-shadow: <span class="c-num">6px</span> <span class="c-num">6px</span> <span class="c-num">0</span> <span class="c-num">0</span> var(--text);
+<span class="c-key">[data-system=<span class="c-str">"geist"</span>] .card.hoverable:hover</span> {
+  box-shadow: <span class="c-num">0</span> <span class="c-num">0</span> <span class="c-num">0</span> <span class="c-num">1px</span> var(--border-strong), <span class="c-num">0</span> <span class="c-num">12px</span> <span class="c-num">32px</span> rgba(<span class="c-num">0</span>,<span class="c-num">0</span>,<span class="c-num">0</span>,<span class="c-num">0.5</span>);
 }`}</Code>
       <H2>Persistence</H2>
-      <P>The app stores choices in <code className="mono" style={{color:'var(--accent)'}}>localStorage</code> as <code className="mono" style={{color:'var(--accent)'}}>av-ds-system</code> + <code className="mono" style={{color:'var(--accent)'}}>av-ds-accent</code>. Reading them on load before first paint avoids the flash of default theme.</P>
+      <P>The app stores choices in <code className="mono" style={{color:'var(--accent)'}}>localStorage</code> as <code className="mono" style={{color:'var(--accent)'}}>ds-system</code> + <code className="mono" style={{color:'var(--accent)'}}>ds-accent</code>. Reading them on load before first paint avoids the flash of default theme.</P>
       <Code>{`<span class="c-key">&lt;script&gt;</span>
-  <span class="c-key">const</span> sys = localStorage.getItem(<span class="c-str">'av-ds-system'</span>) || <span class="c-str">'editorial'</span>;
-  <span class="c-key">const</span> acc = localStorage.getItem(<span class="c-str">'av-ds-accent'</span>)
+  <span class="c-key">const</span> sys = localStorage.getItem(<span class="c-str">'ds-system'</span>) || <span class="c-str">'editorial'</span>;
+  <span class="c-key">const</span> acc = localStorage.getItem(<span class="c-str">'ds-accent'</span>)
             || SYSTEM_DEFAULT_ACCENT[sys];
   applyDesignSystem(sys, acc);
 <span class="c-key">&lt;/script&gt;</span>`}</Code>
       <H2>Smart accent defaults</H2>
-      <P>Each system declares its natural accent. When the user picks a fresh system without specifying an accent, we move them to that system's default — Editorial→Crimson, Terminal→Matrix, Geist→Cyan, Brutalist→Amber, Swiss→Orange.</P>
+      <P>Each system declares its natural accent. When the user picks a fresh system without specifying an accent, we move them to that system's default — Editorial→Crimson, Geist→Cyan. A stored system that is no longer offered resolves to Editorial × Crimson.</P>
     </>
   );
 }
@@ -279,17 +278,14 @@ function TypographyDoc() {
       </Surface>
       <H2>The three families</H2>
       <UL items={[
-        <span><strong style={{color:'var(--text)'}}>Display</strong> — used for h1–h2 and any moment of voice. Italic in Editorial, mono in Terminal.</span>,
-        <span><strong style={{color:'var(--text)'}}>Body</strong> — UI labels, prose, inputs, table cells. Always sans except in Terminal (mono).</span>,
+        <span><strong style={{color:'var(--text)'}}>Display</strong> — used for h1–h2 and any moment of voice. Italic Fraunces in Editorial, Geist Sans in Geist.</span>,
+        <span><strong style={{color:'var(--text)'}}>Body</strong> — UI labels, prose, inputs, table cells. Always sans.</span>,
         <span><strong style={{color:'var(--text)'}}>Mono</strong> — eyebrows, codes, indices, keys, anything indicating structure.</span>,
       ]} />
       <H2>Per-system stacks</H2>
       <Spec rows={[
         ['Editorial', 'Display: Fraunces (italic) · Body: Inter · Mono: JetBrains Mono'],
-        ['Terminal',  'All three: IBM Plex Mono'],
         ['Geist',     'Display: Geist · Body: Geist · Mono: JetBrains Mono'],
-        ['Brutalist', 'Display: Instrument Serif · Body: Space Grotesk · Mono: JetBrains Mono'],
-        ['Swiss',     'Display: Manrope · Body: Manrope · Mono: IBM Plex Mono'],
       ]} />
       <H2>Type scale</H2>
       <Spec rows={[
@@ -350,7 +346,7 @@ function ColorDoc() {
       </Surface>
       <H2>Where accent appears</H2>
       <UL items={[
-        'Primary buttons (filled in most systems, outlined+glow in Terminal).',
+        'Primary buttons (accent fill in both systems).',
         'Active nav indicator — left rail of the active accordion item.',
         'Eyebrows — `── 02 / SECTION` style mono labels.',
         'Hover ring on cards (.card.glow:hover).',
@@ -442,10 +438,7 @@ function MotionDoc() {
       <H2>Per-system motion grammar</H2>
       <Spec rows={[
         ['Editorial', 'Soft transforms, opacity fades. No bounces.'],
-        ['Terminal',  'Step animations only. Caret + scanlines. Hover = glow, not transform.'],
         ['Geist',     'Subtle. Hover = box-shadow ring, no lift.'],
-        ['Brutalist', 'Hard. translate(-2px,-2px) on hover, instant. No easing on shadow.'],
-        ['Swiss',     'Almost none. Color shift on hover, that\'s it.'],
       ]} />
       <Callout kind="REDUCED MOTION">
         Add <code className="mono" style={{color:'var(--accent)'}}>.no-anim</code> to a parent (or honor <code className="mono" style={{color:'var(--accent)'}}>prefers-reduced-motion</code>) — it freezes caret, shimmer, and dot pulse.
@@ -524,7 +517,7 @@ function ButtonsDoc() {
       <H2b>Variants</H2b>
       <Specb rows={[
         ['.btn',          'Default — outlined, surface fill.'],
-        ['.btn.primary',  'Primary action — accent fill (Editorial/Geist), accent outline+glow (Terminal), accent fill + offset shadow (Brutalist).'],
+        ['.btn.primary',  'Primary action — accent fill in both systems.'],
         ['.btn.ghost',    'Tertiary — transparent until hover.'],
         ['.btn.danger',   'Destructive — accent-tinted with danger affordance.'],
         ['.btn.icon',     '36×36 square. Combine with .ghost.'],
@@ -533,9 +526,9 @@ function ButtonsDoc() {
       <Specb rows={[
         ['Padding',     '9px 16px (default), 36×36 (icon)'],
         ['Gap',         '8px between icon and label'],
-        ['Font size',   '13px (12px in Brutalist with uppercase)'],
+        ['Font size',   '13px'],
         ['Font weight', '500 default, 600 primary'],
-        ['Radius',      'var(--radius-sm) — 0 in Terminal/Brutalist, 6 in Geist'],
+        ['Radius',      'var(--radius-sm) — 8px in Editorial, 6px in Geist'],
       ]} />
       <H2b>Usage</H2b>
       <ULb items={[
@@ -574,7 +567,7 @@ function CardsDoc() {
         ['Padding',     '20-28px depending on density'],
         ['Border',      'var(--border-w) solid var(--border)'],
         ['Radius',      'var(--radius)'],
-        ['Hover',       'translateY(-2px) + brighter border + shadow (Brutalist offsets, Geist glows, Swiss none)'],
+        ['Hover',       'translateY(-2px) + brighter border + shadow (Geist adds a ring glow)'],
       ]} />
       <H2b>Composition</H2b>
       <ULb items={[
@@ -640,7 +633,7 @@ function NavDoc() {
       <Specb rows={[
         ['Width',       '280px desktop, 240px tablet, hidden on mobile (drawer)'],
         ['Item height', '46-50px'],
-        ['Active mark', '2px accent left rail, glow in Editorial/Geist, hard in Brutalist/Swiss'],
+        ['Active mark', '2px accent left rail with a soft glow'],
         ['Sub items',   '7px y-padding, 1px translate-x on hover'],
       ]} />
       <H2b>Tabs</H2b>
@@ -708,22 +701,19 @@ function FlowsDoc() {
   return (
     <>
       <H1b>Flow diagrams</H1b>
-      <Leadb>Each system ships a flow-diagram grammar — see the Showcase → Flow Diagrams section for a live render in all five languages.</Leadb>
+      <Leadb>Each system ships a flow-diagram grammar — see the Showcase → Flow Diagrams section for a live render in both languages.</Leadb>
       <H2b>Primitives</H2b>
       <Specb rows={[
         ['Node',     'Process step. Filled surface, system-appropriate edge.'],
-        ['Decision', 'Branch. Diamond (rotated 45°) in most systems, `&lt; ?&gt;` brackets in Terminal.'],
-        ['Arrow',    'Edge between nodes. Straight in Geist/Brutalist/Swiss, slight curve in Editorial, ASCII `▶` in Terminal.'],
-        ['Lane',     'Optional swim-lane divider. Dashed mono rule in Terminal, hairline elsewhere.'],
+        ['Decision', 'Branch. Diamond (rotated 45°; rounded in Geist).'],
+        ['Arrow',    'Edge between nodes. Straight in Geist, slight curve in Editorial.'],
+        ['Lane',     'Optional swim-lane divider. Solid hairline in Editorial, dashed in Geist.'],
         ['Accent node', 'Highlighted current step or output. Accent fill or accent border + glow.'],
       ]} />
       <H2b>Per-system grammar</H2b>
       <Specb rows={[
         ['Editorial', 'Soft cards, classic diamonds, curved edges with serif edge labels.'],
-        ['Terminal',  '`[&gt; NODE ]` brackets, `&lt; ? &gt;` decision, `▶` arrowheads, dashed lane rules.'],
         ['Geist',     '10px rounded blocks, thin straight arrows, mono labels.'],
-        ['Brutalist', 'Hard 4px-offset shadows, rotated square diamonds, block arrowheads.'],
-        ['Swiss',     '0.5px hairlines on a 32px grid, minimal diamond, no shadow.'],
       ]} />
       <H2b>When to use</H2b>
       <ULb items={[
@@ -851,10 +841,7 @@ function ThemingAppDoc() {
       <H2b>System defaults map</H2b>
       <Codeb>{`<span class="c-key">window.SYSTEM_DEFAULT_ACCENT</span> = {
   editorial: <span class="c-str">'crimson'</span>,
-  terminal:  <span class="c-str">'matrix'</span>,
   geist:     <span class="c-str">'cyan'</span>,
-  brutalist: <span class="c-str">'amber'</span>,
-  swiss:     <span class="c-str">'orange'</span>,
 };`}</Codeb>
       <H2b>UX rules</H2b>
       <ULb items={[
@@ -899,7 +886,7 @@ function A11yDoc() {
         'Accordion: aria-expanded on header, aria-controls pointing at body.',
       ]} />
       <Calloutb kind="TEST">
-        Run each system × each accent through axe-core or WAVE before shipping. Pay extra attention to Brutalist with Amber and Swiss with Orange — bright accents on near-pure-white tokens can trip warnings.
+        Run each system × each accent through axe-core or WAVE before shipping. Pay extra attention to the bright accents (Amber, Lime, Matrix) on small text — they can trip warnings.
       </Calloutb>
     </>
   );
@@ -909,7 +896,7 @@ function A11yDoc() {
 function ChecklistDoc() {
   const sections = [
     { label: 'TOKENS', items: [
-      'All five systems define ~36 tokens — no missing keys.',
+      'Both systems define ~36 tokens — no missing keys.',
       'No hex values or px numbers outside design-systems.jsx and the per-system skin section of styles.css.',
       'Default accent declared per system in SYSTEM_DEFAULT_ACCENT.',
     ]},

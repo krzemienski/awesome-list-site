@@ -7,4 +7,4 @@ Kind is stored for every resource. The boot backfill fills `kind IS NULL` only, 
 
 **Why:** an admin's override must never be overwritten, and with no provenance column the backfill cannot tell an automatic value from a manual one.
 
-**How to apply:** after changing classifier rules, rows that are already stored keep their old kind. On dev, first check resource_audit_log for live "Resource kind set by admin" rows, then reset to NULL and restart so the boot backfill re-runs. On prod, never bulk-reset. Re-classifying there needs a provenance column or per-row admin "Automatic". Articles and tutorials are "other" by design; no learning kind exists.
+**How to apply:** classifier rule changes never reach already-stored kinds by themselves. Re-classifying existing rows (especially on prod) needs a provenance column or per-row admin "Automatic" — never a bulk reset that could erase admin overrides.

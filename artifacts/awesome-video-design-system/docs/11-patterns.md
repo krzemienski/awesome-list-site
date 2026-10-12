@@ -1,7 +1,3 @@
----
-source: awesome-list-site-ds/docs/11-patterns.md
-sha256: 9e220b1ab08c10d709ff02dfe40efccd80cbdb5fc32ed7e3d963b9483d37f761
----
 # 11 · Patterns
 
 > Composed solutions for the recurring shapes in a content directory site:
@@ -20,7 +16,7 @@ personality automatically.
 | Primitive | Use |
 |-----------|-----|
 | **Node** | Process step. Filled surface, system edge. |
-| **Decision** | Branch. Diamond (rotated 45°) in most; `< ?>` brackets in Terminal. |
+| **Decision** | Branch. Diamond (rotated 45°; rounded in Geist). |
 | **Arrow** | Edge. Straight default; slight curve when crossing rows. |
 | **Edge label** | Pill on the arrow midpoint with the condition (`yes`, `apple`). |
 | **Lane** | Optional swim-lane container around grouped nodes. |
@@ -31,10 +27,7 @@ personality automatically.
 | System | Node edge | Decision | Arrow head | Lane |
 |--------|-----------|----------|------------|------|
 | Editorial | 12px radius, soft falloff | Classic diamond | Classic triangle | Soft dashed |
-| Terminal | Square, mono caps | `< ?>` brackets | ASCII `▶` | Dashed mono rule |
 | Geist | 10px radius, hairline | Rounded diamond | Thin chevron | Soft dashed |
-| Brutalist | 0px, 2px border, `4px 4px 0 0` | Square rotated 45° | Block triangle | Hard 2px box |
-| Swiss | 4px, 0.5px hairline | Minimal polygon | Thin chevron | Top/bottom hairline |
 
 ### Implementation
 
@@ -48,10 +41,7 @@ In a non-React codebase, the same pattern works:
 // Pick the system's flow style from a lookup table:
 const FLOW = {
   editorial: { radius: 12, border: 1, shadow: 'soft', head: 'classic' },
-  terminal:  { radius: 0,  border: 1, shadow: 'none', head: 'ascii' },
   geist:     { radius: 10, border: 1, shadow: 'ring', head: 'thin' },
-  brutalist: { radius: 0,  border: 2, shadow: 'offset', head: 'block' },
-  swiss:     { radius: 4,  border: 0.5, shadow: 'none', head: 'thin' },
 };
 
 function renderNode({ system, x, y, w, h, label }) {

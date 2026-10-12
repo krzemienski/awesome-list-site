@@ -493,29 +493,19 @@ button.taxonomy-child {
   border-radius: var(--radius-pill);
   font-size: 10.5px;
   font-weight: 400;
-  /* Body leading per system (1.6 Editorial, 1.5 Brutalist, 1.55 elsewhere);
+  /* Body leading per system (1.6 Editorial, 1.55 Geist);
      a fixed 1.6 made alternate-system chips 0.53px taller per row. */
   line-height: var(--body-leading);
   letter-spacing: 0.6px;
 }
 
-/* The block above restates the Editorial chip; give the frozen per-system
-   .chip skins (design-system.css) back the properties it restated. */
+/* The block above restates the Editorial chip; give the frozen Geist
+   .chip skin (design-system.css) back the properties it restated. */
 [data-system="geist"] .taxonomy-page .resource-card--taxonomy .resource-card__tag {
   font-family: var(--font-body);
   font-weight: 500;
   letter-spacing: 0;
   text-transform: none;
-}
-
-[data-system="swiss"] .taxonomy-page .resource-card--taxonomy .resource-card__tag {
-  font-family: var(--font-mono);
-  font-weight: 500;
-}
-
-[data-system="brutalist"] .taxonomy-page .resource-card--taxonomy .resource-card__tag {
-  border-width: 1.5px; /* DS-OK: frozen Brutalist .chip border, no token */
-  border-color: var(--text-2);
 }
 
 .taxonomy-loading-header {

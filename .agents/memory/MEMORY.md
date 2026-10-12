@@ -198,4 +198,5 @@
 - [ESLint ratchet](eslint-ratchet.md) — app correctness rules held at 0, rest per-file ratchet that only shrinks; Node API needs TSESTREE_SINGLE_RUN=true to match CLI counts.
 - [Publish gate offline repro](pre-publish-gate-offline-repro.md) — run pre-publish-gate.sh --publish in a /tmp tar copy (keep .agents+docs, BUILD_REVISION set, bogus DATABASE_URL) to prove blocking.
 - [Analytics browser verification](analytics-browser-verification.md) — PostHog silently drops headless (webdriver/UA brands); Mixpanel resends → count $insert_id; sanitizer drops `email*` keys.
-- [Resource kind backfill](resource-kind-backfill.md) — backfill fills NULL kinds only (no provenance); classifier changes need a dev reset+restart, never a prod bulk reset.
+- [Resource kind backfill](resource-kind-backfill.md) — backfill fills NULL kinds only (no provenance); classifier changes never reach stored kinds; never bulk-reset (erases admin overrides).
+- [Two design systems only](two-design-systems.md) — owner kept Editorial×Crimson + Geist; one kept-list; removed values → default; artifact docs hand-owned.

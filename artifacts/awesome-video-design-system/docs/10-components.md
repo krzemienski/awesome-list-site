@@ -1,14 +1,10 @@
----
-source: awesome-list-site-ds/docs/10-components.md
-sha256: 083ffe1beac8b9529d53eb694588d3f51d9eae30bc49474895a8287bc17feeaf
----
 # 10 · Components
 
 > Every primitive in the system, with class API and per-system notes.
 
 The cardinal rule: **components are classes**. No JS, no framework. Apply
 classes, get the system's look. The same `<button class="btn primary">`
-becomes five different buttons across the five systems.
+becomes two different buttons across the two systems.
 
 ---
 
@@ -27,7 +23,7 @@ becomes five different buttons across the five systems.
 | Class | Use |
 |-------|-----|
 | `.btn` | Default — outlined surface. |
-| `.btn.primary` | Primary action — filled accent (Geist), outlined accent + glow (Terminal), filled + offset shadow (Brutalist). |
+| `.btn.primary` | Primary action — filled accent with near-black ink in both systems. |
 | `.btn.ghost` | Tertiary — transparent until hover. |
 | `.btn.danger` | Destructive — accent-tinted with danger affordance. |
 | `.btn.icon` | 36×36 square. Combine with `.ghost`. |
@@ -38,17 +34,14 @@ becomes five different buttons across the five systems.
 |------|-------|
 | Padding | `9px 16px` (default), `36×36` (icon) |
 | Gap between icon + label | `8px` |
-| Font size | `13px` default, `12px` in Brutalist (uppercase) |
+| Font size | `13px` |
 | Font weight | `500` default, `600` primary |
 | Radius | `var(--radius-sm)` |
 
 ### Per-system notes
 
-- **Terminal**: primary becomes a transparent outline with `text-shadow` glow
-  and inset glow on hover.
-- **Brutalist**: primary becomes uppercase, 0.04em tracked, with `4px 4px
-  0 0 var(--text)` offset shadow.
-- **Swiss**: borders drop to `0.5px`, no shadow, transform on hover.
+- **Editorial**: 12px-radius button with a soft accent glow on hover.
+- **Geist**: weight drops to `500`; soft 6px small radius and a quiet ring.
 
 ### Rules
 
@@ -88,9 +81,8 @@ becomes five different buttons across the five systems.
 
 ### Per-system notes
 
-- **Brutalist**: hover translates `(-2px, -2px)` with `6px 6px 0 0 var(--text)`
-  shadow. Genuinely springs.
-- **Swiss**: hover is a border color change. No transform, no shadow.
+- **Editorial**: hover lifts `translateY(-2px)` with a soft falloff shadow.
+- **Geist**: hover adds a `1px` strong-border ring plus a large soft shadow.
 
 ---
 
@@ -118,9 +110,8 @@ becomes five different buttons across the five systems.
 
 ### Per-system notes
 
-- **Terminal**: brackets wrap every chip (`[ENCODING]`).
-- **Geist**: sentence-case, no tracking, no uppercase.
-- **Brutalist**: 1.5px border, uppercase.
+- **Editorial**: mono caps, tracked.
+- **Geist**: sentence-case body face, no tracking, no uppercase.
 
 ---
 
@@ -284,7 +275,7 @@ optional but recommended — it gives the system a "broadcast" voice.
 |------|-------|
 | Sidebar width | 280px (desktop), 240px (tablet), hidden (mobile) |
 | Sub-item height | 7px y-padding, ~32px tall |
-| Active mark | 2px accent left rail; glow in Editorial/Geist, hard in Brutalist/Swiss |
+| Active mark | 2px accent left rail with a soft glow |
 
 The `max-height` on `.accordion-body` is what drives the open/close
 animation — set it inline based on the children count.
@@ -359,9 +350,9 @@ Always:
 </article>
 ```
 
-Try that in all five systems. The icon, title, stat, paragraph, and chips
-all stay in place — but the **feel** shifts from soft magazine to ASCII
-terminal to brutalist slab.
+Try that in both systems. The icon, title, stat, paragraph, and chips all
+stay in place — but the **feel** shifts from soft magazine (Editorial) to
+quiet engineered neutral (Geist).
 
 ---
 

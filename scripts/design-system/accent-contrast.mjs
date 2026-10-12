@@ -42,7 +42,7 @@ export function accentContrastTable(rootDir = ROOT) {
       rows.push({ system, accent: accent.id, backing, tint, ink: "--accent-ink", inkShare: share, ratio: contrast(ink, bg), upstreamRatio: contrast(rgba(accent.primary), bg) });
       if (!tint) rows.push({ system, accent: accent.id, backing, tint, ink: "--text-3", ratio: contrast(rgba(corrections[system]), bg), upstreamRatio: contrast(rgba(tokens["--text-3"]), bg) });
     }
-    if (system !== "terminal") rows.push({ system, accent: accent.id, backing: "filled primary", tint: 1, ink: "--on-accent", ratio: contrast(rgba(tokens["--bg"]), rgba(accent.primary)), upstreamRatio: contrast(rgba(system === "brutalist" ? "#000000" : "#0a0a0a"), rgba(accent.primary)) });
+    rows.push({ system, accent: accent.id, backing: "filled primary", tint: 1, ink: "--on-accent", ratio: contrast(rgba(tokens["--bg"]), rgba(accent.primary)), upstreamRatio: contrast(rgba("#0a0a0a"), rgba(accent.primary)) });
   }
   const failed = rows.filter(row => row.ratio < 4.5);
   if (failed.length) throw new Error(`App contrast failures: ${JSON.stringify(failed)}`);

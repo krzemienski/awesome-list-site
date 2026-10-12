@@ -55,17 +55,10 @@
 /* Per system/accent accessible ink (verified by app-accent-contrast.mjs). */
 :root[data-system="editorial"][data-accent="crimson"] { --accent-ink: color-mix(in srgb, var(--accent) 92%, #ffffff); } /* DS-OK: accessible ink token */
 :root[data-system="geist"][data-accent="crimson"] { --accent-ink: color-mix(in srgb, var(--accent) 83%, #ffffff); } /* DS-OK: accessible ink token */
-:root[data-system="brutalist"][data-accent="crimson"] { --accent-ink: color-mix(in srgb, var(--accent) 83%, #ffffff); } /* DS-OK: accessible ink token */
-:root[data-system="swiss"][data-accent="crimson"] { --accent-ink: color-mix(in srgb, var(--accent) 97%, #ffffff); } /* DS-OK: accessible ink token */
 :root[data-system="editorial"][data-accent="magenta"] { --accent-ink: color-mix(in srgb, var(--accent) 92%, #ffffff); } /* DS-OK: accessible ink token */
 :root[data-system="geist"][data-accent="magenta"] { --accent-ink: color-mix(in srgb, var(--accent) 83%, #ffffff); } /* DS-OK: accessible ink token */
-:root[data-system="brutalist"][data-accent="magenta"] { --accent-ink: color-mix(in srgb, var(--accent) 83%, #ffffff); } /* DS-OK: accessible ink token */
-:root[data-system="swiss"][data-accent="magenta"] { --accent-ink: color-mix(in srgb, var(--accent) 95%, #ffffff); } /* DS-OK: accessible ink token */
 :root[data-system="editorial"][data-accent="violet"] { --accent-ink: color-mix(in srgb, var(--accent) 80%, #ffffff); } /* DS-OK: accessible ink token */
-:root[data-system="terminal"][data-accent="violet"] { --accent-ink: color-mix(in srgb, var(--accent) 87%, #ffffff); } /* DS-OK: accessible ink token */
 :root[data-system="geist"][data-accent="violet"] { --accent-ink: color-mix(in srgb, var(--accent) 74%, #ffffff); } /* DS-OK: accessible ink token */
-:root[data-system="brutalist"][data-accent="violet"] { --accent-ink: color-mix(in srgb, var(--accent) 74%, #ffffff); } /* DS-OK: accessible ink token */
-:root[data-system="swiss"][data-accent="violet"] { --accent-ink: color-mix(in srgb, var(--accent) 82%, #ffffff); } /* DS-OK: accessible ink token */
 
 @media (min-width: 768px) and (max-width: 1023px) { :root { --shell-sidebar-w: var(--shell-sidebar-w-tablet); } }
 @media (max-width: 767px) { :root { --shell-header-h: 56px; } }
@@ -76,23 +69,21 @@
    to 0. min-height keeps short pages viewport-tall without the cap. */
 body { height: auto; min-height: 100%; }
 
-/* Approved accessibility deviations from the immutable handoff. Preserve
-   Terminal's outline/tint grammar and Brutalist's existing black fill ink. */
-:root:not([data-system="terminal"]) .btn.primary { color: var(--on-accent); }
+/* Approved accessibility deviations from the immutable handoff. Filled
+   primary labels use black --on-accent (`[data-system]` keeps the selector's
+   original weight; the boot always sets it). */
+:root[data-system] .btn.primary { color: var(--on-accent); }
 :root .chip.accent,
 :root .btn.danger,
 :root .btn.link,
-:root[data-system="terminal"] .eyebrow,
 :root[data-system="geist"] .eyebrow,
-:root[data-system="brutalist"] .eyebrow,
 :root .sub-item.active,
 :root .tab.active,
 :root .icon-rail .icon-btn.active,
 :root[data-system="editorial"] .serif-italic,
 :root[data-system="editorial"] .eyebrow,
 :root .journey-card__progress-value,
-:root .journey-detail-card__progress-value,
-:root[data-system="terminal"] .btn.primary { color: var(--accent-ink); }
+:root .journey-detail-card__progress-value { color: var(--accent-ink); }
 
 /* Global "reduce motion" toggle: extends the canonical .no-anim to every
    descendant, not just the three helper classes it names. */
@@ -169,8 +160,6 @@ body { height: auto; min-height: 100%; }
    Clerk's `.cl-*` DOM structure trip its "structural CSS" warning. The card
    box reads the same per-system edge tokens from its appearance styles. */
 :root { --auth-edge-w: var(--border-w); --auth-card-edge: var(--border); }
-[data-system="swiss"] { --auth-edge-w: var(--hairline-w); }
-[data-system="brutalist"] { --auth-card-edge: var(--text); }
 .auth-edge.auth-edge.auth-edge {
   border-width: var(--auth-edge-w);
   border-style: solid;

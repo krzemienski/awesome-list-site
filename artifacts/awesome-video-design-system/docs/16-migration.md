@@ -1,7 +1,3 @@
----
-source: awesome-list-site-ds/docs/16-migration.md
-sha256: 7d5076e486008b51fae6d6a4ad48bcb5289a4b2b87036d561ef3f9cf454cb98a
----
 # 16 · Migrating an existing site
 
 > Incremental adoption. Move one page, one component, one screen at a time.
@@ -108,7 +104,7 @@ Each hit is a candidate for a token replacement. Use this checklist:
 
 After the replace, run your test suite, then pick a system and look. The
 first compile will look weird (Editorial probably won't match your
-existing brand). Switch through all five — odds are one of them is close.
+existing brand). Switch to Geist — odds are one of the two is close.
 
 ## Mapping existing brand colors
 

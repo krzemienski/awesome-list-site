@@ -1,7 +1,3 @@
----
-source: awesome-list-site-ds/docs/09-motion.md
-sha256: 8f8a4a3f86c154455764580cd43c2da613f150c273ceb5190b9b6e02d5cbac4c
----
 # 09 · Motion
 
 > Confident, brief, structural. Motion clarifies state — it never decorates.
@@ -86,7 +82,7 @@ machine.
 }
 ```
 
-Use on terminal-style hero text, command palettes, "type to search" hints.
+Use on command-line-style hero text, command palettes, "type to search" hints.
 Always with `steps(1)` — never tween a blink.
 
 ### `.shimmer-line`
@@ -118,10 +114,7 @@ major sections. One per major section, no more.
 | System | Hover transform | Hover shadow | Notes |
 |--------|----------------|--------------|-------|
 | Editorial | `translateY(-2px)` | soft falloff | Default — subtle lift. |
-| Terminal | `none` | accent glow ring | Glow, not transform. |
 | Geist | `none` | 1px ring + soft glow | Quiet. |
-| Brutalist | `translate(-2px,-2px)` | `6px 6px 0 0 var(--text)` | Hard, instant. |
-| Swiss | `none` | none | Color shift on hover, that's it. |
 
 This is all expressed in `[data-system]` selectors in `styles.css`. You don't
 manage it per-component — the system does.

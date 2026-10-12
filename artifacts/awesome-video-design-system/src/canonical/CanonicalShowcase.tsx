@@ -53,35 +53,6 @@ const SYSTEM_FLOW_STYLES = {
     textMuted: 'rgba(244,243,238,0.6)',
     accentToken: '--accent',
   },
-  terminal: {
-    name: 'Terminal',
-    nodeBg: 'transparent',
-    // DS-OK: canonical per-system flow-diagram skin, ported verbatim from awesome-list-site-ds/design-system-anatomy.jsx; the anatomy view is pixel-gated against that source
-    nodeBorder: 'rgba(232,232,224,0.4)',
-    nodeRadius: 0,
-    nodeBorderW: 1,
-    nodeShadow: 'none',
-    nodeFont: "'IBM Plex Mono', monospace",
-    nodeWeight: 500,
-    nodeCase: 'uppercase',
-    nodeLetterSpacing: '0.06em',
-    titleFont: "'IBM Plex Mono', monospace",
-    titleStyle: 'normal',
-    arrowStyle: 'ascii',
-    arrowColor: '__accent__',
-    arrowDash: 'none',
-    arrowHead: 'ascii',
-    edgeLabelBg: '#000',
-    edgeLabelFont: "'IBM Plex Mono', mono",
-    edgeLabelCase: 'uppercase',
-    decisionShape: 'bracketed',
-    laneStyle: 'ascii',
-    bg: '#000',
-    // DS-OK: canonical per-system flow-diagram skin, ported verbatim from awesome-list-site-ds/design-system-anatomy.jsx; the anatomy view is pixel-gated against that source
-    text: '#e8e8e0',
-    textMuted: 'rgba(232,232,224,0.6)',
-    accentToken: '--accent',
-  },
   geist: {
     name: 'Geist',
     // DS-OK: canonical per-system flow-diagram skin, ported verbatim from awesome-list-site-ds/design-system-anatomy.jsx; the anatomy view is pixel-gated against that source
@@ -112,66 +83,6 @@ const SYSTEM_FLOW_STYLES = {
     textMuted: 'rgba(250,250,250,0.62)',
     accentToken: '--accent',
   },
-  brutalist: {
-    name: 'Brutalist',
-    nodeBg: '#000',
-    // DS-OK: canonical per-system flow-diagram skin, ported verbatim from awesome-list-site-ds/design-system-anatomy.jsx; the anatomy view is pixel-gated against that source
-    nodeBorder: '#f5f5f0',
-    nodeRadius: 0,
-    nodeBorderW: 2,
-    nodeShadow: '4px 4px 0 0 #f5f5f0',
-    nodeFont: "'Space Grotesk', sans-serif",
-    nodeWeight: 600,
-    nodeCase: 'uppercase',
-    nodeLetterSpacing: '0.04em',
-    titleFont: "'Instrument Serif', serif",
-    titleStyle: 'normal',
-    arrowStyle: 'thick',
-    // DS-OK: canonical per-system flow-diagram skin, ported verbatim from awesome-list-site-ds/design-system-anatomy.jsx; the anatomy view is pixel-gated against that source
-    arrowColor: '#f5f5f0',
-    arrowDash: 'none',
-    arrowHead: 'block',
-    edgeLabelBg: '__accent__',
-    edgeLabelFont: "'JetBrains Mono', mono",
-    edgeLabelCase: 'uppercase',
-    decisionShape: 'square',
-    laneStyle: 'hard',
-    bg: '#000',
-    // DS-OK: canonical per-system flow-diagram skin, ported verbatim from awesome-list-site-ds/design-system-anatomy.jsx; the anatomy view is pixel-gated against that source
-    text: '#f5f5f0',
-    textMuted: 'rgba(245,245,240,0.7)',
-    accentToken: '--accent',
-  },
-  swiss: {
-    name: 'Swiss',
-    // DS-OK: canonical per-system flow-diagram skin, ported verbatim from awesome-list-site-ds/design-system-anatomy.jsx; the anatomy view is pixel-gated against that source
-    nodeBg: 'rgba(250,250,248,0.018)',
-    nodeBorder: 'rgba(250,250,248,0.32)',
-    nodeRadius: 4,
-    nodeBorderW: 0.5,
-    nodeShadow: 'none',
-    nodeFont: "'Manrope', sans-serif",
-    nodeWeight: 600,
-    nodeCase: 'none',
-    nodeLetterSpacing: '-0.01em',
-    titleFont: "'Manrope', sans-serif",
-    titleStyle: 'normal',
-    arrowStyle: 'hairline',
-    // DS-OK: canonical per-system flow-diagram skin, ported verbatim from awesome-list-site-ds/design-system-anatomy.jsx; the anatomy view is pixel-gated against that source
-    arrowColor: 'rgba(250,250,248,0.5)',
-    arrowDash: 'none',
-    arrowHead: 'thin',
-    edgeLabelBg: '#000',
-    edgeLabelFont: "'IBM Plex Mono', mono",
-    edgeLabelCase: 'none',
-    decisionShape: 'minimal',
-    laneStyle: 'hairline',
-    bg: '#000',
-    // DS-OK: canonical per-system flow-diagram skin, ported verbatim from awesome-list-site-ds/design-system-anatomy.jsx; the anatomy view is pixel-gated against that source
-    text: '#fafaf8',
-    textMuted: 'rgba(250,250,248,0.62)',
-    accentToken: '--accent',
-  },
 };
 
 /* ─── Node ─── */
@@ -179,19 +90,15 @@ function FlowNode({ sysId, label, sublabel, x, y, w = 140, h = 56, accent, varia
   const s = SYSTEM_FLOW_STYLES[sysId];
   const isAccent = variant === 'accent';
   const border = isAccent ? accent : s.nodeBorder;
-  const bg = sysId === 'brutalist' && isAccent ? accent
-    : sysId === 'terminal' && isAccent ? `${accent}1f`
-    : s.nodeBg;
-  const txtColor = sysId === 'brutalist' && isAccent ? '#000'
-    : sysId === 'terminal' && isAccent ? accent
-    : s.text;
+  const bg = s.nodeBg;
+  const txtColor = s.text;
   return (
     <div style={{
       position: 'absolute', left: x, top: y, width: w, height: h,
       background: bg,
       border: `${s.nodeBorderW}px solid ${border}`,
       borderRadius: s.nodeRadius,
-      boxShadow: isAccent && sysId === 'brutalist' ? `4px 4px 0 0 ${accent}` : s.nodeShadow,
+      boxShadow: s.nodeShadow,
       padding: '8px 12px',
       display: 'flex', flexDirection: 'column', justifyContent: 'center',
       fontFamily: s.nodeFont,
@@ -201,20 +108,15 @@ function FlowNode({ sysId, label, sublabel, x, y, w = 140, h = 56, accent, varia
       textTransform: s.nodeCase,
       color: txtColor,
     }}>
-      {sysId === 'terminal' && <span style={{ color: accent, marginRight: 4 }}>[</span>}
-      <span>
-        {sysId === 'terminal' && <span style={{ color: accent, marginRight: 4 }}>{'>'}</span>}
-        {label}
-        {sysId === 'terminal' && <span style={{ color: accent, marginLeft: 4 }}>]</span>}
-      </span>
+      <span>{label}</span>
       {sublabel && (
         <span style={{
           fontFamily: "'JetBrains Mono', monospace",
           fontSize: 9, fontWeight: 400, marginTop: 3,
           // DS-OK: canonical per-system anatomy renderer value from awesome-list-site-ds/design-system-anatomy.jsx; pixel-gated against that source
-           color: sysId === 'brutalist' && isAccent ? txtColor : s.textMuted,
+           color: s.textMuted,
           letterSpacing: '0.08em',
-          textTransform: sysId === 'brutalist' || sysId === 'terminal' ? 'uppercase' : 'none',
+          textTransform: 'none',
         }}>
           {sublabel}
         </span>
@@ -228,67 +130,6 @@ function FlowDecision({ sysId, label, x, y, w = 110, h = 110, accent }) {
   const s = SYSTEM_FLOW_STYLES[sysId];
   const cx = x + w/2, cy = y + h/2;
   const stroke = s.nodeBorder;
-
-  if (s.decisionShape === 'bracketed') {
-    /* terminal: angle brackets */
-    return (
-      <div style={{
-        position: 'absolute', left: x, top: y, width: w, height: h,
-        display: 'flex', alignItems: 'center', justifyContent: 'center',
-        fontFamily: s.nodeFont, fontSize: 12, fontWeight: 500,
-        textTransform: 'uppercase', letterSpacing: '0.08em',
-        color: s.text,
-      }}>
-        <span style={{ color: accent, fontSize: 22, fontWeight: 400, marginRight: 6 }}>{'<'}</span>
-        <span>{label}</span>
-        <span style={{ color: accent, fontSize: 22, fontWeight: 400, marginLeft: 6 }}>{'?>'}</span>
-      </div>
-    );
-  }
-
-  if (s.decisionShape === 'square') {
-    /* brutalist: rotated square = diamond, hard offset */
-    return (
-      <div style={{ position: 'absolute', left: x, top: y, width: w, height: h }}>
-        <div style={{
-          position: 'absolute', inset: 0,
-          background: '#000',
-          // DS-OK: canonical per-system anatomy renderer value from awesome-list-site-ds/design-system-anatomy.jsx; pixel-gated against that source
-          border: '2px solid #f5f5f0',
-          boxShadow: '4px 4px 0 0 #f5f5f0',
-          transform: 'rotate(45deg)',
-          transformOrigin: 'center',
-        }} />
-        <div style={{
-          position: 'absolute', inset: 0,
-          display: 'flex', alignItems: 'center', justifyContent: 'center',
-          fontFamily: s.nodeFont, fontSize: 11, fontWeight: 600,
-          textTransform: 'uppercase', letterSpacing: '0.04em',
-          color: s.text, textAlign: 'center', padding: 12,
-        }}>{label}</div>
-      </div>
-    );
-  }
-
-  if (s.decisionShape === 'minimal') {
-    /* swiss: hairline diamond, very thin */
-    return (
-      <div style={{ position: 'absolute', left: x, top: y, width: w, height: h }}>
-        <svg aria-hidden="true" focusable="false" width={w} height={h} style={{ position: 'absolute', inset: 0 }}>
-          <polygon points={`${w/2},2 ${w-2},${h/2} ${w/2},${h-2} 2,${h/2}`}
-            /* DS-OK: canonical per-system anatomy renderer value from awesome-list-site-ds/design-system-anatomy.jsx; pixel-gated against that source */
-            fill="rgba(250,250,248,0.018)" stroke={stroke} strokeWidth="0.5" />
-        </svg>
-        <div style={{
-          position: 'absolute', inset: 0,
-          display: 'flex', alignItems: 'center', justifyContent: 'center',
-          fontFamily: s.nodeFont, fontSize: 11, fontWeight: 600,
-          color: s.text, textAlign: 'center', padding: 16,
-          letterSpacing: '-0.01em',
-        }}>{label}</div>
-      </div>
-    );
-  }
 
   if (s.decisionShape === 'rounded') {
     /* geist: rounded diamond */
@@ -332,7 +173,7 @@ function FlowDecision({ sysId, label, x, y, w = 110, h = 110, accent }) {
 function FlowArrow({ sysId, from, to, label, accent, curve = 0, dashed = false }) {
   const s = SYSTEM_FLOW_STYLES[sysId];
   const stroke = s.arrowColor === '__accent__' ? accent : s.arrowColor;
-  const strokeW = sysId === 'brutalist' ? 2 : sysId === 'swiss' ? 0.5 : 1;
+  const strokeW = 1;
   const id = `arrow-${sysId}-${from.x}-${from.y}-${to.x}-${to.y}`.replace(/\./g,'_');
 
   /* curved or straight path */
@@ -363,22 +204,11 @@ function FlowArrow({ sysId, from, to, label, accent, curve = 0, dashed = false }
         <path d="M 1 1 L 9 5 L 1 9" fill="none" stroke={stroke} strokeWidth="1" strokeLinecap="round" strokeLinejoin="round" />
       </marker>
     );
-  } else if (s.arrowHead === 'block') {
-    markerEl = (
-      <marker id={id} markerWidth="14" markerHeight="14" refX="13" refY="7" orient="auto">
-        <polygon points="0,0 14,7 0,14" fill={stroke} />
-      </marker>
-    );
-  } else if (s.arrowHead === 'ascii') {
-    markerEl = null; /* drawn as text below */
   }
 
   /* label position */
   const lx = (from.x + to.x) / 2;
   const ly = (from.y + to.y) / 2;
-
-  /* ASCII arrow head as character */
-  const asciiHead = s.arrowHead === 'ascii';
 
   return (
     <>
@@ -392,31 +222,21 @@ function FlowArrow({ sysId, from, to, label, accent, curve = 0, dashed = false }
           markerEnd={markerEl ? `url(#${id})` : undefined}
         />
       </svg>
-      {asciiHead && (
-        <div style={{
-          position: 'absolute',
-          left: to.x - 8, top: to.y - 9,
-          fontFamily: "'IBM Plex Mono', monospace",
-          fontSize: 14, color: stroke, fontWeight: 600,
-          pointerEvents: 'none', lineHeight: 1,
-        }}>▶</div>
-      )}
       {label && (
         <div style={{
           position: 'absolute',
           left: lx, top: ly,
           transform: 'translate(-50%, -50%)',
-          background: s.edgeLabelBg === '__accent__' ? accent : s.edgeLabelBg,
-          color: s.edgeLabelBg === '__accent__' ? '#000' : s.textMuted,
+          background: s.edgeLabelBg,
+          color: s.textMuted,
           padding: '2px 7px',
           fontFamily: s.edgeLabelFont,
           fontSize: 9.5,
-          fontWeight: s.edgeLabelBg === '__accent__' ? 700 : 500,
+          fontWeight: 500,
           letterSpacing: '0.06em',
           textTransform: s.edgeLabelCase,
-          // DS-OK: canonical per-system anatomy renderer value from awesome-list-site-ds/design-system-anatomy.jsx; pixel-gated against that source
-          border: sysId === 'brutalist' ? '1.5px solid #f5f5f0' : sysId === 'swiss' ? '0.5px solid rgba(250,250,248,0.18)' : 'none',
-          borderRadius: sysId === 'brutalist' || sysId === 'terminal' ? 0 : 4,
+          border: 'none',
+          borderRadius: 4,
           whiteSpace: 'nowrap',
         }}>
           {label}
@@ -429,60 +249,6 @@ function FlowArrow({ sysId, from, to, label, accent, curve = 0, dashed = false }
 /* ─── Swim lane / group container ─── */
 function FlowLane({ sysId, label, x, y, w, h }) {
   const s = SYSTEM_FLOW_STYLES[sysId];
-  if (sysId === 'terminal') {
-    return (
-      <div style={{
-        position: 'absolute', left: x, top: y, width: w, height: h,
-        pointerEvents: 'none',
-        fontFamily: "'IBM Plex Mono', monospace",
-        fontSize: 9, color: 'var(--text-3)',
-        letterSpacing: '0.14em',
-      }}>
-        {/* DS-OK: canonical per-system anatomy renderer value from awesome-list-site-ds/design-system-anatomy.jsx; pixel-gated against that source */}
-        <div style={{ position: 'absolute', top: 0, left: 0, right: 0, borderTop: '1px dashed rgba(232,232,224,0.18)', textAlign: 'center' }}>
-          <span style={{ background: '#000', padding: '0 8px', position: 'relative', top: -7 }}>── {label} ──</span>
-        </div>
-        <div style={{ position: 'absolute', bottom: 0, left: 0, right: 0, borderBottom: '1px dashed rgba(232,232,224,0.18)' }} />
-      </div>
-    );
-  }
-  if (sysId === 'brutalist') {
-    return (
-      <div style={{
-        position: 'absolute', left: x, top: y, width: w, height: h,
-        // DS-OK: canonical per-system anatomy renderer value from awesome-list-site-ds/design-system-anatomy.jsx; pixel-gated against that source
-        border: '2px solid #f5f5f0', pointerEvents: 'none',
-      }}>
-        <div style={{
-          position: 'absolute', top: -12, left: 12,
-          background: '#000', padding: '0 8px',
-          fontFamily: "'JetBrains Mono', monospace",
-          fontSize: 10, fontWeight: 700, letterSpacing: '0.18em',
-          // DS-OK: canonical per-system anatomy renderer value from awesome-list-site-ds/design-system-anatomy.jsx; pixel-gated against that source
-          textTransform: 'uppercase', color: '#f5f5f0',
-        }}>{label}</div>
-      </div>
-    );
-  }
-  if (sysId === 'swiss') {
-    return (
-      <div style={{
-        position: 'absolute', left: x, top: y, width: w, height: h,
-        // DS-OK: canonical per-system anatomy renderer value from awesome-list-site-ds/design-system-anatomy.jsx; pixel-gated against that source
-        borderTop: '0.5px solid rgba(250,250,248,0.18)',
-        borderBottom: '0.5px solid rgba(250,250,248,0.18)',
-        pointerEvents: 'none',
-      }}>
-        <div style={{
-          position: 'absolute', top: 6, left: 8,
-          fontFamily: "'IBM Plex Mono', monospace",
-          fontSize: 9, letterSpacing: '0.14em',
-          // DS-OK: canonical per-system anatomy renderer value from awesome-list-site-ds/design-system-anatomy.jsx; pixel-gated against that source
-          color: 'rgba(250,250,248,0.5)',
-        }}>{label}</div>
-      </div>
-    );
-  }
   /* editorial / geist: soft */
   return (
     <div style={{
@@ -512,30 +278,12 @@ function FlowCanvas({ sysId, accent, children, height = 360, scrollable = false,
     <div className="ds-flow-canvas" style={{
       position: 'relative',
       background: s.bg,
-      // DS-OK: canonical per-system anatomy renderer value from awesome-list-site-ds/design-system-anatomy.jsx; pixel-gated against that source
-      border: sysId === 'brutalist' ? '2px solid #f5f5f0' : '1px solid var(--border)',
-      borderRadius: s.nodeRadius === 0 ? 0 : 'var(--radius)',
+      border: '1px solid var(--border)',
+      borderRadius: 'var(--radius)',
       height,
       overflow: 'hidden',
     }}>
       {/* atmosphere per system */}
-      {sysId === 'terminal' && (
-        <div style={{
-          position: 'absolute', inset: 0, pointerEvents: 'none',
-          // DS-OK: canonical per-system anatomy renderer value from awesome-list-site-ds/design-system-anatomy.jsx; pixel-gated against that source
-          backgroundImage: 'repeating-linear-gradient(0deg, transparent 0, transparent 2px, rgba(255,255,255,0.025) 2px, rgba(255,255,255,0.025) 3px)',
-        }} />
-      )}
-      {sysId === 'swiss' && (
-        <div style={{
-          position: 'absolute', inset: 0, pointerEvents: 'none',
-          // DS-OK: canonical per-system anatomy renderer value from awesome-list-site-ds/design-system-anatomy.jsx; pixel-gated against that source
-          backgroundImage:
-            `linear-gradient(0deg, transparent calc(100% - 1px), rgba(250,250,248,0.04) calc(100% - 1px)),` +
-            `linear-gradient(90deg, transparent calc(100% - 1px), rgba(250,250,248,0.04) calc(100% - 1px))`,
-          backgroundSize: '32px 32px',
-        }} />
-      )}
       {sysId === 'editorial' && (
         <div style={{
           position: 'absolute', inset: 0, pointerEvents: 'none',
@@ -665,14 +413,14 @@ function PrimitivePalette({ sysId, accent }) {
 /* ─── The Section ─── */
 function FlowDiagramsSection({ accent }) {
   const accentHex = (ACCENTS.find(x => x.id === accent) || ACCENTS[0]).primary;
-  const order = ['editorial', 'terminal', 'geist', 'brutalist', 'swiss'];
+  const order = Object.keys(SYSTEM_FLOW_STYLES);
 
   return (
     <section className="ds-section ds-flow-section" data-canonical-section="anatomy">
       <SectionHead
         eyebrow="── 02b / FLOW DIAGRAMS"
         title={<>Charts &amp; flows, <em style={{ fontStyle: 'italic', color: 'var(--accent)', fontFamily: 'var(--font-display)' }}>per system</em></>}
-        sub="The same delivery pipeline rendered five ways. Each system supplies its own grammar of nodes, decisions, arrows, edge labels, and lane containers — so any chart you build inherits the personality automatically."
+        sub="The same delivery pipeline rendered in both systems. Each system supplies its own grammar of nodes, decisions, arrows, edge labels, and lane containers — so any chart you build inherits the personality automatically."
       />
 
       <div style={{ display: 'flex', flexDirection: 'column', gap: 64 }}>
@@ -692,10 +440,7 @@ function FlowDiagramsSection({ accent }) {
                   </div>
                   <h3 className="ds-h" style={{ fontSize: 22, lineHeight: 1.2 }}>
                     {sysId === 'editorial'  && <>Soft cards, classic <em style={{ fontStyle: 'italic', fontFamily: 'var(--font-display)' }}>diamonds</em>, curved edges.</>}
-                    {sysId === 'terminal'   && <>ASCII boxes, <code>&lt; ?&gt;</code> branches, <code>▶</code> heads.</>}
                     {sysId === 'geist'      && <>Soft 10px corners, thin straight arrows, quiet labels.</>}
-                    {sysId === 'brutalist'  && <>Hard-shadow blocks, rotated diamonds, thick block heads.</>}
-                    {sysId === 'swiss'      && <>0.5px hairlines on a 32px grid. No shadow. No noise.</>}
                   </h3>
                 </div>
                 <div style={{
@@ -834,7 +579,7 @@ function Hero({ system }) {
         ── DESIGN&nbsp;SYSTEM&nbsp;v1.0 / awesome.video
       </div>
       <h1 className="ds-h" style={{ fontSize: 'clamp(48px, 8vw, 96px)', marginBottom: 24 }}>
-        Five systems.<br/>
+        Two systems.<br/>
         <span style={{ color: 'var(--accent)' }}>One taxonomy.</span>
       </h1>
       <p style={{
@@ -883,7 +628,7 @@ function SystemsOverview({ system, onSystem }) {
     <section className="ds-section">
       <SectionHead
         eyebrow="── 01 / SYSTEMS"
-        title={<>Five distinct <em style={{ fontStyle: 'italic', color: 'var(--accent)', fontFamily: 'var(--font-display)' }}>personalities</em></>}
+        title={<>Two distinct <em style={{ fontStyle: 'italic', color: 'var(--accent)', fontFamily: 'var(--font-display)' }}>personalities</em></>}
         sub="Each system is more than a recolor — different edges, type stacks, surface treatments, and component grammars. Click to apply globally."
       />
       <div style={{
@@ -1086,7 +831,7 @@ function Geometry({ system }) {
       <SectionHead
         eyebrow="── 04 / GEOMETRY"
         title="Spacing, radius, shadow"
-        sub="A 4px base spacing scale, system-specific radii, and shadow tokens that range from soft falloff (Editorial) to hard offset (Brutalist) to none (Swiss)."
+        sub="A 4px base spacing scale, system-specific radii, and shadow tokens that range from soft falloff (Editorial) to a quiet ring and glow (Geist)."
       />
 
       {/* Spacing */}

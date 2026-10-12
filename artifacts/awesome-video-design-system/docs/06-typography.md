@@ -1,7 +1,3 @@
----
-source: awesome-list-site-ds/docs/06-typography.md
-sha256: 50636d27ae58414d3c5e36ab4013b82dfa92ce6d1c0ed0dfaa68887694cc562d
----
 # 06 · Typography
 
 > Three families per system. The display does the personality work.
@@ -38,13 +34,10 @@ titles.
 | System | Display | Body | Mono |
 |--------|---------|------|------|
 | Editorial | Fraunces (italic accents) | Inter | JetBrains Mono |
-| Terminal | IBM Plex Mono | IBM Plex Mono | IBM Plex Mono |
 | Geist | Geist Sans | Geist Sans | JetBrains Mono |
-| Brutalist | Instrument Serif | Space Grotesk | JetBrains Mono |
-| Swiss | Manrope | Manrope | IBM Plex Mono |
 
-Why so many? Because the *typeface* is the personality. If you collapsed
-all five into one font stack you'd be left with five color schemes. That's
+Why different stacks? Because the *typeface* is the personality. If you
+collapsed both into one font stack you'd be left with two color schemes. That's
 not a design system, that's a `prefers-color-scheme` toggle.
 
 ## Type scale
@@ -82,15 +75,15 @@ mobile:
 
 Display gets **tight** leading and **negative** tracking:
 
-| Token | Editorial | Terminal | Geist | Brutalist | Swiss |
-|-------|-----------|----------|-------|-----------|-------|
-| `--display-weight` | 500 | 600 | 600 | 400 | 700 |
-| `--display-tracking` | -0.02em | -0.01em | -0.035em | -0.04em | -0.045em |
-| `--display-leading` | 1.04 | 1.1 | 1.05 | 0.92 | 1 |
-| `--body-leading` | 1.6 | 1.55 | 1.55 | 1.5 | 1.55 |
+| Token | Editorial | Geist |
+|-------|-----------|-------|
+| `--display-weight` | 500 | 600 |
+| `--display-tracking` | -0.02em | -0.035em |
+| `--display-leading` | 1.04 | 1.05 |
+| `--body-leading` | 1.6 | 1.55 |
 
-Notice Brutalist runs `0.92` leading — letters genuinely overlap, which is
-part of its monumental feeling. Swiss tops out at `1` — perfectly stacked.
+Geist tightens display tracking further (`-0.04em` on `.display-h`) for its
+compact, engineered headline voice.
 
 ## The mono micro-scale
 
@@ -135,16 +128,14 @@ font-feature-settings: "ss01", "cv11", "tnum";
 - `tnum` — **tabular numerals**. Always on. This makes columns of numbers
   align. *Critical* for an awesome-list site.
 
-Swiss adds `lnum` (lining figures) for stronger numeric presence.
-
 ## Italics
 
-Italics are **reserved** in two of five systems:
+Italics are **reserved** to one of the two systems:
 
 - **Editorial** — italic Fraunces *is* the accent. Use it sparingly: one
   italic word per headline, maximum. Italics in body copy mean true
   emphasis (a citation, a foreign word), never decoration.
-- **All other systems** — italics are not part of the visual language.
+- **Geist** — italics are not part of the visual language.
   Don't italicize at all.
 
 ```html
@@ -164,9 +155,9 @@ That `.serif-italic` helper class is:
 }
 ```
 
-In Terminal/Geist/Brutalist/Swiss it falls through to whatever the display
-font does (most of those mono/sans families have no italic, so it just
-renders normal — which is correct behavior).
+In Geist it falls through to whatever the display font does (Geist Sans
+ships no italic here, so it just renders normal — which is correct
+behavior).
 
 ## Rules
 
@@ -177,9 +168,6 @@ renders normal — which is correct behavior).
 
 > **RULE:** Use display family **only** for true display sizes (≥28px).
 > Below that, body. A 20px Fraunces line is a recipe card, not editorial.
-
-> **RULE:** Brutalist headlines should be **huge** — 80px+ in hero contexts.
-> Anything smaller forfeits the monumentality that makes it Brutalist.
 
 ## Common patterns
 
@@ -212,9 +200,8 @@ renders normal — which is correct behavior).
 </div>
 ```
 
-In Swiss, the `2,418` renders with tabular lining figures and tight
-tracking, looking like a Bloomberg terminal. In Editorial it's Inter, softer
-and warmer. Same markup.
+In Geist, the `2,418` renders in Geist Sans with tight tracking and a crisp,
+engineered feel. In Editorial it's Fraunces, softer and warmer. Same markup.
 
 ---
 

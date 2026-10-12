@@ -164,7 +164,7 @@ export default function AdminDashboard() {
     const userScrollEvents = ["pointerdown", "wheel", "touchstart"] as const;
     userScrollEvents.forEach((type) => host.addEventListener(type, release, { passive: true }));
     observer.observe(scroller);
-    // A late display-face swap (e.g. Terminal's mono) widens the tabs without
+    // A late display-face swap (e.g. a font-picker override) widens the tabs without
     // resizing the scroller itself, so also watch every tab trigger.
     scroller.querySelectorAll<HTMLElement>('[role="tab"]').forEach((tab) => observer.observe(tab));
     void document.fonts?.ready.then(reveal);

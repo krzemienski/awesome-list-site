@@ -78,8 +78,8 @@ Standard shadcn/ui primitives present in the repo. Import from
 
 **Design-system hooks.** `Button` emits `data-ds-variant="<variant>"` and `Badge`
 emits `data-ds="chip"` for its DS variants `chip` / `accent`, so the per-system skins
-in `design-system.css` restyle them automatically (terminal brackets, brutalist slabs,
-swiss hairlines). Interactive cards add `data-ds="card-hover"` (see `ResourceCard` /
+in `design-system.css` restyle them automatically (Editorial accent eyebrows, Geist sentence-case
+chips and ring-glow hovers). Interactive cards add `data-ds="card-hover"` (see `ResourceCard` /
 `TaxonomyCard`). Details: [`docs/DESIGN-SYSTEM.md`](DESIGN-SYSTEM.md) §7, contract:
 [`docs/AGENTS.md`](AGENTS.md).
 

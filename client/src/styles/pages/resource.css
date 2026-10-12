@@ -154,7 +154,7 @@
 .resource-detail-related { display: grid; gap: 24px; min-width: 0; }
 .resource-detail-related > * { min-width: 0; }
 
-/* Wider faces (terminal's mono) push the one-line "View all in …" label past a
+/* Wider faces (e.g. a font-picker override) push the one-line "View all in …" label past a
    phone column; let it wrap inside its 44px-min button instead. */
 .resource-detail-related [data-testid="link-view-all-category"] {
   height: auto;

@@ -22,14 +22,28 @@ export const HOME_LAYOUT_VALUES = ["index", "curated"] as const;
 export type HomeLayout = (typeof HOME_LAYOUT_VALUES)[number];
 export const DEFAULT_HOME_LAYOUT: HomeLayout = "index";
 
+/**
+ * THE kept design-system list — the single source of truth for which systems
+ * the site offers. The client theme module, the pre-paint boot data, the theme
+ * picker, the public /ds tables and the server's accepted values all read it.
+ * Editorial (the default, Crimson red) and Geist (neutral black) are kept;
+ * Terminal, Brutalist and Swiss were removed. Re-adding a system means one
+ * entry here plus its token table in client/public/ds/design-system.js + CSS.
+ */
 export const THEME_SYSTEM_VALUES = [
   "editorial",
-  "terminal",
   "geist",
-  "brutalist",
-  "swiss",
 ] as const;
 export type ThemeSystemId = (typeof THEME_SYSTEM_VALUES)[number];
+
+/** Systems that were offered once. A stored one resolves to the default pair. */
+export const REMOVED_THEME_SYSTEM_VALUES = ["terminal", "brutalist", "swiss"] as const;
+export const DEFAULT_THEME_SYSTEM: ThemeSystemId = "editorial";
+export const DEFAULT_THEME_ACCENT = "crimson" as const;
+
+export function isThemeSystemId(value: unknown): value is ThemeSystemId {
+  return typeof value === "string" && (THEME_SYSTEM_VALUES as readonly string[]).includes(value);
+}
 
 export const THEME_ACCENT_VALUES = [
   "crimson",

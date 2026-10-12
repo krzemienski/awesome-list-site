@@ -275,7 +275,7 @@ function buildClerkAppearance(
       // radius (buttons, inputs, OTP cells sit at the same step as the rest of
       // the app's controls) and the card is pinned separately below — Clerk's
       // own card step is a multiple of the base, which would overshoot the DS
-      // card token. Terminal and Brutalist author 0px, so they stay square.
+      // card token.
       ...(radii.control ? { borderRadius: radii.control } : {}),
     },
     elements: {

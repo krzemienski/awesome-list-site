@@ -79,7 +79,7 @@ This kit formalizes the **Editorial + Crimson** skin as the canonical awesome.vi
 brand. The tokens in `tokens/` mirror the runtime values in
 `client/src/styles/design-system.css` (`:root[data-system="editorial"]` +
 `[data-accent="crimson"]`) — if those change, regenerate this kit to match.
-The other 4 runtime skins (Terminal / Geist / Brutalist / Swiss) and 10-accent
+The other runtime skin (Geist) and the 10-accent
 switcher are **product theming**, not brand: use only Editorial + Crimson in
 external/off-product contexts. The full DS contract lives in
 `docs/DESIGN-SYSTEM.md` and `awesome-list-site-ds/HANDOFF.md`; this document

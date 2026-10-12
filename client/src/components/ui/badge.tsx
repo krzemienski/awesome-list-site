@@ -4,7 +4,7 @@ import { cva, type VariantProps } from "class-variance-authority"
 import { cn } from "@/lib/utils"
 
 // Every variant is a design-system `.chip`: paint, mono caps and the
-// per-system skins (Terminal brackets, Geist sentence case…) come from the
+// per-system skins (Geist sentence case…) come from the
 // canonical sheet. Accent stays reserved for the explicit `accent` variant.
 const badgeVariants = cva(
   "chip focus:outline-none",

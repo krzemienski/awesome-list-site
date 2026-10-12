@@ -12,7 +12,14 @@
   every reader falls back to an empty table when the globals don't exist.
 */
 
-export type SystemId = "editorial" | "terminal" | "geist" | "brutalist" | "swiss";
+import {
+  REMOVED_THEME_SYSTEM_VALUES,
+  THEME_SYSTEM_VALUES,
+  type ThemeSystemId,
+} from "../../../shared/onboarding-values";
+
+/** The kept systems come from ONE list: THEME_SYSTEM_VALUES (shared). */
+export type SystemId = ThemeSystemId;
 export type AccentId =
   | "crimson" | "magenta" | "orange" | "amber" | "emerald"
   | "matrix" | "cyan" | "violet" | "lime" | "rose";
@@ -75,21 +82,21 @@ export const THEME_BOOT_DATA = {
   systemKey: SYSTEM_STORAGE_KEY,
   accentKey: ACCENT_STORAGE_KEY,
   defaultSystem: DEFAULT_SYSTEM,
-  systemIds: ["editorial", "terminal", "geist", "brutalist", "swiss"],
+  systemIds: THEME_SYSTEM_VALUES,
+  // A stored removed system resets the accent too (terminal + matrix ->
+  // editorial + crimson), and the boot rewrites the stored pair.
+  removedSystemIds: REMOVED_THEME_SYSTEM_VALUES,
   accentIds: ["crimson", "magenta", "orange", "amber", "emerald", "matrix", "cyan", "violet", "lime", "rose"],
-  defaultAccents: { editorial: "crimson", terminal: "matrix", geist: "cyan", brutalist: "amber", swiss: "orange" },
+  defaultAccents: { editorial: "crimson", geist: "cyan" },
   // Minimum hundredth alpha for >=4.6:1 across bg, bg-2 and all three
   // surfaces composited on bg-2 (the lightest backing). Surface-3 is the
-  // limiting surface: editorial 4.6728, terminal 4.6253, geist 4.7085,
-  // brutalist 4.6763, swiss 4.7518. One hundredth lower fails each.
+  // limiting surface: editorial 4.6728, geist 4.7085. One hundredth lower
+  // fails each.
   // RGB is unchanged from each canonical system; --text-4 is untouched.
   text3Corrections: {
     // DS-OK: app-owned AA token corrections; canonical-token-parity recomputes contrast and minimal alpha.
     editorial: "rgba(244,243,238,0.49)",
-    terminal: "rgba(232,232,224,0.51)",
     geist: "rgba(250,250,250,0.49)",
-    brutalist: "rgba(245,245,240,0.50)",
-    swiss: "rgba(250,250,248,0.48)",
   },
 } as const;
 
@@ -99,8 +106,15 @@ const NO_SYSTEMS = Object.freeze({}) as Record<SystemId, DesignSystem>;
 const NO_ACCENTS: Accent[] = [];
 const NO_DEFAULTS = Object.freeze({}) as Record<SystemId, AccentId>;
 
+/** Only the kept systems, in THEME_SYSTEM_VALUES order, even if /ds lists more. */
 export function getDesignSystems(): Record<SystemId, DesignSystem> {
-  return (hasWindow() ? window.DESIGN_SYSTEMS : undefined) ?? NO_SYSTEMS;
+  const all = hasWindow() ? window.DESIGN_SYSTEMS : undefined;
+  if (!all) return NO_SYSTEMS;
+  const kept = {} as Record<SystemId, DesignSystem>;
+  for (const id of THEME_SYSTEM_VALUES) {
+    if (Object.prototype.hasOwnProperty.call(all, id)) kept[id] = all[id];
+  }
+  return kept;
 }
 
 export function getAccents(): Accent[] {
@@ -124,7 +138,7 @@ export function resolveSystemId(id: string | null | undefined): SystemId {
   return isSystemId(id) ? id : DEFAULT_SYSTEM;
 }
 
-/** A system's natural accent (terminal→matrix, geist→cyan…). */
+/** A system's natural accent (editorial→crimson, geist→cyan). */
 export function getSystemDefaultAccent(systemId: string | null | undefined): AccentId {
   return getSystemDefaultAccents()[resolveSystemId(systemId)] ?? DEFAULT_ACCENT;
 }
@@ -134,6 +148,22 @@ export function resolveAccentId(
   systemId: string | null | undefined,
 ): AccentId {
   return isAccentId(id) ? id : getSystemDefaultAccent(systemId);
+}
+
+/**
+ * Resolve a stored system/accent pair. A system that was removed from the kept
+ * list lands on the default pair (editorial + crimson): its accent was chosen
+ * for a look that no longer exists.
+ */
+export function resolveStoredTheme(
+  system: string | null | undefined,
+  accent: string | null | undefined,
+): { system: SystemId; accent: AccentId; removed: boolean } {
+  if (typeof system === "string" && (REMOVED_THEME_SYSTEM_VALUES as readonly string[]).includes(system)) {
+    return { system: DEFAULT_SYSTEM, accent: DEFAULT_ACCENT, removed: true };
+  }
+  const resolved = resolveSystemId(system);
+  return { system: resolved, accent: resolveAccentId(accent, resolved), removed: false };
 }
 
 function readStored(key: string): string | null {

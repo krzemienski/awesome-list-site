@@ -51,15 +51,11 @@ export const GLYPH_VARIANTS = ["sans", "mono", "serif"];
 export const FAMILY_VARIANT = {
   Inter: "sans",
   Geist: "sans",
-  "Space Grotesk": "sans",
   "IBM Plex Sans": "sans",
-  Manrope: "sans",
   "DM Sans": "sans",
   "Source Sans 3": "sans",
   "JetBrains Mono": "mono",
-  "IBM Plex Mono": "mono",
   Fraunces: "serif",
-  "Instrument Serif": "serif",
 };
 
 export const fontFileName = (variant) => `category-glyphs-${variant}.otf`;

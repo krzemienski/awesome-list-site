@@ -156,7 +156,7 @@
      (a syllable per line at 768px), so the title keeps a readable floor at
      every width and the table scrolls sideways instead. */
   min-width: 11rem;
-  /* Two lines at most, so wide mono systems (Terminal at 768/1024) keep the
+  /* Two lines at most, so wide faces (font-picker overrides at 768/1024) keep the
      same row rhythm; the full title is in the element's title attribute. */
   display: -webkit-box;
   -webkit-box-orient: vertical;

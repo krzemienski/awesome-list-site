@@ -1,7 +1,3 @@
----
-source: awesome-list-site-ds/docs/13-integration-react.md
-sha256: 4eaff2bbbc7aaf04809d81d5d8babbb02e020496e6f5aaeaebfb2cb8af7cf3b2
----
 # 13 · Integration: React
 
 > Provider, hooks, and component patterns for a React app.
@@ -22,7 +18,7 @@ Keep the same two files; rename for clarity:
 
 ```ts
 // design-system.ts
-export type SystemId = 'editorial' | 'terminal' | 'geist' | 'brutalist' | 'swiss';
+export type SystemId = 'editorial' | 'geist';
 export type AccentId =
   | 'crimson' | 'magenta' | 'orange' | 'amber' | 'emerald'
   | 'matrix' | 'cyan' | 'violet' | 'lime' | 'rose';
@@ -249,12 +245,12 @@ import { DesignSystemProvider } from './DesignSystemProvider';
 
 test('applies data-system attribute', () => {
   render(
-    <DesignSystemProvider defaultSystem="terminal">
+    <DesignSystemProvider defaultSystem="geist">
       <div data-testid="x">x</div>
     </DesignSystemProvider>
   );
   expect(document.documentElement.getAttribute('data-system'))
-    .toBe('terminal');
+    .toBe('geist');
 });
 ```
 

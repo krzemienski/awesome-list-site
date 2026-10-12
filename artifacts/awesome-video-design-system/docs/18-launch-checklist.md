@@ -1,7 +1,3 @@
----
-source: awesome-list-site-ds/docs/18-launch-checklist.md
-sha256: 4fefbb090fca7699abbc7f59a274f751bb27c20d3f0510bc7408c8a41f91c707
----
 # 18 · Launch checklist
 
 > The final gate. Run this before pushing the design system into production.
@@ -12,7 +8,7 @@ Print this. Tape it next to your monitor.
 
 ## Tokens
 
-- [ ] All five systems define every token in the contract — no missing keys.
+- [ ] Both systems define every token in the contract — no missing keys.
   See [04-tokens.md](./04-tokens.md#reference-complete-token-list) for the
   full list.
 - [ ] `SYSTEM_DEFAULT_ACCENT` has an entry for every system.

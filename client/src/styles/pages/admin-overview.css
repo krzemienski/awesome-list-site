@@ -12,8 +12,8 @@
 
 .admin-overview-stats-canonical .admin-canonical-stat {
   min-width: 0;
-  /* No border-color here: the frozen `.card` edge (and per-system skins such
-     as Brutalist's --text edge) must win, as on the reference. */
+  /* No border-color here: the frozen `.card` edge (and any per-system
+     skin) must win, as on the reference. */
   border-radius: var(--radius, var(--radius-md));
   box-shadow: none;
   text-align: start;
@@ -117,7 +117,7 @@
   padding: 22px;
   /* Frozen `.card` edge and fill: the legacy `.admin-panel` hairline/--card
      pair (0,1,0) would otherwise win. Border colour is left to `.admin-panel`
-     so the frozen per-system skins (e.g. Brutalist's --text edge, 0,2,0) still
+     so the frozen per-system skins (0,2,0) still
      apply, exactly as on the reference. */
   border-width: var(--border-w);
   border-radius: var(--radius, var(--radius-md));
@@ -406,8 +406,8 @@
   height: 4px;
   overflow: hidden;
   border-radius: var(--radius-pill);
-  /* Editorial's --surface-3 equals its --border (the reference track); Brutalist's
-     near-opaque --border would swallow the ink bar, --surface-3 does not. */
+  /* Editorial's --surface-3 equals its --border (the reference track); the
+     fallback keeps the track when a system omits --surface-3. */
   background: var(--surface-3, var(--border));
 }
 

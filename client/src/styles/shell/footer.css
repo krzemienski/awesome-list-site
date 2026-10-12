@@ -19,9 +19,6 @@
 .app-footer p { margin: 0; }
 
 .app-footer .app-footer-eyebrow { display: flex; font-size: 10px; margin-bottom: 12px; }
-/* The frozen footer label is plain .mono ("── INDEX"), so the Terminal
-   eyebrow prompt must not prefix it; the .eyebrow hook stays for stage 6. */
-[data-system="terminal"] .app-footer .app-footer-eyebrow::before { content: none; }
 .app-footer .app-footer-name {
   display: block;
   width: fit-content;
@@ -130,7 +127,7 @@
 .app-footer-meta-links > a:hover { color: var(--text); }
 
 /* Canonical `btn ghost` marker on a meta-strip text control: keep the strip's
-   link paint in every skin (no fill, border, lift, or brutalist caps). */
+   link paint in every skin (no fill, border, or lift). */
 .app-footer .app-footer-meta-links .btn.footer-cookie-settings,
 .app-footer .app-footer-meta-links .btn.footer-cookie-settings:hover {
   min-height: 44px;

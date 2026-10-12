@@ -1,7 +1,3 @@
----
-source: awesome-list-site-ds/docs/03-getting-started.md
-sha256: 99dbdf4ccf793d551985b5eb10bdafb99c8393848bb65af3c07bbe937b2f33b3
----
 # 03 · Getting started
 
 > The 3-step install. Zero build tools required.
@@ -28,7 +24,7 @@ The system uses 6 font families. Easiest: a single Google Fonts request.
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link
   rel="stylesheet"
-  href="https://fonts.googleapis.com/css2?family=Fraunces:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500;1,600&family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&family=Geist:wght@400;500;600;700&family=Instrument+Serif&family=Space+Grotesk:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600;700&family=Manrope:wght@400;500;600;700;800&display=swap">
+  href="https://fonts.googleapis.com/css2?family=Fraunces:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500;1,600&family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&family=Geist:wght@400;500;600;700&display=swap">
 ```
 
 If you only plan to use **one** system, you can trim to just its families
@@ -53,7 +49,7 @@ It exposes four globals:
 
 | Global | What it is |
 |--------|------------|
-| `window.DESIGN_SYSTEMS` | The five system definitions (tokens). |
+| `window.DESIGN_SYSTEMS` | The two system definitions (tokens). |
 | `window.ACCENTS` | The 10 accent colors. |
 | `window.SYSTEM_DEFAULT_ACCENT` | Natural-default accent per system. |
 | `window.applyDesignSystem(systemId, accentId)` | The applier. |

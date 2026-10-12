@@ -1,7 +1,3 @@
----
-source: awesome-list-site-ds/docs/15-integration-vue.md
-sha256: be4ef659fc307401eb86a9c59434bdd201059120dba4bb11f87d2812608b2f5d
----
 # 15 · Integration: Vue / Nuxt
 
 > Same primitives, idiomatic Vue API.
@@ -151,8 +147,7 @@ export default defineNuxtConfig({
           children: `
             (function(){
               var SYS_DEFAULT = {
-                editorial:'crimson', terminal:'matrix',
-                geist:'cyan', brutalist:'amber', swiss:'orange'
+                editorial:'crimson', geist:'cyan'
               };
               try {
                 var sys = localStorage.getItem('ds-system') || 'editorial';

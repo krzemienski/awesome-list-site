@@ -1,6 +1,8 @@
 /* =====================================================================
    DESIGN SYSTEMS — Awesome.Video
-   Five distinct, opinionated systems. All flat-black background.
+   Two kept systems: Editorial (the default, Crimson red) and Geist
+   (neutral black). All flat-black background. The kept list lives in
+   shared/onboarding-values.ts (THEME_SYSTEM_VALUES).
    Each system overrides ~30 tokens AND triggers a [data-system] attribute
    on <html> so component skins can shift in CSS (see styles.css).
    ===================================================================== */
@@ -64,57 +66,6 @@ window.DESIGN_SYSTEMS = {
     },
   },
 
-  /* ───────────────────────── TERMINAL ─────────────────────────
-     Mono everything. Square edges. ASCII rules and brackets.
-     Scanline overlay. Monochrome — accent only as glow.
-  */
-  terminal: {
-    name: 'Terminal',
-    tag: 'CRT · IBM Plex Mono',
-    desc: 'Mono-first terminal — square edges, scanlines, blinking carets.',
-    vars: {
-      '--bg':            '#000000',
-      '--bg-2':          '#040404',
-      '--surface':       'rgba(0,255,136,0.012)',
-      '--surface-2':     'rgba(0,255,136,0.025)',
-      '--surface-3':     'rgba(0,255,136,0.05)',
-      '--border':        'rgba(232,232,224,0.14)',
-      '--border-strong': 'rgba(232,232,224,0.32)',
-      '--hairline':      'rgba(232,232,224,0.08)',
-
-      '--text':   '#e8e8e0',
-      '--text-2': 'rgba(232,232,224,0.62)',
-      '--text-3': 'rgba(232,232,224,0.36)',
-      '--text-4': 'rgba(232,232,224,0.2)',
-
-      '--font-body':    "'IBM Plex Mono', ui-monospace, monospace",
-      '--font-display': "'IBM Plex Mono', ui-monospace, monospace",
-      '--font-mono':    "'IBM Plex Mono', ui-monospace, monospace",
-      '--display-weight': '600',
-      '--display-tracking': '-0.01em',
-      '--display-leading':  '1.1',
-      '--body-leading':     '1.55',
-      '--eyebrow-tracking': '0.2em',
-      '--mono-size-step':   '12px',
-
-      '--radius':    '0px',
-      '--radius-sm': '0px',
-      '--radius-pill': '0px',
-      '--border-w':  '1px',
-      '--hairline-w': '1px',
-
-      '--shadow-sm':  'none',
-      '--shadow':     'none',
-      '--shadow-lg':  '0 0 0 1px var(--accent), inset 0 0 60px color-mix(in srgb, var(--accent) 8%, transparent)',
-      '--shadow-accent': '0 0 0 1px var(--accent), 0 0 24px color-mix(in srgb, var(--accent) 30%, transparent)',
-
-      '--bg-atmosphere':
-        'repeating-linear-gradient(0deg, transparent 0, transparent 2px, rgba(255,255,255,0.018) 2px, rgba(255,255,255,0.018) 3px),' +
-        'radial-gradient(ellipse 800px 600px at 50% 50%, color-mix(in srgb, var(--accent) 4%, transparent), transparent 70%)',
-      '--grain-opacity': '0.5',
-    },
-  },
-
   /* ───────────────────────── GEIST ─────────────────────────
      Vercel-clean. Geist sans, neutral grays, soft 8px radii,
      subtle hover glow, no decoration. Quiet confidence.
@@ -165,106 +116,6 @@ window.DESIGN_SYSTEMS = {
     },
   },
 
-  /* ───────────────────────── BRUTALIST ─────────────────────────
-     Slab. Instrument Serif huge headlines. Hard 2px borders.
-     Offset hard shadow (4px 4px 0 0). No radius. Yells.
-  */
-  brutalist: {
-    name: 'Brutalist',
-    tag: 'Slab · Instrument Serif',
-    desc: 'Concrete slab — hard 2px borders, offset shadows, monumental serif.',
-    vars: {
-      '--bg':            '#000000',
-      '--bg-2':          '#0a0a0a',
-      '--surface':       'rgba(255,255,255,0.025)',
-      '--surface-2':     'rgba(255,255,255,0.06)',
-      '--surface-3':     'rgba(255,255,255,0.1)',
-      '--border':        'rgba(245,245,240,0.85)',
-      '--border-strong': 'rgba(245,245,240,1)',
-      '--hairline':      'rgba(245,245,240,0.18)',
-
-      '--text':   '#f5f5f0',
-      '--text-2': 'rgba(245,245,240,0.7)',
-      '--text-3': 'rgba(245,245,240,0.4)',
-      '--text-4': 'rgba(245,245,240,0.22)',
-
-      '--font-body':    "'Space Grotesk', system-ui, sans-serif",
-      '--font-display': "'Instrument Serif', 'Times New Roman', serif",
-      '--font-mono':    "'JetBrains Mono', ui-monospace, monospace",
-      '--display-weight': '400',
-      '--display-tracking': '-0.04em',
-      '--display-leading':  '0.92',
-      '--body-leading':     '1.5',
-      '--eyebrow-tracking': '0.24em',
-      '--mono-size-step':   '11px',
-
-      '--radius':    '0px',
-      '--radius-sm': '0px',
-      '--radius-pill': '0px',
-      '--border-w':  '2px',
-      '--hairline-w': '1px',
-
-      '--shadow-sm':  '2px 2px 0 0 var(--text)',
-      '--shadow':     '4px 4px 0 0 var(--text)',
-      '--shadow-lg':  '8px 8px 0 0 var(--text)',
-      '--shadow-accent': '4px 4px 0 0 var(--accent)',
-
-      '--bg-atmosphere': 'none',
-      '--grain-opacity': '0.55',
-    },
-  },
-
-  /* ───────────────────────── SWISS ─────────────────────────
-     Tight grid. Manrope. Hairline 0.5px borders. Numerals.
-     Visible grid lines. Generous whitespace. Clinical precision.
-  */
-  swiss: {
-    name: 'Swiss',
-    tag: 'Grid · Manrope',
-    desc: 'Tight Swiss grid — hairline rules, lining figures, clinical whitespace.',
-    vars: {
-      '--bg':            '#000000',
-      '--bg-2':          '#050506',
-      '--surface':       'rgba(250,250,248,0.018)',
-      '--surface-2':     'rgba(250,250,248,0.04)',
-      '--surface-3':     'rgba(250,250,248,0.07)',
-      '--border':        'rgba(250,250,248,0.085)',
-      '--border-strong': 'rgba(250,250,248,0.18)',
-      '--hairline':      'rgba(250,250,248,0.05)',
-
-      '--text':   '#fafaf8',
-      '--text-2': 'rgba(250,250,248,0.62)',
-      '--text-3': 'rgba(250,250,248,0.38)',
-      '--text-4': 'rgba(250,250,248,0.2)',
-
-      '--font-body':    "'Manrope', system-ui, sans-serif",
-      '--font-display': "'Manrope', system-ui, sans-serif",
-      '--font-mono':    "'IBM Plex Mono', ui-monospace, monospace",
-      '--display-weight': '700',
-      '--display-tracking': '-0.045em',
-      '--display-leading':  '1',
-      '--body-leading':     '1.55',
-      '--eyebrow-tracking': '0.14em',
-      '--mono-size-step':   '10.5px',
-
-      '--radius':    '4px',
-      '--radius-sm': '2px',
-      '--radius-pill': '999px',
-      '--border-w':  '1px',
-      '--hairline-w': '0.5px',
-
-      '--shadow-sm':  'none',
-      '--shadow':     'none',
-      '--shadow-lg':  '0 24px 60px rgba(0,0,0,0.5)',
-      '--shadow-accent': '0 0 0 1px var(--accent)',
-
-      '--bg-atmosphere':
-        'linear-gradient(0deg, transparent calc(100% - 1px), rgba(250,250,248,0.04) calc(100% - 1px)),' +
-        'linear-gradient(90deg, transparent calc(100% - 1px), rgba(250,250,248,0.04) calc(100% - 1px))',
-      '--bg-atmosphere-size': '64px 64px, 64px 64px',
-      '--grain-opacity': '0.18',
-    },
-  },
 };
 
 /* Accent palette — used across all systems. Each system tones them differently. */
@@ -284,10 +135,7 @@ window.ACCENTS = [
 /* Smart accent default per system — nudges users toward the system's natural color. */
 window.SYSTEM_DEFAULT_ACCENT = {
   editorial: 'crimson',
-  terminal:  'matrix',
   geist:     'cyan',
-  brutalist: 'amber',
-  swiss:     'orange',
 };
 
 /* Type scale — semantic sizes the showcase + components can use. */
