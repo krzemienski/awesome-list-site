@@ -679,7 +679,7 @@ function Router({ homeComponent: Home }: { homeComponent: HomeRouteComponent }) 
 
   // Run17 BUG-052: Back/Forward return to the saved scroll position instead
   // of the top; forward navigations still start at the top.
-  useScrollRestoration(location);
+  useScrollRestoration(location, search);
 
   // Run22 BUG-008: the chrome (sidebar/header) renders from a ~few-KB nav
   // tree; the 2.7MB corpus is only fetched on routes whose CONTENT needs it

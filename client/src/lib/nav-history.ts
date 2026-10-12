@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import { useEffect, useRef } from "react";
 
 // BUG-013 (run14): window.history.length is useless for "did the user
 // navigate inside the app?" — a fresh tab already has about:blank (and the
@@ -48,7 +48,13 @@ if (typeof window !== "undefined") {
   });
 }
 
-export function useScrollRestoration(location: string): void {
+// `location` is wouter's path; `search` its query. Positions are keyed by
+// both, so a Back/Forward that only changes the query (?page=2 → ?page=3)
+// must re-run the restore too. Forward query-only changes (filters, typing,
+// the paginator's own smooth scroll) keep the current offset; only a path
+// change starts at the top.
+export function useScrollRestoration(location: string, search: string): void {
+  const lastPath = useRef(location);
   useEffect(() => {
     if ("scrollRestoration" in window.history) {
       window.history.scrollRestoration = "manual";
@@ -75,8 +81,10 @@ export function useScrollRestoration(location: string): void {
   }, []);
 
   useEffect(() => {
+    const pathChanged = lastPath.current !== location;
+    lastPath.current = location;
     if (!pendingPop) {
-      window.scrollTo(0, 0);
+      if (pathChanged) window.scrollTo(0, 0);
       return;
     }
     pendingPop = false;
@@ -111,7 +119,7 @@ export function useScrollRestoration(location: string): void {
     return () => {
       cancelled = true;
     };
-  }, [location]);
+  }, [location, search]);
 }
 
 // In-app links to a page section (/settings#notification-settings) arrive via
