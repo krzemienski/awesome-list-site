@@ -1,3 +1,4 @@
+import { createHmac } from 'crypto';
 import fs from 'fs';
 import path from 'path';
 import yaml from 'js-yaml';
@@ -137,7 +138,10 @@ function envValue(value: string | undefined): string | undefined {
  * checked-in YAML ships blank values. `enabled` and `ip_hash_secret` are
  * environment-only (see ContactConfig) and never fall back to YAML: a secret
  * must not live in a committed file, and a too-short one counts as absent so
- * the endpoint fails closed instead of hashing with a guessable key.
+ * the endpoint fails closed instead of hashing with a guessable key. Without
+ * an explicit CONTACT_IP_HASH_SECRET the key is derived from SESSION_SECRET
+ * under a fixed purpose label, so enabling the form needs no extra secret and
+ * the derived key reveals nothing about the session secret.
  */
 export function resolveContactConfig(
   yamlContact: Partial<ContactConfig> | null | undefined,
@@ -150,7 +154,11 @@ export function resolveContactConfig(
   const discussionsUrl = envValue(env.CONTACT_DISCUSSIONS_URL);
   const discussionsVerified = envValue(env.CONTACT_DISCUSSIONS_VERIFIED);
   const retentionDays = yamlContact?.retention_days;
-  const ipHashSecret = envValue(env.CONTACT_IP_HASH_SECRET) ?? "";
+  const sessionSecret = envValue(env.SESSION_SECRET);
+  const ipHashSecret = envValue(env.CONTACT_IP_HASH_SECRET)
+    ?? (sessionSecret && sessionSecret.length >= CONTACT_IP_HASH_SECRET_MIN_LENGTH
+      ? createHmac("sha256", sessionSecret).update("awesome-video:contact-ip-hash:v1").digest("hex")
+      : "");
 
   return {
     enabled: env.CONTACT_ENABLED === "true",

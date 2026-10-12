@@ -35,7 +35,7 @@ Submission intake is default-off: a deployment that sets none of the `CONTACT_*`
 | Endpoint | Auth | Behaviour |
 | --- | --- | --- |
 | `GET /api/config` | none | Public site metadata plus the `contact` object above. Destinations are derived only from server config/env; the response carries `Cache-Control: public, max-age=300`. With the default configuration every destination is `available: false` and `form` is `{ available: false, unavailableReason: "The contact form is disabled" }`. |
-| `POST /api/contact` | none (same-origin required) | `404 { "message": "Not found" }` unless `CONTACT_ENABLED=true` — the disabled route is indistinguishable from a missing one and answers before any validation, origin, or limiter work. When enabled but `CONTACT_IP_HASH_SECRET` is missing or shorter than 16 characters it answers `503 { "message": "Contact form is not fully configured" }` (and `/api/config` reports the form unavailable with the matching reason). Otherwise the chain is: same-origin check → rate limiter → Zod validation (`shared/contact.ts`) → honeypot → persistence, and success is `200 { id, status: "received" }`. |
+| `POST /api/contact` | none (same-origin required) | `404 { "message": "Not found" }` unless `CONTACT_ENABLED=true` — the disabled route is indistinguishable from a missing one and answers before any validation, origin, or limiter work. When enabled but neither `CONTACT_IP_HASH_SECRET` nor `SESSION_SECRET` (from which the key is derived when the former is unset) is at least 16 characters it answers `503 { "message": "Contact form is not fully configured" }` (and `/api/config` reports the form unavailable with the matching reason). Otherwise the chain is: same-origin check → rate limiter → Zod validation (`shared/contact.ts`) → honeypot → persistence, and success is `200 { id, status: "received" }`. |
 | `GET /api/admin/contact-submissions?limit=&offset=` | authenticated admin | Newest-first page of the inbox: `{ submissions, total, limit, offset }` with `limit` 1–500 (default 50) and `offset` ≥ 0; anything else is `400`. Rows expose `id, name, replyTo, subject, message, createdAt, ipHash, userId` — never a raw IP. `Cache-Control: no-store`. There is no delete endpoint yet. |
 
 ### Submission rules
@@ -53,7 +53,7 @@ Submission intake is default-off: a deployment that sets none of the `CONTACT_*`
 | Setting | Source | Default | Effect |
 | --- | --- | --- | --- |
 | `CONTACT_ENABLED` | env only | unset (off) | Exactly `true` enables `POST /api/contact`. |
-| `CONTACT_IP_HASH_SECRET` | env only | unset | ≥ 16 characters; required once enabled, otherwise `503` + form unavailable. |
+| `CONTACT_IP_HASH_SECRET` | env only | derived from `SESSION_SECRET` | ≥ 16 characters; when unset the key is HMAC-derived from `SESSION_SECRET`; if neither is usable, `503` + form unavailable. |
 | `CONTACT_EMAIL` / YAML `contact.email` | env > YAML | empty | `mailto:` destination; anything else is unavailable. |
 | `CONTACT_ISSUES_URL` / YAML `contact.issues_url` | env > YAML | empty | `https:` issue tracker; never derived from `source.url`. |
 | `CONTACT_DISCUSSIONS_URL` + `CONTACT_DISCUSSIONS_VERIFIED` / YAML | env > YAML | empty / `false` | Discussions is offered only when both the URL and the verified flag are set. |

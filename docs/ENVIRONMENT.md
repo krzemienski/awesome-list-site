@@ -56,7 +56,7 @@ these in the **Secrets** pane instead of a file.
 | `VITE_MIXPANEL_TOKEN` / `MIXPANEL_TOKEN` | ❌ | – | Mixpanel browser/server analytics |
 | `VITE_POSTHOG_KEY` / `VITE_POSTHOG_HOST` | ❌ | – | PostHog browser analytics |
 | `CONTACT_ENABLED` | ❌ | unset (form off, `POST /api/contact` → 404) | `server/config.ts`, `server/routes/domains/contact.ts` |
-| `CONTACT_IP_HASH_SECRET` | ❌ (required once enabled) | – | `server/config.ts`, `server/routes/domains/contact.ts` |
+| `CONTACT_IP_HASH_SECRET` | ❌ (derived from `SESSION_SECRET` when unset) | – | `server/config.ts`, `server/routes/domains/contact.ts` |
 | `CONTACT_EMAIL` | ❌ | YAML `contact.email` (empty) | `server/config.ts` |
 | `CONTACT_ISSUES_URL` | ❌ | YAML `contact.issues_url` (empty) | `server/config.ts` |
 | `CONTACT_DISCUSSIONS_URL` | ❌ | YAML `contact.discussions_url` (empty) | `server/config.ts` |
@@ -243,8 +243,9 @@ stored in `contact_submissions`). Anything else keeps it disabled.
 ### `CONTACT_IP_HASH_SECRET`
 Environment-only HMAC key for the stored sender-IP hash (the raw address is
 never written). At least 16 characters; shorter values are treated as unset.
-Required once `CONTACT_ENABLED=true`: without it the server logs an error at
-boot, `/api/config` reports `form.available: false` with
+Optional: when unset, the key is derived from `SESSION_SECRET`
+(HMAC-SHA256 under a fixed purpose label). Only if neither is usable once
+`CONTACT_ENABLED=true` does the server log an error at boot, `/api/config` reports `form.available: false` with
 `"The contact form is not fully configured"`, and `POST /api/contact` answers
 `503` instead of storing an unhashed address. Rotating the key only breaks
 correlation between old and new rows.

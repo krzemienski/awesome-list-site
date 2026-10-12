@@ -5,7 +5,7 @@ import { TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/compon
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Skeleton } from "@/components/ui/skeleton";
-import { AlertCircle, ChevronLeft, ChevronRight, RefreshCw } from "lucide-react";
+import { AlertCircle, ChevronLeft, ChevronRight, Eye, EyeOff, RefreshCw } from "lucide-react";
 import { AdminOpsTable as Table, TableShell } from "@/components/admin/AdminOpsPrimitives";
 import { AdminLoadError } from "@/components/admin/AdminLoadError";
 import "@/styles/pages/admin-ops-users-audit.css";
@@ -54,6 +54,8 @@ function errorStatus(error: unknown): number | null {
 export default function ContactSubmissions() {
   const [offset, setOffset] = useState(0);
   const [selectedSubmission, setSelectedSubmission] = useState<ContactSubmission | null>(null);
+  // Reply-to stays masked until an admin explicitly reveals it for the open submission.
+  const [revealedId, setRevealedId] = useState<string | null>(null);
 
   const { data, isLoading, isError, error, refetch, isFetching } = useQuery<ContactSubmissionsResponse>({
     queryKey: ["/api/admin/contact-submissions", PAGE_SIZE, offset],
@@ -248,7 +250,10 @@ export default function ContactSubmissions() {
       <Dialog
         open={!!selectedSubmission}
         onOpenChange={(open) => {
-          if (!open) setSelectedSubmission(null);
+          if (!open) {
+            setSelectedSubmission(null);
+            setRevealedId(null);
+          }
         }}
       >
         <DialogContent className="admin-ops-contact-dialog max-w-2xl">
@@ -267,12 +272,32 @@ export default function ContactSubmissions() {
                 </div>
                 <div>
                   <div className="text-muted-foreground mb-1">Reply-to</div>
-                  <p
-                    title={maskEmail(selectedSubmission.replyTo)}
-                    data-testid="text-contact-detail-email"
-                  >
-                    {maskEmail(selectedSubmission.replyTo)}
-                  </p>
+                  <div className="flex min-w-0 items-center gap-1.5">
+                    {revealedId === selectedSubmission.id ? (
+                      <a
+                        href={`mailto:${selectedSubmission.replyTo}?subject=${encodeURIComponent(`Re: ${selectedSubmission.subject}`)}`}
+                        className="min-w-0 break-all underline underline-offset-4"
+                        data-testid="text-contact-detail-email"
+                      >
+                        {selectedSubmission.replyTo}
+                      </a>
+                    ) : (
+                      <p className="min-w-0 break-all" data-testid="text-contact-detail-email">
+                        {maskEmail(selectedSubmission.replyTo)}
+                      </p>
+                    )}
+                    <Button
+                      type="button"
+                      variant="ghost"
+                      size="icon"
+                      className="shrink-0"
+                      onClick={() => setRevealedId(revealedId === selectedSubmission.id ? null : selectedSubmission.id)}
+                      aria-label={revealedId === selectedSubmission.id ? "Mask reply-to email" : "Reveal reply-to email"}
+                      data-testid="button-contact-detail-reveal"
+                    >
+                      {revealedId === selectedSubmission.id ? <EyeOff className="h-3.5 w-3.5" aria-hidden="true" /> : <Eye className="h-3.5 w-3.5" aria-hidden="true" />}
+                    </Button>
+                  </div>
                 </div>
               </div>
               <div>

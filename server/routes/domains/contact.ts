@@ -220,7 +220,7 @@ export function registerContactRoutes(app: Express, ctx: ContactRoutesContext): 
 
   if (config.contact.enabled && !isFormReady()) {
     console.error(
-      "[contact] CONTACT_ENABLED=true but CONTACT_IP_HASH_SECRET is missing or shorter than 16 characters; " +
+      "[contact] CONTACT_ENABLED=true but neither CONTACT_IP_HASH_SECRET nor SESSION_SECRET (used to derive the key) is at least 16 characters; " +
         "POST /api/contact answers 503 and /api/config reports the form unavailable until it is set.",
     );
   }
