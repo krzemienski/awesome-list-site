@@ -102,7 +102,7 @@ Verification is by real browser use / curl only (no proof packets or gates since
 | D-09 | 44px touch targets at ≤1024 | FIXED — pagination, card actions, recommendation feedback, "+N more", home index rows, logo link, footer and related-tag links ≥44px at ≤1024; frozen chips/pills keep their sizes (≥24px AA) by decision | |
 | D-10 | Category glyph fallback on WebKit / Android emulation | OPEN | |
 | D-11 | Loading/empty/error states consistent | OPEN | |
-| D-12 | *(discovered in N-14)* Mobile drawer close button covers the counts of rows scrolled under it (375) | CONFIRMED | [D-12](proof/D-12/packet.md) |
+| D-12 | *(discovered in N-14)* Mobile drawer close button covers the counts of rows scrolled under it (375) | FIXED | [D-12](proof/D-12/packet.md): the drawer itself scrolls (as the reference's .mobile-drawer does), so the X leaves with its header row. Re-checked on the current tree (guest, /category/players-clients): editorial 375 and brutalist 375 scrolled 430 → X at −420, brutalist 768 scrolled 218 → X at −208; 0 counts under the X, "General Tools 134" readable, inner nav scrollTop 0, no overflow, Escape returns focus to "Toggle sidebar", 0 console errors |
 
 ## WS8 Accessibility and performance
 | ID | Item | Status | Packet |
