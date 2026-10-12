@@ -108,7 +108,7 @@ Verification is by real browser use / curl only (no proof packets or gates since
 | ID | Item | Status | Packet |
 |---|---|---|---|
 | X-01 | Lighthouse + axe on every route with dialogs/menus open | FIXED — axe (WCAG 2.0–2.2 A/AA) clean on 24 public routes + palette/drawer/account/consent/filters/share/suggest/report states, all 15 admin tabs, settings/profile/notifications/contributions/bookmarks/favorites; 1440 + 375; all five systems spot-checked. Fixed 2.5.3 label-in-name on header brand/search/account, drawer brand, palette close, chips, facets, taxonomy cards, resource actions, settings cards, admin stat cards (name hid the value), research notes, invite; admin activity list overflowed at 375 (actor 0px, unreachable scroll region) → wraps to two lines below 340px. Lighthouse a11y 100 on /, resource, categories, journey; dev best-practices 78 is Replit dev banner + Clerk dev cookies only (prod 100) | |
-| X-02 | Keyboard-only walk of core journeys | OPEN | |
+| X-02 | Keyboard-only walk of core journeys | FIXED — keyboard-only walk (Playwright, real Tab/Enter/Esc/arrows) of home (skip link → main), ⌘K palette select + Esc restore, category, search, resource, journey, guest + signed-in submit (Radix selects by keyboard), account menu, suggest dialog (trap + restore), 375 drawer (trap + restore): every stop has a visible ring, in view, no focus loss, 0 page errors. Fixed resource-card link name "Open Link : X" → "Open Link X (opens in new tab)" | |
 | X-03 | Lighthouse mobile on home/category/resource (≥90, LCP <2.5 s) | OPEN | |
 | X-04 | Core journeys in Firefox and WebKit | OPEN | |
 | X-05 | Print preview for resource, journey, bookmarks | OPEN | |
