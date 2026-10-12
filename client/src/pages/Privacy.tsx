@@ -97,28 +97,29 @@ export default function Privacy() {
               storage (not cookies). The cookies you may see are:
             </p>
             <div className="legal-table-wrap overflow-x-auto">
-              <table className="legal-table block w-full text-left text-xs sm:table sm:text-sm border-collapse" data-testid="table-cookies">
-                <thead className="hidden sm:table-header-group">
-                  <tr className="border-b border-[var(--border)] text-[color:var(--text)]">
-                    <th className="py-2 pr-4 font-semibold align-top">Cookie</th>
-                    <th className="py-2 pr-4 font-semibold align-top">Purpose</th>
-                    <th className="py-2 font-semibold align-top">Lifetime</th>
+              <table role="table" className="legal-table block w-full text-left text-xs sm:table sm:text-sm border-collapse" data-testid="table-cookies">
+                {/* Preserve table semantics when the mobile layout uses display: block. */}
+                <thead role="rowgroup" className="sr-only sm:not-sr-only sm:table-header-group">
+                  <tr role="row" className="border-b border-[var(--border)] text-[color:var(--text)]">
+                    <th role="columnheader" id="cookie-header-name" scope="col" className="py-2 pr-4 font-semibold align-top">Cookie</th>
+                    <th role="columnheader" id="cookie-header-purpose" scope="col" className="py-2 pr-4 font-semibold align-top">Purpose</th>
+                    <th role="columnheader" id="cookie-header-lifetime" scope="col" className="py-2 font-semibold align-top">Lifetime</th>
                   </tr>
                 </thead>
-                <tbody className="block sm:table-row-group">
-                  <tr className="block border-b border-[var(--border)] py-2 sm:table-row sm:py-0">
-                    <td className="block py-1 align-top font-mono sm:table-cell sm:py-2 sm:pr-4">
-                      <span className="mb-1 block font-sans font-semibold text-[color:var(--text)] sm:hidden">Cookie</span>
+                <tbody role="rowgroup" className="block sm:table-row-group">
+                  <tr role="row" className="block border-b border-[var(--border)] py-2 sm:table-row sm:py-0">
+                    <td role="cell" headers="cookie-header-name" className="block py-1 align-top font-mono sm:table-cell sm:py-2 sm:pr-4">
+                      <span aria-hidden="true" className="mb-1 block font-sans font-semibold text-[color:var(--text)] sm:hidden">Cookie</span>
                       __session*
                     </td>
-                    <td className="block py-1 align-top sm:table-cell sm:py-2 sm:pr-4">
-                      <span className="mb-1 block font-semibold text-[color:var(--text)] sm:hidden">Purpose</span>
+                    <td role="cell" headers="cookie-header-purpose" className="block py-1 align-top sm:table-cell sm:py-2 sm:pr-4">
+                      <span aria-hidden="true" className="mb-1 block font-semibold text-[color:var(--text)] sm:hidden">Purpose</span>
                       Clerk authentication cookie. Clerk uses it to maintain and
                       verify your signed-in session; the name may include an
                       instance suffix.
                     </td>
-                    <td className="block py-1 align-top sm:table-cell sm:py-2">
-                      <span className="mb-1 block font-semibold text-[color:var(--text)] sm:hidden">Lifetime</span>
+                    <td role="cell" headers="cookie-header-lifetime" className="block py-1 align-top sm:table-cell sm:py-2">
+                      <span aria-hidden="true" className="mb-1 block font-semibold text-[color:var(--text)] sm:hidden">Lifetime</span>
                       Managed by Clerk according to the authentication session
                     </td>
                   </tr>
@@ -127,13 +128,13 @@ export default function Privacy() {
                       (expires ~30 days, path=/, set on the first response
                       before any consent because it comes from the edge, not
                       our application). */}
-                  <tr className="block border-b border-[var(--border)] py-2 sm:table-row sm:py-0">
-                    <td className="block py-1 align-top font-mono sm:table-cell sm:py-2 sm:pr-4">
-                      <span className="mb-1 block font-sans font-semibold text-[color:var(--text)] sm:hidden">Cookie</span>
+                  <tr role="row" className="block border-b border-[var(--border)] py-2 sm:table-row sm:py-0">
+                    <td role="cell" headers="cookie-header-name" className="block py-1 align-top font-mono sm:table-cell sm:py-2 sm:pr-4">
+                      <span aria-hidden="true" className="mb-1 block font-sans font-semibold text-[color:var(--text)] sm:hidden">Cookie</span>
                       GAESA
                     </td>
-                    <td className="block py-1 align-top sm:table-cell sm:py-2 sm:pr-4">
-                      <span className="mb-1 block font-semibold text-[color:var(--text)] sm:hidden">Purpose</span>
+                    <td role="cell" headers="cookie-header-purpose" className="block py-1 align-top sm:table-cell sm:py-2 sm:pr-4">
+                      <span aria-hidden="true" className="mb-1 block font-semibold text-[color:var(--text)] sm:hidden">Purpose</span>
                       Infrastructure cookie set by our hosting edge (Google App
                       Engine), not by this application. It supports request
                       routing between the edge and our servers — we do not use
@@ -145,25 +146,25 @@ export default function Privacy() {
                       the site keeps working; the edge may simply set a fresh
                       one on a later visit.
                     </td>
-                    <td className="block py-1 align-top sm:table-cell sm:py-2">
-                      <span className="mb-1 block font-semibold text-[color:var(--text)] sm:hidden">Lifetime</span>
+                    <td role="cell" headers="cookie-header-lifetime" className="block py-1 align-top sm:table-cell sm:py-2">
+                      <span aria-hidden="true" className="mb-1 block font-semibold text-[color:var(--text)] sm:hidden">Lifetime</span>
                       About 30 days from your last visit
                     </td>
                   </tr>
-                  <tr className="block py-2 sm:table-row sm:py-0">
-                    <td className="block py-1 align-top font-mono sm:table-cell sm:py-2 sm:pr-4">
-                      <span className="mb-1 block font-sans font-semibold text-[color:var(--text)] sm:hidden">Cookie</span>
+                  <tr role="row" className="block py-2 sm:table-row sm:py-0">
+                    <td role="cell" headers="cookie-header-name" className="block py-1 align-top font-mono sm:table-cell sm:py-2 sm:pr-4">
+                      <span aria-hidden="true" className="mb-1 block font-sans font-semibold text-[color:var(--text)] sm:hidden">Cookie</span>
                       _ga*, ph_*, AMP_*, AMP_MKTG_*
                     </td>
-                    <td className="block py-1 align-top sm:table-cell sm:py-2 sm:pr-4">
-                      <span className="mb-1 block font-semibold text-[color:var(--text)] sm:hidden">Purpose</span>
+                    <td role="cell" headers="cookie-header-purpose" className="block py-1 align-top sm:table-cell sm:py-2 sm:pr-4">
+                      <span aria-hidden="true" className="mb-1 block font-semibold text-[color:var(--text)] sm:hidden">Purpose</span>
                       Cookies used by Google Analytics, PostHog, and Amplitude
                       for analytics identifiers and session continuity. They
                       are only set after you accept analytics; declining keeps
                       these services from loading.
                     </td>
-                    <td className="block py-1 align-top sm:table-cell sm:py-2">
-                      <span className="mb-1 block font-semibold text-[color:var(--text)] sm:hidden">Lifetime</span>
+                    <td role="cell" headers="cookie-header-lifetime" className="block py-1 align-top sm:table-cell sm:py-2">
+                      <span aria-hidden="true" className="mb-1 block font-semibold text-[color:var(--text)] sm:hidden">Lifetime</span>
                       Set and managed by the relevant analytics provider
                     </td>
                   </tr>
