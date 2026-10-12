@@ -1,3 +1,5 @@
+// Match server/index.ts: load the same root .env before resolving site identity.
+import "dotenv/config";
 import { defineConfig, type Plugin } from "vite";
 import react from "@vitejs/plugin-react";
 import path from "path";
@@ -5,6 +7,7 @@ import { PRODUCT_PROFILE_BOOT_DATA, THEME_BOOT_DATA } from "./client/src/lib/des
 import { FONT_BOOT_DATA, FONT_OPTIONS } from "./client/src/lib/font-options";
 
 const workspaceRoot = path.resolve(import.meta.dirname);
+const canonicalSiteUrl = process.env.PUBLIC_SITE_URL?.replace(/\/$/, "");
 
 /**
  * Vite's manifest describes the chunk graph but not which source modules were
@@ -147,6 +150,13 @@ function fontBootRegistry(): Plugin {
 }
 
 export default defineConfig({
+  // Canonical metadata uses the same configuration as server/og-middleware.ts.
+  // Ignore the retired VITE_SITE_URL override, including in legacy .env files.
+  define: {
+    "import.meta.env.VITE_SITE_URL": JSON.stringify(
+      canonicalSiteUrl?.length ? canonicalSiteUrl : "https://awesome.video",
+    ),
+  },
   plugins: [
     react(),
     themeBootRegistry(),

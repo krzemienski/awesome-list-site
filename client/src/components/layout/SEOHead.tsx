@@ -55,7 +55,8 @@ const SITE_NAME = "Awesome Video";
 // Canonical base must match the server SITE_URL (server/og-middleware.ts) so the
 // client-hydrated canonical / og:url / og:image never drift to a non-apex host
 // (e.g. the old staging subdomain, a www host, or a preview domain). Like the
-// server, an env override (VITE_SITE_URL) wins; otherwise the official apex.
+// server, PUBLIC_SITE_URL wins; Vite projects it into VITE_SITE_URL at build
+// time, ignoring any independently maintained legacy client override.
 const CANONICAL_BASE = (import.meta.env.VITE_SITE_URL || "https://awesome.video").replace(/\/+$/, "");
 
 // react-helmet registers an instance in UNSAFE_componentWillMount, which React

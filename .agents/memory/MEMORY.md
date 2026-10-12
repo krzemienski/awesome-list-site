@@ -31,7 +31,7 @@
 - [executeSql output format](executesql-output-format.md) — code_execution executeSql returns CSV-quoted TEXT in `.output` (no `.rows`); wrap queries in json_build_object + unwrap. Writes → use tsx/drizzle.
 - [Client API shape drift](client-api-shape-drift.md) — hand-typed client interfaces silently diverge from real API payloads (tsc can't catch); React key warnings + /path/undefined nav are the tell.
 - [Default query fetcher reads only queryKey[0]](queryclient-fetcher-key0.md) — array key segments are cache-only; a param fetch with no custom queryFn silently hits the LIST url → data.job undefined, view renders defaults with no error.
-- [Canonical base env divergence](canonical-base-env-divergence.md) — client canonical uses VITE_SITE_URL (stale github.io in .env), server uses SITE_URL; they can disagree, but noindex pages omit canonicals so are safe.
+- [Canonical origin parity](canonical-base-env-divergence.md) — compare full canonical and social URLs, not only paths; use the server's origin configuration.
 - [Recommendations endpoint perf](recommendations-endpoint-perf.md) — anon cold-start must be O(1) DB (per-resource N+1 wedges the pg pool → permanent hang); routes discard learningPaths so pass includeLearningPaths=false; authed ~9s is the real Claude call, not a bug.
 - [Claude Agent SDK migration](agent-sdk-migration.md) — shared router resolver (fail-closed on URL-without-cred), alias subagent models, token-only override pinned to router, tool lockdown, SDK peers.
 - [QA reports reference stale schema](qa-report-stale-schema.md) — external QA/audit bug reports assume a Next.js app with stale counts/routes; reproduce each against live DB+app first, ~1/3 don't reproduce.
@@ -149,21 +149,14 @@
 - [Contract masks 500 bodies](contract-500-body-masking.md) — every /api 500 body becomes "Internal Server Error"; 5xx ≠ nothing changed (write commits before audit) — keep describeWriteError copy uncertain.
 - [Queued optimistic rollback](queued-optimistic-rollback.md) — queued writes must roll back to last server-confirmed state, not their onMutate snapshot; failed refetch keeps loaded page.
 - [Before-fix proof instance](before-fix-proof-instance.md) — run pre-fix code from a /tmp copy + git show HEAD files on a 2nd port; worktree blocked, nohup dies; use run_in_background.
-- [Initial bundle zod-free](initial-bundle-zod.md) — shell imports must use resourceFacets-core; zod in App.tsx graph blew bundle-budget and blocked publish; run the publish gate before asking to republish.
+- [Initial bundle zod-free](initial-bundle-zod.md) — shell-reachable shared facet constants must stay zod-free; compare production bundle imports when investigating size regressions.
 - [og-middleware outage shell](og-middleware-outage-shell.md) — DB outage: HTML navigations get SPA shell + 503/Retry-After (client error card), non-HTML keeps JSON 503 (resilience gate contract).
 - [GitHub import taxonomy merge](github-import-taxonomy-merge.md) — import headings colliding by slug/case merge into the existing node + canonical names; no suffixed slugs; dryRun still creates nodes.
 - [AI job liveness](ai-job-liveness.md) — enrichment/research orphans judged by worker_id+heartbeat, not age; queue leftovers → 'cancelled'; USD-cap stops = budget_stopped.
 - [Full database backup design](database-backup-design.md) — private storage, no download route, CLI-only restore, archive-derived counts; never claim api_keys are hashed.
 - [Parity header-band split](header-band-split.md) — approved tablet header deviations judged band (≤5%) vs body (≤0.5%); add widths only with user approval.
 - [Edge decodes %-escapes](edge-percent-decoding.md) — prod edge decodes %2D etc. before the app, so escape-normalising 301s never fire on awesome.video; probe via trailing-slash echo.
-- [Symbol glyph fallback faces](symbol-glyph-font-faces.md) — unicode-range family augmentation must mirror every weight/style (Chrome); Vite inlines <4KB fonts; no url rebasing.
-- [Retry predicates that never stop](query-retry-predicate-forever.md) — a local useQuery retry fn ignoring failureCount loops 5xx forever (skeleton, no error UI); folded admin panels need unfolding in proofs.
-- [Vite transformIndexHtml query OOM](vite-transform-html-query-oom.md) — pass pathname only; a query on "/" makes Vite watch the whole filesystem → OOM + fake "all files changed" bursts.
-- [Route param names drive validation](route-param-id-inference.md) — any `:xxxId` path param is validated as int4 before the handler; varchar user ids 400 unless the param is renamed.
-- [Sync watchdog live ids](sync-watchdog-live-ids.md) — route-started syncs must register live queue ids or the 5-min watchdog orphans them mid-run; link scans hold heavy slot only for DB read.
-- [Page title face](page-title-face.md) — page h1s use .page-title (body face 700) per the reference; display face only for wordmark/numerals/state titles/accents.
-- [SSR lazy boundary #421](ssr-lazy-boundary-421.md) — env-gated lazy hosts in the hydrated Home tree throw #421/#419; mount closed hosts client-only; diff .replit userenv first.
-- [Secret leak scan by value](secret-history-leak-scan.md) — prove 'no secrets committed' by grepping real secret VALUES across all history blobs; owner password leaked via deleted July scripts.
+- [Runtime lessons](runtime-verification-lessons.md) — font fallback, retries, Vite, SSR, job liveness; [SEO](seo-routing-lessons.md) and [auth](auth-security-lessons.md) topic indexes.
 - [Robots parser precedence](robots-parser-precedence.md) — Python 3.11 robotparser uses first-match rules; use longest-match semantics to verify Allow: / plus private exclusions.
 - [Initial bundle zod boundary](initial-bundle-zod-boundary.md) — shell-reachable shared code must import resourceFacets-core; zod in entry failed publish; diff vs last-published build in /tmp.
 - [Reference sync gate history](design-reference-independence.md) — the design archive root is a frozen reference excluded from palette/profile gates; the frozen check reads a gitignored zip by recorded path → ENOENT elsewhere.
