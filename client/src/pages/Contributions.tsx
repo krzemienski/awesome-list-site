@@ -47,6 +47,15 @@ import { useToast } from "@/hooks/use-toast";
 import { queryUnavailableReason } from "@/lib/query-availability";
 import { ApiError, apiRequest, queryClient } from "@/lib/queryClient";
 import { writeFilterParams } from "@/lib/url-filter-state";
+import {
+  trackContributionExternalLinkOpened,
+  trackContributionFilterChanged,
+  trackContributionFiltersCleared,
+  trackContributionPublicResourceOpened,
+  trackContributionSubmitCtaClicked,
+  trackContributionWithdrawn,
+  trackContributionsPageChanged,
+} from "@/lib/analytics-contributions";
 import "@/styles/pages/account.css";
 
 type ContributionKind = "resource" | "edit";
@@ -290,6 +299,7 @@ function ContributionCard({
             </p>
             <a
               href={item.submission.url}
+              onClick={() => trackContributionExternalLinkOpened(item.submission!.url)}
               target="_blank"
               rel="noopener noreferrer"
               className="account-accent inline-flex min-h-8 min-w-0 items-center gap-1.5 text-sm underline-offset-4 hover:underline"
@@ -375,6 +385,9 @@ function ContributionCard({
               <Button asChild variant="outline" size="sm">
                 <Link
                   href={item.publicResource.path}
+                  onClick={() =>
+                    trackContributionPublicResourceOpened(item.kind, item.publicResource!.id)
+                  }
                   data-testid={`link-public-${item.kind}-${item.id}`}
                 >
                   View public resource
@@ -423,6 +436,10 @@ export default function Contributions() {
     const timer = window.setTimeout(() => {
       if (searchInput === state.q) return;
       setState((current) => ({ ...current, q: searchInput, page: 1 }));
+      trackContributionFilterChanged({
+        filterType: "search",
+        queryLength: searchInput.length,
+      });
       writeFilterParams(
         { q: searchInput || null, page: null },
         "replace",
@@ -480,6 +497,7 @@ export default function Contributions() {
       // C6-VX-02: the row's Withdraw button disappears with the withdraw, so
       // the dialog's close hands focus to the row (or the timeline heading).
       withdrawnRef.current = { kind: item.kind, id: item.id };
+      trackContributionWithdrawn(item.kind, item.id);
       setWithdrawTarget(null);
       void queryClient.invalidateQueries({
         queryKey: ["/api/user/contributions"],
@@ -514,6 +532,9 @@ export default function Contributions() {
     key: "type" | "status" | "sort",
     value: string,
   ) => {
+    if (state[key] !== value) {
+      trackContributionFilterChanged({ filterType: key, filterValue: value });
+    }
     const next = { ...state, [key]: value, page: 1 } as FilterState;
     setState(next);
     writeFilterParams(
@@ -532,6 +553,10 @@ export default function Contributions() {
   };
 
   const clearFilters = () => {
+    trackContributionFiltersCleared(
+      [state.type !== "all", state.status !== "all", state.sort !== "newest", !!state.q]
+        .filter(Boolean).length,
+    );
     const next = { type: "all", status: "all", sort: "newest", q: "", page: 1 } as const;
     setState(next);
     setSearchInput("");
@@ -547,6 +572,7 @@ export default function Contributions() {
   };
 
   const gotoPage = (page: number) => {
+    trackContributionsPageChanged(page, query.data?.pagination.totalPages ?? page);
     setState((current) => ({ ...current, page }));
     writeFilterParams({ page: page > 1 ? String(page) : null }, "push");
     setPageNotice(null);
@@ -624,7 +650,7 @@ export default function Contributions() {
             </p>
           </div>
           <Button asChild className="shrink-0">
-            <Link href="/submit">
+            <Link href="/submit" onClick={() => trackContributionSubmitCtaClicked("header")}>
               <Send className="mr-2 h-4 w-4" aria-hidden="true" />
               Submit a resource
             </Link>
@@ -819,7 +845,7 @@ export default function Contributions() {
           </StatePanel>
         ) : summary?.total === 0 ? (
           <StatePanel tone="empty" label="No contributions" title="No contributions yet" inline
-            actions={<Button asChild><Link href="/submit">Submit your first resource</Link></Button>}>
+            actions={<Button asChild><Link href="/submit" onClick={() => trackContributionSubmitCtaClicked("empty_state")}>Submit your first resource</Link></Button>}>
             Submit a useful video-development resource, or suggest an edit
             from any resource page. Both will appear here.
           </StatePanel>

@@ -23,7 +23,7 @@ export default function ContinueLearningPreview() {
   const summaryQuery = useContinueLearningSummary(true);
   const { data, isLoading, isError, refetch, isFetching } = summaryQuery;
   const offline = queryUnavailableReason(summaryQuery) === "offline";
-  const resumeJourney = useResumeJourney();
+  const resumeJourney = useResumeJourney("home_preview");
 
   if (isLoading) {
     return (
@@ -137,6 +137,8 @@ export default function ContinueLearningPreview() {
                   resumeJourney.mutate({
                     journeyId: active.journeyId,
                     href: active.nextStep?.href || active.href,
+                    hasNextStep: !!active.nextStep,
+                    progressPercent: active.progressPercent,
                   })
                 }
                 disabled={resumeJourney.isPending}

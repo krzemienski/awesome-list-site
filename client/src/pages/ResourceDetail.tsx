@@ -1190,6 +1190,7 @@ export default function ResourceDetail() {
             resource={resource}
             open={suggestEditOpen}
             onOpenChange={setSuggestEditOpen}
+            entryPoint="resource_page"
           />
         </Suspense>
       )}

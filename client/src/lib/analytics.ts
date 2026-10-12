@@ -620,10 +620,11 @@ const queuedDispatches: AnalyticsDispatchRequest[] = [];
  * Mixpanel, PostHog and Amplitude with identically cleaned properties.
  * Pre-consent it returns before doing anything — the dispatcher chunk (and
  * the property-hygiene rules inside it) is only fetched after a grant.
- * Module-private on purpose: callers use the typed helpers below, so the
- * catalog in docs/ANALYTICS.md stays the one place event names are decided.
+ * Components never call it directly: they use typed helpers — the ones in
+ * this file or an area module (analytics-<area>.ts) — so the catalog in
+ * docs/ANALYTICS.md stays the one place event names are decided.
  */
-const track = (name: string, props: EventProps = {}, options: TrackOptions = {}) => {
+export const track = (name: string, props: EventProps = {}, options: TrackOptions = {}) => {
   if (typeof window === 'undefined') return;
   if (getAnalyticsConsent() !== 'granted') return;
   const ga =
@@ -653,10 +654,6 @@ const track = (name: string, props: EventProps = {}, options: TrackOptions = {})
       queuedDispatches.length = 0;
       dispatchLoad = null;
     });
-};
-
-export const trackResourceEditSubmitted = (resourceId: string | number) => {
-  track('resource_edit_submitted', { resource_id: String(resourceId) }, { ga: false });
 };
 
 export type CommandPaletteOpenMethod = 'keyboard_shortcut' | 'slash_key' | 'header_button';

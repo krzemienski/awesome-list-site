@@ -141,3 +141,4 @@
 - [Page title face](page-title-face.md) — page h1s use .page-title (body face 700) per the reference; display face only for wordmark/numerals/state titles/accents.
 - [SSR lazy boundary #421](ssr-lazy-boundary-421.md) — env-gated lazy hosts in the hydrated Home tree throw #421/#419; mount closed hosts client-only; diff .replit userenv first.
 - [Secret leak scan by value](secret-history-leak-scan.md) — prove 'no secrets committed' by grepping real secret VALUES across all history blobs; owner password leaked via deleted July scripts.
+- [Analytics event counting in browser runs](analytics-event-counting.md) — Mixpanel/GA resend in-flight hits on a quick navigation (same $insert_id); dedupe by insert id or wait ~15s before navigating.

@@ -38,6 +38,7 @@ import {
   useContinueLearningSummary,
   useResumeJourney,
 } from "@/hooks/useContinueLearning";
+import { trackContinueLearningCtaClicked } from "@/lib/analytics-contributions";
 import "@/styles/pages/account.css";
 
 function relativeTime(value: string): string {
@@ -111,7 +112,16 @@ function ActiveJourneyCard({
           </Button>
         ) : (
           <Button className="w-full" variant="outline" asChild>
-            <Link href="/journeys">Browse available journeys</Link>
+            <Link
+              href="/journeys"
+              onClick={() =>
+                trackContinueLearningCtaClicked("browse_available_journeys", {
+                  journeyId: item.journeyId,
+                })
+              }
+            >
+              Browse available journeys
+            </Link>
           </Button>
         )}
       </CardFooter>
@@ -123,6 +133,9 @@ function RecentResourceCard({ item }: { item: ContinueLearningRecentResource }) 
   return (
     <Link
       href={item.href}
+      onClick={() =>
+        trackContinueLearningCtaClicked("recent_resource", { resourceId: item.resourceId })
+      }
       className="account-recent-resource group block min-w-0 p-4 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
       data-testid={`link-recent-resource-${item.resourceId}`}
     >
@@ -169,7 +182,7 @@ export default function ContinueLearning() {
   const { isAuthenticated, isLoading: authLoading } = useAuth();
   const summaryQuery = useContinueLearningSummary(isAuthenticated);
   const { data, isLoading, isError, refetch, isFetching } = summaryQuery;
-  const resumeJourney = useResumeJourney();
+  const resumeJourney = useResumeJourney("continue_learning_page");
 
   if (authLoading) {
     return (
@@ -293,10 +306,16 @@ export default function ContinueLearning() {
           </CardHeader>
           <CardContent className="flex flex-wrap gap-3">
             <Button asChild>
-              <Link href="/journeys">Start a journey</Link>
+              <Link
+                href="/journeys"
+                onClick={() => trackContinueLearningCtaClicked("start_journey")}
+              >
+                Start a journey
+              </Link>
             </Button>
             <Button variant="outline" asChild>
               <Link
+                onClick={() => trackContinueLearningCtaClicked("browse_resources")}
                 href={
                   preferredCategory
                     ? `/search?q=${encodeURIComponent(preferredCategory)}`
@@ -340,6 +359,8 @@ export default function ContinueLearning() {
                   resumeJourney.mutate({
                     journeyId: selected.journeyId,
                     href: selected.nextStep?.href || selected.href,
+                    hasNextStep: !!selected.nextStep,
+                    progressPercent: selected.progressPercent,
                   })
                 }
               />
@@ -393,7 +414,17 @@ export default function ContinueLearning() {
                     </p>
                   </div>
                   <Button variant="outline" size="sm" asChild>
-                    <Link href={item.href}>{item.isAvailable ? "Review" : "Find another"}</Link>
+                    <Link
+                      href={item.href}
+                      onClick={() =>
+                        trackContinueLearningCtaClicked(
+                          item.isAvailable ? "review_journey" : "find_another_journey",
+                          { journeyId: item.journeyId },
+                        )
+                      }
+                    >
+                      {item.isAvailable ? "Review" : "Find another"}
+                    </Link>
                   </Button>
                 </CardContent>
               </Card>
@@ -435,7 +466,14 @@ export default function ContinueLearning() {
                 </CardContent>
                 <CardFooter>
                   <Button className="w-full" variant="outline" asChild>
-                    <Link href={item.href}>
+                    <Link
+                      href={item.href}
+                      onClick={() =>
+                        trackContinueLearningCtaClicked("suggested_journey", {
+                          journeyId: item.journeyId,
+                        })
+                      }
+                    >
                       View journey
                       <ArrowRight className="ml-2 h-4 w-4" />
                     </Link>

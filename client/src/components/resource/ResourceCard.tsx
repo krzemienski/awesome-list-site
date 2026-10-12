@@ -463,6 +463,7 @@ function ResourceCard({
             resource={resourceForDialog}
             open={suggestEditOpen}
             onOpenChange={setSuggestEditOpen}
+            entryPoint="resource_card"
           />
         </Suspense>
       )}

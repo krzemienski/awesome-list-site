@@ -39,7 +39,14 @@ import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/hooks/useAuth";
 import { ApiError, apiRequest, queryClient } from "@/lib/queryClient";
 import { humanizeApiError } from "@/lib/apiError";
-import { trackResourceEditSubmitted } from "@/lib/analytics";
+import {
+  trackResourceEditAiAnalysisRequested,
+  trackResourceEditAiSuggestionsApplied,
+  trackResourceEditCancelled,
+  trackResourceEditStarted,
+  trackResourceEditSubmitted,
+  type SuggestEditEntryPoint,
+} from "@/lib/analytics-contributions";
 import type { Resource } from "@shared/schema";
 import { hasVisibleChars, isPlausiblePublicUrl, URL_HOSTNAME_MESSAGE, URL_WHITESPACE_MESSAGE } from "@shared/validation";
 
@@ -142,6 +149,8 @@ interface SuggestEditDialogProps {
   resource: Resource;
   open: boolean;
   onOpenChange: (open: boolean) => void;
+  /** Which opener showed the dialog — recorded on every funnel event. */
+  entryPoint: SuggestEditEntryPoint;
 }
 
 // BUG-023 (run14): the diff is computed on RESOLVED NAMES (the caller maps
@@ -180,7 +189,7 @@ function calculateDiff(original: Resource, updated: SuggestEditFormData): Record
   return diff;
 }
 
-export function SuggestEditDialog({ resource, open, onOpenChange }: SuggestEditDialogProps) {
+export function SuggestEditDialog({ resource, open, onOpenChange, entryPoint }: SuggestEditDialogProps) {
   const { toast } = useToast();
   const [, setLocation] = useLocation();
   const { isAuthenticated, user } = useAuth();
@@ -204,6 +213,22 @@ export function SuggestEditDialog({ resource, open, onOpenChange }: SuggestEditD
       analyzeButtonRef.current?.focus();
     }
   }, [confirmAnalyze, analyzingWithAI]);
+
+  // Funnel analytics. The started event fires once per editable open (the ref
+  // survives StrictMode's effect replay); the sign-in wall is not a start.
+  const funnelInfo = { resourceId: resource.id, entryPoint };
+  const startTrackedRef = useRef(false);
+  const aiAppliedRef = useRef(false);
+  useEffect(() => {
+    if (!open) {
+      startTrackedRef.current = false;
+      return;
+    }
+    if (!isAuthenticated || startTrackedRef.current) return;
+    startTrackedRef.current = true;
+    aiAppliedRef.current = false;
+    trackResourceEditStarted({ resourceId: resource.id, entryPoint });
+  }, [open, isAuthenticated, resource.id, entryPoint]);
 
   const { data: categories = [] } = useQuery<Category[]>({
     queryKey: ['/api/categories'],
@@ -262,6 +287,24 @@ export function SuggestEditDialog({ resource, open, onOpenChange }: SuggestEditD
       }
     }
   }, [open, categories, resource.category, form]);
+
+  // Read during render so react-hook-form subscribes to it (a first read
+  // inside an event handler would stay false).
+  const formChanged = form.formState.isDirty;
+
+  // Every user-initiated close (Cancel, Esc, overlay, ✕) goes through here;
+  // the submit success path calls onOpenChange directly and is not a cancel.
+  const handleDialogOpenChange = (next: boolean) => {
+    // A close while the submit is in flight is not an abandonment: the
+    // success path records it as submitted.
+    if (!next && open && !submitMutation.isPending) {
+      trackResourceEditCancelled(funnelInfo, {
+        formChanged,
+        aiSuggestionsApplied: aiAppliedRef.current,
+      });
+    }
+    onOpenChange(next);
+  };
 
   const watchedCategoryId = form.watch('category');
   const watchedSubcategoryId = form.watch('subcategory');
@@ -335,6 +378,7 @@ export function SuggestEditDialog({ resource, open, onOpenChange }: SuggestEditD
       });
       
       if (response.available === false) {
+        trackResourceEditAiAnalysisRequested(funnelInfo, "unavailable");
         toast({
           title: "AI Analysis Not Available",
           description: "Claude AI service is not configured. Please enter details manually.",
@@ -344,11 +388,13 @@ export function SuggestEditDialog({ resource, open, onOpenChange }: SuggestEditD
       }
       
       setClaudeSuggestions(response);
+      trackResourceEditAiAnalysisRequested(funnelInfo, "succeeded");
       toast({
         title: "AI Analysis Complete",
         description: `Suggestions generated with ${Math.round(response.confidence * 100)}% confidence`,
       });
     } catch (error) {
+      trackResourceEditAiAnalysisRequested(funnelInfo, "failed");
       toast({ ...analyzeFailureToast(error), variant: "destructive" });
     } finally {
       setAnalyzingWithAI(false);
@@ -357,12 +403,15 @@ export function SuggestEditDialog({ resource, open, onOpenChange }: SuggestEditD
 
   const handleApplySuggestions = () => {
     if (!claudeSuggestions) return;
+    let appliedFieldCount = 0;
     
     if (claudeSuggestions.suggestedTitle) {
       form.setValue('title', claudeSuggestions.suggestedTitle);
+      appliedFieldCount += 1;
     }
     if (claudeSuggestions.suggestedDescription) {
       form.setValue('description', claudeSuggestions.suggestedDescription);
+      appliedFieldCount += 1;
     }
     if (claudeSuggestions.suggestedCategory) {
       const matchingCategory = categories.find(
@@ -370,6 +419,7 @@ export function SuggestEditDialog({ resource, open, onOpenChange }: SuggestEditD
       );
       if (matchingCategory) {
         form.setValue('category', matchingCategory.id.toString());
+        appliedFieldCount += 1;
         if (claudeSuggestions.suggestedSubcategory) {
           const matchingSubcategory = subcategories.find(
             s => s.categoryId === matchingCategory.id &&
@@ -377,6 +427,7 @@ export function SuggestEditDialog({ resource, open, onOpenChange }: SuggestEditD
           );
           if (matchingSubcategory) {
             form.setValue('subcategory', matchingSubcategory.id.toString());
+            appliedFieldCount += 1;
             if (claudeSuggestions.suggestedSubSubcategory) {
               const matchingSubSub = subSubcategories.find(
                 ss => ss.subcategoryId === matchingSubcategory.id &&
@@ -384,12 +435,15 @@ export function SuggestEditDialog({ resource, open, onOpenChange }: SuggestEditD
               );
               if (matchingSubSub) {
                 form.setValue('subSubcategory', matchingSubSub.id.toString());
+                appliedFieldCount += 1;
               }
             }
           }
         }
       }
     }
+    aiAppliedRef.current = true;
+    trackResourceEditAiSuggestionsApplied(funnelInfo, appliedFieldCount);
     
     toast({
       title: "AI Suggestions Applied",
@@ -410,10 +464,13 @@ export function SuggestEditDialog({ resource, open, onOpenChange }: SuggestEditD
         body: JSON.stringify({ proposedData }),
       });
     },
-    onSuccess: () => {
+    onSuccess: (_data, { changedFields }) => {
       // Task #232: edit-suggestion event (ids only, no content — proposed
       // text may quote external material).
-      trackResourceEditSubmitted(resource.id);
+      trackResourceEditSubmitted(funnelInfo, {
+        changedFieldCount: changedFields.length,
+        aiSuggestionsApplied: aiAppliedRef.current,
+      });
       toast({
         title: "Edit Suggestion Submitted",
         description: "Your edit is pending review and now appears in your contribution timeline.",
@@ -525,7 +582,7 @@ export function SuggestEditDialog({ resource, open, onOpenChange }: SuggestEditD
   }
 
   return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
+    <Dialog open={open} onOpenChange={handleDialogOpenChange}>
       <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
         <DialogHeader>
           <div className="eyebrow" aria-hidden>{"// Suggest edit"}</div>
@@ -805,7 +862,7 @@ export function SuggestEditDialog({ resource, open, onOpenChange }: SuggestEditD
               <Button
                 type="button"
                 variant="outline"
-                onClick={() => onOpenChange(false)}
+                onClick={() => handleDialogOpenChange(false)}
                 data-testid="button-cancel-edit"
               >
                 Cancel

@@ -63,9 +63,11 @@ typed helper (analytics.ts: trackSearch, trackJourneyStart, …)
              └─ ampTrack      → Amplitude
 ```
 
-- **One call, four tools.** App code only calls typed helpers in
-  `client/src/lib/analytics.ts`; each helper calls the module-private
-  `track()`. Components never import `mpTrack` / `phCapture` / `ampTrack` /
+- **One call, four tools.** App code only calls typed helpers — in
+  `client/src/lib/analytics.ts` or an area module such as
+  `client/src/lib/analytics-contributions.ts`; each helper calls the shared
+  `track()` (exported only for those helper modules, never imported by
+  components). Components never import `mpTrack` / `phCapture` / `ampTrack` /
   `sendGaEvent` — those are the vendor halves of the dispatcher.
 - **Consent is unchanged per tool.** `track()` returns before doing anything
   unless `analytics-consent` is `granted`; the dispatcher re-checks before
@@ -150,10 +152,10 @@ the naming rules).
 | # | Question | Funnel / metric | Events it needs | Status / owner |
 |---|---|---|---|---|
 | 1 | **Activation** — do new visitors reach a first moment of value? | `page_viewed` (first session) → any value event within the session: `resource_link_opened`, `resource_bookmarked` / `guest_bookmark_added`, `journey_started` | listed | live |
-| 2 | **Retention** — do activated visitors come back and get value again? | weekly cohort retention on the same value events; returning-learner path `journey_resumed` → `journey_step_completed` | value events (live) + `journey_resumed` | live / planned — continue-learning area |
+| 2 | **Retention** — do activated visitors come back and get value again? | weekly cohort retention on the same value events; returning-learner path `journey_resumed` → `journey_step_completed` | value events (live) + `journey_resumed` (live) | live — continue-learning area |
 | 3 | **Collection usage** — are collections created, filled and shared? | `collection_created` → `collection_resource_added` → `collection_shared` → `public_collection_viewed` | `collection_created`, `collection_resource_added`, `collection_resource_removed`, `collection_shared`, `collection_deleted`, `public_collection_viewed` | planned — collections area |
 | 4 | **Notification engagement** — do notifications and digests bring people back? | `notifications_viewed` → `notification_opened`; digest landing (`digest_link_opened`) → value event; opt-outs via `notification_preferences_updated` | `notifications_viewed`, `notification_opened`, `notifications_marked_read`, `notification_preferences_updated`, `digest_link_opened` | planned — notifications & digest area |
-| 5 | **Contribution funnel** — how many visitors who start a submission or edit finish it, and how many get approved? | `resource_submit_started` → `resource_submitted` (server) → approval (server status) ; `resource_edit_started` → `resource_edit_submitted` | `resource_submit_started`, `resource_submitted` (server, live), `resource_edit_started`, `resource_edit_submitted` (live), `contributions_viewed` | partly live — contributions area |
+| 5 | **Contribution funnel** — how many visitors who start a submission or edit finish it, and how many get approved? | `resource_submit_started` → `resource_submitted` (server) → approval (server status) ; `resource_edit_started` (`entry_point`) → optional `resource_edit_ai_analysis_requested` → `resource_edit_ai_suggestions_applied` → `resource_edit_submitted`, exits via `resource_edit_cancelled`; follow-up on `/contributions` (`contribution_withdrawn`, `contribution_public_resource_opened`) | `resource_submit_started`, `resource_submitted` (server, live), `resource_edit_*` (live), `contribution_*` (live) | edit funnel + contributions page live; `resource_submit_started` planned — contributions area |
 | 6 | **Recommendation quality** — are recommendations opened, and from which position? | `recommendations_viewed` (`recommendation_count`, `source`) → `recommendation_opened` (`position`, `resource_id`) → value event on that resource | `recommendations_viewed`, `recommendation_opened`, `recommendations_refreshed` | planned — recommendations & onboarding area |
 | 7 | **Onboarding drop-off** — where do new accounts abandon onboarding? | `onboarding_started` → `onboarding_step_completed` (`step_number`, `step_name`) → `onboarding_completed`; exits via `onboarding_skipped` | `onboarding_started`, `onboarding_step_completed`, `onboarding_skipped`, `onboarding_completed` | planned — recommendations & onboarding area |
 | — | **Learning journeys** (existing funnel) | `journey_started` → `journey_step_completed` → `journey_completed` | listed | live |
@@ -206,7 +208,6 @@ taxonomy further down and are not repeated here.
 | `journey_completed` | `journey_complete` | all four | `journey_id`, `journey_title`, `total_steps` | `trackJourneyComplete` |
 | `resource_bookmarked` / `resource_unbookmarked` | — | product | `resource_id` | `trackResourceSaveToggle` ← `useResourceToggle` |
 | `resource_favorited` / `resource_unfavorited` | — (GA4 has legacy `resource_favorite`) | product | `resource_id` | `trackResourceSaveToggle` ← `useResourceToggle` |
-| `resource_edit_submitted` | — | product | `resource_id` | `trackResourceEditSubmitted` ← `suggest-edit-dialog` |
 | `guest_bookmark_added` / `guest_bookmark_removed` | same | all four | `resource_id`, `guest_saved_count` | `trackGuestBookmarkAdded` / `Removed` |
 | `auth_prompt_shown` | same | all four | `prompt_context`, `guest_saved_count` | `trackAuthPromptShown` |
 | `bookmarks_merged` | same | all four | `merged_count`, `duplicate_count`, `failed_count` | `trackBookmarksMerged` |
@@ -225,6 +226,31 @@ taxonomy further down and are not repeated here.
 | `sign_up_completed` | (`sign_up`, GA4-only client event) | Mixpanel, **server** | see `MIXPANEL.md` | server — Clerk JIT provisioning |
 | `resource_submitted` | (`generate_lead`, GA4-only client event) | Mixpanel, **server** | see `MIXPANEL.md` | server — resource-submit handler |
 
+
+#### Contributions and continue learning
+
+Helpers live in `client/src/lib/analytics-contributions.ts`. The suggest-edit
+funnel is product-only (like its pre-existing `resource_edit_submitted` step)
+so every step lives in the same tools; the rest go to all four. No proposed
+edit text, contribution search text or URLs beyond a hostname are sent.
+
+| Catalog event (product name) | GA4 name | Tools | Properties | Helper / source |
+|---|---|---|---|---|
+| `resource_edit_started` | — | product | `resource_id`, `entry_point` (`resource_card` \| `resource_page`) | `trackResourceEditStarted` ← `suggest-edit-dialog` (once per editable open; the signed-out sign-in wall is not a start) |
+| `resource_edit_ai_analysis_requested` | — | product | `resource_id`, `entry_point`, `outcome` (`succeeded` \| `unavailable` \| `failed`) | `trackResourceEditAiAnalysisRequested` ← dialog, after the confirmed (paid) request settles |
+| `resource_edit_ai_suggestions_applied` | — | product | `resource_id`, `entry_point`, `applied_field_count` | `trackResourceEditAiSuggestionsApplied` ← dialog "Apply" |
+| `resource_edit_cancelled` | — | product | `resource_id`, `entry_point`, `form_changed`, `ai_suggestions_applied` | `trackResourceEditCancelled` ← dialog Cancel / Esc / overlay / ✕ (not the post-submit close) |
+| `resource_edit_submitted` | — | product | `resource_id`, `entry_point`, `changed_field_count`, `ai_suggestions_applied` | `trackResourceEditSubmitted` ← dialog submit `onSuccess` (name unchanged) |
+| `contribution_filter_changed` | same | all four | `filter_type` (`type` \| `status` \| `sort` \| `search`), `filter_value` (selects) or `query_length` (search, debounced) | `trackContributionFilterChanged` ← `Contributions` |
+| `contribution_filters_cleared` | same | all four | `active_filter_count` | `trackContributionFiltersCleared` ← `Contributions` empty-state "Clear filters" |
+| `contribution_withdrawn` | same | all four | `contribution_kind` (`resource` \| `edit`), `contribution_id` | `trackContributionWithdrawn` ← withdraw `onSuccess` |
+| `contributions_page_changed` | same | all four | `page_number`, `total_pages` | `trackContributionsPageChanged` ← `Contributions` paginator |
+| `contribution_public_resource_opened` | same | all four | `contribution_kind`, `resource_id` | `trackContributionPublicResourceOpened` ← "View public resource" |
+| `contribution_external_link_opened` | same | all four | `contribution_kind`, `link_domain` | `trackContributionExternalLinkOpened` ← submitted URL link |
+| `contribution_submit_cta_clicked` | same | all four | `placement` (`header` \| `empty_state`) | `trackContributionSubmitCtaClicked` ← `Contributions` |
+| `journey_resumed` | same | all four | `journey_id`, `surface` (`continue_learning_page` \| `home_preview`), `has_next_step`, `progress_percent` | `trackJourneyResumed` ← `useResumeJourney` `onSuccess` (never `journey_started`) |
+| `continue_learning_cta_clicked` | same | all four | `cta` (`recent_resource` \| `review_journey` \| `find_another_journey` \| `browse_available_journeys` \| `suggested_journey` \| `start_journey` \| `browse_resources`), `journey_id` / `resource_id` when the CTA has one | `trackContinueLearningCtaClicked` ← `ContinueLearning` |
+
 Amplitude additionally sends its own `Viewed Home Page` verification event and
 autocaptured `[Amplitude] …` events; PostHog sends autocapture, `$pageview` and
 `$pageleave`. Those are SDK events, not catalog events.
@@ -233,7 +259,8 @@ autocaptured `[Amplitude] …` events; PostHog sends autocapture, `$pageview` an
 
 1. Pick the name with the naming rules; add a catalog row (and update the
    question/funnel row it serves).
-2. Add a typed helper in `analytics.ts` that calls `track()` — default options
+2. Add a typed helper in `analytics.ts` (or the area's `analytics-<area>.ts`
+   module) that calls `track()` — default options
    send the same name and properties to all four tools. Export it only together
    with its first caller (no speculative exports).
 3. Call it from the server-confirmed success point.
