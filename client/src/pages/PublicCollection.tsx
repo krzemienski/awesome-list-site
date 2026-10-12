@@ -1,12 +1,15 @@
 import { useQuery } from "@tanstack/react-query";
 import "@/styles/pages/discovery.css";
-import { Link } from "wouter";
 import { BookOpen, FolderOpen } from "lucide-react";
 import SEOHead from "@/components/layout/SEOHead";
 import ResourceCard from "@/components/resource/ResourceCard";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { ResourceCardSkeleton, PageHeaderSkeleton } from "@/components/ui/skeletons";
+import OfflinePageState from "@/components/layout/OfflinePageState";
+import NotFound from "@/pages/not-found";
+import { ApiError } from "@/lib/queryClient";
+import { queryUnavailableReason } from "@/lib/query-availability";
 import type { PublicCollection as PublicCollectionData } from "@/types/bookmarks";
 
 const CANONICAL_BASE = (import.meta.env.VITE_SITE_URL || "https://awesome.video").replace(
@@ -22,11 +25,12 @@ function collectionDescription(count: number): string {
 
 export default function PublicCollection({ shareId }: { shareId: string }) {
   const url = `/api/public/collections/${encodeURIComponent(shareId)}`;
-  const { data, isLoading, error } = useQuery<PublicCollectionData>({
+  const collectionQuery = useQuery<PublicCollectionData>({
     queryKey: [url],
     staleTime: 0,
     retry: false,
   });
+  const { data, isLoading, error, refetch } = collectionQuery;
   const publicUrl = `${CANONICAL_BASE}/collection/${encodeURIComponent(shareId)}`;
 
   if (isLoading) {
@@ -48,29 +52,35 @@ export default function PublicCollection({ shareId }: { shareId: string }) {
     );
   }
 
+  // Malformed, unknown, unpublished and deleted links all answer 404: the
+  // shared not-found page (same head the server sends for these URLs).
+  if (error instanceof ApiError && error.status === 404) {
+    return <NotFound suggestion={{ label: "Explore learning journeys", href: "/journeys" }} />;
+  }
+
+  if (queryUnavailableReason(collectionQuery) === "offline") {
+    return <OfflinePageState onRetry={() => void refetch()} testId="collection-offline" />;
+  }
+
   if (error || !data) {
     return (
       <div className="discovery-page space-y-6">
         <SEOHead
-          title="Collection Not Found"
-          description="This shared collection is unavailable or no longer published."
+          title="Collection unavailable"
+          description="This shared collection could not be loaded."
           noindex
           ogUrl={`${CANONICAL_BASE}/`}
         />
         <Card>
-          <CardContent className="discovery-state">
+          <CardContent className="discovery-state" role="alert" data-testid="collection-unavailable">
             <FolderOpen className="h-12 w-12 text-muted-foreground mb-4" aria-hidden="true" />
-            <h1 className="display-h text-2xl mb-2">Collection not found</h1>
+            <h1 className="display-h text-2xl mb-2">Couldn't load this collection</h1>
             <p className="max-w-md text-muted-foreground">
-              This link may be invalid, deleted, or no longer shared by its owner.
+              Something went wrong while fetching it. Please try again.
             </p>
-            {/* F013: dead-end recovery — give the visitor somewhere to go. */}
             <div className="mt-6 flex flex-wrap items-center justify-center gap-3">
-              <Button asChild data-testid="button-collection-browse">
-                <Link href="/">Browse resources</Link>
-              </Button>
-              <Button asChild variant="outline" data-testid="button-collection-journeys">
-                <Link href="/journeys">Explore journeys</Link>
+              <Button onClick={() => void refetch()} data-testid="button-collection-retry">
+                Try again
               </Button>
             </div>
           </CardContent>

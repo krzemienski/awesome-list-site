@@ -8,9 +8,10 @@ import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Separator } from "@/components/ui/separator";
 import SEOHead from "@/components/layout/SEOHead";
-import { resourceSeoDescription, missingPageSeo } from "@shared/seo-templates";
+import { resourceSeoDescription } from "@shared/seo-templates";
+import { parseRouteId } from "@shared/route-id";
+import NotFound from "@/pages/not-found";
 import { categoryGlyph } from "@/lib/category-glyph";
-import { useMissingRouteTelemetry } from "@/lib/route-monitor";
 import {
   ArrowLeft,
   ExternalLink,
@@ -96,14 +97,16 @@ export default function ResourceDetail() {
   const [loadedImage, setLoadedImage] = useState<string | null>(null);
   const [failedImage, setFailedImage] = useState<string | null>(null);
 
+  // A malformed id ("abc", "0", "1.5", past int4) names no resource: render
+  // the not-found page without asking the API, which would answer 400.
+  const validId = parseRouteId(id) !== null;
   const resourceQuery = useQuery<Resource & { resolvedKind?: ResourceKind; featured?: boolean }>({
     queryKey: ['/api/resources', id],
     queryFn: () => apiRequest(`/api/resources/${id}`, { method: "GET" }),
-    enabled: !!id
+    enabled: validId
   });
   const { data: resource, isLoading, error } = resourceQuery;
-  const resourceMissing = error instanceof ApiError && error.status === 404;
-  useMissingRouteTelemetry(resourceMissing);
+  const resourceMissing = !validId || (error instanceof ApiError && error.status === 404);
 
   const { data: favorites } = useQuery<Resource[]>({
     queryKey: ['/api/favorites'],
@@ -569,6 +572,11 @@ export default function ResourceDetail() {
     .slice(0, 6)
     .map((item) => ({ ...item.resource, score: item.score, reasons: item.reasons }));
 
+  // The shared not-found page owns the 404 head, h1 and dead-link telemetry.
+  if (resourceMissing) {
+    return <NotFound suggestion={{ label: "Search resources", href: "/search" }} />;
+  }
+
   if (isLoading) {
     return (
       <div className="space-y-4 sm:space-y-6 max-w-5xl mx-auto px-0 sm:px-4" aria-busy={true} aria-live="polite">
@@ -597,54 +605,14 @@ export default function ResourceDetail() {
   }
 
   if (error || !resource) {
-    if (!resourceMissing) {
-      return (
-        <Card className="m-auto w-full max-w-lg" data-testid="resource-unavailable">
-          <CardHeader>
-            <h1 className="text-2xl font-semibold">Resource temporarily unavailable</h1>
-            <CardDescription role="alert">We couldn't load this resource. Please try again.</CardDescription>
-          </CardHeader>
-          <CardContent><Button onClick={() => void resourceQuery.refetch()}>Retry</Button></CardContent>
-        </Card>
-      );
-    }
-    const requestedIdentifier = id || "unknown";
     return (
-      <div className="flex items-center justify-center min-h-full px-4">
-        <SEOHead
-          title={missingPageSeo.title}
-          description={missingPageSeo.description}
-          noindex
-          ogUrl={`${(import.meta.env.VITE_SITE_URL || "https://awesome.video").replace(/\/+$/, "")}/`}
-          image={`${(import.meta.env.VITE_SITE_URL || "https://awesome.video").replace(/\/+$/, "")}/og-image.png?path=%2F`}
-        />
-        <Card className="w-full max-w-lg" data-testid="resource-not-found">
-          <CardHeader>
-            <h1 className="text-2xl font-semibold leading-none tracking-tight">
-              Resource Not Found
-            </h1>
-            <CardDescription>
-              We couldn't find the resource requested as{" "}
-              <span className="font-medium text-foreground break-all">
-                {requestedIdentifier}
-              </span>
-              . It may have been removed or its link may be incorrect.
-            </CardDescription>
-          </CardHeader>
-          <CardContent className="flex flex-col gap-3 sm:flex-row">
-            <Button asChild variant="outline" className="min-h-10">
-              <Link href="/categories" data-testid="link-not-found-categories">
-                Browse categories
-              </Link>
-            </Button>
-            <Button asChild className="min-h-10">
-              <Link href="/search" data-testid="link-not-found-search">
-                Search resources
-              </Link>
-            </Button>
-          </CardContent>
-        </Card>
-      </div>
+      <Card className="m-auto w-full max-w-lg" data-testid="resource-unavailable">
+        <CardHeader>
+          <h1 className="text-2xl font-semibold">Resource temporarily unavailable</h1>
+          <CardDescription role="alert">We couldn't load this resource. Please try again.</CardDescription>
+        </CardHeader>
+        <CardContent><Button onClick={() => void resourceQuery.refetch()}>Retry</Button></CardContent>
+      </Card>
     );
   }
 

@@ -34,9 +34,10 @@ import {
 } from "@/lib/analytics";
 import SEOHead from "@/components/layout/SEOHead";
 import { isLogicalJourneyStepComplete } from "@shared/journeyProgress";
-import { journeySeoDescription, missingPageSeo } from "@shared/seo-templates";
+import { journeySeoDescription } from "@shared/seo-templates";
+import { parseRouteId } from "@shared/route-id";
+import NotFound from "@/pages/not-found";
 import "@/styles/pages/discovery-journeys.css";
-import { useMissingRouteTelemetry } from "@/lib/route-monitor";
 
 interface JourneyStep {
   id: number;
@@ -93,9 +94,9 @@ function applyOptimisticToggle(journey: Journey, stepIds: number[], completed: b
 }
 export default function JourneyDetail() {
   const { id } = useParams<{ id: string }>();
-  // Journey ids are positive integers; anything else is a not-found URL, not a
-  // transient failure worth retrying (the API rejects it with 400).
-  const isValidId = /^[1-9]\d*$/.test(id ?? "");
+  // Journey ids are positive int4 integers; anything else is a not-found URL,
+  // not a transient failure worth retrying (the API rejects it with 400).
+  const isValidId = parseRouteId(id) !== null;
   const [location, setLocation] = useLocation();
   const search = useSearch();
   const { isAuthenticated } = useAuth();
@@ -130,9 +131,6 @@ export default function JourneyDetail() {
   // a first load with no data becomes the full-page unavailable state.
   const journeyUnavailable =
     journeyMissing || journey ? null : queryUnavailableReason(journeyQuery);
-  // H08: a missing (or draft/archived — indistinguishable 404) journey reports
-  // the same dead-link telemetry as a missing resource page.
-  useMissingRouteTelemetry(!isValidId || journeyMissing);
 
   // Task #330: logical step count (distinct stepNumbers) for funnel events —
   // the same accounting the server uses for stepCount, never raw row count.
@@ -442,31 +440,10 @@ export default function JourneyDetail() {
     );
   }
 
+  // A missing (or draft/archived — indistinguishable 404) journey gets the
+  // shared not-found page, which owns the 404 head and dead-link telemetry.
   if (!journey) {
-    return (
-      <div className="journey-detail-page journey-detail-page--state">
-        {/* BUG-031 (run22): not-found state gets its own head (noindex — matches
-            the server's soft-404 contract) instead of inheriting a stale one. */}
-        {/* Task #587 (H07): same head as the server's soft-404 so crawl and
-            render passes agree; the visible h1 stays journey-specific. */}
-        <SEOHead title={missingPageSeo.title} description={missingPageSeo.description} noindex />
-        <h1 className="display-h journeys-state__title">Journey not found.</h1>
-        <Alert variant="destructive" className="journeys-alert">
-          <AlertCircle className="h-4 w-4" />
-          <AlertDescription>
-            It may have been removed or archived.
-          </AlertDescription>
-        </Alert>
-        <Button 
-          variant="outline" 
-          className="journeys-state__action mt-4"
-          onClick={() => setLocation('/journeys')}
-        >
-          <ArrowLeft className="h-4 w-4 mr-2" />
-          Back to Journeys
-        </Button>
-      </div>
-    );
+    return <NotFound suggestion={{ label: "Browse all journeys", href: "/journeys" }} />;
   }
 
   const isEnrolled = !!journey?.progress;

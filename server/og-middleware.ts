@@ -2,6 +2,7 @@ import type { Request, Response, NextFunction } from "express";
 import { storage } from "./storage";
 import { getAboutFaqs } from "@shared/faq";
 import { parsePageNumber, parseUrlPageStrict } from "@shared/page-param";
+import { parseRouteId } from "@shared/route-id";
 import { isSearchableQuery, normalizeSearchQuery } from "@shared/searchNormalize";
 import { readSearchState, searchCanBrowse, searchStateValid, discoveryRedirect } from "@shared/discovery-params";
 import { listDiscoveryResources, resolveTaxonomyPage } from "./services/public-discovery";
@@ -1565,8 +1566,9 @@ function homeShellChrome(): string {
     // resolves. Number("+184847") parses fine, so the old check served a 200
     // duplicate for the "+"-prefixed shape; any non-canonical variant that
     // slips past the middleware normalizer (which 301s it) soft-404s here.
-    const idNum = /^\d+$/.test(raw) ? parseInt(raw, 10) : NaN;
-    if (Number.isInteger(idNum) && idNum > 0) {
+    // Ids past int4 are 404s too, not a failed lookup that falls back to 200.
+    const idNum = parseRouteId(raw);
+    if (idNum !== null) {
       try {
         const resource = await storage.getResource(idNum);
         // Only approved resources are public/indexable (this mirrors the
@@ -1765,8 +1767,8 @@ function homeShellChrome(): string {
     const raw = safeDecode(jMatch[1]);
     // BUG-033 (audit 2): same strict all-digits rule as /resource/:id — a
     // "+7"-style id must never render a 200 duplicate of /journey/7.
-    const idNum = /^\d+$/.test(raw) ? parseInt(raw, 10) : NaN;
-    if (Number.isInteger(idNum) && idNum > 0) {
+    const idNum = parseRouteId(raw);
+    if (idNum !== null) {
       try {
         const journey = await storage.getLearningJourney(idNum);
         // Only published journeys are public/indexable (this mirrors the
