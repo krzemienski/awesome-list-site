@@ -153,6 +153,25 @@ export const optOutGA = () => {
   const measurementId = getMeasurementId();
   if (measurementId) window[`ga-disable-${measurementId}`] = true;
   window.gtag?.('consent', 'update', { analytics_storage: 'denied' });
+  clearGACookies();
+};
+
+// Withdrawing consent also withdraws the stored client id. GA writes _ga and
+// _ga_<id> on the highest settable parent domain, so expire each name on the
+// host and on every parent (the browser ignores a public-suffix domain).
+const clearGACookies = () => {
+  if (typeof document === 'undefined') return;
+  const names = document.cookie
+    .split(';')
+    .map((part) => part.split('=')[0].trim())
+    .filter((name) => name === '_ga' || name.startsWith('_ga_'));
+  if (names.length === 0) return;
+  const labels = window.location.hostname.split('.');
+  const domains = [''];
+  for (let i = 0; i < labels.length - 1; i += 1) domains.push(`; Domain=.${labels.slice(i).join('.')}`);
+  for (const name of names) {
+    for (const domain of domains) document.cookie = `${name}=; Path=/; Max-Age=0${domain}`;
+  }
 };
 const baseContext = (): Record<string, unknown> => {
   if (typeof window === 'undefined') return {};
