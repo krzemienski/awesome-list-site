@@ -737,6 +737,12 @@ function Router({ homeComponent: Home }: { homeComponent: HomeRouteComponent }) 
   // wrong redirect can flash before /api/auth/user answers. The old
   // app-wide skeleton gate is gone entirely; the guards own their loading UI.
 
+  const homeElement = legacyHomeQuery ? (
+    <Redirect to={`/search?q=${encodeURIComponent(legacyHomeQuery)}`} replace />
+  ) : (
+    <Home nav={nav} navLoading={navLoading} />
+  );
+
   // Run15 BUG-033 (supersedes R3-29's lean standalone 404): unknown URLs keep
   // the full sidebar/header chrome so lost visitors can navigate away instead
   // of hitting a dead end.
@@ -780,15 +786,18 @@ function Router({ homeComponent: Home }: { homeComponent: HomeRouteComponent }) 
         </div>
       ) : null}
       <RouteErrorBoundary location={location}>
+      {Home !== HomeRoute && location === "/" ? (
+        // SSR and its hydration pass the resolved Home, so nothing here can
+        // suspend. Keeping it outside the route Suspense matters: React defers
+        // a server-rendered boundary to an idle hydration pass, and the shell's
+        // query updates (auth, config) re-render into it first — a sync update
+        // into a dehydrated boundary throws #421 and client-renders Home
+        // (WebKit ~2/5 loads). Lazy pieces inside Home own their boundaries.
+        homeElement
+      ) : (
       <Suspense fallback={<RouteFallback />}>
       <Switch>
-        <Route path="/">
-          {legacyHomeQuery ? (
-            <Redirect to={`/search?q=${encodeURIComponent(legacyHomeQuery)}`} replace />
-          ) : (
-            <Home nav={nav} navLoading={navLoading} />
-          )}
-        </Route>
+        <Route path="/">{homeElement}</Route>
         {/* REQUIRED — the /*? optional wildcard is the only wouter syntax that
             matches both the bare URL and Clerk's OAuth/verification sub-paths. */}
         <Route path="/sign-in/*?" component={SignInPage} />
@@ -909,6 +918,7 @@ function Router({ homeComponent: Home }: { homeComponent: HomeRouteComponent }) 
         </Route>
       </Switch>
       </Suspense>
+      )}
       </RouteErrorBoundary>
     </MainLayout>
   );

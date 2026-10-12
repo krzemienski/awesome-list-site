@@ -1,3 +1,4 @@
+import "./lib/zod-jitless";
 import { hydrateRoot, createRoot } from "react-dom/client";
 import App from "./App";
 import "./index.css";
