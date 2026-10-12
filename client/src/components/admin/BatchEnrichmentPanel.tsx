@@ -102,6 +102,26 @@ function averageBatchCost(jobs: EnrichmentJob[]): string {
   return `$${mean.toFixed(2)}`;
 }
 
+/**
+ * Recorded agent cost divided by resources processed, over jobs that carry
+ * both; null until a job has reported a cost. A run's cost scales with the
+ * resources it processes, not with its batch size.
+ */
+function costPerResource(jobs: EnrichmentJob[]): number | null {
+  let cost = 0;
+  let processed = 0;
+  for (const job of jobs) {
+    const metadata = job.metadata as { agent?: { estimatedCostUsd?: unknown } } | null | undefined;
+    const jobCost = Number(metadata?.agent?.estimatedCostUsd);
+    const jobProcessed = Number(job.processedResources);
+    if (Number.isFinite(jobCost) && jobCost >= 0 && jobProcessed > 0) {
+      cost += jobCost;
+      processed += jobProcessed;
+    }
+  }
+  return processed > 0 ? cost / processed : null;
+}
+
 export default function BatchEnrichmentPanel() {
   const { toast } = useToast();
   const queryClient = useQueryClient();
@@ -247,6 +267,13 @@ export default function BatchEnrichmentPanel() {
   useEffect(() => {
     setIsPolling(hasActiveJob);
   }, [hasActiveJob]);
+
+  // The server enriches every resource the filter matches; "unenriched" uses
+  // the same no-tags predicate as the coverage endpoint.
+  const startScopeCount = coverage
+    ? (filter === 'unenriched' ? coverage.untagged : coverage.approvedTotal)
+    : null;
+  const startCostPerResource = costPerResource(jobs);
 
   const handleStartEnrichment = () => {
     if (!activeJobStateKnown) {
@@ -1185,6 +1212,29 @@ export default function BatchEnrichmentPanel() {
               in batches of {batchSize}. The job runs in the background and incurs real API cost.
             </AlertDialogDescription>
           </AlertDialogHeader>
+          <div className="space-y-1 text-center text-sm sm:text-left" data-testid="text-enrichment-scope">
+            {startScopeCount === null ? (
+              <p className="text-muted-foreground">
+                The number of matching resources couldn&apos;t be loaded, so this run&apos;s size is unknown.
+              </p>
+            ) : startScopeCount === 0 ? (
+              <p>No resources match this filter, so there is nothing to enrich.</p>
+            ) : (
+              <>
+                <p>
+                  It will process <strong>{startScopeCount.toLocaleString()}</strong>{' '}
+                  {startScopeCount === 1 ? 'resource' : 'resources'}
+                  {!batchSizeInvalid && ` (${Math.ceil(startScopeCount / batchSize).toLocaleString()} ${Math.ceil(startScopeCount / batchSize) === 1 ? 'batch' : 'batches'} of ${batchSize})`}, not just one batch.
+                </p>
+                {startCostPerResource !== null && (
+                  <p className="text-muted-foreground">
+                    Recent runs cost about ${startCostPerResource.toFixed(3)} per resource, so this run
+                    could cost around ${(startCostPerResource * startScopeCount).toFixed(2)}. You can cancel it while it runs.
+                  </p>
+                )}
+              </>
+            )}
+          </div>
           {startMutation.isError && (
             <Alert variant="destructive" className="queues-agent__inline-error" role="alert">
               <AlertCircle className="h-4 w-4" />
@@ -1198,7 +1248,7 @@ export default function BatchEnrichmentPanel() {
                 event.preventDefault();
                 launchEnrichment();
               }}
-              disabled={startMutation.isPending || !activeJobStateKnown || hasActiveJob}
+              disabled={startMutation.isPending || !activeJobStateKnown || hasActiveJob || startScopeCount === 0}
               data-testid="button-confirm-enrichment-start"
             >
               {startMutation.isPending ? "Starting…" : "Start enrichment"}
