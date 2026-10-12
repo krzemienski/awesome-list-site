@@ -24,6 +24,17 @@ const ContactDialogHost =
     ? lazy(() => import("@/components/contact/contact-dialog").then((module) => ({ default: module.ContactDialogHost })))
     : null;
 
+/** Mounts the lazy contact host only after hydration. Server-rendered, its
+ * empty Suspense boundary stayed dehydrated on the client until the chunk
+ * arrived, and any update reaching it first threw React #421/#419 and forced
+ * a client re-render of the boundary. */
+function ClientContactDialogHost() {
+  const [mounted, setMounted] = useState(false);
+  useEffect(() => setMounted(true), []);
+  if (!ContactDialogHost || !mounted) return null;
+  return <Suspense fallback={null}><ContactDialogHost /></Suspense>;
+}
+
 /** R2-L01: floating "back to top" button, appears after scrolling ~600px.
  * It steps aside once the footer's meta strip is on screen: that strip spans
  * the content column to its right edge, exactly where the button floats. */
@@ -32,9 +43,15 @@ function BackToTop() {
 
   useEffect(() => {
     const onScroll = () => {
+      // Read scrollY first: measuring the footer forces a synchronous layout,
+      // which on mount (scrollY 0) cost a full-page layout mid-commit.
+      if (window.scrollY <= 600) {
+        setVisible(false);
+        return;
+      }
       const meta = document.querySelector(".app-footer-meta");
       const metaOnScreen = meta ? meta.getBoundingClientRect().top < window.innerHeight : false;
-      setVisible(window.scrollY > 600 && !metaOnScreen);
+      setVisible(!metaOnScreen);
     };
     onScroll();
     window.addEventListener("scroll", onScroll, { passive: true });
@@ -257,9 +274,7 @@ export default function MainLayout({ productProfile, nav, isLoading, navError, o
         </div>
         </div>
       </div>
-      {ContactDialogHost ? (
-        <Suspense fallback={null}><ContactDialogHost /></Suspense>
-      ) : null}
+      {ContactDialogHost ? <ClientContactDialogHost /> : null}
       {renderSearchDialog?.({
         isOpen: searchOpen,
         setIsOpen: setSearchOpen,
