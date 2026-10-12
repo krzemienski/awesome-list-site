@@ -31,8 +31,10 @@ import { UserRepository } from "../../repositories";
 import {
   ADMIN_SESSION_COOKIE,
   ADMIN_SESSION_TTL_MS,
+  adminCookieOptions,
   checkAdminPassword,
   issueAdminSessionToken,
+  revokeAdminSessions,
 } from "../../clerkAuth";
 import { negotiated429Handler } from "../../middleware/rateLimit";
 import { PgRateLimitStore } from "../../middleware/pgRateLimitStore";
@@ -48,13 +50,6 @@ const adminLoginLimiter = rateLimit({
   store: new PgRateLimitStore("admin-login"),
   handler: negotiated429Handler("Too many sign-in attempts. Please try again later."),
 });
-
-const adminCookieOptions = {
-  httpOnly: true,
-  secure: process.env.NODE_ENV === "production",
-  sameSite: "lax" as const,
-  path: "/",
-};
 
 export interface AuthUserRoutesContext {
   /** Clerk-backed auth gate (kept in the ctx for wiring symmetry). */
@@ -124,7 +119,13 @@ export function registerAuthUserRoutes(
     try {
       const clerkUserId = req.clerkIdentity?.clerkUserId;
       if (!clerkUserId) {
-        return res.status(401).json({ message: "Unauthorized" });
+        // The owner password session has no Clerk sessions to list: revoke
+        // every owner cookie issued so far and drop this one.
+        if (!(await revokeAdminSessions(req))) {
+          return res.status(401).json({ message: "Unauthorized" });
+        }
+        res.clearCookie(ADMIN_SESSION_COOKIE, adminCookieOptions);
+        return res.json({ message: "Signed out everywhere" });
       }
       const sessions = await clerkClient.sessions.getSessionList({
         userId: clerkUserId,

@@ -227,6 +227,12 @@ export function hasValidAuthReturnAuditKey(req: Request): boolean {
  */
 export const ADMIN_SESSION_COOKIE = "av_admin_session";
 export const ADMIN_SESSION_TTL_MS = 12 * 60 * 60 * 1000;
+export const adminCookieOptions = {
+  httpOnly: true,
+  secure: process.env.NODE_ENV === "production",
+  sameSite: "lax" as const,
+  path: "/",
+};
 const ADMIN_LOGIN_MIN_PASSWORD_LENGTH = 8;
 
 function adminLoginPassword(): string | null {
@@ -283,6 +289,33 @@ export function hasValidAdminSessionCookie(req: Request): boolean {
   return secretsMatch(raw.slice(dot + 1), adminSessionSignature(expiresAt, password));
 }
 
+/** When the request's owner cookie was issued (ms), or null without one. */
+function adminSessionIssuedAt(req: Request): number | null {
+  if (!hasValidAdminSessionCookie(req)) return null;
+  const raw = readCookie(req, ADMIN_SESSION_COOKIE)!;
+  return Number(raw.slice(0, raw.indexOf("."))) - ADMIN_SESSION_TTL_MS;
+}
+
+/** An owner cookie issued at or before the admin row's revocation time is dead. */
+function isRevokedAdminSession(req: Request, admin: User): boolean {
+  const issuedAt = adminSessionIssuedAt(req);
+  const revokedAt = admin.sessionsRevokedAt?.getTime();
+  return issuedAt !== null && revokedAt !== undefined && issuedAt <= revokedAt;
+}
+
+/**
+ * "Sign out all devices" for the owner: every owner cookie issued until now
+ * stops working. Returns false when the request is not an owner session.
+ */
+export async function revokeAdminSessions(req: Request): Promise<boolean> {
+  if (adminSessionIssuedAt(req) === null || !req.dbUser) return false;
+  await db
+    .update(users)
+    .set({ sessionsRevokedAt: new Date() })
+    .where(eq(users.id, req.dbUser.id));
+  return true;
+}
+
 /** True when the request is admin-authenticated without Clerk (header or cookie). */
 export function hasAdminBypass(req: Request): boolean {
   return hasValidAuditKey(req) || hasValidAdminSessionCookie(req);
@@ -314,7 +347,11 @@ export const clerkUserContext: RequestHandler = asyncHandler(async function cler
   if (viaAuditKey || hasValidAdminSessionCookie(req)) {
     try {
       const auditAdmin = await resolveBypassAdmin();
-      if (auditAdmin) {
+      if (auditAdmin && !viaAuditKey && isRevokedAdminSession(req, auditAdmin)) {
+        // Signed out everywhere after this cookie was issued: anonymous, and
+        // drop the dead cookie so later requests take the normal path.
+        res.clearCookie(ADMIN_SESSION_COOKIE, adminCookieOptions);
+      } else if (auditAdmin) {
         req.dbUser = auditAdmin;
         req.clerkIdentity = undefined; // no Clerk session backs this request
         if (viaAuditKey) {
