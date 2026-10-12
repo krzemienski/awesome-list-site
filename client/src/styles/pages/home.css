@@ -140,6 +140,23 @@
   margin-top: 2.5rem;
 }
 
+/* docs/11 home template: FEATURED cards sit between the stat strip and the
+   category index. Four picks as a 2 × 2 block (one column on phones), so the
+   main column never leaves an orphan card on a second row. */
+.home-index-featured {
+  margin-top: 2.5rem;
+}
+
+.home-resource-grid.home-index-featured-grid {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.home-featured-star {
+  color: var(--accent-ink);
+  font-size: 0.75rem;
+  line-height: 1.1;
+}
+
 .home-category-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(min(100%, 340px), 1fr));
@@ -914,6 +931,10 @@
 }
 
 @media (max-width: 640px) {
+  .home-resource-grid.home-index-featured-grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
   .home-stat-strip,
   .home-stat-strip[data-cells="3"] {
     grid-template-columns: repeat(2, minmax(0, 1fr));

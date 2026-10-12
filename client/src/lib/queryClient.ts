@@ -75,6 +75,8 @@ function invalidateCatalogQueries(): Promise<void> {
     '/api/admin/resources', '/api/admin/pending-resources', '/api/admin/resource-edits',
     '/api/admin/categories', '/api/admin/subcategories', '/api/admin/sub-subcategories',
     '/api/admin/stats', '/api/admin/audit-logs', '/api/search', '/api/tags',
+    // Home feed: featured picks, counts and the recent list change with admin writes.
+    '/api/home',
     'awesome-list-nav', 'awesome-list-data', 'awesome-list-listing',
   ];
   return queryClient.invalidateQueries({

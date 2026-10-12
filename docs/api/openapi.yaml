@@ -872,7 +872,7 @@ components:
               - resolvedKind
             additionalProperties: {}
         featured:
-          maxItems: 6
+          maxItems: 8
           type: array
           items:
             type: object

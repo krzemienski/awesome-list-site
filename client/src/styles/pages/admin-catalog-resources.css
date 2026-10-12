@@ -226,6 +226,43 @@
   color: var(--text-3);
 }
 
+/* Featured column: the ★ / — mark is itself the home-page toggle. Rows already
+   carry a 44px delete target, so the same floor adds no height. */
+.admin-catalog-resources__featured-toggle {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 2.75rem;
+  min-height: 2.75rem;
+  padding: 0;
+  color: inherit;
+  background: transparent;
+  border: 0;
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+}
+
+.admin-catalog-resources__featured-toggle:hover .admin-catalog-resources__muted {
+  color: var(--accent-ink);
+}
+
+.admin-catalog-resources__featured-toggle:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
+.admin-catalog-resources__featured-toggle:disabled {
+  cursor: progress;
+  opacity: 0.6;
+}
+
+.admin-catalog-resources__featured-error {
+  max-width: 12rem;
+  margin-top: 0.25rem;
+  color: var(--status-bad);
+  font-size: 0.75rem;
+}
+
 /* The action column contains View, Edit and the retained 44px delete target,
    surrounded by the same canonical padding as the other cells. */
 .admin-catalog-resources__table td.admin-catalog-resources__actions-cell {

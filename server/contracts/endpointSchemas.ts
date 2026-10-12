@@ -719,7 +719,7 @@ export function registerCoreEndpointSchemas(): void {
       approvedThisWeek: z.number().int().nonnegative(),
       featuredCount: z.number().int().nonnegative(),
       recent: z.array(publicResourceSchema).max(5),
-      featured: z.array(publicResourceSchema).max(6),
+      featured: z.array(publicResourceSchema).max(8),
     }),
   });
 

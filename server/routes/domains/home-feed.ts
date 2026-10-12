@@ -9,6 +9,9 @@ import { isDatabaseUnavailableError } from "../../db/errors";
 import { ServiceUnavailableError } from "../../middleware/errors";
 import { asyncHandler } from "../../middleware/asyncHandler";
 
+/** Hand-picked shortlist size: the Index rail lists all of them, card grids show fewer. */
+const HOME_FEATURED_LIMIT = 8;
+
 /** Home-only public projection: bounded feeds, no corpus download or per-row queries. */
 export async function loadHomeFeed() {
   return getPublicCacheValue({
@@ -28,7 +31,7 @@ export async function loadHomeFeed() {
         db.select().from(resources).where(approved)
           .orderBy(sql`${indexedAt} desc nulls last`, desc(resources.id)).limit(5),
         db.select().from(resources).where(and(approved, featured))
-          .orderBy(sql`${indexedAt} desc nulls last`, desc(resources.id)).limit(6),
+          .orderBy(sql`${indexedAt} desc nulls last`, desc(resources.id)).limit(HOME_FEATURED_LIMIT),
       ]);
       return {
         ...stats[0],

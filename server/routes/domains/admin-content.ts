@@ -993,6 +993,12 @@ export function registerAdminContentRoutes(
       // Run16 BUG-035: pass the whitelisted sort through to the repo
       // (unknown values fall back to newest-first inside listResources).
       const sort = req.query.sort as "name-asc" | "name-desc" | "newest" | "oldest" | undefined;
+      // ?featured=true narrows to home-page picks; any other value is a typo,
+      // not "no filter", so it must not silently list everything.
+      const featuredParam = req.query.featured;
+      if (featuredParam !== undefined && featuredParam !== '' && featuredParam !== 'true') {
+        return res.status(400).json({ error: 'invalid_featured', message: 'featured must be "true" when provided' });
+      }
       
       const result = await resourceRepo.listResources({
         page,
@@ -1001,6 +1007,7 @@ export function registerAdminContentRoutes(
         category,
         status: status || undefined,
         sort,
+        featuredOnly: featuredParam === 'true',
         // C9-V5A-06: no fuzzy near-misses in the admin list (bulk actions act on what is shown).
         exactSearchOnly: true,
         matchUrlSubstring: true

@@ -660,7 +660,7 @@ export default function Home({ nav, navLoading }: HomeProps) {
 
   const filteredFeatured = useMemo(() => {
     if (!corpusFilterActive) return homeData?.featured ?? [];
-    return filteredCorpusResources.filter(isFeaturedResource).slice(0, 6);
+    return filteredCorpusResources.filter(isFeaturedResource).slice(0, 8);
   }, [corpusFilterActive, filteredCorpusResources, homeData?.featured]);
 
   const categoriesForPresentation = useMemo<HomeCategoryView[]>(

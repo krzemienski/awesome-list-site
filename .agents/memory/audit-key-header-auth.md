@@ -57,3 +57,8 @@ guard); anonymous visitors and prod-without-the-secret can never exercise it.
   navigation before React mounts. Route-intercept every same-origin resource
   type (still gated on the app origin) or the "admin" screenshot is the sign-in
   page.
+
+## Production: the audit key is dead — use owner admin-login for intended prod admin writes
+- Prod returns 401 for X-Admin-Audit-Key (prod holds an older ADMIN_PASSWORD that publishing never overwrites).
+- For an intended, task-approved prod admin write: POST /api/auth/admin-login with `{"password": OWNER_PASSWORD}` + Origin into a /tmp cookie jar (build the body file from env, delete it right after), make the admin calls with the jar + Origin, then POST /api/auth/admin-logout and delete the jar. It resolves to the break-glass admin row, not the owner's personal account.
+- **Why:** 2026-10-12 a prod featuring write 401'd on the audit key; admin-login worked first try.

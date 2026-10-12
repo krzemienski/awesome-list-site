@@ -53,6 +53,7 @@ import {
   type ResourceKind,
 } from "@shared/resourceKinds";
 import { AdminLoadError } from "@/components/admin/AdminLoadError";
+import { ChipButton } from "@/components/ui/chip-button";
 import "@/styles/pages/admin-catalog-resources.css";
 
 const RESOURCE_KIND_LABELS: Record<ResourceKind, string> = {
@@ -189,8 +190,9 @@ export default function ResourceManager({ createRequest = 0 }: { createRequest?:
   // A deep-linked non-default status (?status=rejected from the dashboard
   // stat, or a reload) must be visible, so the filter panel starts open.
   const [catalogToolsOpen, setCatalogToolsOpen] = useState(() => {
-    const s = new URLSearchParams(window.location.search).get("status");
-    return !!s && s !== "approved";
+    const params = new URLSearchParams(window.location.search);
+    const s = params.get("status");
+    return (!!s && s !== "approved") || params.get("featured") === "true";
   });
   // Audit2 BUG-003: debounce the search text into the query key. Every
   // keystroke used to swap the queryKey immediately; the fresh key had no
@@ -214,6 +216,21 @@ export default function ResourceManager({ createRequest = 0 }: { createRequest?:
     // "approved"), so it survives reload/Back and reads as a real value.
     return s && (s === "all" || FILTER_STATUS_OPTIONS.some(o => o.value === s)) ? s : "approved";
   });
+
+  // Home-page picks: "Featured only" narrows the table to metadata.featured
+  // rows and round-trips through ?featured=true like ?status=.
+  const [featuredOnly, setFeaturedOnly] = useState(
+    () => new URLSearchParams(window.location.search).get("featured") === "true",
+  );
+  useEffect(() => {
+    const url = new URL(window.location.href);
+    const current = url.searchParams.get("featured");
+    const want = featuredOnly ? "true" : null;
+    if (current === want) return;
+    if (want) url.searchParams.set("featured", want);
+    else url.searchParams.delete("featured");
+    window.history.replaceState({}, "", url.pathname + url.search + url.hash);
+  }, [featuredOnly]);
 
   // Task 275: mirror the effective page into ?page= (replaceState, no history
   // spam) so the paginator's hrefs stay honest and refresh keeps your place.
@@ -313,11 +330,12 @@ export default function ResourceManager({ createRequest = 0 }: { createRequest?:
     if (search) params.set('search', search);
     if (categoryFilter) params.set('category', categoryFilter);
     if (statusFilter && statusFilter !== 'all') params.set('status', statusFilter);
+    if (featuredOnly) params.set('featured', 'true');
     return `/api/admin/resources?${params.toString()}`;
   };
 
   const { data, isLoading, isError, error: resourcesError, isFetching: resourcesFetching, isPaused, refetch } = useQuery<ResourcesResponse>({
-    queryKey: ['/api/admin/resources', page, limit, debouncedSearch, categoryFilter, statusFilter, sort],
+    queryKey: ['/api/admin/resources', page, limit, debouncedSearch, categoryFilter, statusFilter, sort, featuredOnly],
     queryFn: async () => {
       const params = new URLSearchParams();
       params.set('page', page.toString());
@@ -328,6 +346,7 @@ export default function ResourceManager({ createRequest = 0 }: { createRequest?:
       if (debouncedSearch) params.set('search', debouncedSearch);
       if (categoryFilter) params.set('category', categoryFilter);
       if (statusFilter && statusFilter !== 'all') params.set('status', statusFilter);
+      if (featuredOnly) params.set('featured', 'true');
       const response = await fetch(`/api/admin/resources?${params.toString()}`, {
         credentials: 'include'
       });
@@ -386,6 +405,22 @@ export default function ResourceManager({ createRequest = 0 }: { createRequest?:
     },
     staleTime: 60000
   });
+
+  // Live home-page picks: approved + featured is exactly what /api/home shows.
+  const { data: featuredCountData } = useQuery<ResourcesResponse>({
+    queryKey: ['/api/admin/resources', 'featured-count'],
+    queryFn: async () => {
+      const response = await fetch('/api/admin/resources?page=1&limit=1&status=approved&featured=true', {
+        credentials: 'include'
+      });
+      if (!response.ok) throw new ApiError(response.status, 'Failed to fetch featured count');
+      return normalizeAdminResourcesResponse(
+        (await response.json()) as AdminResourcesWireResponse,
+      );
+    },
+    staleTime: 30_000
+  });
+  const featuredCount = featuredCountData?.total;
 
   // C3-V5A-02: a server 400 carries per-field messages; mark those fields
   // inline and keep the banner for anything that has no field in the dialog.
@@ -1008,6 +1043,7 @@ export default function ResourceManager({ createRequest = 0 }: { createRequest?:
     setDebouncedSearch("");
     setCategoryFilter("");
     setStatusFilter("approved");
+    setFeaturedOnly(false);
     setSort("newest");
     setPage(1);
     setSelectedResourceIds([]);
@@ -1090,7 +1126,12 @@ export default function ResourceManager({ createRequest = 0 }: { createRequest?:
             </CardTitle>
             <CardDescription className="admin-catalog-resources__subtitle">
               Manage every entry in the index
-              {(search || categoryFilter || (statusFilter && statusFilter !== "approved")) ? " · Filters applied" : ""}
+              {featuredCount !== undefined ? (
+                <span data-testid="text-featured-count">
+                  {` · ★ ${featuredCount.toLocaleString()} featured on the home page`}
+                </span>
+              ) : null}
+              {(search || categoryFilter || featuredOnly || (statusFilter && statusFilter !== "approved")) ? " · Filters applied" : ""}
             </CardDescription>
           </div>
           <div className="admin-catalog-resources__header-actions">
@@ -1180,10 +1221,17 @@ export default function ResourceManager({ createRequest = 0 }: { createRequest?:
                 <SelectItem value="name-desc">Title Z–A</SelectItem>
               </SelectContent>
             </Select>
+            <ChipButton
+              aria-pressed={featuredOnly}
+              onClick={() => { setFeaturedOnly((on) => !on); setPage(1); setSelectedResourceIds([]); }}
+              data-testid="button-featured-only"
+            >
+              ★ Featured only
+            </ChipButton>
             <Button type="submit" variant="outline" aria-label="Search" data-testid="button-search">
               <Search className="h-4 w-4" />
             </Button>
-            {(search || categoryFilter || statusFilter) && (
+            {(search || categoryFilter || statusFilter || featuredOnly) && (
               <Button type="button" variant="ghost" onClick={clearFilters} aria-label="Clear filters" data-testid="button-clear-filters">
                 <X className="h-4 w-4" />
               </Button>
@@ -1486,7 +1534,23 @@ export default function ResourceManager({ createRequest = 0 }: { createRequest?:
                       </div>
                     </td>
                     <td>
-                      {featuredValue(resource) ? <Badge variant="accent">★</Badge> : <span className="admin-catalog-resources__muted">—</span>}
+                      <button
+                        type="button"
+                        className="admin-catalog-resources__featured-toggle"
+                        aria-pressed={featuredValue(resource)}
+                        aria-label={`${featuredValue(resource) ? "Remove from" : "Feature on"} the home page: ${resource.title || `resource #${resource.id}`}`}
+                        title={featuredValue(resource) ? "Featured on the home page — click to remove" : "Feature on the home page"}
+                        disabled={editControlsPending}
+                        onClick={() => featuredMutation.mutate({ id: resource.id, featured: !featuredValue(resource) })}
+                        data-testid={`button-toggle-featured-${resource.id}`}
+                      >
+                        {featuredValue(resource) ? <Badge variant="accent">★</Badge> : <span className="admin-catalog-resources__muted">—</span>}
+                      </button>
+                      {resourceActionErrors[`featured:${resource.id}`] && !editDialogOpen ? (
+                        <p role="alert" className="admin-catalog-resources__featured-error">
+                          {resourceActionErrors[`featured:${resource.id}`]}
+                        </p>
+                      ) : null}
                     </td>
                     <td className="admin-catalog-resources__actions-cell text-right">
                       <div className="admin-catalog-resources__row-actions">

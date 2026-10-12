@@ -93,6 +93,8 @@ export interface ListResourceOptions {
    * inference) so the list agrees with /api/resources/kinds/counts.
    */
   kind?: ResourceKind;
+  /** Admin list: only resources hand-picked for the home page (metadata.featured). */
+  featuredOnly?: boolean;
 }
 
 export type ResourceSearchMetadata = {
@@ -412,6 +414,7 @@ export class ResourceRepository {
       generalScope,
       sort,
       kind,
+      featuredOnly = false,
       includeFacets = false,
       exactSearchOnly = false,
       matchUrlSubstring = false,
@@ -531,6 +534,8 @@ export class ResourceRepository {
       // (server/lib/resourceKinds.ts) — the same expression the counts
       // endpoint groups by, so totals and pages can never disagree.
       if (kind) conditions.push(sql`${resolvedResourceKindSql()} = ${kind}`);
+      // Same predicate as the public home feed (server/routes/domains/home-feed.ts).
+      if (featuredOnly) conditions.push(sql`${resources.metadata}->'featured' = 'true'::jsonb`);
       if (tags.length > 0 && omit !== "tags") {
         const canonicalTags = Array.from(new Set(tags.map(normalizeTagFilter)));
         conditions.push(tagExists(sql`${canonicalTagSql} IN (${sql.join(canonicalTags.map((v) => sql`${v}`), sql`, `)})`));

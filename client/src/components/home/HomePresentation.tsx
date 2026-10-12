@@ -509,9 +509,31 @@ function CategoryIndex({ categories, selectedTags, selectedKind, onClearFilters 
   );
 }
 
-function RecentRail({ recent }: { recent: Resource[] }) {
+function RecentRail({ recent, featured }: { recent: Resource[]; featured: Resource[] }) {
   return (
     <aside className="home-index-rail">
+      {featured.length > 0 ? (
+        <div data-testid="home-featured-rail">
+          <div className="eyebrow home-rail-eyebrow">── FEATURED</div>
+          <div className="home-recent-list">
+            {featured.map((resource) => (
+              <ResourceLink
+                key={String(resource.id)}
+                resource={resource}
+                className="home-recent-row"
+                dataTestId={`link-home-featured-rail-${resource.id}`}
+                analyticsSurface="home_featured_rail"
+              >
+                <span className="home-recent-number home-featured-star" aria-hidden="true">★</span>
+                <span className="home-recent-copy">
+                  <span className="home-recent-title">{resource.title}</span>
+                  <span className="home-recent-meta">{categoryShortName(resource)}</span>
+                </span>
+              </ResourceLink>
+            ))}
+          </div>
+        </div>
+      ) : null}
       <div>
         <div className="eyebrow home-rail-eyebrow">── RECENTLY INDEXED</div>
         <div className="home-recent-list">
@@ -551,11 +573,15 @@ function RecentRail({ recent }: { recent: Resource[] }) {
 function IndexLayout({
   categories,
   recent,
+  featured,
   stats,
   selectedTags,
   selectedKind,
   onClearFilters,
-}: Pick<HomePresentationProps, "categories" | "recent" | "stats" | "selectedTags" | "selectedKind" | "onClearFilters">) {
+}: Pick<HomePresentationProps, "categories" | "recent" | "featured" | "stats" | "selectedTags" | "selectedKind" | "onClearFilters">) {
+  // docs/11 home template: HERO → FEATURED cards → ALL CATEGORIES. The dense
+  // Index shows one row of cards; the rail lists the whole shortlist.
+  const shownFeatured = featured.slice(0, 4);
   return (
     <>
       <h1 className="home-index-title mono">
@@ -563,6 +589,28 @@ function IndexLayout({
         <span className="sr-only">{homeHeading}</span>
       </h1>
       <StatStrip stats={stats} layout="index" />
+      {shownFeatured.length > 0 ? (
+        <section className="home-index-featured" aria-labelledby="home-index-featured-title" data-testid="home-featured-index">
+          <div className="home-section-header home-index-featured-header">
+            <div>
+              <div className="eyebrow home-section-eyebrow">── FEATURED</div>
+              <h2 id="home-index-featured-title" className="home-section-title">
+                Hand-picked <span className="serif-italic home-accent-italic">highlights</span>
+              </h2>
+            </div>
+          </div>
+          <div className="home-resource-grid home-index-featured-grid">
+            {shownFeatured.map((resource) => (
+              <ResourceCard
+                key={String(resource.id)}
+                resource={resource}
+                featured
+                selectedKind={selectedKind}
+              />
+            ))}
+          </div>
+        </section>
+      ) : null}
       <div className="home-index-grid">
         <CategoryIndex
           categories={categories}
@@ -570,7 +618,7 @@ function IndexLayout({
           selectedKind={selectedKind}
           onClearFilters={onClearFilters}
         />
-        <RecentRail recent={recent} />
+        <RecentRail recent={recent} featured={featured} />
       </div>
     </>
   );
@@ -745,6 +793,7 @@ export default function HomePresentation({
         <IndexLayout
           categories={categories}
           recent={recent}
+          featured={featured}
           stats={stats}
           selectedTags={selectedTags}
           selectedKind={selectedKind}

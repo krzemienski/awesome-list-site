@@ -3,7 +3,7 @@ name: Playwright browsers on this host
 description: Why browser launches fail or WebKit misbehaves here, and the rules that avoid re-debugging it (revision source, WebKitGTK runtime, Clerk cookies, hover-only controls).
 ---
 
-**Current state:** the repo's Playwright test suite/config were removed (no validation tooling). For ad-hoc browser checks use playwright 1.60 installed under /tmp/tools (matches cached firefox-1522 + webkit-2287; 1.61 fails Firefox with a protocol error) and pass explicit `executablePath`s from `.cache/ms-playwright`; Rule 2's WebKit env still applies at launch.
+**Current state:** the repo Playwright suite was removed. Ad-hoc checks: the root `playwright` (1.61) wants chromium 1228, which is not installed — launch it with `executablePath: .cache/ms-playwright/chromium_headless_shell-1223/chrome-headless-shell-linux64/chrome-headless-shell` (works for Chromium; `@playwright/test` is no longer in node_modules). For Firefox/WebKit use playwright 1.60 under /tmp/tools if present (1.61 fails Firefox with a protocol error); Rule 2 WebKit env still applies.
 
 **Rule 1 (historical) — one package decides the browser revision.** Import `chromium`/`firefox`/`webkit` from `@playwright/test` (the package that runs the suite), never from the floating root `playwright` dependency, and install browsers with the repo's `test:e2e:browsers` script (workspace cache `.cache/ms-playwright`, which survives restarts; `~/.cache` does not).
 **Why:** two packages expect two revisions; the wrong one reports "Executable doesn't exist" even though a browser is installed, and reinstalling clobbers harnesses that pin the cache.

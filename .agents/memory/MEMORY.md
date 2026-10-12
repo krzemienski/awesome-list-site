@@ -47,7 +47,7 @@
 - [Safe ?next= redirect validation](next-redirect-validation.md) — startsWith("/") && !startsWith("//") is bypassable via /\evil.com (backslash→slash normalization); require /^\/(?![/\\])/.
 - [Toast dropped by full-page nav](toast-fullpage-nav.md) — window.location.href tears down the toast store pre-paint; use a one-shot ?param and let the destination greet + strip it.
 - [Admin password rotation path](admin-password-rotation.md) — rotate via ADMIN_PASSWORD secret + boot sync (restart/republish); PROD_ADMIN_PASSWORD is stale; prod scripts must pin connect.sid from login only.
-- [Audit-key header auth](audit-key-header-auth.md) — scripts auth via X-Admin-Audit-Key: ADMIN_PASSWORD (fails closed <8 chars); task envs get the key from gitignored .env, never setEnvVars.
+- [Audit-key header auth](audit-key-header-auth.md) — dev scripts: X-Admin-Audit-Key (ADMIN_PASSWORD); prod 401s it — intended prod admin writes use admin-login cookie + logout.
 - [RHF formState Proxy](rhf-formstate-proxy.md) — formState.isDirty etc. must be READ during render to subscribe; first read inside an event handler returns stale false forever.
 - [Flex-anchor min-width:auto](flex-anchor-min-width.md) — raw text in a flex container is an anonymous item with min-width:auto that never wraps; wrap it in a min-w-0 span or long URLs blow dialogs.
 - [Full-origin CSRF comparison](origin-check-port-normalization.md) — compare normalized scheme+host+effective port; scripts hitting prod admin API MUST send Origin header or 403.
