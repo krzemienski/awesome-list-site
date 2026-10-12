@@ -1,55 +1,32 @@
 import { getAnalyticsConsent } from "./analytics";
-import type { TransportHttpRequest } from "@amplitude/engagement-browser";
-
-type ManagedPlugin = {
-  name?: string;
-  teardown?: () => Promise<void>;
-};
+import type { AmplitudeProductSlots, ManagedPlugin } from "./analytics-sdk-options";
 
 let initialized = false;
 let initStarted = false;
 let disabled = false;
 let coreInitialized = false;
-let sessionReplayAdded = false;
-let experimentAdded = false;
-let engagementAdded = false;
 let amplitudeClient: typeof import("@amplitude/analytics-browser") | null = null;
-let sessionReplayInstance: ManagedPlugin | null = null;
-let experimentInstance: ManagedPlugin | null = null;
-let engagementInstance: ManagedPlugin | null = null;
-let sessionReplayAbortController: AbortController | null = null;
-let engagementAbortController: AbortController | null = null;
+let urlScrubAdded = false;
+// Post-consent options chunk, loaded together with the SDK.
+let sdkOptions: typeof import("./analytics-sdk-options") | null = null;
+
+// Session Replay / Experiment / Guides & Surveys plugin slots. Setup lives in
+// the post-consent options chunk (addAmplitudeProducts); teardown stays here.
+const emptySlot = () => ({ added: false, instance: null, controller: null });
+const products: AmplitudeProductSlots = {
+  replay: emptySlot(),
+  experiment: emptySlot(),
+  engagement: emptySlot(),
+};
+
 let teardownPromise: Promise<void> = Promise.resolve();
 let lifecycleVersion = 0;
 
-function mergeAbortSignals(
-  first: AbortSignal | undefined,
-  second: AbortSignal,
-): AbortSignal {
-  if (!first) return second;
-  if (typeof AbortSignal.any === "function") return AbortSignal.any([first, second]);
-  const controller = new AbortController();
-  const abort = () => controller.abort();
-  if (first.aborted || second.aborted) abort();
-  else {
-    first.addEventListener("abort", abort, { once: true });
-    second.addEventListener("abort", abort, { once: true });
-  }
-  return controller.signal;
-}
-
-async function removePlugin(plugin: ManagedPlugin | null): Promise<void> {
-  if (!plugin) return;
-  if (plugin.name && amplitudeClient) {
-    try {
-      await amplitudeClient.remove(plugin.name).promise;
-      return;
-    } catch {
-      // Fall through to direct teardown if the host removal raced setup.
-    }
-  }
-  await plugin.teardown?.().catch(() => {});
-}
+// Custom events accepted while the consented setup is still loading. Never
+// filled pre-consent (ampTrack drops unless init is under way) and cleared on
+// every revoke, mirroring the Mixpanel/PostHog wrappers.
+const MAX_PENDING_EVENTS = 100;
+let pendingEvents: { name: string; props: Record<string, unknown> }[] = [];
 
 function clearAmplitudeStorage(): void {
   for (const storage of [localStorage, sessionStorage]) {
@@ -79,10 +56,11 @@ function clearAmplitudeStorage(): void {
 }
 
 function teardownAmplitudePlugins(): Promise<void> {
-  sessionReplayAbortController?.abort();
-  sessionReplayAbortController = null;
-  engagementAbortController?.abort();
-  engagementAbortController = null;
+  const slots = [products.replay, products.experiment, products.engagement];
+  for (const slot of slots) {
+    slot.controller?.abort();
+    slot.controller = null;
+  }
   const engagement = (
     window as typeof window & {
       engagement?: { disable?: () => void; shutdown?: () => void };
@@ -94,21 +72,17 @@ function teardownAmplitudePlugins(): Promise<void> {
   } catch {
     // Analytics teardown must never interrupt the application.
   }
-  const plugins = [
-    sessionReplayInstance,
-    experimentInstance,
-    engagementInstance,
-  ];
-  sessionReplayInstance = null;
-  experimentInstance = null;
-  engagementInstance = null;
-  sessionReplayAdded = false;
-  experimentAdded = false;
-  engagementAdded = false;
+  const plugins: (ManagedPlugin | null)[] = [];
+  for (const slot of slots) {
+    plugins.push(slot.instance);
+    slot.instance = null;
+    slot.added = false;
+  }
   initialized = false;
   clearAmplitudeStorage();
   const remove = async () => {
-    await Promise.all(plugins.map(removePlugin));
+    // Non-null plugins imply the options chunk was loaded (it adds them).
+    if (sdkOptions) await sdkOptions.removeAmplitudePlugins(amplitudeClient, plugins);
     // A plugin setup that was already resolving can write state while its
     // removal runs. Sweep once more after every teardown has settled.
     clearAmplitudeStorage();
@@ -134,6 +108,7 @@ async function consentWasRevoked(runVersion: number): Promise<boolean> {
   ) {
     return false;
   }
+  pendingEvents = [];
   if (coreInitialized) amplitudeClient?.setOptOut(true);
   await teardownAmplitudePlugins();
   initStarted = false;
@@ -155,7 +130,7 @@ export function initAmplitude(): void {
   if (initStarted) return;
   const key = import.meta.env.VITE_AMPLITUDE_API_KEY;
   if (!key) {
-    console.warn('Amplitude API key missing — analytics disabled');
+    if (import.meta.env.DEV) console.warn('Missing VITE_AMPLITUDE_API_KEY — Amplitude disabled');
     return;
   }
   initStarted = true;
@@ -164,118 +139,36 @@ export function initAmplitude(): void {
   void (async () => {
     // Import and initialize each stage separately so a revoke while a chunk is
     // in flight cannot initialize the SDK or add a recorder/plugin afterward.
-    const amplitude = await import("@amplitude/analytics-browser");
+    const [amplitude, options] = await Promise.all([
+      import("@amplitude/analytics-browser"),
+      // Post-consent plugin/transport config, kept out of the entry bundle.
+      import("./analytics-sdk-options"),
+    ]);
+    const isBlocked = () => disabled || getAnalyticsConsent() !== "granted";
     amplitudeClient = amplitude;
+    sdkOptions = options;
     await teardownPromise;
     if (await consentWasRevoked(runVersion)) return;
     if (coreInitialized) amplitude.setOptOut(false);
     if (!coreInitialized) {
-      await amplitude.init(key, {
-        autocapture: true,
-        // Audit 2 BUG-039: AMP_* / AMP_MKTG_* cookies previously shipped with
-        // secure:false on an HTTPS-only site. SameSite is pinned to the Lax
-        // the SDK already defaults to; Secure is set whenever the page is
-        // https (prod + replit.dev preview) — plain-http localhost keeps
-        // unflagged cookies so dev persistence still works. HttpOnly is
-        // impossible by construction: these cookies are written and read by
-        // JavaScript (document.cookie), which is also why the audit's
-        // HttpOnly ask applies only to the platform's GAESA cookie.
-        cookieOptions: {
-          sameSite: 'Lax',
-          secure: window.location.protocol === 'https:',
-        },
-      }).promise;
+      await amplitude.init(key, options.amplitudeInitOptions()).promise;
       coreInitialized = true;
     }
-    if (await consentWasRevoked(runVersion)) return;
-
-    if (!sessionReplayAdded) {
-      const { sessionReplayPlugin } =
-        await import("@amplitude/plugin-session-replay-browser");
-      if (await consentWasRevoked(runVersion)) return;
-      sessionReplayAbortController = new AbortController();
-      const controller = sessionReplayAbortController;
-      const plugin = sessionReplayPlugin({
-        sampleRate: 1,
-        handleSendEvents: (request) => {
-          if (disabled || getAnalyticsConsent() !== "granted") {
-            return Promise.reject(new DOMException("Analytics consent revoked", "AbortError"));
-          }
-          return fetch(request.url, {
-            method: request.method,
-            headers: request.headers,
-            body: request.body as BodyInit,
-            signal: controller.signal,
-            keepalive: request.keepalive,
-          });
-        },
-        handleFetchConfig: (request) => {
-          if (disabled || getAnalyticsConsent() !== "granted") {
-            return Promise.reject(new DOMException("Analytics consent revoked", "AbortError"));
-          }
-          return fetch(request.url, {
-            method: request.method,
-            headers: request.headers,
-            signal: mergeAbortSignals(request.signal, controller.signal),
-          });
-        },
-      });
-      sessionReplayInstance = plugin;
-      await amplitude.add(plugin).promise;
-      sessionReplayInstance = plugin;
-      sessionReplayAdded = true;
+    // URL scrubber: registered after init so it runs after the SDK's own
+    // enrichment plugins (see amplitudeUrlScrubPlugin).
+    if (!urlScrubAdded) {
+      await amplitude.add(options.amplitudeUrlScrubPlugin).promise;
+      urlScrubAdded = true;
     }
     if (await consentWasRevoked(runVersion)) return;
 
-    // Unified's initAll performs these after Session Replay. Dynamic imports
-    // preserve that behavior/order while keeping their SDKs out of the
-    // render-blocking entry module.
-    if (!experimentAdded) {
-      const { experimentPlugin } =
-        await import('@amplitude/plugin-experiment-browser');
-      if (await consentWasRevoked(runVersion)) return;
-      const plugin = experimentPlugin();
-      experimentInstance = plugin;
-      await amplitude.add(plugin).promise;
-      experimentInstance = plugin;
-      experimentAdded = true;
+    if (
+      !(await options.addAmplitudeProducts(amplitude, products, isBlocked, () =>
+        consentWasRevoked(runVersion),
+      ))
+    ) {
+      return;
     }
-    if (await consentWasRevoked(runVersion)) return;
-    if (!engagementAdded) {
-      const { plugin: engagementPlugin } =
-        await import('@amplitude/engagement-browser');
-      if (await consentWasRevoked(runVersion)) return;
-      engagementAbortController = new AbortController();
-      const controller = engagementAbortController;
-      const plugin = engagementPlugin({
-        options: {
-          // Keep the SDK in the consent-controlled local chunk instead of
-          // starting uncancellable remote split-script downloads.
-          splitting: false,
-        },
-        transport: {
-          handleHttpRequest: (request: TransportHttpRequest) => {
-            if (disabled || getAnalyticsConsent() !== "granted") {
-              return Promise.reject(new DOMException("Analytics consent revoked", "AbortError"));
-            }
-            return fetch(request.url, {
-              method: request.method,
-              headers: request.headers,
-              body: request.body,
-              signal: mergeAbortSignals(request.signal, controller.signal),
-              keepalive: request.keepalive,
-            });
-          },
-        },
-      });
-      engagementInstance = plugin;
-      await amplitude.add(plugin).promise;
-      // Teardown may have cleared the global ref while setup was in flight.
-      // Restore it so a post-await revoke check can remove this exact plugin.
-      engagementInstance = plugin;
-      engagementAdded = true;
-    }
-    if (await consentWasRevoked(runVersion)) return;
     initialized = true;
     initStarted = false;
 
@@ -284,6 +177,9 @@ export function initAmplitude(): void {
     if (!disabled) {
       amplitude.track('Viewed Home Page', { prompt_version: 'BA400.4' });
     }
+    const flush = pendingEvents;
+    pendingEvents = [];
+    flush.forEach(({ name, props }) => ampTrack(name, props));
   })().catch((err) => {
     // Unlatch so a later call can retry after a transient setup failure.
     initStarted = false;
@@ -292,9 +188,34 @@ export function initAmplitude(): void {
   });
 }
 
+// Amplitude half of the shared dispatcher (analytics-dispatch.ts is the only
+// caller; props arrive already cleaned). Same auto props as mpTrack/phCapture
+// so the three product tools see identical event shapes.
+export function ampTrack(name: string, props: Record<string, unknown> = {}): void {
+  if (disabled || getAnalyticsConsent() !== "granted") return;
+  if (!initialized || !amplitudeClient) {
+    // Buffer only while a consented init is under way; otherwise drop.
+    if (initStarted && pendingEvents.length < MAX_PENDING_EVENTS) {
+      pendingEvents.push({ name, props });
+    }
+    return;
+  }
+  const merged: Record<string, unknown> = {
+    platform: "web",
+    page_path: window.location.pathname,
+    ...props,
+  };
+  try {
+    amplitudeClient.track(name, merged);
+  } catch {
+    // Analytics must never break the app.
+  }
+}
+
 export function optOutAmplitude(): void {
   lifecycleVersion += 1;
   disabled = true;
+  pendingEvents = [];
   amplitudeClient?.setOptOut(true);
   void teardownAmplitudePlugins();
 }

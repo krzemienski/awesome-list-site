@@ -39,7 +39,7 @@ import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/hooks/useAuth";
 import { ApiError, apiRequest, queryClient } from "@/lib/queryClient";
 import { humanizeApiError } from "@/lib/apiError";
-import { mpTrack } from "@/lib/mixpanel";
+import { trackResourceEditSubmitted } from "@/lib/analytics";
 import type { Resource } from "@shared/schema";
 import { hasVisibleChars, isPlausiblePublicUrl, URL_HOSTNAME_MESSAGE, URL_WHITESPACE_MESSAGE } from "@shared/validation";
 
@@ -411,9 +411,9 @@ export function SuggestEditDialog({ resource, open, onOpenChange }: SuggestEditD
       });
     },
     onSuccess: () => {
-      // Task #232: Mixpanel edit-suggestion event (ids only, no content —
-      // proposed text may quote external material).
-      mpTrack('resource_edit_submitted', { resource_id: String(resource.id) });
+      // Task #232: edit-suggestion event (ids only, no content — proposed
+      // text may quote external material).
+      trackResourceEditSubmitted(resource.id);
       toast({
         title: "Edit Suggestion Submitted",
         description: "Your edit is pending review and now appears in your contribution timeline.",

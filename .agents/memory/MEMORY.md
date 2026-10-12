@@ -36,6 +36,7 @@
 - [Claude Agent SDK migration](agent-sdk-migration.md) — shared router resolver (fail-closed on URL-without-cred), alias subagent models, token-only override pinned to router, tool lockdown, SDK peers.
 - [QA reports reference stale schema](qa-report-stale-schema.md) — external QA/audit bug reports assume a Next.js app with stale counts/routes; reproduce each against live DB+app first, ~1/3 don't reproduce.
 - [Mixpanel consent integration](mixpanel-consent-integration.md) — SDK must be dynamic-imported post-consent (module load has side effects); opt_in fires an event; strip query/referrer; /track bodies are gzipped.
+- [Analytics shared sender + keys](analytics-shared-sender.md) — all custom events via track() → 4 vendors; GA context token-free; product keys are shared VITE_* env vars, not client/.env.
 - [GA4 tracking gotchas](ga4-tracking.md) — SPA self-tracked page_view double-counts unless GA4 Enhanced Measurement history toggle is OFF; init gtag at module load; gtag batches (poll+force-flush to validate); no PII.
 - [GitHub push workflow scope](github-push-workflow-scope.md) — pushes touching .github/workflows need the GITHUB_PUSH_TOKEN PAT (connector OAuth lacks `workflow` scope); bash blocks .git writes/fetch but Node fs + plain push work.
 - [Harness verified activation](harness-verified-activation.md) — tab-sweep harnesses must assert the panel actually activated (aria-selected/data-state) or every cell scans the default panel; byte-identical dumps are the tell.
@@ -164,3 +165,29 @@
 - [SSR lazy boundary #421](ssr-lazy-boundary-421.md) — env-gated lazy hosts in the hydrated Home tree throw #421/#419; mount closed hosts client-only; diff .replit userenv first.
 - [Secret leak scan by value](secret-history-leak-scan.md) — prove 'no secrets committed' by grepping real secret VALUES across all history blobs; owner password leaked via deleted July scripts.
 - [Robots parser precedence](robots-parser-precedence.md) — Python 3.11 robotparser uses first-match rules; use longest-match semantics to verify Allow: / plus private exclusions.
+- [Initial bundle zod boundary](initial-bundle-zod-boundary.md) — shell-reachable shared code must import resourceFacets-core; zod in entry failed publish; diff vs last-published build in /tmp.
+- [Reference sync gate history](design-reference-independence.md) — the design archive root is a frozen reference excluded from palette/profile gates; the frozen check reads a gitignored zip by recorded path → ENOENT elsewhere.
+- [Publish build gate isolation](publish-build-gate-isolation.md) — deploy-build gates run with PROD env before the schema diff applies; never boot the app or open a DB there (chicken-and-egg block + scratch-DB DDL hit prod).
+- [Validation workflow registration](validation-workflow-registration.md) — drift gates are validation workflows via setValidationCommand (configureWorkflow hits the 10-workflow cap); in-process contract harness must install+probe before registerRoutes.
+- [Completion gate DB contention](completion-gate-db-contention.md) — DB-outage + crawl gates must share the "db-heavy" file lease (gate-lease.mjs); fixed sleep staggers lose the race as the suite grows.
+- [Validation thread exhaustion](validation-thread-exhaustion.md) — EAGAIN/lost listeners cascade; cgroup pids.max ~1152 caps parallel Chromium auditors at ~6.
+- [Cold-cache gate flattery](cold-cache-gate-flattery.md) — a crawl gate passing right after a warm-up burst proves nothing; confirm cold-boot solo (ladders lose to sustained saturation — cap uncached resolutions below the pool).
+- [Palette scans miss gradient stops](palette-scan-gradient-stops.md) — the stage-5 regex skips from/via/to (+divide/outline/shadow/...); extend the prefix list or gradients slip through; comments naming palette classes also match.
+- [Dead-code reachability gate](dead-code-reachability-gate.md) — BFS from execution roots (importer counts miss mutual clusters); strip comments/.js→.ts swap; repo root is a separate blind spot needing an evidence gate.
+- [Drift-gate mutation probing](drift-gate-mutation-probing.md) — prove a gate fails by mutating a /tmp copy of its inputs; parser-rot short-circuits parity checks, and literals need unescaping first.
+- [Last-green gate baselines](last-green-baselines.md) — lint/integration were never green; diff per file+test vs last green sha; e2e runs all 5 projects (~40 min, background it).
+- [Product-profile gate target](product-profile-gate-target.md) — validate the design-system artifact, never the frozen canonical source; assert token consumers per selector, not substring.
+- [dead-exports forbids speculative exports](dead-exports-speculative.md) — export helpers with their first importer, never "for a later wave"; no pinned exceptions.
+- [Frozen reference roots in drift gates](standalone-palette-gate-scope.md) — an archive-identical dir can't take tokens or DS-OK; exclude it AND verify it against the zip each run.
+- [Shared test DB vs vitest file parallelism](vitest-shared-db-file-parallelism.md) — per-file cleanupDatabase() on ONE DB: parallel files wipe each other (500/401/never-429); run serially.
+- [Vitest spy calls vanish on mockRestore](vitest-spy-mockrestore.md) — `mockRestore()` also clears `mock.calls`; collect observed lines inside the mockImplementation or a live warning looks like "the observer never ran".
+- [Token parity by effective cascade](token-parity-effective-cascade.md) — one resolver over every sheet with ORDERED cascade layers (not a bit); element model + selector engine for shadows; in-gate canaries.
+- [Gates vs folded UI](gate-drift-from-folded-ui.md) — reveal every collapsed aria-expanded disclosure (never popups/tabs) before sweeping; folds hide selectors and new strays.
+- [Consensus audit panels](consensus-audit-panels.md) — blind auditors get skill+URL+private .cache dir only; dev panel then prod panel; save verdicts verbatim; waitForJob caps at 600 s.
+- [DS verify skill copies](ds-verify-skill-copies.md) — repo copy authoritative (mirror .local); the frozen verbatim skill always FAILs this app’s data-ds hooks; md5 both before a panel.
+- [DS deep gates vs Claude Design](ds-gates-post-claude-design.md) — post-adoption deep verify FAIL is baseline (frozen gates/pre-boot, ENOENT design-system.css, swiss/orange gate race); restore docs/parity after runs.
+- [Dead-code gates miss harness readers](dead-code-harness-readers.md) — tests/parity reads app source by path; grep tests/ scripts/ for file+symbol before deleting or un-exporting.
+- [ds-button-sweep empty-queue dependency](ds-sweep-empty-queue-dependency.md) — admin tab checks wait for empty-state controls; pending QA fixtures fail them; run DS verify after cleanup.
+- [cache-headers boot locks DEV](cache-headers-boot-migrator-locks.md) — spawned prod server runs boot DDL on dev; must hold db-heavy lease while up or seo-snapshot sheds random /tag/* 503s.
+- [ESLint ratchet](eslint-ratchet.md) — app correctness rules held at 0, rest per-file ratchet that only shrinks; Node API needs TSESTREE_SINGLE_RUN=true to match CLI counts.
+- [Publish gate offline repro](pre-publish-gate-offline-repro.md) — run pre-publish-gate.sh --publish in a /tmp tar copy (keep .agents+docs, BUILD_REVISION set, bogus DATABASE_URL) to prove blocking.

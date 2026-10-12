@@ -4,15 +4,21 @@
 //  - initGA loads gtag with `send_page_view:false` so page_view is fired
 //    exactly once per navigation from a single source (use-analytics), and adds
 //    `debug_mode` in DEV so events surface in GA4 DebugView.
-//  - Every event routes through `sendEvent`, which enriches it with standard
-//    GA4 context (page_location, page_path, page_title, page_referrer).
+//  - Every custom event goes through the module-private `track()`, which
+//    lazily loads the shared dispatcher (analytics-dispatch.ts) after consent.
+//    The dispatcher cleans properties once (analytics-hygiene.ts) and fans the
+//    event out to GA4, Mixpanel, PostHog and Amplitude. GA4's half lands in
+//    `sendGaEvent` together with sanitized GA4 page context (page_location
+//    keeps only attribution params; path-only page_path; origin+path referrer).
+//  - Tracking plan + shared event catalog: docs/ANALYTICS.md. New events are
+//    added there AND as a typed helper below that calls `track()`.
 //  - Legacy custom event NAMES are preserved (dashboard continuity); GA4
 //    recommended events (login/sign_up/select_content/generate_lead/search/
 //    share) are ADDED with dedicated recommended parameters.
 //  - No PII is ever sent (no email/password/token/raw copied text).
 
 import { captureAcquisition, getAcquisition } from './acquisition';
-import { mpTrack, mpReferrerOrigin } from './mixpanel';
+import type { AnalyticsDispatchRequest } from './analytics-dispatch';
 
 // Define the gtag function globally
 declare global {
@@ -85,6 +91,7 @@ let gaInitialized = false;
 const pendingEvents: Array<{
   name: string;
   params: Record<string, unknown>;
+  context: Record<string, unknown>;
 }> = [];
 export const initGA = () => {
   if (getAnalyticsConsent() !== 'granted') return;
@@ -144,12 +151,15 @@ export const initGA = () => {
   }
   window.gtag('config', measurementId, configParams);
   const queued = pendingEvents.splice(0);
-  for (const event of queued) sendEvent(event.name, event.params);
+  for (const event of queued) sendGaEvent(event.name, event.params, event.context);
 };
 
 /** Stop GA immediately after an in-session consent revoke. */
 export const optOutGA = () => {
   pendingEvents.length = 0;
+  // Events waiting for the dispatcher chunk were accepted under the old grant;
+  // drop them too (the dispatcher also re-checks consent before sending).
+  queuedDispatches.length = 0;
   const measurementId = getMeasurementId();
   if (measurementId) window[`ga-disable-${measurementId}`] = true;
   window.gtag?.('consent', 'update', { analytics_storage: 'denied' });
@@ -173,63 +183,104 @@ const clearGACookies = () => {
     for (const domain of domains) document.cookie = `${name}=; Path=/; Max-Age=0${domain}`;
   }
 };
-const baseContext = (): Record<string, unknown> => {
-  if (typeof window === 'undefined') return {};
-  return {
-    page_location: window.location.href,
-    page_path: window.location.pathname + window.location.search,
-    page_title: typeof document !== 'undefined' ? document.title : undefined,
-    page_referrer:
-      typeof document !== 'undefined' ? document.referrer || undefined : undefined,
-  };
-};
-
 /**
- * Central event dispatcher. Enriches every event with standard GA4 context and
- * strips undefined/null params so payloads stay clean. All other helpers in this
- * module funnel through here. Module-private on purpose: callers use the named
- * helpers below, so exporting the raw dispatcher would be an unused surface the
- * dead-exports gate correctly flags.
+ * GA4 half of the shared dispatcher (analytics-dispatch.ts is its only
+ * caller). `params` arrive already cleaned by analytics-hygiene, and
+ * `context` is the sanitized page context from `gaPageContext` (page_location
+ * with only utm_* and click-id params, path-only page_path, origin+path
+ * referrer), captured when the event was dispatched. The context is also
+ * pinned with gtag('set') so hits gtag sends on its own (enhanced measurement)
+ * reuse it instead of the raw document URL and referrer. When there is no
+ * document.referrer the dispatcher supplies the previous sanitized location as
+ * page_referrer, so gtag never falls back to the raw previous SPA URL.
  */
-const sendEvent = (name: string, params: Record<string, unknown> = {}) => {
+export const sendGaEvent = (
+  name: string,
+  params: Record<string, unknown> = {},
+  context: Record<string, unknown> = {},
+) => {
   if (typeof window === 'undefined') return;
   if (getAnalyticsConsent() !== 'granted') return;
   if (!window.gtag) {
     // With a persisted grant, React can emit its initial page_view before the
     // deferred post-paint SDK bootstrap. Preserve those events without ever
     // queueing anything before consent.
-    pendingEvents.push({ name, params });
+    pendingEvents.push({ name, params, context });
     return;
   }
 
-  const merged: Record<string, unknown> = { ...baseContext(), ...params };
+  const pinned: Record<string, unknown> = {};
+  for (const key of ['page_location', 'page_referrer', 'page_title'] as const) {
+    if (context[key] !== undefined) pinned[key] = context[key];
+  }
+  if (Object.keys(pinned).length > 0) window.gtag('set', pinned);
+
+  const merged: Record<string, unknown> = { ...context, ...params };
   Object.keys(merged).forEach((key) => {
     if (merged[key] === undefined || merged[key] === null) delete merged[key];
   });
 
   window.gtag('event', name, merged);
 };
+/**
+ * GA4 half of the shared dispatcher (analytics-dispatch.ts is its only
+ * caller). `params` arrive already cleaned by analytics-hygiene, and
+ * `context` is the sanitized page context from `gaPageContext` (page_location
+ * with only utm_* and click-id params, path-only page_path, origin+path
+ * referrer), captured when the event was dispatched. The context is also
+ * pinned with gtag('set') so hits gtag sends on its own (enhanced measurement)
+ * reuse it instead of the raw document URL and referrer. When there is no
+ * document.referrer the dispatcher supplies the previous sanitized location as
+ * page_referrer, so gtag never falls back to the raw previous SPA URL.
+ */
+export const sendGaEvent = (
+  name: string,
+  params: Record<string, unknown> = {},
+  context: Record<string, unknown> = {},
+) => {
+  if (typeof window === 'undefined') return;
+  if (getAnalyticsConsent() !== 'granted') return;
+  if (!window.gtag) {
+    // With a persisted grant, React can emit its initial page_view before the
+    // deferred post-paint SDK bootstrap. Preserve those events without ever
+    // queueing anything before consent.
+    pendingEvents.push({ name, params, context });
+    return;
+  }
 
-// Track page views — single source, called on mount + every route change.
-// Relies on baseContext for page_location (carries UTMs) / page_path / title.
-export const trackPageView = (_url?: string) => {
-  sendEvent('page_view', {});
-  mpTrack('page_viewed', {
-    page_title: typeof document !== 'undefined' ? document.title : undefined,
-    // Origin only — full referrer URLs can carry tokens/PII in queries.
-    referrer_origin: mpReferrerOrigin(),
+  const pinned: Record<string, unknown> = {};
+  for (const key of ['page_location', 'page_referrer', 'page_title'] as const) {
+    if (context[key] !== undefined) pinned[key] = context[key];
+  }
+  if (Object.keys(pinned).length > 0) window.gtag('set', pinned);
+
+  const merged: Record<string, unknown> = { ...context, ...params };
+  Object.keys(merged).forEach((key) => {
+    if (merged[key] === undefined || merged[key] === null) delete merged[key];
   });
+
+  window.gtag('event', name, merged);
+};
+export const trackPageView = (_url?: string) => {
+  track(
+    'page_viewed',
+    {
+      page_title: typeof document !== 'undefined' ? document.title : undefined,
+      referrer_origin: referrerOrigin(),
+    },
+    { ga: { name: 'page_view', params: {} } },
+  );
 };
 
 // Track engagement duration for a page (fired on route change + tab hide).
 export const trackPageEngagement = (pagePath: string, engagementMs: number) => {
   const engagement_time_msec = Math.round(engagementMs);
   if (!Number.isFinite(engagement_time_msec) || engagement_time_msec <= 0) return;
-  sendEvent('page_engaged', { page_path: pagePath, engagement_time_msec });
+  track('page_engaged', { page_path: pagePath, engagement_time_msec }, { product: false });
 };
 
 // Generic event (legacy UA-style params retained for dashboard continuity, now
-// enriched with GA4 context via sendEvent).
+// enriched with GA4 context).
 export const trackEvent = (
   action: string,
   category?: string,
@@ -240,7 +291,7 @@ export const trackEvent = (
   if (category !== undefined) params.event_category = category;
   if (label !== undefined) params.event_label = label;
   if (value !== undefined) params.value = value;
-  sendEvent(action, params);
+  track(action, params, { product: false });
 };
 
 // ---------------------------------------------------------------------------
@@ -249,16 +300,19 @@ export const trackEvent = (
 
 // User signed in (method e.g. "password"). Carries first-touch acquisition.
 export const trackLogin = (method: string) => {
-  sendEvent('login', { method, ...getAcquisition() });
-  mpTrack('logged_in', { login_method: method, ...getAcquisition() });
+  track(
+    'logged_in',
+    { login_method: method, ...getAcquisition() },
+    { ga: { name: 'login', params: { method, ...getAcquisition() } } },
+  );
 };
 
 // User created an account. Carries first-touch acquisition.
 export const trackSignUp = (method: string) => {
-  sendEvent('sign_up', { method, ...getAcquisition() });
-  // Mixpanel half (sign_up_completed) is emitted SERVER-side from the
-  // register handler (Task #233) so ad blockers can't undercount it — do not
-  // re-add mpTrack here or the conversion double-counts.
+  // Product half (sign_up_completed) is emitted SERVER-side to Mixpanel from
+  // Clerk JIT provisioning (Task #233) so ad blockers can't undercount it — do
+  // not enable `product` here or the conversion double-counts.
+  track('sign_up', { method, ...getAcquisition() }, { product: false });
 };
 
 // User selected/opened a piece of content (e.g. viewed a resource detail).
@@ -267,22 +321,28 @@ export const trackSelectContent = (
   contentId: string | number,
   extra: Record<string, unknown> = {}
 ) => {
-  sendEvent('select_content', {
+  const gaParams = {
     content_type: contentType,
     content_id: String(contentId),
     ...extra,
-  });
+  };
   if (contentType === 'resource') {
-    mpTrack('resource_viewed', { resource_id: String(contentId), ...extra });
+    track(
+      'resource_viewed',
+      { resource_id: String(contentId), ...extra },
+      { ga: { name: 'select_content', params: gaParams } },
+    );
+  } else {
+    track('select_content', gaParams, { product: false });
   }
 };
 
 // User completed a lead-generating form (e.g. submitted a resource).
 export const trackGenerateLead = (params: Record<string, unknown> = {}) => {
-  sendEvent('generate_lead', { ...params, ...getAcquisition() });
-  // Mixpanel half (resource_submitted) is emitted SERVER-side from the
-  // resource-submit handler (Task #233) — do not re-add mpTrack here or the
+  // Product half (resource_submitted) is emitted SERVER-side from the
+  // resource-submit handler (Task #233) — do not enable `product` here or the
   // conversion double-counts.
+  track('generate_lead', { ...params, ...getAcquisition() }, { product: false });
 };
 
 export type AuthPromptContext =
@@ -294,23 +354,27 @@ export const trackShare = (
   contentType: string,
   contentId: string | number
 ) => {
-  sendEvent('share', {
-    method,
-    content_type: contentType,
-    content_id: String(contentId),
-  });
-  mpTrack('content_shared', {
-    share_method: method,
-    content_type: contentType,
-    content_id: String(contentId),
-  });
+  track(
+    'content_shared',
+    {
+      share_method: method,
+      content_type: contentType,
+      content_id: String(contentId),
+    },
+    {
+      ga: {
+        name: 'share',
+        params: { method, content_type: contentType, content_id: String(contentId) },
+      },
+    },
+  );
 };
 
 // ---------------------------------------------------------------------------
 // Learning-journey funnel (Task #330): journey_start → journey_step_complete
 // → journey_complete. Every event carries journey id + title; step events add
 // the logical step position so the funnel can segment by depth. GA4 names use
-// the funnel verbs from the task spec; Mixpanel mirrors keep the established
+// the funnel verbs from the task spec; the catalog names keep the established
 // snake_case object_action convention (journey_step_completed predates this
 // task — its name is preserved for dashboard continuity).
 // ---------------------------------------------------------------------------
@@ -325,16 +389,11 @@ type JourneyEventInfo = {
 // start button). Resume paths (Continue CTA, useResumeJourney) re-POST the
 // idempotent start endpoint to bump lastAccessedAt but must NOT re-fire this.
 export const trackJourneyStart = ({ journeyId, journeyTitle, totalSteps }: JourneyEventInfo) => {
-  sendEvent('journey_start', {
-    journey_id: String(journeyId),
-    journey_title: journeyTitle,
-    total_steps: totalSteps,
-  });
-  mpTrack('journey_started', {
-    journey_id: String(journeyId),
-    journey_title: journeyTitle,
-    total_steps: totalSteps,
-  });
+  track(
+    'journey_started',
+    { journey_id: String(journeyId), journey_title: journeyTitle, total_steps: totalSteps },
+    { ga: { name: 'journey_start' } },
+  );
 };
 
 // One event per LOGICAL step (a logical step spans up to 3 DB rows; the caller
@@ -351,98 +410,134 @@ export const trackJourneyStepComplete = ({
   stepPosition?: number;
   stepRowCount?: number;
 }) => {
-  sendEvent('journey_step_complete', {
+  const funnel = {
     journey_id: String(journeyId),
     journey_title: journeyTitle,
     step_number: stepNumber,
     step_position: stepPosition,
     total_steps: totalSteps,
-  });
-  mpTrack('journey_step_completed', {
-    journey_id: String(journeyId),
-    journey_title: journeyTitle,
-    step_number: stepNumber,
-    step_position: stepPosition,
-    total_steps: totalSteps,
-    step_row_count: stepRowCount,
-  });
+  };
+  track(
+    'journey_step_completed',
+    { ...funnel, step_row_count: stepRowCount },
+    { ga: { name: 'journey_step_complete', params: funnel } },
+  );
 };
 
-// Fired on the server-confirmed transition of completedAt null → set (the PUT
-// progress response), never re-fired for already-complete journeys.
+export const trackJourneyStepUncomplete = ({
+  journeyId,
+  journeyTitle,
+  stepNumber,
+  stepRowCount,
+}: {
+  journeyId: string | number;
+  journeyTitle?: string;
+  stepNumber: number;
+  stepRowCount: number;
+}) => {
+  track(
+    'journey_step_uncompleted',
+    {
+      journey_id: String(journeyId),
+      journey_title: journeyTitle,
+      step_number: stepNumber,
+      step_row_count: stepRowCount,
+    },
+    { ga: false },
+  );
+};
 export const trackJourneyComplete = ({ journeyId, journeyTitle, totalSteps }: JourneyEventInfo) => {
-  sendEvent('journey_complete', {
-    journey_id: String(journeyId),
-    journey_title: journeyTitle,
-    total_steps: totalSteps,
-  });
-  mpTrack('journey_completed', {
-    journey_id: String(journeyId),
-    journey_title: journeyTitle,
-    total_steps: totalSteps,
-  });
+  track(
+    'journey_completed',
+    { journey_id: String(journeyId), journey_title: journeyTitle, total_steps: totalSteps },
+    { ga: { name: 'journey_complete' } },
+  );
 };
 
-// ---------------------------------------------------------------------------
-// Retained custom events (names preserved, params enriched)
-// ---------------------------------------------------------------------------
-
-// Track resource clicks — most important for awesome lists. Intentionally emits
-// two distinct named events (documented pair, not duplicates): the engagement
-// signal and the outbound-navigation signal.
+export const trackResourceSaveToggle = (
+  kind: 'bookmark' | 'favorite',
+  saved: boolean,
+  resourceId: string | number,
+) => {
+  const name =
+    kind === 'bookmark'
+      ? saved ? 'resource_bookmarked' : 'resource_unbookmarked'
+      : saved ? 'resource_favorited' : 'resource_unfavorited';
+  track(name, { resource_id: String(resourceId) }, { ga: false });
+};
 export const trackResourceClick = (
   resourceTitle: string,
   resourceUrl: string,
   category: string
 ) => {
-  sendEvent('resource_click', {
-    content_type: 'resource',
-    content_name: resourceTitle,
-    content_category: category,
-    value: 1,
-  });
-  sendEvent('outbound_link', {
-    link_url: resourceUrl,
-    link_domain: domainOf(resourceUrl),
-  });
-  mpTrack('resource_link_opened', {
-    resource_title: resourceTitle,
-    link_url: resourceUrl,
-    link_domain: domainOf(resourceUrl),
-    category,
-  });
+  const linkDomain = domainOf(resourceUrl);
+  track(
+    'resource_link_opened',
+    {
+      resource_title: resourceTitle,
+      link_url: resourceUrl,
+      link_domain: linkDomain,
+      category,
+    },
+    {
+      ga: {
+        name: 'resource_click',
+        params: {
+          content_type: 'resource',
+          content_name: resourceTitle,
+          content_category: category,
+          value: 1,
+        },
+      },
+    },
+  );
+  track(
+    'outbound_link',
+    { link_url: resourceUrl, link_domain: linkDomain },
+    { product: false },
+  );
 };
 
 // Track site search (GA4 recommended `search` with search_term).
 export const trackSearch = (searchTerm: string, resultCount: number, surface = 'search_page') => {
-  const properties = { search_term: searchTerm, result_count: resultCount, surface };
-  sendEvent('search', properties);
-  mpTrack('search_performed', properties);
+  track(
+    'search_performed',
+    { search_term: searchTerm, result_count: resultCount, surface },
+    { ga: { name: 'search' } },
+  );
 };
 
 // Track category navigation.
 export const trackCategoryView = (categoryName: string) => {
-  sendEvent('category_view', { content_category: categoryName });
-  mpTrack('category_viewed', { category: categoryName });
+  track(
+    'category_viewed',
+    { category: categoryName },
+    { ga: { name: 'category_view', params: { content_category: categoryName } } },
+  );
 };
 
 // Track theme / appearance changes (themeType e.g. "color" | "font" | "system").
 export const trackThemeChange = (themeName: string, themeType = 'color') => {
-  sendEvent('theme_change', { theme_name: themeName, theme_type: themeType });
+  track('theme_change', { theme_name: themeName, theme_type: themeType }, { product: false });
 };
 
-// Track resource favoriting.
+// Track resource favoriting (GA4 legacy; the catalog's resource_favorited /
+// resource_unfavorited come from trackResourceSaveToggle).
 export const trackResourceFavorite = (
   resourceTitle: string,
   category: string,
   action: 'add' | 'remove'
 ) => {
-  sendEvent('resource_favorite', {
-    action,
-    content_type: 'resource',
-    content_name: resourceTitle,
-    content_category: category,
-  });
+  track(
+    'resource_favorite',
+    {
+      action,
+      content_type: 'resource',
+      content_name: resourceTitle,
+      content_category: category,
+    },
+    { product: false },
+  );
 };
 
 // Track API response times.
@@ -451,11 +546,11 @@ export const trackApiPerformance = (
   responseTime: number,
   status: number
 ) => {
-  sendEvent('api_performance', {
-    endpoint,
-    status,
-    value: Math.round(responseTime),
-  });
+  track(
+    'api_performance',
+    { endpoint, status, value: Math.round(responseTime) },
+    { product: false },
+  );
 };
 
 // Track Core Web Vitals. LCP/FID/INP are milliseconds; CLS is a unitless score,
@@ -465,15 +560,16 @@ export const trackPerformance = (metric: string, value: number) => {
   const normalizedMetric = metric.toLowerCase();
   const reportedValue =
     normalizedMetric === 'cls' ? Number(value.toFixed(4)) : Math.round(value);
-  sendEvent('performance', {
-    metric_name: normalizedMetric,
-    value: reportedValue,
-  });
+  track(
+    'performance',
+    { metric_name: normalizedMetric, value: reportedValue },
+    { product: false },
+  );
 };
 
 // Track error events.
 export const trackError = (errorType: string, errorMessage: string) => {
-  sendEvent('error', { error_type: errorType, error_message: errorMessage });
+  track('error', { error_type: errorType, error_message: errorMessage }, { product: false });
 };
 
 export const trackFilterUsage = (
@@ -482,47 +578,43 @@ export const trackFilterUsage = (
   resultCount: number,
   surface = 'unknown',
 ) => {
-  const properties = {
+  track('filter_applied', {
     filter_type: filterType,
     filter_value: filterValue,
     result_count: resultCount,
     zero_results: resultCount === 0,
     surface,
-  };
-  sendEvent('filter_applied', properties);
-  mpTrack('filter_applied', properties);
+  });
 };
 
 export const trackSortChange = (sortType: string, surface = 'unknown', resultCount?: number) => {
-  const properties = {
-    sort_type: sortType,
-    surface,
-    result_count: resultCount,
-    zero_results: resultCount === 0,
-  };
-  sendEvent('sort_change', properties);
-  mpTrack('sort_changed', properties);
+  track(
+    'sort_changed',
+    {
+      sort_type: sortType,
+      surface,
+      result_count: resultCount,
+      zero_results: resultCount === 0,
+    },
+    { ga: { name: 'sort_change' } },
+  );
 };
 
 export const trackTagInteraction = (tag: string, action: string, surface = 'unknown', resultCount?: number) => {
-  const properties = {
+  track('tag_interaction', {
     tag,
     action,
     surface,
     result_count: resultCount,
     zero_results: resultCount === 0,
-  };
-  sendEvent('tag_interaction', properties);
-  mpTrack('tag_interaction', properties);
+  });
 };
 
 export const trackAuthPromptShown = (
   context: AuthPromptContext,
   guestSavedCount: number
 ) => {
-  const params = { prompt_context: context, guest_saved_count: guestSavedCount };
-  sendEvent('auth_prompt_shown', params);
-  mpTrack('auth_prompt_shown', params);
+  track('auth_prompt_shown', { prompt_context: context, guest_saved_count: guestSavedCount });
 };
 
 export const trackBookmarksMerged = (outcome: {
@@ -530,35 +622,106 @@ export const trackBookmarksMerged = (outcome: {
   duplicates: number;
   failed: number;
 }) => {
-  const params = {
+  track('bookmarks_merged', {
     merged_count: outcome.merged,
     duplicate_count: outcome.duplicates,
     failed_count: outcome.failed,
-  };
-  sendEvent('bookmarks_merged', params);
-  mpTrack('bookmarks_merged', params);
+  });
 };
 
 export const trackGuestBookmarkRemoved = (
   resourceId: string | number,
   guestSavedCount: number
 ) => {
-  const params = {
+  track('guest_bookmark_removed', {
     resource_id: String(resourceId),
     guest_saved_count: guestSavedCount,
-  };
-  sendEvent('guest_bookmark_removed', params);
-  mpTrack('guest_bookmark_removed', params);
+  });
 };
 
 export const trackGuestBookmarkAdded = (
   resourceId: string | number,
   guestSavedCount: number
 ) => {
-  const params = {
+  track('guest_bookmark_added', {
     resource_id: String(resourceId),
     guest_saved_count: guestSavedCount,
-  };
-  sendEvent('guest_bookmark_added', params);
-  mpTrack('guest_bookmark_added', params);
+  });
 };
+
+const queuedDispatches: AnalyticsDispatchRequest[] = [];
+
+/**
+ * The single entry point for every custom event: one call reaches GA4,
+ * Mixpanel, PostHog and Amplitude with identically cleaned properties.
+ * Pre-consent it returns before doing anything — the dispatcher chunk (and
+ * the property-hygiene rules inside it) is only fetched after a grant.
+ * Module-private on purpose: callers use the typed helpers below, so the
+ * catalog in docs/ANALYTICS.md stays the one place event names are decided.
+ */
+const track = (name: string, props: EventProps = {}, options: TrackOptions = {}) => {
+  if (typeof window === 'undefined') return;
+  if (getAnalyticsConsent() !== 'granted') return;
+  const ga =
+    options.ga === false
+      ? null
+      : { name: options.ga?.name ?? name, params: options.ga?.params ?? props };
+  const request: AnalyticsDispatchRequest = {
+    name,
+    props,
+    ga,
+    product: options.product !== false,
+  };
+  if (dispatch) {
+    dispatch(request);
+    return;
+  }
+  queuedDispatches.push(request);
+  if (dispatchLoad) return;
+  dispatchLoad = import('./analytics-dispatch')
+    .then(({ dispatchAnalyticsEvent }) => {
+      dispatch = dispatchAnalyticsEvent;
+      // FIFO flush keeps the order the helpers were called in.
+      for (const queued of queuedDispatches.splice(0)) dispatchAnalyticsEvent(queued);
+    })
+    .catch(() => {
+      // Transient chunk failure: drop what was queued and allow a retry.
+      queuedDispatches.length = 0;
+      dispatchLoad = null;
+    });
+};
+
+export const trackResourceEditSubmitted = (resourceId: string | number) => {
+  track('resource_edit_submitted', { resource_id: String(resourceId) }, { ga: false });
+};
+
+const referrerOrigin = (): string | undefined => {
+  if (typeof document === 'undefined' || !document.referrer) return undefined;
+  try {
+    return new URL(document.referrer).origin;
+  } catch {
+    return undefined;
+  }
+};
+
+let dispatchLoad: Promise<void> | null = null;
+
+interface TrackOptions {
+  /**
+   * GA4 half. Default: the same name and properties as the catalog event.
+   * `{ name, params? }` keeps a legacy GA4 name (and optionally its own
+   * params) for events that predate the catalog; `false` skips GA4.
+   */
+  ga?: false | { name?: string; params?: EventProps };
+  /**
+   * Mixpanel + PostHog + Amplitude. Default true; `false` only for the legacy
+   * GA4-only events (page_view, page_engaged, performance, api_performance,
+   * error, theme_change, resource_favorite, sign_up, generate_lead,
+   * outbound_link, page_not_found) so their vendor coverage is unchanged.
+   */
+  product?: boolean;
+}
+
+let dispatch: ((request: AnalyticsDispatchRequest) => void) | null = null;
+
+type EventProps = Record<string, unknown>;

@@ -30,7 +30,6 @@ A production-ready React application for browsing and discovering over 2,600 cur
 > **Full history:** see [`CHANGELOG.md`](./CHANGELOG.md) for every dated entry back to December 2025. Older "Recent Changes" entries are moved there periodically.
 
 
-
 ### Rich structured data & SERP templates (August 19, 2026)
 - The server-only SEO pipeline now emits page-specific `ItemList` entries for category and journey listings, enriched resource entities (provider, taxonomy, tags, skill level, format-aware type), and Course syllabi from logical journey steps. Client pages still emit no JSON-LD.
 - `shared/seo-templates.ts` now owns hierarchy-aware listing text, resource/journey fallbacks, and pagination variants. Server crawl HTML and hydrated client heads use the same functions, preserving two-pass title/description parity.
@@ -50,15 +49,15 @@ A production-ready React application for browsing and discovering over 2,600 cur
 - **Post-republish**: run the §4 checklist in PLATFORM-ACTIONS.md (COOP/CORP + security.txt + og-image CORP curls; consented analytics cookies must show Secure+Lax in devtools).
 
 
-### Amplitude analytics + session replay (July 31, 2026)
-- `@amplitude/unified` via the Amplitude setup wizard. **Initializes immediately at load — NOT consent-gated** (explicit user decision, unlike GA4/Mixpanel/PostHog). `initAll` with autocapture + session replay (sampleRate 1) in `client/src/lib/amplitude.ts`, called once from `main.tsx`. One verification event: `Viewed Home Page` (fires at load). Key in `VITE_AMPLITUDE_API_KEY` (`client/.env`). CSP: `cdn.amplitude.com` in script-src (lazy engagement bundles), `*.amplitude.com` in connect-src.
+### Amplitude analytics + session replay (July 31, 2026; consent-gated since)
+- `@amplitude/analytics-browser` + session-replay / experiment / engagement plugins in `client/src/lib/amplitude.ts`. **Consent-gated like GA4/Mixpanel/PostHog**: SDK and plugins are dynamic-imported only after the `analytics-consent` grant (`initAmplitude` from `main.tsx`'s post-paint hook and the consent banner); revoke (`optOutAmplitude`) opts out, tears down plugins and clears AMP_* storage/cookies. Verification event `Viewed Home Page` fires once setup completes. Custom events arrive via the shared sender (`ampTrack`). Key in `VITE_AMPLITUDE_API_KEY` (see the env caveat under PostHog). CSP: `cdn.amplitude.com` in script-src, `*.amplitude.com` in connect-src.
 
 ### PostHog analytics — consent-gated, full feature set (July 31, 2026)
-- `posthog-js` (npm) integrated with the same zero pre-consent architecture as Mixpanel: dynamic import post-consent only, `opt_out_capturing_by_default:true` + opt-in, Cookie-settings revoke stops capture + session recording. All features on: autocapture, SPA pageviews/pageleave, session replay (all inputs masked), exception capture, web vitals, heatmaps, feature flags (`phIsFeatureEnabled`/`phGetFeatureFlag` in `client/src/lib/posthog.ts`). Custom events mirrored via the `mpTrack` choke point so Mixpanel and PostHog see the same stream. Keys via `VITE_POSTHOG_KEY`/`VITE_POSTHOG_HOST` in gitignored `client/.env` (Vite's root is `client/` — root `.env` is NOT read by client builds). CSP allows `us.i.posthog.com` + `us-assets.i.posthog.com`.
+- `posthog-js` (npm) integrated with the same zero pre-consent architecture as Mixpanel: dynamic import post-consent only, `opt_out_capturing_by_default:true` + opt-in, Cookie-settings revoke stops capture + session recording. All features on: autocapture, SPA pageviews/pageleave, session replay (all inputs masked), exception capture, web vitals, heatmaps, feature flags (`phIsFeatureEnabled`/`phGetFeatureFlag` in `client/src/lib/posthog.ts`). Custom events arrive from the shared sender (same stream as Mixpanel and Amplitude). Keys via `VITE_POSTHOG_KEY`/`VITE_POSTHOG_HOST`. **Keys:** `vite.config.ts` sets `envDir` to the repo root, so the legacy gitignored `client/.env` is never read; `VITE_MIXPANEL_TOKEN`, `VITE_POSTHOG_KEY`, `VITE_POSTHOG_HOST` and `VITE_AMPLITUDE_API_KEY` are project-level shared env vars (public client keys, set Oct 2026), which Vite picks up from `process.env` in dev and in the deploy build. Without them those three SDKs log "missing key" and stay off. CSP allows `us.i.posthog.com` + `us-assets.i.posthog.com`.
 
 ### Mixpanel analytics — consent-gated, alongside GA4 (July 31, 2026)
 - Task #232. `mixpanel-browser` (npm) integrated with a ZERO pre-consent footprint: SDK is dynamic-imported only after the consent banner "Accept" (same `analytics-consent` localStorage gate as GA4); `opt_out_tracking_by_default:true` + opt-in post-consent; Cookie-settings revoke hard-disables the dispatcher and clears SDK state. Token via `VITE_MIXPANEL_TOKEN` (shared env).
-- Events (snake_case object_action, tracked at server-confirmed points): page_viewed, resource_viewed, resource_link_opened, search_performed, category_viewed, sign_up_completed, logged_in, resource_(un)bookmarked/(un)favorited (choke point: `useResourceToggle`), resource_submitted, resource_edit_submitted, content_shared, journey_step_(un)completed. Tracking plan: `docs/MIXPANEL.md`.
+- Events (snake_case object_action, tracked at server-confirmed points): page_viewed, resource_viewed, resource_link_opened, search_performed, category_viewed, sign_up_completed, logged_in, resource_(un)bookmarked/(un)favorited (choke point: `useResourceToggle`), resource_submitted, resource_edit_submitted, content_shared, journey_step_(un)completed. Tracking plan: `docs/ANALYTICS.md` (shared catalog) + `docs/MIXPANEL.md` (Mixpanel specifics).
 - Identity: identify by DB user id on login/session restore (`useAuth`), people props ($name/$email/role/$created/acquisition), reset on logout. Privacy: `page_path` sent without query strings; referrer reduced to origin. CSP: `api-js.mixpanel.com`/`api.mixpanel.com` (connect-src), `cdn.mxpnl.com` (script-src).
 - Live-verified via headless browser: 0 pre-consent requests, events + $identify + engage decoded from gzipped payloads, no query-token leakage. GA4 unchanged. Architect review findings (static import, URL/referrer leak, revoke hardening) all fixed.
 
@@ -194,3 +193,6 @@ The application employs a client-server architecture. The frontend is a React-ba
 - Vite
 - ESBuild
 - TSX (TypeScript execute)
+
+### Analytics tracking plan + shared sender (October 2026)
+- Every custom event goes through ONE module-private `track()` in `client/src/lib/analytics.ts` → lazily loaded `analytics-dispatch.ts` (post-consent chunk) → property hygiene (`analytics-hygiene.ts`: drops PII keys/email-shaped values, strips URL queries/fragments, caps strings, ids → strings) → GA4 + Mixpanel + PostHog + Amplitude. Components call typed helpers only, never vendor `mpTrack`/`phCapture`/`ampTrack`. Live event names unchanged (GA4 legacy aliases kept). Tracking plan, naming rules and the shared catalog that area tasks extend: `docs/ANALYTICS.md` → "Tracking plan".

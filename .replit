@@ -101,6 +101,10 @@ ANTHROPIC_MODEL = "cc/claude-opus-5"
 CONTACT_ISSUES_URL = "https://github.com/krzemienski/awesome-video/issues"
 CONTACT_ENABLED = "true"
 VITE_CONTACT_VARIANT = "b"
+VITE_AMPLITUDE_API_KEY = "f5338474e281eac273d5ec975dd13c45"
+VITE_MIXPANEL_TOKEN = "47cf526a041e2df05ad1ab433d96d8b2"
+VITE_POSTHOG_HOST = "https://us.i.posthog.com"
+VITE_POSTHOG_KEY = "phc_S8h7za1M71TeH99lB7zbTeKuRqAR8tBk1D5caFwvUt8"
 
 [userenv.development]
 

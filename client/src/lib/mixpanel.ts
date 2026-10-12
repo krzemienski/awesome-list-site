@@ -16,11 +16,15 @@
 //    raw copied text). People properties ($name/$email/role) are set
 //    deliberately on identify.
 //  - Naming convention: snake_case object_action (resource_viewed,
-//    search_performed). Tracking plan: docs/MIXPANEL.md — add new events there.
+//    search_performed). Tracking plan + shared catalog: docs/ANALYTICS.md.
+//  - App code never calls mpTrack directly: custom events go through the
+//    typed helpers in analytics.ts → the shared dispatcher
+//    (analytics-dispatch.ts), which cleans properties and fans out to GA4,
+//    Mixpanel, PostHog and Amplitude.
 import type { OverridedMixpanel } from 'mixpanel-browser';
+import type { IdentityUser } from './analytics-sdk-options';
 import { getAnalyticsConsent } from './analytics';
 import { getAcquisition } from './acquisition';
-import { phCapture } from './posthog';
 
 const getToken = (): string | undefined =>
   import.meta.env.VITE_MIXPANEL_TOKEN as string | undefined;
@@ -28,6 +32,8 @@ const getToken = (): string | undefined =>
 // The SDK instance, present only after consented init. All helpers no-op
 // while null.
 let mp: OverridedMixpanel | null = null;
+// Post-consent options chunk, loaded together with the SDK (set before mp).
+let sdkOptions: typeof import('./analytics-sdk-options') | null = null;
 let initStarted = false;
 let disabled = false; // set on consent revoke — hard-stops the dispatcher
 
@@ -72,8 +78,9 @@ export const initMixpanel = () => {
   disabled = false;
   // Dynamic import — the SDK's module code (which registers globals as a side
   // effect) must not run pre-consent.
-  import('mixpanel-browser')
-    .then(({ default: mixpanel }) => {
+  // SDK options ship in a post-consent chunk with the SDK.
+  Promise.all([import('mixpanel-browser'), import('./analytics-sdk-options')])
+    .then(([{ default: mixpanel }, options]) => {
       if (disabled) {
         // Consent revoked while the SDK was loading — abort without latching
         // initStarted, so a later re-grant re-runs init (ph/mp otherwise stay
@@ -81,22 +88,13 @@ export const initMixpanel = () => {
         initStarted = false;
         return;
       }
-      mixpanel.init(token, {
-        // EU/CA compliance: nothing is tracked unless explicitly opted in below.
-        opt_out_tracking_by_default: true,
-        // Default api host (api-js.mixpanel.com) is allowlisted in the server
-        // CSP connect-src (server/index.ts).
-        debug: import.meta.env.DEV,
-        // Page views are fired manually from use-analytics (single source
-        // shared with GA4) so SPA route changes are counted exactly once.
-        track_pageview: false,
-        persistence: 'localStorage',
-      });
+      sdkOptions = options;
+      mixpanel.init(token, options.mixpanelInitOptions);
       // The visitor has consented (gate above) — enable tracking. Only call
       // opt_in when actually opted out: opt_in_tracking() fires an `$opt_in`
       // event every time, which would add noise on every page load.
       if (mixpanel.has_opted_out_tracking()) {
-        mixpanel.opt_in_tracking();
+        mixpanel.opt_in_tracking({ track_properties: autoUrlOverrides() });
       }
       mp = mixpanel;
       // Identity first (so buffered events attach to the right profile), then
@@ -124,27 +122,30 @@ export const optOutMixpanel = () => {
   }
 };
 
-// Privacy helpers: never send query strings (tokens live there) or full
-// referrer URLs.
+// Privacy helper: never send query strings (tokens live there).
 const safePath = (): string | undefined =>
   typeof window !== 'undefined' ? window.location.pathname : undefined;
 
-const referrerOrigin = (): string | undefined => {
-  if (typeof document === 'undefined' || !document.referrer) return undefined;
+// The SDK auto-adds $current_url (full href, query + fragment) and $referrer
+// (full referrer URL) to every event. Event properties override them, so each
+// send replaces both with origin + path / origin only.
+const autoUrlOverrides = (): Record<string, unknown> => {
+  if (typeof window === 'undefined') return {};
+  const overrides: Record<string, unknown> = {
+    $current_url: window.location.origin + window.location.pathname,
+  };
   try {
-    return new URL(document.referrer).origin;
+    if (document.referrer) overrides.$referrer = new URL(document.referrer).origin;
   } catch {
-    return undefined;
+    // Malformed referrer: let the blank SDK default stand.
   }
+  return overrides;
 };
 
-// Central dispatcher — every Mixpanel event funnels through here. Custom
-// events are also mirrored to PostHog here (single choke point: analytics.ts,
-// useResourceToggle, JourneyDetail and suggest-edit all call mpTrack), so the
-// two products see the same event stream. phCapture has its own consent gate
-// and no-ops independently of Mixpanel's state.
+// Mixpanel half of the shared dispatcher (analytics-dispatch.ts is the only
+// caller; props arrive already cleaned). PostHog and Amplitude receive the
+// same event from the dispatcher, each behind its own consent gate.
 export const mpTrack = (name: string, props: Record<string, unknown> = {}) => {
-  phCapture(name, props);
   if (disabled) return;
   if (!mp) {
     // SDK still loading (or never consented). Buffer only when init is under
@@ -155,11 +156,9 @@ export const mpTrack = (name: string, props: Record<string, unknown> = {}) => {
   const merged: Record<string, unknown> = {
     platform: 'web',
     page_path: safePath(),
+    ...autoUrlOverrides(),
     ...props,
   };
-  Object.keys(merged).forEach((k) => {
-    if (merged[k] === undefined || merged[k] === null) delete merged[k];
-  });
   try {
     mp.track(name, merged);
   } catch {
@@ -173,13 +172,6 @@ export const mpTrack = (name: string, props: Record<string, unknown> = {}) => {
 
 let identifiedUserId: string | null = null;
 
-type IdentityUser = {
-  id: string;
-  name?: string | null;
-  email?: string | null;
-  role?: string | null;
-  createdAt?: string | Date | null;
-};
 
 // Latest known identity. Kept even while the SDK is loading or consent is
 // revoked so that (a) session-restore identify isn't dropped during the
@@ -196,14 +188,7 @@ const applyIdentity = (user: IdentityUser) => {
     // profiles). Anonymous pre-login events merge into this identity.
     mp.identify(user.id);
     // Deliberate people properties (profile, not event, data).
-    const people: Record<string, unknown> = {
-      role: user.role ?? 'user',
-      ...getAcquisition(),
-    };
-    if (user.name) people.$name = user.name;
-    if (user.email) people.$email = user.email;
-    if (user.createdAt) people.$created = new Date(user.createdAt).toISOString();
-    mp.people.set(people);
+    if (sdkOptions) mp.people.set(sdkOptions.mixpanelPeopleProps(user, getAcquisition()));
   } catch {
     // ignore
   }
@@ -230,10 +215,6 @@ export const mpReset = () => {
     // ignore
   }
 };
-
-// Referrer origin is exposed for trackPageView (analytics.ts) so page_viewed
-// carries attribution without leaking full referrer URLs.
-export const mpReferrerOrigin = referrerOrigin;
 
 // ---------------------------------------------------------------------------
 // Server-side conversion tracking support (Task #233)

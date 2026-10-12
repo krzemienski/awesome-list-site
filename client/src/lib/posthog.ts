@@ -12,6 +12,7 @@
 //  - Privacy: session replay masks ALL text inputs; no query strings are sent
 //    on manual events (URLs can carry sensitive tokens).
 import type { PostHog } from 'posthog-js';
+import type { IdentityUser } from './analytics-sdk-options';
 import { getAnalyticsConsent } from './analytics';
 import { getAcquisition } from './acquisition';
 
@@ -22,6 +23,8 @@ const getHost = (): string =>
   'https://us.i.posthog.com';
 
 let ph: PostHog | null = null;
+// Post-consent options chunk, loaded together with the SDK (set before ph).
+let sdkOptions: typeof import('./analytics-sdk-options') | null = null;
 let initStarted = false;
 let disabled = false;
 
@@ -58,8 +61,9 @@ export const initPosthog = () => {
 
   initStarted = true;
   disabled = false;
-  import('posthog-js')
-    .then(({ default: posthog }) => {
+  // SDK options (incl. the URL scrubber) ship in a post-consent chunk too.
+  Promise.all([import('posthog-js'), import('./analytics-sdk-options')])
+    .then(([{ default: posthog }, options]) => {
       if (disabled) {
         // Consent revoked while the SDK was loading — abort WITHOUT leaving
         // initStarted latched, so a later re-grant can re-run init from
@@ -67,56 +71,8 @@ export const initPosthog = () => {
         initStarted = false;
         return;
       }
-      posthog.init(key, {
-        api_host: getHost(),
-        // Modern defaults (2025-05-24): history-change pageviews for SPAs,
-        // pageleave, sane autocapture config.
-        defaults: '2025-05-24',
-        // EU/CA compliance: nothing captured unless explicitly opted in below.
-        opt_out_capturing_by_default: true,
-        persistence: 'localStorage+cookie',
-        // Audit 2 BUG-039: the ph_* cookie half of the persistence defaults
-        // to secure:false. Secure whenever the page is https (prod +
-        // replit.dev preview); plain-http localhost dev keeps an unflagged
-        // cookie so persistence still works there. SameSite already defaults
-        // to Lax in posthog-js.
-        secure_cookie: window.location.protocol === 'https:',
-        // Full feature set:
-        autocapture: true,
-        capture_pageview: 'history_change',
-        capture_pageleave: true,
-        capture_exceptions: true, // Error tracking
-        capture_performance: true, // Web vitals / network timing
-        enable_heatmaps: true,
-        disable_session_recording: false, // Session replay ON post-consent
-        session_recording: {
-          // Privacy: never record what people type OR read. Replays show
-          // layout + interactions with all text redacted — loosen deliberately
-          // (per-selector) if readable replays are ever needed.
-          maskAllInputs: true,
-          maskTextSelector: '*',
-        },
-        // Privacy: automatic events ($pageview etc.) carry full URLs by
-        // default; query strings can hold sensitive tokens (e.g.
-        // /reset-password?token=...). Strip query+hash from every URL-ish
-        // property, and reduce referrers to their origin.
-        sanitize_properties: (props: Record<string, unknown>) => {
-          for (const k of Object.keys(props)) {
-            const v = props[k];
-            if (typeof v !== 'string' || !/^https?:\/\//.test(v)) continue;
-            if (/referrer/i.test(k)) {
-              try { props[k] = new URL(v).origin; } catch { delete props[k]; }
-            } else if (/url|href/i.test(k)) {
-              try {
-                const u = new URL(v);
-                props[k] = u.origin + u.pathname;
-              } catch { delete props[k]; }
-            }
-          }
-          return props;
-        },
-        debug: import.meta.env.DEV,
-      });
+      sdkOptions = options;
+      posthog.init(key, options.posthogInitOptions(getHost()));
       if (posthog.has_opted_out_capturing()) {
         posthog.opt_in_capturing();
       }
@@ -151,9 +107,9 @@ export const optOutPosthog = () => {
 const safePath = (): string | undefined =>
   typeof window !== 'undefined' ? window.location.pathname : undefined;
 
-// Central dispatcher for manual events (autocapture/pageviews are handled by
-// the SDK itself). Mirrors mpTrack's naming convention: snake_case
-// object_action.
+// PostHog half of the shared dispatcher (analytics-dispatch.ts is the only
+// caller; props arrive already cleaned). Autocapture/pageviews are handled by
+// the SDK itself.
 export const phCapture = (name: string, props: Record<string, unknown> = {}) => {
   if (disabled) return;
   if (!ph) {
@@ -165,9 +121,6 @@ export const phCapture = (name: string, props: Record<string, unknown> = {}) => 
     page_path: safePath(),
     ...props,
   };
-  Object.keys(merged).forEach((k) => {
-    if (merged[k] === undefined || merged[k] === null) delete merged[k];
-  });
   try {
     ph.capture(name, merged);
   } catch {
@@ -181,13 +134,6 @@ export const phCapture = (name: string, props: Record<string, unknown> = {}) => 
 
 let identifiedUserId: string | null = null;
 
-type IdentityUser = {
-  id: string;
-  name?: string | null;
-  email?: string | null;
-  role?: string | null;
-  createdAt?: string | Date | null;
-};
 
 let lastIdentity: IdentityUser | null = null;
 
@@ -196,16 +142,9 @@ const applyIdentity = (user: IdentityUser) => {
   if (identifiedUserId === user.id) return;
   identifiedUserId = user.id;
   try {
-    // Deliberately NO name/email person properties: PostHog also records
-    // session replays, so it stays PII-minimal — the immutable DB id is
-    // enough to join against other systems when needed.
-    const person: Record<string, unknown> = {
-      role: user.role ?? 'user',
-      ...getAcquisition(),
-    };
-    if (user.createdAt) person.created_at = new Date(user.createdAt).toISOString();
     // Identify by immutable DB id (never email); anonymous events merge in.
-    ph.identify(user.id, person);
+    // Person properties stay PII-minimal (see posthogPersonProps).
+    ph.identify(user.id, sdkOptions?.posthogPersonProps(user, getAcquisition()));
   } catch {
     // ignore
   }

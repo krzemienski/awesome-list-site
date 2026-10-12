@@ -27,7 +27,6 @@ import { useToast } from "@/hooks/use-toast";
 import { queryClient, apiRequest, ApiError } from "@/lib/queryClient";
 import { humanizeApiError } from "@/lib/apiError";
 import { queryUnavailableReason } from "@/lib/query-availability";
-import { mpTrack } from "@/lib/mixpanel";
 import {
   trackJourneyStart,
   trackJourneyStepComplete,
@@ -280,13 +279,13 @@ export default function JourneyDetail() {
           stepRowCount: vars.stepIds.length,
         });
       } else {
-        // Un-complete is not part of the GA4 funnel — Mixpanel-only signal
+        // Un-complete is not part of the GA4 funnel — catalog-only signal
         // (pre-existing event name preserved for dashboard continuity).
-        mpTrack('journey_step_uncompleted', {
-          journey_id: String(id),
-          journey_title: journey?.title,
-          step_number: vars.stepNumber,
-          step_row_count: vars.stepIds.length,
+        trackJourneyStepUncomplete({
+          journeyId: String(id),
+          journeyTitle: journey?.title,
+          stepNumber: vars.stepNumber,
+          stepRowCount: vars.stepIds.length,
         });
       }
       // Completion is likewise server-authoritative rather than inferred from

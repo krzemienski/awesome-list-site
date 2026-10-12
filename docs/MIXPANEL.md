@@ -9,7 +9,15 @@ below.
 ## Architecture
 
 - **Module**: `client/src/lib/mixpanel.ts` — init, consent gate, `mpTrack()`
-  dispatcher, identity helpers. All Mixpanel calls funnel through this module.
+  (the Mixpanel half of the shared sender), identity helpers. All Mixpanel
+  calls funnel through this module.
+- **Shared sender**: app code never calls `mpTrack()` directly. Custom events go
+  through the typed helpers in `lib/analytics.ts` → `track()` → the shared
+  dispatcher (`lib/analytics-dispatch.ts`), which cleans properties once and
+  sends the same event to GA4, Mixpanel, PostHog and Amplitude. The usage
+  questions, funnels, naming rules, property hygiene and the **shared event
+  catalog** live in `ANALYTICS.md` → "Tracking plan"; this file keeps the
+  Mixpanel-specific details.
 - **Zero pre-consent footprint**: the SDK is loaded via **dynamic import** only
   after consent — no SDK module code executes, no chunk is fetched, no cookies,
   no network before "Accept". Events fired while the chunk loads are buffered.
@@ -30,10 +38,9 @@ below.
 
 ## Naming convention
 
-- **Events**: `snake_case`, `object_action` in past tense — `resource_viewed`,
-  `search_performed`. Never rename a live event (creates a new event in
-  Mixpanel); never track inside loops; no PII in event properties.
-- **Properties**: `snake_case`; ids as strings; enums documented here.
+Defined once in `ANALYTICS.md` → "Tracking plan → Naming rules": `snake_case`
+`object_action` in the past tense, never rename a live event, ids as strings,
+no PII (enforced by the shared sender's property hygiene).
 
 ## Events
 
@@ -46,19 +53,22 @@ below.
 | `category_viewed` | Category / subcategory / sub-subcategory page, once per resolved node | `category` | `TaxonomyListing` via `trackCategoryView` |
 | `sign_up_completed` | Clerk user is first provisioned into the application DB | `sign_up_method: 'clerk'`, acquisition, `tracked_from: 'server'` | **server** — Clerk JIT provisioning (`server/clerkAuth.ts`) |
 | `logged_in` | A Clerk sign-in attempt completes and produces a session (never on a session restore or token refresh) | `login_method` (verification strategy), acquisition | `AuthConversionTracker` via `trackLogin` |
-| `resource_bookmarked` / `resource_unbookmarked` | Bookmark toggle server-confirmed | `resource_id` | `useResourceToggle` (choke point, all surfaces) |
-| `resource_favorited` / `resource_unfavorited` | Favorite toggle server-confirmed | `resource_id` | `useResourceToggle` |
+| `resource_bookmarked` / `resource_unbookmarked` | Bookmark toggle server-confirmed | `resource_id` | `useResourceToggle` → `trackResourceSaveToggle` (choke point, all surfaces) |
+| `resource_favorited` / `resource_unfavorited` | Favorite toggle server-confirmed | `resource_id` | `useResourceToggle` → `trackResourceSaveToggle` |
 | `resource_submitted` | Resource submission accepted | `content_type`, `category`, acquisition, `tracked_from: 'server'` (no PII) | **server** — `routes/domains/catalog-contributions.ts` |
-| `resource_edit_submitted` | Edit suggestion accepted | `resource_id` | `suggest-edit-dialog` |
+| `resource_edit_submitted` | Edit suggestion accepted | `resource_id` | `suggest-edit-dialog` → `trackResourceEditSubmitted` |
 | `content_shared` | Share action | `share_method`, `content_type`, `content_id` | `trackShare` |
 | `journey_started` | Genuinely new enrollment (listing one-click start or detail start button; resume re-POSTs never re-fire) | `journey_id`, `journey_title`, `total_steps` | `lib/analytics.ts trackJourneyStart` (Task #330) |
-| `journey_step_completed` / `journey_step_uncompleted` | Logical journey step toggled (server-confirmed; one event per logical step, not per row) | `journey_id`, `journey_title`, `step_number`, `step_position`, `total_steps`, `step_row_count` (uncompleted omits `step_position`/`total_steps`) | `JourneyDetail` via `trackJourneyStepComplete` / inline `mpTrack` |
+| `journey_step_completed` / `journey_step_uncompleted` | Logical journey step toggled (server-confirmed; one event per logical step, not per row) | `journey_id`, `journey_title`, `step_number`, `step_position`, `total_steps`, `step_row_count` (uncompleted omits `step_position`/`total_steps`) | `JourneyDetail` via `trackJourneyStepComplete` / `trackJourneyStepUncomplete` |
 | `journey_completed` | Server-confirmed `completedAt` transition null → set (PUT progress response; never re-fired for already-complete journeys) | `journey_id`, `journey_title`, `total_steps` | `JourneyDetail` via `trackJourneyComplete` (Task #330) |
 | `guest_bookmark_added` / `guest_bookmark_removed` | Signed-out visitor toggles an on-device save (Task #329 guest funnel) | `resource_id`, `guest_saved_count` | `useResourceToggle` guest branch |
 | `auth_prompt_shown` | Save-intent sign-in prompt shown to a guest | `prompt_context` (`'guest_save_toast'` \| `'guest_save_cap'` \| `'bookmarks_page'`), `guest_saved_count` | toggle hook + `GuestBookmarks` page |
 | `bookmarks_merged` | On-device guest saves pushed into the account after sign-in | `merged_count`, `duplicate_count`, `failed_count` | `GuestBookmarkMerge` |
 
 All events also carry auto props `platform: 'web'` and `page_path` from `mpTrack`.
+Every client event in this table is also sent, with the same name and
+properties, to PostHog and Amplitude by the shared sender.
+
 ## Server-side conversions (ad-blocker-proof)
 
 Ad blockers block `api-js.mixpanel.com` for a large share of technical
@@ -70,7 +80,7 @@ audiences, undercounting client-only conversions. The fix (Task #233):
   `resource_submitted` (resource-submit handler) are emitted **only**
   server-side. The client
   helpers (`trackSignUp` / `trackGenerateLead`) still fire the GA4 halves but
-  deliberately no longer call `mpTrack` for these — one producer per event, so
+  are marked GA4-only (`product: false`) — one producer per event, so
   there is nothing to dedup. Server events carry `tracked_from: 'server'` and
   a unique `$insert_id` (Mixpanel's retry-dedup key).
 - **Consent**: the server only tracks when the request carries
@@ -96,10 +106,10 @@ audiences, undercounting client-only conversions. The fix (Task #233):
 
 ## Adding a new event
 
-1. Add it to the table above (name per convention, properties documented).
-2. Track at the **server-confirmed** success point (mutation `onSuccess`), not
-   on button click, via `mpTrack()` — prefer an existing choke point
-   (`lib/analytics.ts` helper or shared hook) over per-surface wiring.
+1. Follow `ANALYTICS.md` → "Tracking plan → Adding an event": catalog row +
+   typed helper in `lib/analytics.ts` calling `track()` (never `mpTrack()`
+   directly), fired at the **server-confirmed** success point.
+2. Add it to the table above if it matters for Mixpanel reports.
 3. Add a Lexicon description in Mixpanel (Data Management → Lexicon).
 
 ## Mixpanel project

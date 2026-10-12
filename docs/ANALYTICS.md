@@ -1,9 +1,14 @@
-# Analytics (GA4) — Event Taxonomy & Instrumentation
+# Analytics — Tracking Plan, Event Taxonomy & Instrumentation
 
-This document is the source of truth for how the app tracks usage in **Google
-Analytics 4** (gtag.js). It covers the event taxonomy, where each event is wired,
-the parameters each carries, first-touch acquisition, the PII exclusion policy,
-and how tracking is validated end-to-end against the real GA4 network endpoint.
+This document is the source of truth for how the app tracks usage. The
+**[Tracking plan](#tracking-plan)** (next section) owns the usage questions,
+funnels, naming rules, property hygiene and the **shared event catalog** for
+all four consent-gated tools — Google Analytics 4, Mixpanel, PostHog and
+Amplitude. The rest of the document covers GA4 specifics (gtag.js): where each
+GA4 event is wired, the parameters each carries, first-touch acquisition, the
+PII exclusion policy, and how tracking is validated end-to-end against the real
+GA4 network endpoint. Mixpanel specifics (identity, server-side conversions)
+live in `MIXPANEL.md`.
 
 Measurement ID comes from the `VITE_GA_MEASUREMENT_ID` env var. If it is unset,
 `initGA()` logs a warning and no tracking runs (the app still works).
@@ -26,7 +31,11 @@ Enhanced Measurement toggles (scrolls, outbound clicks, site search, etc.) as yo
 like — only the history-based page-view sub-toggle conflicts with our tracking.
 
 This cannot be changed from application code — it is a GA4 property setting. Until
-it is turned off, SPA `page_view` counts are inflated (~2×). This was observed
+it is turned off, SPA `page_view` counts are inflated (~2×), **and** those
+automatic page views bypass the app's URL hygiene: gtag fills their `dr` with
+the raw previous URL (query string included), so a token in a landing URL can
+reach GA4 through them. Every hit the app itself sends is sanitized (see
+[Property hygiene](#property-hygiene-enforced-in-code)). This was observed
 live during validation on the configured property (an automatic `page_view` with
 the `ae` flag appeared alongside our manual one on the one true SPA navigation).
 
@@ -39,13 +48,180 @@ the `ae` flag appeared alongside our manual one on the one true SPA navigation).
 > `page_path`/`page_location` are the reliable page dimensions; treat the manual
 > event's `page_title` as best-effort (GA4's own view derives the correct title).
 
+## Tracking plan
+
+### One shared sender for every custom event
+
+```
+typed helper (analytics.ts: trackSearch, trackJourneyStart, …)
+   └─ track(name, props, { ga?, product? })      module-private, consent-gated
+        └─ dispatchAnalyticsEvent()              analytics-dispatch.ts — lazy chunk,
+             ├─ sanitizeEventProps()             analytics-hygiene.ts  fetched after consent
+             ├─ sendGaEvent   → GA4      (legacy GA name/params when the event predates the catalog)
+             ├─ mpTrack       → Mixpanel
+             ├─ phCapture     → PostHog
+             └─ ampTrack      → Amplitude
+```
+
+- **One call, four tools.** App code only calls typed helpers in
+  `client/src/lib/analytics.ts`; each helper calls the module-private
+  `track()`. Components never import `mpTrack` / `phCapture` / `ampTrack` /
+  `sendGaEvent` — those are the vendor halves of the dispatcher.
+- **Consent is unchanged per tool.** `track()` returns before doing anything
+  unless `analytics-consent` is `granted`; the dispatcher re-checks before
+  sending (events queued while its chunk loads are dropped on revoke). Each
+  vendor half then applies its own gate: pre-SDK buffering only while a
+  consented init is under way, and a revoke kill switch that clears its buffer
+  (`optOutGA` / `optOutMixpanel` / `optOutPostHog` / `optOutAmplitude`).
+- **Stays out of the pre-consent bundle.** The dispatcher and the hygiene
+  rules are a separate chunk, imported on the first post-consent event (keep
+  it out of the entry closure). Once loaded, dispatch
+  is synchronous, so `page_engaged` on `pagehide` still goes out.
+- **Names.** Mixpanel, PostHog and Amplitude receive the catalog name. GA4
+  receives the same name by default; events that predate this plan keep their
+  live GA4 name via `{ ga: { name } }` (e.g. `search` ↔ `search_performed`).
+  `{ ga: false }` skips GA4; `{ product: false }` marks the legacy GA4-only
+  events (performance/error/engagement telemetry and the two conversions whose
+  product half is server-side), so their vendor coverage did not change.
+- **Auto props.** Mixpanel, PostHog and Amplitude add `platform: "web"` and a
+  query-free `page_path` to every event; GA4 adds its page context (below).
+- **SDK-collected URLs are scrubbed too.** The vendor SDKs attach their own
+  URL properties to every event, including SDK events. Mixpanel's
+  `$current_url` / `$referrer` are overridden with origin + path / origin and
+  `$initial_referrer` is blacklisted; PostHog's `sanitize_properties` reduces
+  URL values at any nesting depth up to 3, e.g. web-vitals `navigationURL`
+  (replay snapshots excepted); an Amplitude enrichment plugin registered after
+  init does the same and drops raw `query` / `search` / `hash` fields. These
+  SDK options live in `analytics-sdk-options.ts`, a post-consent chunk loaded
+  together with each SDK, so they cost nothing in the pre-consent bundle.
+
+### Naming rules
+
+- **Event names:** `snake_case`, `object_action`, verb in the **past tense** —
+  `collection_created`, `notification_opened`. Never present tense
+  (`create_collection`) or UI wording (`click_button`).
+- **Never rename a live event** — a rename starts a new event series in
+  Mixpanel/Amplitude and breaks GA4 reports. Legacy GA4 names that differ from
+  the catalog name stay as GA4 aliases in the catalog below.
+- **Properties:** `snake_case`; IDs end in `_id` and are sent as **strings**
+  (the sanitizer converts numeric `*_id` values); counts are numbers ending in
+  `_count`; enums are documented in the catalog row.
+- **No PII, no user-authored text.** No email, name, password, token, phone,
+  free-text notes or proposed edit content. Describe content by id, type or
+  length. Fire at **server-confirmed** success points (mutation `onSuccess`),
+  never inside loops, and prefer an existing choke point over per-surface
+  wiring.
+
+### Property hygiene (enforced in code)
+
+`sanitizeEventProps()` (`client/src/lib/analytics-hygiene.ts`) runs once per
+event, before any vendor sees it, and the same cleaned object goes to all four:
+
+| Rule | Effect |
+|---|---|
+| PII-named keys | keys matching `email`, `password`/`passwd`, `token`, `secret`, `phone` are dropped |
+| Email-shaped values | any string still containing an email address is dropped |
+| URLs | absolute URLs → `origin + pathname`; relative `/path?q#h` → `/path` (also inside longer strings, e.g. `error_message`) |
+| Long strings | capped at 200 characters (input scanned up to 2,000) |
+| IDs | numeric `id` / `*_id` → string |
+| Empty / invalid | `null`, `undefined`, `""`, `NaN`, `±Infinity` and nested objects are dropped; arrays keep up to 50 primitive items |
+
+**GA4 page context** (`gaPageContext` in `analytics-hygiene.ts`, GA4 only) is
+held to the same no-token rule. GA4 derives source / medium / campaign from the
+page URL, so `page_location` keeps origin + path plus **only** the attribution
+parameters (`utm_*`, `gclid`, `gbraid`, `wbraid`, `dclid`; values ≤100 chars,
+never email-shaped). Every other query parameter (reset / auth tokens, search
+terms, invite codes) and the fragment are dropped. `page_path` is the path
+alone and `page_referrer` is origin + path. `sendGaEvent` also pins this
+context with `gtag('set', …)`, so hits gtag sends on its own (enhanced
+measurement) never fall back to the raw `document.location` / `document.referrer`.
+When there is no `document.referrer` (SPA navigations), the dispatcher supplies
+the previous sanitized `page_location` as `page_referrer`, so gtag never fills
+`dr` from the raw previous URL. (GA4's own history page views are the one
+exception — see the deployment prerequisite above.)
+
+### Usage questions → funnels → events
+
+Status: **live** = instrumented today; **planned** = to be added by the area
+task named in the last column (those tasks add rows to the catalog below; the
+names here are the starting proposal and may be refined there, but must follow
+the naming rules).
+
+| # | Question | Funnel / metric | Events it needs | Status / owner |
+|---|---|---|---|---|
+| 1 | **Activation** — do new visitors reach a first moment of value? | `page_viewed` (first session) → any value event within the session: `resource_link_opened`, `resource_bookmarked` / `guest_bookmark_added`, `journey_started` | listed | live |
+| 2 | **Retention** — do activated visitors come back and get value again? | weekly cohort retention on the same value events; returning-learner path `journey_resumed` → `journey_step_completed` | value events (live) + `journey_resumed` | live / planned — continue-learning area |
+| 3 | **Collection usage** — are collections created, filled and shared? | `collection_created` → `collection_resource_added` → `collection_shared` → `public_collection_viewed` | `collection_created`, `collection_resource_added`, `collection_resource_removed`, `collection_shared`, `collection_deleted`, `public_collection_viewed` | planned — collections area |
+| 4 | **Notification engagement** — do notifications and digests bring people back? | `notifications_viewed` → `notification_opened`; digest landing (`digest_link_opened`) → value event; opt-outs via `notification_preferences_updated` | `notifications_viewed`, `notification_opened`, `notifications_marked_read`, `notification_preferences_updated`, `digest_link_opened` | planned — notifications & digest area |
+| 5 | **Contribution funnel** — how many visitors who start a submission or edit finish it, and how many get approved? | `resource_submit_started` → `resource_submitted` (server) → approval (server status) ; `resource_edit_started` → `resource_edit_submitted` | `resource_submit_started`, `resource_submitted` (server, live), `resource_edit_started`, `resource_edit_submitted` (live), `contributions_viewed` | partly live — contributions area |
+| 6 | **Recommendation quality** — are recommendations opened, and from which position? | `recommendations_viewed` (`recommendation_count`, `source`) → `recommendation_opened` (`position`, `resource_id`) → value event on that resource | `recommendations_viewed`, `recommendation_opened`, `recommendations_refreshed` | planned — recommendations & onboarding area |
+| 7 | **Onboarding drop-off** — where do new accounts abandon onboarding? | `onboarding_started` → `onboarding_step_completed` (`step_number`, `step_name`) → `onboarding_completed`; exits via `onboarding_skipped` | `onboarding_started`, `onboarding_step_completed`, `onboarding_skipped`, `onboarding_completed` | planned — recommendations & onboarding area |
+| — | **Learning journeys** (existing funnel) | `journey_started` → `journey_step_completed` → `journey_completed` | listed | live |
+| — | **Guest → account** (existing funnel) | `guest_bookmark_added` → `auth_prompt_shown` → `sign_up_completed` (server) / `logged_in` → `bookmarks_merged` | listed | live |
+| — | **Discovery** (existing) | `search_performed` / `category_viewed` / `filter_applied` → `resource_viewed` → `resource_link_opened` | listed | live |
+
+Remaining site-wide actions (theme and layout changes, exports, keyboard
+shortcuts and the like) are added by the remaining-site-wide-actions area task
+only when they answer one of the questions above or a new one added here.
+
+### Shared event catalog
+
+Every custom event the client emits. **Area tasks add their events here** (one
+row each, same columns) in the same change that adds the typed helper. "Product"
+= Mixpanel + PostHog + Amplitude. GA4-only legacy events are listed in the GA4
+taxonomy further down and are not repeated here.
+
+| Catalog event (product name) | GA4 name | Tools | Properties | Helper / source |
+|---|---|---|---|---|
+| `page_viewed` | `page_view` | all four | `page_title`, `referrer_origin` (GA4: page context only) | `trackPageView` ← `use-analytics` |
+| `resource_viewed` | `select_content` | all four | `resource_id` + caller extras (GA4: `content_type`, `content_id`, extras) | `trackSelectContent('resource', …)` |
+| `resource_link_opened` | `resource_click` (+ GA4-only `outbound_link`) | all four | `resource_title`, `link_url` (origin+path), `link_domain`, `category` | `trackResourceClick` |
+| `search_performed` | `search` | all four | `search_term`, `result_count`, `surface` | `trackSearch` |
+| `category_viewed` | `category_view` | all four | `category` (GA4: `content_category`) | `trackCategoryView` |
+| `filter_applied` | `filter_applied` | all four | `filter_type`, `filter_value`, `result_count`, `zero_results`, `surface` | `trackFilterUsage` |
+| `sort_changed` | `sort_change` | all four | `sort_type`, `surface`, `result_count`, `zero_results` | `trackSortChange` |
+| `tag_interaction` | `tag_interaction` | all four | `tag`, `action`, `surface`, `result_count`, `zero_results` | `trackTagInteraction` |
+| `logged_in` | `login` | all four | `login_method` (GA4: `method`) + acquisition | `trackLogin` ← `AuthConversionTracker` |
+| `content_shared` | `share` | all four | `share_method` (GA4: `method`), `content_type`, `content_id` | `trackShare` |
+| `journey_started` | `journey_start` | all four | `journey_id`, `journey_title`, `total_steps` | `trackJourneyStart` |
+| `journey_step_completed` | `journey_step_complete` | all four | `journey_id`, `journey_title`, `step_number`, `step_position`, `total_steps`, `step_row_count` (product only) | `trackJourneyStepComplete` |
+| `journey_step_uncompleted` | — | product | `journey_id`, `journey_title`, `step_number`, `step_row_count` | `trackJourneyStepUncomplete` |
+| `journey_completed` | `journey_complete` | all four | `journey_id`, `journey_title`, `total_steps` | `trackJourneyComplete` |
+| `resource_bookmarked` / `resource_unbookmarked` | — | product | `resource_id` | `trackResourceSaveToggle` ← `useResourceToggle` |
+| `resource_favorited` / `resource_unfavorited` | — (GA4 has legacy `resource_favorite`) | product | `resource_id` | `trackResourceSaveToggle` ← `useResourceToggle` |
+| `resource_edit_submitted` | — | product | `resource_id` | `trackResourceEditSubmitted` ← `suggest-edit-dialog` |
+| `guest_bookmark_added` / `guest_bookmark_removed` | same | all four | `resource_id`, `guest_saved_count` | `trackGuestBookmarkAdded` / `Removed` |
+| `auth_prompt_shown` | same | all four | `prompt_context`, `guest_saved_count` | `trackAuthPromptShown` |
+| `bookmarks_merged` | same | all four | `merged_count`, `duplicate_count`, `failed_count` | `trackBookmarksMerged` |
+| `sign_up_completed` | (`sign_up`, GA4-only client event) | Mixpanel, **server** | see `MIXPANEL.md` | server — Clerk JIT provisioning |
+| `resource_submitted` | (`generate_lead`, GA4-only client event) | Mixpanel, **server** | see `MIXPANEL.md` | server — resource-submit handler |
+
+Amplitude additionally sends its own `Viewed Home Page` verification event and
+autocaptured `[Amplitude] …` events; PostHog sends autocapture, `$pageview` and
+`$pageleave`. Those are SDK events, not catalog events.
+
+### Adding an event (area tasks)
+
+1. Pick the name with the naming rules; add a catalog row (and update the
+   question/funnel row it serves).
+2. Add a typed helper in `analytics.ts` that calls `track()` — default options
+   send the same name and properties to all four tools. Export it only together
+   with its first caller (no speculative exports).
+3. Call it from the server-confirmed success point.
+4. Verify in a consented real browser that GA4 `/g/collect`, Mixpanel `/track`
+   (gzipped), PostHog `/e/` and Amplitude `/2/httpapi` requests carry it with
+   clean properties, and that nothing is sent after a revoke.
+
 ## Architecture
 
-- **`client/src/lib/analytics.ts`** — the only place that talks to gtag. Every
-  event routes through the central `sendEvent(name, params)` — module-private on
-  purpose — which enriches the payload with standard GA4 context
-  (`page_location`, `page_path`, `page_title`, `page_referrer`) and strips
-  `undefined`/`null` params. Callers import the named `track*` helpers.
+- **`client/src/lib/analytics.ts`** — the only place that talks to gtag, and
+  home of the typed `track*` helpers callers import. Every event goes through
+  the shared sender (see [Tracking plan](#tracking-plan)); its GA4 half,
+  `sendGaEvent(name, params, context)`, merges the already-cleaned payload
+  with the sanitized GA4 page context from `gaPageContext` (`page_location`
+  with attribution params only, `page_path`, `page_title`, origin + path
+  `page_referrer`), pins that context with `gtag('set')` and strips
+  `undefined`/`null` params. Only the dispatcher calls `sendGaEvent`.
 - **`client/src/lib/acquisition.ts`** — captures first-touch UTM + referrer once
   and attaches it to conversion events.
 - **`client/src/hooks/use-analytics.tsx`** — fires exactly one `page_view` per
@@ -128,11 +304,14 @@ and a timestamp into `localStorage['av_acquisition']`. It never overwrites an
 existing record (true first-touch). `getAcquisition()` attaches `utm_*` +
 `referrer_domain` to the conversion events (`login`, `sign_up`, `generate_lead`)
 so acquisition can be analyzed alongside conversions even though GA4 already
-derives source/medium natively from `page_location`.
+derives source/medium natively from `page_location` (which keeps its `utm_*`
+and click-id params; see [Property hygiene](#property-hygiene-enforced-in-code)).
 
 ## PII exclusion policy
 
-No personally identifiable information is ever sent to GA4:
+No personally identifiable information is ever sent to GA4 (or to Mixpanel,
+PostHog or Amplitude — the shared sender's property hygiene, described in the
+tracking plan, applies to all four):
 
 - No email, password, auth token, or session id in any event or param.
 - No user-authored or user-copied text in any event: an event that describes
