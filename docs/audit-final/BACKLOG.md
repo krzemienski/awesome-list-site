@@ -39,7 +39,7 @@ Verification is by real browser use / curl only (no proof packets or gates since
 ## WS3 Member features
 | ID | Item | Status | Packet |
 |---|---|---|---|
-| U-01 | Resource detail actions (bookmark+note, favorite, related, suggest edit, share, outbound, dead-link report) | OPEN | |
+| U-01 | Resource detail actions (bookmark+note, favorite, related, suggest edit, share, outbound, dead-link report) | FIXED | Dead-link report was missing: added member report button + dialog, `resource_link_reports` (migration 0055) and an admin Member reports panel on Link Health. Browser-verified as a member: favorite, bookmark + note add/edit, share (clipboard), suggest edit, outbound popup, related nav, report + repeat + reload; guest gets sign-in toast; admin resolve/filter/re-open at 375/1280 |
 | U-02 | Bookmarks: sort, filter, notes, collections, privacy, public view (two users) | OPEN | |
 | U-03 | Guest bookmarks merge on sign-in | OPEN | |
 | U-04 | Journeys start/resume/complete/undo; step resource field shape | OPEN | |

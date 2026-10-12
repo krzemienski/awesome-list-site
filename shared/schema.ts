@@ -941,6 +941,34 @@ export const userBookmarks = pgTable(
 export type UserBookmark = typeof userBookmarks.$inferSelect;
 
 /**
+ * Member reports that a resource's link is dead, triaged on the admin Link
+ * Health panel. One row per member and resource; reporting again after an
+ * admin resolved or dismissed it reopens the same row.
+ */
+export const LINK_REPORT_STATUSES = ["open", "resolved", "dismissed"] as const;
+export type LinkReportStatus = (typeof LINK_REPORT_STATUSES)[number];
+export const LINK_REPORT_NOTE_MAX = 500;
+
+export const resourceLinkReports = pgTable(
+  "resource_link_reports",
+  {
+    resourceId: integer("resource_id").references(() => resources.id, { onDelete: "cascade" }).notNull(),
+    userId: varchar("user_id").references(() => users.id, { onDelete: "cascade" }).notNull(),
+    status: text("status").$type<LinkReportStatus>().notNull().default("open"),
+    note: text("note"),
+    handledBy: varchar("handled_by").references(() => users.id, { onDelete: "set null" }),
+    handledAt: timestamp("handled_at"),
+    createdAt: timestamp("created_at").defaultNow().notNull(),
+  },
+  (table) => [
+    primaryKey({ columns: [table.resourceId, table.userId] }),
+    check("resource_link_reports_status_check", sql`${table.status} IN ('open','resolved','dismissed')`),
+    check("resource_link_reports_note_length_check", sql`${table.note} IS NULL OR char_length(${table.note}) <= 500`),
+    index("idx_resource_link_reports_status_created_at").on(table.status, table.createdAt),
+  ]
+);
+
+/**
  * User-owned bookmark collections. Collections organize user_bookmarks without
  * replacing them; deleting a collection only cascades its membership rows.
  */

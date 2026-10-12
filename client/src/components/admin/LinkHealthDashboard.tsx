@@ -28,6 +28,7 @@ import { useToast } from "@/hooks/use-toast";
 import type { LinkHealthJob, LinkHealthCheck } from "@shared/schema";
 import { AdminOpsTable as Table, StatusChip, TableShell } from "@/components/admin/AdminOpsPrimitives";
 import { AdminLoadError } from "@/components/admin/AdminLoadError";
+import LinkReportsPanel from "@/components/admin/LinkReportsPanel";
 import "@/styles/pages/admin-ops-github-links.css";
 import type { LinkHealthTrendPoint } from "@/components/admin/LinkHealthTrendChart";
 
@@ -413,6 +414,8 @@ export default function LinkHealthDashboard() {
           </div>
         ))}
       </div>
+
+      <LinkReportsPanel />
 
       {/* Summary Card */}
       {showDetails && <Card className="ops-link-health__summary-card">

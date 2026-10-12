@@ -63,6 +63,7 @@ import {
 } from "./routes/domains/export-link-health";
 import { registerAiJobsRoutes } from "./routes/domains/ai-jobs";
 import { registerContactRoutes } from "./routes/domains/contact";
+import { registerLinkReportRoutes } from "./routes/domains/link-reports";
 import { registerNonApiRoutes } from "./routes/non-api";
 import { registerOperationsRoutes } from "./routes/domains/operations";
 
@@ -309,6 +310,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     SITE_URL,
     parseBoundedInt,
   });
+  registerLinkReportRoutes(app, { isAuthenticated, isAdmin });
   registerJourneyRoutes(app, {
     isAuthenticated,
     isAdmin,

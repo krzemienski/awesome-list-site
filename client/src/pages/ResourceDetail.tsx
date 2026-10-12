@@ -29,6 +29,7 @@ import {
   NotebookPen
 } from "lucide-react";
 import BookmarkNotesDialog from "@/components/resource/BookmarkNotesDialog";
+import ReportLinkAction from "@/components/resource/ReportLinkAction";
 import { useAuth } from "@/hooks/useAuth";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { apiRequest, ApiError } from "@/lib/queryClient";
@@ -826,6 +827,12 @@ export default function ResourceDetail() {
                 <span>Suggest Edit</span>
               </Button>
             )}
+          />
+          <ReportLinkAction
+            resourceId={resource.id}
+            resourceTitle={resource.title}
+            isAuthenticated={isAuthenticated}
+            signInAction={signInAction}
           />
       </div>
 
