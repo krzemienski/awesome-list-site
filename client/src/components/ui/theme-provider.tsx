@@ -30,7 +30,7 @@ import { useToast } from "@/hooks/use-toast";
 import { ToastAction } from "@/components/ui/toast";
 
 interface ThemeProviderState {
-  accountSync: "local" | "syncing" | "saved" | "failed";
+  accountSync: "local" | "syncing" | "queued" | "saved" | "failed";
   accountSyncError: string | null;
   retryAccountSync: () => void;
   systemId: DesignSystemId;
@@ -165,6 +165,7 @@ export function AccountThemePreferenceBridge({ children }: { children: ReactNode
     isLoading,
     isAuthenticated,
     saveThemeAsync,
+    isThemeSavePaused,
     refetch,
   } = useLearningPreferences();
   const { toast } = useToast();
@@ -274,7 +275,8 @@ export function AccountThemePreferenceBridge({ children }: { children: ReactNode
 
   return (
     <ThemeProviderContext.Provider value={{
-      ...theme, setSystem, setAccent, accountSync, accountSyncError,
+      ...theme, setSystem, setAccent, accountSyncError,
+      accountSync: accountSync === "syncing" && isThemeSavePaused ? "queued" : accountSync,
       retryAccountSync: () => persist(selectedSystem.current, selectedAccent.current),
     }}>
       {children}

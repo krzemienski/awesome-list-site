@@ -115,15 +115,6 @@ export default function ThemeSettings() {
         description="Customize the look and feel of Awesome Video — switch fonts and color themes."
         noindex
       />
-      <div role={accountSync === "failed" ? "alert" : "status"} aria-live="polite">
-        {accountSync === "local" && <p>Theme choices are saved on this device.</p>}
-        {accountSync === "syncing" && <p>Saving theme to your account…</p>}
-        {accountSync === "saved" && <p>Theme saved to your account.</p>}
-        {accountSync === "failed" && <>
-          <p>{accountSyncError}</p>
-          <Button variant="outline" onClick={retryAccountSync}>Retry account save</Button>
-        </>}
-      </div>
       <div>
         <Link
           href="/"
@@ -144,6 +135,23 @@ export default function ThemeSettings() {
             Active: {activeSystem?.name ?? systemId} · {activeAccent?.name ?? accentId}
           </span>
         </p>
+        {/* Where this choice is saved (device vs account), under the lede
+            rather than above the page head. */}
+        <div
+          role={accountSync === "failed" ? "alert" : "status"}
+          aria-live="polite"
+          className="mt-3 flex flex-wrap items-center gap-3 text-sm text-[color:var(--text-2)]"
+          data-testid="text-account-sync"
+        >
+          {accountSync === "local" && <p>Theme choices are saved on this device.</p>}
+          {accountSync === "syncing" && <p>Saving theme to your account…</p>}
+          {accountSync === "queued" && <p>You're offline. This theme is saved on this device and will be saved to your account when you reconnect.</p>}
+          {accountSync === "saved" && <p>Theme saved to your account.</p>}
+          {accountSync === "failed" && <>
+            <p>{accountSyncError}</p>
+            <Button variant="outline" onClick={retryAccountSync}>Retry account save</Button>
+          </>}
+        </div>
         {/* Task #346: living showcase — full token catalog + component anatomy. */}
         <Link
           href="/design-system"

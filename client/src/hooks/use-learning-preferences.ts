@@ -174,6 +174,9 @@ export function useLearningPreferences() {
     resetError: resetMutation.error,
     saveThemeAsync: saveThemeMutation.mutateAsync,
     isSavingTheme: saveThemeMutation.isPending,
+    // React Query holds mutations while the browser is offline and sends
+    // them on reconnect; the theme status line says so instead of "Saving…".
+    isThemeSavePaused: saveThemeMutation.isPaused,
     saveThemeError: saveThemeMutation.error,
   };
 }
