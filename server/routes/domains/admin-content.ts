@@ -458,9 +458,21 @@ export function registerAdminContentRoutes(
         }
       }
 
+      // Optional comma-separated action filter (e.g. the Export tab's history
+      // asks for export actions only instead of scanning every audit page).
+      let actions: string[] | undefined;
+      const rawActions = req.query.actions;
+      if (rawActions !== undefined) {
+        const list = typeof rawActions === 'string' ? rawActions.split(',').map((a) => a.trim()) : [];
+        if (list.length === 0 || list.length > 20 || list.some((a) => !/^[a-z][a-z0-9_.]{0,63}$/.test(a))) {
+          return res.status(400).json({ message: 'actions must be a comma-separated list of up to 20 audit action names' });
+        }
+        actions = list;
+      }
+
       const [logs, total] = await Promise.all([
-        auditRepo.getResourceAuditLog(rid, limit, offset),
-        auditRepo.countAuditLogs(rid),
+        auditRepo.getResourceAuditLog(rid, limit, offset, actions),
+        auditRepo.countAuditLogs(rid, actions),
       ]);
       res.json({ logs, total, limit, offset });
     } catch (error) {

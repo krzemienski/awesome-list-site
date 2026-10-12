@@ -41,7 +41,7 @@ import {
   resourceProviderSchema,
   resourceSkillLevelSchema,
 } from "@shared/resourceFacets";
-import { and, eq, desc, asc, or, sql } from "drizzle-orm";
+import { and, eq, desc, asc, or, sql, inArray } from "drizzle-orm";
 import { invalidatePublicCache } from "../cache/publicCache";
 
 export type ContributorLifecycleStatus =
@@ -134,16 +134,17 @@ export class AuditRepository {
   // - New logs (have originalResourceId set)
   // - Old logs from before migration (only have resourceId set)
   // Note: Logs for deleted resources created before migration are lost (both fields NULL)
-  private auditLogWhere(resourceId: number | null) {
-    if (resourceId === null) return undefined;
-    return or(
+  private auditLogWhere(resourceId: number | null, actions?: string[]) {
+    const byResource = resourceId === null ? undefined : or(
       eq(resourceAuditLog.originalResourceId, resourceId),
       eq(resourceAuditLog.resourceId, resourceId)
     );
+    const byAction = actions && actions.length > 0 ? inArray(resourceAuditLog.action, actions) : undefined;
+    return byResource && byAction ? and(byResource, byAction) : byResource ?? byAction;
   }
 
-  async getResourceAuditLog(resourceId: number | null, limit = 50, offset = 0): Promise<any[]> {
-    const whereClause = this.auditLogWhere(resourceId);
+  async getResourceAuditLog(resourceId: number | null, limit = 50, offset = 0, actions?: string[]): Promise<any[]> {
+    const whereClause = this.auditLogWhere(resourceId, actions);
     let query = db
       .select({
         id: resourceAuditLog.id,
@@ -173,8 +174,8 @@ export class AuditRepository {
    * Count audit log entries (same matching semantics as getResourceAuditLog)
    * so the admin UI can paginate against the REAL total, not the page size.
    */
-  async countAuditLogs(resourceId: number | null): Promise<number> {
-    const whereClause = this.auditLogWhere(resourceId);
+  async countAuditLogs(resourceId: number | null, actions?: string[]): Promise<number> {
+    const whereClause = this.auditLogWhere(resourceId, actions);
     let query = db
       .select({ count: sql<number>`count(*)::int` })
       .from(resourceAuditLog);

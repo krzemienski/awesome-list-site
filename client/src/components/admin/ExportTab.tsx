@@ -67,7 +67,7 @@ interface AuditLogsResponse {
   total: number;
 }
 
-const AUDIT_HISTORY_PAGE_SIZE = 50;
+const AUDIT_HISTORY_PAGE_SIZE = 20;
 const EXPORT_ACTIONS = new Set(["catalog.exported", "database.exported", "resources.exported", "categories.exported"]);
 
 const EXPORT_TITLE = "Awesome Video";
@@ -117,8 +117,8 @@ export default function ExportTab({ validationStatus: propValidationStatus }: Ex
     refetchOnWindowFocus: true,
   });
 
-  // Export history is read from the existing audit endpoint. There is no
-  // separate export-history endpoint, so this surface never invents records.
+  // Export history is read from the audit log, filtered server-side to export
+  // actions, so every page holds exports and the total counts exports only.
   const {
     data: exportHistoryData,
     isLoading: isExportHistoryLoading,
@@ -133,7 +133,7 @@ export default function ExportTab({ validationStatus: propValidationStatus }: Ex
     queryFn: async () => {
       const auditOffset = auditHistoryPage * AUDIT_HISTORY_PAGE_SIZE;
       const response = await fetch(
-        `/api/admin/audit-logs?limit=${AUDIT_HISTORY_PAGE_SIZE}&offset=${auditOffset}`,
+        `/api/admin/audit-logs?limit=${AUDIT_HISTORY_PAGE_SIZE}&offset=${auditOffset}&actions=${[...EXPORT_ACTIONS].join(",")}`,
         {
           credentials: "include",
         },
@@ -157,20 +157,12 @@ export default function ExportTab({ validationStatus: propValidationStatus }: Ex
     auditHistoryEnd < auditHistoryTotal &&
     (exportHistoryData?.logs.length ?? 0) > 0;
   const auditHistoryWindowLabel = isExportHistoryLoading
-    ? `Loading audit entries ${auditHistoryOffset + 1}–${auditHistoryOffset + AUDIT_HISTORY_PAGE_SIZE} in a bounded window…`
+    ? "Loading export history…"
     : isExportHistoryError
-      ? "Export history window unavailable."
+      ? "Export history unavailable."
       : auditHistoryTotal === 0
-        ? "Exports among audit entries 0–0 of 0; no audit entries are available."
-        : `Exports among audit entries ${auditHistoryOffset + 1}–${auditHistoryEnd} of ${auditHistoryTotal} (50-entry bounded window); ${
-            exportHistoryData?.logs.some(
-              (entry) => EXPORT_ACTIONS.has(entry.action),
-            )
-              ? "exports found on this audit page."
-              : hasNextAuditHistoryPage
-                ? "no exports on this audit page; use Next to inspect the next window."
-                : "no exports on this audit page; this is the final audit page."
-          }`;
+        ? "No exports recorded yet."
+        : `Exports ${auditHistoryOffset + 1}–${auditHistoryEnd} of ${auditHistoryTotal.toLocaleString()}, newest first`;
 
   const exportHistory = useMemo(
     () =>
@@ -639,7 +631,7 @@ export default function ExportTab({ validationStatus: propValidationStatus }: Ex
               aria-disabled={!hasPreviousAuditHistoryPage || isExportHistoryLoading}
               aria-busy={isExportHistoryLoading}
               onClick={() => { if (hasPreviousAuditHistoryPage && !isExportHistoryLoading) setAuditHistoryPage((page) => Math.max(0, page - 1)); }}
-              aria-label="Previous audit entries"
+              aria-label="Previous exports"
             >
               <ChevronLeft className="h-4 w-4" aria-hidden="true" />
               Previous
@@ -651,7 +643,7 @@ export default function ExportTab({ validationStatus: propValidationStatus }: Ex
               aria-disabled={!hasNextAuditHistoryPage || isExportHistoryLoading}
               aria-busy={isExportHistoryLoading}
               onClick={() => { if (hasNextAuditHistoryPage && !isExportHistoryLoading) setAuditHistoryPage((page) => page + 1); }}
-              aria-label="Next audit entries"
+              aria-label="Next exports"
             >
               Next
               <ChevronRight className="h-4 w-4" aria-hidden="true" />
@@ -673,10 +665,8 @@ export default function ExportTab({ validationStatus: propValidationStatus }: Ex
         ) : exportHistory.length === 0 ? (
           <p className="admin-ops-table__empty">
             {auditHistoryTotal === 0
-              ? "No audit entries are available."
-              : hasNextAuditHistoryPage
-                ? "No exports on this audit page. Use Next to inspect the next bounded audit window."
-                : "No exports on this final audit page. Use Previous to inspect earlier windows."}
+              ? "No exports recorded yet. Downloads above appear here."
+              : "No exports on this page. Use Previous to return to newer exports."}
           </p>
         ) : (
           <Table className="table admin-ops-table" data-testid="table-export-history">

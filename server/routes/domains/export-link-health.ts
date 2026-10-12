@@ -655,8 +655,32 @@ export function registerExportLinkHealthRoutes(
         .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
         // eslint-disable-next-line no-control-regex -- deliberate: this pattern exists to match control characters
         .replace(/"/g, '&quot;').replace(/[\u0000-\u0008\u000B\u000C\u000E-\u001F]/g, '');
-      const links = (pick: (r: any) => boolean, indent: string) => rows
-        .filter(pick)
+      // Every approved resource appears exactly once. A resource whose stored
+      // sub-subcategory or subcategory has no matching node folds into the
+      // nearest valid ancestor (as the site's sidebar does) instead of being
+      // silently dropped; one with an unknown category goes to "Uncategorized".
+      const nodeKey = (...parts: unknown[]) => parts.map((part) => String(part ?? '')).join('\u0000');
+      const subByKey = new Map<string, any>();
+      for (const sub of subcategories as any[]) {
+        const cat = (categories as any[]).find((c) => c.id === sub.categoryId);
+        if (cat) subByKey.set(nodeKey(cat.name, sub.name), sub);
+      }
+      const placed = new Map<string, any[]>();
+      const place = (key: string, r: any) => {
+        const list = placed.get(key);
+        if (list) list.push(r); else placed.set(key, [r]);
+      };
+      const categoryNames = new Set((categories as any[]).map((c) => c.name));
+      for (const r of rows) {
+        if (!categoryNames.has(r.category)) { place('uncategorized', r); continue; }
+        const sub = r.subcategory ? subByKey.get(nodeKey(r.category, r.subcategory)) : undefined;
+        if (!sub) { place(nodeKey('cat', r.category), r); continue; }
+        const ss = r.subSubcategory
+          ? (subSubcategories as any[]).find((x) => x.subcategoryId === sub.id && x.name === r.subSubcategory)
+          : undefined;
+        place(ss ? nodeKey('ss', ss.id) : nodeKey('sub', sub.id), r);
+      }
+      const links = (key: string, indent: string) => (placed.get(key) ?? [])
         .map((r) => `${indent}<outline type="link" text="${xml(r.title)}" url="${xml(r.url)}"/>`);
       const out: string[] = [];
       for (const cat of categories as any[]) {
@@ -665,14 +689,17 @@ export function registerExportLinkHealthRoutes(
           out.push(`      <outline text="${xml(sub.name)}">`);
           for (const ss of (subSubcategories as any[]).filter((x) => x.subcategoryId === sub.id)) {
             out.push(`        <outline text="${xml(ss.name)}">`);
-            out.push(...links((r) => r.category === cat.name && r.subcategory === sub.name && r.subSubcategory === ss.name, '          '));
+            out.push(...links(nodeKey('ss', ss.id), '          '));
             out.push('        </outline>');
           }
-          out.push(...links((r) => r.category === cat.name && r.subcategory === sub.name && !r.subSubcategory, '        '));
+          out.push(...links(nodeKey('sub', sub.id), '        '));
           out.push('      </outline>');
         }
-        out.push(...links((r) => r.category === cat.name && !r.subcategory, '      '));
+        out.push(...links(nodeKey('cat', cat.name), '      '));
         out.push('    </outline>');
+      }
+      if (placed.has('uncategorized')) {
+        out.push('    <outline text="Uncategorized">', ...links('uncategorized', '      '), '    </outline>');
       }
       const body = [
         '<?xml version="1.0" encoding="UTF-8"?>',
