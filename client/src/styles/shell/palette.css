@@ -110,8 +110,10 @@
   transition: background var(--motion-fast) ease, color var(--motion-fast) ease;
 }
 
-.search-palette-row[data-selected="true"],
-.search-palette-row:hover {
+/* cmdk moves data-selected with the pointer, so a separate :hover tint would
+   paint a second highlighted row under a resting mouse while the keyboard
+   selection (what Enter opens) sits elsewhere. */
+.search-palette-row[data-selected="true"] {
   background: color-mix(in srgb, var(--accent) 12%, transparent);
   color: var(--text);
 }
@@ -151,7 +153,6 @@
 }
 
 .search-palette-row[data-selected="true"] .search-palette-kind,
-.search-palette-row:hover .search-palette-kind,
 .search-palette-view-all .search-palette-kind {
   color: var(--accent-ink);
 }
@@ -175,8 +176,7 @@
   font-weight: 500;
 }
 
-.search-palette-row[data-selected="true"] .search-palette-copy > span,
-.search-palette-row:hover .search-palette-copy > span {
+.search-palette-row[data-selected="true"] .search-palette-copy > span {
   color: var(--accent-ink);
 }
 
@@ -197,8 +197,7 @@
 /* The selected tint darkens the row behind text-3 below 4.5:1 in some
    system/accent pairs (Terminal/Matrix), so the caption steps up one ink
    level with the row, as the title already does. */
-.search-palette-row[data-selected="true"] .search-palette-copy small,
-.search-palette-row:hover .search-palette-copy small {
+.search-palette-row[data-selected="true"] .search-palette-copy small {
   color: var(--text-2);
 }
 
@@ -214,8 +213,7 @@
   visibility: hidden;
 }
 
-.search-palette-row[data-selected="true"] .search-palette-arrow,
-.search-palette-row:hover .search-palette-arrow {
+.search-palette-row[data-selected="true"] .search-palette-arrow {
   visibility: visible;
 }
 
