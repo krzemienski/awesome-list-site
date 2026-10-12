@@ -22,3 +22,4 @@ description: Why pushes touching .github/workflows fail and how to push from thi
 - As of 2026-09-12, ordinary shell fetch, fast-forward merge, and push work; old claims that these are universally blocked are stale. Respect actual tool restrictions if encountered.
 - Stale `.git/*.lock` files (from interrupted operations) block the user's Git pane too; check lock file mtimes vs running git processes before assuming auth problems.
 - The code-execution notebook's `process.env` does NOT pick up secrets added after the notebook process started — freshly added secrets are visible in new bash sessions instead.
+- The GitHub connector (proxyFetch) can comment on and close PRs/issues, but returned 403 for `/repos/.../contents/...` (2026-10-12) — read file contents from the local checkout instead.
