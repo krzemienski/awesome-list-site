@@ -1,4 +1,4 @@
-import { memo } from "react";
+import { memo, type MouseEvent } from "react";
 import {
   Brain,
   ExternalLink,
@@ -10,6 +10,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import RecommendationFeedback from "@/components/ui/recommendation-feedback";
+import { trackRecommendationOpened } from "@/lib/analytics-recommendations";
 import { cn } from "@/lib/utils";
 import type {
   RecommendationExplanation,
@@ -34,13 +35,32 @@ interface RecommendationCardProps {
   resource: RecommendationCardResource;
   className?: string;
   onFeedbackChange?: (feedback: RecommendationFeedbackValue | null) => void;
+  /** 1-based place in the shown list, recorded when the item is opened. */
+  position: number;
+  /** Server recommendation type (ai_powered / rule_based / hybrid). */
+  recommendationType: string;
+  signedIn: boolean;
 }
 
 function RecommendationCard({
   resource,
   className,
   onFeedbackChange,
+  position,
+  recommendationType,
+  signedIn,
 }: RecommendationCardProps) {
+  const trackOpen = (event: MouseEvent) => {
+    if (event.type === "auxclick" && event.button !== 1) return;
+    trackRecommendationOpened({
+      resourceId: resource.id,
+      position,
+      recommendationType,
+      signedIn,
+      linkTarget: "external",
+    });
+  };
+
   const confidence = Math.max(0, Math.min(100, resource.confidence ?? 0));
   const confidenceLabel =
     confidence >= 80 ? "High" : confidence >= 60 ? "Medium" : "Exploratory";
@@ -126,7 +146,7 @@ function RecommendationCard({
           ) : null}
 
           <Button asChild variant="outline" size="sm" className="w-full">
-            <a href={resource.url} target="_blank" rel="noopener noreferrer" aria-label={`View resource: ${resource.name} (opens in new tab)`}>
+            <a href={resource.url} target="_blank" rel="noopener noreferrer" onClick={trackOpen} onAuxClick={trackOpen} aria-label={`View resource: ${resource.name} (opens in new tab)`}>
               <ExternalLink className="mr-2 h-4 w-4" />
               View resource
             </a>
@@ -151,4 +171,7 @@ export default memo(RecommendationCard, (previous, next) =>
   && JSON.stringify(previous.resource.tags ?? []) === JSON.stringify(next.resource.tags ?? [])
   && previous.className === next.className
   && previous.onFeedbackChange === next.onFeedbackChange
+  && previous.position === next.position
+  && previous.recommendationType === next.recommendationType
+  && previous.signedIn === next.signedIn
 );

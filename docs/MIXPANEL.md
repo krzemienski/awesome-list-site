@@ -71,6 +71,14 @@ no PII (enforced by the shared sender's property hygiene).
 | `guest_bookmark_added` / `guest_bookmark_removed` | Signed-out visitor toggles an on-device save (Task #329 guest funnel) | `resource_id`, `guest_saved_count` | `useResourceToggle` guest branch |
 | `auth_prompt_shown` | Save-intent sign-in prompt shown to a guest | `prompt_context` (`'guest_save_toast'` \| `'guest_save_cap'` \| `'bookmarks_page'`), `guest_saved_count` | toggle hook + `GuestBookmarks` page |
 | `bookmarks_merged` | On-device guest saves pushed into the account after sign-in | `merged_count`, `duplicate_count`, `failed_count` | `GuestBookmarkMerge` |
+| `recommendations_viewed` | Recommendations shown, once per surface load | `recommendation_count`, `signed_in`, `source`, `from_cache` | `lib/analytics-recommendations.ts` |
+| `recommendations_refreshed` / `recommendations_retried` | Refresh / Try again started a request (no extra request) | `signed_in`, `source`, `recommendation_count` | `lib/analytics-recommendations.ts` |
+| `recommendation_opened` | Recommended item opened | `resource_id`, `position`, `recommendation_type`, `signed_in`, `source`, `link_target` | `lib/analytics-recommendations.ts` |
+| `recommendation_feedback_saved` / `recommendation_restored` | Feedback or restore server-confirmed | `resource_id`, `feedback`, `previous_feedback` (restore: `resource_id`) | `lib/analytics-recommendations.ts` |
+| `recommendation_sign_in_clicked` | Guest sign-in CTA on a recommendation surface | `placement` | `lib/analytics-recommendations.ts` |
+| `onboarding_step_viewed` / `onboarding_step_completed` / `onboarding_navigated_back` | Onboarding step shown / saved with Continue / Back | `step_number`, `step_name`, `total_steps` (back adds `to_step_number`) | `lib/analytics-recommendations.ts` ← `Onboarding` |
+| `onboarding_skipped` | "Save and browse later" saved | `step_number`, `step_name`, `total_steps`, `answer_count`, `already_completed` | `lib/analytics-recommendations.ts` ← `Onboarding` |
+| `onboarding_completed` | Final save confirmed | `answer_count`, choice values (`skill_level`, `time_commitment`, `topics`, `learning_goals`, `resource_formats`, `topic_count`), `already_completed` | `lib/analytics-recommendations.ts` ← `Onboarding` |
 | `command_palette_opened` | Search palette opens (closed → open) | `open_method` | `MainLayout` |
 | `export_started` / `export_downloaded` | Export begun / file download triggered | `export_format`, `export_scope`, `category_count`, `resource_count` | `export-tools` |
 | `api_key_created` / `api_key_copied` / `api_key_revoked` | API key created (server-confirmed) / secret copied / revoked (server-confirmed) — never the key | `expiry_option` / `copy_method` / — | `ApiKeysCard` |

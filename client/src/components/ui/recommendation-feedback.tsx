@@ -12,6 +12,7 @@ import { ToastAction } from "@/components/ui/toast";
 import { useAuth } from "@/hooks/useAuth";
 import { useToast } from "@/hooks/use-toast";
 import { useRecommendationFeedback } from "@/hooks/useRecommendationFeedback";
+import { trackRecommendationFeedbackSaved } from "@/lib/analytics-recommendations";
 import { cn } from "@/lib/utils";
 import type { RecommendationFeedbackValue } from "@shared/recommendations";
 
@@ -86,6 +87,11 @@ function RecommendationFeedback({
     onFeedbackChange?.(next);
     try {
       await recordFeedbackAsync({ resourceId, feedback: next });
+      trackRecommendationFeedbackSaved({
+        resourceId,
+        feedback: next,
+        previousFeedback: previous,
+      });
       if (next === "hidden") {
         toast({
           title: "Recommendation hidden",

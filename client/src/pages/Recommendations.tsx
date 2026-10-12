@@ -1,4 +1,5 @@
 import StatePanel, { RetryButton } from "@/components/layout/StatePanel";
+import { useEffect, useRef, type MouseEvent } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { Link } from "wouter";
 import { queryUnavailableReason } from "@/lib/query-availability";
@@ -12,10 +13,16 @@ import AIRecommendationsPanel from "@/components/ui/ai-recommendations-panel";
 import ResourceCard from "@/components/resource/ResourceCard";
 import { useAuth } from "@/hooks/useAuth";
 import type { RecommendationResult } from "@/hooks/useAIRecommendations";
+import {
+  trackRecommendationOpened,
+  trackRecommendationSignInClicked,
+  trackRecommendationsRefreshed,
+  trackRecommendationsViewed,
+} from "@/lib/analytics-recommendations";
 import "@/styles/pages/discovery-tools.css";
 
 export default function Recommendations() {
-  const { isAuthenticated } = useAuth();
+  const { isAuthenticated, isLoading: authLoading } = useAuth();
 
   // Anonymous browse: rule-based recommendations from the public GET endpoint.
   const anonQuery = useQuery<RecommendationResult[]>({
@@ -41,6 +48,43 @@ export default function Recommendations() {
   const anonError = anonUnavailable !== null;
 
   const anonRecommendations = Array.isArray(anonData) ? anonData : [];
+
+  // One view per page load, once the guest picks (or their empty state) are
+  // actually on screen. Signed-in visitors are counted by the panel itself;
+  // the guest query also runs while the session is still resolving, so wait
+  // for auth to settle or a signed-in load would count as a guest view.
+  const viewTrackedRef = useRef(false);
+  const anonLoaded = !authLoading && !isAuthenticated && anonQuery.isSuccess && !anonError;
+  useEffect(() => {
+    if (!anonLoaded || viewTrackedRef.current) return;
+    viewTrackedRef.current = true;
+    trackRecommendationsViewed({
+      recommendationCount: anonRecommendations.length,
+      signedIn: false,
+    });
+  }, [anonLoaded, anonRecommendations.length]);
+
+  // ResourceCard owns its links (title, View Details, Open Link), so opens are
+  // observed in the capture phase here — before Open Link stops propagation —
+  // without changing how the card navigates.
+  const handleAnonCardOpen = (event: MouseEvent<HTMLDivElement>) => {
+    if (event.type === "auxclick" && event.button !== 1) return;
+    const link = (event.target as Element | null)?.closest<HTMLAnchorElement>("a[data-testid]");
+    const match = link?.dataset.testid?.match(
+      /^(link-resource-title|link-view-details|button-visit)-(\d+)$/,
+    );
+    if (!match) return;
+    const resourceId = Number(match[2]);
+    const index = anonRecommendations.findIndex((rec) => rec.resource.id === resourceId);
+    if (index === -1) return;
+    trackRecommendationOpened({
+      resourceId,
+      position: index + 1,
+      recommendationType: anonRecommendations[index].type,
+      signedIn: false,
+      linkTarget: match[1] === "button-visit" ? "external" : "detail",
+    });
+  };
 
   return (
     <div className="discovery-tools-page discovery-tools-page--recommendations">
@@ -93,7 +137,10 @@ export default function Recommendations() {
               <StatePanel tone="error" label={anonUnavailable === "offline" ? "Offline" : "Error · unavailable"}
                 title={anonUnavailable === "offline" ? "You’re offline" : "Couldn’t load recommendations"} inline
                 testId="recommendations-error"
-                actions={<RetryButton onRetry={() => void refetch()} testId="button-retry-recommendations" />}>
+                actions={<RetryButton onRetry={() => {
+                  trackRecommendationsRefreshed({ trigger: "retry", signedIn: false, recommendationCount: 0 });
+                  void refetch();
+                }} testId="button-retry-recommendations" />}>
                 {anonUnavailable === "offline"
                   ? "Recommendations will load when your connection is back."
                   : "Something went wrong while fetching recommendations. Please try again."}
@@ -104,7 +151,11 @@ export default function Recommendations() {
                 Browse the categories to get started.
               </StatePanel>
             ) : (
-              <div className="discovery-tools-recommendation-grid discovery-tools-recommendation-grid--anonymous">
+              <div
+                className="discovery-tools-recommendation-grid discovery-tools-recommendation-grid--anonymous"
+                onClickCapture={handleAnonCardOpen}
+                onAuxClickCapture={handleAnonCardOpen}
+              >
                 {anonRecommendations.map((rec) => (
                   <ResourceCard
                     key={rec.resource.id}
@@ -138,7 +189,10 @@ export default function Recommendations() {
             <CardContent className="discovery-tools-panel-content">
               {/* BUG-049 (run26): asChild — no <a>-wrapping-<button> nesting. */}
               <Button asChild className="w-full sm:w-auto" data-testid="button-login-to-get-started">
-                <Link href="/sign-in?redirect_url=%2Frecommendations">
+                <Link
+                  href="/sign-in?redirect_url=%2Frecommendations"
+                  onClick={() => trackRecommendationSignInClicked("recommendations_page")}
+                >
                   <LogIn className="mr-2 h-4 w-4" />
                   Sign in
                 </Link>

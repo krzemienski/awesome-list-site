@@ -34,6 +34,12 @@ import {
   hasMeaningfulLearningPreferences,
 } from "@shared/onboarding-values";
 import type { RecommendationFeedbackValue } from "@shared/recommendations";
+import {
+  trackRecommendationRestored,
+  trackRecommendationSignInClicked,
+  trackRecommendationsRefreshed,
+  trackRecommendationsViewed,
+} from "@/lib/analytics-recommendations";
 
 interface AIRecommendationsPanelProps {
   resources?: Resource[];
@@ -106,6 +112,7 @@ export default function AIRecommendationsPanel({
     isPaused,
     isError,
     error,
+    isSuccess,
     hasUsefulResults,
     isStale,
     isFromCache,
@@ -191,6 +198,25 @@ export default function AIRecommendationsPanel({
     (state) => state.feedback === "hidden" && state.resource,
   );
 
+  // One view per panel load: a fresh device cache reused without a request,
+  // a finished request (including an empty result), or saved results kept
+  // after a failed refresh. A stale cache waits for its background refresh.
+  const viewTrackedRef = useRef(false);
+  const resultsSettled =
+    !authLoading
+    && !isLoading
+    && canRenderRecommendations
+    && (isFromCache ? !isStale || isError : isSuccess);
+  useEffect(() => {
+    if (!resultsSettled || viewTrackedRef.current) return;
+    viewTrackedRef.current = true;
+    trackRecommendationsViewed({
+      recommendationCount: visibleRecommendations.length,
+      signedIn: isAuthenticated,
+      fromCache: isFromCache,
+    });
+  }, [resultsSettled, visibleRecommendations.length, isAuthenticated, isFromCache]);
+
   useEffect(() => {
     const candidates = hideFocusRef.current;
     if (!candidates) return;
@@ -250,6 +276,7 @@ export default function AIRecommendationsPanel({
     }
     try {
       await recordFeedbackAsync({ resourceId, feedback: null });
+      trackRecommendationRestored(resourceId);
       setLocallyHidden((current) => {
         const next = new Set(current);
         next.delete(resourceId);
@@ -272,8 +299,13 @@ export default function AIRecommendationsPanel({
   // Anonymous visitors have no account: their refresh must hit the anon-safe
   // GET path (POST /api/recommendations is auth-gated and 401s). Passing no
   // profile makes the hook use GET; a profile forces the authed POST.
-  const retry = () => {
+  const retry = (trigger: "refresh" | "retry" = "retry") => {
     if (isLoading) return; // aria-disabled: a refresh is already running
+    trackRecommendationsRefreshed({
+      trigger,
+      signedIn: isAuthenticated,
+      recommendationCount: visibleRecommendations.length,
+    });
     refreshRecommendations(isAuthenticated ? effectiveProfile : undefined);
   };
 
@@ -291,7 +323,7 @@ export default function AIRecommendationsPanel({
     <Button
       type="button"
       variant="ghost"
-      onClick={retry}
+      onClick={() => retry("refresh")}
       aria-disabled={isLoading}
       aria-busy={isLoading}
       data-testid="button-generate-recommendations"
@@ -368,7 +400,11 @@ export default function AIRecommendationsPanel({
         </p>
         <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
           <Button asChild variant="outline">
-            <Link href={signInHref} data-testid="link-sign-in-personalize">
+            <Link
+              href={signInHref}
+              data-testid="link-sign-in-personalize"
+              onClick={() => trackRecommendationSignInClicked("panel_footer")}
+            >
               Sign in to personalize
             </Link>
           </Button>
@@ -548,10 +584,13 @@ export default function AIRecommendationsPanel({
             </p>
           </div>
           <div className="grid items-stretch gap-4 md:grid-cols-2">
-            {visibleRecommendations.map((recommendation) => (
+            {visibleRecommendations.map((recommendation, index) => (
               <RecommendationCard
                 key={recommendation.resource.id}
                 className="min-w-0"
+                position={index + 1}
+                recommendationType={recommendation.type}
+                signedIn={isAuthenticated}
                 resource={{
                   id: String(recommendation.resource.id),
                   name: recommendation.resource.title,
@@ -602,7 +641,11 @@ export default function AIRecommendationsPanel({
                   Try again
                 </Button>
                 <Button asChild size="sm" variant="outline">
-                  <Link href={signInHref} data-testid="link-sign-in-empty-state">
+                  <Link
+                    href={signInHref}
+                    data-testid="link-sign-in-empty-state"
+                    onClick={() => trackRecommendationSignInClicked("panel_empty_state")}
+                  >
                     Sign in to personalize
                   </Link>
                 </Button>

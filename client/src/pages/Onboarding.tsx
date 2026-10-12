@@ -18,6 +18,13 @@ import { Progress } from "@/components/ui/progress";
 import { useAuth } from "@/hooks/useAuth";
 import { useLearningPreferences } from "@/hooks/use-learning-preferences";
 import { safeGetItem, safeRemoveItem, safeSetItem } from "@/lib/safeStorage";
+import {
+  trackOnboardingCompleted,
+  trackOnboardingNavigatedBack,
+  trackOnboardingSkipped,
+  trackOnboardingStepCompleted,
+  trackOnboardingStepViewed,
+} from "@/lib/analytics-recommendations";
 import "@/styles/pages/account.css";
 
 interface CategoryOption {
@@ -36,6 +43,11 @@ function stepFromUrl(): number | null {
   return Number.isInteger(raw) && raw >= 1 && raw <= ONBOARDING_STEP_COUNT
     ? raw
     : null;
+}
+
+/** Stable analytics name for a step ("level", "topics", …). */
+function stepName(step: number): string {
+  return LEARNING_PREFERENCE_STEPS[step - 1]?.short.toLowerCase() ?? "unknown";
 }
 
 function valuesFromPreferences(
@@ -77,6 +89,10 @@ export default function Onboarding() {
   const [errors, setErrors] = useState<PreferenceErrors>({});
   const [requestError, setRequestError] = useState<string | null>(null);
   const [completed, setCompleted] = useState(false);
+  // State twin of hydratedRef so the step-view event waits for the step the
+  // hydration effect settles on instead of the URL/default first guess.
+  const [hydrated, setHydrated] = useState(false);
+  const lastViewedStepRef = useRef<number | null>(null);
   const hydratedRef = useRef(false);
   const headingRef = useRef<HTMLHeadingElement>(null);
   const historyDepthRef = useRef(0);
@@ -119,6 +135,7 @@ export default function Onboarding() {
     }
 
     hydratedRef.current = true;
+    setHydrated(true);
     setValues(initialValues);
     setStep(initialStep);
     const params = new URLSearchParams(window.location.search);
@@ -228,6 +245,7 @@ export default function Onboarding() {
             : "in_progress",
         onboardingStep: nextStep,
       });
+      trackOnboardingStepCompleted(step, stepName(step));
       navigateStep(nextStep);
     } catch (error) {
       setRequestError(
@@ -240,6 +258,7 @@ export default function Onboarding() {
 
   const handleBack = () => {
     if (step <= 1) return;
+    trackOnboardingNavigatedBack(step, stepName(step));
     // Traverse the entry created by Continue so the browser's Forward action
     // can restore the later step. A direct deep link has no onboarding history,
     // so it falls back to replacing that entry with the prior step.
@@ -262,6 +281,12 @@ export default function Onboarding() {
         onboardingStatus: alreadyCompleted ? "completed" : "dismissed",
         onboardingStep: step,
       });
+      trackOnboardingSkipped({
+        stepNumber: step,
+        stepName: stepName(step),
+        values,
+        alreadyCompleted,
+      });
       safeRemoveItem(DRAFT_STORAGE_KEY);
       window.location.href = "/";
     } catch (error) {
@@ -282,6 +307,10 @@ export default function Onboarding() {
         onboardingStatus: "completed",
         onboardingStep: ONBOARDING_STEP_COUNT,
       });
+      trackOnboardingCompleted({
+        values,
+        alreadyCompleted: preferences?.onboardingStatus === "completed",
+      });
       safeRemoveItem(DRAFT_STORAGE_KEY);
       setCompleted(true);
       requestAnimationFrame(() => headingRef.current?.focus());
@@ -296,6 +325,13 @@ export default function Onboarding() {
 
   const loading = preferencesLoading || categoriesLoading;
   const loadError = preferencesError || categoriesError;
+  const stepVisible = hydrated && !loading && !loadError && !completed;
+  useEffect(() => {
+    if (!stepVisible || lastViewedStepRef.current === step) return;
+    lastViewedStepRef.current = step;
+    trackOnboardingStepViewed(step, stepName(step));
+  }, [stepVisible, step]);
+
   const categoryNames = (categories ?? [])
     .filter((category) => category.resourceCount > 0)
     .map((category) => category.name);
