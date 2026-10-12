@@ -107,7 +107,7 @@ Verification is by real browser use / curl only (no proof packets or gates since
 ## WS8 Accessibility and performance
 | ID | Item | Status | Packet |
 |---|---|---|---|
-| X-01 | Lighthouse + axe on every route with dialogs/menus open | OPEN | |
+| X-01 | Lighthouse + axe on every route with dialogs/menus open | FIXED — axe (WCAG 2.0–2.2 A/AA) clean on 24 public routes + palette/drawer/account/consent/filters/share/suggest/report states, all 15 admin tabs, settings/profile/notifications/contributions/bookmarks/favorites; 1440 + 375; all five systems spot-checked. Fixed 2.5.3 label-in-name on header brand/search/account, drawer brand, palette close, chips, facets, taxonomy cards, resource actions, settings cards, admin stat cards (name hid the value), research notes, invite; admin activity list overflowed at 375 (actor 0px, unreachable scroll region) → wraps to two lines below 340px. Lighthouse a11y 100 on /, resource, categories, journey; dev best-practices 78 is Replit dev banner + Clerk dev cookies only (prod 100) | |
 | X-02 | Keyboard-only walk of core journeys | OPEN | |
 | X-03 | Lighthouse mobile on home/category/resource (≥90, LCP <2.5 s) | OPEN | |
 | X-04 | Core journeys in Firefox and WebKit | OPEN | |

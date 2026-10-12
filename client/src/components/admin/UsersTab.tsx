@@ -239,7 +239,6 @@ export default function UsersTab() {
             className="btn ghost"
             disabled
             title="Invitations are not supported by the admin API."
-            aria-label="Invite user unavailable"
             data-testid="button-invite-user"
           >
             <Plus className="h-3 w-3" />

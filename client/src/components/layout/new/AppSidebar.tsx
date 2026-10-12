@@ -392,11 +392,6 @@ function CategoryAccordion({
         data-state={isOpen ? "open" : "closed"}
         title={cat.name}
         onClick={subs.length > 0 ? onToggle : () => navigate(catPath)}
-        aria-label={
-          subs.length > 0
-            ? `${isOpen ? "Collapse" : "Expand"} ${cat.name}`
-            : `Open ${cat.name} category page`
-        }
         aria-expanded={subs.length > 0 ? isOpen : undefined}
         aria-controls={subs.length > 0 ? bodyId : undefined}
       >
@@ -826,12 +821,12 @@ export default function AppSidebar({
       <Link
         href="/"
         onClick={() => setOpenMobile(false)}
-        aria-label={`${brandName} home`}
         className="flex min-h-7 items-center gap-[10px] px-0 py-0 no-underline"
       >
         <span className="av-sidebar-drawer-logo" aria-hidden="true">av</span>
         <span className="av-sidebar-drawer-wordmark">
           {brandWordmark}
+          <span className="sr-only"> home, </span>
           <span className="sr-only" data-testid="sidebar-resource-count">
             {navError && totalResources === 0
               ? "Catalog unavailable"

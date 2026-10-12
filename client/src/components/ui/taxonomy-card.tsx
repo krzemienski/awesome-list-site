@@ -38,7 +38,7 @@ export function TaxonomyCard({
   return (
     <Link
       href={href}
-      aria-label={ariaLabel ?? `View ${name} with ${count} ${count === 1 ? "resource" : "resources"}`}
+      aria-label={ariaLabel}
       data-testid={linkTestId}
       className="block h-full outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--bg)] rounded-[var(--radius)]"
     >

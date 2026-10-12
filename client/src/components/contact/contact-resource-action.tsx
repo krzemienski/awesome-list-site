@@ -23,7 +23,6 @@ export function ContactResourceAction({
       onClick={onSuggestEdit}
       data-testid="button-suggest-edit"
       className="contact-resource-action min-h-[44px] px-4"
-      aria-label="Suggest an edit"
     >
       <Edit className="h-4 w-4 mr-2" />
       <span>Suggest Edit</span>

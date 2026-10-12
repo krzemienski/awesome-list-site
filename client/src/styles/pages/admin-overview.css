@@ -288,6 +288,49 @@
   white-space: nowrap;
 }
 
+/* Five columns need ~340px. Narrower lists (375 phones) squeezed the actor
+   to 0px and still overflowed into a scroll region keyboard users cannot
+   reach, so the row splits: who and when first, what and which below. */
+.admin-overview-canonical .admin-canonical-activity-list {
+  container-type: inline-size;
+}
+
+@container (max-width: 340px) {
+  .admin-overview-canonical .admin-canonical-activity-row {
+    flex-wrap: wrap;
+    row-gap: 2px;
+  }
+
+  .admin-overview-canonical .admin-canonical-activity-actor {
+    flex: 1 1 0;
+    order: 1;
+  }
+
+  .admin-overview-canonical .admin-canonical-activity-id {
+    order: 0;
+  }
+
+  .admin-overview-canonical .admin-canonical-activity-time {
+    order: 2;
+  }
+
+  .admin-overview-canonical .admin-canonical-activity-action {
+    order: 3;
+    max-inline-size: 60%;
+  }
+
+  .admin-overview-canonical .admin-canonical-activity-target {
+    order: 4;
+  }
+
+  .admin-overview-canonical .admin-canonical-activity-row::after {
+    content: "";
+    order: 2;
+    flex-basis: 100%;
+    height: 0;
+  }
+}
+
 .admin-overview-canonical .admin-canonical-health-list,
 .admin-overview-canonical .admin-canonical-category-list {
   display: flex;

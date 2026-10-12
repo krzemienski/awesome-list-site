@@ -112,7 +112,6 @@ export function ResearchWorkspace() {
                   if (job) setSelectedJobId(job.id);
                 }}
                 aria-haspopup="dialog"
-                aria-label={`Open research note: ${note.title}`}
                 data-testid={`button-research-note-${note.id}`}
               >
                 <h3 title={note.title}>{note.title}</h3>

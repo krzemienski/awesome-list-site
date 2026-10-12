@@ -97,7 +97,6 @@ export default function ReportLinkAction({
         data-testid="button-report-link"
         className="min-h-[44px] px-4"
         aria-pressed={reported || undefined}
-        aria-label={reported ? "Broken link reported" : "Report a broken link"}
       >
         <Flag className={`h-4 w-4 mr-2 ${reported ? "fill-current" : ""}`} aria-hidden="true" />
         <span>{reported ? "Link reported" : "Report broken link"}</span>

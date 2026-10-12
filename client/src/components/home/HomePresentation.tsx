@@ -209,7 +209,7 @@ function KindStrip({
           type="button"
           className="home-kind-chip"
           data-testid={`home-kind-chip-${kind}`}
-          aria-label={`${KIND_LABELS[kind]} — ${counts ? formatCount(counts[kind]) : "loading"} resources`}
+          aria-label={counts ? `${KIND_LABELS[kind]}, ${formatCount(counts[kind])} resources` : `${KIND_LABELS[kind]}, loading`}
           title={`Browse ${KIND_LABELS[kind]}`}
           aria-pressed={selectedKind === kind}
           onClick={(event) => {
@@ -221,7 +221,7 @@ function KindStrip({
             onKindChange?.(selectedKind === kind ? null : kind);
           }}
         >
-          <span>{KIND_LABELS[kind]}</span>
+          <span>{KIND_LABELS[kind]}</span>{" "}
           <span className="home-kind-count mono">
             {isLoading ? "…" : isError ? "—" : formatCount(counts?.[kind] ?? 0)}
           </span>
@@ -395,12 +395,12 @@ function CategoryHeading({
       href={`/category/${category.slug}${tagsQuery}`}
       className="home-category-heading"
       data-testid={`link-category-${category.slug}`}
-      aria-label={`View ${category.name} category with ${category.count} resources`}
+      aria-label={`${category.name}, ${category.count} resources`}
     >
       <span className="home-category-icon" aria-hidden="true">
         {category.icon}
       </span>
-      <h3>{category.name}</h3>
+      <h3>{category.name}</h3>{" "}
       <span className="home-category-count mono" data-testid={`badge-count-${category.slug}`}>
         {formatCount(category.count)}
       </span>

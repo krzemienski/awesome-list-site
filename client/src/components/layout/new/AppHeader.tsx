@@ -65,9 +65,7 @@ export default function AppHeader({ onSearchOpen, user, onLogout, logoutError, c
     .filter(c => !["Table of contents", "Contributing", "License", "External Links", "Anti-features"].includes(c.name) && !c.name.startsWith("List of"))
     .reduce((sum, node) => sum + totalCount(node), 0);
   const firstName = user?.name?.trim() ? user.name.trim().split(/\s+/)[0] : "Account";
-  const role = user?.role === "admin" ? "Admin" : user ? "Member" : "Visitor";
   const brand = shellBrand(siteName);
-  const accessibleBrand = siteName?.trim() || "Awesome Video";
   const signIn = () => {
     const here = window.location.pathname + window.location.search;
     const skipNext = here === "/" || here.startsWith("/sign-in") || here.startsWith("/sign-up");
@@ -92,17 +90,19 @@ export default function AppHeader({ onSearchOpen, user, onLogout, logoutError, c
         <SidebarTrigger className="btn icon ghost mobile-menu-btn" data-testid="mobile-drawer-trigger" aria-label="Toggle sidebar" />
         <svg className="header-menu-icon" aria-hidden="true" width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"><path d="M2 4 H14 M2 8 H14 M2 12 H14" /></svg>
       </span>
-      <Link href="/" className="header-brand" aria-label={`${accessibleBrand} — home`} data-testid="header-brand">
+      <Link href="/" className="header-brand" data-testid="header-brand">
         <span className="header-logo" aria-hidden="true" data-testid="brand-mark">av</span>
-        <span className="header-wordmark hide-tablet">{brand}</span>
+        <span className="header-wordmark hide-tablet" aria-hidden="true">{brand}</span>
+        <span className="sr-only">{brand} home</span>
       </Link>
       <div className="header-spacer" />
       {/* One responsive control preserves the existing search selector and focus
           restoration contract without a hidden duplicate winning querySelector. */}
-      <button type="button" onClick={onSearchOpen} className="header-search-trigger" aria-label="Open search">
+      <button type="button" onClick={onSearchOpen} className="header-search-trigger">
         <SearchIcon />
-        <span className="header-search-label">Search <span>{categories.length ? count.toLocaleString() : "…"} resources…</span></span>
-        <span className="kbd hide-mobile">⌘K</span>
+        <span className="sr-only">{categories.length ? `Search ${count.toLocaleString()} resources` : "Search resources"}</span>
+        <span className="header-search-label" aria-hidden="true">Search <span>{categories.length ? count.toLocaleString() : "…"} resources…</span></span>
+        <span className="kbd hide-mobile" aria-hidden="true">⌘K</span>
       </button>
       <nav className="header-nav hide-tablet" aria-label="Primary">
         {navLink("/categories", "Browse")}
@@ -113,13 +113,14 @@ export default function AppHeader({ onSearchOpen, user, onLogout, logoutError, c
       </nav>
       <DropdownMenu modal={false}>
         <DropdownMenuTrigger asChild>
-          <button type="button" className="user-pill" aria-label={`Account · ${role}`}>
-            {user ? <Avatar className="header-avatar">
+          <button type="button" className="user-pill">
+            {user ? <Avatar className="header-avatar" aria-hidden="true">
               <AvatarImage src={user.avatar} alt="" />
               {/* The header chip shows one letter, as in the reference design. */}
               <AvatarFallback>{Array.from(getInitials(user.name, user.email))[0]}</AvatarFallback>
             </Avatar> : <span className="header-avatar"><LogIn size={12} aria-hidden="true" /></span>}
-            <span className="header-account-name hide-mobile">{user ? firstName : "Sign in"}</span>
+            <span className="header-account-name hide-mobile" aria-hidden="true">{user ? firstName : "Sign in"}</span>
+            <span className="sr-only">{user ? firstName : "Sign in"}, account menu</span>
           </button>
         </DropdownMenuTrigger>
         <DropdownMenuContent className="header-account-menu w-56" align="end" sideOffset={8}>

@@ -217,7 +217,7 @@ export default function SearchDialog({ isOpen, setIsOpen }: SearchDialogProps) {
   const restoreOpenerFocus = (event: Event) => {
     const opener = openerRef.current && openerRef.current !== document.body
       ? openerRef.current
-      : Array.from(document.querySelectorAll<HTMLElement>('button[aria-label="Open search"], button[aria-label="Search resources"], button[aria-label="Search"]'))
+      : Array.from(document.querySelectorAll<HTMLElement>('button.header-search-trigger, button[aria-label="Search resources"], button[aria-label="Search"]'))
           .find((element) => element.getClientRects().length > 0);
     if (opener?.isConnected) {
       event.preventDefault();
@@ -376,7 +376,7 @@ export default function SearchDialog({ isOpen, setIsOpen }: SearchDialogProps) {
               aria-label="Search resources, categories, and pages"
               placeholder="Find resources, categories, or pages…"
               trailing={
-                <DialogPrimitive.Close className="search-palette-close" aria-label="Close search" onKeyDown={keepNativeEnter}>
+                <DialogPrimitive.Close className="search-palette-close" onKeyDown={keepNativeEnter}>
                   <kbd className="kbd">esc</kbd>
                   <span className="sr-only">Close search</span>
                 </DialogPrimitive.Close>

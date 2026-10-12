@@ -57,7 +57,6 @@ export default function Stat({
       data-testid={testId}
       role={containerInteractive ? "button" : undefined}
       tabIndex={containerInteractive ? 0 : undefined}
-      aria-label={containerInteractive ? navigateLabel : undefined}
       title={containerInteractive ? navigateLabel : undefined}
       onClick={containerInteractive ? onNavigate : undefined}
       onKeyDown={containerInteractive ? handleKeyDown : undefined}
