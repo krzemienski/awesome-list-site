@@ -21,8 +21,7 @@ const TYPE_LAYER: Record<NodeType, number> = {
 };
 
 // Node role colors are DS status/info semantics (cyan info / violet info /
-// ok), mirrored verbatim from client/src/lib/charts/palette.ts and
-// docs/DESIGN-SYSTEM.md §5. Three distinct hues are required to tell the roles
+// ok), per docs/DESIGN-SYSTEM.md §5. Three distinct hues are required to tell the roles
 // apart under every accent, so they cannot track var(--accent).
 // Status/info tokens (app-bridge.css) — semantics, not themeable paint.
 const TYPE_STROKE: Record<NodeType, string> = {

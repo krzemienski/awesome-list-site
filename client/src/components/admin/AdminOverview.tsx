@@ -515,7 +515,7 @@ export default function AdminOverview({ stats }: AdminOverviewProps) {
                     </div>
                     <div className="admin-canonical-category-track" aria-hidden="true">
                       <span
-                        className="admin-canonical-category-bar"
+                        className={`admin-canonical-category-bar admin-canonical-category-bar--${index === 0 ? "accent" : `ink-${index}`}`}
                         style={{ width: `${Math.max(2, (count / categoryMax) * 100)}%` }}
                       />
                     </div>

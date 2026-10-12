@@ -527,7 +527,6 @@ function CategoryAccordion({
                         className="av-sidebar-l2-link no-underline"
                       >
                         <span>{sub.name}</span>
-                        <span className="av-sidebar-nested-count" aria-hidden="true">+{subSubs.length}</span>
                         <span
                           className="font-mono tabular-nums"
                           title={`${formatCount(subCount)} ${subCount === 1 ? "resource" : "resources"}`}
@@ -544,8 +543,13 @@ function CategoryAccordion({
                         aria-controls={`${bodyId}-sub-${subSlug}`}
                         data-state={subOpen ? "open" : "closed"}
                         data-testid={`expand-sub-${subSlug}`}
+                        title={`${subSubs.length} nested ${subSubs.length === 1 ? "group" : "groups"}`}
                         className="icon-btn av-sidebar-l2-toggle"
                       >
+                        {/* Hand-off L2Row: the "+N" marker lives on the
+                            disclosure, after the count and past a divider, so
+                            it never reads as part of the resource count. */}
+                        <span className="av-sidebar-nested-count" aria-hidden="true">+{subSubs.length}</span>
                         <ChevronRight className={cn("size-[9px] chevron-rotate", subOpen && "rotate-90")} />
                       </button>
                     </div>

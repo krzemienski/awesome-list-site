@@ -242,53 +242,80 @@
   align-items: center;
   display: flex;
   flex-shrink: 0;
-  gap: 4px;
+  gap: 0;
+  /* The first tile keeps its 10px distance from the status copy; only the
+     transparent part of its 44px target reaches back over the copy's edge. */
+  margin-left: -8px;
+}
+
+/* Footer controls take a 44px touch target (the 48px status row already
+   holds it, so nothing shifts); the reference 28px tile is painted on an
+   inset ::before behind the content. */
+.av-sidebar-compact-footer-links a,
+.av-sidebar-compact-footer .av-sidebar-more-navigation > summary {
+  align-items: center;
+  background: transparent;
+  border: 0;
+  color: var(--text-2);
+  display: inline-flex;
+  height: 44px;
+  isolation: isolate;
+  justify-content: center;
+  min-height: 44px;
+  min-width: 44px;
+  position: relative;
+  text-decoration: none;
+  transition: color 160ms ease;
 }
 
 .av-sidebar-compact-footer-links a {
-  align-items: center;
-  color: var(--text-2);
-  display: inline-flex;
   font-family: var(--font-mono);
   font-size: 10px;
+  padding: 0 14px;
+}
+
+.av-sidebar-compact-footer-links a[aria-label] {
+  padding: 0;
+  width: 44px;
+}
+
+.av-sidebar-compact-footer-links a::before,
+.av-sidebar-compact-footer .av-sidebar-more-navigation > summary::before {
   background: var(--surface);
   border: var(--hairline-w, 1px) solid var(--border);
   border-radius: var(--radius-sm);
-  height: 28px;
-  min-height: 28px;
-  min-width: 28px;
-  justify-content: center;
-  text-decoration: none;
-}
-
-.av-sidebar-compact-footer-links a {
-  transition: all 160ms ease;
+  content: "";
+  inset: 8px;
+  pointer-events: none;
+  position: absolute;
+  transition: border-color 160ms ease;
+  z-index: -1;
 }
 
 .av-sidebar-compact-footer-links a:hover {
-  border-color: color-mix(in srgb, var(--accent) 35%, var(--border));
   color: var(--accent-ink);
 }
 
+.av-sidebar-compact-footer-links a:hover::before {
+  border-color: color-mix(in srgb, var(--accent) 35%, var(--border));
+}
+
+/* The status row's 10px gap plus both 8px insets would triple the space
+   between the tiles; pull the disclosure back so the tiles keep a compact
+   pairing and its tile stays on the row's 14px inset. */
 .av-sidebar-compact-footer .av-sidebar-more-navigation {
-  flex: 0 0 28px;
-  margin-left: 0;
+  flex: 0 0 44px;
+  margin-left: -10px;
+  margin-right: -8px;
   padding: 0;
   position: relative;
 }
 
 .av-sidebar-compact-footer .av-sidebar-more-navigation > summary {
-  align-items: center;
-  display: flex;
-  background: var(--surface);
-  border: var(--hairline-w, 1px) solid var(--border);
-  border-radius: var(--radius-sm);
-  height: 28px;
-  justify-content: center;
+  cursor: pointer;
   list-style: none;
-  min-height: 28px;
   padding: 0;
-  width: 28px;
+  width: 44px;
 }
 
 .av-sidebar-compact-footer .av-sidebar-more-navigation > summary::-webkit-details-marker {
@@ -303,12 +330,12 @@
   min-width: 220px;
   padding: 8px;
   position: absolute;
-  right: -14px;
+  right: -6px;
   z-index: 6;
 }
 
 .av-sidebar-drawer .av-sidebar-compact-footer .av-sidebar-more-navigation > [data-sidebar="menu"] {
-  right: -18px;
+  right: -10px;
 }
 
 /* SidebarMenuButton carries shadcn's generic single-line menu treatment.

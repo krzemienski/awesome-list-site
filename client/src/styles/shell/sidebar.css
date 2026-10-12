@@ -76,15 +76,6 @@
   padding: 0 0 0 12px;
 }
 
-.av-sidebar-drawer .av-sidebar-l2-toggle {
-  border-left: 0;
-  border-radius: 0;
-  color: var(--text-3);
-  justify-content: flex-end;
-  margin-left: -16px;
-  padding: 0 11px 0 0;
-  width: 44px;
-}
 
 /*
  * The frozen drawer scrolls as one document: categories retain natural height

@@ -92,7 +92,7 @@ export default function AppHeader({ onSearchOpen, user, onLogout, logoutError, c
       </span>
       <Link href="/" className="header-brand" data-testid="header-brand">
         <span className="header-logo" aria-hidden="true" data-testid="brand-mark">av</span>
-        <span className="header-wordmark hide-tablet" aria-hidden="true">{brand}</span>
+        <span className="header-wordmark" aria-hidden="true">{brand}</span>
         <span className="sr-only">{brand} home</span>
       </Link>
       <div className="header-spacer" />

@@ -20,7 +20,7 @@ is never edited independently.
 | `client/src/lib/design-system.ts` | System/accent metadata, product profiles, runtime appliers, defaults |
 | `client/index.html` | FOUC-free pre-paint boot script (`ds-system` / `ds-accent` / `ds-font-override`) |
 | `client/src/lib/font-options.ts` | Font override list + on-demand font loading |
-| `client/src/lib/charts/palette.ts` | The single chart color palette (`CHART_PALETTE`) |
+| `client/src/lib/charts/palette.ts` | The single chart color source: ink ramp (`CHART_INK`) + one accent (`CHART_ACCENT`), grid/axis tokens |
 
 This is one logical design system with multiple responsible source files—not a code
 system plus a separate reference system. Run `npm run generate:design-system-artifact`
@@ -212,10 +212,10 @@ literals components may ever carry (always with a `/* DS-OK */` marker):
 
 | Semantic | Hex | Where it's defined |
 |---|---|---|
-| ok / success | `#34d08c` | `.chip.ok`, `.dot` glow, chart palette |
-| warn / attention | `#ffb84d` | `.chip.warn`, chart palette |
-| bad / error / destructive | `#ff5c7a` | `.chip.bad`, bridge `--color-destructive`, chart palette |
-| info (charts) | `#5eddf2`, `#9d4edd` | `CHART_PALETTE` |
+| ok / success | `#34d08c` | `.chip.ok`, `.dot` glow |
+| warn / attention | `#ffb84d` | `.chip.warn` |
+| bad / error / destructive | `#ff5c7a` | `.chip.bad`, bridge `--color-destructive` |
+| info | `#5eddf2`, `#9d4edd` | agent graph node roles (`--status-info`, `--status-info-2`) |
 | **on-accent ink** | `#000000` (or `#0a0a0a`) | bridge `--color-primary-foreground`, skins, `.skip-link` |
 
 **On-accent ink rule:** text/icons sitting on an accent-filled surface are always
@@ -308,8 +308,8 @@ deltas in the parity ledgers, never re-tinted.
 5. **No hardcoded colors/radii/shadows in app code.** Consume tokens via Tailwind
    bridge utilities or `var(--token)` arbitrary values. Allowed literal exceptions
    (each marked `DS-OK` at the definition site): the section-5 constants, the bridge
-   block itself, `[data-system]` skin blocks inside `design-system.css`, and
-   `CHART_PALETTE` (recharts cannot read CSS vars from prop strings).
+   block itself, and `[data-system]` skin blocks inside `design-system.css`.
+   Charts pass `var(--token)` strings to recharts (SVG stroke/fill resolve them).
 6. **FOUC-free boot is non-negotiable.** Any new HTML entry point must apply
    `data-system`/`data-accent` synchronously pre-paint (see `client/index.html`).
 7. **Survive all five systems.** New components must tolerate radius 0, 2px ink

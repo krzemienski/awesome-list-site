@@ -140,7 +140,7 @@ The Awesome.Video DS contract documented in `docs/` + `HANDOFF.md` is implemente
 
 ### Chart palette source of truth
 
-All recharts strokes/fills route through `client/src/lib/charts/palette.ts` (`CHART_PALETTE`). The 10-slot palette mirrors DS accents (`--accent`, `--accent-2`) + DS status semantics (`#34d08c`, `#ff5c7a`, `#ffb84d`, `#5eddf2`, `#9d4edd`) verbatim from `design-system.css`. Per-recharts component literals are intentional — recharts cannot read CSS vars from prop strings — and are tagged `/* DS-OK: ... */` where they appear.
+All recharts strokes/fills route through `client/src/lib/charts/palette.ts`: the ink ramp (`CHART_INK` → `--text`/`--text-2`/`--text-3`) plus one highlighted series (`CHART_ACCENT` → `--accent`), per `awesome-list-site-ds/docs/07-color.md`. Same-ink series also differ by dash pattern (`CHART_DASH`). Values are `var(--token)` strings, which SVG stroke/fill resolve, so charts follow the active design system. Status hues stay on status indicators, never chart series.
 
 ## User Preferences
 

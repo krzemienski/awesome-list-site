@@ -416,11 +416,16 @@
   height: 100%;
   min-width: 0.25rem;
   border-radius: var(--radius-pill);
-  /* Reference admin.jsx fills these in --accent; five accent bars push the
-     first viewport past Stage 7's eight accent users, and a data bar is not a
-     reserved accent moment, so they read in primary ink. */
+  /* Chart fills use the ink ramp plus one accent (docs/07-color.md): the
+     leading category is the single highlighted series, the rest step down
+     the ink ramp in rank order. */
   background: var(--text);
 }
+.admin-overview-canonical .admin-canonical-category-bar--accent { background: var(--accent); }
+.admin-overview-canonical .admin-canonical-category-bar--ink-1 { background: var(--text); }
+.admin-overview-canonical .admin-canonical-category-bar--ink-2 { background: var(--text-2); }
+.admin-overview-canonical .admin-canonical-category-bar--ink-3,
+.admin-overview-canonical .admin-canonical-category-bar--ink-4 { background: var(--text-3); }
 
 @media (max-width: 48rem) {
   .admin-overview-canonical .admin-canonical-table-shell__heading {

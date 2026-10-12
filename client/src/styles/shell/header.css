@@ -86,6 +86,11 @@
 @media (max-width: 768px) {
   .app-canonical-header .header-search-trigger { display: inline-flex !important; }
 }
+/* The wordmark stays beside the logo through tablet widths so a first visit
+   still sees the site name; only phone widths fall back to the logo tile. */
+@media (max-width: 480px) {
+  .app-canonical-header .header-wordmark { display: none; }
+}
 @media (max-width: 767px) {
   .app-canonical-header { height: 56px; padding: 0 14px; }
   /* Takes the reference's `btn icon ghost` search button paint, per system. */

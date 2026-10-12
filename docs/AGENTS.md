@@ -39,8 +39,7 @@ ways, in order of preference:
 
 **Allowed literal exceptions** — always tagged `/* DS-OK: reason */` at the definition
 site: the global status constants (`#34d08c` ok, `#ffb84d` warn, `#ff5c7a` bad), the
-on-accent inks (`#000000` / `#0a0a0a`), `CHART_PALETTE` entries (recharts can't read
-CSS vars from prop strings), the bridge block in `index.css`, and `[data-system]` skin
+on-accent inks (`#000000` / `#0a0a0a`), the bridge block in `index.css`, and `[data-system]` skin
 blocks inside `design-system.css`. If you genuinely need a new escape, tag it `DS-OK`
 with a reason or the audit will flag it.
 
@@ -59,8 +58,9 @@ with a reason or the audit will flag it.
 - **Eyebrow labels** use `.eyebrow` (per-system prefixes/casing come from skins).
 - Variants belong in the component's `cva()` config; merge classes with `cn()`.
 - Icons are lucide (stroke 1.5 is global); icon-only controls need `aria-label`.
-- Charts take colors **only** from `CHART_PALETTE`
-  (`client/src/lib/charts/palette.ts`) or `--color-chart-*`.
+- Charts take colors **only** from `client/src/lib/charts/palette.ts`: the ink ramp
+  (`CHART_INK`) plus at most one highlighted series in `CHART_ACCENT`; status hues are
+  for status indicators, never chart series.
 
 ## 3. Respect the visual rules
 

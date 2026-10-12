@@ -246,16 +246,29 @@
   color: var(--accent-ink);
 }
 
-/* The disclosure's chevron sits 8px after the count, as in V2's single
-   button; the 44px target reaches back over the count's trailing edge. */
-.av-sidebar-shell .av-sidebar-l2-toggle {
+/* Hand-off L2Row (sidebar-variants.jsx): the disclosure carries the "+N"
+   nested marker and the chevron behind a hairline divider, so the marker
+   reads as "N nested groups", never as part of the resource count. The
+   divider is drawn at the painted row height, not the 44px overhang. */
+.av-sidebar-shell .av-sidebar-l2-toggle,
+.av-sidebar-drawer .av-sidebar-l2-toggle {
   border-left: 0;
   border-radius: 0;
   color: var(--text-3);
-  justify-content: flex-end;
-  margin-left: -16px;
-  padding: 0 11px 0 0;
-  width: 44px;
+  justify-content: center;
+  margin-left: 8px;
+  padding: 0 11px 0 8px;
+  width: auto;
+}
+.av-sidebar-shell .av-sidebar-l2-toggle::before,
+.av-sidebar-drawer .av-sidebar-l2-toggle::before {
+  border-left: var(--hairline-w, 1px) solid var(--border);
+  content: "";
+  height: 18px;
+  left: 0;
+  pointer-events: none;
+  position: absolute;
+  top: calc(50% - 9px);
 }
 
 .av-sidebar-shell .av-sidebar-l3-row {
