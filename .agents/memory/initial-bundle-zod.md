@@ -10,3 +10,4 @@ The bundle-budget config now forbids `zod/` in the initial graph, so a regressio
 **How to apply:**
 - Before asking the owner to republish, run the real gate. This also works offline in a /tmp copy: `bash scripts/pre-publish-gate.sh --publish` with `BUILD_REVISION` set, because there is no .git.
 - If a shared module is needed in the shell, check its import chain for zod/drizzle first.
+- To diagnose a budget failure, build the last successfully published commit in /tmp and compare initial module sets, normalizing symlink-resolved dependency paths.

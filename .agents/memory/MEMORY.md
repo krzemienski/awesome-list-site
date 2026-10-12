@@ -148,7 +148,6 @@
 - [Contract masks 500 bodies](contract-500-body-masking.md) — every /api 500 body becomes "Internal Server Error"; 5xx ≠ nothing changed (write commits before audit) — keep describeWriteError copy uncertain.
 - [Queued optimistic rollback](queued-optimistic-rollback.md) — queued writes must roll back to last server-confirmed state, not their onMutate snapshot; failed refetch keeps loaded page.
 - [Before-fix proof instance](before-fix-proof-instance.md) — run pre-fix code from a /tmp copy + git show HEAD files on a 2nd port; worktree blocked, nohup dies; use run_in_background.
-- [Initial bundle zod boundary](initial-bundle-zod-boundary.md) — shell-reachable shared code must import resourceFacets-core; zod in entry failed publish; diff vs last-published build in /tmp.
 - [Initial bundle zod-free](initial-bundle-zod.md) — shell imports must use resourceFacets-core; zod in App.tsx graph blew bundle-budget and blocked publish; run the publish gate before asking to republish.
 - [og-middleware outage shell](og-middleware-outage-shell.md) — DB outage: HTML navigations get SPA shell + 503/Retry-After (client error card), non-HTML keeps JSON 503 (resilience gate contract).
 - [GitHub import taxonomy merge](github-import-taxonomy-merge.md) — import headings colliding by slug/case merge into the existing node + canonical names; no suffixed slugs; dryRun still creates nodes.
@@ -164,3 +163,4 @@
 - [Page title face](page-title-face.md) — page h1s use .page-title (body face 700) per the reference; display face only for wordmark/numerals/state titles/accents.
 - [SSR lazy boundary #421](ssr-lazy-boundary-421.md) — env-gated lazy hosts in the hydrated Home tree throw #421/#419; mount closed hosts client-only; diff .replit userenv first.
 - [Secret leak scan by value](secret-history-leak-scan.md) — prove 'no secrets committed' by grepping real secret VALUES across all history blobs; owner password leaked via deleted July scripts.
+- [Robots parser precedence](robots-parser-precedence.md) — Python 3.11 robotparser uses first-match rules; use longest-match semantics to verify Allow: / plus private exclusions.
