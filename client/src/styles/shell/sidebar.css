@@ -143,6 +143,23 @@
     white-space: normal;
     overflow-wrap: break-word;
   }
+
+  /* The footer's 44px GitHub and More targets leave the status copy ~114px,
+     short of "1,816 indexed · live". The adjacent live dot already signals
+     "live", so the words become screen-reader only here instead of
+     ellipsizing the count. */
+  .av-sidebar-shell .av-sidebar-compact-footer-live {
+    border: 0;
+    clip: rect(0 0 0 0);
+    clip-path: inset(50%);
+    height: 1px;
+    margin: -1px;
+    overflow: hidden;
+    padding: 0;
+    position: absolute;
+    white-space: nowrap;
+    width: 1px;
+  }
 }
 
 /* Canonical rule: below 768px the sidebar is hidden and the drawer takes over.

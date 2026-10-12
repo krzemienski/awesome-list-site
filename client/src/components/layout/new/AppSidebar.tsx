@@ -1137,7 +1137,10 @@ export default function AppSidebar({
             ? { "data-testid": "sidebar-resource-count" }
             : {})}
         >
-          {resourceStatus} · live
+          {resourceStatus}
+          {/* At the 240px tablet rail the live dot carries "live" visually so
+              the count never ellipsizes; the words stay in the accessible name. */}
+          <span className="av-sidebar-compact-footer-live"> · live</span>
         </span>
         <div className="av-sidebar-compact-footer-links">
           {includeDocs && repoUrl && (
