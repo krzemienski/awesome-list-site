@@ -240,6 +240,14 @@ vite-plugin-checker-error-overlay {
 @media print {
   /* Print is fixed paper paint, outside the five-system theme: the CSS system
      colors Canvas / CanvasText / GrayText are the paper, ink and neutral rule. */
+  /* The system colors follow the used color-scheme, and the site is
+     dark-only: without this, Canvas/CanvasText print as a near-black sheet
+     with white text — and as white-on-white (blank) with background graphics
+     off, the browser default. */
+  html {
+    color-scheme: light !important;
+  }
+
   /* White page, full-opacity black readable text everywhere. */
   html,
   body,
@@ -390,8 +398,15 @@ vite-plugin-checker-error-overlay {
      "[&>span]:line-clamp-1" in its class string, so the bare attribute
      selector out-specifies the `button { display:none }` hide above and
      resurrected sort selects on paper (R5-053 regression caught in audit). */
-  [class*="line-clamp"]:not(button):not([role="combobox"]) {
+  /* Component classes clamp in their own CSS, not via a utility class name. */
+  [class*="line-clamp"]:not(button):not([role="combobox"]),
+  .home-resource-description,
+  .resource-card__title-link,
+  .resource-card__description,
+  .resource-card__bookmark-note > span,
+  .resource-card__scraped-copy--clamp {
     -webkit-line-clamp: unset !important;
+    line-clamp: unset !important;
     overflow: visible !important;
     display: block !important;
   }
