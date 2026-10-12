@@ -270,28 +270,33 @@ function renderHealthRows(
     aiRow = { label: "Researcher API", detail: "healthy", state: "ok" };
   }
 
+  // Like the link checker, health reflects the queue now: active work, else the
+  // most recent run. Failures already followed by successful runs are history.
   let enrichmentRow: HealthRow;
   const jobs = enrichment.data?.jobs ?? [];
   const activeJobs = jobs.filter((job) => job.status === "pending" || job.status === "processing").length;
-  const failedJobs = jobs.filter((job) => job.status === "failed").length;
+  const jobTime = (job: EnrichmentJob) => dateValue(String(job.createdAt ?? ""))?.getTime() ?? 0;
+  const latestJob = [...jobs].sort((left, right) => jobTime(right) - jobTime(left))[0];
   if (enrichment.isPending) {
     enrichmentRow = { label: "Enrichment queue", detail: "checking…", state: "unknown" };
   } else if (enrichment.isError || enrichment.data?.success === false) {
     enrichmentRow = { label: "Enrichment queue", detail: "unavailable", state: "bad" };
-  } else if (failedJobs) {
-    enrichmentRow = {
-      label: "Enrichment queue",
-      detail: `${failedJobs} failed`,
-      state: "bad",
-    };
   } else if (activeJobs) {
     enrichmentRow = {
       label: "Enrichment queue",
       detail: `${activeJobs} active`,
       state: "warn",
     };
+  } else if (latestJob) {
+    const status = latestJob.status ?? "completed";
+    const finished = String(latestJob.completedAt ?? latestJob.createdAt ?? "");
+    enrichmentRow = {
+      label: "Enrichment queue",
+      detail: `last run ${status === "budget_stopped" ? "stopped at budget" : status} · ${relativeAge(finished)}`,
+      state: status === "failed" ? "bad" : status === "budget_stopped" ? "warn" : "ok",
+    };
   } else {
-    enrichmentRow = { label: "Enrichment queue", detail: "idle", state: "ok" };
+    enrichmentRow = { label: "Enrichment queue", detail: "no runs", state: "ok" };
   }
 
   return [database, github, link, enrichmentRow, aiRow];
