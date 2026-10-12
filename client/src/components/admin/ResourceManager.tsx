@@ -168,6 +168,12 @@ const STATUS_OPTIONS = [
   { value: "pending", label: "Pending", color: "bg-[var(--status-warn)] text-black" }, // DS-OK: status warn
   { value: "rejected", label: "Rejected", color: "bg-[var(--status-bad)] text-black" } // DS-OK: status bad
 ];
+// Withdrawn is set only by the contributor, so admins can filter and see it
+// but the edit/create status pickers keep STATUS_OPTIONS.
+const FILTER_STATUS_OPTIONS = [
+  ...STATUS_OPTIONS,
+  { value: "withdrawn", label: "Withdrawn", color: "bg-[var(--surface-3)] text-[var(--text)]" },
+];
 
 export default function ResourceManager({ createRequest = 0 }: { createRequest?: number }) {
   const { toast } = useToast();
@@ -180,7 +186,12 @@ export default function ResourceManager({ createRequest = 0 }: { createRequest?:
   const [limit, setLimit] = useState(25);
   const [sort, setSort] = useState<"newest" | "oldest" | "name-asc" | "name-desc">("newest");
   const [search, setSearch] = useState("");
-  const [catalogToolsOpen, setCatalogToolsOpen] = useState(false);
+  // A deep-linked non-default status (?status=rejected from the dashboard
+  // stat, or a reload) must be visible, so the filter panel starts open.
+  const [catalogToolsOpen, setCatalogToolsOpen] = useState(() => {
+    const s = new URLSearchParams(window.location.search).get("status");
+    return !!s && s !== "approved";
+  });
   // Audit2 BUG-003: debounce the search text into the query key. Every
   // keystroke used to swap the queryKey immediately; the fresh key had no
   // cached data, `isLoading` went true, and the whole component fell into the
@@ -201,7 +212,7 @@ export default function ResourceManager({ createRequest = 0 }: { createRequest?:
     const s = new URLSearchParams(window.location.search).get("status");
     // C10-V5A-03: "all" is an explicit choice (distinct from the default
     // "approved"), so it survives reload/Back and reads as a real value.
-    return s && (s === "all" || STATUS_OPTIONS.some(o => o.value === s)) ? s : "approved";
+    return s && (s === "all" || FILTER_STATUS_OPTIONS.some(o => o.value === s)) ? s : "approved";
   });
 
   // Task 275: mirror the effective page into ?page= (replaceState, no history
@@ -1003,7 +1014,7 @@ export default function ResourceManager({ createRequest = 0 }: { createRequest?:
   };
 
   const getStatusBadge = (status: string) => {
-    const statusInfo = STATUS_OPTIONS.find(s => s.value === status);
+    const statusInfo = FILTER_STATUS_OPTIONS.find(s => s.value === status);
     return (
       <Badge className={`${statusInfo?.color || 'bg-[var(--surface-3)] text-white'}`}>
         {statusInfo?.label || status}
@@ -1152,7 +1163,7 @@ export default function ResourceManager({ createRequest = 0 }: { createRequest?:
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value="all">All Status</SelectItem>
-                {STATUS_OPTIONS.map(status => (
+                {FILTER_STATUS_OPTIONS.map(status => (
                   <SelectItem key={status.value} value={status.value}>{status.label}</SelectItem>
                 ))}
               </SelectContent>

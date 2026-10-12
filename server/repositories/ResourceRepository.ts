@@ -84,6 +84,8 @@ export interface ListResourceOptions {
   includeFacets?: boolean;
   /** C9-V5A-06: admin lists must show exact full-text matches only, never fuzzy near-misses. */
   exactSearchOnly?: boolean;
+  /** Admin list: a search also matches any resource whose URL contains the raw text. */
+  matchUrlSubstring?: boolean;
   /** R3-H08: whitelisted sort order; unknown/absent falls back to newest-first. */
   sort?: "relevance" | "name-asc" | "name-desc" | "newest" | "oldest";
   /**
@@ -412,6 +414,7 @@ export class ResourceRepository {
       kind,
       includeFacets = false,
       exactSearchOnly = false,
+      matchUrlSubstring = false,
     } = options;
     const offset = options.offset ?? ((page - 1) * limit);
 
@@ -447,9 +450,23 @@ export class ResourceRepository {
       })
       .filter(Boolean)
       .join(" & ");
-    const strictSearchCondition = tsQuery
+    const tsSearchCondition = tsQuery
       ? sql`${resources.searchTsv} @@ to_tsquery('english', ${tsQuery})`
       : undefined;
+    // Full-text tokens drop URL punctuation, so a pasted URL or path only ever
+    // matched its host. The admin list also matches the literal URL text.
+    const rawSearch = (search ?? "").trim();
+    const urlSearchCondition = matchUrlSubstring && rawSearch
+      ? sql`${resources.url} ILIKE ${`%${rawSearch.replace(/[\\%_]/g, (c) => `\\${c}`)}%`} ESCAPE '\\'`
+      : undefined;
+    // A pasted URL or host/path means "find this link": OR-ing the full-text
+    // half back in would return every resource on the same host.
+    const looksLikeUrl = /^(https?:\/\/)?[\w-]+(\.[\w-]+)+\//i.test(rawSearch);
+    const strictSearchCondition = urlSearchCondition && looksLikeUrl
+      ? urlSearchCondition
+      : tsSearchCondition && urlSearchCondition
+        ? sql`(${tsSearchCondition} OR ${urlSearchCondition})`
+        : tsSearchCondition ?? urlSearchCondition;
     const safeMetadataTags = sql`CASE
       WHEN jsonb_typeof(${resources.metadata}->'tags') = 'array'
       THEN ${resources.metadata}->'tags'
@@ -547,7 +564,7 @@ export class ResourceRepository {
           // relevance — exact title match first, then built-in full-text rank.
           // This prevents a prefix match (for example,
           // "ffmpeg-wasm") from outranking a direct "FFmpeg" lookup.
-          if (strictSearchCondition) {
+          if (tsSearchCondition) {
             const q = normalizedSearch.toLowerCase();
             return [
               asc(sql`CASE WHEN lower(${resources.title}) = ${q} THEN 0 ELSE 1 END`),
