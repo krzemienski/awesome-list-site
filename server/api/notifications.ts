@@ -23,8 +23,8 @@ function userIdOf(request: AuthedRequest): string {
 function unsubscribePage(success: boolean): string {
   const title = success ? "Email digests unsubscribed" : "Link unavailable";
   const body = success
-    ? "You will no longer receive Awesome Video email digests. In-app reminders were not changed."
-    : "This unsubscribe link is invalid or expired. You can still change reminder settings after signing in.";
+    ? "You will no longer receive Awesome Video email digests. In-app updates were not changed."
+    : "This unsubscribe link is invalid or expired. You can still turn off email digests in Settings after signing in.";
   return `<!doctype html>
 <html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <meta name="robots" content="noindex"><meta name="color-scheme" content="dark"><title>${title} · Awesome Video</title>
@@ -38,7 +38,7 @@ function unsubscribeConfirmationPage(token: string): string {
 <html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <meta name="robots" content="noindex"><meta name="color-scheme" content="dark"><title>Unsubscribe from email digests · Awesome Video</title>
 <style>:root{color-scheme:dark}body{margin:0;background:#080706;color:#f4f3ee;font:16px/1.6 system-ui,sans-serif}.card{max-width:620px;margin:12vh auto;padding:32px;border:1px solid #37322e;background:#11100e}.eyebrow{color:#ff5266;text-transform:uppercase;letter-spacing:.12em;font-size:12px}h1{font-size:32px;line-height:1.1}button{min-height:44px;margin-top:14px;color:#fff;background:#c92f43;border:0;padding:11px 16px;font:inherit;font-weight:700;cursor:pointer}</style>
-</head><body><main class="card"><p class="eyebrow">Awesome Video</p><h1>Unsubscribe from email digests?</h1><p>This stops email digests only. In-app reminders will not change.</p><form method="post" action="${action}"><button type="submit">Unsubscribe from email digests</button></form></main></body></html>`;
+</head><body><main class="card"><p class="eyebrow">Awesome Video</p><h1>Unsubscribe from email digests?</h1><p>This stops email digests only. In-app updates will not change.</p><form method="post" action="${action}"><button type="submit">Unsubscribe from email digests</button></form></main></body></html>`;
 }
 
 export function registerNotificationRoutes(

@@ -1241,14 +1241,16 @@ export async function unsubscribeDigestToken(rawToken: string): Promise<boolean>
   const tokenHash = crypto.createHash("sha256").update(rawToken).digest("hex");
   return db.transaction(async (transaction) => {
     const now = new Date();
+    // Valid until it expires, not single-use: a mail provider's one-click
+    // POST often consumes the link before the person clicks it in the email
+    // body, and a second click must confirm the opt-out, not call it invalid.
     const [token] = await transaction
       .update(digestUnsubscribeTokens)
-      .set({ usedAt: now })
+      .set({ usedAt: sql`coalesce(${digestUnsubscribeTokens.usedAt}, now())` })
       .where(
         and(
           eq(digestUnsubscribeTokens.tokenHash, tokenHash),
           sql`${digestUnsubscribeTokens.expiresAt} > now()`,
-          isNull(digestUnsubscribeTokens.usedAt),
         ),
       )
       .returning({ userId: digestUnsubscribeTokens.userId });
@@ -1261,7 +1263,12 @@ export async function unsubscribeDigestToken(rawToken: string): Promise<boolean>
         policyVersion: sql`${notificationPreferences.policyVersion} + 1`,
         updatedAt: now,
       })
-      .where(eq(notificationPreferences.userId, token.userId));
+      .where(
+        and(
+          eq(notificationPreferences.userId, token.userId),
+          eq(notificationPreferences.emailDigestEnabled, true),
+        ),
+      );
     await transaction
       .update(digestJobs)
       .set({

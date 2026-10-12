@@ -332,6 +332,10 @@ app.use((req, res, next) => {
   if (req.method === "GET" || req.method === "HEAD" || req.method === "OPTIONS") {
     return next();
   }
+  // RFC 8058 one-click unsubscribe is POSTed by mail clients from their own
+  // origin. The 256-bit token in the path is the only credential (no session
+  // is read), so there is nothing for a forged cross-site request to borrow.
+  if (/^\/unsubscribe\/digest\/[^/]+$/.test(req.path)) return next();
   const fetchSite = req.get("sec-fetch-site")?.toLowerCase();
   if (fetchSite === "cross-site") {
     return res.status(403).json({ message: "Cross-origin request rejected" });

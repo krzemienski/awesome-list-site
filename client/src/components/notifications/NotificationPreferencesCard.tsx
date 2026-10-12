@@ -11,6 +11,13 @@ import { handoffFocusOnUnmount } from "@/hooks/focus-handoff";
 import type { DigestPreview, NotificationPreferencesResponse, NotificationPreferencesUpdate } from "@shared/notifications";
 import { DIGEST_CADENCES, notificationPreferencesUpdateSchema } from "@shared/notifications";
 
+// "Biweekly" reads as twice a week to many people; the digest runs every 14 days.
+const CADENCE_LABELS: Record<(typeof DIGEST_CADENCES)[number], string> = {
+  weekly: "Weekly",
+  biweekly: "Every 2 weeks",
+  monthly: "Monthly",
+};
+
 const localTimezone = () => {
   try {
     return Intl.DateTimeFormat().resolvedOptions().timeZone || "UTC";
@@ -197,7 +204,7 @@ export default function NotificationPreferencesCard() {
               </div>
             </section>
             <div className="grid gap-4 sm:grid-cols-2">
-              <div><Label htmlFor="digest-cadence">Cadence</Label><select id="digest-cadence" value={values.cadence} onChange={(e) => update("cadence", e.target.value as NotificationPreferencesUpdate["cadence"])} className="mt-2 min-h-[44px] w-full rounded-md border border-input bg-[var(--surface)] px-3 text-sm">{DIGEST_CADENCES.map((cadence) => <option key={cadence} value={cadence}>{cadence[0].toUpperCase() + cadence.slice(1)}</option>)}</select></div>
+              <div><Label htmlFor="digest-cadence">Cadence</Label><select id="digest-cadence" value={values.cadence} onChange={(e) => update("cadence", e.target.value as NotificationPreferencesUpdate["cadence"])} className="mt-2 min-h-[44px] w-full rounded-md border border-input bg-[var(--surface)] px-3 text-sm">{DIGEST_CADENCES.map((cadence) => <option key={cadence} value={cadence}>{CADENCE_LABELS[cadence]}</option>)}</select></div>
                <div><Label htmlFor="digest-timezone">Time zone</Label><input id="digest-timezone" value={values.timezone} onChange={(e) => update("timezone", e.target.value)} aria-invalid={timezoneError ? true : undefined} aria-describedby={timezoneError ? "digest-timezone-error" : undefined} className={`mt-2 min-h-[44px] w-full rounded-md border bg-[var(--surface)] px-3 text-sm ${timezoneError ? "border-destructive" : "border-input"}`} />{timezoneError ? <p id="digest-timezone-error" className="mt-1 text-xs text-destructive" role="alert">{timezoneError}</p> : null}</div>
             </div>
             <div className="flex flex-wrap items-center gap-2 border-t border-[var(--border)] pt-4">
