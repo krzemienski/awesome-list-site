@@ -268,7 +268,7 @@ export default function ContactSubmissions() {
               <div className="admin-ops-contact-detail-grid">
                 <div>
                   <div className="text-muted-foreground mb-1">Name</div>
-                  <p data-testid="text-contact-detail-name">{selectedSubmission.name || "—"}</p>
+                  <p className="[overflow-wrap:anywhere]" data-testid="text-contact-detail-name">{selectedSubmission.name || "—"}</p>
                 </div>
                 <div>
                   <div className="text-muted-foreground mb-1">Reply-to</div>
