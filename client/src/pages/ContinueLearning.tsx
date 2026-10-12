@@ -190,7 +190,7 @@ export default function ContinueLearning() {
             <div className="account-empty-icon mb-3 flex h-12 w-12 items-center justify-center">
               <LogIn className="account-accent-icon h-6 w-6" />
             </div>
-            <h1 className="display-h text-2xl">
+            <h1 className="page-title text-2xl">
               Your progress lives with your account
             </h1>
             <CardDescription className="max-w-xl text-base">
@@ -228,7 +228,7 @@ export default function ContinueLearning() {
     return (
       <div className="account-page account-page--form container mx-auto px-4 py-12">
         <SEOHead title="Continue Learning" description="Resume your learning activity on Awesome Video." noindex />
-        <h1 className="display-h mb-4 text-2xl">Continue Learning</h1>
+        <h1 className="page-title mb-4 text-2xl">Continue Learning</h1>
         <Alert variant="destructive" data-testid="continue-learning-error">
           <RefreshCw className="h-4 w-4" />
           <AlertTitle>We couldn't load your learning activity</AlertTitle>
@@ -268,7 +268,7 @@ export default function ContinueLearning() {
         <p className="eyebrow" aria-hidden>
           {"// Learning dashboard"}
         </p>
-        <h1 className="display-h text-3xl sm:text-4xl">Continue Learning</h1>
+        <h1 className="page-title text-3xl sm:text-4xl">Continue Learning</h1>
         <p className="text-base text-muted-foreground sm:text-lg">
           Pick up from your exact next step, revisit recent resources, and see
           what you've completed—all from the progress you already made.

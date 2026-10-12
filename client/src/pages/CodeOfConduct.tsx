@@ -19,7 +19,7 @@ export default function CodeOfConduct() {
         description="The standards of behavior we expect from everyone who participates in Awesome Video — a free, community-curated directory of video development resources."
       />
       <div className="legal-header">
-        <h1 className="display-h legal-title text-2xl sm:text-3xl flex items-center gap-2" data-testid="heading-code-of-conduct">
+        <h1 className="page-title legal-title text-2xl sm:text-3xl flex items-center gap-2" data-testid="heading-code-of-conduct">
           <HeartHandshake className="h-6 w-6 text-[var(--accent-ink)]" />
           Code of Conduct
         </h1>

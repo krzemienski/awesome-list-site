@@ -57,7 +57,7 @@ export default function Recommendations() {
       <header className="discovery-tools-masthead discovery-tools-recommendations-masthead">
         <div className="discovery-tools-title-row">
           <Sparkles className="discovery-tools-masthead-icon" aria-hidden="true" />
-          <h1 className="display-h discovery-tools-page-title">
+          <h1 className="page-title discovery-tools-page-title">
             {isAuthenticated ? "Personalized Recommendations" : "Recommended Resources"}
           </h1>
         </div>

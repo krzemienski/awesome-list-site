@@ -151,7 +151,7 @@ export default function Advanced() {
       <div className="discovery-tools-masthead">
         <div className="discovery-tools-title-row">
           <Sparkles className="discovery-tools-masthead-icon" aria-hidden="true" />
-          <h1 className="display-h discovery-tools-page-title">Advanced Features</h1>
+          <h1 className="page-title discovery-tools-page-title">Advanced Features</h1>
         </div>
         <p className="discovery-tools-page-lede">
           Discover powerful tools for exploring, analyzing, and sharing awesome list data

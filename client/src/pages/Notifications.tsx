@@ -45,7 +45,7 @@ export default function Notifications() {
           <p className="eyebrow flex items-center gap-2">
             <span aria-hidden="true">──</span> Personal inbox
           </p>
-          <h1 className="display-h mt-2 flex items-center gap-3 text-3xl">
+          <h1 className="page-title mt-2 flex items-center gap-3 text-3xl">
             <Bell className="account-accent-icon h-7 w-7" />
             Notifications
           </h1>

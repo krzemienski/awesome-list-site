@@ -206,7 +206,7 @@ export default function DesignSystemShowcase() {
         </Link>
         <div className="flex items-center gap-3">
           <Shapes className="h-6 w-6 text-[var(--accent-ink)]" />
-          <h1 className="display-h text-3xl" data-testid="text-ds-title">Design System</h1>
+          <h1 className="page-title text-3xl" data-testid="text-ds-title">Design System</h1>
         </div>
         <p className="text-sm sm:text-base text-[color:var(--text-2)] mt-2 max-w-3xl">
           The living anatomy of the runtime design system: five visual languages × ten accents

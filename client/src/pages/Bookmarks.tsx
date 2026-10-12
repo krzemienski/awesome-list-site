@@ -443,7 +443,7 @@ export default function Bookmarks() {
           <div>
             <div className="flex items-center gap-3">
               <Bookmark className="h-8 w-8 text-primary" aria-hidden="true" />
-              <h1 className="display-h text-3xl sm:text-4xl">
+              <h1 className="page-title text-3xl sm:text-4xl">
                 Saved, then <em className="not-italic text-primary">finished.</em>
               </h1>
             </div>

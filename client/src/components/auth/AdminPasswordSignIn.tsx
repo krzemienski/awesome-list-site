@@ -49,7 +49,7 @@ export function AdminPasswordSignIn() {
       className="flex w-full max-w-sm flex-col gap-4 px-4"
       data-testid="form-admin-password"
     >
-      <h1 className="display-h text-xl">Admin sign-in</h1>
+      <h1 className="page-title text-xl">Admin sign-in</h1>
       <div className="flex flex-col gap-2">
         <Label htmlFor="admin-password">Password</Label>
         <Input

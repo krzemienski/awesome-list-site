@@ -128,7 +128,7 @@ export default function ThemeSettings() {
         </Link>
         {/* docs/11 page head: eyebrow, display heading, lede. */}
         <div className="eyebrow theme-page__eyebrow">── Settings · Theme</div>
-        <h1 className="display-h theme-page__title">Theme Settings</h1>
+        <h1 className="page-title theme-page__title">Theme Settings</h1>
         <p className="theme-page__lede">
           Pick a design system, accent, and (optionally) override the font. Changes apply instantly and persist across reloads.{" "}
           <span role="status" aria-live="polite" aria-atomic="true" className="theme-page__status" data-testid="text-active-preset">

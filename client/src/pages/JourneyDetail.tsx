@@ -526,7 +526,7 @@ export default function JourneyDetail() {
               )}
             </div>
           </div>
-          <h1 className="display-h journey-detail-card__title">{journey.title}</h1>
+          <h1 className="page-title journey-detail-card__title">{journey.title}</h1>
           <CardDescription className="journey-detail-card__description">{journey.description}</CardDescription>
         </CardHeader>
 

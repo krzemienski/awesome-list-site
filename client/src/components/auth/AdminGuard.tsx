@@ -35,7 +35,7 @@ export default function AdminGuard({ children }: AdminGuardProps) {
     return (
       <div className="container mx-auto px-4 py-8 max-w-2xl">
         <SEOHead title="Admin Dashboard" noindex />
-        <h1 className="display-h text-2xl sm:text-3xl text-[var(--text)] mb-4 flex items-center gap-2">
+        <h1 className="page-title text-2xl sm:text-3xl text-[var(--text)] mb-4 flex items-center gap-2">
           <Shield className="h-6 w-6 text-[var(--accent-ink)]" />
           Admin Dashboard
         </h1>

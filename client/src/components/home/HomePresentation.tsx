@@ -572,7 +572,7 @@ function CuratedLayout({
   return (
     <>
       <div className="home-hero">
-        <h1 className="display-h home-hero-title">
+        <h1 className="page-title home-hero-title">
           Awesome <span className="serif-italic">video</span> resources
         </h1>
         <p className="home-hero-lede">

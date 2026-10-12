@@ -108,7 +108,7 @@ export default function About() {
           <BookOpen className="about-eyebrow-icon" aria-hidden="true" />
           ABOUT THIS PROJECT
         </div>
-        <h1 className="display-h about-title">
+        <h1 className="page-title about-title">
           A field journal for{" "}
           <span className="serif-italic about-title-accent">video engineers</span>
         </h1>

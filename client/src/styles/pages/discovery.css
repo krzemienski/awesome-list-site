@@ -15,11 +15,7 @@
 }
 
 .discovery-title {
-  font-family: var(--font-display);
   font-size: clamp(28px, 3.5vw, 40px);
-  font-weight: var(--display-weight);
-  line-height: var(--display-leading);
-  letter-spacing: var(--display-tracking);
   overflow-wrap: anywhere;
 }
 

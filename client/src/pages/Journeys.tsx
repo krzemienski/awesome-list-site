@@ -256,7 +256,7 @@ export default function Journeys() {
           <BookOpen className="journeys-page__eyebrow-icon" aria-hidden />
           Discovery · Learning paths
         </span>
-        <h1 className="display-h journeys-page__title">
+        <h1 className="page-title journeys-page__title">
           Learning Journeys
         </h1>
         <p className="journeys-page__lede">

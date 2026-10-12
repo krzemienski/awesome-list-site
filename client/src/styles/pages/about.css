@@ -40,11 +40,7 @@
 
 .about-title {
   margin: 0 0 18px;
-  font-family: var(--font-display);
   font-size: clamp(32px, 4.5vw, 48px);
-  font-weight: var(--display-weight);
-  letter-spacing: var(--display-tracking);
-  line-height: var(--display-leading);
 }
 
 .about-shimmer-line {

@@ -405,7 +405,7 @@ export default function Profile({ user }: ProfileProps) {
             viewport so a long name truncates there too. */}
         <div className="flex-1 min-w-0 w-full sm:w-auto text-center sm:text-left">
           <div className="eyebrow mb-2" aria-hidden>{"// Profile"}</div>
-          <h1 className="display-h text-3xl sm:text-4xl mb-2 flex items-center gap-2 justify-center sm:justify-start min-w-0">
+          <h1 className="page-title text-3xl sm:text-4xl mb-2 flex items-center gap-2 justify-center sm:justify-start min-w-0">
             {/* Run17 BUG-012: truncate — CSS defense for names at the 50-char cap */}
             <span className="truncate">{user.name || "User"}</span>
             <Button

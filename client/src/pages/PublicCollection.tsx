@@ -95,7 +95,7 @@ export default function PublicCollection({ shareId }: { shareId: string }) {
         <div className="mt-2 flex items-start gap-3">
           <BookOpen className="h-8 w-8 shrink-0 text-primary" aria-hidden="true" />
           <div className="min-w-0">
-            <h1 className="display-h discovery-title">{data.name}</h1>
+            <h1 className="page-title discovery-title">{data.name}</h1>
             {/* Task #379 (uxv1-06): unbounded prose ran the full page width on wide
                 desktop screens; max-w-prose holds it to a readable measure. */}
             <p className="mt-2 max-w-prose text-muted-foreground">{description}</p>

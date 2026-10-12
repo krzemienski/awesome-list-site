@@ -180,6 +180,16 @@ body { height: auto; min-height: 100%; }
 .btn.auth-edge.auth-edge:not(:hover) { box-shadow: none; }
 .btn.primary.auth-edge::after { display: none; }
 
+/* Page titles: the reference sets every page h1 in the body face at 700
+   (pages.jsx, admin.jsx, home-layouts.jsx); the display face is kept for the
+   wordmark, numerals, state-panel titles and serif-italic accent words. */
+.page-title {
+  font-family: var(--font-body);
+  font-weight: 700;
+  letter-spacing: -0.027em;
+  line-height: 1.1;
+}
+
 /* ============== ACCESSIBILITY & STATE ============== */
 .skip-link {
   position: absolute;

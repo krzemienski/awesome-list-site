@@ -249,7 +249,7 @@ export default function Settings() {
           <ArrowLeft className="h-4 w-4" />
           Back
         </Link>
-        <h1 className="display-h text-2xl">Settings</h1>
+        <h1 className="page-title text-2xl">Settings</h1>
         <p className="text-sm sm:text-base text-[color:var(--text-2)] mt-2">
           Manage your preferences and account. Pick a section below.
         </p>

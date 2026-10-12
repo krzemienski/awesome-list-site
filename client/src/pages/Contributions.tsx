@@ -615,7 +615,7 @@ export default function Contributions() {
         <div className="eyebrow mb-3">{"// Contributor dashboard"}</div>
         <div className="flex flex-col gap-5 sm:flex-row sm:items-end sm:justify-between">
           <div className="max-w-2xl">
-            <h1 className="display-h text-3xl sm:text-4xl">
+            <h1 className="page-title text-3xl sm:text-4xl">
               Your contributions
             </h1>
             <p className="mt-3 text-sm leading-6 text-muted-foreground sm:text-base">

@@ -187,7 +187,7 @@ export default function TagLanding() {
       {/* Task #379 (uxv2-14): the tag total was stated three times — subtitle,
           badge, and the results heading. It is now stated once, in the results
           heading below. */}
-      <h1 className="display-h discovery-title discovery-header">{name}</h1>
+      <h1 className="page-title discovery-title discovery-header">{name}</h1>
       <section aria-labelledby="tag-scope-heading" data-seo-section="tag-intro">
         <h2 id="tag-scope-heading" className="eyebrow discovery-section-title">About this collection</h2>
         {/* Task #379 (uxv1-06): max-w-prose (65ch) instead of max-w-3xl (~105ch

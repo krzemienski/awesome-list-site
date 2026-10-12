@@ -333,7 +333,7 @@ export default function Onboarding() {
           <h1
             ref={headingRef}
             tabIndex={-1}
-            className="display-h mt-6 text-3xl outline-none"
+            className="page-title mt-6 text-3xl outline-none"
           >
             Your learning profile is ready
           </h1>
@@ -374,7 +374,7 @@ export default function Onboarding() {
           <h1
             ref={headingRef}
             tabIndex={-1}
-            className="display-h mt-1 text-2xl outline-none sm:text-3xl"
+            className="page-title mt-1 text-2xl outline-none sm:text-3xl"
           >
             {activeStep.title}
           </h1>

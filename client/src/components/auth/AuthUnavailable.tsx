@@ -39,7 +39,7 @@ export function AuthUnavailableCard({
       role="alert"
       data-testid="auth-unavailable"
     >
-      <h1 className="display-h text-xl">{title}</h1>
+      <h1 className="page-title text-xl">{title}</h1>
       <p className="text-sm text-muted-foreground">{body}</p>
       {stillOffline && (
         <p className="text-sm font-medium text-[var(--accent-ink)]" data-testid="text-still-offline">

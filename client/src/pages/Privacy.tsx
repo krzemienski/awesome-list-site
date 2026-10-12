@@ -18,7 +18,7 @@ export default function Privacy() {
         description="How Awesome Video handles your data: what we collect, how it's used, and the analytics choices you control."
       />
       <div className="legal-header">
-        <h1 className="display-h legal-title text-2xl sm:text-3xl flex items-center gap-2" data-testid="heading-privacy">
+        <h1 className="page-title legal-title text-2xl sm:text-3xl flex items-center gap-2" data-testid="heading-privacy">
           <Shield className="h-6 w-6 text-[var(--accent-ink)]" />
           Privacy Policy
         </h1>

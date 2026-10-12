@@ -18,7 +18,7 @@ export default function Terms() {
         description="The terms that govern your use of Awesome Video — a free, community-curated directory of video development resources."
       />
       <div className="legal-header">
-        <h1 className="display-h legal-title text-2xl sm:text-3xl flex items-center gap-2" data-testid="heading-terms">
+        <h1 className="page-title legal-title text-2xl sm:text-3xl flex items-center gap-2" data-testid="heading-terms">
           <FileText className="h-6 w-6 text-[var(--accent-ink)]" />
           Terms of Use
         </h1>

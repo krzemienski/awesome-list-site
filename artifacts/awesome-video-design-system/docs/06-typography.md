@@ -20,6 +20,19 @@ The boundary between display and body sits at **28px**. Anything ≥28px is
 display family; anything smaller is body. (Exception: editorial italic
 accents in body copy.)
 
+**Page titles are the other exception.** The reference app sets every page
+`h1` (category, subcategory, resource, submit, about, admin, home hero) in
+the body face at weight 700, tracking about `-0.027em`, leading 1.1, and
+reserves the display face for serif-italic accent words inside it (the live
+site's `.page-title` helper in `client/src/styles/app-bridge.css`):
+
+```html
+<h1 class="page-title">A field journal for <span class="serif-italic">video engineers</span></h1>
+```
+
+The display face stays on the wordmark, large numerals and state-panel
+titles.
+
 ## Per-system stacks
 
 | System | Display | Body | Mono |
