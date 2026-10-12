@@ -50,6 +50,12 @@ interface JourneyStep {
   description: string | null;
   resourceId: number | null;
   isOptional: boolean | null;
+  resource?: { id: number; title: string } | null;
+}
+
+/** Linked resources are named by title; the bare id only when it is gone. */
+function resourceLabel(row: JourneyStep): string {
+  return row.resource?.title ?? `resource #${row.resourceId}`;
 }
 
 interface AdminJourney {
@@ -611,19 +617,20 @@ function StepsDialog({
                         {linkedRows.length} linked resource{linkedRows.length !== 1 ? "s" : ""}:
                       </span>
                       {linkedRows.map((row) => (
-                        <Badge key={row.id} variant="outline" className="gap-1">
+                        <Badge key={row.id} variant="outline" className="gap-1 min-w-0 max-w-full">
                           {/* C5-V5B-01: the chip carried a link icon but was
                               plain text; it now opens the linked resource. */}
                           <a
                             href={`/resource/${row.resourceId}`}
                             target="_blank"
                             rel="noopener noreferrer"
-                            className="inline-flex min-h-[32px] items-center gap-1 underline-offset-2 hover:underline"
-                            aria-label={`Open resource #${row.resourceId} in a new tab`}
+                            className="inline-flex min-h-[32px] min-w-0 items-center gap-1 underline-offset-2 hover:underline"
+                            title={`${resourceLabel(row)} (#${row.resourceId})`}
+                            aria-label={`Open ${resourceLabel(row)} in a new tab`}
                             data-testid={`step-resource-link-${row.id}`}
                           >
-                            <ExternalLink className="h-3 w-3" aria-hidden="true" />
-                            #{row.resourceId}
+                            <ExternalLink className="h-3 w-3 shrink-0" aria-hidden="true" />
+                            <span className="min-w-0 max-w-[16rem] truncate">{resourceLabel(row)}</span>
                           </a>
                           {group.rows.length > 1 && (
                             <Button
@@ -631,8 +638,8 @@ function StepsDialog({
                               variant="ghost"
                               size="icon"
                               onClick={() => setRemovingRow(row)}
-                              className="h-8 w-8 min-h-[32px] min-w-[32px] -my-1 hover:opacity-80"
-                              aria-label={`Remove resource #${row.resourceId} from this step`}
+                              className="h-8 w-8 min-h-[32px] min-w-[32px] shrink-0 -my-1 hover:opacity-80"
+                              aria-label={`Remove ${resourceLabel(row)} from this step`}
                               data-testid={`step-remove-resource-${row.id}`}
                             >
                               <X className="h-3 w-3" />
@@ -745,7 +752,7 @@ function StepsDialog({
             <AlertDialogHeader>
               <AlertDialogTitle>Remove this resource?</AlertDialogTitle>
               <AlertDialogDescription>
-                Resource #{removingRow?.resourceId} will be unlinked from
+                "{removingRow ? resourceLabel(removingRow) : ""}" will be unlinked from
                 "{removingRow?.title}". The step itself stays.
               </AlertDialogDescription>
             </AlertDialogHeader>

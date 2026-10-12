@@ -43,6 +43,7 @@ import {
 import { DEFAULT_LEARNING_PREFERENCES } from "@shared/onboarding";
 import { isForeignKeyViolation } from "../../errors/pgErrors";
 import { asyncHandler } from "../../middleware/asyncHandler";
+import { buildValidationEnvelope } from "../../contracts/envelope";
 
 // ---------------------------------------------------------------------------
 // Journeys registrar
@@ -368,7 +369,7 @@ export function registerJourneyRoutes(
       }
       const parsed = insertLearningJourneySchema.partial().safeParse(req.body);
       if (!parsed.success) {
-        return res.status(400).json({ message: 'Invalid journey update', errors: parsed.error.issues });
+        return res.status(400).json(buildValidationEnvelope(parsed.error, parsed.error.issues[0]?.message ?? 'Invalid journey update'));
       }
       if (Object.keys(parsed.data).length === 0) {
         return res.status(400).json({ message: 'Empty update: provide at least one updatable field' });
@@ -442,7 +443,7 @@ export function registerJourneyRoutes(
       res.status(201).json(step);
     } catch (error) {
       if (error instanceof z.ZodError) {
-        return res.status(400).json({ message: 'Invalid step data', errors: error.issues });
+        return res.status(400).json(buildValidationEnvelope(error, error.issues[0]?.message ?? 'Invalid step data'));
       }
       console.error('Error creating journey step:', error);
       if (isForeignKeyViolation(error) || (error as any)?.code === 'INVALID_STEP_RESOURCE') {
@@ -490,7 +491,7 @@ export function registerJourneyRoutes(
         res.json(updated);
       } catch (error) {
         if (error instanceof z.ZodError) {
-          return res.status(400).json({ message: 'Invalid step data', errors: error.issues });
+          return res.status(400).json(buildValidationEnvelope(error, error.issues[0]?.message ?? 'Invalid step data'));
         }
         console.error('Error updating journey step:', error);
         if (isForeignKeyViolation(error) || (error as any)?.code === 'INVALID_STEP_RESOURCE') {
@@ -594,7 +595,7 @@ export function registerJourneyRoutes(
         res.json({ steps });
       } catch (error) {
         if (error instanceof z.ZodError) {
-          return res.status(400).json({ message: 'Invalid reorder payload', errors: error.issues });
+          return res.status(400).json(buildValidationEnvelope(error, error.issues[0]?.message ?? 'Invalid reorder payload'));
         }
         console.error('Error reordering journey steps:', error);
         res.status(500).json({ message: 'Failed to reorder journey steps' });
