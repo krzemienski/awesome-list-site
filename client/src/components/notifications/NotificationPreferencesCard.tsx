@@ -1,5 +1,6 @@
 import { useLayoutEffect, useMemo, useState } from "react";
 import { useMutation, useQuery } from "@tanstack/react-query";
+import { Link } from "wouter";
 import { Bell, Check, Clock3, Eye, Info, Mail, Pause, Play, ShieldCheck } from "lucide-react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -8,6 +9,13 @@ import { Separator } from "@/components/ui/separator";
 import { apiRequest, queryClient } from "@/lib/queryClient";
 import { queryUnavailableReason } from "@/lib/query-availability";
 import { handoffFocusOnUnmount } from "@/hooks/focus-handoff";
+import {
+  trackDigestPreviewItemOpened,
+  trackNotificationPreferenceChanges,
+  trackNotificationsPaused,
+  trackNotificationsResumed,
+  trackNotificationsUnsubscribedAll,
+} from "@/lib/analytics-notifications";
 import type { DigestPreview, NotificationPreferencesResponse, NotificationPreferencesUpdate } from "@shared/notifications";
 import { DIGEST_CADENCES, notificationPreferencesUpdateSchema } from "@shared/notifications";
 
@@ -36,6 +44,24 @@ const defaults = (): NotificationPreferencesUpdate => ({
   timezone: localTimezone(),
   pausedUntil: null,
 });
+
+const PAUSE_DAYS = 7;
+
+// What a save was for, plus the last server-confirmed preferences it replaces,
+// so analytics compares server state to server state (never unsaved edits).
+type SaveAction = "save" | "pause" | "resume" | "unsubscribe_all";
+interface SaveRequest { body: NotificationPreferencesUpdate; action: SaveAction; previous: NotificationPreferencesUpdate | null }
+
+function trackConfirmedSave({ action, previous }: SaveRequest, saved: NotificationPreferencesResponse) {
+  if (action === "pause") trackNotificationsPaused(PAUSE_DAYS);
+  else if (action === "resume") trackNotificationsResumed();
+  else if (action === "unsubscribe_all") {
+    trackNotificationsUnsubscribedAll({
+      emailDigest: Boolean(previous?.emailDigestEnabled) && !saved.emailDigestEnabled,
+      inApp: Boolean(previous?.inAppEnabled) && !saved.inAppEnabled,
+    });
+  } else trackNotificationPreferenceChanges(previous, saved);
+}
 
 function Toggle({ checked, onChange, label, description, icon: Icon }: { checked: boolean; onChange: (value: boolean) => void; label: string; description: string; icon: typeof Mail }) {
   return (
@@ -101,9 +127,10 @@ export default function NotificationPreferencesCard() {
 
   const unavailable = queryUnavailableReason(preferencesQuery);
   const saveMutation = useMutation({
-    mutationFn: (body: NotificationPreferencesUpdate) =>
+    mutationFn: ({ body }: SaveRequest) =>
       apiRequest("/api/notification-preferences", { method: "PUT", body: JSON.stringify(body) }),
-    onSuccess: (data: NotificationPreferencesResponse) => {
+    onSuccess: (data: NotificationPreferencesResponse, request: SaveRequest) => {
+      trackConfirmedSave(request, data);
       queryClient.setQueryData(["/api/notification-preferences"], data);
       void queryClient.invalidateQueries({ queryKey: ["/api/notification-preferences"] });
       void queryClient.invalidateQueries({ queryKey: ["/api/digests/preview"] });
@@ -116,7 +143,7 @@ export default function NotificationPreferencesCard() {
   });
 
   const previewItems = useMemo(() => (previewQuery.data?.sections ?? []).flatMap((section) =>
-    section.items.map((item) => ({ ...item, sectionTitle: section.title }))), [previewQuery.data]);
+    section.items.map((item) => ({ ...item, sectionTitle: section.title, sectionKey: section.key }))), [previewQuery.data]);
   const paused = Boolean(values.pausedUntil && new Date(values.pausedUntil).getTime() > Date.now());
   const update = <K extends keyof NotificationPreferencesUpdate>(key: K, value: NotificationPreferencesUpdate[K]) => {
     setSavedMessage(null);
@@ -124,7 +151,7 @@ export default function NotificationPreferencesCard() {
     if (key === "timezone") setTimezoneError(null);
     setValues((current) => ({ ...current, [key]: value }));
   };
-  const saveValues = (nextValues: NotificationPreferencesUpdate, message: string, onSaved?: () => void) => {
+  const saveValues = (nextValues: NotificationPreferencesUpdate, action: SaveAction, message: string, onSaved?: () => void) => {
     if (!isValidTimezone(nextValues.timezone)) {
       setSavedMessage(null);
       setRequestError(null);
@@ -139,29 +166,29 @@ export default function NotificationPreferencesCard() {
       return;
     }
     setRequestError(null);
-    saveMutation.mutate(parsed.data, {
+    saveMutation.mutate({ body: parsed.data, action, previous: savedValues }, {
       onSuccess: () => {
         setSavedMessage(message);
         onSaved?.();
       },
     });
   };
-  const save = () => !saveMutation.isPending && saveValues(values, "Your choices are saved.", () => setDirty(false));
+  const save = () => !saveMutation.isPending && saveValues(values, "save", "Your choices are saved.", () => setDirty(false));
   // Quick actions change only their own fields: they save on top of the last
   // saved state, and mirror the change into the form without committing
   // anything else the person has edited but not saved. The confirmation says
   // only what the action saved, so it never vouches for pending edits.
-  const saveQuickAction = (patch: Partial<NotificationPreferencesUpdate>, done: string) => {
+  const saveQuickAction = (action: SaveAction, patch: Partial<NotificationPreferencesUpdate>, done: string) => {
     if (saveMutation.isPending) return; // aria-disabled buttons stay clickable
     setValues((current) => ({ ...current, ...patch }));
     const message = dirty ? `${done} Your other changes aren't saved yet — use Save choices.` : done;
-    saveValues({ ...(savedValues ?? values), ...patch }, message);
+    saveValues({ ...(savedValues ?? values), ...patch }, action, message);
   };
-  const pause = () => saveQuickAction({ pausedUntil: new Date(Date.now() + 7 * 86400000).toISOString() }, "Notifications paused.");
-  const resume = () => saveQuickAction({ pausedUntil: null }, "Notifications resumed.");
+  const pause = () => saveQuickAction("pause", { pausedUntil: new Date(Date.now() + PAUSE_DAYS * 86400000).toISOString() }, "Notifications paused.");
+  const resume = () => saveQuickAction("resume", { pausedUntil: null }, "Notifications resumed.");
   const unsubscribeAll = () => {
     if (!values.emailDigestEnabled && !values.inAppEnabled) return; // aria-disabled: nothing to turn off
-    saveQuickAction({ emailDigestEnabled: false, inAppEnabled: false }, "Email and in-app updates are off.");
+    saveQuickAction("unsubscribe_all", { emailDigestEnabled: false, inAppEnabled: false }, "Email and in-app updates are off.");
   };
 
   return (
@@ -219,7 +246,7 @@ export default function NotificationPreferencesCard() {
             <Separator />
             <section aria-labelledby="digest-preview">
               <div className="flex items-start justify-between gap-3"><div><h3 id="digest-preview" className="flex items-center gap-2 text-sm font-semibold"><Eye className="h-4 w-4 text-[var(--accent-ink)]" />Preview</h3><p className="mt-1 text-xs text-[color:var(--text-2)]">This uses the same rules as delivery.</p></div>{previewQuery.data ? <span className="font-mono text-xs text-[color:var(--text-2)]">{previewQuery.data.itemCount} {previewQuery.data.itemCount === 1 ? "item" : "items"}</span> : null}</div>
-              {previewQuery.isLoading ? <div className="mt-3 space-y-2"><div className="skeleton h-12 w-full" /><div className="skeleton h-12 w-full" /></div> : previewQuery.isError ? <p className="mt-3 text-sm text-destructive" role="alert">Preview is unavailable right now. Your choices have not changed.</p> : previewItems.length === 0 ? <div className="mt-3 border border-dashed border-[var(--border-strong)] p-4 text-sm text-[color:var(--text-2)]"><Info className="mb-2 h-4 w-4 text-[var(--accent-ink)]" /><p>No saved content matches these rules yet. When there is something to share, it will appear here.</p></div> : <div className="mt-3 space-y-2">{previewItems.map((item, index) => <a key={`${item.href}-${index}`} href={item.href} className="block border-l-2 border-[var(--accent)] bg-[var(--surface-2)] px-3 py-2 transition-colors hover:bg-[var(--surface-3)]"><span className="font-mono text-[10px] uppercase tracking-[0.12em] text-[var(--accent-ink)]">{item.sectionTitle}</span><span className="mt-1 block text-sm font-semibold">{item.title}</span><span className="mt-0.5 block text-xs text-[color:var(--text-2)]">{item.description}</span></a>)}</div>}
+              {previewQuery.isLoading ? <div className="mt-3 space-y-2"><div className="skeleton h-12 w-full" /><div className="skeleton h-12 w-full" /></div> : previewQuery.isError ? <p className="mt-3 text-sm text-destructive" role="alert">Preview is unavailable right now. Your choices have not changed.</p> : previewItems.length === 0 ? <div className="mt-3 border border-dashed border-[var(--border-strong)] p-4 text-sm text-[color:var(--text-2)]"><Info className="mb-2 h-4 w-4 text-[var(--accent-ink)]" /><p>No saved content matches these rules yet. When there is something to share, it will appear here.</p></div> : <div className="mt-3 space-y-2">{previewItems.map((item, index) => <Link key={`${item.href}-${index}`} href={item.href} onClick={() => trackDigestPreviewItemOpened({ kind: item.kind, sectionKey: item.sectionKey, position: index + 1 })} className="block border-l-2 border-[var(--accent)] bg-[var(--surface-2)] px-3 py-2 transition-colors hover:bg-[var(--surface-3)]"><span className="font-mono text-[10px] uppercase tracking-[0.12em] text-[var(--accent-ink)]">{item.sectionTitle}</span><span className="mt-1 block text-sm font-semibold">{item.title}</span><span className="mt-0.5 block text-xs text-[color:var(--text-2)]">{item.description}</span></Link>)}</div>}
             </section>
           </>
         )}

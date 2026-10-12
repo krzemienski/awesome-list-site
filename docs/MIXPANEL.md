@@ -79,6 +79,12 @@ no PII (enforced by the shared sender's property hygiene).
 | `onboarding_step_viewed` / `onboarding_step_completed` / `onboarding_navigated_back` | Onboarding step shown / saved with Continue / Back | `step_number`, `step_name`, `total_steps` (back adds `to_step_number`) | `lib/analytics-recommendations.ts` ← `Onboarding` |
 | `onboarding_skipped` | "Save and browse later" saved | `step_number`, `step_name`, `total_steps`, `answer_count`, `already_completed` | `lib/analytics-recommendations.ts` ← `Onboarding` |
 | `onboarding_completed` | Final save confirmed | `answer_count`, choice values (`skill_level`, `time_commitment`, `topics`, `learning_goals`, `resource_formats`, `topic_count`), `already_completed` | `lib/analytics-recommendations.ts` ← `Onboarding` |
+| `notification_preference_changed` | "Save choices" server-confirmed; one event per changed setting | `setting`, `value` (`on`/`off` or cadence; none for `timezone`) | `NotificationPreferencesCard` → `lib/analytics-notifications.ts` |
+| `notifications_paused` / `notifications_resumed` / `notifications_unsubscribed_all` | Preferences quick action server-confirmed | paused: `pause_days`; unsubscribe: `digest_turned_off`, `in_app_turned_off` | `NotificationPreferencesCard` |
+| `notification_opened` | Inbox notification link followed | `notification_id`, `notification_kind`, `was_unread` (never its text) | `Notifications` |
+| `notification_marked_read` / `notifications_marked_all_read` | Read state server-confirmed | `notification_id`, `notification_kind`, `read_via` / `marked_count` | `Notifications` |
+| `digest_preview_item_opened` | Settings digest preview item clicked | `notification_kind`, `digest_section`, `item_position` | `NotificationPreferencesCard` |
+| `learning_preferences_saved` / `learning_preferences_reset` | Settings learning preferences saved / reset (server-confirmed; values never sent) | `surface`, saved: `first_save` | `Settings` |
 | `command_palette_opened` | Search palette opens (closed → open) | `open_method` | `MainLayout` |
 | `export_started` / `export_downloaded` | Export begun / file download triggered | `export_format`, `export_scope`, `category_count`, `resource_count` | `export-tools` |
 | `api_key_created` / `api_key_copied` / `api_key_revoked` | API key created (server-confirmed) / secret copied / revoked (server-confirmed) — never the key | `expiry_option` / `copy_method` / — | `ApiKeysCard` |
@@ -131,7 +137,8 @@ audiences, undercounting client-only conversions. The fix (Task #233):
 ## Adding a new event
 
 1. Follow `ANALYTICS.md` → "Tracking plan → Adding an event": catalog row +
-   typed helper in `lib/analytics.ts` calling `track()` (never `mpTrack()`
+   typed helper in `lib/analytics.ts` (or an area module such as
+   `lib/analytics-notifications.ts`) calling `track()` (never `mpTrack()`
    directly), fired at the **server-confirmed** success point.
 2. Add it to the table above if it matters for Mixpanel reports.
 3. Add a Lexicon description in Mixpanel (Data Management → Lexicon).

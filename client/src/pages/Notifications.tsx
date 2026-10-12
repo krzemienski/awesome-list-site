@@ -8,10 +8,12 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { queryUnavailableReason } from "@/lib/query-availability";
 import { apiRequest, queryClient } from "@/lib/queryClient";
+import { trackNotificationMarkedRead, trackNotificationOpened, trackNotificationsMarkedAllRead } from "@/lib/analytics-notifications";
 import "@/styles/pages/account.css";
 
 type Notification = { id: number | string; kind: string; title: string; description: string; href: string; readAt: string | null; createdAt: string };
 type NotificationResponse = { notifications: Notification[]; unreadCount: number };
+interface ReadRequest { id: Notification["id"]; kind: string; readVia: "opened" | "button" }
 
 const kindLabel: Record<string, string> = { new_resource: "New resource", watch_next: "Watch next", journey_step: "Journey step" };
 const actionLabel: Record<string, string> = { new_resource: "View resource", watch_next: "Open in bookmarks", journey_step: "Continue journey" };
@@ -20,15 +22,18 @@ const formatDate = (value: string) => new Intl.DateTimeFormat(undefined, { dateS
 export default function Notifications() {
   const query = useQuery<NotificationResponse>({ queryKey: ["/api/notifications?limit=50"] });
   const readMutation = useMutation({
-    mutationFn: (id: Notification["id"]) => apiRequest(`/api/notifications/${id}/read`, { method: "PATCH" }),
-    onSuccess: (data: { id: Notification["id"]; read: boolean }) => {
+    mutationFn: ({ id }: ReadRequest) => apiRequest(`/api/notifications/${id}/read`, { method: "PATCH" }),
+    // Mutation-level callbacks still run after an "open" navigates away.
+    onSuccess: (data: { id: Notification["id"]; read: boolean }, request: ReadRequest) => {
+      trackNotificationMarkedRead(request);
       queryClient.setQueryData<NotificationResponse>(["/api/notifications?limit=50"], (old) => old ? { ...old, unreadCount: Math.max(0, old.unreadCount - (old.notifications.find((n) => n.id === data.id && !n.readAt) ? 1 : 0)), notifications: old.notifications.map((n) => n.id === data.id ? { ...n, readAt: new Date().toISOString() } : n) } : old);
       void queryClient.invalidateQueries({ queryKey: ["/api/notifications?limit=50"] });
     },
   });
   const allMutation = useMutation({
     mutationFn: () => apiRequest("/api/notifications/read-all", { method: "POST" }),
-    onSuccess: () => {
+    onSuccess: (data: { updated: number }) => {
+      trackNotificationsMarkedAllRead(data.updated);
       queryClient.setQueryData<NotificationResponse>(["/api/notifications?limit=50"], (old) => old ? { ...old, unreadCount: 0, notifications: old.notifications.map((n) => ({ ...n, readAt: n.readAt ?? new Date().toISOString() })) } : old);
       void queryClient.invalidateQueries({ queryKey: ["/api/notifications?limit=50"] });
     },
@@ -150,8 +155,9 @@ export default function Notifications() {
                           href={notification.href}
                           aria-label={`${actionLabel[notification.kind] ?? "Open"}: ${notification.title}`}
                           onClick={() => {
+                            trackNotificationOpened({ id: notification.id, kind: notification.kind, unread: !notification.readAt });
                             if (!notification.readAt) {
-                              readMutation.mutate(notification.id);
+                              readMutation.mutate({ id: notification.id, kind: notification.kind, readVia: "opened" });
                             }
                           }}
                           className="account-accent inline-flex min-h-[44px] items-center text-sm font-semibold underline underline-offset-4"
@@ -167,7 +173,7 @@ export default function Notifications() {
                               // C6-SWEEP-09: becomes a "Read" span on success; focus the row's link.
                               const link = e.currentTarget.parentElement?.querySelector<HTMLElement>("a");
                               handoffFocusOnUnmount(e.currentTarget, () => link);
-                              readMutation.mutate(notification.id);
+                              readMutation.mutate({ id: notification.id, kind: notification.kind, readVia: "button" });
                             }}
                             aria-label={`Mark read: ${notification.title}`}
                             aria-disabled={readMutation.isPending}

@@ -142,3 +142,59 @@
 - [SSR lazy boundary #421](ssr-lazy-boundary-421.md) — env-gated lazy hosts in the hydrated Home tree throw #421/#419; mount closed hosts client-only; diff .replit userenv first.
 - [Secret leak scan by value](secret-history-leak-scan.md) — prove 'no secrets committed' by grepping real secret VALUES across all history blobs; owner password leaked via deleted July scripts.
 - [Analytics event counting in browser runs](analytics-event-counting.md) — Mixpanel/GA resend in-flight hits on a quick navigation (same $insert_id); dedupe by insert id or wait ~15s before navigating.
+- [Server-authoritative JSON-LD](jsonld-server-authority.md) — og-middleware emits route JSON-LD; client SEOHead ships none, so the two pipelines never produce conflicting graphs.
+- [Resource browsing parity](resource-browsing-parity.md) — listing pages share ResourceCard; SSR prerender must flatten the SAME tree the client fetches (24/page lockstep), not a parallel DB query.
+- [Crawler prerender versus SSR](spa-crawler-prerender.md) — semantic crawler markup is not hydrateable React; exact-tree SSR also needs the client manifest's split CSS before paint.
+- [SEO soft-404 + sitemap](seo-soft-404-architecture.md) — SPA hard-codes 200, so set 404 in og-middleware's buffered res.end; indexable set must equal sitemap; malformed %-URLs crash vite dev via decodeURI — guard before next().
+- [Anthropic mid-loop steering](anthropic-midloop-steering.md) — inject mid-run guidance as a text block on the tool_result user turn (a separate user msg → 400); research agent "don't give up" tuning lives here too.
+- [SEO title two-pass parity](seo-title-two-pass-parity.md) — client SEOHead titles must exactly mirror og-middleware templates or Googlebot's crawl/render passes see different titles.
+- [Playwright browsers here](playwright-browser-version-pin.md) — revision comes from @playwright/test + test:e2e:browsers; WebKitGTK runtime rules; WebKit never gets a Clerk session over http (skip, don't fix).
+- [Playwright audit batching](playwright-audit-batching.md) — full-goto sweeps die at 120s (≤8/call); SPA pushState+popstate nav reuses the cached tree (~0.75s/route) → ~100 routes/call; count parity vs nested tree count.
+- [Client/server noindex lockstep](seo-client-server-noindex-lockstep.md) — every server-noindex route must pass `noindex` to client SEOHead, or hydration adds a contradictory indexable robots + self-canonical.
+- [Canonical base env divergence](canonical-base-env-divergence.md) — client canonical uses VITE_SITE_URL (stale github.io in .env), server uses SITE_URL; they can disagree, but noindex pages omit canonicals so are safe.
+- [Claude Agent SDK migration](agent-sdk-migration.md) — shared router resolver (fail-closed on URL-without-cred), alias subagent models, token-only override pinned to router, tool lockdown, SDK peers.
+- [LLM JSON output hygiene](llm-json-output-hygiene.md) — small max_tokens truncates JSON mid-string and the catch->fallback masks it for months; slice outermost braces + assert generationType, not just 200s.
+- [Publish diff vs boot migrator](publish-diff-vs-boot-migrator.md) — Publish pre-applies the dev schema diff to prod, then the boot migrator re-runs the same DDL; every migration MUST be idempotent or publish 42P07-loops.
+- [Vite workspace watch reload](vite-workspace-watch-reload.md) — ANY repo write (docs, touch, dir delete too) during a browser run reloads every open app page; stage in /tmp, copy after the last capture.
+- [Headless E2E gotchas](headless-e2e-gotchas.md) — /submit consent banner eats clicks (dismiss first); toast = li[data-state]; agent-browser daemon dies between calls — prefer one-shot Playwright; verify "blank render" screenshots with a 2nd capture method.
+- [SDK block-split messages](sdk-block-split-messages.md) — one API turn = many assistant msgs sharing message.id; never count msgs as unanswered calls; dedupe tokens by id.
+- [MCP tool schema leniency](sdk-tool-schema-leniency.md) — SDK-side zod rejects loose tool args BEFORE the handler (no event); keep schemas lenient, validate in-handler.
+- [Reserved characters in SPA routes](reserved-character-spa-routes.md) — encode canonical path segments once; dotted routes need exemptions from asset detection, and percent escapes must not be lowercased.
+- [New SPA route registration](spa-new-route-registration.md) — a wouter Route alone 404s: also add KNOWN_ROUTE_PATTERNS (App.tsx), AppHeader crumb labels, og-middleware staticRoutes + SEOHead parity.
+- [Browser lease cleanup ownership](browser-lease-cleanup-ownership.md) — a released slot can belong to another worker; verify the exact run's process tree before terminating browsers.
+- [Tester false defects](tester-finding-retractions.md) — Radix/cmdk ArrowDown timing, outline 0px mid-transition, Clerk card "unreachable", dialog role=0, Select scroll-to-top mid smooth scroll: re-check recipes before logging a bug.
+- [Built-in tester batching](native-tester-batching.md) — ~45 s ceiling per execution: one family × ≤4 items per step, one navigation per step, running ledger; it may restart the wrong workflow.
+- [Browser capture protocol](browser-capture-protocol.md) — determinism knobs, the 16384px tile-and-stitch ceiling, pre-paint filmstrip reading, and the three read-only enforcement layers.
+- [Axe first-frame animation race](axe-first-frame-race.md) — reduced-motion animations still paint opacity 0 for a frame; wait 2 rAF + finite animations before axe.
+- [Publish snapshots in-flight edits](publish-snapshots-inflight-edits.md) — publishing while subagents edit ships their unverified partial work; never republish mid-wave.
+- [Aborted agent run usage](aborted-agent-run-usage.md) — cancelled SDK runs emit no result msg; accumulate streamed usage (lower bound); count the enrichment queue the server way before paid scratch runs.
+- [Live smoke of production](live-smoke-prod-revision.md) — publish may leave prod on the parent commit; verify by server-behaviour markers; prod sign-up blocked → owner account net-zero.
+- [Initial bundle zod-free](initial-bundle-zod.md) — shell imports must use resourceFacets-core; zod in App.tsx graph blew bundle-budget and blocked publish; run the publish gate before asking to republish.
+- [Edge decodes %-escapes](edge-percent-decoding.md) — prod edge decodes %2D etc. before the app, so escape-normalising 301s never fire on awesome.video; probe via trailing-slash echo.
+- [Initial bundle zod boundary](initial-bundle-zod-boundary.md) — shell-reachable shared code must import resourceFacets-core; zod in entry failed publish; diff vs last-published build in /tmp.
+- [Reference sync gate history](design-reference-independence.md) — the design archive root is a frozen reference excluded from palette/profile gates; the frozen check reads a gitignored zip by recorded path → ENOENT elsewhere.
+- [Publish build gate isolation](publish-build-gate-isolation.md) — deploy-build gates run with PROD env before the schema diff applies; never boot the app or open a DB there (chicken-and-egg block + scratch-DB DDL hit prod).
+- [Validation workflow registration](validation-workflow-registration.md) — drift gates are validation workflows via setValidationCommand (configureWorkflow hits the 10-workflow cap); in-process contract harness must install+probe before registerRoutes.
+- [Completion gate DB contention](completion-gate-db-contention.md) — DB-outage + crawl gates must share the "db-heavy" file lease (gate-lease.mjs); fixed sleep staggers lose the race as the suite grows.
+- [Validation thread exhaustion](validation-thread-exhaustion.md) — EAGAIN/lost listeners cascade; cgroup pids.max ~1152 caps parallel Chromium auditors at ~6.
+- [Cold-cache gate flattery](cold-cache-gate-flattery.md) — a crawl gate passing right after a warm-up burst proves nothing; confirm cold-boot solo (ladders lose to sustained saturation — cap uncached resolutions below the pool).
+- [Palette scans miss gradient stops](palette-scan-gradient-stops.md) — the stage-5 regex skips from/via/to (+divide/outline/shadow/...); extend the prefix list or gradients slip through; comments naming palette classes also match.
+- [Dead-code reachability gate](dead-code-reachability-gate.md) — BFS from execution roots (importer counts miss mutual clusters); strip comments/.js→.ts swap; repo root is a separate blind spot needing an evidence gate.
+- [Drift-gate mutation probing](drift-gate-mutation-probing.md) — prove a gate fails by mutating a /tmp copy of its inputs; parser-rot short-circuits parity checks, and literals need unescaping first.
+- [Last-green gate baselines](last-green-baselines.md) — lint/integration were never green; diff per file+test vs last green sha; e2e runs all 5 projects (~40 min, background it).
+- [Product-profile gate target](product-profile-gate-target.md) — validate the design-system artifact, never the frozen canonical source; assert token consumers per selector, not substring.
+- [dead-exports forbids speculative exports](dead-exports-speculative.md) — export helpers with their first importer, never "for a later wave"; no pinned exceptions.
+- [Frozen reference roots in drift gates](standalone-palette-gate-scope.md) — an archive-identical dir can't take tokens or DS-OK; exclude it AND verify it against the zip each run.
+- [Shared test DB vs vitest file parallelism](vitest-shared-db-file-parallelism.md) — per-file cleanupDatabase() on ONE DB: parallel files wipe each other (500/401/never-429); run serially.
+- [Vitest spy calls vanish on mockRestore](vitest-spy-mockrestore.md) — `mockRestore()` also clears `mock.calls`; collect observed lines inside the mockImplementation or a live warning looks like "the observer never ran".
+- [Token parity by effective cascade](token-parity-effective-cascade.md) — one resolver over every sheet with ORDERED cascade layers (not a bit); element model + selector engine for shadows; in-gate canaries.
+- [Gates vs folded UI](gate-drift-from-folded-ui.md) — reveal every collapsed aria-expanded disclosure (never popups/tabs) before sweeping; folds hide selectors and new strays.
+- [Consensus audit panels](consensus-audit-panels.md) — blind auditors get skill+URL+private .cache dir only; dev panel then prod panel; save verdicts verbatim; waitForJob caps at 600 s.
+- [DS verify skill copies](ds-verify-skill-copies.md) — repo copy authoritative (mirror .local); the frozen verbatim skill always FAILs this app’s data-ds hooks; md5 both before a panel.
+- [DS deep gates vs Claude Design](ds-gates-post-claude-design.md) — post-adoption deep verify FAIL is baseline (frozen gates/pre-boot, ENOENT design-system.css, swiss/orange gate race); restore docs/parity after runs.
+- [Dead-code gates miss harness readers](dead-code-harness-readers.md) — tests/parity reads app source by path; grep tests/ scripts/ for file+symbol before deleting or un-exporting.
+- [ds-button-sweep empty-queue dependency](ds-sweep-empty-queue-dependency.md) — admin tab checks wait for empty-state controls; pending QA fixtures fail them; run DS verify after cleanup.
+- [cache-headers boot locks DEV](cache-headers-boot-migrator-locks.md) — spawned prod server runs boot DDL on dev; must hold db-heavy lease while up or seo-snapshot sheds random /tag/* 503s.
+- [ESLint ratchet](eslint-ratchet.md) — app correctness rules held at 0, rest per-file ratchet that only shrinks; Node API needs TSESTREE_SINGLE_RUN=true to match CLI counts.
+- [Publish gate offline repro](pre-publish-gate-offline-repro.md) — run pre-publish-gate.sh --publish in a /tmp tar copy (keep .agents+docs, BUILD_REVISION set, bogus DATABASE_URL) to prove blocking.
+- [Analytics browser verification](analytics-browser-verification.md) — PostHog silently drops headless (webdriver/UA brands); Mixpanel resends → count $insert_id; sanitizer drops `email*` keys.

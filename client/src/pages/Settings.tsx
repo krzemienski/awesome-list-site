@@ -29,6 +29,7 @@ import {
 import NotificationPreferencesCard from "@/components/notifications/NotificationPreferencesCard";
 import HomeLayoutPreferenceControl from "@/components/home/HomeLayoutPreferenceControl";
 import { useScrollToHash } from "@/lib/nav-history";
+import { trackLearningPreferencesReset, trackLearningPreferencesSaved } from "@/lib/analytics-notifications";
 import "@/styles/pages/account.css";
 
 interface CategoryOption {
@@ -194,6 +195,7 @@ export default function Settings() {
         onboardingStatus: "completed",
         onboardingStep: 5,
       });
+      trackLearningPreferencesSaved(!preferences);
       toast({
         title: "Learning preferences saved",
         description:
@@ -212,6 +214,7 @@ export default function Settings() {
     setPreferenceRequestError(null);
     try {
       await resetPreferencesAsync();
+      trackLearningPreferencesReset();
       setValues(DEFAULT_LEARNING_PREFERENCES);
       setShowEmptyPreferencesEditor(false);
       setPreferenceErrors({});
