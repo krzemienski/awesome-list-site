@@ -34,6 +34,7 @@ import {
 import { HASHED_ASSET_CACHE_CONTROL, SESSION_CACHE_CONTROL } from "./http-cache-policy";
 import { mountVersionRoute } from "./version-route";
 import { asyncHandler } from "./middleware/asyncHandler";
+import { publicApiCors } from "./middleware/publicApiCors";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -140,6 +141,10 @@ app.use(CLERK_PROXY_PATH, clerkProxyMiddleware());
 
 // BUG-020: don't advertise the Express server via the X-Powered-By header.
 app.disable("x-powered-by");
+
+// Browser clients of the developer API (Swagger "Try it out" etc.) are
+// cross-origin; answer their CORS before auth and rate limits run.
+app.use(publicApiCors);
 
 // BUG-006 (run13): gzip/brotli-negotiated response compression. The
 // awesome-list JSON is ~3 MB uncompressed; without this every page load pays

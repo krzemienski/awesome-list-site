@@ -118,7 +118,7 @@ Verification is by real browser use / curl only (no proof packets or gates since
 |---|---|---|---|
 | S-01 | Zero hydration warnings on SSR routes | FIXED — 0 hydration warnings observed in browser console on SSR routes | |
 | S-02 | Sitemap, robots, OG, canonicals per page kind | FIXED — 25 sampled sitemap URLs 200 with self-canonical; OG and robots.txt correct; dotted-tag fix shared with N-09 | |
-| S-03 | Developer API keys, rate limits, OpenAPI Try-it-out | OPEN | |
+| S-03 | Developer API keys, rate limits, OpenAPI Try-it-out | FIXED — key lifecycle driven in the browser as a member (Profile → Security: create, one-time reveal, revoke): keyed calls 200 on the 1000/h key bucket, anon 60/h per IP with 429 + Retry-After/RateLimit-* on the 61st, bad/missing/revoked key 401 with specific message, keyed responses private,no-store + Vary: Authorization. Fixed: no CORS on /api/public/* + /api/openapi.json (preflight 405 → browser Try-it-out impossible; now `*`, no credentials, Authorization allowed, RateLimit headers exposed; Swagger UI on a foreign origin executed /me, /resources/{id}, /resources?search with Authorize); spec listed generic guard keys (afterSeq, jobId, categoryId…) as params on every route without its own query contract (also proposed task "made-up filters"); public routes documented no optional key (now `[{}, BearerAuth]`); SessionCookie named pre-Clerk `connect.sid` (now `__session`); /api/docs states limits + where to create a key | |
 | S-04 | Security headers; secrets in committed config | OPEN | |
 | S-05 | npm audit 0 high / 0 critical | FIXED — 0 high/0 critical (4 moderate inside drizzle-kit, fix is a downgrade) | |
 

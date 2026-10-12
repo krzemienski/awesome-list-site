@@ -186,6 +186,12 @@ export function contractToOperation(contract: ApiContract): Record<string, any> 
   // Surface inferred metadata: security requirement + x-* extensions.
   const meta = contract.meta;
   if (meta) {
+    // An optional key only raises the caller's rate-limit bucket; anonymous
+    // calls stay valid, so the empty requirement comes first.
+    const optionalKey = meta.middleware?.some((name) => /optionalapikey/i.test(name));
+    if (!meta.requiresAuth && optionalKey) {
+      operation.security = [{}, { BearerAuth: [] }];
+    }
     if (meta.requiresAuth) {
       const usesApiKey = meta.middleware?.some((name) =>
         /requireapikey/i.test(name),
@@ -278,11 +284,13 @@ export function generateOpenApiDocument(options: OpenApiDocOptions = {}): Record
           type: "http",
           scheme: "bearer",
           bearerFormat: "API Key",
+          description: "Personal API key created on the profile page, Security tab (/profile?tab=security), sent as Authorization: Bearer <key>",
         },
         SessionCookie: {
           type: "apiKey",
           in: "cookie",
-          name: "connect.sid",
+          name: "__session",
+          description: "Clerk session cookie set by signing in on the site; not usable from third-party clients",
         },
       },
     },

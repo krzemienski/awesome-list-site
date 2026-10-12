@@ -549,8 +549,11 @@ export function declareContract(
     tags: meta.domain ? [meta.domain] : undefined,
     params: paramsSchema,
     paramsName: paramsSchema ? `${schemaBase}.Params` : undefined,
-    query: queryOverride?.schema ?? genericQuerySchema,
-    queryName: queryOverride?.name ?? `${schemaBase}.Query`,
+    // The bounded generic guard (enforced above) is not a description of any
+    // handler's filters; documenting it listed afterSeq/jobId/categoryId…
+    // on every route. Only routes with an explicit schema document a query.
+    query: queryOverride?.schema,
+    queryName: queryOverride?.name,
     body: BODY_METHODS.has(method)
       ? routeBodySchema ?? objectBodyGuardSchema
       : undefined,

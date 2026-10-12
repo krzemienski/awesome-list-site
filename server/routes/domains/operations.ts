@@ -207,6 +207,8 @@ export function registerOperationsRoutes(
     // operation, plus its documented description where one exists.
     const access = (op: any): string => {
       if (op?.['x-requires-admin']) return 'Admin';
+      const anonymousAllowed = op?.security?.some((s: Record<string, unknown>) => Object.keys(s).length === 0);
+      if (anonymousAllowed) return 'Public (API key optional)';
       if (op?.security?.some((s: Record<string, unknown>) => 'BearerAuth' in s)) return 'API key';
       if (op?.security?.length) return 'Signed in';
       return 'Public';
@@ -258,6 +260,7 @@ td,th{border:1px solid #333;padding:.5rem;text-align:left}td:last-child{white-sp
 <div class="table-scroll"><table><thead><tr><th>Method</th><th>Path</th><th>Access</th></tr></thead><tbody>
 ${rows.join('\n')}
 </tbody></table></div>
+<p>The <code>/api/public/*</code> endpoints work without a key at 60 requests per hour per IP. Send a personal key (create one on your <a href="/profile?tab=security">profile, Security tab</a>) as <code>Authorization: Bearer &lt;api-key&gt;</code> for 1,000 requests per hour per key; an invalid, revoked or expired key is rejected with 401.</p>
 <p>Each operation documents whether it requires the session cookie or an <code>Authorization: Bearer &lt;api-key&gt;</code> header. Validation errors use the field-level <code>{ "error": "validation_failed", "message": string, "fieldErrors": object, "errors": array }</code> envelope. Rate-limit state is exposed via <code>RateLimit-*</code> response headers.</p>
 </body>
 </html>`);
