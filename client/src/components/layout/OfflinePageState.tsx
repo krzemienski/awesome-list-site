@@ -1,9 +1,7 @@
 import { useState } from "react";
-import { RefreshCw } from "lucide-react";
-import { Button } from "@/components/ui/button";
 import SEOHead from "@/components/layout/SEOHead";
 import { handoffFocusOnUnmount } from "@/hooks/focus-handoff";
-import "@/styles/pages/system.css";
+import StatePanel, { RetryButton } from "@/components/layout/StatePanel";
 
 /**
  * A page whose primary query was paused because the browser is offline.
@@ -14,26 +12,18 @@ import "@/styles/pages/system.css";
 export default function OfflinePageState({ onRetry, testId }: { onRetry: () => void; testId: string }) {
   const [stillOffline, setStillOffline] = useState(false);
   return (
-    <div className="system-state" role="alert" data-testid={testId}>
+    <>
       <SEOHead title="You're offline" description="This page will load when your connection is back." noindex />
-      <div className="system-state-panel">
-        <p className="system-state-kicker caret" aria-hidden="true">
-          ~/awesome.video/offline → paused
-        </p>
-        <h1 className="display-h system-state-title">You're offline</h1>
-        <p className="system-state-copy">
-          This page couldn't load because your device has no connection. It will
-          load on its own when you reconnect.
-        </p>
-        {stillOffline && (
-          <p className="system-state-note" data-testid={`${testId}-still-offline`}>
-            Still offline — reconnect and try again.
-          </p>
-        )}
-        <div className="system-state-actions">
-          <Button
-            variant="outline"
-            onClick={(e) => {
+      <StatePanel
+        tone="error"
+        label="Offline"
+        title="You're offline"
+        headingLevel={1}
+        testId={testId}
+        actions={
+          <RetryButton
+            handoffFocus={false}
+            onRetry={(e) => {
               if (navigator.onLine === false) {
                 setStillOffline(true);
                 return;
@@ -41,13 +31,18 @@ export default function OfflinePageState({ onRetry, testId }: { onRetry: () => v
               handoffFocusOnUnmount(e.currentTarget);
               onRetry();
             }}
-            data-testid={`${testId}-retry`}
-          >
-            <RefreshCw className="h-4 w-4" aria-hidden="true" />
-            Try again
-          </Button>
-        </div>
-      </div>
-    </div>
+            testId={`${testId}-retry`}
+          />
+        }
+      >
+        This page couldn&apos;t load because your device has no connection. It will
+        load on its own when you reconnect.
+        {stillOffline && (
+          <p className="system-state-note" data-testid={`${testId}-still-offline`}>
+            Still offline — reconnect and try again.
+          </p>
+        )}
+      </StatePanel>
+    </>
   );
 }

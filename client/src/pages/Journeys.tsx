@@ -1,5 +1,5 @@
+import StatePanel, { RetryButton } from "@/components/layout/StatePanel";
 import { JourneyCardSkeleton } from "@/components/ui/skeletons";
-import { handoffFocusOnUnmount } from "@/hooks/focus-handoff";
 import { lazy, Suspense, useRef, useState } from "react";
 import { useQuery, useMutation } from "@tanstack/react-query";
 import { useLocation, Link } from "wouter";
@@ -227,32 +227,18 @@ export default function Journeys() {
   if (journeysUnavailable) {
     const offline = journeysUnavailable === "offline";
     return (
-      <div className="journeys-page journeys-page--state" role="alert" data-testid={`journeys-${journeysUnavailable}`}>
+      <div className="journeys-page journeys-page--state" data-testid={`journeys-${journeysUnavailable}`}>
         <SEOHead
           title="Learning Journeys"
           description={journeysHubDescription}
         />
-        <div className="journeys-state journeys-state--error">
-          <Badge variant="destructive" className="journeys-state__error-label">
-            {offline ? "Offline" : "Error · unavailable"}
-          </Badge>
-          <h1 className="display-h journeys-state__title">
-            {offline ? "You’re offline." : "Couldn’t load journeys."}
-          </h1>
-          <p className="journeys-state__copy">
-            {offline
-              ? "Learning journeys will load when your connection is back."
-              : "Something went wrong while fetching the learning paths. Please try again."}
-          </p>
-          <Button
-            variant="outline"
-            className="journeys-state__action"
-            onClick={(e) => { handoffFocusOnUnmount(e.currentTarget); void refetchJourneys(); }}
-            data-testid="button-retry-journeys"
-          >
-            Try again
-          </Button>
-        </div>
+        <StatePanel tone="error" label={offline ? "Offline" : "Error · unavailable"}
+          title={offline ? "You’re offline" : "Couldn’t load journeys"} headingLevel={1} inline
+          actions={<RetryButton onRetry={() => void refetchJourneys()} testId="button-retry-journeys" />}>
+          {offline
+            ? "Learning journeys will load when your connection is back."
+            : "Something went wrong while fetching the learning paths. Please try again."}
+        </StatePanel>
       </div>
     );
   }
@@ -322,37 +308,25 @@ export default function Journeys() {
 
       {/* Journey Grid */}
       {filteredJourneys.length === 0 ? (
-        <Card className="journeys-state journeys-state--empty">
-          <div className="journeys-state__content">
-            <BookOpen className="journeys-state__icon" aria-hidden />
-            <div>
-              <span className="eyebrow journeys-state__eyebrow">No journeys</span>
-              {/* BUG-037 (run26): h2 — /journeys had no heading level below
-                  the H1, so the empty state and card titles are now h2s. */}
-              <h2 className="journeys-state__title">No journeys found</h2>
-              <p className="journeys-state__copy">
-                {selectedCategory === "all" 
-                  ? "No learning journeys are available at the moment." 
-                  : `No journeys found in the "${selectedCategory}" category.`}
-              </p>
-            </div>
-            {selectedCategory !== "all" && (
-              <Button 
-                variant="outline" 
-                className="journeys-state__action"
-                onClick={() => {
-                  handleCategoryChange("all");
-                  // C6-V2-01: this button unmounts with the empty state; hand
-                  // focus to the category filter it just reset.
-                  filterRef.current?.querySelector<HTMLElement>("button, select")?.focus();
-                }}
-                data-testid="button-clear-filter"
-              >
-                Clear Filter
-              </Button>
-            )}
-          </div>
-        </Card>
+        <StatePanel tone="empty" label="No journeys" title="No journeys found" inline testId="journeys-empty"
+          actions={selectedCategory !== "all" && (
+            <Button
+              variant="outline"
+              onClick={() => {
+                handleCategoryChange("all");
+                // C6-V2-01: this button unmounts with the empty state; hand
+                // focus to the category filter it just reset.
+                filterRef.current?.querySelector<HTMLElement>("button, select")?.focus();
+              }}
+              data-testid="button-clear-filter"
+            >
+              Clear filter
+            </Button>
+          )}>
+          {selectedCategory === "all"
+            ? "No learning journeys are available at the moment."
+            : `No journeys found in the "${selectedCategory}" category.`}
+        </StatePanel>
       ) : (
         // BUG-012 (run22): 3 columns only from xl — at lg (1024–1279) the
         // docked sidebar left ~220px cards and the CTA labels ellipsized.

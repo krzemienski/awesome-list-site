@@ -1,6 +1,5 @@
 import { Component, type ErrorInfo, type ReactNode } from "react";
-import { AlertCircle, RefreshCw } from "lucide-react";
-import { Button } from "@/components/ui/button";
+import StatePanel, { RetryButton } from "@/components/layout/StatePanel";
 
 interface ErrorBoundaryProps {
   children: ReactNode;
@@ -35,25 +34,11 @@ export default class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBo
   render() {
     if (this.state.error) {
       return (
-        <div
-          className="border border-destructive/30 bg-destructive/5 rounded-lg p-6 text-center space-y-3"
-          role="alert"
-          data-testid="error-boundary-fallback"
-        >
-          <AlertCircle className="h-8 w-8 text-destructive mx-auto" />
-          <div className="space-y-1">
-            <p className="font-medium text-[var(--text)]">
-              {this.props.label ? `The ${this.props.label} crashed.` : "Something went wrong."}
-            </p>
-            <p className="text-sm text-[var(--text-2)] font-mono break-all">
-              {this.state.error.message}
-            </p>
-          </div>
-          <Button variant="outline" size="sm" onClick={this.handleReset} data-testid="button-error-retry">
-            <RefreshCw className="h-4 w-4 mr-2" />
-            Try again
-          </Button>
-        </div>
+        <StatePanel tone="error" label="Error · crashed" inline testId="error-boundary-fallback"
+          title={this.props.label ? `The ${this.props.label} crashed` : "Something went wrong"}
+          actions={<RetryButton onRetry={this.handleReset} handoffFocus={false} testId="button-error-retry" />}>
+          This part of the page hit an unexpected error. The rest of the page still works.
+        </StatePanel>
       );
     }
     return this.props.children;

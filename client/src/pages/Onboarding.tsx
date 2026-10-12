@@ -1,5 +1,5 @@
+import StatePanel, { RetryButton } from "@/components/layout/StatePanel";
 import { useEffect, useRef, useState } from "react";
-import { handoffFocusOnUnmount } from "@/hooks/focus-handoff";
 import { Link } from "wouter";
 import { useQuery } from "@tanstack/react-query";
 import { ArrowLeft, ArrowRight, Check, Sparkles } from "lucide-react";
@@ -304,33 +304,21 @@ export default function Onboarding() {
     return (
       <div className="account-page account-page--form space-y-4 py-8" aria-busy="true">
         <SEOHead title="Learning Preferences" noindex />
-        <div className="h-7 w-52 animate-pulse bg-muted" />
-        <div className="h-48 animate-pulse bg-muted" />
+        <div className="skeleton h-7 w-52" />
+        <div className="skeleton h-48" />
       </div>
     );
   }
 
   if (loadError) {
     return (
-      <Card className="account-page account-page--form p-6 text-center" role="alert">
+      <div className="account-page account-page--form">
         <SEOHead title="Learning Preferences" noindex />
-        <h1 className="display-h text-xl">
-          We couldn’t load your preferences
-        </h1>
-        <p className="account-muted mt-2 text-sm">
+        <StatePanel tone="error" label="Error · unavailable" title="Couldn’t load your preferences" headingLevel={1}
+          actions={<RetryButton onRetry={() => { void refetchPreferences(); void refetchCategories(); }} />}>
           Your account and the rest of the catalog are still available.
-        </p>
-        <Button
-          className="mt-4"
-          onClick={(e) => {
-            handoffFocusOnUnmount(e.currentTarget);
-            void refetchPreferences();
-            void refetchCategories();
-          }}
-        >
-          Try again
-        </Button>
-      </Card>
+        </StatePanel>
+      </div>
     );
   }
 

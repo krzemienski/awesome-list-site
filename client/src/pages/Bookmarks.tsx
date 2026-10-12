@@ -1,13 +1,12 @@
+import StatePanel, { RetryButton } from "@/components/layout/StatePanel";
 import { useEffect, useMemo, useRef, useState } from "react";
-import { focusElement, focusPageHeading, handoffFocusOnUnmount, handoffFocusToSiblingControl } from "@/hooks/focus-handoff";
+import { focusElement, focusPageHeading, handoffFocusToSiblingControl } from "@/hooks/focus-handoff";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import {
   Archive,
   ArrowDown,
   ArrowUp,
   Bookmark,
-  BookmarkX,
-  CheckCheck,
   Clipboard,
   Folder,
   FolderArchive,
@@ -33,7 +32,6 @@ import BookmarkNotesDialog from "@/components/resource/BookmarkNotesDialog";
 import SEOHead from "@/components/layout/SEOHead";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent } from "@/components/ui/card";
 import { Checkbox } from "@/components/ui/checkbox";
 import {
   Dialog,
@@ -410,23 +408,11 @@ export default function Bookmarks() {
     return (
       <div className="account-page account-page--wide space-y-6">
         <SEOHead title="My Library - Offline" description="View your saved library" noindex />
-        <div className="text-center py-12" role="alert" data-testid="library-offline">
-          <BookmarkX className="h-16 w-16 mx-auto text-muted-foreground mb-4" />
-          <h1 className="display-h text-2xl mb-2">You’re offline</h1>
-          <p className="text-muted-foreground mb-5">
-            Your saves are still safe. Your library will load when your
-            connection is back.
-          </p>
-          <Button
-            onClick={(e) => {
-              handoffFocusOnUnmount(e.currentTarget);
-              void bookmarksQuery.refetch();
-              void collectionsQuery.refetch();
-            }}
-          >
-            Try again
-          </Button>
-        </div>
+        <StatePanel tone="error" label="Offline" title="You’re offline" headingLevel={1} testId="library-offline"
+          actions={<RetryButton onRetry={() => { void bookmarksQuery.refetch(); void collectionsQuery.refetch(); }} />}>
+          Your saves are still safe. Your library will load when your
+          connection is back.
+        </StatePanel>
       </div>
     );
   }
@@ -435,14 +421,10 @@ export default function Bookmarks() {
     return (
       <div className="account-page account-page--wide space-y-6">
         <SEOHead title="My Library - Error" description="View your saved library" noindex />
-        <div className="text-center py-12" role="alert">
-          <BookmarkX className="h-16 w-16 mx-auto text-destructive mb-4" />
-          <h1 className="display-h text-2xl mb-2">Your library couldn't load</h1>
-          <p className="text-muted-foreground mb-5">
-            Your saves are still safe. Refresh the page to try again.
-          </p>
-          <Button onClick={() => window.location.reload()}>Refresh</Button>
-        </div>
+        <StatePanel tone="error" label="Error · unavailable" title="Your library couldn’t load" headingLevel={1} testId="library-error"
+          actions={<RetryButton onRetry={() => { void bookmarksQuery.refetch(); void collectionsQuery.refetch(); }} />}>
+          Your saves are still safe. Something went wrong while fetching your library.
+        </StatePanel>
       </div>
     );
   }
@@ -987,32 +969,16 @@ export default function Bookmarks() {
               ))}
             </div>
           ) : bookmarks.length === 0 ? (
-            <Card>
-              <CardContent className="flex flex-col items-center justify-center py-16 text-center">
-                  <div className="account-empty-icon p-6 mb-6">
-                  <BookmarkX className="h-12 w-12 text-primary" aria-hidden="true" />
-                </div>
-                <h2 className="font-display text-2xl font-medium tracking-tight mb-3">
-                  Your learning library is empty
-                </h2>
-                <p className="max-w-md mb-6 text-muted-foreground">
-                  Bookmark resources as you browse. They will land here ready to organize.
-                </p>
-                <Button asChild><Link href="/">Explore resources</Link></Button>
-              </CardContent>
-            </Card>
+            <StatePanel tone="empty" label="No saves" title="Your learning library is empty" inline
+              actions={<Button asChild><Link href="/">Explore resources</Link></Button>}>
+              Bookmark resources as you browse. They will land here ready to organize.
+            </StatePanel>
           ) : selectedCollection &&
             selectedCollection.itemCount === 0 &&
             statusFilter === "all" &&
             archiveFilter === "active" ? (
-            <Card>
-              <CardContent className="flex flex-col items-center justify-center py-12 text-center">
-                <Folder className="h-10 w-10 text-primary mb-4" aria-hidden="true" />
-                <h2 className="text-xl font-semibold mb-2">This collection is empty</h2>
-                <p className="max-w-md text-muted-foreground mb-5">
-                  To add bookmarks, open All saved, select the bookmarks you want, then pick
-                  this collection under Move to collection and choose Move.
-                </p>
+            <StatePanel tone="empty" label="Empty collection" title="This collection is empty" inline
+              actions={
                 <Button
                   variant="outline"
                   onClick={() => {
@@ -1022,16 +988,13 @@ export default function Bookmarks() {
                 >
                   Go to All saved
                 </Button>
-              </CardContent>
-            </Card>
+              }>
+              To add bookmarks, open All saved, select the bookmarks you want, then pick
+              this collection under Move to collection and choose Move.
+            </StatePanel>
           ) : (
-            <Card>
-              <CardContent className="flex flex-col items-center justify-center py-12 text-center">
-                <CheckCheck className="h-10 w-10 text-primary mb-4" aria-hidden="true" />
-                <h2 className="text-xl font-semibold mb-2">Nothing matches this view</h2>
-                <p className="text-muted-foreground mb-5">
-                  Try another collection, status, or archive filter.
-                </p>
+            <StatePanel tone="empty" label="No matches" title="Nothing matches this view" inline
+              actions={
                 <Button
                   variant="outline"
                   onClick={() => {
@@ -1044,8 +1007,9 @@ export default function Bookmarks() {
                 >
                   Clear filters
                 </Button>
-              </CardContent>
-            </Card>
+              }>
+              Try another collection, status, or archive filter.
+            </StatePanel>
           )}
         </div>
       </div>

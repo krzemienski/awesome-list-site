@@ -1,5 +1,5 @@
+import StatePanel, { RetryButton } from "@/components/layout/StatePanel";
 import { useState } from "react";
-import { handoffFocusOnUnmount } from "@/hooks/focus-handoff";
 import { Link } from "wouter";
 import { useQuery } from "@tanstack/react-query";
 import SEOHead from "@/components/layout/SEOHead";
@@ -11,15 +11,12 @@ import CommunityMetrics from "@/components/ui/community-metrics";
 import ExportTools, { type ExportFormat } from "@/components/ui/export-tools";
 import AIRecommendationsPanel from "@/components/ui/ai-recommendations-panel";
 import { Skeleton } from "@/components/ui/skeleton";
-import { Button } from "@/components/ui/button";
 import { 
   Compass, 
   BarChart3, 
   Download, 
   Lightbulb,
   Sparkles,
-  AlertCircle,
-  RefreshCw,
   FileText,
   Code,
   Database,
@@ -123,33 +120,14 @@ export default function Advanced() {
     return (
       <div className="discovery-tools-page discovery-tools-page--advanced">
         <SEOHead title={advancedSeoTitle} description={advancedSeoDescription} />
-        <div
-          className="discovery-tools-state discovery-tools-state--error"
-          role="alert"
-          data-testid={`advanced-${catalogUnavailable}`}
-        >
-          <span className="chip bad discovery-tools-state-badge">
-            {offline ? "Offline" : "Error · Catalog"}
-          </span>
-          <AlertCircle className="discovery-tools-state-icon" aria-hidden="true" />
-          <h1 className="display-h discovery-tools-state-title">
-            {offline ? "You’re offline." : "Couldn’t load advanced features"}
-          </h1>
-          <p className="discovery-tools-state-copy">
-            {offline
-              ? "Advanced features will load when your connection is back."
-              : "We couldn’t reach the catalog data. This is usually a temporary network problem."}
-          </p>
-          <Button
-            variant="outline"
-            onClick={(e) => { if (isFetching) return; handoffFocusOnUnmount(e.currentTarget); void refetch(); }}
-            aria-disabled={isFetching}
-            data-testid="button-advanced-retry"
-          >
-            <RefreshCw className={`h-4 w-4 mr-2 ${isFetching ? "animate-spin" : ""}`} />
-            {isFetching ? "Retrying…" : "Try again"}
-          </Button>
-        </div>
+        <StatePanel tone="error" label={offline ? "Offline" : "Error · unavailable"}
+          title={offline ? "You’re offline" : "Couldn’t load advanced features"} headingLevel={1}
+          testId={`advanced-${catalogUnavailable}`}
+          actions={<RetryButton onRetry={() => void refetch()} busy={isFetching} testId="button-advanced-retry" />}>
+          {offline
+            ? "Advanced features will load when your connection is back."
+            : "We couldn’t reach the catalog data. This is usually a temporary network problem."}
+        </StatePanel>
       </div>
     );
   }
@@ -157,11 +135,10 @@ export default function Advanced() {
   if (!awesomeList && tab !== "recommendations") {
     return (
       <div className="discovery-tools-page discovery-tools-page--advanced">
-        <div className="discovery-tools-state discovery-tools-state--empty">
-          <span className="eyebrow discovery-tools-state-eyebrow">No catalog data</span>
-          <h1 className="display-h discovery-tools-state-title">Advanced Features</h1>
-          <p className="discovery-tools-state-copy">Unable to load awesome list data</p>
-        </div>
+        <StatePanel tone="empty" label="No catalog data" title="Advanced features" headingLevel={1}
+          actions={<RetryButton onRetry={() => void refetch()} />}>
+          The catalog came back empty, so there is nothing to explore yet.
+        </StatePanel>
       </div>
     );
   }

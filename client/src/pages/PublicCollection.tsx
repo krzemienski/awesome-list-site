@@ -1,10 +1,9 @@
 import { useQuery } from "@tanstack/react-query";
 import "@/styles/pages/discovery.css";
-import { BookOpen, FolderOpen } from "lucide-react";
+import { BookOpen } from "lucide-react";
 import SEOHead from "@/components/layout/SEOHead";
 import ResourceCard from "@/components/resource/ResourceCard";
-import { Button } from "@/components/ui/button";
-import { Card, CardContent } from "@/components/ui/card";
+import StatePanel, { RetryButton } from "@/components/layout/StatePanel";
 import { ResourceCardSkeleton, PageHeaderSkeleton } from "@/components/ui/skeletons";
 import OfflinePageState from "@/components/layout/OfflinePageState";
 import NotFound from "@/pages/not-found";
@@ -71,20 +70,11 @@ export default function PublicCollection({ shareId }: { shareId: string }) {
           noindex
           ogUrl={`${CANONICAL_BASE}/`}
         />
-        <Card>
-          <CardContent className="discovery-state" role="alert" data-testid="collection-unavailable">
-            <FolderOpen className="h-12 w-12 text-muted-foreground mb-4" aria-hidden="true" />
-            <h1 className="display-h text-2xl mb-2">Couldn't load this collection</h1>
-            <p className="max-w-md text-muted-foreground">
-              Something went wrong while fetching it. Please try again.
-            </p>
-            <div className="mt-6 flex flex-wrap items-center justify-center gap-3">
-              <Button onClick={() => void refetch()} data-testid="button-collection-retry">
-                Try again
-              </Button>
-            </div>
-          </CardContent>
-        </Card>
+        <StatePanel tone="error" label="Error · unavailable" title="Couldn’t load this collection" headingLevel={1}
+          testId="collection-unavailable"
+          actions={<RetryButton onRetry={() => void refetch()} testId="button-collection-retry" />}>
+          Something went wrong while fetching it. Please try again.
+        </StatePanel>
       </div>
     );
   }
@@ -135,15 +125,9 @@ export default function PublicCollection({ shareId }: { shareId: string }) {
           ))}
         </div>
       ) : (
-        <Card>
-          <CardContent className="discovery-state">
-            <FolderOpen className="h-10 w-10 text-muted-foreground mb-4" aria-hidden="true" />
-            <h2 className="text-xl font-semibold mb-2">No public resources yet</h2>
-            <p className="max-w-md text-muted-foreground">
-              The owner may still be organizing this collection. Only approved, active resources appear here.
-            </p>
-          </CardContent>
-        </Card>
+        <StatePanel tone="empty" label="No resources" title="No public resources yet" inline>
+          The owner may still be organizing this collection. Only approved, active resources appear here.
+        </StatePanel>
       )}
     </div>
   );

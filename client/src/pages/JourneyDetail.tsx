@@ -1,3 +1,4 @@
+import StatePanel, { RetryButton } from "@/components/layout/StatePanel";
 import { useEffect, useRef } from "react";
 import { handoffFocusOnUnmount } from "@/hooks/focus-handoff";
 import { useQuery, useMutation } from "@tanstack/react-query";
@@ -409,33 +410,19 @@ export default function JourneyDetail() {
   if (journeyUnavailable) {
     const offline = journeyUnavailable === "offline";
     return (
-      <div className="journey-detail-page journey-detail-page--state" role="alert" data-testid={`journey-${journeyUnavailable}`}>
+      <div className="journey-detail-page journey-detail-page--state" data-testid={`journey-${journeyUnavailable}`}>
         <SEOHead
           title="Journey unavailable"
           description="This learning journey could not be loaded."
           noindex
         />
-        <div className="journeys-state journeys-state--error">
-          <Badge variant="destructive" className="journeys-state__error-label">
-            {offline ? "Offline" : "Error · unavailable"}
-          </Badge>
-          <h1 className="display-h journeys-state__title">
-            {offline ? "You’re offline." : "Couldn’t load this journey."}
-          </h1>
-          <p className="journeys-state__copy">
-            {offline
-              ? "This journey will load when your connection is back."
-              : "Something went wrong while fetching the learning path. Please try again."}
-          </p>
-          <Button
-            variant="outline"
-            className="journeys-state__action"
-            onClick={(e) => { handoffFocusOnUnmount(e.currentTarget); void refetchJourney(); }}
-            data-testid="button-retry-journey"
-          >
-            Try again
-          </Button>
-        </div>
+        <StatePanel tone="error" label={offline ? "Offline" : "Error · unavailable"}
+          title={offline ? "You’re offline" : "Couldn’t load this journey"} headingLevel={1} inline
+          actions={<RetryButton onRetry={() => void refetchJourney()} testId="button-retry-journey" />}>
+          {offline
+            ? "This journey will load when your connection is back."
+            : "Something went wrong while fetching the learning path. Please try again."}
+        </StatePanel>
       </div>
     );
   }

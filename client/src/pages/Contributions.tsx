@@ -1,6 +1,6 @@
+import StatePanel, { RetryButton } from "@/components/layout/StatePanel";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { focusElement } from "@/hooks/focus-handoff";
-import { handoffFocusOnUnmount } from "@/hooks/focus-handoff";
 import { keepPreviousData, useMutation, useQuery } from "@tanstack/react-query";
 import { Link, useSearch } from "wouter";
 import { formatDistanceToNow } from "date-fns";
@@ -12,8 +12,6 @@ import {
   Eye,
   FilePenLine,
   FilePlus2,
-  Inbox,
-  Loader2,
   RefreshCw,
   Search,
   Send,
@@ -811,72 +809,29 @@ export default function Contributions() {
             ))}
           </div>
         ) : unavailable ? (
-          <Card>
-            <CardContent
-              className="flex flex-col items-center gap-3 py-12 text-center"
-              role="alert"
-              data-testid={`contributions-${unavailable}`}
-            >
-              <RefreshCw className="account-accent-icon h-8 w-8" />
-              <h3 className="font-semibold">
-                {unavailable === "offline"
-                  ? "You’re offline"
-                  : "We couldn't load your contributions"}
-              </h3>
-              <p className="max-w-md text-sm text-muted-foreground">
-                {unavailable === "offline"
-                  ? "Your contributions will load when your connection is back."
-                  : "Your data is unchanged. Check your connection and try again."}
-              </p>
-              <Button
-                variant="outline"
-                onClick={(e) => { if (query.isFetching) return; handoffFocusOnUnmount(e.currentTarget); void query.refetch(); }}
-                aria-disabled={query.isFetching}
-                aria-busy={query.isFetching}
-                data-testid="button-retry-contributions"
-              >
-                {query.isFetching ? (
-                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                ) : (
-                  <RefreshCw className="mr-2 h-4 w-4" />
-                )}
-                Try again
-              </Button>
-            </CardContent>
-          </Card>
+          <StatePanel tone="error" label={unavailable === "offline" ? "Offline" : "Error · unavailable"}
+            title={unavailable === "offline" ? "You’re offline" : "Couldn’t load your contributions"} inline
+            testId={`contributions-${unavailable}`}
+            actions={<RetryButton onRetry={() => void query.refetch()} busy={query.isFetching} testId="button-retry-contributions" />}>
+            {unavailable === "offline"
+              ? "Your contributions will load when your connection is back."
+              : "Your data is unchanged. Check your connection and try again."}
+          </StatePanel>
         ) : summary?.total === 0 ? (
-          <Card>
-            <CardContent className="flex flex-col items-center gap-3 py-14 text-center">
-              <Inbox className="h-10 w-10 text-muted-foreground" />
-              <h3 className="text-lg font-semibold">No contributions yet</h3>
-              <p className="max-w-md text-sm text-muted-foreground">
-                Submit a useful video-development resource, or suggest an edit
-                from any resource page. Both will appear here.
-              </p>
-              <Button asChild>
-                <Link href="/submit">Submit your first resource</Link>
-              </Button>
-            </CardContent>
-          </Card>
+          <StatePanel tone="empty" label="No contributions" title="No contributions yet" inline
+            actions={<Button asChild><Link href="/submit">Submit your first resource</Link></Button>}>
+            Submit a useful video-development resource, or suggest an edit
+            from any resource page. Both will appear here.
+          </StatePanel>
         ) : query.data?.items.length === 0 ? (
-          <Card>
-            <CardContent className="flex flex-col items-center gap-3 py-12 text-center">
-              <Search className="h-8 w-8 text-muted-foreground" />
-              <h3 className="font-semibold">No contributions match</h3>
-              <p className="text-sm text-muted-foreground">
-                Try a different type, status, or search.
-              </p>
-              {hasFilters && (
-                <Button
-                  variant="outline"
-                  onClick={clearFilters}
-                  data-testid="button-clear-contribution-filters"
-                >
-                  Clear filters
-                </Button>
-              )}
-            </CardContent>
-          </Card>
+          <StatePanel tone="empty" label="No matches" title="No contributions match" inline
+            actions={hasFilters && (
+              <Button variant="outline" onClick={clearFilters} data-testid="button-clear-contribution-filters">
+                Clear filters
+              </Button>
+            )}>
+            Try a different type, status, or search.
+          </StatePanel>
         ) : (
           <>
             <p

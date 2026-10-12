@@ -10,6 +10,13 @@
   text-align: center;
 }
 
+/* In-page states (under a page header, inside a results column) keep the
+   docs/11 composition without claiming the page's height. */
+.system-state--inline {
+  min-height: 0;
+  padding: 48px 20px;
+}
+
 .system-state-card {
   width: 100%;
   max-width: 520px;
@@ -87,6 +94,10 @@
 .system-state-code {
   align-self: center;
   margin-bottom: 16px;
+}
+
+.system-state-panel .system-state-code {
+  display: inline-flex;
 }
 
 .system-state-detail {

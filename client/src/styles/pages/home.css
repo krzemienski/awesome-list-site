@@ -716,24 +716,6 @@
   font-weight: 500;
 }
 
-.home-error {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 1rem;
-  padding: 5rem 1rem;
-  text-align: center;
-}
-
-.home-error h1 {
-  font-size: 1.5rem;
-}
-
-.home-error p {
-  max-width: 32rem;
-  color: var(--text-2);
-}
-
 .home-skeleton-line,
 .home-skeleton-chip,
 .home-skeleton-contribute {

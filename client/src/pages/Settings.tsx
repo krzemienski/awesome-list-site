@@ -317,8 +317,8 @@ export default function Settings() {
             <CardContent ref={preferencesContentRef}>
               {preferencesLoading || categoriesLoading ? (
                 <div className="space-y-3" aria-busy="true">
-                  <div className="h-5 w-40 animate-pulse bg-muted" />
-                  <div className="h-28 animate-pulse bg-muted" />
+                  <div className="skeleton h-5 w-40" />
+                  <div className="skeleton h-28" />
                 </div>
               ) : preferencesError || categoriesError ? (
                 <div className="py-6 text-center" role="alert">
@@ -334,7 +334,7 @@ export default function Settings() {
                       void refetchCategories();
                     }}
                   >
-                    Try again
+                    Retry
                   </Button>
                 </div>
               ) : !preferences && !showEmptyPreferencesEditor ? (

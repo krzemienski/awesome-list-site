@@ -150,7 +150,7 @@ function UnavailableNotice({
           <p>Your {subject} will load when your connection is back.</p>
         )}
         <Button variant="outline" size="sm" onClick={(e) => { handoffFocusOnUnmount(e.currentTarget); onRetry(); }}>
-          Try again
+          Retry
         </Button>
       </AlertDescription>
     </Alert>

@@ -522,13 +522,6 @@ button.taxonomy-child {
   min-height: 260px;
 }
 
-.taxonomy-page [data-testid="empty-resources"] {
-  padding: 80px 20px;
-  border: var(--border-w) solid var(--border);
-  border-radius: var(--radius);
-  background: var(--surface);
-}
-
 .taxonomy-child:focus-visible,
 .taxonomy-breadcrumbs a:focus-visible {
   outline: 2px solid var(--accent);

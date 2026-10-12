@@ -1,12 +1,12 @@
+import StatePanel, { RetryButton } from "@/components/layout/StatePanel";
 import { useQuery } from "@tanstack/react-query";
-import { handoffFocusOnUnmount } from "@/hooks/focus-handoff";
 import { Link } from "wouter";
 import { queryUnavailableReason } from "@/lib/query-availability";
 import { apiRequest } from "@/lib/queryClient";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Sparkles, LogIn, AlertCircle } from "lucide-react";
+import { Sparkles, LogIn } from "lucide-react";
 import SEOHead from "@/components/layout/SEOHead";
 import AIRecommendationsPanel from "@/components/ui/ai-recommendations-panel";
 import ResourceCard from "@/components/resource/ResourceCard";
@@ -90,29 +90,19 @@ export default function Recommendations() {
                 ))}
               </div>
             ) : anonError ? (
-              <Card className="discovery-tools-state-card">
-                <CardContent className="discovery-tools-state discovery-tools-state--error">
-                  <span className="chip bad discovery-tools-state-badge">Error · Recommendations</span>
-                  <AlertCircle className="discovery-tools-state-icon" aria-hidden="true" />
-                  <p className="discovery-tools-state-copy">
-                    {anonUnavailable === "offline"
-                      ? "You're offline, so recommendations can't load. They'll load when you reconnect, or try again."
-                      : "We couldn't load recommendations right now."}
-                  </p>
-                  <Button variant="outline" onClick={(e) => { handoffFocusOnUnmount(e.currentTarget); void refetch(); }} data-testid="button-retry-recommendations">
-                    Try again
-                  </Button>
-                </CardContent>
-              </Card>
+              <StatePanel tone="error" label={anonUnavailable === "offline" ? "Offline" : "Error · unavailable"}
+                title={anonUnavailable === "offline" ? "You’re offline" : "Couldn’t load recommendations"} inline
+                testId="recommendations-error"
+                actions={<RetryButton onRetry={() => void refetch()} testId="button-retry-recommendations" />}>
+                {anonUnavailable === "offline"
+                  ? "Recommendations will load when your connection is back."
+                  : "Something went wrong while fetching recommendations. Please try again."}
+              </StatePanel>
             ) : anonRecommendations.length === 0 ? (
-              <Card className="discovery-tools-state-card">
-                <CardContent className="discovery-tools-state discovery-tools-state--empty">
-                  <span className="eyebrow discovery-tools-state-eyebrow">No recommendations</span>
-                  <p className="discovery-tools-state-copy">
-                  No recommendations available yet. Browse the categories on the home page to get started.
-                  </p>
-                </CardContent>
-              </Card>
+              <StatePanel tone="empty" label="No recommendations" title="No recommendations yet" inline
+                actions={<Button asChild variant="outline"><Link href="/categories">Browse categories</Link></Button>}>
+                Browse the categories to get started.
+              </StatePanel>
             ) : (
               <div className="discovery-tools-recommendation-grid discovery-tools-recommendation-grid--anonymous">
                 {anonRecommendations.map((rec) => (

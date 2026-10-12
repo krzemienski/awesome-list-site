@@ -1,6 +1,6 @@
+import StatePanel, { RetryButton } from "@/components/layout/StatePanel";
 import { useEffect, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
-import { handoffFocusOnUnmount } from "@/hooks/focus-handoff";
 import "@/styles/pages/discovery.css";
 import { ArrowLeft } from "lucide-react";
 import { Link, Redirect, useLocation, useParams, useSearch } from "wouter";
@@ -126,19 +126,16 @@ export default function TagLanding() {
   }
   if (listing.error) {
     return (
-      <div className="discovery-page discovery-state" role="alert">
-        <h1 className="display-h">Error Loading Tag</h1>
-        <p>Please try again.</p>
-        <div className="flex flex-wrap justify-center gap-2">
-          <Button variant="outline" className="min-h-11" onClick={(e) => { handoffFocusOnUnmount(e.currentTarget); void listing.refetch(); }}>Retry</Button>
-          <Button asChild variant="outline" className="min-h-11">
+      <StatePanel tone="error" label="Error · unavailable" title="Couldn't load this tag" headingLevel={1}
+        testId="tag-error"
+        actions={<>
+          <RetryButton onRetry={() => void listing.refetch()} testId="button-retry-tag" />
+          <Button asChild variant="outline">
             <Link href="/categories" data-testid="link-tag-error-categories">Browse categories</Link>
           </Button>
-          <Button asChild className="min-h-11">
-            <Link href="/" data-testid="link-tag-error-home"><ArrowLeft className="h-4 w-4" />Back to Home</Link>
-          </Button>
-        </div>
-      </div>
+        </>}>
+        Something went wrong while fetching resources with this tag. Please try again.
+      </StatePanel>
     );
   }
 

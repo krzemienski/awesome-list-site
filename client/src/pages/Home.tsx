@@ -1,5 +1,6 @@
+import StatePanel, { RetryButton } from "@/components/layout/StatePanel";
 import { lazy, Suspense, useEffect, useMemo, useState } from "react";
-import { focusPageHeading, handoffFocusOnUnmount } from "@/hooks/focus-handoff";
+import { focusPageHeading } from "@/hooks/focus-handoff";
 import { Link, useSearch } from "wouter";
 import { useQuery } from "@tanstack/react-query";
 import { Card, CardContent } from "@/components/ui/card";
@@ -53,7 +54,7 @@ const AdvancedFilter = lazy(() => import("@/components/ui/advanced-filter"));
 function AccountFeatureFallback({ label }: { label: string }) {
   return (
     <div
-      className="h-28 animate-pulse border border-[var(--border)] bg-[var(--surface)]"
+      className="skeleton h-28"
       aria-busy="true"
       aria-label={label}
       data-testid="home-account-feature-skeleton"
@@ -69,8 +70,8 @@ function FilterControlsFallback() {
       aria-label="Loading filter controls"
       data-testid="filter-controls-skeleton"
     >
-      <div className="h-11 w-36 animate-pulse bg-muted" />
-      <div className="h-11 w-full animate-pulse bg-muted sm:w-[180px]" />
+      <div className="skeleton h-11 w-36" />
+      <div className="skeleton h-11 w-full sm:w-[180px]" />
     </div>
   );
 }
@@ -296,13 +297,10 @@ function HomeSkeleton({
 
 function CatalogError({ onRetry, message }: { onRetry: () => void; message: string }) {
   return (
-    <div className="home-error" role="alert">
-      <h1 className="display-h">We couldn&apos;t load the catalog</h1>
-      <p>{message}</p>
-      <Button onClick={(e) => { handoffFocusOnUnmount(e.currentTarget); onRetry(); }} data-testid="button-retry-catalog">
-        Retry
-      </Button>
-    </div>
+    <StatePanel tone="error" label="Error · unavailable" title="We couldn't load the catalog" headingLevel={1}
+      actions={<RetryButton onRetry={onRetry} testId="button-retry-catalog" />}>
+      {message}
+    </StatePanel>
   );
 }
 

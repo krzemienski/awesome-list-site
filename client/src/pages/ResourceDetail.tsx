@@ -1,3 +1,4 @@
+import StatePanel, { RetryButton } from "@/components/layout/StatePanel";
 import { useParams, Link, useLocation } from "wouter";
 import { hasInAppHistory } from "@/lib/nav-history";
 import { useQuery } from "@tanstack/react-query";
@@ -606,13 +607,11 @@ export default function ResourceDetail() {
 
   if (error || !resource) {
     return (
-      <Card className="m-auto w-full max-w-lg" data-testid="resource-unavailable">
-        <CardHeader>
-          <h1 className="text-2xl font-semibold">Resource temporarily unavailable</h1>
-          <CardDescription role="alert">We couldn't load this resource. Please try again.</CardDescription>
-        </CardHeader>
-        <CardContent><Button onClick={() => void resourceQuery.refetch()}>Retry</Button></CardContent>
-      </Card>
+      <StatePanel tone="error" label="Error · unavailable" title="Resource temporarily unavailable" headingLevel={1}
+        testId="resource-unavailable"
+        actions={<RetryButton onRetry={() => void resourceQuery.refetch()} testId="button-retry-resource" />}>
+        We couldn&apos;t load this resource. Please try again.
+      </StatePanel>
     );
   }
 

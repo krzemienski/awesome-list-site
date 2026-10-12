@@ -1,6 +1,7 @@
+import StatePanel, { RetryButton } from "@/components/layout/StatePanel";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { handoffFocusOnUnmount } from "@/hooks/focus-handoff";
-import { Bell, Check, CheckCheck, Inbox, RefreshCw } from "lucide-react";
+import { Bell, Check, CheckCheck } from "lucide-react";
 import { Link } from "wouter";
 import SEOHead from "@/components/layout/SEOHead";
 import { Button } from "@/components/ui/button";
@@ -84,40 +85,20 @@ export default function Notifications() {
           </CardContent>
         </Card>
       ) : unavailable ? (
-        <Card>
-          <CardContent className="p-8 text-center" role="alert" data-testid={`notifications-${unavailable}`}>
-            <RefreshCw className="account-accent-icon mx-auto h-8 w-8" />
-            <p className="account-muted mt-3 text-sm">
-              {unavailable === "offline"
-                ? "You’re offline. Your notifications will load when your connection is back."
-                : "We couldn’t load your notifications."}
-            </p>
-            <Button
-              variant="outline"
-              className="mt-4 min-h-[44px]"
-              onClick={(e) => { handoffFocusOnUnmount(e.currentTarget); void query.refetch(); }}
-            >
-              Try again
-            </Button>
-          </CardContent>
-        </Card>
+        <StatePanel tone="error" label={unavailable === "offline" ? "Offline" : "Error · unavailable"}
+          title={unavailable === "offline" ? "You’re offline" : "Couldn’t load your notifications"} inline
+          testId={`notifications-${unavailable}`}
+          actions={<RetryButton onRetry={() => void query.refetch()} />}>
+          {unavailable === "offline"
+            ? "Your notifications will load when your connection is back."
+            : "Something went wrong while fetching your inbox. Please try again."}
+        </StatePanel>
       ) : !query.data?.notifications.length ? (
-        <Card>
-          <CardContent className="p-10 text-center">
-            <Inbox className="account-accent-icon mx-auto h-9 w-9" />
-            <h2 className="mt-4 font-display text-xl">Nothing here yet</h2>
-            <p className="account-muted mx-auto mt-2 max-w-sm text-sm">
-              When you opt in to updates and something matches your choices, it
-              will appear in this quiet inbox.
-            </p>
-            <Link
-              href="/settings#notification-settings"
-              className="account-accent mt-5 inline-flex min-h-[44px] items-center text-sm font-semibold underline underline-offset-4"
-            >
-              Review notification choices
-            </Link>
-          </CardContent>
-        </Card>
+        <StatePanel tone="empty" label="No notifications" title="Nothing here yet" inline
+          actions={<Button asChild variant="outline"><Link href="/settings#notification-settings">Review notification choices</Link></Button>}>
+          When you opt in to updates and something matches your choices, it
+          will appear in this quiet inbox.
+        </StatePanel>
       ) : (
         <Card>
           <CardHeader className="account-notification-header">

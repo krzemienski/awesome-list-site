@@ -1,7 +1,8 @@
+import StatePanel from "@/components/layout/StatePanel";
 import { useEffect, useMemo, useRef } from "react";
 import { useQueries } from "@tanstack/react-query";
 import { Link, useLocation } from "wouter";
-import { AlertTriangle, Bookmark, BookmarkX, CloudUpload, LogIn } from "lucide-react";
+import { AlertTriangle, Bookmark, CloudUpload, LogIn } from "lucide-react";
 import SEOHead from "@/components/layout/SEOHead";
 import { bookmarksPageSeo } from "@shared/seo-templates";
 import ResourceCard from "@/components/resource/ResourceCard";
@@ -112,29 +113,24 @@ export default function GuestBookmarks() {
           description={bookmarksPageSeo.description}
           noindex
         />
-        <div className="text-center py-12">
-          <div className="account-empty-icon p-6 mb-6 inline-flex">
-            <BookmarkX className="h-12 w-12 text-primary" aria-hidden="true" />
-          </div>
-          <h1 className="display-h text-2xl mb-2">Nothing saved on this device</h1>
-          <p className="text-muted-foreground mb-5">
-            Tap the bookmark icon on any resource to save it — no account needed.
-            Sign in to keep your saves across devices.
-          </p>
-          <div className="flex flex-wrap justify-center gap-3">
-            <Button asChild className="min-h-11">
-              <Link href="/">Explore resources</Link>
-            </Button>
-            <Button
-              variant="outline"
-              className="min-h-11"
-              onClick={() => goAuth("/sign-in")}
-              data-testid="button-guest-empty-signin"
-            >
-              <LogIn className="mr-2 h-4 w-4" aria-hidden="true" /> Sign in
-            </Button>
-          </div>
-        </div>
+        <StatePanel tone="empty" label="No saves" title="Nothing saved on this device" headingLevel={1}
+          actions={
+            <>
+              <Button asChild>
+                <Link href="/">Explore resources</Link>
+              </Button>
+              <Button
+                variant="outline"
+                onClick={() => goAuth("/sign-in")}
+                data-testid="button-guest-empty-signin"
+              >
+                <LogIn className="mr-2 h-4 w-4" aria-hidden="true" /> Sign in
+              </Button>
+            </>
+          }>
+          Tap the bookmark icon on any resource to save it — no account needed.
+          Sign in to keep your saves across devices.
+        </StatePanel>
       </div>
     );
   }

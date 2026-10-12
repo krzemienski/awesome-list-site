@@ -1,3 +1,4 @@
+import StatePanel from "@/components/layout/StatePanel";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useParams, Link, useLocation, useSearch } from "wouter";
 import { keepPreviousData, useQuery } from "@tanstack/react-query";
@@ -425,7 +426,14 @@ export default function TaxonomyListing({ level }: Props) {
   // healthy listing once the query is idle again (e.g. Back to this page with
   // the panel closed): only a live, enabled request can fail the page.
   const taxonomySearchError = taxonomySearchEnabled ? taxonomySearch.error : null;
-  if (listing.error || taxonomySearchError) return <ErrorPage error={listing.error ?? taxonomySearchError} />;
+  if (listing.error || taxonomySearchError) {
+    return (
+      <ErrorPage
+        error={listing.error ?? taxonomySearchError}
+        onRetry={() => { void (listing.error ? listing.refetch() : taxonomySearch.refetch()); }}
+      />
+    );
+  }
   if (queryUnavailableReason(listing) === "offline") return <OfflinePageState onRetry={() => void listing.refetch()} testId="taxonomy-offline" />;
   if (!listingData || !name) return <NotFound />;
 
@@ -636,7 +644,7 @@ export default function TaxonomyListing({ level }: Props) {
           {(listingData.scope.ignoredSubcategory || listingData.scope.ignoredSubSubcategory) && <div role="status" data-testid="notice-unknown-subcategory" className="rounded border p-3 text-sm">“{selection}” isn't a subcategory of {name}, so that filter was ignored.<button type="button" className="btn ghost ml-2 min-h-8" onClick={broadenScope}>Remove it</button></div>}
           {serverSearchActive && !taxonomySearch.isPlaceholderData && taxonomySearch.data?.search?.mode === "fuzzy" && taxonomySearch.data.search.suggestion && <div className="flex flex-wrap items-center justify-center gap-2 rounded border p-3 text-sm" role="status" data-testid="notice-taxonomy-search-suggestion"><span>No exact matches. Did you mean</span><Button variant="link" className="h-auto p-0" onClick={() => { setSearchTerm(taxonomySearch.data!.search!.suggestion!); setPage(1); /* C6-SWEEP-08: the notice unmounts with this button; the input is display:none while the tools panel is closed, so fall back to the results region */ const input = searchInputRef.current; if (input && input.offsetParent !== null) input.focus(); else resultsRef.current?.focus({ preventScroll: true }); }}>{taxonomySearch.data.search.suggestion}</Button><span>?</span></div>}
           {resultsLoading ? <div className="taxonomy-grid" data-testid="taxonomy-results-loading">{Array.from({ length: 6 }).map((_, index) => <ResourceCardSkeleton key={index} />)}</div>
-             : resources.length === 0 ? <div className="flex flex-col items-center gap-3 py-12 text-center" data-testid="empty-resources">{emptyCollection ? <><h3 className="text-lg font-semibold">No resources here yet</h3><p className="text-muted-foreground">Nothing has been approved for this {level === "category" ? "category" : "collection"} yet. Browse the wider catalog in the meantime.</p></> : <><h3 className="text-lg font-semibold">No resources match this combination</h3><p className="text-muted-foreground">Clear a filter, remove the search, or broaden where you're looking.</p></>}<div className="flex flex-wrap justify-center gap-2">{(tags.length > 0 || provider || format || skillLevel || kind || sort !== "default") && <Button variant="outline" onClick={clearFacetFilters} data-testid="button-clear-taxonomy-filters">Clear filters</Button>}{normalizedSearch && <Button variant="ghost" onClick={() => { setSearchTerm(""); setPage(1); requestResultsFocus(); }} data-testid="button-clear-taxonomy-search">Clear search</Button>}{(selection !== "all" || general) ? <Button variant="secondary" onClick={broadenScope} data-testid="button-broaden-taxonomy-scope">Show all in {name}</Button> : <Button asChild variant="secondary"><Link href={broadenHref} data-testid="link-broaden-taxonomy-scope">{level === "category" ? `Search all of ${siteName}` : "Search the broader category"}</Link></Button>}</div></div> :
+             : resources.length === 0 ? <StatePanel tone="empty" label={emptyCollection ? "No resources" : "No matches"} title={emptyCollection ? "No resources here yet" : "No resources match this combination"} inline testId="empty-resources" actions={<>{(tags.length > 0 || provider || format || skillLevel || kind || sort !== "default") && <Button variant="outline" onClick={clearFacetFilters} data-testid="button-clear-taxonomy-filters">Clear filters</Button>}{normalizedSearch && <Button variant="ghost" onClick={() => { setSearchTerm(""); setPage(1); requestResultsFocus(); }} data-testid="button-clear-taxonomy-search">Clear search</Button>}{(selection !== "all" || general) ? <Button variant="secondary" onClick={broadenScope} data-testid="button-broaden-taxonomy-scope">Show all in {name}</Button> : <Button asChild variant="secondary"><Link href={broadenHref} data-testid="link-broaden-taxonomy-scope">{level === "category" ? `Search all of ${siteName}` : "Search the broader category"}</Link></Button>}</>}>{emptyCollection ? `Nothing has been approved for this ${level === "category" ? "category" : "collection"} yet. Browse the wider catalog in the meantime.` : "Clear a filter, remove the search, or broaden where you're looking."}</StatePanel> :
             <div className={view === "grid" ? "taxonomy-grid" : view === "list" ? "flex flex-col gap-2" : "grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3"}>{resources.map((resource: any, index: number) => {
                const normalized = {
                  ...resource,

@@ -1,7 +1,6 @@
+import StatePanel, { RetryButton } from "@/components/layout/StatePanel";
 import { TaxonomyCardSkeleton } from "@/components/ui/skeletons";
-import { handoffFocusOnUnmount } from "@/hooks/focus-handoff";
 import "@/styles/pages/discovery.css";
-import { Button } from "@/components/ui/button";
 import { useMemo, useState } from "react";
 import { TaxonomyCard } from "@/components/ui/taxonomy-card";
 import {
@@ -194,24 +193,12 @@ export default function Categories({ nav, isLoading, error, onRetry }: Categorie
         /* R5-024 (run24): real error card with Retry — the old code showed an
            eternal skeleton (or a misleading "No categories") when the nav
            fetch failed. */
-        <div
-          className="discovery-state"
-          role="alert"
-          data-testid="categories-error-card"
-        >
-          <h2 className="text-lg font-semibold">Couldn't load categories</h2>
-          <p className="max-w-md text-sm text-muted-foreground">
-            Something went wrong while fetching the category list. Check your
-            connection and try again.
-          </p>
-          <Button
-            type="button"
-            onClick={(e) => { handoffFocusOnUnmount(e.currentTarget); onRetry?.(); }}
-            data-testid="button-categories-retry"
-          >
-            Retry
-          </Button>
-        </div>
+        <StatePanel tone="error" label="Error · unavailable" title="Couldn't load categories" inline
+          testId="categories-error-card"
+          actions={onRetry && <RetryButton onRetry={onRetry} testId="button-categories-retry" />}>
+          Something went wrong while fetching the category list. Check your
+          connection and try again.
+        </StatePanel>
       ) : isLoading ? (
         <div className="discovery-grid" aria-busy="true">
           {Array.from({ length: 9 }).map((_, i) => (
@@ -219,7 +206,7 @@ export default function Categories({ nav, isLoading, error, onRetry }: Categorie
           ))}
         </div>
       ) : categories.length === 0 ? (
-        <div className="discovery-state"><h2>No categories available yet.</h2><p>Check back for curated video development resources.</p></div>
+        <StatePanel tone="empty" label="No categories" title="No categories available yet" inline>Check back for curated video development resources.</StatePanel>
       ) : (
         <div className="discovery-grid">
           {categories.map((cat) => {
