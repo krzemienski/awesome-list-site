@@ -638,7 +638,7 @@ export default function PendingEdits() {
                 <h3 className="font-semibold mb-2">Metadata</h3>
                 <div className="bg-muted/50 rounded-lg p-3 text-sm space-y-1">
                   <p><strong>Submitted:</strong> {formatDate(selectedEdit.createdAt)}</p>
-                  <p><strong>Status:</strong> <Badge>{selectedEdit.status}</Badge></p>
+                  <div><strong>Status:</strong> <Badge>{selectedEdit.status}</Badge></div>
                 </div>
               </div>
             </div>

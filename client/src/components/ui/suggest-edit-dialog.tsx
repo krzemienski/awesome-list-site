@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useMutation, useQuery } from "@tanstack/react-query";
@@ -189,6 +189,21 @@ export function SuggestEditDialog({ resource, open, onOpenChange }: SuggestEditD
   const isAdminUser = Boolean(user && (user as any).role === "admin");
   const [claudeSuggestions, setClaudeSuggestions] = useState<ClaudeSuggestions | null>(null);
   const [analyzingWithAI, setAnalyzingWithAI] = useState(false);
+  // Analysis is a paid Claude request, so it needs an explicit second step.
+  const [confirmAnalyze, setConfirmAnalyze] = useState(false);
+  const analyzeButtonRef = useRef<HTMLButtonElement>(null);
+  const runAnalysisButtonRef = useRef<HTMLButtonElement>(null);
+  const refocusAnalyzeRef = useRef(false);
+  // Focus moves after the render that enables/disables the buttons; focusing
+  // a still-disabled Analyze button in the click handler drops focus to body.
+  useEffect(() => {
+    if (confirmAnalyze) {
+      runAnalysisButtonRef.current?.focus();
+    } else if (!analyzingWithAI && refocusAnalyzeRef.current) {
+      refocusAnalyzeRef.current = false;
+      analyzeButtonRef.current?.focus();
+    }
+  }, [confirmAnalyze, analyzingWithAI]);
 
   const { data: categories = [] } = useQuery<Category[]>({
     queryKey: ['/api/categories'],
@@ -298,7 +313,19 @@ export function SuggestEditDialog({ resource, open, onOpenChange }: SuggestEditD
 
   // C5-V2-01: analyze the URL in the field (the user's proposed URL), not the
   // stored one; an invalid field shows its own validation instead of a request.
+  const requestAnalyzeWithAI = async () => {
+    if (!(await form.trigger("url"))) return;
+    setConfirmAnalyze(true);
+  };
+
+  const cancelAnalyzeWithAI = () => {
+    refocusAnalyzeRef.current = true;
+    setConfirmAnalyze(false);
+  };
+
   const handleAnalyzeWithAI = async () => {
+    refocusAnalyzeRef.current = true;
+    setConfirmAnalyze(false);
     if (!(await form.trigger("url"))) return;
     setAnalyzingWithAI(true);
     try {
@@ -673,8 +700,11 @@ export function SuggestEditDialog({ resource, open, onOpenChange }: SuggestEditD
               <Button
                 type="button"
                 variant="outline"
-                onClick={() => void handleAnalyzeWithAI()}
-                disabled={analyzingWithAI}
+                ref={analyzeButtonRef}
+                onClick={() => void requestAnalyzeWithAI()}
+                disabled={analyzingWithAI || confirmAnalyze}
+                aria-expanded={confirmAnalyze}
+                aria-controls="analyze-ai-confirm"
                 data-testid="button-analyze-ai"
               >
                 {analyzingWithAI ? (
@@ -703,6 +733,38 @@ export function SuggestEditDialog({ resource, open, onOpenChange }: SuggestEditD
                 </Button>
               )}
             </div>
+
+            {isAdminUser && confirmAnalyze && (
+              <div
+                id="analyze-ai-confirm"
+                role="group"
+                aria-labelledby="analyze-ai-confirm-text"
+                className="space-y-3 rounded-md border border-[var(--border)] bg-[var(--surface)] p-3"
+                data-testid="panel-analyze-ai-confirm"
+              >
+                <p id="analyze-ai-confirm-text" className="text-sm">
+                  This sends the URL to Claude as a paid request and counts toward your daily AI analysis limit.
+                </p>
+                <div className="flex flex-wrap gap-2">
+                  <Button
+                    type="button"
+                    ref={runAnalysisButtonRef}
+                    onClick={() => void handleAnalyzeWithAI()}
+                    data-testid="button-confirm-analyze-ai"
+                  >
+                    Run analysis
+                  </Button>
+                  <Button
+                    type="button"
+                    variant="outline"
+                    onClick={cancelAnalyzeWithAI}
+                    data-testid="button-cancel-analyze-ai"
+                  >
+                    Cancel
+                  </Button>
+                </div>
+              </div>
+            )}
 
             {claudeSuggestions && (
               <Card className="bg-muted/50">
