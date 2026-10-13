@@ -58,6 +58,7 @@ export class AwesomeVideoApp extends Container<AppEnv> {
   defaultPort = 5000;
   sleepAfter = "1h";
   enableInternet = true;
+  private imageChecked = false;
 
   constructor(ctx: ConstructorParameters<typeof Container<AppEnv>>[0], env: AppEnv) {
     super(ctx, env);
@@ -73,6 +74,28 @@ export class AwesomeVideoApp extends Container<AppEnv> {
       DISABLE_BACKGROUND_JOBS: "1",
       PUBLIC_SITE_URL: "https://awesome.video",
     };
+  }
+
+  // A running container keeps the image it started with: a deploy that
+  // changes `image` does not replace the instance bound to this Durable
+  // Object (cloudflare/containers#233). Once per object lifetime, compare the
+  // running image with IMAGE_TAG (kept equal to the wrangler.jsonc tag by
+  // release.sh) and stop a stale one so the next start uses the configured
+  // image. inspect() reports "" while a container is starting.
+  private async replaceStaleImage(): Promise<void> {
+    if (this.imageChecked) return;
+    this.imageChecked = true;
+    const expected = this.env.IMAGE_TAG;
+    if (!expected || !this.ctx.container?.running) return;
+    const running = (await this.ctx.container.inspect())?.image ?? "";
+    if (running === "" || running.endsWith(`:${expected}`)) return;
+    console.log(`replacing container image ${running} with tag ${expected}`);
+    await this.destroy();
+  }
+
+  override async fetch(request: Request): Promise<Response> {
+    await this.replaceStaleImage();
+    return super.fetch(request);
   }
 }
 

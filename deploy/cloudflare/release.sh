@@ -54,6 +54,7 @@ echo "release: pushing $image"
 (cd "$cf" && npx --no-install wrangler containers push "awesome-video-cf:$tag")
 
 sed -i.bak "s#awesome-video-cf:[0-9a-f]\{7,40\}\"#awesome-video-cf:$tag\"#" "$cf/wrangler.jsonc"
+sed -i.bak "s#\"IMAGE_TAG\": \"[0-9a-f]*\"#\"IMAGE_TAG\": \"$tag\"#" "$cf/wrangler.jsonc"
 rm -f "$cf/wrangler.jsonc.bak"
 echo "release: wrangler.jsonc now references $tag (commit this change)"
 
