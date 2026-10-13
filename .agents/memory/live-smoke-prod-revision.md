@@ -11,3 +11,5 @@ description: How to tell which code production really runs, and how to do signed
   **Why:** you get route-level proof for cancel/start endpoints without the side effects of an authenticated call.
 - For signed-in read-only admin sweeps, route-abort every non-GET /api request in the page. The only ones seen are `POST /api/send`. These are the Replit-injected widget beacon, not app writes.
 - A one-off 500 from admin-login with no 5xx in the deployment logs is the platform edge; retry once.
+- Signed-in prod checks in a non-default design system: the account's saved server theme beats a seeded `ds-system` localStorage value, so the page loads in the saved system. Call `window.applyDesignSystem(system, accent)` in the page instead, with non-GET /api calls aborted so nothing is saved.
+  **Why:** 2026-10-12 a Geist admin chart check silently ran in Editorial after localStorage was seeded with geist.
