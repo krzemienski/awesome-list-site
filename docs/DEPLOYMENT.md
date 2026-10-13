@@ -185,8 +185,15 @@ git commit -m "chore: point cf container at image <tag>" deploy/cloudflare/wrang
 (Clerk key, contact variant, Amplitude/Mixpanel/PostHog/GA keys — the same
 values Replit sets in `.replit`), pushes `awesome-video-cf:<8-char sha>` to
 the account registry, rewrites the image tag in `wrangler.jsonc`, type-checks
-the Worker and deploys. Confirm `https://cf.awesome.video/api/version`
-returns the full commit SHA.
+the Worker, then deletes the container application and deploys, which
+recreates it on the new image. Confirm `https://cf.awesome.video/api/version`
+returns the full commit SHA (about a minute of 5xx while it starts).
+
+Why delete: a plain `wrangler deploy` that changes only `image` reports
+success and updates the application config, but the running instance kept
+serving the previous image for 10+ minutes in every attempt
+(cloudflare/containers#233). Recreating the application switched it within
+about 70 seconds each time. Nothing persistent lives in the container.
 
 Runtime secrets are uploaded separately and never baked into the image:
 
@@ -202,10 +209,10 @@ already applied in production, or get the owner's go-ahead first.
 
 ### Rollback
 
-`npx wrangler deployments list` shows each deploy with its image tag in the
-message; `npx wrangler rollback <deployment-id>` returns to it. Pushed images
-stay in the registry (`npx wrangler containers images list`), so re-pointing
-`wrangler.jsonc` at an older tag and deploying also works.
+Pushed images stay in the registry (`npx wrangler containers images list`).
+Point `wrangler.jsonc` at the previous tag, then delete the container
+application and deploy, as `release.sh` does. `wrangler rollback` only
+restores Worker code; it does not move a running instance to another image.
 
 ### Known gaps before cutover
 

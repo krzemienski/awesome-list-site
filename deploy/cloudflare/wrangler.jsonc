@@ -3,8 +3,6 @@
   "main": "src/index.ts",
   "compatibility_date": "2026-09-01",
   "observability": { "enabled": true },
-  // Must equal the image tag below; release.sh rewrites both.
-  "vars": { "IMAGE_TAG": "c51c12e2" },
   "routes": [{ "pattern": "cf.awesome.video", "custom_domain": true }],
   "containers": [
     {

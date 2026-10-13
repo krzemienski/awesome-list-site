@@ -54,12 +54,23 @@ echo "release: pushing $image"
 (cd "$cf" && npx --no-install wrangler containers push "awesome-video-cf:$tag")
 
 sed -i.bak "s#awesome-video-cf:[0-9a-f]\{7,40\}\"#awesome-video-cf:$tag\"#" "$cf/wrangler.jsonc"
-sed -i.bak "s#\"IMAGE_TAG\": \"[0-9a-f]*\"#\"IMAGE_TAG\": \"$tag\"#" "$cf/wrangler.jsonc"
 rm -f "$cf/wrangler.jsonc.bak"
-(cd "$cf" && npx --no-install wrangler types >/dev/null)
-echo "release: wrangler.jsonc and worker-configuration.d.ts now reference $tag (commit them)"
+echo "release: wrangler.jsonc now references $tag (commit it)"
 
 if [[ ${1:-} == "--no-deploy" ]]; then exit 0; fi
 
-(cd "$cf" && npm run check && npx --no-install wrangler deploy --message "image $tag")
+# A deploy that only changes `image` leaves the running instance on its old
+# image indefinitely (observed 2026-10-13; cloudflare/containers#233), so
+# recreate the container application. cf.awesome.video answers 5xx for about
+# a minute while the new instance starts; the database is external and the
+# Durable Object storage belongs to the Worker, so nothing is lost.
+cd "$cf"
+npm run check
+app_id=$(npx --no-install wrangler containers list 2>/dev/null |
+  sed -n 's/^│ \([0-9a-f-]\{36\}\) │ awesome-video-cf-awesomevideoapp .*/\1/p' | head -n 1)
+if [[ -n $app_id ]]; then
+  echo "release: deleting container application $app_id"
+  yes | npx --no-install wrangler containers delete "$app_id" >/dev/null
+fi
+npx --no-install wrangler deploy --message "image $tag"
 echo "release: deployed $tag; confirm https://cf.awesome.video/api/version reports $rev"
