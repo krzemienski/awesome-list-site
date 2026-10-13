@@ -141,7 +141,6 @@
 - [Page title face](page-title-face.md) — page h1s use .page-title (body face 700) per the reference; display face only for wordmark/numerals/state titles/accents.
 - [SSR lazy boundary #421](ssr-lazy-boundary-421.md) — env-gated lazy hosts in the hydrated Home tree throw #421/#419; mount closed hosts client-only; diff .replit userenv first.
 - [Secret leak scan by value](secret-history-leak-scan.md) — prove 'no secrets committed' by grepping real secret VALUES across all history blobs; owner password leaked via deleted July scripts.
-- [Analytics event counting in browser runs](analytics-event-counting.md) — Mixpanel/GA resend in-flight hits on a quick navigation (same $insert_id); dedupe by insert id or wait ~15s before navigating.
 - [Server-authoritative JSON-LD](jsonld-server-authority.md) — og-middleware emits route JSON-LD; client SEOHead ships none, so the two pipelines never produce conflicting graphs.
 - [Resource browsing parity](resource-browsing-parity.md) — listing pages share ResourceCard; SSR prerender must flatten the SAME tree the client fetches (24/page lockstep), not a parallel DB query.
 - [Crawler prerender versus SSR](spa-crawler-prerender.md) — semantic crawler markup is not hydrateable React; exact-tree SSR also needs the client manifest's split CSS before paint.
@@ -195,6 +194,6 @@
 - [cache-headers boot locks DEV](cache-headers-boot-migrator-locks.md) — spawned prod server runs boot DDL on dev; must hold db-heavy lease while up or seo-snapshot sheds random /tag/* 503s.
 - [ESLint ratchet](eslint-ratchet.md) — app correctness rules held at 0, rest per-file ratchet that only shrinks; Node API needs TSESTREE_SINGLE_RUN=true to match CLI counts.
 - [Publish gate offline repro](pre-publish-gate-offline-repro.md) — run pre-publish-gate.sh --publish in a /tmp tar copy (keep .agents+docs, BUILD_REVISION set, bogus DATABASE_URL) to prove blocking.
-- [Analytics browser verification](analytics-browser-verification.md) — PostHog silently drops headless (webdriver/UA brands); Mixpanel resends → count $insert_id; sanitizer drops `email*` keys.
+- [Analytics browser verification](analytics-browser-verification.md) — PostHog drops headless; Mixpanel/GA resend on quick nav → count $insert_id or wait 15s; sanitizer drops `email*` keys.
 - [Resource kind backfill](resource-kind-backfill.md) — backfill fills NULL kinds only (no provenance); classifier changes never reach stored kinds; never bulk-reset (erases admin overrides).
 - [Two design systems only](two-design-systems.md) — owner kept Editorial×Crimson + Geist; one kept-list; removed values → default; artifact docs hand-owned.

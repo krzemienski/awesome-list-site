@@ -144,6 +144,6 @@ Verification is by real browser use / curl only (no proof packets or gates since
 ## WS11 Release
 | ID | Item | Status | Packet |
 |---|---|---|---|
-| P-01 | Release candidate commit with every row confirmed | OPEN | |
-| P-02 | Post-publish prod revision + reviewer read-only walkthrough | OPEN | |
-| P-03 | Net-zero signed-in prod walkthrough with the A-06 identity | OPEN | |
+| P-01 | Release candidate commit with every row confirmed | FIXED 2026-10-12 — prod `/api/version` = f9bba9b9 (main HEAD), behaviour markers confirmed (kind backfill, 8 featured picks). Every route, control and admin tab is recorded in the [release report](RELEASE-REPORT-2026-10-12.md). One defect found (/submit Category+Tags truncated at 375) was fixed after this revision and ships with the next publish — see [Bugs found and fixed](RELEASE-REPORT-2026-10-12.md#bugs-found-and-fixed). | [report](RELEASE-REPORT-2026-10-12.md) |
+| P-02 | Post-publish prod revision + reviewer read-only walkthrough | FIXED 2026-10-12 — signed-out walkthrough in the in-app browser at 375/768/1024/1440 plus curl SEO/sitemap/robots/404 checks, and a read-only pass over all 18 admin tabs. See [Logged-out sweep](RELEASE-REPORT-2026-10-12.md#logged-out-sweep-prod) and [Signed-in admin sweep](RELEASE-REPORT-2026-10-12.md#signed-in-admin-sweep-prod-owner-admin-1440). | [report](RELEASE-REPORT-2026-10-12.md) |
+| P-03 | Net-zero signed-in prod walkthrough with the A-06 identity | FIXED 2026-10-12 — owner admin session (RELEASE.md §4): favourite, bookmark, featuring and kind override each toggled and restored; a signed-in submission created and deleted (190337 → 404); featured set confirmed unchanged by curl; signed out with "Sign out". See [Net-zero signed-in writes](RELEASE-REPORT-2026-10-12.md#net-zero-signed-in-writes-prod). | [report](RELEASE-REPORT-2026-10-12.md) |

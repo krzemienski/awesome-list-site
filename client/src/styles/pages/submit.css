@@ -377,6 +377,12 @@
 }
 
 @media (max-width: 560px) {
+  /* Two ~118px columns at phone widths truncate category names and the Tags
+     placeholder; stack them. */
+  .submit-form-row {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
   .submit-success-content {
     align-items: flex-start;
     flex-direction: column;
