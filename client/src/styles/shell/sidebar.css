@@ -160,6 +160,17 @@
     white-space: nowrap;
     width: 1px;
   }
+
+  /* "Catalog unavailable" and "Loading resources" are still wider than that
+     ~114px slot, so those states wrap onto a second line instead of
+     ellipsizing. Two 10px lines sit inside the 48px status row, so the row
+     height and the 44px targets stay unchanged. The count state keeps its
+     single nowrap line. */
+  .av-sidebar-shell .av-sidebar-compact-footer-copy:not([data-status="count"]) {
+    line-height: 1.4;
+    overflow-wrap: break-word;
+    white-space: normal;
+  }
 }
 
 /* Canonical rule: below 768px the sidebar is hidden and the drawer takes over.

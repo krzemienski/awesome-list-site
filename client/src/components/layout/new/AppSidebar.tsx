@@ -977,11 +977,17 @@ export default function AppSidebar({
     { label: "About", icon: Info, href: "/about", testId: "nav-about" },
   ];
 
+  const resourceStatusState: "error" | "loading" | "count" =
+    navError && totalResources === 0
+      ? "error"
+      : isLoading || totalResources === 0
+        ? "loading"
+        : "count";
   const resourceStatus = (
     <>
-      {navError && totalResources === 0
+      {resourceStatusState === "error"
         ? "Catalog unavailable"
-        : isLoading || totalResources === 0
+        : resourceStatusState === "loading"
           ? "Loading resources"
           : `${totalResources.toLocaleString()} indexed`}
     </>
@@ -1133,6 +1139,7 @@ export default function AppSidebar({
         <span className="live-dot" aria-hidden="true" />
         <span
           className="av-sidebar-compact-footer-copy"
+          data-status={resourceStatusState}
           {...(exposeResourceTestId
             ? { "data-testid": "sidebar-resource-count" }
             : {})}
