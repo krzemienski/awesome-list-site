@@ -23,6 +23,11 @@ import "@/styles/pages/discovery-tools.css";
 
 export default function Recommendations() {
   const { isAuthenticated, isLoading: authLoading } = useAuth();
+  // Guest picks are only for visitors the session check has confirmed as
+  // signed out. While it is still resolving, !isAuthenticated is also true, so
+  // gating on it alone fired a guest request and flashed the guest layout for
+  // signed-in visitors before the personalized panel took over.
+  const isGuest = !authLoading && !isAuthenticated;
 
   // Anonymous browse: rule-based recommendations from the public GET endpoint.
   const anonQuery = useQuery<RecommendationResult[]>({
@@ -38,7 +43,7 @@ export default function Recommendations() {
         ? response as RecommendationResult[]
         : [];
     },
-    enabled: !isAuthenticated,
+    enabled: isGuest,
     staleTime: 5 * 60 * 1000,
     retry: false,
   });
@@ -51,10 +56,9 @@ export default function Recommendations() {
 
   // One view per page load, once the guest picks (or their empty state) are
   // actually on screen. Signed-in visitors are counted by the panel itself;
-  // the guest query also runs while the session is still resolving, so wait
-  // for auth to settle or a signed-in load would count as a guest view.
+  // The guest query only runs once auth has settled as signed out.
   const viewTrackedRef = useRef(false);
-  const anonLoaded = !authLoading && !isAuthenticated && anonQuery.isSuccess && !anonError;
+  const anonLoaded = isGuest && anonQuery.isSuccess && !anonError;
   useEffect(() => {
     if (!anonLoaded || viewTrackedRef.current) return;
     viewTrackedRef.current = true;
@@ -102,17 +106,36 @@ export default function Recommendations() {
         <div className="discovery-tools-title-row">
           <Sparkles className="discovery-tools-masthead-icon" aria-hidden="true" />
           <h1 className="page-title discovery-tools-page-title">
-            {isAuthenticated ? "Personalized Recommendations" : "Recommended Resources"}
+            {isAuthenticated
+              ? "Personalized Recommendations"
+              : isGuest
+                ? "Recommended Resources"
+                : "Recommendations"}
           </h1>
         </div>
         <p className="discovery-tools-page-lede">
           {isAuthenticated
             ? "Get personalized resource recommendations based on your interests and learning goals."
-            : "Popular picks from across the catalog. Sign in to tailor them to your interests and learning goals."}
+            : isGuest
+              ? "Popular picks from across the catalog. Sign in to tailor them to your interests and learning goals."
+              : "Checking your session…"}
         </p>
       </header>
 
-      {isAuthenticated ? (
+      {authLoading ? (
+        <section
+          className="discovery-tools-results-section"
+          aria-busy="true"
+          data-testid="recommendations-auth-loading"
+        >
+          <span className="sr-only" role="status">Loading recommendations</span>
+          <div className="discovery-tools-recommendation-grid discovery-tools-recommendation-grid--anonymous">
+            {Array.from({ length: 6 }).map((_, i) => (
+              <Skeleton key={i} className="discovery-tools-recommendation-skeleton" />
+            ))}
+          </div>
+        </section>
+      ) : isAuthenticated ? (
         <div className="discovery-tools-owned-panel discovery-tools-ai-panel">
           <AIRecommendationsPanel showHeader={false} />
         </div>
