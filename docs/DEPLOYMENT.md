@@ -177,7 +177,7 @@ How the Worker runs the container (`deploy/cloudflare/src/index.ts`):
 ```bash
 cd deploy/cloudflare && npm ci          # wrangler + containers SDK
 deploy/cloudflare/release.sh            # from a clean commit
-git commit -m "chore: point cf container at image <tag>" deploy/cloudflare/wrangler.jsonc
+git commit -m "Point cf container at image <tag>" deploy/cloudflare/wrangler.jsonc
 ```
 
 `release.sh` refuses a dirty tree, builds `linux/amd64` with
