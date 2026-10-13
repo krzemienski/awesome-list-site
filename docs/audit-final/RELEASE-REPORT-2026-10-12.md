@@ -21,7 +21,7 @@ Status key:
 
 | # | Where | Bug | Fix | Prod re-check |
 |---|---|---|---|---|
-| 1 | `/submit` at 375 | Category and Tags sat side by side in two columns of about 118px. Category names and the "comma,separated" placeholder were cut off (tester shot `x1bir7`). The two-column row was copied from the desktop-only reference. | `client/src/styles/pages/submit.css`: the row stacks into one column at ≤560px. Wider screens keep two columns: 768 and 1024 re-checked side by side, shots `w7c5kg` and `igb91q`. | Verified on dev at 375. **Pending owner republish**; see "Prod re-check after republish" below. |
+| 1 | `/submit` at 375 | Category and Tags sat side by side in two columns of about 118px. Category names and the "comma,separated" placeholder were cut off (tester shot `x1bir7`). The two-column row was copied from the desktop-only reference. | `client/src/styles/pages/submit.css`: the row stacks into one column at ≤560px. Wider screens keep two columns: 768 and 1024 re-checked side by side, shots `w7c5kg` and `igb91q`. | Verified on dev at 375. **PASS on prod** after republish (rev `2bbd3554`, 2026-10-13); see "Prod re-check after republish" below. |
 
 ### Not bugs (investigated and closed)
 
@@ -156,6 +156,6 @@ These need the owner's choice: replace the URL, archive or reject the resource, 
 
 | Item | Result |
 |---|---|
-| `/submit` at 375: Category and Tags stacked, placeholders readable | UNVERIFIED on prod. The fix was verified on dev at 375. It ships when this audit's changes reach main and the owner republishes; the prod re-check is tracked as a follow-up. |
+| `/submit` at 375: Category and Tags stacked, placeholders readable | **PASS** (2026-10-13). `https://awesome.video/api/version` reports `2bbd3554`, the commit that holds the fix. Checked in the browser on awesome.video while signed out. At 375×812 the row has one 231px column. Category is above Tags (tops at 803 and 888), and each control is full width at 229px. Neither placeholder is cut off: "Select…" and "comma,separated" both have scrollWidth equal to clientWidth. At 768 the columns are 305px + 305px and at 1440 they are 324px + 324px, still side by side on the same row. |
 
-Apart from that one item, the final pass found no open bugs on prod.
+The final pass found no open bugs on prod.
