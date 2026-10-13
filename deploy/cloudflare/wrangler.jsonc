@@ -4,7 +4,7 @@
   "compatibility_date": "2026-09-01",
   "observability": { "enabled": true },
   // Must equal the image tag below; release.sh rewrites both.
-  "vars": { "IMAGE_TAG": "260cf674" },
+  "vars": { "IMAGE_TAG": "c51c12e2" },
   "routes": [{ "pattern": "cf.awesome.video", "custom_domain": true }],
   "containers": [
     {
@@ -14,7 +14,7 @@
       // development Clerk key and an empty VITE_CLERK_PROXY_URL: Clerk rejects
       // proxied Frontend API calls for development instances, and a pk_live
       // key would derive a nonexistent clerk.cf.awesome.video.
-      "image": "registry.cloudflare.com/24080dbbce9363d385fac0500c121b85/awesome-video-cf:260cf674",
+      "image": "registry.cloudflare.com/24080dbbce9363d385fac0500c121b85/awesome-video-cf:c51c12e2",
       "instance_type": "standard-1",
       "max_instances": 1
     }
