@@ -73,7 +73,7 @@ async function fetchAuthUser(): Promise<AuthResponse> {
 export function useAuth() {
   const { toast } = useToast();
   const [logoutError, setLogoutError] = useState<string | null>(null);
-  const { data, isLoading, error, refetch } = useQuery<AuthResponse>({
+  const { data, isLoading, isFetching, error, refetch } = useQuery<AuthResponse>({
     queryKey: ['/api/auth/user'],
     queryFn: fetchAuthUser,
     staleTime: 5 * 60 * 1000, // 5 minutes
@@ -190,6 +190,12 @@ export function useAuth() {
   return {
     user: data?.user ?? null,
     isLoading,
+    // True while a "not signed in" answer could still turn into "signed in":
+    // the first check is in flight, or an anonymous answer is being re-asked
+    // (Clerk restoring a session invalidates the cache after the first load).
+    // Click-time auth gates must wait this out instead of treating the
+    // provisional `isAuthenticated: false` as a signed-out visitor.
+    isAuthPending: isLoading || (isFetching && !data?.isAuthenticated),
     isAuthenticated: data?.isAuthenticated ?? false,
     error,
     refetchAuth: refetch,

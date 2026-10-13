@@ -197,3 +197,4 @@
 - [Analytics browser verification](analytics-browser-verification.md) — PostHog drops headless; Mixpanel/GA resend on quick nav → count $insert_id or wait 15s; sanitizer drops `email*` keys.
 - [Resource kind backfill](resource-kind-backfill.md) — backfill fills NULL kinds only (no provenance); classifier changes never reach stored kinds; never bulk-reset (erases admin overrides).
 - [Two design systems only](two-design-systems.md) — owner kept Editorial×Crimson + Geist; one kept-list; removed values → default; artifact docs hand-owned.
+- [Click-time auth gates](click-time-auth-gates.md) — isAuthenticated is provisional false while auth resolves; click gates must wait on isAuthPending.

@@ -192,7 +192,7 @@ function calculateDiff(original: Resource, updated: SuggestEditFormData): Record
 export function SuggestEditDialog({ resource, open, onOpenChange, entryPoint }: SuggestEditDialogProps) {
   const { toast } = useToast();
   const [, setLocation] = useLocation();
-  const { isAuthenticated, user } = useAuth();
+  const { isAuthenticated, isAuthPending, user } = useAuth();
   // R5-030 (run25): AI URL analysis is admin-only (owner decision) — the
   // endpoint 403s for everyone else, so only offer the button to admins.
   const isAdminUser = Boolean(user && (user as any).role === "admin");
@@ -533,6 +533,31 @@ export function SuggestEditDialog({ resource, open, onOpenChange, entryPoint }: 
 
     submitMutation.mutate({ data: resolved, changedFields: Object.keys(proposedChanges) });
   };
+
+  // Opened before the auth check answered: a signed-in member must never see
+  // the sign-in wall just because their session is still being confirmed.
+  if (!isAuthenticated && isAuthPending) {
+    return (
+      <Dialog open={open} onOpenChange={onOpenChange}>
+        <DialogContent className="max-w-md" aria-busy="true">
+          <DialogHeader>
+            <div className="eyebrow" aria-hidden>{"// Suggest edit"}</div>
+            <DialogTitle className="font-display text-2xl font-medium tracking-tight">
+              Suggest <em className="not-italic" style={{ fontStyle: 'italic', color: 'var(--accent-ink)' }}>edit</em>
+            </DialogTitle>
+            <DialogDescription role="status" data-testid="suggest-edit-auth-pending">
+              Checking your sign-in…
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter>
+            <Button variant="ghost" onClick={() => onOpenChange(false)}>
+              Cancel
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+    );
+  }
 
   if (!isAuthenticated) {
     return (

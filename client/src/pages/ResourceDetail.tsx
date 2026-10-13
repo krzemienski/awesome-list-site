@@ -90,7 +90,7 @@ function ContactResourceAction(props: { onSuggestEdit: () => void; fallback: Rea
 
 export default function ResourceDetail() {
   const { id } = useParams<{ id: string }>();
-  const { user, isAuthenticated } = useAuth();
+  const { user, isAuthenticated, isAuthPending } = useAuth();
   const { toast } = useToast();
   const queryClient = useQueryClient();
   const [, setLocation] = useLocation();
@@ -407,16 +407,44 @@ export default function ResourceDetail() {
   // BUG-028 (run19): Suggest Edit used to open the dialog (which showed its own
   // sign-in wall) while Favorite/Bookmark toast — one auth-gate pattern now:
   // logged-out clicks get the same toast + Sign in action everywhere.
+  const showSuggestEditSignInToast = () => {
+    toast({
+      title: "Sign in to suggest edits",
+      description: "Create an account or sign in to propose changes to this resource.",
+      action: signInAction,
+    });
+  };
+  // A click before the auth check answers must not be judged on the
+  // provisional "signed out" value: open the dialog (it shows a checking
+  // state), then settle once auth resolves — form for members, toast for
+  // visitors.
+  const [suggestEditAwaitingAuth, setSuggestEditAwaitingAuth] = useState(false);
   const handleSuggestEditClick = () => {
+    if (isAuthPending) {
+      setSuggestEditAwaitingAuth(true);
+      setSuggestEditOpen(true);
+      return;
+    }
     if (!isAuthenticated) {
-      toast({
-        title: "Sign in to suggest edits",
-        description: "Create an account or sign in to propose changes to this resource.",
-        action: signInAction,
-      });
+      showSuggestEditSignInToast();
       return;
     }
     setSuggestEditOpen(true);
+  };
+  useEffect(() => {
+    if (!suggestEditAwaitingAuth || isAuthPending) return;
+    setSuggestEditAwaitingAuth(false);
+    if (!isAuthenticated) {
+      setSuggestEditOpen(false);
+      showSuggestEditSignInToast();
+    }
+    // showSuggestEditSignInToast is recreated each render; the transition
+    // out of the pending state is the only trigger that matters.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [suggestEditAwaitingAuth, isAuthPending, isAuthenticated]);
+  const handleSuggestEditOpenChange = (open: boolean) => {
+    if (!open) setSuggestEditAwaitingAuth(false);
+    setSuggestEditOpen(open);
   };
 
   const trackInteraction = useMutation({
@@ -1200,7 +1228,7 @@ export default function ResourceDetail() {
           <SuggestEditDialog
             resource={resource}
             open={suggestEditOpen}
-            onOpenChange={setSuggestEditOpen}
+            onOpenChange={handleSuggestEditOpenChange}
             entryPoint="resource_page"
           />
         </Suspense>
