@@ -70,7 +70,9 @@ app_id=$(npx --no-install wrangler containers list 2>/dev/null |
   sed -n 's/^│ \([0-9a-f-]\{36\}\) │ awesome-video-cf-awesomevideoapp .*/\1/p' | head -n 1)
 if [[ -n $app_id ]]; then
   echo "release: deleting container application $app_id"
-  yes | npx --no-install wrangler containers delete "$app_id" >/dev/null
+  # One finite answer: `yes |` would die of SIGPIPE (141) under pipefail
+  # after a successful delete and abort the deploy below.
+  npx --no-install wrangler containers delete "$app_id" <<<"y" >/dev/null
 fi
 npx --no-install wrangler deploy --message "image $tag"
 echo "release: deployed $tag; confirm https://cf.awesome.video/api/version reports $rev"
