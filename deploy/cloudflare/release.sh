@@ -61,9 +61,9 @@ if [[ ${1:-} == "--no-deploy" ]]; then exit 0; fi
 
 # A deploy that only changes `image` leaves the running instance on its old
 # image indefinitely (observed 2026-10-13; cloudflare/containers#233), so
-# recreate the container application. cf.awesome.video answers 5xx for about
-# a minute while the new instance starts; the database is external and the
-# Durable Object storage belongs to the Worker, so nothing is lost.
+# recreate the container application. The old container keeps answering until
+# the new one takes over (70 s to 6 min observed); the database is external and
+# the Durable Object storage belongs to the Worker, so nothing is lost.
 cd "$cf"
 npm run check
 app_id=$(npx --no-install wrangler containers list 2>/dev/null |
