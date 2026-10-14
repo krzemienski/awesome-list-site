@@ -221,11 +221,12 @@ These need decisions before `awesome.video` moves to Cloudflare:
 
 | Area | State on cf | Needed for cutover |
 |---|---|---|
-| Clerk | Development instance (`pk_test`), `VITE_CLERK_PROXY_URL` empty. Production members cannot sign in on cf. | Production instance keys (`sk_live`/`pk_live`, today held by Replit's publish environment), proxy URL `/api/__clerk`, and `cf`/apex hosts allowed on the production instance. |
+| Clerk | Development instance (`pk_test`), `VITE_CLERK_PROXY_URL` empty. Production members cannot sign in on cf; the sign-in card shows Clerk's "Development mode" footer. With a development key the CSP also allows the dev Frontend API host and `clerk-telemetry.com` (`server/index.ts`); a production key drops both. | Production instance keys (`sk_live`/`pk_live`, today held by Replit's publish environment), proxy URL `/api/__clerk`, and `cf`/apex hosts allowed on the production instance. |
 | Email | Replit Gmail connector (`server/email.ts`) is unavailable; contact notifications and digests report `unavailable`. | A portable mail provider. |
 | DB backups | `@replit/object-storage` and `pg_dump` are absent; the admin backup panel cannot run. | Object storage replacement and `postgresql-client` in the image. |
 | AI | Uses `ANTHROPIC_BASE_URL` + token; the Replit AI-integrations sidecar is not forwarded. | None if the router stays. |
 | Schedulers | Off (`DISABLE_BACKGROUND_JOBS=1`). | Switch in one window: disable jobs on Replit, then remove the override here — never both on, never both off. Containers sleep when idle, so scheduled work also needs an always-on instance or a Cron Trigger that wakes it. |
+| Shared DB writes | Boot runs only the `IF NOT EXISTS` drizzle journal DDL when migrations are current. Requests to rate-limited routes upsert `rate_limit_hits` in the shared database, so counters are shared with Replit. | Nothing; expected while both deployments use one database. |
 | Domains | Only `cf.awesome.video`. | Apex/`www` routes, TLS, then DNS — after schedulers move. Keep the Replit deployment paused, not deleted, as rollback. |
 
 ## Other Container Platforms
