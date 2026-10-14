@@ -15,6 +15,7 @@ Container Apps).
 - [Docker / Self-Hosting](#docker--self-hosting)
 - [Railway](#railway)
 - [Vercel](#vercel)
+- [Cloudflare Containers (cf.awesome.video)](#cloudflare-containers-cfawesomevideo)
 - [Other Container Platforms](#other-container-platforms)
 - [Database Setup](#database-setup)
 - [Environment Variables](#environment-variables)
@@ -150,6 +151,83 @@ API will not run. To actually host the backend on Vercel you would need to wrap
 the Express app in a serverless handler under `api/` (e.g. an `api/index.ts`
 shim) — that work has not been done. The checked-in configuration remains
 static-only; no backend runtime variables are consumed by that static deploy.
+
+## Cloudflare Containers (cf.awesome.video)
+
+`deploy/cloudflare/` runs the repo `Dockerfile` image on Cloudflare
+Containers behind the `awesome-video-cf` Worker, on the `cf.awesome.video`
+custom domain. It is the release path for the eventual move off Replit; until
+cutover it runs beside the Replit deployment against the shared production
+database.
+
+How the Worker runs the container (`deploy/cloudflare/src/index.ts`):
+
+- `standard-1` instance, `max_instances: 1`, sleeps after 1h idle.
+- Forces `NODE_ENV=production`, `PORT=5000`, `DISABLE_BACKGROUND_JOBS=1`
+  (Replit owns the schedulers until cutover) and
+  `PUBLIC_SITE_URL=https://awesome.video` (canonical URLs stay on the apex).
+- Forwards only the Worker secrets named in `CONTAINER_ENV`. Add a name
+  there before relying on a new runtime variable; anything else bound to the
+  Worker never reaches the app.
+- Strips `cf-*`/`cdn-loop` headers and sets `x-forwarded-*`, so the Clerk
+  proxy does not hit Cloudflare Error 1000.
+
+### Release
+
+```bash
+cd deploy/cloudflare && npm ci          # wrangler + containers SDK
+deploy/cloudflare/release.sh            # from a clean commit
+git commit -m "Point cf container at image <tag>" deploy/cloudflare/wrangler.jsonc
+```
+
+`release.sh` refuses a dirty tree, builds `linux/amd64` with
+`BUILD_REVISION=<HEAD>`, passes the public `VITE_*` inputs from `.env`
+(Clerk key, contact variant, Amplitude/Mixpanel/PostHog/GA keys — the same
+values Replit sets in `.replit`), pushes `awesome-video-cf:<8-char sha>` to
+the account registry, rewrites the image tag in `wrangler.jsonc`, type-checks
+the Worker, then deletes the container application and deploys, which
+recreates it on the new image. Confirm `https://cf.awesome.video/api/version`
+returns the full commit SHA. Switch-over took 70 seconds to 6 minutes in
+practice; until then the previous container keeps answering.
+
+Why delete: a plain `wrangler deploy` that changes only `image` reports
+success and updates the application config, but the running instance kept
+serving the previous image for 10+ minutes in every attempt
+(cloudflare/containers#233). Recreating the application switched it every
+time. Nothing persistent lives in the container.
+
+Runtime secrets are uploaded separately and never baked into the image:
+
+```bash
+cd deploy/cloudflare
+npx wrangler secret put DATABASE_URL       # one name at a time, or
+npx wrangler secret bulk secrets.json      # a JSON file kept outside the repo
+```
+
+Boot runs `server/migrate.ts` against `DATABASE_URL` before listening, even
+with background jobs disabled. Deploy only commits whose `migrations/` are
+already applied in production, or get the owner's go-ahead first.
+
+### Rollback
+
+Pushed images stay in the registry (`npx wrangler containers images list`).
+Point `wrangler.jsonc` at the previous tag, then delete the container
+application and deploy, as `release.sh` does. `wrangler rollback` only
+restores Worker code; it does not move a running instance to another image.
+
+### Known gaps before cutover
+
+These need decisions before `awesome.video` moves to Cloudflare:
+
+| Area | State on cf | Needed for cutover |
+|---|---|---|
+| Clerk | Development instance (`pk_test`), `VITE_CLERK_PROXY_URL` empty. Production members cannot sign in on cf; the sign-in card shows Clerk's "Development mode" footer. With a development key the CSP also allows the dev Frontend API host and `clerk-telemetry.com` (`server/index.ts`); a production key drops both. | Production instance keys (`sk_live`/`pk_live`, today held by Replit's publish environment), proxy URL `/api/__clerk`, and `cf`/apex hosts allowed on the production instance. |
+| Email | Replit Gmail connector (`server/email.ts`) is unavailable; contact notifications and digests report `unavailable`. | A portable mail provider. |
+| DB backups | `@replit/object-storage` and `pg_dump` are absent; the admin backup panel cannot run. | Object storage replacement and `postgresql-client` in the image. |
+| AI | Uses `ANTHROPIC_BASE_URL` + token; the Replit AI-integrations sidecar is not forwarded. | None if the router stays. |
+| Schedulers | Off (`DISABLE_BACKGROUND_JOBS=1`). | Switch in one window: disable jobs on Replit, then remove the override here — never both on, never both off. Containers sleep when idle, so scheduled work also needs an always-on instance or a Cron Trigger that wakes it. |
+| Shared DB writes | Boot runs only the `IF NOT EXISTS` drizzle journal DDL when migrations are current. Requests to rate-limited routes upsert `rate_limit_hits` in the shared database, so counters are shared with Replit. | Nothing; expected while both deployments use one database. |
+| Domains | Only `cf.awesome.video`. | Apex/`www` routes, TLS, then DNS — after schedulers move. Keep the Replit deployment paused, not deleted, as rollback. |
 
 ## Other Container Platforms
 
