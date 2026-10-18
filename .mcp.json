@@ -1,5 +1,4 @@
 {
-  "$schema": "https://raw.githubusercontent.com/can1357/oh-my-pi/main/packages/coding-agent/src/config/mcp-schema.json",
   "mcpServers": {
     "claude-flow": {
       "command": "npx",
@@ -17,8 +16,7 @@
         "CLAUDE_FLOW_MAX_AGENTS": "15",
         "CLAUDE_FLOW_MEMORY_BACKEND": "hybrid"
       },
-      "autoStart": false,
-      "enabled": false
+      "autoStart": false
     }
   }
 }
