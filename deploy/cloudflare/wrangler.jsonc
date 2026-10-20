@@ -12,7 +12,7 @@
       // identity is the sk_test/pk_test Clerk instance (owner decision), so
       // VITE_CLERK_PROXY_URL stays empty: Clerk rejects proxied Frontend API
       // calls for development-type instances.
-      "image": "registry.cloudflare.com/24080dbbce9363d385fac0500c121b85/awesome-video-cf:92391572",
+      "image": "registry.cloudflare.com/24080dbbce9363d385fac0500c121b85/awesome-video-cf:5d56cb47",
       "instance_type": "standard-1",
       "max_instances": 1
     }
