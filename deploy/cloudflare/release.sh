@@ -33,8 +33,9 @@ env_value() {
 }
 
 build_args=(--build-arg "BUILD_REVISION=$rev")
-# Development Clerk instance until cutover: Clerk rejects proxied Frontend API
-# calls for development instances, so the proxy URL stays empty.
+# cf's production identity is the sk_test/pk_test Clerk instance (owner
+# decision). Clerk rejects proxied Frontend API calls for development-type
+# instances, so the proxy URL stays empty.
 build_args+=(--build-arg "VITE_CLERK_PROXY_URL=")
 for name in VITE_CLERK_PUBLISHABLE_KEY VITE_CONTACT_VARIANT VITE_AMPLITUDE_API_KEY \
   VITE_MIXPANEL_TOKEN VITE_POSTHOG_KEY VITE_POSTHOG_HOST VITE_GA_MEASUREMENT_ID; do
