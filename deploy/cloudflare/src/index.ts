@@ -4,6 +4,10 @@ import { Container, getContainer } from "@cloudflare/containers";
 // production database. The primary deployment owns the schedulers, so this
 // instance starts with DISABLE_BACKGROUND_JOBS=1, and PUBLIC_SITE_URL keeps
 // canonical URLs on the apex.
+//
+// Edge AI-bot blocks/challenges run before this Worker and cannot be bypassed
+// here. The zone administrator owns the crawler-delivery prerequisites in
+// ../README.md, including managed robots policy and private-route protections.
 
 interface Env {
   APP: DurableObjectNamespace<AwesomeVideoApp>;
