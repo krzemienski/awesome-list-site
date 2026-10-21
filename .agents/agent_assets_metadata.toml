@@ -407,3 +407,17 @@ mtime_ms = 1789685998382
 storage_uri = "gcs://replit-rams-assets-picard/rams/assets/repl:71ccccc7-37f7-4f07-a880-5973ae4aa911/4b70d1af-6b61-47f2-ab19-4ca6622fd5bb/e298f4db-fcdd-4950-bae6-1b21c6b7fda9"
 storage_version_token = "1789686055617363"
 content_type = "text/markdown"
+
+[[outputs]]
+id = "2IOaDRHTDeRPlL4CrJ7d_"
+uri = "file://.local/outputs/daily-visitors.chart.html"
+type = "text"
+title = "Visitors peaked on Oct 16, then settled near 400 a day"
+description = "Daily visitors to awesome.video, last 7 days"
+logical_id = "fa483750-0819-4a8a-9de7-1358ebebaa49"
+content_hash = "sha256:bddcc0cca07a107d57fb35341922e971a6029144e4530be2350a2302e61486d7"
+size = 3471
+mtime_ms = 1792574370592
+storage_uri = "gcs://replit-rams-assets-picard/rams/assets/repl:71ccccc7-37f7-4f07-a880-5973ae4aa911/fa483750-0819-4a8a-9de7-1358ebebaa49/fcb05836-ac53-473e-a044-037e9938b538"
+storage_version_token = "1792574371250565"
+content_type = "text/html;profile=replit-chart"
