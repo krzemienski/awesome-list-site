@@ -1,4 +1,4 @@
-import { useState, useMemo, useRef } from "react";
+import { useState, useMemo, useRef, useId } from "react";
 import { Search, Filter, Tag, Folder, ExternalLink, Star, ChevronRight } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -89,6 +89,7 @@ function syncExplorerParam(
 }
 
 export default function CategoryExplorer({ categories, resources, className }: CategoryExplorerProps) {
+  const searchInputId = useId();
   const [, navigate] = useLocation();
   const [searchTerm, setSearchTerm] = useState(
     () => new URLSearchParams(window.location.search).get("q") || "",
@@ -257,15 +258,21 @@ export default function CategoryExplorer({ categories, resources, className }: C
         </CardHeader>
         <CardContent className="space-y-4">
           {/* Search */}
-          <div className="relative">
-            <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-            <Input
-              ref={searchInputRef}
-              placeholder="Search categories and resources..."
-              value={searchTerm}
-              onChange={(e) => handleSearchChange(e.target.value)}
-              className="pl-10"
-            />
+          <div className="space-y-2">
+            <label htmlFor={searchInputId} className="text-sm font-medium">
+              Search categories and resources
+            </label>
+            <div className="relative">
+              <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+              <Input
+                id={searchInputId}
+                ref={searchInputRef}
+                placeholder="Search categories and resources..."
+                value={searchTerm}
+                onChange={(e) => handleSearchChange(e.target.value)}
+                className="pl-10"
+              />
+            </div>
           </div>
 
           {/* Controls Row */}

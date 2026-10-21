@@ -131,7 +131,7 @@ export default function About() {
           {ABOUT_PROJECT.facts.map((fact, index) => (
             <div key={fact.title} className="about-card about-callout-card">
               <div className="about-callout-index mono">{String(index + 1).padStart(2, "0")}</div>
-              <div className="about-callout-title">{fact.title}</div>
+              <h2 className="about-callout-title">{fact.title}</h2>
               <div className="about-callout-copy">{fact.description}</div>
             </div>
           ))}
