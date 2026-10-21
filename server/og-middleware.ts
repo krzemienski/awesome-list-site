@@ -6,14 +6,15 @@ import { parseRouteId } from "@shared/route-id";
 import { isSearchableQuery, normalizeSearchQuery } from "@shared/searchNormalize";
 import { readSearchState, searchCanBrowse, searchStateValid, discoveryRedirect } from "@shared/discovery-params";
 import { listDiscoveryResources, resolveTaxonomyPage } from "./services/public-discovery";
-import { MAINTAINER } from "@shared/about-content";
+import { getAboutCatalogSummary, MAINTAINER } from "@shared/about-content";
 import { normalizeAdminTab } from "@shared/admin-tabs";
 import {
   repositoryDisplayName,
   resolveSiteIdentity,
+  siteHost,
 } from "@shared/site-identity";
 import { config } from "./config";
-import { homeHeading, advancedHeading } from "@shared/page-headings";
+import { homeHeading, advancedHeading, aboutHeading, submitHeading } from "@shared/page-headings";
 import { legalPolicies, type LegalPolicyPath } from "@shared/legal-policy-content";
 import { preferredContactDestination } from "@shared/contact-destination";
 import { configuredContactDestinations, configuredSourceRepository } from "./public-contact";
@@ -979,7 +980,11 @@ function homeShellChrome(): string {
         ];
       }
       bodyHtml = renderStaticPageContent({
-        heading: path === "/advanced" ? advancedHeading : m.title.split(" — ")[0],
+        heading: path === "/about"
+          ? aboutHeading
+          : path === "/submit"
+            ? submitHeading
+            : path === "/advanced" ? advancedHeading : m.title.split(" — ")[0],
         description: m.description,
         ...(path === "/submit"
           ? {
@@ -1047,7 +1052,16 @@ function homeShellChrome(): string {
             }
           : {}),
         ...(path === "/about"
-          ? { faqs: aboutFaqs, paragraphs: MAINTAINER.bio }
+          ? {
+              faqs: aboutFaqs,
+              about: {
+                catalogSummary: getAboutCatalogSummary(
+                  siteHost(aboutSite.url) || aboutSite.name,
+                  aboutResourceCount,
+                  aboutCategoryCount,
+                ),
+              },
+            }
           : {}),
         categories,
       });

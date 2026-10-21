@@ -23,7 +23,8 @@ import {
 } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
 import { getAboutFaqs } from "@shared/faq";
-import { MAINTAINER } from "@shared/about-content";
+import { ABOUT_PROJECT, getAboutCatalogSummary, MAINTAINER } from "@shared/about-content";
+import { aboutTitle } from "@shared/page-headings";
 import { resolveSiteIdentity, siteHost } from "@shared/site-identity";
 import { fetchAwesomeListNav, fetchStaticAwesomeList, visibleNavCategories } from "@/lib/static-data";
 import { preferredContactDestination, useContactConfig } from "@/lib/contact";
@@ -70,10 +71,11 @@ export default function About() {
     site: siteIdentity,
   });
   const siteHostName = siteHost(siteIdentity.url);
-  const catalogSummary =
-    treeData?.resources?.length && domainCount
-      ? `${siteHostName || siteIdentity.name} is a hand-curated index of ${treeData.resources.length.toLocaleString()} resources across ${domainCount} domains — encoding, transport, players, infrastructure, standards. Maintained as the canonical reference for people who actually ship video in production. `
-      : "";
+  const catalogSummary = getAboutCatalogSummary(
+    siteHostName || siteIdentity.name,
+    treeData?.resources?.length,
+    domainCount,
+  );
   const [openFaqs, setOpenFaqs] = useState<Set<number>>(() => new Set());
 
   const toggleFaq = (faqIndex: number) => {
@@ -109,8 +111,8 @@ export default function About() {
           ABOUT THIS PROJECT
         </div>
         <h1 className="page-title about-title">
-          A field journal for{" "}
-          <span className="serif-italic about-title-accent">video engineers</span>
+          {aboutTitle.lead}{" "}
+          <span className="serif-italic about-title-accent">{aboutTitle.accent}</span>
         </h1>
         <div className="shimmer-line about-shimmer-line" aria-hidden="true" />
 
@@ -118,48 +120,21 @@ export default function About() {
           <CardContent className="about-lead-content">
             <p className="about-lead-copy">
               <span>{catalogSummary}</span>
-              awesome.video is the web home of{" "}
-              <span className="about-strong">awesome-video</span> — a
-              community-curated list of the best streaming and video-development
-              tools, frameworks, libraries, and learning resources, maintained by
-              Nick Krzemienski on GitHub.
+              {ABOUT_PROJECT.introLead}{" "}
+              <span className="about-strong">{ABOUT_PROJECT.sourceName}</span>{" "}
+              {ABOUT_PROJECT.introDescription}
             </p>
           </CardContent>
         </Card>
 
         <div className="about-callout-grid" aria-label="About this project">
-          <div className="about-card about-callout-card">
-            <div className="about-callout-index mono">01</div>
-            <div className="about-callout-title">The source list</div>
-            <div className="about-callout-copy">
-              Resources on this site are drawn from the open-source awesome-video
-              repository.
+          {ABOUT_PROJECT.facts.map((fact, index) => (
+            <div key={fact.title} className="about-card about-callout-card">
+              <div className="about-callout-index mono">{String(index + 1).padStart(2, "0")}</div>
+              <div className="about-callout-title">{fact.title}</div>
+              <div className="about-callout-copy">{fact.description}</div>
             </div>
-          </div>
-          <div className="about-card about-callout-card">
-            <div className="about-callout-index mono">02</div>
-            <div className="about-callout-title">Open source</div>
-            <div className="about-callout-copy">
-              The curated list and the platform that renders it are open source
-              on GitHub.
-            </div>
-          </div>
-          <div className="about-card about-callout-card">
-            <div className="about-callout-index mono">03</div>
-            <div className="about-callout-title">Human reviewed</div>
-            <div className="about-callout-copy">
-              New submissions are reviewed by maintainers before they are
-              published.
-            </div>
-          </div>
-          <div className="about-card about-callout-card">
-            <div className="about-callout-index mono">04</div>
-            <div className="about-callout-title">For video builders</div>
-            <div className="about-callout-copy">
-              Browse practical tools, frameworks, libraries, and learning
-              resources for the video pipeline.
-            </div>
-          </div>
+          ))}
         </div>
       </header>
 
@@ -258,16 +233,16 @@ export default function About() {
           <CardHeader className="about-card-header">
             <h2 className="about-section-title">
               <Github className="about-section-icon about-icon-ink" aria-hidden="true" />
-              Open source at its core
+              {ABOUT_PROJECT.sourcesHeading}
             </h2>
             <CardDescription>
-              The curated list that feeds this site, and the platform that renders it
+              {ABOUT_PROJECT.sourcesDescription}
             </CardDescription>
           </CardHeader>
           <CardContent className="about-card-content">
             <div className="about-source-grid">
               <a
-                href="https://github.com/krzemienski/awesome-video"
+                href={ABOUT_PROJECT.sources[0].url}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="about-source-link about-card"
@@ -275,22 +250,20 @@ export default function About() {
                 <div className="about-source-heading">
                   <div className="about-source-name">
                     <Github className="about-source-icon" aria-hidden="true" />
-                    <span>awesome-video</span>
+                    <span>{ABOUT_PROJECT.sources[0].name}</span>
                   </div>
                   <ExternalLink className="about-source-external" aria-hidden="true" />
                 </div>
                 <p className="about-source-copy">
-                  A curated list of awesome streaming video tools, frameworks,
-                  libraries, and learning resources. Every resource on this site
-                  is sourced from and kept in sync with this repository.
+                  {ABOUT_PROJECT.sources[0].description}
                 </p>
                 <div className="about-chip-row">
-                  <span className="about-chip">The source list</span>
-                  <span className="about-chip">CC0-1.0</span>
+                  <span className="about-chip">{ABOUT_PROJECT.sources[0].label}</span>
+                  <span className="about-chip">{ABOUT_PROJECT.sources[0].license}</span>
                 </div>
               </a>
               <a
-                href="https://github.com/krzemienski/awesome-list-site"
+                href={ABOUT_PROJECT.sources[1].url}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="about-source-link about-card"
@@ -298,19 +271,16 @@ export default function About() {
                 <div className="about-source-heading">
                   <div className="about-source-name">
                     <Rocket className="about-source-icon" aria-hidden="true" />
-                    <span>awesome-list-site</span>
+                    <span>{ABOUT_PROJECT.sources[1].name}</span>
                   </div>
                   <ExternalLink className="about-source-external" aria-hidden="true" />
                 </div>
                 <p className="about-source-copy">
-                  The open-source platform that powers this site — it transforms
-                  any GitHub awesome list into a sophisticated, interactive web
-                  dashboard with AI-powered enhancements, advanced search, and
-                  modern UI components.
+                  {ABOUT_PROJECT.sources[1].description}
                 </p>
                 <div className="about-chip-row">
-                  <span className="about-chip">The engine</span>
-                  <span className="about-chip">MIT</span>
+                  <span className="about-chip">{ABOUT_PROJECT.sources[1].label}</span>
+                  <span className="about-chip">{ABOUT_PROJECT.sources[1].license}</span>
                 </div>
               </a>
             </div>
@@ -322,33 +292,27 @@ export default function About() {
           <CardHeader className="about-card-header">
             <h2 className="about-section-title">
               <Zap className="about-section-icon" aria-hidden="true" />
-              Features
+              {ABOUT_PROJECT.featuresHeading}
             </h2>
             <CardDescription>
-              Built for speed, accessibility, and user experience
+              {ABOUT_PROJECT.featuresDescription}
             </CardDescription>
           </CardHeader>
           <CardContent className="about-card-content">
             <div className="about-feature-grid">
-              {[
-                { icon: Wind, label: "Responsive Design", desc: "Mobile-first" },
-                { icon: Rocket, label: "Fast Performance", desc: "Optimized SPA" },
-                { icon: Search, label: "Fuzzy Search", desc: "Find anything" },
-                { icon: Palette, label: "Multiple Themes", desc: "Customizable" },
-                { icon: Accessibility, label: "Accessible", desc: "WCAG compliant" },
-                { icon: Globe, label: "SEO Optimized", desc: "Discoverable" },
-                { icon: Keyboard, label: "Keyboard Shortcuts", desc: "⌘K or / to search" },
-                { icon: Component, label: "Component Library", desc: "shadcn/ui" },
-              ].map((feature, idx) => (
-                <div key={feature.label} className="about-feature-card about-card">
-                  <feature.icon
-                    className={`about-feature-icon ${idx < 4 ? "about-icon-ink" : ""}`}
-                    aria-hidden="true"
-                  />
-                  <div className="about-feature-label">{feature.label}</div>
-                  <div className="about-feature-description">{feature.desc}</div>
-                </div>
-              ))}
+              {ABOUT_PROJECT.features.map((feature, idx) => {
+                const Icon = [Wind, Rocket, Search, Palette, Accessibility, Globe, Keyboard, Component][idx];
+                return (
+                  <div key={feature.label} className="about-feature-card about-card">
+                    <Icon
+                      className={`about-feature-icon ${idx < 4 ? "about-icon-ink" : ""}`}
+                      aria-hidden="true"
+                    />
+                    <div className="about-feature-label">{feature.label}</div>
+                    <div className="about-feature-description">{feature.desc}</div>
+                  </div>
+                );
+              })}
             </div>
           </CardContent>
         </Card>
@@ -358,60 +322,27 @@ export default function About() {
           <CardHeader className="about-card-header">
             <h2 className="about-section-title">
               <Code2 className="about-section-icon" aria-hidden="true" />
-              Technology Stack
+              {ABOUT_PROJECT.technologyHeading}
             </h2>
             <CardDescription>
-              Modern web technologies for optimal performance
+              {ABOUT_PROJECT.technologyDescription}
             </CardDescription>
           </CardHeader>
           <CardContent className="about-card-content">
             <div className="about-tech-grid">
-              <div className="about-tech-column">
-                <div className="about-tech-item">
-                  <div className="about-tech-dot about-tech-dot-filled" aria-hidden="true" />
-                  <div>
-                    <div className="about-tech-name">React</div>
-                    <div className="about-tech-description">UI component framework</div>
-                  </div>
+              {[0, 3].map((start) => (
+                <div key={start} className="about-tech-column">
+                  {ABOUT_PROJECT.technologies.slice(start, start + 3).map((technology, index) => (
+                    <div key={technology.name} className="about-tech-item">
+                      <div className={`about-tech-dot${index < 2 ? " about-tech-dot-filled" : ""}`} aria-hidden="true" />
+                      <div>
+                        <div className="about-tech-name">{technology.name}</div>
+                        <div className="about-tech-description">{technology.description}</div>
+                      </div>
+                    </div>
+                  ))}
                 </div>
-                <div className="about-tech-item">
-                  <div className="about-tech-dot about-tech-dot-filled" aria-hidden="true" />
-                  <div>
-                    <div className="about-tech-name">Tailwind CSS</div>
-                    <div className="about-tech-description">Utility-first styling</div>
-                  </div>
-                </div>
-                <div className="about-tech-item">
-                  <div className="about-tech-dot" aria-hidden="true" />
-                  <div>
-                    <div className="about-tech-name">shadcn/ui</div>
-                    <div className="about-tech-description">Component primitives</div>
-                  </div>
-                </div>
-              </div>
-              <div className="about-tech-column">
-                <div className="about-tech-item">
-                  <div className="about-tech-dot about-tech-dot-filled" aria-hidden="true" />
-                  <div>
-                    <div className="about-tech-name">Fuse.js</div>
-                    <div className="about-tech-description">Fuzzy search engine</div>
-                  </div>
-                </div>
-                <div className="about-tech-item">
-                  <div className="about-tech-dot about-tech-dot-filled" aria-hidden="true" />
-                  <div>
-                    <div className="about-tech-name">Framer Motion</div>
-                    <div className="about-tech-description">Smooth animations</div>
-                  </div>
-                </div>
-                <div className="about-tech-item">
-                  <div className="about-tech-dot" aria-hidden="true" />
-                  <div>
-                    <div className="about-tech-name">TypeScript</div>
-                    <div className="about-tech-description">Type safety</div>
-                  </div>
-                </div>
-              </div>
+              ))}
             </div>
           </CardContent>
         </Card>
@@ -421,22 +352,15 @@ export default function About() {
           <CardHeader className="about-card-header">
             <h2 className="about-section-title">
               <Accessibility className="about-section-icon" aria-hidden="true" />
-              Accessibility First
+              {ABOUT_PROJECT.accessibilityHeading}
             </h2>
             <CardDescription>
-              Following WCAG 2.1 AA guidelines for inclusive design
+              {ABOUT_PROJECT.accessibilityDescription}
             </CardDescription>
           </CardHeader>
           <CardContent className="about-card-content">
             <div className="about-accessibility-grid">
-              {[
-                "Proper heading structure",
-                "Keyboard navigation",
-                "Sufficient color contrast",
-                "Appropriate ARIA attributes",
-                "Respect for user motion preferences",
-                "Screen reader optimized",
-              ].map((item) => (
+              {ABOUT_PROJECT.accessibility.map((item) => (
                 <div key={item} className="about-accessibility-item">
                   <div className="about-accessibility-dot" aria-hidden="true" />
                   <span>{item}</span>
@@ -451,53 +375,52 @@ export default function About() {
           <CardHeader className="about-card-header">
             <h2 className="about-section-title">
               <Heart className="about-section-icon" aria-hidden="true" />
-              Credits
+              {ABOUT_PROJECT.creditsHeading}
             </h2>
             <CardDescription>
-              Built with open source technologies
+              {ABOUT_PROJECT.creditsDescription}
             </CardDescription>
           </CardHeader>
           <CardContent className="about-card-content">
             <div className="about-copy-stack">
               <p className="about-body-copy">
-                This project was built with dedication using open source technologies.
-                Special thanks to:
+                {ABOUT_PROJECT.creditsIntro}
               </p>
               <div className="about-credits-grid">
                 <a
-                  href="https://github.com/krzemienski"
+                  href={ABOUT_PROJECT.credits[0].url}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="about-credit-link about-card"
                 >
                   <Users className="about-credit-icon about-icon-ink" aria-hidden="true" />
                   <div>
-                    <div className="about-credit-name">Nick Krzemienski</div>
-                    <div className="about-credit-description">Maintainer</div>
+                    <div className="about-credit-name">{ABOUT_PROJECT.credits[0].name}</div>
+                    <div className="about-credit-description">{ABOUT_PROJECT.credits[0].description}</div>
                   </div>
                 </a>
                 <a
-                  href="https://ui.shadcn.com/"
+                  href={ABOUT_PROJECT.credits[1].url}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="about-credit-link about-card"
                 >
                   <Component className="about-credit-icon about-icon-ink" aria-hidden="true" />
                   <div>
-                    <div className="about-credit-name">shadcn/ui</div>
-                    <div className="about-credit-description">Components</div>
+                    <div className="about-credit-name">{ABOUT_PROJECT.credits[1].name}</div>
+                    <div className="about-credit-description">{ABOUT_PROJECT.credits[1].description}</div>
                   </div>
                 </a>
                 <a
-                  href="https://tailwindcss.com/"
+                  href={ABOUT_PROJECT.credits[2].url}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="about-credit-link about-card"
                 >
                   <Wind className="about-credit-icon about-icon-ink" aria-hidden="true" />
                   <div>
-                    <div className="about-credit-name">Tailwind CSS</div>
-                    <div className="about-credit-description">Styling</div>
+                    <div className="about-credit-name">{ABOUT_PROJECT.credits[2].name}</div>
+                    <div className="about-credit-description">{ABOUT_PROJECT.credits[2].description}</div>
                   </div>
                 </a>
               </div>

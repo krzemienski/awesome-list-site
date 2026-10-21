@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef } from "react";
+import { submitTitle } from "@shared/page-headings";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useMutation, useQuery } from "@tanstack/react-query";
@@ -530,7 +531,8 @@ export default function SubmitResource() {
           SUBMIT A RESOURCE
         </div>
         <h1 className="submit-title">
-          Add to the <span className="serif-italic submit-title-accent">index</span>
+          {submitTitle.lead}{" "}
+          <span className="serif-italic submit-title-accent">{submitTitle.accent}</span>
         </h1>
         <p className="submit-lede">
           Submit a tool, library, paper, or talk. We hand-review every entry before it lands in the catalog.

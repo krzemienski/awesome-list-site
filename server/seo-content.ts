@@ -5,6 +5,7 @@ import type { PreferredContactDestination } from "@shared/contact-destination";
 // Server-side prerendered content for indexable public routes (Task #80).
 import { resourceFactsSummary } from "@shared/seo-content-templates";
 import { tagLandingPath } from "@shared/tagNormalize";
+import { ABOUT_PROJECT, MAINTAINER } from "@shared/about-content";
 
 /** Identical child/general scope policy for crawler and public listing API. */
 export function scopeTaxonomyResources(
@@ -663,6 +664,40 @@ export function renderJourneyContent(opts: {
   );
 }
 
+/** Semantic equivalent of About's public copy; no interactive preferences. */
+function renderAboutContent(catalogSummary: string): string {
+  const project = ABOUT_PROJECT;
+  const paragraph = (text: string) => `<p>${escapeHtml(text)}</p>`;
+  const section = (heading: string, description: string, body: string) =>
+    `<section><h2>${escapeHtml(heading)}</h2>${paragraph(description)}${body}</section>`;
+  const descriptions = (items: { name: string; description: string }[]) =>
+    `<dl>${items.map(item => `<dt>${escapeHtml(item.name)}</dt><dd>${escapeHtml(item.description)}</dd>`).join("")}</dl>`;
+  const link = (url: string, label: string) =>
+    `<a href="${escapeHtml(url)}">${escapeHtml(label)}</a>`;
+
+  return `<article data-seo-section="about-project">` +
+    paragraph(`${catalogSummary}${project.introLead} ${project.sourceName} ${project.introDescription}`) +
+    `<dl>${project.facts.map(fact => `<dt>${escapeHtml(fact.title)}</dt><dd>${escapeHtml(fact.description)}</dd>`).join("")}</dl>` +
+    section("About the maintainer", MAINTAINER.role,
+      MAINTAINER.bio.map(paragraph).join("") +
+      `<p>${link(MAINTAINER.profileUrl, `${MAINTAINER.name} on GitHub`)}</p>`) +
+    section(project.sourcesHeading, project.sourcesDescription,
+      project.sources.map(source =>
+        `<h3>${link(source.url, source.name)}</h3>` +
+        paragraph(source.description) +
+        paragraph(`${source.label} · ${source.license}`),
+      ).join("")) +
+    section(project.featuresHeading, project.featuresDescription,
+      descriptions(project.features.map(feature => ({ name: feature.label, description: feature.desc })))) +
+    section(project.technologyHeading, project.technologyDescription, descriptions(project.technologies)) +
+    section(project.accessibilityHeading, project.accessibilityDescription,
+      `<ul>${project.accessibility.map(item => `<li>${escapeHtml(item)}</li>`).join("")}</ul>`) +
+    section(project.creditsHeading, project.creditsDescription,
+      paragraph(project.creditsIntro) +
+      `<ul>${project.credits.map(credit => `<li>${link(credit.url, credit.name)} — ${escapeHtml(credit.description)}</li>`).join("")}</ul>`) +
+    `</article>`;
+}
+
 export function renderStaticPageContent(opts: {
   heading: string;
   description: string;
@@ -670,6 +705,7 @@ export function renderStaticPageContent(opts: {
   links?: { path: string; label: string }[];
   categories?: { name: string; slug: string; count: number }[];
   faqs?: { question: string; answer: string }[];
+  about?: { catalogSummary: string };
   policy?: { path: LegalPolicyPath; contactDestination: PreferredContactDestination | null };
   form?: {
     action: string;
@@ -779,6 +815,7 @@ export function renderStaticPageContent(opts: {
           `</article>`
         : "") +
       paras +
+      (opts.about ? renderAboutContent(opts.about.catalogSummary) : "") +
       formHtml +
       faqHtml +
       `<h2>Explore</h2>${linkList(nav)}` +
