@@ -8,6 +8,8 @@
 //   Mixpanel   mpTrack      (mixpanel.ts)
 //   PostHog    phCapture    (posthog.ts)
 //   Amplitude  ampTrack     (amplitude.ts)
+//   Replit     replitTrack  (replit-analytics.ts) — platform-injected Umami
+//                                             tracker; page views are its own
 //
 // Each vendor dispatcher keeps its own consent gate, pre-SDK buffer and revoke
 // kill switch, so this module adds no new queueing semantics — it only
@@ -20,6 +22,7 @@ import { gaPageContext, sanitizeEventProps } from './analytics-hygiene';
 import { mpTrack } from './mixpanel';
 import { phCapture } from './posthog';
 import { ampTrack } from './amplitude';
+import { replitTrack } from './replit-analytics';
 
 type EventProps = Record<string, unknown>;
 
@@ -77,5 +80,6 @@ export const dispatchAnalyticsEvent = (request: AnalyticsDispatchRequest) => {
     safely(() => mpTrack(request.name, props));
     safely(() => phCapture(request.name, props));
     safely(() => ampTrack(request.name, props));
+    safely(() => replitTrack(request.name, props));
   }
 };

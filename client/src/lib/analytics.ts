@@ -39,6 +39,8 @@ export const ANALYTICS_VENDORS = [
   { name: 'Mixpanel', configured: Boolean(import.meta.env.VITE_MIXPANEL_TOKEN) },
   { name: 'PostHog', configured: Boolean(import.meta.env.VITE_POSTHOG_KEY) },
   { name: 'Amplitude', configured: Boolean(import.meta.env.VITE_AMPLITUDE_API_KEY) },
+  // The platform injects Replit Analytics' tracker into published builds only.
+  { name: 'Replit Analytics', configured: import.meta.env.PROD },
 ].filter((vendor) => vendor.configured).map((vendor) => vendor.name);
 
 // BUG-020 (run13): analytics is consent-gated. The choice lives in

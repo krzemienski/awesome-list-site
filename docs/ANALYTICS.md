@@ -3,8 +3,8 @@
 This document is the source of truth for how the app tracks usage. The
 **[Tracking plan](#tracking-plan)** (next section) owns the usage questions,
 funnels, naming rules, property hygiene and the **shared event catalog** for
-all four consent-gated tools — Google Analytics 4, Mixpanel, PostHog and
-Amplitude. The rest of the document covers GA4 specifics (gtag.js): where each
+the consent-gated tools — Google Analytics 4, Mixpanel, PostHog, Amplitude and
+Replit Analytics (see [Replit Analytics](#replit-analytics)). The rest of the document covers GA4 specifics (gtag.js): where each
 GA4 event is wired, the parameters each carries, first-touch acquisition, the
 PII exclusion policy, and how tracking is validated end-to-end against the real
 GA4 network endpoint. Mixpanel specifics (identity, server-side conversions)
@@ -60,10 +60,11 @@ typed helper (analytics.ts: trackSearch, trackJourneyStart, …)
              ├─ sendGaEvent   → GA4      (legacy GA name/params when the event predates the catalog)
              ├─ mpTrack       → Mixpanel
              ├─ phCapture     → PostHog
-             └─ ampTrack      → Amplitude
+             ├─ ampTrack      → Amplitude
+             └─ replitTrack   → Replit Analytics (platform-injected Umami tracker)
 ```
 
-- **One call, four tools.** App code only calls typed helpers — in
+- **One call, every tool.** App code only calls typed helpers — in
   `client/src/lib/analytics.ts` or an area module such as
   `client/src/lib/analytics-contributions.ts`; each helper calls the shared
   `track()` (exported only for those helper modules, never imported by
@@ -117,7 +118,7 @@ typed helper (analytics.ts: trackSearch, trackJourneyStart, …)
 ### Property hygiene (enforced in code)
 
 `sanitizeEventProps()` (`client/src/lib/analytics-hygiene.ts`) runs once per
-event, before any vendor sees it, and the same cleaned object goes to all four:
+event, before any vendor sees it, and the same cleaned object goes to every tool:
 
 | Rule | Effect |
 |---|---|
@@ -185,11 +186,39 @@ journey start…) already records the outcome. The exception is the Bookmarks
 empty state's Explore resources (`library_explore_clicked`), which has no
 single follow-up event.
 
+### Replit Analytics
+
+The published site carries Replit's own analytics tracker
+(`https://i.replit.com/script.js`, Umami), which the hosting platform injects
+into the HTML once analytics is enabled in Publishing settings. The app never
+adds the script, a website id or an env var for it, and `script-src` /
+`connect-src` already allow `https://i.replit.com`.
+
+- **Page views** are recorded by the tracker itself on every load and SPA
+  navigation, independent of the consent banner (cookieless, platform-level).
+  For that reason `page_viewed` is **not** forwarded as a custom event — it
+  would double the count.
+- **Custom events:** every *product* event in the catalog below (the rows
+  whose Tools column says "all four" or "product") also goes to Replit
+  Analytics via `replitTrack` (`client/src/lib/replit-analytics.ts`) under the
+  same catalog name, with the same cleaned properties. GA4-only legacy events
+  (`{ product: false }`) are not sent. Server-side conversions
+  (`sign_up_completed`, `resource_submitted`) stay Mixpanel-only.
+- **Consent:** same rule as the other tools — nothing before `granted`; events
+  queued while the tracker script is still loading (max 50) are re-checked at
+  flush and dropped on revoke.
+- **Shape:** Umami takes flat values only, so arrays (e.g. onboarding
+  `topics`) arrive as comma-separated strings, as in GA4; event names over 50
+  characters are not sent (none exist today).
+- **No tracker** (dev, analytics disabled, blocked script) is a silent no-op.
+  The consent banner names "Replit Analytics" in production builds only.
+
 ### Shared event catalog
 
 Every custom event the client emits. **Area tasks add their events here** (one
 row each, same columns) in the same change that adds the typed helper. "Product"
-= Mixpanel + PostHog + Amplitude. GA4-only legacy events are listed in the GA4
+= Mixpanel + PostHog + Amplitude + Replit Analytics, and "all four" = GA4 +
+product (both include Replit Analytics; `page_viewed` excepted, see above). GA4-only legacy events are listed in the GA4
 taxonomy further down and are not repeated here.
 
 | Catalog event (product name) | GA4 name | Tools | Properties | Helper / source |

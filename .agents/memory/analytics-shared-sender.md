@@ -3,7 +3,7 @@ name: Analytics shared sender + product-SDK keys
 description: How custom events reach GA4/Mixpanel/PostHog/Amplitude, where the product keys must live, and traps when verifying on the real network.
 ---
 
-**Rule:** every custom event goes through the module-private `track()` in analytics.ts (typed helpers only). Never call a vendor dispatcher from a component, never rename a live event; the catalog in docs/ANALYTICS.md is where names are decided.
+**Rule:** every custom event goes through the module-private `track()` in analytics.ts (typed helpers only). Product events also fan out to Replit Analytics (platform-injected Umami, prod only) — except page_viewed, which Umami counts itself. Never call a vendor dispatcher from a component, never rename a live event; the catalog in docs/ANALYTICS.md is where names are decided.
 **Why:** one hygiene pass for four vendors; renames start new series in Mixpanel/Amplitude.
 
 **Rule:** GA4 page context (page_location/page_path/page_referrer) obeys the same no-token rule as event props — only utm_* and ad click ids survive in the URL.
