@@ -51,10 +51,11 @@ export const useAnalytics = () => {
     };
   }, []);
 
-  // Start telemetry only after the visitor grants analytics consent. The
-  // web-vitals callbacks do not expose an unsubscribe API, so their observers
-  // are started once per page; sendEvent still checks the current consent if a
-  // visitor revokes it later in the same session.
+  // Web vitals start unless the visitor declined: they reach Replit Analytics
+  // (cookie-free) before a choice and GA4 only after a grant. Error capture
+  // starts only after a grant. The web-vitals callbacks do not expose an
+  // unsubscribe API, so their observers are started once per page; track()
+  // still checks the current consent if a visitor declines later.
   useEffect(() => {
     let errorsAttached = false;
 
@@ -68,7 +69,8 @@ export const useAnalytics = () => {
     };
 
     const startCapture = () => {
-      if (getAnalyticsConsent() !== 'granted') return;
+      const consent = getAnalyticsConsent();
+      if (consent === 'denied') return;
 
       if (!vitalsStartedRef.current) {
         vitalsStartedRef.current = true;
@@ -94,7 +96,7 @@ export const useAnalytics = () => {
         }
       }
 
-      if (!errorsAttached) {
+      if (consent === 'granted' && !errorsAttached) {
         window.addEventListener('error', handleError);
         window.addEventListener('unhandledrejection', handleUnhandledRejection);
         errorsAttached = true;
@@ -114,9 +116,8 @@ export const useAnalytics = () => {
     };
 
     const handleConsentChange = () => {
-      if (getAnalyticsConsent() === 'granted') {
-        startCapture();
-      } else if (errorsAttached) {
+      startCapture();
+      if (getAnalyticsConsent() !== 'granted' && errorsAttached) {
         window.removeEventListener('error', handleError);
         window.removeEventListener('unhandledrejection', handleUnhandledRejection);
         errorsAttached = false;

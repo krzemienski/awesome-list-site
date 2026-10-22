@@ -3,8 +3,9 @@
 This document is the source of truth for how the app tracks usage. The
 **[Tracking plan](#tracking-plan)** (next section) owns the usage questions,
 funnels, naming rules, property hygiene and the **shared event catalog** for
-the consent-gated tools — Google Analytics 4, Mixpanel, PostHog, Amplitude and
-Replit Analytics (see [Replit Analytics](#replit-analytics)). The rest of the document covers GA4 specifics (gtag.js): where each
+the consent-gated tools — Google Analytics 4, Mixpanel, PostHog and Amplitude
+— and the cookie-free Replit Analytics, which also receives events before a
+consent choice (see [Replit Analytics](#replit-analytics)). The rest of the document covers GA4 specifics (gtag.js): where each
 GA4 event is wired, the parameters each carries, first-touch acquisition, the
 PII exclusion policy, and how tracking is validated end-to-end against the real
 GA4 network endpoint. Mixpanel specifics (identity, server-side conversions)
@@ -54,14 +55,14 @@ the `ae` flag appeared alongside our manual one on the one true SPA navigation).
 
 ```
 typed helper (analytics.ts: trackSearch, trackJourneyStart, …)
-   └─ track(name, props, { ga?, product? })      module-private, consent-gated
+   └─ track(name, props, { ga?, product?, replit? })  module-private, consent-aware
         └─ dispatchAnalyticsEvent()              analytics-dispatch.ts — lazy chunk,
-             ├─ sanitizeEventProps()             analytics-hygiene.ts  fetched after consent
+             ├─ sanitizeEventProps()             analytics-hygiene.ts  fetched on first event
+             ├─ replitTrack   → Replit Analytics unless declined (platform-injected Umami)
              ├─ sendGaEvent   → GA4      (legacy GA name/params when the event predates the catalog)
              ├─ mpTrack       → Mixpanel
              ├─ phCapture     → PostHog
-             ├─ ampTrack      → Amplitude
-             └─ replitTrack   → Replit Analytics (platform-injected Umami tracker)
+             └─ ampTrack      → Amplitude                       (these four after a grant only)
 ```
 
 - **One call, every tool.** App code only calls typed helpers — in
@@ -70,14 +71,17 @@ typed helper (analytics.ts: trackSearch, trackJourneyStart, …)
   `track()` (exported only for those helper modules, never imported by
   components). Components never import `mpTrack` / `phCapture` / `ampTrack` /
   `sendGaEvent` — those are the vendor halves of the dispatcher.
-- **Consent is unchanged per tool.** `track()` returns before doing anything
-  unless `analytics-consent` is `granted`; the dispatcher re-checks before
-  sending (events queued while its chunk loads are dropped on revoke). Each
+- **Consent per tool.** `track()` returns before doing anything when
+  `analytics-consent` is `denied`, and also when it is unset and the event has
+  no Replit half. GA4, Mixpanel, PostHog and Amplitude only receive events once
+  it is `granted`; Replit Analytics receives them while it is unset or
+  granted. The dispatcher re-checks before sending (events queued while its
+  chunk loads are dropped on Decline). Each
   vendor half then applies its own gate: pre-SDK buffering only while a
   consented init is under way, and a revoke kill switch that clears its buffer
   (`optOutGA` / `optOutMixpanel` / `optOutPostHog` / `optOutAmplitude`).
-- **Stays out of the pre-consent bundle.** The dispatcher and the hygiene
-  rules are a separate chunk, imported on the first post-consent event (keep
+- **Stays out of the entry bundle.** The dispatcher and the hygiene
+  rules are a separate chunk, imported on the first event (keep
   it out of the entry closure). Once loaded, dispatch
   is synchronous, so `page_engaged` on `pagehide` still goes out.
 - **Names.** Mixpanel, PostHog and Amplitude receive the catalog name. GA4
@@ -201,17 +205,23 @@ adds the script, a website id or an env var for it, and `script-src` /
 - **Custom events:** every *product* event in the catalog below (the rows
   whose Tools column says "all four" or "product") also goes to Replit
   Analytics via `replitTrack` (`client/src/lib/replit-analytics.ts`) under the
-  same catalog name, with the same cleaned properties. GA4-only legacy events
-  (`{ product: false }`) are not sent. Server-side conversions
-  (`sign_up_completed`, `resource_submitted`) stay Mixpanel-only.
-- **Consent:** same rule as the other tools — nothing before `granted`; events
-  queued while the tracker script is still loading (max 50) are re-checked at
-  flush and dropped on revoke.
+  same catalog name, with the same cleaned properties minus free-form visitor
+  text (`search_term`). GA4-only legacy events (`{ product: false }`) are not
+  sent, except `performance` (`{ replit: true }`), so web vitals reach Replit
+  Analytics too. Server-side conversions (`sign_up_completed`,
+  `resource_submitted`) stay Mixpanel-only.
+- **Consent:** the tracker is cookie-free and the events carry no identity,
+  so they are sent while the visitor has not answered the banner (most never
+  do — before this, under 2% of visitors produced any custom event). An
+  explicit Decline stops them; events queued while the tracker script is still
+  loading (max 50) are re-checked at flush and dropped on Decline. The privacy
+  policy (Analytics section) describes this.
 - **Shape:** Umami takes flat values only, so arrays (e.g. onboarding
   `topics`) arrive as comma-separated strings, as in GA4; event names over 50
   characters are not sent (none exist today).
 - **No tracker** (dev, analytics disabled, blocked script) is a silent no-op.
-  The consent banner names "Replit Analytics" in production builds only.
+  The consent banner does not name Replit Analytics: it lists only the tools
+  the banner switches on.
 
 ### Shared event catalog
 
@@ -398,7 +408,7 @@ Funnel: journeys list view (`page_view`) → `journey_start` → `journey_step_c
 | `category_view` | Category / Subcategory / Sub-subcategory pages — `TaxonomyListing.tsx`, once per resolved node (filtering, sorting and paging within the node do not re-fire it) | `content_category` |
 | `theme_change` | Theme settings pickers — `ThemeSettings.tsx` | `theme_name`, `theme_type: "color" \| "font" \| "system"` |
 | `resource_favorite` | Favorite toggle — `ResourceDetail.tsx` | `action: "add" \| "remove"`, `content_name`, `content_category` |
-| `performance` | Core Web Vitals after analytics consent — `use-analytics.tsx` | `metric_name: "lcp" \| "inp" \| "fid" \| "cls"`, `value` (milliseconds for LCP/INP/FID, unitless score for CLS) |
+| `performance` | Core Web Vitals unless analytics was declined (GA4 after consent; Replit Analytics before a choice too) — `use-analytics.tsx` | `metric_name: "lcp" \| "inp" \| "fid" \| "cls"`, `value` (milliseconds for LCP/INP/FID, unitless score for CLS) |
 | `api_performance` | Every API request — `queryClient.ts` | `endpoint`, `status`, `value` (ms) |
 | `error` | Failed API request or global JavaScript error — `queryClient.ts` / `use-analytics.tsx` | `error_type`, `error_message` (browser errors use a non-content shape such as `short-text`) |
 | `guest_bookmark_added` / `guest_bookmark_removed` | Signed-out save toggle (on-device store, Task #329) — `useResourceToggle` guest branch | `resource_id`, `guest_saved_count` |
@@ -411,7 +421,7 @@ Funnel: journeys list view (`page_view`) → `journey_start` → `journey_step_c
 ### FID to INP transition
 
 Google replaced First Input Delay (FID) with **Interaction to Next Paint (INP)**
-as the responsiveness Core Web Vital. The mounted, consent-gated performance
+as the responsiveness Core Web Vital. The mounted performance (skipped after a Decline)
 capture therefore reports `inp` using the current `web-vitals` package. The
 existing `fid` observer remains intentionally enabled where the browser exposes
 the `first-input` PerformanceObserver entry, preserving historical dashboard

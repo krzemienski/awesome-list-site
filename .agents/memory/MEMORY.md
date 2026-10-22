@@ -63,7 +63,7 @@
 - [Shared PG rate-limit store](pg-shared-rate-limit-store.md) — limits are global via rate_limit_hits; localKeys=false stores need distinct `prefix` or layered limiters trip ERR_ERL_DOUBLE_COUNT; fails open to memory on DB trouble.
 - [Export URL normalization](export-url-normalization.md) — export strips trailing slashes (a live slashed URL can 404 slashless); allowlist bare domains, %-encoded entries never match.
 - [awesome_bot export check](awesome-bot-export-check.md) — gem via nix-shell ruby; chunk big lists past the 5-min shell budget; ReadTimeout/418/202 are bot-blocks, not dead.
-- [www/apex split-brain DNS](www-domain-split-brain.md) — www is Cloudflare-proxied (525: origin lacks a www cert) while apex hits Replit's edge directly; only a CF redirect rule or Replit custom domain fixes it — never app code.
+- [www/apex split-brain DNS](www-domain-split-brain.md) — www handled only at Cloudflare edge; current redirect rule loops (Location lacks https://); connector token lacks ruleset perms.
 - [z.json() wire vs memory](zod-json-wire-vs-memory.md) — res.json-wrapper validation sees pre-serialization bodies; z.json() rejects Dates → false mismatch spam; validate JSON.stringify-ability instead.
 - [Link Health scan lifecycle](link-health-scan-lifecycle.md) — dashboard flags = latest COMPLETED job only; URL fixes need a fresh ~90-min scan; "suspect" = off-domain redirect, repoint to final host.
 - [HTTP cache edge rewrite](http-cache-edge-rewrite.md) — Google-Frontend can downgrade a cookie-less first asset response to private when it emits GAESA; verify origin policy separately.

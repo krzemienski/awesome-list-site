@@ -5,9 +5,10 @@
 //    exactly once per navigation from a single source (use-analytics), and adds
 //    `debug_mode` in DEV so events surface in GA4 DebugView.
 //  - Every custom event goes through the module-private `track()`, which
-//    lazily loads the shared dispatcher (analytics-dispatch.ts) after consent.
-//    The dispatcher cleans properties once (analytics-hygiene.ts) and fans the
-//    event out to GA4, Mixpanel, PostHog and Amplitude. GA4's half lands in
+//    lazily loads the shared dispatcher (analytics-dispatch.ts). The
+//    dispatcher cleans properties once (analytics-hygiene.ts) and fans the
+//    event out to GA4, Mixpanel, PostHog and Amplitude after consent, and to
+//    Replit Analytics unless the visitor declined. GA4's half lands in
 //    `sendGaEvent` together with sanitized GA4 page context (page_location
 //    keeps only attribution params; path-only page_path; origin+path referrer).
 //  - Tracking plan + shared event catalog: docs/ANALYTICS.md. New events are
@@ -39,8 +40,9 @@ export const ANALYTICS_VENDORS = [
   { name: 'Mixpanel', configured: Boolean(import.meta.env.VITE_MIXPANEL_TOKEN) },
   { name: 'PostHog', configured: Boolean(import.meta.env.VITE_POSTHOG_KEY) },
   { name: 'Amplitude', configured: Boolean(import.meta.env.VITE_AMPLITUDE_API_KEY) },
-  // The platform injects Replit Analytics' tracker into published builds only.
-  { name: 'Replit Analytics', configured: import.meta.env.PROD },
+  // Replit Analytics is not listed: the platform injects its cookie-free
+  // tracker into every published page, so it is not something the banner can
+  // switch on. Only an explicit Decline stops the app's custom events to it.
 ].filter((vendor) => vendor.configured).map((vendor) => vendor.name);
 
 // BUG-020 (run13): analytics is consent-gated. The choice lives in
@@ -231,7 +233,8 @@ export const trackPageView = (_url?: string) => {
       page_title: typeof document !== 'undefined' ? document.title : undefined,
       referrer_origin: referrerOrigin(),
     },
-    { ga: { name: 'page_view', params: {} } },
+    // Replit Analytics records page views itself.
+    { ga: { name: 'page_view', params: {} }, replit: false },
   );
 };
 
@@ -529,7 +532,7 @@ export const trackPerformance = (metric: string, value: number) => {
   track(
     'performance',
     { metric_name: normalizedMetric, value: reportedValue },
-    { product: false },
+    { product: false, replit: true },
   );
 };
 
@@ -619,16 +622,21 @@ const queuedDispatches: AnalyticsDispatchRequest[] = [];
 
 /**
  * The single entry point for every custom event: one call reaches GA4,
- * Mixpanel, PostHog and Amplitude with identically cleaned properties.
- * Pre-consent it returns before doing anything — the dispatcher chunk (and
- * the property-hygiene rules inside it) is only fetched after a grant.
+ * Mixpanel, PostHog, Amplitude and Replit Analytics with identically cleaned
+ * properties. The four banner-named vendors only receive events after a
+ * grant; Replit Analytics (cookie-free, no identifiers) also receives them
+ * while the visitor has not chosen, and nothing is sent after a Decline.
  * Components never call it directly: they use typed helpers — the ones in
  * this file or an area module (analytics-<area>.ts) — so the catalog in
  * docs/ANALYTICS.md stays the one place event names are decided.
  */
 export const track = (name: string, props: EventProps = {}, options: TrackOptions = {}) => {
   if (typeof window === 'undefined') return;
-  if (getAnalyticsConsent() !== 'granted') return;
+  const consent = getAnalyticsConsent();
+  if (consent === 'denied') return;
+  const product = options.product !== false;
+  const replit = options.replit ?? product;
+  if (consent !== 'granted' && !replit) return;
   const ga =
     options.ga === false
       ? null
@@ -637,7 +645,8 @@ export const track = (name: string, props: EventProps = {}, options: TrackOption
     name,
     props,
     ga,
-    product: options.product !== false,
+    product,
+    replit,
   };
   if (dispatch) {
     dispatch(request);
@@ -684,6 +693,12 @@ interface TrackOptions {
    * outbound_link, page_not_found) so their vendor coverage is unchanged.
    */
   product?: boolean;
+  /**
+   * Replit Analytics. Default: same as `product`. `false` for page_viewed
+   * (the platform records page views); `true` for GA4-only events that should
+   * still reach Replit Analytics (performance).
+   */
+  replit?: boolean;
 }
 
 let dispatch: ((request: AnalyticsDispatchRequest) => void) | null = null;

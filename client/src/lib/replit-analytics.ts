@@ -4,8 +4,10 @@
 // records page views by itself; this module only forwards the catalog's
 // custom events to `window.umami.track()`.
 //
-// - Consent: the dispatcher only calls this after consent, and queued events
-//   are re-checked at flush and dropped on revoke, like the other four tools.
+// - Consent: the tracker is cookie-free and carries no identifiers, so events
+//   flow while the visitor has not answered the banner. An explicit Decline
+//   stops them: queued events are re-checked at flush and dropped on Decline.
+// - Free-form text typed by visitors (search terms) is never sent here.
 // - Shape: Umami takes flat string/number/boolean values. Props arrive already
 //   cleaned by analytics-hygiene; arrays become comma-separated strings (as
 //   GA4 receives them) and anything else non-primitive is dropped.
@@ -28,6 +30,7 @@ const TRACKER_SELECTOR = 'script[src^="https://i.replit.com/script.js"]';
 
 // Umami records page views itself; a custom page_viewed would double them.
 const PLATFORM_TRACKED = new Set(['page_viewed']);
+const FREE_FORM_KEYS = new Set(['search_term']);
 
 interface QueuedEvent {
   name: string;
@@ -37,9 +40,9 @@ interface QueuedEvent {
 const queue: QueuedEvent[] = [];
 let waitingForTracker = false;
 
-const isGranted = () => {
+const isDeclined = () => {
   try {
-    return localStorage.getItem('analytics-consent') === 'granted';
+    return localStorage.getItem('analytics-consent') === 'denied';
   } catch {
     return false;
   }
@@ -48,6 +51,7 @@ const isGranted = () => {
 const toUmamiData = (props: Record<string, unknown>): UmamiData => {
   const data: UmamiData = {};
   for (const [key, value] of Object.entries(props)) {
+    if (FREE_FORM_KEYS.has(key)) continue;
     if (typeof value === 'string' || typeof value === 'number' || typeof value === 'boolean') {
       data[key] = value;
     } else if (Array.isArray(value)) {
@@ -71,13 +75,13 @@ const send = (name: string, data: UmamiData) => {
 const flush = () => {
   waitingForTracker = false;
   const pending = queue.splice(0);
-  if (!isGranted() || !window.umami) return;
+  if (isDeclined() || !window.umami) return;
   for (const event of pending) send(event.name, event.data);
 };
 
 if (typeof window !== 'undefined') {
   window.addEventListener('analytics-consent-changed', () => {
-    if (!isGranted()) queue.length = 0;
+    if (isDeclined()) queue.length = 0;
   });
 }
 

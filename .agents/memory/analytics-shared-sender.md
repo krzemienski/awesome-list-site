@@ -23,3 +23,6 @@ description: How custom events reach GA4/Mixpanel/PostHog/Amplitude, where the p
 **Full-page navigation resends:** Mixpanel re-sends a batch interrupted by `window.location.href` (e.g. onboarding skip), so raw counts double — same `$insert_id`, not a double fire.
 
 **Rule:** guest-only events must wait for auth to settle (`useAuth().isLoading` false). Guest queries gated on `!isAuthenticated` also run while the session is resolving, so signed-in loads emitted a phantom guest event.
+
+**Rule (owner decision, 2026-10-22):** Replit Analytics gets custom events (incl. `performance` web vitals) while consent is UNSET; only an explicit Decline stops it. GA4/Mixpanel/PostHog/Amplitude stay grant-only. The banner names only those four; the privacy policy's Analytics section describes the Replit behaviour — keep both in sync if this changes. `search_term` is never sent to Replit.
+**Why:** almost nobody answers the banner, so a fully consent-gated sender gave ~2% custom-event coverage in Replit Analytics; the tracker is cookie-free and the events carry no identity.
