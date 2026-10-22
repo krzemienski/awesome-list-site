@@ -722,6 +722,27 @@ export const trackResourceCardOpened = (
   });
 };
 
+export const trackRelatedResourceOpened = (
+  resourceId: string | number,
+  fromResourceId: string | number,
+  position: number,
+  matchScore?: number,
+) => {
+  track('related_resource_opened', {
+    resource_id: String(resourceId),
+    from_resource_id: String(fromResourceId),
+    position,
+    match_score: matchScore,
+  });
+};
+
+export const trackRelatedCategoryOpened = (fromResourceId: string | number, category: string) => {
+  track('related_category_opened', {
+    from_resource_id: String(fromResourceId),
+    category,
+  });
+};
+
 export const trackApiKeyCopied = (copyMethod: 'clipboard' | 'manual_select') => {
   track('api_key_copied', { copy_method: copyMethod });
 };

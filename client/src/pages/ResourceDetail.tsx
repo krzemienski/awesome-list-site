@@ -36,7 +36,14 @@ import { useAuth } from "@/hooks/useAuth";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { apiRequest, ApiError } from "@/lib/queryClient";
 import { useFavoriteToggle, useBookmarkToggle } from "@/hooks/useResourceToggle";
-import { trackSelectContent, trackShare, trackResourceFavorite, trackResourceClick } from "@/lib/analytics";
+import {
+  trackSelectContent,
+  trackShare,
+  trackResourceFavorite,
+  trackResourceClick,
+  trackRelatedResourceOpened,
+  trackRelatedCategoryOpened,
+} from "@/lib/analytics";
 import { trackCollectionMembershipResults } from "@/lib/analytics-collections";
 import { useToast } from "@/hooks/use-toast";
 import { ToastAction } from "@/components/ui/toast";
@@ -568,8 +575,10 @@ export default function ResourceDetail() {
   // open-in-new-tab works.
   const handleRelatedResourceClick = (
     e: React.MouseEvent<HTMLAnchorElement>,
-    relatedResource: Resource,
+    relatedResource: Resource & { score?: number },
+    position: number,
   ) => {
+    trackRelatedResourceOpened(relatedResource.id, id, position, relatedResource.score);
     trackInteraction.mutate({
       resourceId: relatedResource.id.toString(),
       interactionType: "click",
@@ -884,6 +893,96 @@ export default function ResourceDetail() {
         collectionsLoading={collectionsLoading}
       />
 
+      {/* Related resources sit directly under the actions: resource pages are
+          the main search entry point, and when this list was below the details
+          it started a full screen down, so most visitors never saw a next step.
+          BUG-011: always render it — an explicit empty state when the related
+          endpoint returns no matches, never a missing section. */}
+      <section className="resource-detail-related" aria-labelledby="related-resources-heading">
+        <Card>
+          <CardHeader>
+            <h2
+              id="related-resources-heading"
+              className="text-lg font-semibold leading-none tracking-tight flex items-center gap-2"
+            >
+              <FolderTree className="h-4 w-4 text-[color:var(--text-3)]" />
+              Related Resources
+            </h2>
+            <CardDescription>
+              Resources you might find interesting
+            </CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-2">
+            {relatedQuery.isLoading && <p role="status">Loading related resources…</p>}
+            {relatedQuery.isError && (
+              <div role="alert">
+                <p>Related resources are temporarily unavailable.</p>
+                <Button variant="outline" onClick={() => void relatedQuery.refetch()}>Retry related resources</Button>
+              </div>
+            )}
+            {!relatedQuery.isLoading && !relatedQuery.isError && filteredRelatedResources.length === 0 && (
+              <p
+                className="text-sm text-muted-foreground"
+                data-testid="related-empty-state"
+              >
+                No related resources yet. Explore more in this category below.
+              </p>
+            )}
+            {filteredRelatedResources.map((related, index) => (
+              <a
+                key={related.id}
+                href={`/resource/${related.id}`}
+                className="resource-detail-related-item block p-3 border border-border hover:bg-accent hover:text-accent-foreground focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none cursor-pointer transition-colors group min-h-[44px]"
+                onClick={(e) => handleRelatedResourceClick(e, related, index + 1)}
+                data-testid={`related-resource-${related.id}`}
+              >
+                <div className="flex items-center justify-between gap-2">
+                  <span className="font-medium text-sm line-clamp-1 flex-1">
+                    {related.title}
+                  </span>
+                  {related.score !== undefined && (
+                    <Badge variant="secondary" className="text-xs flex-shrink-0">
+                      <TrendingUp className="h-3 w-3 mr-1" aria-hidden="true" />
+                      {related.score}% match
+                    </Badge>
+                  )}
+                  <ChevronRight className="h-4 w-4 text-muted-foreground flex-shrink-0" aria-hidden="true" />
+                </div>
+                {related.description && (
+                  <p className="text-xs text-muted-foreground line-clamp-1 mt-1">
+                    {related.description}
+                  </p>
+                )}
+                {related.reasons && related.reasons.length > 0 && (
+                  <div className="mt-2 flex flex-wrap gap-1">
+                    <span className="sr-only">Why recommended:</span>
+                    {related.reasons.slice(0, 2).map((reason, reasonIndex) => (
+                      <span key={reasonIndex} className="resource-detail-related-reason text-xs bg-muted text-muted-foreground px-2 py-0.5">
+                        {reason}
+                      </span>
+                    ))}
+                  </div>
+                )}
+              </a>
+            ))}
+            {resource.category && taxonomySlugs.category && (
+              /* Run16 BUG-057: asChild makes the anchor itself the ≥44px button
+                 (an inline Link wrapping a Button was a 20px-tall target). */
+              <Button asChild variant="ghost" size="sm" className="w-full mt-2 min-h-[44px]">
+                <Link
+                  href={`/category/${taxonomySlugs.category}`}
+                  onClick={() => trackRelatedCategoryOpened(resource.id, resource.category ?? "")}
+                  data-testid="link-view-all-category"
+                >
+                  View all in {resource.category}
+                  <ChevronRight className="h-4 w-4 ml-1" />
+                </Link>
+              </Button>
+            )}
+          </CardContent>
+        </Card>
+      </section>
+
       <div className="resource-detail-body">
         <div>
           <Card className="resource-detail-content">
@@ -1103,124 +1202,30 @@ export default function ResourceDetail() {
           </Card>
         </div>
 
-        <div className="resource-detail-related">
-          {/* BUG-034 (run19): the "Quick Actions" card was removed — it held a
-              single "Visit Resource" button duplicating the header CTA, so the
-              page offered the same P0 action twice. The header button is now
-              the one and only Visit control. */}
-
-          {/* BUG-011: always render the Related section. When the related
-              endpoint returns no matches, show an explicit empty state instead
-              of dropping the whole card (which read as a broken/missing section
-              in the QA audit). */}
-          <Card>
+        {scrapedTitle && (
+          <Card className="bg-[var(--surface-2)]">
             <CardHeader>
-              {/* F018: a real heading (CardTitle renders a div) so the section
-                  shows up in the document outline / screen-reader rotor. */}
-              <h2 className="text-lg font-semibold leading-none tracking-tight flex items-center gap-2">
-                <FolderTree className="h-4 w-4 text-[color:var(--text-3)]" />
-                Related Resources
-              </h2>
-              <CardDescription>
-                Resources you might find interesting
-              </CardDescription>
+              <CardTitle className="text-sm flex items-center gap-2 text-muted-foreground">
+                <ImageIcon className="h-4 w-4" />
+                Page Metadata
+              </CardTitle>
             </CardHeader>
-            <CardContent className="space-y-2">
-              {relatedQuery.isLoading && <p role="status">Loading related resources…</p>}
-              {relatedQuery.isError && (
-                <div role="alert">
-                  <p>Related resources are temporarily unavailable.</p>
-                  <Button variant="outline" onClick={() => void relatedQuery.refetch()}>Retry related resources</Button>
+            <CardContent className="space-y-2 text-sm">
+              {scrapedTitle && scrapedTitle !== resource.title && (
+                <div>
+                  <span className="text-muted-foreground">Title:</span>
+                  <p className="text-foreground">{scrapedTitle}</p>
                 </div>
               )}
-              {!relatedQuery.isLoading && !relatedQuery.isError && filteredRelatedResources.length === 0 && (
-                <p
-                  className="text-sm text-muted-foreground"
-                  data-testid="related-empty-state"
-                >
-                  No related resources yet. Explore more in this category below.
-                </p>
+              {metadata?.twitterCard && (
+                <div>
+                  <span className="text-muted-foreground">Twitter Card:</span>
+                  <p className="text-foreground">{metadata.twitterCard}</p>
+                </div>
               )}
-              {filteredRelatedResources.map((related) => (
-                  <a
-                    key={related.id}
-                    href={`/resource/${related.id}`}
-                    className="resource-detail-related-item block p-3 border border-border hover:bg-accent hover:text-accent-foreground focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none cursor-pointer transition-colors group min-h-[44px]"
-                    onClick={(e) => handleRelatedResourceClick(e, related)}
-                    data-testid={`related-resource-${related.id}`}
-                  >
-                    <div className="flex items-center justify-between gap-2">
-                      <span className="font-medium text-sm line-clamp-1 flex-1">
-                        {related.title}
-                      </span>
-                      <ChevronRight className="h-4 w-4 text-muted-foreground flex-shrink-0" />
-                    </div>
-                    {related.description && (
-                      <p className="text-xs text-muted-foreground line-clamp-2 mt-1">
-                        {related.description}
-                      </p>
-                    )}
-                    {related.score !== undefined && (
-                      <div className="mt-2">
-                        <Badge variant="secondary" className="text-xs">
-                          <TrendingUp className="h-3 w-3 mr-1" />
-                          {related.score}% match
-                        </Badge>
-                      </div>
-                    )}
-                    {related.reasons && related.reasons.length > 0 && (
-                      <div className="mt-2 space-y-1">
-                        <div className="text-xs text-muted-foreground">Why recommended:</div>
-                        <div className="flex flex-wrap gap-1">
-                          {related.reasons.slice(0, 2).map((reason, index) => (
-                            <span key={index} className="resource-detail-related-reason text-xs bg-muted text-muted-foreground px-2 py-0.5">
-                              {reason}
-                            </span>
-                          ))}
-                        </div>
-                      </div>
-                    )}
-                  </a>
-                ))}
-                {resource.category && taxonomySlugs.category && (
-                  /* Run16 BUG-057: the inline wouter <Link> wrapping a Button
-                     produced a 20px-tall anchor box (< 24px WCAG 2.5.8).
-                     asChild makes the anchor itself the ≥44px button. */
-                  <Button asChild variant="ghost" size="sm" className="w-full mt-2 min-h-[44px]">
-                    <Link href={`/category/${taxonomySlugs.category}`} data-testid="link-view-all-category">
-                      View all in {resource.category}
-                      <ChevronRight className="h-4 w-4 ml-1" />
-                    </Link>
-                  </Button>
-                )}
-              </CardContent>
-            </Card>
-
-          {scrapedTitle && (
-            <Card className="bg-[var(--surface-2)]">
-              <CardHeader>
-                <CardTitle className="text-sm flex items-center gap-2 text-muted-foreground">
-                  <ImageIcon className="h-4 w-4" />
-                  Page Metadata
-                </CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-2 text-sm">
-                {scrapedTitle && scrapedTitle !== resource.title && (
-                  <div>
-                    <span className="text-muted-foreground">Title:</span>
-                    <p className="text-foreground">{scrapedTitle}</p>
-                  </div>
-                )}
-                {metadata?.twitterCard && (
-                  <div>
-                    <span className="text-muted-foreground">Twitter Card:</span>
-                    <p className="text-foreground">{metadata.twitterCard}</p>
-                  </div>
-                )}
-              </CardContent>
-            </Card>
-          )}
-        </div>
+            </CardContent>
+          </Card>
+        )}
       </div>
 
       {suggestEditOpen && (

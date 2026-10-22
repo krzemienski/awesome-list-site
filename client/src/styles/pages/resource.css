@@ -151,7 +151,7 @@
 .resource-detail-sections [data-seo-section="resource-tags"] > div { display: flex; flex-wrap: wrap; gap: 8px; }
 
 .resource-detail-sections [data-testid="link-url"] svg { display: inline; margin-left: 8px; }
-.resource-detail-related { display: grid; gap: 24px; min-width: 0; }
+.resource-detail-related { display: grid; gap: 24px; min-width: 0; margin-bottom: 24px; }
 .resource-detail-related > * { min-width: 0; }
 
 /* Wider faces (e.g. a font-picker override) push the one-line "View all in …" label past a
