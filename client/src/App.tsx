@@ -12,10 +12,11 @@ import {
 import { Switch, Route, Redirect, useLocation, useSearch } from "wouter";
 import { discoveryRedirect } from "@shared/discovery-params";
 import { AccountThemePreferenceBridge } from "@/components/ui/theme-provider";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { noteLocationChange, useScrollRestoration } from "./lib/nav-history";
 import { useAuth } from "./hooks/useAuth";
 import { findRouteSuggestion } from "./lib/not-found-suggestion";
+import { pendingRouteTitle } from "./lib/pending-route-title";
 import { useAnalytics } from "./hooks/use-analytics";
 import { useCrossTabSync } from "./lib/crossTabSync";
 import { hasClerkSessionHint, requestClerk, routeNeedsClerk, useClerkBridge } from "./lib/clerk-bridge";
@@ -90,6 +91,9 @@ const SearchDialog = lazy(() => import("@/components/ui/search-dialog"));
 /** Route-level Suspense fallback — mirrors the page skeletons so a code-split
  * route paints a familiar loading state instead of a blank main region. */
 function RouteFallback() {
+  const queryClient = useQueryClient();
+  const pendingTitle =
+    typeof window === "undefined" ? undefined : pendingRouteTitle(queryClient, window.location.pathname);
   return (
     <div className="space-y-6" data-testid="route-chunk-skeleton" role="status" aria-busy="true" aria-label="Loading page">
       {/* BUG-031 (run22): while a lazy chunk loads, the head must already
@@ -97,7 +101,7 @@ function RouteFallback() {
           never linger on the previous route's metadata. The destination page
           replaces this with its real head in the same render that swaps the
           skeleton out. */}
-      <SEOHead />
+      {pendingTitle ? <SEOHead title={pendingTitle} loading /> : <SEOHead />}
       <div className="h-8 w-2/3 max-w-md rounded-none bg-muted animate-pulse" />
       <div className="h-4 w-1/2 max-w-sm rounded-none bg-muted animate-pulse" />
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">

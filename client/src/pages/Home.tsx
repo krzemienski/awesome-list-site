@@ -224,7 +224,10 @@ function HomeSkeleton({
         </div>
       </div>
       {layout === "index" ? (
-        <div className="home-skeleton-line home-skeleton-index-title" />
+        <>
+          <div className="home-skeleton-line home-skeleton-index-title" />
+          <div className="home-skeleton-line home-skeleton-index-search" />
+        </>
       ) : (
         <div className="home-hero">
           <div className="home-skeleton-line home-skeleton-hero-title" />

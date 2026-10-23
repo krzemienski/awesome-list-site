@@ -1,6 +1,6 @@
 import { homeHeading } from "@shared/page-headings";
-import type { ReactNode } from "react";
-import { Link } from "wouter";
+import { useState, type FormEvent, type ReactNode } from "react";
+import { Link, useLocation } from "wouter";
 import type { Resource } from "@/types/awesome-list";
 import type { ResourceKind } from "@shared/resourceKinds";
 import { STRIP_KINDS, type ResourceKindCounts } from "@/lib/static-data";
@@ -8,6 +8,7 @@ import { Badge } from "@/components/ui/badge";
 import { getCategoryGlyph } from "@/components/layout/new/category-glyphs";
 import { ChipButton } from "@/components/ui/chip-button";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 import { handoffFocusOnUnmount } from "@/hooks/focus-handoff";
 import { trackResourceCardOpened, trackResourceClick, trackTagInteraction } from "@/lib/analytics";
 
@@ -570,6 +571,33 @@ function RecentRail({ recent, featured }: { recent: Resource[]; featured: Resour
   );
 }
 
+// On a phone the only search affordance was the header icon; half of home
+// landers left without a second page. A visible field opens /search directly.
+function HomeSearch() {
+  const [, navigate] = useLocation();
+  const [value, setValue] = useState("");
+  const submit = (event: FormEvent) => {
+    event.preventDefault();
+    const q = value.trim();
+    navigate(q ? `/search?q=${encodeURIComponent(q)}` : "/search");
+  };
+  return (
+    <form role="search" className="home-index-search" onSubmit={submit} data-testid="home-search-form">
+      <Input
+        type="search"
+        name="q"
+        value={value}
+        onChange={(event) => setValue(event.target.value)}
+        placeholder="Search codecs, players…"
+        aria-label="Search the catalog"
+        enterKeyHint="search"
+        data-testid="input-home-search"
+      />
+      <Button type="submit" className="min-h-11" data-testid="button-home-search">Search</Button>
+    </form>
+  );
+}
+
 function IndexLayout({
   categories,
   recent,
@@ -588,6 +616,7 @@ function IndexLayout({
         <span className="caret" aria-hidden="true">~/awesome.video</span>
         <span className="sr-only">{homeHeading}</span>
       </h1>
+      <HomeSearch />
       <StatStrip stats={stats} layout="index" />
       {shownFeatured.length > 0 ? (
         <section className="home-index-featured" aria-labelledby="home-index-featured-title" data-testid="home-featured-index">

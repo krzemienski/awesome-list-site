@@ -1,5 +1,5 @@
 import StatePanel, { RetryButton } from "@/components/layout/StatePanel";
-import { useEffect, useState } from "react";
+import { Fragment, useEffect, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import "@/styles/pages/discovery.css";
 import { ArrowLeft } from "lucide-react";
@@ -193,6 +193,24 @@ export default function TagLanding() {
         {/* Task #379 (uxv1-06): max-w-prose (65ch) instead of max-w-3xl (~105ch
             at this size) keeps the measure readable on wide desktop screens. */}
         <p className="mt-1 max-w-prose text-sm leading-relaxed text-muted-foreground">{intro}</p>
+        {/* The full related-topics section sits under the list; nearly every
+            tag lander left before reaching it, so name the closest few here. */}
+        {(categories.length > 0 || relatedTags.length > 0) && (
+          <p className="mt-2 max-w-prose text-sm leading-relaxed text-muted-foreground" data-testid="tag-related-shortcut">
+            Related:{" "}
+            {[
+              ...relatedTags.slice(0, 3).map(([related]) => ({ href: tagLandingPath(related), label: `#${tagDisplayName(related)}` })),
+              ...categories.slice(0, 1).map((category) => ({ href: `/category/${slugify(category.value)}`, label: category.value })),
+            ].map((item, index) => (
+              <Fragment key={item.href}>
+                {index > 0 && ", "}
+                <Link href={item.href} className="text-foreground underline underline-offset-4 hover:opacity-80">{item.label}</Link>
+              </Fragment>
+            ))}
+            {" · "}
+            <a href="#related-topics-heading" className="text-foreground underline underline-offset-4 hover:opacity-80">All related topics</a>
+          </p>
+        )}
       </section>
       {pageNoticeFor(parsedPage, totalPages) && (
         <div role="status" data-testid="notice-page-adjusted" className="rounded border p-3 text-sm">

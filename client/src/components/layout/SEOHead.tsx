@@ -40,6 +40,12 @@ interface SEOHeadProps {
    * server.
    */
   ogUrl?: string;
+  /**
+   * Marks a head rendered while the page's data is still loading. It follows
+   * the loading-fallback rules (never replaces the server head on first paint)
+   * even when the title already names the page.
+   */
+  loading?: boolean;
 }
 
 // R5-022: on the very first client render the SSR head (stamped
@@ -86,13 +92,15 @@ export default function SEOHead({
   type = "website",
   noindex = false,
   follow = false,
-  ogUrl
+  ogUrl,
+  loading = false,
 }: SEOHeadProps) {
   const committed = useCommitted();
   // R5-022: identify transient loading fallbacks — the "Loading …" titles the
   // pages mount while their data fetch is in flight, and the prop-less
   // <SEOHead /> Home renders while the tree loads.
   const isLoadingFallback =
+    loading ||
     (!!title && /^Loading /.test(title)) ||
     (!title && !description && !awesomeList && !category);
   if (isLoadingFallback && !firstRealHeadCommitted) {

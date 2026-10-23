@@ -156,7 +156,8 @@
 
 /* Wider faces (e.g. a font-picker override) push the one-line "View all in …" label past a
    phone column; let it wrap inside its 44px-min button instead. */
-.resource-detail-related [data-testid="link-view-all-category"] {
+.resource-detail-related [data-testid="link-view-all-category"],
+.resource-detail-related [data-testid="link-more-in-collection"] {
   height: auto;
   white-space: normal;
   text-align: center;

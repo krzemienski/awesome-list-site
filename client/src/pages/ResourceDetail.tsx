@@ -99,6 +99,20 @@ function ContactResourceAction(props: { onSuggestEdit: () => void; fallback: Rea
   ) : <>{props.fallback}</>;
 }
 
+// Name where the button goes ("View on GitHub", "Open on dashif.org") so a
+// visitor knows what they get before leaving the site.
+function visitLabel(url: string): string {
+  let host: string;
+  try {
+    host = new URL(url).hostname.replace(/^www\./, "");
+  } catch {
+    return "Open resource";
+  }
+  if (host === "github.com") return "View on GitHub";
+  if (host === "gitlab.com") return "View on GitLab";
+  return host ? `Open on ${host}` : "Open resource";
+}
+
 export default function ResourceDetail() {
   const { id } = useParams<{ id: string }>();
   const { user, isAuthenticated, isAuthPending } = useAuth();
@@ -631,6 +645,14 @@ export default function ResourceDetail() {
     }));
   const allUnclassified = classificationRows.length === 0;
 
+  // The closest shelf to this resource: visitors who land here from search
+  // want its neighbours first, the whole category second.
+  const narrowestCollection = resource?.subSubcategory && taxonomySlugs.subSubcategory
+    ? { name: resource.subSubcategory, href: `/sub-subcategory/${taxonomySlugs.subSubcategory}` }
+    : resource?.subcategory && taxonomySlugs.subcategory
+      ? { name: resource.subcategory, href: `/subcategory/${taxonomySlugs.subcategory}` }
+      : null;
+
   const filteredRelatedResources = (relatedResources?.similar ?? [])
     .slice(0, 6)
     .map((item) => ({ ...item.resource, score: item.score, reasons: item.reasons }));
@@ -795,7 +817,7 @@ export default function ResourceDetail() {
           <Button asChild>
             <a href={resource.url} target="_blank" rel="noopener noreferrer"
               onClick={handleVisitResource} data-testid="button-visit">
-              Open resource <ExternalLink size={14} aria-hidden="true" />
+              {visitLabel(resource.url)} <ExternalLink size={14} aria-hidden="true" />
             </a>
           </Button>
           {/* R2-L09: favorite/bookmark shown to anonymous users too — clicks
@@ -942,10 +964,10 @@ export default function ResourceDetail() {
                     data-testid="related-placeholder"
                   >
                     <div className="flex items-center justify-between gap-2">
-                      <span className="font-medium text-sm line-clamp-1 flex-1">
+                      <span className="font-medium text-sm line-clamp-1 flex-1 min-w-0">
                         <Skeleton className="inline-block w-2/3 max-w-full">{"\u00a0"}</Skeleton>
                       </span>
-                      <Badge variant="secondary" className="text-xs flex-shrink-0 invisible">
+                      <Badge variant="secondary" className="text-xs flex-shrink-0 invisible hidden sm:inline-flex">
                         <TrendingUp className="h-3 w-3 mr-1" />
                         00% match
                       </Badge>
@@ -984,11 +1006,11 @@ export default function ResourceDetail() {
                 data-testid={`related-resource-${related.id}`}
               >
                 <div className="flex items-center justify-between gap-2">
-                  <span className="font-medium text-sm line-clamp-1 flex-1">
+                  <span className="font-medium text-sm line-clamp-2 sm:line-clamp-1 flex-1 min-w-0">
                     {related.title}
                   </span>
                   {related.score !== undefined && (
-                    <Badge variant="secondary" className="text-xs flex-shrink-0">
+                    <Badge variant="secondary" className="text-xs flex-shrink-0 hidden sm:inline-flex">
                       <TrendingUp className="h-3 w-3 mr-1" aria-hidden="true" />
                       {related.score}% match
                     </Badge>
@@ -1016,6 +1038,21 @@ export default function ResourceDetail() {
                 that tree is still loading so the card does not grow later. */}
             {resource.category && !awesomeListTree && (
               <div aria-hidden="true" className="w-full mt-2 min-h-[44px]" />
+            )}
+            {resource.subcategory && !awesomeListTree && (
+              <div aria-hidden="true" className="w-full mt-2 min-h-[44px]" />
+            )}
+            {narrowestCollection && (
+              <Button asChild variant="outline" size="sm" className="w-full mt-2 min-h-[44px]">
+                <Link
+                  href={narrowestCollection.href}
+                  onClick={() => trackRelatedCategoryOpened(resource.id, narrowestCollection.name)}
+                  data-testid="link-more-in-collection"
+                >
+                  More in {narrowestCollection.name}
+                  <ChevronRight className="h-4 w-4 ml-1" />
+                </Link>
+              </Button>
             )}
             {resource.category && taxonomySlugs.category && (
               /* Run16 BUG-057: asChild makes the anchor itself the ≥44px button

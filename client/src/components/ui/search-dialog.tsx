@@ -486,11 +486,16 @@ export default function SearchDialog({ isOpen, setIsOpen }: SearchDialogProps) {
                         <span>Resource results will load when your connection is back.</span>
                       </div>
                     ) : !hasNonResourceMatches && results.length === 0 && (
-                      <div className="search-palette-status" data-testid="search-no-results">
-                        <Search aria-hidden="true" />
-                        <strong>No results for “{queryTrimmed}”</strong>
-                        <span>Try different keywords or check the spelling.</span>
-                      </div>
+                      <>
+                        <div className="search-palette-status" data-testid="search-no-results">
+                          <Search aria-hidden="true" />
+                          <strong>No results for “{queryTrimmed}”</strong>
+                          <span>Try different keywords, or start from one of these.</span>
+                        </div>
+                        {/* A dead end closed the palette with nowhere to go;
+                            offer the same jump targets as the empty palette. */}
+                        {renderDefaultJumps()}
+                      </>
                     )}
                     {categoriesQuery.isError && (
                       <div className="search-palette-inline-error" role="status">

@@ -25,6 +25,7 @@ import {
 } from "@shared/seo-templates";
 import NotFound from "@/pages/not-found";
 import { findTaxonomySuggestion } from "@/lib/not-found-suggestion";
+import { findNavNode } from "@/lib/nav-lookup";
 import ErrorPage from "@/pages/ErrorPage";
 import OfflinePageState from "@/components/layout/OfflinePageState";
 import { queryUnavailableReason } from "@/lib/query-availability";
@@ -37,7 +38,7 @@ import { apiRequest } from "@/lib/queryClient";
 import { useDebounce } from "@/hooks/useDebounce";
 import { useContactConfig } from "@/lib/contact";
 import { normalizeSearchQuery } from "@shared/searchNormalize";
-import { fetchAwesomeListNav, fetchListingPage, type AwesomeListNav, type ListingLevel } from "@/lib/static-data";
+import { fetchAwesomeListNav, fetchListingPage, navTotalCount, type AwesomeListNav, type ListingLevel } from "@/lib/static-data";
 import type { ResourceSearchFacets } from "@shared/resourceFacets";
 import { RESOURCE_KIND_VALUES, type ResourceKind } from "@shared/resourceKinds";
 import { trackCategoryView, trackFilterUsage, trackSearch, trackSortChange, trackTagInteraction } from "@/lib/analytics";
@@ -416,7 +417,14 @@ export default function TaxonomyListing({ level }: Props) {
   // advertise subcategories the filter has already ruled out.
   const childTiles = kind ? listingData?.children.filter((child) => child.count > 0) ?? [] : listingData?.children ?? [];
 
-  if (loading) return <div className={`taxonomy-page taxonomy-page--${level}`} aria-busy="true"><SEOHead title="Loading resources" description="Loading catalog resources." /><div className="taxonomy-loading-header"><PageHeaderSkeleton /></div><div className="taxonomy-grid">{Array.from({ length: 9 }).map((_, i) => <ResourceCardSkeleton key={i} />)}</div></div>;
+  const navPlacement = level === "category" ? undefined : findNavNode(nav, level, slug);
+  const siblingParent = navPlacement?.parent?.slug ? navPlacement.parent : undefined;
+  const siblingTiles = (navPlacement?.siblings ?? [])
+    .filter((sibling) => sibling.slug && navTotalCount(sibling) > 0)
+    .sort((a, b) => navTotalCount(b) - navTotalCount(a))
+    .slice(0, 8);
+
+  if (loading) return <div className={`taxonomy-page taxonomy-page--${level}`} aria-busy="true"><SEOHead title={findNavNode(nav, level, slug)?.node.name ?? "Loading resources"} description="Loading catalog resources." loading /><div className="taxonomy-loading-header"><PageHeaderSkeleton /></div><div className="taxonomy-grid">{Array.from({ length: 9 }).map((_, i) => <ResourceCardSkeleton key={i} />)}</div></div>;
   // An unknown top-level slug 404s from the listing endpoint. Treat that as a
   // real not-found page (with navigation), not a transient "please try again"
   // error — matching the resource-detail 404 UX. Genuine 5xx/network errors
@@ -666,5 +674,8 @@ export default function TaxonomyListing({ level }: Props) {
         </div>
       </div>
     </div>
+    {/* Where next: most visitors who land on a subcollection leave from it,
+        and below lg the sidebar listing its neighbours is hidden. */}
+    {level !== "category" && siblingParent && siblingTiles.length > 0 && <section className="taxonomy-children taxonomy-siblings" aria-labelledby="taxonomy-siblings-heading" data-testid="taxonomy-siblings"><h2 id="taxonomy-siblings-heading">More in {siblingParent.name}</h2><div className="taxonomy-child-grid">{siblingTiles.map((sibling) => <Link key={sibling.slug} className="taxonomy-child card hoverable" href={routeFor(level, sibling.slug!)}><span>{sibling.name}</span><span className="chip mono">{navTotalCount(sibling)}</span></Link>)}<Link className="taxonomy-child card hoverable" href={routeFor(level === "subcategory" ? "category" : "subcategory", siblingParent.slug!)} data-testid="taxonomy-siblings-parent"><span>All of {siblingParent.name}</span><span aria-hidden="true">→</span></Link></div></section>}
   </div>;
 }

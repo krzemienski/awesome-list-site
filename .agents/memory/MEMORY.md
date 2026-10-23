@@ -179,3 +179,4 @@
 - [Two design systems only](two-design-systems.md) — owner kept Editorial×Crimson + Geist; one kept-list; removed values → default; artifact docs hand-owned.
 - [Click-time auth gates](click-time-auth-gates.md) — isAuthenticated is provisional false while auth resolves; click gates must wait on isAuthPending.
 - [CLS hidden under the prerender hold](hidden-fallback-cls.md) — occluded layout still counts; seed boot data + await route chunk + modulepreload; banner copy is first-visit LCP.
+- [Pageview titles from loading heads](pageview-loading-titles.md) — analytics read the title ~300ms after soft nav; loading heads must name the page (SEOHead `loading`).
