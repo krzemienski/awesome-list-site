@@ -445,7 +445,13 @@ function ClerkHost() {
   );
 }
 
-function Router({ homeComponent: Home }: { homeComponent: HomeRouteComponent }) {
+function Router({
+  homeComponent: Home,
+  resourceComponent: ResourcePage,
+}: {
+  homeComponent: HomeRouteComponent;
+  resourceComponent: ComponentType;
+}) {
   // Analytics tracking is consent-gated internally, but the hook itself stays
   // in the eager graph. Deferring it only relocates bytes: Router mounts it on
   // every route immediately, so visitors would still fetch this chunk on
@@ -680,7 +686,7 @@ function Router({ homeComponent: Home }: { homeComponent: HomeRouteComponent }) 
         <Route path="/subsubcategory/:slug">
           {(params) => <Redirect to={discoveryRedirect(`/sub-subcategory/${params.slug}`, search)} replace />}
         </Route>
-        <Route path="/resource/:id" component={ResourceDetail} />
+        <Route path="/resource/:id" component={ResourcePage} />
         <Route path="/about" component={About} />
         <Route path="/terms" component={Terms} />
         <Route path="/privacy" component={Privacy} />
@@ -749,8 +755,15 @@ function Router({ homeComponent: Home }: { homeComponent: HomeRouteComponent }) 
 
 export function App({
   homeComponent = HomeRoute,
+  resourceComponent = ResourceDetail,
 }: {
   homeComponent?: HomeRouteComponent;
+  /**
+   * The already-loaded resource page on a direct visit (main.tsx), so the
+   * first commit is the finished page rather than the route skeleton that the
+   * page then replaces — a full-height layout shift under the prerender hold.
+   */
+  resourceComponent?: ComponentType;
 } = {}) {
   // R4-057: the server (og-middleware) injects a full crawl-time meta set into
   // <head>; after hydration react-helmet renders its own tags (marked with
@@ -810,7 +823,7 @@ export function App({
           the skip link on every fresh visit). The banner stays fixed at the
           bottom visually and remains keyboard-reachable after the page
           content, with Escape still dismissing it for the session. */}
-      <Router homeComponent={homeComponent} />
+      <Router homeComponent={homeComponent} resourceComponent={resourceComponent} />
       <ConsentBanner />
       <ClerkHost />
     </AccountThemePreferenceBridge>

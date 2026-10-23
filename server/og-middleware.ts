@@ -67,6 +67,7 @@ import {
   renderHomeContent,
   renderTaxonomyContent,
   renderResourceContent,
+  renderResourceBoot,
   renderJourneysContent,
   renderJourneyContent,
   renderStaticPageContent,
@@ -79,12 +80,14 @@ import {
   findSubSubcategory,
 } from "./seo-content";
 import { buildRelatedResources } from "./services/relatedResources";
+import { stripInternalResourceFields } from "./lib/publicResource";
 import { CollectionRepository } from "./repositories/CollectionRepository";
 import { collectionShareIdSchema } from "@shared/bookmarkCollections";
 import { getPublicCacheValue } from "./cache/publicCache";
 import { isDatabaseUnavailableError } from "./db/errors";
 import { ServiceUnavailableError } from "./middleware/errors";
 import { loadHomeNav } from "./home-ssr-data";
+import { RESOURCE_DETAIL_MANIFEST_KEY, routeChunkPreloadTags } from "./ssr";
 
 export const SITE_URL =
   process.env.PUBLIC_SITE_URL?.replace(/\/$/, "") || "https://awesome.video";
@@ -1739,6 +1742,9 @@ function homeShellChrome(): string {
           // non-JS crawlers). Mirrors GET /api/resources/:id/related.
           let relatedLinks: { id: number; title: string; description?: string }[] =
             [];
+          // The same /related payload the page would otherwise fetch after
+          // boot; undefined when it could not be built (the client fetches).
+          let relatedBoot: unknown;
           try {
             const { resources: pool } = await storage.listResources({
               status: "approved",
@@ -1746,6 +1752,17 @@ function homeShellChrome(): string {
               limit: 60,
             });
             const related = buildRelatedResources(resource as any, pool, 5);
+            const sanitizeItems = (items: any[]) =>
+              items.map((item) => ({
+                ...item,
+                resource: stripInternalResourceFields(item.resource),
+              }));
+            relatedBoot = {
+              ...related,
+              similar: sanitizeItems(related.similar),
+              prerequisites: sanitizeItems(related.prerequisites),
+              nextSteps: sanitizeItems(related.nextSteps),
+            };
             const seen = new Set<number>();
             for (const bucket of [
               related.similar,
@@ -1786,6 +1803,9 @@ function homeShellChrome(): string {
               ] ?? "Not yet classified",
             tags: tags.map((tag) => tag.name),
             related: relatedLinks,
+          }) + renderResourceBoot({
+            resource: stripInternalResourceFields(resource as any),
+            related: relatedBoot,
           });
           return { meta: m, found: true, bodyHtml };
         }
@@ -2463,6 +2483,8 @@ export function ogInjectionMiddleware() {
     // Retry-After) so the client can render its own error card and Retry.
     let dependencyUnavailable = false;
     let bodyHtml: string | undefined;
+    // Route-chunk hints for pages main.tsx renders only once their chunk is in.
+    let headPreload: { href: string; tag: string }[] = [];
     if (forcedNotFound) {
       // Malformed ?page short-circuits the resolver entirely so the junk URL
       // never lands in the public route-meta cache (parsePage would collapse it onto the
@@ -2485,6 +2507,9 @@ export function ogInjectionMiddleware() {
         meta = resolved.meta;
         notFound = !resolved.found;
         bodyHtml = resolved.bodyHtml;
+        if (resolved.found && bodyHtml && /^\/resource\/\d+$/.test(urlPath)) {
+          headPreload = await routeChunkPreloadTags(RESOURCE_DETAIL_MANIFEST_KEY);
+        }
       } catch (e) {
         if (req.aborted || res.destroyed) return;
         if (isBoundedDependencyFailure(e)) {
@@ -2582,6 +2607,13 @@ export function ogInjectionMiddleware() {
             html.includes("<!--app-html-->")
           ) {
             html = html.replace("<!--app-html-->", () => bodyHtml!);
+            const hints = headPreload
+              .filter(({ href }) => !html.includes(`href="${href}"`))
+              .map(({ tag }) => tag)
+              .join("");
+            if (hints && html.includes("</head>")) {
+              html = html.replace("</head>", () => `${hints}</head>`);
+            }
           }
           // BUG-014: stamp the per-request CSP nonce onto every inline
           // <script>/<style> now that the head rewrite and SSR body injection

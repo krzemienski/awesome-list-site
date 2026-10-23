@@ -18,24 +18,21 @@
   border-style: solid;
   border-width: 0 0 var(--border-w);
   border-color: var(--border);
-  background: color-mix(in srgb, var(--bg-2) 94%, transparent);
+  /* The accent wash is a background layer, not a ::before: Chrome reported
+     the absolutely positioned pseudo as jumping from a stale position to the
+     banner on every content reflow under the sticky banner — up to 0.1 of
+     layout shift per page load for every visitor still seeing the banner. */
+  background:
+    linear-gradient(
+      90deg,
+      color-mix(in srgb, var(--accent) 8%, transparent),
+      transparent 38%,
+      color-mix(in srgb, var(--accent-2) 5%, transparent)
+    ),
+    color-mix(in srgb, var(--bg-2) 94%, transparent);
   box-shadow: var(--shadow-lg);
   color: var(--text);
   isolation: isolate;
-}
-
-.system-consent-banner::before {
-  position: absolute;
-  inset: 0;
-  z-index: -1;
-  background: linear-gradient(
-    90deg,
-    color-mix(in srgb, var(--accent) 8%, transparent),
-    transparent 38%,
-    color-mix(in srgb, var(--accent-2) 5%, transparent)
-  );
-  content: "";
-  pointer-events: none;
 }
 
 .system-consent-banner__inner {

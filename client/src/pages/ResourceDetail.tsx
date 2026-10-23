@@ -67,7 +67,11 @@ import {
 } from "@shared/resourceFacets";
 import { tagLandingPath } from "@shared/tagNormalize";
 import type { ResourceKind } from "@shared/resourceKinds";
+import { findCachedResource } from "@/lib/cached-resource";
 import "@/styles/pages/resource.css";
+
+// GET /api/resources/:id/related returns five matches unless asked for more.
+const RELATED_PLACEHOLDER_ROWS = 5;
 
 // Match resource cards: fetch the editor and form dependencies only on demand.
 const SuggestEditDialog = lazy(() =>
@@ -112,7 +116,15 @@ export default function ResourceDetail() {
   const resourceQuery = useQuery<Resource & { resolvedKind?: ResourceKind; featured?: boolean }>({
     queryKey: ['/api/resources', id],
     queryFn: () => apiRequest(`/api/resources/${id}`, { method: "GET" }),
-    enabled: validId
+    enabled: validId,
+    // In-app visits render from the list the link was in while the detail
+    // request runs (direct visits arrive seeded from the server document).
+    placeholderData: () =>
+      validId
+        ? (findCachedResource(queryClient, Number(id), ['/api/resources', id]) as
+            | (Resource & { resolvedKind?: ResourceKind; featured?: boolean })
+            | undefined)
+        : undefined,
   });
   const { data: resource, isLoading, error } = resourceQuery;
   const resourceMissing = !validId || (error instanceof ApiError && error.status === 404);
@@ -178,7 +190,9 @@ export default function ResourceDetail() {
   const relatedQuery = useQuery<{ similar: { resource: Resource; score: number; reasons: string[] }[] }>({
     queryKey: ['/api/resources', id, 'related'],
     queryFn: () => apiRequest(`/api/resources/${id}/related`, { method: "GET" }),
-    enabled: !!resource
+    // Fetched alongside the resource, not after it: the endpoint answers a
+    // missing or hidden id with an empty list.
+    enabled: validId
   });
   const relatedResources = relatedQuery.data;
 
@@ -913,7 +927,40 @@ export default function ResourceDetail() {
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-2">
-            {relatedQuery.isLoading && <p role="status">Loading related resources…</p>}
+            {relatedQuery.isLoading && (
+              <>
+                <p role="status" className="sr-only">Loading related resources…</p>
+                {/* Same markup and line boxes as a loaded row (title + match
+                    badge, description, reasons) so the card is already at its
+                    loaded height and nothing below it moves when the list lands.
+                    */}
+                {Array.from({ length: RELATED_PLACEHOLDER_ROWS }, (_, index) => (
+                  <div
+                    key={index}
+                    aria-hidden="true"
+                    className="resource-detail-related-item block p-3 border border-border min-h-[44px]"
+                    data-testid="related-placeholder"
+                  >
+                    <div className="flex items-center justify-between gap-2">
+                      <span className="font-medium text-sm line-clamp-1 flex-1">
+                        <Skeleton className="inline-block w-2/3 max-w-full">{"\u00a0"}</Skeleton>
+                      </span>
+                      <Badge variant="secondary" className="text-xs flex-shrink-0 invisible">
+                        <TrendingUp className="h-3 w-3 mr-1" />
+                        00% match
+                      </Badge>
+                      <ChevronRight className="h-4 w-4 flex-shrink-0 invisible" />
+                    </div>
+                    <p className="text-xs line-clamp-1 mt-1">
+                      <Skeleton className="inline-block w-5/6 max-w-full">{"\u00a0"}</Skeleton>
+                    </p>
+                    <div className="mt-2 flex flex-wrap gap-1">
+                      <Skeleton className="resource-detail-related-reason inline-block text-xs px-2 py-0.5 w-24">{"\u00a0"}</Skeleton>
+                    </div>
+                  </div>
+                ))}
+              </>
+            )}
             {relatedQuery.isError && (
               <div role="alert">
                 <p>Related resources are temporarily unavailable.</p>
@@ -965,6 +1012,11 @@ export default function ResourceDetail() {
                 )}
               </a>
             ))}
+            {/* The category link needs the nav tree's slug; hold its row while
+                that tree is still loading so the card does not grow later. */}
+            {resource.category && !awesomeListTree && (
+              <div aria-hidden="true" className="w-full mt-2 min-h-[44px]" />
+            )}
             {resource.category && taxonomySlugs.category && (
               /* Run16 BUG-057: asChild makes the anchor itself the ≥44px button
                  (an inline Link wrapping a Button was a 20px-tall target). */

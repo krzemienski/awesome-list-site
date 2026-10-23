@@ -46,9 +46,10 @@ export function scopeTaxonomyResources(
 // It mirrors the visible client page — same headings, same summaries, the same
 // internal links — so it is progressive enhancement, NOT cloaking. On boot,
 // client/src/main.tsx calls createRoot().render(), which REPLACES this content
-// with the live React app. We deliberately do NOT set window.__INITIAL_DATA__,
-// so there is no hydration step and therefore no hydration-mismatch risk; this
-// markup is purely the pre-JavaScript / crawler view.
+// with the live React app. There is no hydration step and therefore no
+// hydration-mismatch risk; this markup is purely the pre-JavaScript / crawler
+// view. (Resource pages also embed their API responses as inert JSON — see
+// renderResourceBoot — so the app's first render is the finished page.)
 
 export type Crumb = { name: string; path?: string };
 
@@ -609,6 +610,19 @@ export function renderResourceContent(opts: {
       tags +
       related,
   );
+}
+
+// The resource page's first API responses, embedded so the app renders the
+// page from them instead of a loading skeleton (client/src/lib/resource-boot.ts
+// seeds them into the query cache). Same public projection as
+// GET /api/resources/:id and GET /api/resources/:id/related. A JSON data block
+// never executes; escaping "<" keeps any "</script" inside text inert.
+export function renderResourceBoot(opts: { resource: unknown; related?: unknown }): string {
+  const json = JSON.stringify(opts)
+    .replace(/</g, "\\u003c")
+    .replace(/\u2028/g, "\\u2028")
+    .replace(/\u2029/g, "\\u2029");
+  return `<script type="application/json" id="resource-boot">${json}</script>`;
 }
 
 export function renderJourneysContent(opts: {

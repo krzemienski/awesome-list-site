@@ -1,4 +1,5 @@
 import "./lib/zod-jitless";
+import type { ComponentType } from "react";
 import { hydrateRoot, createRoot } from "react-dom/client";
 import App from "./App";
 import "./index.css";
@@ -9,6 +10,7 @@ import { initMixpanel } from "./lib/mixpanel";
 import { initPosthog } from "./lib/posthog";
 import { initAmplitude } from "./lib/amplitude";
 import { loadFontOverride } from "./lib/font-options";
+import { seedResourceBoot } from "./lib/resource-boot";
 
 function afterFirstPaint(callback: () => void): void {
   const scheduleIdle = () => {
@@ -119,6 +121,10 @@ const initialRouteChunk = preloadInitialRouteChunk();
 // React mounts underneath, and the overlay is removed only once the app has
 // real content to show. We still never hydrate this markup (see
 // .agents/memory/spa-crawler-prerender.md).
+// Before the hold below evaluates readiness: a seeded resource page renders
+// finished on its first commit.
+if (!homeSsr) seedResourceBoot(queryClient);
+
 (function holdSsrContent() {
   if (homeSsr) return;
   // The inline pre-boot script in index.html normally builds this overlay
@@ -211,12 +217,16 @@ const initialRouteChunk = preloadInitialRouteChunk();
         } catch {
           // Keep the raw segment. A malformed URL must not strand the hold.
         }
+        // Seeded data is settled before React (or the lazy route chunk) has
+        // rendered anything, so also wait for the page to subscribe: that
+        // happens only once its tree has committed.
         return routeQueries.some(
           (query) =>
             query.queryKey[0] === "/api/resources" &&
             query.queryKey[1] === id &&
             query.queryKey.length === 2 &&
-            query.state.status !== "pending",
+            query.state.status !== "pending" &&
+            query.getObserversCount() > 0,
         );
       }
       return (
@@ -228,7 +238,17 @@ const initialRouteChunk = preloadInitialRouteChunk();
       if (isSettled()) requestAnimationFrame(remove);
     };
     const unsubscribe = queryClient.getQueryCache().subscribe(handoff);
-    const timeout = window.setTimeout(remove, 3000);
+    // Safety net for a page that never settles.  Never uncover an empty root
+    // (a resource deep link renders only once its chunk is in): keep the
+    // prerender up until React has committed something to show instead.
+    const expire = () => {
+      if (rootElement.childElementCount === 0) {
+        timeout = window.setTimeout(expire, 250);
+        return;
+      }
+      remove();
+    };
+    let timeout = window.setTimeout(expire, 3000);
     // Wouter's pushState navigations do not emit popstate. Remove the old
     // visual tree synchronously for both navigation forms, then restore the
     // native methods during normal handoff/timeout cleanup.
@@ -284,6 +304,21 @@ if (homeSsr) {
       </AppProviders>,
     );
   });
+} else if (/^\/resource\/[^/]+$/.test(window.location.pathname)) {
+  // Resource deep links (most search landings) render once their page chunk
+  // is in, so the first commit is the page itself, not the route skeleton it
+  // would replace. The prerender hold stays on screen meanwhile; a failed
+  // chunk falls back to the lazy route and its error/retry surface.
+  const render = (ResourceDetail?: ComponentType) =>
+    createRoot(rootElement).render(
+      <AppProviders queryClient={queryClient}>
+        <App resourceComponent={ResourceDetail} />
+      </AppProviders>,
+    );
+  import("./pages/ResourceDetail").then(
+    ({ default: ResourceDetail }) => render(ResourceDetail),
+    () => render(),
+  );
 } else {
   // Non-SSR routes retain App's lazy Home route and do not load Home here.
   createRoot(rootElement).render(

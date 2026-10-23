@@ -178,3 +178,4 @@
 - [Resource kind backfill](resource-kind-backfill.md) — backfill fills NULL kinds only (no provenance); classifier changes never reach stored kinds; never bulk-reset (erases admin overrides).
 - [Two design systems only](two-design-systems.md) — owner kept Editorial×Crimson + Geist; one kept-list; removed values → default; artifact docs hand-owned.
 - [Click-time auth gates](click-time-auth-gates.md) — isAuthenticated is provisional false while auth resolves; click gates must wait on isAuthPending.
+- [CLS hidden under the prerender hold](hidden-fallback-cls.md) — occluded layout still counts; seed boot data + await route chunk + modulepreload; banner copy is first-visit LCP.

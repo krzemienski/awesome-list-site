@@ -220,6 +220,63 @@ function homeStylesheetHrefs(manifest: ClientManifest): string[] {
   return [...stylesheets];
 }
 
+export const RESOURCE_DETAIL_MANIFEST_KEY = "src/pages/ResourceDetail.tsx";
+let routePreloadWarned = false;
+
+/**
+ * <head> hints for a code-split route the client renders on arrival: its
+ * chunk and static imports as modulepreload, its CSS as preload. Without them
+ * the browser discovers the route chunk only after the entry module runs, a
+ * full round trip after the document. Callers skip hrefs the template already
+ * links (shared chunks the entry preloads). Hints only — when the manifest is
+ * unavailable (dev, or a broken build) the page still loads, just later.
+ */
+export async function routeChunkPreloadTags(
+  manifestKey: string,
+): Promise<{ href: string; tag: string }[]> {
+  let manifest: ClientManifest;
+  try {
+    manifest = await clientManifest();
+  } catch (error) {
+    if (process.env.NODE_ENV === "production" && !routePreloadWarned) {
+      routePreloadWarned = true;
+      console.warn("[route-preload] no client manifest; route chunks load unhinted", error);
+    }
+    return [];
+  }
+  const scripts = new Set<string>();
+  const stylesheets = new Set<string>();
+  const visited = new Set<string>();
+  const visit = (key: string) => {
+    if (visited.has(key)) return;
+    visited.add(key);
+    const entry = manifest[key] as (ClientManifestEntry & { file?: string; isEntry?: boolean }) | undefined;
+    // The entry chunk (index.html) and its imports are already in the template.
+    if (!entry || entry.isEntry) return;
+    if (typeof entry.file === "string" && entry.file.endsWith(".js")) {
+      scripts.add(manifestAssetHref(entry.file));
+    }
+    for (const file of entry.css ?? []) stylesheets.add(manifestAssetHref(file));
+    for (const imported of entry.imports ?? []) visit(imported);
+  };
+  try {
+    visit(manifestKey);
+  } catch (error) {
+    console.warn("[route-preload] unusable manifest entry; route chunks load unhinted", error);
+    return [];
+  }
+  return [
+    ...[...scripts].map((href) => ({
+      href,
+      tag: `<link rel="modulepreload" crossorigin href="${escapeHtmlAttribute(href)}">`,
+    })),
+    ...[...stylesheets].map((href) => ({
+      href,
+      tag: `<link rel="preload" as="style" crossorigin href="${escapeHtmlAttribute(href)}">`,
+    })),
+  ];
+}
+
 function escapeHtmlAttribute(value: string): string {
   return value
     .replaceAll("&", "&amp;")
