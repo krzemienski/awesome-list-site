@@ -38,6 +38,9 @@ import {
 } from "@shared/validation";
 import { asyncHandler } from "../../middleware/asyncHandler";
 import { isUniqueViolation } from "../../errors/pgErrors";
+import { createLogger } from "../../lib/logger";
+
+const logger = createLogger("ai-jobs");
 
 /**
  * Dependencies the AI job handlers need from the composing module. These mirror
@@ -109,7 +112,7 @@ export function registerAiJobsRoutes(
       if (error?.code === 'ENRICHMENT_JOB_ACTIVE') {
         return res.status(409).json({ success: false, message: error.message });
       }
-      console.error('Error starting enrichment job:', error);
+      logger.error('Error starting enrichment job:', error);
       res.status(500).json({
         success: false,
         message: 'Failed to start enrichment job',
@@ -138,7 +141,7 @@ export function registerAiJobsRoutes(
         jobs: jobs.map(stripJobAuthSecret)
       });
     } catch (error: any) {
-      console.error('Error listing enrichment jobs:', error);
+      logger.error('Error listing enrichment jobs:', error);
       res.status(500).json({
         success: false,
         message: 'Failed to list enrichment jobs',
@@ -173,7 +176,7 @@ export function registerAiJobsRoutes(
         job: stripJobAuthSecret(job)
       });
     } catch (error: any) {
-      console.error('Error getting job status:', error);
+      logger.error('Error getting job status:', error);
       res.status(500).json({
         success: false,
         message: 'Failed to get job status',
@@ -219,7 +222,7 @@ export function registerAiJobsRoutes(
         message: `Enrichment job ${jobId} cancelled successfully`
       });
     } catch (error: any) {
-      console.error('Error cancelling job:', error);
+      logger.error('Error cancelling job:', error);
       if (error?.name === 'JobNotFoundError' || error?.name === 'JobConflictError') {
         return res.status(error.name === 'JobNotFoundError' ? 404 : 409).json({ success: false, message: error.message });
       }
@@ -307,7 +310,7 @@ export function registerAiJobsRoutes(
         errors,
       };
 
-      console.log('[backfill-suggestions] report:', JSON.stringify(report));
+      logger.info('[backfill-suggestions] report:', JSON.stringify(report));
 
       res.json({
         success: true,
@@ -315,7 +318,7 @@ export function registerAiJobsRoutes(
         report,
       });
     } catch (error: any) {
-      console.error('Error backfilling enrichment suggestions:', error);
+      logger.error('Error backfilling enrichment suggestions:', error);
       res.status(500).json({
         success: false,
         message: 'Failed to backfill enrichment suggestions',
@@ -432,7 +435,7 @@ export function registerAiJobsRoutes(
 
       res.json({ success: true, jobId, message: 'Research job started' });
     } catch (error: any) {
-      console.error('Error starting research job:', error);
+      logger.error('Error starting research job:', error);
       res.status(500).json({ success: false, message: error.message || 'Failed to start research job' });
     }
   }));
@@ -445,7 +448,7 @@ export function registerAiJobsRoutes(
       const { brief, angle } = await researchService.generateBrief();
       res.json({ success: true, brief, angle });
     } catch (error: any) {
-      console.error('Error generating research brief:', error);
+      logger.error('Error generating research brief:', error);
       res.status(500).json({ success: false, message: error.message || 'Failed to generate research brief' });
     }
   }));

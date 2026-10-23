@@ -54,6 +54,9 @@ import {
 } from "./inference";
 import { objectBodyGuardSchema } from "./bodyGuard";
 import { buildValidationEnvelope, normalizeValidationBody } from "./envelope";
+import { createLogger } from "../lib/logger";
+
+const logger = createLogger("contracts");
 
 /** Methods whose registrations carry a request body worth guarding. */
 const BODY_METHODS = new Set<HttpMethod>(["post", "put", "patch", "delete"]);
@@ -393,7 +396,7 @@ function defaultMismatchReporter(info: {
   path: string;
   issues: { path: (string | number)[]; message: string }[];
 }): void {
-  console.warn(
+  logger.warn(
     `[contract] response mismatch for "${info.contract}" (${info.method} ${info.path}) status ${info.status}:`,
     info.issues.map((i) => `${i.path.join(".") || "<root>"}: ${i.message}`).join("; "),
   );

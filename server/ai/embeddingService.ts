@@ -40,6 +40,9 @@
  */
 
 import OpenAI from 'openai';
+import { createLogger } from "../lib/logger";
+
+const logger = createLogger("embeddings");
 
 // <important_do_not_delete>
 const DEFAULT_EMBEDDING_MODEL = "text-embedding-3-small"; // 1536 dimensions, cost-effective
@@ -86,13 +89,13 @@ export class EmbeddingService {
           apiKey,
           ...(baseURL && { baseURL })
         });
-        console.log('OpenAI embedding service initialized successfully');
+        logger.info('OpenAI embedding service initialized successfully');
       } catch (error) {
-        console.error('Failed to initialize OpenAI embedding service:', error);
+        logger.error('Failed to initialize OpenAI embedding service:', error);
         this.openai = null;
       }
     } else {
-      console.log('OpenAI API key not found - embedding features will be unavailable');
+      logger.info('OpenAI API key not found - embedding features will be unavailable');
     }
   }
 
@@ -115,13 +118,13 @@ export class EmbeddingService {
     model: string = DEFAULT_EMBEDDING_MODEL
   ): Promise<number[] | null> {
     if (!this.isAvailable()) {
-      console.log('OpenAI embedding service not available, returning null');
+      logger.info('OpenAI embedding service not available, returning null');
       return null;
     }
 
     // Validate input
     if (!text || text.trim() === '') {
-      console.error('Cannot generate embedding for empty text');
+      logger.error('Cannot generate embedding for empty text');
       return null;
     }
 
@@ -134,7 +137,7 @@ export class EmbeddingService {
     // Check cache first
     const cached = this.getFromCache(cacheKey);
     if (cached) {
-      console.log('Returning cached embedding');
+      logger.info('Returning cached embedding');
       return cached;
     }
 
@@ -142,7 +145,7 @@ export class EmbeddingService {
     await this.applyRateLimit();
 
     try {
-      console.log('Generating new embedding...');
+      logger.info('Generating new embedding...');
       const response = await this.openai!.embeddings.create({
         model,
         input: truncatedText,
@@ -150,7 +153,7 @@ export class EmbeddingService {
       });
 
       if (!response.data || response.data.length === 0) {
-        console.error('OpenAI API returned no embedding data');
+        logger.error('OpenAI API returned no embedding data');
         return null;
       }
 
@@ -158,7 +161,7 @@ export class EmbeddingService {
 
       // Validate embedding dimensions
       if (embedding.length !== EMBEDDING_DIMENSIONS) {
-        console.error(`Unexpected embedding dimensions: ${embedding.length} (expected ${EMBEDDING_DIMENSIONS})`);
+        logger.error(`Unexpected embedding dimensions: ${embedding.length} (expected ${EMBEDDING_DIMENSIONS})`);
         return null;
       }
 
@@ -172,15 +175,15 @@ export class EmbeddingService {
       return embedding;
 
     } catch (error: any) {
-      console.error('OpenAI API error:', error.message || error);
+      logger.error('OpenAI API error:', error.message || error);
 
       // Handle specific error types
       if (error.status === 429) {
-        console.error('Rate limit exceeded - please try again later');
+        logger.error('Rate limit exceeded - please try again later');
       } else if (error.status === 401) {
-        console.error('Invalid API key - please check your OpenAI credentials');
+        logger.error('Invalid API key - please check your OpenAI credentials');
       } else if (error.status === 400) {
-        console.error('Invalid request - text may be too long or contain invalid characters');
+        logger.error('Invalid request - text may be too long or contain invalid characters');
       }
 
       return null;
@@ -202,14 +205,14 @@ export class EmbeddingService {
     onProgress?: (current: number, total: number) => void
   ): Promise<Array<number[] | null>> {
     if (!this.isAvailable()) {
-      console.log('OpenAI embedding service not available');
+      logger.info('OpenAI embedding service not available');
       return texts.map(() => null);
     }
 
     const embeddings: Array<number[] | null> = [];
     const total = texts.length;
 
-    console.log(`Starting batch embedding generation for ${total} texts...`);
+    logger.info(`Starting batch embedding generation for ${total} texts...`);
 
     for (let i = 0; i < texts.length; i++) {
       const text = texts[i];
@@ -227,7 +230,7 @@ export class EmbeddingService {
     }
 
     const successCount = embeddings.filter(e => e !== null).length;
-    console.log(`Batch embedding generation complete: ${successCount}/${total} successful`);
+    logger.info(`Batch embedding generation complete: ${successCount}/${total} successful`);
 
     return embeddings;
   }
@@ -290,7 +293,7 @@ export class EmbeddingService {
    */
   public clearCache(): void {
     this.embeddingCache.clear();
-    console.log('Embedding cache cleared');
+    logger.info('Embedding cache cleared');
   }
 
   // ============================================================================
@@ -375,7 +378,7 @@ export class EmbeddingService {
       return text;
     }
 
-    console.warn(`Truncating text from ${text.length} to ${maxChars} characters`);
+    logger.warn(`Truncating text from ${text.length} to ${maxChars} characters`);
     return text.substring(0, maxChars);
   }
 }

@@ -2,7 +2,7 @@ import 'dotenv/config';
 import express, { type Request, Response, NextFunction } from "express";
 import compression from "compression";
 import { registerRoutes, runBackgroundInitialization } from "./routes";
-import { serveStatic, log } from "./vite";
+import { serveStatic } from "./vite";
 import { handleSSR, prewarmSSRRenderer } from "./ssr";
 import { errorHandler } from "./middleware/errorHandler";
 import { runMigrations } from "./migrate";
@@ -34,12 +34,14 @@ import {
 import { HASHED_ASSET_CACHE_CONTROL, SESSION_CACHE_CONTROL } from "./http-cache-policy";
 import { mountVersionRoute } from "./version-route";
 import { asyncHandler } from "./middleware/asyncHandler";
+import { createLogger, logHttpRequest } from "./lib/logger";
 import { publicApiCors } from "./middleware/publicApiCors";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 const app = express();
+const logger = createLogger("startup");
 
 /**
  * A development publishable key names its Frontend API host. Allow only that
@@ -489,17 +491,29 @@ app.use((req, res, next) => {
     if (path.startsWith("/api")) {
       const group = endpointGroup(path);
       recordEndpointLatency(req.method, group, res.statusCode, duration);
-      // Bounded labels only: never emit raw paths, query strings, response
-      // bodies, user ids, cookies, or database details.
-      log(
-        JSON.stringify({
-          event: "ops.http_request",
-          method: req.method,
-          group,
-          status: res.statusCode,
-          durationMs: duration,
-        }),
-      );
+      // One line per API request: method, scrubbed path (opaque tokens and
+      // emails replaced, never the query string), status and duration.
+      logHttpRequest({
+        id: res.locals.requestId,
+        method: req.method,
+        path,
+        status: res.statusCode,
+        durationMs: duration,
+        group,
+        // Who did it, for mutating calls (admin actions included): the
+        // pseudonymous account id only.
+        userId: req.method !== "GET" && req.method !== "HEAD" ? (req as { dbUser?: { id?: string } }).dbUser?.id : undefined,
+      });
+    } else if (res.statusCode >= 400 && !path.startsWith("/assets/") && !path.startsWith("/@")) {
+      // Page documents only show up when they fail (404 / 5xx), so missing
+      // pages are visible in the logs without logging every page view.
+      logHttpRequest({
+        id: res.locals.requestId,
+        method: req.method,
+        path,
+        status: res.statusCode,
+        durationMs: duration,
+      });
     }
   });
 
@@ -514,7 +528,7 @@ void (async () => {
     try {
       await runMigrations();
     } catch (error) {
-      console.error('❌ Failed to run migrations, cannot start server');
+      logger.error('Migrations failed; the server cannot start', error);
       process.exit(1);
     }
   } else {
@@ -644,8 +658,8 @@ void (async () => {
     try {
       await prewarmSSRRenderer();
     } catch (error) {
-      console.error(
-        "⚠️ Failed to prewarm the production Home SSR renderer; continuing with the existing SPA fallback",
+      logger.warn(
+        "Home SSR renderer prewarm failed; continuing with the SPA fallback",
         error,
       );
     }
@@ -667,20 +681,20 @@ void (async () => {
   }
 
   server.listen(listenOptions, () => {
-    log(`serving on port ${port} (${isProduction ? 'production' : 'development'} mode)`);
+    logger.info(`Serving on port ${port}`, { mode: isProduction ? 'production' : 'development' });
 
     // A second deployment sharing the production database sets
     // DISABLE_BACKGROUND_JOBS=1 so only the primary runs the schedulers and the
     // startup watchdog, which fails every pending/processing enrichment job.
     if (process.env.DISABLE_BACKGROUND_JOBS === '1') {
-      log('background jobs disabled (DISABLE_BACKGROUND_JOBS=1)');
+      logger.info('Background jobs disabled (DISABLE_BACKGROUND_JOBS=1)');
       return;
     }
 
     // Run background initialization AFTER server is listening
     // This ensures fast startup for production deployments
     runBackgroundInitialization().catch((error) => {
-      console.error('❌ Background initialization error (non-fatal):', error);
+      logger.error('Background initialization failed (non-fatal)', error);
     });
 
     // Initialize link health monitoring cron job
@@ -688,7 +702,7 @@ void (async () => {
     initializeDigestScheduler();
     initializeContactRetentionScheduler();
   }).on('error', (err) => {
-    console.error(`❌ Server failed to start on port ${port}:`, err);
+    logger.error(`Server failed to start on port ${port}`, err);
     process.exit(1);
   });
 })();

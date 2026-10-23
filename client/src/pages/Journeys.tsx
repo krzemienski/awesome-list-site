@@ -15,7 +15,7 @@ import { useToast } from "@/hooks/use-toast";
 import { queryClient, apiRequest } from "@/lib/queryClient";
 import { humanizeApiError } from "@/lib/apiError";
 import { queryUnavailableReason } from "@/lib/query-availability";
-import { trackJourneyStart } from "@/lib/analytics";
+import { trackFilterUsage, trackJourneyStart } from "@/lib/analytics";
 import SEOHead from "@/components/layout/SEOHead";
 import { writeFilterParams, usePopstateParams } from "@/lib/url-filter-state";
 import "@/styles/pages/discovery-journeys.css";
@@ -92,6 +92,10 @@ export default function Journeys() {
   });
   const filterRef = useRef<HTMLDivElement>(null);
   const handleCategoryChange = (next: string) => {
+    if (next !== selectedCategory) {
+      const count = next === "all" ? journeys.length : journeys.filter((j) => j.category === next).length;
+      trackFilterUsage("category", next, count, "journeys_page");
+    }
     setSelectedCategory(next);
     // Run22 BUG-016: push (not replace) so Back steps through filter changes.
     writeFilterParams({ category: next === "all" ? null : next });

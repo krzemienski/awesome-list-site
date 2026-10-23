@@ -1,5 +1,8 @@
 import { Octokit } from "@octokit/rest";
 import type { RequestError } from "@octokit/request-error";
+import { createLogger } from "../lib/logger";
+
+const logger = createLogger("github");
 
 /**
  * GitHub client for interacting with repositories
@@ -46,7 +49,7 @@ export class GitHubClient {
 
     this.token = token;
     if (!token) {
-      console.warn('GitHub token not provided. Limited functionality available.');
+      logger.warn('GitHub token not provided. Limited functionality available.');
       // Create a basic client without authentication for read-only operations
     }
 
@@ -55,14 +58,14 @@ export class GitHubClient {
       userAgent: 'awesome-list-sync v1.0.0',
       throttle: {
         onRateLimit: (retryAfter: number, options: ThrottleOptions) => {
-          console.warn(`Request quota exhausted for request ${options.method} ${options.url}`);
+          logger.warn(`Request quota exhausted for request ${options.method} ${options.url}`);
           if (options.request.retryCount === 0) {
-            console.log(`Retrying after ${retryAfter} seconds!`);
+            logger.info(`Retrying after ${retryAfter} seconds!`);
             return true;
           }
         },
         onSecondaryRateLimit: (retryAfter: number, options: ThrottleOptions) => {
-          console.warn(`Abuse detected for request ${options.method} ${options.url}`);
+          logger.warn(`Abuse detected for request ${options.method} ${options.url}`);
         },
       },
     });
@@ -123,7 +126,7 @@ export class GitHubClient {
       try {
         // Use raw.githubusercontent.com for direct file access (no auth needed for public repos)
         const rawUrl = `https://raw.githubusercontent.com/${owner}/${repo}/refs/heads/${branchName}/${path}`;
-        console.log(`Fetching from: ${rawUrl}`);
+        logger.info(`Fetching from: ${rawUrl}`);
         
         // Private repositories need the token; a stale token must not break
         // public imports, so an authenticated miss retries anonymously.
@@ -134,7 +137,7 @@ export class GitHubClient {
         
         if (response.ok) {
           const content = await response.text();
-          console.log(`✅ Successfully fetched ${path} from ${branchName} branch`);
+          logger.info(`✅ Successfully fetched ${path} from ${branchName} branch`);
           return { content, branch: branchName };
         }
         
@@ -308,7 +311,7 @@ export class GitHubClient {
         message: commitMessage
       };
     } catch (error: unknown) {
-      console.error('Error committing files:', error);
+      logger.error('Error committing files:', error);
       throw error;
     }
   }
@@ -427,10 +430,10 @@ export class GitHubClient {
       this.rateLimitReset = rateLimit.reset;
 
       if (this.rateLimitRemaining < 100) {
-        console.warn(`Low GitHub API rate limit: ${this.rateLimitRemaining} remaining`);
+        logger.warn(`Low GitHub API rate limit: ${this.rateLimitRemaining} remaining`);
       }
     } catch (error) {
-      console.error('Failed to update rate limits:', error);
+      logger.error('Failed to update rate limits:', error);
     }
   }
 
@@ -441,7 +444,7 @@ export class GitHubClient {
     if (this.rateLimitRemaining <= 0) {
       const waitTime = this.rateLimitReset.getTime() - Date.now();
       if (waitTime > 0) {
-        console.log(`Rate limit exceeded. Waiting ${Math.ceil(waitTime / 1000)} seconds...`);
+        logger.info(`Rate limit exceeded. Waiting ${Math.ceil(waitTime / 1000)} seconds...`);
         await new Promise(resolve => setTimeout(resolve, waitTime));
       }
     }

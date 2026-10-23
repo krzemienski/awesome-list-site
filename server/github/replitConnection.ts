@@ -4,6 +4,9 @@ import { Octokit } from '@octokit/rest';
 // refresh, and auth headers automatically. Do NOT revert to the legacy
 // /api/v2/connection token-fetch endpoint; it no longer serves this connection.
 import { ReplitConnectors } from '@replit/connectors-sdk';
+import { createLogger } from "../lib/logger";
+
+const logger = createLogger("github");
 
 /**
  * Replit GitHub Connection Helper
@@ -24,14 +27,14 @@ const OCTOKIT_BASE_OPTIONS = {
   userAgent: 'awesome-list-sync v1.0.0',
   throttle: {
     onRateLimit: (retryAfter: number, options: ThrottleOptions) => {
-      console.warn(`GitHub rate limit reached for ${options.method} ${options.url}`);
+      logger.warn(`GitHub rate limit reached for ${options.method} ${options.url}`);
       if (options.request.retryCount === 0) {
-        console.log(`Retrying after ${retryAfter} seconds`);
+        logger.info(`Retrying after ${retryAfter} seconds`);
         return true;
       }
     },
     onSecondaryRateLimit: (_retryAfter: number, options: ThrottleOptions) => {
-      console.warn(`GitHub secondary rate limit for ${options.method} ${options.url}`);
+      logger.warn(`GitHub secondary rate limit for ${options.method} ${options.url}`);
     },
   },
 };
@@ -77,7 +80,7 @@ async function connectorWorks(): Promise<boolean> {
     await octokit.rest.users.getAuthenticated();
     connectorVerdict = { ok: true, checkedAt: Date.now() };
   } catch (err) {
-    console.warn(
+    logger.warn(
       'Replit GitHub connector unavailable:',
       err instanceof Error ? err.message : err
     );
@@ -125,14 +128,14 @@ export async function getGitHubClient(): Promise<Octokit> {
 
   const fallback = getFallbackToken();
   if (fallback && await isTokenValid(fallback)) {
-    console.log('GitHub connector unavailable; using personal access token fallback.');
+    logger.info('GitHub connector unavailable; using personal access token fallback.');
     return new Octokit({
       ...OCTOKIT_BASE_OPTIONS,
       auth: fallback,
     });
   }
   if (fallback) {
-    console.warn('GitHub personal access token was rejected by GitHub (bad credentials).');
+    logger.warn('GitHub personal access token was rejected by GitHub (bad credentials).');
   }
 
   throw new Error(

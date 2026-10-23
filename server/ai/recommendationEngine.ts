@@ -14,6 +14,9 @@ import {
   skillPhrase,
 } from './recommendations';
 import { claudeService } from './claudeService';
+import { createLogger } from "../lib/logger";
+
+const logger = createLogger("recommendations");
 
 export interface UserProfile {
   userId: string;
@@ -258,7 +261,7 @@ export class RecommendationEngine {
           .map(jp => jp.journeyId);
       }
     } catch (error) {
-      console.error('Error fetching user preferences and interactions, using provided profile:', error);
+      logger.error('Error fetching user preferences and interactions, using provided profile:', error);
       // enrichedProfile already has a copy of userProfile
     }
 
@@ -375,7 +378,7 @@ export class RecommendationEngine {
       // Debug: Log cold-start detection (audit cycle-01 F007: dev-only —
       // production must not spam per-request behavioral debug lines).
       const debugRecommendations = process.env.NODE_ENV !== 'production';
-      if (debugRecommendations) console.log('[COLD-START DEBUG]', {
+      if (debugRecommendations) logger.info('[COLD-START DEBUG]', {
         userId: enrichedProfile.userId,
         viewHistoryLength: enrichedProfile.viewHistory.length,
         completedResourcesLength: enrichedProfile.completedResources.length,
@@ -412,7 +415,7 @@ export class RecommendationEngine {
           }
         }
 
-        if (debugRecommendations) console.log('[PERSONALIZATION DEBUG]', {
+        if (debugRecommendations) logger.info('[PERSONALIZATION DEBUG]', {
           userId: enrichedProfile.userId,
           totalResources: resources.length,
           eligibleResources: eligibleResources.length,
@@ -431,7 +434,7 @@ export class RecommendationEngine {
 
       // For cold-start users, use popular resources as recommendations
       if (isColdStart) {
-        if (debugRecommendations) console.log('[COLD-START] Generating popular resources for new user:', enrichedProfile.userId);
+        if (debugRecommendations) logger.info('[COLD-START] Generating popular resources for new user:', enrichedProfile.userId);
         // Run16 BUG-004: the cold-start path previously ignored the user's
         // explicitly selected preferred categories entirely (they only fed the
         // rule-based scorer, which cold-start never reaches) and hard-coded
@@ -581,7 +584,7 @@ export class RecommendationEngine {
             .filter(Boolean)
             .sort((a, b) => (b?.score ?? 0) - (a?.score ?? 0)) as RecommendationResult[];
         } catch (error) {
-          console.warn('AI recommendations failed, falling back to rule-based:', error);
+          logger.warn('AI recommendations failed, falling back to rule-based:', error);
         }
       }
 
@@ -614,7 +617,7 @@ export class RecommendationEngine {
       recommendations = uniqueByResourceId(recommendations).slice(0, limit);
 
       // Debug: Log final recommendations with categories
-      console.log('[RECOMMENDATIONS DEBUG]', {
+      logger.info('[RECOMMENDATIONS DEBUG]', {
         userId: enrichedProfile.userId,
         totalRecommendations: recommendations.length,
         recommendedCategories: recommendations.map(r => ({
@@ -636,7 +639,7 @@ export class RecommendationEngine {
       };
 
     } catch (error) {
-      console.error('Error generating recommendations:', error);
+      logger.error('Error generating recommendations:', error);
       // Keep operational failures distinct from a valid "no eligible matches"
       // result. The API layer turns this into a non-2xx response, allowing the
       // client to preserve its last useful recommendations and offer a retry.
@@ -695,13 +698,13 @@ export class RecommendationEngine {
     }
 
     // Debug: Log category frequency for rule-based recommendations
-    console.log('[RULE-BASED DEBUG] Category frequency from bookmarks/favorites:',
+    logger.info('[RULE-BASED DEBUG] Category frequency from bookmarks/favorites:',
       Object.fromEntries(categoryFrequency)
     );
-    console.log('[RULE-BASED DEBUG] Journey category frequency:',
+    logger.info('[RULE-BASED DEBUG] Journey category frequency:',
       Object.fromEntries(journeyCategoryFrequency)
     );
-    console.log('[RULE-BASED DEBUG] Rating-based category preferences:',
+    logger.info('[RULE-BASED DEBUG] Rating-based category preferences:',
       Object.fromEntries(ratingCategoryPreference)
     );
 
@@ -846,7 +849,7 @@ export class RecommendationEngine {
     try {
       return await storage.getUserFavorites(userId);
     } catch (error) {
-      console.error('Error fetching user favorites:', error);
+      logger.error('Error fetching user favorites:', error);
       return [];
     }
   }
@@ -858,7 +861,7 @@ export class RecommendationEngine {
     try {
       return await storage.getUserBookmarks(userId);
     } catch (error) {
-      console.error('Error fetching user bookmarks:', error);
+      logger.error('Error fetching user bookmarks:', error);
       return [];
     }
   }
@@ -885,7 +888,7 @@ export class RecommendationEngine {
         .map(item => item.resource);
 
     } catch (error) {
-      console.error('Error fetching popular resources:', error);
+      logger.error('Error fetching popular resources:', error);
       // Fallback: return random sample of resources
       const shuffled = [...resources].sort(() => Math.random() - 0.5);
       return shuffled.slice(0, limit);

@@ -39,6 +39,9 @@ import {
 import { negotiated429Handler } from "../../middleware/rateLimit";
 import { PgRateLimitStore } from "../../middleware/pgRateLimitStore";
 import { asyncHandler } from "../../middleware/asyncHandler";
+import { createLogger } from "../../lib/logger";
+
+const logger = createLogger("auth");
 
 // Owner password sign-in: 10 attempts per 15 minutes per IP, on its own store
 // prefix so hits never double-count against the /api backstop limiter.
@@ -141,7 +144,7 @@ export function registerAuthUserRoutes(
       }
       res.json({ message: "Signed out everywhere", sessionsRevoked: revoked });
     } catch (error) {
-      console.error("[/api/auth/logout-all] Error:", error);
+      logger.error("[/api/auth/logout-all] Error:", error);
       res.status(500).json({ message: "Failed to sign out everywhere" });
     }
   }));
@@ -153,12 +156,12 @@ export function registerAuthUserRoutes(
   app.post("/api/auth/admin-login", adminLoginLimiter, (req, res) => {
     const password = typeof req.body?.password === "string" ? req.body.password : "";
     if (password.length === 0 || password.length > 256 || !checkAdminPassword(password)) {
-      console.warn(`[auth] admin password sign-in rejected from ${req.ip}`);
+      logger.warn("Admin password sign-in rejected");
       return res.status(401).json({ message: "Incorrect password" });
     }
     const token = issueAdminSessionToken();
     if (!token) return res.status(401).json({ message: "Incorrect password" });
-    console.log(`[auth] admin password sign-in succeeded from ${req.ip}`);
+    logger.info("Admin password sign-in succeeded");
     res.cookie(ADMIN_SESSION_COOKIE, token, {
       ...adminCookieOptions,
       maxAge: ADMIN_SESSION_TTL_MS,

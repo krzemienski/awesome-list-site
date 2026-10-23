@@ -44,6 +44,9 @@ import type {
   ResourceRepository,
 } from "../repositories";
 import { asyncHandler } from "../middleware/asyncHandler";
+import { createLogger } from "../lib/logger";
+
+const logger = createLogger("pages");
 
 /**
  * Dependencies the non-api handlers need from the composing module. These
@@ -341,7 +344,7 @@ ${date ? `    <lastmod>${date}</lastmod>\n` : ""}    <changefreq>${changefreq}</
         }
       }
     } catch (error) {
-      console.error('Error adding category/resource URLs to sitemap:', error);
+      logger.error('Error adding category/resource URLs to sitemap:', error);
     }
 
     // Published learning journeys.
@@ -351,7 +354,7 @@ ${date ? `    <lastmod>${date}</lastmod>\n` : ""}    <changefreq>${changefreq}</
         addUrl(`/journey/${journey.id}`, 'weekly', '0.6', journey.updatedAt);
       });
     } catch (error) {
-      console.error('Error adding journey URLs to sitemap:', error);
+      logger.error('Error adding journey URLs to sitemap:', error);
     }
 
     const sitemap = `<?xml version="1.0" encoding="UTF-8"?>
@@ -596,7 +599,7 @@ ${urls.join('\n')}
       res.set('Cache-Control', 'public, max-age=86400');
       res.send(svg);
     } catch (error) {
-      console.error('Error generating OG image (SVG):', error);
+      logger.error('Error generating OG image (SVG):', error);
       sendOperationalFailure(res, error, 'Error generating image');
     }
   }
@@ -618,7 +621,7 @@ ${urls.join('\n')}
       res.set('Cache-Control', 'public, max-age=86400');
       res.send(png);
     } catch (error) {
-      console.error('Error generating OG image (PNG):', error);
+      logger.error('Error generating OG image (PNG):', error);
       sendOperationalFailure(res, error, 'Error generating image');
     }
   }

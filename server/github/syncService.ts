@@ -47,6 +47,9 @@ import { GithubSyncRepository } from "../repositories/GithubSyncRepository";
 import { Resource, InsertResource, GithubSyncQueue } from "@shared/schema";
 import { getGitHubClient } from "./replitConnection";
 import { validateAwesomeList } from "../validation/awesomeLint";
+import { createLogger } from "../lib/logger";
+
+const logger = createLogger("github-sync");
 
 interface SyncOptions {
   dryRun?: boolean;
@@ -188,7 +191,7 @@ async function ensureCategoryHierarchy(
         name: categoryName,
         slug: categorySlug,
       });
-      console.log(`  Created category: ${categoryName}`);
+      logger.info(`  Created category: ${categoryName}`);
     } catch (e: any) {
       // May already exist due to race condition, try to fetch again
       category = await findCategory();
@@ -216,7 +219,7 @@ async function ensureCategoryHierarchy(
           slug: subSlug,
           categoryId: parentId,
         });
-        console.log(`  Created subcategory: ${subcategoryName} under ${category.name}`);
+        logger.info(`  Created subcategory: ${subcategoryName} under ${category.name}`);
       } catch (e: any) {
         // May already exist due to race condition
         subcategory = await findSubcategory();
@@ -245,7 +248,7 @@ async function ensureCategoryHierarchy(
           slug: subSubSlug,
           subcategoryId: parentId,
         });
-        console.log(`  Created sub-subcategory: ${subSubcategoryName} under ${subcategory.name}`);
+        logger.info(`  Created sub-subcategory: ${subSubcategoryName} under ${subcategory.name}`);
       } catch (e: any) {
         // May already exist due to race condition
         subSubcategory = await findSubSubcategory();
@@ -315,15 +318,16 @@ export class GitHubSyncService {
       },
       resources: []
     };
+    logger.info('Import started', { repo: repoUrl, dryRun: !!options.dryRun });
 
     try {
       // Fetch README content
-      console.log(`Fetching README from ${repoUrl}...`);
+      logger.info(`Fetching README from ${repoUrl}...`);
       const { content: readmeContent, branch: readmeBranch } = await this.client.fetchFile(repoUrl, 'README.md');
       result.branch = readmeBranch;
       
       // STEP 1: Validate with awesome-lint BEFORE importing
-      console.log('Validating awesome list with awesome-lint...');
+      logger.info('Validating awesome list with awesome-lint...');
       const validationResult = validateAwesomeList(readmeContent);
       
       // Store validation results
@@ -350,30 +354,30 @@ export class GitHubSyncService {
       );
       
       // Log validation results
-      console.log(`Validation: ${validationResult.valid ? '✓ PASSED' : '✗ FAILED'}`);
-      console.log(`  - Lines: ${validationResult.stats.totalLines}`);
-      console.log(`  - Resources detected: ${validationResult.stats.totalResources}`);
-      console.log(`  - Categories detected: ${validationResult.stats.totalCategories}`);
-      console.log(`  - Errors: ${validationResult.errors.length}`);
-      console.log(`  - Warnings: ${validationResult.warnings.length}`);
+      logger.info(`Validation: ${validationResult.valid ? '✓ PASSED' : '✗ FAILED'}`);
+      logger.info(`  - Lines: ${validationResult.stats.totalLines}`);
+      logger.info(`  - Resources detected: ${validationResult.stats.totalResources}`);
+      logger.info(`  - Categories detected: ${validationResult.stats.totalCategories}`);
+      logger.info(`  - Errors: ${validationResult.errors.length}`);
+      logger.info(`  - Warnings: ${validationResult.warnings.length}`);
       
       // Validation is informational during import - do NOT block
       // External repos may not conform to our strict formatting rules
       if (!validationResult.valid) {
-        console.log(`⚠ Validation found ${validationResult.errors.length} formatting issues - proceeding with import anyway`);
-        console.log(`  (Validation is enforced on export, not import)`);
+        logger.info(`⚠ Validation found ${validationResult.errors.length} formatting issues - proceeding with import anyway`);
+        logger.info(`  (Validation is enforced on export, not import)`);
       }
       
       if (validationResult.warnings.length > 0) {
-        console.log(`⚠ Proceeding with ${validationResult.warnings.length} warnings`);
+        logger.info(`⚠ Proceeding with ${validationResult.warnings.length} warnings`);
       }
       
       // STEP 2: Parse the awesome list
-      console.log('Parsing awesome list content...');
+      logger.info('Parsing awesome list content...');
       const parsedList = await parseAwesomeList(readmeContent);
       const dbResources = convertToDbResources(parsedList);
       
-      console.log(`Found ${dbResources.length} resources in the awesome list`);
+      logger.info(`Found ${dbResources.length} resources in the awesome list`);
       
       // Run21 R4-036: identical boilerplate descriptions on different
       // resources ("Defines the file format and structure" x3) read as
@@ -394,7 +398,7 @@ export class GitHubSyncService {
       }
       
       // STEP 3: Build and ensure category hierarchy exists in database
-      console.log('Ensuring category hierarchy exists in database...');
+      logger.info('Ensuring category hierarchy exists in database...');
       const uniqueHierarchies = new Map<string, { category: string; subcategory?: string; subSubcategory?: string }>();
       
       for (const resource of dbResources) {
@@ -408,7 +412,7 @@ export class GitHubSyncService {
         }
       }
       
-      console.log(`Found ${uniqueHierarchies.size} unique category hierarchies`);
+      logger.info(`Found ${uniqueHierarchies.size} unique category hierarchies`);
       
       // Create all category hierarchies
       const hierarchyIds = new Map<string, Awaited<ReturnType<typeof ensureCategoryHierarchy>>>();
@@ -429,16 +433,16 @@ export class GitHubSyncService {
           for (const m of ids.merges) {
             const note = `Imported ${m.level} "${m.imported}" merged into existing ${m.level} "${m.existing}" (same slug or name)`;
             if (result.warnings.includes(note)) continue;
-            console.log(`  ${note}`);
+            logger.info(`  ${note}`);
             result.warnings.push(note);
           }
         } catch (error: any) {
-          console.error(`Error creating hierarchy for ${key}: ${error.message}`);
+          logger.error(`Error creating hierarchy for ${key}: ${error.message}`);
           failedHierarchies.set(key, error instanceof Error ? error.message : String(error));
         }
       }
       
-      console.log('Category hierarchy setup complete');
+      logger.info('Category hierarchy setup complete');
       
       // STEP 4: Process each resource
       for (const resource of dbResources) {
@@ -449,7 +453,7 @@ export class GitHubSyncService {
           const hierarchyFailure = failedHierarchies.get(hierarchyKey);
           if (hierarchyFailure !== undefined) {
             const errorMsg = `Error processing ${resource.title}: Category hierarchy error: ${hierarchyFailure}`;
-            console.error(errorMsg);
+            logger.error(errorMsg);
             result.errors.push(errorMsg);
             continue;
           }
@@ -495,7 +499,7 @@ export class GitHubSyncService {
                 );
               }
               result.imported++;
-              console.log(`✓ Imported: ${resource.title}`);
+              logger.info(`✓ Imported: ${resource.title}`);
               break;
               
             case 'update':
@@ -531,18 +535,18 @@ export class GitHubSyncService {
                 );
               }
               result.updated++;
-              console.log(`↻ Updated: ${resource.title} - ${conflict.reason}`);
+              logger.info(`↻ Updated: ${resource.title} - ${conflict.reason}`);
               break;
               
             case 'skip':
               result.skipped++;
-              console.log(`- Skipped: ${resource.title} - ${conflict.reason}`);
+              logger.info(`- Skipped: ${resource.title} - ${conflict.reason}`);
               break;
           }
         } catch (error: any) {
           const errorMsg = `Error processing ${resource.title}: ${error.message}`;
           result.errors.push(errorMsg);
-          console.error(errorMsg);
+          logger.error(errorMsg);
         }
       }
       
@@ -552,6 +556,18 @@ export class GitHubSyncService {
       const importOutcome = result.errors.length === 0
         ? 'completed'
         : result.imported > 0 || result.updated > 0 ? 'partial' : 'failed';
+      logger[importOutcome === 'failed' ? 'error' : importOutcome === 'partial' ? 'warn' : 'info'](
+        'Import finished',
+        {
+          repo: repoUrl,
+          outcome: importOutcome,
+          imported: result.imported,
+          updated: result.updated,
+          skipped: result.skipped,
+          errors: result.errors.length,
+          ...(result.errors[0] ? { firstError: result.errors[0] } : {}),
+        },
+      );
 
       // Add to sync queue for tracking
       if (!options.dryRun) {
@@ -595,14 +611,14 @@ export class GitHubSyncService {
             },
           });
         } catch (historyErr: any) {
-          console.error('Failed to write github_sync_history row (non-fatal):', historyErr?.message || historyErr);
+          logger.error('Failed to write github_sync_history row (non-fatal):', historyErr);
         }
       }
 
     } catch (error: any) {
       const errorMsg = `Import failed: ${error.message}`;
       result.errors.push(errorMsg);
-      console.error(errorMsg);
+      logger.error('Import failed', { repo: repoUrl, reason: error.message }, error);
       
       // Log failed import
       if (!options.dryRun) {
@@ -626,7 +642,7 @@ export class GitHubSyncService {
             metadata: { outcome: 'failed' },
           });
         } catch (historyErr: any) {
-          console.error('Failed to write github_sync_history failed row (non-fatal):', historyErr?.message || historyErr);
+          logger.error('Failed to write github_sync_history failed row (non-fatal):', historyErr);
         }
       }
     }
@@ -650,9 +666,9 @@ export class GitHubSyncService {
     try {
       const { data: repoInfo } = await octokit.repos.get({ owner, repo });
       defaultBranch = repoInfo.default_branch;
-      console.log(`Repository default branch: ${defaultBranch}`);
+      logger.info(`Repository default branch: ${defaultBranch}`);
     } catch (error: any) {
-      console.warn(`Could not fetch repository info: ${error.message} (HTTP ${error.status || 'unknown'})`);
+      logger.warn(`Could not fetch repository info: ${error.message} (HTTP ${error.status || 'unknown'})`);
       repoFetchError = error;
     }
 
@@ -691,14 +707,14 @@ export class GitHubSyncService {
             repo,
             ref: `heads/${branch}`
           });
-          console.log(`✓ Using branch: ${branch}${attempt > 1 ? ` (attempt ${attempt})` : ''}`);
+          logger.info(`✓ Using branch: ${branch}${attempt > 1 ? ` (attempt ${attempt})` : ''}`);
           return branch;
         } catch (error: any) {
           const status = error.status || 'unknown';
           const isTransient = status === 503 || status === 500 || status === 'unknown';
           const shouldRetry = isDefaultBranch && attempt < maxAttempts && isTransient;
           
-          console.warn(
+          logger.warn(
             `Branch '${branch}' not accessible (attempt ${attempt}/${maxAttempts}): ` +
             `${error.message} (HTTP ${status})${shouldRetry ? ' - retrying...' : ''}`
           );
@@ -758,6 +774,11 @@ export class GitHubSyncService {
       exported: 0,
       errors: []
     };
+    logger.info('Export started', {
+      repo: repoUrl,
+      dryRun: !!options.dryRun,
+      ...(typeof options.queueId === 'number' ? { queueId: options.queueId } : {}),
+    });
 
     try {
       // Get fresh Octokit client with Replit GitHub connection
@@ -785,7 +806,7 @@ export class GitHubSyncService {
         throw new Error('No approved resources to export');
       }
 
-      console.log(`Exporting ${currentResources.length} approved resources...`);
+      logger.info(`Exporting ${currentResources.length} approved resources...`);
 
       // Get last sync history to calculate diff
       const lastSync = await this.syncRepo.getLastSyncHistory(repoUrl, 'export');
@@ -794,7 +815,7 @@ export class GitHubSyncService {
       // Calculate diff: added, updated, removed
       const { added, updated, removed } = this.calculateDiff(lastSnapshot, currentResources);
 
-      console.log(`Diff: ${added} added, ${updated} updated, ${removed} removed`);
+      logger.info(`Diff: ${added} added, ${updated} updated, ${removed} removed`);
 
       // Generate smart commit message
       const commitMessage = lastSync 
@@ -815,7 +836,7 @@ export class GitHubSyncService {
       const contributingContent = generateContributingMd(this.websiteUrl, repoUrl);
 
       // Validate with awesome-lint BEFORE pushing to GitHub
-      console.log('Validating generated markdown with awesome-lint...');
+      logger.info('Validating generated markdown with awesome-lint...');
       const validationResult = validateAwesomeList(readmeContent);
       
       if (!validationResult.valid) {
@@ -828,7 +849,7 @@ export class GitHubSyncService {
         );
       }
       
-      console.log(`✓ awesome-lint validation passed (${validationResult.warnings.length} warnings)`);
+      logger.info(`✓ awesome-lint validation passed (${validationResult.warnings.length} warnings)`);
 
       // Export link gate: check the EXACT README we are about to push for
       // confirmed-broken links, BEFORE any GitHub write. Repository/export
@@ -838,11 +859,11 @@ export class GitHubSyncService {
       // Opt out via options.skipLinkCheck or EXPORT_LINK_CHECK=off.
       if (!options.skipLinkCheck && process.env.EXPORT_LINK_CHECK !== 'off') {
         const { runExportLinkGate } = await import('../validation/exportLinkGate');
-        console.log('[export-link-check] scanning generated README for confirmed-broken links...');
+        logger.info('[export-link-check] scanning generated README for confirmed-broken links...');
         const gate = await runExportLinkGate(readmeContent, {
           onProgress: (checked, total) => {
             if (checked % 200 === 0 || checked === total) {
-              console.log(`[export-link-check] first pass ${checked}/${total}`);
+              logger.info(`[export-link-check] first pass ${checked}/${total}`);
             }
           },
         });
@@ -857,16 +878,16 @@ export class GitHubSyncService {
             `This check is separate from the Link Health dashboard.`
           );
         }
-        console.log(`[export-link-check] ✓ passed — ${gate.checked} links checked, ${gate.skipped} allowlisted, 0 confirmed broken`);
+        logger.info(`[export-link-check] ✓ passed — ${gate.checked} links checked, ${gate.skipped} allowlisted, 0 confirmed broken`);
       } else {
-        console.log('[export-link-check] skipped (disabled by option or EXPORT_LINK_CHECK=off)');
+        logger.info('[export-link-check] skipped (disabled by option or EXPORT_LINK_CHECK=off)');
       }
 
       if (options.dryRun) {
-        console.log('Dry run - would update:');
-        console.log('- README.md');
-        console.log('- CONTRIBUTING.md');
-        console.log(`Commit message: ${commitMessage}`);
+        logger.info('Dry run - would update:');
+        logger.info('- README.md');
+        logger.info('- CONTRIBUTING.md');
+        logger.info(`Commit message: ${commitMessage}`);
         result.exported = currentResources.length;
         return result;
       }
@@ -948,7 +969,15 @@ export class GitHubSyncService {
       result.commitUrl = newCommit.html_url;
       result.exported = currentResources.length;
 
-      console.log(`✓ Committed changes: ${newCommit.sha}`);
+      logger.info('Export committed', {
+        repo: repoUrl,
+        commit: newCommit.sha,
+        resources: currentResources.length,
+        added,
+        updated,
+        removed,
+        ...(typeof options.queueId === 'number' ? { queueId: options.queueId } : {}),
+      });
 
       // Update resources as synced (single bulk UPDATE — a per-resource
       // Promise.all here exhausted the pg pool on large exports)
@@ -1020,7 +1049,11 @@ export class GitHubSyncService {
       }
       
       result.errors.push(errorMsg);
-      console.error('GitHub export error:', errorMsg);
+      logger.error('Export failed', {
+        repo: repoUrl,
+        reason: errorMsg,
+        ...(typeof options.queueId === 'number' ? { queueId: options.queueId } : {}),
+      });
       // Queue-row failure status is recorded by the caller (route or queue
       // processor) via updateGithubSyncStatus on the row it created — no
       // duplicate terminal row is inserted here.
@@ -1078,16 +1111,16 @@ export class GitHubSyncService {
    * Process the GitHub sync queue
    */
   async processQueue(): Promise<void> {
-    console.log('Processing GitHub sync queue...');
+    logger.info('Processing GitHub sync queue...');
     
     const queueItems = await this.syncRepo.getGithubSyncQueue('pending');
     
     if (queueItems.length === 0) {
-      console.log('No pending items in sync queue');
+      logger.info('No pending items in sync queue');
       return;
     }
 
-    console.log(`Found ${queueItems.length} pending items in queue`);
+    logger.info(`Found ${queueItems.length} pending items in queue`);
 
     for (const item of queueItems) {
       this.activeQueueIds.add(item.id);
@@ -1155,7 +1188,7 @@ export class GitHubSyncService {
           }
         }
       } catch (error: any) {
-        console.error(`Error processing queue item ${item.id}:`, error);
+        logger.error(`Error processing queue item ${item.id}:`, error);
         await this.syncRepo.updateGithubSyncStatus(
           item.id,
           'failed',
@@ -1166,7 +1199,7 @@ export class GitHubSyncService {
       }
     }
 
-    console.log('Queue processing completed');
+    logger.info('Queue processing completed');
   }
 
   // Run15 BUG-011 (architect review): expose live-owned queue row ids for the

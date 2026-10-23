@@ -1,5 +1,8 @@
 import type { Resource } from "@shared/schema";
 import { storage } from "../storage";
+import { createLogger } from "../lib/logger";
+
+const logger = createLogger("seed");
 
 export interface StepTemplate {
   title: string;
@@ -187,7 +190,7 @@ async function seedStepsForPlan(plan: JourneyPlan, summary: SeedJourneyStepsSumm
     // Create the canonical journey row so a fresh database ships with working
     // Learning Journeys instead of an empty page (previously this skipped and
     // /api/journeys returned [] on every new deployment).
-    console.log(`🆕 Journey not in DB, creating: "${plan.journeyTitle}"`);
+    logger.info(`🆕 Journey not in DB, creating: "${plan.journeyTitle}"`);
     journey = await storage.createLearningJourney({
       title: plan.journeyTitle,
       description: plan.description,
@@ -211,7 +214,7 @@ async function seedStepsForPlan(plan: JourneyPlan, summary: SeedJourneyStepsSumm
   }
 
   if (missingIndices.length === 0) {
-    console.log(`⏭️  Journey #${journey.id} "${journey.title}" already has all ${targetCount} logical steps (${existingSteps.length} rows), skipping.`);
+    logger.info(`⏭️  Journey #${journey.id} "${journey.title}" already has all ${targetCount} logical steps (${existingSteps.length} rows), skipping.`);
     summary.journeysAlreadyPopulated++;
     summary.perJourney.push({
       journeyId: journey.id,
@@ -231,7 +234,7 @@ async function seedStepsForPlan(plan: JourneyPlan, summary: SeedJourneyStepsSumm
     existingSteps.map(s => s.resourceId).filter((id): id is number => id != null),
   );
 
-  console.log(`📚 Journey #${journey.id} "${journey.title}": ${existingStepNumbers.size}/${targetCount} logical steps present; backfilling ${missingIndices.length} (found ${candidates.length} candidate resources).`);
+  logger.info(`📚 Journey #${journey.id} "${journey.title}": ${existingStepNumbers.size}/${targetCount} logical steps present; backfilling ${missingIndices.length} (found ${candidates.length} candidate resources).`);
 
   let rowsCreated = 0;
   let inlineRowsCreated = 0;
@@ -287,7 +290,7 @@ async function seedStepsForPlan(plan: JourneyPlan, summary: SeedJourneyStepsSumm
     inlineRowsCreated,
   });
 
-  console.log(`   ✅ Created ${rowsCreated} step rows (${inlineRowsCreated} inline) → ${afterUnique}/${targetCount} logical steps.`);
+  logger.info(`   ✅ Created ${rowsCreated} step rows (${inlineRowsCreated} inline) → ${afterUnique}/${targetCount} logical steps.`);
 }
 
 /**
@@ -310,12 +313,12 @@ export async function seedJourneyStepsForExisting(): Promise<SeedJourneyStepsSum
     perJourney: [],
   };
 
-  console.log("🌱 Backfilling journey steps for canonical learning journeys...");
+  logger.info("🌱 Backfilling journey steps for canonical learning journeys...");
   for (const plan of JOURNEY_PLANS) {
     try {
       await seedStepsForPlan(plan, summary);
     } catch (err) {
-      console.error(`💥 Failed seeding "${plan.journeyTitle}":`, err);
+      logger.error(`💥 Failed seeding "${plan.journeyTitle}":`, err);
     }
   }
 
@@ -340,7 +343,7 @@ export async function seedJourneyStepsForExisting(): Promise<SeedJourneyStepsSum
     );
   }
 
-  console.log(
+  logger.info(
     `🎉 Journey-step seed done. touched=${summary.journeysTouched} ` +
     `alreadyPopulated=${summary.journeysAlreadyPopulated} ` +
     `journeyRowsCreated=${summary.journeyRowsCreated} ` +
@@ -359,7 +362,7 @@ if (isDirectRun) {
   seedJourneyStepsForExisting()
     .then(() => process.exit(0))
     .catch(err => {
-      console.error("💥 Fatal:", err);
+      logger.error("💥 Fatal:", err);
       process.exit(1);
     });
 }

@@ -96,6 +96,9 @@ import { listApprovedResourceTags } from "../../repositories/TagRepository";
 import { asyncHandler } from "../../middleware/asyncHandler";
 import { negotiated429Handler } from "../../middleware/rateLimit";
 import { PgRateLimitStore } from "../../middleware/pgRateLimitStore";
+import { createLogger } from "../../lib/logger";
+
+const logger = createLogger("contributions");
 
 /**
  * Copied verbatim from server/routes.ts (module-level helper). Duplicated here
@@ -435,7 +438,7 @@ export function registerCatalogContributionsRoutes(
         ...(Object.keys(resolvedFilters).length ? { resolvedFilters } : {}),
       });
     } catch (error) {
-      console.error('Error fetching resources:', error);
+      logger.error('Error fetching resources:', error);
       sendOperationalFailure(res, error, 'Failed to fetch resources');
     }
   }));
@@ -493,7 +496,7 @@ export function registerCatalogContributionsRoutes(
       res.set('Cache-Control', knownScope ? CATALOG_CACHE_CONTROL : UNCACHED_CATALOG_CACHE_CONTROL);
       res.json(counts);
     } catch (error) {
-      console.error('Error counting resources by kind:', error);
+      logger.error('Error counting resources by kind:', error);
       sendOperationalFailure(res, error, 'Failed to count resources by kind');
     }
   }));
@@ -556,7 +559,7 @@ export function registerCatalogContributionsRoutes(
       const nextOffset = offset + resources.length < total ? offset + resources.length : null;
       res.json({ query: q, total, limit, offset, nextOffset, results: results.map(toPublicResource), search });
     } catch (error) {
-      console.error('Error searching resources:', error);
+      logger.error('Error searching resources:', error);
       sendOperationalFailure(res, error, 'Failed to search resources');
     }
   }));
@@ -591,7 +594,7 @@ export function registerCatalogContributionsRoutes(
         safeReferrer = null;
       }
     }
-    console.warn(
+    logger.warn(
       `[dead-link] path=${JSON.stringify(path)} referrer=${JSON.stringify(safeReferrer ?? '')} ts=${ts ?? new Date().toISOString()}`
     );
     res.status(204).end();
@@ -626,7 +629,7 @@ export function registerCatalogContributionsRoutes(
       // contents to anonymous probes).
       res.json({ exists: !!existingResource });
     } catch (error) {
-      console.error('Error checking URL:', error);
+      logger.error('Error checking URL:', error);
       sendOperationalFailure(res, error, 'Failed to check URL');
     }
   }));
@@ -666,7 +669,7 @@ export function registerCatalogContributionsRoutes(
       // NEW-019: strip internal `searchTsv` from the public detail response.
       res.json(toPublicResource(resource));
     } catch (error) {
-      console.error('Error fetching resource:', error);
+      logger.error('Error fetching resource:', error);
       sendOperationalFailure(res, error, 'Failed to fetch resource');
     }
   };
@@ -716,7 +719,7 @@ export function registerCatalogContributionsRoutes(
         nextSteps: sanitizeItems(related.nextSteps),
       });
     } catch (error) {
-      console.error('Error fetching related resources:', error);
+      logger.error('Error fetching related resources:', error);
       sendOperationalFailure(res, error, 'Failed to fetch related resources');
     }
   }));
@@ -871,6 +874,7 @@ export function registerCatalogContributionsRoutes(
           content_type: 'resource_submission',
           category: resourceData.category,
         });
+        logger.info('Resource submitted for review', { resourceId: resource.id, user: userId });
 
         res.status(201).json(resource);
       } catch (createError: any) {
@@ -883,7 +887,7 @@ export function registerCatalogContributionsRoutes(
       if (error instanceof z.ZodError) {
         return res.status(400).json({ message: 'Invalid resource data', errors: error.issues });
       }
-      console.error('Error creating resource:', error);
+      logger.error('Error creating resource:', error);
       sendOperationalFailure(res, error, 'Failed to create resource');
     }
   };
@@ -918,7 +922,7 @@ export function registerCatalogContributionsRoutes(
       
       res.json(result);
     } catch (error) {
-      console.error('Error fetching pending resources:', error);
+      logger.error('Error fetching pending resources:', error);
       res.status(500).json({ message: 'Failed to fetch pending resources' });
     }
   }));
@@ -948,9 +952,10 @@ export function registerCatalogContributionsRoutes(
       }
       
       const resource = await resourceRepo.updateResourceStatus(id, 'approved', userId);
+      logger.info('Resource approved', { resourceId: id, admin: userId });
       res.json(resource);
     } catch (error: any) {
-      console.error('Error approving resource:', error);
+      logger.error('Error approving resource:', error);
       if (error?.message?.includes('not pending approval')) {
         return res.status(409).json({ message: error.message });
       }
@@ -976,9 +981,10 @@ export function registerCatalogContributionsRoutes(
       }
       
       const resource = await resourceRepo.updateResourceStatus(id, 'rejected', userId);
+      logger.info('Resource rejected', { resourceId: id, admin: userId });
       res.json(resource);
     } catch (error: any) {
-      console.error('Error rejecting resource:', error);
+      logger.error('Error rejecting resource:', error);
       if (error?.message?.includes('not pending approval')) {
         return res.status(409).json({ message: error.message });
       }
@@ -1248,7 +1254,7 @@ export function registerCatalogContributionsRoutes(
       if (error instanceof z.ZodError) {
         return res.status(400).json({ message: 'Invalid edit data', errors: error.issues });
       }
-      console.error('Error creating edit suggestion:', error);
+      logger.error('Error creating edit suggestion:', error);
       res.status(500).json({ message: 'Failed to create edit suggestion' });
     }
   }));
@@ -1276,7 +1282,7 @@ export function registerCatalogContributionsRoutes(
       res.set('Cache-Control', CATALOG_CACHE_CONTROL);
       res.json(enriched);
     } catch (error) {
-      console.error('Error fetching categories:', error);
+      logger.error('Error fetching categories:', error);
       sendOperationalFailure(res, error, 'Failed to fetch categories');
     }
   }));
@@ -1300,7 +1306,7 @@ export function registerCatalogContributionsRoutes(
       res.set('Cache-Control', CATALOG_CACHE_CONTROL);
       res.json(payload);
     } catch (error) {
-      console.error('Error aggregating tags:', error);
+      logger.error('Error aggregating tags:', error);
       sendOperationalFailure(res, error, 'Failed to fetch tags');
     }
   }));
@@ -1343,7 +1349,7 @@ export function registerCatalogContributionsRoutes(
       res.set('Cache-Control', CATALOG_CACHE_CONTROL);
       res.json(subcategories);
     } catch (error) {
-      console.error('Error fetching subcategories:', error);
+      logger.error('Error fetching subcategories:', error);
       sendOperationalFailure(res, error, 'Failed to fetch subcategories');
     }
   }));
@@ -1385,7 +1391,7 @@ export function registerCatalogContributionsRoutes(
       res.set('Cache-Control', CATALOG_CACHE_CONTROL);
       res.json(subSubcategories);
     } catch (error) {
-      console.error('Error fetching sub-subcategories:', error);
+      logger.error('Error fetching sub-subcategories:', error);
       sendOperationalFailure(res, error, 'Failed to fetch sub-subcategories');
     }
   }));

@@ -1,3 +1,7 @@
+import { createLogger } from "../lib/logger";
+
+const logger = createLogger("ops");
+
 type MetricAggregate = {
   count: number;
   errors: number;
@@ -92,15 +96,13 @@ export function recordDatabaseQuery(
   const safeCommand = QUERY_COMMANDS.has(command) ? command : "other";
   updateAggregate(queryMetrics, safeCommand, durationMs, !!error, 500);
   if (durationMs >= 500 || error) {
-    console.log(
-      JSON.stringify({
-        event: "ops.db_query",
-        command: safeCommand,
-        durationMs,
-        outcome: error ? "error" : "ok",
-        ...(error ? { errorClass: classifyDatabaseError(error) } : {}),
-      }),
-    );
+    const details = {
+      command: safeCommand,
+      ms: durationMs,
+      ...(error ? { errorClass: classifyDatabaseError(error) } : {}),
+    };
+    if (error) logger.warn("Database query failed", details);
+    else logger.info("Slow database query", details);
   }
 }
 

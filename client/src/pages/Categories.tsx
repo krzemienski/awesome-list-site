@@ -15,6 +15,7 @@ import SEOHead from "@/components/layout/SEOHead";
 import { getCategoryIcon } from "@/config/navigation-icons";
 import { getCategorySlug } from "@/lib/utils";
 import { writeFilterParams, usePopstateParams } from "@/lib/url-filter-state";
+import { trackSortChange } from "@/lib/analytics";
 
 // Run23 R-06: this page only needs names/slugs/counts — it renders from the
 // ~few-KB nav tree instead of the 3.1MB corpus.
@@ -99,6 +100,8 @@ export default function Categories({ nav, isLoading, error, onRetry }: Categorie
 
   const handleSortChange = (next: string) => {
     const value = normalizeSort(next);
+    // Sorting reorders the same list, so the count is the categories shown.
+    if (value !== sort) trackSortChange(value, "categories_page", baseCategories.length);
     setSort(value);
     // BUG-015 (run18): write back the exact canonical slug we read, so the
     // Select stays symmetric across reloads. Default (name-asc) drops the param.

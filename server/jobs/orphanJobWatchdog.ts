@@ -3,6 +3,9 @@ import { enrichmentJobs, githubSyncQueue, researchJobs } from "@shared/schema";
 import { and, eq, inArray, notInArray, lt, or } from "drizzle-orm";
 import { isJobOrphaned, livenessUnchangedSince, ORPHANED_BY_RESTART_MESSAGE } from "../ai/jobLiveness";
 import { closeOutEnrichmentQueue } from "../repositories/EnrichmentRepository";
+import { createLogger } from "../lib/logger";
+
+const logger = createLogger("job-watchdog");
 
 // GitHub sync queue rows have no worker liveness columns; they keep the
 // fixed age threshold. AI jobs (enrichment/research) use worker liveness
@@ -154,14 +157,14 @@ export async function runOrphanWatchdogStartup(): Promise<void> {
   try {
     const r = await sweepOrphanedJobs();
     if (r.enrichmentJobsFailed > 0 || r.githubSyncQueueFailed > 0 || r.researchJobsFailed > 0) {
-      console.log(
+      logger.info(
         `🧹 Orphan watchdog: flipped ${r.enrichmentJobsFailed} enrichment_jobs + ${r.githubSyncQueueFailed} github_sync_queue + ${r.researchJobsFailed} research_jobs rows to failed (AI jobs: owner worker gone; sync queue: older than ${r.cutoff.toISOString()})`,
       );
     } else {
-      console.log('✅ Orphan watchdog: no stuck jobs found');
+      logger.info('✅ Orphan watchdog: no stuck jobs found');
     }
   } catch (err: any) {
-    console.error('❌ Orphan watchdog failed (non-fatal):', err?.message || err);
+    logger.error('❌ Orphan watchdog failed (non-fatal):', err);
   }
 }
 
@@ -196,12 +199,12 @@ export function startOrphanWatchdogPeriodic(): void {
         researchJobIds: researchService.getActiveJobIds(),
       });
       if (r.enrichmentJobsFailed > 0 || r.githubSyncQueueFailed > 0 || r.researchJobsFailed > 0) {
-        console.log(
+        logger.info(
           `🧹 Orphan watchdog (periodic): flipped ${r.enrichmentJobsFailed} enrichment_jobs + ${r.githubSyncQueueFailed} github_sync_queue + ${r.researchJobsFailed} research_jobs rows to failed`,
         );
       }
     } catch (err: any) {
-      console.error('❌ Orphan watchdog periodic sweep failed (non-fatal):', err?.message || err);
+      logger.error('❌ Orphan watchdog periodic sweep failed (non-fatal):', err);
     }
   })(), PERIODIC_SWEEP_INTERVAL_MS);
   // Never keep the process alive just for the watchdog.

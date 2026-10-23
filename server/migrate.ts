@@ -9,6 +9,9 @@ import {
   markMigrationsReady,
   markMigrationsRunning,
 } from './ops/bootState';
+import { createLogger } from "./lib/logger";
+
+const logger = createLogger("migrations");
 
 const { Pool } = pkg;
 const __filename = fileURLToPath(import.meta.url);
@@ -30,7 +33,7 @@ const __dirname = path.dirname(__filename);
 export async function runMigrations(databaseUrl: string = process.env.DATABASE_URL ?? '') {
   markMigrationsRunning();
   if (!databaseUrl) {
-    console.error('Error: DATABASE_URL environment variable is not set');
+    logger.error('Error: DATABASE_URL environment variable is not set');
     markMigrationsFailed();
     throw new Error('DATABASE_URL is required');
   }
@@ -48,7 +51,7 @@ export async function runMigrations(databaseUrl: string = process.env.DATABASE_U
     const journalPath = path.join(p, 'meta', '_journal.json');
     if (fs.existsSync(journalPath)) {
       migrationsFolder = p;
-      console.log(`Found migrations at: ${p}`);
+      logger.info(`Found migrations at: ${p}`);
       break;
     }
   }
@@ -60,12 +63,12 @@ export async function runMigrations(databaseUrl: string = process.env.DATABASE_U
   });
 
   pool.on('error', (err) => {
-    console.error('Database pool error during migration:', err.message);
+    logger.error('Database pool error during migration:', err.message);
   });
 
   // If no migrations folder found, verify database is already set up
   if (!migrationsFolder) {
-    console.log('⚠️ No migrations folder found, checking if database is already configured...');
+    logger.info('⚠️ No migrations folder found, checking if database is already configured...');
     try {
       const client = await pool.connect();
       const result = await client.query(`
@@ -79,7 +82,7 @@ export async function runMigrations(databaseUrl: string = process.env.DATABASE_U
       await pool.end();
 
       if (result.rows[0]?.exists) {
-        console.log('✓ Database schema already exists (configured via db:push)');
+        logger.info('✓ Database schema already exists (configured via db:push)');
         markMigrationsReady();
         return;
       } else {
@@ -94,9 +97,9 @@ export async function runMigrations(databaseUrl: string = process.env.DATABASE_U
 
   try {
     const db = drizzle(pool);
-    console.log('Running database migrations...');
+    logger.info('Running database migrations...');
     await migrate(db, { migrationsFolder });
-    console.log('✓ Migrations completed successfully');
+    logger.info('✓ Migrations completed successfully');
 
     // Belt-and-suspenders: prove the drizzle journal table actually recorded
     // every migration from migrations/meta/_journal.json. If migrate() ever
@@ -111,13 +114,13 @@ export async function runMigrations(databaseUrl: string = process.env.DATABASE_U
     markMigrationsFailed();
     const cause = error?.cause ?? error;
     if (cause?.code === '42P07' || error?.code === '42P07' || (cause?.message?.includes('already exists') && cause?.message?.includes('relation'))) {
-      console.error(
+      logger.error(
         'Migration failed with "already exists" (42P07). This means a migration is NOT idempotent — ' +
         'the rest of its batched statements were rolled back and the schema may be incomplete. ' +
         'Fix the migration to use IF NOT EXISTS / duplicate_object guards. Refusing to start with a partial schema.'
       );
     }
-    console.error('Migration failed:', error);
+    logger.error('Migration failed:', error);
     throw error;
   }
 }
@@ -159,7 +162,7 @@ export async function verifyMigrationJournal(pool: InstanceType<typeof Pool>, mi
       );
     }
 
-    console.log(`✓ Migration journal verified: ${recordedCount} recorded, all ${entries.length} journal entr(y/ies) applied`);
+    logger.info(`✓ Migration journal verified: ${recordedCount} recorded, all ${entries.length} journal entr(y/ies) applied`);
   } finally {
     client.release();
   }

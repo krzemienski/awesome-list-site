@@ -88,6 +88,9 @@ import { isDatabaseUnavailableError } from "./db/errors";
 import { ServiceUnavailableError } from "./middleware/errors";
 import { loadHomeNav } from "./home-ssr-data";
 import { RESOURCE_DETAIL_MANIFEST_KEY, routeChunkPreloadTags } from "./ssr";
+import { createLogger } from "./lib/logger";
+
+const logger = createLogger("og-middleware");
 
 export const SITE_URL =
   process.env.PUBLIC_SITE_URL?.replace(/\/$/, "") || "https://awesome.video";
@@ -238,7 +241,7 @@ async function resolveRouteWithSaturationRetry(
         throw error;
       }
       const delayMs = backoffsMs[attempt];
-      console.warn(
+      logger.warn(
         "[og-middleware] saturation failure for",
         urlPath,
         `— retry ${attempt + 1}/${backoffsMs.length} in ${delayMs}ms:`,
@@ -2253,7 +2256,7 @@ export function ogInjectionMiddleware() {
       } catch {
         // tree lookup failed — fall through to the resolver's fail-open path
       }
-      console.warn("[og-middleware] unresolvable nested category path:", urlPath);
+      logger.warn("[og-middleware] unresolvable nested category path:", urlPath);
     }
     // Slug tolerance for single-level /category/:slug where the slug actually
     // belongs to a subcategory or sub-subcategory — 301 to the canonical page
@@ -2531,7 +2534,7 @@ export function ogInjectionMiddleware() {
       } catch (e) {
         if (req.aborted || res.destroyed) return;
         if (isBoundedDependencyFailure(e)) {
-          console.warn(
+          logger.warn(
             "[og-middleware] bounded dependency failure for",
             urlPath,
             String((e as any)?.message ?? e),
@@ -2553,7 +2556,7 @@ export function ogInjectionMiddleware() {
           meta = defaultMeta(urlPath);
           notFound = false;
         } else {
-          console.warn("[og-middleware] meta lookup failed for", urlPath, e);
+          logger.warn("[og-middleware] meta lookup failed for", urlPath, e);
           // Fail open: never demote a real page to 404 on a transient lookup error.
           meta = defaultMeta(urlPath);
           notFound = false;
@@ -2656,7 +2659,7 @@ export function ogInjectionMiddleware() {
           res.setHeader("Cache-Control", "no-store");
           return (origEnd as any)(buf, ...args);
         } catch (e) {
-          console.warn("[og-middleware] rewrite failed", e);
+          logger.warn("[og-middleware] rewrite failed", e);
           // The security middleware has already issued a nonce-based CSP.
           // Even when metadata rewriting fails, return a body whose inline
           // boot scripts/styles carry that request's nonce rather than an

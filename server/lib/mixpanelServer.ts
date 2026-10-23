@@ -30,6 +30,9 @@
 
 import { randomUUID } from "crypto";
 import type { Request } from "express";
+import { createLogger } from "./logger";
+
+const logger = createLogger("mixpanel-server");
 
 const MIXPANEL_INGEST_URL = "https://api.mixpanel.com/track?verbose=1";
 
@@ -156,14 +159,14 @@ export function trackConsentedServerEvent(
           ok = false;
         }
         if (!ok) {
-          console.error(`[mixpanel-server] ingest rejected for "${event}": ${r.status} ${text.slice(0, 300)}`);
+          logger.error("Mixpanel ingest rejected", { event, status: r.status, reason: text.slice(0, 300) });
         }
       })
       .catch((e) => {
-        console.error(`[mixpanel-server] ingest failed for "${event}":`, e?.message ?? e);
+        logger.error("Mixpanel ingest failed", { event, reason: e?.message ?? String(e) });
       });
   } catch (e) {
     // Analytics must never break a request path.
-    console.error("[mixpanel-server] unexpected error:", e);
+    logger.error("Unexpected Mixpanel error", e);
   }
 }

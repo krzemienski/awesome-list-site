@@ -1,5 +1,5 @@
 import StatePanel, { RetryButton } from "@/components/layout/StatePanel";
-import { lazy, Suspense, useEffect, useMemo, useState } from "react";
+import { lazy, Suspense, useEffect, useMemo, useRef, useState } from "react";
 import { focusPageHeading } from "@/hooks/focus-handoff";
 import { Link, useSearch } from "wouter";
 import { useQuery } from "@tanstack/react-query";
@@ -26,6 +26,7 @@ import { homeSeoTitle, homeSeoDescription } from "@shared/seo-templates";
 import { taxonomyScopeIntro } from "@shared/seo-content-templates";
 import { useAuth } from "@/hooks/useAuth";
 import { normalizeTag, parseTagsParam } from "@/lib/tags";
+import { trackFilterUsage, trackSortChange, trackTagInteraction } from "@/lib/analytics";
 import { writeFilterParams, usePopstateParams } from "@/lib/url-filter-state";
 import { processAwesomeListData } from "@/lib/parser";
 import { fetchStaticAwesomeList } from "@/lib/static-data";
@@ -497,7 +498,27 @@ export default function Home({ nav, navLoading }: HomeProps) {
       : null;
   });
 
+  // Filter analytics wait for the filtered result count (the corpus loads on
+  // the first tag/kind filter), like the search and taxonomy pages.
+  const pendingAnalyticsRef = useRef<
+    | { kind: "sort"; value: string }
+    | { kind: "tag"; value: string; action: "apply" | "remove" }
+    | { kind: "filter"; type: string; value: string }
+    | null
+  >(null);
+  const [analyticsTick, setAnalyticsTick] = useState(0);
+  const queueAnalytics = (pending: NonNullable<typeof pendingAnalyticsRef.current>) => {
+    pendingAnalyticsRef.current = pending;
+    setAnalyticsTick((tick) => tick + 1);
+  };
+
   const setSelectedTags = (next: string[]) => {
+    const previous = new Set(selectedTags.map(normalizeTag));
+    const incoming = new Set(next.map(normalizeTag));
+    const added = next.find((tag) => !previous.has(normalizeTag(tag)));
+    const removed = selectedTags.find((tag) => !incoming.has(normalizeTag(tag)));
+    const changed = added ?? removed;
+    if (changed) queueAnalytics({ kind: "tag", value: changed, action: added ? "apply" : "remove" });
     setSelectedTagsState(next);
     writeFilterParams({ tags: next.length === 0 ? null : next.join(",") });
   };
@@ -517,11 +538,13 @@ export default function Home({ nav, navLoading }: HomeProps) {
     const safeNext = (VALID_SORTS as readonly string[]).includes(next)
       ? (next as HomeSort)
       : "default";
+    if (safeNext !== sortBy) queueAnalytics({ kind: "sort", value: safeNext });
     setSortBy(safeNext);
     writeFilterParams({ sort: safeNext === "default" ? null : safeNext });
   };
 
   const handleKindChange = (next: ResourceKind | null) => {
+    if (next !== selectedKind) queueAnalytics({ kind: "filter", type: "kind", value: next ?? "all" });
     setSelectedKindState(next);
     writeFilterParams({ kind: next });
   };
@@ -745,6 +768,18 @@ export default function Home({ nav, navLoading }: HomeProps) {
     };
   }, [homeData, nav?.categories, nav?.totalResources, navCategories.length, corpusFilterActive, filteredCorpusResources.length]);
 
+  useEffect(() => {
+    const pending = pendingAnalyticsRef.current;
+    if (!pending) return;
+    // A tag/kind filter counts the live corpus; wait until it has loaded.
+    if (corpusFilterActive && (!rawCorpus || corpusLoading)) return;
+    const resultCount = corpusFilterActive ? filteredCorpusResources.length : stats.total;
+    pendingAnalyticsRef.current = null;
+    if (pending.kind === "sort") trackSortChange(pending.value, "home", resultCount);
+    else if (pending.kind === "tag") trackTagInteraction(pending.value, pending.action, "home", resultCount);
+    else trackFilterUsage(pending.type, pending.value, resultCount, "home");
+  }, [analyticsTick, corpusFilterActive, rawCorpus, corpusLoading, filteredCorpusResources.length, stats.total]);
+
   const filters = showFilters ? (
     <Suspense fallback={<FilterControlsFallback />}>
       <AdvancedFilter
@@ -828,7 +863,8 @@ export default function Home({ nav, navLoading }: HomeProps) {
         onKindChange={handleKindChange}
         selectedTags={selectedTags}
         onClearFilters={() => {
-          setSelectedTags([]);
+          queueAnalytics({ kind: "filter", type: "all", value: "cleared" });
+          setSelectedTagsState([]);
           setSelectedKindState(null);
           setSortBy("default");
           writeFilterParams({ tags: null, kind: null, sort: null });

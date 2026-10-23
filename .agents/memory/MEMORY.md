@@ -181,3 +181,4 @@
 - [CLS hidden under the prerender hold](hidden-fallback-cls.md) — occluded layout still counts; seed boot data + await route chunk + modulepreload; banner copy is first-visit LCP.
 - [Pageview titles from loading heads](pageview-loading-titles.md) — analytics read the title ~300ms after soft nav; loading heads must name the page (SEOHead `loading`).
 - [Sync history run matching](sync-history-run-matching.md) — tie history rows to queue runs by queueId/commitSha identity; time windows mis-attribute commits when exports overlap.
+- [Server logging conventions](server-logging.md) — one area logger, job start/outcome/reason; scrubPath must keep readable slugs; JIT sign-up needs .returning() or concurrent calls triple-count.

@@ -3,6 +3,9 @@
  */
 
 import { getFallbackToken } from "./github/replitConnection";
+import { createLogger } from "./lib/logger";
+
+const logger = createLogger("github");
 
 interface GitHubRepo {
   id: number;
@@ -88,7 +91,7 @@ export async function fetchAwesomeLists(page = 1, perPage = 30): Promise<{
       hasMore: page < Math.floor(Math.min(data.total_count, 1000) / perPage),
     };
   } catch (error) {
-    console.error('Error fetching awesome lists:', error);
+    logger.error('Error fetching awesome lists:', error);
     throw error;
   }
 }
@@ -145,7 +148,7 @@ export async function searchAwesomeLists(query: string, page = 1): Promise<{
       hasMore: page * 20 < data.total_count,
     };
   } catch (error) {
-    console.error('Error searching awesome lists:', error);
+    logger.error('Error searching awesome lists:', error);
     throw error;
   }
 }

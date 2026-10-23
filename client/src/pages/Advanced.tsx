@@ -28,6 +28,7 @@ import {
 import { AwesomeList } from "@/types/awesome-list";
 import { fetchStaticAwesomeList } from "@/lib/static-data";
 import { writeFilterParams, usePopstateParams } from "@/lib/url-filter-state";
+import { trackToolTabOpened } from "@/lib/analytics";
 import { queryUnavailableReason } from "@/lib/query-availability";
 import "@/styles/pages/discovery-tools.css";
 
@@ -54,6 +55,7 @@ export default function Advanced() {
       : "overview";
   });
   const handleTabChange = (next: string) => {
+    if (next !== tab) trackToolTabOpened("advanced", next);
     setTab(next);
     // audit2 BUG-036: ?sub= only means anything on the Metrics tab — reset
     // the inner selection and drop the param when the outer tab changes.

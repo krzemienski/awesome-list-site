@@ -47,6 +47,9 @@ import { join } from "node:path";
 import { createInterface } from "node:readline";
 import pg from "pg";
 import { Client as ObjectStorageClient } from "@replit/object-storage";
+import { createLogger } from "../lib/logger";
+
+const logger = createLogger("backup");
 
 export const BACKUP_FORMAT_VERSION = 1;
 /** Platform-owned schema on the managed production database; not app data. */
@@ -395,11 +398,14 @@ export async function createDatabaseBackup(options: {
   if (!databaseUrl) throw new DatabaseBackupError("DATABASE_URL is not set.");
   if (backupInFlight) throw new DatabaseBackupError("A database backup is already running.", 409);
   backupInFlight = true;
+  let backupId: string | undefined;
   try {
     const storage = resolveStorage();
     const environment = backupEnvironment();
     const startedAt = new Date();
     const id = newBackupId(startedAt);
+    backupId = id;
+    logger.info("Database backup started", { backupId: id, environment });
     const pgDumpVersion = (await runTool("pg_dump", ["--version"])).trim();
 
     const { database, serverVersion, inventory } = await withClient(databaseUrl, async (client) => {
@@ -455,8 +461,21 @@ export async function createDatabaseBackup(options: {
         await storage.client.uploadFromText(`${storage.prefix}${id}.manifest.json`, JSON.stringify(manifest, null, 2)),
         "manifest upload",
       );
+      logger.info("Database backup finished", {
+        backupId: id,
+        bytes: size,
+        tables: tables.length,
+        rows: manifest.coverage.totalRows,
+        ms: manifest.durationMs,
+      });
       return manifest;
     });
+  } catch (error) {
+    logger.error("Database backup failed; nothing was stored", {
+      backupId,
+      reason: redact(error instanceof Error ? error.message : String(error)),
+    });
+    throw error;
   } finally {
     backupInFlight = false;
   }

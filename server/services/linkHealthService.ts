@@ -5,6 +5,9 @@ import { desc, eq, ne, and, inArray, lt, sql } from "drizzle-orm";
 import { storage } from "../storage";
 import { checkResourceLinks, browserVerifyLink, type LinkCheckResult } from "../validation/linkChecker";
 import { runHeavyWork } from "../ops/heavyWork";
+import { createLogger } from "../lib/logger";
+
+const logger = createLogger("link-health");
 
 const scanControllers = new Map<number, AbortController>();
 
@@ -76,7 +79,7 @@ export const linkHealthService = {
       .where(inArray(linkHealthJobs.status, ['pending', 'processing']))
       .returning({ id: linkHealthJobs.id });
     if (interrupted.length > 0) {
-      console.log(`[LinkHealth] Marked ${interrupted.length} interrupted job(s) as failed after restart: ${interrupted.map(j => j.id).join(', ')}`);
+      logger.info(`Marked ${interrupted.length} interrupted job(s) as failed after restart: ${interrupted.map(j => j.id).join(', ')}`);
     }
   },
 
@@ -159,8 +162,9 @@ export const linkHealthService = {
     });
 
     scanControllers.set(row.id, new AbortController());
+    logger.info('Link scan started', { jobId: row.id });
     this.runCheckInBackground(row.id).catch(err => {
-      console.error('[LinkHealth] Background check failed:', err);
+      logger.error('Link scan failed', { jobId: row.id }, err);
     });
 
     return jobRowToApi(row);
@@ -204,7 +208,7 @@ export const linkHealthService = {
             db.update(linkHealthJobs)
               .set({ checkedLinks: checked })
               .where(and(eq(linkHealthJobs.id, jobId), eq(linkHealthJobs.status, 'processing')))
-              .catch(err => console.error('[LinkHealth] Progress write failed:', err.message));
+              .catch(err => logger.error('Progress write failed:', err.message));
           }
         }
       });
@@ -215,7 +219,7 @@ export const linkHealthService = {
         .from(linkHealthJobs)
         .where(eq(linkHealthJobs.id, jobId));
       if (!current || current.status !== 'processing') {
-        console.log(`[LinkHealth] Job ${jobId} is no longer processing (${current?.status ?? 'gone'}); discarding results`);
+        logger.info(`Job ${jobId} is no longer processing (${current?.status ?? 'gone'}); discarding results`);
         return;
       }
 
@@ -232,7 +236,7 @@ export const linkHealthService = {
         const s = statuses.get(r)!;
         return s === 'broken' || s === 'timeout' || s === 'dns_failure';
       });
-      console.log(`[LinkHealth] Job ${jobId}: pass 1 flagged ${toVerify.length} link(s); starting browser-UA verification pass`);
+      logger.info(`Job ${jobId}: pass 1 flagged ${toVerify.length} link(s); starting browser-UA verification pass`);
       const verdicts = new Map<LinkCheckResult, string>();
       const VERIFY_CONC = 10;
       let verified = 0;
@@ -256,7 +260,7 @@ export const linkHealthService = {
         verified += batch.length;
         // Reuse checkedLinks-style progress logging (throttled by batch).
         if (verified % 50 < VERIFY_CONC) {
-          console.log(`[LinkHealth] Job ${jobId}: verification pass ${verified}/${toVerify.length}`);
+          logger.info(`Job ${jobId}: verification pass ${verified}/${toVerify.length}`);
         }
       }
 
@@ -266,7 +270,7 @@ export const linkHealthService = {
         .from(linkHealthJobs)
         .where(eq(linkHealthJobs.id, jobId));
       if (!afterVerify || afterVerify.status !== 'processing') {
-        console.log(`[LinkHealth] Job ${jobId} is no longer processing after verification pass; discarding results`);
+        logger.info(`Job ${jobId} is no longer processing after verification pass; discarding results`);
         return;
       }
 
@@ -329,7 +333,7 @@ export const linkHealthService = {
       // checks are ever served, and each scan writes ~1,800 rows.
       await tx.delete(linkHealthChecks).where(lt(linkHealthChecks.jobId, jobId));
 
-      console.log(`[LinkHealth] Check completed for job ${jobId}: ${healthyCount} healthy, ${suspectCount} suspect, ${brokenCount} broken, ${redirectCount} redirects, ${timeoutCount} timeouts out of ${report.totalLinks} total (verification pass cleared ${toVerify.length - (brokenCount + timeoutCount)} bot-block false positives)`);
+      logger.info({ jobId }, `Link scan finished: ${healthyCount} healthy, ${suspectCount} suspect, ${brokenCount} broken, ${redirectCount} redirects, ${timeoutCount} timeouts out of ${report.totalLinks} total (verification pass cleared ${toVerify.length - (brokenCount + timeoutCount)} bot-block false positives)`);
       });
       })();
     } catch (err: any) {
@@ -342,7 +346,7 @@ export const linkHealthService = {
           completedAt: new Date(),
         })
         .where(and(eq(linkHealthJobs.id, jobId), eq(linkHealthJobs.status, 'processing')))
-        .catch(e => console.error('[LinkHealth] Failed to mark job failed:', e.message));
+        .catch(e => logger.error('Failed to mark job failed:', e.message));
       throw err;
     } finally {
       scanControllers.delete(jobId);

@@ -36,6 +36,9 @@ import {
   buildValidationEnvelope,
   normalizeValidationBody,
 } from "../contracts/envelope";
+import { createLogger } from "../lib/logger";
+
+const logger = createLogger("errors");
 
 /**
  * Centralized error handling middleware for Express
@@ -74,7 +77,7 @@ export function errorHandler(
     res.status(400).json(
       normalizeValidationBody({ message: "Invalid JSON payload" }),
     );
-    console.log("Client error (400): malformed JSON body");
+    logger.warn("Request rejected", { status: 400, reason: "malformed JSON body" });
     return;
   }
 
@@ -85,7 +88,7 @@ export function errorHandler(
     res.status(413).json(
       normalizeValidationBody({ message: "Request body too large" }),
     );
-    console.log("Client error (413): request body too large");
+    logger.warn("Request rejected", { status: 413, reason: "request body too large" });
     return;
   }
 
@@ -100,7 +103,7 @@ export function errorHandler(
         message: "Request contains invalid characters",
       }),
     );
-    console.log("Client error (400): invalid byte sequence for PG (22021)");
+    logger.warn("Request rejected", { status: 400, reason: "invalid byte sequence (PG 22021)" });
     return;
   }
 
@@ -109,7 +112,8 @@ export function errorHandler(
       .status(503)
       .set("Retry-After", "1")
       .json({ message: "Database is temporarily unavailable" });
-    console.error("Operational database error:", {
+    logger.error("Database unavailable", {
+      status: 503,
       code: (err as any)?.code ?? (err as any)?.cause?.code ?? "timeout",
     });
     return;
@@ -122,8 +126,9 @@ export function errorHandler(
       .status(validationError.statusCode)
       .json(buildValidationEnvelope(err, validationError.message));
 
-    console.error("Validation error:", {
-      message: validationError.message,
+    logger.warn("Request rejected", {
+      status: validationError.statusCode,
+      reason: "validation failed",
       errors: err.issues.map((issue) => ({
         path: issue.path,
         message: issue.message,
@@ -154,24 +159,16 @@ export function errorHandler(
 
     // Only log non-client errors (5xx) as errors
     if (err.statusCode >= 500) {
-      console.error("Application error:", {
-        message: err.message,
-        statusCode: err.statusCode,
-        stack: err.stack,
-      });
+      logger.error("Request failed", { status: err.statusCode }, err);
     } else {
-      console.log(`Client error (${err.statusCode}):`, err.message);
+      logger.warn("Request rejected", { status: err.statusCode, reason: err.message });
     }
 
     return;
   }
 
   // Handle unknown/unexpected errors (non-operational)
-  console.error("Unexpected error:", {
-    message: err.message,
-    stack: err.stack,
-    error: err,
-  });
+  logger.error("Unexpected error", { status: 500 }, err);
 
   // Don't leak error details in production for unknown errors
   res.status(500).json({ message: "Internal Server Error" });

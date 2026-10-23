@@ -45,6 +45,9 @@ import {
   PUBLIC_API_KEYED_CACHE_CONTROL,
 } from "../http-cache-policy";
 import { asyncHandler } from "../middleware/asyncHandler";
+import { createLogger } from "../lib/logger";
+
+const logger = createLogger("public-api");
 
 /**
  * Responses differ by the Authorization header (valid key → own bucket,
@@ -227,7 +230,7 @@ export function registerPublicApiRoutes(app: Express): void {
         resources: (result.resources ?? []).map(stripInternalResourceFields),
       });
     } catch (error) {
-      console.error('Error fetching public resources:', error);
+      logger.error('Error fetching public resources:', error);
       res.status(500).json({ message: 'Failed to fetch resources' });
     }
   }));
@@ -322,7 +325,7 @@ export function registerPublicApiRoutes(app: Express): void {
       res.set('Cache-Control', publicApiCacheControl(req));
       res.json(stripInternalResourceFields(resource));
     } catch (error) {
-      console.error('Error fetching public resource:', error);
+      logger.error('Error fetching public resource:', error);
       res.status(500).json({ message: 'Failed to fetch resource' });
     }
   }));
@@ -375,7 +378,7 @@ export function registerPublicApiRoutes(app: Express): void {
       res.set('Cache-Control', publicApiCacheControl(req));
       res.json({ categories });
     } catch (error) {
-      console.error('Error fetching public categories:', error);
+      logger.error('Error fetching public categories:', error);
       res.status(500).json({ message: 'Failed to fetch categories' });
     }
   }));
@@ -428,7 +431,7 @@ export function registerPublicApiRoutes(app: Express): void {
       res.set('Cache-Control', publicApiCacheControl(req));
       res.json(payload);
     } catch (error) {
-      console.error('Error fetching public tags:', error);
+      logger.error('Error fetching public tags:', error);
       res.status(500).json({ message: 'Failed to fetch tags' });
     }
   }));

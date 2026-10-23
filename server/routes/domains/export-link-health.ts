@@ -118,6 +118,9 @@ import type {
   LegacyRepository,
 } from "../../repositories";
 import { asyncHandler } from "../../middleware/asyncHandler";
+import { createLogger } from "../../lib/logger";
+
+const logger = createLogger("admin-ops");
 /**
  * Explicit dependency context for the export/link-health/GitHub-sync routes
  * and the public awesome-list/discovery routes. Everything the handlers need —
@@ -198,7 +201,7 @@ export function registerExportLinkHealthRoutes(
       
       res.json(result);
     } catch (error) {
-      console.error('Error configuring GitHub repository:', error);
+      logger.error('Error configuring GitHub repository:', error);
       res.status(500).json({ message: 'Failed to configure GitHub repository' });
     }
   }));
@@ -237,7 +240,7 @@ export function registerExportLinkHealthRoutes(
         await githubSyncRepo.updateGithubSyncStatus(queueItem.id, 'processing');
         try {
           const result = await syncService.importFromGitHub(repositoryUrl, options, { queueRowOwnedByCaller: true });
-          console.log('GitHub import completed:', result);
+          logger.info('GitHub import completed:', result);
           const completed = result.errors.length === 0 || result.imported > 0 || result.updated > 0;
           await githubSyncRepo.updateGithubSyncStatus(
             queueItem.id,
@@ -254,7 +257,7 @@ export function registerExportLinkHealthRoutes(
             result.branch,
           );
         } catch (error) {
-          console.error('GitHub import failed:', error);
+          logger.error('GitHub import failed:', error);
           await githubSyncRepo.updateGithubSyncStatus(
             queueItem.id,
             'failed',
@@ -270,7 +273,7 @@ export function registerExportLinkHealthRoutes(
         status: 'processing'
       });
     } catch (error) {
-      console.error('Error starting GitHub import:', error);
+      logger.error('Error starting GitHub import:', error);
       if (queueItemId !== undefined) {
         await githubSyncRepo.updateGithubSyncStatus(
           queueItemId,
@@ -327,7 +330,7 @@ export function registerExportLinkHealthRoutes(
         try {
           const result = await syncService.exportToGitHub(repositoryUrl, { ...options, queueId: queueItem.id });
           if (result.errors.length > 0) {
-            console.error('GitHub export failed:', result.errors);
+            logger.error('GitHub export failed:', result.errors);
             // A failure after the commit landed keeps that commit's identity on
             // this run's row, so the panel can say the commit is on GitHub.
             await githubSyncRepo.updateGithubSyncStatus(
@@ -341,14 +344,14 @@ export function registerExportLinkHealthRoutes(
             );
             return;
           }
-          console.log('GitHub export completed:', result);
+          logger.info('GitHub export completed:', result);
           await githubSyncRepo.updateGithubSyncStatus(queueItem.id, 'completed', undefined, {
             exported: result.exported,
             commitSha: result.commitSha,
             commitUrl: result.commitUrl
           }, result.branch);
         } catch (error) {
-          console.error('GitHub export failed:', error);
+          logger.error('GitHub export failed:', error);
           await githubSyncRepo.updateGithubSyncStatus(
             queueItem.id,
             'failed',
@@ -364,7 +367,7 @@ export function registerExportLinkHealthRoutes(
         status: 'processing'
       });
     } catch (error) {
-      console.error('Error starting GitHub export:', error);
+      logger.error('Error starting GitHub export:', error);
       if (queueItemId !== undefined) {
         await githubSyncRepo.updateGithubSyncStatus(
           queueItemId,
@@ -484,7 +487,7 @@ export function registerExportLinkHealthRoutes(
         })
       });
     } catch (error) {
-      console.error('Error fetching sync status:', error);
+      logger.error('Error fetching sync status:', error);
       res.status(500).json({ message: 'Failed to fetch sync status' });
     }
   }));
@@ -502,7 +505,7 @@ export function registerExportLinkHealthRoutes(
       
       res.json(item);
     } catch (error) {
-      console.error('Error fetching sync item:', error);
+      logger.error('Error fetching sync item:', error);
       res.status(500).json({ message: 'Failed to fetch sync item' });
     }
   }));
@@ -607,7 +610,7 @@ export function registerExportLinkHealthRoutes(
         new Date(b.createdAt!).getTime() - new Date(a.createdAt!).getTime()
       ));
     } catch (error) {
-      console.error('Error fetching sync history:', error);
+      logger.error('Error fetching sync history:', error);
       res.status(500).json({ message: 'Failed to fetch sync history' });
     }
   }));
@@ -618,7 +621,7 @@ export function registerExportLinkHealthRoutes(
       // Acquire bounded heavy-work capacity before acknowledging the job.
       await startHeavyWork('github-sync', async () => {
         await syncService.processQueue();
-        console.log('GitHub sync queue processing completed');
+        logger.info('GitHub sync queue processing completed');
       });
       
       res.json({
@@ -626,7 +629,7 @@ export function registerExportLinkHealthRoutes(
         status: 'processing'
       });
     } catch (error) {
-      console.error('Error starting queue processing:', error);
+      logger.error('Error starting queue processing:', error);
       sendOperationalFailure(res, error, 'Failed to start queue processing');
     }
   }));
@@ -673,7 +676,7 @@ export function registerExportLinkHealthRoutes(
       
       res.send(markdown);
     } catch (error) {
-      console.error('Error generating awesome list export:', error);
+      logger.error('Error generating awesome list export:', error);
       sendOperationalFailure(res, error, 'Failed to generate awesome list export');
     }
   }));
@@ -714,7 +717,7 @@ export function registerExportLinkHealthRoutes(
       res.set('Content-Disposition', `attachment; filename="resources-export-${new Date().toISOString().slice(0, 10)}.csv"`);
       res.send(lines.join('\r\n') + '\r\n');
     } catch (error) {
-      console.error('Error generating CSV export:', error);
+      logger.error('Error generating CSV export:', error);
       sendOperationalFailure(res, error, 'Failed to generate CSV export');
     }
   }));
@@ -805,7 +808,7 @@ export function registerExportLinkHealthRoutes(
       res.set('Content-Disposition', `attachment; filename="awesome-video-categories-${new Date().toISOString().slice(0, 10)}.opml"`);
       res.send(body);
     } catch (error) {
-      console.error('Error generating OPML export:', error);
+      logger.error('Error generating OPML export:', error);
       sendOperationalFailure(res, error, 'Failed to generate OPML export');
     }
   }));
@@ -963,7 +966,7 @@ export function registerExportLinkHealthRoutes(
       
       res.json(exportData);
     } catch (error) {
-      console.error('Error generating JSON export:', error);
+      logger.error('Error generating JSON export:', error);
       sendOperationalFailure(res, error, 'Failed to generate JSON export');
     }
   }));
@@ -1034,7 +1037,7 @@ export function registerExportLinkHealthRoutes(
         backups: backups.map(summarizeBackup),
       });
     } catch (error) {
-      console.error('Error listing database backups:', error);
+      logger.error('Error listing database backups:', error);
       sendBackupFailure(res, error, 'Failed to list database backups');
     }
   }));
@@ -1062,7 +1065,7 @@ export function registerExportLinkHealthRoutes(
       res.set('Cache-Control', 'no-store');
       res.status(201).json(summarizeBackup(manifest));
     } catch (error) {
-      console.error('Error creating database backup:', error);
+      logger.error('Error creating database backup:', error);
       sendBackupFailure(res, error, 'Failed to create database backup');
     }
   }));
@@ -1109,7 +1112,7 @@ export function registerExportLinkHealthRoutes(
         report: formatValidationReport(validationResult)
       });
     } catch (error) {
-      console.error('Error validating awesome list:', error);
+      logger.error('Error validating awesome list:', error);
       sendOperationalFailure(res, error, 'Failed to validate awesome list');
     }
   }));
@@ -1132,7 +1135,7 @@ export function registerExportLinkHealthRoutes(
         res.status(409).json({ success: false, started: false, message: error.message, job, scope: 'stored-approved-resource-urls' });
       }
     } catch (error) {
-      console.error('Error starting export link check:', error);
+      logger.error('Error starting export link check:', error);
       sendOperationalFailure(res, error, 'Failed to start link check');
     }
   }));
@@ -1150,7 +1153,7 @@ export function registerExportLinkHealthRoutes(
         lastUpdated: validationResults?.lastUpdated ?? null,
       });
     } catch (error) {
-      console.error('Error fetching validation status:', error);
+      logger.error('Error fetching validation status:', error);
       sendOperationalFailure(res, error, 'Failed to fetch validation status');
     }
   }));
@@ -1164,7 +1167,7 @@ export function registerExportLinkHealthRoutes(
       const job = await linkHealthService.getLatestJob();
       res.json({ success: true, job: job || null });
     } catch (error) {
-      console.error('Error fetching link health status:', error);
+      logger.error('Error fetching link health status:', error);
       sendOperationalFailure(res, error, 'Failed to fetch link health status');
     }
   }));
@@ -1176,7 +1179,7 @@ export function registerExportLinkHealthRoutes(
       const job = await linkHealthService.startCheck();
       res.json({ success: true, job });
     } catch (error: any) {
-      console.error('Error starting link health check:', error);
+      logger.error('Error starting link health check:', error);
       if (error.message?.includes('already running')) {
         return res.status(409).json({ success: false, message: error.message });
       }
@@ -1204,7 +1207,7 @@ export function registerExportLinkHealthRoutes(
       }
       res.json({ success: true, job });
     } catch (error) {
-      console.error('Error cancelling link health job:', error);
+      logger.error('Error cancelling link health job:', error);
       sendOperationalFailure(res, error, 'Failed to cancel link health job');
     }
   }));
@@ -1216,7 +1219,7 @@ export function registerExportLinkHealthRoutes(
       const history = await linkHealthService.getJobHistory();
       res.json({ success: true, jobs: history });
     } catch (error) {
-      console.error('Error fetching link health history:', error);
+      logger.error('Error fetching link health history:', error);
       sendOperationalFailure(res, error, 'Failed to fetch link health history');
     }
   }));
@@ -1229,7 +1232,7 @@ export function registerExportLinkHealthRoutes(
       const brokenLinks = await linkHealthService.getBrokenLinks(filter);
       res.json({ success: true, checks: brokenLinks });
     } catch (error) {
-      console.error('Error fetching broken links:', error);
+      logger.error('Error fetching broken links:', error);
       sendOperationalFailure(res, error, 'Failed to fetch broken links');
     }
   }));
@@ -1241,7 +1244,7 @@ export function registerExportLinkHealthRoutes(
   // - Manual admin intervention when needed
   app.post('/api/admin/seed-database', isAuthenticated, isAdmin, asyncHandler(async (req, res) => {
     try {
-      console.log('Starting manual database seeding...');
+      logger.info('Starting manual database seeding...');
       
       // Get options from request body
       const { clearExisting = false } = req.body;
@@ -1267,7 +1270,7 @@ export function registerExportLinkHealthRoutes(
         totalErrors: result.errors.length
       });
     } catch (error: any) {
-      console.error('Error seeding database:', error);
+      logger.error('Error seeding database:', error);
       if (error instanceof SeedAbortedError) {
         // Nothing was committed; the message says why and that the catalog
         // is unchanged, so the admin sees the real reason.
@@ -1295,7 +1298,7 @@ export function registerExportLinkHealthRoutes(
         return res.status(400).json({ message: 'Repository URL is required' });
       }
 
-      console.log(`Starting GitHub import from: ${repoUrl}`);
+      logger.info(`Starting GitHub import from: ${repoUrl}`);
       
       // Use the sync service to import
       const result = await runHeavyWork(
@@ -1303,7 +1306,7 @@ export function registerExportLinkHealthRoutes(
         () => syncService.importFromGitHub(repoUrl, { dryRun, strictMode }),
       );
       
-      console.log(`GitHub import completed: ${result.imported} imported, ${result.updated} updated, ${result.skipped} skipped`);
+      logger.info(`GitHub import completed: ${result.imported} imported, ${result.updated} updated, ${result.skipped} skipped`);
       
       // F13: awesome-lint is informational on import (syncService never
       // blocks on it), so a lint-invalid list may already have written rows.
@@ -1332,7 +1335,7 @@ export function registerExportLinkHealthRoutes(
           : `${outcome === 'partial' ? 'Partial import' : 'Import failed'} from ${repoUrl}: ${result.imported} imported, ${result.updated} updated, ${result.errors.length} failed`
       });
     } catch (error: any) {
-      console.error('Error importing from GitHub:', error);
+      logger.error('Error importing from GitHub:', error);
       if (
         error instanceof ServiceUnavailableError ||
         isDatabaseUnavailableError(error)
@@ -1374,7 +1377,7 @@ export function registerExportLinkHealthRoutes(
         coveragePct: approvedTotal > 0 ? Math.round((tagged / approvedTotal) * 1000) / 10 : 0,
       });
     } catch (error) {
-      console.error('Error computing tag coverage:', error);
+      logger.error('Error computing tag coverage:', error);
       res.status(500).json({ message: 'Failed to compute tag coverage' });
     }
   }));
@@ -1409,7 +1412,7 @@ export function registerExportLinkHealthRoutes(
       });
       res.json({ backfilled, remainingNull: (remaining.rows as any[])[0].n });
     } catch (error) {
-      console.error('Error backfilling approved_at:', error);
+      logger.error('Error backfilling approved_at:', error);
       res.status(500).json({ message: 'Failed to backfill approved_at' });
     }
   }));
@@ -1467,7 +1470,7 @@ export function registerExportLinkHealthRoutes(
       if (resourcesUpdated > 0) invalidatePublicCache('resource-mutation');
       res.json({ variantFamiliesFound: variantFamilies, pluralMerges, resourcesUpdated });
     } catch (error) {
-      console.error('Error canonicalizing tags:', error);
+      logger.error('Error canonicalizing tags:', error);
       res.status(500).json({ message: 'Failed to canonicalize tags' });
     }
   }));
@@ -1603,7 +1606,7 @@ export function registerAwesomeListDiscoveryRoutes(
             // keeps `resources` in its original position, so cached and
             // uncached bodies are byte-identical for the same filter set.
             const body = JSON.stringify({ ...data, resources: filteredResources });
-            console.log(
+            logger.info(
               `📊 /api/awesome-list rebuild [${variantKey}]: ${filteredResources.length} resources, ${data.categories.length} categories`,
             );
             return {
@@ -1624,7 +1627,7 @@ export function registerAwesomeListDiscoveryRoutes(
       // deliberately not server-cached (unbounded key space).
       const data = await legacyRepo.getAwesomeListFromDatabase();
       if (!data?.resources?.length) {
-        console.warn('⚠️ No resources in database - database may need seeding');
+        logger.warn('⚠️ No resources in database - database may need seeding');
         return res.status(500).json({ message: 'No awesome list data available' });
       }
 
@@ -1637,7 +1640,7 @@ export function registerAwesomeListDiscoveryRoutes(
         filteredResources = filteredResources.filter((resource: any) => 
           resource.category === categoryTitle
         );
-        console.log(`📁 Filtered by category "${categoryTitle}": ${filteredResources.length} resources`);
+        logger.info(`📁 Filtered by category "${categoryTitle}": ${filteredResources.length} resources`);
       }
 
       if (subcategory) {
@@ -1646,7 +1649,7 @@ export function registerAwesomeListDiscoveryRoutes(
         filteredResources = filteredResources.filter((resource: any) => 
           resource.subcategory === subcategoryTitle
         );
-        console.log(`📂 Filtered by subcategory "${subcategoryTitle}": ${filteredResources.length} resources`);
+        logger.info(`📂 Filtered by subcategory "${subcategoryTitle}": ${filteredResources.length} resources`);
       }
 
       if (subSubcategory) {
@@ -1655,7 +1658,7 @@ export function registerAwesomeListDiscoveryRoutes(
         filteredResources = filteredResources.filter((resource: any) => 
           resource.subSubcategory === subSubcategoryTitle
         );
-        console.log(`🎯 Filtered by sub-subcategory "${subSubcategoryTitle}": ${filteredResources.length} resources`);
+        logger.info(`🎯 Filtered by sub-subcategory "${subSubcategoryTitle}": ${filteredResources.length} resources`);
       }
 
       // Return filtered data
@@ -1664,12 +1667,12 @@ export function registerAwesomeListDiscoveryRoutes(
         resources: filteredResources
       };
       
-      console.log(`📊 /api/awesome-list: ${filteredResources.length} resources, ${data.categories.length} categories`);
+      logger.info(`📊 /api/awesome-list: ${filteredResources.length} resources, ${data.categories.length} categories`);
       // Task #327 cache contract: see server/http-cache-policy.ts.
       res.set('Cache-Control', UNCACHED_CATALOG_CACHE_CONTROL);
       res.json(filteredData);
     } catch (error) {
-      console.error('Error processing awesome list:', error);
+      logger.error('Error processing awesome list:', error);
       sendOperationalFailure(res, error, 'Failed to process awesome list');
     }
   }));
@@ -1751,7 +1754,7 @@ export function registerAwesomeListDiscoveryRoutes(
       }
       return res.type('application/json').send(payload.body);
     } catch (error) {
-      console.error('Error building awesome-list nav:', error);
+      logger.error('Error building awesome-list nav:', error);
       sendOperationalFailure(res, error, 'Failed to build navigation tree');
     }
   }));
@@ -1925,7 +1928,7 @@ export function registerAwesomeListDiscoveryRoutes(
       if (req.headers["if-none-match"] === etag) return res.status(304).end();
       return res.type("application/json").send(body);
     } catch (error) {
-      console.error("Error building awesome-list listing:", error);
+      logger.error("Error building awesome-list listing:", error);
       sendOperationalFailure(res, error, "Failed to build taxonomy listing");
     }
   }));
@@ -1942,7 +1945,7 @@ export function registerAwesomeListDiscoveryRoutes(
       const result = await fetchAwesomeLists(page, perPage);
       res.json(result);
     } catch (error) {
-      console.error('Error fetching awesome lists from GitHub:', error);
+      logger.error('Error fetching awesome lists from GitHub:', error);
       res.status(500).json({ message: 'Failed to fetch awesome lists' });
     }
   }));
@@ -1963,7 +1966,7 @@ export function registerAwesomeListDiscoveryRoutes(
       const result = await searchAwesomeLists(query, page);
       res.json(result);
     } catch (error) {
-      console.error('Error searching awesome lists:', error);
+      logger.error('Error searching awesome lists:', error);
       res.status(500).json({ message: 'Failed to search awesome lists' });
     }
   }));

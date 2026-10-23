@@ -3,6 +3,9 @@ import type { Request, Response, NextFunction } from 'express';
 import fs from 'fs';
 import path from 'path';
 import { storage } from './storage';
+import { createLogger } from "./lib/logger";
+
+const logger = createLogger("ssr");
 
 export async function setupSSRDev(vite: ViteDevServer) {
   return async function ssrMiddleware(req: Request, res: Response, next: NextFunction) {
@@ -54,7 +57,7 @@ export async function setupSSRDev(vite: ViteDevServer) {
       res.status(200).set({ 'Content-Type': 'text/html' }).end(template);
     } catch (error) {
       // If SSR fails, let Vite handle it normally
-      console.error('SSR error:', error);
+      logger.error('SSR error:', error);
       vite.ssrFixStacktrace(error as Error);
       next(error);
     }

@@ -84,6 +84,9 @@ import type {
   AdminRepository,
 } from "../../repositories";
 import { asyncHandler } from "../../middleware/asyncHandler";
+import { createLogger } from "../../lib/logger";
+
+const logger = createLogger("admin");
 
 // Every value resources.status can hold (shared/schema.ts resources.status).
 const ADMIN_RESOURCE_STATUSES = ['approved', 'pending', 'rejected', 'withdrawn', 'archived'];
@@ -183,7 +186,7 @@ export function registerAdminContentRoutes(
         totalRejected: stats.totalRejected,
       });
     } catch (error) {
-      console.error('Error fetching admin stats:', error);
+      logger.error('Error fetching admin stats:', error);
       res.status(500).json({ message: 'Failed to fetch admin statistics' });
     }
   }));
@@ -222,7 +225,7 @@ export function registerAdminContentRoutes(
       const sanitizedUsers = result.users.map((u) => sanitizeUser(u));
       res.json({ ...result, users: sanitizedUsers });
     } catch (error) {
-      console.error('Error fetching users:', error);
+      logger.error('Error fetching users:', error);
       res.status(500).json({ message: 'Failed to fetch users' });
     }
   }));
@@ -277,7 +280,7 @@ export function registerAdminContentRoutes(
       res.set('Content-Disposition', `attachment; filename="users-export-${new Date().toISOString().slice(0, 10)}.csv"`);
       res.send(lines.join('\r\n') + '\r\n');
     } catch (error) {
-      console.error('Error exporting users:', error);
+      logger.error('Error exporting users:', error);
       res.status(500).json({ message: 'Failed to export users' });
     }
   }));
@@ -319,7 +322,7 @@ export function registerAdminContentRoutes(
       }
       res.json(sanitizeUser(updated));
     } catch (error) {
-      console.error('Error updating user name:', error);
+      logger.error('Error updating user name:', error);
       res.status(500).json({ message: 'Failed to update user name' });
     }
   }));
@@ -351,7 +354,7 @@ export function registerAdminContentRoutes(
       // including the bcrypt hash. Field-whitelist serializer only.
       res.json(sanitizeUser(user));
     } catch (error) {
-      console.error('Error updating user role:', error);
+      logger.error('Error updating user role:', error);
       res.status(500).json({ message: 'Failed to update user role' });
     }
   }));
@@ -379,7 +382,7 @@ export function registerAdminContentRoutes(
       try {
         clerk = await deleteClerkIdentity(targetId);
       } catch (clerkError) {
-        console.error('Error deleting Clerk identity for user:', clerkError);
+        logger.error('Error deleting Clerk identity for user:', clerkError);
         return res.status(502).json({
           message: 'Could not delete the sign-in identity. Nothing was deleted; try again.',
         });
@@ -399,7 +402,7 @@ export function registerAdminContentRoutes(
         ...summary,
       });
     } catch (error) {
-      console.error('Error deleting user:', error);
+      logger.error('Error deleting user:', error);
       res.status(500).json({ message: 'Failed to delete user' });
     }
   }));
@@ -477,7 +480,7 @@ export function registerAdminContentRoutes(
       ]);
       res.json({ logs, total, limit, offset });
     } catch (error) {
-      console.error('Error fetching audit logs:', error);
+      logger.error('Error fetching audit logs:', error);
       res.status(500).json({ message: 'Failed to fetch audit logs' });
     }
   }));
@@ -491,7 +494,7 @@ export function registerAdminContentRoutes(
       
       res.json(result);
     } catch (error) {
-      console.error('Error fetching pending resources:', error);
+      logger.error('Error fetching pending resources:', error);
       res.status(500).json({ message: 'Failed to fetch pending resources' });
     }
   }));
@@ -521,10 +524,10 @@ export function registerAdminContentRoutes(
       }
       
       const updatedResource = await resourceRepo.approveResource(resourceId, userId);
-      
+      logger.info('Resource approved', { resourceId, admin: userId });
       res.json(updatedResource);
     } catch (error: any) {
-      console.error('Error approving resource:', error);
+      logger.error('Error approving resource:', error);
       if (error?.message?.includes('not pending approval')) {
         return res.status(409).json({ message: error.message });
       }
@@ -563,11 +566,12 @@ export function registerAdminContentRoutes(
       }
 
       await resourceRepo.rejectResource(resourceId, userId, rejection.data.reason);
+      logger.info('Resource rejected', { resourceId, admin: userId });
       const updatedResource = await resourceRepo.getResource(resourceId);
       
       res.json(updatedResource);
     } catch (error: any) {
-      console.error('Error rejecting resource:', error);
+      logger.error('Error rejecting resource:', error);
       if (error?.message?.includes('not pending approval')) {
         return res.status(409).json({ message: error.message });
       }
@@ -598,9 +602,10 @@ export function registerAdminContentRoutes(
       }
 
       const updatedResource = await resourceRepo.updateResourceStatus(resourceId, 'pending', userId);
+      logger.info('Resource moved back to pending', { resourceId, admin: userId });
       res.json(updatedResource);
     } catch (error: any) {
-      console.error('Error unapproving resource:', error);
+      logger.error('Error unapproving resource:', error);
       if (error?.message?.includes('not approved')) {
         return res.status(409).json({ message: error.message });
       }
@@ -747,7 +752,7 @@ export function registerAdminContentRoutes(
           message: 'Another resource already uses this URL. URLs must be unique.',
         });
       }
-      console.error('Error updating resource:', error);
+      logger.error('Error updating resource:', error);
       res.status(500).json({ message: 'Failed to update resource' });
     }
   }));
@@ -795,7 +800,7 @@ export function registerAdminContentRoutes(
         }
         res.json(updated);
       } catch (error) {
-        console.error('Error updating resource kind:', error);
+        logger.error('Error updating resource kind:', error);
         sendOperationalFailure(res, error, 'Failed to update resource kind');
       }
     }),
@@ -841,7 +846,7 @@ export function registerAdminContentRoutes(
         }
         res.json(updated);
       } catch (error) {
-        console.error('Error updating resource featured flag:', error);
+        logger.error('Error updating resource featured flag:', error);
         sendOperationalFailure(res, error, 'Failed to update resource featured flag');
       }
     }),
@@ -875,7 +880,7 @@ export function registerAdminContentRoutes(
       if (error instanceof Error && error.name === 'ResourceNotFoundError') {
         return res.status(404).json({ message: 'Resource not found' });
       }
-      console.error('Error deleting resource:', error);
+      logger.error('Error deleting resource:', error);
       sendOperationalFailure(res, error, 'Failed to delete resource');
     }
   }));
@@ -904,9 +909,10 @@ export function registerAdminContentRoutes(
         }
       }
 
+      logger[failed ? 'warn' : 'info']('Bulk approve finished', { requested: numericIds.length, succeeded, failed, admin: userId, firstFailure: failures[0]?.reason });
       res.status(succeeded === 0 ? 409 : failed ? 207 : 200).json({ message: bulkOutcomeMessage('approved', succeeded, failures), succeeded, failed, failures });
     } catch (error) {
-      console.error('Error in bulk approve:', error);
+      logger.error('Error in bulk approve:', error);
       sendOperationalFailure(res, error, 'Failed to bulk approve resources');
     }
   }));
@@ -933,9 +939,10 @@ export function registerAdminContentRoutes(
         }
       }
 
+      logger[failed ? 'warn' : 'info']('Bulk reject finished', { requested: numericIds.length, succeeded, failed, admin: userId, firstFailure: failures[0]?.reason });
       res.status(succeeded === 0 ? 409 : failed ? 207 : 200).json({ message: bulkOutcomeMessage('rejected', succeeded, failures), succeeded, failed, failures });
     } catch (error) {
-      console.error('Error in bulk reject:', error);
+      logger.error('Error in bulk reject:', error);
       sendOperationalFailure(res, error, 'Failed to bulk reject resources');
     }
   }));
@@ -964,7 +971,7 @@ export function registerAdminContentRoutes(
           await resourceRepo.deleteResource(id, userId);
           succeeded++;
         } catch (err) {
-          console.error(`Error deleting resource ${id} in bulk:`, err);
+          logger.error(`Error deleting resource ${id} in bulk:`, err);
           if (isDatabaseUnavailableError(err)) throw err;
           failed++;
           failures.push({
@@ -978,7 +985,7 @@ export function registerAdminContentRoutes(
 
       res.status(succeeded === 0 ? 409 : failed ? 207 : 200).json({ message: bulkOutcomeMessage('deleted', succeeded, failures), succeeded, failed, failures });
     } catch (error) {
-      console.error('Error in bulk delete:', error);
+      logger.error('Error in bulk delete:', error);
       sendOperationalFailure(res, error, 'Failed to bulk delete resources');
     }
   }));
@@ -1050,7 +1057,7 @@ export function registerAdminContentRoutes(
         totalPages: Math.ceil(result.total / limit)
       });
     } catch (error) {
-      console.error('Error fetching admin resources:', error);
+      logger.error('Error fetching admin resources:', error);
       res.status(500).json({ message: 'Failed to fetch resources' });
     }
   }));
@@ -1138,7 +1145,7 @@ export function registerAdminContentRoutes(
       if (isUniqueViolation(error, 'url')) {
         return res.status(409).json({ message: 'Another resource already uses this URL. URLs must be unique.' });
       }
-      console.error('Error creating resource:', error);
+      logger.error('Error creating resource:', error);
       res.status(500).json({ message: 'Failed to create resource' });
     }
   }));
@@ -1162,7 +1169,7 @@ export function registerAdminContentRoutes(
       
       res.json(editsWithResources);
     } catch (error) {
-      console.error('Error fetching pending edits:', error);
+      logger.error('Error fetching pending edits:', error);
       res.status(500).json({ message: 'Failed to fetch pending edits' });
     }
   }));
@@ -1185,7 +1192,7 @@ export function registerAdminContentRoutes(
       
       res.json({ message: 'Edit approved and merged successfully' });
     } catch (error: any) {
-      console.error('Error approving edit:', error);
+      logger.error('Error approving edit:', error);
       // Drizzle wraps PostgreSQL errors in cause; a URL race must remain a
       // useful conflict response, never leak SQL or change the pending edit.
       let cause = error;
@@ -1249,7 +1256,7 @@ export function registerAdminContentRoutes(
       
       res.json({ message: 'Edit rejected successfully' });
     } catch (error: any) {
-      console.error('Error rejecting edit:', error);
+      logger.error('Error rejecting edit:', error);
       if (error?.message?.includes('not pending')) {
         return res.status(409).json({ message: error.message });
       }
@@ -1347,7 +1354,7 @@ export function registerAdminContentRoutes(
           message: "Couldn't retrieve that URL — the site may be blocking automated access. You can fill in the details manually.",
         });
       }
-      console.error('Error analyzing URL:', error);
+      logger.error('Error analyzing URL:', error);
       res.status(500).json({ message: 'Failed to analyze URL' });
     }
   }));
@@ -1376,7 +1383,7 @@ export function registerAdminContentRoutes(
 
       res.json(categoriesWithCounts);
     } catch (error) {
-      console.error('Error fetching categories:', error);
+      logger.error('Error fetching categories:', error);
       res.status(500).json({ message: 'Failed to fetch categories' });
     }
   }));
@@ -1406,7 +1413,7 @@ export function registerAdminContentRoutes(
       
       res.status(201).json(newCategory);
     } catch (error) {
-      console.error('Error creating category:', error);
+      logger.error('Error creating category:', error);
       if (sendTaxonomyConflict(res, error)) return;
       
       if (error instanceof Error && error.message.includes('already exists')) {
@@ -1453,7 +1460,7 @@ export function registerAdminContentRoutes(
       
       res.json(updatedCategory);
     } catch (error) {
-      console.error('Error updating category:', error);
+      logger.error('Error updating category:', error);
       if (sendTaxonomyConflict(res, error)) return;
       res.status(500).json({ message: 'Failed to update category' });
     }
@@ -1496,7 +1503,7 @@ export function registerAdminContentRoutes(
       if (error instanceof ConflictError) {
         return res.status(409).json({ message: error.message });
       }
-      console.error('Error deleting category:', error);
+      logger.error('Error deleting category:', error);
       res.status(500).json({ message: 'Failed to delete category' });
     }
   }));
@@ -1521,7 +1528,7 @@ export function registerAdminContentRoutes(
       
       res.json(subcategoriesWithCounts);
     } catch (error) {
-      console.error('Error fetching subcategories:', error);
+      logger.error('Error fetching subcategories:', error);
       res.status(500).json({ message: 'Failed to fetch subcategories' });
     }
   }));
@@ -1573,7 +1580,7 @@ export function registerAdminContentRoutes(
       
       res.status(201).json(newSubcategory);
     } catch (error) {
-      console.error('Error creating subcategory:', error);
+      logger.error('Error creating subcategory:', error);
       if (sendTaxonomyConflict(res, error)) return;
       
       if (error instanceof Error && error.message.includes('already exists')) {
@@ -1643,7 +1650,7 @@ export function registerAdminContentRoutes(
       
       res.json(updatedSubcategory);
     } catch (error) {
-      console.error('Error updating subcategory:', error);
+      logger.error('Error updating subcategory:', error);
       if (sendTaxonomyConflict(res, error)) return;
       res.status(500).json({ message: 'Failed to update subcategory' });
     }
@@ -1686,7 +1693,7 @@ export function registerAdminContentRoutes(
       if (error instanceof ConflictError) {
         return res.status(409).json({ message: error.message });
       }
-      console.error('Error deleting subcategory:', error);
+      logger.error('Error deleting subcategory:', error);
       res.status(500).json({ message: 'Failed to delete subcategory' });
     }
   }));
@@ -1708,7 +1715,7 @@ export function registerAdminContentRoutes(
       
       res.json(subSubcategoriesWithCounts);
     } catch (error) {
-      console.error('Error fetching sub-subcategories:', error);
+      logger.error('Error fetching sub-subcategories:', error);
       res.status(500).json({ message: 'Failed to fetch sub-subcategories' });
     }
   }));
@@ -1758,7 +1765,7 @@ export function registerAdminContentRoutes(
       
       res.status(201).json(newSubSubcategory);
     } catch (error) {
-      console.error('Error creating sub-subcategory:', error);
+      logger.error('Error creating sub-subcategory:', error);
       if (sendTaxonomyConflict(res, error)) return;
       
       if (error instanceof Error && error.message.includes('already exists')) {
@@ -1812,7 +1819,7 @@ export function registerAdminContentRoutes(
       
       res.json(updatedSubSubcategory);
     } catch (error) {
-      console.error('Error updating sub-subcategory:', error);
+      logger.error('Error updating sub-subcategory:', error);
       if (sendTaxonomyConflict(res, error)) return;
       res.status(500).json({ message: 'Failed to update sub-subcategory' });
     }
@@ -1855,7 +1862,7 @@ export function registerAdminContentRoutes(
       if (error instanceof ConflictError) {
         return res.status(409).json({ message: error.message });
       }
-      console.error('Error deleting sub-subcategory:', error);
+      logger.error('Error deleting sub-subcategory:', error);
       res.status(500).json({ message: 'Failed to delete sub-subcategory' });
     }
   }));

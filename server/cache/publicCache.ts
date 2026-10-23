@@ -13,6 +13,9 @@
  */
 import { ServiceUnavailableError } from "../middleware/errors";
 import { afterCommit } from "../db";
+import { createLogger } from "../lib/logger";
+
+const logger = createLogger("public-cache");
 
 export const PUBLIC_CACHE_SCHEMA_VERSION = 1;
 
@@ -198,13 +201,7 @@ function clearPublicCache(reason: PublicCacheInvalidationReason): void {
   invalidations[reason]++;
   entries.clear();
   bytes = 0;
-  console.log(
-    JSON.stringify({
-      event: "ops.public_cache_invalidated",
-      reason,
-      generation,
-    }),
-  );
+  logger.info("Public cache cleared", { reason, generation });
 }
 
 export function getPublicCacheSnapshot() {

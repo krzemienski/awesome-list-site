@@ -66,6 +66,9 @@ import { registerContactRoutes } from "./routes/domains/contact";
 import { registerLinkReportRoutes } from "./routes/domains/link-reports";
 import { registerNonApiRoutes } from "./routes/non-api";
 import { registerOperationsRoutes } from "./routes/domains/operations";
+import { createLogger } from "./lib/logger";
+
+const logger = createLogger("routes");
 
 // One instance per repository for the full process. Domain routers receive
 // these through explicit contexts; none silently creates a parallel data path.
@@ -401,7 +404,7 @@ async function withRetry<T>(
         error.message?.includes("connection") ||
         error.message?.includes("ECONNREFUSED");
       if (attempt === maxRetries || !retryable) throw error;
-      console.log(
+      logger.info(
         `⏳ Database operation failed (attempt ${attempt}/${maxRetries}), retrying in ${delayMs}ms...`,
       );
       await new Promise((resolve) => setTimeout(resolve, delayMs));
@@ -413,10 +416,10 @@ async function withRetry<T>(
 
 export async function runBackgroundInitialization(): Promise<void> {
   const isProduction = process.env.NODE_ENV === "production";
-  console.log(
+  logger.info(
     `🔄 Running background initialization (${isProduction ? "production" : "development"} mode)...`,
   );
-  console.log("📊 Note: /api/awesome-list now serves from PostgreSQL database");
+  logger.info("📊 Note: /api/awesome-list now serves from PostgreSQL database");
 
   try {
     const { runOrphanWatchdogStartup, startOrphanWatchdogPeriodic } =
@@ -424,44 +427,44 @@ export async function runBackgroundInitialization(): Promise<void> {
     await runOrphanWatchdogStartup();
     startOrphanWatchdogPeriodic();
   } catch (error) {
-    console.error("Failed to import/run orphan watchdog (non-fatal):", error);
+    logger.error("Failed to import/run orphan watchdog (non-fatal):", error);
   }
 
   try {
-    console.log("Checking if database needs seeding...");
+    logger.info("Checking if database needs seeding...");
     const categories = await withRetry(() => categoryRepo.listCategories());
     const resourceCount = await withRetry(() =>
       resourceRepo.getResourceCount(),
     );
     const needsReseeding = categories.length === 0 && resourceCount === 0;
     if (needsReseeding) {
-      console.log(
+      logger.info(
         `📦 Database needs seeding (categories: ${categories.length}, resources: ${resourceCount})...`,
       );
-      console.log(
+      logger.info(
         `⚙️  Running database seeding in ${isProduction ? "production" : "development"} mode...`,
       );
       const result = await runHeavyWork("automatic-seed", () =>
         seedDatabase({ clearExisting: resourceCount > 0 }),
       );
-      console.log("✅ Auto-seeding completed successfully:");
-      console.log(`   - Categories: ${result.categoriesInserted}`);
-      console.log(`   - Subcategories: ${result.subcategoriesInserted}`);
-      console.log(`   - Sub-subcategories: ${result.subSubcategoriesInserted}`);
-      console.log(`   - Resources: ${result.resourcesInserted}`);
+      logger.info("✅ Auto-seeding completed successfully:");
+      logger.info(`   - Categories: ${result.categoriesInserted}`);
+      logger.info(`   - Subcategories: ${result.subcategoriesInserted}`);
+      logger.info(`   - Sub-subcategories: ${result.subSubcategoriesInserted}`);
+      logger.info(`   - Resources: ${result.resourcesInserted}`);
       if (result.errors.length > 0) {
-        console.warn(
+        logger.warn(
           `⚠️  Seeding completed with ${result.errors.length} errors`,
         );
       }
     } else {
-      console.log(
+      logger.info(
         `✓ Database already populated: ${categories.length} categories, ${resourceCount} resources`,
       );
     }
   } catch (error) {
-    console.error("❌ Error during auto-seeding (non-fatal):", error);
-    console.log(
+    logger.error("❌ Error during auto-seeding (non-fatal):", error);
+    logger.info(
       "Server will continue without seeding. You can manually seed via /api/admin/seed-database",
     );
   }
@@ -475,16 +478,16 @@ export async function runBackgroundInitialization(): Promise<void> {
     if (before > 0) {
       const result = await resourceRepo.backfillMissingResourceKinds();
       const after = await withRetry(() => resourceRepo.countResourcesWithoutKind());
-      console.log(
+      logger.info(
         `🏷️  Resource kind backfill: ${before} without kind → filled ${result.filled} ` +
           `(${Object.entries(result.byKind).map(([kind, n]) => `${kind} ${n}`).join(", ")}); ${after} remain without kind`,
       );
     } else {
-      console.log("✓ Resource kinds: every resource already has a stored kind");
+      logger.info("✓ Resource kinds: every resource already has a stored kind");
     }
   } catch (error) {
-    console.error("❌ Resource kind backfill failed (non-fatal):", error);
+    logger.error("❌ Resource kind backfill failed (non-fatal):", error);
   }
 
-  console.log("✅ Background initialization complete");
+  logger.info("✅ Background initialization complete");
 }

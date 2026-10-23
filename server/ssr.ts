@@ -4,6 +4,9 @@ import path from "path";
 import { pathToFileURL } from "url";
 import { loadHomeSSRData } from "./home-ssr-data";
 import type { HomeBoot } from "../client/src/lib/home-boot";
+import { createLogger } from "./lib/logger";
+
+const logger = createLogger("ssr");
 
 type HomeRenderer = {
   renderHome(context: {
@@ -240,7 +243,7 @@ export async function routeChunkPreloadTags(
   } catch (error) {
     if (process.env.NODE_ENV === "production" && !routePreloadWarned) {
       routePreloadWarned = true;
-      console.warn("[route-preload] no client manifest; route chunks load unhinted", error);
+      logger.warn("[route-preload] no client manifest; route chunks load unhinted", error);
     }
     return [];
   }
@@ -262,7 +265,7 @@ export async function routeChunkPreloadTags(
   try {
     visit(manifestKey);
   } catch (error) {
-    console.warn("[route-preload] unusable manifest entry; route chunks load unhinted", error);
+    logger.warn("[route-preload] unusable manifest entry; route chunks load unhinted", error);
     return [];
   }
   return [
@@ -399,7 +402,7 @@ export async function handleSSR(req: Request, res: Response, next: NextFunction)
   } catch (error) {
     // A document-render failure must not turn a healthy public route into a
     // blank/error page. The normal static SPA remains the explicit fallback.
-    console.error("[home-ssr] render failed; using the existing SPA fallback", error);
+    logger.error("[home-ssr] render failed; using the existing SPA fallback", error);
     next();
   }
 }

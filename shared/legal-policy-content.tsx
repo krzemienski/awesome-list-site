@@ -9,7 +9,7 @@ export const legalPolicies = {
   },
   "/privacy": {
     heading: "Privacy Policy",
-    updated: "October 22, 2026",
+    updated: "October 23, 2026",
     description: "How Awesome Video handles your data: what we collect, how it's used, and the analytics choices you control.",
   },
   "/code-of-conduct": {
@@ -93,7 +93,7 @@ export function LegalPolicyContent({ path, contactDestination, cookieSettings, L
     </Section>
     <Section heading="2. Analytics">
       <p>We use Google Analytics 4, Mixpanel, PostHog, and Amplitude to understand how the site is used, including page visits, popular resources, interactions, performance, and errors. PostHog and Amplitude may also provide session-replay features; PostHog masks page text and all form inputs in those recordings. These services only load after you accept analytics in the consent banner, and you can decline without losing site functionality.</p>
-      <p>Our hosting platform, Replit, also provides Replit Analytics, which counts page visits without cookies or cross-site identifiers. Unless you decline analytics in the consent banner, the site also sends Replit Analytics anonymous interaction and performance events — for example, which resource or related link was opened and page-load timings. These events never include your name, email address, account identifier, or the text you type. Page-visit counts are recorded by the platform whether or not you decline.</p>
+      <p>Our hosting platform, Replit, also provides Replit Analytics, which counts page visits without cookies or cross-site identifiers. Unless you decline analytics in the consent banner, the site also sends Replit Analytics anonymous interaction and performance events — for example, which resource or related link was opened, page-load timings, whether a submission, sign-up or sign-in completed, the address of a page that was not found, and the kind of error the site hit. These events never include your name, email address, account identifier, or the text you type. Page-visit counts are recorded by the platform whether or not you decline.</p>
       <p>Analytics data can include usage events, technical and device information, pseudonymous identifiers, and your account identifier when you are signed in. After consent, Mixpanel may also receive your name and email address as account profile properties. Mixpanel stores its browser identifier in local storage rather than a cookie.</p>
       {cookieSettings}
     </Section>

@@ -3,7 +3,7 @@ import { Button } from "@/components/ui/button";
 import { Home, List, ArrowRight } from "lucide-react";
 import { Link } from "wouter";
 import SEOHead from "@/components/layout/SEOHead";
-import { trackEvent } from "@/lib/analytics";
+import { trackPageNotFound } from "@/lib/analytics";
 import { useMissingRouteTelemetry } from "@/lib/route-monitor";
 import { missingPageSeo } from "@shared/seo-templates";
 import "@/styles/pages/system.css";
@@ -27,8 +27,7 @@ interface NotFoundProps {
 export default function NotFound({ suggestion }: NotFoundProps) {
   useMissingRouteTelemetry(true);
   useEffect(() => {
-    const path = window.location.pathname + window.location.search;
-    trackEvent("page_not_found", "navigation", path);
+    trackPageNotFound(window.location.pathname, window.location.search);
   }, []);
 
   // min-h-full, not a 100vh calc: <main> already fills whatever the app shell

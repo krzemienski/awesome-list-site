@@ -3,6 +3,9 @@ import fs from 'fs';
 import path from 'path';
 import yaml from 'js-yaml';
 import type { ResourceKindTagMappings } from '@shared/resourceKinds';
+import { createLogger } from "./lib/logger";
+
+const logger = createLogger("config");
 
 interface SiteConfig {
   title: string;
@@ -259,7 +262,7 @@ function loadConfig(): AwesomeListConfig {
       };
     }
   } catch (error) {
-    console.warn('Could not load config file, using defaults:', error);
+    logger.warn('Could not load config file, using defaults:', error);
   }
   
   return defaultConfig;

@@ -6,6 +6,9 @@ import { mapCategoryName } from "@shared/categoryMapping";
 import { seedJourneyStepsForExisting } from "./cli/seedJourneyStepsForExisting";
 import { invalidatePublicCache } from "./cache/publicCache";
 import { classifyKindForStorage } from "./lib/resourceKinds";
+import { createLogger } from "./lib/logger";
+
+const logger = createLogger("seed");
 
 const invalidateSeedCache = () => invalidatePublicCache('seed-mutation');
 
@@ -220,7 +223,7 @@ async function seedAdminUser(): Promise<boolean> {
     const auditKey = process.env.ADMIN_PASSWORD;
 
     if (!auditKey || auditKey.length < 8) {
-      console.warn(
+      logger.warn(
         `⚠️  ADMIN_PASSWORD is not set (or is shorter than 8 characters) — skipping audit admin row creation. ` +
         `Set the ADMIN_PASSWORD secret to enable the audit-key bridge (${adminEmail}).`
       );
@@ -235,9 +238,9 @@ async function seedAdminUser(): Promise<boolean> {
           .update(users)
           .set({ password: null })
           .where(eq(users.email, adminEmail));
-        console.log(`ℹ️  Cleared legacy password hash from audit admin row (${adminEmail})`);
+        logger.info(`ℹ️  Cleared legacy password hash from audit admin row (${adminEmail})`);
       } else {
-        console.log(`ℹ️  Audit admin row already exists (${adminEmail})`);
+        logger.info(`ℹ️  Audit admin row already exists (${adminEmail})`);
       }
       return false;
     }
@@ -249,17 +252,17 @@ async function seedAdminUser(): Promise<boolean> {
       role: "admin",
     });
 
-    console.log(`\n${'='.repeat(60)}`);
-    console.log(`🔐 AUDIT ADMIN ROW CREATED`);
-    console.log(`${'='.repeat(60)}`);
-    console.log(`Email: ${adminEmail}`);
-    console.log(`Credential: none (ADMIN_PASSWORD remains an environment-only audit key)`);
-    console.log(`${'='.repeat(60)}\n`);
+    logger.info(`\n${'='.repeat(60)}`);
+    logger.info(`🔐 AUDIT ADMIN ROW CREATED`);
+    logger.info(`${'='.repeat(60)}`);
+    logger.info(`Email: ${adminEmail}`);
+    logger.info(`Credential: none (ADMIN_PASSWORD remains an environment-only audit key)`);
+    logger.info(`${'='.repeat(60)}\n`);
 
     return true;
   } catch (error: unknown) {
     const errorMessage = error instanceof Error ? error.message : 'Unknown error';
-    console.error(`❌ Failed to create admin user: ${errorMessage}`);
+    logger.error(`❌ Failed to create admin user: ${errorMessage}`);
     return false;
   }
 }
@@ -396,13 +399,13 @@ async function applySeed(db: SeedConnection, awesomeData: SeedData, options: { c
   };
 
   try {
-    console.log("🌱 Starting database seeding...");
+    logger.info("🌱 Starting database seeding...");
     
     if (!options.clearExisting) result.adminUserCreated = await seedAdminUser();
 
     // Optional: Clear existing data
     if (options.clearExisting) {
-      console.log("🗑️  Clearing existing data...");
+      logger.info("🗑️  Clearing existing data...");
       // Resources referenced by editorial/user data keep their ids (and the
       // dependent rows keep their links); everything else is replaced.
       if (preservedResourceIds.length > 0) {
@@ -415,10 +418,10 @@ async function applySeed(db: SeedConnection, awesomeData: SeedData, options: { c
       await db.delete(subcategories);
       await db.delete(categories);
       invalidatePublicCache('seed-mutation');
-      console.log("✅ Existing data cleared");
+      logger.info("✅ Existing data cleared");
     }
 
-    console.log(`📊 Found ${awesomeData.categories.length} categories and ${awesomeData.projects.length} resources`);
+    logger.info(`📊 Found ${awesomeData.categories.length} categories and ${awesomeData.projects.length} resources`);
 
     // Build category map and hierarchy
     const categoryMap = new Map<string, VideoCategory>();
@@ -427,7 +430,7 @@ async function applySeed(db: SeedConnection, awesomeData: SeedData, options: { c
     });
 
     const hierarchy = buildCategoryHierarchy(awesomeData.categories);
-    console.log(`📂 Hierarchy: ${hierarchy.level1.size} L1, ${hierarchy.level2.size} L2, ${hierarchy.level3.size} L3`);
+    logger.info(`📂 Hierarchy: ${hierarchy.level1.size} L1, ${hierarchy.level2.size} L2, ${hierarchy.level3.size} L3`);
 
     // Maps to track database IDs
     const categoryDbMap = new Map<string, number>(); // JSON ID -> DB ID
@@ -435,7 +438,7 @@ async function applySeed(db: SeedConnection, awesomeData: SeedData, options: { c
     const subSubcategoryDbMap = new Map<string, number>();
 
     // Insert Level 1 Categories
-    console.log("📁 Inserting level 1 categories...");
+    logger.info("📁 Inserting level 1 categories...");
     for (const [jsonId, cat] of Array.from(hierarchy.level1.entries())) {
       try {
         const slug = generateSlug(cat.title);
@@ -446,7 +449,7 @@ async function applySeed(db: SeedConnection, awesomeData: SeedData, options: { c
         let dbId: number;
         if (existing.length > 0) {
           dbId = existing[0].id;
-          console.log(`  ⏭️  Category "${cat.title}" already exists (ID: ${dbId})`);
+          logger.info(`  ⏭️  Category "${cat.title}" already exists (ID: ${dbId})`);
         } else {
           const [inserted] = await db.insert(categories).values({
             name: cat.title,
@@ -455,20 +458,20 @@ async function applySeed(db: SeedConnection, awesomeData: SeedData, options: { c
           dbId = inserted.id;
           result.categoriesInserted++;
           invalidatePublicCache('seed-mutation');
-          console.log(`  ✅ Inserted category: ${cat.title} (ID: ${dbId})`);
+          logger.info(`  ✅ Inserted category: ${cat.title} (ID: ${dbId})`);
         }
 
         categoryDbMap.set(jsonId, dbId);
       } catch (error: unknown) {
         const errorMessage = error instanceof Error ? error.message : 'Unknown error';
         const errorMsg = `Failed to insert category ${cat.title}: ${errorMessage}`;
-        console.error(`  ❌ ${errorMsg}`);
+        logger.error(`  ❌ ${errorMsg}`);
         result.errors.push(errorMsg);
       }
     }
 
     // Insert Level 2 Subcategories
-    console.log("📁 Inserting level 2 subcategories...");
+    logger.info("📁 Inserting level 2 subcategories...");
     for (const [jsonId, { category: cat, parentId }] of Array.from(hierarchy.level2.entries())) {
       try {
         const parentDbId = categoryDbMap.get(parentId);
@@ -486,7 +489,7 @@ async function applySeed(db: SeedConnection, awesomeData: SeedData, options: { c
         let dbId: number;
         if (existing.length > 0) {
           dbId = existing[0].id;
-          console.log(`  ⏭️  Subcategory "${cat.title}" already exists (ID: ${dbId})`);
+          logger.info(`  ⏭️  Subcategory "${cat.title}" already exists (ID: ${dbId})`);
         } else {
           const [inserted] = await db.insert(subcategories).values({
             name: cat.title,
@@ -496,20 +499,20 @@ async function applySeed(db: SeedConnection, awesomeData: SeedData, options: { c
           dbId = inserted.id;
           result.subcategoriesInserted++;
           invalidatePublicCache('seed-mutation');
-          console.log(`  ✅ Inserted subcategory: ${cat.title} (ID: ${dbId})`);
+          logger.info(`  ✅ Inserted subcategory: ${cat.title} (ID: ${dbId})`);
         }
 
         subcategoryDbMap.set(jsonId, dbId);
       } catch (error: unknown) {
         const errorMessage = error instanceof Error ? error.message : 'Unknown error';
         const errorMsg = `Failed to insert subcategory ${cat.title}: ${errorMessage}`;
-        console.error(`  ❌ ${errorMsg}`);
+        logger.error(`  ❌ ${errorMsg}`);
         result.errors.push(errorMsg);
       }
     }
 
     // Insert Level 3 Sub-subcategories
-    console.log("📁 Inserting level 3 sub-subcategories...");
+    logger.info("📁 Inserting level 3 sub-subcategories...");
     for (const [jsonId, { category: cat, parentId }] of Array.from(hierarchy.level3.entries())) {
       try {
         const parentDbId = subcategoryDbMap.get(parentId);
@@ -527,7 +530,7 @@ async function applySeed(db: SeedConnection, awesomeData: SeedData, options: { c
         let dbId: number;
         if (existing.length > 0) {
           dbId = existing[0].id;
-          console.log(`  ⏭️  Sub-subcategory "${cat.title}" already exists (ID: ${dbId})`);
+          logger.info(`  ⏭️  Sub-subcategory "${cat.title}" already exists (ID: ${dbId})`);
         } else {
           const [inserted] = await db.insert(subSubcategories).values({
             name: cat.title,
@@ -537,20 +540,20 @@ async function applySeed(db: SeedConnection, awesomeData: SeedData, options: { c
           dbId = inserted.id;
           result.subSubcategoriesInserted++;
           invalidatePublicCache('seed-mutation');
-          console.log(`  ✅ Inserted sub-subcategory: ${cat.title} (ID: ${dbId})`);
+          logger.info(`  ✅ Inserted sub-subcategory: ${cat.title} (ID: ${dbId})`);
         }
 
         subSubcategoryDbMap.set(jsonId, dbId);
       } catch (error: unknown) {
         const errorMessage = error instanceof Error ? error.message : 'Unknown error';
         const errorMsg = `Failed to insert sub-subcategory ${cat.title}: ${errorMessage}`;
-        console.error(`  ❌ ${errorMsg}`);
+        logger.error(`  ❌ ${errorMsg}`);
         result.errors.push(errorMsg);
       }
     }
 
     // Insert Resources
-    console.log("📄 Inserting resources...");
+    logger.info("📄 Inserting resources...");
     let resourceCount = 0;
     let skippedNoCategory = 0;
     let skippedNoDeepest = 0;
@@ -637,12 +640,12 @@ async function applySeed(db: SeedConnection, awesomeData: SeedData, options: { c
         invalidatePublicCache('seed-mutation');
 
         if (resourceCount % 100 === 0) {
-          console.log(`  📊 Inserted ${resourceCount} resources...`);
+          logger.info(`  📊 Inserted ${resourceCount} resources...`);
         }
       } catch (error: unknown) {
         const errorMessage = error instanceof Error ? error.message : 'Unknown error';
         const errorMsg = `Failed to insert resource ${project.title}: ${errorMessage}`;
-        console.error(`  ❌ ${errorMsg}`);
+        logger.error(`  ❌ ${errorMsg}`);
         result.errors.push(errorMsg);
       }
     }
@@ -655,10 +658,10 @@ async function applySeed(db: SeedConnection, awesomeData: SeedData, options: { c
       if (tagsSeeded.tagRows > 0 || tagsSeeded.linkRows > 0) {
         invalidatePublicCache('seed-mutation');
       }
-      console.log(`🏷️  Tags: ${tagsSeeded.tagRows} new tag rows, ${tagsSeeded.linkRows} new resource links inserted (existing rows untouched)`);
+      logger.info(`🏷️  Tags: ${tagsSeeded.tagRows} new tag rows, ${tagsSeeded.linkRows} new resource links inserted (existing rows untouched)`);
     } catch (tagErr: unknown) {
       const msg = tagErr instanceof Error ? tagErr.message : 'Unknown error';
-      console.error(`  ⚠️ Tag backfill reported an issue: ${msg}`);
+      logger.error(`  ⚠️ Tag backfill reported an issue: ${msg}`);
       result.errors.push(`Tag backfill: ${msg}`);
     }
 
@@ -668,26 +671,26 @@ async function applySeed(db: SeedConnection, awesomeData: SeedData, options: { c
       if (!options.clearExisting) await seedJourneyStepsForExisting();
     } catch (journeyErr: unknown) {
       const msg = journeyErr instanceof Error ? journeyErr.message : 'Unknown error';
-      console.error(`  ⚠️ Journey-step backfill reported an issue: ${msg}`);
+      logger.error(`  ⚠️ Journey-step backfill reported an issue: ${msg}`);
       result.errors.push(`Journey-step backfill: ${msg}`);
     }
 
-    console.log("\n✅ Database seeding completed!");
-    console.log(`📊 Summary:`);
-    console.log(`  - Audit admin row: ${result.adminUserCreated ? 'created' : 'already exists or disabled'}`);
-    console.log(`  - Categories: ${result.categoriesInserted} inserted`);
-    console.log(`  - Subcategories: ${result.subcategoriesInserted} inserted`);
-    console.log(`  - Sub-subcategories: ${result.subSubcategoriesInserted} inserted`);
-    console.log(`  - Resources: ${result.resourcesInserted} inserted`);
-    console.log(`  - Resources skipped (no category): ${skippedNoCategory}`);
-    console.log(`  - Resources skipped (no deepest category): ${skippedNoDeepest}`);
-    console.log(`  - Resources skipped (no category name): ${skippedNoCategoryName}`);
-    console.log(`  - Resources skipped (duplicates): ${skippedDuplicate}`);
-    console.log(`  - Errors: ${result.errors.length}`);
+    logger.info("\n✅ Database seeding completed!");
+    logger.info(`📊 Summary:`);
+    logger.info(`  - Audit admin row: ${result.adminUserCreated ? 'created' : 'already exists or disabled'}`);
+    logger.info(`  - Categories: ${result.categoriesInserted} inserted`);
+    logger.info(`  - Subcategories: ${result.subcategoriesInserted} inserted`);
+    logger.info(`  - Sub-subcategories: ${result.subSubcategoriesInserted} inserted`);
+    logger.info(`  - Resources: ${result.resourcesInserted} inserted`);
+    logger.info(`  - Resources skipped (no category): ${skippedNoCategory}`);
+    logger.info(`  - Resources skipped (no deepest category): ${skippedNoDeepest}`);
+    logger.info(`  - Resources skipped (no category name): ${skippedNoCategoryName}`);
+    logger.info(`  - Resources skipped (duplicates): ${skippedDuplicate}`);
+    logger.info(`  - Errors: ${result.errors.length}`);
 
     return result;
   } catch (error: unknown) {
-    console.error("❌ Database seeding failed:", error);
+    logger.error("❌ Database seeding failed:", error);
     const errorMessage = error instanceof Error ? error.message : 'Unknown error';
     result.errors.push(`Fatal error: ${errorMessage}`);
     throw error;

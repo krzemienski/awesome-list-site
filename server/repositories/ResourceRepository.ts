@@ -62,6 +62,9 @@ import {
   type ResourceKind,
   type ResourceKindCounts,
 } from "../lib/resourceKinds";
+import { createLogger } from "../lib/logger";
+
+const logger = createLogger("resources");
 
 /**
  * Options for listing resources with filtering and pagination
@@ -915,7 +918,7 @@ export class ResourceRepository {
       const code = error?.code ?? cause?.code;
       const constraint = String(error?.constraint ?? cause?.constraint ?? '');
       if (code !== '23505' || constraint !== 'resources_pkey') throw error;
-      console.warn(
+      logger.warn(
         'resources_id_seq drift detected (23505 on resources_pkey); resyncing sequence and retrying insert',
       );
       await db.execute(

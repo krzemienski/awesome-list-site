@@ -8,6 +8,9 @@ import { stripInternalResourceFields } from "../../lib/publicResource";
 import { isDatabaseUnavailableError } from "../../db/errors";
 import { ServiceUnavailableError } from "../../middleware/errors";
 import { asyncHandler } from "../../middleware/asyncHandler";
+import { createLogger } from "../../lib/logger";
+
+const logger = createLogger("home-feed");
 
 /** Hand-picked shortlist size: the Index rail lists all of them, card grids show fewer. */
 const HOME_FEATURED_LIMIT = 8;
@@ -51,7 +54,7 @@ export function registerHomeFeed(app: Express, limiter: RequestHandler) {
       if (error instanceof ServiceUnavailableError || isDatabaseUnavailableError(error)) {
         res.status(503).set("Retry-After", "1").json({ message: "Service is temporarily unavailable" });
       } else {
-        console.error("Home feed failed", error);
+        logger.error("Home feed failed", error);
         res.status(500).json({ message: "Could not load the home feed" });
       }
     }

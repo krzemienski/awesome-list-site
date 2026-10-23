@@ -1,5 +1,8 @@
 import { config } from "../config";
 import { ContactRepository, purgeExpiredContactSubmissions } from "../repositories/ContactRepository";
+import { createLogger } from "../lib/logger";
+
+const logger = createLogger("contact-retention");
 
 const RUN_EVERY_MS = 60 * 60 * 1000;
 const BATCH_SIZE = 500;
@@ -13,6 +16,7 @@ async function runScheduledCycle(): Promise<void> {
   let deletedCount = 0;
   try {
     if (!config.contact.enabled && !(await new ContactRepository().countSubmissions())) return;
+    logger.info("Contact retention purge started");
     let batches = 0;
     let deleted: number;
     do {
@@ -20,20 +24,19 @@ async function runScheduledCycle(): Promise<void> {
       deletedCount += deleted;
       batches++;
     } while (deleted === BATCH_SIZE && batches < MAX_BATCHES);
-    console.log(JSON.stringify({
-      event: "ops.contact_retention_completed",
-      deletedCount,
+    logger.info("Contact retention purge finished", {
+      deleted: deletedCount,
       batches,
       batchLimitReached: batches === MAX_BATCHES && deleted === BATCH_SIZE,
-    }));
-  } catch {
-    // DB exceptions can contain SQL parameters/PII. Keep this failure loud but
-    // bounded, including the count from batches that committed before failure.
-    console.error(JSON.stringify({
-      event: "ops.contact_retention_failed",
-      deletedCount,
-      message: "Contact retention failed; inspect database health. Retrying next hour.",
-    }));
+    });
+  } catch (error) {
+    // DB exceptions can contain SQL parameters/PII, so only the error class
+    // and code are logged, plus the count from batches that committed.
+    logger.error("Contact retention purge failed; retrying next hour", {
+      deleted: deletedCount,
+      errorClass: error instanceof Error ? error.name : "unknown",
+      code: (error as { code?: unknown } | null)?.code ?? undefined,
+    });
   } finally {
     running = false;
   }

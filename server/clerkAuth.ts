@@ -26,6 +26,9 @@ import { db } from "./db";
 import { deletedUserTombstones, users, type User } from "@shared/schema";
 import { trackServerEvent } from "./lib/mixpanelServer";
 import { asyncHandler } from "./middleware/asyncHandler";
+import { createLogger } from "./lib/logger";
+
+const logger = createLogger("auth");
 
 export interface ClerkSessionIdentity {
   /** Legacy bridge id — equals users.id for migrated users. */
@@ -111,13 +114,13 @@ export async function ensureDbUser(
     )
     .limit(1);
   if (tombstone) {
-    console.warn(
+    logger.warn(
       `[clerkAuth] refusing JIT provisioning for deleted account ${identity.bridgeUserId}`,
     );
     return undefined;
   }
 
-  await db
+  const inserted = await db
     .insert(users)
     .values({
       id: identity.bridgeUserId,
@@ -127,7 +130,8 @@ export async function ensureDbUser(
       profileImageUrl: identity.imageUrl ?? null,
       role: "user",
     })
-    .onConflictDoNothing();
+    .onConflictDoNothing()
+    .returning({ id: users.id });
 
   const [created] = await db
     .select()
@@ -135,11 +139,15 @@ export async function ensureDbUser(
     .where(eq(users.id, identity.bridgeUserId))
     .limit(1);
   if (created) {
-    // Row genuinely created by this request (or a concurrent twin) — this is
-    // the Clerk-era "sign_up_completed" moment. Consent-gated internally.
-    trackServerEvent(req, "sign_up_completed", created.id, {
-      sign_up_method: "clerk",
-    });
+    // Only the request whose insert won is the Clerk-era "sign_up_completed"
+    // moment; a new session fires several API calls at once and the others
+    // just re-select the row. Consent-gated internally.
+    if (inserted.length > 0) {
+      trackServerEvent(req, "sign_up_completed", created.id, {
+        sign_up_method: "clerk",
+      });
+      logger.info("New account provisioned from Clerk sign-up", { user: created.id });
+    }
     return created;
   }
 
@@ -147,7 +155,7 @@ export async function ensureDbUser(
   // certainly the UNIQUE(email) constraint colliding with an existing row
   // under a different id. Deliberately fail closed (no email-based binding);
   // the visitor stays effectively signed out of app data until reconciled.
-  console.error(
+  logger.error(
     `[clerkAuth] JIT provisioning conflict for bridge id ${identity.bridgeUserId}: ` +
       `an existing account owns this session's email. Refusing to auto-bind; ` +
       `manual reconciliation required.`,
@@ -355,16 +363,16 @@ export const clerkUserContext: RequestHandler = asyncHandler(async function cler
         req.dbUser = auditAdmin;
         req.clerkIdentity = undefined; // no Clerk session backs this request
         if (viaAuditKey) {
-          console.log(`[clerkAuth] audit-key bypass: ${req.method} ${req.path}`);
+          logger.info(`[clerkAuth] audit-key bypass: ${req.method} ${req.path}`);
         }
       } else {
         // Valid credential but no seeded admin row: treat as anonymous.
-        console.warn(
+        logger.warn(
           "[clerkAuth] admin bypass valid but admin@example.com row missing — request stays anonymous",
         );
       }
     } catch (error) {
-      console.error("[clerkAuth] audit-key bypass lookup failed:", error);
+      logger.error("[clerkAuth] audit-key bypass lookup failed:", error);
       res.locals.clerkUserLookupError = error;
     }
     return next();
@@ -377,7 +385,7 @@ export const clerkUserContext: RequestHandler = asyncHandler(async function cler
   try {
     req.dbUser = await ensureDbUser(req, identity);
   } catch (error) {
-    console.error("[clerkAuth] Failed to resolve local user for Clerk session:", error);
+    logger.error("[clerkAuth] Failed to resolve local user for Clerk session:", error);
     res.locals.clerkUserLookupError = error;
   }
   next();

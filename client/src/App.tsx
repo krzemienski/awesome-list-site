@@ -18,6 +18,7 @@ import { useAuth } from "./hooks/useAuth";
 import { findRouteSuggestion } from "./lib/not-found-suggestion";
 import { pendingRouteTitle } from "./lib/pending-route-title";
 import { useAnalytics } from "./hooks/use-analytics";
+import { trackSiteError } from "./lib/analytics";
 import { useCrossTabSync } from "./lib/crossTabSync";
 import { hasClerkSessionHint, requestClerk, routeNeedsClerk, useClerkBridge } from "./lib/clerk-bridge";
 import {
@@ -194,6 +195,7 @@ class RouteErrorBoundary extends Component<RouteErrorBoundaryProps, RouteErrorBo
   }
 
   componentDidCatch(error: Error) {
+    trackSiteError(isChunkLoadError(error) ? "chunk_load_failed" : "route_crash");
     if (isChunkLoadError(error)) {
       // One-shot auto-reload guarded by a TIMESTAMP, not a boolean flag.
       // A boolean cleared on "clean render" loops forever: the boundary

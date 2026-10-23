@@ -40,6 +40,9 @@ import {
   probeEmailTransport,
   sendTransactionalEmail,
 } from "../email";
+import { createLogger } from "../lib/logger";
+
+const logger = createLogger("digest");
 
 const MAX_SELECTOR_ITEMS = 3;
 const JOB_LEASE_MINUTES = 15;
@@ -1001,9 +1004,11 @@ async function processClaimedJob(job: DigestJob): Promise<void> {
       providerMessageId: result.providerMessageId,
     });
   } catch (error) {
-    console.error(
-      `[digest] Job ${job.id} failed (${error instanceof Error ? error.name : "unknown"})`,
-    );
+    logger.error("Digest delivery failed", {
+      digestJobId: job.id,
+      channel: job.channel,
+      errorClass: error instanceof Error ? error.name : "unknown",
+    });
     if (job.channel === "email" && emailDeliveryAttempted) {
       await markDeliveryUnknownAttempt(job, "post_send_processing_error");
     } else {

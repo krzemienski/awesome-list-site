@@ -12,6 +12,9 @@
  */
 
 import * as cheerio from 'cheerio';
+import { createLogger } from "../lib/logger";
+
+const logger = createLogger("research");
 
 // Cache for scraped content (24-hour TTL)
 interface ScrapedContent {
@@ -158,7 +161,7 @@ export class WebResearchService {
 
       return content;
     } catch (error: any) {
-      console.error(`Failed to scrape ${url}:`, error.message);
+      logger.error(`Failed to scrape ${url}:`, error.message);
       return null;
     }
   }

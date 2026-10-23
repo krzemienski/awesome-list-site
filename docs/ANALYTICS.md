@@ -207,9 +207,15 @@ adds the script, a website id or an env var for it, and `script-src` /
   Analytics via `replitTrack` (`client/src/lib/replit-analytics.ts`) under the
   same catalog name, with the same cleaned properties minus free-form visitor
   text (`search_term`). GA4-only legacy events (`{ product: false }`) are not
-  sent, except `performance` (`{ replit: true }`), so web vitals reach Replit
-  Analytics too. Server-side conversions (`sign_up_completed`,
-  `resource_submitted`) stay Mixpanel-only.
+  sent, except the ones marked `{ replit: true }`: `performance` (web vitals),
+  `page_not_found` (path only), `site_error` (error type only) and the client
+  halves of the two server-side conversions, `sign_up_completed` and
+  `resource_submitted`. Mixpanel still gets those two conversions from the
+  server only (`product: false` on the client keeps them from double-counting
+  there); Replit Analytics has no server feed, so it gets them from the
+  browser under the same catalog name.
+- **Not sent to Replit:** `page_engaged` (Replit computes visit duration from
+  its own page views) and every GA4-only legacy row not listed above.
 - **Consent:** the tracker is cookie-free and the events carry no identity,
   so they are sent while the visitor has not answered the banner (most never
   do — before this, under 2% of visitors produced any custom event). An
@@ -238,9 +244,9 @@ taxonomy further down and are not repeated here.
 | `resource_link_opened` | `resource_click` (+ GA4-only `outbound_link`) | all four | `resource_title`, `link_url` (origin+path), `link_domain`, `category`, `surface` (`search_palette` \| `resource_detail` \| `resource_card` \| `taxonomy_card` \| `home_card` \| `home_recent_rail` \| `home_recent_list`) | `trackResourceClick` ← palette, detail page, `ResourceCard`, home cards |
 | `search_performed` | `search` | all four | `search_term`, `result_count`, `surface` | `trackSearch` |
 | `category_viewed` | `category_view` | all four | `category` (GA4: `content_category`) | `trackCategoryView` |
-| `filter_applied` | `filter_applied` | all four | `filter_type`, `filter_value`, `result_count`, `zero_results`, `surface` | `trackFilterUsage` |
-| `sort_changed` | `sort_change` | all four | `sort_type`, `surface`, `result_count`, `zero_results` | `trackSortChange` |
-| `tag_interaction` | `tag_interaction` | all four | `tag`, `action`, `surface`, `result_count`, `zero_results` | `trackTagInteraction` (cards: `action: 'card_click'` only when the pill navigates; pages that filter in place via `onTagClick` keep their own `apply` event) |
+| `filter_applied` | `filter_applied` | all four | `filter_type`, `filter_value`, `result_count`, `zero_results`, `surface` (`search_page` \| `taxonomy_*` \| `home` (kind filter / clear all) \| `journeys_page` (category)) | `trackFilterUsage` |
+| `sort_changed` | `sort_change` | all four | `sort_type`, `surface` (`search_page` \| `taxonomy_*` \| `home` \| `categories_page`), `result_count`, `zero_results` | `trackSortChange` |
+| `tag_interaction` | `tag_interaction` | all four | `tag`, `action` (`apply` \| `remove` \| `card_click` \| `landing_viewed`), `surface` (adds `home`, `tag_page`), `result_count`, `zero_results` | `trackTagInteraction` (cards: `action: 'card_click'` only when the pill navigates; pages that filter in place via `onTagClick` keep their own `apply` event; `/tag/:slug` sends `landing_viewed` once per tag visit) |
 | `logged_in` | `login` | all four | `login_method` (GA4: `method`) + acquisition | `trackLogin` ← `AuthConversionTracker` |
 | `content_shared` | `share` | all four | `share_method` (GA4: `method`), `content_type`, `content_id` | `trackShare` |
 | `journey_started` | `journey_start` | all four | `journey_id`, `journey_title`, `total_steps` | `trackJourneyStart` |
@@ -298,8 +304,12 @@ taxonomy further down and are not repeated here.
 | `notifications_marked_all_read` | same | all four | `marked_count` (server's updated count) | `trackNotificationsMarkedAllRead` ← "Mark all read" |
 | `digest_preview_item_opened` | same | all four | `notification_kind`, `digest_section` (`new_resources` \| `watch_next` \| `journey_step`), `item_position` (1-based) | `trackDigestPreviewItemOpened` ← preferences card preview |
 | `learning_preferences_saved` / `learning_preferences_reset` | same | all four | `surface: 'settings'`; saved adds `first_save` — preference values are never sent | `trackLearningPreferencesSaved` / `Reset` ← `Settings` (after the server confirms) |
-| `sign_up_completed` | (`sign_up`, GA4-only client event) | Mixpanel, **server** | see `MIXPANEL.md` | server — Clerk JIT provisioning |
-| `resource_submitted` | (`generate_lead`, GA4-only client event) | Mixpanel, **server** | see `MIXPANEL.md` | server — resource-submit handler |
+| `sign_up_completed` | `sign_up` | GA4 + Replit (client); Mixpanel (**server**) | client: `signup_method` + acquisition (GA4: `method` + acquisition); server: see `MIXPANEL.md` | `trackSignUp` ← `AuthConversionTracker`; server — Clerk JIT provisioning |
+| `resource_submitted` | `generate_lead` | GA4 + Replit (client); Mixpanel (**server**) | client: `content_type: "resource_submission"`, `category` (taxonomy name) + acquisition — never title, URL or description; server: see `MIXPANEL.md` | `trackGenerateLead` ← `SubmitResource` (server-confirmed); server — resource-submit handler |
+| `page_not_found` | same (legacy `event_category: "navigation"`, `event_label`: path + query) | GA4 + Replit | Replit: `page_path` (path only, no query, ≤200 chars) | `trackPageNotFound` ← `NotFound` (every 404 surface) |
+| `site_error` | — (GA4 keeps its legacy `error` event) | Replit | `error_type` only (`javascript_error` \| `unhandled_promise_rejection` \| `api_error` \| `component_crash` \| `route_crash` \| `chunk_load_failed` \| `page_load_failed`) — never the message | `trackSiteError` ← `trackError`, `ErrorBoundary`, `RouteErrorBoundary`, `ErrorPage` |
+| `contact_message_sent` | same | all four | `reply_requested` (boolean) — never the name, address, subject or message | `trackContactMessageSent` ← contact dialog (server-confirmed) |
+| `tool_tab_opened` | same | all four | `page: "advanced"`, `tab` (`explorer` \| `metrics` \| `export` \| `recommendations`) | `trackToolTabOpened` ← `Advanced` |
 
 
 #### Contributions and continue learning
@@ -385,8 +395,8 @@ In DEV, `debug_mode: true` is added so events appear in GA4 DebugView.
 | `search` | Search dialog, once per debounced query — `search-dialog.tsx` | `search_term`, `result_count` |
 | `select_content` | Resource detail page mount — `ResourceDetail.tsx` | `content_type: "resource"`, `content_id`, `content_name`, `content_category` |
 | `login` | A Clerk sign-in attempt completes and produces a session — `AuthConversionTracker.tsx`. Session restores, page reloads and token refreshes never fire it. | `method` (verification strategy, e.g. `password`, `google`) + acquisition |
-| `sign_up` | A Clerk sign-up attempt completes and produces a session — `AuthConversionTracker.tsx`. An OAuth sign-in transferred into a registration counts here, not as `login`. | `method` (verification strategy, e.g. `email_code`, `google`) + acquisition |
-| `generate_lead` | Successful resource submission — `SubmitResource.tsx` | `content_type: "resource_submission"`, `category` + acquisition |
+| `sign_up` (catalog `sign_up_completed`) | A Clerk sign-up attempt completes and produces a session — `AuthConversionTracker.tsx`. An OAuth sign-in transferred into a registration counts here, not as `login`. | `method` (verification strategy, e.g. `email_code`, `google`) + acquisition |
+| `generate_lead` (catalog `resource_submitted`) | Successful resource submission — `SubmitResource.tsx` | `content_type: "resource_submission"`, `category` + acquisition |
 | `share` | Share button on a resource — `ResourceDetail.tsx` | `method: "web_share" \| "clipboard"`, `content_type`, `content_id` |
 
 ### Learning-journey funnel (Task #330)
@@ -410,7 +420,7 @@ Funnel: journeys list view (`page_view`) → `journey_start` → `journey_step_c
 | `resource_favorite` | Favorite toggle — `ResourceDetail.tsx` | `action: "add" \| "remove"`, `content_name`, `content_category` |
 | `performance` | Core Web Vitals unless analytics was declined (GA4 after consent; Replit Analytics before a choice too) — `use-analytics.tsx` | `metric_name: "lcp" \| "inp" \| "fid" \| "cls"`, `value` (milliseconds for LCP/INP/FID, unitless score for CLS) |
 | `api_performance` | Every API request — `queryClient.ts` | `endpoint`, `status`, `value` (ms) |
-| `error` | Failed API request or global JavaScript error — `queryClient.ts` / `use-analytics.tsx` | `error_type`, `error_message` (browser errors use a non-content shape such as `short-text`) |
+| `error` | Failed API request or global JavaScript error — `queryClient.ts` / `use-analytics.tsx` (the browser listeners run unless analytics was declined; GA4 still only after a grant). Each also sends `site_error` (type only) to Replit Analytics | `error_type`, `error_message` (browser errors use a non-content shape such as `short-text`) |
 | `guest_bookmark_added` / `guest_bookmark_removed` | Signed-out save toggle (on-device store, Task #329) — `useResourceToggle` guest branch | `resource_id`, `guest_saved_count` |
 | `auth_prompt_shown` | Save-intent sign-in prompt shown to a guest — toggle hook / `GuestBookmarks.tsx` | `prompt_context: "guest_save_toast" \| "guest_save_cap" \| "bookmarks_page"`, `guest_saved_count` |
 | `bookmarks_merged` | Guest saves merged into the account after sign-in — `GuestBookmarkMerge.tsx` | `merged_count`, `duplicate_count`, `failed_count` |

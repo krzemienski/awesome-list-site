@@ -1,5 +1,5 @@
 import StatePanel, { RetryButton } from "@/components/layout/StatePanel";
-import { Fragment, useEffect, useState } from "react";
+import { Fragment, useEffect, useRef, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import "@/styles/pages/discovery.css";
 import { ArrowLeft } from "lucide-react";
@@ -11,6 +11,7 @@ import { Button } from "@/components/ui/button";
 import { Paginator } from "@/components/ui/paginator";
 import { PageHeaderSkeleton, ResourceCardSkeleton } from "@/components/ui/skeletons";
 import { apiRequest } from "@/lib/queryClient";
+import { trackTagInteraction } from "@/lib/analytics";
 import { parsePageParamStrict, pageNoticeFor } from "@/lib/page-param";
 import { slugify } from "@/lib/utils";
 import NotFound from "@/pages/not-found";
@@ -102,6 +103,16 @@ export default function TagLanding() {
       if (parsedPage.page > lastPage) setClamp({ requested: requestedKey, slug, page: lastPage });
     }
   }, [activeClamp, listedTotal, listing.isPlaceholderData, parsedPage.page, requestedKey, slug]);
+
+  // One view event per tag visit, once the real (non-placeholder) total is in,
+  // matching category_viewed on the taxonomy pages.
+  const viewedTagRef = useRef<string | null>(null);
+  useEffect(() => {
+    if (!tagIsQueryable || listedTotal === undefined || listing.isPlaceholderData) return;
+    if (viewedTagRef.current === slug) return;
+    viewedTagRef.current = slug;
+    trackTagInteraction(slug, "landing_viewed", "tag_page", listedTotal);
+  }, [listedTotal, listing.isPlaceholderData, slug, tagIsQueryable]);
 
   const canonicalPath = tagLandingPath(slug);
   if (slug && window.location.pathname !== canonicalPath) {

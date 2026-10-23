@@ -21,6 +21,9 @@
  */
 import type { Request, Response, NextFunction, RequestHandler } from "express";
 import { contracts, type ApiContract } from "./registry";
+import { createLogger } from "../lib/logger";
+
+const logger = createLogger("contracts");
 
 export interface ResponseMismatch {
   contract: string;
@@ -37,7 +40,7 @@ export interface ResponseValidationOptions {
 }
 
 function defaultReporter(m: ResponseMismatch): void {
-  console.warn(
+  logger.warn(
     `[contract] response mismatch for "${m.contract}" (${m.method} ${m.path}) status ${m.status}:`,
     m.issues.map((i) => `${i.path.join(".") || "<root>"}: ${i.message}`).join("; "),
   );

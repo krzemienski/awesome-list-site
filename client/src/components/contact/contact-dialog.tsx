@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useMutation } from "@tanstack/react-query";
+import { trackContactMessageSent } from "@/lib/analytics";
 import { z } from "zod";
 import { Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -65,7 +66,8 @@ export function ContactDialogHost() {
         method: "POST",
         body: JSON.stringify(data),
       }) as Promise<ContactSubmissionReceipt>,
-    onSuccess: (data) => {
+    onSuccess: (data, submitted) => {
+      trackContactMessageSent(Boolean(submitted.replyTo));
       setReceipt(data);
       form.reset();
     },

@@ -5,6 +5,9 @@ import {
   resolveFlowModel,
   StructuredOutputError,
 } from './anthropicConfig';
+import { createLogger } from "../lib/logger";
+
+const logger = createLogger("ai-tagging");
 
 interface AITagSuggestion {
   tags: string[];
@@ -37,7 +40,7 @@ export async function generateResourceTags(
   url: string
 ): Promise<AITagSuggestion> {
   if (!isAnthropicConfigured()) {
-    console.warn('AI tagging skipped: Anthropic is not configured; using rule-based tags');
+    logger.warn('AI tagging skipped: Anthropic is not configured; using rule-based tags');
     return generateFallbackTags(title, description, url);
   }
 
@@ -70,7 +73,7 @@ URL: ${url}`;
         : error instanceof Error
           ? error.message
           : 'Unknown error';
-    console.warn(`AI tagging failed (${detail}); using rule-based tags`);
+    logger.warn(`AI tagging failed (${detail}); using rule-based tags`);
     return generateFallbackTags(title, description, url);
   }
 }

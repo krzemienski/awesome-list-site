@@ -275,10 +275,15 @@ export const trackLogin = (method: string) => {
 
 // User created an account. Carries first-touch acquisition.
 export const trackSignUp = (method: string) => {
-  // Product half (sign_up_completed) is emitted SERVER-side to Mixpanel from
-  // Clerk JIT provisioning (Task #233) so ad blockers can't undercount it — do
-  // not enable `product` here or the conversion double-counts.
-  track('sign_up', { method, ...getAcquisition() }, { product: false });
+  // Mixpanel's sign_up_completed is emitted SERVER-side from Clerk JIT
+  // provisioning so ad blockers can't undercount it — `product` stays off or
+  // that conversion double-counts. Replit Analytics has no server feed, so it
+  // gets the same catalog name from here (GA4 keeps its `sign_up` name).
+  track(
+    'sign_up_completed',
+    { signup_method: method, ...getAcquisition() },
+    { ga: { name: 'sign_up', params: { method, ...getAcquisition() } }, product: false, replit: true },
+  );
 };
 
 // User selected/opened a piece of content (e.g. viewed a resource detail).
@@ -305,10 +310,32 @@ export const trackSelectContent = (
 
 // User completed a lead-generating form (e.g. submitted a resource).
 export const trackGenerateLead = (params: Record<string, unknown> = {}) => {
-  // Product half (resource_submitted) is emitted SERVER-side from the
-  // resource-submit handler (Task #233) — do not enable `product` here or the
-  // conversion double-counts.
-  track('generate_lead', { ...params, ...getAcquisition() }, { product: false });
+  // Mixpanel's resource_submitted is emitted SERVER-side from the submit
+  // handler — `product` stays off or that conversion double-counts. Replit
+  // Analytics has no server feed, so it gets the same catalog name from here
+  // (GA4 keeps its `generate_lead` name).
+  const props = { ...params, ...getAcquisition() };
+  track('resource_submitted', props, {
+    ga: { name: 'generate_lead', params: props },
+    product: false,
+    replit: true,
+  });
+};
+
+// A visitor landed on a "page not found" surface. Replit Analytics gets the
+// path only (a query string can carry typed search text or tokens), capped in
+// length; GA4 keeps its legacy UA-style params (path + query, after consent).
+export const trackPageNotFound = (pathname: string, search = '') => {
+  const path = pathname.split(/[?#]/, 1)[0].slice(0, 200) || '/';
+  track(
+    'page_not_found',
+    { page_path: path },
+    {
+      ga: { name: 'page_not_found', params: { event_category: 'navigation', event_label: pathname + search } },
+      product: false,
+      replit: true,
+    },
+  );
 };
 
 export type AuthPromptContext =
@@ -537,8 +564,24 @@ export const trackPerformance = (metric: string, value: number) => {
 };
 
 // Track error events.
-export const trackError = (errorType: string, errorMessage: string) => {
+export const trackError = (errorType: SiteErrorType, errorMessage: string) => {
   track('error', { error_type: errorType, error_message: errorMessage }, { product: false });
+  trackSiteError(errorType);
+};
+
+export type SiteErrorType =
+  | 'javascript_error'
+  | 'unhandled_promise_rejection'
+  | 'api_error'
+  | 'component_crash'
+  | 'route_crash'
+  | 'chunk_load_failed'
+  | 'page_load_failed';
+
+// Replit Analytics half of every site error: the error TYPE only — never the
+// message, which can carry URLs, copied text or query values.
+export const trackSiteError = (errorType: SiteErrorType) => {
+  track('site_error', { error_type: errorType }, { ga: false, product: false, replit: true });
 };
 
 export const trackFilterUsage = (
@@ -689,14 +732,16 @@ interface TrackOptions {
   /**
    * Mixpanel + PostHog + Amplitude. Default true; `false` only for the legacy
    * GA4-only events (page_view, page_engaged, performance, api_performance,
-   * error, theme_change, resource_favorite, sign_up, generate_lead,
-   * outbound_link, page_not_found) so their vendor coverage is unchanged.
+   * error, theme_change, resource_favorite, outbound_link) and the client
+   * halves of server-emitted conversions (sign_up_completed,
+   * resource_submitted) so their vendor coverage is unchanged.
    */
   product?: boolean;
   /**
    * Replit Analytics. Default: same as `product`. `false` for page_viewed
-   * (the platform records page views); `true` for GA4-only events that should
-   * still reach Replit Analytics (performance).
+   * (the platform records page views); `true` for non-product events that
+   * should still reach Replit Analytics (performance, page_not_found,
+   * site_error, sign_up_completed, resource_submitted).
    */
   replit?: boolean;
 }
@@ -704,6 +749,17 @@ interface TrackOptions {
 let dispatch: ((request: AnalyticsDispatchRequest) => void) | null = null;
 
 type EventProps = Record<string, unknown>;
+
+// A visitor switched tabs on a multi-tool page (e.g. Discovery tools).
+export const trackToolTabOpened = (page: string, tab: string) => {
+  track('tool_tab_opened', { page, tab });
+};
+
+// The contact form was accepted by the server. No form text, name or address
+// is sent — only whether the visitor asked for a reply.
+export const trackContactMessageSent = (replyRequested: boolean) => {
+  track('contact_message_sent', { reply_requested: replyRequested });
+};
 
 export const trackCommandPaletteOpened = (method: CommandPaletteOpenMethod) => {
   track('command_palette_opened', { open_method: method });

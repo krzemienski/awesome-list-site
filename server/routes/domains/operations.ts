@@ -34,6 +34,9 @@ import { getOperationalTelemetrySnapshot } from "../../ops/operationalTelemetry"
 import { getPublicCacheSnapshot } from "../../cache/publicCache";
 import type { UserRepository } from "../../repositories";
 import { asyncHandler } from "../../middleware/asyncHandler";
+import { createLogger } from "../../lib/logger";
+
+const logger = createLogger("ops");
 
 /**
  * Dependencies the operational handlers need from the composing module. These
@@ -147,7 +150,7 @@ export function registerOperationsRoutes(
         config,
       });
     } catch (error) {
-      console.error('Error checking AI health:', error);
+      logger.error('Error checking AI health:', error);
       res.status(500).json({ status: 'error', error: 'Failed to check AI service health' });
     }
   }));

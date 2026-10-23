@@ -44,6 +44,9 @@
 import { db as dbInstance } from "../db";
 import { eq, and, desc, or } from "drizzle-orm";
 import { resourceAuditLog } from "@shared/schema";
+import { createLogger } from "../lib/logger";
+
+const logger = createLogger("audit-log");
 
 /**
  * Parameters for creating an audit log entry
@@ -153,7 +156,7 @@ export class AuditLogRepository {
    * @example
    * const logs = await auditRepo.getByResourceId(123);
    * logs.forEach(log => {
-   *   console.log(`${log.action} at ${log.createdAt} by ${log.performedBy}`);
+   *   logger.info(`${log.action} at ${log.createdAt} by ${log.performedBy}`);
    * });
    */
   async getByResourceId(resourceId: number, limit = 50): Promise<AuditLogRecord[]> {

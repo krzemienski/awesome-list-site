@@ -532,8 +532,15 @@ The application is designed for Replit deployment:
 
 ## Monitoring & Logging
 
-- Console logging for debugging
-- Audit log for resource changes
-- Google Analytics for frontend tracking
+- Server logs go through one helper, `server/lib/logger.ts`
+  (`createLogger(area)`): every line is `time LEVEL [area] message key=value`,
+  with the request id and method + path when it runs inside a request, and
+  one status line per API request (non-API pages only when they fail). Secret
+  values, token shapes, emails and IPs are scrubbed before printing. Background
+  jobs (GitHub import/export, enrichment, research, link scans, backups,
+  digests, heavy work) log a start, an outcome and the reason for any failure.
+  Don't call `console.*` in server runtime code; use the area logger.
+- Audit log for resource changes (admin actions)
+- Frontend analytics through the shared `track()` sender (see `ANALYTICS.md`)
 - Process liveness: `GET /api/health` or `GET /api/health/live`
 - Database/migration readiness: `GET /api/health/ready`

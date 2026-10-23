@@ -51,9 +51,9 @@ export const useAnalytics = () => {
     };
   }, []);
 
-  // Web vitals start unless the visitor declined: they reach Replit Analytics
-  // (cookie-free) before a choice and GA4 only after a grant. Error capture
-  // starts only after a grant. The web-vitals callbacks do not expose an
+  // Web vitals and error capture start unless the visitor declined: they
+  // reach Replit Analytics (cookie-free; errors as their type only) before a
+  // choice and GA4 only after a grant. The web-vitals callbacks do not expose an
   // unsubscribe API, so their observers are started once per page; track()
   // still checks the current consent if a visitor declines later.
   useEffect(() => {
@@ -96,7 +96,7 @@ export const useAnalytics = () => {
         }
       }
 
-      if (consent === 'granted' && !errorsAttached) {
+      if (!errorsAttached) {
         window.addEventListener('error', handleError);
         window.addEventListener('unhandledrejection', handleUnhandledRejection);
         errorsAttached = true;
@@ -117,7 +117,7 @@ export const useAnalytics = () => {
 
     const handleConsentChange = () => {
       startCapture();
-      if (getAnalyticsConsent() !== 'granted' && errorsAttached) {
+      if (getAnalyticsConsent() === 'denied' && errorsAttached) {
         window.removeEventListener('error', handleError);
         window.removeEventListener('unhandledrejection', handleUnhandledRejection);
         errorsAttached = false;

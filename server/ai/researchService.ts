@@ -30,6 +30,9 @@ import { LinkChecker } from '../validation/linkChecker';
 import { isPlausiblePublicUrl } from '@shared/validation';
 import { invalidatePublicCache } from '../cache/publicCache';
 import { classifyKindForStorage } from '../lib/resourceKinds';
+import { createLogger } from "../lib/logger";
+
+const logger = createLogger("research");
 
 // Cap how much pre-computed context we inline into the orchestrator system prompt.
 const MAX_TAXONOMY_LINES = 200;
@@ -257,7 +260,7 @@ async function bestEffort(p: PromiseLike<unknown>, label: string): Promise<void>
   try {
     await withTimeout(p, TOOL_DB_TIMEOUT_MS, label);
   } catch (e: any) {
-    console.error(`[research] best-effort ${label} failed:`, e?.message || e);
+    logger.error(`[research] best-effort ${label} failed:`, e);
   }
 }
 
@@ -502,7 +505,7 @@ class ResearchService {
           await emitResult('check_duplicate', text, Date.now() - started);
           return { content: [{ type: 'text', text }] };
         } catch (err: any) {
-          console.error(`[research:${ctx.jobId}] check_duplicate handler error:`, err?.message || err);
+          logger.error({ jobId: ctx.jobId }, `check_duplicate handler error:`, err);
           const text = JSON.stringify({
             error: preview(String(err?.message || err), 300),
             recoverable: true,
@@ -588,7 +591,7 @@ class ResearchService {
               break;
             } catch (e: any) {
               lastErr = e;
-              console.error(`[research:${ctx.jobId}] save_discovery attempt ${attempt}/${SAVE_RETRY_ATTEMPTS} failed:`, e?.message || e);
+              logger.error({ jobId: ctx.jobId }, `save_discovery attempt ${attempt}/${SAVE_RETRY_ATTEMPTS} failed:`, e);
               if (isNonRetryableDbError(e)) break; // permanent input failure — retrying identical input can never succeed
               if (attempt < SAVE_RETRY_ATTEMPTS) await sleep(SAVE_RETRY_BASE_MS * attempt);
             }
@@ -640,7 +643,7 @@ class ResearchService {
             ...targetNote,
           });
         } catch (err: any) {
-          console.error(`[research:${ctx.jobId}] save_discovery handler error:`, err?.message || err);
+          logger.error({ jobId: ctx.jobId }, `save_discovery handler error:`, err);
           return await respond({
             error: preview(String(err?.message || err), 300),
             recoverable: true,
@@ -664,7 +667,7 @@ class ResearchService {
           await emitResult('get_coverage_gaps', `${gaps.length} gaps`, Date.now() - started);
           return { content: [{ type: 'text', text }] };
         } catch (err: any) {
-          console.error(`[research:${ctx.jobId}] get_coverage_gaps handler error:`, err?.message || err);
+          logger.error({ jobId: ctx.jobId }, `get_coverage_gaps handler error:`, err);
           const text = JSON.stringify({
             gaps: [],
             degraded: true,
@@ -704,7 +707,7 @@ class ResearchService {
           await emitResult('get_existing_resources', `${existing.length} resources`, Date.now() - started);
           return { content: [{ type: 'text', text }] };
         } catch (err: any) {
-          console.error(`[research:${ctx.jobId}] get_existing_resources handler error:`, err?.message || err);
+          logger.error({ jobId: ctx.jobId }, `get_existing_resources handler error:`, err);
           const text = JSON.stringify({
             count: 0,
             resources: [],
@@ -764,7 +767,7 @@ class ResearchService {
         'save_discovery conflict lookup',
       );
       if (!existing) throw new Error('save_discovery insert conflicted but no existing row was found');
-      console.log(`[research:${ctx.jobId}] save_discovery conflict — adopting existing row ${existing.id} for ${input.url}`);
+      logger.info({ jobId: ctx.jobId }, `save_discovery conflict — adopting existing row ${existing.id} for ${input.url}`);
       this.scheduleVerification(existing.id, input.url);
       return existing.id;
     }
@@ -786,7 +789,7 @@ class ResearchService {
    */
   private scheduleVerification(discoveryId: number, url: string): void {
     void this.verifyDiscovery(discoveryId, url).catch((e: any) => {
-      console.error(`[research] verification for discovery ${discoveryId} failed:`, e?.message || e);
+      logger.error(`[research] verification for discovery ${discoveryId} failed:`, e);
     });
   }
 
@@ -883,7 +886,7 @@ class ResearchService {
       } catch (e: any) {
         if (isNonRetryableDbError(e)) {
           const dump = JSON.stringify(item.input);
-          console.error(`[research:${ctx.jobId}] queued discovery permanently rejected (${e?.message || e}) — manual recovery data: ${dump}`);
+          logger.error({ jobId: ctx.jobId }, `queued discovery permanently rejected (${e?.message || e}) — manual recovery data: ${dump}`);
           await ctx.addLog('error', `Queued discovery permanently rejected by storage (${preview(String(e?.message || e), 200)}) — manual recovery data: ${dump}`, true);
         } else {
           still.push(item);
@@ -895,7 +898,7 @@ class ResearchService {
     ctx.pendingDiscoveries.push(...still);
     ctx.flushBackoffUntil = halted ? Date.now() + FLUSH_BACKOFF_MS : 0;
     if (flushed > 0 || still.length > 0) {
-      console.log(`[research:${ctx.jobId}] pending-discovery flush: ${flushed} saved, ${still.length} still queued${halted ? ` (halted on transient failure, backoff ${FLUSH_BACKOFF_MS}ms)` : ''}`);
+      logger.info({ jobId: ctx.jobId }, `pending-discovery flush: ${flushed} saved, ${still.length} still queued${halted ? ` (halted on transient failure, backoff ${FLUSH_BACKOFF_MS}ms)` : ''}`);
     }
     return { flushed, remaining: still.length };
   }
@@ -912,7 +915,7 @@ class ResearchService {
     if (ctx.pendingDiscoveries.length > 0) {
       for (const item of ctx.pendingDiscoveries) {
         const dump = JSON.stringify(item.input);
-        console.error(`[research:${ctx.jobId}] UNRECOVERED queued discovery (manual recovery data): ${dump}`);
+        logger.error({ jobId: ctx.jobId }, `UNRECOVERED queued discovery (manual recovery data): ${dump}`);
         await ctx.addLog('error', `Discovery could not be persisted after run-end retries — manual recovery data: ${dump}`, true);
       }
     }
@@ -1071,6 +1074,13 @@ class ResearchService {
       authTokenEncrypted: options.authTokenEncrypted || null,
     };
 
+    logger.info('Research job started', {
+      jobId: job.id,
+      categoryFocus: options.categoryFocus || undefined,
+      maxTurns: options.maxTurns ?? undefined,
+      maxBudgetUsd: options.maxBudgetUsd ?? undefined,
+    });
+
     this.runResearchLoop(
       job.id,
       options.prompt,
@@ -1084,8 +1094,7 @@ class ResearchService {
     )
       .catch(async (err) => {
         const msg = err?.message || String(err);
-        console.error(`[research:${job.id}] FAILED:`, msg);
-        if (err?.stack) console.error(err.stack);
+        logger.error('Research job failed', { jobId: job.id, reason: msg }, err instanceof Error ? err : undefined);
         try {
           const [cur] = await db.select({ agentLog: researchJobs.agentLog }).from(researchJobs).where(eq(researchJobs.id, job.id));
           const existing = Array.isArray(cur?.agentLog) ? (cur!.agentLog as any[]) : [];
@@ -1109,7 +1118,7 @@ class ResearchService {
             completedAt: sql`coalesce(${researchJobs.completedAt}, now())`,
           }).where(eq(researchJobs.id, job.id));
         } catch (persistErr: any) {
-          console.error(`[research:${job.id}] failed to persist failure:`, persistErr?.message);
+          logger.error({ jobId: job.id }, `failed to persist failure:`, persistErr?.message);
         }
       })
       .finally(() => {
@@ -1179,13 +1188,13 @@ class ResearchService {
           'agentLog persist',
         );
       } catch (e: any) {
-        console.error(`[research:${jobId}] persist failed:`, e.message);
+        logger.error({ jobId: jobId }, `persist failed:`, e.message);
       }
     };
     const addLog = async (role: string, content: string, persistNow = false) => {
       const stored = content.length > 8000 ? content.slice(0, 8000) + `\n…[truncated, full ${content.length} chars in workflow logs]` : content;
       agentLog.push({ role, content: stored, timestamp: new Date().toISOString() });
-      console.log(`[research:${jobId}] [${role}] ${content}`);
+      logger.info(`Agent ${role}: ${content}`, { jobId });
       if (persistNow) await persist();
     };
 
@@ -1348,7 +1357,7 @@ STOP TARGET: this run ends AUTOMATICALLY once ${targetDiscoveries} new discoveri
         'final job counters select',
       );
     } catch (e: any) {
-      console.error(`[research:${jobId}] final counters select failed (${e?.message}) — using in-memory counters`);
+      logger.error({ jobId: jobId }, `final counters select failed (${e?.message}) — using in-memory counters`);
       finalJob = { totalDiscoveries: runCtx.discoveriesSaved, duplicatesSkipped: null };
     }
 
@@ -1410,10 +1419,20 @@ STOP TARGET: this run ends AUTOMATICALLY once ${targetDiscoveries} new discoveri
         );
         statusPersisted = true;
       } catch (e: any) {
-        console.error(`[research:${jobId}] final status update attempt ${attempt}/3 failed:`, e?.message || e);
+        logger.error({ jobId: jobId }, `final status update attempt ${attempt}/3 failed:`, e);
         if (attempt < 3) await sleep(1000 * attempt);
       }
     }
+
+    logger[statusPersisted ? 'info' : 'error']('Research job finished', {
+      jobId,
+      status: reclaimed ? 'reclaimed' : finalStatus,
+      discoveries: finalJob?.totalDiscoveries || 0,
+      duplicates: finalJob?.duplicatesSkipped || 0,
+      turns: result.numTurns,
+      costUsd: Number(result.totalCostUsd.toFixed(4)),
+      ...(statusPersisted ? {} : { reason: 'final status update failed after 3 attempts' }),
+    });
 
     // Then the heavyweight agentLog snapshot. It re-asserts status/usage as
     // belt-and-braces in case all three dedicated attempts above failed.
@@ -1634,7 +1653,7 @@ STOP TARGET: this run ends AUTOMATICALLY once ${targetDiscoveries} new discoveri
         }
         approved++;
       } catch (err: any) {
-        console.error(`[research] approve-all failed for discovery ${row.id}:`, err?.message || err);
+        logger.error(`[research] approve-all failed for discovery ${row.id}:`, err);
         failed.push({ id: row.id, title: row.title, error: String(err?.message || err).slice(0, 300) });
       }
     }

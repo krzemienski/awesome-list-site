@@ -12,6 +12,9 @@ import {
   updateNotificationPreferences,
 } from "../services/digestService";
 import { asyncHandler } from "../middleware/asyncHandler";
+import { createLogger } from "../lib/logger";
+
+const logger = createLogger("notifications");
 
 type AuthedRequest = Parameters<RequestHandler>[0];
 
@@ -90,7 +93,7 @@ export function registerNotificationRoutes(
             message: "Add an email address before enabling email digests.",
           });
         }
-        console.error("[notifications] Failed to save preferences:", error);
+        logger.error("[notifications] Failed to save preferences:", error);
         return response
           .status(500)
           .json({ message: "Could not save reminder settings." });
