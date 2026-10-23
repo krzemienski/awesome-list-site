@@ -421,3 +421,17 @@ mtime_ms = 1792574370592
 storage_uri = "gcs://replit-rams-assets-picard/rams/assets/repl:71ccccc7-37f7-4f07-a880-5973ae4aa911/fa483750-0819-4a8a-9de7-1358ebebaa49/fcb05836-ac53-473e-a044-037e9938b538"
 storage_version_token = "1792574371250565"
 content_type = "text/html;profile=replit-chart"
+
+[[outputs]]
+id = "IXCtR8EHbhDcmdsPYT1uD"
+uri = "file://.local/outputs/visitor-mix.chart.html"
+type = "text"
+title = "Three in four visitors look automated"
+description = "Visitor mix for the last 7 days"
+logical_id = "2f248e14-8f53-4d15-8edd-622019bd5216"
+content_hash = "sha256:f1981846a62f54a65da4fe2227dbe7eb74b31985054a3c7d2391cf48b524630a"
+size = 2674
+mtime_ms = 1792775894248
+storage_uri = "gcs://replit-rams-assets-picard/rams/assets/repl:71ccccc7-37f7-4f07-a880-5973ae4aa911/2f248e14-8f53-4d15-8edd-622019bd5216/c43794c2-6b3e-476b-a199-b1c495db102e"
+storage_version_token = "1792775895073093"
+content_type = "text/html;profile=replit-chart"
