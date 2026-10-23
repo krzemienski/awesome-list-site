@@ -55,6 +55,11 @@ interface SyncOptions {
   branchName?: string;
   /** Skip the pre-push broken-link gate (export link check). Default: run it. */
   skipLinkCheck?: boolean;
+  /**
+   * Queue row that owns this run. Stamped into the export's history row so
+   * the admin panel can tie a commit to exactly one run (never by timestamp).
+   */
+  queueId?: number;
 }
 
 interface ImportResult {
@@ -973,7 +978,8 @@ export class GitHubSyncService {
           }))
         } as any,
         metadata: {
-          diff: { added, updated, removed }
+          diff: { added, updated, removed },
+          ...(typeof options.queueId === 'number' ? { queueId: options.queueId } : {}),
         } as any
       });
 
@@ -1124,12 +1130,16 @@ export class GitHubSyncService {
         } else if (item.action === 'export') {
           const result = await this.exportToGitHub(item.repositoryUrl, {
             dryRun: false,
-            createPullRequest: true
+            createPullRequest: true,
+            queueId: item.id,
           });
 
+          // commitSha is set as soon as the commit lands, so a failure in the
+          // bookkeeping after it still records which commit this run made.
           const metadata = {
             exported: result.exported,
-            errors: result.errors.length
+            errors: result.errors.length,
+            ...(result.commitSha ? { commitSha: result.commitSha, commitUrl: result.commitUrl } : {}),
           };
 
           if (result.errors.length === 0) {

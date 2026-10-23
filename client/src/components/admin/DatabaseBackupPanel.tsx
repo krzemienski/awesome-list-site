@@ -76,7 +76,7 @@ export default function DatabaseBackupPanel() {
       void queryClient.invalidateQueries({ queryKey: ["/api/admin/audit-logs"] });
       toast({
         title: "Database backup stored",
-        description: `${backup.tableCount} tables, ${backup.totalRows.toLocaleString()} rows saved to private storage.`,
+        description: `Backup ${backup.id}: ${backup.tableCount} tables, ${backup.totalRows.toLocaleString()} rows saved to private storage.`,
       });
     },
   });

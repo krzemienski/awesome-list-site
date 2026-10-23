@@ -154,3 +154,13 @@
   color: var(--text-3);
   font-size: 12px;
 }
+
+/* Journeys/Digests open from the Settings menu; the trigger names the open
+   section so the masthead always shows where the admin is. */
+.admin-dashboard .admin-dashboard__actions > .admin-dashboard__settings-trigger--active {
+  border-color: var(--accent);
+  color: var(--accent-ink);
+  box-shadow: inset 0 -2px 0 var(--accent);
+}
+.admin-dashboard__settings-current { margin-left: 4px; font-weight: 600; }
+.admin-dashboard__settings-item-current { margin-left: 4px; color: var(--accent-ink); }

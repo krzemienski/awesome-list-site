@@ -211,13 +211,15 @@ export default function ExportTab({ validationStatus: propValidationStatus }: Ex
 
       void queryClient.invalidateQueries({ queryKey: ["/api/admin/audit-logs"] });
       toast({
-        title: "Export Successful",
-        description: "Awesome list markdown file has been downloaded.",
+        title: "Markdown export downloaded",
+        description: "Saved awesome-list.md — the full awesome list as Markdown.",
       });
-    } catch {
+    } catch (error) {
+      // Name the real cause (signed out, rate limited, server error) instead
+      // of a generic "try again"; nothing is downloaded on failure.
       toast({
         title: "Export Failed",
-        description: "Failed to export awesome list. Please try again.",
+        description: describeWriteError(error, { fallback: "Failed to export awesome list.", outcome: "No file was downloaded. Try again in a moment." }),
         variant: "destructive",
       });
     } finally {
@@ -234,19 +236,19 @@ export default function ExportTab({ validationStatus: propValidationStatus }: Ex
       });
       if (!response.ok) throw new ApiError(response.status, "JSON export failed");
 
-      triggerBlobDownload(
-        await response.blob(),
-        exportFileName(response, "awesome-list-catalog-snapshot.json"),
-      );
+      const jsonName = exportFileName(response, "awesome-list-catalog-snapshot.json");
+      triggerBlobDownload(await response.blob(), jsonName);
       void queryClient.invalidateQueries({ queryKey: ["/api/admin/audit-logs"] });
       toast({
-        title: "JSON Export Successful",
-        description: "The catalog snapshot has been downloaded. This is not a restorable database backup.",
+        title: "JSON export downloaded",
+        description: `Saved ${jsonName} — the catalog snapshot. This is not a restorable database backup.`,
       });
-    } catch {
+    } catch (error) {
+      // Name the real cause (signed out, rate limited, server error) instead
+      // of a generic "try again"; nothing is downloaded on failure.
       toast({
         title: "JSON Export Failed",
-        description: "Failed to export the catalog snapshot. Please try again.",
+        description: describeWriteError(error, { fallback: "Failed to export the catalog snapshot.", outcome: "No file was downloaded. Try again in a moment." }),
         variant: "destructive",
       });
     } finally {
@@ -262,19 +264,19 @@ export default function ExportTab({ validationStatus: propValidationStatus }: Ex
       });
       if (!response.ok) throw new ApiError(response.status, "CSV export failed");
 
-      triggerBlobDownload(
-        await response.blob(),
-        exportFileName(response, "resources-export.csv"),
-      );
+      const csvName = exportFileName(response, "resources-export.csv");
+      triggerBlobDownload(await response.blob(), csvName);
       void queryClient.invalidateQueries({ queryKey: ["/api/admin/audit-logs"] });
       toast({
-        title: "CSV Export Successful",
-        description: "The resource table has been downloaded.",
+        title: "CSV export downloaded",
+        description: `Saved ${csvName} — the resource table.`,
       });
-    } catch {
+    } catch (error) {
+      // Name the real cause (signed out, rate limited, server error) instead
+      // of a generic "try again"; nothing is downloaded on failure.
       toast({
         title: "CSV Export Failed",
-        description: "Failed to export the resource table. Please try again.",
+        description: describeWriteError(error, { fallback: "Failed to export the resource table.", outcome: "No file was downloaded. Try again in a moment." }),
         variant: "destructive",
       });
     } finally {
@@ -290,19 +292,19 @@ export default function ExportTab({ validationStatus: propValidationStatus }: Ex
       });
       if (!response.ok) throw new ApiError(response.status, "OPML export failed");
 
-      triggerBlobDownload(
-        await response.blob(),
-        exportFileName(response, "categories-export.opml"),
-      );
+      const opmlName = exportFileName(response, "categories-export.opml");
+      triggerBlobDownload(await response.blob(), opmlName);
       void queryClient.invalidateQueries({ queryKey: ["/api/admin/audit-logs"] });
       toast({
-        title: "OPML Export Successful",
-        description: "The category tree has been downloaded.",
+        title: "OPML export downloaded",
+        description: `Saved ${opmlName} — the category tree.`,
       });
-    } catch {
+    } catch (error) {
+      // Name the real cause (signed out, rate limited, server error) instead
+      // of a generic "try again"; nothing is downloaded on failure.
       toast({
         title: "OPML Export Failed",
-        description: "Failed to export the category tree. Please try again.",
+        description: describeWriteError(error, { fallback: "Failed to export the category tree.", outcome: "No file was downloaded. Try again in a moment." }),
         variant: "destructive",
       });
     } finally {
@@ -323,17 +325,22 @@ export default function ExportTab({ validationStatus: propValidationStatus }: Ex
       });
       return response;
     },
-    onSuccess: () => {
+    onSuccess: (result) => {
       void queryClient.invalidateQueries({ queryKey: ["/api/admin/validation-status"] });
+      const outcome = result as { valid?: boolean; errors?: unknown[] } | null;
+      const problemCount = Array.isArray(outcome?.errors) ? outcome.errors.length : 0;
       toast({
-        title: "Validation Complete",
-        description: "Awesome list validation has been completed.",
+        title: outcome?.valid === false ? "Validation found problems" : "Validation passed",
+        description: outcome?.valid === false
+          ? `The awesome-lint check reported ${problemCount} problem${problemCount === 1 ? "" : "s"}. See the results below.`
+          : "The exported list passes the awesome-lint check.",
+        variant: outcome?.valid === false ? "destructive" : undefined,
       });
     },
-    onError: () => {
+    onError: (error: Error) => {
       toast({
-        title: "Validation Failed",
-        description: "Failed to validate awesome list. Please try again.",
+        title: "Validation could not run",
+        description: describeWriteError(error, { fallback: "Failed to validate the awesome list.", outcome: "No new validation result was recorded. Try again in a moment." }),
         variant: "destructive",
       });
     },
@@ -508,7 +515,7 @@ export default function ExportTab({ validationStatus: propValidationStatus }: Ex
                 {isLinkJobActive
                   ? `${(linkJob.checkedLinks || 0).toLocaleString()} of ${(linkJob.totalLinks || 0).toLocaleString()} links checked (started ${linkJob.startedAt ? formatAdminDateTime(linkJob.startedAt) : formatAdminDateTime(linkJob.createdAt)}).`
                   : linkJob.status === "completed"
-                    ? `Completed ${linkJob.completedAt ? formatAdminDateTime(linkJob.completedAt) : ""}: ${(linkJob.healthyLinks ?? 0).toLocaleString()} healthy, ${(linkJob.brokenLinks ?? 0).toLocaleString()} broken, ${(linkJob.redirectLinks ?? 0).toLocaleString()} redirects, ${(linkJob.timeoutLinks ?? 0).toLocaleString()} timeouts, ${(linkJob.suspectLinks ?? 0).toLocaleString()} suspect of ${(linkJob.totalLinks ?? 0).toLocaleString()}.`
+                    ? `Scan #${linkJob.id} completed ${linkJob.completedAt ? formatAdminDateTime(linkJob.completedAt) : ""}. At scan time: ${(linkJob.healthyLinks ?? 0).toLocaleString()} healthy, ${(linkJob.brokenLinks ?? 0).toLocaleString()} broken, ${(linkJob.redirectLinks ?? 0).toLocaleString()} redirects, ${(linkJob.timeoutLinks ?? 0).toLocaleString()} timeouts, ${(linkJob.suspectLinks ?? 0).toLocaleString()} suspect of ${(linkJob.totalLinks ?? 0).toLocaleString()}.`
                     : `${linkJob.status === "failed" ? "Failed" : "Cancelled"}${linkJob.completedAt ? ` ${formatAdminDateTime(linkJob.completedAt)}` : ""}: ${linkJob.errorMessage || "No reason was recorded."}`}
               </p>
               {isLinkJobError ? (
@@ -521,6 +528,11 @@ export default function ExportTab({ validationStatus: propValidationStatus }: Ex
                   testId="alert-export-link-check-stale"
                   retryTestId="button-retry-export-link-check"
                 />
+              ) : null}
+              {linkJob.status === "completed" ? (
+                <p className="admin-ops-export__link-job-scope" data-testid="export-link-check-scan-time-note">
+                  These are the counts saved when the scan finished. Link Health shows the same scan&apos;s problem links for resources still in the catalog, so its numbers drop when a flagged resource is later fixed, rejected or removed.
+                </p>
               ) : null}
               <RouterLink className="admin-ops-export__link-job-link" href="/admin/linkhealth">Open Link Health for problem links</RouterLink>
             </>
@@ -824,7 +836,7 @@ export default function ExportTab({ validationStatus: propValidationStatus }: Ex
               <AlertCircle className="mx-auto mb-4 h-12 w-12 text-[var(--text-2)]" />
               <p className="mb-2 text-[var(--text-2)]">No validation results yet</p>
               <p className="text-sm text-[var(--text-2)]">
-                Run validation above to check the exported Markdown against awesome-lint rules.
+                Use “Run Validation” at the top of this section to check the exported Markdown against awesome-lint rules.
               </p>
             </div>
           </section>

@@ -215,8 +215,8 @@ export default function AdminStats({
         loading={subcategoriesLoading}
         onNavigate={onNavigate ? () => onNavigate("subcategories") : undefined}
         navigateLabel="Subcategories — open the subcategories tab"
-        titleTestId="stat-title-journeys"
-        testId="stat-card-journeys"
+        titleTestId="stat-title-subcategories"
+        testId="stat-card-subcategories"
       />
       <Stat
         label="Active users"

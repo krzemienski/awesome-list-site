@@ -1813,8 +1813,8 @@ export default function GenericCrudManager<T extends BaseEntityWithCount>({
       }
 
       toast({
-        title: "Success",
-        description: `${entityName} created successfully`
+        title: `${entityName} created`,
+        description: newEntity?.name ? `"${newEntity.name}" was added.` : `The ${entityName.toLowerCase()} was added.`
       });
       setCreateDialogOpen(false);
       setFormData(initialFormData);
@@ -1871,8 +1871,8 @@ export default function GenericCrudManager<T extends BaseEntityWithCount>({
       }
 
       toast({
-        title: "Success",
-        description: `${entityName} updated successfully`
+        title: `${entityName} updated`,
+        description: (updatedEntity?.name || previousData?.name) ? `Changes to "${updatedEntity?.name || previousData?.name}" were saved.` : `Your changes were saved.`
       });
       setEditDialogOpen(false);
       setSelectedItem(null);
@@ -1916,8 +1916,8 @@ export default function GenericCrudManager<T extends BaseEntityWithCount>({
       }
 
       toast({
-        title: "Success",
-        description: `${entityName} deleted successfully`
+        title: `${entityName} deleted`,
+        description: previousData?.name ? `"${previousData.name}" was deleted.` : `The ${entityName.toLowerCase()} was deleted.`
       });
       const rows = paginatedItems || [];
       const index = rows.findIndex(item => item.id === id);
@@ -1930,7 +1930,7 @@ export default function GenericCrudManager<T extends BaseEntityWithCount>({
     onError: (error: any) => {
       // Run15 BUG-015: surface a human sentence, not a raw "400: {json}" blob.
       toast({
-        title: "Error",
+        title: `Could not delete ${entityName.toLowerCase()}`,
         description: describeWriteError(error, { fallback: `Failed to delete ${entityName.toLowerCase()}`, outcome: NOTHING_CHANGED_OUTCOME }),
         variant: "destructive"
       });
@@ -1969,8 +1969,8 @@ export default function GenericCrudManager<T extends BaseEntityWithCount>({
         void queryClient.invalidateQueries({ queryKey: [publicQueryKey] });
       }
       toast({
-        title: "Success",
-        description: `${deletedIds.length} ${deletedIds.length === 1 ? entityName.toLowerCase() : entityNamePlural.toLowerCase()} deleted successfully`
+        title: `${deletedIds.length === 1 ? entityName : entityNamePlural} deleted`,
+        description: `${deletedIds.length} ${deletedIds.length === 1 ? entityName.toLowerCase() : entityNamePlural.toLowerCase()} deleted.`
       });
       setBulkDeleteDialogOpen(false);
       clearSelection();
@@ -1978,7 +1978,7 @@ export default function GenericCrudManager<T extends BaseEntityWithCount>({
     onError: (error: any) => {
       // Run15 BUG-015: surface a human sentence, not a raw "400: {json}" blob.
       toast({
-        title: "Error",
+        title: `Could not delete ${entityNamePlural.toLowerCase()}`,
         description: describeWriteError(error, {
           fallback: `Failed to delete ${entityNamePlural.toLowerCase()}`,
           outcome: `Some ${entityNamePlural.toLowerCase()} may already be deleted. Refresh the list, then try again.`,

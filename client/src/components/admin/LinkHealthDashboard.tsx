@@ -421,6 +421,17 @@ export default function LinkHealthDashboard() {
           </div>
         ))}
       </div>
+      {lastCompletedJob ? (
+        <p className="text-xs text-muted-foreground" data-testid="text-link-health-count-source">
+          {!isJobInProgress && !isTerminalWithoutResults && brokenLinksData
+            ? `Counts are from scan #${latestJob?.id} (${formatAdminDateTime(latestJob?.completedAt ?? latestJob?.createdAt ?? lastCompletedJob.createdAt)}) for resources still in the catalog.${
+                (latestJob?.brokenLinks ?? 0) !== summaryCounts.broken
+                  ? ` When it finished, the scan recorded ${(latestJob?.brokenLinks ?? 0).toLocaleString()} broken; ${summaryCounts.broken.toLocaleString()} of those resources are still listed.`
+                  : ""
+              }`
+            : `Counts are the totals saved when scan #${lastCompletedJob.id} finished (${formatAdminDateTime(lastCompletedJob.completedAt ?? lastCompletedJob.createdAt)}).`}
+        </p>
+      ) : null}
 
       <LinkReportsPanel />
 

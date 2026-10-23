@@ -290,7 +290,13 @@ function StepEditor({
               value={form.title}
               onChange={(e) => setForm((f) => ({ ...f, title: e.target.value }))}
               data-testid="step-title-input"
+              aria-describedby={form.title.trim() ? undefined : "step-title-required"}
             />
+            {!form.title.trim() && (
+              <p id="step-title-required" className="text-xs text-muted-foreground" data-testid="step-title-required">
+                A title is required before you can {submitLabel.toLowerCase().startsWith("add") ? "add" : "save"} this step.
+              </p>
+            )}
           </div>
           <div className="space-y-2">
             <Label htmlFor="step-description">Description</Label>
@@ -401,8 +407,8 @@ function StepsDialog({
           isOptional: form.isOptional,
         }),
       }),
-    onSuccess: () => {
-      toast({ title: "Step added" });
+    onSuccess: (_data, form) => {
+      toast({ title: "Step added", description: `"${form.title}" is now live on the journey page.` });
       setCreateOpen(false);
       invalidate();
     },
@@ -423,8 +429,8 @@ function StepsDialog({
           }),
         });
     },
-    onSuccess: () => {
-      toast({ title: "Step saved" });
+    onSuccess: (_data, { form }) => {
+      toast({ title: "Step saved", description: `Changes to "${form.title}" are live.` });
       setEditingGroup(null);
       invalidate();
     },
@@ -438,8 +444,8 @@ function StepsDialog({
           method: "DELETE",
         });
     },
-    onSuccess: () => {
-      toast({ title: "Step deleted" });
+    onSuccess: (_data, group) => {
+      toast({ title: "Step deleted", description: `Step ${group.stepNumber} ("${group.rows[0]?.title ?? "untitled"}") was removed and the remaining steps renumbered.` });
       setDeletingGroup(null);
       invalidate();
     },

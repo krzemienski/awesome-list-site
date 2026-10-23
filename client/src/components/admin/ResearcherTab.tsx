@@ -417,6 +417,13 @@ export default function ResearcherTab({ initialTab = "launch" }: ResearcherTabPr
   // number inputs were flagged invalid (budget $0 jobs got created). Block
   // submission client-side, mirroring the server's min-$0.25 / 5–100 ranges
   // (Run20: no upper budget cap per user request).
+  // Launch-form problems show next to the Run/Launch button (inline, not a
+  // vanishing toast) and clear on the next valid attempt.
+  const [launchError, setLaunchError] = useState<string | null>(null);
+  const launchErrorNode = launchError ? (
+    <p role="alert" className="text-sm text-destructive" data-testid="error-research-launch">{launchError}</p>
+  ) : null;
+
   const handleLaunch = () => {
     if (!activeJobStateKnown) {
       toast({
@@ -434,11 +441,7 @@ export default function ResearcherTab({ initialTab = "launch" }: ResearcherTabPr
     // WS1: an EMPTY prompt is valid — the server auto-generates the brief.
     const trimmedPrompt = prompt.trim();
     if (trimmedPrompt.length > 0 && trimmedPrompt.length < 10) {
-      toast({
-        title: "Prompt too short",
-        description: "Write at least 10 characters, or clear the field to auto-generate a brief.",
-        variant: "destructive",
-      });
+      setLaunchError("Prompt too short: Write at least 10 characters, or clear the field to auto-generate a brief.");
       return;
     }
     // Blank = unlimited (no cap). A provided value must still be a sane
@@ -446,11 +449,7 @@ export default function ResearcherTab({ initialTab = "launch" }: ResearcherTabPr
     if (maxBudget.trim() !== "") {
       const budget = Number(maxBudget);
       if (!Number.isFinite(budget) || budget <= 0) {
-        toast({
-          title: "Invalid budget",
-          description: "Budget must be a positive number, or leave blank for unlimited.",
-          variant: "destructive",
-        });
+        setLaunchError("Invalid budget: Budget must be a positive number, or leave blank for unlimited.");
         return;
       }
     }
@@ -459,25 +458,18 @@ export default function ResearcherTab({ initialTab = "launch" }: ResearcherTabPr
     if (maxTurns.trim() !== "") {
       const turns = Number(maxTurns);
       if (!Number.isInteger(turns) || turns <= 0) {
-        toast({
-          title: "Invalid max turns",
-          description: "Max turns must be a positive whole number, or leave blank for unlimited.",
-          variant: "destructive",
-        });
+        setLaunchError("Invalid max turns: Max turns must be a positive whole number, or leave blank for unlimited.");
         return;
       }
     }
     if (targetDiscoveries.trim() !== "") {
       const target = Number(targetDiscoveries);
       if (!Number.isInteger(target) || target <= 0 || target > 1000) {
-        toast({
-          title: "Invalid discovery target",
-          description: "Stop-after must be a whole number from 1 to 1000, or leave blank for no target.",
-          variant: "destructive",
-        });
+        setLaunchError("Invalid discovery target: Stop-after must be a whole number from 1 to 1000, or leave blank for no target.");
         return;
       }
     }
+    setLaunchError(null);
     // Run23 NB-040: don't fire the job from the raw click — open an explicit
     // confirmation dialog first.
     setConfirmLaunch(true);
@@ -647,6 +639,7 @@ export default function ResearcherTab({ initialTab = "launch" }: ResearcherTabPr
               >
                 Run job
               </Button>
+              {launchErrorNode}
             </div>
           </div>
         </section>
@@ -998,7 +991,7 @@ export default function ResearcherTab({ initialTab = "launch" }: ResearcherTabPr
 
                 {/* R4-051: NB-022 — don't hard-disable on the min-length rule
                     (that's the "silently disabled" bug). Only the one-shot
-                    pending state disables; short prompts get a toast on click. */}
+                    pending state disables; short prompts get an inline error on click. */}
                 <Button
                   onClick={handleLaunch}
                   disabled={startMutation.isPending || !activeJobStateKnown}
@@ -1010,6 +1003,7 @@ export default function ResearcherTab({ initialTab = "launch" }: ResearcherTabPr
                     <><Play className="w-4 h-4 mr-2" />Launch Researcher</>
                   )}
                 </Button>
+                {launchErrorNode}
 
                 {/* Run23 NB-040: explicit confirmation before starting a paid job. */}
                 <AlertDialog open={confirmLaunch} onOpenChange={(open) => { if (!open && !startMutation.isPending) setConfirmLaunch(false); }}>
@@ -1473,7 +1467,7 @@ export default function ResearcherTab({ initialTab = "launch" }: ResearcherTabPr
         <DialogContent className="queues-agent__dialog max-w-4xl max-h-[90vh] overflow-auto">
           <DialogHeader>
             <DialogTitle className="flex items-center gap-2">
-              Research Job #{selectedJob?.id}
+              Research Job #{selectedJob?.id ?? selectedJobId}
               {selectedJob && getStatusBadge(selectedJob.status)}
               {selectedJob?.isActive && (
                 <Badge variant="outline" className="text-[10px]">

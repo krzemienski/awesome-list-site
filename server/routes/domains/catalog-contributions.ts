@@ -65,6 +65,8 @@ import {
   resourceTitleSchema,
   resourceDescriptionSchema,
   tagSchema,
+  isReservedTestHost,
+  RESERVED_TEST_HOST_MESSAGE,
 } from "@shared/validation";
 import { isSearchableQuery, normalizeSearchQuery } from "@shared/searchNormalize";
 import {
@@ -764,6 +766,18 @@ export function registerCatalogContributionsRoutes(
           message: 'Validation failed',
           fieldErrors,
           errors: submitValidation.error.issues
+        });
+      }
+
+      // Leftover QA probes (example.com etc.) silted up the live moderation
+      // queue; the live site refuses reserved test domains outright. Dev
+      // keeps accepting them so disposable QA submissions still work there.
+      if (process.env.NODE_ENV === 'production' && isReservedTestHost(submitValidation.data.url)) {
+        return res.status(400).json({
+          error: 'validation_failed',
+          message: RESERVED_TEST_HOST_MESSAGE,
+          fieldErrors: { url: RESERVED_TEST_HOST_MESSAGE },
+          errors: [],
         });
       }
 

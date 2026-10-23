@@ -1063,13 +1063,17 @@ export class ResourceRepository {
   async updateResource(
     id: number,
     resource: Partial<InsertResource>,
-    audit: { performedBy?: string; notes?: string } | false = {},
+    audit: { performedBy?: string; notes?: string; rejectionReason?: string } | false = {},
   ): Promise<Resource> {
     // Task #248: same universal decode boundary as createResource.
     resource = this.normalizeResourceFacets(decodeResourceTextFields({ ...resource }), false);
     return withResourcePublication(tx => transitionResourceInTransaction(
       tx, id, resource, audit ? audit.performedBy : undefined,
-      { audit: audit !== false, notes: audit ? audit.notes : undefined },
+      {
+        audit: audit !== false,
+        notes: audit ? audit.notes : undefined,
+        rejectionReason: audit ? audit.rejectionReason : undefined,
+      },
     ));
   }
 

@@ -56,6 +56,9 @@ interface SyncQueueItem {
   action: string;
   status: string;
   errorMessage?: string;
+  /** The export's commit landed on GitHub; only post-commit bookkeeping failed. */
+  committedDespiteError?: boolean;
+  commitSha?: string;
   importResult?: { imported?: number; updated?: number; skipped?: number; errors?: number; outcome?: string; errorMessages?: string[] };
   createdAt: string;
   processedAt?: string;
@@ -529,6 +532,11 @@ export default function GitHubSyncPanel() {
                             Imported: {item.importResult.imported ?? 0}; updated: {item.importResult.updated ?? 0}; skipped: {item.importResult.skipped ?? 0}; failed: {item.importResult.errors ?? 0}.
                           </p>
                         )}
+                        {item.committedDespiteError && item.errorMessage && (
+                          <p className="text-xs text-muted-foreground break-words pl-6" data-testid={`sync-queue-committed-note-${item.id}`}>
+                            {item.errorMessage}
+                          </p>
+                        )}
                         {(item.status === 'failed' || item.status === 'partial') && (
                           item.importResult?.errorMessages && item.importResult.errorMessages.length > 0 ? (
                             <ul className="ops-github-panel__error-list" data-testid={`sync-queue-errors-${item.id}`}>
@@ -684,7 +692,11 @@ export default function GitHubSyncPanel() {
             <DialogTitle>Sync {selectedHistory?.label}</DialogTitle>
             <DialogDescription>
               {selectedHistory
-                ? `${selectedHistory.direction === "export" ? "Export" : "Import"} · ${formatSyncDate(selectedHistory.createdAt)}`
+                ? `${selectedHistory.direction === "export" ? "Export" : "Import"} · ${formatSyncDate(selectedHistory.createdAt)}${
+                    // Name the repository: older runs may have targeted a
+                    // different repo than the one configured today.
+                    selectedHistory.repositoryUrl ? ` · ${normalizeGithubRepoInput(selectedHistory.repositoryUrl) ?? selectedHistory.repositoryUrl}` : ""
+                  }`
                 : "Sync job details"}
             </DialogDescription>
           </DialogHeader>

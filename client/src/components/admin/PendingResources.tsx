@@ -19,6 +19,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { ExternalLink, Calendar, User, FolderTree, RefreshCw, AlertCircle } from "lucide-react";
 import type { Resource } from "@shared/schema";
+import { isReservedTestHost } from "@shared/validation";
 import "./queues-review.css";
 
 // Bulk actions process resources one by one, so a server failure can leave
@@ -194,6 +195,16 @@ export default function PendingResources() {
     focusAfterRemovalRef.current = null;
   }, [pendingResourceIds]);
 
+  // Success feedback names what changed: one title, or up to three titles
+  // plus "and N more" for bulk actions.
+  const titleFor = (id: number) => pendingResources.find((r) => r.id === id)?.title;
+  const describeTitles = (ids: number[]) => {
+    const titles = ids.map(titleFor).filter((t): t is string => Boolean(t)).map((t) => `"${t}"`);
+    if (titles.length === 0) return "";
+    const shown = titles.slice(0, 3).join(", ");
+    return titles.length > 3 ? `${shown} and ${titles.length - 3} more` : shown;
+  };
+
   const approveMutation = useMutation({
     mutationFn: async (resourceId: number): Promise<unknown> => {
       return await apiRequest(`/api/admin/resources/${resourceId}/approve`, {
@@ -207,9 +218,10 @@ export default function PendingResources() {
       setApproveDialogOpen(false);
       setResourceToApprove(null);
       setApproveError(null);
+      const approvedTitle = titleFor(resourceId);
       toast({
-        title: "Resource Approved",
-        description: "The resource has been approved and added to the public catalog.",
+        title: "Resource approved",
+        description: `${approvedTitle ? `"${approvedTitle}"` : "The resource"} is now live in the public catalog.`,
       });
     },
     onError: (error: Error) => {
@@ -224,7 +236,8 @@ export default function PendingResources() {
         body: JSON.stringify({ reason })
       });
     },
-    onSuccess: (_data, { resourceId }) => {
+    onSuccess: (_data, { resourceId, reason }) => {
+      const rejectedTitle = titleFor(resourceId);
       planFocusAfterRemoval([resourceId]);
       void queryClient.invalidateQueries({ queryKey: ['/api/admin/pending-resources'] });
       void queryClient.invalidateQueries({ queryKey: ['/api/admin/stats'] });
@@ -233,8 +246,8 @@ export default function PendingResources() {
       setRejectionReason("");
       setRejectError(null);
       toast({
-        title: "Resource Rejected",
-        description: "The resource has been rejected.",
+        title: "Resource rejected",
+        description: `${rejectedTitle ? `"${rejectedTitle}"` : "The resource"} was rejected. The contributor will see your reason: "${reason.trim()}"`,
       });
     },
     onError: (error: Error) => {
@@ -253,6 +266,7 @@ export default function PendingResources() {
       }) as BulkResourceResponse;
     },
     onSuccess: (response, ids) => {
+      const names = describeTitles(ids);
       const outcome = {
         action: "approved" as const,
         requested: ids.length,
@@ -268,8 +282,8 @@ export default function PendingResources() {
       void queryClient.invalidateQueries({ queryKey: ['/api/admin/pending-resources'] });
       void queryClient.invalidateQueries({ queryKey: ['/api/admin/stats'] });
       toast({
-        title: response.failed > 0 ? "Bulk approval completed with failures" : "Resources Approved",
-        description: `${response.succeeded} approved${response.failed > 0 ? `, ${response.failed} failed` : ""}.`,
+        title: response.failed > 0 ? "Bulk approval completed with failures" : "Resources approved",
+        description: `${response.succeeded} approved${response.failed > 0 ? `, ${response.failed} failed` : ""}${names ? `: ${names}` : ""}.`,
         variant: response.failed > 0 ? "destructive" : undefined
       });
     },
@@ -292,6 +306,7 @@ export default function PendingResources() {
       }) as BulkResourceResponse;
     },
     onSuccess: (response, variables) => {
+      const names = describeTitles(variables.ids);
       const outcome = {
         action: "rejected" as const,
         requested: variables.ids.length,
@@ -308,8 +323,8 @@ export default function PendingResources() {
       void queryClient.invalidateQueries({ queryKey: ['/api/admin/pending-resources'] });
       void queryClient.invalidateQueries({ queryKey: ['/api/admin/stats'] });
       toast({
-        title: response.failed > 0 ? "Bulk rejection completed with failures" : "Resources Rejected",
-        description: `${response.succeeded} rejected${response.failed > 0 ? `, ${response.failed} failed` : ""}.`,
+        title: response.failed > 0 ? "Bulk rejection completed with failures" : "Resources rejected",
+        description: `${response.succeeded} rejected${response.failed > 0 ? `, ${response.failed} failed` : ""}${names ? `: ${names}` : ""}.`,
         variant: response.failed > 0 ? "destructive" : undefined
       });
     },
@@ -667,6 +682,15 @@ export default function PendingResources() {
                     <td>
                       <div className="queue-review-item-title">
                         <span title={resource.title}>{resource.title}</span>
+                        {(isReservedTestHost(resource.url) || resource.title.startsWith("__qa_test_")) && (
+                          <Badge
+                            variant="outline"
+                            title="Looks like a leftover QA probe (reserved test domain or __qa_test_ title). Reject it to clear the queue."
+                            data-testid={`badge-test-entry-${resource.id}`}
+                          >
+                            Test entry
+                          </Badge>
+                        )}
                         <a
                           href={resource.url}
                           target="_blank"
@@ -962,7 +986,8 @@ export default function PendingResources() {
                   data-testid="textarea-rejection-reason"
                 />
                 <p className="text-xs text-muted-foreground mt-1">
-                   {rejectionReason.trim().length}/{MIN_REJECTION_REASON_LENGTH} characters minimum · visible to the contributor
+                  {rejectionReason.trim().length > 0 && rejectionReason.trim().length < MIN_REJECTION_REASON_LENGTH ? <span className="text-destructive">Too short — add {MIN_REJECTION_REASON_LENGTH - rejectionReason.trim().length} more character{MIN_REJECTION_REASON_LENGTH - rejectionReason.trim().length === 1 ? "" : "s"} to enable Reject. </span> : null}
+                  {rejectionReason.trim().length}/{MIN_REJECTION_REASON_LENGTH} characters minimum · visible to the contributor
                 </p>
               </div>
             </div>
@@ -1060,6 +1085,7 @@ export default function PendingResources() {
                data-testid="textarea-bulk-rejection-reason"
              />
              <p className="text-xs text-muted-foreground">
+                  {bulkRejectionReason.trim().length > 0 && bulkRejectionReason.trim().length < MIN_REJECTION_REASON_LENGTH ? <span className="text-destructive">Too short — add {MIN_REJECTION_REASON_LENGTH - bulkRejectionReason.trim().length} more character{MIN_REJECTION_REASON_LENGTH - bulkRejectionReason.trim().length === 1 ? "" : "s"} to enable Reject. </span> : null}
                   {bulkRejectionReason.trim().length}/{MIN_REJECTION_REASON_LENGTH} characters minimum · visible to contributors
              </p>
            </div>

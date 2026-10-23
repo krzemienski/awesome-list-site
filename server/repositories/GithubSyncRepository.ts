@@ -127,4 +127,24 @@ export class GithubSyncRepository {
       .orderBy(desc(githubSyncHistory.createdAt))
       .limit(limit);
   }
+
+  /**
+   * Recent history rows WITHOUT the (large) snapshot column — enough to tell
+   * whether a queue job's commit actually landed on GitHub.
+   */
+  async getRecentCommitSummaries(limit: number = 50): Promise<Array<Pick<GithubSyncHistory, 'id' | 'repositoryUrl' | 'direction' | 'commitSha' | 'commitUrl' | 'metadata' | 'createdAt'>>> {
+    return await db
+      .select({
+        id: githubSyncHistory.id,
+        repositoryUrl: githubSyncHistory.repositoryUrl,
+        direction: githubSyncHistory.direction,
+        commitSha: githubSyncHistory.commitSha,
+        commitUrl: githubSyncHistory.commitUrl,
+        metadata: githubSyncHistory.metadata,
+        createdAt: githubSyncHistory.createdAt,
+      })
+      .from(githubSyncHistory)
+      .orderBy(desc(githubSyncHistory.createdAt))
+      .limit(limit);
+  }
 }

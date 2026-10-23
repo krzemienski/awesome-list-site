@@ -284,7 +284,10 @@ export default function ResourceManager({ createRequest = 0 }: { createRequest?:
   const [bulkApproveDialogOpen, setBulkApproveDialogOpen] = useState(false);
 
   // BUG-049: per-field inline errors + a dialog-level banner for server 400s.
-  const [fieldErrors, setFieldErrors] = useState<{ title?: string; url?: string; description?: string; category?: string }>({});
+  const [fieldErrors, setFieldErrors] = useState<{ title?: string; url?: string; description?: string; category?: string; rejectionReason?: string }>({});
+  // Moving a resource into Rejected from the editor needs the same 10+
+  // character reason as the moderation queue; the contributor sees it.
+  const [rejectionReason, setRejectionReason] = useState("");
   const [formError, setFormError] = useState<string | null>(null);
   // Catalog controls use narrow PATCH endpoints. Keep failures next to the
   // control that initiated them so an error never closes/remounts the dialog.
@@ -442,10 +445,10 @@ export default function ResourceManager({ createRequest = 0 }: { createRequest?:
       setFormError(describeWriteError(error, { fallback, outcome: NOTHING_CHANGED_OUTCOME }));
       return;
     }
-    const inline: { title?: string; url?: string; description?: string } = {};
+    const inline: { title?: string; url?: string; description?: string; rejectionReason?: string } = {};
     const other: string[] = [];
     for (const [field, message] of Object.entries(serverFieldErrors)) {
-      if (field === "title" || field === "url" || field === "description") inline[field] = message;
+      if (field === "title" || field === "url" || field === "description" || field === "rejectionReason") inline[field] = message;
       else other.push(`${field}: ${message}`);
     }
     setFieldErrors(inline);
@@ -453,13 +456,13 @@ export default function ResourceManager({ createRequest = 0 }: { createRequest?:
   };
 
   const updateMutation = useMutation({
-    mutationFn: async ({ id, data }: { id: number, data: Partial<AdminResource> }) => {
+    mutationFn: async ({ id, data }: { id: number, data: Partial<AdminResource> & { rejectionReason?: string } }) => {
       return await apiRequest(`/api/admin/resources/${id}`, {
         method: 'PUT',
         body: JSON.stringify(data)
       });
     },
-    onSuccess: () => {
+    onSuccess: (_result, variables) => {
       void queryClient.invalidateQueries({ queryKey: ['/api/admin/resources'] });
       void queryClient.invalidateQueries({ queryKey: ['/api/resources'] });
       void queryClient.invalidateQueries({ queryKey: ["awesome-list-data"] });
@@ -467,9 +470,12 @@ export default function ResourceManager({ createRequest = 0 }: { createRequest?:
       void queryClient.invalidateQueries({ queryKey: ["/api/admin/stats"] });
       setEditDialogOpen(false);
       setSelectedResource(null);
+      const savedTitle = variables.data.title || "The resource";
       toast({
-        title: "Resource Updated",
-        description: "The resource has been successfully updated.",
+        title: "Resource updated",
+        description: variables.data.rejectionReason
+          ? `"${savedTitle}" was rejected. The contributor will see your reason.`
+          : `Changes to "${savedTitle}" were saved.`,
       });
     },
     onError: (error: Error) => {
@@ -828,6 +834,7 @@ export default function ResourceManager({ createRequest = 0 }: { createRequest?:
     setSelectedResource(resource);
     // BUG-049: fresh dialog, fresh error state.
     setFieldErrors({});
+    setRejectionReason("");
     setFormError(null);
     setResourceActionErrors((previous) => {
       const next = { ...previous };
@@ -916,8 +923,12 @@ export default function ResourceManager({ createRequest = 0 }: { createRequest?:
   // inline next to each field instead of toast-only. Edit accepts legacy
   // http:// URLs (server PUT uses webUrlSchema); Create requires https
   // (server POST uses httpsUrlSchema).
+  const needsRejectionReason = Boolean(
+    selectedResource && editForm.status === "rejected" && selectedResource.status !== "rejected",
+  );
+
   const validateEditForm = (mode: 'edit' | 'create'): boolean => {
-    const errors: { title?: string; url?: string; description?: string; category?: string } = {};
+    const errors: { title?: string; url?: string; description?: string; category?: string; rejectionReason?: string } = {};
     const titleParsed = resourceTitleSchema.safeParse(editForm.title.trim());
     if (!titleParsed.success) {
       errors.title = titleParsed.error.issues[0]?.message || "Invalid title";
@@ -935,12 +946,15 @@ export default function ResourceManager({ createRequest = 0 }: { createRequest?:
     if (mode === 'create' && !editForm.category) {
       errors.category = "Category is required";
     }
+    if (mode === 'edit' && needsRejectionReason && rejectionReason.trim().length < 10) {
+      errors.rejectionReason = "Rejection reason is required (minimum 10 characters)";
+    }
     setFieldErrors(errors);
     setFormError(null);
     return Object.keys(errors).length === 0;
   };
 
-  const clearFieldError = (field: 'title' | 'url' | 'description' | 'category') => {
+  const clearFieldError = (field: 'title' | 'url' | 'description' | 'category' | 'rejectionReason') => {
     setFieldErrors(prev => (prev[field] ? { ...prev, [field]: undefined } : prev));
   };
 
@@ -954,7 +968,10 @@ export default function ResourceManager({ createRequest = 0 }: { createRequest?:
     delete (fields as Partial<typeof editForm>).featured;
     updateMutation.mutate({
       id: selectedResource.id,
-      data: fields as Partial<AdminResource>,
+      data: {
+        ...(fields as Partial<AdminResource>),
+        ...(needsRejectionReason ? { rejectionReason: rejectionReason.trim() } : {}),
+      },
     });
   };
 
@@ -1766,7 +1783,7 @@ export default function ResourceManager({ createRequest = 0 }: { createRequest?:
                 <Label htmlFor="edit-status">Status</Label>
                 <Select 
                   value={editForm.status} 
-                  onValueChange={(v) => setEditForm(f => ({ ...f, status: v }))}
+                  onValueChange={(v) => { clearFieldError('rejectionReason'); setEditForm(f => ({ ...f, status: v })); }}
                 >
                   <SelectTrigger id="edit-status" data-testid="select-edit-status">
                     <SelectValue placeholder="Select status" />
@@ -1779,6 +1796,26 @@ export default function ResourceManager({ createRequest = 0 }: { createRequest?:
                 </Select>
               </div>
             </div>
+            {needsRejectionReason && (
+              <div className="grid gap-2">
+                <Label htmlFor="edit-rejection-reason">Rejection reason * <span className="text-muted-foreground font-normal">(shown to the contributor)</span></Label>
+                <Textarea
+                  id="edit-rejection-reason"
+                  value={rejectionReason}
+                  onChange={(e) => { clearFieldError('rejectionReason'); setRejectionReason(e.target.value); }}
+                  rows={3}
+                  placeholder="Explain why this resource is being rejected (at least 10 characters)..."
+                  aria-invalid={!!fieldErrors.rejectionReason}
+                  aria-describedby={fieldErrors.rejectionReason ? "edit-rejection-reason-error" : undefined}
+                  data-testid="input-edit-rejection-reason"
+                />
+                {fieldErrors.rejectionReason && (
+                  <p id="edit-rejection-reason-error" className="text-sm text-destructive" data-testid="error-edit-rejection-reason">
+                    {fieldErrors.rejectionReason}
+                  </p>
+                )}
+              </div>
+            )}
             <div className="grid gap-4 sm:grid-cols-2">
               <div className="grid gap-2">
                 <Label htmlFor="edit-subcategory">Subcategory</Label>

@@ -164,6 +164,7 @@ export default function PendingEdits() {
       });
     },
     onSuccess: (_data, editId) => {
+      const approvedTitle = editToApprove?.id === editId ? editToApprove.resource?.title : undefined;
       planFocusAfterRemoval(editId);
       void queryClient.invalidateQueries({ queryKey: ['/api/admin/resource-edits'] });
       void queryClient.invalidateQueries({ queryKey: ['/api/admin/stats'] });
@@ -172,8 +173,8 @@ export default function PendingEdits() {
       setEditToApprove(null);
       setApproveError(null);
       toast({
-        title: "Edit Approved",
-        description: "The changes have been applied to the resource.",
+        title: "Edit approved",
+        description: `Edit #${editId} was applied to ${approvedTitle ? `"${approvedTitle}"` : "the resource"}.`,
       });
     },
     onError: (error: Error) => {
@@ -190,6 +191,7 @@ export default function PendingEdits() {
       });
     },
     onSuccess: (_data, { editId }) => {
+      const rejectedTitle = editToReject?.id === editId ? editToReject.resource?.title : undefined;
       planFocusAfterRemoval(editId);
       void queryClient.invalidateQueries({ queryKey: ['/api/admin/resource-edits'] });
       void queryClient.invalidateQueries({ queryKey: ['/api/admin/stats'] });
@@ -198,8 +200,8 @@ export default function PendingEdits() {
       setRejectionReason("");
       setRejectError(null);
       toast({
-        title: "Edit Rejected",
-        description: "The edit suggestion has been rejected.",
+        title: "Edit rejected",
+        description: `Edit #${editId} for ${rejectedTitle ? `"${rejectedTitle}"` : "the resource"} was rejected; the contributor will see your reason.`,
       });
     },
     onError: (error: Error) => {

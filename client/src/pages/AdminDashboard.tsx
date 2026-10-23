@@ -107,6 +107,12 @@ export default function AdminDashboard() {
   // Digests have no parent tab, so each renders its own panel with no strip
   // tab selected.
   const visibleTab = ({ subsubcategories: "subcategories" } as Record<string, string>)[activeTab] ?? activeTab;
+  // Journeys and Digests open from the Settings menu with no strip tab
+  // selected, so the Settings trigger names the open section instead.
+  // Sections reached only through the Settings menu: the trigger names the
+  // open one, because no strip tab can (Sub-Subcats also keeps its parent
+  // Subcategories tab highlighted).
+  const settingsSection = ({ journeys: "Journeys", digests: "Digests", subsubcategories: "Sub-Subcats" } as Record<string, string>)[activeTab];
 
   // Keep the tab in sync if the user navigates between /admin/:section links.
   useEffect(() => {
@@ -353,7 +359,16 @@ export default function AdminDashboard() {
         <div className="admin-dashboard__actions">
           <DropdownMenu open={settingsOpen} onOpenChange={setSettingsOpen}>
             <DropdownMenuTrigger asChild>
-              <Button variant="ghost"><Settings className="h-4 w-4" /> Settings</Button>
+              <Button
+                variant="ghost"
+                className={settingsSection ? "admin-dashboard__settings-trigger--active" : undefined}
+                aria-current={settingsSection ? "page" : undefined}
+                aria-label={settingsSection ? `Settings, ${settingsSection} section open` : undefined}
+                data-testid="button-admin-settings"
+              >
+                <Settings className="h-4 w-4" /> Settings
+                {settingsSection ? <span className="admin-dashboard__settings-current" aria-hidden="true">· {settingsSection}</span> : null}
+              </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent className="admin-dashboard__settings-menu" align="start" sideOffset={6} collisionPadding={12}>
               <DropdownMenuItem asChild><WLink href="/settings/theme">Theme settings</WLink></DropdownMenuItem>
@@ -373,14 +388,18 @@ export default function AdminDashboard() {
                   Rejected resources
                 </DropdownMenuItem>
               ) : null}
-              <DropdownMenuItem data-testid="tab-subsubcategories" onSelect={() => handleTabChange("subsubcategories")}>Sub-Subcats</DropdownMenuItem>
-              <DropdownMenuItem data-testid="tab-journeys" onSelect={() => handleTabChange("journeys")}>Journeys</DropdownMenuItem>
-              <DropdownMenuItem data-testid="tab-digests" onSelect={() => handleTabChange("digests")}>Digests</DropdownMenuItem>
+              <DropdownMenuItem data-testid="tab-subsubcategories" aria-current={activeTab === "subsubcategories" ? "page" : undefined} onSelect={() => handleTabChange("subsubcategories")}>Sub-Subcats{activeTab === "subsubcategories" ? <span className="admin-dashboard__settings-item-current"> (open)</span> : null}</DropdownMenuItem>
+              <DropdownMenuItem data-testid="tab-journeys" aria-current={activeTab === "journeys" ? "page" : undefined} onSelect={() => handleTabChange("journeys")}>Journeys{activeTab === "journeys" ? <span className="admin-dashboard__settings-item-current"> (open)</span> : null}</DropdownMenuItem>
+              <DropdownMenuItem data-testid="tab-digests" aria-current={activeTab === "digests" ? "page" : undefined} onSelect={() => handleTabChange("digests")}>Digests{activeTab === "digests" ? <span className="admin-dashboard__settings-item-current"> (open)</span> : null}</DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
-          <Button className="btn primary" onClick={handleNewEntry}><Plus className="h-4 w-4" /> New entry</Button>
+          <Button className="btn primary" onClick={handleNewEntry} title="Add a new resource to the catalog" aria-label="New entry: add a resource" data-testid="button-admin-new-entry"><Plus className="h-4 w-4" /> New entry</Button>
         </div>
       </div>
+
+      <p className="sr-only" role="status" data-testid="text-admin-hidden-section-status">
+        {settingsSection ? `${settingsSection} section open` : ""}
+      </p>
 
       {/* NB-020 (run18): `activeTab` is always one of the TabsTrigger values
           (normalizeTab yields a valid id or the "approvals" default), so Radix's
@@ -518,7 +537,7 @@ export default function AdminDashboard() {
           <ErrorBoundary label="GitHub tab"><GitHubSyncPanel /></ErrorBoundary>
         </TabsContent>
 
-        <TabsContent value="digests" data-testid="content-digests">
+        <TabsContent value="digests" data-testid="content-digests" aria-label="Digests">
           <ErrorBoundary label="Digests tab"><DigestQueueHealth /></ErrorBoundary>
         </TabsContent>
 
@@ -529,7 +548,7 @@ export default function AdminDashboard() {
         <TabsContent value="audit">
           <ErrorBoundary label="Audit tab"><AuditTab /></ErrorBoundary>
         </TabsContent>
-        <TabsContent value="journeys" data-testid="content-journeys">
+        <TabsContent value="journeys" data-testid="content-journeys" aria-label="Journeys">
           <ErrorBoundary label="Journeys tab"><JourneyStepsManager /></ErrorBoundary>
         </TabsContent>
 

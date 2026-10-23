@@ -631,6 +631,26 @@ export function registerAdminContentRoutes(
       // to what's already stored, the field is skipped entirely, so unrelated
       // edits on legacy http:// rows still succeed and never churn the URL.
       const bodyForValidation = { ...(req.body ?? {}) };
+      // The editor's rejection reason is not a resource column: pull it out
+      // before the resource schema sees the body. Moving a resource INTO
+      // "rejected" needs the same 10+ character reason as the moderation
+      // queue, so the contributor learns why (stored on the row by the shared
+      // status transition).
+      const rawRejectionReason = bodyForValidation.rejectionReason;
+      delete bodyForValidation.rejectionReason;
+      let editorRejectionReason: string | undefined;
+      if (bodyForValidation.status === 'rejected' && resource.status !== 'rejected') {
+        const rejection = resourceRejectionSchema.safeParse({ reason: rawRejectionReason });
+        if (!rejection.success) {
+          return res.status(400).json({
+            error: 'validation_failed',
+            message: REJECTION_REASON_MESSAGE,
+            fieldErrors: { rejectionReason: REJECTION_REASON_MESSAGE },
+            errors: rejection.error.issues,
+          });
+        }
+        editorRejectionReason = rejection.data.reason;
+      }
       if (typeof bodyForValidation.url === 'string' && bodyForValidation.url === resource.url) {
         delete bodyForValidation.url;
       }
@@ -713,7 +733,8 @@ export function registerAdminContentRoutes(
         }
         return resourceRepo.updateResource(resourceId, updateData, {
           performedBy: userId,
-          notes: 'Resource updated by admin',
+          notes: editorRejectionReason ? 'Resource rejected by admin from the resource editor' : 'Resource updated by admin',
+          rejectionReason: editorRejectionReason,
         });
       });
       

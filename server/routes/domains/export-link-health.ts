@@ -325,10 +325,20 @@ export function registerExportLinkHealthRoutes(
       await startHeavyWork('github-sync', () => syncService.runOwnedQueueItem(queueItem.id, async () => {
         await githubSyncRepo.updateGithubSyncStatus(queueItem.id, 'processing');
         try {
-          const result = await syncService.exportToGitHub(repositoryUrl, options);
+          const result = await syncService.exportToGitHub(repositoryUrl, { ...options, queueId: queueItem.id });
           if (result.errors.length > 0) {
             console.error('GitHub export failed:', result.errors);
-            await githubSyncRepo.updateGithubSyncStatus(queueItem.id, 'failed', result.errors.join('; '), undefined, result.branch);
+            // A failure after the commit landed keeps that commit's identity on
+            // this run's row, so the panel can say the commit is on GitHub.
+            await githubSyncRepo.updateGithubSyncStatus(
+              queueItem.id,
+              'failed',
+              result.errors.join('; '),
+              result.commitSha
+                ? { exported: result.exported, commitSha: result.commitSha, commitUrl: result.commitUrl }
+                : undefined,
+              result.branch,
+            );
             return;
           }
           console.log('GitHub export completed:', result);
@@ -367,10 +377,71 @@ export function registerExportLinkHealthRoutes(
   }));
   
   // GET /api/github/sync-status - Check sync queue status
+  // Which queue run a history row belongs to. Identity first: exports stamp
+  // their queue id into the history row and their commit SHA into the queue
+  // row (also when bookkeeping after the commit fails). Timestamps alone do
+  // not identify a run: a second export can be queued while the first runs,
+  // so overlapping windows would hand the first run's commit to the second.
+  // Legacy history rows (written before the queue id was stamped) are
+  // attributed only when exactly ONE same-repo, same-direction queue run was
+  // executing when the row was written; ambiguous overlaps match nothing.
+  const RUN_SLACK_MS = 5_000;
+  type RunWindow = {
+    id: number;
+    repositoryUrl: string;
+    action: string;
+    metadata: unknown;
+    createdAt: Date | string | null;
+    processedAt: Date | string | null;
+  };
+  type HistoryRef = {
+    repositoryUrl: string;
+    direction: string;
+    commitSha: string | null;
+    metadata: unknown;
+    createdAt: Date | string | null;
+  };
+  const executingAt = (at: number, q: RunWindow): boolean => {
+    if (!q.createdAt) return false;
+    const start = new Date(q.createdAt).getTime() - RUN_SLACK_MS;
+    const end = new Date(q.processedAt ?? q.createdAt).getTime() + RUN_SLACK_MS;
+    return at >= start && at <= end;
+  };
+  const historyBelongsToRun = (h: HistoryRef, q: RunWindow, allRuns: RunWindow[]): boolean => {
+    if (h.repositoryUrl !== q.repositoryUrl || h.direction !== q.action) return false;
+    const stampedQueueId = (h.metadata as Record<string, unknown> | null)?.queueId;
+    if (typeof stampedQueueId === 'number') return stampedQueueId === q.id;
+    const runSha = (q.metadata as Record<string, unknown> | null)?.commitSha;
+    if (typeof runSha === 'string' && runSha && h.commitSha) return runSha === h.commitSha;
+    if (!h.createdAt) return false;
+    const at = new Date(h.createdAt).getTime();
+    const executing = allRuns.filter(r =>
+      r.repositoryUrl === h.repositoryUrl && r.action === h.direction && executingAt(at, r));
+    return executing.length === 1 && executing[0].id === q.id;
+  };
+
   app.get('/api/github/sync-status', isAuthenticated, isAdmin, asyncHandler(async (req, res) => {
     try {
       const status = req.query.status as string;
       const queueItems = await githubSyncRepo.getGithubSyncQueue(status);
+      // A failed export whose commit DID land on GitHub (only the bookkeeping
+      // after the commit failed) is not a failed export: report it as
+      // completed with the original error kept as a note, so the panel never
+      // tells admins an export failed when its commit is on GitHub.
+      const hasFailedExport = queueItems.some(q => q.status === 'failed' && q.action === 'export');
+      const commitSummaries = hasFailedExport ? await githubSyncRepo.getRecentCommitSummaries(50) : [];
+      // Legacy attribution must see every run, not just the status-filtered page.
+      const allRuns = hasFailedExport && status ? await githubSyncRepo.getGithubSyncQueue() : queueItems;
+      const landedCommitFor = (q: typeof queueItems[number]): string | null => {
+        if (q.status !== 'failed' || q.action !== 'export') return null;
+        const md = (q.metadata ?? {}) as Record<string, any>;
+        if (typeof md.commitSha === 'string' && md.commitSha) return md.commitSha;
+        const match = commitSummaries.find(h =>
+          !!h.commitSha &&
+          (h.metadata as Record<string, unknown> | null)?.outcome !== 'failed' &&
+          historyBelongsToRun(h, q, allRuns));
+        return match?.commitSha ?? null;
+      };
 
       // Run23 NB-038: the queue list used to ship every row's full
       // resourceIds array (thousands of ids per export row) + raw metadata —
@@ -384,13 +455,18 @@ export function registerExportLinkHealthRoutes(
           const md = (q.metadata ?? {}) as Record<string, any>;
           const count = (v: unknown): number => Array.isArray(v) ? (Number(v[0]) || 0) : (Number(v) || 0);
           const errorMessages: string[] = Array.isArray(md.errorMessages) ? md.errorMessages.map(String) : [];
+          const landedCommit = landedCommitFor(q);
           return {
           id: q.id,
           repositoryUrl: q.repositoryUrl,
           branch: q.branch,
           action: q.action,
-          status: md.outcome === 'partial' ? 'partial' : q.status,
-          errorMessage: q.errorMessage ?? (errorMessages.length ? errorMessages.join('; ') : null),
+          status: landedCommit ? 'completed' : md.outcome === 'partial' ? 'partial' : q.status,
+          committedDespiteError: landedCommit ? true : undefined,
+          commitSha: landedCommit ?? undefined,
+          errorMessage: landedCommit
+            ? `Commit ${landedCommit.slice(0, 7)} landed on GitHub; only the bookkeeping after the commit failed${q.errorMessage ? ` (${q.errorMessage})` : ''}.`
+            : q.errorMessage ?? (errorMessages.length ? errorMessages.join('; ') : null),
           importResult: q.action === 'import' && q.status !== 'pending' && q.status !== 'processing'
             ? {
                 imported: count(md.imported),
@@ -439,7 +515,7 @@ export function registerExportLinkHealthRoutes(
       // long-lived deployments), so the panel showed "no syncs" despite
       // completed runs. Merge terminal queue rows into the history shape,
       // skipping any queue row that has a matching canonical history row
-      // (same repo + direction within 10 min) to avoid double-counting runs
+      // (see historyBelongsToRun) to avoid double-counting runs
       // recorded in BOTH tables.
       const [history, queueItems] = await Promise.all([
         githubSyncRepo.getSyncHistory(),
@@ -447,14 +523,9 @@ export function registerExportLinkHealthRoutes(
       ]);
 
       const unwrap = (v: any): number => Array.isArray(v) ? (Number(v[0]) || 0) : (Number(v) || 0);
-      const TEN_MIN = 10 * 60 * 1000;
       const fromQueue = queueItems
         .filter(q => q.status === 'completed' || q.status === 'failed')
-        .filter(q => !history.some(h =>
-          h.repositoryUrl === q.repositoryUrl &&
-          h.direction === q.action &&
-          Math.abs(new Date(h.createdAt!).getTime() - new Date((q.processedAt ?? q.createdAt)!).getTime()) < TEN_MIN
-        ))
+        .filter(q => !history.some(h => historyBelongsToRun(h, q, queueItems)))
         .map(q => {
           const md = (q.metadata ?? {}) as Record<string, any>;
           const added = md.diff?.added ?? unwrap(md.imported);
@@ -470,12 +541,18 @@ export function registerExportLinkHealthRoutes(
             // ADM-03/04: carry the outcome so the UI can badge failed/orphaned
             // rows honestly instead of rendering every row as a success.
             // F13: a partial import stays partial in history too.
-            status: md.outcome === 'partial' ? 'partial' : q.status,
+            // An export whose commit landed is not a failed export, even
+            // when the bookkeeping after the commit failed.
+            status: q.status === 'failed' && q.action === 'export' && md.commitSha
+              ? 'completed'
+              : md.outcome === 'partial' ? 'partial' : q.status,
             commitSha: md.commitSha ?? null,
             // A failure reason is not a commit message; the panel labels
             // errorMessage as "Error".
             commitMessage: md.commitMessage ?? null,
-            errorMessage: q.status === 'failed'
+            errorMessage: q.status === 'failed' && q.action === 'export' && md.commitSha
+              ? null
+              : q.status === 'failed'
               ? (q.errorMessage || 'Sync failed')
               : md.outcome === 'partial'
                 ? (Array.isArray(md.errorMessages) ? md.errorMessages.join('; ') : (q.errorMessage || null))

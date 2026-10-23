@@ -132,7 +132,7 @@ export default function AuditTab() {
 
   // Run23 NB-041: surface fetch failures as a distinct error state instead of
   // letting them render as the "No audit log entries found" empty state.
-  const { data, isLoading, isError, error, refetch, isFetching, isPlaceholderData } = useQuery<AuditLogsResponse>({
+  const { data, isLoading, isError, error, refetch, isFetching, isPlaceholderData, dataUpdatedAt } = useQuery<AuditLogsResponse>({
     queryKey: ['/api/admin/audit-logs', appliedFilter, appliedLimit, offset],
     queryFn: async () => {
       const params = new URLSearchParams({ limit: appliedLimit, offset: String(offset) });
@@ -324,6 +324,11 @@ export default function AuditTab() {
           >
             <RefreshCw className={`h-4 w-4 ${isFetching ? 'animate-spin' : ''}`} />
           </Button>
+          {/* Refresh feedback: the log rarely changes between clicks, so name
+              when it was last read instead of leaving the click silent. */}
+          <p className="self-center text-xs text-muted-foreground" role="status" data-testid="text-audit-updated">
+            {isFetching ? "Refreshing…" : dataUpdatedAt ? `Updated ${new Date(dataUpdatedAt).toLocaleTimeString()}` : null}
+          </p>
         </form>}
 
         {/* Run23 NB-041: fetch failures render a distinct, retryable error
@@ -397,7 +402,7 @@ export default function AuditTab() {
                       {actorLabel(log)}
                     </TableCell>
                     <TableCell className="text-sm">
-                      {log.action.replace(/_/g, " ")}
+                      {log.action.replace(/[._]/g, " ")}
                     </TableCell>
                     <TableCell className="text-sm" title={targetLabel(log)}>
                        {targetLabel(log)}
@@ -490,7 +495,7 @@ export default function AuditTab() {
               <DialogDescription>
                 {selectedLog && (
                   <>
-                    {selectedLog.action.replace(/_/g, ' ')} ·{" "}
+                    {selectedLog.action.replace(/[._]/g, ' ')} ·{" "}
                     {selectedLog.originalResourceId || selectedLog.resourceId
                       ? `Resource #${selectedLog.originalResourceId || selectedLog.resourceId}`
                       : recordedTarget(selectedLog.changes) ?? "system"}{" "}

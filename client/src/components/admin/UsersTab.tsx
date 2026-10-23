@@ -116,6 +116,15 @@ export default function UsersTab() {
     });
   };
 
+  // Toasts name the account the way the table does: its name, else the
+  // masked email (raw emails stay out of the DOM).
+  const userLabel = (userId: string) => {
+    const user = data?.users.find((u) => u.id === userId);
+    const name = `${user?.firstName || ""} ${user?.lastName || ""}`.trim();
+    if (name) return name;
+    return user?.email ? maskEmail(user.email) : "The account";
+  };
+
   const updateRoleMutation = useMutation({
     mutationFn: async ({ userId, role }: { userId: string; role: string }) => {
       return await apiRequest(`/api/admin/users/${userId}/role`, {
@@ -123,9 +132,9 @@ export default function UsersTab() {
         body: JSON.stringify({ role }),
       });
     },
-    onSuccess: () => {
+    onSuccess: (_data, { userId, role }) => {
       void queryClient.invalidateQueries({ queryKey: ['/api/admin/users'] });
-      toast({ title: "Role Updated", description: "User role has been changed." });
+      toast({ title: "Role updated", description: `${userLabel(userId)} is now ${role === "admin" ? "an admin" : `a ${role}`}.` });
     },
     onError: (error: Error) => {
       toast({ title: "Update Failed", description: describeWriteError(error, { outcome: "The role may not have changed. Refresh the user list to check before trying again." }), variant: "destructive" });
@@ -143,9 +152,9 @@ export default function UsersTab() {
     mutationFn: async (userId: string) => {
       return await apiRequest(`/api/admin/users/${userId}`, { method: 'DELETE' });
     },
-    onSuccess: () => {
+    onSuccess: (_data, userId) => {
       void queryClient.invalidateQueries({ queryKey: ['/api/admin/users'] });
-      toast({ title: "User Deleted", description: "The account and its sign-in identity have been removed." });
+      toast({ title: "User deleted", description: `${userLabel(userId)} and its sign-in identity were removed.` });
       deletedUserRef.current = true;
       setUserToDelete(null);
       // The Action button closes the dialog on click, so Radix usually
@@ -571,9 +580,13 @@ export default function UsersTab() {
                     already revealed that row in the table. */}
                 This permanently deletes{" "}
                 <span className="font-medium text-foreground">
+                  {`${userToDelete?.firstName || ""} ${userToDelete?.lastName || ""}`.trim()
+                    ? `${`${userToDelete?.firstName || ""} ${userToDelete?.lastName || ""}`.trim()} (`
+                    : null}
                   {userToDelete?.email
                     ? (revealedIds.has(userToDelete.id) ? userToDelete.email : maskEmail(userToDelete.email))
                     : userToDelete?.id}
+                  {`${userToDelete?.firstName || ""} ${userToDelete?.lastName || ""}`.trim() ? ")" : null}
                 </span>{" "}
                 along with their sign-in identity, bookmarks, favorites, progress,
                 and API keys. They are signed out everywhere and the account

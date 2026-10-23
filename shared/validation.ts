@@ -156,6 +156,25 @@ export function isPlausiblePublicUrl(raw: string): boolean {
   }
 }
 
+/**
+ * Reserved documentation/test hosts (RFC 2606/6761: example.com/.net/.org,
+ * *.example, *.test, *.invalid, *.localhost). They never point at a real
+ * resource; QA probes use them, so the live site refuses them on submit to
+ * keep leftover test entries out of the moderation queue.
+ */
+export function isReservedTestHost(raw: string): boolean {
+  try {
+    const host = new URL(raw).hostname.toLowerCase().replace(/\.$/, "");
+    if (/(^|\.)example\.(com|net|org)$/.test(host)) return true;
+    return /\.(example|test|invalid|localhost)$/.test(host) || host === "localhost";
+  } catch {
+    return false;
+  }
+}
+
+export const RESERVED_TEST_HOST_MESSAGE =
+  "This URL uses a reserved test domain (such as example.com), so it can't be added to the live catalog. Use the resource's real address.";
+
 // ---------------------------------------------------------------------------
 // GitHub repository identifiers (BUG-042 run25)
 // ---------------------------------------------------------------------------

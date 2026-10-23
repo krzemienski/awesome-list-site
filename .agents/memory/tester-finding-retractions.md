@@ -20,3 +20,5 @@ Re-check these before recording a defect:
 - **"Opening a Select jumps the page to the top"** — Playwright `locator.click()` issued while a smooth scroll (html `scroll-behavior:smooth`, or `scrollIntoView` without `behavior:'instant'`) is still animating sends the page to y=0. Real mouse click, wheel-then-click and keyboard Enter don't. Scroll with `behavior:'instant'` and click with `page.mouse.click(x,y)` before calling it a bug.
 
 - **`cssText` pageerror right after the tester visits an XML doc (`/sitemap.xml`).** The tester's capture code touches `.style.cssText` on a document that has no `.style`; the error is then attributed to the next HTML page. Re-check in a fresh context before logging it; keep XML docs out of browser runs (curl them instead).
+
+- "No toast appeared" after a list-changing admin action is usually a capture taken after the ~5 s toast closed. Ask for an immediate capture before logging a bug.
