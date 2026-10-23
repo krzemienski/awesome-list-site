@@ -33,6 +33,7 @@ import { queryUnavailableReason } from "@/lib/query-availability";
 import { useLearningPreferences } from "@/hooks/use-learning-preferences";
 import { DEFAULT_LEARNING_PREFERENCES } from "@shared/onboarding-values";
 import { useHomeLayout } from "@/components/home/use-home-layout";
+import { useLegacyReadmeAnchor } from "@/lib/legacy-readme-anchor";
 import HomePresentation, {
   type HomeCategoryView,
   type HomeStats,
@@ -434,6 +435,7 @@ export default function Home({ nav, navLoading }: HomeProps) {
   const { isAuthenticated } = useAuth();
   const { toast } = useToast();
   const { layout, isLoading: layoutLoading } = useHomeLayout();
+  useLegacyReadmeAnchor(nav);
   const {
     preferences,
     isLoading: preferencesLoading,

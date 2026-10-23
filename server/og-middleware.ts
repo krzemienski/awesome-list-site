@@ -855,7 +855,15 @@ function homeShellChrome(): string {
   // meta (noindex) instead of a soft-404. The section ids and aliases are the
   // ones AdminDashboard accepts; unknown sections still fall through to 404.
   const adminSection = path.match(/^\/admin\/([^/]+)$/)?.[1];
-  const staticKey = adminSection && normalizeAdminTab(adminSection) ? "/admin" : path;
+  // Clerk path routing owns everything under /sign-in/ and /sign-up/
+  // (sso-callback after Google, factor-one, verify-email-address, ...); the
+  // client renders the same auth page for all of them, so they share its meta.
+  const authFlow = path.match(/^\/(sign-in|sign-up)\/[^?#]+$/)?.[1];
+  const staticKey = adminSection && normalizeAdminTab(adminSection)
+    ? "/admin"
+    : authFlow
+      ? `/${authFlow}`
+      : path;
   if (staticRoutes[staticKey]) {
     const m = defaultMeta(path);
     Object.assign(m, staticRoutes[staticKey]);
@@ -2173,9 +2181,19 @@ export function ogInjectionMiddleware() {
         const tree = await getTreeCached();
         const level = taxonomyVariant[1].toLowerCase();
         const identity = safeDecode(taxonomyVariant[2]).toLowerCase();
-        const match = level === "category" ? findCategory(tree, identity)
-          : level === "subcategory" ? findSubcategory(tree, identity)
-          : findSubSubcategory(tree, identity);
+        const findAtLevel = (slug: string) =>
+          level === "category" ? findCategory(tree, slug)
+          : level === "subcategory" ? findSubcategory(tree, slug)
+          : findSubSubcategory(tree, slug);
+        // Old slugs were generated from names like "Standards & Industry"
+        // without collapsing separators ("standards--industry"); current
+        // slugs collapse them. Tidy only when the literal slug is unknown.
+        const tidied = identity.replace(/-{2,}/g, "-").replace(/^-+|-+$/g, "");
+        const match = findAtLevel(identity)
+          ?? (tidied && tidied !== identity
+            ? findAtLevel(tidied) ?? findCategory(tree, tidied)
+              ?? findSubcategory(tree, tidied) ?? findSubSubcategory(tree, tidied)
+            : null);
         if (match && urlPath !== match.path) {
           const query = (req.originalUrl || req.url).split("?")[1];
           return res.redirect(301, match.path + (query ? `?${query}` : ""));
