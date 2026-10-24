@@ -179,8 +179,13 @@ if (!homeSsr) seedResourceBoot(queryClient);
       unsubscribe();
       window.clearTimeout(timeout);
       window.removeEventListener("popstate", remove);
-      history.pushState = originalPushState;
-      history.replaceState = originalReplaceState;
+      // Unwrap only our own wrapper. If another script (e.g. the async
+      // Replit/Umami tracker) patched history after us, its wrapper calls ours;
+      // reassigning the saved original here would silently erase its hook and
+      // drop every SPA pageview after the landing page. Our wrapper then stays
+      // in its chain as a pass-through (remove() is a no-op once disconnected).
+      if (history.pushState === holdPushState) history.pushState = originalPushState;
+      if (history.replaceState === holdReplaceState) history.replaceState = originalReplaceState;
       // Restore the attributes before disposal so cleanup is complete even
       // when a browser retains a detached node for inspection/extensions.
       if (previousAriaHidden === null) overlay.removeAttribute("aria-hidden");
@@ -251,23 +256,24 @@ if (!homeSsr) seedResourceBoot(queryClient);
     let timeout = window.setTimeout(expire, 3000);
     // Wouter's pushState navigations do not emit popstate. Remove the old
     // visual tree synchronously for both navigation forms, then restore the
-    // native methods during normal handoff/timeout cleanup.
-    // Preserve the exact pre-existing methods so other navigation shims are
-    // restored byte-for-byte when this short-lived hold is disposed.
+    // native methods during normal handoff/timeout cleanup — but only while
+    // our wrapper is still the installed method (see remove()).
     // eslint-disable-next-line @typescript-eslint/unbound-method
     const originalPushState = history.pushState;
     // eslint-disable-next-line @typescript-eslint/unbound-method
     const originalReplaceState = history.replaceState;
-    history.pushState = function (data, unused, url) {
+    const holdPushState: History["pushState"] = function (data, unused, url) {
       const result = originalPushState.call(history, data, unused, url);
       remove();
       return result;
     };
-    history.replaceState = function (data, unused, url) {
+    const holdReplaceState: History["replaceState"] = function (data, unused, url) {
       const result = originalReplaceState.call(history, data, unused, url);
       remove();
       return result;
     };
+    history.pushState = holdPushState;
+    history.replaceState = holdReplaceState;
     window.addEventListener("popstate", remove);
     handoff();
   } catch {
