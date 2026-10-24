@@ -308,7 +308,7 @@ taxonomy further down and are not repeated here.
 | `resource_submitted` | `generate_lead` | GA4 + Replit (client); Mixpanel (**server**) | client: `content_type: "resource_submission"`, `category` (taxonomy name) + acquisition — never title, URL or description; server: see `MIXPANEL.md` | `trackGenerateLead` ← `SubmitResource` (server-confirmed); server — resource-submit handler |
 | `page_not_found` | same (legacy `event_category: "navigation"`, `event_label`: path + query) | GA4 + Replit | Replit: `page_path` (path only, no query, ≤200 chars) | `trackPageNotFound` ← `NotFound` (every 404 surface) |
 | `site_error` | — (GA4 keeps its legacy `error` event) | Replit | `error_type` only (`javascript_error` \| `unhandled_promise_rejection` \| `api_error` \| `component_crash` \| `route_crash` \| `chunk_load_failed` \| `page_load_failed`) — never the message | `trackSiteError` ← `trackError`, `ErrorBoundary`, `RouteErrorBoundary`, `ErrorPage` |
-| `contact_message_sent` | same | all four | `reply_requested` (boolean) — never the name, address, subject or message | `trackContactMessageSent` ← contact dialog (server-confirmed) |
+| `contact_message_sent` | same | all four | none — never the name, address, subject or message (the reply address is required, so no reply flag is sent) | `trackContactMessageSent` ← contact dialog (server-confirmed) |
 | `tool_tab_opened` | same | all four | `page: "advanced"`, `tab` (`explorer` \| `metrics` \| `export` \| `recommendations`) | `trackToolTabOpened` ← `Advanced` |
 
 

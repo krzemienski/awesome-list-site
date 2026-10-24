@@ -50,6 +50,14 @@ const schema = z.object({
 
 type FormData = z.infer<typeof schema>;
 
+// Every field is required by the client schema, shared/contact.ts and the
+// NOT NULL columns. The asterisk is visual only; the inputs carry required /
+// aria-required so assistive tech announces it (noValidate keeps native
+// browser bubbles off — the schema messages render inline instead).
+const RequiredMark = () => (
+  <span className="text-destructive" aria-hidden="true"> *</span>
+);
+
 export function ContactDialogHost() {
   const [open, setOpen] = useState(false);
   const [receipt, setReceipt] = useState<ContactSubmissionReceipt | null>(null);
@@ -66,8 +74,8 @@ export function ContactDialogHost() {
         method: "POST",
         body: JSON.stringify(data),
       }) as Promise<ContactSubmissionReceipt>,
-    onSuccess: (data, submitted) => {
-      trackContactMessageSent(Boolean(submitted.replyTo));
+    onSuccess: (data) => {
+      trackContactMessageSent();
       setReceipt(data);
       form.reset();
     },
@@ -154,8 +162,8 @@ export function ContactDialogHost() {
                 name="name"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Name</FormLabel>
-                    <FormControl><Input autoComplete="name" data-testid="contact-name" {...field} /></FormControl>
+                    <FormLabel>Name<RequiredMark /></FormLabel>
+                    <FormControl><Input autoComplete="name" data-testid="contact-name" required aria-required="true" {...field} /></FormControl>
                     <FormMessage />
                   </FormItem>
                 )}
@@ -165,8 +173,8 @@ export function ContactDialogHost() {
                 name="replyTo"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Email</FormLabel>
-                    <FormControl><Input type="email" autoComplete="email" data-testid="contact-email" {...field} /></FormControl>
+                    <FormLabel>Email<RequiredMark /></FormLabel>
+                    <FormControl><Input type="email" autoComplete="email" data-testid="contact-email" required aria-required="true" {...field} /></FormControl>
                     <FormMessage />
                   </FormItem>
                 )}
@@ -176,8 +184,8 @@ export function ContactDialogHost() {
                 name="subject"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Subject</FormLabel>
-                    <FormControl><Input data-testid="contact-subject" {...field} /></FormControl>
+                    <FormLabel>Subject<RequiredMark /></FormLabel>
+                    <FormControl><Input data-testid="contact-subject" required aria-required="true" {...field} /></FormControl>
                     <FormMessage />
                   </FormItem>
                 )}
@@ -187,8 +195,8 @@ export function ContactDialogHost() {
                 name="message"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Message</FormLabel>
-                    <FormControl><Textarea rows={6} data-testid="contact-message" {...field} /></FormControl>
+                    <FormLabel>Message<RequiredMark /></FormLabel>
+                    <FormControl><Textarea rows={6} data-testid="contact-message" required aria-required="true" {...field} /></FormControl>
                     <FormMessage />
                   </FormItem>
                 )}

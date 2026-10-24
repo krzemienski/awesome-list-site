@@ -755,10 +755,11 @@ export const trackToolTabOpened = (page: string, tab: string) => {
   track('tool_tab_opened', { page, tab });
 };
 
-// The contact form was accepted by the server. No form text, name or address
-// is sent — only whether the visitor asked for a reply.
-export const trackContactMessageSent = (replyRequested: boolean) => {
-  track('contact_message_sent', { reply_requested: replyRequested });
+// The contact form was accepted by the server. No properties: the form text,
+// name and address are never sent, and the reply address is mandatory, so a
+// "reply requested" flag would always be true.
+export const trackContactMessageSent = () => {
+  track('contact_message_sent');
 };
 
 export const trackCommandPaletteOpened = (method: CommandPaletteOpenMethod) => {
