@@ -181,4 +181,6 @@
 - [CLS hidden under the prerender hold](hidden-fallback-cls.md) — occluded layout still counts; seed boot data + await route chunk + modulepreload; banner copy is first-visit LCP.
 - [Pageview titles from loading heads](pageview-loading-titles.md) — analytics read the title ~300ms after soft nav; loading heads must name the page (SEOHead `loading`).
 - [Sync history run matching](sync-history-run-matching.md) — tie history rows to queue runs by queueId/commitSha identity; time windows mis-attribute commits when exports overlap.
+- [Clerk conversion detection](clerk-conversion-detection.md) — one-step Clerk sign-in/up never expose in-flight status; trigger on signed-out→session; tight createdAt window + per-user guard.
+- [Umami SPA pageviews wiped](umami-spa-pageviews-history-restore.md) — SSR-hold cleanup reassigns saved history.pushState, dropping the Replit tracker's hook; only landing pageviews record.
 - [Server logging conventions](server-logging.md) — one area logger, job start/outcome/reason; scrubPath must keep readable slugs; JIT sign-up needs .returning() or concurrent calls triple-count.

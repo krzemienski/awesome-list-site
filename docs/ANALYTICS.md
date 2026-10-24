@@ -394,8 +394,8 @@ In DEV, `debug_mode: true` is added so events appear in GA4 DebugView.
 | `page_view` | Every navigation — `use-analytics` on mount + route change | `page_location`, `page_path`, `page_title`, `page_referrer` |
 | `search` | Search dialog, once per debounced query — `search-dialog.tsx` | `search_term`, `result_count` |
 | `select_content` | Resource detail page mount — `ResourceDetail.tsx` | `content_type: "resource"`, `content_id`, `content_name`, `content_category` |
-| `login` | A Clerk sign-in attempt completes and produces a session — `AuthConversionTracker.tsx`. Session restores, page reloads and token refreshes never fire it. | `method` (verification strategy, e.g. `password`, `google`) + acquisition |
-| `sign_up` (catalog `sign_up_completed`) | A Clerk sign-up attempt completes and produces a session — `AuthConversionTracker.tsx`. An OAuth sign-in transferred into a registration counts here, not as `login`. | `method` (verification strategy, e.g. `email_code`, `google`) + acquisition |
+| `login` | The page goes from signed out to a new Clerk session — `AuthConversionTracker.tsx`. One-step password sign-ins never expose an in-flight `signIn` status, so the transition itself is the trigger. Session restores, page reloads and token refreshes never fire it. | `method` (`client.lastAuthenticationStrategy`, e.g. `password`, `google`) + acquisition |
+| `sign_up` (catalog `sign_up_completed`) | Same transition, when the account was created within 10 s of the session (or a live `signUp` attempt was seen) and this browser has not already reported that account's sign-up — `AuthConversionTracker.tsx`. An OAuth sign-in transferred into a registration counts here, not as `login`. | `method` (the account's OAuth provider, else `password`) + acquisition |
 | `generate_lead` (catalog `resource_submitted`) | Successful resource submission — `SubmitResource.tsx` | `content_type: "resource_submission"`, `category` + acquisition |
 | `share` | Share button on a resource — `ResourceDetail.tsx` | `method: "web_share" \| "clipboard"`, `content_type`, `content_id` |
 
