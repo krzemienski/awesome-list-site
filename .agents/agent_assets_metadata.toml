@@ -435,3 +435,17 @@ mtime_ms = 1792775894248
 storage_uri = "gcs://replit-rams-assets-picard/rams/assets/repl:71ccccc7-37f7-4f07-a880-5973ae4aa911/2f248e14-8f53-4d15-8edd-622019bd5216/c43794c2-6b3e-476b-a199-b1c495db102e"
 storage_version_token = "1792775895073093"
 content_type = "text/html;profile=replit-chart"
+
+[[outputs]]
+id = "5TlxNnw4Q_3lBE0v2f18h"
+uri = "file://.local/outputs/google-resource-landing.chart.html"
+type = "text"
+title = "Most Google visitors read one resource page and leave"
+description = "What Google visitors did after landing on a resource page, Oct 23–24"
+logical_id = "f0c6f967-e5d1-484d-86dd-acf31de15c51"
+content_hash = "sha256:81436008937acb59f817bdd2d410a1a45398e537a45e91c5187ed30dde0eabdc"
+size = 3131
+mtime_ms = 1792885950978
+storage_uri = "gcs://replit-rams-assets-picard/rams/assets/repl:71ccccc7-37f7-4f07-a880-5973ae4aa911/f0c6f967-e5d1-484d-86dd-acf31de15c51/95986b8d-734d-4b62-a588-7b403b6f70cd"
+storage_version_token = "1792885951474543"
+content_type = "text/html;profile=replit-chart"
