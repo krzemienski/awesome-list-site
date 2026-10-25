@@ -101,6 +101,7 @@ const domainOf = (url: string): string | undefined => {
 // mount-only init would drop the initial page_view.
 let gaInitialized = false;
 
+const MAX_PENDING_GA_EVENTS = 100;
 const pendingEvents: Array<{
   name: string;
   params: Record<string, unknown>;
@@ -217,8 +218,11 @@ export const sendGaEvent = (
   if (!window.gtag) {
     // With a persisted grant, React can emit its initial page_view before the
     // deferred post-paint SDK bootstrap. Preserve those events without ever
-    // queueing anything before consent.
-    pendingEvents.push({ name, params, context });
+    // queueing anything before consent or while suppressed. Bounded, because
+    // without a measurement id gtag never loads to drain it.
+    if (vendorSdksAllowed() && pendingEvents.length < MAX_PENDING_GA_EVENTS) {
+      pendingEvents.push({ name, params, context });
+    }
     return;
   }
 

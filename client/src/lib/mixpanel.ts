@@ -37,8 +37,11 @@ let sdkOptions: typeof import('./analytics-sdk-options') | null = null;
 let initStarted = false;
 let disabled = false; // set on consent revoke — hard-stops the dispatcher
 
-// Events tracked between init start and SDK load resolve would otherwise be
-// dropped (the dynamic import takes a few ms); buffer and flush them.
+// Events accepted before the SDK is ready: either init is under way, or the
+// visitor already granted consent and init has not started yet (main.tsx starts
+// it after first paint, but the landing page_viewed fires at React mount).
+// Flushed once the SDK loads; cleared on revoke.
+const MAX_PENDING_EVENTS = 100;
 let pending: Array<{ name: string; props: Record<string, unknown> }> = [];
 
 // Idempotent, consent-gated init. Called at module-load time from main.tsx
@@ -147,18 +150,20 @@ const autoUrlOverrides = (): Record<string, unknown> => {
 // same event from the dispatcher, each behind its own consent gate.
 export const mpTrack = (name: string, props: Record<string, unknown> = {}) => {
   if (disabled) return;
-  if (!mp) {
-    // SDK still loading (or never consented). Buffer only when init is under
-    // way; otherwise drop — pre-consent events must never be queued.
-    if (initStarted) pending.push({ name, props });
-    return;
-  }
+  // Page context is read now, so a buffered event keeps the page it fired on.
   const merged: Record<string, unknown> = {
     platform: 'web',
     page_path: safePath(),
     ...autoUrlOverrides(),
     ...props,
   };
+  if (!mp) {
+    // Never buffer before consent, after Decline, or while suppressed.
+    if (vendorSdksAllowed() && pending.length < MAX_PENDING_EVENTS) {
+      pending.push({ name, props: merged });
+    }
+    return;
+  }
   try {
     mp.track(name, merged);
   } catch {

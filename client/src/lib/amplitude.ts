@@ -23,9 +23,10 @@ const products: AmplitudeProductSlots = {
 let teardownPromise: Promise<void> = Promise.resolve();
 let lifecycleVersion = 0;
 
-// Custom events accepted while the consented setup is still loading. Never
-// filled pre-consent (ampTrack drops unless init is under way) and cleared on
-// every revoke, mirroring the Mixpanel/PostHog wrappers.
+// Custom events accepted before setup finishes: init under way, or consent
+// already granted and the post-paint init not started yet. Never filled
+// pre-consent, after Decline or while suppressed, and cleared on every revoke,
+// mirroring the Mixpanel/PostHog wrappers.
 const MAX_PENDING_EVENTS = 100;
 let pendingEvents: { name: string; props: Record<string, unknown> }[] = [];
 
@@ -196,18 +197,18 @@ export function initAmplitude(): void {
 // so the three product tools see identical event shapes.
 export function ampTrack(name: string, props: Record<string, unknown> = {}): void {
   if (disabled || getAnalyticsConsent() !== "granted") return;
-  if (!initialized || !amplitudeClient) {
-    // Buffer only while a consented init is under way; otherwise drop.
-    if (initStarted && pendingEvents.length < MAX_PENDING_EVENTS) {
-      pendingEvents.push({ name, props });
-    }
-    return;
-  }
+  // Page context is read now, so a buffered event keeps the page it fired on.
   const merged: Record<string, unknown> = {
     platform: "web",
     page_path: window.location.pathname,
     ...props,
   };
+  if (!initialized || !amplitudeClient) {
+    if (vendorSdksAllowed() && pendingEvents.length < MAX_PENDING_EVENTS) {
+      pendingEvents.push({ name, props: merged });
+    }
+    return;
+  }
   try {
     amplitudeClient.track(name, merged);
   } catch {
