@@ -457,6 +457,11 @@ export function registerAiJobsRoutes(
 
       res.json({ success: true, jobId, message: 'Research job started', config: resolvedConfig });
     } catch (error: any) {
+      // One active run at a time, on any instance: a conflict, not a failure.
+      // (researchService is imported lazily, so match the error by name.)
+      if (error instanceof Error && error.name === 'ResearchJobActiveError') {
+        return res.status(409).json({ success: false, code: 'RESEARCH_JOB_ACTIVE', message: error.message });
+      }
       logger.error('Error starting research job:', error);
       res.status(500).json({ success: false, message: error.message || 'Failed to start research job' });
     }

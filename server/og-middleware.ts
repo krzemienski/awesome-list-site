@@ -332,6 +332,17 @@ async function resolveRoute(
   });
 }
 
+// A taxonomy node with nothing approved in it is a valid page (it shows an
+// empty state and links onward) but thin, so it is noindex, follow and left
+// out of the sitemap. The count comes from the tree, so approving a resource
+// into the node makes it indexable again. LOCKSTEP: client TaxonomyListing
+// SEOHead (listing totalAll === 0) and the sitemap's empty-node skip.
+function markEmptyTaxonomyNoindex(m: RouteMeta, approvedCount: number): void {
+  if (approvedCount > 0) return;
+  m.noindex = true;
+  m.follow = true;
+}
+
 // Soft-404 metadata: a known-shape page rendered for an unknown URL. Marked
 // noindex so buildMetaTags drops the self-referencing canonical/og:url and emits
 // a static robots noindex tag; the middleware additionally sets HTTP 404.
@@ -1245,6 +1256,7 @@ function homeShellChrome(): string {
         if (page > totalPages) {
           return { meta: notFoundMeta(path), found: false };
         }
+        markEmptyTaxonomyNoindex(m, flat.length);
         m.title = `${pagedSeoTitleCore(titleCore, page)} — ${SITE_NAME}`;
         m.description = pagedSeoDescription(
           categorySeoDescription(found.name, slug, total),
@@ -1457,6 +1469,7 @@ function homeShellChrome(): string {
         if (page > totalPages) {
           return { meta: notFoundMeta(path), found: false };
         }
+        markEmptyTaxonomyNoindex(m, flat.length);
         m.title = `${pagedSeoTitleCore(titleCore, page)} — ${SITE_NAME}`;
         m.description = pagedSeoDescription(
           subcategorySeoDescription(found.name, categoryName, total),
@@ -1550,6 +1563,7 @@ function homeShellChrome(): string {
         if (page > totalPages) {
           return { meta: notFoundMeta(path), found: false };
         }
+        markEmptyTaxonomyNoindex(m, flat.length);
         m.title = `${pagedSeoTitleCore(titleCore, page)} — ${SITE_NAME}`;
         m.description = pagedSeoDescription(
           subSubcategorySeoDescription(

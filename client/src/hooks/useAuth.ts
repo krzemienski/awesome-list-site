@@ -66,6 +66,35 @@ function logoutRequestSignal(): AbortSignal {
 }
 
 /**
+ * End both kinds of session, then confirm the server no longer sees one.
+ * Every sign-out path (account menu and the /logout route) runs this.
+ */
+export async function signOutAndVerify(): Promise<void> {
+  // Clear the owner password cookie too (no-op for Clerk-only sessions),
+  // or the server would still see the admin after Clerk signs out.
+  await fetch('/api/auth/admin-logout', {
+    method: 'POST',
+    credentials: 'include',
+    signal: logoutRequestSignal(),
+  });
+  // Clerk loads on demand (backlog X-03); waiting for it to load matters on a
+  // direct /logout load, where signOut() would otherwise only queue
+  // (C3-V3-02). The bridged signOut skips Clerk's after-sign-out navigation;
+  // callers do the full reload once the server confirms.
+  const clerk = await whenClerkLoaded();
+  await clerk.signOut();
+  const authCheck = await fetch('/api/auth/user', {
+    credentials: 'include',
+    cache: 'no-store',
+    signal: logoutRequestSignal(),
+  });
+  const authState = authCheck.ok ? await authCheck.json() : null;
+  if (!authCheck.ok || authState?.isAuthenticated !== false) {
+    throw new Error('The server could not confirm that your session ended');
+  }
+}
+
+/**
  * Task #307 (Clerk migration): sessions are Clerk cookies now, but the app's
  * identity endpoint stays /api/auth/user — it overlays app-specific columns
  * (role, deletionRequestedAt, joined display name) that Clerk doesn't own.
@@ -131,31 +160,6 @@ export function useAuth() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [authedUser?.id]);
 
-  /** Sign out via Clerk, then confirm the server no longer sees a session. */
-  const clerkSignOutAndVerify = async () => {
-    // Clear the owner password cookie too (no-op for Clerk-only sessions),
-    // or the server would still see the admin after Clerk signs out.
-    await fetch('/api/auth/admin-logout', {
-      method: 'POST',
-      credentials: 'include',
-      signal: logoutRequestSignal(),
-    });
-    // Clerk loads on demand (backlog X-03); the bridged signOut skips Clerk's
-    // after-sign-out navigation, and finishLogout does the full reload once
-    // the server confirms (C3-V3-02).
-    const clerk = await whenClerkLoaded();
-    await clerk.signOut();
-    const authCheck = await fetch('/api/auth/user', {
-      credentials: 'include',
-      cache: 'no-store',
-      signal: logoutRequestSignal(),
-    });
-    const authState = authCheck.ok ? await authCheck.json() : null;
-    if (!authCheck.ok || authState?.isAuthenticated !== false) {
-      throw new Error('The server could not confirm that your session ended');
-    }
-  };
-
   const finishLogout = (scope: 'this_device' | 'all_devices') => {
       // Before clearSignedInClientState resets the analytics identities, so
       // the event is attributed to the account that signed out.
@@ -181,7 +185,7 @@ export function useAuth() {
   const logoutMutation = useMutation({
     mutationFn: async () => {
       setLogoutError(null);
-      await clerkSignOutAndVerify();
+      await signOutAndVerify();
     },
     onSuccess: () => finishLogout('this_device'),
     onError: handleLogoutError,
@@ -202,7 +206,7 @@ export function useAuth() {
         const body = await response.json().catch(() => null);
         throw new Error(body?.message || 'Sign out failed');
       }
-      await clerkSignOutAndVerify();
+      await signOutAndVerify();
     },
     onSuccess: () => finishLogout('all_devices'),
     onError: handleLogoutError,

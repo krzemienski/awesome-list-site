@@ -218,6 +218,10 @@ ${date ? `    <lastmod>${date}</lastmod>\n` : ""}    <changefreq>${changefreq}</
         }
       };
       awesomeListData?.categories?.forEach(category => {
+        // A node with nothing approved in it is noindex (og-middleware
+        // markEmptyTaxonomyNoindex), so it stays out of the sitemap; so do
+        // its children, which are empty too.
+        if (flattenListingResources(category, 'category').length === 0) return;
         const categoryRecord = categoryRecords.find(
           (record) => record.slug === category.slug,
         );
@@ -250,6 +254,7 @@ ${date ? `    <lastmod>${date}</lastmod>\n` : ""}    <changefreq>${changefreq}</
           addListingPages(catBase, category, 'category', 'weekly', categoryLastmod);
         }
         category.subcategories?.forEach(subcategory => {
+          if (flattenListingResources(subcategory, 'subcategory').length === 0) return;
           const subcategoryRecord = categoryRecord
             ? subcategoryRecords.find(
                 (record) =>

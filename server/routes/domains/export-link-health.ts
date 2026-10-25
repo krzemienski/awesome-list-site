@@ -1306,7 +1306,7 @@ export function registerExportLinkHealthRoutes(
         () => syncService.importFromGitHub(repoUrl, { dryRun, strictMode }),
       );
       
-      logger.info(`GitHub import completed: ${result.imported} imported, ${result.updated} updated, ${result.skipped} skipped`);
+      logger.info(`GitHub import ${dryRun ? 'dry run ' : ''}completed: ${result.imported} imported, ${result.updated} updated, ${result.skipped} skipped`);
       
       // F13: awesome-lint is informational on import (syncService never
       // blocks on it), so a lint-invalid list may already have written rows.
@@ -1330,9 +1330,13 @@ export function registerExportLinkHealthRoutes(
         validationStats: result.validationStats,
         validationErrors: result.validationErrors.filter(e => e.severity === 'error'),
         validationWarnings: result.validationErrors.filter(e => e.severity === 'warning'),
-        message: outcome === 'completed'
-          ? `Imported ${result.imported} and updated ${result.updated} resources from ${repoUrl}`
-          : `${outcome === 'partial' ? 'Partial import' : 'Import failed'} from ${repoUrl}: ${result.imported} imported, ${result.updated} updated, ${result.errors.length} failed`
+        dryRun: Boolean(dryRun),
+        // A dry run writes nothing, so its counts are what an import would do.
+        message: dryRun
+          ? `Dry run of ${repoUrl}: an import would add ${result.imported} and update ${result.updated} resources${result.errors.length ? ` (${result.errors.length} would fail)` : ''}. Nothing was written.`
+          : outcome === 'completed'
+            ? `Imported ${result.imported} and updated ${result.updated} resources from ${repoUrl}`
+            : `${outcome === 'partial' ? 'Partial import' : 'Import failed'} from ${repoUrl}: ${result.imported} imported, ${result.updated} updated, ${result.errors.length} failed`
       });
     } catch (error: any) {
       logger.error('Error importing from GitHub:', error);

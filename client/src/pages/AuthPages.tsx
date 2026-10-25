@@ -3,11 +3,11 @@
  * out of the anonymous entry bundle; the Clerk widgets render through
  * <ClerkSlot>, i.e. inside the lazily mounted Clerk runtime.
  */
-import { useEffect, useState } from "react";
+import { useEffect, useLayoutEffect, useState } from "react";
 import { SignIn, SignUp } from "@clerk/react";
 import { foldInheritedHashIntoRedirect, sanitizeRedirectParam } from "@/lib/returnUrl";
-import { ClerkSlot, useClerkBridge, requestClerk } from "@/lib/clerk-bridge";
-import { clearSignedInClientState } from "@/hooks/useAuth";
+import { ClerkSlot } from "@/lib/clerk-bridge";
+import { clearSignedInClientState, signOutAndVerify } from "@/hooks/useAuth";
 import { trackLoggedOut } from "@/lib/analytics";
 import SEOHead from "@/components/layout/SEOHead";
 import { signInSeoDescription, signUpSeoDescription } from "@shared/seo-templates";
@@ -22,8 +22,16 @@ export function SignInPage() {
   // A server-guard 302 from /admin#users keeps "#users" on this URL but not in
   // redirect_url; fold it in before Clerk reads the parameter (idempotent).
   // Unsafe redirect_url values are dropped first so Clerk never sees them.
-  sanitizeRedirectParam();
-  foldInheritedHashIntoRedirect();
+  // Both rewrite history, which wouter broadcasts to every location
+  // subscriber, so they run in a layout effect (not during render) and the
+  // sign-in form mounts only after they have, still before first paint.
+  const [urlReady, setUrlReady] = useState(false);
+  useLayoutEffect(() => {
+    sanitizeRedirectParam();
+    foldInheritedHashIntoRedirect();
+    setUrlReady(true);
+  }, []);
+  if (!urlReady) return null;
   // /sign-in?admin shows the owner password form instead of Clerk.
   const adminPasswordMode =
     typeof window !== "undefined" &&
@@ -80,39 +88,19 @@ export function SignUpPage() {
 }
 
 // SPA-side /logout. Both direct and client-side navigation render this route,
-// which signs out via Clerk and confirms invalidation before redirecting.
+// which runs the same sign-out as the account menu (owner password cookie and
+// Clerk) and confirms invalidation before redirecting.
 export function Logout() {
-  const { loaded, clerk } = useClerkBridge();
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    requestClerk();
-  }, []);
-
-  useEffect(() => {
-    // C3-V3-02: on a direct /logout load Clerk is still loading, and signOut()
-    // then only queues the call and resolves at once — the server check below
-    // saw a live session, and the queued signOut later routed to "/"
-    // client-side, leaving the cached signed-in user in the header.
-    if (!loaded || !clerk) return;
     let cancelled = false;
     const doSignOut = async () => {
       try {
-        // The bridged signOut skips Clerk's own navigation so the full reload
-        // below, not a client-side route change, ends the signed-in page.
-        await clerk.signOut();
+        await signOutAndVerify();
         // Before the identity reset, so the event stays on this account.
         trackLoggedOut("this_device");
         clearSignedInClientState();
-        const authCheck = await fetch("/api/auth/user", {
-          credentials: "include",
-          cache: "no-store",
-          signal: AbortSignal.timeout(5_000),
-        });
-        const state = authCheck.ok ? await authCheck.json() : null;
-        if (!authCheck.ok || state?.isAuthenticated !== false) {
-          throw new Error("The server could not confirm that your session ended");
-        }
         if (!cancelled) window.location.replace("/");
       } catch (reason) {
         if (!cancelled) {
@@ -126,7 +114,7 @@ export function Logout() {
     return () => {
       cancelled = true;
     };
-  }, [loaded, clerk]);
+  }, []);
   return (
     // min-h-full, not min-h-screen: this screen renders inside the app shell's
     // <main>, and a row that claims a viewport height of its own pushes the

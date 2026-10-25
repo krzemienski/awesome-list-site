@@ -19,6 +19,7 @@ import { COST_BASIS_NOTE, formatCost, getStatusBadge, humanizeJobError, isActive
 import { OUTCOME_LABEL, STEP_LABEL, deriveRunProgress, type RunOutcome } from "./researchRunProgress";
 import { ResearchPhaseTimeline } from "./ResearchPhaseTimeline";
 import { ResearchRunDiscoveries } from "./ResearchRunDiscoveries";
+import { CancelResearchRunDialog } from "./CancelResearchRunDialog";
 
 interface ResearchRunViewProps {
   jobId: number;
@@ -71,6 +72,7 @@ export function ResearchRunView({ jobId, focusOnMount, onStartNew, onRelaunchHig
   const reviewHeadingRef = useRef<HTMLHeadingElement>(null);
   const [showDetail, setShowDetail] = useState(false);
   const [announcement, setAnnouncement] = useState("");
+  const [confirmCancel, setConfirmCancel] = useState(false);
   const [now, setNow] = useState(() => Date.now());
 
   // The run keeps writing for a moment after its status leaves "processing"
@@ -124,6 +126,7 @@ export function ResearchRunView({ jobId, focusOnMount, onStartNew, onRelaunchHig
   const cancel = useMutation({
     mutationFn: async () => { await apiRequest(`/api/researcher/jobs/${jobId}`, { method: "DELETE" }); },
     onSuccess: () => {
+      setConfirmCancel(false);
       void queryClient.invalidateQueries({ queryKey: ["/api/researcher/jobs"] });
       toast({ title: `Run #${jobId} cancelled` });
     },
@@ -210,7 +213,7 @@ export function ResearchRunView({ jobId, focusOnMount, onStartNew, onRelaunchHig
           <div className="flex flex-wrap items-center gap-2">
             {job && getStatusBadge(job.status)}
             {job && active && (
-              <Button size="sm" variant="outline" className="min-h-11" onClick={() => cancel.mutate()} disabled={cancel.isPending} data-testid="button-cancel-run">
+              <Button size="sm" variant="outline" className="min-h-11" onClick={() => { cancel.reset(); setConfirmCancel(true); }} disabled={cancel.isPending} data-testid="button-cancel-run">
                 <XCircle className="mr-1 h-3 w-3" />{cancel.isPending ? "Cancelling…" : "Cancel run"}
               </Button>
             )}
@@ -231,7 +234,14 @@ export function ResearchRunView({ jobId, focusOnMount, onStartNew, onRelaunchHig
             <RefreshCw className="mr-1 inline h-3 w-3" aria-hidden="true" />Live updates failed; showing the last good data and retrying.
           </p>
         )}
-        {cancel.isError && (
+        <CancelResearchRunDialog
+          jobId={confirmCancel && job && active ? jobId : null}
+          pending={cancel.isPending}
+          error={cancel.isError ? cancel.error : null}
+          onConfirm={() => cancel.mutate()}
+          onDismiss={() => setConfirmCancel(false)}
+        />
+        {cancel.isError && !confirmCancel && (
           <Alert variant="destructive" role="alert">
             <AlertCircle className="h-4 w-4" />
             <AlertDescription>{describeWriteError(cancel.error, { outcome: "The run may still be going. Try cancelling again." })}</AlertDescription>

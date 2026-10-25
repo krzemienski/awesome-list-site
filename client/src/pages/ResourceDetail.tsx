@@ -608,11 +608,14 @@ export default function ResourceDetail() {
     surface?: string,
   ) => {
     trackRelatedResourceOpened(relatedResource.id, id, position, relatedResource.score, surface);
-    trackInteraction.mutate({
-      resourceId: relatedResource.id.toString(),
-      interactionType: "click",
-      metadata: { source: "related-resources", fromResourceId: id }
-    });
+    // Interaction history is per member; guests would only collect a 401.
+    if (user?.id) {
+      trackInteraction.mutate({
+        resourceId: relatedResource.id.toString(),
+        interactionType: "click",
+        metadata: { source: "related-resources", fromResourceId: id }
+      });
+    }
     if (e.metaKey || e.ctrlKey || e.shiftKey || e.altKey || e.button !== 0) return;
     e.preventDefault();
     setLocation(`/resource/${relatedResource.id}`);
