@@ -1,4 +1,4 @@
-import { useQuery } from "@tanstack/react-query";
+import { keepPreviousData, useQuery } from "@tanstack/react-query";
 import { apiRequest } from "@/lib/queryClient";
 import type { ResolvedResearchConfig } from "@shared/researcherContract";
 
@@ -35,5 +35,7 @@ export function useResearcherConfig(overrides: ResearcherConfigOverrides, enable
     queryFn: () => apiRequest(url),
     enabled,
     staleTime: 30_000,
+    // Keep the last summary on screen while an edited override re-resolves.
+    placeholderData: keepPreviousData,
   });
 }

@@ -1,0 +1,343 @@
+/*
+ * Guided researcher: launch steps (ResearchLaunchGuide) and the live run
+ * view (ResearchRunView, ResearchPhaseTimeline, ResearchRunDiscoveries).
+ * Design-system tokens only; motion uses --motion-* and collapses under
+ * prefers-reduced-motion.
+ */
+.research-guided {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4, 1rem);
+  min-width: 0;
+}
+
+.research-guided > h3 {
+  font-size: 1rem;
+  font-weight: 600;
+}
+
+/* ---- Launch steps ---- */
+.research-guide {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4, 1rem);
+  min-width: 0;
+}
+
+.research-guide__step {
+  border-top: var(--hairline-w, 1px) solid var(--border);
+  min-width: 0;
+  padding-top: var(--space-4, 1rem);
+}
+
+.research-guide__step:first-child {
+  border-top: 0;
+  padding-top: 0;
+}
+
+.research-guide__step-head {
+  align-items: center;
+  display: flex;
+  flex-wrap: wrap;
+  gap: .5rem .75rem;
+  margin-bottom: .75rem;
+}
+
+.research-guide__step-num {
+  align-items: center;
+  border: var(--hairline-w, 1px) solid var(--border);
+  border-radius: 999px;
+  color: var(--text-3, var(--muted-foreground));
+  display: inline-flex;
+  flex: none;
+  font-size: .75rem;
+  font-variant-numeric: tabular-nums;
+  height: 1.5rem;
+  justify-content: center;
+  width: 1.5rem;
+}
+
+.research-guide__step-summary {
+  margin-left: auto;
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+
+.research-guide__step-body {
+  min-width: 0;
+  padding-left: 2.25rem;
+}
+
+.research-guide__choice {
+  align-items: flex-start;
+  border-radius: var(--radius, .5rem);
+  cursor: pointer;
+  display: flex;
+  gap: .75rem;
+  min-height: 44px;
+  padding: .5rem;
+  transition: background var(--motion-fast) ease;
+}
+
+.research-guide__choice:hover {
+  background: var(--surface-2, var(--muted));
+}
+
+.research-guide__choice > button {
+  margin-top: .15rem;
+}
+
+.research-guide__limits,
+.research-guide__advanced {
+  display: grid;
+  gap: var(--space-4, 1rem);
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 12rem), 1fr));
+}
+
+.research-guide__advanced {
+  border: var(--hairline-w, 1px) solid var(--border);
+  border-radius: var(--radius, .5rem);
+  margin-top: .5rem;
+  padding: var(--space-4, 1rem);
+}
+
+/* ---- Live run ---- */
+.research-run {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4, 1rem);
+  min-width: 0;
+}
+
+.research-run__head {
+  align-items: flex-start;
+  display: flex;
+  flex-wrap: wrap;
+  gap: .75rem;
+  justify-content: space-between;
+}
+
+.research-run__head h3:focus-visible,
+.research-run__review h4:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
+.research-run__latest {
+  color: var(--text-3, var(--muted-foreground));
+  min-height: 1rem;
+  overflow-wrap: anywhere;
+}
+
+.research-run__timeline {
+  display: grid;
+  gap: .5rem;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.research-run__step {
+  align-items: flex-start;
+  border-top: 2px solid var(--border);
+  color: var(--text-3, var(--muted-foreground));
+  display: flex;
+  gap: .5rem;
+  min-width: 0;
+  padding-top: .5rem;
+  transition: border-color var(--motion-base) var(--motion-ease), color var(--motion-base) var(--motion-ease);
+}
+
+.research-run__step--done,
+.research-run__step--current {
+  border-top-color: var(--accent);
+  color: var(--text);
+}
+
+.research-run__step--budget_stopped.research-run__step--current,
+.research-run__step--cancelled.research-run__step--current {
+  border-top-color: var(--status-warn);
+}
+
+.research-run__step--failed.research-run__step--current {
+  border-top-color: var(--status-bad);
+}
+
+.research-run__step-dot {
+  align-items: center;
+  border: var(--hairline-w, 1px) solid var(--border);
+  border-radius: 999px;
+  display: inline-flex;
+  flex: none;
+  height: 1.25rem;
+  justify-content: center;
+  position: relative;
+  width: 1.25rem;
+}
+
+.research-run__step--done .research-run__step-dot {
+  border-color: var(--accent);
+  color: var(--accent-ink, var(--accent));
+}
+
+.research-run__step-marker {
+  background: var(--accent);
+  border-radius: 999px;
+  inset: 3px;
+  position: absolute;
+}
+
+.research-run__step-label {
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+
+.research-run__scouts {
+  display: flex;
+  flex-direction: column;
+  gap: .5rem;
+  margin-top: var(--space-4, 1rem);
+}
+
+.research-run__scout-list,
+.research-run__discoveries {
+  display: grid;
+  gap: .5rem;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.research-run__scout-list {
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 16rem), 1fr));
+}
+
+.research-run__scout,
+.research-run__discovery {
+  background: var(--surface-1, var(--card));
+  border: var(--hairline-w, 1px) solid var(--border);
+  border-radius: var(--radius, .5rem);
+  min-width: 0;
+  padding: .75rem;
+}
+
+.research-run__scout--running {
+  border-color: var(--status-info-2);
+}
+
+/* Indeterminate "searching" bar: a segment sweeping across the card. */
+.research-run__scout-bar {
+  background: var(--border);
+  border-radius: 999px;
+  display: block;
+  height: 2px;
+  margin-top: .5rem;
+  overflow: hidden;
+  position: relative;
+}
+
+.research-run__scout-bar::after {
+  animation: research-scout-sweep calc(var(--motion-slow) * 4) linear infinite;
+  background: var(--status-info-2);
+  content: "";
+  inset: 0 auto 0 0;
+  position: absolute;
+  width: 35%;
+}
+
+@keyframes research-scout-sweep {
+  from { transform: translateX(-100%); }
+  to { transform: translateX(300%); }
+}
+
+.research-run__meters {
+  display: grid;
+  gap: var(--space-4, 1rem);
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 12rem), 1fr));
+}
+
+.research-run__meters dd {
+  overflow-wrap: anywhere;
+}
+
+.research-run__review {
+  display: flex;
+  flex-direction: column;
+  gap: .75rem;
+}
+
+.research-run__discovery {
+  align-items: flex-start;
+  display: flex;
+  flex-wrap: wrap;
+  gap: .75rem;
+}
+
+.research-run__discovery-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: .5rem;
+}
+
+.research-run__detail {
+  border-top: var(--hairline-w, 1px) solid var(--border);
+  padding-top: .5rem;
+}
+
+@media (max-width: 48rem) {
+  .research-guide__step-body {
+    padding-left: 0;
+  }
+
+  .research-guide__step-summary {
+    flex-basis: 100%;
+    margin-left: 0;
+  }
+
+  /* Phones: the five phases stack as a vertical timeline. */
+  .research-run__timeline {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .research-run__step {
+    border-left: 2px solid var(--border);
+    border-top: 0;
+    padding: .25rem 0 .25rem .75rem;
+  }
+
+  .research-run__step--done,
+  .research-run__step--current {
+    border-left-color: var(--accent);
+  }
+
+  .research-run__step--budget_stopped.research-run__step--current,
+  .research-run__step--cancelled.research-run__step--current {
+    border-left-color: var(--status-warn);
+  }
+
+  .research-run__step--failed.research-run__step--current {
+    border-left-color: var(--status-bad);
+  }
+
+  .research-run__discovery-actions {
+    width: 100%;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .research-run__scout-bar::after {
+    animation: none;
+    width: 100%;
+  }
+
+  .research-run__step,
+  .research-guide__choice {
+    transition: none;
+  }
+}
+
+.research-run__discovery:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
