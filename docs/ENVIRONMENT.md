@@ -412,6 +412,28 @@ The lockfile keeps Replit's `package-firewall.replit.internal` URL for every
 entry whose version did not change. Changed entries resolve from
 registry.npmjs.org.
 
+### Major upgrades
+
+Only the majors triaged as cheap. Release notes or migration guides were read
+for each one, and the package source was read where the notes were thin.
+
+| Package | From → to | Source read | Breaking changes | Effect on our code | Action |
+|---|---|---|---|---|---|
+| dotenv | 17.4.2 → 18.0.9 | GH motdotla/dotenv `CHANGELOG.md` (18.0.0–18.0.9); `dist/index.cjs` and `dist/config.cjs` in the 18.0.9 tarball | `.env.vault`/`DOTENV_KEY` removed; preloading (`node -r dotenv/config`) removed in favour of a `dotenv run` CLI; tips removed and the injected message moved to stderr; `import 'dotenv/config'` is quiet by default; `override` parsed with `parseBoolean` (the string `"false"` no longer means true); `DOTENV_*` env names added, `DOTENV_CONFIG_*` kept as fallbacks; opt-in `fast` parser; `~` expands in paths. | Override stays off by default: `populate()` writes a key already in `process.env` only when `override` is true. We load it with `import 'dotenv/config'` (`server/index.ts:1`, `vite.config.ts:2`, `scripts/run-digest-dispatch.ts:1`) and use no vault, no preload and no `dotenv_config_*` argv. Explicit `DATABASE_URL`, `PORT` and `ANTHROPIC_*` still win over `.env`. The package now installs a `dotenv` bin; no script calls one. | Upgraded. No code change. |
+| express-rate-limit | 7.5.1 → 8.7.1 | `docs/reference/changelog.mdx` in GH express-rate-limit/express-rate-limit (8.0.0–8.7.1); `dist/index.mjs` validations | IPv6 clients are keyed by /56 subnet by default; new `ipKeyGenerator` helper; a custom `keyGenerator` that reads `req.ip` without it logs `ERR_ERL_KEY_GEN_IPV6`; validations run once each; unknown-option check; async store `init`. | `generateRateLimitKey` in `server/middleware/rateLimit.ts` read `req.ip`, so v8 logged `ERR_ERL_KEY_GEN_IPV6` twice at boot (free and standard tiers). The Postgres store (`pgRateLimitStore.ts`) still satisfies the `Store` interface. Each limiter keeps a distinct `prefix`, so `ERR_ERL_DOUBLE_COUNT` doesn't fire. Default-keyed limiters now group IPv6 clients by /56; IPv4 keys are unchanged. | Upgraded. The IP fallback now goes through `ipKeyGenerator`. |
+| date-fns | 3.6.0 → 4.4.0 | `CHANGELOG.md` in the 4.4.0 tarball (v4.0.0–v4.4.0) | Type-level changes only; ESM-first; time-zone support via `in`; CDN scripts deprecated. | We only call `formatDistanceToNow(date, { addSuffix: true })` (Profile, ApiKeysCard, Contributions, ContinueLearning, ContinueLearningPreview). Output is unchanged. The unused `react-day-picker@8` declared a `date-fns ^2 \|\| ^3` peer; nothing imports it. | Upgraded. `react-day-picker` removed from `package.json` (0 importers). |
+| js-yaml | 4.3.2 → 5.5.0 | GH nodeca/js-yaml `CHANGELOG.md` (5.0.0–5.5.0) and `docs/migrate_v4_to_v5.md` | No ESM default export; `load()` uses `CORE_SCHEMA` (no `!!timestamp`, `<<` merge or `!!binary` by default); `load('')` throws; `safeLoad`/`safeDump`, `DEFAULT_SCHEMA`, `types` and several dump options removed; ships its own types. | `import yaml from 'js-yaml'` type-checked (esModuleInterop) but the server died at boot: `SyntaxError: The requested module 'js-yaml' does not provide an export named 'default'`. `awesome-list.config.yaml` uses only strings, numbers, booleans and lists, so `CORE_SCHEMA` loads it unchanged. `scripts/export-openapi-yaml.ts` already used the named `dump` with options that still exist; v5 may quote some scalars differently the next time it runs. | Upgraded. Named `load` import in `server/config.ts` and `server/github/parser.ts`. `@types/js-yaml` removed. |
+| tailwind-merge | 2.6.1 → 3.7.0 | GH dcastil/tailwind-merge `docs/changelog/v2-to-v3-migration.md` and `v3-changelog.md` | Tailwind 3 support dropped for Tailwind 4; theme keys renamed; `isLength` removed; `orderSensitiveModifiers` required in `createTailwindMerge`; prefix and separator config changes. | We only call `twMerge(clsx(...))` in `cn()` (`client/src/lib/utils.ts`) with no config. The class list of every element on home, resource, bookmark dialog, admin researcher guided view, contributions and profile was identical before and after at 1440, 820 and 390. | Upgraded. No code change. |
+| nanoid | 5.1.16 (direct) | GH ai/nanoid `CHANGELOG.md` (6.0.0–6.0.2) | 6.0 drops Node 18 and 20 (`engines: ^22 \|\| ^24 \|\| >=26`); Replit runs `nodejs-20`. | Nothing imports `nanoid`; postcss uses its own nested `nanoid@3`. | Not upgraded. Removed from `package.json`. |
+| @types/node | 20.16.11 → 20.19.43 | npm dist-tags; vite 7 `peerDependencies` | — | Stays on the Node 20 line that Replit runs (`.replit` `nodejs-20`), not latest (26.x). 20.19.x matches Vite 7's `^20.19.0 \|\| >=22.12.0` peer, which 20.16.11 failed (`npm ls` reported it invalid). | Upgraded, exact pin kept. |
+
+Lockfile: 8 entries changed version, 4 were removed (`nanoid`,
+`react-day-picker`, `@types/js-yaml`, and the copy of `express-rate-limit`
+nested under `@modelcontextprotocol/sdk`, which now dedupes to the root), and
+2 were added (`@eslint/eslintrc` keeps its own `js-yaml@4.3.2` and
+`argparse@2.0.1`). All 156 `package-firewall.replit.internal` URLs on
+unchanged entries were kept.
+
 ## See also
 
 - [SETUP.md](./SETUP.md) — development setup

@@ -1,5 +1,5 @@
 import { Resource } from "@shared/schema";
-import yaml from "js-yaml";
+import { load as loadYaml } from "js-yaml";
 import { mapCategoryName } from "@shared/categoryMapping";
 import { isJunkResource, humanizeTitle, sanitizeDescription, decodeHtmlEntities } from "./importHygiene";
 import { createLogger } from "../lib/logger";
@@ -299,7 +299,7 @@ export class AwesomeListParser {
     
     try {
       const frontMatter = this.content.substring(3, endIndex);
-      return yaml.load(frontMatter) as Record<string, any>;
+      return loadYaml(frontMatter) as Record<string, any>;
     } catch (error) {
       logger.error('Error parsing front matter:', error);
       return null;
