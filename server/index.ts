@@ -65,6 +65,13 @@ const clerkDevelopmentOrigin = configuredClerkDevelopmentOrigin();
 const clerkDevelopmentCspSource = clerkDevelopmentOrigin
   ? ` ${clerkDevelopmentOrigin}`
   : "";
+// Clerk's SDK sends telemetry to clerk-telemetry.com only for development
+// instances (@clerk/shared TelemetryCollector.isEnabled), so allow it in
+// connect-src only when a development key is configured; production CSP is
+// unchanged.
+const clerkDevelopmentConnectSources = clerkDevelopmentOrigin
+  ? `${clerkDevelopmentCspSource} https://clerk-telemetry.com`
+  : "";
 
 const buildContentSecurityPolicy = (nonce: string): string =>
   [
@@ -117,7 +124,7 @@ const buildContentSecurityPolicy = (nonce: string): string =>
     // Task #232: api-js.mixpanel.com is mixpanel-browser's default ingest
     // host; api.mixpanel.com covers config fallbacks.
     // PostHog ingest + assets (feature flags, replay, surveys).
-    `connect-src 'self' https://*.google-analytics.com https://*.analytics.google.com https://www.googletagmanager.com https://www.google.com https://api-js.mixpanel.com https://api.mixpanel.com https://us.i.posthog.com https://us-assets.i.posthog.com https://*.amplitude.com https://replit.com https://replit-cdn.com https://i.replit.com https://challenges.cloudflare.com${clerkDevelopmentCspSource}`,
+    `connect-src 'self' https://*.google-analytics.com https://*.analytics.google.com https://www.googletagmanager.com https://www.google.com https://api-js.mixpanel.com https://api.mixpanel.com https://us.i.posthog.com https://us-assets.i.posthog.com https://*.amplitude.com https://replit.com https://replit-cdn.com https://i.replit.com https://challenges.cloudflare.com${clerkDevelopmentConnectSources}`,
     // Turnstile renders inside an iframe from challenges.cloudflare.com;
     // without an explicit frame-src it falls back to default-src 'self'
     // and the widget is blocked silently (Turnstile error 300030).
