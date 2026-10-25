@@ -81,6 +81,11 @@ function stripTrailingSlash(u: string): string {
   return u.replace(/\/+$/, "");
 }
 
+/** Environment variable that maps a tier alias to a model id. */
+export function tierEnvVar(tier: ModelTier): string {
+  return TIER_ENV[tier];
+}
+
 /** Resolve the model id for a tier (env override → first-party default). */
 export function resolveTierModel(tier: ModelTier, env: Env = process.env): string {
   return clean(env[TIER_ENV[tier]]) ?? FIRST_PARTY_TIER_MODELS[tier];
@@ -95,18 +100,6 @@ export function resolveFlowModel(flow: FlowName, env: Env = process.env): string
 /** ANTHROPIC_MODEL when set, else the sonnet tier. */
 export function resolvePrimaryModel(env: Env = process.env): string {
   return clean(env.ANTHROPIC_MODEL) ?? resolveTierModel("sonnet", env);
-}
-
-/**
- * Model value to hand the Claude Agent SDK for a SUBAGENT definition. The CLI
- * validates per-agent model ids against an internal allowlist and silently
- * swaps unknown ids for its default subagent model (which a custom endpoint
- * then rejects). Aliases always pass and are mapped by the CLI through the
- * same ANTHROPIC_DEFAULT_<TIER>_MODEL variables we use here, so subagents get
- * the tier alias rather than the resolved id.
- */
-export function subagentModelForTier(tier: ModelTier): string {
-  return tier;
 }
 
 export type CredentialKind = "router" | "managed" | "direct" | "none";

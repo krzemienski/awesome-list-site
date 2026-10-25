@@ -28,6 +28,9 @@ const EVENT_TYPE_STYLES: Record<string, string> = {
   delegation_result: "border-[var(--status-info-2)]/30 text-[var(--status-info-2)]/80", // DS-OK: violet info (DS chart/info constant)
   result: "border-[var(--status-ok)]/60 text-[var(--status-ok)]", // DS-OK: status ok
   error: "border-[var(--status-bad)]/50 text-[var(--status-bad)]", // DS-OK: status bad
+  phase: "border-[var(--status-warn)]/60 text-[var(--status-warn)]", // DS-OK: status warn
+  scout_start: "border-[var(--status-info-2)]/50 text-[var(--status-info-2)]", // DS-OK: violet info (DS chart/info constant)
+  scout_end: "border-[var(--status-info-2)]/30 text-[var(--status-info-2)]/80", // DS-OK: violet info (DS chart/info constant)
 };
 
 const DELEGATION_TARGET_TEXT = "text-[var(--status-info-2)]/80"; // DS-OK: violet info (DS chart/info constant)

@@ -48,6 +48,10 @@ import { formatAdminDate } from "@/lib/utils";
 import { fetchStaticAwesomeList } from "@/lib/static-data";
 import { keepPreviousData, useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useAiDefaults } from "@/hooks/useAiDefaults";
+import { useResearcherConfig } from "@/hooks/useResearcherConfig";
+import { ResearchRunConfigSummary } from "@/components/admin/ResearchRunConfigSummary";
+import { Checkbox } from "@/components/ui/checkbox";
+import type { CostBasis } from "@shared/researcherContract";
 import { apiRequest, ApiError } from "@/lib/queryClient";
 import { describeWriteError } from "@/lib/apiError";
 import { sanitizeDisplay } from "@/lib/sanitize-display";
@@ -139,6 +143,13 @@ function formatCost(value: string | number | null | undefined): string {
   return `$${Number(value ?? 0).toFixed(4)}`;
 }
 
+/** Short qualifier for a cost that is not the Agent SDK's reported total. */
+const COST_BASIS_NOTE: Record<CostBasis, string | null> = {
+  reported: null,
+  lower_bound: "lower bound",
+  unknown: "unknown",
+};
+
 // Cancelling a job that the server failed to stop: it may still be running.
 const CANCEL_OUTCOME = "The job may still be running. Refresh the job list, then try again.";
 
@@ -219,11 +230,13 @@ export default function ResearcherTab({ initialTab = "launch" }: ResearcherTabPr
   // unbounded by default; entering a number opts INTO a cap.
   // BUG-045 (run25): default to a sane spending cap instead of UNLIMITED —
   // the operator can clear the field deliberately if they want no cap.
-  const [maxBudget, setMaxBudget] = useState("1.00");
+  // $3 / 40 turns: on the cc/claude-opus-5 orchestrator one saved discovery
+  // cost $1.14 in 8 turns and two hit a $1.50 cap (docs/AI-SERVICES.md).
+  const [maxBudget, setMaxBudget] = useState("3.00");
   // R4-052: keep the raw input string (like maxBudget) instead of a number so
   // typing "5.5" or "0" is never silently rewritten — validation feedback is
   // shown instead (see the hint below the field + handleLaunch).
-  const [maxTurns, setMaxTurns] = useState("15");
+  const [maxTurns, setMaxTurns] = useState("40");
   // Stop condition: end the run automatically after N NEW saved discoveries.
   // Raw string like maxTurns so typing is never silently rewritten.
   const [targetDiscoveries, setTargetDiscoveries] = useState("");
@@ -234,6 +247,10 @@ export default function ResearcherTab({ initialTab = "launch" }: ResearcherTabPr
   const [scoutModel, setScoutModel] = useState("");
   const [baseUrl, setBaseUrl] = useState("");
   const [authToken, setAuthToken] = useState("");
+  // Plain-http override endpoints need an explicit confirmation; the server
+  // refuses them without allowInsecureHttp.
+  const [confirmInsecureHttp, setConfirmInsecureHttp] = useState(false);
+  const baseUrlIsPlainHttp = /^http:\/\//i.test(baseUrl.trim());
   const [selectedJobId, setSelectedJobId] = useState<number | null>(() => {
     if (typeof window === 'undefined') return null;
     const value = Number(new URLSearchParams(window.location.search).get('jobId'));
@@ -250,6 +267,15 @@ export default function ResearcherTab({ initialTab = "launch" }: ResearcherTabPr
   // Run23 NB-040: launching a paid research job needs an explicit confirmation
   // step (same AlertDialog pattern as GitHub import/export).
   const [confirmLaunch, setConfirmLaunch] = useState(false);
+  const configPreview = useResearcherConfig({
+    model,
+    scoutModel,
+    baseUrl,
+    hasAuthToken: authToken.trim() !== "",
+    allowInsecureHttp: baseUrlIsPlainHttp && confirmInsecureHttp,
+  }, confirmLaunch);
+  const previewConfig = configPreview.data?.config;
+  const preflightBlocked = !!previewConfig && !previewConfig.preflight.ok;
 
   const [isPolling, setIsPolling] = useState(false);
 
@@ -393,6 +419,7 @@ export default function ResearcherTab({ initialTab = "launch" }: ResearcherTabPr
           scoutModel: scoutModel.trim() || undefined,
           baseUrl: baseUrl.trim() || undefined,
           authToken: authToken.trim() || undefined,
+          allowInsecureHttp: baseUrlIsPlainHttp && confirmInsecureHttp ? true : undefined,
         }),
       });
     },
@@ -614,7 +641,7 @@ export default function ResearcherTab({ initialTab = "launch" }: ResearcherTabPr
                   className="input"
                   value={maxTurns}
                   onChange={(event) => setMaxTurns(event.target.value)}
-                  placeholder="15"
+                  placeholder="40"
                   inputMode="numeric"
                 />
               </div>
@@ -667,7 +694,12 @@ export default function ResearcherTab({ initialTab = "launch" }: ResearcherTabPr
                     <td className="prompt">{job.prompt || "Auto-generated research brief"}</td>
                     <td className="mono queues-agent__cell-mono">{job.totalDiscoveries || 0}</td>
                     <td className="mono queues-agent__cell-mono">{job.approvedDiscoveries || 0}/{job.rejectedDiscoveries || 0}</td>
-                    <td className="mono accent queues-agent__cell-mono">{formatCost(job.estimatedCostUsd)}</td>
+                    <td className="mono accent queues-agent__cell-mono">
+                      {formatCost(job.estimatedCostUsd)}
+                      {job.costBasis && COST_BASIS_NOTE[job.costBasis] && (
+                        <span className="block text-[10px] text-muted-foreground">{COST_BASIS_NOTE[job.costBasis]}</span>
+                      )}
+                    </td>
                     <td className="mono queues-agent__cell-mono">{job.turnsUsed || 0}/{job.maxTurns ?? "∞"}</td>
                     <td className="mono muted queues-agent__cell-mono queues-agent__cell-muted queues-agent__cell-created">{job.createdAt ? formatAdminDate(job.createdAt) : "—"}</td>
                   </tr>
@@ -947,7 +979,7 @@ export default function ResearcherTab({ initialTab = "launch" }: ResearcherTabPr
                         <Input
                           id="research-baseurl"
                           value={baseUrl}
-                          onChange={(e) => setBaseUrl(e.target.value)}
+                          onChange={(e) => { setBaseUrl(e.target.value); setConfirmInsecureHttp(false); }}
                           placeholder={defaultBaseUrl ? `${defaultBaseUrl} (default)` : "Default endpoint"}
                           className="mt-1 font-mono text-xs"
                           data-testid="input-research-baseurl"
@@ -1014,6 +1046,27 @@ export default function ResearcherTab({ initialTab = "launch" }: ResearcherTabPr
                         This starts a Claude research agent with {maxBudget.trim() === "" ? "an UNLIMITED budget" : `a budget of up to $${maxBudget}`} and {maxTurns.trim() === "" ? "unlimited turns" : `${maxTurns} turns`}.{targetDiscoveries.trim() !== "" ? ` It will stop automatically after ${targetDiscoveries} new ${Number(targetDiscoveries) === 1 ? "discovery" : "discoveries"}.` : ""} The job runs in the background and incurs real API cost{maxBudget.trim() === "" && targetDiscoveries.trim() === "" ? " with no spending cap — cancel it manually when you're satisfied" : ""}.
                       </AlertDialogDescription>
                     </AlertDialogHeader>
+                    <div className="space-y-2 rounded border p-3">
+                      <p className="text-xs font-medium">This run will use</p>
+                      {previewConfig ? (
+                        <ResearchRunConfigSummary config={previewConfig} testId="research-launch-config" />
+                      ) : configPreview.isError ? (
+                        <p role="alert" className="text-xs text-destructive">{describeWriteError(configPreview.error, { outcome: "Could not resolve the run configuration." })}</p>
+                      ) : (
+                        <p className="text-xs text-muted-foreground">Resolving endpoint and models…</p>
+                      )}
+                      {baseUrlIsPlainHttp && (
+                        <label className="flex items-start gap-2 text-xs" htmlFor="research-confirm-insecure-http">
+                          <Checkbox
+                            id="research-confirm-insecure-http"
+                            checked={confirmInsecureHttp}
+                            onCheckedChange={(v) => setConfirmInsecureHttp(v === true)}
+                            data-testid="checkbox-confirm-insecure-http"
+                          />
+                          <span>Send the auth token to this plain http:// endpoint unencrypted. Anyone on the network path can read it.</span>
+                        </label>
+                      )}
+                    </div>
                     {startMutation.isError && (
                       <Alert variant="destructive" className="queues-agent__inline-error" role="alert">
                         <AlertCircle className="w-4 h-4" />
@@ -1026,10 +1079,10 @@ export default function ResearcherTab({ initialTab = "launch" }: ResearcherTabPr
                         data-testid="button-confirm-launch"
                         onClick={(event) => {
                           event.preventDefault();
-                          if (!activeJobStateKnown) return;
+                          if (!activeJobStateKnown || preflightBlocked) return;
                           startMutation.mutate();
                         }}
-                        disabled={startMutation.isPending || !activeJobStateKnown}
+                        disabled={startMutation.isPending || !activeJobStateKnown || preflightBlocked}
                       >
                         {startMutation.isPending ? "Launching…" : "Launch"}
                       </AlertDialogAction>
@@ -1374,7 +1427,12 @@ export default function ResearcherTab({ initialTab = "launch" }: ResearcherTabPr
                             {job.status === 'cancelled' && (!job.estimatedCostUsd || Number(job.estimatedCostUsd) === 0) ? (
                               <span className="text-muted-foreground">—</span>
                             ) : (
-                              formatCost(job.estimatedCostUsd)
+                              <>
+                                {formatCost(job.estimatedCostUsd)}
+                                {job.costBasis && COST_BASIS_NOTE[job.costBasis] && (
+                                  <span className="block text-[10px] text-muted-foreground whitespace-nowrap">{COST_BASIS_NOTE[job.costBasis]}</span>
+                                )}
+                              </>
                             )}
                           </TableCell>
                           {/* NB-032 (run18): turnsUsed accumulates across
@@ -1510,7 +1568,9 @@ export default function ResearcherTab({ initialTab = "launch" }: ResearcherTabPr
                 <div className="text-center p-2 border rounded">
                   {/* NB-033 (run18): same 4-decimal formatter as the table. */}
                   <div className="text-lg font-bold">{formatCost(selectedJob.estimatedCostUsd)}</div>
-                  <div className="text-xs text-muted-foreground">Cost</div>
+                  <div className="text-xs text-muted-foreground" data-testid="text-research-cost-basis">
+                    Cost{selectedJob.costBasis && COST_BASIS_NOTE[selectedJob.costBasis] ? ` (${COST_BASIS_NOTE[selectedJob.costBasis]})` : ""}
+                  </div>
                 </div>
               </div>
 
@@ -1526,6 +1586,15 @@ export default function ResearcherTab({ initialTab = "launch" }: ResearcherTabPr
                 </div>
               )}
 
+              {selectedJob.resolvedConfig ? (
+                <div className="space-y-3">
+                  <ResearchRunConfigSummary config={selectedJob.resolvedConfig} testId="research-job-config" />
+                  <div>
+                    <Label className="text-xs text-muted-foreground">Discovery Target</Label>
+                    <p className="text-xs font-mono mt-1">{selectedJob.targetDiscoveries != null ? `Stop after ${selectedJob.targetDiscoveries}` : 'None'}</p>
+                  </div>
+                </div>
+              ) : (
               <div className="grid grid-cols-3 gap-4">
                 <div>
                   <Label className="text-xs text-muted-foreground">Model</Label>
@@ -1548,6 +1617,7 @@ export default function ResearcherTab({ initialTab = "launch" }: ResearcherTabPr
                   <p className="text-xs font-mono mt-1">{selectedJob.authTokenLast4 ? `••••${selectedJob.authTokenLast4}` : 'Platform key'}</p>
                 </div>
               </div>
+              )}
 
               {selectedJob.errorMessage && (
                 <Alert variant="destructive">

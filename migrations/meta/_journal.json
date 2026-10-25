@@ -225,6 +225,13 @@
       "when": 1791907200000,
       "tag": "0057_keep_two_theme_systems",
       "breakpoints": true
+    },
+    {
+      "idx": 32,
+      "version": "7",
+      "when": 1791993600000,
+      "tag": "0058_research_run_config_and_cost_basis",
+      "breakpoints": true
     }
   ]
 }
