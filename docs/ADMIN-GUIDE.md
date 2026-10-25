@@ -373,8 +373,10 @@ The **Journeys** tab manages curated learning journeys and their ordered steps.
 
 ### Managing Journeys
 1. Admin → **Journeys**
-2. Create/edit/delete journeys (title, description, difficulty, published state)
+2. Pick an existing journey and edit its details (`PUT /api/admin/journeys/:id`)
 3. Add, reorder, or remove steps that reference resources
+
+The admin panel cannot create or delete a journey: there is no create control and no `POST /api/admin/journeys` route. New journeys come only from the seed CLI (`server/cli/seedJourneys.ts`), which calls Claude for each journey and inserts it as `published`. With no journeys in the database, the tab shows "No journeys yet."
 
 Only **published** journeys are visible to end users on `/journeys`.
 

@@ -340,7 +340,48 @@ finish even a two-discovery run).
   `permissionDecision`; `task_started` still carries `subagent_type` and now
   `tool_use_id`; the result still has `num_turns`, `total_cost_usd`, `usage`,
   `terminal_reason`. The package ships no CHANGELOG; the typings diff
-  (`sdk.d.ts`, `sdk-tools.d.ts`) is the record.
+  (`sdk.d.ts`, `sdk-tools.d.ts`) is the record. The GitHub releases page
+  (https://github.com/anthropics/claude-agent-sdk-typescript/releases, read
+  2026-10-25) lists two default changes in 0.3.302: fork subagents are on by
+  default, and an omitted `permissionMode` starts in `default` on third-party
+  providers. The researcher passes `permissionMode: "bypassPermissions"` and an
+  explicit `agents: { scout }`, and real runs after the upgrade still delegate
+  to `scout`.
+
+### Single loop or subagents (October 2026)
+
+Anthropic's article "Building agents: When to fold subagents into your main
+agent loop"
+(https://claude.com/resources/articles/building-agents-when-to-fold-subagents-into-your-main-agent-loop)
+and its kit (https://github.com/anthropics/single-agent-loop-kit) recommend
+folding most subagents into one loop that loads skills and tools on demand.
+They keep a subagent only when it earns its own context: large reads, parallel
+or independent exploration in fresh contexts, or tool overload.
+
+The kit's audit (`skill/steps/00-audit.md`), applied to the researcher with
+real run data, gives the scout the `as-tool` verdict:
+
+- It works from one brief, returns a structured candidate list, and never
+  talks to the user.
+- Two scouts explore different gaps in parallel fresh contexts, which is the
+  article's own example of a subagent worth keeping.
+- Each scout call reads about 12k input tokens (lower bound from the event
+  stream). The orchestrator reads about 117k–137k per run, most of it the
+  cached system prompt.
+
+So the scouts stay. Two gaps against the kit's `as-tool` guidance
+(`skill/steps/04-as-tool.md`) are open, and neither is done yet:
+
+- The scout result is not validated against a schema at the tool boundary.
+  The kit wants every field checked, an empty reply treated as an error, and
+  caveats carried to the main agent. Today the server only enforces that a
+  saved URL appeared in a scout report.
+- Cost is dominated by the orchestrator's long prompt. Moving the brief and
+  rubric into skills or tool output loaded on demand is the larger lever.
+
+Both changes need an eval to measure before and after (the kit starts with
+about 10 golden tasks, 2–3 reps each). The project currently has no eval
+tooling by owner decision.
 
 ## HTTP API surface
 

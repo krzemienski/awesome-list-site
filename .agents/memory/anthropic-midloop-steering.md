@@ -5,7 +5,7 @@ description: How to inject guidance into an Anthropic agent loop mid-run without
 
 # Steering an Anthropic agent loop mid-run
 
-To nudge an agent's strategy mid-conversation (e.g. the research agent's stall-pivot nudge in `server/ai/researchService.ts`), append the guidance as a `{ type: 'text', text: ... }` block to the SAME user message that already carries the `tool_result` blocks — do NOT push a separate standalone `{ role: 'user' }` message.
+Applies to hand-written Messages-API loops only. As of Oct 2026 the research agent runs on the Claude Agent SDK and no longer has a hand-written loop (no `messages.create` in `server/ai/researchService.ts`); steer it through the SDK (prompt, hooks) instead. To nudge a hand-written loop's strategy mid-conversation, append the guidance as a `{ type: 'text', text: ... }` block to the SAME user message that already carries the `tool_result` blocks — do NOT push a separate standalone `{ role: 'user' }` message.
 
 **Why:** The Anthropic Messages API requires strict user/assistant role alternation. After an assistant turn with `tool_use`, the very next message MUST be a single `user` message containing a `tool_result` for every `tool_use` id. Pushing the tool_results AND then a second user message produces two consecutive user turns → HTTP 400. Putting the text block after the tool_result blocks in the one user turn satisfies both constraints.
 
