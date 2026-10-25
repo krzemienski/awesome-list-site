@@ -50,7 +50,10 @@ Agent SDK runs get a purpose-built subprocess env (`buildAgentEnv`): every
 credential key is stripped, then only the resolved router URL + bearer are
 re-added. Per-run admin overrides win — a custom base URL only ever travels
 with the admin-supplied token (platform credentials never reach a custom
-host), and a token-only override still targets the configured router.
+host), and a token-only override always targets `ANTHROPIC_BASE_URL`, even
+when the server has no credential of its own; with `ANTHROPIC_BASE_URL` unset
+a token-only override is refused (400 at launch, and the env builder throws)
+rather than sent to api.anthropic.com.
 Subagents (scout) are given the tier **alias** (`haiku`), which the CLI maps
 through `ANTHROPIC_DEFAULT_HAIKU_MODEL`; a literal custom id would be
 rejected by the CLI's per-agent allowlist. Structured JSON responses use
@@ -177,11 +180,26 @@ With the launch form's advanced fields empty, a run uses exactly:
 | Orchestrator model | `ANTHROPIC_MODEL` | launch refused |
 | Scout model | `haiku` alias → `ANTHROPIC_DEFAULT_HAIKU_MODEL` | launch refused (the CLI would otherwise silently pick its own model) |
 
-Per-run overrides (model, scout model, base URL + token) are labelled as
-overrides in the job row (`resolved_config`), the first log line, the API and
-the admin UI. A plain `http://` override base URL is refused unless the
-request carries `allowInsecureHttp: true`; the launch dialog asks for that
-with a checkbox. A custom base URL always needs its own token.
+Per-run overrides go through the same rules:
+
+| Override | Runs as | Refused when |
+|---|---|---|
+| Base URL + token | the override URL with the override token | no token (`override_token_required`); plain `http://` without `allowInsecureHttp: true` (`insecure_http_unconfirmed`); invalid or private host, or a query string or fragment in the URL (`invalid_base_url`) |
+| Token only | `ANTHROPIC_BASE_URL` with the override token | `ANTHROPIC_BASE_URL` unset (`missing_env`) |
+| Orchestrator model | the given id | — |
+| Scout model = orchestrator model | `inherit` | — |
+| Scout model = tier alias (`haiku`, `sonnet`, `opus`, `fable`) | that alias | its `ANTHROPIC_DEFAULT_<TIER>_MODEL` is unset (`missing_env`) |
+| Scout model = the id a `ANTHROPIC_DEFAULT_<TIER>_MODEL` maps to | that tier's alias | — |
+| Any other scout model id | — | always (`unsupported_scout_model`): the CLI's per-agent allowlist would swap it for its own default |
+
+Overrides are labelled as overrides in the job row (`resolved_config`), the
+first log line, the API and the admin UI. The launch dialog asks for
+`allowInsecureHttp` with a checkbox. `resolved_config.endpoint.baseUrl` is
+recorded without credentials, query string or fragment (an override URL with
+either is refused). When the agent
+starts, the runner checks that the subprocess env's endpoint host equals
+`resolved_config.endpoint.host` and refuses the run otherwise; the agent log
+then records `Agent endpoint: <host>`.
 
 The run row stores the resolution as `research_jobs.resolved_config`
 (migration 0058), and the first agent-log line states it, for example:
@@ -239,7 +257,7 @@ preview overrides: `model`, `scoutModel`, `baseUrl` (validated like start),
 
 `preflight.issues[]` items are `{ code, message, variable? }` with `code` one
 of `missing_env`, `override_token_required`, `insecure_http_unconfirmed`,
-`invalid_base_url`. `POST /api/researcher/start` returns the same `config` on
+`invalid_base_url`, `unsupported_scout_model`. `POST /api/researcher/start` returns the same `config` on
 success, and on a refused launch returns
 `400 { success: false, code, message, config }` without creating a job.
 `GET /api/researcher/jobs/:id` includes `resolvedConfig` and `costBasis`.

@@ -1,5 +1,5 @@
 import type { ResearchPreflightIssue, ResolvedResearchConfig } from "@shared/researcherContract";
-import { FLOW_TIERS, tierEnvVar } from "./anthropicConfig";
+import { FLOW_TIERS, MODEL_TIERS, tierEnvVar } from "./anthropicConfig";
 
 /**
  * Strict endpoint / credential / model resolution for Researcher runs.
@@ -15,7 +15,9 @@ import { FLOW_TIERS, tierEnvVar } from "./anthropicConfig";
  *     CLI silently substitutes its own first-party model. The alias, not the
  *     resolved id, goes in the subagent definition because the CLI checks
  *     per-agent model ids against an Anthropic allowlist and silently swaps
- *     unknown ones (router "cc/…" ids included); aliases always pass.
+ *     unknown ones (router "cc/…" ids included); aliases always pass. A scout
+ *     override is therefore only accepted as a tier alias (or the id one maps
+ *     to) with its variable set, or as the orchestrator model ("inherit").
  * Every missing piece is a preflight issue; the launch route refuses the run.
  */
 
@@ -42,6 +44,9 @@ function parseEndpoint(raw: string): { host: string; baseUrl: string; scheme: "h
     if (u.protocol !== "https:" && u.protocol !== "http:") return null;
     u.username = "";
     u.password = "";
+    // Recorded in research_jobs and shown to admins: never keep a ?key=.
+    u.search = "";
+    u.hash = "";
     return { host: u.host, baseUrl: u.toString().replace(/\/+$/, ""), scheme: u.protocol === "http:" ? "http" : "https" };
   } catch {
     return null;
@@ -50,6 +55,34 @@ function parseEndpoint(raw: string): { host: string; baseUrl: string; scheme: "h
 
 function missing(variable: string, why: string): ResearchPreflightIssue {
   return { code: "missing_env", variable, message: `${variable} is not set: ${why}` };
+}
+
+/**
+ * A scout override must run exactly as recorded. The orchestrator id runs as
+ * "inherit"; a tier alias, or the id an ANTHROPIC_DEFAULT_<TIER>_MODEL maps
+ * to, runs as that alias. Any other id is refused: the CLI's per-agent
+ * allowlist would silently swap it for its own default model.
+ */
+function resolveScoutOverride(
+  requested: string,
+  orchestratorModel: string | null,
+  env: Env,
+  issues: ResearchPreflightIssue[],
+): ResolvedResearchConfig["scout"] {
+  if (requested === orchestratorModel) return { value: "inherit", model: requested, source: "override" };
+  const tier = MODEL_TIERS.find((t) => t === requested.toLowerCase())
+    ?? MODEL_TIERS.find((t) => clean(env[tierEnvVar(t)]) === requested);
+  if (!tier) {
+    issues.push({
+      code: "unsupported_scout_model",
+      message: `Scout model "${requested}" cannot be guaranteed: the Agent SDK can swap a subagent model id for its own default, so the scout only runs on a tier alias (${MODEL_TIERS.join(", ")}) whose ANTHROPIC_DEFAULT_<TIER>_MODEL is set, the id one of those variables maps to, or the orchestrator model.`,
+    });
+    return { value: null, model: null, source: "override" };
+  }
+  const variable = tierEnvVar(tier);
+  const id = clean(env[variable]);
+  if (!id) issues.push(missing(variable, `the scout override "${requested}" runs on the "${tier}" alias, which the Agent SDK maps through it (without it the SDK silently uses its own default model).`));
+  return { value: tier, model: id, source: "override" };
 }
 
 export function resolveResearchRunConfig(input: ResearchRunConfigInput, env: Env = process.env): ResolvedResearchConfig {
@@ -94,7 +127,7 @@ export function resolveResearchRunConfig(input: ResearchRunConfigInput, env: Env
 
   let scout: ResolvedResearchConfig["scout"];
   if (overrideScout) {
-    scout = { value: overrideScout === orchestratorModel ? "inherit" : overrideScout, model: overrideScout, source: "override" };
+    scout = resolveScoutOverride(overrideScout, orchestratorModel, env, issues);
   } else if (overrideModel) {
     // A custom orchestrator id may not exist behind the scout alias; the CLI's
     // per-agent allowlist would also swap a custom id. "inherit" reuses it verbatim.
@@ -145,7 +178,7 @@ export function describeResearchRunConfig(config: ResolvedResearchConfig): strin
   const endpoint = `Endpoint ${config.endpoint.host ?? "(unresolved)"}${endpointTags.length ? ` [${endpointTags.join(", ")}]` : ""} (${config.credential.label}${o.authToken ? " [OVERRIDE]" : ""})`;
   const orchestrator = `Orchestrator ${config.orchestrator.model ?? "(unresolved)"} (${config.orchestrator.source === "override" ? "OVERRIDE" : config.orchestrator.source})`;
   const s = config.scout;
-  const scoutSource = s.source === "override" ? "OVERRIDE" : s.source === "inherit" ? "inherit from orchestrator" : `${s.value} via ${s.source}`;
+  const scoutSource = s.source === "override" ? `OVERRIDE as ${s.value}` : s.source === "inherit" ? "inherit from orchestrator" : `${s.value} via ${s.source}`;
   const scout = `Scout ${s.model ?? "(unresolved)"} (${scoutSource})`;
   return `${endpoint} · ${orchestrator} · ${scout}`;
 }

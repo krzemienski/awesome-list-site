@@ -27,6 +27,8 @@ import { config } from "../config";
 // BUG-012 (audit 2): the sitemap's paginated-URL counts must use the exact
 // flatten + page size the SSR renderer and client use (indexable == sitemap).
 import {
+  findSubcategory,
+  findSubSubcategory,
   flattenListingResources,
   LISTING_PAGE_SIZE,
   type ListingLevel,
@@ -195,10 +197,7 @@ ${date ? `    <lastmod>${date}</lastmod>\n` : ""}    <changefreq>${changefreq}</
       // them too (indexable set == sitemap set). Page counts use THE SAME
       // flatten + dedupe + page size as the SSR renderer and the client
       // (seo-content.ts flattenListingResources / LISTING_PAGE_SIZE), so the
-      // sitemap never lists a page the resolver would 404. Slugs can repeat
-      // across parents (R3-05) and the resolver always resolves the FIRST tree
-      // match — `firstSeen` keeps a later same-slug node from contributing
-      // deeper page numbers than the resolved node actually has.
+      // sitemap never lists a page the resolver would 404.
       const addListingPages = (
         basePath: string,
         node: any,
@@ -254,7 +253,6 @@ ${date ? `    <lastmod>${date}</lastmod>\n` : ""}    <changefreq>${changefreq}</
           addListingPages(catBase, category, 'category', 'weekly', categoryLastmod);
         }
         category.subcategories?.forEach(subcategory => {
-          if (flattenListingResources(subcategory, 'subcategory').length === 0) return;
           const subcategoryRecord = categoryRecord
             ? subcategoryRecords.find(
                 (record) =>
@@ -262,25 +260,32 @@ ${date ? `    <lastmod>${date}</lastmod>\n` : ""}    <changefreq>${changefreq}</
                   record.slug === subcategory.slug,
               )
             : undefined;
-          const subcategorySubSubcategoryRecords = subcategoryRecord
-            ? subSubcategoryRecords.filter(
-                (record) => record.subcategoryId === subcategoryRecord.id,
-              )
-            : [];
-          const subcategoryLastmod = latestDate([
-            subcategoryRecord,
-            ...subcategorySubSubcategoryRecords,
-            ...datedResources(flattenListingResources(subcategory, 'subcategory')),
-          ]);
-          const subBase = `/subcategory/${subcategory.slug}`;
-          const subFirstSeen = !seenLocs.has(subBase);
-          addUrl(
-            subBase,
-            'weekly',
-            '0.6',
-            subcategoryLastmod,
-          );
-          if (subFirstSeen) {
+          // Slugs repeat across parents (R3-05) and /subcategory/<slug> serves
+          // the FIRST tree match (findSubcategory, as og-middleware resolves
+          // it). Only that node decides whether the URL is listed (an empty
+          // one is noindex) and supplies its lastmod and pages; a later
+          // same-slug node still lists its own sub-subcategories.
+          if (
+            findSubcategory(awesomeListData, subcategory.slug)?.node === subcategory &&
+            flattenListingResources(subcategory, 'subcategory').length > 0
+          ) {
+            const subcategorySubSubcategoryRecords = subcategoryRecord
+              ? subSubcategoryRecords.filter(
+                  (record) => record.subcategoryId === subcategoryRecord.id,
+                )
+              : [];
+            const subcategoryLastmod = latestDate([
+              subcategoryRecord,
+              ...subcategorySubSubcategoryRecords,
+              ...datedResources(flattenListingResources(subcategory, 'subcategory')),
+            ]);
+            const subBase = `/subcategory/${subcategory.slug}`;
+            addUrl(
+              subBase,
+              'weekly',
+              '0.6',
+              subcategoryLastmod,
+            );
             addListingPages(
               subBase,
               subcategory,
@@ -290,6 +295,8 @@ ${date ? `    <lastmod>${date}</lastmod>\n` : ""}    <changefreq>${changefreq}</
             );
           }
           subcategory.subSubcategories?.forEach(subSubcategory => {
+            // Same first-match rule as subcategories (findSubSubcategory).
+            if (findSubSubcategory(awesomeListData, subSubcategory.slug)?.node !== subSubcategory) return;
             // BUG-053 (run14): an empty sub-subcategory renders "No resources
             // found" and has no inbound link from its parent page — keep such
             // orphans OUT of the sitemap (sitemap set == reachable content set).
@@ -308,22 +315,19 @@ ${date ? `    <lastmod>${date}</lastmod>\n` : ""}    <changefreq>${changefreq}</
               ),
             ]);
             const ssBase = `/sub-subcategory/${subSubcategory.slug}`;
-            const ssFirstSeen = !seenLocs.has(ssBase);
             addUrl(
               ssBase,
               'weekly',
               '0.5',
               subSubcategoryLastmod,
             );
-            if (ssFirstSeen) {
-              addListingPages(
-                ssBase,
-                subSubcategory,
-                'sub-subcategory',
-                'weekly',
-                subSubcategoryLastmod,
-              );
-            }
+            addListingPages(
+              ssBase,
+              subSubcategory,
+              'sub-subcategory',
+              'weekly',
+              subSubcategoryLastmod,
+            );
           });
         });
       });

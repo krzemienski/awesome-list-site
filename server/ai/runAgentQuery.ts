@@ -126,6 +126,11 @@ export interface RunAgentQueryParams {
   model: string;
   /** Per-run endpoint/auth config → options.env. */
   config: AgentRunConfig;
+  /**
+   * Host the run was approved for (the Researcher's resolved_config). The run
+   * refuses to start when the subprocess env would call any other host.
+   */
+  approvedEndpointHost?: string | null;
   /** In-process MCP servers (custom tools) keyed by server name. */
   mcpServers?: Record<string, any>;
   /** Subagent definitions keyed by agent name (e.g. { scout: {...} }). */
@@ -244,6 +249,7 @@ export async function runAgentQuery(params: RunAgentQueryParams): Promise<RunAge
     log,
     onDelegation,
     maxConcurrentDelegations = null,
+    approvedEndpointHost,
   } = params;
 
   // Re-resolve any custom base URL at run start (not just at job-creation time)
@@ -380,6 +386,13 @@ export async function runAgentQuery(params: RunAgentQueryParams): Promise<RunAge
   // SDK emits a result message while scouts are still running.
   let outstandingDelegations = 0;
 
+  const agentEnv = buildAgentEnv(config);
+  const endpointHost = agentEnv.ANTHROPIC_BASE_URL ? new URL(agentEnv.ANTHROPIC_BASE_URL).host : "api.anthropic.com";
+  if (approvedEndpointHost !== undefined && endpointHost !== approvedEndpointHost) {
+    throw new Error(`Run not started: the agent would call ${endpointHost}, but the run was approved for ${approvedEndpointHost ?? "no endpoint"}.`);
+  }
+  await mirror("system", `Agent endpoint: ${endpointHost}`);
+
   const stderrLines: string[] = [];
   let terminalSdkError = false;
   const q = query({
@@ -398,7 +411,7 @@ export async function runAgentQuery(params: RunAgentQueryParams): Promise<RunAge
       agents: agents as any,
       allowedTools,
       disallowedTools,
-      env: buildAgentEnv(config),
+      env: agentEnv,
       // ── Force SYNCHRONOUS delegation. Since SDK ~0.3.2xx the Task/Agent
       // delegation tool runs subagents IN THE BACKGROUND BY DEFAULT
       // (run_in_background defaults to true). A background delegation lets the
