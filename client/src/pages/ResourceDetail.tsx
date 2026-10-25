@@ -832,8 +832,10 @@ export default function ResourceDetail() {
           </Button>
           {/* R2-L09: favorite/bookmark shown to anonymous users too — clicks
               prompt sign-in instead of hiding the affordance. */}
+          {/* Pressed state is painted by the aria-pressed rule in resource.css
+              (accent ink on an accent wash), so the variant stays outline. */}
           <Button
-            variant={isFavorite ? "default" : "outline"}
+            variant="outline"
             size="sm"
             onClick={handleFavoriteClick}
             aria-disabled={favorite.isPending}
@@ -848,7 +850,7 @@ export default function ResourceDetail() {
             <span>{isFavorite ? 'Favorited' : 'Favorite'}</span>
           </Button>
           <Button
-            variant={isBookmarked ? "default" : "outline"}
+            variant="outline"
             size="sm"
             onClick={handleBookmarkClick}
             aria-disabled={bookmark.isPending}

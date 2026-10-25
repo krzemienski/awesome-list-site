@@ -304,7 +304,7 @@ export function ResearchRunView({ jobId, focusOnMount, onStartNew, onRelaunchHig
                 <AlertDescription className="space-y-3 break-words">
                   <p>{endingCopy(outcome, saved, job)}</p>
                   {outcome === "budget_stopped" && (
-                    <Button size="sm" className="min-h-11" onClick={onRelaunchHigherCap} data-testid="button-relaunch-higher-cap">
+                    <Button size="sm" className="min-h-11 max-w-full whitespace-normal" onClick={onRelaunchHigherCap} data-testid="button-relaunch-higher-cap">
                       <Play className="mr-1 h-3 w-3" />Relaunch with a higher cap
                     </Button>
                   )}
