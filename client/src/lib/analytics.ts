@@ -20,6 +20,7 @@
 
 import { captureAcquisition, getAcquisition } from './acquisition';
 import type { AnalyticsDispatchRequest } from './analytics-dispatch';
+import { isAnalyticsSuppressed } from './analytics-suppression';
 
 // Define the gtag function globally
 declare global {
@@ -61,6 +62,14 @@ export const getAnalyticsConsent = (): AnalyticsConsent => {
   }
 };
 
+/**
+ * Gate for starting a vendor SDK (GA4, Mixpanel, PostHog, Amplitude): a
+ * grant, and not an admin session or QA path. SDKs that never start cannot
+ * send their own page views, autocapture or identity calls.
+ */
+export const vendorSdksAllowed = (): boolean =>
+  getAnalyticsConsent() === 'granted' && !isAnalyticsSuppressed();
+
 export const setAnalyticsConsent = (value: 'granted' | 'denied') => {
   try {
     localStorage.setItem(CONSENT_KEY, value);
@@ -98,7 +107,7 @@ const pendingEvents: Array<{
   context: Record<string, unknown>;
 }> = [];
 export const initGA = () => {
-  if (getAnalyticsConsent() !== 'granted') return;
+  if (!vendorSdksAllowed()) return;
 
   const measurementId = getMeasurementId();
 
@@ -549,7 +558,8 @@ export const trackApiPerformance = (
   );
 };
 
-// Track Core Web Vitals. LCP/FID/INP are milliseconds; CLS is a unitless score,
+// Track Core Web Vitals (LCP, INP, CLS) and the loading diagnostics FCP and
+// TTFB, all from web-vitals. Times are milliseconds; CLS is a unitless score,
 // so retain enough precision for the score to remain useful in GA4.
 export const trackPerformance = (metric: string, value: number) => {
   if (!Number.isFinite(value)) return;
@@ -669,12 +679,15 @@ const queuedDispatches: AnalyticsDispatchRequest[] = [];
  * properties. The four banner-named vendors only receive events after a
  * grant; Replit Analytics (cookie-free, no identifiers) also receives them
  * while the visitor has not chosen, and nothing is sent after a Decline.
+ * Nothing is sent from an admin session or a QA path.
  * Components never call it directly: they use typed helpers — the ones in
  * this file or an area module (analytics-<area>.ts) — so the catalog in
  * docs/ANALYTICS.md stays the one place event names are decided.
  */
 export const track = (name: string, props: EventProps = {}, options: TrackOptions = {}) => {
   if (typeof window === 'undefined') return;
+  // Admin sessions and QA paths reach no vendor (analytics-suppression.ts).
+  if (isAnalyticsSuppressed()) return;
   const consent = getAnalyticsConsent();
   if (consent === 'denied') return;
   const product = options.product !== false;
@@ -710,7 +723,12 @@ export const track = (name: string, props: EventProps = {}, options: TrackOption
     });
 };
 
-export type CommandPaletteOpenMethod = 'keyboard_shortcut' | 'slash_key' | 'header_button';
+export type CommandPaletteOpenMethod =
+  | 'keyboard_shortcut'
+  | 'slash_key'
+  | 'header_button'
+  | 'resource_page_button'
+  | 'listing_page_button';
 const referrerOrigin = (): string | undefined => {
   if (typeof document === 'undefined' || !document.referrer) return undefined;
   try {
@@ -762,8 +780,8 @@ export const trackContactMessageSent = () => {
   track('contact_message_sent');
 };
 
-export const trackCommandPaletteOpened = (method: CommandPaletteOpenMethod) => {
-  track('command_palette_opened', { open_method: method });
+export const trackCommandPaletteOpened = (method: CommandPaletteOpenMethod, surface?: string) => {
+  track('command_palette_opened', { open_method: method, surface });
 };
 
 export const trackExportStarted = (info: ExportEventInfo) => {
@@ -799,19 +817,26 @@ export const trackRelatedResourceOpened = (
   fromResourceId: string | number,
   position: number,
   matchScore?: number,
+  surface = 'related_list',
 ) => {
   track('related_resource_opened', {
     resource_id: String(resourceId),
     from_resource_id: String(fromResourceId),
     position,
     match_score: matchScore,
+    surface,
   });
 };
 
-export const trackRelatedCategoryOpened = (fromResourceId: string | number, category: string) => {
+export const trackRelatedCategoryOpened = (
+  fromResourceId: string | number,
+  category: string,
+  surface = 'related_list',
+) => {
   track('related_category_opened', {
     from_resource_id: String(fromResourceId),
     category,
+    surface,
   });
 };
 

@@ -6,7 +6,8 @@
 
 /* The frozen DESCRIPTION label is a block .mono div. Keep the semantic h2
    and its tokenized eyebrow paint, without an inline-flex baseline strut. */
-.resource-detail-description h2 { display: block; }
+.resource-detail-description h2,
+.resource-detail-onward h2 { display: block; }
 .resource-detail {
   width: 100%;
   max-width: 880px;
@@ -104,6 +105,7 @@
 }
 
 .resource-detail-description h2,
+.resource-detail-onward h2,
 .resource-detail-sections h2 {
   margin-bottom: 10px;
   color: var(--accent-ink);
@@ -117,6 +119,7 @@
 
 /* The frozen card labels are plain mono, not the Editorial eyebrow's 700. */
 [data-system="editorial"] .resource-detail-description h2.eyebrow,
+[data-system="editorial"] .resource-detail-onward h2.eyebrow,
 [data-system="editorial"] .resource-detail-sections h2.eyebrow { font-weight: 400; }
 
 .resource-detail-sections h2 svg { display: none; }
@@ -156,8 +159,8 @@
 
 /* Wider faces (e.g. a font-picker override) push the one-line "View all in …" label past a
    phone column; let it wrap inside its 44px-min button instead. */
-.resource-detail-related [data-testid="link-view-all-category"],
-.resource-detail-related [data-testid="link-more-in-collection"] {
+.resource-detail-onward [data-testid="link-view-all-category"],
+.resource-detail-onward [data-testid="link-more-in-collection"] {
   height: auto;
   white-space: normal;
   text-align: center;
@@ -165,3 +168,71 @@
 .resource-detail a:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; }
 .resource-detail-related-item { border-radius: var(--radius-sm); }
 .resource-detail-related-reason { border-radius: var(--radius-pill); }
+
+/* Keep exploring: under the actions on narrow screens; on wide ones it sits in
+   the otherwise empty column beside the page, level with the heading (the
+   back row is a 44px control plus its 28px margin). */
+.resource-detail-onward {
+  display: grid;
+  gap: 16px;
+  min-width: 0;
+  margin-bottom: 24px;
+  padding: 24px;
+  border: var(--border-w) solid var(--border);
+  border-radius: var(--radius);
+  background: var(--surface);
+}
+.resource-detail-onward h2 { margin-bottom: 0; }
+.resource-detail-onward-group { display: grid; gap: 8px; min-width: 0; }
+.resource-detail-onward-label {
+  color: var(--text-2);
+  font-family: var(--font-mono);
+  font-size: 11px;
+  line-height: var(--body-leading);
+}
+/* Under the actions the Related Resources card follows directly, so the short
+   list only shows in the side column. */
+.resource-detail-onward-similar { display: none; }
+.resource-detail-onward-similar-list {
+  display: grid;
+  align-content: start;
+  gap: 4px;
+  min-width: 0;
+  min-height: calc(3 * 44px + 2 * 4px);
+}
+.resource-detail-onward-similar-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  min-height: 44px;
+  padding: 0 12px;
+  border-radius: var(--radius-sm);
+  color: var(--text);
+  font-size: 13px;
+  transition: background var(--motion-fast) var(--motion-ease);
+}
+.resource-detail-onward-similar-list > li,
+.resource-detail-onward-similar-item > span { min-width: 0; }
+a.resource-detail-onward-similar-item:hover { background: var(--surface-2); }
+.resource-detail-onward-similar-item svg { width: 16px; height: 16px; flex-shrink: 0; color: var(--text-3); }
+.resource-detail-onward-empty { color: var(--text-2); font-size: 13px; }
+.resource-detail-onward-tags { display: flex; flex-wrap: wrap; column-gap: 8px; min-width: 0; }
+.resource-detail-onward-tags > li { min-width: 0; max-width: 100%; }
+.resource-detail-onward-tag { display: inline-flex; align-items: center; min-height: 44px; max-width: 100%; }
+.resource-detail-onward-tag .chip { max-width: 100%; overflow-wrap: anywhere; white-space: normal; }
+
+@media (max-width: 639px) {
+  .resource-detail-onward { gap: 12px; padding: 16px; }
+}
+
+@media (min-width: 1320px) {
+  .resource-detail-onward {
+    position: absolute;
+    top: 72px;
+    left: calc(100% + 32px);
+    width: 300px;
+    margin-bottom: 0;
+  }
+  .resource-detail-onward-similar { display: grid; }
+}

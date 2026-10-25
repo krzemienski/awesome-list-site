@@ -23,7 +23,7 @@
 //    Mixpanel, PostHog and Amplitude.
 import type { OverridedMixpanel } from 'mixpanel-browser';
 import type { IdentityUser } from './analytics-sdk-options';
-import { getAnalyticsConsent } from './analytics';
+import { vendorSdksAllowed } from './analytics';
 import { getAcquisition } from './acquisition';
 
 const getToken = (): string | undefined =>
@@ -46,7 +46,7 @@ let pending: Array<{ name: string; props: Record<string, unknown> }> = [];
 // Fire-and-forget: the SDK loads asynchronously; early events are buffered.
 export const initMixpanel = () => {
   if (typeof window === 'undefined') return;
-  if (getAnalyticsConsent() !== 'granted') return;
+  if (!vendorSdksAllowed()) return;
 
   // Re-grant after an in-session revoke (Cookie settings supports flipping the
   // decision without a reload): the SDK is already loaded/initialized — just
@@ -227,7 +227,7 @@ export const mpReset = () => {
 // to the register / resource-submit requests. Empty object = no consent =
 // server tracks nothing.
 export const serverConversionHeaders = (): Record<string, string> => {
-  if (getAnalyticsConsent() !== 'granted') return {};
+  if (!vendorSdksAllowed()) return {};
   const headers: Record<string, string> = { 'x-analytics-consent': 'granted' };
   if (mp && !disabled) {
     try {

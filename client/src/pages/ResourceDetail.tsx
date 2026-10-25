@@ -32,6 +32,7 @@ import {
 } from "lucide-react";
 import BookmarkNotesDialog from "@/components/resource/BookmarkNotesDialog";
 import ReportLinkAction from "@/components/resource/ReportLinkAction";
+import ResourceOnwardPaths, { ONWARD_SURFACE } from "@/components/resource/ResourceOnwardPaths";
 import { useAuth } from "@/hooks/useAuth";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { apiRequest, ApiError } from "@/lib/queryClient";
@@ -42,7 +43,6 @@ import {
   trackResourceFavorite,
   trackResourceClick,
   trackRelatedResourceOpened,
-  trackRelatedCategoryOpened,
 } from "@/lib/analytics";
 import { trackCollectionMembershipResults } from "@/lib/analytics-collections";
 import { useToast } from "@/hooks/use-toast";
@@ -603,10 +603,11 @@ export default function ResourceDetail() {
   // open-in-new-tab works.
   const handleRelatedResourceClick = (
     e: React.MouseEvent<HTMLAnchorElement>,
-    relatedResource: Resource & { score?: number },
+    relatedResource: { id: number; score?: number },
     position: number,
+    surface?: string,
   ) => {
-    trackRelatedResourceOpened(relatedResource.id, id, position, relatedResource.score);
+    trackRelatedResourceOpened(relatedResource.id, id, position, relatedResource.score, surface);
     trackInteraction.mutate({
       resourceId: relatedResource.id.toString(),
       interactionType: "click",
@@ -929,6 +930,19 @@ export default function ResourceDetail() {
         collectionsLoading={collectionsLoading}
       />
 
+      <ResourceOnwardPaths
+        resourceId={resource.id}
+        related={filteredRelatedResources}
+        relatedLoading={relatedQuery.isLoading}
+        onRelatedClick={(e, related, position) => handleRelatedResourceClick(e, related, position, ONWARD_SURFACE)}
+        narrowestCollection={narrowestCollection}
+        category={resource.category && taxonomySlugs.category
+          ? { name: resource.category, href: `/category/${taxonomySlugs.category}` }
+          : null}
+        pendingCollectionRows={awesomeListTree ? 0 : Number(Boolean(resource.category)) + Number(Boolean(resource.subcategory))}
+        tags={tags ?? []}
+      />
+
       {/* Related resources sit directly under the actions: resource pages are
           the main search entry point, and when this list was below the details
           it started a full screen down, so most visitors never saw a next step.
@@ -994,7 +1008,7 @@ export default function ResourceDetail() {
                 className="text-sm text-muted-foreground"
                 data-testid="related-empty-state"
               >
-                No related resources yet. Explore more in this category below.
+                No related resources yet. Try this resource&apos;s collection or tags under Keep exploring.
               </p>
             )}
             {filteredRelatedResources.map((related, index) => (
@@ -1034,40 +1048,6 @@ export default function ResourceDetail() {
                 )}
               </a>
             ))}
-            {/* The category link needs the nav tree's slug; hold its row while
-                that tree is still loading so the card does not grow later. */}
-            {resource.category && !awesomeListTree && (
-              <div aria-hidden="true" className="w-full mt-2 min-h-[44px]" />
-            )}
-            {resource.subcategory && !awesomeListTree && (
-              <div aria-hidden="true" className="w-full mt-2 min-h-[44px]" />
-            )}
-            {narrowestCollection && (
-              <Button asChild variant="outline" size="sm" className="w-full mt-2 min-h-[44px]">
-                <Link
-                  href={narrowestCollection.href}
-                  onClick={() => trackRelatedCategoryOpened(resource.id, narrowestCollection.name)}
-                  data-testid="link-more-in-collection"
-                >
-                  More in {narrowestCollection.name}
-                  <ChevronRight className="h-4 w-4 ml-1" />
-                </Link>
-              </Button>
-            )}
-            {resource.category && taxonomySlugs.category && (
-              /* Run16 BUG-057: asChild makes the anchor itself the ≥44px button
-                 (an inline Link wrapping a Button was a 20px-tall target). */
-              <Button asChild variant="ghost" size="sm" className="w-full mt-2 min-h-[44px]">
-                <Link
-                  href={`/category/${taxonomySlugs.category}`}
-                  onClick={() => trackRelatedCategoryOpened(resource.id, resource.category ?? "")}
-                  data-testid="link-view-all-category"
-                >
-                  View all in {resource.category}
-                  <ChevronRight className="h-4 w-4 ml-1" />
-                </Link>
-              </Button>
-            )}
           </CardContent>
         </Card>
       </section>

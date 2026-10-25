@@ -13,7 +13,7 @@
 //    on manual events (URLs can carry sensitive tokens).
 import type { PostHog } from 'posthog-js';
 import type { IdentityUser } from './analytics-sdk-options';
-import { getAnalyticsConsent } from './analytics';
+import { vendorSdksAllowed } from './analytics';
 import { getAcquisition } from './acquisition';
 
 const getKey = (): string | undefined =>
@@ -34,7 +34,7 @@ let pending: Array<{ name: string; props: Record<string, unknown> }> = [];
 // the consent banner right after "Accept".
 export const initPosthog = () => {
   if (typeof window === 'undefined') return;
-  if (getAnalyticsConsent() !== 'granted') return;
+  if (!vendorSdksAllowed()) return;
 
   if (initStarted) {
     // Re-grant after an in-session revoke.

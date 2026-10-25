@@ -9,6 +9,7 @@ import { initGA } from "./lib/analytics";
 import { initMixpanel } from "./lib/mixpanel";
 import { initPosthog } from "./lib/posthog";
 import { initAmplitude } from "./lib/amplitude";
+import { syncReplitPageviewOptOut } from "./lib/analytics-suppression";
 import { loadFontOverride } from "./lib/font-options";
 import { seedResourceBoot } from "./lib/resource-boot";
 
@@ -62,6 +63,10 @@ try {
 } catch {
   // Storage can be unavailable in hardened/private browsing contexts.
 }
+
+// Admin sessions and QA paths: quiet Replit's injected page-view tracker
+// before it records this document's first page view (it sends at load).
+syncReplitPageviewOptOut();
 
 // Analytics SDKs are all consent-gated and deferred until the first painted
 // frame. The consent banner invokes these immediately after an explicit grant.
