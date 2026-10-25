@@ -91,7 +91,7 @@
 - [Vite component probes](vite-browser-component-probes.md) — discover dependency URLs from transformed modules; optimized CJS React dependencies may expose default rather than named exports.
 - [cmdk live regions](cmdk-live-region-placement.md) — audit populated results too; aria-live count elements inside the listbox violate its required-child semantics.
 - [Lighthouse Lantern loopback artifact](lantern-loopback-artifact.md) — simulate scores vs 127.0.0.1 sit ~5–15 below same-day prod for identical code (bundle/fonts enter the FCP graph, h1 chunk fan-out); compare same tool same day, probe with real throttling.
-- [Page atmosphere raster clip](page-atmosphere-raster-clip.md) — full-page radial atmosphere = seconds of raster on long pages; paint it on .page::after clipped by a per-system token, pixels unchanged; regenerate DS artifact tokens after adding tokens.
+- [Page atmosphere raster clip](page-atmosphere-raster-clip.md) — historical: the .page::before/::after clip and --bg-atmosphere-clip token are gone from the CSS; re-measure against current .page rules before re-applying.
 - [Census state replay](census-state-replay.md) — historical global control ordinals drift across layout/disclosure states; repeated controls require a stable resource owner.
 - [JIT teardown order](jit-teardown-order.md) — delete the Clerk user BEFORE the local row; a live session re-provisions it via JIT within seconds, faking net-zero.
 - [URL-sync effects vs history navigation](url-sync-effect-popstate.md) — a URL-mirroring effect must no-op once the document left its route, or popstate entries get overwritten and Back never leaves the page.
@@ -184,3 +184,6 @@
 - [Clerk conversion detection](clerk-conversion-detection.md) — one-step Clerk sign-in/up never expose in-flight status; trigger on signed-out→session; tight createdAt window + per-user guard.
 - [Umami SPA pageviews wiped](umami-spa-pageviews-history-restore.md) — SSR-hold cleanup reassigns saved history.pushState, dropping the Replit tracker's hook; only landing pageviews record.
 - [Server logging conventions](server-logging.md) — one area logger, job start/outcome/reason; scrubPath must keep readable slugs; JIT sign-up needs .returning() or concurrent calls triple-count.
+- [Radix Tabs double activation](radix-tabs-double-activation.md) — Radix Tabs ≥1.2 calls onValueChange twice per click; use @/components/ui/tabs (dedupes), never Radix Tabs directly; count one event per click.
+- [Window Escape vs overlays](window-escape-default-prevented.md) — Radix layers preventDefault the Escape they consume; window/document Escape handlers must skip defaultPrevented events.
+- [Research admission guard](research-admission-guard.md) — POST /api/researcher/start returns 409 RESEARCH_JOB_ACTIVE while a run is live; prove it via the real path (start, start again, DELETE /api/researcher/jobs/:id), never a hand-inserted row (local PG tz skew makes it look orphaned).
