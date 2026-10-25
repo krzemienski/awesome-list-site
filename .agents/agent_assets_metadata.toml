@@ -449,3 +449,17 @@ mtime_ms = 1792885950978
 storage_uri = "gcs://replit-rams-assets-picard/rams/assets/repl:71ccccc7-37f7-4f07-a880-5973ae4aa911/f0c6f967-e5d1-484d-86dd-acf31de15c51/95986b8d-734d-4b62-a588-7b403b6f70cd"
 storage_version_token = "1792885951474543"
 content_type = "text/html;profile=replit-chart"
+
+[[outputs]]
+id = "djWInXyNoGstoszLWL0IV"
+uri = "file://docs/prompts/awesome-video-improvement-waves.md"
+type = "text"
+title = "Prompt: analytics, researcher and full-audit waves"
+description = "Self-contained prompt covering tasks 706–709, their dependencies and execution order, for running in another environment."
+logical_id = "4b868d37-7f69-4bfb-aebf-3acc2dea7161"
+content_hash = "sha256:b55943ff67280b240f09f65bb0a8bd7cf79f15067c9a036dba5e291d1293b642"
+size = 22127
+mtime_ms = 1792886945662
+storage_uri = "gcs://replit-rams-assets-picard/rams/assets/repl:71ccccc7-37f7-4f07-a880-5973ae4aa911/4b868d37-7f69-4bfb-aebf-3acc2dea7161/aa71be2d-cf40-47d7-b24a-d0eda0c47a0e"
+storage_version_token = "1792886954071140"
+content_type = "text/markdown"
