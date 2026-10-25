@@ -144,6 +144,11 @@
   white-space: nowrap;
 }
 
+/* The select-all header shares the ID cell's swap but keeps the header face. */
+.admin-catalog-resources__id-head {
+  font-family: inherit;
+}
+
 .admin-catalog-resources__resource-title {
   color: var(--text);
   font-weight: 500;
@@ -288,13 +293,22 @@
   position: absolute;
 }
 
+/* 44px hit area around the 32px box without changing its drawn size (the
+   inset is measured from the 30px padding box inside the 1px border). */
+.admin-catalog-resources__row-select::after {
+  content: "";
+  inset: -7px;
+  position: absolute;
+}
+
 /* C6-V5A-05: a checked box stays visible in place of the ID. */
-.admin-catalog-resources__row-select[data-state="checked"] {
+.admin-catalog-resources__row-select[data-state="checked"],
+.admin-catalog-resources__row-select[data-state="indeterminate"] {
   opacity: 1;
 }
 
 .admin-catalog-resources:not(.admin-catalog-resources--tools-open)
-  .admin-catalog-resources__id-cell:has(.admin-catalog-resources__row-select[data-state="checked"]) > span {
+  .admin-catalog-resources__id-cell:has(.admin-catalog-resources__row-select:is([data-state="checked"], [data-state="indeterminate"])) > span {
   visibility: hidden;
 }
 
@@ -341,7 +355,9 @@
   margin-inline-start: 8px;
   opacity: 1;
   margin-block: 0;
-  position: static;
+  /* Relative, not static, so the ::after hit area stays anchored to the box. */
+  inset: auto;
+  position: relative;
   vertical-align: middle;
 }
 

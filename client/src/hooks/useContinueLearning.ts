@@ -2,6 +2,8 @@ import { useMutation, useQuery } from "@tanstack/react-query";
 import { useLocation } from "wouter";
 import type { ContinueLearningSummary } from "@shared/continueLearning";
 import { apiRequest, queryClient } from "@/lib/queryClient";
+import { humanizeApiError } from "@/lib/apiError";
+import { useToast } from "@/hooks/use-toast";
 import { trackJourneyResumed, type ResumeSurface } from "@/lib/analytics-contributions";
 
 const SUMMARY_KEY = ["/api/user/continue-learning"] as const;
@@ -16,6 +18,7 @@ export function useContinueLearningSummary(enabled: boolean) {
 
 export function useResumeJourney(surface: ResumeSurface) {
   const [, setLocation] = useLocation();
+  const { toast } = useToast();
 
   return useMutation({
     mutationFn: async ({
@@ -48,6 +51,13 @@ export function useResumeJourney(surface: ResumeSurface) {
         queryKey: [`/api/journeys/${variables.journeyId}`],
       });
       setLocation(href);
+    },
+    onError: (error: Error) => {
+      toast({
+        title: "Failed to Resume Journey",
+        description: humanizeApiError(error, "Something went wrong. Please try again."),
+        variant: "destructive",
+      });
     },
   });
 }

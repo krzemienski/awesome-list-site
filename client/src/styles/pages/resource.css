@@ -52,6 +52,24 @@
 
 .resource-detail-chip-wrap {
   display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  min-width: 0;
+  max-width: 100%;
+}
+
+/* The chip keeps its drawn size; the link around it is the 44px target. */
+.resource-detail-chips { row-gap: 0; }
+
+.resource-detail-chip-link {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  min-width: 0;
+  max-width: 100%;
+}
+
+.resource-detail-chip-link > .chip {
   min-width: 0;
   max-width: 100%;
 }

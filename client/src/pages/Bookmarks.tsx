@@ -279,10 +279,11 @@ export default function Bookmarks() {
     target.focus({ preventScroll: true });
   }, [filteredBookmarks]);
 
-  const selectedCollection =
+  const selectedCollectionIndex =
     collectionFilter === "all"
-      ? null
-      : collections.find((collection) => collection.id === Number(collectionFilter)) ?? null;
+      ? -1
+      : collections.findIndex((collection) => collection.id === Number(collectionFilter));
+  const selectedCollection = selectedCollectionIndex >= 0 ? collections[selectedCollectionIndex] : null;
   const selectedIds = Array.from(selected);
   const allShownSelected =
     filteredBookmarks.length > 0 &&
@@ -369,10 +370,13 @@ export default function Bookmarks() {
       // it at the list edge), so put focus back on the moved collection.
       after: () =>
         requestAnimationFrame(() => {
-          const controls = document.querySelectorAll<HTMLButtonElement>(
-            `[data-reorder-collection="${movedId}"] button`,
-          );
-          const [up, down] = Array.from(controls);
+          // The sidebar and the narrow-screen panel both carry arrows; only one
+          // pair is rendered at a given width.
+          const [up, down] = Array.from(
+            document.querySelectorAll<HTMLButtonElement>(
+              `[data-reorder-collection="${movedId}"] button`,
+            ),
+          ).filter((button) => button.getClientRects().length > 0);
           const preferred = direction < 0 ? up : down;
           (preferred && !preferred.disabled ? preferred : direction < 0 ? down : up)?.focus();
         }),
@@ -650,6 +654,36 @@ export default function Bookmarks() {
                   </p>
                 </div>
                 <div className="flex flex-wrap gap-2">
+                  {collections.length > 1 && (
+                    <div
+                      className="flex gap-2 lg:hidden"
+                      aria-label={`Reorder ${selectedCollection.name}`}
+                      data-reorder-collection={selectedCollection.id}
+                    >
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        className="min-h-11"
+                        aria-label={`Move ${selectedCollection.name} up`}
+                        disabled={selectedCollectionIndex === 0}
+                        onClick={() => reorderCollection(selectedCollectionIndex, -1)}
+                      >
+                        <ArrowUp className="h-4 w-4 mr-2" aria-hidden="true" />
+                        Move up
+                      </Button>
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        className="min-h-11"
+                        aria-label={`Move ${selectedCollection.name} down`}
+                        disabled={selectedCollectionIndex === collections.length - 1}
+                        onClick={() => reorderCollection(selectedCollectionIndex, 1)}
+                      >
+                        <ArrowDown className="h-4 w-4 mr-2" aria-hidden="true" />
+                        Move down
+                      </Button>
+                    </div>
+                  )}
                   <Button
                     variant="outline"
                     size="sm"
@@ -963,7 +997,7 @@ export default function Bookmarks() {
                   data-testid={`bookmark-card-${resource.id}`}
                 >
                   <div className="account-bookmark-toolbar flex flex-wrap items-center gap-2 p-3">
-                    <label className="flex min-h-11 cursor-pointer items-center gap-2 px-1">
+                    <label className="flex min-h-11 min-w-11 cursor-pointer items-center justify-center">
                       <Checkbox
                         checked={selected.has(resource.id)}
                         onCheckedChange={(checked) =>

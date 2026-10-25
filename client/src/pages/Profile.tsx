@@ -39,6 +39,7 @@ import {
 } from "@/lib/query-availability";
 import { hasVisibleChars } from "@shared/validation";
 import { useToast } from "@/hooks/use-toast";
+import { humanizeApiError } from "@/lib/apiError";
 import {
   User,
   Heart,
@@ -259,6 +260,7 @@ export default function Profile({ user }: ProfileProps) {
   // Run22 BUG-020: private account/data-deletion request channel — no public
   // GitHub issue (and no personal data exposure) required.
   const [deletionDialogOpen, setDeletionDialogOpen] = useState(false);
+  const [deletionError, setDeletionError] = useState<string | null>(null);
 
   const requestDeletionMutation = useMutation({
     mutationFn: async () => {
@@ -274,13 +276,9 @@ export default function Profile({ user }: ProfileProps) {
           "A maintainer will process your request privately. You can withdraw it any time before it's processed.",
       });
     },
-    onError: (err: any) => {
-      setDeletionDialogOpen(false);
-      toast({
-        title: "Couldn't submit deletion request",
-        description: err?.message?.replace(/^\d+:\s*/, "") || "Please try again.",
-        variant: "destructive",
-      });
+    onError: (err: Error) => {
+      const message = humanizeApiError(err, "Please try again.");
+      setDeletionError(/[.!?]$/.test(message) ? message : `${message}.`);
     },
   });
 
@@ -979,6 +977,7 @@ export default function Profile({ user }: ProfileProps) {
                       variant="destructive"
                       onClick={() => {
                         trackAccountDeletionDialogOpened();
+                        setDeletionError(null);
                         setDeletionDialogOpen(true);
                       }}
                       data-testid="button-request-deletion"
@@ -991,7 +990,13 @@ export default function Profile({ user }: ProfileProps) {
             </Card>
           </div>
 
-          <AlertDialog open={deletionDialogOpen} onOpenChange={setDeletionDialogOpen}>
+          <AlertDialog
+            open={deletionDialogOpen}
+            onOpenChange={(open) => {
+              if (!open && requestDeletionMutation.isPending) return;
+              setDeletionDialogOpen(open);
+            }}
+          >
             <AlertDialogContent data-testid="dialog-deletion-confirm">
               <AlertDialogHeader>
                 <AlertDialogTitle>Request account deletion?</AlertDialogTitle>
@@ -1001,12 +1006,28 @@ export default function Profile({ user }: ProfileProps) {
                   the request any time before it's completed.
                 </AlertDialogDescription>
               </AlertDialogHeader>
+              {deletionError && (
+                <Alert variant="destructive" data-testid="alert-deletion-error">
+                  <AlertTitle>Couldn&apos;t submit deletion request</AlertTitle>
+                  <AlertDescription>{deletionError} Your account is unchanged.</AlertDescription>
+                </Alert>
+              )}
               <AlertDialogFooter>
-                <AlertDialogCancel data-testid="button-deletion-cancel">
+                <AlertDialogCancel
+                  disabled={requestDeletionMutation.isPending}
+                  data-testid="button-deletion-cancel"
+                >
                   Cancel
                 </AlertDialogCancel>
                 <AlertDialogAction
-                  onClick={() => requestDeletionMutation.mutate()}
+                  onClick={(event) => {
+                    // Keep the dialog open until the server answers so a failure
+                    // is shown in place instead of disappearing with the dialog.
+                    event.preventDefault();
+                    if (requestDeletionMutation.isPending) return;
+                    setDeletionError(null);
+                    requestDeletionMutation.mutate();
+                  }}
                   aria-disabled={requestDeletionMutation.isPending}
                   data-testid="button-deletion-confirm"
                 >
