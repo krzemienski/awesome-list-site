@@ -46,7 +46,7 @@
 .research-guide__step-num {
   align-items: center;
   border: var(--hairline-w, 1px) solid var(--border);
-  border-radius: 999px;
+  border-radius: var(--radius-pill);
   color: var(--text-3, var(--muted-foreground));
   display: inline-flex;
   flex: none;
@@ -167,7 +167,7 @@
 .research-run__step-dot {
   align-items: center;
   border: var(--hairline-w, 1px) solid var(--border);
-  border-radius: 999px;
+  border-radius: var(--radius-pill);
   display: inline-flex;
   flex: none;
   height: 1.25rem;
@@ -183,7 +183,7 @@
 
 .research-run__step-marker {
   background: var(--accent);
-  border-radius: 999px;
+  border-radius: var(--radius-pill);
   inset: 3px;
   position: absolute;
 }
@@ -229,7 +229,7 @@
 /* Indeterminate "searching" bar: a segment sweeping across the card. */
 .research-run__scout-bar {
   background: var(--border);
-  border-radius: 999px;
+  border-radius: var(--radius-pill);
   display: block;
   height: 2px;
   margin-top: .5rem;
