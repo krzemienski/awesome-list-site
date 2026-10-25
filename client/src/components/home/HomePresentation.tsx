@@ -428,6 +428,20 @@ function CategoryHeading({
   );
 }
 
+function NoFilterMatches({ onClearFilters, headingSelector }: {
+  onClearFilters: () => void;
+  headingSelector: string;
+}) {
+  return (
+    <div className="home-empty-categories" data-testid="empty-categories">
+      <p>No categories match the selected filters.</p>
+      <Button variant="outline" size="sm" onClick={(e) => { /* C6-SWEEP-02: the card unmounts once categories return; focus the page heading */ handoffFocusOnUnmount(e.currentTarget, () => document.querySelector<HTMLElement>(headingSelector)); onClearFilters(); }} data-testid="button-clear-filters">
+        Clear filters
+      </Button>
+    </div>
+  );
+}
+
 function CategoryIndex({ categories, selectedTags, selectedKind, onClearFilters }: {
   categories: HomeCategoryView[];
   selectedTags: string[];
@@ -435,14 +449,7 @@ function CategoryIndex({ categories, selectedTags, selectedKind, onClearFilters 
   onClearFilters: () => void;
 }) {
   if (categories.length === 0) {
-    return (
-      <div className="home-empty-categories" data-testid="empty-categories">
-        <p>No categories match the selected filters.</p>
-        <Button variant="outline" size="sm" onClick={(e) => { /* C6-SWEEP-02: the card unmounts once categories return; focus the index heading */ handoffFocusOnUnmount(e.currentTarget, () => document.querySelector<HTMLElement>(".home-index-title")); onClearFilters(); }} data-testid="button-clear-filters">
-          Clear filters
-        </Button>
-      </div>
-    );
+    return <NoFilterMatches onClearFilters={onClearFilters} headingSelector=".home-index-title" />;
   }
 
   const filterQuery = (() => {
@@ -660,7 +667,8 @@ function CuratedLayout({
   stats,
   selectedTags,
   selectedKind,
-}: Pick<HomePresentationProps, "categories" | "recent" | "featured" | "stats" | "selectedTags" | "selectedKind">) {
+  onClearFilters,
+}: Pick<HomePresentationProps, "categories" | "recent" | "featured" | "stats" | "selectedTags" | "selectedKind" | "onClearFilters">) {
   const query = new URLSearchParams();
   if (selectedTags.length > 0) query.set("tags", selectedTags.join(","));
   if (selectedKind) query.set("kind", selectedKind);
@@ -727,64 +735,70 @@ function CuratedLayout({
             </>
           }
         />
-        <div className="home-curated-category-grid" data-testid="list-categories">
-          {categories.map((category) => (
-            <Link
-              key={category.slug}
-              href={`/category/${category.slug}${tagSearch}`}
-              className="home-curated-category card hoverable glow"
-              data-testid={`link-category-${category.slug}`}
-            >
-              <div className="home-curated-category-top">
-                <span className="home-category-icon" aria-hidden="true">
-                  {category.icon}
+        {categories.length === 0 ? (
+          <NoFilterMatches onClearFilters={onClearFilters} headingSelector=".home-hero-title" />
+        ) : (
+          <div className="home-curated-category-grid" data-testid="list-categories">
+            {categories.map((category) => (
+              <Link
+                key={category.slug}
+                href={`/category/${category.slug}${tagSearch}`}
+                className="home-curated-category card hoverable glow"
+                data-testid={`link-category-${category.slug}`}
+              >
+                <div className="home-curated-category-top">
+                  <span className="home-category-icon" aria-hidden="true">
+                    {category.icon}
+                  </span>
+                  <span className="home-category-count mono">{formatCount(category.count)}</span>
+                </div>
+                <h3>{category.name}</h3>
+                <p>{category.description ?? `Explore ${formatCount(category.count)} resources in ${category.name}.`}</p>
+                <span className="home-curated-explore">
+                  Explore <HomeArrow className="h-3 w-3" />
                 </span>
-                <span className="home-category-count mono">{formatCount(category.count)}</span>
-              </div>
-              <h3>{category.name}</h3>
-              <p>{category.description ?? `Explore ${formatCount(category.count)} resources in ${category.name}.`}</p>
-              <span className="home-curated-explore">
-                Explore <HomeArrow className="h-3 w-3" />
-              </span>
-            </Link>
-          ))}
-        </div>
+              </Link>
+            ))}
+          </div>
+        )}
       </div>
 
-      <div className="home-curated-section home-curated-recent">
-        <SectionHeader
-          eyebrow="── RECENTLY UPDATED"
-          title={
-            <>
-              Fresh from <span className="serif-italic home-muted-italic">the index</span>
-            </>
-          }
-        />
-        <div className="home-recent-table card">
-          {recent.slice(0, 5).map((resource, index) => {
-            const category = categoryShortName(resource);
-            return (
-              <ResourceLink
-                key={String(resource.id)}
-                resource={resource}
-                className="home-curated-recent-row"
-                dataTestId={`link-home-curated-recent-${resource.id}`}
-                analyticsSurface="home_recent_list"
-              >
-                <span className="home-recent-number mono">{String(index + 1).padStart(2, "0")}</span>
-                <span className="home-curated-recent-copy">
-                  <span className="home-curated-recent-title">
-                    <span className="home-curated-recent-title-text">{resource.title}</span>
-                    <span className="home-curated-category chip muted">{category}</span>
+      {recent.length > 0 ? (
+        <div className="home-curated-section home-curated-recent">
+          <SectionHeader
+            eyebrow="── RECENTLY UPDATED"
+            title={
+              <>
+                Fresh from <span className="serif-italic home-muted-italic">the index</span>
+              </>
+            }
+          />
+          <div className="home-recent-table card">
+            {recent.slice(0, 5).map((resource, index) => {
+              const category = categoryShortName(resource);
+              return (
+                <ResourceLink
+                  key={String(resource.id)}
+                  resource={resource}
+                  className="home-curated-recent-row"
+                  dataTestId={`link-home-curated-recent-${resource.id}`}
+                  analyticsSurface="home_recent_list"
+                >
+                  <span className="home-recent-number mono">{String(index + 1).padStart(2, "0")}</span>
+                  <span className="home-curated-recent-copy">
+                    <span className="home-curated-recent-title">
+                      <span className="home-curated-recent-title-text">{resource.title}</span>
+                      <span className="home-curated-category chip muted">{category}</span>
+                    </span>
+                    <span className="home-curated-recent-description">{resource.description}</span>
                   </span>
-                  <span className="home-curated-recent-description">{resource.description}</span>
-                </span>
-                <HomeArrow className="home-recent-arrow" />
-              </ResourceLink>
-            );
-          })}
+                  <HomeArrow className="home-recent-arrow" />
+                </ResourceLink>
+              );
+            })}
+          </div>
         </div>
-      </div>
+      ) : null}
     </>
   );
 }
@@ -836,6 +850,7 @@ export default function HomePresentation({
           stats={stats}
           selectedTags={selectedTags}
           selectedKind={selectedKind}
+          onClearFilters={onClearFilters}
         />
       )}
       {filters}

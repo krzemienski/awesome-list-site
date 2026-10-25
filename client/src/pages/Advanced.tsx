@@ -26,7 +26,7 @@ import {
   Settings
 } from "lucide-react";
 import { AwesomeList } from "@/types/awesome-list";
-import { fetchStaticAwesomeList } from "@/lib/static-data";
+import { countVisibleSubcategories, fetchAwesomeListNav, fetchStaticAwesomeList, visibleNavCategories, type AwesomeListNav } from "@/lib/static-data";
 import { writeFilterParams, usePopstateParams } from "@/lib/url-filter-state";
 import { trackToolTabOpened } from "@/lib/analytics";
 import { queryUnavailableReason } from "@/lib/query-availability";
@@ -98,6 +98,13 @@ export default function Advanced() {
   const catalogUnavailable = queryUnavailableReason(catalogQuery);
   const resources = awesomeList?.resources ?? [];
   const categories = awesomeList?.categories ?? [];
+  // The stat cards quote the site-wide definitions, not a recount of the
+  // corpus: subcategories as the footer and Home count them (empty ones
+  // pruned) and tags as /api/tags folds them.
+  const navQuery = useQuery<AwesomeListNav>({ queryKey: ["awesome-list-nav"], queryFn: fetchAwesomeListNav, staleTime: 1000 * 60 * 60 });
+  const tagsQuery = useQuery<{ total: number }>({ queryKey: ["/api/tags"], staleTime: 1000 * 60 * 5 });
+  const statValue = (pending: boolean, value: number | undefined) =>
+    pending ? <Skeleton className="inline-block h-[1em] w-[2.5ch] align-middle" /> : value?.toLocaleString() ?? "—";
 
   if (isLoading && tab !== "recommendations") {
     return (
@@ -232,7 +239,7 @@ export default function Advanced() {
                 <Card className="discovery-tools-stat-card">
                   <CardContent className="discovery-tools-stat-card-content">
                     <div className="discovery-tools-stat-value discovery-tools-stat-value--tertiary">
-                      {new Set(resources.flatMap((r) => r.metadata?.tags ?? r.tags ?? []).map((tag) => tag.toLowerCase())).size.toLocaleString()}
+                      {statValue(tagsQuery.isPending, tagsQuery.data?.total)}
                     </div>
                     <div className="eyebrow discovery-tools-stat-label">Unique Tags</div>
                   </CardContent>
@@ -240,7 +247,7 @@ export default function Advanced() {
                 <Card className="discovery-tools-stat-card">
                   <CardContent className="discovery-tools-stat-card-content">
                     <div className="discovery-tools-stat-value discovery-tools-stat-value--quaternary">
-                      {categories.reduce((sum, cat) => sum + (cat.subcategories?.length || 0), 0)}
+                      {statValue(navQuery.isPending, navQuery.data && countVisibleSubcategories(visibleNavCategories(navQuery.data.categories)))}
                     </div>
                     <div className="eyebrow discovery-tools-stat-label">Subcategories</div>
                   </CardContent>

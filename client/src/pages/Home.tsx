@@ -7,6 +7,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Category, Resource, Subcategory } from "@/types/awesome-list";
 import {
+  countVisibleSubcategories,
   fetchKindCounts,
   isRealCategory,
   navTotalCount,
@@ -103,13 +104,6 @@ interface DisplayCategory {
   count: number;
   teaser?: { title: string; description: string };
   subcategories: AwesomeListNavNode[];
-}
-
-function countSubcategories(categories: AwesomeListNavNode[]): number {
-  return categories.reduce(
-    (total, category) => total + (category.subcategories?.length ?? 0),
-    0,
-  );
 }
 
 function countNestedGroups(categories: AwesomeListNavNode[]): number {
@@ -760,7 +754,7 @@ export default function Home({ nav, navLoading }: HomeProps) {
     return {
       total: homeData?.total ?? nav?.totalResources ?? 0,
       categories: realCategories,
-      subcategories: countSubcategories(rawCategories),
+      subcategories: countVisibleSubcategories(rawCategories),
       nestedGroups: countNestedGroups(rawCategories),
       featured: homeData?.featuredCount ?? homeData?.featured?.length ?? 0,
       approvedThisWeek: homeData?.approvedThisWeek ?? 0,

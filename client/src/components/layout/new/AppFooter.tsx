@@ -1,7 +1,7 @@
 import { lazy, Suspense } from "react";
 import { Link, useLocation } from "wouter";
 import { hasAnalyticsVendors, openCookieSettings } from "@/components/ui/consent-banner";
-import { visibleNavCategories, type AwesomeListNav } from "@/lib/static-data";
+import { countVisibleSubcategories, visibleNavCategories, type AwesomeListNav } from "@/lib/static-data";
 import { getCategoryGlyph } from "./category-glyphs";
 import "@/styles/shell/footer.css";
 
@@ -49,7 +49,7 @@ export default function AppFooter({ nav, site }: {
   const displayName = footerDisplayName(site.name);
   // C9-V1-01: count and link only the categories the rest of the site shows.
   const categories = visibleNavCategories(nav?.categories);
-  const subcategoryCount = categories.reduce((total, category) => total + (category.subcategories?.length ?? 0), 0);
+  const subcategoryCount = countVisibleSubcategories(categories);
 
   return (
     <footer className="app-footer" data-testid="site-footer">

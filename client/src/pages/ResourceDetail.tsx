@@ -1194,13 +1194,6 @@ export default function ResourceDetail() {
                 </a>
               </div>
 
-              {(!tags || tags.length === 0) && (
-                <div data-seo-section="resource-tags">
-                  <h2 className="eyebrow">Tags</h2>
-                  <div />
-                </div>
-              )}
-
               {tags && tags.length > 0 && (
                 <>
                   <Separator />

@@ -142,7 +142,10 @@ export default function ConsentBanner() {
   useEffect(() => {
     if (choiceMade) return;
     const onKeyDown = (e: KeyboardEvent) => {
-      if (e.key !== "Escape") return;
+      // An overlay that consumed this Escape (Radix dialogs, sheets and the
+      // search palette preventDefault when they close) owns it; the banner
+      // only dismisses on an Escape nothing else claimed.
+      if (e.key !== "Escape" || e.defaultPrevented) return;
       closeBanner();
     };
     window.addEventListener("keydown", onKeyDown);

@@ -155,20 +155,18 @@ export default function MainLayout({ productProfile, nav, isLoading, navError, o
         openPalette("keyboard_shortcut");
         return;
       }
+      // "/" opens the palette only from outside a text field; once it is open
+      // the key is ordinary input ("h.264/avc").
       if (
         event.key === "/" &&
         !event.ctrlKey &&
         !event.metaKey &&
-        !event.altKey
+        !event.altKey &&
+        !searchOpen &&
+        !inField
       ) {
-        if (searchOpen) {
-          if (inField) event.preventDefault();
-          return;
-        }
-        if (!inField) {
-          event.preventDefault();
-          openPalette("slash_key");
-        }
+        event.preventDefault();
+        openPalette("slash_key");
       }
     };
     // Page-level search entries (resource and listing pages) pass their method;
