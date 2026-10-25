@@ -1,4 +1,5 @@
 import { getAnalyticsConsent, vendorSdksAllowed } from "./analytics";
+import { isAnalyticsSuppressed } from "./analytics-suppression";
 import type { AmplitudeProductSlots, ManagedPlugin } from "./analytics-sdk-options";
 
 let initialized = false;
@@ -144,7 +145,9 @@ export function initAmplitude(): void {
       // Post-consent plugin/transport config, kept out of the entry bundle.
       import("./analytics-sdk-options"),
     ]);
-    const isBlocked = () => disabled || getAnalyticsConsent() !== "granted";
+    // Replay and Guides & Surveys uploads also stop on QA paths and once any
+    // tab marks the device as an admin session.
+    const isBlocked = () => disabled || getAnalyticsConsent() !== "granted" || isAnalyticsSuppressed();
     amplitudeClient = amplitude;
     sdkOptions = options;
     await teardownPromise;

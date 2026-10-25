@@ -4,10 +4,10 @@ import { whenClerkLoaded } from '@/lib/clerk-bridge';
 import { queryClient, ApiError, renewSessionToken } from '@/lib/queryClient';
 import { notifyCrossTabSync } from '@/lib/crossTabSync';
 import { safeRemoveItem } from '@/lib/safeStorage';
-import { mpIdentify, mpReset, optOutMixpanel } from '@/lib/mixpanel';
-import { phIdentify, phReset, optOutPosthog } from '@/lib/posthog';
-import { optOutAmplitude } from '@/lib/amplitude';
-import { optOutGA, trackLoggedOut } from '@/lib/analytics';
+import { initMixpanel, mpIdentify, mpReset, optOutMixpanel } from '@/lib/mixpanel';
+import { initPosthog, phIdentify, phReset, optOutPosthog } from '@/lib/posthog';
+import { initAmplitude, optOutAmplitude } from '@/lib/amplitude';
+import { initGA, optOutGA, trackLoggedOut, trackPageView } from '@/lib/analytics';
 import { setAdminAnalyticsSession } from '@/lib/analytics-suppression';
 import { useToast } from '@/hooks/use-toast';
 
@@ -26,18 +26,35 @@ export function clearSignedInClientState(): void {
   notifyCrossTabSync();
 }
 
+// Whether this tab has stopped its vendor SDKs for an admin session. The
+// localStorage marker is shared by every tab, so it cannot tell a tab that
+// started its SDKs as a visitor before another tab set it.
+let vendorsStoppedForAdmin = false;
+
 /**
  * Admin sessions send nothing to any analytics tool. The marker makes the
- * next load quiet before auth resolves; when it is newly set here, SDKs that
- * already started under a visitor's grant are stopped.
+ * next load quiet before auth resolves. Each tab that learns the user is an
+ * admin stops the SDKs it already started under a visitor's grant; when a
+ * non-admin account replaces an admin marker, the SDKs start again (each
+ * init still checks consent and QA paths).
  */
 function syncAdminAnalytics(role: string | undefined): boolean {
   const isAdmin = role === 'admin';
-  if (setAdminAnalyticsSession(isAdmin) && isAdmin) {
+  const markerChanged = setAdminAnalyticsSession(isAdmin);
+  if (isAdmin && !vendorsStoppedForAdmin) {
+    vendorsStoppedForAdmin = true;
     optOutGA();
     optOutMixpanel();
     optOutPosthog();
     optOutAmplitude();
+  } else if (!isAdmin && (markerChanged || vendorsStoppedForAdmin)) {
+    vendorsStoppedForAdmin = false;
+    initGA();
+    initMixpanel();
+    initPosthog();
+    initAmplitude();
+    // This page's view was dropped while the marker suppressed it.
+    trackPageView(window.location.href);
   }
   return isAdmin;
 }

@@ -263,11 +263,20 @@ exactly as before. The rules live in
   for them is SDK start-up: `initGA` / `initMixpanel` / `initPosthog` /
   `initAmplitude` all gate on `vendorSdksAllowed()` (a grant **and** not
   suppressed), so an admin load or a QA landing never loads any vendor SDK.
-  When the marker is set mid-session (a visitor who granted consent signs in
-  as admin), `useAuth` stops the running SDKs with the existing revoke
-  functions and skips identify. For a visitor who navigates into a QA path
-  while the SDKs run, PostHog's `before_send` and the Amplitude URL-scrub
-  enrichment plugin drop every event while suppressed. Server conversion
+  Mid-session (a visitor who granted consent signs in as admin), each tab
+  stops its own running SDKs with the existing revoke functions and skips
+  identify the first time its `/api/auth/user` answer reports the admin role,
+  whether or not another tab set the shared marker first (`useAuth` keeps a
+  per-tab "stopped for admin" flag). If a non-admin account replaces the
+  marker within a page load (a non-admin signs in on a device with an expired
+  admin marker), `useAuth` starts the SDKs again and records the current page
+  view; each init still checks consent and QA paths. For a visitor who
+  navigates into a QA path while the SDKs run, PostHog's `before_send` and the
+  Amplitude URL-scrub enrichment plugin drop every event while suppressed, and
+  the Amplitude Session Replay and Guides & Surveys transports refuse every
+  upload while suppressed. That transport check also stops replay uploads in
+  a visitor tab as soon as another tab sets the admin marker, before that tab
+  has re-asked `/api/auth/user`. Server conversion
   headers (`serverConversionHeaders`) are also withheld, so the server sends no
   Mixpanel conversion for an admin.
 - **Replit page views.** The injected Umami tracker checks
