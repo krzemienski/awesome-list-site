@@ -1403,6 +1403,7 @@ STOP TARGET: this run ends AUTOMATICALLY once ${targetDiscoveries} new discoveri
         systemPrompt,
         model: orchestratorModel,
         config,
+        approvedEndpointHost: resolved.endpoint.host,
         mcpServers: { research: mcpServer },
         agents: { scout },
         allowedTools,

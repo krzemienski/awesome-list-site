@@ -42,6 +42,9 @@ const TIER_ENV: Record<ModelTier, string> = {
   fable: "ANTHROPIC_DEFAULT_FABLE_MODEL",
 };
 
+/** Every tier alias, which is also the set the Agent SDK CLI accepts as a model alias. */
+export const MODEL_TIERS = Object.keys(TIER_ENV) as ModelTier[];
+
 // First-party ids used only when no ANTHROPIC_DEFAULT_<TIER>_MODEL override exists.
 const FIRST_PARTY_TIER_MODELS: Record<ModelTier, string> = {
   haiku: "claude-haiku-4-5",
@@ -116,8 +119,14 @@ export interface AnthropicCredentials {
   label: string;
 }
 
-export function resolveAnthropicCredentials(env: Env = process.env): AnthropicCredentials {
+/** The operator-configured endpoint (ANTHROPIC_BASE_URL, no trailing slash), if any. */
+export function configuredBaseUrl(env: Env = process.env): string | undefined {
   const baseUrl = clean(env.ANTHROPIC_BASE_URL);
+  return baseUrl ? stripTrailingSlash(baseUrl) : undefined;
+}
+
+export function resolveAnthropicCredentials(env: Env = process.env): AnthropicCredentials {
+  const baseUrl = configuredBaseUrl(env);
   const authToken = clean(env.ANTHROPIC_AUTH_TOKEN);
   const apiKey = clean(env.ANTHROPIC_API_KEY);
   const managedKey = clean(env.AI_INTEGRATIONS_ANTHROPIC_API_KEY);
@@ -125,11 +134,11 @@ export function resolveAnthropicCredentials(env: Env = process.env): AnthropicCr
 
   if (baseUrl && authToken) {
     const host = safeHost(baseUrl);
-    return { kind: "router", baseURL: stripTrailingSlash(baseUrl), authToken, label: `router ${host} (bearer token)` };
+    return { kind: "router", baseURL: baseUrl, authToken, label: `router ${host} (bearer token)` };
   }
   if (baseUrl && apiKey) {
     const host = safeHost(baseUrl);
-    return { kind: "router", baseURL: stripTrailingSlash(baseUrl), apiKey, label: `router ${host} (api key)` };
+    return { kind: "router", baseURL: baseUrl, apiKey, label: `router ${host} (api key)` };
   }
   if (baseUrl) {
     // Fail closed: a custom endpoint with no matching credential must NOT fall

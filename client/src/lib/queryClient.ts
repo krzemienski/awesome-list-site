@@ -55,9 +55,11 @@ export async function apiRequest(
   await throwIfResNotOk(res);
   // All admin catalog callers (including edits, bulk operations and undo/redo)
   // pass this boundary. Invalidate the whole catalog graph after a successful
-  // write, not just whichever manager happens to be mounted.
+  // write, not just whichever manager happens to be mounted. Approving a
+  // research discovery publishes a resource, so it is a catalog write too.
   if (options?.method && !['GET', 'HEAD'].includes(options.method.toUpperCase()) &&
-      /^\/api\/admin\/(?:resources|resource-edits|categories|subcategories|sub-subcategories)(?:\/|$)/.test(url)) {
+      (/^\/api\/admin\/(?:resources|resource-edits|categories|subcategories|sub-subcategories)(?:\/|$)/.test(url) ||
+        /^\/api\/researcher\/discoveries\/(?:\d+\/approve|approve-all)$/.test(url))) {
     void invalidateCatalogQueries();
   }
   const contentType = res.headers.get("content-type");

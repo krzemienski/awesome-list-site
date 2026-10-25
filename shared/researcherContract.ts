@@ -12,7 +12,9 @@ export type ResearchPreflightCode =
   | "missing_env"
   | "override_token_required"
   | "insecure_http_unconfirmed"
-  | "invalid_base_url";
+  | "invalid_base_url"
+  /** A scout model override the Agent SDK could silently replace. */
+  | "unsupported_scout_model";
 
 export interface ResearchPreflightIssue {
   code: ResearchPreflightCode;
