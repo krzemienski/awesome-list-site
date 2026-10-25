@@ -16,6 +16,7 @@ import { AgentCommsGraph } from "@/components/admin/AgentCommsGraph";
 import { StatusChip, TableShell } from "@/components/admin/AdminOpsPrimitives";
 import { ResearchLaunchGuide, type ResearchLaunchGuideHandle } from "@/components/admin/ResearchLaunchGuide";
 import { ResearchRunView } from "@/components/admin/ResearchRunView";
+import { CancelResearchRunDialog } from "@/components/admin/CancelResearchRunDialog";
 import { ResearchRunConfigSummary } from "@/components/admin/ResearchRunConfigSummary";
 import {
   BAD_TEXT,
@@ -252,11 +253,13 @@ export default function ResearcherTab({ initialTab = "review" }: ResearcherTabPr
     .map((c) => c.name ?? c.title ?? "")
     .filter((name) => name !== "");
 
+  const [jobToCancel, setJobToCancel] = useState<number | null>(null);
   const cancelMutation = useMutation({
     mutationFn: async (jobId: number) => {
       return await apiRequest(`/api/researcher/jobs/${jobId}`, { method: 'DELETE' });
     },
     onSuccess: () => {
+      setJobToCancel(null);
       void queryClient.invalidateQueries({ queryKey: ['/api/researcher/jobs'] });
       toast({ title: "Job cancelled" });
     },
@@ -330,7 +333,14 @@ export default function ResearcherTab({ initialTab = "review" }: ResearcherTabPr
 
   return (
     <div className="queues-agent queues-agent--research">
-      {cancelMutation.isError && (
+      <CancelResearchRunDialog
+        jobId={jobToCancel}
+        pending={cancelMutation.isPending}
+        error={cancelMutation.isError ? cancelMutation.error : null}
+        onConfirm={(id) => cancelMutation.mutate(id)}
+        onDismiss={() => setJobToCancel(null)}
+      />
+      {cancelMutation.isError && jobToCancel === null && (
         <Alert variant="destructive" role="alert">
           <AlertCircle className="w-4 h-4" />
           <AlertDescription>
@@ -750,7 +760,7 @@ export default function ResearcherTab({ initialTab = "review" }: ResearcherTabPr
                                   size="sm"
                                   variant="ghost"
                                   className="text-destructive"
-                                  onClick={() => cancelMutation.mutate(job.id)}
+                                  onClick={() => { cancelMutation.reset(); setJobToCancel(job.id); }}
                                   disabled={cancelMutation.isPending}
                                   aria-label={`Cancel job #${job.id}`}
                                 >

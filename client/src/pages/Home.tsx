@@ -604,10 +604,11 @@ export default function Home({ nav, navLoading }: HomeProps) {
   const kindCountsUnavailable = queryUnavailableReason(kindCountsQuery) !== null;
   const corpusUnavailable = corpusFilterActive ? queryUnavailableReason(corpusQuery) : null;
 
+  // The pruned public taxonomy (no empty subcategories), the same tree the
+  // stats, sidebar and crawler HTML list.
   const navCategories = useMemo<DisplayCategory[]>(() => {
     if (!nav?.categories) return [];
-    return nav.categories
-      .filter((category) => isRealCategory(category.name) && navTotalCount(category) > 0)
+    return visibleNavCategories(nav.categories)
       .map((category) => ({
         name: category.name,
         slug: category.slug ?? "",

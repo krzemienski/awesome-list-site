@@ -415,9 +415,9 @@ export default function TaxonomyListing({ level }: Props) {
     setView(isLayoutViewMode(nextView) ? nextView : "grid");
   }, [level, search, slug]);
 
-  // Under a kind filter the listing counts that kind only; empty tiles would
-  // advertise subcategories the filter has already ruled out.
-  const childTiles = kind ? listingData?.children.filter((child) => child.count > 0) ?? [] : listingData?.children ?? [];
+  // An empty tile is a dead end: a subcategory with no approved resources, or
+  // one the kind filter has ruled out. The crawler HTML hides them too.
+  const childTiles = listingData?.children.filter((child) => child.count > 0) ?? [];
 
   const navPlacement = level === "category" ? undefined : findNavNode(nav, level, slug);
   const siblingParent = navPlacement?.parent?.slug ? navPlacement.parent : undefined;
@@ -456,11 +456,11 @@ export default function TaxonomyListing({ level }: Props) {
   // option and claims "All subcategories" while the URL still filters by it.
   const selectedChild = selection.split(" › ")[0];
   const optionChildren = (listingData.children ?? [])
-    .filter((child) => !kind || child.count > 0 || child.name === selectedChild)
+    .filter((child) => child.count > 0 || child.name === selectedChild)
     .flatMap((child: any) => [
       { value: child.name, count: child.count },
       ...((child.subSubcategories ?? [])
-        .filter((subSub: any) => !kind || subSub.count > 0 || `${child.name} › ${subSub.name}` === selection)
+        .filter((subSub: any) => subSub.count > 0 || `${child.name} › ${subSub.name}` === selection)
         .map((subSub: any) => ({ value: `${child.name} › ${subSub.name}`, count: subSub.count }))),
     ]);
   const backSlug = level === "subcategory" ? parentCategory?.slug : parentSubcategory?.slug;
@@ -616,7 +616,8 @@ export default function TaxonomyListing({ level }: Props) {
   const kindLabel = kind ? kind.replace(/[-_]/g, " ").replace(/\b\w/g, (letter) => letter.toUpperCase()) : "";
 
   return <div className={`taxonomy-page taxonomy-page--${level}`}>
-    <SEOHead title={pagedSeoTitleCore(seoCore, currentPage)} description={pagedSeoDescription(seoDescription, currentPage, totalPages)} category={name} resourceCount={listingData.totalAll} pageParam={currentPage} />
+    {/* LOCKSTEP: og-middleware marks a taxonomy page with nothing approved in it noindex, follow. */}
+    <SEOHead title={pagedSeoTitleCore(seoCore, currentPage)} description={pagedSeoDescription(seoDescription, currentPage, totalPages)} category={name} resourceCount={listingData.totalAll} pageParam={currentPage} noindex={listingData.totalAll === 0} follow={listingData.totalAll === 0} />
     {level === "category" ? <Button asChild variant="ghost" size="sm" className="taxonomy-back"><Link href="/"><ArrowLeft size={12} aria-hidden="true" />Browse</Link></Button> :
       <nav className="taxonomy-breadcrumbs" aria-label="Collection breadcrumb">
         <Link href="/">Home</Link><span aria-hidden="true">/</span>

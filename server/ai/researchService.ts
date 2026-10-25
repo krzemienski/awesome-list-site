@@ -1,6 +1,6 @@
 import { db } from '../db';
 import { resources, researchJobs, researchDiscoveries, agentEvents, categories, subcategories, subSubcategories } from '@shared/schema';
-import { and, eq, ne, or, sql, getTableColumns } from 'drizzle-orm';
+import { and, eq, inArray, ne, or, sql, getTableColumns } from 'drizzle-orm';
 import type { ResearchJob, ResearchDiscovery, DiscoveryVerification } from '@shared/schema';
 import { ensureSubSubcategoryExists, type SubSubcategoryTaxonomyAccess } from '../repositories/ensureSubSubcategory';
 import { transitionResourceInTransaction, withResourcePublication } from '../repositories/resourcePublication';
@@ -16,6 +16,13 @@ export class DiscoveryNotFoundError extends Error {
     this.name = "DiscoveryNotFoundError";
   }
 }
+/** A research run is already active on some worker; the start route maps it to 409. */
+export class ResearchJobActiveError extends Error {
+  constructor(jobId: number) {
+    super(`Research run #${jobId} is still running. Wait for it to finish or cancel it before starting another.`);
+    this.name = "ResearchJobActiveError";
+  }
+}
 export class DiscoveryConflictError extends Error {
   constructor(message = "Discovery has already been moderated") {
     super(message);
@@ -24,7 +31,7 @@ export class DiscoveryConflictError extends Error {
 }
 import { decodeHtmlEntities, decodeResourceTextFields } from '../github/importHygiene';
 import { runAgentQuery, agentUsageFromError, isBudgetCapStop, BUDGET_STOPPED_STATUS, type AgentDefinitionInput } from './runAgentQuery';
-import { startJobHeartbeat, WORKER_ID } from './jobLiveness';
+import { isJobOrphaned, livenessUnchangedSince, ORPHANED_BY_RESTART_MESSAGE, startJobHeartbeat, WORKER_ID } from './jobLiveness';
 import { validateBaseUrl, type AgentRunConfig } from './agentRuntime';
 import { KnownUrls, normalizeUrl, surfacedByScout } from './researchDedup';
 import { ResearchPhaseTracker, extractUrls } from './researchPhases';
@@ -1021,6 +1028,61 @@ class ResearchService {
     return { brief: sections.join('\n\n'), angle: angle.label };
   }
 
+  /**
+   * Admit at most ONE active research run across every instance. Concurrent
+   * starts serialize on a transaction-scoped advisory lock, so the second sees
+   * the first's committed row. An active row blocks admission unless its
+   * worker is provably gone (server/ai/jobLiveness.ts); such an orphan is
+   * reclaimed as 'failed' inside the same transaction, so a restart never
+   * leaves a window where starts 409 on a dead run.
+   */
+  private async admitResearchJob(values: Omit<typeof researchJobs.$inferInsert, 'workerId' | 'heartbeatAt'>): Promise<ResearchJob> {
+    return await db.transaction(async (tx) => {
+      await tx.execute(sql`SELECT pg_advisory_xact_lock(hashtext('research_job_admission'))`);
+      const activeRows = await tx
+        .select({
+          id: researchJobs.id,
+          status: researchJobs.status,
+          workerId: researchJobs.workerId,
+          heartbeatAt: researchJobs.heartbeatAt,
+          startedAt: researchJobs.startedAt,
+          createdAt: researchJobs.createdAt,
+        })
+        .from(researchJobs)
+        .where(inArray(researchJobs.status, ['pending', 'processing']));
+      const now = Date.now();
+      const live = activeRows.find((row) => !isJobOrphaned(row, this.activeJobs.has(row.id), now));
+      if (live) throw new ResearchJobActiveError(live.id);
+      for (const orphan of activeRows) {
+        const [reclaimed] = await tx
+          .update(researchJobs)
+          .set({ status: 'failed', errorMessage: ORPHANED_BY_RESTART_MESSAGE, completedAt: new Date() })
+          .where(and(
+            eq(researchJobs.id, orphan.id),
+            inArray(researchJobs.status, ['pending', 'processing']),
+            livenessUnchangedSince(researchJobs, orphan),
+          ))
+          .returning({ id: researchJobs.id });
+        if (reclaimed) {
+          logger.info(`🧹 Research admission reclaimed orphaned job #${orphan.id} (worker gone)`);
+          continue;
+        }
+        // No match: it finished meanwhile (fine), or its worker just
+        // heartbeated, which proves it alive, so it still blocks admission.
+        const [still] = await tx
+          .select({ id: researchJobs.id })
+          .from(researchJobs)
+          .where(and(eq(researchJobs.id, orphan.id), inArray(researchJobs.status, ['pending', 'processing'])));
+        if (still) throw new ResearchJobActiveError(orphan.id);
+      }
+      const [job] = await tx
+        .insert(researchJobs)
+        .values({ ...values, workerId: WORKER_ID, heartbeatAt: new Date() })
+        .returning();
+      return job;
+    });
+  }
+
   async startResearchJob(options: {
     prompt: string;
     categoryFocus?: string;
@@ -1042,7 +1104,7 @@ class ResearchService {
   }): Promise<number> {
     const resolved = options.resolvedConfig;
     if (!resolved.preflight.ok) throw new Error(researchPreflightMessage(resolved));
-    const [job] = await db.insert(researchJobs).values({
+    const job = await this.admitResearchJob({
       prompt: options.prompt,
       categoryFocus: options.categoryFocus || null,
       // NULL = unlimited (owner request July 24, 2026): no default caps.
@@ -1058,9 +1120,7 @@ class ResearchService {
       resolvedConfig: resolved,
       status: 'processing',
       startedAt: new Date(),
-      workerId: WORKER_ID,
-      heartbeatAt: new Date(),
-    }).returning();
+    });
 
     const abortController = new AbortController();
     this.activeJobs.set(job.id, { jobId: job.id, abortController });
