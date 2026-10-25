@@ -1282,12 +1282,12 @@ export default function ResourceManager({ createRequest = 0 }: { createRequest?:
           </form>
 
           {selectedResourceIds.length > 0 && (
-            <div className="flex items-center justify-between p-3 bg-[var(--surface-2)] border border-[var(--accent)]/30 rounded-lg">
-              <div className="flex items-center gap-3">
+            <div className="flex flex-wrap items-center justify-between gap-2 p-3 bg-[var(--surface-2)] border border-[var(--accent)]/30 rounded-lg">
+              <div className="flex flex-wrap items-center gap-3">
                 <span className="text-sm font-medium text-[var(--text)]">
                   {selectedResourceIds.length} {selectedResourceIds.length === 1 ? 'item' : 'items'} selected
                 </span>
-                <div className="flex gap-2">
+                <div className="flex flex-wrap gap-2">
                   <Button
                     size="sm"
                     variant="outline"
@@ -1538,7 +1538,7 @@ export default function ResourceManager({ createRequest = 0 }: { createRequest?:
                                 hand focus to the table that shows them. */}
                             <button
                               type="button"
-                              className="text-primary underline"
+                              className="min-h-6 text-primary underline"
                               onClick={() => {
                                 clearFilters();
                                 tableRegionRef.current?.focus();
