@@ -33,8 +33,8 @@ these in the **Secrets** pane instead of a file.
 | `WEBSITE_URL` | ❌ | `https://awesome.video` | `server/github/syncService.ts` |
 | `ANTHROPIC_BASE_URL` | ❌ (AI router) | – | `server/ai/anthropicConfig.ts` (all Claude calls + Agent SDK env) |
 | `ANTHROPIC_AUTH_TOKEN` | ❌ (with base URL) | – | `server/ai/anthropicConfig.ts` |
-| `ANTHROPIC_MODEL` | ❌ | sonnet tier | `server/ai/anthropicConfig.ts` (primary / orchestrator model) |
-| `ANTHROPIC_DEFAULT_{HAIKU,SONNET,OPUS,FABLE}_MODEL` | ❌ | first-party ids | `server/ai/anthropicConfig.ts` (tier → model id) |
+| `ANTHROPIC_MODEL` | ❌ (✅ for Researcher) | sonnet tier; none for Researcher | `server/ai/anthropicConfig.ts` (primary / orchestrator model), `server/ai/researchRunConfig.ts` |
+| `ANTHROPIC_DEFAULT_{HAIKU,SONNET,OPUS,FABLE}_MODEL` | ❌ (HAIKU ✅ for Researcher) | first-party ids; none for Researcher scouts | `server/ai/anthropicConfig.ts` (tier → model id), `server/ai/researchRunConfig.ts` |
 | `AI_INTEGRATIONS_ANTHROPIC_API_KEY` | ❌ (AI features) | – | `server/ai/anthropicConfig.ts` |
 | `AI_INTEGRATIONS_ANTHROPIC_BASE_URL` | ❌ | Anthropic default | `server/ai/anthropicConfig.ts` |
 | `ANTHROPIC_API_KEY` | ❌ (fallback) | – | `server/ai/anthropicConfig.ts` |
@@ -177,6 +177,30 @@ Model ids per tier (router ids look like `cc/claude-opus-5`); unset tiers use
 first-party ids. `ANTHROPIC_MODEL` is the primary model (Researcher
 orchestrator). Resolved in `server/ai/anthropicConfig.ts`.
 
+**Researcher runs have no fallbacks** (`server/ai/researchRunConfig.ts`).
+Unless an admin supplies a per-run override, a research launch requires
+`ANTHROPIC_BASE_URL`, `ANTHROPIC_AUTH_TOKEN`, `ANTHROPIC_MODEL` (orchestrator)
+and `ANTHROPIC_DEFAULT_HAIKU_MODEL` (scouts run on the `haiku` alias, which
+the Agent SDK maps through that variable). If one is missing, the launch is
+refused with `400 { code: "missing_env" }` naming the variable, and the
+Researcher launch dialog shows the same message. Check with
+`GET /api/researcher/config` (admin).
+
+Values in `.replit` `[userenv.shared]` (October 2026):
+`ANTHROPIC_BASE_URL=https://router.hack.ski`, `ANTHROPIC_MODEL=cc/claude-opus-5`,
+`ANTHROPIC_DEFAULT_OPUS_MODEL=cc/claude-opus-5`,
+`ANTHROPIC_DEFAULT_SONNET_MODEL=cc/claude-sonnet-5`,
+`ANTHROPIC_DEFAULT_HAIKU_MODEL=cc/claude-haiku-4-5-20251001`,
+`ANTHROPIC_DEFAULT_FABLE_MODEL=cc/claude-fable-5`. The token is a secret.
+
+Production, read-only (2026-10-25): the anonymous `GET https://awesome.video/api/health/ai`
+returns only `{"status":"healthy"}`, so it confirms that a credential resolved
+but not which endpoint or models. Only the owner can confirm the published
+values. Signed in as admin, `GET /api/health/ai` returns `config` (endpoint
+host and tier models), and after publishing `GET /api/researcher/config`
+shows the researcher preflight. Today that route returns 404 in production
+because it is not deployed yet.
+
 ### `AI_INTEGRATIONS_ANTHROPIC_API_KEY`
 Replit-managed Anthropic Claude key, used when no router is configured
 (`server/ai/anthropicConfig.ts`).
@@ -200,7 +224,8 @@ OpenAI key; also used in `server/config.ts` as the on/off flag for the
 
 ### `CONFIG_ENCRYPTION_KEY`
 Symmetric key used to encrypt/decrypt AI agent configuration secrets stored in
-the database (`server/ai/configCrypto.ts`).
+the database (`server/ai/configCrypto.ts`). Without it, any per-run override
+token is refused (400), so Researcher/Enrichment overrides cannot be used.
 
 ---
 

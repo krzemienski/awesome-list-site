@@ -827,6 +827,13 @@ function registerDocumentedHandlerQueries(): void {
     ["get", "/api/enrichment/jobs/:id/events", "AgentEventsQuery", {
       afterSeq: digits("Only events after this sequence number"),
     }],
+    ["get", "/api/researcher/config", "ResearcherConfigQuery", {
+      model: text("Preview an orchestrator model override"),
+      scoutModel: text("Preview a scout model override"),
+      baseUrl: text("Preview a base URL override (validated like POST /api/researcher/start)"),
+      hasAuthToken: z.literal("1").optional().describe("Preview as if an override auth token were supplied"),
+      allowInsecureHttp: z.literal("1").optional().describe("Preview with a plain-http override confirmed"),
+    }],
     ["get", "/api/researcher/jobs", "ResearcherJobsQuery", {
       limit: digits("Number of jobs (default 20, clamped to 1–200)"),
     }],

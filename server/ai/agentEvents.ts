@@ -30,7 +30,11 @@ export type AgentEventType =
   | "delegation"
   | "delegation_result"
   | "result"
-  | "error";
+  | "error"
+  // Researcher progress contract (shared/researcherContract.ts).
+  | "phase"
+  | "scout_start"
+  | "scout_end";
 
 export interface EmitInput {
   actor: string;

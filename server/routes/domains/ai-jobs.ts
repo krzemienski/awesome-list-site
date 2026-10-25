@@ -25,7 +25,9 @@ import { enrichmentService } from "../../ai/enrichmentService";
 import {
   parseAgentConfigFromRequest,
   stripJobAuthSecret,
+  validateBaseUrl,
 } from "../../ai/agentRuntime";
+import { researchPreflightMessage, resolveResearchRunConfig } from "../../ai/researchRunConfig";
 import type { EnrichmentRepository } from "../../repositories";
 import type { CategoryRepository } from "../../repositories";
 import type { ResourceRepository } from "../../repositories";
@@ -393,7 +395,7 @@ export function registerAiJobsRoutes(
       }
       // Stop-after-N target: omitted/blank => no target. Bounded to the
       // per-run discovery ceiling (1000) so a typo can't demand a month-long run.
-      const { targetDiscoveries, scoutModel } = req.body ?? {};
+      const { targetDiscoveries, scoutModel, allowInsecureHttp } = req.body ?? {};
       let target: number | null = null;
       if (targetDiscoveries !== undefined && targetDiscoveries !== null && String(targetDiscoveries).trim() !== '') {
         const n = Number(targetDiscoveries);
@@ -418,6 +420,25 @@ export function registerAiJobsRoutes(
         return res.status(400).json({ success: false, message: cfgErr.message || 'Invalid agent configuration' });
       }
 
+      // Strict resolution for the researcher: no fallback endpoint or model,
+      // and a plain-http override needs the explicit allowInsecureHttp flag.
+      const resolvedConfig = resolveResearchRunConfig({
+        model: agentConfig.model,
+        scoutModel: scout,
+        baseUrl: agentConfig.baseUrl,
+        hasAuthToken: !!agentConfig.authTokenEncrypted,
+        authTokenLast4: agentConfig.authTokenLast4,
+        allowInsecureHttp: allowInsecureHttp === true,
+      });
+      if (!resolvedConfig.preflight.ok) {
+        return res.status(400).json({
+          success: false,
+          code: resolvedConfig.preflight.issues[0].code,
+          message: researchPreflightMessage(resolvedConfig),
+          config: resolvedConfig,
+        });
+      }
+
       const userId = req.dbUser?.id;
       const jobId = await researchService.startResearchJob({
         prompt: effectivePrompt,
@@ -431,13 +452,46 @@ export function registerAiJobsRoutes(
         baseUrl: agentConfig.baseUrl,
         authTokenEncrypted: agentConfig.authTokenEncrypted,
         authTokenLast4: agentConfig.authTokenLast4,
+        resolvedConfig,
       });
 
-      res.json({ success: true, jobId, message: 'Research job started' });
+      res.json({ success: true, jobId, message: 'Research job started', config: resolvedConfig });
     } catch (error: any) {
       logger.error('Error starting research job:', error);
       res.status(500).json({ success: false, message: error.message || 'Failed to start research job' });
     }
+  }));
+
+  // Resolved run configuration BEFORE launch (endpoint host, credential
+  // source, orchestrator + scout model, override flags, preflight). Query
+  // params preview overrides exactly as POST /api/researcher/start would
+  // apply them; the token itself is never sent, only hasAuthToken=1.
+  app.get('/api/researcher/config', isAuthenticated, isAdmin, asyncHandler(async (req, res) => {
+    const q = req.query as Record<string, unknown>;
+    const str = (v: unknown) => (typeof v === 'string' && v.trim() ? v.trim().slice(0, 500) : null);
+    let baseUrl = str(q.baseUrl);
+    let baseUrlError: string | null = null;
+    if (baseUrl) {
+      try {
+        baseUrl = await validateBaseUrl(baseUrl);
+      } catch (e) {
+        baseUrlError = e instanceof Error ? e.message : 'Invalid base URL';
+        baseUrl = null;
+      }
+    }
+    const config = resolveResearchRunConfig({
+      model: str(q.model),
+      scoutModel: str(q.scoutModel),
+      baseUrl,
+      hasAuthToken: q.hasAuthToken === '1',
+      authTokenLast4: null,
+      allowInsecureHttp: q.allowInsecureHttp === '1',
+    });
+    if (baseUrlError) {
+      config.preflight.issues.unshift({ code: 'invalid_base_url', message: baseUrlError });
+      config.preflight.ok = false;
+    }
+    res.json({ success: true, config });
   }));
 
   // WS1 (July 30, 2026): preview the auto-generated research brief so the

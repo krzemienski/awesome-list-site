@@ -1,6 +1,9 @@
 import { query } from "@anthropic-ai/claude-agent-sdk";
 import { buildAgentEnv, validateBaseUrl, type AgentRunConfig } from "./agentRuntime";
 import { AgentEventEmitter } from "./agentEvents";
+import { DelegationTracker, type DelegationEvent } from "./delegationTracker";
+import { StreamedUsage, estimateUsageCost } from "./usageCost";
+import type { CostBasis } from "@shared/researcherContract";
 
 /**
  * Shared driver for both multi-agent flows (Researcher + Enrichment). It wraps
@@ -139,6 +142,10 @@ export interface RunAgentQueryParams {
   extraDisallowedTools?: string[];
   /** Optional mirror of human-readable lines into a legacy log sink (agentLog UI). */
   log?: (role: string, content: string) => void | Promise<void>;
+  /** Called once when each subagent delegation starts and once when it returns. */
+  onDelegation?: (e: DelegationEvent) => void | Promise<void>;
+  /** Most delegations allowed to run at once; extra calls are denied with a reason the model sees. */
+  maxConcurrentDelegations?: number | null;
 }
 
 export interface RunAgentQueryResult {
@@ -151,8 +158,11 @@ export interface RunAgentQueryResult {
   terminalReason?: string;
   resultText: string;
   totalCostUsd: number;
+  /** "reported" from the SDK result; estimated from streamed usage when no result arrived. */
+  costBasis: CostBasis;
   tokensIn: number;
   tokensOut: number;
+  /** SDK num_turns when a result arrived, else distinct API turns (message ids) seen in the stream. */
   numTurns: number;
   durationMs: number;
   webSearchCount: number;
@@ -165,6 +175,7 @@ export interface AgentRunUsage {
   tokensIn: number;
   tokensOut: number;
   totalCostUsd: number;
+  costBasis: CostBasis;
 }
 
 /** Usage attached to an error thrown by runAgentQuery, or null when none was observed. */
@@ -231,6 +242,8 @@ export async function runAgentQuery(params: RunAgentQueryParams): Promise<RunAge
     abortController,
     extraDisallowedTools = [],
     log,
+    onDelegation,
+    maxConcurrentDelegations = null,
   } = params;
 
   // Re-resolve any custom base URL at run start (not just at job-creation time)
@@ -259,6 +272,7 @@ export async function runAgentQuery(params: RunAgentQueryParams): Promise<RunAge
     aborted: false,
     resultText: "",
     totalCostUsd: 0,
+    costBasis: "reported",
     tokensIn: 0,
     tokensOut: 0,
     numTurns: 0,
@@ -333,9 +347,31 @@ export async function runAgentQuery(params: RunAgentQueryParams): Promise<RunAge
   // Usage observed on streamed assistant messages (deduped by message id).
   // A cancelled run never receives the SDK's final result message, so these
   // running totals are the only record of what the run already consumed.
-  let observedTokensIn = 0;
-  let observedTokensOut = 0;
+  // Usage observed on the stream, per API message. A cancelled run never
+  // receives the SDK's final result message, so this is the only record of
+  // what it already consumed (turns, tokens, an estimated cost).
+  const streamed = new StreamedUsage();
   let sawResultMessage = false;
+  const applyStreamedUsage = () => {
+    const t = streamed.totals();
+    const estimate = estimateUsageCost(t.byModel);
+    result.numTurns = t.turns;
+    result.tokensIn = t.inputTokens;
+    result.tokensOut = t.outputTokens;
+    result.totalCostUsd = estimate.usd;
+    result.costBasis = estimate.basis;
+    return estimate;
+  };
+
+  const delegations = new DelegationTracker(maxConcurrentDelegations);
+  const notifyDelegation = async (e: DelegationEvent | null) => {
+    if (!e || !onDelegation) return;
+    try {
+      await onDelegation(e);
+    } catch {
+      /* observers must never break the run */
+    }
+  };
 
   // ── Task attribution: map task_id → actor name so task_updated /
   // task_notification events resolve the real subagent name instead of null.
@@ -355,6 +391,7 @@ export async function runAgentQuery(params: RunAgentQueryParams): Promise<RunAge
       ...(maxTurns != null ? { maxTurns } : {}),
       ...(maxBudgetUsd != null ? { maxBudgetUsd } : {}),
       abortController,
+      includePartialMessages: true,
       permissionMode: "bypassPermissions",
       settingSources: [],
       mcpServers: mcpServers as any,
@@ -381,6 +418,18 @@ export async function runAgentQuery(params: RunAgentQueryParams): Promise<RunAge
                   input?.hook_event_name === "PreToolUse" &&
                   DELEGATION_TOOL_NAMES.has(input.tool_name)
                 ) {
+                  const hookToolUseId = (input as { tool_use_id?: unknown }).tool_use_id;
+                  if (typeof hookToolUseId === "string" && !delegations.admit(hookToolUseId)) {
+                    return {
+                      continue: true,
+                      hookSpecificOutput: {
+                        hookEventName: "PreToolUse" as const,
+                        permissionDecision: "deny" as const,
+                        permissionDecisionReason:
+                          `At most ${delegations.cap} subagents may run at once. Wait for a running one to report back, then delegate again.`,
+                      },
+                    };
+                  }
                   const raw: Record<string, unknown> =
                     typeof input.tool_input === "object" && input.tool_input !== null
                       ? (input.tool_input as Record<string, unknown>)
@@ -471,6 +520,7 @@ export async function runAgentQuery(params: RunAgentQueryParams): Promise<RunAge
             }
 
             const isStart = msg.subtype === "task_started";
+            if (isStart) await notifyDelegation(delegations.taskStarted(msg as Parameters<DelegationTracker["taskStarted"]>[0]));
             // A task_notification arriving after we already emitted delegation_result
             // for this task_id is a duplicate placeholder — suppress it.
             const isDuplicateResult =
@@ -535,9 +585,9 @@ export async function runAgentQuery(params: RunAgentQueryParams): Promise<RunAge
           const cacheCreation = usage?.cache_creation_input_tokens ?? 0;
           const rawIn = usage?.input_tokens ?? null;
           const totalTokensIn = rawIn !== null ? rawIn + cacheRead + cacheCreation : null;
-          if (!usageAlreadyCounted) {
-            observedTokensIn += rawIn ?? 0;
-            observedTokensOut += usage?.output_tokens ?? 0;
+          if (apiMessageId !== null && usage) {
+            const view = msg as { message?: { model?: string; usage: Parameters<StreamedUsage["noteAssistant"]>[2] } };
+            streamed.noteAssistant(apiMessageId, view.message?.model ?? model, view.message!.usage);
           }
 
           await emitter.emit({
@@ -572,7 +622,12 @@ export async function runAgentQuery(params: RunAgentQueryParams): Promise<RunAge
 
           for (const tb of toolUseBlocks) {
             const name: string = tb.name;
-            if (name === "WebSearch") result.webSearchCount++;
+            if (name === "WebSearch") {
+              result.webSearchCount++;
+              delegations.noteSubagentWebSearch((msg as { parent_tool_use_id?: string | null }).parent_tool_use_id);
+            }
+            const block = tb as { id?: string; input?: unknown };
+            if (DELEGATION_TOOL_NAMES.has(name) && block.id) delegations.noteToolUse(block.id, block.input);
 
             // Circuit breaker (stall arm): register the in-flight call, then
             // abort only if a large backlog of calls has gone completely
@@ -617,17 +672,18 @@ export async function runAgentQuery(params: RunAgentQueryParams): Promise<RunAge
           const userBlocks: any[] = Array.isArray(msg.message?.content) ? msg.message.content : [];
           for (const ub of userBlocks) {
             if (ub?.type !== "tool_result" || !ub.tool_use_id) continue;
+            const text: string = typeof ub.content === "string"
+              ? ub.content
+              : Array.isArray(ub.content)
+                ? ub.content.filter((c: any) => c?.type === "text").map((c: any) => c.text).join("\n")
+                : "";
+            const resultBlock = ub as { tool_use_id: string; is_error?: boolean };
+            await notifyDelegation(delegations.toolResult(String(resultBlock.tool_use_id), resultBlock.is_error === true, text));
             const pending = pendingMcpCalls.get(String(ub.tool_use_id));
             if (!pending) continue;
             const toolName = pending.name;
             pendingMcpCalls.delete(String(ub.tool_use_id));
             lastMcpResultAt = Date.now();
-
-            const text = typeof ub.content === "string"
-              ? ub.content
-              : Array.isArray(ub.content)
-                ? ub.content.filter((c: any) => c?.type === "text").map((c: any) => c.text).join("\n")
-                : "";
             const shortName = toolName.replace(/^mcp__[^_]+(?:__)?/, "") || toolName;
 
             if (ub.is_error === true) {
@@ -702,6 +758,14 @@ export async function runAgentQuery(params: RunAgentQueryParams): Promise<RunAge
           break;
         }
 
+        case "stream_event": {
+          // Partial events exist only for usage: message_delta carries the
+          // final output token count the assistant messages lack.
+          const partial = msg as { event?: Parameters<StreamedUsage["noteStreamEvent"]>[1]; parent_tool_use_id?: string | null };
+          if (partial.event) streamed.noteStreamEvent(partial.parent_tool_use_id ?? null, partial.event, model);
+          break;
+        }
+
         case "result": {
           result.subtype = msg.subtype;
           // SDK 0.3.220: results carry an optional fine-grained terminal_reason
@@ -713,6 +777,7 @@ export async function runAgentQuery(params: RunAgentQueryParams): Promise<RunAge
           terminalSdkError = msg.is_error === true;
           sawResultMessage = true;
           result.totalCostUsd = typeof msg.total_cost_usd === "number" ? msg.total_cost_usd : 0;
+          result.costBasis = "reported";
           result.tokensIn = msg.usage?.input_tokens ?? 0;
           result.tokensOut = msg.usage?.output_tokens ?? 0;
           result.numTurns = msg.num_turns ?? 0;
@@ -767,6 +832,13 @@ export async function runAgentQuery(params: RunAgentQueryParams): Promise<RunAge
               num_turns: result.numTurns,
               duration_api_ms: msg.duration_api_ms,
               is_error: msg.is_error,
+              // What an abort at this point would have recorded, next to the
+              // reported values, so the stream-based estimate can be checked.
+              streamed: (() => {
+                const t = streamed.totals();
+                const e = estimateUsageCost(t.byModel);
+                return { turns: t.turns, tokens_in: t.inputTokens, tokens_out: t.outputTokens, cost_usd: Number(e.usd.toFixed(4)), cost_basis: e.basis };
+              })(),
             },
           });
           break;
@@ -795,18 +867,26 @@ export async function runAgentQuery(params: RunAgentQueryParams): Promise<RunAge
       // Persisted side-effects already survived; treat as a clean stop.
       result.aborted = true;
       result.subtype = result.subtype || "cancelled";
-      if (!sawResultMessage) {
-        result.tokensIn = observedTokensIn;
-        result.tokensOut = observedTokensOut;
-      }
+      // No result message after an abort: turns, tokens and cost come from the stream.
+      const estimate = sawResultMessage ? null : applyStreamedUsage();
+      const usageNote = `${result.numTurns} turns, $${result.totalCostUsd.toFixed(4)} ${result.costBasis}`;
       await emitter.emit({
         actor: "orchestrator",
         actorType: "system",
         eventType: "lifecycle",
-        summary: "Run cancelled by user",
-        detail: { reason: "aborted" },
+        summary: `Run aborted (${usageNote})`,
+        costUsd: result.totalCostUsd.toFixed(4),
+        tokensIn: result.tokensIn,
+        tokensOut: result.tokensOut,
+        detail: {
+          reason: "aborted",
+          num_turns: result.numTurns,
+          cost_basis: result.costBasis,
+          unpriced_models: estimate?.unpricedModels ?? [],
+          delegations_in_flight: delegations.inFlight,
+        },
       });
-      await mirror("system", "Run cancelled by user");
+      await mirror("system", `Run aborted (${usageNote})`);
     } else if (!terminalSdkError && (isNativeCapSubtype(result.subtype) || isBudget || isTurns)) {
       // Native cap hit: the SDK emits a result message with an `error_max_*`
       // subtype AND THEN throws. Hitting a configured budget/turn cap is a
@@ -833,11 +913,13 @@ export async function runAgentQuery(params: RunAgentQueryParams): Promise<RunAge
         // budget-cap stop (isBudgetCapStop) from a genuine failure.
         if (result.subtype) (err as { agentSubtype?: string }).agentSubtype = result.subtype;
         if (result.terminalReason) (err as { agentTerminalReason?: string }).agentTerminalReason = result.terminalReason;
+        if (!sawResultMessage) applyStreamedUsage();
         (err as { agentUsage?: AgentRunUsage }).agentUsage = {
           numTurns: result.numTurns,
-          tokensIn: sawResultMessage ? result.tokensIn : observedTokensIn,
-          tokensOut: sawResultMessage ? result.tokensOut : observedTokensOut,
+          tokensIn: result.tokensIn,
+          tokensOut: result.tokensOut,
           totalCostUsd: result.totalCostUsd,
+          costBasis: result.costBasis,
         };
       }
       throw err;

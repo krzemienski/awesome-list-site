@@ -1,13 +1,7 @@
 import dns from "dns/promises";
 import { safeFetch, isPublicAddress } from "./safeFetch";
 import { decryptAuthToken, encryptAuthToken, isConfigEncryptionAvailable } from "./configCrypto";
-import {
-  FLOW_TIERS,
-  resolveAnthropicCredentials,
-  resolveFlowModel,
-  resolveTierModel,
-  subagentModelForTier,
-} from "./anthropicConfig";
+import { resolveAnthropicCredentials, resolveFlowModel } from "./anthropicConfig";
 
 /**
  * Shared runtime helpers for the Claude Agent SDK multi-agent flows (Researcher + Enrichment):
@@ -23,25 +17,12 @@ export interface AgentRunConfig {
 }
 
 /**
- * Default models for each flow when no per-run override is supplied. Resolved
- * from the shared config at call time (ANTHROPIC_MODEL / ANTHROPIC_DEFAULT_*)
- * so the agents follow the same endpoint + model mapping as every other call.
+ * Default model for the enrichment flow when no per-run override is supplied,
+ * resolved from the shared config at call time (ANTHROPIC_DEFAULT_*). The
+ * Researcher resolves its models strictly instead — see researchRunConfig.ts.
  */
-export function defaultResearchModel(): string {
-  return resolveFlowModel("researchOrchestrator");
-}
 export function defaultEnrichmentModel(): string {
   return resolveFlowModel("enrichment");
-}
-/**
- * Default scout SUBAGENT model. Subagents receive the tier ALIAS (the CLI
- * maps it through ANTHROPIC_DEFAULT_<TIER>_MODEL) because a literal custom id
- * would be rejected by the CLI's per-agent model allowlist and silently
- * swapped — see anthropicConfig.subagentModelForTier.
- */
-export function defaultScoutModel(): { value: string; resolved: string } {
-  const tier = FLOW_TIERS.researchScout;
-  return { value: subagentModelForTier(tier), resolved: resolveTierModel(tier) };
 }
 
 /**

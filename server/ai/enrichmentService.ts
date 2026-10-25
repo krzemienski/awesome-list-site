@@ -131,6 +131,8 @@ interface EnrichmentRunTotals {
   tokensOut: number;
   turns: number;
   batches: number;
+  /** A batch ended without an SDK result, so part of costUsd is estimated from streamed usage. */
+  costEstimated?: boolean;
 }
 
 export class EnrichmentService {
@@ -350,6 +352,7 @@ export class EnrichmentService {
         totals.tokensIn += usage.tokensIn;
         totals.tokensOut += usage.tokensOut;
         totals.costUsd += usage.totalCostUsd;
+        if (usage.costBasis !== 'reported') totals.costEstimated = true;
       }
       const cur = await this.enrichmentRepo.getEnrichmentJob(jobId);
       agentLog.push({ role: 'error', content: `Job failed: ${error.message}`, timestamp: new Date().toISOString() });
@@ -403,6 +406,7 @@ export class EnrichmentService {
         totalInputTokens: totals.tokensIn,
         totalOutputTokens: totals.tokensOut,
         estimatedCostUsd: totals.costUsd.toFixed(4),
+        costBasis: totals.costEstimated ? 'lower_bound' : 'reported',
       },
       // Keep only the most recent lines; agent_events holds the full structured trace.
       agentLog: agentLog.slice(-100),
@@ -689,6 +693,7 @@ ${taxonomyHint}`;
     totals.tokensIn += result.tokensIn;
     totals.tokensOut += result.tokensOut;
     totals.costUsd += result.totalCostUsd;
+    if (result.costBasis !== 'reported') totals.costEstimated = true;
 
     const submitted = batch.filter(b => b.submitted).length;
     await addLog('system', `Batch ${result.aborted ? 'cancelled' : (result.subtype || 'done')}: ${submitted}/${items} enriched, turns ${result.numTurns}, cost $${result.totalCostUsd.toFixed(4)}`);
