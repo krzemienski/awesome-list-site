@@ -384,6 +384,34 @@ optional integration values in Secrets.
 - **Can't access the admin panel** — sign in via Clerk, then confirm your user
   row has `role = 'admin'` in the database (password login was removed).
 
+## Dependency refresh 2026-10-25
+
+`npm update` took every dependency to the newest version its existing
+`package.json` range allows. No range changed. Majors stayed out of scope.
+Release notes were read for each runtime package between the old and the new
+version. GH = github.com.
+
+| Package | From → to | Release notes read | Effect on our code | Action |
+|---|---|---|---|---|
+| @radix-ui/react-tabs (+ roving-focus) | 1.1.17 → 1.2.1 | GH radix-ui/primitives `packages/react/tabs/CHANGELOG.md` (1.2.0, commit 82301b2c9) | A trigger now calls `focus()` on mousedown before activating. In automatic mode that focus also activates it, so one click called `onValueChange` twice. `/advanced` sent `tool_tab_opened` twice per click. | Fixed in `client/src/components/ui/tabs.tsx`: a repeat of the same value in the same task is dropped. One event per click after the fix. |
+| zod | 4.4.3 → 4.6.7 | GH colinhacks/zod releases v4.5.0–v4.6.7; GHSA-mrhx-c7xc-m3w5 | Fixes a HIGH advisory (memory exhaustion from large arrays). `.nullable()` now becomes `type: [T, "null"]` in JSON Schema, which changes the tool schema `zodOutputFormat` builds at `server/ai/anthropicConfig.ts:313`. `.min`/`.max` now count code points. | Ran one real `/api/claude/analyze` call: 200, structured output parsed. Form messages are custom strings, so their wording is unchanged. |
+| @clerk/react, @clerk/shared, @clerk/express | 6.14.1 → 6.18.1, 4.28.1 → 4.41.1, 2.1.55 → 2.1.83 | GH clerk/javascript `packages/{react,shared,express,backend}/CHANGELOG.md` | Passkey second factor (opt-in from the dashboard). `ClerkProvider` always supplies a router; we pass our own (`ClerkRuntime.tsx:157`). The backend rejects JWT-template tokens where a session token is expected; we only use session tokens. | None. Sign-in and sign-out driven in the browser. |
+| posthog-js | 1.409.4 → 1.438.21 | GH PostHog/posthog-js `packages/browser/CHANGELOG.md` | INP/LCP attribution is now on by default. Replay is held until the first interaction. `reset()` warns about `opt_out_capturing_by_default`. We pin `defaults:'2025-05-24'` (`analytics-sdk-options.ts:65`), so the new defaults don't apply. | None. PostHog sends nothing from automation browsers. |
+| mixpanel-browser | 2.81.0 → 2.84.0 | `node_modules/mixpanel-browser/CHANGELOG.md` | Adds an opt-in `hooks.on_track`. The opt-out flag is now honoured when it falls back to a cookie. | None. The `/track` body matches the old version, `surface` included. |
+| @amplitude/unified (+ analytics-browser 2.48.1, analytics-core 2.61.0, session replay 1.51.5) | 1.1.28 → 1.1.43 | GH amplitude/Amplitude-TypeScript per-package `CHANGELOG.md` | Events with an empty type are dropped. Autocapture sees shadow DOM. Replay start/stop APIs. | None. `/2/httpapi` returns 200. |
+| @tanstack/react-query | 5.101.2 → 5.104.5 | GH TanStack/query releases | `fetchQuery` is deprecated in favour of `query()` (we call it at `client/src/lib/legacy-readme-anchor.ts:64`). Defaults unchanged. | None now; migrate later. |
+| react-hook-form, @hookform/resolvers | 7.81.0 → 7.91.0, 5.4.0 → 5.9.2 | GH react-hook-form releases; GH react-hook-form/resolvers releases | Bug fixes: `isSubmitting` no longer sticks; Zod v4 union and locale fixes. | None. `/submit` validation driven in the browser. |
+| wouter | 3.10.0 → 3.13.0 | GH molefrog/wouter releases v3.11.0–v3.13.0 | Location subscribers are notified in one batch on popstate (#556), so `<Switch>` no longer re-renders the old route first. `useSearch`/`useLocation` unchanged. | None. Back steps through tab history once per entry. |
+| other Radix (dialog, alert-dialog, dropdown-menu, select, popover, toast, tooltip, scroll-area, checkbox, switch, radio-group, slot, …) | minor bumps, e.g. dialog 1.1.19 → 1.3.1, select 2.3.3 → 2.4.1 | GH radix-ui/primitives `packages/react/<pkg>/CHANGELOG.md` | Fixes for nested non-modal layers; programmatic form changes no longer fire a bubbling `click`. Components no longer set `displayName`, so our wrappers copy `undefined` (only affects React DevTools names). All `--radix-*` CSS vars are still present. | None. Dialog focus trap, pointer lock, focus return, menu and select driven in the browser. |
+| web-vitals | 6.2.1 → 6.2.3 | GH GoogleChrome/web-vitals `CHANGELOG.md` | INP memory-leak and LCP attribution fixes. | None |
+| tailwindcss, @tailwindcss/vite, @tailwindcss/postcss | 4.3.2 → 4.3.3 | GH tailwindlabs/tailwindcss release v4.3.3 | The default sans stack changed; we override `--font-sans`. | None |
+| openai, @modelcontextprotocol/sdk, ws, unist-util-visit, @replit/connectors-sdk | 6.46.0 → 6.49.0, 1.32.1 → 1.32.2, 8.21.0 → 8.22.0, 5.1.0 → 5.2.0, 0.4.1 → 0.4.3 | `openai` `CHANGELOG.md`; GH release pages; connectors-sdk npm tarball diff | Additive changes only. connectors-sdk takes the identity token from the local Replit endpoint on deployments. | None locally. Email and GitHub sync need a check on the published site. |
+| tsx, input-otp, autoprefixer, postcss, typescript-eslint, prettier, playwright, wrangler | patch or dev-only bumps | Each project's releases or `CHANGELOG.md` | input-otp is not imported. Wrangler 4.152.0 still pins undici 7.29.1 (GHSA-xjj6-f33q-929c, HIGH, dev-only). | None |
+
+The lockfile keeps Replit's `package-firewall.replit.internal` URL for every
+entry whose version did not change. Changed entries resolve from
+registry.npmjs.org.
+
 ## See also
 
 - [SETUP.md](./SETUP.md) — development setup
