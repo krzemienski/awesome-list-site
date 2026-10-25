@@ -25,6 +25,10 @@ export function writeFilterParams(
   mode: "push" | "replace" = "push",
 ): void {
   const params = new URLSearchParams(window.location.search);
+  // `tag` is the legacy spelling of `tags` that old shared links still carry;
+  // readers merge both, so any write of `tags` must also retire `tag` or a
+  // removed tag comes back on reload, Back or share.
+  if ("tags" in updates) params.delete("tag");
   for (const [key, value] of Object.entries(updates)) {
     if (value == null || value === "") params.delete(key);
     else params.set(key, value);
