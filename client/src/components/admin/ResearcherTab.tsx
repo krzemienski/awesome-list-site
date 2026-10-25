@@ -316,6 +316,17 @@ export default function ResearcherTab({ initialTab = "review" }: ResearcherTabPr
     if (activeJob) setFollowJobId(activeJob.id);
   }, [activeJobStateKnown, activeJob]);
 
+  // The ?jobId= deep link names the run being followed; once the view
+  // follows another run or none, drop it so a reload or a shared link does
+  // not reopen the old run.
+  useEffect(() => {
+    const url = new URL(window.location.href);
+    const linked = url.searchParams.get("jobId");
+    if (linked === null || Number(linked) === followJobId || !url.pathname.startsWith("/admin")) return;
+    url.searchParams.delete("jobId");
+    window.history.replaceState(window.history.state, "", url.pathname + url.search + url.hash);
+  }, [followJobId]);
+
   useEffect(() => {
     if (!pendingGuideFocus || followJobId !== null) return;
     setPendingGuideFocus(false);

@@ -78,10 +78,12 @@ export function ResearchRunView({ jobId, focusOnMount, onStartNew, onRelaunchHig
   // The run keeps writing for a moment after its status leaves "processing"
   // (aborted scouts' scout_end, the finishing event, final usage), so polling
   // continues until the finishing event arrives — at most SETTLE_MS.
+  // Nothing polls until the job itself has loaded: a deep link to a missing
+  // or failing job is answered once and then waits for Retry.
   const [settleExpired, setSettleExpired] = useState(false);
   const [finished, setFinished] = useState(false);
   const pollingOf = (status: string | undefined) =>
-    !status || isActiveJobStatus(status) || (!finished && !settleExpired);
+    status !== undefined && (isActiveJobStatus(status) || (!finished && !settleExpired));
 
   const jobQuery = useQuery<JobWithLiveness>({
     queryKey: ["/api/researcher/jobs", jobId],
@@ -138,11 +140,12 @@ export function ResearchRunView({ jobId, focusOnMount, onStartNew, onRelaunchHig
     return () => cancelAnimationFrame(id);
   }, [focusOnMount]);
 
+  const running = !!job && active;
   useEffect(() => {
-    if (!active) return;
+    if (!running) return;
     const id = window.setInterval(() => setNow(Date.now()), 1000);
     return () => window.clearInterval(id);
-  }, [active]);
+  }, [running]);
 
   // Announcements: one polite region, fed by phase, discovery and ending
   // changes. The first render only records the starting point.
@@ -226,8 +229,22 @@ export function ResearchRunView({ jobId, focusOnMount, onStartNew, onRelaunchHig
         </p>
 
         {jobQuery.isError && !job && (
-          <AdminLoadError subject={`run #${jobId}`} error={jobQuery.error} onRetry={() => { void jobQuery.refetch(); }}
-            retrying={jobQuery.isFetching} testId="error-research-run" retryTestId="button-retry-research-run" />
+          <div className="space-y-2">
+            {jobQuery.error instanceof ApiError && jobQuery.error.status === 404 ? (
+              <Alert variant="destructive" data-testid="error-research-run-missing">
+                <AlertCircle className="h-4 w-4" />
+                <AlertDescription>
+                  There is no research run #{jobId}. It may have been deleted, or the link has the wrong run number.
+                </AlertDescription>
+              </Alert>
+            ) : (
+              <AdminLoadError subject={`run #${jobId}`} error={jobQuery.error} onRetry={() => { void jobQuery.refetch(); }}
+                retrying={jobQuery.isFetching} testId="error-research-run" retryTestId="button-retry-research-run" />
+            )}
+            <Button size="sm" variant="outline" className="min-h-11" onClick={onStartNew} data-testid="button-start-new-run">
+              <Play className="mr-1 h-3 w-3" />Start another run
+            </Button>
+          </div>
         )}
         {pollTrouble && (
           <p className="text-xs text-muted-foreground" role="status" data-testid="text-run-poll-trouble">

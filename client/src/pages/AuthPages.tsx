@@ -5,6 +5,7 @@
  */
 import { useEffect, useLayoutEffect, useState } from "react";
 import { SignIn, SignUp } from "@clerk/react";
+import { useLocation, useSearch } from "wouter";
 import { foldInheritedHashIntoRedirect, sanitizeRedirectParam } from "@/lib/returnUrl";
 import { ClerkSlot } from "@/lib/clerk-bridge";
 import { clearSignedInClientState, signOutAndVerify } from "@/hooks/useAuth";
@@ -25,9 +26,15 @@ export function SignInPage() {
   // Both rewrite history, which wouter broadcasts to every location
   // subscriber, so they run in a layout effect (not during render) and the
   // sign-in form mounts only after they have, still before first paint.
+  // The sanitizer runs again on every in-app navigation that changes this URL
+  // (e.g. /sign-in → /sign-in?redirect_url=…), because the page stays mounted.
+  const [location] = useLocation();
+  const search = useSearch();
   const [urlReady, setUrlReady] = useState(false);
   useLayoutEffect(() => {
     sanitizeRedirectParam();
+  }, [location, search]);
+  useLayoutEffect(() => {
     foldInheritedHashIntoRedirect();
     setUrlReady(true);
   }, []);

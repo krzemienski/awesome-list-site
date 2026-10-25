@@ -586,7 +586,7 @@ export default function Bookmarks() {
                     <span className="shrink-0">{collection.itemCount}</span>
                   </span>
                 </button>
-                {collections.length > 1 && <div className="flex" aria-label={`Reorder ${collection.name}`} data-reorder-collection={collection.id}>
+                {collections.length > 1 && <div className="flex" role="group" aria-label={`Reorder ${collection.name}`} data-reorder-collection={collection.id}>
                   <Button
                     type="button"
                     variant="ghost"
@@ -657,6 +657,7 @@ export default function Bookmarks() {
                   {collections.length > 1 && (
                     <div
                       className="flex gap-2 lg:hidden"
+                      role="group"
                       aria-label={`Reorder ${selectedCollection.name}`}
                       data-reorder-collection={selectedCollection.id}
                     >
