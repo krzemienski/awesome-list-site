@@ -28,6 +28,10 @@ let sdkOptions: typeof import('./analytics-sdk-options') | null = null;
 let initStarted = false;
 let disabled = false;
 
+// Events accepted before the SDK is ready (init under way, or consent already
+// granted and the post-paint init not started yet). Flushed once the SDK
+// loads; cleared on revoke.
+const MAX_PENDING_EVENTS = 100;
 let pending: Array<{ name: string; props: Record<string, unknown> }> = [];
 
 // Idempotent, consent-gated init. Called at module load from main.tsx and by
@@ -112,15 +116,19 @@ const safePath = (): string | undefined =>
 // the SDK itself.
 export const phCapture = (name: string, props: Record<string, unknown> = {}) => {
   if (disabled) return;
-  if (!ph) {
-    if (initStarted) pending.push({ name, props });
-    return;
-  }
+  // Page context is read now, so a buffered event keeps the page it fired on.
   const merged: Record<string, unknown> = {
     platform: 'web',
     page_path: safePath(),
     ...props,
   };
+  if (!ph) {
+    // Never buffer before consent, after Decline, or while suppressed.
+    if (vendorSdksAllowed() && pending.length < MAX_PENDING_EVENTS) {
+      pending.push({ name, props: merged });
+    }
+    return;
+  }
   try {
     ph.capture(name, merged);
   } catch {

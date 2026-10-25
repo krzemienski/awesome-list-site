@@ -77,9 +77,15 @@ typed helper (analytics.ts: trackSearch, trackJourneyStart, …)
   it is `granted`; Replit Analytics receives them while it is unset or
   granted. The dispatcher re-checks before sending (events queued while its
   chunk loads are dropped on Decline). Each
-  vendor half then applies its own gate: pre-SDK buffering only while a
-  consented init is under way, and a revoke kill switch that clears its buffer
-  (`optOutGA` / `optOutMixpanel` / `optOutPostHog` / `optOutAmplitude`).
+  vendor half then applies its own gate: a pre-SDK buffer (at most 100
+  events) that holds an event only while `vendorSdksAllowed()` is true (a
+  grant and not suppressed) and the SDK is not ready yet, and a revoke kill
+  switch that clears it (`optOutGA` / `optOutMixpanel` / `optOutPostHog` /
+  `optOutAmplitude`). The buffer also covers the gap before init starts: with
+  a stored grant, `page_viewed` fires when React mounts, while `main.tsx`
+  starts the SDKs only after first paint. The buffer is flushed once each SDK
+  is ready. Page context (`page_path`, Mixpanel's `$current_url`) is read when
+  the event fires, not at flush time.
 - **Admin sessions and QA paths send nothing** (see
   [Admin sessions and QA paths](#admin-sessions-and-qa-paths)): `track()`
   returns first thing, so the dispatcher chunk is never even fetched.
