@@ -4,9 +4,11 @@ import { whenClerkLoaded } from '@/lib/clerk-bridge';
 import { queryClient, ApiError, renewSessionToken } from '@/lib/queryClient';
 import { notifyCrossTabSync } from '@/lib/crossTabSync';
 import { safeRemoveItem } from '@/lib/safeStorage';
-import { mpIdentify, mpReset } from '@/lib/mixpanel';
-import { phIdentify, phReset } from '@/lib/posthog';
-import { trackLoggedOut } from '@/lib/analytics';
+import { mpIdentify, mpReset, optOutMixpanel } from '@/lib/mixpanel';
+import { phIdentify, phReset, optOutPosthog } from '@/lib/posthog';
+import { optOutAmplitude } from '@/lib/amplitude';
+import { optOutGA, trackLoggedOut } from '@/lib/analytics';
+import { setAdminAnalyticsSession } from '@/lib/analytics-suppression';
 import { useToast } from '@/hooks/use-toast';
 
 /**
@@ -18,7 +20,26 @@ export function clearSignedInClientState(): void {
   safeRemoveItem('submit-resource-draft');
   mpReset();
   phReset();
+  // Every sign-out path ends with a full reload, so a visitor's analytics
+  // start again on the next page.
+  setAdminAnalyticsSession(false);
   notifyCrossTabSync();
+}
+
+/**
+ * Admin sessions send nothing to any analytics tool. The marker makes the
+ * next load quiet before auth resolves; when it is newly set here, SDKs that
+ * already started under a visitor's grant are stopped.
+ */
+function syncAdminAnalytics(role: string | undefined): boolean {
+  const isAdmin = role === 'admin';
+  if (setAdminAnalyticsSession(isAdmin) && isAdmin) {
+    optOutGA();
+    optOutMixpanel();
+    optOutPosthog();
+    optOutAmplitude();
+  }
+  return isAdmin;
 }
 
 interface User {
@@ -94,7 +115,7 @@ export function useAuth() {
   // harmless. Reset lives in the logout mutation below.
   const authedUser = data?.user ?? null;
   useEffect(() => {
-    if (authedUser?.id) {
+    if (authedUser?.id && !syncAdminAnalytics(authedUser.role)) {
       const identity = {
         id: authedUser.id,
         name: authedUser.name,
@@ -106,7 +127,7 @@ export function useAuth() {
       phIdentify(identity);
     }
     // Identify once per signed-in user id (session start/restore), not on
-    // every profile-field refetch.
+    // every profile-field refetch. Admins are never identified.
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [authedUser?.id]);
 

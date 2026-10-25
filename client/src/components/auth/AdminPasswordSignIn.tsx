@@ -3,6 +3,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { requestedReturnPath } from "@/lib/returnUrl";
+import { setAdminAnalyticsSession } from "@/lib/analytics-suppression";
 
 /**
  * Owner password sign-in, shown on /sign-in?admin. Posts to
@@ -27,6 +28,9 @@ export function AdminPasswordSignIn() {
         body: JSON.stringify({ password }),
       });
       if (response.ok) {
+        // The owner is an admin: keep the next page out of analytics before
+        // its auth check answers.
+        setAdminAnalyticsSession(true);
         // Full reload so every cached signed-out query is discarded. Honor a
         // validated same-origin redirect_url (incl. #tab), else the dashboard.
         window.location.href = requestedReturnPath() ?? "/admin";

@@ -80,6 +80,9 @@ typed helper (analytics.ts: trackSearch, trackJourneyStart, …)
   vendor half then applies its own gate: pre-SDK buffering only while a
   consented init is under way, and a revoke kill switch that clears its buffer
   (`optOutGA` / `optOutMixpanel` / `optOutPostHog` / `optOutAmplitude`).
+- **Admin sessions and QA paths send nothing** (see
+  [Admin sessions and QA paths](#admin-sessions-and-qa-paths)): `track()`
+  returns first thing, so the dispatcher chunk is never even fetched.
 - **Stays out of the entry bundle.** The dispatcher and the hygiene
   rules are a separate chunk, imported on the first event (keep
   it out of the entry closure). Once loaded, dispatch
@@ -229,6 +232,70 @@ adds the script, a website id or an env var for it, and `script-src` /
   The consent banner does not name Replit Analytics: it lists only the tools
   the banner switches on.
 
+### Admin sessions and QA paths
+
+Signed-in admin sessions and known QA/test paths send nothing to Replit
+Analytics, GA4, Mixpanel, PostHog or Amplitude. Real visitors are tracked
+exactly as before. The rules live in
+`client/src/lib/analytics-suppression.ts`.
+
+- **What is suppressed.** An admin session (below), any `/qa-*` path, the
+  all-nines sentinel resource ids test runs use (`/resource/99999999`,
+  `/resource/999999999`, …: `^/resource/9{8,}$`) and the owner sign-in page
+  `/sign-in?admin`. `/admin` and `/bookmarks` are **not** path-blocked:
+  visitors' `/bookmarks` stays tracked, and admin pages are covered by the
+  session rule.
+- **Admin marker.** `localStorage['analytics-admin-session'] = '1'` is set
+  when `/api/auth/user` reports `role: "admin"` (any sign-in path, in
+  `useAuth`) and right after the owner password sign-in succeeds, before its
+  reload. It is cleared in `clearSignedInClientState()`, which every sign-out
+  path runs (account menu, "sign out all devices", `/logout`), and when a
+  non-admin account is reported on the device. An anonymous answer does not
+  clear it: an expired admin session on the owner's device stays quiet.
+  localStorage is read synchronously, so the marker covers events fired before
+  Clerk loads or the auth check answers on every load after the first.
+- **One check in the shared sender.** `track()` returns when
+  `isAnalyticsSuppressed()` is true; the dispatcher re-checks the admin marker
+  for events queued while its chunk loaded.
+- **SDK self-sends.** PostHog (`$pageview`, autocapture, replay), Amplitude
+  (autocapture, `Viewed Home Page`, replay) and Mixpanel (`$opt_in`, people
+  `engage` on identify) send without going through `track()`. The choke point
+  for them is SDK start-up: `initGA` / `initMixpanel` / `initPosthog` /
+  `initAmplitude` all gate on `vendorSdksAllowed()` (a grant **and** not
+  suppressed), so an admin load or a QA landing never loads any vendor SDK.
+  When the marker is set mid-session (a visitor who granted consent signs in
+  as admin), `useAuth` stops the running SDKs with the existing revoke
+  functions and skips identify. For a visitor who navigates into a QA path
+  while the SDKs run, PostHog's `before_send` and the Amplitude URL-scrub
+  enrichment plugin drop every event while suppressed. Server conversion
+  headers (`serverConversionHeaders`) are also withheld, so the server sends no
+  Mixpanel conversion for an admin.
+- **Replit page views.** The injected Umami tracker checks
+  `localStorage['umami.disabled']` before every send, page views included
+  ([Umami docs](https://umami.is/docs/exclude-my-own-visits)).
+  `syncReplitPageviewOptOut()` sets it (plus the flag
+  `analytics-umami-disabled-by-app`) while suppressed, at entry-module load
+  and on every route change before the tracker's ~300 ms soft-navigation
+  delay, and removes both when no longer suppressed. A value set by hand (no
+  app flag beside it) is never changed or removed.
+- **Residual gaps.**
+  - The first page of a device that has never had the marker is, by
+    definition, not yet an admin session.
+  - Clerk sign-in on a device without the marker: `logged_in` (fired by
+    `AuthConversionTracker` when the Clerk session appears) and the landing
+    page view can go out before `/api/auth/user` reports the role; SDK
+    autocapture on the sign-in page itself is also sent. The owner password
+    path has no gap (the marker is set before its reload, and
+    `/sign-in?admin` is a suppressed path). Every sign-out clears the marker,
+    so this boundary recurs on each Clerk sign-in.
+  - A visitor session that lands on a QA path does not start the SDKs for
+    that page load. The Umami tracker never installs its SPA hook if
+    `umami.disabled` was set before it evaluated, so Replit misses the rest of
+    that page load's soft navigations.
+  - GA4 Enhanced Measurement history page views on SPA navigation into a QA
+    path from a normal page are not filtered (keep that GA4 setting off, see
+    the deployment prerequisite).
+
 ### Shared event catalog
 
 Every custom event the client emits. **Area tasks add their events here** (one
@@ -246,7 +313,7 @@ taxonomy further down and are not repeated here.
 | `category_viewed` | `category_view` | all four | `category` (GA4: `content_category`) | `trackCategoryView` |
 | `filter_applied` | `filter_applied` | all four | `filter_type`, `filter_value`, `result_count`, `zero_results`, `surface` (`search_page` \| `taxonomy_*` \| `home` (kind filter / clear all) \| `journeys_page` (category)) | `trackFilterUsage` |
 | `sort_changed` | `sort_change` | all four | `sort_type`, `surface` (`search_page` \| `taxonomy_*` \| `home` \| `categories_page`), `result_count`, `zero_results` | `trackSortChange` |
-| `tag_interaction` | `tag_interaction` | all four | `tag`, `action` (`apply` \| `remove` \| `card_click` \| `landing_viewed`), `surface` (adds `home`, `tag_page`), `result_count`, `zero_results` | `trackTagInteraction` (cards: `action: 'card_click'` only when the pill navigates; pages that filter in place via `onTagClick` keep their own `apply` event; `/tag/:slug` sends `landing_viewed` once per tag visit) |
+| `tag_interaction` | `tag_interaction` | all four | `tag`, `action` (`apply` \| `remove` \| `card_click` \| `landing_viewed` \| `link_click` — a resource page's Keep exploring tag link), `surface` (adds `home`, `tag_page`, `resource_onward`), `result_count`, `zero_results` | `trackTagInteraction` (cards: `action: 'card_click'` only when the pill navigates; pages that filter in place via `onTagClick` keep their own `apply` event; `/tag/:slug` sends `landing_viewed` once per tag visit) |
 | `logged_in` | `login` | all four | `login_method` (GA4: `method`) + acquisition | `trackLogin` ← `AuthConversionTracker` |
 | `content_shared` | `share` | all four | `share_method` (GA4: `method`), `content_type`, `content_id` | `trackShare` |
 | `journey_started` | `journey_start` | all four | `journey_id`, `journey_title`, `total_steps` | `trackJourneyStart` |
@@ -272,9 +339,9 @@ taxonomy further down and are not repeated here.
 | `public_collection_resource_opened` | same | all four | `collection_share_id`, `resource_id`, `position` (1-based), `item_count`, `link_target: "detail" \| "external"` — click or middle-click on a card's title / View Details (detail) or Open Link (external) | `trackPublicCollectionResourceOpened` ← `PublicCollection` |
 | `public_collection_recovery_clicked` | same | all four | `collection_share_id` (only when well-formed), `recovery_action: "retry_error" \| "retry_offline" \| "explore_journeys" \| "home" \| "categories"`, `page_state: "not_found" \| "error" \| "offline"` | `trackPublicCollectionRecoveryClicked` ← `PublicCollection` |
 | `resource_card_opened` | same | all four | `resource_id`, `surface`, `card_control` (`title` \| `view_details`) | `trackResourceCardOpened` ← `ResourceCard`, home cards (the detail page's `resource_viewed` fires on arrival) |
-| `related_resource_opened` | same | all four | `resource_id` (opened), `from_resource_id`, `position` (1-based), `match_score` | `trackRelatedResourceOpened` ← `ResourceDetail` Related Resources list |
-| `related_category_opened` | same | all four | `from_resource_id`, `category` | `trackRelatedCategoryOpened` ← `ResourceDetail` "View all in …" link |
-| `command_palette_opened` | same | all four | `open_method` (`keyboard_shortcut` \| `slash_key` \| `header_button`) — closed → open only | `trackCommandPaletteOpened` ← `MainLayout` |
+| `related_resource_opened` | same | all four | `resource_id` (opened), `from_resource_id`, `position` (1-based), `match_score`, `surface` (`related_list` — Related Resources card \| `resource_onward` — Keep exploring "More like this") | `trackRelatedResourceOpened` ← `ResourceDetail` Related Resources list, `ResourceOnwardPaths` |
+| `related_category_opened` | same | all four | `from_resource_id`, `category` (the collection's name), `surface` (`resource_onward`; `related_list` is the default for any other caller) | `trackRelatedCategoryOpened` ← `ResourceOnwardPaths` "More in …" / "View all in …" |
+| `command_palette_opened` | same | all four | `open_method` (`keyboard_shortcut` \| `slash_key` \| `header_button` \| `resource_page_button` \| `listing_page_button`), `surface` (page entries only: `resource_onward` \| `tag_page`) — closed → open only | `trackCommandPaletteOpened` ← `MainLayout` (page entries open it through `openSearchPalette`) |
 | `export_started` / `export_downloaded` | same | all four | `export_format`, `export_scope` (`all` \| `selected_categories`), `category_count`, `resource_count` — never file contents | `trackExportStarted` / `trackExportDownloaded` ← `export-tools` |
 | `api_key_created` | same | all four | `expiry_option` (`30` \| `90` \| `365` \| `never`) — never the key or its name | `trackApiKeyCreated` ← `ApiKeysCard` (server-confirmed) |
 | `api_key_copied` | same | all four | `copy_method` (`clipboard` \| `manual_select`) | `trackApiKeyCopied` ← `ApiKeysCard` |
@@ -367,10 +434,9 @@ autocaptured `[Amplitude] …` events; PostHog sends autocapture, `$pageview` an
   and attaches it to conversion events.
 - **`client/src/hooks/use-analytics.tsx`** — fires exactly one `page_view` per
   navigation (mount + every route change) and a `page_engaged` (with dwell time)
-  when leaving a page or hiding the tab. After consent, the same mounted hook
-  reports Core Web Vitals (LCP/CLS/INP) and global JavaScript errors. The
-  historical FID signal is also retained when the browser supports it. Mounted
-  once in `App.tsx`.
+  when leaving a page or hiding the tab. Unless analytics was declined, the
+  same mounted hook reports web vitals through `web-vitals` (LCP, INP, CLS,
+  FCP, TTFB) and global JavaScript errors. Mounted once in `App.tsx`.
 
 ### Initialization order (important)
 
@@ -418,7 +484,7 @@ Funnel: journeys list view (`page_view`) → `journey_start` → `journey_step_c
 | `category_view` | Category / Subcategory / Sub-subcategory pages — `TaxonomyListing.tsx`, once per resolved node (filtering, sorting and paging within the node do not re-fire it) | `content_category` |
 | `theme_change` | Theme settings pickers — `ThemeSettings.tsx` | `theme_name`, `theme_type: "color" \| "font" \| "system"` |
 | `resource_favorite` | Favorite toggle — `ResourceDetail.tsx` | `action: "add" \| "remove"`, `content_name`, `content_category` |
-| `performance` | Core Web Vitals unless analytics was declined (GA4 after consent; Replit Analytics before a choice too) — `use-analytics.tsx` | `metric_name: "lcp" \| "inp" \| "fid" \| "cls"`, `value` (milliseconds for LCP/INP/FID, unitless score for CLS) |
+| `performance` | Web vitals from `web-vitals` unless analytics was declined (GA4 after consent; Replit Analytics before a choice too) — `use-analytics.tsx` | `metric_name: "lcp" \| "inp" \| "cls" \| "fcp" \| "ttfb"`, `value` (milliseconds for LCP/INP/FCP/TTFB, unitless score for CLS). `fid` stopped in October 2026. |
 | `api_performance` | Every API request — `queryClient.ts` | `endpoint`, `status`, `value` (ms) |
 | `error` | Failed API request or global JavaScript error — `queryClient.ts` / `use-analytics.tsx` (the browser listeners run unless analytics was declined; GA4 still only after a grant). Each also sends `site_error` (type only) to Replit Analytics | `error_type`, `error_message` (browser errors use a non-content shape such as `short-text`) |
 | `guest_bookmark_added` / `guest_bookmark_removed` | Signed-out save toggle (on-device store, Task #329) — `useResourceToggle` guest branch | `resource_id`, `guest_saved_count` |
@@ -431,11 +497,11 @@ Funnel: journeys list view (`page_view`) → `journey_start` → `journey_step_c
 ### FID to INP transition
 
 Google replaced First Input Delay (FID) with **Interaction to Next Paint (INP)**
-as the responsiveness Core Web Vital. The mounted performance (skipped after a Decline)
-capture therefore reports `inp` using the current `web-vitals` package. The
-existing `fid` observer remains intentionally enabled where the browser exposes
-the `first-input` PerformanceObserver entry, preserving historical dashboard
-continuity while the dashboard transitions to INP.
+as the responsiveness Core Web Vital. The performance capture (skipped after a
+Decline) reports `inp` from the `web-vitals` package. The hand-written
+`first-input` observer that sent `fid` was removed in October 2026; FID series
+end there. `fcp` and `ttfb` were added at the same time, also from
+`web-vitals`.
 
 ### First-touch acquisition
 

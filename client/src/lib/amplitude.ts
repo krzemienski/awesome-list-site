@@ -1,4 +1,4 @@
-import { getAnalyticsConsent } from "./analytics";
+import { getAnalyticsConsent, vendorSdksAllowed } from "./analytics";
 import type { AmplitudeProductSlots, ManagedPlugin } from "./analytics-sdk-options";
 
 let initialized = false;
@@ -121,7 +121,7 @@ async function consentWasRevoked(runVersion: number): Promise<boolean> {
 }
 
 export function initAmplitude(): void {
-  if (getAnalyticsConsent() !== "granted") return;
+  if (!vendorSdksAllowed()) return;
   disabled = false;
   if (initialized) {
     amplitudeClient?.setOptOut(false);

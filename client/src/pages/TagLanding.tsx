@@ -8,6 +8,7 @@ import SEOHead from "@/components/layout/SEOHead";
 import ResourceCard from "@/components/resource/ResourceCard";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { SearchEntryButton } from "@/components/search/SearchEntryButton";
 import { Paginator } from "@/components/ui/paginator";
 import { PageHeaderSkeleton, ResourceCardSkeleton } from "@/components/ui/skeletons";
 import { apiRequest } from "@/lib/queryClient";
@@ -192,9 +193,14 @@ export default function TagLanding() {
         noindex={noindex}
         follow={noindex}
       />
-      <Button asChild variant="ghost" size="sm" className="gap-2 min-h-[44px]">
-        <Link href="/"><ArrowLeft className="h-4 w-4" />Back to Home</Link>
-      </Button>
+      <div className="flex flex-wrap items-center justify-between gap-2">
+        <Button asChild variant="ghost" size="sm" className="gap-2 min-h-[44px]">
+          <Link href="/"><ArrowLeft className="h-4 w-4" />Back to Home</Link>
+        </Button>
+        {/* Tag landers rarely continue; site search is the most common next
+            page from a landing, and the header's phone control is icon-only. */}
+        <SearchEntryButton method="listing_page_button" surface="tag_page" />
+      </div>
       {/* Task #379 (uxv2-14): the tag total was stated three times — subtitle,
           badge, and the results heading. It is now stated once, in the results
           heading below. */}
