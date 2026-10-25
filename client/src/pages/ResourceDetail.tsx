@@ -745,9 +745,11 @@ export default function ResourceDetail() {
             <span className="resource-detail-chip-wrap">
               {taxonomySlugs.category
                 ? (
-                  <Link href={`/category/${taxonomySlugs.category}`} className="chip" data-testid="badge-category">
-                    <span aria-hidden="true">{categoryGlyph(taxonomySlugs.category || resource.category)}</span>
-                    <span className="resource-detail-chip-label">{resource.category}</span>
+                  <Link href={`/category/${taxonomySlugs.category}`} className="resource-detail-chip-link" data-testid="badge-category">
+                    <span className="chip">
+                      <span aria-hidden="true">{categoryGlyph(taxonomySlugs.category || resource.category)}</span>
+                      <span className="resource-detail-chip-label">{resource.category}</span>
+                    </span>
                   </Link>
                 )
                 : (
@@ -781,8 +783,10 @@ export default function ResourceDetail() {
             <span className="resource-detail-chip-wrap">
               {taxonomySlugs.subcategory
                 ? (
-                  <Link className="chip" href={`/subcategory/${taxonomySlugs.subcategory}`} data-testid="badge-subcategory">
-                    <span className="resource-detail-chip-label">{resource.subcategory}</span>
+                  <Link className="resource-detail-chip-link" href={`/subcategory/${taxonomySlugs.subcategory}`} data-testid="badge-subcategory">
+                    <span className="chip">
+                      <span className="resource-detail-chip-label">{resource.subcategory}</span>
+                    </span>
                   </Link>
                 )
                 : (
@@ -796,8 +800,10 @@ export default function ResourceDetail() {
             <span className="resource-detail-chip-wrap">
               {taxonomySlugs.subSubcategory
                 ? (
-                  <Link className="chip" href={`/sub-subcategory/${taxonomySlugs.subSubcategory}`} data-testid="badge-sub-subcategory">
-                    <span className="resource-detail-chip-label">{resource.subSubcategory}</span>
+                  <Link className="resource-detail-chip-link" href={`/sub-subcategory/${taxonomySlugs.subSubcategory}`} data-testid="badge-sub-subcategory">
+                    <span className="chip">
+                      <span className="resource-detail-chip-label">{resource.subSubcategory}</span>
+                    </span>
                   </Link>
                 )
                 : (
@@ -1205,10 +1211,10 @@ export default function ResourceDetail() {
                       <Tag className="h-4 w-4 text-[color:var(--text-3)]" />
                       Tags
                     </h2>
-                    <div className="flex flex-wrap gap-2">
+                    <div className="flex flex-wrap gap-x-2">
                       {tags.map((tag, index) => (
                         <span className="resource-detail-chip-wrap" key={index}>
-                          <Link href={tagLandingPath(tag)}>
+                          <Link href={tagLandingPath(tag)} className="resource-detail-chip-link">
                             <span
                               className="chip mono"
                               data-testid={`tag-link-${index}`}

@@ -571,7 +571,7 @@ export default function ResearcherTab({ initialTab = "review" }: ResearcherTabPr
                                 {getVerificationBadges(d)}
                               </div>
                               <a href={d.url} target="_blank" rel="noopener noreferrer"
-                                className="mt-1 flex min-w-0 items-center gap-1 truncate text-xs text-primary hover:underline">
+                                className="mt-1 flex min-h-6 min-w-0 items-center gap-1 truncate text-xs text-primary hover:underline">
                                 <span className="truncate">{sanitizeDisplay(d.url)}</span><ExternalLink className="h-3 w-3 shrink-0" />
                               </a>
                               {d.description && <p className="mt-1 line-clamp-2 text-xs text-muted-foreground" title={sanitizeDisplay(d.description)}>{sanitizeDisplay(d.description)}</p>}
@@ -997,7 +997,7 @@ export default function ResearcherTab({ initialTab = "review" }: ResearcherTabPr
                             {getVerificationBadges(d)}
                           </div>
                           <a href={d.url} target="_blank" rel="noopener noreferrer"
-                            className="text-xs text-primary hover:underline truncate block">
+                            className="block truncate text-xs leading-6 text-primary hover:underline">
                             {sanitizeDisplay(d.url)}
                           </a>
                         </div>
