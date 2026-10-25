@@ -11,6 +11,9 @@
 //   Replit     replitTrack  (replit-analytics.ts) — platform-injected Umami
 //                                             tracker; page views are its own
 //
+// Admin sessions and QA paths: nothing is sent (track() decides; queued
+// events are re-checked here). See analytics-suppression.ts.
+//
 // Consent: the four banner-named vendors only get events after a grant.
 // Replit Analytics is cookie-free and carries no identifiers, so it also gets
 // events while the visitor has not chosen; an explicit Decline stops it too.
@@ -27,6 +30,7 @@ import { mpTrack } from './mixpanel';
 import { phCapture } from './posthog';
 import { ampTrack } from './amplitude';
 import { replitTrack } from './replit-analytics';
+import { isAdminAnalyticsSession } from './analytics-suppression';
 
 type EventProps = Record<string, unknown>;
 
@@ -58,6 +62,8 @@ const safely = (send: () => void) => {
 export const dispatchAnalyticsEvent = (request: AnalyticsDispatchRequest) => {
   // Re-checked here as well as in track(): events queued while this chunk
   // was loading must not go out if consent was revoked in the meantime.
+  // Same for an admin session that started while this chunk was loading.
+  if (isAdminAnalyticsSession()) return;
   const consent = getAnalyticsConsent();
   if (consent === 'denied') return;
   const granted = consent === 'granted';

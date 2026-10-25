@@ -51,6 +51,21 @@ No new analytics events were added. The one new link reuses the existing
 | 9 | **/search with no results: popular-category chips.** It shows the 6 largest categories with counts, above the existing Clear / Browse / Advanced buttons. | `/search` was the most common second page for resource landers (18). Its empty state offered no specific destinations. | `/search?q=zzqxv` shows Encoding & Codecs 333, Media Tools 266, Players & Clients 239, Protocols & Transport 213, Infrastructure & Delivery 191 and Intro & Learning 187. The chips wrap cleanly on phone. |
 | 10 | **Home: a visible search field under the title** (index layout, the default). Its loading skeleton reserves the same 44 px row. | 56 of 108 home landers left after one page. On phone the only search entry point was the header icon. | Visible at both sizes. On laptop it is 576 × 44 px under `~/awesome.video`. On phone, typing "hls player" and pressing Enter opened `/search?q=hls%20player` with 30 results. |
 
+## Follow-up: onward paths, search entry, clean analytics (October 25)
+
+Builds on changes 5 (collection links) and 9/10 (search entries) above.
+
+| Change | What it does | Verified (1440×900 / 820×1180 / 390×844) |
+| ------ | ------------ | ---------------------------------------- |
+| **Resource page: "Keep exploring" panel** (`ResourceOnwardPaths`) | One panel with a labelled **Search all resources** button, **More like this** (top 3 related, from the already-loaded related list), **In this collection** ("More in {closest collection}" and "View all in {category}", moved here from the bottom of the Related Resources card) and up to 6 **Tags** linking to `/tag/{slug}` from `metadata.tags`. From 1320 px it sits in the empty column beside the page, level with the heading; below that it follows the actions, and its "More like this" rows hide because the Related Resources card comes next. Every late group holds its loaded height. The resource's own link stays the only primary button. | `/resource/836` at 1440: panel at x 952–1252 beside the heading, all targets 44 px, no horizontal scroll. At 820 the panel starts at y 599 and the first related row at y 1065. At 390 the panel starts at y 920 and the tags at y 1201; before this change the collection links were at y 1746 and the tags at y 2327. CLS 0.00 / 0.0002 / 0 and LCP 274 / 84 / 52 ms on dev. |
+| **Tag pages: Search all resources** | The same button beside "Back to Home". Tag landers had no search control on the page, and the phone header search is a 44 px icon. | `/tag/streaming` at 1440 and `/tag/rfc` at 390: the palette opens. At 1440, Escape returns focus to the button. |
+| **Events** | No new event names. `command_palette_opened` gains `open_method` `resource_page_button` / `listing_page_button` plus `surface`. `related_resource_opened` and `related_category_opened` gain `surface` (`resource_onward`, or `related_list` for the existing card). `tag_interaction` gains action `link_click` with surface `resource_onward`. | Mixpanel `/track` bodies at all three widths, e.g. `"open_method":"resource_page_button","surface":"resource_onward"` and `"action":"link_click","surface":"resource_onward"`. |
+| **Clean analytics** | Admin sessions and QA paths send nothing to any tool (docs/ANALYTICS.md → "Admin sessions and QA paths"). | With consent granted and signed in as admin: 0 vendor requests, and no SDK or dispatcher chunk loaded, on a cold landing and after clicks. `umami.disabled` set; signing out clears it and the visitor's events resume. |
+
+Taxonomy listing pages were left alone. They already have in-collection
+search under "Filters & view" plus the header search, and their frozen
+header has no room for another control at phone width.
+
 ## Not changed (owned elsewhere or deliberately left)
 
 - Resource-page speed and layout shift, sign-in, 404s, tracking, guide/Events

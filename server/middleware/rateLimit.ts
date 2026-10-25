@@ -1,4 +1,4 @@
-import rateLimit from "express-rate-limit";
+import rateLimit, { ipKeyGenerator } from "express-rate-limit";
 import type { NextFunction, Request, Response } from "express";
 import { PgRateLimitStore } from "./pgRateLimitStore";
 
@@ -64,9 +64,11 @@ function generateRateLimitKey(req: Request): string {
     return `apikey:${apiKey.id}`;
   }
 
-  // Fall back to IP address for unauthenticated requests
+  // Fall back to IP address for unauthenticated requests. ipKeyGenerator
+  // groups IPv6 clients by /56 subnet so rotating addresses within one ISP
+  // allocation can't dodge the limit (IPv4 passes through unchanged).
   const ip = req.ip || req.socket.remoteAddress || "unknown";
-  return `ip:${ip}`;
+  return `ip:${ipKeyGenerator(ip)}`;
 }
 
 /**

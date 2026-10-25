@@ -560,11 +560,9 @@ async function applySeed(db: SeedConnection, awesomeData: SeedData, options: { c
     let skippedNoCategoryName = 0;
     let skippedDuplicate = 0;
 
-    // Dedup by NORMALIZED URL (same normalization LegacyRepository uses when
-    // rendering the tree: trim + lowercase + strip trailing slashes). Exact-URL
-    // matching used to let near-duplicates through (e.g. trailing-slash
-    // variants), which made the DB count (1949) disagree with every
-    // UI-visible count (1934) derived from the deduped awesome-list tree.
+    // Dedup by NORMALIZED URL (trim + lowercase + strip trailing slashes).
+    // Exact-URL matching let near-duplicates through (e.g. trailing-slash
+    // variants), and every approved row the seed inserts is shown publicly.
     const normalizeUrl = (url: string): string =>
       (typeof url === 'string' ? url.trim().toLowerCase() : '').replace(/\/+$/, '');
     const existingUrls = await db.select({ url: resources.url }).from(resources);

@@ -12,6 +12,7 @@ import type { ProductProfileId } from "@/lib/design-system";
 import { useHomeBoot } from "@/lib/home-boot";
 import { handoffFocusOnUnmount } from "@/hooks/focus-handoff";
 import { trackCommandPaletteOpened, type CommandPaletteOpenMethod } from "@/lib/analytics";
+import { OPEN_SEARCH_PALETTE_EVENT, type OpenSearchPaletteDetail } from "@/lib/search-palette";
 
 // Contact variants (docs/CONTACT-VARIANTS.md) are opt-in via
 // VITE_CONTACT_VARIANT; with it unset (the default) neither chunk is fetched
@@ -136,8 +137,8 @@ export default function MainLayout({ productProfile, nav, isLoading, navError, o
   // itself is loaded only after one of these controls opens it.
   useEffect(() => {
     // One open event per closed → open transition, tagged with its trigger.
-    const openPalette = (method: CommandPaletteOpenMethod) => {
-      if (!searchOpen) trackCommandPaletteOpened(method);
+    const openPalette = (method: CommandPaletteOpenMethod, surface?: string) => {
+      if (!searchOpen) trackCommandPaletteOpened(method, surface);
       setSearchOpen(true);
     };
     const handleKeyDown = (event: KeyboardEvent) => {
@@ -154,29 +155,31 @@ export default function MainLayout({ productProfile, nav, isLoading, navError, o
         openPalette("keyboard_shortcut");
         return;
       }
+      // "/" opens the palette only from outside a text field; once it is open
+      // the key is ordinary input ("h.264/avc").
       if (
         event.key === "/" &&
         !event.ctrlKey &&
         !event.metaKey &&
-        !event.altKey
+        !event.altKey &&
+        !searchOpen &&
+        !inField
       ) {
-        if (searchOpen) {
-          if (inField) event.preventDefault();
-          return;
-        }
-        if (!inField) {
-          event.preventDefault();
-          openPalette("slash_key");
-        }
+        event.preventDefault();
+        openPalette("slash_key");
       }
     };
-    // Only the /search page input dispatches this (on a pristine "/" press).
-    const openSearch = () => openPalette("slash_key");
+    // Page-level search entries (resource and listing pages) pass their method;
+    // the /search input's pristine "/" press sends a bare event.
+    const openSearch = (event: Event) => {
+      const detail = (event as CustomEvent<OpenSearchPaletteDetail | undefined>).detail;
+      openPalette(detail?.method ?? "slash_key", detail?.surface);
+    };
     document.addEventListener("keydown", handleKeyDown);
-    window.addEventListener("awesome:open-search-palette", openSearch);
+    window.addEventListener(OPEN_SEARCH_PALETTE_EVENT, openSearch);
     return () => {
       document.removeEventListener("keydown", handleKeyDown);
-      window.removeEventListener("awesome:open-search-palette", openSearch);
+      window.removeEventListener(OPEN_SEARCH_PALETTE_EVENT, openSearch);
     };
   }, [searchOpen]);
 

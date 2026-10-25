@@ -33,8 +33,8 @@ these in the **Secrets** pane instead of a file.
 | `WEBSITE_URL` | ❌ | `https://awesome.video` | `server/github/syncService.ts` |
 | `ANTHROPIC_BASE_URL` | ❌ (AI router) | – | `server/ai/anthropicConfig.ts` (all Claude calls + Agent SDK env) |
 | `ANTHROPIC_AUTH_TOKEN` | ❌ (with base URL) | – | `server/ai/anthropicConfig.ts` |
-| `ANTHROPIC_MODEL` | ❌ | sonnet tier | `server/ai/anthropicConfig.ts` (primary / orchestrator model) |
-| `ANTHROPIC_DEFAULT_{HAIKU,SONNET,OPUS,FABLE}_MODEL` | ❌ | first-party ids | `server/ai/anthropicConfig.ts` (tier → model id) |
+| `ANTHROPIC_MODEL` | ❌ (✅ for Researcher) | sonnet tier; none for Researcher | `server/ai/anthropicConfig.ts` (primary / orchestrator model), `server/ai/researchRunConfig.ts` |
+| `ANTHROPIC_DEFAULT_{HAIKU,SONNET,OPUS,FABLE}_MODEL` | ❌ (HAIKU ✅ for Researcher) | first-party ids; none for Researcher scouts | `server/ai/anthropicConfig.ts` (tier → model id), `server/ai/researchRunConfig.ts` |
 | `AI_INTEGRATIONS_ANTHROPIC_API_KEY` | ❌ (AI features) | – | `server/ai/anthropicConfig.ts` |
 | `AI_INTEGRATIONS_ANTHROPIC_BASE_URL` | ❌ | Anthropic default | `server/ai/anthropicConfig.ts` |
 | `ANTHROPIC_API_KEY` | ❌ (fallback) | – | `server/ai/anthropicConfig.ts` |
@@ -177,6 +177,30 @@ Model ids per tier (router ids look like `cc/claude-opus-5`); unset tiers use
 first-party ids. `ANTHROPIC_MODEL` is the primary model (Researcher
 orchestrator). Resolved in `server/ai/anthropicConfig.ts`.
 
+**Researcher runs have no fallbacks** (`server/ai/researchRunConfig.ts`).
+Unless an admin supplies a per-run override, a research launch requires
+`ANTHROPIC_BASE_URL`, `ANTHROPIC_AUTH_TOKEN`, `ANTHROPIC_MODEL` (orchestrator)
+and `ANTHROPIC_DEFAULT_HAIKU_MODEL` (scouts run on the `haiku` alias, which
+the Agent SDK maps through that variable). If one is missing, the launch is
+refused with `400 { code: "missing_env" }` naming the variable, and the
+Researcher launch dialog shows the same message. Check with
+`GET /api/researcher/config` (admin).
+
+Values in `.replit` `[userenv.shared]` (October 2026):
+`ANTHROPIC_BASE_URL=https://router.hack.ski`, `ANTHROPIC_MODEL=cc/claude-opus-5`,
+`ANTHROPIC_DEFAULT_OPUS_MODEL=cc/claude-opus-5`,
+`ANTHROPIC_DEFAULT_SONNET_MODEL=cc/claude-sonnet-5`,
+`ANTHROPIC_DEFAULT_HAIKU_MODEL=cc/claude-haiku-4-5-20251001`,
+`ANTHROPIC_DEFAULT_FABLE_MODEL=cc/claude-fable-5`. The token is a secret.
+
+Production, read-only (2026-10-25): the anonymous `GET https://awesome.video/api/health/ai`
+returns only `{"status":"healthy"}`, so it confirms that a credential resolved
+but not which endpoint or models. Only the owner can confirm the published
+values. Signed in as admin, `GET /api/health/ai` returns `config` (endpoint
+host and tier models), and after publishing `GET /api/researcher/config`
+shows the researcher preflight. Today that route returns 404 in production
+because it is not deployed yet.
+
 ### `AI_INTEGRATIONS_ANTHROPIC_API_KEY`
 Replit-managed Anthropic Claude key, used when no router is configured
 (`server/ai/anthropicConfig.ts`).
@@ -200,7 +224,8 @@ OpenAI key; also used in `server/config.ts` as the on/off flag for the
 
 ### `CONFIG_ENCRYPTION_KEY`
 Symmetric key used to encrypt/decrypt AI agent configuration secrets stored in
-the database (`server/ai/configCrypto.ts`).
+the database (`server/ai/configCrypto.ts`). Without it, any per-run override
+token is refused (400), so Researcher/Enrichment overrides cannot be used.
 
 ---
 
@@ -358,6 +383,56 @@ optional integration values in Secrets.
   expired.
 - **Can't access the admin panel** — sign in via Clerk, then confirm your user
   row has `role = 'admin'` in the database (password login was removed).
+
+## Dependency refresh 2026-10-25
+
+`npm update` took every dependency to the newest version its existing
+`package.json` range allows. No range changed. Majors stayed out of scope.
+Release notes were read for each runtime package between the old and the new
+version. GH = github.com.
+
+| Package | From → to | Release notes read | Effect on our code | Action |
+|---|---|---|---|---|
+| @radix-ui/react-tabs (+ roving-focus) | 1.1.17 → 1.2.1 | GH radix-ui/primitives `packages/react/tabs/CHANGELOG.md` (1.2.0, commit 82301b2c9) | A trigger now calls `focus()` on mousedown before activating. In automatic mode that focus also activates it, so one click called `onValueChange` twice. `/advanced` sent `tool_tab_opened` twice per click. | Fixed in `client/src/components/ui/tabs.tsx`: a repeat of the same value in the same task is dropped. One event per click after the fix. |
+| zod | 4.4.3 → 4.6.7 | GH colinhacks/zod releases v4.5.0–v4.6.7; GHSA-mrhx-c7xc-m3w5 | Fixes a HIGH advisory (memory exhaustion from large arrays). `.nullable()` now becomes `type: [T, "null"]` in JSON Schema, which changes the tool schema `zodOutputFormat` builds at `server/ai/anthropicConfig.ts:313`. `.min`/`.max` now count code points. | Ran one real `/api/claude/analyze` call: 200, structured output parsed. Form messages are custom strings, so their wording is unchanged. |
+| @clerk/react, @clerk/shared, @clerk/express | 6.14.1 → 6.18.1, 4.28.1 → 4.41.1, 2.1.55 → 2.1.83 | GH clerk/javascript `packages/{react,shared,express,backend}/CHANGELOG.md` | Passkey second factor (opt-in from the dashboard). `ClerkProvider` always supplies a router; we pass our own (`ClerkRuntime.tsx:157`). The backend rejects JWT-template tokens where a session token is expected; we only use session tokens. | None. Sign-in and sign-out driven in the browser. |
+| posthog-js | 1.409.4 → 1.438.21 | GH PostHog/posthog-js `packages/browser/CHANGELOG.md` | INP/LCP attribution is now on by default. Replay is held until the first interaction. `reset()` warns about `opt_out_capturing_by_default`. We pin `defaults:'2025-05-24'` (`analytics-sdk-options.ts:65`), so the new defaults don't apply. | None. PostHog sends nothing from automation browsers. |
+| mixpanel-browser | 2.81.0 → 2.84.0 | `node_modules/mixpanel-browser/CHANGELOG.md` | Adds an opt-in `hooks.on_track`. The opt-out flag is now honoured when it falls back to a cookie. | None. The `/track` body matches the old version, `surface` included. |
+| @amplitude/unified (+ analytics-browser 2.48.1, analytics-core 2.61.0, session replay 1.51.5) | 1.1.28 → 1.1.43 | GH amplitude/Amplitude-TypeScript per-package `CHANGELOG.md` | Events with an empty type are dropped. Autocapture sees shadow DOM. Replay start/stop APIs. | None. `/2/httpapi` returns 200. |
+| @tanstack/react-query | 5.101.2 → 5.104.5 | GH TanStack/query releases | `fetchQuery` is deprecated in favour of `query()` (we call it at `client/src/lib/legacy-readme-anchor.ts:64`). Defaults unchanged. | None now; migrate later. |
+| react-hook-form, @hookform/resolvers | 7.81.0 → 7.91.0, 5.4.0 → 5.9.2 | GH react-hook-form releases; GH react-hook-form/resolvers releases | Bug fixes: `isSubmitting` no longer sticks; Zod v4 union and locale fixes. | None. `/submit` validation driven in the browser. |
+| wouter | 3.10.0 → 3.13.0 | GH molefrog/wouter releases v3.11.0–v3.13.0 | Location subscribers are notified in one batch on popstate (#556), so `<Switch>` no longer re-renders the old route first. `useSearch`/`useLocation` unchanged. | None. Back steps through tab history once per entry. |
+| other Radix (dialog, alert-dialog, dropdown-menu, select, popover, toast, tooltip, scroll-area, checkbox, switch, radio-group, slot, …) | minor bumps, e.g. dialog 1.1.19 → 1.3.1, select 2.3.3 → 2.4.1 | GH radix-ui/primitives `packages/react/<pkg>/CHANGELOG.md` | Fixes for nested non-modal layers; programmatic form changes no longer fire a bubbling `click`. Components no longer set `displayName`, so our wrappers copy `undefined` (only affects React DevTools names). All `--radix-*` CSS vars are still present. | None. Dialog focus trap, pointer lock, focus return, menu and select driven in the browser. |
+| web-vitals | 6.2.1 → 6.2.3 | GH GoogleChrome/web-vitals `CHANGELOG.md` | INP memory-leak and LCP attribution fixes. | None |
+| tailwindcss, @tailwindcss/vite, @tailwindcss/postcss | 4.3.2 → 4.3.3 | GH tailwindlabs/tailwindcss release v4.3.3 | The default sans stack changed; we override `--font-sans`. | None |
+| openai, @modelcontextprotocol/sdk, ws, unist-util-visit, @replit/connectors-sdk | 6.46.0 → 6.49.0, 1.32.1 → 1.32.2, 8.21.0 → 8.22.0, 5.1.0 → 5.2.0, 0.4.1 → 0.4.3 | `openai` `CHANGELOG.md`; GH release pages; connectors-sdk npm tarball diff | Additive changes only. connectors-sdk takes the identity token from the local Replit endpoint on deployments. | None locally. Email and GitHub sync need a check on the published site. |
+| tsx, input-otp, autoprefixer, postcss, typescript-eslint, prettier, playwright, wrangler | patch or dev-only bumps | Each project's releases or `CHANGELOG.md` | input-otp is not imported. Wrangler 4.152.0 still pins undici 7.29.1 (GHSA-xjj6-f33q-929c, HIGH, dev-only). | None |
+
+The lockfile keeps Replit's `package-firewall.replit.internal` URL for every
+entry whose version did not change. Changed entries resolve from
+registry.npmjs.org.
+
+### Major upgrades
+
+Only the majors triaged as cheap. Release notes or migration guides were read
+for each one, and the package source was read where the notes were thin.
+
+| Package | From → to | Source read | Breaking changes | Effect on our code | Action |
+|---|---|---|---|---|---|
+| dotenv | 17.4.2 → 18.0.9 | GH motdotla/dotenv `CHANGELOG.md` (18.0.0–18.0.9); `dist/index.cjs` and `dist/config.cjs` in the 18.0.9 tarball | `.env.vault`/`DOTENV_KEY` removed; preloading (`node -r dotenv/config`) removed in favour of a `dotenv run` CLI; tips removed and the injected message moved to stderr; `import 'dotenv/config'` is quiet by default; `override` parsed with `parseBoolean` (the string `"false"` no longer means true); `DOTENV_*` env names added, `DOTENV_CONFIG_*` kept as fallbacks; opt-in `fast` parser; `~` expands in paths. | Override stays off by default: `populate()` writes a key already in `process.env` only when `override` is true. We load it with `import 'dotenv/config'` (`server/index.ts:1`, `vite.config.ts:2`, `scripts/run-digest-dispatch.ts:1`) and use no vault, no preload and no `dotenv_config_*` argv. Explicit `DATABASE_URL`, `PORT` and `ANTHROPIC_*` still win over `.env`. The package now installs a `dotenv` bin; no script calls one. | Upgraded. No code change. |
+| express-rate-limit | 7.5.1 → 8.7.1 | `docs/reference/changelog.mdx` in GH express-rate-limit/express-rate-limit (8.0.0–8.7.1); `dist/index.mjs` validations | IPv6 clients are keyed by /56 subnet by default; new `ipKeyGenerator` helper; a custom `keyGenerator` that reads `req.ip` without it logs `ERR_ERL_KEY_GEN_IPV6`; validations run once each; unknown-option check; async store `init`. | `generateRateLimitKey` in `server/middleware/rateLimit.ts` read `req.ip`, so v8 logged `ERR_ERL_KEY_GEN_IPV6` twice at boot (free and standard tiers). The Postgres store (`pgRateLimitStore.ts`) still satisfies the `Store` interface. Each limiter keeps a distinct `prefix`, so `ERR_ERL_DOUBLE_COUNT` doesn't fire. Default-keyed limiters now group IPv6 clients by /56; IPv4 keys are unchanged. | Upgraded. The IP fallback now goes through `ipKeyGenerator`. |
+| date-fns | 3.6.0 → 4.4.0 | `CHANGELOG.md` in the 4.4.0 tarball (v4.0.0–v4.4.0) | Type-level changes only; ESM-first; time-zone support via `in`; CDN scripts deprecated. | We only call `formatDistanceToNow(date, { addSuffix: true })` (Profile, ApiKeysCard, Contributions, ContinueLearning, ContinueLearningPreview). Output is unchanged. The unused `react-day-picker@8` declared a `date-fns ^2 \|\| ^3` peer; nothing imports it. | Upgraded. `react-day-picker` removed from `package.json` (0 importers). |
+| js-yaml | 4.3.2 → 5.5.0 | GH nodeca/js-yaml `CHANGELOG.md` (5.0.0–5.5.0) and `docs/migrate_v4_to_v5.md` | No ESM default export; `load()` uses `CORE_SCHEMA` (no `!!timestamp`, `<<` merge or `!!binary` by default); `load('')` throws; `safeLoad`/`safeDump`, `DEFAULT_SCHEMA`, `types` and several dump options removed; ships its own types. | `import yaml from 'js-yaml'` type-checked (esModuleInterop) but the server died at boot: `SyntaxError: The requested module 'js-yaml' does not provide an export named 'default'`. `awesome-list.config.yaml` uses only strings, numbers, booleans and lists, so `CORE_SCHEMA` loads it unchanged. `scripts/export-openapi-yaml.ts` already used the named `dump` with options that still exist; v5 may quote some scalars differently the next time it runs. | Upgraded. Named `load` import in `server/config.ts` and `server/github/parser.ts`. `@types/js-yaml` removed. |
+| tailwind-merge | 2.6.1 → 3.7.0 | GH dcastil/tailwind-merge `docs/changelog/v2-to-v3-migration.md` and `v3-changelog.md` | Tailwind 3 support dropped for Tailwind 4; theme keys renamed; `isLength` removed; `orderSensitiveModifiers` required in `createTailwindMerge`; prefix and separator config changes. | We only call `twMerge(clsx(...))` in `cn()` (`client/src/lib/utils.ts`) with no config. The class list of every element on home, resource, bookmark dialog, admin researcher guided view, contributions and profile was identical before and after at 1440, 820 and 390. | Upgraded. No code change. |
+| nanoid | 5.1.16 (direct) | GH ai/nanoid `CHANGELOG.md` (6.0.0–6.0.2) | 6.0 drops Node 18 and 20 (`engines: ^22 \|\| ^24 \|\| >=26`); Replit runs `nodejs-20`. | Nothing imports `nanoid`; postcss uses its own nested `nanoid@3`. | Not upgraded. Removed from `package.json`. |
+| @types/node | 20.16.11 → 20.19.43 | npm dist-tags; vite 7 `peerDependencies` | — | Stays on the Node 20 line that Replit runs (`.replit` `nodejs-20`), not latest (26.x). 20.19.x matches Vite 7's `^20.19.0 \|\| >=22.12.0` peer, which 20.16.11 failed (`npm ls` reported it invalid). | Upgraded, exact pin kept. |
+
+Lockfile: 8 entries changed version, 4 were removed (`nanoid`,
+`react-day-picker`, `@types/js-yaml`, and the copy of `express-rate-limit`
+nested under `@modelcontextprotocol/sdk`, which now dedupes to the root), and
+2 were added (`@eslint/eslintrc` keeps its own `js-yaml@4.3.2` and
+`argparse@2.0.1`). All 156 `package-firewall.replit.internal` URLs on
+unchanged entries were kept.
 
 ## See also
 

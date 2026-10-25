@@ -1,11 +1,9 @@
 ---
 name: Page atmosphere raster clip
-description: The full-page radial-gradient atmosphere costs seconds of software raster on long pages; clip it to its visible bands via a per-system token instead of removing it.
+description: Historical. The .page::before/::after atmosphere clip and --bg-atmosphere-clip token no longer exist in the CSS; the atmosphere is .page's own background.
 ---
-`--bg-atmosphere` (two radial ellipses ending at `transparent 60%`) painted over the whole `.page` box rasterised ~4.6s per Home load on a 6000px page even though everything between the top ~420px and bottom ~300px is exactly transparent. Paint `var(--bg)` on `.page::before` and the atmosphere on `.page::after` (both `z-index:-1`), clip only `::after` with `--bg-atmosphere-clip`, and make every system that redefines `--bg-atmosphere` redeclare the clip for its own geometry (`none` for full-page atmospheres).
+The `.page::before` / `.page::after` split and the `--bg-atmosphere-clip` and repeat tokens described here earlier are gone from the shipped CSS (no matches in `client/` on 2026-10-25). The atmosphere is now painted as `.page`'s own background (`client/public/ds/design-system.css`, `.page` rules).
 
-Clipping alone is not enough: the auto-sized gradient is still TILED over the whole box by the initial `background-repeat: repeat` (~350ms of first-frame raster on the compiled Home). Add a per-system repeat token (`no-repeat` default; a grid-pattern system like Swiss re-declares `repeat`) — pixel-identical because an auto-sized gradient's tile equals its positioning area.
+**Why:** this note told agents to keep and extend CSS that no longer exists.
 
-**Why:** pixels are identical by construction (verified pixel PASS at 375/768/1024/1440), while raster fell to ~1s; `in srgb`, will-change, blend/grain removal and `background-attachment` changes measured no gain.
-
-**How to apply:** `.page` must stay transparent (documented deviations `rule:.page:background*` in canonical-token-parity, with canaries); regenerate the design-system artifact tokens after adding a token or `product-profile-browser` fails "artifact tokens are stale".
+**How to apply:** if long pages show seconds of raster again, measure first; the earlier finding still holds as a technique (a full-box radial gradient that is transparent in the middle can be clipped or set to `no-repeat` with identical pixels), but re-derive it against the current `.page` rules.

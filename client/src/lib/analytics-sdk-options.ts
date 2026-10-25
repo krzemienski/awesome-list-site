@@ -5,6 +5,7 @@
 import type { Config as MixpanelConfig } from 'mixpanel-browser';
 import type { PostHogConfig } from 'posthog-js';
 import { scrubSdkUrlFields } from './analytics-hygiene';
+import { isAnalyticsSuppressed } from './analytics-suppression';
 
 export interface IdentityUser {
   id: string;
@@ -92,6 +93,9 @@ export const posthogInitOptions = (apiHost: string): Partial<PostHogConfig> => (
   // skipped — they are large and their inputs are already masked.
   sanitize_properties: (props: Record<string, unknown>, eventName: string) =>
     eventName === '$snapshot' ? props : scrubSdkUrlFields(props),
+  // A running SDK drops its own events ($pageview, autocapture, ...) on a
+  // QA path or once an admin session starts (analytics-suppression.ts).
+  before_send: (event) => (isAnalyticsSuppressed() ? null : event),
   debug: import.meta.env.DEV,
 });
 
@@ -127,7 +131,10 @@ interface AmplitudeEnrichmentEvent {
 export const amplitudeUrlScrubPlugin = {
   name: 'awesome-video-url-scrub',
   type: 'enrichment' as const,
-  execute: <T extends AmplitudeEnrichmentEvent>(event: T): Promise<T> => {
+  // Also drops every event (autocapture page views included) on a QA path or
+  // in an admin session, like PostHog's before_send.
+  execute: <T extends AmplitudeEnrichmentEvent>(event: T): Promise<T | null> => {
+    if (isAnalyticsSuppressed()) return Promise.resolve(null);
     for (const field of [event.event_properties, event.user_properties]) {
       if (field && typeof field === 'object') scrubSdkUrlFields(field as Record<string, unknown>);
     }

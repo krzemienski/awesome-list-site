@@ -132,6 +132,13 @@
     width: var(--shell-sidebar-w-tablet, 240px);
   }
 
+  /* The compact rail is a desktop-only mode (AppSidebar isRailCompact), so
+     collapsing here changed nothing visible yet saved a collapsed
+     preference that later opened 1440 as the 56px rail. */
+  .av-sidebar-shell .av-sidebar-collapse-toggle {
+    display: none;
+  }
+
   /* F210: at 240px an ellipsis cut category names to ~10 characters
      ("Community &…"). Drop the L3 marker as the drawer does and let the name
      wrap so every category stays readable. */

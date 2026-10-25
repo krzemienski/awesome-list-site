@@ -24,6 +24,7 @@ import {
   type ResourceSkillLevel,
 } from "./resourceFacets";
 import type { BookmarkQueueStatus } from "./bookmarkCollections";
+import type { CostBasis, ResolvedResearchConfig } from "./researcherContract";
 import { resourceKindSchema, type ResourceKind } from "./resourceKinds";
 import type {
   DigestAttemptOutcome,
@@ -1900,6 +1901,10 @@ export const researchJobs = pgTable(
     totalOutputTokens: integer("total_output_tokens").default(0),
     estimatedCostUsd: text("estimated_cost_usd").default("0.00"),
     turnsUsed: integer("turns_used").default(0),
+    // How estimatedCostUsd was obtained (see shared/researcherContract.ts). Null on legacy rows.
+    costBasis: text("cost_basis").$type<CostBasis>(),
+    // Secret-free endpoint/credential/model resolution the run launched with.
+    resolvedConfig: jsonb("resolved_config").$type<ResolvedResearchConfig>(),
     agentLog: jsonb("agent_log").$type<Array<{ role: string; content: string; timestamp: string }>>().default([]),
     errorMessage: text("error_message"),
     startedBy: varchar("started_by").references(() => users.id),

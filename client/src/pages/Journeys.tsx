@@ -406,7 +406,7 @@ export default function Journeys() {
                       <Badge variant="chip">
                         {journey.category}
                       </Badge>
-                      {journey.stepCount && (
+                      {(journey.stepCount ?? 0) > 0 && (
                         <Badge variant="chip">
                           {journey.stepCount} steps
                         </Badge>
@@ -414,7 +414,7 @@ export default function Journeys() {
                     </div>
 
                     {/* Progress Bar for Enrolled Journeys */}
-                    {enrolled && journey.stepCount && journey.stepCount > 0 && (
+                    {enrolled && (journey.stepCount ?? 0) > 0 && (
                       <div className="journey-card__progress">
                         <div className="journey-card__progress-label">
                           <span>Progress</span>

@@ -1,6 +1,6 @@
 import { db } from '../db';
 import { resources, researchJobs, researchDiscoveries, agentEvents, categories, subcategories, subSubcategories } from '@shared/schema';
-import { and, eq, ne, or, sql, getTableColumns } from 'drizzle-orm';
+import { and, eq, inArray, ne, or, sql, getTableColumns } from 'drizzle-orm';
 import type { ResearchJob, ResearchDiscovery, DiscoveryVerification } from '@shared/schema';
 import { ensureSubSubcategoryExists, type SubSubcategoryTaxonomyAccess } from '../repositories/ensureSubSubcategory';
 import { transitionResourceInTransaction, withResourcePublication } from '../repositories/resourcePublication';
@@ -16,6 +16,13 @@ export class DiscoveryNotFoundError extends Error {
     this.name = "DiscoveryNotFoundError";
   }
 }
+/** A research run is already active on some worker; the start route maps it to 409. */
+export class ResearchJobActiveError extends Error {
+  constructor(jobId: number) {
+    super(`Research run #${jobId} is still running. Wait for it to finish or cancel it before starting another.`);
+    this.name = "ResearchJobActiveError";
+  }
+}
 export class DiscoveryConflictError extends Error {
   constructor(message = "Discovery has already been moderated") {
     super(message);
@@ -24,8 +31,12 @@ export class DiscoveryConflictError extends Error {
 }
 import { decodeHtmlEntities, decodeResourceTextFields } from '../github/importHygiene';
 import { runAgentQuery, agentUsageFromError, isBudgetCapStop, BUDGET_STOPPED_STATUS, type AgentDefinitionInput } from './runAgentQuery';
-import { startJobHeartbeat, WORKER_ID } from './jobLiveness';
-import { defaultResearchModel, defaultScoutModel, resolveModel, validateBaseUrl, type AgentRunConfig } from './agentRuntime';
+import { isJobOrphaned, livenessUnchangedSince, ORPHANED_BY_RESTART_MESSAGE, startJobHeartbeat, WORKER_ID } from './jobLiveness';
+import { validateBaseUrl, type AgentRunConfig } from './agentRuntime';
+import { KnownUrls, normalizeUrl, surfacedByScout } from './researchDedup';
+import { ResearchPhaseTracker, extractUrls } from './researchPhases';
+import { describeResearchRunConfig, researchPreflightMessage } from './researchRunConfig';
+import type { CostBasis, ResolvedResearchConfig } from '@shared/researcherContract';
 import { LinkChecker } from '../validation/linkChecker';
 import { isPlausiblePublicUrl } from '@shared/validation';
 import { invalidatePublicCache } from '../cache/publicCache';
@@ -38,61 +49,6 @@ const logger = createLogger("research");
 const MAX_TAXONOMY_LINES = 200;
 const MAX_TOP_DOMAINS = 50;
 const MAX_FOCUS_URLS = 80;
-
-/**
- * Query params that are pure tracking/share noise — they never distinguish
- * two different resources, so they are stripped before dedup comparison.
- * Everything else (e.g. youtube ?v=, ?id=, ?page=) is SIGNIFICANT and kept:
- * dropping the whole query string (the pre-July-2026 behavior) over-merged
- * distinct resources like youtube.com/watch?v=A vs ?v=B.
- */
-const TRACKING_PARAMS = new Set([
-  'ref', 'ref_src', 'ref_url', 'referrer', 'source', 'fbclid', 'gclid',
-  'msclkid', 'dclid', 'twclid', 'igshid', 'mc_cid', 'mc_eid', '_hsenc',
-  '_hsmi', 's_kwcid', 'si', 'feature',
-]);
-function isTrackingParam(key: string): boolean {
-  const k = key.toLowerCase();
-  return k.startsWith('utm_') || TRACKING_PARAMS.has(k);
-}
-
-/**
- * Canonical dedup key for a URL (July 30, 2026 hardening):
- *  - protocol-insensitive (http/https variants of the same page merge);
- *  - hostname lowercased, leading www. stripped;
- *  - path lowercased, trailing slashes stripped;
- *  - github.com: strip trailing ".git" and a trailing "/tree/main|master"
- *    (default-branch root = the repo itself). /blob/* deep links are KEPT
- *    distinct — a file deep-link is a legitimately different resource;
- *  - tracking params stripped, remaining params sorted (keys lowercased,
- *    values case-preserved — youtube IDs are case-sensitive);
- *  - fragments dropped (#readme anchors etc. never distinguish resources).
- * Compute-only: nothing stored is normalized, so changing this function
- * re-keys every comparison on the next run/approval with no data migration.
- */
-export function normalizeUrl(url: string): string {
-  try {
-    const parsed = new URL(url);
-    const host = parsed.hostname.toLowerCase().replace(/^www\./, '');
-    let path = parsed.pathname.replace(/\/+$/, '').toLowerCase();
-    if (host === 'github.com') {
-      path = path.replace(/\.git$/, '').replace(/\/tree\/(main|master)$/, '');
-    }
-    const params: Array<[string, string]> = [];
-    parsed.searchParams.forEach((value, key) => {
-      if (!isTrackingParam(key)) params.push([key.toLowerCase(), value]);
-    });
-    params.sort((a, b) => (a[0] < b[0] ? -1 : a[0] > b[0] ? 1 : a[1] < b[1] ? -1 : a[1] > b[1] ? 1 : 0));
-    const query = params.length > 0 ? '?' + params.map(([k, v]) => `${k}=${v}`).join('&') : '';
-    return host + path + query;
-  } catch {
-    return url
-      .toLowerCase()
-      .replace(/^https?:\/\//, '')
-      .replace(/^www\./, '')
-      .replace(/\/+$/, '');
-  }
-}
 
 function domainOf(url: string): string {
   try {
@@ -108,7 +64,7 @@ function preview(text: string, n = 600): string {
 }
 
 interface ResearchContext {
-  existingUrls: Set<string>;
+  known: KnownUrls;
   taxonomyBlock: string;
   domainsBlock: string;
   focusUrlsBlock: string;
@@ -126,13 +82,14 @@ async function buildResearchContext(categoryFocus: string | undefined): Promise<
   // archived resource is still "known" — re-discovering it wastes the run)
   // plus every discovery across all jobs/statuses.
   const [allRes, allDisc] = await Promise.all([
-    db.select({ url: resources.url, category: resources.category, status: resources.status }).from(resources),
-    db.select({ url: researchDiscoveries.url }).from(researchDiscoveries),
+    db.select({ id: resources.id, url: resources.url, category: resources.category, status: resources.status }).from(resources),
+    db.select({ id: researchDiscoveries.id, url: researchDiscoveries.url }).from(researchDiscoveries),
   ]);
   const approvedRes = allRes.filter(r => r.status === 'approved');
-  const existingUrls = new Set<string>();
-  for (const r of allRes) existingUrls.add(normalizeUrl(r.url));
-  for (const d of allDisc) existingUrls.add(normalizeUrl(d.url));
+  const known = new KnownUrls([
+    ...allRes.map(r => ({ id: r.id, url: r.url, kind: 'resource' as const })),
+    ...allDisc.map(d => ({ id: d.id, url: d.url, kind: 'discovery' as const })),
+  ]);
 
   const [taxRows, countRows] = await Promise.all([
     db.execute<{ category: string; subcategory: string | null; sub_subcategory: string | null }>(sql`
@@ -192,7 +149,7 @@ async function buildResearchContext(categoryFocus: string | undefined): Promise<
   }
 
   return {
-    existingUrls,
+    known,
     taxonomyBlock,
     domainsBlock,
     focusUrlsBlock,
@@ -316,11 +273,39 @@ const CAMPAIGN_ANGLES = [
   },
 ];
 
+/** Scouts that may run at once (parallel delegations in one turn, each on a different gap). */
+const MAX_PARALLEL_SCOUTS = 2;
+/** After the discovery target is hit, how long the orchestrator gets to end its turn before the run is aborted. */
+const TARGET_STOP_GRACE_MS = 90_000;
+
 const STALL_PIVOT_NUDGE =
 `STRATEGY PIVOT REQUIRED. Recent candidates were all duplicates. Do NOT repeat similar searches — change approach now:
 1. Delegate a search for a DIFFERENT under-served gap (call get_coverage_gaps again and pick a subcategory not yet searched this run).
 2. Tell the scout to MINE aggregators: a "Top 10…"/awesome-list is not savable itself, but the individual tools it names usually are — have the scout extract specific project names and search each directly.
 3. Point the scout at source-rich venues: "site:github.com <topic>", Show HN, Demuxed/Mux/Streaming Media talks, arxiv.org / dl.acm.org with companion code.`;
+
+const COST_BASIS_LABEL: Record<CostBasis, string> = {
+  reported: 'reported by the Agent SDK',
+  lower_bound: 'lower bound priced from streamed usage — no SDK result after abort; excludes tool-internal model calls',
+  unknown: 'unknown — no model had a known price',
+};
+
+/**
+ * Terminal status of a finished run. A run the SDK stopped at its USD cap is
+ * budget_stopped (distinct from completed or failed); reaching the discovery
+ * target wins over both that and the backstop abort.
+ */
+function finalStatusOf(result: { aborted: boolean; subtype?: string; terminalReason?: string }, stoppedAtTarget: boolean): string {
+  if (stoppedAtTarget) return 'completed';
+  if (result.aborted) return 'cancelled';
+  return isBudgetCapStop(result) ? BUDGET_STOPPED_STATUS : 'completed';
+}
+
+/** Terminal status of a run whose agent query threw (see finalStatusOf for runs that returned). */
+function errorStatusOf(err: unknown): string {
+  if (err && typeof err === 'object' && (err as { researchTargetReached?: boolean }).researchTargetReached) return 'completed';
+  return isBudgetCapStop(err) ? BUDGET_STOPPED_STATUS : 'failed';
+}
 
 interface ActiveJob {
   jobId: number;
@@ -347,7 +332,10 @@ interface PendingDiscovery {
 interface ResearchRunContext {
   jobId: number;
   emitter: AgentEventEmitter;
-  existingUrls: Set<string>;
+  phases: ResearchPhaseTracker;
+  known: KnownUrls;
+  /** Normalized URLs that appeared in a scout report this run; only these may be saved. */
+  scoutSurfacedUrls: Set<string>;
   discoveryCap: number;
   discoveriesSaved: number;
   consecutiveDuplicates: number;
@@ -359,7 +347,7 @@ interface ResearchRunContext {
   targetDiscoveries: number | null;
   /** Set once the target is hit so the aborted run is persisted as 'completed', not 'cancelled'. */
   targetReached: boolean;
-  /** Aborts the SDK query (slightly delayed so the in-flight tool result can land). */
+  /** Backstop abort in case the orchestrator keeps working after the target was reached. */
   requestStop: () => void;
   addLog: (role: string, content: string, persistNow?: boolean) => Promise<void>;
 }
@@ -480,9 +468,18 @@ class ResearchService {
             await emitResult('check_duplicate', text, Date.now() - started);
             return { content: [{ type: 'text' as const, text }] };
           }
-          // Core check is in-memory (existingUrls Set) — it cannot fail on DB issues.
+          await ctx.phases.enter('verifying', 'tool:check_duplicate');
+          // Pick up rows another run or a submission added since this run
+          // started. The core check stays in-memory, so a failed refresh only
+          // narrows it to the run-start snapshot.
+          try {
+            await withTimeout(ctx.known.refresh(), TOOL_DB_TIMEOUT_MS, 'known-url refresh');
+          } catch (e) {
+            logger.warn({ jobId: ctx.jobId }, `known-url refresh failed (${e instanceof Error ? e.message : String(e)}) — checking against the run-start snapshot`);
+          }
           const normalized = normalizeUrl(url);
-          const isDuplicate = ctx.existingUrls.has(normalized);
+          const isDuplicate = ctx.known.has(url);
+          const sameProjectAs = isDuplicate ? [] : ctx.known.sameProject(url);
           if (isDuplicate) {
             ctx.consecutiveDuplicates++;
             await bestEffort(
@@ -496,12 +493,19 @@ class ResearchService {
           }
           // Opportunistic flush: if earlier saves were queued, retry them now.
           await this.flushPendingDiscoveries(ctx);
-          let text = JSON.stringify({ isDuplicate, normalizedUrl: normalized });
+          let text = JSON.stringify({
+            isDuplicate,
+            normalizedUrl: normalized,
+            ...(sameProjectAs.length > 0 ? {
+              sameProjectAs,
+              note: 'The catalog or review queue already has this project (repo or docs site). Save this URL only if it is a distinct resource such as a paper or talk, not another page of the same project.',
+            } : {}),
+          });
           if (isDuplicate && ctx.consecutiveDuplicates > 0 && ctx.consecutiveDuplicates % 3 === 0) {
             text += `\n\n${STALL_PIVOT_NUDGE}`;
             await ctx.addLog('system', `Stall nudge injected (${ctx.consecutiveDuplicates} consecutive duplicates).`);
           }
-          await ctx.addLog('tool_result', `check_duplicate(${url}) → isDuplicate=${isDuplicate}`);
+          await ctx.addLog('tool_result', `check_duplicate(${url}) → isDuplicate=${isDuplicate}${sameProjectAs.length > 0 ? `, same project as ${sameProjectAs.join(', ')}` : ''}`);
           await emitResult('check_duplicate', text, Date.now() - started);
           return { content: [{ type: 'text', text }] };
         } catch (err: any) {
@@ -538,7 +542,15 @@ class ResearchService {
           return { content: [{ type: 'text' as const, text }] };
         };
         try {
+          await ctx.phases.enter('saving', 'tool:save_discovery');
           await emitCall('save_discovery', { url: rawInput?.url, title: rawInput?.title, confidence: rawInput?.confidence });
+          if (ctx.targetReached) {
+            return await respond({
+              saved: false,
+              targetReached: true,
+              reason: `The discovery target of ${ctx.targetDiscoveries} was already reached. Do not save or search anything else — end your turn now with a one-line summary.`,
+            });
+          }
 
           // In-handler validation (see SCHEMA LENIENCY note above): reject
           // with an actionable error instead of letting the SDK reject the
@@ -572,8 +584,14 @@ class ResearchService {
           if (ctx.discoveriesSaved >= ctx.discoveryCap) {
             return await respond({ saved: false, reason: `Discovery cap of ${ctx.discoveryCap} reached for this run. Wrap up and stop searching.` });
           }
-          if (ctx.existingUrls.has(normalized)) {
+          if (ctx.known.has(input.url)) {
             return await respond({ saved: false, reason: 'URL already exists (duplicate — you should have caught this with check_duplicate)' });
+          }
+          if (!surfacedByScout(ctx.scoutSurfacedUrls, normalized)) {
+            return await respond({
+              saved: false,
+              reason: 'This URL did not appear in any scout report this run. Only save URLs a scout returned from a real web search; delegate a scout search for it first, or move on.',
+            });
           }
           if ((input.confidence || 0) < 70) {
             return await respond({ saved: false, reason: `Confidence ${input.confidence} < 70 threshold. Find a higher-quality resource or justify a higher confidence.` });
@@ -610,14 +628,14 @@ class ResearchService {
 
           // Bookkeeping happens regardless of persistence outcome so the agent
           // never re-saves the same URL and the cap semantics stay intact.
-          ctx.existingUrls.add(normalized);
+          ctx.known.add(input.url);
           ctx.discoveriesSaved++;
           ctx.consecutiveDuplicates = 0;
 
           // Stop-after-N target: this save may be the one that hits it. Flag
-          // first (so the run persists as 'completed', not 'cancelled'), log,
-          // then schedule the abort — requestStop delays slightly so this tool
-          // result still reaches the SDK before the query is torn down.
+          // first (later saves are refused and the run persists as
+          // 'completed'), then tell the orchestrator to end its turn so the SDK
+          // reports the run's real cost. requestStop is only a backstop abort.
           const targetHit = ctx.targetDiscoveries != null && !ctx.targetReached && ctx.discoveriesSaved >= ctx.targetDiscoveries;
           if (targetHit) {
             ctx.targetReached = true;
@@ -625,7 +643,7 @@ class ResearchService {
             ctx.requestStop();
           }
           const targetNote = targetHit
-            ? { targetReached: true, note: `Discovery target of ${ctx.targetDiscoveries} reached — the run is ending now. Stop searching.` }
+            ? { targetReached: true, note: `Discovery target of ${ctx.targetDiscoveries} reached. Do not search or save anything else — end your turn now with a one-line summary.` }
             : {};
 
           if (discoveryId !== null) {
@@ -661,6 +679,7 @@ class ResearchService {
         const started = Date.now();
         const limit = looseNumber(rawInput?.limit);
         try {
+          await ctx.phases.enter('planning', 'tool:get_coverage_gaps');
           await emitCall('get_coverage_gaps', { limit: rawInput?.limit });
           const gaps = await withTimeout(getCoverageGaps(Number.isFinite(limit) && limit > 0 ? limit : 15), TOOL_DB_TIMEOUT_MS, 'get_coverage_gaps query');
           const text = JSON.stringify({ gaps });
@@ -691,6 +710,7 @@ class ResearchService {
         const category = looseString(rawInput?.category);
         const limit = looseNumber(rawInput?.limit);
         try {
+          await ctx.phases.enter('planning', 'tool:get_existing_resources');
           await emitCall('get_existing_resources', { category: category || rawInput?.category, limit: rawInput?.limit });
           if (!category) {
             const text = JSON.stringify({
@@ -1008,6 +1028,61 @@ class ResearchService {
     return { brief: sections.join('\n\n'), angle: angle.label };
   }
 
+  /**
+   * Admit at most ONE active research run across every instance. Concurrent
+   * starts serialize on a transaction-scoped advisory lock, so the second sees
+   * the first's committed row. An active row blocks admission unless its
+   * worker is provably gone (server/ai/jobLiveness.ts); such an orphan is
+   * reclaimed as 'failed' inside the same transaction, so a restart never
+   * leaves a window where starts 409 on a dead run.
+   */
+  private async admitResearchJob(values: Omit<typeof researchJobs.$inferInsert, 'workerId' | 'heartbeatAt'>): Promise<ResearchJob> {
+    return await db.transaction(async (tx) => {
+      await tx.execute(sql`SELECT pg_advisory_xact_lock(hashtext('research_job_admission'))`);
+      const activeRows = await tx
+        .select({
+          id: researchJobs.id,
+          status: researchJobs.status,
+          workerId: researchJobs.workerId,
+          heartbeatAt: researchJobs.heartbeatAt,
+          startedAt: researchJobs.startedAt,
+          createdAt: researchJobs.createdAt,
+        })
+        .from(researchJobs)
+        .where(inArray(researchJobs.status, ['pending', 'processing']));
+      const now = Date.now();
+      const live = activeRows.find((row) => !isJobOrphaned(row, this.activeJobs.has(row.id), now));
+      if (live) throw new ResearchJobActiveError(live.id);
+      for (const orphan of activeRows) {
+        const [reclaimed] = await tx
+          .update(researchJobs)
+          .set({ status: 'failed', errorMessage: ORPHANED_BY_RESTART_MESSAGE, completedAt: new Date() })
+          .where(and(
+            eq(researchJobs.id, orphan.id),
+            inArray(researchJobs.status, ['pending', 'processing']),
+            livenessUnchangedSince(researchJobs, orphan),
+          ))
+          .returning({ id: researchJobs.id });
+        if (reclaimed) {
+          logger.info(`🧹 Research admission reclaimed orphaned job #${orphan.id} (worker gone)`);
+          continue;
+        }
+        // No match: it finished meanwhile (fine), or its worker just
+        // heartbeated, which proves it alive, so it still blocks admission.
+        const [still] = await tx
+          .select({ id: researchJobs.id })
+          .from(researchJobs)
+          .where(and(eq(researchJobs.id, orphan.id), inArray(researchJobs.status, ['pending', 'processing'])));
+        if (still) throw new ResearchJobActiveError(orphan.id);
+      }
+      const [job] = await tx
+        .insert(researchJobs)
+        .values({ ...values, workerId: WORKER_ID, heartbeatAt: new Date() })
+        .returning();
+      return job;
+    });
+  }
+
   async startResearchJob(options: {
     prompt: string;
     categoryFocus?: string;
@@ -1024,8 +1099,12 @@ class ResearchService {
     baseUrl?: string | null;
     authTokenEncrypted?: string | null;
     authTokenLast4?: string | null;
+    /** Strict endpoint/credential/model resolution (researchRunConfig.ts); must pass preflight. */
+    resolvedConfig: ResolvedResearchConfig;
   }): Promise<number> {
-    const [job] = await db.insert(researchJobs).values({
+    const resolved = options.resolvedConfig;
+    if (!resolved.preflight.ok) throw new Error(researchPreflightMessage(resolved));
+    const job = await this.admitResearchJob({
       prompt: options.prompt,
       categoryFocus: options.categoryFocus || null,
       // NULL = unlimited (owner request July 24, 2026): no default caps.
@@ -1038,11 +1117,10 @@ class ResearchService {
       baseUrl: options.baseUrl || null,
       authTokenEncrypted: options.authTokenEncrypted || null,
       authTokenLast4: options.authTokenLast4 || null,
+      resolvedConfig: resolved,
       status: 'processing',
       startedAt: new Date(),
-      workerId: WORKER_ID,
-      heartbeatAt: new Date(),
-    }).returning();
+    });
 
     const abortController = new AbortController();
     this.activeJobs.set(job.id, { jobId: job.id, abortController });
@@ -1076,6 +1154,7 @@ class ResearchService {
 
     logger.info('Research job started', {
       jobId: job.id,
+      config: describeResearchRunConfig(resolved),
       categoryFocus: options.categoryFocus || undefined,
       maxTurns: options.maxTurns ?? undefined,
       maxBudgetUsd: options.maxBudgetUsd ?? undefined,
@@ -1088,31 +1167,39 @@ class ResearchService {
       options.maxTurns ?? null,
       options.maxBudgetUsd != null ? parseFloat(options.maxBudgetUsd) : null,
       config,
+      resolved,
       abortController,
-      options.scoutModel ?? null,
       options.targetDiscoveries ?? null,
     )
       .catch(async (err) => {
         const msg = err?.message || String(err);
-        logger.error('Research job failed', { jobId: job.id, reason: msg }, err instanceof Error ? err : undefined);
+        const failStatus = errorStatusOf(err);
+        if (failStatus === 'failed') {
+          logger.error('Research job failed', { jobId: job.id, reason: msg }, err instanceof Error ? err : undefined);
+        } else {
+          logger.info('Research job finished', { jobId: job.id, status: failStatus, reason: String(msg) });
+        }
         try {
           const [cur] = await db.select({ agentLog: researchJobs.agentLog }).from(researchJobs).where(eq(researchJobs.id, job.id));
           const existing = Array.isArray(cur?.agentLog) ? (cur!.agentLog as any[]) : [];
-          existing.push({ role: 'error', content: `Job failed: ${msg}`, timestamp: new Date().toISOString() });
+          existing.push(failStatus === 'failed'
+            ? { role: 'error', content: `Job failed: ${msg}`, timestamp: new Date().toISOString() }
+            : { role: 'system', content: `Run ended (${failStatus}): ${msg}`, timestamp: new Date().toISOString() });
           const usage = agentUsageFromError(err);
-          // Hitting the configured USD cap is a budget stop, not a crash.
-          const failStatus = isBudgetCapStop(err) ? BUDGET_STOPPED_STATUS : 'failed';
           const reclaimed = this.reclaimedJobs.has(job.id);
           await db.update(researchJobs).set({
             ...(reclaimed ? {} : {
               status: sql`case when ${researchJobs.status} = 'cancelled' then 'cancelled' else ${failStatus} end`,
-              errorMessage: msg,
+              // A run that reached its discovery target is a success even if the
+              // budget cap stopped its last turn; it carries no error banner.
+              errorMessage: failStatus === 'completed' ? null : msg,
             }),
             ...(usage ? {
               turnsUsed: usage.numTurns,
               totalInputTokens: usage.tokensIn,
               totalOutputTokens: usage.tokensOut,
               estimatedCostUsd: usage.totalCostUsd.toFixed(4),
+              costBasis: usage.costBasis,
             } : {}),
             agentLog: existing,
             completedAt: sql`coalesce(${researchJobs.completedAt}, now())`,
@@ -1137,41 +1224,20 @@ class ResearchService {
     maxTurns: number | null,
     maxBudgetUsd: number | null,
     config: AgentRunConfig,
+    resolved: ResolvedResearchConfig,
     abortController: AbortController,
-    scoutModelOverride: string | null = null,
     targetDiscoveries: number | null = null,
   ): Promise<void> {
     const emitter = new AgentEventEmitter('research', jobId);
+    const phases = new ResearchPhaseTracker(emitter);
+    await phases.enter('planning', 'run_started');
     const ctx = await buildResearchContext(categoryFocus);
 
-    const orchestratorModel = resolveModel(config, defaultResearchModel());
-    // Scout (subagent) model resolution — verified against the Agent SDK CLI
-    // binary (July 24, 2026): the CLI validates BOTH the per-agent `model`
-    // field AND CLAUDE_CODE_SUBAGENT_MODEL against an internal Anthropic-only
-    // model allowlist. Any unknown id (e.g. "minimax/minimax-m3" pointed at a
-    // custom base URL) is SILENTLY replaced with the CLI's default subagent
-    // model, which the custom endpoint then 404s on ("issue with the selected
-    // model"). The ONE path that bypasses the allowlist is `model: 'inherit'`,
-    // which returns the main-loop model verbatim. Therefore:
-    //  - explicit scout override equal to the orchestrator model -> 'inherit'
-    //    (identical behavior, but allowlist-proof for custom models);
-    //  - explicit override that differs -> passed verbatim (fine for Anthropic
-    //    ids; a non-Anthropic id that differs from the orchestrator cannot
-    //    survive the allowlist and will fall back — the UI documents this);
-    //  - no override + custom model -> 'inherit' (the old buggy path passed
-    //    the custom id verbatim and every scout died on claude-sonnet-5);
-    //  - no override + platform default -> the cheaper scout tier, passed as
-    //    its ALIAS ("haiku"), which the CLI resolves through the same
-    //    ANTHROPIC_DEFAULT_HAIKU_MODEL variable our tier resolver reads.
-    const requestedScout = scoutModelOverride && scoutModelOverride.trim() ? scoutModelOverride.trim() : null;
-    const hasCustomModel = !!(config.model && config.model.trim());
-    const scoutDefault = defaultScoutModel();
-    const scoutModel = requestedScout
-      ? (requestedScout === orchestratorModel ? 'inherit' : requestedScout)
-      : (hasCustomModel ? 'inherit' : scoutDefault.value);
-    const scoutModelLabel = scoutModel === 'inherit'
-      ? `inherit (${orchestratorModel})`
-      : scoutModel === scoutDefault.value ? `${scoutModel} (${scoutDefault.resolved})` : scoutModel;
+    // Preflight guarantees both are set; the scout value is a tier alias the
+    // CLI maps through ANTHROPIC_DEFAULT_<TIER>_MODEL, "inherit", or an
+    // explicit override (see researchRunConfig.ts for the allowlist rules).
+    const orchestratorModel = resolved.orchestrator.model!;
+    const scoutModel = resolved.scout.value!;
 
     const agentLog: Array<{ role: string; content: string; timestamp: string }> = [];
     const persist = async (extra: Record<string, any> = {}) => {
@@ -1211,7 +1277,9 @@ class ResearchService {
     const runCtx: ResearchRunContext = {
       jobId,
       emitter,
-      existingUrls: ctx.existingUrls,
+      phases,
+      known: ctx.known,
+      scoutSurfacedUrls: new Set<string>(),
       discoveryCap,
       discoveriesSaved: 0,
       consecutiveDuplicates: 0,
@@ -1220,15 +1288,15 @@ class ResearchService {
       targetDiscoveries,
       targetReached: false,
       requestStop: () => {
-        // Delay slightly so the in-flight save_discovery tool result reaches
-        // the SDK before the query is torn down; runResearchLoop reinterprets
-        // this abort as a successful target-stop via runCtx.targetReached.
-        setTimeout(() => abortController.abort(), 1500);
+        // The orchestrator is told to end its turn, which yields the SDK's
+        // result message (real turns + cost). Abort only if it keeps going;
+        // runResearchLoop reads that abort as a target-stop via targetReached.
+        setTimeout(() => abortController.abort(), TARGET_STOP_GRACE_MS).unref();
       },
       addLog,
     };
 
-    await addLog('system', `Research started. Orchestrator: ${orchestratorModel}, Scout: ${scoutModelLabel}, Budget: ${maxBudgetUsd != null ? `$${maxBudgetUsd}` : 'unlimited'}, Discovery cap: ${discoveryCapLabel}, Discovery target: ${targetDiscoveries ?? 'none'}, Max turns: ${maxTurns ?? 'unlimited'}, Existing URLs: ${ctx.existingUrls.size}, Distinct domains: ${ctx.totalDomains}${config.baseUrl ? `, Base URL: ${config.baseUrl}` : ''}`, true);
+    await addLog('system', `Research started. ${describeResearchRunConfig(resolved)}. Budget: ${maxBudgetUsd != null ? `$${maxBudgetUsd}` : 'unlimited'}, Discovery cap: ${discoveryCapLabel}, Discovery target: ${targetDiscoveries ?? 'none'}, Max turns: ${maxTurns ?? 'unlimited'}, Max parallel scouts: ${MAX_PARALLEL_SCOUTS}, Known URLs: ${ctx.known.size}, Distinct domains: ${ctx.totalDomains}`, true);
     if (categoryFocus) await addLog('system', `Focus: ${categoryFocus}`);
     await addLog('user', prompt);
 
@@ -1253,6 +1321,9 @@ The orchestrator will hand you a specific gap or set of search targets. Your job
 
 SEARCH BUDGET — STRICT: run AT MOST 3-4 web searches for one delegation, then STOP searching and return your consolidated candidate list as your final message. Do NOT keep searching to be thorough — the orchestrator needs control back to dedup and save. Returning 5-15 solid candidates from 3-4 searches is a success; running 8+ searches is a failure even if you find more.
 
+REPORT FORMAT — your final message is ONLY a JSON array in a \`\`\`json fenced block, one object per candidate:
+{"url": "<exact URL from a search result>", "title": "...", "description": "<one line: what it offers>", "fits_gap": "<the gap it fills>", "source_type": "repo|docs|paper|talk|blog|tool|other", "maintained": "yes|no|unknown"}
+
 Return ONLY candidates you actually saw in real search results. Do not dedup or judge saturation — that is the orchestrator's job.`,
     };
 
@@ -1271,7 +1342,9 @@ Your own tools (in-process):
 - get_coverage_gaps — the most under-served subcategories with sample URLs.
 - get_existing_resources — sample what already exists in a category before delegating.
 - check_duplicate — MUST be called on every candidate URL before saving.
-- save_discovery — persist a NEW, quality (confidence ≥ 70) candidate for admin review.
+- save_discovery — persist a NEW, quality (confidence ≥ 70) candidate for admin review. The server only accepts URLs that appeared in a scout report this run.
+
+PARALLEL SCOUTS: you may run up to ${MAX_PARALLEL_SCOUTS} scouts at once — issue the delegation calls in the SAME turn, each on a DIFFERENT gap with distinct search targets so they do not repeat each other's searches. A third concurrent delegation is refused.
 
 ==== STATIC RESEARCH CONTEXT ====
 
@@ -1294,13 +1367,13 @@ R1. NEVER fabricate URLs. Only save URLs the scout surfaced from a real web sear
 R2. ALWAYS check_duplicate BEFORE save_discovery.
 R3. Skip anything from the SATURATED DOMAINS list unless the specific resource is exceptional.
 R4. Skip generic intro articles, vendor marketing, and SEO listicles. Prefer maintained OSS, niche official docs, conference talks (Demuxed/IBC/NAB), academic papers (ACM/IEEE/arXiv), specialized tools, and technically-deep developer blogs.
-R5. Confidence < 70 → don't save. Quality > quantity.
+R5. Confidence < 70 → don't save. Quality > quantity. Score confidence with this rubric: start at 50; +15 primary source (official repo, docs, paper, talk recording); +10 actively maintained or recent (scout says maintained: yes, or a 2024+ date); +15 fills a listed gap that has few resources; +10 technically deep for video engineers; −30 SEO listicle, content farm or vendor marketing; −20 same project as something check_duplicate reports in sameProjectAs.
 R6. Be persistent — the best resources live in the long tail. When a vein runs dry, pivot (different gap, mine a listicle's named tools, GitHub/Show HN/arXiv) and keep delegating. Wind down only once you've genuinely exhausted varied attempts across multiple gaps.
 R7. TOOLS ARE RESILIENT BUT NOT INDESTRUCTIBLE: check_duplicate / save_discovery / get_coverage_gaps / get_existing_resources are in-process — persistence retries and queueing are handled automatically on the server. If a tool result contains queued:true or degraded:true, that IS success: keep going. If a tool result contains an error field, retry that one call once, then move on to other candidates. NEVER wait for tools to "recover", never hold candidates back, and never end the run early because of a tool response. If tools truly stop responding entirely the server will terminate the run automatically — that is not your concern.
 
 Database state: ${ctx.totalResources} approved resources across ${ctx.totalDomains} distinct domains. Discovery cap this run: ${discoveryCapLabel}.${targetDiscoveries != null ? `
 
-STOP TARGET: this run ends AUTOMATICALLY once ${targetDiscoveries} new discoveries are saved. When a save_discovery result contains targetReached:true, the server is already shutting the run down — stop searching immediately and do not start new work.` : ''}`;
+STOP TARGET: this run ends AUTOMATICALLY once ${targetDiscoveries} new discoveries are saved. When a save_discovery result contains targetReached:true, stop: do not search, delegate or save anything else, and end your turn immediately with a one-line summary.` : ''}`;
 
     // Only the blocking `Task` primitive may be used for delegation — NOT the
     // async management set (TaskCreate/TaskList/TaskOutput/etc.). NOTE:
@@ -1319,7 +1392,8 @@ STOP TARGET: this run ends AUTOMATICALLY once ${targetDiscoveries} new discoveri
       'Agent',
     ];
 
-    let result!: Awaited<ReturnType<typeof runAgentQuery>>;
+    let result: Awaited<ReturnType<typeof runAgentQuery>> | undefined;
+    let runError: unknown = null;
     try {
       result = await runAgentQuery({
         jobType: 'research',
@@ -1329,6 +1403,7 @@ STOP TARGET: this run ends AUTOMATICALLY once ${targetDiscoveries} new discoveri
         systemPrompt,
         model: orchestratorModel,
         config,
+        approvedEndpointHost: resolved.endpoint.host,
         mcpServers: { research: mcpServer },
         agents: { scout },
         allowedTools,
@@ -1336,8 +1411,33 @@ STOP TARGET: this run ends AUTOMATICALLY once ${targetDiscoveries} new discoveri
         maxBudgetUsd,
         abortController,
         log: addLog,
+        maxConcurrentDelegations: MAX_PARALLEL_SCOUTS,
+        onDelegation: async (e) => {
+          if (e.kind === 'started') {
+            await phases.scoutStarted(e);
+            return;
+          }
+          const urls = extractUrls(e.output);
+          for (const u of urls) runCtx.scoutSurfacedUrls.add(normalizeUrl(u));
+          await phases.scoutEnded(e, urls.length);
+        },
       });
+    } catch (err) {
+      // runAgentQuery throws for SDK error results, including the budget cap
+      // hit on the turn after the target was reached: the caller's status
+      // logic must know the target was met.
+      if (runCtx.targetReached && err && typeof err === 'object') {
+        (err as { researchTargetReached?: boolean }).researchTargetReached = true;
+      }
+      runError = err;
+      throw err;
     } finally {
+      await phases.abortRunningScouts();
+      await phases.enter(
+        'finishing',
+        result ? 'run_ended' : 'run_error',
+        result ? finalStatusOf(result, runCtx.targetReached) : errorStatusOf(runError),
+      );
       // Whatever happened to the run (success, error, cancel), never lose
       // queued discoveries: retry persistence, then dump unrecovered ones
       // into the persisted agent log.
@@ -1369,7 +1469,7 @@ STOP TARGET: this run ends AUTOMATICALLY once ${targetDiscoveries} new discoveri
       `Research ${result.aborted ? (stoppedAtTarget ? 'completed (discovery target reached)' : 'cancelled') : (!stoppedAtTarget && isBudgetCapStop(result) ? 'stopped at budget cap' : 'completed')} (${result.subtype || 'done'}). Turns: ${result.numTurns}/${maxTurns ?? '∞'}, ` +
       `Web searches: ${result.webSearchCount}, Discoveries saved: ${finalJob?.totalDiscoveries || 0}, ` +
       `Duplicates skipped: ${finalJob?.duplicatesSkipped || 0}, ` +
-      `Tokens: in=${result.tokensIn} out=${result.tokensOut}, Cost: $${result.totalCostUsd.toFixed(4)}`,
+      `Tokens: in=${result.tokensIn} out=${result.tokensOut}, Cost: $${result.totalCostUsd.toFixed(4)} (${COST_BASIS_LABEL[result.costBasis]})`,
     );
 
     // Run16 BUG-028: an aborted run can resolve before the SDK reports any
@@ -1379,13 +1479,7 @@ STOP TARGET: this run ends AUTOMATICALLY once ${targetDiscoveries} new discoveri
     const abortedWithNoUsage =
       result.aborted && result.numTurns === 0 && result.totalCostUsd === 0 &&
       result.tokensIn === 0 && result.tokensOut === 0;
-    // A run the SDK stopped at its configured USD cap gets a distinct
-    // terminal state ("Stopped at budget") rather than reading as a normal
-    // completion or a crash. Reaching the discovery target wins over it.
-    const budgetStopped = !stoppedAtTarget && !result.aborted && isBudgetCapStop(result);
-    const finalStatus = result.aborted && !stoppedAtTarget
-      ? 'cancelled'
-      : budgetStopped ? BUDGET_STOPPED_STATUS : 'completed';
+    const finalStatus = finalStatusOf(result, stoppedAtTarget);
     // Reclaimed as orphaned mid-run: persist usage/log, keep the 'failed' verdict.
     const reclaimed = this.reclaimedJobs.has(jobId);
     const usageFields = abortedWithNoUsage ? {} : {
@@ -1393,6 +1487,7 @@ STOP TARGET: this run ends AUTOMATICALLY once ${targetDiscoveries} new discoveri
       totalInputTokens: result.tokensIn,
       totalOutputTokens: result.tokensOut,
       estimatedCostUsd: result.totalCostUsd.toFixed(4),
+      costBasis: result.costBasis,
     };
 
     // Persist the terminal status FIRST via a small dedicated retried UPDATE.
@@ -1431,6 +1526,7 @@ STOP TARGET: this run ends AUTOMATICALLY once ${targetDiscoveries} new discoveri
       duplicates: finalJob?.duplicatesSkipped || 0,
       turns: result.numTurns,
       costUsd: Number(result.totalCostUsd.toFixed(4)),
+      costBasis: result.costBasis,
       ...(statusPersisted ? {} : { reason: 'final status update failed after 3 attempts' }),
     });
 

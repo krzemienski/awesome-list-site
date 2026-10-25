@@ -5,7 +5,6 @@ import { db } from "../db";
 type HomeNavResource = {
   id: number;
   title: string;
-  url: string;
   description: string;
   category: string;
   subcategory: string | null;
@@ -57,12 +56,11 @@ function appendToMap<K, V>(map: Map<K, V[]>, key: K, value: V): void {
  */
 export class HomeNavRepository {
   async getHomeNav(): Promise<HomeNav> {
-    const [resourceRows, categoryRows, subcategoryRows, subSubcategoryRows] = await Promise.all([
+    const [allResources, categoryRows, subcategoryRows, subSubcategoryRows] = await Promise.all([
       db
         .select({
           id: resources.id,
           title: resources.title,
-          url: resources.url,
           description: resources.description,
           category: resources.category,
           subcategory: resources.subcategory,
@@ -98,19 +96,6 @@ export class HomeNavRepository {
         .from(subSubcategories)
         .orderBy(asc(subSubcategories.name)),
     ]);
-
-    // Keep the same first-row-wins URL deduplication and title/id ordering as
-    // LegacyRepository. The projection contains exactly the fields needed for
-    // this dedupe and the nav teaser/tree placement.
-    const seenUrls = new Set<string>();
-    const allResources = resourceRows.filter((resource) => {
-      const raw = typeof resource.url === "string" ? resource.url.trim().toLowerCase() : "";
-      const key = raw.replace(/\/+$/, "");
-      if (!key) return true;
-      if (seenUrls.has(key)) return false;
-      seenUrls.add(key);
-      return true;
-    });
 
     const subcategoriesByCategoryId = new Map<number, Array<(typeof subcategoryRows)[number]>>();
     for (const subcategory of subcategoryRows) {

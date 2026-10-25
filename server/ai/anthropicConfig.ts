@@ -42,6 +42,9 @@ const TIER_ENV: Record<ModelTier, string> = {
   fable: "ANTHROPIC_DEFAULT_FABLE_MODEL",
 };
 
+/** Every tier alias, which is also the set the Agent SDK CLI accepts as a model alias. */
+export const MODEL_TIERS = Object.keys(TIER_ENV) as ModelTier[];
+
 // First-party ids used only when no ANTHROPIC_DEFAULT_<TIER>_MODEL override exists.
 const FIRST_PARTY_TIER_MODELS: Record<ModelTier, string> = {
   haiku: "claude-haiku-4-5",
@@ -81,6 +84,11 @@ function stripTrailingSlash(u: string): string {
   return u.replace(/\/+$/, "");
 }
 
+/** Environment variable that maps a tier alias to a model id. */
+export function tierEnvVar(tier: ModelTier): string {
+  return TIER_ENV[tier];
+}
+
 /** Resolve the model id for a tier (env override → first-party default). */
 export function resolveTierModel(tier: ModelTier, env: Env = process.env): string {
   return clean(env[TIER_ENV[tier]]) ?? FIRST_PARTY_TIER_MODELS[tier];
@@ -97,18 +105,6 @@ export function resolvePrimaryModel(env: Env = process.env): string {
   return clean(env.ANTHROPIC_MODEL) ?? resolveTierModel("sonnet", env);
 }
 
-/**
- * Model value to hand the Claude Agent SDK for a SUBAGENT definition. The CLI
- * validates per-agent model ids against an internal allowlist and silently
- * swaps unknown ids for its default subagent model (which a custom endpoint
- * then rejects). Aliases always pass and are mapped by the CLI through the
- * same ANTHROPIC_DEFAULT_<TIER>_MODEL variables we use here, so subagents get
- * the tier alias rather than the resolved id.
- */
-export function subagentModelForTier(tier: ModelTier): string {
-  return tier;
-}
-
 export type CredentialKind = "router" | "managed" | "direct" | "none";
 
 export interface AnthropicCredentials {
@@ -123,8 +119,14 @@ export interface AnthropicCredentials {
   label: string;
 }
 
-export function resolveAnthropicCredentials(env: Env = process.env): AnthropicCredentials {
+/** The operator-configured endpoint (ANTHROPIC_BASE_URL, no trailing slash), if any. */
+export function configuredBaseUrl(env: Env = process.env): string | undefined {
   const baseUrl = clean(env.ANTHROPIC_BASE_URL);
+  return baseUrl ? stripTrailingSlash(baseUrl) : undefined;
+}
+
+export function resolveAnthropicCredentials(env: Env = process.env): AnthropicCredentials {
+  const baseUrl = configuredBaseUrl(env);
   const authToken = clean(env.ANTHROPIC_AUTH_TOKEN);
   const apiKey = clean(env.ANTHROPIC_API_KEY);
   const managedKey = clean(env.AI_INTEGRATIONS_ANTHROPIC_API_KEY);
@@ -132,11 +134,11 @@ export function resolveAnthropicCredentials(env: Env = process.env): AnthropicCr
 
   if (baseUrl && authToken) {
     const host = safeHost(baseUrl);
-    return { kind: "router", baseURL: stripTrailingSlash(baseUrl), authToken, label: `router ${host} (bearer token)` };
+    return { kind: "router", baseURL: baseUrl, authToken, label: `router ${host} (bearer token)` };
   }
   if (baseUrl && apiKey) {
     const host = safeHost(baseUrl);
-    return { kind: "router", baseURL: stripTrailingSlash(baseUrl), apiKey, label: `router ${host} (api key)` };
+    return { kind: "router", baseURL: baseUrl, apiKey, label: `router ${host} (api key)` };
   }
   if (baseUrl) {
     // Fail closed: a custom endpoint with no matching credential must NOT fall

@@ -12,7 +12,6 @@ import {
   Palette,
   Search,
   MoreHorizontal,
-  PanelLeft,
 } from "lucide-react";
 import { cn, slugify, getCategorySlug } from "@/lib/utils";
 import { getCategoryGlyph } from "./category-glyphs";
@@ -1002,7 +1001,6 @@ export default function AppSidebar({
     }>,
     className = "",
     compact = false,
-    showNavigationModeToggle = false,
   ) => (
     <DismissibleDetails className={`av-sidebar-more-navigation ${className}`}>
       <summary
@@ -1017,25 +1015,6 @@ export default function AppSidebar({
         )}
       </summary>
       <SidebarMenu className="px-2 pb-2">
-        {showNavigationModeToggle && (
-          <SidebarMenuItem>
-            <SidebarMenuButton asChild className="min-h-[44px]">
-              <button
-                type="button"
-                onClick={(e) => setNavigationMode(false, e.currentTarget)}
-                data-testid="sidebar-compact-navigation"
-                aria-label="Compact navigation"
-                title="Compact navigation"
-                className="sub-item touch-manipulation min-h-[44px] no-underline w-full"
-              >
-                <span className="flex min-w-0 items-center gap-[10px]">
-                  <PanelLeft aria-hidden="true" className="size-[14px] shrink-0" />
-                  <span className="break-words">Compact navigation</span>
-                </span>
-              </button>
-            </SidebarMenuButton>
-          </SidebarMenuItem>
-        )}
         {items.map((item) => {
           const MoreIcon = item.icon;
           return (
@@ -1132,7 +1111,6 @@ export default function AppSidebar({
     className: string,
     includeDocs = false,
     exposeResourceTestId = false,
-    showNavigationModeToggle = false,
   ) => (
     <SidebarFooter className={`av-sidebar-compact-footer ${className}`}>
       <div className="av-sidebar-compact-footer-status">
@@ -1179,12 +1157,7 @@ export default function AppSidebar({
             </svg>
           </a>
         </div>
-        {renderMoreNavigation(
-          items,
-          "av-sidebar-footer-more",
-          true,
-          showNavigationModeToggle,
-        )}
+        {renderMoreNavigation(items, "av-sidebar-footer-more", true)}
       </div>
     </SidebarFooter>
   );

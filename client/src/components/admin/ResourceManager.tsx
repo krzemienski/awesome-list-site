@@ -1124,6 +1124,9 @@ export default function ResourceManager({ createRequest = 0 }: { createRequest?:
     return data.resources.some(r => selectedResourceIds.includes(r.id)) && !isAllSelected;
   }, [data?.resources, selectedResourceIds, isAllSelected]);
 
+  // "approved" is the default status, not a filter the admin chose.
+  const hasActiveFilters = Boolean(search || categoryFilter || featuredOnly || statusFilter !== "approved");
+
   // Audit2 BUG-003: only the true first load may show the skeleton. With
   // keepPreviousData above, later key changes (typing, paging, filters) keep
   // `data` populated, so this branch can never unmount the search input
@@ -1161,7 +1164,7 @@ export default function ResourceManager({ createRequest = 0 }: { createRequest?:
                   {` · ★ ${featuredCount.toLocaleString()} featured on the home page`}
                 </span>
               ) : null}
-              {(search || categoryFilter || featuredOnly || (statusFilter && statusFilter !== "approved")) ? " · Filters applied" : ""}
+              {hasActiveFilters ? " · Filters applied" : ""}
             </CardDescription>
           </div>
           <div className="admin-catalog-resources__header-actions">
@@ -1261,20 +1264,30 @@ export default function ResourceManager({ createRequest = 0 }: { createRequest?:
             <Button type="submit" variant="outline" aria-label="Search" data-testid="button-search">
               <Search className="h-4 w-4" />
             </Button>
-            {(search || categoryFilter || statusFilter || featuredOnly) && (
-              <Button type="button" variant="ghost" onClick={clearFilters} aria-label="Clear filters" data-testid="button-clear-filters">
+            {hasActiveFilters && (
+              <Button
+                type="button"
+                variant="ghost"
+                onClick={(event) => {
+                  // The button hides once nothing is filtered; keep focus with the results.
+                  handoffFocusOnUnmount(event.currentTarget, () => tableRegionRef.current);
+                  clearFilters();
+                }}
+                aria-label="Clear filters"
+                data-testid="button-clear-filters"
+              >
                 <X className="h-4 w-4" />
               </Button>
             )}
           </form>
 
           {selectedResourceIds.length > 0 && (
-            <div className="flex items-center justify-between p-3 bg-[var(--surface-2)] border border-[var(--accent)]/30 rounded-lg">
-              <div className="flex items-center gap-3">
+            <div className="flex flex-wrap items-center justify-between gap-2 p-3 bg-[var(--surface-2)] border border-[var(--accent)]/30 rounded-lg">
+              <div className="flex flex-wrap items-center gap-3">
                 <span className="text-sm font-medium text-[var(--text)]">
                   {selectedResourceIds.length} {selectedResourceIds.length === 1 ? 'item' : 'items'} selected
                 </span>
-                <div className="flex gap-2">
+                <div className="flex flex-wrap gap-2">
                   <Button
                     size="sm"
                     variant="outline"
@@ -1496,7 +1509,17 @@ export default function ResourceManager({ createRequest = 0 }: { createRequest?:
             <table className="table admin-catalog-resources__table">
               <thead>
                 <tr>
-                  <th>ID</th>
+                  <th className="admin-catalog-resources__id-cell admin-catalog-resources__id-head">
+                    <span>ID</span>
+                    <Checkbox
+                      checked={isAllSelected ? true : isSomeSelected ? "indeterminate" : false}
+                      onCheckedChange={toggleSelectAll}
+                      disabled={!data?.resources.length}
+                      aria-label="Select all resources on this page"
+                      className="admin-catalog-resources__row-select h-8 w-8"
+                      data-testid="checkbox-select-all-resources"
+                    />
+                  </th>
                   <th>Title</th>
                   <th>Category</th>
                   <th>Tags</th>
@@ -1509,13 +1532,13 @@ export default function ResourceManager({ createRequest = 0 }: { createRequest?:
                 {!isLoading && !isError && (data?.resources.length || 0) === 0 && (
                   <tr>
                     <td colSpan={6} className="py-12 text-center text-sm text-[var(--text-2)]" data-testid="row-empty-state">
-                      {(search || categoryFilter || statusFilter)
+                      {hasActiveFilters
                         ? <>No resources match the current search or filters.{' '}
                             {/* C5-V5A-02: this row unmounts once results return;
                                 hand focus to the table that shows them. */}
                             <button
                               type="button"
-                              className="text-primary underline"
+                              className="min-h-6 text-primary underline"
                               onClick={() => {
                                 clearFilters();
                                 tableRegionRef.current?.focus();

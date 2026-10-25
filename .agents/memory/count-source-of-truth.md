@@ -41,6 +41,8 @@ The trap is not limited to the sidebar and the sub/sub-sub pages. The landing pa
 
 **Rule:** ALL user-facing count + list surfaces derive from the single `/api/awesome-list` tree via `getTotalResourceCount` (counts) / flatten-the-subtree (lists). Never reintroduce `/api/categories` counts or raw `/api/resources` for DISPLAY. Admin views and `/search` intentionally stay on the raw table (raw is correct there).
 
-**Why:** the app dedups by normalized URL at tree-build time (`getAwesomeListFromDatabase`); the raw table still carries the dupes. Two sources = guaranteed divergence + a client/SSR hydration mismatch.
+**Why:** two sources = guaranteed divergence + a client/SSR hydration mismatch.
+
+**Superseded 2026-10-25 (merge e5a0abf0):** the tree builders (`LegacyRepository`, `HomeNavRepository`) no longer drop approved rows that share a normalized URL. That render-time dedup hid 15 approved resources from every listing while `/api/categories`, search and the detail page still counted them (tree 1,934 vs DB 1,949). Every approved row is public now, so the tree count equals the raw approved count; near-duplicate URL pairs render as two cards until an admin merges or rejects one. To find them, compare `count(*)` with `count(distinct regexp_replace(lower(trim(url)),'/+$',''))`; an exact-URL check misses them.
 
 **How to apply:** to verify end-to-end, one category (e.g. `intro-learning`) must read the SAME number on the sidebar, the home card, the `/categories` card, the `/category/:slug` header/badge/"Showing X of Y", and the Googlebot SSR title+description. The durable source-level fix is to merge/reject the near-duplicate DB rows so raw == tree everywhere (publishing does not reseed prod, so that reconciliation is a separate prod-data step).

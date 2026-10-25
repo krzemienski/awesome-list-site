@@ -32,6 +32,7 @@ import {
 } from "lucide-react";
 import BookmarkNotesDialog from "@/components/resource/BookmarkNotesDialog";
 import ReportLinkAction from "@/components/resource/ReportLinkAction";
+import ResourceOnwardPaths, { ONWARD_SURFACE } from "@/components/resource/ResourceOnwardPaths";
 import { useAuth } from "@/hooks/useAuth";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { apiRequest, ApiError } from "@/lib/queryClient";
@@ -42,7 +43,6 @@ import {
   trackResourceFavorite,
   trackResourceClick,
   trackRelatedResourceOpened,
-  trackRelatedCategoryOpened,
 } from "@/lib/analytics";
 import { trackCollectionMembershipResults } from "@/lib/analytics-collections";
 import { useToast } from "@/hooks/use-toast";
@@ -603,15 +603,19 @@ export default function ResourceDetail() {
   // open-in-new-tab works.
   const handleRelatedResourceClick = (
     e: React.MouseEvent<HTMLAnchorElement>,
-    relatedResource: Resource & { score?: number },
+    relatedResource: { id: number; score?: number },
     position: number,
+    surface?: string,
   ) => {
-    trackRelatedResourceOpened(relatedResource.id, id, position, relatedResource.score);
-    trackInteraction.mutate({
-      resourceId: relatedResource.id.toString(),
-      interactionType: "click",
-      metadata: { source: "related-resources", fromResourceId: id }
-    });
+    trackRelatedResourceOpened(relatedResource.id, id, position, relatedResource.score, surface);
+    // Interaction history is per member; guests would only collect a 401.
+    if (user?.id) {
+      trackInteraction.mutate({
+        resourceId: relatedResource.id.toString(),
+        interactionType: "click",
+        metadata: { source: "related-resources", fromResourceId: id }
+      });
+    }
     if (e.metaKey || e.ctrlKey || e.shiftKey || e.altKey || e.button !== 0) return;
     e.preventDefault();
     setLocation(`/resource/${relatedResource.id}`);
@@ -741,9 +745,11 @@ export default function ResourceDetail() {
             <span className="resource-detail-chip-wrap">
               {taxonomySlugs.category
                 ? (
-                  <Link href={`/category/${taxonomySlugs.category}`} className="chip" data-testid="badge-category">
-                    <span aria-hidden="true">{categoryGlyph(taxonomySlugs.category || resource.category)}</span>
-                    <span className="resource-detail-chip-label">{resource.category}</span>
+                  <Link href={`/category/${taxonomySlugs.category}`} className="resource-detail-chip-link" data-testid="badge-category">
+                    <span className="chip">
+                      <span aria-hidden="true">{categoryGlyph(taxonomySlugs.category || resource.category)}</span>
+                      <span className="resource-detail-chip-label">{resource.category}</span>
+                    </span>
                   </Link>
                 )
                 : (
@@ -777,8 +783,10 @@ export default function ResourceDetail() {
             <span className="resource-detail-chip-wrap">
               {taxonomySlugs.subcategory
                 ? (
-                  <Link className="chip" href={`/subcategory/${taxonomySlugs.subcategory}`} data-testid="badge-subcategory">
-                    <span className="resource-detail-chip-label">{resource.subcategory}</span>
+                  <Link className="resource-detail-chip-link" href={`/subcategory/${taxonomySlugs.subcategory}`} data-testid="badge-subcategory">
+                    <span className="chip">
+                      <span className="resource-detail-chip-label">{resource.subcategory}</span>
+                    </span>
                   </Link>
                 )
                 : (
@@ -792,8 +800,10 @@ export default function ResourceDetail() {
             <span className="resource-detail-chip-wrap">
               {taxonomySlugs.subSubcategory
                 ? (
-                  <Link className="chip" href={`/sub-subcategory/${taxonomySlugs.subSubcategory}`} data-testid="badge-sub-subcategory">
-                    <span className="resource-detail-chip-label">{resource.subSubcategory}</span>
+                  <Link className="resource-detail-chip-link" href={`/sub-subcategory/${taxonomySlugs.subSubcategory}`} data-testid="badge-sub-subcategory">
+                    <span className="chip">
+                      <span className="resource-detail-chip-label">{resource.subSubcategory}</span>
+                    </span>
                   </Link>
                 )
                 : (
@@ -822,8 +832,10 @@ export default function ResourceDetail() {
           </Button>
           {/* R2-L09: favorite/bookmark shown to anonymous users too — clicks
               prompt sign-in instead of hiding the affordance. */}
+          {/* Pressed state is painted by the aria-pressed rule in resource.css
+              (accent ink on an accent wash), so the variant stays outline. */}
           <Button
-            variant={isFavorite ? "default" : "outline"}
+            variant="outline"
             size="sm"
             onClick={handleFavoriteClick}
             aria-disabled={favorite.isPending}
@@ -838,7 +850,7 @@ export default function ResourceDetail() {
             <span>{isFavorite ? 'Favorited' : 'Favorite'}</span>
           </Button>
           <Button
-            variant={isBookmarked ? "default" : "outline"}
+            variant="outline"
             size="sm"
             onClick={handleBookmarkClick}
             aria-disabled={bookmark.isPending}
@@ -929,6 +941,19 @@ export default function ResourceDetail() {
         collectionsLoading={collectionsLoading}
       />
 
+      <ResourceOnwardPaths
+        resourceId={resource.id}
+        related={filteredRelatedResources}
+        relatedLoading={relatedQuery.isLoading}
+        onRelatedClick={(e, related, position) => handleRelatedResourceClick(e, related, position, ONWARD_SURFACE)}
+        narrowestCollection={narrowestCollection}
+        category={resource.category && taxonomySlugs.category
+          ? { name: resource.category, href: `/category/${taxonomySlugs.category}` }
+          : null}
+        pendingCollectionRows={awesomeListTree ? 0 : Number(Boolean(resource.category)) + Number(Boolean(resource.subcategory))}
+        tags={tags ?? []}
+      />
+
       {/* Related resources sit directly under the actions: resource pages are
           the main search entry point, and when this list was below the details
           it started a full screen down, so most visitors never saw a next step.
@@ -994,7 +1019,7 @@ export default function ResourceDetail() {
                 className="text-sm text-muted-foreground"
                 data-testid="related-empty-state"
               >
-                No related resources yet. Explore more in this category below.
+                No related resources yet. Try this resource&apos;s collection or tags under Keep exploring.
               </p>
             )}
             {filteredRelatedResources.map((related, index) => (
@@ -1034,40 +1059,6 @@ export default function ResourceDetail() {
                 )}
               </a>
             ))}
-            {/* The category link needs the nav tree's slug; hold its row while
-                that tree is still loading so the card does not grow later. */}
-            {resource.category && !awesomeListTree && (
-              <div aria-hidden="true" className="w-full mt-2 min-h-[44px]" />
-            )}
-            {resource.subcategory && !awesomeListTree && (
-              <div aria-hidden="true" className="w-full mt-2 min-h-[44px]" />
-            )}
-            {narrowestCollection && (
-              <Button asChild variant="outline" size="sm" className="w-full mt-2 min-h-[44px]">
-                <Link
-                  href={narrowestCollection.href}
-                  onClick={() => trackRelatedCategoryOpened(resource.id, narrowestCollection.name)}
-                  data-testid="link-more-in-collection"
-                >
-                  More in {narrowestCollection.name}
-                  <ChevronRight className="h-4 w-4 ml-1" />
-                </Link>
-              </Button>
-            )}
-            {resource.category && taxonomySlugs.category && (
-              /* Run16 BUG-057: asChild makes the anchor itself the ≥44px button
-                 (an inline Link wrapping a Button was a 20px-tall target). */
-              <Button asChild variant="ghost" size="sm" className="w-full mt-2 min-h-[44px]">
-                <Link
-                  href={`/category/${taxonomySlugs.category}`}
-                  onClick={() => trackRelatedCategoryOpened(resource.id, resource.category ?? "")}
-                  data-testid="link-view-all-category"
-                >
-                  View all in {resource.category}
-                  <ChevronRight className="h-4 w-4 ml-1" />
-                </Link>
-              </Button>
-            )}
           </CardContent>
         </Card>
       </section>
@@ -1214,13 +1205,6 @@ export default function ResourceDetail() {
                 </a>
               </div>
 
-              {(!tags || tags.length === 0) && (
-                <div data-seo-section="resource-tags">
-                  <h2 className="eyebrow">Tags</h2>
-                  <div />
-                </div>
-              )}
-
               {tags && tags.length > 0 && (
                 <>
                   <Separator />
@@ -1229,10 +1213,10 @@ export default function ResourceDetail() {
                       <Tag className="h-4 w-4 text-[color:var(--text-3)]" />
                       Tags
                     </h2>
-                    <div className="flex flex-wrap gap-2">
+                    <div className="flex flex-wrap gap-x-2">
                       {tags.map((tag, index) => (
                         <span className="resource-detail-chip-wrap" key={index}>
-                          <Link href={tagLandingPath(tag)}>
+                          <Link href={tagLandingPath(tag)} className="resource-detail-chip-link">
                             <span
                               className="chip mono"
                               data-testid={`tag-link-${index}`}

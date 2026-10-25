@@ -146,6 +146,11 @@ export function visibleNavCategories(
     }));
 }
 
+/** The public subcategory count: subcategories of the visible tree. */
+export function countVisibleSubcategories(categories: AwesomeListNavNode[]): number {
+  return categories.reduce((total, category) => total + (category.subcategories?.length ?? 0), 0);
+}
+
 /**
  * Routes whose CONTENT needs the full corpus (resource listings / client-side
  * fuzzy browse). Everything else renders from the nav tree + page-scoped

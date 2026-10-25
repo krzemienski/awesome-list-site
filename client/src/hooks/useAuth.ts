@@ -4,9 +4,11 @@ import { whenClerkLoaded } from '@/lib/clerk-bridge';
 import { queryClient, ApiError, renewSessionToken } from '@/lib/queryClient';
 import { notifyCrossTabSync } from '@/lib/crossTabSync';
 import { safeRemoveItem } from '@/lib/safeStorage';
-import { mpIdentify, mpReset } from '@/lib/mixpanel';
-import { phIdentify, phReset } from '@/lib/posthog';
-import { trackLoggedOut } from '@/lib/analytics';
+import { initMixpanel, mpIdentify, mpReset, optOutMixpanel } from '@/lib/mixpanel';
+import { initPosthog, phIdentify, phReset, optOutPosthog } from '@/lib/posthog';
+import { initAmplitude, optOutAmplitude } from '@/lib/amplitude';
+import { initGA, optOutGA, trackLoggedOut, trackPageView } from '@/lib/analytics';
+import { setAdminAnalyticsSession } from '@/lib/analytics-suppression';
 import { useToast } from '@/hooks/use-toast';
 
 /**
@@ -18,7 +20,43 @@ export function clearSignedInClientState(): void {
   safeRemoveItem('submit-resource-draft');
   mpReset();
   phReset();
+  // Every sign-out path ends with a full reload, so a visitor's analytics
+  // start again on the next page.
+  setAdminAnalyticsSession(false);
   notifyCrossTabSync();
+}
+
+// Whether this tab has stopped its vendor SDKs for an admin session. The
+// localStorage marker is shared by every tab, so it cannot tell a tab that
+// started its SDKs as a visitor before another tab set it.
+let vendorsStoppedForAdmin = false;
+
+/**
+ * Admin sessions send nothing to any analytics tool. The marker makes the
+ * next load quiet before auth resolves. Each tab that learns the user is an
+ * admin stops the SDKs it already started under a visitor's grant; when a
+ * non-admin account replaces an admin marker, the SDKs start again (each
+ * init still checks consent and QA paths).
+ */
+function syncAdminAnalytics(role: string | undefined): boolean {
+  const isAdmin = role === 'admin';
+  const markerChanged = setAdminAnalyticsSession(isAdmin);
+  if (isAdmin && !vendorsStoppedForAdmin) {
+    vendorsStoppedForAdmin = true;
+    optOutGA();
+    optOutMixpanel();
+    optOutPosthog();
+    optOutAmplitude();
+  } else if (!isAdmin && (markerChanged || vendorsStoppedForAdmin)) {
+    vendorsStoppedForAdmin = false;
+    initGA();
+    initMixpanel();
+    initPosthog();
+    initAmplitude();
+    // This page's view was dropped while the marker suppressed it.
+    trackPageView(window.location.href);
+  }
+  return isAdmin;
 }
 
 interface User {
@@ -42,6 +80,35 @@ const LOGOUT_REQUEST_TIMEOUT_MS = 5_000;
 
 function logoutRequestSignal(): AbortSignal {
   return AbortSignal.timeout(LOGOUT_REQUEST_TIMEOUT_MS);
+}
+
+/**
+ * End both kinds of session, then confirm the server no longer sees one.
+ * Every sign-out path (account menu and the /logout route) runs this.
+ */
+export async function signOutAndVerify(): Promise<void> {
+  // Clear the owner password cookie too (no-op for Clerk-only sessions),
+  // or the server would still see the admin after Clerk signs out.
+  await fetch('/api/auth/admin-logout', {
+    method: 'POST',
+    credentials: 'include',
+    signal: logoutRequestSignal(),
+  });
+  // Clerk loads on demand (backlog X-03); waiting for it to load matters on a
+  // direct /logout load, where signOut() would otherwise only queue
+  // (C3-V3-02). The bridged signOut skips Clerk's after-sign-out navigation;
+  // callers do the full reload once the server confirms.
+  const clerk = await whenClerkLoaded();
+  await clerk.signOut();
+  const authCheck = await fetch('/api/auth/user', {
+    credentials: 'include',
+    cache: 'no-store',
+    signal: logoutRequestSignal(),
+  });
+  const authState = authCheck.ok ? await authCheck.json() : null;
+  if (!authCheck.ok || authState?.isAuthenticated !== false) {
+    throw new Error('The server could not confirm that your session ended');
+  }
 }
 
 /**
@@ -94,7 +161,7 @@ export function useAuth() {
   // harmless. Reset lives in the logout mutation below.
   const authedUser = data?.user ?? null;
   useEffect(() => {
-    if (authedUser?.id) {
+    if (authedUser?.id && !syncAdminAnalytics(authedUser.role)) {
       const identity = {
         id: authedUser.id,
         name: authedUser.name,
@@ -106,34 +173,9 @@ export function useAuth() {
       phIdentify(identity);
     }
     // Identify once per signed-in user id (session start/restore), not on
-    // every profile-field refetch.
+    // every profile-field refetch. Admins are never identified.
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [authedUser?.id]);
-
-  /** Sign out via Clerk, then confirm the server no longer sees a session. */
-  const clerkSignOutAndVerify = async () => {
-    // Clear the owner password cookie too (no-op for Clerk-only sessions),
-    // or the server would still see the admin after Clerk signs out.
-    await fetch('/api/auth/admin-logout', {
-      method: 'POST',
-      credentials: 'include',
-      signal: logoutRequestSignal(),
-    });
-    // Clerk loads on demand (backlog X-03); the bridged signOut skips Clerk's
-    // after-sign-out navigation, and finishLogout does the full reload once
-    // the server confirms (C3-V3-02).
-    const clerk = await whenClerkLoaded();
-    await clerk.signOut();
-    const authCheck = await fetch('/api/auth/user', {
-      credentials: 'include',
-      cache: 'no-store',
-      signal: logoutRequestSignal(),
-    });
-    const authState = authCheck.ok ? await authCheck.json() : null;
-    if (!authCheck.ok || authState?.isAuthenticated !== false) {
-      throw new Error('The server could not confirm that your session ended');
-    }
-  };
 
   const finishLogout = (scope: 'this_device' | 'all_devices') => {
       // Before clearSignedInClientState resets the analytics identities, so
@@ -160,7 +202,7 @@ export function useAuth() {
   const logoutMutation = useMutation({
     mutationFn: async () => {
       setLogoutError(null);
-      await clerkSignOutAndVerify();
+      await signOutAndVerify();
     },
     onSuccess: () => finishLogout('this_device'),
     onError: handleLogoutError,
@@ -181,7 +223,7 @@ export function useAuth() {
         const body = await response.json().catch(() => null);
         throw new Error(body?.message || 'Sign out failed');
       }
-      await clerkSignOutAndVerify();
+      await signOutAndVerify();
     },
     onSuccess: () => finishLogout('all_devices'),
     onError: handleLogoutError,
