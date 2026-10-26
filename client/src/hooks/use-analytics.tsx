@@ -42,9 +42,11 @@ export const useAnalytics = () => {
   // pushState/replaceState wrappers and has no popstate listener, so after
   // Back/Forward it recorded no page view and kept tagging events with the
   // previous page's URL. A same-URL, same-state replaceState hands it the
-  // current URL; without the tracker the call changes nothing.
+  // current URL; without the tracker the call changes nothing. Suppression is
+  // refreshed for the new URL first so the tracker never sees a stale opt-out.
   useEffect(() => {
     const announceTraversal = () => {
+      syncReplitPageviewOptOut();
       window.history.replaceState(window.history.state, '', window.location.href);
     };
     window.addEventListener('popstate', announceTraversal);
