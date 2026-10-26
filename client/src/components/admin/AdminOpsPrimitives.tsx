@@ -30,13 +30,19 @@ AdminOpsScrollBar.displayName = ScrollAreaPrimitive.ScrollAreaScrollbar.displayN
  * Operations-owned equivalent of the shared Table primitive. The viewport
  * wrapper intentionally owns the focus target so every operations table has
  * one keyboard-discoverable horizontal scroll region without changing the
- * shared UI contract.
+ * shared UI contract. `scrollLabel` names that focus target as a region so a
+ * screen reader announces what Tab landed on.
  */
 export const AdminOpsTable = React.forwardRef<
   HTMLTableElement,
-  React.HTMLAttributes<HTMLTableElement>
->(({ className, ...props }, ref) => (
-  <div className="relative w-full overflow-auto" tabIndex={0}>
+  React.HTMLAttributes<HTMLTableElement> & { scrollLabel?: string }
+>(({ className, scrollLabel, ...props }, ref) => (
+  <div
+    className="relative w-full overflow-auto"
+    tabIndex={0}
+    role={scrollLabel ? "region" : undefined}
+    aria-label={scrollLabel}
+  >
     <table ref={ref} className={cn("w-full caption-bottom text-sm", className)} {...props} />
   </div>
 ));
