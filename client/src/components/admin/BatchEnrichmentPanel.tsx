@@ -417,13 +417,19 @@ export default function BatchEnrichmentPanel() {
       <div className="queues-agent__canonical">
         <div className="queues-agent__stat-strip">
           {(() => {
-            // The newest finished job that enriched anything, whatever its
-            // end state: a cancelled run still wrote the resources it reached,
-            // while a "completed" run with nothing to do enriched nothing.
-            const lastEnriching = jobs.find((job) =>
-              job.completedAt && (job.successfulResources || 0) > 0,
-            );
-            const enrichedCount = lastEnriching?.successfulResources || 0;
+            // The most recently finished job that enriched anything, whatever
+            // its end state: a cancelled run still wrote the resources it
+            // reached, while a "completed" run with nothing to do enriched
+            // nothing. Jobs arrive newest-created first, which is not the
+            // order they finished in.
+            let lastEnriching: EnrichmentJob | undefined;
+            for (const job of jobs) {
+              if (!job.completedAt || (job.successfulResources ?? 0) === 0) continue;
+              if (!lastEnriching?.completedAt || new Date(job.completedAt) > new Date(lastEnriching.completedAt)) {
+                lastEnriching = job;
+              }
+            }
+            const enrichedCount = lastEnriching?.successfulResources ?? 0;
             return (
               <Stat
                 className="queues-agent__stat"
@@ -433,7 +439,7 @@ export default function BatchEnrichmentPanel() {
                   ? "unavailable"
                   : lastEnriching
                     ? `batch #${lastEnriching.id} · ${enrichedCount} ${enrichedCount === 1 ? "resource" : "resources"}${lastEnriching.status === "completed" ? "" : ` · ${lastEnriching.status === "budget_stopped" ? "stopped at budget" : lastEnriching.status}`}`
-                    : "No batch has enriched resources yet"}
+                    : "No recent batch enriched resources"}
               />
             );
           })()}
@@ -869,7 +875,7 @@ export default function BatchEnrichmentPanel() {
             // Radix ScrollArea viewport clipped horizontal overflow, making
             // Processed/Success Rate/Actions unreachable at ≤768px.
             <div
-              className="max-h-[400px] overflow-auto"
+              className="queues-agent__jobs-scroll max-h-[400px] overflow-auto"
               tabIndex={0}
               role="region"
               aria-label="Job history table, scrollable"

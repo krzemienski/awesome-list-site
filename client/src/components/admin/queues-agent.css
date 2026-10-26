@@ -469,20 +469,9 @@
     padding: 16px;
   }
 }
-/* Job History scrolls in one named region. The shared Table's own overflow
-   wrapper would nest a second, unnamed scroller that clipped the Actions
-   column at tablet widths, so it yields to the region. */
-.queues-agent--enrichment [data-testid="scroller-enrichment-jobs-table"] > .relative {
-  overflow: visible;
-}
-
-/* Compact cells from tablet width down, so all seven columns fit at 820. */
-@media (max-width: 64rem) {
-  .queues-agent--enrichment .queues-agent__table-body td,
-  .queues-agent--enrichment .queues-agent__table-body th {
-    padding: .65rem .75rem;
-  }
-}
+/* Job History: one named scroller (the Table's own yields), cells fit at 820. */
+.queues-agent__jobs-scroll > div { overflow: visible; }
+@media (max-width: 64rem) { .queues-agent--enrichment .queues-agent__table-body :is(td, th) { padding: .65rem .75rem; } }
 
 /* Match the adjusted reference's 44px control floor without changing inset. */
 .queues-agent .admin-ops-table-shell__actions .btn {
