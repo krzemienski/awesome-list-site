@@ -17,6 +17,7 @@ import { strictUrlPage } from "@/lib/page-param";
 import { slugify } from "@/lib/utils";
 import NotFound from "@/pages/not-found";
 import { tagScopeIntro } from "@shared/seo-content-templates";
+import { MAX_PAGE } from "@shared/page-param";
 import {
   pagedSeoDescription,
   pagedSeoTitleCore,
@@ -70,6 +71,9 @@ export default function TagLanding() {
   const urlPage = strictUrlPage(new URLSearchParams(search).get("page"));
   const page = urlPage ?? 1;
   const offset = (page - 1) * PAGE_SIZE;
+  // The API 400s an offset past int4; no tag has that many pages, so such a
+  // page is past the end like any other and 404s on both passes.
+  const pageReachable = urlPage !== null && offset <= MAX_PAGE;
   // The API rejects over-length tags with a 400 that no retry can fix; the
   // server already answers such URLs 404, so the page must agree.
   const tagIsQueryable = Boolean(slug) && slug.length <= TAG_MAX_LENGTH;
@@ -86,7 +90,7 @@ export default function TagLanding() {
       }
       return apiRequest(url, { method: "GET" });
     },
-    enabled: tagIsQueryable && urlPage !== null,
+    enabled: tagIsQueryable && pageReachable,
     staleTime: 60_000,
     // Hold the current page only while paging within this tag; another tag's
     // cards and total must never render under the new tag's heading.
@@ -97,23 +101,26 @@ export default function TagLanding() {
   const listedTotal = listing.data?.total;
   const pastLastPage = listedTotal !== undefined && !listing.isPlaceholderData
     && page > Math.max(1, Math.ceil(listedTotal / PAGE_SIZE));
+  // A rejected ?page= disables the query but still reads page 1 from the
+  // cache, so the listing data alone can't tell a 404 from a real view.
+  const notFound = !tagIsQueryable || !pageReachable || pastLastPage;
 
   // One view event per tag visit, once the real (non-placeholder) total is in,
   // matching category_viewed on the taxonomy pages.
   const viewedTagRef = useRef<string | null>(null);
   useEffect(() => {
-    if (!tagIsQueryable || listedTotal === undefined || listing.isPlaceholderData || pastLastPage) return;
+    if (notFound || listedTotal === undefined || listing.isPlaceholderData) return;
     if (viewedTagRef.current === slug) return;
     viewedTagRef.current = slug;
     trackTagInteraction(slug, "landing_viewed", "tag_page", listedTotal);
-  }, [listedTotal, listing.isPlaceholderData, pastLastPage, slug, tagIsQueryable]);
+  }, [listedTotal, listing.isPlaceholderData, notFound, slug]);
 
   const canonicalPath = tagLandingPath(slug);
   if (slug && window.location.pathname !== canonicalPath) {
     return <Redirect to={`${canonicalPath}${search ? `?${search}` : ""}`} replace />;
   }
 
-  if (!tagIsQueryable || urlPage === null || pastLastPage) return <NotFound />;
+  if (notFound) return <NotFound />;
   if (queryUnavailableReason(listing) === "offline") {
     return <OfflinePageState onRetry={() => void listing.refetch()} testId="tag-offline" />;
   }

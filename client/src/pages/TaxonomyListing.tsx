@@ -109,6 +109,37 @@ function samePath(a: string, b: string) {
   };
   return norm(a) === norm(b);
 }
+interface ListingUrlState {
+  searchTerm: string;
+  selection: string;
+  general: boolean;
+  tags: string[];
+  provider: string;
+  format: string;
+  skillLevel: string;
+  sort: string;
+  kind: ResourceKind | null;
+  page: number;
+  view: ViewMode;
+}
+
+/** The canonical query string for the listing's visible state. */
+function listingQuery(state: ListingUrlState): URLSearchParams {
+  const next = new URLSearchParams();
+  if (state.searchTerm.trim()) next.set("search", state.searchTerm);
+  if (state.selection !== "all" && !state.general) next.set("subcategory", state.selection);
+  if (state.tags.length) next.set("tags", state.tags.join(","));
+  if (state.provider) next.set("provider", state.provider);
+  if (state.format) next.set("format", state.format);
+  if (state.skillLevel) next.set("skillLevel", state.skillLevel);
+  if (state.sort !== "default") next.set("sortBy", state.sort);
+  if (state.kind) next.set("kind", state.kind);
+  if (state.page > 1) next.set("page", String(state.page));
+  if (state.general) next.set("filter", "general");
+  if (state.view !== "grid") next.set("view", state.view);
+  return next;
+}
+
 function resourceNoun(count: number): string {
   return count === 1 ? "resource" : "resources";
 }
@@ -120,10 +151,9 @@ export default function TaxonomyListing({ level }: Props) {
   const { data: publicConfig } = useContactConfig(true);
   const siteName = publicConfig ? resolveSiteIdentity({ name: publicConfig.site.title }).name : "the catalog";
   const params = new URLSearchParams(search);
-  const initialPage = strictUrlPage(params.get("page"));
-  const [page, setPage] = useState(initialPage ?? 1);
+  const [page, setPage] = useState(() => strictUrlPage(params.get("page")) ?? 1);
   // The URL's ?page= is a spelling og-middleware 404s ("abc", "0", "1e3").
-  const [pageRejected, setPageRejected] = useState(initialPage === null);
+  const pageRejected = strictUrlPage(params.get("page")) === null;
   const [searchTerm, setSearchTerm] = useState(params.get("search") ?? "");
   const [tags, setTags] = useState(() => parseTagsParam(params));
   const [provider, setProvider] = useState(params.get("provider") ?? "");
@@ -145,6 +175,40 @@ export default function TaxonomyListing({ level }: Props) {
   const [selection, setSelection] = useState(initialGeneral ? "__general__" : params.get("subcategory") ?? "all");
   const [general, setGeneral] = useState(initialGeneral);
   const [toolsOpen, setToolsOpen] = useState(false);
+
+  // Every navigation (link, Back/Forward) reaches this mounted listing as a
+  // new route key. Rehydrate from it during render, not in an effect: the
+  // commit delivering the URL would otherwise run the URL-sync effect on the
+  // previous route's state and overwrite the requested URL.
+  const routeKey = `${routeFor(level, slug)}?${search}`;
+  const [hydratedRoute, setHydratedRoute] = useState(routeKey);
+  const stateQuery = listingQuery({ searchTerm, selection, general, tags, provider, format, skillLevel, sort, kind, page, view });
+  if (hydratedRoute !== routeKey) {
+    setHydratedRoute(routeKey);
+    // C8-V1-02: wouter reports our own canonicalising rewrite (?sort=asc ->
+    // ?sortBy=name-asc) back as a navigation; state already matches it, and
+    // rehydrating would wipe the page-clamp notice set just before it.
+    if (routeKey !== `${routeFor(level, slug)}?${stateQuery}`) {
+      const nextGeneral =
+        params.get("filter") === "general" ||
+        params.get("view") === "general" ||
+        params.get("subcategory") === "__general__";
+      setSearchTerm(params.get("search") ?? "");
+      setSelection(nextGeneral ? "__general__" : params.get("subcategory") ?? "all");
+      setGeneral(nextGeneral);
+      setTags(parseTagsParam(params));
+      setProvider(params.get("provider") ?? "");
+      setFormat(params.get("format") ?? "");
+      setSkillLevel(params.get("skillLevel") ?? "");
+      setKind(parseKindParam(params.get("kind")));
+      setSort(normalizeSort(params.get("sortBy") || params.get("sort")));
+      setPage(strictUrlPage(params.get("page")) ?? 1);
+      setNotice(null);
+      const nextView = params.get("view");
+      setView(isLayoutViewMode(nextView) ? nextView : "grid");
+    }
+  }
+
   const normalizedSearch = normalizeSearchQuery(searchTerm);
   const debouncedSearch = normalizeSearchQuery(useDebounce(searchTerm, 300));
   const serverSearchActive = debouncedSearch.length > 0;
@@ -251,10 +315,17 @@ export default function TaxonomyListing({ level }: Props) {
   const parentSubcategory = listingData?.parents.subcategory;
   const displayName = name;
   const loading = listing.isLoading && !listingData;
-  const resultsLoading = serverFilterActive && (taxonomySearch.isLoading || taxonomySearch.isPlaceholderData);
-  const paginationReady = serverFilterActive
+  // Placeholder cards belong to the previous page or scope; never show them
+  // under a URL that asks for another one.
+  const resultsLoading = serverFilterActive
+    ? taxonomySearch.isLoading || taxonomySearch.isPlaceholderData
+    : listing.isPlaceholderData;
+  // While the debounce lags the URL's search, neither total describes the
+  // URL, so the clamp-or-404 decision waits.
+  const searchSettled = debouncedSearch === normalizedSearch;
+  const paginationReady = searchSettled && (serverFilterActive
     ? Boolean(taxonomySearch.data && !taxonomySearch.isPlaceholderData)
-    : Boolean(listingData && !listing.isPlaceholderData);
+    : Boolean(listingData && !listing.isPlaceholderData));
   // Same split as resolveTaxonomyPage: a narrowed view clamps a page past the
   // end, the plain listing 404s it (BUG-027).
   const listingFiltered = serverFilterActive || selection !== "all" || general;
@@ -317,114 +388,47 @@ export default function TaxonomyListing({ level }: Props) {
     pendingAnalyticsRef.current = null;
   }, [currentFilterSignature, level, taxonomySearch.data, taxonomySearch.isPlaceholderData]);
 
-  const hydratedRouteRef = useRef(`${routeFor(level, slug)}?${search}`);
-  const lastWrittenRouteRef = useRef<string | null>(null);
   const urlSyncInitialized = useRef(false);
-  const popNavigation = useRef(false);
+  const syncedRoute = useRef(hydratedRoute);
   const replaceNextUrlSync = useRef(false);
   const pushSnapshot = useRef("");
   useEffect(() => {
     if (listingFiltered && page > totalPages && paginationReady) {
+      // Correct the URL in place: Back to it would only clamp again.
+      replaceNextUrlSync.current = true;
       setNotice(`Page ${page} is not available; showing page ${totalPages} instead.`);
       setPage(totalPages);
     }
   }, [listingFiltered, page, paginationReady, totalPages]);
+  const stateHref = `${routeFor(level, slug)}${stateQuery.size ? `?${stateQuery}` : ""}`;
+  // Search text is left out so typing replaces the entry instead of pushing.
+  const snapshot = JSON.stringify([page, selection, tags, provider, format, skillLevel, sort, kind, general, view]);
   useEffect(() => {
-    const next = new URLSearchParams();
-    if (searchTerm.trim()) next.set("search", searchTerm);
-    if (selection !== "all" && !general) next.set("subcategory", selection);
-    if (tags.length) next.set("tags", tags.join(","));
-    if (provider) next.set("provider", provider);
-    if (format) next.set("format", format);
-    if (skillLevel) next.set("skillLevel", skillLevel);
-    if (sort !== "default") next.set("sortBy", sort);
-    if (kind) next.set("kind", kind);
-    if (page > 1) next.set("page", String(page));
-    if (general) next.set("filter", "general");
-    if (view !== "grid") next.set("view", view);
-    const href = `${routeFor(level, slug)}${next.size ? `?${next}` : ""}`;
+    // State just hydrated from a navigation (link, Back/Forward) may still be
+    // canonicalised, but that rewrite must not add a history entry.
+    const fromUrl = syncedRoute.current !== hydratedRoute;
     const current = `${window.location.pathname}${window.location.search}`;
-    const snapshot = JSON.stringify([page, selection, tags, provider, format, skillLevel, sort, kind, general, view]);
     // Browser Back/Forward to another route fires this effect (location dep)
     // while this listing is still mounted. Writing our href then would
     // overwrite the entry the user just navigated to and trap them here
     // (Back from a category never reached Home). Only sync while the
     // document is still on this listing's own path.
     if (!samePath(window.location.pathname, routeFor(level, slug))) return;
-    // A 404 keeps the requested URL, exactly as the server answered it.
+    // A 404 keeps the requested URL, exactly as the server answered it. A
+    // linked page past 1 may still turn out to be one, so wait for its total.
     if (pageNotFound) return;
-    if (current !== href) {
-      const shouldPush = urlSyncInitialized.current && !popNavigation.current && !replaceNextUrlSync.current && pushSnapshot.current !== snapshot;
-      window.history[shouldPush ? "pushState" : "replaceState"]({}, "", href);
-      // Our own write already matches state; rehydrating from it would clear
-      // the page-clamp notice set just before this rewrite.
-      hydratedRouteRef.current = `${routeFor(level, slug)}?${next}`;
-      lastWrittenRouteRef.current = hydratedRouteRef.current;
+    if (page > 1 && !paginationReady && strictUrlPage(new URLSearchParams(window.location.search).get("page")) === page) return;
+    if (current !== stateHref) {
+      const shouldPush = urlSyncInitialized.current && !fromUrl && !replaceNextUrlSync.current && pushSnapshot.current !== snapshot;
+      window.history[shouldPush ? "pushState" : "replaceState"]({}, "", stateHref);
+      // Cleared only by the write it was set for: the page clamp sets it in
+      // the same commit as a sync that has nothing to write yet.
+      replaceNextUrlSync.current = false;
     }
     urlSyncInitialized.current = true;
-    popNavigation.current = false;
-    replaceNextUrlSync.current = false;
+    syncedRoute.current = hydratedRoute;
     pushSnapshot.current = snapshot;
-  }, [format, general, kind, level, location, page, pageNotFound, provider, searchTerm, selection, skillLevel, slug, sort, tags, view]);
-  useEffect(() => {
-    const onPopState = () => {
-      popNavigation.current = true;
-      const next = new URLSearchParams(window.location.search);
-      const nextGeneral = next.get("filter") === "general" || next.get("view") === "general";
-      setSearchTerm(next.get("search") ?? "");
-      setSelection(nextGeneral ? "__general__" : next.get("subcategory") ?? "all");
-      setGeneral(nextGeneral);
-      setTags(parseTagsParam(next));
-      setProvider(next.get("provider") ?? "");
-      setFormat(next.get("format") ?? "");
-      setSkillLevel(next.get("skillLevel") ?? "");
-       setKind(parseKindParam(next.get("kind")));
-      setSort(normalizeSort(next.get("sortBy") || next.get("sort")));
-      const nextPage = strictUrlPage(next.get("page"));
-      setPage(nextPage ?? 1);
-      setPageRejected(nextPage === null);
-      setNotice(null);
-      const nextView = next.get("view");
-      setView(isLayoutViewMode(nextView) ? nextView : "grid");
-    };
-    window.addEventListener("popstate", onPopState);
-    return () => window.removeEventListener("popstate", onPopState);
-  }, []);
-
-  // Wouter links can replace the taxonomy slug without emitting a native
-  // popstate event. Rehydrate the listing state from the new URL in that case
-  // as well; otherwise a search/filter/page from the previous sibling leaks
-  // into the newly selected category and the URL no longer describes the
-  // visible controls.
-  useEffect(() => {
-    const routeKey = `${routeFor(level, slug)}?${search}`;
-    if (hydratedRouteRef.current === routeKey) return;
-    hydratedRouteRef.current = routeKey;
-    // C8-V1-02: wouter reports our own canonicalising rewrite (?sort=asc ->
-    // ?sortBy=name-asc) back as a navigation; state already matches it, and
-    // rehydrating would wipe the page-clamp notice set just before it.
-    if (lastWrittenRouteRef.current === routeKey) return;
-    const next = new URLSearchParams(search);
-    const nextGeneral =
-      next.get("filter") === "general" ||
-      next.get("view") === "general" ||
-      next.get("subcategory") === "__general__";
-    setSearchTerm(next.get("search") ?? "");
-    setSelection(nextGeneral ? "__general__" : next.get("subcategory") ?? "all");
-    setGeneral(nextGeneral);
-    setTags(parseTagsParam(next));
-    setProvider(next.get("provider") ?? "");
-    setFormat(next.get("format") ?? "");
-    setSkillLevel(next.get("skillLevel") ?? "");
-    setKind(parseKindParam(next.get("kind")));
-    setSort(normalizeSort(next.get("sortBy") || next.get("sort")));
-    const nextPage = strictUrlPage(next.get("page"));
-    setPage(nextPage ?? 1);
-    setPageRejected(nextPage === null);
-    setNotice(null);
-    const nextView = next.get("view");
-    setView(isLayoutViewMode(nextView) ? nextView : "grid");
-  }, [level, search, slug]);
+  }, [hydratedRoute, level, location, page, pageNotFound, paginationReady, slug, snapshot, stateHref]);
 
   // An empty tile is a dead end: a subcategory with no approved resources, or
   // one the kind filter has ruled out. The crawler HTML hides them too.
