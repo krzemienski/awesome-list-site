@@ -519,7 +519,7 @@ export default function AIRecommendationsPanel({
       ) : null}
 
       {isPaused ? (
-        <Alert data-testid="offline-refresh-state" role="status">
+        <Alert data-testid="offline-refresh-state" live="polite">
           <WifiOff className="h-4 w-4" />
           <AlertTitle>You’re offline</AlertTitle>
           <AlertDescription>

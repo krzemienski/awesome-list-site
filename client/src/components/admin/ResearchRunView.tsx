@@ -259,7 +259,7 @@ export function ResearchRunView({ jobId, focusOnMount, onStartNew, onRelaunchHig
           onDismiss={() => setConfirmCancel(false)}
         />
         {cancel.isError && !confirmCancel && (
-          <Alert variant="destructive" role="alert">
+          <Alert variant="destructive">
             <AlertCircle className="h-4 w-4" />
             <AlertDescription>{describeWriteError(cancel.error, { outcome: "The run may still be going. Try cancelling again." })}</AlertDescription>
           </Alert>
@@ -298,8 +298,8 @@ export function ResearchRunView({ jobId, focusOnMount, onStartNew, onRelaunchHig
             </dl>
 
             {outcome && (
-              // role="note": the polite region above already announces the ending.
-              <Alert role="note" variant={outcome === "failed" ? "destructive" : "default"} data-testid="research-run-ending" data-outcome={outcome}>
+              // live="off": the polite region above already announces the ending.
+              <Alert live="off" variant={outcome === "failed" ? "destructive" : "default"} data-testid="research-run-ending" data-outcome={outcome}>
                 {outcome === "completed" ? <CheckCircle2 className="h-4 w-4" /> : <AlertCircle className="h-4 w-4" />}
                 <AlertDescription className="space-y-3 break-words">
                   <p>{endingCopy(outcome, saved, job)}</p>

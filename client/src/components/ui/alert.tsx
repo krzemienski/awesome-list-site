@@ -19,13 +19,28 @@ const alertVariants = cva(
   }
 )
 
+/**
+ * When assistive tech reads the box. "assertive" interrupts, for an error the
+ * user just caused. "polite" waits for a pause, for a result that lands while
+ * the page is open. "off" is never announced, for text that is simply part of
+ * the page when it renders.
+ */
+export type AlertLive = "assertive" | "polite" | "off"
+
+const roleFor: Record<AlertLive, string> = {
+  assertive: "alert",
+  polite: "status",
+  off: "note",
+}
+
 const Alert = React.forwardRef<
   HTMLDivElement,
-  React.HTMLAttributes<HTMLDivElement> & VariantProps<typeof alertVariants>
->(({ className, variant, ...props }, ref) => (
+  Omit<React.HTMLAttributes<HTMLDivElement>, "role"> &
+    VariantProps<typeof alertVariants> & { live?: AlertLive }
+>(({ className, variant, live = "assertive", ...props }, ref) => (
   <div
     ref={ref}
-    role="alert"
+    role={roleFor[live]}
     className={cn(alertVariants({ variant }), className)}
     {...props}
   />

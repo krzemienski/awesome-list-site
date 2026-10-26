@@ -389,7 +389,7 @@ export const ResearchLaunchGuide = forwardRef<ResearchLaunchGuideHandle, Researc
           )}
         </div>
         {activeJobId !== null && (
-          <Alert role="note" className="mt-3">
+          <Alert live="off" className="mt-3">
             <AlertDescription className="flex flex-wrap items-center gap-2">
               Run #{activeJobId} is still in progress. One run at a time.
               <Button type="button" size="sm" variant="outline" className="min-h-11" onClick={() => onFollow(activeJobId)} data-testid="button-follow-active-run">
@@ -426,7 +426,7 @@ export const ResearchLaunchGuide = forwardRef<ResearchLaunchGuideHandle, Researc
             </AlertDialogDescription>
           </AlertDialogHeader>
           {start.isError && (
-            <Alert variant="destructive" className="queues-agent__inline-error" role="alert">
+            <Alert variant="destructive" className="queues-agent__inline-error">
               <AlertCircle className="h-4 w-4" />
               <AlertDescription>{describeWriteError(start.error, { outcome: "The job may not have started. Check the jobs table before starting another." })}</AlertDescription>
             </Alert>

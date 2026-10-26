@@ -423,7 +423,7 @@ export default function GitHubSyncPanel() {
               </p>
             )}
             {failureIsCurrent && (
-              <Alert variant="destructive" data-testid="alert-sync-failures">
+              <Alert variant="destructive" live="polite" data-testid="alert-sync-failures">
                 <XCircle className="h-4 w-4" />
                 <AlertDescription className="space-y-1">
                   <p className="font-semibold">
@@ -446,7 +446,7 @@ export default function GitHubSyncPanel() {
               const lastSyncFailed = lastSync.status === 'failed';
               const lastSyncPartial = lastSync.status === 'partial';
               return (
-              <Alert variant={lastSyncFailed ? 'destructive' : undefined} data-testid="alert-last-sync">
+              <Alert variant={lastSyncFailed ? 'destructive' : undefined} live="polite" data-testid="alert-last-sync">
                 {lastSyncFailed || lastSyncPartial ? <XCircle className="h-4 w-4" /> : <CheckCircle2 className="h-4 w-4" />}
                 <AlertDescription className="space-y-2">
                   <div className="ops-github-panel__last-sync-head">

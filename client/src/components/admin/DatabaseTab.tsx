@@ -206,7 +206,7 @@ export default function DatabaseTab({ stats }: DatabaseTabProps) {
           </div>
         </header>
         <div className="admin-ops-database__seed-body">
-          <Alert className="admin-ops-database__seed-alert">
+          <Alert live="off" className="admin-ops-database__seed-alert">
             <AlertCircle className="h-4 w-4" />
             <AlertTitle>Database Seeding</AlertTitle>
             <AlertDescription>
@@ -264,7 +264,6 @@ export default function DatabaseTab({ stats }: DatabaseTabProps) {
           {seedFailure && (
             <Alert
               variant="destructive"
-              role="alert"
               className="admin-ops-database__seed-result admin-ops-database__seed-result--bad"
               data-testid="seed-result-failed"
             >
@@ -282,7 +281,7 @@ export default function DatabaseTab({ stats }: DatabaseTabProps) {
           {seedResult && (
             <Alert
               variant={seedResult.totalErrors > 0 ? "destructive" : "default"}
-              role={seedResult.totalErrors > 0 ? "alert" : "status"}
+              live={seedResult.totalErrors > 0 ? "assertive" : "polite"}
               className={`admin-ops-database__seed-result${seedResult.totalErrors > 0 ? " admin-ops-database__seed-result--warn" : ""}`}
               data-testid={seedResult.totalErrors > 0 ? "seed-result-partial" : "seed-result-success"}
             >

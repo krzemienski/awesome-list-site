@@ -728,7 +728,7 @@ export default function BatchEnrichmentPanel() {
                 </AlertDescription>
               </Alert>
             ) : !activeJobStateKnown && (
-              <Alert variant={jobsIsError ? "destructive" : "default"} className="flex-1 ml-4" role={jobsIsError ? "alert" : undefined}>
+              <Alert variant={jobsIsError ? "destructive" : "default"} className="flex-1 ml-4" live={jobsIsError ? "assertive" : "off"}>
                 <AlertCircle className="h-4 w-4" />
                 <AlertDescription>
                   {jobsIsError
@@ -1221,7 +1221,7 @@ export default function BatchEnrichmentPanel() {
             </AlertDialogDescription>
           </AlertDialogHeader>
           {cancelMutation.isError && (
-            <Alert variant="destructive" className="queues-agent__inline-error" role="alert">
+            <Alert variant="destructive" className="queues-agent__inline-error">
               <AlertCircle className="h-4 w-4" />
               <AlertDescription>{describeWriteError(cancelMutation.error, { outcome: "The job may still be running. Refresh the job list, then try again." })}</AlertDescription>
             </Alert>
@@ -1277,7 +1277,7 @@ export default function BatchEnrichmentPanel() {
             )}
           </div>
           {startMutation.isError && (
-            <Alert variant="destructive" className="queues-agent__inline-error" role="alert">
+            <Alert variant="destructive" className="queues-agent__inline-error">
               <AlertCircle className="h-4 w-4" />
               <AlertDescription>{describeWriteError(startMutation.error, { outcome: "The job may not have started. Check the job list before starting another." })}</AlertDescription>
             </Alert>
