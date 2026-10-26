@@ -18,6 +18,7 @@ import type {
   ContinueLearningRecentResource,
 } from "@shared/continueLearning";
 import SEOHead from "@/components/layout/SEOHead";
+import { staticPageHeads } from "@shared/seo-templates";
 import OfflinePageState from "@/components/layout/OfflinePageState";
 import { queryUnavailableReason } from "@/lib/query-availability";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
@@ -204,11 +205,10 @@ export default function ContinueLearning() {
               <LogIn className="account-accent-icon h-6 w-6" />
             </div>
             <h1 className="page-title text-2xl">
-              Your progress lives with your account
+              {staticPageHeads["/continue-learning"].heading}
             </h1>
             <CardDescription className="max-w-xl text-base">
-              Sign in to resume your journeys, pick up at your next step, and
-              revisit resources you've opened.
+              {staticPageHeads["/continue-learning"].lead}
             </CardDescription>
           </CardHeader>
           <CardContent className="flex flex-wrap justify-center gap-3 pb-10">

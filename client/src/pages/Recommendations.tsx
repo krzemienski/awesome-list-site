@@ -9,6 +9,7 @@ import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/com
 import { Button } from "@/components/ui/button";
 import { Sparkles, LogIn } from "lucide-react";
 import SEOHead from "@/components/layout/SEOHead";
+import { staticPageHeads } from "@shared/seo-templates";
 import AIRecommendationsPanel from "@/components/ui/ai-recommendations-panel";
 import ResourceCard from "@/components/resource/ResourceCard";
 import { useAuth } from "@/hooks/useAuth";
@@ -109,7 +110,7 @@ export default function Recommendations() {
             {isAuthenticated
               ? "Personalized Recommendations"
               : isGuest
-                ? "Recommended Resources"
+                ? staticPageHeads["/recommendations"].heading
                 : "Recommendations"}
           </h1>
         </div>
@@ -117,7 +118,7 @@ export default function Recommendations() {
           {isAuthenticated
             ? "Get personalized resource recommendations based on your interests and learning goals."
             : isGuest
-              ? "Popular picks from across the catalog. Sign in to tailor them to your interests and learning goals."
+              ? staticPageHeads["/recommendations"].lead
               : "Checking your session…"}
         </p>
       </header>

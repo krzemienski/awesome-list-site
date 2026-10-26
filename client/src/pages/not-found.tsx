@@ -53,11 +53,8 @@ export default function NotFound({ suggestion }: NotFoundProps) {
         <p className="system-state-kicker caret" aria-hidden="true">
           ~/awesome.video/404 → not_found
         </p>
-        <h1 className="display-h system-state-title">Page Not Found</h1>
-        <p className="system-state-copy">
-          We couldn't find the page you're looking for. The page may have been
-          moved or doesn't exist.
-        </p>
+        <h1 className="display-h system-state-title">{missingPageSeo.heading}</h1>
+        <p className="system-state-copy">{missingPageSeo.lead}</p>
         {suggestion && (
           <p className="system-state-copy">
             <Link
