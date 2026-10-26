@@ -520,8 +520,17 @@
 }
 
 .home-resource-card {
+  position: relative;
   min-width: 0;
   padding: 1.25rem;
+}
+
+/* The title link stretches over the whole card, as in the listing card; the
+   tag chips sit above it and reach the 44px touch floor. */
+.home-resource-title a::after {
+  position: absolute;
+  inset: 0;
+  content: "";
 }
 
 .home-resource-card:hover {
@@ -599,6 +608,19 @@
   letter-spacing: 0.0375rem;
   border-radius: var(--radius-pill);
   text-decoration: none;
+}
+
+.home-resource-tag {
+  position: relative;
+  z-index: 1;
+}
+
+@media (max-width: 1024px) {
+  .home-resource-tag {
+    display: inline-flex;
+    min-height: 44px;
+    align-items: center;
+  }
 }
 
 .home-recent-table {

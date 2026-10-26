@@ -480,8 +480,30 @@ button.taxonomy-child {
 }
 
 .taxonomy-page .resource-card--taxonomy .resource-card__tag-link {
-  min-height: 0;
   pointer-events: auto;
+}
+
+/* Desktop pointers keep the compact 32px chip row; at touch widths the shared
+   resource-card.css 44px floor applies instead. */
+@media (min-width: 1025px) {
+  .taxonomy-page .resource-card--taxonomy .resource-card__tag-link {
+    min-height: 0;
+  }
+}
+
+/* The tray is 36px tall; centred 44px controls overflow it evenly and still
+   fit the band beside the mark. */
+@media (max-width: 1024px) {
+  .taxonomy-page .resource-card--taxonomy .resource-card__reveal > *,
+  .taxonomy-page .resource-card--taxonomy .resource-card__reveal .resource-card__visit-button {
+    min-height: 44px;
+  }
+
+  .taxonomy-page .resource-card--taxonomy .resource-card__reveal .resource-card__visit-button,
+  .taxonomy-page .resource-card--taxonomy .resource-card__reveal .resource-card__meta-badge {
+    width: 44px;
+    height: 44px;
+  }
 }
 
 /* Frozen ResCard tags are canonical `.chip.mono`: 10.5px mono, 0.6px tracking,
