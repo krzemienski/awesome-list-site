@@ -51,6 +51,7 @@ import { AgentEventLog } from "@/components/admin/AgentEventLog";
 import { AgentCommsGraph } from "@/components/admin/AgentCommsGraph";
 import { Stat, StatusChip, TableShell } from "@/components/admin/AdminOpsPrimitives";
 import type { EnrichmentJob } from "@shared/schema";
+import { baseUrlSyntaxError } from "@shared/validation";
 import "./queues-agent.css";
 
 const CANONICAL_JOB_ROWS = 6;
@@ -132,8 +133,9 @@ export default function BatchEnrichmentPanel() {
   const [filter, setFilter] = useState<'all' | 'unenriched'>('unenriched');
   // C6-V5A-02: the field's own text, so it can be emptied; the number is derived.
   const [batchSizeText, setBatchSizeText] = useState("10");
-  const parsedBatchSize = parseInt(batchSizeText, 10);
-  const batchSize = Number.isNaN(parsedBatchSize) ? 0 : parsedBatchSize;
+  // Number, not parseInt: "2.5" must stay 2.5 so the integer rule rejects it
+  // instead of silently becoming 2.
+  const batchSize = batchSizeText.trim() === "" ? 0 : Number(batchSizeText);
   const [showAdvanced, setShowAdvanced] = useState(false);
   const [model, setModel] = useState("");
   const [baseUrl, setBaseUrl] = useState("");
@@ -153,6 +155,11 @@ export default function BatchEnrichmentPanel() {
   // min/max attributes never validated anything (999 sat there silently until
   // Start was clicked).
   const batchSizeInvalid = !Number.isInteger(batchSize) || batchSize < 1 || batchSize > 50;
+  // Same rules /api/enrichment/start applies, checked before the paid-job
+  // dialog can open (the server adds its DNS check on top).
+  const baseUrlError = baseUrl.trim() ? baseUrlSyntaxError(baseUrl) : null;
+  const authTokenMissing = !!baseUrl.trim() && !baseUrlError && !authToken.trim();
+  const startConfigInvalid = batchSizeInvalid || !!baseUrlError || authTokenMissing;
 
   const {
     data: jobsData,
@@ -286,14 +293,7 @@ export default function BatchEnrichmentPanel() {
       });
       return;
     }
-    if (batchSize < 1 || batchSize > 50) {
-      toast({
-        title: "Invalid batch size",
-        description: "Batch size must be between 1 and 50.",
-        variant: "destructive"
-      });
-      return;
-    }
+    if (startConfigInvalid) return;
     // Run23 NB-040: explicit confirmation before starting a paid AI job.
     setConfirmStart(true);
   };
@@ -442,7 +442,7 @@ export default function BatchEnrichmentPanel() {
             <Button
               className="btn primary"
               onClick={handleStartEnrichment}
-              disabled={!activeJobStateKnown || hasActiveJob || startMutation.isPending || batchSizeInvalid}
+              disabled={!activeJobStateKnown || hasActiveJob || startMutation.isPending || startConfigInvalid}
               data-testid="button-start-enrichment-canonical"
             >
               {/* The frozen Run job action carries the bolt glyph. */}
@@ -588,7 +588,7 @@ export default function BatchEnrichmentPanel() {
                   className="text-xs font-medium text-destructive"
                   data-testid="error-batch-size"
                 >
-                  Batch size must be between 1 and 50.
+                  Batch size must be a whole number between 1 and 50.
                 </p>
               )}
             </div>
@@ -611,6 +611,11 @@ export default function BatchEnrichmentPanel() {
               </span>
               {showAdvanced ? <ChevronDown className="w-4 h-4" /> : <ChevronRight className="w-4 h-4" />}
             </Button>
+            {!showAdvanced && (baseUrlError || authTokenMissing) && (
+              <p role="alert" className="border-t px-3 py-2 text-xs font-medium text-destructive" data-testid="error-enrich-endpoint-collapsed">
+                The custom endpoint needs fixing before a job can start. Open this section to fix it.
+              </p>
+            )}
             {showAdvanced && (
               <div id="advanced-enrichment-region" className="space-y-3 border-t px-3 py-3">
                 <div className="space-y-2">
@@ -638,9 +643,16 @@ export default function BatchEnrichmentPanel() {
                     placeholder={defaultBaseUrl ? `${defaultBaseUrl} (default)` : "Default endpoint"}
                     className="font-mono text-xs"
                     disabled={hasActiveJob}
+                    aria-invalid={!!baseUrlError}
+                    aria-describedby={baseUrlError ? "enrich-baseurl-error enrich-baseurl-help" : "enrich-baseurl-help"}
                     data-testid="input-enrich-baseurl"
                   />
-                  <p className="text-[11px] text-muted-foreground">http or https; requires an auth token below (over plain http the token is sent unencrypted). Leave blank to use the server's configured endpoint.</p>
+                  <p id="enrich-baseurl-help" className="text-[11px] text-muted-foreground">http or https; requires an auth token below (over plain http the token is sent unencrypted). Leave blank to use the server's configured endpoint.</p>
+                  {baseUrlError && (
+                    <p id="enrich-baseurl-error" role="alert" className="text-xs font-medium text-destructive" data-testid="error-enrich-baseurl">
+                      {baseUrlError}.
+                    </p>
+                  )}
                 </div>
                 <div className="space-y-2">
                   <Label htmlFor="enrich-token" className="flex items-center gap-1.5">
@@ -655,9 +667,16 @@ export default function BatchEnrichmentPanel() {
                     className="font-mono text-xs"
                     autoComplete="off"
                     disabled={hasActiveJob}
+                    aria-invalid={authTokenMissing}
+                    aria-describedby={authTokenMissing ? "enrich-token-error enrich-token-help" : "enrich-token-help"}
                     data-testid="input-enrich-token"
                   />
-                  <p className="text-[11px] text-muted-foreground">Encrypted at rest (AES-256-GCM). Only the last 4 characters are ever shown afterwards.</p>
+                  <p id="enrich-token-help" className="text-[11px] text-muted-foreground">Encrypted at rest (AES-256-GCM). Only the last 4 characters are ever shown afterwards.</p>
+                  {authTokenMissing && (
+                    <p id="enrich-token-error" role="alert" className="text-xs font-medium text-destructive" data-testid="error-enrich-token">
+                      A custom base URL needs an auth token. The platform key is never sent to a custom endpoint.
+                    </p>
+                  )}
                 </div>
               </div>
             )}
@@ -668,7 +687,7 @@ export default function BatchEnrichmentPanel() {
           <div className="flex items-center justify-between">
             <Button
               onClick={handleStartEnrichment}
-              disabled={!activeJobStateKnown || hasActiveJob || startMutation.isPending || batchSizeInvalid}
+              disabled={!activeJobStateKnown || hasActiveJob || startMutation.isPending || startConfigInvalid}
              
               data-testid="button-start-enrichment"
             >

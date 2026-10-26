@@ -2,6 +2,7 @@ import dns from "dns/promises";
 import { safeFetch, isPublicAddress } from "./safeFetch";
 import { decryptAuthToken, encryptAuthToken, isConfigEncryptionAvailable } from "./configCrypto";
 import { configuredBaseUrl, resolveAnthropicCredentials, resolveFlowModel } from "./anthropicConfig";
+import { baseUrlSyntaxError } from "@shared/validation";
 
 /**
  * Shared runtime helpers for the Claude Agent SDK multi-agent flows (Researcher + Enrichment):
@@ -32,20 +33,9 @@ export function defaultEnrichmentModel(): string {
  * travels unencrypted — the admin UI warns about this.
  */
 export async function validateBaseUrl(raw: string): Promise<string> {
-  let u: URL;
-  try {
-    u = new URL(raw.trim());
-  } catch {
-    throw new Error("Base URL is not a valid URL");
-  }
-  if (u.protocol !== "https:" && u.protocol !== "http:") {
-    throw new Error("Base URL must use http:// or https://");
-  }
-  if (!u.hostname) throw new Error("Base URL must include a host");
-  if (u.username || u.password) throw new Error("Base URL must not contain credentials");
-  // The SDK appends /v1/messages to the base URL, so a query or fragment
-  // never works; refusing it also keeps a ?key= out of job rows and logs.
-  if (u.search || u.hash) throw new Error("Base URL must not contain a query string or fragment");
+  const syntaxError = baseUrlSyntaxError(raw);
+  if (syntaxError) throw new Error(syntaxError);
+  const u = new URL(raw.trim());
 
   let addresses: string[] = [];
   try {
