@@ -454,7 +454,9 @@ export default function LinkHealthDashboard() {
           </CardTitle>
           <CardDescription>
             {latestJob
-              ? `Last check: ${formatAdminDateTime(latestJob.createdAt)}`
+              ? latestJob.completedAt
+                ? `Last check: ${formatAdminDateTime(latestJob.completedAt)}`
+                : `Check started ${formatAdminDateTime(latestJob.startedAt ?? latestJob.createdAt)}`
               : statusError
                 ? 'Last check unavailable'
                 : 'No link health checks performed yet'
