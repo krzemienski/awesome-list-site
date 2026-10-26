@@ -28,7 +28,11 @@
 .app-canonical-header .header-wordmark { font-family: var(--font-mono); font-size: 11px; font-weight: 700; letter-spacing: 1.8px; white-space: nowrap; }
 .app-canonical-header .header-spacer { flex: 1; }
 .app-canonical-header .header-nav { display: flex; gap: 18px; align-items: center; }
-.app-canonical-header .nav-link { font-size: 13px; font-weight: 500; color: var(--text-2); white-space: nowrap; text-decoration: none; transition: color 160ms ease; }
+/* The 21px text box was the only target: inline-flex + min-height grows the
+   hit area to the 24px floor (44px for coarse pointers) inside the 60px bar
+   without moving the centred text. */
+.app-canonical-header .nav-link { display: inline-flex; align-items: center; min-height: 24px; font-size: 13px; font-weight: 500; color: var(--text-2); white-space: nowrap; text-decoration: none; transition: color 160ms ease; }
+@media (pointer: coarse) { .app-canonical-header .nav-link { min-height: 44px; } }
 .app-canonical-header .nav-link:hover, .app-canonical-header .nav-link.active { color: var(--text); }
 .app-canonical-header .header-live-dot { position: relative; margin-left: 6px; }
 /* The reference inline span reserves only its margin. Paint the required live
