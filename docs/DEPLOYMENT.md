@@ -55,7 +55,9 @@ Key runtime facts (verified against the code in this repo):
 Replit is the primary deployment target for this project (`.replit` is
 preconfigured).
 
-- **Build** runs `bash scripts/publish-build.sh`: `npm run build`, then trims
+- **Build** runs `bash scripts/publish-build.sh`: a check that `HEAD` matches
+  GitHub `main` (see [Publishing GitHub `main`](#publishing-github-main)),
+  `npm run build`, then trims
   development-only files from the publish image. It does not boot the app or
   touch the production database. See [RELEASE.md](../RELEASE.md) for the
   release checklist and the production QA identity.
@@ -81,9 +83,15 @@ and their configuration has been removed.
 Publish snapshots the files in the Replit workspace, not GitHub. That includes
 git-ignored and untracked files, so never keep secret-bearing files such as
 `.env` in the workspace; secrets belong in Replit **Secrets**. The workspace
-must match `origin/main` when you publish. `https://awesome.video/api/version`
-reports the live commit, which is a Replit publish or autosave commit on top of
-the commit you shipped, so compare trees rather than SHAs.
+must match `origin/main` when you publish.
+
+`scripts/publish-build.sh` enforces part of this. It fails the build unless
+the tree of `HEAD` equals the tree of `origin/main` (Replit's empty "Published
+your App" commit passes), and it fails when untracked files are present. It
+does not check modified tracked files or ignored files, so
+`git status --short` must still print nothing. On success it stamps the
+`origin/main` commit into the bundle, so `https://awesome.video/api/version`
+reports exactly the GitHub `main` commit that shipped.
 
 The procedure is kept in one place, the project skill
 [`.claude/skills/replit-deploy/SKILL.md`](../.claude/skills/replit-deploy/SKILL.md).
