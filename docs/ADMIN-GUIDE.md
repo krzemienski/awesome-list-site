@@ -198,7 +198,12 @@ Import resources from any awesome-list repository.
      categories, or queue/history rows) and returns the plan synchronously:
      "Would create …" warnings for headings with no matching taxonomy node,
      plus `wouldCreateTaxonomy`. The queued `POST /api/github/import` rejects
-     `dryRun` with a 400.
+     `dryRun` with a 400. Against the full awesome-video README it answers in
+     about 10 seconds on production. With the taxonomy in sync,
+     `wouldCreateTaxonomy` is empty. An entry there means an upstream heading
+     names no existing node, so check its spelling before you run the real
+     import. Headings keep `&`, `/` and `-`, so `iOS/tvOS` matches the
+     existing `ios-tvos` node.
    - **Strict Mode**: not available. `POST /api/admin/import-github` accepts a
      `strictMode` field, but the import service never reads it, so it changes
      nothing and the panel has no such control.

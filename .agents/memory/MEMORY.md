@@ -129,7 +129,7 @@
 - [Queued optimistic rollback](queued-optimistic-rollback.md) — queued writes must roll back to last server-confirmed state, not their onMutate snapshot; failed refetch keeps loaded page.
 - [Before-fix proof instance](before-fix-proof-instance.md) — run pre-fix code from a /tmp copy + git show HEAD files on a 2nd port; worktree blocked, nohup dies; use run_in_background.
 - [og-middleware outage shell](og-middleware-outage-shell.md) — DB outage: HTML navigations get SPA shell + 503/Retry-After (client error card), non-HTML keeps JSON 503 (resilience gate contract).
-- [GitHub import taxonomy merge](github-import-taxonomy-merge.md) — import headings colliding by slug/case merge into the existing node + canonical names; no suffixed slugs; dryRun still creates nodes.
+- [GitHub import taxonomy merge](github-import-taxonomy-merge.md) — import headings colliding by slug/case merge into the existing node + canonical names; no suffixed slugs; "/" kept in headings (iOS/tvOS); dry run writes nothing, `wouldCreateTaxonomy` should be empty on prod.
 - [AI job liveness](ai-job-liveness.md) — enrichment/research orphans judged by worker_id+heartbeat, not age; queue leftovers → 'cancelled'; USD-cap stops = budget_stopped.
 - [Full database backup design](database-backup-design.md) — private storage, no download route, CLI-only restore, archive-derived counts; never claim api_keys are hashed.
 - [Parity header-band split](header-band-split.md) — approved tablet header deviations judged band (≤5%) vs body (≤0.5%); add widths only with user approval.
@@ -157,7 +157,7 @@
 - [Built-in tester batching](native-tester-batching.md) — ~45 s ceiling per execution: one family × ≤4 items per step, one navigation per step, running ledger; it may restart the wrong workflow.
 - [Browser capture protocol](browser-capture-protocol.md) — determinism knobs, the 16384px tile-and-stitch ceiling, pre-paint filmstrip reading, and the three read-only enforcement layers.
 - [Axe first-frame animation race](axe-first-frame-race.md) — reduced-motion animations still paint opacity 0 for a frame; wait 2 rAF + finite animations before axe.
-- [Publish snapshots in-flight edits](publish-snapshots-inflight-edits.md) — publishing while subagents edit ships their unverified partial work; never republish mid-wave.
+- [Publish snapshots in-flight edits](publish-snapshots-inflight-edits.md) — publishing while subagents edit ships their unverified partial work; autosave also commits untracked files (634e8afd); never republish mid-wave or with a dirty/untracked workspace.
 - [Aborted agent run usage](aborted-agent-run-usage.md) — cancelled SDK runs emit no result msg; accumulate streamed usage (lower bound); count the enrichment queue the server way before paid scratch runs.
 - [Live smoke of production](live-smoke-prod-revision.md) — publish may leave prod on the parent commit; verify by server-behaviour markers; prod sign-up blocked → owner account net-zero.
 - [Edge decodes %-escapes](edge-percent-decoding.md) — prod edge decodes %2D etc. before the app, so escape-normalising 301s never fire on awesome.video; probe via trailing-slash echo.
