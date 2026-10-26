@@ -203,7 +203,7 @@
 
 /*
  * The recent rows stand in for native buttons, whose font shorthand resets
- * OpenType features; other links inherit the body ss01/cv11/tnum settings,
+ * OpenType features; other links inherit the body ss01/cv11 settings,
  * as the design's category headings and subcategory rows do.
  */
 .home-recent-row,

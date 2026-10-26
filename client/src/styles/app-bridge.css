@@ -69,6 +69,13 @@
    to 0. min-height keeps short pages viewport-tall without the cap. */
 body { height: auto; min-height: 100%; }
 
+/* The canonical body sets "tnum" for all text, and Inter's tnum gives the
+   hyphen figure width, so Editorial prose read "go - astisub". Figures are
+   tabular where numbers line up: table columns here, and counts, paginators
+   and stat values where they are drawn. */
+body { font-feature-settings: "ss01", "cv11"; }
+:where(table) { font-variant-numeric: tabular-nums; }
+
 /* Approved accessibility deviations from the immutable handoff. Filled
    primary labels use black --on-accent (`[data-system]` keeps the selector's
    original weight; the boot always sets it). */
