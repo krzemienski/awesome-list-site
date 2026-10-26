@@ -65,6 +65,7 @@ import { queryUnavailableReason } from "@/lib/query-availability";
 import { apiRequest, queryClient } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
 import { writeFilterParams, usePopstateParams } from "@/lib/url-filter-state";
+import { scrollBehavior } from "@/lib/scroll-behavior";
 import {
   trackCollectionArchiveChanged,
   trackCollectionCreated,
@@ -275,7 +276,7 @@ export default function Bookmarks() {
     if (!match || filteredBookmarks.length === 0) return;
     const target = document.getElementById(`bookmark-${match[1]}`);
     if (!target) return;
-    target.scrollIntoView({ behavior: "smooth", block: "center" });
+    target.scrollIntoView({ behavior: scrollBehavior(), block: "center" });
     target.focus({ preventScroll: true });
   }, [filteredBookmarks]);
 

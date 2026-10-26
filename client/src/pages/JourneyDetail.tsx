@@ -27,6 +27,7 @@ import { useToast } from "@/hooks/use-toast";
 import { queryClient, apiRequest, ApiError } from "@/lib/queryClient";
 import { humanizeApiError } from "@/lib/apiError";
 import { queryUnavailableReason } from "@/lib/query-availability";
+import { scrollBehavior } from "@/lib/scroll-behavior";
 import {
   trackJourneyStart,
   trackJourneyStepComplete,
@@ -148,7 +149,7 @@ export default function JourneyDetail() {
     const target = document.getElementById(window.location.hash.slice(1));
     if (!target) return;
     const frame = requestAnimationFrame(() => {
-      target.scrollIntoView({ block: "start", behavior: "smooth" });
+      target.scrollIntoView({ block: "start", behavior: scrollBehavior() });
       target.focus({ preventScroll: true });
     });
     return () => cancelAnimationFrame(frame);

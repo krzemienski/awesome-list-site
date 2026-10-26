@@ -20,6 +20,7 @@ import { OPEN_SEARCH_PALETTE_EVENT, type OpenSearchPaletteDetail } from "@/lib/s
 // b/e host the contact dialog.
 import AppFooter from "./AppFooter";
 import { useContactConfig } from "@/lib/contact";
+import { scrollBehavior } from "@/lib/scroll-behavior";
 // Guard the import itself so disabled builds do not emit the contact chunk.
 const ContactDialogHost =
   import.meta.env.VITE_CONTACT_VARIANT === "b" || import.meta.env.VITE_CONTACT_VARIANT === "e"
@@ -70,7 +71,7 @@ function BackToTop() {
         // The button unmounts once the page is back near the top; hand focus
         // to the page heading so keyboard users don't drop to <body>.
         handoffFocusOnUnmount(e.currentTarget);
-        window.scrollTo({ top: 0, behavior: "smooth" });
+        window.scrollTo({ top: 0, behavior: scrollBehavior() });
       }}
       aria-label="Back to top"
       data-testid="button-back-to-top"

@@ -33,6 +33,7 @@ import DigestQueueHealth from "@/components/admin/DigestQueueHealth";
 import ErrorBoundary from "@/components/ErrorBoundary";
 import NotFound from "@/pages/not-found";
 import { ApiError } from "@/lib/queryClient";
+import { scrollBehavior } from "@/lib/scroll-behavior";
 import { focusElement, handoffFocusOnUnmount } from "@/hooks/focus-handoff";
 // Run3 audit R3-02 / Run16 BUG-034/074/085: valid tab ids and aliases live in
 // one shared module so the SSR middleware accepts exactly the same
@@ -210,7 +211,7 @@ export default function AdminDashboard() {
       ),
     );
     const scroller = document.querySelector<HTMLElement>(".admin-dashboard__tabs");
-    scroller?.scrollBy({ left: direction * scroller.clientWidth * 0.6, behavior: "smooth" });
+    scroller?.scrollBy({ left: direction * scroller.clientWidth * 0.6, behavior: scrollBehavior() });
   };
 
   // Bumped on every New entry click so an already-mounted ResourceManager

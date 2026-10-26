@@ -27,6 +27,7 @@ import {
 } from "@shared/seo-templates";
 import OfflinePageState from "@/components/layout/OfflinePageState";
 import { queryUnavailableReason } from "@/lib/query-availability";
+import { scrollBehavior } from "@/lib/scroll-behavior";
 import { TAG_MAX_LENGTH } from "@shared/validation";
 import {
   normalizeTagFilter,
@@ -114,6 +115,18 @@ export default function TagLanding() {
     viewedTagRef.current = slug;
     trackTagInteraction(slug, "landing_viewed", "tag_page", listedTotal);
   }, [listedTotal, listing.isPlaceholderData, notFound, slug]);
+
+  // After a page change, wait for the new page: the intro above the count is
+  // built from its resources and can change height. Then bring the count to
+  // the top and focus it so a screen reader announces the new range.
+  const resultsCountRef = useRef<HTMLParagraphElement>(null);
+  const pendingResultsFocusRef = useRef(false);
+  useEffect(() => {
+    if (!pendingResultsFocusRef.current || !listing.data || listing.isPlaceholderData) return;
+    pendingResultsFocusRef.current = false;
+    resultsCountRef.current?.scrollIntoView({ block: "start", behavior: scrollBehavior() });
+    resultsCountRef.current?.focus({ preventScroll: true });
+  }, [listing.data, listing.isPlaceholderData]);
 
   const canonicalPath = tagLandingPath(slug);
   if (slug && window.location.pathname !== canonicalPath) {
@@ -229,7 +242,7 @@ export default function TagLanding() {
           </p>
         )}
       </section>
-      <p className="text-sm text-muted-foreground" data-testid="text-results-count" data-total={data.total}>
+      <p ref={resultsCountRef} tabIndex={-1} className="text-sm text-muted-foreground" data-testid="text-results-count" data-total={data.total}>
         Showing {(page - 1) * PAGE_SIZE + 1}–{Math.min(page * PAGE_SIZE, data.total)} of {data.total} {resourceNoun(data.total)}
       </p>
       <div className="discovery-grid">
@@ -252,8 +265,8 @@ export default function TagLanding() {
         totalPages={totalPages}
         makeHref={makeHref}
         onNavigate={(nextPage) => {
+          pendingResultsFocusRef.current = true;
           navigate(makeHref(nextPage));
-          window.scrollTo({ top: 0, behavior: "smooth" });
         }}
       />
       {/* Task #379 (uxv2-13): this chip wall used to sit between the intro and
