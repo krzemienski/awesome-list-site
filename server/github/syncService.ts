@@ -198,7 +198,7 @@ function generateSlug(name: string): string {
  * Pick the taxonomy node an imported heading belongs to.
  *
  * Imported headings pass through normalizeCategory(), which keeps only
- * letters, digits, spaces, "&" and "-". Two headings whose slugs collide
+ * letters, digits, spaces, "&", "/" and "-". Two headings whose slugs collide
  * therefore differ only in case or punctuation ("Audio & Video" vs
  * "Audio-Video", or an exported "__qa_ Cat A" re-imported as "qa Cat A"), so
  * they name the SAME node. Resolution order is deterministic:
