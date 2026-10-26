@@ -92,10 +92,11 @@ export default function ConsentBanner() {
   }, [choiceMade]);
 
   // Task #380: the banner no longer reaches into layout it does not own. It is
-  // a row of the #root column (index.css) — `order-first` in flow at the top
-  // below 640px, `sticky bottom-0` from 640px up — so normal flow keeps page
-  // content and the footer clear of it without any padding written onto body,
-  // #root or the footer's container. The one thing flow cannot move is
+  // the last row of the #root column (index.css), `position: sticky; bottom: 0`
+  // at every width, so normal flow keeps page content and the footer clear of
+  // it without any padding written onto body, #root or the footer's container.
+  // Being last in the DOM and last on screen at every width keeps focus order
+  // and visual order the same (WCAG 2.4.3). The one thing flow cannot move is
   // viewport-fixed UI, which reads the shell's --app-bottom-inset instead.
   useAppBottomInset(bannerEl, !choiceMade);
 
@@ -160,17 +161,9 @@ export default function ConsentBanner() {
       const active = document.activeElement;
       openerRef.current = active instanceof HTMLElement && active !== document.body ? active : null;
       setChoiceMade(false);
-      // Re-focus after the banner re-renders. On phones the banner is an
-      // in-flow row at the top of the document; prevent focus from preserving
-      // the footer's old scroll anchor, then explicitly bring that row back
-      // into view so the reopened settings are reachable.
-      setTimeout(() => {
-        const banner = bannerRef.current;
-        if (!banner) return;
-        const phone = window.innerWidth < 640;
-        banner.focus({ preventScroll: phone });
-        if (phone) window.scrollTo({ top: 0, behavior: "instant" });
-      }, 0);
+      // Re-focus after the banner re-renders; it is pinned to the viewport
+      // bottom, so it is already on screen wherever the opener was.
+      setTimeout(() => bannerRef.current?.focus(), 0);
     };
     window.addEventListener(OPEN_COOKIE_SETTINGS_EVENT, onOpen);
     return () => window.removeEventListener(OPEN_COOKIE_SETTINGS_EVENT, onOpen);
@@ -211,7 +204,7 @@ export default function ConsentBanner() {
         role="region"
         aria-label="Analytics consent"
         tabIndex={-1}
-        className="system-consent-banner system-consent-banner--compact relative order-first outline-none sm:sticky sm:bottom-0 sm:z-50 sm:order-none"
+        className="system-consent-banner system-consent-banner--compact outline-none"
         data-testid="consent-banner"
       >
         <div className="system-consent-banner__inner mx-auto flex w-full max-h-[30vh] items-center gap-2 overflow-hidden px-3 py-2">
@@ -219,7 +212,7 @@ export default function ConsentBanner() {
             Analytics cookies?{" "}
             <Link
               href="/privacy"
-              className="system-consent-banner__privacy-link inline-flex min-h-10 items-center align-middle"
+              className="system-consent-banner__privacy-link"
               data-testid="consent-privacy-link"
             >
               Privacy
@@ -255,12 +248,12 @@ export default function ConsentBanner() {
       role="region"
       aria-label="Analytics consent"
       tabIndex={-1}
-      className="system-consent-banner relative order-first outline-none sm:sticky sm:bottom-0 sm:z-50 sm:order-none"
+      className="system-consent-banner outline-none"
       data-testid="consent-banner"
     >
       {/* Run16 BUG-062: shrink the mobile footprint (tighter padding, second
-          sentence hidden on xs) so the bar takes less of the viewport at
-          375px, where it sits in flow at the top and scrolls away. */}
+          sentence hidden on xs) so the pinned bar takes less of a 375px
+          viewport. */}
       <div className="system-consent-banner__inner mx-auto w-full flex flex-col items-start gap-2 px-4 py-2 sm:flex-row sm:items-center sm:gap-3 sm:px-6 sm:py-3 md:px-12">
         <p className="system-consent-banner__copy flex-1 text-xs sm:text-sm">
           We use analytics ({vendorList}) to understand how the site is used — only if you allow
@@ -271,10 +264,12 @@ export default function ConsentBanner() {
               ? " Allow and, if you are signed in, your name and email are attached to your analytics profile."
               : ""}{" "}
           </span>
-          See our {/* Run17 BUG-048: inline-flex + min-h keeps the tap target ≥24px. */}
+          See our{" "}
+          {/* An inline link in running text is exempt from the 24px target
+              minimum (WCAG 2.5.8); a taller box would stretch its line. */}
           <Link
             href="/privacy"
-            className="system-consent-banner__privacy-link inline-flex min-h-10 items-center align-middle"
+            className="system-consent-banner__privacy-link"
             data-testid="consent-privacy-link"
           >
             Privacy Policy

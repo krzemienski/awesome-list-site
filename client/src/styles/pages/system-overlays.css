@@ -12,11 +12,15 @@
  * Analytics consent
  * -------------------------------------------------------------------------- */
 
+/* The last row of the #root column, pinned to the viewport bottom at every
+   width: last on screen as it is last in the DOM, so focus order matches what
+   is seen (WCAG 2.4.3). */
 .system-consent-banner {
-  position: relative;
-  order: -1;
+  position: sticky;
+  bottom: 0;
+  z-index: 50;
   border-style: solid;
-  border-width: 0 0 var(--border-w);
+  border-width: var(--border-w) 0 0;
   border-color: var(--border);
   /* The accent wash is a background layer, not a ::before: Chrome reported
      the absolutely positioned pseudo as jumping from a stale position to the
@@ -35,6 +39,14 @@
   isolation: isolate;
 }
 
+/* The shell's scroll-margin-bottom (index.css) keeps content clear of this
+   bar. Applied to the bar's own controls it can never be satisfied, so every
+   focus move into the bar scrolled the page by the bar's height. */
+.system-consent-banner,
+.system-consent-banner * {
+  scroll-margin-bottom: 0;
+}
+
 .system-consent-banner__inner {
   box-sizing: border-box;
   max-width: var(--content-max);
@@ -46,8 +58,12 @@
   line-height: 1.45;
 }
 
+/* Underlined so the link differs from the copy by more than colour (WCAG
+   1.4.1); it stays inline so the copy keeps even leading. */
 .system-consent-banner__privacy-link {
   color: var(--text);
+  text-decoration: underline;
+  text-decoration-thickness: 1px;
   text-underline-offset: 0.2em;
   transition: color var(--motion-fast) var(--motion-ease);
 }
@@ -65,14 +81,6 @@
 }
 
 @media (min-width: 640px) {
-  .system-consent-banner {
-    position: sticky;
-    bottom: 0;
-    z-index: 50;
-    order: 0;
-    border-width: var(--border-w) 0 0;
-  }
-
   .system-consent-banner__inner {
     padding-inline: var(--page-pad-x);
   }

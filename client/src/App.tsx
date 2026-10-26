@@ -826,9 +826,10 @@ export function App({
           BUG-054 (run26): rendered AFTER the router so the layout's
           "Skip to main content" link is the document's FIRST tab stop
           (run22 had it first in DOM, which put 3 banner controls ahead of
-          the skip link on every fresh visit). The banner stays fixed at the
-          bottom visually and remains keyboard-reachable after the page
-          content, with Escape still dismissing it for the session. */}
+          the skip link on every fresh visit). It is a sticky bottom row at
+          every width, so its controls come after the page content both on
+          screen and in focus order, and Escape still dismisses it for the
+          session. */}
       <Router homeComponent={homeComponent} resourceComponent={resourceComponent} />
       <ConsentBanner />
       <ClerkHost />
