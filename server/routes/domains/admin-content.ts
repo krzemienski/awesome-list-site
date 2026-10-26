@@ -94,7 +94,7 @@ const ADMIN_RESOURCE_STATUSES = ['approved', 'pending', 'rejected', 'withdrawn',
 
 const RECENT_RESOLVED_EDITS_LIMIT = 10;
 
-const REJECTION_REASON_MESSAGE ='Rejection reason is required (minimum 10 characters)';
+const REJECTION_REASON_MESSAGE = 'Rejection reason is required (minimum 10 characters)';
 const resourceRejectionSchema = z.object({
   reason: z.string({ error: REJECTION_REASON_MESSAGE }).trim().min(10, REJECTION_REASON_MESSAGE).max(5000),
 });

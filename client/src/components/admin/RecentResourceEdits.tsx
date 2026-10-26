@@ -4,20 +4,7 @@ import { formatAdminDateTime, formatRelativeAgo, maskEmail } from "@/lib/utils";
 import { AdminLoadError } from "@/components/admin/AdminLoadError";
 import { useHorizontalScrollCue } from "@/hooks/use-horizontal-scroll-cue";
 import { Skeleton } from "@/components/ui/skeleton";
-import type { ResourceEdit } from "@shared/schema";
-
-/** Wire shape of GET /api/admin/resource-edits/recent. */
-interface ResolvedResourceEdit {
-  id: number;
-  resourceId: number;
-  status: Exclude<ResourceEdit["status"], "pending">;
-  fields: string[];
-  rejectionReason: string | null;
-  createdAt: string;
-  resolvedAt: string;
-  submittedByEmail: string | null;
-  resourceTitle: string | null;
-}
+import type { ResolvedResourceEdit } from "@shared/schema";
 
 const OUTCOME: Record<ResolvedResourceEdit["status"], { label: string; chip: string }> = {
   approved: { label: "Approved", chip: "chip ok" },
@@ -26,7 +13,7 @@ const OUTCOME: Record<ResolvedResourceEdit["status"], { label: string; chip: str
   superseded: { label: "Superseded", chip: "chip warn" },
 };
 
-const RECENT_EDITS_KEY = "/api/admin/resource-edits/recent";
+export const RECENT_EDITS_KEY = "/api/admin/resource-edits/recent";
 
 /**
  * AC-04: the Edits tab promised "Pending and recent edits", but an edit

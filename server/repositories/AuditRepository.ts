@@ -34,6 +34,7 @@ import {
   EDITABLE_RESOURCE_FIELDS,
   type ResourceEdit,
   type InsertResourceEdit,
+  type ResolvedResourceEdit,
 } from "@shared/schema";
 import { db } from "../db";
 import {
@@ -42,19 +43,6 @@ import {
   resourceSkillLevelSchema,
 } from "@shared/resourceFacets";
 import { and, eq, ne, desc, asc, or, sql, inArray } from "drizzle-orm";
-
-/** A resolved edit suggestion as the admin edit history lists it. */
-export interface ResolvedResourceEdit {
-  id: number;
-  resourceId: number;
-  status: ResourceEdit["status"];
-  fields: string[];
-  rejectionReason: string | null;
-  createdAt: Date;
-  resolvedAt: Date;
-  submittedByEmail: string | null;
-  resourceTitle: string | null;
-}
 import { invalidatePublicCache } from "../cache/publicCache";
 
 export type ContributorLifecycleStatus =
@@ -604,7 +592,7 @@ export class AuditRepository {
    * superseded) edit suggestions, newest first, for the admin edit history.
    * @param limit - Maximum rows to return
    */
-  async getRecentResolvedResourceEdits(limit: number): Promise<ResolvedResourceEdit[]> {
+  async getRecentResolvedResourceEdits(limit: number): Promise<ResolvedResourceEdit<Date>[]> {
     const rows = await db
       .select({
         id: resourceEdits.id,
@@ -624,12 +612,15 @@ export class AuditRepository {
       .orderBy(desc(resourceEdits.updatedAt), desc(resourceEdits.id))
       .limit(limit);
 
-    return rows.map(({ proposedChanges, submittedByEmail, resourceTitle, ...edit }) => ({
-      ...edit,
-      fields: Object.keys(proposedChanges ?? {}),
-      submittedByEmail: submittedByEmail ?? null,
-      resourceTitle: resourceTitle ?? null,
-    }));
+    // The WHERE already drops pending rows; the check narrows `status` for the type.
+    return rows.flatMap(({ status, proposedChanges, submittedByEmail, resourceTitle, ...edit }) =>
+      status === 'pending' ? [] : [{
+        ...edit,
+        status,
+        fields: Object.keys(proposedChanges ?? {}),
+        submittedByEmail: submittedByEmail ?? null,
+        resourceTitle: resourceTitle ?? null,
+      }]);
   }
 
   /**

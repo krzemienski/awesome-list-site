@@ -526,6 +526,23 @@ export type InsertResourceEdit = z.infer<typeof insertResourceEditSchema>;
 export type ResourceEdit = typeof resourceEdits.$inferSelect;
 
 /**
+ * A resolved edit suggestion as GET /api/admin/resource-edits/recent lists it.
+ * The server builds it with `Date`s; the client reads the JSON, so its dates
+ * are ISO strings (the default).
+ */
+export interface ResolvedResourceEdit<TDate extends Date | string = string> {
+  id: number;
+  resourceId: number;
+  status: Exclude<ResourceEdit["status"], "pending">;
+  fields: string[];
+  rejectionReason: string | null;
+  createdAt: TDate;
+  resolvedAt: TDate;
+  submittedByEmail: string | null;
+  resourceTitle: string | null;
+}
+
+/**
  * Categories table - Top-level taxonomy
  *
  * Defines the primary categorization for resources (e.g., "Frameworks", "Languages", "Tools").
