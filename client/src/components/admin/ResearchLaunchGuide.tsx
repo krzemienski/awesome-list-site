@@ -295,7 +295,7 @@ export const ResearchLaunchGuide = forwardRef<ResearchLaunchGuideHandle, Researc
               value={maxBudget} onChange={(e) => setMaxBudget(e.target.value)}
               className="mt-1 min-h-11" data-testid="input-research-budget" />
             <p className={hint(maxBudget.trim() !== "" && !(Number.isFinite(budgetN) && budgetN > 0))}>
-              {maxBudget.trim() === "" ? "No cap — the run spends until it stops or you cancel it." : "The run stops when it reaches this spend."}
+              {maxBudget.trim() === "" ? "No cap — the run spends until it stops or you cancel it." : "Spend is checked between turns, so a run can go over this cap by up to one turn's cost before it stops."}
             </p>
           </div>
           <div>
