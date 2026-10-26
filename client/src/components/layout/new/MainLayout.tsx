@@ -20,6 +20,7 @@ import { OPEN_SEARCH_PALETTE_EVENT, type OpenSearchPaletteDetail } from "@/lib/s
 // b/e host the contact dialog.
 import AppFooter from "./AppFooter";
 import { useContactConfig } from "@/lib/contact";
+import { scrollBehavior } from "@/lib/scroll-behavior";
 // Guard the import itself so disabled builds do not emit the contact chunk.
 const ContactDialogHost =
   import.meta.env.VITE_CONTACT_VARIANT === "b" || import.meta.env.VITE_CONTACT_VARIANT === "e"
@@ -37,39 +38,49 @@ function ClientContactDialogHost() {
   return <Suspense fallback={null}><ContactDialogHost /></Suspense>;
 }
 
-/** R2-L01: "back to top" button, shown after scrolling ~600px. It lives in
- * its own slot at the end of <main> (see .back-to-top-slot in layout.css),
- * so where it may sit is decided by layout, not measured at runtime. */
+/** R2-L01: floating "back to top" button, appears after scrolling ~600px.
+ * It steps aside once the footer's meta strip is on screen: that strip spans
+ * the content column to its right edge, exactly where the button floats. */
 function BackToTop() {
   const [visible, setVisible] = useState(false);
 
   useEffect(() => {
-    const onScroll = () => setVisible(window.scrollY > 600);
+    const onScroll = () => {
+      // Read scrollY first: measuring the footer forces a synchronous layout,
+      // which on mount (scrollY 0) cost a full-page layout mid-commit.
+      if (window.scrollY <= 600) {
+        setVisible(false);
+        return;
+      }
+      const meta = document.querySelector(".app-footer-meta");
+      const metaOnScreen = meta ? meta.getBoundingClientRect().top < window.innerHeight : false;
+      setVisible(!metaOnScreen);
+    };
     onScroll();
     window.addEventListener("scroll", onScroll, { passive: true });
     return () => window.removeEventListener("scroll", onScroll);
   }, []);
 
+  if (!visible) return null;
+
   return (
-    <div className="back-to-top-slot">
-      {visible ? (
-        <Button
-          variant="outline"
-          size="icon"
-          onClick={(e) => {
-            // The button unmounts once the page is back near the top; hand focus
-            // to the page heading so keyboard users don't drop to <body>.
-            handoffFocusOnUnmount(e.currentTarget);
-            window.scrollTo({ top: 0, behavior: "smooth" });
-          }}
-          aria-label="Back to top"
-          data-testid="button-back-to-top"
-          className="h-[var(--back-to-top-size)] w-[var(--back-to-top-size)] shadow-lg"
-        >
-          <ArrowUp className="h-5 w-5" />
-        </Button>
-      ) : null}
-    </div>
+    <Button
+      variant="outline"
+      size="icon"
+      onClick={(e) => {
+        // The button unmounts once the page is back near the top; hand focus
+        // to the page heading so keyboard users don't drop to <body>.
+        handoffFocusOnUnmount(e.currentTarget);
+        window.scrollTo({ top: 0, behavior: scrollBehavior() });
+      }}
+      aria-label="Back to top"
+      data-testid="button-back-to-top"
+      // Fixed to the SCREEN, so it is lifted by the app shell's
+      // --app-bottom-inset (0px unless an app-level bottom bar is showing).
+      className="fixed bottom-[calc(1.5rem+var(--app-bottom-inset,0px))] right-6 z-40 h-11 w-11 shadow-lg bg-[var(--surface)]"
+    >
+      <ArrowUp className="h-5 w-5" />
+    </Button>
   );
 }
 
@@ -261,7 +272,6 @@ export default function MainLayout({ productProfile, nav, isLoading, navError, o
           <PageBreadcrumb categories={nav?.categories ?? []} />
           {children}
           </div>
-          <BackToTop />
         </main>
         {!isAdmin && publicConfig?.site ? (
           <AppFooter
@@ -283,6 +293,7 @@ export default function MainLayout({ productProfile, nav, isLoading, navError, o
         isOpen: searchOpen,
         setIsOpen: setSearchOpen,
       })}
+      <BackToTop />
     </SidebarProvider>
   );
 }

@@ -714,7 +714,7 @@ function renderAboutContent(catalogSummary: string): string {
 
 export function renderStaticPageContent(opts: {
   heading: string;
-  description: string;
+  description?: string;
   paragraphs?: string[];
   links?: { path: string; label: string }[];
   categories?: { name: string; slug: string; count: number }[];
@@ -821,7 +821,7 @@ export function renderStaticPageContent(opts: {
         `</form>`;
   return shell(
     `<h1>${escapeHtml(opts.heading)}</h1>` +
-      `<p class="ssr-lead">${escapeHtml(opts.description)}</p>` +
+      (opts.description ? `<p class="ssr-lead">${escapeHtml(opts.description)}</p>` : "") +
       (opts.policy
         ? `<p>Last updated: ${escapeHtml(legalPolicies[opts.policy.path].updated)}</p>` +
           `<article data-seo-section="legal-policy">` +

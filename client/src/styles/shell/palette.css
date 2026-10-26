@@ -338,4 +338,15 @@
     min-height: 44px;
     align-content: center;
   }
+
+  /* Out of flow, so the 44px target leaves the heading row's height alone.
+     Centred on the heading label; it reaches into the first recent row
+     rather than the previous group's last row. */
+  .search-palette-clear {
+    z-index: 1;
+    top: -2px;
+    min-width: 44px;
+    min-height: 44px;
+    justify-content: center;
+  }
 }

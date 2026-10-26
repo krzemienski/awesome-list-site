@@ -46,6 +46,7 @@ import { trackCategoryView, trackFilterUsage, trackSearch, trackSortChange, trac
 const PAGE_SIZE = 24;
 type Props = { level: ListingLevel };
 import { CATEGORY_GLYPHS as categoryMarks } from "@/lib/category-glyph";
+import { scrollBehavior } from "@/lib/scroll-behavior";
 
 const CANONICAL_SORTS = new Set(["default", "name-asc", "name-desc"]);
 
@@ -333,6 +334,7 @@ export default function TaxonomyListing({ level }: Props) {
   const lastTrackedSearchIntentRef = useRef("");
   const trackedCategoryViewRef = useRef("");
   const resultsRef = useRef<HTMLDivElement>(null);
+  const resultsHeadingRef = useRef<HTMLHeadingElement>(null);
   const searchInputRef = useRef<HTMLInputElement>(null);
   const pendingResultsFocusRef = useRef(false);
   const pendingAnalyticsRef = useRef<{
@@ -373,7 +375,7 @@ export default function TaxonomyListing({ level }: Props) {
   useEffect(() => {
     if (!pendingResultsFocusRef.current || loading || resultsLoading || listing.isPlaceholderData) return;
     pendingResultsFocusRef.current = false;
-    const timer = window.setTimeout(() => resultsRef.current?.focus({ preventScroll: true }), 250);
+    const timer = window.setTimeout(() => resultsHeadingRef.current?.focus({ preventScroll: true }), 250);
     return () => window.clearTimeout(timer);
   }, [loading, listing.isPlaceholderData, resultsLoading, resources, total]);
 
@@ -582,7 +584,9 @@ export default function TaxonomyListing({ level }: Props) {
   const onPage = (nextPage: number) => {
     setPage(nextPage);
     requestResultsFocus();
-    window.scrollTo({ top: 0, behavior: "smooth" });
+    // The header, filters and child tiles above the results don't change with
+    // the page, so the top of the window would show none of the new cards.
+    resultsRef.current?.scrollIntoView({ block: "start", behavior: scrollBehavior() });
   };
   const makeHref = (nextPage: number) => {
     const next = new URLSearchParams(window.location.search);
@@ -670,7 +674,7 @@ export default function TaxonomyListing({ level }: Props) {
          />
        </div>
     </div>
-    {level === "category" && childTiles.length > 0 && <section className="taxonomy-children" aria-labelledby="taxonomy-children-heading"><h2 id="taxonomy-children-heading">Subcategories</h2><div className="taxonomy-child-grid">{childTiles.map((child, index) => <Link key={child.slug} className="taxonomy-child card hoverable" style={{ animationDelay: `${index * 30}ms` }} href={`${routeFor("subcategory", child.slug)}${kind ? `?kind=${kind}` : ""}`}><span>{child.name}</span><span className="chip mono">{child.count}</span></Link>)}{/* Resources filed directly under the category have no subcategory page;
+    {level !== "sub-subcategory" && childTiles.length > 0 && <section className="taxonomy-children" aria-labelledby="taxonomy-children-heading"><h2 id="taxonomy-children-heading">{level === "category" ? "Subcategories" : "Topics"}</h2><div className="taxonomy-child-grid">{childTiles.map((child, index) => <Link key={child.slug} className="taxonomy-child card hoverable" style={{ animationDelay: `${index * 30}ms` }} href={`${routeFor(level === "category" ? "subcategory" : "sub-subcategory", child.slug)}${kind ? `?kind=${kind}` : ""}`}><span>{child.name}</span><span className="chip mono">{child.count}</span></Link>)}{/* Resources filed directly under this collection have no child page;
         without this tile the grid summed short of the category total. */}{listingData.generalCount > 0 && <button type="button" className="taxonomy-child card hoverable" style={{ animationDelay: `${childTiles.length * 30}ms` }} aria-pressed={general} onClick={() => applySelection(general ? "all" : "__general__")} data-testid="taxonomy-child-uncategorized"><span>Uncategorized</span><span className={`chip mono${general ? " accent" : ""}`}>{listingData.generalCount}</span></button>}</div></section>}
     {/* C9-V1-02: active filters stay visible while the tools panel is closed. */}
     <div className="taxonomy-active-filters">{!toolsOpen && scopeNarrowed && <button type="button" className="btn ghost search-filter-chip" aria-label={`Remove filter “${scopeLabel}”`} onClick={broadenScope} data-testid="chip-taxonomy-scope">{scopeLabel}<X className="h-3.5 w-3.5" aria-hidden="true" /></button>}{!toolsOpen && normalizedSearch && <button type="button" className="btn ghost search-filter-chip" aria-label={`Remove search “${normalizedSearch}”`} onClick={() => { setSearchTerm(""); setPage(1); requestResultsFocus(); }}>Search: “{normalizedSearch}”<X className="h-3.5 w-3.5" aria-hidden="true" /></button>}<ActiveFilters state={filterState} onChange={onFacetChange} onClear={clearAllFilters} defaultSort="default" /></div>
@@ -683,7 +687,7 @@ export default function TaxonomyListing({ level }: Props) {
               narrowed from. */}
            {/* Below the category level the count stays screen-reader-only until
                something narrows the list; a scope selection narrows it too. */}
-           <div className={`taxonomy-results-heading-row${narrowed ? " taxonomy-results-heading-row--narrowed" : ""}`}><h2 id="taxonomy-results-heading" data-testid="text-results-count" data-total={total}>{level === "category" ? (total > 0 || narrowed ? `Resources (${total})` : "Coming soon") : narrowed ? `${total} of ${listingData.totalAll} ${resourceNoun(listingData.totalAll)} match` : <span className="sr-only">{total} {resourceNoun(total)}</span>}</h2></div>
+           <div className={`taxonomy-results-heading-row${narrowed ? " taxonomy-results-heading-row--narrowed" : ""}`}><h2 ref={resultsHeadingRef} tabIndex={-1} id="taxonomy-results-heading" data-testid="text-results-count" data-total={total}>{level === "category" ? (total > 0 || narrowed ? `Resources (${total})` : "Coming soon") : narrowed ? `${total} of ${listingData.totalAll} ${resourceNoun(listingData.totalAll)} match` : <span className="sr-only">{total} {resourceNoun(total)}</span>}</h2></div>
           {notice && <div role="status" data-testid="notice-page-adjusted" className="rounded border p-3 text-sm">{notice}<button type="button" className="btn ghost ml-2 min-h-8" onClick={() => { setNotice(null); /* C6-SWEEP-07: notice unmounts; focus the results region */ resultsRef.current?.focus({ preventScroll: true }); }}>Dismiss</button></div>}
           {(listingData.scope.ignoredSubcategory || listingData.scope.ignoredSubSubcategory) && <div role="status" data-testid="notice-unknown-subcategory" className="rounded border p-3 text-sm">“{selection}” isn't a subcategory of {name}, so that filter was ignored.<button type="button" className="btn ghost ml-2 min-h-8" onClick={broadenScope}>Remove it</button></div>}
           {serverSearchActive && !taxonomySearch.isPlaceholderData && taxonomySearch.data?.search?.mode === "fuzzy" && taxonomySearch.data.search.suggestion && <div className="flex flex-wrap items-center justify-center gap-2 rounded border p-3 text-sm" role="status" data-testid="notice-taxonomy-search-suggestion"><span>No exact matches. Did you mean</span><Button variant="link" className="h-auto p-0" onClick={() => { setSearchTerm(taxonomySearch.data!.search!.suggestion!); setPage(1); /* C6-SWEEP-08: the notice unmounts with this button; the input is display:none while the tools panel is closed, so fall back to the results region */ const input = searchInputRef.current; if (input && input.offsetParent !== null) input.focus(); else resultsRef.current?.focus({ preventScroll: true }); }}>{taxonomySearch.data.search.suggestion}</Button><span>?</span></div>}

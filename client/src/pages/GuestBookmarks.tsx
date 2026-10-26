@@ -4,7 +4,7 @@ import { useQueries } from "@tanstack/react-query";
 import { Link, useLocation } from "wouter";
 import { AlertTriangle, Bookmark, CloudUpload, LogIn } from "lucide-react";
 import SEOHead from "@/components/layout/SEOHead";
-import { bookmarksPageSeo } from "@shared/seo-templates";
+import { bookmarksPageSeo, staticPageHeads } from "@shared/seo-templates";
 import ResourceCard from "@/components/resource/ResourceCard";
 import { ResourceCardSkeleton } from "@/components/ui/skeletons";
 import { Button } from "@/components/ui/button";
@@ -113,7 +113,7 @@ export default function GuestBookmarks() {
           description={bookmarksPageSeo.description}
           noindex
         />
-        <StatePanel tone="empty" label="No saves" title="Nothing saved on this device" headingLevel={1}
+        <StatePanel tone="empty" label="No saves" title={staticPageHeads["/bookmarks"].heading} headingLevel={1}
           actions={
             <>
               <Button asChild>
@@ -128,8 +128,7 @@ export default function GuestBookmarks() {
               </Button>
             </>
           }>
-          Tap the bookmark icon on any resource to save it — no account needed.
-          Sign in to keep your saves across devices.
+          {staticPageHeads["/bookmarks"].lead}
         </StatePanel>
       </div>
     );

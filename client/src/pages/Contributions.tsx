@@ -47,6 +47,7 @@ import { useToast } from "@/hooks/use-toast";
 import { queryUnavailableReason } from "@/lib/query-availability";
 import { ApiError, apiRequest, queryClient } from "@/lib/queryClient";
 import { writeFilterParams } from "@/lib/url-filter-state";
+import { scrollBehavior } from "@/lib/scroll-behavior";
 import {
   trackContributionExternalLinkOpened,
   trackContributionFilterChanged,
@@ -576,7 +577,7 @@ export default function Contributions() {
     setState((current) => ({ ...current, page }));
     writeFilterParams({ page: page > 1 ? String(page) : null }, "push");
     setPageNotice(null);
-    window.scrollTo({ top: 0, behavior: "smooth" });
+    window.scrollTo({ top: 0, behavior: scrollBehavior() });
   };
 
   const makePageHref = (page: number) => {
