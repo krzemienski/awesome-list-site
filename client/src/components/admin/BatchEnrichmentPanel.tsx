@@ -417,13 +417,23 @@ export default function BatchEnrichmentPanel() {
       <div className="queues-agent__canonical">
         <div className="queues-agent__stat-strip">
           {(() => {
-            const lastCompleted = jobs.find((job) => job.status === "completed");
+            // The newest finished job that enriched anything, whatever its
+            // end state: a cancelled run still wrote the resources it reached,
+            // while a "completed" run with nothing to do enriched nothing.
+            const lastEnriching = jobs.find((job) =>
+              job.completedAt && (job.successfulResources || 0) > 0,
+            );
+            const enrichedCount = lastEnriching?.successfulResources || 0;
             return (
               <Stat
                 className="queues-agent__stat"
                 label="Last enriched"
-                value={formatRelativeAgo(lastCompleted?.completedAt ?? null)}
-                sub={jobsIsError && !jobsData ? "unavailable" : lastCompleted ? `batch #${lastCompleted.id} · ${lastCompleted.successfulResources || 0} entries` : "No completed batches"}
+                value={formatRelativeAgo(lastEnriching?.completedAt ?? null)}
+                sub={jobsIsError && !jobsData
+                  ? "unavailable"
+                  : lastEnriching
+                    ? `batch #${lastEnriching.id} · ${enrichedCount} ${enrichedCount === 1 ? "resource" : "resources"}${lastEnriching.status === "completed" ? "" : ` · ${lastEnriching.status === "budget_stopped" ? "stopped at budget" : lastEnriching.status}`}`
+                    : "No batch has enriched resources yet"}
               />
             );
           })()}
