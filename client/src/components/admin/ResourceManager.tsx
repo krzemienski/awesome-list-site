@@ -29,7 +29,14 @@ import {
 import type { Resource, Category, Subcategory, SubSubcategory } from "@shared/schema";
 // Task 275: same fast numbered + jump pagination as the public listings.
 import { Paginator } from "@/components/ui/paginator";
-import { parsePageFromSearch } from "@/lib/page-param";
+import { useSearch } from "wouter";
+import {
+  parseResourceListQuery,
+  updateResourceListQuery,
+  type ResourceListQuery,
+  type ResourceSort,
+} from "@/lib/admin-resource-list-query";
+import { scrollBehavior } from "@/lib/scroll-behavior";
 // BUG-049: client-side validation mirrors the server's shared schemas so the
 // dialog flags bad input inline instead of only failing server-side.
 import { resourceTitleSchema, optionalResourceDescriptionSchema, webUrlSchema, httpsUrlSchema } from "@shared/validation";
@@ -216,25 +223,25 @@ const FILTER_STATUS_OPTIONS = [
   ...STATUS_OPTIONS,
   { value: "withdrawn", label: "Withdrawn", color: "bg-[var(--surface-3)] text-[var(--text)]" },
 ];
+const FILTER_STATUS_VALUES = FILTER_STATUS_OPTIONS.map((option) => option.value);
 
 export default function ResourceManager({ createRequest = 0 }: { createRequest?: number }) {
   const { toast } = useToast();
   const queryClient = useQueryClient();
   
-  // Task 275: honor ?page= on load so the paginator's real hrefs
-  // (copy-link / cmd-click) actually land on the linked page.
-  const [page, setPage] = useState(() => parsePageFromSearch(window.location.search).page);
-  // Run16 BUG-035: page size + sort are now user-selectable.
-  const [limit, setLimit] = useState(25);
-  const [sort, setSort] = useState<"newest" | "oldest" | "name-asc" | "name-desc">("newest");
-  const [search, setSearch] = useState("");
-  // A deep-linked non-default status (?status=rejected from the dashboard
-  // stat, or a reload) must be visible, so the filter panel starts open.
-  const [catalogToolsOpen, setCatalogToolsOpen] = useState(() => {
-    const params = new URLSearchParams(window.location.search);
-    const s = params.get("status");
-    return (!!s && s !== "approved") || params.get("featured") === "true";
-  });
+  // AC-06: the URL is the only owner of the list state (search, category,
+  // status, sort, featured, page, size), so reload, share, Back and the
+  // dashboard's ?status=rejected deep link all land on the same table.
+  const searchString = useSearch();
+  const { search, category: categoryFilter, status: statusFilter, sort, featured: featuredOnly, page, limit } =
+    useMemo(() => parseResourceListQuery(searchString, FILTER_STATUS_VALUES), [searchString]);
+  const updateListQuery = (patch: Partial<ResourceListQuery>) =>
+    updateResourceListQuery(patch, FILTER_STATUS_VALUES);
+  // A deep-linked filter hidden inside the closed panel must be visible, so
+  // the panel starts open for anything but the default view.
+  const [catalogToolsOpen, setCatalogToolsOpen] = useState(
+    () => statusFilter !== "approved" || featuredOnly || !!categoryFilter || sort !== "newest",
+  );
   // Audit2 BUG-003: debounce the search text into the query key. Every
   // keystroke used to swap the queryKey immediately; the fresh key had no
   // cached data, `isLoading` went true, and the whole component fell into the
@@ -242,62 +249,11 @@ export default function ResourceManager({ createRequest = 0 }: { createRequest?:
   // to the first character, focus lost, one request per remount, and rapid
   // typing could hang the page). Debounce + keepPreviousData keep the form
   // mounted and send ONE request for the full string.
-  const [debouncedSearch, setDebouncedSearch] = useState("");
+  const [debouncedSearch, setDebouncedSearch] = useState(search);
   useEffect(() => {
     const t = setTimeout(() => setDebouncedSearch(search), 300);
     return () => clearTimeout(t);
   }, [search]);
-  const [categoryFilter, setCategoryFilter] = useState<string>("");
-  // P1-04: seed the status filter from ?status= on first load so a deep-link
-  // (the dashboard's "N rejected" stat) and a plain reload/bookmark of
-  // /admin?tab=resources&status=rejected both land on the same filtered table.
-  const [statusFilter, setStatusFilter] = useState<string>(() => {
-    const s = new URLSearchParams(window.location.search).get("status");
-    // C10-V5A-03: "all" is an explicit choice (distinct from the default
-    // "approved"), so it survives reload/Back and reads as a real value.
-    return s && (s === "all" || FILTER_STATUS_OPTIONS.some(o => o.value === s)) ? s : "approved";
-  });
-
-  // Home-page picks: "Featured only" narrows the table to metadata.featured
-  // rows and round-trips through ?featured=true like ?status=.
-  const [featuredOnly, setFeaturedOnly] = useState(
-    () => new URLSearchParams(window.location.search).get("featured") === "true",
-  );
-  useEffect(() => {
-    const url = new URL(window.location.href);
-    const current = url.searchParams.get("featured");
-    const want = featuredOnly ? "true" : null;
-    if (current === want) return;
-    if (want) url.searchParams.set("featured", want);
-    else url.searchParams.delete("featured");
-    window.history.replaceState({}, "", url.pathname + url.search + url.hash);
-  }, [featuredOnly]);
-
-  // Task 275: mirror the effective page into ?page= (replaceState, no history
-  // spam) so the paginator's hrefs stay honest and refresh keeps your place.
-  useEffect(() => {
-    const url = new URL(window.location.href);
-    const current = url.searchParams.get("page");
-    const want = page > 1 ? String(page) : null;
-    if (current === want) return;
-    if (want) url.searchParams.set("page", want);
-    else url.searchParams.delete("page");
-    window.history.replaceState({}, "", url.pathname + url.search + url.hash);
-  }, [page]);
-
-  // P1-04: keep ?status= in sync with the active status filter (replaceState,
-  // no history spam) so the deep-linked/filtered view round-trips on reload,
-  // share, and bookmark — and clearing the filter removes the param instead of
-  // leaving a stale ?status=rejected behind.
-  useEffect(() => {
-    const url = new URL(window.location.href);
-    const current = url.searchParams.get("status");
-    const want = statusFilter || null;
-    if (current === want) return;
-    if (want) url.searchParams.set("status", want);
-    else url.searchParams.delete("status");
-    window.history.replaceState({}, "", url.pathname + url.search + url.hash);
-  }, [statusFilter]);
 
   const [editDialogOpen, setEditDialogOpen] = useState(false);
   const [createDialogOpen, setCreateDialogOpen] = useState(false);
@@ -367,18 +323,7 @@ export default function ResourceManager({ createRequest = 0 }: { createRequest?:
     return subSubcategoriesData.filter(ss => ss.subcategoryId === selectedSub.id);
   }, [editForm.subcategory, subSubcategoriesData, subcategoriesData]);
 
-  const buildQueryKey = () => {
-    const params = new URLSearchParams();
-    params.set('page', page.toString());
-    params.set('limit', limit.toString());
-    if (search) params.set('search', search);
-    if (categoryFilter) params.set('category', categoryFilter);
-    if (statusFilter && statusFilter !== 'all') params.set('status', statusFilter);
-    if (featuredOnly) params.set('featured', 'true');
-    return `/api/admin/resources?${params.toString()}`;
-  };
-
-  const { data, isLoading, isError, error: resourcesError, isFetching: resourcesFetching, isPaused, refetch } = useQuery<ResourcesResponse>({
+  const { data, isLoading, isError, error: resourcesError, isFetching: resourcesFetching, isPaused, isPlaceholderData, refetch } = useQuery<ResourcesResponse>({
     queryKey: ['/api/admin/resources', page, limit, debouncedSearch, categoryFilter, statusFilter, sort, featuredOnly],
     queryFn: async () => {
       const params = new URLSearchParams();
@@ -433,11 +378,29 @@ export default function ResourceManager({ createRequest = 0 }: { createRequest?:
     tableRegionRef.current?.focus();
   };
 
+  // AC-11: the paginator sits under up to 100 rows. Paging brings the panel's
+  // top back into view at once and, once the new rows replace the
+  // placeholder page, moves focus to the count heading (as on the public
+  // listings) so keyboard and screen-reader users land on the new results.
+  const shellRef = useRef<HTMLElement | null>(null);
+  const resultsHeadingRef = useRef<HTMLDivElement | null>(null);
+  const pendingResultsFocusRef = useRef(false);
+  const goToPage = (nextPage: number) => {
+    updateListQuery({ page: nextPage });
+    pendingResultsFocusRef.current = true;
+    shellRef.current?.scrollIntoView({ block: "start", behavior: scrollBehavior() });
+  };
+  useEffect(() => {
+    if (!pendingResultsFocusRef.current || !data || isPlaceholderData) return;
+    pendingResultsFocusRef.current = false;
+    resultsHeadingRef.current?.focus({ preventScroll: true });
+  }, [data, isPlaceholderData]);
+
   // Task 275: clamp an out-of-range page (stale ?page= link, shrunk result
   // set) back to the last real page instead of showing an empty table.
   const totalPages = data?.totalPages || 1;
   useEffect(() => {
-    if (data && page > totalPages) setPage(totalPages);
+    if (data && page > totalPages) updateResourceListQuery({ page: totalPages }, FILTER_STATUS_VALUES);
   }, [data, page, totalPages]);
 
   // Run17 BUG-028: unfiltered grand total so the header never claims
@@ -710,11 +673,8 @@ export default function ResourceManager({ createRequest = 0 }: { createRequest?:
       const createdStatus = STATUS_OPTIONS.find((option) => option.value === createdResource?.status)?.value
         ?? editForm.status
         ?? "pending";
-      setSearch("");
       setDebouncedSearch("");
-      setCategoryFilter("");
-      setStatusFilter(createdStatus);
-      setPage(1);
+      updateListQuery({ search: "", category: "", status: createdStatus });
       setSelectedResourceIds([]);
       setCreateDialogOpen(false);
       resetEditForm();
@@ -1100,18 +1060,13 @@ export default function ResourceManager({ createRequest = 0 }: { createRequest?:
     e.preventDefault();
     // Explicit submit skips the debounce window (Audit2 BUG-003).
     setDebouncedSearch(search);
-    setPage(1);
+    updateListQuery({});
     setSelectedResourceIds([]);
   };
 
   const clearFilters = () => {
-    setSearch("");
     setDebouncedSearch("");
-    setCategoryFilter("");
-    setStatusFilter("approved");
-    setFeaturedOnly(false);
-    setSort("newest");
-    setPage(1);
+    updateListQuery({ search: "", category: "", status: "approved", featured: false, sort: "newest" });
     setSelectedResourceIds([]);
   };
 
@@ -1186,10 +1141,17 @@ export default function ResourceManager({ createRequest = 0 }: { createRequest?:
 
   return (
     <div className={`admin-catalog-resources space-y-4${catalogToolsOpen ? " admin-catalog-resources--tools-open" : ""}`}>
-      <Card className="admin-catalog-resources__shell">
+      <Card ref={shellRef} className="admin-catalog-resources__shell">
         <CardHeader className="admin-catalog-resources__header">
           <div>
-            <CardTitle className="admin-catalog-resources__title flex items-center gap-2">
+            <CardTitle
+              ref={resultsHeadingRef}
+              role="heading"
+              aria-level={2}
+              tabIndex={-1}
+              className="admin-catalog-resources__title flex items-center gap-2 outline-none"
+              data-testid="text-resources-heading"
+            >
               <Database className="h-5 w-5" />
               Resources ({data?.resources.length ?? 0} of {(data?.total ?? 0).toLocaleString()})
             </CardTitle>
@@ -1207,7 +1169,7 @@ export default function ResourceManager({ createRequest = 0 }: { createRequest?:
             <Input
               placeholder="Search…"
               value={search}
-              onChange={(event) => { setSearch(event.target.value); setPage(1); }}
+              onChange={(event) => updateListQuery({ search: event.target.value })}
               data-testid="input-search-resources-header"
             />
             <Button
@@ -1246,7 +1208,7 @@ export default function ResourceManager({ createRequest = 0 }: { createRequest?:
                 /* R4-018: the query key includes `search`, so each keystroke
                    refetches live — reset to page 1 too, or a deep page index
                    survives into a smaller result set ("Page 101 of 11"). */
-                onChange={(e) => { setSearch(e.target.value); setPage(1); }}
+                onChange={(e) => updateListQuery({ search: e.target.value })}
                 className="pl-10"
                 data-testid="input-search-resources"
               />
@@ -1255,7 +1217,7 @@ export default function ResourceManager({ createRequest = 0 }: { createRequest?:
                 value=""), but the API treats a literal status/category of "all"
                 as a real filter value and matches nothing. Map "all" back to ""
                 (= param omitted) so resetting a filter actually resets it. */}
-            <Select value={categoryFilter} onValueChange={(v) => { setCategoryFilter(v === "all" ? "" : v); setPage(1); setSelectedResourceIds([]); }}>
+            <Select value={categoryFilter} onValueChange={(v) => { updateListQuery({ category: v === "all" ? "" : v }); setSelectedResourceIds([]); }}>
               <SelectTrigger className="w-full sm:w-48" aria-label="Filter by category" data-testid="select-category-filter">
                 <Filter className="h-4 w-4 mr-2" />
                 <SelectValue placeholder="All Categories" />
@@ -1267,7 +1229,7 @@ export default function ResourceManager({ createRequest = 0 }: { createRequest?:
                 ))}
               </SelectContent>
             </Select>
-            <Select value={statusFilter} onValueChange={(v) => { setStatusFilter(v); setPage(1); setSelectedResourceIds([]); }}>
+            <Select value={statusFilter} onValueChange={(v) => { updateListQuery({ status: v }); setSelectedResourceIds([]); }}>
               <SelectTrigger className="w-full sm:w-36" aria-label="Filter by status" data-testid="select-status-filter">
                 <SelectValue placeholder="All Status" />
               </SelectTrigger>
@@ -1279,7 +1241,7 @@ export default function ResourceManager({ createRequest = 0 }: { createRequest?:
               </SelectContent>
             </Select>
             {/* Run16 BUG-035: user-selectable sort order (server-side, whitelisted). */}
-            <Select value={sort} onValueChange={(v) => { setSort(v as typeof sort); setPage(1); }}>
+            <Select value={sort} onValueChange={(v) => updateListQuery({ sort: v as ResourceSort })}>
               <SelectTrigger className="w-full sm:w-40" aria-label="Sort resources" data-testid="select-sort">
                 <SelectValue placeholder="Sort" />
               </SelectTrigger>
@@ -1292,7 +1254,7 @@ export default function ResourceManager({ createRequest = 0 }: { createRequest?:
             </Select>
             <ChipButton
               aria-pressed={featuredOnly}
-              onClick={() => { setFeaturedOnly((on) => !on); setPage(1); setSelectedResourceIds([]); }}
+              onClick={() => { updateListQuery({ featured: !featuredOnly }); setSelectedResourceIds([]); }}
               data-testid="button-featured-only"
             >
               ★ Featured only
@@ -1515,7 +1477,7 @@ export default function ResourceManager({ createRequest = 0 }: { createRequest?:
                     variant="ghost"
                     size="sm"
                     onClick={() => {
-                      setPage(shownPage);
+                      updateListQuery({ page: shownPage });
                       tableRegionRef.current?.focus();
                     }}
                     data-testid="button-resources-offline-stay"
@@ -1700,7 +1662,7 @@ export default function ResourceManager({ createRequest = 0 }: { createRequest?:
                   ? "0 resources"
                   : `Showing ${(((shownPage - 1) * shownLimit) + 1).toLocaleString()} - ${Math.min(shownPage * shownLimit, data?.total || 0).toLocaleString()} of ${(data?.total || 0).toLocaleString()} ${(data?.total || 0) === 1 ? 'resource' : 'resources'}`}
               </div>
-              <Select value={String(limit)} onValueChange={(v) => { setLimit(parseInt(v, 10)); setPage(1); }}>
+              <Select value={String(limit)} onValueChange={(v) => updateListQuery({ limit: parseInt(v, 10) })}>
                 {/* Run17 BUG-034: shrink-0 — flexbox squeezed the trigger below w-28
                     at 375px and ellipsis-clipped "25 / page" to "25 /…". */}
                 <SelectTrigger className="w-28 h-8 shrink-0" aria-label="Rows per page" data-testid="select-page-size">
@@ -1730,7 +1692,7 @@ export default function ResourceManager({ createRequest = 0 }: { createRequest?:
               else url.searchParams.delete("page");
               return url.pathname + url.search + url.hash;
             }}
-            onNavigate={(p) => setPage(p)}
+            onNavigate={goToPage}
             className="admin-catalog-resources__paginator pt-4"
           />
         </CardContent>
