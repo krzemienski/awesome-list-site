@@ -1079,6 +1079,25 @@ export default function GenericCrudManager<T extends BaseEntityWithCount>({
   const [filePreviews, setFilePreviews] = useState<Record<string, string>>({});
   const [searchQuery, setSearchQuery] = useState("");
   const searchInputRef = useRef<HTMLInputElement>(null);
+  const searchToggleRef = useRef<HTMLButtonElement>(null);
+  // AC-09: the field only becomes focusable once the open class commits.
+  const focusSearchOnOpenRef = useRef(false);
+  useEffect(() => {
+    if (!toolsOpen || !focusSearchOnOpenRef.current) return;
+    focusSearchOnOpenRef.current = false;
+    searchInputRef.current?.focus();
+  }, [toolsOpen]);
+  const openSearchTools = () => {
+    focusSearchOnOpenRef.current = true;
+    setToolsOpen(true);
+  };
+  const closeSearchTools = () => {
+    setToolsOpen(false);
+    // An empty field leaves the layout when closed; keep focus on the toggle.
+    if (searchInputRef.current?.parentElement?.contains(document.activeElement)) {
+      searchToggleRef.current?.focus();
+    }
+  };
   const [currentPage, setCurrentPage] = useState(1);
   const [pageSize, setPageSize] = useState(defaultItemsPerPage);
   const [selectedIds, setSelectedIds] = useState<Set<number>>(new Set());
@@ -2588,7 +2607,8 @@ export default function GenericCrudManager<T extends BaseEntityWithCount>({
                 type="button"
                 variant="ghost"
                 size="sm"
-                onClick={() => setToolsOpen((open) => !open)}
+                ref={searchToggleRef}
+                onClick={toolsOpen ? closeSearchTools : openSearchTools}
                 aria-expanded={toolsOpen}
                 data-testid={`button-more-${testIdEntityPlural}`}
               >
@@ -2679,6 +2699,12 @@ export default function GenericCrudManager<T extends BaseEntityWithCount>({
                   placeholder={searchPlaceholder || `Search ${entityNamePlural.toLowerCase()}...`}
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
+                  onKeyDown={(e) => {
+                    if (e.key === "Escape" && toolsOpen) {
+                      e.preventDefault();
+                      closeSearchTools();
+                    }
+                  }}
                   className="pl-8 pr-8"
                   data-testid={`input-search-${testIdEntityPlural}`}
                 />
@@ -2694,7 +2720,7 @@ export default function GenericCrudManager<T extends BaseEntityWithCount>({
                       setToolsOpen(true);
                       searchInputRef.current?.focus();
                     }}
-                    className="absolute right-1 top-1/2 h-8 w-8 min-h-8 min-w-8 -translate-y-1/2 text-muted-foreground hover:text-foreground"
+                    className="admin-taxonomy-search-clear absolute right-1 top-1/2 h-8 w-8 min-h-8 min-w-8 -translate-y-1/2 text-muted-foreground hover:text-foreground"
                     aria-label="Clear search"
                     data-testid="button-clear-search"
                   >
