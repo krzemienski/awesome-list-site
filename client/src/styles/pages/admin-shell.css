@@ -127,6 +127,7 @@
 }
 .admin-research-note__open {
   display: block;
+  min-height: 44px;
   border: 0;
   padding: 0;
   color: inherit;
