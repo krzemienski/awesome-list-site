@@ -653,7 +653,7 @@ function StepsDialog({
                               variant="ghost"
                               size="icon"
                               onClick={() => setRemovingRow(row)}
-                              className="h-8 w-8 min-h-[32px] min-w-[32px] shrink-0 -my-1 hover:opacity-80"
+                              className="h-11 w-11 min-h-11 min-w-11 min-[1025px]:h-8 min-[1025px]:w-8 min-[1025px]:min-h-8 min-[1025px]:min-w-8 shrink-0 -my-1 hover:opacity-80"
                               aria-label={`Remove ${resourceLabel(row)} from this step`}
                               data-testid={`step-remove-resource-${row.id}`}
                             >
