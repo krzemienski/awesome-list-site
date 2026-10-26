@@ -209,8 +209,8 @@ export function describeWriteError(error: unknown, options: WriteErrorOptions = 
  * Every /api 500 body is masked to a bare "Internal Server Error", so for
  * 5xx responses this returns a sentence that says the server failed, that a
  * failed read changed nothing, and that retrying is safe. The server's own
- * JSON message on a non-500 5xx is kept as-is, matching describeWriteError. Everything else (4xx, network errors) goes through
- * humanizeApiError.
+ * JSON message on a non-500 5xx is kept as-is, matching describeWriteError.
+ * Everything else (4xx, network errors) goes through humanizeApiError.
  */
 export function describeLoadError(error: unknown): string {
   const status = errorStatus(error);
