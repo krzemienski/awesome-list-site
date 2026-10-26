@@ -1,4 +1,4 @@
-import type { MouseEvent, ReactNode } from "react";
+import { forwardRef, type MouseEvent, type ReactNode } from "react";
 import { RefreshCw } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { handoffFocusOnUnmount } from "@/hooks/focus-handoff";
@@ -11,17 +11,7 @@ import "@/styles/pages/system.css";
  * copy and the actions. `inline` drops the full-page height for states that
  * sit under a page header or inside a results column.
  */
-export default function StatePanel({
-  tone,
-  label,
-  title,
-  headingLevel = 2,
-  children,
-  actions,
-  inline = false,
-  className,
-  testId,
-}: {
+const StatePanel = forwardRef<HTMLDivElement, {
   tone: "error" | "empty";
   label: string;
   title: string;
@@ -31,10 +21,21 @@ export default function StatePanel({
   inline?: boolean;
   className?: string;
   testId?: string;
-}) {
+}>(function StatePanel({
+  tone,
+  label,
+  title,
+  headingLevel = 2,
+  children,
+  actions,
+  inline = false,
+  className,
+  testId,
+}, ref) {
   const Heading = `h${headingLevel}` as const;
   return (
     <div
+      ref={ref}
       className={cn("system-state", inline && "system-state--inline", className)}
       role={tone === "error" ? "alert" : undefined}
       data-testid={testId}
@@ -51,7 +52,8 @@ export default function StatePanel({
       </div>
     </div>
   );
-}
+});
+export default StatePanel;
 
 /**
  * The one retry control every failed-fetch state uses. The state unmounts
