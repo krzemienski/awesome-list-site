@@ -56,6 +56,7 @@ import type { ResearchJob, ResearchDiscovery } from "@shared/schema";
 import "./queues-agent.css";
 import "./research-run.css";
 import { useState, useEffect, useRef } from "react";
+import { flushSync } from "react-dom";
 
 const CANONICAL_JOB_ROWS = 5;
 
@@ -120,7 +121,6 @@ export default function ResearcherTab({ initialTab = "review" }: ResearcherTabPr
   const [focusRunOnMount, setFocusRunOnMount] = useState(false);
   const autoFollowed = useRef(followJobId !== null);
   const guideRef = useRef<ResearchLaunchGuideHandle>(null);
-  const [pendingGuideFocus, setPendingGuideFocus] = useState(false);
   const [historyJobId, setHistoryJobId] = useState<number | null>(null);
 
   const [selectedJobId, setSelectedJobId] = useState<number | null>(null);
@@ -327,19 +327,21 @@ export default function ResearcherTab({ initialTab = "review" }: ResearcherTabPr
     window.history.replaceState(window.history.state, "", url.pathname + url.search + url.hash);
   }, [followJobId]);
 
-  useEffect(() => {
-    if (!pendingGuideFocus || followJobId !== null) return;
-    setPendingGuideFocus(false);
-    requestAnimationFrame(() => guideRef.current?.focusBudget());
-  }, [pendingGuideFocus, followJobId]);
+  // Leaving the run view removes the focused button. Commit that change inside
+  // the click and move focus straight away: a deferred (rAF) focus never runs
+  // in a tab that is not producing frames, and focus stays on <body>.
+  const relaunchHigherCap = () => {
+    flushSync(() => setFollowJobId(null));
+    guideRef.current?.focusBudget();
+  };
 
   const showHistory = (jobId: number) => {
-    setHistoryJobId(jobId);
-    setFollowJobId(null);
-    requestAnimationFrame(() => {
-      jobsRegionRef.current?.scrollIntoView({ block: "center" });
-      focusElement(jobsRegionRef.current);
+    flushSync(() => {
+      setHistoryJobId(jobId);
+      setFollowJobId(null);
     });
+    jobsRegionRef.current?.scrollIntoView({ block: "center" });
+    focusElement(jobsRegionRef.current);
   };
 
   return (
@@ -392,7 +394,7 @@ export default function ResearcherTab({ initialTab = "review" }: ResearcherTabPr
               jobId={followJobId}
               focusOnMount={focusRunOnMount}
               onStartNew={() => setFollowJobId(null)}
-              onRelaunchHigherCap={() => { setFollowJobId(null); setPendingGuideFocus(true); }}
+              onRelaunchHigherCap={relaunchHigherCap}
               onShowHistory={() => showHistory(followJobId)}
             />
           )}
