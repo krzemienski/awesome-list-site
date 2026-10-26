@@ -117,8 +117,8 @@ export const users = pgTable("users", {
   // issue needed); admins see and action the request privately. NULL = no
   // pending request.
   deletionRequestedAt: timestamp("deletion_requested_at"),
-  // Owner password cookies issued at or before this time are rejected
-  // ("Sign out all devices" for the stateless owner session).
+  // Owner password cookies issued at or before this time are rejected. Every
+  // owner sign-out sets it, because the stateless cookie cannot be deleted.
   sessionsRevokedAt: timestamp("sessions_revoked_at"),
   createdAt: timestamp("created_at").defaultNow(),
   updatedAt: timestamp("updated_at").defaultNow(),

@@ -36,5 +36,6 @@ Each feature file starts with an H1 and one paragraph on the user-visible behavi
 - [Bookmarks](./bookmarks.md) covers guest saves on this device, member bookmarks and the merge on sign-in.
 - [Admin researcher](./admin-researcher.md) covers the admin sign-in, the Researcher tab launch, a live run and reviewing discoveries.
 - [Analytics and consent](./analytics-consent.md) covers the consent banner, vendor requests after consent and admin suppression.
+- [Admin GitHub import](./admin-github-import.md) covers the synchronous dry run, counts before and after it, and the queued import's refusal of dry runs.
 
 Full inventories for audits (every route, control and endpoint): `/Users/nick/Desktop/awesome-list-site/.local/state/inventory-admin-endpoints.md` and `inventory-public-member.md` when present.

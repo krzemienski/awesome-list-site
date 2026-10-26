@@ -65,6 +65,7 @@ The document arrives with crawler prerender markup, `#ssr-seo-content`, injected
 - Window flags: `window.__HOME_SSR__` exists only on production-SSR Home (`server/ssr.ts:388`, `main.tsx:83`). `window.__awesomeListListingEarlyFetch` is a transient early fetch (`client/src/lib/static-data.ts:212`). Neither is a dev readiness signal. Use the hold probe instead.
 - Skeleton testids that mean "not ready": `route-chunk-skeleton` (`App.tsx:99`), `home-skeleton` (`pages/Home.tsx:218`), `taxonomy-results-loading`, `search-results-loading`, `search-loading`.
 - **Do not wait for networkidle.** Some pages hold a connection open, so networkidle never fires (`.agents/memory/headless-e2e-gotchas.md:17`). Wait for a selector or text.
+- **Load-time code needs a new document.** Anything that runs only on document load (a `navigate_page` `initScript`, a request recorder, first-load analytics, the URL scrubbing of tracking parameters) reruns only on a navigation that loads a new document. Change the query string (for example `?r=2`) to get one. A fragment-only change (`#x`) keeps the same document, so none of that code reruns.
 - **Consent banner** (`client/src/components/ui/consent-banner.tsx`):
   - It shows on a first visit to every fresh context: `data-testid="consent-banner"`, `role` region `aria-label="Analytics consent"` (`:209-212, :253-256`).
   - Buttons: `consent-decline` "Decline" (`:283-290`) and `consent-accept` "Allow analytics" (`:292-299`). `Escape` hides it for the session without saving a choice (`:142-150`).
@@ -77,6 +78,8 @@ The document arrives with crawler prerender markup, `#ssr-seo-content`, injected
 ---
 
 ## 3. Stable handles per feature (routes: `client/src/App.tsx:635-753`)
+
+**Clicking.** Radix menu and select triggers (for example `button-admin-settings`) ignore a DOM `.click()` sent through `evaluate_script`, because they open on pointer events. Click them with `click` on the snapshot uid, which sends real pointer events. A DOM `.click()` is fine for plain anchors and buttons.
 
 **Global shell**
 - Header: `header-brand`, `mobile-drawer-trigger` ("Toggle sidebar"), button "Sign in", `button-notifications`, `button-guest-saved` (aria "Saved resources, N on this device"), button "Theme Settings" (`components/layout/new/AppHeader.tsx:91-156`).
@@ -160,7 +163,7 @@ The document arrives with crawler prerender markup, `#ssr-seo-content`, injected
 **Vendor ingestion endpoints.** Match only these. A loose regex also matches `us-assets.i.posthog.com/static/*` and same-origin `/src/lib/mixpanel.ts`. Source: `.agents/memory/analytics-browser-verification.md:10,24`.
 - Mixpanel `api-js.mixpanel.com/track`: gzip body → `data=<urlencoded JSON>`. Count by distinct `$insert_id`, because Mixpanel resends persisted batches after navigation.
 - Amplitude `*.amplitude.com/2/httpapi`: gzip body.
-- PostHog `us.i.posthog.com/(e|i/v0/e|batch)/`: **stays at 0 in automation browsers** because of the bot filter on `navigator.webdriver`/HeadlessChrome. That is expected unless both are overridden in an initScript.
+- PostHog `us.i.posthog.com/(e|i/v0/e|batch)/`: **stays at 0 in automation browsers** because posthog-js drops events while `navigator.webdriver` is true or the user agent is HeadlessChrome. With both overridden in an initScript, the requests prove only what the app emits; follow `../SKILL.md` Evidence (report "emitted", ingestion is an owner step).
 - GA `/g/collect`: not configured locally (no `VITE_GA_MEASUREMENT_ID`).
 - Replit Umami `i.replit.com`: injected only on the published site.
 - Before consent, there must be zero vendor requests. Wait about 15 s after an action before navigating, or Mixpanel/GA retransmit the batch (`analytics-browser-verification.md:16-22`).
