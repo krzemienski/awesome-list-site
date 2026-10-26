@@ -27,6 +27,7 @@ import {
 } from "@shared/seo-templates";
 import OfflinePageState from "@/components/layout/OfflinePageState";
 import { queryUnavailableReason } from "@/lib/query-availability";
+import { scrollBehavior } from "@/lib/scroll-behavior";
 import { TAG_MAX_LENGTH } from "@shared/validation";
 import {
   normalizeTagFilter,
@@ -253,7 +254,7 @@ export default function TagLanding() {
         makeHref={makeHref}
         onNavigate={(nextPage) => {
           navigate(makeHref(nextPage));
-          window.scrollTo({ top: 0, behavior: "smooth" });
+          window.scrollTo({ top: 0, behavior: scrollBehavior() });
         }}
       />
       {/* Task #379 (uxv2-13): this chip wall used to sit between the intro and

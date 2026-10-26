@@ -46,6 +46,7 @@ import { trackCategoryView, trackFilterUsage, trackSearch, trackSortChange, trac
 const PAGE_SIZE = 24;
 type Props = { level: ListingLevel };
 import { CATEGORY_GLYPHS as categoryMarks } from "@/lib/category-glyph";
+import { scrollBehavior } from "@/lib/scroll-behavior";
 
 const CANONICAL_SORTS = new Set(["default", "name-asc", "name-desc"]);
 
@@ -582,7 +583,7 @@ export default function TaxonomyListing({ level }: Props) {
   const onPage = (nextPage: number) => {
     setPage(nextPage);
     requestResultsFocus();
-    window.scrollTo({ top: 0, behavior: "smooth" });
+    window.scrollTo({ top: 0, behavior: scrollBehavior() });
   };
   const makeHref = (nextPage: number) => {
     const next = new URLSearchParams(window.location.search);

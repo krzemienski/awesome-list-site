@@ -24,6 +24,7 @@ import { trackFilterUsage, trackSearch, trackSortChange, trackTagInteraction } f
 import { readSearchState, searchApiParams, searchCanBrowse } from "@shared/discovery-params";
 import { searchPageSeo } from "@shared/seo-templates";
 import { fetchAwesomeListNav, navTotalCount, visibleNavCategories, type AwesomeListNav } from "@/lib/static-data";
+import { scrollBehavior } from "@/lib/scroll-behavior";
 
 type State = { q: string; category: string; subcategory: string; subSubcategory: string; tags: string[]; provider: string; format: string; skillLevel: string; sort: string; page: number };
 const PAGE_SIZE = 24;
@@ -252,7 +253,7 @@ export default function Search() {
     subcategory: resolvedNames.current.subcategory.get(state.subcategory) ?? state.subcategory,
   };
   useEffect(() => { if (data && state.page > totalPages) { preservePageNoticeRef.current = true; setState(s => ({ ...s, page: totalPages })); writeFilterParams({ page: totalPages > 1 ? String(totalPages) : null }, "replace"); setPageNotice(`Page ${state.page} is beyond the available results. Showing page ${totalPages}.`); } }, [data, state.page, totalPages]);
-  const gotoPage = (n: number) => { setState(s => ({ ...s, page: n })); writeFilterParams({ page: n > 1 ? String(n) : null }, "push"); setPageNotice(null); pendingResultsFocusRef.current = true; window.scrollTo({ top: 0, behavior: "smooth" }); };
+  const gotoPage = (n: number) => { setState(s => ({ ...s, page: n })); writeFilterParams({ page: n > 1 ? String(n) : null }, "push"); setPageNotice(null); pendingResultsFocusRef.current = true; window.scrollTo({ top: 0, behavior: scrollBehavior() }); };
   const makePageHref = (n: number) => { const p = new URLSearchParams(window.location.search); if (n > 1) p.set("page", String(n)); else p.delete("page"); return `/search?${p.toString()}`; };
   const invalid = query.error instanceof ApiError && query.error.status === 400;
   // A search started offline is paused, not failed: isLoading and isError are

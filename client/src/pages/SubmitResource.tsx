@@ -47,6 +47,7 @@ import { safeGetItem, safeSetItem, safeRemoveItem } from "@/lib/safeStorage";
 import { redirectToLogin } from "@/lib/authUtils";
 import { trackGenerateLead } from "@/lib/analytics";
 import { serverConversionHeaders } from "@/lib/mixpanel";
+import { scrollBehavior } from "@/lib/scroll-behavior";
 import SEOHead from "@/components/layout/SEOHead";
 import { submitSeoTitle, submitSeoDescription } from "@shared/seo-templates";
 import "@/styles/pages/submit.css";
@@ -467,7 +468,7 @@ export default function SubmitResource() {
       void queryClient.invalidateQueries({ queryKey: ['/api/user/contributions'] });
       
       // Scroll to top
-      window.scrollTo({ top: 0, behavior: 'smooth' });
+      window.scrollTo({ top: 0, behavior: scrollBehavior() });
     },
     onError: (error: Error) => {
       // BUG-005 (run19): the server's 400 carries per-field messages in
