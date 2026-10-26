@@ -1,4 +1,5 @@
 import type { ResearchPreflightIssue, ResolvedResearchConfig } from "@shared/researcherContract";
+import { insecureHttpRefusal } from "@shared/validation";
 import { FLOW_TIERS, MODEL_TIERS, tierEnvVar } from "./anthropicConfig";
 
 /**
@@ -98,12 +99,8 @@ export function resolveResearchRunConfig(input: ResearchRunConfigInput, env: Env
   } else if (!endpoint) {
     issues.push({ code: "invalid_base_url", message: `${overrideBase ? "The override base URL" : "ANTHROPIC_BASE_URL"} is not a valid http(s) URL.` });
   }
-  if (overrideBase && endpoint?.scheme === "http" && !input.allowInsecureHttp) {
-    issues.push({
-      code: "insecure_http_unconfirmed",
-      message: `The override base URL uses plain http://, so the auth token would travel unencrypted to ${endpoint.host}. Confirm the insecure endpoint to launch.`,
-    });
-  }
+  const insecureHttp = insecureHttpRefusal(overrideBase, !!input.allowInsecureHttp);
+  if (insecureHttp) issues.push({ code: "insecure_http_unconfirmed", message: insecureHttp });
 
   let credentialLabel: string;
   if (input.hasAuthToken) {

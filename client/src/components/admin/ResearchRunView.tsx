@@ -50,8 +50,12 @@ function endingCopy(outcome: RunOutcome, saved: number, job: ResearchJob): strin
   switch (outcome) {
     case "completed":
       return saved > 0 ? `Run finished with ${found}. Review them below.` : "Run finished without saving a discovery. Relaunch with a different focus or brief.";
-    case "budget_stopped":
-      return `Budget cap reached ($${Number(job.maxBudgetUsd ?? 0).toFixed(2)}) — review the ${found}, or relaunch with a higher cap.`;
+    case "budget_stopped": {
+      const cap = `Budget cap reached ($${Number(job.maxBudgetUsd ?? 0).toFixed(2)})`;
+      return saved > 0
+        ? `${cap} — review the ${found}, or relaunch with a higher cap.`
+        : `${cap} before the run saved a discovery. Relaunch with a higher cap.`;
+    }
     case "cancelled":
       return saved > 0 ? `Run cancelled — review the ${found} it made before stopping.` : "Run cancelled before it saved a discovery.";
     case "failed":
