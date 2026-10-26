@@ -638,7 +638,7 @@ export default function TaxonomyListing({ level }: Props) {
   return <div className={`taxonomy-page taxonomy-page--${level}`}>
     {/* LOCKSTEP: og-middleware marks a taxonomy page with nothing approved in it noindex, follow. */}
     <SEOHead title={pagedSeoTitleCore(seoCore, currentPage)} description={pagedSeoDescription(seoDescription, currentPage, totalPages)} category={name} resourceCount={listingData.totalAll} pageParam={currentPage} noindex={listingData.totalAll === 0} follow={listingData.totalAll === 0} />
-    {level === "category" ? <Button asChild variant="ghost" size="sm" className="taxonomy-back"><Link href="/"><ArrowLeft size={12} aria-hidden="true" />Browse</Link></Button> :
+    {level === "category" ? <Button asChild variant="ghost" size="sm" className="taxonomy-back"><Link href="/categories"><ArrowLeft size={12} aria-hidden="true" />Browse</Link></Button> :
       <nav className="taxonomy-breadcrumbs" aria-label="Collection breadcrumb">
         <Link href="/">Home</Link><span aria-hidden="true">/</span>
         {parentCategory && <><Link href={routeFor("category", parentCategory.slug)}>{parentCategory.name}</Link><span aria-hidden="true">/</span></>}
