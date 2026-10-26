@@ -672,11 +672,15 @@
   color: var(--text-2);
 }
 
+/* A standalone action, so it gets the 44px control floor, not the text-link one. */
 .admin-ops-export__link-job-link {
+  align-items: center;
   color: var(--accent-ink);
+  display: inline-flex;
+  justify-self: start;
+  min-height: 44px;
   text-decoration: underline;
   text-underline-offset: 2px;
-  justify-self: start;
 }
 
 /* Full database backup (restorable pg_dump in private App Storage). */
