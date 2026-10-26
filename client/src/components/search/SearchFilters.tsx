@@ -21,6 +21,8 @@ type Props = {
   onClear: () => void;
   /** Taxonomy listings already establish their category scope. */
   hideTaxonomyFacets?: boolean;
+  /** The surface's own narrowing controls outside this panel, named when no facet applies. */
+  otherControls: string[];
 };
 type Count = { value: string; count: number };
 
@@ -111,7 +113,29 @@ function FacetList({ title, items, value, onSelect, testid, collapseInert = fals
   </FacetGroup>;
 }
 
-export default function SearchFilters({ state, facets, onChange, onClear, hideTaxonomyFacets = false }: Props) {
+/** "a, b, or c" for copy that names a list of controls or facets. */
+export const orList = (items: string[]) => new Intl.ListFormat("en", { type: "disjunction" }).format(items);
+
+/**
+ * The facet groups the panel renders for these facets, in panel order. Mirrors
+ * FacetList's hide rules, so copy elsewhere names only filters a visitor can see.
+ */
+export function offeredFacets(facets: ResourceSearchFacets | undefined, state: State, hideTaxonomyFacets = false): string[] {
+  const renders = (items: unknown[], value: string, collapseInert = false) =>
+    items.length > 0 && !(collapseInert && items.length === 1 && !value);
+  const groups: [string, boolean][] = [
+    ["category", !hideTaxonomyFacets && renders(options(facets?.categories, state.category), state.category)],
+    ["subcategory", !hideTaxonomyFacets && renders(options(facets?.subcategories, state.subcategory), state.subcategory)],
+    ["sub-subcategory", !hideTaxonomyFacets && renders(options(facets?.subSubcategories, state.subSubcategory), state.subSubcategory)],
+    ["provider", renders(options(facets?.providers, state.provider, RESOURCE_PROVIDER_LABELS), state.provider, true)],
+    ["format", renders(options(facets?.formats, state.format, RESOURCE_FORMAT_LABELS), state.format, true)],
+    ["skill level", renders(options(facets?.skillLevels, state.skillLevel, RESOURCE_SKILL_LEVEL_LABELS), state.skillLevel, true)],
+    ["tag", options(facets?.tags, state.tags, undefined, tagLabel, normalizeTag).length > 0],
+  ];
+  return groups.filter(([, shown]) => shown).map(([name]) => name);
+}
+
+export default function SearchFilters({ state, facets, onChange, onClear, hideTaxonomyFacets = false, otherControls }: Props) {
   const [open, setOpen] = useState(false);
   const [tagSearch, setTagSearch] = useState("");
   const applyChange = (key: keyof State, value: string | string[]) => {
@@ -134,20 +158,9 @@ export default function SearchFilters({ state, facets, onChange, onClear, hideTa
   }, [allTags, state.tags, tagSearch]);
   const listedTags = tags.slice(0, TAG_LIMIT);
   const unlistedTags = tags.length - listedTags.length;
-  // Mirrors FacetList's own hide rules: when every group would render nothing
-  // (e.g. a listing whose resources are all unclassified and untagged), say
-  // so instead of opening a blank panel.
-  const renders = (items: unknown[], value: string, collapseInert = false) =>
-    items.length > 0 && !(collapseInert && items.length === 1 && !value);
-  const hasFacets =
-    allTags.length > 0 ||
-    (!hideTaxonomyFacets && (
-      renders(options(facets?.categories, state.category), state.category) ||
-      renders(options(facets?.subcategories, state.subcategory), state.subcategory) ||
-      renders(options(facets?.subSubcategories, state.subSubcategory), state.subSubcategory))) ||
-    renders(options(facets?.providers, state.provider, RESOURCE_PROVIDER_LABELS), state.provider, true) ||
-    renders(options(facets?.formats, state.format, RESOURCE_FORMAT_LABELS), state.format, true) ||
-    renders(options(facets?.skillLevels, state.skillLevel, RESOURCE_SKILL_LEVEL_LABELS), state.skillLevel, true);
+  // When every group would render nothing (e.g. a listing whose resources are
+  // all unclassified and untagged), say so instead of opening a blank panel.
+  const hasFacets = offeredFacets(facets, state, hideTaxonomyFacets).length > 0;
   // The desktop sidebar is a persistent column, so its tag list scrolls in
   // place; the mobile sheet already scrolls as a whole, so there the list
   // takes the sheet's height instead of a 224px box inside it.
@@ -155,7 +168,7 @@ export default function SearchFilters({ state, facets, onChange, onClear, hideTa
     const tagsScroll = collapsible && listedTags.length > TAG_VISIBLE_ROWS;
     return <div className="space-y-6">
     <div className="flex items-center justify-between"><div><p className="text-sm font-semibold">Narrow results</p><p className="text-xs text-muted-foreground">Counts update for this combination.</p></div>{activeCount > 0 && <Button variant="ghost" size="sm" onClick={clear} data-testid="button-clear-filters">Clear all</Button>}</div>
-    {facets && !hasFacets && <p className="text-sm text-muted-foreground" role="status" data-testid="text-no-facets">No further filters apply to these results. Use search, type or sort to narrow them.</p>}
+    {facets && !hasFacets && <p className="text-sm text-muted-foreground" role="status" data-testid="text-no-facets">No further filters apply to these results.{otherControls.length > 0 && ` Use ${orList(otherControls)} to narrow them.`}</p>}
     {/* Category is the entry point into the taxonomy, so it stays open; the two
         drill-down levels and the tag list are the long ones and open on demand. */}
     {!hideTaxonomyFacets && <FacetList title="Category" items={options(facets?.categories, state.category)} value={state.category} onSelect={v => applyChange("category", v)} testid="category" showAll />}

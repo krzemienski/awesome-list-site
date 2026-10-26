@@ -481,6 +481,7 @@ export default function TaxonomyListing({ level }: Props) {
         .filter((subSub: any) => subSub.count > 0 || `${child.name} › ${subSub.name}` === selection)
         .map((subSub: any) => ({ value: `${child.name} › ${subSub.name}`, count: subSub.count }))),
     ]);
+  const showScopeSelect = level !== "sub-subcategory" && optionChildren.length > 0;
   const backSlug = level === "subcategory" ? parentCategory?.slug : parentSubcategory?.slug;
   const back = level === "category" || !backSlug
     ? "/"
@@ -660,7 +661,7 @@ export default function TaxonomyListing({ level }: Props) {
     {/* Directly under the header's toggle: after the subcategory tiles the
         opened panel landed below the fold at 1440x900 and the click looked inert. */}
     <div id="taxonomy-tools-panel" className={`taxonomy-controls taxonomy-production-controls ${toolsOpen ? "taxonomy-production-controls--open" : ""} flex flex-col gap-4`}><div className="relative"><Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" /><Input ref={searchInputRef} className="pl-10" value={searchTerm} onChange={(event) => { setSearchTerm(event.target.value); setPage(1); }} placeholder={`Search in ${name}...`} aria-label={`Search in ${name}`} data-testid="input-search-resources" /></div>
-       {level !== "sub-subcategory" && optionChildren.length > 0 && <select className="select min-h-11" aria-label={`Limit ${name} by subcategory`} value={selection} onChange={(event) => applySelection(event.target.value)} data-testid="select-subcategory-filter"><option value="all">All subcategories</option>{listingData.generalCount > 0 && <option value="__general__">Uncategorized ({listingData.generalCount})</option>}{optionChildren.map((item) => <option key={item.value} value={item.value}>{item.value} ({item.count})</option>)}</select>}
+       {showScopeSelect && <select className="select min-h-11" aria-label={`Limit ${name} by subcategory`} value={selection} onChange={(event) => applySelection(event.target.value)} data-testid="select-subcategory-filter"><option value="all">All subcategories</option>{listingData.generalCount > 0 && <option value="__general__">Uncategorized ({listingData.generalCount})</option>}{optionChildren.map((item) => <option key={item.value} value={item.value}>{item.value} ({item.count})</option>)}</select>}
        <select className="select min-h-11" aria-label="Limit by resource kind" value={kind ?? ""} onChange={(event) => { const nextKind = parseKindParam(event.target.value); setKind(nextKind); setPage(1); requestResultsFocus(); }} data-testid="select-kind-filter"><option value="">All resource kinds</option>{RESOURCE_KIND_VALUES.map((value) => <option key={value} value={value}>{value.replace(/[-_]/g, " ").replace(/\b\w/g, (letter) => letter.toUpperCase())}</option>)}</select>
        <AdvancedFilter selectedTags={tags} sortBy={sort} availableTags={listingData.tags} onTagsChange={(value) => onFacetChange("tags", value)} onSortChange={(value) => onFacetChange("sort", value)} showCountSorts={false} showTagFilter={false} />
        <div className="taxonomy-view-toggle-row" aria-label="View mode">
@@ -679,7 +680,7 @@ export default function TaxonomyListing({ level }: Props) {
     {/* C9-V1-02: active filters stay visible while the tools panel is closed. */}
     <div className="taxonomy-active-filters">{!toolsOpen && scopeNarrowed && <button type="button" className="btn ghost search-filter-chip" aria-label={`Remove filter “${scopeLabel}”`} onClick={broadenScope} data-testid="chip-taxonomy-scope">{scopeLabel}<X className="h-3.5 w-3.5" aria-hidden="true" /></button>}{!toolsOpen && normalizedSearch && <button type="button" className="btn ghost search-filter-chip" aria-label={`Remove search “${normalizedSearch}”`} onClick={() => { setSearchTerm(""); setPage(1); requestResultsFocus(); }}>Search: “{normalizedSearch}”<X className="h-3.5 w-3.5" aria-hidden="true" /></button>}<ActiveFilters state={filterState} onChange={onFacetChange} onClear={clearAllFilters} defaultSort="default" /></div>
     <div className="taxonomy-results-layout">
-      <div className={`taxonomy-production-controls ${toolsOpen ? "taxonomy-production-controls--open" : ""}`} aria-busy={toolsOpen && taxonomySearch.isLoading}><SearchFilters state={filterState} facets={taxonomySearch.data?.facets} onChange={onFacetChange} onClear={clearFacetFilters} hideTaxonomyFacets /></div>
+      <div className={`taxonomy-production-controls ${toolsOpen ? "taxonomy-production-controls--open" : ""}`} aria-busy={toolsOpen && taxonomySearch.isLoading}><SearchFilters state={filterState} facets={taxonomySearch.data?.facets} onChange={onFacetChange} onClear={clearFacetFilters} hideTaxonomyFacets otherControls={["search", ...(showScopeSelect ? ["subcategory"] : []), "resource kind", "sort"]} /></div>
       <div className="min-w-0 flex-1">
         <div ref={resultsRef} tabIndex={-1} className="space-y-4 outline-none" aria-busy={resultsLoading} aria-labelledby="taxonomy-results-heading" data-testid="taxonomy-results-region">
           {/* The listing's single count statement: visible range, matching total,
