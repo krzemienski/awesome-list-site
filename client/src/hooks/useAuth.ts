@@ -10,6 +10,7 @@ import { initAmplitude, optOutAmplitude } from '@/lib/amplitude';
 import { initGA, optOutGA, trackLoggedOut, trackPageView } from '@/lib/analytics';
 import { setAdminAnalyticsSession } from '@/lib/analytics-suppression';
 import { useToast } from '@/hooks/use-toast';
+import type { AuthMethod } from '@shared/schema';
 
 /**
  * Per-device state that belongs to the person who just signed out: the
@@ -59,7 +60,7 @@ function syncAdminAnalytics(role: string | undefined): boolean {
   return isAdmin;
 }
 
-interface User {
+export interface AuthUser {
   id: string;
   email?: string;
   name?: string;
@@ -69,10 +70,11 @@ interface User {
   createdAt?: string;
   // Run22 BUG-020: pending private account-deletion request (null = none).
   deletionRequestedAt?: string | null;
+  authMethod: AuthMethod;
 }
 
 interface AuthResponse {
-  user: User | null;
+  user: AuthUser | null;
   isAuthenticated: boolean;
 }
 

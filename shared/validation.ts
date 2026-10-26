@@ -175,6 +175,27 @@ export function isReservedTestHost(raw: string): boolean {
 export const RESERVED_TEST_HOST_MESSAGE =
   "This URL uses a reserved test domain (such as example.com), so it can't be added to the live catalog. Use the resource's real address.";
 
+/**
+ * Syntax rules for a custom Anthropic-compatible base URL, shared by the
+ * admin forms and the server. The server adds its DNS/private-address check
+ * on top. Returns the user-facing error, or null when the URL is acceptable.
+ */
+export function baseUrlSyntaxError(raw: string): string | null {
+  let u: URL;
+  try {
+    u = new URL(raw.trim());
+  } catch {
+    return "Base URL is not a valid URL";
+  }
+  if (u.protocol !== "https:" && u.protocol !== "http:") return "Base URL must use http:// or https://";
+  if (!u.hostname) return "Base URL must include a host";
+  if (u.username || u.password) return "Base URL must not contain credentials";
+  // The SDK appends /v1/messages to the base URL, so a query or fragment
+  // never works; refusing it also keeps a ?key= out of job rows and logs.
+  if (u.search || u.hash) return "Base URL must not contain a query string or fragment";
+  return null;
+}
+
 // ---------------------------------------------------------------------------
 // GitHub repository identifiers (BUG-042 run25)
 // ---------------------------------------------------------------------------

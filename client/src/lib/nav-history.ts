@@ -1,4 +1,5 @@
 import { useEffect, useRef } from "react";
+import { focusElement } from "@/hooks/focus-handoff";
 
 // BUG-013 (run14): window.history.length is useless for "did the user
 // navigate inside the app?" — a fresh tab already has about:blank (and the
@@ -120,6 +121,92 @@ export function useScrollRestoration(location: string, search: string): void {
       cancelled = true;
     };
   }, [location, search]);
+}
+
+// A path change moves focus to the new page's <h1>, so a screen reader names
+// the page and Tab continues from the top of its content, as after a full page
+// load. Query-only changes (filters, paging) keep the page's own focus
+// handling, and #fragment targets are focused or scrolled by their page. The
+// hand-off retries each frame while the page renders: a loading heading that
+// is replaced, or a dialog that restores focus to its opener, gets focus moved
+// to the current heading. The budget runs on while <main> shows a loading
+// state, so a slow lazy route still gets its heading; if focus is still
+// outside <main> when it runs out (no h1 rendered), <main> takes it. It ends
+// early when the page focuses something in <main> itself, or on any key or
+// pointer input (so the skip link keeps working).
+const ROUTE_FOCUS_BUDGET_MS = 4000;
+const ROUTE_FOCUS_BUSY_LIMIT_MS = 20000;
+// Marks focus this hook placed, so only that focus drops the ring
+// (app-bridge.css). Keyboard hand-offs to the same heading keep their ring.
+const ROUTE_FOCUS_ATTR = "data-route-focus";
+
+function focusForRoute(el: HTMLElement): boolean {
+  el.setAttribute(ROUTE_FOCUS_ATTR, "");
+  if (!focusElement(el, { preventScroll: true })) {
+    el.removeAttribute(ROUTE_FOCUS_ATTR);
+    return false;
+  }
+  el.addEventListener("blur", () => el.removeAttribute(ROUTE_FOCUS_ATTR), { once: true });
+  return true;
+}
+
+function isTextEntry(element: Element | null): boolean {
+  return (
+    element instanceof HTMLInputElement ||
+    element instanceof HTMLTextAreaElement ||
+    element instanceof HTMLSelectElement ||
+    (element instanceof HTMLElement && element.isContentEditable)
+  );
+}
+
+export function useRouteFocus(location: string): void {
+  const lastPath = useRef(location);
+  useEffect(() => {
+    if (lastPath.current === location) return;
+    lastPath.current = location;
+    // A page that mounted in this same commit may already have focused its
+    // search box (a clicked link is never a text field).
+    if (window.location.hash || isTextEntry(document.activeElement)) return;
+
+    let heading: HTMLElement | null = null;
+    let frame = 0;
+    const startedAt = Date.now();
+    function stop() {
+      cancelAnimationFrame(frame);
+      document.removeEventListener("focusin", onFocusIn);
+      window.removeEventListener("keydown", stop, true);
+      window.removeEventListener("pointerdown", stop, true);
+    }
+    function onFocusIn(event: FocusEvent) {
+      const main = document.getElementById("main");
+      if (event.target !== heading && main?.contains(event.target as Node)) stop();
+    }
+    function tick() {
+      const main = document.getElementById("main");
+      // A suspended route keeps the previous page's h1 in the DOM, hidden
+      // (display: none), so only a rendered h1 counts.
+      const next = Array.from(main?.querySelectorAll<HTMLElement>("h1") ?? []).find(
+        (h1) => h1.getClientRects().length > 0,
+      );
+      const focusOutsideMain = !main?.contains(document.activeElement);
+      if (next && next !== document.activeElement && (!heading || focusOutsideMain) && focusForRoute(next)) {
+        heading = next;
+      }
+      const elapsed = Date.now() - startedAt;
+      const loading = document.querySelector('#main [aria-busy="true"]') !== null;
+      if (elapsed < ROUTE_FOCUS_BUDGET_MS || (loading && elapsed < ROUTE_FOCUS_BUSY_LIMIT_MS)) {
+        frame = requestAnimationFrame(tick);
+        return;
+      }
+      stop();
+      if (main && !main.contains(document.activeElement)) focusForRoute(main);
+    }
+    document.addEventListener("focusin", onFocusIn);
+    window.addEventListener("keydown", stop, true);
+    window.addEventListener("pointerdown", stop, true);
+    frame = requestAnimationFrame(tick);
+    return stop;
+  }, [location]);
 }
 
 // In-app links to a page section (/settings#notification-settings) arrive via

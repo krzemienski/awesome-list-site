@@ -48,7 +48,7 @@ import { Resource, InsertResource, GithubSyncQueue } from "@shared/schema";
 import { getGitHubClient } from "./replitConnection";
 import { validateAwesomeList } from "../validation/awesomeLint";
 import { createLogger } from "../lib/logger";
-import { describeDbError } from "../errors/pgErrors";
+import { describeDbError, isUniqueViolation } from "../errors/pgErrors";
 
 const logger = createLogger("github-sync");
 
@@ -89,6 +89,8 @@ interface ImportResult {
   wouldCreateTaxonomy: PlannedTaxonomyNode[];
   /** Branch the README was read from; unset if the fetch never succeeded. */
   branch?: string;
+  /** Why the whole run stopped (unreadable repo or README), as opposed to per-item errors. */
+  runError?: string;
 }
 
 interface ExportResult {
@@ -803,6 +805,15 @@ export class GitHubSyncService {
               break;
           }
         } catch (error: unknown) {
+          // The catalog was read before the loop, so another writer can take
+          // this URL in between. The row that holds it stays as it is.
+          if (isUniqueViolation(error, "resources_url")) {
+            const warning = `Skipped ${resource.title}: URL already held by another row (concurrent write)`;
+            result.skipped++;
+            result.warnings.push(warning);
+            logger.warn(warning);
+            continue;
+          }
           const errorMsg = `Error processing ${resource.title}: ${describeDbError(error)}`;
           result.errors.push(errorMsg);
           logger.error(errorMsg);
@@ -875,8 +886,10 @@ export class GitHubSyncService {
       }
 
     } catch (error: any) {
-      const errorMsg = `Import failed: ${error.message}`;
+      const reason = error instanceof Error ? error.message : String(error);
+      const errorMsg = `Import failed: ${reason}`;
       result.errors.push(errorMsg);
+      result.runError = reason;
       logger.error('Import failed', { repo: repoUrl, reason: error.message }, error);
       
       // Log failed import

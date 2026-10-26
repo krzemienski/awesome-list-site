@@ -629,6 +629,22 @@
   z-index: 1;
 }
 
+/* A pill is its own link inside a hoverable card, so it answers the pointer
+   (and keyboard focus) separately with the DS accent-chip paint. */
+@media (hover: hover) {
+  .home-resource-tag:hover {
+    color: var(--accent-ink);
+    border-color: color-mix(in srgb, var(--accent) 35%, var(--border));
+    background: color-mix(in srgb, var(--accent) 8%, transparent);
+  }
+}
+
+.home-resource-tag:focus-visible {
+  color: var(--accent-ink);
+  border-color: color-mix(in srgb, var(--accent) 35%, var(--border));
+  background: color-mix(in srgb, var(--accent) 8%, transparent);
+}
+
 @media (max-width: 1024px) {
   .home-resource-tag {
     display: inline-flex;

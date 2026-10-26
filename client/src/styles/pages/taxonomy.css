@@ -385,7 +385,9 @@ button.taxonomy-child {
    revealed on hover/focus. Inserted into the chip row they pushed the tag
    pills right/down and grew the card ~88px, so a click aimed at a pill landed
    on View Details. They now float over the empty band right of the mark
-   (36px tall) and only toggle visibility, so nothing reflows. */
+   (36px tall) and only fade, so nothing reflows. The tray is first in the
+   card's tab order, so at rest it is transparent and ignores the pointer but
+   stays focusable: Tab lands on it and :focus-within shows it. */
 .taxonomy-page .resource-card--taxonomy .resource-card__reveal {
   position: absolute;
   z-index: 10;
@@ -397,15 +399,15 @@ button.taxonomy-child {
   align-items: center;
   justify-content: flex-end;
   gap: 6px;
-  visibility: hidden;
   opacity: 0;
-  transition: opacity 160ms ease, visibility 160ms;
+  pointer-events: none;
+  transition: opacity 160ms ease;
 }
 
 .taxonomy-page .resource-card--taxonomy:hover .resource-card__reveal,
 .taxonomy-page .resource-card--taxonomy:focus-within .resource-card__reveal {
-  visibility: visible;
   opacity: 1;
+  pointer-events: auto;
 }
 
 /* The tray takes the featured chip's corner while it is shown. */
@@ -418,8 +420,8 @@ button.taxonomy-child {
    empty band, so showing it costs no layout. */
 @media (hover: none) {
   .taxonomy-page .resource-card--taxonomy .resource-card__reveal {
-    visibility: visible;
     opacity: 1;
+    pointer-events: auto;
   }
 
   .taxonomy-page .resource-card--taxonomy .resource-card__featured {

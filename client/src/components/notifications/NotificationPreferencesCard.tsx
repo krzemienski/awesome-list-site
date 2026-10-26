@@ -16,7 +16,7 @@ import {
   trackNotificationsResumed,
   trackNotificationsUnsubscribedAll,
 } from "@/lib/analytics-notifications";
-import type { DigestPreview, NotificationPreferencesResponse, NotificationPreferencesUpdate } from "@shared/notifications";
+import type { DigestPreview, NotificationPreferencesPatch, NotificationPreferencesResponse, NotificationPreferencesUpdate } from "@shared/notifications";
 import { DIGEST_CADENCES, notificationPreferencesUpdateSchema } from "@shared/notifications";
 
 // "Biweekly" reads as twice a week to many people; the digest runs every 14 days.
@@ -49,8 +49,12 @@ const PAUSE_DAYS = 7;
 
 // What a save was for, plus the last server-confirmed preferences it replaces,
 // so analytics compares server state to server state (never unsaved edits).
+// "save" PUTs the whole form; the quick actions PATCH only their own fields, so
+// they never store the time zone the form merely suggests.
 type SaveAction = "save" | "pause" | "resume" | "unsubscribe_all";
-interface SaveRequest { body: NotificationPreferencesUpdate; action: SaveAction; previous: NotificationPreferencesUpdate | null }
+type SaveRequest =
+  | { action: "save"; body: NotificationPreferencesUpdate; previous: NotificationPreferencesUpdate | null }
+  | { action: Exclude<SaveAction, "save">; body: NotificationPreferencesPatch; previous: NotificationPreferencesUpdate | null };
 
 function trackConfirmedSave({ action, previous }: SaveRequest, saved: NotificationPreferencesResponse) {
   if (action === "pause") trackNotificationsPaused(PAUSE_DAYS);
@@ -127,8 +131,8 @@ export default function NotificationPreferencesCard() {
 
   const unavailable = queryUnavailableReason(preferencesQuery);
   const saveMutation = useMutation({
-    mutationFn: ({ body }: SaveRequest) =>
-      apiRequest("/api/notification-preferences", { method: "PUT", body: JSON.stringify(body) }),
+    mutationFn: ({ action, body }: SaveRequest) =>
+      apiRequest("/api/notification-preferences", { method: action === "save" ? "PUT" : "PATCH", body: JSON.stringify(body) }),
     onSuccess: (data: NotificationPreferencesResponse, request: SaveRequest) => {
       trackConfirmedSave(request, data);
       queryClient.setQueryData(["/api/notification-preferences"], data);
@@ -151,38 +155,41 @@ export default function NotificationPreferencesCard() {
     if (key === "timezone") setTimezoneError(null);
     setValues((current) => ({ ...current, [key]: value }));
   };
-  const saveValues = (nextValues: NotificationPreferencesUpdate, action: SaveAction, message: string, onSaved?: () => void) => {
-    if (!isValidTimezone(nextValues.timezone)) {
+  const save = () => {
+    if (saveMutation.isPending) return;
+    if (!isValidTimezone(values.timezone)) {
       setSavedMessage(null);
       setRequestError(null);
       setTimezoneError("Choose a valid IANA time zone.");
       return;
     }
     setTimezoneError(null);
-    const parsed = notificationPreferencesUpdateSchema.safeParse(nextValues);
+    const parsed = notificationPreferencesUpdateSchema.safeParse(values);
     if (!parsed.success) {
       setSavedMessage(null);
       setRequestError(parsed.error.issues[0]?.message ?? "Check your notification choices.");
       return;
     }
     setRequestError(null);
-    saveMutation.mutate({ body: parsed.data, action, previous: savedValues }, {
+    saveMutation.mutate({ action: "save", body: parsed.data, previous: savedValues }, {
       onSuccess: () => {
-        setSavedMessage(message);
-        onSaved?.();
+        setSavedMessage("Your choices are saved.");
+        setDirty(false);
       },
     });
   };
-  const save = () => !saveMutation.isPending && saveValues(values, "save", "Your choices are saved.", () => setDirty(false));
-  // Quick actions change only their own fields: they save on top of the last
-  // saved state, and mirror the change into the form without committing
-  // anything else the person has edited but not saved. The confirmation says
-  // only what the action saved, so it never vouches for pending edits.
-  const saveQuickAction = (action: SaveAction, patch: Partial<NotificationPreferencesUpdate>, done: string) => {
+  // Quick actions send only their own fields, and mirror the change into the
+  // form without committing anything else the person has edited but not
+  // saved. The confirmation says only what the action saved, so it never
+  // vouches for pending edits.
+  const saveQuickAction = (action: Exclude<SaveAction, "save">, patch: NotificationPreferencesPatch, done: string) => {
     if (saveMutation.isPending) return; // aria-disabled buttons stay clickable
     setValues((current) => ({ ...current, ...patch }));
+    setRequestError(null);
     const message = dirty ? `${done} Your other changes aren't saved yet — use Save choices.` : done;
-    saveValues({ ...(savedValues ?? values), ...patch }, action, message);
+    saveMutation.mutate({ action, body: patch, previous: savedValues }, {
+      onSuccess: () => setSavedMessage(message),
+    });
   };
   const pause = () => saveQuickAction("pause", { pausedUntil: new Date(Date.now() + PAUSE_DAYS * 86400000).toISOString() }, "Notifications paused.");
   const resume = () => saveQuickAction("resume", { pausedUntil: null }, "Notifications resumed.");
