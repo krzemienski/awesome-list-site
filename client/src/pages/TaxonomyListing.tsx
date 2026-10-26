@@ -31,7 +31,7 @@ import OfflinePageState from "@/components/layout/OfflinePageState";
 import { queryUnavailableReason } from "@/lib/query-availability";
 import { resolveSiteIdentity } from "@shared/site-identity";
 import "@/styles/pages/taxonomy.css";
-import { parsePageParamStrict, pageNoticeFor } from "@/lib/page-param";
+import { strictUrlPage } from "@/lib/page-param";
 import { safeGetItem, safeSetItem } from "@/lib/safeStorage";
 import { normalizeTag, parseTagsParam } from "@/lib/tags";
 import { apiRequest, ApiError } from "@/lib/queryClient";
@@ -120,8 +120,10 @@ export default function TaxonomyListing({ level }: Props) {
   const { data: publicConfig } = useContactConfig(true);
   const siteName = publicConfig ? resolveSiteIdentity({ name: publicConfig.site.title }).name : "the catalog";
   const params = new URLSearchParams(search);
-  const initialPage = parsePageParamStrict(params.get("page"));
-  const [page, setPage] = useState(initialPage.page);
+  const initialPage = strictUrlPage(params.get("page"));
+  const [page, setPage] = useState(initialPage ?? 1);
+  // The URL's ?page= is a spelling og-middleware 404s ("abc", "0", "1e3").
+  const [pageRejected, setPageRejected] = useState(initialPage === null);
   const [searchTerm, setSearchTerm] = useState(params.get("search") ?? "");
   const [tags, setTags] = useState(() => parseTagsParam(params));
   const [provider, setProvider] = useState(params.get("provider") ?? "");
@@ -137,7 +139,7 @@ export default function TaxonomyListing({ level }: Props) {
     const saved = safeGetItem("awesome-list-view-mode");
     return isLayoutViewMode(saved) ? saved : "grid";
   });
-  const [notice, setNotice] = useState<string | null>(pageNoticeFor(initialPage));
+  const [notice, setNotice] = useState<string | null>(null);
   const initialGeneral =
     params.get("filter") === "general" || params.get("view") === "general" || params.get("subcategory") === "__general__";
   const [selection, setSelection] = useState(initialGeneral ? "__general__" : params.get("subcategory") ?? "all");
@@ -176,6 +178,7 @@ export default function TaxonomyListing({ level }: Props) {
   const listing = useQuery({
     queryKey: ["awesome-list-listing", level, slug, page, pageOptions],
     queryFn: () => fetchListingPage(level, slug, page, pageOptions),
+    enabled: !pageRejected,
     staleTime: 60_000,
     placeholderData: keepPreviousData,
   });
@@ -252,6 +255,10 @@ export default function TaxonomyListing({ level }: Props) {
   const paginationReady = serverFilterActive
     ? Boolean(taxonomySearch.data && !taxonomySearch.isPlaceholderData)
     : Boolean(listingData && !listing.isPlaceholderData);
+  // Same split as resolveTaxonomyPage: a narrowed view clamps a page past the
+  // end, the plain listing 404s it (BUG-027).
+  const listingFiltered = serverFilterActive || selection !== "all" || general;
+  const pageNotFound = pageRejected || (!listingFiltered && paginationReady && page > totalPages);
   const lastTrackedSearchIntentRef = useRef("");
   const trackedCategoryViewRef = useRef("");
   const resultsRef = useRef<HTMLDivElement>(null);
@@ -276,12 +283,12 @@ export default function TaxonomyListing({ level }: Props) {
   // from a keepPreviousData query, so wait for the placeholder to clear —
   // otherwise the first event after a sibling nav reports the PREVIOUS node.
   useEffect(() => {
-    if (!name || listing.isPlaceholderData) return;
+    if (!name || listing.isPlaceholderData || pageNotFound) return;
     const key = `${level}:${slug}`;
     if (trackedCategoryViewRef.current === key) return;
     trackedCategoryViewRef.current = key;
     trackCategoryView(name);
-  }, [level, listing.isPlaceholderData, name, slug]);
+  }, [level, listing.isPlaceholderData, name, pageNotFound, slug]);
 
   useEffect(() => {
     if (serverSearchActive && taxonomySearch.data && !taxonomySearch.isPlaceholderData) {
@@ -317,11 +324,11 @@ export default function TaxonomyListing({ level }: Props) {
   const replaceNextUrlSync = useRef(false);
   const pushSnapshot = useRef("");
   useEffect(() => {
-    if (page > totalPages && paginationReady) {
+    if (listingFiltered && page > totalPages && paginationReady) {
       setNotice(`Page ${page} is not available; showing page ${totalPages} instead.`);
       setPage(totalPages);
     }
-  }, [page, paginationReady, totalPages]);
+  }, [listingFiltered, page, paginationReady, totalPages]);
   useEffect(() => {
     const next = new URLSearchParams();
     if (searchTerm.trim()) next.set("search", searchTerm);
@@ -344,6 +351,8 @@ export default function TaxonomyListing({ level }: Props) {
     // (Back from a category never reached Home). Only sync while the
     // document is still on this listing's own path.
     if (!samePath(window.location.pathname, routeFor(level, slug))) return;
+    // A 404 keeps the requested URL, exactly as the server answered it.
+    if (pageNotFound) return;
     if (current !== href) {
       const shouldPush = urlSyncInitialized.current && !popNavigation.current && !replaceNextUrlSync.current && pushSnapshot.current !== snapshot;
       window.history[shouldPush ? "pushState" : "replaceState"]({}, "", href);
@@ -356,7 +365,7 @@ export default function TaxonomyListing({ level }: Props) {
     popNavigation.current = false;
     replaceNextUrlSync.current = false;
     pushSnapshot.current = snapshot;
-  }, [format, general, kind, level, location, page, provider, searchTerm, selection, skillLevel, slug, sort, tags, view]);
+  }, [format, general, kind, level, location, page, pageNotFound, provider, searchTerm, selection, skillLevel, slug, sort, tags, view]);
   useEffect(() => {
     const onPopState = () => {
       popNavigation.current = true;
@@ -371,9 +380,10 @@ export default function TaxonomyListing({ level }: Props) {
       setSkillLevel(next.get("skillLevel") ?? "");
        setKind(parseKindParam(next.get("kind")));
       setSort(normalizeSort(next.get("sortBy") || next.get("sort")));
-      const parsed = parsePageParamStrict(next.get("page"));
-      setPage(parsed.page);
-      setNotice(pageNoticeFor(parsed));
+      const nextPage = strictUrlPage(next.get("page"));
+      setPage(nextPage ?? 1);
+      setPageRejected(nextPage === null);
+      setNotice(null);
       const nextView = next.get("view");
       setView(isLayoutViewMode(nextView) ? nextView : "grid");
     };
@@ -390,9 +400,9 @@ export default function TaxonomyListing({ level }: Props) {
     const routeKey = `${routeFor(level, slug)}?${search}`;
     if (hydratedRouteRef.current === routeKey) return;
     hydratedRouteRef.current = routeKey;
-    // C8-V1-02: wouter reports our own canonicalising rewrite (?page=0 -> no
-    // param) back as a navigation; state already matches it, and rehydrating
-    // would wipe the invalid-page notice just set from the original URL.
+    // C8-V1-02: wouter reports our own canonicalising rewrite (?sort=asc ->
+    // ?sortBy=name-asc) back as a navigation; state already matches it, and
+    // rehydrating would wipe the page-clamp notice set just before it.
     if (lastWrittenRouteRef.current === routeKey) return;
     const next = new URLSearchParams(search);
     const nextGeneral =
@@ -408,9 +418,10 @@ export default function TaxonomyListing({ level }: Props) {
     setSkillLevel(next.get("skillLevel") ?? "");
     setKind(parseKindParam(next.get("kind")));
     setSort(normalizeSort(next.get("sortBy") || next.get("sort")));
-    const parsed = parsePageParamStrict(next.get("page"));
-    setPage(parsed.page);
-    setNotice(pageNoticeFor(parsed));
+    const nextPage = strictUrlPage(next.get("page"));
+    setPage(nextPage ?? 1);
+    setPageRejected(nextPage === null);
+    setNotice(null);
     const nextView = next.get("view");
     setView(isLayoutViewMode(nextView) ? nextView : "grid");
   }, [level, search, slug]);
@@ -426,6 +437,7 @@ export default function TaxonomyListing({ level }: Props) {
     .sort((a, b) => navTotalCount(b) - navTotalCount(a))
     .slice(0, 8);
 
+  if (pageNotFound) return <NotFound />;
   if (loading) return <div className={`taxonomy-page taxonomy-page--${level}`} aria-busy="true"><SEOHead title={findNavNode(nav, level, slug)?.node.name ?? "Loading resources"} description="Loading catalog resources." loading /><div className="taxonomy-loading-header"><PageHeaderSkeleton /></div><div className="taxonomy-grid">{Array.from({ length: 9 }).map((_, i) => <ResourceCardSkeleton key={i} />)}</div></div>;
   // An unknown top-level slug 404s from the listing endpoint. Treat that as a
   // real not-found page (with navigation), not a transient "please try again"
