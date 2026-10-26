@@ -1,4 +1,4 @@
-import { useState, useMemo, useEffect, useRef } from "react";
+import { useState, useMemo, useEffect, useRef, useCallback } from "react";
 import { useQuery, useMutation, useQueryClient, keepPreviousData } from "@tanstack/react-query";
 import { apiRequest, ApiError } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
@@ -120,13 +120,13 @@ const featuredValue = (resource: AdminResource) => resource.metadata?.featured =
 type ResourceFormField = "title" | "url" | "description" | "category" | "rejectionReason";
 type ResourceFieldErrors = Partial<Record<ResourceFormField, string>>;
 
-/** The dialogs' validated fields in visual order, with their labels. */
-const RESOURCE_FORM_FIELDS: readonly (readonly [ResourceFormField, string])[] = [
-  ["title", "Title"],
-  ["url", "URL"],
-  ["description", "Description"],
-  ["category", "Category"],
-  ["rejectionReason", "Rejection reason"],
+/** The dialogs' validated fields in visual order. */
+const RESOURCE_FORM_FIELDS: readonly ResourceFormField[] = [
+  "title",
+  "url",
+  "description",
+  "category",
+  "rejectionReason",
 ];
 
 const resourceFieldId = (mode: "edit" | "create", field: ResourceFormField) =>
@@ -135,19 +135,14 @@ const resourceFieldId = (mode: "edit" | "create", field: ResourceFormField) =>
 /**
  * A failed submit left focus on the submit button, or on the dialog once a
  * pending save disabled it. Land on the first invalid field after it renders
- * its aria-describedby error. Returns whether any field was invalid.
+ * its aria-describedby error, which screen readers then read with the field.
+ * Returns whether any field was invalid.
  */
 const focusFirstInvalidField = (mode: "edit" | "create", errors: ResourceFieldErrors): boolean => {
-  const firstInvalid = RESOURCE_FORM_FIELDS.find(([field]) => errors[field]);
+  const firstInvalid = RESOURCE_FORM_FIELDS.find((field) => errors[field]);
   if (!firstInvalid) return false;
-  requestAnimationFrame(() => document.getElementById(resourceFieldId(mode, firstInvalid[0]))?.focus());
+  requestAnimationFrame(() => document.getElementById(resourceFieldId(mode, firstInvalid))?.focus());
   return true;
-};
-
-const describeFieldErrors = (errors: ResourceFieldErrors): string => {
-  const labels = RESOURCE_FORM_FIELDS.filter(([field]) => errors[field]).map(([, label]) => label);
-  if (labels.length === 0) return "";
-  return `${labels.length === 1 ? "1 field needs" : `${labels.length} fields need`} attention: ${labels.join(", ")}.`;
 };
 
 /** Bulk endpoints answer 200 (all ok) or 207 (partial) with per-item failures. */
@@ -319,7 +314,6 @@ export default function ResourceManager({ createRequest = 0 }: { createRequest?:
 
   // BUG-049: per-field inline errors + a dialog-level banner for server 400s.
   const [fieldErrors, setFieldErrors] = useState<ResourceFieldErrors>({});
-  const fieldErrorSummary = describeFieldErrors(fieldErrors);
   // Moving a resource into Rejected from the editor needs the same 10+
   // character reason as the moderation queue; the contributor sees it.
   const [rejectionReason, setRejectionReason] = useState("");
@@ -423,6 +417,11 @@ export default function ResourceManager({ createRequest = 0 }: { createRequest?:
   // kept instead of dropping it to <body>.
   const tableRegionRef = useRef<HTMLDivElement | null>(null);
   const tableScrollCue = useHorizontalScrollCue();
+  const setTableScroller = tableScrollCue.ref;
+  const tableRegionCallbackRef = useCallback((el: HTMLDivElement | null) => {
+    tableRegionRef.current = el;
+    setTableScroller(el);
+  }, [setTableScroller]);
   // C5-V5A-01: a confirmed bulk action clears the selection (unmounting the
   // bar that opened its dialog) and a row delete removes its row, so the
   // dialog's return-focus target is gone. Land on the table instead.
@@ -1547,10 +1546,7 @@ export default function ResourceManager({ createRequest = 0 }: { createRequest?:
             />
           )}
           <div
-            ref={(el) => {
-              tableRegionRef.current = el;
-              tableScrollCue.ref(el);
-            }}
+            ref={tableRegionCallbackRef}
             tabIndex={0}
             role="region"
             aria-label="Resources table, scrollable"
@@ -1789,9 +1785,6 @@ export default function ResourceManager({ createRequest = 0 }: { createRequest?:
                 {formError}
               </div>
             )}
-            <p className="sr-only" role="status" data-testid="status-edit-field-errors">
-              {fieldErrorSummary}
-            </p>
             <div className="grid gap-2">
               <Label htmlFor="edit-title">Title *</Label>
               <Input
@@ -2089,9 +2082,6 @@ export default function ResourceManager({ createRequest = 0 }: { createRequest?:
                 {formError}
               </div>
             )}
-            <p className="sr-only" role="status" data-testid="status-create-field-errors">
-              {fieldErrorSummary}
-            </p>
             <div className="grid gap-2">
               <Label htmlFor="create-title">Title *</Label>
               <Input
