@@ -116,6 +116,39 @@ const kindSelectValue = (resource: Pick<AdminResource, "kind" | "inferredKind">)
   resource.kind && resource.kind !== resource.inferredKind ? resource.kind : "";
 const featuredValue = (resource: AdminResource) => resource.metadata?.featured === true;
 
+type ResourceFormField = "title" | "url" | "description" | "category" | "rejectionReason";
+type ResourceFieldErrors = Partial<Record<ResourceFormField, string>>;
+
+/** The dialogs' validated fields in visual order, with their labels. */
+const RESOURCE_FORM_FIELDS: readonly (readonly [ResourceFormField, string])[] = [
+  ["title", "Title"],
+  ["url", "URL"],
+  ["description", "Description"],
+  ["category", "Category"],
+  ["rejectionReason", "Rejection reason"],
+];
+
+const resourceFieldId = (mode: "edit" | "create", field: ResourceFormField) =>
+  field === "rejectionReason" ? "edit-rejection-reason" : `${mode}-${field}`;
+
+/**
+ * A failed submit left focus on the submit button, or on the dialog once a
+ * pending save disabled it. Land on the first invalid field after it renders
+ * its aria-describedby error. Returns whether any field was invalid.
+ */
+const focusFirstInvalidField = (mode: "edit" | "create", errors: ResourceFieldErrors): boolean => {
+  const firstInvalid = RESOURCE_FORM_FIELDS.find(([field]) => errors[field]);
+  if (!firstInvalid) return false;
+  requestAnimationFrame(() => document.getElementById(resourceFieldId(mode, firstInvalid[0]))?.focus());
+  return true;
+};
+
+const describeFieldErrors = (errors: ResourceFieldErrors): string => {
+  const labels = RESOURCE_FORM_FIELDS.filter(([field]) => errors[field]).map(([, label]) => label);
+  if (labels.length === 0) return "";
+  return `${labels.length === 1 ? "1 field needs" : `${labels.length} fields need`} attention: ${labels.join(", ")}.`;
+};
+
 /** Bulk endpoints answer 200 (all ok) or 207 (partial) with per-item failures. */
 interface BulkResourceResult {
   succeeded?: number;
@@ -284,7 +317,8 @@ export default function ResourceManager({ createRequest = 0 }: { createRequest?:
   const [bulkApproveDialogOpen, setBulkApproveDialogOpen] = useState(false);
 
   // BUG-049: per-field inline errors + a dialog-level banner for server 400s.
-  const [fieldErrors, setFieldErrors] = useState<{ title?: string; url?: string; description?: string; category?: string; rejectionReason?: string }>({});
+  const [fieldErrors, setFieldErrors] = useState<ResourceFieldErrors>({});
+  const fieldErrorSummary = describeFieldErrors(fieldErrors);
   // Moving a resource into Rejected from the editor needs the same 10+
   // character reason as the moderation queue; the contributor sees it.
   const [rejectionReason, setRejectionReason] = useState("");
@@ -439,13 +473,13 @@ export default function ResourceManager({ createRequest = 0 }: { createRequest?:
 
   // C3-V5A-02: a server 400 carries per-field messages; mark those fields
   // inline and keep the banner for anything that has no field in the dialog.
-  const showServerFormError = (error: Error, fallback: string) => {
+  const showServerFormError = (mode: "edit" | "create", error: Error, fallback: string) => {
     const serverFieldErrors = extractFieldErrors(error);
     if (!serverFieldErrors) {
       setFormError(describeWriteError(error, { fallback, outcome: NOTHING_CHANGED_OUTCOME }));
       return;
     }
-    const inline: { title?: string; url?: string; description?: string; rejectionReason?: string } = {};
+    const inline: ResourceFieldErrors = {};
     const other: string[] = [];
     for (const [field, message] of Object.entries(serverFieldErrors)) {
       if (field === "title" || field === "url" || field === "description" || field === "rejectionReason") inline[field] = message;
@@ -453,6 +487,7 @@ export default function ResourceManager({ createRequest = 0 }: { createRequest?:
     }
     setFieldErrors(inline);
     setFormError(other.length > 0 ? other.join(" ") : "Please fix the highlighted fields.");
+    focusFirstInvalidField(mode, inline);
   };
 
   const updateMutation = useMutation({
@@ -481,7 +516,7 @@ export default function ResourceManager({ createRequest = 0 }: { createRequest?:
     onError: (error: Error) => {
       // BUG-049: keep the dialog open and surface the server's message inline
       // so the operator can correct the field, not just see a vanishing toast.
-      showServerFormError(error, "Failed to update resource");
+      showServerFormError("edit", error, "Failed to update resource");
     }
   });
 
@@ -691,7 +726,7 @@ export default function ResourceManager({ createRequest = 0 }: { createRequest?:
     },
     onError: (error: Error) => {
       // BUG-049: surface server-side rejection inline in the open dialog.
-      showServerFormError(error, "Failed to create resource");
+      showServerFormError("create", error, "Failed to create resource");
     }
   });
 
@@ -928,7 +963,7 @@ export default function ResourceManager({ createRequest = 0 }: { createRequest?:
   );
 
   const validateEditForm = (mode: 'edit' | 'create'): boolean => {
-    const errors: { title?: string; url?: string; description?: string; category?: string; rejectionReason?: string } = {};
+    const errors: ResourceFieldErrors = {};
     const titleParsed = resourceTitleSchema.safeParse(editForm.title.trim());
     if (!titleParsed.success) {
       errors.title = titleParsed.error.issues[0]?.message || "Invalid title";
@@ -951,10 +986,10 @@ export default function ResourceManager({ createRequest = 0 }: { createRequest?:
     }
     setFieldErrors(errors);
     setFormError(null);
-    return Object.keys(errors).length === 0;
+    return !focusFirstInvalidField(mode, errors);
   };
 
-  const clearFieldError = (field: 'title' | 'url' | 'description' | 'category' | 'rejectionReason') => {
+  const clearFieldError = (field: ResourceFormField) => {
     setFieldErrors(prev => (prev[field] ? { ...prev, [field]: undefined } : prev));
   };
 
@@ -1736,6 +1771,9 @@ export default function ResourceManager({ createRequest = 0 }: { createRequest?:
                 {formError}
               </div>
             )}
+            <p className="sr-only" role="status" data-testid="status-edit-field-errors">
+              {fieldErrorSummary}
+            </p>
             <div className="grid gap-2">
               <Label htmlFor="edit-title">Title *</Label>
               <Input
@@ -2033,6 +2071,9 @@ export default function ResourceManager({ createRequest = 0 }: { createRequest?:
                 {formError}
               </div>
             )}
+            <p className="sr-only" role="status" data-testid="status-create-field-errors">
+              {fieldErrorSummary}
+            </p>
             <div className="grid gap-2">
               <Label htmlFor="create-title">Title *</Label>
               <Input
