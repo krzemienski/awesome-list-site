@@ -20,6 +20,7 @@ import {
 } from "@/lib/font-options";
 import { trackThemeChange } from "@/lib/analytics";
 import SEOHead from "@/components/layout/SEOHead";
+import { staticPageHeads } from "@shared/seo-templates";
 import { isSystemId } from "@/lib/design-system";
 import { safeGetItem, safeSetItem } from "@/lib/safeStorage";
 import "@/styles/pages/account.css";
@@ -129,9 +130,9 @@ export default function ThemeSettings() {
         </Link>
         {/* docs/11 page head: eyebrow, display heading, lede. */}
         <div className="eyebrow theme-page__eyebrow">── Settings · Theme</div>
-        <h1 className="page-title theme-page__title">Theme Settings</h1>
+        <h1 className="page-title theme-page__title">{staticPageHeads["/settings/theme"].heading}</h1>
         <p className="theme-page__lede">
-          Pick a design system, accent, and (optionally) override the font. Changes apply instantly and persist across reloads.{" "}
+          {staticPageHeads["/settings/theme"].lead}{" "}
           <span role="status" aria-live="polite" aria-atomic="true" className="theme-page__status" data-testid="text-active-preset">
             Active: {activeSystem?.name ?? systemId} · {activeAccent?.name ?? accentId}
           </span>

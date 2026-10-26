@@ -50,6 +50,8 @@ import {
   missingPageSeo,
   bookmarksPageSeo,
   searchPageSeo,
+  staticPageHeads,
+  type StaticPageHeadPath,
 } from "@shared/seo-templates";
 import {
   RESOURCE_FORMAT_LABELS,
@@ -116,8 +118,8 @@ export interface RouteMeta {
    *   2. Valid utility pages with no search value (e.g. /sign-in, /sign-up) —
    *      these stay HTTP 200 because `found` is true; only the index signal is
    *      suppressed. These may still opt in to prerendered body injection
-   *      (noindex governs indexing, not readability); soft-404s never receive
-   *      an injected body because `found` is false (`!notFound` guard).
+   *      (noindex governs indexing, not readability). Soft-404s get the
+   *      same "Page Not Found" body the client renders.
    */
   noindex?: boolean;
   /** Opt a valid noindex page into link crawling; soft-404s stay nofollow. */
@@ -260,10 +262,10 @@ interface ResolvedRoute {
   /** false → unknown route / missing entity → soft-404 (HTTP 404 + noindex). */
   found: boolean;
   /**
-   * Prerendered semantic body HTML for the SPA shell (Task #80). Present only
-   * for found, indexable public routes; injected into `<!--app-html-->` so
-   * non-JS crawlers see real content. Absent for soft-404s and auth/internal
-   * routes (those keep the empty shell).
+   * Prerendered semantic body HTML for the SPA shell (Task #80), injected into
+   * `<!--app-html-->` so non-JS crawlers see real content. Absent for
+   * soft-404s (the middleware adds the shared 404 body) and for routes that
+   * keep the empty shell.
    */
   bodyHtml?: string;
 }
@@ -1100,6 +1102,9 @@ function homeShellChrome(): string {
           : {}),
         categories,
       });
+    } else if (Object.hasOwn(staticPageHeads, path)) {
+      const head = staticPageHeads[path as StaticPageHeadPath];
+      bodyHtml = renderStaticPageContent({ heading: head.heading, description: head.lead });
     } else if (path === "/sign-in" || path === "/sign-up") {
       // Noindex utility pages still get a minimal readable body so non-JS
       // crawlers (GPTBot, ClaudeBot, PerplexityBot, Applebot-Extended) see real
@@ -1114,7 +1119,6 @@ function homeShellChrome(): string {
       bodyHtml = isSignIn && isAdminSignIn(url)
         ? renderStaticPageContent({
             heading: authPageHeadings.adminSignIn,
-            description: m.description,
             paragraphs: ["The admin sign-in form requires JavaScript."],
           })
         : renderStaticPageContent({
@@ -2597,6 +2601,14 @@ export function ogInjectionMiddleware() {
       }
     }
 
+    if (notFound) {
+      bodyHtml = renderStaticPageContent({
+        heading: missingPageSeo.heading,
+        description: missingPageSeo.lead,
+        links: [{ path: "/categories", label: "Browse all categories" }],
+      });
+    }
+
     // Wrap res.end / res.write to capture HTML and rewrite it.
     const origWrite = res.write.bind(res);
     const origEnd = res.end.bind(res);
@@ -2642,21 +2654,17 @@ export function ogInjectionMiddleware() {
           if (/<head[\s>]/i.test(html)) {
             html = rewriteHead(html, meta!);
           }
-          // Task #80: inject prerendered semantic content into the SPA shell for
-          // found routes so non-JS crawlers (GPTBot, ClaudeBot, Googlebot's
+          // Task #80: inject prerendered semantic content into the SPA shell so
+          // non-JS crawlers (GPTBot, ClaudeBot, Googlebot's
           // pre-render) see real headings, summaries, and internal links.
-          // Noindex utility routes (/sign-in, /sign-up) are included on purpose:
+          // Noindex routes (utility pages, soft-404s) are included on purpose:
           // noindex governs indexing, not readability, and bodyHtml is only ever
           // assigned to routes that deliberately opt in. main.tsx calls
           // createRoot().render() on boot, which REPLACES this content — we
           // never set __INITIAL_DATA__, so there is no hydration step (and no
           // mismatch). The function form of replace() avoids `$`
           // special-sequence interpretation in titles/descriptions.
-          if (
-            bodyHtml &&
-            !notFound &&
-            html.includes("<!--app-html-->")
-          ) {
+          if (bodyHtml && html.includes("<!--app-html-->")) {
             html = html.replace("<!--app-html-->", () => bodyHtml!);
             const hints = headPreload
               .filter(({ href }) => !html.includes(`href="${href}"`))

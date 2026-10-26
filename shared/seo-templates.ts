@@ -2,7 +2,37 @@
 export const missingPageSeo = {
   title: "Page Not Found",
   description: "The page you're looking for doesn't exist on Awesome Video. Browse the curated index of video development resources instead.",
+  heading: "Page Not Found",
+  lead: "We couldn't find the page you're looking for. The page may have been moved or doesn't exist.",
 };
+/**
+ * The h1 and lead line each page hydrates to for a signed-out visitor with no
+ * device saves, which is what a crawler is. The server prerender and the page
+ * both read this table.
+ */
+export const staticPageHeads = {
+  "/bookmarks": {
+    heading: "Nothing saved on this device",
+    lead: "Tap the bookmark icon on any resource to save it — no account needed. Sign in to keep your saves across devices.",
+  },
+  "/recommendations": {
+    heading: "Recommended Resources",
+    lead: "Popular picks from across the catalog. Sign in to tailor them to your interests and learning goals.",
+  },
+  "/continue-learning": {
+    heading: "Your progress lives with your account",
+    lead: "Sign in to resume your journeys, pick up at your next step, and revisit resources you've opened.",
+  },
+  "/settings/theme": {
+    heading: "Theme Settings",
+    lead: "Pick a design system, accent, and (optionally) override the font. Changes apply instantly and persist across reloads.",
+  },
+  "/design-system": {
+    heading: "Design System",
+    lead: "The living anatomy of the runtime design system: two visual languages × ten accents sharing one component contract. Every value below is read live from the active stylesheet — switch a system or accent and watch the whole catalog re-derive.",
+  },
+} as const satisfies Record<string, { heading: string; lead: string }>;
+export type StaticPageHeadPath = keyof typeof staticPageHeads;
 /** /search is noindex; both passes still render the same title, h1 and description. */
 export const searchPageSeo = {
   heading: "Search",

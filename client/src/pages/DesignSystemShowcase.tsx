@@ -13,7 +13,7 @@ import { Switch } from "@/components/ui/switch";
 import { Checkbox } from "@/components/ui/checkbox";
 import SEOHead from "@/components/layout/SEOHead";
 import { PRODUCT_PROFILES } from "@/lib/design-system";
-import { designSystemSeoDescription } from "@shared/seo-templates";
+import { designSystemSeoDescription, staticPageHeads } from "@shared/seo-templates";
 import "@/styles/pages/system.css";
 
 /**
@@ -192,12 +192,10 @@ export default function DesignSystemShowcase() {
         </Link>
         <div className="flex items-center gap-3">
           <Shapes className="h-6 w-6 text-[var(--accent-ink)]" />
-          <h1 className="page-title text-3xl" data-testid="text-ds-title">Design System</h1>
+          <h1 className="page-title text-3xl" data-testid="text-ds-title">{staticPageHeads["/design-system"].heading}</h1>
         </div>
         <p className="text-sm sm:text-base text-[color:var(--text-2)] mt-2 max-w-3xl">
-          The living anatomy of the runtime design system: two visual languages × ten accents
-          sharing one component contract. Every value below is read live from the active
-          stylesheet — switch a system or accent and watch the whole catalog re-derive.{" "}
+          {staticPageHeads["/design-system"].lead}{" "}
           <span className="text-[color:var(--text-3)]" data-testid="text-ds-active">
             Active: {activeSystem?.name ?? systemId} · {activeAccent?.name ?? accentId}
           </span>
