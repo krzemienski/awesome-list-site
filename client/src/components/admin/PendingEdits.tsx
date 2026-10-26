@@ -6,7 +6,7 @@ import { formatAdminDateTime, formatRelativeAgo, maskEmail } from "@/lib/utils";
 import { useToast } from "@/hooks/use-toast";
 import { queryUnavailableReason } from "@/lib/query-availability";
 import { AdminLoadError } from "@/components/admin/AdminLoadError";
-import { RecentResourceEdits } from "@/components/admin/RecentResourceEdits";
+import { RECENT_EDITS_KEY, RecentResourceEdits } from "@/components/admin/RecentResourceEdits";
 import { handoffFocusOnUnmount } from "@/hooks/focus-handoff";
 import { useHorizontalScrollCue } from "@/hooks/use-horizontal-scroll-cue";
 import { Button } from "@/components/ui/button";
@@ -345,9 +345,12 @@ export default function PendingEdits() {
               }
               setRecheckState('checking');
               const done = () => setRecheckState(navigator.onLine && queryClient.getQueryState(['/api/admin/resource-edits'])?.status !== 'error' ? 'checked' : 'offline');
-              void queryClient
-                .invalidateQueries({ queryKey: ['/api/admin/resource-edits'] })
-                .then(done, done);
+              // Query keys match per element, so the recent list's key is not
+              // under ['/api/admin/resource-edits'] and needs its own refetch.
+              void Promise.all([
+                queryClient.invalidateQueries({ queryKey: ['/api/admin/resource-edits'] }),
+                queryClient.invalidateQueries({ queryKey: [RECENT_EDITS_KEY] }),
+              ]).then(done, done);
             }}
             data-testid="button-refresh-pending-edits"
           >
