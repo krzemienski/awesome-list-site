@@ -360,8 +360,11 @@ function normalizeCategory(category: string): string {
   // Markdown headings arrive as "Community &amp; Events"; without decoding,
   // the entity text persisted verbatim into the denormalized category
   // columns and rendered as literal "&amp;" site-wide.
+  // "/" is kept: stripping it turned "iOS/tvOS" into "iOStvOS", whose slug
+  // "iostvos" misses the existing "ios-tvos" node, so a re-import minted a
+  // duplicate sub-subcategory.
   return decodeHtmlEntities(category)
-    .replace(/[^a-zA-Z0-9\s&-]/g, '') // Remove special characters
+    .replace(/[^a-zA-Z0-9\s&/-]/g, '') // Remove special characters
     .replace(/\s+/g, ' ')              // Normalize whitespace
     .trim();
 }
