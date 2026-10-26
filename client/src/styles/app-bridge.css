@@ -205,12 +205,16 @@ body { height: auto; min-height: 100%; }
   outline-offset: 2px;
 }
 
-/* One keyboard focus ring for every interactive role, in the accent. */
+/* One keyboard focus ring for every interactive role, in the accent.
+   Radix focuses the menu content itself (tabindex=-1) when a pointer opens a
+   menu, and Chrome reports that as :focus-visible; keyboard opens focus the
+   first item instead, so the ring belongs on the items, not the container. */
 :where(
     a, button, [role="button"], [role="link"], [role="tab"], [role="menuitem"],
     [role="menuitemcheckbox"], [role="menuitemradio"], [role="option"],
     [role="switch"], [role="checkbox"], [role="radio"], [role="combobox"],
-    input, select, textarea, summary, [contenteditable="true"], [tabindex]
+    input, select, textarea, summary, [contenteditable="true"],
+    [tabindex]:not([data-radix-menu-content])
   ):focus-visible {
   outline: 2px solid var(--accent) !important;
   outline-offset: 2px;
