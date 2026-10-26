@@ -1,4 +1,4 @@
-import { lazy, Suspense, useEffect, useState, type CSSProperties } from "react";
+import { lazy, Suspense, useCallback, useEffect, useRef, useState, type CSSProperties } from "react";
 import { useLocation, useSearch } from "wouter";
 import { ArrowUp } from "lucide-react";
 import type { AwesomeListNav } from "@/lib/static-data";
@@ -6,6 +6,7 @@ import AppSidebar from "./AppSidebar";
 import AppHeader from "./AppHeader";
 import PageBreadcrumb from "./PageBreadcrumb";
 import { Button } from "@/components/ui/button";
+import { cn } from "@/lib/utils";
 import { SidebarProvider } from "@/components/ui/sidebar";
 import "@/styles/shell/layout.css";
 import type { ProductProfileId } from "@/lib/design-system";
@@ -37,11 +38,42 @@ function ClientContactDialogHost() {
   return <Suspense fallback={null}><ContactDialogHost /></Suspense>;
 }
 
+/** The button floats over the right edge of the content column. In-flow
+ * content scrolls out from under it, but viewport-pinned content (the home
+ * rail's sticky "Submit a resource" card, an open drawer) would stay covered
+ * for a whole scroll range. True while pinned content is under any corner or
+ * the centre of the button. */
+function coversPinnedContent(button: HTMLElement): boolean {
+  const r = button.getBoundingClientRect();
+  const points = [
+    [r.left, r.top], [r.right - 1, r.top], [r.left, r.bottom - 1], [r.right - 1, r.bottom - 1],
+    [r.left + r.width / 2, r.top + r.height / 2],
+  ];
+  return points.some(([x, y]) => {
+    const under = document.elementsFromPoint(x, y).find((el) => !button.contains(el));
+    for (let el = under ?? null; el && el !== document.body; el = el.parentElement) {
+      const { position } = getComputedStyle(el);
+      if (position === "sticky" || position === "fixed") return true;
+    }
+    return false;
+  });
+}
+
 /** R2-L01: floating "back to top" button, appears after scrolling ~600px.
  * It steps aside once the footer's meta strip is on screen: that strip spans
- * the content column to its right edge, exactly where the button floats. */
+ * the content column to its right edge, exactly where the button floats.
+ * Over pinned content it fades out but stays mounted, so it can be measured. */
 function BackToTop() {
   const [visible, setVisible] = useState(false);
+  // Starts (and restarts after each unmount) faded out: the scroll event
+  // that shows the button runs before it exists, so it is checked as it
+  // attaches and fades in only if nothing pinned is under it.
+  const [overPinned, setOverPinned] = useState(true);
+  const buttonRef = useRef<HTMLButtonElement | null>(null);
+  const attachButton = useCallback((el: HTMLButtonElement | null) => {
+    buttonRef.current = el;
+    setOverPinned(el ? coversPinnedContent(el) : true);
+  }, []);
 
   useEffect(() => {
     const onScroll = () => {
@@ -54,6 +86,7 @@ function BackToTop() {
       const meta = document.querySelector(".app-footer-meta");
       const metaOnScreen = meta ? meta.getBoundingClientRect().top < window.innerHeight : false;
       setVisible(!metaOnScreen);
+      if (buttonRef.current) setOverPinned(coversPinnedContent(buttonRef.current));
     };
     onScroll();
     window.addEventListener("scroll", onScroll, { passive: true });
@@ -64,6 +97,7 @@ function BackToTop() {
 
   return (
     <Button
+      ref={attachButton}
       variant="outline"
       size="icon"
       onClick={(e) => {
@@ -73,10 +107,18 @@ function BackToTop() {
         window.scrollTo({ top: 0, behavior: "smooth" });
       }}
       aria-label="Back to top"
+      aria-hidden={overPinned || undefined}
+      tabIndex={overPinned ? -1 : undefined}
       data-testid="button-back-to-top"
       // Fixed to the SCREEN, so it is lifted by the app shell's
       // --app-bottom-inset (0px unless an app-level bottom bar is showing).
-      className="fixed bottom-[calc(1.5rem+var(--app-bottom-inset,0px))] right-6 z-40 h-11 w-11 shadow-lg bg-[var(--surface)]"
+      className={cn(
+        "fixed bottom-[calc(1.5rem+var(--app-bottom-inset,0px))] right-6 z-40 h-11 w-11 shadow-lg bg-[var(--surface)]",
+        // Not `invisible`: the DS button transitions `all`, which would hold
+        // visibility (and the hit area) for 160ms. This fades and lets taps
+        // through at once.
+        overPinned && "pointer-events-none opacity-0",
+      )}
     >
       <ArrowUp className="h-5 w-5" />
     </Button>
