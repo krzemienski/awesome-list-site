@@ -85,7 +85,7 @@ Tools: chrome-devtools MCP (`new_page`, `navigate_page`, `emulate`, `take_snapsh
 - For each claim record: width, URL, the action, what you saw (screenshot path or snapshot excerpt), and for side effects the request and response (`get_network_request`, `requestFilePath`/`responseFilePath` for big bodies) or a `psql -At -c "select …"` on your DB.
 - Capture the action and the resulting state, then the state after a reload.
 - Vendor analytics: Mixpanel `api-js.mixpanel.com/track` and Amplitude `/2/httpapi` bodies are gzipped; count Mixpanel by distinct `$insert_id` or wait 15 s before navigating. GA4 is off locally, and the Replit (Umami) tracker exists only on the published site; those are owner steps, not passes. Exclude same-origin `/src/lib/*.ts` URLs when counting vendor traffic.
-- PostHog: posthog-js drops every event while `navigator.webdriver` is true (and on a `HeadlessChrome` user agent), so an automation browser sends nothing. An override of those in the test browser's `initScript` may prove what the app *emits*. Read the request bodies with `get_network_request`, never by patching `fetch` in the page, and report the result as "emitted". Ingestion and dashboards stay an owner step. `features/analytics-consent.md` and `references/drive-recipe.md` §4 follow this rule.
+- PostHog: posthog-js drops every event while `navigator.webdriver` is true (and on a `HeadlessChrome` user agent), so an automation browser sends nothing. An override of those in the test browser's `initScript` may prove what the app *emits*. Read the request bodies with `get_network_request`, never by patching `fetch` in the page, and report the result as "emitted". Ingestion and dashboards stay an owner step. `features/analytics-consent.md`, `references/drive-recipe.md` §4 and `references/regression-watchlist.md` §4 follow this rule.
 - Before filing a bug, check `references/regression-watchlist.md` §4 and `references/visual-checklist.md` §5 for known false positives, and rerun once after a cold restart.
 - Report each claim as PASS, FAIL or UNVERIFIED with its evidence path.
 
@@ -95,7 +95,7 @@ Tools: chrome-devtools MCP (`new_page`, `navigate_page`, `emulate`, `take_snapsh
 - `close_page` only your pages.
 - Drop only DB clones you created (`dropdb -h localhost <name>` after its server stops). Never drop `awesome_waves`.
 - Throwaway users: delete the Clerk user first, wait 60–90 s, then the local rows in the FK order in `references/drive-recipe.md` §6. Never delete the shared Clerk test account.
-- Production deletes are irreversible API calls. Delete only exact ids whose rows match a test signature (the run's title prefix, an `example.invalid` URL, the expected status), never ids found by substring search. When the list differs from what the user saw, show the full list and wait for approval. Before each `DELETE`, save that full row as JSON under the evidence directory.
+- Production deletes are irreversible API calls. Delete only exact ids whose rows match a test signature (the run's title prefix, an `example.invalid` URL, the expected status), never ids found by substring search. When the list differs from what the user saw, show the full list and wait for approval. Immediately before each `DELETE`, read that row again by its id and save the full row as JSON under the evidence directory. If it no longer matches the test signature (title, URL or status changed, or it is gone), skip it and report it.
 - Evidence under `.local/verify-evidence/` is never deleted by cleanup.
 
 ## Map

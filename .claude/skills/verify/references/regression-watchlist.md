@@ -212,7 +212,7 @@ Check these before logging a defect. Sources: `.agents/memory/tester-finding-ret
 - **"Prod lacks the escape-normalising 301" (`%2D` URLs):** the Google edge decodes before the app (`edge-percent-decoding.md:5`).
 - **"Silent full-catalog fallback" on a markup-shaped `q`/`tags`:** the pre-boot scrubber, with a visible notice (N-11 DECIDED, `BACKLOG.md:34`).
 - **`/api/__clerk` 404 in dev:** the proxy is production-only (`clerk-auth-migration.md`).
-- **Umami pageviews or PostHog events missing from a headless run:** both drop HeadlessChrome. Use a normal UA. Mixpanel resends batches, so count `$insert_id` (`analytics-browser-verification.md:6`).
+- **Umami pageviews or PostHog events missing from a headless run:** Umami drops a HeadlessChrome user agent, so use a normal UA. posthog-js also drops every event while `navigator.webdriver` is true, so override both in the `initScript`, read the bodies with `get_network_request`, and report PostHog as "emitted"; ingestion is an owner step (`../SKILL.md` Evidence). Mixpanel resends batches, so count `$insert_id` (`analytics-browser-verification.md:6`).
 - **"Dead" links that are connect timeouts from a datacenter IP:** bot-blocks (`link-scan-false-positives.md:6`).
 - **External QA reports that assume a Next.js app or old counts:** about a third don't reproduce. Reproduce on the live app first (`qa-report-stale-schema.md:6`).
 - **Browser "offline" as proof a write failed:** an in-flight mutation can still land. Block the exact request instead (`headless-e2e-gotchas.md`).

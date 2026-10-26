@@ -5,7 +5,7 @@ A first-time visitor sees a consent banner. Nothing reaches GA4, Mixpanel, PostH
 ## Sub-features
 
 - AC-BANNER: banner placement per width; `consent-accept`, `consent-decline`; footer "Cookie settings" reopens it.
-- AC-PRE: zero vendor requests before a choice.
+- AC-PRE: zero GA4, Mixpanel, Amplitude and PostHog requests before a choice. On production the cookieless Replit tracker still sends page views to `i.replit.com/api/send`; those are expected unless `localStorage['umami.disabled']` is set.
 - AC-EVENTS: after consent, catalog events carry the documented properties (`docs/ANALYTICS.md`).
 - AC-DECLINE: decline/revoke stops vendors and clears `_ga*` and SDK storage.
 - AC-ADMIN: an admin session (including a cold landing) sends zero vendor requests.
@@ -21,7 +21,7 @@ A first-time visitor sees a consent banner. Nothing reaches GA4, Mixpanel, PostH
 Preconditions: a fresh guest context per sub-feature; a separate admin context for AC-ADMIN.
 
 - **Banner.** Fresh context on `/` at each width: 1440/820 the banner is a sticky bottom row and does not cover the footer; 390 it sits in flow at the top. Take a screenshot.
-- **Before consent.** Navigate three pages; `list_network_requests` (include `fetch`, `xhr`, `ping`, `other`) shows no request to `api-js.mixpanel.com/track`, `*.amplitude.com/2/httpapi`, `us.i.posthog.com/(e|batch|i/v0/e)`, or `/g/collect`.
+- **Before consent.** Navigate three pages; `list_network_requests` (include `fetch`, `xhr`, `ping`, `other`) shows no request to `api-js.mixpanel.com/track`, `*.amplitude.com/2/httpapi`, `us.i.posthog.com/(e|batch|i/v0/e)`, or `/g/collect`. On production, `i.replit.com/api/send` page views are expected here regardless of consent; they stop only when `localStorage['umami.disabled']` is set. Count them separately and never as a consent failure.
 - **After consent.** Click `consent-accept`; perform the action under test; wait 15 s; `get_network_request` on the Mixpanel `/track` and Amplitude `/2/httpapi` requests with `requestFilePath` under `.local/verify-evidence/`; gunzip and read the event name and properties. Count Mixpanel by distinct `$insert_id`.
 - **Decline.** Footer "Cookie settings" → Decline → `document.cookie` has no `_ga`; further navigation makes no vendor requests.
 - **Admin.** Sign in as admin in its own context with consent granted; navigate and click; then open a new page straight onto `/resource/1` (cold landing). Zero vendor requests throughout; `localStorage['umami.disabled']` is set. Sign out → the marker is cleared and visitor tracking resumes.
