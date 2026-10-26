@@ -1089,6 +1089,7 @@ export class ResourceRepository {
     id: number,
     resource: Partial<InsertResource>,
     audit: { performedBy?: string; notes?: string; rejectionReason?: string } | false = {},
+    options: { mergeMetadata?: Record<string, unknown> } = {},
   ): Promise<Resource> {
     // Task #248: same universal decode boundary as createResource.
     resource = this.normalizeResourceFacets(decodeResourceTextFields({ ...resource }), false);
@@ -1098,6 +1099,7 @@ export class ResourceRepository {
         audit: audit !== false,
         notes: audit ? audit.notes : undefined,
         rejectionReason: audit ? audit.rejectionReason : undefined,
+        mergeMetadata: options.mergeMetadata,
       },
     ));
   }

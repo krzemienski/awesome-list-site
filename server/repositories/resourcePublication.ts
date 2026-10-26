@@ -1,5 +1,5 @@
 import { resources, resourceAuditLog, type InsertResource, type Resource } from "@shared/schema";
-import { eq } from "drizzle-orm";
+import { eq, sql } from "drizzle-orm";
 import { db } from "../db";
 import { ensureMinDescription } from "../github/importHygiene";
 import { invalidatePublicCache } from "../cache/publicCache";
@@ -28,7 +28,14 @@ export async function transitionResourceInTransaction(
   id: number,
   patch: Partial<InsertResource>,
   actor?: string,
-  options: { expectedStatus?: string; notes?: string; audit?: boolean; rejectionReason?: string } = {},
+  options: {
+    expectedStatus?: string; notes?: string; audit?: boolean; rejectionReason?: string;
+    /**
+     * Keys merged into the stored metadata inside the UPDATE, so a writer that
+     * read the row earlier cannot drop keys another writer (enrichment) set since.
+     */
+    mergeMetadata?: Record<string, unknown>;
+  } = {},
 ): Promise<Resource> {
   const [before] = await tx.select().from(resources).where(eq(resources.id, id)).for('update');
   if (!before) throw new Error('Resource not found');
@@ -57,7 +64,12 @@ export async function transitionResourceInTransaction(
       patch.url ?? before.url,
     );
   }
-  const [updated] = await tx.update(resources).set(data).where(eq(resources.id, id)).returning();
+  const [updated] = await tx.update(resources)
+    .set(options.mergeMetadata
+      ? { ...data, metadata: sql`coalesce(${resources.metadata}, '{}'::jsonb) || ${JSON.stringify(options.mergeMetadata)}::jsonb` }
+      : data)
+    .where(eq(resources.id, id))
+    .returning();
   // Status changes are always audited, even when an internal caller suppresses
   // ordinary edit audits because it owns a separate edit-approval audit.
   if (changed || options.audit !== false) {

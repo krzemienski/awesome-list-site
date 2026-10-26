@@ -38,7 +38,7 @@
 
 import { GitHubClient } from "./client";
 import { parseAwesomeList, convertToDbResources } from "./parser";
-import { normalizeUrlForDedup, normalizeTitleForDedup, domainOf, ensureMinDescription } from "./importHygiene";
+import { normalizeUrlForDedup, normalizeTitleForDedup, domainOf, ensureMinDescription, TAXONOMY_PATH_SEPARATOR } from "./importHygiene";
 import { AwesomeListFormatter, generateContributingMd } from "./formatter";
 import { CategoryRepository } from "../repositories/CategoryRepository";
 import { ResourceRepository } from "../repositories/ResourceRepository";
@@ -103,20 +103,91 @@ interface ExportResult {
   branch?: string;
 }
 
-interface ConflictResolution {
-  action: 'skip' | 'update' | 'create';
-  resource: Partial<Resource>;
-  reason: string;
+/**
+ * Columns a GitHub import owns. The rest of a row (status, facets,
+ * enrichment metadata such as tags) is curation an import never overwrites.
+ */
+type ImportedFields = Pick<Resource, 'url' | 'title' | 'description' | 'category' | 'subcategory' | 'subSubcategory'>;
+
+/** What the catalog holds per row: enough to match an item and plan its update. */
+type CatalogRow = Pick<Resource, 'id' | 'metadata'> & ImportedFields;
+
+type ConflictResolution =
+  | { action: 'create'; resource: Partial<Resource> }
+  /** `changes` holds only the fields whose stored value would change; never empty. */
+  | { action: 'update'; existing: CatalogRow; changes: Partial<ImportedFields> }
+  | { action: 'skip'; reason: string };
+
+/**
+ * The imported fields an update would change on `existing`, under the
+ * import's merge rules. Comparing these effective values instead of the raw
+ * README ones is what makes a re-Pull of an unchanged README write nothing
+ * (#64).
+ *
+ * - url, title: the README value. The README is authoritative for links, so a
+ *   row matched only by its normalized URL takes the README form (http to
+ *   https, a trailing slash).
+ * - description: the README text only when it is longer. The stored text is
+ *   usually an enriched rewrite.
+ * - taxonomy: the parser emits a complete heading path, so a level the README
+ *   leaves out means there is no such level. A stored deeper level survives
+ *   only while every level above it is unchanged. When the README moves the
+ *   item to another category or subcategory, the lower levels take the README
+ *   value, null included.
+ * - Under an unchanged parent, a level the README leaves out keeps its stored
+ *   value. Enrichment (promoteEnrichmentSuggestions) and the admin resource
+ *   editor place rows deeper than their README heading, and clearing that
+ *   placement would undo the curation and make every re-Pull an update again.
+ *   The cost: when a README deletes a `####` heading but keeps its parent,
+ *   its rows stay at that level until an admin moves them.
+ */
+function importChanges(existing: CatalogRow, incoming: Partial<Resource>): Partial<ImportedFields> {
+  const category = incoming.category ?? existing.category;
+  const categoryKept = category === existing.category;
+  const subcategory = categoryKept
+    ? incoming.subcategory ?? existing.subcategory
+    : incoming.subcategory ?? null;
+  const subSubcategory = categoryKept && subcategory === existing.subcategory
+    ? incoming.subSubcategory ?? existing.subSubcategory
+    : incoming.subSubcategory ?? null;
+  const next: ImportedFields = {
+    url: incoming.url ?? existing.url,
+    title: incoming.title ?? existing.title,
+    description: (incoming.description?.length ?? 0) > existing.description.length
+      ? incoming.description!
+      : existing.description,
+    category,
+    subcategory,
+    subSubcategory,
+  };
+  return Object.fromEntries(
+    (Object.keys(next) as (keyof ImportedFields)[])
+      .filter(field => next[field] !== existing[field])
+      .map(field => [field, next[field]]),
+  );
+}
+
+function taxonomyPath(resource: Partial<Resource>): string {
+  return [resource.category, resource.subcategory, resource.subSubcategory].filter(Boolean).join(TAXONOMY_PATH_SEPARATOR);
+}
+
+/** The metadata keys that point a row at its taxonomy nodes; null where the row has no such level or node. */
+function taxonomyIds(ids: HierarchyResolution | undefined) {
+  return {
+    categoryId: ids?.categoryId ?? null,
+    subcategoryId: ids?.subcategoryId ?? null,
+    subSubcategoryId: ids?.subSubcategoryId ?? null,
+  };
 }
 
 interface CatalogEntry {
-  resource: Resource;
+  resource: CatalogRow;
   urlKey: string;
   /** Empty when the title or domain normalizes to nothing (never matches). */
   titleDomainKey: string;
 }
 
-function toCatalogEntry(resource: Resource): CatalogEntry {
+function toCatalogEntry(resource: CatalogRow): CatalogEntry {
   const titleKey = normalizeTitleForDedup(resource.title);
   const domainKey = domainOf(resource.url);
   return {
@@ -134,11 +205,11 @@ function toCatalogEntry(resource: Resource): CatalogEntry {
  */
 class ImportCatalog {
   private entries: CatalogEntry[];
-  private byExactUrl = new Map<string, Resource>();
-  private byUrl = new Map<string, Resource>();
-  private byTitleDomain = new Map<string, Resource>();
+  private byExactUrl = new Map<string, CatalogRow>();
+  private byUrl = new Map<string, CatalogRow>();
+  private byTitleDomain = new Map<string, CatalogRow>();
 
-  constructor(resources: Resource[]) {
+  constructor(resources: CatalogRow[]) {
     this.entries = resources.map(toCatalogEntry);
     for (const entry of this.entries) {
       if (!this.byExactUrl.has(entry.resource.url)) this.byExactUrl.set(entry.resource.url, entry.resource);
@@ -155,11 +226,11 @@ class ImportCatalog {
    * and `https://ffmpeg.org/`); matching the other form made the update
    * write this URL onto it, which `resources_url_unique` rejects (AI-18).
    */
-  findByUrl(url: string): Resource | undefined {
+  findByUrl(url: string): CatalogRow | undefined {
     return this.byExactUrl.get(url) ?? this.byUrl.get(normalizeUrlForDedup(url));
   }
 
-  findByTitleDomain(title: string, url: string): Resource | undefined {
+  findByTitleDomain(title: string, url: string): CatalogRow | undefined {
     const titleKey = normalizeTitleForDedup(title);
     const domainKey = domainOf(url);
     return titleKey && domainKey ? this.byTitleDomain.get(`${titleKey}|${domainKey}`) : undefined;
@@ -170,7 +241,7 @@ class ImportCatalog {
    * re-read the table. A new row sorts first (newest); an updated row keeps
    * its place, and every key it left or joined resolves again.
    */
-  record(row: Resource): void {
+  record(row: CatalogRow): void {
     const next = toCatalogEntry(row);
     const index = this.entries.findIndex(e => e.resource.id === row.id);
     const previous = index >= 0 ? this.entries[index] : undefined;
@@ -187,7 +258,7 @@ class ImportCatalog {
     }
   }
 
-  private resolve(index: Map<string, Resource>, key: string, keyOf: (e: CatalogEntry) => string): void {
+  private resolve(index: Map<string, CatalogRow>, key: string, keyOf: (e: CatalogEntry) => string): void {
     const first = this.entries.find(e => keyOf(e) === key);
     if (first) index.set(key, first.resource);
     else index.delete(key);
@@ -638,7 +709,22 @@ export class GitHubSyncService {
       const catalog = new ImportCatalog(
         (await this.resourceRepo.listResources({ limit: 100000 })).resources
       );
+      // A link the README lists under two headings would otherwise move
+      // between them twice per Pull and never settle; its first listing wins.
+      const firstListing = new Map<string, string>();
+      // A dry run records the rows it would write under ids no real row has,
+      // so later items match them exactly as the real run does.
+      let plannedId = 0;
       for (const resource of dbResources) {
+        const urlKey = normalizeUrlForDedup(resource.url ?? '');
+        const listedUnder = firstListing.get(urlKey);
+        if (listedUnder !== undefined) {
+          const note = `"${resource.title}" is listed again under "${taxonomyPath(resource)}"; kept its first listing under "${listedUnder}"`;
+          logger.info(`- Skipped: ${note}`);
+          result.warnings.push(note);
+          result.skipped++;
+          continue;
+        }
         try {
           // Get hierarchy IDs for this resource
           const hierarchyKey = `${resource.category}|${resource.subcategory || ''}|${resource.subSubcategory || ''}`;
@@ -658,7 +744,10 @@ export class GitHubSyncService {
             resource.subcategory = hierarchyId.subcategory ?? resource.subcategory;
             resource.subSubcategory = hierarchyId.subSubcategory ?? resource.subSubcategory;
           }
-          
+          // Recorded only once the item has a usable heading, so a later
+          // listing still imports when the first one's hierarchy failed.
+          firstListing.set(urlKey, taxonomyPath(resource));
+
           const conflict = this.checkConflict(resource, catalog);
           
           switch (conflict.action) {
@@ -691,31 +780,48 @@ export class GitHubSyncService {
                   { source: repoUrl },
                   `Imported from GitHub: ${repoUrl}`
                 );
+              } else {
+                catalog.record({
+                  id: --plannedId,
+                  url: resource.url!,
+                  metadata: null,
+                  title: resource.title!,
+                  description: resource.description ?? '',
+                  category: resource.category!,
+                  subcategory: resource.subcategory ?? null,
+                  subSubcategory: resource.subSubcategory ?? null,
+                });
               }
               result.imported++;
               logger.info(`✓ Imported: ${resource.title}`);
               break;
               
-            case 'update':
-              if (!options.dryRun && conflict.resource.id) {
-                // Update hierarchy IDs in metadata for consistency
-                const existingMetadata = (conflict.resource.metadata as Record<string, any>) || {};
-                const updatedMetadata = {
-                  ...existingMetadata,
-                  categoryId: hierarchyId?.categoryId,
-                  subcategoryId: hierarchyId?.subcategoryId,
-                  subSubcategoryId: hierarchyId?.subSubcategoryId,
-                  lastUpdatedFrom: repoUrl,
-                  lastUpdatedAt: new Date().toISOString(),
-                };
-                
+            case 'update': {
+              const changedFields = Object.keys(conflict.changes).join(', ');
+              if (!options.dryRun) {
+                // The ids name the path the row ends up on, which keeps a
+                // stored deeper level the README path lacks.
+                const after = { ...conflict.existing, ...conflict.changes };
+                const ids = taxonomyPath(after) === taxonomyPath(resource)
+                  ? hierarchyId
+                  : await planCategoryHierarchy(
+                    this.categoryRepo, [], after.category,
+                    after.subcategory ?? undefined, after.subSubcategory ?? undefined,
+                  );
+                // Merged into the stored metadata by the UPDATE itself, so
+                // enrichment keys (tags, ogImage) written since the catalog
+                // was read survive.
                 const updated = await this.resourceRepo.updateResource(
-                  conflict.resource.id,
+                  conflict.existing.id,
+                  conflict.changes,
+                  false,
                   {
-                    ...conflict.resource,
-                    metadata: updatedMetadata
-                  } as Partial<InsertResource>,
-                  false
+                    mergeMetadata: {
+                      ...taxonomyIds(ids),
+                      lastUpdatedFrom: repoUrl,
+                      lastUpdatedAt: new Date().toISOString(),
+                    },
+                  },
                 );
                 catalog.record(updated);
                 result.resources.push(updated);
@@ -726,12 +832,15 @@ export class GitHubSyncService {
                   'updated',
                   undefined,
                   { source: repoUrl },
-                  `Updated from GitHub: ${conflict.reason}`
+                  `Updated from GitHub: ${changedFields}`
                 );
+              } else {
+                catalog.record({ ...conflict.existing, ...conflict.changes });
               }
               result.updated++;
-              logger.info(`↻ Updated: ${resource.title} - ${conflict.reason}`);
+              logger.info(`↻ Updated: ${resource.title} - ${changedFields}`);
               break;
+            }
               
             case 'skip':
               result.skipped++;
@@ -1445,60 +1554,20 @@ export class GitHubSyncService {
       // different URL shape (tracking params, short-links, mirrors).
       const duplicate = catalog.findByTitleDomain(resource.title ?? '', resource.url ?? '');
       if (duplicate) {
+        // A dry run's planned rows have no real id (see plannedId).
+        const original = duplicate.id > 0 ? `#${duplicate.id}` : `"${duplicate.title}" (new in this run)`;
         return {
           action: 'skip',
-          resource: duplicate,
-          reason: `Duplicate of #${duplicate.id} (same title + domain, different URL form)`
+          reason: `Duplicate of ${original} (same title + domain, different URL form)`
         };
       }
+      return { action: 'create', resource };
     }
 
-    if (!existing) {
-      return {
-        action: 'create',
-        resource,
-        reason: 'New resource'
-      };
-    }
-
-    // Check if there are differences
-    // The parser leaves absent levels undefined while stored rows hold null;
-    // compare nullishly or every unchanged re-import is miscounted as an
-    // update (and rewrites updated_at plus an audit row per resource).
-    const differs = (a: unknown, b: unknown) => (a ?? null) !== (b ?? null);
-    const hasChanges =
-      differs(existing.title, resource.title) ||
-      differs(existing.description, resource.description) ||
-      differs(existing.category, resource.category) ||
-      differs(existing.subcategory, resource.subcategory) ||
-      differs(existing.subSubcategory, resource.subSubcategory);
-
-    if (hasChanges) {
-      // Merge descriptions if different
-      let mergedDescription = existing.description;
-      if (resource.description && resource.description !== existing.description) {
-        // Use the longer description or combine them
-        if ((resource.description?.length || 0) > (existing.description?.length || 0)) {
-          mergedDescription = resource.description;
-        }
-      }
-
-      return {
-        action: 'update',
-        resource: {
-          ...resource,
-          id: existing.id,
-          description: mergedDescription
-        },
-        reason: 'Updated content'
-      };
-    }
-
-    return {
-      action: 'skip',
-      resource: existing,
-      reason: 'No changes detected'
-    };
+    const changes = importChanges(existing, resource);
+    return Object.keys(changes).length > 0
+      ? { action: 'update', existing, changes }
+      : { action: 'skip', reason: 'No changes detected' };
   }
 
   /**
