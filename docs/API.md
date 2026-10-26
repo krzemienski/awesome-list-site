@@ -338,7 +338,7 @@ and `server/routes/domains/` for the complete set):
 | PATCH | `/api/admin/resources/:id/featured` — body `{ "featured": boolean }`, toggles `metadata.featured` (audit-logged) |
 | POST | `/api/admin/resources/:id/approve` \| `/reject` \| `/unapprove` |
 | POST | `/api/admin/resources/bulk/approve` \| `/reject` \| `/delete` |
-| GET | `/api/admin/resource-edits` |
+| GET | `/api/admin/resource-edits` (pending) \| `/recent` (last 10 resolved) |
 | POST | `/api/admin/resource-edits/:id/approve` \| `/reject` |
 
 **Taxonomy** (`categories`, `subcategories`, `sub-subcategories`)

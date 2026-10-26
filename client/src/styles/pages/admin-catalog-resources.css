@@ -276,21 +276,17 @@
   width: 1%;
 }
 
-/* Product-only bulk selection remains keyboard/hover reachable without
-   changing the frozen table's resting composition: at rest the checkbox sits
-   invisibly over the ID and hover/focus swaps the two in place, so revealing
-   it never reflows the row. The box stays neutral (the shadcn default border
-   is the accent, which would put an accent mark on every row). */
+/* Bulk selection sits beside the ID at rest. AC-02: touch has no hover, so a
+   hover-revealed checkbox hid bulk actions on tablets and phones. The box
+   stays neutral (the shadcn default border is the accent, which would put an
+   accent mark on every row). */
 .admin-catalog-resources__row-select {
   border-color: var(--border-strong);
   border-radius: var(--radius-sm);
-  /* C6-V5A-01: centre with auto margins, not transform, so the global
-     button:active translateY(1px) can't move the box out from under the press. */
-  inset-block: 0;
-  inset-inline-start: 14px;
-  margin-block: auto;
-  opacity: 0;
-  position: absolute;
+  margin-inline-start: 8px;
+  /* Relative, not static, so the ::after hit area stays anchored to the box. */
+  position: relative;
+  vertical-align: middle;
 }
 
 /* 44px hit area around the 32px box without changing its drawn size (the
@@ -301,64 +297,41 @@
   position: absolute;
 }
 
-/* C6-V5A-05: a checked box stays visible in place of the ID. */
-.admin-catalog-resources__row-select[data-state="checked"],
-.admin-catalog-resources__row-select[data-state="indeterminate"] {
-  opacity: 1;
+.admin-catalog-resources__id-cell > span {
+  vertical-align: middle;
 }
 
-.admin-catalog-resources:not(.admin-catalog-resources--tools-open)
-  .admin-catalog-resources__id-cell:has(.admin-catalog-resources__row-select:is([data-state="checked"], [data-state="indeterminate"])) > span {
-  visibility: hidden;
+/* A fine hovering pointer above 1024px keeps the frozen table's resting
+   composition while the tools are closed: the checkbox sits invisibly over
+   the ID and hover/focus swaps the two in place, so revealing it never
+   reflows the row. */
+@media (hover: hover) and (pointer: fine) and (min-width: 64.0625rem) {
+  .admin-catalog-resources:not(.admin-catalog-resources--tools-open) .admin-catalog-resources__row-select {
+    /* C6-V5A-01: centre with auto margins, not transform, so the global
+       button:active translateY(1px) can't move the box out from under the press. */
+    inset-block: 0;
+    inset-inline-start: 14px;
+    margin-block: auto;
+    margin-inline-start: 0;
+    opacity: 0;
+    position: absolute;
+  }
+
+  /* C6-V5A-05: a checked box stays visible in place of the ID. */
+  .admin-catalog-resources:not(.admin-catalog-resources--tools-open) .admin-catalog-resources__row-select:is([data-state="checked"], [data-state="indeterminate"]),
+  .admin-catalog-resources:not(.admin-catalog-resources--tools-open) .admin-catalog-resources__id-cell:is(:hover, :focus-within) .admin-catalog-resources__row-select {
+    opacity: 1;
+  }
+
+  .admin-catalog-resources:not(.admin-catalog-resources--tools-open)
+    .admin-catalog-resources__id-cell:is(:hover, :focus-within, :has(.admin-catalog-resources__row-select:is([data-state="checked"], [data-state="indeterminate"]))) > span {
+    visibility: hidden;
+  }
 }
 
-.admin-catalog-resources__id-cell:focus-within .admin-catalog-resources__row-select,
-.admin-catalog-resources__id-cell:hover .admin-catalog-resources__row-select {
-  opacity: 1;
-}
-
-.admin-catalog-resources__id-cell:focus-within > span,
-.admin-catalog-resources__id-cell:hover > span {
-  visibility: hidden;
-}
-
-/* Hidden until the tools open. Anchored to the top of its containing block so
-   the out-of-flow box never extends the document below the panel, and while
-   invisible it takes no pointer input. */
+/* Rendered only while the table overflows, inset like the card content. */
 .admin-catalog-resources__scroll-hint {
-  inset: 0 auto auto 0;
-  opacity: 0;
-  pointer-events: none;
-  position: absolute;
-}
-
-/* C8-V5A-04: with the tools open the hint shows below the table at narrow
-   widths, inset like the card content. */
-.admin-catalog-resources--tools-open .admin-catalog-resources__scroll-hint {
-  opacity: 1;
   padding-inline: 1.375rem;
-  pointer-events: auto;
-  position: static;
-}
-
-/* With the tools open, selection is a first-class column: ID and checkbox
-   sit side by side. */
-.admin-catalog-resources--tools-open .admin-catalog-resources__id-cell > span {
-  visibility: visible;
-}
-
-.admin-catalog-resources--tools-open .admin-catalog-resources__id-cell > span {
-  vertical-align: middle;
-}
-
-.admin-catalog-resources--tools-open .admin-catalog-resources__row-select {
-  margin-inline-start: 8px;
-  opacity: 1;
-  margin-block: 0;
-  /* Relative, not static, so the ::after hit area stays anchored to the box. */
-  inset: auto;
-  position: relative;
-  vertical-align: middle;
 }
 
 /* The footer shares the TableShell header's 22px inset instead of running

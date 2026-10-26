@@ -6,7 +6,9 @@ import { formatAdminDateTime, formatRelativeAgo, maskEmail } from "@/lib/utils";
 import { useToast } from "@/hooks/use-toast";
 import { queryUnavailableReason } from "@/lib/query-availability";
 import { AdminLoadError } from "@/components/admin/AdminLoadError";
+import { RECENT_EDITS_KEY, RecentResourceEdits } from "@/components/admin/RecentResourceEdits";
 import { handoffFocusOnUnmount } from "@/hooks/focus-handoff";
+import { useHorizontalScrollCue } from "@/hooks/use-horizontal-scroll-cue";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -88,32 +90,9 @@ export default function PendingEdits() {
   const unavailable = queryUnavailableReason(editsQuery);
   const [recheckState, setRecheckState] = useState<'idle' | 'checking' | 'checked' | 'offline'>('idle');
 
-  // R5-013 (run24): same keyboard-operable scroller + right-edge gradient cue
-  // as PendingResources (R5-058) — the edits table clipped its Actions column
-  // at narrow widths with no affordance that more columns existed.
-  const scrollRef = useRef<HTMLDivElement>(null);
-  const [showSwipeHint, setShowSwipeHint] = useState(false);
-  // R5-058 (run25): track the table viewport's scrollLeft so the gradient
-  // cue hides at max scroll and re-shows when the user scrolls back.
-  useEffect(() => {
-    const el = scrollRef.current;
-    if (!el) return;
-    const scroller = (el.querySelector('table')?.parentElement ?? el) as HTMLElement;
-    const check = () => {
-      const hasOverflow = scroller.scrollWidth > scroller.clientWidth + 1;
-      const atEnd = scroller.scrollLeft + scroller.clientWidth >= scroller.scrollWidth - 1;
-      setShowSwipeHint(hasOverflow && !atEnd);
-    };
-    check();
-    const ro = new ResizeObserver(check);
-    ro.observe(el);
-    ro.observe(scroller);
-    scroller.addEventListener('scroll', check, { passive: true });
-    return () => {
-      ro.disconnect();
-      scroller.removeEventListener('scroll', check);
-    };
-  }, [isLoading, edits.length]);
+  // R5-013 (run24): the edits table clipped its Actions column at narrow
+  // widths with no affordance that more columns existed.
+  const scrollCue = useHorizontalScrollCue();
 
   // C6-SWEEP-13: approving/rejecting removes the row whose button opened the
   // dialog, so the dialog's return-focus target disappears. Plan a surviving
@@ -366,9 +345,12 @@ export default function PendingEdits() {
               }
               setRecheckState('checking');
               const done = () => setRecheckState(navigator.onLine && queryClient.getQueryState(['/api/admin/resource-edits'])?.status !== 'error' ? 'checked' : 'offline');
-              void queryClient
-                .invalidateQueries({ queryKey: ['/api/admin/resource-edits'] })
-                .then(done, done);
+              // Query keys match per element, so the recent list's key is not
+              // under ['/api/admin/resource-edits'] and needs its own refetch.
+              void Promise.all([
+                queryClient.invalidateQueries({ queryKey: ['/api/admin/resource-edits'] }),
+                queryClient.invalidateQueries({ queryKey: [RECENT_EDITS_KEY] }),
+              ]).then(done, done);
             }}
             data-testid="button-refresh-pending-edits"
           >
@@ -396,6 +378,7 @@ export default function PendingEdits() {
               ? "You're offline — couldn't check for new edits."
               : ''}
         </span>
+        <RecentResourceEdits />
       </section>
     );
   }
@@ -416,7 +399,7 @@ export default function PendingEdits() {
             Actions column ≤768px. max-h keeps short lists compact; the
             desktop layout (table already fits, no scroll) is unchanged. */}
         <div className="relative">
-          {showSwipeHint && (
+          {scrollCue.showCue && (
             <div
               aria-hidden="true"
               className="pointer-events-none absolute inset-y-0 right-0 w-8 bg-gradient-to-l from-background to-transparent z-10"
@@ -424,18 +407,12 @@ export default function PendingEdits() {
             />
           )}
           <div
-            ref={scrollRef}
+            ref={scrollCue.ref}
             className="admin-table-wrap queue-review-table-wrap focus-visible:outline focus-visible:outline-2 focus-visible:outline-ring"
             tabIndex={0}
             role="region"
             aria-label="Pending edits table, scrollable"
-            onKeyDown={(e) => {
-              const el = scrollRef.current;
-              if (!el) return;
-              const scroller = (el.querySelector('table')?.parentElement ?? el) as HTMLElement;
-              if (e.key === 'ArrowRight') { scroller.scrollBy({ left: 80 }); e.preventDefault(); }
-              else if (e.key === 'ArrowLeft') { scroller.scrollBy({ left: -80 }); e.preventDefault(); }
-            }}
+            onKeyDown={scrollCue.onKeyDown}
           >
             <table className="table queue-review-table queue-review-table--edits">
               <colgroup>
@@ -554,12 +531,13 @@ export default function PendingEdits() {
               </tbody>
             </table>
           </div>
-          {showSwipeHint && (
+          {scrollCue.showCue && (
             <p className="admin-ops-scroll-hint mt-2 text-xs text-muted-foreground" data-testid="text-swipe-hint-edits">
               Swipe the table sideways to see all columns, including Approve/Reject.
             </p>
           )}
         </div>
+        <RecentResourceEdits />
       </section>
 
       {/* View Details Dialog */}
