@@ -92,7 +92,8 @@ test-results/
 playwright/.cache/
 
 # Agent / tooling working dirs (not part of the app)
-.claude/
+.claude/*
+!.claude/skills/
 .omc/
 .anneal/
 .a5c/
