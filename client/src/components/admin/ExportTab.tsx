@@ -681,7 +681,7 @@ export default function ExportTab({ validationStatus: propValidationStatus }: Ex
               : "No exports on this page. Use Previous to return to newer exports."}
           </p>
         ) : (
-          <Table className="table admin-ops-table" data-testid="table-export-history">
+          <Table className="table admin-ops-table" data-testid="table-export-history" scrollLabel="Export history table, scrollable">
             <thead>
               <tr>
                 <th>Type</th>

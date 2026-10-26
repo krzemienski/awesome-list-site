@@ -35,12 +35,12 @@ AdminOpsScrollBar.displayName = ScrollAreaPrimitive.ScrollAreaScrollbar.displayN
  */
 export const AdminOpsTable = React.forwardRef<
   HTMLTableElement,
-  React.HTMLAttributes<HTMLTableElement> & { scrollLabel?: string }
+  React.HTMLAttributes<HTMLTableElement> & { scrollLabel: string }
 >(({ className, scrollLabel, ...props }, ref) => (
   <div
     className="relative w-full overflow-auto"
     tabIndex={0}
-    role={scrollLabel ? "region" : undefined}
+    role="region"
     aria-label={scrollLabel}
   >
     <table ref={ref} className={cn("w-full caption-bottom text-sm", className)} {...props} />

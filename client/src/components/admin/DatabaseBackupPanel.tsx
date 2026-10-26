@@ -165,7 +165,7 @@ export default function DatabaseBackupPanel() {
         <p className="admin-ops-table__empty">No {data?.environment ?? ""} backups yet.</p>
       ) : (
         <>
-          <Table className="table admin-ops-table" data-testid="table-database-backups">
+          <Table className="table admin-ops-table" data-testid="table-database-backups" scrollLabel="Backups table, scrollable">
             <thead>
               <tr>
                 <th>Backup id</th>
@@ -212,7 +212,7 @@ export default function DatabaseBackupPanel() {
                     {latest.sequenceCount} sequences
                     {latest.inventory.extensions.length ? ` · extensions ${latest.inventory.extensions.join(", ")}` : ""}
                   </p>
-                  <Table className="table admin-ops-table" data-testid="table-database-backup-contents">
+                  <Table className="table admin-ops-table" data-testid="table-database-backup-contents" scrollLabel="Latest backup contents table, scrollable">
                     <thead>
                       <tr>
                         <th>Table</th>

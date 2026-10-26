@@ -647,7 +647,7 @@ export default function LinkHealthDashboard() {
             </div>
           ) : (
             <div className="ops-link-health__flagged-table-wrap">
-              <Table className="table">
+              <Table className="table" scrollLabel="Recent failures table, scrollable">
                 <TableHeader>
                   <TableRow>
                     <TableHead>Resource</TableHead>
@@ -779,7 +779,7 @@ export default function LinkHealthDashboard() {
             // Radix ScrollArea viewport clipped horizontal overflow, making
             // right-hand columns unreachable at ≤768px.
             <div className="max-h-[400px] overflow-auto" data-testid="scroller-link-health-table">
-              <Table className="table">
+              <Table className="table" scrollLabel="Problem links table, scrollable">
                 <TableHeader>
                   <TableRow>
                     <TableHead className="w-[100px]">Status</TableHead>

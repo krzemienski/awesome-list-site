@@ -334,7 +334,7 @@ export default function DatabaseTab({ stats }: DatabaseTabProps) {
           </span>
         }
       >
-        <Table className="table admin-ops-table" data-testid="table-database-tables">
+        <Table className="table admin-ops-table" data-testid="table-database-tables" scrollLabel="Key tables, scrollable">
           <thead>
             <tr>
               <th>Name</th>
