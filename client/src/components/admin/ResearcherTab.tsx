@@ -459,6 +459,7 @@ export default function ResearcherTab({ initialTab = "review" }: ResearcherTabPr
                   if (showAllJobs) setJobsLimit((l) => Math.min(l + 20, 200));
                   setShowAllJobs(true);
                 }}
+                aria-label={showAllJobs ? `Load more (${jobs.length} of ${jobsTotal}) in the Researcher jobs table` : undefined}
                 data-testid="button-show-more-research-jobs"
               >
                 {showAllJobs ? `Load more (${jobs.length} of ${jobsTotal})` : "Show more"}
@@ -806,6 +807,7 @@ export default function ResearcherTab({ initialTab = "review" }: ResearcherTabPr
                     variant="outline"
                     size="sm"
                     onClick={() => setJobsLimit((l) => Math.min(l + 20, 200))}
+                    aria-label={`Load more (${jobs.length} of ${jobsTotal}) in Job History`}
                     data-testid="button-load-more-jobs"
                   >
                     Load more ({jobs.length} of {jobsTotal})
