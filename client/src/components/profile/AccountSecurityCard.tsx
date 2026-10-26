@@ -19,10 +19,13 @@ import { trackAccountSecurityOpened } from "@/lib/analytics";
 export default function AccountSecurityCard() {
   // Signed-in pages load Clerk anyway; request it here too so the portal
   // button is ready, and keep it disabled until clerk-js has loaded.
-  const { loaded, clerk } = useClerkBridge();
+  const { loaded, clerk, isSignedIn } = useClerkBridge();
   useEffect(() => {
     requestClerk();
   }, []);
+  // The owner password session is not a Clerk session: Clerk loads with no
+  // user, so its account portal would open nothing.
+  const ownerPasswordSession = loaded && isSignedIn === false;
   return (
     <Card data-testid="card-account-security">
       <CardHeader>
@@ -31,25 +34,27 @@ export default function AccountSecurityCard() {
           Password &amp; security
         </CardTitle>
         <CardDescription>
-          Change your password, review devices where you're signed in, and
-          manage connected sign-in methods in your secure account settings.
-          App API keys are managed separately, below.
+          {ownerPasswordSession
+            ? "You're signed in with the owner password, so there is no account password, device list or connected sign-in method to manage here. To end owner sessions everywhere, use Sign out all devices at the top of this page. App API keys are managed separately, below."
+            : "Change your password, review devices where you're signed in, and manage connected sign-in methods in your secure account settings. App API keys are managed separately, below."}
         </CardDescription>
       </CardHeader>
-      <CardContent>
-        <Button
-          variant="outline"
-          disabled={!loaded || !clerk}
-          onClick={() => {
-            if (!clerk) return;
-            trackAccountSecurityOpened("manage_button");
-            clerk.openUserProfile();
-          }}
-          data-testid="button-open-account-security"
-        >
-          Manage account security
-        </Button>
-      </CardContent>
+      {ownerPasswordSession ? null : (
+        <CardContent>
+          <Button
+            variant="outline"
+            disabled={!loaded || !clerk}
+            onClick={() => {
+              if (!clerk) return;
+              trackAccountSecurityOpened("manage_button");
+              clerk.openUserProfile();
+            }}
+            data-testid="button-open-account-security"
+          >
+            Manage account security
+          </Button>
+        </CardContent>
+      )}
     </Card>
   );
 }
