@@ -125,8 +125,10 @@
   white-space: nowrap;
 }
 
+/* The count is information, so it takes --text-3 (the 4.5:1 ink, 0.49 alpha
+   in both systems), not the decorative --text-4. */
 .av-sidebar-l3-row > span:last-child {
-  color: var(--text-4);
+  color: var(--text-3);
   font-size: 9.5px;
 }
 
