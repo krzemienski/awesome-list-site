@@ -42,6 +42,8 @@ interface ActiveDelegation {
   subagentType: string | null;
   startedAt: number;
   webSearches: number;
+  /** Unkeyed start that was open when a delegation result could not be tied to a start. */
+  ambiguous?: boolean;
 }
 
 export class DelegationTracker {
@@ -118,15 +120,18 @@ export class DelegationTracker {
     const denied = this.denied.delete(toolUseId);
     const isDelegation = this.delegationCalls.delete(toolUseId) && !denied;
     // A start stored under `task:<id>` (no tool_use_id to pair with at the
-    // time) belongs to the oldest delegation result that has no start of its own.
+    // time) is paired with a result only by elimination: it is the one such
+    // start open, no other delegation is still out without a start of its own,
+    // and no earlier result went unpaired while it was open. Anything looser
+    // can hand one scout's status and duration to another when results return
+    // out of order. An ambiguous start is never paired; the caller closes it
+    // as aborted when the run stops.
     let key: string | undefined = this.active.has(toolUseId) ? toolUseId : undefined;
     if (!key && isDelegation) {
-      for (const [k, d] of this.active) {
-        if (d.toolUseId === null) {
-          key = k;
-          break;
-        }
-      }
+      const unkeyed = [...this.active].filter(([, a]) => a.toolUseId === null);
+      const otherUnstarted = [...this.delegationCalls].some((id) => !this.active.has(id) && !this.denied.has(id));
+      if (unkeyed.length === 1 && !otherUnstarted && !unkeyed[0][1].ambiguous) key = unkeyed[0][0];
+      else for (const [, a] of unkeyed) a.ambiguous = true;
     }
     const d = key ? this.active.get(key) : undefined;
     if (!d && !isDelegation) return null;

@@ -586,13 +586,20 @@ class ResearchService {
             return await respond({ saved: false, reason: `Discovery cap of ${ctx.discoveryCap} reached for this run. Wrap up and stop searching.` });
           }
           // The in-memory set can lag (throttled, watermark-based refresh), so
-          // the last guard before a save reads the tables directly.
+          // the last guard before a save reads the tables directly. If that
+          // read fails the URL is not saved: the stale set can't prove it new.
           let duplicate = ctx.known.has(input.url);
           if (!duplicate) {
             try {
               duplicate = await withTimeout(knownInDb(input.url), TOOL_DB_TIMEOUT_MS, 'save duplicate check');
             } catch (e) {
-              logger.warn({ jobId: ctx.jobId }, `save duplicate check failed (${e instanceof Error ? e.message : String(e)}) — relying on the in-memory known-URL set`);
+              const message = e instanceof Error ? e.message : String(e);
+              logger.warn({ jobId: ctx.jobId }, `save duplicate check failed (${message}) — discovery not saved`);
+              return await respond({
+                saved: false,
+                retry: true,
+                reason: `Couldn't verify this URL against the catalog (${preview(message, 200)}), so it was NOT saved. Retry this save_discovery call once; if it fails again, move on to other candidates. Never stop the run.`,
+              });
             }
             if (duplicate) ctx.known.add(input.url);
           }
@@ -1242,7 +1249,16 @@ class ResearchService {
   ): Promise<void> {
     const emitter = new AgentEventEmitter('research', jobId);
     const phases = new ResearchPhaseTracker(emitter);
-    const ctx = await buildResearchContext(categoryFocus);
+    // Every run that emits a phase also emits 'finishing': a setup failure
+    // (e.g. a DB timeout while reading the catalog) ends here as failed.
+    await phases.enter('planning', 'run_started');
+    let ctx: ResearchContext;
+    try {
+      ctx = await buildResearchContext(categoryFocus);
+    } catch (err) {
+      await phases.enter('finishing', 'run_error', errorStatusOf(err));
+      throw err;
+    }
 
     // Preflight guarantees both are set; the scout value is a tier alias the
     // CLI maps through ANTHROPIC_DEFAULT_<TIER>_MODEL, "inherit", or an
@@ -1406,8 +1422,6 @@ STOP TARGET: this run ends AUTOMATICALLY once ${targetDiscoveries} new discoveri
     let result: Awaited<ReturnType<typeof runAgentQuery>> | undefined;
     let runError: unknown = null;
     try {
-      // Inside the try so every run that emits a phase also emits 'finishing'.
-      await phases.enter('planning', 'run_started');
       result = await runAgentQuery({
         jobType: 'research',
         jobId,

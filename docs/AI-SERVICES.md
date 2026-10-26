@@ -315,7 +315,32 @@ Adopted:
   after the run started (another run's saves, new submissions) and reports
   `sameProjectAs` when the catalog or queue already has the same GitHub/GitLab
   project or its GitHub Pages site (dzhng's `visitedUrls`, the
-  open_deep_research unique-URL rule).
+  open_deep_research unique-URL rule). The known-URL set can lag, so
+  `save_discovery` re-reads `resources` and `research_discoveries` for the
+  exact normalized URL before it inserts. If that read fails, the save is
+  refused with `retry: true`; it never falls back to the in-memory set.
+
+  Accepted limits:
+  - *Check-then-insert race.* There is no lock between that read and the
+    insert. Only one research run is admitted at a time
+    (`admitResearchJob`), so two runs cannot race each other. A manual
+    submission landing in that gap can still produce one duplicate
+    `pending_review` discovery. Approval re-checks the normalized URL against
+    `resources` and refuses it (409), so it never becomes a duplicate
+    resource. A per-URL advisory lock in `save_discovery` would not close
+    this: submissions do not take that lock.
+  - *Near-duplicates inside the refresh window.* `sameProjectAs` comes from
+    the in-memory set, which refreshes at most every 5 s, so it can miss a
+    same-project URL saved moments earlier. It is advice to the model; the
+    save gate checks the exact normalized URL, and admins review every
+    discovery.
+  - *Unindexed save-time lookup.* That lookup is `ILIKE '%host/path%'` on
+    both tables, which cannot use the `url` index. It runs once per save
+    (`check_duplicate` uses the in-memory set), over about 2k resources and
+    a small discovery table, so it costs a few ms. The proper fix is a stored
+    normalized-URL column with an index (a migration). That column also
+    fixes stored rows whose URL spells the host or default port differently
+    from the normalized form, which this pattern misses.
 - **Phase / scout events** derived from the message stream at no extra model
   cost (dzhng `onProgress`).
 - **Confidence rubric** in the orchestrator prompt (primary source,
