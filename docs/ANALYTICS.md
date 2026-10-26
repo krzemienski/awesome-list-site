@@ -210,7 +210,11 @@ adds the script, a website id or an env var for it, and `script-src` /
 - **Page views** are recorded by the tracker itself on every load and SPA
   navigation, independent of the consent banner (cookieless, platform-level).
   For that reason `page_viewed` is **not** forwarded as a custom event — it
-  would double the count.
+  would double the count. The tracker sees SPA navigations only through
+  `history.pushState`/`replaceState` and has no `popstate` listener, so on
+  Back/Forward `use-analytics.tsx` re-announces the current URL with a
+  same-URL, same-state `replaceState`. Without that, a traversal recorded no
+  page view and later custom events carried the previous page's URL.
 - **Custom events:** every *product* event in the catalog below (the rows
   whose Tools column says "all four" or "product") also goes to Replit
   Analytics via `replitTrack` (`client/src/lib/replit-analytics.ts`) under the
