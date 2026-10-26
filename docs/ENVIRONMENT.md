@@ -104,7 +104,7 @@ before the server accepts traffic and the built frontend is served from
 
 ### `PORT`
 HTTP port for the Express server. Defaults to `5000`. Most hosts set this
-automatically — do not override it on Replit/Railway/Vercel.
+automatically — do not override it on Replit/Railway.
 
 ---
 

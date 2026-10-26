@@ -14,7 +14,6 @@ Container Apps).
 - [Replit Deployment](#replit-deployment)
 - [Docker / Self-Hosting](#docker--self-hosting)
 - [Railway](#railway)
-- [Vercel](#vercel)
 - [Other Container Platforms](#other-container-platforms)
 - [Database Setup](#database-setup)
 - [Environment Variables](#environment-variables)
@@ -123,34 +122,6 @@ Steps:
    `RAILWAY_GIT_COMMIT_SHA` build variable so `/api/version` identifies the
    exact source revision running in the container.
 
-## Vercel
-
-> ⚠️ Vercel is **serverless**. This app is a long-running Express process with a
-> boot-time migrator and background seeding, which does not map cleanly to
-> ephemeral serverless functions (cold starts re-run boot work; long tasks hit the
-> function timeout). For production, prefer Replit, Railway, or a container
-> platform. Use Vercel only if you understand these constraints.
-
-`vercel.json` is intentionally minimal — it only defines the build (no
-`functions` or `rewrites` blocks, because the Express server is not structured
-as Vercel serverless functions):
-
-```json
-{
-  "buildCommand": "npm run build",
-  "outputDirectory": "dist/public",
-  "framework": null,
-  "regions": ["iad1"],
-  "env": { "NODE_ENV": "production" }
-}
-```
-
-As-is, a Vercel deploy serves only the static frontend from `dist/public`; the
-API will not run. To actually host the backend on Vercel you would need to wrap
-the Express app in a serverless handler under `api/` (e.g. an `api/index.ts`
-shim) — that work has not been done. The checked-in configuration remains
-static-only; no backend runtime variables are consumed by that static deploy.
-
 ## Other Container Platforms
 
 Any platform that runs a container works with the same `Dockerfile` (Google Cloud
@@ -208,8 +179,7 @@ CLERK_SECRET_KEY=sk_...                    # runtime, server-only
 Optional feature keys (AI enrichment, GitHub import/export, analytics, etc.) are
 documented — with where each one is read — in [ENVIRONMENT.md](./ENVIRONMENT.md).
 
-Set them via each platform's mechanism: Replit Secrets, Railway variables, Vercel
-env, or a Docker `.env` file / `--env`.
+Set them via each platform's mechanism: Replit Secrets, Railway variables, or a Docker `.env` file / `--env`.
 
 ## Health Checks
 
