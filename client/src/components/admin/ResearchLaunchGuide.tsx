@@ -38,6 +38,11 @@ interface ResearchLaunchGuideProps {
 
 type BriefMode = "auto" | "custom";
 
+// docs/AI-SERVICES.md "Budget": the cheapest run that saved a discovery cost
+// $1.14 in 8 turns, and $0.30 caps (jobs 65, 68) stopped after 3 turns
+// without a search. Below this a cap usually ends the run before it saves one.
+const LOW_BUDGET_USD = 1.25;
+
 const hint = (warn: boolean) => `mt-1 text-xs ${warn ? WARN_TEXT : "text-muted-foreground"}`;
 
 function Step({ n, title, summary, children }: { n: number; title: string; summary?: ReactNode; children: ReactNode }) {
@@ -295,8 +300,13 @@ export const ResearchLaunchGuide = forwardRef<ResearchLaunchGuideHandle, Researc
               value={maxBudget} onChange={(e) => setMaxBudget(e.target.value)}
               className="mt-1 min-h-11" data-testid="input-research-budget" />
             <p className={hint(maxBudget.trim() !== "" && !(Number.isFinite(budgetN) && budgetN > 0))}>
-              {maxBudget.trim() === "" ? "No cap — the run spends until it stops or you cancel it." : "The run stops when it reaches this spend."}
+              {maxBudget.trim() === "" ? "No cap — the run spends until it stops or you cancel it." : "Spend is checked between turns, so a run can go over this cap by up to one turn's cost before it stops."}
             </p>
+            {Number.isFinite(budgetN) && budgetN > 0 && budgetN < LOW_BUDGET_USD && (
+              <p className={hint(true)} data-testid="text-budget-low">
+                Under ${LOW_BUDGET_USD.toFixed(2)} a run usually stops before it saves anything. Each turn costs about $0.10–$0.15, $0.30 caps ended after 3 turns with no searches, and the cheapest run that saved a discovery cost $1.14.
+              </p>
+            )}
           </div>
           <div>
             <Label htmlFor="turns">Max turns</Label>

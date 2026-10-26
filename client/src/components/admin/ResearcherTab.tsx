@@ -56,6 +56,7 @@ import type { ResearchJob, ResearchDiscovery } from "@shared/schema";
 import "./queues-agent.css";
 import "./research-run.css";
 import { useState, useEffect, useRef } from "react";
+import { flushSync } from "react-dom";
 
 const CANONICAL_JOB_ROWS = 5;
 
@@ -120,7 +121,6 @@ export default function ResearcherTab({ initialTab = "review" }: ResearcherTabPr
   const [focusRunOnMount, setFocusRunOnMount] = useState(false);
   const autoFollowed = useRef(followJobId !== null);
   const guideRef = useRef<ResearchLaunchGuideHandle>(null);
-  const [pendingGuideFocus, setPendingGuideFocus] = useState(false);
   const [historyJobId, setHistoryJobId] = useState<number | null>(null);
 
   const [selectedJobId, setSelectedJobId] = useState<number | null>(null);
@@ -316,30 +316,33 @@ export default function ResearcherTab({ initialTab = "review" }: ResearcherTabPr
     if (activeJob) setFollowJobId(activeJob.id);
   }, [activeJobStateKnown, activeJob]);
 
-  // The ?jobId= deep link names the run being followed; once the view
-  // follows another run or none, drop it so a reload or a shared link does
-  // not reopen the old run.
+  // ?jobId= names the run being followed, so the live view can be shared or
+  // reloaded; following none drops it. replaceState keeps Back unchanged.
   useEffect(() => {
     const url = new URL(window.location.href);
-    const linked = url.searchParams.get("jobId");
-    if (linked === null || Number(linked) === followJobId || !url.pathname.startsWith("/admin")) return;
-    url.searchParams.delete("jobId");
+    if (!url.pathname.startsWith("/admin")) return;
+    const linked = followJobId === null ? null : String(followJobId);
+    if (url.searchParams.get("jobId") === linked) return;
+    if (linked === null) url.searchParams.delete("jobId");
+    else url.searchParams.set("jobId", linked);
     window.history.replaceState(window.history.state, "", url.pathname + url.search + url.hash);
   }, [followJobId]);
 
-  useEffect(() => {
-    if (!pendingGuideFocus || followJobId !== null) return;
-    setPendingGuideFocus(false);
-    requestAnimationFrame(() => guideRef.current?.focusBudget());
-  }, [pendingGuideFocus, followJobId]);
+  // Leaving the run view removes the focused button. Commit that change inside
+  // the click and move focus straight away: a deferred (rAF) focus never runs
+  // in a tab that is not producing frames, and focus stays on <body>.
+  const relaunchHigherCap = () => {
+    flushSync(() => setFollowJobId(null));
+    guideRef.current?.focusBudget();
+  };
 
   const showHistory = (jobId: number) => {
-    setHistoryJobId(jobId);
-    setFollowJobId(null);
-    requestAnimationFrame(() => {
-      jobsRegionRef.current?.scrollIntoView({ block: "center" });
-      focusElement(jobsRegionRef.current);
+    flushSync(() => {
+      setHistoryJobId(jobId);
+      setFollowJobId(null);
     });
+    jobsRegionRef.current?.scrollIntoView({ block: "center" });
+    focusElement(jobsRegionRef.current);
   };
 
   return (
@@ -392,7 +395,7 @@ export default function ResearcherTab({ initialTab = "review" }: ResearcherTabPr
               jobId={followJobId}
               focusOnMount={focusRunOnMount}
               onStartNew={() => setFollowJobId(null)}
-              onRelaunchHigherCap={() => { setFollowJobId(null); setPendingGuideFocus(true); }}
+              onRelaunchHigherCap={relaunchHigherCap}
               onShowHistory={() => showHistory(followJobId)}
             />
           )}
@@ -421,7 +424,7 @@ export default function ResearcherTab({ initialTab = "review" }: ResearcherTabPr
                     <td className="prompt">{job.prompt || "Auto-generated research brief"}</td>
                     <td className="mono queues-agent__cell-mono">{job.totalDiscoveries || 0}</td>
                     <td className="mono queues-agent__cell-mono">{job.approvedDiscoveries || 0}/{job.rejectedDiscoveries || 0}</td>
-                    <td className="mono accent queues-agent__cell-mono">
+                    <td className="mono queues-agent__cell-mono">
                       {formatCost(job.estimatedCostUsd)}
                       {job.costBasis && COST_BASIS_NOTE[job.costBasis] && (
                         <span className="block text-[10px] text-muted-foreground">{COST_BASIS_NOTE[job.costBasis]}</span>
@@ -457,6 +460,7 @@ export default function ResearcherTab({ initialTab = "review" }: ResearcherTabPr
                   if (showAllJobs) setJobsLimit((l) => Math.min(l + 20, 200));
                   setShowAllJobs(true);
                 }}
+                aria-label={showAllJobs ? `Load more (${jobs.length} of ${jobsTotal}) in the Researcher jobs table` : undefined}
                 data-testid="button-show-more-research-jobs"
               >
                 {showAllJobs ? `Load more (${jobs.length} of ${jobsTotal})` : "Show more"}
@@ -804,6 +808,7 @@ export default function ResearcherTab({ initialTab = "review" }: ResearcherTabPr
                     variant="outline"
                     size="sm"
                     onClick={() => setJobsLimit((l) => Math.min(l + 20, 200))}
+                    aria-label={`Load more (${jobs.length} of ${jobsTotal}) in Job History`}
                     data-testid="button-load-more-jobs"
                   >
                     Load more ({jobs.length} of {jobsTotal})
