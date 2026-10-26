@@ -95,6 +95,11 @@ export function loadFontOverride(id: string): void {
   if (href) loadStylesheet(href, id);
 }
 
+/** What "System default" means: the given design system's own body face. */
+export function systemFontStack(system: string | null): string | undefined {
+  return isSystemId(system) ? getDesignSystems()[system].vars["--font-body"] : undefined;
+}
+
 export function applyFontOverride(id: string): void {
   const resolvedId = resolveFontOverrideId(id);
   const opt = FONT_OPTIONS.find((f) => f.id === resolvedId)!;
@@ -108,8 +113,7 @@ export function applyFontOverride(id: string): void {
     // "System default" means the ACTIVE design system's own body face. The
     // applier owns --font-body, so hand it back its value rather than
     // removing the property (which would leave nothing behind).
-    const system = root.getAttribute("data-system");
-    const owned = isSystemId(system) ? getDesignSystems()[system].vars["--font-body"] : undefined;
+    const owned = systemFontStack(root.getAttribute("data-system"));
     if (owned) root.style.setProperty("--font-body", owned);
     root.style.removeProperty("--font-sans");
   } else {

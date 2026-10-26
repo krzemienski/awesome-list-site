@@ -16,6 +16,7 @@ import {
   FONT_LS_KEY,
   applyFontOverride,
   resolveFontOverrideId,
+  systemFontStack,
 } from "@/lib/font-options";
 import { trackThemeChange } from "@/lib/analytics";
 import SEOHead from "@/components/layout/SEOHead";
@@ -318,7 +319,7 @@ export default function ThemeSettings() {
                 </div>
                 <p
                   className="text-sm text-[color:var(--text-2)]"
-                  style={{ fontFamily: f.stack || undefined }}
+                  style={{ fontFamily: f.stack || systemFontStack(systemId) }}
                 >
                   The quick brown fox jumps over the lazy dog. 0123456789
                 </p>
