@@ -836,7 +836,7 @@ export default function ExportTab({ validationStatus: propValidationStatus }: Ex
               <AlertCircle className="mx-auto mb-4 h-12 w-12 text-[var(--text-2)]" />
               <p className="mb-2 text-[var(--text-2)]">No validation results yet</p>
               <p className="text-sm text-[var(--text-2)]">
-                Use “Run Validation” at the top of this section to check the exported Markdown against awesome-lint rules.
+                Open “Validation controls” at the top of this tab and use “Run Validation” to check the exported Markdown against awesome-lint rules.
               </p>
             </div>
           </section>
