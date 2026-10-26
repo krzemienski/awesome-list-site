@@ -182,7 +182,7 @@ function ResourcePicker({
                 onChange(null);
                 toggleRef.current?.focus();
               }}
-              className="inline-flex shrink-0 items-center justify-center min-h-[32px] min-w-[32px] -my-1 hover:opacity-80"
+              className="inline-flex shrink-0 items-center justify-center min-h-11 min-w-11 min-[1025px]:min-h-8 min-[1025px]:min-w-8 -my-1 hover:opacity-80"
               aria-label="Clear resource"
               data-testid="step-resource-clear"
             >
