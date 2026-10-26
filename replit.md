@@ -21,6 +21,11 @@ A production-ready React application for browsing and discovering over 2,600 cur
 
 ## Recent Changes
 
+### Production validation and redeploy loop — October 26, 2026
+- Pieces A–D of the October improvement waves were proven on `https://awesome.video` itself at 1440, 820 and 390, with four redeploys from GitHub `main`. The report is in `reports/prod-validation-2026-10-26/`, and the audit is in `docs/audits/full-functional-audit-2026-10-26-production.md`.
+- Fixes found on production. Umami Back/Forward page views and event URLs (#30, #38). Touch targets on taxonomy cards, home cards, footer, admin rows, tag pills and the taxonomy breadcrumb (#31, #33, #36, #40). GitHub import dry run: it no longer writes taxonomy (#34), reads the catalog once instead of per item (#37, 504 after 300 s → about 10 s), and keeps `/` in headings (#39).
+- Vercel config and the unused GitHub Pages workflow were removed (#32, #35). Project skills are tracked in git (#35). See `docs/DEPLOYMENT.md` "Publishing GitHub main" for the workspace-sync rules (empty publish commits, autosave of untracked files, `/api/version` proof).
+
 ### AI calls unified on the Anthropic router — September 15, 2026
 - `server/ai/anthropicConfig.ts` is the single source of truth for endpoint, credentials and model ids for EVERY Claude call (direct SDK + Claude Agent SDK). Precedence: router (`ANTHROPIC_BASE_URL` + `ANTHROPIC_AUTH_TOKEN`) → managed integration → direct key; a base URL with no credential fails closed. Tiers resolve via `ANTHROPIC_DEFAULT_{HAIKU,SONNET,OPUS,FABLE}_MODEL`; `ANTHROPIC_MODEL` drives the Researcher orchestrator. Per-flow tiers live in `FLOW_TIERS` — change tiers there, not at call sites.
 - Agent SDK runs use `buildAgentEnv` (strips all credential keys, re-adds only the resolved router creds; platform creds never reach a custom base URL; token-only admin override still targets the router). Scout subagents get the tier alias `haiku` (CLI allowlist rejects literal custom ids). Structured outputs use `messages.parse` + `zodOutputFormat`.

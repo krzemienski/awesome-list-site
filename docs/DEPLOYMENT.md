@@ -73,6 +73,34 @@ Steps:
 Replit provides managed PostgreSQL with separate development and production
 databases. An external PostgreSQL provider also works.
 
+### Publishing GitHub `main`
+
+Replit is the only production target. Vercel and GitHub Pages are not used,
+and their configuration has been removed.
+
+Publish snapshots the files in the Replit workspace, not GitHub. Before each
+publish, bring the workspace to `origin/main` with a fast-forward, and confirm
+that `git status` is clean and `HEAD` equals `origin/main`. The project skill
+`.claude/skills/replit-deploy/SKILL.md` has the full procedure.
+
+- Each publish adds an empty "Published your App" commit (author Replit Agent)
+  on top of the published commit. It changes no files. When Replit pushes it to
+  GitHub, the next sync is a plain fast-forward. When it stays only in the
+  workspace, move the workspace back with `git reset --keep origin/main`, but
+  only after confirming that the commit's tree equals its parent's.
+- Replit's autosave commits untracked files in the workspace. On 2026-10-26 an
+  untracked notes file was committed this way and published as revision
+  `634e8afd`, which is not on GitHub. Before you publish, delete untracked files
+  you do not want shipped.
+- `npm run build` stamps the workspace `HEAD` into the bundle, and
+  `/api/version` serves it. After a publish, check that
+  `https://awesome.video/api/version` returns the commit you meant to ship and
+  that `/api/health/ready` returns 200.
+- `npm install` and `npm run db:push` are needed only when `package.json`,
+  `package-lock.json`, `shared/schema.ts` or `migrations/` changed since the
+  last publish. Check with
+  `git diff --stat <live revision> origin/main -- package.json package-lock.json shared/schema.ts migrations`.
+
 ## Docker / Self-Hosting
 
 The repo ships a production `Dockerfile` and a `docker-compose.yml` (app +

@@ -2,7 +2,6 @@
 
 A production-ready React application for browsing and discovering 2,200+ curated video development resources. Features AI-powered recommendations, admin curation tools, GitHub synchronization, and awesome-lint compliant exports.
 
-[![Build Status](https://github.com/krzemienski/awesome-list-site/actions/workflows/deploy.yml/badge.svg)](https://github.com/krzemienski/awesome-list-site/actions/workflows/deploy.yml)
 [![TypeScript](https://img.shields.io/badge/TypeScript-5.6-blue)](https://www.typescriptlang.org/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)](https://github.com/krzemienski/awesome-list-site/blob/main/CONTRIBUTING.md)
