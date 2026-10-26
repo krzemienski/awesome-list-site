@@ -36,6 +36,7 @@ import {
   BIDI_CONTROL_RE,
   BIDI_CONTROL_MESSAGE,
   SINGLE_LINE_CONTROL_RE,
+  insecureHttpRefusal,
   visibleLength,
 } from "@shared/validation";
 import { asyncHandler } from "../../middleware/asyncHandler";
@@ -73,7 +74,7 @@ export function registerAiJobsRoutes(
   // POST /api/enrichment/start - Start batch enrichment job
   app.post('/api/enrichment/start', isAuthenticated, isAdmin, asyncHandler(async (req: any, res) => {
     try {
-      const { filter = 'unenriched', batchSize = 10 } = req.body;
+      const { filter = 'unenriched', batchSize = 10, allowInsecureHttp } = req.body;
       const userId = req.dbUser?.id;
 
       // Run15 BUG-019 companion: the client guard alone is bypassable —
@@ -91,6 +92,10 @@ export function registerAiJobsRoutes(
         agentConfig = await parseAgentConfigFromRequest(req.body);
       } catch (cfgErr: any) {
         return res.status(400).json({ success: false, message: cfgErr.message || 'Invalid agent configuration' });
+      }
+      const insecureHttp = insecureHttpRefusal(agentConfig.baseUrl, allowInsecureHttp === true);
+      if (insecureHttp) {
+        return res.status(400).json({ success: false, code: 'insecure_http_unconfirmed', message: insecureHttp });
       }
 
       const jobId = await enrichmentService.queueBatchEnrichment({
