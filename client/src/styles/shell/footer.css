@@ -6,6 +6,8 @@
   margin-top: 80px;
   border-top: var(--hairline-w) solid var(--border);
   padding: 48px 40px 42px;
+  /* The back-to-top lane (index.css) is never content. */
+  padding-inline-end: var(--shell-gutter-end);
   font-family: var(--font-body);
   color: var(--text);
 }
@@ -168,7 +170,7 @@
   .app-footer-identity { grid-column: 1 / -1; }
 }
 @media (max-width: 640px) {
-  .app-footer { padding: 36px 20px 24px; margin-top: 56px; }
+  .app-footer { padding-block: 36px 24px; padding-inline-start: 20px; margin-top: 56px; }
   .app-footer-grid > :last-child { grid-column: 1 / -1; }
   .app-footer-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 32px 24px; }
   .app-footer-meta { margin-top: 28px; }

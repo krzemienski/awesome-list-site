@@ -284,6 +284,10 @@ function buildClerkAppearance(
       // styles below keep painting from tokens. `auth-edge` restores the DS
       // border over Clerk's shadow ring (app-bridge.css).
       button: "btn auth-edge",
+      // Clerk caps the card at the VIEWPORT width less 2.5rem, which is wider
+      // than the page column on a phone: the card spilled past both gutters
+      // and under the back-to-top button. Cap both boxes at the column.
+      rootBox: { maxWidth: "100%" },
       // Task #404: Clerk rounds the card at TWICE the base above (its own
       // ladder step), which overshoots the DS card token — 16px against the
       // 12px every other card on the page sits at. `cardBox` is the outer,
@@ -291,6 +295,7 @@ function buildClerkAppearance(
       // it is the corner a visitor actually sees; pin it to the card token and
       // let Clerk's slightly tighter inner step nest inside it as designed.
       cardBox: {
+        maxWidth: "100%",
         ...(radii.card ? { borderRadius: radii.card } : {}),
         // Clerk's card/footer are transparent in the auth treatment;
         // this outer clipping surface owns the single DS background.

@@ -25,6 +25,9 @@
   flex: 1;
   flex-direction: column;
   min-width: 0;
+  /* A word longer than its line (a scraped repo path, a URL) breaks instead
+     of spilling past its box, into the gutter and the back-to-top lane. */
+  overflow-wrap: break-word;
 }
 
 .app-shell-main {
@@ -37,6 +40,8 @@
   max-width: var(--shell-page-measure, var(--content-max));
   margin-inline: auto;
   padding: var(--page-pad-y) var(--page-pad-x);
+  /* The back-to-top lane (index.css) is never content. */
+  padding-inline-end: var(--shell-gutter-end);
 }
 
 .app-shell-main > .page-content-wrap[data-admin="true"] {
