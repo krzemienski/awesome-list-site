@@ -1,3 +1,4 @@
+import { useLayoutEffect, useRef, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { Link } from "wouter";
 import { formatAdminDateTime, formatRelativeAgo, maskEmail } from "@/lib/utils";
@@ -14,6 +15,54 @@ const OUTCOME: Record<ResolvedResourceEdit["status"], { label: string; chip: str
 };
 
 export const RECENT_EDITS_KEY = "/api/admin/resource-edits/recent";
+
+/**
+ * AC-10: a rejection reason wraps to three lines and offers "Show full
+ * reason" when it runs longer, so the whole text is readable on touch, where
+ * a title tooltip never appears.
+ */
+function RejectionReason({ editId, reason }: { editId: number; reason: string }) {
+  const textRef = useRef<HTMLSpanElement>(null);
+  const [expanded, setExpanded] = useState(false);
+  const [overflows, setOverflows] = useState(false);
+
+  useLayoutEffect(() => {
+    const el = textRef.current;
+    if (!el || expanded) return;
+    const measure = () => setOverflows(el.scrollHeight > el.clientHeight + 1);
+    measure();
+    const observer = new ResizeObserver(measure);
+    observer.observe(el);
+    return () => observer.disconnect();
+  }, [expanded, reason]);
+
+  const textId = `recent-edit-reason-${editId}`;
+  return (
+    <>
+      <span
+        ref={textRef}
+        id={textId}
+        className="queue-review-sub queue-review-reason"
+        data-expanded={expanded}
+        data-testid={`text-recent-edit-reason-${editId}`}
+      >
+        {reason}
+      </span>
+      {(overflows || expanded) && (
+        <button
+          type="button"
+          className="queue-review-reason-toggle"
+          aria-expanded={expanded}
+          aria-controls={textId}
+          onClick={() => setExpanded((open) => !open)}
+          data-testid={`button-recent-edit-reason-${editId}`}
+        >
+          {expanded ? "Show less" : "Show full reason"}
+        </button>
+      )}
+    </>
+  );
+}
 
 /**
  * AC-04: the Edits tab promised "Pending and recent edits", but an edit
@@ -105,9 +154,7 @@ export function RecentResourceEdits() {
                           {outcome.label}
                         </span>
                         {edit.rejectionReason && (
-                          <span className="queue-review-sub queue-review-truncate" title={edit.rejectionReason}>
-                            {edit.rejectionReason}
-                          </span>
+                          <RejectionReason editId={edit.id} reason={edit.rejectionReason} />
                         )}
                       </td>
                       <td className="mono queue-review-mono queue-review-when">

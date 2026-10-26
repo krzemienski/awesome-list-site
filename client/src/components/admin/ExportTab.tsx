@@ -767,7 +767,7 @@ export default function ExportTab({ validationStatus: propValidationStatus }: Ex
                       Errors ({validationStatus.awesomeLint.errors.length})
                     </button>
                     {showErrors && (
-                      <ScrollArea className="admin-ops-validation-list admin-ops-validation-list--bad h-48">
+                      <ScrollArea className="admin-ops-validation-list admin-ops-validation-list--bad h-48" scrollLabel="Validation errors, scrollable">
                         {groupByRule(validationStatus.awesomeLint.errors).map(([rule, items]) => (
                           <div key={rule} className="admin-ops-validation-group" data-testid={`error-group-${rule}`}>
                             <div className="admin-ops-validation-group__heading admin-ops-validation-group__heading--bad">
@@ -803,7 +803,7 @@ export default function ExportTab({ validationStatus: propValidationStatus }: Ex
                       Warnings ({validationStatus.awesomeLint.warnings.length})
                     </button>
                     {showWarnings && (
-                      <ScrollArea className="admin-ops-validation-list admin-ops-validation-list--warn h-48">
+                      <ScrollArea className="admin-ops-validation-list admin-ops-validation-list--warn h-48" scrollLabel="Validation warnings, scrollable">
                         {groupByRule(validationStatus.awesomeLint.warnings).map(([rule, items]) => (
                           <div key={rule} className="admin-ops-validation-group" data-testid={`warning-group-${rule}`}>
                             <div className="admin-ops-validation-group__heading admin-ops-validation-group__heading--warn">

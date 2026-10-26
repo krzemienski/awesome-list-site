@@ -260,6 +260,37 @@
   margin-block-start: 0.125rem;
 }
 
+.queue-review-reason {
+  -webkit-box-orient: vertical;
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  line-clamp: 3;
+  overflow: hidden;
+  overflow-wrap: anywhere;
+  white-space: normal;
+}
+
+.queue-review-reason[data-expanded="true"] {
+  display: block;
+  -webkit-line-clamp: unset;
+  line-clamp: none;
+}
+
+.queue-review-reason-toggle {
+  color: var(--accent);
+  font-size: 12px;
+  min-height: 24px;
+  padding: 0;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
+@media (hover: none), (pointer: coarse) {
+  .queue-review-reason-toggle {
+    min-height: 44px;
+  }
+}
+
 .queue-review-ai {
   align-items: center;
   display: inline-flex;
