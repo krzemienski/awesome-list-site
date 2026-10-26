@@ -127,8 +127,7 @@
        vertical strip at the right edge that it floats in: the button plus its
        offset plus a gap. Content scrolls past a fixed button at every scroll
        position, so no content may ever enter that strip; the shell's end
-       gutter (--shell-gutter-end) is at least that wide. The lane is 60px:
-       wider and the home index drops to one column at 1440. */
+       gutter (--shell-gutter-end) is at least that wide. */
     --back-to-top-size: 2.75rem;
     --back-to-top-offset: 0.75rem;
     --back-to-top-lane: calc(var(--back-to-top-size) + var(--back-to-top-offset) + 0.25rem);
