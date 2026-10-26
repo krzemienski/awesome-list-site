@@ -1,19 +1,28 @@
 import { useEffect, useRef } from "react";
-import { useLocation, useSearch } from "wouter";
+import { useLocation } from "wouter";
 
 /** Report a confirmed missing page once per route visit, including StrictMode. */
 export function useMissingRouteTelemetry(missing: boolean): void {
   const [pathname] = useLocation();
-  const search = useSearch();
   const reported = useRef<string | null>(null);
   useEffect(() => {
-    const path = pathname + (search ? `?${search.replace(/^\?/, "")}` : "");
     // A refetch of a missing entity passes through pending (missing=false)
     // and back; that is the same visit, so only a path change re-arms.
-    if (!missing || reported.current === path) return;
-    reported.current = path;
-    reportDeadLink(path, document.referrer);
-  }, [missing, pathname, search]);
+    if (!missing || reported.current === pathname) return;
+    reported.current = pathname;
+    reportDeadLink(pathname, document.referrer);
+  }, [missing, pathname]);
+}
+
+// Query strings and fragments can carry typed search text or tokens; the
+// report needs only where the visitor was.
+function withoutQuery(url: string): string | null {
+  try {
+    const parsed = new URL(url);
+    return `${parsed.origin}${parsed.pathname}`;
+  } catch {
+    return null;
+  }
 }
 
 /**
@@ -30,7 +39,7 @@ export function useMissingRouteTelemetry(missing: boolean): void {
 function reportDeadLink(path: string, referrer: string): void {
   const payload = {
     path,
-    referrer: referrer || null,
+    referrer: referrer ? withoutQuery(referrer) : null,
     ts: new Date().toISOString(),
   };
 

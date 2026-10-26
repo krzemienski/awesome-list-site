@@ -6,11 +6,10 @@
  *   • parsePageParam / parsePageInput — LENIENT (Number()-based, "1e3" IS
  *     1000): every "Go to page" input, and /search's ?page= (both passes of
  *     /search clamp out-of-range instead of 404ing — it's noindex);
- *   • parsePageParamStrict — STRICT canonical-decimal rule for the indexable
- *     taxonomy listings (/category, /subcategory, /sub-subcategory): the
- *     crawler pass soft-404s "1e3"/"007"/"abc"/"0", so the client renders the
- *     SAME verdict as page 1 plus a visible notice — never a silent rewrite,
- *     and never content the crawler pass would deny.
+ *   • strictUrlPage — STRICT canonical-decimal rule for the indexable
+ *     listings (/category, /subcategory, /sub-subcategory, /tag): the
+ *     crawler pass 404s "1e3"/"007"/"abc"/"0", so the client renders the
+ *     same not-found page, never a listing the crawler pass denies.
  */
 
 import { parsePageNumber, parseUrlPageStrict } from "@shared/page-param";
@@ -47,24 +46,14 @@ export function parsePageFromSearch(search: string): ParsedPageParam {
 }
 
 /**
- * STRICT variant for the indexable taxonomy listings — consumes the same
- * shared verdict og-middleware uses for its soft-404 gate, so the client can
- * never present ?page=1e3 as page 1000 while the crawler pass 404s it.
+ * STRICT ?page= for the indexable listings: the page to fetch (1 when the
+ * param is absent), or null when og-middleware 404s the spelling. The caller
+ * still 404s a page past the end once it knows the last page.
  */
-export function parsePageParamStrict(raw: string | null): ParsedPageParam {
-  const v = parseUrlPageStrict(raw);
-  switch (v.kind) {
-    case "missing":
-      return { page: 1, kind: "default", raw };
-    case "page":
-      return { page: v.page, kind: "valid", raw };
-    case "below-range":
-      return { page: 1, kind: "clamped-low", raw };
-    case "malformed":
-      // Present-but-empty (?page=) is malformed on the server too; the notice
-      // copy handles the empty raw specially.
-      return { page: 1, kind: "invalid", raw };
-  }
+export function strictUrlPage(raw: string | null): number | null {
+  const verdict = parseUrlPageStrict(raw);
+  if (verdict.kind === "missing") return 1;
+  return verdict.kind === "page" ? verdict.page : null;
 }
 
 /**
@@ -78,24 +67,15 @@ export function parsePageInput(text: string): number | null {
 }
 
 /**
- * Standard notice copy for a URL-sourced page correction, so every listing
- * surface words the feedback identically.
+ * Notice copy for a lenient URL-sourced page correction (/search), which
+ * clamps instead of 404ing.
  */
-export function pageNoticeFor(
-  parsed: ParsedPageParam,
-  totalPages?: number,
-): string | null {
+export function pageNoticeFor(parsed: ParsedPageParam): string | null {
   if (parsed.kind === "invalid") {
-    if (parsed.raw == null || parsed.raw.trim() === "") {
-      return "The page number in the link is empty, so page 1 is shown.";
-    }
     return `“${parsed.raw}” isn't a valid page number, so page 1 is shown. Pages are whole numbers like 2 or 10.`;
   }
   if (parsed.kind === "clamped-low") {
     return `Page ${parsed.raw} doesn't exist, so page 1 is shown.`;
-  }
-  if (parsed.kind === "valid" && totalPages != null && parsed.page > totalPages) {
-    return `Page ${parsed.page} doesn't exist here — there ${totalPages === 1 ? "is only 1 page" : `are only ${totalPages} pages`}, so the last page is shown.`;
   }
   return null;
 }

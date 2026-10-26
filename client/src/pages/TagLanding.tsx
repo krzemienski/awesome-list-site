@@ -1,5 +1,5 @@
 import StatePanel, { RetryButton } from "@/components/layout/StatePanel";
-import { Fragment, useEffect, useRef, useState } from "react";
+import { Fragment, useEffect, useRef } from "react";
 import { useQuery } from "@tanstack/react-query";
 import "@/styles/pages/discovery.css";
 import { ArrowLeft } from "lucide-react";
@@ -13,10 +13,11 @@ import { Paginator } from "@/components/ui/paginator";
 import { PageHeaderSkeleton, ResourceCardSkeleton } from "@/components/ui/skeletons";
 import { apiRequest } from "@/lib/queryClient";
 import { trackTagInteraction } from "@/lib/analytics";
-import { parsePageParamStrict, pageNoticeFor } from "@/lib/page-param";
+import { strictUrlPage } from "@/lib/page-param";
 import { slugify } from "@/lib/utils";
 import NotFound from "@/pages/not-found";
 import { tagScopeIntro } from "@shared/seo-content-templates";
+import { MAX_PAGE } from "@shared/page-param";
 import {
   pagedSeoDescription,
   pagedSeoTitleCore,
@@ -64,15 +65,15 @@ export default function TagLanding() {
   const [, navigate] = useLocation();
   const { slug: rawSlug = "" } = useParams<{ slug: string }>();
   const slug = normalizeTagPathSegment(rawSlug);
-  const parsedPage = parsePageParamStrict(new URLSearchParams(useSearch()).get("page"));
-  // C8-V1-04: a page past the end shows the last page plus a notice (as the
-  // taxonomy listings do) instead of a 404. `clamp` remembers the last page
-  // once the first fetch for the out-of-range page reveals the total.
-  const [clamp, setClamp] = useState<{ requested: string; slug: string; page: number } | null>(null);
-  const requestedKey = String(parsedPage.page);
-  const activeClamp = clamp && clamp.slug === slug && clamp.requested === requestedKey ? clamp : null;
-  const page = activeClamp ? activeClamp.page : parsedPage.page;
+  // A ?page= the server 404s (malformed, below 1, or past the end) renders
+  // the same not-found page here.
+  const search = useSearch();
+  const urlPage = strictUrlPage(new URLSearchParams(search).get("page"));
+  const page = urlPage ?? 1;
   const offset = (page - 1) * PAGE_SIZE;
+  // The API 400s an offset past int4; no tag has that many pages, so such a
+  // page is past the end like any other and 404s on both passes.
+  const pageReachable = urlPage !== null && offset <= MAX_PAGE;
   // The API rejects over-length tags with a 400 that no retry can fix; the
   // server already answers such URLs 404, so the page must agree.
   const tagIsQueryable = Boolean(slug) && slug.length <= TAG_MAX_LENGTH;
@@ -89,7 +90,7 @@ export default function TagLanding() {
       }
       return apiRequest(url, { method: "GET" });
     },
-    enabled: tagIsQueryable,
+    enabled: tagIsQueryable && pageReachable,
     staleTime: 60_000,
     // Hold the current page only while paging within this tag; another tag's
     // cards and total must never render under the new tag's heading.
@@ -98,35 +99,34 @@ export default function TagLanding() {
   });
 
   const listedTotal = listing.data?.total;
-  useEffect(() => {
-    if (listedTotal && !activeClamp && !listing.isPlaceholderData) {
-      const lastPage = Math.max(1, Math.ceil(listedTotal / PAGE_SIZE));
-      if (parsedPage.page > lastPage) setClamp({ requested: requestedKey, slug, page: lastPage });
-    }
-  }, [activeClamp, listedTotal, listing.isPlaceholderData, parsedPage.page, requestedKey, slug]);
+  const pastLastPage = listedTotal !== undefined && !listing.isPlaceholderData
+    && page > Math.max(1, Math.ceil(listedTotal / PAGE_SIZE));
+  // A rejected ?page= disables the query but still reads page 1 from the
+  // cache, so the listing data alone can't tell a 404 from a real view.
+  const notFound = !tagIsQueryable || !pageReachable || pastLastPage;
 
   // One view event per tag visit, once the real (non-placeholder) total is in,
   // matching category_viewed on the taxonomy pages.
   const viewedTagRef = useRef<string | null>(null);
   useEffect(() => {
-    if (!tagIsQueryable || listedTotal === undefined || listing.isPlaceholderData) return;
+    if (notFound || listedTotal === undefined || listing.isPlaceholderData) return;
     if (viewedTagRef.current === slug) return;
     viewedTagRef.current = slug;
     trackTagInteraction(slug, "landing_viewed", "tag_page", listedTotal);
-  }, [listedTotal, listing.isPlaceholderData, slug, tagIsQueryable]);
+  }, [listedTotal, listing.isPlaceholderData, notFound, slug]);
 
   const canonicalPath = tagLandingPath(slug);
   if (slug && window.location.pathname !== canonicalPath) {
-    return <Redirect to={`${canonicalPath}${page > 1 ? `?page=${page}` : ""}`} replace />;
+    return <Redirect to={`${canonicalPath}${search ? `?${search}` : ""}`} replace />;
   }
 
-  if (!tagIsQueryable) return <NotFound />;
+  if (notFound) return <NotFound />;
   if (queryUnavailableReason(listing) === "offline") {
     return <OfflinePageState onRetry={() => void listing.refetch()} testId="tag-offline" />;
   }
   // isPending, not isLoading: offline the fetch is paused (isLoading false),
   // which fell through to the no-data 404 below.
-  if (listing.isPending || (activeClamp && listing.isPlaceholderData)) {
+  if (listing.isPending) {
     return (
       <div className="discovery-page space-y-6" aria-busy="true">
         <PageHeaderSkeleton />
@@ -229,11 +229,6 @@ export default function TagLanding() {
           </p>
         )}
       </section>
-      {pageNoticeFor(parsedPage, totalPages) && (
-        <div role="status" data-testid="notice-page-adjusted" className="rounded border p-3 text-sm">
-          {pageNoticeFor(parsedPage, totalPages)}
-        </div>
-      )}
       <p className="text-sm text-muted-foreground" data-testid="text-results-count" data-total={data.total}>
         Showing {(page - 1) * PAGE_SIZE + 1}–{Math.min(page * PAGE_SIZE, data.total)} of {data.total} {resourceNoun(data.total)}
       </p>

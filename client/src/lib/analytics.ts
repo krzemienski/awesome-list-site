@@ -335,16 +335,16 @@ export const trackGenerateLead = (params: Record<string, unknown> = {}) => {
   });
 };
 
-// A visitor landed on a "page not found" surface. Replit Analytics gets the
-// path only (a query string can carry typed search text or tokens), capped in
-// length; GA4 keeps its legacy UA-style params (path + query, after consent).
-export const trackPageNotFound = (pathname: string, search = '') => {
+// A visitor landed on a "page not found" surface. Every tool gets the path
+// only (a query string can carry typed search text or tokens), capped in
+// length; GA4 keeps its legacy UA-style param names.
+export const trackPageNotFound = (pathname: string) => {
   const path = pathname.split(/[?#]/, 1)[0].slice(0, 200) || '/';
   track(
     'page_not_found',
     { page_path: path },
     {
-      ga: { name: 'page_not_found', params: { event_category: 'navigation', event_label: pathname + search } },
+      ga: { name: 'page_not_found', params: { event_category: 'navigation', event_label: path } },
       product: false,
       replit: true,
     },

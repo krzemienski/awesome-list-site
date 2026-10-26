@@ -2504,7 +2504,7 @@ export function ogInjectionMiddleware() {
     // prefixes. An explicit ?page=1 duplicates the param-less canonical → 301
     // (other params preserved); anything the SHARED strict rule
     // (shared/page-param.ts parseUrlPageStrict — the exact verdict the
-    // hydrated client renders as its invalid/clamped-to-1 notice) doesn't
+    // hydrated client renders as the same 404 page) doesn't
     // accept as a canonical page spelling (0, -1, abc, 2.5, 1e3, 007 …) is a
     // real 404, never a silent clamp onto page 1's content.
     // Out-of-range pages 404 inside the resolver, which knows totalPages.

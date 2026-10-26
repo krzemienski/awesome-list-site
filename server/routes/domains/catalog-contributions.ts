@@ -582,13 +582,16 @@ export function registerCatalogContributionsRoutes(
     if (!parsed.success) {
       return res.status(400).json({ message: 'Invalid payload' });
     }
-    const { path, referrer, ts } = parsed.data;
+    const { referrer, ts } = parsed.data;
+    // Query strings can carry search text or tokens, and older clients still
+    // send them: only the path is logged, for the page and the referrer.
+    const path = parsed.data.path.split(/[?#]/, 1)[0] || '/';
     let safeReferrer: string | null = null;
     if (referrer) {
       try {
         const u = new URL(referrer);
         if ((u.protocol === 'https:' || u.protocol === 'http:') && u.host === req.get('host')) {
-          safeReferrer = u.toString();
+          safeReferrer = `${u.origin}${u.pathname}`;
         }
       } catch {
         safeReferrer = null;

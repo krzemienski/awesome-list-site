@@ -27,7 +27,7 @@ interface NotFoundProps {
 export default function NotFound({ suggestion }: NotFoundProps) {
   useMissingRouteTelemetry(true);
   useEffect(() => {
-    trackPageNotFound(window.location.pathname, window.location.search);
+    trackPageNotFound(window.location.pathname);
   }, []);
 
   // min-h-full, not a 100vh calc: <main> already fills whatever the app shell
