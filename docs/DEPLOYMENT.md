@@ -55,7 +55,9 @@ Key runtime facts (verified against the code in this repo):
 Replit is the primary deployment target for this project (`.replit` is
 preconfigured).
 
-- **Build** runs `bash scripts/publish-build.sh`: `npm run build`, then trims
+- **Build** runs `bash scripts/publish-build.sh`: a check that `HEAD` matches
+  GitHub `main` (see [Publishing GitHub `main`](#publishing-github-main)),
+  `npm run build`, then trims
   development-only files from the publish image. It does not boot the app or
   touch the production database. See [RELEASE.md](../RELEASE.md) for the
   release checklist and the production QA identity.
@@ -96,6 +98,15 @@ has the full procedure.
   untracked notes file was committed this way and published as revision
   `634e8afd`, which is not on GitHub. Before you publish, delete untracked files
   you do not want shipped.
+- `scripts/publish-build.sh` fails the build unless the tree of `HEAD` equals
+  the tree of `origin/main`, and prints `git diff --stat origin/main HEAD`. An
+  empty "Published your App" commit passes. A commit that changes files, a
+  workspace behind `origin/main`, or a missing `origin/main` ref fails. The
+  build does not fetch, because the build container may have no GitHub
+  credentials. It compares against the ref from the last sync, so a stale ref
+  can fail the build or pass an older `main` tree, but never pass a tree that
+  was not on `main`. The check covers commits only. Uncommitted files still
+  ship, so `git status` must be clean.
 - `npm run build` stamps the workspace `HEAD` into the bundle, and
   `/api/version` serves it. After a publish, check that
   `https://awesome.video/api/version` returns the commit you meant to ship and

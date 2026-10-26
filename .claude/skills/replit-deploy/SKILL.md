@@ -89,6 +89,8 @@ ssh awesome-replit 'cd ~/workspace; timeout 300 npm run db:push 2>&1'
 ```bash
 ssh awesome-replit 'cd ~/workspace; timeout 900 bash scripts/publish-build.sh 2>&1 | tail -80'
 ```
+The build first fails unless `HEAD`'s tree equals `origin/main`'s, printing the differing files; that failure means step 2 left the workspace off main, so fix the sync and never edit the guard to publish.
+
 Safe in the workspace: the image-trim step runs only when `REPLIT_DEPLOYMENT=1` or `REPLIT_PUBLISH_IMAGE_TRIM=1`, which exist only in production. A build failure here is a stop condition with the log tail as evidence; publishing would fail the same way and cost a deploy.
 
 ### 5. Publish (MCP)
