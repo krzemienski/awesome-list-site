@@ -84,6 +84,8 @@ interface ImportResult {
     totalCategories: number;
   };
   resources: Resource[];
+  /** Taxonomy nodes a dry run would create; always empty for a real import. */
+  wouldCreateTaxonomy: PlannedTaxonomyNode[];
   /** Branch the README was read from; unset if the fetch never succeeded. */
   branch?: string;
 }
@@ -141,14 +143,60 @@ function pickNode<T extends { name: string; slug: string }>(
     ?? rows.find(r => r.name.toLowerCase() === lower);
 }
 
+type HierarchyLevel = 'category' | 'subcategory' | 'sub-subcategory';
+
 /**
  * A hierarchy level that was merged into an existing node with a different
  * spelling. Reported as an import warning so the rename is visible.
  */
 interface HierarchyMerge {
-  level: 'category' | 'subcategory' | 'sub-subcategory';
+  level: HierarchyLevel;
   imported: string;
   existing: string;
+}
+
+/** A taxonomy node a dry-run import would create; `parent` is its path ("Cat > Sub"). */
+interface PlannedTaxonomyNode {
+  level: HierarchyLevel;
+  name: string;
+  slug: string;
+  parent?: string;
+}
+
+/**
+ * IDs (unset for nodes a dry run would create) and canonical names for each
+ * level of one imported heading path.
+ */
+interface HierarchyResolution {
+  categoryId?: number;
+  subcategoryId?: number;
+  subSubcategoryId?: number;
+  category: string;
+  subcategory?: string;
+  subSubcategory?: string;
+  merges: HierarchyMerge[];
+}
+
+// Existing-node lookups shared by the writing and the dry-run resolvers.
+async function findCategoryNode(categoryRepo: CategoryRepository, name: string) {
+  const slug = generateSlug(name);
+  return (await categoryRepo.getCategoryByName(name))
+    ?? (slug ? await categoryRepo.getCategoryBySlug(slug) : undefined)
+    ?? pickNode(await categoryRepo.listCategories(), name, slug);
+}
+
+async function findSubcategoryNode(categoryRepo: CategoryRepository, name: string, parentId: number) {
+  const slug = generateSlug(name);
+  return (await categoryRepo.getSubcategoryByName(name, parentId))
+    ?? (slug ? await categoryRepo.getSubcategoryBySlug(slug, parentId) : undefined)
+    ?? pickNode(await categoryRepo.listSubcategories(parentId), name, slug);
+}
+
+async function findSubSubcategoryNode(categoryRepo: CategoryRepository, name: string, parentId: number) {
+  const slug = generateSlug(name);
+  return (await categoryRepo.getSubSubcategoryByName(name, parentId))
+    ?? (slug ? await categoryRepo.getSubSubcategoryBySlug(slug, parentId) : undefined)
+    ?? pickNode(await categoryRepo.listSubSubcategories(parentId), name, slug);
 }
 
 /**
@@ -164,15 +212,7 @@ async function ensureCategoryHierarchy(
   categoryName: string,
   subcategoryName?: string,
   subSubcategoryName?: string
-): Promise<{
-  categoryId: number;
-  subcategoryId?: number;
-  subSubcategoryId?: number;
-  category: string;
-  subcategory?: string;
-  subSubcategory?: string;
-  merges: HierarchyMerge[];
-}> {
+): Promise<HierarchyResolution> {
   const merges: HierarchyMerge[] = [];
   const noteMerge = (level: HierarchyMerge['level'], imported: string, existing: string) => {
     if (imported !== existing) merges.push({ level, imported, existing });
@@ -180,10 +220,7 @@ async function ensureCategoryHierarchy(
 
   // 1. Ensure category exists
   const categorySlug = generateSlug(categoryName);
-  const findCategory = async () =>
-    (await categoryRepo.getCategoryByName(categoryName))
-    ?? (categorySlug ? await categoryRepo.getCategoryBySlug(categorySlug) : undefined)
-    ?? pickNode(await categoryRepo.listCategories(), categoryName, categorySlug);
+  const findCategory = () => findCategoryNode(categoryRepo, categoryName);
   let category = await findCategory();
   if (!category) {
     try {
@@ -207,10 +244,7 @@ async function ensureCategoryHierarchy(
   if (subcategoryName) {
     const parentId = category.id;
     const subSlug = generateSlug(subcategoryName);
-    const findSubcategory = async () =>
-      (await categoryRepo.getSubcategoryByName(subcategoryName, parentId))
-      ?? (subSlug ? await categoryRepo.getSubcategoryBySlug(subSlug, parentId) : undefined)
-      ?? pickNode(await categoryRepo.listSubcategories(parentId), subcategoryName, subSlug);
+    const findSubcategory = () => findSubcategoryNode(categoryRepo, subcategoryName, parentId);
     subcategory = await findSubcategory();
     if (!subcategory) {
       try {
@@ -236,10 +270,7 @@ async function ensureCategoryHierarchy(
   if (subSubcategoryName && subcategory) {
     const parentId = subcategory.id;
     const subSubSlug = generateSlug(subSubcategoryName);
-    const findSubSubcategory = async () =>
-      (await categoryRepo.getSubSubcategoryByName(subSubcategoryName, parentId))
-      ?? (subSubSlug ? await categoryRepo.getSubSubcategoryBySlug(subSubSlug, parentId) : undefined)
-      ?? pickNode(await categoryRepo.listSubSubcategories(parentId), subSubcategoryName, subSubSlug);
+    const findSubSubcategory = () => findSubSubcategoryNode(categoryRepo, subSubcategoryName, parentId);
     subSubcategory = await findSubSubcategory();
     if (!subSubcategory) {
       try {
@@ -260,6 +291,60 @@ async function ensureCategoryHierarchy(
     noteMerge('sub-subcategory', subSubcategoryName, subSubcategory.name);
   }
 
+  return {
+    categoryId: category.id,
+    subcategoryId: subcategory?.id,
+    subSubcategoryId: subSubcategory?.id,
+    category: category.name,
+    subcategory: subcategory?.name,
+    subSubcategory: subSubcategory?.name,
+    merges,
+  };
+}
+
+/**
+ * Dry-run counterpart of ensureCategoryHierarchy: resolves each level against
+ * existing rows read-only and never writes. A missing level (and every level
+ * under it) is appended to `plan`, and later headings resolve against those
+ * planned nodes the way a real import resolves against rows it just inserted,
+ * so a dry run reports the same canonical names, merges and creations.
+ */
+async function planCategoryHierarchy(
+  categoryRepo: CategoryRepository,
+  plan: PlannedTaxonomyNode[],
+  categoryName: string,
+  subcategoryName?: string,
+  subSubcategoryName?: string
+): Promise<HierarchyResolution> {
+  const steps: {
+    level: HierarchyLevel;
+    name: string | undefined;
+    find: (name: string, parentId?: number) => Promise<{ id: number; name: string } | undefined>;
+  }[] = [
+    { level: 'category', name: categoryName, find: (name) => findCategoryNode(categoryRepo, name) },
+    { level: 'subcategory', name: subcategoryName, find: (name, parentId) => findSubcategoryNode(categoryRepo, name, parentId!) },
+    { level: 'sub-subcategory', name: subSubcategoryName, find: (name, parentId) => findSubSubcategoryNode(categoryRepo, name, parentId!) },
+  ];
+  const merges: HierarchyMerge[] = [];
+  const resolved: { id?: number; name: string }[] = [];
+  for (const [depth, step] of steps.entries()) {
+    if (!step.name) break;
+    const parent = resolved[depth - 1];
+    const parentPath = resolved.map(n => n.name).join(' > ') || undefined;
+    // A planned parent has no row yet, so nothing can exist under it.
+    const existing = depth > 0 && parent.id === undefined ? undefined : await step.find(step.name, parent?.id);
+    const slug = generateSlug(step.name);
+    let node: { name: string } | undefined = existing
+      ?? pickNode(plan.filter(p => p.level === step.level && p.parent === parentPath), step.name, slug);
+    if (!node) {
+      const planned: PlannedTaxonomyNode = { level: step.level, name: step.name, slug, parent: parentPath };
+      plan.push(planned);
+      node = planned;
+    }
+    if (node.name !== step.name) merges.push({ level: step.level, imported: step.name, existing: node.name });
+    resolved.push({ id: existing?.id, name: node.name });
+  }
+  const [category, subcategory, subSubcategory] = resolved;
   return {
     categoryId: category.id,
     subcategoryId: subcategory?.id,
@@ -316,7 +401,8 @@ export class GitHubSyncService {
         totalResources: 0,
         totalCategories: 0
       },
-      resources: []
+      resources: [],
+      wouldCreateTaxonomy: []
     };
     logger.info('Import started', { repo: repoUrl, dryRun: !!options.dryRun });
 
@@ -414,8 +500,9 @@ export class GitHubSyncService {
       
       logger.info(`Found ${uniqueHierarchies.size} unique category hierarchies`);
       
-      // Create all category hierarchies
-      const hierarchyIds = new Map<string, Awaited<ReturnType<typeof ensureCategoryHierarchy>>>();
+      // Create all category hierarchies (a dry run only plans them)
+      const hierarchyIds = new Map<string, HierarchyResolution>();
+      const plannedTaxonomy: PlannedTaxonomyNode[] = [];
       // Hierarchies that could not be resolved. Items under them are refused
       // in STEP 4 (one item error each) instead of being written with
       // category text that names no taxonomy row (orphan resources desync
@@ -423,12 +510,20 @@ export class GitHubSyncService {
       const failedHierarchies = new Map<string, string>();
       for (const [key, hierarchy] of Array.from(uniqueHierarchies.entries())) {
         try {
-          const ids = await ensureCategoryHierarchy(
-            this.categoryRepo,
-            hierarchy.category,
-            hierarchy.subcategory,
-            hierarchy.subSubcategory
-          );
+          const ids = options.dryRun
+            ? await planCategoryHierarchy(
+              this.categoryRepo,
+              plannedTaxonomy,
+              hierarchy.category,
+              hierarchy.subcategory,
+              hierarchy.subSubcategory
+            )
+            : await ensureCategoryHierarchy(
+              this.categoryRepo,
+              hierarchy.category,
+              hierarchy.subcategory,
+              hierarchy.subSubcategory
+            );
           hierarchyIds.set(key, ids);
           for (const m of ids.merges) {
             const note = `Imported ${m.level} "${m.imported}" merged into existing ${m.level} "${m.existing}" (same slug or name)`;
@@ -442,6 +537,11 @@ export class GitHubSyncService {
         }
       }
       
+      result.wouldCreateTaxonomy = plannedTaxonomy;
+      for (const node of result.wouldCreateTaxonomy) {
+        result.warnings.push(`Would create ${node.level} "${node.name}"${node.parent ? ` under "${node.parent}"` : ''}`);
+      }
+
       logger.info('Category hierarchy setup complete');
       
       // STEP 4: Process each resource

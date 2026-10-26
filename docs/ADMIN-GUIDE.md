@@ -191,7 +191,9 @@ Import resources from any awesome-list repository.
    https://raw.githubusercontent.com/user/repo/main/README.md
    ```
 3. Options:
-   - **Dry Run**: Preview without importing
+   - **Dry Run**: Preview without writing anything. Resources, categories and
+     subcategories are only counted; headings with no matching taxonomy node
+     come back as "Would create …" warnings instead of being added.
    - **Strict Mode**: Fail on validation errors
 4. Click Import
 5. Review results:
