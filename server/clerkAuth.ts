@@ -265,10 +265,13 @@ function adminSessionSignature(expiresAt: number, password: string): string {
 }
 
 /** Returns a fresh cookie value, or null when password login is disabled. */
-export function issueAdminSessionToken(now = Date.now()): string | null {
+export async function issueAdminSessionToken(): Promise<string | null> {
   const password = adminLoginPassword();
   if (!password) return null;
-  const expiresAt = now + ADMIN_SESSION_TTL_MS;
+  // Revocation rejects cookies issued at or before sessionsRevokedAt, so a
+  // sign-in in the same millisecond as a sign-out must be dated after it.
+  const revokedAt = (await resolveBypassAdmin())?.sessionsRevokedAt?.getTime() ?? 0;
+  const expiresAt = Math.max(Date.now(), revokedAt + 1) + ADMIN_SESSION_TTL_MS;
   return `${expiresAt}.${adminSessionSignature(expiresAt, password)}`;
 }
 
@@ -312,8 +315,10 @@ function isRevokedAdminSession(req: Request, admin: User): boolean {
 }
 
 /**
- * "Sign out all devices" for the owner: every owner cookie issued until now
- * stops working. Returns false when the request is not an owner session.
+ * Ends the owner session on the server: every owner cookie issued until now
+ * stops working, including copies of the request's own cookie. The cookie
+ * carries no per-device id, so sign-out and "sign out all devices" both end
+ * every owner session. Returns false when the request is not an owner session.
  */
 export async function revokeAdminSessions(req: Request): Promise<boolean> {
   if (adminSessionIssuedAt(req) === null || !req.dbUser) return false;
@@ -356,7 +361,7 @@ export const clerkUserContext: RequestHandler = asyncHandler(async function cler
     try {
       const auditAdmin = await resolveBypassAdmin();
       if (auditAdmin && !viaAuditKey && isRevokedAdminSession(req, auditAdmin)) {
-        // Signed out everywhere after this cookie was issued: anonymous, and
+        // The owner signed out after this cookie was issued: anonymous, and
         // drop the dead cookie so later requests take the normal path.
         res.clearCookie(ADMIN_SESSION_COOKIE, adminCookieOptions);
       } else if (auditAdmin) {

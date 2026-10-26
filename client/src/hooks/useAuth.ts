@@ -87,8 +87,8 @@ function logoutRequestSignal(): AbortSignal {
  * Every sign-out path (account menu and the /logout route) runs this.
  */
 export async function signOutAndVerify(): Promise<void> {
-  // Clear the owner password cookie too (no-op for Clerk-only sessions),
-  // or the server would still see the admin after Clerk signs out.
+  // End the owner password session too (no-op for Clerk-only sessions), or
+  // the server would still see the admin after Clerk signs out.
   await fetch('/api/auth/admin-logout', {
     method: 'POST',
     credentials: 'include',
