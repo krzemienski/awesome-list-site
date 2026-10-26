@@ -300,6 +300,24 @@
   display: inline-flex;
 }
 
+/* A fine hovering pointer above 1024px reads the reason from the title
+   tooltip; touch and narrow layouts show it under the actions. */
+.admin-taxonomy-delete-reason {
+  display: none;
+  margin-top: 0.25rem;
+  color: var(--text-3);
+  font-size: 0.6875rem;
+  line-height: 1.3;
+  text-align: end;
+  white-space: nowrap;
+}
+
+@media (hover: none), (pointer: coarse), (max-width: 64rem) {
+  .admin-taxonomy-delete-reason {
+    display: block;
+  }
+}
+
 .admin-taxonomy-pagination {
   margin-inline: 1.375rem;
   padding-bottom: 1rem;

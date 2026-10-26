@@ -2888,6 +2888,7 @@ export default function GenericCrudManager<T extends BaseEntityWithCount>({
                               {item.resourceCount}
                             </Badge>
                           ) : col.key === "actions" ? (
+                            <>
                             <div className="admin-taxonomy-row-actions flex items-center justify-end gap-2">
                               <Button
                                 ref={(el) => {
@@ -2932,6 +2933,22 @@ export default function GenericCrudManager<T extends BaseEntityWithCount>({
                                 );
                               })()}
                             </div>
+                            {/* AC-05: touch has no tooltip, so the title above
+                                never showed. The button's aria-label already
+                                carries the reason, so this copy is visual only. */}
+                            {(() => {
+                              const blocker = getDeleteBlocker(item);
+                              return blocker ? (
+                                <p
+                                  className="admin-taxonomy-delete-reason"
+                                  aria-hidden="true"
+                                  data-testid={`text-delete-blocked-${item.id}`}
+                                >
+                                  Delete locked: {blocker.reason}
+                                </p>
+                              ) : null;
+                            })()}
+                            </>
                           ) : (
                             item[col.key]
                           )
