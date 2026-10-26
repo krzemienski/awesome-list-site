@@ -668,7 +668,7 @@ export default function LinkHealthDashboard() {
                           href={check.url}
                           target="_blank"
                           rel="noopener noreferrer"
-                          className={`block truncate font-mono text-xs hover:underline ${INFO_TEXT_CLASS}`}
+                          className={`block truncate font-mono text-xs leading-7 hover:underline ${INFO_TEXT_CLASS}`}
                           title={check.url}
                         >
                           {check.url}
@@ -804,16 +804,14 @@ export default function LinkHealthDashboard() {
                         {check.resource?.category ?? '-'}
                       </TableCell>
                       <TableCell className="text-sm font-mono max-w-md">
-                        <div className="truncate">
-                          <a
-                            href={check.url}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className={`hover:underline ${INFO_TEXT_CLASS}`}
-                          >
-                            {check.url}
-                          </a>
-                        </div>
+                        <a
+                          href={check.url}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className={`block truncate leading-7 hover:underline ${INFO_TEXT_CLASS}`}
+                        >
+                          {check.url}
+                        </a>
                         {/* Suspicion detail (why the heuristic fired) or fetch error */}
                         {check.errorMessage && (
                           <div className="text-xs text-muted-foreground truncate" title={check.errorMessage}>

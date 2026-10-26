@@ -363,7 +363,7 @@ export default function UsersTab() {
                           variant="ghost"
                           size="icon"
                           onClick={() => toggleReveal(user.id)}
-                          className="inline-flex h-8 w-8 shrink-0 items-center justify-center min-h-[32px] min-w-[32px] text-muted-foreground/70 hover:bg-transparent hover:text-foreground transition-colors"
+                          className="shrink-0 text-muted-foreground/70 hover:bg-transparent hover:text-foreground transition-colors"
                           aria-label={`${revealedIds.has(user.id) ? "Mask" : "Reveal"} email for ${
                             `${user.firstName || ''} ${user.lastName || ''}`.trim() || maskEmail(user.email)
                           }`}
