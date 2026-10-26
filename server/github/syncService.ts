@@ -71,6 +71,7 @@ interface ImportResult {
   updated: number;
   skipped: number;
   errors: string[];
+  /** Notes about the import plan (taxonomy merges, repeat listings, concurrent writes); lint findings live in validationErrors. */
   warnings: string[];
   validationPassed: boolean;
   validationErrors: Array<{
@@ -593,12 +594,7 @@ export class GitHubSyncService {
           severity: 'warning' as const
         }))
       ];
-      
-      // Add warnings to result
-      result.warnings = validationResult.warnings.map(w => 
-        `Line ${w.line}: [${w.rule}] ${w.message}`
-      );
-      
+
       // Log validation results
       logger.info(`Validation: ${validationResult.valid ? '✓ PASSED' : '✗ FAILED'}`);
       logger.info(`  - Lines: ${validationResult.stats.totalLines}`);
@@ -698,9 +694,6 @@ export class GitHubSyncService {
       }
       
       result.wouldCreateTaxonomy = plannedTaxonomy;
-      for (const node of result.wouldCreateTaxonomy) {
-        result.warnings.push(`Would create ${node.level} "${node.name}"${node.parent ? ` under "${node.parent}"` : ''}`);
-      }
 
       logger.info('Category hierarchy setup complete');
       

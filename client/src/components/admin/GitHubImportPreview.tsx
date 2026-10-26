@@ -12,9 +12,20 @@ interface ImportPlan {
   updated: number;
   skipped: number;
   errors: string[];
+  /** Notes about the plan itself: taxonomy merges, repeat listings. */
   warnings: string[];
+  /** awesome-lint findings on the README, as "Line n: [rule] message". */
+  lintWarnings: string[];
   wouldCreateTaxonomy: { level: TaxonomyLevel; name: string; parent?: string }[];
 }
+
+interface LintFinding { line: number; rule: string; message: string }
+
+const isLintFinding = (value: unknown): value is LintFinding => {
+  if (typeof value !== "object" || value === null) return false;
+  const v = value as Record<string, unknown>;
+  return typeof v.line === "number" && typeof v.rule === "string" && typeof v.message === "string";
+};
 
 /**
  * One dry run of one repository. A run that stopped before planning (repo
@@ -36,8 +47,12 @@ function parseDryRun(body: unknown): { plan: ImportPlan; runError: string | null
   const counts = [b.imported, b.updated, b.skipped];
   if (!counts.every((n) => typeof n === "number")) return null;
   if (!isStringArray(b.errors) || !isStringArray(b.warnings) || !Array.isArray(b.wouldCreateTaxonomy)) return null;
+  const lint = Array.isArray(b.validationWarnings) ? b.validationWarnings.filter(isLintFinding) : [];
   return {
-    plan: b as unknown as ImportPlan,
+    plan: {
+      ...(b as unknown as ImportPlan),
+      lintWarnings: lint.map((w) => `Line ${w.line}: [${w.rule}] ${w.message}`),
+    },
     runError: typeof b.runError === "string" && b.runError ? b.runError : null,
   };
 }
@@ -96,8 +111,8 @@ export type ImportPreviewState = ReturnType<typeof useImportPreview>;
 function PlanList({ label, items }: { label: string; items: string[] }) {
   return (
     <details className="github-import-preview__details">
-      <summary>{label} ({items.length})</summary>
-      <ul className="github-import-preview__list" tabIndex={0} aria-label={`${label}, ${items.length}, scrollable`}>
+      <summary>{label} ({items.length.toLocaleString()})</summary>
+      <ul className="github-import-preview__list" tabIndex={0} aria-label={`${label}, ${items.length.toLocaleString()}, scrollable`}>
         {items.map((item, i) => <li key={i}>{item}</li>)}
       </ul>
     </details>
@@ -125,7 +140,8 @@ function PlanBody({ plan }: { plan: ImportPlan }) {
         />
       )}
       {plan.errors.length > 0 && <PlanList label="Items that would fail" items={plan.errors} />}
-      {plan.warnings.length > 0 && <PlanList label="Warnings" items={plan.warnings} />}
+      {plan.warnings.length > 0 && <PlanList label="Import warnings" items={plan.warnings} />}
+      {plan.lintWarnings.length > 0 && <PlanList label="README formatting warnings (awesome-lint)" items={plan.lintWarnings} />}
     </>
   );
 }
