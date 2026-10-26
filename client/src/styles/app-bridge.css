@@ -102,6 +102,20 @@ body { font-feature-settings: "ss01", "cv11"; }
   transition: none !important;
 }
 
+/* The canonical card hover paints (lift, border, fill, glow) are not gated
+   by pointer type, and a touch browser keeps :hover on the last tapped card.
+   Without a hovering pointer the card keeps its resting paint. */
+@media not all and (hover: hover) and (pointer: fine) {
+  .card.hoverable:hover,
+  .card.glow:hover {
+    transform: none;
+    border-color: var(--border);
+    background: var(--surface);
+    box-shadow: none;
+  }
+  [data-system="geist"] .card.hoverable:hover { box-shadow: none; }
+}
+
 /* ============== SIDEBAR / RAIL (shadcn + Radix bridge) ============== */
 .accordion-header { min-height: 44px; }
 .accordion-header .truncate {

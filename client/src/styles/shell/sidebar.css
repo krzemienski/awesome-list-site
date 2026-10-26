@@ -54,11 +54,33 @@
   border-color: transparent;
 }
 
-.av-sidebar-drawer .av-sidebar-all-category:hover::before,
-.av-sidebar-drawer .av-sidebar-leaf:hover::before,
-.av-sidebar-drawer .av-sidebar-l2-row:hover::before {
-  background: var(--surface);
-  border-color: var(--border);
+@media (hover: hover) and (pointer: fine) {
+  .av-sidebar-drawer .av-sidebar-all-category:hover::before,
+  .av-sidebar-drawer .av-sidebar-leaf:hover::before,
+  .av-sidebar-drawer .av-sidebar-l2-row:hover::before {
+    background: var(--surface);
+    border-color: var(--border);
+  }
+}
+
+/* The canonical .sub-item and .accordion-header hovers (design-system.css,
+   never edited) are not gated, and a touch browser keeps :hover on the last
+   tapped row. Without a hovering pointer those rows keep their resting paint. */
+@media not all and (hover: hover) and (pointer: fine) {
+  .av-sidebar-shell .sub-item:hover,
+  .av-sidebar-drawer .sub-item:hover {
+    border-color: transparent;
+    transform: none;
+  }
+  .av-sidebar-shell .sub-item:not([data-active="true"]):hover,
+  .av-sidebar-drawer .sub-item:not([data-active="true"]):hover {
+    background: transparent;
+    color: var(--text-2);
+  }
+  .av-sidebar-shell .accordion-header:not(.active):hover,
+  .av-sidebar-drawer .accordion-header:not(.active):hover {
+    background: transparent;
+  }
 }
 
 .av-sidebar-drawer .av-sidebar-leaf[data-active="true"]::before,
