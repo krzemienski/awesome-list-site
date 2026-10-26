@@ -41,7 +41,20 @@ import {
   resourceProviderSchema,
   resourceSkillLevelSchema,
 } from "@shared/resourceFacets";
-import { and, eq, desc, asc, or, sql, inArray } from "drizzle-orm";
+import { and, eq, ne, desc, asc, or, sql, inArray } from "drizzle-orm";
+
+/** A resolved edit suggestion as the admin edit history lists it. */
+export interface ResolvedResourceEdit {
+  id: number;
+  resourceId: number;
+  status: ResourceEdit["status"];
+  fields: string[];
+  rejectionReason: string | null;
+  createdAt: Date;
+  resolvedAt: Date;
+  submittedByEmail: string | null;
+  resourceTitle: string | null;
+}
 import { invalidatePublicCache } from "../cache/publicCache";
 
 export type ContributorLifecycleStatus =
@@ -583,6 +596,39 @@ export class AuditRepository {
     return rows.map((row) => ({
       ...row.edit,
       submittedByEmail: row.submittedByEmail ?? null,
+    }));
+  }
+
+  /**
+   * Get the most recently resolved (approved, rejected, withdrawn or
+   * superseded) edit suggestions, newest first, for the admin edit history.
+   * @param limit - Maximum rows to return
+   */
+  async getRecentResolvedResourceEdits(limit: number): Promise<ResolvedResourceEdit[]> {
+    const rows = await db
+      .select({
+        id: resourceEdits.id,
+        resourceId: resourceEdits.resourceId,
+        status: resourceEdits.status,
+        proposedChanges: resourceEdits.proposedChanges,
+        rejectionReason: resourceEdits.rejectionReason,
+        createdAt: resourceEdits.createdAt,
+        resolvedAt: resourceEdits.updatedAt,
+        submittedByEmail: users.email,
+        resourceTitle: resources.title,
+      })
+      .from(resourceEdits)
+      .leftJoin(users, eq(resourceEdits.submittedBy, users.id))
+      .leftJoin(resources, eq(resourceEdits.resourceId, resources.id))
+      .where(ne(resourceEdits.status, 'pending'))
+      .orderBy(desc(resourceEdits.updatedAt), desc(resourceEdits.id))
+      .limit(limit);
+
+    return rows.map(({ proposedChanges, submittedByEmail, resourceTitle, ...edit }) => ({
+      ...edit,
+      fields: Object.keys(proposedChanges ?? {}),
+      submittedByEmail: submittedByEmail ?? null,
+      resourceTitle: resourceTitle ?? null,
     }));
   }
 

@@ -29,6 +29,7 @@
  *   - GET    /api/admin/resources
  *   - POST   /api/admin/resources
  *   - GET    /api/admin/resource-edits
+ *   - GET    /api/admin/resource-edits/recent
  *   - POST   /api/admin/resource-edits/:id/approve
  *   - POST   /api/admin/resource-edits/:id/reject
  *   - POST   /api/claude/analyze
@@ -91,7 +92,9 @@ const logger = createLogger("admin");
 // Every value resources.status can hold (shared/schema.ts resources.status).
 const ADMIN_RESOURCE_STATUSES = ['approved', 'pending', 'rejected', 'withdrawn', 'archived'];
 
-const REJECTION_REASON_MESSAGE = 'Rejection reason is required (minimum 10 characters)';
+const RECENT_RESOLVED_EDITS_LIMIT = 10;
+
+const REJECTION_REASON_MESSAGE ='Rejection reason is required (minimum 10 characters)';
 const resourceRejectionSchema = z.object({
   reason: z.string({ error: REJECTION_REASON_MESSAGE }).trim().min(10, REJECTION_REASON_MESSAGE).max(5000),
 });
@@ -1174,6 +1177,17 @@ export function registerAdminContentRoutes(
     }
   }));
   
+  // GET /api/admin/resource-edits/recent - The most recently resolved edits,
+  // so the Edits tab's "Pending and recent edits" history shows outcomes.
+  app.get('/api/admin/resource-edits/recent', isAuthenticated, isAdmin, asyncHandler(async (_req, res) => {
+    try {
+      res.json(await auditRepo.getRecentResolvedResourceEdits(RECENT_RESOLVED_EDITS_LIMIT));
+    } catch (error) {
+      logger.error('Error fetching recent resolved edits:', error);
+      res.status(500).json({ message: 'Failed to fetch recent edits' });
+    }
+  }));
+
   // POST /api/admin/resource-edits/:id/approve - Approve an edit (admin only)
   app.post('/api/admin/resource-edits/:id/approve', isAuthenticated, isAdmin, asyncHandler(async (req: any, res) => {
     try {

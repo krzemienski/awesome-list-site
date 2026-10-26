@@ -6,6 +6,7 @@ import { formatAdminDateTime, formatRelativeAgo, maskEmail } from "@/lib/utils";
 import { useToast } from "@/hooks/use-toast";
 import { queryUnavailableReason } from "@/lib/query-availability";
 import { AdminLoadError } from "@/components/admin/AdminLoadError";
+import { RecentResourceEdits } from "@/components/admin/RecentResourceEdits";
 import { handoffFocusOnUnmount } from "@/hooks/focus-handoff";
 import { useHorizontalScrollCue } from "@/hooks/use-horizontal-scroll-cue";
 import { Button } from "@/components/ui/button";
@@ -374,6 +375,7 @@ export default function PendingEdits() {
               ? "You're offline — couldn't check for new edits."
               : ''}
         </span>
+        <RecentResourceEdits />
       </section>
     );
   }
@@ -532,6 +534,7 @@ export default function PendingEdits() {
             </p>
           )}
         </div>
+        <RecentResourceEdits />
       </section>
 
       {/* View Details Dialog */}

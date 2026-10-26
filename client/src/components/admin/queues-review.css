@@ -143,6 +143,20 @@
 .queue-review-col-submitter { inline-size: 11rem; }
 .queue-review-col-when { inline-size: 6.5rem; }
 .queue-review-col-actions { inline-size: 16.5rem; }
+.queue-review-col-outcome { inline-size: 12rem; }
+
+/* The resolved-edits history sits under the pending queue in the same panel. */
+.queue-review-recent-heading {
+  border-block-start: var(--hairline-w) solid var(--border);
+  min-height: 0;
+}
+
+.queue-review-recent-heading h3 {
+  color: var(--text);
+  font-size: 13px;
+  font-weight: 600;
+  line-height: 1.6;
+}
 
 .queue-review-shell .admin-table-wrap .table .queue-review-select-cell {
   padding-inline-end: 0.25rem;
