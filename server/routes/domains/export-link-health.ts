@@ -70,6 +70,7 @@ import {
 } from "@shared/resourceKinds";
 import { taxonomyScopeIntro } from "@shared/seo-content-templates";
 import { normalizeGithubRepoInput } from "@shared/validation";
+import { describeTaxonomyPlan } from "@shared/github-import";
 import { db, runInTransaction } from "../../db";
 import { fetchAwesomeLists, searchAwesomeLists } from "../../github-api";
 import { syncService } from "../../github/syncService";
@@ -1321,10 +1322,7 @@ export function registerExportLinkHealthRoutes(
       const outcome = result.errors.length === 0
         ? 'completed'
         : result.imported > 0 || result.updated > 0 ? 'partial' : 'failed';
-      const taxonomyPlan = (['category', 'subcategory', 'sub-subcategory'] as const)
-        .map(level => [level, result.wouldCreateTaxonomy.filter(n => n.level === level).length] as const)
-        .filter(([, count]) => count > 0)
-        .map(([level, count]) => `${count} ${count === 1 ? level : level.replace(/y$/, 'ies')}`);
+      const taxonomyPlan = describeTaxonomyPlan(result.wouldCreateTaxonomy);
       res.status(outcome === 'failed' ? 422 : 200).json({
         success: outcome === 'completed',
         outcome,
@@ -1340,9 +1338,14 @@ export function registerExportLinkHealthRoutes(
         validationWarnings: result.validationErrors.filter(e => e.severity === 'warning'),
         dryRun: Boolean(dryRun),
         wouldCreateTaxonomy: result.wouldCreateTaxonomy,
+        // Set when the run stopped before it could plan every item (the
+        // README could not be read or parsed); the counts are then not a plan.
+        runError: result.runError ?? null,
         // A dry run writes nothing, so its counts are what an import would do.
-        message: dryRun
-          ? `Dry run of ${repoUrl}: an import would add ${result.imported} and update ${result.updated} resources${result.errors.length ? ` (${result.errors.length} would fail)` : ''}${taxonomyPlan.length ? ` and create ${taxonomyPlan.join(', ')}` : ''}. Nothing was written.`
+        message: dryRun && result.runError
+          ? `Dry run of ${repoUrl} stopped before planning: ${result.runError}. Nothing was written.`
+          : dryRun
+          ? `Dry run of ${repoUrl}: an import would add ${result.imported} and update ${result.updated} resources${result.errors.length ? ` (${result.errors.length} would fail)` : ''}${taxonomyPlan ? ` and create ${taxonomyPlan}` : ''}. Nothing was written.`
           : outcome === 'completed'
             ? `Imported ${result.imported} and updated ${result.updated} resources from ${repoUrl}`
             : `${outcome === 'partial' ? 'Partial import' : 'Import failed'} from ${repoUrl}: ${result.imported} imported, ${result.updated} updated, ${result.errors.length} failed`

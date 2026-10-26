@@ -89,6 +89,8 @@ interface ImportResult {
   wouldCreateTaxonomy: PlannedTaxonomyNode[];
   /** Branch the README was read from; unset if the fetch never succeeded. */
   branch?: string;
+  /** Why the whole run stopped (unreadable repo or README), as opposed to per-item errors. */
+  runError?: string;
 }
 
 interface ExportResult {
@@ -809,8 +811,10 @@ export class GitHubSyncService {
       }
 
     } catch (error: any) {
-      const errorMsg = `Import failed: ${error.message}`;
+      const reason = error instanceof Error ? error.message : String(error);
+      const errorMsg = `Import failed: ${reason}`;
       result.errors.push(errorMsg);
+      result.runError = reason;
       logger.error('Import failed', { repo: repoUrl, reason: error.message }, error);
       
       // Log failed import
