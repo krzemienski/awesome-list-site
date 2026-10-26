@@ -303,8 +303,11 @@
 .search-palette-close {
   display: inline-flex;
   flex-shrink: 0;
+  min-width: 24px;
+  min-height: 24px;
   margin-left: 12px;
   align-items: center;
+  justify-content: center;
   gap: 5px;
   border: 0;
   background: transparent;
@@ -319,4 +322,20 @@
 .search-palette-close svg {
   width: 14px;
   height: 14px;
+}
+
+/* Touch widths: the esc chip keeps its size, centred in a 44px target whose
+   extra height overflows the input wrapper's padding instead of growing it.
+   One-line rows (View all, recent searches) reach the same floor. */
+@media (max-width: 1024px) {
+  .search-palette-close {
+    min-width: 44px;
+    min-height: 44px;
+    margin-block: -10px;
+  }
+
+  .search-palette-row {
+    min-height: 44px;
+    align-content: center;
+  }
 }
