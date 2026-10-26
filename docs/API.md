@@ -290,7 +290,7 @@ unknown kind is `400 invalid_kind` with the allowed values.
 | POST/DELETE | `/api/collections/:collectionId/items/:resourceId` | Manage collection membership |
 | POST/DELETE | `/api/collections/:collectionId/publish` | Publish or unpublish a collection |
 | PATCH/POST | `/api/bookmarks/:resourceId/state`, `/api/bookmarks/bulk` | Bookmark queue/bulk actions |
-| GET/PUT | `/api/notification-preferences` | Reminder/digest preferences |
+| GET/PUT/PATCH | `/api/notification-preferences` | Reminder/digest preferences (PUT saves the whole form; PATCH changes only the fields sent) |
 | GET/PATCH/POST | `/api/notifications`, `/api/notifications/:id/read`, `/api/notifications/read-all` | Notification inbox |
 | GET | `/api/digests/preview` | Preview the caller's next digest |
 | GET | `/api/user/progress` | Learning progress |
