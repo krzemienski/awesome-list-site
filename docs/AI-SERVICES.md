@@ -371,7 +371,9 @@ finish even a two-discovery run). On production (2026-10-26, same models
 through `router.hack.ski`), a target-2 run on the defaults saved two
 discoveries in 9 turns for $1.32 (job 64). A $0.30 cap ended
 `budget_stopped`, and a cancel reported $0.28 as a lower bound. Enrichment
-records no cost, so its spend is visible only at the router.
+jobs store their estimated cost in `metadata.agent.estimatedCostUsd`, which
+the admin enrichment panel shows: 30 resources on haiku cost $0.21 (job 33),
+and 10 resources cost $0.04 (job 34).
 
 ### SDK versions (October 2026)
 

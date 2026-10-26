@@ -4,11 +4,7 @@ This audit proves pieces A–D of the October improvement waves on the live site
 
 Every check drove the real site in a browser at 1440×900, 820×1180 (touch) and 390×844 (touch), with single `curl` requests for API reads. No test scripts, suites or gates were written or run. Every defect found went through the same loop: root cause, a fix authored by a separate agent, review, merge to `main`, republish from the Replit workspace, and a re-check on production.
 
-The detailed record is in `reports/prod-validation-2026-10-26/`:
-- `PROGRESS.md` covers each cycle, deploy and row this run created.
-- `ORIGINAL-PROMPT-CHECKLIST.md` has the status of every requirement.
-- `RESEARCH.md` covers the researcher runs.
-- `evidence/` holds the HARs, request bodies, snapshots and counts.
+The run's working record (progress log, per-requirement checklist, researcher notes, HARs, request bodies, snapshots and counts) stays outside the repository, because the admin HARs carry session cookies. This document gives the results it supports, and the PRs carry the code evidence.
 
 ## Deploys and cycles
 

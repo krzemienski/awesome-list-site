@@ -78,10 +78,14 @@ databases. An external PostgreSQL provider also works.
 Replit is the only production target. Vercel and GitHub Pages are not used,
 and their configuration has been removed.
 
-Publish snapshots the files in the Replit workspace, not GitHub. Before each
-publish, bring the workspace to `origin/main` with a fast-forward, and confirm
-that `git status` is clean and `HEAD` equals `origin/main`. The project skill
-`.claude/skills/replit-deploy/SKILL.md` has the full procedure.
+Publish snapshots the files in the Replit workspace, not GitHub. That includes
+git-ignored files, so never keep secret-bearing files such as `.env` in the
+workspace; secrets belong in Replit **Secrets**. Before each publish, bring the
+workspace to `origin/main` with a fast-forward, and confirm that `git status` is
+clean and `HEAD` equals `origin/main`. Repeat that check immediately before you
+click Publish, and do not publish while Replit Agent or any other writer is
+editing the workspace. The project skill `.claude/skills/replit-deploy/SKILL.md`
+has the full procedure.
 
 - Each publish adds an empty "Published your App" commit (author Replit Agent)
   on top of the published commit. It changes no files. When Replit pushes it to
@@ -95,10 +99,15 @@ that `git status` is clean and `HEAD` equals `origin/main`. The project skill
 - `npm run build` stamps the workspace `HEAD` into the bundle, and
   `/api/version` serves it. After a publish, check that
   `https://awesome.video/api/version` returns the commit you meant to ship and
-  that `/api/health/ready` returns 200.
-- `npm install` and `npm run db:push` are needed only when `package.json`,
-  `package-lock.json`, `shared/schema.ts` or `migrations/` changed since the
-  last publish. Check with
+  that `/api/health/ready` returns 200. Then check one behaviour that only the
+  new release has, because a cutover can briefly serve the previous build.
+- Run `npm install` in the workspace only when `package.json` or
+  `package-lock.json` changed since the last publish. Run `npm run db:push`
+  only when `shared/schema.ts` changed, and only against the workspace's
+  development database: at publish, Replit applies the development-to-production
+  schema diff after a review. Never point `db:push` at production. Changes
+  under `migrations/` need neither, because the boot migrator applies the
+  journal on start. Check with
   `git diff --stat <live revision> origin/main -- package.json package-lock.json shared/schema.ts migrations`.
 
 ## Docker / Self-Hosting
