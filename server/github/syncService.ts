@@ -48,6 +48,7 @@ import { Resource, InsertResource, GithubSyncQueue } from "@shared/schema";
 import { getGitHubClient } from "./replitConnection";
 import { validateAwesomeList } from "../validation/awesomeLint";
 import { createLogger } from "../lib/logger";
+import { describeDbError, isUniqueViolation } from "../errors/pgErrors";
 
 const logger = createLogger("github-sync");
 
@@ -133,12 +134,14 @@ function toCatalogEntry(resource: Resource): CatalogEntry {
  */
 class ImportCatalog {
   private entries: CatalogEntry[];
+  private byExactUrl = new Map<string, Resource>();
   private byUrl = new Map<string, Resource>();
   private byTitleDomain = new Map<string, Resource>();
 
   constructor(resources: Resource[]) {
     this.entries = resources.map(toCatalogEntry);
     for (const entry of this.entries) {
+      if (!this.byExactUrl.has(entry.resource.url)) this.byExactUrl.set(entry.resource.url, entry.resource);
       if (!this.byUrl.has(entry.urlKey)) this.byUrl.set(entry.urlKey, entry.resource);
       if (entry.titleDomainKey && !this.byTitleDomain.has(entry.titleDomainKey)) {
         this.byTitleDomain.set(entry.titleDomainKey, entry.resource);
@@ -146,8 +149,14 @@ class ImportCatalog {
     }
   }
 
+  /**
+   * The row stored under exactly this URL wins over a row that only
+   * normalizes to it. The catalog can hold both forms (`https://ffmpeg.org`
+   * and `https://ffmpeg.org/`); matching the other form made the update
+   * write this URL onto it, which `resources_url_unique` rejects (AI-18).
+   */
   findByUrl(url: string): Resource | undefined {
-    return this.byUrl.get(normalizeUrlForDedup(url));
+    return this.byExactUrl.get(url) ?? this.byUrl.get(normalizeUrlForDedup(url));
   }
 
   findByTitleDomain(title: string, url: string): Resource | undefined {
@@ -167,6 +176,9 @@ class ImportCatalog {
     const previous = index >= 0 ? this.entries[index] : undefined;
     if (previous) this.entries[index] = next;
     else this.entries.unshift(next);
+    for (const key of new Set([previous?.resource.url, next.resource.url])) {
+      if (key !== undefined) this.resolve(this.byExactUrl, key, e => e.resource.url);
+    }
     for (const key of new Set([previous?.urlKey, next.urlKey])) {
       if (key !== undefined) this.resolve(this.byUrl, key, e => e.urlKey);
     }
@@ -726,8 +738,17 @@ export class GitHubSyncService {
               logger.info(`- Skipped: ${resource.title} - ${conflict.reason}`);
               break;
           }
-        } catch (error: any) {
-          const errorMsg = `Error processing ${resource.title}: ${error.message}`;
+        } catch (error: unknown) {
+          // The catalog was read before the loop, so another writer can take
+          // this URL in between. The row that holds it stays as it is.
+          if (isUniqueViolation(error, "resources_url")) {
+            const warning = `Skipped ${resource.title}: URL already held by another row (concurrent write)`;
+            result.skipped++;
+            result.warnings.push(warning);
+            logger.warn(warning);
+            continue;
+          }
+          const errorMsg = `Error processing ${resource.title}: ${describeDbError(error)}`;
           result.errors.push(errorMsg);
           logger.error(errorMsg);
         }
