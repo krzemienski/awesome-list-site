@@ -316,6 +316,7 @@ async function planCategoryHierarchy(
   subcategoryName?: string,
   subSubcategoryName?: string
 ): Promise<HierarchyResolution> {
+  if (!categoryName?.trim()) throw new Error('Empty category heading');
   const steps: {
     level: HierarchyLevel;
     name: string | undefined;

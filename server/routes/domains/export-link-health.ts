@@ -222,6 +222,10 @@ export function registerExportLinkHealthRoutes(
         return res.status(400).json({ message: 'Invalid repository. Use owner/repository (e.g. krzemienski/awesome-video) or a github.com URL.' });
       }
       
+      if ((options as { dryRun?: unknown }).dryRun) {
+        return res.status(400).json({ message: 'Dry runs are not queued. Use POST /api/admin/import-github with dryRun: true, which returns the plan synchronously.' });
+      }
+
       // Add to queue for processing
       // The branch is recorded once the sync has resolved it; the column's
       // 'main' default would otherwise mislabel repos on another branch.

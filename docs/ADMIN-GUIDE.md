@@ -190,12 +190,19 @@ Import resources from any awesome-list repository.
    ```
    https://raw.githubusercontent.com/user/repo/main/README.md
    ```
-3. Options:
-   - **Dry Run**: Preview without writing anything. Resources, categories and
-     subcategories are only counted; headings with no matching taxonomy node
-     come back as "Would create …" warnings instead of being added.
-   - **Strict Mode**: Fail on validation errors
-4. Click Import
+3. Click Import. The panel has no option controls.
+
+   Dry run is API-only, and Strict Mode is not available:
+   - **Dry Run**: `POST /api/admin/import-github` with
+     `{"repoUrl": "...", "dryRun": true}`. It writes nothing (no resources,
+     categories, or queue/history rows) and returns the plan synchronously:
+     "Would create …" warnings for headings with no matching taxonomy node,
+     plus `wouldCreateTaxonomy`. The queued `POST /api/github/import` rejects
+     `dryRun` with a 400.
+   - **Strict Mode**: not available. `POST /api/admin/import-github` accepts a
+     `strictMode` field, but the import service never reads it, so it changes
+     nothing and the panel has no such control.
+4. Wait for the queued import to finish
 5. Review results:
    - Imported count
    - Updated count
