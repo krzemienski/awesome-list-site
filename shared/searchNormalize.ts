@@ -45,6 +45,8 @@ const SEARCHABLE_CHAR = /[\p{L}\p{N}]/u;
  * C6-API-01: the minimum applies per word. Counting across the whole query let
  * "C / C++" or "a b" through as bare one-letter prefixes (2,872 / 1,783 rows);
  * at least one word must carry 2 letters/digits, so "x 264" still searches.
+ * A literal token ("c++", see isLiteralSearchToken) is matched exactly, not as
+ * a prefix, so it only needs 2 characters.
  */
 const SEARCH_QUERY_MIN_CHARS = 2;
 
@@ -76,16 +78,29 @@ function matcherForm(token: string): string {
   return token.toLowerCase().replace(/[^\p{L}\p{N}_]+/gu, "");
 }
 
+/**
+ * PS-05: Postgres's parser drops "+" and "#" and a leading "." ("C++" and "C#"
+ * index as "c", ".NET" as "net"), so the full-text matcher cannot tell these
+ * names apart from the bare word. Such a token is matched as a whole word in
+ * the literal text instead, which is exact, so the one-letter-prefix flood the
+ * minimum guards against cannot happen.
+ */
+export function isLiteralSearchToken(token: string): boolean {
+  return /[\p{L}\p{N}][+#]/u.test(token) || /^\.[\p{L}\p{N}]/u.test(token);
+}
+
 export function isSearchableQuery(query: string): boolean {
   // C8-API-01: Postgres splits the matcher form at "_" ("the_c" -> the & c,
   // then drops the stop word), so judge each "_"-separated part on its own.
   // C8-V5A-05: a hyphenated token is parsed into its parts too ("c-c" ->
   // c & c), so each hyphen-separated piece is judged the same way.
   return tokenizeSearchQuery(query).some((t) =>
-    t.toLowerCase().split("-").flatMap((piece) => matcherForm(piece).split("_")).some((part) =>
-      (part.match(/[\p{L}\p{N}]/gu)?.length ?? 0) >= SEARCH_QUERY_MIN_CHARS
-      && !POSTGRES_ENGLISH_STOP_WORDS.has(part),
-    ),
+    isLiteralSearchToken(t)
+      ? t.length >= SEARCH_QUERY_MIN_CHARS
+      : t.toLowerCase().split("-").flatMap((piece) => matcherForm(piece).split("_")).some((part) =>
+        (part.match(/[\p{L}\p{N}]/gu)?.length ?? 0) >= SEARCH_QUERY_MIN_CHARS
+        && !POSTGRES_ENGLISH_STOP_WORDS.has(part),
+      ),
   );
 }
 

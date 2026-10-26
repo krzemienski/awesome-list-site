@@ -3,8 +3,9 @@ export const missingPageSeo = {
   title: "Page Not Found",
   description: "The page you're looking for doesn't exist on Awesome Video. Browse the curated index of video development resources instead.",
 };
-/** /search is noindex; both passes still render the same title/description. */
+/** /search is noindex; both passes still render the same title, h1 and description. */
 export const searchPageSeo = {
+  heading: "Search",
   description: "Search curated video development tools, libraries, players, codecs, and learning resources.",
   titleCore: (normalizedQuery: string) => (normalizedQuery ? `Search: ${normalizedQuery}` : "Search"),
 };
@@ -25,6 +26,7 @@ export const bookmarksPageSeo = {
 // parity can never drift even if the two count sources momentarily disagree.
 
 import { tagDisplayName } from "./tagNormalize";
+import { THEME_ACCENT_VALUES, THEME_SYSTEM_VALUES } from "./onboarding-values";
 
 const SITE_NAME = "Awesome Video";
 
@@ -418,6 +420,15 @@ export const signInSeoDescription =
   `Sign in to ${SITE_NAME} to save bookmarks, submit resources, and personalize your learning journey.`;
 export const signUpSeoDescription =
   `Create an ${SITE_NAME} account to save bookmarks, submit resources, and track your learning journeys.`;
+/** The h1 each auth page hydrates to (Clerk localization, the owner form). */
+export const authPageHeadings = {
+  signIn: "Welcome back",
+  signUp: "Create your account",
+  adminSignIn: "Admin sign-in",
+} as const;
+
+export const designSystemSeoDescription =
+  `The ${SITE_NAME} design system — ${THEME_SYSTEM_VALUES.length} systems × ${THEME_ACCENT_VALUES.length} accents, live tokens, type scale, and core components.`;
 
 export const submitSeoTitle = `Submit a Resource — ${SITE_NAME}`;
 export const submitSeoDescription =

@@ -38,7 +38,7 @@ import {
 } from "@shared/schema";
 import { db, runInTransaction } from "../db";
 import { eq, and, sql, asc, desc, like, inArray, isNull, getTableColumns } from "drizzle-orm";
-import { tokenizeSearchQuery } from "@shared/searchNormalize";
+import { isLiteralSearchToken, tokenizeSearchQuery } from "@shared/searchNormalize";
 import { decodeResourceTextFields } from "../github/importHygiene";
 import { invalidatePublicCache } from "../cache/publicCache";
 import { transitionResourceInTransaction, withResourcePublication } from "./resourcePublication";
@@ -62,6 +62,7 @@ import {
   type ResourceKind,
   type ResourceKindCounts,
 } from "../lib/resourceKinds";
+import { compareTitles, titleOrderAsc, titleOrderDesc } from "../lib/titleOrder";
 import { createLogger } from "../lib/logger";
 
 const logger = createLogger("resources");
@@ -148,6 +149,21 @@ type FuzzyMatch = {
   titleLengthDelta: number;
   editDirectionPriority: number;
 };
+
+/**
+ * Whole-word, case-insensitive pattern for a literal search token. Every regex
+ * metacharacter is escaped and the pattern is bound as a parameter, so a query
+ * only ever matches its own text. The token must start a word ("mpv.net" does
+ * not match ".net"). A token ending in a letter or digit must also end a word;
+ * one ending in "+" or "#" may be followed by digits ("C++11") but not letters,
+ * so "c++" does not match "C++foo".
+ */
+function literalWordPattern(token: string): string {
+  const escaped = token.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+  const edge = "[^[:alnum:]_]";
+  const end = /[\p{L}\p{N}]$/u.test(token) ? `(${edge}|$)` : "([^[:alpha:]]|$)";
+  return `(^|${edge})${escaped}${end}`;
+}
 
 function compactSearchText(value: string): string {
   return value.toLowerCase().replace(/[^\p{L}\p{N}]+/gu, "");
@@ -317,12 +333,11 @@ function scoreFuzzyCandidates(
     .filter((match): match is FuzzyMatch => Boolean(match));
 
   return matches.sort((left, right) => {
-    const titleOrder = left.title.localeCompare(right.title, undefined, { sensitivity: "base" });
     switch (sort) {
       case "name-asc":
-        return titleOrder || left.id - right.id;
+        return compareTitles(left, right);
       case "name-desc":
-        return -titleOrder || right.id - left.id;
+        return compareTitles(right, left);
       case "oldest":
         return (left.createdAt?.getTime() ?? 0) - (right.createdAt?.getTime() ?? 0) || left.id - right.id;
       case "newest":
@@ -336,8 +351,7 @@ function scoreFuzzyCandidates(
           left.normalizedDistance - right.normalizedDistance ||
           left.lengthDelta - right.lengthDelta ||
           left.titleLengthDelta - right.titleLengthDelta ||
-          titleOrder ||
-          left.id - right.id
+          compareTitles(left, right)
         );
     }
   });
@@ -435,7 +449,9 @@ export class ResourceRepository {
     // C3-V2-03: Postgres indexes dotted names ("hls.js", "video.js") as one
     // host-style lexeme, so the punctuation-stripped prefix alone ("hlsjs:*")
     // missed most of them. A dotted token matches either form.
+    const literalTokens = searchTokens.filter(isLiteralSearchToken);
     const tsQuery = searchTokens
+      .filter((token) => !isLiteralSearchToken(token))
       .map((token) => {
         const lower = token.toLowerCase();
         const stripped = lower.replace(/[^\p{L}\p{N}_]+/gu, "");
@@ -457,9 +473,11 @@ export class ResourceRepository {
       })
       .filter(Boolean)
       .join(" & ");
-    const tsSearchCondition = tsQuery
-      ? sql`${resources.searchTsv} @@ to_tsquery('english', ${tsQuery})`
-      : undefined;
+    const searchDocument = sql`(coalesce(${resources.title}, '') || ' ' || coalesce(${resources.description}, '') || ' ' || coalesce(${resources.url}, ''))`;
+    const textSearchCondition = and(
+      tsQuery ? sql`${resources.searchTsv} @@ to_tsquery('english', ${tsQuery})` : undefined,
+      ...literalTokens.map((token) => sql`${searchDocument} ~* ${literalWordPattern(token)}`),
+    );
     // Full-text tokens drop URL punctuation, so a pasted URL or path only ever
     // matched its host. The admin list also matches the literal URL text.
     const rawSearch = (search ?? "").trim();
@@ -471,9 +489,9 @@ export class ResourceRepository {
     const looksLikeUrl = /^(https?:\/\/)?[\w-]+(\.[\w-]+)+\//i.test(rawSearch);
     const strictSearchCondition = urlSearchCondition && looksLikeUrl
       ? urlSearchCondition
-      : tsSearchCondition && urlSearchCondition
-        ? sql`(${tsSearchCondition} OR ${urlSearchCondition})`
-        : tsSearchCondition ?? urlSearchCondition;
+      : textSearchCondition && urlSearchCondition
+        ? sql`(${textSearchCondition} OR ${urlSearchCondition})`
+        : textSearchCondition ?? urlSearchCondition;
     const safeMetadataTags = sql`CASE
       WHEN jsonb_typeof(${resources.metadata}->'tags') = 'array'
       THEN ${resources.metadata}->'tags'
@@ -555,14 +573,14 @@ export class ResourceRepository {
       countQuery = countQuery.where(and(...conditions));
     }
 
-    // R3-H08: server-side sort. Title sorts are case-insensitive; id is a
-    // deterministic tiebreaker (createdAt is identical for bulk-seeded rows).
+    // R3-H08: server-side sort. id is a deterministic tiebreaker (createdAt
+    // is identical for bulk-seeded rows).
     const orderBy = (() => {
       switch (sort) {
         case "name-asc":
-          return [asc(sql`lower(${resources.title})`), asc(resources.id)];
+          return titleOrderAsc;
         case "name-desc":
-          return [desc(sql`lower(${resources.title})`), desc(resources.id)];
+          return titleOrderDesc;
         case "oldest":
           return [asc(resources.createdAt), asc(resources.id)];
         case "newest":
@@ -573,14 +591,16 @@ export class ResourceRepository {
           // relevance — exact title match first, then built-in full-text rank.
           // This prevents a prefix match (for example,
           // "ffmpeg-wasm") from outranking a direct "FFmpeg" lookup.
-          if (tsSearchCondition) {
+          if (textSearchCondition) {
             const q = normalizedSearch.toLowerCase();
             return [
               asc(sql`CASE WHEN lower(${resources.title}) = ${q} THEN 0 ELSE 1 END`),
-              desc(sql`ts_rank_cd(${resources.searchTsv}, to_tsquery('english', ${tsQuery}))`),
+              ...(literalTokens.length > 0
+                ? [desc(sql`${and(...literalTokens.map((token) => sql`coalesce(${resources.title}, '') ~* ${literalWordPattern(token)}`))}`)]
+                : []),
+              ...(tsQuery ? [desc(sql`ts_rank_cd(${resources.searchTsv}, to_tsquery('english', ${tsQuery}))`)] : []),
               asc(sql`length(${resources.title})`),
-              asc(sql`lower(${resources.title})`),
-              asc(resources.id),
+              ...titleOrderAsc,
             ];
           }
           return [desc(resources.createdAt), desc(resources.id)];
@@ -700,7 +720,9 @@ export class ResourceRepository {
         };
       }
 
-      if (exactSearchOnly) {
+      // The fuzzy scorer compares letters and digits only, so it would read
+      // "c++" as "c" and offer near-misses for the very word the query ruled out.
+      if (exactSearchOnly || literalTokens.length > 0) {
         return {
           resources: [],
           total: 0,

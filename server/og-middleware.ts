@@ -45,6 +45,8 @@ import {
   siteTagline,
   signInSeoDescription,
   signUpSeoDescription,
+  authPageHeadings,
+  designSystemSeoDescription,
   missingPageSeo,
   bookmarksPageSeo,
   searchPageSeo,
@@ -304,6 +306,11 @@ function parsePage(url: string): number {
   return n != null && n > 1 ? n : 1;
 }
 
+// Same test as SignInPage: any ?admin switches /sign-in to the owner form.
+function isAdminSignIn(url: string): boolean {
+  return new URLSearchParams(url.split("?")[1] || "").has("admin");
+}
+
 async function resolveRoute(
   url: string,
   signal?: AbortSignal,
@@ -320,10 +327,13 @@ async function resolveRoute(
   ) {
     return resolveRouteUncached(url, signal);
   }
-  // Only ?page= differentiates cacheable routes; fold it into the key so page 2
-  // is not served page 1's cached body (BUG-001). All other params are ignored.
+  // Only ?page= (and /sign-in's ?admin) differentiate cacheable routes; fold
+  // them into the key so page 2 is not served page 1's cached body (BUG-001).
+  // All other params are ignored.
   const page = parsePage(url);
-  const key = page > 1 ? `${cleanPath}?page=${page}` : cleanPath;
+  const key = cleanPath === "/sign-in" && isAdminSignIn(url)
+    ? "/sign-in?admin"
+    : page > 1 ? `${cleanPath}?page=${page}` : cleanPath;
   return getPublicCacheValue({
     namespace: "route-meta",
     key,
@@ -832,7 +842,7 @@ function homeShellChrome(): string {
       // (two-pass parity). Internal reference page — noindex keeps the
       // indexable set equal to the sitemap.
       title: `Design System — ${SITE_NAME}`,
-      description: `The ${SITE_NAME} design system — 5 systems × 10 accents, live tokens, type scale, and core components.`,
+      description: designSystemSeoDescription,
       noindex: true,
     },
     "/recommendations": {
@@ -1098,28 +1108,34 @@ function homeShellChrome(): string {
       // form itself is rendered client-side by the auth provider, so no static
       // <form> markup is emitted — password reset lives inside the sign-in
       // flow now, not on a separate token-bearing page.)
+      // Headings match what the client hydrates to: Clerk's localized title,
+      // or the owner password form that AuthPages shows for /sign-in?admin.
       const isSignIn = path === "/sign-in";
-      bodyHtml = renderStaticPageContent({
-        heading: isSignIn
-          ? "Sign in to Awesome Video"
-          : "Create an Awesome Video account",
-        description: m.description,
-        paragraphs: [
-          isSignIn
-            ? "Welcome back. Sign in to access your bookmarks, submitted resources, and personalized learning journeys. Forgot your password? Use the reset option on the sign-in form."
-            : "Join the community to submit and save resources. A free account lets you bookmark tools, suggest new resources, and track your learning journeys.",
-          "The interactive sign-in form requires JavaScript.",
-        ],
-        links: isSignIn
-          ? [
-              { path: "/sign-up", label: "Create an account" },
-              { path: "/submit", label: "Submit a resource" },
-            ]
-          : [
-              { path: "/sign-in", label: "Sign in" },
-              { path: "/submit", label: "Submit a resource" },
+      bodyHtml = isSignIn && isAdminSignIn(url)
+        ? renderStaticPageContent({
+            heading: authPageHeadings.adminSignIn,
+            description: m.description,
+            paragraphs: ["The admin sign-in form requires JavaScript."],
+          })
+        : renderStaticPageContent({
+            heading: isSignIn ? authPageHeadings.signIn : authPageHeadings.signUp,
+            description: m.description,
+            paragraphs: [
+              isSignIn
+                ? "Sign in to access your bookmarks, submitted resources, and personalized learning journeys. Forgot your password? Use the reset option on the sign-in form."
+                : "Join the community to submit and save resources. A free account lets you bookmark tools, suggest new resources, and track your learning journeys.",
+              "The interactive sign-in form requires JavaScript.",
             ],
-      });
+            links: isSignIn
+              ? [
+                  { path: "/sign-up", label: "Create an account" },
+                  { path: "/submit", label: "Submit a resource" },
+                ]
+              : [
+                  { path: "/sign-in", label: "Sign in" },
+                  { path: "/submit", label: "Submit a resource" },
+                ],
+          });
     } else if (path === "/search") {
       // BUG-002: render real SSR search results for ?q= (still noindex).
       // BUG-007 (audit 2): EXACT client parity — the hydrated Search page calls
