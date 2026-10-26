@@ -423,7 +423,7 @@ export default function ResearcherTab({ initialTab = "review" }: ResearcherTabPr
                     <td className="prompt">{job.prompt || "Auto-generated research brief"}</td>
                     <td className="mono queues-agent__cell-mono">{job.totalDiscoveries || 0}</td>
                     <td className="mono queues-agent__cell-mono">{job.approvedDiscoveries || 0}/{job.rejectedDiscoveries || 0}</td>
-                    <td className="mono accent queues-agent__cell-mono">
+                    <td className="mono queues-agent__cell-mono">
                       {formatCost(job.estimatedCostUsd)}
                       {job.costBasis && COST_BASIS_NOTE[job.costBasis] && (
                         <span className="block text-[10px] text-muted-foreground">{COST_BASIS_NOTE[job.costBasis]}</span>
