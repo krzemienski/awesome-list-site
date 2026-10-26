@@ -222,6 +222,10 @@ export function registerExportLinkHealthRoutes(
         return res.status(400).json({ message: 'Invalid repository. Use owner/repository (e.g. krzemienski/awesome-video) or a github.com URL.' });
       }
       
+      if ((options as { dryRun?: unknown }).dryRun) {
+        return res.status(400).json({ message: 'Dry runs are not queued. Use POST /api/admin/import-github with dryRun: true, which returns the plan synchronously.' });
+      }
+
       // Add to queue for processing
       // The branch is recorded once the sync has resolved it; the column's
       // 'main' default would otherwise mislabel repos on another branch.
@@ -1317,6 +1321,10 @@ export function registerExportLinkHealthRoutes(
       const outcome = result.errors.length === 0
         ? 'completed'
         : result.imported > 0 || result.updated > 0 ? 'partial' : 'failed';
+      const taxonomyPlan = (['category', 'subcategory', 'sub-subcategory'] as const)
+        .map(level => [level, result.wouldCreateTaxonomy.filter(n => n.level === level).length] as const)
+        .filter(([, count]) => count > 0)
+        .map(([level, count]) => `${count} ${count === 1 ? level : level.replace(/y$/, 'ies')}`);
       res.status(outcome === 'failed' ? 422 : 200).json({
         success: outcome === 'completed',
         outcome,
@@ -1331,9 +1339,10 @@ export function registerExportLinkHealthRoutes(
         validationErrors: result.validationErrors.filter(e => e.severity === 'error'),
         validationWarnings: result.validationErrors.filter(e => e.severity === 'warning'),
         dryRun: Boolean(dryRun),
+        wouldCreateTaxonomy: result.wouldCreateTaxonomy,
         // A dry run writes nothing, so its counts are what an import would do.
         message: dryRun
-          ? `Dry run of ${repoUrl}: an import would add ${result.imported} and update ${result.updated} resources${result.errors.length ? ` (${result.errors.length} would fail)` : ''}. Nothing was written.`
+          ? `Dry run of ${repoUrl}: an import would add ${result.imported} and update ${result.updated} resources${result.errors.length ? ` (${result.errors.length} would fail)` : ''}${taxonomyPlan.length ? ` and create ${taxonomyPlan.join(', ')}` : ''}. Nothing was written.`
           : outcome === 'completed'
             ? `Imported ${result.imported} and updated ${result.updated} resources from ${repoUrl}`
             : `${outcome === 'partial' ? 'Partial import' : 'Import failed'} from ${repoUrl}: ${result.imported} imported, ${result.updated} updated, ${result.errors.length} failed`
