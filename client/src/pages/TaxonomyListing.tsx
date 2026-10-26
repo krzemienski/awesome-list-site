@@ -1,7 +1,7 @@
 import StatePanel from "@/components/layout/StatePanel";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useParams, Link, useLocation, useSearch } from "wouter";
-import { keepPreviousData, useQuery } from "@tanstack/react-query";
+import { useQuery } from "@tanstack/react-query";
 import { ArrowLeft, Search, SlidersHorizontal, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -93,6 +93,14 @@ function parseKindParam(value: string | null): ResourceKind | null {
 // transient "Please try again" error state.
 function isNotFoundError(error: unknown): boolean {
   return error instanceof Error && /^HTTP 404\b/.test(error.message);
+}
+
+// Both listing queries key the node at [1] (level) and [2] (slug). Paging,
+// filtering and sorting one node holds its previous result on screen; another
+// node's heading, cards, totals and facets must never render under this one.
+function holdWithinNode(level: ListingLevel, slug: string) {
+  return <T,>(previous: T | undefined, previousQuery?: { queryKey: readonly unknown[] }) =>
+    previousQuery?.queryKey[1] === level && previousQuery.queryKey[2] === slug ? previous : undefined;
 }
 
 function routeFor(level: ListingLevel, slug: string) {
@@ -245,7 +253,7 @@ export default function TaxonomyListing({ level }: Props) {
     queryFn: () => fetchListingPage(level, slug, page, pageOptions),
     enabled: !pageRejected,
     staleTime: 60_000,
-    placeholderData: keepPreviousData,
+    placeholderData: holdWithinNode(level, slug),
   });
   const listingData = listing.data;
   const taxonomySearchUrl = useMemo(() => {
@@ -298,11 +306,11 @@ export default function TaxonomyListing({ level }: Props) {
     search?: { mode: "fts" | "fuzzy"; suggestion?: string };
     facets?: ResourceSearchFacets;
   }>({
-    queryKey: [taxonomySearchUrl],
+    queryKey: [taxonomySearchUrl, level, slug],
     queryFn: () => apiRequest(taxonomySearchUrl, { method: "GET" }),
     enabled: taxonomySearchEnabled,
     staleTime: 60_000,
-    placeholderData: keepPreviousData,
+    placeholderData: holdWithinNode(level, slug),
   });
   const total = serverFilterActive ? taxonomySearch.data?.total ?? 0 : listingData?.total ?? 0;
   const totalPages = Math.max(1, Math.ceil(total / PAGE_SIZE));
@@ -352,9 +360,8 @@ export default function TaxonomyListing({ level }: Props) {
 
   // Task #393: GA4 `category_view` / Mixpanel `category_viewed`. Keyed on the
   // node being viewed, so paging, filtering and re-renders never re-fire it,
-  // and a sibling navigation (same component, new slug) does. `name` comes
-  // from a keepPreviousData query, so wait for the placeholder to clear —
-  // otherwise the first event after a sibling nav reports the PREVIOUS node.
+  // and a sibling navigation (same component, new slug) does. Only the real
+  // (non-placeholder) listing names the node.
   useEffect(() => {
     if (!name || listing.isPlaceholderData || pageNotFound) return;
     const key = `${level}:${slug}`;
@@ -466,7 +473,14 @@ export default function TaxonomyListing({ level }: Props) {
       />
     );
   }
-  if (queryUnavailableReason(listing) === "offline") return <OfflinePageState onRetry={() => void listing.refetch()} testId="taxonomy-offline" />;
+  // A filtered view's results come from the search query, so its pause is the
+  // page's too. Held placeholder results render as a loading skeleton here, so
+  // a paused fetch behind them (paging offline) is offline as well.
+  const resultsQuery = serverFilterActive ? taxonomySearch : listing;
+  const resultsOffline = queryUnavailableReason(resultsQuery) === "offline" || (resultsQuery.isPlaceholderData && resultsQuery.isPaused);
+  if (queryUnavailableReason(listing) === "offline" || resultsOffline) {
+    return <OfflinePageState onRetry={() => { void listing.refetch(); if (resultsQuery !== listing) void resultsQuery.refetch(); }} testId="taxonomy-offline" />;
+  }
   if (!listingData || !name) return <NotFound />;
 
   // C3-V1-01: the active selection keeps its option even when the kind filter
