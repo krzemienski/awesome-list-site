@@ -1,6 +1,7 @@
 import { lazy, Suspense, useEffect, useRef, useState, type KeyboardEvent } from "react";
 import * as DialogPrimitive from "@radix-ui/react-dialog";
 import { useQuery } from "@tanstack/react-query";
+import { useCommandState } from "cmdk";
 import { Command, CommandGroup, CommandInput, CommandItem, CommandList } from "@/components/ui/command";
 import { Clock, Folder, Grid2X2, Info, Loader2, Plus, Search, WifiOff, X } from "lucide-react";
 import { useLocation } from "wouter";
@@ -73,6 +74,36 @@ function saveRecentSearch(query: string): string[] {
   return next;
 }
 
+/**
+ * Rendered inside <Command> so the empty palette's suggestion count is cmdk's
+ * own count of mounted rows. Rows that decide their own visibility (the lazy
+ * contact row) are then counted exactly when they render.
+ */
+function PaletteFooter({ showResults, shownResults, totalMatches }: { showResults: boolean; shownResults: number; totalMatches: number }) {
+  const rowCount = useCommandState((state) => state.filtered.count);
+  const showCount = showResults ? shownResults > 0 : rowCount > 0;
+  return (
+    <footer className="search-palette-footer">
+      <span><kbd className="kbd">↑↓</kbd> navigate</span>
+      <span><kbd className="kbd">↵</kbd> open</span>
+      <span><kbd className="kbd">esc</kbd> close</span>
+      <span className="search-palette-footer-spacer" aria-hidden="true" />
+      {showCount ? (
+        <span className="search-palette-result-count" data-testid="search-result-count" aria-live="polite">
+          {showResults ? (
+            <>
+              {totalMatches.toLocaleString()} match{totalMatches === 1 ? "" : "es"}
+              {totalMatches > shownResults ? ` — showing top ${shownResults}` : ""}
+            </>
+          ) : (
+            <>{rowCount} suggestion{rowCount === 1 ? "" : "s"}</>
+          )}
+        </span>
+      ) : null}
+    </footer>
+  );
+}
+
 export default function SearchDialog({ isOpen, setIsOpen }: SearchDialogProps) {
   const [query, setQuery] = useState("");
   const [recentSearches, setRecentSearches] = useState<string[]>(readRecentSearches);
@@ -129,9 +160,6 @@ export default function SearchDialog({ isOpen, setIsOpen }: SearchDialogProps) {
   const results = allMatches.slice(0, 15);
   const defaultCategories = (categoriesQuery.data ?? []).slice(0, 5);
   const featuredResources = (featuredQuery.data?.featured ?? []).slice(0, 4);
-  // C7-V2-05: count every row the empty palette lists (jump targets, pages, recent searches).
-  const defaultSuggestionCount =
-    defaultCategories.length + featuredResources.length + PAGES.length + recentSearches.length;
   const firstCategoryValue = defaultCategories[0]
     ? `category-${defaultCategories[0].name}`
     : undefined;
@@ -521,27 +549,8 @@ export default function SearchDialog({ isOpen, setIsOpen }: SearchDialogProps) {
                 </>
               )}
             </CommandList>
+            <PaletteFooter showResults={showResults} shownResults={results.length} totalMatches={totalMatches} />
           </Command>
-
-          <footer className="search-palette-footer">
-            <span><kbd className="kbd">↑↓</kbd> navigate</span>
-            <span><kbd className="kbd">↵</kbd> open</span>
-            <span><kbd className="kbd">esc</kbd> close</span>
-            <span className="search-palette-footer-spacer" aria-hidden="true" />
-            {(showResults && results.length > 0) || (!showResults && defaultSuggestionCount > 0) ? (
-              <span className="search-palette-result-count" data-testid="search-result-count" aria-live="polite">
-                {showResults ? (
-                  <>
-                    {totalMatches.toLocaleString()} match{totalMatches === 1 ? "" : "es"}
-                    {totalMatches > results.length ? ` — showing top ${results.length}` : ""}
-                  </>
-                ) : (
-                  <>{defaultSuggestionCount} suggestion{defaultSuggestionCount === 1 ? "" : "s"}</>
-                )}
-              </span>
-            ) : null}
-          </footer>
-
         </DialogPrimitive.Content>
       </DialogPrimitive.Portal>
     </DialogPrimitive.Root>

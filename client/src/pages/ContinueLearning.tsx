@@ -18,7 +18,7 @@ import type {
   ContinueLearningRecentResource,
 } from "@shared/continueLearning";
 import SEOHead from "@/components/layout/SEOHead";
-import { staticPageHeads } from "@shared/seo-templates";
+import { continueLearningPageSeo, staticPageHeads } from "@shared/seo-templates";
 import OfflinePageState from "@/components/layout/OfflinePageState";
 import { queryUnavailableReason } from "@/lib/query-availability";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
@@ -197,7 +197,7 @@ export default function ContinueLearning() {
   if (!isAuthenticated) {
     return (
       <div className="account-page account-page--form container mx-auto px-4 py-12">
-        <SEOHead title="Continue Learning" description="Sign in to resume your learning activity on Awesome Video." noindex />
+        <SEOHead title={continueLearningPageSeo.title} description={continueLearningPageSeo.description} noindex />
         <Card className="overflow-hidden text-center" data-testid="continue-learning-sign-in">
           <div className="account-accent-rule h-1" aria-hidden />
           <CardHeader className="items-center pt-10">

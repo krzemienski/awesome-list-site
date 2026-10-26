@@ -13,7 +13,7 @@
   top: 12vh;
   left: 50%;
   display: grid;
-  grid-template-rows: minmax(0, 1fr) auto;
+  grid-template-rows: minmax(0, 1fr);
   width: calc(100vw - 40px);
   max-width: 640px;
   max-height: 76vh;
