@@ -353,7 +353,7 @@ export default function AuditTab() {
             className="pointer-events-none absolute inset-y-0 right-0 w-8 bg-gradient-to-l from-card to-transparent sm:hidden"
             aria-hidden="true"
           />
-          <Table className="admin-ops-table admin-ops-audit-table">
+          <Table className="admin-ops-table admin-ops-audit-table" scrollLabel="Audit log table, scrollable">
             <TableHeader>
               <TableRow>
                 <TableHead>ID</TableHead>

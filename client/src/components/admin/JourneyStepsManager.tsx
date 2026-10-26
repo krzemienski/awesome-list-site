@@ -131,6 +131,10 @@ function ResourcePicker({
 }) {
   const [query, setQuery] = useState("");
   const [open, setOpen] = useState(false);
+  // Picking an option or pressing Clear unmounts the focused control; without
+  // a handoff Radix drops focus onto the dialog container. The toggle stays
+  // mounted in every state, so it receives focus.
+  const toggleRef = useRef<HTMLButtonElement>(null);
 
   const resourcesQuery = useQuery<{ resources: ResourceLite[]; total: number }>({
     queryKey: ["/api/resources", { search: query, limit: 10 }],
@@ -174,8 +178,11 @@ function ResourcePicker({
             </span>
             <button
               type="button"
-              onClick={() => onChange(null)}
-              className="inline-flex shrink-0 items-center justify-center min-h-[32px] min-w-[32px] -my-1 hover:opacity-80"
+              onClick={() => {
+                onChange(null);
+                toggleRef.current?.focus();
+              }}
+              className="inline-flex shrink-0 items-center justify-center min-h-11 min-w-11 min-[1025px]:min-h-8 min-[1025px]:min-w-8 -my-1 hover:opacity-80"
               aria-label="Clear resource"
               data-testid="step-resource-clear"
             >
@@ -186,6 +193,7 @@ function ResourcePicker({
           <span className="text-sm text-muted-foreground">No resource linked</span>
         )}
         <Button
+          ref={toggleRef}
           type="button"
           size="sm"
           variant="outline"
@@ -224,6 +232,7 @@ function ResourcePicker({
                 onClick={() => {
                   onChange(r.id);
                   setOpen(false);
+                  toggleRef.current?.focus();
                 }}
                 className="w-full text-left p-2 hover:bg-accent text-sm"
                 data-testid={`step-resource-option-${r.id}`}
@@ -644,7 +653,7 @@ function StepsDialog({
                               variant="ghost"
                               size="icon"
                               onClick={() => setRemovingRow(row)}
-                              className="h-8 w-8 min-h-[32px] min-w-[32px] shrink-0 -my-1 hover:opacity-80"
+                              className="h-11 w-11 min-h-11 min-w-11 min-[1025px]:h-8 min-[1025px]:w-8 min-[1025px]:min-h-8 min-[1025px]:min-w-8 shrink-0 -my-1 hover:opacity-80"
                               aria-label={`Remove ${resourceLabel(row)} from this step`}
                               data-testid={`step-remove-resource-${row.id}`}
                             >
