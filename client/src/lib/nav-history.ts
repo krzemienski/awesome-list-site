@@ -123,22 +123,59 @@ export function useScrollRestoration(location: string, search: string): void {
   }, [location, search]);
 }
 
-// A path change moves focus to the new page's <h1>, so a screen reader names
-// the page and Tab continues from the top of its content, as after a full page
-// load. Query-only changes (filters, paging) keep the page's own focus
-// handling, and #fragment targets are focused or scrolled by their page. The
-// hand-off retries each frame while the page renders: a loading heading that
-// is replaced, or a dialog that restores focus to its opener, gets focus moved
-// to the current heading. The budget runs on while <main> shows a loading
-// state, so a slow lazy route still gets its heading; if focus is still
-// outside <main> when it runs out (no h1 rendered), <main> takes it. It ends
-// early when the page focuses something in <main> itself, or on any key or
-// pointer input (so the skip link keeps working).
+// A path change moves focus to the new page's <h1>, or to the element a
+// #fragment names, so a screen reader names the page and Tab continues from
+// there, as after a full page load. Query-only changes (filters, paging) keep
+// the page's own focus handling. The hand-off retries each frame while the
+// page renders: a loading heading that is replaced, a fragment target that
+// renders after the heading, or a dialog that restores focus to its opener,
+// gets focus moved to the current target. The budget runs on while <main>
+// shows a loading state, so a slow lazy route still gets its heading; if focus
+// is still outside <main> when it runs out (no h1 rendered), <main> takes it.
+// It ends early when the page focuses something in <main> itself, or on any
+// key or pointer input (so the skip link keeps working).
 const ROUTE_FOCUS_BUDGET_MS = 4000;
 const ROUTE_FOCUS_BUSY_LIMIT_MS = 20000;
 // Marks focus this hook placed, so only that focus drops the ring
 // (app-bridge.css). Keyboard hand-offs to the same heading keep their ring.
 const ROUTE_FOCUS_ATTR = "data-route-focus";
+
+// A suspended route keeps the previous page's h1 in the DOM, hidden
+// (display: none), so only a rendered h1 counts.
+function visibleHeading(): HTMLElement | undefined {
+  const main = document.getElementById("main");
+  return Array.from(main?.querySelectorAll<HTMLElement>("h1") ?? []).find(
+    (h1) => h1.getClientRects().length > 0,
+  );
+}
+
+// The outgoing page's heading, captured when the path changes and before
+// React renders the next route (registered at module load for the same
+// ordering reason as the pop flag above). While <main> is still loading, a
+// page showing this exact heading, same node and same text, has not rendered
+// the new route yet. Once settled, the heading is the new route's even when
+// it reads the same (one "You're offline" state replacing another).
+let outgoingHeading: { el: HTMLElement; text: string | null } | null = null;
+let lastPathname = typeof window !== "undefined" ? window.location.pathname : "";
+
+if (typeof window !== "undefined") {
+  for (const type of ["popstate", "pushState", "replaceState"]) {
+    window.addEventListener(type, () => {
+      if (window.location.pathname === lastPathname) return;
+      lastPathname = window.location.pathname;
+      const el = visibleHeading();
+      outgoingHeading = el ? { el, text: el.textContent } : null;
+    });
+  }
+}
+
+function fragmentId(): string {
+  try {
+    return decodeURIComponent(window.location.hash.slice(1));
+  } catch {
+    return "";
+  }
+}
 
 function focusForRoute(el: HTMLElement): boolean {
   el.setAttribute(ROUTE_FOCUS_ATTR, "");
@@ -166,9 +203,11 @@ export function useRouteFocus(location: string): void {
     lastPath.current = location;
     // A page that mounted in this same commit may already have focused its
     // search box (a clicked link is never a text field).
-    if (window.location.hash || isTextEntry(document.activeElement)) return;
+    if (isTextEntry(document.activeElement)) return;
 
-    let heading: HTMLElement | null = null;
+    const outgoing = outgoingHeading;
+    const fragment = fragmentId();
+    let placed: HTMLElement | null = null;
     let frame = 0;
     const startedAt = Date.now();
     function stop() {
@@ -177,23 +216,28 @@ export function useRouteFocus(location: string): void {
       window.removeEventListener("keydown", stop, true);
       window.removeEventListener("pointerdown", stop, true);
     }
+    // Focus this hook places carries ROUTE_FOCUS_ATTR; any other focus inside
+    // <main> is the page's own and ends the hand-off.
     function onFocusIn(event: FocusEvent) {
+      const target = event.target as Element;
       const main = document.getElementById("main");
-      if (event.target !== heading && main?.contains(event.target as Node)) stop();
+      if (!target.hasAttribute?.(ROUTE_FOCUS_ATTR) && main?.contains(target)) stop();
+    }
+    function routeTarget(main: HTMLElement | null, loading: boolean): HTMLElement | null {
+      const heading = visibleHeading();
+      if (loading && heading && heading === outgoing?.el && heading.textContent === outgoing.text) return null;
+      const section = fragment ? document.getElementById(fragment) : null;
+      return (section && main?.contains(section) ? section : null) ?? heading ?? null;
     }
     function tick() {
       const main = document.getElementById("main");
-      // A suspended route keeps the previous page's h1 in the DOM, hidden
-      // (display: none), so only a rendered h1 counts.
-      const next = Array.from(main?.querySelectorAll<HTMLElement>("h1") ?? []).find(
-        (h1) => h1.getClientRects().length > 0,
-      );
-      const focusOutsideMain = !main?.contains(document.activeElement);
-      if (next && next !== document.activeElement && (!heading || focusOutsideMain) && focusForRoute(next)) {
-        heading = next;
+      const loading = document.querySelector('#main [aria-busy="true"]') !== null;
+      const next = routeTarget(main, loading);
+      const active = document.activeElement;
+      if (next && next !== active && (!placed || active === placed || !main?.contains(active)) && focusForRoute(next)) {
+        placed = next;
       }
       const elapsed = Date.now() - startedAt;
-      const loading = document.querySelector('#main [aria-busy="true"]') !== null;
       if (elapsed < ROUTE_FOCUS_BUDGET_MS || (loading && elapsed < ROUTE_FOCUS_BUSY_LIMIT_MS)) {
         frame = requestAnimationFrame(tick);
         return;

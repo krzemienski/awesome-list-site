@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useLayoutEffect, useRef, useState } from "react";
 import SEOHead from "@/components/layout/SEOHead";
 import { handoffFocusOnUnmount } from "@/hooks/focus-handoff";
 import StatePanel, { RetryButton } from "@/components/layout/StatePanel";
@@ -11,10 +11,22 @@ import StatePanel, { RetryButton } from "@/components/layout/StatePanel";
  */
 export default function OfflinePageState({ onRetry, testId }: { onRetry: () => void; testId: string }) {
   const [stillOffline, setStillOffline] = useState(false);
+  const panelRef = useRef<HTMLDivElement>(null);
+  // Reconnecting (or Retry) unmounts this state from under the visitor's
+  // focus. A layout cleanup still runs while the panel is in the DOM, so it
+  // can tell whether focus was inside and pass it to the loaded page's h1.
+  useLayoutEffect(() => {
+    const panel = panelRef.current;
+    return () => {
+      const active = document.activeElement;
+      if (active instanceof HTMLElement && panel?.contains(active)) handoffFocusOnUnmount(active);
+    };
+  }, []);
   return (
     <>
       <SEOHead title="You're offline" description="This page will load when your connection is back." noindex />
       <StatePanel
+        ref={panelRef}
         tone="error"
         label="Offline"
         title="You're offline"
@@ -23,12 +35,11 @@ export default function OfflinePageState({ onRetry, testId }: { onRetry: () => v
         actions={
           <RetryButton
             handoffFocus={false}
-            onRetry={(e) => {
+            onRetry={() => {
               if (navigator.onLine === false) {
                 setStillOffline(true);
                 return;
               }
-              handoffFocusOnUnmount(e.currentTarget);
               onRetry();
             }}
             testId={`${testId}-retry`}
