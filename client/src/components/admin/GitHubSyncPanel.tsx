@@ -10,7 +10,7 @@ import { Folder, Download, Upload, RefreshCw, CheckCircle2, XCircle, Clock, Exte
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { apiRequest } from "@/lib/queryClient";
+import { apiRequest, ApiError } from "@/lib/queryClient";
 import { describeWriteError } from "@/lib/apiError";
 import { useToast } from "@/hooks/use-toast";
 import { useContactConfig } from "@/lib/contact";
@@ -69,6 +69,36 @@ interface SyncQueueResponse {
   items: SyncQueueItem[];
 }
 
+type TaxonomyLevel = "category" | "subcategory" | "sub-subcategory";
+
+/** Body of POST /api/admin/import-github with dryRun: true. */
+interface ImportPlan {
+  outcome: "completed" | "partial" | "failed";
+  imported: number;
+  updated: number;
+  skipped: number;
+  errors: string[];
+  warnings: string[];
+  wouldCreateTaxonomy: { level: TaxonomyLevel; name: string; parent?: string }[];
+}
+
+interface ImportPreview {
+  repo: string;
+  previewedAt: string;
+  plan: ImportPlan;
+}
+
+const TAXONOMY_LEVELS: TaxonomyLevel[] = ["category", "subcategory", "sub-subcategory"];
+
+/** "2 categories, 1 subcategory", or null when the import creates none. */
+function describeTaxonomyPlan(nodes: ImportPlan["wouldCreateTaxonomy"]): string | null {
+  const parts = TAXONOMY_LEVELS
+    .map((level) => [level, nodes.filter((node) => node.level === level).length] as const)
+    .filter(([, count]) => count > 0)
+    .map(([level, count]) => `${count} ${count === 1 ? level : level.replace(/y$/, "ies")}`);
+  return parts.length ? parts.join(", ") : null;
+}
+
 export default function GitHubSyncPanel() {
   const { toast } = useToast();
   const queryClient = useQueryClient();
@@ -103,7 +133,19 @@ export default function GitHubSyncPanel() {
   // "not a repo!!" used to be accepted and fail minutes later in the queue.
   const normalizedRepo = normalizeGithubRepoInput(repoUrl);
   const repoInvalid = repoUrl.trim().length > 0 && !normalizedRepo;
+  const repoMissing = repoUrlTouched && repoUrl.trim().length === 0;
   const repositoryExample = configuredRepo ?? "owner/repository";
+  // Pull and Sync now act on the edited target, so the header says so
+  // whenever that target is not the configured repository, or is unusable.
+  const targetNote = repoUrlTouched && !normalizedRepo
+    ? "Pull and Sync now stay off until Target Repository holds a repository (owner/repository)."
+    : normalizedRepo && configuredRepo && normalizedRepo !== configuredRepo
+      ? `Pull and Sync now target ${normalizedRepo}, not the configured repository.`
+      : null;
+
+  // A preview describes one repository; editing the target retires it.
+  const [preview, setPreview] = useState<ImportPreview | null>(null);
+  const currentPreview = preview && preview.repo === normalizedRepo ? preview : null;
 
   const resetRepository = () => {
     if (configuredRepo) {
@@ -158,6 +200,7 @@ export default function GitHubSyncPanel() {
       });
     },
     onSuccess: () => {
+      setPreview(null);
       void queryClient.invalidateQueries({ queryKey: ['/api/github/sync-history'] });
       void queryClient.invalidateQueries({ queryKey: ['/api/github/sync-status'] });
       toast({
@@ -172,6 +215,23 @@ export default function GitHubSyncPanel() {
         variant: "destructive"
       });
     }
+  });
+
+  // The synchronous dry run writes nothing and answers with the plan. A plan
+  // in which every item would fail comes back as 422 and is still a plan.
+  const previewMutation = useMutation({
+    mutationFn: async (repo: string): Promise<ImportPreview> => {
+      const body = JSON.stringify({ repoUrl: repo, dryRun: true });
+      let plan: ImportPlan;
+      try {
+        plan = await apiRequest('/api/admin/import-github', { method: 'POST', body }) as ImportPlan;
+      } catch (error) {
+        if (!(error instanceof ApiError) || error.status !== 422) throw error;
+        plan = JSON.parse(error.body) as ImportPlan;
+      }
+      return { repo, previewedAt: new Date().toISOString(), plan };
+    },
+    onSuccess: (result) => setPreview(result),
   });
 
   const exportMutation = useMutation({
@@ -268,13 +328,33 @@ export default function GitHubSyncPanel() {
               <p className="ops-github-panel__repository-meta">
                 {configuredBranch} · {lastSync ? `last sync ${formatSyncDate(lastSync.createdAt)}` : "not synced yet"} · {syncQueueData?.total ?? 0} sync jobs
               </p>
+              {targetNote && (
+                <p
+                  id="repo-target-note"
+                  className={`ops-github-panel__repository-target${normalizedRepo ? "" : " ops-github-panel__repository-target--blocked"}`}
+                  data-testid="text-repo-target"
+                >
+                  {targetNote}
+                </p>
+              )}
             </div>
             <div className="ops-github-panel__repository-actions">
               <div className="flex flex-wrap gap-2">
                 <Button
                   variant="outline"
+                  onClick={() => { if (normalizedRepo) previewMutation.mutate(normalizedRepo); }}
+                  disabled={previewMutation.isPending || !normalizedRepo}
+                  aria-describedby={targetNote ? "repo-target-note" : undefined}
+                  data-testid="button-preview-import"
+                >
+                  {previewMutation.isPending && <RefreshCw className="h-4 w-4 mr-2 animate-spin" />}
+                  {previewMutation.isPending ? "Previewing..." : "Preview import"}
+                </Button>
+                <Button
+                  variant="outline"
                   onClick={() => setConfirmAction("import")}
                   disabled={importMutation.isPending || !normalizedRepo}
+                  aria-describedby={targetNote ? "repo-target-note" : undefined}
                   data-testid="button-import-github"
                 >
                   {importMutation.isPending && <RefreshCw className="h-4 w-4 mr-2 animate-spin" />}
@@ -283,6 +363,7 @@ export default function GitHubSyncPanel() {
                 <Button
                   onClick={() => setConfirmAction("export")}
                   disabled={exportMutation.isPending || !normalizedRepo}
+                  aria-describedby={targetNote ? "repo-target-note" : undefined}
                   data-testid="button-export-github"
                 >
                   {exportMutation.isPending && <RefreshCw className="h-4 w-4 mr-2 animate-spin" />}
@@ -313,9 +394,9 @@ export default function GitHubSyncPanel() {
                   setRepoUrlTouched(true);
                   setRepoUrl(e.target.value);
                 }}
-                className={`font-mono text-sm ${repoInvalid ? "border-destructive focus-visible:ring-destructive" : ""}`}
-                aria-invalid={repoInvalid}
-                aria-describedby={repoInvalid ? "repo-url-error" : undefined}
+                className={`font-mono text-sm ${repoInvalid || repoMissing ? "border-destructive focus-visible:ring-destructive" : ""}`}
+                aria-invalid={repoInvalid || repoMissing}
+                aria-describedby={repoInvalid || repoMissing ? "repo-url-error" : undefined}
                 data-testid="input-repo-url"
               />
               <Button
@@ -329,9 +410,10 @@ export default function GitHubSyncPanel() {
                 <RefreshCw className="h-4 w-4" />
               </Button>
             </div>
-            {repoInvalid ? (
+            {repoInvalid || repoMissing ? (
               <p id="repo-url-error" className="text-xs text-destructive" role="alert" data-testid="text-repo-url-error">
-                Not a valid repository. Use owner/repository (e.g., {repositoryExample}) or a github.com URL.
+                {repoMissing ? "Enter a repository to pull from or sync to." : "Not a valid repository."}{" "}
+                Use owner/repository (e.g., {repositoryExample}) or a github.com URL.
               </p>
             ) : (
               <p className="text-xs text-muted-foreground">
@@ -339,6 +421,80 @@ export default function GitHubSyncPanel() {
               </p>
             )}
           </div>}
+          {(previewMutation.isPending || previewMutation.isError || preview) && (
+            <section className="ops-github-panel__preview" aria-labelledby="import-preview-title" data-testid="import-preview">
+              <h3 id="import-preview-title" className="ops-github-panel__preview-title">
+                Import preview{currentPreview ? ` · ${currentPreview.repo}` : ""}
+              </h3>
+              <p role="status" className="ops-github-panel__preview-status" data-testid="text-import-preview-status">
+                {previewMutation.isPending
+                  ? `Reading ${previewMutation.variables} and planning the import. Nothing is written. This takes about 15 seconds.`
+                  : currentPreview
+                    ? `Dry run at ${formatSyncDate(currentPreview.previewedAt)}. Nothing was written. Pulling now would:`
+                    : preview && !previewMutation.isError
+                      ? `This preview was for ${preview.repo}. Preview ${normalizedRepo ?? "the new target"} to see its plan.`
+                      : null}
+              </p>
+              {previewMutation.isError && !previewMutation.isPending && (
+                <p role="alert" className="text-sm text-destructive" data-testid="text-import-preview-error">
+                  The preview did not run. {describeWriteError(previewMutation.error, { fallback: "Failed to preview the import", outcome: "Nothing was written. Try the preview again." })}
+                </p>
+              )}
+              {currentPreview && !previewMutation.isPending && (() => {
+                const { plan } = currentPreview;
+                const taxonomy = describeTaxonomyPlan(plan.wouldCreateTaxonomy);
+                return (
+                  <>
+                    <dl className="ops-github-panel__preview-counts" data-testid="import-preview-counts">
+                      <div><dt>Add</dt><dd>{plan.imported.toLocaleString()}</dd></div>
+                      <div><dt>Update</dt><dd>{plan.updated.toLocaleString()}</dd></div>
+                      <div><dt>Skip</dt><dd>{plan.skipped.toLocaleString()}</dd></div>
+                      <div><dt>Fail</dt><dd>{plan.errors.length.toLocaleString()}</dd></div>
+                    </dl>
+                    <p className="text-sm" data-testid="text-import-preview-taxonomy">
+                      {taxonomy ? `Create ${taxonomy}.` : "Create no new categories, subcategories or sub-subcategories."}
+                    </p>
+                    {plan.wouldCreateTaxonomy.length > 0 && (
+                      <details className="ops-github-panel__preview-details">
+                        <summary>Taxonomy it would create ({plan.wouldCreateTaxonomy.length})</summary>
+                        <ul
+                          className="ops-github-panel__preview-list ops-github-panel__preview-scroll"
+                          tabIndex={0}
+                          aria-label={`Taxonomy the import would create, ${plan.wouldCreateTaxonomy.length}, scrollable`}
+                        >
+                          {plan.wouldCreateTaxonomy.map((node) => (
+                            <li key={`${node.level}|${node.parent ?? ""}|${node.name}`}>
+                              {node.level} “{node.name}”{node.parent ? ` under “${node.parent}”` : ""}
+                            </li>
+                          ))}
+                        </ul>
+                      </details>
+                    )}
+                    {plan.errors.length > 0 && (
+                      <details className="ops-github-panel__preview-details">
+                        <summary>Items that would fail ({plan.errors.length})</summary>
+                        <ul className="ops-github-panel__preview-list ops-github-panel__error-list">
+                          {plan.errors.map((message, i) => <li key={i}>{message}</li>)}
+                        </ul>
+                      </details>
+                    )}
+                    {plan.warnings.length > 0 && (
+                      <details className="ops-github-panel__preview-details">
+                        <summary>Warnings ({plan.warnings.length})</summary>
+                        <ul
+                          className="ops-github-panel__preview-list ops-github-panel__preview-scroll"
+                          tabIndex={0}
+                          aria-label={`Import preview warnings, ${plan.warnings.length}, scrollable`}
+                        >
+                          {plan.warnings.map((message, i) => <li key={i}>{message}</li>)}
+                        </ul>
+                      </details>
+                    )}
+                  </>
+                );
+              })()}
+            </section>
+          )}
         </CardContent>
       </Card>
 
@@ -657,14 +813,30 @@ export default function GitHubSyncPanel() {
               {confirmAction === "import" ? (
                 <>
                   This pulls the resource list from{" "}
-                  <span className="font-medium text-foreground">{repoUrl}</span>{" "}
-                  and updates the database to match — new resources are added and
-                  existing ones may be updated.
+                  <span className="font-medium text-foreground">{normalizedRepo}</span>{" "}
+                  and updates the database to match.{" "}
+                  {currentPreview ? (
+                    <span data-testid="text-import-plan">
+                      The preview at {formatSyncDate(currentPreview.previewedAt)} found it would add{" "}
+                      {currentPreview.plan.imported.toLocaleString()}, update {currentPreview.plan.updated.toLocaleString()} and
+                      skip {currentPreview.plan.skipped.toLocaleString()} resources
+                      {currentPreview.plan.errors.length ? `, with ${currentPreview.plan.errors.length.toLocaleString()} failing` : ""}
+                      {describeTaxonomyPlan(currentPreview.plan.wouldCreateTaxonomy)
+                        ? `, and create ${describeTaxonomyPlan(currentPreview.plan.wouldCreateTaxonomy)}`
+                        : ", creating no new categories"}.
+                      {" "}Edits since then can change these numbers.
+                    </span>
+                  ) : (
+                    <span data-testid="text-import-plan">
+                      New resources are added and existing ones may be updated. Cancel and
+                      use Preview import to see how many before pulling.
+                    </span>
+                  )}
                 </>
               ) : (
                 <>
                   This pushes the approved catalog as a commit to{" "}
-                  <span className="font-medium text-foreground">{repoUrl}</span>,
+                  <span className="font-medium text-foreground">{normalizedRepo}</span>,
                   rewriting its README resource list.
                 </>
               )}
