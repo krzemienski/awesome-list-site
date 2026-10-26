@@ -707,6 +707,7 @@ export const track = (name: string, props: EventProps = {}, options: TrackOption
     ga,
     product,
     replit,
+    pageUrl: location.href,
   };
   if (dispatch) {
     dispatch(request);

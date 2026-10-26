@@ -44,6 +44,8 @@ export interface AnalyticsDispatchRequest {
   product: boolean;
   /** Replit Analytics; sent without a grant unless the visitor declined. */
   replit: boolean;
+  /** location.href when track() received the event, before the chunk loaded. */
+  pageUrl: string;
 }
 
 const EVENT_NAME = /^[a-z][a-z0-9_]*$/;
@@ -73,7 +75,7 @@ export const dispatchAnalyticsEvent = (request: AnalyticsDispatchRequest) => {
   }
 
   const props = sanitizeEventProps(request.props);
-  if (request.replit) safely(() => replitTrack(request.name, props));
+  if (request.replit) safely(() => replitTrack(request.name, props, request.pageUrl));
   if (!granted) return;
 
   if (request.ga) {
