@@ -11,6 +11,7 @@ import { completedLearningPreferencesSchema } from "@shared/onboarding";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import SEOHead from "@/components/layout/SEOHead";
+import { staticPageHeads } from "@shared/seo-templates";
 import { useAuth } from "@/hooks/useAuth";
 import LearningPreferencesForm from "@/components/onboarding/learning-preferences-form";
 import { useLearningPreferences } from "@/hooks/use-learning-preferences";
@@ -252,9 +253,9 @@ export default function Settings() {
           <ArrowLeft className="h-4 w-4" />
           Back
         </Link>
-        <h1 className="page-title text-2xl">Settings</h1>
+        <h1 className="page-title text-2xl">{staticPageHeads["/settings"].heading}</h1>
         <p className="text-sm sm:text-base text-[color:var(--text-2)] mt-2">
-          Manage your preferences and account. Pick a section below.
+          {staticPageHeads["/settings"].lead}
         </p>
       </div>
 

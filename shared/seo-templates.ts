@@ -23,6 +23,10 @@ export const staticPageHeads = {
     heading: "Your progress lives with your account",
     lead: "Sign in to resume your journeys, pick up at your next step, and revisit resources you've opened.",
   },
+  "/settings": {
+    heading: "Settings",
+    lead: "Manage your preferences and account. Pick a section below.",
+  },
   "/settings/theme": {
     heading: "Theme Settings",
     lead: "Pick a design system, accent, and (optionally) override the font. Changes apply instantly and persist across reloads.",
@@ -42,6 +46,18 @@ export const searchPageSeo = {
 export const bookmarksPageSeo = {
   title: "Bookmarks",
   description: "Your saved video development resources on Awesome Video.",
+};
+/** The signed-out page is what the server prerenders, so both passes use this description. */
+export const continueLearningPageSeo = {
+  title: "Continue Learning",
+  description: "Sign in to resume your learning activity on Awesome Video.",
+};
+export const publicCollectionSeo = {
+  titleCore: (name: string) => `${name} — Shared collection`,
+  description: (count: number) =>
+    `A read-only collection of ${count} curated video development ${
+      count === 1 ? "resource" : "resources"
+    } shared on Awesome Video.`,
 };
 // Keyword-optimized, GEO-friendly SEO title/description templates shared VERBATIM
 // between the server SEO authority (server/og-middleware.ts) and the client

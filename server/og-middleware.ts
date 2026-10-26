@@ -49,6 +49,8 @@ import {
   designSystemSeoDescription,
   missingPageSeo,
   bookmarksPageSeo,
+  continueLearningPageSeo,
+  publicCollectionSeo,
   searchPageSeo,
   staticPageHeads,
   type StaticPageHeadPath,
@@ -704,18 +706,19 @@ function homeShellChrome(): string {
       return { meta: notFoundMeta(path), found: false };
     }
     const m = defaultMeta(path);
-    const count = collection.resources.length;
-    m.title = clampSeoTitle(`${collection.name} — Shared collection — ${SITE_NAME}`);
+    m.title = clampSeoTitle(`${publicCollectionSeo.titleCore(collection.name)} — ${SITE_NAME}`);
     m.description = clampSeoDescription(
-      `A read-only collection of ${count} curated video development ${
-        count === 1 ? "resource" : "resources"
-      } shared on ${SITE_NAME}.`,
+      publicCollectionSeo.description(collection.resources.length),
     );
     m.noindex = true;
     m.follow = true;
     m.ogUrl = abs(path);
     m.image = ogImage(path);
-    return { meta: m, found: true };
+    const bodyHtml = renderStaticPageContent({
+      heading: collection.name,
+      description: m.description,
+    });
+    return { meta: m, found: true, bodyHtml };
   }
 
   // Static page routes (every fixed client route in App.tsx). These always
@@ -792,8 +795,8 @@ function homeShellChrome(): string {
       noindex: true,
     },
     "/continue-learning": {
-      title: `Continue Learning — ${SITE_NAME}`,
-      description: `Resume journeys, revisit resources, and see learning milestones on ${SITE_NAME}.`,
+      title: `${continueLearningPageSeo.title} — ${SITE_NAME}`,
+      description: continueLearningPageSeo.description,
       // Personalized, auth-gated progress summary — noindex like /profile.
       noindex: true,
     },
