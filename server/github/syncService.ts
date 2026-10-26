@@ -38,7 +38,7 @@
 
 import { GitHubClient } from "./client";
 import { parseAwesomeList, convertToDbResources } from "./parser";
-import { normalizeUrlForDedup, normalizeTitleForDedup, domainOf, ensureMinDescription } from "./importHygiene";
+import { normalizeUrlForDedup, normalizeTitleForDedup, domainOf, ensureMinDescription, TAXONOMY_PATH_SEPARATOR } from "./importHygiene";
 import { AwesomeListFormatter, generateContributingMd } from "./formatter";
 import { CategoryRepository } from "../repositories/CategoryRepository";
 import { ResourceRepository } from "../repositories/ResourceRepository";
@@ -104,13 +104,13 @@ interface ExportResult {
 }
 
 /**
- * Columns a GitHub import owns. The rest of a row (url, status, facets,
+ * Columns a GitHub import owns. The rest of a row (status, facets,
  * enrichment metadata such as tags) is curation an import never overwrites.
  */
-type ImportedFields = Pick<Resource, 'title' | 'description' | 'category' | 'subcategory' | 'subSubcategory'>;
+type ImportedFields = Pick<Resource, 'url' | 'title' | 'description' | 'category' | 'subcategory' | 'subSubcategory'>;
 
 /** What the catalog holds per row: enough to match an item and plan its update. */
-type CatalogRow = Pick<Resource, 'id' | 'url' | 'metadata'> & ImportedFields;
+type CatalogRow = Pick<Resource, 'id' | 'metadata'> & ImportedFields;
 
 type ConflictResolution =
   | { action: 'create'; resource: Partial<Resource> }
@@ -120,21 +120,45 @@ type ConflictResolution =
 
 /**
  * The imported fields an update would change on `existing`, under the
- * import's merge rules: a README description replaces the stored one only
- * when it is longer (the stored text is usually an enriched rewrite), and a
- * level the README leaves out keeps its stored value. Comparing these
- * effective values instead of the raw README ones is what makes a re-Pull of
- * an unchanged README write nothing (#64).
+ * import's merge rules. Comparing these effective values instead of the raw
+ * README ones is what makes a re-Pull of an unchanged README write nothing
+ * (#64).
+ *
+ * - url, title: the README value. The README is authoritative for links, so a
+ *   row matched only by its normalized URL takes the README form (http to
+ *   https, a trailing slash).
+ * - description: the README text only when it is longer. The stored text is
+ *   usually an enriched rewrite.
+ * - taxonomy: the parser emits a complete heading path, so a level the README
+ *   leaves out means there is no such level. A stored deeper level survives
+ *   only while every level above it is unchanged. When the README moves the
+ *   item to another category or subcategory, the lower levels take the README
+ *   value, null included.
+ * - Under an unchanged parent, a level the README leaves out keeps its stored
+ *   value. Enrichment (promoteEnrichmentSuggestions) and the admin resource
+ *   editor place rows deeper than their README heading, and clearing that
+ *   placement would undo the curation and make every re-Pull an update again.
+ *   The cost: when a README deletes a `####` heading but keeps its parent,
+ *   its rows stay at that level until an admin moves them.
  */
 function importChanges(existing: CatalogRow, incoming: Partial<Resource>): Partial<ImportedFields> {
+  const category = incoming.category ?? existing.category;
+  const categoryKept = category === existing.category;
+  const subcategory = categoryKept
+    ? incoming.subcategory ?? existing.subcategory
+    : incoming.subcategory ?? null;
+  const subSubcategory = categoryKept && subcategory === existing.subcategory
+    ? incoming.subSubcategory ?? existing.subSubcategory
+    : incoming.subSubcategory ?? null;
   const next: ImportedFields = {
+    url: incoming.url ?? existing.url,
     title: incoming.title ?? existing.title,
     description: (incoming.description?.length ?? 0) > existing.description.length
       ? incoming.description!
       : existing.description,
-    category: incoming.category ?? existing.category,
-    subcategory: incoming.subcategory ?? existing.subcategory,
-    subSubcategory: incoming.subSubcategory ?? existing.subSubcategory,
+    category,
+    subcategory,
+    subSubcategory,
   };
   return Object.fromEntries(
     (Object.keys(next) as (keyof ImportedFields)[])
@@ -144,7 +168,16 @@ function importChanges(existing: CatalogRow, incoming: Partial<Resource>): Parti
 }
 
 function taxonomyPath(resource: Partial<Resource>): string {
-  return [resource.category, resource.subcategory, resource.subSubcategory].filter(Boolean).join(' › ');
+  return [resource.category, resource.subcategory, resource.subSubcategory].filter(Boolean).join(TAXONOMY_PATH_SEPARATOR);
+}
+
+/** The metadata keys that point a row at its taxonomy nodes; null where the row has no such level or node. */
+function taxonomyIds(ids: HierarchyResolution | undefined) {
+  return {
+    categoryId: ids?.categoryId ?? null,
+    subcategoryId: ids?.subcategoryId ?? null,
+    subSubcategoryId: ids?.subSubcategoryId ?? null,
+  };
 }
 
 interface CatalogEntry {
@@ -692,7 +725,6 @@ export class GitHubSyncService {
           result.skipped++;
           continue;
         }
-        firstListing.set(urlKey, taxonomyPath(resource));
         try {
           // Get hierarchy IDs for this resource
           const hierarchyKey = `${resource.category}|${resource.subcategory || ''}|${resource.subSubcategory || ''}`;
@@ -712,7 +744,10 @@ export class GitHubSyncService {
             resource.subcategory = hierarchyId.subcategory ?? resource.subcategory;
             resource.subSubcategory = hierarchyId.subSubcategory ?? resource.subSubcategory;
           }
-          
+          // Recorded only once the item has a usable heading, so a later
+          // listing still imports when the first one's hierarchy failed.
+          firstListing.set(urlKey, taxonomyPath(resource));
+
           const conflict = this.checkConflict(resource, catalog);
           
           switch (conflict.action) {
@@ -764,21 +799,29 @@ export class GitHubSyncService {
             case 'update': {
               const changedFields = Object.keys(conflict.changes).join(', ');
               if (!options.dryRun) {
-                // Stored metadata carries enrichment (tags, ogImage); only the
-                // import bookkeeping keys are refreshed on top of it.
-                const metadata = {
-                  ...conflict.existing.metadata,
-                  categoryId: hierarchyId?.categoryId,
-                  subcategoryId: hierarchyId?.subcategoryId,
-                  subSubcategoryId: hierarchyId?.subSubcategoryId,
-                  lastUpdatedFrom: repoUrl,
-                  lastUpdatedAt: new Date().toISOString(),
-                };
-                
+                // The ids name the path the row ends up on, which keeps a
+                // stored deeper level the README path lacks.
+                const after = { ...conflict.existing, ...conflict.changes };
+                const ids = taxonomyPath(after) === taxonomyPath(resource)
+                  ? hierarchyId
+                  : await planCategoryHierarchy(
+                    this.categoryRepo, [], after.category,
+                    after.subcategory ?? undefined, after.subSubcategory ?? undefined,
+                  );
+                // Merged into the stored metadata by the UPDATE itself, so
+                // enrichment keys (tags, ogImage) written since the catalog
+                // was read survive.
                 const updated = await this.resourceRepo.updateResource(
                   conflict.existing.id,
-                  { ...conflict.changes, metadata },
-                  false
+                  conflict.changes,
+                  false,
+                  {
+                    mergeMetadata: {
+                      ...taxonomyIds(ids),
+                      lastUpdatedFrom: repoUrl,
+                      lastUpdatedAt: new Date().toISOString(),
+                    },
+                  },
                 );
                 catalog.record(updated);
                 result.resources.push(updated);
@@ -1511,9 +1554,11 @@ export class GitHubSyncService {
       // different URL shape (tracking params, short-links, mirrors).
       const duplicate = catalog.findByTitleDomain(resource.title ?? '', resource.url ?? '');
       if (duplicate) {
+        // A dry run's planned rows have no real id (see plannedId).
+        const original = duplicate.id > 0 ? `#${duplicate.id}` : `"${duplicate.title}" (new in this run)`;
         return {
           action: 'skip',
-          reason: `Duplicate of #${duplicate.id} (same title + domain, different URL form)`
+          reason: `Duplicate of ${original} (same title + domain, different URL form)`
         };
       }
       return { action: 'create', resource };
