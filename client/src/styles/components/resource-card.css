@@ -269,6 +269,22 @@
   text-decoration: none;
 }
 
+/* A pill is its own link inside a hoverable card, so it answers the pointer
+   (and keyboard focus) separately with the DS accent-chip paint. */
+@media (hover: hover) {
+  .resource-card__tag-link:hover .resource-card__tag {
+    color: var(--accent-ink);
+    border-color: color-mix(in srgb, var(--accent) 35%, var(--border));
+    background: color-mix(in srgb, var(--accent) 8%, transparent);
+  }
+}
+
+.resource-card__tag-link:focus-visible .resource-card__tag {
+  color: var(--accent-ink);
+  border-color: color-mix(in srgb, var(--accent) 35%, var(--border));
+  background: color-mix(in srgb, var(--accent) 8%, transparent);
+}
+
 /* The mono override above is unlayered, so it beat the frozen Geist chip skin
    (design-system.css: [data-system="geist"] .chip → body face, no tracking,
    no caps). Restore that skin for the card chips. */
