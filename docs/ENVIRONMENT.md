@@ -343,7 +343,7 @@ PORT="5000"
 # VITE_GA_MEASUREMENT_ID="G-XXXXXXXXXX"
 ```
 
-### Production (self-hosted / Docker / Railway / Vercel)
+### Production (self-hosted / Docker / Railway)
 
 ```bash
 DATABASE_URL="postgresql://user:pass@host:5432/db"

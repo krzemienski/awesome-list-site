@@ -150,7 +150,7 @@ Any PostgreSQL 14+ database works. Managed options:
 
 | Provider | Notes |
 |----------|-------|
-| [Neon](https://neon.tech) | Serverless Postgres with built-in pooling; good for Vercel/Railway. |
+| [Neon](https://neon.tech) | Serverless Postgres with built-in pooling; good for Railway. |
 | [Supabase](https://supabase.com) | Full-featured managed Postgres. |
 | [Railway PostgreSQL](https://railway.app) | Auto-wired `DATABASE_URL` on Railway. |
 | AWS RDS / GCP Cloud SQL / Azure Database | Managed Postgres for the respective clouds. |
