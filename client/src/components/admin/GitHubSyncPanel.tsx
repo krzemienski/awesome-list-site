@@ -617,7 +617,7 @@ export default function GitHubSyncPanel() {
           className="ops-github-panel__history-shell"
         >
             <div className="ops-github-panel__history-table-wrap">
-              <Table className="table" scrollLabel="Sync jobs table, scrollable">
+              <Table className="table">
                 <TableHeader>
                   <TableRow>
                     <TableHead>ID</TableHead>
