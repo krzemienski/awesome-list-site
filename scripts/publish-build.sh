@@ -34,10 +34,31 @@ require_head_on_origin_main() {
     git --no-pager diff --stat "$MAIN_REF" HEAD >&2
     refuse_publish "this build would ship files that are not GitHub main's."
   fi
-  echo "publish-build: HEAD $(git rev-parse --short HEAD) has the same files as origin/main $(git rev-parse --short "$MAIN_REF")."
+}
+
+# Untracked files ship with the publish snapshot. Modified tracked files are
+# allowed because the build container's install can rewrite package-lock.json.
+# Ignored files are not inspected: secrets live in Replit Secrets, not files.
+require_no_untracked_files() {
+  local untracked
+  untracked=$(git ls-files --others --exclude-standard)
+  if [ -n "$untracked" ]; then
+    echo "publish-build: untracked files in the workspace:" >&2
+    echo "$untracked" >&2
+    refuse_publish "this build would ship files that are not GitHub main's."
+  fi
 }
 
 require_head_on_origin_main
+require_no_untracked_files
+
+# Stamp the GitHub main commit, not HEAD: HEAD may be Replit's empty "Published
+# your App" commit, which GitHub does not have. An explicit value wins.
+if [ -z "${BUILD_REVISION:-}" ]; then
+  BUILD_REVISION=$(git rev-parse "$MAIN_REF")
+  export BUILD_REVISION
+fi
+echo "publish-build: HEAD $(git rev-parse --short HEAD) has the same files as origin/main $(git rev-parse --short "$MAIN_REF"); stamping BUILD_REVISION=$BUILD_REVISION."
 
 npm run build
 

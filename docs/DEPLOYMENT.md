@@ -105,12 +105,16 @@ has the full procedure.
   build does not fetch, because the build container may have no GitHub
   credentials. It compares against the ref from the last sync, so a stale ref
   can fail the build or pass an older `main` tree, but never pass a tree that
-  was not on `main`. The check covers commits only. Uncommitted files still
-  ship, so `git status` must be clean.
-- `npm run build` stamps the workspace `HEAD` into the bundle, and
-  `/api/version` serves it. After a publish, check that
-  `https://awesome.video/api/version` returns the commit you meant to ship and
-  that `/api/health/ready` returns 200. Then check one behaviour that only the
+  was not on `main`. It also fails when untracked files are present, and lists
+  them. Modified tracked files and ignored files are not checked, so
+  `git status` must still be clean.
+- After the check passes, the publish build stamps the `origin/main` commit
+  (not `HEAD`, which may be the empty "Published your App" commit) into the
+  bundle, and `/api/version` serves it. A `BUILD_REVISION` already set in the
+  environment is kept. Plain `npm run build` stamps `HEAD`. After a publish,
+  check that `https://awesome.video/api/version` returns exactly the
+  `origin/main` commit you meant to ship and that `/api/health/ready` returns
+  200. Then check one behaviour that only the
   new release has, because a cutover can briefly serve the previous build.
 - Run `npm install` in the workspace only when `package.json` or
   `package-lock.json` changed since the last publish. Run `npm run db:push`

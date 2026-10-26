@@ -12,7 +12,7 @@ Run unattended. Stop and report only on the stop conditions named in each step; 
 ## How the pieces fit (why the steps are ordered this way)
 
 - Publishing snapshots the **Replit workspace files**, not GitHub. So the workspace must be at origin/main before you publish. There is no CLI, REST API or GitHub-triggered deploy; MCP `publish_app` is the only programmatic trigger.
-- `npm run build` stamps `BUILD_REVISION=$(git rev-parse HEAD)` of the workspace into the bundle, and `/api/version` serves it. That is why the live revision is a reliable proof of what shipped.
+- The publish build (`scripts/publish-build.sh`) refuses to build unless `HEAD`'s tree equals `origin/main`'s and no untracked files exist, then stamps `BUILD_REVISION=$(git rev-parse origin/main)` into the bundle (an explicit `BUILD_REVISION` in the environment wins), and `/api/version` serves it. So the live revision equals the GitHub main SHA exactly when the guard passed, even though `HEAD` may be an empty "Published your App" commit. Plain `npm run build` stamps `HEAD`.
 - At publish, Replit diffs the **dev database schema against production** and applies the difference (drizzle-kit based, with a conflict dialog for destructive changes). `npm run db:push` on the dev DB therefore decides the production schema of the next publish.
 - Agent checkpoints, Monitoring Auto-fix and Agent task merges commit inside the workspace. Those commits are not on GitHub, which is the usual cause of divergence.
 - `.replit` `[deployment]`: Autoscale, build `bash scripts/publish-build.sh`, run `npm run start`, port 5000 → 80. The homepage must answer within 5 s or Promote fails.
@@ -87,9 +87,11 @@ ssh awesome-replit 'cd ~/workspace; timeout 300 npm run db:push 2>&1'
 ### 4. Build pre-check (SSH)
 
 ```bash
-ssh awesome-replit 'cd ~/workspace; timeout 900 bash scripts/publish-build.sh 2>&1 | tail -80'
+ssh awesome-replit 'set -o pipefail; cd ~/workspace; timeout 900 bash scripts/publish-build.sh 2>&1 | tail -80'; echo "exit=$?"
 ```
-The build first fails unless `HEAD`'s tree equals `origin/main`'s, printing the differing files; that failure means step 2 left the workspace off main, so fix the sync and never edit the guard to publish.
+Check the exit status, not only the log tail: `exit=0` is the only pass. `pipefail` makes the script's failure the command's status instead of `tail`'s.
+
+The build first fails unless `HEAD`'s tree equals `origin/main`'s, printing the differing files, and then fails if any untracked file exists, listing them. Either failure means step 2 left the workspace off main, so fix the sync (delete stray untracked files) and never edit the guard to publish. On success it prints `stamping BUILD_REVISION=<sha>`; that SHA must equal TARGET.
 
 Safe in the workspace: the image-trim step runs only when `REPLIT_DEPLOYMENT=1` or `REPLIT_PUBLISH_IMAGE_TRIM=1`, which exist only in production. A build failure here is a stop condition with the log tail as evidence; publishing would fail the same way and cost a deploy.
 
@@ -121,7 +123,7 @@ curl -s -o /dev/null -w '%{http_code}\n' https://awesome.video/api/health/ready 
 curl -s -o /dev/null -w '%{http_code} %{time_total}\n' https://awesome.video/      # 200
 ```
 
-If `/api/version` still shows BEFORE right after a "published" status, retry for up to 2 minutes (Autoscale cutover). If it shows neither BEFORE nor TARGET, report it: the workspace HEAD moved during the publish.
+If `/api/version` still shows BEFORE right after a "published" status, retry for up to 2 minutes (Autoscale cutover). The publish build stamps the workspace's `origin/main`, so the live revision equals TARGET exactly when the guard passed on TARGET's files; it is never the "Published your App" commit's SHA. If it shows neither BEFORE nor TARGET, report it: the workspace's `origin/main` ref moved (a fetch) between the sync and the publish build.
 
 Then check the site as a visitor with the project `verify` skill's browser method against `https://awesome.video` (home, a category page, a resource page, search) at 1440×900 and 390×844, reading the console for errors. Do not sign in or write anything on production.
 
