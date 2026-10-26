@@ -868,7 +868,13 @@ export default function BatchEnrichmentPanel() {
             // R5-004 (run24): plain two-axis overflow-auto scroller — the
             // Radix ScrollArea viewport clipped horizontal overflow, making
             // Processed/Success Rate/Actions unreachable at ≤768px.
-            <div className="max-h-[400px] overflow-auto" data-testid="scroller-enrichment-jobs-table">
+            <div
+              className="max-h-[400px] overflow-auto"
+              tabIndex={0}
+              role="region"
+              aria-label="Job history table, scrollable"
+              data-testid="scroller-enrichment-jobs-table"
+            >
               <Table>
                 <TableHeader>
                   <TableRow>
