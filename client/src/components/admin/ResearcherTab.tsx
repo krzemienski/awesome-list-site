@@ -316,14 +316,15 @@ export default function ResearcherTab({ initialTab = "review" }: ResearcherTabPr
     if (activeJob) setFollowJobId(activeJob.id);
   }, [activeJobStateKnown, activeJob]);
 
-  // The ?jobId= deep link names the run being followed; once the view
-  // follows another run or none, drop it so a reload or a shared link does
-  // not reopen the old run.
+  // ?jobId= names the run being followed, so the live view can be shared or
+  // reloaded; following none drops it. replaceState keeps Back unchanged.
   useEffect(() => {
     const url = new URL(window.location.href);
-    const linked = url.searchParams.get("jobId");
-    if (linked === null || Number(linked) === followJobId || !url.pathname.startsWith("/admin")) return;
-    url.searchParams.delete("jobId");
+    if (!url.pathname.startsWith("/admin")) return;
+    const linked = followJobId === null ? null : String(followJobId);
+    if (url.searchParams.get("jobId") === linked) return;
+    if (linked === null) url.searchParams.delete("jobId");
+    else url.searchParams.set("jobId", linked);
     window.history.replaceState(window.history.state, "", url.pathname + url.search + url.hash);
   }, [followJobId]);
 
