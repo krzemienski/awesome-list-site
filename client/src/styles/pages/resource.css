@@ -237,7 +237,7 @@ a.resource-detail-onward-similar-item:hover { background: var(--surface-2); }
 .resource-detail-onward-empty { color: var(--text-2); font-size: 13px; }
 .resource-detail-onward-tags { display: flex; flex-wrap: wrap; column-gap: 8px; min-width: 0; }
 .resource-detail-onward-tags > li { min-width: 0; max-width: 100%; }
-.resource-detail-onward-tag { display: inline-flex; align-items: center; min-height: 44px; max-width: 100%; }
+.resource-detail-onward-tag { display: inline-flex; align-items: center; justify-content: center; min-height: 44px; min-width: 44px; max-width: 100%; }
 .resource-detail-onward-tag .chip { max-width: 100%; overflow-wrap: anywhere; white-space: normal; }
 
 @media (max-width: 639px) {
