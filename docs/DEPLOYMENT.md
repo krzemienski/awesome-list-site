@@ -81,49 +81,23 @@ Replit is the only production target. Vercel and GitHub Pages are not used,
 and their configuration has been removed.
 
 Publish snapshots the files in the Replit workspace, not GitHub. That includes
-git-ignored files, so never keep secret-bearing files such as `.env` in the
-workspace; secrets belong in Replit **Secrets**. Before each publish, bring the
-workspace to `origin/main` with a fast-forward, and confirm that `git status` is
-clean and `HEAD` equals `origin/main`. Repeat that check immediately before you
-click Publish, and do not publish while Replit Agent or any other writer is
-editing the workspace. The project skill `.claude/skills/replit-deploy/SKILL.md`
-has the full procedure.
+git-ignored and untracked files, so never keep secret-bearing files such as
+`.env` in the workspace; secrets belong in Replit **Secrets**. The workspace
+must match `origin/main` when you publish.
 
-- Each publish adds an empty "Published your App" commit (author Replit Agent)
-  on top of the published commit. It changes no files. When Replit pushes it to
-  GitHub, the next sync is a plain fast-forward. When it stays only in the
-  workspace, move the workspace back with `git reset --keep origin/main`, but
-  only after confirming that the commit's tree equals its parent's.
-- Replit's autosave commits untracked files in the workspace. On 2026-10-26 an
-  untracked notes file was committed this way and published as revision
-  `634e8afd`, which is not on GitHub. Before you publish, delete untracked files
-  you do not want shipped.
-- `scripts/publish-build.sh` fails the build unless the tree of `HEAD` equals
-  the tree of `origin/main`, and prints `git diff --stat origin/main HEAD`. An
-  empty "Published your App" commit passes. A commit that changes files, a
-  workspace behind `origin/main`, or a missing `origin/main` ref fails. The
-  build does not fetch, because the build container may have no GitHub
-  credentials. It compares against the ref from the last sync, so a stale ref
-  can fail the build or pass an older `main` tree, but never pass a tree that
-  was not on `main`. It also fails when untracked files are present, and lists
-  them. Modified tracked files and ignored files are not checked, so
-  `git status` must still be clean.
-- After the check passes, the publish build stamps the `origin/main` commit
-  (not `HEAD`, which may be the empty "Published your App" commit) into the
-  bundle, and `/api/version` serves it. A `BUILD_REVISION` already set in the
-  environment is kept. Plain `npm run build` stamps `HEAD`. After a publish,
-  check that `https://awesome.video/api/version` returns exactly the
-  `origin/main` commit you meant to ship and that `/api/health/ready` returns
-  200. Then check one behaviour that only the
-  new release has, because a cutover can briefly serve the previous build.
-- Run `npm install` in the workspace only when `package.json` or
-  `package-lock.json` changed since the last publish. Run `npm run db:push`
-  only when `shared/schema.ts` changed, and only against the workspace's
-  development database: at publish, Replit applies the development-to-production
-  schema diff after a review. Never point `db:push` at production. Changes
-  under `migrations/` need neither, because the boot migrator applies the
-  journal on start. Check with
-  `git diff --stat <live revision> origin/main -- package.json package-lock.json shared/schema.ts migrations`.
+`scripts/publish-build.sh` enforces part of this. It fails the build unless
+the tree of `HEAD` equals the tree of `origin/main` (Replit's empty "Published
+your App" commit passes), and it fails when untracked files are present. It
+does not check modified tracked files or ignored files, so
+`git status --short` must still print nothing. On success it stamps the
+`origin/main` commit into the bundle, so `https://awesome.video/api/version`
+reports exactly the GitHub `main` commit that shipped.
+
+The procedure is kept in one place, the project skill
+[`.claude/skills/replit-deploy/SKILL.md`](../.claude/skills/replit-deploy/SKILL.md).
+It covers syncing the workspace, when to run `npm install` and
+`npm run db:push`, the check before you publish, publishing, and proving the
+release is live. Change the procedure there, not here.
 
 ## Docker / Self-Hosting
 

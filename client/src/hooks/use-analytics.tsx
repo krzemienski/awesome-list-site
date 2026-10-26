@@ -40,10 +40,10 @@ export const useAnalytics = () => {
 
   // Replit's tracker learns about SPA navigations only through its
   // pushState/replaceState wrappers and has no popstate listener, so after
-  // Back/Forward it recorded no page view and kept tagging events with the
-  // previous page's URL. A same-URL, same-state replaceState hands it the
-  // current URL; without the tracker the call changes nothing. Suppression is
-  // refreshed for the new URL first so the tracker never sees a stale opt-out.
+  // Back/Forward it recorded no page view. A same-URL, same-state replaceState
+  // hands it the current URL; without the tracker the call changes nothing.
+  // Custom events do not rely on this: replitTrack stamps each one with the
+  // URL it fired on.
   useEffect(() => {
     const announceTraversal = () => {
       syncReplitPageviewOptOut();
