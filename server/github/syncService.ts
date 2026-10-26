@@ -48,7 +48,7 @@ import { Resource, InsertResource, GithubSyncQueue } from "@shared/schema";
 import { getGitHubClient } from "./replitConnection";
 import { validateAwesomeList } from "../validation/awesomeLint";
 import { createLogger } from "../lib/logger";
-import { describeDbError } from "../errors/pgErrors";
+import { describeDbError, isUniqueViolation } from "../errors/pgErrors";
 
 const logger = createLogger("github-sync");
 
@@ -739,6 +739,15 @@ export class GitHubSyncService {
               break;
           }
         } catch (error: unknown) {
+          // The catalog was read before the loop, so another writer can take
+          // this URL in between. The row that holds it stays as it is.
+          if (isUniqueViolation(error, "resources_url")) {
+            const warning = `Skipped ${resource.title}: URL already held by another row (concurrent write)`;
+            result.skipped++;
+            result.warnings.push(warning);
+            logger.warn(warning);
+            continue;
+          }
           const errorMsg = `Error processing ${resource.title}: ${describeDbError(error)}`;
           result.errors.push(errorMsg);
           logger.error(errorMsg);
