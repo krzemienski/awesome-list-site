@@ -73,10 +73,6 @@ Steps:
 Replit provides managed PostgreSQL with separate development and production
 databases. An external PostgreSQL provider also works.
 
-For the GitHub Pages release path, `.github/workflows/deploy.yml` builds the
-static site (`scripts/build-static.ts` + `npm run build`) on every push to
-`main` and deploys it to GitHub Pages. It runs no post-deploy checks.
-
 ## Docker / Self-Hosting
 
 The repo ships a production `Dockerfile` and a `docker-compose.yml` (app +
