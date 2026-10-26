@@ -116,12 +116,20 @@
 
   /* App shell contract. --app-bottom-inset is the height of that bottom bar
      (0px when there is none), published by useAppBottomInset(). Normal flow
-     already accounts for the bar, so only viewport-pinned UI needs this: the
-     toast viewport, the sticky back-to-top slot, the fixed sidebar column, and
-     the scroll-into-view rule below. Readers get a generic "the shell has N pixels
+     already accounts for the bar, so only viewport-FIXED UI needs this: the
+     toast viewport, the back-to-top button, the fixed sidebar column, and the
+     scroll-into-view rule below. Readers get a generic "the shell has N pixels
      of bottom inset" value — none of them has to know which bar is showing. */
   :root {
     --app-bottom-inset: 0px;
+    /* The fixed back-to-top button (MainLayout) is sized and placed from
+       these. --back-to-top-lane is the bottom band of the viewport it owns,
+       with a gap above it; pinned page content (the home rail) ends above it. */
+    --back-to-top-size: 2.75rem;
+    --back-to-top-offset: 1.5rem;
+    --back-to-top-lane: calc(
+      var(--back-to-top-size) + 2 * var(--back-to-top-offset) + var(--app-bottom-inset)
+    );
   }
 
   /* BUG-006 (audit2): a bottom bar hides whatever a scroll-into-view lands

@@ -304,17 +304,26 @@
   border-radius: var(--radius-xs);
 }
 
-/* The reference pins the rail under the header (top: 84px). Pinned by its
-   bottom edge instead, above the back-to-top lane: a rail taller than the
-   viewport still reaches its "Submit a resource" card, and nothing pinned
-   ever sits under the button. */
 .home-index-rail {
-  position: sticky;
-  bottom: var(--back-to-top-lane);
-  align-self: end;
   display: flex;
   flex-direction: column;
   gap: 1.75rem;
+}
+
+/* Pinned under the header, as the reference has it, but ending above the
+   back-to-top lane so its "Submit a resource" card never sits under the
+   fixed button. A taller rail scrolls itself; the inline padding keeps focus
+   rings inside that scroll box. */
+@media (min-width: 1025px) {
+  .home-index-rail {
+    --home-rail-top: 5.25rem;
+    position: sticky;
+    top: var(--home-rail-top);
+    max-height: calc(100svh - var(--home-rail-top) - var(--back-to-top-lane));
+    overflow-y: auto;
+    margin-inline: -0.25rem;
+    padding-inline: 0.25rem;
+  }
 }
 
 .home-rail-eyebrow {
@@ -972,10 +981,6 @@
 
   .home-index-grid {
     grid-template-columns: 1fr;
-  }
-
-  .home-index-rail {
-    position: static;
   }
 }
 

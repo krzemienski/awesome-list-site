@@ -6,13 +6,6 @@
   flex-direction: column;
   min-height: auto;
   min-width: 0;
-  --back-to-top-size: 2.75rem;
-  --back-to-top-gap: 1.5rem;
-  /* The bottom band of the viewport the back-to-top button may occupy, with a
-     gap above it. Viewport-pinned page content ends above this line. */
-  --back-to-top-lane: calc(
-    var(--back-to-top-size) + 2 * var(--back-to-top-gap) + var(--app-bottom-inset, 0px)
-  );
 }
 
 .app-shell-row {
@@ -37,30 +30,6 @@
 .app-shell-main {
   flex: 1;
   min-width: 0;
-}
-
-/* Back-to-top's own row: the last child of <main>, the button plus a gap
-   below it. Sticky, it floats at the bottom-right of the viewport (lifted by
-   --app-bottom-inset) while the content runs on below the fold. A sticky box
-   cannot leave its containing block, so at the end of the content it settles
-   into this reserved row and never reaches the footer. The empty part of the
-   row lets taps through. */
-.app-shell-main > .back-to-top-slot {
-  position: sticky;
-  bottom: var(--app-bottom-inset, 0px);
-  z-index: 40;
-  display: flex;
-  justify-content: flex-end;
-  height: calc(var(--back-to-top-size) + var(--back-to-top-gap));
-  padding: 0 var(--back-to-top-gap) var(--back-to-top-gap);
-  pointer-events: none;
-}
-
-/* In-flow content still scrolls under the button, so give the translucent
-   --surface tint an opaque --bg base, as the theme page's sticky preview does. */
-.app-shell-main > .back-to-top-slot > * {
-  pointer-events: auto;
-  background: linear-gradient(var(--surface), var(--surface)), var(--bg);
 }
 
 .app-shell-main > .page-content-wrap {
