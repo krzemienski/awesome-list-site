@@ -116,9 +116,9 @@
 
   /* App shell contract. --app-bottom-inset is the height of that bottom bar
      (0px when there is none), published by useAppBottomInset(). Normal flow
-     already accounts for the bar, so only viewport-FIXED UI needs this: the
-     toast viewport, the back-to-top button, the fixed sidebar column, and the
-     scroll-into-view rule below. Readers get a generic "the shell has N pixels
+     already accounts for the bar, so only viewport-pinned UI needs this: the
+     toast viewport, the sticky back-to-top slot, the fixed sidebar column, and
+     the scroll-into-view rule below. Readers get a generic "the shell has N pixels
      of bottom inset" value — none of them has to know which bar is showing. */
   :root {
     --app-bottom-inset: 0px;

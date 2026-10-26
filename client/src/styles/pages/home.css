@@ -304,9 +304,14 @@
   border-radius: var(--radius-xs);
 }
 
+/* The reference pins the rail under the header (top: 84px). Pinned by its
+   bottom edge instead, above the back-to-top lane: a rail taller than the
+   viewport still reaches its "Submit a resource" card, and nothing pinned
+   ever sits under the button. */
 .home-index-rail {
   position: sticky;
-  top: 5.25rem;
+  bottom: var(--back-to-top-lane);
+  align-self: end;
   display: flex;
   flex-direction: column;
   gap: 1.75rem;

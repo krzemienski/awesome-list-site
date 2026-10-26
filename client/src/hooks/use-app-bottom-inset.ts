@@ -11,8 +11,8 @@ import { useEffect } from "react";
  * inline styles are written onto `#root`, `body` or any other element the bar
  * does not own.
  *
- * Flow reservation cannot move viewport-FIXED UI (the toast viewport, the
- * back-to-top button, the fixed sidebar column) or the native scroll-into-view
+ * Flow reservation cannot move viewport-pinned UI (the toast viewport, the
+ * sticky back-to-top slot, the fixed sidebar column) or the native scroll-into-view
  * algorithm, so this hook publishes the bar's height once, as the shell-level
  * `--app-bottom-inset` custom property on `<html>`. Consumers read a generic
  * "the shell has N pixels of bottom inset" value and never learn which bar is
