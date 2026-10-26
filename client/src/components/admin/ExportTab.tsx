@@ -204,7 +204,7 @@ export default function ExportTab({ validationStatus: propValidationStatus }: Ex
         }),
       });
 
-      if (!response.ok) throw new ApiError(response.status, "Export failed");
+      if (!response.ok) throw new ApiError(response.status, await response.text());
 
       const blob = await response.blob();
       triggerBlobDownload(blob, "awesome-list.md");
@@ -234,7 +234,7 @@ export default function ExportTab({ validationStatus: propValidationStatus }: Ex
       const response = await fetch("/api/admin/export-json", {
         credentials: "include",
       });
-      if (!response.ok) throw new ApiError(response.status, "JSON export failed");
+      if (!response.ok) throw new ApiError(response.status, await response.text());
 
       const jsonName = exportFileName(response, "awesome-list-catalog-snapshot.json");
       triggerBlobDownload(await response.blob(), jsonName);
@@ -262,7 +262,7 @@ export default function ExportTab({ validationStatus: propValidationStatus }: Ex
       const response = await fetch("/api/admin/export-csv", {
         credentials: "include",
       });
-      if (!response.ok) throw new ApiError(response.status, "CSV export failed");
+      if (!response.ok) throw new ApiError(response.status, await response.text());
 
       const csvName = exportFileName(response, "resources-export.csv");
       triggerBlobDownload(await response.blob(), csvName);
@@ -290,7 +290,7 @@ export default function ExportTab({ validationStatus: propValidationStatus }: Ex
       const response = await fetch("/api/admin/export-opml", {
         credentials: "include",
       });
-      if (!response.ok) throw new ApiError(response.status, "OPML export failed");
+      if (!response.ok) throw new ApiError(response.status, await response.text());
 
       const opmlName = exportFileName(response, "categories-export.opml");
       triggerBlobDownload(await response.blob(), opmlName);
@@ -681,7 +681,7 @@ export default function ExportTab({ validationStatus: propValidationStatus }: Ex
               : "No exports on this page. Use Previous to return to newer exports."}
           </p>
         ) : (
-          <Table className="table admin-ops-table" data-testid="table-export-history">
+          <Table className="table admin-ops-table" data-testid="table-export-history" scrollLabel="Export history table, scrollable">
             <thead>
               <tr>
                 <th>Type</th>
@@ -836,7 +836,7 @@ export default function ExportTab({ validationStatus: propValidationStatus }: Ex
               <AlertCircle className="mx-auto mb-4 h-12 w-12 text-[var(--text-2)]" />
               <p className="mb-2 text-[var(--text-2)]">No validation results yet</p>
               <p className="text-sm text-[var(--text-2)]">
-                Use “Run Validation” at the top of this section to check the exported Markdown against awesome-lint rules.
+                Open “Validation controls” at the top of this tab and use “Run Validation” to check the exported Markdown against awesome-lint rules.
               </p>
             </div>
           </section>

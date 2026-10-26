@@ -2,6 +2,16 @@ import { useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { ChevronDown, ChevronUp, DatabaseBackup, RefreshCw } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 import { apiRequest } from "@/lib/queryClient";
 import { describeWriteError, isServerError } from "@/lib/apiError";
 import { formatAdminDateTime } from "@/lib/utils";
@@ -61,6 +71,7 @@ export default function DatabaseBackupPanel() {
   const { toast } = useToast();
   const queryClient = useQueryClient();
   const [showContents, setShowContents] = useState(false);
+  const [confirmOpen, setConfirmOpen] = useState(false);
 
   const { data, isLoading, isError, error, refetch, isFetching } = useQuery<DatabaseBackupList>({
     queryKey: BACKUPS_KEY,
@@ -93,7 +104,7 @@ export default function DatabaseBackupPanel() {
       actions={
         <Button
           type="button"
-          onClick={() => { if (!busy && !unavailable) createBackup.mutate(); }}
+          onClick={() => { if (!busy && !unavailable) setConfirmOpen(true); }}
           aria-disabled={busy || unavailable}
           aria-busy={busy}
           data-testid="button-create-database-backup"
@@ -154,7 +165,7 @@ export default function DatabaseBackupPanel() {
         <p className="admin-ops-table__empty">No {data?.environment ?? ""} backups yet.</p>
       ) : (
         <>
-          <Table className="table admin-ops-table" data-testid="table-database-backups">
+          <Table className="table admin-ops-table" data-testid="table-database-backups" scrollLabel="Backups table, scrollable">
             <thead>
               <tr>
                 <th>Backup id</th>
@@ -201,7 +212,7 @@ export default function DatabaseBackupPanel() {
                     {latest.sequenceCount} sequences
                     {latest.inventory.extensions.length ? ` · extensions ${latest.inventory.extensions.join(", ")}` : ""}
                   </p>
-                  <Table className="table admin-ops-table" data-testid="table-database-backup-contents">
+                  <Table className="table admin-ops-table" data-testid="table-database-backup-contents" scrollLabel="Latest backup contents table, scrollable">
                     <thead>
                       <tr>
                         <th>Table</th>
@@ -223,6 +234,31 @@ export default function DatabaseBackupPanel() {
           ) : null}
         </>
       )}
+
+      <AlertDialog open={confirmOpen} onOpenChange={setConfirmOpen}>
+        <AlertDialogContent data-testid="dialog-confirm-database-backup">
+          <AlertDialogHeader>
+            <AlertDialogTitle>Create a full database backup?</AlertDialogTitle>
+            <AlertDialogDescription>
+              This copies every table and row, including user accounts and other personal data, into this
+              project&apos;s private App Storage. It runs while you wait. Existing data is not changed; the audit log records
+              the backup.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel data-testid="button-cancel-database-backup">Cancel</AlertDialogCancel>
+            <AlertDialogAction
+              data-testid="button-confirm-database-backup"
+              onClick={() => {
+                setConfirmOpen(false);
+                createBackup.mutate();
+              }}
+            >
+              Create backup
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </TableShell>
   );
 }

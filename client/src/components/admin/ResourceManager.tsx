@@ -1,4 +1,4 @@
-import { useState, useMemo, useEffect, useRef } from "react";
+import { useState, useMemo, useEffect, useRef, useCallback } from "react";
 import { useQuery, useMutation, useQueryClient, keepPreviousData } from "@tanstack/react-query";
 import { apiRequest, ApiError } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
@@ -35,6 +35,7 @@ import { parsePageFromSearch } from "@/lib/page-param";
 import { resourceTitleSchema, optionalResourceDescriptionSchema, webUrlSchema, httpsUrlSchema } from "@shared/validation";
 import { describeWriteError, NOTHING_CHANGED_OUTCOME, extractFieldErrors } from "@/lib/apiError";
 import { focusElement, focusPageHeading, handoffFocusOnUnmount } from "@/hooks/focus-handoff";
+import { useHorizontalScrollCue } from "@/hooks/use-horizontal-scroll-cue";
 import {
   RESOURCE_FORMAT_LABELS,
   RESOURCE_FORMAT_VALUES,
@@ -115,6 +116,34 @@ const normalizeAdminResource = (resource: AdminResourceWire): AdminResource => {
 const kindSelectValue = (resource: Pick<AdminResource, "kind" | "inferredKind">): ResourceKind | "" =>
   resource.kind && resource.kind !== resource.inferredKind ? resource.kind : "";
 const featuredValue = (resource: AdminResource) => resource.metadata?.featured === true;
+
+type ResourceFormField = "title" | "url" | "description" | "category" | "rejectionReason";
+type ResourceFieldErrors = Partial<Record<ResourceFormField, string>>;
+
+/** The dialogs' validated fields in visual order. */
+const RESOURCE_FORM_FIELDS: readonly ResourceFormField[] = [
+  "title",
+  "url",
+  "description",
+  "category",
+  "rejectionReason",
+];
+
+const resourceFieldId = (mode: "edit" | "create", field: ResourceFormField) =>
+  field === "rejectionReason" ? "edit-rejection-reason" : `${mode}-${field}`;
+
+/**
+ * A failed submit left focus on the submit button, or on the dialog once a
+ * pending save disabled it. Land on the first invalid field after it renders
+ * its aria-describedby error, which screen readers then read with the field.
+ * Returns whether any field was invalid.
+ */
+const focusFirstInvalidField = (mode: "edit" | "create", errors: ResourceFieldErrors): boolean => {
+  const firstInvalid = RESOURCE_FORM_FIELDS.find((field) => errors[field]);
+  if (!firstInvalid) return false;
+  requestAnimationFrame(() => document.getElementById(resourceFieldId(mode, firstInvalid))?.focus());
+  return true;
+};
 
 /** Bulk endpoints answer 200 (all ok) or 207 (partial) with per-item failures. */
 interface BulkResourceResult {
@@ -284,7 +313,7 @@ export default function ResourceManager({ createRequest = 0 }: { createRequest?:
   const [bulkApproveDialogOpen, setBulkApproveDialogOpen] = useState(false);
 
   // BUG-049: per-field inline errors + a dialog-level banner for server 400s.
-  const [fieldErrors, setFieldErrors] = useState<{ title?: string; url?: string; description?: string; category?: string; rejectionReason?: string }>({});
+  const [fieldErrors, setFieldErrors] = useState<ResourceFieldErrors>({});
   // Moving a resource into Rejected from the editor needs the same 10+
   // character reason as the moderation queue; the contributor sees it.
   const [rejectionReason, setRejectionReason] = useState("");
@@ -386,7 +415,13 @@ export default function ResourceManager({ createRequest = 0 }: { createRequest?:
   const shownLimit = data?.limit ?? limit;
   // C4-V5A-01: "Stay on page N" unmounts itself; land focus on the rows it
   // kept instead of dropping it to <body>.
-  const tableRegionRef = useRef<HTMLDivElement>(null);
+  const tableRegionRef = useRef<HTMLDivElement | null>(null);
+  const tableScrollCue = useHorizontalScrollCue();
+  const setTableScroller = tableScrollCue.ref;
+  const tableRegionCallbackRef = useCallback((el: HTMLDivElement | null) => {
+    tableRegionRef.current = el;
+    setTableScroller(el);
+  }, [setTableScroller]);
   // C5-V5A-01: a confirmed bulk action clears the selection (unmounting the
   // bar that opened its dialog) and a row delete removes its row, so the
   // dialog's return-focus target is gone. Land on the table instead.
@@ -439,13 +474,13 @@ export default function ResourceManager({ createRequest = 0 }: { createRequest?:
 
   // C3-V5A-02: a server 400 carries per-field messages; mark those fields
   // inline and keep the banner for anything that has no field in the dialog.
-  const showServerFormError = (error: Error, fallback: string) => {
+  const showServerFormError = (mode: "edit" | "create", error: Error, fallback: string) => {
     const serverFieldErrors = extractFieldErrors(error);
     if (!serverFieldErrors) {
       setFormError(describeWriteError(error, { fallback, outcome: NOTHING_CHANGED_OUTCOME }));
       return;
     }
-    const inline: { title?: string; url?: string; description?: string; rejectionReason?: string } = {};
+    const inline: ResourceFieldErrors = {};
     const other: string[] = [];
     for (const [field, message] of Object.entries(serverFieldErrors)) {
       if (field === "title" || field === "url" || field === "description" || field === "rejectionReason") inline[field] = message;
@@ -453,6 +488,7 @@ export default function ResourceManager({ createRequest = 0 }: { createRequest?:
     }
     setFieldErrors(inline);
     setFormError(other.length > 0 ? other.join(" ") : "Please fix the highlighted fields.");
+    focusFirstInvalidField(mode, inline);
   };
 
   const updateMutation = useMutation({
@@ -481,7 +517,7 @@ export default function ResourceManager({ createRequest = 0 }: { createRequest?:
     onError: (error: Error) => {
       // BUG-049: keep the dialog open and surface the server's message inline
       // so the operator can correct the field, not just see a vanishing toast.
-      showServerFormError(error, "Failed to update resource");
+      showServerFormError("edit", error, "Failed to update resource");
     }
   });
 
@@ -691,7 +727,7 @@ export default function ResourceManager({ createRequest = 0 }: { createRequest?:
     },
     onError: (error: Error) => {
       // BUG-049: surface server-side rejection inline in the open dialog.
-      showServerFormError(error, "Failed to create resource");
+      showServerFormError("create", error, "Failed to create resource");
     }
   });
 
@@ -928,7 +964,7 @@ export default function ResourceManager({ createRequest = 0 }: { createRequest?:
   );
 
   const validateEditForm = (mode: 'edit' | 'create'): boolean => {
-    const errors: { title?: string; url?: string; description?: string; category?: string; rejectionReason?: string } = {};
+    const errors: ResourceFieldErrors = {};
     const titleParsed = resourceTitleSchema.safeParse(editForm.title.trim());
     if (!titleParsed.success) {
       errors.title = titleParsed.error.issues[0]?.message || "Invalid title";
@@ -951,10 +987,10 @@ export default function ResourceManager({ createRequest = 0 }: { createRequest?:
     }
     setFieldErrors(errors);
     setFormError(null);
-    return Object.keys(errors).length === 0;
+    return !focusFirstInvalidField(mode, errors);
   };
 
-  const clearFieldError = (field: 'title' | 'url' | 'description' | 'category' | 'rejectionReason') => {
+  const clearFieldError = (field: ResourceFormField) => {
     setFieldErrors(prev => (prev[field] ? { ...prev, [field]: undefined } : prev));
   };
 
@@ -1501,10 +1537,21 @@ export default function ResourceManager({ createRequest = 0 }: { createRequest?:
               </div>
             </div>
           )}
+          <div className="relative">
+          {tableScrollCue.showCue && (
+            <div
+              aria-hidden="true"
+              className="pointer-events-none absolute inset-y-0 right-0 w-8 bg-gradient-to-l from-background to-transparent z-10"
+              data-testid="gradient-scroll-cue-resources"
+            />
+          )}
           <div
-            ref={tableRegionRef}
-            tabIndex={-1}
-            className="admin-catalog-resources__table-scroll overflow-auto"
+            ref={tableRegionCallbackRef}
+            tabIndex={0}
+            role="region"
+            aria-label="Resources table, scrollable"
+            onKeyDown={tableScrollCue.onKeyDown}
+            className="admin-catalog-resources__table-scroll overflow-auto focus-visible:outline focus-visible:outline-2 focus-visible:outline-ring"
           >
             <table className="table admin-catalog-resources__table">
               <thead>
@@ -1636,10 +1683,12 @@ export default function ResourceManager({ createRequest = 0 }: { createRequest?:
               </tbody>
             </table>
           </div>
-          {/* Run17 BUG-033: same sideways-scroll hint the Users table has. */}
-          <p className="admin-catalog-resources__scroll-hint text-xs text-muted-foreground mt-2 sm:hidden">
-            Swipe the table sideways to see category, tags, featured, and actions.
-          </p>
+          </div>
+          {tableScrollCue.showCue && (
+            <p className="admin-catalog-resources__scroll-hint text-xs text-muted-foreground mt-2" data-testid="hint-swipe-resources-table">
+              Swipe the table sideways to see category, tags, featured, and actions.
+            </p>
+          )}
 
           {/* Run16 BUG-035: page-size selector + first/last jump buttons. */}
           <div className="admin-catalog-resources__pagination-summary flex flex-wrap items-center justify-between gap-3 pt-4 border-t border-[var(--border)]">

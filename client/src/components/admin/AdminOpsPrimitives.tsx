@@ -30,13 +30,19 @@ AdminOpsScrollBar.displayName = ScrollAreaPrimitive.ScrollAreaScrollbar.displayN
  * Operations-owned equivalent of the shared Table primitive. The viewport
  * wrapper intentionally owns the focus target so every operations table has
  * one keyboard-discoverable horizontal scroll region without changing the
- * shared UI contract.
+ * shared UI contract. `scrollLabel` names that focus target as a region so a
+ * screen reader announces what Tab landed on.
  */
 export const AdminOpsTable = React.forwardRef<
   HTMLTableElement,
-  React.HTMLAttributes<HTMLTableElement>
->(({ className, ...props }, ref) => (
-  <div className="relative w-full overflow-auto" tabIndex={0}>
+  React.HTMLAttributes<HTMLTableElement> & { scrollLabel: string }
+>(({ className, scrollLabel, ...props }, ref) => (
+  <div
+    className="relative w-full overflow-auto"
+    tabIndex={0}
+    role="region"
+    aria-label={scrollLabel}
+  >
     <table ref={ref} className={cn("w-full caption-bottom text-sm", className)} {...props} />
   </div>
 ));
@@ -44,6 +50,8 @@ AdminOpsTable.displayName = "Table";
 
 type AdminOpsScrollAreaProps = React.ComponentPropsWithoutRef<typeof ScrollAreaPrimitive.Root> & {
   viewportClassName?: string;
+  /** Names the focusable viewport as a region for assistive technology. */
+  scrollLabel?: string;
 };
 
 /**
@@ -54,7 +62,7 @@ type AdminOpsScrollAreaProps = React.ComponentPropsWithoutRef<typeof ScrollAreaP
 export const AdminOpsScrollArea = React.forwardRef<
   React.ElementRef<typeof ScrollAreaPrimitive.Root>,
   AdminOpsScrollAreaProps
->(({ className, viewportClassName, children, ...props }, ref) => (
+>(({ className, viewportClassName, scrollLabel, children, ...props }, ref) => (
   <ScrollAreaPrimitive.Root
     ref={ref}
     className={cn("relative overflow-hidden", className)}
@@ -63,6 +71,8 @@ export const AdminOpsScrollArea = React.forwardRef<
     <ScrollAreaPrimitive.Viewport
       className={cn("h-full w-full", viewportClassName)}
       tabIndex={0}
+      role={scrollLabel ? "region" : undefined}
+      aria-label={scrollLabel}
     >
       {children}
     </ScrollAreaPrimitive.Viewport>

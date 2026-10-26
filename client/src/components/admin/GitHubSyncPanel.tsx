@@ -5,7 +5,9 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Badge } from "@/components/ui/badge";
-import { TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+// The history table wraps its cells instead of scrolling, so it uses the
+// shared Table, whose wrapper is not a keyboard stop.
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Folder, Download, Upload, RefreshCw, CheckCircle2, XCircle, Clock, ExternalLink, Activity } from "lucide-react";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
@@ -16,7 +18,6 @@ import { useToast } from "@/hooks/use-toast";
 import { useContactConfig } from "@/lib/contact";
 import {
   AdminOpsScrollArea as ScrollArea,
-  AdminOpsTable as Table,
   StatusChip,
   TableShell,
 } from "@/components/admin/AdminOpsPrimitives";
@@ -25,6 +26,7 @@ import {
 import { formatAdminDateTime as formatSyncDate } from "@/lib/utils";
 import { normalizeGithubRepoInput } from "@shared/validation";
 import { AdminLoadError } from "@/components/admin/AdminLoadError";
+import { GitHubImportPreview, ImportPreviewConfirmNote, useImportPreview } from "@/components/admin/GitHubImportPreview";
 import "@/styles/pages/admin-ops-github-links.css";
 
 interface SyncHistory {
@@ -103,10 +105,21 @@ export default function GitHubSyncPanel() {
   // "not a repo!!" used to be accepted and fail minutes later in the queue.
   const normalizedRepo = normalizeGithubRepoInput(repoUrl);
   const repoInvalid = repoUrl.trim().length > 0 && !normalizedRepo;
+  const repoMissing = repoUrlTouched && repoUrl.trim().length === 0;
   const repositoryExample = configuredRepo ?? "owner/repository";
+  // Pull and Sync now act on the edited target, so the header says so
+  // whenever that target is not the configured repository, or is unusable.
+  const targetNote = repoUrlTouched && !normalizedRepo
+    ? "Pull and Sync now stay off until Target Repository holds a repository (owner/repository)."
+    : normalizedRepo && configuredRepo && normalizedRepo !== configuredRepo
+      ? `Pull and Sync now target ${normalizedRepo}, not the configured repository.`
+      : null;
+
+  const importPreview = useImportPreview(normalizedRepo);
 
   const resetRepository = () => {
     if (configuredRepo) {
+      importPreview.retarget();
       setRepoUrlTouched(false);
       setRepoUrl(configuredRepo);
     }
@@ -158,6 +171,7 @@ export default function GitHubSyncPanel() {
       });
     },
     onSuccess: () => {
+      importPreview.clear();
       void queryClient.invalidateQueries({ queryKey: ['/api/github/sync-history'] });
       void queryClient.invalidateQueries({ queryKey: ['/api/github/sync-status'] });
       toast({
@@ -268,13 +282,33 @@ export default function GitHubSyncPanel() {
               <p className="ops-github-panel__repository-meta">
                 {configuredBranch} · {lastSync ? `last sync ${formatSyncDate(lastSync.createdAt)}` : "not synced yet"} · {syncQueueData?.total ?? 0} sync jobs
               </p>
+              {targetNote && (
+                <p
+                  id="repo-target-note"
+                  className={`ops-github-panel__repository-target${normalizedRepo ? "" : " ops-github-panel__repository-target--blocked"}`}
+                  data-testid="text-repo-target"
+                >
+                  {targetNote}
+                </p>
+              )}
             </div>
             <div className="ops-github-panel__repository-actions">
               <div className="flex flex-wrap gap-2">
                 <Button
                   variant="outline"
+                  onClick={importPreview.run}
+                  disabled={importPreview.isPending || !normalizedRepo}
+                  aria-describedby={targetNote ? "repo-target-note" : undefined}
+                  data-testid="button-preview-import"
+                >
+                  {importPreview.isPending && <RefreshCw className="h-4 w-4 mr-2 animate-spin" />}
+                  {importPreview.isPending ? "Previewing..." : "Preview import"}
+                </Button>
+                <Button
+                  variant="outline"
                   onClick={() => setConfirmAction("import")}
                   disabled={importMutation.isPending || !normalizedRepo}
+                  aria-describedby={targetNote ? "repo-target-note" : undefined}
                   data-testid="button-import-github"
                 >
                   {importMutation.isPending && <RefreshCw className="h-4 w-4 mr-2 animate-spin" />}
@@ -283,6 +317,7 @@ export default function GitHubSyncPanel() {
                 <Button
                   onClick={() => setConfirmAction("export")}
                   disabled={exportMutation.isPending || !normalizedRepo}
+                  aria-describedby={targetNote ? "repo-target-note" : undefined}
                   data-testid="button-export-github"
                 >
                   {exportMutation.isPending && <RefreshCw className="h-4 w-4 mr-2 animate-spin" />}
@@ -310,12 +345,13 @@ export default function GitHubSyncPanel() {
                 placeholder={repositoryExample}
                 value={repoUrl}
                 onChange={(e) => {
+                  importPreview.retarget();
                   setRepoUrlTouched(true);
                   setRepoUrl(e.target.value);
                 }}
-                className={`font-mono text-sm ${repoInvalid ? "border-destructive focus-visible:ring-destructive" : ""}`}
-                aria-invalid={repoInvalid}
-                aria-describedby={repoInvalid ? "repo-url-error" : undefined}
+                className={`font-mono text-sm ${repoInvalid || repoMissing ? "border-destructive focus-visible:ring-destructive" : ""}`}
+                aria-invalid={repoInvalid || repoMissing}
+                aria-describedby={repoInvalid || repoMissing ? "repo-url-error" : undefined}
                 data-testid="input-repo-url"
               />
               <Button
@@ -329,9 +365,10 @@ export default function GitHubSyncPanel() {
                 <RefreshCw className="h-4 w-4" />
               </Button>
             </div>
-            {repoInvalid ? (
+            {repoInvalid || repoMissing ? (
               <p id="repo-url-error" className="text-xs text-destructive" role="alert" data-testid="text-repo-url-error">
-                Not a valid repository. Use owner/repository (e.g., {repositoryExample}) or a github.com URL.
+                {repoMissing ? "Enter a repository to pull from or sync to." : "Not a valid repository."}{" "}
+                Use owner/repository (e.g., {repositoryExample}) or a github.com URL.
               </p>
             ) : (
               <p className="text-xs text-muted-foreground">
@@ -339,6 +376,7 @@ export default function GitHubSyncPanel() {
               </p>
             )}
           </div>}
+          <GitHubImportPreview state={importPreview} />
         </CardContent>
       </Card>
 
@@ -411,7 +449,7 @@ export default function GitHubSyncPanel() {
               <Alert variant={lastSyncFailed ? 'destructive' : undefined} data-testid="alert-last-sync">
                 {lastSyncFailed || lastSyncPartial ? <XCircle className="h-4 w-4" /> : <CheckCircle2 className="h-4 w-4" />}
                 <AlertDescription className="space-y-2">
-                  <div className="flex items-center justify-between">
+                  <div className="ops-github-panel__last-sync-head">
                     <span className="font-semibold">
                         Last {lastSync.direction === 'export' ? 'Export' : 'Import'}
                     </span>
@@ -426,8 +464,8 @@ export default function GitHubSyncPanel() {
                         partial · {lastSync.errorMessages?.length ?? 0} failed
                       </StatusChip>
                     )}
-                    <Badge variant="outline">
-                      <Clock className="h-3 w-3 mr-1" />
+                    <Badge variant="outline" className="ops-github-panel__last-sync-date" data-testid="badge-last-sync-date">
+                      <Clock className="h-3 w-3 mr-1 shrink-0" />
                       {formatSyncDate(lastSync.createdAt)}
                     </Badge>
                   </div>
@@ -493,7 +531,7 @@ export default function GitHubSyncPanel() {
              ) : syncQueue && syncQueue.length > 0 && (
               <div className="space-y-2">
                 <h4 className="text-sm font-semibold">Recent Sync Jobs</h4>
-                <ScrollArea className="h-[200px] rounded border">
+                <ScrollArea className="h-[200px] rounded border" scrollLabel="Recent sync jobs, scrollable">
                   <div className="p-2 space-y-2">
                     {dedupedQueue.map(({ item, count }) => (
                       <div
@@ -657,14 +695,14 @@ export default function GitHubSyncPanel() {
               {confirmAction === "import" ? (
                 <>
                   This pulls the resource list from{" "}
-                  <span className="font-medium text-foreground">{repoUrl}</span>{" "}
-                  and updates the database to match — new resources are added and
-                  existing ones may be updated.
+                  <span className="font-medium text-foreground">{normalizedRepo}</span>{" "}
+                  and updates the database to match.{" "}
+                  <ImportPreviewConfirmNote preview={importPreview.current} />
                 </>
               ) : (
                 <>
                   This pushes the approved catalog as a commit to{" "}
-                  <span className="font-medium text-foreground">{repoUrl}</span>,
+                  <span className="font-medium text-foreground">{normalizedRepo}</span>,
                   rewriting its README resource list.
                 </>
               )}

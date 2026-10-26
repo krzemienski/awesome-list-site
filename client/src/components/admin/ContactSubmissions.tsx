@@ -149,7 +149,7 @@ export default function ContactSubmissions() {
                 className="pointer-events-none absolute inset-y-0 right-0 w-8 bg-gradient-to-l from-card to-transparent sm:hidden"
                 aria-hidden="true"
               />
-              <Table className="admin-ops-table admin-ops-contact-table">
+              <Table className="admin-ops-table admin-ops-contact-table" scrollLabel="Contact submissions table, scrollable">
                 <TableHeader>
                   <TableRow>
                     <TableHead>Name</TableHead>
