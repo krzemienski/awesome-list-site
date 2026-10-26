@@ -380,6 +380,15 @@ function buildClerkAppearance(
       // The design system's `.input` paints the field; the 44px touch minimum
       // rides on `.cl-formFieldInput.input` in app-bridge.css.
       formFieldInput: "input auth-edge",
+      // Clerk insets the toggle 3px inside the 44px field, leaving it 38px
+      // tall; pinning it to the field's edges gives it the full 44px.
+      formFieldInputShowPasswordButton: {
+        top: 0,
+        right: 0,
+        bottom: 0,
+        minHeight: "44px",
+        minWidth: "44px",
+      },
       otpCodeFieldInput: {
         ...(palette.fieldSurface ? { backgroundColor: palette.fieldSurface } : {}),
         ...(palette.ink ? { color: palette.ink } : {}),
