@@ -13,6 +13,7 @@ import { Switch } from "@/components/ui/switch";
 import { Checkbox } from "@/components/ui/checkbox";
 import SEOHead from "@/components/layout/SEOHead";
 import { PRODUCT_PROFILES } from "@/lib/design-system";
+import { designSystemSeoDescription } from "@shared/seo-templates";
 import "@/styles/pages/system.css";
 
 /**
@@ -175,7 +176,7 @@ export default function DesignSystemShowcase() {
     <div className="system-showcase space-y-12">
       <SEOHead
         title="Design System"
-        description="The Awesome Video design system — 2 systems × 10 accents, live tokens, type scale, and core components."
+        description={designSystemSeoDescription}
         noindex
       />
 

@@ -4,6 +4,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { requestedReturnPath } from "@/lib/returnUrl";
 import { setAdminAnalyticsSession } from "@/lib/analytics-suppression";
+import { authPageHeadings } from "@shared/seo-templates";
 
 /**
  * Owner password sign-in, shown on /sign-in?admin. Posts to
@@ -53,7 +54,7 @@ export function AdminPasswordSignIn() {
       className="flex w-full max-w-sm flex-col gap-4 px-4"
       data-testid="form-admin-password"
     >
-      <h1 className="page-title text-xl">Admin sign-in</h1>
+      <h1 className="page-title text-xl">{authPageHeadings.adminSignIn}</h1>
       <div className="flex flex-col gap-2">
         <Label htmlFor="admin-password">Password</Label>
         <Input
