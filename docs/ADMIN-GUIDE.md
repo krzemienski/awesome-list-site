@@ -196,8 +196,9 @@ Import resources from any awesome-list repository.
    - **Dry Run**: `POST /api/admin/import-github` with
      `{"repoUrl": "...", "dryRun": true}`. It writes nothing (no resources,
      categories, or queue/history rows) and returns the plan synchronously:
-     "Would create …" warnings for headings with no matching taxonomy node,
-     plus `wouldCreateTaxonomy`. The queued `POST /api/github/import` rejects
+     the counts, `wouldCreateTaxonomy` for headings with no matching taxonomy
+     node, `warnings` for plan notes such as taxonomy merges, and the README's
+     awesome-lint findings in `validationWarnings`. The queued `POST /api/github/import` rejects
      `dryRun` with a 400. Against the full awesome-video README it answers in
      about 10 seconds on production. With the taxonomy in sync,
      `wouldCreateTaxonomy` is empty. An entry there means an upstream heading

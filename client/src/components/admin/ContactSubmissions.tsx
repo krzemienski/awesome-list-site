@@ -145,10 +145,6 @@ export default function ContactSubmissions() {
         ) : (
           <>
             <div className="admin-ops-table-wrap relative">
-              <div
-                className="pointer-events-none absolute inset-y-0 right-0 w-8 bg-gradient-to-l from-card to-transparent sm:hidden"
-                aria-hidden="true"
-              />
               <Table className="admin-ops-table admin-ops-contact-table" scrollLabel="Contact submissions table, scrollable">
                 <TableHeader>
                   <TableRow>
@@ -208,9 +204,6 @@ export default function ContactSubmissions() {
                 </TableBody>
               </Table>
             </div>
-            <p className="admin-ops-scroll-hint text-xs text-muted-foreground mt-2 sm:hidden">
-              Swipe the table sideways to see all columns.
-            </p>
             {total > 0 && (
               <div className="admin-ops-pagination flex flex-wrap items-center justify-between gap-3 pt-4">
                 <p className="text-sm text-muted-foreground" data-testid="text-contact-submissions-range">

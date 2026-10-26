@@ -39,7 +39,7 @@ export function CancelResearchRunDialog({ jobId, pending, error, onConfirm, onDi
           </AlertDialogDescription>
         </AlertDialogHeader>
         {error ? (
-          <Alert variant="destructive" role="alert">
+          <Alert variant="destructive">
             <AlertCircle className="h-4 w-4" />
             <AlertDescription>{describeWriteError(error, { outcome: "The run may still be going. Try cancelling again." })}</AlertDescription>
           </Alert>

@@ -10,19 +10,19 @@ import {
   RESOURCE_SKILL_LEVEL_LABELS, type ResourceFormat, type ResourceProvider,
   type ResourceSearchSort, type ResourceSkillLevel, type ResourceSearchFacets,
 } from "@shared/resourceFacets-core";
-import { tagDisplayNameBranded } from "@shared/seo-templates";
 import { normalizeTag } from "@/lib/tags";
+import { label, offeredFacets, options, orList, tagLabel, type FilterState } from "./facet-options";
 
-type State = { category: string; subcategory: string; subSubcategory: string; tags: string[]; provider: string; format: string; skillLevel: string; sort: string };
 type Props = {
-  state: State;
+  state: FilterState;
   facets?: ResourceSearchFacets;
-  onChange: (key: keyof State, value: string | string[]) => void;
+  onChange: (key: keyof FilterState, value: string | string[]) => void;
   onClear: () => void;
   /** Taxonomy listings already establish their category scope. */
   hideTaxonomyFacets?: boolean;
+  /** The surface's own narrowing controls outside this panel, named when no facet applies. */
+  otherControls: string[];
 };
-type Count = { value: string; count: number };
 
 /**
  * Task #379 (uxv2-08): the tag facet used to render up to 80 rows, which alone
@@ -35,29 +35,10 @@ const FACET_VISIBLE_ROWS = 6;
 /** Tag rows the sidebar's max-h-56 (14rem) list holds; rows are 2.75rem. */
 const TAG_VISIBLE_ROWS = 5;
 
-// Taxonomy facet values are the canonical names ("FFmpeg-Based Tools"); only
-// the placeholder value needs a label. Tags are slugs with their own display names.
-const label = (value: string) => value === "unknown" ? "Not yet classified" : value;
-// C3-V1-02: an all-caps tag from the data ("AMD", via a card pill) keeps its
-// spelling; title-casing the slug would print "Amd".
-const tagLabel = (value: string) =>
-  /[A-Z]/.test(value) && value === value.toUpperCase() ? value.trim() : tagDisplayNameBranded(normalizeTag(value));
 const fieldLabel = (value: string) => value
   .replace(/([a-z])([A-Z])/g, "$1 $2")
   .replace(/[-_]/g, " ")
   .replace(/\b\w/g, c => c.toUpperCase());
-const identity = (value: string) => value;
-const options = (counts: Count[] | undefined, selected: string | string[], labels?: Record<string, string>, toLabel = label, keyOf = identity) => {
-  const values = new Map((counts ?? []).map(c => [keyOf(c.value), { value: c.value, count: c.count }]));
-  const selectedValues = Array.isArray(selected) ? selected : selected ? [selected] : [];
-  // C3-V1-02: a selected value joins its facet row by identity (tags: the
-  // canonical slug, so "?tags=AMD" is the facet's "amd"), keeping the
-  // selected spelling, instead of adding a second zero-count row.
-  for (const value of selectedValues) {
-    values.set(keyOf(value), { value, count: values.get(keyOf(value))?.count ?? 0 });
-  }
-  return [...values.values()].map(({ value, count }) => ({ value, count, label: labels?.[value] ?? toLabel(value) }));
-};
 
 /**
  * Task #379 (uxv2-08): the sidebar listed seven always-open facet groups, so on
@@ -111,10 +92,10 @@ function FacetList({ title, items, value, onSelect, testid, collapseInert = fals
   </FacetGroup>;
 }
 
-export default function SearchFilters({ state, facets, onChange, onClear, hideTaxonomyFacets = false }: Props) {
+export default function SearchFilters({ state, facets, onChange, onClear, hideTaxonomyFacets = false, otherControls }: Props) {
   const [open, setOpen] = useState(false);
   const [tagSearch, setTagSearch] = useState("");
-  const applyChange = (key: keyof State, value: string | string[]) => {
+  const applyChange = (key: keyof FilterState, value: string | string[]) => {
     setOpen(false);
     onChange(key, value);
   };
@@ -134,20 +115,9 @@ export default function SearchFilters({ state, facets, onChange, onClear, hideTa
   }, [allTags, state.tags, tagSearch]);
   const listedTags = tags.slice(0, TAG_LIMIT);
   const unlistedTags = tags.length - listedTags.length;
-  // Mirrors FacetList's own hide rules: when every group would render nothing
-  // (e.g. a listing whose resources are all unclassified and untagged), say
-  // so instead of opening a blank panel.
-  const renders = (items: unknown[], value: string, collapseInert = false) =>
-    items.length > 0 && !(collapseInert && items.length === 1 && !value);
-  const hasFacets =
-    allTags.length > 0 ||
-    (!hideTaxonomyFacets && (
-      renders(options(facets?.categories, state.category), state.category) ||
-      renders(options(facets?.subcategories, state.subcategory), state.subcategory) ||
-      renders(options(facets?.subSubcategories, state.subSubcategory), state.subSubcategory))) ||
-    renders(options(facets?.providers, state.provider, RESOURCE_PROVIDER_LABELS), state.provider, true) ||
-    renders(options(facets?.formats, state.format, RESOURCE_FORMAT_LABELS), state.format, true) ||
-    renders(options(facets?.skillLevels, state.skillLevel, RESOURCE_SKILL_LEVEL_LABELS), state.skillLevel, true);
+  // When every group would render nothing (e.g. a listing whose resources are
+  // all unclassified and untagged), say so instead of opening a blank panel.
+  const hasFacets = offeredFacets(facets, state, hideTaxonomyFacets).length > 0;
   // The desktop sidebar is a persistent column, so its tag list scrolls in
   // place; the mobile sheet already scrolls as a whole, so there the list
   // takes the sheet's height instead of a 224px box inside it.
@@ -155,7 +125,7 @@ export default function SearchFilters({ state, facets, onChange, onClear, hideTa
     const tagsScroll = collapsible && listedTags.length > TAG_VISIBLE_ROWS;
     return <div className="space-y-6">
     <div className="flex items-center justify-between"><div><p className="text-sm font-semibold">Narrow results</p><p className="text-xs text-muted-foreground">Counts update for this combination.</p></div>{activeCount > 0 && <Button variant="ghost" size="sm" onClick={clear} data-testid="button-clear-filters">Clear all</Button>}</div>
-    {facets && !hasFacets && <p className="text-sm text-muted-foreground" role="status" data-testid="text-no-facets">No further filters apply to these results. Use search, type or sort to narrow them.</p>}
+    {facets && !hasFacets && <p className="text-sm text-muted-foreground" role="status" data-testid="text-no-facets">No further filters apply to these results.{otherControls.length > 0 && ` Use ${orList(otherControls)} to narrow them.`}</p>}
     {/* Category is the entry point into the taxonomy, so it stays open; the two
         drill-down levels and the tag list are the long ones and open on demand. */}
     {!hideTaxonomyFacets && <FacetList title="Category" items={options(facets?.categories, state.category)} value={state.category} onSelect={v => applyChange("category", v)} testid="category" showAll />}
@@ -183,9 +153,9 @@ export default function SearchFilters({ state, facets, onChange, onClear, hideTa
     <div className="lg:hidden"><Sheet open={open} onOpenChange={setOpen}><SheetTrigger asChild><Button variant="outline" className="min-h-11 gap-2" data-testid="button-open-filters"><SlidersHorizontal className="h-4 w-4" /> Filters {activeCount > 0 && <span className="rounded-full bg-[var(--accent)] px-2 py-0.5 text-xs text-black">{activeCount}</span>}</Button></SheetTrigger><SheetContent side="left" className="w-[min(90vw,360px)] overflow-y-auto"><SheetHeader><SheetTitle>Filters</SheetTitle></SheetHeader><div className="mt-5">{content(false)}</div></SheetContent></Sheet></div></>;
 }
 
-export function ActiveFilters({ state, onChange, onClear, defaultSort = "relevance" }: { state: State; onChange: (key: keyof State, value: string | string[]) => void; onClear: () => void; defaultSort?: string }) {
-  const chips: { key: keyof State; value: string; text: string }[] = [];
-  const chipLabels: Partial<Record<keyof State, Record<string, string>>> = { provider: RESOURCE_PROVIDER_LABELS, format: RESOURCE_FORMAT_LABELS, skillLevel: RESOURCE_SKILL_LEVEL_LABELS };
+export function ActiveFilters({ state, onChange, onClear, defaultSort = "relevance" }: { state: FilterState; onChange: (key: keyof FilterState, value: string | string[]) => void; onClear: () => void; defaultSort?: string }) {
+  const chips: { key: keyof FilterState; value: string; text: string }[] = [];
+  const chipLabels: Partial<Record<keyof FilterState, Record<string, string>>> = { provider: RESOURCE_PROVIDER_LABELS, format: RESOURCE_FORMAT_LABELS, skillLevel: RESOURCE_SKILL_LEVEL_LABELS };
   (["category", "subcategory", "subSubcategory", "provider", "format", "skillLevel"] as const).forEach(key => { if (state[key]) { const value = state[key] as string; chips.push({ key, value, text: `${fieldLabel(key)}: ${chipLabels[key]?.[value] ?? label(value)}` }); } });
   if (state.sort && state.sort !== defaultSort && !(state.sort in RESOURCE_SEARCH_SORT_LABELS)) {
     chips.push({ key: "sort", value: state.sort, text: `Unsupported sort: ${state.sort}` });

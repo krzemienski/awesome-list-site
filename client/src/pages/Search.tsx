@@ -19,6 +19,7 @@ import type { Resource as DbResource } from "@shared/schema";
 import type { ResourceSearchFacets } from "@shared/resourceFacets";
 import { Paginator } from "@/components/ui/paginator";
 import SearchFilters, { ActiveFilters, sortLabels } from "@/components/search/SearchFilters";
+import { offeredFacets, orList } from "@/components/search/facet-options";
 import { parsePageFromSearch, pageNoticeFor } from "@/lib/page-param";
 import { trackFilterUsage, trackSearch, trackSortChange, trackTagInteraction } from "@/lib/analytics";
 import { readSearchState, searchApiParams, searchCanBrowse } from "@shared/discovery-params";
@@ -252,6 +253,8 @@ export default function Search() {
     category: resolvedNames.current.category.get(state.category) ?? state.category,
     subcategory: resolvedNames.current.subcategory.get(state.subcategory) ?? state.subcategory,
   };
+  const facets = data?.facets ?? lastFacets.current;
+  const facetNames = offeredFacets(facets, filterState);
   useEffect(() => { if (data && state.page > totalPages) { preservePageNoticeRef.current = true; setState(s => ({ ...s, page: totalPages })); writeFilterParams({ page: totalPages > 1 ? String(totalPages) : null }, "replace"); setPageNotice(`Page ${state.page} is beyond the available results. Showing page ${totalPages}.`); } }, [data, state.page, totalPages]);
   const gotoPage = (n: number) => { setState(s => ({ ...s, page: n })); writeFilterParams({ page: n > 1 ? String(n) : null }, "push"); setPageNotice(null); pendingResultsFocusRef.current = true; resultsRef.current?.scrollIntoView({ block: "start", behavior: scrollBehavior() }); };
   const makePageHref = (n: number) => { const p = new URLSearchParams(window.location.search); if (n > 1) p.set("page", String(n)); else p.delete("page"); return `/search?${p.toString()}`; };
@@ -280,8 +283,8 @@ export default function Search() {
     </header>
     <ActiveFilters state={filterState} onChange={update} onClear={() => clearFilters()} />
     {pageNotice && <div className="flex items-center justify-between rounded-md border border-[var(--border)] bg-[var(--surface)] px-4 py-2 text-sm" role="status" data-testid="notice-page-adjusted"><span>{pageNotice}</span><button className="min-h-8 underline" onClick={() => { setPageNotice(null); /* C6-SWEEP-04: the notice unmounts; focus the results region */ resultsRef.current?.focus({ preventScroll: true }); }} data-testid="button-dismiss-page-notice">Dismiss</button></div>}
-    <div className="flex flex-col items-stretch gap-4 lg:flex-row lg:items-start lg:gap-6"><SearchFilters state={filterState} facets={data?.facets ?? lastFacets.current} onChange={update} onClear={() => clearFilters()} /><section ref={resultsRef} tabIndex={-1} aria-label="Search results" className="min-w-0 flex-1 outline-none">
-      {!shouldShowResults ? <StatePanel tone="empty" label={normalized ? "Query too short" : "No query"} title={normalized ? "Keep typing to search" : "Enter a query or choose filters"} inline testId="text-search-prompt" actions={<Button asChild variant="outline"><Link href="/categories">Browse categories</Link></Button>}>{normalized ? "Type a word of at least 2 letters or digits (common words like “and” or “the” are skipped), or choose a filter to browse." : "Narrow the catalog by category, provider, format, skill level, or tag."}</StatePanel>
+    <div className="flex flex-col items-stretch gap-4 lg:flex-row lg:items-start lg:gap-6"><SearchFilters state={filterState} facets={facets} onChange={update} onClear={() => clearFilters()} otherControls={["search", "sort"]} /><section ref={resultsRef} tabIndex={-1} aria-label="Search results" className="min-w-0 flex-1 outline-none">
+      {!shouldShowResults ? <StatePanel tone="empty" label={normalized ? "Query too short" : "No query"} title={normalized ? "Keep typing to search" : "Enter a query or choose filters"} inline testId="text-search-prompt" actions={<Button asChild variant="outline"><Link href="/categories">Browse categories</Link></Button>}>{normalized ? "Type a word of at least 2 letters or digits (common words like “and” or “the” are skipped), or choose a filter to browse." : facetNames.length > 0 ? `Narrow the catalog by ${orList(facetNames)}.` : "Type a word to search the catalog."}</StatePanel>
        : queryTooLong ? <StatePanel tone="empty" label="Query too long" title="Shorten your search" inline testId="search-query-too-long" actions={<Button variant="outline" onClick={clearSearch} data-testid="button-clear-long-query">Clear search</Button>}><span role="alert">Search is limited to {SEARCH_QUERY_MAX_LENGTH} characters. This query has {normalized.length.toLocaleString()} — shorten it to search.</span></StatePanel>
        : offline ? <StatePanel tone="error" label="Offline" title="You’re offline" inline testId="search-results-offline" actions={<RetryButton onRetry={retrySearch} handoffFocus={false} testId="button-retry-offline-search" />}>Search couldn’t reach the catalog because your device has no connection. Results will load on their own when you reconnect.{stillOffline && <p className="system-state-note" data-testid="text-search-still-offline">Still offline — reconnect and try again.</p>}</StatePanel>
        : query.isLoading || (!data && !query.isError) ? <div className="grid gap-4 [grid-template-columns:repeat(auto-fill,minmax(min(100%,300px),1fr))]" data-testid="search-results-loading" aria-busy="true">{Array.from({ length: 6 }).map((_, i) => <ResourceCardSkeleton key={i} />)}</div>

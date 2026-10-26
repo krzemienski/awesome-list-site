@@ -85,7 +85,7 @@ export function useDiscoveryReview(onReviewed?: (discoveryId: number) => void) {
           </DialogDescription>
         </DialogHeader>
         {reject.isError && (
-          <Alert variant="destructive" className="queues-agent__inline-error" role="alert">
+          <Alert variant="destructive" className="queues-agent__inline-error">
             <AlertCircle className="w-4 h-4" />
             <AlertDescription>{describeWriteError(reject.error)}</AlertDescription>
           </Alert>
