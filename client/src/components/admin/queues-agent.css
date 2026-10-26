@@ -465,6 +465,10 @@
     padding: 16px;
   }
 }
+/* Job History: one named scroller (the Table's own yields), cells fit at 820. */
+.queues-agent__jobs-scroll > div { overflow: visible; }
+@media (max-width: 64rem) { .queues-agent--enrichment .queues-agent__table-body :is(td, th) { padding: .65rem .75rem; } }
+
 /* Match the adjusted reference's 44px control floor without changing inset. */
 .queues-agent .admin-ops-table-shell__actions .btn {
   height: auto;
