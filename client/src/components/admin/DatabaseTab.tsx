@@ -59,6 +59,11 @@ const formatStorageSize = (bytes: number): string => {
   return `${(mb / 1024).toFixed(1)} GB`;
 };
 
+const keyTablesSummary = (keyCount: number, totalTables: number): string => {
+  const total = `${totalTables.toLocaleString()} table${totalTables === 1 ? "" : "s"}`;
+  if (keyCount === 0) return `None of the key tables exist in the primary PostgreSQL database (${total} in total)`;
+  return `${keyCount} key table${keyCount === 1 ? "" : "s"} of ${total} in the primary PostgreSQL database`;
+};
 
 /**
  * @description Response type from the seed database API endpoint
@@ -328,12 +333,15 @@ export default function DatabaseTab({ stats }: DatabaseTabProps) {
         title="Key tables"
         sub={
           <span data-testid="text-database-key-tables">
-            {database
-              ? `${tableRows.length} key tables of ${database.tables.toLocaleString()} in the primary PostgreSQL database`
-              : "PostgreSQL — primary database"}
+            {database ? keyTablesSummary(tableRows.length, database.tables) : "PostgreSQL — primary database"}
           </span>
         }
       >
+        {database && tableRows.length === 0 ? (
+          <p className="admin-ops-table__empty" data-testid="text-database-key-tables-empty">
+            No key tables to list.
+          </p>
+        ) : (
         <Table className="table admin-ops-table" data-testid="table-database-tables" scrollLabel="Key tables, scrollable">
           <thead>
             <tr>
@@ -356,6 +364,7 @@ export default function DatabaseTab({ stats }: DatabaseTabProps) {
             ))}
           </tbody>
         </Table>
+        )}
       </TableShell>
 
       <AlertDialog open={seedDialogOpen} onOpenChange={setSeedDialogOpen}>
