@@ -107,11 +107,18 @@ General capture discipline:
 - **Drawer:** use `click` on the menu button, then `wait_for` `.av-sidebar-drawer[data-state="open"]`, then screenshot. Before asserting anything else, wait for `data-state="open"` on *that* element, not just any `[role=dialog]` (`.agents/memory/dialog-open-locator-race.md`).
 
 ### 2.3 44px targets
-- ES:
+Use this one probe and the triage below unchanged in every cycle, so two cycles' counts compare. Do not edit the probe for one page.
+- ES (it skips `.sr-only`, `aria-hidden` and `inert` nodes, and in-viewport nodes covered by an overlay; `op` is the resting opacity):
   ```js
-  [...document.querySelectorAll('a,button,[role=button],[role=tab],[role=menuitem],[role=option],input,select,[role=combobox],[role=checkbox],[role=radio],[role=switch]')].filter(e=>{const r=e.getBoundingClientRect(),s=getComputedStyle(e);return r.width&&r.height&&s.visibility!=='hidden'&&(r.height<44||r.width<44)}).map(e=>[e.tagName,e.dataset.testid||e.getAttribute('aria-label')||e.textContent.trim().slice(0,30),Math.round(e.getBoundingClientRect().width),Math.round(e.getBoundingClientRect().height)])
+  [...document.querySelectorAll('a,button,[role=button],[role=tab],[role=menuitem],[role=option],input,select,[role=combobox],[role=checkbox],[role=radio],[role=switch]')].filter(e=>{if(e.closest('.sr-only,[aria-hidden=true],[inert]'))return false;const r=e.getBoundingClientRect(),s=getComputedStyle(e);if(!r.width||!r.height||s.visibility==='hidden'||(r.height>=44&&r.width>=44))return false;if(r.bottom<=0||r.top>=innerHeight)return true;const h=document.elementFromPoint(r.left+r.width/2,r.top+r.height/2);return !!h&&(e.contains(h)||h.contains(e))}).map(e=>{const r=e.getBoundingClientRect();return [e.tagName,e.dataset.testid||e.getAttribute('aria-label')||e.textContent.trim().slice(0,30),Math.round(r.width),Math.round(r.height),'op '+getComputedStyle(e).opacity]})
   ```
-- Triage each hit. Inline text links (in a sentence, footer or banner) need 24px, not 44px (`docs/AGENTS.md:77`). Accepted small controls are listed in §5. A wrapper hit area counts: measure the element under `elementFromPoint`, not the painted glyph.
+- Triage each hit, in this order:
+  1. Inline text links (in a sentence, footer or banner) need 24px, not 44px (WCAG 2.5.8 inline exception, `docs/AGENTS.md:77`).
+  2. Accepted small controls are listed in §5.
+  3. A hit under 24px fails unless WCAG 2.5.8's spacing exception holds: a 24px circle centred on it intersects no other target and no other target's circle.
+  4. At 820 and 390 (touch), buttons, icon buttons, pills, tabs, pagination and menu items need 44px. A smaller one is a FAIL.
+  5. A control at `op 0` is hover-reveal, hidden at rest. Touch has no hover, so it is a touch FAIL. Confirm it with a real tap (`click` on its snapshot uid under touch emulation) and record what the tap did.
+- A wrapper hit area counts: measure the element under `elementFromPoint`, not the painted glyph.
 
 ### 2.4 Focus visible
 - Use `press_key Tab` (real keyboard), then `take_screenshot`, and look for the crimson 2px ring with a visible gap.
