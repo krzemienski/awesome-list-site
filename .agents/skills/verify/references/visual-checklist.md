@@ -52,7 +52,7 @@ correct looks like, then the read-only check. ("ES" = `evaluate_script`.)
 - [ ] **Chips:** a pill radius, `--surface` fill, hairline border, mono **UPPERCASE** at 10.5px with 0.6px tracking in `--text-2` (`design-system.css:226-240`). `chip.accent` is crimson text on an 8% crimson wash. Status chips are always #34d08c / #ffb84d / #ff5c7a and are never re-themed (`design-system.css:246-248`).
 - [ ] **Dialogs:** a black 80% backdrop; content centred, max 512px (`max-w-lg`), `--bg-2` fill (`bg-popover`), 12px radius, `--shadow-lg`, and a 44×44 close button at top-right. Tall content scrolls inside, capped at `100dvh-4rem`. Long URLs wrap rather than widen the dialog (`components/ui/dialog.tsx:79,88`).
 - [ ] **Toasts:** stacked bottom-right, max 420px wide, lifted above any consent bar by `--app-bottom-inset` (`components/ui/toast.tsx:24`). Each is an `li[data-state].system-toast` (`styles/pages/system-overlays.css:113`).
-- [ ] **Consent banner** (first visit only): a sticky bottom row at ≥640px. It is in flow, so it never covers the footer, even at first paint before scrolling (`index.css:95-114`, `.agents/memory/app-shell-bottom-bar.md:17-23`).
+- [ ] **Consent banner** (first visit only): a sticky bottom row at every width. It is in flow, so it never covers the footer, even at first paint before scrolling. Scrolled to the end, the last row of content (the footer, or an admin tab's last table row and its buttons) sits fully above it, and back-to-top and toasts are lifted above it by `--app-bottom-inset`. "Skip to main content" stays the first Tab stop (`index.css:95-114`, `.agents/memory/app-shell-bottom-bar.md:17-23`).
 
 ### 820 × 1180 (tablet)
 
@@ -67,7 +67,7 @@ correct looks like, then the read-only check. ("ES" = `evaluate_script`.)
 - [ ] **Header is 56px** with 14px side padding (`header.css:92-93`), and the mobile 56px header is a documented divergence (`replit.md:124`). It shows the logo tile only (no wordmark), a 44×44 icon-only search button, a 44px avatar-only user pill, and the menu button (`header.css:89-99`).
 - [ ] **No sidebar at all** (`sidebar.css:178-182`), and no icon rail on phone. Navigation comes only from the drawer: 86% of 390 ≈ 335px, under the 340px cap (`drawer.css:41,51`).
 - [ ] The content gutter is 14–24px (`18-launch-checklist.md:38`, `08-spacing-layout.md:68-72`), and content is single column.
-- [ ] **Consent banner** sits *in flow at the top*, below 640px, and scrolls away (`index.css:101-104`).
+- [ ] **Consent banner** is the same sticky bottom row as at 1440, never in flow at the top. With it open, scroll a long page or admin tab to the end: the last row and its buttons, back-to-top and toasts all sit above its top edge (`styles/pages/system-overlays.css:18-21`).
 - [ ] **Dialogs** are `calc(100vw - 2rem)` = 358px wide. Sheets use `w-3/4` (`sheet.tsx:41-43`).
 - [ ] **Toasts** are full width at the bottom, never covering the header (`toast.tsx:18-24`).
 - [ ] **Targets:** every header and drawer row is ≥ 44px tall (`17-accessibility.md:208-214`).
@@ -219,7 +219,7 @@ General capture discipline:
 11. **Paragraph copy in `--text-3` or `--text-4`**, or `--text-3` measuring 0.4 (the boot correction didn't run).
 12. **Page `h1` in Fraunces** where the page should use `.page-title` (a regression to `display-h`), or the reverse on 404 and state panels (`page-title-face.md`).
 13. **Card titles exceeding their clamp** at 1024–1279px (`line-clamp-anchor.md`).
-14. **The consent banner covering the footer** or the last table row at first paint (`app-shell-bottom-bar.md:17-23`, `shell/layout.css:50-61`).
+14. **The consent banner covering the footer** or the last table row at first paint (`app-shell-bottom-bar.md:17-23`), at any width.
 15. **An overlay hidden under the header**, or page text showing through a menu or dialog surface (`verifying-css-states.md:8-19`).
 16. **No visible ring after a real Tab press**, or a suppressed outline (`docs/AGENTS.md:122-123`).
 17. **A removed system** (Terminal, Brutalist, Swiss) is rendering, or the picker offers it (`two-design-systems.md:13-16`).
