@@ -4,7 +4,7 @@ A first-time visitor sees a consent banner. Nothing reaches GA4, Mixpanel, PostH
 
 ## Sub-features
 
-- AC-BANNER: banner placement per width; `consent-accept`, `consent-decline`; footer "Cookie settings" reopens it.
+- AC-BANNER: sticky bottom placement at every width; `consent-accept`, `consent-decline`; footer "Cookie settings" reopens it.
 - AC-PRE: zero vendor requests before a choice.
 - AC-EVENTS: after consent, catalog events carry the documented properties (`docs/ANALYTICS.md`).
 - AC-DECLINE: decline/revoke stops vendors and clears `_ga*` and SDK storage.
@@ -20,7 +20,7 @@ A first-time visitor sees a consent banner. Nothing reaches GA4, Mixpanel, PostH
 
 Preconditions: a fresh guest context per sub-feature; a separate admin context for AC-ADMIN.
 
-- **Banner.** Fresh context on `/` at each width: 1440/820 the banner is a sticky bottom row and does not cover the footer; 390 it sits in flow at the top. Take a screenshot.
+- **Banner.** Fresh context on `/` at each width: the banner is the last row of the page, pinned to the viewport bottom at 1440, 820 and 390 alike. Scroll to the end: the footer, or on an admin tab the last table row and its action buttons, ends fully above the banner's top edge. Back-to-top and toasts sit above the banner. The first Tab stop is still "Skip to main content", and the banner's controls come after the page content. Take a screenshot.
 - **Before consent.** Navigate three pages; `list_network_requests` (include `fetch`, `xhr`, `ping`, `other`) shows no request to `api-js.mixpanel.com/track`, `*.amplitude.com/2/httpapi`, `us.i.posthog.com/(e|batch|i/v0/e)`, or `/g/collect`.
 - **After consent.** Click `consent-accept`; perform the action under test; wait 15 s; `get_network_request` on the Mixpanel `/track` and Amplitude `/2/httpapi` requests with `requestFilePath` under `.local/verify-evidence/`; gunzip and read the event name and properties. Count Mixpanel by distinct `$insert_id`.
 - **Decline.** Footer "Cookie settings" → Decline → `document.cookie` has no `_ga`; further navigation makes no vendor requests.
