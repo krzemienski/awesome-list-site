@@ -17,6 +17,7 @@ import { useDebounce } from "@/hooks/useDebounce";
 import { useToast } from "@/hooks/use-toast";
 import { ApiError, apiRequest } from "@/lib/queryClient";
 import { describeWriteError } from "@/lib/apiError";
+import { plainHttpHost } from "@shared/validation";
 import { WARN_OUTLINE, WARN_TEXT } from "./researchDisplay";
 
 export interface ResearchLaunchGuideHandle {
@@ -33,14 +34,16 @@ interface ResearchLaunchGuideProps {
   onFollow: (jobId: number) => void;
   onLaunched: (jobId: number) => void;
   costRange: { min: number; max: number } | null;
+  /** Cost of the cheapest completed or budget-stopped run that saved a discovery. */
+  cheapestSavingRunUsd: number | null;
   catalogSize: number | null;
 }
 
 type BriefMode = "auto" | "custom";
 
-// docs/AI-SERVICES.md "Budget": the cheapest run that saved a discovery cost
-// $1.14 in 8 turns, and $0.30 caps (jobs 65, 68) stopped after 3 turns
-// without a search. Below this a cap usually ends the run before it saves one.
+// The low-budget threshold when the loaded job history has no run that saved
+// a discovery. docs/AI-SERVICES.md "Budget": $0.30 caps (jobs 65, 68)
+// stopped after 3 turns without a search.
 const LOW_BUDGET_USD = 1.25;
 
 const hint = (warn: boolean) => `mt-1 text-xs ${warn ? WARN_TEXT : "text-muted-foreground"}`;
@@ -66,7 +69,7 @@ function Step({ n, title, summary, children }: { n: number; title: string; summa
  * wherever the admin is on the tab.
  */
 export const ResearchLaunchGuide = forwardRef<ResearchLaunchGuideHandle, ResearchLaunchGuideProps>(function ResearchLaunchGuide(
-  { categoryNames, activeStateKnown, activeStateError, activeJobId, onFollow, onLaunched, costRange, catalogSize },
+  { categoryNames, activeStateKnown, activeStateError, activeJobId, onFollow, onLaunched, costRange, cheapestSavingRunUsd, catalogSize },
   ref,
 ) {
   const { toast } = useToast();
@@ -96,8 +99,9 @@ export const ResearchLaunchGuide = forwardRef<ResearchLaunchGuideHandle, Researc
   // Plain-http override endpoints need an explicit confirmation; the server
   // refuses them without allowInsecureHttp.
   const [confirmInsecureHttp, setConfirmInsecureHttp] = useState(false);
-  const baseUrlIsPlainHttp = /^http:\/\//i.test(baseUrl.trim());
-  const [launchError, setLaunchError] = useState<string | null>(null);
+  const baseUrlIsPlainHttp = plainHttpHost(baseUrl) !== null;
+  // After the first Launch click the error tracks the fields, so fixing one clears it.
+  const [launchAttempted, setLaunchAttempted] = useState(false);
   const [confirmOpen, setConfirmOpen] = useState(false);
   const launchedRef = useRef(false);
 
@@ -186,11 +190,11 @@ export const ResearchLaunchGuide = forwardRef<ResearchLaunchGuideHandle, Researc
     }
     return null;
   };
+  const launchError = launchAttempted ? validate() : null;
 
   const handleLaunch = () => {
-    const problem = validate();
-    setLaunchError(problem);
-    if (problem) return;
+    setLaunchAttempted(true);
+    if (validate()) return;
     start.reset();
     setConfirmOpen(true);
   };
@@ -302,9 +306,12 @@ export const ResearchLaunchGuide = forwardRef<ResearchLaunchGuideHandle, Researc
             <p className={hint(maxBudget.trim() !== "" && !(Number.isFinite(budgetN) && budgetN > 0))}>
               {maxBudget.trim() === "" ? "No cap — the run spends until it stops or you cancel it." : "Spend is checked between turns, so a run can go over this cap by up to one turn's cost before it stops."}
             </p>
-            {Number.isFinite(budgetN) && budgetN > 0 && budgetN < LOW_BUDGET_USD && (
+            {Number.isFinite(budgetN) && budgetN > 0 && budgetN < (cheapestSavingRunUsd ?? LOW_BUDGET_USD) && (
               <p className={hint(true)} data-testid="text-budget-low">
-                Under ${LOW_BUDGET_USD.toFixed(2)} a run usually stops before it saves anything. Each turn costs about $0.10–$0.15, $0.30 caps ended after 3 turns with no searches, and the cheapest run that saved a discovery cost $1.14.
+                {cheapestSavingRunUsd !== null
+                  ? `No run in the job history below saved a discovery for less than $${cheapestSavingRunUsd.toFixed(2)}.`
+                  : `Under $${LOW_BUDGET_USD.toFixed(2)} a run may stop before it saves anything.`}{" "}
+                Each turn costs about $0.10–$0.15, and $0.30 caps ended after 3 turns with no searches.
               </p>
             )}
           </div>

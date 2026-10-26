@@ -578,7 +578,7 @@ export default function SubmitResource() {
           <CardContent className="submit-form-card-content">
             <Form {...form}>
               {authLoading ? (
-                <Alert className="submit-auth-alert" data-testid="alert-auth-loading">
+                <Alert role="status" className="submit-auth-alert" data-testid="alert-auth-loading">
                   <Loader2 className="submit-alert-icon animate-spin" />
                   <AlertTitle>Verifying sign-in…</AlertTitle>
                   <AlertDescription>
@@ -609,7 +609,7 @@ export default function SubmitResource() {
                   </AlertDescription>
                 </Alert>
               ) : !isAuthenticated ? (
-                <Alert className="submit-auth-alert submit-login-alert" data-testid="alert-login-required"> {/* DS-OK: status warn */}
+                <Alert role="note" className="submit-auth-alert submit-login-alert" data-testid="alert-login-required"> {/* DS-OK: status warn */}
                   <LogIn className="submit-alert-icon" /> {/* DS-OK: status warn */}
                   <AlertTitle>Login required to submit</AlertTitle> {/* DS-OK: status warn */}
                   <AlertDescription>

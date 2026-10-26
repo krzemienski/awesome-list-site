@@ -194,7 +194,9 @@ Per-run overrides go through the same rules:
 
 Overrides are labelled as overrides in the job row (`resolved_config`), the
 first log line, the API and the admin UI. The launch dialog asks for
-`allowInsecureHttp` with a checkbox. `resolved_config.endpoint.baseUrl` is
+`allowInsecureHttp` with a checkbox. `POST /api/enrichment/start` applies the
+same plain-http rule and returns 400 `insecure_http_unconfirmed` without it.
+`resolved_config.endpoint.baseUrl` is
 recorded without credentials, query string or fragment (an override URL with
 either is refused). When the agent
 starts, the runner checks that the subprocess env's endpoint host equals
@@ -369,8 +371,13 @@ cached system prompt (taxonomy + saturated domains) every turn. The launch
 form now defaults to a $3.00 cap and 40 turns (was $1.00 / 15, which cannot
 finish even a two-discovery run). On production (2026-10-26, same models
 through `router.hack.ski`), a target-2 run on the defaults saved two
-discoveries in 9 turns for $1.32 (job 64). A $0.30 cap ended
-`budget_stopped`, and a cancel reported $0.28 as a lower bound. Enrichment
+discoveries in 9 turns for $1.32 (job 64), and runs 2, 9 and 11 saved
+discoveries for $0.43–$0.47. A $0.30 cap ended
+`budget_stopped`, and a cancel reported $0.28 as a lower bound. These costs
+differ by deployment, so the launch form takes its low-budget warning from
+the job history it loads: a cap below the cheapest completed or
+budget-stopped run that saved a discovery gets the warning, and with no such
+run the threshold is $1.25. Enrichment
 jobs store their estimated cost in `metadata.agent.estimatedCostUsd`, which
 the admin enrichment panel shows: 30 resources on haiku cost $0.21 (job 33),
 and 10 resources cost $0.04 (job 34).

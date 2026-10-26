@@ -2,6 +2,7 @@ import * as React from "react";
 import type { HTMLAttributes, ReactNode } from "react";
 import * as ScrollAreaPrimitive from "@radix-ui/react-scroll-area";
 import { cn } from "@/lib/utils";
+import { useHorizontalScrollCue } from "@/hooks/use-horizontal-scroll-cue";
 import "./admin-ops-primitives.css";
 
 const AdminOpsScrollBar = React.forwardRef<
@@ -26,32 +27,54 @@ const AdminOpsScrollBar = React.forwardRef<
 ));
 AdminOpsScrollBar.displayName = ScrollAreaPrimitive.ScrollAreaScrollbar.displayName;
 
+const DEFAULT_SCROLL_HINT = "Swipe the table sideways to see all columns.";
+
 /**
  * Operations-owned equivalent of the shared Table primitive. The viewport
  * wrapper intentionally owns the focus target so every operations table has
  * one keyboard-discoverable horizontal scroll region without changing the
  * shared UI contract. `scrollLabel` names that focus target as a region so a
- * screen reader announces what Tab landed on.
+ * screen reader announces what Tab landed on. Whenever the table is wider
+ * than its viewport, at any screen width, a hint above it and a right-edge
+ * fade say that more columns sit off-screen.
  */
 export const AdminOpsTable = React.forwardRef<
   HTMLTableElement,
-  React.HTMLAttributes<HTMLTableElement> & { scrollLabel: string }
->(({ className, scrollLabel, ...props }, ref) => (
-  <div
-    className="relative w-full overflow-auto"
-    tabIndex={0}
-    role="region"
-    aria-label={scrollLabel}
-  >
-    <table ref={ref} className={cn("w-full caption-bottom text-sm", className)} {...props} />
-  </div>
-));
+  React.HTMLAttributes<HTMLTableElement> & { scrollLabel: string; scrollHint?: string }
+>(({ className, scrollLabel, scrollHint = DEFAULT_SCROLL_HINT, ...props }, ref) => {
+  const scrollCue = useHorizontalScrollCue();
+  return (
+    <>
+      {scrollCue.overflows ? (
+        <p className="admin-ops-table-scroll-hint text-xs text-muted-foreground">{scrollHint}</p>
+      ) : null}
+      <div className="relative w-full">
+        {scrollCue.showCue ? (
+          <div
+            aria-hidden="true"
+            className="pointer-events-none absolute inset-y-0 right-0 z-10 w-8 bg-gradient-to-l from-card to-transparent"
+          />
+        ) : null}
+        <div
+          ref={scrollCue.ref}
+          className="relative w-full overflow-auto"
+          tabIndex={0}
+          role="region"
+          aria-label={scrollLabel}
+          onKeyDown={scrollCue.onKeyDown}
+        >
+          <table ref={ref} className={cn("w-full caption-bottom text-sm", className)} {...props} />
+        </div>
+      </div>
+    </>
+  );
+});
 AdminOpsTable.displayName = "Table";
 
 type AdminOpsScrollAreaProps = React.ComponentPropsWithoutRef<typeof ScrollAreaPrimitive.Root> & {
   viewportClassName?: string;
-  /** Names the focusable viewport as a region for assistive technology. */
-  scrollLabel?: string;
+  /** The viewport is always a tab stop, so it always needs a region name. */
+  scrollLabel: string;
 };
 
 /**
@@ -71,7 +94,7 @@ export const AdminOpsScrollArea = React.forwardRef<
     <ScrollAreaPrimitive.Viewport
       className={cn("h-full w-full", viewportClassName)}
       tabIndex={0}
-      role={scrollLabel ? "region" : undefined}
+      role="region"
       aria-label={scrollLabel}
     >
       {children}

@@ -102,6 +102,13 @@ const formatHealthPercentage = (healthy: number, total: number) => {
   return (Math.floor((healthy / total) * 1000) / 10).toFixed(1);
 };
 
+// A check is dated by when it finished. One still running has no finish time,
+// so it is dated by its start and `finished` lets the label say so.
+const checkTime = (job: LinkHealthJob) =>
+  job.completedAt
+    ? { at: job.completedAt, finished: true }
+    : { at: job.startedAt ?? job.createdAt, finished: false };
+
 export default function LinkHealthDashboard() {
   const { toast } = useToast();
   const queryClient = useQueryClient();
@@ -192,6 +199,7 @@ export default function LinkHealthDashboard() {
   });
 
   const latestJob = statusData?.job;
+  const latestJobTime = latestJob ? checkTime(latestJob) : null;
   // BUG-031 (run18): the history endpoint can echo the same job multiple times
   // (one row per job×check join), which plotted duplicate trend points for a
   // single run — dedupe by job id in the render layer.
@@ -227,14 +235,11 @@ export default function LinkHealthDashboard() {
           : c.status === statusFilter
       );
 
-  // R4-044: summary counters tally the SAME array the table renders, so the
-  // numbers always reconcile with the visible rows (dns_failure folds into
-  // Broken, matching the table's badge semantics). Healthy is the job's own
-  // recorded healthy results — deriving it as total − problems turned the
-  // checks the table excludes (resources deleted since the scan) into
-  // "healthy" ones — and Total is healthy + the problems shown, so the
-  // excluded checks leave the total too. While a job is still running we
-  // fall back to the job record's live progress counts.
+  // R4-044: problem counters tally the SAME array the table renders, so they
+  // always reconcile with the visible rows (dns_failure folds into Broken,
+  // matching the table's badge semantics). Total and Healthy are the check's
+  // own recorded counts: deriving either from the listed problems miscounts
+  // the checks the table excludes (resources deleted since the scan).
   const countByStatus = (statuses: string[]) =>
     allProblemLinks.filter((c) => statuses.includes(c.status)).length;
   // R5-009 (run24): while a check runs, the in-progress job's counters are all
@@ -245,23 +250,23 @@ export default function LinkHealthDashboard() {
     .filter((job) => job.status === 'completed')
     .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())[0];
   const summaryJob = isJobInProgress || isTerminalWithoutResults ? lastCompletedJob : latestJob;
-  const summaryCounts = !isJobInProgress && !isTerminalWithoutResults && brokenLinksData
-    ? {
-        total: (latestJob?.healthyLinks || 0) + allProblemLinks.length,
-        broken: countByStatus(['broken', 'dns_failure']),
-        redirect: countByStatus(['redirect']),
-        timeout: countByStatus(['timeout']),
-        suspect: countByStatus(['suspect']),
-        healthy: latestJob?.healthyLinks || 0,
-      }
-    : {
-        total: summaryJob?.totalLinks || 0,
-        broken: summaryJob?.brokenLinks || 0,
-        redirect: summaryJob?.redirectLinks || 0,
-        timeout: summaryJob?.timeoutLinks || 0,
-        suspect: summaryJob?.suspectLinks || 0,
-        healthy: summaryJob?.healthyLinks || 0,
-      };
+  const summaryCounts = {
+    total: summaryJob?.checkedLinks || 0,
+    healthy: summaryJob?.healthyLinks || 0,
+    ...(!isJobInProgress && !isTerminalWithoutResults && brokenLinksData
+      ? {
+          broken: countByStatus(['broken', 'dns_failure']),
+          redirect: countByStatus(['redirect']),
+          timeout: countByStatus(['timeout']),
+          suspect: countByStatus(['suspect']),
+        }
+      : {
+          broken: summaryJob?.brokenLinks || 0,
+          redirect: summaryJob?.redirectLinks || 0,
+          timeout: summaryJob?.timeoutLinks || 0,
+          suspect: summaryJob?.suspectLinks || 0,
+        }),
+  };
 
   useEffect(() => {
     setIsPolling(isJobInProgress);
@@ -318,10 +323,11 @@ export default function LinkHealthDashboard() {
   // Failed/cancelled runs never finished counting, so plotting their partial
   // healthy count would draw a false drop to ~0%. Trend completed runs only.
   const trendJobs = jobs.filter((job) => job.status === 'completed').slice(0, 10).reverse();
-  const trendDates = trendJobs.map((job) => formatAdminDate(job.createdAt));
+  const trendTimes = trendJobs.map((job) => checkTime(job).at);
+  const trendDates = trendTimes.map(formatAdminDate);
   const trendNeedsTime = new Set(trendDates).size < trendDates.length;
   const trendData: LinkHealthTrendPoint[] = trendJobs.map((job, i) => ({
-    date: trendNeedsTime ? formatAdminDateTime(job.createdAt) : trendDates[i],
+    date: trendNeedsTime ? formatAdminDateTime(trendTimes[i]) : trendDates[i],
     healthy: ((job.healthyLinks || 0) / (job.totalLinks || 1)) * 100,
     broken: ((job.brokenLinks || 0) / (job.totalLinks || 1)) * 100,
     redirect: ((job.redirectLinks || 0) / (job.totalLinks || 1)) * 100,
@@ -385,7 +391,7 @@ export default function LinkHealthDashboard() {
             </p>
             <p>
               {lastCompletedJob
-                ? `Counts and problem links below are from the previous completed scan (#${lastCompletedJob.id}, ${formatAdminDateTime(lastCompletedJob.createdAt)}).`
+                ? `Counts and problem links below are from the previous completed scan (#${lastCompletedJob.id}, ${formatAdminDateTime(checkTime(lastCompletedJob).at)}).`
                 : historyError
                   ? "Scan history couldn't be loaded, so the previous completed scan is unknown."
                   : 'No scan has completed yet, so there are no verified results to show.'}
@@ -424,12 +430,12 @@ export default function LinkHealthDashboard() {
       {lastCompletedJob ? (
         <p className="text-xs text-muted-foreground" data-testid="text-link-health-count-source">
           {!isJobInProgress && !isTerminalWithoutResults && brokenLinksData
-            ? `Counts are from scan #${latestJob?.id} (${formatAdminDateTime(latestJob?.completedAt ?? latestJob?.createdAt ?? lastCompletedJob.createdAt)}) for resources still in the catalog.${
+            ? `Counts are from scan #${latestJob?.id} (${formatAdminDateTime(checkTime(latestJob ?? lastCompletedJob).at)}) for resources still in the catalog.${
                 (latestJob?.brokenLinks ?? 0) !== summaryCounts.broken
                   ? ` When it finished, the scan recorded ${(latestJob?.brokenLinks ?? 0).toLocaleString()} broken; ${summaryCounts.broken.toLocaleString()} of those resources are still listed.`
                   : ""
               }`
-            : `Counts are the totals saved when scan #${lastCompletedJob.id} finished (${formatAdminDateTime(lastCompletedJob.completedAt ?? lastCompletedJob.createdAt)}).`}
+            : `Counts are the totals saved when scan #${lastCompletedJob.id} finished (${formatAdminDateTime(checkTime(lastCompletedJob).at)}).`}
         </p>
       ) : null}
 
@@ -453,10 +459,8 @@ export default function LinkHealthDashboard() {
             )}
           </CardTitle>
           <CardDescription>
-            {latestJob
-              ? latestJob.completedAt
-                ? `Last check: ${formatAdminDateTime(latestJob.completedAt)}`
-                : `Check started ${formatAdminDateTime(latestJob.startedAt ?? latestJob.createdAt)}`
+            {latestJobTime
+              ? `${latestJobTime.finished ? 'Last check:' : 'Check started'} ${formatAdminDateTime(latestJobTime.at)}`
               : statusError
                 ? 'Last check unavailable'
                 : 'No link health checks performed yet'
@@ -486,7 +490,7 @@ export default function LinkHealthDashboard() {
 
               {isJobInProgress && lastCompletedJob && (
                 <p className="text-xs text-muted-foreground" data-testid="text-summary-last-completed">
-                  Showing results from the last completed check ({formatAdminDateTime(lastCompletedJob.createdAt)}) while the current check runs.
+                  Showing results from the last completed check ({formatAdminDateTime(checkTime(lastCompletedJob).at)}) while the current check runs.
                 </p>
               )}
               {approvedTotal != null && summaryCounts.total > 0 && (
@@ -498,21 +502,21 @@ export default function LinkHealthDashboard() {
                 </p>
               )}
               <div className="ops-link-health__summary-meta" aria-label="Detailed link counts">
-                <span data-testid="counter-total-links">Total {summaryCounts.total}</span>
+                <span data-testid="counter-total-links">Total {summaryCounts.total.toLocaleString()}</span>
                 <span className={TONE_TEXT_CLASS[statusTone('healthy')]} data-testid="counter-healthy-links">
-                  Healthy {summaryCounts.healthy}
+                  Healthy {summaryCounts.healthy.toLocaleString()}
                 </span>
                 <span className={TONE_TEXT_CLASS[statusTone('broken')]} data-testid="counter-broken-links">
-                  Broken {summaryCounts.broken}
+                  Broken {summaryCounts.broken.toLocaleString()}
                 </span>
                 <span className={TONE_TEXT_CLASS[statusTone('redirect')]} data-testid="counter-redirect-links">
-                  Redirects {summaryCounts.redirect}
+                  Redirects {summaryCounts.redirect.toLocaleString()}
                 </span>
                 <span className={TONE_TEXT_CLASS[statusTone('timeout')]} data-testid="counter-timeout-links">
-                  Timeouts {summaryCounts.timeout}
+                  Timeouts {summaryCounts.timeout.toLocaleString()}
                 </span>
                 <span className={TONE_TEXT_CLASS[statusTone('suspect')]} data-testid="counter-suspect-links">
-                  Suspect {summaryCounts.suspect}
+                  Suspect {summaryCounts.suspect.toLocaleString()}
                 </span>
               </div>
 

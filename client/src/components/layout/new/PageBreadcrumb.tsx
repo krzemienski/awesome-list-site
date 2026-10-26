@@ -17,6 +17,8 @@ const ResourceBreadcrumbAncestorDisclosure = lazy(
   () => import("./ResourceBreadcrumbAncestorDisclosure"),
 );
 
+const PAGE_TRAIL_SELECTOR = 'nav[aria-label="Breadcrumb"]:not([data-testid="page-breadcrumb"])';
+
 const RESOURCE_BREADCRUMB_DISCLOSURE_QUERY =
   "(min-width: 768px) and (max-width: 1279px)";
 
@@ -202,6 +204,7 @@ export default function PageBreadcrumb({ categories }: { categories: AwesomeList
     () => (typeof document === "undefined" ? "" : document.title),
   );
   const [pageHeading, setPageHeading] = useState<string>();
+  const [pageOwnsTrail, setPageOwnsTrail] = useState(false);
 
   useEffect(() => {
     const title = document.querySelector("title");
@@ -211,6 +214,7 @@ export default function PageBreadcrumb({ categories }: { categories: AwesomeList
       setPageTitle(document.title);
       const heading = main?.querySelector("h1")?.textContent?.trim();
       if (heading) setPageHeading(heading);
+      setPageOwnsTrail(Boolean(main?.querySelector(PAGE_TRAIL_SELECTOR)));
     };
     update();
     const observer = new MutationObserver(update);
@@ -223,13 +227,16 @@ export default function PageBreadcrumb({ categories }: { categories: AwesomeList
     () => resolveCrumbs(categories, location, pageHeading ?? pageTitle),
     [categories, location, pageHeading, pageTitle],
   );
-  if (crumbs.length === 0) return null;
+  // A page that paints its own trail (subcategory and sub-subcategory
+  // listings) owns the one Breadcrumb landmark; a second, hidden copy made
+  // screen readers list two.
+  if (crumbs.length === 0 || pageOwnsTrail) return null;
   // The frozen design has no shell-level breadcrumb row: every page that
   // shows crumbs (pages.jsx SubcategoryPage) or a back link / eyebrow
   // (CategoryPage, ResourcePage, SubmitPage, AboutPage, admin) renders it
-  // inside its own `.page-content`. This shell breadcrumb therefore stays in
-  // the DOM for assistive technology and the selector contracts (same
-  // testids, same links) but is visually hidden on every route. Its links
+  // inside its own `.page-content`. On the other routes this shell breadcrumb
+  // stays in the DOM for assistive technology and the selector contracts (same
+  // testids, same links) but is visually hidden. Its links
   // stay in the accessibility tree but out of the Tab order, so keyboard
   // focus never lands on an invisible 1px target.
   // ResourceDetail uses this exact string id in its public-detail query key.
