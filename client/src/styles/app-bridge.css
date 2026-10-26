@@ -227,6 +227,12 @@ body { font-feature-settings: "ss01", "cv11"; }
   outline-offset: 2px;
 }
 
+/* A route change focuses the new page's h1 (useRouteFocus) so it is
+   announced; a heading is not a control, so it takes no ring. */
+main h1[tabindex="-1"]:focus {
+  outline: none !important;
+}
+
 [disabled],
 [aria-disabled="true"],
 .is-disabled {

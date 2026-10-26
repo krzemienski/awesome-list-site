@@ -122,6 +122,68 @@ export function useScrollRestoration(location: string, search: string): void {
   }, [location, search]);
 }
 
+// A path change moves focus to the new page's <h1>, so a screen reader names
+// the page and Tab continues from the top of its content, as after a full page
+// load. Query-only changes (filters, paging) keep the page's own focus
+// handling, and #fragment targets are focused or scrolled by their page. The
+// hand-off retries each frame while the page renders: a loading heading that
+// is replaced, or a dialog that restores focus to its opener, gets focus moved
+// to the current heading. It ends when the page focuses something in <main>
+// itself, on any key or pointer input (so the skip link keeps working), or
+// after the time budget.
+const ROUTE_FOCUS_BUDGET_MS = 4000;
+
+function isTextEntry(element: Element | null): boolean {
+  return (
+    element instanceof HTMLInputElement ||
+    element instanceof HTMLTextAreaElement ||
+    element instanceof HTMLSelectElement ||
+    (element instanceof HTMLElement && element.isContentEditable)
+  );
+}
+
+export function useRouteFocus(location: string): void {
+  const lastPath = useRef(location);
+  useEffect(() => {
+    if (lastPath.current === location) return;
+    lastPath.current = location;
+    // A page that mounted in this same commit may already have focused its
+    // search box (a clicked link is never a text field).
+    if (window.location.hash || isTextEntry(document.activeElement)) return;
+
+    let heading: HTMLElement | null = null;
+    let frame = 0;
+    const deadline = Date.now() + ROUTE_FOCUS_BUDGET_MS;
+    function stop() {
+      cancelAnimationFrame(frame);
+      document.removeEventListener("focusin", onFocusIn);
+      window.removeEventListener("keydown", stop, true);
+      window.removeEventListener("pointerdown", stop, true);
+    }
+    function onFocusIn(event: FocusEvent) {
+      const main = document.getElementById("main");
+      if (event.target !== heading && main?.contains(event.target as Node)) stop();
+    }
+    function tick() {
+      const main = document.getElementById("main");
+      const next = main?.querySelector<HTMLElement>("h1");
+      const focusOutsideMain = !main?.contains(document.activeElement);
+      if (next && next !== document.activeElement && (!heading || focusOutsideMain)) {
+        if (!next.hasAttribute("tabindex")) next.tabIndex = -1;
+        heading = next;
+        next.focus({ preventScroll: true });
+      }
+      if (Date.now() < deadline) frame = requestAnimationFrame(tick);
+      else stop();
+    }
+    document.addEventListener("focusin", onFocusIn);
+    window.addEventListener("keydown", stop, true);
+    window.addEventListener("pointerdown", stop, true);
+    frame = requestAnimationFrame(tick);
+    return stop;
+  }, [location]);
+}
+
 // In-app links to a page section (/settings#notification-settings) arrive via
 // pushState, which never jumps to a fragment, and the route-change effect above
 // scrolls to the top anyway. Once the caller's content has loaded, bring the
