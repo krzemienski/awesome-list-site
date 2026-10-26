@@ -154,13 +154,14 @@ type FuzzyMatch = {
  * Whole-word, case-insensitive pattern for a literal search token. Every regex
  * metacharacter is escaped and the pattern is bound as a parameter, so a query
  * only ever matches its own text. The token must start a word ("mpv.net" does
- * not match ".net"); it must end one only when it ends in a letter or digit, so
- * "C++11" still matches "c++".
+ * not match ".net"). A token ending in a letter or digit must also end a word;
+ * one ending in "+" or "#" may be followed by digits ("C++11") but not letters,
+ * so "c++" does not match "C++foo".
  */
 function literalWordPattern(token: string): string {
   const escaped = token.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
   const edge = "[^[:alnum:]_]";
-  const end = /[\p{L}\p{N}]$/u.test(token) ? `(${edge}|$)` : "";
+  const end = /[\p{L}\p{N}]$/u.test(token) ? `(${edge}|$)` : "([^[:alpha:]]|$)";
   return `(^|${edge})${escaped}${end}`;
 }
 
