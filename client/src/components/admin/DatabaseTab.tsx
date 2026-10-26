@@ -60,8 +60,8 @@ const formatStorageSize = (bytes: number): string => {
 };
 
 const keyTablesSummary = (keyCount: number, totalTables: number): string => {
-  const total = `${totalTables.toLocaleString()} table${totalTables === 1 ? "" : "s"}`;
-  if (keyCount === 0) return `None of the key tables exist in the primary PostgreSQL database (${total} in total)`;
+  const total = totalTables.toLocaleString();
+  if (keyCount === 0) return `None of the key tables exist in the primary PostgreSQL database (${total} tables in total)`;
   return `${keyCount} key table${keyCount === 1 ? "" : "s"} of ${total} in the primary PostgreSQL database`;
 };
 
