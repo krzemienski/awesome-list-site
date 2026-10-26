@@ -143,6 +143,10 @@
   height: 56px;
 }
 
+.admin-taxonomy-scroll-hint {
+  padding-inline: 1.375rem;
+}
+
 .admin-taxonomy-table tbody tr {
   transition: background-color var(--motion-fast), color var(--motion-fast);
 }

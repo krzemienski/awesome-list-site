@@ -35,6 +35,7 @@ import { parsePageFromSearch } from "@/lib/page-param";
 import { resourceTitleSchema, optionalResourceDescriptionSchema, webUrlSchema, httpsUrlSchema } from "@shared/validation";
 import { describeWriteError, NOTHING_CHANGED_OUTCOME, extractFieldErrors } from "@/lib/apiError";
 import { focusElement, focusPageHeading, handoffFocusOnUnmount } from "@/hooks/focus-handoff";
+import { useHorizontalScrollCue } from "@/hooks/use-horizontal-scroll-cue";
 import {
   RESOURCE_FORMAT_LABELS,
   RESOURCE_FORMAT_VALUES,
@@ -420,7 +421,8 @@ export default function ResourceManager({ createRequest = 0 }: { createRequest?:
   const shownLimit = data?.limit ?? limit;
   // C4-V5A-01: "Stay on page N" unmounts itself; land focus on the rows it
   // kept instead of dropping it to <body>.
-  const tableRegionRef = useRef<HTMLDivElement>(null);
+  const tableRegionRef = useRef<HTMLDivElement | null>(null);
+  const tableScrollCue = useHorizontalScrollCue();
   // C5-V5A-01: a confirmed bulk action clears the selection (unmounting the
   // bar that opened its dialog) and a row delete removes its row, so the
   // dialog's return-focus target is gone. Land on the table instead.
@@ -1536,10 +1538,24 @@ export default function ResourceManager({ createRequest = 0 }: { createRequest?:
               </div>
             </div>
           )}
+          <div className="relative">
+          {tableScrollCue.showCue && (
+            <div
+              aria-hidden="true"
+              className="pointer-events-none absolute inset-y-0 right-0 w-8 bg-gradient-to-l from-background to-transparent z-10"
+              data-testid="gradient-scroll-cue-resources"
+            />
+          )}
           <div
-            ref={tableRegionRef}
-            tabIndex={-1}
-            className="admin-catalog-resources__table-scroll overflow-auto"
+            ref={(el) => {
+              tableRegionRef.current = el;
+              tableScrollCue.ref(el);
+            }}
+            tabIndex={0}
+            role="region"
+            aria-label="Resources table, scrollable"
+            onKeyDown={tableScrollCue.onKeyDown}
+            className="admin-catalog-resources__table-scroll overflow-auto focus-visible:outline focus-visible:outline-2 focus-visible:outline-ring"
           >
             <table className="table admin-catalog-resources__table">
               <thead>
@@ -1671,10 +1687,12 @@ export default function ResourceManager({ createRequest = 0 }: { createRequest?:
               </tbody>
             </table>
           </div>
-          {/* Run17 BUG-033: same sideways-scroll hint the Users table has. */}
-          <p className="admin-catalog-resources__scroll-hint text-xs text-muted-foreground mt-2 sm:hidden">
-            Swipe the table sideways to see category, tags, featured, and actions.
-          </p>
+          </div>
+          {tableScrollCue.showCue && (
+            <p className="admin-catalog-resources__scroll-hint text-xs text-muted-foreground mt-2" data-testid="hint-swipe-resources-table">
+              Swipe the table sideways to see category, tags, featured, and actions.
+            </p>
+          )}
 
           {/* Run16 BUG-035: page-size selector + first/last jump buttons. */}
           <div className="admin-catalog-resources__pagination-summary flex flex-wrap items-center justify-between gap-3 pt-4 border-t border-[var(--border)]">

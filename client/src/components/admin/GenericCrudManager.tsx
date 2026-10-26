@@ -21,6 +21,7 @@ import { fetchAwesomeListNav, type AwesomeListNav } from "@/lib/static-data";
 // Task 275: same fast numbered + jump pagination as the public listings.
 import { Paginator } from "@/components/ui/paginator";
 import { AdminLoadError } from "@/components/admin/AdminLoadError";
+import { useHorizontalScrollCue } from "@/hooks/use-horizontal-scroll-cue";
 import "@/styles/pages/admin-catalog-taxonomy.css";
 
 /**
@@ -1071,6 +1072,7 @@ export default function GenericCrudManager<T extends BaseEntityWithCount>({
   // successful delete, focus a neighbouring row's Edit button (or Add) instead.
   const createButtonRef = useRef<HTMLButtonElement>(null);
   const editButtonRefs = useRef(new Map<number, HTMLButtonElement>());
+  const tableScrollCue = useHorizontalScrollCue();
   const deleteFocusTargetRef = useRef<HTMLElement | null>(null);
   const [selectedItem, setSelectedItem] = useState<T | null>(null);
   const [fileData, setFileData] = useState<Record<string, File | null>>({});
@@ -2799,7 +2801,22 @@ export default function GenericCrudManager<T extends BaseEntityWithCount>({
           </div>
         ) : (
           <>
-          <div className="admin-taxonomy-table-scroll">
+          <div className="relative">
+          {tableScrollCue.showCue && (
+            <div
+              aria-hidden="true"
+              className="pointer-events-none absolute inset-y-0 right-0 w-8 bg-gradient-to-l from-background to-transparent z-10"
+              data-testid={`gradient-scroll-cue-${testIdEntityPlural}`}
+            />
+          )}
+          <div
+            ref={tableScrollCue.ref}
+            className="admin-taxonomy-table-scroll focus-visible:outline focus-visible:outline-2 focus-visible:outline-ring"
+            tabIndex={0}
+            role="region"
+            aria-label={`${entityNamePlural} table, scrollable`}
+            onKeyDown={tableScrollCue.onKeyDown}
+          >
             <table className="table admin-taxonomy-table" data-testid={`table-${testIdEntityPlural}`}>
               <thead>
                 <tr>
@@ -2926,6 +2943,12 @@ export default function GenericCrudManager<T extends BaseEntityWithCount>({
               </tbody>
             </table>
           </div>
+          </div>
+          {tableScrollCue.showCue && (
+            <p className="admin-taxonomy-scroll-hint mt-2 text-xs text-muted-foreground" data-testid={`hint-swipe-${testIdEntityPlural}-table`}>
+              Swipe the table sideways to see all columns, including Edit/Delete.
+            </p>
+          )}
 
           {/* Pagination Controls — Task 275: shared numbered paginator (same
               component as the public listings) so any page is reachable in ≤2

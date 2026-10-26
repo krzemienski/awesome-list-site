@@ -329,23 +329,9 @@
   }
 }
 
-/* Hidden until the tools open. Anchored to the top of its containing block so
-   the out-of-flow box never extends the document below the panel, and while
-   invisible it takes no pointer input. */
+/* Rendered only while the table overflows, inset like the card content. */
 .admin-catalog-resources__scroll-hint {
-  inset: 0 auto auto 0;
-  opacity: 0;
-  pointer-events: none;
-  position: absolute;
-}
-
-/* C8-V5A-04: with the tools open the hint shows below the table at narrow
-   widths, inset like the card content. */
-.admin-catalog-resources--tools-open .admin-catalog-resources__scroll-hint {
-  opacity: 1;
   padding-inline: 1.375rem;
-  pointer-events: auto;
-  position: static;
 }
 
 /* The footer shares the TableShell header's 22px inset instead of running
