@@ -62,6 +62,7 @@ import {
   type ResourceKind,
   type ResourceKindCounts,
 } from "../lib/resourceKinds";
+import { compareTitles, titleOrderAsc, titleOrderDesc } from "../lib/titleOrder";
 import { createLogger } from "../lib/logger";
 
 const logger = createLogger("resources");
@@ -331,12 +332,11 @@ function scoreFuzzyCandidates(
     .filter((match): match is FuzzyMatch => Boolean(match));
 
   return matches.sort((left, right) => {
-    const titleOrder = left.title.localeCompare(right.title, undefined, { sensitivity: "base" });
     switch (sort) {
       case "name-asc":
-        return titleOrder || left.id - right.id;
+        return compareTitles(left, right);
       case "name-desc":
-        return -titleOrder || right.id - left.id;
+        return compareTitles(right, left);
       case "oldest":
         return (left.createdAt?.getTime() ?? 0) - (right.createdAt?.getTime() ?? 0) || left.id - right.id;
       case "newest":
@@ -350,8 +350,7 @@ function scoreFuzzyCandidates(
           left.normalizedDistance - right.normalizedDistance ||
           left.lengthDelta - right.lengthDelta ||
           left.titleLengthDelta - right.titleLengthDelta ||
-          titleOrder ||
-          left.id - right.id
+          compareTitles(left, right)
         );
     }
   });
@@ -573,14 +572,14 @@ export class ResourceRepository {
       countQuery = countQuery.where(and(...conditions));
     }
 
-    // R3-H08: server-side sort. Title sorts are case-insensitive; id is a
-    // deterministic tiebreaker (createdAt is identical for bulk-seeded rows).
+    // R3-H08: server-side sort. id is a deterministic tiebreaker (createdAt
+    // is identical for bulk-seeded rows).
     const orderBy = (() => {
       switch (sort) {
         case "name-asc":
-          return [asc(sql`lower(${resources.title})`), asc(resources.id)];
+          return titleOrderAsc;
         case "name-desc":
-          return [desc(sql`lower(${resources.title})`), desc(resources.id)];
+          return titleOrderDesc;
         case "oldest":
           return [asc(resources.createdAt), asc(resources.id)];
         case "newest":
@@ -600,8 +599,7 @@ export class ResourceRepository {
                 : []),
               ...(tsQuery ? [desc(sql`ts_rank_cd(${resources.searchTsv}, to_tsquery('english', ${tsQuery}))`)] : []),
               asc(sql`length(${resources.title})`),
-              asc(sql`lower(${resources.title})`),
-              asc(resources.id),
+              ...titleOrderAsc,
             ];
           }
           return [desc(resources.createdAt), desc(resources.id)];

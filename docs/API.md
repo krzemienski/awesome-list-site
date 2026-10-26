@@ -149,7 +149,9 @@ email/password login endpoint was removed.
 | GET | `/api/auth/user` | Always `200`; `{ user: null, isAuthenticated: false }` when anonymous |
 | GET | `/api/auth/me` | Deprecated current-user alias (401 when anonymous) |
 | GET | `/api/auth/status` | Deprecated lightweight auth probe |
-| POST | `/api/auth/logout-all` | Revoke all active Clerk sessions for the caller |
+| POST | `/api/auth/logout-all` | Revoke all active Clerk sessions for the caller, or every owner password session |
+| POST | `/api/auth/admin-login` | Owner password sign-in (`OWNER_PASSWORD`); sets the owner session cookie |
+| POST | `/api/auth/admin-logout` | End every owner password session and clear the cookie; `200` without one |
 
 > Sign-in, sign-out, and session management go through Clerk's hosted flow;
 > check `/api/docs` and `server/routes/domains/auth-user.ts` for the current

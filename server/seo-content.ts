@@ -4,6 +4,7 @@ import { LegalPolicyContent, legalPolicies, type LegalPolicyPath } from "@shared
 import type { PreferredContactDestination } from "@shared/contact-destination";
 // Server-side prerendered content for indexable public routes (Task #80).
 import { resourceFactsSummary } from "@shared/seo-content-templates";
+import { searchPageSeo } from "@shared/seo-templates";
 import { tagLandingPath } from "@shared/tagNormalize";
 import { ABOUT_PROJECT, MAINTAINER } from "@shared/about-content";
 
@@ -464,7 +465,6 @@ export function renderSearchContent(opts: {
   totalPages?: number;
 }): string {
   const q = String(opts.query ?? "").trim();
-  const heading = q ? `Search results for “${escapeHtml(q)}”` : "Search";
   const links: LinkItem[] = opts.results.map((r) => ({
     href: internalHref(`/resource/${r.id}`),
     label: r.title,
@@ -494,7 +494,7 @@ export function renderSearchContent(opts: {
           q,
         )}”. Try a different term or browse the categories below.</p>`;
   return shell(
-    `<h1>${heading}</h1>` +
+    `<h1>${searchPageSeo.heading}</h1>` +
       body +
       `<h2>Browse</h2>${linkList([
         { href: internalHref("/categories"), label: "All categories" },

@@ -35,6 +35,7 @@ import {
 import { db } from "../db";
 import { eq, asc } from "drizzle-orm";
 import { stripInternalResourceFields } from "../lib/publicResource";
+import { titleOrderAsc } from "../lib/titleOrder";
 import { getPublicCacheValue } from "../cache/publicCache";
 
 // Hierarchical category structure types
@@ -101,10 +102,7 @@ export class LegacyRepository {
       .select()
       .from(resources)
       .where(eq(resources.status, 'approved'))
-      // Taxonomy listings are sliced both by the crawler renderer and by the
-      // paged public API. A numeric tie-breaker makes those page boundaries
-      // deterministic when two approved resources share a title.
-      .orderBy(asc(resources.title), asc(resources.id));
+      .orderBy(...titleOrderAsc);
 
     // Every approved row is public and lands in the tree, even when another
     // approved row shares its URL. Hiding near-duplicate URLs here dropped

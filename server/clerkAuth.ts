@@ -21,7 +21,7 @@
 import type { Request, RequestHandler } from "express";
 import { createHash, createHmac, timingSafeEqual } from "node:crypto";
 import { getAuth } from "@clerk/express";
-import { eq, or } from "drizzle-orm";
+import { eq, or, sql } from "drizzle-orm";
 import { db } from "./db";
 import { deletedUserTombstones, users, type User } from "@shared/schema";
 import { trackServerEvent } from "./lib/mixpanelServer";
@@ -235,6 +235,8 @@ export function hasValidAuthReturnAuditKey(req: Request): boolean {
  */
 export const ADMIN_SESSION_COOKIE = "av_admin_session";
 export const ADMIN_SESSION_TTL_MS = 12 * 60 * 60 * 1000;
+/** How far past now + TTL a cookie's expiry may be (clock skew between instances). */
+const ADMIN_SESSION_FUTURE_TOLERANCE_MS = 60_000;
 export const adminCookieOptions = {
   httpOnly: true,
   secure: process.env.NODE_ENV === "production",
@@ -265,10 +267,26 @@ function adminSessionSignature(expiresAt: number, password: string): string {
 }
 
 /** Returns a fresh cookie value, or null when password login is disabled. */
-export function issueAdminSessionToken(now = Date.now()): string | null {
+export async function issueAdminSessionToken(): Promise<string | null> {
   const password = adminLoginPassword();
   if (!password) return null;
-  const expiresAt = now + ADMIN_SESSION_TTL_MS;
+  const now = Date.now();
+  const admin = await resolveBypassAdmin();
+  const revokedAt = admin?.sessionsRevokedAt?.getTime() ?? 0;
+  // Revocation kills cookies issued at or before sessionsRevokedAt (a database
+  // clock time), so a sign-in right after a sign-out is dated just after it.
+  // The bump never exceeds the future-dated tolerance, so the cookie always
+  // validates. A cutoff further ahead came from a skewed clock and would
+  // refuse every sign-in until wall time caught up, so it is pulled back.
+  let issuedAt = Math.max(now, revokedAt + 1);
+  if (admin && issuedAt > now + ADMIN_SESSION_FUTURE_TOLERANCE_MS) {
+    issuedAt = now;
+    await db
+      .update(users)
+      .set({ sessionsRevokedAt: new Date(now - 1) })
+      .where(eq(users.id, admin.id));
+  }
+  const expiresAt = issuedAt + ADMIN_SESSION_TTL_MS;
   return `${expiresAt}.${adminSessionSignature(expiresAt, password)}`;
 }
 
@@ -293,7 +311,7 @@ export function hasValidAdminSessionCookie(req: Request): boolean {
   const expiresAt = Number(raw.slice(0, dot));
   const now = Date.now();
   if (!Number.isSafeInteger(expiresAt) || expiresAt <= now) return false;
-  if (expiresAt > now + ADMIN_SESSION_TTL_MS + 60_000) return false;
+  if (expiresAt > now + ADMIN_SESSION_TTL_MS + ADMIN_SESSION_FUTURE_TOLERANCE_MS) return false;
   return secretsMatch(raw.slice(dot + 1), adminSessionSignature(expiresAt, password));
 }
 
@@ -312,14 +330,19 @@ function isRevokedAdminSession(req: Request, admin: User): boolean {
 }
 
 /**
- * "Sign out all devices" for the owner: every owner cookie issued until now
- * stops working. Returns false when the request is not an owner session.
+ * Ends the owner session on the server: every owner cookie issued until now
+ * stops working, including copies of the request's own cookie. The cookie
+ * carries no per-device id, so sign-out and "sign out all devices" both end
+ * every owner session. Returns false when the request is not an owner session.
  */
 export async function revokeAdminSessions(req: Request): Promise<boolean> {
   if (adminSessionIssuedAt(req) === null || !req.dbUser) return false;
+  // Database clock, and never moved backwards: a sign-out that lands after a
+  // later one must not revive the sessions that one ended. The column holds
+  // UTC wall time (how Drizzle writes a Date to a timestamp without zone).
   await db
     .update(users)
-    .set({ sessionsRevokedAt: new Date() })
+    .set({ sessionsRevokedAt: sql`greatest(${users.sessionsRevokedAt}, now() at time zone 'utc')` })
     .where(eq(users.id, req.dbUser.id));
   return true;
 }
@@ -356,7 +379,7 @@ export const clerkUserContext: RequestHandler = asyncHandler(async function cler
     try {
       const auditAdmin = await resolveBypassAdmin();
       if (auditAdmin && !viaAuditKey && isRevokedAdminSession(req, auditAdmin)) {
-        // Signed out everywhere after this cookie was issued: anonymous, and
+        // The owner signed out after this cookie was issued: anonymous, and
         // drop the dead cookie so later requests take the normal path.
         res.clearCookie(ADMIN_SESSION_COOKIE, adminCookieOptions);
       } else if (auditAdmin) {

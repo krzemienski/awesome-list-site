@@ -330,7 +330,7 @@ export default function SearchDialog({ isOpen, setIsOpen }: SearchDialogProps) {
               <span className="sr-only">Featured: </span>
               {resource.title}
             </span>
-            {resource.description ? <small>{resource.description.slice(0, 60)}</small> : null}
+            {resource.description ? <small>{resource.description}</small> : null}
           </span>
           <span className="search-palette-arrow" aria-hidden="true">→</span>
         </CommandItem>
@@ -536,7 +536,7 @@ export default function SearchDialog({ isOpen, setIsOpen }: SearchDialogProps) {
                     {totalMatches > results.length ? ` — showing top ${results.length}` : ""}
                   </>
                 ) : (
-                  <>{defaultSuggestionCount} result{defaultSuggestionCount === 1 ? "" : "s"}</>
+                  <>{defaultSuggestionCount} suggestion{defaultSuggestionCount === 1 ? "" : "s"}</>
                 )}
               </span>
             ) : null}
