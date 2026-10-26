@@ -490,6 +490,7 @@ function CategoryAccordion({
                       activePath ===
                       `/sub-subcategory/${ss.slug || slugify(ss.name)}`,
                   );
+                const subIsPage = activePath === subPath && !generalActive;
                 const subOpen = openSubs.includes(subKey(sub.name));
                 const subDirectCount = directResourceCount(sub);
                 const subGeneralPath = `${subPath}?filter=general`;
@@ -510,7 +511,12 @@ function CategoryAccordion({
 
                 return (
                   <div key={sub.name} className="av-sidebar-l2-group">
-                    <div className={cn("av-sidebar-l2-row", subActive && "active")}>
+                    <div
+                      className={cn(
+                        "av-sidebar-l2-row",
+                        subIsPage ? "active" : subActive && "contains-active",
+                      )}
+                    >
                       <a
                         href={subPath}
                         onClick={(event) => {
@@ -518,9 +524,9 @@ function CategoryAccordion({
                           navigate(subPath);
                         }}
                         data-testid={`sub-${subSlug}`}
-                        // The row highlight marks the group holding the current
-                        // page; only the exact unfiltered listing is "page".
-                        aria-current={activePath === subPath && !generalActive ? "page" : undefined}
+                        // Only the exact unfiltered listing is "page"; a group
+                        // that holds the current page is only "contains-active".
+                        aria-current={subIsPage ? "page" : undefined}
                         data-active={subActive || undefined}
                         title={sub.name}
                         className="av-sidebar-l2-link no-underline"
