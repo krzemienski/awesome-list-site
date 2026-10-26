@@ -1,5 +1,9 @@
 import type { Express, RequestHandler } from "express";
-import { notificationPreferencesUpdateSchema } from "@shared/notifications";
+import {
+  DIGEST_SECTION_REQUIRED_MESSAGE,
+  notificationPreferencesPatchSchema,
+  notificationPreferencesUpdateSchema,
+} from "@shared/notifications";
 import { parseIntInRange } from "@shared/validation";
 import {
   getDigestQueueHealth,
@@ -17,6 +21,14 @@ import { createLogger } from "../lib/logger";
 const logger = createLogger("notifications");
 
 type AuthedRequest = Parameters<RequestHandler>[0];
+
+// updateNotificationPreferences' rule failures, as the 400 message to show.
+const PREFERENCE_ERROR_MESSAGES: Record<string, string> = {
+  invalid_timezone: "Choose a valid IANA time zone.",
+  pause_too_long: "Reminders can be paused for up to one year.",
+  section_required: DIGEST_SECTION_REQUIRED_MESSAGE,
+  email_required: "Add an email address before enabling email digests.",
+};
 
 function userIdOf(request: AuthedRequest): string {
   // Clerk migration: identity lives on req.dbUser (resolved by clerkUserContext).
@@ -58,11 +70,14 @@ export function registerNotificationRoutes(
     }),
   );
 
-  app.put(
-    "/api/notification-preferences",
-    isAuthenticated,
+  // PUT saves the whole form; PATCH saves a quick action's own fields only.
+  const savePreferences = (
+    schema:
+      | typeof notificationPreferencesUpdateSchema
+      | typeof notificationPreferencesPatchSchema,
+  ) =>
     asyncHandler(async (request: AuthedRequest, response) => {
-      const parsed = notificationPreferencesUpdateSchema.safeParse(request.body);
+      const parsed = schema.safeParse(request.body);
       if (!parsed.success) {
         return response.status(400).json({
           message: "Check your reminder settings and try again.",
@@ -78,27 +93,23 @@ export function registerNotificationRoutes(
         return response.json(saved);
       } catch (error) {
         const code = error instanceof Error ? error.message : "unknown";
-        if (code === "invalid_timezone") {
-          return response
-            .status(400)
-            .json({ message: "Choose a valid IANA time zone." });
-        }
-        if (code === "pause_too_long") {
-          return response
-            .status(400)
-            .json({ message: "Reminders can be paused for up to one year." });
-        }
-        if (code === "email_required") {
-          return response.status(400).json({
-            message: "Add an email address before enabling email digests.",
-          });
-        }
+        const message = PREFERENCE_ERROR_MESSAGES[code];
+        if (message) return response.status(400).json({ message });
         logger.error("[notifications] Failed to save preferences:", error);
         return response
           .status(500)
           .json({ message: "Could not save reminder settings." });
       }
-    }),
+    });
+  app.put(
+    "/api/notification-preferences",
+    isAuthenticated,
+    savePreferences(notificationPreferencesUpdateSchema),
+  );
+  app.patch(
+    "/api/notification-preferences",
+    isAuthenticated,
+    savePreferences(notificationPreferencesPatchSchema),
   );
 
   app.get(

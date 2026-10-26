@@ -24,6 +24,7 @@
  */
 import { z } from "zod";
 import { RESOURCE_KIND_VALUES } from "@shared/resourceKinds";
+import { AUTH_METHODS } from "@shared/schema";
 import { RESOURCE_FORMAT_VALUES, RESOURCE_PROVIDER_VALUES, RESOURCE_SKILL_LEVEL_VALUES, RESOURCE_SEARCH_SORT_VALUES } from "@shared/resourceFacets";
 import { RECOMMENDATION_FEEDBACK_VALUES, RECOMMENDATION_SIGNAL_CODES } from "@shared/recommendations";
 import { setRouteQuerySchema, setRouteResponseSchema } from "./install";
@@ -187,6 +188,7 @@ const clientUserSchema = z
     role: z.string(),
     createdAt: timestampField,
     deletionRequestedAt: timestampField,
+    authMethod: z.enum(AUTH_METHODS),
   })
   .passthrough();
 

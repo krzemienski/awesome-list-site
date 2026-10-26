@@ -95,7 +95,10 @@ export function registerAuthUserRoutes(
     if (!req.dbUser) {
       return res.json({ user: null, isAuthenticated: false });
     }
-    res.json({ user: toClientUser(req.dbUser), isAuthenticated: true });
+    res.json({
+      user: { ...toClientUser(req.dbUser), authMethod: req.authMethod },
+      isAuthenticated: true,
+    });
   });
 
   // GET /api/auth/me — deprecated REST-style alias (401 when unauthenticated).

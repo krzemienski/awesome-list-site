@@ -128,6 +128,14 @@ export type UpsertUser = typeof users.$inferInsert;
 export type User = typeof users.$inferSelect;
 
 /**
+ * How the signed-in request authenticated (GET /api/auth/user `user.authMethod`):
+ * a Clerk session, the owner password cookie, or the audit-key header.
+ * Only a Clerk session has a Clerk account portal to open.
+ */
+export const AUTH_METHODS = ["clerk", "owner_password", "audit_key"] as const;
+export type AuthMethod = (typeof AUTH_METHODS)[number];
+
+/**
  * Deleted account tombstones (migrations/0053_deleted_user_tombstones.sql).
  * Written in the same transaction that removes a user row. Clerk session JWTs
  * are verified offline, so a token minted before deletion stays valid for up
@@ -1292,7 +1300,8 @@ export const notificationPreferences = pgTable(
     includeWatchNext: boolean("include_watch_next").notNull().default(true),
     includeJourneyStep: boolean("include_journey_step").notNull().default(true),
     cadence: text("cadence").$type<DigestCadence>().notNull().default("weekly"),
-    timezone: varchar("timezone", { length: 64 }).notNull().default("UTC"),
+    // null until the user saves a time zone (digests use UTC until then).
+    timezone: varchar("timezone", { length: 64 }),
     policyVersion: integer("policy_version").notNull().default(1),
     pausedUntil: timestamp("paused_until", { withTimezone: true }),
     emailOptedInAt: timestamp("email_opted_in_at", { withTimezone: true }),

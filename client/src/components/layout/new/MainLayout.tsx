@@ -11,6 +11,7 @@ import "@/styles/shell/layout.css";
 import type { ProductProfileId } from "@/lib/design-system";
 import { useHomeBoot } from "@/lib/home-boot";
 import { handoffFocusOnUnmount } from "@/hooks/focus-handoff";
+import type { AuthUser } from "@/hooks/useAuth";
 import { trackCommandPaletteOpened, type CommandPaletteOpenMethod } from "@/lib/analytics";
 import { OPEN_SEARCH_PALETTE_EVENT, type OpenSearchPaletteDetail } from "@/lib/search-palette";
 
@@ -86,16 +87,6 @@ function BackToTop() {
   );
 }
 
-interface User {
-  id: string;
-  email?: string;
-  name?: string;
-  avatar?: string;
-  provider?: string;
-  role?: string;
-  createdAt?: string;
-}
-
 interface MainLayoutProps {
   productProfile: ProductProfileId;
   // Run22 BUG-008: chrome (sidebar/header) renders from the lightweight nav
@@ -109,7 +100,7 @@ interface MainLayoutProps {
   // the /categories card's Retry button.
   onRetryNav?: () => void;
   children: React.ReactNode;
-  user?: User;
+  user?: AuthUser;
   onLogout?: () => void;
   logoutError?: string | null;
   renderSearchDialog?: (controls: {

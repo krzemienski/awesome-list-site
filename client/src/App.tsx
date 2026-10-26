@@ -13,7 +13,7 @@ import { Switch, Route, Redirect, useLocation, useSearch } from "wouter";
 import { discoveryRedirect } from "@shared/discovery-params";
 import { AccountThemePreferenceBridge } from "@/components/ui/theme-provider";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
-import { noteLocationChange, useScrollRestoration } from "./lib/nav-history";
+import { noteLocationChange, useRouteFocus, useScrollRestoration } from "./lib/nav-history";
 import { useAuth } from "./hooks/useAuth";
 import { findRouteSuggestion } from "./lib/not-found-suggestion";
 import { pendingRouteTitle } from "./lib/pending-route-title";
@@ -515,6 +515,8 @@ function Router({
   // Run17 BUG-052: Back/Forward return to the saved scroll position instead
   // of the top; forward navigations still start at the top.
   useScrollRestoration(location, search);
+  // PG-01: announce in-app navigations by focusing the new page's h1.
+  useRouteFocus(location);
 
   // Run22 BUG-008: the chrome (sidebar/header) renders from a ~few-KB nav
   // tree; the 2.7MB corpus is only fetched on routes whose CONTENT needs it

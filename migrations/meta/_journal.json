@@ -232,6 +232,13 @@
       "when": 1791993600000,
       "tag": "0058_research_run_config_and_cost_basis",
       "breakpoints": true
+    },
+    {
+      "idx": 33,
+      "version": "7",
+      "when": 1792080000000,
+      "tag": "0059_notification_timezone_unset",
+      "breakpoints": true
     }
   ]
 }

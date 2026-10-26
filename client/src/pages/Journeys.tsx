@@ -341,6 +341,17 @@ export default function Journeys() {
             const isStartingThis =
               startJourneyMutation.isPending &&
               startJourneyMutation.variables?.id === journey.id;
+            // The label follows enrollment, the state the click acts on: an
+            // enrolled journey opens at its next step even at 0%, as
+            // /continue-learning ("Resume next step") and the detail page say.
+            // Run21 R4-075: a finished journey gets its own label.
+            const cta = isStartingThis
+              ? { label: "Starting Journey...", Icon: Loader2 }
+              : enrolled && progressPercent === 100
+                ? { label: "Completed · Review", Icon: Trophy }
+                : enrolled
+                  ? { label: "Continue Journey", Icon: CheckCircle2 }
+                  : { label: "Start Journey", Icon: Play };
 
             return (
               <Card 
@@ -462,13 +473,7 @@ export default function Journeys() {
                     // BUG-037 (audit2): five cards all announced an identical
                     // "Start Journey" — the accessible name now appends the
                     // journey title (visible label stays the prefix, WCAG 2.5.3).
-                    aria-label={`${
-                      enrolled && progressPercent === 100
-                        ? "Completed · Review"
-                        : enrolled && (journey.completedStepCount || 0) > 0
-                          ? "Continue Journey"
-                          : "Start Journey"
-                    }: ${journey.title}`}
+                    aria-label={`${cta.label}: ${journey.title}`}
                   >
                     {/* BUG-037 (run14): shrink-0 icons — at 768px the flex
                         button squeezed the leading icon and clipped it. */}
@@ -477,32 +482,8 @@ export default function Journeys() {
                         text wrap in the worst case instead of clipping); the
                         decorative trailing arrow hides below 900px to keep the
                         label on one line at 768–899px. */}
-                    {/* Run17 BUG-046: "Continue" only once real progress exists —
-                        enrolled-with-zero-progress previously showed "Continue
-                        Journey" on journeys the user had never actually begun.
-                        Run21 R4-075: a 100%-complete journey gets its own
-                        Completed-state label instead of still saying "Continue". */}
-                    {isStartingThis ? (
-                      <>
-                        <Loader2 className="h-4 w-4 mr-2 shrink-0 animate-spin" />
-                        <span className="text-left">Starting Journey...</span>
-                      </>
-                    ) : enrolled && progressPercent === 100 ? (
-                      <>
-                        <Trophy className="h-4 w-4 mr-2 shrink-0" />
-                        <span className="text-left">Completed · Review</span>
-                      </>
-                    ) : enrolled && (journey.completedStepCount || 0) > 0 ? (
-                      <>
-                        <CheckCircle2 className="h-4 w-4 mr-2 shrink-0" />
-                        <span className="text-left">Continue Journey</span>
-                      </>
-                    ) : (
-                      <>
-                        <Play className="h-4 w-4 mr-2 shrink-0" />
-                        <span className="text-left">Start Journey</span>
-                      </>
-                    )}
+                    <cta.Icon className={cn("h-4 w-4 mr-2 shrink-0", isStartingThis && "animate-spin")} />
+                    <span className="text-left">{cta.label}</span>
                     <ArrowRight className="hidden min-[900px]:block h-4 w-4 ml-auto shrink-0 group-hover:translate-x-1 transition-transform" />
                   </Button>
                 </CardFooter>

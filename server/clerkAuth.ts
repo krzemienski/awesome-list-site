@@ -23,7 +23,7 @@ import { createHash, createHmac, timingSafeEqual } from "node:crypto";
 import { getAuth } from "@clerk/express";
 import { eq, or, sql } from "drizzle-orm";
 import { db } from "./db";
-import { deletedUserTombstones, users, type User } from "@shared/schema";
+import { deletedUserTombstones, users, type AuthMethod, type User } from "@shared/schema";
 import { trackServerEvent } from "./lib/mixpanelServer";
 import { asyncHandler } from "./middleware/asyncHandler";
 import { createLogger } from "./lib/logger";
@@ -49,6 +49,8 @@ declare global {
       dbUser?: User;
       /** Clerk session identity (set whenever a valid Clerk session exists). */
       clerkIdentity?: ClerkSessionIdentity;
+      /** How clerkUserContext authenticated `dbUser` (set with it). */
+      authMethod?: AuthMethod;
     }
   }
 }
@@ -384,6 +386,7 @@ export const clerkUserContext: RequestHandler = asyncHandler(async function cler
         res.clearCookie(ADMIN_SESSION_COOKIE, adminCookieOptions);
       } else if (auditAdmin) {
         req.dbUser = auditAdmin;
+        req.authMethod = viaAuditKey ? "audit_key" : "owner_password";
         req.clerkIdentity = undefined; // no Clerk session backs this request
         if (viaAuditKey) {
           logger.info(`[clerkAuth] audit-key bypass: ${req.method} ${req.path}`);
@@ -407,6 +410,7 @@ export const clerkUserContext: RequestHandler = asyncHandler(async function cler
   req.clerkIdentity = identity;
   try {
     req.dbUser = await ensureDbUser(req, identity);
+    req.authMethod = "clerk";
   } catch (error) {
     logger.error("[clerkAuth] Failed to resolve local user for Clerk session:", error);
     res.locals.clerkUserLookupError = error;
