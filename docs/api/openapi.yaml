@@ -91,12 +91,19 @@ components:
                       enum:
                         - null
                     - {}
+                authMethod:
+                  type: string
+                  enum:
+                    - clerk
+                    - owner_password
+                    - audit_key
               required:
                 - id
                 - name
                 - role
                 - createdAt
                 - deletionRequestedAt
+                - authMethod
               additionalProperties: {}
             - type: string
               nullable: true
@@ -2955,6 +2962,91 @@ paths:
       x-contract-schemas: {}
     put:
       operationId: put:/api/notification-preferences
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/JsonResponse'
+        '400':
+          description: Request validation failed
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationError'
+        '401':
+          description: Authentication required
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '403':
+          description: Insufficient permission
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '404':
+          description: Resource not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '409':
+          description: Request conflicts with current state
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '413':
+          description: Request body too large
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationError'
+        '422':
+          description: Request could not be processed
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '429':
+          description: Rate limit exceeded
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '503':
+          description: Service temporarily unavailable
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+      tags:
+        - notification-preferences
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/JsonObjectBody'
+      security:
+        - SessionCookie: []
+      x-domain: notification-preferences
+      x-requires-auth: true
+      x-middleware:
+        - requireAuth
+      x-contract-schemas:
+        body: JsonObjectBody
+    patch:
+      operationId: patch:/api/notification-preferences
       responses:
         '200':
           description: Successful response
