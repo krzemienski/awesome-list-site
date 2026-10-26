@@ -60,7 +60,7 @@ export function ResearchRunConfigSummary({ config, testId }: { config: ResolvedR
         <Row label="Scout model" value={config.scout.model} source={scoutSource} override={o.scoutModel} />
       </dl>
       {!config.preflight.ok && (
-        <Alert variant="destructive" role="alert">
+        <Alert variant="destructive">
           <AlertCircle className="h-4 w-4" />
           <AlertDescription>
             <ul className="list-disc space-y-1 pl-4">

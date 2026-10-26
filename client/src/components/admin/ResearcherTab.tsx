@@ -187,6 +187,13 @@ export default function ResearcherTab({ initialTab = "review" }: ResearcherTabPr
     .filter((c) => Number.isFinite(c) && c > 0);
   const costMin = finishedCosts.length > 0 ? Math.min(...finishedCosts) : null;
   const costMax = finishedCosts.length > 0 ? Math.max(...finishedCosts) : null;
+  // Cancelled and failed runs report a lower-bound cost, so only runs that
+  // ended on their own count.
+  const savingCosts = (jobs || [])
+    .filter((j) => (j.status === "completed" || j.status === "budget_stopped") && (j.totalDiscoveries ?? 0) > 0)
+    .map((j) => Number(j.estimatedCostUsd))
+    .filter((c) => Number.isFinite(c) && c > 0);
+  const cheapestSavingRunUsd = savingCosts.length > 0 ? Math.min(...savingCosts) : null;
 
   const {
     data: selectedJob,
@@ -355,7 +362,7 @@ export default function ResearcherTab({ initialTab = "review" }: ResearcherTabPr
         onDismiss={() => setJobToCancel(null)}
       />
       {cancelMutation.isError && jobToCancel === null && (
-        <Alert variant="destructive" role="alert">
+        <Alert variant="destructive">
           <AlertCircle className="w-4 h-4" />
           <AlertDescription>
             Could not cancel job #{cancelMutation.variables}: {describeWriteError(cancelMutation.error, { outcome: CANCEL_OUTCOME })}
@@ -385,6 +392,7 @@ export default function ResearcherTab({ initialTab = "review" }: ResearcherTabPr
                   setIsPolling(true);
                 }}
                 costRange={costMin !== null && costMax !== null ? { min: costMin, max: costMax } : null}
+                cheapestSavingRunUsd={cheapestSavingRunUsd}
                 catalogSize={categoriesData?.resources?.length ?? null}
               />
             </div>
@@ -524,7 +532,7 @@ export default function ResearcherTab({ initialTab = "review" }: ResearcherTabPr
                     </AlertDialogDescription>
                   </AlertDialogHeader>
                   {approveAllMutation.isError && (
-                    <Alert variant="destructive" className="queues-agent__inline-error" role="alert">
+                    <Alert variant="destructive" className="queues-agent__inline-error">
                       <AlertCircle className="w-4 h-4" />
                       <AlertDescription>{describeWriteError(approveAllMutation.error, { outcome: "Some discoveries may already be approved. Refresh the list, then try again." })}</AlertDescription>
                     </Alert>
@@ -788,7 +796,7 @@ export default function ResearcherTab({ initialTab = "review" }: ResearcherTabPr
                         (job.status === 'failed' || (job.status === 'completed' && (job.totalDiscoveries || 0) === 0)) && job.errorMessage ? (
                           <TableRow key={`${job.id}-error`}>
                             <TableCell colSpan={9} className="p-0">
-                              <Alert variant="destructive" className="rounded-none border-x-0 border-t-0">
+                              <Alert variant="destructive" live="off" className="rounded-none border-x-0 border-t-0">
                                 <AlertCircle className="w-4 h-4" />
                                 <AlertDescription className="text-xs break-all">
                                   Job #{job.id}: {humanizeJobError(job.errorMessage)}
@@ -919,7 +927,7 @@ export default function ResearcherTab({ initialTab = "review" }: ResearcherTabPr
               )}
 
               {selectedJob.errorMessage && (
-                <Alert variant="destructive">
+                <Alert variant="destructive" live="off">
                   <AlertCircle className="w-4 h-4" />
                   {/* NB-018 (run18): long unbroken tokens/URLs in agent errors
                       blew the banner to ~1,786px inside the dialog — force the

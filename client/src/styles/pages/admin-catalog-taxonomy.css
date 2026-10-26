@@ -88,8 +88,10 @@
   font-size: 0.6875rem;
 }
 
+/* AC-12: wide enough for the longest placeholder ("Search sub-subcategories...")
+   beside the search icon and the 44px touch clear button. */
 .admin-taxonomy-search {
-  width: 12.5rem;
+  width: 17rem;
 }
 
 /* Tools closed: the search field leaves the flow and the accessibility
@@ -317,6 +319,19 @@
 @media (hover: none), (pointer: coarse), (max-width: 64rem) {
   .admin-taxonomy-delete-reason {
     display: block;
+  }
+
+  /* AC-08: the clear-search X is a 44px touch target like the other controls. */
+  .admin-taxonomy-search .admin-taxonomy-search-clear {
+    height: 44px;
+    min-height: 44px;
+    min-width: 44px;
+    right: 0;
+    width: 44px;
+  }
+
+  .admin-taxonomy-search input {
+    padding-right: 2.75rem;
   }
 }
 

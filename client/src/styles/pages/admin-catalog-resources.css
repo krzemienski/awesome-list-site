@@ -14,6 +14,9 @@
   gap: 12px;
   justify-content: space-between;
   padding: 18px 22px;
+  /* AC-07: the tools toggle drops to icon-only by the header's own width,
+     which the sidebar and page gutters change independently of the viewport. */
+  container: resources-header / inline-size;
 }
 
 .admin-catalog-resources__header-actions {
@@ -55,12 +58,42 @@
 }
 
 .admin-catalog-resources__header-actions [data-testid="button-resource-tools"] {
+  /* AC-07: never narrower than its content; the search field takes the shrink. */
+  flex: none;
   opacity: 1;
   position: static;
 }
 
 .admin-catalog-resources__tools-icon {
   display: none;
+}
+
+/* Below this the labelled toggle crowds the search field, so it becomes a
+   44px icon button; its aria-label still names the action. */
+@container resources-header (max-width: 59.99rem) {
+  .admin-catalog-resources__header-actions [data-testid="button-resource-tools"] {
+    align-items: center;
+    display: inline-flex;
+    height: 44px;
+    justify-content: center;
+    padding: 0;
+    width: 44px;
+  }
+
+  .admin-catalog-resources__header-actions [data-testid="button-resource-tools"]:focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: 2px;
+  }
+
+  .admin-catalog-resources__tools-icon {
+    display: block;
+    height: 18px;
+    width: 18px;
+  }
+
+  .admin-catalog-resources__tools-label {
+    display: none;
+  }
 }
 
 .admin-catalog-resources__title {
@@ -420,31 +453,6 @@
     min-width: 0;
   }
 
-  .admin-catalog-resources__header-actions [data-testid="button-resource-tools"] {
-    align-items: center;
-    display: inline-flex;
-    flex: 0 0 44px;
-    height: 44px;
-    justify-content: center;
-    padding: 0;
-    width: 44px;
-  }
-
-  .admin-catalog-resources__header-actions [data-testid="button-resource-tools"]:focus-visible {
-    outline: 2px solid var(--accent);
-    outline-offset: 2px;
-  }
-
-  .admin-catalog-resources__tools-icon {
-    display: block;
-    height: 18px;
-    width: 18px;
-  }
-
-  .admin-catalog-resources__tools-label {
-    display: none;
-  }
-
   .admin-catalog-resources__header,
   .admin-catalog-resources__content {
     padding-left: 0;
@@ -468,9 +476,15 @@
   /* The frozen TableShell header is one row (title · search + Add). Our
      extra tools toggle made the actions group 24px too wide for the 768px
      inset, so the whole group wrapped 55px under the title; let the group
-     share the row and give the search field the shrink instead. */
+     share the row. AC-07: the controls keep their content width and the
+     title wraps instead, so nothing is squeezed below its label. */
+  .admin-catalog-resources__header > div:first-child {
+    flex: 1 1 14rem;
+    min-width: 0;
+  }
+
   .admin-catalog-resources__header-actions {
-    flex: 1 1 0;
+    flex: 0 1 auto;
     flex-wrap: nowrap;
     justify-content: flex-end;
   }

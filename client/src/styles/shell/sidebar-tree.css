@@ -17,12 +17,20 @@
   transition: background 140ms ease;
 }
 
-.av-sidebar-l2-row:hover {
-  background: var(--surface);
+@media (hover: hover) and (pointer: fine) {
+  .av-sidebar-l2-row:hover {
+    background: var(--surface);
+  }
 }
 
+/* .active is the row whose own page is current; .contains-active only holds
+   the current page, so it takes bright ink, not the accent fill. */
 .av-sidebar-l2-row.active {
   background: color-mix(in srgb, var(--accent) 10%, transparent);
+}
+
+.av-sidebar-l2-row.contains-active .av-sidebar-l2-link {
+  color: var(--text);
 }
 
 .av-sidebar-l2-link {
@@ -132,9 +140,37 @@
   font-size: 9.5px;
 }
 
-.av-sidebar-l3-row:hover,
-.av-sidebar-l3-row[data-active="true"] {
-  color: var(--text);
+@media (hover: hover) and (pointer: fine) {
+  .av-sidebar-l3-row:hover {
+    color: var(--text);
+  }
+}
+
+/* The current page's row gets the strongest paint in the tree: the accent
+   fill and ink the L2 .active row uses, on an inset ::before. */
+.av-sidebar-l3-row {
+  position: relative;
+}
+
+.av-sidebar-l3-row > span {
+  position: relative;
+}
+
+.av-sidebar-l3-row::before {
+  border-radius: 6px; /* DS-OK: matches the refined L2 row radius above. */
+  content: "";
+  inset: 6px 0;
+  pointer-events: none;
+  position: absolute;
+}
+
+.av-sidebar-l3-row[data-active="true"],
+.av-sidebar-l3-row[data-active="true"] > span:last-child {
+  color: var(--accent-ink);
+}
+
+.av-sidebar-l3-row[data-active="true"]::before {
+  background: color-mix(in srgb, var(--accent) 10%, transparent);
 }
 
 /* Leaf taxonomy rows share the V2 L2Row type in both sidebars: one line,
@@ -203,9 +239,11 @@
   background: transparent;
   border-color: transparent;
 }
-.av-sidebar-shell .av-sidebar-all-category:hover::before {
-  background: var(--surface);
-  border-color: var(--border);
+@media (hover: hover) and (pointer: fine) {
+  .av-sidebar-shell .av-sidebar-all-category:hover::before {
+    background: var(--surface);
+    border-color: var(--border);
+  }
 }
 
 /* L2 rows (leaf links, and the link + disclosure pair for nested groups). */
@@ -223,9 +261,11 @@
   transform: none;
 }
 .av-sidebar-shell .av-sidebar-leaf:hover { color: var(--text-2); }
-.av-sidebar-shell .av-sidebar-leaf:hover::before,
-.av-sidebar-shell .av-sidebar-l2-row:hover::before {
-  background: var(--surface);
+@media (hover: hover) and (pointer: fine) {
+  .av-sidebar-shell .av-sidebar-leaf:hover::before,
+  .av-sidebar-shell .av-sidebar-l2-row:hover::before {
+    background: var(--surface);
+  }
 }
 .av-sidebar-shell .av-sidebar-leaf[data-active="true"]::before,
 .av-sidebar-shell .av-sidebar-l2-row.active::before {
@@ -243,7 +283,8 @@
 .av-sidebar-shell .av-sidebar-l2-link {
   padding: 0 0 0 11px;
 }
-.av-sidebar-l2-row.active .av-sidebar-nested-count {
+.av-sidebar-l2-row.active .av-sidebar-nested-count,
+.av-sidebar-l2-row.contains-active .av-sidebar-nested-count {
   border-color: color-mix(in srgb, var(--accent) 30%, var(--border));
   color: var(--accent-ink);
 }
@@ -277,6 +318,7 @@
   margin-block: -9.5px;
   padding: 5px 11px 5px 0;
 }
+.av-sidebar-shell .av-sidebar-l3-row::before { inset: 9.5px 0; }
 
 .av-sidebar-shell .av-sidebar-l3-all {
   margin-block: -11px -9px;

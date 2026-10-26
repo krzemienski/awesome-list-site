@@ -33,7 +33,7 @@
       transparent 38%,
       color-mix(in srgb, var(--accent-2) 5%, transparent)
     ),
-    color-mix(in srgb, var(--bg-2) 94%, transparent);
+    var(--bg-2);
   box-shadow: var(--shadow-lg);
   color: var(--text);
   isolation: isolate;

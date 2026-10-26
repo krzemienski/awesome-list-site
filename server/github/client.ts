@@ -149,15 +149,29 @@ export class GitHubClient {
         throw new Error(`Failed to fetch file: ${response.status} ${response.statusText}`);
       } catch (error: unknown) {
         if (branches.indexOf(branchName) === branches.length - 1) {
-          // Last branch, throw error
-          throw new Error(`File not found: ${path} in ${repoUrl} (tried branches: ${branches.join(', ')})`);
+          throw await this.missingFileError(repoUrl, path, branches);
         }
         // Try next branch
         continue;
       }
     }
-    
-    throw new Error(`File not found: ${path} in ${repoUrl}`);
+
+    throw await this.missingFileError(repoUrl, path, branches);
+  }
+
+  /**
+   * A raw-file 404 cannot tell a missing file from a missing repository,
+   * so the repository endpoint decides which one the admin is told about.
+   */
+  private async missingFileError(repoUrl: string, path: string, branches: string[]): Promise<Error> {
+    const { owner, repo } = this.parseRepoUrl(repoUrl);
+    const repoMissing = await this.octokit.repos.get({ owner, repo }).then(
+      () => false,
+      (error: unknown) => !!error && typeof error === 'object' && 'status' in error && error.status === 404,
+    );
+    return repoMissing
+      ? new Error(`Repository not found (or not public): ${owner}/${repo}`)
+      : new Error(`File not found: ${path} in ${repoUrl} (tried branches: ${branches.join(', ')})`);
   }
 
   /**

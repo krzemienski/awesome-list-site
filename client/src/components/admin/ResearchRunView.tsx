@@ -50,8 +50,12 @@ function endingCopy(outcome: RunOutcome, saved: number, job: ResearchJob): strin
   switch (outcome) {
     case "completed":
       return saved > 0 ? `Run finished with ${found}. Review them below.` : "Run finished without saving a discovery. Relaunch with a different focus or brief.";
-    case "budget_stopped":
-      return `Budget cap reached ($${Number(job.maxBudgetUsd ?? 0).toFixed(2)}) — review the ${found}, or relaunch with a higher cap.`;
+    case "budget_stopped": {
+      const cap = `Budget cap reached ($${Number(job.maxBudgetUsd ?? 0).toFixed(2)})`;
+      return saved > 0
+        ? `${cap} — review the ${found}, or relaunch with a higher cap.`
+        : `${cap} before the run saved a discovery. Relaunch with a higher cap.`;
+    }
     case "cancelled":
       return saved > 0 ? `Run cancelled — review the ${found} it made before stopping.` : "Run cancelled before it saved a discovery.";
     case "failed":
@@ -259,7 +263,7 @@ export function ResearchRunView({ jobId, focusOnMount, onStartNew, onRelaunchHig
           onDismiss={() => setConfirmCancel(false)}
         />
         {cancel.isError && !confirmCancel && (
-          <Alert variant="destructive" role="alert">
+          <Alert variant="destructive">
             <AlertCircle className="h-4 w-4" />
             <AlertDescription>{describeWriteError(cancel.error, { outcome: "The run may still be going. Try cancelling again." })}</AlertDescription>
           </Alert>
@@ -298,8 +302,8 @@ export function ResearchRunView({ jobId, focusOnMount, onStartNew, onRelaunchHig
             </dl>
 
             {outcome && (
-              // role="note": the polite region above already announces the ending.
-              <Alert role="note" variant={outcome === "failed" ? "destructive" : "default"} data-testid="research-run-ending" data-outcome={outcome}>
+              // live="off": the polite region above already announces the ending.
+              <Alert live="off" variant={outcome === "failed" ? "destructive" : "default"} data-testid="research-run-ending" data-outcome={outcome}>
                 {outcome === "completed" ? <CheckCircle2 className="h-4 w-4" /> : <AlertCircle className="h-4 w-4" />}
                 <AlertDescription className="space-y-3 break-words">
                   <p>{endingCopy(outcome, saved, job)}</p>

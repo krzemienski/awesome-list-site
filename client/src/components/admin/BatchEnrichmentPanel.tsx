@@ -51,7 +51,8 @@ import { AgentEventLog } from "@/components/admin/AgentEventLog";
 import { AgentCommsGraph } from "@/components/admin/AgentCommsGraph";
 import { Stat, StatusChip, TableShell } from "@/components/admin/AdminOpsPrimitives";
 import type { EnrichmentJob } from "@shared/schema";
-import { baseUrlSyntaxError } from "@shared/validation";
+import { baseUrlSyntaxError, insecureHttpRefusal, plainHttpHost } from "@shared/validation";
+import { Checkbox } from "@/components/ui/checkbox";
 import "./queues-agent.css";
 
 const CANONICAL_JOB_ROWS = 6;
@@ -140,6 +141,7 @@ export default function BatchEnrichmentPanel() {
   const [model, setModel] = useState("");
   const [baseUrl, setBaseUrl] = useState("");
   const [authToken, setAuthToken] = useState("");
+  const [confirmInsecureHttp, setConfirmInsecureHttp] = useState(false);
   const [selectedJobId, setSelectedJobId] = useState<number | null>(null);
   const [isDetailsModalOpen, setIsDetailsModalOpen] = useState(false);
   // R2-H04 companion: cancel-job confirmation via AlertDialog, not confirm().
@@ -159,7 +161,11 @@ export default function BatchEnrichmentPanel() {
   // dialog can open (the server adds its DNS check on top).
   const baseUrlError = baseUrl.trim() ? baseUrlSyntaxError(baseUrl) : null;
   const authTokenMissing = !!baseUrl.trim() && !baseUrlError && !authToken.trim();
-  const startConfigInvalid = batchSizeInvalid || !!baseUrlError || authTokenMissing;
+  const insecureHttpUnconfirmed = !!insecureHttpRefusal(baseUrl, confirmInsecureHttp);
+  const startConfigInvalid = batchSizeInvalid || !!baseUrlError || authTokenMissing || insecureHttpUnconfirmed;
+  const insecureHost = plainHttpHost(baseUrl);
+  const customHost = baseUrl.trim() && !baseUrlError ? new URL(baseUrl.trim()).host : null;
+  const startHost = customHost ?? aiDefaults.config?.baseUrlHost ?? null;
 
   const {
     data: jobsData,
@@ -218,6 +224,7 @@ export default function BatchEnrichmentPanel() {
       model?: string;
       baseUrl?: string;
       authToken?: string;
+      allowInsecureHttp?: true;
     }) => {
       return await apiRequest('/api/enrichment/start', {
         method: 'POST',
@@ -306,6 +313,7 @@ export default function BatchEnrichmentPanel() {
       model: model.trim() || undefined,
       baseUrl: baseUrl.trim() || undefined,
       authToken: authToken.trim() || undefined,
+      allowInsecureHttp: insecureHost && confirmInsecureHttp ? true : undefined,
     });
   };
 
@@ -490,6 +498,7 @@ export default function BatchEnrichmentPanel() {
                       <button
                         className="btn ghost"
                         onClick={() => handleViewDetails(job.id)}
+                        aria-label={`View logs for job #${job.id}`}
                         data-testid={`button-view-job-${job.id}-canonical`}
                       >
                         Logs
@@ -627,7 +636,7 @@ export default function BatchEnrichmentPanel() {
               </span>
               {showAdvanced ? <ChevronDown className="w-4 h-4" /> : <ChevronRight className="w-4 h-4" />}
             </Button>
-            {!showAdvanced && (baseUrlError || authTokenMissing) && (
+            {!showAdvanced && (!!baseUrlError || authTokenMissing || insecureHttpUnconfirmed) && (
               <p role="alert" className="border-t px-3 py-2 text-xs font-medium text-destructive" data-testid="error-enrich-endpoint-collapsed">
                 The custom endpoint needs fixing before a job can start. Open this section to fix it.
               </p>
@@ -655,7 +664,7 @@ export default function BatchEnrichmentPanel() {
                   <Input
                     id="enrich-baseurl"
                     value={baseUrl}
-                    onChange={(e) => setBaseUrl(e.target.value)}
+                    onChange={(e) => { setBaseUrl(e.target.value); setConfirmInsecureHttp(false); }}
                     placeholder={defaultBaseUrl ? `${defaultBaseUrl} (default)` : "Default endpoint"}
                     className="font-mono text-xs"
                     disabled={hasActiveJob}
@@ -694,6 +703,13 @@ export default function BatchEnrichmentPanel() {
                     </p>
                   )}
                 </div>
+                {insecureHost && (
+                  <Label htmlFor="enrich-confirm-insecure-http" className="flex items-start gap-2 font-normal">
+                    <Checkbox id="enrich-confirm-insecure-http" checked={confirmInsecureHttp} disabled={hasActiveJob}
+                      onCheckedChange={(v) => setConfirmInsecureHttp(v === true)} data-testid="checkbox-enrich-confirm-insecure-http" />
+                    <span className="text-xs">Send the auth token to this plain http:// endpoint unencrypted. Anyone on the network path can read it.</span>
+                  </Label>
+                )}
               </div>
             )}
           </div>
@@ -728,7 +744,7 @@ export default function BatchEnrichmentPanel() {
                 </AlertDescription>
               </Alert>
             ) : !activeJobStateKnown && (
-              <Alert variant={jobsIsError ? "destructive" : "default"} className="flex-1 ml-4" role={jobsIsError ? "alert" : undefined}>
+              <Alert variant={jobsIsError ? "destructive" : "default"} className="flex-1 ml-4" live={jobsIsError ? "assertive" : "off"}>
                 <AlertCircle className="h-4 w-4" />
                 <AlertDescription>
                   {jobsIsError
@@ -999,6 +1015,7 @@ export default function BatchEnrichmentPanel() {
                           onClick={() => handleViewDetails(job.id)}
                           variant="ghost"
                           size="sm"
+                          aria-label={`View details for job #${job.id}`}
                           data-testid={`button-view-details-${job.id}`}
                         >
                           <Eye className="h-4 w-4 mr-2" />
@@ -1221,7 +1238,7 @@ export default function BatchEnrichmentPanel() {
             </AlertDialogDescription>
           </AlertDialogHeader>
           {cancelMutation.isError && (
-            <Alert variant="destructive" className="queues-agent__inline-error" role="alert">
+            <Alert variant="destructive" className="queues-agent__inline-error">
               <AlertCircle className="h-4 w-4" />
               <AlertDescription>{describeWriteError(cancelMutation.error, { outcome: "The job may still be running. Refresh the job list, then try again." })}</AlertDescription>
             </Alert>
@@ -1250,7 +1267,9 @@ export default function BatchEnrichmentPanel() {
             <AlertDialogTitle>Start enrichment job?</AlertDialogTitle>
             <AlertDialogDescription>
               This starts a Claude AI enrichment run over {filter === 'unenriched' ? 'unenriched' : 'all'} resources
-              in batches of {batchSize}. The job runs in the background and incurs real API cost.
+              in batches of {batchSize} on {startHost ?? "the server's configured endpoint"}{customHost ? " (custom endpoint)" : ""}.
+              The job runs in the background and incurs real API cost.
+              {insecureHost && ` The auth token goes to ${insecureHost} over plain http, unencrypted.`}
             </AlertDialogDescription>
           </AlertDialogHeader>
           <div className="space-y-1 text-center text-sm sm:text-left" data-testid="text-enrichment-scope">
@@ -1277,7 +1296,7 @@ export default function BatchEnrichmentPanel() {
             )}
           </div>
           {startMutation.isError && (
-            <Alert variant="destructive" className="queues-agent__inline-error" role="alert">
+            <Alert variant="destructive" className="queues-agent__inline-error">
               <AlertCircle className="h-4 w-4" />
               <AlertDescription>{describeWriteError(startMutation.error, { outcome: "The job may not have started. Check the job list before starting another." })}</AlertDescription>
             </Alert>

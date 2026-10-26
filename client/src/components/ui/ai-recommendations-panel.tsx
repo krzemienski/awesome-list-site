@@ -469,7 +469,7 @@ export default function AIRecommendationsPanel({
       ) : null}
 
       {feedbackStatesError && !canRenderRecommendations ? (
-        <Alert>
+        <Alert live="polite">
           <AlertCircle className="h-4 w-4" />
           <AlertTitle>Saved feedback is temporarily unavailable</AlertTitle>
           <AlertDescription className="space-y-2">
@@ -499,7 +499,7 @@ export default function AIRecommendationsPanel({
       ) : null}
 
       {(isStale || (isError && hasUsefulResults)) && visibleRecommendations.length > 0 ? (
-        <Alert data-testid="stale-recommendations-state">
+        <Alert data-testid="stale-recommendations-state" live="polite">
           <RefreshCw className="h-4 w-4" />
           <AlertTitle>Showing your last useful recommendations</AlertTitle>
           <AlertDescription className="space-y-2">
@@ -519,7 +519,7 @@ export default function AIRecommendationsPanel({
       ) : null}
 
       {isPaused ? (
-        <Alert data-testid="offline-refresh-state" role="status">
+        <Alert data-testid="offline-refresh-state" live="polite">
           <WifiOff className="h-4 w-4" />
           <AlertTitle>You’re offline</AlertTitle>
           <AlertDescription>
@@ -622,7 +622,7 @@ export default function AIRecommendationsPanel({
       {!isAuthenticated && visibleRecommendations.length > 0 ? guestFooterCard : null}
 
       {!isLoading && !isError && recommendations.length === 0 ? (
-        <Alert data-testid="no-recommendations">
+        <Alert data-testid="no-recommendations" live="polite">
           <AlertCircle className="h-4 w-4" />
           <AlertTitle>No unseen recommendations right now</AlertTitle>
           <AlertDescription className="space-y-3">

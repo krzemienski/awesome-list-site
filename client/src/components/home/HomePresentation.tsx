@@ -710,7 +710,11 @@ function CuratedLayout({
                 Hand-picked <span className="serif-italic home-accent-italic">highlights</span>
               </>
             }
-            sub={`${formatCount(shownFeatured.length)} of ${formatCount(stats.total)} resources stand out this week.`}
+            sub={
+              shownFeatured.length < stats.featured
+                ? `${formatCount(shownFeatured.length)} of ${formatCount(stats.featured)} hand-picked resources.`
+                : `${formatCount(stats.featured)} hand-picked resources.`
+            }
           />
           <div className="home-resource-grid">
             {shownFeatured.map((resource) => (

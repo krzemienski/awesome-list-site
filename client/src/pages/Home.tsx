@@ -28,7 +28,7 @@ import { taxonomyScopeIntro } from "@shared/seo-content-templates";
 import { useAuth } from "@/hooks/useAuth";
 import { normalizeTag, parseTagsParam } from "@/lib/tags";
 import { trackFilterUsage, trackSortChange, trackTagInteraction } from "@/lib/analytics";
-import { writeFilterParams, usePopstateParams } from "@/lib/url-filter-state";
+import { writeFilterParams } from "@/lib/url-filter-state";
 import { processAwesomeListData } from "@/lib/parser";
 import { fetchStaticAwesomeList } from "@/lib/static-data";
 import { queryUnavailableReason } from "@/lib/query-availability";
@@ -470,27 +470,20 @@ export default function Home({ nav, navLoading }: HomeProps) {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  const [selectedTags, setSelectedTagsState] = useState<string[]>(() =>
-    parseTagsParam(
-      new URLSearchParams(typeof window === "undefined" ? search : window.location.search),
-    ),
+  // The query string is the only filter state. In-page links (a featured
+  // card's tag pill), writeFilterParams and Back/Forward all change it, and
+  // wouter's useSearch re-renders on each of them.
+  const selectedTags = useMemo(() => parseTagsParam(currentParams), [currentParams]);
+  const [emptyTagParamNotice, setEmptyTagParamNotice] = useState(
+    () =>
+      (currentParams.has("tags") || currentParams.has("tag")) &&
+      parseTagsParam(currentParams).length === 0,
   );
-  const [emptyTagParamNotice, setEmptyTagParamNotice] = useState(() => {
-    const params = new URLSearchParams(
-      typeof window === "undefined" ? search : window.location.search,
-    );
-    return (
-      (params.has("tags") || params.has("tag")) &&
-      parseTagsParam(params).length === 0
-    );
-  });
-  const [selectedKind, setSelectedKindState] = useState<ResourceKind | null>(() => {
-    if (typeof window === "undefined") return null;
-    const rawKind = new URLSearchParams(window.location.search).get("kind");
-    return rawKind && (STRIP_KINDS as readonly string[]).includes(rawKind)
+  const rawKind = currentParams.get("kind");
+  const selectedKind: ResourceKind | null =
+    rawKind && (STRIP_KINDS as readonly string[]).includes(rawKind)
       ? (rawKind as ResourceKind)
       : null;
-  });
 
   // Filter analytics wait for the filtered result count (the corpus loads on
   // the first tag/kind filter), like the search and taxonomy pages.
@@ -513,51 +506,29 @@ export default function Home({ nav, navLoading }: HomeProps) {
     const removed = selectedTags.find((tag) => !incoming.has(normalizeTag(tag)));
     const changed = added ?? removed;
     if (changed) queueAnalytics({ kind: "tag", value: changed, action: added ? "apply" : "remove" });
-    setSelectedTagsState(next);
     writeFilterParams({ tags: next.length === 0 ? null : next.join(",") });
   };
 
   const VALID_SORTS = ["default", "name-asc", "name-desc", "count-desc", "count-asc"] as const;
   type HomeSort = (typeof VALID_SORTS)[number];
-  const [sortBy, setSortBy] = useState<HomeSort>(() => {
-    const fromUrl = new URLSearchParams(
-      typeof window === "undefined" ? search : window.location.search,
-    ).get("sort");
-    return fromUrl && (VALID_SORTS as readonly string[]).includes(fromUrl)
-      ? (fromUrl as HomeSort)
+  const rawSort = currentParams.get("sort");
+  const sortBy: HomeSort =
+    rawSort && (VALID_SORTS as readonly string[]).includes(rawSort)
+      ? (rawSort as HomeSort)
       : "default";
-  });
 
   const handleSortChange = (next: string) => {
     const safeNext = (VALID_SORTS as readonly string[]).includes(next)
       ? (next as HomeSort)
       : "default";
     if (safeNext !== sortBy) queueAnalytics({ kind: "sort", value: safeNext });
-    setSortBy(safeNext);
     writeFilterParams({ sort: safeNext === "default" ? null : safeNext });
   };
 
   const handleKindChange = (next: ResourceKind | null) => {
     if (next !== selectedKind) queueAnalytics({ kind: "filter", type: "kind", value: next ?? "all" });
-    setSelectedKindState(next);
     writeFilterParams({ kind: next });
   };
-
-  usePopstateParams((params) => {
-    setSelectedTagsState(parseTagsParam(params));
-    const kind = params.get("kind");
-    setSelectedKindState(
-      kind && (STRIP_KINDS as readonly string[]).includes(kind)
-        ? (kind as ResourceKind)
-        : null,
-    );
-    const sort = params.get("sort");
-    setSortBy(
-      sort && (VALID_SORTS as readonly string[]).includes(sort)
-        ? (sort as HomeSort)
-        : "default",
-    );
-  });
 
   const corpusFilterActive = selectedTags.length > 0 || selectedKind !== null;
   const showFilters =
@@ -859,9 +830,6 @@ export default function Home({ nav, navLoading }: HomeProps) {
         selectedTags={selectedTags}
         onClearFilters={() => {
           queueAnalytics({ kind: "filter", type: "all", value: "cleared" });
-          setSelectedTagsState([]);
-          setSelectedKindState(null);
-          setSortBy("default");
           writeFilterParams({ tags: null, kind: null, sort: null });
         }}
         filters={filters}
