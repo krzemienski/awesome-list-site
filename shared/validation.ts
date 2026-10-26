@@ -196,6 +196,28 @@ export function baseUrlSyntaxError(raw: string): string | null {
   return null;
 }
 
+/** Host of a plain-http custom base URL, or null when the URL is not plain http. */
+export function plainHttpHost(raw: string | null | undefined): string | null {
+  try {
+    const u = new URL((raw ?? "").trim());
+    return u.protocol === "http:" && u.host ? u.host : null;
+  } catch {
+    return null;
+  }
+}
+
+/**
+ * A custom base URL over plain http sends the run's auth token unencrypted,
+ * so the admin has to confirm it (allowInsecureHttp). Shared by the
+ * Researcher and Enrichment forms and their start routes. Returns the
+ * refusal, or null when nothing needs confirming.
+ */
+export function insecureHttpRefusal(baseUrl: string | null | undefined, confirmed: boolean): string | null {
+  const host = plainHttpHost(baseUrl);
+  if (!host || confirmed) return null;
+  return `The custom base URL uses plain http://, so the auth token would travel unencrypted to ${host}. Confirm the insecure endpoint first.`;
+}
+
 // ---------------------------------------------------------------------------
 // GitHub repository identifiers (BUG-042 run25)
 // ---------------------------------------------------------------------------

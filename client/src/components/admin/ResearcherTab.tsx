@@ -187,6 +187,13 @@ export default function ResearcherTab({ initialTab = "review" }: ResearcherTabPr
     .filter((c) => Number.isFinite(c) && c > 0);
   const costMin = finishedCosts.length > 0 ? Math.min(...finishedCosts) : null;
   const costMax = finishedCosts.length > 0 ? Math.max(...finishedCosts) : null;
+  // Cancelled and failed runs report a lower-bound cost, so only runs that
+  // ended on their own count.
+  const savingCosts = (jobs || [])
+    .filter((j) => (j.status === "completed" || j.status === "budget_stopped") && (j.totalDiscoveries ?? 0) > 0)
+    .map((j) => Number(j.estimatedCostUsd))
+    .filter((c) => Number.isFinite(c) && c > 0);
+  const cheapestSavingRunUsd = savingCosts.length > 0 ? Math.min(...savingCosts) : null;
 
   const {
     data: selectedJob,
@@ -385,6 +392,7 @@ export default function ResearcherTab({ initialTab = "review" }: ResearcherTabPr
                   setIsPolling(true);
                 }}
                 costRange={costMin !== null && costMax !== null ? { min: costMin, max: costMax } : null}
+                cheapestSavingRunUsd={cheapestSavingRunUsd}
                 catalogSize={categoriesData?.resources?.length ?? null}
               />
             </div>
