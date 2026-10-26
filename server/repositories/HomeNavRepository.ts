@@ -1,6 +1,7 @@
 import { categories, resources, subcategories, subSubcategories } from "@shared/schema";
 import { asc, eq } from "drizzle-orm";
 import { db } from "../db";
+import { titleOrderAsc } from "../lib/titleOrder";
 
 type HomeNavResource = {
   id: number;
@@ -68,7 +69,7 @@ export class HomeNavRepository {
         })
         .from(resources)
         .where(eq(resources.status, "approved"))
-        .orderBy(asc(resources.title), asc(resources.id)),
+        .orderBy(...titleOrderAsc),
       db
         .select({
           id: categories.id,
