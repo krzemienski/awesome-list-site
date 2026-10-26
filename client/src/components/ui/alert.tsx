@@ -4,7 +4,7 @@ import { cva, type VariantProps } from "class-variance-authority"
 import { cn } from "@/lib/utils"
 
 const alertVariants = cva(
-  "relative w-full border p-4 [&>svg~*]:pl-7 [&>svg+div]:translate-y-[-3px] [&>svg]:absolute [&>svg]:left-4 [&>svg]:top-4 [&>svg]:text-foreground",
+  "relative w-full border p-4 [&>svg~*]:pl-7 [&>svg+div:not([data-slot=alert-title])]:translate-y-[-3px] [&>svg]:absolute [&>svg]:left-4 [&>svg]:top-4 [&>svg]:text-foreground",
   {
     variants: {
       variant: {
@@ -32,12 +32,15 @@ const Alert = React.forwardRef<
 ))
 Alert.displayName = "Alert"
 
+// A callout title, not a section heading: as an <h5> it broke the outline of
+// every page that shows an alert under its h1 or h2.
 const AlertTitle = React.forwardRef<
-  HTMLParagraphElement,
-  React.HTMLAttributes<HTMLHeadingElement>
+  HTMLDivElement,
+  React.HTMLAttributes<HTMLDivElement>
 >(({ className, ...props }, ref) => (
-  <h5
+  <div
     ref={ref}
+    data-slot="alert-title"
     className={cn("mb-1 font-medium leading-none tracking-tight", className)}
     {...props}
   />

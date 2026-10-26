@@ -271,19 +271,12 @@ export default function UsersTab() {
           />
         )}
         {isError && !data ? null : <>
-        {/* Run16 BUG-088: on narrow screens the table scrolls sideways — a
-            right-edge fade + explicit hint make the hidden columns
-            discoverable instead of silently clipping them. The hint sits above
-            the table so it is read before the rows, not after all of them. */}
-        <p className="admin-ops-scroll-hint text-xs text-muted-foreground mb-2 sm:hidden" data-testid="hint-swipe-users-table">
-          Swipe the table sideways to see role, join date, and actions.
-        </p>
         <div className="admin-ops-table-wrap relative">
-          <div
-            className="pointer-events-none absolute inset-y-0 right-0 w-8 bg-gradient-to-l from-card to-transparent sm:hidden"
-            aria-hidden="true"
-          />
-          <Table className="admin-ops-table admin-ops-users-table" scrollLabel="Users table, scrollable">
+          <Table
+            className="admin-ops-table admin-ops-users-table"
+            scrollLabel="Users table, scrollable"
+            scrollHint="Swipe the table sideways to see role, join date, and actions."
+          >
             <TableHeader>
             <TableRow>
               {/* Run16 BUG-087: sortable column headers (server-side sort). */}

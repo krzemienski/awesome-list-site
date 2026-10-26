@@ -345,14 +345,7 @@ export default function AuditTab() {
           />
         ) : (
         <>
-        {/* Run16 BUG-088: on narrow screens the table scrolls sideways — a
-            right-edge fade + explicit hint make the hidden columns
-            discoverable instead of silently clipping them. */}
         <div className="admin-ops-table-wrap relative">
-          <div
-            className="pointer-events-none absolute inset-y-0 right-0 w-8 bg-gradient-to-l from-card to-transparent sm:hidden"
-            aria-hidden="true"
-          />
           <Table className="admin-ops-table admin-ops-audit-table" scrollLabel="Audit log table, scrollable">
             <TableHeader>
               <TableRow>
@@ -427,11 +420,6 @@ export default function AuditTab() {
             </TableBody>
           </Table>
         </div>
-        {/* The right-edge fade above is the visible cue; the frozen card ends
-            at the table, so the sideways hint stays for assistive tech only. */}
-        <p className="sr-only">
-          Swipe the table sideways to see all columns.
-        </p>
         </>
         )}
 
@@ -519,7 +507,7 @@ export default function AuditTab() {
                 <div>
                   <div className="text-muted-foreground mb-1">Changes</div>
                   {selectedLog.changes && Object.keys(selectedLog.changes).length > 0 ? (
-                    <ScrollArea className="max-h-[300px] border rounded p-2">
+                    <ScrollArea className="max-h-[300px] border rounded p-2" scrollLabel="Changes, scrollable">
                       <pre className="text-xs whitespace-pre-wrap break-all" data-testid="text-audit-detail-changes">
                         {JSON.stringify(selectedLog.changes, null, 2)}
                       </pre>

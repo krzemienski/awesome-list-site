@@ -573,7 +573,7 @@ export default function JourneyDetail() {
 
           {/* Enroll Button */}
           {!isAuthenticated ? (
-            <Alert className="journey-enroll-note mt-6">
+            <Alert role="note" className="journey-enroll-note mt-6">
               <AlertCircle className="h-4 w-4" />
               <AlertDescription>
                 {/* P1-08: canonical /sign-in with a redirect_url back to this
@@ -786,7 +786,7 @@ export default function JourneyDetail() {
               );
             })
         ) : (
-          <Alert className="journeys-alert">
+          <Alert role="note" className="journeys-alert">
             <AlertCircle className="h-4 w-4" />
             <AlertDescription>
               This journey doesn't have any steps yet. Check back later!
