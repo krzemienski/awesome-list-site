@@ -204,7 +204,7 @@ export default function ExportTab({ validationStatus: propValidationStatus }: Ex
         }),
       });
 
-      if (!response.ok) throw new ApiError(response.status, "Export failed");
+      if (!response.ok) throw new ApiError(response.status, await response.text());
 
       const blob = await response.blob();
       triggerBlobDownload(blob, "awesome-list.md");
@@ -234,7 +234,7 @@ export default function ExportTab({ validationStatus: propValidationStatus }: Ex
       const response = await fetch("/api/admin/export-json", {
         credentials: "include",
       });
-      if (!response.ok) throw new ApiError(response.status, "JSON export failed");
+      if (!response.ok) throw new ApiError(response.status, await response.text());
 
       const jsonName = exportFileName(response, "awesome-list-catalog-snapshot.json");
       triggerBlobDownload(await response.blob(), jsonName);
@@ -262,7 +262,7 @@ export default function ExportTab({ validationStatus: propValidationStatus }: Ex
       const response = await fetch("/api/admin/export-csv", {
         credentials: "include",
       });
-      if (!response.ok) throw new ApiError(response.status, "CSV export failed");
+      if (!response.ok) throw new ApiError(response.status, await response.text());
 
       const csvName = exportFileName(response, "resources-export.csv");
       triggerBlobDownload(await response.blob(), csvName);
@@ -290,7 +290,7 @@ export default function ExportTab({ validationStatus: propValidationStatus }: Ex
       const response = await fetch("/api/admin/export-opml", {
         credentials: "include",
       });
-      if (!response.ok) throw new ApiError(response.status, "OPML export failed");
+      if (!response.ok) throw new ApiError(response.status, await response.text());
 
       const opmlName = exportFileName(response, "categories-export.opml");
       triggerBlobDownload(await response.blob(), opmlName);
