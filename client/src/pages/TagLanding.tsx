@@ -203,7 +203,7 @@ export default function TagLanding() {
       />
       <div className="flex flex-wrap items-start justify-between gap-2">
         <Button asChild variant="ghost" size="sm" className="taxonomy-back">
-          <Link href="/"><ArrowLeft size={12} aria-hidden="true" />Browse</Link>
+          <Link href="/categories"><ArrowLeft size={12} aria-hidden="true" />Browse</Link>
         </Button>
         {/* Tag landers rarely continue; site search is the most common next
             page from a landing, and the header's phone control is icon-only. */}
