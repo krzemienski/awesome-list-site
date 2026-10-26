@@ -2887,7 +2887,9 @@ export default function GenericCrudManager<T extends BaseEntityWithCount>({
                             <Badge className="admin-taxonomy-cell-count" variant="secondary" data-testid={`badge-count-${item.id}`}>
                               {item.resourceCount}
                             </Badge>
-                          ) : col.key === "actions" ? (
+                          ) : col.key === "actions" ? (() => {
+                            const blocker = getDeleteBlocker(item);
+                            return (
                             <>
                             <div className="admin-taxonomy-row-actions flex items-center justify-end gap-2">
                               <Button
@@ -2907,49 +2909,42 @@ export default function GenericCrudManager<T extends BaseEntityWithCount>({
                               {/* Run16 BUG-081: disabled delete gets a visible reason.
                                   The title lives on a wrapping span because disabled
                                   buttons swallow hover events in some browsers. */}
-                              {(() => {
-                                const blocker = getDeleteBlocker(item);
-                                return (
-                                  <span
-                                    className="admin-taxonomy-delete-action inline-block"
-                                    title={blocker
-                                      ? `Cannot delete: ${blocker.reason}. Move or delete ${blocker.count === 1 ? "it" : "them"} first.`
-                                      : undefined}
-                                  >
-                                    <Button
-                                      variant="ghost"
-                                      size="sm"
-                                      onClick={() => openDeleteDialog(item)}
-                                      disabled={!!blocker}
-                                      className="admin-taxonomy-row-action"
-                                      aria-label={blocker
-                                        ? `Delete ${item.name} unavailable: ${blocker.reason}`
-                                        : `Delete ${item.name}`}
-                                      data-testid={`button-delete-${item.id}`}
-                                    >
-                                      <Trash2 className="h-4 w-4" />
-                                    </Button>
-                                  </span>
-                                );
-                              })()}
+                              <span
+                                className="admin-taxonomy-delete-action inline-block"
+                                title={blocker
+                                  ? `Cannot delete: ${blocker.reason}. Move or delete ${blocker.count === 1 ? "it" : "them"} first.`
+                                  : undefined}
+                              >
+                                <Button
+                                  variant="ghost"
+                                  size="sm"
+                                  onClick={() => openDeleteDialog(item)}
+                                  disabled={!!blocker}
+                                  className="admin-taxonomy-row-action"
+                                  aria-label={blocker
+                                    ? `Delete ${item.name} unavailable: ${blocker.reason}`
+                                    : `Delete ${item.name}`}
+                                  data-testid={`button-delete-${item.id}`}
+                                >
+                                  <Trash2 className="h-4 w-4" />
+                                </Button>
+                              </span>
                             </div>
                             {/* AC-05: touch has no tooltip, so the title above
                                 never showed. The button's aria-label already
                                 carries the reason, so this copy is visual only. */}
-                            {(() => {
-                              const blocker = getDeleteBlocker(item);
-                              return blocker ? (
-                                <p
-                                  className="admin-taxonomy-delete-reason"
-                                  aria-hidden="true"
-                                  data-testid={`text-delete-blocked-${item.id}`}
-                                >
-                                  Delete locked: {blocker.reason}
-                                </p>
-                              ) : null;
-                            })()}
+                            {blocker && (
+                              <p
+                                className="admin-taxonomy-delete-reason"
+                                aria-hidden="true"
+                                data-testid={`text-delete-blocked-${item.id}`}
+                              >
+                                Delete locked: {blocker.reason}
+                              </p>
+                            )}
                             </>
-                          ) : (
+                            );
+                          })() : (
                             item[col.key]
                           )
                         )}

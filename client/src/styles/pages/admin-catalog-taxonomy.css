@@ -309,7 +309,9 @@
   font-size: 0.6875rem;
   line-height: 1.3;
   text-align: end;
-  white-space: nowrap;
+  /* The actions cell is nowrap; wrap the reason to the buttons' width so it
+     never widens the column. */
+  white-space: normal;
 }
 
 @media (hover: none), (pointer: coarse), (max-width: 64rem) {
