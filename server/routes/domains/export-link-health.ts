@@ -591,9 +591,12 @@ export function registerExportLinkHealthRoutes(
         // badged like the Recent Sync Jobs section, not shown as successes.
         const outcome = (h.metadata as any)?.outcome;
         const status = outcome === 'failed' ? 'failed' : outcome === 'partial' ? 'partial' : 'completed';
+        // A run that has a queue row goes by that job's id, the one Recent
+        // Sync Jobs shows; only a run with no queue row keeps its own id.
+        const job = queueItems.find(q => historyBelongsToRun(h, q, queueItems));
         return {
           id: h.id,
-          label: `Run #${h.id}`,
+          label: job ? `Job #${job.id}` : `Run #${h.id}`,
           repositoryUrl: h.repositoryUrl,
           direction: h.direction,
           status,

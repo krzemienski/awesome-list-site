@@ -31,7 +31,7 @@ import "@/styles/pages/admin-ops-github-links.css";
 
 interface SyncHistory {
   id: number;
-  /** Display id: "Run #n" for history rows, "Job #n" for queue rows. */
+  /** Display id: "Job #n" for a run with a queue job (as Recent Sync Jobs shows it), else "Run #n". */
   label: string;
   direction: string;
   // ADM-03/04: sync-history rows now carry their outcome so failed/orphaned
@@ -541,13 +541,14 @@ export default function GitHubSyncPanel() {
                         key={item.id}
                         className="p-2 rounded bg-muted/50 text-sm space-y-1"
                       >
-                        <div className="flex items-center justify-between">
-                          <div className="flex items-center gap-2">
+                        <div className="flex items-center justify-between gap-2">
+                          <div className="flex min-w-0 flex-wrap items-center gap-x-2 gap-y-1">
                             {item.status === 'completed' && <CheckCircle2 className={"h-4 w-4 text-[var(--status-ok)]" /* DS-OK: status ok */} />}
                             {item.status === 'failed' && <XCircle className={"h-4 w-4 text-[var(--status-bad)]" /* DS-OK: status bad */} />}
                             {(item.status === 'pending' || item.status === 'processing') && (
                               <RefreshCw className={"h-4 w-4 text-[var(--status-warn)] animate-spin" /* DS-OK: status warn */} />
                             )}
+                            <span className="whitespace-nowrap font-mono text-xs" data-testid={`sync-queue-id-${item.id}`}>{`Job #${item.id}`}</span>
                             <span className="font-medium capitalize">{item.action}</span>
                             {item.branch && (
                               <span className="font-mono text-xs text-muted-foreground" title="Branch recorded for this job">
@@ -634,8 +635,11 @@ export default function GitHubSyncPanel() {
                   return (
                   <TableRow key={sync.id} data-testid={`sync-history-row-${sync.id}`}>
                        <TableCell className="font-mono text-xs">{sync.label}</TableCell>
-                       <TableCell className="ops-github-panel__history-direction">
-                         {sync.direction}
+                       <TableCell>
+                         <span className="ops-github-panel__history-direction">{sync.direction}</span>
+                         <span className="block text-xs text-muted-foreground" data-testid={`sync-history-date-${sync.id}`}>
+                           {formatSyncDate(sync.createdAt)}
+                         </span>
                       </TableCell>
                       <TableCell>
                          {sync.status && (
