@@ -11,6 +11,9 @@
 // - Shape: Umami takes flat string/number/boolean values. Props arrive already
 //   cleaned by analytics-hygiene; arrays become comma-separated strings (as
 //   GA4 receives them) and anything else non-primitive is dropped.
+// - URL: the tracker stamps events with the URL it last saw, and on Back/Forward
+//   that lags the page's own tracking effect, so each event carries the URL it
+//   was fired on, normalized like the tracker's own (pageUrl below).
 // - No tracker (dev, analytics disabled in Publishing settings, blocked
 //   script) is a silent no-op. While the injected script is still loading,
 //   events wait in a small bounded queue and flush on its load event.
@@ -19,7 +22,10 @@ type UmamiData = Record<string, string | number | boolean>;
 
 declare global {
   interface Window {
-    umami?: { track(name: string, data?: UmamiData): void };
+    umami?: {
+      track(name: string, data?: UmamiData): void;
+      track(build: (props: Record<string, unknown>) => Record<string, unknown>): void;
+    };
   }
 }
 
@@ -35,6 +41,7 @@ const FREE_FORM_KEYS = new Set(['search_term']);
 interface QueuedEvent {
   name: string;
   data: UmamiData;
+  url: string;
 }
 
 const queue: QueuedEvent[] = [];
@@ -64,9 +71,19 @@ const toUmamiData = (props: Record<string, unknown>): UmamiData => {
   return data;
 };
 
-const send = (name: string, data: UmamiData) => {
+// Mirrors the tracker's URL normalization: it drops the query or hash only when
+// its script tag sets data-exclude-search / data-exclude-hash.
+const pageUrl = () => {
+  const url = new URL(location.href);
+  const tracker = document.querySelector(TRACKER_SELECTOR);
+  if (tracker?.getAttribute('data-exclude-search') === 'true') url.search = '';
+  if (tracker?.getAttribute('data-exclude-hash') === 'true') url.hash = '';
+  return url.toString();
+};
+
+const send = (name: string, data: UmamiData, url: string) => {
   try {
-    window.umami?.track(name, data);
+    window.umami?.track((props) => ({ ...props, name, data, url }));
   } catch {
     // Analytics must never break the app or the other tools.
   }
@@ -76,7 +93,7 @@ const flush = () => {
   waitingForTracker = false;
   const pending = queue.splice(0);
   if (isDeclined() || !window.umami) return;
-  for (const event of pending) send(event.name, event.data);
+  for (const event of pending) send(event.name, event.data, event.url);
 };
 
 if (typeof window !== 'undefined') {
@@ -95,13 +112,14 @@ export const replitTrack = (name: string, props: Record<string, unknown>) => {
     return;
   }
   const data = toUmamiData(props);
+  const url = pageUrl();
   if (window.umami) {
-    send(name, data);
+    send(name, data, url);
     return;
   }
   const tracker = document.querySelector<HTMLScriptElement>(TRACKER_SELECTOR);
   if (!tracker) return;
-  if (queue.length < MAX_QUEUED_EVENTS) queue.push({ name, data });
+  if (queue.length < MAX_QUEUED_EVENTS) queue.push({ name, data, url });
   if (!waitingForTracker) {
     waitingForTracker = true;
     tracker.addEventListener('load', flush, { once: true });

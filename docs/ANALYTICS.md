@@ -215,6 +215,9 @@ adds the script, a website id or an env var for it, and `script-src` /
   Back/Forward `use-analytics.tsx` re-announces the current URL with a
   same-URL, same-state `replaceState`. Without that, a traversal recorded no
   page view and later custom events carried the previous page's URL.
+  Custom events also carry the URL they were fired on (captured in
+  `replitTrack`, before any queueing), because on Back/Forward the page's
+  tracking effect runs before `popstate`, i.e. before the tracker learns the new URL.
 - **Custom events:** every *product* event in the catalog below (the rows
   whose Tools column says "all four" or "product") also goes to Replit
   Analytics via `replitTrack` (`client/src/lib/replit-analytics.ts`) under the
