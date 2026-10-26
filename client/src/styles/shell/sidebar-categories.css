@@ -38,9 +38,11 @@
   }
 }
 
-.av-sidebar-shell .accordion-header:hover,
-.av-sidebar-drawer .accordion-header:hover {
-  background: var(--surface);
+@media (hover: hover) and (pointer: fine) {
+  .av-sidebar-shell .accordion-header:hover,
+  .av-sidebar-drawer .accordion-header:hover {
+    background: var(--surface);
+  }
 }
 
 /* The owning .accordion-item clips overflow and the header fills it edge to
@@ -409,12 +411,14 @@
   transition: all 140ms ease;
 }
 
-.av-sidebar-shell .sub-item:hover,
-.av-sidebar-drawer .sub-item:hover {
-  background: var(--surface);
-  border-color: var(--border);
-  color: var(--text);
-  transform: translateX(2px);
+@media (hover: hover) and (pointer: fine) {
+  .av-sidebar-shell .sub-item:hover,
+  .av-sidebar-drawer .sub-item:hover {
+    background: var(--surface);
+    border-color: var(--border);
+    color: var(--text);
+    transform: translateX(2px);
+  }
 }
 
 .av-sidebar-shell .sub-item[data-active="true"],

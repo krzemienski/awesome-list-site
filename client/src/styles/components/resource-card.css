@@ -120,9 +120,14 @@
   content: "";
 }
 
-.resource-card__title-link:hover,
 .resource-card__title-link:focus-visible {
   color: var(--accent-ink);
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .resource-card__title-link:hover {
+    color: var(--accent-ink);
+  }
 }
 
 .resource-card__print-url {
@@ -244,11 +249,18 @@
   font-size: 0.625rem;
 }
 
-.resource-card__meta-badge:hover,
 .resource-card__meta-badge:focus-visible {
   color: var(--text);
   border-color: var(--border-strong);
   background: var(--surface-2);
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .resource-card__meta-badge:hover {
+    color: var(--text);
+    border-color: var(--border-strong);
+    background: var(--surface-2);
+  }
 }
 
 .resource-card__meta-icon {
@@ -271,7 +283,7 @@
 
 /* A pill is its own link inside a hoverable card, so it answers the pointer
    (and keyboard focus) separately with the DS accent-chip paint. */
-@media (hover: hover) {
+@media (hover: hover) and (pointer: fine) {
   .resource-card__tag-link:hover .resource-card__tag {
     color: var(--accent-ink);
     border-color: color-mix(in srgb, var(--accent) 35%, var(--border));
@@ -307,11 +319,18 @@
   text-decoration: none;
 }
 
-.resource-card__more-tags:hover,
 .resource-card__more-tags:focus-visible {
   color: var(--text);
   text-decoration: underline;
   text-underline-offset: 0.125rem;
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .resource-card__more-tags:hover {
+    color: var(--text);
+    text-decoration: underline;
+    text-underline-offset: 0.125rem;
+  }
 }
 
 .resource-card__actions {
@@ -326,10 +345,16 @@
   border-color: color-mix(in srgb, var(--accent) 50%, var(--border));
 }
 
-.resource-card__visit-button:hover,
 .resource-card__visit-button:focus-visible {
   border-color: var(--accent);
   background: color-mix(in srgb, var(--accent) 10%, transparent);
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .resource-card__visit-button:hover {
+    border-color: var(--accent);
+    background: color-mix(in srgb, var(--accent) 10%, transparent);
+  }
 }
 
 /* Touch widths: the card's own controls reach the 44px floor. */

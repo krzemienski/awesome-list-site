@@ -17,8 +17,10 @@
   transition: background 140ms ease;
 }
 
-.av-sidebar-l2-row:hover {
-  background: var(--surface);
+@media (hover: hover) and (pointer: fine) {
+  .av-sidebar-l2-row:hover {
+    background: var(--surface);
+  }
 }
 
 .av-sidebar-l2-row.active {
@@ -132,7 +134,12 @@
   font-size: 9.5px;
 }
 
-.av-sidebar-l3-row:hover,
+@media (hover: hover) and (pointer: fine) {
+  .av-sidebar-l3-row:hover {
+    color: var(--text);
+  }
+}
+
 .av-sidebar-l3-row[data-active="true"] {
   color: var(--text);
 }
@@ -203,9 +210,11 @@
   background: transparent;
   border-color: transparent;
 }
-.av-sidebar-shell .av-sidebar-all-category:hover::before {
-  background: var(--surface);
-  border-color: var(--border);
+@media (hover: hover) and (pointer: fine) {
+  .av-sidebar-shell .av-sidebar-all-category:hover::before {
+    background: var(--surface);
+    border-color: var(--border);
+  }
 }
 
 /* L2 rows (leaf links, and the link + disclosure pair for nested groups). */
@@ -223,9 +232,11 @@
   transform: none;
 }
 .av-sidebar-shell .av-sidebar-leaf:hover { color: var(--text-2); }
-.av-sidebar-shell .av-sidebar-leaf:hover::before,
-.av-sidebar-shell .av-sidebar-l2-row:hover::before {
-  background: var(--surface);
+@media (hover: hover) and (pointer: fine) {
+  .av-sidebar-shell .av-sidebar-leaf:hover::before,
+  .av-sidebar-shell .av-sidebar-l2-row:hover::before {
+    background: var(--surface);
+  }
 }
 .av-sidebar-shell .av-sidebar-leaf[data-active="true"]::before,
 .av-sidebar-shell .av-sidebar-l2-row.active::before {
