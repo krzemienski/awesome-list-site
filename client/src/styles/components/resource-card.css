@@ -323,6 +323,11 @@
   .btn.resource-card__more-tags {
     min-height: 44px;
   }
+
+  .resource-card__tag-link {
+    min-width: 44px;
+    justify-content: center;
+  }
 }
 
 @media (max-width: 40rem) {
