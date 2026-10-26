@@ -126,6 +126,20 @@ function errorBody(error: unknown): string {
   return "";
 }
 
+/**
+ * The server's own specific wording on a non-500 5xx, or "". Only a JSON body
+ * counts: our API always answers in JSON, while a plain-text 502/503/504 comes
+ * from the edge proxy ("upstream request timeout") or is a client-authored
+ * placeholder ("Failed to fetch users"), and neither says what happened to
+ * the request or what to do next.
+ */
+function specificServerMessage(error: unknown, status: number): string {
+  const body = errorBody(error);
+  if (!body.trim().startsWith("{")) return "";
+  const specific = humanizeStatusBody(status, body, "");
+  return specific && specific !== STATUS_FALLBACKS[status] && !isGenericOutageText(specific) ? specific : "";
+}
+
 /** True when the error is an HTTP 5xx response from our API. */
 export function isServerError(error: unknown): boolean {
   const status = errorStatus(error);
@@ -164,9 +178,10 @@ export interface WriteErrorOptions {
  * The API contract rewrites every 500 body to a bare "Internal Server
  * Error" so internals never leak, which leaves the admin with no next step.
  * For 5xx responses this returns a clear sentence that says the server
- * failed, what that means for the change, and to try again. A specific,
- * human-readable message on a non-500 5xx (e.g. a 502 "Could not delete the
- * sign-in identity. Nothing was deleted; try again.") is kept as-is.
+ * failed, what that means for the change, and to try again. The server's own
+ * JSON message on a non-500 5xx (e.g. a 502 "Could not delete the sign-in
+ * identity. Nothing was deleted; try again.") is kept as-is; a plain-text
+ * edge body such as a 504 "upstream request timeout" is not.
  * Everything else (4xx, network errors) goes through humanizeApiError.
  */
 export function describeWriteError(error: unknown, options: WriteErrorOptions = {}): string {
@@ -177,10 +192,8 @@ export function describeWriteError(error: unknown, options: WriteErrorOptions = 
     return humanizeApiError(error, fallback);
   }
   if (status !== 500) {
-    const specific = humanizeStatusBody(status, errorBody(error), "");
-    if (specific && specific !== STATUS_FALLBACKS[status] && !isGenericOutageText(specific)) {
-      return specific;
-    }
+    const specific = specificServerMessage(error, status);
+    if (specific) return specific;
     if (status === 502 || status === 503 || status === 504) {
       return `The server is temporarily unavailable. ${outcome}`;
     }
@@ -195,9 +208,8 @@ export function describeWriteError(error: unknown, options: WriteErrorOptions = 
  *
  * Every /api 500 body is masked to a bare "Internal Server Error", so for
  * 5xx responses this returns a sentence that says the server failed, that a
- * failed read changed nothing, and that retrying is safe. A specific,
- * human-readable message on a non-500 5xx is kept as-is, matching
- * describeWriteError. Everything else (4xx, network errors) goes through
+ * failed read changed nothing, and that retrying is safe. The server's own
+ * JSON message on a non-500 5xx is kept as-is, matching describeWriteError. Everything else (4xx, network errors) goes through
  * humanizeApiError.
  */
 export function describeLoadError(error: unknown): string {
@@ -206,14 +218,8 @@ export function describeLoadError(error: unknown): string {
     return humanizeApiError(error, "Something went wrong while loading. Please retry.");
   }
   if (status !== 500) {
-    // Only a JSON body is the server's own wording; several admin queryFns
-    // throw ApiError with a client-authored placeholder ("Failed to fetch
-    // users") that must not replace this guidance.
-    const body = errorBody(error);
-    const specific = body.trim().startsWith("{") ? humanizeStatusBody(status, body, "") : "";
-    if (specific && specific !== STATUS_FALLBACKS[status] && !isGenericOutageText(specific)) {
-      return specific;
-    }
+    const specific = specificServerMessage(error, status);
+    if (specific) return specific;
     if (status === 502 || status === 503 || status === 504) {
       return "The server is temporarily unavailable. Nothing was changed — retry in a moment.";
     }
