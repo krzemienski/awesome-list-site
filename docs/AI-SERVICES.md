@@ -211,8 +211,11 @@ Research started. Endpoint router.hack.ski (router via ANTHROPIC_BASE_URL) · Or
 ### Accounting
 
 - **Turns** — the SDK result's `num_turns` when a result arrives; otherwise
-  the number of distinct API turns (assistant `message.id`s, orchestrator and
-  scouts) seen in the stream.
+  the orchestrator's distinct API turns (assistant `message.id`s with no
+  `parent_tool_use_id`) seen in the stream. Scout turns are left out because
+  `maxTurns` limits the orchestrator only; counting them showed cancelled runs
+  as "50 of 40" turns. The result event's `detail.streamed` records both
+  `turns` (orchestrator) and `api_messages` (all agents).
 - **Tokens** — streamed usage deduplicated by `message.id` (the SDK repeats a
   turn's usage on every content-block message).
 - **Cost** — `research_jobs.cost_basis` says where `estimated_cost_usd` came

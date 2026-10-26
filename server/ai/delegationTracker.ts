@@ -7,7 +7,9 @@
  * A delegation is a blocking Task/Agent tool call: it starts with a
  * `system/task_started` message and ends when the orchestrator receives the
  * tool_result for that tool_use_id. Subagent assistant messages carry the
- * delegation's tool_use_id as `parent_tool_use_id`.
+ * delegation's tool_use_id as `parent_tool_use_id`. Every delegation
+ * tool_result yields an "ended" event, so the caller sees every report even
+ * when its start could not be tied to a tool_use_id.
  */
 
 export interface DelegationStarted {
@@ -49,13 +51,21 @@ export class DelegationTracker {
   private readonly active = new Map<string, ActiveDelegation>();
   /** tool_use_ids the PreToolUse hook admitted that have not returned yet. */
   private readonly admitted = new Set<string>();
+  /** Every delegation tool_use_id seen (tool_use block or hook) that has not returned yet. */
+  private readonly delegationCalls = new Set<string>();
+  /** Delegation calls the cap refused; their tool_result is the refusal, not a report. */
+  private readonly denied = new Set<string>();
 
   constructor(private readonly maxConcurrent: number | null) {}
 
   /** PreToolUse gate: false when the cap is already full. */
   admit(toolUseId: string): boolean {
-    if (this.maxConcurrent != null && this.admitted.size >= this.maxConcurrent) return false;
+    if (this.maxConcurrent != null && this.admitted.size >= this.maxConcurrent) {
+      this.denied.add(toolUseId);
+      return false;
+    }
     this.admitted.add(toolUseId);
+    this.delegationCalls.add(toolUseId);
     return true;
   }
 
@@ -65,6 +75,7 @@ export class DelegationTracker {
 
   noteToolUse(toolUseId: string, input: unknown): void {
     const i = (input && typeof input === "object" ? input : {}) as Record<string, unknown>;
+    this.delegationCalls.add(toolUseId);
     this.calls.set(toolUseId, {
       subagentType: typeof i.subagent_type === "string" ? i.subagent_type : null,
       description: typeof i.description === "string" ? i.description : "",
@@ -102,18 +113,32 @@ export class DelegationTracker {
   /** Call for every tool_result the orchestrator receives. */
   toolResult(toolUseId: string, isError: boolean, output: string): DelegationEnded | null {
     this.admitted.delete(toolUseId);
+    const call = this.calls.get(toolUseId);
     this.calls.delete(toolUseId);
-    const d = this.active.get(toolUseId);
-    if (!d) return null;
-    this.active.delete(toolUseId);
+    const denied = this.denied.delete(toolUseId);
+    const isDelegation = this.delegationCalls.delete(toolUseId) && !denied;
+    // A start stored under `task:<id>` (no tool_use_id to pair with at the
+    // time) belongs to the oldest delegation result that has no start of its own.
+    let key: string | undefined = this.active.has(toolUseId) ? toolUseId : undefined;
+    if (!key && isDelegation) {
+      for (const [k, d] of this.active) {
+        if (d.toolUseId === null) {
+          key = k;
+          break;
+        }
+      }
+    }
+    const d = key ? this.active.get(key) : undefined;
+    if (!d && !isDelegation) return null;
+    if (key) this.active.delete(key);
     return {
       kind: "ended",
-      taskId: d.taskId,
+      taskId: d?.taskId ?? toolUseId,
       toolUseId,
-      subagentType: d.subagentType,
+      subagentType: d?.subagentType ?? call?.subagentType ?? null,
       status: isError ? "failed" : "completed",
-      durationMs: Date.now() - d.startedAt,
-      webSearches: d.webSearches,
+      durationMs: d ? Date.now() - d.startedAt : 0,
+      webSearches: d?.webSearches ?? 0,
       output,
     };
   }

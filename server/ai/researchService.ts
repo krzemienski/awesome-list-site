@@ -33,7 +33,7 @@ import { decodeHtmlEntities, decodeResourceTextFields } from '../github/importHy
 import { runAgentQuery, agentUsageFromError, isBudgetCapStop, BUDGET_STOPPED_STATUS, type AgentDefinitionInput } from './runAgentQuery';
 import { isJobOrphaned, livenessUnchangedSince, ORPHANED_BY_RESTART_MESSAGE, startJobHeartbeat, WORKER_ID } from './jobLiveness';
 import { validateBaseUrl, type AgentRunConfig } from './agentRuntime';
-import { KnownUrls, normalizeUrl, surfacedByScout } from './researchDedup';
+import { KnownUrls, knownInDb, normalizeUrl, surfacedByScout } from './researchDedup';
 import { ResearchPhaseTracker, extractUrls } from './researchPhases';
 import { describeResearchRunConfig, researchPreflightMessage } from './researchRunConfig';
 import type { CostBasis, ResolvedResearchConfig } from '@shared/researcherContract';
@@ -470,8 +470,9 @@ class ResearchService {
           }
           await ctx.phases.enter('verifying', 'tool:check_duplicate');
           // Pick up rows another run or a submission added since this run
-          // started. The core check stays in-memory, so a failed refresh only
-          // narrows it to the run-start snapshot.
+          // started (throttled; save_discovery re-checks the tables). The core
+          // check stays in-memory, so a failed refresh only narrows it to the
+          // run-start snapshot.
           try {
             await withTimeout(ctx.known.refresh(), TOOL_DB_TIMEOUT_MS, 'known-url refresh');
           } catch (e) {
@@ -584,7 +585,18 @@ class ResearchService {
           if (ctx.discoveriesSaved >= ctx.discoveryCap) {
             return await respond({ saved: false, reason: `Discovery cap of ${ctx.discoveryCap} reached for this run. Wrap up and stop searching.` });
           }
-          if (ctx.known.has(input.url)) {
+          // The in-memory set can lag (throttled, watermark-based refresh), so
+          // the last guard before a save reads the tables directly.
+          let duplicate = ctx.known.has(input.url);
+          if (!duplicate) {
+            try {
+              duplicate = await withTimeout(knownInDb(input.url), TOOL_DB_TIMEOUT_MS, 'save duplicate check');
+            } catch (e) {
+              logger.warn({ jobId: ctx.jobId }, `save duplicate check failed (${e instanceof Error ? e.message : String(e)}) — relying on the in-memory known-URL set`);
+            }
+            if (duplicate) ctx.known.add(input.url);
+          }
+          if (duplicate) {
             return await respond({ saved: false, reason: 'URL already exists (duplicate — you should have caught this with check_duplicate)' });
           }
           if (!surfacedByScout(ctx.scoutSurfacedUrls, normalized)) {
@@ -1230,7 +1242,6 @@ class ResearchService {
   ): Promise<void> {
     const emitter = new AgentEventEmitter('research', jobId);
     const phases = new ResearchPhaseTracker(emitter);
-    await phases.enter('planning', 'run_started');
     const ctx = await buildResearchContext(categoryFocus);
 
     // Preflight guarantees both are set; the scout value is a tier alias the
@@ -1395,6 +1406,8 @@ STOP TARGET: this run ends AUTOMATICALLY once ${targetDiscoveries} new discoveri
     let result: Awaited<ReturnType<typeof runAgentQuery>> | undefined;
     let runError: unknown = null;
     try {
+      // Inside the try so every run that emits a phase also emits 'finishing'.
+      await phases.enter('planning', 'run_started');
       result = await runAgentQuery({
         jobType: 'research',
         jobId,

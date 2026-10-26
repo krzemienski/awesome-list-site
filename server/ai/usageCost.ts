@@ -72,6 +72,8 @@ export function estimateUsageCost(byModel: Map<string, ModelUsageTotals>): { usd
 
 interface MessageUsage {
   model: string;
+  /** Sent by the orchestrator itself (no parent_tool_use_id), not by a subagent. */
+  orchestrator: boolean;
   inputTokens: number;
   outputTokens: number;
   cacheReadTokens: number;
@@ -92,13 +94,16 @@ interface RawUsage {
  * output_tokens is a handful of tokens; the final count arrives in the
  * message_delta partial event (options.includePartialMessages), which this
  * class pairs with its message by agent stream (parent_tool_use_id).
+ *
+ * Turns count the orchestrator's API messages only: maxTurns limits the
+ * orchestrator's turns, so a scout's turns must not push "turns used" past it.
  */
 export class StreamedUsage {
   private readonly messages = new Map<string, MessageUsage>();
   private readonly openMessageByStream = new Map<string, string>();
 
-  private upsert(id: string, model: string, usage: RawUsage): void {
-    const cur = this.messages.get(id) ?? { model, inputTokens: 0, outputTokens: 0, cacheReadTokens: 0, cacheCreationTokens: 0 };
+  private upsert(parentToolUseId: string | null, id: string, model: string, usage: RawUsage): void {
+    const cur = this.messages.get(id) ?? { model, orchestrator: parentToolUseId === null, inputTokens: 0, outputTokens: 0, cacheReadTokens: 0, cacheCreationTokens: 0 };
     // Values are cumulative per message, so the largest seen is the final one.
     cur.inputTokens = Math.max(cur.inputTokens, usage.input_tokens ?? 0);
     cur.outputTokens = Math.max(cur.outputTokens, usage.output_tokens ?? 0);
@@ -107,27 +112,29 @@ export class StreamedUsage {
     this.messages.set(id, cur);
   }
 
-  noteAssistant(id: string, model: string, usage: RawUsage): void {
-    this.upsert(id, model, usage);
+  noteAssistant(parentToolUseId: string | null, id: string, model: string, usage: RawUsage): void {
+    this.upsert(parentToolUseId, id, model, usage);
   }
 
   noteStreamEvent(parentToolUseId: string | null, event: { type?: string; message?: { id?: string; model?: string; usage?: RawUsage }; usage?: RawUsage }, fallbackModel: string): void {
     const stream = parentToolUseId ?? "";
     if (event.type === "message_start" && event.message?.id) {
       this.openMessageByStream.set(stream, event.message.id);
-      this.upsert(event.message.id, event.message.model ?? fallbackModel, event.message.usage ?? {});
+      this.upsert(parentToolUseId, event.message.id, event.message.model ?? fallbackModel, event.message.usage ?? {});
     } else if (event.type === "message_delta" && event.usage) {
       const id = this.openMessageByStream.get(stream);
       const cur = id ? this.messages.get(id) : undefined;
-      if (id && cur) this.upsert(id, cur.model, event.usage);
+      if (id && cur) this.upsert(parentToolUseId, id, cur.model, event.usage);
     }
   }
 
-  totals(): { turns: number; inputTokens: number; outputTokens: number; byModel: Map<string, ModelUsageTotals> } {
+  totals(): { turns: number; apiMessages: number; inputTokens: number; outputTokens: number; byModel: Map<string, ModelUsageTotals> } {
     const byModel = new Map<string, ModelUsageTotals>();
+    let turns = 0;
     let inputTokens = 0;
     let outputTokens = 0;
     for (const m of this.messages.values()) {
+      if (m.orchestrator) turns++;
       inputTokens += m.inputTokens;
       outputTokens += m.outputTokens;
       const t = byModel.get(m.model) ?? { turns: 0, inputTokens: 0, outputTokens: 0, cacheReadTokens: 0, cacheCreationTokens: 0 };
@@ -138,6 +145,6 @@ export class StreamedUsage {
       t.cacheCreationTokens += m.cacheCreationTokens;
       byModel.set(m.model, t);
     }
-    return { turns: this.messages.size, inputTokens, outputTokens, byModel };
+    return { turns, apiMessages: this.messages.size, inputTokens, outputTokens, byModel };
   }
 }

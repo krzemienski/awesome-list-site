@@ -1,4 +1,4 @@
-import { gt } from "drizzle-orm";
+import { gt, ilike } from "drizzle-orm";
 import { db } from "../db";
 import { researchDiscoveries, resources } from "@shared/schema";
 
@@ -79,18 +79,24 @@ export function projectKey(url: string): string | null {
   }
 }
 
+/** Minimum gap between KnownUrls reads; check_duplicate asks for one per candidate. */
+const REFRESH_INTERVAL_MS = 5_000;
+
 /**
  * Every URL the catalog or the review queue already knows (all resource
  * statuses, every discovery of every run), keyed by normalizeUrl, plus a
  * project index for near-duplicates. refresh() picks up rows written after the
- * run-start load (id above the load's watermark) — another run's saves or a new submission — so a long run does
- * not save something that landed in the queue meanwhile.
+ * run-start load (id above the load's watermark) — another run's saves or a
+ * new submission. It is a fast, possibly lagging view: a row that commits after
+ * a higher id was already read is never picked up, so the save path re-checks
+ * the tables with knownInDb().
  */
 export class KnownUrls {
   private readonly urls = new Set<string>();
   private readonly projects = new Map<string, string[]>();
   private lastResourceId: number;
   private lastDiscoveryId: number;
+  private refreshedAt = 0;
 
   /** Seed from the run-start load; the watermarks are the highest ids that load saw. */
   constructor(rows: Iterable<{ id: number; url: string; kind: "resource" | "discovery" }>) {
@@ -130,7 +136,10 @@ export class KnownUrls {
     return (this.projects.get(key) ?? []).filter((u) => normalizeUrl(u) !== self);
   }
 
+  /** Reads rows above the watermarks, at most once per REFRESH_INTERVAL_MS; 0 when skipped. */
   async refresh(): Promise<number> {
+    if (Date.now() - this.refreshedAt < REFRESH_INTERVAL_MS) return 0;
+    this.refreshedAt = Date.now();
     const [res, disc] = await Promise.all([
       db.select({ id: resources.id, url: resources.url }).from(resources).where(gt(resources.id, this.lastResourceId)),
       db.select({ id: researchDiscoveries.id, url: researchDiscoveries.url }).from(researchDiscoveries).where(gt(researchDiscoveries.id, this.lastDiscoveryId)),
@@ -143,14 +152,35 @@ export class KnownUrls {
 }
 
 /**
- * Whether a normalized URL appeared in a scout report: an exact match, or one
- * is a path prefix of the other (the orchestrator trimmed a deep link to the
- * project root, or saved a deeper page of a reported site).
+ * Whether any resource (any status) or discovery (any run, any status) already
+ * has this URL under normalizeUrl, read straight from the tables. SQL narrows
+ * by host + path (LIKE wildcards in it only widen the match); the exact
+ * comparison happens here.
+ */
+export async function knownInDb(url: string): Promise<boolean> {
+  const normalized = normalizeUrl(url);
+  const pattern = `%${normalized.split('?')[0]}%`;
+  const [res, disc] = await Promise.all([
+    db.select({ url: resources.url }).from(resources).where(ilike(resources.url, pattern)),
+    db.select({ url: researchDiscoveries.url }).from(researchDiscoveries).where(ilike(researchDiscoveries.url, pattern)),
+  ]);
+  return [...res, ...disc].some((r) => normalizeUrl(r.url) === normalized);
+}
+
+const GITHUB_REPO_ROOT_RE = /^github\.com\/[^/?]+\/[^/?]+$/;
+
+/**
+ * Whether a normalized URL appeared in a scout report. Only an exact match
+ * counts, plus one trim: the root of a GitHub repo (github.com/<owner>/<repo>)
+ * when a scout reported a deeper link or a query view of that repo. Anything
+ * looser (a bare domain, another page of a reported site) would let the
+ * orchestrator save URLs no search ever returned.
  */
 export function surfacedByScout(surfaced: Set<string>, normalized: string): boolean {
   if (surfaced.has(normalized)) return true;
+  if (!GITHUB_REPO_ROOT_RE.test(normalized)) return false;
   for (const s of surfaced) {
-    if (s.startsWith(`${normalized}/`) || (s.includes('/') && normalized.startsWith(`${s}/`))) return true;
+    if (s.startsWith(`${normalized}/`) || s.startsWith(`${normalized}?`)) return true;
   }
   return false;
 }
