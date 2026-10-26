@@ -120,6 +120,12 @@
   margin-top: 40px;
 }
 
+/* Tag landings (TagLanding) are a top-level listing with no subcategory
+   tiles, so the results follow the intro at the category page's gap. */
+.taxonomy-page--tag .taxonomy-results-layout {
+  margin-top: 56px;
+}
+
 /* C8-V1-05 / C10-V1-02: the open filter controls (the Filters trigger below
    lg, the "Narrow results" panel above it) stack on the results; keep a gap. */
 .taxonomy-page--category .taxonomy-results-layout > .taxonomy-production-controls--open,
