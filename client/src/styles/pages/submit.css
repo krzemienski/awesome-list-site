@@ -261,8 +261,7 @@
 .submit-auth-alert { margin-bottom: 18px; }
 
 .submit-auth-alert [data-slot="alert-title"],
-.submit-auth-alert h5,
-.submit-inline-alert h5 {
+.submit-inline-alert [data-slot="alert-title"] {
   margin-bottom: 4px;
   color: var(--text);
   font-size: 13px;
@@ -307,7 +306,7 @@
 }
 
 .submit-login-alert .submit-alert-icon,
-.submit-login-alert h5 {
+.submit-login-alert [data-slot="alert-title"] {
   color: var(--status-warn); /* DS-OK: status warn */
 }
 
@@ -317,7 +316,7 @@
 }
 
 .submit-inline-alert .submit-alert-icon,
-.submit-inline-alert h5 {
+.submit-inline-alert [data-slot="alert-title"] {
   color: var(--status-warn); /* DS-OK: status warn */
 }
 
