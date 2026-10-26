@@ -5,7 +5,9 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Badge } from "@/components/ui/badge";
-import { TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+// The history table wraps its cells instead of scrolling, so it uses the
+// shared Table, whose wrapper is not a keyboard stop.
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Folder, Download, Upload, RefreshCw, CheckCircle2, XCircle, Clock, ExternalLink, Activity } from "lucide-react";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
@@ -16,7 +18,6 @@ import { useToast } from "@/hooks/use-toast";
 import { useContactConfig } from "@/lib/contact";
 import {
   AdminOpsScrollArea as ScrollArea,
-  AdminOpsTable as Table,
   StatusChip,
   TableShell,
 } from "@/components/admin/AdminOpsPrimitives";
@@ -567,7 +568,7 @@ export default function GitHubSyncPanel() {
               <Alert variant={lastSyncFailed ? 'destructive' : undefined} data-testid="alert-last-sync">
                 {lastSyncFailed || lastSyncPartial ? <XCircle className="h-4 w-4" /> : <CheckCircle2 className="h-4 w-4" />}
                 <AlertDescription className="space-y-2">
-                  <div className="flex items-center justify-between">
+                  <div className="ops-github-panel__last-sync-head">
                     <span className="font-semibold">
                         Last {lastSync.direction === 'export' ? 'Export' : 'Import'}
                     </span>
@@ -582,8 +583,8 @@ export default function GitHubSyncPanel() {
                         partial · {lastSync.errorMessages?.length ?? 0} failed
                       </StatusChip>
                     )}
-                    <Badge variant="outline">
-                      <Clock className="h-3 w-3 mr-1" />
+                    <Badge variant="outline" className="ops-github-panel__last-sync-date" data-testid="badge-last-sync-date">
+                      <Clock className="h-3 w-3 mr-1 shrink-0" />
                       {formatSyncDate(lastSync.createdAt)}
                     </Badge>
                   </div>
@@ -649,7 +650,7 @@ export default function GitHubSyncPanel() {
              ) : syncQueue && syncQueue.length > 0 && (
               <div className="space-y-2">
                 <h4 className="text-sm font-semibold">Recent Sync Jobs</h4>
-                <ScrollArea className="h-[200px] rounded border">
+                <ScrollArea className="h-[200px] rounded border" viewportLabel="Recent sync jobs, scrollable">
                   <div className="p-2 space-y-2">
                     {dedupedQueue.map(({ item, count }) => (
                       <div

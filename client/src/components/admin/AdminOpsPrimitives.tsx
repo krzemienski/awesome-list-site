@@ -44,6 +44,8 @@ AdminOpsTable.displayName = "Table";
 
 type AdminOpsScrollAreaProps = React.ComponentPropsWithoutRef<typeof ScrollAreaPrimitive.Root> & {
   viewportClassName?: string;
+  /** Names the focusable viewport as a region for assistive technology. */
+  viewportLabel?: string;
 };
 
 /**
@@ -54,7 +56,7 @@ type AdminOpsScrollAreaProps = React.ComponentPropsWithoutRef<typeof ScrollAreaP
 export const AdminOpsScrollArea = React.forwardRef<
   React.ElementRef<typeof ScrollAreaPrimitive.Root>,
   AdminOpsScrollAreaProps
->(({ className, viewportClassName, children, ...props }, ref) => (
+>(({ className, viewportClassName, viewportLabel, children, ...props }, ref) => (
   <ScrollAreaPrimitive.Root
     ref={ref}
     className={cn("relative overflow-hidden", className)}
@@ -63,6 +65,8 @@ export const AdminOpsScrollArea = React.forwardRef<
     <ScrollAreaPrimitive.Viewport
       className={cn("h-full w-full", viewportClassName)}
       tabIndex={0}
+      role={viewportLabel ? "region" : undefined}
+      aria-label={viewportLabel}
     >
       {children}
     </ScrollAreaPrimitive.Viewport>

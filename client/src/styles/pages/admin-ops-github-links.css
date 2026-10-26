@@ -540,3 +540,20 @@
   max-height: 16rem;
   overflow-y: auto;
 }
+
+/* AI-11: the Last Import/Export title, outcome chip and date chip wrap
+   inside the alert instead of pushing the date past its edge at 390. */
+.ops-github-panel__last-sync-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+  min-width: 0;
+}
+
+.ops-github-panel__last-sync-date {
+  max-width: 100%;
+  white-space: normal;
+  overflow-wrap: anywhere;
+}
