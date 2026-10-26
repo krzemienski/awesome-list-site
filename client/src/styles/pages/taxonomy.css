@@ -101,6 +101,7 @@
 
 .taxonomy-breadcrumbs a {
   display: inline-flex;
+  min-height: 24px;
   align-items: center;
   color: var(--text-2);
 }
