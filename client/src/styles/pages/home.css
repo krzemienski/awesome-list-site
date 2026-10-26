@@ -203,7 +203,7 @@
 
 /*
  * The recent rows stand in for native buttons, whose font shorthand resets
- * OpenType features; other links inherit the body ss01/cv11/tnum settings,
+ * OpenType features; other links inherit the body ss01/cv11 settings,
  * as the design's category headings and subcategory rows do.
  */
 .home-recent-row,
@@ -305,11 +305,25 @@
 }
 
 .home-index-rail {
-  position: sticky;
-  top: 5.25rem;
   display: flex;
   flex-direction: column;
   gap: 1.75rem;
+}
+
+/* Pinned under the header, as the reference has it, but ending above the
+   back-to-top lane so its "Submit a resource" card never sits under the
+   fixed button. A taller rail scrolls itself; the inline padding keeps focus
+   rings inside that scroll box. */
+@media (min-width: 1025px) {
+  .home-index-rail {
+    --home-rail-top: 5.25rem;
+    position: sticky;
+    top: var(--home-rail-top);
+    max-height: calc(100svh - var(--home-rail-top) - var(--back-to-top-lane));
+    overflow-y: auto;
+    margin-inline: -0.25rem;
+    padding-inline: 0.25rem;
+  }
 }
 
 .home-rail-eyebrow {
@@ -967,10 +981,6 @@
 
   .home-index-grid {
     grid-template-columns: 1fr;
-  }
-
-  .home-index-rail {
-    position: static;
   }
 }
 

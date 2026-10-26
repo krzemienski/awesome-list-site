@@ -122,6 +122,14 @@
      of bottom inset" value — none of them has to know which bar is showing. */
   :root {
     --app-bottom-inset: 0px;
+    /* The fixed back-to-top button (MainLayout) is sized and placed from
+       these. --back-to-top-lane is the bottom band of the viewport it owns,
+       with a gap above it; pinned page content (the home rail) ends above it. */
+    --back-to-top-size: 2.75rem;
+    --back-to-top-offset: 1.5rem;
+    --back-to-top-lane: calc(
+      var(--back-to-top-size) + 2 * var(--back-to-top-offset) + var(--app-bottom-inset)
+    );
   }
 
   /* BUG-006 (audit2): a bottom bar hides whatever a scroll-into-view lands

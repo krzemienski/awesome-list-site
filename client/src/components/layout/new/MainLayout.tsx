@@ -77,7 +77,9 @@ function BackToTop() {
       data-testid="button-back-to-top"
       // Fixed to the SCREEN, so it is lifted by the app shell's
       // --app-bottom-inset (0px unless an app-level bottom bar is showing).
-      className="fixed bottom-[calc(1.5rem+var(--app-bottom-inset,0px))] right-6 z-40 h-11 w-11 shadow-lg bg-[var(--surface)]"
+      // Size and offset are the --back-to-top-* tokens (index.css) that the
+      // home rail also reads to stay out of the button's lane.
+      className="fixed bottom-[calc(var(--back-to-top-offset)+var(--app-bottom-inset,0px))] right-[var(--back-to-top-offset)] z-40 h-[var(--back-to-top-size)] w-[var(--back-to-top-size)] shadow-lg bg-[var(--surface)]"
     >
       <ArrowUp className="h-5 w-5" />
     </Button>

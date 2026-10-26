@@ -69,6 +69,13 @@
    to 0. min-height keeps short pages viewport-tall without the cap. */
 body { height: auto; min-height: 100%; }
 
+/* The canonical body sets "tnum" for all text, and Inter's tnum gives the
+   hyphen figure width, so Editorial prose read "go - astisub". Figures are
+   tabular where numbers line up: table columns here, and counts, paginators
+   and stat values where they are drawn. */
+body { font-feature-settings: "ss01", "cv11"; }
+:where(table) { font-variant-numeric: tabular-nums; }
+
 /* Approved accessibility deviations from the immutable handoff. Filled
    primary labels use black --on-accent (`[data-system]` keeps the selector's
    original weight; the boot always sets it). */
@@ -205,12 +212,16 @@ body { height: auto; min-height: 100%; }
   outline-offset: 2px;
 }
 
-/* One keyboard focus ring for every interactive role, in the accent. */
+/* One keyboard focus ring for every interactive role, in the accent.
+   Radix focuses the menu content itself (tabindex=-1) when a pointer opens a
+   menu, and Chrome reports that as :focus-visible; keyboard opens focus the
+   first item instead, so the ring belongs on the items, not the container. */
 :where(
     a, button, [role="button"], [role="link"], [role="tab"], [role="menuitem"],
     [role="menuitemcheckbox"], [role="menuitemradio"], [role="option"],
     [role="switch"], [role="checkbox"], [role="radio"], [role="combobox"],
-    input, select, textarea, summary, [contenteditable="true"], [tabindex]
+    input, select, textarea, summary, [contenteditable="true"],
+    [tabindex]:not([data-radix-menu-content])
   ):focus-visible {
   outline: 2px solid var(--accent) !important;
   outline-offset: 2px;
