@@ -52,8 +52,10 @@ Rules for using the owner admin session on production:
    (both together) and an `Origin: https://awesome.video` header.
 4. Never trigger paid AI work: no recommendation Refresh / `?refresh=true`, no
    enrichment or research job starts.
-5. Do not use "Sign out all devices" with this session. It ends every owner
-   session, including other people's checks.
+5. Signing out of this session, with "Sign out" or "Sign out all devices",
+   ends every owner session, including other people's checks. The cookie has
+   no per-device identity, so the server cannot end only one. Agree a sign-out
+   time with anyone else using the session, and sign in again afterwards.
 6. Scripts calling admin APIs must send `Origin: https://awesome.video`, or the
    cross-site guard answers 403.
 

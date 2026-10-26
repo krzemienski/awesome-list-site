@@ -16,7 +16,7 @@
  *   GET  /api/auth/status  — deprecated lightweight probe
  *   POST /api/auth/logout-all — revoke every active Clerk session
  *   POST /api/auth/admin-login  — owner password sign-in (OWNER_PASSWORD)
- *   POST /api/auth/admin-logout — clear the owner password cookie
+ *   POST /api/auth/admin-logout — end every owner password session
  *
  * Session state comes from `req.dbUser`, resolved by clerkUserContext
  * (server/clerkAuth.ts) after clerkMiddleware verifies the Clerk session.
@@ -123,7 +123,8 @@ export function registerAuthUserRoutes(
       const clerkUserId = req.clerkIdentity?.clerkUserId;
       if (!clerkUserId) {
         // The owner password session has no Clerk sessions to list: revoke
-        // every owner cookie issued so far and drop this one.
+        // every owner cookie issued so far (as admin-logout does) and drop
+        // this one.
         if (!(await revokeAdminSessions(req))) {
           return res.status(401).json({ message: "Unauthorized" });
         }
@@ -153,13 +154,13 @@ export function registerAuthUserRoutes(
   // OWNER_PASSWORD sets a signed 12-hour HttpOnly cookie that resolves to the
   // admin@example.com row (see clerkUserContext). Disabled and wrong
   // passwords get the same 401 so the endpoint never reveals its config.
-  app.post("/api/auth/admin-login", adminLoginLimiter, (req, res) => {
+  app.post("/api/auth/admin-login", adminLoginLimiter, asyncHandler(async (req, res) => {
     const password = typeof req.body?.password === "string" ? req.body.password : "";
     if (password.length === 0 || password.length > 256 || !checkAdminPassword(password)) {
       logger.warn("Admin password sign-in rejected");
       return res.status(401).json({ message: "Incorrect password" });
     }
-    const token = issueAdminSessionToken();
+    const token = await issueAdminSessionToken();
     if (!token) return res.status(401).json({ message: "Incorrect password" });
     logger.info("Admin password sign-in succeeded");
     res.cookie(ADMIN_SESSION_COOKIE, token, {
@@ -168,15 +169,20 @@ export function registerAuthUserRoutes(
     });
     res.set("Cache-Control", "no-store");
     return res.json({ ok: true });
-  });
+  }));
 
-  // POST /api/auth/admin-logout — clears the owner password cookie. Always
-  // succeeds so the normal sign-out flow can call it unconditionally.
-  app.post("/api/auth/admin-logout", (_req, res) => {
+  // POST /api/auth/admin-logout — ends the owner password session on the
+  // server (copies of the cookie stop working too) and clears the cookie.
+  // Without a live owner cookie it only clears, so the normal sign-out flow
+  // can call it unconditionally. A failed owner lookup is surfaced rather
+  // than reported as a sign-out that never happened.
+  app.post("/api/auth/admin-logout", asyncHandler(async (req, res) => {
+    if (res.locals.clerkUserLookupError) throw res.locals.clerkUserLookupError;
+    await revokeAdminSessions(req);
     res.clearCookie(ADMIN_SESSION_COOKIE, adminCookieOptions);
     res.set("Cache-Control", "no-store");
     return res.json({ ok: true });
-  });
+  }));
 
   // GET /api/auth/status — deprecated lightweight session probe.
   app.get("/api/auth/status", (req, res) => {
