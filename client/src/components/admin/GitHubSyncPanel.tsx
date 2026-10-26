@@ -12,7 +12,7 @@ import { Folder, Download, Upload, RefreshCw, CheckCircle2, XCircle, Clock, Exte
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { apiRequest, ApiError } from "@/lib/queryClient";
+import { apiRequest } from "@/lib/queryClient";
 import { describeWriteError } from "@/lib/apiError";
 import { useToast } from "@/hooks/use-toast";
 import { useContactConfig } from "@/lib/contact";
@@ -26,6 +26,7 @@ import {
 import { formatAdminDateTime as formatSyncDate } from "@/lib/utils";
 import { normalizeGithubRepoInput } from "@shared/validation";
 import { AdminLoadError } from "@/components/admin/AdminLoadError";
+import { GitHubImportPreview, ImportPreviewConfirmNote, useImportPreview } from "@/components/admin/GitHubImportPreview";
 import "@/styles/pages/admin-ops-github-links.css";
 
 interface SyncHistory {
@@ -68,36 +69,6 @@ interface SyncQueueItem {
 interface SyncQueueResponse {
   total: number;
   items: SyncQueueItem[];
-}
-
-type TaxonomyLevel = "category" | "subcategory" | "sub-subcategory";
-
-/** Body of POST /api/admin/import-github with dryRun: true. */
-interface ImportPlan {
-  outcome: "completed" | "partial" | "failed";
-  imported: number;
-  updated: number;
-  skipped: number;
-  errors: string[];
-  warnings: string[];
-  wouldCreateTaxonomy: { level: TaxonomyLevel; name: string; parent?: string }[];
-}
-
-interface ImportPreview {
-  repo: string;
-  previewedAt: string;
-  plan: ImportPlan;
-}
-
-const TAXONOMY_LEVELS: TaxonomyLevel[] = ["category", "subcategory", "sub-subcategory"];
-
-/** "2 categories, 1 subcategory", or null when the import creates none. */
-function describeTaxonomyPlan(nodes: ImportPlan["wouldCreateTaxonomy"]): string | null {
-  const parts = TAXONOMY_LEVELS
-    .map((level) => [level, nodes.filter((node) => node.level === level).length] as const)
-    .filter(([, count]) => count > 0)
-    .map(([level, count]) => `${count} ${count === 1 ? level : level.replace(/y$/, "ies")}`);
-  return parts.length ? parts.join(", ") : null;
 }
 
 export default function GitHubSyncPanel() {
@@ -144,12 +115,11 @@ export default function GitHubSyncPanel() {
       ? `Pull and Sync now target ${normalizedRepo}, not the configured repository.`
       : null;
 
-  // A preview describes one repository; editing the target retires it.
-  const [preview, setPreview] = useState<ImportPreview | null>(null);
-  const currentPreview = preview && preview.repo === normalizedRepo ? preview : null;
+  const importPreview = useImportPreview(normalizedRepo);
 
   const resetRepository = () => {
     if (configuredRepo) {
+      importPreview.retarget();
       setRepoUrlTouched(false);
       setRepoUrl(configuredRepo);
     }
@@ -201,7 +171,7 @@ export default function GitHubSyncPanel() {
       });
     },
     onSuccess: () => {
-      setPreview(null);
+      importPreview.clear();
       void queryClient.invalidateQueries({ queryKey: ['/api/github/sync-history'] });
       void queryClient.invalidateQueries({ queryKey: ['/api/github/sync-status'] });
       toast({
@@ -216,23 +186,6 @@ export default function GitHubSyncPanel() {
         variant: "destructive"
       });
     }
-  });
-
-  // The synchronous dry run writes nothing and answers with the plan. A plan
-  // in which every item would fail comes back as 422 and is still a plan.
-  const previewMutation = useMutation({
-    mutationFn: async (repo: string): Promise<ImportPreview> => {
-      const body = JSON.stringify({ repoUrl: repo, dryRun: true });
-      let plan: ImportPlan;
-      try {
-        plan = await apiRequest('/api/admin/import-github', { method: 'POST', body }) as ImportPlan;
-      } catch (error) {
-        if (!(error instanceof ApiError) || error.status !== 422) throw error;
-        plan = JSON.parse(error.body) as ImportPlan;
-      }
-      return { repo, previewedAt: new Date().toISOString(), plan };
-    },
-    onSuccess: (result) => setPreview(result),
   });
 
   const exportMutation = useMutation({
@@ -343,13 +296,13 @@ export default function GitHubSyncPanel() {
               <div className="flex flex-wrap gap-2">
                 <Button
                   variant="outline"
-                  onClick={() => { if (normalizedRepo) previewMutation.mutate(normalizedRepo); }}
-                  disabled={previewMutation.isPending || !normalizedRepo}
+                  onClick={importPreview.run}
+                  disabled={importPreview.isPending || !normalizedRepo}
                   aria-describedby={targetNote ? "repo-target-note" : undefined}
                   data-testid="button-preview-import"
                 >
-                  {previewMutation.isPending && <RefreshCw className="h-4 w-4 mr-2 animate-spin" />}
-                  {previewMutation.isPending ? "Previewing..." : "Preview import"}
+                  {importPreview.isPending && <RefreshCw className="h-4 w-4 mr-2 animate-spin" />}
+                  {importPreview.isPending ? "Previewing..." : "Preview import"}
                 </Button>
                 <Button
                   variant="outline"
@@ -392,6 +345,7 @@ export default function GitHubSyncPanel() {
                 placeholder={repositoryExample}
                 value={repoUrl}
                 onChange={(e) => {
+                  importPreview.retarget();
                   setRepoUrlTouched(true);
                   setRepoUrl(e.target.value);
                 }}
@@ -422,80 +376,7 @@ export default function GitHubSyncPanel() {
               </p>
             )}
           </div>}
-          {(previewMutation.isPending || previewMutation.isError || preview) && (
-            <section className="ops-github-panel__preview" aria-labelledby="import-preview-title" data-testid="import-preview">
-              <h3 id="import-preview-title" className="ops-github-panel__preview-title">
-                Import preview{currentPreview ? ` · ${currentPreview.repo}` : ""}
-              </h3>
-              <p role="status" className="ops-github-panel__preview-status" data-testid="text-import-preview-status">
-                {previewMutation.isPending
-                  ? `Reading ${previewMutation.variables} and planning the import. Nothing is written. This takes about 15 seconds.`
-                  : currentPreview
-                    ? `Dry run at ${formatSyncDate(currentPreview.previewedAt)}. Nothing was written. Pulling now would:`
-                    : preview && !previewMutation.isError
-                      ? `This preview was for ${preview.repo}. Preview ${normalizedRepo ?? "the new target"} to see its plan.`
-                      : null}
-              </p>
-              {previewMutation.isError && !previewMutation.isPending && (
-                <p role="alert" className="text-sm text-destructive" data-testid="text-import-preview-error">
-                  The preview did not run. {describeWriteError(previewMutation.error, { fallback: "Failed to preview the import", outcome: "Nothing was written. Try the preview again." })}
-                </p>
-              )}
-              {currentPreview && !previewMutation.isPending && (() => {
-                const { plan } = currentPreview;
-                const taxonomy = describeTaxonomyPlan(plan.wouldCreateTaxonomy);
-                return (
-                  <>
-                    <dl className="ops-github-panel__preview-counts" data-testid="import-preview-counts">
-                      <div><dt>Add</dt><dd>{plan.imported.toLocaleString()}</dd></div>
-                      <div><dt>Update</dt><dd>{plan.updated.toLocaleString()}</dd></div>
-                      <div><dt>Skip</dt><dd>{plan.skipped.toLocaleString()}</dd></div>
-                      <div><dt>Fail</dt><dd>{plan.errors.length.toLocaleString()}</dd></div>
-                    </dl>
-                    <p className="text-sm" data-testid="text-import-preview-taxonomy">
-                      {taxonomy ? `Create ${taxonomy}.` : "Create no new categories, subcategories or sub-subcategories."}
-                    </p>
-                    {plan.wouldCreateTaxonomy.length > 0 && (
-                      <details className="ops-github-panel__preview-details">
-                        <summary>Taxonomy it would create ({plan.wouldCreateTaxonomy.length})</summary>
-                        <ul
-                          className="ops-github-panel__preview-list ops-github-panel__preview-scroll"
-                          tabIndex={0}
-                          aria-label={`Taxonomy the import would create, ${plan.wouldCreateTaxonomy.length}, scrollable`}
-                        >
-                          {plan.wouldCreateTaxonomy.map((node) => (
-                            <li key={`${node.level}|${node.parent ?? ""}|${node.name}`}>
-                              {node.level} “{node.name}”{node.parent ? ` under “${node.parent}”` : ""}
-                            </li>
-                          ))}
-                        </ul>
-                      </details>
-                    )}
-                    {plan.errors.length > 0 && (
-                      <details className="ops-github-panel__preview-details">
-                        <summary>Items that would fail ({plan.errors.length})</summary>
-                        <ul className="ops-github-panel__preview-list ops-github-panel__error-list">
-                          {plan.errors.map((message, i) => <li key={i}>{message}</li>)}
-                        </ul>
-                      </details>
-                    )}
-                    {plan.warnings.length > 0 && (
-                      <details className="ops-github-panel__preview-details">
-                        <summary>Warnings ({plan.warnings.length})</summary>
-                        <ul
-                          className="ops-github-panel__preview-list ops-github-panel__preview-scroll"
-                          tabIndex={0}
-                          aria-label={`Import preview warnings, ${plan.warnings.length}, scrollable`}
-                        >
-                          {plan.warnings.map((message, i) => <li key={i}>{message}</li>)}
-                        </ul>
-                      </details>
-                    )}
-                  </>
-                );
-              })()}
-            </section>
-          )}
+          <GitHubImportPreview state={importPreview} />
         </CardContent>
       </Card>
 
@@ -650,7 +531,7 @@ export default function GitHubSyncPanel() {
              ) : syncQueue && syncQueue.length > 0 && (
               <div className="space-y-2">
                 <h4 className="text-sm font-semibold">Recent Sync Jobs</h4>
-                <ScrollArea className="h-[200px] rounded border" viewportLabel="Recent sync jobs, scrollable">
+                <ScrollArea className="h-[200px] rounded border" scrollLabel="Recent sync jobs, scrollable">
                   <div className="p-2 space-y-2">
                     {dedupedQueue.map(({ item, count }) => (
                       <div
@@ -816,23 +697,7 @@ export default function GitHubSyncPanel() {
                   This pulls the resource list from{" "}
                   <span className="font-medium text-foreground">{normalizedRepo}</span>{" "}
                   and updates the database to match.{" "}
-                  {currentPreview ? (
-                    <span data-testid="text-import-plan">
-                      The preview at {formatSyncDate(currentPreview.previewedAt)} found it would add{" "}
-                      {currentPreview.plan.imported.toLocaleString()}, update {currentPreview.plan.updated.toLocaleString()} and
-                      skip {currentPreview.plan.skipped.toLocaleString()} resources
-                      {currentPreview.plan.errors.length ? `, with ${currentPreview.plan.errors.length.toLocaleString()} failing` : ""}
-                      {describeTaxonomyPlan(currentPreview.plan.wouldCreateTaxonomy)
-                        ? `, and create ${describeTaxonomyPlan(currentPreview.plan.wouldCreateTaxonomy)}`
-                        : ", creating no new categories"}.
-                      {" "}Edits since then can change these numbers.
-                    </span>
-                  ) : (
-                    <span data-testid="text-import-plan">
-                      New resources are added and existing ones may be updated. Cancel and
-                      use Preview import to see how many before pulling.
-                    </span>
-                  )}
+                  <ImportPreviewConfirmNote preview={importPreview.current} />
                 </>
               ) : (
                 <>
