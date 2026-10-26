@@ -167,7 +167,7 @@ export interface RunAgentQueryResult {
   costBasis: CostBasis;
   tokensIn: number;
   tokensOut: number;
-  /** SDK num_turns when a result arrived, else distinct API turns (message ids) seen in the stream. */
+  /** SDK num_turns when a result arrived, else the orchestrator's API turns (message ids) seen in the stream. */
   numTurns: number;
   durationMs: number;
   webSearchCount: number;
@@ -341,18 +341,10 @@ export async function runAgentQuery(params: RunAgentQueryParams): Promise<RunAge
     await mirror("error", cbMsg);
     abortController.abort();
   };
-  const stallTimer = setInterval(() => {
-    if (abortController.signal.aborted) return;
-    const stall = mcpStallDetected();
-    if (stall) void abortForStall(stall, "timer").catch(() => {});
-  }, MCP_STALL_TIMER_MS);
 
   // API message ids whose usage has already been attributed to an event —
   // block-split assistant messages repeat the same usage per block.
   const seenUsageMessageIds = new Set<string>();
-  // Usage observed on streamed assistant messages (deduped by message id).
-  // A cancelled run never receives the SDK's final result message, so these
-  // running totals are the only record of what the run already consumed.
   // Usage observed on the stream, per API message. A cancelled run never
   // receives the SDK's final result message, so this is the only record of
   // what it already consumed (turns, tokens, an estimated cost).
@@ -493,6 +485,14 @@ export async function runAgentQuery(params: RunAgentQueryParams): Promise<RunAge
     },
   });
 
+  // Started only once nothing before the try below can throw (env build, host
+  // check, query()), so the finally that clears it always runs.
+  const stallTimer = setInterval(() => {
+    if (abortController.signal.aborted) return;
+    const stall = mcpStallDetected();
+    if (stall) void abortForStall(stall, "timer").catch(() => {});
+  }, MCP_STALL_TIMER_MS);
+
   try {
     for await (const msg of q as any) {
       switch (msg.type) {
@@ -599,8 +599,8 @@ export async function runAgentQuery(params: RunAgentQueryParams): Promise<RunAge
           const rawIn = usage?.input_tokens ?? null;
           const totalTokensIn = rawIn !== null ? rawIn + cacheRead + cacheCreation : null;
           if (apiMessageId !== null && usage) {
-            const view = msg as { message?: { model?: string; usage: Parameters<StreamedUsage["noteAssistant"]>[2] } };
-            streamed.noteAssistant(apiMessageId, view.message?.model ?? model, view.message!.usage);
+            const view = msg as { parent_tool_use_id?: string | null; message?: { model?: string; usage: Parameters<StreamedUsage["noteAssistant"]>[3] } };
+            streamed.noteAssistant(view.parent_tool_use_id ?? null, apiMessageId, view.message?.model ?? model, view.message!.usage);
           }
 
           await emitter.emit({
@@ -850,7 +850,7 @@ export async function runAgentQuery(params: RunAgentQueryParams): Promise<RunAge
               streamed: (() => {
                 const t = streamed.totals();
                 const e = estimateUsageCost(t.byModel);
-                return { turns: t.turns, tokens_in: t.inputTokens, tokens_out: t.outputTokens, cost_usd: Number(e.usd.toFixed(4)), cost_basis: e.basis };
+                return { turns: t.turns, api_messages: t.apiMessages, tokens_in: t.inputTokens, tokens_out: t.outputTokens, cost_usd: Number(e.usd.toFixed(4)), cost_basis: e.basis };
               })(),
             },
           });
