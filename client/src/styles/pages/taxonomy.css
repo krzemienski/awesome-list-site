@@ -182,14 +182,8 @@ button.taxonomy-child {
    below 360px, where a 320px track would leave the viewport, does it yield. */
 .taxonomy-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(min(320px, 100%), 1fr));
   gap: 16px;
-}
-
-@media (max-width: 359px) {
-  .taxonomy-grid {
-    grid-template-columns: minmax(0, 1fr);
-  }
 }
 
 .taxonomy-production-controls {

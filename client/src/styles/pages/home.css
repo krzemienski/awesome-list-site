@@ -310,19 +310,15 @@
   gap: 1.75rem;
 }
 
-/* Pinned under the header, as the reference has it, but ending above the
-   back-to-top lane so its "Submit a resource" card never sits under the
-   fixed button. A taller rail scrolls itself; the inline padding keeps focus
-   rings inside that scroll box. */
-@media (min-width: 1025px) {
+/* Pinned under the header, as the reference has it, only on viewports tall
+   enough to show the whole rail (with eight featured picks it is ~1100px).
+   A sticky box taller than the viewport hides its own end until the index
+   beside it runs out, so a shorter viewport lets the rail scroll with the
+   page instead. */
+@media (min-width: 1025px) and (min-height: 75rem) {
   .home-index-rail {
-    --home-rail-top: 5.25rem;
     position: sticky;
-    top: var(--home-rail-top);
-    max-height: calc(100svh - var(--home-rail-top) - var(--back-to-top-lane));
-    overflow-y: auto;
-    margin-inline: -0.25rem;
-    padding-inline: 0.25rem;
+    top: 5.25rem;
   }
 }
 

@@ -39,24 +39,12 @@ function ClientContactDialogHost() {
   return <Suspense fallback={null}><ContactDialogHost /></Suspense>;
 }
 
-/** R2-L01: floating "back to top" button, appears after scrolling ~600px.
- * It steps aside once the footer's meta strip is on screen: that strip spans
- * the content column to its right edge, exactly where the button floats. */
+/** R2-L01: floating "back to top" button, appears after scrolling ~600px. */
 function BackToTop() {
   const [visible, setVisible] = useState(false);
 
   useEffect(() => {
-    const onScroll = () => {
-      // Read scrollY first: measuring the footer forces a synchronous layout,
-      // which on mount (scrollY 0) cost a full-page layout mid-commit.
-      if (window.scrollY <= 600) {
-        setVisible(false);
-        return;
-      }
-      const meta = document.querySelector(".app-footer-meta");
-      const metaOnScreen = meta ? meta.getBoundingClientRect().top < window.innerHeight : false;
-      setVisible(!metaOnScreen);
-    };
+    const onScroll = () => setVisible(window.scrollY > 600);
     onScroll();
     window.addEventListener("scroll", onScroll, { passive: true });
     return () => window.removeEventListener("scroll", onScroll);
@@ -78,8 +66,8 @@ function BackToTop() {
       data-testid="button-back-to-top"
       // Fixed to the SCREEN, so it is lifted by the app shell's
       // --app-bottom-inset (0px unless an app-level bottom bar is showing).
-      // Size and offset are the --back-to-top-* tokens (index.css) that the
-      // home rail also reads to stay out of the button's lane.
+      // It floats in --back-to-top-lane (index.css), which the shell's end
+      // gutter keeps clear of content at every width.
       className="fixed bottom-[calc(var(--back-to-top-offset)+var(--app-bottom-inset,0px))] right-[var(--back-to-top-offset)] z-40 h-[var(--back-to-top-size)] w-[var(--back-to-top-size)] shadow-lg bg-[var(--surface)]"
     >
       <ArrowUp className="h-5 w-5" />
