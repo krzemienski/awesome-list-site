@@ -13,7 +13,8 @@
 //   GA4 receives them) and anything else non-primitive is dropped.
 // - URL: the tracker stamps events with the URL it last saw, and on Back/Forward
 //   that lags the page's own tracking effect, so each event carries the URL it
-//   was fired on, normalized like the tracker's own (pageUrl below).
+//   was fired on (snapshotted in track(), before this chunk loads), normalized
+//   like the tracker's own (pageUrl below).
 // - No tracker (dev, analytics disabled in Publishing settings, blocked
 //   script) is a silent no-op. While the injected script is still loading,
 //   events wait in a small bounded queue and flush on its load event.
@@ -73,8 +74,8 @@ const toUmamiData = (props: Record<string, unknown>): UmamiData => {
 
 // Mirrors the tracker's URL normalization: it drops the query or hash only when
 // its script tag sets data-exclude-search / data-exclude-hash.
-const pageUrl = () => {
-  const url = new URL(location.href);
+const pageUrl = (href: string) => {
+  const url = new URL(href);
   const tracker = document.querySelector(TRACKER_SELECTOR);
   if (tracker?.getAttribute('data-exclude-search') === 'true') url.search = '';
   if (tracker?.getAttribute('data-exclude-hash') === 'true') url.hash = '';
@@ -102,7 +103,7 @@ if (typeof window !== 'undefined') {
   });
 }
 
-export const replitTrack = (name: string, props: Record<string, unknown>) => {
+export const replitTrack = (name: string, props: Record<string, unknown>, href: string) => {
   if (typeof window === 'undefined') return;
   if (PLATFORM_TRACKED.has(name)) return;
   if (name.length > MAX_EVENT_NAME_LENGTH) {
@@ -112,7 +113,7 @@ export const replitTrack = (name: string, props: Record<string, unknown>) => {
     return;
   }
   const data = toUmamiData(props);
-  const url = pageUrl();
+  const url = pageUrl(href);
   if (window.umami) {
     send(name, data, url);
     return;
