@@ -106,6 +106,80 @@ interface ConflictResolution {
   reason: string;
 }
 
+interface CatalogEntry {
+  resource: Resource;
+  urlKey: string;
+  /** Empty when the title or domain normalizes to nothing (never matches). */
+  titleDomainKey: string;
+}
+
+function toCatalogEntry(resource: Resource): CatalogEntry {
+  const titleKey = normalizeTitleForDedup(resource.title);
+  const domainKey = domainOf(resource.url);
+  return {
+    resource,
+    urlKey: normalizeUrlForDedup(resource.url),
+    titleDomainKey: titleKey && domainKey ? `${titleKey}|${domainKey}` : '',
+  };
+}
+
+/**
+ * The whole catalog loaded once per import (any status, so a pending copy
+ * also blocks re-import), keyed the way
+ * checkConflict matches. Entries keep listResources' newest-first order and
+ * each key maps to its first entry, the row a linear `.find` would return.
+ */
+class ImportCatalog {
+  private entries: CatalogEntry[];
+  private byUrl = new Map<string, Resource>();
+  private byTitleDomain = new Map<string, Resource>();
+
+  constructor(resources: Resource[]) {
+    this.entries = resources.map(toCatalogEntry);
+    for (const entry of this.entries) {
+      if (!this.byUrl.has(entry.urlKey)) this.byUrl.set(entry.urlKey, entry.resource);
+      if (entry.titleDomainKey && !this.byTitleDomain.has(entry.titleDomainKey)) {
+        this.byTitleDomain.set(entry.titleDomainKey, entry.resource);
+      }
+    }
+  }
+
+  findByUrl(url: string): Resource | undefined {
+    return this.byUrl.get(normalizeUrlForDedup(url));
+  }
+
+  findByTitleDomain(title: string, url: string): Resource | undefined {
+    const titleKey = normalizeTitleForDedup(title);
+    const domainKey = domainOf(url);
+    return titleKey && domainKey ? this.byTitleDomain.get(`${titleKey}|${domainKey}`) : undefined;
+  }
+
+  /**
+   * A row this run wrote, so later items see it as they did when each one
+   * re-read the table. A new row sorts first (newest); an updated row keeps
+   * its place, and every key it left or joined resolves again.
+   */
+  record(row: Resource): void {
+    const next = toCatalogEntry(row);
+    const index = this.entries.findIndex(e => e.resource.id === row.id);
+    const previous = index >= 0 ? this.entries[index] : undefined;
+    if (previous) this.entries[index] = next;
+    else this.entries.unshift(next);
+    for (const key of new Set([previous?.urlKey, next.urlKey])) {
+      if (key !== undefined) this.resolve(this.byUrl, key, e => e.urlKey);
+    }
+    for (const key of new Set([previous?.titleDomainKey, next.titleDomainKey])) {
+      if (key) this.resolve(this.byTitleDomain, key, e => e.titleDomainKey);
+    }
+  }
+
+  private resolve(index: Map<string, Resource>, key: string, keyOf: (e: CatalogEntry) => string): void {
+    const first = this.entries.find(e => keyOf(e) === key);
+    if (first) index.set(key, first.resource);
+    else index.delete(key);
+  }
+}
+
 /**
  * Helper function to generate URL-safe slugs from names
  */
@@ -545,7 +619,11 @@ export class GitHubSyncService {
 
       logger.info('Category hierarchy setup complete');
       
-      // STEP 4: Process each resource
+      // STEP 4: Process each resource. The catalog is read once: reading every
+      // row per item timed the request out on a catalog of a few thousand.
+      const catalog = new ImportCatalog(
+        (await this.resourceRepo.listResources({ limit: 100000 })).resources
+      );
       for (const resource of dbResources) {
         try {
           // Get hierarchy IDs for this resource
@@ -567,7 +645,7 @@ export class GitHubSyncService {
             resource.subSubcategory = hierarchyId.subSubcategory ?? resource.subSubcategory;
           }
           
-          const conflict = await this.checkConflict(resource);
+          const conflict = this.checkConflict(resource, catalog);
           
           switch (conflict.action) {
             case 'create':
@@ -588,6 +666,7 @@ export class GitHubSyncService {
                   status: 'approved',
                   githubSynced: true
                 } as InsertResource);
+                catalog.record(created);
                 result.resources.push(created);
                 
                 // Log the import
@@ -624,6 +703,7 @@ export class GitHubSyncService {
                   } as Partial<InsertResource>,
                   false
                 );
+                catalog.record(updated);
                 result.resources.push(updated);
                 
                 // Log the update
@@ -1327,37 +1407,24 @@ export class GitHubSyncService {
   /**
    * Check for conflicts with existing resources
    */
-  private async checkConflict(resource: Partial<Resource>): Promise<ConflictResolution> {
+  private checkConflict(resource: Partial<Resource>, catalog: ImportCatalog): ConflictResolution {
     // Run3 audit R3-24: the old check compared EXACT URLs over only the first
     // 1,000 approved rows — short-links (link.medium.com) and rows past the
     // cap slipped through and were re-imported as duplicates. Now we compare
-    // normalized URLs over the whole catalog (any status, so a pending copy
-    // also blocks re-import) and fall back to a title+domain match.
-    const existingResources = await this.resourceRepo.listResources({
-      limit: 100000,
-    });
-
-    const targetUrlKey = normalizeUrlForDedup(resource.url || '');
-    let existing = existingResources.resources.find(
-      r => normalizeUrlForDedup(r.url) === targetUrlKey
-    );
+    // normalized URLs over the whole catalog and fall back to a title+domain
+    // match.
+    const existing = catalog.findByUrl(resource.url ?? '');
 
     if (!existing) {
       // Same normalized title + same root domain = same item behind a
       // different URL shape (tracking params, short-links, mirrors).
-      const titleKey = normalizeTitleForDedup(resource.title || '');
-      const domainKey = domainOf(resource.url || '');
-      if (titleKey && domainKey) {
-        existing = existingResources.resources.find(
-          r => normalizeTitleForDedup(r.title) === titleKey && domainOf(r.url) === domainKey
-        );
-        if (existing) {
-          return {
-            action: 'skip',
-            resource: existing,
-            reason: `Duplicate of #${existing.id} (same title + domain, different URL form)`
-          };
-        }
+      const duplicate = catalog.findByTitleDomain(resource.title ?? '', resource.url ?? '');
+      if (duplicate) {
+        return {
+          action: 'skip',
+          resource: duplicate,
+          reason: `Duplicate of #${duplicate.id} (same title + domain, different URL form)`
+        };
       }
     }
 
