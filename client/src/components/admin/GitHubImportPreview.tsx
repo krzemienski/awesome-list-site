@@ -200,7 +200,9 @@ export function ImportPreviewConfirmNote({ preview }: { preview: ImportPreview |
   if (preview.kind === "stopped") {
     return (
       <span data-testid="text-import-plan">
-        The preview at {at} could not plan this import: {preview.reason}
+        The preview at {at} could not plan this import: {preview.reason.replace(/\.$/, "")}. A Pull
+        would stop the same way, so Start Import stays off. Check the target,
+        then run Preview import again.
       </span>
     );
   }

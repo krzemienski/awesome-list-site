@@ -116,6 +116,9 @@ export default function GitHubSyncPanel() {
       : null;
 
   const importPreview = useImportPreview(normalizedRepo);
+  // The preview reads the README the same way a Pull does, so a preview of
+  // this target that could not plan means the Pull would stop the same way.
+  const importBlocked = confirmAction === "import" && importPreview.current?.kind === "stopped";
 
   const resetRepository = () => {
     if (configuredRepo) {
@@ -711,6 +714,7 @@ export default function GitHubSyncPanel() {
           <AlertDialogFooter>
             <AlertDialogCancel data-testid="button-cancel-sync-action">Cancel</AlertDialogCancel>
             <AlertDialogAction
+              disabled={importBlocked}
               onClick={() => {
                 if (confirmAction === "import") importMutation.mutate();
                 if (confirmAction === "export") exportMutation.mutate();
