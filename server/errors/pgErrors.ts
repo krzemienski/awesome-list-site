@@ -17,6 +17,33 @@ export function isForeignKeyViolation(error: unknown): boolean {
 }
 
 /**
+ * One line naming the PostgreSQL failure behind `error`: SQLSTATE, the
+ * constraint or column, and the server's detail. Drizzle's own message is
+ * the SQL text plus every bound parameter and never says what Postgres
+ * rejected, so logs and sync history built from it are undiagnosable.
+ * Errors with no PostgreSQL cause keep their own message.
+ */
+export function describeDbError(error: unknown): string {
+  let current = error as {
+    code?: unknown; constraint?: unknown; column?: unknown; table?: unknown;
+    detail?: unknown; message?: unknown; cause?: unknown;
+  } | null | undefined;
+  for (let depth = 0; current && depth < 8; depth++) {
+    if (typeof current.code === "string" && /^[0-9A-Z]{5}$/.test(current.code)) {
+      const target = [current.table, current.constraint ?? current.column]
+        .filter((part): part is string => typeof part === "string" && part.length > 0)
+        .join(".");
+      return [
+        `database error ${current.code}${target ? ` on ${target}` : ""}: ${typeof current.message === "string" ? current.message : ""}`,
+        typeof current.detail === "string" ? current.detail : "",
+      ].filter(Boolean).join(" ");
+    }
+    current = current.cause as typeof current;
+  }
+  return error instanceof Error ? error.message : String(error);
+}
+
+/**
  * A unique-constraint violation (23505), optionally narrowed to constraints
  * whose name contains `constraintIncludes`. Drizzle wraps the PostgreSQL
  * error in `cause` (sometimes more than once), so the whole chain is walked.
