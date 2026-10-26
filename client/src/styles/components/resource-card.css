@@ -297,6 +297,19 @@
   background: color-mix(in srgb, var(--accent) 8%, transparent);
 }
 
+/* The link is a square 32/44px hit box around a rounded pill, so the global
+   ring moves onto the pill and follows its radius. */
+.resource-card__meta-link:focus-visible,
+.resource-card__tag-link:focus-visible {
+  outline: none !important;
+}
+
+.resource-card__meta-link:focus-visible > .chip,
+.resource-card__tag-link:focus-visible .resource-card__tag {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
 /* The mono override above is unlayered, so it beat the frozen Geist chip skin
    (design-system.css: [data-system="geist"] .chip → body face, no tracking,
    no caps). Restore that skin for the card chips. */
