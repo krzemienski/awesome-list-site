@@ -324,7 +324,16 @@ export default function DatabaseTab({ stats }: DatabaseTabProps) {
       </section>
       </details>
 
-      <TableShell title="Tables" sub="PostgreSQL — primary database">
+      <TableShell
+        title="Key tables"
+        sub={
+          <span data-testid="text-database-key-tables">
+            {database
+              ? `${tableRows.length} key tables of ${database.tables.toLocaleString()} in the primary PostgreSQL database`
+              : "PostgreSQL — primary database"}
+          </span>
+        }
+      >
         <Table className="table admin-ops-table" data-testid="table-database-tables">
           <thead>
             <tr>
