@@ -4,6 +4,14 @@ All notable changes to the Awesome Video Resource Viewer project. Newest entries
 
 ---
 
+## October 27, 2026
+
+### Search and Advanced form field identifiers
+- Fixed C6-PS-064 by identifying Search query, sort and tag-search fields,
+  Advanced explorer controls and export options, including Radix native
+  companion fields. Responsive tag-search IDs remain distinct when the desktop
+  sidebar and mobile sheet are mounted together; existing labels are preserved.
+
 ## September 15, 2026
 
 ### Parity documentation and independent verification

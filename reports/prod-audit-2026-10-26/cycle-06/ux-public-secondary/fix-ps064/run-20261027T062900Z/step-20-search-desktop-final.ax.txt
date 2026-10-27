@@ -1,0 +1,1004 @@
+- generic [ref=e2]:
+  - region "Notifications (F8)":
+    - list
+  - generic [ref=e3]:
+    - link "Skip to main content" [ref=e4] [cursor=pointer]:
+      - /url: "#main"
+    - generic [ref=e5]:
+      - banner [ref=e6]:
+        - link "AWESOME.VIDEO home" [ref=e7] [cursor=pointer]:
+          - /url: /
+          - generic [ref=e8]: av
+          - generic [ref=e9]: AWESOME.VIDEO
+          - generic [ref=e10]: AWESOME.VIDEO home
+        - button "Search 1,949 resources" [ref=e11] [cursor=pointer]:
+          - img [ref=e12]
+          - generic [ref=e15]: Search 1,949 resources
+          - generic [ref=e16]:
+            - text: Search
+            - generic [ref=e17]: 1,949 resources…
+          - generic [ref=e18]: ⌘K
+        - navigation "Primary" [ref=e19]:
+          - link "Browse" [ref=e20] [cursor=pointer]:
+            - /url: /categories
+          - link "Submit" [ref=e21] [cursor=pointer]:
+            - /url: /submit
+          - link "About" [ref=e22] [cursor=pointer]:
+            - /url: /about
+          - link "Docs ↗" [ref=e23] [cursor=pointer]:
+            - /url: /design-system
+        - button "Sign in, account menu" [ref=e24] [cursor=pointer]:
+          - img [ref=e26]
+          - generic [ref=e29]: Sign in
+          - generic [ref=e30]: Sign in, account menu
+      - generic [ref=e32]:
+        - main [ref=e33]:
+          - generic [ref=e34]:
+            - navigation "Breadcrumb" [ref=e35]:
+              - list [ref=e36]:
+                - listitem [ref=e37]:
+                  - link "Home" [ref=e38] [cursor=pointer]:
+                    - /url: /
+                - listitem [ref=e39]:
+                  - img [ref=e40]
+                - listitem:
+                  - link "Search" [disabled]
+            - generic [ref=e42]:
+              - generic [ref=e43]:
+                - generic [ref=e44]:
+                  - img [ref=e45]
+                  - generic [ref=e48]:
+                    - heading "Search" [level=1] [ref=e49]
+                    - paragraph [ref=e50]: A precise index of tools, standards, and ideas for video developers.
+                - generic [ref=e51]:
+                  - generic [ref=e52]:
+                    - img [ref=e53]
+                    - textbox "Search resources" [ref=e56]:
+                      - /placeholder: Search resources...
+                      - text: video
+                  - generic [ref=e57]:
+                    - generic [ref=e58]: Sort
+                    - combobox "Sort results" [ref=e59] [cursor=pointer]:
+                      - generic: Name A–Z
+                      - img [ref=e60]
+              - generic [ref=e62]:
+                - complementary [ref=e63]:
+                  - generic [ref=e64]:
+                    - generic [ref=e66]:
+                      - paragraph [ref=e67]: Narrow results
+                      - paragraph [ref=e68]: Counts update for this combination.
+                    - group "Category" [ref=e69]:
+                      - generic [ref=e70]: Category
+                      - generic [ref=e71]:
+                        - button "Encoding & Codecs, 238 results" [ref=e72] [cursor=pointer]:
+                          - generic [ref=e74]: Encoding & Codecs
+                          - generic [ref=e75]: "238"
+                        - button "Media Tools, 174 results" [ref=e76] [cursor=pointer]:
+                          - generic [ref=e78]: Media Tools
+                          - generic [ref=e79]: "174"
+                        - button "Intro & Learning, 161 results" [ref=e80] [cursor=pointer]:
+                          - generic [ref=e82]: Intro & Learning
+                          - generic [ref=e83]: "161"
+                        - button "Players & Clients, 161 results" [ref=e84] [cursor=pointer]:
+                          - generic [ref=e86]: Players & Clients
+                          - generic [ref=e87]: "161"
+                        - button "Infrastructure & Delivery, 127 results" [ref=e88] [cursor=pointer]:
+                          - generic [ref=e90]: Infrastructure & Delivery
+                          - generic [ref=e91]: "127"
+                        - button "Standards & Industry, 89 results" [ref=e92] [cursor=pointer]:
+                          - generic [ref=e94]: Standards & Industry
+                          - generic [ref=e95]: "89"
+                        - button "Protocols & Transport, 81 results" [ref=e96] [cursor=pointer]:
+                          - generic [ref=e98]: Protocols & Transport
+                          - generic [ref=e99]: "81"
+                        - button "Community & Events, 69 results" [ref=e100] [cursor=pointer]:
+                          - generic [ref=e102]: Community & Events
+                          - generic [ref=e103]: "69"
+                        - button "General Tools, 59 results" [ref=e104] [cursor=pointer]:
+                          - generic [ref=e106]: General Tools
+                          - generic [ref=e107]: "59"
+                    - group [ref=e108]:
+                      - generic "Subcategory" [ref=e109] [cursor=pointer]:
+                        - img [ref=e110]
+                        - text: Subcategory
+                    - group [ref=e112]:
+                      - generic "Sub-subcategory" [ref=e113] [cursor=pointer]:
+                        - img [ref=e114]
+                        - text: Sub-subcategory
+                    - group [ref=e116]:
+                      - generic "Tags" [ref=e117] [cursor=pointer]:
+                        - img [ref=e118]
+                        - text: Tags
+                      - group "Tags" [ref=e120]:
+                        - generic [ref=e121]:
+                          - img [ref=e122]
+                          - textbox "Search tags" [ref=e125]:
+                            - /placeholder: Find a tag
+                            - text: ffmpeg
+                        - generic [ref=e126]:
+                          - button "FFmpeg, 106 results" [ref=e127] [cursor=pointer]:
+                            - generic [ref=e130]: FFmpeg
+                            - generic [ref=e131]: "106"
+                          - button "FFMPEG Related, 3 results" [ref=e132] [cursor=pointer]:
+                            - generic [ref=e135]: FFMPEG Related
+                            - generic [ref=e136]: "3"
+                          - button "FFMPEG Frontend, 1 result" [ref=e137] [cursor=pointer]:
+                            - generic [ref=e140]: FFMPEG Frontend
+                            - generic [ref=e141]: "1"
+                          - button "FFMPEG Gui, 1 result" [ref=e142] [cursor=pointer]:
+                            - generic [ref=e145]: FFMPEG Gui
+                            - generic [ref=e146]: "1"
+                          - button "FFMPEG Like, 1 result" [ref=e147] [cursor=pointer]:
+                            - generic [ref=e150]: FFMPEG Like
+                            - generic [ref=e151]: "1"
+                          - button "Ffmpeg.wasm, 1 result" [ref=e152] [cursor=pointer]:
+                            - generic [ref=e155]: Ffmpeg.wasm
+                            - generic [ref=e156]: "1"
+                        - paragraph [ref=e157]: 6 tags · scroll the list for more
+                - region "Search results" [active] [ref=e158]:
+                  - paragraph [ref=e159]: Page 1 of 49 · showing 1–24 of 1159 results for “video”
+                  - generic [ref=e160]:
+                    - article [ref=e161] [cursor=pointer]:
+                      - generic [ref=e162]:
+                        - generic [ref=e163]:
+                          - generic [ref=e164]: ⟁
+                          - generic [ref=e166]:
+                            - 'button "Favorite to your account — sign in required: 100ms: RTMP vs WebRTC vs HLS - Live Video Streaming Protocols Compared" [ref=e167]':
+                              - generic [ref=e168]:
+                                - img
+                            - 'button "Bookmark on this device — no sign-in required: 100ms: RTMP vs WebRTC vs HLS - Live Video Streaming Protocols Compared" [ref=e169]':
+                              - generic [ref=e170]:
+                                - img
+                        - 'heading "100ms: RTMP vs WebRTC vs HLS - Live Video Streaming Protocols Compared" [level=2] [ref=e172]':
+                          - 'link "100ms: RTMP vs WebRTC vs HLS - Live Video Streaming Protocols Compared" [ref=e173]':
+                            - /url: /resource/282
+                        - paragraph [ref=e174]: A detailed comparison of RTMP, WebRTC, and HLS protocols, highlighting their differences in latency, scalability, quality, and reach. This resource assists developers in choosing the appropriate protocol based on their specific live video streaming requirements.
+                      - generic [ref=e175]:
+                        - generic [ref=e176]:
+                          - 'link "View details for 100ms: RTMP vs WebRTC vs HLS - Live Video Streaming Protocols Compared" [ref=e177]':
+                            - /url: /resource/282
+                            - generic [ref=e178]:
+                              - img [ref=e179]
+                              - generic [ref=e181]: View Details
+                          - generic [ref=e182]: Protocols & Transport
+                        - generic [ref=e183]:
+                          - 'link "Open Link 100ms: RTMP vs WebRTC vs HLS - Live Video Streaming Protocols Compared (opens in new tab)" [ref=e184]':
+                            - /url: https://www.100ms.live/blog/rtmp-vs-webrtc-vs-hls
+                            - img
+                            - generic [ref=e185]: Open Link
+                            - generic [ref=e186]: "100ms: RTMP vs WebRTC vs HLS - Live Video Streaming Protocols Compared (opens in new tab)"
+                          - 'button "Suggest an edit: 100ms: RTMP vs WebRTC vs HLS - Live Video Streaming Protocols Compared" [ref=e187]':
+                            - img
+                    - article [ref=e188] [cursor=pointer]:
+                      - generic [ref=e189]:
+                        - generic [ref=e190]:
+                          - generic [ref=e191]: ◈
+                          - generic [ref=e193]:
+                            - 'button "Favorite to your account — sign in required: 2025 NAB Show: CineCentral" [ref=e194]':
+                              - generic [ref=e195]:
+                                - img
+                            - 'button "Bookmark on this device — no sign-in required: 2025 NAB Show: CineCentral" [ref=e196]':
+                              - generic [ref=e197]:
+                                - img
+                        - 'heading "2025 NAB Show: CineCentral" [level=2] [ref=e199]':
+                          - 'link "2025 NAB Show: CineCentral" [ref=e200]':
+                            - /url: /resource/13
+                        - paragraph [ref=e201]: The 2025 NAB Show's CineCentral focuses on the interplay between tools and techniques in storytelling across media formats. It offers hands-on education through live demos, expert-led training, and interactive workshops, covering topics like scene blocking, emotional camera work, and technical skills essential for video production.
+                      - generic [ref=e202]:
+                        - generic [ref=e203]:
+                          - 'link "View details for 2025 NAB Show: CineCentral" [ref=e204]':
+                            - /url: /resource/13
+                            - generic [ref=e205]:
+                              - img [ref=e206]
+                              - generic [ref=e208]: View Details
+                          - generic [ref=e209]: Community & Events
+                        - generic [ref=e210]:
+                          - 'link "Open Link 2025 NAB Show: CineCentral (opens in new tab)" [ref=e211]':
+                            - /url: https://www.tvtechnology.com/features/2025-nab-show-cinecentral-fuses-tools-and-technique
+                            - img
+                            - generic [ref=e212]: Open Link
+                            - generic [ref=e213]: "2025 NAB Show: CineCentral (opens in new tab)"
+                          - 'button "Suggest an edit: 2025 NAB Show: CineCentral" [ref=e214]':
+                            - img
+                    - article [ref=e215] [cursor=pointer]:
+                      - generic [ref=e216]:
+                        - generic [ref=e217]:
+                          - generic [ref=e218]: ▤
+                          - generic [ref=e220]:
+                            - 'button "Favorite to your account — sign in required: 3 Cases from a Video Expert: Encoding Basics" [ref=e221]':
+                              - generic [ref=e222]:
+                                - img
+                            - 'button "Bookmark on this device — no sign-in required: 3 Cases from a Video Expert: Encoding Basics" [ref=e223]':
+                              - generic [ref=e224]:
+                                - img
+                        - 'heading "3 Cases from a Video Expert: Encoding Basics" [level=2] [ref=e226]':
+                          - 'link "3 Cases from a Video Expert: Encoding Basics" [ref=e227]':
+                            - /url: /resource/1407
+                        - paragraph [ref=e228]: Introduction
+                      - generic [ref=e229]:
+                        - generic [ref=e230]:
+                          - 'link "View details for 3 Cases from a Video Expert: Encoding Basics" [ref=e231]':
+                            - /url: /resource/1407
+                            - generic [ref=e232]:
+                              - img [ref=e233]
+                              - generic [ref=e235]: View Details
+                          - generic [ref=e236]: Intro & Learning
+                        - generic [ref=e237]:
+                          - 'link "Open Link 3 Cases from a Video Expert: Encoding Basics (opens in new tab)" [ref=e238]':
+                            - /url: https://link.medium.com/z6IDbLDWO7
+                            - img
+                            - generic [ref=e239]: Open Link
+                            - generic [ref=e240]: "3 Cases from a Video Expert: Encoding Basics (opens in new tab)"
+                          - 'button "Suggest an edit: 3 Cases from a Video Expert: Encoding Basics" [ref=e241]':
+                            - img
+                    - article [ref=e242] [cursor=pointer]:
+                      - generic [ref=e243]:
+                        - generic [ref=e244]:
+                          - generic [ref=e245]: ▥
+                          - generic [ref=e247]:
+                            - 'button "Favorite to your account — sign in required: 3DLUT Creator" [ref=e248]':
+                              - generic [ref=e249]:
+                                - img
+                            - 'button "Bookmark on this device — no sign-in required: 3DLUT Creator" [ref=e250]':
+                              - generic [ref=e251]:
+                                - img
+                        - heading "3DLUT Creator" [level=2] [ref=e253]:
+                          - link "3DLUT Creator" [ref=e254]:
+                            - /url: /resource/1739
+                        - paragraph [ref=e255]: A stand-alone software to create and edit 3D LUTs (Look Up Tables) for color grading. It provides a unique interface for manipulating the color response of images and videos, which can then be applied via LUT in other grading software or on monitors.
+                      - generic [ref=e256]:
+                        - generic [ref=e257]:
+                          - link "View details for 3DLUT Creator" [ref=e258]:
+                            - /url: /resource/1739
+                            - generic [ref=e259]:
+                              - img [ref=e260]
+                              - generic [ref=e262]: View Details
+                          - generic [ref=e263]: Media Tools
+                        - generic [ref=e264]:
+                          - link "Open Link 3DLUT Creator (opens in new tab)" [ref=e265]:
+                            - /url: https://3dlutcreator.com/
+                            - img
+                            - generic [ref=e266]: Open Link
+                            - generic [ref=e267]: 3DLUT Creator (opens in new tab)
+                          - 'button "Suggest an edit: 3DLUT Creator" [ref=e268]':
+                            - img
+                    - article [ref=e269] [cursor=pointer]:
+                      - generic [ref=e270]:
+                        - generic [ref=e271]:
+                          - generic [ref=e272]: ▥
+                          - generic [ref=e274]:
+                            - 'button "Favorite to your account — sign in required: 4K Media | Free Ultra-HD / HDR / HLG / Dolby Vision 4K Video Demos" [ref=e275]':
+                              - generic [ref=e276]:
+                                - img
+                            - 'button "Bookmark on this device — no sign-in required: 4K Media | Free Ultra-HD / HDR / HLG / Dolby Vision 4K Video Demos" [ref=e277]':
+                              - generic [ref=e278]:
+                                - img
+                        - heading "4K Media | Free Ultra-HD / HDR / HLG / Dolby Vision 4K Video Demos" [level=2] [ref=e280]:
+                          - link "4K Media | Free Ultra-HD / HDR / HLG / Dolby Vision 4K Video Demos" [ref=e281]:
+                            - /url: /resource/832
+                        - paragraph [ref=e282]: Uncompressed 4K demos, samples, and trailers, to show off your new ultra-HD (2160p) HDR/HLG/Dolby Vision television or monitor.
+                      - generic [ref=e283]:
+                        - generic [ref=e284]:
+                          - link "View details for 4K Media | Free Ultra-HD / HDR / HLG / Dolby Vision 4K Video Demos" [ref=e285]:
+                            - /url: /resource/832
+                            - generic [ref=e286]:
+                              - img [ref=e287]
+                              - generic [ref=e289]: View Details
+                          - generic [ref=e290]: Media Tools
+                        - generic [ref=e291]:
+                          - link "Open Link 4K Media | Free Ultra-HD / HDR / HLG / Dolby Vision 4K Video Demos (opens in new tab)" [ref=e292]:
+                            - /url: https://4kmedia.org/
+                            - img
+                            - generic [ref=e293]: Open Link
+                            - generic [ref=e294]: 4K Media | Free Ultra-HD / HDR / HLG / Dolby Vision 4K Video Demos (opens in new tab)
+                          - 'button "Suggest an edit: 4K Media | Free Ultra-HD / HDR / HLG / Dolby Vision 4K Video Demos" [ref=e295]':
+                            - img
+                    - article [ref=e296] [cursor=pointer]:
+                      - generic [ref=e297]:
+                        - generic [ref=e298]:
+                          - generic [ref=e299]: ▤
+                          - generic [ref=e301]:
+                            - 'button "Favorite to your account — sign in required: A Brief History of Video Coding" [ref=e302]':
+                              - generic [ref=e303]:
+                                - img
+                            - 'button "Bookmark on this device — no sign-in required: A Brief History of Video Coding" [ref=e304]':
+                              - generic [ref=e305]:
+                                - img
+                        - heading "A Brief History of Video Coding" [level=2] [ref=e307]:
+                          - link "A Brief History of Video Coding" [ref=e308]:
+                            - /url: /resource/442
+                        - paragraph [ref=e309]: Authored by Marco Jacobs and Jonah Probell, this document provides a detailed account of the history of video coding. It discusses early forms of compression, the development of interlacing, and the progression of video coding standards. This resource is useful for those interested in the technical aspects and historical context of video coding.
+                      - generic [ref=e310]:
+                        - generic [ref=e311]:
+                          - link "View details for A Brief History of Video Coding" [ref=e312]:
+                            - /url: /resource/442
+                            - generic [ref=e313]:
+                              - img [ref=e314]
+                              - generic [ref=e316]: View Details
+                          - generic [ref=e317]: Intro & Learning
+                          - generic [ref=e318]: Standards
+                        - generic [ref=e319]:
+                          - link "Open Link A Brief History of Video Coding (opens in new tab)" [ref=e320]:
+                            - /url: https://docslib.org/doc/10606874/a-brief-history-of-video-coding
+                            - img
+                            - generic [ref=e321]: Open Link
+                            - generic [ref=e322]: A Brief History of Video Coding (opens in new tab)
+                          - 'button "Suggest an edit: A Brief History of Video Coding" [ref=e323]':
+                            - img
+                    - article [ref=e324] [cursor=pointer]:
+                      - generic [ref=e325]:
+                        - generic [ref=e326]:
+                          - generic [ref=e327]: ▤
+                          - generic [ref=e329]:
+                            - 'button "Favorite to your account — sign in required: A Brief History of Video Compression Standards: 1929 to 2020" [ref=e330]':
+                              - generic [ref=e331]:
+                                - img
+                            - 'button "Bookmark on this device — no sign-in required: A Brief History of Video Compression Standards: 1929 to 2020" [ref=e332]':
+                              - generic [ref=e333]:
+                                - img
+                        - 'heading "A Brief History of Video Compression Standards: 1929 to 2020" [level=2] [ref=e335]':
+                          - 'link "A Brief History of Video Compression Standards: 1929 to 2020" [ref=e336]':
+                            - /url: /resource/486
+                        - paragraph [ref=e337]: An article by Moment For Technology that provides a concise history of video compression standards, covering key developments from 1929 to 2020.
+                      - generic [ref=e338]:
+                        - generic [ref=e339]:
+                          - 'link "View details for A Brief History of Video Compression Standards: 1929 to 2020" [ref=e340]':
+                            - /url: /resource/486
+                            - generic [ref=e341]:
+                              - img [ref=e342]
+                              - generic [ref=e344]: View Details
+                          - generic [ref=e345]: Intro & Learning
+                          - generic [ref=e346]: Standards
+                        - generic [ref=e347]:
+                          - 'link "Open Link A Brief History of Video Compression Standards: 1929 to 2020 (opens in new tab)" [ref=e348]':
+                            - /url: https://www.mo4tech.com/a-brief-history-of-video-compression-standards-1929-to-2020.html
+                            - img
+                            - generic [ref=e349]: Open Link
+                            - generic [ref=e350]: "A Brief History of Video Compression Standards: 1929 to 2020 (opens in new tab)"
+                          - 'button "Suggest an edit: A Brief History of Video Compression Standards: 1929 to 2020" [ref=e351]':
+                            - img
+                    - article [ref=e352] [cursor=pointer]:
+                      - generic [ref=e353]:
+                        - generic [ref=e354]:
+                          - generic [ref=e355]: ▤
+                          - generic [ref=e357]:
+                            - 'button "Favorite to your account — sign in required: A Comprehensive Guide To Develop A Live Video & On-demand Video Streaming App" [ref=e358]':
+                              - generic [ref=e359]:
+                                - img
+                            - 'button "Bookmark on this device — no sign-in required: A Comprehensive Guide To Develop A Live Video & On-demand Video Streaming App" [ref=e360]':
+                              - generic [ref=e361]:
+                                - img
+                        - heading "A Comprehensive Guide To Develop A Live Video & On-demand Video Streaming App" [level=2] [ref=e363]:
+                          - link "A Comprehensive Guide To Develop A Live Video & On-demand Video Streaming App" [ref=e364]:
+                            - /url: /resource/100
+                        - paragraph [ref=e365]: An extensive guide by RaftLabs detailing the development of live and on-demand video streaming applications, including business use cases, essential features, and technology stacks.
+                      - generic [ref=e366]:
+                        - generic [ref=e367]:
+                          - link "View details for A Comprehensive Guide To Develop A Live Video & On-demand Video Streaming App" [ref=e368]:
+                            - /url: /resource/100
+                            - generic [ref=e369]:
+                              - img [ref=e370]
+                              - generic [ref=e372]: View Details
+                          - generic [ref=e373]: Intro & Learning
+                        - generic [ref=e374]:
+                          - link "Open Link A Comprehensive Guide To Develop A Live Video & On-demand Video Streaming App (opens in new tab)" [ref=e375]:
+                            - /url: https://raftlabs.medium.com/the-complete-guide-to-build-a-live-streaming-app-learn-the-best-approach-and-tech-stack-263bd67e2915
+                            - img
+                            - generic [ref=e376]: Open Link
+                            - generic [ref=e377]: A Comprehensive Guide To Develop A Live Video & On-demand Video Streaming App (opens in new tab)
+                          - 'button "Suggest an edit: A Comprehensive Guide To Develop A Live Video & On-demand Video Streaming App" [ref=e378]':
+                            - img
+                    - article [ref=e379] [cursor=pointer]:
+                      - generic [ref=e380]:
+                        - generic [ref=e381]:
+                          - generic [ref=e382]: ▥
+                          - generic [ref=e384]:
+                            - 'button "Favorite to your account — sign in required: A Docker container with the video streaming tools you need" [ref=e385]':
+                              - generic [ref=e386]:
+                                - img
+                            - 'button "Bookmark on this device — no sign-in required: A Docker container with the video streaming tools you need" [ref=e387]':
+                              - generic [ref=e388]:
+                                - img
+                        - heading "A Docker container with the video streaming tools you need" [level=2] [ref=e390]:
+                          - link "A Docker container with the video streaming tools you need" [ref=e391]:
+                            - /url: /resource/1024
+                        - paragraph [ref=e392]: As a video streaming technician there are a number of tools that you find yourself using on a daily basis. Wouldn’t it be handy if all…
+                      - generic [ref=e393]:
+                        - generic [ref=e394]:
+                          - link "View details for A Docker container with the video streaming tools you need" [ref=e395]:
+                            - /url: /resource/1024
+                            - generic [ref=e396]:
+                              - img [ref=e397]
+                              - generic [ref=e399]: View Details
+                          - generic [ref=e400]: Media Tools
+                          - generic [ref=e401]: Tools & SDKs
+                        - generic [ref=e402]:
+                          - link "Open Link A Docker container with the video streaming tools you need (opens in new tab)" [ref=e403]:
+                            - /url: https://medium.com/@eyevinntechnology/a-docker-container-with-the-video-streaming-tools-you-need-b8319e98f36a
+                            - img
+                            - generic [ref=e404]: Open Link
+                            - generic [ref=e405]: A Docker container with the video streaming tools you need (opens in new tab)
+                          - 'button "Suggest an edit: A Docker container with the video streaming tools you need" [ref=e406]':
+                            - img
+                    - article [ref=e407] [cursor=pointer]:
+                      - generic [ref=e408]:
+                        - generic [ref=e409]:
+                          - generic [ref=e410]: ▤
+                          - generic [ref=e412]:
+                            - 'button "Favorite to your account — sign in required: A short history of video coding" [ref=e413]':
+                              - generic [ref=e414]:
+                                - img
+                            - 'button "Bookmark on this device — no sign-in required: A short history of video coding" [ref=e415]':
+                              - generic [ref=e416]:
+                                - img
+                        - heading "A short history of video coding" [level=2] [ref=e418]:
+                          - link "A short history of video coding" [ref=e419]:
+                            - /url: /resource/1091
+                        - paragraph [ref=e420]: Video coding is an essential component of video streaming, digital TV, video chat and many other technologies. This presentation, an invited lecture to the US …
+                      - generic [ref=e421]:
+                        - generic [ref=e422]:
+                          - link "View details for A short history of video coding" [ref=e423]:
+                            - /url: /resource/1091
+                            - generic [ref=e424]:
+                              - img [ref=e425]
+                              - generic [ref=e427]: View Details
+                          - generic [ref=e428]: Intro & Learning
+                        - generic [ref=e429]:
+                          - link "Open Link A short history of video coding (opens in new tab)" [ref=e430]:
+                            - /url: https://www.slideshare.net/vcodex/a-short-history-of-video-coding?from_m_app=ios
+                            - img
+                            - generic [ref=e431]: Open Link
+                            - generic [ref=e432]: A short history of video coding (opens in new tab)
+                          - 'button "Suggest an edit: A short history of video coding" [ref=e433]':
+                            - img
+                    - article [ref=e434] [cursor=pointer]:
+                      - generic [ref=e435]:
+                        - generic [ref=e436]:
+                          - generic [ref=e437]: ▥
+                          - generic [ref=e439]:
+                            - 'button "Favorite to your account — sign in required: abhirooptalasila/AutoSub" [ref=e440]':
+                              - generic [ref=e441]:
+                                - img
+                            - 'button "Bookmark on this device — no sign-in required: abhirooptalasila/AutoSub" [ref=e442]':
+                              - generic [ref=e443]:
+                                - img
+                        - heading "abhirooptalasila/AutoSub" [level=2] [ref=e445]:
+                          - link "abhirooptalasila/AutoSub" [ref=e446]:
+                            - /url: /resource/1315
+                        - paragraph [ref=e447]: AutoSub is a CLI application to generate subtitle file (.srt) for any video file using Mozilla DeepSpeech - abhirooptalasila/AutoSub
+                      - generic [ref=e448]:
+                        - generic [ref=e449]:
+                          - link "View details for abhirooptalasila/AutoSub" [ref=e450]:
+                            - /url: /resource/1315
+                            - generic [ref=e451]:
+                              - img [ref=e452]
+                              - generic [ref=e454]: View Details
+                          - generic [ref=e455]: Media Tools
+                        - generic [ref=e456]:
+                          - link "Open Link abhirooptalasila/AutoSub (opens in new tab)" [ref=e457]:
+                            - /url: https://github.com/abhirooptalasila/AutoSub
+                            - img
+                            - generic [ref=e458]: Open Link
+                            - generic [ref=e459]: abhirooptalasila/AutoSub (opens in new tab)
+                          - 'button "Suggest an edit: abhirooptalasila/AutoSub" [ref=e460]':
+                            - img
+                    - article [ref=e461] [cursor=pointer]:
+                      - generic [ref=e462]:
+                        - generic [ref=e463]:
+                          - generic [ref=e464]: ▥
+                          - generic [ref=e466]:
+                            - 'button "Favorite to your account — sign in required: abinashmeher999/voice-data-extract" [ref=e467]':
+                              - generic [ref=e468]:
+                                - img
+                            - 'button "Bookmark on this device — no sign-in required: abinashmeher999/voice-data-extract" [ref=e469]':
+                              - generic [ref=e470]:
+                                - img
+                        - heading "abinashmeher999/voice-data-extract" [level=2] [ref=e472]:
+                          - link "abinashmeher999/voice-data-extract" [ref=e473]:
+                            - /url: /resource/1064
+                        - paragraph [ref=e474]: A command line interface to combine text information from subtitles with voice data in the video. Provides a convenient way to generate training data for speech-recognition purposes. - abinashmeher...
+                      - generic [ref=e475]:
+                        - generic [ref=e476]:
+                          - link "View details for abinashmeher999/voice-data-extract" [ref=e477]:
+                            - /url: /resource/1064
+                            - generic [ref=e478]:
+                              - img [ref=e479]
+                              - generic [ref=e481]: View Details
+                          - generic [ref=e482]: Media Tools
+                        - generic [ref=e483]:
+                          - link "Open Link abinashmeher999/voice-data-extract (opens in new tab)" [ref=e484]:
+                            - /url: https://github.com/abinashmeher999/voice-data-extract
+                            - img
+                            - generic [ref=e485]: Open Link
+                            - generic [ref=e486]: abinashmeher999/voice-data-extract (opens in new tab)
+                          - 'button "Suggest an edit: abinashmeher999/voice-data-extract" [ref=e487]':
+                            - img
+                    - article [ref=e488] [cursor=pointer]:
+                      - generic [ref=e489]:
+                        - generic [ref=e490]:
+                          - generic [ref=e491]: ▤
+                          - generic [ref=e493]:
+                            - 'button "Favorite to your account — sign in required: About Frame Rates or Why 29.97?" [ref=e494]':
+                              - generic [ref=e495]:
+                                - img
+                            - 'button "Bookmark on this device — no sign-in required: About Frame Rates or Why 29.97?" [ref=e496]':
+                              - generic [ref=e497]:
+                                - img
+                        - heading "About Frame Rates or Why 29.97?" [level=2] [ref=e499]:
+                          - link "About Frame Rates or Why 29.97?" [ref=e500]:
+                            - /url: /resource/1474
+                        - paragraph [ref=e501]: I recently remembered this popular post from my old blog. Since that blog no longer exists, I thought I would repost it here. Since I wrote this post about a decade ago, many others of done a much better job describing this in detail. I highly recommend the following two videos by Alec Watson fro
+                      - generic [ref=e502]:
+                        - generic [ref=e503]:
+                          - link "View details for About Frame Rates or Why 29.97?" [ref=e504]:
+                            - /url: /resource/1474
+                            - generic [ref=e505]:
+                              - img [ref=e506]
+                              - generic [ref=e508]: View Details
+                          - generic [ref=e509]: Intro & Learning
+                        - generic [ref=e510]:
+                          - link "Open Link About Frame Rates or Why 29.97? (opens in new tab)" [ref=e511]:
+                            - /url: http://theautomaticfilmmaker.com/blog/2009/2/23/about-frame-rates-or-why-2997.html
+                            - img
+                            - generic [ref=e512]: Open Link
+                            - generic [ref=e513]: About Frame Rates or Why 29.97? (opens in new tab)
+                          - 'button "Suggest an edit: About Frame Rates or Why 29.97?" [ref=e514]':
+                            - img
+                    - article [ref=e515] [cursor=pointer]:
+                      - generic [ref=e516]:
+                        - generic [ref=e517]:
+                          - generic [ref=e518]: ◈
+                          - generic [ref=e520]:
+                            - 'button "Favorite to your account — sign in required: ACM Mile-High Video 2025" [ref=e521]':
+                              - generic [ref=e522]:
+                                - img
+                            - 'button "Bookmark on this device — no sign-in required: ACM Mile-High Video 2025" [ref=e523]':
+                              - generic [ref=e524]:
+                                - img
+                        - heading "ACM Mile-High Video 2025" [level=2] [ref=e526]:
+                          - link "ACM Mile-High Video 2025" [ref=e527]:
+                            - /url: /resource/461
+                        - paragraph [ref=e528]: The ACM Mile-High Video 2025 conference features a comprehensive technical program covering topics such as CDN-based video streaming, content-adaptive encoding, video enhancement, AI-generated content, and film grain technology. It includes presentations, panels, and discussions led by industry experts.
+                      - generic [ref=e529]:
+                        - generic [ref=e530]:
+                          - link "View details for ACM Mile-High Video 2025" [ref=e531]:
+                            - /url: /resource/461
+                            - generic [ref=e532]:
+                              - img [ref=e533]
+                              - generic [ref=e535]: View Details
+                          - generic [ref=e536]: Community & Events
+                          - generic [ref=e537]: Events
+                        - generic [ref=e538]:
+                          - link "Open Link ACM Mile-High Video 2025 (opens in new tab)" [ref=e539]:
+                            - /url: https://www.mile-high.video/technical-program
+                            - img
+                            - generic [ref=e540]: Open Link
+                            - generic [ref=e541]: ACM Mile-High Video 2025 (opens in new tab)
+                          - 'button "Suggest an edit: ACM Mile-High Video 2025" [ref=e542]':
+                            - img
+                    - article [ref=e543] [cursor=pointer]:
+                      - generic [ref=e544]:
+                        - generic [ref=e545]:
+                          - generic [ref=e546]: ▥
+                          - generic [ref=e548]:
+                            - 'button "Favorite to your account — sign in required: active-video/subtitles" [ref=e549]':
+                              - generic [ref=e550]:
+                                - img
+                            - 'button "Bookmark on this device — no sign-in required: active-video/subtitles" [ref=e551]':
+                              - generic [ref=e552]:
+                                - img
+                        - heading "active-video/subtitles" [level=2] [ref=e554]:
+                          - link "active-video/subtitles" [ref=e555]:
+                            - /url: /resource/1190
+                        - paragraph [ref=e556]: AV Platform MPEG DASH subtitles.
+                      - generic [ref=e557]:
+                        - generic [ref=e558]:
+                          - link "View details for active-video/subtitles" [ref=e559]:
+                            - /url: /resource/1190
+                            - generic [ref=e560]:
+                              - img [ref=e561]
+                              - generic [ref=e563]: View Details
+                          - generic [ref=e564]: Media Tools
+                        - generic [ref=e565]:
+                          - link "Open Link active-video/subtitles (opens in new tab)" [ref=e566]:
+                            - /url: https://github.com/active-video/subtitles
+                            - img
+                            - generic [ref=e567]: Open Link
+                            - generic [ref=e568]: active-video/subtitles (opens in new tab)
+                          - 'button "Suggest an edit: active-video/subtitles" [ref=e569]':
+                            - img
+                    - article [ref=e570] [cursor=pointer]:
+                      - generic [ref=e571]:
+                        - generic [ref=e572]:
+                          - generic [ref=e573]: ⟁
+                          - generic [ref=e575]:
+                            - 'button "Favorite to your account — sign in required: Ad Creative Signaling in DASH and HLS" [ref=e576]':
+                              - generic [ref=e577]:
+                                - img
+                            - 'button "Bookmark on this device — no sign-in required: Ad Creative Signaling in DASH and HLS" [ref=e578]':
+                              - generic [ref=e579]:
+                                - img
+                        - heading "Ad Creative Signaling in DASH and HLS" [level=2] [ref=e581]:
+                          - link "Ad Creative Signaling in DASH and HLS" [ref=e582]:
+                            - /url: /resource/812
+                        - paragraph [ref=e583]: This project by the Streaming Video Technology Alliance defines a data scheme for signaling advertisement creative assets within DASH manifests and HLS playlists, facilitating better ad integration in streaming workflows.
+                      - generic [ref=e584]:
+                        - generic [ref=e585]:
+                          - link "View details for Ad Creative Signaling in DASH and HLS" [ref=e586]:
+                            - /url: /resource/812
+                            - generic [ref=e587]:
+                              - img [ref=e588]
+                              - generic [ref=e590]: View Details
+                          - generic [ref=e591]: Protocols & Transport
+                        - generic [ref=e592]:
+                          - link "Open Link Ad Creative Signaling in DASH and HLS (opens in new tab)" [ref=e593]:
+                            - /url: https://www.svta.org/project/ad-creative-signaling-in-dash-and-hls/
+                            - img
+                            - generic [ref=e594]: Open Link
+                            - generic [ref=e595]: Ad Creative Signaling in DASH and HLS (opens in new tab)
+                          - 'button "Suggest an edit: Ad Creative Signaling in DASH and HLS" [ref=e596]':
+                            - img
+                    - article [ref=e597] [cursor=pointer]:
+                      - generic [ref=e598]:
+                        - generic [ref=e599]:
+                          - generic [ref=e600]: ▥
+                          - generic [ref=e602]:
+                            - 'button "Favorite to your account — sign in required: Ad Insertion Sample" [ref=e603]':
+                              - generic [ref=e604]:
+                                - img
+                            - 'button "Bookmark on this device — no sign-in required: Ad Insertion Sample" [ref=e605]':
+                              - generic [ref=e606]:
+                                - img
+                        - heading "Ad Insertion Sample" [level=2] [ref=e608]:
+                          - link "Ad Insertion Sample" [ref=e609]:
+                            - /url: /resource/653
+                        - paragraph [ref=e610]: A server-side ad insertion system featuring on-demand video transcoding and streaming, with ad insertion based on video content analysis, powered by Open Visual Cloud software stacks.
+                      - generic [ref=e611]:
+                        - generic [ref=e612]:
+                          - link "View details for Ad Insertion Sample" [ref=e613]:
+                            - /url: /resource/653
+                            - generic [ref=e614]:
+                              - img [ref=e615]
+                              - generic [ref=e617]: View Details
+                          - generic [ref=e618]: Media Tools
+                        - generic [ref=e619]:
+                          - link "Open Link Ad Insertion Sample (opens in new tab)" [ref=e620]:
+                            - /url: https://www.intel.com/content/www/us/en/developer/articles/technical/ad-insertion-sample-powered-by-open-visual-cloud.html
+                            - img
+                            - generic [ref=e621]: Open Link
+                            - generic [ref=e622]: Ad Insertion Sample (opens in new tab)
+                          - 'button "Suggest an edit: Ad Insertion Sample" [ref=e623]':
+                            - img
+                    - article [ref=e624] [cursor=pointer]:
+                      - generic [ref=e625]:
+                        - generic [ref=e626]:
+                          - generic [ref=e627]: ⟁
+                          - generic [ref=e629]:
+                            - 'button "Favorite to your account — sign in required: Adaptive Streaming with MPEG-DASH and HLS using AWS" [ref=e630]':
+                              - generic [ref=e631]:
+                                - img
+                            - 'button "Bookmark on this device — no sign-in required: Adaptive Streaming with MPEG-DASH and HLS using AWS" [ref=e632]':
+                              - generic [ref=e633]:
+                                - img
+                        - heading "Adaptive Streaming with MPEG-DASH and HLS using AWS" [level=2] [ref=e635]:
+                          - link "Adaptive Streaming with MPEG-DASH and HLS using AWS" [ref=e636]:
+                            - /url: /resource/655
+                        - paragraph [ref=e637]: A comprehensive guide detailing the process of setting up adaptive streaming using MPEG-DASH and HLS with AWS services. It covers S3 bucket configuration, Elastic Transcoder usage, and integration with Video.js for playback.
+                      - generic [ref=e638]:
+                        - generic [ref=e639]:
+                          - link "View details for Adaptive Streaming with MPEG-DASH and HLS using AWS" [ref=e640]:
+                            - /url: /resource/655
+                            - generic [ref=e641]:
+                              - img [ref=e642]
+                              - generic [ref=e644]: View Details
+                          - generic [ref=e645]: Protocols & Transport
+                        - generic [ref=e646]:
+                          - link "Open Link Adaptive Streaming with MPEG-DASH and HLS using AWS (opens in new tab)" [ref=e647]:
+                            - /url: https://gist.github.com/PaulRosset/7bf10bf53895b1a53630bc947c8b1834
+                            - img
+                            - generic [ref=e648]: Open Link
+                            - generic [ref=e649]: Adaptive Streaming with MPEG-DASH and HLS using AWS (opens in new tab)
+                          - 'button "Suggest an edit: Adaptive Streaming with MPEG-DASH and HLS using AWS" [ref=e650]':
+                            - img
+                    - article [ref=e651] [cursor=pointer]:
+                      - generic [ref=e652]:
+                        - generic [ref=e653]:
+                          - generic [ref=e654]: ◇
+                          - generic [ref=e656]:
+                            - 'button "Favorite to your account — sign in required: Adobe Media Encoder" [ref=e657]':
+                              - generic [ref=e658]:
+                                - img
+                            - 'button "Bookmark on this device — no sign-in required: Adobe Media Encoder" [ref=e659]':
+                              - generic [ref=e660]:
+                                - img
+                        - heading "Adobe Media Encoder" [level=2] [ref=e662]:
+                          - link "Adobe Media Encoder" [ref=e663]:
+                            - /url: /resource/324
+                        - paragraph [ref=e664]: Adobe Media Encoder is a professional video encoding software that integrates seamlessly with Adobe's suite of creative tools. It supports a wide range of formats and offers features like batch processing, GPU acceleration, and preset templates, making it ideal for high-quality video encoding tasks.
+                      - generic [ref=e665]:
+                        - generic [ref=e666]:
+                          - link "View details for Adobe Media Encoder" [ref=e667]:
+                            - /url: /resource/324
+                            - generic [ref=e668]:
+                              - img [ref=e669]
+                              - generic [ref=e671]: View Details
+                          - generic [ref=e672]: Encoding & Codecs
+                        - generic [ref=e673]:
+                          - link "Open Link Adobe Media Encoder (opens in new tab)" [ref=e674]:
+                            - /url: https://www.adobe.com/products/media-encoder.html
+                            - img
+                            - generic [ref=e675]: Open Link
+                            - generic [ref=e676]: Adobe Media Encoder (opens in new tab)
+                          - 'button "Suggest an edit: Adobe Media Encoder" [ref=e677]':
+                            - img
+                    - article [ref=e678] [cursor=pointer]:
+                      - generic [ref=e679]:
+                        - generic [ref=e680]:
+                          - generic [ref=e681]: ◇
+                          - generic [ref=e683]:
+                            - 'button "Favorite to your account — sign in required: Adobe Media Encoder (AME) Guide" [ref=e684]':
+                              - generic [ref=e685]:
+                                - img
+                            - 'button "Bookmark on this device — no sign-in required: Adobe Media Encoder (AME) Guide" [ref=e686]':
+                              - generic [ref=e687]:
+                                - img
+                        - heading "Adobe Media Encoder (AME) Guide" [level=2] [ref=e689]:
+                          - link "Adobe Media Encoder (AME) Guide" [ref=e690]:
+                            - /url: /resource/1745
+                        - paragraph [ref=e691]: User guide for Adobe Media Encoder, a tool that automates batch transcoding and export from Adobe's video apps. Useful resource for understanding batch encoding settings for various formats and how to optimize output for different platforms.
+                      - generic [ref=e692]:
+                        - generic [ref=e693]:
+                          - link "View details for Adobe Media Encoder (AME) Guide" [ref=e694]:
+                            - /url: /resource/1745
+                            - generic [ref=e695]:
+                              - img [ref=e696]
+                              - generic [ref=e698]: View Details
+                          - generic [ref=e699]: Encoding & Codecs
+                        - generic [ref=e700]:
+                          - link "Open Link Adobe Media Encoder (AME) Guide (opens in new tab)" [ref=e701]:
+                            - /url: https://helpx.adobe.com/media-encoder/user-guide.html
+                            - img
+                            - generic [ref=e702]: Open Link
+                            - generic [ref=e703]: Adobe Media Encoder (AME) Guide (opens in new tab)
+                          - 'button "Suggest an edit: Adobe Media Encoder (AME) Guide" [ref=e704]':
+                            - img
+                    - article [ref=e705] [cursor=pointer]:
+                      - generic [ref=e706]:
+                        - generic [ref=e707]:
+                          - generic [ref=e708]: ◉
+                          - generic [ref=e710]:
+                            - 'button "Favorite to your account — sign in required: Advanced Video Coding (AVC) - H.264/MPEG-4 Part 10" [ref=e711]':
+                              - generic [ref=e712]:
+                                - img
+                            - 'button "Bookmark on this device — no sign-in required: Advanced Video Coding (AVC) - H.264/MPEG-4 Part 10" [ref=e713]':
+                              - generic [ref=e714]:
+                                - img
+                        - heading "Advanced Video Coding (AVC) - H.264/MPEG-4 Part 10" [level=2] [ref=e716]:
+                          - link "Advanced Video Coding (AVC) - H.264/MPEG-4 Part 10" [ref=e717]:
+                            - /url: /resource/425
+                        - paragraph [ref=e718]: An in-depth overview of the H.264/MPEG-4 Part 10 standard, also known as Advanced Video Coding (AVC). This resource provides detailed information on the features, design, and applications of AVC, which is widely used for video compression in various media formats.
+                      - generic [ref=e719]:
+                        - generic [ref=e720]:
+                          - link "View details for Advanced Video Coding (AVC) - H.264/MPEG-4 Part 10" [ref=e721]:
+                            - /url: /resource/425
+                            - generic [ref=e722]:
+                              - img [ref=e723]
+                              - generic [ref=e725]: View Details
+                          - generic [ref=e726]: Standards & Industry
+                          - generic [ref=e727]: Standards
+                        - generic [ref=e728]:
+                          - link "Open Link Advanced Video Coding (AVC) - H.264/MPEG-4 Part 10 (opens in new tab)" [ref=e729]:
+                            - /url: https://en.wikipedia.org/wiki/Advanced_Video_Coding
+                            - img
+                            - generic [ref=e730]: Open Link
+                            - generic [ref=e731]: Advanced Video Coding (AVC) - H.264/MPEG-4 Part 10 (opens in new tab)
+                          - 'button "Suggest an edit: Advanced Video Coding (AVC) - H.264/MPEG-4 Part 10" [ref=e732]':
+                            - img
+                    - article [ref=e733] [cursor=pointer]:
+                      - generic [ref=e734]:
+                        - generic [ref=e735]:
+                          - generic [ref=e736]: ◉
+                          - generic [ref=e738]:
+                            - 'button "Favorite to your account — sign in required: Advanced Video Coding (AVC) Standard" [ref=e739]':
+                              - generic [ref=e740]:
+                                - img
+                            - 'button "Bookmark on this device — no sign-in required: Advanced Video Coding (AVC) Standard" [ref=e741]':
+                              - generic [ref=e742]:
+                                - img
+                        - heading "Advanced Video Coding (AVC) Standard" [level=2] [ref=e744]:
+                          - link "Advanced Video Coding (AVC) Standard" [ref=e745]:
+                            - /url: /resource/4
+                        - paragraph [ref=e746]: Also known as H.264 or MPEG-4 Part 10, AVC is a widely used video compression standard that supports high-definition video and is fundamental in various streaming and broadcasting applications. This resource provides comprehensive information on AVC.
+                      - generic [ref=e747]:
+                        - generic [ref=e748]:
+                          - link "View details for Advanced Video Coding (AVC) Standard" [ref=e749]:
+                            - /url: /resource/4
+                            - generic [ref=e750]:
+                              - img [ref=e751]
+                              - generic [ref=e753]: View Details
+                          - generic [ref=e754]: Standards & Industry
+                        - generic [ref=e755]:
+                          - link "Open Link Advanced Video Coding (AVC) Standard (opens in new tab)" [ref=e756]:
+                            - /url: https://www.itu.int/rec/T-REC-H.264
+                            - img
+                            - generic [ref=e757]: Open Link
+                            - generic [ref=e758]: Advanced Video Coding (AVC) Standard (opens in new tab)
+                          - 'button "Suggest an edit: Advanced Video Coding (AVC) Standard" [ref=e759]':
+                            - img
+                    - article [ref=e760] [cursor=pointer]:
+                      - generic [ref=e761]:
+                        - generic [ref=e762]:
+                          - generic [ref=e763]: ⟁
+                          - generic [ref=e765]:
+                            - 'button "Favorite to your account — sign in required: Advances in HTTP Live Streaming - WWDC 2017 - Videos - Apple Developer" [ref=e766]':
+                              - generic [ref=e767]:
+                                - img
+                            - 'button "Bookmark on this device — no sign-in required: Advances in HTTP Live Streaming - WWDC 2017 - Videos - Apple Developer" [ref=e768]':
+                              - generic [ref=e769]:
+                                - img
+                        - heading "Advances in HTTP Live Streaming - WWDC 2017 - Videos - Apple Developer" [level=2] [ref=e771]:
+                          - link "Advances in HTTP Live Streaming - WWDC 2017 - Videos - Apple Developer" [ref=e772]:
+                            - /url: /resource/1015
+                        - paragraph [ref=e773]: HTTP Live Streaming allows you to stream live and on-demand content to global audiences. Learn about great new features and enhancements...
+                      - generic [ref=e774]:
+                        - generic [ref=e775]:
+                          - link "View details for Advances in HTTP Live Streaming - WWDC 2017 - Videos - Apple Developer" [ref=e776]:
+                            - /url: /resource/1015
+                            - generic [ref=e777]:
+                              - img [ref=e778]
+                              - generic [ref=e780]: View Details
+                          - generic [ref=e781]: Protocols & Transport
+                          - generic [ref=e782]: Protocols
+                        - generic [ref=e783]:
+                          - link "Open Link Advances in HTTP Live Streaming - WWDC 2017 - Videos - Apple Developer (opens in new tab)" [ref=e784]:
+                            - /url: https://developer.apple.com/videos/play/wwdc2017/504/
+                            - img
+                            - generic [ref=e785]: Open Link
+                            - generic [ref=e786]: Advances in HTTP Live Streaming - WWDC 2017 - Videos - Apple Developer (opens in new tab)
+                          - 'button "Suggest an edit: Advances in HTTP Live Streaming - WWDC 2017 - Videos - Apple Developer" [ref=e787]':
+                            - img
+                    - article [ref=e788] [cursor=pointer]:
+                      - generic [ref=e789]:
+                        - generic [ref=e790]:
+                          - generic [ref=e791]: ▶
+                          - generic [ref=e793]:
+                            - 'button "Favorite to your account — sign in required: Advantech VEGA Video Solutions" [ref=e794]':
+                              - generic [ref=e795]:
+                                - img
+                            - 'button "Bookmark on this device — no sign-in required: Advantech VEGA Video Solutions" [ref=e796]':
+                              - generic [ref=e797]:
+                                - img
+                        - heading "Advantech VEGA Video Solutions" [level=2] [ref=e799]:
+                          - link "Advantech VEGA Video Solutions" [ref=e800]:
+                            - /url: /resource/762
+                        - paragraph [ref=e801]: Advantech's VEGA series offers hardware-accelerated video processing platforms designed for high-density media solutions. These platforms support real-time HEVC encoding, significantly reducing power consumption and cost compared to software-only solutions. They are ideal for applications requiring UHD HEVC broadcast encoding and high-density OTT video transcoding.
+                      - generic [ref=e802]:
+                        - generic [ref=e803]:
+                          - link "View details for Advantech VEGA Video Solutions" [ref=e804]:
+                            - /url: /resource/762
+                            - generic [ref=e805]:
+                              - img [ref=e806]
+                              - generic [ref=e808]: View Details
+                          - generic [ref=e809]: Players & Clients
+                        - generic [ref=e810]:
+                          - link "Open Link Advantech VEGA Video Solutions (opens in new tab)" [ref=e811]:
+                            - /url: https://www.advantech.com/en-us/networks-communications/video/overview
+                            - img
+                            - generic [ref=e812]: Open Link
+                            - generic [ref=e813]: Advantech VEGA Video Solutions (opens in new tab)
+                          - 'button "Suggest an edit: Advantech VEGA Video Solutions" [ref=e814]':
+                            - img
+                  - navigation "Pagination" [ref=e815]:
+                    - generic [ref=e816]:
+                      - generic:
+                        - img
+                        - text: Previous
+                      - link "Page 1, current page" [ref=e817] [cursor=pointer]:
+                        - /url: /search?q=video&sort=name-asc
+                        - text: "1"
+                      - link "Go to page 2" [ref=e818] [cursor=pointer]:
+                        - /url: /search?q=video&sort=name-asc&page=2
+                        - text: "2"
+                      - generic [ref=e819]: …
+                      - link "Go to page 49" [ref=e820] [cursor=pointer]:
+                        - /url: /search?q=video&sort=name-asc&page=49
+                        - text: "49"
+                      - link "Next" [ref=e821] [cursor=pointer]:
+                        - /url: /search?q=video&sort=name-asc&page=2
+                        - text: Next
+                        - img
+                    - generic [ref=e822]:
+                      - generic [ref=e823]: Page 1 of 49
+                      - generic [ref=e824]:
+                        - generic [ref=e825] [cursor=pointer]: Go to page
+                        - textbox "Page number, 1 to 49" [ref=e826]: "1"
+                        - generic [ref=e827]: / 49
+                    - status [ref=e828]
+        - contentinfo [ref=e829]:
+          - generic [ref=e830]:
+            - generic [ref=e831]:
+              - paragraph [ref=e832]: ── INDEX
+              - link "awesome.video home" [ref=e833] [cursor=pointer]:
+                - /url: /
+                - text: awesome.video
+              - paragraph [ref=e834]: A curated collection of awesome video resources, tools, and technologies for developers and content creators
+            - generic [ref=e836]:
+              - heading "INDEXED" [level=2] [ref=e837]
+              - paragraph [ref=e838]: 1,949
+              - paragraph [ref=e839]:
+                - text: 9 categories
+                - text: 18 subcategories
+                - generic [ref=e840]: live
+            - navigation "Explore categories" [ref=e842]:
+              - heading "EXPLORE" [level=2] [ref=e843]
+              - generic [ref=e844]:
+                - link "Community & Events" [ref=e845] [cursor=pointer]:
+                  - /url: /category/community-events
+                  - generic [ref=e846]: ◈
+                  - generic [ref=e847]: Community
+                - link "Encoding & Codecs" [ref=e848] [cursor=pointer]:
+                  - /url: /category/encoding-codecs
+                  - generic [ref=e849]: ◇
+                  - generic [ref=e850]: Encoding
+                - link "General Tools" [ref=e851] [cursor=pointer]:
+                  - /url: /category/general-tools
+                  - generic [ref=e852]: ◆
+                  - generic [ref=e853]: General
+                - link "Infrastructure & Delivery" [ref=e854] [cursor=pointer]:
+                  - /url: /category/infrastructure-delivery
+                  - generic [ref=e855]: ▣
+                  - generic [ref=e856]: Infrastructure
+                - link "Intro & Learning" [ref=e857] [cursor=pointer]:
+                  - /url: /category/intro-learning
+                  - generic [ref=e858]: ▤
+                  - generic [ref=e859]: Intro
+                - link "Media Tools" [ref=e860] [cursor=pointer]:
+                  - /url: /category/media-tools
+                  - generic [ref=e861]: ▥
+                  - generic [ref=e862]: Media
+                - link "Players & Clients" [ref=e863] [cursor=pointer]:
+                  - /url: /category/players-clients
+                  - generic [ref=e864]: ▶
+                  - generic [ref=e865]: Players
+                - link "Protocols & Transport" [ref=e866] [cursor=pointer]:
+                  - /url: /category/protocols-transport
+                  - generic [ref=e867]: ⟁
+                  - generic [ref=e868]: Protocols
+                - link "Standards & Industry" [ref=e869] [cursor=pointer]:
+                  - /url: /category/standards-industry
+                  - generic [ref=e870]: ◉
+                  - generic [ref=e871]: Standards
+            - generic [ref=e872]:
+              - heading "SOURCE" [level=2] [ref=e873]
+              - link "krzemienski/awesome-video" [ref=e874] [cursor=pointer]:
+                - /url: https://github.com/krzemienski/awesome-video
+                - img [ref=e875]
+                - generic [ref=e877]:
+                  - text: krzemienski
+                  - generic [ref=e878]:
+                    - text: /
+                    - text: awesome-video
+                - generic [ref=e879]: ↗
+              - paragraph [ref=e880]:
+                - text: Open-source.
+                - link "PRs welcome" [ref=e881] [cursor=pointer]:
+                  - /url: https://github.com/krzemienski/awesome-video/blob/master/CONTRIBUTING.md
+                - text: .
+                - text: Indexed automatically from README.md.
+          - generic [ref=e882]:
+            - generic [ref=e883]: © 2026 awesome.video · content CC0, code MIT
+            - navigation "Site policies" [ref=e884]:
+              - link "About" [ref=e885] [cursor=pointer]:
+                - /url: /about
+              - link "Terms" [ref=e886] [cursor=pointer]:
+                - /url: /terms
+              - link "Privacy" [ref=e887] [cursor=pointer]:
+                - /url: /privacy
+              - link "Code of Conduct" [ref=e888] [cursor=pointer]:
+                - /url: /code-of-conduct
+                - text: Conduct
+              - link "Issues ↗" [ref=e889] [cursor=pointer]:
+                - /url: https://github.com/krzemienski/awesome-video/issues
+              - link "Sitemap" [ref=e890] [cursor=pointer]:
+                - /url: /sitemap.xml
+            - generic [ref=e891]: built with the awesome-list framework

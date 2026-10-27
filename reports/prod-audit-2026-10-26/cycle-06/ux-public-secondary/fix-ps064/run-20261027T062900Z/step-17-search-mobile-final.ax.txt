@@ -1,0 +1,1183 @@
+- generic:
+  - generic:
+    - list
+    - generic:
+      - link:
+        - /url: "#main"
+        - text: Skip to main content
+      - generic:
+        - banner:
+          - generic:
+            - button:
+              - generic: Toggle sidebar
+            - img
+          - link:
+            - /url: /
+            - generic: av
+            - generic: AWESOME.VIDEO home
+          - button:
+            - img
+            - generic: Search 1,949 resources
+          - button:
+            - generic:
+              - img
+            - generic: Sign in, account menu
+        - generic:
+          - generic:
+            - main:
+              - generic:
+                - navigation:
+                  - list:
+                    - listitem:
+                      - link:
+                        - /url: /
+                        - text: Home
+                    - listitem:
+                      - img
+                - generic:
+                  - generic:
+                    - generic:
+                      - img
+                      - generic:
+                        - heading [level=1]: Search
+                        - paragraph: A precise index of tools, standards, and ideas for video developers.
+                    - generic:
+                      - generic:
+                        - img
+                        - textbox:
+                          - /placeholder: Search resources...
+                          - text: video
+                      - generic:
+                        - generic: Sort
+                        - combobox:
+                          - generic: Relevance
+                          - img
+                  - generic:
+                    - generic:
+                      - button [expanded]:
+                        - img
+                        - text: Filters
+                    - region "Search results":
+                      - paragraph: Page 1 of 49 · showing 1–24 of 1159 results for “video”
+                      - generic:
+                        - article:
+                          - generic:
+                            - generic:
+                              - generic: ▥
+                              - generic:
+                                - generic:
+                                  - button:
+                                    - generic:
+                                      - img
+                                  - button:
+                                    - generic:
+                                      - img
+                            - generic:
+                              - heading [level=2]:
+                                - link:
+                                  - /url: /resource/441
+                                  - text: Renee Video Editor Pro
+                            - paragraph: Renee Video Editor Pro is a comprehensive video editing software that allows users to add subtitles and text to videos effortlessly. It supports various video formats and provides multiple editing tools, including cutting, merging, cropping, rotating, and transforming videos. Users can change and add background music, subtitles, and remove watermarks from videos. The software also supports format conversion, enabling users to convert videos and audios into different formats. Additionally, it offers screen recording capabilities, allowing users to record screen and webcam activities on Windows computers. The intuitive interface and diverse functionalities make it suitable for both beginners and professionals.
+                          - generic:
+                            - generic:
+                              - link:
+                                - /url: /resource/441
+                                - generic:
+                                  - img
+                                  - generic: View Details
+                              - generic: Media Tools
+                            - generic:
+                              - link:
+                                - /url: https://www.reneelab.com/add-subtitles-to-video.html
+                                - img
+                                - generic: Open Link
+                                - generic: Renee Video Editor Pro (opens in new tab)
+                              - button:
+                                - img
+                        - article:
+                          - generic:
+                            - generic:
+                              - generic: ▣
+                              - generic:
+                                - generic:
+                                  - button:
+                                    - generic:
+                                      - img
+                                  - button:
+                                    - generic:
+                                      - img
+                            - generic:
+                              - heading [level=2]:
+                                - link:
+                                  - /url: /resource/544
+                                  - text: Cloudinary Video Management Platform
+                            - paragraph: Cloudinary offers a comprehensive cloud-based video content management solution for developers. It provides APIs and UI widgets for video upload, real-time video transcoding and manipulation via CDN delivery URLs, a customizable video player with user engagement analytics, live video streaming directly from web and mobile apps, and AI-based video tagging and transcription. This platform simplifies the video workflow for web and mobile developers while enhancing the end-user experience.
+                          - generic:
+                            - generic:
+                              - link:
+                                - /url: /resource/544
+                                - generic:
+                                  - img
+                                  - generic: View Details
+                              - generic: Infrastructure & Delivery
+                            - generic:
+                              - link:
+                                - /url: https://cloudinary.com/blog/introducing_the_complete_video_solution_for_web_and_mobile_developers
+                                - img
+                                - generic: Open Link
+                                - generic: Cloudinary Video Management Platform (opens in new tab)
+                              - button:
+                                - img
+                        - article:
+                          - generic:
+                            - generic:
+                              - generic: ▥
+                              - generic:
+                                - generic:
+                                  - button:
+                                    - generic:
+                                      - img
+                                  - button:
+                                    - generic:
+                                      - img
+                            - generic:
+                              - heading [level=2]:
+                                - link:
+                                  - /url: /resource/197
+                                  - text: Kapwing
+                            - paragraph: Kapwing is a user-friendly AI tool that allows users to easily add subtitles, captions, and annotations to videos. It’s ideal for non-profit video production, where making video content accessible to a diverse audience is essential. Kapwing offers automatic captioning, helping to increase the accessibility of videos. The platform supports various video formats and provides options for optimizing video titles and adding metadata, which helps improve search rankings on video platforms.
+                          - generic:
+                            - generic:
+                              - link:
+                                - /url: /resource/197
+                                - generic:
+                                  - img
+                                  - generic: View Details
+                              - generic: Media Tools
+                            - generic:
+                              - link:
+                                - /url: https://thinkbrandedmedia.com/the-best-ai-tools-for-adding-subtitles-improve-your-videos-and-retain-customers/
+                                - img
+                                - generic: Open Link
+                                - generic: Kapwing (opens in new tab)
+                              - button:
+                                - img
+                        - article:
+                          - generic:
+                            - generic:
+                              - generic: ▣
+                              - generic:
+                                - generic:
+                                  - button:
+                                    - generic:
+                                      - img
+                                  - button:
+                                    - generic:
+                                      - img
+                            - generic:
+                              - heading [level=2]:
+                                - link:
+                                  - /url: /resource/660
+                                  - text: Cloudinary Video API
+                            - paragraph: Cloudinary provides a cloud-based video content management solution with APIs for uploading, storing, transcoding, and delivering videos. It offers real-time video manipulation, customizable video players, live streaming capabilities, and AI-based video tagging and transcription, simplifying video workflows for developers.
+                          - generic:
+                            - generic:
+                              - link:
+                                - /url: /resource/660
+                                - generic:
+                                  - img
+                                  - generic: View Details
+                              - generic: Infrastructure & Delivery
+                            - generic:
+                              - link:
+                                - /url: https://cloudinary.com/video_api
+                                - img
+                                - generic: Open Link
+                                - generic: Cloudinary Video API (opens in new tab)
+                              - button:
+                                - img
+                        - article:
+                          - generic:
+                            - generic:
+                              - generic: ▣
+                              - generic:
+                                - generic:
+                                  - button:
+                                    - generic:
+                                      - img
+                                  - button:
+                                    - generic:
+                                      - img
+                            - generic:
+                              - heading [level=2]:
+                                - link:
+                                  - /url: /resource/417
+                                  - text: Cloudinary Video CDN
+                            - paragraph: Cloudinary provides a comprehensive Video CDN solution that enhances video delivery through features like adaptive bitrate streaming, video prefetching for live events, and optimized video formats for various devices. It also offers advanced capabilities such as dynamic overlays, allowing developers to add text, images, or other videos over the main video stream, facilitating personalized and interactive content delivery.
+                          - generic:
+                            - generic:
+                              - link:
+                                - /url: /resource/417
+                                - generic:
+                                  - img
+                                  - generic: View Details
+                              - generic: Infrastructure & Delivery
+                            - generic:
+                              - link:
+                                - /url: https://cloudinary.com/guides/web-performance/video-cdn-why-you-need-it-and-top-5-video-cdns
+                                - img
+                                - generic: Open Link
+                                - generic: Cloudinary Video CDN (opens in new tab)
+                              - button:
+                                - img
+                        - article:
+                          - generic:
+                            - generic:
+                              - generic: ▶
+                              - generic:
+                                - generic:
+                                  - button:
+                                    - generic:
+                                      - img
+                                  - button:
+                                    - generic:
+                                      - img
+                            - generic:
+                              - heading [level=2]:
+                                - link:
+                                  - /url: /resource/182
+                                  - text: Hardware Video Streaming
+                            - paragraph: Hardware Video Streaming is a meta repository encompassing several projects focused on hardware-accelerated video encoding and streaming. It includes components like HVE (Hardware Video Encoder), MLSP (Minimal Latency Streaming Protocol), NHVD (Network Hardware Video Decoder), and NHVE (Network Hardware Video Encoder). These tools facilitate efficient video streaming with low latency, leveraging hardware acceleration for improved performance.
+                          - generic:
+                            - generic:
+                              - link:
+                                - /url: /resource/182
+                                - generic:
+                                  - img
+                                  - generic: View Details
+                              - generic: Players & Clients
+                            - generic:
+                              - link:
+                                - /url: https://github.com/bmegli/hardware-video-streaming
+                                - img
+                                - generic: Open Link
+                                - generic: Hardware Video Streaming (opens in new tab)
+                              - button:
+                                - img
+                        - article:
+                          - generic:
+                            - generic:
+                              - generic: ◈
+                              - generic:
+                                - generic:
+                                  - button:
+                                    - generic:
+                                      - img
+                                  - button:
+                                    - generic:
+                                      - img
+                            - generic:
+                              - heading [level=2]:
+                                - link:
+                                  - /url: /resource/499
+                                  - text: Digital Video Talk Forum on DPReview
+                            - paragraph: The Digital Video Talk Forum on DPReview is a community where videographers and video editors discuss topics related to videography, video editing, and equipment. It's a valuable platform for sharing knowledge and seeking advice on video production.
+                          - generic:
+                            - generic:
+                              - link:
+                                - /url: /resource/499
+                                - generic:
+                                  - img
+                                  - generic: View Details
+                              - generic: Community & Events
+                            - generic:
+                              - link:
+                                - /url: https://www.dpreview.com/forums/1009
+                                - img
+                                - generic: Open Link
+                                - generic: Digital Video Talk Forum on DPReview (opens in new tab)
+                              - button:
+                                - img
+                        - article:
+                          - generic:
+                            - generic:
+                              - generic: ◉
+                              - generic:
+                                - generic:
+                                  - button:
+                                    - generic:
+                                      - img
+                                  - button:
+                                    - generic:
+                                      - img
+                            - generic:
+                              - heading [level=2]:
+                                - link:
+                                  - /url: /resource/339
+                                  - text: "Awesome Video: A Curated List of Streaming Video Tools and Resources"
+                            - paragraph: Awesome Video is a curated list of streaming video tools, frameworks, libraries, and learning resources. It covers various aspects of video technology, including DASH, AV1, and video containers, providing valuable information for developers interested in video streaming and encoding.
+                          - generic:
+                            - generic:
+                              - link:
+                                - /url: /resource/339
+                                - generic:
+                                  - img
+                                  - generic: View Details
+                              - generic: Standards & Industry
+                              - generic: Tools & SDKs
+                            - generic:
+                              - link:
+                                - /url: https://github.com/krzemienski/awesome-video
+                                - img
+                                - generic: Open Link
+                                - generic: "Awesome Video: A Curated List of Streaming Video Tools and Resources (opens in new tab)"
+                              - button:
+                                - img
+                        - article:
+                          - generic:
+                            - generic:
+                              - generic: ▤
+                              - generic:
+                                - generic:
+                                  - button:
+                                    - generic:
+                                      - img
+                                  - button:
+                                    - generic:
+                                      - img
+                            - generic:
+                              - heading [level=2]:
+                                - link:
+                                  - /url: /resource/433
+                                  - text: "The State of Video Codecs: Evolution of Compression in a Video-First Economy"
+                            - paragraph: This white paper by InterDigital explores the landscape of video compression technology, detailing the history of video coding standards and examining the advantages of modern codecs. It provides a comprehensive overview of the evolution of video compression, making it a valuable resource for understanding the current state and future of video coding.
+                          - generic:
+                            - generic:
+                              - link:
+                                - /url: /resource/433
+                                - generic:
+                                  - img
+                                  - generic: View Details
+                              - generic: Intro & Learning
+                            - generic:
+                              - link:
+                                - /url: https://www.interdigital.com/white_papers/the-state-of-video-codecs-evolution-of-compression-in-a-video-first-economy-
+                                - img
+                                - generic: Open Link
+                                - generic: "The State of Video Codecs: Evolution of Compression in a Video-First Economy (opens in new tab)"
+                              - button:
+                                - img
+                        - article:
+                          - generic:
+                            - generic:
+                              - generic: ◆
+                              - generic:
+                                - generic:
+                                  - button:
+                                    - generic:
+                                      - img
+                                  - button:
+                                    - generic:
+                                      - img
+                            - generic:
+                              - heading [level=2]:
+                                - link:
+                                  - /url: /resource/82
+                                  - text: media-tools
+                            - paragraph: media-tools is a video processing pipeline that leverages the FFmpeg command-line interface to perform various video manipulations. It includes functionalities such as downloading videos from YouTube, compressing videos, cutting segments, applying effects like blur and gamma correction, and converting videos to different formats. This project is valuable for developers looking to automate complex video processing workflows using FFmpeg.
+                          - generic:
+                            - generic:
+                              - link:
+                                - /url: /resource/82
+                                - generic:
+                                  - img
+                                  - generic: View Details
+                              - generic: General Tools
+                            - generic:
+                              - link:
+                                - /url: https://github.com/MartinCastroAlvarez/media-tools
+                                - img
+                                - generic: Open Link
+                                - generic: media-tools (opens in new tab)
+                              - button:
+                                - img
+                        - article:
+                          - generic:
+                            - generic:
+                              - generic: ▤
+                              - generic:
+                                - generic:
+                                  - button:
+                                    - generic:
+                                      - img
+                                  - button:
+                                    - generic:
+                                      - img
+                            - generic:
+                              - heading [level=2]:
+                                - link:
+                                  - /url: /resource/468
+                                  - text: Digital Video
+                            - paragraph: The Wikipedia page on Digital Video provides an overview of digital video technologies, including the history of video compression standards from H.261 to HEVC. It discusses the evolution of video coding formats and their applications, offering a broad perspective on digital video development.
+                          - generic:
+                            - generic:
+                              - link:
+                                - /url: /resource/468
+                                - generic:
+                                  - img
+                                  - generic: View Details
+                              - generic: Intro & Learning
+                              - generic: Standards
+                            - generic:
+                              - link:
+                                - /url: https://en.wikipedia.org/wiki/Digital_video
+                                - img
+                                - generic: Open Link
+                                - generic: Digital Video (opens in new tab)
+                              - button:
+                                - img
+                        - article:
+                          - generic:
+                            - generic:
+                              - generic: ◈
+                              - generic:
+                                - generic:
+                                  - button:
+                                    - generic:
+                                      - img
+                                  - button:
+                                    - generic:
+                                      - img
+                            - generic:
+                              - heading [level=2]:
+                                - link:
+                                  - /url: /resource/376
+                                  - text: VideoHelp Forum
+                            - paragraph: The VideoHelp Forum is a comprehensive platform covering a wide range of topics related to video technology, including video conversion, editing, authoring, and capturing. It serves as a valuable resource for developers and enthusiasts seeking advice, tutorials, and discussions on various video-related tools and techniques.
+                          - generic:
+                            - generic:
+                              - link:
+                                - /url: /resource/376
+                                - generic:
+                                  - img
+                                  - generic: View Details
+                              - generic: Community & Events
+                            - generic:
+                              - link:
+                                - /url: https://forum.videohelp.com/
+                                - img
+                                - generic: Open Link
+                                - generic: VideoHelp Forum (opens in new tab)
+                              - button:
+                                - img
+                        - article:
+                          - generic:
+                            - generic:
+                              - generic: ◈
+                              - generic:
+                                - generic:
+                                  - button:
+                                    - generic:
+                                      - img
+                                  - button:
+                                    - generic:
+                                      - img
+                            - generic:
+                              - heading [level=2]:
+                                - link:
+                                  - /url: /resource/424
+                                  - text: Canon Video Forums
+                            - paragraph: The Canon Video Forums provide a platform for discussions related to Canon's video products, including camcorders, professional video equipment, and video accessories. Users can seek advice, share experiences, and discuss technical aspects, making it a valuable community for developers and professionals working with Canon's video technology.
+                          - generic:
+                            - generic:
+                              - link:
+                                - /url: /resource/424
+                                - generic:
+                                  - img
+                                  - generic: View Details
+                              - generic: Community & Events
+                            - generic:
+                              - link:
+                                - /url: https://community.usa.canon.com/t5/Video/ct-p/videosolutions
+                                - img
+                                - generic: Open Link
+                                - generic: Canon Video Forums (opens in new tab)
+                              - button:
+                                - img
+                        - article:
+                          - generic:
+                            - generic:
+                              - generic: ▥
+                              - generic:
+                                - generic:
+                                  - button:
+                                    - generic:
+                                      - img
+                                  - button:
+                                    - generic:
+                                      - img
+                            - generic:
+                              - heading [level=2]:
+                                - link:
+                                  - /url: /resource/62
+                                  - text: videojs-contrib-ads
+                            - paragraph: A Video.js plugin that provides a framework for creating ad integrations, offering a set of events and methods to manage ad playback and content video interactions.
+                          - generic:
+                            - generic:
+                              - link:
+                                - /url: /resource/62
+                                - generic:
+                                  - img
+                                  - generic: View Details
+                              - generic: Media Tools
+                              - generic: Libraries
+                            - generic:
+                              - link:
+                                - /url: https://videojs.github.io/videojs-contrib-ads/integrator/getting-started.html
+                                - img
+                                - generic: Open Link
+                                - generic: videojs-contrib-ads (opens in new tab)
+                              - button:
+                                - img
+                        - article:
+                          - generic:
+                            - generic:
+                              - generic: ▣
+                              - generic:
+                                - generic:
+                                  - button:
+                                    - generic:
+                                      - img
+                                  - button:
+                                    - generic:
+                                      - img
+                            - generic:
+                              - heading [level=2]:
+                                - link:
+                                  - /url: /resource/659
+                                  - text: Brightcove Video Cloud
+                            - paragraph: Brightcove Video Cloud is a comprehensive online video platform offering APIs and SDKs for developers to integrate video ingestion, transcoding, content management, and delivery into their applications. It supports live streaming, interactive video, monetization, DRM, and analytics, enabling developers to build robust video solutions.
+                          - generic:
+                            - generic:
+                              - link:
+                                - /url: /resource/659
+                                - generic:
+                                  - img
+                                  - generic: View Details
+                              - generic: Infrastructure & Delivery
+                              - generic: Libraries
+                            - generic:
+                              - link:
+                                - /url: https://dev.web-origin.brightcove.com/en/online-video-platform/platform-and-apis
+                                - img
+                                - generic: Open Link
+                                - generic: Brightcove Video Cloud (opens in new tab)
+                              - button:
+                                - img
+                        - article:
+                          - generic:
+                            - generic:
+                              - generic: ◉
+                              - generic:
+                                - generic:
+                                  - button:
+                                    - generic:
+                                      - img
+                                  - button:
+                                    - generic:
+                                      - img
+                            - generic:
+                              - heading [level=2]:
+                                - link:
+                                  - /url: /resource/261
+                                  - text: ISO/IEC TR 23008-15:2018
+                            - paragraph: This ISO/IEC Technical Report reviews approaches for processing and coding HDR/WCG video content. It provides methods for operating AVC or HEVC video coding systems adapted for compressing HDR/WCG video for consumer distribution applications. The document includes a review of video usability information (VUI) indicators and supplemental enhancement information (SEI) messages applicable for HDR/WCG video, as well as descriptions of processing steps for converting from 4:4:4 RGB linear light representation to video signals with ICTCP color representation and PQ transfer function, or with Y'CbCr color representation and HLG transfer function.
+                          - generic:
+                            - generic:
+                              - link:
+                                - /url: /resource/261
+                                - generic:
+                                  - img
+                                  - generic: View Details
+                              - generic: Standards & Industry
+                            - generic:
+                              - link:
+                                - /url: https://www.iso.org/standard/72656.html
+                                - img
+                                - generic: Open Link
+                                - generic: ISO/IEC TR 23008-15:2018 (opens in new tab)
+                              - button:
+                                - img
+                        - article:
+                          - generic:
+                            - generic:
+                              - generic: ▣
+                              - generic:
+                                - generic:
+                                  - button:
+                                    - generic:
+                                      - img
+                                  - button:
+                                    - generic:
+                                      - img
+                            - generic:
+                              - heading [level=2]:
+                                - link:
+                                  - /url: /resource/460
+                                  - text: Panopto Video Cloud Platform
+                            - paragraph: Panopto's Video Cloud Platform provides secure storage and management of video content, enabling organizations to host private, internal videos with ease. It offers features like elastic scaling, regional hosting options, and intelligent video content delivery, ensuring optimal playback across devices. This platform is particularly beneficial for enterprises looking to manage and deliver video content efficiently.
+                          - generic:
+                            - generic:
+                              - link:
+                                - /url: /resource/460
+                                - generic:
+                                  - img
+                                  - generic: View Details
+                              - generic: Infrastructure & Delivery
+                            - generic:
+                              - link:
+                                - /url: https://www.panopto.com/features/video-cms/video-cloud/
+                                - img
+                                - generic: Open Link
+                                - generic: Panopto Video Cloud Platform (opens in new tab)
+                              - button:
+                                - img
+                        - article:
+                          - generic:
+                            - generic:
+                              - generic: ▣
+                              - generic:
+                                - generic:
+                                  - button:
+                                    - generic:
+                                      - img
+                                  - button:
+                                    - generic:
+                                      - img
+                            - generic:
+                              - heading [level=2]:
+                                - link:
+                                  - /url: /resource/703
+                                  - text: Qencode Cloud Video Services
+                            - paragraph: Qencode offers a suite of cloud-based video services, including video transcoding, live streaming, media storage, and content delivery. Their APIs allow developers to transcode videos into various formats and codecs, launch high-quality live streams globally, and manage media storage efficiently. The platform also provides a customizable HTML5 video player and features like per-title encoding to optimize file sizes using AI-powered video optimization.
+                          - generic:
+                            - generic:
+                              - link:
+                                - /url: /resource/703
+                                - generic:
+                                  - img
+                                  - generic: View Details
+                              - generic: Infrastructure & Delivery
+                            - generic:
+                              - link:
+                                - /url: https://cloud.qencode.com/
+                                - img
+                                - generic: Open Link
+                                - generic: Qencode Cloud Video Services (opens in new tab)
+                              - button:
+                                - img
+                        - article:
+                          - generic:
+                            - generic:
+                              - generic: ◈
+                              - generic:
+                                - generic:
+                                  - button:
+                                    - generic:
+                                      - img
+                                  - button:
+                                    - generic:
+                                      - img
+                            - generic:
+                              - heading [level=2]:
+                                - link:
+                                  - /url: /resource/16
+                                  - text: Denver Video Technology Meetup
+                            - paragraph: The Denver Video Technology meetup is for individuals interested in the technology behind video and video publishing, focusing on software development. Topics include video streaming, transcoding, codecs, and open standards, emphasizing the software aspects of video technology.
+                          - generic:
+                            - generic:
+                              - link:
+                                - /url: /resource/16
+                                - generic:
+                                  - img
+                                  - generic: View Details
+                              - generic: Community & Events
+                            - generic:
+                              - link:
+                                - /url: https://www.meetup.com/Denver-Digital-Video/
+                                - img
+                                - generic: Open Link
+                                - generic: Denver Video Technology Meetup (opens in new tab)
+                              - button:
+                                - img
+                        - article:
+                          - generic:
+                            - generic:
+                              - generic: ◆
+                              - generic:
+                                - generic:
+                                  - button:
+                                    - generic:
+                                      - img
+                                  - button:
+                                    - generic:
+                                      - img
+                            - generic:
+                              - heading [level=2]:
+                                - link:
+                                  - /url: /resource/422
+                                  - text: Fast Video Cataloger Scripting
+                            - paragraph: Fast Video Cataloger offers scripting support for managing video databases, allowing users to create custom user interfaces and extend functionalities using C#. It provides access to the .NET library and supports external libraries, making it suitable for developers looking to customize video cataloging solutions.
+                          - generic:
+                            - generic:
+                              - link:
+                                - /url: /resource/422
+                                - generic:
+                                  - img
+                                  - generic: View Details
+                              - generic: General Tools
+                            - generic:
+                              - link:
+                                - /url: https://videocataloger.com/feature1/scripting-in-fast-video-cataloger/
+                                - img
+                                - generic: Open Link
+                                - generic: Fast Video Cataloger Scripting (opens in new tab)
+                              - button:
+                                - img
+                        - article:
+                          - generic:
+                            - generic:
+                              - generic: ▶
+                              - generic:
+                                - generic:
+                                  - button:
+                                    - generic:
+                                      - img
+                                  - button:
+                                    - generic:
+                                      - img
+                            - generic:
+                              - heading [level=2]:
+                                - link:
+                                  - /url: /resource/550
+                                  - text: IVB - Interactive Video Builder
+                            - paragraph: IVB is an open-source interactive video builder that supports learning analytics. It allows educators and developers to create interactive video-based learning environments using open-source technologies. IVB integrates with MediaElement, an open-source HTML5 video player, to provide a seamless video playback experience.
+                          - generic:
+                            - generic:
+                              - link:
+                                - /url: /resource/550
+                                - generic:
+                                  - img
+                                  - generic: View Details
+                              - generic: Players & Clients
+                            - generic:
+                              - link:
+                                - /url: https://github.com/kleftodimos/IVB-An-interactive-video-builder-that-supports-learning-analytics
+                                - img
+                                - generic: Open Link
+                                - generic: IVB - Interactive Video Builder (opens in new tab)
+                              - button:
+                                - img
+                        - article:
+                          - generic:
+                            - generic:
+                              - generic: ▣
+                              - generic:
+                                - generic:
+                                  - button:
+                                    - generic:
+                                      - img
+                                  - button:
+                                    - generic:
+                                      - img
+                            - generic:
+                              - heading [level=2]:
+                                - link:
+                                  - /url: /resource/484
+                                  - text: Video on Demand on AWS Foundation
+                            - paragraph: This AWS solution provides a customizable architecture to build a video-on-demand workflow. It automatically provisions the necessary AWS services to create a scalable, distributed video-on-demand system, facilitating efficient video processing and delivery.
+                          - generic:
+                            - generic:
+                              - link:
+                                - /url: /resource/484
+                                - generic:
+                                  - img
+                                  - generic: View Details
+                              - generic: Infrastructure & Delivery
+                            - generic:
+                              - link:
+                                - /url: https://docs.aws.amazon.com/solutions/latest/video-on-demand-on-aws-foundation/solution-overview.html
+                                - img
+                                - generic: Open Link
+                                - generic: Video on Demand on AWS Foundation (opens in new tab)
+                              - button:
+                                - img
+                        - article:
+                          - generic:
+                            - generic:
+                              - generic: ◇
+                              - generic:
+                                - generic:
+                                  - button:
+                                    - generic:
+                                      - img
+                                  - button:
+                                    - generic:
+                                      - img
+                            - generic:
+                              - heading [level=2]:
+                                - link:
+                                  - /url: /resource/478
+                                  - text: CircleHD Video Transcoding Service
+                            - paragraph: CircleHD offers a full-featured video-on-demand platform for developers and content teams building video applications. The service provides an easy API call to upload a video and get an embeddable video, handling encoding, storage, and delivery in the background. It optimizes the right format and bitrate for every device and network connection, supporting features like thumbnail generation, multiple bitrate encoding, watermarking, VR/360 encoding, subtitles and captions, and more.
+                          - generic:
+                            - generic:
+                              - link:
+                                - /url: /resource/478
+                                - generic:
+                                  - img
+                                  - generic: View Details
+                              - generic: Encoding & Codecs
+                            - generic:
+                              - link:
+                                - /url: https://www.circlehd.com/products/video-transcoding-service/
+                                - img
+                                - generic: Open Link
+                                - generic: CircleHD Video Transcoding Service (opens in new tab)
+                              - button:
+                                - img
+                        - article:
+                          - generic:
+                            - generic:
+                              - generic: ▣
+                              - generic:
+                                - generic:
+                                  - button:
+                                    - generic:
+                                      - img
+                                  - button:
+                                    - generic:
+                                      - img
+                            - generic:
+                              - heading [level=2]:
+                                - link:
+                                  - /url: /resource/567
+                                  - text: MediaPlatform Video Delivery Services
+                            - paragraph: MediaPlatform offers enterprise video delivery solutions that optimize live and on-demand video streaming across corporate networks. Their services include eCDN (Enterprise Content Delivery Network) for efficient video caching and delivery, Smartpath for rules-based distribution, and integration with various peering and WAN optimization technologies. These solutions ensure high-quality video experiences with minimal network impact, making them valuable for organizations looking to enhance their internal video communications.
+                          - generic:
+                            - generic:
+                              - link:
+                                - /url: /resource/567
+                                - generic:
+                                  - img
+                                  - generic: View Details
+                              - generic: Infrastructure & Delivery
+                            - generic:
+                              - link:
+                                - /url: https://www.mediaplatform.com/platforms/video-delivery-services/
+                                - img
+                                - generic: Open Link
+                                - generic: MediaPlatform Video Delivery Services (opens in new tab)
+                              - button:
+                                - img
+                      - navigation "Pagination":
+                        - generic:
+                          - generic:
+                            - img
+                            - text: Previous
+                          - link:
+                            - /url: /search?q=video
+                            - text: "1"
+                          - link:
+                            - /url: /search?q=video&page=2
+                            - text: "2"
+                          - generic: …
+                          - link:
+                            - /url: /search?q=video&page=49
+                            - text: "49"
+                          - link:
+                            - /url: /search?q=video&page=2
+                            - text: Next
+                            - img
+                        - generic:
+                          - generic: Page 1 of 49
+                          - generic:
+                            - generic: Go to page
+                            - textbox: "1"
+                            - generic: / 49
+                        - status
+            - contentinfo:
+              - generic:
+                - generic:
+                  - paragraph: ── INDEX
+                  - link:
+                    - /url: /
+                    - text: awesome.video
+                  - paragraph: A curated collection of awesome video resources, tools, and technologies for developers and content creators
+                - generic:
+                  - heading [level=2]: INDEXED
+                  - paragraph: 1,949
+                  - paragraph:
+                    - text: 9 categories 18 subcategories
+                    - generic: live
+                - navigation:
+                  - heading [level=2]: EXPLORE
+                  - generic:
+                    - link:
+                      - /url: /category/community-events
+                      - generic: ◈
+                      - generic: Community
+                    - link:
+                      - /url: /category/encoding-codecs
+                      - generic: ◇
+                      - generic: Encoding
+                    - link:
+                      - /url: /category/general-tools
+                      - generic: ◆
+                      - generic: General
+                    - link:
+                      - /url: /category/infrastructure-delivery
+                      - generic: ▣
+                      - generic: Infrastructure
+                    - link:
+                      - /url: /category/intro-learning
+                      - generic: ▤
+                      - generic: Intro
+                    - link:
+                      - /url: /category/media-tools
+                      - generic: ▥
+                      - generic: Media
+                    - link:
+                      - /url: /category/players-clients
+                      - generic: ▶
+                      - generic: Players
+                    - link:
+                      - /url: /category/protocols-transport
+                      - generic: ⟁
+                      - generic: Protocols
+                    - link:
+                      - /url: /category/standards-industry
+                      - generic: ◉
+                      - generic: Standards
+                - generic:
+                  - heading [level=2]: SOURCE
+                  - link:
+                    - /url: https://github.com/krzemienski/awesome-video
+                    - img
+                    - generic:
+                      - text: krzemienski
+                      - generic: /awesome-video
+                    - generic: ↗
+                  - paragraph:
+                    - text: Open-source.
+                    - link:
+                      - /url: https://github.com/krzemienski/awesome-video/blob/master/CONTRIBUTING.md
+                      - text: PRs welcome
+                    - text: . Indexed automatically from README.md.
+              - generic:
+                - generic: © 2026 awesome.video · content CC0, code MIT
+                - navigation:
+                  - link:
+                    - /url: /about
+                    - text: About
+                  - link:
+                    - /url: /terms
+                    - text: Terms
+                  - link:
+                    - /url: /privacy
+                    - text: Privacy
+                  - link:
+                    - /url: /code-of-conduct
+                    - text: Conduct
+                  - link:
+                    - /url: https://github.com/krzemienski/awesome-video/issues
+                    - text: Issues ↗
+                  - link:
+                    - /url: /sitemap.xml
+                    - text: Sitemap
+                - generic: built with the awesome-list framework
+  - dialog "Filters" [ref=e2]:
+    - generic [ref=e3]:
+      - heading "Filters" [level=2] [ref=e4]
+      - paragraph [ref=e5]: No filters applied.
+    - generic [ref=e7]:
+      - generic [ref=e9]:
+        - paragraph [ref=e10]: Narrow results
+        - paragraph [ref=e11]: Counts update for this combination.
+      - group "Category" [ref=e12]:
+        - generic [ref=e13]: Category
+        - generic [ref=e14]:
+          - button "Encoding & Codecs, 238 results" [ref=e15] [cursor=pointer]:
+            - generic [ref=e17]: Encoding & Codecs
+            - generic [ref=e18]: "238"
+          - button "Media Tools, 174 results" [ref=e19] [cursor=pointer]:
+            - generic [ref=e21]: Media Tools
+            - generic [ref=e22]: "174"
+          - button "Intro & Learning, 161 results" [ref=e23] [cursor=pointer]:
+            - generic [ref=e25]: Intro & Learning
+            - generic [ref=e26]: "161"
+          - button "Players & Clients, 161 results" [ref=e27] [cursor=pointer]:
+            - generic [ref=e29]: Players & Clients
+            - generic [ref=e30]: "161"
+          - button "Infrastructure & Delivery, 127 results" [ref=e31] [cursor=pointer]:
+            - generic [ref=e33]: Infrastructure & Delivery
+            - generic [ref=e34]: "127"
+          - button "Standards & Industry, 89 results" [ref=e35] [cursor=pointer]:
+            - generic [ref=e37]: Standards & Industry
+            - generic [ref=e38]: "89"
+          - button "Protocols & Transport, 81 results" [ref=e39] [cursor=pointer]:
+            - generic [ref=e41]: Protocols & Transport
+            - generic [ref=e42]: "81"
+          - button "Community & Events, 69 results" [ref=e43] [cursor=pointer]:
+            - generic [ref=e45]: Community & Events
+            - generic [ref=e46]: "69"
+          - button "General Tools, 59 results" [ref=e47] [cursor=pointer]:
+            - generic [ref=e49]: General Tools
+            - generic [ref=e50]: "59"
+      - group "Subcategory" [ref=e51]:
+        - generic [ref=e52]: Subcategory
+        - generic [ref=e53]:
+          - button "Encoding Tools, 118 results" [ref=e54] [cursor=pointer]:
+            - generic [ref=e56]: Encoding Tools
+            - generic [ref=e57]: "118"
+          - button "Mobile & Web Players, 49 results" [ref=e58] [cursor=pointer]:
+            - generic [ref=e60]: Mobile & Web Players
+            - generic [ref=e61]: "49"
+          - button "Tutorials & Case Studies, 33 results" [ref=e62] [cursor=pointer]:
+            - generic [ref=e64]: Tutorials & Case Studies
+            - generic [ref=e65]: "33"
+          - button "Adaptive Streaming, 22 results" [ref=e66] [cursor=pointer]:
+            - generic [ref=e68]: Adaptive Streaming
+            - generic [ref=e69]: "22"
+          - button "Codecs, 20 results" [ref=e70] [cursor=pointer]:
+            - generic [ref=e72]: Codecs
+            - generic [ref=e73]: "20"
+          - button "Ads & QoE, 18 results" [ref=e74] [cursor=pointer]:
+            - generic [ref=e76]: Ads & QoE
+            - generic [ref=e77]: "18"
+          - button "Learning Resources, 18 results" [ref=e78] [cursor=pointer]:
+            - generic [ref=e80]: Learning Resources
+            - generic [ref=e81]: "18"
+          - button "Audio & Subtitles, 17 results" [ref=e82] [cursor=pointer]:
+            - generic [ref=e84]: Audio & Subtitles
+            - generic [ref=e85]: "17"
+          - button "Streaming Servers, 12 results" [ref=e86] [cursor=pointer]:
+            - generic [ref=e88]: Streaming Servers
+            - generic [ref=e89]: "12"
+          - button "Specs & Standards, 11 results" [ref=e90] [cursor=pointer]:
+            - generic [ref=e92]: Specs & Standards
+            - generic [ref=e93]: "11"
+          - button "Community Groups, 4 results" [ref=e94] [cursor=pointer]:
+            - generic [ref=e96]: Community Groups
+            - generic [ref=e97]: "4"
+          - button "DRM, 3 results" [ref=e98] [cursor=pointer]:
+            - generic [ref=e100]: DRM
+            - generic [ref=e101]: "3"
+          - button "Cloud & CDN, 2 results" [ref=e102] [cursor=pointer]:
+            - generic [ref=e104]: Cloud & CDN
+            - generic [ref=e105]: "2"
+          - button "Events & Conferences, 2 results" [ref=e106] [cursor=pointer]:
+            - generic [ref=e108]: Events & Conferences
+            - generic [ref=e109]: "2"
+          - button "Introduction, 2 results" [ref=e110] [cursor=pointer]:
+            - generic [ref=e112]: Introduction
+            - generic [ref=e113]: "2"
+          - button "Transport Protocols, 2 results" [ref=e114] [cursor=pointer]:
+            - generic [ref=e116]: Transport Protocols
+            - generic [ref=e117]: "2"
+          - button "Hardware Players, 1 result" [ref=e118] [cursor=pointer]:
+            - generic [ref=e120]: Hardware Players
+            - generic [ref=e121]: "1"
+        - paragraph [ref=e122]: 17 options · scroll the list for more
+      - group "Sub-subcategory" [ref=e123]:
+        - generic [ref=e124]: Sub-subcategory
+        - generic [ref=e125]:
+          - button "FFMPEG, 19 results" [ref=e126] [cursor=pointer]:
+            - generic [ref=e128]: FFMPEG
+            - generic [ref=e129]: "19"
+          - button "Web Players, 18 results" [ref=e130] [cursor=pointer]:
+            - generic [ref=e132]: Web Players
+            - generic [ref=e133]: "18"
+          - button "iOS/tvOS, 16 results" [ref=e134] [cursor=pointer]:
+            - generic [ref=e136]: iOS/tvOS
+            - generic [ref=e137]: "16"
+          - button "Quality & Testing, 16 results" [ref=e138] [cursor=pointer]:
+            - generic [ref=e140]: Quality & Testing
+            - generic [ref=e141]: "16"
+          - button "HLS, 11 results" [ref=e142] [cursor=pointer]:
+            - generic [ref=e144]: HLS
+            - generic [ref=e145]: "11"
+          - button "HEVC, 8 results" [ref=e146] [cursor=pointer]:
+            - generic [ref=e148]: HEVC
+            - generic [ref=e149]: "8"
+          - button "Subtitles & Captions, 8 results" [ref=e150] [cursor=pointer]:
+            - generic [ref=e152]: Subtitles & Captions
+            - generic [ref=e153]: "8"
+          - button "Android, 7 results" [ref=e154] [cursor=pointer]:
+            - generic [ref=e156]: Android
+            - generic [ref=e157]: "7"
+          - button "DASH, 3 results" [ref=e158] [cursor=pointer]:
+            - generic [ref=e160]: DASH
+            - generic [ref=e161]: "3"
+          - button "Cloud Platforms, 2 results" [ref=e162] [cursor=pointer]:
+            - generic [ref=e164]: Cloud Platforms
+            - generic [ref=e165]: "2"
+          - button "Online Forums, 2 results" [ref=e166] [cursor=pointer]:
+            - generic [ref=e168]: Online Forums
+            - generic [ref=e169]: "2"
+          - button "Podcasts & Webinars, 2 results" [ref=e170] [cursor=pointer]:
+            - generic [ref=e172]: Podcasts & Webinars
+            - generic [ref=e173]: "2"
+          - button "Audio, 1 result" [ref=e174] [cursor=pointer]:
+            - generic [ref=e176]: Audio
+            - generic [ref=e177]: "1"
+          - button "AV1, 1 result" [ref=e178] [cursor=pointer]:
+            - generic [ref=e180]: AV1
+            - generic [ref=e181]: "1"
+          - button "MPEG & Forums, 1 result" [ref=e182] [cursor=pointer]:
+            - generic [ref=e184]: MPEG & Forums
+            - generic [ref=e185]: "1"
+          - button "Official Specs, 1 result" [ref=e186] [cursor=pointer]:
+            - generic [ref=e188]: Official Specs
+            - generic [ref=e189]: "1"
+          - button "RIST, 1 result" [ref=e190] [cursor=pointer]:
+            - generic [ref=e192]: RIST
+            - generic [ref=e193]: "1"
+          - button "Roku, 1 result" [ref=e194] [cursor=pointer]:
+            - generic [ref=e196]: Roku
+            - generic [ref=e197]: "1"
+          - button "VP9, 1 result" [ref=e198] [cursor=pointer]:
+            - generic [ref=e200]: VP9
+            - generic [ref=e201]: "1"
+        - paragraph [ref=e202]: 19 options · scroll the list for more
+      - group "Tags" [ref=e203]:
+        - generic [ref=e204]: Tags
+        - generic [ref=e205]:
+          - generic [ref=e206]:
+            - img [ref=e207]
+            - textbox "Search tags" [active] [ref=e210]:
+              - /placeholder: Find a tag
+              - text: ffmpeg
+          - generic [ref=e211]:
+            - button "FFmpeg, 106 results" [ref=e212] [cursor=pointer]:
+              - generic [ref=e215]: FFmpeg
+              - generic [ref=e216]: "106"
+            - button "FFMPEG Related, 3 results" [ref=e217] [cursor=pointer]:
+              - generic [ref=e220]: FFMPEG Related
+              - generic [ref=e221]: "3"
+            - button "FFMPEG Frontend, 1 result" [ref=e222] [cursor=pointer]:
+              - generic [ref=e225]: FFMPEG Frontend
+              - generic [ref=e226]: "1"
+            - button "FFMPEG Gui, 1 result" [ref=e227] [cursor=pointer]:
+              - generic [ref=e230]: FFMPEG Gui
+              - generic [ref=e231]: "1"
+            - button "FFMPEG Like, 1 result" [ref=e232] [cursor=pointer]:
+              - generic [ref=e235]: FFMPEG Like
+              - generic [ref=e236]: "1"
+            - button "Ffmpeg.wasm, 1 result" [ref=e237] [cursor=pointer]:
+              - generic [ref=e240]: Ffmpeg.wasm
+              - generic [ref=e241]: "1"
+    - button "Done" [ref=e243] [cursor=pointer]
+    - button "Close" [ref=e244] [cursor=pointer]:
+      - img [ref=e245]
+      - generic [ref=e248]: Close
