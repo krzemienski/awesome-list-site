@@ -104,6 +104,11 @@ const ACTION_STATUS: Record<string, string> = {
   "journey.step_deleted": "completed",
   "journey.step_group_deleted": "completed",
   "journey.steps_reordered": "completed",
+  // Legacy rows from the retired local-auth routes; nothing writes these now.
+  "auth.login": "completed",
+  "auth.register": "completed",
+  "auth.logout": "completed",
+  "auth.login_failed": "failed",
 };
 
 /* User-management and journey entries carry their own target identity in
