@@ -58,6 +58,7 @@ import "./queues-agent.css";
 import "./research-run.css";
 import { useState, useEffect, useRef } from "react";
 import { flushSync } from "react-dom";
+import { apiFetch } from "@/lib/api-fetch";
 
 const CANONICAL_JOB_ROWS = 5;
 
@@ -147,7 +148,7 @@ export default function ResearcherTab({ initialTab = "review" }: ResearcherTabPr
   } = useQuery<{ jobs: ResearchJob[]; total: number; cheapestSavingRun: CheapestSavingRun | null }>({
     queryKey: ['/api/researcher/jobs', { limit: jobsLimit }],
     queryFn: async () => {
-      const res = await fetch(`/api/researcher/jobs?limit=${jobsLimit}`, { credentials: 'include' });
+      const res = await apiFetch(`/api/researcher/jobs?limit=${jobsLimit}`, { credentials: 'include' });
       if (!res.ok) throw new ApiError(res.status, await res.text());
       return res.json();
     },
@@ -204,7 +205,7 @@ export default function ResearcherTab({ initialTab = "review" }: ResearcherTabPr
     // hit the LIST endpoint instead of /jobs/:id, leaving the popover bound
     // to an array (everything undefined → "No log entries" forever).
     queryFn: async () => {
-      const res = await fetch(`/api/researcher/jobs/${selectedJobId}`, { credentials: 'include' });
+      const res = await apiFetch(`/api/researcher/jobs/${selectedJobId}`, { credentials: 'include' });
       if (!res.ok) throw new ApiError(res.status, `Failed to fetch job ${selectedJobId}: ${res.status}`);
       return res.json();
     },
@@ -239,7 +240,7 @@ export default function ResearcherTab({ initialTab = "review" }: ResearcherTabPr
     queryKey: ['/api/researcher/discoveries', selectedJobId ? `?jobId=${selectedJobId}` : ''],
     enabled: !!selectedJobId && showJobDetails,
     queryFn: async () => {
-      const res = await fetch(`/api/researcher/discoveries?jobId=${selectedJobId}`, { credentials: 'include' });
+      const res = await apiFetch(`/api/researcher/discoveries?jobId=${selectedJobId}`, { credentials: 'include' });
       if (!res.ok) throw new ApiError(res.status, 'Failed to fetch');
       return res.json();
     },

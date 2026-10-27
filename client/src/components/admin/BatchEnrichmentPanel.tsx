@@ -54,6 +54,7 @@ import type { EnrichmentJob } from "@shared/schema";
 import { baseUrlSyntaxError, insecureHttpRefusal, plainHttpHost } from "@shared/validation";
 import { Checkbox } from "@/components/ui/checkbox";
 import "./queues-agent.css";
+import { apiFetch } from "@/lib/api-fetch";
 
 const CANONICAL_JOB_ROWS = 6;
 
@@ -210,7 +211,7 @@ export default function BatchEnrichmentPanel() {
     // hit the LIST endpoint, leaving selectedJobData.job undefined (stats +
     // config would all render defaults).
     queryFn: async () => {
-      const res = await fetch(`/api/enrichment/jobs/${selectedJobId}`, { credentials: 'include' });
+      const res = await apiFetch(`/api/enrichment/jobs/${selectedJobId}`, { credentials: 'include' });
       if (!res.ok) throw new ApiError(res.status, `Failed to fetch enrichment job ${selectedJobId}: ${res.status}`);
       return res.json();
     },

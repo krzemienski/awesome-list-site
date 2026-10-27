@@ -20,6 +20,7 @@ import ContactSubmissions from "@/components/admin/ContactSubmissions";
 import { AdminLoadError } from "@/components/admin/AdminLoadError";
 import "@/styles/pages/admin-ops-users-audit.css";
 import "@/styles/pages/admin-ops-audit.css";
+import { apiFetch } from "@/lib/api-fetch";
 
 interface AuditLogEntry {
   id: number;
@@ -155,7 +156,7 @@ export default function AuditTab() {
     queryFn: async () => {
       const params = new URLSearchParams({ limit: appliedLimit, offset: String(offset) });
       if (appliedFilter) params.set('resourceId', appliedFilter);
-      const response = await fetch(`/api/admin/audit-logs?${params}`, { credentials: 'include' });
+      const response = await apiFetch(`/api/admin/audit-logs?${params}`, { credentials: 'include' });
       if (!response.ok) throw new ApiError(response.status, 'Failed to fetch audit logs');
       return response.json();
     },

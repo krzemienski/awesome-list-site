@@ -2,6 +2,7 @@ import { useCallback, useEffect, useRef, useState, type ReactNode } from "react"
 import { useAuth as useClerkAuth } from "@clerk/react";
 import { useQueryClient } from "@tanstack/react-query";
 import { AuthUnavailableCard } from "./AuthUnavailable";
+import { apiFetch } from "@/lib/api-fetch";
 
 const SESSION_CHECK_TIMEOUT_MS = 5_000;
 
@@ -18,7 +19,7 @@ function withTimeout<T>(promise: Promise<T>, ms: number): Promise<T | null> {
  */
 async function serverSeesSession(): Promise<boolean | null> {
   try {
-    const res = await fetch("/api/auth/user", {
+    const res = await apiFetch("/api/auth/user", {
       credentials: "include",
       cache: "no-store",
       signal: AbortSignal.timeout(SESSION_CHECK_TIMEOUT_MS),
