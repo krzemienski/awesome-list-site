@@ -1,0 +1,44 @@
+{
+  "duplicates": [],
+  "fields": [
+    {
+      "checked": null,
+      "id": ":rg:",
+      "label": null,
+      "name": "explorer-search",
+      "tag": "INPUT",
+      "value": "hls"
+    },
+    {
+      "checked": null,
+      "id": "explorer-sort-:rg:",
+      "label": "Sort categories",
+      "name": null,
+      "tag": "BUTTON",
+      "value": ""
+    },
+    {
+      "checked": "true",
+      "id": "subcategories",
+      "label": "Show subcategories",
+      "name": null,
+      "tag": "BUTTON",
+      "value": "on"
+    }
+  ],
+  "labels": [
+    {
+      "controlExists": true,
+      "for": ":rg:",
+      "text": "Search categories and resources"
+    },
+    {
+      "controlExists": true,
+      "for": "subcategories",
+      "text": "Show subcategories"
+    }
+  ],
+  "missing": [],
+  "url": "http://127.0.0.1:5064/advanced?tab=explorer&q=hls&sort=activity&tags=ffmpeg%2Chls",
+  "width": 390
+}
