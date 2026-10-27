@@ -43,6 +43,13 @@ All notable changes to the Awesome Video Resource Viewer project. Newest entries
   companion fields. Responsive tag-search IDs remain distinct when the desktop
   sidebar and mobile sheet are mounted together; existing labels are preserved.
 
+### Admin Users search availability
+- Addressed C6-AO025 by withholding previous Users rows and counts during
+  debounced search, page and sort transitions. Offline or failed loads expose
+  Retry rather than a false no-match state; same-query retained rows are marked
+  as potentially out of date. Search remains mounted through loading and retries.
+- Authenticated browser verification is blocked pending an authorized session.
+
 ## September 15, 2026
 
 ### Parity documentation and independent verification
