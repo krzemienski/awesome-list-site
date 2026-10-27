@@ -47,6 +47,7 @@ import type { LinkHealthJob } from "@shared/schema";
 import DatabaseBackupPanel from "@/components/admin/DatabaseBackupPanel";
 import { AdminLoadError } from "@/components/admin/AdminLoadError";
 import "./admin-ops-export-database.css";
+import { apiFetch } from "@/lib/api-fetch";
 
 interface ExportTabProps {
   validationStatus?: ValidationStatus;
@@ -132,7 +133,7 @@ export default function ExportTab({ validationStatus: propValidationStatus }: Ex
     refetchOnWindowFocus: true,
     queryFn: async () => {
       const auditOffset = auditHistoryPage * AUDIT_HISTORY_PAGE_SIZE;
-      const response = await fetch(
+      const response = await apiFetch(
         `/api/admin/audit-logs?limit=${AUDIT_HISTORY_PAGE_SIZE}&offset=${auditOffset}&actions=${[...EXPORT_ACTIONS].join(",")}`,
         {
           credentials: "include",
@@ -192,7 +193,7 @@ export default function ExportTab({ validationStatus: propValidationStatus }: Ex
     exportingRef.current = true;
     try {
       setIsExporting(true);
-      const response = await fetch("/api/admin/export", {
+      const response = await apiFetch("/api/admin/export", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         credentials: "include",
@@ -231,7 +232,7 @@ export default function ExportTab({ validationStatus: propValidationStatus }: Ex
   const handleJsonExport = async () => {
     try {
       setIsJsonExporting(true);
-      const response = await fetch("/api/admin/export-json", {
+      const response = await apiFetch("/api/admin/export-json", {
         credentials: "include",
       });
       if (!response.ok) throw new ApiError(response.status, await response.text());
@@ -259,7 +260,7 @@ export default function ExportTab({ validationStatus: propValidationStatus }: Ex
   const handleCsvExport = async () => {
     try {
       setIsCsvExporting(true);
-      const response = await fetch("/api/admin/export-csv", {
+      const response = await apiFetch("/api/admin/export-csv", {
         credentials: "include",
       });
       if (!response.ok) throw new ApiError(response.status, await response.text());
@@ -287,7 +288,7 @@ export default function ExportTab({ validationStatus: propValidationStatus }: Ex
   const handleOpmlExport = async () => {
     try {
       setIsOpmlExporting(true);
-      const response = await fetch("/api/admin/export-opml", {
+      const response = await apiFetch("/api/admin/export-opml", {
         credentials: "include",
       });
       if (!response.ok) throw new ApiError(response.status, await response.text());

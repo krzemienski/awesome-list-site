@@ -1,5 +1,6 @@
 import { useEffect, useRef } from "react";
 import { useLocation } from "wouter";
+import { apiFetch } from "./api-fetch";
 
 /** Report a confirmed missing page once per route visit, including StrictMode. */
 export function useMissingRouteTelemetry(missing: boolean): void {
@@ -49,7 +50,7 @@ function reportDeadLink(path: string, referrer: string): void {
   }
 
   try {
-    fetch("/api/telemetry/dead-link", {
+    apiFetch("/api/telemetry/dead-link", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(payload),

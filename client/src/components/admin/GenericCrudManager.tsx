@@ -23,6 +23,7 @@ import { Paginator } from "@/components/ui/paginator";
 import { AdminLoadError } from "@/components/admin/AdminLoadError";
 import { useHorizontalScrollCue } from "@/hooks/use-horizontal-scroll-cue";
 import "@/styles/pages/admin-catalog-taxonomy.css";
+import { apiFetch } from "@/lib/api-fetch";
 
 /**
  * Base entity interface that all managed entities must extend.
@@ -370,7 +371,7 @@ function MultiSelect({ value, onChange, config, id, "data-testid": testId }: Mul
     queryKey: [config?.queryKey || config?.fetchUrl],
     queryFn: async () => {
       if (!config?.fetchUrl) return [];
-      const response = await fetch(config.fetchUrl, { credentials: 'include' });
+      const response = await apiFetch(config.fetchUrl, { credentials: 'include' });
       if (!response.ok) throw new ApiError(response.status, 'Failed to fetch options');
       return response.json();
     },
@@ -1639,7 +1640,7 @@ export default function GenericCrudManager<T extends BaseEntityWithCount>({
     queries: parents.map(parent => ({
       queryKey: [parent.queryKey],
       queryFn: async (): Promise<BaseEntityWithCount[]> => {
-        const response = await fetch(parent.fetchUrl, {
+        const response = await apiFetch(parent.fetchUrl, {
           credentials: 'include'
         });
         if (!response.ok) throw new ApiError(response.status, `Failed to fetch ${parent.label.toLowerCase()}`);
@@ -1676,7 +1677,7 @@ export default function GenericCrudManager<T extends BaseEntityWithCount>({
   } = useQuery<T[]>({
     queryKey: [queryKey],
     queryFn: async () => {
-      const response = await fetch(fetchUrl, {
+      const response = await apiFetch(fetchUrl, {
         credentials: 'include'
       });
       if (!response.ok) throw new ApiError(response.status, `Failed to fetch ${entityNamePlural.toLowerCase()}`);
@@ -1838,7 +1839,7 @@ export default function GenericCrudManager<T extends BaseEntityWithCount>({
   const createMutation = useMutation({
     mutationFn: async (data: Record<string, any> | FormData) => {
       if (data instanceof FormData) {
-        const response = await fetch(createUrl, {
+        const response = await apiFetch(createUrl, {
           method: 'POST',
           credentials: 'include',
           body: data
@@ -1895,7 +1896,7 @@ export default function GenericCrudManager<T extends BaseEntityWithCount>({
   const updateMutation = useMutation({
     mutationFn: async ({ id, data, previousData }: { id: number; data: Record<string, any> | FormData; previousData?: T }) => {
       if (data instanceof FormData) {
-        const response = await fetch(updateUrl(id), {
+        const response = await apiFetch(updateUrl(id), {
           method: 'PATCH',
           credentials: 'include',
           body: data

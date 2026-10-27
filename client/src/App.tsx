@@ -35,6 +35,7 @@ import { focusPageHeading } from "@/hooks/focus-handoff";
 // Static, not lazy: a corpus failure while offline must render this page
 // without fetching another chunk.
 import ErrorPage from "@/pages/ErrorPage";
+import { useHeldError } from "@/hooks/useHeldError";
 
 // Guard and terminal error surfaces only render after routing has selected a
 // matching branch. Keep them out of the anonymous entry while the auth/theme
@@ -147,6 +148,23 @@ function SearchDialogFallback() {
 const CHUNK_ERROR_RE =
   /Failed to fetch dynamically imported module|Importing a module script failed|error loading dynamically imported module|ChunkLoadError|Loading chunk [\d]+ failed|Unable to preload CSS/i;
 const CHUNK_RELOAD_FLAG = "route-chunk-reload-attempted";
+const CONNECTIVITY_PROBE_TIMEOUT_MS = 3000;
+/** Delays between reachability probes after a failed one; then the card waits for a click or `online`. */
+const CONNECTIVITY_PROBE_BACKOFF_MS = [1000, 2000, 4000, 8000];
+
+/** Any HTTP answer from our own server means a reload can load a document. */
+async function isServerReachable(): Promise<boolean> {
+  const controller = new AbortController();
+  const timer = window.setTimeout(() => controller.abort(), CONNECTIVITY_PROBE_TIMEOUT_MS);
+  try {
+    await fetch("/api/health", { cache: "no-store", signal: controller.signal });
+    return true;
+  } catch {
+    return false;
+  } finally {
+    window.clearTimeout(timer);
+  }
+}
 // C10-V2-01: a keyboard user who was on the route error card when it reloads
 // the page lands on the recovered page's h1, not <body>.
 const ROUTE_RETRY_FOCUS_FLAG = "route-retry-focus-heading";
@@ -246,22 +264,37 @@ class RouteErrorBoundary extends Component<RouteErrorBoundaryProps, RouteErrorBo
     if (this.state.error && isChunkLoadError(this.state.error)) this.handleRetry();
   };
 
+  private probeTimer: number | undefined;
+  private probeAttempts = 0;
+
   componentDidMount() {
     window.addEventListener("online", this.handleOnline);
   }
 
   componentWillUnmount() {
     window.removeEventListener("online", this.handleOnline);
+    window.clearTimeout(this.probeTimer);
   }
 
   componentDidUpdate(prevProps: RouteErrorBoundaryProps) {
     // Navigating away clears the error so the next route renders normally.
     if (this.state.error && prevProps.location !== this.props.location) {
+      window.clearTimeout(this.probeTimer);
       this.setState({ error: null, stillOffline: false });
     }
   }
 
   handleRetry = () => {
+    this.probeAttempts = 0;
+    void this.reloadWhenReachable();
+  };
+
+  // The `online` event often fires before the network is usable, and a reload
+  // into a dead network lands on the browser's error page where nothing can
+  // retry. Reload only once the server answers; until then keep this page and
+  // probe again on a short backoff.
+  private reloadWhenReachable = async () => {
+    window.clearTimeout(this.probeTimer);
     // R5-018 (run24): while offline a reload would land on the browser's
     // error page and kill the app session — surface an inline "still offline"
     // notice instead and keep the card (and app state) alive.
@@ -269,6 +302,16 @@ class RouteErrorBoundary extends Component<RouteErrorBoundaryProps, RouteErrorBo
       this.setState({ stillOffline: true });
       return;
     }
+    if (!(await isServerReachable())) {
+      if (!this.state.error) return;
+      this.setState({ stillOffline: true });
+      const delay = CONNECTIVITY_PROBE_BACKOFF_MS[this.probeAttempts++];
+      if (delay !== undefined) {
+        this.probeTimer = window.setTimeout(() => void this.reloadWhenReachable(), delay);
+      }
+      return;
+    }
+    if (!this.state.error) return;
     // Stamp (not clear) the guard: this click IS a reload attempt, so if the
     // chunk still fails after it, the visitor lands back on this card instead
     // of burning an extra automatic reload first. (NB-001: never CLEAR the
@@ -300,7 +343,7 @@ class RouteErrorBoundary extends Component<RouteErrorBoundaryProps, RouteErrorBo
     if (isChunkLoadError(error)) {
       // R5-018 (run24): offline chunk failures get connection-specific copy;
       // online ones keep the deploy-rotation explanation.
-      const offline = navigator.onLine === false;
+      const offline = navigator.onLine === false || this.state.stillOffline;
       return (
         <div
           className="flex flex-col items-center justify-center gap-4 py-24 px-4 text-center"
@@ -540,7 +583,7 @@ function Router({
   // one server-paged tree slice and opt into this query themselves only after
   // an in-page search, tag filter, or alternate sort is active.
   const corpusNeeded = needsCorpusRoute(location);
-  const { error } = useQuery({
+  const { error: corpusError, isFetching: corpusFetching, refetch } = useQuery({
     queryKey: ["awesome-list-data"],
     queryFn: fetchStaticAwesomeList,
     staleTime: 1000 * 60 * 60,
@@ -555,12 +598,14 @@ function Router({
    * now lives in SearchDialog so the hint resolves to the dialog that
    * MainLayout actually renders. */
 
+  const error = useHeldError(corpusError, corpusFetching, "awesome-list-data");
+
   if (error) {
     return (
       <div className="page">
         <div className="grain" aria-hidden="true" />
         <RouteErrorBoundary location={location}>
-          <ErrorPage error={error} />
+          <ErrorPage error={error} retrying={corpusFetching} onRetry={() => void refetch()} />
         </RouteErrorBoundary>
       </div>
     );

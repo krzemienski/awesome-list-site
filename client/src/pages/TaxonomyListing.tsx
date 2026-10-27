@@ -27,6 +27,7 @@ import NotFound from "@/pages/not-found";
 import { findTaxonomySuggestion } from "@/lib/not-found-suggestion";
 import { findNavNode } from "@/lib/nav-lookup";
 import ErrorPage from "@/pages/ErrorPage";
+import { useHeldError } from "@/hooks/useHeldError";
 import OfflinePageState from "@/components/layout/OfflinePageState";
 import { queryUnavailableReason } from "@/lib/query-availability";
 import { resolveSiteIdentity } from "@shared/site-identity";
@@ -323,7 +324,21 @@ export default function TaxonomyListing({ level }: Props) {
   const parentCategory = listingData?.parents.category;
   const parentSubcategory = listingData?.parents.subcategory;
   const displayName = name;
-  const loading = listing.isLoading && !listingData;
+  // A facets error cached from an earlier panel opening must not replace a
+  // healthy listing once the query is idle again (e.g. Back to this page with
+  // the panel closed): only a live, enabled request can fail the page.
+  const taxonomySearchError = taxonomySearchEnabled ? taxonomySearch.error : null;
+  // A 400 means the link carries a filter value the API rejects (a stale or
+  // edited deep link). The listing itself loaded, so keep the page and offer
+  // the recovery /search offers; Retry would only repeat the same 400.
+  const invalidFilters = taxonomySearchError instanceof ApiError && taxonomySearchError.status === 400 ? taxonomySearchError : null;
+  // Held through the refetch so ErrorPage (and its retry budget) outlives it.
+  const pageError = useHeldError(
+    listing.error ?? (taxonomySearchError && !invalidFilters ? taxonomySearchError : null),
+    listing.isFetching || taxonomySearch.isFetching,
+    JSON.stringify([level, slug, page, pageOptions, taxonomySearchUrl]),
+  );
+  const loading = listing.isLoading && !listingData && !pageError;
   // Placeholder cards belong to the previous page or scope; never show them
   // under a URL that asks for another one.
   const resultsLoading = serverFilterActive
@@ -457,19 +472,12 @@ export default function TaxonomyListing({ level }: Props) {
   // error — matching the resource-detail 404 UX. Genuine 5xx/network errors
   // still surface the retry-able error state.
   if (isNotFoundError(listing.error)) return <NotFound suggestion={findTaxonomySuggestion(nav, level, slug)} />;
-  // A facets error cached from an earlier panel opening must not replace a
-  // healthy listing once the query is idle again (e.g. Back to this page with
-  // the panel closed): only a live, enabled request can fail the page.
-  const taxonomySearchError = taxonomySearchEnabled ? taxonomySearch.error : null;
-  // A 400 means the link carries a filter value the API rejects (a stale or
-  // edited deep link). The listing itself loaded, so keep the page and offer
-  // the recovery /search offers; Retry would only repeat the same 400.
-  const invalidFilters = taxonomySearchError instanceof ApiError && taxonomySearchError.status === 400 ? taxonomySearchError : null;
-  if (listing.error || (taxonomySearchError && !invalidFilters)) {
+  if (pageError) {
     return (
       <ErrorPage
-        error={listing.error ?? taxonomySearchError}
-        onRetry={() => { void (listing.error ? listing.refetch() : taxonomySearch.refetch()); }}
+        error={pageError}
+        retrying={listing.isFetching || taxonomySearch.isFetching}
+        onRetry={() => { void (listing.error || !listingData ? listing : taxonomySearch).refetch(); }}
       />
     );
   }

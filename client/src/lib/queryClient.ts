@@ -2,6 +2,7 @@ import { QueryClient, QueryCache, MutationCache, QueryFunction } from "@tanstack
 import { trackApiPerformance, trackError } from "./analytics";
 import { humanizeStatusBody } from "./apiError";
 import { isClerkRequested, whenClerkLoaded } from "./clerk-bridge";
+import { apiFetch } from "./api-fetch";
 
 // NB-028 (run18): errors must carry the HTTP status as a real property —
 // retry predicates checking `'status' in error` silently failed against the
@@ -42,7 +43,7 @@ export async function apiRequest(
   options?: RequestInit,
 ): Promise<any> {
   const isRead = !options?.method || ['GET', 'HEAD'].includes(options.method.toUpperCase());
-  const res = await fetch(url, {
+  const res = await apiFetch(url, {
     ...(isRead && !options?.cache ? { cache: catalogRequestCache() } : {}),
     ...options,
     headers: {
@@ -100,7 +101,7 @@ const getQueryFn: <T>(options: {
     const startTime = performance.now();
     
     try {
-      const res = await fetch(url, {
+      const res = await apiFetch(url, {
         credentials: "include",
         cache: catalogRequestCache(),
       });
@@ -199,7 +200,7 @@ export async function renewSessionToken(): Promise<boolean> {
 async function sessionStillValid(): Promise<boolean> {
   try {
     if (!(await renewSessionToken())) return false;
-    const res = await fetch("/api/auth/user", {
+    const res = await apiFetch("/api/auth/user", {
       credentials: "include",
       cache: "no-store",
       signal: AbortSignal.timeout(SESSION_RECHECK_TIMEOUT_MS),
