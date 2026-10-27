@@ -1,4 +1,4 @@
-import { queryOptions, useQuery } from "@tanstack/react-query";
+import { useQuery } from "@tanstack/react-query";
 import type { UseQueryResult } from "@tanstack/react-query";
 import { apiRequest } from "@/lib/queryClient";
 import type { EnrichmentJob, LinkHealthJob } from "@shared/schema";
@@ -106,16 +106,6 @@ interface CategorySummary {
   icon?: string | null;
   resourceCount?: number;
 }
-
-/**
- * The metric strip (AdminStats) and Top categories read this one query, so a
- * Retry from either section recovers both.
- */
-export const overviewCategoriesQuery = queryOptions({
-  queryKey: ["/api/categories"],
-  queryFn: (): Promise<CategorySummary[]> => apiRequest("/api/categories"),
-  staleTime: 60_000,
-});
 
 type HealthState = "ok" | "warn" | "bad" | "unknown";
 
@@ -364,7 +354,12 @@ export default function AdminOverview({ stats }: AdminOverviewProps) {
     queryFn: () => apiRequest("/api/enrichment/jobs?limit=100"),
     staleTime: 30_000,
   });
-  const categories = useQuery(overviewCategoriesQuery);
+  // Same key and default fetcher as the metric strip (AdminStats), so a Retry
+  // in either section recovers both.
+  const categories = useQuery<CategorySummary[]>({
+    queryKey: ["/api/categories"],
+    staleTime: 60_000,
+  });
 
   const healthRows = renderHealthRows(
     operations,
