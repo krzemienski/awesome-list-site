@@ -69,9 +69,9 @@ function trackConfirmedSave({ action, previous }: SaveRequest, saved: Notificati
 
 function Toggle({ checked, onChange, label, description, icon: Icon }: { checked: boolean; onChange: (value: boolean) => void; label: string; description: string; icon: typeof Mail }) {
   return (
-    <label className="flex min-h-[64px] cursor-pointer items-center gap-3 rounded-md border border-[var(--border)] bg-[var(--surface-2)] px-3 py-3 transition-colors hover:border-[var(--accent)]">
+    <label className="flex min-h-[64px] cursor-pointer items-center gap-3 rounded-md border border-[var(--border)] bg-[var(--surface-2)] px-3 py-3 transition-colors hover:border-[var(--accent)] has-[:focus-visible]:outline has-[:focus-visible]:outline-2 has-[:focus-visible]:outline-offset-2 has-[:focus-visible]:outline-[var(--accent)]">
       <input type="checkbox" checked={checked} onChange={(e) => onChange(e.target.checked)} className="peer sr-only" />
-      <span aria-hidden="true" className={`flex h-6 w-6 shrink-0 items-center justify-center rounded-full border transition-colors ${checked ? "border-[var(--accent)] bg-[var(--accent)] text-[var(--bg)]" : "border-[var(--border-strong)] text-transparent"}`}>
+      <span aria-hidden="true" className={`flex h-6 w-6 shrink-0 items-center justify-center rounded-full border transition-colors peer-focus-visible:ring-2 peer-focus-visible:ring-[var(--accent)] peer-focus-visible:ring-offset-2 peer-focus-visible:ring-offset-[var(--surface-2)] ${checked ? "border-[var(--accent)] bg-[var(--accent)] text-[var(--bg)]" : "border-[var(--border-strong)] text-transparent"}`}>
         <Icon className="h-3.5 w-3.5" />
       </span>
       <span className="min-w-0 flex-1">
