@@ -182,6 +182,13 @@
   text-underline-offset: 3px;
 }
 
+/* Touch widths: the block link reaches the 44px floor. */
+@media (max-width: 1024px) {
+  .about-inline-link:not(.about-inline-link-text) {
+    min-height: 44px;
+  }
+}
+
 .about-inline-link:hover {
   text-decoration-color: var(--text);
 }
