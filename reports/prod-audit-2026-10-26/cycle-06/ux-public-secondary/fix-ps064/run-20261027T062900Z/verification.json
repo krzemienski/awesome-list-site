@@ -1,0 +1,178 @@
+{
+  "finding": "C6-PS-064",
+  "scope": "Search and Advanced form identifiers only",
+  "base": "520d6778369bc7ce495204cfcacc7e0533f941cc",
+  "branch": "fix/c6-ps064-form-field-ids",
+  "runtime": {
+    "url": "http://127.0.0.1:5064",
+    "command": "npm run dev",
+    "mode": "development",
+    "backgroundJobsDisabled": true,
+    "autoSeedDisabled": true,
+    "database": "loopback Postgres awesome_c2_pubsec",
+    "productionDataAccess": false,
+    "authenticatedUser": false,
+    "paidAiOperations": 0,
+    "consent": "denied"
+  },
+  "checks": [
+    {
+      "command": "./node_modules/.bin/tsc --noEmit",
+      "exit": 0,
+      "unpiped": true,
+      "evidence": "step-01-typecheck.log"
+    },
+    {
+      "command": "npm run build",
+      "exit": 0,
+      "unpiped": true,
+      "evidence": "step-02-build.log"
+    }
+  ],
+  "browserProof": [
+    {
+      "surface": "Search",
+      "width": 1440,
+      "actions": [
+        "typed video query",
+        "selected Name A–Z sort",
+        "expanded Tags",
+        "typed ffmpeg tag search",
+        "keyboard focus"
+      ],
+      "screenshot": "step-20-search-desktop-final.png",
+      "accessibility": "step-20-search-desktop-final.ax.txt",
+      "console": "step-20-search-desktop-final.console.json",
+      "network": "step-20-search-desktop-final.network.json",
+      "issues": "step-20-search-desktop-final.issues-fields.json",
+      "missingNativeIdentity": 0,
+      "duplicateIds": 0
+    },
+    {
+      "surface": "Search",
+      "width": 390,
+      "actions": [
+        "typed query",
+        "selected Newest sort",
+        "opened mobile Filters sheet",
+        "typed ffmpeg tag search",
+        "closed sheet with Done"
+      ],
+      "screenshot": "step-17-search-mobile-final.png",
+      "accessibility": "step-17-search-mobile-final.ax.txt",
+      "console": "step-17-search-mobile-final.console.json",
+      "network": "step-17-search-mobile-final.network.json",
+      "issues": "step-17-search-mobile-final.issues-fields.json",
+      "coMountedTagFields": "distinct desktop/mobile IDs and names",
+      "missingNativeIdentity": 0,
+      "duplicateIds": 0
+    },
+    {
+      "surface": "Advanced Explorer",
+      "width": 1440,
+      "actions": [
+        "clicked search label and confirmed focus",
+        "typed ffmpeg",
+        "selected Resource Count",
+        "toggled Show subcategories via label",
+        "selected ffmpeg tag"
+      ],
+      "screenshot": "step-19-explorer-desktop-final.png",
+      "accessibility": "step-19-explorer-desktop-final.ax.txt",
+      "console": "step-19-explorer-desktop-final.console.json",
+      "network": "step-19-explorer-desktop-final.network.json",
+      "issues": "step-19-explorer-desktop-final.issues-fields.json",
+      "missingNativeIdentity": 0,
+      "duplicateIds": 0
+    },
+    {
+      "surface": "Advanced Explorer",
+      "width": 390,
+      "actions": [
+        "typed ffmpeg/hls",
+        "keyboard selected Activity",
+        "Space toggled Show subcategories",
+        "Enter selected ffmpeg/hls tags",
+        "focused search input with visible outline"
+      ],
+      "screenshot": "step-21-explorer-mobile-controls.png",
+      "accessibility": "step-21-explorer-mobile-controls.ax.txt",
+      "console": "step-21-explorer-mobile-controls.console.json",
+      "network": "step-21-explorer-mobile-controls.network.json",
+      "issues": "step-18-explorer-mobile-final.issues-fields.json",
+      "missingNativeIdentity": 0,
+      "duplicateIds": 0
+    },
+    {
+      "surface": "Advanced Export",
+      "width": 390,
+      "actions": [
+        "keyboard selected JSON",
+        "toggled every content option",
+        "deselected Community & Events",
+        "activated Export",
+        "read actual browser-downloaded JSON"
+      ],
+      "screenshot": "step-12-export-mobile-final.png",
+      "accessibility": "step-12-export-mobile-final.ax.txt",
+      "console": "step-12-export-mobile-final.console.json",
+      "network": "step-12-export-mobile-final.network.json",
+      "issues": "step-13-export-mobile-chrome-issues.json",
+      "download": "downloads/awesome-video.json",
+      "exportCount": 1858,
+      "resourceKeys": [
+        "title",
+        "url"
+      ]
+    },
+    {
+      "surface": "Advanced Export",
+      "width": 1440,
+      "actions": [
+        "clicked Export Format label: actual listbox opened and option received focus (step-23)",
+        "selected CSV via format select",
+        "clicked Include descriptions label (focus and toggle)",
+        "toggled all content options and category checkbox",
+        "activated Export",
+        "read actual browser-downloaded CSV"
+      ],
+      "screenshot": "step-14-export-desktop.png",
+      "accessibility": "step-14-export-desktop.ax.txt",
+      "console": "step-14-export-desktop.console.json",
+      "network": "step-14-export-desktop.network.json",
+      "issues": "step-15-export-desktop-chrome-issues.json",
+      "download": "downloads/awesome-video.csv",
+      "exportDataLines": 1858,
+      "exportHeader": "Title,URL",
+      "missingNativeIdentity": 0,
+      "duplicateIds": 0,
+      "labelProof": [
+        "step-23-export-format-label.png",
+        "step-23-export-format-label.ax.txt",
+        "step-23-export-format-label.json"
+      ]
+    }
+  ],
+  "consoleFormFieldWarnings": 0,
+  "chromeFormIssueObservations": 0,
+  "unrelatedChromeIssues": "PerformanceIssue DocumentCookie only; not a globally clean console/issues claim",
+  "intentionallyUnchanged": [
+    "Paginator jump already has id and matching label",
+    "cmdk palette assigns generated id internally",
+    "mobile sidebar search has contract-sensitive name=q",
+    "advanced-filter.tsx is not nested on Advanced",
+    "existing export and explorer label/id pairs"
+  ],
+  "unverified": [
+    "Production fix state: not merged or deployed by contract",
+    "Full six-format export matrix: JSON and CSV downloaded; Markdown/PDF/HTML/YAML not downloaded",
+    "Actual production SSR hydration: Search/Advanced currently client-rendered; SSR build passed, no production hydration claim",
+    "Unaffected Metrics/AI behavior and broad accessibility/visual quality outside C6-PS-064"
+  ],
+  "toolCaveats": [
+    "MCP /tmp evidence writes refused by workspace roots; no evidence fabricated",
+    "Shared9222 browser target adoption crossed unrelated tab: discontinued, peer notified; final evidence uses independent c6ps064local-sol Chrome at own CDP endpoint",
+    "Agent-browser pointer clicks occasionally reported success without state change; recovered with focus+keyboard and checked actual values",
+    "Agent-browser download wrapper timed out; recovered via actual Chrome Browser.setDownloadBehavior and keyboard activation, captured original browser download bytes"
+  ]
+}

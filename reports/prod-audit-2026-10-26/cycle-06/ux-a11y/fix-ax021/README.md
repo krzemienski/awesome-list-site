@@ -4,10 +4,12 @@
 
 - Isolated clone: `/tmp/awesome-c6-ax021-3QyZeQ`.
 - Base: `520d6778369bc7ce495204cfcacc7e0533f941cc` (`origin/main` at assignment).
+- Integration update: merged `origin/main` at `e06d9c4537561ea19eeabc70639860cb42f08be3` into the fix branch, preserving all changelog entries. This is a branch synchronization, not a merge of PR #106 into main.
 - Branch: `fix/c6-ax021-admin-stats-offline`.
 - Only initial admin-stats state and missing-value presentation changed. No API, analytics, authentication, schema, global query retry/network policy, or `AdminOverview` changes.
 - TanStack Query's initial offline request is **paused**: no data, no error, and `isLoading=false`. The dashboard previously fell through into the zero-resource masthead and indefinitely pending overview. The hook now exposes the role-masked pause state; before rendering stats or activity, the dashboard reuses `OfflinePageState` for the initial paused/no-data case. Its existing focusable Retry reports a still-offline attempt and lets Query resume on reconnect. Missing values render a dash/no count; real numeric zero still formats as `0`.
 - The normal loading state is now a busy status region so the existing recovery-focus handoff waits for the loaded dashboard. The existing non-offline initial failure Retry also registers that handoff. These are source changes, not live-proven behavior.
+- Review follow-up: while categories are pending and actively fetching, the Resources card retains its neutral `across — categories` placeholder. Error/paused states report unavailable; a measured zero remains `across 0 categories`. This copy change is code-checked, not browser-proven.
 
 ## Exact exercised checks
 
@@ -19,6 +21,8 @@
 | `npm run dev` with local isolated environment | ready | `NODE_ENV=development`, local Postgres, port 5071, `DISABLE_BACKGROUND_JOBS=1`, `ENABLE_AUTO_SEED=false`. Runtime reported background jobs disabled. No migrations, seeds, or paid AI jobs triggered. |
 
 The build emitted dependency annotation warnings for `zod` and an esbuild bundle-size notice; these did not change the zero exit. No tests, mocks, validation scripts/harnesses, lint, or reviewer panels were run.
+
+Typecheck and build were rerun, both direct/unpiped with exit 0, after the `e06d9c45` integration and category-loading copy change. `build-output.txt` contains this latest build. The retained browser captures below precede that integration and remain authentication-boundary evidence only.
 
 ## Auth prerequisite and all-width captures
 
@@ -47,4 +51,4 @@ At **1440, 820 touch, and 390 touch**, all of these remain unexercised:
 5. Normal populated/loading browser states and later polling failure retaining last-good stats.
 6. Screen-reader speech and physical touch devices.
 
-A future authorized run must use the real authenticated app, prime the lazy admin assets **without populating stats**, then exercise the initial offline/no-data transition. An app chunk-load error or warm stats cache is not a substitute. No deploy, merge, production mutation, production cookie import, or production secret reuse was performed.
+A future authorized run must use the real authenticated app, prime the lazy admin assets **without populating stats**, then exercise the initial offline/no-data transition. An app chunk-load error or warm stats cache is not a substitute. No deploy, PR merge into main, production mutation, production cookie import, or production secret reuse was performed.

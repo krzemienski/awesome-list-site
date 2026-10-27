@@ -1587,10 +1587,9 @@ export default function GenericCrudManager<T extends BaseEntityWithCount>({
     }
   };
 
-  // A field-specific error marks its input (aria-invalid + aria-describedby)
-  // and moves focus there; the banner is kept only for errors that name no
-  // field in the dialog. Mirrors ResourceManager's showServerFormError.
-  const dialogFieldNames = ["name", "slug", ...customFields.filter(f => f.type !== "file" && f.type !== "multiselect").map(f => f.name)];
+  // Field errors mark their inputs and focus the first enabled field;
+  // errors that name no field in the dialog stay in the banner.
+  const dialogFieldNames = [...parents.map(p => p.fieldName), "name", "slug", ...customFields.filter(f => f.type !== "file" && f.type !== "multiselect").map(f => f.name)];
   const fieldErrorProps = (mode: "create" | "edit", name: string) =>
     validationErrors[name]
       ? { "aria-invalid": true as const, "aria-describedby": `${mode}-${name}-error` }
@@ -1598,8 +1597,16 @@ export default function GenericCrudManager<T extends BaseEntityWithCount>({
   const showFieldErrors = (mode: "create" | "edit", errors: FieldValidationErrors, banner: string | null) => {
     setValidationErrors(errors);
     setFormError(banner);
-    const first = dialogFieldNames.find(name => errors[name]);
-    if (first) requestAnimationFrame(() => document.getElementById(`${mode}-${first}`)?.focus());
+    requestAnimationFrame(() => {
+      for (const name of dialogFieldNames) {
+        if (!errors[name]) continue;
+        const field = document.getElementById(`${mode}-${name}`);
+        if (field && !field.matches(":disabled, [aria-disabled='true']")) {
+          field.focus();
+          break;
+        }
+      }
+    });
   };
   const showMissingFields = (mode: "create" | "edit", fields: string[], labels: string[]) => {
     const inline: FieldValidationErrors = {};
@@ -2150,6 +2157,7 @@ export default function GenericCrudManager<T extends BaseEntityWithCount>({
     const noOptions = !!parent.filterBy && !awaitingFilter && options.length === 0;
     const id = `${mode}-${parent.fieldName}`;
     const hintId = `${id}-empty-hint`;
+    const errorProps = fieldErrorProps(mode, parent.fieldName);
 
     return (
       <div key={parent.fieldName} className="space-y-2">
@@ -2161,7 +2169,8 @@ export default function GenericCrudManager<T extends BaseEntityWithCount>({
         >
           <SelectTrigger
             id={id}
-            aria-describedby={noOptions ? hintId : undefined}
+            {...errorProps}
+            aria-describedby={[errorProps["aria-describedby"], noOptions ? hintId : null].filter(Boolean).join(" ") || undefined}
             data-testid={`select-${mode}-${parent.fieldName.replace(/([A-Z])/g, '-$1').toLowerCase()}`}
           >
             <SelectValue placeholder={`Select ${parent.label.toLowerCase().replace(' *', '')}`} />
@@ -2174,6 +2183,11 @@ export default function GenericCrudManager<T extends BaseEntityWithCount>({
             ))}
           </SelectContent>
         </Select>
+        {validationErrors[parent.fieldName] && (
+          <p id={`${id}-error`} role={awaitingFilter || noOptions ? "alert" : undefined} className="text-xs text-destructive" data-testid={`error-${id}`}>
+            {validationErrors[parent.fieldName]}
+          </p>
+        )}
         {noOptions && (
           <p id={hintId} className="text-xs text-muted-foreground" data-testid={`hint-${id}-empty`}>
             {parent.emptyHint ?? "No options are available for this selection yet."}
@@ -2612,9 +2626,8 @@ export default function GenericCrudManager<T extends BaseEntityWithCount>({
     }
 
     setFormData(newFormData);
-    // A "Parent … is required" banner is stale once a parent is picked; the
-    // next submit re-validates everything.
     setFormError(null);
+    clearFieldError(parentFieldName);
   };
 
   return (

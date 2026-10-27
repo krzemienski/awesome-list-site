@@ -194,9 +194,11 @@ export default function AdminStats({
         value={value(stats?.totalPublic ?? stats?.resources)}
         sub={
           <>
-            {categories.isError || categoryCount === undefined
-              ? "category data unavailable"
-              : `across ${categoryCount} categories`}
+            {categories.isPending && categories.fetchStatus === "fetching"
+              ? "across — categories"
+              : categories.isError || categories.isPaused || categoryCount === undefined
+                ? "category data unavailable"
+                : `across ${categoryCount} categories`}
           </>
         }
         loading={isLoading && !stats}
