@@ -90,11 +90,13 @@ const BAD_OUTLINE_CLASS = 'border-[var(--status-bad)] text-[var(--status-bad)]';
 
 /**
  * Mean of the per-job cost the enrichment agent records
- * (metadata.agent.estimatedCostUsd) over the jobs that carry one; "—" until
- * a job has reported a cost. Same arithmetic as the parity reference binding.
+ * (metadata.agent.estimatedCostUsd) over the jobs that carry one and
+ * processed at least one resource (a no-op run costs $0 and would drag the
+ * mean down, as in costPerResource); "—" until such a job exists.
  */
 function averageBatchCost(jobs: EnrichmentJob[]): string {
   const costs = jobs
+    .filter((job) => Number(job.processedResources) > 0)
     .map((job) => {
       const metadata = job.metadata as { agent?: { estimatedCostUsd?: unknown } } | null | undefined;
       return Number(metadata?.agent?.estimatedCostUsd);
