@@ -40,6 +40,7 @@ import { journeySeoDescription } from "@shared/seo-templates";
 import { parseRouteId } from "@shared/route-id";
 import NotFound from "@/pages/not-found";
 import "@/styles/pages/discovery-journeys.css";
+import { apiFetch } from "@/lib/api-fetch";
 
 interface JourneyStep {
   id: number;
@@ -112,7 +113,7 @@ export default function JourneyDetail() {
   const journeyQuery = useQuery<Journey>({
     queryKey: [`/api/journeys/${id}`],
     queryFn: async () => {
-      const response = await fetch(`/api/journeys/${id}`);
+      const response = await apiFetch(`/api/journeys/${id}`);
       if (!response.ok) throw new ApiError(response.status, await response.text());
       return response.json();
     },

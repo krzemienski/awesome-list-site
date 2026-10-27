@@ -6,6 +6,7 @@ import { formatRelativeAgo } from "@/lib/utils";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { AdminLoadError } from "@/components/admin/AdminLoadError";
 import "./queues-agent.css";
+import { apiFetch } from "@/lib/api-fetch";
 
 const RESEARCH_WORKSPACE_LIMIT = 4;
 const NOTE_TITLE_MAX = 80;
@@ -49,7 +50,7 @@ export function ResearchWorkspace() {
   const { data, isError, error, isLoading, isFetching, refetch } = useQuery<{ jobs: ResearchJob[]; total: number }>({
     queryKey: ["/api/researcher/jobs", { limit: RESEARCH_WORKSPACE_LIMIT }],
     queryFn: async () => {
-      const res = await fetch(`/api/researcher/jobs?limit=${RESEARCH_WORKSPACE_LIMIT}`, { credentials: "include" });
+      const res = await apiFetch(`/api/researcher/jobs?limit=${RESEARCH_WORKSPACE_LIMIT}`, { credentials: "include" });
       if (!res.ok) throw new ApiError(res.status, `${res.status}: ${await res.text()}`);
       return res.json();
     },
@@ -64,7 +65,7 @@ export function ResearchWorkspace() {
     queryKey: ["/api/researcher/jobs", selectedJobId],
     enabled: selectedJobId !== null,
     queryFn: async () => {
-      const res = await fetch(`/api/researcher/jobs/${selectedJobId}`, { credentials: "include" });
+      const res = await apiFetch(`/api/researcher/jobs/${selectedJobId}`, { credentials: "include" });
       if (!res.ok) throw new ApiError(res.status, `${res.status}: ${await res.text()}`);
       return res.json();
     },

@@ -16,6 +16,7 @@ import type { User } from "@shared/schema";
 import { AdminOpsTable as Table, StatusChip, TableShell } from "@/components/admin/AdminOpsPrimitives";
 import { AdminLoadError } from "@/components/admin/AdminLoadError";
 import "@/styles/pages/admin-ops-users-audit.css";
+import { apiFetch } from "@/lib/api-fetch";
 
 interface UsersResponse {
   users: User[];
@@ -99,7 +100,7 @@ export default function UsersTab() {
       if (searchQuery) params.set('q', searchQuery);
       params.set('sortBy', sortBy);
       params.set('sortDir', sortDir);
-      const response = await fetch(`/api/admin/users?${params}`, { credentials: 'include' });
+      const response = await apiFetch(`/api/admin/users?${params}`, { credentials: 'include' });
       if (!response.ok) throw new ApiError(response.status, 'Failed to fetch users');
       return response.json();
     },

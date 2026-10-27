@@ -20,6 +20,7 @@ import { OUTCOME_LABEL, STEP_LABEL, deriveRunProgress, type RunOutcome } from ".
 import { ResearchPhaseTimeline } from "./ResearchPhaseTimeline";
 import { ResearchRunDiscoveries } from "./ResearchRunDiscoveries";
 import { CancelResearchRunDialog } from "./CancelResearchRunDialog";
+import { apiFetch } from "@/lib/api-fetch";
 
 interface ResearchRunViewProps {
   jobId: number;
@@ -93,7 +94,7 @@ export function ResearchRunView({ jobId, focusOnMount, onStartNew, onRelaunchHig
     queryKey: ["/api/researcher/jobs", jobId],
     // Explicit queryFn: the default fetcher reads only queryKey[0].
     queryFn: async () => {
-      const res = await fetch(`/api/researcher/jobs/${jobId}`, { credentials: "include" });
+      const res = await apiFetch(`/api/researcher/jobs/${jobId}`, { credentials: "include" });
       if (!res.ok) throw new ApiError(res.status, `Failed to fetch job ${jobId}: ${res.status}`);
       return (await res.json()) as JobWithLiveness;
     },
@@ -109,7 +110,7 @@ export function ResearchRunView({ jobId, focusOnMount, onStartNew, onRelaunchHig
   const discoveriesQuery = useQuery<ResearchDiscovery[]>({
     queryKey: ["/api/researcher/discoveries", `?jobId=${jobId}`],
     queryFn: async () => {
-      const res = await fetch(`/api/researcher/discoveries?jobId=${jobId}`, { credentials: "include" });
+      const res = await apiFetch(`/api/researcher/discoveries?jobId=${jobId}`, { credentials: "include" });
       if (!res.ok) throw new ApiError(res.status, `Failed to fetch discoveries: ${res.status}`);
       return (await res.json()) as ResearchDiscovery[];
     },

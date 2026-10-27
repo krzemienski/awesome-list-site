@@ -63,6 +63,7 @@ import { classifyResourceKind } from "@shared/resourceKindClassifier";
 import { AdminLoadError } from "@/components/admin/AdminLoadError";
 import { ChipButton } from "@/components/ui/chip-button";
 import "@/styles/pages/admin-catalog-resources.css";
+import { apiFetch } from "@/lib/api-fetch";
 
 const RESOURCE_KIND_LABELS: Record<ResourceKind, string> = {
   tools: "Tools",
@@ -353,7 +354,7 @@ export default function ResourceManager({ createRequest = 0 }: { createRequest?:
       if (categoryFilter) params.set('category', categoryFilter);
       if (statusFilter && statusFilter !== 'all') params.set('status', statusFilter);
       if (featuredOnly) params.set('featured', 'true');
-      const response = await fetch(`/api/admin/resources?${params.toString()}`, {
+      const response = await apiFetch(`/api/admin/resources?${params.toString()}`, {
         credentials: 'include'
       });
       if (!response.ok) throw new ApiError(response.status, 'Failed to fetch resources');
@@ -431,7 +432,7 @@ export default function ResourceManager({ createRequest = 0 }: { createRequest?:
   const { data: grandTotalData } = useQuery<ResourcesResponse>({
     queryKey: ['/api/admin/resources', 'grand-total'],
     queryFn: async () => {
-      const response = await fetch('/api/admin/resources?page=1&limit=1', {
+      const response = await apiFetch('/api/admin/resources?page=1&limit=1', {
         credentials: 'include'
       });
       if (!response.ok) throw new ApiError(response.status, 'Failed to fetch resource total');
@@ -446,7 +447,7 @@ export default function ResourceManager({ createRequest = 0 }: { createRequest?:
   const { data: featuredCountData } = useQuery<ResourcesResponse>({
     queryKey: ['/api/admin/resources', 'featured-count'],
     queryFn: async () => {
-      const response = await fetch('/api/admin/resources?page=1&limit=1&status=approved&featured=true', {
+      const response = await apiFetch('/api/admin/resources?page=1&limit=1&status=approved&featured=true', {
         credentials: 'include'
       });
       if (!response.ok) throw new ApiError(response.status, 'Failed to fetch featured count');
@@ -925,7 +926,7 @@ export default function ResourceManager({ createRequest = 0 }: { createRequest?:
       url.searchParams.delete("resourceId");
       window.history.replaceState({}, "", url.pathname + url.search + url.hash);
     };
-    fetch(`/api/resources/${rid}`, { credentials: "include" })
+    apiFetch(`/api/resources/${rid}`, { credentials: "include" })
       .then((r) => (r.ok ? r.json() : Promise.reject(new Error(`HTTP ${r.status}`))))
       .then((resource: AdminResourceWire) => openEditDialog(normalizeAdminResource(resource)))
       .catch(() => {

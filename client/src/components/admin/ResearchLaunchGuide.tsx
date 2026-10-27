@@ -19,6 +19,7 @@ import { ApiError, apiRequest } from "@/lib/queryClient";
 import { describeWriteError } from "@/lib/apiError";
 import { plainHttpHost } from "@shared/validation";
 import { WARN_OUTLINE, WARN_TEXT, type CheapestSavingRun } from "./researchDisplay";
+import { apiFetch } from "@/lib/api-fetch";
 
 export interface ResearchLaunchGuideHandle {
   /** Bring the budget field into view and focus it ("relaunch with a higher cap"). */
@@ -133,7 +134,7 @@ export const ResearchLaunchGuide = forwardRef<ResearchLaunchGuideHandle, Researc
 
   const brief = useMutation({
     mutationFn: async () => {
-      const res = await fetch("/api/researcher/brief", { credentials: "include" });
+      const res = await apiFetch("/api/researcher/brief", { credentials: "include" });
       if (!res.ok) throw new ApiError(res.status, await res.text());
       return (await res.json()) as { brief?: string; angle?: string };
     },

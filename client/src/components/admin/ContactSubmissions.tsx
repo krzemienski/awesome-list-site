@@ -9,6 +9,7 @@ import { AlertCircle, ChevronLeft, ChevronRight, Eye, EyeOff, RefreshCw } from "
 import { AdminOpsTable as Table, TableShell } from "@/components/admin/AdminOpsPrimitives";
 import { AdminLoadError } from "@/components/admin/AdminLoadError";
 import "@/styles/pages/admin-ops-users-audit.css";
+import { apiFetch } from "@/lib/api-fetch";
 
 interface ContactSubmission {
   id: string;
@@ -64,7 +65,7 @@ export default function ContactSubmissions() {
         limit: String(PAGE_SIZE),
         offset: String(offset),
       });
-      const response = await fetch(`/api/admin/contact-submissions?${params}`, {
+      const response = await apiFetch(`/api/admin/contact-submissions?${params}`, {
         credentials: "include",
       });
       if (!response.ok) {
