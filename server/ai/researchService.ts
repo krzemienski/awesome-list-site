@@ -1619,7 +1619,7 @@ STOP TARGET: this run ends AUTOMATICALLY once ${targetDiscoveries} new discoveri
     // The column is text; legacy or hand-edited rows may not be numeric, and
     // a bare cast would fail the whole query. CASE keeps the cast from being
     // evaluated for rows that fail the plain-decimal guard.
-    const cost = sql`(case when ${researchJobs.estimatedCostUsd} ~ '^[0-9]+(\.[0-9]+)?$' then cast(${researchJobs.estimatedCostUsd} as numeric) end)`;
+    const cost = sql`(case when ${researchJobs.estimatedCostUsd} ~ '^[0-9]+([.][0-9]+)?$' then cast(${researchJobs.estimatedCostUsd} as numeric) end)`;
     const [row] = await db
       .select({ costUsd: researchJobs.estimatedCostUsd, costBasis: researchJobs.costBasis })
       .from(researchJobs)
