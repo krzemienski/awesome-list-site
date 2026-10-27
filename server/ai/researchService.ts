@@ -1109,6 +1109,8 @@ class ResearchService {
     maxBudgetUsd?: string | null;
     /** null/undefined => unlimited turns (no cap passed to the SDK). */
     maxTurns?: number | null;
+    /** Optional minimum elapsed research time; early model completions resume with fresh work. */
+    minDurationMs?: number | null;
     startedBy?: string;
     model?: string | null;
     /** Explicit scout (subagent) model. Null => auto (default scout, or 'inherit' with a custom model). */
@@ -1189,6 +1191,7 @@ class ResearchService {
       resolved,
       abortController,
       options.targetDiscoveries ?? null,
+      options.minDurationMs ?? null,
     )
       .catch(async (err) => {
         const msg = err?.message || String(err);
@@ -1246,7 +1249,9 @@ class ResearchService {
     resolved: ResolvedResearchConfig,
     abortController: AbortController,
     targetDiscoveries: number | null = null,
+    minDurationMs: number | null = null,
   ): Promise<void> {
+    const researchStartedAt = Date.now();
     const emitter = new AgentEventEmitter('research', jobId);
     const phases = new ResearchPhaseTracker(emitter);
     // Every run that emits a phase also emits 'finishing': a setup failure
@@ -1422,33 +1427,62 @@ STOP TARGET: this run ends AUTOMATICALLY once ${targetDiscoveries} new discoveri
     let result: Awaited<ReturnType<typeof runAgentQuery>> | undefined;
     let runError: unknown = null;
     try {
-      result = await runAgentQuery({
-        jobType: 'research',
-        jobId,
-        emitter,
-        prompt,
-        systemPrompt,
-        model: orchestratorModel,
-        config,
-        approvedEndpointHost: resolved.endpoint.host,
-        mcpServers: { research: mcpServer },
-        agents: { scout },
-        allowedTools,
-        maxTurns,
-        maxBudgetUsd,
-        abortController,
-        log: addLog,
-        maxConcurrentDelegations: MAX_PARALLEL_SCOUTS,
-        onDelegation: async (e) => {
-          if (e.kind === 'started') {
-            await phases.scoutStarted(e);
-            return;
-          }
-          const urls = extractUrls(e.output);
-          for (const u of urls) runCtx.scoutSurfacedUrls.add(normalizeUrl(u));
-          await phases.scoutEnded(e, urls.length);
-        },
-      });
+      const rounds: NonNullable<typeof result>[] = [];
+      while (true) {
+        const usedTurns = rounds.reduce((sum, round) => sum + round.numTurns, 0);
+        const usedCost = rounds.reduce((sum, round) => sum + round.totalCostUsd, 0);
+        const round = await runAgentQuery({
+          jobType: 'research',
+          jobId,
+          emitter,
+          prompt: rounds.length === 0 ? prompt :
+            `Continue this research run with fresh, substantive work for at least ${Math.max(1, Math.ceil((researchStartedAt + (minDurationMs ?? 0) - Date.now()) / 60_000))} more minutes. Previous terminal summary: ${rounds[rounds.length - 1].resultText.slice(0, 4000)}\n\nDo not repeat prior queries or candidates. Pick the next under-served subcategories, retrieve existing resources, delegate fresh scouts, check duplicates and save only genuine new discoveries. Do not finalize just because one subcategory or a small set is complete.`,
+          systemPrompt,
+          model: orchestratorModel,
+          config,
+          approvedEndpointHost: resolved.endpoint.host,
+          mcpServers: { research: mcpServer },
+          agents: { scout },
+          allowedTools,
+          maxTurns: maxTurns === null ? null : Math.max(0, maxTurns - usedTurns),
+          maxBudgetUsd: maxBudgetUsd === null ? null : Math.max(0, maxBudgetUsd - usedCost),
+          abortController,
+          log: addLog,
+          maxConcurrentDelegations: MAX_PARALLEL_SCOUTS,
+          onDelegation: async (e) => {
+            if (e.kind === 'started') {
+              await phases.scoutStarted(e);
+              return;
+            }
+            const urls = extractUrls(e.output);
+            for (const u of urls) runCtx.scoutSurfacedUrls.add(normalizeUrl(u));
+            await phases.scoutEnded(e, urls.length);
+          },
+        });
+        rounds.push(round);
+        const remainingMs = minDurationMs === null ? 0 : researchStartedAt + minDurationMs - Date.now();
+        const remainingTurns = maxTurns === null ? null : maxTurns - rounds.reduce((sum, item) => sum + item.numTurns, 0);
+        const remainingBudget = maxBudgetUsd === null ? null : maxBudgetUsd - rounds.reduce((sum, item) => sum + item.totalCostUsd, 0);
+        if (remainingMs <= 0 || round.aborted || runCtx.targetReached ||
+            (remainingTurns !== null && remainingTurns <= 0) ||
+            (remainingBudget !== null && remainingBudget <= 0.0001)) {
+          result = round;
+          break;
+        }
+        await addLog('system', `Continuing research for at least ${Math.ceil(remainingMs / 60_000)} more minute(s) with fresh gaps and candidates.`, true);
+      }
+      if (rounds.length > 1) {
+        const last = rounds[rounds.length - 1];
+        result = {
+          ...last,
+          numTurns: rounds.reduce((sum, round) => sum + round.numTurns, 0),
+          totalCostUsd: rounds.reduce((sum, round) => sum + round.totalCostUsd, 0),
+          tokensIn: rounds.reduce((sum, round) => sum + round.tokensIn, 0),
+          tokensOut: rounds.reduce((sum, round) => sum + round.tokensOut, 0),
+          webSearchCount: rounds.reduce((sum, round) => sum + round.webSearchCount, 0),
+          durationMs: rounds.reduce((sum, round) => sum + round.durationMs, 0),
+        };
+      }
     } catch (err) {
       // runAgentQuery throws for SDK error results, including the budget cap
       // hit on the turn after the target was reached: the caller's status

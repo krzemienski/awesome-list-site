@@ -6,6 +6,9 @@ All notable changes to the Awesome Video Resource Viewer project. Newest entries
 
 ## October 27, 2026
 
+### Sustained researcher runs
+- Add an optional minimum-duration launch limit. Early orchestrator completions now resume with fresh gap research and the previous terminal summary instead of ending the job, while elapsed time, remaining turns and remaining budget are enforced across all continuations. Turn, token, web-search, duration and cost accounting is cumulative.
+
 ### Curated Home card target sizing
 - C6-MEMBER-04: private Home curated-card title and tag links now meet the
   same 44×44px minimum as shared resource cards at every width, with layout,

@@ -91,6 +91,7 @@ export const ResearchLaunchGuide = forwardRef<ResearchLaunchGuideHandle, Researc
   // Raw strings so typing "5.5" or "0" is never silently rewritten.
   const [maxBudget, setMaxBudget] = useState("3.00");
   const [maxTurns, setMaxTurns] = useState("40");
+  const [minDurationMinutes, setMinDurationMinutes] = useState("");
   const [targetDiscoveries, setTargetDiscoveries] = useState("");
   const [showAdvanced, setShowAdvanced] = useState(false);
   const [model, setModel] = useState("");
@@ -157,6 +158,7 @@ export const ResearchLaunchGuide = forwardRef<ResearchLaunchGuideHandle, Researc
         categoryFocus: categoryFocus !== "all" ? categoryFocus : undefined,
         maxBudgetUsd: maxBudget.trim() === "" ? undefined : Number(maxBudget),
         maxTurns: maxTurns.trim() === "" ? undefined : Number(maxTurns),
+        minDurationMinutes: minDurationMinutes.trim() === "" ? undefined : Number(minDurationMinutes),
         targetDiscoveries: target ?? undefined,
         model: model.trim() || undefined,
         scoutModel: scoutModel.trim() || undefined,
@@ -193,6 +195,10 @@ export const ResearchLaunchGuide = forwardRef<ResearchLaunchGuideHandle, Researc
       const t = Number(maxTurns);
       if (!Number.isInteger(t) || t <= 0) return "Invalid max turns: enter a positive whole number, or leave it blank for no cap.";
     }
+    if (minDurationMinutes.trim() !== "") {
+      const minutes = Number(minDurationMinutes);
+      if (!Number.isInteger(minutes) || minutes < 1 || minutes > 240) return "Invalid minimum duration: enter 1–240 whole minutes, or leave it blank for no minimum.";
+    }
     if (target !== null && (!Number.isInteger(target) || target <= 0 || target > 1000)) {
       return "Invalid discovery target: enter a whole number from 1 to 1000, or leave it blank for no target.";
     }
@@ -220,6 +226,7 @@ export const ResearchLaunchGuide = forwardRef<ResearchLaunchGuideHandle, Researc
     target !== null && Number.isInteger(target) && target > 0 ? `stop after ${target}` : "no target",
     maxBudget.trim() === "" ? "no budget cap" : Number.isFinite(budgetN) && budgetN > 0 ? `$${budgetN.toFixed(2)} cap` : "budget?",
     maxTurns.trim() === "" ? "no turn cap" : Number.isInteger(turnsN) && turnsN > 0 ? `${turnsN} turns` : "turns?",
+    minDurationMinutes.trim() === "" ? "no minimum duration" : `${minDurationMinutes} min minimum`,
   ].join(" · ");
 
   return (
@@ -330,6 +337,15 @@ export const ResearchLaunchGuide = forwardRef<ResearchLaunchGuideHandle, Researc
               className="mt-1 min-h-11" data-testid="input-research-turns" />
             <p className={hint(maxTurns.trim() !== "" && !(Number.isInteger(turnsN) && turnsN > 0))} data-testid="text-turns-hint">
               {maxTurns.trim() === "" ? "No turn cap." : "Positive whole number (blank = no cap)."}
+            </p>
+          </div>
+          <div>
+            <Label htmlFor="minimum-duration">Minimum duration (minutes)</Label>
+            <Input id="minimum-duration" type="number" min={1} max={240} step={1} placeholder="No minimum"
+              value={minDurationMinutes} onChange={(e) => setMinDurationMinutes(e.target.value)}
+              className="mt-1 min-h-11" data-testid="input-research-min-duration" />
+            <p className="mt-1 text-xs text-muted-foreground" data-testid="text-min-duration-hint">
+              Optional. If the first turn ends early, the run continues with fresh research until this elapsed time, budget and turns allow.
             </p>
           </div>
         </div>
