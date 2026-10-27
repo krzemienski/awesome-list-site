@@ -1,0 +1,30 @@
+Checks executed in /tmp/c6-ac021-parent-feedback-20261027 after the scoped production edit, unpiped:
+
+1. npm ci --ignore-scripts
+   Exit 0; 935 packages installed. Dependency-install deprecation warnings only. No lifecycle scripts.
+2. npx tsc --noEmit
+   Exit 0; no output; 16.35 seconds.
+3. npm run build
+   Exit 0; 7.81 seconds. Client Vite build, SSR Vite build and esbuild server bundle completed. Raw complete command output: build-output.txt (captured from tool artifact://1542). Warnings: Zod pure-comment annotation placement; existing large bundle notices. No test suite, test files, mock, validation script/harness, lint, formatter or reviewer panel executed.
+4. npm run dev
+   Started isolated real local runtime at 127.0.0.1:5068 using development Clerk and loopback nonproduction database. New local-only random SESSION_SECRET; no OWNER_PASSWORD or ADMIN_PASSWORD configured; no production session/cookie/secret copied. Development startup skips migrations; DISABLE_BACKGROUND_JOBS=1; ENABLE_AUTO_SEED=false. Startup logged Serving on port 5068 mode=development and Background jobs disabled (DISABLE_BACKGROUND_JOBS=1).
+5. Real local browser navigation to /admin#subcategories at 1440x900 desktop, 820x1180 touch and 390x844 touch.
+   Every attempt reached the real development Clerk sign-in page. No approved authenticated local session was available; no login or auth bypass attempted. Fresh screenshots, accessibility snapshots, state/viewport and console/API network evidence saved beside this file. These prove the authentication boundary only, NOT AC-21 acceptance. Tablet/phone state capture confirms touchPoints=1 and coarse=true through direct CDP emulation. The earlier agent-browser set viewport reset touch; captures were replaced only after exact CDP touch state was observed.
+
+Evidence review: all three final screenshots were opened and viewed. They show the empty development Clerk email form, not a taxonomy dialog. Final PNG dimensions independently read as 1440x900, 820x1180 and 390x844. The first phone Puppeteer capture retained stale tablet-sized output bounds; it was replaced by direct Page.captureScreenshot after exact 390x844 touch metrics were reapplied. No screenshot is claimed as an AC-21 PASS. Saved application API network captures contain only GETs; development Clerk's own anonymous client/environment initialization is not taxonomy proof. No page errors were captured; the expected development-key Clerk warning remains in console evidence. The runtime and isolated browser were closed after capture.
+
+Final code check after removing the obsolete parent-banner comment: npx tsc --noEmit && npm run build, exit 0, 14.50 seconds, unpiped. The build command ran only because TypeScript returned 0; both completed successfully. Full captured output: final-check-output.txt (tool artifact://1772). This checks the final code, not just the earlier draft. No changed production logic followed it.
+
+Main-integration follow-up: merged origin/main at 1eb2e902 (PR104) into this feature branch as explicitly requested by Main. Only CHANGELOG.md conflicted; both the AC-21 and Search/Advanced form-field entries are retained under October 27, 2026. Re-ran npx tsc --noEmit separately, unpiped, exit 0 with no output (5.20 seconds), then npm run build separately, unpiped, exit 0 (8.48 seconds). Full intermediate integrated build output: main-integration-build-output.txt (tool artifact://1890). The original sign-in-boundary browser captures predate this main integration and are not promoted to current-head form proof. No PR merge or deploy was performed.
+
+Disabled-parent review correction: Main reported that Sub-Subcategories can have a disabled missing Parent Subcategory when a selected category has no children. The original focus routine attempted that disabled field, and parent error mapping removed the prior banner announcement. Corrected showFieldErrors to select the first errored element that exists and matches neither :disabled nor aria-disabled=true; if no such field exists, focus remains unchanged. Disabled parent inline feedback retains its association and now has role=alert, preserving an announcement without trying to focus a disabled control. Enabled-parent first-error feedback and Name/Slug ordering remain intact. No missing-field predicate, parent disabled rule or auth behavior changed. Final separate unpiped checks after this correction: npx tsc --noEmit exit 0 with no output (5.13 seconds), npm run build exit 0 (8.40 seconds); full output in disabled-parent-build-output.txt (tool artifact://1940). Runtime/assistive-technology proof for this additional disabled-parent case remains BLOCKED/UNVERIFIED under the same local-auth boundary.
+
+Remaining BLOCKED/UNVERIFIED at all three widths:
+- Empty create focuses Parent Category, marks aria-invalid, describes inline feedback.
+- Missing-parent edit equivalent.
+- With parent present, Name remains first, followed by Slug.
+- Correcting parent clears its inline error and ARIA state.
+- Disabled errored parents remain announced; focus moves to the first existing enabled invalid field, or stays unchanged if none exists.
+- Authenticated form console/network, real screen-reader speech and physical touch.
+- Server duplicate transport was not exercised; existing duplicate code/payload/validation predicates unchanged.
+- No production behavior claimed; no merge or deploy.

@@ -1,0 +1,166 @@
+- generic [ref=e2]:
+  - region "Notifications (F8)":
+    - list
+  - generic [ref=e3]:
+    - link "Skip to main content" [ref=e4] [cursor=pointer]:
+      - /url: "#main"
+    - generic [ref=e5]:
+      - banner [ref=e6]:
+        - generic [ref=e7]:
+          - button "Toggle sidebar" [ref=e8] [cursor=pointer]:
+            - generic [ref=e9]: Toggle sidebar
+          - img
+        - link "AWESOME.VIDEO home" [ref=e10] [cursor=pointer]:
+          - /url: /
+          - generic [ref=e11]: av
+          - generic [ref=e12]: AWESOME.VIDEO
+          - generic [ref=e13]: AWESOME.VIDEO home
+        - button "Search 1,949 resources" [ref=e14] [cursor=pointer]:
+          - img [ref=e15]
+          - generic [ref=e18]: Search 1,949 resources
+          - generic [ref=e19]: Search
+          - generic [ref=e20]: ⌘K
+        - button "Sign in, account menu" [ref=e21] [cursor=pointer]:
+          - img [ref=e23]
+          - generic [ref=e26]: Sign in
+          - generic [ref=e27]: Sign in, account menu
+      - generic [ref=e29]:
+        - main [ref=e30]:
+          - generic [ref=e31]:
+            - navigation "Breadcrumb" [ref=e32]:
+              - list [ref=e33]:
+                - listitem [ref=e34]:
+                  - link "Home" [ref=e35] [cursor=pointer]:
+                    - /url: /
+                - listitem [ref=e36]:
+                  - img [ref=e37]
+                - listitem:
+                  - link "Sign in" [disabled]
+            - generic [ref=e42]:
+              - generic [ref=e43]:
+                - generic [ref=e44]:
+                  - link "Awesome Video" [ref=e46] [cursor=pointer]:
+                    - /url: http://127.0.0.1:5068/
+                    - img "Awesome Video" [ref=e47]
+                  - generic [ref=e48]:
+                    - heading "Welcome back" [active] [level=1] [ref=e49]
+                    - paragraph [ref=e50]: Sign in to continue to Awesome Video
+                - generic [ref=e51]:
+                  - generic [ref=e53]:
+                    - button "Continue with Apple" [ref=e54] [cursor=pointer]
+                    - button "Continue with GitHub" [ref=e57] [cursor=pointer]
+                    - button "Continue with Google" [ref=e60] [cursor=pointer]
+                    - button "Continue with X / Twitter" [ref=e63] [cursor=pointer]
+                  - paragraph [ref=e68]: or
+                  - generic [ref=e70]:
+                    - generic [ref=e71]:
+                      - generic [ref=e74]:
+                        - generic [ref=e76] [cursor=pointer]: Email address
+                        - textbox "Email address" [ref=e77]:
+                          - /placeholder: Enter your email address
+                      - generic:
+                        - generic:
+                          - generic: Password
+                        - generic:
+                          - textbox:
+                            - /placeholder: Enter your password
+                          - button:
+                            - img
+                    - button "Continue" [ref=e80] [cursor=pointer]:
+                      - generic [ref=e81]:
+                        - text: Continue
+                        - img [ref=e82]
+              - generic [ref=e84]:
+                - generic [ref=e85]:
+                  - generic [ref=e86]: Don’t have an account?
+                  - link "Sign up" [ref=e87] [cursor=pointer]:
+                    - /url: http://127.0.0.1:5068/sign-up#/?redirect_url=http%3A%2F%2F127.0.0.1%3A5068%2Fadmin%23subcategories
+                - paragraph [ref=e90]: Development mode
+        - contentinfo [ref=e91]:
+          - generic [ref=e92]:
+            - generic [ref=e93]:
+              - paragraph [ref=e94]: ── INDEX
+              - link "awesome.video home" [ref=e95] [cursor=pointer]:
+                - /url: /
+                - text: awesome.video
+              - paragraph [ref=e96]: A curated collection of awesome video resources, tools, and technologies for developers and content creators
+            - generic [ref=e98]:
+              - heading "INDEXED" [level=2] [ref=e99]
+              - paragraph [ref=e100]: 1,949
+              - paragraph [ref=e101]:
+                - text: 9 categories
+                - text: 18 subcategories
+                - generic [ref=e102]: live
+            - navigation "Explore categories" [ref=e104]:
+              - heading "EXPLORE" [level=2] [ref=e105]
+              - generic [ref=e106]:
+                - link "Community & Events" [ref=e107] [cursor=pointer]:
+                  - /url: /category/community-events
+                  - generic [ref=e108]: ◈
+                  - generic [ref=e109]: Community
+                - link "Encoding & Codecs" [ref=e110] [cursor=pointer]:
+                  - /url: /category/encoding-codecs
+                  - generic [ref=e111]: ◇
+                  - generic [ref=e112]: Encoding
+                - link "General Tools" [ref=e113] [cursor=pointer]:
+                  - /url: /category/general-tools
+                  - generic [ref=e114]: ◆
+                  - generic [ref=e115]: General
+                - link "Infrastructure & Delivery" [ref=e116] [cursor=pointer]:
+                  - /url: /category/infrastructure-delivery
+                  - generic [ref=e117]: ▣
+                  - generic [ref=e118]: Infrastructure
+                - link "Intro & Learning" [ref=e119] [cursor=pointer]:
+                  - /url: /category/intro-learning
+                  - generic [ref=e120]: ▤
+                  - generic [ref=e121]: Intro
+                - link "Media Tools" [ref=e122] [cursor=pointer]:
+                  - /url: /category/media-tools
+                  - generic [ref=e123]: ▥
+                  - generic [ref=e124]: Media
+                - link "Players & Clients" [ref=e125] [cursor=pointer]:
+                  - /url: /category/players-clients
+                  - generic [ref=e126]: ▶
+                  - generic [ref=e127]: Players
+                - link "Protocols & Transport" [ref=e128] [cursor=pointer]:
+                  - /url: /category/protocols-transport
+                  - generic [ref=e129]: ⟁
+                  - generic [ref=e130]: Protocols
+                - link "Standards & Industry" [ref=e131] [cursor=pointer]:
+                  - /url: /category/standards-industry
+                  - generic [ref=e132]: ◉
+                  - generic [ref=e133]: Standards
+            - generic [ref=e134]:
+              - heading "SOURCE" [level=2] [ref=e135]
+              - link "krzemienski/awesome-video" [ref=e136] [cursor=pointer]:
+                - /url: https://github.com/krzemienski/awesome-video
+                - img [ref=e137]
+                - generic [ref=e139]:
+                  - text: krzemienski
+                  - generic [ref=e140]:
+                    - text: /
+                    - text: awesome-video
+                - generic [ref=e141]: ↗
+              - paragraph [ref=e142]:
+                - text: Open-source.
+                - link "PRs welcome" [ref=e143] [cursor=pointer]:
+                  - /url: https://github.com/krzemienski/awesome-video/blob/master/CONTRIBUTING.md
+                - text: .
+                - text: Indexed automatically from README.md.
+          - generic [ref=e144]:
+            - generic [ref=e145]: © 2026 awesome.video · content CC0, code MIT
+            - navigation "Site policies" [ref=e146]:
+              - link "About" [ref=e147] [cursor=pointer]:
+                - /url: /about
+              - link "Terms" [ref=e148] [cursor=pointer]:
+                - /url: /terms
+              - link "Privacy" [ref=e149] [cursor=pointer]:
+                - /url: /privacy
+              - link "Code of Conduct" [ref=e150] [cursor=pointer]:
+                - /url: /code-of-conduct
+                - text: Conduct
+              - link "Issues ↗" [ref=e151] [cursor=pointer]:
+                - /url: https://github.com/krzemienski/awesome-video/issues
+              - link "Sitemap" [ref=e152] [cursor=pointer]:
+                - /url: /sitemap.xml
+            - generic [ref=e153]: built with the awesome-list framework

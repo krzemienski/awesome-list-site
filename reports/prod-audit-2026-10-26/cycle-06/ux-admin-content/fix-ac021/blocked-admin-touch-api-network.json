@@ -1,0 +1,20 @@
+[
+  {
+    "url": "http://127.0.0.1:5068/api/awesome-list/nav",
+    "method": "GET",
+    "status": 304,
+    "type": "fetch"
+  },
+  {
+    "url": "http://127.0.0.1:5068/api/config",
+    "method": "GET",
+    "status": 200,
+    "type": "fetch"
+  },
+  {
+    "url": "http://127.0.0.1:5068/api/auth/user",
+    "method": "GET",
+    "status": 304,
+    "type": "fetch"
+  }
+]
