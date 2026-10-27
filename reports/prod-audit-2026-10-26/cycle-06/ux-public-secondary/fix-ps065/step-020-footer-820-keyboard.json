@@ -1,0 +1,128 @@
+{
+  "capturedAt": "2026-10-27T07:25:48.699Z",
+  "viewport": {
+    "width": 820,
+    "height": 1180,
+    "coarse": true
+  },
+  "order": [
+    {
+      "name": "Community & Events",
+      "href": "/category/community-events",
+      "focusVisible": true,
+      "outline": "rgb(255, 61, 82) solid 2px"
+    },
+    {
+      "name": "Encoding & Codecs",
+      "href": "/category/encoding-codecs",
+      "focusVisible": true,
+      "outline": "rgb(255, 61, 82) solid 2px"
+    },
+    {
+      "name": "General Tools",
+      "href": "/category/general-tools",
+      "focusVisible": true,
+      "outline": "rgb(255, 61, 82) solid 2px"
+    },
+    {
+      "name": "Infrastructure & Delivery",
+      "href": "/category/infrastructure-delivery",
+      "focusVisible": true,
+      "outline": "rgb(255, 61, 82) solid 2px"
+    },
+    {
+      "name": "Intro & Learning",
+      "href": "/category/intro-learning",
+      "focusVisible": true,
+      "outline": "rgb(255, 61, 82) solid 2px"
+    },
+    {
+      "name": "Media Tools",
+      "href": "/category/media-tools",
+      "focusVisible": true,
+      "outline": "rgb(255, 61, 82) solid 2px"
+    },
+    {
+      "name": "Players & Clients",
+      "href": "/category/players-clients",
+      "focusVisible": true,
+      "outline": "rgb(255, 61, 82) solid 2px"
+    },
+    {
+      "name": "Protocols & Transport",
+      "href": "/category/protocols-transport",
+      "focusVisible": true,
+      "outline": "rgb(255, 61, 82) solid 2px"
+    },
+    {
+      "name": "Standards & Industry",
+      "href": "/category/standards-industry",
+      "focusVisible": true,
+      "outline": "rgb(255, 61, 82) solid 2px"
+    },
+    {
+      "name": "krzemienski/awesome-video↗",
+      "href": "https://github.com/krzemienski/awesome-video",
+      "focusVisible": true,
+      "outline": "rgb(244, 243, 238) solid 3px"
+    },
+    {
+      "name": "PRs welcome",
+      "href": "https://github.com/krzemienski/awesome-video/blob/master/CONTRIBUTING.md",
+      "focusVisible": true,
+      "outline": "rgb(255, 61, 82) solid 2px"
+    },
+    {
+      "name": "About",
+      "href": "/about",
+      "focusVisible": true,
+      "outline": "rgb(255, 61, 82) solid 2px"
+    },
+    {
+      "name": "Terms",
+      "href": "/terms",
+      "focusVisible": true,
+      "outline": "rgb(255, 61, 82) solid 2px"
+    },
+    {
+      "name": "Privacy",
+      "href": "/privacy",
+      "focusVisible": true,
+      "outline": "rgb(255, 61, 82) solid 2px"
+    },
+    {
+      "name": "Code of Conduct",
+      "href": "/code-of-conduct",
+      "focusVisible": true,
+      "outline": "rgb(255, 61, 82) solid 2px"
+    },
+    {
+      "name": "Issues ↗",
+      "href": "https://github.com/krzemienski/awesome-video/issues",
+      "focusVisible": true,
+      "outline": "rgb(255, 61, 82) solid 2px"
+    },
+    {
+      "name": "Sitemap",
+      "href": "/sitemap.xml",
+      "focusVisible": true,
+      "outline": "rgb(255, 61, 82) solid 2px"
+    }
+  ],
+  "forwardGeneral": {
+    "name": "General Tools",
+    "href": "/category/general-tools",
+    "focusVisible": true
+  },
+  "reverseEncoding": {
+    "name": "Encoding & Codecs",
+    "href": "/category/encoding-codecs",
+    "focusVisible": true,
+    "outline": "rgb(255, 61, 82) solid 2px",
+    "outlineOffset": "-2px"
+  },
+  "enterResult": {
+    "url": "http://127.0.0.1:5165/category/encoding-codecs",
+    "h1": "Encoding & Codecs"
+  }
+}

@@ -8,6 +8,10 @@ Base: `520d6778369bc7ce495204cfcacc7e0533f941cc`. Branch: `fix/c6-ax020-advanced
 - `npm run build`: exit 0, unpiped. Raw output is `build-output.txt`; dependency PURE-annotation and bundle-size warnings remain.
 - No test files, test suites, mocks, validation scripts or harnesses were created or run.
 
+### Main synchronization
+
+Merged `origin/main` at `2c4a00eed2085561e9170b2575b92837e48ac5da` into this fix branch. The additive CHANGELOG conflict preserves both the Advanced recovery entry and all upstream entries. Re-ran `npx tsc --noEmit` (exit 0, no diagnostics) and `npm run build` (exit 0), both unpiped. See `integration-checks.json` and `integration-build-output.txt`. The existing all-width browser proof was retained as explicitly authorized for this synchronization; it was not repeated solely for integration. This did not merge the PR or deploy.
+
 ## Real runtime and failure method
 
 The existing Express/Vite app ran at `http://127.0.0.1:5167`, using the approved isolated loopback `awesome_c2_pubsec` database, development mode and `DISABLE_BACKGROUND_JOBS=1`. No production database, migration, seeding or paid work was used. Analytics consent was denied and `umami.disabled=1`.

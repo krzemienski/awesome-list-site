@@ -1,0 +1,79 @@
+{
+  "url": "http://127.0.0.1:5064/advanced?tab=export",
+  "width": 1440,
+  "labels": [
+    {
+      "text": "Export Format",
+      "for": "export-format",
+      "target": true
+    },
+    {
+      "text": "Include descriptions",
+      "for": "descriptions",
+      "target": true
+    },
+    {
+      "text": "Include tags",
+      "for": "tags",
+      "target": true
+    },
+    {
+      "text": "Include categories",
+      "for": "categories",
+      "target": true
+    },
+    {
+      "text": "Group by category",
+      "for": "groupByCategory",
+      "target": true
+    },
+    {
+      "text": "Community & Events (91)",
+      "for": "category-Community & Events",
+      "target": true
+    },
+    {
+      "text": "Encoding & Codecs (372)",
+      "for": "category-Encoding & Codecs",
+      "target": true
+    },
+    {
+      "text": "General Tools (95)",
+      "for": "category-General Tools",
+      "target": true
+    },
+    {
+      "text": "Infrastructure & Delivery (183)",
+      "for": "category-Infrastructure & Delivery",
+      "target": true
+    },
+    {
+      "text": "Intro & Learning (227)",
+      "for": "category-Intro & Learning",
+      "target": true
+    },
+    {
+      "text": "Media Tools (304)",
+      "for": "category-Media Tools",
+      "target": true
+    },
+    {
+      "text": "Players & Clients (263)",
+      "for": "category-Players & Clients",
+      "target": true
+    },
+    {
+      "text": "Protocols & Transport (242)",
+      "for": "category-Protocols & Transport",
+      "target": true
+    },
+    {
+      "text": "Standards & Industry (172)",
+      "for": "category-Standards & Industry",
+      "target": true
+    }
+  ],
+  "duplicateIds": [],
+  "missing": [],
+  "nativeInputs": []
+}

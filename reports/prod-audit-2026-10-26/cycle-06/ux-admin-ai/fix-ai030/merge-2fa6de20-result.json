@@ -1,0 +1,18 @@
+{
+  "finding": "C6-AI-030",
+  "pr": "https://github.com/krzemienski/awesome-list-site/pull/107",
+  "branch": "fix/c6-ai030-full-history",
+  "integratedMain": "2fa6de209f1fbf11ad62858cfa7f343258cb407d",
+  "mergeCommit": "faadaa02502261c83f419d01c8ee616955112565",
+  "priorBranchHead": "fd7f36e83188fcd3c34e2dbee4b33dfb6f02374c",
+  "operation": "Merge origin/main into the fix branch; do not merge the PR or deploy.",
+  "conflictResolution": "Resolved the sole CHANGELOG conflict by retaining both AI030 and exact-uppercase reseed entries. All earlier entries remain. ResearcherTab source was unchanged by this integration.",
+  "checks": [
+    { "command": "./node_modules/.bin/tsc --noEmit", "exitCode": 0, "piped": false, "evidence": "merge-2fa6de20-typecheck.txt:1-4" },
+    { "command": "npm run build", "exitCode": 0, "piped": false, "evidence": "merge-2fa6de20-build.txt:275-287" }
+  ],
+  "sourceHashes": "merge-2fa6de20-source-sha256.txt",
+  "buildMetadataNote": "Checks ran at mergeCommit. A subsequent evidence-only commit records these receipts without changing production source.",
+  "browserProof": "BLOCKED/UNVERIFIED, unchanged from browser-proof.json: no authorized local admin session; no sign-in, cookie transfer or auth bypass performed.",
+  "safety": "No PR merge or deployment. No test suites, test files, mocks, validation scripts/harnesses or paid AI work."
+}

@@ -1,0 +1,9 @@
+Final source checks in isolated /tmp/awesome-list-c6-taxonomy-20261027
+./node_modules/.bin/tsc --noEmit
+TSC_EXIT=0
+
+npm run build
+BUILD_EXIT=0
+Client: 3959 modules; built in 6.17s. SSR: 309 modules; built in 1.24s. esbuild done in 26ms.
+Warnings: zod PURE-comment annotations; chunks over 500 kB; Home dynamically and statically imported.
+No test suites, mocks, validation scripts, or harnesses run.

@@ -124,6 +124,10 @@ export default function ResearcherTab({ initialTab = "review" }: ResearcherTabPr
   const autoFollowed = useRef(followJobId !== null);
   const guideRef = useRef<ResearchLaunchGuideHandle>(null);
   const [historyJobId, setHistoryJobId] = useState<number | null>(null);
+  const [historyOpen, setHistoryOpen] = useState(false);
+  const [historyTab, setHistoryTab] = useState<string>(initialTab);
+  const historyRegionRef = useRef<HTMLElement>(null);
+  const historyRowRef = useRef<HTMLTableRowElement>(null);
 
   const [selectedJobId, setSelectedJobId] = useState<number | null>(null);
   const [showJobDetails, setShowJobDetails] = useState(false);
@@ -217,6 +221,22 @@ export default function ResearcherTab({ initialTab = "review" }: ResearcherTabPr
       return false;
     },
   });
+
+  // A deep-linked run can be older than the paginated list, even at its limit.
+  // Reuse the run view's cached detail without growing the compact jobs window.
+  const historyJobQuery = useQuery<ResearchJob>({
+    queryKey: ['/api/researcher/jobs', historyJobId],
+    enabled: historyJobId !== null && !jobs?.some((job) => job.id === historyJobId),
+    queryFn: async () => {
+      const res = await apiFetch(`/api/researcher/jobs/${historyJobId}`, { credentials: 'include' });
+      if (!res.ok) throw new ApiError(res.status, `Failed to fetch job ${historyJobId}: ${res.status}`);
+      return res.json();
+    },
+  });
+  const extraHistoryJob = historyJobQuery.data?.id === historyJobId && !jobs?.some((job) => job.id === historyJobId)
+    ? historyJobQuery.data
+    : null;
+  const historyJobs = extraHistoryJob ? [extraHistoryJob, ...(jobs ?? [])] : (jobs ?? []);
 
   const {
     data: pendingDiscoveries,
@@ -343,10 +363,12 @@ export default function ResearcherTab({ initialTab = "review" }: ResearcherTabPr
   const showHistory = (jobId: number) => {
     flushSync(() => {
       setHistoryJobId(jobId);
+      setHistoryOpen(true);
+      setHistoryTab("history");
       setFollowJobId(null);
     });
-    jobsRegionRef.current?.scrollIntoView({ block: "center" });
-    focusElement(jobsRegionRef.current);
+    (historyRowRef.current ?? historyRegionRef.current)?.scrollIntoView({ block: "center" });
+    focusElement(historyRegionRef.current, { preventScroll: true });
   };
 
   return (
@@ -474,9 +496,9 @@ export default function ResearcherTab({ initialTab = "review" }: ResearcherTabPr
           ) : null}
         </TableShell>
       </div>
-      <details className="queues-agent__more">
+      <details className="queues-agent__more" open={historyOpen} onToggle={(event) => setHistoryOpen(event.currentTarget.open)}>
         <summary className="btn ghost">All pending discoveries &amp; full job history</summary>
-      <Tabs defaultValue={initialTab} className="w-full queues-agent__tabs">
+      <Tabs value={historyTab} onValueChange={setHistoryTab} className="w-full queues-agent__tabs">
         {/* Run16 BUG-030: wrap at narrow widths — the fixed inline-flex bar
             was 465px wide and pushed "Job History" off-screen at 375px. */}
         <TabsList className="mb-4 flex flex-wrap h-auto w-full justify-start gap-1">
@@ -630,10 +652,17 @@ export default function ResearcherTab({ initialTab = "review" }: ResearcherTabPr
         </TabsContent>
 
         <TabsContent value="history">
-          <Card className="queues-agent__table-shell">
+          <Card
+            ref={historyRegionRef}
+            role="region"
+            aria-label={historyJobId === null ? "Research job history" : `Research job history, selected run #${historyJobId}`}
+            tabIndex={-1}
+            className="queues-agent__table-shell focus-visible:outline focus-visible:outline-2 focus-visible:outline-ring"
+          >
             <CardHeader className="queues-agent__table-heading">
               <CardTitle className="queues-agent__table-title">Research Job History</CardTitle>
               <CardDescription className="queues-agent__table-description" data-testid="text-job-history-range">
+                {extraHistoryJob && `Selected job #${extraHistoryJob.id} is shown above the latest jobs. `}
                 {/* Run23 NB-039: say when the list is truncated instead of
                     silently capping at the latest 20. */}
                 {jobs && jobsTotal > jobs.length
@@ -642,6 +671,15 @@ export default function ResearcherTab({ initialTab = "review" }: ResearcherTabPr
               </CardDescription>
             </CardHeader>
             <CardContent className="queues-agent__table-body">
+              {historyJobQuery.isError && !historyJobs.some((job) => job.id === historyJobId) && (
+                <AdminLoadError
+                  subject={`selected job #${historyJobId}`}
+                  error={historyJobQuery.error}
+                  onRetry={() => { void historyJobQuery.refetch(); }}
+                  retrying={historyJobQuery.isFetching}
+                  className="queues-agent__inline-error"
+                />
+              )}
               {jobsLoading ? (
                 /* Run16 BUG-077: skeleton rows instead of a bare text node. */
                 <div className="space-y-3 py-2" aria-label="Loading research jobs">
@@ -659,7 +697,7 @@ export default function ResearcherTab({ initialTab = "review" }: ResearcherTabPr
                   testId="error-research-jobs"
                   retryTestId="button-retry-research-jobs"
                 />
-              ) : !jobs || jobs.length === 0 ? (
+              ) : historyJobs.length === 0 ? (
                 <p className="text-sm text-muted-foreground text-center py-8">No research jobs yet</p>
               ) : (
                 <Table>
@@ -680,8 +718,13 @@ export default function ResearcherTab({ initialTab = "review" }: ResearcherTabPr
                     </TableRow>
                   </TableHeader>
                   <TableBody>
-                    {jobs.map(job => ([
-                        <TableRow key={`${job.id}-main`}>
+                    {historyJobs.flatMap(job => ([
+                        <TableRow
+                          key={`${job.id}-main`}
+                          ref={job.id === historyJobId ? historyRowRef : undefined}
+                          aria-current={job.id === historyJobId ? "true" : undefined}
+                          data-state={job.id === historyJobId ? "selected" : undefined}
+                        >
                           <TableCell className="font-medium">#{job.id}</TableCell>
                           <TableCell>{getStatusBadge(job.status)}</TableCell>
                           <TableCell className="max-w-[200px] truncate text-xs">{job.prompt}</TableCell>

@@ -1,0 +1,363 @@
+{
+  "ticket": "C6-PS-065",
+  "drivenBy": "C6PS065FixSol on omniroute/cx/gpt-6.1-sol",
+  "capturedAt": "2026-10-27T07:36:33.841Z",
+  "base": "1eb2e90270b9f358862575abfe7912a3a29c8f71",
+  "runtime": {
+    "origin": "http://127.0.0.1:5165",
+    "mode": "development",
+    "browser": "Owned signed-out Google Chrome CDP9265; no production session",
+    "database": "Dedicated local awesome_c6_ps065 copied from local awesome_c2_pubsec; 9 categories / 1949 resources",
+    "backgroundJobs": "DISABLE_BACKGROUND_JOBS=1; startup log confirms disabled",
+    "migrations": "not run; development boot skips migrations"
+  },
+  "checks": [
+    {
+      "command": "node_modules/.bin/tsc --noEmit",
+      "exitCode": 0,
+      "basis": "Tool call returned normally with no diagnostics; 19.51s",
+      "artifact": "step-001-tsc-no-emit.json"
+    },
+    {
+      "command": "npm run build",
+      "exitCode": 0,
+      "basis": "BUILD_EXIT=0 in captured unpiped output; 8.39s",
+      "artifact": "step-002-build.json",
+      "warnings": [
+        "Rollup removed uninterpretable third-party zod PURE annotations",
+        "Vite chunk-size advisory; esbuild server bundle 1.5MB"
+      ]
+    }
+  ],
+  "measurements": [
+    {
+      "width": 1440,
+      "height": 1000,
+      "touch": false,
+      "dpr": 1,
+      "totalFooterTargets": 18,
+      "exploreTargets": 9,
+      "minExploreHeight": 44,
+      "minExploreWidth": 238.2578125,
+      "adjacentPitch": [
+        44
+      ],
+      "adjacentGap": [
+        0
+      ],
+      "intersections": [],
+      "overflowPixels": 0,
+      "gridColumns": "381.211px 238.266px 238.258px 238.266px"
+    },
+    {
+      "width": 820,
+      "height": 1180,
+      "touch": true,
+      "dpr": 1,
+      "totalFooterTargets": 18,
+      "exploreTargets": 9,
+      "minExploreHeight": 44,
+      "minExploreWidth": 218.6640625,
+      "adjacentPitch": [
+        44
+      ],
+      "adjacentGap": [
+        0
+      ],
+      "intersections": [],
+      "overflowPixels": 0,
+      "gridColumns": "218.664px 218.664px 218.672px"
+    },
+    {
+      "width": 390,
+      "height": 844,
+      "touch": true,
+      "dpr": 1,
+      "totalFooterTargets": 18,
+      "exploreTargets": 9,
+      "minExploreHeight": 44,
+      "minExploreWidth": 143,
+      "adjacentPitch": [
+        44
+      ],
+      "adjacentGap": [
+        0
+      ],
+      "intersections": [],
+      "overflowPixels": 0,
+      "gridColumns": "143px 143px"
+    }
+  ],
+  "interactions": {
+    "390": {
+      "input": "native touchscreen tap",
+      "actions": [
+        {
+          "name": "Encoding & Codecs",
+          "edge": "bottom-center",
+          "x": 258.5,
+          "y": 433.328125,
+          "expected": "/category/encoding-codecs",
+          "hit": "/category/encoding-codecs",
+          "before": "http://127.0.0.1:5165/about",
+          "after": {
+            "url": "http://127.0.0.1:5165/category/encoding-codecs",
+            "title": "Video Encoding & Codecs: AV1, HEVC, H.264 — Awesome Video",
+            "h1": "Encoding & Codecs"
+          }
+        },
+        {
+          "name": "General Tools",
+          "edge": "top-center",
+          "x": 258.5,
+          "y": 437.328125,
+          "expected": "/category/general-tools",
+          "hit": "/category/general-tools",
+          "before": "http://127.0.0.1:5165/about",
+          "after": {
+            "url": "http://127.0.0.1:5165/category/general-tools",
+            "title": "Video Development Tools & Utilities — Awesome Video",
+            "h1": "General Tools"
+          }
+        },
+        {
+          "name": "Encoding & Codecs",
+          "edge": "top-center",
+          "x": 258.5,
+          "y": 392.921875,
+          "expected": "/category/encoding-codecs",
+          "hit": "/category/encoding-codecs",
+          "before": "http://127.0.0.1:5165/about",
+          "after": {
+            "url": "http://127.0.0.1:5165/category/encoding-codecs",
+            "h1": "Encoding & Codecs"
+          }
+        },
+        {
+          "name": "General Tools",
+          "edge": "bottom-center",
+          "x": 258.5,
+          "y": 477.328125,
+          "expected": "/category/general-tools",
+          "hit": "/category/general-tools",
+          "before": "http://127.0.0.1:5165/about",
+          "after": {
+            "url": "http://127.0.0.1:5165/category/general-tools",
+            "h1": "General Tools"
+          }
+        }
+      ],
+      "keyboard": "step-030-footer-390-keyboard.json",
+      "focusScreenshot": "step-031-footer-390-keyboard-focus.png"
+    },
+    "820": {
+      "input": "native touchscreen tap",
+      "actions": [
+        {
+          "name": "Encoding & Codecs",
+          "edge": "bottom-center",
+          "x": 399.99609375,
+          "y": 695.0078125,
+          "expected": "/category/encoding-codecs",
+          "hit": "/category/encoding-codecs",
+          "before": "http://127.0.0.1:5165/about",
+          "after": {
+            "url": "http://127.0.0.1:5165/category/encoding-codecs",
+            "title": "Video Encoding & Codecs: AV1, HEVC, H.264 — Awesome Video",
+            "h1": "Encoding & Codecs"
+          }
+        },
+        {
+          "name": "General Tools",
+          "edge": "top-center",
+          "x": 399.99609375,
+          "y": 699.0078125,
+          "expected": "/category/general-tools",
+          "hit": "/category/general-tools",
+          "before": "http://127.0.0.1:5165/about",
+          "after": {
+            "url": "http://127.0.0.1:5165/category/general-tools",
+            "title": "Video Development Tools & Utilities — Awesome Video",
+            "h1": "General Tools"
+          }
+        },
+        {
+          "name": "Encoding & Codecs",
+          "edge": "top-center",
+          "x": 399.99609375,
+          "y": 654.9765625,
+          "expected": "/category/encoding-codecs",
+          "hit": "/category/encoding-codecs",
+          "before": "http://127.0.0.1:5165/about",
+          "after": {
+            "url": "http://127.0.0.1:5165/category/encoding-codecs",
+            "h1": "Encoding & Codecs"
+          }
+        },
+        {
+          "name": "General Tools",
+          "edge": "bottom-center",
+          "x": 399.99609375,
+          "y": 739.0078125,
+          "expected": "/category/general-tools",
+          "hit": "/category/general-tools",
+          "before": "http://127.0.0.1:5165/about",
+          "after": {
+            "url": "http://127.0.0.1:5165/category/general-tools",
+            "h1": "General Tools"
+          }
+        }
+      ],
+      "keyboard": "step-020-footer-820-keyboard.json",
+      "focusScreenshot": "step-035-footer-820-focus-visible.png"
+    },
+    "1440": {
+      "input": "native mouse click",
+      "actions": [
+        {
+          "name": "Encoding & Codecs",
+          "edge": "bottom-center",
+          "x": 931.60546875,
+          "y": 558.8359375,
+          "expected": "/category/encoding-codecs",
+          "hit": "/category/encoding-codecs",
+          "before": "http://127.0.0.1:5165/about",
+          "after": {
+            "url": "http://127.0.0.1:5165/category/encoding-codecs",
+            "title": "Video Encoding & Codecs: AV1, HEVC, H.264 — Awesome Video",
+            "h1": "Encoding & Codecs"
+          },
+          "waiterNote": "tab.waitForUrl wildcard timed out although browser navigated correctly; exact location and H1 read directly afterward"
+        },
+        {
+          "name": "General Tools",
+          "edge": "top-center",
+          "x": 931.60546875,
+          "y": 563.1484375,
+          "expected": "/category/general-tools",
+          "hit": "/category/general-tools",
+          "before": "http://127.0.0.1:5165/about",
+          "after": {
+            "url": "http://127.0.0.1:5165/category/general-tools",
+            "title": "Video Development Tools & Utilities — Awesome Video",
+            "h1": "General Tools"
+          }
+        },
+        {
+          "name": "Encoding & Codecs",
+          "edge": "top-center",
+          "x": 931.60546875,
+          "y": 518.8359375,
+          "expected": "/category/encoding-codecs",
+          "hit": "/category/encoding-codecs",
+          "before": "http://127.0.0.1:5165/about",
+          "after": {
+            "url": "http://127.0.0.1:5165/category/encoding-codecs",
+            "h1": "Encoding & Codecs"
+          }
+        },
+        {
+          "name": "General Tools",
+          "edge": "bottom-center",
+          "x": 931.60546875,
+          "y": 602.8359375,
+          "expected": "/category/general-tools",
+          "hit": "/category/general-tools",
+          "before": "http://127.0.0.1:5165/about",
+          "after": {
+            "url": "http://127.0.0.1:5165/category/general-tools",
+            "h1": "General Tools"
+          }
+        }
+      ],
+      "keyboard": "step-011-footer-1440-keyboard.json",
+      "focusScreenshot": "step-033-footer-1440-focus-visible.png"
+    }
+  },
+  "diagnostics": [
+    {
+      "width": 1440,
+      "pageErrors": [],
+      "consoleErrorWarn": [],
+      "networkFailures": [],
+      "note": "HTTP 304 cache revalidations are retained and are not failed requests; browser network helper reports ok:false for 304."
+    },
+    {
+      "width": 820,
+      "pageErrors": [],
+      "consoleErrorWarn": [],
+      "networkFailures": [],
+      "note": "HTTP 304 cache revalidations are retained and are not failed requests; browser network helper reports ok:false for 304."
+    },
+    {
+      "width": 390,
+      "pageErrors": [],
+      "consoleErrorWarn": [],
+      "networkFailures": [],
+      "note": "HTTP 304 cache revalidations are retained and are not failed requests; browser network helper reports ok:false for 304."
+    }
+  ],
+  "screenshotsReviewed": [
+    {
+      "files": [
+        "step-005-footer-1440.png",
+        "step-033-footer-1440-focus-visible.png"
+      ],
+      "observed": "Desktop four-column identity/indexed/explore/source footer, nine separated category rows, full policy strip and visible inset red focus rectangle around Encoding; no row or text overlap."
+    },
+    {
+      "files": [
+        "step-016-footer-820.png",
+        "step-035-footer-820-focus-visible.png"
+      ],
+      "observed": "Tablet identity above three columns, source to right of full nine-row category list, policy strip below. Encoding focus ring stays inside its own row."
+    },
+    {
+      "files": [
+        "step-025-footer-390-lower.png",
+        "step-026-footer-390-upper.png",
+        "step-031-footer-390-keyboard-focus.png"
+      ],
+      "observed": "Phone identity full-width, indexed/explore two-column layout, source and wrapped policies below; all nine rows remain separate. The focused Encoding ring does not touch neighboring labels."
+    },
+    {
+      "files": [
+        "step-007-desktop-encoding-route.png",
+        "step-010-desktop-general-route-settled.png",
+        "step-018-tablet-encoding-route.png",
+        "step-019-tablet-general-route.png",
+        "step-028-phone-encoding-route.png",
+        "step-029-phone-general-route.png"
+      ],
+      "observed": "Native edge activations show the expected Encoding & Codecs or General Tools category title and actual catalog content at each width."
+    }
+  ],
+  "toolLimitations": [
+    {
+      "attempt": "Initial connected CDP9224 viewport",
+      "outcome": "Shared Chrome zoom125% caused declared vs actual CSS-width mismatch; no proof uses that attempt. Switched to owned clean-profile Chrome9265 and verified innerWidth/DPR and PNG IHDR."
+    },
+    {
+      "attempt": "tab.waitForUrl wildcard",
+      "outcome": "Timed out even though Encoding navigation succeeded; persisted actual URL/H1. Later native interactions use exact pathname+H1 waits."
+    },
+    {
+      "attempt": "page.keyboard.press Shift+Tab",
+      "outcome": "Unknown key; subsequent native down(Shift),press(Tab),up(Shift) succeeded."
+    },
+    {
+      "attempt": "Early focus screenshots step-012 and step-021",
+      "outcome": "Captured during scroll restoration; focus value correct but screenshot misses focused row. Superseded by stable visible screenshots step-033 and step-035."
+    },
+    {
+      "attempt": "Direct CDP Page.reload cache reset",
+      "outcome": "Timed out in tool and reset metrics to browser default. Not used as responsive proof; validator performs own fresh target setup."
+    }
+  ],
+  "unverified": [
+    "No production deployment or post-deploy check (explicitly prohibited).",
+    "Physical touch devices, non-Chromium browsers, alternate product themes and optional contact/analytics footer variants were not exercised; shared CSS change does not target them.",
+    "Global app accessibility/contrast, unrelated sidebar negative-margin patterns and non-footer controls are outside this ticket."
+  ],
+  "safety": "No test files, mocked APIs, validation scripts/harnesses, production data writes, auth bypasses, merge or deploy."
+}

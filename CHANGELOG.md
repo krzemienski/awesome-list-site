@@ -10,6 +10,60 @@ All notable changes to the Awesome Video Resource Viewer project. Newest entries
 - The catalog ErrorPage distinguishes a disconnected device from an online server failure. Retry while offline keeps the page in place and explains that reconnection is required.
 - Automatic recovery from a displayed offline error hands focus to the recovered page heading only while focus still belongs to that error or the document body. Navigation and subsequent user-directed focus cancel the handoff; ordinary background refetches do not arm it.
 
+### Taxonomy card actions and recovery
+- Restored Favorite and Bookmark controls to taxonomy Grid cards using the same guest/member actions as List and Compact.
+- Numeric page overflow recovers to the last page with a dismissible explanation, including typed page jumps and direct document loads. Recovery replaces the unavailable history entry even when saved view preferences or query normalization also apply. Invalid page text and unknown taxonomy routes retain their existing validation.
+- Offline collection recovery preserves focus intent until results mount and restores lost focus without moving it during ordinary background refreshes.
+
+### Footer category target separation
+- Fixed C6-PS-065 by giving each Explore category link its full 44px layout
+  row instead of overlapping neighboring targets with negative margins.
+  Category typography, ordering, focus rings and responsive footer columns
+  are unchanged.
+
+### Researcher history navigation (C6-AI-030)
+- `Done` and `Review later` now open the full-history disclosure, activate Job History, highlight the requested run, and focus the named history region instead of the compact jobs table.
+- A selected run outside the paginated window is shown separately without changing compact `Show more` or full-history `Load more` counts. Direct run links, launch drafts, and detail-dialog focus restoration retain their existing paths.
+- Browser verification remains blocked pending an authorized local admin session; the 1440, 820-touch, and 390-touch production journeys are unverified until deployment.
+
+### Database reseed confirmation
+- Fixed C6-AO-024: Clear & Re-seed requires exact uppercase `RESEED` after
+  trimming surrounding whitespace; lowercase and mixed-case input stay disabled.
+
+### Link Health chart reduced motion
+- C6-AO-026: Link Health Trends uses the existing motion library's reduced-motion
+  preference for all four line/dot series and tooltip transitions. Normal-motion
+  animation is retained; authorized browser verification is pending.
+
+### Admin initial-stats availability (C6-AX-021)
+- Handle an initial offline stats query as unavailable instead of rendering a zero-resource dashboard with permanently pending activity. Reuse the existing offline state, focusable Retry, still-offline feedback, and reconnect behavior.
+- Keep genuine zero counts distinct from missing values; remove numeric fallback counts from the admin masthead and stat cards.
+- Local authenticated admin proof remains UNVERIFIED: no approved local owner session was available. The fix does not change authentication, analytics, APIs, or query retry policy.
+
+### Admin taxonomy parent-field feedback
+- AC-21: create/edit validation now focuses the first enabled invalid field, marks missing parents invalid, links inline feedback, and clears their errors when corrected. Disabled cascading-parent errors remain announced as alerts; Name and Slug retain their existing order when parents are present.
+
+### Admin export failure states
+- Fixed C6-AO-022 by naming Markdown in README export failure toasts.
+- Fixed C6-AO-023 by distinguishing uncached offline export history from a
+  successful empty history response. The load error offers a focusable Retry,
+  preserves reconnect recovery, and hands focus back to the history heading
+  when Retry is replaced. Authenticated browser proof remains unverified
+  pending authorized post-deploy verification.
+
+### Search and Advanced form field identifiers
+- Fixed C6-PS-064 by identifying Search query, sort and tag-search fields,
+  Advanced explorer controls and export options, including Radix native
+  companion fields. Responsive tag-search IDs remain distinct when the desktop
+  sidebar and mobile sheet are mounted together; existing labels are preserved.
+
+### Admin Users search availability
+- Addressed C6-AO025 by withholding previous Users rows and counts during
+  debounced search, page and sort transitions. Offline or failed loads expose
+  Retry rather than a false no-match state; same-query retained rows are marked
+  as potentially out of date. Search remains mounted through loading and retries.
+- Authenticated browser verification is blocked pending an authorized session.
+
 ## September 15, 2026
 
 ### Parity documentation and independent verification

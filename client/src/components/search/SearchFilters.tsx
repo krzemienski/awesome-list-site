@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useId, useMemo, useRef, useState } from "react";
 import { Check, ChevronRight, Search, SlidersHorizontal, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -95,6 +95,7 @@ function FacetList({ title, items, value, onSelect, testid, collapseInert = fals
 }
 
 export default function SearchFilters({ state, facets, onChange, onClear, hideTaxonomyFacets = false, otherControls, onSheetOpenChange }: Props) {
+  const tagSearchId = useId();
   const [open, setOpenState] = useState(false);
   const setOpen = (next: boolean) => { setOpenState(next); onSheetOpenChange?.(next); };
   const [tagSearch, setTagSearch] = useState("");
@@ -135,7 +136,7 @@ export default function SearchFilters({ state, facets, onChange, onClear, hideTa
     <FacetList title="Format" items={options(facets?.formats, state.format, RESOURCE_FORMAT_LABELS)} value={state.format} onSelect={v => applyChange("format", v)} testid="format" collapseInert />
     <FacetList title="Skill level" items={options(facets?.skillLevels, state.skillLevel, RESOURCE_SKILL_LEVEL_LABELS)} value={state.skillLevel} onSelect={v => applyChange("skillLevel", v)} testid="skill-level" collapseInert />
     {allTags.length > 0 && <FacetGroup title="Tags" collapsible={collapsible} defaultOpen={false} forceOpen={state.tags.length > 0} bodyClassName="space-y-2">
-      <div className="relative"><Search className="absolute left-2.5 top-3.5 h-4 w-4 text-muted-foreground" /><Input value={tagSearch} onChange={e => setTagSearch(e.target.value)} placeholder="Find a tag" className="h-11 pl-8" aria-label="Search tags" data-testid="input-search-tags" /></div>
+      <div className="relative"><Search className="absolute left-2.5 top-3.5 h-4 w-4 text-muted-foreground" /><Input id={`search-filter-tags-${tagSearchId}-${collapsible ? "desktop" : "mobile"}`} name={`search-filter-tags-${collapsible ? "desktop" : "mobile"}`} value={tagSearch} onChange={e => setTagSearch(e.target.value)} placeholder="Find a tag" className="h-11 pl-8" aria-label="Search tags" data-testid="input-search-tags" /></div>
       <div className={cn(tagsScroll && "search-facet-scroll max-h-56 overflow-y-auto overscroll-contain pr-1")}>{listedTags.map(item => {
         const selected = state.tags.some(t => t.toLowerCase() === item.value.toLowerCase());
         return <button type="button" key={item.value} className="btn ghost search-facet-option" aria-pressed={selected} aria-label={`${item.label}, ${item.count} ${item.count === 1 ? "result" : "results"}`} onClick={() => applyChange("tags", selected ? state.tags.filter(t => t.toLowerCase() !== item.value.toLowerCase()) : [...state.tags, item.value])}><span className="flex min-w-0 items-center gap-2"><span aria-hidden="true" className="search-facet-check" data-selected={selected}>{selected && <Check className="h-3 w-3" />}</span><span className="truncate">{item.label}</span></span>{" "}<span className="shrink-0 font-mono text-xs normal-case text-muted-foreground">{item.count}</span></button>;

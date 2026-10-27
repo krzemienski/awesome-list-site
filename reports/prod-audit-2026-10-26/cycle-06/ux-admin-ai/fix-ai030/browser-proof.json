@@ -1,0 +1,38 @@
+{
+  "finding": "C6-AI-030",
+  "branch": "fix/c6-ai030-full-history",
+  "baseRevision": "520d6778369bc7ce495204cfcacc7e0533f941cc",
+  "localBrowserProof": "BLOCKED",
+  "renderedBehaviorVerdict": "UNVERIFIED",
+  "blocker": "No authorized loopback admin session is available. The lead explicitly instructed this lane to finish the implementation, checks and PR without signing in, transferring production cookies or bypassing authentication.",
+  "authorizationDecision": {
+    "source": "Main message received during this assignment",
+    "text": "No authorized loopback admin session is available. Finish the scoped implementation/checks and PR with browser proof explicitly BLOCKED/UNVERIFIED as the contract permits; do not sign in, transfer cookies or bypass auth. Production proof will follow deploy."
+  },
+  "observations": [
+    "The mounted browser target list contained loopback public pages and a loopback Sign In page, not an authenticated local researcher screen.",
+    "The production AI audit lane reported no known authorized loopback admin runtime/session or local auth state; its owner-cookie authorization was production-only.",
+    "The isolated clone contained no .env file. No secret values were read or copied into it.",
+    "A read-only accessibility snapshot save of the already-open loopback Sign In page was denied because the assigned /tmp clone was outside the mounted browser tool workspace roots. No snapshot file was produced; this is not evidence of rendered AI030 behavior."
+  ],
+  "notPerformed": [
+    "No local or production sign-in or sign-out.",
+    "No cookie transfer, auth bypass or synthetic auth/session creation.",
+    "No research launch, approval, rejection, cancellation or other paid/data-changing work.",
+    "No merge or deployment.",
+    "No test files, mocks, Playwright scripts, validation scripts, harnesses, test suites or reviewer panels."
+  ],
+  "eventualProductionProof": {
+    "status": "UNVERIFIED",
+    "viewports": ["1440 desktop", "820 touch", "390 touch"],
+    "criteria": [
+      "Done expands All pending discoveries & full job history and activates Job History.",
+      "Review later expands the same disclosure and activates Job History.",
+      "The requested run is visible and highlighted, including one absent from compact latest-five and one outside the initial paginated window.",
+      "Focus lands in the named expanded history region or selected run heading.",
+      "Compact Show more and full-history Load more remain distinct and their counts retain list-window semantics.",
+      "Direct /admin/researcher?jobId=N, detail-dialog close focus restoration and launch draft state remain correct."
+    ],
+    "evidenceRequired": ["Fresh screenshots", "Accessibility and focused-element state", "Console output", "Network output"]
+  }
+}
