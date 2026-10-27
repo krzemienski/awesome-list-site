@@ -6,6 +6,11 @@ All notable changes to the Awesome Video Resource Viewer project. Newest entries
 
 ## October 27, 2026
 
+### Admin initial-stats availability (C6-AX-021)
+- Handle an initial offline stats query as unavailable instead of rendering a zero-resource dashboard with permanently pending activity. Reuse the existing offline state, focusable Retry, still-offline feedback, and reconnect behavior.
+- Keep genuine zero counts distinct from missing values; remove numeric fallback counts from the admin masthead and stat cards.
+- Local authenticated admin proof remains UNVERIFIED: no approved local owner session was available. The fix does not change authentication, analytics, APIs, or query retry policy.
+
 ### Admin taxonomy parent-field feedback
 - AC-21: create/edit validation now focuses the first enabled invalid field, marks missing parents invalid, links inline feedback, and clears their errors when corrected. Disabled cascading-parent errors remain announced as alerts; Name and Slug retain their existing order when parents are present.
 
