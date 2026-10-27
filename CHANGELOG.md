@@ -6,6 +6,15 @@ All notable changes to the Awesome Video Resource Viewer project. Newest entries
 
 ## October 27, 2026
 
+### Shared resource-card target sizing (C6-MEMBER-02)
+- Give title, details, tag, tag-expansion and outbound-link actions a 44×44px
+  minimum at every width, including taxonomy reveal trays. Existing labels,
+  link destinations, focus treatments and guest/member behavior are unchanged.
+- Local 1440px, 820px-touch and 390px-touch geometry and interaction evidence
+  is in `reports/prod-audit-2026-10-26/cycle-06/ux-member/fix-member02/`.
+  Home uses a separate card implementation; its independently observed
+  undersized title/tag targets are reported there and are not changed here.
+
 ### Taxonomy card actions and recovery
 - Restored Favorite and Bookmark controls to taxonomy Grid cards using the same guest/member actions as List and Compact.
 - Numeric page overflow recovers to the last page with a dismissible explanation, including typed page jumps and direct document loads. Recovery replaces the unavailable history entry even when saved view preferences or query normalization also apply. Invalid page text and unknown taxonomy routes retain their existing validation.

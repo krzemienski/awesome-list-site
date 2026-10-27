@@ -104,7 +104,8 @@
 
 .resource-card__title-link {
   display: -webkit-box;
-  min-height: 2.6rem;
+  min-width: 2.75rem;
+  min-height: 2.75rem;
   overflow: hidden;
   color: inherit;
   overflow-wrap: anywhere;
@@ -238,8 +239,10 @@
 .resource-card__meta-link,
 .resource-card__tag-link {
   display: inline-flex;
-  min-height: 2rem;
+  min-width: 2.75rem;
+  min-height: 2.75rem;
   align-items: center;
+  justify-content: center;
   text-decoration: none;
 }
 
@@ -297,7 +300,7 @@
   background: color-mix(in srgb, var(--accent) 8%, transparent);
 }
 
-/* The link is a square 32/44px hit box around a rounded pill, so the global
+/* The link has a 44px minimum hit box around a rounded pill, so the global
    ring moves onto the pill and follows its radius. */
 .resource-card__meta-link:focus-visible,
 .resource-card__tag-link:focus-visible {
@@ -325,7 +328,8 @@
 
 /* DS .btn.ghost, compacted to sit inline with the tag chips. */
 .btn.resource-card__more-tags {
-  min-height: 2rem;
+  min-width: 2.75rem;
+  min-height: 2.75rem;
   padding: 0 0.5rem;
   color: var(--text-2);
   font-size: 0.6875rem;
@@ -353,6 +357,7 @@
 }
 
 .resource-card__visit-button {
+  min-width: 2.75rem;
   min-height: 2.75rem;
   flex: 1;
   border-color: color-mix(in srgb, var(--accent) 50%, var(--border));
@@ -367,21 +372,6 @@
   .resource-card__visit-button:hover {
     border-color: var(--accent);
     background: color-mix(in srgb, var(--accent) 10%, transparent);
-  }
-}
-
-/* Touch widths: the card's own controls reach the 44px floor. */
-@media (max-width: 1024px) {
-  .resource-card__title-link,
-  .resource-card__meta-link,
-  .resource-card__tag-link,
-  .btn.resource-card__more-tags {
-    min-height: 44px;
-  }
-
-  .resource-card__tag-link {
-    min-width: 44px;
-    justify-content: center;
   }
 }
 

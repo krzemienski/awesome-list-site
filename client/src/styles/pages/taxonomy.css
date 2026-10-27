@@ -342,7 +342,7 @@ button.taxonomy-child {
 
 .taxonomy-page .resource-card--taxonomy .resource-card__title-link {
   display: block;
-  min-height: 0;
+  min-height: 44px;
   overflow: visible;
   -webkit-line-clamp: unset;
 }
@@ -445,7 +445,7 @@ button.taxonomy-child {
 .taxonomy-page .resource-card--taxonomy .resource-card__reveal > *,
 .taxonomy-page .resource-card--taxonomy .resource-card__reveal .resource-card__visit-button {
   flex: none;
-  min-height: 32px;
+  min-height: 44px;
   margin: 0;
   white-space: nowrap;
 }
@@ -453,8 +453,8 @@ button.taxonomy-child {
 /* The band right of the mark is 232px on the narrowest (320px) card, so Open
    Link is icon-only here; its label stays as the accessible name. */
 .taxonomy-page .resource-card--taxonomy .resource-card__reveal .resource-card__visit-button {
-  width: 32px;
-  height: 32px;
+  width: 44px;
+  height: 44px;
   padding: 0;
 }
 
@@ -467,8 +467,8 @@ button.taxonomy-child {
    (257px of controls in a 230-247px band). It is icon-only here too, like
    Open Link; the title link above already names the detail page. */
 .taxonomy-page .resource-card--taxonomy .resource-card__reveal .resource-card__meta-badge {
-  width: 32px;
-  height: 32px;
+  width: 44px;
+  height: 44px;
   justify-content: center;
   padding: 0;
 }
@@ -497,33 +497,6 @@ button.taxonomy-child {
 
 .taxonomy-page .resource-card--taxonomy .resource-card__tag-link {
   pointer-events: auto;
-}
-
-/* Desktop pointers keep the compact 32px chip row; at touch widths the shared
-   resource-card.css 44px floor applies instead. */
-@media (min-width: 1025px) {
-  .taxonomy-page .resource-card--taxonomy .resource-card__tag-link {
-    min-height: 0;
-  }
-}
-
-/* The tray is 36px tall; centred 44px controls overflow it evenly and still
-   fit the band beside the mark. */
-@media (max-width: 1024px) {
-  .taxonomy-page .resource-card--taxonomy .resource-card__title-link {
-    min-height: 44px;
-  }
-
-  .taxonomy-page .resource-card--taxonomy .resource-card__reveal > *,
-  .taxonomy-page .resource-card--taxonomy .resource-card__reveal .resource-card__visit-button {
-    min-height: 44px;
-  }
-
-  .taxonomy-page .resource-card--taxonomy .resource-card__reveal .resource-card__visit-button,
-  .taxonomy-page .resource-card--taxonomy .resource-card__reveal .resource-card__meta-badge {
-    width: 44px;
-    height: 44px;
-  }
 }
 
 /* Frozen ResCard tags are canonical `.chip.mono`: 10.5px mono, 0.6px tracking,
