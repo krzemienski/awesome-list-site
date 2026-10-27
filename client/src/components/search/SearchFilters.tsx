@@ -1,8 +1,8 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { Check, ChevronRight, Search, SlidersHorizontal, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
+import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
 import { cn } from "@/lib/utils";
 import "@/styles/components/search-filters.css";
 import {
@@ -95,14 +95,11 @@ function FacetList({ title, items, value, onSelect, testid, collapseInert = fals
 export default function SearchFilters({ state, facets, onChange, onClear, hideTaxonomyFacets = false, otherControls }: Props) {
   const [open, setOpen] = useState(false);
   const [tagSearch, setTagSearch] = useState("");
-  const applyChange = (key: keyof FilterState, value: string | string[]) => {
-    setOpen(false);
-    onChange(key, value);
-  };
-  const clear = () => {
-    setOpen(false);
-    onClear();
-  };
+  const triggerRef = useRef<HTMLButtonElement>(null);
+  // The sheet stays open while facets are toggled so counts and results update
+  // in place; the Done button (or the close control) is the only way out.
+  const applyChange = onChange;
+  const clear = onClear;
   const activeCount = [state.category, state.subcategory, state.subSubcategory, state.provider, state.format, state.skillLevel].filter(Boolean).length + state.tags.length;
   // Task #379: selected tags sort first so a deep-linked selection is never cut
   // off by TAG_LIMIT and always stays removable from the panel.
@@ -150,7 +147,7 @@ export default function SearchFilters({ state, facets, onChange, onClear, hideTa
   </div>;
   };
   return <><aside className="hidden w-64 shrink-0 rounded-lg border border-[var(--border)] bg-[var(--surface)] p-4 lg:block">{content(true)}</aside>
-    <div className="lg:hidden"><Sheet open={open} onOpenChange={setOpen}><SheetTrigger asChild><Button variant="outline" className="min-h-11 gap-2" data-testid="button-open-filters"><SlidersHorizontal className="h-4 w-4" /> Filters {activeCount > 0 && <span className="rounded-full bg-[var(--accent)] px-2 py-0.5 text-xs text-black">{activeCount}</span>}</Button></SheetTrigger><SheetContent side="left" className="w-[min(90vw,360px)] overflow-y-auto"><SheetHeader><SheetTitle>Filters</SheetTitle></SheetHeader><div className="mt-5">{content(false)}</div></SheetContent></Sheet></div></>;
+    <div className="lg:hidden"><Sheet open={open} onOpenChange={setOpen}><SheetTrigger asChild><Button ref={triggerRef} variant="outline" className="min-h-11 gap-2" data-testid="button-open-filters"><SlidersHorizontal className="h-4 w-4" /> Filters {activeCount > 0 && <span className="rounded-full bg-[var(--accent)] px-2 py-0.5 text-xs text-black">{activeCount}</span>}</Button></SheetTrigger><SheetContent side="left" className="w-[min(90vw,360px)] overflow-y-auto" onCloseAutoFocus={e => { e.preventDefault(); triggerRef.current?.focus(); }}><SheetHeader><SheetTitle>Filters</SheetTitle><SheetDescription data-testid="text-active-filter-count" aria-live="polite">{activeCount === 0 ? "No filters applied." : `${activeCount} ${activeCount === 1 ? "filter" : "filters"} applied.`}</SheetDescription></SheetHeader><div className="mt-5">{content(false)}</div><div className="sticky bottom-0 -mx-6 mt-6 border-t border-[var(--border)] bg-background px-6 py-3"><Button className="min-h-11 w-full" onClick={() => setOpen(false)} data-testid="button-close-filters">Done</Button></div></SheetContent></Sheet></div></>;
 }
 
 export function ActiveFilters({ state, onChange, onClear, defaultSort = "relevance" }: { state: FilterState; onChange: (key: keyof FilterState, value: string | string[]) => void; onClear: () => void; defaultSort?: string }) {
