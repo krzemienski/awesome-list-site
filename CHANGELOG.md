@@ -6,6 +6,11 @@ All notable changes to the Awesome Video Resource Viewer project. Newest entries
 
 ## October 27, 2026
 
+### Link Health chart reduced motion
+- C6-AO-026: Link Health Trends uses the existing motion library's reduced-motion
+  preference for all four line/dot series and tooltip transitions. Normal-motion
+  animation is retained; authorized browser verification is pending.
+
 ### Admin taxonomy parent-field feedback
 - AC-21: create/edit validation now focuses the first enabled invalid field, marks missing parents invalid, links inline feedback, and clears their errors when corrected. Disabled cascading-parent errors remain announced as alerts; Name and Slug retain their existing order when parents are present.
 
