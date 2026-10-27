@@ -1,0 +1,14 @@
+{
+  "url": "http://127.0.0.1:5067/category/encoding-codecs?page=2",
+  "online": true,
+  "active": {
+    "tag": "DIV",
+    "id": "",
+    "test": "taxonomy-results-region"
+  },
+  "viewport": {
+    "w": 390,
+    "h": 844,
+    "touch": 1
+  }
+}

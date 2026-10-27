@@ -1,0 +1,25 @@
+{
+  "saved": "compact",
+  "before": {
+    "url": "http://127.0.0.1:5067/about",
+    "length": 4,
+    "title": "About — Awesome Video"
+  },
+  "status": 200,
+  "recovered": {
+    "url": "http://127.0.0.1:5067/category/encoding-codecs?page=16&view=compact",
+    "length": 5,
+    "title": "Video Encoding & Codecs: AV1… — Page 16 — Awesome Video",
+    "notice": "Page 999 is not available; showing page 16 instead.Dismiss",
+    "view": "true",
+    "viewport": {
+      "width": 1440,
+      "height": 900
+    }
+  },
+  "afterBack": {
+    "url": "http://127.0.0.1:5067/about",
+    "length": 5,
+    "title": "About — Awesome Video"
+  }
+}

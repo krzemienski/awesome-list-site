@@ -48,6 +48,7 @@ interface PaginatorProps {
   makeHref: (page: number) => string;
   /** SPA navigation — setPage + history integration owned by the page. */
   onNavigate: (page: number) => void;
+  onPageAdjusted?: (requested: number, adjusted: number) => void;
   className?: string;
   testIds?: PaginatorTestIds;
   pageLinkTestId?: (page: number) => string;
@@ -124,6 +125,7 @@ export function Paginator({
   totalPages,
   makeHref,
   onNavigate,
+  onPageAdjusted,
   className,
   testIds,
   pageLinkTestId = (page) => `link-page-${page}`,
@@ -164,6 +166,7 @@ export function Paginator({
     const clamped = Math.min(Math.max(n, 1), totalPages);
     jumpEditedRef.current = false;
     setJumpError(null);
+    if (clamped !== n) onPageAdjusted?.(n, clamped);
     if (clamped !== currentPage) onNavigate(clamped);
     // C4-V5A-01: the box mirrors the shown page, not the last request. When
     // the requested page never arrives (offline, then "Stay on page N"),

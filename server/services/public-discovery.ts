@@ -76,7 +76,7 @@ export async function resolveTaxonomyPage(match: TaxonomyMatch, level: ListingLe
   if (!serverFilterActive) {
     const total = scope.resources.length;
     const totalPages = Math.max(1, Math.ceil(total / 24));
-    const page = filtered ? Math.min(requestedPage, totalPages) : requestedPage;
+    const page = Math.min(requestedPage, totalPages);
     return { allResources, resources: scope.resources.slice((page - 1) * 24, page * 24), total, totalPages, page, filtered };
   }
   const api = new URLSearchParams(search);

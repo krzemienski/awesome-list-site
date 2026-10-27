@@ -1,0 +1,972 @@
+- main [ref=e1]:
+  - generic [ref=e2]:
+    - navigation "Breadcrumb" [ref=e3]:
+      - list [ref=e4]:
+        - listitem [ref=e5]:
+          - link "Home" [ref=e6] [cursor=pointer]:
+            - /url: /
+        - listitem [ref=e7]:
+          - img [ref=e8]
+        - listitem:
+          - link "Encoding & Codecs" [disabled]
+    - generic [ref=e10]:
+      - link "Browse" [ref=e11] [cursor=pointer]:
+        - /url: /categories
+        - img
+        - text: Browse
+      - generic [ref=e12]:
+        - generic [ref=e14]: ◇
+        - text: CATEGORY · ENCODING & CODECS
+        - heading "Encoding & Codecs" [level=1] [ref=e15]
+        - region "About this collection" [ref=e16]:
+          - heading "About this collection" [level=2] [ref=e17]
+          - paragraph [ref=e18]: Encoding & Codecs brings together 372 curated resources from across the video technology landscape. Notable topics include Codecs and Encoding Tools.
+        - generic [ref=e19]:
+          - generic [ref=e20]: 372 resources
+          - generic [ref=e21]: 2 subcategories
+          - button "Filters & view" [ref=e22] [cursor=pointer]:
+            - generic [ref=e23]: Filters & view
+      - region "Subcategories" [ref=e24]:
+        - heading "Subcategories" [level=2] [ref=e25]
+        - generic [ref=e26]:
+          - link "Codecs 27" [ref=e27] [cursor=pointer]:
+            - /url: /subcategory/codecs
+            - generic [ref=e28]: Codecs
+            - generic [ref=e29]: "27"
+          - link "Encoding Tools 225" [ref=e30] [cursor=pointer]:
+            - /url: /subcategory/encoding-tools
+            - generic [ref=e31]: Encoding Tools
+            - generic [ref=e32]: "225"
+          - button "Uncategorized 120" [ref=e33] [cursor=pointer]:
+            - generic [ref=e34]: Uncategorized
+            - generic [ref=e35]: "120"
+      - generic "Resources (372)" [ref=e38]:
+        - heading "Resources (372)" [level=2] [ref=e40]
+        - generic [ref=e41]:
+          - article [ref=e42] [cursor=pointer]:
+            - generic [ref=e43]:
+              - generic [ref=e44]:
+                - generic [ref=e45]: ◇
+                - generic [ref=e46]:
+                  - link "View details for dav1d" [active] [ref=e47]:
+                    - /url: /resource/108
+                    - img [ref=e49]
+                    - generic [ref=e51]: View Details
+                  - button "Show 1 more tag" [ref=e52]: +1 more
+                  - generic [ref=e53]:
+                    - link "Open Link dav1d (opens in new tab)" [ref=e54]:
+                      - /url: https://www.videolan.org/projects/dav1d.html
+                      - img
+                      - generic [ref=e55]: Open Link
+                      - generic [ref=e56]: dav1d (opens in new tab)
+                    - 'button "Suggest an edit: dav1d" [ref=e57]':
+                      - img
+                - 'button "Favorite to your account — sign in required: dav1d" [ref=e60]':
+                  - img
+                - 'button "Bookmark on this device — no sign-in required: dav1d" [ref=e62]':
+                  - img
+              - heading "dav1d" [level=2] [ref=e65]:
+                - link "dav1d" [ref=e66]:
+                  - /url: /resource/108
+              - paragraph [ref=e67]: dav1d is an open-source AV1 decoder developed by the VideoLAN and FFmpeg communities. It is designed for speed and efficiency, making it suitable for a wide range of devices and applications.
+            - generic [ref=e69]:
+              - generic [ref=e70]: Encoding & Codecs
+              - link "Filter by tag AV1" [ref=e71]:
+                - /url: /tag/av1
+                - generic [ref=e72]: "#AV1"
+              - link "Filter by tag video decoding" [ref=e73]:
+                - /url: /tag/video-decoding
+                - generic [ref=e74]: "#video decoding"
+              - link "Filter by tag open-source" [ref=e75]:
+                - /url: /tag/open-source
+                - generic [ref=e76]: "#open-source"
+          - article [ref=e77] [cursor=pointer]:
+            - generic [ref=e78]:
+              - generic [ref=e79]:
+                - generic [ref=e80]: ◇
+                - generic:
+                  - link "View details for DivX Converter":
+                    - /url: /resource/31
+                    - img
+                    - generic: View Details
+                  - button "Show 2 more tags": +2 more
+                  - generic:
+                    - link "Open Link DivX Converter (opens in new tab)":
+                      - /url: https://www.divx.com/en/software/converter/
+                      - img
+                      - generic: Open Link
+                      - generic: DivX Converter (opens in new tab)
+                    - 'button "Suggest an edit: DivX Converter"':
+                      - img
+                - 'button "Favorite to your account — sign in required: DivX Converter" [ref=e83]':
+                  - img
+                - 'button "Bookmark on this device — no sign-in required: DivX Converter" [ref=e85]':
+                  - img
+              - heading "DivX Converter" [level=2] [ref=e88]:
+                - link "DivX Converter" [ref=e89]:
+                  - /url: /resource/31
+              - paragraph [ref=e90]: DivX Converter is a video encoding software that allows users to compress and convert video files into the DivX digital format, known for its high-quality output and efficient compression.
+            - generic [ref=e92]:
+              - generic [ref=e93]: Encoding & Codecs
+              - link "Filter by tag video" [ref=e94]:
+                - /url: /tag/video
+                - generic [ref=e95]: "#video"
+              - link "Filter by tag compression" [ref=e96]:
+                - /url: /tag/compression
+                - generic [ref=e97]: "#compression"
+              - link "Filter by tag conversion" [ref=e98]:
+                - /url: /tag/conversion
+                - generic [ref=e99]: "#conversion"
+          - article [ref=e100] [cursor=pointer]:
+            - generic [ref=e101]:
+              - generic [ref=e102]:
+                - generic [ref=e103]: ◇
+                - generic:
+                  - 'link "View details for DolbyLaboratories/dlb_mp4demux: The Dolby MP4 streaming demuxer (dlb_mp4demux) is a software implementation of a demuxer of fragmented or unfragmented ISO base media file format (mp4). It supports demuxing of Dolby Digital (AC-3), Dolby Digital Plus (E-AC"':
+                    - /url: /resource/1527
+                    - img
+                    - generic: View Details
+                  - button "Show 2 more tags": +2 more
+                  - 'link "Open Link DolbyLaboratories/dlb_mp4demux: The Dolby MP4 streaming demuxer (dlb_mp4demux) is a software implementation of a demuxer of fragmented or unfragmented ISO base media file format (mp4). It supports demuxing of Dolby Digital (AC-3), Dolby Digital Plus (E-AC (opens in new tab)"':
+                    - /url: https://github.com/DolbyLaboratories/dlb_mp4demux
+                    - img
+                    - generic: Open Link
+                    - generic: "DolbyLaboratories/dlb_mp4demux: The Dolby MP4 streaming demuxer (dlb_mp4demux) is a software implementation of a demuxer of fragmented or unfragmented ISO base media file format (mp4). It supports demuxing of Dolby Digital (AC-3), Dolby Digital Plus (E-AC (opens in new tab)"
+                  - 'button "Suggest an edit: DolbyLaboratories/dlb_mp4demux: The Dolby MP4 streaming demuxer (dlb_mp4demux) is a software implementation of a demuxer of fragmented or unfragmented ISO base media file format (mp4). It supports demuxing of Dolby Digital (AC-3), Dolby Digital Plus (E-AC"':
+                    - img
+                - 'button "Favorite to your account — sign in required: DolbyLaboratories/dlb_mp4demux: The Dolby MP4 streaming demuxer (dlb_mp4demux) is a software implementation of a demuxer of fragmented or unfragmented ISO base media file format (mp4). It supports demuxing of Dolby Digital (AC-3), Dolby Digital Plus (E-AC" [ref=e106]':
+                  - img
+                - 'button "Bookmark on this device — no sign-in required: DolbyLaboratories/dlb_mp4demux: The Dolby MP4 streaming demuxer (dlb_mp4demux) is a software implementation of a demuxer of fragmented or unfragmented ISO base media file format (mp4). It supports demuxing of Dolby Digital (AC-3), Dolby Digital Plus (E-AC" [ref=e108]':
+                  - img
+              - 'heading "DolbyLaboratories/dlb_mp4demux: The Dolby MP4 streaming demuxer (dlb_mp4demux) is a software implementation of a demuxer of fragmented or unfragmented ISO base media file format (mp4). It supports demuxing of Dolby Digital (AC-3), Dolby Digital Plus (E-AC" [level=2] [ref=e111]':
+                - 'link "DolbyLaboratories/dlb_mp4demux: The Dolby MP4 streaming demuxer (dlb_mp4demux) is a software implementation of a demuxer of fragmented or unfragmented ISO base media file format (mp4). It supports demuxing of Dolby Digital (AC-3), Dolby Digital Plus (E-AC" [ref=e112]':
+                  - /url: /resource/1527
+              - paragraph [ref=e113]: The Dolby MP4 streaming demuxer (dlb_mp4demux) is a software implementation of a demuxer of fragmented or unfragmented ISO base media file format (mp4). It supports demuxing of Dolby Digital (AC-3)...
+            - generic [ref=e115]:
+              - generic [ref=e116]: Encoding & Codecs
+              - link "Filter by tag demuxer" [ref=e117]:
+                - /url: /tag/demuxer
+                - generic [ref=e118]: "#demuxer"
+              - link "Filter by tag mp4" [ref=e119]:
+                - /url: /tag/mp4
+                - generic [ref=e120]: "#mp4"
+              - link "Filter by tag audio-codec" [ref=e121]:
+                - /url: /tag/audio-codec
+                - generic [ref=e122]: "#audio-codec"
+          - article [ref=e123] [cursor=pointer]:
+            - generic [ref=e124]:
+              - generic [ref=e125]:
+                - generic [ref=e126]: ◇
+                - generic:
+                  - link "View details for DolbyLaboratories/dolby_vision_professional_decoder_plugin":
+                    - /url: /resource/1520
+                    - img
+                    - generic: View Details
+                  - button "Show 3 more tags": +3 more
+                  - generic:
+                    - link "Open Link DolbyLaboratories/dolby_vision_professional_decoder_plugin (opens in new tab)":
+                      - /url: https://github.com/DolbyLaboratories/dolby_vision_professional_decoder_plugin
+                      - img
+                      - generic: Open Link
+                      - generic: DolbyLaboratories/dolby_vision_professional_decoder_plugin (opens in new tab)
+                    - 'button "Suggest an edit: DolbyLaboratories/dolby_vision_professional_decoder_plugin"':
+                      - img
+                - 'button "Favorite to your account — sign in required: DolbyLaboratories/dolby_vision_professional_decoder_plugin" [ref=e129]':
+                  - img
+                - 'button "Bookmark on this device — no sign-in required: DolbyLaboratories/dolby_vision_professional_decoder_plugin" [ref=e131]':
+                  - img
+              - heading "DolbyLaboratories/dolby_vision_professional_decoder_plugin" [level=2] [ref=e134]:
+                - link "DolbyLaboratories/dolby_vision_professional_decoder_plugin" [ref=e135]:
+                  - /url: /resource/1520
+              - paragraph [ref=e136]: DolbyLaboratories/dolby_vision_professional_decoder_plugin - A GitHub repository for video/multimedia development
+            - generic [ref=e137]:
+              - img "GitHub - DolbyLaboratories/dolby_vision_professional_decoder_plugin" [ref=e140]
+              - generic [ref=e141]: "Page Title: GitHub - DolbyLaboratories/dolby_vision_professional_decoder_plugin · GitHub"
+              - generic [ref=e142]: "Page Description: Contribute to DolbyLaboratories/dolby_vision_professional_decoder_plugin development by creating an account on GitHub."
+              - generic [ref=e143]:
+                - generic [ref=e144]: Encoding & Codecs
+                - link "Filter by tag dolby" [ref=e145]:
+                  - /url: /tag/dolby
+                  - generic [ref=e146]: "#dolby"
+                - link "Filter by tag vision" [ref=e147]:
+                  - /url: /tag/vision
+                  - generic [ref=e148]: "#vision"
+                - link "Filter by tag decoder" [ref=e149]:
+                  - /url: /tag/decoder
+                  - generic [ref=e150]: "#decoder"
+          - article [ref=e151] [cursor=pointer]:
+            - generic [ref=e152]:
+              - generic [ref=e153]:
+                - generic [ref=e154]: ◇
+                - generic:
+                  - link "View details for EncodeGUI":
+                    - /url: /resource/689
+                    - img
+                    - generic: View Details
+                  - button "Show 2 more tags": +2 more
+                  - generic:
+                    - link "Open Link EncodeGUI (opens in new tab)":
+                      - /url: https://github.com/Alkl58/EncodeGUI
+                      - img
+                      - generic: Open Link
+                      - generic: EncodeGUI (opens in new tab)
+                    - 'button "Suggest an edit: EncodeGUI"':
+                      - img
+                - 'button "Favorite to your account — sign in required: EncodeGUI" [ref=e157]':
+                  - img
+                - 'button "Bookmark on this device — no sign-in required: EncodeGUI" [ref=e159]':
+                  - img
+              - heading "EncodeGUI" [level=2] [ref=e162]:
+                - link "EncodeGUI" [ref=e163]:
+                  - /url: /resource/689
+              - paragraph [ref=e164]: EncodeGUI is a free and open-source video transcoder GUI that utilizes AI tools for an enhanced encoding experience. It provides a user-friendly interface for video encoding tasks, making it accessible for developers and users alike.
+            - generic [ref=e166]:
+              - generic [ref=e167]: Encoding & Codecs
+              - link "Filter by tag video transcoder" [ref=e168]:
+                - /url: /tag/video-transcoder
+                - generic [ref=e169]: "#video transcoder"
+              - link "Filter by tag GUI" [ref=e170]:
+                - /url: /tag/gui
+                - generic [ref=e171]: "#GUI"
+              - link "Filter by tag AI tools" [ref=e172]:
+                - /url: /tag/ai-tool
+                - generic [ref=e173]: "#AI tools"
+          - article [ref=e174] [cursor=pointer]:
+            - generic [ref=e175]:
+              - generic [ref=e176]:
+                - generic [ref=e177]: ◇
+                - generic:
+                  - link "View details for Eyevinn/fmp4-js":
+                    - /url: /resource/1151
+                    - img
+                    - generic: View Details
+                  - button "Show 2 more tags": +2 more
+                  - generic:
+                    - link "Open Link Eyevinn/fmp4-js (opens in new tab)":
+                      - /url: https://github.com/Eyevinn/fmp4-js
+                      - img
+                      - generic: Open Link
+                      - generic: Eyevinn/fmp4-js (opens in new tab)
+                    - 'button "Suggest an edit: Eyevinn/fmp4-js"':
+                      - img
+                - 'button "Favorite to your account — sign in required: Eyevinn/fmp4-js" [ref=e180]':
+                  - img
+                - 'button "Bookmark on this device — no sign-in required: Eyevinn/fmp4-js" [ref=e182]':
+                  - img
+              - heading "Eyevinn/fmp4-js" [level=2] [ref=e185]:
+                - link "Eyevinn/fmp4-js" [ref=e186]:
+                  - /url: /resource/1151
+              - paragraph [ref=e187]: A Javascript library to parse ISO Base Media File Format (MPEG-4 Part 12) - Eyevinn/fmp4-js
+            - generic [ref=e189]:
+              - generic [ref=e190]: Encoding & Codecs
+              - link "Filter by tag javascript" [ref=e191]:
+                - /url: /tag/javascript
+                - generic [ref=e192]: "#javascript"
+              - link "Filter by tag codec" [ref=e193]:
+                - /url: /tag/codec
+                - generic [ref=e194]: "#codec"
+              - link "Filter by tag parsing" [ref=e195]:
+                - /url: /tag/parsing
+                - generic [ref=e196]: "#parsing"
+          - article [ref=e197] [cursor=pointer]:
+            - generic [ref=e198]:
+              - generic [ref=e199]:
+                - generic [ref=e200]: ◇
+                - generic:
+                  - link "View details for FastPix Cloud Transcoding":
+                    - /url: /resource/479
+                    - img
+                    - generic: View Details
+                  - button "Show 2 more tags": +2 more
+                  - generic:
+                    - link "Open Link FastPix Cloud Transcoding (opens in new tab)":
+                      - /url: https://www.fastpix.io/blog/cloud-transcoding-choosing-the-right-solution-for-your-video-centric-product
+                      - img
+                      - generic: Open Link
+                      - generic: FastPix Cloud Transcoding (opens in new tab)
+                    - 'button "Suggest an edit: FastPix Cloud Transcoding"':
+                      - img
+                - 'button "Favorite to your account — sign in required: FastPix Cloud Transcoding" [ref=e203]':
+                  - img
+                - 'button "Bookmark on this device — no sign-in required: FastPix Cloud Transcoding" [ref=e205]':
+                  - img
+              - heading "FastPix Cloud Transcoding" [level=2] [ref=e208]:
+                - link "FastPix Cloud Transcoding" [ref=e209]:
+                  - /url: /resource/479
+              - paragraph [ref=e210]: FastPix provides a cloud-based transcoding solution that converts video files into multiple resolutions, bitrates, and formats optimized for playback across devices and networks. Key benefits include scalability to handle peak traffic, cost-efficiency with pay-as-you-go models, and accessibility through powerful APIs for automation and dynamic workflows. FastPix supports modern codecs like AV1 and legacy ones like H.264, ensuring compatibility across various platforms.
+            - generic [ref=e212]:
+              - generic [ref=e213]: Encoding & Codecs
+              - link "Filter by tag cloud transcoding" [ref=e214]:
+                - /url: /tag/cloud-transcoding
+                - generic [ref=e215]: "#cloud transcoding"
+              - link "Filter by tag video encoding" [ref=e216]:
+                - /url: /tag/video-encoding
+                - generic [ref=e217]: "#video encoding"
+              - link "Filter by tag API integration" [ref=e218]:
+                - /url: /tag/api-integration
+                - generic [ref=e219]: "#API integration"
+          - article [ref=e220] [cursor=pointer]:
+            - generic [ref=e221]:
+              - generic [ref=e222]:
+                - generic [ref=e223]: ◇
+                - generic:
+                  - link "View details for FFmpeg":
+                    - /url: /resource/476
+                    - img
+                    - generic: View Details
+                  - button "Show 2 more tags": +2 more
+                  - generic:
+                    - link "Open Link FFmpeg (opens in new tab)":
+                      - /url: https://ffmpeg.org
+                      - img
+                      - generic: Open Link
+                      - generic: FFmpeg (opens in new tab)
+                    - 'button "Suggest an edit: FFmpeg"':
+                      - img
+                - 'button "Favorite to your account — sign in required: FFmpeg" [ref=e226]':
+                  - img
+                - 'button "Bookmark on this device — no sign-in required: FFmpeg" [ref=e228]':
+                  - img
+              - heading "FFmpeg" [level=2] [ref=e231]:
+                - link "FFmpeg" [ref=e232]:
+                  - /url: /resource/476
+              - paragraph [ref=e233]: FFmpeg is a free and open-source software project consisting of a suite of libraries and programs for handling video, audio, and other multimedia files and streams. It is widely used for format transcoding, basic editing, and standards compliance.
+            - generic [ref=e235]:
+              - generic [ref=e236]: Encoding & Codecs
+              - link "Filter by tag multimedia framework" [ref=e237]:
+                - /url: /tag/multimedia-framework
+                - generic [ref=e238]: "#multimedia framework"
+              - link "Filter by tag video processing" [ref=e239]:
+                - /url: /tag/video-processing
+                - generic [ref=e240]: "#video processing"
+              - link "Filter by tag audio processing" [ref=e241]:
+                - /url: /tag/audio-processing
+                - generic [ref=e242]: "#audio processing"
+          - article [ref=e243] [cursor=pointer]:
+            - generic [ref=e244]:
+              - generic [ref=e245]:
+                - generic [ref=e246]: ◇
+                - generic:
+                  - link "View details for FFmpeg Docker Container":
+                    - /url: /resource/712
+                    - img
+                    - generic: View Details
+                  - button "Show 2 more tags": +2 more
+                  - generic:
+                    - link "Open Link FFmpeg Docker Container (opens in new tab)":
+                      - /url: https://github.com/tamara-schmitz/ffmpeg-docker-container
+                      - img
+                      - generic: Open Link
+                      - generic: FFmpeg Docker Container (opens in new tab)
+                    - 'button "Suggest an edit: FFmpeg Docker Container"':
+                      - img
+                - 'button "Favorite to your account — sign in required: FFmpeg Docker Container" [ref=e249]':
+                  - img
+                - 'button "Bookmark on this device — no sign-in required: FFmpeg Docker Container" [ref=e251]':
+                  - img
+              - heading "FFmpeg Docker Container" [level=2] [ref=e254]:
+                - link "FFmpeg Docker Container" [ref=e255]:
+                  - /url: /resource/712
+              - paragraph [ref=e256]: This project provides a Docker container for FFmpeg, facilitating the use of FFmpeg in isolated environments. It simplifies the deployment and execution of FFmpeg commands, ensuring consistency across different systems and easing the setup process for developers.
+            - generic [ref=e258]:
+              - generic [ref=e259]: Encoding & Codecs
+              - link "Filter by tag Docker" [ref=e260]:
+                - /url: /tag/docker
+                - generic [ref=e261]: "#Docker"
+              - link "Filter by tag FFmpeg" [ref=e262]:
+                - /url: /tag/ffmpeg
+                - generic [ref=e263]: "#FFmpeg"
+              - link "Filter by tag containerization" [ref=e264]:
+                - /url: /tag/containerization
+                - generic [ref=e265]: "#containerization"
+          - article [ref=e266] [cursor=pointer]:
+            - generic [ref=e267]:
+              - generic [ref=e268]:
+                - generic [ref=e269]: ◇
+                - generic:
+                  - link "View details for FFmpeg iOS":
+                    - /url: /resource/363
+                    - img
+                    - generic: View Details
+                  - button "Show 2 more tags": +2 more
+                  - generic:
+                    - link "Open Link FFmpeg iOS (opens in new tab)":
+                      - /url: https://sourceforge.net/projects/ffmpeg-ios/
+                      - img
+                      - generic: Open Link
+                      - generic: FFmpeg iOS (opens in new tab)
+                    - 'button "Suggest an edit: FFmpeg iOS"':
+                      - img
+                - 'button "Favorite to your account — sign in required: FFmpeg iOS" [ref=e272]':
+                  - img
+                - 'button "Bookmark on this device — no sign-in required: FFmpeg iOS" [ref=e274]':
+                  - img
+              - heading "FFmpeg iOS" [level=2] [ref=e277]:
+                - link "FFmpeg iOS" [ref=e278]:
+                  - /url: /resource/363
+              - paragraph [ref=e279]: FFmpeg iOS provides precompiled FFmpeg libraries tailored for iOS development. These libraries enable developers to incorporate robust video processing capabilities into iOS applications, supporting a wide range of codecs and formats essential for video streaming and encoding tasks.
+            - generic [ref=e281]:
+              - generic [ref=e282]: Encoding & Codecs
+              - link "Filter by tag FFmpeg" [ref=e283]:
+                - /url: /tag/ffmpeg
+                - generic [ref=e284]: "#FFmpeg"
+              - link "Filter by tag iOS" [ref=e285]:
+                - /url: /tag/ios
+                - generic [ref=e286]: "#iOS"
+              - link "Filter by tag video processing" [ref=e287]:
+                - /url: /tag/video-processing
+                - generic [ref=e288]: "#video processing"
+          - article [ref=e289] [cursor=pointer]:
+            - generic [ref=e290]:
+              - generic [ref=e291]:
+                - generic [ref=e292]: ◇
+                - generic [ref=e293]:
+                  - link "View details for ffmpeg-apple-arm64-build" [ref=e294]:
+                    - /url: /resource/627
+                    - img [ref=e296]
+                    - generic [ref=e298]: View Details
+                  - button "Show 2 more tags" [ref=e299]: +2 more
+                  - generic [ref=e300]:
+                    - link "Open Link ffmpeg-apple-arm64-build (opens in new tab)" [ref=e301]:
+                      - /url: https://github.com/Vargol/ffmpeg-apple-arm64-build
+                      - img
+                      - generic [ref=e302]: Open Link
+                      - generic [ref=e303]: ffmpeg-apple-arm64-build (opens in new tab)
+                    - 'button "Suggest an edit: ffmpeg-apple-arm64-build" [ref=e304]':
+                      - img
+                - 'button "Favorite to your account — sign in required: ffmpeg-apple-arm64-build" [ref=e307]':
+                  - img
+                - 'button "Bookmark on this device — no sign-in required: ffmpeg-apple-arm64-build" [ref=e309]':
+                  - img
+              - heading "ffmpeg-apple-arm64-build" [level=2] [ref=e312]:
+                - link "ffmpeg-apple-arm64-build" [ref=e313]:
+                  - /url: /resource/627
+              - paragraph [ref=e314]: A build script for FFmpeg targeting the latest open-source video codecs running on macOS using Apple's M1 processor.
+            - generic [ref=e316]:
+              - generic [ref=e317]: Encoding & Codecs
+              - link "Filter by tag FFmpeg" [ref=e318]:
+                - /url: /tag/ffmpeg
+                - generic [ref=e319]: "#FFmpeg"
+              - link "Filter by tag macOS" [ref=e320]:
+                - /url: /tag/macos
+                - generic [ref=e321]: "#macOS"
+              - link "Filter by tag Apple-M1" [ref=e322]:
+                - /url: /tag/apple-m1
+                - generic [ref=e323]: "#Apple-M1"
+          - article [ref=e324] [cursor=pointer]:
+            - generic [ref=e325]:
+              - generic [ref=e326]:
+                - generic [ref=e327]: ◇
+                - generic:
+                  - link "View details for Gmmlib":
+                    - /url: /resource/1370
+                    - img
+                    - generic: View Details
+                  - button "Show 3 more tags": +3 more
+                  - generic:
+                    - link "Open Link Gmmlib (opens in new tab)":
+                      - /url: https://github.com/intel/gmmlib
+                      - img
+                      - generic: Open Link
+                      - generic: Gmmlib (opens in new tab)
+                    - 'button "Suggest an edit: Gmmlib"':
+                      - img
+                - 'button "Favorite to your account — sign in required: Gmmlib" [ref=e330]':
+                  - img
+                - 'button "Bookmark on this device — no sign-in required: Gmmlib" [ref=e332]':
+                  - img
+              - heading "Gmmlib" [level=2] [ref=e335]:
+                - link "Gmmlib" [ref=e336]:
+                  - /url: /resource/1370
+              - paragraph [ref=e337]: intel/gmmlib - A GitHub repository for video/multimedia development
+            - generic [ref=e338]:
+              - img "GitHub - intel/gmmlib" [ref=e341]
+              - generic [ref=e342]: "Page Title: GitHub - intel/gmmlib · GitHub"
+              - generic [ref=e343]: "Page Description: Contribute to intel/gmmlib development by creating an account on GitHub."
+              - generic [ref=e344]:
+                - generic [ref=e345]: Encoding & Codecs
+                - generic [ref=e346]: Libraries
+                - link "Filter by tag intel" [ref=e347]:
+                  - /url: /tag/intel
+                  - generic [ref=e348]: "#intel"
+                - link "Filter by tag graphics" [ref=e349]:
+                  - /url: /tag/graphics
+                  - generic [ref=e350]: "#graphics"
+                - link "Filter by tag memory" [ref=e351]:
+                  - /url: /tag/memory
+                  - generic [ref=e352]: "#memory"
+          - article [ref=e353] [cursor=pointer]:
+            - generic [ref=e354]:
+              - generic [ref=e355]:
+                - generic [ref=e356]: ◇
+                - generic:
+                  - link "View details for H.264 profiles and levels | Inside & Outside MediaCoder":
+                    - /url: /resource/1502
+                    - img
+                    - generic: View Details
+                  - button "Show 3 more tags": +3 more
+                  - generic:
+                    - link "Open Link H.264 profiles and levels | Inside & Outside MediaCoder (opens in new tab)":
+                      - /url: http://blog.mediacoderhq.com/h264-profiles-and-levels
+                      - img
+                      - generic: Open Link
+                      - generic: H.264 profiles and levels | Inside & Outside MediaCoder (opens in new tab)
+                    - 'button "Suggest an edit: H.264 profiles and levels | Inside & Outside MediaCoder"':
+                      - img
+                - 'button "Favorite to your account — sign in required: H.264 profiles and levels | Inside & Outside MediaCoder" [ref=e359]':
+                  - img
+                - 'button "Bookmark on this device — no sign-in required: H.264 profiles and levels | Inside & Outside MediaCoder" [ref=e361]':
+                  - img
+              - heading "H.264 profiles and levels | Inside & Outside MediaCoder" [level=2] [ref=e364]:
+                - link "H.264 profiles and levels | Inside & Outside MediaCoder" [ref=e365]:
+                  - /url: /resource/1502
+              - paragraph [ref=e366]: H.264 profiles and levels | Inside & Outside MediaCoder - Resource from blog.mediacoderhq.com
+            - generic [ref=e368]:
+              - generic [ref=e369]: Encoding & Codecs
+              - link "Filter by tag h264" [ref=e370]:
+                - /url: /tag/h264
+                - generic [ref=e371]: "#h264"
+              - link "Filter by tag codec" [ref=e372]:
+                - /url: /tag/codec
+                - generic [ref=e373]: "#codec"
+              - link "Filter by tag video encoding" [ref=e374]:
+                - /url: /tag/video-encoding
+                - generic [ref=e375]: "#video encoding"
+          - article [ref=e376] [cursor=pointer]:
+            - generic [ref=e377]:
+              - generic [ref=e378]:
+                - generic [ref=e379]: ◇
+                - generic:
+                  - link "View details for HandBrake Web":
+                    - /url: /resource/278
+                    - img
+                    - generic: View Details
+                  - button "Show 2 more tags": +2 more
+                  - generic:
+                    - link "Open Link HandBrake Web (opens in new tab)":
+                      - /url: https://github.com/TheNickOfTime/handbrake-web
+                      - img
+                      - generic: Open Link
+                      - generic: HandBrake Web (opens in new tab)
+                    - 'button "Suggest an edit: HandBrake Web"':
+                      - img
+                - 'button "Favorite to your account — sign in required: HandBrake Web" [ref=e382]':
+                  - img
+                - 'button "Bookmark on this device — no sign-in required: HandBrake Web" [ref=e384]':
+                  - img
+              - heading "HandBrake Web" [level=2] [ref=e387]:
+                - link "HandBrake Web" [ref=e388]:
+                  - /url: /resource/278
+              - paragraph [ref=e389]: A self-hosted platform to use HandBrake on headless devices via a bespoke web interface. It allows users to harness the processing power of multiple devices to work on a single queue, facilitating efficient video transcoding workflows.
+            - generic [ref=e391]:
+              - generic [ref=e392]: Encoding & Codecs
+              - link "Filter by tag web" [ref=e393]:
+                - /url: /tag/web
+                - generic [ref=e394]: "#web"
+              - link "Filter by tag HandBrake" [ref=e395]:
+                - /url: /tag/handbrake
+                - generic [ref=e396]: "#HandBrake"
+              - link "Filter by tag transcoding" [ref=e397]:
+                - /url: /tag/transcoding
+                - generic [ref=e398]: "#transcoding"
+          - article [ref=e399] [cursor=pointer]:
+            - generic [ref=e400]:
+              - generic [ref=e401]:
+                - generic [ref=e402]: ◇
+                - generic:
+                  - link "View details for IHMC Video Codecs":
+                    - /url: /resource/500
+                    - img
+                    - generic: View Details
+                  - button "Show 2 more tags": +2 more
+                  - generic:
+                    - link "Open Link IHMC Video Codecs (opens in new tab)":
+                      - /url: https://github.com/ihmcrobotics/ihmc-video-codecs
+                      - img
+                      - generic: Open Link
+                      - generic: IHMC Video Codecs (opens in new tab)
+                    - 'button "Suggest an edit: IHMC Video Codecs"':
+                      - img
+                - 'button "Favorite to your account — sign in required: IHMC Video Codecs" [ref=e405]':
+                  - img
+                - 'button "Bookmark on this device — no sign-in required: IHMC Video Codecs" [ref=e407]':
+                  - img
+              - heading "IHMC Video Codecs" [level=2] [ref=e410]:
+                - link "IHMC Video Codecs" [ref=e411]:
+                  - /url: /resource/500
+              - paragraph [ref=e412]: A Java library providing support for H.264 and MJPEG encoding and decoding, as well as MP4 support. It utilizes native code for efficient video processing and includes automatic downloading of the OpenH264 library, ensuring compliance with licensing requirements.
+            - generic [ref=e414]:
+              - generic [ref=e415]: Encoding & Codecs
+              - link "Filter by tag Java" [ref=e416]:
+                - /url: /tag/java
+                - generic [ref=e417]: "#Java"
+              - link "Filter by tag H.264" [ref=e418]:
+                - /url: /tag/h.264
+                - generic [ref=e419]: "#H.264"
+              - link "Filter by tag MJPEG" [ref=e420]:
+                - /url: /tag/mjpeg
+                - generic [ref=e421]: "#MJPEG"
+          - article [ref=e422] [cursor=pointer]:
+            - generic [ref=e423]:
+              - generic [ref=e424]:
+                - generic [ref=e425]: ◇
+                - generic:
+                  - link "View details for Improving our video encodes for legacy devices":
+                    - /url: /resource/1359
+                    - img
+                    - generic: View Details
+                  - button "Show 1 more tag": +1 more
+                  - generic:
+                    - link "Open Link Improving our video encodes for legacy devices (opens in new tab)":
+                      - /url: https://link.medium.com/T7S5MS6IT8
+                      - img
+                      - generic: Open Link
+                      - generic: Improving our video encodes for legacy devices (opens in new tab)
+                    - 'button "Suggest an edit: Improving our video encodes for legacy devices"':
+                      - img
+                - 'button "Favorite to your account — sign in required: Improving our video encodes for legacy devices" [ref=e428]':
+                  - img
+                - 'button "Bookmark on this device — no sign-in required: Improving our video encodes for legacy devices" [ref=e430]':
+                  - img
+              - heading "Improving our video encodes for legacy devices" [level=2] [ref=e433]:
+                - link "Improving our video encodes for legacy devices" [ref=e434]:
+                  - /url: /resource/1359
+              - paragraph [ref=e435]: by Mariana Afonso, Anush Moorthy, Liwei Guo, Lishan Zhu, Anne Aaron
+            - generic [ref=e437]:
+              - generic [ref=e438]: Encoding & Codecs
+              - link "Filter by tag encoding" [ref=e439]:
+                - /url: /tag/encoding
+                - generic [ref=e440]: "#encoding"
+              - link "Filter by tag legacy devices" [ref=e441]:
+                - /url: /tag/legacy-device
+                - generic [ref=e442]: "#legacy devices"
+              - link "Filter by tag video optimization" [ref=e443]:
+                - /url: /tag/video-optimization
+                - generic [ref=e444]: "#video optimization"
+          - article [ref=e445] [cursor=pointer]:
+            - generic [ref=e446]:
+              - generic [ref=e447]:
+                - generic [ref=e448]: ◇
+                - generic:
+                  - link "View details for Improving Our Video Encodes for Legacy Devices":
+                    - /url: /resource/1687
+                    - img
+                    - generic: View Details
+                  - button "Show 2 more tags": +2 more
+                  - generic:
+                    - link "Open Link Improving Our Video Encodes for Legacy Devices (opens in new tab)":
+                      - /url: https://netflixtechblog.com/improving-our-video-encodes-for-legacy-devices-9f39f7774850
+                      - img
+                      - generic: Open Link
+                      - generic: Improving Our Video Encodes for Legacy Devices (opens in new tab)
+                    - 'button "Suggest an edit: Improving Our Video Encodes for Legacy Devices"':
+                      - img
+                - 'button "Favorite to your account — sign in required: Improving Our Video Encodes for Legacy Devices" [ref=e451]':
+                  - img
+                - 'button "Bookmark on this device — no sign-in required: Improving Our Video Encodes for Legacy Devices" [ref=e453]':
+                  - img
+              - heading "Improving Our Video Encodes for Legacy Devices" [level=2] [ref=e456]:
+                - link "Improving Our Video Encodes for Legacy Devices" [ref=e457]:
+                  - /url: /resource/1687
+              - paragraph [ref=e458]: A Netflix Tech Blog post describing techniques to ensure Netflix content remains compatible and efficient on older or less powerful devices, through specialized encoding profiles and optimizations.
+            - generic [ref=e460]:
+              - generic [ref=e461]: Encoding & Codecs
+              - link "Filter by tag encoding" [ref=e462]:
+                - /url: /tag/encoding
+                - generic [ref=e463]: "#encoding"
+              - link "Filter by tag device compatibility" [ref=e464]:
+                - /url: /tag/device-compatibility
+                - generic [ref=e465]: "#device compatibility"
+              - link "Filter by tag optimization" [ref=e466]:
+                - /url: /tag/optimization
+                - generic [ref=e467]: "#optimization"
+          - article [ref=e468] [cursor=pointer]:
+            - generic [ref=e469]:
+              - generic [ref=e470]:
+                - generic [ref=e471]: ◇
+                - generic:
+                  - link "View details for intel/intel-vaapi-driver":
+                    - /url: /resource/1374
+                    - img
+                    - generic: View Details
+                  - button "Show 3 more tags": +3 more
+                  - generic:
+                    - link "Open Link intel/intel-vaapi-driver (opens in new tab)":
+                      - /url: https://github.com/intel/intel-vaapi-driver
+                      - img
+                      - generic: Open Link
+                      - generic: intel/intel-vaapi-driver (opens in new tab)
+                    - 'button "Suggest an edit: intel/intel-vaapi-driver"':
+                      - img
+                - 'button "Favorite to your account — sign in required: intel/intel-vaapi-driver" [ref=e474]':
+                  - img
+                - 'button "Bookmark on this device — no sign-in required: intel/intel-vaapi-driver" [ref=e476]':
+                  - img
+              - heading "intel/intel-vaapi-driver" [level=2] [ref=e479]:
+                - link "intel/intel-vaapi-driver" [ref=e480]:
+                  - /url: /resource/1374
+              - paragraph [ref=e481]: VA-API user mode driver for Intel GEN Graphics family - intel/intel-vaapi-driver
+            - generic [ref=e483]:
+              - generic [ref=e484]: Encoding & Codecs
+              - link "Filter by tag intel" [ref=e485]:
+                - /url: /tag/intel
+                - generic [ref=e486]: "#intel"
+              - link "Filter by tag vaapi" [ref=e487]:
+                - /url: /tag/vaapi
+                - generic [ref=e488]: "#vaapi"
+              - link "Filter by tag graphics" [ref=e489]:
+                - /url: /tag/graphics
+                - generic [ref=e490]: "#graphics"
+          - article [ref=e491] [cursor=pointer]:
+            - generic [ref=e492]:
+              - generic [ref=e493]:
+                - generic [ref=e494]: ◇
+                - generic:
+                  - link "View details for intel/libva":
+                    - /url: /resource/1372
+                    - img
+                    - generic: View Details
+                  - button "Show 2 more tags": +2 more
+                  - generic:
+                    - link "Open Link intel/libva (opens in new tab)":
+                      - /url: https://github.com/intel/libva
+                      - img
+                      - generic: Open Link
+                      - generic: intel/libva (opens in new tab)
+                    - 'button "Suggest an edit: intel/libva"':
+                      - img
+                - 'button "Favorite to your account — sign in required: intel/libva" [ref=e497]':
+                  - img
+                - 'button "Bookmark on this device — no sign-in required: intel/libva" [ref=e499]':
+                  - img
+              - heading "intel/libva" [level=2] [ref=e502]:
+                - link "intel/libva" [ref=e503]:
+                  - /url: /resource/1372
+              - paragraph [ref=e504]: Libva is an implementation for VA-API (Video Acceleration API) - intel/libva
+            - generic [ref=e506]:
+              - generic [ref=e507]: Encoding & Codecs
+              - link "Filter by tag video acceleration" [ref=e508]:
+                - /url: /tag/video-acceleration
+                - generic [ref=e509]: "#video acceleration"
+              - link "Filter by tag codec" [ref=e510]:
+                - /url: /tag/codec
+                - generic [ref=e511]: "#codec"
+              - link "Filter by tag hardware encoding" [ref=e512]:
+                - /url: /tag/hardware-encoding
+                - generic [ref=e513]: "#hardware encoding"
+          - article [ref=e514] [cursor=pointer]:
+            - generic [ref=e515]:
+              - generic [ref=e516]:
+                - generic [ref=e517]: ◇
+                - generic:
+                  - link "View details for Intel® Video Processing Library (Intel® VPL)":
+                    - /url: /resource/595
+                    - img
+                    - generic: View Details
+                  - button "Show 2 more tags": +2 more
+                  - generic:
+                    - link "Open Link Intel® Video Processing Library (Intel® VPL) (opens in new tab)":
+                      - /url: https://www.intel.com/content/www/us/en/developer/tools/vpl/overview.html
+                      - img
+                      - generic: Open Link
+                      - generic: Intel® Video Processing Library (Intel® VPL) (opens in new tab)
+                    - 'button "Suggest an edit: Intel® Video Processing Library (Intel® VPL)"':
+                      - img
+                - 'button "Favorite to your account — sign in required: Intel® Video Processing Library (Intel® VPL)" [ref=e520]':
+                  - img
+                - 'button "Bookmark on this device — no sign-in required: Intel® Video Processing Library (Intel® VPL)" [ref=e522]':
+                  - img
+              - heading "Intel® Video Processing Library (Intel® VPL)" [level=2] [ref=e525]:
+                - link "Intel® Video Processing Library (Intel® VPL)" [ref=e526]:
+                  - /url: /resource/595
+              - paragraph [ref=e527]: A library offering advanced access to specialized media hardware, including encode, decode, and video processing features on Intel GPUs. It supports hardware-accelerated codecs and programmable graphics, improving frame rates and reducing power usage compared to traditional CPUs.
+            - generic [ref=e529]:
+              - generic [ref=e530]: Encoding & Codecs
+              - link "Filter by tag Intel" [ref=e531]:
+                - /url: /tag/intel
+                - generic [ref=e532]: "#Intel"
+              - link "Filter by tag video processing" [ref=e533]:
+                - /url: /tag/video-processing
+                - generic [ref=e534]: "#video processing"
+              - link "Filter by tag hardware acceleration" [ref=e535]:
+                - /url: /tag/hardware-acceleration
+                - generic [ref=e536]: "#hardware acceleration"
+          - article [ref=e537] [cursor=pointer]:
+            - generic [ref=e538]:
+              - generic [ref=e539]:
+                - generic [ref=e540]: ◇
+                - generic:
+                  - link "View details for JCodec":
+                    - /url: /resource/1866
+                    - img
+                    - generic: View Details
+                  - button "Show 3 more tags": +3 more
+                  - generic:
+                    - link "Open Link JCodec (opens in new tab)":
+                      - /url: https://github.com/jcodec/jcodec
+                      - img
+                      - generic: Open Link
+                      - generic: JCodec (opens in new tab)
+                    - 'button "Suggest an edit: JCodec"':
+                      - img
+                - 'button "Favorite to your account — sign in required: JCodec" [ref=e543]':
+                  - img
+                - 'button "Bookmark on this device — no sign-in required: JCodec" [ref=e545]':
+                  - img
+              - heading "JCodec" [level=2] [ref=e548]:
+                - link "JCodec" [ref=e549]:
+                  - /url: /resource/1866
+              - paragraph [ref=e550]: A pure Java library for video and audio codecs, including support for H.264 and AAC decoding, aimed at processing media without native dependencies.
+            - generic [ref=e552]:
+              - generic [ref=e553]: Encoding & Codecs
+              - generic [ref=e554]: Libraries
+              - link "Filter by tag codec" [ref=e555]:
+                - /url: /tag/codec
+                - generic [ref=e556]: "#codec"
+              - link "Filter by tag java" [ref=e557]:
+                - /url: /tag/java
+                - generic [ref=e558]: "#java"
+              - link "Filter by tag h264" [ref=e559]:
+                - /url: /tag/h264
+                - generic [ref=e560]: "#h264"
+          - article [ref=e561] [cursor=pointer]:
+            - generic [ref=e562]:
+              - generic [ref=e563]:
+                - generic [ref=e564]: ◇
+                - generic:
+                  - link "View details for JPEG XL Reference Implementation":
+                    - /url: /resource/575
+                    - img
+                    - generic: View Details
+                  - button "Show 2 more tags": +2 more
+                  - generic:
+                    - link "Open Link JPEG XL Reference Implementation (opens in new tab)":
+                      - /url: https://github.com/libjxl/libjxl
+                      - img
+                      - generic: Open Link
+                      - generic: JPEG XL Reference Implementation (opens in new tab)
+                    - 'button "Suggest an edit: JPEG XL Reference Implementation"':
+                      - img
+                - 'button "Favorite to your account — sign in required: JPEG XL Reference Implementation" [ref=e567]':
+                  - img
+                - 'button "Bookmark on this device — no sign-in required: JPEG XL Reference Implementation" [ref=e569]':
+                  - img
+              - heading "JPEG XL Reference Implementation" [level=2] [ref=e572]:
+                - link "JPEG XL Reference Implementation" [ref=e573]:
+                  - /url: /resource/575
+              - paragraph [ref=e574]: The official reference implementation of the JPEG XL image format, offering both lossy and lossless compression. This project is valuable for developers working on image and video processing applications that require efficient compression techniques.
+            - generic [ref=e576]:
+              - generic [ref=e577]: Encoding & Codecs
+              - link "Filter by tag JPEG XL" [ref=e578]:
+                - /url: /tag/jpeg-xl
+                - generic [ref=e579]: "#JPEG XL"
+              - link "Filter by tag image compression" [ref=e580]:
+                - /url: /tag/image-compression
+                - generic [ref=e581]: "#image compression"
+              - link "Filter by tag lossy" [ref=e582]:
+                - /url: /tag/lossy
+                - generic [ref=e583]: "#lossy"
+          - article [ref=e584] [cursor=pointer]:
+            - generic [ref=e585]:
+              - generic [ref=e586]:
+                - generic [ref=e587]: ◇
+                - generic:
+                  - link "View details for Kaltura Media Transcoding Services":
+                    - /url: /resource/220
+                    - img
+                    - generic: View Details
+                  - button "Show 2 more tags": +2 more
+                  - generic:
+                    - link "Open Link Kaltura Media Transcoding Services (opens in new tab)":
+                      - /url: https://knowledge.kaltura.com/help/kaltura-media-transcoding-services-and-technology
+                      - img
+                      - generic: Open Link
+                      - generic: Kaltura Media Transcoding Services (opens in new tab)
+                    - 'button "Suggest an edit: Kaltura Media Transcoding Services"':
+                      - img
+                - 'button "Favorite to your account — sign in required: Kaltura Media Transcoding Services" [ref=e590]':
+                  - img
+                - 'button "Bookmark on this device — no sign-in required: Kaltura Media Transcoding Services" [ref=e592]':
+                  - img
+              - heading "Kaltura Media Transcoding Services" [level=2] [ref=e595]:
+                - link "Kaltura Media Transcoding Services" [ref=e596]:
+                  - /url: /resource/220
+              - paragraph [ref=e597]: Kaltura offers cloud-based media transcoding services designed to handle any input type and file size, supporting large volumes of jobs from simple web delivery to complex production workflows. It provides scalable solutions for video encoding and streaming, optimized for the latest formats and codecs.
+            - generic [ref=e599]:
+              - generic [ref=e600]: Encoding & Codecs
+              - link "Filter by tag cloud-based" [ref=e601]:
+                - /url: /tag/cloud-based
+                - generic [ref=e602]: "#cloud-based"
+              - link "Filter by tag media transcoding" [ref=e603]:
+                - /url: /tag/media-transcoding
+                - generic [ref=e604]: "#media transcoding"
+              - link "Filter by tag video encoding" [ref=e605]:
+                - /url: /tag/video-encoding
+                - generic [ref=e606]: "#video encoding"
+          - article [ref=e607] [cursor=pointer]:
+            - generic [ref=e608]:
+              - generic [ref=e609]:
+                - generic [ref=e610]: ◇
+                - generic:
+                  - link "View details for Lagarith Lossless Codec":
+                    - /url: /resource/1937
+                    - img
+                    - generic: View Details
+                  - button "Show 3 more tags": +3 more
+                  - generic:
+                    - link "Open Link Lagarith Lossless Codec (opens in new tab)":
+                      - /url: https://lags.leetcode.net/codec.html
+                      - img
+                      - generic: Open Link
+                      - generic: Lagarith Lossless Codec (opens in new tab)
+                    - 'button "Suggest an edit: Lagarith Lossless Codec"':
+                      - img
+                - 'button "Favorite to your account — sign in required: Lagarith Lossless Codec" [ref=e613]':
+                  - img
+                - 'button "Bookmark on this device — no sign-in required: Lagarith Lossless Codec" [ref=e615]':
+                  - img
+              - heading "Lagarith Lossless Codec" [level=2] [ref=e618]:
+                - link "Lagarith Lossless Codec" [ref=e619]:
+                  - /url: /resource/1937
+              - paragraph [ref=e620]: A lossless video codec for Windows that offers high compression ratios. Useful for archival and intermediate video editing workflows where quality must be preserved (open source).
+            - generic [ref=e622]:
+              - generic [ref=e623]: Encoding & Codecs
+              - link "Filter by tag codec" [ref=e624]:
+                - /url: /tag/codec
+                - generic [ref=e625]: "#codec"
+              - link "Filter by tag lossless" [ref=e626]:
+                - /url: /tag/lossless
+                - generic [ref=e627]: "#lossless"
+              - link "Filter by tag compression" [ref=e628]:
+                - /url: /tag/compression
+                - generic [ref=e629]: "#compression"
+        - navigation "Pagination" [ref=e631]:
+          - generic [ref=e632]:
+            - link "Previous" [ref=e633] [cursor=pointer]:
+              - /url: /category/encoding-codecs
+              - img
+              - text: Previous
+            - link "Go to page 1" [ref=e634] [cursor=pointer]:
+              - /url: /category/encoding-codecs
+              - text: "1"
+            - link "Page 2, current page" [ref=e635] [cursor=pointer]:
+              - /url: /category/encoding-codecs?page=2
+              - text: "2"
+            - link "Go to page 3" [ref=e636] [cursor=pointer]:
+              - /url: /category/encoding-codecs?page=3
+              - text: "3"
+            - generic [ref=e637]: …
+            - link "Go to page 16" [ref=e638] [cursor=pointer]:
+              - /url: /category/encoding-codecs?page=16
+              - text: "16"
+            - link "Next" [ref=e639] [cursor=pointer]:
+              - /url: /category/encoding-codecs?page=3
+              - text: Next
+              - img
+          - generic [ref=e640]:
+            - generic [ref=e641]: Page 2 of 16
+            - generic [ref=e642]:
+              - generic [ref=e643] [cursor=pointer]: Go to page
+              - textbox "Page number, 1 to 16" [ref=e644]: "2"
+              - generic [ref=e645]: / 16
+          - status [ref=e646]

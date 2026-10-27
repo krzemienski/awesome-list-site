@@ -1,0 +1,959 @@
+- main [ref=e1]:
+  - generic [ref=e2]:
+    - navigation "Breadcrumb" [ref=e3]:
+      - list [ref=e4]:
+        - listitem [ref=e5]:
+          - link "Home" [ref=e6] [cursor=pointer]:
+            - /url: /
+        - listitem [ref=e7]:
+          - img [ref=e8]
+        - listitem:
+          - link "Encoding & Codecs" [disabled]
+    - generic [ref=e10]:
+      - link "Browse" [ref=e11] [cursor=pointer]:
+        - /url: /categories
+        - img
+        - text: Browse
+      - generic [ref=e12]:
+        - generic [ref=e14]: ◇
+        - text: CATEGORY · ENCODING & CODECS
+        - heading "Encoding & Codecs" [level=1] [ref=e15]
+        - region "About this collection" [ref=e16]:
+          - heading "About this collection" [level=2] [ref=e17]
+          - paragraph [ref=e18]: Encoding & Codecs brings together 372 curated resources from across the video technology landscape. Notable topics include Codecs and Encoding Tools.
+        - generic [ref=e19]:
+          - generic [ref=e20]: 372 resources
+          - generic [ref=e21]: 2 subcategories
+          - button "Filters & view" [ref=e22] [cursor=pointer]:
+            - generic [ref=e23]: Filters & view
+      - region "Subcategories" [ref=e24]:
+        - heading "Subcategories" [level=2] [ref=e25]
+        - generic [ref=e26]:
+          - link "Codecs 27" [ref=e27] [cursor=pointer]:
+            - /url: /subcategory/codecs
+            - generic [ref=e28]: Codecs
+            - generic [ref=e29]: "27"
+          - link "Encoding Tools 225" [ref=e30] [cursor=pointer]:
+            - /url: /subcategory/encoding-tools
+            - generic [ref=e31]: Encoding Tools
+            - generic [ref=e32]: "225"
+          - button "Uncategorized 120" [ref=e33] [cursor=pointer]:
+            - generic [ref=e34]: Uncategorized
+            - generic [ref=e35]: "120"
+      - generic "Resources (372)" [ref=e38]:
+        - heading "Resources (372)" [level=2] [ref=e40]
+        - generic [ref=e41]:
+          - article [ref=e42] [cursor=pointer]:
+            - generic [ref=e43]:
+              - generic [ref=e44]:
+                - generic [ref=e45]: ◇
+                - generic:
+                  - link "View details for A Large-Scale Comparison of x264, x265, and libvpx":
+                    - /url: /resource/1014
+                    - img
+                    - generic: View Details
+                  - button "Show 4 more tags": +4 more
+                  - generic:
+                    - link "Open Link A Large-Scale Comparison of x264, x265, and libvpx (opens in new tab)":
+                      - /url: https://medium.com/netflix-techblog/a-large-scale-comparison-of-x264-x265-and-libvpx-a-sneak-peek-2e81e88f8b0f
+                      - img
+                      - generic: Open Link
+                      - generic: A Large-Scale Comparison of x264, x265, and libvpx (opens in new tab)
+                    - 'button "Suggest an edit: A Large-Scale Comparison of x264, x265, and libvpx"':
+                      - img
+                - 'button "Favorite to your account — sign in required: A Large-Scale Comparison of x264, x265, and libvpx" [ref=e48]':
+                  - img
+                - 'button "Bookmark on this device — no sign-in required: A Large-Scale Comparison of x264, x265, and libvpx" [ref=e50]':
+                  - img
+              - heading "A Large-Scale Comparison of x264, x265, and libvpx" [level=2] [ref=e53]:
+                - link "A Large-Scale Comparison of x264, x265, and libvpx" [ref=e54]:
+                  - /url: /resource/1014
+              - paragraph [ref=e55]: a Sneak Peek
+            - generic [ref=e57]:
+              - generic [ref=e58]: Encoding & Codecs
+              - link "Filter by tag codec" [ref=e59]:
+                - /url: /tag/codec
+                - generic [ref=e60]: "#codec"
+              - link "Filter by tag comparison" [ref=e61]:
+                - /url: /tag/comparison
+                - generic [ref=e62]: "#comparison"
+              - link "Filter by tag encoding" [ref=e63]:
+                - /url: /tag/encoding
+                - generic [ref=e64]: "#encoding"
+          - article [ref=e65] [cursor=pointer]:
+            - generic [ref=e66]:
+              - generic [ref=e67]:
+                - generic [ref=e68]: ◇
+                - generic:
+                  - link "View details for Adobe Media Encoder":
+                    - /url: /resource/324
+                    - img
+                    - generic: View Details
+                  - button "Show 2 more tags": +2 more
+                  - generic:
+                    - link "Open Link Adobe Media Encoder (opens in new tab)":
+                      - /url: https://www.adobe.com/products/media-encoder.html
+                      - img
+                      - generic: Open Link
+                      - generic: Adobe Media Encoder (opens in new tab)
+                    - 'button "Suggest an edit: Adobe Media Encoder"':
+                      - img
+                - 'button "Favorite to your account — sign in required: Adobe Media Encoder" [ref=e71]':
+                  - img
+                - 'button "Bookmark on this device — no sign-in required: Adobe Media Encoder" [ref=e73]':
+                  - img
+              - heading "Adobe Media Encoder" [level=2] [ref=e76]:
+                - link "Adobe Media Encoder" [ref=e77]:
+                  - /url: /resource/324
+              - paragraph [ref=e78]: Adobe Media Encoder is a professional video encoding software that integrates seamlessly with Adobe's suite of creative tools. It supports a wide range of formats and offers features like batch processing, GPU acceleration, and preset templates, making it ideal for high-quality video encoding tasks.
+            - generic [ref=e80]:
+              - generic [ref=e81]: Encoding & Codecs
+              - link "Filter by tag video encoding" [ref=e82]:
+                - /url: /tag/video-encoding
+                - generic [ref=e83]: "#video encoding"
+              - link "Filter by tag professional" [ref=e84]:
+                - /url: /tag/professional
+                - generic [ref=e85]: "#professional"
+              - link "Filter by tag batch processing" [ref=e86]:
+                - /url: /tag/batch-processing
+                - generic [ref=e87]: "#batch processing"
+          - article [ref=e88] [cursor=pointer]:
+            - generic [ref=e89]:
+              - generic [ref=e90]:
+                - generic [ref=e91]: ◇
+                - generic:
+                  - 'link "View details for AK1194/Video-Compression-motion-estimation-block-video-encoder: This repository is about video compression, and more specifically about the motion estimation block (ME block) of a video encoder. It is a research project for developing an efficient motion"':
+                    - /url: /resource/1498
+                    - img
+                    - generic: View Details
+                  - button "Show 2 more tags": +2 more
+                  - 'link "Open Link AK1194/Video-Compression-motion-estimation-block-video-encoder: This repository is about video compression, and more specifically about the motion estimation block (ME block) of a video encoder. It is a research project for developing an efficient motion (opens in new tab)"':
+                    - /url: https://github.com/AK1194/Video-Compression-motion-estimation-block-video-encoder
+                    - img
+                    - generic: Open Link
+                    - generic: "AK1194/Video-Compression-motion-estimation-block-video-encoder: This repository is about video compression, and more specifically about the motion estimation block (ME block) of a video encoder. It is a research project for developing an efficient motion (opens in new tab)"
+                  - 'button "Suggest an edit: AK1194/Video-Compression-motion-estimation-block-video-encoder: This repository is about video compression, and more specifically about the motion estimation block (ME block) of a video encoder. It is a research project for developing an efficient motion"':
+                    - img
+                - 'button "Favorite to your account — sign in required: AK1194/Video-Compression-motion-estimation-block-video-encoder: This repository is about video compression, and more specifically about the motion estimation block (ME block) of a video encoder. It is a research project for developing an efficient motion" [ref=e94]':
+                  - img
+                - 'button "Bookmark on this device — no sign-in required: AK1194/Video-Compression-motion-estimation-block-video-encoder: This repository is about video compression, and more specifically about the motion estimation block (ME block) of a video encoder. It is a research project for developing an efficient motion" [ref=e96]':
+                  - img
+              - 'heading "AK1194/Video-Compression-motion-estimation-block-video-encoder: This repository is about video compression, and more specifically about the motion estimation block (ME block) of a video encoder. It is a research project for developing an efficient motion" [level=2] [ref=e99]':
+                - 'link "AK1194/Video-Compression-motion-estimation-block-video-encoder: This repository is about video compression, and more specifically about the motion estimation block (ME block) of a video encoder. It is a research project for developing an efficient motion" [ref=e100]':
+                  - /url: /resource/1498
+              - paragraph [ref=e101]: This repository is about video compression, and more specifically about the motion estimation block (ME block) of a video encoder. It is a research project for developing an efficient motion estima...
+            - generic [ref=e103]:
+              - generic [ref=e104]: Encoding & Codecs
+              - link "Filter by tag video compression" [ref=e105]:
+                - /url: /tag/video-compression
+                - generic [ref=e106]: "#video compression"
+              - link "Filter by tag motion estimation" [ref=e107]:
+                - /url: /tag/motion-estimation
+                - generic [ref=e108]: "#motion estimation"
+              - link "Filter by tag encoder" [ref=e109]:
+                - /url: /tag/encoder
+                - generic [ref=e110]: "#encoder"
+          - article [ref=e111] [cursor=pointer]:
+            - generic [ref=e112]:
+              - generic [ref=e113]:
+                - generic [ref=e114]: ◇
+                - generic:
+                  - link "View details for Alliance for Open Media (AOMedia)":
+                    - /url: /resource/1619
+                    - img
+                    - generic: View Details
+                  - button "Show 2 more tags": +2 more
+                  - generic:
+                    - link "Open Link Alliance for Open Media (AOMedia) (opens in new tab)":
+                      - /url: https://aomedia.org/
+                      - img
+                      - generic: Open Link
+                      - generic: Alliance for Open Media (AOMedia) (opens in new tab)
+                    - 'button "Suggest an edit: Alliance for Open Media (AOMedia)"':
+                      - img
+                - 'button "Favorite to your account — sign in required: Alliance for Open Media (AOMedia)" [ref=e117]':
+                  - img
+                - 'button "Bookmark on this device — no sign-in required: Alliance for Open Media (AOMedia)" [ref=e119]':
+                  - img
+              - heading "Alliance for Open Media (AOMedia)" [level=2] [ref=e122]:
+                - link "Alliance for Open Media (AOMedia)" [ref=e123]:
+                  - /url: /resource/1619
+              - paragraph [ref=e124]: An industry consortium that develops open, royalty-free media formats. AOMedia created the AV1 video codec and works on related audio/image formats and tools.
+            - generic [ref=e126]:
+              - generic [ref=e127]: Encoding & Codecs
+              - link "Filter by tag codec" [ref=e128]:
+                - /url: /tag/codec
+                - generic [ref=e129]: "#codec"
+              - link "Filter by tag AV1" [ref=e130]:
+                - /url: /tag/av1
+                - generic [ref=e131]: "#AV1"
+              - link "Filter by tag open source" [ref=e132]:
+                - /url: /tag/open-source
+                - generic [ref=e133]: "#open source"
+          - article [ref=e134] [cursor=pointer]:
+            - generic [ref=e135]:
+              - generic [ref=e136]:
+                - generic [ref=e137]: ◇
+                - generic:
+                  - link "View details for AMD Advanced Media Acceleration (AMA) SDK":
+                    - /url: /resource/109
+                    - img
+                    - generic: View Details
+                  - button "Show 2 more tags": +2 more
+                  - generic:
+                    - link "Open Link AMD Advanced Media Acceleration (AMA) SDK (opens in new tab)":
+                      - /url: https://amd.github.io/ama-sdk/latest/git_hub.html
+                      - img
+                      - generic: Open Link
+                      - generic: AMD Advanced Media Acceleration (AMA) SDK (opens in new tab)
+                    - 'button "Suggest an edit: AMD Advanced Media Acceleration (AMA) SDK"':
+                      - img
+                - 'button "Favorite to your account — sign in required: AMD Advanced Media Acceleration (AMA) SDK" [ref=e140]':
+                  - img
+                - 'button "Bookmark on this device — no sign-in required: AMD Advanced Media Acceleration (AMA) SDK" [ref=e142]':
+                  - img
+              - heading "AMD Advanced Media Acceleration (AMA) SDK" [level=2] [ref=e145]:
+                - link "AMD Advanced Media Acceleration (AMA) SDK" [ref=e146]:
+                  - /url: /resource/109
+              - paragraph [ref=e147]: A comprehensive SDK from AMD that provides source codes for various elements of media acceleration, including sample codes, third-party integrations, and utilities. It is particularly useful for developers looking to leverage AMD hardware for efficient video encoding and decoding.
+            - generic [ref=e149]:
+              - generic [ref=e150]: Encoding & Codecs
+              - generic [ref=e151]: Libraries
+              - link "Filter by tag AMD" [ref=e152]:
+                - /url: /tag/amd
+                - generic [ref=e153]: "#AMD"
+              - link "Filter by tag media acceleration" [ref=e154]:
+                - /url: /tag/media-acceleration
+                - generic [ref=e155]: "#media acceleration"
+              - link "Filter by tag SDK" [ref=e156]:
+                - /url: /tag/sdk
+                - generic [ref=e157]: "#SDK"
+          - article [ref=e158] [cursor=pointer]:
+            - generic [ref=e159]:
+              - generic [ref=e160]:
+                - generic [ref=e161]: ◇
+                - generic:
+                  - link "View details for AMD Advanced Media Framework (AMF SDK)":
+                    - /url: /resource/1885
+                    - img
+                    - generic: View Details
+                  - button "Show 4 more tags": +4 more
+                  - generic:
+                    - link "Open Link AMD Advanced Media Framework (AMF SDK) (opens in new tab)":
+                      - /url: https://github.com/GPUOpen-LibrariesAndSDKs/AMF
+                      - img
+                      - generic: Open Link
+                      - generic: AMD Advanced Media Framework (AMF SDK) (opens in new tab)
+                    - 'button "Suggest an edit: AMD Advanced Media Framework (AMF SDK)"':
+                      - img
+                - 'button "Favorite to your account — sign in required: AMD Advanced Media Framework (AMF SDK)" [ref=e164]':
+                  - img
+                - 'button "Bookmark on this device — no sign-in required: AMD Advanced Media Framework (AMF SDK)" [ref=e166]':
+                  - img
+              - heading "AMD Advanced Media Framework (AMF SDK)" [level=2] [ref=e169]:
+                - link "AMD Advanced Media Framework (AMF SDK)" [ref=e170]:
+                  - /url: /resource/1885
+              - paragraph [ref=e171]: AMD's GPUOpen Video SDK that provides developers access to GPU-accelerated encoding and decoding (H.264, HEVC, etc.) on AMD hardware.
+            - generic [ref=e173]:
+              - generic [ref=e174]: Encoding & Codecs
+              - generic [ref=e175]: Libraries
+              - link "Filter by tag gpu" [ref=e176]:
+                - /url: /tag/gpu
+                - generic [ref=e177]: "#gpu"
+              - link "Filter by tag encoding" [ref=e178]:
+                - /url: /tag/encoding
+                - generic [ref=e179]: "#encoding"
+              - link "Filter by tag decoding" [ref=e180]:
+                - /url: /tag/decoding
+                - generic [ref=e181]: "#decoding"
+          - article [ref=e182] [cursor=pointer]:
+            - generic [ref=e183]:
+              - generic [ref=e184]:
+                - generic [ref=e185]: ◇
+                - generic:
+                  - link "View details for AMF (Advanced Media Framework)":
+                    - /url: /resource/463
+                    - img
+                    - generic: View Details
+                  - button "Show 2 more tags": +2 more
+                  - generic:
+                    - link "Open Link AMF (Advanced Media Framework) (opens in new tab)":
+                      - /url: https://github.com/GPUOpen-LibrariesAndSDKs/AMF/wiki/Guide-for-Video-CODEC-Encoder-App-Developers
+                      - img
+                      - generic: Open Link
+                      - generic: AMF (Advanced Media Framework) (opens in new tab)
+                    - 'button "Suggest an edit: AMF (Advanced Media Framework)"':
+                      - img
+                - 'button "Favorite to your account — sign in required: AMF (Advanced Media Framework)" [ref=e188]':
+                  - img
+                - 'button "Bookmark on this device — no sign-in required: AMF (Advanced Media Framework)" [ref=e190]':
+                  - img
+              - heading "AMF (Advanced Media Framework)" [level=2] [ref=e193]:
+                - link "AMF (Advanced Media Framework)" [ref=e194]:
+                  - /url: /resource/463
+              - paragraph [ref=e195]: AMF is a comprehensive framework by AMD that provides developers with access to hardware-accelerated video encoding, decoding, and processing capabilities. It supports both C and C++ interfaces, allowing for flexible integration into various applications. The framework includes detailed guides and code samples to assist developers in implementing efficient video encoding solutions.
+            - generic [ref=e197]:
+              - generic [ref=e198]: Encoding & Codecs
+              - link "Filter by tag video encoding" [ref=e199]:
+                - /url: /tag/video-encoding
+                - generic [ref=e200]: "#video encoding"
+              - link "Filter by tag hardware acceleration" [ref=e201]:
+                - /url: /tag/hardware-acceleration
+                - generic [ref=e202]: "#hardware acceleration"
+              - link "Filter by tag AMD" [ref=e203]:
+                - /url: /tag/amd
+                - generic [ref=e204]: "#AMD"
+          - article [ref=e205] [cursor=pointer]:
+            - generic [ref=e206]:
+              - generic [ref=e207]:
+                - generic [ref=e208]: ◇
+                - generic:
+                  - link "View details for Android-Video-Trimmer":
+                    - /url: /resource/626
+                    - img
+                    - generic: View Details
+                  - button "Show 2 more tags": +2 more
+                  - generic:
+                    - link "Open Link Android-Video-Trimmer (opens in new tab)":
+                      - /url: https://github.com/iknow4x/Android-Video-Trimmer
+                      - img
+                      - generic: Open Link
+                      - generic: Android-Video-Trimmer (opens in new tab)
+                    - 'button "Suggest an edit: Android-Video-Trimmer"':
+                      - img
+                - 'button "Favorite to your account — sign in required: Android-Video-Trimmer" [ref=e211]':
+                  - img
+                - 'button "Bookmark on this device — no sign-in required: Android-Video-Trimmer" [ref=e213]':
+                  - img
+              - heading "Android-Video-Trimmer" [level=2] [ref=e216]:
+                - link "Android-Video-Trimmer" [ref=e217]:
+                  - /url: /resource/626
+              - paragraph [ref=e218]: An Android project that implements video trimming functionality using MediaMetadataRetriever to obtain video frames and FFmpeg for video cropping and compression.
+            - generic [ref=e220]:
+              - generic [ref=e221]: Encoding & Codecs
+              - link "Filter by tag Android" [ref=e222]:
+                - /url: /tag/android
+                - generic [ref=e223]: "#Android"
+              - link "Filter by tag video-trimming" [ref=e224]:
+                - /url: /tag/video-trimming
+                - generic [ref=e225]: "#video-trimming"
+              - link "Filter by tag FFmpeg" [ref=e226]:
+                - /url: /tag/ffmpeg
+                - generic [ref=e227]: "#FFmpeg"
+          - article [ref=e228] [cursor=pointer]:
+            - generic [ref=e229]:
+              - generic [ref=e230]:
+                - generic [ref=e231]: ◇
+                - generic:
+                  - link "View details for aom - Git at Google":
+                    - /url: /resource/1440
+                    - img
+                    - generic: View Details
+                  - button "Show 2 more tags": +2 more
+                  - generic:
+                    - link "Open Link aom - Git at Google (opens in new tab)":
+                      - /url: https://aomedia.googlesource.com/aom/
+                      - img
+                      - generic: Open Link
+                      - generic: aom - Git at Google (opens in new tab)
+                    - 'button "Suggest an edit: aom - Git at Google"':
+                      - img
+                - 'button "Favorite to your account — sign in required: aom - Git at Google" [ref=e234]':
+                  - img
+                - 'button "Bookmark on this device — no sign-in required: aom - Git at Google" [ref=e236]':
+                  - img
+              - heading "aom - Git at Google" [level=2] [ref=e239]:
+                - link "aom - Git at Google" [ref=e240]:
+                  - /url: /resource/1440
+              - paragraph [ref=e241]: aom - Git at Google - Resource from aomedia.googlesource.com
+            - generic [ref=e243]:
+              - generic [ref=e244]: Encoding & Codecs
+              - link "Filter by tag codec" [ref=e245]:
+                - /url: /tag/codec
+                - generic [ref=e246]: "#codec"
+              - link "Filter by tag open-source" [ref=e247]:
+                - /url: /tag/open-source
+                - generic [ref=e248]: "#open-source"
+              - link "Filter by tag video-encoding" [ref=e249]:
+                - /url: /tag/video-encoding
+                - generic [ref=e250]: "#video-encoding"
+          - article [ref=e251] [cursor=pointer]:
+            - generic [ref=e252]:
+              - generic [ref=e253]:
+                - generic [ref=e254]: ◇
+                - generic:
+                  - link "View details for AOMedia AV1 Codec Build Instructions":
+                    - /url: /resource/1719
+                    - img
+                    - generic: View Details
+                  - button "Show 3 more tags": +3 more
+                  - generic:
+                    - link "Open Link AOMedia AV1 Codec Build Instructions (opens in new tab)":
+                      - /url: https://aomedia.googlesource.com/aom/+/refs/heads/master/BUILD.md
+                      - img
+                      - generic: Open Link
+                      - generic: AOMedia AV1 Codec Build Instructions (opens in new tab)
+                    - 'button "Suggest an edit: AOMedia AV1 Codec Build Instructions"':
+                      - img
+                - 'button "Favorite to your account — sign in required: AOMedia AV1 Codec Build Instructions" [ref=e257]':
+                  - img
+                - 'button "Bookmark on this device — no sign-in required: AOMedia AV1 Codec Build Instructions" [ref=e259]':
+                  - img
+              - heading "AOMedia AV1 Codec Build Instructions" [level=2] [ref=e262]:
+                - link "AOMedia AV1 Codec Build Instructions" [ref=e263]:
+                  - /url: /resource/1719
+              - paragraph [ref=e264]: Documentation for building the AOMedia AV1 codec library (libaom) from source on various platforms. It's a useful reference for developers wanting to compile the latest AV1 encoder/decoder and integrate it into their workflows or products.
+            - generic [ref=e266]:
+              - generic [ref=e267]: Encoding & Codecs
+              - link "Filter by tag codec" [ref=e268]:
+                - /url: /tag/codec
+                - generic [ref=e269]: "#codec"
+              - link "Filter by tag AV1" [ref=e270]:
+                - /url: /tag/av1
+                - generic [ref=e271]: "#AV1"
+              - link "Filter by tag libaom" [ref=e272]:
+                - /url: /tag/libaom
+                - generic [ref=e273]: "#libaom"
+          - article [ref=e274] [cursor=pointer]:
+            - generic [ref=e275]:
+              - generic [ref=e276]:
+                - generic [ref=e277]: ◇
+                - generic:
+                  - 'link "View details for Apple Got It Wrong: Encoding Specs for HEVC in HLS"':
+                    - /url: /resource/1016
+                    - img
+                    - generic: View Details
+                  - button "Show 2 more tags": +2 more
+                  - 'link "Open Link Apple Got It Wrong: Encoding Specs for HEVC in HLS (opens in new tab)"':
+                    - /url: https://www.streamingmedia.com/Articles/ReadArticle.aspx?ArticleID=121878
+                    - img
+                    - generic: Open Link
+                    - generic: "Apple Got It Wrong: Encoding Specs for HEVC in HLS (opens in new tab)"
+                  - 'button "Suggest an edit: Apple Got It Wrong: Encoding Specs for HEVC in HLS"':
+                    - img
+                - 'button "Favorite to your account — sign in required: Apple Got It Wrong: Encoding Specs for HEVC in HLS" [ref=e280]':
+                  - img
+                - 'button "Bookmark on this device — no sign-in required: Apple Got It Wrong: Encoding Specs for HEVC in HLS" [ref=e282]':
+                  - img
+              - 'heading "Apple Got It Wrong: Encoding Specs for HEVC in HLS" [level=2] [ref=e285]':
+                - 'link "Apple Got It Wrong: Encoding Specs for HEVC in HLS" [ref=e286]':
+                  - /url: /resource/1016
+              - paragraph [ref=e287]: Adding HEVC to your HLS streams is looking like a no brainer, but if you decide to do so, you may not want to take Apple's HEVC encoding recommendations verbatim. You'll deliver noticeably higher quality video if you follow the advice detailed below.
+            - generic [ref=e289]:
+              - generic [ref=e290]: Encoding & Codecs
+              - link "Filter by tag HEVC" [ref=e291]:
+                - /url: /tag/hevc
+                - generic [ref=e292]: "#HEVC"
+              - link "Filter by tag encoding" [ref=e293]:
+                - /url: /tag/encoding
+                - generic [ref=e294]: "#encoding"
+              - link "Filter by tag HLS" [ref=e295]:
+                - /url: /tag/hls
+                - generic [ref=e296]: "#HLS"
+          - article [ref=e297] [cursor=pointer]:
+            - generic [ref=e298]:
+              - generic [ref=e299]:
+                - generic [ref=e300]: ◇
+                - generic:
+                  - link "View details for Ateme TITAN":
+                    - /url: /resource/30
+                    - img
+                    - generic: View Details
+                  - button "Show 2 more tags": +2 more
+                  - generic:
+                    - link "Open Link Ateme TITAN (opens in new tab)":
+                      - /url: https://www.ateme.com/products/titan/
+                      - img
+                      - generic: Open Link
+                      - generic: Ateme TITAN (opens in new tab)
+                    - 'button "Suggest an edit: Ateme TITAN"':
+                      - img
+                - 'button "Favorite to your account — sign in required: Ateme TITAN" [ref=e303]':
+                  - img
+                - 'button "Bookmark on this device — no sign-in required: Ateme TITAN" [ref=e305]':
+                  - img
+              - heading "Ateme TITAN" [level=2] [ref=e308]:
+                - link "Ateme TITAN" [ref=e309]:
+                  - /url: /resource/30
+              - paragraph [ref=e310]: Ateme TITAN is a software suite designed for video origination, acquisition, and compression. It offers high-quality encoding solutions suitable for various applications, including broadcasting and OTT services.
+            - generic [ref=e312]:
+              - generic [ref=e313]: Encoding & Codecs
+              - link "Filter by tag video" [ref=e314]:
+                - /url: /tag/video
+                - generic [ref=e315]: "#video"
+              - link "Filter by tag compression" [ref=e316]:
+                - /url: /tag/compression
+                - generic [ref=e317]: "#compression"
+              - link "Filter by tag broadcasting" [ref=e318]:
+                - /url: /tag/broadcasting
+                - generic [ref=e319]: "#broadcasting"
+          - article [ref=e320] [cursor=pointer]:
+            - generic [ref=e321]:
+              - generic [ref=e322]:
+                - generic [ref=e323]: ◇
+                - generic:
+                  - link "View details for AV1 vs HEVC – Bitmovin Compression Efficiency Results":
+                    - /url: /resource/1756
+                    - img
+                    - generic: View Details
+                  - button "Show 4 more tags": +4 more
+                  - generic:
+                    - link "Open Link AV1 vs HEVC – Bitmovin Compression Efficiency Results (opens in new tab)":
+                      - /url: https://bitmovin.com/av1-showing-greater-compression-efficiency-than-hevc/
+                      - img
+                      - generic: Open Link
+                      - generic: AV1 vs HEVC – Bitmovin Compression Efficiency Results (opens in new tab)
+                    - 'button "Suggest an edit: AV1 vs HEVC – Bitmovin Compression Efficiency Results"':
+                      - img
+                - 'button "Favorite to your account — sign in required: AV1 vs HEVC – Bitmovin Compression Efficiency Results" [ref=e326]':
+                  - img
+                - 'button "Bookmark on this device — no sign-in required: AV1 vs HEVC – Bitmovin Compression Efficiency Results" [ref=e328]':
+                  - img
+              - heading "AV1 vs HEVC – Bitmovin Compression Efficiency Results" [level=2] [ref=e331]:
+                - link "AV1 vs HEVC – Bitmovin Compression Efficiency Results" [ref=e332]:
+                  - /url: /resource/1756
+              - paragraph [ref=e333]: A Bitmovin blog post that discusses internal testing results comparing AV1 and HEVC encoders. It provides charts and analysis of bitrate savings, encoding speed, and visual quality, contributing practical data to the conversation about next-gen codec adoption.
+            - generic [ref=e335]:
+              - generic [ref=e336]: Encoding & Codecs
+              - link "Filter by tag codec" [ref=e337]:
+                - /url: /tag/codec
+                - generic [ref=e338]: "#codec"
+              - link "Filter by tag compression" [ref=e339]:
+                - /url: /tag/compression
+                - generic [ref=e340]: "#compression"
+              - link "Filter by tag AV1" [ref=e341]:
+                - /url: /tag/av1
+                - generic [ref=e342]: "#AV1"
+          - article [ref=e343] [cursor=pointer]:
+            - generic [ref=e344]:
+              - generic [ref=e345]:
+                - generic [ref=e346]: ◇
+                - generic:
+                  - link "View details for BBC Dirac (SMPTE VC-2)":
+                    - /url: /resource/1821
+                    - img
+                    - generic: View Details
+                  - button "Show 3 more tags": +3 more
+                  - generic:
+                    - link "Open Link BBC Dirac (SMPTE VC-2) (opens in new tab)":
+                      - /url: https://github.com/bbc/dirac-research
+                      - img
+                      - generic: Open Link
+                      - generic: BBC Dirac (SMPTE VC-2) (opens in new tab)
+                    - 'button "Suggest an edit: BBC Dirac (SMPTE VC-2)"':
+                      - img
+                - 'button "Favorite to your account — sign in required: BBC Dirac (SMPTE VC-2)" [ref=e349]':
+                  - img
+                - 'button "Bookmark on this device — no sign-in required: BBC Dirac (SMPTE VC-2)" [ref=e351]':
+                  - img
+              - heading "BBC Dirac (SMPTE VC-2)" [level=2] [ref=e354]:
+                - link "BBC Dirac (SMPTE VC-2)" [ref=e355]:
+                  - /url: /resource/1821
+              - paragraph [ref=e356]: Dirac is an open and royalty-free video compression format developed by the BBC, later standardized as SMPTE VC-2. It uses wavelet compression; open implementations include Schrödinger for encoding/decoding Dirac streams.
+            - generic [ref=e358]:
+              - generic [ref=e359]: Encoding & Codecs
+              - link "Filter by tag codec" [ref=e360]:
+                - /url: /tag/codec
+                - generic [ref=e361]: "#codec"
+              - link "Filter by tag compression" [ref=e362]:
+                - /url: /tag/compression
+                - generic [ref=e363]: "#compression"
+              - link "Filter by tag open-source" [ref=e364]:
+                - /url: /tag/open-source
+                - generic [ref=e365]: "#open-source"
+          - article [ref=e366] [cursor=pointer]:
+            - generic [ref=e367]:
+              - generic [ref=e368]:
+                - generic [ref=e369]: ◇
+                - generic:
+                  - link "View details for Beamr Content-Adaptive Bitrate Encoding":
+                    - /url: /resource/692
+                    - img
+                    - generic: View Details
+                  - button "Show 2 more tags": +2 more
+                  - generic:
+                    - link "Open Link Beamr Content-Adaptive Bitrate Encoding (opens in new tab)":
+                      - /url: https://www.encoding.com/media-services-overview
+                      - img
+                      - generic: Open Link
+                      - generic: Beamr Content-Adaptive Bitrate Encoding (opens in new tab)
+                    - 'button "Suggest an edit: Beamr Content-Adaptive Bitrate Encoding"':
+                      - img
+                - 'button "Favorite to your account — sign in required: Beamr Content-Adaptive Bitrate Encoding" [ref=e372]':
+                  - img
+                - 'button "Bookmark on this device — no sign-in required: Beamr Content-Adaptive Bitrate Encoding" [ref=e374]':
+                  - img
+              - heading "Beamr Content-Adaptive Bitrate Encoding" [level=2] [ref=e377]:
+                - link "Beamr Content-Adaptive Bitrate Encoding" [ref=e378]:
+                  - /url: /resource/692
+              - paragraph [ref=e379]: Beamr's Content-Adaptive Bitrate (CABR) technology is integrated into Encoding.com's platform, allowing for streaming video with the highest possible picture quality while reducing bitrate by up to 50%. This technology is valuable for efficient video delivery and storage.
+            - generic [ref=e381]:
+              - generic [ref=e382]: Encoding & Codecs
+              - link "Filter by tag CABR" [ref=e383]:
+                - /url: /tag/cabr
+                - generic [ref=e384]: "#CABR"
+              - link "Filter by tag video streaming" [ref=e385]:
+                - /url: /tag/video-streaming
+                - generic [ref=e386]: "#video streaming"
+              - link "Filter by tag bitrate reduction" [ref=e387]:
+                - /url: /tag/bitrate-reduction
+                - generic [ref=e388]: "#bitrate reduction"
+          - article [ref=e389] [cursor=pointer]:
+            - generic [ref=e390]:
+              - generic [ref=e391]:
+                - generic [ref=e392]: ◇
+                - generic:
+                  - link "View details for Bento":
+                    - /url: /resource/171
+                    - img
+                    - generic: View Details
+                  - button "Show 2 more tags": +2 more
+                  - generic:
+                    - link "Open Link Bento (opens in new tab)":
+                      - /url: https://github.com/bento-video/bento
+                      - img
+                      - generic: Open Link
+                      - generic: Bento (opens in new tab)
+                    - 'button "Suggest an edit: Bento"':
+                      - img
+                - 'button "Favorite to your account — sign in required: Bento" [ref=e395]':
+                  - img
+                - 'button "Bookmark on this device — no sign-in required: Bento" [ref=e397]':
+                  - img
+              - heading "Bento" [level=2] [ref=e400]:
+                - link "Bento" [ref=e401]:
+                  - /url: /resource/171
+              - paragraph [ref=e402]: Bento is an open-source, high-speed serverless video transcoding pipeline designed for deployment on Amazon Web Services (AWS). It offers a fast and simple solution for individuals and small businesses needing efficient video transcoding capabilities.
+            - generic [ref=e404]:
+              - generic [ref=e405]: Encoding & Codecs
+              - link "Filter by tag serverless" [ref=e406]:
+                - /url: /tag/serverless
+                - generic [ref=e407]: "#serverless"
+              - link "Filter by tag video" [ref=e408]:
+                - /url: /tag/video
+                - generic [ref=e409]: "#video"
+              - link "Filter by tag transcoding" [ref=e410]:
+                - /url: /tag/transcoding
+                - generic [ref=e411]: "#transcoding"
+          - article [ref=e412] [cursor=pointer]:
+            - generic [ref=e413]:
+              - generic [ref=e414]:
+                - generic [ref=e415]: ◇
+                - generic:
+                  - link "View details for Bitrate Viewer":
+                    - /url: /resource/299
+                    - img
+                    - generic: View Details
+                  - button "Show 2 more tags": +2 more
+                  - generic:
+                    - link "Open Link Bitrate Viewer (opens in new tab)":
+                      - /url: https://www.winhoros.de/docs/bitrate-viewer/
+                      - img
+                      - generic: Open Link
+                      - generic: Bitrate Viewer (opens in new tab)
+                    - 'button "Suggest an edit: Bitrate Viewer"':
+                      - img
+                - 'button "Favorite to your account — sign in required: Bitrate Viewer" [ref=e418]':
+                  - img
+                - 'button "Bookmark on this device — no sign-in required: Bitrate Viewer" [ref=e420]':
+                  - img
+              - heading "Bitrate Viewer" [level=2] [ref=e423]:
+                - link "Bitrate Viewer" [ref=e424]:
+                  - /url: /resource/299
+              - paragraph [ref=e425]: Bitrate Viewer is a free Windows application that allows users to analyze the bitrate of H.264 encoded video files. It provides a graphical representation of bitrate distribution, aiding in the assessment of video quality and encoding efficiency.
+            - generic [ref=e427]:
+              - generic [ref=e428]: Encoding & Codecs
+              - link "Filter by tag bitrate analysis" [ref=e429]:
+                - /url: /tag/bitrate-analysis
+                - generic [ref=e430]: "#bitrate analysis"
+              - link "Filter by tag H.264" [ref=e431]:
+                - /url: /tag/h.264
+                - generic [ref=e432]: "#H.264"
+              - link "Filter by tag video quality" [ref=e433]:
+                - /url: /tag/video-quality
+                - generic [ref=e434]: "#video quality"
+          - article [ref=e435] [cursor=pointer]:
+            - generic [ref=e436]:
+              - generic [ref=e437]:
+                - generic [ref=e438]: ◇
+                - generic:
+                  - link "View details for bloc97/Anime4K":
+                    - /url: /resource/1159
+                    - img
+                    - generic: View Details
+                  - button "Show 2 more tags": +2 more
+                  - generic:
+                    - link "Open Link bloc97/Anime4K (opens in new tab)":
+                      - /url: https://github.com/bloc97/Anime4K
+                      - img
+                      - generic: Open Link
+                      - generic: bloc97/Anime4K (opens in new tab)
+                    - 'button "Suggest an edit: bloc97/Anime4K"':
+                      - img
+                - 'button "Favorite to your account — sign in required: bloc97/Anime4K" [ref=e441]':
+                  - img
+                - 'button "Bookmark on this device — no sign-in required: bloc97/Anime4K" [ref=e443]':
+                  - img
+              - heading "bloc97/Anime4K" [level=2] [ref=e446]:
+                - link "bloc97/Anime4K" [ref=e447]:
+                  - /url: /resource/1159
+              - paragraph [ref=e448]: A High-Quality Real Time Upscaler for Anime Video.
+            - generic [ref=e450]:
+              - generic [ref=e451]: Encoding & Codecs
+              - link "Filter by tag upscaling" [ref=e452]:
+                - /url: /tag/upscaling
+                - generic [ref=e453]: "#upscaling"
+              - link "Filter by tag anime" [ref=e454]:
+                - /url: /tag/anime
+                - generic [ref=e455]: "#anime"
+              - link "Filter by tag video-enhancement" [ref=e456]:
+                - /url: /tag/video-enhancement
+                - generic [ref=e457]: "#video-enhancement"
+          - article [ref=e458] [cursor=pointer]:
+            - generic [ref=e459]:
+              - generic [ref=e460]:
+                - generic [ref=e461]: ◇
+                - generic:
+                  - link "View details for CineForm SDK":
+                    - /url: /resource/1936
+                    - img
+                    - generic: View Details
+                  - button "Show 2 more tags": +2 more
+                  - generic:
+                    - link "Open Link CineForm SDK (opens in new tab)":
+                      - /url: https://gopro.github.io/cineform-sdk/
+                      - img
+                      - generic: Open Link
+                      - generic: CineForm SDK (opens in new tab)
+                    - 'button "Suggest an edit: CineForm SDK"':
+                      - img
+                - 'button "Favorite to your account — sign in required: CineForm SDK" [ref=e464]':
+                  - img
+                - 'button "Bookmark on this device — no sign-in required: CineForm SDK" [ref=e466]':
+                  - img
+              - heading "CineForm SDK" [level=2] [ref=e469]:
+                - link "CineForm SDK" [ref=e470]:
+                  - /url: /resource/1936
+              - paragraph [ref=e471]: GoPro’s CineForm codec SDK, open-sourced, providing tools and libraries for the CineForm HD wavelet-based video codec used for high-fidelity video compression.
+            - generic [ref=e473]:
+              - generic [ref=e474]: Encoding & Codecs
+              - generic [ref=e475]: Libraries
+              - link "Filter by tag codec" [ref=e476]:
+                - /url: /tag/codec
+                - generic [ref=e477]: "#codec"
+              - link "Filter by tag sdk" [ref=e478]:
+                - /url: /tag/sdk
+                - generic [ref=e479]: "#sdk"
+              - link "Filter by tag compression" [ref=e480]:
+                - /url: /tag/compression
+                - generic [ref=e481]: "#compression"
+          - article [ref=e482] [cursor=pointer]:
+            - generic [ref=e483]:
+              - generic [ref=e484]:
+                - generic [ref=e485]: ◇
+                - generic:
+                  - link "View details for CircleHD Video Transcoding Service":
+                    - /url: /resource/478
+                    - img
+                    - generic: View Details
+                  - button "Show 2 more tags": +2 more
+                  - generic:
+                    - link "Open Link CircleHD Video Transcoding Service (opens in new tab)":
+                      - /url: https://www.circlehd.com/products/video-transcoding-service/
+                      - img
+                      - generic: Open Link
+                      - generic: CircleHD Video Transcoding Service (opens in new tab)
+                    - 'button "Suggest an edit: CircleHD Video Transcoding Service"':
+                      - img
+                - 'button "Favorite to your account — sign in required: CircleHD Video Transcoding Service" [ref=e488]':
+                  - img
+                - 'button "Bookmark on this device — no sign-in required: CircleHD Video Transcoding Service" [ref=e490]':
+                  - img
+              - heading "CircleHD Video Transcoding Service" [level=2] [ref=e493]:
+                - link "CircleHD Video Transcoding Service" [ref=e494]:
+                  - /url: /resource/478
+              - paragraph [ref=e495]: CircleHD offers a full-featured video-on-demand platform for developers and content teams building video applications. The service provides an easy API call to upload a video and get an embeddable video, handling encoding, storage, and delivery in the background. It optimizes the right format and bitrate for every device and network connection, supporting features like thumbnail generation, multiple bitrate encoding, watermarking, VR/360 encoding, subtitles and captions, and more.
+            - generic [ref=e497]:
+              - generic [ref=e498]: Encoding & Codecs
+              - link "Filter by tag video-on-demand" [ref=e499]:
+                - /url: /tag/video-on-demand
+                - generic [ref=e500]: "#video-on-demand"
+              - link "Filter by tag API" [ref=e501]:
+                - /url: /tag/api
+                - generic [ref=e502]: "#API"
+              - link "Filter by tag video encoding" [ref=e503]:
+                - /url: /tag/video-encoding
+                - generic [ref=e504]: "#video encoding"
+          - article [ref=e505] [cursor=pointer]:
+            - generic [ref=e506]:
+              - generic [ref=e507]:
+                - generic [ref=e508]: ◇
+                - generic:
+                  - link "View details for Cisco Thor Video Codec":
+                    - /url: /resource/1749
+                    - img
+                    - generic: View Details
+                  - button "Show 2 more tags": +2 more
+                  - generic:
+                    - link "Open Link Cisco Thor Video Codec (opens in new tab)":
+                      - /url: https://tools.ietf.org/html/draft-fuldseth-netvc-thor-00
+                      - img
+                      - generic: Open Link
+                      - generic: Cisco Thor Video Codec (opens in new tab)
+                    - 'button "Suggest an edit: Cisco Thor Video Codec"':
+                      - img
+                - 'button "Favorite to your account — sign in required: Cisco Thor Video Codec" [ref=e511]':
+                  - img
+                - 'button "Bookmark on this device — no sign-in required: Cisco Thor Video Codec" [ref=e513]':
+                  - img
+              - heading "Cisco Thor Video Codec" [level=2] [ref=e516]:
+                - link "Cisco Thor Video Codec" [ref=e517]:
+                  - /url: /resource/1749
+              - paragraph [ref=e518]: Thor was an experimental video codec developed by Cisco as a candidate for the NETVC (Next-Gen Video) initiative. While Thor itself is not used as-is, some of its technology contributed to the development of AV1. It's a piece of codec research history with source available for study.
+            - generic [ref=e520]:
+              - generic [ref=e521]: Encoding & Codecs
+              - link "Filter by tag codec" [ref=e522]:
+                - /url: /tag/codec
+                - generic [ref=e523]: "#codec"
+              - link "Filter by tag research" [ref=e524]:
+                - /url: /tag/research
+                - generic [ref=e525]: "#research"
+              - link "Filter by tag video compression" [ref=e526]:
+                - /url: /tag/video-compression
+                - generic [ref=e527]: "#video compression"
+          - article [ref=e528] [cursor=pointer]:
+            - generic [ref=e529]:
+              - generic [ref=e530]:
+                - generic [ref=e531]: ◇
+                - generic:
+                  - link "View details for Codec Licensing and Web Video Streaming – StreamingMedia":
+                    - /url: /resource/1659
+                    - img
+                    - generic: View Details
+                  - button "Show 4 more tags": +4 more
+                  - generic:
+                    - link "Open Link Codec Licensing and Web Video Streaming – StreamingMedia (opens in new tab)":
+                      - /url: https://www.streamingmedia.com/Articles/ReadArticle.aspx?ArticleID=130184
+                      - img
+                      - generic: Open Link
+                      - generic: Codec Licensing and Web Video Streaming – StreamingMedia (opens in new tab)
+                    - 'button "Suggest an edit: Codec Licensing and Web Video Streaming – StreamingMedia"':
+                      - img
+                - 'button "Favorite to your account — sign in required: Codec Licensing and Web Video Streaming – StreamingMedia" [ref=e534]':
+                  - img
+                - 'button "Bookmark on this device — no sign-in required: Codec Licensing and Web Video Streaming – StreamingMedia" [ref=e536]':
+                  - img
+              - heading "Codec Licensing and Web Video Streaming – StreamingMedia" [level=2] [ref=e539]:
+                - link "Codec Licensing and Web Video Streaming – StreamingMedia" [ref=e540]:
+                  - /url: /resource/1659
+              - paragraph [ref=e541]: An article discussing how video codec patent licensing (H.264, HEVC, AV1) impacts web streaming. It provides insights into royalties and the push for royalty-free codecs.
+            - generic [ref=e543]:
+              - generic [ref=e544]: Encoding & Codecs
+              - link "Filter by tag codec" [ref=e545]:
+                - /url: /tag/codec
+                - generic [ref=e546]: "#codec"
+              - link "Filter by tag licensing" [ref=e547]:
+                - /url: /tag/licensing
+                - generic [ref=e548]: "#licensing"
+              - link "Filter by tag patents" [ref=e549]:
+                - /url: /tag/patent
+                - generic [ref=e550]: "#patents"
+          - article [ref=e551] [cursor=pointer]:
+            - generic [ref=e552]:
+              - generic [ref=e553]:
+                - generic [ref=e554]: ◇
+                - generic:
+                  - link "View details for CompressAI":
+                    - /url: /resource/218
+                    - img
+                    - generic: View Details
+                  - button "Show 2 more tags": +2 more
+                  - generic:
+                    - link "Open Link CompressAI (opens in new tab)":
+                      - /url: https://arxiv.org/abs/2011.03029
+                      - img
+                      - generic: Open Link
+                      - generic: CompressAI (opens in new tab)
+                    - 'button "Suggest an edit: CompressAI"':
+                      - img
+                - 'button "Favorite to your account — sign in required: CompressAI" [ref=e557]':
+                  - img
+                - 'button "Bookmark on this device — no sign-in required: CompressAI" [ref=e559]':
+                  - img
+              - heading "CompressAI" [level=2] [ref=e562]:
+                - link "CompressAI" [ref=e563]:
+                  - /url: /resource/218
+              - paragraph [ref=e564]: CompressAI is a PyTorch library and evaluation platform for end-to-end compression research. It provides custom operations, layers, models, and tools to research, develop, and evaluate image and video compression codecs. CompressAI includes pre-trained models and evaluation tools to compare learned methods with traditional codecs, facilitating advancements in compression technology.
+            - generic [ref=e566]:
+              - generic [ref=e567]: Encoding & Codecs
+              - link "Filter by tag compression research" [ref=e568]:
+                - /url: /tag/compression-research
+                - generic [ref=e569]: "#compression research"
+              - link "Filter by tag PyTorch" [ref=e570]:
+                - /url: /tag/pytorch
+                - generic [ref=e571]: "#PyTorch"
+              - link "Filter by tag video encoding" [ref=e572]:
+                - /url: /tag/video-encoding
+                - generic [ref=e573]: "#video encoding"
+          - article [ref=e574] [cursor=pointer]:
+            - generic [ref=e575]:
+              - generic [ref=e576]:
+                - generic [ref=e577]: ◇
+                - generic:
+                  - link "View details for CrafyVideoJS":
+                    - /url: /resource/559
+                    - img
+                    - generic: View Details
+                  - button "Show 2 more tags": +2 more
+                  - generic:
+                    - link "Open Link CrafyVideoJS (opens in new tab)":
+                      - /url: https://github.com/chijete/CrafyVideoJS
+                      - img
+                      - generic: Open Link
+                      - generic: CrafyVideoJS (opens in new tab)
+                    - 'button "Suggest an edit: CrafyVideoJS"':
+                      - img
+                - 'button "Favorite to your account — sign in required: CrafyVideoJS" [ref=e580]':
+                  - img
+                - 'button "Bookmark on this device — no sign-in required: CrafyVideoJS" [ref=e582]':
+                  - img
+              - heading "CrafyVideoJS" [level=2] [ref=e585]:
+                - link "CrafyVideoJS" [ref=e586]:
+                  - /url: /resource/559
+              - paragraph [ref=e587]: CrafyVideoJS is a lightweight, hardware-accelerated JavaScript library that enables in-browser manipulation, decoding, and encoding of MP4 H.264 (AVC) videos. It leverages the browser's VideoEncoder and VideoDecoder APIs along with mp4box.js to provide efficient video processing without server-side support. Features include video trimming, bitrate adjustment, resolution changes, and metadata extraction.
+            - generic [ref=e589]:
+              - generic [ref=e590]: Encoding & Codecs
+              - link "Filter by tag JavaScript" [ref=e591]:
+                - /url: /tag/javascript
+                - generic [ref=e592]: "#JavaScript"
+              - link "Filter by tag video processing" [ref=e593]:
+                - /url: /tag/video-processing
+                - generic [ref=e594]: "#video processing"
+              - link "Filter by tag MP4" [ref=e595]:
+                - /url: /tag/mp4
+                - generic [ref=e596]: "#MP4"
+        - navigation "Pagination" [ref=e598]:
+          - generic [ref=e599]:
+            - img
+            - text: Previous
+            - link "Page 1, current page" [ref=e600] [cursor=pointer]:
+              - /url: /category/encoding-codecs
+              - text: "1"
+            - link "Go to page 2" [ref=e601] [cursor=pointer]:
+              - /url: /category/encoding-codecs?page=2
+              - text: "2"
+            - generic [ref=e602]: …
+            - link "Go to page 16" [ref=e603] [cursor=pointer]:
+              - /url: /category/encoding-codecs?page=16
+              - text: "16"
+            - link "Next" [ref=e604] [cursor=pointer]:
+              - /url: /category/encoding-codecs?page=2
+              - text: Next
+              - img
+          - generic [ref=e605]:
+            - generic [ref=e606]: Page 1 of 16
+            - generic [ref=e607]:
+              - generic [ref=e608] [cursor=pointer]: Go to page
+              - textbox "Page number, 1 to 16" [active] [invalid] [ref=e609]: abc
+              - generic [ref=e610]: / 16
+          - status [ref=e611]: Enter a whole number between 1 and 16.
