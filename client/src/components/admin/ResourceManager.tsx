@@ -152,6 +152,21 @@ const focusFirstInvalidField = (mode: "edit" | "create", errors: ResourceFieldEr
   return true;
 };
 
+/**
+ * A save that collides with another resource's URL is answered 409 with a
+ * plain message (no fieldErrors). The only unique field on the write is the
+ * URL, so the message belongs on that field. Null for any other error.
+ */
+const duplicateUrlMessage = (error: unknown): string | null => {
+  if (!(error instanceof ApiError) || error.status !== 409) return null;
+  try {
+    const message = (JSON.parse(error.body) as { message?: unknown }).message;
+    return typeof message === "string" && message ? message : null;
+  } catch {
+    return null;
+  }
+};
+
 /** Bulk endpoints answer 200 (all ok) or 207 (partial) with per-item failures. */
 interface BulkResourceResult {
   succeeded?: number;
@@ -446,6 +461,13 @@ export default function ResourceManager({ createRequest = 0 }: { createRequest?:
   // C3-V5A-02: a server 400 carries per-field messages; mark those fields
   // inline and keep the banner for anything that has no field in the dialog.
   const showServerFormError = (mode: "edit" | "create", error: Error, fallback: string) => {
+    const duplicateUrl = duplicateUrlMessage(error);
+    if (duplicateUrl) {
+      setFieldErrors({ url: duplicateUrl });
+      setFormError(null);
+      focusFirstInvalidField(mode, { url: duplicateUrl });
+      return;
+    }
     const serverFieldErrors = extractFieldErrors(error);
     if (!serverFieldErrors) {
       setFormError(describeWriteError(error, { fallback, outcome: NOTHING_CHANGED_OUTCOME }));
