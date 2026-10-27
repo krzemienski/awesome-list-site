@@ -53,12 +53,15 @@ Run before driving, and whenever anything looks off. All read-only.
 5. `curl -s -o /dev/null -w "%{http_code} %{redirect_url}" localhost:$P/admin` → `302 …/sign-in?redirect_url=%2Fadmin`.
 6. In the browser, `list_console_messages` has no `Invalid hook call` or "more than one copy of React". If it does, two dev instances share a `node_modules/.vite` cache: each checkout needs its own real `node_modules`.
 
-Merge gate. Before you merge a PR, check the tree that the merge will produce, not the branch on its own.
-1. Merge the branch into a scratch worktree of the current `origin/main`.
-2. In that worktree, run `./node_modules/.bin/tsc --noEmit -p .` and then `npm run build`.
-3. Read each command's own exit code, for example `; echo "TSC_EXIT=$?"`. Never pipe the output first: `tsc | tail; echo $?` reports the exit code of `tail`.
 
-`npm run build` uses esbuild and does not type-check, so a passing build proves nothing about types. When `main` moves, run the gate again.
+## Before merging
+
+Check the tree the merge will produce, not the branch alone.
+1. Create a scratch worktree of the current `origin/main`, merge the branch into it, and give it `node_modules`. A symlink to another checkout's `node_modules` is fine for type-check and build; a dev server needs its own.
+2. Run `npm run type-check; echo "TSC_EXIT=$?"`, then `npm run build; echo "BUILD_EXIT=$?"`.
+3. Read each exit code on its own. Piping first (`tsc | tail; echo $?`) reports the exit code of `tail`.
+
+`npm run build` uses esbuild and does not type-check, so a passing build proves nothing about types. Type-check and build do not replace driving the app. When `main` moves, run the check again.
 
 ## Production
 
