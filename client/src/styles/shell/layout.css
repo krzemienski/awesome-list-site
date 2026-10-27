@@ -25,6 +25,8 @@
   flex: 1;
   flex-direction: column;
   min-width: 0;
+  /* Container for the shell boxes' back-to-top lane math (cqw below). */
+  container-type: inline-size;
   /* A word longer than its line (a scraped repo path, a URL) breaks instead
      of spilling past its box, into the gutter and the back-to-top lane. */
   overflow-wrap: break-word;
@@ -37,18 +39,31 @@
 
 .app-shell-main > .page-content-wrap {
   width: 100%;
-  max-width: var(--shell-page-measure, var(--content-max));
+  --box-max: var(--shell-page-measure, var(--content-max));
+  /* Free space the box leaves at the column's end (centered: half the slack). */
+  --box-free-end: calc((100cqw - min(100cqw, var(--box-max))) / 2);
+  max-width: var(--box-max);
   margin-inline: auto;
   padding: var(--page-pad-y) var(--page-pad-x);
-  /* The back-to-top lane (index.css) is never content. */
-  padding-inline-end: var(--shell-gutter-end);
+  /* The back-to-top lane (index.css) is never content: pad only the part of
+     it the free space doesn't already cover. */
+  padding-inline-end: max(var(--page-pad-x), calc(var(--back-to-top-lane) - var(--box-free-end)));
+}
+
+/* Phones: the end side already gives up a back-to-top lane, so the start
+   side matches the footer's 20px instead of the desktop 40px. */
+@media (max-width: 640px) {
+  .app-shell-main > .page-content-wrap {
+    padding-inline-start: 20px;
+  }
 }
 
 .app-shell-main > .page-content-wrap[data-admin="true"] {
   /* The canonical admin canvas is a left-anchored 1400px measure (no
      auto centering); centering it doubles the desktop gutter. */
   margin-inline: 0;
-  max-width: var(--content-max-admin);
+  --box-max: var(--content-max-admin);
+  --box-free-end: calc(100cqw - min(100cqw, var(--box-max)));
 }
 
 /* Integration boundary: leaf styles remain independently owned. Wide page
@@ -72,7 +87,7 @@
    margin: the box can only grow as far as <main> allows, so its gutter always
    holds. At wide desktop widths the root lands where it always did. */
 .app-shell-main > .page-content-wrap:has(> :is(.about-page, .submit-page)) {
-  max-width: calc(
+  --box-max: calc(
     var(--shell-page-measure, var(--content-max))
     + var(--content-max-admin) - var(--content-max)
   );

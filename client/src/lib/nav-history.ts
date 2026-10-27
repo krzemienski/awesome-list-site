@@ -178,12 +178,20 @@ function fragmentId(): string {
 }
 
 function focusForRoute(el: HTMLElement): boolean {
+  // focusElement makes a non-focusable target programmatically focusable; the
+  // tabindex it adds must not outlive the focus, or a fragment section stays
+  // a focus stop for later scripts and a11y tooling.
+  const addedTabindex = !el.hasAttribute("tabindex");
   el.setAttribute(ROUTE_FOCUS_ATTR, "");
   if (!focusElement(el, { preventScroll: true })) {
     el.removeAttribute(ROUTE_FOCUS_ATTR);
+    if (addedTabindex && el.getAttribute("tabindex") === "-1") el.removeAttribute("tabindex");
     return false;
   }
-  el.addEventListener("blur", () => el.removeAttribute(ROUTE_FOCUS_ATTR), { once: true });
+  el.addEventListener("blur", () => {
+    el.removeAttribute(ROUTE_FOCUS_ATTR);
+    if (addedTabindex && el.getAttribute("tabindex") === "-1") el.removeAttribute("tabindex");
+  }, { once: true });
   return true;
 }
 

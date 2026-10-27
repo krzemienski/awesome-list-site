@@ -310,15 +310,17 @@
   gap: 1.75rem;
 }
 
-/* Pinned under the header, as the reference has it, only on viewports tall
-   enough to show the whole rail (with eight featured picks it is ~1100px).
-   A sticky box taller than the viewport hides its own end until the index
-   beside it runs out, so a shorter viewport lets the rail scroll with the
-   page instead. */
-@media (min-width: 1025px) and (min-height: 75rem) {
+/* Pinned under the header, as the reference has it. With eight featured picks
+   the rail is ~1100px, taller than most laptop screens; a rail pinned by its
+   top would then hide its own end until the index beside it runs out. So the
+   pin offset is min(header offset, viewport - rail height - 1rem): a rail
+   that fits sits under the header, a taller one scrolls until its last link
+   reaches the bottom of the screen and stays there. The rail's measured
+   height arrives as --home-rail-h (RecentRail). No inner scroller. */
+@media (min-width: 1025px) {
   .home-index-rail {
     position: sticky;
-    top: 5.25rem;
+    top: min(5.25rem, calc(100svh - var(--home-rail-h, 0px) - 1rem - var(--app-bottom-inset, 0px)));
   }
 }
 

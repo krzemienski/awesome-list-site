@@ -248,7 +248,6 @@ export default function TagLanding() {
             <ResourceCard
               key={`${resource.id}-${index}`}
               variant="taxonomy"
-              showPersonalActions={false}
               resource={{
                 id: String(resource.id),
                 name: resource.title,

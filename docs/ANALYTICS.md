@@ -429,6 +429,18 @@ Amplitude additionally sends its own `Viewed Home Page` verification event and
 autocaptured `[Amplitude] …` events; PostHog sends autocapture, `$pageview` and
 `$pageleave`. Those are SDK events, not catalog events.
 
+### Cutover: `/tag/:slug` cards report `taxonomy_card` (2026-10)
+
+Cards on `/tag/:slug` moved from the default resource card to the taxonomy card
+variant (the same card `/category/*` uses). Their `resource_link_opened` and
+`resource_card_opened` events therefore carry `surface: 'taxonomy_card'`
+(before: `resource_card`). Event names are unchanged. A funnel that filtered
+tag-page clicks by `surface = 'resource_card'` drops to zero from the cutover
+date and reappears under `taxonomy_card`, mixed with category-page clicks;
+split the two by the event's page path (`/tag/…` vs `/category/…`). The
+favorite and bookmark buttons on these cards are unchanged (`resource_favorited`, `resource_bookmarked`
+events carry no `surface`).
+
 ### Adding an event (area tasks)
 
 1. Pick the name with the naming rules; add a catalog row (and update the

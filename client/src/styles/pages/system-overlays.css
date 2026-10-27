@@ -110,7 +110,13 @@
   box-sizing: border-box;
   gap: 0.75rem;
   pointer-events: none;
-  padding-bottom: max(1rem, env(safe-area-inset-bottom));
+}
+
+/* Toasts stack above the fixed back-to-top button (index.css lane), which
+   sits in the same bottom-right corner. Doubled class: the viewport's `p-4`
+   utility would otherwise win. */
+.system-toast-viewport.system-toast-viewport {
+  padding-bottom: max(var(--back-to-top-lane), env(safe-area-inset-bottom));
 }
 
 /*
