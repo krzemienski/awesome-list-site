@@ -41,7 +41,8 @@ All six screenshots were opened and visually reviewed. Focus rings are visible, 
 - Merged current `origin/main` (`2c4a00ee`) into the fix branch at the integration owner's request. The only conflict was additive CHANGELOG content; both entries were preserved.
 - Re-ran `npx tsc --noEmit` unpiped: exit 0, no output (7.55s).
 - Re-ran `npm run build` unpiped: exit 0 (7.67s); full output in `main-sync-build-output.txt`.
-- After PR115 landed, merged newer `origin/main` (`d3bfce3c`) at the integration owner's request, preserving both additive CHANGELOG entries again. Latest `npx tsc --noEmit` exited 0 with no output (4.70s); latest `npm run build` exited 0 (8.92s), captured in `main-sync-d3bfce3c-build-output.txt`.
+- After PR115 landed, merged newer `origin/main` (`d3bfce3c`) at the integration owner's request, preserving both additive CHANGELOG entries again. `npx tsc --noEmit` exited 0 with no output (4.70s); `npm run build` exited 0 (8.92s), captured in `main-sync-d3bfce3c-build-output.txt`.
+- After PR114 landed, merged `origin/main` (`301e6711`), preserving the offline-recovery and contextual-link CHANGELOG entries. Latest unpiped `npx tsc --noEmit` exited 0 with no output (18.58s); latest unpiped `npm run build` exited 0 (8.77s), captured in `main-sync-301e6711-build-output.txt`.
 - The integration owner accepted the existing all-width browser proof for this main sync; those captures were not rerun and remain explicitly tied to the original fix state.
 - No merge into main and no deployment performed.
 

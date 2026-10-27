@@ -1,0 +1,28 @@
+{
+  "at": 1793086854121,
+  "url": "http://127.0.0.1:5167/advanced",
+  "online": true,
+  "width": 390,
+  "height": 844,
+  "dpr": 1,
+  "touch": 1,
+  "coarse": true,
+  "h1": "Advanced Features",
+  "errorPage": false,
+  "focus": {
+    "tag": "INPUT",
+    "text": "",
+    "testId": null,
+    "isH1": false
+  },
+  "navigation": [
+    {
+      "type": "navigate",
+      "name": "http://127.0.0.1:5167/about",
+      "start": 0
+    }
+  ],
+  "consent": "denied",
+  "umamiDisabled": "1",
+  "overflow": 0
+}

@@ -1,0 +1,28 @@
+{
+  "at": 1793087463412,
+  "url": "http://127.0.0.1:5167/about",
+  "online": true,
+  "width": 820,
+  "height": 1180,
+  "dpr": 1,
+  "touch": 1,
+  "coarse": true,
+  "h1": "A field journal for video engineers",
+  "errorPage": false,
+  "focus": {
+    "tag": "BUTTON",
+    "text": "What is Awesome Video?",
+    "testId": "button-about-faq-0",
+    "isH1": false
+  },
+  "navigation": [
+    {
+      "type": "navigate",
+      "name": "http://127.0.0.1:5167/about",
+      "start": 0
+    }
+  ],
+  "consent": "denied",
+  "umamiDisabled": "1",
+  "overflow": 0
+}

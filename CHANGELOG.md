@@ -11,6 +11,10 @@ All notable changes to the Awesome Video Resource Viewer project. Newest entries
   and new-tab behavior. Matching tooltips and accessible names retain the
   existing icons, 44px targets, URLs, and List/Compact layouts.
 
+### Advanced offline error recovery (C6-AX-020 / C6-AX-022)
+- The catalog ErrorPage distinguishes a disconnected device from an online server failure. Retry while offline keeps the page in place and explains that reconnection is required.
+- Automatic recovery from a displayed offline error hands focus to the recovered page heading only while focus still belongs to that error or the document body. Navigation and subsequent user-directed focus cancel the handoff; ordinary background refetches do not arm it.
+
 ### Profile name validation focus
 - C6-MEMBER-01: invalid empty or invisible display-name submissions focus the first invalid name field after inline feedback renders. Only invalid fields are marked and linked to the existing error message; validation still returns before PATCH, and valid save/cancel behavior is unchanged.
 - Browser proof is blocked because no authorized local member session is available. Post-deploy verification at 1440, 820-touch, and 390-touch remains unverified; no production cookies were transferred and authentication was not bypassed.

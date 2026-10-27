@@ -1,0 +1,26 @@
+{
+  "cwd": "/tmp/awesome-c6-ax020-ax022.N3IHuj",
+  "sourceBaseline": "520d6778369bc7ce495204cfcacc7e0533f941cc",
+  "checks": [
+    {
+      "command": "npx tsc --noEmit",
+      "exitCode": 0,
+      "output": "",
+      "wallSeconds": 6.9
+    },
+    {
+      "command": "npm run build",
+      "exitCode": 0,
+      "wallSeconds": 8.13,
+      "outputFile": "build-output.txt"
+    }
+  ],
+  "excluded": [
+    "test files",
+    "test suites",
+    "validation scripts",
+    "mocks",
+    "deployment",
+    "merge"
+  ]
+}
