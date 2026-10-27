@@ -267,6 +267,9 @@ export default function BatchEnrichmentPanel() {
   });
 
   const jobs = jobsData?.jobs || [];
+  // Until the list arrives, or when it failed with nothing cached, the tiles
+  // have no jobs to describe; an empty list would read as idle and zero.
+  const jobsUnknownNote = isLoading ? "Loading…" : jobsIsError && !jobsData ? "unavailable" : null;
   const visibleJobs = showAllJobs ? jobs : jobs.slice(0, CANONICAL_JOB_ROWS);
   // A missing or failed list response cannot establish whether another job is
   // active. Keep paid launches disabled until the active-job state is known.
@@ -446,21 +449,20 @@ export default function BatchEnrichmentPanel() {
                 className="queues-agent__stat"
                 label="Last enriched"
                 value={formatRelativeAgo(lastEnriching?.completedAt ?? null)}
-                sub={jobsIsError && !jobsData
-                  ? "unavailable"
-                  : lastEnriching
+                sub={jobsUnknownNote
+                  ?? (lastEnriching
                     ? `batch #${lastEnriching.id} · ${enrichedCount} ${enrichedCount === 1 ? "resource" : "resources"}${lastEnriching.status === "completed" ? "" : ` · ${lastEnriching.status === "budget_stopped" ? "stopped at budget" : lastEnriching.status}`}`
-                    : "No recent batch enriched resources"}
+                    : "No recent batch enriched resources")}
               />
             );
           })()}
           <Stat
             className="queues-agent__stat"
             label="Queue"
-            value={jobsIsError && !jobsData ? "—" : jobs.filter((job) => job.status === "pending" || job.status === "processing").length}
-            sub={jobsIsError && !jobsData ? "unavailable" : hasActiveJob ? "active" : "idle"}
+            value={jobsUnknownNote ? "—" : jobs.filter((job) => job.status === "pending" || job.status === "processing").length}
+            sub={jobsUnknownNote ?? (hasActiveJob ? "active" : "idle")}
           />
-          <Stat className="queues-agent__stat" label="Avg cost" value={averageBatchCost(jobs)} sub="per batch" />
+          <Stat className="queues-agent__stat" label="Avg cost" value={averageBatchCost(jobs)} sub={jobsUnknownNote ?? "per batch"} />
         </div>
         <TableShell
           title="Enrichment jobs"
@@ -483,6 +485,7 @@ export default function BatchEnrichmentPanel() {
             tabIndex={0}
             role="region"
             aria-label="Enrichment jobs table, scrollable"
+            aria-busy={isLoading}
           >
             <table className="table">
               <thead>
@@ -522,7 +525,12 @@ export default function BatchEnrichmentPanel() {
                 testId="error-enrichment-jobs-canonical"
                 retryTestId="button-retry-enrichment-jobs-canonical"
               />
-            ) : !isLoading && jobs.length === 0 ? <p className="queues-agent__empty">No enrichment jobs found.</p> : null}
+            ) : isLoading ? (
+              <p className="queues-agent__empty" role="status" data-testid="status-enrichment-jobs-loading">
+                <RefreshCw className="mr-2 inline h-4 w-4 animate-spin" aria-hidden="true" />
+                Loading jobs…
+              </p>
+            ) : jobs.length === 0 ? <p className="queues-agent__empty">No enrichment jobs found.</p> : null}
           </div>
           {jobs.length > CANONICAL_JOB_ROWS ? (
             <div className="queues-agent__table-more">
