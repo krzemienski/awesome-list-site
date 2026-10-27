@@ -161,6 +161,7 @@ export default function NotificationPreferencesCard() {
       setSavedMessage(null);
       setRequestError(null);
       setTimezoneError("Choose a valid IANA time zone.");
+      requestAnimationFrame(() => document.getElementById("digest-timezone")?.focus());
       return;
     }
     setTimezoneError(null);
