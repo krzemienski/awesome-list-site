@@ -168,7 +168,8 @@ function visibleHeading(): HTMLElement | undefined {
 // page showing this exact heading, same node and same text, has not rendered
 // the new route yet. Once settled, the heading is the new route's even when
 // it reads the same (one "You're offline" state replacing another).
-let outgoingHeading: { el: HTMLElement; text: string | null } | null = null;
+type OutgoingHeading = { el: HTMLElement; text: string | null } | null;
+let outgoingHeading: OutgoingHeading = null;
 let lastPathname = typeof window !== "undefined" ? window.location.pathname : "";
 
 if (typeof window !== "undefined") {
@@ -223,8 +224,73 @@ function isTextEntry(element: Element | null): boolean {
   );
 }
 
+interface Handoff {
+  outgoing: OutgoingHeading;
+  fragment: string;
+  isPop: boolean;
+}
+
+// Moves focus to the route's target (see the comment above) and returns the
+// function that ends the hand-off.
+function startHandoff({ outgoing, fragment, isPop }: Handoff): () => void {
+  let placed: HTMLElement | null = null;
+  let frame = 0;
+  const startedAt = Date.now();
+  function stop() {
+    cancelAnimationFrame(frame);
+    document.removeEventListener("focusin", onFocusIn);
+    window.removeEventListener("keydown", stop, true);
+    window.removeEventListener("pointerdown", stop, true);
+  }
+  // Focus this hook places carries ROUTE_FOCUS_ATTR; any other focus inside
+  // <main> is the page's own and ends the hand-off.
+  function onFocusIn(event: FocusEvent) {
+    const target = event.target as Element;
+    const main = document.getElementById("main");
+    if (!target.hasAttribute?.(ROUTE_FOCUS_ATTR) && main?.contains(target)) stop();
+  }
+  function routeTarget(main: HTMLElement | null, loading: boolean): HTMLElement | null {
+    const heading = visibleHeading();
+    if (loading && heading && heading === outgoing?.el && heading.textContent === outgoing.text) return null;
+    const section = fragment ? document.getElementById(fragment) : null;
+    // Back/Forward keeps the restored scroll: the fragment target takes
+    // focus only if it is on screen, else the heading does, without scrolling.
+    const fragmentTarget = section && main?.contains(section) && (!isPop || inViewport(section)) ? section : null;
+    if (fragmentTarget) return fragmentTarget;
+    return heading && (!isPop || inViewport(heading)) ? heading : null;
+  }
+  function tick() {
+    const main = document.getElementById("main");
+    const loading = document.querySelector('#main [aria-busy="true"]') !== null;
+    const busy = loading || restoringScroll;
+    // A pop's saved scroll is still being re-applied: choose the target
+    // against the final scroll position, not the one on the way there.
+    const next = restoringScroll ? null : routeTarget(main, loading);
+    const active = document.activeElement;
+    if (next && next !== active && (!placed || active === placed || !main?.contains(active)) && focusForRoute(next)) {
+      // A fragment link or first load scrolls to its target, which may only
+      // exist once async data has rendered; scroll and focus must agree.
+      if (!isPop && fragment && next.id === fragment) next.scrollIntoView({ block: "start" });
+      placed = next;
+    }
+    const elapsed = Date.now() - startedAt;
+    if (elapsed < ROUTE_FOCUS_BUDGET_MS || (busy && elapsed < ROUTE_FOCUS_BUSY_LIMIT_MS)) {
+      frame = requestAnimationFrame(tick);
+      return;
+    }
+    stop();
+    if (main && !main.contains(document.activeElement) && (!isPop || inViewport(main))) focusForRoute(main);
+  }
+  document.addEventListener("focusin", onFocusIn);
+  window.addEventListener("keydown", stop, true);
+  window.addEventListener("pointerdown", stop, true);
+  frame = requestAnimationFrame(tick);
+  return stop;
+}
+
 export function useRouteFocus(location: string): void {
   const lastPath = useRef<string | null>(null);
+  const stopHandoff = useRef<() => void>(() => {});
   useEffect(() => {
     const firstRun = lastPath.current === null;
     if (lastPath.current === location) return;
@@ -235,64 +301,48 @@ export function useRouteFocus(location: string): void {
     // A page that mounted in this same commit may already have focused its
     // search box (a clicked link is never a text field).
     if (isTextEntry(document.activeElement)) return;
-
-    const outgoing = outgoingHeading;
-    const fragment = fragmentId();
-    const isPop = navigationIsPop;
-    let placed: HTMLElement | null = null;
-    let frame = 0;
-    const startedAt = Date.now();
-    function stop() {
-      cancelAnimationFrame(frame);
-      document.removeEventListener("focusin", onFocusIn);
-      window.removeEventListener("keydown", stop, true);
-      window.removeEventListener("pointerdown", stop, true);
-    }
-    // Focus this hook places carries ROUTE_FOCUS_ATTR; any other focus inside
-    // <main> is the page's own and ends the hand-off.
-    function onFocusIn(event: FocusEvent) {
-      const target = event.target as Element;
-      const main = document.getElementById("main");
-      if (!target.hasAttribute?.(ROUTE_FOCUS_ATTR) && main?.contains(target)) stop();
-    }
-    function routeTarget(main: HTMLElement | null, loading: boolean): HTMLElement | null {
-      const heading = visibleHeading();
-      if (loading && heading && heading === outgoing?.el && heading.textContent === outgoing.text) return null;
-      const section = fragment ? document.getElementById(fragment) : null;
-      // Back/Forward keeps the restored scroll: the fragment target takes
-      // focus only if it is on screen, else the heading does, without scrolling.
-      const fragmentTarget = section && main?.contains(section) && (!isPop || inViewport(section)) ? section : null;
-      if (fragmentTarget) return fragmentTarget;
-      return heading && (!isPop || inViewport(heading)) ? heading : null;
-    }
-    function tick() {
-      const main = document.getElementById("main");
-      const loading = document.querySelector('#main [aria-busy="true"]') !== null;
-      const busy = loading || restoringScroll;
-      // A pop's saved scroll is still being re-applied: choose the target
-      // against the final scroll position, not the one on the way there.
-      const next = restoringScroll ? null : routeTarget(main, loading);
-      const active = document.activeElement;
-      if (next && next !== active && (!placed || active === placed || !main?.contains(active)) && focusForRoute(next)) {
-        // A fragment link or first load scrolls to its target, which may only
-        // exist once async data has rendered; scroll and focus must agree.
-        if (!isPop && fragment && next.id === fragment) next.scrollIntoView({ block: "start" });
-        placed = next;
-      }
-      const elapsed = Date.now() - startedAt;
-      if (elapsed < ROUTE_FOCUS_BUDGET_MS || (busy && elapsed < ROUTE_FOCUS_BUSY_LIMIT_MS)) {
-        frame = requestAnimationFrame(tick);
-        return;
-      }
-      stop();
-      if (main && !main.contains(document.activeElement) && (!isPop || inViewport(main))) focusForRoute(main);
-    }
-    document.addEventListener("focusin", onFocusIn);
-    window.addEventListener("keydown", stop, true);
-    window.addEventListener("pointerdown", stop, true);
-    frame = requestAnimationFrame(tick);
-    return stop;
+    stopHandoff.current();
+    stopHandoff.current = startHandoff({
+      outgoing: outgoingHeading,
+      fragment: fragmentId(),
+      isPop: navigationIsPop,
+    });
   }, [location]);
+
+  // A same-document fragment activation never changes the wouter path, so the
+  // effect above does not run. Native clicks also mark the navigation non-pop:
+  // otherwise a hashchange after Back/Forward inherits its stale pop flag.
+  // Repeating an already-current #fragment emits no hashchange, so that click
+  // starts the hand-off directly. Back/Forward still arrives via popstate and
+  // hashchange alone, retaining the restored-scroll behavior.
+  useEffect(() => {
+    const startFragmentHandoff = (isPop: boolean) => {
+      const target = document.getElementById(fragmentId());
+      if (!target || !document.getElementById("main")?.contains(target)) return;
+      stopHandoff.current();
+      stopHandoff.current = startHandoff({
+        outgoing: null,
+        fragment: target.id,
+        isPop,
+      });
+    };
+    const onHashChange = () => startFragmentHandoff(navigationIsPop);
+    const onFragmentClick = (event: MouseEvent) => {
+      if (event.defaultPrevented || event.button !== 0 || event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return;
+      const anchor = event.target instanceof Element ? event.target.closest<HTMLAnchorElement>("a[href]") : null;
+      if (!anchor || anchor.hasAttribute("download") || (anchor.target && anchor.target !== "_self")) return;
+      if (anchor.origin !== window.location.origin || anchor.pathname !== window.location.pathname || anchor.search !== window.location.search || !anchor.hash) return;
+      navigationIsPop = false;
+      if (anchor.hash === window.location.hash) startFragmentHandoff(false);
+    };
+    document.addEventListener("click", onFragmentClick);
+    window.addEventListener("hashchange", onHashChange);
+    return () => {
+      document.removeEventListener("click", onFragmentClick);
+      window.removeEventListener("hashchange", onHashChange);
+      stopHandoff.current();
+    };
+  }, []);
 }
 
 // In-app links to a page section (/settings#notification-settings) arrive via
