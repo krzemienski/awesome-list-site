@@ -6,6 +6,15 @@ Every check drove the real site in a browser at 1440×900, 820×1180 (touch) and
 
 The run's working record (progress log, per-requirement checklist, researcher notes, HARs, request bodies, snapshots and counts) stays outside the repository, because the admin HARs carry session cookies. This document gives the results it supports, and the PRs carry the code evidence.
 
+## Correction and current audit status (2026-10-27)
+
+**The cycle-5 "Clean" claim below is invalid as a clean/full-audit PASS.** The later production audit started on that same `f476d79c` revision and found defects; subsequent production cycles continued to find defects, including cycle 5 on `63a1c79d`. The current audit is **IN PROGRESS**, not complete. A final PASS requires two consecutive clean full production passes, and those passes have not been recorded.
+
+Sources for this correction:
+
+- `reports/prod-audit-2026-10-26/PROGRESS.md`: cycle 1 starts on live `f476d79c`; the 00:40Z and 03:43Z 2026-10-27 resume entries require zero findings plus two clean confirmation passes and carry the run forward to cycle 6.
+- `reports/prod-audit-2026-10-26/cycle-05/ux-public-core/findings.md` (PC-25), `ux-public-secondary/findings.md` (PS-28), `ux-member/findings.md` (MB-05–MB-07), `ux-admin-content/findings.md` (AC-19–AC-20), `ux-admin-ops/findings.md` (AO-19–AO-21) and `ux-a11y/findings.md` (PG-11): cycle-5 defects on `63a1c79d`.
+
 ## Deploys and cycles
 
 | Cycle | Live revision | Result |
@@ -14,7 +23,7 @@ The run's working record (progress log, per-requirement checklist, researcher no
 | 2 | `b09abb1b` (empty publish commit, tree of `f9455363`) | F1–F3 and G1–G3 pass. New findings: F4 (dry run 504), F1b (event URL after Back), G4 (short tag pills 41 px wide) |
 | 3 | `634e8afd` (Replit autosave commit; code identical to `6db26e73`) | F4, F1b and G4 pass. New finding: F5 (dry run plans a duplicate `iOStvOS` node) |
 | 4 | `dbc173f2` | F5 passes. New finding: G5 (taxonomy breadcrumb links 18 px tall) |
-| 5 | `f476d79c` = GitHub `main` | **Clean**: 0 FAIL at all three widths, 0 console errors |
+| 5 | `f476d79c` = GitHub `main` | **Invalid as a clean/full-audit verdict**: the later production audit found defects on this same revision; see the correction above |
 
 ## What failed and what fixed it
 
@@ -32,7 +41,9 @@ Each item gives the root cause in one line and the PR that fixed it.
 
 The removal of Vercel (#32) and of the unused GitHub Pages workflow (#35) came from the owner's requests during the run. No defect prompted them.
 
-## Final pass (cycle 5, `f476d79c`)
+## Cycle 5 observations (`f476d79c`) — historical, not a final verdict
+
+These observations record what the earlier run checked. They do not establish a clean/full-audit PASS; the later production findings and outstanding confirmation passes are described in the correction above.
 
 - **Visitor.** Home, category, subcategory, sub-subcategory (`/sub-subcategory/ios-tvos` renders "iOS/tvOS"), resource, tag and search, at all three widths:
   - No horizontal overflow and no console errors.
