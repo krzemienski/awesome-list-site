@@ -341,7 +341,7 @@ export default function ResourceManager({ createRequest = 0 }: { createRequest?:
     return subSubcategoriesData.filter(ss => ss.subcategoryId === selectedSub.id);
   }, [editForm.subcategory, subSubcategoriesData, subcategoriesData]);
 
-  const { data, isLoading, isError, error: resourcesError, isFetching: resourcesFetching, isPaused, isPlaceholderData, refetch } = useQuery<ResourcesResponse>({
+  const { data: queryData, isLoading, isError, error: resourcesError, isFetching: resourcesFetching, isPaused, isPlaceholderData, refetch } = useQuery<ResourcesResponse>({
     queryKey: ['/api/admin/resources', page, limit, debouncedSearch, categoryFilter, statusFilter, sort, featuredOnly],
     queryFn: async () => {
       const params = new URLSearchParams();
@@ -370,6 +370,16 @@ export default function ResourceManager({ createRequest = 0 }: { createRequest?:
     staleTime: 30_000,
     refetchOnWindowFocus: true
   });
+
+  // React Query v5 drops placeholderData as soon as the new key errors, so a
+  // failed page/filter/search change used to wipe the rows and print "0 of 0".
+  // Retain the last successful response instead; every count below then
+  // describes the rows that are actually on screen.
+  const lastLoadedRef = useRef<ResourcesResponse | null>(null);
+  useEffect(() => {
+    if (queryData) lastLoadedRef.current = queryData;
+  }, [queryData]);
+  const data = queryData ?? lastLoadedRef.current ?? undefined;
 
   // C3-V5A-08: placeholderData keeps the previous page on screen while the
   // next one loads (or, offline, while its fetch is paused). The footer and
@@ -1149,11 +1159,24 @@ export default function ResourceManager({ createRequest = 0 }: { createRequest?:
   // "approved" is the default status, not a filter the admin chose.
   const hasActiveFilters = Boolean(search || categoryFilter || featuredOnly || statusFilter !== "approved");
 
+  // The empty state names exactly these filters, so "nothing found" explains
+  // which search/category/status/featured choices produced it.
+  const activeFilterSummary = [
+    search.trim() ? `"${search.trim()}"` : null,
+    categoryFilter || null,
+    statusFilter !== "approved"
+      ? FILTER_STATUS_OPTIONS.find((option) => option.value === statusFilter)?.label ?? statusFilter
+      : null,
+    featuredOnly ? "Featured only" : null,
+  ].filter(Boolean).join(" · ");
+
   // Audit2 BUG-003: only the true first load may show the skeleton. With
   // keepPreviousData above, later key changes (typing, paging, filters) keep
   // `data` populated, so this branch can never unmount the search input
   // mid-typing again.
-  if (isLoading && !data) {
+  // A first load paused offline has no data and no error either; it must show
+  // the skeleton (plus the offline banner), never an empty-catalog claim.
+  if ((isLoading || isPaused) && !data) {
     return (
       <Card>
         <CardHeader>
@@ -1229,9 +1252,9 @@ export default function ResourceManager({ createRequest = 0 }: { createRequest?:
             role="region"
             aria-label="Resource filters and tools"
             onSubmit={handleSearch}
-            className="admin-catalog-resources__filters flex flex-col sm:flex-row gap-3"
+            className="admin-catalog-resources__filters flex flex-col sm:flex-row sm:flex-wrap gap-3"
           >
-            <div className="flex-1 relative">
+            <div className="flex-1 relative min-w-52">
               <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-[var(--text-2)]" />
               <Input
                 placeholder="Search by title or URL..."
@@ -1249,7 +1272,7 @@ export default function ResourceManager({ createRequest = 0 }: { createRequest?:
                 as a real filter value and matches nothing. Map "all" back to ""
                 (= param omitted) so resetting a filter actually resets it. */}
             <Select value={categoryFilter} onValueChange={(v) => { updateListQuery({ category: v === "all" ? "" : v }); setSelectedResourceIds([]); }}>
-              <SelectTrigger className="w-full sm:w-48" aria-label="Filter by category" data-testid="select-category-filter">
+              <SelectTrigger className="w-full sm:w-48 shrink-0" aria-label="Filter by category" data-testid="select-category-filter">
                 <Filter className="h-4 w-4 mr-2" />
                 <SelectValue placeholder="All Categories" />
               </SelectTrigger>
@@ -1261,7 +1284,7 @@ export default function ResourceManager({ createRequest = 0 }: { createRequest?:
               </SelectContent>
             </Select>
             <Select value={statusFilter} onValueChange={(v) => { updateListQuery({ status: v }); setSelectedResourceIds([]); }}>
-              <SelectTrigger className="w-full sm:w-36" aria-label="Filter by status" data-testid="select-status-filter">
+              <SelectTrigger className="w-full sm:w-36 shrink-0" aria-label="Filter by status" data-testid="select-status-filter">
                 <SelectValue placeholder="All Status" />
               </SelectTrigger>
               <SelectContent>
@@ -1273,7 +1296,7 @@ export default function ResourceManager({ createRequest = 0 }: { createRequest?:
             </Select>
             {/* Run16 BUG-035: user-selectable sort order (server-side, whitelisted). */}
             <Select value={sort} onValueChange={(v) => updateListQuery({ sort: v as ResourceSort })}>
-              <SelectTrigger className="w-full sm:w-40" aria-label="Sort resources" data-testid="select-sort">
+              <SelectTrigger className="w-full sm:w-40 shrink-0" aria-label="Sort resources" data-testid="select-sort">
                 <SelectValue placeholder="Sort" />
               </SelectTrigger>
               <SelectContent>
@@ -1562,35 +1585,13 @@ export default function ResourceManager({ createRequest = 0 }: { createRequest?:
                   </th>
                   <th>Title</th>
                   <th>Category</th>
+                  <th>Status</th>
                   <th>Tags</th>
                   <th>Featured</th>
                   <th aria-label="Actions" />
                 </tr>
               </thead>
               <tbody>
-                {/* Run16 BUG-080: explicit empty state instead of a blank table. */}
-                {!isLoading && !isError && (data?.resources.length || 0) === 0 && (
-                  <tr>
-                    <td colSpan={6} className="py-12 text-center text-sm text-[var(--text-2)]" data-testid="row-empty-state">
-                      {hasActiveFilters
-                        ? <>No resources match the current search or filters.{' '}
-                            {/* C5-V5A-02: this row unmounts once results return;
-                                hand focus to the table that shows them. */}
-                            <button
-                              type="button"
-                              className="min-h-6 text-primary underline"
-                              onClick={() => {
-                                clearFilters();
-                                tableRegionRef.current?.focus();
-                              }}
-                              data-testid="button-empty-clear-filters"
-                            >
-                              Clear filters
-                            </button></>
-                        : "No resources yet."}
-                    </td>
-                  </tr>
-                )}
                 {data?.resources.map((resource) => (
                   <tr
                     key={resource.id}
@@ -1614,16 +1615,37 @@ export default function ResourceManager({ createRequest = 0 }: { createRequest?:
                     <td className="admin-catalog-resources__category-cell">
                       {resource.category || "Uncategorized"}
                     </td>
+                    {/* Rows must show their own status: with status=all the
+                        table mixed approved/pending/rejected with no way to
+                        tell them apart. getStatusBadge already existed. */}
+                    <td>{getStatusBadge(resource.status ?? "unknown")}</td>
                     <td>
                       <div className="admin-catalog-resources__tags">
-                        {(safeResourceMetadataTags(resource.metadata) || []).slice(0, 2).map((tag, index) => {
-                          const label = typeof tag === "object" && tag && "name" in tag ? String(tag.name) : String(tag);
-                          return (
-                            <Badge key={index} variant="chip" title={label}>
-                              {label}
-                            </Badge>
+                        {(() => {
+                          const labels = (safeResourceMetadataTags(resource.metadata) || []).map((tag) =>
+                            typeof tag === "object" && tag && "name" in tag ? String(tag.name) : String(tag),
                           );
-                        })}
+                          return (
+                            <>
+                              {labels.slice(0, 2).map((label, index) => (
+                                <Badge key={index} variant="chip" title={label}>
+                                  {label}
+                                </Badge>
+                              ))}
+                              {/* Truncating silently hid real tags; the +N names
+                                  the rest for pointer and assistive-tech users. */}
+                              {labels.length > 2 && (
+                                <Badge
+                                  variant="chip"
+                                  title={labels.slice(2).join(", ")}
+                                  aria-label={`${labels.length - 2} more tags: ${labels.slice(2).join(", ")}`}
+                                >
+                                  +{labels.length - 2}
+                                </Badge>
+                              )}
+                            </>
+                          );
+                        })()}
                       </div>
                     </td>
                     <td>
@@ -1677,6 +1699,32 @@ export default function ResourceManager({ createRequest = 0 }: { createRequest?:
             </table>
           </div>
           </div>
+          {/* Run16 BUG-080: explicit empty state instead of a blank table.
+              Rendered OUTSIDE the horizontally scrolling table: a colSpan cell
+              centred on a 1052px table was clipped to "No resources match th…"
+              on a phone, with Clear filters unreachable. */}
+          {!isLoading && !isError && !isPaused && (data?.resources.length || 0) === 0 && (
+            <div className="py-12 text-center text-sm text-[var(--text-2)]" data-testid="row-empty-state">
+              {hasActiveFilters ? (
+                <>
+                  No resources match {activeFilterSummary}.{' '}
+                  {/* C5-V5A-02: this message unmounts once results return;
+                      hand focus to the table that shows them. */}
+                  <button
+                    type="button"
+                    className="min-h-6 text-primary underline"
+                    onClick={() => {
+                      clearFilters();
+                      tableRegionRef.current?.focus();
+                    }}
+                    data-testid="button-empty-clear-filters"
+                  >
+                    Clear filters
+                  </button>
+                </>
+              ) : "No resources yet."}
+            </div>
+          )}
           {tableScrollCue.showCue && (
             <p className="admin-catalog-resources__scroll-hint text-xs text-muted-foreground mt-2" data-testid="hint-swipe-resources-table">
               Swipe the table sideways to see category, tags, featured, and actions.
