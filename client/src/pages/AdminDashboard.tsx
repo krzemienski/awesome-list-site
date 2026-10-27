@@ -8,6 +8,7 @@ import { Link as WLink, useRoute } from "wouter";
 import AdminStats from "@/components/admin/AdminStats";
 import { AdminLoadError } from "@/components/admin/AdminLoadError";
 import AdminOverview from "@/components/admin/AdminOverview";
+import OfflinePageState from "@/components/layout/OfflinePageState";
 import { Button } from "@/components/ui/button";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import "@/components/admin/admin-canonical.css";
@@ -81,7 +82,8 @@ function revealTabTrigger(scroller: HTMLElement, trigger: HTMLElement) {
 }
 
 export default function AdminDashboard() {
-  const { stats, isLoading, error: statsError, isFetching: statsFetching, refetch: refetchStats } = useAdmin();
+  const { stats, isLoading, isPaused: statsPaused, error: statsError, isFetching: statsFetching, refetch: refetchStats } = useAdmin();
+  const resourceCount = stats?.totalPublic ?? stats?.resources;
   // Only a first-load failure or an expired session replaces the dashboard;
   // a failed background poll keeps the last good stats on screen.
   const error =
@@ -286,9 +288,20 @@ export default function AdminDashboard() {
     );
   }
 
+  // An initial offline query pauses without isLoading or an error. Do not
+  // mount zero-valued stats or the overview's unstarted activity requests.
+  if (!stats && statsPaused) {
+    return (
+      <OfflinePageState
+        onRetry={() => { void refetchStats(); }}
+        testId="admin-dashboard-offline"
+      />
+    );
+  }
+
   if (isLoading) {
     return (
-      <div className="min-h-full flex items-center justify-center bg-background">
+      <div className="min-h-full flex items-center justify-center bg-background" role="status" aria-busy="true">
         <h1 className="sr-only">Admin Dashboard</h1>
         <div className="text-center">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[var(--accent)] mx-auto mb-4"></div>
@@ -325,7 +338,10 @@ export default function AdminDashboard() {
             <AdminLoadError
               subject="the admin dashboard"
               error={error}
-              onRetry={() => { void refetchStats(); }}
+              onRetry={(event) => {
+                handoffFocusOnUnmount(event.currentTarget);
+                void refetchStats();
+              }}
               retrying={statsFetching}
               className="text-left"
               testId="alert-admin-dashboard-error"
@@ -355,7 +371,7 @@ export default function AdminDashboard() {
         <h1 className="page-title">
           Operations <em>dashboard</em>
         </h1>
-        <p>Manage the {(stats?.totalPublic ?? stats?.resources ?? 0).toLocaleString()} resources, jobs, and contributors that keep the index alive.</p>
+        <p>Manage {resourceCount === undefined ? "resources" : `the ${resourceCount.toLocaleString()} resources`}, jobs, and contributors that keep the index alive.</p>
         </div>
         <div className="admin-dashboard__actions">
           <DropdownMenu open={settingsOpen} onOpenChange={setSettingsOpen}>

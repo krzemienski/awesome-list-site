@@ -1,0 +1,36 @@
+[
+  {
+    "event": "request",
+    "requestId": "CE9038A478F06F3F2949C39FA797BAB5",
+    "method": "GET",
+    "url": "http://127.0.0.1:5071/admin"
+  },
+  {
+    "event": "request",
+    "requestId": "CE9038A478F06F3F2949C39FA797BAB5",
+    "method": "GET",
+    "url": "http://127.0.0.1:5071/sign-in?redirect_url=%2Fadmin",
+    "redirect": {
+      "status": 302,
+      "url": "/admin"
+    }
+  },
+  {
+    "event": "response",
+    "requestId": "CE9038A478F06F3F2949C39FA797BAB5",
+    "status": 200,
+    "url": "http://127.0.0.1:5071/sign-in?redirect_url=%2Fadmin"
+  },
+  {
+    "event": "request",
+    "requestId": "32539.1142",
+    "method": "GET",
+    "url": "http://127.0.0.1:5071/api/auth/user"
+  },
+  {
+    "event": "response",
+    "requestId": "32539.1142",
+    "status": 200,
+    "url": "http://127.0.0.1:5071/api/auth/user"
+  }
+]
