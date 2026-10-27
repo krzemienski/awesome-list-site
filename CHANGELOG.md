@@ -6,6 +6,11 @@ All notable changes to the Awesome Video Resource Viewer project. Newest entries
 
 ## October 27, 2026
 
+### Contextual List and Compact external links
+- Fixed C6-AX-023 by naming each external-link action with its resource title
+  and new-tab behavior. Matching tooltips and accessible names retain the
+  existing icons, 44px targets, URLs, and List/Compact layouts.
+
 ### Footer category target separation
 - Fixed C6-PS-065 by giving each Explore category link its full 44px layout
   row instead of overlapping neighboring targets with negative margins.

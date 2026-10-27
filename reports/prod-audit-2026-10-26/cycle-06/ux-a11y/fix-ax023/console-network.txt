@@ -1,0 +1,45 @@
+Raw chrome-devtools outputs for owned page 88, local clone runtime http://127.0.0.1:5093.
+List document retained while resizing 1440 -> 820 touch -> 390 touch; Compact document retained while resizing 390 touch -> 820 touch -> 1440.
+
+LIST console (list_console_messages pageId 88):
+Showing 1-4 of 4 (Page 1 of 1).
+msgid=1 [debug] [vite] connecting... (1 args)
+msgid=2 [debug] [vite] connected. (1 args)
+msgid=3 [info] %cDownload the React DevTools for a better development experience: https://reactjs.org/link/react-devtools font-weight:bold (2 args)
+msgid=4 [issue] A form field element should have an id or name attribute (count: 3)
+
+LIST document/fetch/xhr (list_network_requests pageId 88):
+Showing 1-7 of 7 (Page 1 of 1).
+reqid=1 GET http://127.0.0.1:5093/category/encoding-codecs?search=ffmpeg&view=list [200]
+reqid=6 GET http://127.0.0.1:5093/api/awesome-list/nav [200]
+reqid=7 GET http://127.0.0.1:5093/api/awesome-list [200]
+reqid=138 GET http://127.0.0.1:5093/api/config [200]
+reqid=139 GET http://127.0.0.1:5093/api/auth/user [200]
+reqid=195 GET http://127.0.0.1:5093/api/awesome-list/listing?level=category&slug=encoding-codecs&page=1 [200]
+reqid=196 GET http://127.0.0.1:5093/api/resources?page=1&limit=24&facets=true&search=ffmpeg&category=encoding-codecs [200]
+
+COMPACT console (list_console_messages pageId 88):
+Showing 1-4 of 4 (Page 1 of 1).
+msgid=13 [debug] [vite] connecting... (1 args)
+msgid=14 [debug] [vite] connected. (1 args)
+msgid=15 [info] %cDownload the React DevTools for a better development experience: https://reactjs.org/link/react-devtools font-weight:bold (2 args)
+msgid=16 [issue] A form field element should have an id or name attribute (count: 3)
+
+COMPACT document/fetch/xhr (list_network_requests pageId 88):
+Showing 1-7 of 7 (Page 1 of 1).
+reqid=607 GET http://127.0.0.1:5093/category/encoding-codecs?search=ffmpeg&view=compact [200]
+reqid=612 GET http://127.0.0.1:5093/api/awesome-list/nav [304]
+reqid=613 GET http://127.0.0.1:5093/api/awesome-list [304]
+reqid=747 GET http://127.0.0.1:5093/api/config [304]
+reqid=748 GET http://127.0.0.1:5093/api/auth/user [304]
+reqid=806 GET http://127.0.0.1:5093/api/awesome-list/listing?level=category&slug=encoding-codecs&page=1 [304]
+reqid=807 GET http://127.0.0.1:5093/api/resources?page=1&limit=24&facets=true&search=ffmpeg&category=encoding-codecs [304]
+
+Keyboard destination chrome-devtools receipts:
+List 1440 Enter: Opened page 90: FFmpeg (https://ffmpeg.org/).
+List 820 touch Enter: Opened page 91: FFmpeg (https://ffmpeg.org/).
+List 390 touch Enter: page 92 FFmpeg appeared in next navigation page list.
+Compact 390 touch Enter: Opened page 93: FFmpeg (https://ffmpeg.org/).
+Compact 820 touch Enter: Opened page 94: FFmpeg (https://ffmpeg.org/).
+Compact 1440 Enter: Opened page 95: FFmpeg (https://ffmpeg.org/).
+Trusted click event records are saved separately per state. No click handler prevented navigation.
