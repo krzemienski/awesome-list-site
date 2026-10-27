@@ -1,0 +1,74 @@
+{
+  "entries": [
+    {
+      "seq": 1,
+      "ts": 1793089413766.389,
+      "type": "console",
+      "level": "debug",
+      "text": "[vite] connecting...",
+      "location": "http://127.0.0.1:5122/@vite/client:732:8",
+      "args": [
+        "[vite] connecting..."
+      ]
+    },
+    {
+      "seq": 2,
+      "ts": 1793089413773.597,
+      "type": "console",
+      "level": "debug",
+      "text": "[vite] connected.",
+      "location": "http://127.0.0.1:5122/@vite/client:826:11",
+      "args": [
+        "[vite] connected."
+      ]
+    },
+    {
+      "seq": 3,
+      "ts": 1793089413881.959,
+      "type": "console",
+      "level": "info",
+      "text": "%cDownload the React DevTools for a better development experience: https://reactjs.org/link/react-devtools font-weight:bold",
+      "location": "http://127.0.0.1:5122/@fs/private/tmp/c6-member02-sol.2ofXGB/node_modules/.vite/deps/chunk-4RLYWRLX.js?v=cdcae9a1:21608:24",
+      "args": [
+        "%cDownload the React DevTools for a better development experience: https://reactjs.org/link/react-devtools",
+        "font-weight:bold"
+      ]
+    },
+    {
+      "seq": 4,
+      "ts": 1793089467678.436,
+      "type": "console",
+      "level": "debug",
+      "text": "[vite] connecting...",
+      "location": "http://127.0.0.1:5122/@vite/client:732:8",
+      "args": [
+        "[vite] connecting..."
+      ]
+    },
+    {
+      "seq": 5,
+      "ts": 1793089467700.138,
+      "type": "console",
+      "level": "debug",
+      "text": "[vite] connected.",
+      "location": "http://127.0.0.1:5122/@vite/client:826:11",
+      "args": [
+        "[vite] connected."
+      ]
+    },
+    {
+      "seq": 6,
+      "ts": 1793089467711.979,
+      "type": "console",
+      "level": "info",
+      "text": "%cDownload the React DevTools for a better development experience: https://reactjs.org/link/react-devtools font-weight:bold",
+      "location": "http://127.0.0.1:5122/@fs/private/tmp/c6-member02-sol.2ofXGB/node_modules/.vite/deps/chunk-4RLYWRLX.js?v=cdcae9a1:21608:24",
+      "args": [
+        "%cDownload the React DevTools for a better development experience: https://reactjs.org/link/react-devtools",
+        "font-weight:bold"
+      ]
+    }
+  ],
+  "nextSeq": 6,
+  "dropped": 0
+}
