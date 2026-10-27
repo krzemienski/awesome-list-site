@@ -42,7 +42,9 @@ export default function LinkHealthTrendChart({ data }: LinkHealthTrendChartProps
         <ResponsiveContainer width="100%" height={300}>
           <LineChart data={data}>
             <CartesianGrid strokeDasharray="3 3" stroke={CHART_GRID} />
-            <XAxis dataKey="date" stroke={CHART_GRID} tick={AXIS_TICK} />
+            {/* interval={0}: every check gets a label (the default interval dropped
+                the first of six); the angle keeps them apart at phone width. */}
+            <XAxis dataKey="date" stroke={CHART_GRID} tick={AXIS_TICK} interval={0} angle={-35} textAnchor="end" height={72} tickMargin={6} />
             <YAxis
               stroke={CHART_GRID}
               tick={AXIS_TICK}
@@ -53,6 +55,7 @@ export default function LinkHealthTrendChart({ data }: LinkHealthTrendChartProps
               labelStyle={{ color: "var(--text-2)" }}
               itemStyle={{ color: "var(--text)" }}
               cursor={{ stroke: CHART_GRID }}
+              formatter={(value) => (typeof value === "number" ? `${value.toFixed(1)}%` : value)}
             />
             <Legend wrapperStyle={{ color: "var(--text-2)", fontSize: 12 }} />
             {/* Ink ramp + one accent (docs/07-color.md): Broken is the series

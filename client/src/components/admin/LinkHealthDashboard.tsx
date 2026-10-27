@@ -268,6 +268,15 @@ export default function LinkHealthDashboard() {
         }),
   };
 
+  // Total and Healthy come from the scan; the problem counts come from the
+  // rows still listed. The gap is the scan's links whose resource was deleted
+  // since, so the summary names it instead of leaving the sum unexplained.
+  const unlistedLinks = Math.max(
+    0,
+    summaryCounts.total -
+      (summaryCounts.healthy + summaryCounts.broken + summaryCounts.redirect + summaryCounts.timeout + summaryCounts.suspect),
+  );
+
   useEffect(() => {
     setIsPolling(isJobInProgress);
     if (!isActiveJob && latestJob && ['completed', 'failed', 'cancelled'].includes(latestJob.status)) {
@@ -502,7 +511,7 @@ export default function LinkHealthDashboard() {
                 </p>
               )}
               <div className="ops-link-health__summary-meta" aria-label="Detailed link counts">
-                <span data-testid="counter-total-links">Total {summaryCounts.total.toLocaleString()}</span>
+                <span data-testid="counter-total-links">Checked {summaryCounts.total.toLocaleString()}</span>
                 <span className={TONE_TEXT_CLASS[statusTone('healthy')]} data-testid="counter-healthy-links">
                   Healthy {summaryCounts.healthy.toLocaleString()}
                 </span>
@@ -519,6 +528,11 @@ export default function LinkHealthDashboard() {
                   Suspect {summaryCounts.suspect.toLocaleString()}
                 </span>
               </div>
+              {unlistedLinks > 0 && (
+                <p className="text-xs text-muted-foreground" data-testid="text-linkhealth-unlisted">
+                  Checked is every link the scan covered. {unlistedLinks.toLocaleString()} of them belong to resources that are no longer listed, so Healthy plus the problem counts adds up to {(summaryCounts.total - unlistedLinks).toLocaleString()}.
+                </p>
+              )}
 
               <Separator />
 
@@ -553,7 +567,7 @@ export default function LinkHealthDashboard() {
               </div>
 
               {isActiveJob && (
-                <Alert className={INFO_PANEL_CLASS}>
+                <Alert live="off" className={INFO_PANEL_CLASS}>
                   <Info className="h-4 w-4" />
                   <AlertDescription>
                     Link health check is currently running. Please wait for it to complete.
@@ -756,7 +770,7 @@ export default function LinkHealthDashboard() {
               <RefreshCw className="h-6 w-6 animate-spin text-muted-foreground" />
             </div>
           ) : brokenLinks.length === 0 ? (
-            <Alert>
+            <Alert live="off">
               <Info className="h-4 w-4" />
               <AlertDescription>
                 {/* Run16 BUG-043: don't claim "all links are healthy" when no

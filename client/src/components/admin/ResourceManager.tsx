@@ -230,8 +230,10 @@ export default function ResourceManager({ createRequest = 0 }: { createRequest?:
   const queryClient = useQueryClient();
   
   // AC-06: the URL is the only owner of the list state (search, category,
-  // status, sort, featured, page, size), so reload, share, Back and the
-  // dashboard's ?status=rejected deep link all land on the same table.
+  // status, sort, featured, page, size), so reload, share and the
+  // dashboard's ?status=rejected deep link all land on the same table. List
+  // changes use replaceState, so Back leaves the list instead of stepping
+  // through earlier filters or pages.
   const searchString = useSearch();
   const { search, category: categoryFilter, status: statusFilter, sort, featured: featuredOnly, page, limit } =
     useMemo(() => parseResourceListQuery(searchString, FILTER_STATUS_VALUES), [searchString]);
@@ -395,6 +397,12 @@ export default function ResourceManager({ createRequest = 0 }: { createRequest?:
     pendingResultsFocusRef.current = false;
     resultsHeadingRef.current?.focus({ preventScroll: true });
   }, [data, isPlaceholderData]);
+  // A page request that fails keeps the placeholder rows; the pending move
+  // must not survive to steal focus from a later refetch. Unmount drops it too.
+  useEffect(() => {
+    if (isError) pendingResultsFocusRef.current = false;
+  }, [isError]);
+  useEffect(() => () => { pendingResultsFocusRef.current = false; }, []);
 
   // Task 275: clamp an out-of-range page (stale ?page= link, shrunk result
   // set) back to the last real page instead of showing an empty table.

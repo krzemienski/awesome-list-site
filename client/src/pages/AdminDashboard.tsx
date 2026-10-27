@@ -429,7 +429,7 @@ export default function AdminDashboard() {
               <ChevronLeft aria-hidden="true" size={16} />
             </button>
           )}
-          <TabsList className="admin-dashboard__tabs">
+          <TabsList className="admin-dashboard__tabs" aria-label="Admin sections">
             {CANONICAL_TABS.map(([id, label, Icon]) => (
               <TabsTrigger
                 key={id}

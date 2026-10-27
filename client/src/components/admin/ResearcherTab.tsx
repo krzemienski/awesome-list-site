@@ -21,6 +21,7 @@ import { ResearchRunConfigSummary } from "@/components/admin/ResearchRunConfigSu
 import {
   BAD_TEXT,
   COST_BASIS_NOTE,
+  type CheapestSavingRun,
   OK_SOLID_BUTTON,
   OK_TEXT,
   formatCost,
@@ -143,7 +144,7 @@ export default function ResearcherTab({ initialTab = "review" }: ResearcherTabPr
     isLoading: jobsLoading,
     isFetching: jobsFetching,
     refetch: refetchJobs,
-  } = useQuery<{ jobs: ResearchJob[]; total: number }>({
+  } = useQuery<{ jobs: ResearchJob[]; total: number; cheapestSavingRun: CheapestSavingRun | null }>({
     queryKey: ['/api/researcher/jobs', { limit: jobsLimit }],
     queryFn: async () => {
       const res = await fetch(`/api/researcher/jobs?limit=${jobsLimit}`, { credentials: 'include' });
@@ -187,13 +188,8 @@ export default function ResearcherTab({ initialTab = "review" }: ResearcherTabPr
     .filter((c) => Number.isFinite(c) && c > 0);
   const costMin = finishedCosts.length > 0 ? Math.min(...finishedCosts) : null;
   const costMax = finishedCosts.length > 0 ? Math.max(...finishedCosts) : null;
-  // Cancelled and failed runs report a lower-bound cost, so only runs that
-  // ended on their own count.
-  const savingCosts = (jobs || [])
-    .filter((j) => (j.status === "completed" || j.status === "budget_stopped") && (j.totalDiscoveries ?? 0) > 0)
-    .map((j) => Number(j.estimatedCostUsd))
-    .filter((c) => Number.isFinite(c) && c > 0);
-  const cheapestSavingRunUsd = savingCosts.length > 0 ? Math.min(...savingCosts) : null;
+  // Server-side over the whole history: the listed window holds only the latest runs.
+  const cheapestSavingRun = jobsData?.cheapestSavingRun ?? null;
 
   const {
     data: selectedJob,
@@ -392,7 +388,7 @@ export default function ResearcherTab({ initialTab = "review" }: ResearcherTabPr
                   setIsPolling(true);
                 }}
                 costRange={costMin !== null && costMax !== null ? { min: costMin, max: costMax } : null}
-                cheapestSavingRunUsd={cheapestSavingRunUsd}
+                cheapestSavingRun={cheapestSavingRun}
                 catalogSize={categoriesData?.resources?.length ?? null}
               />
             </div>
