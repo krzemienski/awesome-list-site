@@ -209,6 +209,13 @@
   transition: color var(--motion-fast) ease;
 }
 
+/* Touch widths: the title link reaches the 44px floor. */
+@media (max-width: 1024px) {
+  .journey-card__title-link {
+    min-height: 44px;
+  }
+}
+
 .journey-card__title-link:hover {
   color: var(--accent-ink);
   text-decoration: underline;

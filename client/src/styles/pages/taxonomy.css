@@ -497,6 +497,10 @@ button.taxonomy-child {
 /* The tray is 36px tall; centred 44px controls overflow it evenly and still
    fit the band beside the mark. */
 @media (max-width: 1024px) {
+  .taxonomy-page .resource-card--taxonomy .resource-card__title-link {
+    min-height: 44px;
+  }
+
   .taxonomy-page .resource-card--taxonomy .resource-card__reveal > *,
   .taxonomy-page .resource-card--taxonomy .resource-card__reveal .resource-card__visit-button {
     min-height: 44px;
