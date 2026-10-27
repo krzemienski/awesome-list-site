@@ -8,6 +8,7 @@ import type { AwesomeListNavNode } from "@/lib/static-data";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { getInitials } from "@/lib/utils";
 import { requestClerk } from "@/lib/clerk-bridge";
+import { docsUrl } from "@/lib/docs-url";
 import {
   DropdownMenu, DropdownMenuContent, DropdownMenuItem,
   DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger,
@@ -21,6 +22,8 @@ interface AppHeaderProps {
   logoutError?: string | null;
   categories?: AwesomeListNavNode[];
   siteName?: string;
+  repoUrl?: string;
+  repoBranch?: string;
 }
 
 /**
@@ -52,7 +55,7 @@ function SearchIcon() {
   </svg>;
 }
 
-export default function AppHeader({ onSearchOpen, user, onLogout, logoutError, categories = [], siteName }: AppHeaderProps) {
+export default function AppHeader({ onSearchOpen, user, onLogout, logoutError, categories = [], siteName, repoUrl, repoBranch }: AppHeaderProps) {
   const [location, navigate] = useLocation();
   const guestSavedCount = useGuestBookmarkIds().size;
   const { data: notificationState } = useQuery<{ unreadCount: number }>({
@@ -67,6 +70,7 @@ export default function AppHeader({ onSearchOpen, user, onLogout, logoutError, c
     .reduce((sum, node) => sum + totalCount(node), 0);
   const firstName = user?.name?.trim() ? user.name.trim().split(/\s+/)[0] : "Account";
   const brand = shellBrand(siteName);
+  const docsHref = docsUrl(repoUrl, repoBranch);
   const signIn = () => {
     const here = window.location.pathname + window.location.search;
     const skipNext = here === "/" || here.startsWith("/sign-in") || here.startsWith("/sign-up");
@@ -109,7 +113,7 @@ export default function AppHeader({ onSearchOpen, user, onLogout, logoutError, c
         {navLink("/categories", "Browse")}
         {navLink("/submit", "Submit")}
         {navLink("/about", "About")}
-        <a className="nav-link" href="/design-system" target="_blank" rel="noopener noreferrer">Docs ↗</a>
+        {docsHref && <a className="nav-link" href={docsHref} target="_blank" rel="noopener noreferrer">Docs ↗</a>}
         {user?.role === "admin" && <Link href="/admin" className={`nav-link${location.startsWith("/admin") ? " active" : ""}`} aria-current={location.startsWith("/admin") ? "page" : undefined}>Admin<span className="header-live-dot" aria-hidden="true" /></Link>}
       </nav>
       {/* Backlog X-03: Clerk loads on demand — warm it when the visitor
