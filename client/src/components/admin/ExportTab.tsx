@@ -34,7 +34,9 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { Link as RouterLink } from "wouter";
 import { apiRequest, ApiError } from "@/lib/queryClient";
 import { describeWriteError } from "@/lib/apiError";
+import { queryUnavailableReason } from "@/lib/query-availability";
 import { formatAdminDateTime } from "@/lib/utils";
+import { handoffFocusOnUnmount } from "@/hooks/focus-handoff";
 import { useToast } from "@/hooks/use-toast";
 import {
   AdminOpsTable as Table,
@@ -120,14 +122,7 @@ export default function ExportTab({ validationStatus: propValidationStatus }: Ex
 
   // Export history is read from the audit log, filtered server-side to export
   // actions, so every page holds exports and the total counts exports only.
-  const {
-    data: exportHistoryData,
-    isLoading: isExportHistoryLoading,
-    isError: isExportHistoryError,
-    error: exportHistoryError,
-    isFetching: isExportHistoryFetching,
-    refetch: refetchExportHistory,
-  } = useQuery<AuditLogsResponse>({
+  const exportHistoryQuery = useQuery<AuditLogsResponse>({
     queryKey: ["/api/admin/audit-logs", "export-history", auditHistoryPage],
     staleTime: 30_000,
     refetchOnWindowFocus: true,
@@ -146,6 +141,14 @@ export default function ExportTab({ validationStatus: propValidationStatus }: Ex
       return body as AuditLogsResponse;
     },
   });
+  const {
+    data: exportHistoryData,
+    isLoading: isExportHistoryLoading,
+    error: exportHistoryError,
+    isFetching: isExportHistoryFetching,
+    refetch: refetchExportHistory,
+  } = exportHistoryQuery;
+  const exportHistoryUnavailable = queryUnavailableReason(exportHistoryQuery);
 
   const auditHistoryTotal = exportHistoryData?.total ?? 0;
   const auditHistoryOffset = auditHistoryPage * AUDIT_HISTORY_PAGE_SIZE;
@@ -157,10 +160,10 @@ export default function ExportTab({ validationStatus: propValidationStatus }: Ex
   const hasNextAuditHistoryPage =
     auditHistoryEnd < auditHistoryTotal &&
     (exportHistoryData?.logs.length ?? 0) > 0;
-  const auditHistoryWindowLabel = isExportHistoryLoading
-    ? "Loading export history…"
-    : isExportHistoryError
-      ? "Export history unavailable."
+  const auditHistoryWindowLabel = exportHistoryUnavailable
+    ? "Export history unavailable."
+    : isExportHistoryLoading || !exportHistoryData
+      ? "Loading export history…"
       : auditHistoryTotal === 0
         ? "No exports recorded yet."
         : `Exports ${auditHistoryOffset + 1}–${auditHistoryEnd} of ${auditHistoryTotal.toLocaleString()}, newest first`;
@@ -219,8 +222,8 @@ export default function ExportTab({ validationStatus: propValidationStatus }: Ex
       // Name the real cause (signed out, rate limited, server error) instead
       // of a generic "try again"; nothing is downloaded on failure.
       toast({
-        title: "Export Failed",
-        description: describeWriteError(error, { fallback: "Failed to export awesome list.", outcome: "No file was downloaded. Try again in a moment." }),
+        title: "Markdown Export Failed",
+        description: describeWriteError(error, { fallback: "Failed to export the awesome list as Markdown.", outcome: "No file was downloaded. Try again in a moment." }),
         variant: "destructive",
       });
     } finally {
@@ -630,7 +633,7 @@ export default function ExportTab({ validationStatus: propValidationStatus }: Ex
       <details className="admin-ops-more">
         <summary className="btn ghost">Export history &amp; validation results</summary>
       <TableShell
-        title="Export history"
+        title={<span id="export-history-heading" tabIndex={-1}>Export history</span>}
         sub={auditHistoryWindowLabel}
         actions={
           <div className="admin-ops-table-shell__pagination" aria-label="Export history pages">
@@ -664,17 +667,22 @@ export default function ExportTab({ validationStatus: propValidationStatus }: Ex
           </div>
         }
       >
-        {isExportHistoryLoading ? (
-          <p className="admin-ops-table__empty">Loading export history...</p>
-        ) : isExportHistoryError ? (
+        {exportHistoryUnavailable ? (
           <AdminLoadError
             subject="export history"
-            error={exportHistoryError}
-            onRetry={() => { void refetchExportHistory(); }}
+            error={exportHistoryUnavailable === "offline"
+              ? "You're offline. Reconnect and retry to load export history."
+              : exportHistoryError}
+            onRetry={(event) => {
+              handoffFocusOnUnmount(event.currentTarget, () => document.getElementById("export-history-heading"));
+              void refetchExportHistory();
+            }}
             retrying={isExportHistoryFetching}
             testId="alert-export-history-error"
             retryTestId="button-retry-export-history"
           />
+        ) : isExportHistoryLoading || !exportHistoryData ? (
+          <p className="admin-ops-table__empty">Loading export history...</p>
         ) : exportHistory.length === 0 ? (
           <p className="admin-ops-table__empty">
             {auditHistoryTotal === 0
