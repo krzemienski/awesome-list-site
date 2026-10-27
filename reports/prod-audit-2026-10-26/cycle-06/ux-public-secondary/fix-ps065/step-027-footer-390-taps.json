@@ -1,0 +1,30 @@
+[
+  {
+    "name": "Encoding & Codecs",
+    "edge": "bottom-center",
+    "x": 258.5,
+    "y": 433.328125,
+    "expected": "/category/encoding-codecs",
+    "hit": "/category/encoding-codecs",
+    "before": "http://127.0.0.1:5165/about",
+    "after": {
+      "url": "http://127.0.0.1:5165/category/encoding-codecs",
+      "title": "Video Encoding & Codecs: AV1, HEVC, H.264 — Awesome Video",
+      "h1": "Encoding & Codecs"
+    }
+  },
+  {
+    "name": "General Tools",
+    "edge": "top-center",
+    "x": 258.5,
+    "y": 437.328125,
+    "expected": "/category/general-tools",
+    "hit": "/category/general-tools",
+    "before": "http://127.0.0.1:5165/about",
+    "after": {
+      "url": "http://127.0.0.1:5165/category/general-tools",
+      "title": "Video Development Tools & Utilities — Awesome Video",
+      "h1": "General Tools"
+    }
+  }
+]

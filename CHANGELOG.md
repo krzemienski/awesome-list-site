@@ -6,6 +6,12 @@ All notable changes to the Awesome Video Resource Viewer project. Newest entries
 
 ## October 27, 2026
 
+### Footer category target separation
+- Fixed C6-PS-065 by giving each Explore category link its full 44px layout
+  row instead of overlapping neighboring targets with negative margins.
+  Category typography, ordering, focus rings and responsive footer columns
+  are unchanged.
+
 ### Researcher history navigation (C6-AI-030)
 - `Done` and `Review later` now open the full-history disclosure, activate Job History, highlight the requested run, and focus the named history region instead of the compact jobs table.
 - A selected run outside the paginated window is shown separately without changing compact `Show more` or full-history `Load more` counts. Direct run links, launch drafts, and detail-dialog focus restoration retain their existing paths.

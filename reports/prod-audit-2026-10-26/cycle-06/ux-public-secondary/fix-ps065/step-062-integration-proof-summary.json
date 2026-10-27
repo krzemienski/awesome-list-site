@@ -1,0 +1,336 @@
+{
+  "ticket": "C6-PS-065",
+  "capturedAt": "2026-10-27T07:43:01.528Z",
+  "initialFixCommit": "f14110c28b322730ff69ff13986defa6798256c6",
+  "integratedOriginMain": "2fa6de20",
+  "reason": "PR113 initially reported CONFLICTING because five independently merged fixes added October27 changelog sections. Merged origin/main into fix branch, resolving only additive CHANGELOG conflict by retaining both sets. This did not merge PR113 into main or deploy.",
+  "checks": {
+    "tsc": {
+      "command": "node_modules/.bin/tsc --noEmit",
+      "exitCode": 0,
+      "artifact": "step-044-integrated-tsc.json"
+    },
+    "build": {
+      "command": "npm run build",
+      "exitCode": 0,
+      "artifact": "step-045-integrated-build.json"
+    }
+  },
+  "geometry": [
+    {
+      "width": 1440,
+      "height": 1000,
+      "dpr": 1,
+      "coarse": false,
+      "touchPoints": 0,
+      "exploreHeights": [
+        44,
+        44,
+        44,
+        44,
+        44,
+        44,
+        44,
+        44,
+        44
+      ],
+      "pitch": [
+        44,
+        44,
+        44,
+        44,
+        44,
+        44,
+        44,
+        44
+      ],
+      "gap": [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "intersections": [],
+      "horizontalOverflow": 0
+    },
+    {
+      "width": 820,
+      "height": 1180,
+      "dpr": 1,
+      "coarse": true,
+      "touchPoints": 1,
+      "exploreHeights": [
+        44,
+        44,
+        44,
+        44,
+        44,
+        44,
+        44,
+        44,
+        44
+      ],
+      "pitch": [
+        44,
+        44,
+        44,
+        44,
+        44,
+        44,
+        44,
+        44
+      ],
+      "gap": [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "intersections": [],
+      "horizontalOverflow": 0
+    },
+    {
+      "width": 390,
+      "height": 844,
+      "dpr": 1,
+      "coarse": true,
+      "touchPoints": 1,
+      "exploreHeights": [
+        44,
+        44,
+        44,
+        44,
+        44,
+        44,
+        44,
+        44,
+        44
+      ],
+      "pitch": [
+        44,
+        44,
+        44,
+        44,
+        44,
+        44,
+        44,
+        44
+      ],
+      "gap": [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "intersections": [],
+      "horizontalOverflow": 0
+    }
+  ],
+  "interactions": [
+    {
+      "width": 1440,
+      "artifact": "step-049-integrated-1440-interactions.json",
+      "value": {
+        "actions": [
+          {
+            "name": "Encoding & Codecs",
+            "edge": "bottom",
+            "x": 931.60546875,
+            "y": 558.8359375,
+            "expected": "/category/encoding-codecs",
+            "hit": "/category/encoding-codecs",
+            "after": {
+              "url": "http://127.0.0.1:5165/category/encoding-codecs",
+              "h1": "Encoding & Codecs"
+            }
+          },
+          {
+            "name": "General Tools",
+            "edge": "top",
+            "x": 931.60546875,
+            "y": 562.8359375,
+            "expected": "/category/general-tools",
+            "hit": "/category/general-tools",
+            "after": {
+              "url": "http://127.0.0.1:5165/category/general-tools",
+              "h1": "General Tools"
+            }
+          }
+        ],
+        "order": [
+          {
+            "name": "Community & Events",
+            "focusVisible": true
+          },
+          {
+            "name": "Encoding & Codecs",
+            "focusVisible": true
+          },
+          {
+            "name": "General Tools",
+            "focusVisible": true
+          }
+        ],
+        "reverse": {
+          "name": "Encoding & Codecs",
+          "focusVisible": true,
+          "outline": "rgb(255, 61, 82) solid 2px"
+        },
+        "enter": {
+          "url": "http://127.0.0.1:5165/category/encoding-codecs",
+          "h1": "Encoding & Codecs"
+        }
+      }
+    },
+    {
+      "width": 820,
+      "artifact": "step-054-integrated-820-interactions.json",
+      "value": {
+        "viewport": {
+          "width": 820,
+          "dpr": 1,
+          "coarse": true,
+          "touchPoints": 1
+        },
+        "actions": [
+          {
+            "name": "Encoding & Codecs",
+            "edge": "bottom",
+            "x": 399.99609375,
+            "y": 695.0078125,
+            "expected": "/category/encoding-codecs",
+            "hit": "/category/encoding-codecs",
+            "after": {
+              "url": "http://127.0.0.1:5165/category/encoding-codecs",
+              "h1": "Encoding & Codecs"
+            }
+          },
+          {
+            "name": "General Tools",
+            "edge": "top",
+            "x": 399.99609375,
+            "y": 699.0078125,
+            "expected": "/category/general-tools",
+            "hit": "/category/general-tools",
+            "after": {
+              "url": "http://127.0.0.1:5165/category/general-tools",
+              "h1": "General Tools"
+            }
+          }
+        ],
+        "order": [
+          {
+            "name": "Community & Events",
+            "focusVisible": true
+          },
+          {
+            "name": "Encoding & Codecs",
+            "focusVisible": true
+          },
+          {
+            "name": "General Tools",
+            "focusVisible": true
+          }
+        ],
+        "reverse": {
+          "name": "Encoding & Codecs",
+          "focusVisible": true,
+          "outline": "rgb(255, 61, 82) solid 2px"
+        },
+        "enter": {
+          "url": "http://127.0.0.1:5165/category/encoding-codecs",
+          "h1": "Encoding & Codecs"
+        }
+      }
+    },
+    {
+      "width": 390,
+      "artifact": "step-059-integrated-390-interactions.json",
+      "value": {
+        "viewport": {
+          "width": 390,
+          "dpr": 1,
+          "coarse": true,
+          "touchPoints": 1
+        },
+        "actions": [
+          {
+            "name": "Encoding & Codecs",
+            "edge": "bottom",
+            "x": 258.5,
+            "y": 433.328125,
+            "expected": "/category/encoding-codecs",
+            "hit": "/category/encoding-codecs",
+            "after": {
+              "url": "http://127.0.0.1:5165/category/encoding-codecs",
+              "h1": "Encoding & Codecs"
+            }
+          },
+          {
+            "name": "General Tools",
+            "edge": "top",
+            "x": 258.5,
+            "y": 437.328125,
+            "expected": "/category/general-tools",
+            "hit": "/category/general-tools",
+            "after": {
+              "url": "http://127.0.0.1:5165/category/general-tools",
+              "h1": "General Tools"
+            }
+          }
+        ],
+        "order": [
+          {
+            "name": "Community & Events",
+            "focusVisible": true
+          },
+          {
+            "name": "Encoding & Codecs",
+            "focusVisible": true
+          },
+          {
+            "name": "General Tools",
+            "focusVisible": true
+          }
+        ],
+        "reverse": {
+          "name": "Encoding & Codecs",
+          "focusVisible": true,
+          "outline": "rgb(255, 61, 82) solid 2px"
+        },
+        "enter": {
+          "url": "http://127.0.0.1:5165/category/encoding-codecs",
+          "h1": "Encoding & Codecs"
+        }
+      }
+    }
+  ],
+  "screenshotsPersonallyViewed": [
+    "step-048-integrated-1440.png",
+    "step-050-integrated-1440-focus.png",
+    "step-053-integrated-820.png",
+    "step-055-integrated-820-focus.png",
+    "step-058-integrated-390.png",
+    "step-060-integrated-390-focus.png"
+  ],
+  "visualObservation": "All three widths retain their footer columns and 13px category labels. Encoding has a crisp 2px inset red focus rectangle within its separate 44px row. Phone Source is below the category grid and is scroll reachable. No label or target overlap.",
+  "diagnostics": {
+    "artifact": "step-061-integrated-console-network.json",
+    "pageErrors": 0,
+    "errorWarn": 0,
+    "transportOrHttpFailures": 0
+  },
+  "limitations": "Same UNVERIFIED scope as initial direct summary. Initial full top+bottom edge proof and 17-control Tab traversal remain valid; integrated smoke repeated the originally failing neighboring edge pair, Tab neighbor order, native Shift+Tab and Enter."
+}
