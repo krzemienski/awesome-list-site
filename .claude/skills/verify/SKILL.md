@@ -53,16 +53,6 @@ Run before driving, and whenever anything looks off. All read-only.
 5. `curl -s -o /dev/null -w "%{http_code} %{redirect_url}" localhost:$P/admin` → `302 …/sign-in?redirect_url=%2Fadmin`.
 6. In the browser, `list_console_messages` has no `Invalid hook call` or "more than one copy of React". If it does, two dev instances share a `node_modules/.vite` cache: each checkout needs its own real `node_modules`.
 
-## Production
-
-For checks against `https://awesome.video`. Launch, Doctor and the seed notes do not apply.
-
-- Clerk is a live instance there. The dev test account, its `424242` code and the `clerk` CLI do not work against it.
-- Admin access is an `av_admin_session` cookie the owner authorizes for the run. It is a credential: it never goes into evidence, logs or reports.
-- Every `POST` and `DELETE` needs `-H 'Origin: https://awesome.video'`; the server rejects a cookie-bearing write without it.
-- There is no production database access. Read state through the admin APIs, never `psql`.
-- The visitor rule in `replit-deploy` step 7 (no sign-in, no writes) holds unless the owner authorizes otherwise for the run.
-
 ## Drive
 
 Tools: chrome-devtools MCP (`new_page`, `navigate_page`, `emulate`, `take_snapshot`, `click`, `fill`, `type_text`, `press_key`, `hover`, `wait_for`, `evaluate_script`, `take_screenshot`, `list_network_requests`, `get_network_request`, `list_console_messages`, `performance_start_trace`). Load them with ToolSearch.
@@ -70,11 +60,18 @@ Tools: chrome-devtools MCP (`new_page`, `navigate_page`, `emulate`, `take_snapsh
 - **Your own context.** The browser is shared. Always `new_page {url, isolatedContext:"<run>-<role>"}` (separate contexts for guest and admin) and use only your pageIds. Never close pages you did not open. Cookies are not port-scoped, so contexts are the only isolation.
 - **Widths.** `emulate {viewport:"1440x900x1"}`, `"820x1180x2,mobile,touch"`, `"390x844x3,mobile,touch"`, then reload: some layout is decided at mount.
 - **Readiness.** Every page first shows the inert prerender overlay `#ssr-seo-hold`; clicks and snapshots hit it. Usable when `evaluate_script` of `() => ({hold: !!document.getElementById('ssr-seo-hold'), kids: document.getElementById('root').childElementCount})` returns `hold:false, kids>0`. Then `wait_for` page text, then take a fresh snapshot (uids change during hydration). Never wait for network idle.
-- **Consent banner.** A fresh context shows it and it covers bottom buttons. Click `consent-decline` / `consent-accept`, or pass `initScript: "try{localStorage.setItem('analytics-consent','denied')}catch{}"` (use `'granted'` for analytics checks) on `navigate_page`. On the published site, denied consent does not stop the Replit (Umami) tracker, which is cookieless. A production sweep that is not testing analytics also sets `localStorage.setItem('umami.disabled','1')` in the same initScript, and its report gives the owner the QA time windows so the owner can discount that traffic.
+- **Consent banner.** A fresh context shows it and it covers bottom buttons. Click `consent-decline` / `consent-accept`, or pass `initScript: "try{localStorage.setItem('analytics-consent','denied')}catch{}"` (use `'granted'` for analytics checks) on `navigate_page`.
 - **Handles.** Prefer `data-testid`, ARIA names and route paths. The per-feature handles are in `features/` and `references/drive-recipe.md` §3.
 - **Forms.** react-hook-form inputs lose `fill` when uids go stale; set them in one `evaluate_script` with the native value setter plus `input` and `blur` events, then click submit.
-- **Admin sign-in (local).** On production, see Production instead. Agents cannot use the owner password (a secret). Use the Clerk dev test account: `/sign-in`, email `cf-audit+clerk_test@awesome.video`, choose the email code, type `424242` with `type_text` (not `fill`), also for any new-device step. Wait for the URL to leave `/sign-in` on its own, then `evaluate_script` `async()=>(await (await fetch('/api/auth/user')).json())` must show `role:"admin"`. The local row `user_3K1RqOtITAqqTqT62nRvvGGks9s` is admin in `awesome_waves` and its clones.
-- **Sign-out.** A signed-out UI proves nothing about the session. Before signing out, keep the credential (session cookie or bearer token) the page used, outside evidence. After sign-out, replay it against a protected endpoint such as `/api/admin/stats` (not `/api/auth/user`, which answers 200 when signed out). A 200 is FAIL unless the owner accepts it. Sign-out and any other check that destroys a session run early in the sweep, from a second session, so the session the rest of the sweep uses survives.
+- **Admin sign-in (local).** On a local server agents do not use the owner password. Use the Clerk dev test account: `/sign-in`, email `cf-audit+clerk_test@awesome.video`, choose the email code, type `424242` with `type_text` (not `fill`), also for any new-device step. Wait for the URL to leave `/sign-in` on its own, then `evaluate_script` `async()=>(await (await fetch('/api/auth/user')).json())` must show `role:"admin"`. The local row `user_3K1RqOtITAqqTqT62nRvvGGks9s` is admin in `awesome_waves` and its clones.
+- **Admin on production (https://awesome.video).** The lead creates the owner session once from `.env` `OWNER_PASSWORD` with a single POST to `/api/auth/admin-login` (Origin header set, body written to a mode-600 temp file and deleted, password never printed or logged), saves the cookie jar and a Cookie header file with mode 600, and hands workers the file paths. Never ask the user to sign in. Workers never log in themselves: on a 401 or a `/sign-in` redirect they report BLOCKED. The jar marks `av_admin_session` with a `#HttpOnly_` prefix, so strip it before building the header file. The session lasts 12 hours; a longer run re-creates it before it lapses. **Nobody ever signs out of the owner session or clicks "Sign out all devices"**: any owner sign-out revokes every owner session on the server, which ends every other worker's session too.
+- **Browser tool quirks.**
+  - agent-browser takes its session from `AGENT_BROWSER_SESSION=<name>`; a `--session` flag is an unknown command.
+  - Headless agent-browser never scrolls (scrollY stays 0), so below-fold clicks miss silently: use a tall viewport, a DOM click, or chrome-devtools.
+  - Radix menus and selects ignore a DOM `.click()`; click by snapshot uid.
+  - A fragment-only navigation (`#x`) does not reload the document.
+  - For QA traffic on production set `localStorage['umami.disabled']='1'` and dec‍line consent; the Replit tracker is cookieless and ignores consent.
+  - An `initScript` fetch wrapper may not run in an isolated context after `navigate_page`; check `typeof` first and read payloads with `list_network_requests` + `get_network_request` instead (vendor bodies are gzip).
 - **Never write inside the watched tree while a browser is open** (any repo write reloads every Vite page; only `.local`, `.cache`, `.agents`, `node_modules`, `dist`, logs are excluded). Finish the browser check, then edit.
 - **Catalog GETs are cached 60 s.** After an admin write, check public freshness by soft-navigating in the same tab, or reload with `navigate_page {type:"reload", ignoreCache:true}`.
 - **Paid actions.** Researcher launches, enrichment, `/api/health/ai?deep=1`, recommendations refresh and "Analyze with AI" spend real model tokens. Do them only when the task needs that proof, with small limits.
@@ -84,18 +81,17 @@ Tools: chrome-devtools MCP (`new_page`, `navigate_page`, `emulate`, `take_snapsh
 - Save evidence under `.local/verify-evidence/<run-id>/` in the checkout (git-excluded and outside Vite's watch). Screenshot `filePath` must be inside the workspace; `/tmp` is refused.
 - For each claim record: width, URL, the action, what you saw (screenshot path or snapshot excerpt), and for side effects the request and response (`get_network_request`, `requestFilePath`/`responseFilePath` for big bodies) or a `psql -At -c "select …"` on your DB.
 - Capture the action and the resulting state, then the state after a reload.
-- Vendor analytics: Mixpanel `api-js.mixpanel.com/track` and Amplitude `/2/httpapi` bodies are gzipped; count Mixpanel by distinct `$insert_id` or wait 15 s before navigating. GA4 is off locally, and the Replit (Umami) tracker exists only on the published site; those are owner steps, not passes. Exclude same-origin `/src/lib/*.ts` URLs when counting vendor traffic.
-- PostHog: posthog-js drops every event while `navigator.webdriver` is true (and on a `HeadlessChrome` user agent), so an automation browser sends nothing. An override of those in the test browser's `initScript` may prove what the app *emits*. Read the request bodies with `get_network_request`, never by patching `fetch` in the page, and report the result as "emitted". Ingestion and dashboards stay an owner step. `features/analytics-consent.md`, `references/drive-recipe.md` §4 and `references/regression-watchlist.md` §4 follow this rule.
+- Vendor analytics: Mixpanel `api-js.mixpanel.com/track` and Amplitude `/2/httpapi` bodies are gzipped; count Mixpanel by distinct `$insert_id` or wait 15 s before navigating. PostHog sends nothing from automation browsers, GA4 is off locally, and the Replit (Umami) tracker exists only on the published site; those are owner steps, not passes. Exclude same-origin `/src/lib/*.ts` URLs when counting vendor traffic.
 - Before filing a bug, check `references/regression-watchlist.md` §4 and `references/visual-checklist.md` §5 for known false positives, and rerun once after a cold restart.
 - Report each claim as PASS, FAIL or UNVERIFIED with its evidence path.
 
 ## Cleanup
 
+- **Rows created on production.** Title every row with the run's prefix (for example `[QA-audit-<date>]`) and record its id in a `created-rows.md` ledger the moment it is created, not at the end. Before deleting, re-read each row and save it as JSON. Delete only ids from the ledger, never by prefix match or from a few example ids, then re-read each one and confirm 404 or absent. Any change you cannot undo (a timestamp, a revision counter, a preference you cannot unset) goes in the ledger with its before and after values. Show the user the full id list, not a sample.
 - Stop the servers you started (TaskStop or the recorded PID); confirm the port is free.
 - `close_page` only your pages.
 - Drop only DB clones you created (`dropdb -h localhost <name>` after its server stops). Never drop `awesome_waves`.
 - Throwaway users: delete the Clerk user first, wait 60–90 s, then the local rows in the FK order in `references/drive-recipe.md` §6. Never delete the shared Clerk test account.
-- Production deletes are irreversible API calls. Delete only exact ids whose rows match a test signature (the run's title prefix, an `example.invalid` URL, the expected status), never ids found by substring search. When the list differs from what the user saw, show the full list and wait for approval. Immediately before each `DELETE`, read that row again by its id and save the full row as JSON under the evidence directory. If it no longer matches the test signature (title, URL or status changed, or it is gone), skip it and report it.
 - Evidence under `.local/verify-evidence/` is never deleted by cleanup.
 
 ## Map
