@@ -90,10 +90,10 @@ function getResourceTags(resource: Resource): string[] {
  * 44px hit area centred on its 24px box, so each row is 44px tall and a tap
  * lands on its own control, never the row above or below.
  */
-function OptionRow({ id, text, checked, onCheckedChange }: { id: string; text: string; checked: boolean; onCheckedChange: (checked: boolean) => void }) {
+function OptionRow({ id, name, text, checked, onCheckedChange }: { id: string; name: string; text: string; checked: boolean; onCheckedChange: (checked: boolean) => void }) {
   return (
     <div className="flex items-center space-x-2 max-lg:min-h-11">
-      <Checkbox className="h-6 w-6" id={id} checked={checked} onCheckedChange={(value) => onCheckedChange(!!value)} />
+      <Checkbox className="h-6 w-6" id={id} name={name} checked={checked} onCheckedChange={(value) => onCheckedChange(!!value)} />
       <label htmlFor={id} className="cursor-pointer text-sm max-lg:flex max-lg:min-h-11 max-lg:flex-1 max-lg:items-center">{text}</label>
     </div>
   );
@@ -804,6 +804,7 @@ export default function ExportTools({
         <div className="space-y-3">
           <label htmlFor="export-format" className="text-sm font-medium">Export Format</label>
           <Select
+            name="export-format"
             value={format}
             onValueChange={(value: ExportFormat) => setFormat(value)}
           >
@@ -839,6 +840,7 @@ export default function ExportTools({
               <OptionRow
                 key={id}
                 id={id}
+                name={`export-${key}`}
                 text={text}
                 checked={exportOptions[key]}
                 onCheckedChange={(checked) => setExportOptions(prev => ({ ...prev, [key]: checked }))}
@@ -869,6 +871,7 @@ export default function ExportTools({
               <OptionRow
                 key={category.name}
                 id={`category-${category.name}`}
+                name={`export-category-${category.slug}`}
                 text={`${category.name} (${categoryCounts[category.name] || 0})`}
                 checked={exportOptions.selectedCategories.includes(category.name)}
                 onCheckedChange={() => toggleCategory(category.name)}

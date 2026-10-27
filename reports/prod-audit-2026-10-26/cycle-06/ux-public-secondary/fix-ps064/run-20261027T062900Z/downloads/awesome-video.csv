@@ -1,0 +1,1859 @@
+Title,URL
+"100ms: RTMP vs WebRTC vs HLS - Live Video Streaming Protocols Compared",https://www.100ms.live/blog/rtmp-vs-webrtc-vs-hls
+"2501world/transcoding-performance-trial: Runs FFmpeg transcoding processes simultaneously and measures CPU performance",https://github.com/2501world/transcoding-performance-trial
+"3 Cases from a Video Expert: Encoding Basics",https://link.medium.com/z6IDbLDWO7
+"3DLUT Creator",https://3dlutcreator.com/
+"4K Media | Free Ultra-HD / HDR / HLG / Dolby Vision 4K Video Demos",https://4kmedia.org/
+"507_hls_authoring_for_airplay_2.",https://devstreaming-cdn.apple.com/videos/wwdc/2019/507fk9wyls0np6piwk/507/507_hls_authoring_for_airplay_2_video.pdf
+"510_validating_http_live_streams.",https://devstreaming-cdn.apple.com/videos/wwdc/2016/510ndmh9wkcvzneegv2/510/510_validating_http_live_streams.pdf
+"515_hls_authoring_update",https://devstreaming-cdn.apple.com/videos/wwdc/2017/515vy4sl7iu70/515/515_hls_authoring_update.pdf
+"9 Best Home Server Apps to Automate Media Management",https://www.smarthomebeginner.com/best-home-server-apps/
+"A Brief History of Video Coding",https://docslib.org/doc/10606874/a-brief-history-of-video-coding
+"A Brief History of Video Compression Standards: 1929 to 2020",https://www.mo4tech.com/a-brief-history-of-video-compression-standards-1929-to-2020.html
+"A Comprehensive Guide To Develop A Live Video & On-demand Video Streaming App",https://raftlabs.medium.com/the-complete-guide-to-build-a-live-streaming-app-learn-the-best-approach-and-tech-stack-263bd67e2915
+"A Docker container with the video streaming tools you need",https://medium.com/@eyevinntechnology/a-docker-container-with-the-video-streaming-tools-you-need-b8319e98f36a
+"A Large-Scale Comparison of x264, x265, and libvpx",https://medium.com/netflix-techblog/a-large-scale-comparison-of-x264-x265-and-libvpx-a-sneak-peek-2e81e88f8b0f
+"A short history of video coding",https://www.slideshare.net/vcodex/a-short-history-of-video-coding?from_m_app=ios
+"AAC Audio Coding Standard - ISO/IEC 14496-3",https://www.iso.org/standard/76383.html
+"abhirooptalasila/AutoSub",https://github.com/abhirooptalasila/AutoSub
+"abinashmeher999/voice-data-extract",https://github.com/abinashmeher999/voice-data-extract
+"Able Player",https://ableplayer.github.io/ableplayer
+"About Frame Rates or Why 29.97?",http://theautomaticfilmmaker.com/blog/2009/2/23/about-frame-rates-or-why-2997.html
+"Academy Color Encoding System (ACES)",https://acescentral.com/
+"active-video/subtitles",https://github.com/active-video/subtitles
+"Ad Creative Signaling in DASH and HLS",https://www.svta.org/project/ad-creative-signaling-in-dash-and-hls/
+"Ad Insertion Sample",https://www.intel.com/content/www/us/en/developer/articles/technical/ad-insertion-sample-powered-by-open-visual-cloud.html
+"Adaptive Streaming with MPEG-DASH and HLS using AWS",https://gist.github.com/PaulRosset/7bf10bf53895b1a53630bc947c8b1834
+"Adjust and Normalize Your Music Files with FFMPEG - Make Tech Easier",https://www.maketecheasier.com/normalize-music-files-with-ffmpeg/
+"Adobe Media Encoder",https://www.adobe.com/products/media-encoder.html
+"Adobe Media Encoder (AME) Guide",https://helpx.adobe.com/media-encoder/user-guide.html
+"adrg/libvlc-go",https://github.com/adrg/libvlc-go
+"Advanced Encryption Techniques: ContentProtection Tags for MPDs and PSSH Boxes for DASH.",https://go.buydrm.com/thedrmblog/advanced_encryption_techniques
+"Advanced Television Systems Committee (ATSC)",https://www.atsc.org/
+"Advanced Video Coding (AVC) - H.264/MPEG-4 Part 10",https://en.wikipedia.org/wiki/Advanced_Video_Coding
+"Advanced Video Coding (AVC) Standard",https://www.itu.int/rec/T-REC-H.264
+"Advances in HTTP Live Streaming - WWDC 2017 - Videos - Apple Developer",https://developer.apple.com/videos/play/wwdc2017/504/
+"Advantech VEGA Video Solutions",https://www.advantech.com/en-us/networks-communications/video/overview
+"Advantech Video Solutions",https://www.advantech.com/en-us/solutions/video-solution
+"Aegisub",http://www.aegisub.org/
+"Aeneas",https://github.com/readbeyond/aeneas
+"afterglow",https://afterglowplayer.com/
+"Agora Video SDK",https://www.agora.io/en/products/video-call-sdk/
+"Agora Video SDK for Android",https://docs.agora.io/en/interactive-live-streaming/get-started/compile-run-sample-project
+"Agora.io Live Streaming SDK",https://www.agora.io/en/products/interactive-live-streaming/
+"aiortc (Python WebRTC)",https://github.com/aiortc/aiortc
+"AK1194/Video-Compression-motion-estimation-block-video-encoder: This repository is about video compression, and more specifically about the motion estimation block (ME block) of a video encoder. It is a research project for developing an efficient motion",https://github.com/AK1194/Video-Compression-motion-estimation-block-video-encoder
+"Akamai Players",https://players.akamai.com/players
+"Akamai Stream Validator",https://players.akamai.com/stream-validator
+"albanie/shot-detection-benchmarks: A comparison of ffmpeg, Shotdetect and PySceneDetect for shot transition detection",https://github.com/albanie/shot-detection-benchmarks
+"aler9/rtsp-simple-server",https://github.com/aler9/rtsp-simple-server
+"alexgand/springer_free_books: Python script to download all Springer books released for free during the 2020 COVID-19 quarantine",https://github.com/alexgand/springer_free_books
+"alfg/docker-bento4",https://github.com/alfg/docker-bento4
+"alfg/docker-nginx-rtmp",https://github.com/alfg/docker-nginx-rtmp
+"Alkl58/NotEnoughAV1Encodes",https://github.com/Alkl58/NotEnoughAV1Encodes
+"Alliance for Open Media (AOMedia)",https://aomedia.org/
+"AllPlayer",https://www.allplayer.org/
+"AlvianPrasetya/transcoding: FFmpeg transcoders benchmark",https://github.com/AlvianPrasetya/transcoding
+"Amara",https://amara.org/
+"amaurypm/transcode2H265",https://github.com/amaurypm/transcode2H265
+"Amazon CloudFront Streaming Tutorials",https://aws.amazon.com/cloudfront/streaming/
+"Amazon Kinesis Video Streams WebRTC SDKs",https://docs.aws.amazon.com/kinesisvideostreams-webrtc-dg/latest/devguide/webrtc-sdks.html
+"Amazon S3 | Fastly Help Guides",https://docs.fastly.com/en/guides/amazon-s3
+"AMD Advanced Media Acceleration (AMA) SDK",https://amd.github.io/ama-sdk/latest/git_hub.html
+"AMD Advanced Media Framework (AMF SDK)",https://gpuopen.com/video-encode-decode/
+"AMD Advanced Media Framework (AMF SDK)",https://github.com/GPUOpen-LibrariesAndSDKs/AMF
+"AMF (Advanced Media Framework)",https://github.com/GPUOpen-LibrariesAndSDKs/AMF/wiki/Guide-for-Video-CODEC-Encoder-App-Developers
+"amiaopensource/cable-bible",https://github.com/amiaopensource/cable-bible
+"aminyazdanpanah/python-ffmpeg-video-streaming",https://github.com/aminyazdanpanah/python-ffmpeg-video-streaming
+"Amity Video SDK",https://www.amity.co/video/sdk
+"An Overview of Emerging Video Coding Standards",https://dl.acm.org/doi/abs/10.1145/3325867.3325873
+"anachirino/bifserver",https://github.com/anachirino/bifserver
+"andressspinetti/video-transcoder",https://github.com/andressspinetti/video-transcoder
+"Android-Video-Trimmer",https://github.com/iknow4x/Android-Video-Trimmer
+"Aniview Android Video Player SDK",https://aniview.com/mobile-sdk/android-sdk/
+"Aniview iOS Video Player SDK",https://aniview.com/mobile-sdk/ios-sdk/
+"Aniview Mobile Video Player SDKs",https://aniview.com/mobile-sdk/
+"Ant Media Server",https://antmedia.io/
+"Ant Media Server Mobile Streaming SDKs",https://antmedia.io/solutions/mobile-streaming-application/
+"Ant Media Server Tutorials",https://mirror.antmedia.io/tutorial/
+"Ant Media Video Streaming Tutorials",https://antmedia.io/tutorial/
+"ant-media/Ant-Media-Server",https://github.com/ant-media/Ant-Media-Server
+"antiboredom/videogrep",https://github.com/antiboredom/videogrep
+"aom - Git at Google",https://aomedia.googlesource.com/aom/
+"AOMedia AV1 Codec Build Instructions",https://aomedia.googlesource.com/aom/+/refs/heads/master/BUILD.md
+"AOMediaCodec/av1-rtp-spec",https://github.com/AOMediaCodec/av1-rtp-spec
+"Apache Traffic Control",https://trafficcontrol.apache.org/
+"Apache Traffic Server",https://trafficserver.apache.org/
+"api.video",https://api.video/
+"api.video In-stream Ads",https://docs.api.video/delivery/ads
+"api.video Live Streaming SDKs",https://docs.api.video/sdks/livestream
+"api.video Player SDKs",https://api.video/catalog/player-sdk/
+"apm1467/videocr",https://github.com/apm1467/videocr
+"Apple Got It Wrong: Encoding Specs for HEVC in HLS ",https://www.streamingmedia.com/Articles/ReadArticle.aspx?ArticleID=121878
+"Apple HLS - IETF RFC8216",https://datatracker.ietf.org/doc/html/draft-pantos-hls-rfc8216bis
+"Apple HLS Tools",https://developer.apple.com/documentation/http-live-streaming/using-apple-s-http-live-streaming-hls-tools
+"Apple Reference Streams",https://developer.apple.com/streaming/examples/
+"Apple Technical Note TN2224 - HLS Best Practices",https://developer.apple.com/library/archive/technotes/tn2224/_index.html
+"Applicaster Video Ads Integration",https://docs.applicaster.com/using-zapp/monetization/video-ads
+"Apprentice Video",https://sourceforge.net/projects/apprenticevideo/
+"Ardour",http://www.ardour.org/
+"artilleryio/artillery-plugin-hls",https://github.com/artilleryio/artillery-plugin-hls
+"Ateme",https://www.ateme.com/
+"Ateme KYRION",https://www.ateme.com/products/kyrion/
+"Ateme NEA",https://www.ateme.com/products/nea/
+"Ateme PILOT",https://www.ateme.com/products/pilot/
+"Ateme TITAN",https://www.ateme.com/products/titan/
+"Ateme+",https://www.ateme.com/products/ateme-plus/
+"Audacity",http://audacity.sourceforge.net/
+"Audio Loudness  |  Conversational Actions  |  Google Developers",https://developers.google.com/assistant/tools/audio-loudness
+"Audio normalization with ffmpeg using loudnorm (ebur128) filter",https://bytesandbones.wordpress.com/2017/03/16/audio-nomalization-with-ffmpeg-using-loudnorm-ebur128-filter/
+"AudioTools Server by Telos Alliance",https://success.telosalliance.com/file-based-audio-processing
+"AudioTrack",https://developer.android.com/reference/android/media/AudioTrack
+"Auto-Editor",https://github.com/WyattBlue/auto-editor
+"Auto-Subs",https://github.com/tmoroney/auto-subs
+"Automated Testing on Devices",https://medium.com/netflix-techblog/automated-testing-on-devices-fc5a39f47e24
+"AutoVideo",https://github.com/datamllab/autovideo
+"AV1 Bitstream & Decoding Specification (1.0.0 with Errata 1)",https://aomediacodec.github.io/av1-spec/av1-spec.pdf
+"AV1 Codec",https://docs.google.com/presentation/d/12_Vewc0SDpB1FycflfT4us9eipRCy0HWJVSaDMDifRs/edit?usp=sharing
+"AV1 decoder model",https://norkin.org/research/av1_decoder_model/
+"AV1 Video Codec",https://aomedia.org/av1/
+"AV1 vs HEVC – Bitmovin Compression Efficiency Results",https://bitmovin.com/av1-showing-greater-compression-efficiency-than-hevc/
+"Avatarify",https://github.com/alievk/avatarify
+"AVC/h264 Video Coding Standard - ISO/IEC 14496-10",https://www.iso.org/standard/83529.html
+"AVC/HEVC in ISOBMFF - ISO/IEC 14496-15",https://www.iso.org/standard/83336.html
+"Avid Media Composer | First",https://my.avid.com/get/media-composer-first
+"Avidemux",http://avidemux.sourceforge.net/
+"AVideo CDN Storage",https://github.com/WWBN/AVideo/wiki/CDN-Storage
+"AviSynth",http://avisynth.nl/index.php/Main_Page
+"AviSynth+",https://avs-plus.net/
+"AVIXA AV Standards",https://www.avixa.org/standards/
+"AVPlayer",https://developer.apple.com/documentation/avfoundation/avplayer
+"AVstandards",https://github.com/digitensions/AVstandards
+"avTranscoder/avTranscoder",https://github.com/avTranscoder/avTranscoder
+"Awesome DASH",https://github.com/yuan-jinghao/awesome-dash
+"Awesome Video",https://awesome.video/
+"Awesome Video: A Curated List of Streaming Video Tools and Resources",https://github.com/krzemienski/awesome-video
+"AWS CDN Video Streaming Service",https://github.com/Shereefo/AWS-CDN-Video-Streaming-Service
+"AWS CloudFront for Live Streaming",https://docs.aws.amazon.com/AmazonCloudFront/latest/DeveloperGuide/live-streaming.html
+"AWS CloudFront Live failover",https://docs.aws.amazon.com/AmazonCloudFront/latest/DeveloperGuide/high_availability_origin_failover.html
+"AWS Elemental Live",https://aws.amazon.com/elemental-live/
+"AWS Elemental Media Services",https://aws.amazon.com/media/
+"AWS Elemental MediaConnect",https://aws.amazon.com/mediaconnect/features/
+"AWS Elemental MediaConvert",https://aws.amazon.com/mediaconvert/
+"AWS Elemental MediaLive",https://aws.amazon.com/medialive/
+"AWS Elemental MediaPackage",https://aws.amazon.com/mediapackage/
+"AWS Elemental MediaTailor",https://aws.amazon.com/mediatailor/
+"AWS Media & Entertainment Cloud Solutions",https://aws.amazon.com/media/resources/
+"AWS Media Services",https://aws.amazon.com/media-services/
+"AWS Media Services Training",https://aws.amazon.com/blogs/training-and-certification/three-free-resources-to-build-skills-in-media-services-workflows/
+"AWS SPEKE Reference Server",https://github.com/awslabs/speke-reference-server
+"awslabs/aws-stale-playlist-detector",https://github.com/awslabs/aws-stale-playlist-detector
+"awslabs/serverless-subtitles",https://github.com/awslabs/serverless-subtitles
+"Axinom DRM Decoders",https://tools.axinom.com/
+"Axinom/cpix-validator: Web app for validating CPIX documents",https://github.com/Axinom/cpix-validator
+"Azure Media Services",https://azure.microsoft.com/en-us/products/media-services/
+"Azure-Samples/batch-python-ffmpeg-tutorial",https://github.com/Azure-Samples/batch-python-ffmpeg-tutorial
+"Back to Basics: Encoding Definition and Adaptive Bitrate",https://bitmovin.com/encoding-definition-bitrates/?utm_campaign=Newsletter&utm_medium=email&_hsenc=p2ANqtz-8MPFxhR7snQrxPYM7Bl3UTEMgOh5ZXoDQCHjLl9lkskqE0IfBhEuz3us39Br-lvA_CnyNmQl6L5wqO6iKOfAJ8HznenQ&_hsmi=79678208&utm_content=79677632&utm_source=hs_email&hsCtaTracking=b8eb0e0a-f292-435e-8b99-719b75d81412%7C367afa65-d810-4c2e-aa2c-c87e897a8942
+"Background on the BAVC Model | Video History Project",https://www.videohistoryproject.org/background-bavc-model
+"BackgroundRemover",https://github.com/nadermx/backgroundremover
+"Banshee",https://bansheemediaplayer.github.io/
+"bash scripts to create VOD HLS stream with ffmpeg almighty (tested on Linux and OS X)",https://gist.github.com/mrbar42/ae111731906f958b396f30906004b3fa
+"bavc/qctools",https://github.com/bavc/qctools
+"BBC Dirac (SMPTE VC-2)",https://github.com/bbc/dirac-research
+"BBC R&D Adaptive Bitrate Test Media",http://rdmedia.bbc.co.uk/
+"BBC R&D Blog (Research & Development)",https://www.bbc.co.uk/rd/blog
+"bbc/audio-offset-finder: Find the offset of an audio file within another audio file",https://github.com/bbc/audio-offset-finder
+"bbc/bigscreen-player",https://github.com/bbc/bigscreen-player
+"bbc/brave",https://github.com/bbc/brave
+"bbc/qtff-parameter-editor",https://github.com/bbc/qtff-parameter-editor
+"bbc/tal",https://github.com/bbc/tal
+"bcoudurier/FFmbc",https://github.com/bcoudurier/FFmbc
+"bcpierce00/unison",https://github.com/bcpierce00/unison
+"Beamr Content-Adaptive Bitrate Encoding",https://www.encoding.com/media-services-overview
+"BemTV",https://github.com/streamroot/bemtv
+"bengarney/list-of-streams",https://github.com/bengarney/list-of-streams
+"Bento",https://github.com/bento-video/bento
+"Bento4 | Fast, Modern Tools and C++ Class Library for all your MP4 and DASH media format needs",https://www.bento4.com/
+"bento4.mp4encrypt",https://www.bento4.com/documentation/mp4encrypt/
+"benvanik/node-transcoding",https://github.com/benvanik/node-transcoding
+"Best Practices for End-to-End Workflow Monitoring | Streaming Video Alliance",https://www.streamingvideoalliance.org/project/best-practices-for-end-to-end-workflow-monitoring/
+"BestMediaPlayer",https://github.com/bestmediaplayer/mediaplayer
+"bfansports/CloudTranscode",https://github.com/bfansports/CloudTranscode
+"Big Buck Bunny (4K UHD Demo)",https://peach.blender.org/
+"BigBlueButton",https://bigbluebutton.org/
+"Binary to base64: Convert between bytes and base64 — Cryptii",https://cryptii.com/pipes/binary-to-base64
+"BingLingGroup/autosub",https://github.com/BingLingGroup/autosub
+"binoculars/aws-lambda-ffmpeg",https://github.com/binoculars/aws-lambda-ffmpeg
+"Bitmovin",https://bitmovin.com/
+"Bitmovin Advertising",https://bitmovin.com/docs/player/articles/advertising
+"Bitmovin CDN Output",https://developer.bitmovin.com/encoding/docs/bitmovin-cdn-output
+"Bitmovin Encoding API",https://bitmovin.com/encoding/
+"Bitmovin Native Player SDKs",https://bitmovin.com/demos/native-sdks
+"Bitmovin Player",https://github.com/bitmovin/bitmovin-player-web-samples
+"Bitmovin Player SDK",https://bitmovin.com/video-player/android-sdk
+"Bitmovin Player SDKs",https://bitmovin.com/delivering-high-quality-video-ios-android-sdks/
+"Bitmovin Player Web SDK",https://developer.bitmovin.com/playback/docs/streaming-drm-protected-content-with-bitmovin-player-web-sdk
+"Bitmovin Streams",https://bitmovin.com/video-streaming-apis-sdks-ovps-explained/
+"Bitmovin Tech Blog",https://bitmovin.com/blog/
+"Bitmovin Test Stream",https://bitmovin.com/demos/stream-test
+"Bitmovin Video Encoding API",https://bitmovin.com/video-encoding/
+"Bitmovin Video Player SDKs",https://bitmovin.com/video-player/
+"Bitmovin Video Streaming APIs and SDKs",https://bitmovin.com/blog/video-streaming-apis-sdks-ovps-explained/
+"bitmovin/libdash",https://github.com/bitmovin/libdash
+"Bitrate Viewer",https://www.winhoros.de/docs/bitrate-viewer/
+"Blackmagic Fusion",https://www.blackmagicdesign.com/products/fusion/
+"BlazingCDN",https://blazingcdn.com/
+"BlazingCDN Integration Best Practices",https://blog.blazingcdn.com/en-us/best-practices-for-cdn-integration-with-existing-it-systems
+"Blender (Video Sequence Editor)",https://www.blender.org/
+"BlendVision: Top 6 Live Streaming Protocols Comparison",https://blendvision.com/en/blog/live-streaming-protocols-comparison
+"bloc97/Anime4K",https://github.com/bloc97/Anime4K
+"bmhayward/Transcode",https://github.com/bmhayward/Transcode
+"BOLA: Near-Optimal Bitrate Adaptation for Online Videos",https://arxiv.org/pdf/1601.06748.pdf
+"BONES: Near-Optimal Neural-Enhanced Video Streaming",https://github.com/UMass-LIDS/bones
+"bookyo/express-ffmpeg",https://github.com/bookyo/express-ffmpeg
+"BoxCast Live Streaming Resources",https://www.boxcast.com/learn
+"bramp/ffmpeg-cli-wrapper",https://github.com/bramp/ffmpeg-cli-wrapper
+"brendanlong/mpeg-ts-inspector: A command-line tool for inspecting MPEG-TS files",https://github.com/brendanlong/mpeg-ts-inspector
+"briandunnington/Redoku",https://github.com/briandunnington/Redoku
+"briandunnington/Roact",https://github.com/briandunnington/Roact
+"Brightcove",https://www.brightcove.com/
+"Brightcove APIs and SDKs",https://www.brightcove.com/platform-and-apis/
+"Brightcove Native Player SDKs",https://www.brightcove.com/en/resources/blog/mobile-sdks-serving-videos-natively-custom-apps/
+"Brightcove Open Source Projects",https://general.support.brightcove.com/general/brightcove-open-source-projects.html
+"Brightcove Player Advertising Integration",https://player.support.brightcove.com/getting-started/learning-guide-video-advertising.html
+"Brightcove Player IMA3 Plugin",https://player.support.brightcove.com/plugins/advertising-ima3.html
+"Brightcove Video Cloud",https://dev.web-origin.brightcove.com/en/online-video-platform/platform-and-apis
+"BrikerMan/BMPlayer",https://github.com/BrikerMan/BMPlayer
+"Broadcasting Technologies",https://github.com/DexxMedialabs/Broadcasting-Technologies-
+"Build a basic Cast Receiver",https://codelabs.developers.google.com/codelabs/cast-receiver/#0
+"Build Your Own Video Compression Service with Rust WASM",https://beendless.com/2024/08/02/Build%20Your%20Own%20Video%20Compression%20Service%20with%20Rust%20WASM/
+"Build Your Own Video Streaming Platform - Linode Tutorial",https://www.classcentral.com/course/youtube-build-your-own-video-streaming-platform-it-s-easier-than-you-might-think-147570
+"Building In-Video Search at Netflix",https://netflixtechblog.com/building-in-video-search-c2f93429d18b
+"Building native video Pins",https://medium.com/pinterest-engineering/building-native-video-pins-7ff89ad3ec33
+"Building Scalable Video Encoding Pipelines Essentials - Tonex Training",https://www.tonex.com/training-courses/building-scalable-video-encoding-pipelines-essentials/
+"Building Scalable Video Encoding Pipelines Training",https://www.tonex.com/training-courses/building-scalable-video-encoding-pipelines-training/
+"ButtleOFX",https://github.com/ButtleOFX/ButtleOFX
+"BuyDRM_KeyOS_PlatformOverview_FUUGO_062118",https://go.buydrm.com/hubfs/BuyDRM_KeyOS_Content_Protection_in_DASH_DASHIF_Workshop_Comcast_August2018-1.pdf
+"Byte Down: Making Netflix’s Data Infrastructure Cost-Effective",https://netflixtechblog.com/byte-down-making-netflixs-data-infrastructure-cost-effective-fee7b3235032
+"bytedance/xgplayer",https://github.com/bytedance/xgplayer
+"BytePlus Live",https://www.byteplus.com/en/topic/86429?title=top-10-tools-for-video-streaming-api-in-2024-byteplus-live-leads-the-pack
+"CADET (Caption and Description Editing Tool)",https://ncamftp.wgbh.org/cadet/
+"CALM Act (FCC Audio Loudness Rules)",https://www.fcc.gov/document/calm-act-guide-industry
+"CAMBI: A Banding Artifact Detector",https://netflixtechblog.com/cambi-a-banding-artifact-detector-ea0f291a4dd8
+"Can ffmpeg extract closed caption data",https://stackoverflow.com/questions/3169910/can-ffmpeg-extract-closed-caption-data
+"Can I use... Support tables for HTML5, CSS3, etc",https://caniuse.com/#search=drm
+"cannonbeach/ott-packager",https://github.com/cannonbeach/ott-packager
+"Captions App",https://topai.tools/s/video-subtitling-tool
+"carlanton/m3u8-parser",https://github.com/carlanton/m3u8-parser
+"carlanton/mpd-tools",https://github.com/carlanton/mpd-tools
+"cash2one/VideoTranscoding-Backend",https://github.com/cash2one/VideoTranscoding-Backend
+"CasparCG",http://casparcg.com/
+"CasparCG",https://github.com/CasparCG/server
+"castlabs/dashencrypt: DASH fragmenter/segmenter and encrypter",https://github.com/castlabs/dashencrypt
+"CCecilia/roku-suite-desktop",https://github.com/CCecilia/roku-suite-desktop
+"CCExtractor/ccextractor: CCExtractor - Official version maintained by the core team",https://github.com/CCExtractor/ccextractor
+"CDN Transcode Sample",https://www.intel.com/content/www/us/en/developer/articles/technical/cdn-transcode-sample-powered-by-open-visual-cloud.html
+"CDN Video Streaming",https://github.com/shaowenwei/cdn-video-streaming
+"CDN Video Uploader and Transcoder",https://github.com/SoftUni/CDN-Video-Uploader
+"cdnbye/hlsjs-p2p-engine",https://github.com/cdnbye/hlsjs-p2p-engine
+"cdnjs",https://cdnjs.com/
+"CEA-608/708 Closed Captioning Standards",https://en.wikipedia.org/wiki/CEA-708
+"Cedexis Openmix (Whitepaper)",https://www.cedexis.com/openmix-application-load-balancer/
+"Celluloid (GNOME MPV)",https://github.com/celluloid-player/celluloid
+"cessen/subs_extract",https://github.com/cessen/subs_extract
+"Ch00k/ffmpy",https://github.com/Ch00k/ffmpy
+"Chimeejs/chimee",https://github.com/Chimeejs/chimee
+"chn-lee-yumi/distributed_ffmpeg_transcoding_cluster: 分布式FFMpeg转码集群。A FFMpeg transcoding cluster runs in variable CPUs, including ARM, x86, and others which can run linux. You can use it to run a RaspberryPi cluster.",https://github.com/chn-lee-yumi/distributed_ffmpeg_transcoding_cluster
+"chrishoffman/brightscript-json",https://github.com/chrishoffman/brightscript-json
+"Chrome Media Internals",https://developer.chrome.com/docs/devtools/media-panel/
+"CineForm SDK",https://gopro.github.io/cineform-sdk/
+"Cinelerra GG Infinity",https://cinelerra-gg.org/
+"cinelerra-cv",https://github.com/cinelerra-cv-team/cinelerra-cv
+"CinePaint",http://www.cinepaint.org/
+"CircleHD Video Transcoding Service",https://www.circlehd.com/products/video-transcoding-service/
+"Circles of Confusion",https://tech.ebu.ch/publicaions/circles-of-confusion
+"Cisco OpenH264",https://github.com/cisco/openh264
+"Cisco Thor Video Codec",https://tools.ietf.org/html/draft-fuldseth-netvc-thor-00
+"Clapper",https://github.com/Rafostar/clapper
+"Clappr",https://github.com/clappr/clappr
+"ClearSlide/Fantastic-Transcoder",https://github.com/ClearSlide/Fantastic-Transcoder
+"ClipBucket",https://github.com/arslancb/clipbucket
+"Closed Captioning and Subtitling Products - MacCaption and CaptionMaker Overview - Telestream",https://www.telestream.net/captioning/overview.htm?utm_campaign=partners&utm_source=itunespartner.apple.com&utm_medium=text_link
+"Cloud-Based Video Streaming",https://github.com/spatil36/Cloud-Based-Video-Streaming
+"Cloudinary",https://cloudinary.com/
+"Cloudinary Cloud Video Streaming",https://cloudinary.com/glossary/cloud-video-streaming
+"Cloudinary Video API",https://cloudinary.com/video_api
+"Cloudinary Video CDN",https://cloudinary.com/guides/web-performance/video-cdn-why-you-need-it-and-top-5-video-cdns
+"Cloudinary Video Management Platform",https://cloudinary.com/blog/introducing_the_complete_video_solution_for_web_and_mobile_developers
+"Cloudinary's Guide on Live Streaming",https://cloudinary.com/guides/live-streaming-video/a-guide-on-live-streaming-and-tips-for-making-it-a-success
+"CMAF for Low Latency Streaming – Bitmovin",https://bitmovin.com/cmaf-low-latency.html
+"CMAF Specification (ISO/IEC 23000-19:2018)",https://www.iso.org/standard/71975.html
+"CMAF.js",https://github.com/Orange-OpenSource/CMAF.js
+"Cobalt",https://cobalt.tools/
+"Coconut DRM and AES Encryption",https://www.coconut.co/features/drm
+"Coconut Video Encoding API",https://www.coconut.co/features/coconut-api
+"Codec Licensing and Web Video Streaming – StreamingMedia",https://www.streamingmedia.com/Articles/ReadArticle.aspx?ArticleID=130184
+"Coding Video: A Practical Guide to HEVC and Beyond",https://www.oreilly.com/library/view/coding-video/9781118711781/c03.xhtml
+"Collection of VMAF Resources",https://streaminglearningcenter.com/blogs/collection-of-vmaf-resources.html
+"ColorlabMD/FFCommand_Engine",https://github.com/ColorlabMD/FFCommand_Engine
+"Comcast/caption-inspector",https://github.com/Comcast/caption-inspector
+"Comcast/cea-extractor",https://github.com/Comcast/cea-extractor
+"Comcast/eel",https://github.com/Comcast/eel
+"Comcast/gots",https://github.com/Comcast/gots
+"Comcast/mamba",https://github.com/Comcast/mamba
+"Comcast/scte35-js",https://github.com/Comcast/scte35-js
+"Common Encryption (CENC) Standard",https://www.iso.org/standard/68042.html
+"Common Encryption - ISO/IEC 23001-7",https://iso.org/standard/84637.html
+"Common Media Library",https://github.com/streaming-video-technology-alliance/common-media-library
+"Common Media Library (CML)",https://www.businesswire.com/news/home/20231019229734/en/Streaming-Video-Technology-Alliance-Announces-First-Public-Open-Source-Repository-Common-Media-Library/
+"Communicating Pictures",https://www.elsevier.com/books/communicating-pictures/bull/978-0-12-405906-1
+"Comparing Video Transport Technologies: Which One is Best for Your Needs?",https://medialooks.com/articles/comparing-video-transport-technologies-which-one-is-best-for-your-needs/
+"Comparison of Streaming Media Software",https://en.wikipedia.org/wiki/Comparison_of_streaming_media_software
+"Comparison of Streaming Protocols",https://gist.github.com/travelhawk/89c17064afcedc9b919d985da37f72fd
+"compile and install latest ffmpeg source as pkg",https://gist.github.com/krzemienski/e51a0b7a6ba77e616f954e516783270c#file-compile-and-install-latest-ffmpeg-source-sh-L2
+"CompressAI",https://arxiv.org/abs/2011.03029
+"ComQi Digital Display Players",https://comqi.com/display-hardware/
+"Content Delivery Video Library (CDVL)",https://www.cdvl.org/
+"Content Protection for HLS with AES-128 Encryption",https://www.theoplayer.com/blog/content-protection-for-hls-with-aes-128-encryption
+"Conviva Streaming Performance Index (Report)",https://www.conviva.com/state-of-streaming/
+"coopernurse/nginx-s3-proxy",https://github.com/coopernurse/nginx-s3-proxy
+"Correcting for audio/video sync issues with the ffmpeg program’s ITSOFFSET switch",https://wjwoodrow.wordpress.com/2013/02/04/correcting-for-audiovideo-sync-issues-with-the-ffmpeg-programs-itsoffset-switch/
+"coturn",https://github.com/coturn/coturn
+"Coursera: AR & Video Streaming Services Emerging Technologies",https://www.coursera.org/learn/ar-technologies-video-streaming
+"cpitkin/openfaas-transcode",https://github.com/cpitkin/openfaas-transcode
+"CrackerCat/video_decrypter",https://github.com/CrackerCat/video_decrypter
+"CrafyVideoJS",https://github.com/chijete/CrafyVideoJS
+"Create a Video Streaming Platform with React",https://www.geeksforgeeks.org/create-a-video-streaming-platform-with-react/
+"Create a Video Trimming App Using ffmpeg.wasm",https://cloudinary.com/blog/guest_post/create-a-video-trimming-app-using-ffmpeg-wasm
+"Create your own video streaming server with Linux",https://opensource.com/article/19/1/basic-live-video-streaming-server
+"create-subtitles",https://github.com/geomedialab/create-subtitles
+"Creating a Master Playlist | Apple Developer Documentation",https://developer.apple.com/documentation/http_live_streaming/example_playlists_for_http_live_streaming/creating_a_master_playlist#overview
+"Creating A Production Ready Multi Bitrate HLS VOD stream - Peer5 P2P Docs",https://docs.peer5.com/guides/production-ready-hls-vod/
+"Creating a secure video-on-demand (VOD) platform using AWS",https://aws.amazon.com/blogs/media/creating-a-secure-video-on-demand-vod-platform-using-aws/
+"creeveliu/HTTPLiveStreamingTools",https://github.com/creeveliu/HTTPLiveStreamingTools
+"CRF Guide (Constant Rate Factor in x264, x265 and libvpx)",https://slhck.info/video/2017/02/24/crf-guide.html
+"crunchyroll/objective_perceptual_analysis",https://github.com/crunchyroll/objective_perceptual_analysis
+"CTA WAVE Low Latency Service Guidelines",https://cta.tech/Research-Standards/Standards/CTA-WAVE
+"CTA | WAVE Project",https://cta.tech/Resources/Standards/WAVE-Project
+"cta-wave/R4WG20-QoE-Metrics",https://github.com/cta-wave/R4WG20-QoE-Metrics
+"CTVideoPlayerView",https://github.com/ChiliLabs/CTVideoPlayerView
+"CUDA GPU Accelerated h264/h265/HEVC Video Encoding with ffmpeg",https://ntown.at/de/knowledgebase/cuda-gpu-accelerated-h264-h265-hevc-video-encoding-with-ffmpeg/
+"cuda/ubuntu16.04/ffmpeg-gpu/Dockerfile · master · nvidia / container-images / samples",https://gitlab.com/nvidia/container-images/samples/blob/master/cuda/ubuntu16.04/ffmpeg-gpu/Dockerfile
+"cwinging/transcode",https://github.com/cwinging/transcode
+"CyTube",https://github.com/calzoneman/sync
+"Daala Codec (Xiph)",https://xiph.org/daala/
+"Dacast Video Streaming Platform",https://www.dacast.com/
+"Daily Video SDKs",https://www.daily.co/products/video-sdk/
+"DaMingShen/SUCacheLoader",https://github.com/DaMingShen/SUCacheLoader
+"DASH & HLS Sample Streams",https://bitmovin.com/mpeg-dash-hls-examples-sample-streams/
+"DASH IF Test Assets Database",https://testassets.dashif.org/#testcase/details/58a5ddaa7459f8cb201b8a6d
+"DASH IF Test Assets Database",https://testassets.dashif.org/#testvector/groupedList
+"Dash IF Test Assets Database",https://testassets.dashif.org/#testvector/list
+"DASH Industry Forum (DASH-IF)",https://dashif.org/
+"Dash JavaScript Player",http://reference.dashif.org/dash.js/latest/samples/dash-if-reference-player/index.html
+"Dash Sequences GPAC Wiki",https://github.com/gpac/gpac/wiki/dash-sequences
+"DASH-IF Conformance Tool",https://github.com/Dash-Industry-Forum/Conformance-Software
+"DASH-IF IOPs",https://dashif.org/guidelines/
+"DASH-IF-IOP-v3.2-diff-3.1.pdf",https://dashif.org/docs/DASH-IF-IOP-v3.2-diff-3.1.pdf
+"Dash-Industry-Forum/cea608.js",https://github.com/Dash-Industry-Forum/cea608.js
+"Dash-Industry-Forum/DASH-IF-Conformance",https://github.com/Dash-Industry-Forum/DASH-IF-Conformance
+"Dash-Industry-Forum/dash-live-source-simulator",https://github.com/Dash-Industry-Forum/dash-live-source-simulator
+"Dash-Industry-Forum/dash.js",https://github.com/Dash-Industry-Forum/dash.js
+"Dash-Industry-Forum/ISOSegmentValidator",https://github.com/Dash-Industry-Forum/ISOSegmentValidator
+"Dash-Industry-Forum/media-tools",https://github.com/Dash-Industry-Forum/media-tools
+"dash-mpd-cli",https://github.com/emarsden/dash-mpd-cli
+"dash-mpd-rs",https://github.com/emarsden/dash-mpd-rs
+"dash-validator-js/README.md at master · Eyevinn/dash-validator-js",https://github.com/Eyevinn/dash-validator-js/
+"Dashif Conformance",https://conformance.dashif.org/
+"Dashif Content Protection List",https://dashif.org/identifiers/content_protection/
+"datarhei Restreamer",https://datarhei.com/
+"Datavideo's 'Getting Started with Streaming' Tutorials",https://www.datavideo.com/ap/page/getting-started-with-streaming/
+"dav1d",https://www.videolan.org/projects/dav1d.html
+"davidbt/djmediastreamer",https://github.com/davidbt/djmediastreamer
+"DaVinci Resolve (Free Edition)",https://www.blackmagicdesign.com/products/davinciresolve
+"Decoding the Video Codec Wars: H.264, HEVC, and AV1 Compared for Streaming",https://flussonic.com/cn/blog/news/evolution-of-video-codecs/
+"Deep Video Analytics",https://github.com/DeepVideoAnalytics/DVA
+"DeepFaceLab",https://github.com/iperov/DeepFaceLab
+"Deepgram Captioning Packages",https://deepgram.com/learn/subtitles-made-easy-deepgram-s-new-open-source-captioning-packages
+"DeepMedia Camera SDK",https://deepmedia.io/
+"Def Video Ads",https://defold.com/assets/defvideoads/
+"Demuxed 2016",https://www.youtube.com/watch?v=kEo2TrXm7F4&list=PLkyaYNWEKcOekC2m9Na77G40Lmhb1bnsK
+"Demuxed 2020",https://www.youtube.com/playlist?list=PLkyaYNWEKcOcDlGjEbpxBe4woCJGHrarN
+"Demuxed Conference Talks (YouTube Channel)",https://www.youtube.com/channel/UCFQoJk-PKfXI4M7qLrH_cCg
+"Demystifying HTML5 Video Player",https://medium.com/@eyevinntechnology/demystifying-html5-video-player-e480846328f0
+"denex/hls-downloader",https://github.com/denex/hls-downloader
+"Deploying KeyOS with AWS Elemental Media Services",https://go.buydrm.com/thedrmblog/deploying-keyos-with-aws-elemental-media-services
+"Design of scheduling and rate-adaptation algorithms for adaptive HTTP streaming · dispar.at Blog",https://dispar.at/blog/2017/07/08/design-of-scheduling-and-rate-adaptation-algorithms-for-adaptive-http-streaming/
+"Deskreen",https://github.com/pavlobu/deskreen
+"DeviLeo/DLGPlayer",https://github.com/DeviLeo/DLGPlayer
+"Devine",https://github.com/devine-dl/devine
+"dhairav/URLSessionHLSDownload",https://github.com/dhairav/URLSessionHLSDownload
+"diego3g/gcloud-node-video-transcoding",https://github.com/diego3g/gcloud-node-video-transcoding
+"Digital Rights Management (DRM) – Everything you need to know",https://bitmovin.com/digital-rights-management-everything-to-know/
+"Digital Rights Management (multi - drm) – aameer.github.io",https://aameer.github.io/articles/digital-rights-management-multi-drm
+"Digital Rights Management Project",https://github.com/davidgmorais/digital-rights-management
+"Digital Subband Video 2 - Open Source Wavelet Codec",https://github.com/LMP88959/Digital-Subband-Video-2
+"Digital Video",https://en.wikipedia.org/wiki/Digital_video
+"Digital Video: How it Works, History, and Formats",https://www.vodpod.com/video/digital/
+"Dionysia",https://github.com/dionysia-dev/dionysia
+"Discover MPEG",https://mpeg.chiariglione.org/about.html
+"DisplayCAL",https://displaycal.net/
+"Distributed Codec Engine (DCE)",https://en.wikipedia.org/wiki/Distributed_Codec_Engine
+"DivFix++",https://sourceforge.net/projects/divfixpp/
+"DivX Converter",https://www.divx.com/en/software/converter/
+"djvergad/dash",https://github.com/djvergad/dash
+"Docker Ffmpeg",https://github.com/linuxserver/docker-ffmpeg
+"Doikki/DKVideoPlayer",https://github.com/Doikki/DKVideoPlayer
+"Dolby Stream Validator",https://ott.dolby.com/OnDelKits_dev/StreamValidator/Start_Here.html
+"Dolby Stream Validator",https://ott.dolby.com/OnDel_tools/validator/Start_Here.html
+"Dolby Vision",https://en.wikipedia.org/wiki/Dolby_Vision
+"Dolby Vision for Content Creators | Dolby Laboratories",https://www.dolby.com/us/en/technologies/dolby-vision/dolby-vision-for-creative-professionals.html
+"Dolby Vision HDR Technology",https://www.dolby.com/technologies/dolby-vision/
+"dolby-encoding-engine/plugins at master · DolbyLaboratories/dolby-encoding-engine",https://github.com/DolbyLaboratories/dolby-encoding-engine/tree/master/plugins
+"Dolby.io Client SDKs",https://docs.dolby.io/streaming-apis/docs/client-sdks
+"DolbyLaboratories/AM-Viewer: Audio Metadata Viewer",https://github.com/DolbyLaboratories/AM-Viewer
+"DolbyLaboratories/dbmd-atmos-parser: Dolby Atmos DBMD Wave Chunk Parser",https://github.com/DolbyLaboratories/dbmd-atmos-parser
+"DolbyLaboratories/dlb_mp4base: The Dolby MP4 streaming muxer (dlb_mp4base) is a software implementation of a muxer of fragmented or unfragmented ISO base media file format (mp4). It supports muxing of Dolby Digital (AC-3), Dolby Digital Plus (E-AC-3), and",https://github.com/DolbyLaboratories/dlb_mp4base
+"DolbyLaboratories/dlb_mp4demux: The Dolby MP4 streaming demuxer (dlb_mp4demux) is a software implementation of a demuxer of fragmented or unfragmented ISO base media file format (mp4). It supports demuxing of Dolby Digital (AC-3), Dolby Digital Plus (E-AC",https://github.com/DolbyLaboratories/dlb_mp4demux
+"DolbyLaboratories/dolby_vision_professional_decoder_plugin",https://github.com/DolbyLaboratories/dolby_vision_professional_decoder_plugin
+"DolbyLaboratories/pmd_tool: pmd_tool is a command line utility that converts between different representations of SMPTE RDD49 metadata",https://github.com/DolbyLaboratories/pmd_tool
+"donmelton/other_video_transcoding",https://github.com/donmelton/other_video_transcoding
+"donmelton/video_transcoding",https://github.com/donmelton/video_transcoding
+"dphang/roku-lib",https://github.com/dphang/roku-lib
+"DPlayer",https://dplayer.diygod.dev/
+"draft-pantos-hls-rfc8216bis-00 - HTTP Live Streaming 2nd Edition",https://tools.ietf.org/html/draft-pantos-hls-rfc8216bis-00#section-5.1
+"DRM Web3 Player Demo",https://github.com/gsofter/drm-player-demo
+"drm_server",https://github.com/gyr66/drm_server
+"drmx-integration-learndash",https://github.com/Haihaisoft/drmx-integration-learndash
+"drmx-integration-tutorlms",https://github.com/Haihaisoft/drmx-integration-tutorlms
+"drmx-integration-woocommerce",https://github.com/Haihaisoft/drmx-integration-woocommerce
+"DSRCorporation/imf-conversion",https://github.com/DSRCorporation/imf-conversion
+"DTube",https://d.tube/
+"DVB captions in media convert",https://docs.aws.amazon.com/mediaconvert/latest/ug/dvb-sub-output-captions.html
+"DVB Inspector",https://sourceforge.net/projects/dvbinspector/
+"DVBlast",https://www.videolan.org/projects/dvblast.html
+"DVBlast - Open Source fast DVB/ASI network streamer! - VideoLAN",http://www.videolan.org/projects/dvblast.html
+"DVBSnoop",http://dvbsnoop.sourceforge.net/
+"Dynamic Adaptive Streaming over HTTP (DASH)",https://en.wikipedia.org/wiki/Dynamic_Adaptive_Streaming_over_HTTP
+"EBU Evaluations of Multichannel Audio Codecs",https://tech.ebu.ch/docs/tech/tech3324.pdf
+"EBU HDR Technology & Innovation",https://tech.ebu.ch/hdr
+"EBU R128 Introduction - Florian Camerer",https://www.youtube.com/watch?v=iuEtQqC-Sqo
+"EBU STL Validator",https://github.com/IRT-Open-Source/ebu-stl-validator
+"EBU-TT Live Interoperability Toolkit",http://ebu.github.io/ebu-tt-live-toolkit/
+"ebu/awesome-broadcasting",https://github.com/ebu/awesome-broadcasting
+"ebu/content-manager",https://github.com/ebu/content-manager
+"ebu/dtt2ip",https://github.com/ebu/dtt2ip
+"ebu/test-engine-live-tools",https://github.com/ebu/test-engine-live-tools
+"ebu/test-engine-ondemand",https://github.com/ebu/test-engine-ondemand
+"Edge Computing with Fastly CDN and Varnish VCL for Authenticated Requests - Endertech",https://endertech.com/blog/edge-computing-fastly-cdn-varnish-vcl-authenticated-requests
+"Edgio CDN",https://edg.io/
+"Editly",https://github.com/mifi/editly
+"egg-bread/hls-to-mp4",https://github.com/egg-bread/hls-to-mp4
+"ElderByte-/docker-java-media",https://github.com/ElderByte-/docker-java-media
+"elements/packages/mux-player",https://github.com/muxinc/elements/tree/main/packages/mux-player
+"Elephants Dream (Open Movie)",https://orange.blender.org/
+"Emby",https://emby.media/
+"Encode HDR with VP9",https://developers.google.com/media/vp9/hdr-encoding
+"EncodeGUI",https://github.com/Alkl58/EncodeGUI
+"Encoding Guidelines by Academy Software Foundation",https://github.com/AcademySoftwareFoundation/EncodingGuidelines
+"Encoding-for-HEVC",https://streaminglearningcenter.com/wp-content/uploads/2018/05/Encoding-for-HEVC-SME-2018-Jan.pdf
+"Encoding.com Resource Library",https://www.encoding.com/resources/
+"Encrypted Media Extensions (W3C Recommendation)",https://www.w3.org/TR/encrypted-media/
+"Encryption & DRM with Multiple Keys — Unified Streaming",https://docs.unified-streaming.com/documentation/package/multiple-keys.html
+"End-to-End Guidelines for UHD Phase A Implementation",https://ultrahdforum.org/phasea-guidelines-description/
+"Enhanced RTMP (E-RTMP)",https://veovera.org/docs/enhanced/enhanced-rtmp-v2
+"Enhancer for YouTube",https://www.mrfdev.com/enhancer-for-youtube
+"epiclabs-io/epic-video-comparator",https://github.com/epiclabs-io/epic-video-comparator
+"epiclabs-io/hls-analyzer",https://github.com/epiclabs-io/hls-analyzer
+"ericgriffin/fflock",https://github.com/ericgriffin/fflock
+"erikkaashoek/Comskip",https://github.com/erikkaashoek/Comskip
+"escaped/django-video-encoding",https://github.com/escaped/django-video-encoding
+"ESP32-TV",https://hackaday.com/2025/03/15/esp32-tv-plays-video-and-sound/
+"essential61/mp4analyser",https://github.com/essential61/mp4analyser
+"estliberitas/node-thumbnails-webvtt",https://github.com/estliberitas/node-thumbnails-webvtt
+"EU AVMSD Accessibility Requirements",https://digital-strategy.ec.europa.eu/en/policies/accessibility-avmsd
+"Evolution of AVS Video Coding Standards: Twenty Years of Innovation and Development",https://link.springer.com/article/10.1007/s11432-021-3461-9
+"Example Project: Video Streaming Platform",https://docs.osaas.io/osaas.wiki/Example-Project%3A-Video-Streaming-Platform.html
+"excalibur-kvrv/m3u8-dl",https://github.com/excalibur-kvrv/m3u8-dl
+"exegersha/network-benchmark",https://github.com/exegersha/network-benchmark
+"ExoPlayer",https://exoplayer.dev/
+"Extending the Browser with WebAssembly",https://web.dev/articles/wasm-av1
+"Extracting contextual information from video assets",https://medium.com/netflix-techblog/extracting-contextual-information-from-video-assets-ee9da25b6008
+"Eyevinn Live Encoding",https://github.com/Eyevinn/live-encoding
+"Eyevinn SRT to RTMP",https://github.com/Eyevinn/srt-rtmp
+"Eyevinn Stream Corruptor",https://github.com/Eyevinn/streaming-onboarding/blob/master/Stream-Corruptor.md
+"Eyevinn Streaming Samples",https://github.com/eyevinn/http-streaming-samples
+"Eyevinn/abr-player-chrome",https://github.com/Eyevinn/abr-player-chrome
+"Eyevinn/adxchange-engine",https://github.com/Eyevinn/adxchange-engine
+"Eyevinn/av1-player",https://github.com/Eyevinn/av1-player
+"Eyevinn/channel-engine",https://github.com/Eyevinn/channel-engine
+"Eyevinn/channel-engine-multiview",https://github.com/Eyevinn/channel-engine-multiview
+"Eyevinn/dash-validator-js",https://github.com/Eyevinn/dash-validator-js
+"Eyevinn/docker-2dash",https://github.com/Eyevinn/docker-2dash
+"Eyevinn/docker-dash-packager",https://github.com/Eyevinn/docker-dash-packager
+"Eyevinn/docker-hevc",https://github.com/Eyevinn/docker-hevc
+"Eyevinn/docker-html5player",https://github.com/Eyevinn/docker-html5player
+"Eyevinn/docker-jit-capture",https://github.com/Eyevinn/docker-jit-capture
+"Eyevinn/docker-serve",https://github.com/Eyevinn/docker-serve
+"Eyevinn/eyevinn-player",https://github.com/Eyevinn/eyevinn-player
+"Eyevinn/fmp4-js",https://github.com/Eyevinn/fmp4-js
+"Eyevinn/hls-cutsegment",https://github.com/Eyevinn/hls-cutsegment
+"Eyevinn/hls-download",https://github.com/Eyevinn/hls-download
+"Eyevinn/hls-origin-scripts",https://github.com/Eyevinn/hls-origin-scripts
+"Eyevinn/hls-playlist-parser",https://github.com/Eyevinn/hls-playlist-parser
+"Eyevinn/hls-relay",https://github.com/Eyevinn/hls-relay
+"Eyevinn/hls-to-dash",https://github.com/Eyevinn/hls-to-dash
+"Eyevinn/hls-ts-analyzer",https://github.com/Eyevinn/hls-ts-analyzer
+"Eyevinn/hls-ts-js",https://github.com/Eyevinn/hls-ts-js
+"Eyevinn/manifestparser",https://github.com/Eyevinn/manifestparser
+"Eyevinn/ott-multiview",https://github.com/Eyevinn/ott-multiview
+"Eyevinn/pseudo-live-playout",https://github.com/Eyevinn/pseudo-live-playout
+"Eyevinn/srt-metadata-extractor",https://github.com/Eyevinn/srt-metadata-extractor
+"Eyevinn/streaming-onboarding",https://github.com/Eyevinn/streaming-onboarding
+"Eyevinn/toolbox",https://github.com/Eyevinn/toolbox
+"Eyevinn/vast-info",https://github.com/Eyevinn/vast-info
+"Eyevinn/vmapproxy",https://github.com/Eyevinn/vmapproxy
+"Eyevinn/vod-to-live",https://github.com/Eyevinn/vod-to-live
+"Eyevinn/vp9-dash",https://github.com/Eyevinn/vp9-dash
+"Facebook Live Video at Facebook: A Technical Deep Dive",https://engineering.fb.com/video-engineering/live-video/
+"FaceSwap",https://github.com/deepfakes/faceswap
+"FairPlay Streaming Developer Guide (Apple)",https://developer.apple.com/documentation/fairplaystreaming
+"FallingSnow/h265ize",https://github.com/FallingSnow/h265ize
+"Fast Video Cataloger Scripting",https://videocataloger.com/feature1/scripting-in-fast-video-cataloger/
+"Fastly CDN",https://www.fastly.com/
+"FastPix Cloud Transcoding",https://www.fastpix.io/blog/cloud-transcoding-choosing-the-right-solution-for-your-video-centric-product
+"fcanas/HLSCore",https://github.com/fcanas/HLSCore
+"FCC Closed Captioning Guidelines",https://www.fcc.gov/consumers/guides/closed-captioning
+"federicocalendino/pysub-parser",https://github.com/federicocalendino/pysub-parser
+"FFAStrans",https://github.com/FFAStrans/FFAStrans
+"FFCreator",https://github.com/tnfe/FFCreator
+"FFMediaToolkit",https://github.com/radek-k/FFMediaToolkit
+"FFmpeg",https://ffmpeg.org
+"FFmpeg and how to use it wrong",https://videoblerg.wordpress.com/2017/11/10/ffmpeg-and-how-to-use-it-wrong/
+"FFmpeg AutoGen (C#)",https://github.com/Ruslan-B/FFmpeg.AutoGen
+"FFmpeg Batch Converter (Windows)",https://ffmpeg-batch.sourceforge.io/
+"FFmpeg CLI (ffmpeg)",https://ffmpeg.org/
+"FFmpeg Decklink HDR Metadata Support",https://lists.ffmpeg.org/pipermail/ffmpeg-devel/2023-July/312425.html
+"FFmpeg Docker Container",https://github.com/tamara-schmitz/ffmpeg-docker-container
+"FFmpeg General Documentation",https://ffmpeg.org/general.html
+"FFmpeg iOS",https://sourceforge.net/projects/ffmpeg-ios/
+"Ffmpeg Scale Benchmark",https://github.com/Saurabh702/ffmpeg-scale-benchmark
+"FFmpeg Threads Command: How it Affects Quality and Performance",https://streaminglearningcenter.com/blogs/ffmpeg-command-threads-how-it-affects-quality-and-performance.html
+"ffmpeg tutorial",http://www.dranger.com/ffmpeg/
+"FFmpeg Utilities Documentation",https://ffmpeg.org/ffmpeg-utils.html
+"FFmpeg Verbose Logging",https://ffmpeg.org/ffmpeg.html#Generic-Options
+"FFmpeg Wiki",https://trac.ffmpeg.org/wiki
+"FFmpeg Wiki: Filtering Guide",https://trac.ffmpeg.org/wiki/FilteringGuide
+"FFmpeg Wiki: H.264 Encoding Guide",https://trac.ffmpeg.org/wiki/Encode/H.264
+"FFmpeg Wiki: H.265 (HEVC) Encoding Guide",https://trac.ffmpeg.org/wiki/Encode/H.265
+"FFmpeg Wiki: Streaming Guide",https://trac.ffmpeg.org/wiki/StreamingGuide
+"ffmpeg-apple-arm64-build",https://github.com/Vargol/ffmpeg-apple-arm64-build
+"ffmpeg-concat",https://github.com/transitive-bullshit/ffmpeg-concat
+"FFmpeg-For-Beginners-Ebook",https://github.com/jdriselvato/FFmpeg-For-Beginners-Ebook
+"ffmpeg-gl-transition",https://github.com/transitive-bullshit/ffmpeg-gl-transition
+"ffmpeg-go",https://github.com/u2takey/ffmpeg-go
+"ffmpeg-static",https://github.com/eugeneware/ffmpeg-static
+"ffmpeg-tools",https://github.com/utility-toolbox/ffmpeg-tools
+"ffmpeg-wasm",https://github.com/wide-video/ffmpeg-wasm
+"FFmpeg.wasm",https://github.com/ffmpegwasm/ffmpeg.wasm
+"ffmpeg.wasm webcam Example",https://gist.github.com/phgoodfriend/e356648e000658fa84ce50865fe3f189
+"FFmpeg/FFmpeg",https://github.com/FFmpeg/FFmpeg
+"FFmpeg/FFV1",https://github.com/FFmpeg/FFV1
+"FfmpegGUI (ffWorks)",https://www.ffworks.net/
+"FFmpegKit",https://github.com/tanersener/ffmpeg-kit
+"ffmprovisr",https://amiaopensource.github.io/ffmprovisr
+"ffsubsync",https://github.com/smacke/ffsubsync
+"FFV1 Codec",https://ffmpeg.org/~michael/ffv1.html
+"FilmLight Baselight STUDENT",https://www.filmlight.ltd.uk/products/editions/student.php
+"First Order Motion Model",https://github.com/AliaksandrSiarohin/first-order-model
+"flavioribeiro/nginx-audio-track-for-hls-module",https://github.com/flavioribeiro/nginx-audio-track-for-hls-module
+"flavioribeiro/nginx-vod-module-fmp4-hls",https://github.com/flavioribeiro/nginx-vod-module-fmp4-hls
+"flavioribeiro/video-thumbnail-generator",https://github.com/flavioribeiro/video-thumbnail-generator
+"Flowplayer",https://flowplayer.com/
+"fluendo/fluster",https://github.com/fluendo/fluster
+"fluent-ffmpeg/node-fluent-ffmpeg",https://github.com/fluent-ffmpeg/node-fluent-ffmpeg
+"Fluid Player",https://github.com/fluid-player/fluid-player
+"Flussonic Media Server",https://flussonic.com/flussonic-media-server/
+"flvmeta",https://github.com/noirotm/flvmeta
+"FOSDEM Video Hardware",https://github.com/FOSDEM/video-hardware
+"Foundry Nuke (Non-commercial)",https://www.foundry.com/products/nuke/non-commercial
+"foxford/react-hls",https://github.com/foxford/react-hls
+"FPGA-Video-Player",https://github.com/sicajc/FPGA-Video-Player
+"FPGAmp",https://github.com/ultraembedded/FPGAmp
+"FPGAmp Media Player",https://hackaday.com/2021/09/28/fpga-media-player-plays-mjpeg-and-mp3/
+"FrameFlow",https://github.com/carsonDB/frameflow
+"FreeJ",https://github.com/freej/freej
+"FreeTube",https://freetubeapp.io/
+"FreeWheel Ad Integration Plugin for Brightcove Player",https://player.support.brightcove.com/plugins/advertising-freewheel.html
+"FreeWheel Ad Management Platform",https://www.freewheel.com/
+"Frei0r Plugins",https://github.com/dyne/frei0r
+"Frequently Asked Questions on High Dynamic Range and Hybrid Log-Gamma",https://downloads.bbc.co.uk/rd/pubs/papers/HDR/BBC_HDRTV_FAQ.pdf
+"From Sys Admin to Netflix SRE",https://www.youtube.com/watch?v=lZI51YzIgVE
+"Fundamentals of Multimedia",https://www.amazon.com/Fundamentals-Multimedia-Texts-Computer-Science/dp/303062126X/
+"fvp",https://www.vecbase.com/p/wang-bin/fvp
+"FVV Live",https://arxiv.org/abs/2007.00558
+"Fyrd/caniuse",https://github.com/Fyrd/caniuse
+"gabek/Amplitude-Brightscript",https://github.com/gabek/Amplitude-Brightscript
+"gabek/SegmentIO-Brightscript",https://github.com/gabek/SegmentIO-Brightscript
+"Galene",https://galene.org/
+"Galicaster",https://github.com/teltek/Galicaster
+"Gaupol",https://otsaloma.io/gaupol/
+"gdavila/easyVmaf",https://github.com/gdavila/easyVmaf
+"Generate MPEG DASH content encrypted with MPEG CENC ClearKey · Dash-Industry-Forum/dash.js Wiki",https://github.com/Dash-Industry-Forum/dash.js/wiki/Generate-MPEG-DASH-content-encrypted-with-MPEG-CENC-ClearKey
+"Generate MPEG-TS from file with ffmpeg",https://medium.com/@eyevinntechnology/generate-mpeg-ts-from-file-with-ffmpeg-7561181e6369?source=userActivityShare-94bccb50d11-1560983471&_branch_match_id=670020142756633081
+"Generative Face Video Coding Techniques and Standardization Efforts: A Review",https://arxiv.org/abs/2311.02649
+"GeneticGenesis/phils-players",https://github.com/GeneticGenesis/phils-players
+"GeoHaber/Video-Transcode",https://github.com/GeoHaber/Video-Transcode
+"georgejecook/rooibos",https://github.com/georgejecook/rooibos
+"GetStream JavaScript Video SDK",https://github.com/GetStream/stream-video-js
+"git-developer/vaapi-video-converter",https://github.com/git-developer/vaapi-video-converter
+"gitfu/manifesto",https://github.com/gitfu/manifesto
+"gkozlenko/node-video-lib",https://github.com/gkozlenko/node-video-lib
+"globocom/hlsclient",https://github.com/globocom/hlsclient
+"globocom/m3u8",https://github.com/globocom/m3u8
+"glut23/webvtt-py",https://github.com/glut23/webvtt-py
+"GMF (Go Media Framework)",https://github.com/3d0c/gmf
+"Gmmlib",https://github.com/intel/gmmlib
+"gnolizuh/BLSS",https://github.com/gnolizuh/BLSS
+"Gnome Subtitles",https://gnomesubtitles.org/
+"GNOME Videos (Totem)",https://apps.gnome.org/Totem/
+"GNU MediaGoblin",https://mediagoblin.org/
+"go-astiav",https://github.com/asticode/go-astiav
+"go-astisub",https://github.com/asticode/go-astisub
+"go-astits",https://github.com/asticode/go-astits
+"go2rtc",https://github.com/AlexxIT/go2rtc
+"goav",https://github.com/giorgisio/goav
+"GOM Player",https://www.gomlab.com/gomplayer-media-player/
+"Google Cloud Media Supply Chain Solutions",https://cloud.google.com/blog/products/media-entertainment/how-cloud-enables-the-media-supply-chain
+"Google Cloud Video Services C++ Client Library",https://googleapis.github.io/google-cloud-cpp/google/cloud/video/
+"Google IMA SDK",https://developers.google.com/interactive-media-ads
+"Google IMA SDK for HTML5",https://developers.google.com/interactive-media-ads/docs/sdks/html5
+"Google IMA SDKs",https://developers.google.com/interactive-media-ads/
+"Google Media Transcoder",https://cloud.google.com/transcoder
+"google/ExoPlayer",https://github.com/google/ExoPlayer
+"google/shaka-player-embedded",https://github.com/google/shaka-player-embedded
+"googleads/google-media-framework-ios",https://github.com/googleads/google-media-framework-ios
+"googlecast/CastReceiver",https://github.com/googlecast/CastReceiver
+"gortsplib",https://github.com/aler9/gortsplib
+"GoSRT",https://github.com/eyevinn/gosrt
+"GPAC MP4Box",https://github.com/gpac/gpac/wiki/mp4box
+"GPAC Project on Advanced Content",https://gpac.io/
+"gpac/gpac",https://github.com/gpac/gpac
+"gpac/mp4box.js",https://github.com/gpac/mp4box.js
+"GPUVideo-android",https://github.com/MasayukiSuda/GPUVideo-android
+"grafov/m3u8",https://github.com/grafov/m3u8
+"GStreamer",https://gstreamer.freedesktop.org/
+"GStreamer Multimedia Framework",https://gstreamer.freedesktop.org
+"gstreamer-rs",https://github.com/sdroege/gstreamer-rs
+"GstWASM",https://fluendo.com/zh-cn/blog/gstwasm-the-open-source-project-for-gstreamer-development-in-the-web/
+"GSYVideoPlayer",https://github.com/CarGuo/GSYVideoPlayer
+"Guide to HEVC/H.265 Encoding and Playback",https://www.techspot.com/article/1131-hevc-h256-enconding-playback/
+"Guide to Mobile Video Streaming with HLS",https://mux.com/blog/mobile-hls-guide/
+"Guidelines for Implementation: DASH-IF Interoperability Points",https://dashif.org/docs/DASH-IF-IOP-v4.3.pdf
+"Guidelines for UHD Phase B Implementation",https://ultrahdforum.org/phaseb-guidelines-description/
+"H.261 Video Compression Standard",https://en.wikipedia.org/wiki/H.261
+"H.264 profiles and levels | Inside & Outside MediaCoder",http://blog.mediacoderhq.com/h264-profiles-and-levels
+"Haivision SRT Gateway",https://www.haivision.com/products/srt-secure-reliable-transport/
+"Haivision SRT Protocol Technical Overview",https://www.haivision.com/resources/white-paper/srt-protocol-technical-overview/
+"Haivision SRT Solutions",https://www.haivision.com/products/srt-solutions/
+"haiwen/seafile",https://github.com/haiwen/seafile
+"HandBrake",https://handbrake.fr/
+"HandBrake HDR Encoding Documentation",https://handbrake.fr/docs/en/latest/technical/hdr.html
+"HandBrake Web",https://github.com/TheNickOfTime/handbrake-web
+"hanton/HTY360Player",https://github.com/hanton/HTY360Player
+"Hardware Video Streaming",https://github.com/bmegli/hardware-video-streaming
+"Hardware-Assisted Video Transcoding At Dailymotion",https://link.medium.com/jfUev36Zs8
+"Harmonic VOS360 Ad",https://www.harmonicinc.com/insights/blog/targeted-ads-innovations/
+"HDMI 2.1: features, specs and news about the latest HDMI standard",https://www.whathifi.com/advice/what-hdmi-21-everything-you-need-to-know
+"HDR Video Evaluation",https://github.com/bbc/hdr-video-evaluation
+"HDR Video Production Guidelines",https://www.atsc.org/atsc-documents/atsc-3-0-nextgen-tv/hdr-video-production-guidelines/
+"HDR Web Video Creator's Guide",https://github.com/igarrison/HDRWebVideoCreatorsGuide
+"HDR10",https://en.wikipedia.org/wiki/HDR10
+"HDR10+ Resources",https://hdr10plus.org/resources/
+"HDRTools",https://github.com/bbc/hdr-tools
+"Helix Universal Server",https://www.realnetworks.com/products/helix-universal-server
+"HESP (High Efficiency Streaming Protocol) Whitepaper",https://download2.diva-cdn.com/files/High%20Efficiency%20Streaming%20Protocol%20(HESP)%20Whitepaper%20v2.0.pdf
+"HEVC DRM Market Update",https://go.buydrm.com/thedrmblog/hevc-drm-market-update
+"HEVC in HLS: 10 Key Questions for Streaming Video Developers",https://www.streamingmedia.com/Articles/ReadArticle.aspx?ArticleID=122637&PageNum=2
+"HEVC/H.265 Encoding Guidelines",https://academysoftwarefoundation.github.io/EncodingGuidelines/EncodeHevc.html
+"HEVC/H.265 Video Coding Standard: Part 1",https://www.youtube.com/watch?v=TLNkK5C1KN8&feature=youtu.be
+"HEVC/H.265 Video Coding Standard: Part 2",https://www.youtube.com/watch?v=V6a1AW5xyAw&feature=youtu.be
+"HEVC/h265 Video Coding Standard - ISO/IEC 23008-2",https://www.iso.org/standard/85457.html
+"High Dynamic Range Television and Hybrid Log-Gamma - BBC R&D",https://www.bbc.co.uk/rd/projects/high-dynamic-range
+"High Efficiency Streaming Protocol (HESP)",https://www.theoplayer.com/hesp
+"High Efficiency Video Coding (HEVC)",https://www.itu.int/rec/T-REC-H.265
+"High Efficiency Video Coding (HEVC) - MPEG-H Part 2",https://www.mpeg.org/standards/mpeg-h/
+"Hippo Video SDK",https://www.hippovideo.io/products/video-sdk.html
+"Historical Timeline of Video Coding Standards and Formats",https://www.vcodex.com/historical-timeline-of-video-coding-standards-and-formats/
+"History of Video Technology",https://public.websites.umich.edu/~evideo/1940.html
+"HitFilm Express",https://fxhome.com/product/hitfilm-express
+"HLG vs PQ Systems for HDR Television",https://www.displaydaily.com/article/display-daily/hlg-vs-pq-systems-for-hdr-television
+"HLS (HTTP Live Streaming)",https://developer.apple.com/streaming/
+"HLS adaptive streaming tutorial with CloudFront & JW Player | Miracle Tutorials",https://www.miracletutorials.com/hls-adaptive-streaming-tutorial-with-cloudfront-jw-player/
+"HLS and Fragmented MP4",https://hlsbook.net/hls-fragmented-mp4/
+"HLS Authoring Specification for Apple Devices | Apple Developer Documentation",https://developer.apple.com/documentation/http_live_streaming/hls_authoring_specification_for_apple_devices
+"HLS vs WebRTC: Comparing Two Video Streaming Protocols",https://blog.phenixrts.com/hls-vs-webrtc-comparing-two-video-streaming-protocols
+"HLS with Widevine for Android - Taku Semba - Medium",https://medium.com/@takusemba/hls-with-widevine-for-android-de3f41027ed2
+"HLS | Bento4",https://www.bento4.com/developers/hls/
+"hls-dash-dl",https://github.com/ssnangua/hls-dash-dl
+"hls.js Low-Latency Playlist Simulator",https://hls-js.netlify.app/demo/?src=LL-HLS_URL
+"hlsjs-p2p-engine",https://cdnbye.github.io/hlsjs-p2p-engine/
+"Home | Streaming Video Alliance",https://www.streamingvideoalliance.org/
+"How Do I Become an ANSI Member",https://www.ansi.org/membership/how_to_join/how_3
+"How to Build a Video Editor with Wasm in React",https://img.ly/blog/how-to-build-a-video-editor-with-wasm-in-react/
+"How to Build a Video Streaming App? - Development Guide 2024",https://theninehertz.com/blog/how-to/build-a-video-streaming-app
+"How to Create a Video Streaming App: A Step-by-Step Guide to Building Your Own Platform",https://repurtech.com/how-to-create-a-video-streaming-app-a-step-by-step-guide-to-building-your-own-platform/
+"How to decode a video (memory file / byte string) and step through it frame by frame in python?",https://stackoverflow.com/questions/60558412/how-to-decode-a-video-memory-file-byte-string-and-step-through-it-frame-by-f
+"How to Develop a Video Streaming Service in 2024",https://toxigon.com/developing-a-video-streaming-service
+"How to generate a fmp4 hls live stream with FFMPEG",https://nomadyun.wordpress.com/2018/04/12/how-to-generate-a-fmp4-hls-live-stream-with-ffmpeg/
+"How to Live Stream: Beginners Guide to Get Started",https://academy.wedio.com/how-to-live-stream/
+"How to Protect Your Content With DRM",https://www.streamingmedia.com/Articles/ReadArticle.aspx?ArticleID=132289&pageNum=2
+"How to Set Audio Levels for Video",https://www.premiumbeat.com/blog/how-to-set-audio-levels-for-video/
+"How To Setup Nginx For HLS Video Streaming On Centos 7",https://dev.to/samuyi/how-to-setup-nginx-for-hls-video-streaming-on-centos-7-3jb8
+"How To Stream Video: A Beginner's Guide",https://www.inetsolutions.org/how-to-stream-video-a-beginners-guide/
+"HOW TO: View an HLS Stream in QuickTime or VLC – Softron Support Desk",https://softron.zendesk.com/hc/en-us/articles/207694617-HOW-TO-View-an-HLS-Stream-in-QuickTime-or-VLC?mobile_site=true
+"How video streaming works on the web: An introduction",https://medium.com/canal-tech/how-video-streaming-works-on-the-web-an-introduction-7919739f7e1
+"HowVideo.works",https://howvideo.works
+"HTTP Live Streaming (HLS)",https://en.wikipedia.org/wiki/HTTP_Live_Streaming
+"HTTP Live Streaming (HLS) - Artillery.io Docs",https://artillery.io/docs/plugin-hls/
+"HunyuanVideo: A Systematic Framework For Large Video Generative Models",https://github.com/Tencent/HunyuanVideo
+"huzhenjie/m3u8_downloader",https://github.com/huzhenjie/m3u8_downloader
+"HVD - Hardware Video Decoder",https://github.com/bmegli/hardware-video-decoder
+"HyBid SDK",https://verve.com/blog/open-source-modular-sdk/
+"Hybrik API Reference",https://docs.hybrik.com/api/v1/HybrikAPI.html?#getting-started
+"hybrik/hybrik-samples",https://github.com/hybrik/hybrik-samples
+"hybrik/hybrik-samples",https://github.com/hybrik/hybrik-samples/blob/master/Feature%20Examples/Filters/ebu_r128_audio_normalization.json
+"Hysia: Serving DNN-Based Video-to-Retail Applications in Cloud",https://github.com/huaizhengZhang/Hysia
+"i4tv/gstreamill",https://github.com/i4tv/gstreamill
+"IBM Cloud Video",https://www.ibm.com/cloud/video
+"IBM Video Streaming: Basics of Streaming Video Production",https://support.video.ibm.com/hc/en-us/articles/207852167-Basics-of-Streaming-Video-Production
+"Icecast",https://icecast.org/
+"id3as/ffmpeg-libvpx-HDR-static",https://github.com/id3as/ffmpeg-libvpx-HDR-static
+"IEC TR 62935:2016 - Measurement Methods for High Dynamic Range Video",https://webstore.iec.ch/en/publication/25463
+"IENT/YUView",https://github.com/IENT/YUView
+"iheartradio/open-m3u8",https://github.com/iheartradio/open-m3u8
+"IHMC Video Codecs",https://github.com/ihmcrobotics/ihmc-video-codecs
+"IINA",https://iina.io/
+"iina/iina",https://github.com/iina/iina
+"ijkplayer",https://github.com/bilibili/ijkplayer
+"iliya-gr/mediasegmenter",https://github.com/iliya-gr/mediasegmenter
+"ilstam/FF-Multi-Converter: GUI File Format Converter",https://github.com/ilstam/FF-Multi-Converter
+"IMA Wrapper",https://github.com/InteractiveAdvertisingBureau/IMA-Wrapper
+"imageio/imageio-ffmpeg",https://github.com/imageio/imageio-ffmpeg
+"ImageKit Video CDN",https://imagekit.io/guides/video-cdn
+"IMF: A Prescription for Versionitis",https://medium.com/netflix-techblog/imf-a-prescription-for-versionitis-e0b4c1865c20
+"Immersive Virtual Production With SMPTE 2110",https://github.com/videofeedback/Immersive-Virtual-Production-With-SMPTE-2110
+"imoreapps/ffmpeg-avplayer-for-ios-tvos",https://github.com/imoreapps/ffmpeg-avplayer-for-ios-tvos
+"Implementation and Analysis of Real-Time Streaming Protocols",https://pmc.ncbi.nlm.nih.gov/articles/PMC5424723/
+"Improving our video encodes for legacy devices",https://link.medium.com/T7S5MS6IT8
+"Improving Our Video Encodes for Legacy Devices",https://netflixtechblog.com/improving-our-video-encodes-for-legacy-devices-9f39f7774850
+"imsanthosh/HLS-Stream-health-monitoring-tool",https://github.com/imsanthosh/HLS-Stream-health-monitoring-tool
+"IMSC 1.0.1 Text test content",https://github.com/w3c/IMSC-1.0.1_Text_TestContent/
+"IMSC 1.1 Image test content",https://github.com/w3c/IMSC-1.1_Image_TestContent/
+"IMSC 1.1 Text test content",https://github.com/w3c/IMSC-1.1_Text_TestContent/
+"IMSC HRM validator",https://github.com/sandflow/imscHRM
+"IMSC Specification",https://www.w3.org/TR/ttml-imsc1.1/
+"IMSC validator",https://apps.sandflow.com/imscV/
+"imscJS: IMSC/TTML/SMPTE-TT/EBU-TT-D renderer",https://github.com/sandflow/imscJS/
+"In-browser Transcoding of Video Files with FFmpeg and WebAssembly",https://blog.scottlogic.com/2020/11/23/ffmpeg-webassembly.html
+"Inca — Message Tracing and Loss Detection For Streaming Data @Netflix",https://link.medium.com/Lu3GnIPeg0
+"InfraRecorder",http://infrarecorder.org/
+"Ingest",https://github.com/Dash-Industry-Forum/Ingest
+"Inkscape",http://www.inkscape.org/
+"Inside MPEG's Ambitious Plan to Launch 3 Video Codecs in 2020",https://www.streamingmedia.com/Articles/Editorial/Featured-Articles/Inside-MPEGs-Ambitious-Plan-to-Launch-3-Video-Codecs-in-2020-134694.aspx
+"Integrate BuyDRM for a Multi-DRM workflow",https://bitmovin.com/integrate-buydrm-multi-drm-system
+"Integrating AirPlay for Long-Form Video Apps | Apple Developer Documentation",https://developer.apple.com/documentation/avfoundation/airplay_2/integrating_airplay_for_long-form_video_apps
+"Integrating FFmpeg with React.js via WebAssembly",https://www.editframe.com/guides/integrating-ffmpeg-with-react.js-via-webassembly
+"Intel Cloud Streaming",https://github.com/intel/cloud-streaming
+"Intel oneAPI Video Processing Library (oneVPL)",https://software.intel.com/content/www/us/en/develop/tools/oneapi/components/onevpl.html
+"intel/intel-vaapi-driver",https://github.com/intel/intel-vaapi-driver
+"intel/libva",https://github.com/intel/libva
+"Intel® Video Processing Library (Intel® VPL)",https://www.intel.com/content/www/us/en/developer/tools/vpl/overview.html
+"Interactive Video Ads Integration Techniques",https://fastercapital.com/content/Interactive-video-ads--Multi-Platform-Integration--Seamless-Multi-Platform-Integration-for-Interactive-Video-Ads.html
+"Internet Friendly Media Encoder (IFME)",https://github.com/Anime4000/IFME
+"Internet Protocol Media Experience (IPMX)",https://en.wikipedia.org/wiki/IPMX
+"Internet Video Streaming — ABR part 1",https://medium.com/@eyevinntechnology/internet-video-streaming-abr-part-1-b10964849e19?source=userActivityShare-94bccb50d11-1559723768&_branch_match_id=664736558865703297
+"Internet Video Streaming — ABR part 2",https://medium.com/@eyevinntechnology/internet-video-streaming-abr-part-2-dbce136b0d7c?source=userActivityShare-94bccb50d11-1559723862&_branch_match_id=664736952377004405
+"Introducing Low-Latency HLS - WWDC 2019 - Videos - Apple Developer",https://developer.apple.com/videos/play/wwdc2019/502
+"Introducing SVT-AV1: a scalable open-source AV1 framework",https://medium.com/netflix-techblog/introducing-svt-av1-a-scalable-open-source-av1-framework-c726cce3103a
+"Introduction to Digital Video Technology",https://wangwei1237.github.io/2020/02/28/Introduction-to-digital-video-technology/
+"Introduction to H.264: (1) NAL Unit | Yumi Chan's Blog",https://yumichan.net/video-processing/video-compression/introduction-to-h264-nal-unit/
+"Introduction to HTTP Live Streaming: HLS on Android and More",https://www.toptal.com/apple/introduction-to-http-live-streaming-hls
+"Introduction to the WebCodec API - Real Time Video Encoding and Display",https://dev.to/ethand91/introduction-to-the-webcodec-api-real-time-video-encoding-and-display-1b54
+"Invidious",https://github.com/iv-org/invidious
+"ireader/media-server",https://github.com/ireader/media-server
+"ironSource Mobile Ad SDK",https://www.is.com/mobile-advertising-sdk/
+"Is it possible to get FFmpeg to use hardware acceleration for HEVC transcoding on macOS?",https://superuser.com/questions/1295957/ffmpeg-and-hardware-acceleration-of-hevc-transcoding-on-mac
+"ISO - ISO/IEC 23009-1:2019 - Information technology — Dynamic adaptive streaming over HTTP (DASH) — Part 1: Media presentation description and segment formats",https://www.iso.org/standard/79329.html
+"ISO Base Media File Format Reference Software",https://github.com/MPEGGroup/isobmff
+"ISO/IEC 14496-12 (MPEG-4 Part 12) ISO Base Media File Format",https://www.iso.org/standard/74428.html
+"ISO/IEC 23009-1:2019",https://www.iso.org/standard/75485.html
+"ISO/IEC 23009-1:2019 (MPEG-DASH)",https://www.iso.org/standard/75440.html
+"ISO/IEC TR 23008-14:2018",https://www.iso.org/standard/72655.html
+"ISO/IEC TR 23008-15:2018",https://www.iso.org/standard/72656.html
+"ITU Guidance for HDR Television Production",https://www.itu.int/hub/publication/r-rep-bt-2408-4-2021/
+"ITU-R BT.2100 - Image Parameter Values for High Dynamic Range Television",https://www.itu.int/rec/R-REC-BT.2100
+"ITU-R BT.2390 - High Dynamic Range Television for Production and International Programme Exchange",https://www.itu.int/hub/publication/r-rep-bt-2390-8-2020/
+"ITU-R Recommendation BT.2100",https://www.itu.int/rec/R-REC-BT.2100/
+"ITU-T P.1204.3 Reference Implementation",https://github.com/Telecommunication-Telemedia-Assessment/bitstream_mode3_p1204_3
+"IvanoBilenchi/Adaptive-Video-Player",https://github.com/IvanoBilenchi/Adaptive-Video-Player
+"IVB - Interactive Video Builder",https://github.com/kleftodimos/IVB-An-interactive-video-builder-that-supports-learning-analytics
+"jamesfining/scte",https://github.com/jamesfining/scte
+"Janus WebRTC Server",https://github.com/meetecho/janus-gateway
+"Janus WebRTC Server",https://janus.conf.meetecho.com/
+"jaskie/PlayoutAutomation",https://github.com/jaskie/PlayoutAutomation
+"JCodec",https://github.com/jcodec/jcodec
+"Jellyfin",https://jellyfin.org/
+"JetAudio",http://www.jetaudio.com/
+"Jitsi Meet",https://jitsi.org/jitsi-meet/
+"Jitsi Meet SDK",https://jitsi.github.io/handbook/docs/dev-guide/dev-guide-mobile
+"jkarthic-akamai/ABR-Broadcaster",https://github.com/jkarthic-akamai/ABR-Broadcaster
+"jliljebl/flowblade",https://github.com/jliljebl/flowblade
+"JNoDuq/videobench",https://github.com/JNoDuq/videobench
+"jnorton001/pycaption-cli",https://github.com/jnorton001/pycaption-cli
+"jonghwanhyeon/python-ffmpeg",https://github.com/jonghwanhyeon/python-ffmpeg
+"jordicenzano/go-ts-segmenter",https://github.com/jordicenzano/go-ts-segmenter
+"JPEG XL Reference Implementation",https://github.com/libjxl/libjxl
+"jPlayer",https://jplayer.org/
+"JRiver Media Center",https://jriver.com/
+"jrottenberg/ffmpeg",https://github.com/jrottenberg/ffmpeg
+"jrottenberg/ffmpeg Docker Images",https://hub.docker.com/r/jrottenberg/ffmpeg
+"jsDelivr",https://www.jsdelivr.com/
+"Jubler",http://www.jubler.org/
+"juliomalves/roku-libs",https://github.com/juliomalves/roku-libs
+"just-work/django-video-transcoding",https://github.com/just-work/django-video-transcoding
+"justdan96/tsMuxer",https://github.com/justdan96/tsMuxer
+"JW Player",https://github.com/jwplayer/jwplayer
+"JW Player (Free Version)",https://www.jwplayer.com/
+"JW Player Advertising",https://www.jwplayer.com/advertising/
+"JW Player Mobile SDKs",https://jwplayer.com/mobile-sdk/
+"Kagami/ffmpeg.js",https://github.com/Kagami/ffmpeg.js
+"Kaltura",https://corp.kaltura.com/
+"Kaltura Community Edition",https://github.com/kaltura/server
+"Kaltura HTML5 Video Player",https://player.kaltura.com/
+"Kaltura Media Transcoding Services",https://knowledge.kaltura.com/help/kaltura-media-transcoding-services-and-technology
+"Kaltura Mobile Video Player SDKs",https://github.com/kaltura/DeveloperPortalDocs/blob/master/documentation/Mobile-Video-Player-SDKs/IntroductionV2.md
+"Kaltura Mobile Video SDK",https://site.kaltura.com/Kaltura_Mobile_Video_SDK_Page.html
+"Kaltura nginx-vod-module",https://github.com/kaltura/nginx-vod-module
+"Kaltura Platform Install Packages",https://github.com/kaltura/platform-install-packages
+"Kaltura Player SDK for Android",https://developer.kaltura.com/player/android/getting-started-android/
+"Kaltura uDRM Module",https://knowledge.kaltura.com/help/drm-support
+"Kaltura Video Advertising",https://corp.kaltura.com/products/video-player/advertising/
+"Kaltura Video Player",https://github.com/kaltura/kaltura-player-js
+"Kapwing",https://thinkbrandedmedia.com/the-best-ai-tools-for-adding-subtitles-improve-your-videos-and-retain-customers/
+"karimkawambwa/roku-framework",https://github.com/karimkawambwa/roku-framework
+"karimkawambwa/roku-framework-example",https://github.com/karimkawambwa/roku-framework-example
+"Kdenlive",https://kdenlive.org/
+"kees/transcode",https://github.com/kees/transcode
+"kewlbear/FFmpeg-iOS-build-script",https://github.com/kewlbear/FFmpeg-iOS-build-script
+"kibotu/Android-FFmpeg-Transcoder",https://github.com/kibotu/Android-FFmpeg-Transcoder
+"kkroening/ffmpeg-python",https://github.com/kkroening/ffmpeg-python
+"KMPlayer",https://www.kmplayer.com/
+"Kodi",https://kodi.tv/
+"Kodi Add-ons (PVR IPTV Simple Client)",https://kodi.tv/addons
+"kodlian/TVVLCPlayer",https://github.com/kodlian/TVVLCPlayer
+"kokorin/Jaffree",https://github.com/kokorin/Jaffree
+"krad/morsel",https://github.com/krad/morsel
+"Kthulu120/liquid_dl",https://github.com/Kthulu120/liquid_dl
+"Kubernetes and FFmpeg (Batch Jobs)",https://kubernetes.io/blog/2018/07/24/kubernetes-batch-processing-state-of-the-art/
+"Kurento Media Server",https://www.kurento.org/
+"Kvazaar HEVC Encoder",https://github.com/ultravideo/kvazaar
+"kwodzicki/video_utils",https://github.com/kwodzicki/video_utils
+"Lagarith Lossless Codec",https://lags.leetcode.net/codec.html
+"Lambda Edge Tutorial",https://docs.aws.amazon.com/AmazonCloudFront/latest/DeveloperGuide/lambda-edge-how-it-works-tutorial.html
+"Lambda@Edge Design Best Practices | Amazon Web Services",https://aws.amazon.com/blogs/networking-and-content-delivery/lambdaedge-design-best-practices/
+"Larix Broadcaster",https://softvelum.com/srt/
+"Larix Broadcaster SDK for Android",https://softvelum.com/larix/android_sdk/
+"Larix Player SDK for Android",https://softvelum.com/player/android_sdk/
+"Larix Player SDKs",https://softvelum.com/mobile/
+"Last-Order/Minyami",https://github.com/Last-Order/Minyami
+"latest HLS Spec",https://tools.ietf.org/html/draft-pantos-hls-rfc8216bis-08
+"LAV Filters",https://github.com/Nevcairiel/LAVFilters
+"LCEVC: Low Complexity Enhancement Video Coding",https://www.lcevc.org/
+"lcy0321/m3u8-downloader",https://github.com/lcy0321/m3u8-downloader
+"LEADTOOLS Audio and Video Processing Filters",https://www.leadtools.com/sdk/multimedia/filters/audio-video-processing-filters
+"LEADTOOLS Multimedia SDK",https://www.leadtools.com/sdk/multimedia
+"leandromoreira/digital_video_introduction",https://github.com/leandromoreira/digital_video_introduction
+"leandromoreira/ffmpeg-libav-tutorial",https://github.com/leandromoreira/ffmpeg-libav-tutorial
+"leandromoreira/http-video-streaming-troubleshooting",https://github.com/leandromoreira/http-video-streaming-troubleshooting
+"leandromoreira/video-containers-debugging-tools",https://github.com/leandromoreira/video-containers-debugging-tools
+"Learned Scalable Video Coding For Humans and Machines",https://github.com/hadipardis/svc
+"LEXI AI-Powered Captioning Toolkit",https://www.ai-media.tv/knowledge-hub/insights/free-captioning-tools/
+"LFLiveKit",https://github.com/LaiFengiOS/LFLiveKit
+"lhls-simple-live-platform",https://slides.com/jordicenzano/deck-973aed
+"libaom",https://aomedia.org/oss/
+"libaom: AV1 Codec Library",https://aomedia.googlesource.com/aom
+"libass-wasm",https://www.npmjs.com/package/libass-wasm
+"Libav",https://libav.org/
+"Libavcodec",https://ffmpeg.org/libavcodec.html
+"libdash",https://bitmovin.com/libdash/
+"libde265",https://github.com/strukturag/libde265
+"libebur128",https://github.com/jiixyj/libebur128
+"libmedia",https://zhaohappy.github.io/libmedia/README_en.html
+"libmpeg2",http://libmpeg2.sourceforge.net/
+"libmpv-wasm",https://github.com/brianhvo02/libmpv-wasm
+"libobjc/SGPlayer",https://github.com/libobjc/SGPlayer
+"librist",https://code.videolan.org/rist/librist
+"Librosa",https://librosa.org/
+"libVLC",https://www.videolan.org/vlc/libvlc.html
+"libvpx",https://www.webmproject.org/code/
+"libvpx (VP8/VP9 Codec Library)",https://github.com/webmproject/libvpx
+"libvpx: VP8/VP9 Codec SDK",https://chromium.googlesource.com/webm/libvpx/
+"libvsd",https://github.com/Parkour-Labs/libvsd
+"libwebm: WebM File Parser",https://chromium.googlesource.com/webm/libwebm/
+"Light Alloy",https://light-alloy.com/
+"lightspark/lightspark",https://github.com/lightspark/lightspark
+"Lightworks",https://lwks.com/lightworks/
+"Live DASH DRM ClearKey Sample (DASH-IF)",https://reference.dashif.org/dash.js/v/latest/samples/drm/clearkey/
+"Live Low-Latency Cloud-based Adaptive Video Streaming Evaluation Framework",https://github.com/cd-athena/LLL-CAdViSE
+"Live Streaming for Dummies: How to Get Started",https://umatechnology.org/live-streaming-for-dummies-how-to-get-started/
+"Live Video Transmuxing/Transcoding: FFmpeg vs TwitchTranscoder, Part 2",https://blog.twitch.tv/live-video-transmuxing-transcoding-ffmpeg-vs-twitchtranscoder-part-ii-4973f475f8a3?source=userActivityShare-94bccb50d11-1561003748&_branch_match_id=670105191114382351&gi=fd8d504494f4
+"Live Video Transmuxing/Transcoding: FFmpeg vs TwitchTranscoder, Part I",https://blog.twitch.tv/en/2017/10/10/live-video-transmuxing-transcoding-f-fmpeg-vs-twitch-transcoder-part-i-489c1c125f28/
+"Live Video Transmuxing/Transcoding: FFmpeg vs TwitchTranscoder, Part I",https://link.medium.com/iws08p9VO7
+"Live Video Transmuxing/Transcoding: FFmpeg vs TwitchTranscoder, Part II",https://link.medium.com/EYVMBQ3VO7
+"Live555 Streaming Media",http://www.live555.com/liveMedia/
+"LiveAPI",https://liveapi.com/
+"Livepeer",https://livepeer.org/
+"LiVES",https://lives-video.com/
+"LiVES Video Editing System",http://lives-video.com/
+"Livestreamer",https://github.com/chrippa/livestreamer
+"liwf616/awesome-live-stream",https://github.com/liwf616/awesome-live-stream
+"Loop file and generate multiple video bitrates muxed in MPEG-TS with ffmpeg",https://medium.com/@eyevinntechnology/loop-file-and-generate-multiple-video-bitrates-muxed-in-mpeg-ts-with-ffmpeg-85658d0b74bb?source=userActivityShare-94bccb50d11-1560983383&_branch_match_id=670019768959110835
+"LordCrainer/transcoding_ffmpeg",https://github.com/LordCrainer/transcoding_ffmpeg
+"Lossless H.264 Codec",https://github.com/inno-v/losslessh264
+"Loudness Explained Page | Music Tribe - TC Electronic",https://www.tcelectronic.com/brand/tcelectronic/loudness-explained#googtrans(en|en)
+"Low Latency Live Streaming",https://docs.google.com/presentation/d/1ZwqWcweR5SqeMBRmJjSukWaHbpdPy-EPYvJCS23_n3U/edit?usp=sharing
+"Low-complexity Deep Video Compression with A Distributed Coding Architecture",https://github.com/Xinjie-Q/Distributed-DVC
+"Luma HDRv",https://computergraphics.on.liu.se/lumahdrv/
+"Lux (Media Downloader)",https://github.com/iawia002/lux
+"luziferius/av1transcoder",https://github.com/luziferius/av1transcoder
+"M2amedia SCTE35 Dump for MPEGTS",https://github.com/m2amedia/scte35dump
+"M3U8Kit/M3U8Parser",https://github.com/M3U8Kit/M3U8Parser
+"madebyhiro/codem-transcode",https://github.com/madebyhiro/codem-transcode
+"madman-android",https://github.com/flipkart-incubator/madman-android
+"mahbubcseju/MPEG-DASH-Downloader",https://github.com/mahbubcseju/MPEG-DASH-Downloader
+"MainConcept Codec SDK",https://www.mainconcept.com/codec-sdk
+"majamee/arch-ffmpeg-gpac",https://github.com/majamee/arch-ffmpeg-gpac
+"majamee/auto-dash-hls",https://github.com/majamee/auto-dash-hls
+"Man in the Middle Proxy",https://github.com/mitmproxy/mitmproxy
+"Manim",https://www.manim.community/
+"mar10/wsgidav",https://github.com/mar10/wsgidav
+"MarcAntoine-Arnaud/wisual",https://github.com/MarcAntoine-Arnaud/wisual
+"MarcinMoskala/VideoPlayView",https://github.com/MarcinMoskala/VideoPlayView
+"Marcos-A/STRCleaner",https://github.com/Marcos-A/STRCleaner
+"markus-perl/ffmpeg-build-script",https://github.com/markus-perl/ffmpeg-build-script
+"master-of-zen/Av1an: Cross-platform command-line AV1 encode toolkit",https://github.com/master-of-zen/Av1an
+"matmoi/create-DASH-HLS",https://github.com/matmoi/create-DASH-HLS/
+"matmoi/create-DASH-HLS",https://github.com/matmoi/create-DASH-HLS
+"Matroska Specification",https://www.matroska.org/
+"Matrox Video Learning Resources",https://video.matrox.com/en/learning/resources
+"matvp91/indigo-player",https://github.com/matvp91/indigo-player
+"matvp91/mixwave",https://github.com/matvp91/mixwave
+"Media Coding Industry Forum (MC-IF)",https://www.mc-if.org/
+"Media Driver",https://github.com/intel/media-driver
+"Media Player Classic - Black Edition (MPC-BE)",https://sourceforge.net/projects/mpcbe/
+"Media Player Classic - Home Cinema (MPC-HC)",https://github.com/clsid2/mpc-hc
+"Media Source Extensions (W3C Recommendation)",https://www.w3.org/TR/media-source/
+"media-toolbox/avbroadcast: avbroadcast - republish media streams for mass consumption",https://github.com/media-toolbox/avbroadcast
+"media-tools",https://github.com/MartinCastroAlvarez/media-tools
+"Media-Transport-Library",https://github.com/OpenVisualCloud/Media-Transport-Library
+"MediaArea Tools (MediaInfo, etc.)",https://mediaarea.net/
+"MediaArea/MediaInfo",https://github.com/MediaArea/MediaInfo
+"MediaBrowser/Emby.Roku",https://github.com/MediaBrowser/Emby.Roku
+"MediaCMS",https://mediacms.io/
+"mediacommon Go Package",https://pkg.go.dev/github.com/bluenviron/mediacommon
+"MediaConch",https://mediaarea.net/MediaConch
+"MediaConversions",https://github.com/thisguyshouldworkforus/MediaConversions
+"mediaelement/mediaelement",https://github.com/mediaelement/mediaelement
+"mediaEngine by nablet GmbH",https://nablet.com/media-engine
+"MediaFlow Proxy",https://github.com/mhdzumair/mediaflow-proxy
+"MediaInfo",https://mediaarea.net/en/MediaInfo
+"MediaMTX",https://github.com/bluenviron/mediamtx
+"MediaMTX (rtsp-simple-server)",https://github.com/aler9/mediamtx
+"MediaMTX SRT",https://github.com/dm-dma/mediamtx_srt
+"mediamtx-rtsp-simple-server",https://github.com/xiejiulong/mediamtx-rtsp-simple-server
+"MediaPlatform Video Delivery Services",https://www.mediaplatform.com/platforms/video-delivery-services/
+"MediaPortal",https://www.team-mediaportal.com/
+"mediasoup",https://mediasoup.org/
+"Medooze Media Server",https://github.com/medooze/media-server
+"Meteorite",https://sourceforge.net/projects/meteorite/
+"MHVideoPhotoGallery",https://github.com/mariohahn/MHVideoPhotoGallery
+"microshow/RxFFmpeg",https://github.com/microshow/RxFFmpeg
+"Microsoft PlayReady",https://www.microsoft.com/playready
+"Microsoft PlayReady Documentation",https://learn.microsoft.com/playready/
+"Microsoft Rocket: Hybrid Edge + Cloud Video Analytics Platform",https://www.microsoft.com/en-us/research/video/microsoft-rocket-hybrid-edge-cloud-video-analytics-platform/
+"Microsoft Word - EZDRM Bento 4 Open Source.docx",https://www.ezdrm.com/Documentation/EZDRM%20Bento%204%20Open%20Source%20v1.0.pdf
+"Middleman SCTE35 104 Parser",https://tools.middleman.tv/scte35-parser
+"mifi/hls-vod",https://github.com/mifi/hls-vod
+"mifi/lossless-cut",https://github.com/mifi/lossless-cut
+"Mile High Video 2018 Proceedings",https://mile-high.video/files/mhv2018
+"Mile High Video 2019 Proceedings",https://mile-high.video/files/mhv2019
+"Milkymist One and Flickernoise",https://en.wikipedia.org/wiki/M-Labs
+"minio/minio",https://github.com/minio/minio
+"MiSTer FPGA",https://github.com/MiSTer-devel/Main_MiSTer
+"MistServer",https://mistserver.org/
+"mitio/useful-ffmpeg-commands: A collection of FFmpeg commands taken from practice",https://github.com/mitio/useful-ffmpeg-commands
+"mkaflowski/HybridMediaPlayer",https://github.com/mkaflowski/HybridMediaPlayer
+"MKVToolNix",https://mkvtoolnix.download/
+"MLT Framework",https://www.mltframework.org/
+"mltframework/mlt",https://github.com/mltframework/mlt
+"MMAction2",https://github.com/open-mmlab/mmaction2
+"MobilePlayer",https://github.com/mobileplayer/mobileplayer-ios
+"MoePlayer/DPlayer",https://github.com/MoePlayer/DPlayer
+"mofo7777/Stackoverflow",https://github.com/mofo7777/Stackoverflow
+"monking/transcode-web-video",https://github.com/monking/transcode-web-video
+"moorthy-g/adaptive-streaming",https://github.com/moorthy-g/adaptive-streaming
+"Moovie.js",https://mooviejs.com/
+"More Efficient Mobile Encodes for Netflix Downloads",https://netflixtechblog.com/more-efficient-mobile-encodes-for-netflix-downloads-625d44b2daef
+"Moscow State University Video Quality Measurement Tool (VQMT)",https://streaminglearningcenter.com/learning/free-must-have-apps-for-video-engineers.html
+"MoviePy",https://zulko.github.io/moviepy/
+"Moving Picture Experts Group (MPEG)",https://mpeg.chiariglione.org/
+"Mozilla-Open-Lab-Etwas/Video-Transcoder",https://github.com/Mozilla-Open-Lab-Etwas/Video-Transcoder
+"mp4-wasm-encoder",https://github.com/mattdesl/mp4-wasm-encoder
+"Mp4Composer-android",https://github.com/MasayukiSuda/Mp4Composer-android
+"mp4dash | Bento4",https://www.bento4.com/documentation/mp4dash/
+"mp4ff",https://github.com/edgeware/mp4ff
+"MP4Joiner & MP4Splitter",https://www.mp4joiner.org/en/
+"MPAI-EEV: AI-Based End-to-End Video Coding Standardization",https://arxiv.org/abs/2309.07589
+"MPEG About",https://www.mpegstandards.org/about-mpeg/
+"MPEG Common media application format (CMAF) for segmented media - ISO/IEC 23000-19",https://www.iso.org/standard/85623.html
+"MPEG DASH - ISO/IEC 23009-01",https://www.iso.org/standard/83314.html
+"MPEG DASH Sample Content Bento4",http://www.bento4.com/developers/dash/dash-sample-content/
+"MPEG DASH Sample Content | Bento4",http://www.bento4.com/developers/dash/dash-sample-content
+"MPEG Essential Video Coding (EVC) Test Model",https://github.com/MPEGGroup/MPEG-EVC-ETM
+"MPEG Event message track format for the ISO base media file format - ISO/IEC 23001-18",https://www.iso.org/standard/82529.html
+"MPEG Explorations",https://www.mpeg.org/standards/Explorations/
+"MPEG File Format Discussions",https://github.com/MPEGGroup/FileFormat
+"MPEG High Efficiency Image File Format (HEIF)",https://nokiatech.github.io/heif/
+"MPEG home page",https://www.mpegstandards.org
+"MPEG Industry Forum",https://en.wikipedia.org/wiki/MPEG_Industry_Forum
+"MPEG Industry Forum (MPEGIF)",https://mpegif.org/
+"MPEG Industry Forum Resources",https://mpegif.org/resources.html
+"MPEG ISOBMFF 'MP4' - ISO/IEC 14496-12",https://www.iso.org/standard/83102.html
+"MPEG Meetings",https://www.mpegstandards.org/meetings/
+"MPEG point cloud compression",https://mpeg-pcc.org
+"MPEG Scene Description for Media",https://github.com/MPEGGroup/Scene-Description
+"MPEG Standards Documentation",https://www.mpeg.org/standards/
+"MPEG Standards Overview by Leonardo Chiariglione",https://leonardo.chiariglione.org/public-life/standards/mpeg/
+"MPEG Standards Video Tutorials",https://mpeg.chiariglione.org/video-tutorials.html
+"MPEG Technical Requirements",https://www.mpeg.org/structure/technical-requirements/
+"MPEG V-PCC Volumetric Video Streaming Starter Kit",https://github.com/Shiyuang-scu/MPEG-V-PCC-Volumetric-Video-Streaming-Starter-Kit
+"MPEG Video Tool Library",https://mpeg.chiariglione.org/standards/mpeg-c/video-tool-library.html
+"MPEG Video Tool Library (VTL)",https://www.iso.org/standard/73398.html
+"MPEG – The Moving Picture Experts Group",https://www.mpeg.org/
+"MPEG-2 Transport Stream Packet Analyser",https://github.com/daniep01/MPEG-2-Transport-Stream-Packet-Analyser
+"MPEG-2: Generic Coding of Moving Pictures and Associated Audio Information",https://www.mpeg.org/standards/mpeg-2/
+"MPEG-4 Part 10 Advanced Video Coding (AVC)",https://www.mpeg.org/standards/MPEG-4/10/
+"MPEG-4: Coding of Audio-Visual Objects",https://www.mpeg.org/standards/mpeg-4/
+"MPEG-5 Standard",https://www.mpeg.org/standards/mpeg-5/
+"MPEG-5: Essential Video Coding (EVC)",https://www.mpeg.org/standards/MPEG-5/1/
+"MPEG-7 Library",https://mpeg7.joanneum.at/mpeg-7-library/references/
+"MPEG-7: Multimedia Content Description Interface",https://www.mpeg.org/standards/mpeg-7/
+"MPEG-DASH",https://mpeg.chiariglione.org/standards/mpeg-dash
+"MPEG-DASH (Dynamic Adaptive Streaming over HTTP)",https://www.dashif.org/
+"MPEG-DASH MPD Python Library",https://github.com/MPEGGroup/DASHSchema
+"MPEG-DASH: Dynamic Adaptive Streaming over HTTP",https://www.mpeg.org/standards/mpeg-dash/
+"MPEG-DASH: The Standard for Multimedia Streaming Over Internet",https://www.mpegstandards.org/wp-content/uploads/whitepapers/html/overwiew.html
+"MPEG-G Genomic Information Representation",https://mpeg-g.org/
+"MPEG-H Audio a Next Generation Audio (NGA) codec - ISO/IEC 23008-3",https://www.iso.org/standard/83525.html
+"MPEG-H High Efficiency Video Coding (HEVC)",https://www.mpeg.org/standards/MPEG-H/2/
+"MPEG-H: High Efficiency Video Coding (HEVC)",https://en.wikipedia.org/wiki/MPEG-H
+"MPEG-I: Immersive Video",https://www.mpeg.org/standards/Explorations/7/
+"MPEG: What Happened?",https://www.streamingmedia.com/Articles/ReadArticle.aspx?ArticleID=141678
+"MPEGDASHPlayer/MPEGDASH-iOS-Player",https://github.com/MPEGDASHPlayer/MPEGDASH-iOS-Player
+"MPEGGroup GitHub Repositories",https://github.com/MPEGGroup
+"MPlayer",http://www.mplayerhq.hu/
+"mpquic-video-streaming",https://github.com/heavycrystal/mpquic-video-streaming
+"mpv",https://mpv.io/
+"MPV Media Player",https://www.opensourcealternative.to/project/mpv
+"mpv-android",https://github.com/mpv-android/mpv-android
+"mpv-player/mpv",https://github.com/mpv-player/mpv
+"mpv.net",https://github.com/stax76/mpv.net
+"mrkjffrsn/RokuFramework",https://github.com/mrkjffrsn/RokuFramework
+"mrpdaemon/mmf",https://github.com/mrpdaemon/mmf
+"mugiseyebrows/mugi-ffmpeg",https://github.com/mugiseyebrows/mugi-ffmpeg
+"multicat",https://www.videolan.org/projects/multicat.html
+"multicoreware / x265 / wiki / Home — Bitbucket",https://bitbucket.org/multicoreware/x265_git/wiki/Home
+"Muvi Flex Mobile SDKs",https://www.muvi.com/flex/mobile-sdk/
+"Muvi Live SDK",https://www.muvi.com/live/features/live-sdk/
+"Muvi Live Streaming SDK",https://www.muvi.com/live/
+"Muvi One SDK",https://www.muvi.com/one/features/software-development-kit/
+"Muvi Player SDK",https://www.muvi.com/player/android-sdk/
+"Muvi Video Player SDK",https://www.muvi.com/player/
+"Muvi's Guide to Setting Up a Video Streaming Server",https://www.muvi.com/blogs/video-streaming-server/
+"Mux HLS Streams",https://test-streams.mux.dev/
+"Mux Live Streaming API",https://www.mux.com/live
+"Mux Video API",https://www.mux.com/
+"Mux's Multi-CDN Strategy (Article)",https://mux.com/blog/multi-cdn-strategy-for-video-streaming/
+"muxinc/hlstools",https://github.com/muxinc/hlstools
+"muxinc/stream.new",https://github.com/muxinc/stream.new
+"MystiQ Video Converter",https://github.com/swl-x/MystiQ
+"MythTV",https://www.mythtv.org/
+"Natron",https://natron.fr/
+"NBCU-UHD-HDR-SDR-Resources-Table-of-Contents",https://github.com/digitaltvguy/NBCU-UHD-HDR-SDR-Resources-Table-of-Contents
+"NBCUniversal UHD HDR-SDR Single Master Production Workflow Recommendation LUTs",https://github.com/digitaltvguy/NBCUniversal-UHD-HDR-SDR-Single-Master-Production-Workflow-Recommendation-LUTs
+"Netflix TechBlog – Official Blog",https://netflixtechblog.com/
+"Netflix Timed Text Style Guide (English)",https://partnerhelp.netflixstudios.com/hc/en-us/articles/215758617-Timed-Text-Style-Guide-General-Requirements
+"Netflix Titus (Container orchestration for video)",https://netflix.github.io/titus/
+"Netflix Video Quality at Scale with Cosmos Microservices",https://netflixtechblog.com/netflix-video-quality-at-scale-with-cosmos-microservices-35cf6047ed83
+"Netflix/vmaf",https://github.com/Netflix/vmaf/
+"nextbreakpoint/ffmpeg4java",https://github.com/nextbreakpoint/ffmpeg4java
+"NextLevelSessionExporter",https://github.com/NextLevel/NextLevelSessionExporter
+"Nginx with nginx-rtmp-module",https://nginx.org/
+"Nginx-RTMP Module",https://github.com/arut/nginx-rtmp-module
+"nickdesaulniers/combine-mpd",https://github.com/nickdesaulniers/combine-mpd
+"nickdesaulniers/netfix",https://github.com/nickdesaulniers/netfix
+"Nimble Streamer",https://wmspanel.com/nimble
+"Nimble Streamer DRM",https://softvelum.com/nimble/drm/
+"njh/dvbshout",https://github.com/njh/dvbshout
+"njh/ts2mpa",https://github.com/njh/ts2mpa
+"nmrony/hlsdownloader",https://github.com/nmrony/hlsdownloader
+"nmrony/hlsdownloader-cli",https://github.com/nmrony/hlsdownloader-cli
+"nod/rokumote",https://github.com/nod/rokumote
+"Node.js Tutorial: How to Build a Video Streaming Application in 10 Minutes",https://hackernoon.com/nodejs-tutorial-how-to-build-a-video-streaming-application-in-10-minutes
+"NodeTube",https://github.com/mayeaux/nodetube
+"noreasonprojects/ModernAVPlayer",https://github.com/noreasonprojects/ModernAVPlayer
+"normalizing Audio",https://www.learndigitalaudio.com/normalize-audio
+"NVIDIA Video Codec SDK",https://developer.nvidia.com/nvidia-video-codec-sdk
+"NVIDIA Video Processing Technologies",https://developer.nvidia.com/video-processing
+"NVIDIA/nvidia-docker",https://github.com/NVIDIA/nvidia-docker
+"NymphCast",https://github.com/MayaPosch/NymphCast
+"nytimes/ios-360-videos",https://github.com/nytimes/ios-360-videos
+"OblivCDN: A Practical Privacy-preserving CDN with Oblivious Content Access",https://arxiv.org/abs/2501.07262
+"Oboe",https://github.com/google/oboe
+"OBS Studio - Streaming with SRT and RIST",https://github.com/obsproject/obs-studio/wiki/Streaming-With-SRT-or-RIST-Protocols
+"OBS Studio - Streaming With SRT or RIST Protocols",https://obsproject.com/wiki/Streaming-With-SRT-Or-RIST-Protocols
+"OBS Studio SRT Support",https://srtlab.github.io/srt-cookbook/apps/obs-studio.html
+"obsproject/obs-studio",https://github.com/obsproject/obs-studio
+"Official Registration Authority for the ISOBMFF family of standards",http://mp4ra.org/
+"okorach/audio-video-tools",https://github.com/okorach/audio-video-tools
+"olaris / olaris-server",https://gitlab.com/olaris/olaris-server
+"Olive Video Editor",https://olivevideoeditor.org/
+"OMXPlayer",https://github.com/popcornmix/omxplayer
+"oneVPL (oneAPI Video Processing Library)",https://github.com/oneapi-src/oneVPL
+"OOONA Tools",https://theiabm.org/bamproducts/online-caption-subtitle-toolkit/
+"Open Broadcast Encoder (OBE)",https://github.com/obecast/obe-rt
+"Open Broadcaster Software | OBS",https://obsproject.com/
+"Open Source Cloud by Eyevinn Technology",https://www.osaas.io/
+"Open Source Embedded Video Player",https://av.tib.eu/media/42094
+"Open Source Media Framework",https://www.intel.com/content/www/us/en/developer/topic-technology/open/opensource-media-framework/overview.html
+"Open Transcoder",https://github.com/ysksuzuki/open-transcoder
+"Open Video Downloader (youtube-dl GUI)",https://github.com/jely2002/youtube-dl-gui
+"Open Visual Cloud",https://github.imc.re/OpenVisualCloud
+"Open-Source Project for MPEG-5 EVC (Essential Video Coding)",https://research.samsung.com/news/Open-Source-Project-for-MPEG-5-EVC-Essential-Video-Coding
+"Open-Source Video Streaming Frameworks Tutorial",https://www.restack.io/p/open-source-video-streaming-tutorial-answer
+"openai/jukebox",https://github.com/openai/jukebox
+"Opencast",https://opencast.org/
+"Opencast",https://github.com/opencast/opencast
+"opencoconut/webvtt-ruby",https://github.com/opencoconut/webvtt-ruby
+"OpenColorIO",https://opencolorio.org/
+"OpenCV",https://opencv.org/
+"OpenCV.js",https://docs.opencv.org/master/d5/d10/tutorial_js_root.html
+"OpenDRM",https://github.com/willkk/opendrm
+"OpenDVC: Open Source Implementation of Deep Video Compression",https://github.com/RenYang-home/OpenDVC
+"OpenELEC",https://openelec.tv/
+"OpenEncoder",https://github.com/openencoder/openencoder
+"openfun/marsha",https://github.com/openfun/marsha
+"OpenFX (OFX)",https://github.com/AcademySoftwareFoundation/openfx
+"OpenH264",https://www.openh264.org/
+"OpenHEVC Decoder",https://github.com/OpenHEVC/openHEVC
+"openHPI/nginx-hls-analyzer",https://github.com/openHPI/nginx-hls-analyzer
+"OpenIMAJ Audio Processing Libraries",https://openimaj.org/openimaj-audio/
+"OpenMAX",https://www.khronos.org/openmax/
+"OpenPlayer.js",https://github.com/openplayerjs/openplayerjs
+"OpenPlayerJS",https://openplayerjs.io/
+"OpenPose",https://github.com/CMU-Perceptual-Computing-Lab/openpose
+"OpenShot Library (libopenshot)",https://github.com/OpenShot/libopenshot
+"OpenShot Video Editor",https://www.openshot.org/
+"openstack/swift",https://github.com/openstack/swift
+"OpenTelemetry Video QoE Metrics (Article)",https://medium.com/@opentelemetry/video-streaming-qoe-monitoring-with-opentelemetry-1d9f3c2e0715
+"OpenVidu",https://openvidu.io/
+"OpenVisualCloud",https://github.com/OpenVisualCloud
+"OpenVisualCloud/Ad-Insertion-Sample",https://github.com/OpenVisualCloud/Ad-Insertion-Sample
+"OpenVisualCloud/CDN-Transcode-Sample",https://github.com/OpenVisualCloud/CDN-Transcode-Sample
+"OpenVisualCloud/Smart-City-Sample",https://github.com/OpenVisualCloud/Smart-City-Sample
+"OpenVLC",https://www.openvlc.org/
+"OpenVVC: A Lightweight Software Decoder for the Versatile Video Coding Standard",https://github.com/OpenVVC/OpenVVC
+"Optimized Shot-Based Encodes for 4K: Now Streaming!",https://netflixtechblog.com/optimized-shot-based-encodes-for-4k-now-streaming-9e4236f07f0d
+"ORI Encoding Guidelines",https://academysoftwarefoundation.github.io/EncodingGuidelines/
+"ORI Encoding Guidelines: HDR Encoding",https://academysoftwarefoundation.github.io/EncodingGuidelines/enctests/HDR_Encoding.html
+"ORI Encoding Guidelines: HDR Reference Source Test Media",https://academysoftwarefoundation.github.io/EncodingGuidelines/enctests/sources/hdr_sources/README.html
+"osk/node-webvtt",https://github.com/osk/node-webvtt
+"osklil/hls-fetch",https://github.com/osklil/hls-fetch
+"ossrs/srs",https://github.com/ossrs/srs
+"OTT Content Delivery",https://medium.com/@eyevinntechnology/ott-content-delivery-b43a35ef24f6
+"OTT Content Delivery– CDN Alternatives",https://medium.com/@eyevinntechnology/ott-content-delivery-cdn-alternatives-cafe75dab71d?source=userActivityShare-94bccb50d11-1560983135&_branch_match_id=670018733519578135
+"OTT Content Delivery– Multi CDN",https://medium.com/@eyevinntechnology/ott-content-delivery-multi-cdn-8cd90ad2628a?source=userActivityShare-94bccb50d11-1560983307&_branch_match_id=670019455010399744
+"Otter.ai",https://otter.ai/
+"Otterbein University Digital Video Tutorials",https://otterbein.libguides.com/ctl_video/videotutorials
+"OvenMediaEngine",https://github.com/AirenSoft/OvenMediaEngine
+"OvenPlayer",https://github.com/airensoft/ovenplayer
+"Overcast",https://www.overcasthq.com/
+"Overview of the H.264/AVC video coding standard - Circuits and Systems for Video Technology, IEEE Transactions on",http://ip.hhi.de/imagecom_G1/assets/pdfs/csvt_overview_0305.pdf
+"Owncast",https://owncast.online/
+"P2P CDN SDK for JavaScript",https://github.com/vadootvpeer/p2p-cdn-sdk-javascript
+"P2P Media Loader",https://github.com/Novage/p2p-media-loader
+"PallyCon DRM CLI Packager",https://pallycon.com/docs/en/multidrm/getting-started/downloads/
+"PallyCon Multi-DRM Cloud",https://aws.amazon.com/marketplace/solutions/media-entertainment/drm/
+"PallyCon Multi-DRM Integration Samples",https://github.com/inka-pallycon/html5-player-drm-samples
+"Panopto Certified Video Capture Appliances",https://www.panopto.com/features/video-recording/video-capture-hardware/
+"Panopto Video Cloud Platform",https://www.panopto.com/features/video-cms/video-cloud/
+"pbs/pycaption",https://github.com/pbs/pycaption
+"peak3d/inputstream.adaptive",https://github.com/peak3d/inputstream.adaptive
+"Peer5 HLS P2P",https://docs.peer5.com/
+"PeerJS",https://peerjs.com/
+"PeerTube",https://joinpeertube.org/
+"Pensieve (Adaptive Bitrate AI Algorithm)",https://github.com/hongzimao/pensieve
+"Per-Title Encode Optimization – Netflix TechBlog",https://netflixtechblog.com/per-title-encode-optimization-7e99442b62a2
+"Per-Title Encoding: 5 Implementation Tips – Bitmovin",https://bitmovin.com/per-title-encoding-5-tips/
+"Periscope VideoViewController",https://github.com/gontovnik/Periscope-VideoViewController
+"phaux/node-ffmpeg-stream",https://github.com/phaux/node-ffmpeg-stream
+"piemonte/Player",https://github.com/piemonte/Player
+"Pion WebRTC",https://github.com/pion/webrtc
+"Pitivi",http://www.pitivi.org/
+"Play your own DRM content on ExoPlayer - Taku Semba - Medium",https://medium.com/@takusemba/play-your-own-drm-content-on-exoplayer-e8ed73d5864c
+"Plex",https://www.plex.tv/
+"PLVC",https://github.com/RenYang-home/PLVC
+"Plyr",https://plyr.io/
+"pokey909/dash_adaptation_simulator",https://github.com/pokey909/dash_adaptation_simulator
+"Ponyboy47/TranscodeVideo",https://github.com/Ponyboy47/TranscodeVideo
+"Popcorn.js",http://popcornjs.org/
+"Port-A-Vid",https://hackaday.com/2021/04/06/escape-to-an-alternate-reality-anywhere-with-port-a-vid/
+"PotPlayer",https://potplayer.daum.net/
+"Process Home Videos",https://github.com/mtlynch/process-home-videos
+"Processing Video Library",https://processing.org/reference/libraries/video/
+"product_video_ads",https://github.com/google/product_video_ads
+"Projekktor",https://www.projekktor.com/
+"prologic/tube",https://github.com/prologic/tube
+"Promising Initial Results with AV1 Testing - Streaming Learning Center",https://streaminglearningcenter.com/blogs/promising-initial-results-with-av1-testing.html
+"Protocol Extension for Low-Latency HLS (Preliminary Specification) | Apple Developer Documentation",https://developer.apple.com/documentation/http_live_streaming/protocol_extension_for_low-latency_hls_preliminary_specification#3291001
+"PryntTrimmerView",https://github.com/HHK1/PryntTrimmerView
+"Pssh box",https://raw.githubusercontent.com/google/shaka-packager/master/packager/tools/pssh/pssh-box.py
+"ptrandev/swift-encoder",https://github.com/ptrandev/swift-encoder
+"PTZOptics Hive Tutorial Series",https://remoteproduction.com/the-best-resources-for-learning-remote-production-technology/
+"Publicly Available MPEG Standards",https://alexzambelli.com/blog/2022/01/13/publicly-and-freely-available-mpeg-standards/
+"puemos/hls-downloader-chrome-extension",https://github.com/puemos/hls-downloader-chrome-extension
+"Puffer (Stanford Live Streaming Research)",https://puffer.stanford.edu/
+"PyAV",https://github.com/PyAV-Org/PyAV
+"PyFFmpeg",https://pypi.org/project/pyffmpeg/
+"pyke369/sffmpeg",https://github.com/pyke369/sffmpeg
+"PySceneDetect",https://github.com/Breakthrough/PySceneDetect
+"pysrt",https://github.com/byroot/pysrt
+"pysubs2",https://github.com/tkarabela/pysubs2
+"python-ffmpeg-video-streaming",https://github.com/quasarstream/python-ffmpeg-video-streaming
+"PyTorchVideo",https://pytorchvideo.org/
+"QADRA",https://github.com/PhoenixVideo/QADRA
+"QCTools",https://mediaarea.net/QCTools
+"QCTools (Quality Control Tools for Video Preservation)",https://bavc.org/programs/preservation/preservation-tools/
+"QCTools Documentation",http://bavc.github.io/qctools/
+"Qencode Cloud Video Services",https://cloud.qencode.com/
+"Qencode Digital Rights Management",https://cloud.qencode.com/drm
+"qi-shun-wang/HLSDownloader",https://github.com/qi-shun-wang/HLSDownloader
+"Qt Multimedia on WebAssembly",https://doc.qt.io/qt-6/qtmultimedia-wasm.html
+"Quality of Experience in Streaming",https://medium.com/@eyevinntechnology/quality-of-experience-in-streaming-5c25355a4111?source=userActivityShare-94bccb50d11-1559724940&_branch_match_id=664741478927428385
+"QUANTEEC Digital Rights Management",https://doc.quanteec.com/advanced-topics/drm/
+"Quantifying packaging overhead",https://mux.com/blog/quantifying-packaging-overhead-2
+"quarkscript/media_works",https://github.com/quarkscript/media_works
+"QUIC (Quick UDP Internet Connections)",https://www.chromium.org/quic/
+"Quick Tutorial: How to Increase Volume in Audacity [2019 Update]",https://www.iskysoft.com/video-editing/how-to-increase-volume-in-audacity.html
+"quodlibet/mutagen",https://github.com/quodlibet/mutagen
+"QWinFF",https://sourceforge.net/projects/qwinff/
+"r-plus/HLSion",https://github.com/r-plus/HLSion
+"Radiant Media Player",https://www.radiantmediaplayer.com/docs/v9/video-ads-documentation.html
+"RaftLabs Guide to Building Video Streaming Apps",https://www.raftlabs.com/blog/build-live-streaming-app-best-approach-tech-stack/
+"RapidBay",https://github.com/manwhoami/RapidBay
+"RAPIQUE",https://github.com/vztu/RAPIQUE
+"Rasbora",https://rasbora.openseawave.com/
+"RawCooked",https://mediaarea.net/RawCooked
+"rclone/rclone",https://github.com/rclone/rclone
+"rdp/ffmpeg-windows-build-helpers",https://github.com/rdp/ffmpeg-windows-build-helpers
+"React Native Media Console",https://github.com/lunatiquecoder/react-native-media-console
+"React Native Video",https://github.com/react-native-video/react-native-video
+"React Native VLC Media Player",https://github.com/razorrun/react-native-vlc-media-player
+"react-native-video IMA SDK Integration",https://thewidlarzgroup.github.io/react-native-video/component/ads
+"react-wasm-video-editor",https://github.com/mike-at-redspace/react-wasm-video-editor
+"ReactPlayer",https://github.com/cookpete/react-player
+"Real-HDRV",https://github.com/yungsyu99/Real-HDRV
+"Real-Time Streaming Protocol (RTSP)",https://www.ietf.org/rfc/rfc2326.txt
+"realeyes-media/alpine-bento-ffmpeg",https://github.com/realeyes-media/alpine-bento-ffmpeg
+"realeyes-media/alpine-node-video-multitool",https://github.com/realeyes-media/alpine-node-video-multitool
+"realeyes-media/demo-encoder",https://github.com/realeyes-media/demo-encoder/
+"realeyes-media/demo-encoder",https://github.com/realeyes-media/demo-encoder
+"Rebuilding Netflix Video Processing Pipeline with Microservices",https://netflixtechblog.com/rebuilding-netflix-video-processing-pipeline-with-microservices-7ed3d6f805bf
+"Rec. 2020",https://en.wikipedia.org/wiki/Rec._2020
+"Rec. 2100",https://en.wikipedia.org/wiki/Rec._2100
+"Red5 Media Server",https://www.red5.net/open-source-live-streaming/
+"Red5 Pro",https://www.red5.net/
+"Red5 Pro Mobile Live Video Streaming SDK",https://www.red5.net/blog/mobile-live-video-streaming-sdk/
+"Red5 Pro Mobile SDKs",https://www.red5.net/live-video-streaming-native-sdks/
+"Red5/red5-server",https://github.com/Red5/red5-server
+"Remotion",https://www.remotion.dev/
+"Renee Video Editor Pro",https://www.reneelab.com/add-subtitles-to-video.html
+"renzifeng/ZFPlayer",https://github.com/renzifeng/ZFPlayer
+"RepairTools (AVI & MKV)",https://github.com/fifonik/RepairTools
+"Restreamer",https://github.com/datarhei/restreamer
+"Rev.com",https://www.rev.com/
+"REVC",https://github.com/revc/revc
+"Rewatch",https://www.rewatch.com/
+"RFC 8216: HTTP Live Streaming (HLS)",https://datatracker.ietf.org/doc/html/rfc8216
+"rffmpeg",https://github.com/joshuaboniface/rffmpeg
+"RIFE (AI Frame Interpolation)",https://github.com/hzwer/arXiv2020-RIFE
+"rinsuki/HWAcceleratedVP9Player",https://github.com/rinsuki/HWAcceleratedVP9Player
+"Riot Games Keeps League of Legends Esports Rolling With Fully Cloud-Based Virtualized Workflow",https://www.sportsvideo.org/2020/03/27/riot-games-keeps-league-of-legends-esports-rolling-with-fully-cloud-based-virtualized-production-workflow/
+"Rise Vision Media Player Hardware as a Service",https://www.risevision.com/rise-vision-media-player-hardware-as-a-service
+"RIST Forum",https://www.rist.tv/
+"ristreceiver and ristsender",https://code.videolan.org/rist/librist/-/wikis/LibRIST%20Documentation
+"rkoshak/sensorReporter",https://github.com/rkoshak/sensorReporter
+"rokucommunity/brighterscript-formatter",https://github.com/RokuCommunity/brighterscript-formatter
+"rokucommunity/vscode-brightscript-language",https://github.com/rokucommunity/vscode-brightscript-language
+"rokudev/automated-channel-testing",https://github.com/rokudev/automated-channel-testing
+"rokudev/dolby-audio-sample",https://github.com/rokudev/dolby-audio-sample
+"rokudev/RAF4RSG-sample",https://github.com/rokudev/RAF4RSG-sample
+"rokudev/samples",https://github.com/rokudev/samples
+"rokudev/SceneGraphDeveloperExtensions",https://github.com/rokudev/SceneGraphDeveloperExtensions
+"rokudev/SDK-Development-Guide",https://github.com/rokudev/SDK-Development-Guide
+"rokudev/unit-testing-framework",https://github.com/rokudev/unit-testing-framework
+"rokudev/videoplayer-channel",https://github.com/rokudev/videoplayer-channel
+"rolandoislas/BrightWebSocket",https://github.com/rolandoislas/BrightWebSocket
+"Rolinh/VQMT",https://github.com/Rolinh/VQMT
+"RootEncoder",https://github.com/pedroSG94/RootEncoder
+"rounce/nginx-hls-module",https://github.com/rounce/nginx-hls-module
+"Roverr/rtsp-stream",https://github.com/Roverr/rtsp-stream
+"RTMP (Real-Time Messaging Protocol)",https://www.adobe.com/devnet/rtmp.html
+"RTMP vs. RTSP: Which Protocol Should You Choose?",https://www.wowza.com/blog/rtmp-vs-rtsp-which-protocol-should-you-choose
+"RTMP vs. WebRTC vs. HLS - A Comparison of Streaming Protocols",https://dyte.io/blog/rtmp-webrtc-hls/
+"RTMPDump",https://rtmpdump.mplayerhq.hu/
+"RTP (Real-time Transport Protocol)",https://tools.ietf.org/html/rfc3550
+"RTP Benchmarks",https://github.com/ultravideo/rtp-benchmarks
+"RTSP (Real-Time Streaming Protocol)",https://tools.ietf.org/html/rfc2326
+"ruffle-rs/ruffle",https://github.com/ruffle-rs/ruffle
+"Running FFmpeg on AWS Lambda for 1.9% the cost of AWS Elastic Transcoder",https://intoli.com/blog/transcoding-on-aws-lambda/
+"sambios/ffmpeg_transcoder",https://github.com/sambios/ffmpeg_transcoder
+"Samples players for dash.js",http://reference.dashif.org/dash.js/latest/samples/index.html
+"sampotts/plyr",https://github.com/sampotts/plyr
+"Samsung/HbbPlayer",https://github.com/Samsung/HbbPlayer
+"sangwonl/python-mpegdash",https://github.com/caststack/python-mpegdash
+"sannies/isoviewer: GUI application to have closer look ISO 14496-12 and other MP4 files.",https://github.com/sannies/isoviewer
+"sannies/mp4parser: A Java API to read, write and create MP4 files",https://github.com/sannies/mp4parser
+"Saving on Encoding and Streaming: Deploy Capped CRF – Streaming Learning Center",https://streaminglearningcenter.com/blogs/saving-encoding-streaming-deploy-capped-crf.html
+"sbraz/pymediainfo: A Python wrapper around the MediaInfo library",https://github.com/sbraz/pymediainfo
+"SBTVD Forum",https://en.wikipedia.org/wiki/SBTVD_Forum
+"Scalable, Parallel Video Transcoding on Ubuntu",https://blog.dustinkirkland.com/2014/07/scalable-parallel-video-transcoding-on.html
+"schedules/dl",https://github.com/schedules/dl
+"schtanislau/brightscript-state-machine",https://github.com/schtanislau/brightscript-state-machine
+"scikit-video",https://github.com/aizvorski/scikit-video
+"scivision/PyLivestream",https://github.com/scivision/PyLivestream
+"ScreenToGif",https://www.screentogif.com/
+"SCTE-104/35 and Beyond: A Look at Ad Insertion in an OTT World",https://www.tvtechnology.com/opinions/scte10435-and-beyond-a-look-at-ad-insertion-in-an-ott-world
+"SDVoE Alliance",https://sdvoe.org/
+"Secure HLS streaming using DRM encryption",https://www.wowza.com/docs/how-to-secure-apple-hls-streaming-using-drm-encryption
+"Secure Reliable Transport (SRT) Protocol Specification",https://datatracker.ietf.org/doc/html/draft-sharabayko-srt
+"Secure Video Streaming with Signed URLs",https://github.com/KHAOUITI-Apps/CDN
+"Securing OTT Content — DRM",https://medium.com/@eyevinntechnology/securing-ott-content-drm-1af2c08fdd31?source=userActivityShare-94bccb50d11-1560983518&_branch_match_id=670020366479331042
+"Selene Media Encoder",https://github.com/teejee2008/selene
+"selsamman/react-native-transcode",https://github.com/selsamman/react-native-transcode
+"selsta/hlsdl",https://github.com/selsta/hlsdl
+"Sendbird Live",https://www.tribuneindia.com/news/impact-feature/top-10-live-streaming-apis-sdks-for-mobile-and-web-apps-590709
+"Sendbird Live SDKs",https://sendbird.com/products/live-streaming/sdk
+"senko/avtk",https://github.com/senko/avtk
+"Seriously.js",https://github.com/brianchirls/Seriously.js
+"Server-less Just-in-Time Packaging with AWS Fargate and Unified Origin by Unified Streaming",https://medium.com/@eyevinntechnology/server-less-just-in-time-packaging-with-aws-fargate-and-unified-origin-by-unified-streaming-c1682dc051ca?source=userActivityShare-94bccb50d11-1559724204&_branch_match_id=664738392430917730
+"Server-less Just-in-Time Packaging with AWS Fargate and Unified Origin by Unified Streaming",https://medium.com/@eyevinntechnology/server-less-just-in-time-packaging-with-aws-fargate-and-unified-origin-by-unified-streaming-c1682dc051ca?source=userActivityShare-94bccb50d11-1560983627&_branch_match_id=670020794794030328
+"Server-less Video Backend",https://medium.com/@eyevinntechnology/server-less-video-backend-1a142d1d2ba
+"Server-Side Ad Insertion (SSAI) Plugin for Brightcove Player",https://player.support.brightcove.com/plugins/advertising-ssai.html
+"Server-Side Ad Insertion Techniques",https://www.tothenew.com/blog/techniques-for-online-video-ad-integration/
+"server-side-wasm-video-editing",https://github.com/second-state/server-side-wasm-video-editing
+"serverlesspub/ffmpeg-aws-lambda-layer",https://github.com/serverlesspub/ffmpeg-aws-lambda-layer
+"Shaka Packager",https://github.com/google/shaka-packager
+"Shaka Packager – opensource.google",https://opensource.google/projects/shaka-packager
+"Shaka Player",https://github.com/shaka-project/shaka-player
+"Shaka Player Embedded",https://github.com/shaka-project/shaka-player-embedded
+"ShaoWeiguo/dlb_mp4demux: The Dolby MP4 streaming demuxer (dlb_mp4demux) is a software implementation of a demuxer of fragmented or unfragmented ISO base media file format (mp4). It supports demuxing of Dolby Digital (AC-3), Dolby Digital Plus (E-AC-3), an",https://github.com/ShaoWeiguo/dlb_mp4demux
+"shawnsky/extract-subtitles",https://github.com/shawnsky/extract-subtitles
+"shengbinmeng/dash-drm",https://github.com/shengbinmeng/dash-drm
+"shimberger/gohls",https://github.com/shimberger/gohls
+"shinobizero/audio_transcriber",https://github.com/shinobizero/audio_transcriber
+"ShortGPT",https://github.com/RayVentura/ShortGPT
+"Shotcut",https://shotcut.org/
+"shrimpgo/video-downloader",https://github.com/shrimpgo/video-downloader
+"Shutter Encoder",https://www.shutterencoder.com/en/
+"Shutter Encoder",https://www.shutterencoder.com/
+"silencecorner/jre-ffmpeg-apline",https://github.com/silencecorner/jre-ffmpeg-apline
+"SIMID",https://github.com/InteractiveAdvertisingBureau/SIMID
+"Simple Binary Encoding (SBE)",https://github.com/real-logic/simple-binary-encoding
+"SimpleVideoCutter",https://github.com/bartekmotyl/simple-video-cutter
+"Sintel (Open Movie)",https://durian.blender.org/
+"sitkevij/mp",https://github.com/sitkevij/mpi
+"sjbarag/brs-testbed",https://github.com/sjbarag/brs-testbed
+"SJVideoPlayer",https://github.com/changsanjiang/SJVideoPlayer
+"slhck/ffmpeg-bitrate-stats",https://github.com/slhck/ffmpeg-bitrate-stats
+"slhck/ffmpeg-debug-qp",https://github.com/slhck/ffmpeg-debug-qp
+"slhck/ffmpeg-encoding-course",https://github.com/slhck/ffmpeg-encoding-course
+"slhck/ffmpeg-normalize",https://github.com/slhck/ffmpeg-normalize#examples
+"slhck/ffmpeg-quality-metrics",https://github.com/slhck/ffmpeg-quality-metrics
+"slhck/rate-control-tests: Tests for different rate control modes in x264",https://github.com/slhck/rate-control-tests
+"slhck/scenecut-extractor",https://github.com/slhck/scenecut-extractor
+"slowmoVideo",http://slowmovideo.granjow.net/
+"smacke/subsync",https://github.com/smacke/subsync
+"Smithsonian Video Format Resources",https://www.si.edu/tbma/video-format-resources
+"SMPlayer",https://smplayer.sourceforge.io/
+"SMPTE 2110",https://en.wikipedia.org/wiki/SMPTE_2110
+"SMPTE HDR, 4K, and Beyond Webcast",https://www.smpte.org/webcast-events/hdr-4k-and-beyond
+"SMPTE ST 2084:2014 - High Dynamic Range Electro-Optical Transfer Function",https://ieeexplore.ieee.org/document/7291452
+"SMPTE Standards",https://www.smpte.org/standards/overview
+"SMPTE Standards Projects",https://www.smpte.org/projects
+"SMPTE Virtual Course on HDR",https://www.smpte.org/virtual-course/hdr
+"SMPTE Virtual Course – Essentials of Video Compression",https://education.smpte.org/courses/course-v1:SMPTE+VC101+2019/about
+"SMTube",https://github.com/smplayer-dev/smtube
+"SmurfManX/ffmpeg-nvidia-adaptive-vod-transcoder",https://github.com/SmurfManX/ffmpeg-nvidia-adaptive-vod-transcoder
+"snickers/snickers",https://github.com/snickers/snickers
+"Snowmix - The Swiss Army Knife of Open Source Live Video Mixing.",https://snowmix.sourceforge.io
+"Society of Motion Picture and Television Engineers (SMPTE)",https://www.smpte.org/
+"soldiermoth/hlsq",https://github.com/soldiermoth/hlsq
+"SoulMelody/hls-get",https://github.com/SoulMelody/hls-get
+"SoX (Sound eXchange)",http://sox.sourceforge.net/
+"SponsorBlock",https://github.com/ajayyy/SponsorBlock
+"SpotLink",https://www.tvtechnology.com/news/free-opensource-software-introduced-for-dynamic-ad-insertion
+"SpotX Video Ad Integration Plugin",https://player.support.brightcove.com/plugins/advertising-spotx.html
+"SpotX Video Ad Serving Platform",https://www.spotx.tv/
+"SRGSSR/srgmediaplayer-apple",https://github.com/SRGSSR/srgmediaplayer-apple
+"srt",https://github.com/cdown/srt
+"SRT (Secure Reliable Transport) Protocol",https://en.wikipedia.org/wiki/Secure_Reliable_Transport
+"SRT Alliance",https://www.srtalliance.org/
+"SRT Cookbook",https://srtlab.github.io/srt-cookbook/
+"SRT Live Server",https://github.com/Edward-Wu/srt-live-server
+"SRT Open Source project",https://github.com/Haivision/srt
+"SRT Protocol Documentation",https://doc.haivision.com/SRT/1.5.4/Haivision/
+"SRT Support in VLC and GStreamer",https://www.srtalliance.org/srt-with-vlc-gstreamer-and-wireshark-support/
+"srt-live-transmit",https://github.com/Haivision/srt/blob/master/docs/apps/srt-live-transmit.md
+"Stack Exchange – Video Production",https://video.stackexchange.com/
+"Standardization of High Efficiency Video Coding (HEVC)",https://youtu.be/p6dLZfs0jTY
+"statsbiblioteket/tv-subtitle-extraction",https://github.com/statsbiblioteket/tv-subtitle-extraction
+"StaxRip",https://github.com/staxrip/staxrip
+"Stb-tester",https://github.com/stb-tester/stb-tester
+"Storm Streaming Server",https://www.stormstreaming.com/
+"Stream Analyzer - ts analyzer, stream validation, ETSI TR 101 290 | Elecard: Video Compression Guru ",https://www.elecard.com/products/video-analysis/stream-analyzer
+"Stream Video & Audio SDKs",https://getstream.io/video/sdk/
+"Stream Video Android SDK",https://github.com/GetStream/stream-video-android
+"streamaserver/streama",https://github.com/streamaserver/streama
+"Streamaxia OpenSDK",https://www.streamaxia.com/
+"Streaming 101: Understanding the Differences Between Streaming Protocols",https://www.cardinalpeak.com/blog/understanding-and-choosing-the-right-streaming-protocol
+"Streaming Learning Center's Beginner's Guide to Live Streaming",https://streaminglearningcenter.com/learning/beginners-guide-to-live-streaming.html
+"Streaming Live From the Battlefield: Military Video in 2019",https://www.streamingmedia.com/Articles/ReadArticle.aspx?ArticleID=135141
+"Streaming Media 101: Technical Onboarding for Streaming Media Professionals",https://streaminglearningcenter.com/courses-streaming101
+"Streaming Protocol Comparison: RTMP, WebRTC, FTL, SRT",https://restream.io/blog/streaming-protocols/
+"Streaming Video Alliance (SVA)",https://www.svta.org/
+"Streaming Video Experimentation at Netflix",https://netflixtechblog.com/streaming-video-experimentation-at-netflix-visualizing-practical-optimization-834152da60a5
+"Streaming Video Technology Alliance (SVTA) - Common Media Library",https://www.businesswire.com/news/home/20231019229734/en/Streaming-Video-Technology-Alliance-Announces-First-Public-Open-Source-Repository-Common-Media-Library
+"Streaming Video Technology Alliance (SVTA) Projects",https://www.svta.org/svta-projects/
+"Streaming With SRT Protocol in OBS",https://obsproject.com/wiki/Streaming-With-SRT-Protocol
+"Streamlab",https://vimond.github.io/streamlab/
+"Streamline: End-to-End Live Streaming System",https://github.com/streamlinevideo/streamline
+"streamlink/streamlink",https://github.com/streamlink/streamlink
+"streamlit-webrtc",https://github.com/whitphx/streamlit-webrtc
+"StreamOptix: A Cross-layer Adaptive Video Delivery Scheme",https://arxiv.org/abs/2406.04632
+"Streamsim",https://github.com/VQEG/streamsim
+"stultus/mp4-to-mpegdash-py",https://github.com/stultus/mp4-to-mpegdash-py
+"StyleShare/HLSCachingReverseProxyServer",https://github.com/StyleShare/HLSCachingReverseProxyServer
+"SubEasy",https://topai.tools/s/automated-video-subtitling-tool
+"SubRip",http://zuggy.wz.cz
+"Subtitld",https://subtitld.org/en
+"Subtitle Composer",https://github.com/maxrd2/subtitlecomposer
+"Subtitle Edit",https://github.com/SubtitleEdit/subtitleedit
+"Subtitle Editor",https://kitone.github.io/subtitleeditor/
+"Subtitle Horse",https://www.subtitle-horse.com/
+"Subtitle Workshop",https://www.uruworks.net/
+"Subtitle Workshop XE",https://subworkshop.sourceforge.io/
+"sunhailin-Leo/AutoConfigShellScript: Automatically compile and configure ffmpeg, Python 3.7.2(default), PyAV, OpenCV, Keras, Tensorflow(CPU Mode) and other relative environment.",https://github.com/sunhailin-Leo/AutoConfigShellScript
+"superpoweredSDK/Low-Latency-Android-iOS-Linux-Windows-tvOS-macOS-Interactive-Audio-Platform",https://github.com/superpoweredSDK/Low-Latency-Android-iOS-Linux-Windows-tvOS-macOS-Interactive-Audio-Platform
+"SuperStreamer",https://github.com/matvp91/superstreamer
+"SVT-AV1",https://github.com/AOMediaCodec/SVT-AV1
+"SVT-AV1: an open-source AV1 encoder and decoder",https://netflixtechblog.com/svt-av1-an-open-source-av1-encoder-and-decoder-ad295d9b5ca2
+"SVT-HEVC",https://github.com/OpenVisualCloud/SVT-HEVC
+"SVT-VP9",https://github.com/OpenVisualCloud/SVT-VP9
+"sw360cab/pyup-transcoder",https://github.com/sw360cab/pyup-transcoder
+"Swift Video Generator",https://github.com/dev-labs-bg/swift-video-generator
+"Swift-YouTube-Player",https://github.com/gilesvangruisen/Swift-YouTube-Player
+"swiftsubtitles",https://github.com/dagronf/swiftsubtitles
+"switch media adease",https://www.switch.tv/mediahq/adease/
+"switch media live2vod",https://www.switch.tv/mediahq/live2vod/
+"switch media mediahq",https://www.switch.tv/mediahq/
+"switch media universal player",https://www.switch.tv/mediahq/universal-player/
+"Syncplay",https://syncplay.pl/
+"SyncTube",https://github.com/sync-tube/synctube
+"szatmary/libcaption",https://github.com/szatmary/libcaption
+"t-mullen/hls-server",https://github.com/t-mullen/hls-server
+"T-Pham/RokuJSONHelperNode",https://github.com/T-Pham/RokuJSONHelperNode
+"TalbotGooday/Android-Oembed-Video",https://github.com/TalbotGooday/Android-Oembed-Video
+"tanersener/mobile-ffmpeg",https://github.com/tanersener/mobile-ffmpeg
+"Tartube",https://github.com/axcore/tartube
+"tchakabam/dash-proxy",https://github.com/tchakabam/dash-proxy
+"TCP Video Streaming Tools",https://github.com/AgustinSRG/tcp-video-streaming
+"TCP vs. UDP for Video Streaming",https://www.geeksforgeeks.org/tcp-vs-udp-for-video-streaming/
+"Tears of Steel (Open Movie)",https://mango.blender.org/
+"Techniques for Establishing and Maintaining Audio Loudness for Digital Television",https://www.atsc.org/wp-content/uploads/2015/03/Techniques-for-establishing-and-maintaining-audio-loudness.pdf
+"Telecommunication-Telemedia-Assessment",https://telecommunication-telemedia-assessment.github.io/
+"Telecommunication-Telemedia-Assessment/AVRate",https://github.com/Telecommunication-Telemedia-Assessment/AVRate
+"Telestream Cloud Services",https://www.telestream.net/telestream-cloud/
+"Telestream Vantage",https://www.telestream.net/telestream-solutions/digital-asset-management.htm
+"Teradek Reliable Transport (TRT)",https://teradek.com/blogs/articles/reliable-transport-protocol-intro
+"Tero Subtitler",https://github.com/URUWorks/TeroSubtitler
+"Terraform AWS Media Services Modules",https://registry.terraform.io/modules/terraform-aws-modules/mediaConvert/aws/latest
+"Text2Video-Zero",https://github.com/Picsart-AI-Research/Text2Video-Zero
+"The Challenge to Maintain and Translate Creative Visual Ideas to Everyone’s Viewing Devices",https://medium.com/@eyevinntechnology/the-challenge-to-maintain-and-translate-creative-visual-ideas-to-everyones-viewing-devices-a88e1a841439
+"The Complete Guide to Live Streaming",https://www.wowza.com/blog/complete-guide-to-live-streaming
+"The GIMP",http://www.gimp.org/
+"The Good Parts of LibVLC",https://mfkl.gumroad.com/l/libvlc-good-parts
+"The H.264 Sequence Parameter Set",https://www.cardinalpeak.com/the-h-264-sequence-parameter-set
+"The History of Video Compression Standards",https://api.video/blog/video-trends/the-history-of-video-compression-starts-in-1929/
+"The History Of Video File Formats [INFOGRAPHIC]",https://umatechnology.org/the-history-of-video-file-formats-infographic/
+"The Hitchhiker's Guide to DRM",https://ottverse.com/hitchhikers-guide-to-drm-2/
+"The Making of VES: the Cosmos Microservice for Netflix Video Encoding",https://netflixtechblog.com/the-making-of-ves-the-cosmos-microservice-for-netflix-video-encoding-3e6177bfbeab
+"The Market Significance of Apple's Adopting HEVC: Here's What I Think",https://www.linkedin.com/pulse/market-significance-apples-adopting-hevc-heres-what-i-jan-ozer
+"The Netflix IMF Workflow",https://medium.com/netflix-techblog/the-netflix-imf-workflow-f45dd72ed700?source=userActivityShare-94bccb50d11-1568773157&_branch_match_id=702692448596112473
+"The Real-Time Messaging Protocol Explained",https://www.wowza.com/blog/rtmp-streaming-real-time-messaging-protocol
+"The State of Video Codecs: Evolution of Compression in a Video-First Economy",https://www.interdigital.com/white_papers/the-state-of-video-codecs-evolution-of-compression-in-a-video-first-economy-
+"The structure of an MPEG-DASH MPD",https://www.brendanlong.com/the-structure-of-an-mpeg-dash-mpd.html
+"The Top 656 Video Open Source Projects",https://awesomeopensource.com/projects/video
+"The ultimate guide to CCs",https://www.3playmedia.com/resources/popular-topics/closed-captioning/
+"The Ultimate Live Streaming Setup Guide for Beginners",https://umatechnology.org/the-ultimate-live-streaming-setup-guide-for-beginners/
+"TheDRMBlog | CENC",https://go.buydrm.com/thedrmblog/topic/cenc
+"theolampert/dash-server",https://github.com/theolampert/dash-server
+"THEOplayer",https://www.theoplayer.com/
+"THEOplayer DRM Integration Guide",https://github.com/THEOplayer/documentation/blob/main/theoplayer/how-to-guides/04-drm/00-introduction.md
+"Theora",https://www.theora.org/
+"This gist will generate an Intel QSV-enabled FFmpeg build using the open source Intel Media SDK. Testbed used: Ubuntu 18.04LTS. A fallback is also provided for the intel vaapi driver where needed.",https://gist.github.com/SeanMollet/0eed16e80630ab67532890a9d42132af
+"This is How I Reduced My CloudFront Bills by 80%",https://medium.com/faun/this-is-how-i-reduced-my-cloudfront-bills-by-80-a7b0dfb24128
+"threefive",https://github.com/futzu/threefive
+"ThreeFive SCTE35",https://github.com/futzu/scte-35_threefive
+"TimeSide",https://timeside.readthedocs.io/en/stable/intro.html
+"TimPlayer",https://github.com/timchunght/timplayerdemo
+"Tizen WASM Player",https://developer.samsung.com/smarttv/develop/extension-libraries/webassembly/tizen-wasm-player/overview.html
+"Tizen WASM Player Sample Application",https://developer.samsung.com/smarttv/develop/extension-libraries/webassembly/tizen-wasm-player/sample-wasm-player-application.html
+"Tizen WASM Video Decoder - Sample Application",https://github.com/SamsungDForum/WebAssemblyDemos/blob/master/video_decoder_sample/README.md
+"Tizen WASM Video Decoder Sample",https://developer.samsung.com/smarttv/develop/extension-libraries/webassembly/sample-based-tutorials/tizen-wasm-video-decoder-sample.html
+"tjenkinson/media-element-syncer",https://github.com/tjenkinson/media-element-syncer
+"tjenkinson/mock-hls-server",https://github.com/tjenkinson/mock-hls-server
+"Tools | Video History Project",https://www.videohistoryproject.org/tools
+"TorchAudio",https://github.com/pytorch/audio
+"Toward a Better Quality Metric for the Video Community",https://netflixtechblog.com/toward-a-better-quality-metric-for-the-video-community-7f94ba0d008
+"Toward A Practical Perceptual Video Quality Metric",https://medium.com/netflix-techblog/toward-a-practical-perceptual-video-quality-metric-653f208b9652
+"tozastation/HLS-Streaming",https://github.com/tozastation/HLS-Streaming
+"Transcode",https://github.com/bbxnet/transcode
+"Transcoder",https://opensource.deepmedia.io/transcoder
+"Transcoding 360 Video at Facebook",https://engineering.fb.com/2017/03/14/video-engineering/transcoding-360-video-at-facebook/
+"transitive-bullshit/awesome-ffmpeg",https://github.com/transitive-bullshit/awesome-ffmpeg
+"truex-ad-renderer-web-integration",https://github.com/socialvibe/truex-ad-renderer-web-integration
+"TSDuck",https://tsduck.io/
+"TSLemurs Transport Stream Tools",https://tslemurs.com/
+"ttconv: subtitle/caption format converter",https://github.com/sandflow/ttconv
+"TTML/WebVTT Coding of audio-visual objects - ISO/IEC 14496-30",https://www.iso.org/standard/75394.html
+"Tube Archivist",https://www.tubearchivist.com/
+"Turing Codec (Open H.265 Encoder)",https://turingcodec.org/
+"twitter/vireo: Vireo is a lightweight and versatile video processing library written in C++11",https://github.com/twitter/vireo
+"Type Studio",https://topai.tools/s/automated-video-subtitling-
+"uAVS3",https://github.com/uavs3/uavs3d
+"UCSHDRVideoComp",https://github.com/ratnajitmukherjee/UCSHDRVideoComp
+"UDP vs. TCP and Which One to Use for Video Streaming",https://www.wowza.com/blog/udp-vs-tcp
+"Ultra HD Forum Guidelines",https://ultrahdforum.org/guidelines/
+"UMA Technology: Streaming Protocol Comparison - RTMP, WebRTC, FTL, SRT",https://umatechnology.org/streaming-protocol-comparison-rtmp-webrtc-ftl-srt/
+"Understanding High Dynamic Range (HDR) by The American Society of Cinematographers",https://theasc.com/reports/understanding-high-dynamic-range-hdr
+"Understanding Rate Control Modes (x264, x265, vpx)",https://slhck.info/video/2017/03/01/rate-control.html
+"Understanding Real-time Bidding for AVOD Services",https://medium.com/@eyevinntechnology/understanding-real-time-bidding-for-avod-services-861ebfa8bd13
+"Understanding Server-Side Dynamic Ad Insertion",https://medium.com/@eyevinntechnology/understanding-server-side-dynamic-ad-insertion-d7ed90e34aa2
+"Understanding the HTTP Live Streaming Architecture | Apple Developer Documentation",https://developer.apple.com/documentation/http_live_streaming/understanding_the_http_live_streaming_architecture
+"Unified Origin",https://www.unified-streaming.com/products/unified-origin
+"Unified Streaming Demos",https://demo.unified-streaming.com/
+"Unified Streaming Features Page",https://demo.unified-streaming.com/k8s/features/stable/#!/mpd
+"Unified Streaming Validator",https://validator.unified-streaming.com/
+"unosquare/ffmediaelement",https://github.com/unosquare/ffmediaelement
+"Unreal Media Server",https://www.umediaserver.net/umediaserver/
+"Unsupervised HDR Image and Video Tone Mapping via Contrastive Learning",https://github.com/cao-cong/UnCLTMO
+"Untrunc",https://github.com/ponchio/untrunc
+"Use DirectX with Advanced Color on High/Standard Dynamic Range Displays",https://github.com/MicrosoftDocs/win32/blob/docs/desktop-src/direct3darticles/high-dynamic-range.md
+"Use of Look-Up Tables (LUTs) in FFmpeg",https://downloads.bbc.co.uk/rd/pubs/papers/HDR/BBC_HDRTV_Use_of_LUTs_FFmpeg.pdf
+"Using Rust and WebAssembly to Process Pixels from a Video Feed",https://dev.to/fallenstedt/using-rust-and-webassembly-to-process-pixels-from-a-video-feed-4hhg
+"uStudio Cloud Video Integrations",https://ustudio.com/platform/video-platform/integrations/cloud-video-integrations/
+"ustwo/videoplayback-ios",https://github.com/ustwo/videoplayback-ios
+"UT Video Codec Suite",http://umezawa.dyndns.info/wordpress/?page_id=67
+"uvgRTP",https://github.com/ultravideo/uvgRTP
+"UWA HDR Vivid Standards",https://uhd-world-association.com/uwa-resources/
+"v4l (Go Video4Linux)",https://pkg.go.dev/github.com/korandiz/v4l
+"Vaapi Fits",https://github.com/intel/vaapi-fits
+"Vadootv P2P CDN SDK for JavaScript",https://github.imc.re/vadootvpeer/p2p-cdn-sdk-javascript
+"Vantage Gateway",https://www.encoding.com/
+"Vantage Transcode",https://www.telestream.com/vantage/transcode/
+"Vantage Transcode by Telestream",https://www.telestream.net/vantage/transcode.htm
+"VapourSynth",http://www.vapoursynth.com/
+"VapourSynth Script Repository",https://vsrepo.vapoursynth.com/
+"vapoursynth/vapoursynth",https://github.com/vapoursynth/vapoursynth
+"Varnish Streaming Cache (Blog)",https://www.varnish-software.com/blog/cache-invalidation-for-live-streaming-with-varnish/
+"VAST 4.0 Sample Tags",https://github.com/InteractiveAdvertisingBureau/VAST_Samples
+"VAST 4.0 Specification",https://iabtechlab.com/standards/vast/
+"VAST Inspector",https://developers.google.com/interactive-media-ads/docs/sdks/html5/vastinspector
+"VASTreaming MPEG-DASH Server Library",https://www.vastreaming.net/dash-library.html
+"VCDP/FFmpeg-patch",https://github.com/VCDP/FFmpeg-patch
+"VCodec Interface C++ Library",https://github.com/ConstantRobotics-Ltd/VCodec
+"Vcodes",https://www.vcodes.tv/
+"VCT (Video Converter & Transcoder)",https://github.com/zbabac/VCT
+"VCT - Video Converter & Transcoder",https://sourceforge.net/projects/videoconvertertranscoder/
+"VdoCipher",https://www.vdocipher.com/
+"VdoCipher Developer Platform",https://www.vdocipher.com/developer/
+"veeta-tv/jasmine-roku",https://github.com/veeta-tv/jasmine-roku
+"VEGA-3000 IP Media Interface Adapter",https://www.advantech.com/en-us/networks-communications/video/ipmediaadapters
+"VeinGuo/VGPlayer",https://github.com/VeinGuo/VGPlayer
+"Verimatrix DRM",https://www.verimatrix.com/products/multi-drm
+"VersaPlayer",https://github.com/josejuanqm/VersaPlayer
+"Versatile Video Coding (H.266/VVC) Overview – Fraunhofer HHI",https://www.hhi.fraunhofer.de/en/departments/vca/research-groups/image-video-coding/research-topics/vvc.html
+"Versatile Video Coding (VVC) - MPEG-I Part 3",https://www.mpeg.org/standards/mpeg-i/
+"Versatile Video Coding (VVC) Standard",https://www.mpeg.org/standards/MPEG-I/3/
+"Versatile Video Coding (VVC) Test Model",https://vcgit.hhi.fraunhofer.de/jvet/VVCSoftware_VTM
+"Versatile Video Coding Standard: A Review",https://arxiv.org/abs/2106.14245
+"VESA - Interface Standards for The Display Industry",https://vesa.org/
+"VESA DisplayHDR Standard",https://vesa.org/featured-articles/vesa-defines-new-standard-to-help-speed-pc-industry-adoption-of%E2%80%A8high-dynamic-range-technology-in-laptop-and-desktop-monitor-displays/
+"VHS (Terminal Recorder)",https://github.com/charmbracelet/vhs
+"Viaccess-Orca VO Player",https://dashif.org/tools/clients/
+"Viblast/dash-proxy",https://github.com/Viblast/dash-proxy
+"vid.stab",https://github.com/georgmartius/vid.stab
+"VidCoder",https://github.com/RandomEngy/VidCoder
+"VidCutter",https://github.com/ozmartian/vidcutter
+"Video Acceleration API (VA-API)",https://en.wikipedia.org/wiki/Video_Acceleration_API
+"Video and containers",http://neurocline.github.io/dev/2016/07/28/video-and-containers.html
+"Video Annotator: Building Video Classifiers using Vision-Language",https://netflixtechblog.com/video-annotator-building-video-classifiers-using-vision-language-techniques-8609e457d9c
+"Video Bench — How measure your video quality easily",https://medium.com/@jnoduq/video-bench-how-measure-your-video-quality-easily-85a0feb8f6e2
+"Video Codec",https://en.wikipedia.org/wiki/Video_codec
+"Video Coding - BBC R&D",https://www.bbc.co.uk/rd/projects/video-coding
+"Video Coding Basics - How is this so efficient?",https://youtu.be/LDeL7-49qm4
+"Video Coding Experts Group (VCEG)",https://www.itu.int/en/ITU-T/studygroups/2022-2024/16/video/Pages/vceg.aspx
+"Video Coding History",https://www.vcodex.com/video-coding-history
+"Video Coding Standards and Algorithms - Evolution & Patent Analysis",https://www.copperpodip.com/post/different-types-of-video-coding-standards-and-algorithms-used-over-the-time
+"Video Coding Standards and Algorithms — Evolution & Patent Analysis",https://copperpod.medium.com/video-coding-standards-and-algorithms-evolution-patent-analysis-aaf8cd5994e3
+"Video Coding: An Introduction to Standard Codecs",https://www.globalspec.com/reference/34024/203279/video-coding-an-introduction-to-standard-codecs
+"Video Compression Handbook",https://www.amazon.com/dp/0134866215/
+"Video Electronics Standards Association (VESA)",https://www.vesa.org/
+"Video Encoding - OTTVerse",https://ottverse.com/video-encoding/
+"Video Encoding 101: A Beginner's Guide to Key Concepts",https://www.forasoft.com/blog/article/video-encoding-streaming-quality
+"Video Encoding and Transcoding Guide by OTTVerse",https://ottverse.com/what-is-video-encoding-transcoding-codecs-compression/
+"Video Encoding for Beginners",https://www.mindluster.com/certificate/16034/Video-encoding-video
+"Video Encoding — Compression and Resolutions",https://medium.com/@eyevinntechnology/chessboard-for-beginners-video-encoding-compression-and-resolutions-bcefe04fa639
+"Video Encoding: The Big Streaming Technology Guide",https://bitmovin.com/video-encoding-guide/
+"Video Encoding: The Big Streaming Technology Guide [2023]",https://bitmovin.com/video-encoding-guide
+"Video Encoding: The Definitive Guide",https://www.dacast.com/blog/what-is-video-encoding/
+"Video Frame Processing on the Web – WebAssembly, WebGPU, WebGL, WebCodecs, WebNN, and WebTransport",https://webrtchacks.com/video-frame-processing-on-the-web-webassembly-webgpu-webgl-webcodecs-webnn-and-webtransport/
+"Video History Project by the Experimental Television Center",https://www.videohistoryproject.org/introduction
+"Video Hub App",https://github.com/whyboris/Video-Hub-App
+"Video in the War Zone: The Current State of Military Streaming",https://www.streamingmedia.com/Articles/ReadArticle.aspx?ArticleID=101310
+"Video on Demand on AWS Foundation",https://docs.aws.amazon.com/solutions/latest/video-on-demand-on-aws-foundation/solution-overview.html
+"Video Processing Project",https://sourceforge.net/projects/vpp/
+"Video Quality Assessment",https://medium.com/@eyevinntechnology/video-quality-assessment-34abd35f96c0?source=userActivityShare-94bccb50d11-1560983815&_branch_match_id=670021582869771680
+"Video Quality Experts Group (VQEG)",https://www.its.bldrdoc.gov/vqeg/vqeg-home.aspx
+"Video Resource Center by TV Tech",https://www.tvtechnology.com/miscellaneous/video-resource-center
+"Video SDK",https://www.videosdk.live/
+"Video SDK Live",https://github.com/videosdk-live
+"Video Services Forum (VSF)",https://www.vsf.tv/
+"Video Speed Controller (Chrome Extension)",https://chrome.google.com/webstore/detail/video-speed-controller/nffaoalbilbmmfgbnbgppjihopabppdk
+"Video Streaming App Development: A Step-by-Step Guide",https://www.wowza.com/blog/video-streaming-app-development-a-step-by-step-guide
+"Video Streaming Cheatsheet",https://video-streaming-cheatsheet.s3.eu-west-2.amazonaws.com/artifacts/video-streaming-cheatsheet.pdf
+"Video Streaming Protocols Comparison",https://www.wowza.com/blog/video-streaming-protocol-comparison
+"Video Streaming Server Guide by Ant Media",https://antmedia.io/how-to-make-a-video-streaming-server/
+"Video Streaming Studio",https://github.com/TianYao12/Video-Streaming-Studio
+"Video Streaming via CDN",https://github.com/andrewwong97/video-streaming-cdn
+"Video Streaming via CDN by heaventourist",https://github.com/heaventourist/Video-Streaming-via-CDN
+"Video Technology History (1960s-1990s)",https://public.websites.umich.edu/~evideo/1960.html
+"Video Tensorflow",https://docs.google.com/presentation/d/1NAqYWmFOwxJEacZCuPLdX0mRNRFPFgeRbsm22EaxerU/edit?usp=sharing
+"Video Transcoding Scripts",https://github.com/lisamelton/video-transcoding-scripts
+"video-ad-sdk",https://github.com/rambler-digital-solutions/video-ad-sdk
+"video-dev/hls.js",https://github.com/video-dev/hls.js
+"video-dev/video-transcoding-api",https://github.com/video-dev/video-transcoding-api
+"video-dev/vtt.js",https://github.com/video-dev/vtt.js
+"video-editor-wasm-react",https://github.com/imgly/video-editor-wasm-react
+"video-react",https://github.com/video-react/video-react
+"Video-Streaming-Service",https://github.com/hetjagani/Video-Streaming-Service
+"Video-Streaming-via-CDN",https://github.com/LiZHU7594/Video-Streaming-via-CDN
+"Video-Super-Resolution-Library",https://github.com/OpenVisualCloud/Video-Super-Resolution-Library
+"video-transcoding-api",https://pkg.go.dev/github.com/video-dev/video-transcoding-api/v2
+"Video.js",https://github.com/videojs/video.js/
+"Video.js Ads Plugin",https://github.com/dmlap/videojs-ads
+"Video.js IMA Plugin",https://github.com/googleads/videojs-ima
+"Video.js Mobile UI",https://github.com/mister-ben/videojs-mobile-ui
+"video4j",https://github.com/metaloom/video4j
+"Video: HLS and DASH Multi-Codec Encoding & Packaging",https://thebroadcastknowledge.com/2020/07/10/video-hls-and-dash-multi-codec-encoding-packaging/
+"video_processing_utils",https://github.com/dmcken/video_processing_utils
+"VideoCaptioner",https://github.com/WEIFENG2333/VideoCaptioner
+"videogular/videogular",https://github.com/videogular/videogular
+"VideoHelp",https://www.videohelp.com/
+"videojs-ads",https://github.com/GLStephen/videojs-ads
+"videojs-contrib-ads",https://videojs.github.io/videojs-contrib-ads/integrator/getting-started.html
+"videojs-record ffmpeg.wasm Plugin",https://github.com/collab-project/videojs-record/blob/master/docs/plugins/ffmpeg.wasm.md
+"videojs/aes-decrypter",https://github.com/videojs/aes-decrypter
+"videojs/http-streaming",https://github.com/videojs/http-streaming
+"videojs/m3u8-parser",https://github.com/videojs/m3u8-parser
+"videojs/mpd-parser",https://github.com/videojs/mpd-parser
+"videojs/video.js",https://github.com/videojs/video.js
+"videojs/videojs-contrib-dash",https://github.com/videojs/videojs-contrib-dash
+"videojs/videojs-contrib-hls",https://github.com/videojs/videojs-contrib-hls
+"videolan/dav1d",https://code.videolan.org/videolan/dav1d
+"videolan/libvlcsharp",https://github.com/videolan/LibVLCSharp
+"videolan/vlc",https://github.com/videolan/vlc
+"videolan/vlc-android",https://code.videolan.org/videolan/vlc-android
+"videolan/vlc-ios",https://code.videolan.org/videolan/vlc-ios
+"VideoLingo",https://github.com/Huanshere/VideoLingo
+"videomorph-dev/videomorph",https://github.com/videomorph-dev/videomorph
+"Videoplayer by JingOS",https://github.com/JingOS-team/videoplayer
+"VideoProcessingTools",https://github.com/Otis-Laboratory/VideoProcessingTools
+"VideoReTalking",https://github.com/OpenTalker/video-retalking
+"Videotel Digital VP92+ 4K Digital Signage Media Player",https://www.videoteldigital.com/products/new-vp92-4k-digital-signage-media-player-network-wifi-capable-access-content-remotely-with-sftp-lan-or-cloud-software-interactive-capabilities-copy
+"VidGear",https://github.com/abhiTronix/vidgear
+"vigenair",https://github.com/google-marketing-solutions/vigenair
+"Vilsol/Transcoder",https://github.com/Vilsol/Transcoder
+"Vimeo",https://vimeo.com/
+"Vimeo PlayerKit",https://github.com/vimeo/PlayerKit
+"vimond/replay",https://github.com/vimond/replay
+"VirtualDub",https://www.virtualdub.org/
+"Visual Cloud",https://en.wikipedia.org/wiki/Visual_Cloud
+"vitalets/awesome-smart-tv",https://github.com/vitalets/awesome-smart-tv
+"vitoziv/VIMediaCache",https://github.com/vitoziv/VIMediaCache
+"Vitrium Security",https://www.vitrium.com/drm-for/technology-and-manufacturing
+"Vittorio Giovara - Color Me Intrigued: A Jaunt Through Color Technology in Video",https://www.youtube.com/watch?v=XMnvY7a4-As&feature=share
+"VLC for Android",https://github.com/videolan/vlc-android
+"VLC Live Transcoding Guide",https://gist.github.com/teocci/a7eae1b60ec018b64bdd13bb7a3499e0
+"VLC Media Player",https://www.videolan.org/vlc/
+"VLMC (VideoLAN Movie Creator)",https://www.videolan.org/vlmc/
+"VMAF: The Journey Continues",https://medium.com/netflix-techblog/vmaf-the-journey-continues-44b51ee9ed12
+"voc/voctomix",https://github.com/voc/voctomix
+"VOCAL Technologies Video Software Library",https://vocal.com/software-modules/video-software/
+"VOD on AWS",https://s3.amazonaws.com/solutions-reference/video-on-demand-on-aws/latest/video-on-demand-on-aws.pdf
+"VOD2Live",https://docs.google.com/presentation/d/1Ua76BBaZKtTmaZrlfM_eG0vwz0ZAqPIjreCSfB4qFQQ/edit?usp=sharing
+"Vonage Video API (formerly TokBox OpenTok)",https://www.vonage.com/communications-apis/video/
+"VPAID Specification",https://www.iab.com/guidelines/digital-video-player-ad-interface-definition-vpaid-2-0/
+"VPF: Hardware-Accelerated Video Processing Framework in Python",https://github.com/NVIDIA/VideoProcessingFramework
+"VPF: Video Processing Framework",https://developer.nvidia.com/blog/vpf-hardware-accelerated-video-processing-framework-in-python/
+"VPlayed DRM Platform",https://www.vplayed.com/video-security-drm-platform.php
+"vPlayer",https://circuitdigest.com/news/vplayer-an-opensource-video-player-that-more-than-just-a-screen
+"VQEG Tools and Subjective Labs Setup",https://vqeg.github.io/software-tools/
+"VQEG/software-tools",https://github.com/VQEG/software-tools
+"Vrecord",https://github.com/amiaopensource/vrecord
+"VStream",https://github.com/Benj-Qu/VStream
+"vt-vl-lab/FGVC",https://github.com/vt-vl-lab/FGVC
+"VTCLab Media Analyzer",https://media-analyzer.pro
+"VVdeC (Fraunhofer VVC Decoder)",https://github.com/fraunhoferhhi/vvdec
+"VVenC (Fraunhofer Versatile Video Encoder)",https://github.com/fraunhoferhhi/vvenc
+"VVenC and VVdeC",https://arxiv.org/abs/2107.13385
+"VXG Player SDK",https://docs.vxg.io/site/Android.PlayerSDK/
+"W3C Audiovisual Media Formats for Browsers Community Group",https://github.com/w3c/avmedia-formats-cg
+"W3C Media & Entertainment Interest Group",https://www.w3.org/blog/news/archives/9075
+"W3C Media Working Group Repositories",https://www.w3.org/groups/wg/media/tools/
+"w3c/encrypted-media",https://github.com/w3c/encrypted-media/
+"wargarblgarbl/libgosubs",https://github.com/wargarblgarbl/libgosubs
+"WASM Video Filters",https://ontouchstart.pages.dev/wasm_video_filters
+"wasm-av1",https://github.com/GoogleChromeLabs/wasm-av1
+"wasm-codecs",https://github.com/adminy/wasm-codecs
+"wasm-media-encoders",https://www.npmjs.com/package/wasm-media-encoders
+"wasm-resources",https://github.com/byrneml/wasm-resources
+"WASM-video-editor",https://github.com/metal-face/WASM-video-editor
+"wasmbooth: Video Filter Booth App Written in Rust",https://github.com/mtharrison/wasmbooth
+"wasmplayer",https://github.com/dolphin-run/wasmplayer
+"WasmVideoEncoder",https://github.com/AlexVestin/WasmVideoEncoder
+"WasmVideoPlayer",https://github.com/sonysuqin/WasmVideoPlayer
+"wasmVision",https://github.com/wasmvision/wasmvision
+"wasp-hls",https://git.histb.com/peaBerberian/wasp-hls
+"watson-developer-cloud/text-to-speech-nodejs",https://github.com/watson-developer-cloud/text-to-speech-nodejs
+"Wav2Lip",https://github.com/Rudrabha/Wav2Lip
+"Web Video Text Tracks Format (WebVTT)",https://developer.mozilla.org/en-US/docs/Web/API/WebVTT_API
+"Web Video Text Tracks Format (WebVTT)",https://www.w3.org/TR/webvtt1/
+"Web-Demuxer",https://foreversc.github.io/web-demuxer/
+"web-monetisation-video-ads",https://libraries.io/npm/web-monetisation-video-ads
+"WebASM HEVC Decoder SDK",https://www.mainconcept.com/webasm
+"WebAssembly (Wasm)",https://docs.google.com/presentation/d/1sonEk2neNVBcy8EzieUjWCNzj5SXN7dk-unkR_lpl8k/edit?usp=sharing
+"WebAssembly Samples by Samsung Developer",https://developer.samsung.com/smarttv/develop/samples/webassembly-samples.html
+"WebAssembly Video Filters",https://github.com/HiDoYa/webassembly-video-filters
+"webassembly-pixel-processing",https://github.com/Fallenstedt/webassembly-pixel-processing
+"WebDSP",https://github.com/shamadee/web-dsp
+"WebGazer.js",https://webgazer.cs.brown.edu/
+"webm-tools: WebM Utilities",https://chromium.googlesource.com/webm/webm-tools/
+"webm-wasm",https://github.com/GoogleChromeLabs/webm-wasm
+"webmdshow: DirectShow Filters for WebM",https://chromium.googlesource.com/webm/webmdshow/
+"webmproject/opus-dash: Specification for Encapsulating Opus Audio in ISO-BMFF Container",https://github.com/webmproject/opus-dash
+"webmquicktime: QuickTime Components for WebM",https://chromium.googlesource.com/webm/webmquicktime/
+"WebRTC",https://webrtc.org/
+"WebRTC Samples",https://webrtc.github.io/samples/
+"WebRTC Samples for Live Streaming",https://webrtc.github.io/samples/src/content/peerconnection/webrtc-studio/
+"WebRTC Tutorials - 36 Essential Learning Resources",https://getstream.io/blog/webrtc-tutorials/
+"WebRTC-Experiment",https://github.com/muaz-khan/WebRTC-Experiment
+"WebTorrent",https://webtorrent.io/
+"What Is Video Encoding? | Encoding Formats and How-To",https://www.wowza.com/blog/what-is-video-encoding
+"Widevine",https://widevine.com
+"Widevine DRM",https://developer.widevine.com/solutions/widevine-drm/
+"Widevine DRM Documentation (Google)",https://developers.google.com/widevine
+"Wifibroadcast – Analog-like transmission of live video data",https://befinitiv.wordpress.com/wifibroadcast-analog-like-transmission-of-live-video-data/
+"WildFires",https://docs.google.com/presentation/d/1yiVEOq2rvtFynP1tLdJj7pBWkAEiE9g8BMaoryxRVrk/edit?usp=sharing
+"willowtreeapps/ukor",https://github.com/willowtreeapps/ukor
+"WinFF",https://winff.org/
+"Wirecast",https://www.telestream.net/wirecast/
+"Wireshark",https://www.wireshark.org/
+"WISI SRT Implementation",https://wisigroup.com/us/solutions/low-latency-video-streaming-with-srt/
+"Wowza",https://www.wowza.com/
+"Wowza CDN Integration Overview",https://www.wowza.com/blog/how-do-content-delivery-networks-cdns-work
+"Wowza Developer Portal",https://www.wowza.com/developer
+"Wowza Streaming Cloud",https://www.wowza.com/products/streaming-cloud
+"Wowza Streaming Engine",https://www.wowza.com/products/streaming-engine
+"Wowza Streaming Engine (Docs)",https://www.wowza.com/docs/wowza-streaming-engine
+"Wowza Streaming Engine DRM",https://www.wowza.com/docs/wowza-drm
+"Wowza Streaming Engine DRM Integration",https://www.wowza.com/docs/about-digital-rights-management-and-wowza-streaming-engine
+"Wowza Streaming Engine: Play Your First Live Stream",https://info.wowza.com/trial-getting-started-play-a-live-stream
+"Wowza Ultra Low Latency CMAF Guide",https://www.wowza.com/docs/using-cmaf-for-low-latency-streaming
+"Wowza: Streaming Protocols Overview",https://www.wowza.com/blog/streaming-protocols
+"WritingMinds/ffmpeg-android-java",https://github.com/WritingMinds/ffmpeg-android-java
+"wxxsw/GSPlayer",https://github.com/wxxsw/GSPlayer
+"x264 (H.264/AVC Encoder)",https://code.videolan.org/videolan/x264
+"x264 FFmpeg Options Guide - Linux Encoding",https://sites.google.com/site/linuxencoding/x264-ffmpeg-mapping
+"x264: H.264 Video Encoder",https://github.com/mirror/x264
+"x265 (H.265/HEVC Encoder)",https://x265.org/
+"x265 Documentation — x265  documentation",https://x265.readthedocs.io/en/master/
+"x9k3",https://github.com/futzu/x9k3
+"Xabe.FFmpeg",https://github.com/tomaszzmuda/Xabe.FFmpeg
+"xAVS2 & dAVS2",https://github.com/pkuvcl/xavs2
+"XEVD: eXtra-fast Essential Video Decoder",https://github.com/mpeg5/xevd
+"XEVE: eXtra-fast Essential Video Encoder",https://github.com/mpeg5/xeve
+"xgplayer",https://github.com/bytedance/xgplayer/
+"xiewei-wayne/FFEngine.framework",https://github.com/xiewei-wayne/FFEngine.framework
+"xiewei-wayne/rtmp-video-player-for-ios",https://github.com/xiewei-wayne/rtmp-video-player-for-ios
+"Xine",http://xine.sourceforge.net/
+"xinnjie/extract-subtitle",https://github.com/xinnjie/extract-subtitle
+"Xiph.org :: Test Media",https://media.xiph.org/
+"Xiph.Org Foundation Projects",https://xiph.org/
+"xiph/rav1e",https://github.com/xiph/rav1e
+"xk media library",https://github.com/chapmanjacobd/library
+"XMedia Recode",https://www.xmedia-recode.de/en/
+"XMediaDRM",https://www.xmediatv.com/multi-digital-right-management/
+"XML + Code + Good times = RSG Application",https://medium.com/plexlabs/xml-code-good-times-rsg-application-b963f0cec01b
+"XOS Media Player",https://labs.acmi.net.au/our-open-source-media-player-for-displaying-fleets-of-video-8d518c0c97dc
+"Xuggler",https://github.com/artclarke/xuggle-xuggler
+"xvc",https://xvc.io/
+"XVC Codec (Divideon)",https://github.com/divideon/xvc
+"xyk2/cloud-transcoder",https://github.com/xyk2/cloud-transcoder
+"Yamdi (Yet Another Metadata Injector)",http://yamdi.sourceforge.net/
+"YouPHPTube (AVideo)",https://github.com/WWBN/AVideo
+"YouTube Creator Academy – Captions",https://creatoracademy.youtube.com/page/lesson/captions
+"YouTube Engineering and Developers Blog",https://youtube-eng.googleblog.com/
+"YouTube Live Streaming Ingestion Protocol Comparison",https://developers.google.com/youtube/v3/live/guides/ingestion-protocol-comparison/
+"YouTube-DL",https://ytdl-org.github.io/youtube-dl/
+"youtube-upload",https://github.com/tokland/youtube-upload
+"yt-dlp",https://github.com/yt-dlp/yt-dlp
+"YTT (YouTube Caption) Editor",https://github.com/arc298/ytt
+"yuhuili-lab/Tide",https://github.com/yuhuili-lab/Tide
+"YuJa Enterprise Video Platform",https://www.yuja.com/video-cms/video-cloud/
+"ZaifSenpai/Batch-Py-Remux",https://github.com/ZaifSenpai/Batch-Py-Remux
+"zencoder/go-dash",https://github.com/zencoder/go-dash
+"zhaiweiwei/nginx-hls",https://github.com/zhaiweiwei/nginx-hls
+"Ziggeo Mobile SDKs",https://ziggeo.com
+"Ziggeo Video SDK",https://ziggeo.com/
+"ZLMediaKit",https://github.com/ZLMediaKit/ZLMediaKit
+"zolinux/MediaArchiver",https://github.com/zolinux/MediaArchiver
+"Zubtitle",https://zubtitle.com/
+"Zulko/moviepy",https://github.com/Zulko/moviepy
+"zveloDB",https://zvelo.com/case-study/digital-video-ad-platform-roi-brand-safety/
+"Zype DRM",https://www.zype.com/product/zype-streaming-platform/videometa-cms/drm
+"zype/zype-roku-scenegraph",https://github.com/zype/zype-roku-scenegraph
+"µPlayer",https://liliputing.com/hardware-accelerated-video-playback-now-possible-on-the-pinephon/
+"µPlayer: Lightweight Video Player for Linux Phones",https://source.puri.sm/Librem5/mplayer

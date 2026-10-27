@@ -11,6 +11,15 @@ All notable changes to the Awesome Video Resource Viewer project. Newest entries
 - A selected run outside the paginated window is shown separately without changing compact `Show more` or full-history `Load more` counts. Direct run links, launch drafts, and detail-dialog focus restoration retain their existing paths.
 - Browser verification remains blocked pending an authorized local admin session; the 1440, 820-touch, and 390-touch production journeys are unverified until deployment.
 
+### Admin taxonomy parent-field feedback
+- AC-21: create/edit validation now focuses the first enabled invalid field, marks missing parents invalid, links inline feedback, and clears their errors when corrected. Disabled cascading-parent errors remain announced as alerts; Name and Slug retain their existing order when parents are present.
+
+### Search and Advanced form field identifiers
+- Fixed C6-PS-064 by identifying Search query, sort and tag-search fields,
+  Advanced explorer controls and export options, including Radix native
+  companion fields. Responsive tag-search IDs remain distinct when the desktop
+  sidebar and mobile sheet are mounted together; existing labels are preserved.
+
 ## September 15, 2026
 
 ### Parity documentation and independent verification

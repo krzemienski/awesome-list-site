@@ -266,6 +266,7 @@ export default function CategoryExplorer({ categories, resources, className }: C
               <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
               <Input
                 id={searchInputId}
+                name="explorer-search"
                 ref={searchInputRef}
                 placeholder="Search categories and resources..."
                 value={searchTerm}
@@ -280,10 +281,10 @@ export default function CategoryExplorer({ categories, resources, className }: C
             <div className="flex items-center gap-2">
               <Filter className="h-4 w-4 text-muted-foreground" />
               <span className="text-sm text-muted-foreground">Sort:</span>
-              <Select value={sortBy} onValueChange={handleSortChange}>
+              <Select name="explorer-sort-categories" value={sortBy} onValueChange={handleSortChange}>
                 {/* C5-V2-02: size to the selected label — a fixed w-32 clipped
                     "Resource Count" to "Resource..." in every design system. */}
-                <SelectTrigger className="w-auto min-w-32" aria-label="Sort categories">
+                <SelectTrigger id={`explorer-sort-${searchInputId}`} className="w-auto min-w-32" aria-label="Sort categories">
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
@@ -298,6 +299,7 @@ export default function CategoryExplorer({ categories, resources, className }: C
               <Checkbox
                 className="h-10 w-10 max-lg:h-11 max-lg:w-11"
                 id="subcategories"
+                name="explorer-show-subcategories"
                 aria-label="Show subcategories"
                 checked={showSubcategories}
                 onCheckedChange={(checked) => setShowSubcategories(checked === true)}
