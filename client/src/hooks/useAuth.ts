@@ -11,6 +11,7 @@ import { initGA, optOutGA, trackLoggedOut, trackPageView } from '@/lib/analytics
 import { setAdminAnalyticsSession } from '@/lib/analytics-suppression';
 import { useToast } from '@/hooks/use-toast';
 import type { AuthMethod } from '@shared/schema';
+import { apiFetch } from "@/lib/api-fetch";
 
 /**
  * Per-device state that belongs to the person who just signed out: the
@@ -91,7 +92,7 @@ function logoutRequestSignal(): AbortSignal {
 export async function signOutAndVerify(): Promise<void> {
   // End the owner password session too (no-op for Clerk-only sessions), or
   // the server would still see the admin after Clerk signs out.
-  await fetch('/api/auth/admin-logout', {
+  await apiFetch('/api/auth/admin-logout', {
     method: 'POST',
     credentials: 'include',
     signal: logoutRequestSignal(),
@@ -102,7 +103,7 @@ export async function signOutAndVerify(): Promise<void> {
   // callers do the full reload once the server confirms.
   const clerk = await whenClerkLoaded();
   await clerk.signOut();
-  const authCheck = await fetch('/api/auth/user', {
+  const authCheck = await apiFetch('/api/auth/user', {
     credentials: 'include',
     cache: 'no-store',
     signal: logoutRequestSignal(),
@@ -121,7 +122,7 @@ export async function signOutAndVerify(): Promise<void> {
  * from POST /api/auth/logout to Clerk's signOut().
  */
 async function requestAuthUser(): Promise<AuthResponse> {
-  const res = await fetch('/api/auth/user', { credentials: 'include' });
+  const res = await apiFetch('/api/auth/user', { credentials: 'include' });
   if (!res.ok) {
     const text = (await res.text()) || res.statusText;
     throw new ApiError(res.status, text);
@@ -216,7 +217,7 @@ export function useAuth() {
   const logoutAllMutation = useMutation({
     mutationFn: async () => {
       setLogoutError(null);
-      const response = await fetch('/api/auth/logout-all', {
+      const response = await apiFetch('/api/auth/logout-all', {
         method: 'POST',
         credentials: 'include',
         signal: logoutRequestSignal(),

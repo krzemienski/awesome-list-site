@@ -5,6 +5,7 @@ import { Label } from "@/components/ui/label";
 import { requestedReturnPath } from "@/lib/returnUrl";
 import { setAdminAnalyticsSession } from "@/lib/analytics-suppression";
 import { authPageHeadings } from "@shared/seo-templates";
+import { apiFetch } from "@/lib/api-fetch";
 
 /**
  * Owner password sign-in, shown on /sign-in?admin. Posts to
@@ -22,7 +23,7 @@ export function AdminPasswordSignIn() {
     setSubmitting(true);
     setError(null);
     try {
-      const response = await fetch("/api/auth/admin-login", {
+      const response = await apiFetch("/api/auth/admin-login", {
         method: "POST",
         credentials: "include",
         headers: { "Content-Type": "application/json" },

@@ -41,6 +41,7 @@ import {
   X,
 } from "lucide-react";
 import { AdminLoadError } from "@/components/admin/AdminLoadError";
+import { apiFetch } from "@/lib/api-fetch";
 
 interface JourneyStep {
   id: number;
@@ -141,7 +142,7 @@ function ResourcePicker({
     queryFn: async () => {
       const params = new URLSearchParams({ limit: "10" });
       if (query.trim()) params.set("search", query.trim());
-      const res = await fetch(`/api/resources?${params.toString()}`, {
+      const res = await apiFetch(`/api/resources?${params.toString()}`, {
         credentials: "include",
       });
       if (!res.ok) throw new ApiError(res.status, "Failed to search resources");
@@ -156,7 +157,7 @@ function ResourcePicker({
     queryKey: ["/api/resources/picker", value],
     queryFn: async () => {
       if (!value) return null;
-      const res = await fetch(`/api/resources/${value}`, { credentials: "include" });
+      const res = await apiFetch(`/api/resources/${value}`, { credentials: "include" });
       if (!res.ok) return null;
       const json = await res.json();
       return { id: json.id, title: json.title, url: json.url };
@@ -382,7 +383,7 @@ function StepsDialog({
   const stepsQuery = useQuery<{ steps: JourneyStep[] }>({
     queryKey: ["/api/admin/journeys", journeyId, "steps"],
     queryFn: async () => {
-      const res = await fetch(`/api/admin/journeys/${journeyId}/steps`, {
+      const res = await apiFetch(`/api/admin/journeys/${journeyId}/steps`, {
         credentials: "include",
       });
       if (!res.ok) throw new ApiError(res.status, "Failed to fetch steps");
@@ -791,7 +792,7 @@ export default function JourneyStepsManager() {
   const { data, isLoading, error, refetch, isFetching } = useQuery<{ journeys: AdminJourney[] }>({
     queryKey: ["/api/admin/journeys"],
     queryFn: async () => {
-      const res = await fetch("/api/admin/journeys", { credentials: "include" });
+      const res = await apiFetch("/api/admin/journeys", { credentials: "include" });
       if (!res.ok) throw new ApiError(res.status, "Failed to fetch journeys");
       return res.json();
     },

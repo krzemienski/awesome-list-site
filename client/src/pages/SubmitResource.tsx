@@ -57,6 +57,7 @@ import "@/styles/pages/submit.css";
 // Run21 R4-015/048: rules now come from the SHARED validation module so the
 // two layers can't drift (visible-char titles, 2048-char URL cap).
 import { NO_HTML_RE as NO_HTML, MAX_URL_LENGTH, hasVisibleChars, isPlausiblePublicUrl, URL_HOSTNAME_MESSAGE, URL_WHITESPACE_MESSAGE } from "@shared/validation";
+import { apiFetch } from "@/lib/api-fetch";
 
 // Form validation schema
 const submitResourceSchema = z.object({
@@ -248,7 +249,7 @@ export default function SubmitResource() {
       }
 
       try {
-        const response = await fetch(`/api/resources/check-url?url=${encodeURIComponent(debouncedUrl)}`);
+        const response = await apiFetch(`/api/resources/check-url?url=${encodeURIComponent(debouncedUrl)}`);
         // The public endpoint exposes existence only, not resource details.
         const data = (await response.json()) as {
           exists?: boolean;
