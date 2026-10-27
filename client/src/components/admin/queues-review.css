@@ -217,6 +217,16 @@
   text-decoration: underline;
 }
 
+/* Touch: the title link is the row's only way to the resource, so it gets a
+   44px target. */
+@media (max-width: 64rem) {
+  .queue-review-item-title > a {
+    align-items: center;
+    display: flex;
+    min-height: 2.75rem;
+  }
+}
+
 /* 44px hit area without growing the row: the negative margins cancel the
    padding that makes the target. */
 .queue-review-item-link {
