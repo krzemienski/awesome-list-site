@@ -109,6 +109,19 @@ const checkTime = (job: LinkHealthJob) =>
     ? { at: job.completedAt, finished: true }
     : { at: job.startedAt ?? job.createdAt, finished: false };
 
+// Whole minutes a finished scan ran, or null when it has no start or end time.
+const scanMinutes = (job: LinkHealthJob) =>
+  job.startedAt && job.completedAt
+    ? Math.max(1, Math.round((new Date(job.completedAt).getTime() - new Date(job.startedAt).getTime()) / 60_000))
+    : null;
+
+const formatMinutes = (minutes: number) => {
+  const plural = (n: number, unit: string) => `${n} ${unit}${n === 1 ? '' : 's'}`;
+  if (minutes < 60) return plural(minutes, 'minute');
+  const rest = minutes % 60;
+  return `${plural(Math.floor(minutes / 60), 'hour')}${rest ? ` ${plural(rest, 'minute')}` : ''}`;
+};
+
 export default function LinkHealthDashboard() {
   const { toast } = useToast();
   const queryClient = useQueryClient();
@@ -126,7 +139,7 @@ export default function LinkHealthDashboard() {
     refetchInterval: isPolling ? 3000 : 60000
   });
 
-  const { data: historyData, isError: historyError, error: historyErrorValue, isFetching: historyFetching, refetch: retryHistory } = useQuery<LinkHealthHistoryResponse>({
+  const { data: historyData, isLoading: isHistoryLoading, isError: historyError, error: historyErrorValue, isFetching: historyFetching, refetch: retryHistory } = useQuery<LinkHealthHistoryResponse>({
     queryKey: ['/api/admin/link-health/history'],
     // R5-037: refresh admin data when the operator returns to the tab.
     staleTime: 30_000,
@@ -137,7 +150,7 @@ export default function LinkHealthDashboard() {
   // summary counters and the table rows are driven by the SAME dataset. The old
   // server-filtered query made the counters (from the job record) reconcile
   // against a different/stale set than the visible rows.
-  const { data: brokenLinksData, isError: linksError, error: linksErrorValue, isFetching: linksFetching, refetch: retryLinks } = useQuery<BrokenLinksResponse>({
+  const { data: brokenLinksData, isLoading: isLinksLoading, isError: linksError, error: linksErrorValue, isFetching: linksFetching, refetch: retryLinks } = useQuery<BrokenLinksResponse>({
     queryKey: ['/api/admin/link-health/broken-links'],
     queryFn: () => apiRequest('/api/admin/link-health/broken-links'),
     // R5-037: refresh admin data when the operator returns to the tab.
@@ -250,10 +263,17 @@ export default function LinkHealthDashboard() {
     .filter((job) => job.status === 'completed')
     .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())[0];
   const summaryJob = isJobInProgress || isTerminalWithoutResults ? lastCompletedJob : latestJob;
+  const lastScanMinutes = lastCompletedJob ? scanMinutes(lastCompletedJob) : null;
+  // A finished scan's problem counts come from the listed rows; otherwise they
+  // are the totals saved on the job.
+  const countsFromListedLinks = !isJobInProgress && !isTerminalWithoutResults;
+  // Counts shown before their sources resolve would flip once they land, and an
+  // empty list read before problem links arrive is not an all-clear.
+  const countsLoading = isStatusLoading || isHistoryLoading || (countsFromListedLinks && isLinksLoading);
   const summaryCounts = {
     total: summaryJob?.checkedLinks || 0,
     healthy: summaryJob?.healthyLinks || 0,
-    ...(!isJobInProgress && !isTerminalWithoutResults && brokenLinksData
+    ...(countsFromListedLinks && brokenLinksData
       ? {
           broken: countByStatus(['broken', 'dns_failure']),
           redirect: countByStatus(['redirect']),
@@ -403,7 +423,9 @@ export default function LinkHealthDashboard() {
                 ? `Counts and problem links below are from the previous completed scan (#${lastCompletedJob.id}, ${formatAdminDateTime(checkTime(lastCompletedJob).at)}).`
                 : historyError
                   ? "Scan history couldn't be loaded, so the previous completed scan is unknown."
-                  : 'No scan has completed yet, so there are no verified results to show.'}
+                  : isHistoryLoading
+                    ? 'Loading the previous completed scan…'
+                    : 'No scan has completed yet, so there are no verified results to show.'}
             </p>
           </div>
           <Button
@@ -417,12 +439,12 @@ export default function LinkHealthDashboard() {
       )}
       {/* Until a scan completes there are no measured counts; zeros here
           read as "0 healthy links", so the tiles show a dash instead. */}
-      {!lastCompletedJob && !historyError && !(latestJob && isTerminalWithoutResults) && (
+      {!countsLoading && !lastCompletedJob && !historyError && !(latestJob && isTerminalWithoutResults) && (
         <p className="text-sm text-muted-foreground" data-testid="link-health-no-results">
           No scan has completed yet. Counts appear here when a scan finishes.
         </p>
       )}
-      <div className="ops-link-health__stat-grid" aria-label="Link health status summary">
+      <div className="ops-link-health__stat-grid" aria-label="Link health status summary" aria-busy={countsLoading}>
         {([
           ["Healthy", summaryCounts.healthy, statusTone("healthy")],
           ["Redirect", summaryCounts.redirect, statusTone("redirect")],
@@ -432,13 +454,19 @@ export default function LinkHealthDashboard() {
         ] as const).map(([label, value, tone]) => (
           <div key={label} className={`card ops-link-health__stat-card ops-link-health__stat-card--${tone}`}>
             <div className="mono ops-link-health__stat-label">{label}</div>
-            <div>{!lastCompletedJob ? <span aria-label="No result yet">—</span> : typeof value === "number" ? value.toLocaleString() : value}</div>
+            <div>{countsLoading
+              ? <><span className="skeleton inline-block h-[1em] w-16 align-middle" aria-hidden="true" /><span className="sr-only">Loading</span></>
+              : !lastCompletedJob ? <span aria-label="No result yet">—</span> : typeof value === "number" ? value.toLocaleString() : value}</div>
           </div>
         ))}
       </div>
-      {lastCompletedJob ? (
+      {countsLoading ? (
+        <p className="text-xs text-muted-foreground" role="status" data-testid="status-link-health-loading">
+          Loading link health results…
+        </p>
+      ) : lastCompletedJob ? (
         <p className="text-xs text-muted-foreground" data-testid="text-link-health-count-source">
-          {!isJobInProgress && !isTerminalWithoutResults && brokenLinksData
+          {countsFromListedLinks && brokenLinksData
             ? `Counts are from scan #${latestJob?.id} (${formatAdminDateTime(checkTime(latestJob ?? lastCompletedJob).at)}) for resources still in the catalog.${
                 (latestJob?.brokenLinks ?? 0) !== summaryCounts.broken
                   ? ` When it finished, the scan recorded ${(latestJob?.brokenLinks ?? 0).toLocaleString()} broken; ${summaryCounts.broken.toLocaleString()} of those resources are still listed.`
@@ -470,14 +498,21 @@ export default function LinkHealthDashboard() {
           <CardDescription>
             {latestJobTime
               ? `${latestJobTime.finished ? 'Last check:' : 'Check started'} ${formatAdminDateTime(latestJobTime.at)}`
-              : statusError
+              : isStatusLoading
+                ? 'Loading the last check…'
+                : statusError
                 ? 'Last check unavailable'
                 : 'No link health checks performed yet'
             }
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
-          {latestJob ? (
+          {isStatusLoading ? (
+            <div className="flex items-center justify-center py-8" aria-busy="true">
+              <RefreshCw className="h-6 w-6 animate-spin text-muted-foreground" aria-hidden="true" />
+              <span className="sr-only">Loading the last check</span>
+            </div>
+          ) : latestJob ? (
             <>
               {isActiveJob && (
                 <>
@@ -647,15 +682,17 @@ export default function LinkHealthDashboard() {
         }
       >
           {recentFailures.length === 0 ? (
-            <div className="ops-link-health__flagged-table-wrap">
+            <div className="ops-link-health__flagged-table-wrap" aria-busy={isStatusLoading || isLinksLoading}>
               <table className="table">
                 <thead>
                   <tr><th>Resource</th><th>URL</th><th>Status</th><th>Last checked</th></tr>
                 </thead>
               </table>
-              <p className="ops-link-health__empty" role="status">
+              <p className="ops-link-health__empty" role="status" data-testid="text-recent-failures-empty">
                 {problemLinksUnverified
                   ? "Recent failures couldn't be loaded. This is not evidence that links are healthy."
+                  : isStatusLoading || isLinksLoading
+                  ? "Loading recent failures…"
                   : isJobInProgress
                   ? "Recent failures will appear when the current check completes."
                   : latestJob
@@ -765,8 +802,8 @@ export default function LinkHealthDashboard() {
             </Select>
           </div>
 
-          {isStatusLoading ? (
-            <div className="flex items-center justify-center py-8">
+          {isStatusLoading || isLinksLoading ? (
+            <div className="flex items-center justify-center py-8" aria-busy="true">
               <RefreshCw className="h-6 w-6 animate-spin text-muted-foreground" />
             </div>
           ) : brokenLinks.length === 0 ? (
@@ -893,7 +930,10 @@ export default function LinkHealthDashboard() {
             <AlertDialogDescription>
               This checks the URL of every approved resource in the catalog
               {approvedTotal != null ? ` (currently ${approvedTotal.toLocaleString()})` : ""} against the
-              live web. The job runs in the background and can take several minutes to complete.
+              live web. The job runs in the background.{" "}
+              {lastCompletedJob && lastScanMinutes !== null
+                ? `The last full scan (#${lastCompletedJob.id}, ${lastCompletedJob.checkedLinks.toLocaleString()} links) took ${formatMinutes(lastScanMinutes)}.`
+                : "How long it takes depends on the catalog size and how quickly each site answers; a large catalog can take over an hour."}
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>

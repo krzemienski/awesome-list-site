@@ -182,33 +182,43 @@ export const ResearchLaunchGuide = forwardRef<ResearchLaunchGuideHandle, Researc
     // remains visible and the operator can retry without a toast remount.
   });
 
-  const validate = (): string | null => {
+  const minutesN = Number(minDurationMinutes);
+  const minutesValid = Number.isInteger(minutesN) && minutesN >= 1 && minutesN <= 240;
+
+  // The input id the message is about, so the failing field can be marked and focused.
+  const validate = (): { field: string; message: string } | null => {
     const trimmed = effectivePrompt.trim();
     if (briefMode === "custom" && trimmed.length < 10) {
-      return "Brief too short: write at least 10 characters, or choose \"Auto-generate at launch\".";
+      return { field: "prompt", message: "Brief too short: write at least 10 characters, or choose \"Auto-generate at launch\"." };
     }
     if (maxBudget.trim() !== "") {
       const b = Number(maxBudget);
-      if (!Number.isFinite(b) || b <= 0) return "Invalid budget: enter a positive number, or leave it blank for no cap.";
+      if (!Number.isFinite(b) || b <= 0) return { field: "budget", message: "Invalid budget: enter a positive number, or leave it blank for no cap." };
     }
     if (maxTurns.trim() !== "") {
       const t = Number(maxTurns);
-      if (!Number.isInteger(t) || t <= 0) return "Invalid max turns: enter a positive whole number, or leave it blank for no cap.";
+      if (!Number.isInteger(t) || t <= 0) return { field: "turns", message: "Invalid max turns: enter a positive whole number, or leave it blank for no cap." };
     }
-    if (minDurationMinutes.trim() !== "") {
-      const minutes = Number(minDurationMinutes);
-      if (!Number.isInteger(minutes) || minutes < 1 || minutes > 240) return "Invalid minimum duration: enter 1–240 whole minutes, or leave it blank for no minimum.";
+    if (minDurationMinutes.trim() !== "" && !minutesValid) {
+      return { field: "minimum-duration", message: "Invalid minimum duration: enter 1–240 whole minutes, or leave it blank for no minimum." };
     }
     if (target !== null && (!Number.isInteger(target) || target <= 0 || target > 1000)) {
-      return "Invalid discovery target: enter a whole number from 1 to 1000, or leave it blank for no target.";
+      return { field: "target-discoveries", message: "Invalid discovery target: enter a whole number from 1 to 1000, or leave it blank for no target." };
     }
     return null;
   };
-  const launchError = launchAttempted ? validate() : null;
+  const launchProblem = launchAttempted ? validate() : null;
+  const launchError = launchProblem?.message ?? null;
+  const invalidProps = (field: string) =>
+    launchProblem?.field === field ? { "aria-invalid": true as const, "aria-describedby": "error-research-launch" } : {};
 
   const handleLaunch = () => {
     setLaunchAttempted(true);
-    if (validate()) return;
+    const problem = validate();
+    if (problem) {
+      requestAnimationFrame(() => document.getElementById(problem.field)?.focus());
+      return;
+    }
     start.reset();
     setConfirmOpen(true);
   };
@@ -226,7 +236,7 @@ export const ResearchLaunchGuide = forwardRef<ResearchLaunchGuideHandle, Researc
     target !== null && Number.isInteger(target) && target > 0 ? `stop after ${target}` : "no target",
     maxBudget.trim() === "" ? "no budget cap" : Number.isFinite(budgetN) && budgetN > 0 ? `$${budgetN.toFixed(2)} cap` : "budget?",
     maxTurns.trim() === "" ? "no turn cap" : Number.isInteger(turnsN) && turnsN > 0 ? `${turnsN} turns` : "turns?",
-    minDurationMinutes.trim() === "" ? "no minimum duration" : `${minDurationMinutes} min minimum`,
+    minDurationMinutes.trim() === "" ? "no minimum duration" : minutesValid ? `${minutesN} min minimum` : "minimum?",
   ].join(" · ");
 
   return (
@@ -274,6 +284,7 @@ export const ResearchLaunchGuide = forwardRef<ResearchLaunchGuideHandle, Researc
               value={prompt}
               onChange={(e) => setPrompt(e.target.value)}
               placeholder="e.g. Find open-source AV1 encoders not yet in the index"
+              {...invalidProps("prompt")}
               className="mt-1 min-h-[100px]"
               data-testid="input-research-prompt"
             />
@@ -306,6 +317,7 @@ export const ResearchLaunchGuide = forwardRef<ResearchLaunchGuideHandle, Researc
             <Label htmlFor="target-discoveries">Stop after (discoveries)</Label>
             <Input id="target-discoveries" type="number" min={1} max={1000} step={1} placeholder="No target"
               value={targetDiscoveries} onChange={(e) => setTargetDiscoveries(e.target.value)}
+              {...invalidProps("target-discoveries")}
               className="mt-1 min-h-11" data-testid="input-target-discoveries" />
             <p className={hint(target !== null && (!Number.isInteger(target) || target <= 0 || target > 1000))} data-testid="text-target-hint">
               {target === null ? "No target — runs until the budget or turns end."
@@ -317,6 +329,7 @@ export const ResearchLaunchGuide = forwardRef<ResearchLaunchGuideHandle, Researc
             <Label htmlFor="budget">Budget cap (USD)</Label>
             <Input id="budget" ref={budgetRef} type="number" step="0.25" min="0" placeholder="No cap"
               value={maxBudget} onChange={(e) => setMaxBudget(e.target.value)}
+              {...invalidProps("budget")}
               className="mt-1 min-h-11" data-testid="input-research-budget" />
             <p className={hint(maxBudget.trim() !== "" && !(Number.isFinite(budgetN) && budgetN > 0))}>
               {maxBudget.trim() === "" ? "No cap — the run spends until it stops or you cancel it." : "Spend is checked between turns, so a run can go over this cap by up to one turn's cost before it stops."}
@@ -334,6 +347,7 @@ export const ResearchLaunchGuide = forwardRef<ResearchLaunchGuideHandle, Researc
             <Label htmlFor="turns">Max turns</Label>
             <Input id="turns" type="number" min={1} step={1} placeholder="No cap"
               value={maxTurns} onChange={(e) => setMaxTurns(e.target.value)}
+              {...invalidProps("turns")}
               className="mt-1 min-h-11" data-testid="input-research-turns" />
             <p className={hint(maxTurns.trim() !== "" && !(Number.isInteger(turnsN) && turnsN > 0))} data-testid="text-turns-hint">
               {maxTurns.trim() === "" ? "No turn cap." : "Positive whole number (blank = no cap)."}
@@ -343,6 +357,7 @@ export const ResearchLaunchGuide = forwardRef<ResearchLaunchGuideHandle, Researc
             <Label htmlFor="minimum-duration">Minimum duration (minutes)</Label>
             <Input id="minimum-duration" type="number" min={1} max={240} step={1} placeholder="No minimum"
               value={minDurationMinutes} onChange={(e) => setMinDurationMinutes(e.target.value)}
+              {...invalidProps("minimum-duration")}
               className="mt-1 min-h-11" data-testid="input-research-min-duration" />
             <p className="mt-1 text-xs text-muted-foreground" data-testid="text-min-duration-hint">
               Optional. If the first turn ends early, the run continues with fresh research until this elapsed time, budget and turns allow.
@@ -440,7 +455,7 @@ export const ResearchLaunchGuide = forwardRef<ResearchLaunchGuideHandle, Researc
             {start.isPending ? <><RefreshCw className="mr-2 h-4 w-4 animate-spin" />Starting…</> : <><Play className="mr-2 h-4 w-4" />Launch research run</>}
           </Button>
           {launchBlockedReason && <p className="text-xs text-muted-foreground" data-testid="text-launch-blocked">{launchBlockedReason}</p>}
-          {launchError && <p role="alert" className="text-sm text-destructive" data-testid="error-research-launch">{launchError}</p>}
+          {launchError && <p id="error-research-launch" role="alert" className="text-sm text-destructive" data-testid="error-research-launch">{launchError}</p>}
         </div>
       </Step>
 

@@ -1483,6 +1483,7 @@ export default function GenericCrudManager<T extends BaseEntityWithCount>({
   }, [parents, customFields]);
 
   const [formData, setFormData] = useState<Record<string, string | string[]>>(initialFormData);
+  const [slugEditedByHand, setSlugEditedByHand] = useState(false);
   const [validationErrors, setValidationErrors] = useState<FieldValidationErrors>({});
 
   /**
@@ -2512,6 +2513,7 @@ export default function GenericCrudManager<T extends BaseEntityWithCount>({
 
   const openCreateDialog = () => {
     setFormData(initialFormData);
+    setSlugEditedByHand(false);
     setFileData({});
     setFilePreviews({});
     setValidationErrors({});
@@ -2600,8 +2602,10 @@ export default function GenericCrudManager<T extends BaseEntityWithCount>({
 
   // Only the create dialog auto-slugs. An existing slug is a public URL, so
   // the edit dialog leaves it alone unless the admin edits the slug field.
+  // Once the admin types a slug by hand, later Name edits leave it alone;
+  // emptying the slug hands it back to the name.
   const handleNameChange = (name: string) => {
-    setFormData({ ...formData, name, slug: generateSlug(name) });
+    setFormData(slugEditedByHand ? { ...formData, name } : { ...formData, name, slug: generateSlug(name) });
     setFormError(null);
     clearFieldError("name");
     clearFieldError("slug");
@@ -2610,6 +2614,7 @@ export default function GenericCrudManager<T extends BaseEntityWithCount>({
   // Like a parent pick, editing a field the banner names makes it stale; the
   // next submit re-validates everything.
   const handleFieldEdit = (field: "name" | "slug", value: string) => {
+    if (field === "slug") setSlugEditedByHand(value !== "");
     setFormData({ ...formData, [field]: value });
     setFormError(null);
     clearFieldError(field);
@@ -2915,19 +2920,6 @@ export default function GenericCrudManager<T extends BaseEntityWithCount>({
                 </tr>
               </thead>
               <tbody>
-                {/* Run17 BUG-032: a filter with zero matches renders an explicit
-                    empty row instead of headers floating over nothing. */}
-                {(!paginatedItems || paginatedItems.length === 0) && (
-                  <tr>
-                    <td
-                      colSpan={getVisibleColumns.length + (bulkOperationsEnabled ? 1 : 0)}
-                      className="text-center py-8 text-muted-foreground"
-                      data-testid={`empty-${testIdEntityPlural}`}
-                    >
-                      No {entityNamePlural.toLowerCase()} match your search.
-                    </td>
-                  </tr>
-                )}
                 {paginatedItems?.map((item) => (
                   <tr key={item.id} data-testid={`row-${testIdEntity}-${item.id}`} className={`admin-taxonomy-row ${selectedIds.has(item.id) ? "bg-muted/50" : ""}`}>
                     {bulkOperationsEnabled && (
@@ -3028,6 +3020,14 @@ export default function GenericCrudManager<T extends BaseEntityWithCount>({
             </table>
           </div>
           </div>
+          {/* Run17 BUG-032: a filter with zero matches says so instead of leaving
+              headers over nothing. It sits outside the horizontal scroller, where
+              a cell spanning the full table width cut it off on narrow screens. */}
+          {(!paginatedItems || paginatedItems.length === 0) && (
+            <p className="py-8 text-center text-sm text-muted-foreground" data-testid={`empty-${testIdEntityPlural}`}>
+              No {entityNamePlural.toLowerCase()} match your search.
+            </p>
+          )}
           {tableScrollCue.showCue && (
             <p className="admin-taxonomy-scroll-hint mt-2 text-xs text-muted-foreground" data-testid={`hint-swipe-${testIdEntityPlural}-table`}>
               Swipe the table sideways to see all columns, including Edit/Delete.

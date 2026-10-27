@@ -210,6 +210,8 @@ export default function MainLayout({ productProfile, nav, isLoading, navError, o
             setSearchOpen(true);
           }}
           siteName={publicConfig?.site?.title}
+          repoUrl={publicConfig?.site?.repoUrl}
+          repoBranch={publicConfig?.site?.repoBranch}
           user={user}
           onLogout={onLogout}
           logoutError={logoutError}

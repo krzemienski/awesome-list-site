@@ -28,6 +28,7 @@ import {
 import "@/styles/shell/sidebar.css";
 import "@/styles/shell/drawer.css";
 import { useHomeBoot } from "@/lib/home-boot";
+import { docsUrl } from "@/lib/docs-url";
 
 /**
  * Run22 BUG-008: the sidebar renders from the lightweight nav tree
@@ -648,6 +649,7 @@ export default function AppSidebar({
   onRetryNav,
   user,
 }: AppSidebarProps) {
+  const docsHref = docsUrl(repoUrl, repoBranch);
   const homeBoot = useHomeBoot();
   const isInitialHomeHydration = homeBoot?.isAnonymous === true;
   const [location, setLocation] = useLocation();
@@ -1134,9 +1136,9 @@ export default function AppSidebar({
           <span className="av-sidebar-compact-footer-live"> · live</span>
         </span>
         <div className="av-sidebar-compact-footer-links">
-          {includeDocs && repoUrl && (
+          {includeDocs && docsHref && (
             <a
-              href={`${repoUrl.replace(/\/$/, "")}/tree/${encodeURIComponent(repoBranch)}/docs`}
+              href={docsHref}
               target="_blank"
               rel="noopener noreferrer"
             >

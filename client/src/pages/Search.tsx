@@ -149,6 +149,9 @@ export default function Search() {
     return () => clearTimeout(timer);
   }, [input, state.q]);
   const clearFilters = (includeSort = false) => {
+    // A sort the page doesn't offer is part of what made the request invalid,
+    // so it goes with the filters; a supported one stays.
+    const resetSort = includeSort || !Object.hasOwn(sortLabels, state.sort);
     const next = {
       ...state,
       q: input,
@@ -159,7 +162,7 @@ export default function Search() {
       provider: "",
       format: "",
       skillLevel: "",
-      sort: includeSort ? "relevance" : state.sort,
+      sort: resetSort ? "relevance" : state.sort,
       page: 1,
     };
     setState(next);
@@ -180,18 +183,20 @@ export default function Search() {
       provider: null,
       format: null,
       skillLevel: null,
-      sort: includeSort ? null : state.sort === "relevance" ? null : state.sort,
+      sort: resetSort || state.sort === "relevance" ? null : state.sort,
       page: null,
     }, "push");
   };
   const clearInvalidRequest = () => {
-    const next = readState("");
+    // Keep a valid query; drop every other parameter used to construct the
+    // failed request, including unsupported values and unknown query keys.
+    const queryLength = normalizeSearchQuery(input).length;
+    const kept = queryLength > 0 && queryLength <= SEARCH_QUERY_MAX_LENGTH ? new URLSearchParams({ q: input }).toString() : "";
+    const next = readState(kept);
     setState(next);
-    setInput("");
+    setInput(next.q);
     setPageNotice(null);
-    // Remove every parameter used to construct the failed request, including
-    // unsupported values and any unrelated unknown query keys.
-    window.history.replaceState(null, "", "/search");
+    window.history.replaceState(null, "", `/search${kept ? `?${kept}` : ""}`);
     // C6-SWEEP-05: "Clear invalid filters" unmounts with the error card.
     inputRef.current?.focus();
   };
