@@ -1,0 +1,2 @@
+7a65adaf18d8f86eff7c6a1d496d5b59e6d67aef6058d28bf253303eb23f68da  client/src/components/admin/ResearcherTab.tsx
+4daa6deca73ddb10fe99b8c39d9eac4e3389639b283f1152a2e89cad08080c68  CHANGELOG.md

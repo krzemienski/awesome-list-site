@@ -11,6 +11,11 @@ All notable changes to the Awesome Video Resource Viewer project. Newest entries
 - Numeric page overflow recovers to the last page with a dismissible explanation, including typed page jumps and direct document loads. Invalid page text and unknown taxonomy routes retain their existing validation.
 - Offline collection recovery preserves focus intent until results mount and restores lost focus without moving it during ordinary background refreshes.
 
+### Researcher history navigation (C6-AI-030)
+- `Done` and `Review later` now open the full-history disclosure, activate Job History, highlight the requested run, and focus the named history region instead of the compact jobs table.
+- A selected run outside the paginated window is shown separately without changing compact `Show more` or full-history `Load more` counts. Direct run links, launch drafts, and detail-dialog focus restoration retain their existing paths.
+- Browser verification remains blocked pending an authorized local admin session; the 1440, 820-touch, and 390-touch production journeys are unverified until deployment.
+
 ### Database reseed confirmation
 - Fixed C6-AO-024: Clear & Re-seed requires exact uppercase `RESEED` after
   trimming surrounding whitespace; lowercase and mixed-case input stay disabled.

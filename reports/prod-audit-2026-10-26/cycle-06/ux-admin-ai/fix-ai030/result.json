@@ -1,0 +1,47 @@
+{
+  "finding": "C6-AI-030",
+  "baseRevision": "520d6778369bc7ce495204cfcacc7e0533f941cc",
+  "branch": "fix/c6-ai030-full-history",
+  "implementationStatus": "IMPLEMENTED",
+  "browserStatus": "BLOCKED",
+  "renderedBehaviorVerdict": "UNVERIFIED",
+  "implementationScope": ["client/src/components/admin/ResearcherTab.tsx"],
+  "documentationScope": ["CHANGELOG.md"],
+  "rootCause": "The shared Done/Review later handler selected a run but scrolled and focused only the compact table; it neither opened the full-history disclosure nor activated Job History, and only the compact rows used historyJobId for highlighting.",
+  "implementation": [
+    "The shared return-to-history handler synchronously opens the disclosure, activates the controlled history tab, records the selected run and exits the followed-run view before moving focus.",
+    "Focus targets the named non-live full-history region; the selected row is scrolled into view when mounted.",
+    "Full-history rows use aria-current and the existing TableRow selected-state styling.",
+    "An arbitrary older selected run resolves through the existing per-run query cache/API and is included only in full-history rows, with an explanatory range note. The paginated jobs list, limits, compact rows and pagination count calculations are unchanged.",
+    "Flattened keyed history rows keep row and details-button identity stable when a selected older run is inserted or later enters the paginated window.",
+    "Direct jobId initialization, followed-run URL synchronization, the always-mounted launch guide and shared detail-dialog focus restoration are unchanged."
+  ],
+  "checks": [
+    {
+      "command": "./node_modules/.bin/tsc --noEmit",
+      "exitCode": 0,
+      "piped": false,
+      "evidence": "typecheck.txt:1-4"
+    },
+    {
+      "command": "npm run build",
+      "exitCode": 0,
+      "piped": false,
+      "evidence": "build.txt:2-284",
+      "warnings": "Rollup could not interpret two dependency PURE annotations; client chunk-size advisory and server bundle-size marker were emitted. Build completed."
+    }
+  ],
+  "provenance": {
+    "sourceHashes": "source-sha256.txt",
+    "buildMetadataNote": "The captured build ran against the final edited working tree while HEAD still named the required base revision; source hashes identify the checked source. Build metadata alone is not proof that the base revision contains this fix.",
+    "captureMethod": "Tool-returned command text was persisted directly without hand-transcribing output. Exit status was printed immediately after each unpiped command and returned unchanged."
+  },
+  "browserEvidence": "browser-proof.json",
+  "unverified": [
+    "Done and Review later behavior at 1440 desktop, 820 touch and 390 touch.",
+    "Selected older run visibility/highlighting and meaningful focus in the rendered expanded history.",
+    "Rendered compact/full pagination distinction and counts.",
+    "Rendered direct-link behavior, launch draft preservation and detail-dialog close focus restoration."
+  ],
+  "safety": "No test files, mocks, validation scripts/harnesses or reviewer panels were created or run. No paid work, authentication mutation, cookie transfer, merge or deployment was performed."
+}
