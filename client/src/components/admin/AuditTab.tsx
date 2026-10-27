@@ -68,7 +68,6 @@ const ACTION_STATUS: Record<string, string> = {
   recommendation_feedback_already_known: "completed",
   recommendation_feedback_hidden: "completed",
   recommendation_feedback_restored: "completed",
-  superseded: "completed",
   edit_suggested: "pending",
   edit_approved: "approved",
   edit_rejected: "rejected",
