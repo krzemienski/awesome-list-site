@@ -4,6 +4,13 @@ All notable changes to the Awesome Video Resource Viewer project. Newest entries
 
 ---
 
+## October 27, 2026
+
+### Taxonomy card actions and recovery
+- Restored Favorite and Bookmark controls to taxonomy Grid cards using the same guest/member actions as List and Compact.
+- Numeric page overflow recovers to the last page with a dismissible explanation, including typed page jumps and direct document loads. Invalid page text and unknown taxonomy routes retain their existing validation.
+- Offline collection recovery preserves focus intent until results mount and restores lost focus without moving it during ordinary background refreshes.
+
 ## September 15, 2026
 
 ### Parity documentation and independent verification

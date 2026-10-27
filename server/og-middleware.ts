@@ -1274,11 +1274,6 @@ function homeShellChrome(): string {
         const listing = await resolveTaxonomyPage(found, "category", url.split("?")[1] || "", parsePage(url));
         const flat = listing.allResources;
         const { totalPages, page, total } = listing;
-        // BUG-027 (audit 2): an out-of-range ?page is a real 404 — never a
-        // silent clamp serving page-1 duplicate content on infinite URLs.
-        if (page > totalPages) {
-          return { meta: notFoundMeta(path), found: false };
-        }
         markEmptyTaxonomyNoindex(m, flat.length);
         m.title = `${pagedSeoTitleCore(titleCore, page)} — ${SITE_NAME}`;
         m.description = pagedSeoDescription(
@@ -1488,10 +1483,6 @@ function homeShellChrome(): string {
         const listing = await resolveTaxonomyPage(found, "subcategory", url.split("?")[1] || "", parsePage(url));
         const flat = listing.allResources;
         const { totalPages, page, total } = listing;
-        // BUG-027 (audit 2): out-of-range ?page → real 404, not a clamp.
-        if (page > totalPages) {
-          return { meta: notFoundMeta(path), found: false };
-        }
         markEmptyTaxonomyNoindex(m, flat.length);
         m.title = `${pagedSeoTitleCore(titleCore, page)} — ${SITE_NAME}`;
         m.description = pagedSeoDescription(
@@ -1582,10 +1573,6 @@ function homeShellChrome(): string {
         const listing = await resolveTaxonomyPage(found, "sub-subcategory", url.split("?")[1] || "", parsePage(url));
         const flat = listing.allResources;
         const { totalPages, page, total } = listing;
-        // BUG-027 (audit 2): out-of-range ?page → real 404, not a clamp.
-        if (page > totalPages) {
-          return { meta: notFoundMeta(path), found: false };
-        }
         markEmptyTaxonomyNoindex(m, flat.length);
         m.title = `${pagedSeoTitleCore(titleCore, page)} — ${SITE_NAME}`;
         m.description = pagedSeoDescription(

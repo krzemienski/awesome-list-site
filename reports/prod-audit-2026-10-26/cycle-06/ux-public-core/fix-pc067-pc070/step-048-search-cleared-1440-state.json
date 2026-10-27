@@ -1,0 +1,27 @@
+{
+  "before": {
+    "url": "http://127.0.0.1:5067/category/encoding-codecs?search=ffmpeg&sortBy=name-desc",
+    "input": "ffmpeg",
+    "count": "Resources (142)",
+    "viewport": {
+      "w": 1440,
+      "h": 900,
+      "touch": 0
+    }
+  },
+  "after": {
+    "url": "http://127.0.0.1:5067/category/encoding-codecs?sortBy=name-desc",
+    "input": "",
+    "count": "Resources (372)",
+    "requests": [
+      "http://127.0.0.1:5067/api/resources?page=1&limit=24&facets=true&search=ffmpeg&category=encoding-codecs&sort=name-desc",
+      "http://127.0.0.1:5067/api/resources?page=1&limit=24&facets=true&category=encoding-codecs&sort=name-desc"
+    ],
+    "viewport": {
+      "w": 1440,
+      "h": 900,
+      "touch": 0
+    }
+  },
+  "method": "Native keyboard Meta+A/Backspace, search code unchanged"
+}

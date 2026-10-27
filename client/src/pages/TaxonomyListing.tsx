@@ -345,21 +345,23 @@ export default function TaxonomyListing({ level }: Props) {
     ? taxonomySearch.isLoading || taxonomySearch.isPlaceholderData
     : listing.isPlaceholderData;
   // While the debounce lags the URL's search, neither total describes the
-  // URL, so the clamp-or-404 decision waits.
+  // URL, so page recovery waits.
   const searchSettled = debouncedSearch === normalizedSearch;
   const paginationReady = searchSettled && (serverFilterActive
     ? Boolean(taxonomySearch.data && !taxonomySearch.isPlaceholderData)
     : Boolean(listingData && !listing.isPlaceholderData));
-  // Same split as resolveTaxonomyPage: a narrowed view clamps a page past the
-  // end, the plain listing 404s it (BUG-027).
-  const listingFiltered = serverFilterActive || selection !== "all" || general;
-  const pageNotFound = pageRejected || (!listingFiltered && paginationReady && page > totalPages);
+  const pageNotFound = pageRejected;
+  const resultsQuery = serverFilterActive ? taxonomySearch : listing;
+  const offline = queryUnavailableReason(listing) === "offline" ||
+    queryUnavailableReason(resultsQuery) === "offline" ||
+    (resultsQuery.isPlaceholderData && resultsQuery.isPaused);
   const lastTrackedSearchIntentRef = useRef("");
   const trackedCategoryViewRef = useRef("");
   const resultsRef = useRef<HTMLDivElement>(null);
   const resultsHeadingRef = useRef<HTMLHeadingElement>(null);
   const searchInputRef = useRef<HTMLInputElement>(null);
   const pendingResultsFocusRef = useRef(false);
+  const offlineRouteRef = useRef<string | null>(null);
   const pendingAnalyticsRef = useRef<{
     signature: string;
     type: string;
@@ -395,11 +397,27 @@ export default function TaxonomyListing({ level }: Props) {
   }, [debouncedSearch, format, general, kind, level, provider, selection, serverSearchActive, skillLevel, slug, sort, tags, taxonomySearch.data, taxonomySearch.isPlaceholderData]);
 
   useEffect(() => {
-    if (!pendingResultsFocusRef.current || loading || resultsLoading || listing.isPlaceholderData) return;
+    if (!pendingResultsFocusRef.current || offline || pageError || loading || resultsLoading || !searchSettled || page > totalPages || !resultsHeadingRef.current) return;
     pendingResultsFocusRef.current = false;
-    const timer = window.setTimeout(() => resultsHeadingRef.current?.focus({ preventScroll: true }), 250);
-    return () => window.clearTimeout(timer);
-  }, [loading, listing.isPlaceholderData, resultsLoading, resources, total]);
+    resultsHeadingRef.current.focus({ preventScroll: true });
+  }, [loading, offline, page, pageError, resultsLoading, resources, searchSettled, totalPages]);
+
+  useEffect(() => {
+    const node = `${level}:${slug}`;
+    if (offline) {
+      offlineRouteRef.current = node;
+      // Once the offline panel takes over, recovery must respect any focus
+      // the visitor moves into the surrounding navigation.
+      pendingResultsFocusRef.current = false;
+      return;
+    }
+    if (offlineRouteRef.current !== node || loading || resultsLoading || pageError || !resultsRef.current) return;
+    offlineRouteRef.current = null;
+    const active = document.activeElement;
+    if (!active || active === document.body || !active.isConnected) {
+      resultsRef.current.focus({ preventScroll: true });
+    }
+  }, [level, loading, offline, pageError, resultsLoading, resources, slug]);
 
   useEffect(() => {
     const pending = pendingAnalyticsRef.current;
@@ -417,13 +435,13 @@ export default function TaxonomyListing({ level }: Props) {
   const replaceNextUrlSync = useRef(false);
   const pushSnapshot = useRef("");
   useEffect(() => {
-    if (listingFiltered && page > totalPages && paginationReady) {
+    if (!pageRejected && page > totalPages && paginationReady) {
       // Correct the URL in place: Back to it would only clamp again.
       replaceNextUrlSync.current = true;
       setNotice(`Page ${page} is not available; showing page ${totalPages} instead.`);
       setPage(totalPages);
     }
-  }, [listingFiltered, page, paginationReady, totalPages]);
+  }, [page, pageRejected, paginationReady, totalPages]);
   const stateHref = `${routeFor(level, slug)}${stateQuery.size ? `?${stateQuery}` : ""}`;
   // Search text is left out so typing replaces the entry instead of pushing.
   const snapshot = JSON.stringify([page, selection, tags, provider, format, skillLevel, sort, kind, general, view]);
@@ -438,8 +456,8 @@ export default function TaxonomyListing({ level }: Props) {
     // (Back from a category never reached Home). Only sync while the
     // document is still on this listing's own path.
     if (!samePath(window.location.pathname, routeFor(level, slug))) return;
-    // A 404 keeps the requested URL, exactly as the server answered it. A
-    // linked page past 1 may still turn out to be one, so wait for its total.
+    // Malformed page input retains its rejected URL; numeric pages wait for
+    // their authoritative total before canonical recovery.
     if (pageNotFound) return;
     if (page > 1 && !paginationReady && strictUrlPage(new URLSearchParams(window.location.search).get("page")) === page) return;
     if (current !== stateHref) {
@@ -484,9 +502,7 @@ export default function TaxonomyListing({ level }: Props) {
   // A filtered view's results come from the search query, so its pause is the
   // page's too. Held placeholder results render as a loading skeleton here, so
   // a paused fetch behind them (paging offline) is offline as well.
-  const resultsQuery = serverFilterActive ? taxonomySearch : listing;
-  const resultsOffline = queryUnavailableReason(resultsQuery) === "offline" || (resultsQuery.isPlaceholderData && resultsQuery.isPaused);
-  if (queryUnavailableReason(listing) === "offline" || resultsOffline) {
+  if (offline) {
     return <OfflinePageState onRetry={() => { void listing.refetch(); if (resultsQuery !== listing) void resultsQuery.refetch(); }} testId="taxonomy-offline" />;
   }
   if (!listingData || !name) return <NotFound />;
@@ -730,11 +746,11 @@ export default function TaxonomyListing({ level }: Props) {
                };
               if (view === "list") return <ResourceListRow key={`${normalized.id}-${index}`} resource={normalized} />;
               if (view === "compact") return <ResourceCompactCard key={`${normalized.id}-${index}`} resource={normalized} />;
-                return <ResourceCard key={`${normalized.id}-${index}`} variant="taxonomy" showPersonalActions={false} resource={normalized} fullResource={resource} onTagClick={(tag) => onFacetChange("tags", tags.some(old => normalizeTag(old) === normalizeTag(tag)) ? tags : [...tags, tag])} />;
+                return <ResourceCard key={`${normalized.id}-${index}`} variant="taxonomy" resource={normalized} fullResource={resource} onTagClick={(tag) => onFacetChange("tags", tags.some(old => normalizeTag(old) === normalizeTag(tag)) ? tags : [...tags, tag])} />;
             })}</div>}
           {/* Page navigation stays visible whenever the collection spans more
               than one page: it is primary navigation, not a filter tool. */}
-          {totalPages > 1 && <div className="taxonomy-pagination"><Paginator currentPage={currentPage} totalPages={totalPages} makeHref={makeHref} onNavigate={onPage} /></div>}
+          {totalPages > 1 && <div className="taxonomy-pagination"><Paginator currentPage={currentPage} totalPages={totalPages} makeHref={makeHref} onNavigate={onPage} onPageAdjusted={(requested, adjusted) => setNotice(`Page ${requested} is not available; showing page ${adjusted} instead.`)} /></div>}
         </div>
       </div>
     </div>

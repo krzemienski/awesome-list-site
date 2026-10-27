@@ -1,0 +1,20 @@
+- main [ref=e1]:
+  - generic [ref=e2]:
+    - navigation "Breadcrumb" [ref=e3]:
+      - list [ref=e4]:
+        - listitem [ref=e5]:
+          - link "Home" [ref=e6] [cursor=pointer]:
+            - /url: /
+        - listitem [ref=e7]:
+          - img [ref=e8]
+        - listitem:
+          - link "Encoding & Codecs" [disabled]
+    - alert [ref=e10]:
+      - generic [ref=e11]:
+        - generic [ref=e12]: Offline
+        - heading "You're offline" [level=1] [ref=e13]
+        - text: This page couldn't load because your device has no connection. It will load on its own when you reconnect.
+        - paragraph [ref=e15]: Still offline — reconnect and try again.
+        - button "Retry" [active] [ref=e17] [cursor=pointer]:
+          - img
+          - text: Retry

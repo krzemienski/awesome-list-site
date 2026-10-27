@@ -1,0 +1,10 @@
+{
+  "url": "http://127.0.0.1:5067/category/encoding-codecs?page=999",
+  "status": 200,
+  "state": {
+    "url": "http://127.0.0.1:5067/category/encoding-codecs?page=16&view=compact",
+    "title": "Video Encoding & Codecs: AV1… — Page 16 — Awesome Video",
+    "canonical": "https://awesome.video/category/encoding-codecs?page=16",
+    "notice": "Page 999 is not available; showing page 16 instead.Dismiss"
+  }
+}

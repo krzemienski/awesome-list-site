@@ -1,0 +1,13 @@
+{
+  "status": 200,
+  "canonical": [
+    "rel=\"canonical\" href=\"https://awesome.video/category/encoding-codecs?page=16\" data-react-helmet=\"true\" /"
+  ],
+  "state": {
+    "url": "http://127.0.0.1:5067/category/encoding-codecs?page=16&view=compact",
+    "notice": "Page 999 is not available; showing page 16 instead.Dismiss",
+    "width": 390,
+    "height": 844,
+    "touch": 1
+  }
+}
