@@ -1610,6 +1610,26 @@ STOP TARGET: this run ends AUTOMATICALLY once ${targetDiscoveries} new discoveri
 
   // Run23 NB-039: total job count so the UI can label the truncated list
   // ("showing latest 20 of N") instead of silently capping.
+  /**
+   * The cheapest run that ended on its own and saved at least one discovery,
+   * over the whole history (not just the listed window). Estimated costs
+   * count; cancelled and failed runs report a lower-bound cost and do not.
+   */
+  async cheapestSavingRun(): Promise<{ costUsd: number; costBasis: CostBasis | null } | null> {
+    const cost = sql`cast(${researchJobs.estimatedCostUsd} as numeric)`;
+    const [row] = await db
+      .select({ costUsd: researchJobs.estimatedCostUsd, costBasis: researchJobs.costBasis })
+      .from(researchJobs)
+      .where(and(
+        inArray(researchJobs.status, ['completed', 'budget_stopped']),
+        sql`${researchJobs.totalDiscoveries} > 0`,
+        sql`${cost} > 0`,
+      ))
+      .orderBy(cost)
+      .limit(1);
+    return row ? { costUsd: Number(row.costUsd), costBasis: row.costBasis ?? null } : null;
+  }
+
   async countJobs(): Promise<number> {
     const [row] = await db.select({ count: sql<number>`count(*)::int` }).from(researchJobs);
     return row?.count ?? 0;
