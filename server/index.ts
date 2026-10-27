@@ -179,7 +179,9 @@ app.use((_req, res, next) => {
   const nonce = crypto.randomBytes(16).toString("base64");
   res.locals.cspNonce = nonce;
   res.setHeader("X-Content-Type-Options", "nosniff");
-  res.setHeader("Referrer-Policy", "strict-origin-when-cross-origin");
+  // strict-origin: same-origin subresources must not carry the page's path or
+  // query in their Referer (the edge WAF 403s a Referer containing <script>).
+  res.setHeader("Referrer-Policy", "strict-origin");
   res.setHeader(
     "Permissions-Policy",
     "camera=(), microphone=(), geolocation=()",
