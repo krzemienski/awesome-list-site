@@ -260,10 +260,14 @@ function renderHealthRows(
   let aiRow: HealthRow;
   if (ai.isPending) {
     aiRow = { label: "Researcher API", detail: "checking…", state: "unknown" };
-  } else if (ai.isError || ai.data?.status !== "healthy") {
+  } else if (ai.isError || !ai.data) {
+    // A failed refetch keeps the last good body in ai.data; it no longer
+    // describes the API, so read it the same way as the Database row.
+    aiRow = { label: "Researcher API", detail: "unavailable", state: "bad" };
+  } else if (ai.data.status !== "healthy") {
     aiRow = {
       label: "Researcher API",
-      detail: ai.data?.status ? title(ai.data.status) : "unavailable",
+      detail: ai.data.status ? title(ai.data.status) : "unavailable",
       state: "bad",
     };
   } else {
@@ -298,7 +302,7 @@ function renderHealthRows(
       state: status === "failed" ? "bad" : status === "budget_stopped" || status === "cancelled" ? "warn" : "ok",
     };
   } else {
-    enrichmentRow = { label: "Enrichment queue", detail: "no runs", state: "ok" };
+    enrichmentRow = { label: "Enrichment queue", detail: "no runs", state: "unknown" };
   }
 
   return [database, github, link, enrichmentRow, aiRow];
@@ -350,9 +354,10 @@ export default function AdminOverview({ stats }: AdminOverviewProps) {
     queryFn: () => apiRequest("/api/enrichment/jobs?limit=100"),
     staleTime: 30_000,
   });
+  // Same key and default fetcher as the metric strip (AdminStats), so a Retry
+  // in either section recovers both.
   const categories = useQuery<CategorySummary[]>({
-    queryKey: ["/api/categories", "overview-top-five"],
-    queryFn: () => apiRequest("/api/categories"),
+    queryKey: ["/api/categories"],
     staleTime: 60_000,
   });
 
@@ -384,7 +389,8 @@ export default function AdminOverview({ stats }: AdminOverviewProps) {
       : healthRows.some((row) => row.state === "warn")
         ? "Some systems are still working"
         : "All systems nominal";
-  const topCategories = [...(categories.data ?? [])]
+  const topCategories = (categories.data ?? [])
+    .filter((category) => (category.resourceCount ?? 0) > 0)
     .sort((left, right) => (
       (right.resourceCount ?? 0) - (left.resourceCount ?? 0)
       || left.name.localeCompare(right.name)

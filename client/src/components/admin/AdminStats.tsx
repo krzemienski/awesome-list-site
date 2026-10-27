@@ -133,9 +133,9 @@ export default function AdminStats({
     queryFn: getAllUsers,
     staleTime: 30_000,
   });
+  // Shared with Top categories (AdminOverview): one key, one Retry for both.
   const categories = useQuery<CategorySummary[]>({
-    queryKey: ["/api/categories", "overview-stat"],
-    queryFn: () => apiRequest("/api/categories"),
+    queryKey: ["/api/categories"],
     staleTime: 60_000,
   });
   const subcategories = useQuery<CategorySummary[]>({
