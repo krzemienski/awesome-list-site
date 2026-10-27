@@ -29,6 +29,7 @@
   animation: av-sidebar-overlay-out 280ms ease both;
   opacity: 0;
   pointer-events: none;
+  visibility: hidden;
 }
 
 .av-sidebar-drawer {
@@ -61,6 +62,7 @@
 .av-sidebar-drawer[data-state="closed"] {
   animation: av-sidebar-drawer-out 280ms cubic-bezier(0.2, 0.65, 0.3, 1) both;
   transform: translateX(-100%);
+  visibility: hidden;
 }
 
 .av-sidebar-drawer > [data-sidebar="drawer-navigation"] {
