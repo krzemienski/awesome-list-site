@@ -398,6 +398,15 @@ export function registerAiJobsRoutes(
         }
         turns = n;
       }
+      const { minDurationMinutes } = req.body ?? {};
+      let minDurationMs: number | null = null;
+      if (minDurationMinutes !== undefined && minDurationMinutes !== null && String(minDurationMinutes).trim() !== '') {
+        const n = Number(minDurationMinutes);
+        if (typeof minDurationMinutes !== 'number' || !Number.isInteger(n) || n < 1 || n > 240) {
+          return res.status(400).json({ success: false, message: 'minDurationMinutes must be a whole number from 1 to 240, or omitted for no minimum' });
+        }
+        minDurationMs = n * 60_000;
+      }
       // Stop-after-N target: omitted/blank => no target. Bounded to the
       // per-run discovery ceiling (1000) so a typo can't demand a month-long run.
       const { targetDiscoveries, scoutModel, allowInsecureHttp } = req.body ?? {};
@@ -450,6 +459,7 @@ export function registerAiJobsRoutes(
         categoryFocus: categoryFocus || undefined,
         maxBudgetUsd: budget,
         maxTurns: turns,
+        minDurationMs,
         startedBy: userId,
         model: agentConfig.model,
         scoutModel: scout,
