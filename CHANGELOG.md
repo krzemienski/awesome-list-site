@@ -10,6 +10,9 @@ All notable changes to the Awesome Video Resource Viewer project. Newest entries
 - Fixed C6-AO-024: Clear & Re-seed requires exact uppercase `RESEED` after
   trimming surrounding whitespace; lowercase and mixed-case input stay disabled.
 
+### Admin taxonomy parent-field feedback
+- AC-21: create/edit validation now focuses the first enabled invalid field, marks missing parents invalid, links inline feedback, and clears their errors when corrected. Disabled cascading-parent errors remain announced as alerts; Name and Slug retain their existing order when parents are present.
+
 ### Search and Advanced form field identifiers
 - Fixed C6-PS-064 by identifying Search query, sort and tag-search fields,
   Advanced explorer controls and export options, including Radix native
