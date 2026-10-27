@@ -260,10 +260,14 @@ function renderHealthRows(
   let aiRow: HealthRow;
   if (ai.isPending) {
     aiRow = { label: "Researcher API", detail: "checking…", state: "unknown" };
-  } else if (ai.isError || ai.data?.status !== "healthy") {
+  } else if (ai.isError || !ai.data) {
+    // A failed refetch keeps the last good body in ai.data; it no longer
+    // describes the API, so read it the same way as the Database row.
+    aiRow = { label: "Researcher API", detail: "unavailable", state: "bad" };
+  } else if (ai.data.status !== "healthy") {
     aiRow = {
       label: "Researcher API",
-      detail: ai.data?.status ? title(ai.data.status) : "unavailable",
+      detail: ai.data.status ? title(ai.data.status) : "unavailable",
       state: "bad",
     };
   } else {
