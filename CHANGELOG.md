@@ -6,18 +6,18 @@ All notable changes to the Awesome Video Resource Viewer project. Newest entries
 
 ## October 27, 2026
 
+### Search and Advanced form field identifiers
+- Fixed C6-PS-064 by identifying Search query, sort and tag-search fields,
+  Advanced explorer controls and export options, including Radix native
+  companion fields. Responsive tag-search IDs remain distinct when the desktop
+  sidebar and mobile sheet are mounted together; existing labels are preserved.
+
 ### Admin Users search availability
 - Addressed C6-AO025 by withholding previous Users rows and counts during
   debounced search, page and sort transitions. Offline or failed loads expose
   Retry rather than a false no-match state; same-query retained rows are marked
   as potentially out of date. Search remains mounted through loading and retries.
 - Authenticated browser verification is blocked pending an authorized session.
-
-### Search and Advanced form field identifiers
-- Fixed C6-PS-064 by identifying Search query, sort and tag-search fields,
-  Advanced explorer controls and export options, including Radix native
-  companion fields. Responsive tag-search IDs remain distinct when the desktop
-  sidebar and mobile sheet are mounted together; existing labels are preserved.
 
 ## September 15, 2026
 
