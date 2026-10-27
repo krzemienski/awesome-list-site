@@ -35,7 +35,7 @@ const FACET_VISIBLE_ROWS = 6;
 /** Tag rows the sidebar's max-h-56 (14rem) list holds; rows are 2.75rem. */
 const TAG_VISIBLE_ROWS = 5;
 
-const fieldLabel = (value: string) => value
+const fieldLabel = (value: string) => value === "subSubcategory" ? "Sub-subcategory" : value
   .replace(/([a-z])([A-Z])/g, "$1 $2")
   .replace(/[-_]/g, " ")
   .replace(/\b\w/g, c => c.toUpperCase());
