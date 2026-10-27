@@ -4,6 +4,11 @@ All notable changes to the Awesome Video Resource Viewer project. Newest entries
 
 ---
 
+## October 27, 2026
+
+### Admin taxonomy parent-field feedback
+- AC-21: create/edit validation now focuses the first missing parent selector, marks it invalid, links inline feedback, and clears its error when corrected; Name and Slug retain their existing order when parents are present.
+
 ## September 15, 2026
 
 ### Parity documentation and independent verification
