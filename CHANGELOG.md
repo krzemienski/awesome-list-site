@@ -11,6 +11,10 @@ All notable changes to the Awesome Video Resource Viewer project. Newest entries
   and new-tab behavior. Matching tooltips and accessible names retain the
   existing icons, 44px targets, URLs, and List/Compact layouts.
 
+### Profile name validation focus
+- C6-MEMBER-01: invalid empty or invisible display-name submissions focus the first invalid name field after inline feedback renders. Only invalid fields are marked and linked to the existing error message; validation still returns before PATCH, and valid save/cancel behavior is unchanged.
+- Browser proof is blocked because no authorized local member session is available. Post-deploy verification at 1440, 820-touch, and 390-touch remains unverified; no production cookies were transferred and authentication was not bypassed.
+
 ### Taxonomy card actions and recovery
 - Restored Favorite and Bookmark controls to taxonomy Grid cards using the same guest/member actions as List and Compact.
 - Numeric page overflow recovers to the last page with a dismissible explanation, including typed page jumps and direct document loads. Recovery replaces the unavailable history entry even when saved view preferences or query normalization also apply. Invalid page text and unknown taxonomy routes retain their existing validation.
