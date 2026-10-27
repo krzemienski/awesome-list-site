@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from "react";
+import { useReducedMotion } from "framer-motion";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { TrendingUp } from "lucide-react";
 import { CHART_ACCENT, CHART_AXIS_TEXT, CHART_DASH, CHART_GRID, CHART_INK } from "@/lib/charts/palette";
@@ -38,6 +39,7 @@ interface LinkHealthTrendChartProps {
 }
 
 export default function LinkHealthTrendChart({ data }: LinkHealthTrendChartProps) {
+  const prefersReducedMotion = useReducedMotion();
   const holder = useRef<HTMLDivElement>(null);
   const [width, setWidth] = useState(0);
   useEffect(() => {
@@ -88,6 +90,7 @@ export default function LinkHealthTrendChart({ data }: LinkHealthTrendChartProps
               label={{ value: "Percentage (%)", angle: -90, position: "insideLeft", fill: CHART_AXIS_TEXT, fontSize: 12 }}
             />
             <Tooltip
+              isAnimationActive={!prefersReducedMotion}
               contentStyle={TOOLTIP_STYLE}
               labelStyle={{ color: "var(--text-2)" }}
               itemStyle={{ color: "var(--text)" }}
@@ -103,6 +106,7 @@ export default function LinkHealthTrendChart({ data }: LinkHealthTrendChartProps
             <Line
               type="monotone"
               dataKey="healthy"
+              isAnimationActive={!prefersReducedMotion}
               stroke={CHART_INK.primary}
               strokeDasharray={CHART_DASH.solid}
               name="Healthy"
@@ -112,6 +116,7 @@ export default function LinkHealthTrendChart({ data }: LinkHealthTrendChartProps
             <Line
               type="monotone"
               dataKey="broken"
+              isAnimationActive={!prefersReducedMotion}
               stroke={CHART_ACCENT}
               strokeDasharray={CHART_DASH.solid}
               name="Broken"
@@ -121,6 +126,7 @@ export default function LinkHealthTrendChart({ data }: LinkHealthTrendChartProps
             <Line
               type="monotone"
               dataKey="redirect"
+              isAnimationActive={!prefersReducedMotion}
               stroke={CHART_INK.secondary}
               strokeDasharray={CHART_DASH.dashed}
               name="Redirects"
@@ -130,6 +136,7 @@ export default function LinkHealthTrendChart({ data }: LinkHealthTrendChartProps
             <Line
               type="monotone"
               dataKey="timeout"
+              isAnimationActive={!prefersReducedMotion}
               stroke={CHART_INK.tertiary}
               strokeDasharray={CHART_DASH.dotted}
               name="Timeouts"
