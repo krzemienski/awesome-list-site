@@ -24,6 +24,14 @@ All notable changes to the Awesome Video Resource Viewer project. Newest entries
 ### Admin taxonomy parent-field feedback
 - AC-21: create/edit validation now focuses the first enabled invalid field, marks missing parents invalid, links inline feedback, and clears their errors when corrected. Disabled cascading-parent errors remain announced as alerts; Name and Slug retain their existing order when parents are present.
 
+### Admin export failure states
+- Fixed C6-AO-022 by naming Markdown in README export failure toasts.
+- Fixed C6-AO-023 by distinguishing uncached offline export history from a
+  successful empty history response. The load error offers a focusable Retry,
+  preserves reconnect recovery, and hands focus back to the history heading
+  when Retry is replaced. Authenticated browser proof remains unverified
+  pending authorized post-deploy verification.
+
 ### Search and Advanced form field identifiers
 - Fixed C6-PS-064 by identifying Search query, sort and tag-search fields,
   Advanced explorer controls and export options, including Radix native
