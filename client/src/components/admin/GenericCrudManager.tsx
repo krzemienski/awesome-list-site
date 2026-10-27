@@ -1587,9 +1587,8 @@ export default function GenericCrudManager<T extends BaseEntityWithCount>({
     }
   };
 
-  // A field-specific error marks its input (aria-invalid + aria-describedby)
-  // and moves focus there; the banner is kept only for errors that name no
-  // field in the dialog. Mirrors ResourceManager's showServerFormError.
+  // Field errors mark their inputs and focus the first enabled field;
+  // errors that name no field in the dialog stay in the banner.
   const dialogFieldNames = [...parents.map(p => p.fieldName), "name", "slug", ...customFields.filter(f => f.type !== "file" && f.type !== "multiselect").map(f => f.name)];
   const fieldErrorProps = (mode: "create" | "edit", name: string) =>
     validationErrors[name]
@@ -1598,8 +1597,16 @@ export default function GenericCrudManager<T extends BaseEntityWithCount>({
   const showFieldErrors = (mode: "create" | "edit", errors: FieldValidationErrors, banner: string | null) => {
     setValidationErrors(errors);
     setFormError(banner);
-    const first = dialogFieldNames.find(name => errors[name]);
-    if (first) requestAnimationFrame(() => document.getElementById(`${mode}-${first}`)?.focus());
+    requestAnimationFrame(() => {
+      for (const name of dialogFieldNames) {
+        if (!errors[name]) continue;
+        const field = document.getElementById(`${mode}-${name}`);
+        if (field && !field.matches(":disabled, [aria-disabled='true']")) {
+          field.focus();
+          break;
+        }
+      }
+    });
   };
   const showMissingFields = (mode: "create" | "edit", fields: string[], labels: string[]) => {
     const inline: FieldValidationErrors = {};
@@ -2177,7 +2184,7 @@ export default function GenericCrudManager<T extends BaseEntityWithCount>({
           </SelectContent>
         </Select>
         {validationErrors[parent.fieldName] && (
-          <p id={`${id}-error`} className="text-xs text-destructive" data-testid={`error-${id}`}>
+          <p id={`${id}-error`} role={awaitingFilter || noOptions ? "alert" : undefined} className="text-xs text-destructive" data-testid={`error-${id}`}>
             {validationErrors[parent.fieldName]}
           </p>
         )}

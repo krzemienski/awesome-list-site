@@ -1,0 +1,577 @@
+- generic [ref=e2]:
+  - region "Notifications (F8)":
+    - list
+  - generic [ref=e3]:
+    - link "Skip to main content" [ref=e4] [cursor=pointer]:
+      - /url: "#main"
+    - generic [ref=e5]:
+      - banner [ref=e6]:
+        - generic [ref=e7]:
+          - button "Toggle sidebar" [ref=e8] [cursor=pointer]:
+            - generic [ref=e9]: Toggle sidebar
+          - img
+        - link "AWESOME.VIDEO home" [ref=e10] [cursor=pointer]:
+          - /url: /
+          - generic [ref=e11]: av
+          - generic [ref=e12]: AWESOME.VIDEO home
+        - button "Search 1,949 resources" [ref=e13] [cursor=pointer]:
+          - img [ref=e14]
+          - generic [ref=e17]: Search 1,949 resources
+        - button "Sign in, account menu" [ref=e18] [cursor=pointer]:
+          - img [ref=e20]
+          - generic [ref=e23]: Sign in, account menu
+      - generic [ref=e25]:
+        - main [ref=e26]:
+          - generic [ref=e27]:
+            - navigation "Breadcrumb" [ref=e28]:
+              - list [ref=e29]:
+                - listitem [ref=e30]:
+                  - link "Home" [ref=e31] [cursor=pointer]:
+                    - /url: /
+                - listitem [ref=e32]:
+                  - img [ref=e33]
+                - listitem:
+                  - link "Advanced Search" [disabled]
+            - generic [ref=e35]:
+              - generic [ref=e36]:
+                - generic [ref=e37]:
+                  - img [ref=e38]
+                  - heading "Advanced Features" [level=1] [ref=e40]
+                - paragraph [ref=e41]: Discover powerful tools for exploring, analyzing, and sharing awesome list data
+              - generic [ref=e42]:
+                - tablist [ref=e43]:
+                  - tab "Explorer" [selected] [ref=e44] [cursor=pointer]:
+                    - img [ref=e45]
+                    - text: Explorer
+                  - tab "Metrics" [ref=e48] [cursor=pointer]:
+                    - img [ref=e49]
+                    - text: Metrics
+                  - tab "Export" [ref=e51] [cursor=pointer]:
+                    - img [ref=e52]
+                    - text: Export
+                  - tab "AI Recommendations" [ref=e55] [cursor=pointer]:
+                    - img [ref=e56]
+                    - generic [ref=e58]: AI Recommendations
+                - tabpanel "Explorer" [ref=e59]:
+                  - article [ref=e60]:
+                    - generic [ref=e61]:
+                      - generic [ref=e62]:
+                        - img [ref=e63]
+                        - text: Interactive Category Explorer
+                      - generic [ref=e66]: Advanced search and filtering capabilities with real-time category statistics and interactive exploration
+                    - generic [ref=e68]:
+                      - article [ref=e69]:
+                        - generic [ref=e70]:
+                          - generic [ref=e71]: "9"
+                          - generic [ref=e72]: Categories
+                      - article [ref=e73]:
+                        - generic [ref=e74]:
+                          - generic [ref=e75]: 1,949
+                          - generic [ref=e76]: Resources
+                      - article [ref=e77]:
+                        - generic [ref=e78]:
+                          - generic [ref=e79]: 2,262
+                          - generic [ref=e80]: Unique Tags
+                      - article [ref=e81]:
+                        - generic [ref=e82]:
+                          - generic [ref=e83]: "18"
+                          - generic [ref=e84]: Subcategories
+                  - generic [ref=e85]:
+                    - article [ref=e86]:
+                      - generic [ref=e87]:
+                        - generic [ref=e88]:
+                          - img [ref=e89]
+                          - text: Category Explorer
+                        - generic [ref=e91]: Discover and explore 9 categories with 1,949 total resources
+                      - generic [ref=e92]:
+                        - generic [ref=e93]:
+                          - text: Search categories and resources
+                          - generic [ref=e94]:
+                            - img [ref=e95]
+                            - textbox "Search categories and resources" [active] [ref=e98]:
+                              - /placeholder: Search categories and resources...
+                              - text: ffmpeg
+                        - generic [ref=e99]:
+                          - generic [ref=e100]:
+                            - img [ref=e101]
+                            - generic [ref=e103]: "Sort:"
+                            - combobox "Sort categories" [ref=e104] [cursor=pointer]:
+                              - generic: Resource Count
+                              - img [ref=e105]
+                          - generic [ref=e107]:
+                            - checkbox "Show subcategories" [checked] [ref=e108] [cursor=pointer]:
+                              - generic:
+                                - img
+                            - generic [ref=e109] [cursor=pointer]: Show subcategories
+                        - generic [ref=e110]:
+                          - generic [ref=e111]:
+                            - img [ref=e112]
+                            - generic [ref=e115]: "Filter by tags:"
+                          - group "Filter by tags" [ref=e116]:
+                            - button "streaming" [ref=e117] [cursor=pointer]
+                            - button "open-source" [ref=e118] [cursor=pointer]
+                            - button "ffmpeg" [pressed] [ref=e119] [cursor=pointer]
+                            - button "video-processing" [ref=e120] [cursor=pointer]
+                            - button "encoding" [ref=e121] [cursor=pointer]
+                            - button "hls" [ref=e122] [cursor=pointer]
+                            - button "video-streaming" [ref=e123] [cursor=pointer]
+                            - button "transcoding" [ref=e124] [cursor=pointer]
+                            - button "live-streaming" [ref=e125] [cursor=pointer]
+                            - button "video-encoding" [ref=e126] [cursor=pointer]
+                            - button "video-player" [ref=e127] [cursor=pointer]
+                            - button "codec" [ref=e128] [cursor=pointer]
+                            - button "standard" [ref=e129] [cursor=pointer]
+                            - button "dash" [ref=e130] [cursor=pointer]
+                            - button "tutorial" [ref=e131] [cursor=pointer]
+                            - button "video-technology" [ref=e132] [cursor=pointer]
+                            - button "adaptive-streaming" [ref=e133] [cursor=pointer]
+                            - button "drm" [ref=e134] [cursor=pointer]
+                            - button "python" [ref=e135] [cursor=pointer]
+                            - button "video-compression" [ref=e136] [cursor=pointer]
+                            - button "Show all 2183 tags" [ref=e137] [cursor=pointer]
+                        - generic [ref=e138]:
+                          - generic [ref=e139]: "Active filters:"
+                          - generic [ref=e140]: "Search: \"ffmpeg\""
+                          - generic [ref=e141]: "Tag: ffmpeg"
+                          - button "Clear all" [ref=e142] [cursor=pointer]
+                    - generic [ref=e143]:
+                      - article [ref=e144]:
+                        - generic [ref=e146]:
+                          - generic [ref=e147]:
+                            - link "Encoding & Codecs" [ref=e149] [cursor=pointer]:
+                              - /url: /category/encoding-codecs
+                              - generic [ref=e150]: Encoding & Codecs
+                            - generic [ref=e151]:
+                              - generic [ref=e152]: 372 resources
+                              - generic [ref=e153]: 2 subcategories
+                              - generic [ref=e154]: 517 tags
+                              - generic [ref=e155]: 131 matches
+                          - button "Collapse Encoding & Codecs" [expanded] [ref=e156] [cursor=pointer]:
+                            - img
+                        - generic [ref=e157]:
+                          - generic [ref=e158]:
+                            - generic [ref=e159]:
+                              - link "Android-Video-Trimmer (opens in new tab)" [ref=e160] [cursor=pointer]:
+                                - /url: https://github.com/iknow4x/Android-Video-Trimmer
+                                - text: Android-Video-Trimmer
+                                - img [ref=e161]
+                                - generic [ref=e165]: (opens in new tab)
+                              - paragraph [ref=e166]: An Android project that implements video trimming functionality using MediaMetadataRetriever to obtain video frames and FFmpeg for video cropping and compression.
+                            - generic [ref=e167]:
+                              - link "FFmpeg Docker Container (opens in new tab)" [ref=e168] [cursor=pointer]:
+                                - /url: https://github.com/tamara-schmitz/ffmpeg-docker-container
+                                - text: FFmpeg Docker Container
+                                - img [ref=e169]
+                                - generic [ref=e173]: (opens in new tab)
+                              - paragraph [ref=e174]: This project provides a Docker container for FFmpeg, facilitating the use of FFmpeg in isolated environments. It simplifies the deployment and execution of FFmpeg commands, ensuring consistency across different systems and easing the setup process for developers.
+                            - generic [ref=e175]:
+                              - link "FFmpeg iOS (opens in new tab)" [ref=e176] [cursor=pointer]:
+                                - /url: https://sourceforge.net/projects/ffmpeg-ios/
+                                - text: FFmpeg iOS
+                                - img [ref=e177]
+                                - generic [ref=e181]: (opens in new tab)
+                              - paragraph [ref=e182]: FFmpeg iOS provides precompiled FFmpeg libraries tailored for iOS development. These libraries enable developers to incorporate robust video processing capabilities into iOS applications, supporting a wide range of codecs and formats essential for video streaming and encoding tasks.
+                            - paragraph [ref=e183]: +128 more matching resources
+                          - generic [ref=e186]:
+                            - heading "Subcategories:" [level=4] [ref=e187]
+                            - generic [ref=e188]:
+                              - button "Codecs (27)" [ref=e189] [cursor=pointer]
+                              - button "Encoding Tools (225)" [ref=e190] [cursor=pointer]
+                          - 'button "Explore Category: Encoding & Codecs" [ref=e192] [cursor=pointer]': Explore Category
+                      - article [ref=e193]:
+                        - generic [ref=e195]:
+                          - generic [ref=e196]:
+                            - link "Media Tools" [ref=e198] [cursor=pointer]:
+                              - /url: /category/media-tools
+                              - generic [ref=e199]: Media Tools
+                            - generic [ref=e200]:
+                              - generic [ref=e201]: 304 resources
+                              - generic [ref=e202]: 2 subcategories
+                              - generic [ref=e203]: 635 tags
+                              - generic [ref=e204]: 3 matches
+                          - button "Collapse Media Tools" [expanded] [ref=e205] [cursor=pointer]:
+                            - img
+                        - generic [ref=e206]:
+                          - generic [ref=e207]:
+                            - generic [ref=e208]:
+                              - link "xk media library (opens in new tab)" [ref=e209] [cursor=pointer]:
+                                - /url: https://github.com/chapmanjacobd/library
+                                - text: xk media library
+                                - img [ref=e210]
+                                - generic [ref=e214]: (opens in new tab)
+                              - paragraph [ref=e215]: Scan millions of files with ffmpeg and access the metadata as a SQLite database. Also, a CLI alternative to media browsers like Plex or Jellyfin
+                            - generic [ref=e216]:
+                              - link "ffsubsync (opens in new tab)" [ref=e217] [cursor=pointer]:
+                                - /url: https://github.com/smacke/ffsubsync
+                                - text: ffsubsync
+                                - img [ref=e218]
+                                - generic [ref=e222]: (opens in new tab)
+                              - paragraph [ref=e223]: A tool to automatically synchronize subtitles with video by analyzing audio tracks. It uses speech detection to align subtitle timing via FFmpeg and machine learning.
+                            - generic [ref=e224]:
+                              - link "Audio normalization with ffmpeg using loudnorm (ebur128) filter (opens in new tab)" [ref=e225] [cursor=pointer]:
+                                - /url: https://bytesandbones.wordpress.com/2017/03/16/audio-nomalization-with-ffmpeg-using-loudnorm-ebur128-filter/
+                                - text: Audio normalization with ffmpeg using loudnorm (ebur128) filter
+                                - img [ref=e226]
+                                - generic [ref=e230]: (opens in new tab)
+                              - paragraph [ref=e231]: A tool or resource for audio-analysis-processing.
+                          - generic [ref=e234]:
+                            - heading "Subcategories:" [level=4] [ref=e235]
+                            - generic [ref=e236]:
+                              - button "Ads & QoE (45)" [ref=e237] [cursor=pointer]
+                              - button "Audio & Subtitles (56)" [ref=e238] [cursor=pointer]
+                          - 'button "Explore Category: Media Tools" [ref=e240] [cursor=pointer]': Explore Category
+                      - article [ref=e241]:
+                        - generic [ref=e243]:
+                          - generic [ref=e244]:
+                            - link "Players & Clients" [ref=e246] [cursor=pointer]:
+                              - /url: /category/players-clients
+                              - generic [ref=e247]: Players & Clients
+                            - generic [ref=e248]:
+                              - generic [ref=e249]: 263 resources
+                              - generic [ref=e250]: 2 subcategories
+                              - generic [ref=e251]: 397 tags
+                              - generic [ref=e252]: 6 matches
+                          - button "Collapse Players & Clients" [expanded] [ref=e253] [cursor=pointer]:
+                            - img
+                        - generic [ref=e254]:
+                          - generic [ref=e255]:
+                            - generic [ref=e256]:
+                              - link "fvp (opens in new tab)" [ref=e257] [cursor=pointer]:
+                                - /url: https://www.vecbase.com/p/wang-bin/fvp
+                                - text: fvp
+                                - img [ref=e258]
+                                - generic [ref=e262]: (opens in new tab)
+                              - paragraph [ref=e263]: fvp is a comprehensive video player plugin for multiple platforms, offering hardware acceleration and optimal rendering. It supports Windows, macOS, Linux, iOS, and Android, ensuring high performance with minimal code changes. The plugin utilizes FFmpeg to support various formats and is suitable for creating custom players with features like Dolby Vision, snapshots, and recording.
+                            - generic [ref=e264]:
+                              - link "HVD - Hardware Video Decoder (opens in new tab)" [ref=e265] [cursor=pointer]:
+                                - /url: https://github.com/bmegli/hardware-video-decoder
+                                - text: HVD - Hardware Video Decoder
+                                - img [ref=e266]
+                                - generic [ref=e270]: (opens in new tab)
+                              - paragraph [ref=e271]: HVD is a C library that provides a simple zero-copy interface to FFmpeg for hardware-accelerated video decoding. It supports multiple technologies and is designed for efficient video processing, making it valuable for developers working on performance-critical video applications.
+                            - generic [ref=e272]:
+                              - link "ijkplayer (opens in new tab)" [ref=e273] [cursor=pointer]:
+                                - /url: https://github.com/bilibili/ijkplayer
+                                - text: ijkplayer
+                                - img [ref=e274]
+                                - generic [ref=e278]: (opens in new tab)
+                              - paragraph [ref=e279]: An open source cross-platform media player library based on FFmpeg. ijkplayer is widely used on Android and iOS for its stable performance and was originally developed by Bilibili.
+                            - paragraph [ref=e280]: +3 more matching resources
+                          - generic [ref=e283]:
+                            - heading "Subcategories:" [level=4] [ref=e284]
+                            - generic [ref=e285]:
+                              - button "Hardware Players (35)" [ref=e286] [cursor=pointer]
+                              - button "Mobile & Web Players (78)" [ref=e287] [cursor=pointer]
+                          - 'button "Explore Category: Players & Clients" [ref=e289] [cursor=pointer]': Explore Category
+                      - article [ref=e290]:
+                        - generic [ref=e292]:
+                          - generic [ref=e293]:
+                            - link "Protocols & Transport" [ref=e295] [cursor=pointer]:
+                              - /url: /category/protocols-transport
+                              - generic [ref=e296]: Protocols & Transport
+                            - generic [ref=e297]:
+                              - generic [ref=e298]: 242 resources
+                              - generic [ref=e299]: 2 subcategories
+                              - generic [ref=e300]: 333 tags
+                              - generic [ref=e301]: 3 matches
+                          - button "Collapse Protocols & Transport" [expanded] [ref=e302] [cursor=pointer]:
+                            - img
+                        - generic [ref=e303]:
+                          - generic [ref=e304]:
+                            - generic [ref=e305]:
+                              - link "libvsd (opens in new tab)" [ref=e306] [cursor=pointer]:
+                                - /url: https://github.com/Parkour-Labs/libvsd
+                                - text: libvsd
+                                - img [ref=e307]
+                                - generic [ref=e311]: (opens in new tab)
+                              - paragraph [ref=e312]: libvsd is a command-line tool designed to download video streams served over HTTP from websites, including HLS (.m3u8) and DASH (.mpd) playlists. It supports capturing network requests, collecting media playlists, muxing streams into a single video container using ffmpeg, and decrypting AES-128 and CENC encrypted playlists. This tool is valuable for developers needing to handle various streaming protocols and encryption methods.
+                            - generic [ref=e313]:
+                              - link "mpquic-video-streaming (opens in new tab)" [ref=e314] [cursor=pointer]:
+                                - /url: https://github.com/heavycrystal/mpquic-video-streaming
+                                - text: mpquic-video-streaming
+                                - img [ref=e315]
+                                - generic [ref=e319]: (opens in new tab)
+                              - paragraph [ref=e320]: A client-server video streaming platform utilizing the MPQUIC protocol, developed in Go. It leverages libVLC and FFMPEG for media processing, offering insights into implementing video streaming over the MPQUIC transport protocol.
+                            - generic [ref=e321]:
+                              - link "python-ffmpeg-video-streaming (opens in new tab)" [ref=e322] [cursor=pointer]:
+                                - /url: https://github.com/quasarstream/python-ffmpeg-video-streaming
+                                - text: python-ffmpeg-video-streaming
+                                - img [ref=e323]
+                                - generic [ref=e327]: (opens in new tab)
+                              - paragraph [ref=e328]: This Python package leverages FFmpeg to package media content for online streaming, supporting both DASH and HLS formats. It offers functionalities to implement DRM for HLS packaging and provides options to handle files from and to cloud storage. This tool is valuable for developers looking to integrate FFmpeg-based streaming solutions into their Python applications.
+                          - generic [ref=e331]:
+                            - heading "Subcategories:" [level=4] [ref=e332]
+                            - generic [ref=e333]:
+                              - button "Adaptive Streaming (139)" [ref=e334] [cursor=pointer]
+                              - button "Transport Protocols (9)" [ref=e335] [cursor=pointer]
+                          - 'button "Explore Category: Protocols & Transport" [ref=e337] [cursor=pointer]': Explore Category
+                      - article [ref=e338]:
+                        - generic [ref=e340]:
+                          - generic [ref=e341]:
+                            - link "Intro & Learning" [ref=e343] [cursor=pointer]:
+                              - /url: /category/intro-learning
+                              - generic [ref=e344]: Intro & Learning
+                            - generic [ref=e345]:
+                              - generic [ref=e346]: 227 resources
+                              - generic [ref=e347]: 3 subcategories
+                              - generic [ref=e348]: 464 tags
+                              - generic [ref=e349]: 25 matches
+                          - button "Collapse Intro & Learning" [expanded] [ref=e350] [cursor=pointer]:
+                            - img
+                        - generic [ref=e351]:
+                          - generic [ref=e352]:
+                            - generic [ref=e353]:
+                              - link "Build Your Own Video Compression Service with Rust WASM (opens in new tab)" [ref=e354] [cursor=pointer]:
+                                - /url: https://beendless.com/2024/08/02/Build%20Your%20Own%20Video%20Compression%20Service%20with%20Rust%20WASM/
+                                - text: Build Your Own Video Compression Service with Rust WASM
+                                - img [ref=e355]
+                                - generic [ref=e359]: (opens in new tab)
+                              - paragraph [ref=e360]: This tutorial guides you through creating a Rust application that compiles to WebAssembly and utilizes FFmpeg to build a video compression service. It covers setting up the environment, integrating FFmpeg.wasm, and handling JavaScript interoperability.
+                            - generic [ref=e361]:
+                              - link "Create a Video Trimming App Using ffmpeg.wasm (opens in new tab)" [ref=e362] [cursor=pointer]:
+                                - /url: https://cloudinary.com/blog/guest_post/create-a-video-trimming-app-using-ffmpeg-wasm
+                                - text: Create a Video Trimming App Using ffmpeg.wasm
+                                - img [ref=e363]
+                                - generic [ref=e367]: (opens in new tab)
+                              - paragraph [ref=e368]: This tutorial guides you through building a simple video trimming application using ffmpeg.wasm. It provides a practical example of implementing video processing capabilities directly in the browser, making it a valuable resource for developers looking to integrate similar features into their web applications.
+                            - generic [ref=e369]:
+                              - link "ffmpeg-wasm (opens in new tab)" [ref=e370] [cursor=pointer]:
+                                - /url: https://github.com/wide-video/ffmpeg-wasm
+                                - text: ffmpeg-wasm
+                                - img [ref=e371]
+                                - generic [ref=e375]: (opens in new tab)
+                              - paragraph [ref=e376]: ffmpeg-wasm is a WebAssembly port of FFmpeg, providing scripts and commands to build FFmpeg for WebAssembly. It powers applications like wide.video, a free online video editor, and ffmpeg.wide.video, an online FFmpeg tool.
+                            - paragraph [ref=e377]: +22 more matching resources
+                          - generic [ref=e380]:
+                            - heading "Subcategories:" [level=4] [ref=e381]
+                            - generic [ref=e382]:
+                              - button "Introduction (3)" [ref=e383] [cursor=pointer]
+                              - button "Learning Resources (36)" [ref=e384] [cursor=pointer]
+                              - button "Tutorials & Case Studies (59)" [ref=e385] [cursor=pointer]
+                          - 'button "Explore Category: Intro & Learning" [ref=e387] [cursor=pointer]': Explore Category
+                      - article [ref=e388]:
+                        - generic [ref=e390]:
+                          - generic [ref=e391]:
+                            - link "Infrastructure & Delivery" [ref=e393] [cursor=pointer]:
+                              - /url: /category/infrastructure-delivery
+                              - generic [ref=e394]: Infrastructure & Delivery
+                            - generic [ref=e395]:
+                              - generic [ref=e396]: 183 resources
+                              - generic [ref=e397]: 2 subcategories
+                              - generic [ref=e398]: 344 tags
+                              - generic [ref=e399]: 3 matches
+                          - button "Collapse Infrastructure & Delivery" [expanded] [ref=e400] [cursor=pointer]:
+                            - img
+                        - generic [ref=e401]:
+                          - generic [ref=e402]:
+                            - generic [ref=e403]:
+                              - link "CDN Transcode Sample (opens in new tab)" [ref=e404] [cursor=pointer]:
+                                - /url: https://www.intel.com/content/www/us/en/developer/articles/technical/cdn-transcode-sample-powered-by-open-visual-cloud.html
+                                - text: CDN Transcode Sample
+                                - img [ref=e405]
+                                - generic [ref=e409]: (opens in new tab)
+                              - paragraph [ref=e410]: The CDN Transcode Sample, powered by Open Visual Cloud, demonstrates how to integrate media transcoding and streaming services optimized for Intel® Xeon® processors. It utilizes an FFmpeg-based media transcoding stack and an NGINX-based streaming and web hosting stack. This sample is beneficial for developers aiming to build efficient and scalable video streaming solutions with CDN integration.
+                            - generic [ref=e411]:
+                              - link "Eyevinn Live Encoding (opens in new tab)" [ref=e412] [cursor=pointer]:
+                                - /url: https://github.com/Eyevinn/live-encoding
+                                - text: Eyevinn Live Encoding
+                                - img [ref=e413]
+                                - generic [ref=e417]: (opens in new tab)
+                              - paragraph [ref=e418]: Eyevinn Live Encoding is an open-source live encoder based on ffmpeg and Shaka packager. It supports live transcoding to HLS and optionally MPEG-DASH, providing an origin for CDN shield to pull streams as well as push to CDN origin. It's a valuable tool for setting up live streaming infrastructures.
+                            - generic [ref=e419]:
+                              - link "Kubernetes and FFmpeg (Batch Jobs) (opens in new tab)" [ref=e420] [cursor=pointer]:
+                                - /url: https://kubernetes.io/blog/2018/07/24/kubernetes-batch-processing-state-of-the-art/
+                                - text: Kubernetes and FFmpeg (Batch Jobs)
+                                - img [ref=e421]
+                                - generic [ref=e425]: (opens in new tab)
+                              - paragraph [ref=e426]: A discussion on using Kubernetes for batch processing like transcoding. It covers how to define Kubernetes Jobs or CronJobs to run FFmpeg transcoding tasks, highlighting the benefits of containerization and orchestration in building scalable video processing infrastructure.
+                          - generic [ref=e429]:
+                            - heading "Subcategories:" [level=4] [ref=e430]
+                            - generic [ref=e431]:
+                              - button "Cloud & CDN (9)" [ref=e432] [cursor=pointer]
+                              - button "Streaming Servers (35)" [ref=e433] [cursor=pointer]
+                          - 'button "Explore Category: Infrastructure & Delivery" [ref=e435] [cursor=pointer]': Explore Category
+                      - article [ref=e436]:
+                        - generic [ref=e438]:
+                          - generic [ref=e439]:
+                            - link "Standards & Industry" [ref=e441] [cursor=pointer]:
+                              - /url: /category/standards-industry
+                              - generic [ref=e442]: Standards & Industry
+                            - generic [ref=e443]:
+                              - generic [ref=e444]: 172 resources
+                              - generic [ref=e445]: 2 subcategories
+                              - generic [ref=e446]: 356 tags
+                              - generic [ref=e447]: 3 matches
+                          - button "Collapse Standards & Industry" [expanded] [ref=e448] [cursor=pointer]:
+                            - img
+                        - generic [ref=e449]:
+                          - generic [ref=e450]:
+                            - generic [ref=e451]:
+                              - link "FFmpeg Decklink HDR Metadata Support (opens in new tab)" [ref=e452] [cursor=pointer]:
+                                - /url: https://lists.ffmpeg.org/pipermail/ffmpeg-devel/2023-July/312425.html
+                                - text: FFmpeg Decklink HDR Metadata Support
+                                - img [ref=e453]
+                                - generic [ref=e457]: (opens in new tab)
+                              - paragraph [ref=e458]: A patch for FFmpeg's Decklink output module that adds support for HDR metadata. This enhancement allows for the output of HDR content with proper metadata, ensuring accurate color representation and compliance with HDR standards.
+                            - generic [ref=e459]:
+                              - link "ORI Encoding Guidelines (opens in new tab)" [ref=e460] [cursor=pointer]:
+                                - /url: https://academysoftwarefoundation.github.io/EncodingGuidelines/
+                                - text: ORI Encoding Guidelines
+                                - img [ref=e461]
+                                - generic [ref=e465]: (opens in new tab)
+                              - paragraph [ref=e466]: The Open Review Initiative (ORI) Encoding Guidelines, part of the Academy Software Foundation, aim to establish best practices for encoding video media, particularly for VFX and animation media review. The guidelines provide detailed instructions on HDR encoding, including PQ10 and HLG formats, and offer practical examples using tools like FFmpeg. This resource is essential for developers looking to implement HDR encoding in their workflows.
+                            - generic [ref=e467]:
+                              - 'link "ORI Encoding Guidelines: HDR Encoding (opens in new tab)" [ref=e468] [cursor=pointer]':
+                                - /url: https://academysoftwarefoundation.github.io/EncodingGuidelines/enctests/HDR_Encoding.html
+                                - text: "ORI Encoding Guidelines: HDR Encoding"
+                                - img [ref=e469]
+                                - generic [ref=e473]: (opens in new tab)
+                              - paragraph [ref=e474]: Part of the Academy Software Foundation's Open Review Initiative, this resource provides detailed guidelines on encoding HDR content, covering formats like PQ10 and HLG, and includes frame preparation and FFMPEG encoding instructions.
+                          - generic [ref=e477]:
+                            - heading "Subcategories:" [level=4] [ref=e478]
+                            - generic [ref=e479]:
+                              - button "Specs & Standards (34)" [ref=e480] [cursor=pointer]
+                              - button "Vendors & HDR (5)" [ref=e481] [cursor=pointer]
+                          - 'button "Explore Category: Standards & Industry" [ref=e483] [cursor=pointer]': Explore Category
+                      - article [ref=e484]:
+                        - generic [ref=e486]:
+                          - generic [ref=e487]:
+                            - link "General Tools" [ref=e489] [cursor=pointer]:
+                              - /url: /category/general-tools
+                              - generic [ref=e490]: General Tools
+                            - generic [ref=e491]:
+                              - generic [ref=e492]: 95 resources
+                              - generic [ref=e493]: 2 subcategories
+                              - generic [ref=e494]: 195 tags
+                              - generic [ref=e495]: 12 matches
+                          - button "Collapse General Tools" [expanded] [ref=e496] [cursor=pointer]:
+                            - img
+                        - generic [ref=e497]:
+                          - generic [ref=e498]:
+                            - generic [ref=e499]:
+                              - link "FFMediaToolkit (opens in new tab)" [ref=e500] [cursor=pointer]:
+                                - /url: https://github.com/radek-k/FFMediaToolkit
+                                - text: FFMediaToolkit
+                                - img [ref=e501]
+                                - generic [ref=e505]: (opens in new tab)
+                              - paragraph [ref=e506]: FFMediaToolkit is a cross-platform video decoder/encoder library for .NET that utilizes FFmpeg native libraries. It supports video frame extraction, reading stream metadata, and creating videos from bitmaps in any format supported by FFmpeg. This toolkit is particularly useful for developers working with multimedia applications in .NET environments.
+                            - generic [ref=e507]:
+                              - link "FFmpeg General Documentation (opens in new tab)" [ref=e508] [cursor=pointer]:
+                                - /url: https://ffmpeg.org/general.html
+                                - text: FFmpeg General Documentation
+                                - img [ref=e509]
+                                - generic [ref=e513]: (opens in new tab)
+                              - paragraph [ref=e514]: The General Documentation for FFmpeg offers comprehensive guidance on various aspects of FFmpeg, including compilation guides, encoding instructions, hardware acceleration, streaming, filtering, and more. It serves as a crucial resource for developers aiming to leverage FFmpeg's full potential in their projects.
+                            - generic [ref=e515]:
+                              - link "FFmpeg Utilities Documentation (opens in new tab)" [ref=e516] [cursor=pointer]:
+                                - /url: https://ffmpeg.org/ffmpeg-utils.html
+                                - text: FFmpeg Utilities Documentation
+                                - img [ref=e517]
+                                - generic [ref=e521]: (opens in new tab)
+                              - paragraph [ref=e522]: The FFmpeg Utilities Documentation provides detailed information on various utilities and features offered by FFmpeg, including syntax, quoting and escaping mechanisms, date and time duration formats, video size and rate specifications, and color definitions. This resource is invaluable for developers seeking to understand and utilize FFmpeg's capabilities effectively.
+                            - paragraph [ref=e523]: +9 more matching resources
+                          - generic [ref=e526]:
+                            - heading "Subcategories:" [level=4] [ref=e527]
+                            - generic [ref=e528]:
+                              - button "DRM (17)" [ref=e529] [cursor=pointer]
+                              - button "FFMPEG & Tools (0)" [ref=e530] [cursor=pointer]
+                          - 'button "Explore Category: General Tools" [ref=e532] [cursor=pointer]': Explore Category
+              - article [ref=e533]:
+                - generic [ref=e534]:
+                  - heading "Explore More Features" [level=2] [ref=e535]
+                  - paragraph [ref=e536]: These advanced features help you discover, analyze, and share awesome list data more effectively
+                  - generic [ref=e537]:
+                    - link "Browse All Resources" [ref=e538] [cursor=pointer]:
+                      - /url: /categories
+                    - link "Explore Categories" [ref=e539] [cursor=pointer]:
+                      - /url: /category/community-events
+        - contentinfo [ref=e540]:
+          - generic [ref=e541]:
+            - generic [ref=e542]:
+              - paragraph [ref=e543]: ── INDEX
+              - link "awesome.video home" [ref=e544] [cursor=pointer]:
+                - /url: /
+                - text: awesome.video
+              - paragraph [ref=e545]: A curated collection of awesome video resources, tools, and technologies for developers and content creators
+            - generic [ref=e547]:
+              - heading "INDEXED" [level=2] [ref=e548]
+              - paragraph [ref=e549]: 1,949
+              - paragraph [ref=e550]:
+                - text: 9 categories
+                - text: 18 subcategories
+                - generic [ref=e551]: live
+            - navigation "Explore categories" [ref=e553]:
+              - heading "EXPLORE" [level=2] [ref=e554]
+              - generic [ref=e555]:
+                - link "Community & Events" [ref=e556] [cursor=pointer]:
+                  - /url: /category/community-events
+                  - generic [ref=e557]: ◈
+                  - generic [ref=e558]: Community
+                - link "Encoding & Codecs" [ref=e559] [cursor=pointer]:
+                  - /url: /category/encoding-codecs
+                  - generic [ref=e560]: ◇
+                  - generic [ref=e561]: Encoding
+                - link "General Tools" [ref=e562] [cursor=pointer]:
+                  - /url: /category/general-tools
+                  - generic [ref=e563]: ◆
+                  - generic [ref=e564]: General
+                - link "Infrastructure & Delivery" [ref=e565] [cursor=pointer]:
+                  - /url: /category/infrastructure-delivery
+                  - generic [ref=e566]: ▣
+                  - generic [ref=e567]: Infrastructure
+                - link "Intro & Learning" [ref=e568] [cursor=pointer]:
+                  - /url: /category/intro-learning
+                  - generic [ref=e569]: ▤
+                  - generic [ref=e570]: Intro
+                - link "Media Tools" [ref=e571] [cursor=pointer]:
+                  - /url: /category/media-tools
+                  - generic [ref=e572]: ▥
+                  - generic [ref=e573]: Media
+                - link "Players & Clients" [ref=e574] [cursor=pointer]:
+                  - /url: /category/players-clients
+                  - generic [ref=e575]: ▶
+                  - generic [ref=e576]: Players
+                - link "Protocols & Transport" [ref=e577] [cursor=pointer]:
+                  - /url: /category/protocols-transport
+                  - generic [ref=e578]: ⟁
+                  - generic [ref=e579]: Protocols
+                - link "Standards & Industry" [ref=e580] [cursor=pointer]:
+                  - /url: /category/standards-industry
+                  - generic [ref=e581]: ◉
+                  - generic [ref=e582]: Standards
+            - generic [ref=e583]:
+              - heading "SOURCE" [level=2] [ref=e584]
+              - link "krzemienski/awesome-video" [ref=e585] [cursor=pointer]:
+                - /url: https://github.com/krzemienski/awesome-video
+                - img [ref=e586]
+                - generic [ref=e588]:
+                  - text: krzemienski
+                  - generic [ref=e589]:
+                    - text: /
+                    - text: awesome-video
+                - generic [ref=e590]: ↗
+              - paragraph [ref=e591]:
+                - text: Open-source.
+                - link "PRs welcome" [ref=e592] [cursor=pointer]:
+                  - /url: https://github.com/krzemienski/awesome-video/blob/master/CONTRIBUTING.md
+                - text: .
+                - text: Indexed automatically from README.md.
+          - generic [ref=e593]:
+            - generic [ref=e594]: © 2026 awesome.video · content CC0, code MIT
+            - navigation "Site policies" [ref=e595]:
+              - link "About" [ref=e596] [cursor=pointer]:
+                - /url: /about
+              - link "Terms" [ref=e597] [cursor=pointer]:
+                - /url: /terms
+              - link "Privacy" [ref=e598] [cursor=pointer]:
+                - /url: /privacy
+              - link "Code of Conduct" [ref=e599] [cursor=pointer]:
+                - /url: /code-of-conduct
+                - text: Conduct
+              - link "Issues ↗" [ref=e600] [cursor=pointer]:
+                - /url: https://github.com/krzemienski/awesome-video/issues
+              - link "Sitemap" [ref=e601] [cursor=pointer]:
+                - /url: /sitemap.xml
+            - generic [ref=e602]: built with the awesome-list framework
+    - button "Back to top" [ref=e603] [cursor=pointer]:
+      - img
