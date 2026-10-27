@@ -94,7 +94,7 @@ export default function DatabaseTab({ stats }: DatabaseTabProps) {
   // confirmation inside a proper AlertDialog instead of a native confirm().
   const [reseedDialogOpen, setReseedDialogOpen] = useState(false);
   const [reseedConfirmText, setReseedConfirmText] = useState("");
-  const reseedConfirmed = reseedConfirmText.trim().toUpperCase() === "RESEED";
+  const reseedConfirmed = reseedConfirmText.trim() === "RESEED";
   // Run16 BUG-010: plain Seed Database is also a DB mutation — it must ask
   // before firing (consistent with Clear & Re-seed, which types RESEED).
   // A simple confirm dialog suffices since seeding is additive, not destructive.

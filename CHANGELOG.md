@@ -6,6 +6,10 @@ All notable changes to the Awesome Video Resource Viewer project. Newest entries
 
 ## October 27, 2026
 
+### Database reseed confirmation
+- Fixed C6-AO-024: Clear & Re-seed requires exact uppercase `RESEED` after
+  trimming surrounding whitespace; lowercase and mixed-case input stay disabled.
+
 ### Link Health chart reduced motion
 - C6-AO-026: Link Health Trends uses the existing motion library's reduced-motion
   preference for all four line/dot series and tooltip transitions. Normal-motion
