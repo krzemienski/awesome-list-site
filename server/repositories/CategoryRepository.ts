@@ -537,6 +537,25 @@ export class CategoryRepository {
   }
 
   /**
+   * Get a sub-subcategory by slug WITHOUT a parent subcategory, mirroring
+   * getSubcategoryBySlugGlobal: resolves `?subSubcategory=<slug>` filters that
+   * arrive without a resolvable parent. The unique index is (slug,
+   * subcategory_id), so a slug can repeat under different parents; the lowest
+   * id wins so the result is deterministic. resources.sub_subcategory stores
+   * only the name (no parent id), so a single name is the filter's unit and a
+   * multi-match cannot be expressed without changing ResourceRepository.
+   */
+  async getSubSubcategoryBySlugGlobal(slug: string): Promise<SubSubcategory | undefined> {
+    const [subSubcategory] = await db
+      .select()
+      .from(subSubcategories)
+      .where(eq(subSubcategories.slug, slug))
+      .orderBy(subSubcategories.id)
+      .limit(1);
+    return subSubcategory;
+  }
+
+  /**
    * BUG-003 (run19) recurrence guard: find any sub-subcategory row ANYWHERE in
    * the taxonomy whose name matches case-insensitively OR whose slug matches.
    * Duplicate same-named rows under different subcategories fragment the tree
