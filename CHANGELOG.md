@@ -6,6 +6,10 @@ All notable changes to the Awesome Video Resource Viewer project. Newest entries
 
 ## October 27, 2026
 
+### Database reseed confirmation
+- Fixed C6-AO-024: Clear & Re-seed requires exact uppercase `RESEED` after
+  trimming surrounding whitespace; lowercase and mixed-case input stay disabled.
+
 ### Search and Advanced form field identifiers
 - Fixed C6-PS-064 by identifying Search query, sort and tag-search fields,
   Advanced explorer controls and export options, including Radix native
