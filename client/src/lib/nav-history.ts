@@ -228,14 +228,11 @@ interface Handoff {
   outgoing: OutgoingHeading;
   fragment: string;
   isPop: boolean;
-  // Focus that may be moved on: the link that activated a same-document
-  // fragment, which sits inside <main> but is not the page's own choice.
-  trigger: Element | null;
 }
 
 // Moves focus to the route's target (see the comment above) and returns the
 // function that ends the hand-off.
-function startHandoff({ outgoing, fragment, isPop, trigger }: Handoff): () => void {
+function startHandoff({ outgoing, fragment, isPop }: Handoff): () => void {
   let placed: HTMLElement | null = null;
   let frame = 0;
   const startedAt = Date.now();
@@ -270,8 +267,7 @@ function startHandoff({ outgoing, fragment, isPop, trigger }: Handoff): () => vo
     // against the final scroll position, not the one on the way there.
     const next = restoringScroll ? null : routeTarget(main, loading);
     const active = document.activeElement;
-    const movable = !placed && active === trigger;
-    if (next && next !== active && (movable || !placed || active === placed || !main?.contains(active)) && focusForRoute(next)) {
+    if (next && next !== active && (!placed || active === placed || !main?.contains(active)) && focusForRoute(next)) {
       // A fragment link or first load scrolls to its target, which may only
       // exist once async data has rendered; scroll and focus must agree.
       if (!isPop && fragment && next.id === fragment) next.scrollIntoView({ block: "start" });
@@ -310,28 +306,39 @@ export function useRouteFocus(location: string): void {
       outgoing: outgoingHeading,
       fragment: fragmentId(),
       isPop: navigationIsPop,
-      trigger: null,
     });
   }, [location]);
 
-  // A same-document fragment activation (an in-page #id link, or a hash-only
-  // URL change) never changes the wouter path, so the effect above does not
-  // run. The browser scrolls to the target but leaves focus on <body> or the
-  // link; hand focus to the target the way a route change does.
+  // A same-document fragment activation never changes the wouter path, so the
+  // effect above does not run. Native clicks also mark the navigation non-pop:
+  // otherwise a hashchange after Back/Forward inherits its stale pop flag.
+  // Repeating an already-current #fragment emits no hashchange, so that click
+  // starts the hand-off directly. Back/Forward still arrives via popstate and
+  // hashchange alone, retaining the restored-scroll behavior.
   useEffect(() => {
-    const onHashChange = () => {
+    const startFragmentHandoff = (isPop: boolean) => {
       const target = document.getElementById(fragmentId());
       if (!target || !document.getElementById("main")?.contains(target)) return;
       stopHandoff.current();
       stopHandoff.current = startHandoff({
         outgoing: null,
         fragment: target.id,
-        isPop: navigationIsPop,
-        trigger: document.activeElement,
+        isPop,
       });
     };
+    const onHashChange = () => startFragmentHandoff(navigationIsPop);
+    const onFragmentClick = (event: MouseEvent) => {
+      if (event.defaultPrevented || event.button !== 0 || event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return;
+      const anchor = event.target instanceof Element ? event.target.closest<HTMLAnchorElement>("a[href]") : null;
+      if (!anchor || anchor.hasAttribute("download") || (anchor.target && anchor.target !== "_self")) return;
+      if (anchor.origin !== window.location.origin || anchor.pathname !== window.location.pathname || anchor.search !== window.location.search || !anchor.hash) return;
+      navigationIsPop = false;
+      if (anchor.hash === window.location.hash) startFragmentHandoff(false);
+    };
+    document.addEventListener("click", onFragmentClick);
     window.addEventListener("hashchange", onHashChange);
     return () => {
+      document.removeEventListener("click", onFragmentClick);
       window.removeEventListener("hashchange", onHashChange);
       stopHandoff.current();
     };
