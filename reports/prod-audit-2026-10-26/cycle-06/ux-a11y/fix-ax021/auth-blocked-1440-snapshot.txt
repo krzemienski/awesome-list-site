@@ -1,0 +1,107 @@
+- generic
+  - generic [ref=e1] clickable [onclick]
+    - region "Notifications (F8)" [ref=e2]
+      - list
+    - link "Skip to main content" [ref=e3]
+    - generic
+      - banner
+        - link "AWESOME.VIDEO home" [ref=e4]
+          - StaticText "AWESOME.VIDEO"
+          - StaticText " home"
+        - button "Search 1,949 resources" [ref=e5]
+          - StaticText "Search 1,949 resources"
+        - navigation "Primary" [ref=e6]
+          - link "Browse" [ref=e8]
+          - link "Submit" [ref=e9]
+          - link "About" [ref=e10]
+          - link "Docs ↗" [ref=e11]
+        - button "Sign in, account menu" [expanded=false, ref=e7]
+          - StaticText "Sign in"
+          - StaticText ", account menu"
+      - generic
+        - main
+          - navigation "Breadcrumb" [ref=e12]
+            - list
+              - listitem [level=1]
+                - link "Home" [ref=e37]
+              - listitem [level=1]
+                - link "Sign in" [disabled, ref=e38]
+          - generic [ref=e19] clickable [onclick]
+            - generic
+              - generic
+                - link "Awesome Video" [ref=e40]
+                  - image "Awesome Video"
+                - heading "Welcome back" [level=1, ref=e41]
+                - paragraph
+                  - StaticText "Sign in to continue to Awesome Video"
+                - button "Continue with Apple" [ref=e42]
+                - button "Continue with GitHub" [ref=e43]
+                - button "Continue with Google" [ref=e44]
+                - button "Continue with X / Twitter" [ref=e45]
+                - paragraph
+                  - StaticText "or"
+                - form
+                  - generic
+                    - LabelText [ref=e47] clickable [cursor:pointer]
+                      - StaticText "Email address"
+                    - textbox "Email address" [required, ref=e48]
+                  - button "Continue" [ref=e46]
+                    - StaticText "Continue"
+                    - image
+              - StaticText "Don’t have an account?"
+              - link "Sign up" [ref=e39]
+              - generic
+                - generic
+                - paragraph
+                  - StaticText "Development mode"
+        - contentinfo
+          - StaticText "── INDEX"
+          - link "awesome.video home" [ref=e13]
+            - StaticText "awesome.video"
+          - paragraph
+            - StaticText "A curated collection of awesome video resources, tools, and technologies for developers and content creators"
+          - heading "INDEXED" [level=2, ref=e14]
+          - paragraph
+            - StaticText "1,949"
+          - paragraph
+            - StaticText "9 categories"
+            - LineBreak "\n"
+            - StaticText "18 subcategories"
+            - LineBreak "\n"
+            - StaticText "live"
+          - navigation "Explore categories" [ref=e15]
+            - heading "EXPLORE" [level=2, ref=e20]
+            - link "Community & Events" [ref=e21]
+            - link "Encoding & Codecs" [ref=e22]
+            - link "General Tools" [ref=e23]
+            - link "Infrastructure & Delivery" [ref=e24]
+            - link "Intro & Learning" [ref=e25]
+            - link "Media Tools" [ref=e26]
+            - link "Players & Clients" [ref=e27]
+            - link "Protocols & Transport" [ref=e28]
+            - link "Standards & Industry" [ref=e29]
+          - heading "SOURCE" [level=2, ref=e16]
+          - link "krzemienski/ awesome-video" [ref=e17]
+            - StaticText "krzemienski"
+            - StaticText "/"
+            - StaticText "awesome-video"
+          - paragraph
+            - StaticText "Open-source."
+            - link "PRs welcome" [ref=e30]
+            - StaticText "."
+            - LineBreak "\n"
+            - StaticText "Indexed automatically from README.md."
+          - StaticText "© "
+          - StaticText "2026"
+          - StaticText " "
+          - StaticText "awesome.video"
+          - StaticText " · content CC0, code MIT"
+          - navigation "Site policies" [ref=e18]
+            - link "About" [ref=e31]
+            - link "Terms" [ref=e32]
+            - link "Privacy" [ref=e33]
+            - link "Code of Conduct" [ref=e34]
+              - StaticText "Conduct"
+            - link "Issues ↗" [ref=e35]
+            - link "Sitemap" [ref=e36]
+          - StaticText "built with the awesome-list framework"

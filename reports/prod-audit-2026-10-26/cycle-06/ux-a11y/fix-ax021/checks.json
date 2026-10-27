@@ -1,0 +1,30 @@
+{
+  "cwd": "/tmp/awesome-c6-ax021-3QyZeQ",
+  "base": "520d6778369bc7ce495204cfcacc7e0533f941cc",
+  "checks": [
+    {
+      "command": "./node_modules/.bin/tsc --noEmit",
+      "exitCode": 0,
+      "unpiped": true,
+      "output": "",
+      "finalRun": true
+    },
+    {
+      "command": "npm run build",
+      "exitCode": 0,
+      "unpiped": true,
+      "outputArtifact": "build-output.txt",
+      "warnings": [
+        "Rollup removed misplaced @__PURE__ annotations from zod dependency",
+        "esbuild output-size warning"
+      ]
+    }
+  ],
+  "notRun": [
+    "test suites",
+    "lint",
+    "formatters",
+    "validation scripts",
+    "mocked or authenticated admin browser tests"
+  ]
+}
