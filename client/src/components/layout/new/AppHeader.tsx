@@ -72,14 +72,14 @@ export default function AppHeader({ onSearchOpen, user, onLogout, logoutError, c
     const skipNext = here === "/" || here.startsWith("/sign-in") || here.startsWith("/sign-up");
     navigate(skipNext ? "/sign-in" : `/sign-in?redirect_url=${encodeURIComponent(here)}`);
   };
-  const isCurrent = (href: string) =>
-    location === href ||
-    (href === "/categories" && (location === "/" || BROWSE_ROUTE_PREFIXES.some(prefix => location.startsWith(prefix))));
+  const isSectionMatch = (href: string) =>
+    href === "/categories" && (location === "/" || BROWSE_ROUTE_PREFIXES.some(prefix => location.startsWith(prefix)));
+  const isCurrent = (href: string) => location === href || isSectionMatch(href);
   const navLink = (href: string, label: string) => (
     <Link
       href={href}
       className={`nav-link${isCurrent(href) ? " active" : ""}`}
-      aria-current={isCurrent(href) ? "page" : undefined}
+      aria-current={location === href ? "page" : isSectionMatch(href) ? "true" : undefined}
     >
       {label}
     </Link>
