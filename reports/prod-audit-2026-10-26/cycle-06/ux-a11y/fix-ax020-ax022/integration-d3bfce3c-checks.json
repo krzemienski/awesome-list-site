@@ -1,0 +1,24 @@
+{
+  "mergedMain": "d3bfce3c88a039cb6819b013a8754808efa49a1e",
+  "priorFixHead": "3c3f005c810c6c68077660a3ef39d5190e2bc2d0",
+  "mergeResolution": "Additive CHANGELOG conflict resolved preserving Advanced offline recovery and Profile name validation focus entries.",
+  "checks": [
+    {
+      "command": "npx tsc --noEmit",
+      "exitCode": 0,
+      "output": "",
+      "wallSeconds": 4.78,
+      "unpiped": true
+    },
+    {
+      "command": "npm run build",
+      "exitCode": 0,
+      "outputFile": "integration-d3bfce3c-build-output.txt",
+      "wallSeconds": 9.41,
+      "unpiped": true
+    }
+  ],
+  "browserProof": "Existing all-width proof retained for main synchronization as authorized; not repeated solely for integration.",
+  "noMergeToMain": true,
+  "noDeployment": true
+}

@@ -1,0 +1,24 @@
+{
+  "mergedMain": "2c4a00eed2085561e9170b2575b92837e48ac5da",
+  "priorFixHead": "3907e5e0351018a0c9a1532359dbfe30ea841e4f",
+  "mergeResolution": "Additive CHANGELOG conflict resolved preserving both Advanced offline recovery and every origin/main entry.",
+  "checks": [
+    {
+      "command": "npx tsc --noEmit",
+      "exitCode": 0,
+      "output": "",
+      "wallSeconds": 8.37,
+      "unpiped": true
+    },
+    {
+      "command": "npm run build",
+      "exitCode": 0,
+      "outputFile": "integration-build-output.txt",
+      "wallSeconds": 8.99,
+      "unpiped": true
+    }
+  ],
+  "browserProof": "Retained existing all-width proof as explicitly authorized by Main for main synchronization; not re-driven solely for integration.",
+  "noMergeToMain": true,
+  "noDeployment": true
+}
