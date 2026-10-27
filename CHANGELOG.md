@@ -4,6 +4,12 @@ All notable changes to the Awesome Video Resource Viewer project. Newest entries
 
 ---
 
+## October 27, 2026
+
+### Advanced offline error recovery (C6-AX-020 / C6-AX-022)
+- The catalog ErrorPage distinguishes a disconnected device from an online server failure. Retry while offline keeps the page in place and explains that reconnection is required.
+- Automatic recovery from a displayed offline error hands focus to the recovered page heading only while focus still belongs to that error or the document body. Navigation and subsequent user-directed focus cancel the handoff; ordinary background refetches do not arm it.
+
 ## September 15, 2026
 
 ### Parity documentation and independent verification
