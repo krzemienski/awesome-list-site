@@ -1483,6 +1483,7 @@ export default function GenericCrudManager<T extends BaseEntityWithCount>({
   }, [parents, customFields]);
 
   const [formData, setFormData] = useState<Record<string, string | string[]>>(initialFormData);
+  const [slugEditedByHand, setSlugEditedByHand] = useState(false);
   const [validationErrors, setValidationErrors] = useState<FieldValidationErrors>({});
 
   /**
@@ -2512,6 +2513,7 @@ export default function GenericCrudManager<T extends BaseEntityWithCount>({
 
   const openCreateDialog = () => {
     setFormData(initialFormData);
+    setSlugEditedByHand(false);
     setFileData({});
     setFilePreviews({});
     setValidationErrors({});
@@ -2600,8 +2602,10 @@ export default function GenericCrudManager<T extends BaseEntityWithCount>({
 
   // Only the create dialog auto-slugs. An existing slug is a public URL, so
   // the edit dialog leaves it alone unless the admin edits the slug field.
+  // Once the admin types a slug by hand, later Name edits leave it alone;
+  // emptying the slug hands it back to the name.
   const handleNameChange = (name: string) => {
-    setFormData({ ...formData, name, slug: generateSlug(name) });
+    setFormData(slugEditedByHand ? { ...formData, name } : { ...formData, name, slug: generateSlug(name) });
     setFormError(null);
     clearFieldError("name");
     clearFieldError("slug");
@@ -2610,6 +2614,7 @@ export default function GenericCrudManager<T extends BaseEntityWithCount>({
   // Like a parent pick, editing a field the banner names makes it stale; the
   // next submit re-validates everything.
   const handleFieldEdit = (field: "name" | "slug", value: string) => {
+    if (field === "slug") setSlugEditedByHand(value !== "");
     setFormData({ ...formData, [field]: value });
     setFormError(null);
     clearFieldError(field);
