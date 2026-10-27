@@ -394,7 +394,8 @@ export default function AdminOverview({ stats }: AdminOverviewProps) {
       : healthRows.some((row) => row.state === "warn")
         ? "Some systems are still working"
         : "All systems nominal";
-  const topCategories = [...(categories.data ?? [])]
+  const topCategories = (categories.data ?? [])
+    .filter((category) => (category.resourceCount ?? 0) > 0)
     .sort((left, right) => (
       (right.resourceCount ?? 0) - (left.resourceCount ?? 0)
       || left.name.localeCompare(right.name)
