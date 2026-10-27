@@ -14,7 +14,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Plus, Trash2, Save, X, LucideIcon, Upload, FileIcon, XCircle, Bold, Italic, Underline, Strikethrough, Link, Heading, List, ListOrdered, Quote, Code, Check, ChevronsUpDown, Search, Download, Square, CheckSquare, Minus, Undo, Redo, History, Clock } from "lucide-react";
 import { Checkbox } from "@/components/ui/checkbox";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
-import { describeWriteError, NOTHING_CHANGED_OUTCOME } from "@/lib/apiError";
+import { describeWriteError, extractFieldErrors, NOTHING_CHANGED_OUTCOME } from "@/lib/apiError";
 import { formatAdminDateTime, slugify } from "@/lib/utils";
 import { apiRequest, ApiError } from "@/lib/queryClient";
 import { fetchAwesomeListNav, type AwesomeListNav } from "@/lib/static-data";
@@ -1586,6 +1586,45 @@ export default function GenericCrudManager<T extends BaseEntityWithCount>({
     }
   };
 
+  // A field-specific error marks its input (aria-invalid + aria-describedby)
+  // and moves focus there; the banner is kept only for errors that name no
+  // field in the dialog. Mirrors ResourceManager's showServerFormError.
+  const dialogFieldNames = ["name", "slug", ...customFields.filter(f => f.type !== "file" && f.type !== "multiselect").map(f => f.name)];
+  const fieldErrorProps = (mode: "create" | "edit", name: string) =>
+    validationErrors[name]
+      ? { "aria-invalid": true as const, "aria-describedby": `${mode}-${name}-error` }
+      : {};
+  const showFieldErrors = (mode: "create" | "edit", errors: FieldValidationErrors, banner: string | null) => {
+    setValidationErrors(errors);
+    setFormError(banner);
+    const first = dialogFieldNames.find(name => errors[name]);
+    if (first) requestAnimationFrame(() => document.getElementById(`${mode}-${first}`)?.focus());
+  };
+  const showMissingFields = (mode: "create" | "edit", fields: string[], labels: string[]) => {
+    const inline: FieldValidationErrors = {};
+    const unmapped: string[] = [];
+    fields.forEach((field, i) => {
+      if (dialogFieldNames.includes(field)) inline[field] = `${labels[i]} is required`;
+      else unmapped.push(labels[i]);
+    });
+    const banner = unmapped.length > 0 ? `${unmapped.join(", ")} ${unmapped.length === 1 ? "is" : "are"} required` : null;
+    showFieldErrors(mode, inline, banner);
+  };
+  const showServerFormError = (mode: "create" | "edit", error: Error, fallback: string) => {
+    const serverFieldErrors = extractFieldErrors(error);
+    const inline: FieldValidationErrors = {};
+    const other: string[] = [];
+    for (const [field, message] of Object.entries(serverFieldErrors ?? {})) {
+      if (dialogFieldNames.includes(field)) inline[field] = message;
+      else other.push(`${field}: ${message}`);
+    }
+    if (Object.keys(inline).length === 0) {
+      setFormError(describeWriteError(error, { fallback, outcome: NOTHING_CHANGED_OUTCOME }));
+      return;
+    }
+    showFieldErrors(mode, inline, other.length > 0 ? other.join(" ") : null);
+  };
+
   // The app shell already keeps this lightweight, cached taxonomy tree warm.
   // Reusing its query gives catalog rows authoritative child counts without
   // downloading the full resource corpus or adding a second tree shape.
@@ -1848,7 +1887,7 @@ export default function GenericCrudManager<T extends BaseEntityWithCount>({
       // Run15 BUG-015: surface a human sentence, not a raw "400: {json}" blob.
       // P1-02/07: keep the dialog open and show the server rejection inline so
       // the operator can correct the offending field (matches ResourceManager).
-      setFormError(describeWriteError(error, { fallback: `Failed to create ${entityName.toLowerCase()}`, outcome: NOTHING_CHANGED_OUTCOME }));
+      showServerFormError("create", error, `Failed to create ${entityName.toLowerCase()}`);
     }
   });
 
@@ -1906,7 +1945,7 @@ export default function GenericCrudManager<T extends BaseEntityWithCount>({
     onError: (error: any) => {
       // Run15 BUG-015: surface a human sentence, not a raw "400: {json}" blob.
       // P1-03/07: inline banner, dialog stays open (matches ResourceManager).
-      setFormError(describeWriteError(error, { fallback: `Failed to update ${entityName.toLowerCase()}`, outcome: NOTHING_CHANGED_OUTCOME }));
+      showServerFormError("edit", error, `Failed to update ${entityName.toLowerCase()}`);
     }
   });
 
@@ -2199,24 +2238,24 @@ export default function GenericCrudManager<T extends BaseEntityWithCount>({
   /**
    * Run16 BUG-033: shared name/slug sanity checks for taxonomy CRUD —
    * length caps plus a case-insensitive duplicate check against the loaded
-   * list (excluding the row being edited). Returns an error string or null.
+   * list (excluding the row being edited). Returns the failing field's message or null.
    */
-  const validateNameSlug = (excludeId?: number): string | null => {
+  const validateNameSlug = (excludeId?: number): FieldValidationErrors | null => {
     const name = String(formData.name ?? "").trim();
     const slug = String(formData.slug ?? "").trim();
-    if (name.length > 100) return "Name must be 100 characters or fewer";
-    if (slug.length > 100) return "Slug must be 100 characters or fewer";
+    if (name.length > 100) return { name: "Name must be 100 characters or fewer" };
+    if (slug.length > 100) return { slug: "Slug must be 100 characters or fewer" };
     if (!/^[a-z0-9]+(?:-[a-z0-9]+)*$/.test(slug)) {
-      return "Slug may only contain lowercase letters, numbers, and hyphens";
+      return { slug: "Slug may only contain lowercase letters, numbers, and hyphens" };
     }
     const dupName = (items || []).find(
       i => i.id !== excludeId && i.name.trim().toLowerCase() === name.toLowerCase()
     );
-    if (dupName) return `A ${entityName.toLowerCase()} named "${dupName.name}" already exists`;
+    if (dupName) return { name: `A ${entityName.toLowerCase()} named "${dupName.name}" already exists` };
     const dupSlug = (items || []).find(
       i => i.id !== excludeId && i.slug.trim().toLowerCase() === slug.toLowerCase()
     );
-    if (dupSlug) return `The slug "${dupSlug.slug}" is already in use`;
+    if (dupSlug) return { slug: `The slug "${dupSlug.slug}" is already in use` };
     return null;
   };
 
@@ -2249,26 +2288,21 @@ export default function GenericCrudManager<T extends BaseEntityWithCount>({
 
       // P1-02/07: keep the dialog open with an inline banner instead of a
       // transient toast that vanished along with the user's typed input.
-      setFormError(`${fieldLabels.join(", ")} ${fieldLabels.length === 1 ? 'is' : 'are'} required`);
+      showMissingFields("create", [...missingFields, ...missingFileFields, ...missingMultiSelectFields], fieldLabels);
       return;
     }
 
     // Run16 BUG-033: length + duplicate checks before hitting the API.
     const nameSlugError = validateNameSlug();
     if (nameSlugError) {
-      setFormError(nameSlugError);
+      showFieldErrors("create", nameSlugError, null);
       return;
     }
 
     // Run custom validation rules
     const fieldErrors = await validateAllFields();
     if (Object.keys(fieldErrors).length > 0) {
-      setValidationErrors(fieldErrors);
-      const errorFields = Object.keys(fieldErrors).map(fieldName => {
-        const customField = customFields.find(f => f.name === fieldName);
-        return customField?.label.replace(" *", "") || fieldName;
-      });
-      setFormError(`Please fix the following fields: ${errorFields.join(", ")}`);
+      showFieldErrors("create", fieldErrors, null);
       return;
     }
 
@@ -2361,26 +2395,21 @@ export default function GenericCrudManager<T extends BaseEntityWithCount>({
       });
 
       // P1-03/07: inline banner, dialog stays open (see handleCreate).
-      setFormError(`${fieldLabels.join(", ")} ${fieldLabels.length === 1 ? 'is' : 'are'} required`);
+      showMissingFields("edit", missingFields, fieldLabels);
       return;
     }
 
     // Run16 BUG-033: length + duplicate checks (excluding the row itself).
     const nameSlugError = validateNameSlug(selectedItem.id);
     if (nameSlugError) {
-      setFormError(nameSlugError);
+      showFieldErrors("edit", nameSlugError, null);
       return;
     }
 
     // Run custom validation rules
     const fieldErrors = await validateAllFields();
     if (Object.keys(fieldErrors).length > 0) {
-      setValidationErrors(fieldErrors);
-      const errorFields = Object.keys(fieldErrors).map(fieldName => {
-        const customField = customFields.find(f => f.name === fieldName);
-        return customField?.label.replace(" *", "") || fieldName;
-      });
-      setFormError(`Please fix the following fields: ${errorFields.join(", ")}`);
+      showFieldErrors("edit", fieldErrors, null);
       return;
     }
 
@@ -2559,6 +2588,8 @@ export default function GenericCrudManager<T extends BaseEntityWithCount>({
   const handleNameChange = (name: string) => {
     setFormData({ ...formData, name, slug: generateSlug(name) });
     setFormError(null);
+    clearFieldError("name");
+    clearFieldError("slug");
   };
 
   // Like a parent pick, editing a field the banner names makes it stale; the
@@ -2566,6 +2597,7 @@ export default function GenericCrudManager<T extends BaseEntityWithCount>({
   const handleFieldEdit = (field: "name" | "slug", value: string) => {
     setFormData({ ...formData, [field]: value });
     setFormError(null);
+    clearFieldError(field);
   };
 
   const handleParentChange = (parentFieldName: string, value: string) => {
@@ -3070,8 +3102,14 @@ export default function GenericCrudManager<T extends BaseEntityWithCount>({
                 placeholder={formFields.name.placeholder}
                 value={formData.name}
                 onChange={(e) => handleNameChange(e.target.value)}
+                {...fieldErrorProps("create", "name")}
                 data-testid="input-create-name"
               />
+              {validationErrors.name && (
+                <p id="create-name-error" className="text-xs text-destructive" data-testid="error-create-name">
+                  {validationErrors.name}
+                </p>
+              )}
             </div>
             <div className="space-y-2">
               <Label htmlFor="create-slug">{formFields.slug.label}</Label>
@@ -3080,8 +3118,14 @@ export default function GenericCrudManager<T extends BaseEntityWithCount>({
                 placeholder={formFields.slug.placeholder}
                 value={formData.slug}
                 onChange={(e) => handleFieldEdit("slug", e.target.value)}
+                {...fieldErrorProps("create", "slug")}
                 data-testid="input-create-slug"
               />
+              {validationErrors.slug && (
+                <p id="create-slug-error" className="text-xs text-destructive" data-testid="error-create-slug">
+                  {validationErrors.slug}
+                </p>
+              )}
               {formFields.slug.helpText && (
                 <p className="text-xs text-muted-foreground">
                   {formFields.slug.helpText}
@@ -3197,6 +3241,7 @@ export default function GenericCrudManager<T extends BaseEntityWithCount>({
                     }}
                     disabled={!fieldEditable}
                     className={`flex min-h-[80px] w-full rounded-md border bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 ${validationErrors[field.name] ? "border-destructive" : "border-input"}`}
+                    {...fieldErrorProps("create", field.name)}
                     data-testid={`input-create-${field.name}`}
                   />
                 ) : (
@@ -3219,6 +3264,7 @@ export default function GenericCrudManager<T extends BaseEntityWithCount>({
                     }}
                     disabled={!fieldEditable}
                     className={validationErrors[field.name] ? "border-destructive" : ""}
+                    {...fieldErrorProps("create", field.name)}
                     data-testid={`input-create-${field.name}`}
                   />
                 )}
@@ -3228,7 +3274,7 @@ export default function GenericCrudManager<T extends BaseEntityWithCount>({
                   </p>
                 )}
                 {validationErrors[field.name] && (
-                  <p className="text-xs text-destructive" data-testid={`error-create-${field.name}`}>
+                  <p id={`create-${field.name}-error`} className="text-xs text-destructive" data-testid={`error-create-${field.name}`}>
                     {validationErrors[field.name]}
                   </p>
                 )}
@@ -3301,8 +3347,14 @@ export default function GenericCrudManager<T extends BaseEntityWithCount>({
                 placeholder={formFields.name.placeholder}
                 value={formData.name}
                 onChange={(e) => handleFieldEdit("name", e.target.value)}
+                {...fieldErrorProps("edit", "name")}
                 data-testid="input-edit-name"
               />
+              {validationErrors.name && (
+                <p id="edit-name-error" className="text-xs text-destructive" data-testid="error-edit-name">
+                  {validationErrors.name}
+                </p>
+              )}
             </div>
             <div className="space-y-2">
               <Label htmlFor="edit-slug">{formFields.slug.label}</Label>
@@ -3311,8 +3363,14 @@ export default function GenericCrudManager<T extends BaseEntityWithCount>({
                 placeholder={formFields.slug.placeholder}
                 value={formData.slug}
                 onChange={(e) => handleFieldEdit("slug", e.target.value)}
+                {...fieldErrorProps("edit", "slug")}
                 data-testid="input-edit-slug"
               />
+              {validationErrors.slug && (
+                <p id="edit-slug-error" className="text-xs text-destructive" data-testid="error-edit-slug">
+                  {validationErrors.slug}
+                </p>
+              )}
             </div>
             {/* Custom Fields (including file uploads) */}
             {getVisibleCustomFields('edit', selectedItem || undefined).map((field) => {
@@ -3436,6 +3494,7 @@ export default function GenericCrudManager<T extends BaseEntityWithCount>({
                     }}
                     disabled={!fieldEditable}
                     className={`flex min-h-[80px] w-full rounded-md border bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 ${validationErrors[field.name] ? "border-destructive" : "border-input"}`}
+                    {...fieldErrorProps("edit", field.name)}
                     data-testid={`input-edit-${field.name}`}
                   />
                 ) : (
@@ -3458,6 +3517,7 @@ export default function GenericCrudManager<T extends BaseEntityWithCount>({
                     }}
                     disabled={!fieldEditable}
                     className={validationErrors[field.name] ? "border-destructive" : ""}
+                    {...fieldErrorProps("edit", field.name)}
                     data-testid={`input-edit-${field.name}`}
                   />
                 )}
@@ -3467,7 +3527,7 @@ export default function GenericCrudManager<T extends BaseEntityWithCount>({
                   </p>
                 )}
                 {validationErrors[field.name] && (
-                  <p className="text-xs text-destructive" data-testid={`error-edit-${field.name}`}>
+                  <p id={`edit-${field.name}-error`} className="text-xs text-destructive" data-testid={`error-edit-${field.name}`}>
                     {validationErrors[field.name]}
                   </p>
                 )}
