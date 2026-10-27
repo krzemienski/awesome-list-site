@@ -1,0 +1,19 @@
+{
+  "requested": "http://127.0.0.1:5067/category/encoding-codecs?sort=desc&page=999",
+  "before": {
+    "url": "http://127.0.0.1:5067/about",
+    "length": 5
+  },
+  "status": 200,
+  "recovered": {
+    "url": "http://127.0.0.1:5067/category/encoding-codecs?sortBy=name-desc&page=16&view=compact",
+    "length": 5,
+    "notice": "Page 999 is not available; showing page 16 instead.Dismiss",
+    "view": "true"
+  },
+  "afterBack": {
+    "url": "http://127.0.0.1:5067/about",
+    "length": 5,
+    "title": "About — Awesome Video"
+  }
+}

@@ -29,3 +29,13 @@ All filenames above are relative to this directory; each cited PNG has an adjace
 - No global accessibility, design-system, full parity matrix, or whole-app regression PASS is claimed.
 
 Browser tooling caveats were investigated rather than patched into production: empty MCP fill did not dispatch React change, initial browser helpers restored stale emulation or reused a target, and touch clicks can hit a just-appearing toast. Final critical phone proof explicitly focuses the intended semantic control before keyboard activation and records exact live viewport/touch state. Exploratory invalid artifacts were removed; valid final artifacts were not overwritten.
+
+## Independent-review history correction
+
+Source includes current origin/main `abe2341e`. The URL-sync effect now defers while an authoritative page exceeds totalPages, allowing the clamp state commit to retain its replace-only intent until page16 is written. No API or analytics change.
+
+Real cold navigation after selecting Compact through the UI: `/about` (history length4) → `/category/encoding-codecs?page=999` → recovered `?page=16&view=compact` (length5); exactly one browser Back returns `/about` (length5). Evidence: `step-140-saved-compact-cold-history.json`, adjacent AX, `step-140-saved-compact-cold-overflow.png`, `step-141-one-back-leaves-overflow.png`.
+
+Alias/query-order variant: `/about` → cold `?sort=desc&page=999` → recovered `?sortBy=name-desc&page=16&view=compact`; exactly one Back returns `/about`, not page999. Evidence: `step-142-sort-alias-reordered-history.json`, adjacent AX, and step-142/143 PNGs. HTTP200 retained in both cases.
+
+Rechecks after this production change: `tsc --noEmit` exit0; `npm run build` exit0 (client3959 modules 7.08s, SSR309 modules1.47s; existing warnings unchanged). These runs supersede the earlier history gap only; other declared UNVERIFIED items remain.
