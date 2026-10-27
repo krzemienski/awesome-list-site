@@ -179,7 +179,7 @@ export default function SEOHead({
   if (!committed) return null;
 
   return (
-    <Helmet>
+    <Helmet defer={false}>
       {/* Basic Meta Tags */}
       <title>{pageTitle}</title>
       <meta name="description" content={pageDescription} />
