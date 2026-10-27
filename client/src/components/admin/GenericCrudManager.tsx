@@ -20,6 +20,7 @@ import { apiRequest, ApiError } from "@/lib/queryClient";
 import { fetchAwesomeListNav, type AwesomeListNav } from "@/lib/static-data";
 // Task 275: same fast numbered + jump pagination as the public listings.
 import { Paginator } from "@/components/ui/paginator";
+import { parsePageInput } from "@/lib/page-param";
 import { AdminLoadError } from "@/components/admin/AdminLoadError";
 import { useHorizontalScrollCue } from "@/hooks/use-horizontal-scroll-cue";
 import "@/styles/pages/admin-catalog-taxonomy.css";
@@ -1099,7 +1100,22 @@ export default function GenericCrudManager<T extends BaseEntityWithCount>({
       searchToggleRef.current?.focus();
     }
   };
-  const [currentPage, setCurrentPage] = useState(1);
+  // The shared paginator emits real ?page=N links. Initialize from and write
+  // back to that parameter so direct loads, Back/Forward and copied links open
+  // the same page instead of always snapping to page 1.
+  const readUrlPage = () => parsePageInput(new URLSearchParams(window.location.search).get("page") ?? "") ?? 1;
+  const writeUrlPage = (page: number, replace = false) => {
+    const url = new URL(window.location.href);
+    if (page > 1) url.searchParams.set("page", String(page));
+    else url.searchParams.delete("page");
+    window.history[replace ? "replaceState" : "pushState"](null, "", url.pathname + url.search + url.hash);
+  };
+  const [currentPage, setCurrentPage] = useState(readUrlPage);
+  useEffect(() => {
+    const onPopState = () => setCurrentPage(readUrlPage());
+    window.addEventListener("popstate", onPopState);
+    return () => window.removeEventListener("popstate", onPopState);
+  }, []);
   const [pageSize, setPageSize] = useState(defaultItemsPerPage);
   const [selectedIds, setSelectedIds] = useState<Set<number>>(new Set());
   const [bulkDeleteDialogOpen, setBulkDeleteDialogOpen] = useState(false);
@@ -1735,10 +1751,12 @@ export default function GenericCrudManager<T extends BaseEntityWithCount>({
     if (prevSearchRef.current !== searchQuery) {
       prevSearchRef.current = searchQuery;
       setCurrentPage(1);
+      writeUrlPage(1, true);
       return;
     }
     if (currentPage > totalPages && totalPages > 0) {
       setCurrentPage(1);
+      writeUrlPage(1, true);
     }
   }, [searchQuery, totalPages, currentPage]);
 
@@ -1778,12 +1796,15 @@ export default function GenericCrudManager<T extends BaseEntityWithCount>({
 
   // Pagination handlers
   const goToPage = (page: number) => {
-    setCurrentPage(Math.max(1, Math.min(page, totalPages)));
+    const next = Math.max(1, Math.min(page, totalPages));
+    setCurrentPage(next);
+    writeUrlPage(next);
   };
 
   const handlePageSizeChange = (newSize: number) => {
     setPageSize(newSize);
     setCurrentPage(1); // Reset to first page when changing page size
+    writeUrlPage(1, true);
   };
 
   // Bulk selection helpers
