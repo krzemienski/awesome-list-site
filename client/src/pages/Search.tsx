@@ -252,10 +252,12 @@ export default function Search() {
   // the sidebar names a slug there; the chip then matches the valid state.
   const navCategory = nav?.categories.find(c => c.slug === state.category);
   const navSubcategory = (navCategory ? [navCategory] : nav?.categories ?? []).flatMap(c => c.subcategories ?? []).find(s => s.slug === state.subcategory);
+  const navSubSubcategory = (navSubcategory ? [navSubcategory] : navCategory?.subcategories ?? nav?.categories.flatMap(c => c.subcategories ?? []) ?? []).flatMap(s => s.subSubcategories ?? []).find(s => s.slug === state.subSubcategory);
   const filterState = {
     ...state,
     category: resolvedNames.current.category.get(state.category) ?? navCategory?.name ?? state.category,
     subcategory: resolvedNames.current.subcategory.get(state.subcategory) ?? navSubcategory?.name ?? state.subcategory,
+    subSubcategory: navSubSubcategory?.name ?? state.subSubcategory,
   };
   const facets = data?.facets ?? lastFacets.current;
   const facetNames = offeredFacets(facets, filterState);
