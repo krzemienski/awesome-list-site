@@ -55,7 +55,7 @@ import OfflinePageState from "@/components/layout/OfflinePageState";
 import { queryUnavailableReason } from "@/lib/query-availability";
 import type { BookmarkCollection } from "@/types/bookmarks";
 import { useGuestBookmarkIds } from "@/lib/guestBookmarks";
-import { restoreRemovedBookmark, type RemovedBookmark } from "@/lib/bookmarkRestore";
+import type { RemovedBookmark } from "@/lib/bookmarkRestore";
 import { resourceFactsSummary } from "@shared/seo-content-templates";
 import {
   RESOURCE_FORMAT_LABELS,
@@ -231,7 +231,6 @@ export default function ResourceDetail() {
   const originalCollectionIdsRef = useRef<number[]>([]);
   const desiredCollectionIdsRef = useRef<number[]>([]);
   const saveModeRef = useRef<"add" | "edit">("add");
-  const removedBookmarkRef = useRef<RemovedBookmark | undefined>(undefined);
   const { data: collections = [], isLoading: collectionsLoading } =
     useQuery<BookmarkCollection[]>({
       queryKey: ["/api/collections?includeArchived=true"],
@@ -279,62 +278,18 @@ export default function ResourceDetail() {
     resourceId: id || '',
     isActive: isBookmarked,
     onOptimistic: (next) => {
-      // Snapshot before the flip drops the row from the cache, so Undo can
-      // put back its collections and queue state, not just the bookmark.
-      if (!next) removedBookmarkRef.current = bookmarkedEntry;
       // Guests: saved state re-derives from the guest store — don't seed the
       // disabled authed list cache with guest flips.
       if (isAuthenticated) flipCachedList('/api/bookmarks', next);
     },
     onSuccess: (_data, vars, showToast) => {
-      if (vars.remove) {
-        // Run17 BUG-013: removal is instant — offer a one-click Undo instead
-        // of a confirm dialog.
-        const removed = removedBookmarkRef.current;
-        showToast({
-          title: "Removed from bookmarks",
-          description: "Resource removed from your bookmarks",
-          action: (
-            <ToastAction
-              altText="Undo bookmark removal"
-              onClick={() => void (async () => {
-                try {
-                  const { partial } = await restoreRemovedBookmark(id || '', removed);
-                  showToast(
-                    partial
-                      ? {
-                          title: "Bookmark restored",
-                          description: "Some collections or queue settings couldn't be restored.",
-                          variant: "destructive",
-                        }
-                      : { description: "Bookmark restored", duration: 2000 },
-                  );
-                } catch {
-                  toast({
-                    title: "Error",
-                    description: "Couldn't restore the bookmark. Please try again.",
-                    variant: "destructive",
-                  });
-                }
-              })()}
-              data-testid="button-undo-bookmark-removal"
-            >
-              Undo
-            </ToastAction>
-          ),
-        });
-      } else if (saveModeRef.current === "edit") {
-        showToast({
-          title: "Notes saved",
-          description: "Your bookmark notes were updated"
-        });
-      } else {
-        showToast({
-          title: "Added to bookmarks",
-          description: "Resource saved to your bookmarks"
-        });
-      }
+      // The removed toast and its Undo come from useBookmarkToggle.
       if (!vars.remove) {
+        showToast(
+          saveModeRef.current === "edit"
+            ? { title: "Notes saved", description: "Your bookmark notes were updated" }
+            : { title: "Added to bookmarks", description: "Resource saved to your bookmarks" },
+        );
         const original = new Set(originalCollectionIdsRef.current);
         const desired = new Set(desiredCollectionIdsRef.current);
         const additions = Array.from(desired).filter((collectionId) => !original.has(collectionId));
