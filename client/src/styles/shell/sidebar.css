@@ -6,8 +6,9 @@
 
 /*
  * MobileDrawer (layout.jsx) taxonomy: no L3 marker on category rows, and
- * canonical 36px .sub-item rows (38px rhythm). Rows keep 44px targets that
- * overhang by 3px; paint moves to an inset ::before as on desktop.
+ * canonical 36px .sub-item rows (38px rhythm). With a fine pointer rows keep
+ * 44px targets that overhang by 3px; a touch pointer gets real 44px rows.
+ * Paint moves to an inset ::before as on desktop.
  */
 .av-sidebar-drawer .av-sidebar-l3-indicator {
   display: none;
@@ -25,6 +26,14 @@
   background: transparent;
   margin-block: -3px;
   position: relative;
+}
+
+@media not all and (hover: hover) and (pointer: fine) {
+  .av-sidebar-drawer .av-sidebar-all-category,
+  .av-sidebar-drawer .av-sidebar-leaf,
+  .av-sidebar-drawer .av-sidebar-l2-row {
+    margin-block: 0;
+  }
 }
 
 .av-sidebar-drawer .av-sidebar-all-category::before,
