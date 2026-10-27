@@ -196,7 +196,7 @@ export default function AdminStats({
           <>
             {categories.isPending && categories.fetchStatus === "fetching"
               ? "across — categories"
-              : categories.isError || categories.isPaused || categoryCount === undefined
+              : categories.isError || categoryCount === undefined
                 ? "category data unavailable"
                 : `across ${categoryCount} categories`}
           </>

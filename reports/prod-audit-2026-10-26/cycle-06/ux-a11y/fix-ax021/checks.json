@@ -2,7 +2,7 @@
   "cwd": "/tmp/awesome-c6-ax021-3QyZeQ",
   "base": "520d6778369bc7ce495204cfcacc7e0533f941cc",
   "integratedMain": "e06d9c4537561ea19eeabc70639860cb42f08be3",
-  "scope": "Rerun after merging origin/main into the fix branch and correcting category-loading copy; authenticated browser acceptance remains unverified",
+  "scope": "Rerun after origin/main integration, category-loading copy correction, and preserving cached category counts during a paused background refresh; authenticated browser acceptance remains unverified",
   "checks": [
     {
       "command": "./node_modules/.bin/tsc --noEmit",

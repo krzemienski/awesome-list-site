@@ -9,7 +9,7 @@
 - Only initial admin-stats state and missing-value presentation changed. No API, analytics, authentication, schema, global query retry/network policy, or `AdminOverview` changes.
 - TanStack Query's initial offline request is **paused**: no data, no error, and `isLoading=false`. The dashboard previously fell through into the zero-resource masthead and indefinitely pending overview. The hook now exposes the role-masked pause state; before rendering stats or activity, the dashboard reuses `OfflinePageState` for the initial paused/no-data case. Its existing focusable Retry reports a still-offline attempt and lets Query resume on reconnect. Missing values render a dash/no count; real numeric zero still formats as `0`.
 - The normal loading state is now a busy status region so the existing recovery-focus handoff waits for the loaded dashboard. The existing non-offline initial failure Retry also registers that handoff. These are source changes, not live-proven behavior.
-- Review follow-up: while categories are pending and actively fetching, the Resources card retains its neutral `across — categories` placeholder. Error/paused states report unavailable; a measured zero remains `across 0 categories`. This copy change is code-checked, not browser-proven.
+- Review follow-up: while categories are pending and actively fetching, the Resources card retains its neutral `across — categories` placeholder. Missing data (including an initial pause) or an error reports unavailable; a paused background refresh retains its known last-good category count, including `across 0 categories`. This copy change is code-checked, not browser-proven.
 
 ## Exact exercised checks
 
@@ -22,7 +22,7 @@
 
 The build emitted dependency annotation warnings for `zod` and an esbuild bundle-size notice; these did not change the zero exit. No tests, mocks, validation scripts/harnesses, lint, or reviewer panels were run.
 
-Typecheck and build were rerun, both direct/unpiped with exit 0, after the `e06d9c45` integration and category-loading copy change. `build-output.txt` contains this latest build. The retained browser captures below precede that integration and remain authentication-boundary evidence only.
+Typecheck and build were rerun, both direct/unpiped with exit 0, after the `e06d9c45` integration, category-loading copy change, and last-good count preservation during background pauses. `build-output.txt` contains this latest build. The retained browser captures below precede that integration and remain authentication-boundary evidence only.
 
 ## Auth prerequisite and all-width captures
 
