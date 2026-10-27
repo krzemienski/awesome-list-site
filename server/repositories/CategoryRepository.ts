@@ -539,13 +539,18 @@ export class CategoryRepository {
   /**
    * Get a sub-subcategory by slug WITHOUT a parent subcategory, mirroring
    * getSubcategoryBySlugGlobal: resolves `?subSubcategory=<slug>` filters that
-   * arrive without a resolvable parent. First match wins.
+   * arrive without a resolvable parent. The unique index is (slug,
+   * subcategory_id), so a slug can repeat under different parents; the lowest
+   * id wins so the result is deterministic. resources.sub_subcategory stores
+   * only the name (no parent id), so a single name is the filter's unit and a
+   * multi-match cannot be expressed without changing ResourceRepository.
    */
   async getSubSubcategoryBySlugGlobal(slug: string): Promise<SubSubcategory | undefined> {
     const [subSubcategory] = await db
       .select()
       .from(subSubcategories)
       .where(eq(subSubcategories.slug, slug))
+      .orderBy(subSubcategories.id)
       .limit(1);
     return subSubcategory;
   }
