@@ -197,6 +197,11 @@ export default function Profile({ user }: ProfileProps) {
   // Run17 BUG-011: inline validation message (empty save is rejected, not
   // silently fallen back to the email local-part).
   const [nameError, setNameError] = useState<string | null>(null);
+  const namesEmpty = !editFirstName.trim() && !editLastName.trim();
+  const firstNameInvisible = editFirstName !== "" && !hasVisibleChars(editFirstName);
+  const lastNameInvisible = editLastName !== "" && !hasVisibleChars(editLastName);
+  const firstNameInvalid = !!nameError && (namesEmpty || firstNameInvisible);
+  const lastNameInvalid = !!nameError && (namesEmpty || lastNameInvisible);
   // The dialog has no DialogTrigger, so Radix can't return focus on close.
   const editNameButtonRef = useRef<HTMLButtonElement>(null);
 
@@ -210,8 +215,9 @@ export default function Profile({ user }: ProfileProps) {
   };
 
   const handleSaveName = () => {
-    if (!editFirstName.trim() && !editLastName.trim()) {
+    if (namesEmpty) {
       setNameError("Enter at least a first or last name.");
+      requestAnimationFrame(() => document.getElementById("edit-first-name")?.focus());
       return;
     }
     // Run21 R4-049/077: a zero-width-only name would render as an invisible
@@ -221,11 +227,11 @@ export default function Profile({ user }: ProfileProps) {
     // whitespace-only field is non-empty input with no visible characters
     // and used to silently clear the stored name under a success toast.
     // Only a genuinely empty field means "clear this name".
-    if (
-      (editFirstName !== "" && !hasVisibleChars(editFirstName)) ||
-      (editLastName !== "" && !hasVisibleChars(editLastName))
-    ) {
+    if (firstNameInvisible || lastNameInvisible) {
       setNameError("Name must contain visible characters.");
+      requestAnimationFrame(() => {
+        document.getElementById(firstNameInvisible ? "edit-first-name" : "edit-last-name")?.focus();
+      });
       return;
     }
     setNameError(null);
@@ -1073,8 +1079,8 @@ export default function Profile({ user }: ProfileProps) {
                 value={editFirstName}
                 maxLength={50}
                 onChange={(e) => setEditFirstName(e.target.value)}
-                aria-invalid={!!nameError}
-                aria-describedby={nameError ? "edit-name-error" : undefined}
+                aria-invalid={firstNameInvalid}
+                aria-describedby={firstNameInvalid ? "edit-name-error" : undefined}
                 data-testid="input-first-name"
               />
             </div>
@@ -1085,8 +1091,8 @@ export default function Profile({ user }: ProfileProps) {
                 value={editLastName}
                 maxLength={50}
                 onChange={(e) => setEditLastName(e.target.value)}
-                aria-invalid={!!nameError}
-                aria-describedby={nameError ? "edit-name-error" : undefined}
+                aria-invalid={lastNameInvalid}
+                aria-describedby={lastNameInvalid ? "edit-name-error" : undefined}
                 data-testid="input-last-name"
               />
             </div>
