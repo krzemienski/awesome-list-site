@@ -18,7 +18,9 @@ export async function listDiscoveryResources(search: string, page: number) {
   const categories = new CategoryRepository();
   let category = state.category || undefined;
   let subcategory = state.subcategory || undefined;
+  let subSubcategory = state.subSubcategory || undefined;
   let categoryId: number | undefined;
+  let subcategoryId: number | undefined;
   if (category && /^[a-z0-9-]+$/.test(category)) {
     const match = await categories.getCategoryBySlug(category);
     if (match) { category = match.name; categoryId = match.id; }
@@ -27,11 +29,17 @@ export async function listDiscoveryResources(search: string, page: number) {
     const match = categoryId
       ? await categories.getSubcategoryBySlug(subcategory, categoryId)
       : await categories.getSubcategoryBySlugGlobal(subcategory);
-    if (match) subcategory = match.name;
+    if (match) { subcategory = match.name; subcategoryId = match.id; }
+  }
+  if (subSubcategory && /^[a-z0-9-]+$/.test(subSubcategory)) {
+    const match = subcategoryId
+      ? await categories.getSubSubcategoryBySlug(subSubcategory, subcategoryId)
+      : await categories.getSubSubcategoryBySlugGlobal(subSubcategory);
+    if (match) subSubcategory = match.name;
   }
   const options: ListResourceOptions = {
     page, limit: 24, status: "approved", category, subcategory,
-    subSubcategory: state.subSubcategory || undefined,
+    subSubcategory,
     search: params.get("search") || undefined,
     tags: state.tags,
     provider: state.provider as ListResourceOptions["provider"] || undefined,

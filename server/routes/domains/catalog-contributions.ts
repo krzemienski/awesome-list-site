@@ -323,6 +323,7 @@ export function registerCatalogContributionsRoutes(
       // of a phantom zero-count row named after the raw slug.
       const resolvedFilters: { category?: { requested: string; name: string }; subcategory?: { requested: string; name: string } } = {};
       let resolvedCategory: { id: number; name: string } | undefined;
+      let resolvedSubcategory: { id: number } | undefined;
       if (category && SLUG_SHAPE.test(category)) {
         const cat = await categoryRepo.getCategoryBySlug(category);
         if (cat) {
@@ -339,15 +340,22 @@ export function registerCatalogContributionsRoutes(
           ? await categoryRepo.getSubcategoryBySlug(subcategory, resolvedCategory.id)
           : await categoryRepo.getSubcategoryBySlugGlobal(subcategory);
         if (sub) {
+          resolvedSubcategory = sub;
           resolvedFilters.subcategory = { requested: subcategory, name: sub.name };
           subcategory = sub.name;
         }
       }
 
-      // BUG-002: sub-subcategory filter. The audit's reproduction passes the
-      // display NAME (e.g. subSubcategory=AV1), matching the existing
-      // subcategory behaviour, so pass it straight through to listResources.
-      const subSubcategory = firstQueryValue(req.query.subSubcategory);
+      // BUG-002 / PS-25: sub-subcategory accepts the display NAME or a slug,
+      // like category and subcategory. Prefer the subcategory-scoped lookup
+      // when the parent resolved; otherwise resolve the slug globally.
+      let subSubcategory = firstQueryValue(req.query.subSubcategory);
+      if (subSubcategory && SLUG_SHAPE.test(subSubcategory)) {
+        const subSub = resolvedSubcategory
+          ? await categoryRepo.getSubSubcategoryBySlug(subSubcategory, resolvedSubcategory.id)
+          : await categoryRepo.getSubSubcategoryBySlugGlobal(subSubcategory);
+        if (subSub) subSubcategory = subSub.name;
+      }
       const rawGeneralScope = firstQueryValue(req.query.generalScope);
       if (rawGeneralScope !== undefined && rawGeneralScope !== 'category' && rawGeneralScope !== 'subcategory') {
         return res.status(400).json({
