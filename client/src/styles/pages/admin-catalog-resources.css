@@ -322,12 +322,15 @@
   vertical-align: middle;
 }
 
-/* 44px hit area around the 32px box without changing its drawn size (the
-   inset is measured from the 30px padding box inside the 1px border). */
-.admin-catalog-resources__row-select::after {
-  content: "";
-  inset: -7px;
-  position: absolute;
+/* Below 1024px the Checkbox primitive centres its own 44px hit area; from
+   1024px up this widens the 32px box to 44px (the inset is measured from the
+   30px padding box inside the 1px border). */
+@media (min-width: 64rem) {
+  .admin-catalog-resources__row-select::after {
+    content: "";
+    inset: -7px;
+    position: absolute;
+  }
 }
 
 .admin-catalog-resources__id-cell > span {

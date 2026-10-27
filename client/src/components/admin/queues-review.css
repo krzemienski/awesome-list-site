@@ -168,11 +168,14 @@
   position: relative;
 }
 
-/* 44px hit area around the 16px box without changing its drawn size. */
-.queue-review-select-cell [role="checkbox"]::after {
-  content: "";
-  inset: -14px;
-  position: absolute;
+/* Below 1024px the Checkbox primitive centres its own 44px hit area; from
+   1024px up this widens the 16px box to 44px without changing its drawn size. */
+@media (min-width: 64rem) {
+  .queue-review-select-cell [role="checkbox"]::after {
+    content: "";
+    inset: -14px;
+    position: absolute;
+  }
 }
 
 /* Accent is reserved for the selection itself; an idle box is neutral ink. */
