@@ -1,8 +1,8 @@
 {
-  "capturedAt": "2026-10-27T07:43:01.555Z",
+  "capturedAt": "2026-10-27T07:48:11.376Z",
   "root": "reports/prod-audit-2026-10-26/cycle-06/ux-public-secondary/fix-ps065",
-  "count": 80,
-  "totalBytes": 3089981,
+  "count": 85,
+  "totalBytes": 3144002,
   "files": [
     {
       "file": "independent-1440-ax.txt",
@@ -403,7 +403,32 @@
       "file": "step-062-integration-proof-summary.json",
       "bytes": 8305,
       "sha256": "1dc9188bf1f16b8821d24abac149a26ad12d86e96eb1b2fc8338711c6e9cd2e6"
+    },
+    {
+      "file": "step-063-main126fbcd0-tsc.json",
+      "bytes": 345,
+      "sha256": "c8802761da0975a9f1af97f363e023245f948f5a96e094407fdaef708449fd29"
+    },
+    {
+      "file": "step-064-main126fbcd0-build.json",
+      "bytes": 26126,
+      "sha256": "02caae9934e0602a49a334b4e31a60231bf5a90eacfea906192598e1fff35738"
+    },
+    {
+      "file": "step-065-main3404b6dd-tsc.json",
+      "bytes": 346,
+      "sha256": "dc79d258332c8a8635bb31c0e7714c80596c9bb687374dc168ddb426c117b9e5"
+    },
+    {
+      "file": "step-066-main3404b6dd-build.json",
+      "bytes": 26125,
+      "sha256": "0a740d7dc4e98df2ec029eb3a03da5f695fe2f9f9b56c5cb050d65d0b595cb66"
+    },
+    {
+      "file": "step-067-main-sync-record.json",
+      "bytes": 1079,
+      "sha256": "cdeb06be096e7e56272b26197338b2b73fb1a4379c4d356f10e7e5d78763fcac"
     }
   ],
-  "note": "Inventory excludes itself. step044 onward records fresh checks/proof after additive current-main integration. independent-* remains partial, not upgraded to PASS."
+  "note": "Inventory excludes itself. step065/066 are latest checks after main3404b6dd synchronization. All previous direct browser evidence and independent UNVERIFIED scope retained."
 }
