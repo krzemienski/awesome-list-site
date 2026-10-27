@@ -49,6 +49,13 @@ if (typeof window !== "undefined") {
   });
 }
 
+// Whether the current navigation is a Back/Forward (or a reload), and whether
+// its saved scroll offset is still being re-applied. useRouteFocus reads both:
+// after a pop the scroll position is the user's, so a #fragment target only
+// gets focus if the restore left it in view.
+let navigationIsPop = pendingPop;
+let restoringScroll = false;
+
 // `location` is wouter's path; `search` its query. Positions are keyed by
 // both, so a Back/Forward that only changes the query (?page=2 → ?page=3)
 // must re-run the restore too. Forward query-only changes (filters, typing,
@@ -101,6 +108,7 @@ export function useScrollRestoration(location: string, search: string): void {
       return;
     }
 
+    restoringScroll = true;
     let cancelled = false;
     const deadline = Date.now() + 4000;
     const tryRestore = () => {
@@ -108,17 +116,22 @@ export function useScrollRestoration(location: string, search: string): void {
       const maxScroll =
         document.documentElement.scrollHeight - window.innerHeight;
       if (maxScroll >= saved) {
-        window.scrollTo(0, saved);
+        // "instant": under CSS scroll-behavior: smooth a plain scrollTo
+        // animates, and focus would be chosen against the starting offset.
+        window.scrollTo({ top: saved, behavior: "instant" });
+        restoringScroll = false;
       } else if (Date.now() < deadline) {
         requestAnimationFrame(tryRestore);
       } else {
         // Content never grew that tall (e.g. list shrank) — best effort.
-        window.scrollTo(0, Math.max(0, maxScroll));
+        window.scrollTo({ top: Math.max(0, maxScroll), behavior: "instant" });
+        restoringScroll = false;
       }
     };
     requestAnimationFrame(tryRestore);
     return () => {
       cancelled = true;
+      restoringScroll = false;
     };
   }, [location, search]);
 }
@@ -161,6 +174,7 @@ let lastPathname = typeof window !== "undefined" ? window.location.pathname : ""
 if (typeof window !== "undefined") {
   for (const type of ["popstate", "pushState", "replaceState"]) {
     window.addEventListener(type, () => {
+      if (type !== "replaceState") navigationIsPop = type === "popstate";
       if (window.location.pathname === lastPathname) return;
       lastPathname = window.location.pathname;
       const el = visibleHeading();
@@ -195,6 +209,11 @@ function focusForRoute(el: HTMLElement): boolean {
   return true;
 }
 
+function inViewport(el: HTMLElement): boolean {
+  const { top, bottom } = el.getBoundingClientRect();
+  return bottom > 0 && top < window.innerHeight;
+}
+
 function isTextEntry(element: Element | null): boolean {
   return (
     element instanceof HTMLInputElement ||
@@ -205,16 +224,20 @@ function isTextEntry(element: Element | null): boolean {
 }
 
 export function useRouteFocus(location: string): void {
-  const lastPath = useRef(location);
+  const lastPath = useRef<string | null>(null);
   useEffect(() => {
+    const firstRun = lastPath.current === null;
     if (lastPath.current === location) return;
     lastPath.current = location;
+    // A first load moves focus only to a #fragment target, never to the h1.
+    if (firstRun && !fragmentId()) return;
     // A page that mounted in this same commit may already have focused its
     // search box (a clicked link is never a text field).
     if (isTextEntry(document.activeElement)) return;
 
     const outgoing = outgoingHeading;
     const fragment = fragmentId();
+    const isPop = navigationIsPop;
     let placed: HTMLElement | null = null;
     let frame = 0;
     const startedAt = Date.now();
@@ -235,23 +258,33 @@ export function useRouteFocus(location: string): void {
       const heading = visibleHeading();
       if (loading && heading && heading === outgoing?.el && heading.textContent === outgoing.text) return null;
       const section = fragment ? document.getElementById(fragment) : null;
-      return (section && main?.contains(section) ? section : null) ?? heading ?? null;
+      // Back/Forward keeps the restored scroll: the fragment target takes
+      // focus only if it is on screen, else the heading does, without scrolling.
+      const fragmentTarget = section && main?.contains(section) && (!isPop || inViewport(section)) ? section : null;
+      if (fragmentTarget) return fragmentTarget;
+      return heading && (!isPop || inViewport(heading)) ? heading : null;
     }
     function tick() {
       const main = document.getElementById("main");
       const loading = document.querySelector('#main [aria-busy="true"]') !== null;
-      const next = routeTarget(main, loading);
+      const busy = loading || restoringScroll;
+      // A pop's saved scroll is still being re-applied: choose the target
+      // against the final scroll position, not the one on the way there.
+      const next = restoringScroll ? null : routeTarget(main, loading);
       const active = document.activeElement;
       if (next && next !== active && (!placed || active === placed || !main?.contains(active)) && focusForRoute(next)) {
+        // A fragment link or first load scrolls to its target, which may only
+        // exist once async data has rendered; scroll and focus must agree.
+        if (!isPop && fragment && next.id === fragment) next.scrollIntoView({ block: "start" });
         placed = next;
       }
       const elapsed = Date.now() - startedAt;
-      if (elapsed < ROUTE_FOCUS_BUDGET_MS || (loading && elapsed < ROUTE_FOCUS_BUSY_LIMIT_MS)) {
+      if (elapsed < ROUTE_FOCUS_BUDGET_MS || (busy && elapsed < ROUTE_FOCUS_BUSY_LIMIT_MS)) {
         frame = requestAnimationFrame(tick);
         return;
       }
       stop();
-      if (main && !main.contains(document.activeElement)) focusForRoute(main);
+      if (main && !main.contains(document.activeElement) && (!isPop || inViewport(main))) focusForRoute(main);
     }
     document.addEventListener("focusin", onFocusIn);
     window.addEventListener("keydown", stop, true);
