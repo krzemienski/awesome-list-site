@@ -78,7 +78,12 @@ export async function fetchStaticAwesomeList(): Promise<any> {
           : err instanceof Error
             ? err.message
             : String(err);
-        throw new Error(`Could not load resources from ${url} — ${why} (attempt ${attempt}/${AWESOME_LIST_MAX_ATTEMPTS}).`);
+        const message = `Could not load resources from ${url} — ${why} (attempt ${attempt}/${AWESOME_LIST_MAX_ATTEMPTS}).`;
+        // A connection-level failure (fetch rejected or timed out) stays a
+        // TypeError so ErrorPage's network-failure auto-retry recognises it;
+        // HTTP and parse errors stay plain Errors and are not retried.
+        if (isAbort || err instanceof TypeError) throw new TypeError(message, { cause: err });
+        throw new Error(message);
       }
       await new Promise((r) => setTimeout(r, 500 * attempt));
     }
